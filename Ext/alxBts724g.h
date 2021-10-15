@@ -1,0 +1,113 @@
+﻿/**
+  ******************************************************************************
+  * @file alxBts724g.h
+  * @brief Auralix C Library - ALX HighSide Switch BTS724G Module
+  * @version $LastChangedRevision: 4270 $
+  * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
+  ******************************************************************************
+  */
+
+#ifndef ALX_BTS724G_H
+#define ALX_BTS724G_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+//******************************************************************************
+// Includes
+//******************************************************************************
+#include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+#include "alxIoPin.h"
+#include "alxFiltGlitchBool.h"
+
+
+//******************************************************************************
+// Preprocessor
+//******************************************************************************
+#define ALX_BTS724G_FILE "alxBts724g"
+
+// Assert //
+#if defined(_ALX_BTS724G_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_BTS724G_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BTS724G_FILE, expr)
+#elif defined(_ALX_BTS724G_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_BTS724G_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BTS724G_FILE, expr)
+#elif defined(_ALX_BTS724G_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_BTS724G_ASSERT(expr) ALX_ASSERT_RST(ALX_BTS724G_FILE, expr)
+#else
+	#define ALX_BTS724G_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(_ALX_BTS724G_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_BTS724G_TRACE(...) ALX_TRACE_STD(ALX_BTS724G_FILE, __VA_ARGS__)
+#else
+	#define ALX_BTS724G_TRACE(...) do{} while (false)
+#endif
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Parameters - Const
+	uint32_t stableTrueTime_openLoad_ms;
+	uint32_t stableFalseTime_openLoad_ms;
+	uint32_t stableTrueTime_overTemp_ms;
+	uint32_t stableFalseTime_overTemp_ms;
+
+	// Objects - External
+	AlxIoPin* do_HS_IN;
+	AlxIoPin* di_HS_ST;
+
+	// Objects - Internal
+	AlxFiltGlitchBool filtGlitch_openLoad;
+	AlxFiltGlitchBool filtGlitch_overTemp;
+
+	// Variables
+	bool isOpenLoadDetected;
+	bool isOverTempDetected;
+	bool wasOpenLoadDetected;
+	bool wasOverTempDetected;
+	bool isOutSet;
+
+	// Info
+	bool isInit;
+	bool wasCtorCalled;
+} AlxBts724g;
+
+
+//******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxBts724g_Ctor
+(
+	AlxBts724g* me,
+	AlxIoPin* do_HS_IN,
+	AlxIoPin* di_HS_ST
+);
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
+void AlxBts724g_Init(AlxBts724g* me);
+void AlxBts724g_DeInit(AlxBts724g* me);
+void AlxBts724g_Handle(AlxBts724g* me);
+void AlxBts724g_SetOut(AlxBts724g* me);
+void AlxBts724g_ResetOut(AlxBts724g* me);
+void AlxBts724g_WriteOut(AlxBts724g* me, bool state);
+bool AlxBts724g_IsOpenLoadDetected(AlxBts724g* me);
+bool AlxBts724g_IsOverTempDetected(AlxBts724g* me);
+bool AlxBts724g_WasOpenLoadDetected(AlxBts724g* me);
+bool AlxBts724g_WasOverTempDetected(AlxBts724g* me);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // ALX_BTS724G_H
