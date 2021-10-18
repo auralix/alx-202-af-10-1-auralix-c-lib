@@ -57,7 +57,7 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxCrc_Config_Ccitt = 0,
+	AlxCrc_Config_Ccitt = 0, // Crc8
 	AlxCrc_Config_Crc16 = 1,
 	AlxCrc_Config_Crc32 = 2
 } AlxCrc_Config;
