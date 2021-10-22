@@ -96,7 +96,7 @@ typedef union
 	double _double;
 	bool _bool;
 	void* voidPtr;
-	char* charPtr; // tega nebo
+	char str[50]; // Instead of char pointer
 } AlxParamItem_Val;
 
 typedef struct
@@ -258,9 +258,8 @@ void AlxParamItem_CtorStr
 	const char* name,
 	uint32_t id,
 	uint32_t groupId,
-	char* valDefBuff,
+	const char* valDefBuff,
 	uint32_t valBuffLen,
-	uint32_t valBuffDefLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
 
@@ -300,8 +299,8 @@ Alx_Status			AlxParamItem_SetValFloat	(AlxParamItem* me, float val	);
 Alx_Status			AlxParamItem_SetValDouble	(AlxParamItem* me, double val	);
 Alx_Status			AlxParamItem_SetValBool		(AlxParamItem* me, bool val		);
 
-void				AlxParamItem_GetValArr		(AlxParamItem* me, void* val, uint32_t valLen);
-void				AlxParamItem_SetValArr		(AlxParamItem* me, void* val, uint32_t valLen);
+void				AlxParamItem_GetValArr		(AlxParamItem* me, void* val);
+void				AlxParamItem_SetValArr		(AlxParamItem* me, void* val);
 void				AlxParamItem_GetValStr		(AlxParamItem* me, char* val);
 Alx_Status			AlxParamItem_SetValStr		(AlxParamItem* me, char* val);
 
