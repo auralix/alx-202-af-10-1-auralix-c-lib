@@ -37,7 +37,6 @@ void AlxParamItem_CtorUint8
 	me->valMin.uint8 = valMin;
 	me->valMax.uint8 = valMax;
 	me->valLen = sizeof(uint8_t);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
@@ -67,7 +66,6 @@ void AlxParamItem_CtorUint16
 	me->valMin.uint16 = valMin;
 	me->valMax.uint16 = valMax;
 	me->valLen = sizeof(uint16_t);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
@@ -97,7 +95,6 @@ void AlxParamItem_CtorUint32
 	me->valMin.uint32 = valMin;
 	me->valMax.uint32 = valMax;
 	me->valLen = sizeof(uint32_t);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
@@ -127,7 +124,6 @@ void AlxParamItem_CtorUint64
 	me->valMin.uint64 = valMin;
 	me->valMax.uint64 = valMax;
 	me->valLen = sizeof(uint64_t);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
@@ -157,7 +153,6 @@ void AlxParamItem_CtorInt8
 	me->valMin.int8 = valMin;
 	me->valMax.int8 = valMax;
 	me->valLen = sizeof(int8_t);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
@@ -187,7 +182,6 @@ void AlxParamItem_CtorInt16
 	me->valMin.int16 = valMin;
 	me->valMax.int16 = valMax;
 	me->valLen = sizeof(int16_t);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
@@ -217,7 +211,6 @@ void AlxParamItem_CtorInt32
 	me->valMin.int32 = valMin;
 	me->valMax.int32 = valMax;
 	me->valLen = sizeof(int32_t);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
@@ -247,7 +240,6 @@ void AlxParamItem_CtorInt64
 	me->valMin.int64 = valMin;
 	me->valMax.int64 = valMax;
 	me->valLen = sizeof(int64_t);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
@@ -277,7 +269,6 @@ void AlxParamItem_CtorFloat
 	me->valMin._float = valMin;
 	me->valMax._float = valMax;
 	me->valLen = sizeof(float);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
@@ -307,7 +298,6 @@ void AlxParamItem_CtorDouble
 	me->valMin._double = valMin;
 	me->valMax._double = valMax;
 	me->valLen = sizeof(double);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
@@ -334,7 +324,6 @@ void AlxParamItem_CtorBool
 	me->valMin._bool = ALX_NULL;
 	me->valMax._bool = ALX_NULL;
 	me->valLen = sizeof(bool);
-	me->valDefLen = ALX_NULL;
 	me->valOutOfRangeHandle = ALX_NULL;
 
 	// Variables
@@ -379,26 +368,26 @@ void AlxParamItem_CtorStr
 	const char* name,
 	uint32_t id,
 	uint32_t groupId,
-	char* valDefBuff,
+	const char* valDefBuff,
 	uint32_t valBuffLen,
-	uint32_t valBuffDefLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 )
 {
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(strlen(valDefBuff)<= valBuffLen);
+
 	// Parameters
 	me->type = AlxParamItem_Type_Str;
 	me->name = name;
 	me->id = id;
 	me->groupId = groupId;
-	me->valDef.charPtr = valDefBuff;
-	me->valMin.charPtr = ALX_NULL_PTR;
-	me->valMax.charPtr = ALX_NULL_PTR;
+	strcpy(me->valDef.str, valDefBuff);
 	me->valLen = valBuffLen;
-	me->valDefLen = valBuffDefLen;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
+
 	// Variables
-	me->val.charPtr = valDefBuff;
+	strcpy(me->val.str, valDefBuff);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -474,7 +463,7 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	else if (me->type == AlxParamItem_Type_Double)	{ me->val._double = me->valDef._double; }
 	else if (me->type == AlxParamItem_Type_Bool)	{ me->val._bool = me->valDef._bool; }
 	else if (me->type == AlxParamItem_Type_Uint16)	{ me->val.voidPtr = me->valDef.voidPtr; }
-	else if (me->type == AlxParamItem_Type_Uint16)	{ me->val.charPtr = me->valDef.charPtr; }
+	else if (me->type == AlxParamItem_Type_Uint16)	{ strcpy(me->val.str, me->valDef.str); }
 	else											{ ALX_PARAM_ITEM_ASSERT(false); } // We should never get here
 }
 uint8_t AlxParamItem_GetValUint8(AlxParamItem* me)
@@ -932,7 +921,7 @@ Alx_Status AlxParamItem_SetValInt32(AlxParamItem* me, int32_t val)
 		}
 		case AlxParamItem_ValOutOfRangeHandle_Bound:
 		{
-			status = AlxBound_Int8(&_val, me->valMin.int32, me->valMax.int32);
+			status = AlxBound_Int32(&_val, me->valMin.int32, me->valMax.int32);
 			me->val.int32 = _val;
 			break;
 		}
@@ -1119,25 +1108,23 @@ Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val)
 	// #3 Return
 	return Alx_Ok;
 }
-void AlxParamItem_GetValArr(AlxParamItem* me, void* val, uint32_t valLen)
+void AlxParamItem_GetValArr(AlxParamItem* me, void* val)
 {
 	// #1 Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Arr);
-	ALX_PARAM_ITEM_ASSERT(valLen == me->valLen);
 
-	// #2 
-	memcpy(val, me->val.voidPtr, valLen);
+	// #2
+	memcpy(val, me->val.voidPtr, me->valLen);
 }
-void AlxParamItem_SetValArr(AlxParamItem* me, void* val, uint32_t valLen)
+void AlxParamItem_SetValArr(AlxParamItem* me, void* val)
 {
 	// #1 Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Arr);
-	ALX_PARAM_ITEM_ASSERT(valLen == me->valLen);
 
-	// #2 
-	memcpy(me->val.voidPtr, val, valLen);
+	// #2
+	memcpy(me->val.voidPtr, val, me->valLen);
 }
 void AlxParamItem_GetValStr(AlxParamItem* me, char* val)
 {
@@ -1145,10 +1132,10 @@ void AlxParamItem_GetValStr(AlxParamItem* me, char* val)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
 
-	// #2 
-	strcpy(val, me->val.charPtr);
+	// #2
+	strcpy(val, me->val.str);
 }
-Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val) // Fuka dolžina buffera
+Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 {
 	// #1 Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
@@ -1165,7 +1152,7 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val) // Fuka dolžina b
 			status = AlxRange_CheckStr(val, me->valLen);
 			if (status == Alx_Ok)
 			{
-				strcpy(me->val.charPtr, val);
+				strcpy(me->val.str, val);
 			}
 			else
 			{
@@ -1179,13 +1166,13 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val) // Fuka dolžina b
 			status = AlxRange_CheckStr(val, me->valLen);
 			if (status == Alx_Ok)
 			{
-				strcpy(me->val.charPtr, val);
+				strcpy(me->val.str, val);
 			}
 			break;
 		}
 		case AlxParamItem_ValOutOfRangeHandle_Bound:
 		{
-			status = AlxBound_Str(me->val.charPtr, val, me->valLen);
+			status = AlxBound_Str(me->val.str, val, me->valLen);
 			break;
 		}
 		default:
