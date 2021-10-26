@@ -96,7 +96,7 @@ typedef union
 	double _double;
 	bool _bool;
 	void* voidPtr;
-	char str[50]; // Instead of char pointer
+	char* charPtr;
 } AlxParamItem_Val;
 
 typedef struct
@@ -248,6 +248,8 @@ void AlxParamItem_CtorArr
 	const char* name,
 	uint32_t id,
 	uint32_t groupId,
+	void* valDef,
+	void* valBuff,
 	void* valDefBuff,
 	uint32_t valBuffLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
@@ -258,8 +260,10 @@ void AlxParamItem_CtorStr
 	const char* name,
 	uint32_t id,
 	uint32_t groupId,
-	const char* valDefBuff,
-	uint32_t valBuffLen,
+	const char* valDef,
+	char* valBuff,
+	char* valDefBuff,
+	uint32_t strMaxLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
 

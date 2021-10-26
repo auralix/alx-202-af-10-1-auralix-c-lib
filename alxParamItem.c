@@ -338,6 +338,8 @@ void AlxParamItem_CtorArr
 	const char* name,
 	uint32_t id,
 	uint32_t groupId,
+	void* valDef,
+	void* valBuff,
 	void* valDefBuff,
 	uint32_t valBuffLen,
 	//uint32_t valBuffDefLen,
@@ -349,6 +351,7 @@ void AlxParamItem_CtorArr
 	me->name = name;
 	me->id = id;
 	me->groupId = groupId;
+	me->val.voidPtr = valBuff;
 	me->valDef.voidPtr = valDefBuff;
 	me->valMin.voidPtr = ALX_NULL_PTR;
 	me->valMax.voidPtr = ALX_NULL_PTR;
@@ -357,7 +360,10 @@ void AlxParamItem_CtorArr
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
-	me->val.voidPtr = valDefBuff;
+	memcpy(me->valDef.voidPtr, valDef, me->valLen);			// Copy default value to default value buffer
+	memcpy(me->val.voidPtr, me->valDef.voidPtr, me->valLen);// Copy default value buffer to main buffer
+
+	//me->val.voidPtr = valDefBuff;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -368,26 +374,29 @@ void AlxParamItem_CtorStr
 	const char* name,
 	uint32_t id,
 	uint32_t groupId,
-	const char* valDefBuff,
-	uint32_t valBuffLen,
+	const char* valDef,
+	char* valBuff,
+	char* valDefBuff,
+	uint32_t strMaxLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 )
 {
 	// Assert
-	ALX_PARAM_ITEM_ASSERT(strlen(valDefBuff)<= valBuffLen);
+	ALX_PARAM_ITEM_ASSERT(strlen(valDefBuff) <= strMaxLen);
 
 	// Parameters
 	me->type = AlxParamItem_Type_Str;
 	me->name = name;
 	me->id = id;
 	me->groupId = groupId;
-	strcpy(me->valDef.str, valDefBuff);
-	me->valLen = valBuffLen;
+	me->val.charPtr = valBuff;			// Set char pointer value to address of the buffer
+	me->valDef.charPtr = valDefBuff;	// Set char pointer value to address of the buffer
+	me->valLen = strMaxLen;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
-
 	// Variables
-	strcpy(me->val.str, valDefBuff);
+	strcpy(valDefBuff, valDef); // Save default string to default buffer
+	strcpy(valBuff, valDef);	// Save default string to buffer
 
 	// Info
 	me->wasCtorCalled = true;
@@ -463,7 +472,7 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	else if (me->type == AlxParamItem_Type_Double)	{ me->val._double = me->valDef._double; }
 	else if (me->type == AlxParamItem_Type_Bool)	{ me->val._bool = me->valDef._bool; }
 	else if (me->type == AlxParamItem_Type_Uint16)	{ me->val.voidPtr = me->valDef.voidPtr; }
-	else if (me->type == AlxParamItem_Type_Uint16)	{ strcpy(me->val.str, me->valDef.str); }
+	else if (me->type == AlxParamItem_Type_Uint16)	{ strcpy(me->val.charPtr, me->valDef.charPtr); }
 	else											{ ALX_PARAM_ITEM_ASSERT(false); } // We should never get here
 }
 uint8_t AlxParamItem_GetValUint8(AlxParamItem* me)
@@ -1133,7 +1142,7 @@ void AlxParamItem_GetValStr(AlxParamItem* me, char* val)
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
 
 	// #2
-	strcpy(val, me->val.str);
+	strcpy(val, me->val.charPtr);
 }
 Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 {
@@ -1152,7 +1161,7 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 			status = AlxRange_CheckStr(val, me->valLen);
 			if (status == Alx_Ok)
 			{
-				strcpy(me->val.str, val);
+				strcpy(me->val.charPtr, val);
 			}
 			else
 			{
@@ -1166,13 +1175,13 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 			status = AlxRange_CheckStr(val, me->valLen);
 			if (status == Alx_Ok)
 			{
-				strcpy(me->val.str, val);
+				strcpy(me->val.charPtr, val);
 			}
 			break;
 		}
 		case AlxParamItem_ValOutOfRangeHandle_Bound:
 		{
-			status = AlxBound_Str(me->val.str, val, me->valLen);
+			status = AlxBound_Str(me->val.charPtr, val, me->valLen);
 			break;
 		}
 		default:
