@@ -176,7 +176,7 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 }
 bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t* validatedCrc)
 {
-	const uint32_t crcLen = 4;
+	const uint32_t crcLen = 4;	// Manjka switch case za vsako dolžino?
 
 	union
 	{
