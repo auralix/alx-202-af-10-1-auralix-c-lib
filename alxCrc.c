@@ -21,10 +21,10 @@ void AlxCrc_Ctor
 	AlxCrc_Config config)
 {
 	// Ctor
-	
+
 	// Parameters
 	me->config = config;
-	
+
 	// Info
 	me->wasCtorCalled = true;
 }
@@ -176,14 +176,28 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 }
 bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t* validatedCrc)
 {
-	const uint32_t crcLen = 4;
-
+	uint32_t crcLen = 0;
+	switch (me->config)
+	{
+	case AlxCrc_Config_Ccitt:
+		{
+			crcLen = 1;
+		}
+	case AlxCrc_Config_Crc16:
+		{
+			crcLen = 2;
+		}
+	case AlxCrc_Config_Crc32:
+		{
+			crcLen = 4;
+		}
+	}
 	union
 	{
 		uint32_t crcToCheck;
 		uint8_t raw[4];
 	} crc;
-	
+
 	memcpy(crc.raw, &dataWithCrc[lenWithCrc - crcLen], crcLen);
 	uint32_t crcCalc = AlxCrc_Calc(me, dataWithCrc, lenWithCrc - crcLen);
 
@@ -211,7 +225,7 @@ uint32_t AlxCrc_GetLen(AlxCrc* me)
 			return 4;
 		}
 	}
-	
+
 }
 
 
