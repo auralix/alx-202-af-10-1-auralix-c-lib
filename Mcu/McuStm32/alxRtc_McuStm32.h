@@ -53,11 +53,12 @@ typedef struct
 	RCC_OscInitTypeDef iosc;
 	RCC_PeriphCLKInitTypeDef iclk;
 	RTC_HandleTypeDef hrtc;
+	uint32_t PRER_Expected;
 
 	AlxRtc_DateTime lastSetDateTime;
 	uint32_t lastSetSubSec;
 	uint64_t lastSetUnixTime_ns;
-	
+
 	bool isDateTimeConfigured;
 
 	// Info

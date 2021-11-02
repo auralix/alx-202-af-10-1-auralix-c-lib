@@ -110,6 +110,7 @@ void AlxRtc_Ctor
 		me->hrtc.Init.AsynchPrediv = 1 - 1;
 		me->hrtc.Init.SynchPrediv = 32768 - 1;
 		me->rtcTick_ns = 30518;	// 1000000000 / 32768 = 30517.57813 = ~30518ns
+		me->PRER_Expected = 0x00007FFF;
 	}
 	else
 	{
@@ -155,7 +156,11 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 	me->isInit = true;
 
 	// #3 Init RTC
-	if (AlxRtc_IsDateTimeConfigured(me) == false)
+	if
+	(
+		(AlxRtc_IsDateTimeConfigured(me) == false) ||
+	 	(me->hrtc.Instance->PRER != me->PRER_Expected)	// Check if register PRER value is NOK
+	)
 	{
 		if
 		(
