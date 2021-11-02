@@ -1,4 +1,4 @@
-/**
+﻿/**
   ******************************************************************************
   * @file alxParamGroup.c
   * @brief Auralix C Library - ALX Parameter Group Module
@@ -128,14 +128,14 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 			{
 				// Prepare
 				AlxParamGroup_ParamItemsValDefToValToStoreBuff(me);
-				
+
 				// Write
 				Alx_Status statusAlxMemSafeWrite = AlxMemSafe_Write(me->memSafe, me->valToStoreBuff, me->len);
 				if (statusAlxMemSafeWrite != Alx_Ok)
 				{
 					// Trace
 					ALX_PARAM_GROUP_TRACE("%s - BothNok_ResetToDef_WriteErr", me->name);
-					
+
 					// Continue
 					continue;
 				}
@@ -143,10 +143,10 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				{
 					// Update
 					AlxParamGroup_ValToStoreBuffToValStoredBuff(me);
-					
+
 					// Trace
 					ALX_PARAM_GROUP_TRACE("%s - BothNok_ResToDef");
-					
+
 					// Break
 					break;
 				}
@@ -252,8 +252,8 @@ void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me)
 		valBuffIndex = valBuffIndex + len;
 
 		// #2.5 Check
-		uint32_t lenNext = AlxParamItem_GetValLen(*(me->paramItemArr + i + 1));
-		ALX_PARAM_GROUP_ASSERT((valBuffIndex + lenNext) < me->len);
+//		uint32_t lenNext = AlxParamItem_GetValLen(*(me->paramItemArr + i + 1));
+//		ALX_PARAM_GROUP_ASSERT((valBuffIndex + lenNext) < me->len);
 	}
 }
 
@@ -270,7 +270,7 @@ static void AlxParamGroup_ParamItemsValDefToValToStoreBuff(AlxParamGroup* me)
 	for (uint32_t i = 0; i < me->numOfParamItems; i++)
 	{
 		// #2.1 Get value pointer
-		void* valPtr = AlxParamItem_GetValPtr(*(me->paramItemArr + i));
+		void* valPtr = AlxParamItem_GetValPtr(*(me->paramItemArr + i)); // Mislim da ni vredu vrednsot pointerja..
 
 		// #2.2 Get value length
 		uint32_t len = AlxParamItem_GetValLen(*(me->paramItemArr + i));
@@ -282,8 +282,8 @@ static void AlxParamGroup_ParamItemsValDefToValToStoreBuff(AlxParamGroup* me)
 		valToStoreBuffIndex = valToStoreBuffIndex + len;
 
 		// #2.5 Check
-		uint32_t lenNext = AlxParamItem_GetValLen(*(me->paramItemArr + i + 1));
-		ALX_PARAM_GROUP_ASSERT((valToStoreBuffIndex + lenNext) < me->len);
+		//uint32_t lenNext = AlxParamItem_GetValLen(*(me->paramItemArr + i + 1)); // Ta vrstica da error ker v zadnjem ciklu hočemo pogledat neobstoječ člen arraya.. // Al se to vse odstrani al se pa da v if stavek da se preskoci v zadnjem ciklu
+		//ALX_PARAM_GROUP_ASSERT((valToStoreBuffIndex + lenNext) <= me->len); // Chnaged from < // V zadnjem ciklu je tole narobe. Nekak drgač je treba delat to preverjanje ali pa ga sploh ne delat...
 	}
 }
 static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me)
@@ -307,7 +307,7 @@ static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me)
 		valStoredBuffIndex = valStoredBuffIndex + len;
 
 		// #2.5 Check
-		uint32_t lenNext = AlxParamItem_GetValLen(*(me->paramItemArr + i + 1));
-		ALX_PARAM_GROUP_ASSERT((valStoredBuffIndex + lenNext) < me->len);
+//		uint32_t lenNext = AlxParamItem_GetValLen(*(me->paramItemArr + i + 1)); // Isti problem ko zgori
+//		ALX_PARAM_GROUP_ASSERT((valStoredBuffIndex + lenNext) < me->len);
 	}
 }
