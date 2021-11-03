@@ -76,6 +76,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 		// #3.1 Read memory
 		Alx_Status statusAlxMemSafeRead = Alx_Err;
 		statusAlxMemSafeRead = AlxMemSafe_Read(me->memSafe, me->valStoredBuff, me->len);
+		memcpy(me->valBuff, me->valStoredBuff, me->len);
 
 		// #3.2 Handle result
 		switch(statusAlxMemSafeRead)
@@ -84,7 +85,6 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 			{
 				// Update
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
-
 				// Trace
 				ALX_PARAM_GROUP_TRACE("%s - CrcOkSame_UsedCopyA", me->name);
 
@@ -142,7 +142,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				else
 				{
 					// Update
-					AlxParamGroup_ValToStoreBuffToValStoredBuff(me);
+					//AlxParamGroup_ValToStoreBuffToValStoredBuff(me); // Assert since the group is not inited here..
 
 					// Trace
 					ALX_PARAM_GROUP_TRACE("%s - BothNok_ResToDef");
@@ -301,7 +301,7 @@ static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me)
 		uint32_t len = AlxParamItem_GetValLen(*(me->paramItemArr + i));
 
 		// #2.3 Copy
-		memcpy(valPtr, &me->valToStoreBuff[valStoredBuffIndex], len);
+		memcpy(valPtr, &me->valStoredBuff[valStoredBuffIndex], len);
 
 		// #2.4 Increment
 		valStoredBuffIndex = valStoredBuffIndex + len;

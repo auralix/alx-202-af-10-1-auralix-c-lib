@@ -1059,17 +1059,17 @@ Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val)
 
 	// #2 Prepare variables
 	Alx_Status status = Alx_Err;
-	int8_t _val = val;
+	double _val = val;
 
 	// #3 Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
 		{
-			status = AlxRange_CheckInt8(_val, me->valMin.int8, me->valMax.int8);
+			status = AlxRange_CheckDouble(_val, me->valMin._double, me->valMax._double);
 			if (status == Alx_Ok)
 			{
-				me->val.int8 = _val;
+				me->val._double = _val;
 			}
 			else
 			{
@@ -1080,17 +1080,17 @@ Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val)
 		}
 		case AlxParamItem_ValOutOfRangeHandle_Ignore:
 		{
-			status = AlxRange_CheckInt8(_val, me->valMin.int8, me->valMax.int8);
+			status = AlxRange_CheckDouble(_val, me->valMin._double, me->valMax._double);
 			if (status == Alx_Ok)
 			{
-				me->val.int8 = _val;
+				me->val._double = _val;
 			}
 			break;
 		}
 		case AlxParamItem_ValOutOfRangeHandle_Bound:
 		{
-			status = AlxBound_Int8(&_val, me->valMin.int8, me->valMax.int8);
-			me->val.int8 = _val;
+			status = AlxBound_Double(&_val, me->valMin._double, me->valMax._double);
+			me->val._double = _val;
 			break;
 		}
 		default:
