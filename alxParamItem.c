@@ -444,7 +444,13 @@ void* AlxParamItem_GetValPtr(AlxParamItem* me)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
 	// #2 Return
-	return &me->val;
+	if((me->type == AlxParamItem_Type_Str) || (me->type == AlxParamItem_Type_Arr))
+	{
+		void* ptr;
+		memcpy(&ptr, &me->val, 4);
+		return ptr;
+	}
+	else return &me->val;
 }
 uint32_t AlxParamItem_GetValLen(AlxParamItem* me)
 {
