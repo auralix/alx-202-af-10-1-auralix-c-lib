@@ -17,7 +17,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80x_UNDEFINED)
 
 
 //******************************************************************************
@@ -91,7 +91,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	// #1 Init GPIO
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 		AlxIoPin_Init((*(me->ioPinArr + i)));
-	
+
 	// #2 Init CTIMER
 	CTIMER_Init(me->tim, &me->config); // "Periph_Reset" and "EnableClk" happens here
 
@@ -104,7 +104,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 
 	// #5 Start CTIMER
 	CTIMER_StartTimer(me->tim);
-	
+
 	// #6 Return OK
 	return Alx_Ok;
 }
@@ -112,7 +112,7 @@ Alx_Status AlxPwm_DeInit(AlxPwm* me)
 {
 	ALX_PWM_ASSERT(me->isInit == true);
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
-	
+
 	// #1 DeInit CTIMER
 	CTIMER_Deinit(me->tim); // "Stop CTIMER" and "DisableClk" happens here
 
@@ -132,7 +132,7 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
 	(void)ch;
 	ALX_PWM_ASSERT((0.f <= duty_pct) && (duty_pct <= 100.f));
-	
+
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
 		if (me->chArr[i] == ch)
@@ -141,7 +141,7 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 			return Alx_Ok;
 		}
 	}
-	
+
 	ALX_PWM_ASSERT(false); // We shouldn't get here
 	return Alx_Err;
 }
