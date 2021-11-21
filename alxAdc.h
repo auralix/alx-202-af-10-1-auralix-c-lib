@@ -32,11 +32,11 @@ extern "C" {
 #elif defined(ALX_LPC845)
 #include "alxAdc_McuLpc84.h"
 
-#elif defined(ALX_LPC80x)
+#elif defined(ALX_LPC80x_UNDEFINED)	// TV: AlxAdcMcu module doen't exists anymore, need to fix this
 #include "alxAdc_McuLpc80x.h"
 
 #else
-typedef struct {} AlxAdc_Mcu;
+typedef struct {} AlxAdc;
 #endif
 
 

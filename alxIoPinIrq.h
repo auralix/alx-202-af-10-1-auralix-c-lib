@@ -26,7 +26,7 @@ extern "C" {
 #include "alxIoPinIrq_McuStm32.h"
 
 #elif defined(ALX_LPC80x)
-#include "alxIoPinIrq_McuLpc80x.h"
+//#include "alxIoPinIrq_McuLpc80x.h"	// TV: Multiple definitions, need to fix...
 
 #else
 typedef struct { bool dummy; } AlxIoPinIrq;
