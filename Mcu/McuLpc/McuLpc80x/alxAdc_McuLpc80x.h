@@ -63,15 +63,15 @@ typedef struct
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-} AlxAdc_Mcu;
+} AlxAdc;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxAdcMcu_Ctor
+void AlxAdc_Ctor
 (
-	AlxAdc_Mcu* me,
+	AlxAdc* me,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,
 	uint8_t numOfIoPinsAndCh,

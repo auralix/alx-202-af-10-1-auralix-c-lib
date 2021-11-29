@@ -23,16 +23,16 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint8_t AlxAdcMcu_GetCh(AlxAdc_Mcu* me, Alx_Ch ch);
-static bool AlxAdcMcu_Ctor_IsSysClkOk(AlxAdc_Mcu* me);
+static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch);
+static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me);
 
 
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
-void AlxAdcMcu_Ctor
+void AlxAdc_Ctor
 (
-	AlxAdc_Mcu* me,
+	AlxAdc* me,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,
 	uint8_t numOfIoPinsAndCh,
@@ -44,7 +44,7 @@ void AlxAdcMcu_Ctor
 	(void)me;
 	(void)ioPinArr;
 	(void)chArr;
-	ALX_ADC_MCU_ASSERT(numOfIoPinsAndCh <= ALX_ADC_BUFF_LEN);
+	ALX_ADC_ASSERT(numOfIoPinsAndCh <= ALX_ADC_BUFF_LEN);
 	(void)clk;
 	(void)vRef_V;
 
@@ -59,10 +59,10 @@ void AlxAdcMcu_Ctor
 
 	// Check channel sequence
 	for (uint32_t i = 0; i < numOfIoPinsAndCh - 1; i++)
-		ALX_ADC_MCU_ASSERT(AlxAdcMcu_GetCh(me, chArr[i]) < AlxAdcMcu_GetCh(me, chArr[i + 1])); // Channel sequence must be from low to high number
+		ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) < AlxAdc_GetCh(me, chArr[i + 1])); // Channel sequence must be from low to high number
 
 	// Check clock
-	ALX_ADC_MCU_ASSERT(AlxAdcMcu_Ctor_IsSysClkOk(me));
+	ALX_ADC_ASSERT(AlxAdc_Ctor_IsSysClkOk(me));
 
 	// Variables
 	//me->adcConfig.clockMode = kADC_ClockSynchronousMode;	// Doesn't work on Lpc804
@@ -87,7 +87,7 @@ void AlxAdcMcu_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
-Alx_Status AlxAdcMcu_Init(AlxAdc_Mcu* me)
+Alx_Status AlxAdc_Init(AlxAdc* me)
 {
 	ALX_ADC_ASSERT(me->isInit == false);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
@@ -114,7 +114,7 @@ Alx_Status AlxAdcMcu_Init(AlxAdc_Mcu* me)
 
 	// #6.1 Configure Ch for Coversion Cequence A
 	for(uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++)							// Loop through channels to add appropriate channelMask
-		me->adcConvSeqConfig.channelMask |= (1U << AlxAdcMcu_GetCh(me, me->chArr[i]));
+		me->adcConvSeqConfig.channelMask |= (1U << AlxAdc_GetCh(me, me->chArr[i]));
 
 	// #6.2 Configure and Enable Coversion Sequence A
 	ADC_SetConvSeqAConfig(ALX_ADC_LPC_8XX, &me->adcConvSeqConfig);
@@ -130,7 +130,7 @@ Alx_Status AlxAdcMcu_Init(AlxAdc_Mcu* me)
 	// #9 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
+Alx_Status AlxAdc_DeInit(AlxAdc* me)
 {
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
@@ -154,24 +154,30 @@ Alx_Status AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
 	
 	return Alx_Ok;
 }
-float AlxAdcMcu_GetVoltage_V(AlxAdc_Mcu* me, Alx_Ch* ch)
+float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 {
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Return Voltage
 	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC_8XX);
-	while (!ADC_GetChannelConversionResult(ALX_ADC_LPC_8XX, AlxAdcMcu_GetCh(me, *ch), &me->adcResult)) {}
-	return ((me->adcResult.result * me->vRef_V) / 4095);
+	while (!ADC_GetChannelConversionResult(ALX_ADC_LPC_8XX, AlxAdc_GetCh(me, ch), &me->adcResult)) {}
+	return 3;//(((float)me->adcResult.result * me->vRef_V) / 4095);
 	
-	ALX_ADC_MCU_ASSERT(false); // We shouldn't get here
+	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return 0;
 }
-float AlxAdcMcu_TempSens_GetTemp_degC(AlxAdc_Mcu* me)
+uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
+{
+	// TODO
+	
+	return 0;
+}
+float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
 	// MF: Lpc80x doesn't support internal TempSens_GetTemp
 
-	ALX_ADC_MCU_ASSERT(false); // We shouldn't get here
+	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return 0;
 }
 
@@ -179,7 +185,7 @@ float AlxAdcMcu_TempSens_GetTemp_degC(AlxAdc_Mcu* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint8_t AlxAdcMcu_GetCh(AlxAdc_Mcu* me, Alx_Ch ch)
+static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 {
 	if (ch == Alx_Ch_0)		return  0;
 	if (ch == Alx_Ch_1)		return  1;
@@ -197,7 +203,7 @@ static uint8_t AlxAdcMcu_GetCh(AlxAdc_Mcu* me, Alx_Ch ch)
 	ALX_ADC_ASSERT(false);	// We shouldn't get here
 	return 0;
 }
-static bool AlxAdcMcu_Ctor_IsSysClkOk(AlxAdc_Mcu* me)
+static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me)
 {
 	#if defined(ALX_LPC80x)
 	if (15000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor))
@@ -205,7 +211,7 @@ static bool AlxAdcMcu_Ctor_IsSysClkOk(AlxAdc_Mcu* me)
 	else
 		return false;
 
-	ALX_ADC_MCU_ASSERT(false); // We shouldn't get here
+	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return 0;
 	#endif
 
