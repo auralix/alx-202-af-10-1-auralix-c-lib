@@ -39,7 +39,7 @@ void AlxTest_Ctor(AlxTest* me)
 	me->adcTest_IoPinArr[0] = &me->adcTest_IoPin;
 	me->adcTest_ChArr[0] = ALX_TEST_ADC_CH;
 	
-	AlxIoPin_Ctor(&me->adcTest_IoPin, ALX_TEST_ADC_PORT, ALX_TEST_ADC_PIN, ALX_TEST_ADC_IO_PIN_FUNC_SWM, IOCON_MODE_INACT, false, false, false, ALX_NULL_PTR);
+	AlxIoPin_Ctor(&me->adcTest_IoPin, ALX_TEST_ADC_PORT, ALX_TEST_ADC_PIN, ALX_TEST_ADC_IO_PIN_FUNC_SWM, IOCON_MODE_INACT, false, false, false);
 	AlxAdc_Ctor(&me->adcTest, me->adcTest_IoPinArr, me->adcTest_ChArr, ALX_ARR_LEN(me->adcTest_IoPinArr), &alxClk, ALX_TEST_ADC_VREF);
 	#endif
 
