@@ -191,9 +191,9 @@ static bool AlxClk_AreClkNok(AlxClk* me)
 	//me->extClk = CLOCK_GetExtClkFreq(); // MF: Don't know how we will use it
 	//me->frg0 = CLOCK_GetFRG0ClkFreq(); // MF: Don't know how we will use it
 
-	if		(me->coreSysClk != me->coreSysClk_Ctor)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
-	else if (me->mainClk != me->mainClk_Ctor)			{ ALX_CLK_TRACE("ErrMainClock");	return true; }
-	else if (me->fro != me->fro)						{ ALX_CLK_TRACE("ErrFro");			return true; }
+	if		(me->coreSysClk != me->coreSysClk_Ctor)			{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
+	else if (me->mainClk != me->mainClk_Ctor)				{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+	else if (me->fro != me->fro)							{ ALX_CLK_TRACE("ErrFro");			return true; }
 
 
 	if (me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default)
@@ -208,8 +208,8 @@ static bool AlxClk_AreClkNok(AlxClk* me)
 	}
 	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz)
 	{
-		if		(CLOCK_GetMainClkFreq()    != 9000000U)	{ ALX_CLK_TRACE("ErrMainClock");		return true; }
-		else if (CLOCK_GetCoreSysClkFreq() != 9000000U)	{ ALX_CLK_TRACE("ErrCoreSysClock");		return true; }
+		if		(CLOCK_GetMainClkFreq()    != 9000000U)		{ ALX_CLK_TRACE("ErrMainClock");		return true; }
+		else if (CLOCK_GetCoreSysClkFreq() != 9000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");		return true; }
 	}
 	// MF: TODO treba še ostale enume naštancat
 

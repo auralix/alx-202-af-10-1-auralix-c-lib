@@ -248,15 +248,6 @@ typedef enum
 
 typedef struct
 {
-	// Variables
-	pint_pin_int_t irqPin;
-	pint_pin_enable_t irqType;
-	Alx_IrqPriority irqPriority;
-} AlxIoPinIrq;
-
-
-typedef struct
-{
 	// Parameters
 	uint8_t port;
 	uint8_t pin;
@@ -265,7 +256,6 @@ typedef struct
 	bool isOpenDrain;
 	bool dir;
 	bool val;
-	AlxIoPinIrq* irqPtr;
 
 	// Variables
 	bool swmFunc_isMovable;
@@ -288,8 +278,7 @@ void AlxIoPin_Ctor
 	uint32_t mode,
 	bool isOpenDrain,
 	bool dir,
-	bool val,
-	AlxIoPinIrq* irqPtr
+	bool val
 );
 
 

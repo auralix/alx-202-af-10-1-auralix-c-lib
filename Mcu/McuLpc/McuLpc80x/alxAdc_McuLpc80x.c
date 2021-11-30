@@ -162,15 +162,22 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	// #1 Return Voltage
 	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC_8XX);
 	while (!ADC_GetChannelConversionResult(ALX_ADC_LPC_8XX, AlxAdc_GetCh(me, ch), &me->adcResult)) {}
-	return 3;//(((float)me->adcResult.result * me->vRef_V) / 4095);
+	return ((me->adcResult.result * me->vRef_V) / 4095);
 	
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return 0;
 }
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 {
-	// TODO
+	ALX_ADC_ASSERT(me->isInit == true);
+	ALX_ADC_ASSERT(me->wasCtorCalled == true);
+
+	// #1 Return Voltage
+	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC_8XX);
+	while (!ADC_GetChannelConversionResult(ALX_ADC_LPC_8XX, AlxAdc_GetCh(me, ch), &me->adcResult)) {}
+	return ((me->adcResult.result * me->vRef_V) / 4095) * 1000;
 	
+	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return 0;
 }
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
