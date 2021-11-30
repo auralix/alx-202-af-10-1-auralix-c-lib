@@ -469,7 +469,6 @@ uint8_t AlxId_GetHwId(AlxId* me)
 }
 const char* AlxId_GetUniqueIdStr(AlxId* me)
 {
-	ALX_ID_ASSERT(me->isInit == true);
 	ALX_ID_ASSERT(me->wasCtorCalled == true);
 
 	return me->stm32Hw.uniqueIdStr;
