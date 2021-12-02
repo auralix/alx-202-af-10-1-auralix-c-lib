@@ -40,7 +40,7 @@ void AlxAdc_Ctor
 	float vRef_V
 )
 {
-	//Assert
+	// Assert
 	(void)me;
 	(void)ioPinArr;
 	(void)chArr;
@@ -58,8 +58,7 @@ void AlxAdc_Ctor
 	me->vRef_V = vRef_V;
 
 	// Check channel sequence
-	for (uint32_t i = 0; i < numOfIoPinsAndCh - 1; i++)
-		ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) < AlxAdc_GetCh(me, chArr[i + 1])); // Channel sequence must be from low to high number
+	for (uint32_t i = 0; i < numOfIoPinsAndCh - 1; i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) < AlxAdc_GetCh(me, chArr[i + 1])); // Channel sequence must be from low to high number
 
 	// Check clock
 	ALX_ADC_ASSERT(AlxAdc_Ctor_IsSysClkOk(me));
@@ -149,9 +148,10 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	for(uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++)
 		AlxIoPin_DeInit((*(me->ioPinArr + i)));
 
-	// #4 Reset isInit
+	// #5 Reset isInit
 	me->isInit = false;
-	
+
+	// #6 Return OK
 	return Alx_Ok;
 }
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
@@ -165,7 +165,7 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	return ((me->adcResult.result * me->vRef_V) / 4095);
 	
 	ALX_ADC_ASSERT(false); // We shouldn't get here
-	return 0;
+	return ALX_NULL;
 }
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 {
@@ -178,14 +178,14 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 	return ((me->adcResult.result * me->vRef_V) / 4095) * 1000;
 	
 	ALX_ADC_ASSERT(false); // We shouldn't get here
-	return 0;
+	return ALX_NULL;
 }
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
 	// MF: Lpc80x doesn't support internal TempSens_GetTemp
 
 	ALX_ADC_ASSERT(false); // We shouldn't get here
-	return 0;
+	return ALX_NULL;
 }
 
 
@@ -208,7 +208,7 @@ static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	if (ch == Alx_Ch_11)	return 11;
 
 	ALX_ADC_ASSERT(false);	// We shouldn't get here
-	return 0;
+	return ALX_NULL;
 }
 static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me)
 {
@@ -219,7 +219,7 @@ static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me)
 		return false;
 
 	ALX_ADC_ASSERT(false); // We shouldn't get here
-	return 0;
+	return ALX_NULL;
 	#endif
 
 	#if defined(ALX_LPC81x) || defined(ALX_LPC82x) || defined(ALX_LPC83x) || defined(ALX_LPC84x)

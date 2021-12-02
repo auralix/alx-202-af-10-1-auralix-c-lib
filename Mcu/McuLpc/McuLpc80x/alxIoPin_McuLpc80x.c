@@ -27,7 +27,6 @@ static swm_port_pin_type_t AlxIoPin_GetSwmPortPinIndex(AlxIoPin* me);
 static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me);
 static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me);
 static swm_select_fixed_pin_t AlxIoPin_GetSwmMFixFunc(AlxIoPin* me);
-static void AlxIoPin_PINT_Init(AlxIoPin* me, PINT_Type* base); // MF: I have to rewrite FSL func without "Periph_Reset" in it so we can init more pins
 
 
 //******************************************************************************
@@ -46,7 +45,7 @@ void AlxIoPin_Ctor
 )
 {
 	// Assert
-	if ((alxDbgPin.pin == pin) && (alxDbgPin.port == port)) { ALX_IO_PIN_ASSERT(false); } // MF: Checks Pin and Port are nat the same as DBG Pin
+	//if ((alxDbgPin.pin == pin) && (alxDbgPin.port == port)) { ALX_IO_PIN_ASSERT(false); } // MF: Checks Pin and Port are nat the same as DBG Pin
 
 	// Parameters
 	me->port = port;
@@ -72,48 +71,46 @@ void AlxIoPin_Init(AlxIoPin* me)
 	// #1 Set isInit attribute
 	me->isInit = true;
 
-	AlxIoPin_Write(me, me->val); // Set initial output value, before config
+	// #2 Set initial output value, before config
+	AlxIoPin_Write(me, me->val);
 
-	// #2 Init IOCON
+	// #3.1 Get IoconPortPinIndex
 	uint8_t ioconPortPinIndex = AlxPROTECTED_IoPin_GetIoconPortPinIndex(me->pin, me->port);
 
+	// #3.2 Enable IOCON Clk
 	CLOCK_EnableClock(kCLOCK_Iocon);
 
-	// Set Mode
+	// #3.3 Set IOCON Mode
 	AlxPROTECTED_IoPin_SetIoconMode(me->pin, me->port, me->mode);
 
-	// Set Open Drain
-	if (me->isOpenDrain)
-	{
-		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 10U);
-	}
-	else
-	{
-		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U);
-	}
+	// #3.4 Set Open Drain
+	if (me->isOpenDrain)	{ IOCON->PIO[ioconPortPinIndex] |= (0x1 << 10U); }
+	else					{ IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); }
+
+	// #3.5 Disable IOCON Clk
 	CLOCK_DisableClock(kCLOCK_Iocon);
 
-	// #3.1 Init if SWM
+	// #4.1 Init if SWM
 	if (AlxIoPin_CheckIfSwmUsed(me))
 	{
 		CLOCK_EnableClock(kCLOCK_Swm);
 		if (me->swmFunc_isMovable)
 		{
-			// #3.1.1 Init if Movable
+			// #4.1.1 Init if Movable
 			swm_select_movable_t swmMoveFunc = AlxIoPin_GetSwmMoveFunc(me);
 			swm_port_pin_type_t swmPortPinIndex = AlxIoPin_GetSwmPortPinIndex(me);
 			SWM_SetMovablePinSelect(SWM0, swmMoveFunc, swmPortPinIndex);
 		}
 		else
 		{
-			// #3.1.2 Init if Fixed
+			// #4.1.2 Init if Fixed
 			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmMFixFunc(me);
 			SWM_SetFixedPinSelect(SWM0, swmFixFunc, true);
 		}
 		CLOCK_DisableClock(kCLOCK_Swm);
 	}
 
-	// #3.2 Init if GPIO
+	// #4.2 Init if GPIO
 	if (me->func == AlxIoPin_Func_GPIO)
 	{
 		gpio_pin_config_t gpioConfig;
@@ -126,9 +123,8 @@ void AlxIoPin_Init(AlxIoPin* me)
 		GPIO_PinInit(GPIO, me->port, me->pin, &gpioConfig);
 	}
 
-	AlxIoPin_Write(me, me->val); // Set initial output value, after config
-
-	ALX_IO_PIN_ASSERT(me->isInit == true);
+	// #5 Set initial output value, after config
+	AlxIoPin_Write(me, me->val);
 }
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
@@ -144,7 +140,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); // Reset Open Drain (0)
 	CLOCK_DisableClock(kCLOCK_Iocon);
 
-	// #2.1 DeInit SWM if used
+	// #2.1 DeInit if SWM used
 	if (AlxIoPin_CheckIfSwmUsed(me))
 	{
 		CLOCK_EnableClock(kCLOCK_Swm);
@@ -406,7 +402,7 @@ static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me)
 	#endif
 
 	ALX_IO_PIN_ASSERT(false); // We shouldn't get here
-	return 0;
+	return ALX_NULL;
 }
 static swm_select_fixed_pin_t AlxIoPin_GetSwmMFixFunc(AlxIoPin* me)
 {
@@ -488,26 +484,7 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmMFixFunc(AlxIoPin* me)
 	#endif
 
 	ALX_IO_PIN_ASSERT(false); // We shouldn't get here
-	return 0;
-}
-static void AlxIoPin_PINT_Init(AlxIoPin* me, PINT_Type* base)
-{
-	ALX_IO_PIN_ASSERT(base != NULL);
-	uint32_t pmcfg = 0;
-	uint8_t pintcount = 0;
-
-	pintcount = FSL_FEATURE_PINT_NUMBER_OF_CONNECTED_OUTPUTS;
-
-	/* Disable all bit slices for pint*/
-	for (uint32_t i = 0; i < pintcount; i++)
-	{
-		pmcfg = pmcfg | ((uint32_t)kPINT_PatternMatchNever << (PININT_BITSLICE_CFG_START + (i * 3U)));
-	}
-
-	CLOCK_EnableClock(kCLOCK_GpioInt);
-
-	/* Disable all pattern match bit slices */
-	base->PMCFG = pmcfg;
+	return ALX_NULL;
 }
 
 

@@ -17,7 +17,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x_UNDEFINED)
+#if defined(ALX_LPC80x)
 
 
 //******************************************************************************
@@ -25,6 +25,7 @@
 //******************************************************************************
 static uint32_t AlxPwm_GetCh(Alx_Ch ch);
 static void AlxPwm_SetSrcClk_SetPrescalerMax(AlxPwm* me);
+static void AlxPwm_UpdatePwmDutycyclePermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil);
 
 
 //******************************************************************************
@@ -66,8 +67,8 @@ void AlxPwm_Ctor
 	me->numOfCh = numOfCh;
 
 	// Variables
-	me->config.input = kCTIMER_TimerMode;
-	me->config.mode = kCTIMER_Capture_0; // This field is ignored when mode is timer
+	me->config.input = kCTIMER_Capture_0; // This field is ignored when mode is timer
+	me->config.mode =  kCTIMER_TimerMode;
 	me->config.prescale = prescaler;
 
 	me->period = period;
@@ -97,7 +98,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 
 	// #3 Init CTIMER Channels
 	for(uint32_t i = 0; i < me->numOfCh; i++)
-		if(CTIMER_SetupPwm(me->tim, AlxPwm_GetCh(me->chArr[i]), (uint32_t)me->dutyDefaultArr_pct[i], me->period, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; }
+		if(CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), (uint32_t)me->dutyDefaultArr_pct[i], me->period, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; } // MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
 
 	// #4 Set isInit
 	me->isInit = true;
@@ -137,7 +138,26 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 	{
 		if (me->chArr[i] == ch)
 		{
-			CTIMER_UpdatePwmDutycycle(me->tim, ch, (uint32_t)duty_pct);
+			CTIMER_UpdatePwmDutycycle(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(ch), (uint32_t)duty_pct); // MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
+			return Alx_Ok;
+		}
+	}
+
+	ALX_PWM_ASSERT(false); // We shouldn't get here
+	return Alx_Err;
+}
+Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
+{
+	ALX_PWM_ASSERT(me->isInit == true);
+	ALX_PWM_ASSERT(me->wasCtorCalled == true);
+	(void)ch;
+	ALX_PWM_ASSERT((0.f <= duty_permil) && (duty_permil <= 1000));
+
+	for (uint32_t i = 0; i < me->numOfCh; i++)
+	{
+		if (me->chArr[i] == ch)
+		{
+			AlxPwm_UpdatePwmDutycyclePermil(me, ch, duty_permil);
 			return Alx_Ok;
 		}
 	}
@@ -164,6 +184,21 @@ static void AlxPwm_SetSrcClk_SetPrescalerMax(AlxPwm* me)
 {
 	me->periodMax = 0x0000FFFF;
 	me->srcClk_Hz = AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor);
+}
+static void AlxPwm_UpdatePwmDutycyclePermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
+{
+	// #1 Prepare variable
+	uint32_t pulsePeriod = 0;
+
+	// #2 Get Period
+	uint32_t period = me->tim->MR[kCTIMER_Match_3]; // MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
+
+	// #3 Calculate Pulse
+	if (duty_permil == 0U)	{ pulsePeriod = period + 1U; }
+	else					{ pulsePeriod = (period * (1000U - (uint32_t)duty_permil)) / 1000U; }
+
+	// #4 Update dutycycle
+	me->tim->MR[AlxPwm_GetCh(ch)] = pulsePeriod;
 }
 
 
