@@ -178,7 +178,7 @@ static uint32_t AlxPwm_GetCh(Alx_Ch ch)
 	//if (ch == Alx_Ch_3) return kCTIMER_Match_3; // MF: Match register 3 is for cycle lenght (freq or period)
 
 	ALX_PWM_ASSERT(false); // We shouldn't get here
-	return 0;
+	return ALX_NULL;
 }
 static void AlxPwm_SetSrcClk_SetPrescalerMax(AlxPwm* me)
 {
