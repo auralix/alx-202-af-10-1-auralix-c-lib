@@ -143,7 +143,6 @@ Alx_Status AlxAdau1961_Init(AlxAdau1961* me)
 	status = AlxAdau1961_Reg_WriteNonClkVal(me);
 	if (status != Alx_Ok) { ALX_ADAU1961_TRACE("Err_Reg_WriteNonClkVal"); return status;}
 
-
 	// #9 Set isInit
 	me->isInit = true;
 
