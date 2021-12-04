@@ -66,6 +66,18 @@ extern "C" {
 #include <alxTrace_Printf.h>
 #include <alxVdiv.h>
 
+#include <alxAdau1961.h>
+#include <alxAdxl355.h>
+#include <alxBq24600.h>
+#include <alxBts724g.h>
+#include <alxCrn120.h>
+#include <alxNtcg103jf103ft1s.h>
+#include <alxPca9430.h>
+#include <alxPca9431.h>
+#include <alxTmp1075.h>
+#include <alxTpa3255.h>
+#include <alxVnh7040.h>
+
 
 //******************************************************************************
 // Module Guard
@@ -102,21 +114,21 @@ typedef struct
 	//******************************************************************************
 	// Port B
 	//******************************************************************************
-	AlxIoPin do_PB0_LED1_GR;	// PB0
+	AlxIoPin do_PB0_LED1_GR;
 	// PB1	- Unused
 	// PB2	- Unused
 	// PB3	- Unused
 	// PB4	- Unused
 	// PB5	- Unused
 	// PB6	- Unused
-	AlxIoPin do_PB7_LED2_BL;	// PB7
+	AlxIoPin do_PB7_LED2_BL;
 	// PB8	- Unused
 	// PB9	- Unused
-	AlxIoPin do_PB10_I2C2_SCL;	// PB10
-	AlxIoPin io_PB11_I2C2_SDA;	// PB11
+	AlxIoPin do_PB10_I2C2_SCL;
+	AlxIoPin io_PB11_I2C2_SDA;
 	// PB12	- Unused
 	// PB13	- Unused
-	AlxIoPin do_PB14_LED3_RD;	// PB14
+	AlxIoPin do_PB14_LED3_RD;
 	// PB15	- Unused
 
 

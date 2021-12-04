@@ -98,8 +98,8 @@ static inline void AlxHwNucleoF429Zi_TvTest_G01_BringUp_Init(AlxHwNucleoF429Zi_T
 }
 static inline void AlxHwNucleoF429Zi_TvTest_G01_BringUp_Run(AlxHwNucleoF429Zi_TvTest_G01_BringUp* me)
 {
-	//AlxHwNucleoF429Zi_TvTest_G01_BringUp_T01_Led(me);
-	AlxHwNucleoF429Zi_TvTest_G01_BringUp_T02_Trace(me);
+	AlxHwNucleoF429Zi_TvTest_G01_BringUp_T01_Led(me);
+	//AlxHwNucleoF429Zi_TvTest_G01_BringUp_T02_Trace(me);
 }
 
 
@@ -159,8 +159,8 @@ static inline void AlxHwNucleoF429Zi_TvTest_G02_Init(AlxHwNucleoF429Zi_TvTest_G0
 }
 static inline void AlxHwNucleoF429Zi_TvTest_G02_Run(AlxHwNucleoF429Zi_TvTest_G02* me)
 {
-	//AlxHwNucleoF429Zi_TvTest_G02_T01(me);
-	AlxHwNucleoF429Zi_TvTest_G02_T02(me);
+	AlxHwNucleoF429Zi_TvTest_G02_T01(me);
+	//AlxHwNucleoF429Zi_TvTest_G02_T02(me);
 }
 
 
