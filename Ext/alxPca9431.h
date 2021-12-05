@@ -706,213 +706,218 @@ typedef union
 	uint8_t raw;
 } AlxPca9431_RegVal_21h_VOutLdoSetOCP;
 
-// 
-/******************************			PAC943-1_VRectAdcH		0x30	*/
-/*typedef union
+//------------------------------------------------------------------------------
+// VRECT_ADC Register (Address 30h)
+//------------------------------------------------------------------------------
+typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t VRECT : 8;		// VRectAdc 8...15	VRECT voltage resolution is LSB:15.82 mV	
+		uint8_t VRECT : 8; // Voltage resolution is 15.82 mV
 	};
 	uint8_t raw;
-} AlxPca9431_RegVal_30h_31h_VRectAdcH;*/
+} AlxPca9431_RegVal_30h_VRectAdcH;
 
-	
+//------------------------------------------------------------------------------
+// VRECT_ADC Register (Address 31h)
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t VRECT : 10; /* VRectAdc 8...15	VRECT voltage resolution is LSB:15.82 mV	*/
-		uint16_t unused_0_5 : 6; // bits 0...5 are unused
-	};
-	uint16_t raw;
-} AlxPca9431_RegVal_30h_31h_VRectAdcH;
-	
-	
-	
-	
-	
-	
-/************************************			PAC943-1_VRectAdcL		0x31	*/
-typedef union
-{
-	struct __attribute__((packed))
-	{
-		uint8_t unused_0_5 : 6;	/* bits 0...5 are unused										*/
-		uint8_t VRECT : 2;		/* VRectAdc 6...7	VRECT voltage resolution is LSB:15.82 mV	*/
+		uint8_t unused_0_5 : 6; // bits 0...5 are unused
+		uint8_t VRECT : 2; // Voltage resolution is 15.82 mV
 	};
 	uint8_t raw;
-} AlxPca9431_RegVal_0x31_VRectAdcL;
-	
-/*******************************************************************************************			PAC943-1_VTuneAdcH		0x32	*/
-typedef union
-{
-	struct __attribute__((packed))
-	{
-		uint8_t VTUNE : 8;		/* VRectAdc 8...15	VTUNE voltage resolution is LSB:3.32 mV	*/
-	};
-	uint8_t raw;
-} AlxPca9431_RegVal_0x32_VTuneAdcH;
+} AlxPca9431_RegVal_31h_VRectAdcL;
 
-/*******************************************************************************************			PAC943-1_VTuneAdcL		0x33	*/
+//------------------------------------------------------------------------------
+// VTUNE_ADC Register (Address 32h)
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t unused_0_5 : 6;	/* bits 0...5 are unused									*/
-		uint8_t VTUNE : 2;		/* VRectAdc 6...7	VTUNE voltage resolution is LSB:3.32 mV	*/
+		uint8_t VTUNE : 8; // Voltage resolution is 3.32 mV
 	};
 	uint8_t raw;
-} AlxPca9431_RegVal_0x33_VTuneAdcL;
-	
-/*******************************************************************************************			PAC943-1_VOutAdcH		0x34	*/
-typedef union
-{
-	struct __attribute__((packed))
-	{
-		uint8_t VOUT : 8;		/* VRectAdc 8...15	VOUT voltage resolution is LSB:5.27 mV	*/
-	};
-	uint8_t raw;
-} AlxPca9431_RegVal_0x34_VOutAdcH;
+} AlxPca9431_RegVal_32h_VTuneAdcH;
 
-/*******************************************************************************************			PAC943-1_VOutAdcL		0x35	*/
+//------------------------------------------------------------------------------
+// VTUNE_ADC Register (Address 33h)
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t unused_0_5 : 6;	/* bits 0...5 are unused									*/
-		uint8_t VOUT : 2;		/* VRectAdc 6...7	VOUT voltage resolution is LSB:5.27 mV	*/
+		uint8_t unused_0_5 : 6; // bits 0...5 are unused/
+		uint8_t VTUNE : 2; // Voltage resolution is 3.32 mV
 	};
 	uint8_t raw;
-} AlxPca9431_RegVal_0x35_VOutAdcL;
+} AlxPca9431_RegVal_33h_VTuneAdcL;
 
-/*******************************************************************************************			PAC943-1_IOutAdcH		0x36	*/
+//------------------------------------------------------------------------------
+// VOUT_ADC Register (Address 34h)
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t IOUT : 8;		/* VRectAdc 8...15	IOUT voltage resolution is LSB: 421.8uA	*/
+		uint8_t VOUT : 8; // Voltage resolution is 5.27 mV
 	};
 	uint8_t raw;
-} AlxPca9431_RegVal_0x36_IOutAdcH;
+} AlxPca9431_RegVal_34h_VOutAdcH;
 
-/*******************************************************************************************			PAC943-1_IOutAdcL		0x37	*/
+//------------------------------------------------------------------------------
+// VOUT_ADC Register (Address 35h)
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t unused_0_5 : 6;	/* bits 0...5 are unused									*/
-		uint8_t IOUT : 2;		/* VRectAdc 6...7	IOUT voltage resolution is LSB: 421.8uA	*/
+		uint8_t unused_0_5 : 6; // bits 0...5 are unused
+		uint8_t VOUT : 2; // Voltage resolution is 5.27 mV
 	};
 	uint8_t raw;
-} AlxPca9431_RegVal_0x37_IOutAdcL;
-	
-/*******************************************************************************************			PAC943-1_IRectAdcH		0x38	*/
-typedef union
-{
-	struct __attribute__((packed))
-	{
-		uint8_t IRECT : 8;		/* VRectAdc 8...15	IOUT voltage resolution is LSB: 421.8uA	*/
-		/*	IRECT current is the sum of VOUT and VPWR load current. In application, 
-		 *	the operation current can be added to calculate the received power.				*/
-	};
-	uint8_t raw;
-} AlxPca9431_RegVal_0x38_IRectAdcH;
+} AlxPca9431_RegVal_35h_VOutAdcL;
 
-/*******************************************************************************************			PAC943-1_IRectAdcL		0x39	*/
+//------------------------------------------------------------------------------
+// IOUT_ADC Register (Address 36h)
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t unused_0_5 : 6;		/* bits 0...5 are unused								*/
-		uint8_t IRECT : 2;		/* VRectAdc 6...7	IOUT voltage resolution is LSB: 421.8uA	*/
-		/*	IRECT current is the sum of VOUT and VPWR load current. In application, 
-		 *	the operation current can be added to calculate the received power.				*/
+		uint8_t IOUT : 8; // Voltage resolution is 421.8uA
 	};
 	uint8_t raw;
-} AlxPca9431_RegVal_0x39_IRectAdcL;
+} AlxPca9431_RegVal_36h_IOutAdcH;
 
-/*******************************************************************************	PAC943-1_AlxPca9431_0x21_ChipTempAdcMeas	0x3A	*/	
+//------------------------------------------------------------------------------
+// IOUT_ADC Register (Address 37h)
+//------------------------------------------------------------------------------
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t unused_0_5 : 6; // bits 0...5 are unused
+		uint8_t IOUT : 2; // Voltage resolution is 421.8uA
+	};
+	uint8_t raw;
+} AlxPca9431_RegVal_37h_IOutAdcL;
+
+//------------------------------------------------------------------------------
+// IRECT_ADC Register (Address 38h)
+//------------------------------------------------------------------------------
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t IRECT : 8; // Voltage resolution is 421.8uA
+	};
+	uint8_t raw;
+} AlxPca9431_RegVal_38h_IRectAdcH;
+
+//------------------------------------------------------------------------------
+// IRECT_ADC Register (Address 39h)
+//------------------------------------------------------------------------------
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t unused_0_5 : 6; // bits 0...5 are unused
+		uint8_t IRECT : 2; // Voltage resolution is 421.8uA
+	};
+	uint8_t raw;
+} AlxPca9431_RegVal_39h_IRectAdcL;
+
+//------------------------------------------------------------------------------
+// TDIE_ADC Register (Address 3Ah)
+//------------------------------------------------------------------------------
 typedef enum
 {
-	ChipTempAdc_43C		= 0x00, 	//-43	  °C
-	ChipTempAdc_39C		= 0x01, 	//-39	  °C
-	ChipTempAdc_35C		= 0x02, 	//-35	  °C
-	ChipTempAdc_30C		= 0x03, 	//-30	  °C
-	ChipTempAdc_26C		= 0x04, 	//-26	  °C
-	ChipTempAdc_21C		= 0x05, 	//-21	  °C
-	ChipTempAdc_17C		= 0x06, 	//-17	  °C
-	ChipTempAdc_12C5	= 0x07, 	//-12,5	  °C
-	ChipTempAdc_8C		= 0x08, 	//-8	  °C
-	ChipTempAdc_4C		= 0x09, 	//-4	  °C
-	ChipTempAdc0C		= 0x0A, 	//0		  °C
-	ChipTempAdc5C		= 0x0B, 	//5		  °C
-	ChipTempAdc9C		= 0x0C, 	//9		  °C
-	ChipTempAdc13C5		= 0x0D, 	//13,5	  °C
-	ChipTempAdc18C		= 0x0E, 	//18	  °C
-	ChipTempAdc22C5		= 0x0F, 	//22,5	  °C
-	ChipTempAdc27C		= 0x10, 	//27	  °C
-	ChipTempAdc31C		= 0x11, 	//31	  °C
-	ChipTempAdc35C		= 0x12, 	//35	  °C
-	ChipTempAdc40C		= 0x13, 	//40	  °C
-	ChipTempAdc44C		= 0x14, 	//44	  °C
-	ChipTempAdc48C		= 0x15, 	//48	  °C
-	ChipTempAdc53C		= 0x16, 	//53	  °C
-	ChipTempAdc57C		= 0x17, 	//57	  °C
-	ChipTempAdc62C		= 0x18, 	//62	  °C
-	ChipTempAdc65C5		= 0x19, 	//65,5	  °C
-	ChipTempAdc71C		= 0x1A, 	//71	  °C
-	ChipTempAdc75C		= 0x1B, 	//75	  °C
-	ChipTempAdc79C5		= 0x1C, 	//79,5	  °C
-	ChipTempAdc84C		= 0x1D, 	//84	  °C
-	ChipTempAdc88C		= 0x1E, 	//88	  °C
-	ChipTempAdc92C		= 0x1F, 	//92	  °C
-	ChipTempAdc96C		= 0x20, 	//96	  °C
-	ChipTempAdc100C5	= 0x21, 	//100,5	  °C
-	ChipTempAdc105C		= 0x22, 	//105	  °C
-	ChipTempAdc109C		= 0x23, 	//109	  °C
-	ChipTempAdc114C		= 0x24, 	//114	  °C
-	ChipTempAdc118C		= 0x25, 	//118	  °C
-	ChipTempAdc122C		= 0x26, 	//122	  °C
-	ChipTempAdc126C		= 0x27, 	//126	  °C
-	ChipTempAdc130C		= 0x28, 	//130	  °C
-	ChipTempAdc134C5	= 0x29, 	//134,5	  °C
-	ChipTempAdc138C		= 0x2A, 	//138	  °C
-	ChipTempAdc141C		= 0x2B, 	//141	  °C
-	ChipTempAdc145C		= 0x2C, 	//145	  °C
-	ChipTempAdc148C		= 0x2D, 	//148	  °C
-	ChipTempAdc152C		= 0x2E, 	//152	  °C
-	ChipTempAdc156C		= 0x2F, 	//156	  °C
-} AlxPca9431_0x3A_ChipTempAdcMeas;
+	ChipTempAdc_43C		= 0x00,
+	ChipTempAdc_39C		= 0x01,
+	ChipTempAdc_35C		= 0x02,
+	ChipTempAdc_30C		= 0x03,
+	ChipTempAdc_26C		= 0x04,
+	ChipTempAdc_21C		= 0x05,
+	ChipTempAdc_17C		= 0x06,
+	ChipTempAdc_12C5	= 0x07,
+	ChipTempAdc_8C		= 0x08,
+	ChipTempAdc_4C		= 0x09,
+	ChipTempAdc0C		= 0x0A,
+	ChipTempAdc5C		= 0x0B,
+	ChipTempAdc9C		= 0x0C,
+	ChipTempAdc13C5		= 0x0D,
+	ChipTempAdc18C		= 0x0E,
+	ChipTempAdc22C5		= 0x0F,
+	ChipTempAdc27C		= 0x10,
+	ChipTempAdc31C		= 0x11,
+	ChipTempAdc35C		= 0x12,
+	ChipTempAdc40C		= 0x13,
+	ChipTempAdc44C		= 0x14,
+	ChipTempAdc48C		= 0x15,
+	ChipTempAdc53C		= 0x16,
+	ChipTempAdc57C		= 0x17,
+	ChipTempAdc62C		= 0x18,
+	ChipTempAdc65C5		= 0x19,
+	ChipTempAdc71C		= 0x1A,
+	ChipTempAdc75C		= 0x1B,
+	ChipTempAdc79C5		= 0x1C,
+	ChipTempAdc84C		= 0x1D,
+	ChipTempAdc88C		= 0x1E,
+	ChipTempAdc92C		= 0x1F,
+	ChipTempAdc96C		= 0x20,
+	ChipTempAdc100C5	= 0x21,
+	ChipTempAdc105C		= 0x22,
+	ChipTempAdc109C		= 0x23,
+	ChipTempAdc114C		= 0x24,
+	ChipTempAdc118C		= 0x25,
+	ChipTempAdc122C		= 0x26,
+	ChipTempAdc126C		= 0x27,
+	ChipTempAdc130C		= 0x28,
+	ChipTempAdc134C5	= 0x29,
+	ChipTempAdc138C		= 0x2A,
+	ChipTempAdc141C		= 0x2B,
+	ChipTempAdc145C		= 0x2C,
+	ChipTempAdc148C		= 0x2D,
+	ChipTempAdc152C		= 0x2E,
+	ChipTempAdc156C		= 0x2F,
+} AlxPca9431_3Ah_ChipTempAdcMeas;
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		AlxPca9431_0x3A_ChipTempAdcMeas TDIE : 8;	/* On chip temperature ADC measurement results: */
+		AlxPca9431_3Ah_ChipTempAdcMeas TDIE : 8;
 	};
 	uint8_t raw;
-} AlxPca9431_RegVal_0x3A_ChipTempAdcMeas;
+} AlxPca9431_RegVal_3Ah_ChipTempAdcMeas;
 
-/*******************************************************************************************			PAC943-1_NTCAdcH		0x3B	*/
+//------------------------------------------------------------------------------
+// NTC_ADC Register (Address 3Bh)
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t NTC, : 8;		/* NTC voltage resolution is LSB: 2.64mV	*/
+		uint8_t NTC, : 8; // Voltage resolution is 2.64mV
 	};
 	uint8_t raw;
-} AlxPca9431_RegVal_0x3B_NTCAdcH;
+} AlxPca9431_RegVal_3Bh_NTCAdcH;
 
-/*******************************************************************************************			PAC943-1_NTCAdcL		0x3C	*/
+//------------------------------------------------------------------------------
+// NTC_ADC Register (Address 3Ch)
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t unused_0_5	: 6;	/* bits 0...5 are unused					*/
-		uint8_t NTC	: 2;			/* NTC voltage resolution is LSB: 2.64mV	*/
+		uint8_t unused_0_5	: 6; // bits 0...5 are unused
+		uint8_t NTC	: 2; // Voltage resolution is 2.64mV
 	};
 	uint8_t raw;
-} AlxPca9431_RegVal_0x3C_NTCAdcL;
+} AlxPca9431_RegVal_3Ch_NTCAdcL;
 
 
 //******************************************************************************
@@ -1055,129 +1060,131 @@ typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_30h_31h_VRectAdcH val;
+	AlxPca9431_RegVal_30h_VRectAdcH val;
 } AlxPca9431_Reg_30h_VRectAdcH;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x31_VRectAdcL val;
+	AlxPca9431_RegVal_31h_VRectAdcL val;
 } AlxPca9431_Reg_31h_VRectAdcL;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x32_VTuneAdcH val;
+	AlxPca9431_RegVal_32h_VTuneAdcH val;
 } AlxPca9431_Reg_32h_VTuneAdcH;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x33_VTuneAdcL val;
+	AlxPca9431_RegVal_33h_VTuneAdcL val;
 } AlxPca9431_Reg_33h_VTuneAdcL;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x34_VOutAdcH val;
+	AlxPca9431_RegVal_34h_VOutAdcH val;
 } AlxPca9431_Reg_34h_VOutAdcH;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x35_VOutAdcL val;
+	AlxPca9431_RegVal_35h_VOutAdcL val;
 } AlxPca9431_Reg_35h_VOutAdcL;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x36_IOutAdcH val;
+	AlxPca9431_RegVal_36h_IOutAdcH val;
 } AlxPca9431_Reg_36h_IOutAdcH;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x37_IOutAdcL val;
+	AlxPca9431_RegVal_37h_IOutAdcL val;
 } AlxPca9431_Reg_37h_IOutAdcL;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x38_IRectAdcH val;
+	AlxPca9431_RegVal_38h_IRectAdcH val;
 } AlxPca9431_Reg_38h_IRectAdcH;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x39_IRectAdcL val;
+	AlxPca9431_RegVal_39h_IRectAdcL val;
 } AlxPca9431_Reg_39h_IRectAdcL;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x3A_ChipTempAdcMeas val;
+	AlxPca9431_RegVal_3Ah_ChipTempAdcMeas val;
 } AlxPca9431_Reg_3Ah_ChipTempAdcMeas;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x3B_NTCAdcH val;
+	AlxPca9431_RegVal_3Bh_NTCAdcH val;
 } AlxPca9431_Reg_3Bh_NTCAdcH;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxPca9431_RegVal_0x3C_NTCAdcL val;
+	AlxPca9431_RegVal_3Ch_NTCAdcL val;
 } AlxPca9431_Reg_3Ch_NTCAdcL;
+
+
 //******************************************************************************
 // Main Register Structure
 //******************************************************************************
 typedef struct
 {
-	AlxPca9431_Reg_00h_DeviceId					_00h_Device_ID			;
-	AlxPca9431_Reg_01h_SystemInt				_01h_SYSTEM_INT		;
-	AlxPca9431_Reg_02h_SystemIntMask			_02h_SYSTEM_INT_MASK	;
-	AlxPca9431_Reg_03h_VRectInt					_03h_VRECT_INT			;
-	AlxPca9431_Reg_04h_VRectIntMask				_04h_VRECT_INT_MASK	;
-	AlxPca9431_Reg_05h_VOutLdoInt				_05h_VOUTLDO_INT		;
-	AlxPca9431_Reg_06h_VOutLdoIntMask			_06h_VOUTLDO_INT_MASK	;
-	AlxPca9431_Reg_07h_VOutLdo					_07h_VOUT_LDO			;
-	AlxPca9431_Reg_08h_VRectThd					_08h_VRECT_THD			;
-	AlxPca9431_Reg_09h_VRectOvw					_09h_VRECT_OVW			;
-	AlxPca9431_Reg_0Ah_TempThd					_0Ah_TEMP_THD			;
-	AlxPca9431_Reg_0Bh_WatchdogSoftStartEnMcu	_0Bh_WD_EN_RST			;
-	AlxPca9431_Reg_0Ch_VaractorDac				_0Ch_Varactor_DAC		;
-	AlxPca9431_Reg_0Dh_AdcControl				_0Dh_ADC_CONTROL		;
-	AlxPca9431_Reg_0Eh_AdcSampleEn				_0Eh_Sample_EN			;
-	AlxPca9431_Reg_0Fh_VPwrLdoConf				_0Fh_VPWR_CONFIG		;
-	AlxPca9431_Reg_10h_Rxir_Conf				_10h_RXIR_CONFIG		;
-	AlxPca9431_Reg_20h_OpcLdoSetLock			_20h_OCPSET_LOCK		;
-	AlxPca9431_Reg_21h_VOutLdoSetOCP			_21h_VOUTLDO_OCP		;
-	AlxPca9431_Reg_30h_VRectAdcH				_30h_VRECT_ADC_H		;
-	AlxPca9431_Reg_31h_VRectAdcL				_31h_VRECT_ADC_L		;
-	AlxPca9431_Reg_32h_VTuneAdcH				_32h_VTUNE_ADC_H		;
-	AlxPca9431_Reg_33h_VTuneAdcL				_33h_VTUNE_ADC_L		;
-	AlxPca9431_Reg_34h_VOutAdcH					_34h_VOUT_ADC_H		;
-	AlxPca9431_Reg_35h_VOutAdcL					_35h_VOUT_ADC_L		;
-	AlxPca9431_Reg_36h_IOutAdcH					_36h_IOUT_ADC_H		;
-	AlxPca9431_Reg_37h_IOutAdcL					_37h_IOUT_ADC_L		;
-	AlxPca9431_Reg_38h_IRectAdcH				_38h_IRECT_ADC_H		;
-	AlxPca9431_Reg_39h_IRectAdcL				_39h_IRECT_ADC_L		;
-	AlxPca9431_Reg_3Ah_ChipTempAdcMeas			_3Ah_TDIE_ADC			;
-	AlxPca9431_Reg_3Bh_NTCAdcH					_3Bh_NTC_ADC_H			;
-	AlxPca9431_Reg_3Ch_NTCAdcL					_3Ch_NTC_ADC_L			;
+	AlxPca9431_Reg_00h_DeviceId _00h_Device_ID;
+	AlxPca9431_Reg_01h_SystemInt _01h_SYSTEM_INT;
+	AlxPca9431_Reg_02h_SystemIntMask _02h_SYSTEM_INT_MASK;
+	AlxPca9431_Reg_03h_VRectInt _03h_VRECT_INT;
+	AlxPca9431_Reg_04h_VRectIntMask _04h_VRECT_INT_MASK;
+	AlxPca9431_Reg_05h_VOutLdoInt _05h_VOUTLDO_INT;
+	AlxPca9431_Reg_06h_VOutLdoIntMask _06h_VOUTLDO_INT_MASK;
+	AlxPca9431_Reg_07h_VOutLdo _07h_VOUT_LDO;
+	AlxPca9431_Reg_08h_VRectThd _08h_VRECT_THD;
+	AlxPca9431_Reg_09h_VRectOvw _09h_VRECT_OVW;
+	AlxPca9431_Reg_0Ah_TempThd _0Ah_TEMP_THD;
+	AlxPca9431_Reg_0Bh_WatchdogSoftStartEnMcu _0Bh_WD_EN_RST;
+	AlxPca9431_Reg_0Ch_VaractorDac _0Ch_Varactor_DAC;
+	AlxPca9431_Reg_0Dh_AdcControl _0Dh_ADC_CONTROL;
+	AlxPca9431_Reg_0Eh_AdcSampleEn _0Eh_Sample_EN;
+	AlxPca9431_Reg_0Fh_VPwrLdoConf _0Fh_VPWR_CONFIG;
+	AlxPca9431_Reg_10h_Rxir_Conf _10h_RXIR_CONFIG;
+	AlxPca9431_Reg_20h_OpcLdoSetLock _20h_OCPSET_LOCK;
+	AlxPca9431_Reg_21h_VOutLdoSetOCP _21h_VOUTLDO_OCP;
+	AlxPca9431_Reg_30h_VRectAdcH _30h_VRECT_ADC_H;
+	AlxPca9431_Reg_31h_VRectAdcL _31h_VRECT_ADC_L;
+	AlxPca9431_Reg_32h_VTuneAdcH _32h_VTUNE_ADC_H;
+	AlxPca9431_Reg_33h_VTuneAdcL _33h_VTUNE_ADC_L;
+	AlxPca9431_Reg_34h_VOutAdcH _34h_VOUT_ADC_H;
+	AlxPca9431_Reg_35h_VOutAdcL _35h_VOUT_ADC_L;
+	AlxPca9431_Reg_36h_IOutAdcH _36h_IOUT_ADC_H;
+	AlxPca9431_Reg_37h_IOutAdcL _37h_IOUT_ADC_L;
+	AlxPca9431_Reg_38h_IRectAdcH _38h_IRECT_ADC_H;
+	AlxPca9431_Reg_39h_IRectAdcL _39h_IRECT_ADC_L;
+	AlxPca9431_Reg_3Ah_ChipTempAdcMeas _3Ah_TDIE_ADC;
+	AlxPca9431_Reg_3Bh_NTCAdcH _3Bh_NTC_ADC_H;
+	AlxPca9431_Reg_3Ch_NTCAdcL _3Ch_NTC_ADC_L;
 } AlxPca9431_Reg;
 
 
@@ -1185,33 +1192,34 @@ typedef struct
 // Types
 //******************************************************************************
 typedef struct
-	{
-		// Parameters - Const
+{
+	// Parameters - Const
 
-		// Objects - External
-		AlxI2c* i2c;
+	// Objects - External
+	AlxI2c* i2c;
 		
-		AlxIoPin* do_SleepEn;	// enable / disable sleep modo for PCA9431
-		AlxIoPin* di_Interrupt;	// Pca9431 interrupt
+	AlxIoPin* do_SleepEn;	// enable / disable sleep modo for PCA9431
+	AlxIoPin* di_Interrupt;	// Pca9431 interrupt
 
-		// Parameters
-		uint8_t i2cAddr;
-		bool i2cCheckWithRead;
-		uint8_t i2cNumOfTries;
-		uint16_t i2cTimeout_ms;
+	// Parameters
+	uint8_t i2cAddr;
+	bool i2cCheckWithRead;
+	uint8_t i2cNumOfTries;
+	uint16_t i2cTimeout_ms;
 
-		// Variables
-		AlxPca9431_Reg reg;
+	// Variables
+	AlxPca9431_Reg reg;
 
-		// Info
-		bool isInit;
-		bool wasCtorCalled;
-	} AlxPca9431;
+	// Info
+	bool isInit;
+	bool wasCtorCalled;
+} AlxPca9431;
+
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-	void AlxPca9431_Ctor
+void AlxPca9431_Ctor
 (
 	AlxPca9431* me,
 	AlxI2c* i2c,
@@ -1223,48 +1231,45 @@ typedef struct
 	uint16_t i2cTimeout_ms
 );
 
+
 //******************************************************************************
 // Functions
 //******************************************************************************
-
 Alx_Status AlxPca9431_Init(AlxPca9431* me);
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me);
-	
-	
 //Alx_Status AlxPca9431_LdoVout_SetVoltage_V(AlxPca9431* me, AlxPca9431_0x07_VOutLdo VoutLdoxV); // 3,3V or 5V => write:  VoutLdo3V3 or. VoutLdo5V
-Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC
-Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A); // 10 bit ADC
+
 //Alx_Status AlxPca9431_LdoVPwr_SetVoltage_V(AlxPca9431* me, AlxPca9431_0x0F_VPwrOutSet VPwrOutxVx); // 1.8V, 2.5V, 2.8V, 3.3V  => write:  VPwrOut1V8 or. VPwrOut2V5 or. VPwrOut2V8 or. VPwrOut3V3
-	
-	
 //Alx_Status AlxPca9431_Rect_Uvlo_SetVoltage_V(AlxPca9431* me, AlxPca9431_0x08_VRectThd VRectThd3Vx); // 3V, 3.1V, 3.2V, 3.3V  => write: VRectThd3V or. VRectThd3V1 or. VRectThd3V2 or. VRectThd3V3
 //Alx_Status AlxPca9431_Rect_Ovw_SetVoltage_V(AlxPca9431* me, AlxPca9431_0x09_VRectOvw VRectThd7Vx); // 7V, 7.25V, 7.5V, 7.75V  => write: VRectThd7V or. VRectThd7V25 or. VRectThd7V5 or. VRectThd7V75
-Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC
-Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A); // 10 bit ADC
 
-	
 //Alx_Status AlxPca9431_TempSens_SetWarning_C(AlxPca9431* me, AlxPca9431_0x0A_TempWarnThd TempWarnThdx0C); // 80°C, 90°C ... 110°C =>  write: TempWarnThd80C or. ... or. TempWarnThd110C
 //Alx_Status AlxPca9431_TempSens_SetShutdown_C(AlxPca9431* me, AlxPca9431_0x0A_TempShutdownThd TempShutdownThd1xxC); // 120°C, 125°C ... 150°C =>  write: TempShutdownThd120C or. ... or. TempShutdownThd150C
 Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC); // On chip temperature (-43°C ... +156°C)
-	
 Alx_Status AlxPca9431_VTune_SetVoltage_V(AlxPca9431* me, float* voltage_V); // 0-3.3V 5 bit DAC - TODO
-Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC - TODO
-
-
 //Alx_Status AlxPca9431_Rxir_SetDuration_s(AlxPca9431* me, AlxPca9431_0x10_RxirPullDownDuration RxirPullDownxmsx); // 0.2s, 0.4s, ... , 1.6s =>  write: RxirPullDown0ms2 or. ... or. RxirPullDown1ms6
 //Alx_Status AlxPca9431_Rxir_SetResistance_ohm(AlxPca9431* me, AlxPca9431_0x10_RxirPullDownR RxirPullDownx0R); // 20ohm, 80ohm, ... , 440ohm =>  write: RxirPullDown20R or. ... or. RxirPullDown440R	
-	
-
-	
 Alx_Status AlxPca9431_Ntc_GetTemp_degC(AlxPca9431* me, float* temp_degC); // external NTC voltage / battery temperature measurement - TODO
-
-	
 Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me);
-
 Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
-	
-bool AlxPca9431_IsSleep(AlxPca9431* me);
-	
+//bool AlxPca9431_IsSleep(AlxPca9431* me);
+Alx_Status AlxPca9431_Adc_GetVoltage_VRECT(AlxPca9431* me, float* voltage_V);
+
+// Adc
+// VRECT
+// VTUNE
+// VOUT
+// IOUT
+// IRECT
+// NTC
+
+Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC - TODO
+Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC
+Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC
+Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A); // 10 bit ADC
+Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A); // 10 bit ADC
+
+
 #ifdef __cplusplus
 }
 #endif
