@@ -32,7 +32,7 @@ extern "C" {
 #elif defined(ALX_LPC845)
 #include "alxAdc_McuLpc84.h"
 
-#elif defined(ALX_LPC80x)	// TV: AlxAdcMcu module doen't exists anymore, need to fix this
+#elif defined(ALX_LPC80x)
 #include "alxAdc_McuLpc80x.h"
 
 #else
@@ -70,7 +70,7 @@ typedef struct {} AlxAdc;
 Alx_Status AlxAdc_Init(AlxAdc* me);
 Alx_Status AlxAdc_DeInit(AlxAdc* me);
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);
-uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);
+uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);	// MF: Optimized Func
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
 
 

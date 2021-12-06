@@ -37,7 +37,11 @@ void AlxAdc_Ctor
 	Alx_Ch* chArr,
 	uint8_t numOfIoPinsAndCh,
 	AlxClk* clk,
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	uint32_t vRef_mV
+	#else
 	float vRef_V
+	#endif
 )
 {
 	// Assert
@@ -46,7 +50,11 @@ void AlxAdc_Ctor
 	(void)chArr;
 	ALX_ADC_ASSERT(numOfIoPinsAndCh <= ALX_ADC_BUFF_LEN);
 	(void)clk;
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	(void)vRef_mV;
+	#else
 	(void)vRef_V;
+	#endif
 
 	// Objects - External
 	me->ioPinArr = ioPinArr;
@@ -55,7 +63,11 @@ void AlxAdc_Ctor
 	// Parameters
 	me->chArr = chArr;
 	me->numOfIoPinsAndCh = numOfIoPinsAndCh;
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	me->vRef_mV = vRef_mV;
+	#else
 	me->vRef_V = vRef_V;
+	#endif
 
 	// Check channel sequence
 	for (uint32_t i = 0; i < numOfIoPinsAndCh - 1; i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) < AlxAdc_GetCh(me, chArr[i + 1])); // Channel sequence must be from low to high number
@@ -88,6 +100,7 @@ void AlxAdc_Ctor
 }
 Alx_Status AlxAdc_Init(AlxAdc* me)
 {
+	// Assert
 	ALX_ADC_ASSERT(me->isInit == false);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
@@ -131,6 +144,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 }
 Alx_Status AlxAdc_DeInit(AlxAdc* me)
 {
+	// Assert
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
@@ -156,6 +170,13 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 }
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 {
+	// Optimize Guard
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	ALX_ADC_ASSERT(false);
+	return ALX_NULL;
+	#else
+
+	// Assert
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
@@ -163,22 +184,31 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC_8XX);
 	while (!ADC_GetChannelConversionResult(ALX_ADC_LPC_8XX, AlxAdc_GetCh(me, ch), &me->adcResult)) {}
 	return ((me->adcResult.result * me->vRef_V) / 4095);
-	
+
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
+	#endif
 }
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 {
+	// Optimize Guard
+	#if !(defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	ALX_ADC_ASSERT(false);
+	return ALX_NULL;
+	#else
+
+	// Init Ctor Assert
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Return Voltage
 	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC_8XX);
 	while (!ADC_GetChannelConversionResult(ALX_ADC_LPC_8XX, AlxAdc_GetCh(me, ch), &me->adcResult)) {}
-	return ((me->adcResult.result * me->vRef_V) / 4095) * 1000;
+	return ((me->adcResult.result * me->vRef_mV) / 4095);
 	
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
+	#endif
 }
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
