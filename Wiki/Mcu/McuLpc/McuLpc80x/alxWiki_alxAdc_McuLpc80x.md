@@ -1,4 +1,4 @@
-# Auralix C Library - ALX MCU LPC80x ADC Module - Notes
+# Auralix C Library - ALX MCU LPC80x ADC Module
 ---
 - Write all relevant notes here
 - All notes must be written in bullet style text like this
