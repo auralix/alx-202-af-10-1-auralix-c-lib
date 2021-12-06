@@ -53,7 +53,11 @@ typedef struct
 	// Parameters
 	Alx_Ch* chArr;
 	uint8_t numOfIoPinsAndCh;
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	uint32_t vRef_mV;
+	#else
 	float vRef_V;
+	#endif
 
 	// Variables
 	adc_config_t adcConfig;
@@ -76,7 +80,11 @@ void AlxAdc_Ctor
 	Alx_Ch* chArr,
 	uint8_t numOfIoPinsAndCh,
 	AlxClk* clk,
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	uint32_t vRef_mV
+	#else
 	float vRef_V
+	#endif
 );
 
 
