@@ -36,7 +36,7 @@ extern "C" {
 #include "alxAdc_McuLpc80x.h"
 
 #else
-typedef struct {} AlxAdc_Mcu;
+typedef struct {} AlxAdc;
 #endif
 
 
