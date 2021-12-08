@@ -95,19 +95,19 @@ typedef struct
 	//------------------------------------------------------------------------------
 	//P0_0	- Unused
 	//P0_1	- Unused
-	//P0_2	- Unused
-	//P0_3	- Unused
+	//P0_2	- SWD_IO
+	//P0_3	- SWD_CLK
 	//P0_4	- Unused
 	//P0_5	- Unused
 	//P0_6	- Unused
 	//P0_7	- Unused
 	//P0_8	- Unused
-	//P0_9	- Unused
+	AlxIoPin ai_P0_9_ADC_In; // AlxIoPin PCA943X_nINT
 	//P0_10	- Unused
-	//P0_11	- Unused
+	AlxIoPin ao_P0_11_CRN_VCC;
 	//P0_12	- Unused
-	//P0_13	- SWD_IO
-	//P0_14	- SWD_CLK
+	//P0_13	- Unused
+	//P0_14	- Unused
 	//P0_15	- Unused
 	AlxIoPin io_P0_16_I2C_SDA;
 	AlxIoPin do_P0_17_I2C_SCL;
@@ -115,10 +115,10 @@ typedef struct
 	AlxIoPin do_P0_19_LED200_GR;
 	//P0_20	- Unused
 	//P0_21	- Unused
-	AlxIoPin do_P0_22_LED204_GR;
-	AlxIoPin do_P0_23_LED203_GR;
-	AlxIoPin do_P0_24_LED202_GR;
-	AlxIoPin do_P0_25_LED201_GR;
+	//P0_22 DBG_UART_TX	-> ALX Trace Handle //AlxIoPin do_P0_22_LED204_GR;
+	AlxIoPin di_P0_23_IRQ1; //AlxIoPin do_P0_23_LED203_GR;
+	AlxIoPin do_P0_24_PWM1;//AlxIoPin do_P0_24_LED202_GR;
+	AlxIoPin do_P0_25_PWM2;//AlxIoPin do_P0_25_LED201_GR;
 	//P0_26	- Unused
 	//P0_27	- Unused
 	//P0_28	- Unused
@@ -129,7 +129,10 @@ typedef struct
 typedef struct
 {
 	// ALX Objects
+	AlxIoPinIrq alxIrqPin_IRQ1;
 	AlxI2c alxI2c_I2C_Master;
+	AlxAdc alxAdc_ADC4_Master;
+	AlxPwm alxPwm_Master;
 
 	// Auralix HW NFCWLC LISTENER V3_5B C Library Objects
 	AlxHwNfcWlcListenerV3_5b_MainIoPin alxIoPin;
@@ -147,27 +150,21 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//------------------------------------------------------------------------------
 	// ALX - IoPin
 	//------------------------------------------------------------------------------
-	/*AlxIoPin_Ctor(&me->alxIoPin.do_PB0_LED1_GR, GPIOB, GPIO_PIN_0, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH, ALX_NULL, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_PB7_LED2_BL, GPIOB, GPIO_PIN_7, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH, ALX_NULL, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_PB14_LED3_RD, GPIOB, GPIO_PIN_14, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH, ALX_NULL, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_PB10_I2C2_SCL, GPIOB, GPIO_PIN_10, GPIO_MODE_AF_OD, GPIO_PULLUP, GPIO_SPEED_FREQ_HIGH, GPIO_AF4_I2C2, ALX_NULL);
-	AlxIoPin_Ctor(&me->alxIoPin.io_PB11_I2C2_SDA, GPIOB, GPIO_PIN_11, GPIO_MODE_AF_OD, GPIO_PULLUP, GPIO_SPEED_FREQ_HIGH, GPIO_AF4_I2C2, ALX_NULL);
-*/
 	//P0_0	- Unused
 	//P0_1	- Unused
-	//P0_2	- Unused
-	//P0_3	- Unused
+	//P0_2	- SWD_IO
+	//P0_3	- SWD_CLK
 	//P0_4	- Unused
 	//P0_5	- Unused
 	//P0_6	- Unused
 	//P0_7	- Unused
 	//P0_8	- Unused
-	//P0_9	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_In, 0, 9, AlxIoPin_Func_Swm_ADC_CHN4, IOCON_MODE_INACT, false, false, false); 
 	//P0_10	- Unused
-	//P0_11	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC, 0, 11, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, true);
 	//P0_12	- Unused
-	//P0_13	- SWD_IO
-	//P0_14	- SWD_CLK
+	//P0_13	- Unused
+	//P0_14	- Unused
 	//P0_15	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.io_P0_16_I2C_SDA, 0, 16, AlxIoPin_Func_Swm_I2C0_SDA, IOCON_MODE_INACT, false, false, false);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_17_I2C_SCL, 0, 17, AlxIoPin_Func_Swm_I2C0_SCL, IOCON_MODE_INACT, false, false, false);
@@ -175,15 +172,28 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_19_LED200_GR, 0, 19, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//P0_20	- Unused
 	//P0_21	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED204_GR, 0, 22, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_23_LED203_GR, 0, 23, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_LED202_GR, 0, 24, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_LED201_GR, 0, 25, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	//P0_22 DBG_UART_TX	-> ALX Trace Handle //AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED204_GR, 0, 22, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_23_IRQ1, 0, 23, AlxIoPin_Func_IRQ, IOCON_MODE_INACT, false, true, true); //AlxIoPin_Ctor(&me->alxIoPin.do_P0_23_LED203_GR, 0, 23, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_PWM1, 0, 24, AlxIoPin_Func_Swm_T0_MAT_CHN1, IOCON_MODE_INACT, false, false, false);//AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_LED202_GR, 0, 24, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_PWM2, 0, 25, AlxIoPin_Func_Swm_T0_MAT_CHN2, IOCON_MODE_INACT, false, false, false);//AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_LED201_GR, 0, 25, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//P0_26	- Unused
 	//P0_27	- Unused
 	//P0_28	- Unused
 	//P0_29	- Unused
 	//P0_30	- Unused
+
+
+	//------------------------------------------------------------------------------
+	// ALX - IrqPin
+	//------------------------------------------------------------------------------
+	AlxIoPinIrq_Ctor
+	(
+		&me->alxIrqPin_IRQ1,
+		&me->alxIoPin.di_P0_23_IRQ1,
+		kPINT_PinInt0,
+		kPINT_PinIntEnableRiseEdge,
+		Alx_IrqPriority_0
+	);
 
 
 	//------------------------------------------------------------------------------
@@ -212,15 +222,6 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//------------------------------------------------------------------------------
 	// ALX - ADC
 	//------------------------------------------------------------------------------
-	/*AlxAdc_Ctor
-	(
-		&adc,
-		adcIoPinArr,
-		adcChArr,
-		ALX_ARR_LEN(adcIoPinArr),
-		&alxClk,
-		3300u
-	);*/
 
 
 	//------------------------------------------------------------------------------

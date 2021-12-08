@@ -38,7 +38,14 @@ void SysTick_Handler(void)
 //******************************************************************************
 // Auralix C Library - ALX 01 Module - Weak Functions
 //******************************************************************************
-
+void AlxIoPinIrq_Foreground_Callback_Pin0()
+{
+	AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
+}
+void AlxIoPinIrq_Foreground_Callback_Pin1()
+{
+	AlxTrace_WriteStr(&alxTrace, "FallEdge\r\n");
+}
 
 //******************************************************************************
 // Auralix C Library - ALX 02 Module - Weak Functions
