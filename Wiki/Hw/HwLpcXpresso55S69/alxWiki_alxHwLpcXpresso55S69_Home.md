@@ -3,21 +3,14 @@
 
 ## Youtube
 ---
-    - [Start Guide]()
+    - [Start Guide](test)
 
 ## HW
 ---
-- Development Board Links
-    - [Web](https://www.nxp.com/design/development-boards/lpcxpresso-boards/lpcxpresso55s69-development-board:LPC55S69-EVK)
-    - [Sch](WikiFiles/Pdf/LPCXpresso55S69_Board_Schematic_RevA2_dec4.pdf)
-    - [User Guide](WikiFiles/Pdf/UM11158.pdf)
-- MCU Links
-    - [Datasheet](../Mcu/McuLpc/WikiFiles/LPC55S6x_Datasheet.pdf)
-    - [User Manual](../Mcu/McuLpc/WikiFiles/UM11126_LPC55S6x_LPC55S2x_LPC552x_UserManual.pdf)
-    - MCU on board is:
-        - LPC55S69JBD100E
-        - LPC55S69JBD100K
-        - LPC55S69JBD100Y
+- MCU On Board
+    - LPC55S69JBD100E
+    - LPC55S69JBD100K
+    - LPC55S69JBD100Y
 - Board Connection Notes
     - Erased MCU consumption @3V3 = 4mA
 	- P8 Header UART_RX should be connected to your PC's UART_RX!
