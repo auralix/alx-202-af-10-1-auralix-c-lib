@@ -9,6 +9,8 @@
     - [alxCrn120 - ALX <description_TODO> CRN120 Module](Ext/alxWiki_alxCrn120.md)
     - [alxPca9431 - ALX <description_TODO> PCA9431 Module](Ext/alxWiki_alxPca9431.md)
 - Hw
+    - [HwLpcXpresso55S69](Hw/HwLpcXpresso55S69/alxWiki_alxHwLpcXpresso55S69_Home.md)
+        - Test
     - HwNfcWlcListenerV3_5b
         - Test
     - HwNucleoF429Zi
