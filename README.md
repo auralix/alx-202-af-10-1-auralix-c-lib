@@ -16,3 +16,4 @@
 - [ALX-202-SW-10--GitSystem_IntroVideo](https://youtu.be/nFu7CV_JDlc)
 - [ALX-202-SW-VID-1--AlxTestingSystem](https://youtu.be/ExWDTswHC3M)
 - [ALX-202-SW-VID-2--AlxWikiSystem](https://youtu.be/qGzHsdMJJxE)
+- [ALX-202-SW-VID-3--AlxHwLpcXpresso55S69_StartGuide](https://youtu.be/_WEcMA0Qp60)

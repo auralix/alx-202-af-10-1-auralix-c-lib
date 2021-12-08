@@ -3,7 +3,7 @@
 
 ## Youtube
 ---
-    - [Start Guide](test)
+- [ALX-202-SW-VID-3--AlxHwLpcXpresso55S69_StartGuide](https://youtu.be/_WEcMA0Qp60)
 
 ## HW
 ---
