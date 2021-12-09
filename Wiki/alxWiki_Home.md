@@ -17,7 +17,7 @@
 - Mcu
     - McuLpc
         - McuLpc17
-        - McuLpc80x
+        - [McuLpc80x](Mcu/McuLpc/McuLpc80x/alxWiki_McuLpc80x.md)
             - [alxAdc_McuLpc80x - ALX MCU LPC80x ADC Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxAdc_McuLpc80x.md)
             - [alxClk_McuLpc80x - ALX MCU LPC80x Clock Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxClk_McuLpc80x.md)
             - [alxDbgPin_McuLpc80x - ALX MCU LPC80x Debug Pin Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxDbgPin_McuLpc80x.md)
