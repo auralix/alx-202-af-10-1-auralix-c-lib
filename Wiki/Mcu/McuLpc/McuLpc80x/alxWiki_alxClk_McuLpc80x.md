@@ -5,6 +5,6 @@
 - TODO
 ---
 ## Ctor Arguments
-- __AlxClk* me__ - Clk object
+- __AlxClk* me__ - Pointer to Clk object
 - __AlxClk_Config config__ - Clock configuration enu,
 - __AlxClk_Tick tick__ - Tick time enum

@@ -24,6 +24,7 @@
             - [alxGlobal_McuLpc80x - ALX MCU LPC80x Global Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxGlobal_McuLpc80x.md)
             - [alxI2c_McuLpc80x - ALX MCU LPC80x I2C Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxI2c_McuLpc80x.md)
             - [alxIoPin_McuLpc80x - ALX MCU LPC80x IO Pin Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxIoPin_McuLpc80x.md)
+            - [alxIoPinIrq_McuLpc80x - ALX MCU LPC80x IO Pin Irq Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxIoPinIrq_McuLpc80x.md)
             - [alxPwm_McuLpc80x - ALX MCU LPC80x PWM Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxPwm_McuLpc80x.md)
             - [alxTrace_McuLpc80x - ALX MCU LPC80x Trace Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxTrace_McuLpc80x.md)
         - McuLpc84
