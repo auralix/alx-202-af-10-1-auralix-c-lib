@@ -70,13 +70,13 @@ void AlxPwm_Ctor
 	CTIMER_Type* tim,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,
+	uint8_t numOfCh,
+	AlxClk* clk,
 	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	uint16_t* dutyDefaultArr_permil,
 	#else
 	float* dutyDefaultArr_pct,
 	#endif
-	uint8_t numOfCh,
- 	AlxClk* clk,
 	uint32_t prescaler,
 	uint32_t period
 );

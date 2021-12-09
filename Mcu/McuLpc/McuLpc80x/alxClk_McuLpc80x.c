@@ -152,6 +152,10 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 	ALX_CLK_ASSERT(false); // We shouldn't get here
 	return 0;
 }
+void AlxClk_Irq_Handle(AlxClk* me)
+{
+	// TODO
+}
 
 
 //******************************************************************************

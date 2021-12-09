@@ -37,13 +37,13 @@ void AlxPwm_Ctor
 	CTIMER_Type* tim,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,
+	uint8_t numOfCh,
+	AlxClk* clk,
 	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	uint16_t* dutyDefaultArr_permil,
 	#else
 	float* dutyDefaultArr_pct,
 	#endif
-	uint8_t numOfCh,
-	AlxClk* clk,
 	uint32_t prescaler,
 	uint32_t period
 )
@@ -53,13 +53,13 @@ void AlxPwm_Ctor
 	(void)tim;
 	(void)ioPinArr;
 	(void)chArr;
+	ALX_PWM_ASSERT(numOfCh <= 3); // MF: Only match registers 0, 1, 2 can be used for PRM Output. Match register 3 is for cycle lenght(freq or period)
+	(void)clk;
 	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	(void)dutyDefaultArr_permil;
 	#else
 	(void)dutyDefaultArr_pct;
 	#endif
-	ALX_PWM_ASSERT(numOfCh <= 3); // MF: Only match registers 0, 1, 2 can be used for PRM Output. Match register 3 is for cycle lenght(freq or period)
-	(void)clk;
 	(void)prescaler;
 	(void)period;
 	for (uint8_t i = 0; i < numOfCh - 1; i++) ALX_PWM_ASSERT(chArr[i] < chArr[i + 1]); // Channel sequence must be from low to high number
