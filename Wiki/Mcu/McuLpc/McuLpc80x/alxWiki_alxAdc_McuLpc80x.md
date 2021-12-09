@@ -12,7 +12,7 @@
 ---
 ## Ctor Arguments
 - **AlxAdc* me** - Adc object
-- **AlxIoPin** ioPinArr** - Pointer to array of IoPin pointers
+- ***AlxIoPin** ioPinArr*** - Pointer to array of IoPin pointers
 - **Alx_Ch* chArr** - Pointer to array of Channels
 - **uint8_t numOfIoPinsAndCh** - Number of channels used for Adc
 - **AlxClk* clk** - Clk obejct
