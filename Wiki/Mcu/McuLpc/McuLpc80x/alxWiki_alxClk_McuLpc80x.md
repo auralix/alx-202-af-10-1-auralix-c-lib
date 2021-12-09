@@ -1,5 +1,9 @@
 # Auralix C Library - ALX MCU LPC80x Clock Module
 ---
-- Write all relevant notes here
-- All notes must be written in bullet style text like this
-- Bitbucket Markdown compatible language must be used
+## General
+- Function "void AlxClk_Irq_Handle(AlxClk* me)" is not implemented
+---
+## Ctor Arguments
+- __AlxClk* me__ - Clk object
+- __AlxClk_Config config__ - Clock configuration enu,
+- __AlxClk_Tick tick__ - Tick time enum

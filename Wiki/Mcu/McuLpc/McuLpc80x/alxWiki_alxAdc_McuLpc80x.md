@@ -16,5 +16,5 @@
 - __Alx_Ch* chArr__ - Pointer to array of Channels
 - __uint8_t numOfIoPinsAndCh__ - Number of channels used for Adc
 - __AlxClk* clk__ - Clk obejct
-- uint32_t vRef_mV - Reference voltage 
-- float vRef_V
+- __uint32_t vRef_mV__ - Reference voltage in millivolts when OPTIMIZE SIZE __enabled__
+- __float vRef_V__  - Reference voltage in volts when OPTIMIZE SIZE __disabled__
