@@ -109,8 +109,8 @@ typedef struct
 	//P0_13	- Unused
 	//P0_14	- Unused
 	//P0_15	- Unused
-	AlxIoPin io_P0_16_I2C_SDA;
-	AlxIoPin do_P0_17_I2C_SCL;
+	AlxIoPin io_P0_16_I2C0_SDA;
+	AlxIoPin do_P0_17_I2C0_SCL;
 	AlxIoPin do_P0_18_LED205_RD;
 	AlxIoPin do_P0_19_LED200_GR;
 	//P0_20	- Unused
@@ -130,7 +130,7 @@ typedef struct
 {
 	// ALX Objects
 	AlxIoPinIrq alxIrqPin_IRQ1;
-	AlxI2c alxI2c_I2C_Master;
+	AlxI2c alxI2c_I2C0_Master;
 	AlxAdc alxAdc_ADC4_Master;
 	AlxPwm alxPwm_Master;
 
@@ -166,8 +166,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//P0_13	- Unused
 	//P0_14	- Unused
 	//P0_15	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.io_P0_16_I2C_SDA, 0, 16, AlxIoPin_Func_Swm_I2C0_SDA, IOCON_MODE_INACT, false, false, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_17_I2C_SCL, 0, 17, AlxIoPin_Func_Swm_I2C0_SCL, IOCON_MODE_INACT, false, false, false);
+	AlxIoPin_Ctor(&me->alxIoPin.io_P0_16_I2C0_SDA, 0, 16, AlxIoPin_Func_Swm_I2C0_SDA, IOCON_MODE_INACT, false, false, false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_17_I2C0_SCL, 0, 17, AlxIoPin_Func_Swm_I2C0_SCL, IOCON_MODE_INACT, false, false, false);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_18_LED205_RD, 0, 18, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_19_LED200_GR, 0, 19, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//P0_20	- Unused
@@ -202,7 +202,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	AlxClk_Ctor
 	(
 		&alxClk,
-		AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz, AlxClk_Tick_1ms
+		AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz,
+		AlxClk_Tick_1ms
 	);
 
 
@@ -229,10 +230,10 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//------------------------------------------------------------------------------
 	AlxI2c_Ctor
 	(
-		&me->alxI2c_I2C_Master,
+		&me->alxI2c_I2C0_Master,
 		I2C0,
-		&me->alxIoPin.do_P0_17_I2C_SCL,
-		&me->alxIoPin.io_P0_16_I2C_SDA,
+		&me->alxIoPin.do_P0_17_I2C0_SCL,
+		&me->alxIoPin.io_P0_16_I2C0_SDA,
 		AlxI2c_Clk_McuLpc80x_BitRate_100kHz_I2cFuncClk_15MHz
 	);
 

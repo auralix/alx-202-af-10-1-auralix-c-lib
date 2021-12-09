@@ -1,5 +1,23 @@
 # Auralix C Library - ALX MCU LPC80x PWM Module
 ---
-- Write all relevant notes here
-- All notes must be written in bullet style text like this
-- Bitbucket Markdown compatible language must be used
+## General
+- This module has OPTIMIZE SIZE option
+    - When optimization enabled:
+        - Ctor - Default duties are in permil unsigned
+        - Function "Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)" triggers Assert and must not be used
+    - When optimization disabled:
+        - Ctor - Default duties are in permil float
+        - Function "Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)" triggers Assert and must not be used
+- TODO
+---
+## Ctor Arguments
+- __AlxPwm* me__ - Pointer to Pwm object
+- __CTIMER_Type* tim__ - Ctimer peripheral base pointer
+- __AlxIoPin** ioPinArr__ - Pointer to array of IoPin pointers
+- __Alx_Ch* chArr__ - Pointer to array of Pwm Channels
+- __uint8_t numOfCh__ - Number of channels used for Pwm
+- __AlxClk* clk__ - Pointer to Clk obejct
+- __uint16_t* dutyDefaultArr_permil__ - Default duty in permils when OPTIMIZE SIZE __enabled__
+- __float* dutyDefaultArr_pct__ - Default duty in percent when OPTIMIZE SIZE __disabled__
+- __uint32_t prescaler__ - 
+- __uint32_t period__ - Frequency in Hz of Pwm

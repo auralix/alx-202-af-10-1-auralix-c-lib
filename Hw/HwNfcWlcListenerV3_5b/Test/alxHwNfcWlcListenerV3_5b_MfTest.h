@@ -122,7 +122,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T04_Pwm(AlxH
 	#endif
 
 	// Pwm Ctor
-	AlxPwm_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm_Master, CTIMER0, pwmIoPinArr, pwmChArr, pwmDutyDefaultArr, ALX_ARR_LEN(pwmChArr), &alxClk, 0, 100);
+	AlxPwm_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm_Master, CTIMER0, pwmIoPinArr, pwmChArr, ALX_ARR_LEN(pwmChArr), &alxClk, pwmDutyDefaultArr, 0, 100);
 
 	// Pwm Init
 	AlxPwm_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm_Master);
@@ -153,7 +153,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T05_I2c(AlxH
 
 	while (1)
 	{
-		AlxI2c_Master_StartReadMemStop(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C_Master, devAdrReceive, memAddr, AlxI2c_Master_MemAddrLen_16bit, i2cData, 1, 20, 100);
+		AlxI2c_Master_StartReadMemStop(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0_Master, devAdrReceive, memAddr, AlxI2c_Master_MemAddrLen_16bit, i2cData, 1, 20, 100);
 		//AlxI2c_Master_StartWriteMemStop_Single(&i2c, slaveAddr, memAddr, AlxI2c_Master_MemAddrLen_16bit, i2cData[0], true, 5, 100);
 
 		AlxDelay_ms(1000);
@@ -168,7 +168,6 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Ctor(AlxHwNf
 {
 	// Ctor
 	AlxHwNfcWlcListenerV3_5b_Main_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main);
-	//AlxHwNfcWlcListenerV3_5b_Main_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -184,7 +183,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Init(AlxHwNf
 
 	// I2c
 	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.ao_P0_11_CRN_VCC);
-	AlxI2c_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C_Master);
+	AlxI2c_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0_Master);
 
 	// Info
 	me->isInit = true;
