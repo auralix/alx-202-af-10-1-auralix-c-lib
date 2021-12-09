@@ -11,10 +11,10 @@
 - TempSens function is not supported on this MCU
 ---
 ## Ctor Arguments
-- **AlxAdc* me** - Adc object
-- ***AlxIoPin** ioPinArr*** - Pointer to array of IoPin pointers
-- **Alx_Ch* chArr** - Pointer to array of Channels
-- **uint8_t numOfIoPinsAndCh** - Number of channels used for Adc
-- **AlxClk* clk** - Clk obejct
+- __AlxAdc* me__ - Adc object
+- __AlxIoPin** ioPinArr__ - Pointer to array of IoPin pointers
+- __Alx_Ch* chArr__ - Pointer to array of Channels
+- __uint8_t numOfIoPinsAndCh__ - Number of channels used for Adc
+- __AlxClk* clk__ - Clk obejct
 - uint32_t vRef_mV - Reference voltage 
 - float vRef_V
