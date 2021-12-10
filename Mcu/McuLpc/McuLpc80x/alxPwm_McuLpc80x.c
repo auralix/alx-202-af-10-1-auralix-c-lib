@@ -79,7 +79,7 @@ void AlxPwm_Ctor
 	me->numOfCh = numOfCh;
 
 	// Variables
-	me->config.input = kCTIMER_Capture_0; // This field is ignored when mode is timer
+	me->config.input = kCTIMER_Capture_0; // This field is ignored when mode is "timer"
 	me->config.mode =  kCTIMER_TimerMode;
 	me->config.prescale = prescaler;
 

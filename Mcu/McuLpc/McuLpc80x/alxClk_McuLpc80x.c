@@ -110,7 +110,7 @@ Alx_Status AlxClk_Init(AlxClk* me)
 	else																									{ ALX_CLK_ASSERT(false); return Alx_Err; }
 
 	// #4 Configure SysTick
-	SysTick_Config(SystemCoreClock / (800000U / me->tick)); // MF: In the example it was 1000000 but then tick doesn't count right
+	SysTick_Config(SystemCoreClock / (800000U / me->tick)); // MF: In the example it was 1000000 but then tick didn't count right
 
 	// #5 Check Clocks
 	if (AlxClk_AreClkNok(me)) { ALX_CLK_TRACE("ErrCheck"); return Alx_Err; }
@@ -130,7 +130,7 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 
 	if (me->isInit)
 	{
-		if (clk == AlxClk_Clk_McuLpc8xx_CoreSysClk)		return me->coreSysClk; // tu variable nakurim
+		if (clk == AlxClk_Clk_McuLpc8xx_CoreSysClk)		return me->coreSysClk; // MF: tu variable nakurim
 		if (clk == AlxClk_Clk_McuLpc8xx_MainClk)		return me->mainClk;
 		if (clk == AlxClk_Clk_McuLpc8xx_Fro)			return me->fro;
 		if (clk == AlxClk_Clk_McuLpc8xx_FroDiv)			return me->fro >> 1U;
@@ -155,6 +155,7 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 void AlxClk_Irq_Handle(AlxClk* me)
 {
 	// TODO
+	ALX_CLK_ASSERT(false);
 }
 
 
@@ -166,7 +167,6 @@ static void AlxClk_PeriphGpio_EnableClk()
 	CLOCK_EnableClock(kCLOCK_Gpio0);
 
 	//CLOCK_EnableClock(kCLOCK_Gpio1); // Doesn't work on Lpc804
-
 }
 static void AlxClk_PeriphGpio_Reset()
 {
@@ -176,16 +176,14 @@ static void AlxClk_PeriphGpio_Reset()
 }
 static void AlxClk_SetFro(AlxClk* me)
 {
-	POWER_DisablePD(kPDRUNCFG_PD_FRO_OUT);		// Ensure FRO is on
-	POWER_DisablePD(kPDRUNCFG_PD_FRO);			// Ensure FRO is on
-	//CLOCK_SetFroOutClkSrc(kCLOCK_FroSrcFroOsc);	// Set FRO clock source direct from FRO oscillator   // Doesn't work on Lpc804
+	POWER_DisablePD(kPDRUNCFG_PD_FRO_OUT);			// Ensures FRO is on
+	POWER_DisablePD(kPDRUNCFG_PD_FRO);				// Ensures FRO is on
+	//CLOCK_SetFroOutClkSrc(kCLOCK_FroSrcFroOsc);	// Set FRO clock source direct from FRO oscillator // Doesn't work on Lpc804
 
-	CLOCK_SetMainClkSrc(kCLOCK_MainClkSrcFro);	// Select FRO for Main Clk
+	CLOCK_SetMainClkSrc(kCLOCK_MainClkSrcFro);		// Select FRO for Main Clk
 
-
-
-	/*CLOCK_Select(kFRG0_Clk_From_Fro);			// Select FRO for FRG0		// MF: We migh not need this , I don't understand this
-	CLOCK_SetFRG0ClkFreq(15000000U);			// Select FRG0 freq*/
+	/*CLOCK_Select(kFRG0_Clk_From_Fro);				// Select FRO for FRG0		// MF: We migh not need this, I don't understand this
+	CLOCK_SetFRG0ClkFreq(15000000U);				// Select FRG0 freq*/
 }
 static bool AlxClk_AreClkNok(AlxClk* me)
 {
@@ -195,31 +193,61 @@ static bool AlxClk_AreClkNok(AlxClk* me)
 	//me->extClk = CLOCK_GetExtClkFreq(); // MF: Don't know how we will use it
 	//me->frg0 = CLOCK_GetFRG0ClkFreq(); // MF: Don't know how we will use it
 
-	if		(me->coreSysClk != me->coreSysClk_Ctor)			{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
-	else if (me->mainClk != me->mainClk_Ctor)				{ ALX_CLK_TRACE("ErrMainClock");	return true; }
-	else if (me->fro != me->fro)							{ ALX_CLK_TRACE("ErrFro");			return true; }
-
+	if		(me->coreSysClk != me->coreSysClk_Ctor)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
+	else if (me->mainClk != me->mainClk_Ctor)			{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+	else if (me->fro != me->fro)						{ ALX_CLK_TRACE("ErrFro");			return true; }
 
 	if (me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default)
 	{
-		if		(CLOCK_GetMainClkFreq()    != 12000000U)	{ ALX_CLK_TRACE("ErrMainClock");	return true; }
-		else if (CLOCK_GetCoreSysClkFreq() != 12000000U)	{ ALX_CLK_TRACE("ErrCoreSysClock"); return true; }
+		if (CLOCK_GetMainClkFreq()    != 12000000U)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+		if (CLOCK_GetCoreSysClkFreq() != 12000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
 	}
 	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz)
 	{
-		if		(CLOCK_GetMainClkFreq()    != 15000000U)	{ ALX_CLK_TRACE("ErrMainClock");	return true; }
-		else if (CLOCK_GetCoreSysClkFreq() != 15000000U)	{ ALX_CLK_TRACE("ErrCoreSysClock"); return true; }
+		if (CLOCK_GetMainClkFreq()    != 15000000U)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+		if (CLOCK_GetCoreSysClkFreq() != 15000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
 	}
 	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz)
 	{
-		if		(CLOCK_GetMainClkFreq()    != 9000000U)		{ ALX_CLK_TRACE("ErrMainClock");		return true; }
-		else if (CLOCK_GetCoreSysClkFreq() != 9000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");		return true; }
+		if (CLOCK_GetMainClkFreq()    != 9000000U)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+		if (CLOCK_GetCoreSysClkFreq() != 9000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
 	}
-	// MF: TODO treba še ostale enume naštancat
+	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz_LPO_1MHz)
+	{
+		if (CLOCK_GetMainClkFreq()    != 15000000U)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+		if (CLOCK_GetCoreSysClkFreq() != 15000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
+		if (CLOCK_GetLPOscFreq()      != 1000000U)		{ ALX_CLK_TRACE("ErrLowPwrOsc");	return true; }
+	}
+	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_LPO_1MHz)
+	{
+		if (CLOCK_GetMainClkFreq()    != 12000000U)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+		if (CLOCK_GetCoreSysClkFreq() != 12000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
+		if (CLOCK_GetLPOscFreq()      != 1000000U)		{ ALX_CLK_TRACE("ErrLowPwrOsc");	return true; }
+	}
+	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_1MHz)
+	{
+		if (CLOCK_GetMainClkFreq()    != 9000000U)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+		if (CLOCK_GetCoreSysClkFreq() != 9000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
+		if (CLOCK_GetLPOscFreq()      != 1000000U)		{ ALX_CLK_TRACE("ErrLowPwrOsc");	return true; }
+	}
+	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_7MHz5)
+	{
+		if(CLOCK_GetMainClkFreq()    != 15000000U)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+		if (CLOCK_GetCoreSysClkFreq() != 7500000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
+	}
+	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz)
+	{
+		if (CLOCK_GetMainClkFreq()    != 12000000U)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+		if (CLOCK_GetCoreSysClkFreq() != 6000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
+	}
+	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5)
+	{
+		if (CLOCK_GetMainClkFreq()    != 9000000U)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+		if (CLOCK_GetCoreSysClkFreq() != 4500000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
+	}
 
 	return false;
 }
-
 static void AlxClk_Ctor_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(AlxClk* me)
 {
 	me->coreSysClk_Ctor	= 12000000U;
@@ -241,7 +269,6 @@ static void AlxClk_Ctor_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(AlxC
 	me->fro_Ctor		= 18000000U;
 	me->lpo_Ctor		= 1000000U;
 }
-
 static void AlxClk_Init_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(AlxClk* me)
 {
 	AlxClk_SetFro(me);

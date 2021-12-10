@@ -27,7 +27,7 @@ static uint8_t AlxI2c_GetMemAddrLen(AlxI2c_Master_MemAddrLen* memAddrLen);
 static Alx_Status AlxI2c_ReInit(AlxI2c* me);
 static void AlxI2c_Periph_SelectClk(AlxI2c* me);
 
-// MF: These functions are copied from FSL so that we can add Timeout 
+// MF: These functions are copied from FSL so that Timeout can be added
 static status_t AlxI2c_MasterStart(AlxI2c* me, I2C_Type* base, uint8_t address, i2c_direction_t direction, uint16_t timeout);
 static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const void* txBuff, size_t txSize, uint32_t flags, uint16_t timeout);
 static status_t AlxI2c_MasterReadBlocking(AlxI2c* me, I2C_Type* base, void* rxBuff, size_t rxSize, uint32_t flags, uint16_t timeout);
@@ -46,6 +46,13 @@ void AlxI2c_Ctor
 	AlxI2c_Clk clk
 )
 {
+	// Assert
+	(void)me;
+	(void)i2c;
+	(void)io_SCL;
+	(void)io_SDA;
+	(void)clk;
+
 	// Objects - External
 	me->io_SCL = io_SCL;
 	me->io_SDA = io_SDA;
@@ -72,6 +79,7 @@ void AlxI2c_Ctor
 //******************************************************************************
 Alx_Status AlxI2c_Init(AlxI2c* me)
 {
+	// Assert
 	ALX_I2C_ASSERT(me->isInit == false);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 
@@ -83,7 +91,7 @@ Alx_Status AlxI2c_Init(AlxI2c* me)
 	AlxI2c_Periph_SelectClk(me);
 
 	// #4 Init I2C
-	I2C_MasterInit(me->i2c, &me->i2cConfig, 15000000U); // "Periph_Reset" and "EnableClk" happens here. MF: srcClock_Hz = I2cFuncClk = MainClk
+	I2C_MasterInit(me->i2c, &me->i2cConfig, CLOCK_GetMainClkFreq()); // "Periph_Reset" and "EnableClk" happens here. MF: srcClock_Hz = I2cFuncClk = MainClk
 
 	// #5 Set isInit
 	me->isInit = true;
@@ -93,6 +101,7 @@ Alx_Status AlxI2c_Init(AlxI2c* me)
 }
 Alx_Status AlxI2c_DeInit(AlxI2c* me)
 {
+	// Assert
 	ALX_I2C_ASSERT(me->isInit == true);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 	
@@ -123,6 +132,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 }
 Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
+	// Assert
 	ALX_I2C_ASSERT(me->isInit == true);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -211,6 +221,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Single(AlxI2c* me, uint16_t slaveAddr
 }
 Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, const uint8_t* data, uint16_t len, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms)
 {
+	// Assert
 	ALX_I2C_ASSERT(me->isInit == true);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -311,6 +322,7 @@ Alx_Status AlxI2c_Master_Stop(AlxI2c* me, uint16_t timeout_ms)
 }
 Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t numOfTries, uint16_t timeout_ms)
 {
+	// Assert
 	ALX_I2C_ASSERT(me->isInit == true);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -329,7 +341,7 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_Err; }
 	}*/
 
-	return Alx_Ok;
+	return Alx_Err;
 }
 
 

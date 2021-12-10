@@ -45,7 +45,14 @@ void AlxIoPin_Ctor
 )
 {
 	// Assert
-	//if ((alxDbgPin.pin == pin) && (alxDbgPin.port == port)) { ALX_IO_PIN_ASSERT(false); } // MF: Checks Pin and Port are nat the same as DBG Pin
+	(void)me;
+	(void)port;
+	(void)pin;
+	(void)func;
+	(void)mode;
+	(void)isOpenDrain;
+	(void)dir;
+	(void)val;
 
 	// Parameters
 	me->port = port;
@@ -65,6 +72,7 @@ void AlxIoPin_Ctor
 }
 void AlxIoPin_Init(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == false);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
@@ -128,6 +136,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 }
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
@@ -168,40 +177,50 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 }
 bool AlxIoPin_Read(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Read Pin
 	if (GPIO_PinRead(GPIO, me->port, me->pin) == 1) { return true; }
 	else { return false; }
 }
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
+	// Assert
 	(void)val;
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Write Pin
 	if (val) { GPIO_PinWrite(GPIO, me->port, me->pin, 1U); }
 	else { GPIO_PinWrite(GPIO, me->port, me->pin, 0U); }
 }
 void AlxIoPin_Set(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Set Pin
 	GPIO_PortSet(GPIO, me->port, (1U << me->pin));
 }
 void AlxIoPin_Reset(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Reset Pin
 	GPIO_PortClear(GPIO, me->port, (1U << me->pin));
 }
 void AlxIoPin_Toggle(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Toggle Pin
 	GPIO_PortToggle(GPIO, me->port, (1U << me->pin));
 }
 void AlxIoPin_Lock(AlxIoPin* me)

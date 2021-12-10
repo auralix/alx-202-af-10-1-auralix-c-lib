@@ -116,7 +116,7 @@ uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port)
 	#endif
 
 	//ALX_IO_PIN_ASSERT(false); // We shouldn't get here
-	return 0;
+	return 255;
 }
 void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode)
 {
