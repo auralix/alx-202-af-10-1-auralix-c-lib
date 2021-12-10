@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * @file AlxHwNfcWlcListenerV3_5b_MainTest.h
-  * @brief Auralix HW NUCLEO-F429ZI C Library - Main Test Module
+  * @file alxHwNfcWlcListenerV3_5b_MainTest.h
+  * @brief Auralix HW NFC WLC Listener V3_5 C Library - Main Test Module
   * @version $LastChangedRevision: 4937 $
   * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
   ******************************************************************************
@@ -46,7 +46,6 @@ typedef struct
 	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp;
 
 	// Tv
-	//AlxHwNucleoF429Zi_TvTest_G01_BringUp alxHwNucleoF429Zi_TvTest_G01_BringUp;
 
 } AlxHwNfcWlcListenerV3_5b_MainTest;
 
@@ -72,7 +71,6 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Ctor(AlxHwNfcWlcListenerV3_
 	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
 
 	// Tv
-	//AlxHwNucleoF429Zi_TvTest_G01_BringUp_Ctor(&me->alxHwNucleoF429Zi_TvTest_G01_BringUp);
 }
 static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Init(AlxHwNfcWlcListenerV3_5b_MainTest* me)
 {
@@ -86,7 +84,6 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Init(AlxHwNfcWlcListenerV3_
 	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Init(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
 
 	// Tv
-	//AlxHwNucleoF429Zi_TvTest_G01_BringUp_Init(&me->alxHwNucleoF429Zi_TvTest_G01_BringUp);
 }
 static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Run(AlxHwNfcWlcListenerV3_5b_MainTest* me)
 {
@@ -100,7 +97,6 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Run(AlxHwNfcWlcListenerV3_5
 	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Run(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
 
 	// Tv
-	//AlxHwNucleoF429Zi_TvTest_G01_BringUp_Run(&me->alxHwNucleoF429Zi_TvTest_G01_BringUp);
 }
 
 

@@ -53,7 +53,7 @@ typedef struct
 {
 	// Parameters
 	AlxClk_Config config;
-	AlxClk_Tick tick;	// TODO
+	AlxClk_Tick tick;
 
 	// Variables
 	uint32_t coreSysClk;

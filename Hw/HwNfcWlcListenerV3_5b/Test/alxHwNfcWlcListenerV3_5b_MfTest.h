@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * @file alxHwNucleoF429Zi_TvTest.h
-  * @brief Auralix HW NUCLEO-F429ZI C Library - TV Test Module
+  * @file alxHwNfcWlcListenerV3_5b_MfTest.h
+  * @brief Auralix HW NFC WLC Listener V3_5 C Library - MF Test Module
   * @version $LastChangedRevision: 4937 $
   * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
   ******************************************************************************
@@ -138,7 +138,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T04_Pwm(AlxH
 		#else
 		AlxPwm_SetDuty_pct(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm_Master, pwmChArr[0], 10);
 		AlxPwm_SetDuty_pct(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm_Master, pwmChArr[1], 90);
-		#endif
+		#endif
+
 		AlxDelay_ms(800);
 	}
 }

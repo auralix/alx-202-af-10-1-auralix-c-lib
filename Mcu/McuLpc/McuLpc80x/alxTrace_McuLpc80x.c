@@ -38,8 +38,16 @@ void AlxTrace_Ctor
 	uint8_t port,
 	uint8_t pin,
 	USART_Type* usart,
-	AlxGlobal_BaudRate baudRate)
+	AlxGlobal_BaudRate baudRate
+)
 {
+	// Assert
+	(void)me;
+	(void)port;
+	(void)pin;
+	(void)usart;
+	(void)baudRate;
+
 	// Parameters
 	me->port = port;
 	me->pin = pin;

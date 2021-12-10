@@ -31,18 +31,18 @@ extern "C" {
 #include "fsl_crc.h"
 #include "fsl_ctimer.h"
 #include "fsl_dac.h"
-//#include "fsl_dma.h"
+//#include "fsl_dma.h" // Doesn't work on Lpc804
 #include "fsl_gpio.h"
 #include "fsl_i2c.h"
 #include "fsl_iap.h"
-//#include "fsl_inputmux.h"
-//#include "fsl_inputmux_connections.h"
+//#include "fsl_inputmux.h" // Doesn't work on Lpc804
+//#include "fsl_inputmux_connections.h" // Doesn't work on Lpc804
 #include "fsl_iocon.h"
 #include "fsl_mrt.h"
 #include "fsl_pint.h"
 #include "fsl_power.h"
 #include "fsl_reset.h"
-//#include "fsl_sctimer.h"
+//#include "fsl_sctimer.h" // Doesn't work on Lpc804
 #include "fsl_spi.h"
 #include "fsl_swm.h"
 #include "fsl_swm_connections.h"

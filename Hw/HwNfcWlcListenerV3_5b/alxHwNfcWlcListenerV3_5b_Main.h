@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * @file alxHwNucleoF429Zi_Main.h
-  * @brief Auralix HW NUCLEO-F429ZI C Library - Main Module
+  * @file alxHwNfcWlcListenerV3_5b_Main.h
+  * @brief Auralix HW NFC WLC Listener V3_5 C Library - Main Module
   * @version $LastChangedRevision: 4937 $
   * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
   ******************************************************************************

@@ -2,7 +2,7 @@
 ---
 ## General
 - Function "void AlxClk_Irq_Handle(AlxClk* me)" is not implemented
-- TODO
+- This module has not been *fully* tested yet
 ---
 ## Ctor Arguments
 - __AlxClk* me__ - Pointer to Clk object

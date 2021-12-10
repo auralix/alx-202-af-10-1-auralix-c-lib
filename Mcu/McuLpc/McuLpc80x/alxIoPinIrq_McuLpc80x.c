@@ -53,6 +53,13 @@ void AlxIoPinIrq_Ctor
 	Alx_IrqPriority irqPriority
 )
 {
+	// Assert
+	(void)me;
+	(void)ioPin;
+	(void)irqPin;
+	(void)irqType;
+	(void)irqPriority;
+
 	// Parameters
 	me->ioPin = ioPin;
 	me->irqPin = irqPin;
