@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file alxPca9431.h
-  * @brief Auralix C Library - ALX opis PCA9431 Module
+  * @brief Auralix C Library - ALX PCA9431 Module
   * @version $LastChangedRevision: 5079 $
   * @date $LastChangedDate: 2021-05-12 19:54:08 +0200 (Wed, 12 May 2021) $
   ******************************************************************************
@@ -452,7 +452,7 @@ typedef union
 		AlxPca9431_0Dh_AdcRate ADC_RATE : 2; 
 		AlxPca9431_0Dh_AdcEn ADC_EN : 1;
 		uint8_t unused_5_7 : 3; // bits 5...7 are unused
-	};	
+	};
 	uint8_t raw;
 } AlxPca9431_RegVal_0Dh_AdcControl;
 
@@ -936,7 +936,7 @@ typedef struct
 	uint8_t len;
 	AlxPca9431_RegVal_01h_SystemInt val;
 } AlxPca9431_Reg_01h_SystemInt;
-	
+
 typedef struct
 {
 	uint8_t addr;
@@ -964,14 +964,14 @@ typedef struct
 	uint8_t len;
 	AlxPca9431_RegVal_05h_VOutLdoInt val;
 } AlxPca9431_Reg_05h_VOutLdoInt;
-	
+
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_06h_VOutLdoIntMask val;
 } AlxPca9431_Reg_06h_VOutLdoIntMask;
-	
+
 typedef struct
 {
 	uint8_t addr;
@@ -999,7 +999,7 @@ typedef struct
 	uint8_t len;
 	AlxPca9431_RegVal_0Ah_TempThd val;
 } AlxPca9431_Reg_0Ah_TempThd;
-	
+
 typedef struct
 {
 	uint8_t addr;
@@ -1055,7 +1055,7 @@ typedef struct
 	uint8_t len;
 	AlxPca9431_RegVal_21h_VOutLdoSetOCP val;
 } AlxPca9431_Reg_21h_VOutLdoSetOCP;
-	
+
 typedef struct
 {
 	uint8_t addr;
@@ -1197,7 +1197,6 @@ typedef struct
 
 	// Objects - External
 	AlxI2c* i2c;
-		
 	AlxIoPin* do_SleepEn;	// enable / disable sleep modo for PCA9431
 	AlxIoPin* di_Interrupt;	// Pca9431 interrupt
 
@@ -1224,7 +1223,7 @@ void AlxPca9431_Ctor
 	AlxPca9431* me,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
-	AlxIoPin* do_SleepEn,	
+	AlxIoPin* do_SleepEn,
 	AlxIoPin* di_Interrupt,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
@@ -1237,6 +1236,49 @@ void AlxPca9431_Ctor
 //******************************************************************************
 Alx_Status AlxPca9431_Init(AlxPca9431* me);
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me);
+Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC
+Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A); // 10 bit ADC
+Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC
+Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A); // 10 bit ADC
+Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC); // On chip temperature (-43°C ... +156°C)
+Alx_Status AlxPca9431_VTune_SetVoltage_V(AlxPca9431* me, float* voltage_V); // 0-3.3V 5 bit DAC - TODO
+Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC - TODO
+Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me);
+Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // ALX_ADAU1961_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //Alx_Status AlxPca9431_LdoVout_SetVoltage_V(AlxPca9431* me, AlxPca9431_0x07_VOutLdo VoutLdoxV); // 3,3V or 5V => write:  VoutLdo3V3 or. VoutLdo5V
 
 //Alx_Status AlxPca9431_LdoVPwr_SetVoltage_V(AlxPca9431* me, AlxPca9431_0x0F_VPwrOutSet VPwrOutxVx); // 1.8V, 2.5V, 2.8V, 3.3V  => write:  VPwrOut1V8 or. VPwrOut2V5 or. VPwrOut2V8 or. VPwrOut3V3
@@ -1245,15 +1287,15 @@ Alx_Status AlxPca9431_DeInit(AlxPca9431* me);
 
 //Alx_Status AlxPca9431_TempSens_SetWarning_C(AlxPca9431* me, AlxPca9431_0x0A_TempWarnThd TempWarnThdx0C); // 80°C, 90°C ... 110°C =>  write: TempWarnThd80C or. ... or. TempWarnThd110C
 //Alx_Status AlxPca9431_TempSens_SetShutdown_C(AlxPca9431* me, AlxPca9431_0x0A_TempShutdownThd TempShutdownThd1xxC); // 120°C, 125°C ... 150°C =>  write: TempShutdownThd120C or. ... or. TempShutdownThd150C
-Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC); // On chip temperature (-43°C ... +156°C)
-Alx_Status AlxPca9431_VTune_SetVoltage_V(AlxPca9431* me, float* voltage_V); // 0-3.3V 5 bit DAC - TODO
+
+
 //Alx_Status AlxPca9431_Rxir_SetDuration_s(AlxPca9431* me, AlxPca9431_0x10_RxirPullDownDuration RxirPullDownxmsx); // 0.2s, 0.4s, ... , 1.6s =>  write: RxirPullDown0ms2 or. ... or. RxirPullDown1ms6
 //Alx_Status AlxPca9431_Rxir_SetResistance_ohm(AlxPca9431* me, AlxPca9431_0x10_RxirPullDownR RxirPullDownx0R); // 20ohm, 80ohm, ... , 440ohm =>  write: RxirPullDown20R or. ... or. RxirPullDown440R	
-Alx_Status AlxPca9431_Ntc_GetTemp_degC(AlxPca9431* me, float* temp_degC); // external NTC voltage / battery temperature measurement - TODO
-Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me);
-Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
+//Alx_Status AlxPca9431_Ntc_GetTemp_degC(AlxPca9431* me, float* temp_degC); // external NTC voltage / battery temperature measurement - TODO
+
+
 //bool AlxPca9431_IsSleep(AlxPca9431* me);
-Alx_Status AlxPca9431_Adc_GetVoltage_VRECT(AlxPca9431* me, float* voltage_V);
+//Alx_Status AlxPca9431_Adc_GetVoltage_VRECT(AlxPca9431* me, float* voltage_V);
 
 // Adc
 // VRECT
@@ -1263,15 +1305,4 @@ Alx_Status AlxPca9431_Adc_GetVoltage_VRECT(AlxPca9431* me, float* voltage_V);
 // IRECT
 // NTC
 
-Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC - TODO
-Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC
-Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC
-Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A); // 10 bit ADC
-Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A); // 10 bit ADC
 
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // ALX_ADAU1961_H
