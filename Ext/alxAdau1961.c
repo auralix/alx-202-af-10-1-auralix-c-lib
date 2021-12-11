@@ -1,6 +1,6 @@
 ﻿/**
   ******************************************************************************
-  * @file alxAdau1961.h
+  * @file alxAdau1961.c
   * @brief Auralix C Library - ALX Audio Codec ADAU1961 Module
   * @version $LastChangedRevision: 4584 $
   * @date $LastChangedDate: 2021-04-03 03:11:01 +0200 (Sat, 03 Apr 2021) $
@@ -153,7 +153,7 @@ Alx_Status AlxAdau1961_DeInit(AlxAdau1961* me)
 {
 	// TODO
 	ALX_ADAU1961_ASSERT(false);
-	
+
 	return Alx_Err;
 }
 void AlxAdau1961_Foreground_Handle(AlxAdau1961* me)
@@ -283,7 +283,7 @@ Alx_Status AlxAdau1961_InAuxL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB)
 	else
 	{
 		ALX_ADAU1961_ASSERT((me->IN_AUX_GAIN_MIN_dB <= gain_dB) && (gain_dB <= me->IN_AUX_GAIN_MAX_dB));
-		
+
 		me->reg.R5_RecMixerLeft1.val.MX1AUXG = AlxAdau1961_CalcRegVal_InAuxGain(me, gain_dB);
 	}
 
@@ -309,7 +309,7 @@ Alx_Status AlxAdau1961_InAuxR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB)
 	else
 	{
 		ALX_ADAU1961_ASSERT((me->IN_AUX_GAIN_MIN_dB <= gain_dB) && (gain_dB <= me->IN_AUX_GAIN_MAX_dB));
-		
+
 		me->reg.R7_RecMixerRight1.val.MX2AUXG = AlxAdau1961_CalcRegVal_InAuxGain(me, gain_dB);
 	}
 
@@ -741,17 +741,18 @@ static uint8_t AlxAdau1961_CalcRegVal_OutLineGain(AlxAdau1961* me, int8_t gain_d
 ALX_WEAK void AlxAdau1961_RegStruct_SetClkVal(AlxAdau1961* me)
 {
 	(void)me;
-	
+
 	ALX_ADAU1961_TRACE("Define 'AlxAdau1961_RegStruct_SetClkVal' function in your application.");
 	ALX_ADAU1961_ASSERT(false);
 }
 ALX_WEAK void AlxAdau1961_RegStruct_SetNonClkVal(AlxAdau1961* me)
 {
 	(void)me;
-	
+
 	ALX_ADAU1961_TRACE("Define 'AlxAdau1961_RegStruct_SetNonClkVal' function in your application.");
 	ALX_ADAU1961_ASSERT(false);
 }
+
 
 
 
