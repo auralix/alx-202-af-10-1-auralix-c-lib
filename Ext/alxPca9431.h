@@ -20,7 +20,6 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxTimSw.h"
 #include "alxI2c.h"
 
 
