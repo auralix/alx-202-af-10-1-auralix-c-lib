@@ -17,7 +17,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -25,7 +25,7 @@
 //******************************************************************************
 static syscon_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me);
 static IRQn_Type AlxIoPin_GetIrqType(AlxIoPinIrq* me);
-static void AlxIoPin_PINT_Init(AlxIoPinIrq* me, PINT_Type* base); // MF: I had to rewrite FSL func without "Periph_Reset" in it so we can init more pins
+static void AlxIoPin_PINT_Init(AlxIoPinIrq* me, PINT_Type* base);	// MF: I had to rewrite FSL func without "Periph_Reset" in it so we can init more pins
 
 
 //******************************************************************************
@@ -81,20 +81,20 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 	// #2 Init IoPin
 	AlxIoPin_Init(me->ioPin);
 
-	// #3 Init if IRQ
+	// #3 Prepare IRQ Pin
 	syscon_connection_t irqPortPinSel = AlxIoPin_GetIrqPortPinSel(me);
 	IRQn_Type irqType = AlxIoPin_GetIrqType(me);
 
-	// #3.1 Attach IRQ to right Pin
+	// #4 Attach IRQ to right Pin
 	SYSCON_AttachSignal(SYSCON, me->irqPin, irqPortPinSel);
 
-	// #3.2 Init PINT Periphery
+	// #5 Init PINT Periphery
 	AlxIoPin_PINT_Init(me, PINT); // "EnableClk" happens here.
 
-	// #3.3 Enable IRQ
-	PINT_PinInterruptConfig(PINT, me->irqPin, me->irqType, ALX_NULL_PTR); // MF: "ALX_NULL_PTR" because we'll use "PIN_INTX_IRQHandler" from startup.s
-	NVIC_SetPriority(irqType, (uint32_t)me->irqPriority); // MF: Set IRQ Priority
-	PINT_EnableCallbackByIndex(PINT, me->irqPin); // MF: Enable IRQ
+	// #6 Enable IRQ
+	PINT_PinInterruptConfig(PINT, me->irqPin, me->irqType, ALX_NULL_PTR);	// MF: "ALX_NULL_PTR" because we'll use "PIN_INTX_IRQHandler" from startup.s
+	NVIC_SetPriority(irqType, (uint32_t)me->irqPriority);					// MF: Set IRQ Priority
+	PINT_EnableCallbackByIndex(PINT, me->irqPin);							// MF: Enable IRQ
 }
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 {
@@ -102,7 +102,7 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 	ALX_IO_PIN_IRQ_ASSERT(me->wasCtorCalled == true);
 
 	// #1 DeInit if IRQ
-	PINT_DisableCallbackByIndex(PINT, me->irqPin); // MF: Disable IRQ
+	PINT_DisableCallbackByIndex(PINT, me->irqPin);	// MF: Disable IRQ
 
 	// #2 Clear isInit attribute
 	me->isInit = false;
@@ -238,42 +238,42 @@ ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin7()
 void PIN_INT0_IRQHandler(void)
 {
 	AlxIoPinIrq_Foreground_Callback_Pin0();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt0); // Clear IRQ Flag
+	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt0);	// MF: Clear IRQ Flag
 }
 void PIN_INT1_IRQHandler(void)
 {
 	AlxIoPinIrq_Foreground_Callback_Pin1();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt1); // Clear IRQ Flag
+	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt1);	// MF: Clear IRQ Flag
 }
 void PIN_INT2_IRQHandler(void)
 {
 	AlxIoPinIrq_Foreground_Callback_Pin2();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt2); // Clear IRQ Flag
+	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt2);	// MF: Clear IRQ Flag
 }
 void PIN_INT3_IRQHandler(void)
 {
 	AlxIoPinIrq_Foreground_Callback_Pin3();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt3); // Clear IRQ Flag
+	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt3);	// MF: Clear IRQ Flag
 }
 void PIN_INT4_IRQHandler(void)
 {
 	AlxIoPinIrq_Foreground_Callback_Pin4();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt4); // Clear IRQ Flag
+	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt4);	// MF: Clear IRQ Flag
 }
 void PIN_INT5_IRQHandler(void)
 {
 	AlxIoPinIrq_Foreground_Callback_Pin5();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt5); // Clear IRQ Flag
+	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt5);	// MF: Clear IRQ Flag
 }
 void PIN_INT6_IRQHandler(void)
 {
 	AlxIoPinIrq_Foreground_Callback_Pin6();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt6); // Clear IRQ Flag
+	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt6);	// MF: Clear IRQ Flag
 }
 void PIN_INT7_IRQHandler(void)
 {
 	AlxIoPinIrq_Foreground_Callback_Pin7();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt7); // Clear IRQ Flag
+	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt7);	// MF: Clear IRQ Flag
 }
 
 

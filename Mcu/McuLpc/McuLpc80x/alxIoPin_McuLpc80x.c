@@ -17,7 +17,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -26,7 +26,7 @@
 static swm_port_pin_type_t AlxIoPin_GetSwmPortPinIndex(AlxIoPin* me);
 static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me);
 static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me);
-static swm_select_fixed_pin_t AlxIoPin_GetSwmMFixFunc(AlxIoPin* me);
+static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me);
 
 
 //******************************************************************************
@@ -112,7 +112,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 		else
 		{
 			// #4.1.2 Init if Fixed
-			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmMFixFunc(me);
+			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmFixFunc(me);
 			SWM_SetFixedPinSelect(SWM0, swmFixFunc, true);
 		}
 		CLOCK_DisableClock(kCLOCK_Swm);
@@ -126,7 +126,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 		if (me->dir)	gpioConfig.pinDirection = kGPIO_DigitalOutput;
 		else			gpioConfig.pinDirection = kGPIO_DigitalInput;
 
-		gpioConfig.outputLogic = 0U; // Clears output bit
+		gpioConfig.outputLogic = 0U; // MF: Clears output bit
 
 		GPIO_PinInit(GPIO, me->port, me->pin, &gpioConfig);
 	}
@@ -144,9 +144,9 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	uint8_t ioconPortPinIndex = AlxPROTECTED_IoPin_GetIoconPortPinIndex(me->pin, me->port);
 
 	CLOCK_EnableClock(kCLOCK_Iocon);
-	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U); // Reset Mode (00) Inactive (no pull-down/pull-up)
+	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U); // MF: Reset Mode (00) Inactive (no pull-down/pull-up)
 	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 4U);
-	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); // Reset Open Drain (0)
+	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); // MF: Reset Open Drain (0)
 	CLOCK_DisableClock(kCLOCK_Iocon);
 
 	// #2.1 DeInit if SWM used
@@ -160,7 +160,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 		}
 		else
 		{
-			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmMFixFunc(me);
+			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmFixFunc(me);
 			SWM_SetFixedPinSelect(SWM0, swmFixFunc, false);
 		}
 		CLOCK_DisableClock(kCLOCK_Swm);
@@ -226,30 +226,37 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 void AlxIoPin_Lock(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_IrqHandler(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_PullNone(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_PullUp(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_PullDown(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_AssertOn(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_AssertOff(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 
 
@@ -263,7 +270,7 @@ static swm_port_pin_type_t AlxIoPin_GetSwmPortPinIndex(AlxIoPin* me)
 }
 static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me)
 {
-	#if defined(ALX_LPC80x)
+	#if defined(ALX_LPC80X)
 	if (me->func <= 38)
 	{
 		me->swmFunc_isMovable = true;
@@ -276,7 +283,7 @@ static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me)
 	}
 	#endif
 
-	#if defined(ALX_LPC84x)
+	#if defined(ALX_LPC84X)
 	if (me->func <= 59)
 	{
 		me->func_isMovable = true;
@@ -295,7 +302,7 @@ static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->swmFunc_isMovable == true);
 
-	#if defined(ALX_LPC80x)
+	#if defined(ALX_LPC80X)
 	if (me->func == AlxIoPin_Func_Swm_USART0_TXD)		return kSWM_USART0_TXD;
 	if (me->func == AlxIoPin_Func_Swm_USART0_RXD)		return kSWM_USART0_RXD;
 	if (me->func == AlxIoPin_Func_Swm_USART0_RTS)		return kSWM_USART0_RTS;
@@ -347,7 +354,7 @@ static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me)
 	if (me->func == AlxIoPin_Func_Swm_CAPT_YH)			return kSWM_CAPT_YH;
 	#endif
 
-	#if defined(ALX_LPC84x)
+	#if defined(ALX_LPC84X)
 	if (me->func == AlxIoPin_Func_Swm_USART0_TXD)		return kSWM_USART0_TXD;
 	if (me->func == AlxIoPin_Func_Swm_USART0_RXD)		return kSWM_USART0_RXD;
 	if (me->func == AlxIoPin_Func_Swm_USART0_RTS)		return kSWM_USART0_RTS;
@@ -423,11 +430,11 @@ static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
 }
-static swm_select_fixed_pin_t AlxIoPin_GetSwmMFixFunc(AlxIoPin* me)
+static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->swmFunc_isMovable == false);
 
-	#if defined(ALX_LPC80x)
+	#if defined(ALX_LPC80X)
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT1)		return kSWM_ACMP_INPUT1;
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT2)		return kSWM_ACMP_INPUT2;
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT3)		return kSWM_ACMP_INPUT3;
@@ -457,7 +464,7 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmMFixFunc(AlxIoPin* me)
 	if (me->func == AlxIoPin_Func_Swm_DAC_OUT0)		return kSWM_DAC_OUT0;
 	#endif
 
-	#if defined(ALX_LPC84x)
+	#if defined(ALX_LPC84X)
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT1)		return kSWM_ACMP_INPUT1;
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT2)		return kSWM_ACMP_INPUT2;
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT3)		return kSWM_ACMP_INPUT3;

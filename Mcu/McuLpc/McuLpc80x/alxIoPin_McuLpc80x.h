@@ -7,8 +7,8 @@
   ******************************************************************************
   */
 
-#ifndef ALX_IO_PIN_MCU_LPC80x_H
-#define ALX_IO_PIN_MCU_LPC80x_H
+#ifndef ALX_IO_PIN_MCU_LPC80X_H
+#define ALX_IO_PIN_MCU_LPC80X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,19 +20,18 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxDbgPin.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 typedef enum
 {
 	// SWM Movable
@@ -122,7 +121,7 @@ typedef enum
 	AlxIoPin_Func_GPIO = 255U
 } AlxIoPin_Func;
 #endif
-#if defined(ALX_LPC84x)
+#if defined(ALX_LPC84X)
 typedef enum
 {
 	// Movable
@@ -288,4 +287,4 @@ void AlxIoPin_Ctor
 }
 #endif
 
-#endif // ALX_IO_PIN_MCU_LPC80x_H
+#endif // ALX_IO_PIN_MCU_LPC80X_H

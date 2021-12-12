@@ -10,14 +10,15 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxDbgPin_McuLpc80x.h"
-#include "alxDbgPin.h"
+//#include "alxDbgPin_McuLpc80x.h"
+//#include "alxDbgPin.h"
+#include "alxGlobal_McuLpc80x.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -25,7 +26,7 @@
 //******************************************************************************
 uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port)
 {
-	#if defined(ALX_LPC80x)
+	#if defined(ALX_LPC80X)
 	if (pin == 17)		return 0;
 	if (pin == 13)		return 1;
 	if (pin == 12)		return 2;
@@ -58,7 +59,7 @@ uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port)
 	if (pin == 18)		return 29;
 	#endif
 
-	#if defined(ALX_LPC84x)
+	#if defined(ALX_LPC84X)
 	if (port == 0 && pin == 17)		return 0;
 	if (port == 0 && pin == 13)		return 1;
 	if (port == 0 && pin == 12)		return 2;
@@ -115,7 +116,7 @@ uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port)
 	if (port == 1 && pin == 10)		return 55;
 	#endif
 
-	//ALX_IO_PIN_ASSERT(false); // We shouldn't get here
+	// MF: Assert cannot be used
 	return 255;
 }
 void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode)
@@ -150,7 +151,7 @@ void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode)
 		return;
 	}
 
-	//ALX_IO_PIN_ASSERT(false); // We shouldn't get here
+	// MF: Assert cannot be used
 }
 
 #endif // Module Guard

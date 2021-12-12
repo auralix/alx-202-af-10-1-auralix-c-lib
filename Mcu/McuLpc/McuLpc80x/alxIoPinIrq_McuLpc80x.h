@@ -7,8 +7,8 @@
   ******************************************************************************
   */
 
-#ifndef ALX_IO_PIN_IRQ_MCU_LPC80x_H
-#define ALX_IO_PIN_IRQ_MCU_LPC80x_H
+#ifndef ALX_IO_PIN_IRQ_MCU_LPC80X_H
+#define ALX_IO_PIN_IRQ_MCU_LPC80X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +26,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -67,4 +67,4 @@ void AlxIoPinIrq_Ctor
 }
 #endif
 
-#endif // ALX_IO_PIN_IRQ_MCU_LPC80x_H
+#endif // ALX_IO_PIN_IRQ_MCU_LPC80X_H
