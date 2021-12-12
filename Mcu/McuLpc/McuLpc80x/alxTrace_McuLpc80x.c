@@ -17,7 +17,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -81,7 +81,7 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	AlxTrace_Periph_SelectClk(me);
 
 	// #4 Init UART
-	if (USART_Init(me->usart, &me->usartConfig, CLOCK_GetMainClkFreq()) != kStatus_Success) { return Alx_Err; } // "Periph_Reset" and "EnableClk" happens here
+	if (USART_Init(me->usart, &me->usartConfig, CLOCK_GetMainClkFreq()) != kStatus_Success) { return Alx_Err; }		// MF: "Periph_Reset" and "EnableClk" happens here
 
 	// #5 Set isInit
 	me->isInit = true;
@@ -92,7 +92,7 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
 	// #1 DeInit UART
-	USART_Deinit(me->usart); // "DisableClk" happens here
+	USART_Deinit(me->usart);	// MF: "DisableClk" happens here
 
 	// #2 DeInit SWM
 	CLOCK_EnableClock(kCLOCK_Swm);
