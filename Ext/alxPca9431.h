@@ -448,7 +448,7 @@ typedef union
 	{
 		uint8_t unused_3 : 1; // bit 3 is unused
 		AlxPca9431_0Dh_AdcAveragingEn ADC_AVG_EN : 1;
-		AlxPca9431_0Dh_AdcRate ADC_RATE : 2; 
+		AlxPca9431_0Dh_AdcRate ADC_RATE : 2;
 		AlxPca9431_0Dh_AdcEn ADC_EN : 1;
 		uint8_t unused_5_7 : 3; // bits 5...7 are unused
 	};
@@ -1289,7 +1289,7 @@ Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
 
 
 //Alx_Status AlxPca9431_Rxir_SetDuration_s(AlxPca9431* me, AlxPca9431_0x10_RxirPullDownDuration RxirPullDownxmsx); // 0.2s, 0.4s, ... , 1.6s =>  write: RxirPullDown0ms2 or. ... or. RxirPullDown1ms6
-//Alx_Status AlxPca9431_Rxir_SetResistance_ohm(AlxPca9431* me, AlxPca9431_0x10_RxirPullDownR RxirPullDownx0R); // 20ohm, 80ohm, ... , 440ohm =>  write: RxirPullDown20R or. ... or. RxirPullDown440R	
+//Alx_Status AlxPca9431_Rxir_SetResistance_ohm(AlxPca9431* me, AlxPca9431_0x10_RxirPullDownR RxirPullDownx0R); // 20ohm, 80ohm, ... , 440ohm =>  write: RxirPullDown20R or. ... or. RxirPullDown440R
 //Alx_Status AlxPca9431_Ntc_GetTemp_degC(AlxPca9431* me, float* temp_degC); // external NTC voltage / battery temperature measurement - TODO
 
 
@@ -1303,5 +1303,3 @@ Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
 // IOUT
 // IRECT
 // NTC
-
-

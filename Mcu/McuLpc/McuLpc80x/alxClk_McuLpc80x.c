@@ -69,7 +69,7 @@ void AlxClk_Ctor
 	me->tick = tick;
 
 	// Variables
-	me->SystemCoreClock = 0;
+	me->systemCoreClock = 0;
 	me->coreSysClk = 0;
 	me->mainClk = 0;
 	me->fro = 0;
@@ -131,7 +131,7 @@ Alx_Status AlxClk_Init(AlxClk* me)
 	if (SysTick_Config(SystemCoreClock / (1000000U / me->tick)) == 1) { ALX_CLK_TRACE("ErrSysTickConfig"); return Alx_Err; }	// MF: In the example it was 1000000 when setting up SysTick
 
 	// #7 Set SystemCoreClock
-	me->SystemCoreClock = SystemCoreClock;
+	me->systemCoreClock = SystemCoreClock;
 
 	// #8 Set isInit
 	me->isInit = true;
@@ -266,7 +266,7 @@ static bool AlxClk_AreClkNok(AlxClk* me)
 }
 static void AlxClk_Ctor_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(AlxClk* me)
 {
-	// me->SystemCoreClock	// MF: I do not understand how this sistem with "SystemCoreClock" and "coreSysClk_Ctor" works
+	// me->systemCoreClock	// MF: I do not understand how this sistem with "SystemCoreClock" and "coreSysClk_Ctor" works
 	me->coreSysClk_Ctor	= 12000000U;
 	me->mainClk_Ctor	= 12000000U;
 	me->fro_Ctor		= 24000000U;
@@ -274,7 +274,7 @@ static void AlxClk_Ctor_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_De
 }
 static void AlxClk_Ctor_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(AlxClk* me)
 {
-	// me->SystemCoreClock	// MF: I do not understand how this sistem with "SystemCoreClock" and "coreSysClk_Ctor" works
+	// me->systemCoreClock	// MF: I do not understand how this sistem with "SystemCoreClock" and "coreSysClk_Ctor" works
 	me->coreSysClk_Ctor = 15000000U;
 	me->mainClk_Ctor	= 15000000U;
 	me->fro_Ctor		= 30000000U;
@@ -282,7 +282,7 @@ static void AlxClk_Ctor_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(Al
 }
 static void AlxClk_Ctor_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(AlxClk* me)
 {
-	// me->SystemCoreClock	// MF: I do not understand how this sistem with "SystemCoreClock" and "coreSysClk_Ctor" works
+	// me->systemCoreClock	// MF: I do not understand how this sistem with "SystemCoreClock" and "coreSysClk_Ctor" works
 	me->coreSysClk_Ctor = 9000000U;
 	me->mainClk_Ctor	= 9000000U;
 	me->fro_Ctor		= 18000000U;

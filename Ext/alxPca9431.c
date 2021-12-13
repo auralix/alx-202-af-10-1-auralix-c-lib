@@ -357,7 +357,7 @@ Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V) // 10
 	// #5 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me) 
+Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me)
 {
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
@@ -693,14 +693,3 @@ ALX_WEAK void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 //	return AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
 //}
 ///************************************************************************************************************************************************************************************************************** SVINJARJENJE */
-
-
-
-
-
-
-
-
-
-
-

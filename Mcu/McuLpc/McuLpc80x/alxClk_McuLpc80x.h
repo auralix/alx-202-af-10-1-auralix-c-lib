@@ -56,13 +56,13 @@ typedef struct
 	AlxClk_Tick tick;
 
 	// Variables
+	uint32_t systemCoreClock;
 	uint32_t coreSysClk;
 	uint32_t mainClk;
 	uint32_t fro;
 	//uint32_t extClk;	// MF: Don't know how we will use it
 	//uint32_t frg0;	// MF: Don't know how we will use it
 
-	uint32_t SystemCoreClock;
 	uint32_t coreSysClk_Ctor;
 	uint32_t mainClk_Ctor;
 	uint32_t fro_Ctor;
