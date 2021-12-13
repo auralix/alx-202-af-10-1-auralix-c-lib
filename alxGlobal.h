@@ -336,25 +336,8 @@ typedef enum
 //******************************************************************************
 // Functions
 //******************************************************************************
-ALX_INLINE static inline void AlxGlobal_DisableIrq(void)
-{
-	#if defined(ALX_MBED)
-	#else
-		#if defined(__GNUC__)
-		__disable_irq();
-		#endif
-	#endif
-}
-ALX_INLINE static inline void AlxGlobal_EnableIrq(void)
-{
-	#if defined(ALX_MBED)
-	#else
-		#if defined(__GNUC__)
-		__enable_irq();
-		#endif
-	#endif
-}
-
+void AlxGlobal_DisableIrq(void);
+void AlxGlobal_EnableIrq(void);
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
 Alx_Status AlxGlobal_BoundUint32(uint32_t* valPtr, uint32_t valMin, uint32_t valMax);
 Alx_Status AlxGlobal_BoundFloat(float* valPtr, float valMin, float valMax);

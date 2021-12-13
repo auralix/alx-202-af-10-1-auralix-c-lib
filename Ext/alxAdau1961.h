@@ -1574,6 +1574,23 @@ Alx_Status AlxAdau1961_OutLineL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// 
 Alx_Status AlxAdau1961_OutLineR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// Mute -> gain_dB = -120
 
 
+#ifdef __cplusplus
+}
+#endif
+
+#endif // ALX_ADAU1961_H
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1634,10 +1651,3 @@ Alx_Status AlxAdau1961_OutLineR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// 
 //Alx_Status AlxAdau1961_Ch_Out_SetVolume_pct		(AlxAdau1961* me, AlxAdau1961_Ch* ch, float* volume_pct);
 //Alx_Status AlxAdau1961_Ch_Mute					(AlxAdau1961* me, AlxAdau1961_Ch ch);
 //Alx_Status AlxAdau1961_Ch_UnMute				(AlxAdau1961* me, AlxAdau1961_Ch ch);
-
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // ALX_ADAU1961_H
