@@ -272,10 +272,10 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	me->pwmChArr[0] = Alx_Ch_1;
 	me->pwmChArr[1] = Alx_Ch_2;
 	#if defined ALX_OPTIMIZE_SIZE_ALL
-	me->pwmDutyDefaultArr[0] = 50U;
-	me->pwmDutyDefaultArr[1] = 50U;
+	me->pwmDutyDefaultArr[0] = 543U;
+	me->pwmDutyDefaultArr[1] = 123U;
 	#else
-	me->pwmDutyDefaultArr[0] = 50.f;
+	me->pwmDutyDefaultArr[0] = 12.34f;
 	me->pwmDutyDefaultArr[1] = 50.f;
 	#endif
 	AlxPwm_Ctor
