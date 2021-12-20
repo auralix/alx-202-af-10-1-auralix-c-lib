@@ -64,7 +64,7 @@ void AlxPwm_Ctor
 	#else
 	(void)dutyDefaultArr_pct;
 	#endif
-	(void)prescaler;
+	ALX_PWM_ASSERT(prescaler == 0);	// MF: Do not understand how prescaler affect the PWM behaviour
 	(void)period;
 	for (uint8_t i = 0; i < numOfCh - 1; i++) ALX_PWM_ASSERT(chArr[i] < chArr[i + 1]);	// MF: Channel sequence must be from low to high number
 
@@ -113,12 +113,16 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	CTIMER_Init(me->tim, &me->config);	// MF: "Periph_Reset" and "EnableClk" happens here
 
 	// #3 Init CTIMER Channels
-	for(uint32_t i = 0; i < me->numOfCh; i++)
+	for (uint32_t i = 0; i < me->numOfCh; i++)
+	{
 		#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
-		if(CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), me->dutyDefaultArr_permil[i], me->period, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; }	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
+		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), me->dutyDefaultArr_permil[i] / 10, me->period, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; }	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period). Divide duty by 10 to get pct from permil
+		AlxPwm_UpdatePwmDutycyclePermil(me, me->chArr[i], me->dutyDefaultArr_permil[i]);	// MF: To setup duty in permil because fls cannot handle it
 		#else
-		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), (uint8_t)me->dutyDefaultArr_pct[i], me->period, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; } // MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
+		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), (uint8_t)me->dutyDefaultArr_pct[i], me->period, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; }	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
+		AlxPwm_UpdatePwmDutycyclePct(me, me->chArr[i], me->dutyDefaultArr_pct[i]);			// MF: To setup duty because fls doesn't handle float
 		#endif
+	}
 
 	// #4 Set isInit
 	me->isInit = true;
