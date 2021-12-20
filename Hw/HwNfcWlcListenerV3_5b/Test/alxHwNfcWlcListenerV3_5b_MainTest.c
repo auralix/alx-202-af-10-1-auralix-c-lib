@@ -17,7 +17,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_HW_NFCWLC_LISTENER_V3_5B_C_TEST)
+#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
 
 
 //******************************************************************************
@@ -36,7 +36,7 @@ void SysTick_Handler(void)
 
 
 //******************************************************************************
-// Auralix C Library - ALX 01 Module - Weak Functions
+// Auralix C Library - ALX IoPinIrq Module - Weak Functions
 //******************************************************************************
 void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
@@ -46,10 +46,6 @@ void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
 	AlxTrace_WriteStr(&alxTrace, "FallEdge\r\n");
 }
-
-//******************************************************************************
-// Auralix C Library - ALX 02 Module - Weak Functions
-//******************************************************************************
 
 
 #endif // #if defined(ALX_HW_NFCWLC_LISTENER_V3_5B_C_TEST)
