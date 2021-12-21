@@ -19,5 +19,5 @@
 - __AlxClk* clk__ - Pointer to Clk object
 - __uint16_t* dutyDefaultArr_permil__ - Default duty in permils when OPTIMIZE SIZE __enabled__
 - __float* dutyDefaultArr_pct__ - Default duty in percent when OPTIMIZE SIZE __disabled__
-- __uint32_t prescaler__ - TODO
+- __uint32_t prescaler__ - Must be __0__ otherwise Assert is triggered
 - __uint32_t period__ - Frequency in Hz of Pwm
