@@ -17,6 +17,9 @@
     - HwNucleoF429Zi
         - Test
             - [alxHwNucleoF429Zi_TvTest - ALX HW Nucleo-F429ZI TV Test Module](Hw/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_TvTest.md)
+	- HwNucleoF429Zi & HwNfcWlcListenerV3_7
+        - Test
+			- [alxHwNucleoF429Zi_JsTest - ALX HW Nucleo-F429ZI JS Test Module](Hw/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md)
 - Mcu
     - McuLpc
         - McuLpc17
