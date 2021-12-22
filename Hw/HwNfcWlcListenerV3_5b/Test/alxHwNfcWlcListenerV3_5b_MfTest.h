@@ -93,14 +93,14 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T03_Adc(AlxH
 	(void)me;
 
 	// Init
-	AlxAdc_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxAdc_ADC4_Master);
+	AlxAdc_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxAdc);
 
 	while (1)
 	{
 		#if defined ALX_OPTIMIZE_SIZE_ALL
-		AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", AlxAdc_GetVoltage_mV(&me->alxHwNfcWlcListenerV3_5b_Main.alxAdc_ADC4_Master, me->alxHwNfcWlcListenerV3_5b_Main.adcChArr[0]));
+		AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", AlxAdc_GetVoltage_mV(&me->alxHwNfcWlcListenerV3_5b_Main.alxAdc, me->alxHwNfcWlcListenerV3_5b_Main.adcChArr[0]));
 		#else
-		AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", AlxAdc_GetVoltage_V(&me->alxHwNfcWlcListenerV3_5b_Main.alxAdc_ADC4_Master, me->alxHwNfcWlcListenerV3_5b_Main.adcChArr[0]));
+		AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", AlxAdc_GetVoltage_V(&me->alxHwNfcWlcListenerV3_5b_Main.alxAdc, me->alxHwNfcWlcListenerV3_5b_Main.adcChArr[0]));
 		#endif
 
 		AlxDelay_ms(1000);
@@ -112,7 +112,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T04_Pwm(AlxH
 	(void)me;
 
 	// Init
-	AlxPwm_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm_Master);
+	AlxPwm_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm);
 
 	// Setup Delay	// MF: To see how duty changes from 50% (set in Ctor) to what is set below
 	AlxDelay_ms(500);
@@ -120,11 +120,11 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T04_Pwm(AlxH
 	while (1)
 	{
 		#if defined ALX_OPTIMIZE_SIZE_ALL
-		AlxPwm_SetDuty_permil(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm_Master, me->alxHwNfcWlcListenerV3_5b_Main.pwmChArr[0], 111);
-		AlxPwm_SetDuty_permil(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm_Master, me->alxHwNfcWlcListenerV3_5b_Main.pwmChArr[1], 999);
+		AlxPwm_SetDuty_permil(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm, me->alxHwNfcWlcListenerV3_5b_Main.pwmChArr[0], 111);
+		AlxPwm_SetDuty_permil(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm, me->alxHwNfcWlcListenerV3_5b_Main.pwmChArr[1], 999);
 		#else
-		AlxPwm_SetDuty_pct(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm_Master, me->alxHwNfcWlcListenerV3_5b_Main.pwmChArr[0], 10.34f);
-		AlxPwm_SetDuty_pct(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm_Master, me->alxHwNfcWlcListenerV3_5b_Main.pwmChArr[1], 90);
+		AlxPwm_SetDuty_pct(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm, me->alxHwNfcWlcListenerV3_5b_Main.pwmChArr[0], 10.34f);
+		AlxPwm_SetDuty_pct(&me->alxHwNfcWlcListenerV3_5b_Main.alxPwm, me->alxHwNfcWlcListenerV3_5b_Main.pwmChArr[1], 90);
 		#endif
 
 		AlxDelay_ms(500);
@@ -142,11 +142,11 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T05_I2c(AlxH
 
 	// Init
 	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.ao_P0_11_CRN_VCC);
-	AlxI2c_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0_Master);
+	AlxI2c_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0);
 
 	while (1)
 	{
-		AlxI2c_Master_StartReadMemStop(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0_Master, devAdrReceive, memAddr, AlxI2c_Master_MemAddrLen_16bit, i2cData, 1, 20, 100);
+		AlxI2c_Master_StartReadMemStop(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0, devAdrReceive, memAddr, AlxI2c_Master_MemAddrLen_16bit, i2cData, 1, 20, 100);
 		//AlxI2c_Master_StartWriteMemStop_Single(&i2c, slaveAddr, memAddr, AlxI2c_Master_MemAddrLen_16bit, i2cData[0], true, 5, 100);
 
 		AlxDelay_ms(500);

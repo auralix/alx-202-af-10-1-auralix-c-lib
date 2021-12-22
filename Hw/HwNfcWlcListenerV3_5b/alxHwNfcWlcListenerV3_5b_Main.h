@@ -101,7 +101,7 @@ typedef struct
 	//P0_6	- Unused
 	//P0_7	- Unused
 	//P0_8	- Unused
-	AlxIoPin ai_P0_9_ADC_In;					// AlxIoPin PCA943X_nINT
+	AlxIoPin ai_P0_9_ADC_CH4;					// AlxIoPin PCA943X_nINT
 	//P0_10	- Unused
 	AlxIoPin ao_P0_11_CRN_VCC;
 	//P0_12	- Unused
@@ -129,9 +129,9 @@ typedef struct
 {
 	// ALX Objects
 	AlxIoPinIrq alxIrqPin_IRQ1;
-	AlxI2c alxI2c_I2C0_Master;
-	AlxAdc alxAdc_ADC4_Master;
-	AlxPwm alxPwm_Master;
+	AlxI2c alxI2c_I2C0;
+	AlxAdc alxAdc;
+	AlxPwm alxPwm;
 
 	// Auralix HW NFC WLC LISTENER V3_5B C Library Objects
 	AlxHwNfcWlcListenerV3_5b_MainIoPin alxIoPin;
@@ -175,7 +175,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//P0_6	- Unused
 	//P0_7	- Unused
 	//P0_8	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_In,		0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,	0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,	false,	false,	false	);
 	//P0_10	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC,	0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	true	);
 	//P0_12	- Unused
@@ -200,7 +200,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 
 
 	//------------------------------------------------------------------------------
-	// ALX - IrqPin
+	// ALX - IRQ
 	//------------------------------------------------------------------------------
 	AlxIoPinIrq_Ctor
 	(
@@ -239,12 +239,12 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//------------------------------------------------------------------------------
 	// ALX - ADC
 	//------------------------------------------------------------------------------
-	me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_9_ADC_In;
+	me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_9_ADC_CH4;
 	me->adcChArr[0] = Alx_Ch_4;
 	#if defined ALX_OPTIMIZE_SIZE_ALL
 	AlxAdc_Ctor
 	(
-		&me->alxAdc_ADC4_Master,
+		&me->alxAdc,
 		me->adcIoPinArr,
 		me->adcChArr,
 		ALX_ARR_LEN(me->adcIoPinArr),
@@ -254,7 +254,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	#else
 	AlxAdc_Ctor
 	(
-		&me->alxAdc_ADC4_Master,
+		&me->alxAdc,
 		me->adcIoPinArr,
 		me->adcChArr,
 		ALX_ARR_LEN(me->adcIoPinArr),
@@ -265,7 +265,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 
 
 	//------------------------------------------------------------------------------
-	// ALX - Pwm
+	// ALX - PWM
 	//------------------------------------------------------------------------------
 	me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_PWM1;
 	me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_PWM2;
@@ -280,7 +280,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	#endif
 	AlxPwm_Ctor
 	(
-		&me->alxPwm_Master,
+		&me->alxPwm,
 		CTIMER0,
 		me->pwmIoPinArr,
 		me->pwmChArr,
@@ -297,7 +297,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//------------------------------------------------------------------------------
 	AlxI2c_Ctor
 	(
-		&me->alxI2c_I2C0_Master,
+		&me->alxI2c_I2C0,
 		I2C0,
 		&me->alxIoPin.do_P0_17_I2C0_SCL,
 		&me->alxIoPin.io_P0_16_I2C0_SDA,
@@ -312,7 +312,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 }
 
 
-#endif // #if defined(ALX_HW_NFC_ WLC_LISTENER_V3_5B_C_TEST)
+#endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
 
 #ifdef __cplusplus
 }

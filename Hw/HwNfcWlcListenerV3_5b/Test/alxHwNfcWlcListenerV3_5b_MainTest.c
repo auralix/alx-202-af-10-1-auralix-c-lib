@@ -48,4 +48,4 @@ void AlxIoPinIrq_Foreground_Callback_Pin1()
 }
 
 
-#endif // #if defined(ALX_HW_NFCWLC_LISTENER_V3_5B_C_TEST)
+#endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
