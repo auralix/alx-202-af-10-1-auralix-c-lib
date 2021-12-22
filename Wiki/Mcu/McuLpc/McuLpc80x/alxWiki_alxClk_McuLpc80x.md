@@ -3,7 +3,7 @@
 ## General
 - Function "void AlxClk_Irq_Handle(AlxClk* me)" is not implemented
 - This module has not been *fully* tested yet
-    - The only tested configuration: __AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default = 0__
+    - The only tested configuration: __AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz = 1__
 
 ---
 ## Ctor Arguments

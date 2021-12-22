@@ -57,7 +57,7 @@ void AlxPwm_Ctor
 	(void)tim;
 	(void)ioPinArr;
 	(void)chArr;
-	ALX_PWM_ASSERT(numOfCh <= 3);	// MF: Only match registers 0, 1, 2 can be used for PRM Output. Match register 3 is for cycle lenght (freq or period)
+	ALX_PWM_ASSERT(numOfCh <= 3);	// MF: Only match registers 0, 1, 2 can be used for PWM Output. Match register 3 is for cycle lenght (freq or period)
 	(void)clk;
 	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	(void)dutyDefaultArr_permil;
@@ -156,6 +156,9 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 {
 	// Optimize Guard
 	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	(void)me;
+	(void)ch;
+	(void)duty_pct;
 	ALX_PWM_ASSERT(false);
 	return ALX_NULL;
 	#else
