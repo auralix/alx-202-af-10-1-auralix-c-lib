@@ -26,9 +26,9 @@
 static uint32_t AlxPwm_GetCh(Alx_Ch ch);
 static void AlxPwm_SetSrcClk_SetPrescalerMax(AlxPwm* me);
 #if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
-static void AlxPwm_UpdatePwmDutycyclePermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil);
+static void AlxPwm_UpdatePwmDutyPermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil);
 #else
-static void AlxPwm_UpdatePwmDutycyclePct(AlxPwm* me, Alx_Ch ch, float duty_pct);
+static void AlxPwm_UpdatePwmDutyPct(AlxPwm* me, Alx_Ch ch, float duty_pct);
 #endif
 
 
@@ -57,7 +57,7 @@ void AlxPwm_Ctor
 	(void)tim;
 	(void)ioPinArr;
 	(void)chArr;
-	ALX_PWM_ASSERT(numOfCh <= 3);	// MF: Only match registers 0, 1, 2 can be used for PRM Output. Match register 3 is for cycle lenght(freq or period)
+	ALX_PWM_ASSERT(numOfCh <= 3);	// MF: Only match registers 0, 1, 2 can be used for PRM Output. Match register 3 is for cycle lenght (freq or period)
 	(void)clk;
 	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	(void)dutyDefaultArr_permil;
@@ -117,10 +117,10 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	{
 		#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), me->dutyDefaultArr_permil[i] / 10, me->period, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; }	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period). Divide duty by 10 to get pct from permil
-		AlxPwm_UpdatePwmDutycyclePermil(me, me->chArr[i], me->dutyDefaultArr_permil[i]);	// MF: To setup duty in permil because fls cannot handle it
+		AlxPwm_UpdatePwmDutyPermil(me, me->chArr[i], me->dutyDefaultArr_permil[i]);	// MF: To setup duty in permil because FLS can not handle it
 		#else
 		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), (uint8_t)me->dutyDefaultArr_pct[i], me->period, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; }	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
-		AlxPwm_UpdatePwmDutycyclePct(me, me->chArr[i], me->dutyDefaultArr_pct[i]);			// MF: To setup duty because fls doesn't handle float
+		AlxPwm_UpdatePwmDutyPct(me, me->chArr[i], me->dutyDefaultArr_pct[i]);		// MF: To setup duty in float because FLS can not handle it
 		#endif
 	}
 
@@ -171,7 +171,7 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 	{
 		if (me->chArr[i] == ch)
 		{
-			AlxPwm_UpdatePwmDutycyclePct(me, ch, duty_pct);
+			AlxPwm_UpdatePwmDutyPct(me, ch, duty_pct);
 			//CTIMER_UpdatePwmDutycycle(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(ch), (uint32_t)duty_pct);	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
 			return Alx_Ok;
 		}
@@ -185,6 +185,9 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {
 	// Optimize Guard
 	#if !(defined (ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	(void)me;
+	(void)ch;
+	(void)duty_permil;
 	ALX_PWM_ASSERT(false);
 	return ALX_NULL;
 	#else
@@ -200,7 +203,7 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 	{
 		if (me->chArr[i] == ch)
 		{
-			AlxPwm_UpdatePwmDutycyclePermil(me, ch, duty_permil);
+			AlxPwm_UpdatePwmDutyPermil(me, ch, duty_permil);
 			return Alx_Ok;
 		}
 	}
@@ -230,7 +233,7 @@ static void AlxPwm_SetSrcClk_SetPrescalerMax(AlxPwm* me)
 	me->srcClk_Hz = AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor);
 }
 #if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
-static void AlxPwm_UpdatePwmDutycyclePermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
+static void AlxPwm_UpdatePwmDutyPermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {
 	// #1 Prepare variable
 	uint32_t pulsePeriod = 0;
@@ -246,7 +249,7 @@ static void AlxPwm_UpdatePwmDutycyclePermil(AlxPwm* me, Alx_Ch ch, uint16_t duty
 	me->tim->MR[AlxPwm_GetCh(ch)] = pulsePeriod;
 }
 #else
-static void AlxPwm_UpdatePwmDutycyclePct(AlxPwm* me, Alx_Ch ch, float duty_pct)
+static void AlxPwm_UpdatePwmDutyPct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 {
 	// #1 Prepare variable
 	uint32_t pulsePeriod = 0;
