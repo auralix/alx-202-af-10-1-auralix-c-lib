@@ -19,75 +19,75 @@
 			* add 3-5V power supply on NXP WLC Poller and put together both antennas (Listener and Poller)  
 			* (so supply on should between Listener between 3-12V- depends on type of antenna,distance,matching...)  
 ## **Connection between HW**  
-### Connection between HwNfcWlcPollerV3_7 and HwNfcWlcListenerV3_7   
-	- chosen option **b)** of Supply of PCA9431 on HwNfcWlcListenerV3_7  
-		* add 3-5V power supply on NXP WLC Poller and put together both antennas (Listener and Poller)  
-		* img [HwNfcWlcPollerV3_7 and HwNfcWlcListenerV3_7](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7&ListenerV3_7.jpg)  
+### Connection between HwNfcWlcPollerV3_7 and HwNfcWlcListenerV3_7
+- chosen option **b)** of Supply of PCA9431 on HwNfcWlcListenerV3_7  
+	* add 3-5V power supply on NXP WLC Poller and put together both antennas (Listener and Poller)  
+	* img [HwNfcWlcPollerV3_7 and HwNfcWlcListenerV3_7](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7&ListenerV3_7.jpg)  
 		
 ### Connection between **HwNfcWlcListenerV3_7** and **Nucleo-F429ZI**  
-	-i2c--Scl  
-		* J201_pin 4 -- I2C.SCL on HwNfcWlcListenerV3_7 [white wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7&ListenerV3_7.jpg)  
-		* pin PB10 on Nucleo-F429ZI [white wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
-	-i2c--Sda  
-		* J201_pin 1 -- I2C.SDA on HwNfcWlcListenerV3_7 [green wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7&ListenerV3_7.jpg)  
-		* pin PB10 on Nucleo-F429ZI [green wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
-	- GND  
-		* J201_pin 3 -- GND on HwNfcWlcListenerV3_7 [black wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7&ListenerV3_7.jpg)  
-		* one of GND pins on Nucleo-F429ZI [black wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
-	-interrupt  
-		* J202_pin 10 -- PCA943X_nINT on HwNfcWlcListenerV3_7 [yellow wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7&ListenerV3_7.jpg)  
-		* pin PC3 on Nucleo-F429ZI [yellow wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
-	-sleep-EN  
-		* J202_pin 9 -- PCA943X_EN n HwNfcWlcListenerV3_7 [orange wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7&ListenerV3_7.jpg)  
-		* pin PA9 on Nucleo-F429ZI [orange wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
+-i2c -- Scl  
+	* J201_pin 4 -- I2C.SCL on HwNfcWlcListenerV3_7 [white wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
+	* pin PB10 on Nucleo-F429ZI [white wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
+-i2c -- Sda  
+	* J201_pin 1 -- I2C.SDA on HwNfcWlcListenerV3_7 [green wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
+	* pin PB10 on Nucleo-F429ZI [green wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
+- GND  
+	* J201_pin 3 -- GND on HwNfcWlcListenerV3_7 [black wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
+	* one of GND pins on Nucleo-F429ZI [black wire](../../../test_Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
+-interrupt  
+	* J202_pin 10 -- PCA943X_nINT on HwNfcWlcListenerV3_7 [yellow wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
+	* pin PC3 on Nucleo-F429ZI [yellow wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
+-sleep-EN  
+	* J202_pin 9 -- PCA943X_EN n HwNfcWlcListenerV3_7 [orange wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
+	* pin PA9 on Nucleo-F429ZI [orange wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
 ### I2c pull up  
-	-i2c--pull up **in this case connected to power-supply**  
-		*	J201_pin 2 -- VDD_PULL on HwNfcWlcListenerV3_7 [purple wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7&ListenerV3_7.jpg)  
-		*	J202_pin 24 -- GND on HwNfcWlcListenerV3_7 [blue wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7&ListenerV3_7.jpg)  
+-i2c--pull up **in this case connected to power-supply**  
+	*	J201_pin 2 -- VDD_PULL on HwNfcWlcListenerV3_7 [purple wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
+	*	J202_pin 24 -- GND on HwNfcWlcListenerV3_7 [blue wire](../../../test_Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
 		
 ### Connection to saleae logic analyzer  
-	*Ch 0 -> I2C.SDA [green wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/alxWiki_alxHwNucleoF429Zi_JsTest_AllHw.jpg)  
-	*Ch 1 -> I2C.SCL [white wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/alxWiki_alxHwNucleoF429Zi_JsTest_AllHw.jpg)  
-	*GND  -> [black wire](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/alxWiki_alxHwNucleoF429Zi_JsTest_AllHw.jpg)  
+- Ch 0 -> I2C.SDA [green wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/alxWiki_alxHwNucleoF429Zi_JsTest_AllHw.jpg)  
+- Ch 1 -> I2C.SCL [white wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/alxWiki_alxHwNucleoF429Zi_JsTest_AllHw.jpg)  
+- GND  -> [black wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/alxWiki_alxHwNucleoF429Zi_JsTest_AllHw.jpg)  
 	
 ## **Tests**
 ### AlxPca9431_Init(&Pca9431)  
 - 1) Init GPIO  
 - 2) Init I2C  
-- 4) Set registers values to default [i2c_AlxPca9431_Init_SetToDefault](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2c_AlxPca9431_Init_SetToDefault.jpg)  
-- 6) Set registers values - WEAK [AlxPca9431_RegStruct_SetVal](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2c_AlxPca9431_Init_SetSpecificReg.jpg)  
+- 4) Set registers values to default [i2c_AlxPca9431_Init_SetToDefault](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2c_AlxPca9431_Init_SetToDefault.jpg)  
+- 6) Set registers values - WEAK [AlxPca9431_RegStruct_SetVal](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2c_AlxPca9431_Init_SetSpecificReg.jpg)  
 - 7) Write registers  
-	* image [AlxPca9431_Init_dec](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2c_AlxPca9431_Init_dec.jpg)  
-	* image [AlxPca9431_Init_hex_1/2](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2c_AlxPca9431_Init_hex_1.jpg)  
-	* image [AlxPca9431_Init_hex_2/2](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2c_AlxPca9431_Init_hex_2.jpg)  
+	* image [AlxPca9431_Init_dec](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2c_AlxPca9431_Init_dec.jpg)  
+	* image [AlxPca9431_Init_hex_1/2](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2c_AlxPca9431_Init_hex_1.jpg)  
+	* image [AlxPca9431_Init_hex_2/2](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2c_AlxPca9431_Init_hex_2.jpg)  
 ### AlxPca9431_Reg_ReadAndClearInterrupt(&Pca9431)  
-- image [i2cAlxPca9431_ReadAndclearInterrupt](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt.jpg)
+- image [i2cAlxPca9431_ReadAndclearInterrupt](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt.jpg)
 	* zoom 1st:  
-		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_bin](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_bin.jpg)  
-		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_dec](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_dec.jpg)  
-		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_hex](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_hex.jpg)  
+		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_bin](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_bin.jpg)  
+		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_dec](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_dec.jpg)  
+		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_hex](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_hex.jpg)  
 	* zoom 2nd:  
-		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_bin](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_bin.jpg)  
-		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_dec](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_dec.jpg)  
-		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_hex](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_hex.jpg)  
+		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_bin](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_bin.jpg)  
+		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_dec](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_dec.jpg)  
+		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_hex](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_hex.jpg)  
 	* zoom 3rd:  
-		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_bin](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_bin.jpg)  
-		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_dec](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_dec.jpg)  
-		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_hex](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_hex.jpg)  
+		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_bin](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_bin.jpg)  
+		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_dec](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_dec.jpg)  
+		- image [i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_hex](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_hex.jpg)  
 ### AlxPca9431_LdoVout_GetVoltage_V(&Pca9431, &LdoVout_Voltage_V)  
-- image [i2cAlxPca9431_LdoVou_GetVoltage_bin](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetVoltage_bin.jpg)  
-- image [i2cAlxPca9431_LdoVou_GetVoltage_dec](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetVoltage_dec.jpg)  
-- image [i2cAlxPca9431_LdoVou_GetVoltage_hex](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetVoltage_hex.jpg)  
+- image [i2cAlxPca9431_LdoVou_GetVoltage_bin](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetVoltage_bin.jpg)  
+- image [i2cAlxPca9431_LdoVou_GetVoltage_dec](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetVoltage_dec.jpg)  
+- image [i2cAlxPca9431_LdoVou_GetVoltage_hex](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetVoltage_hex.jpg)  
 ### AlxPca9431_LdoVout_GetCurrent_A(&Pca9431, &LdoVout_Current_A)  
-- image [i2cAlxPca9431_LdoVou_GetCurrent_bin](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetCurrent_bin.jpg)  
-- image [i2cAlxPca9431_LdoVou_GetCurrent_dec](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetCurrent_dec.jpg)  
-- image [i2cAlxPca9431_LdoVou_GetCurrent_hex](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetCurrent_hex.jpg)  
+- image [i2cAlxPca9431_LdoVou_GetCurrent_bin](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetCurrent_bin.jpg)  
+- image [i2cAlxPca9431_LdoVou_GetCurrent_dec](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetCurrent_dec.jpg)  
+- image [i2cAlxPca9431_LdoVou_GetCurrent_hex](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_LdoVou_GetCurrent_hex.jpg)  
 ### AlxPca9431_Rect_GetVoltage_V(&Pca9431, &Rect_Voltage_V)  
-- image [i2cAlxPca9431_Rect_GetVoltage_bin](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_Rect_GetVoltage_bin.jpg)  
-- image [i2cAlxPca9431_Rect_GetVoltage_dec](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_Rect_GetVoltage_dec.jpg)  
-- image [i2cAlxPca9431_Rect_GetVoltage_hex](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_Rect_GetVoltage_hex.jpg)  
+- image [i2cAlxPca9431_Rect_GetVoltage_bin](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_Rect_GetVoltage_bin.jpg)  
+- image [i2cAlxPca9431_Rect_GetVoltage_dec](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_Rect_GetVoltage_dec.jpg)  
+- image [i2cAlxPca9431_Rect_GetVoltage_hex](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_Rect_GetVoltage_hex.jpg)  
 ### Changing voltage on **VRECT** pin  
-	- changing voltage from  4,5V to 3V  
-	- interrupt at 4V (Low voltage on VRECT pin)  
-	- PCA9431 shut down below 3,3V  
-	- image [i2cAlxPca9431_VrectChangingPowerSupply](../../../Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_VrectChangingPowerSupply.jpg)  
+- changing voltage from  4,5V to 3V  
+- interrupt at 4V (Low voltage on VRECT pin)  
+- PCA9431 shut down below 3,3V  
+- image [i2cAlxPca9431_VrectChangingPowerSupply](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_VrectChangingPowerSupply.jpg)  
