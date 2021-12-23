@@ -9,7 +9,7 @@
 		- **a)**  
 			* connect 5-12V from power-supply to red header (VRECT) on NXP WLC Listener board
 			* GND from power-supply to black header (GND) or to GND Busbar on NXP WLC Listener board
-			* see image [alxHwPca_ListenerPowerSupplyPca9431.jpg](..\Img/HwPca9431/ListenerPowerSupplyPca9431.jpg)  
+			* see image [alxHwPca_ListenerPowerSupplyPca9431.jpg](../Img/HwPca9431/ListenerPowerSupplyPca9431.jpg)  
 		- **b)**  
 			* add 3-5V power supply on NXP WLC Poller and put together both antennas (Listener and Poller)
 			* (so supply on should between Listener between 3-12V- depends on type of antenna,distance,matching...)
