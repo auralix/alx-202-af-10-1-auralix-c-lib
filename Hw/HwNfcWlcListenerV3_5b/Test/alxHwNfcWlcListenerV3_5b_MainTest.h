@@ -7,8 +7,8 @@
   ******************************************************************************
   */
 
-#ifndef ALX_HW_NFCWLC_LISTENER_V3_5B_MAIN_TEST_H
-#define ALX_HW_NFCWLC_LISTENER_V3_5B_MAIN_TEST_H
+#ifndef ALX_HW_NFC_WLC_LISTENER_V3_5B_MAIN_TEST_H
+#define ALX_HW_NFC_WLC_LISTENER_V3_5B_MAIN_TEST_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,7 +28,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_HW_NFCWLC_LISTENER_V3_5B_C_TEST)
+#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
 
 
 //******************************************************************************
@@ -100,10 +100,10 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Run(AlxHwNfcWlcListenerV3_5
 }
 
 
-#endif // #if defined(ALX_HW_NFCWLC_LISTENER_V3_5B_C_TEST)
+#endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_HW_NFCWLC_LISTENER_V3_5B_MAIN_TEST_H
+#endif // ALX_HW_NFC_WLC_LISTENER_V3_5B_MAIN_TEST_H
