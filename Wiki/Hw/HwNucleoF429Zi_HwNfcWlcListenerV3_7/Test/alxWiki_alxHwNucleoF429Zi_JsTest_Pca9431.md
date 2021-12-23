@@ -22,7 +22,7 @@
 ### Connection between HwNfcWlcPollerV3_7 and HwNfcWlcListenerV3_7
 - chosen option **b)** of Supply of PCA9431 on HwNfcWlcListenerV3_7  
 	* add 3-5V power supply on NXP WLC Poller and put together both antennas (Listener and Poller)  
-	* img [HwNfcWlcPollerV3_7 and HwNfcWlcListenerV3_7](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7&ListenerV3_7.jpg)  
+	* img [HwNfcWlcPollerV3_7 and HwNfcWlcListenerV3_7](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_Hw_Wlc_PollerV3_7_ListenerV3_7.jpg)  
 		
 ### Connection between **HwNfcWlcListenerV3_7** and **Nucleo-F429ZI**  
 -i2c -- Scl  
@@ -33,7 +33,7 @@
 	* pin PB10 on Nucleo-F429ZI [green wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
 - GND  
 	* J201_pin 3 -- GND on HwNfcWlcListenerV3_7 [black wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
-	* one of GND pins on Nucleo-F429ZI [black wire](../../../test_Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
+	* one of GND pins on Nucleo-F429ZI [black wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
 -interrupt  
 	* J202_pin 10 -- PCA943X_nINT on HwNfcWlcListenerV3_7 [yellow wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
 	* pin PC3 on Nucleo-F429ZI [yellow wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
@@ -43,7 +43,7 @@
 ### I2c pull up  
 -i2c--pull up **in this case connected to power-supply**  
 	*	J201_pin 2 -- VDD_PULL on HwNfcWlcListenerV3_7 [purple wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
-	*	J202_pin 24 -- GND on HwNfcWlcListenerV3_7 [blue wire](../../../test_Img/HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
+	*	J202_pin 24 -- GND on HwNfcWlcListenerV3_7 [blue wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
 		
 ### Connection to saleae logic analyzer  
 - Ch 0 -> I2C.SDA [green wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/alxWiki_alxHwNucleoF429Zi_JsTest_AllHw.jpg)  
