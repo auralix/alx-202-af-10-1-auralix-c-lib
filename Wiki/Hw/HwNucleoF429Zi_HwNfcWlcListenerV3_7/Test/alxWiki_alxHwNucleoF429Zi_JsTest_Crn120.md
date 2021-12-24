@@ -10,11 +10,43 @@
 	- chosen option:  
 		- **b)**  from CRN_VCC on HwNfcWlc**Listener**  V3_7  
 			* Resistor R110 or R223 must **not** be placed  
-				- image [ListenerCrn120SupplyResistorOff](../Img/HwCrn120/ListenerCrn120SupplyResistorOff.jpg)  
+				- image [ListenerCrn120SupplyResistorOff](../../../Img/HwCrn120/ListenerCrn120SupplyResistorOff.jpg)  
 			* connect 3.3V to  J202_pin 6 -- CRN_VCC on HwNfcWlc**Listener** V3_5b or V3_7  
 
 ## **Tests**  
+### regasession, data, data2
+```c
+- uint8_t regasession0[1];
+- regasession0[0] = 0x00;
+- uint8_t regasession1[1];
+- regasession1[0] = 0x01;
+- uint8_t regasession2[1];
+- regasession2[0] = 0x02;
+- uint8_t regasession3[1];
+- regasession3[0] = 0x03;
+- uint8_t regasession4[1];
+- regasession4[0] = 0x04;
+- uint8_t regasession5[1];
+- regasession5[0] = 0x05;
 
+- uint8_t data[7];
+- data[0] = 0x00;
+- data[1] = 0x00;
+- data[2] = 0x00;
+- data[3] = 0x00;
+- data[4] = 0x00;
+- data[5] = 0x00;
+- data[6] = 0x00;
+
+- uint8_t data2[7];
+- data2[0] = CRN120_MEMA_SESSION_REGISTERS;//mema
+- data2[1] = regasession0[0]; //rega
+- data2[2] = 0x01; // mask last zero bit
+- data2[3] = 0x00; // last bit to 0
+- data2[4] = 0x00;
+- data2[5] = 0x00;
+- data2[6] = 0x00;
+```
 ### regasession0  
 - **Read**  
 	// 1. Start condition (with write), address +ACK, mema +ACK, rega +ACK and stop  

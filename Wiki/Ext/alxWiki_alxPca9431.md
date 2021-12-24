@@ -65,7 +65,7 @@
 ## PCA9431 LDO Get Voltage 3V3
 - image [i2cAlxPca9431_LdoVou_GetVoltage3V3.jpg](../Img/HwPca9431/i2cAlxPca9431_LdoVou_GetVoltage3V3.jpg)
 
-## General PCA9431 periphery
+## PCA9431 periphery
 - VOutLDO => 3v3 ali 5v
 - VRECT_UVLO => 3 , 3.1V, 3,2V, 3.3V
 - VPWR_VL => 1.8V, 2.5V, 2.8V, 3.3V
