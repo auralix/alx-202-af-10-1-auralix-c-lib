@@ -10,6 +10,8 @@
 			* connect 5-12V from power-supply to red header (VRECT) on NXP WLC Listener board
 			* GND from power-supply to black header (GND) or to GND Busbar on NXP WLC Listener board
 			* see image [alxHwPca_ListenerPowerSupplyPca9431.jpg](../Img/HwPca9431/ListenerPowerSupplyPca9431.jpg)  
+			* see image [alxHwPca_ListenerPowerSupplyPca9431_Red_BlackConn.jpg](../Img/HwPca9431/ListenerPowerSupplyPca9431_Red_BlackConn.jpg)
+			
 		- **b)**  
 			* add 3-5V power supply on NXP WLC Poller and put together both antennas (Listener and Poller)
 			* (so supply on should between Listener between 3-12V- depends on type of antenna,distance,matching...)
@@ -20,7 +22,7 @@
 - **pca_DevAdrReceive = 0b11100011;** //Pca9031
 
 ## General
-- **implemented** functions:
+- **implemented** functions: // tested and work
 	- **Alx_Status AlxPca9431_Init(AlxPca9431* me**
 	- **AlxPca9431_DeInit(AlxPca9431* me)**
 	- **AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V)** // 10 bit ADC, which measure voltage on PCA9431 LDO output. (0-3.3V or 0-5V)
@@ -37,7 +39,7 @@
 	- **AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V)** // 10 bit ADC - TODO
 	
   
-- **implemented private** functions:
+- **implemented private** functions: // tested and work
 	- **AlxPca9431_RegStruct_SetAddr(AlxPca9431* me)**
 	- **AlxPca9431_RegStruct_SetLen(AlxPca9431* me)**
 	- **AlxPca9431_RegStruct_SetValToZero(AlxPca9431* me)**
@@ -47,9 +49,28 @@
 	- **Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me)**
 	
   
-- **implemented weak** functions:
+- **implemented weak** functions: // tested and work
 	- **void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)** // Define basic Pca9431 Register Structure function in your application
 	
+## PCA9431 interrupt
+- interrupt is automatically cleaned by reading 2 times the same register in a row  
+- Delay between reading should be minimum  
+- If you use trace or. something similar (which increase delay) between both reading the interrupt output pin may not work  
+- image [i2cAlxPca9431_Interrupt.jpg](../Img/HwPca9431/i2cAlxPca9431_Interrupt.jpg)
+ 
+## PCA9431 LDO
+- image [i2c_AlxPca9431_Ldo3V3out.jpg](../Img/HwPca9431/i2c_AlxPca9431_Ldo3V3out.jpg)
+- image [i2c_AlxPca9431_Ldo5Vout.jpg](../Img/HwPca9431/i2c_AlxPca9431_Ldo5Vout.jpg)
+
+## PCA9431 LDO Get Voltage 3V3
+- image [i2cAlxPca9431_LdoVou_GetVoltage3V3.jpg](../Img/HwPca9431/i2cAlxPca9431_LdoVou_GetVoltage3V3.jpg)
+
+## General PCA9431 periphery
+- VOutLDO => 3v3 ali 5v
+- VRECT_UVLO => 3 , 3.1V, 3,2V, 3.3V
+- VPWR_VL => 1.8V, 2.5V, 2.8V, 3.3V
+- ADCs =>10 bit VRECT,IRECT,VOUT,IOUT,chip temperature, NTC voltage 
+- DAC => 5bit VTUNE external varactor
   
 ## Ctor Arguments
 
