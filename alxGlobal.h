@@ -121,9 +121,8 @@ extern "C" {
 #elif defined(ALX_PC)
 #include "alxGlobal_Pc.h"
 
-#elif defined(ALX_LPC55S6x)
-//#include "alxGlobal_McuLpc55S6x.h"	// TV: Create this file with this naming system
-#include "fsl_common.h"					// TV: Remove this, only temp file for init compilation
+#elif defined(ALX_LPC55S6X)
+#include "alxGlobal_McuLpc55S6x.h"
 
 #else
 #error "Please select platform for your application!"
@@ -300,7 +299,7 @@ typedef enum
 	AlxClk_Clk_McuLpc8xx_LPO_Ctor = 23,
 	#endif
 
-	#if defined(ALX_LPC55S6x)
+	#if defined(ALX_LPC55S6X)
 	AlxClk_Clk_McuLpc55s6x_Dummy = 24,
 	#endif
 } AlxClk_Clk;
