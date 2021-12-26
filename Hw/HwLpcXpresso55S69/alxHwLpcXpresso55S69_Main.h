@@ -89,158 +89,78 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	//******************************************************************************
-	// Port A
-	//******************************************************************************
-	// PA0	- Unused
-	// PA1	- Unused
-	// PA2	- Unused
-	// PA3	- Unused
-	// PA4	- Unused
-	// PA5	- Unused
-	// PA6	- Unused
-	// PA7	- Unused
-	// PA8	- Unused
-	// PA9	- Unused
-	// PA10	- Unused
-	// PA11	- Unused
-	// PA12	- Unused
-	// PA13	- SWD_IO
-	// PA14	- SWD_CLK
-	// PA15	- Unused
+	//------------------------------------------------------------------------------
+	// Port 0
+	//------------------------------------------------------------------------------
+	//PIO0_0	- Unused
+	//PIO0_1	- Unused
+	//PIO0_2	- Unused
+	//PIO0_3	- Unused
+	//PIO0_4	- Unused
+	//PIO0_5	- Unused
+	//PIO0_6	- Unused
+	//PIO0_7	- Unused
+	//PIO0_8	- Unused
+	AlxIoPin ai_P0_9_ADC_CH4;					// AlxIoPin PCA943X_nINT
+	//PIO0_10	- Unused
+	AlxIoPin ao_P0_11_CRN_VCC;
+	//PIO0_12	- Unused
+	//PIO0_13	- combo I2C / MFIO
+	//PIO0_14	- combo I2C / MFIO
+	//PIO0_15	- Unused
+	AlxIoPin io_P0_16_I2C0_SDA;
+	AlxIoPin do_P0_17_I2C0_SCL;
+	AlxIoPin do_P0_18_LED205_RD;
+	AlxIoPin do_P0_19_LED200_GR;
+	//PIO0_20	- Unused
+	//PIO0_21	- Unused
+	//PIO0_22	- Unused
+	AlxIoPin di_P0_23_IRQ1;						//AlxIoPin do_P0_23_LED203_GR;
+	AlxIoPin do_P0_24_PWM1;						//AlxIoPin do_P0_24_LED202_GR;
+	AlxIoPin do_P0_25_PWM2;						//AlxIoPin do_P0_25_LED201_GR;
+	//PIO0_26	- Unused
+	//PIO0_27	- Unused
+	//PIO0_28	- Unused
+	//PIO0_29	- Unused
+	//PIO0_30	- Unused
+	//PIO0_31	- Unused
 
 
-	//******************************************************************************
-	// Port B
-	//******************************************************************************
-	AlxIoPin do_PB0_LED1_GR;
-	// PB1	- Unused
-	// PB2	- Unused
-	// PB3	- Unused
-	// PB4	- Unused
-	// PB5	- Unused
-	// PB6	- Unused
-	AlxIoPin do_PB7_LED2_BL;
-	// PB8	- Unused
-	// PB9	- Unused
-	AlxIoPin do_PB10_I2C2_SCL;
-	AlxIoPin io_PB11_I2C2_SDA;
-	// PB12	- Unused
-	// PB13	- Unused
-	AlxIoPin do_PB14_LED3_RD;
-	// PB15	- Unused
-
-
-	//******************************************************************************
-	// Port C
-	//******************************************************************************
-	// PC0	- Unused
-	// PC1	- Unused
-	// PC2	- Unused
-	// PC3	- Unused
-	// PC4	- Unused
-	// PC5	- Unused
-	// PC6	- Unused
-	// PC7	- Unused
-	// PC8	- Unused
-	// PC9	- Unused
-	// PC10	- Unused
-	// PC11	- Unused
-	// PC12	- Unused
-	// PC13	- Unused
-	// PC14	- LSE
-	// PC15	- LSE
-
-
-	//******************************************************************************
-	// Port D
-	//******************************************************************************
-	// PD0	- Unused
-	// PD1	- Unused
-	// PD2	- Unused
-	// PD3	- Unused
-	// PD4	- Unused
-	// PD5	- DBG_UART_TX	-> ALX Trace Handle
-	// PD6	- Unused
-	// PD7	- Unused
-	// PD8	- Unused
-	// PD9	- Unused
-	// PD10	- Unused
-	// PD11	- Unused
-	// PD12	- Unused
-	// PD13	- Unused
-	// PD14	- Unused
-	// PD15	- Unused
-
-
-	//******************************************************************************
-	// Port E
-	//******************************************************************************
-	// PE0	- Unused
-	// PE1	- Unused
-	// PE2	- Unused
-	// PE3	- Unused
-	// PE4	- Unused
-	// PE5	- Unused
-	// PE6	- Unused
-	// PE7	- Unused
-	// PE8	- Unused
-	// PE9	- Unused
-	// PE10	- Unused
-	// PE11	- Unused
-	// PE12	- Unused
-	// PE13	- Unused
-	// PE14	- Unused
-	// PE15	- Unused
-
-
-	//******************************************************************************
-	// Port F
-	//******************************************************************************
-	// PF0	- Unused
-	// PF1	- Unused
-	// PF2	- Unused
-	// PF3	- Unused
-	// PF4	- Unused
-	// PF5	- Unused
-	// PF6	- Unused
-	// PF7	- Unused
-	// PF8	- Unused
-	// PF9	- Unused
-	// PF10	- Unused
-	// PF11	- Unused
-	// PF12	- Unused
-	// PF13	- Unused
-	// PF14	- Unused
-	// PF15	- Unused
-
-
-	//******************************************************************************
-	// Port G
-	//******************************************************************************
-	// PG0	- Unused
-	// PG1	- Unused
-	// PG2	- Unused
-	// PG3	- Unused
-	// PG4	- Unused
-	// PG5	- Unused
-	// PG6	- Unused
-	// PG7	- Unused
-	// PG8	- Unused
-	// PG9	- Unused
-	// PG10	- Unused
-	// PG11	- Unused
-	// PG12	- Unused
-	// PG13	- Unused
-	// PG14	- Unused
-	// PG15	- Unused
-
-
-	//******************************************************************************
-	// Port H
-	//******************************************************************************
-	// PH0 - HSE
-	// PH1 - HSE
+	//------------------------------------------------------------------------------
+	// Port 1
+	//------------------------------------------------------------------------------
+	//PIO1_0	- Unused
+	//PIO1_1	- Unused
+	//PIO1_2	- Unused
+	//PIO1_3	- Unused
+	//PIO1_4	- Unused
+	//PIO1_5	- Unused
+	//PIO1_6	- Unused
+	//PIO1_7	- Unused
+	//PIO1_8	- Unused
+	//AlxIoPin ai_P0_9_ADC_CH4;					// AlxIoPin PCA943X_nINT
+	//PIO1_10	- Unused
+	//AlxIoPin ao_P0_11_CRN_VCC;
+	//PIO1_12	- Unused
+	//PIO1_13	- Unused
+	//PIO1_14	- Unused
+	//PIO1_15	- Unused
+	//AlxIoPin io_P0_16_I2C0_SDA;
+	//AlxIoPin do_P0_17_I2C0_SCL;
+	//AlxIoPin do_P0_18_LED205_RD;
+	//AlxIoPin do_P0_19_LED200_GR;
+	//PIO1_20	- Unused
+	//PIO1_21	- Unused
+	//PIO1_22	- Unused	-> ALX Trace Handle		//AlxIoPin do_P0_22_LED204_GR;
+	//PIO1_23	- Unused
+	//PIO1_24	- Unused
+	//PIO1_25	- Unused
+	//PIO1_26	- Unused
+	//PIO1_27	- Unused
+	//PIO1_28	- Unused
+	//PIO1_29	- Unused
+	//PIO1_30	- Unused
+	//PIO1_31	- Unused
 } AlxHwLpcXpresso55S69_MainIoPin;
 
 typedef struct

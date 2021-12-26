@@ -43,8 +43,9 @@ typedef enum
 	AlxClk_Config_McuLpc55S6x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz = 7,
 	AlxClk_Config_McuLpc55S6x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5 = 8,*/
 
+	// To so vsi main Clk
 	AlxClk_Config_McuLpc55S6x_FroOsc_12MHz_Default = 0,
-	AlxClk_Config_McuLpc55S6x_FroHSOsc_96MHz = 1,	// MF: HS mean High Speed
+	AlxClk_Config_McuLpc55S6x_FroHsOsc_96MHz = 1,	// MF: Hf mean High Speed
 	AlxClk_Config_McuLpc55S6x_ExtOsc_ = 2,
 	AlxClk_Config_McuLpc55S6x_FroOsc_1MHz = 3,
 	AlxClk_Config_McuLpc55S6x_Pll0 = 4,

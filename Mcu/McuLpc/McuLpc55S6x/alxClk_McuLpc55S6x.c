@@ -23,7 +23,8 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-
+static void AlxClk_PeriphGpio_EnableClk();
+static void AlxClk_PeriphGpio_Reset();
 
 
 //******************************************************************************
@@ -53,6 +54,12 @@ Alx_Status AlxClk_Init(AlxClk* me)
 	ALX_CLK_ASSERT(me->isInit == false);
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Reset GPIO Periphery
+	AlxClk_PeriphGpio_Reset();
+
+	// #2 Enable GPIO Periphery clock
+	AlxClk_PeriphGpio_EnableClk();
+
 	// #8 Set isInit
 	me->isInit = true;
 
@@ -78,5 +85,23 @@ void AlxClk_Irq_Handle(AlxClk* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static void AlxClk_PeriphGpio_EnableClk()
+{
+	CLOCK_EnableClock(kCLOCK_Gpio0);
+	CLOCK_EnableClock(kCLOCK_Gpio1);
+	CLOCK_EnableClock(kCLOCK_Gpio2);	// MF: I'm not sure this works on Lpc55S6x
+	CLOCK_EnableClock(kCLOCK_Gpio3);	// MF: I'm not sure this works on Lpc55S6x
+}
+static void AlxClk_PeriphGpio_Reset()
+{
+	RESET_PeripheralReset(kGPIO0_RST_SHIFT_RSTn);
+	RESET_PeripheralReset(kGPIO1_RST_SHIFT_RSTn);
+}
+static bool AlxClk_AreClkNok(AlxClk* me)
+{
+	me->coreSysClk = CLOCK_GetCoreSysClkFreq();
+	me->mainClk = CLOCK_GetMainClkFreq();
+	me->fro = CLOCK_GetFroFreq();
+}
 
 #endif // Module Guard
