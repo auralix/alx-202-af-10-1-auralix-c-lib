@@ -102,7 +102,7 @@ typedef struct
 	// PA6	- Unused
 	// PA7	- Unused
 	// PA8	- Unused
-	// PA9	- Unused
+	AlxIoPin do_PA9_Pca9431_sleep; // Pca9431_sleep
 	// PA10	- Unused
 	// PA11	- Unused
 	// PA12	- Unused
@@ -138,7 +138,7 @@ typedef struct
 	// PC0	- Unused
 	// PC1	- Unused
 	// PC2	- Unused
-	// PC3	- Unused
+	AlxIoPin  di_PC3_Pca9431_interrupt;
 	// PC4	- Unused
 	// PC5	- Unused
 	// PC6	- Unused
@@ -248,6 +248,12 @@ typedef struct
 {
 	// ALX Objects
 	AlxI2c alxI2c_I2C2_Master;
+	AlxIoPin di_PC3_Pca9431_interrupt;
+	AlxIoPinIrq ioPinIrq;
+
+	AlxIoPin* ioPinIrqIoPinArr[1];
+
+	Alx_IrqPriority irqPriorityArr[1];
 
 	// Auralix HW NUCLEO-F429ZI C Library Objects
 	AlxHwNucleoF429Zi_MainIoPin alxIoPin;
@@ -257,57 +263,73 @@ typedef struct
 } AlxHwNucleoF429Zi_Main;
 
 
-//******************************************************************************
-// Constructor
-//******************************************************************************
-static inline void AlxHwNucleoF429Zi_Main_Ctor(AlxHwNucleoF429Zi_Main* me)
-{
 	//******************************************************************************
-	// ALX - IoPin
+	// Constructor
 	//******************************************************************************
-	AlxIoPin_Ctor(&me->alxIoPin.do_PB0_LED1_GR,		GPIOB,	GPIO_PIN_0,		GPIO_MODE_OUTPUT_PP,	GPIO_NOPULL,	GPIO_SPEED_FREQ_HIGH,	ALX_NULL,		false		);
-	AlxIoPin_Ctor(&me->alxIoPin.do_PB7_LED2_BL,		GPIOB,	GPIO_PIN_7,		GPIO_MODE_OUTPUT_PP,	GPIO_NOPULL,	GPIO_SPEED_FREQ_HIGH,	ALX_NULL,		false		);
-	AlxIoPin_Ctor(&me->alxIoPin.do_PB14_LED3_RD,	GPIOB,	GPIO_PIN_14,	GPIO_MODE_OUTPUT_PP,	GPIO_NOPULL,	GPIO_SPEED_FREQ_HIGH,	ALX_NULL,		false		);
-	AlxIoPin_Ctor(&me->alxIoPin.do_PB10_I2C2_SCL,	GPIOB,	GPIO_PIN_10,	GPIO_MODE_AF_OD,		GPIO_PULLUP,	GPIO_SPEED_FREQ_HIGH,	GPIO_AF4_I2C2,	ALX_NULL	);
-	AlxIoPin_Ctor(&me->alxIoPin.io_PB11_I2C2_SDA,	GPIOB,	GPIO_PIN_11,	GPIO_MODE_AF_OD,		GPIO_PULLUP,	GPIO_SPEED_FREQ_HIGH,	GPIO_AF4_I2C2,	ALX_NULL	);
+	static inline void AlxHwNucleoF429Zi_Main_Ctor(AlxHwNucleoF429Zi_Main* me)
+	{
+		//******************************************************************************
+		// ALX - IoPin
+		//******************************************************************************
+		AlxIoPin_Ctor(&me->alxIoPin.do_PB0_LED1_GR, GPIOB, GPIO_PIN_0, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH, ALX_NULL, false);
+		AlxIoPin_Ctor(&me->alxIoPin.do_PB7_LED2_BL, GPIOB, GPIO_PIN_7, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH, ALX_NULL, false);
+		AlxIoPin_Ctor(&me->alxIoPin.do_PB14_LED3_RD, GPIOB, GPIO_PIN_14, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH, ALX_NULL, false);
+		AlxIoPin_Ctor(&me->alxIoPin.do_PB10_I2C2_SCL, GPIOB, GPIO_PIN_10, GPIO_MODE_AF_OD, GPIO_PULLUP, GPIO_SPEED_FREQ_HIGH, GPIO_AF4_I2C2, ALX_NULL);
+		AlxIoPin_Ctor(&me->alxIoPin.io_PB11_I2C2_SDA, GPIOB, GPIO_PIN_11, GPIO_MODE_AF_OD, GPIO_PULLUP, GPIO_SPEED_FREQ_HIGH, GPIO_AF4_I2C2, ALX_NULL);
+		AlxIoPin_Ctor(&me->alxIoPin.do_PA9_Pca9431_sleep, GPIOA, GPIO_PIN_9, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH, ALX_NULL, false);
+		AlxIoPin_Ctor(&me->alxIoPin.di_PC3_Pca9431_interrupt, GPIOC, GPIO_PIN_3, GPIO_MODE_IT_FALLING, GPIO_PULLUP, GPIO_SPEED_FREQ_HIGH, ALX_NULL, ALX_NULL);
+
+		//******************************************************************************
+		// ALX - Clock
+		//******************************************************************************
+		AlxClk_Ctor
+		(
+			&alxClk,
+			//AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz
+			AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_25MHz // Using NUCLEO-F429ZI 2100212 with external 25MHz crystal
+		);
 
 
-	//******************************************************************************
-	// ALX - Clock
-	//******************************************************************************
-	AlxClk_Ctor
-	(
-		&alxClk,
-		AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz
-	);
+		//******************************************************************************
+		// ALX - Trace
+		//******************************************************************************
+		AlxTrace_Ctor
+		(
+			&alxTrace,
+			GPIOD,
+			GPIO_PIN_5,
+			GPIO_AF7_USART2,
+			USART2,
+			AlxGlobal_BaudRate_115200
+		);
 
 
-	//******************************************************************************
-	// ALX - Trace
-	//******************************************************************************
-	AlxTrace_Ctor
-	(
-		&alxTrace,
-		GPIOD,
-		GPIO_PIN_5,
-		GPIO_AF7_USART2,
-		USART2,
-		AlxGlobal_BaudRate_115200
-	);
+		//******************************************************************************
+		// ALX - I2C
+		//******************************************************************************
+		AlxI2c_Ctor
+		(
+			&me->alxI2c_I2C2_Master,
+			I2C2,
+			&me->alxIoPin.do_PB10_I2C2_SCL,
+			&me->alxIoPin.io_PB11_I2C2_SDA,
+			//AlxI2c_Clk_400kHz
+			AlxI2c_Clk_100kHz //-Pca9431
+		);
 
+		//******************************************************************************
+		// ALX - Irq
+		//******************************************************************************
+		me->ioPinIrqIoPinArr[0] = &me->alxIoPin.di_PC3_Pca9431_interrupt;
+		me->irqPriorityArr[0] = Alx_IrqPriority_0;
 
-	//******************************************************************************
-	// ALX - I2C
-	//******************************************************************************
-	AlxI2c_Ctor
-	(
-		&me->alxI2c_I2C2_Master,
-		I2C2,
-		&me->alxIoPin.do_PB10_I2C2_SCL,
-		&me->alxIoPin.io_PB11_I2C2_SDA,
-		AlxI2c_Clk_400kHz
-	);
-
+			AlxIoPinIrq_Ctor
+		(
+			&me->ioPinIrq,
+			me->ioPinIrqIoPinArr,
+			ALX_ARR_LEN(me->ioPinIrqIoPinArr),
+			me->irqPriorityArr
+		);
 
 	//******************************************************************************
 	// Info
