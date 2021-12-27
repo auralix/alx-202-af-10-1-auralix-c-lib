@@ -25,7 +25,11 @@
 //******************************************************************************
 static void AlxClk_PeriphGpio_EnableClk();
 static void AlxClk_PeriphGpio_Reset();
+static bool AlxClk_AreClkNok(AlxClk* me);
 
+static void AlxClk_Ctor_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(AlxClk* me);
+
+static void AlxClk_Init_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(AlxClk* me);
 
 //******************************************************************************
 // Specific Functions
@@ -44,6 +48,10 @@ void AlxClk_Ctor
 	me->config = config;
 	me->tick = tick;
 
+	if		(me->config == AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default)		{ AlxClk_Ctor_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(me); }
+	//else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz)				{ AlxClk_Ctor_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(me); }
+	else																					{ ALX_CLK_ASSERT(false); return; }
+
 	// Info
 	me->isInit = false;
 	me->wasCtorCalled = true;
@@ -59,6 +67,23 @@ Alx_Status AlxClk_Init(AlxClk* me)
 
 	// #2 Enable GPIO Periphery clock
 	AlxClk_PeriphGpio_EnableClk();
+
+	// #3 Init Clocks
+	if		(me->config == AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default)		{ AlxClk_Init_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(me); }
+	//else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz)				{ AlxClk_Init_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(me); }
+	else																					{ ALX_CLK_ASSERT(false); return Alx_Err; }
+
+	// #4 Check Clocks
+	//if (AlxClk_AreClkNok(me)) { ALX_CLK_TRACE("ErrCheck"); return Alx_Err; }
+
+	// #5 Update SystemCoreClock
+	SystemCoreClockUpdate();
+
+	// #6 Configure SysTick
+	if (SysTick_Config(SystemCoreClock / (1000000U / me->tick)) == 1) { ALX_CLK_TRACE("ErrSysTickConfig"); return Alx_Err; }	// MF: In the example it was 1000000 when setting up SysTick
+
+	// #7 Set SystemCoreClock
+	me->systemCoreClock = SystemCoreClock;
 
 	// #8 Set isInit
 	me->isInit = true;
@@ -89,19 +114,46 @@ static void AlxClk_PeriphGpio_EnableClk()
 {
 	CLOCK_EnableClock(kCLOCK_Gpio0);
 	CLOCK_EnableClock(kCLOCK_Gpio1);
-	CLOCK_EnableClock(kCLOCK_Gpio2);	// MF: I'm not sure this works on Lpc55S6x
-	CLOCK_EnableClock(kCLOCK_Gpio3);	// MF: I'm not sure this works on Lpc55S6x
+	//CLOCK_EnableClock(kCLOCK_Gpio2);	// MF: I'm not sure this works on Lpc55S6x
+	//CLOCK_EnableClock(kCLOCK_Gpio3);	// MF: I'm not sure this works on Lpc55S6x
 }
 static void AlxClk_PeriphGpio_Reset()
 {
 	RESET_PeripheralReset(kGPIO0_RST_SHIFT_RSTn);
 	RESET_PeripheralReset(kGPIO1_RST_SHIFT_RSTn);
+	//RESET_PeripheralReset(kGPIO2_RST_SHIFT_RSTn);	// MF: I'm not sure this works on Lpc55S6x
+	//RESET_PeripheralReset(kGPIO3_RST_SHIFT_RSTn);	// MF: I'm not sure this works on Lpc55S6x
 }
 static bool AlxClk_AreClkNok(AlxClk* me)
 {
 	me->coreSysClk = CLOCK_GetCoreSysClkFreq();
-	me->mainClk = CLOCK_GetMainClkFreq();
-	me->fro = CLOCK_GetFroFreq();
+	//me->mainClk = CLOCK_GetMainClkFreq();
+	//me->fro = CLOCK_GetFroFreq();
+
+	if		(me->coreSysClk != me->coreSysClk_Ctor)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
+	//else if (me->mainClk != me->mainClk_Ctor)			{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+	//else if (me->fro != me->fro)						{ ALX_CLK_TRACE("ErrFro");			return true; }
+
+	if (me->config == AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default)
+	{
+		//if (CLOCK_GetMainClkFreq()    != 12000000U)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+		if (CLOCK_GetCoreSysClkFreq() != 12000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
+	}
+}
+
+static void AlxClk_Ctor_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(AlxClk* me)
+{
+	me->coreSysClk_Ctor = 12000000U;
+	me->mainClk_Ctor	= 12000000U;
+	me->fro_Ctor		= 12000000U;
+}
+
+static void AlxClk_Init_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(AlxClk* me)
+{
+	//AlxClk_SetFro(me);
+	POWER_DisablePD(kPDRUNCFG_PD_FRO192M);	// MF: Ensures FRO is on
+
+	CLOCK_AttachClk(kFRO12M_to_MAIN_CLK);                /*!< Switch to FRO 12MHz first to ensure we can change the clock setting */
 }
 
 #endif // Module Guard

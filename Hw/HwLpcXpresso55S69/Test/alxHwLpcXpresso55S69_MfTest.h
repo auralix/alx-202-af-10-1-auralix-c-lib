@@ -56,21 +56,15 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(AlxHwLpc
 	(void)me;
 
 	// Init
-	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_18_LED205_RD);
-	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_19_LED200_GR);
-	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_22_LED204_GR);
-	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_23_LED203_GR);
-	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_24_LED202_GR);
-	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_25_LED201_GR);
+	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UserLED_BL);
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UserLED_RD);
+	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UserLED_GR);
 
 	while (1)
 	{
-		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_18_LED205_RD);
-		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_19_LED200_GR);
-		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_22_LED204_GR);
-		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_23_LED203_GR);
-		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_24_LED202_GR);
-		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_25_LED201_GR);
+		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UserLED_BL);
+		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UserLED_RD);
+		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UserLED_GR);
 
 		AlxDelay_ms(500);
 	}
@@ -169,7 +163,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(AlxHwLpcXpr
 {
 	// Init
 	AlxClk_Init(&alxClk);
-	AlxTrace_Init(&alxTrace);
+	//AlxTrace_Init(&alxTrace);	// MF: TODO
 
 	// IoPinIrq
 	//AlxIoPinIrq_Init(&me->alxHwLpcXpresso55S69_Main.alxIrqPin_IRQ1);	// MF: IoPinIrq is always Inited
@@ -179,10 +173,10 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(AlxHwLpcXpr
 }
 static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
 {
-	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(me);
+	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(me);
-	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(me);
+	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T05_I2c(me);
 }
 

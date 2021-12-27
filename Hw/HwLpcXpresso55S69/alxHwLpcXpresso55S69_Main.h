@@ -103,8 +103,8 @@ typedef struct
 	//PIO0_8	- Unused
 	AlxIoPin ai_P0_9_ADC_CH4;					// AlxIoPin PCA943X_nINT
 	//PIO0_10	- Unused
-	AlxIoPin ao_P0_11_CRN_VCC;
-	//PIO0_12	- Unused
+	//PIO0_11	- SWD_CLK
+	//PIO0_12	- SWD_IO
 	//PIO0_13	- combo I2C / MFIO
 	//PIO0_14	- combo I2C / MFIO
 	//PIO0_15	- Unused
@@ -133,10 +133,10 @@ typedef struct
 	//PIO1_1	- Unused
 	//PIO1_2	- Unused
 	//PIO1_3	- Unused
-	//PIO1_4	- Unused
+	AlxIoPin do_P1_4_UserLED_BL;
 	//PIO1_5	- Unused
-	//PIO1_6	- Unused
-	//PIO1_7	- Unused
+	AlxIoPin do_P1_6_UserLED_RD;
+	AlxIoPin do_P1_7_UserLED_GR;
 	//PIO1_8	- Unused
 	//AlxIoPin ai_P0_9_ADC_CH4;					// AlxIoPin PCA943X_nINT
 	//PIO1_10	- Unused
@@ -181,29 +181,28 @@ typedef struct
 //******************************************************************************
 static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 {
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	// ALX - IoPin
-	//******************************************************************************
-	/*AlxIoPin_Ctor(&me->alxIoPin.do_PB0_LED1_GR,		GPIOB,	GPIO_PIN_0,		GPIO_MODE_OUTPUT_PP,	GPIO_NOPULL,	GPIO_SPEED_FREQ_HIGH,	ALX_NULL,		false		);
-	AlxIoPin_Ctor(&me->alxIoPin.do_PB7_LED2_BL,		GPIOB,	GPIO_PIN_7,		GPIO_MODE_OUTPUT_PP,	GPIO_NOPULL,	GPIO_SPEED_FREQ_HIGH,	ALX_NULL,		false		);
-	AlxIoPin_Ctor(&me->alxIoPin.do_PB14_LED3_RD,	GPIOB,	GPIO_PIN_14,	GPIO_MODE_OUTPUT_PP,	GPIO_NOPULL,	GPIO_SPEED_FREQ_HIGH,	ALX_NULL,		false		);
-	AlxIoPin_Ctor(&me->alxIoPin.do_PB10_I2C2_SCL,	GPIOB,	GPIO_PIN_10,	GPIO_MODE_AF_OD,		GPIO_PULLUP,	GPIO_SPEED_FREQ_HIGH,	GPIO_AF4_I2C2,	ALX_NULL	);
-	AlxIoPin_Ctor(&me->alxIoPin.io_PB11_I2C2_SDA,	GPIOB,	GPIO_PIN_11,	GPIO_MODE_AF_OD,		GPIO_PULLUP,	GPIO_SPEED_FREQ_HIGH,	GPIO_AF4_I2C2,	ALX_NULL	);
-*/
+	//------------------------------------------------------------------------------
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_UserLED_BL, 1, 4, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UserLED_RD, 1, 6, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UserLED_GR, 1, 7, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
 
-	//******************************************************************************
+
+	//------------------------------------------------------------------------------
 	// ALX - Clock
-	//******************************************************************************
-	/*AlxClk_Ctor
+	//------------------------------------------------------------------------------
+	AlxClk_Ctor
 	(
 		&alxClk,
-		AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz
-	);*/
+		AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default,
+		AlxClk_Tick_1ms
+	);
 
 
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	// ALX - Trace
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	/*AlxTrace_Ctor
 	(
 		&alxTrace,
@@ -215,9 +214,9 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	);*/
 
 
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	// ALX - I2C
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	/*AlxI2c_Ctor
 	(
 		&me->alxI2c_I2C2_Master,
@@ -228,9 +227,9 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	);*/
 
 
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	// Info
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	me->wasCtorCalled = true;
 }
 
