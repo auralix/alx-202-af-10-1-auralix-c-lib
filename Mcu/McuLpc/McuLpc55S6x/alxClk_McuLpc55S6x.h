@@ -44,13 +44,13 @@ typedef enum
 	AlxClk_Config_McuLpc55S6x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5 = 8,*/
 
 	// To so vsi main Clk
-	AlxClk_Config_McuLpc55S6x_FroOsc_12MHz_Default = 0,
-	AlxClk_Config_McuLpc55S6x_FroHsOsc_96MHz = 1,	// MF: Hf mean High Speed
-	AlxClk_Config_McuLpc55S6x_ExtOsc_ = 2,
-	AlxClk_Config_McuLpc55S6x_FroOsc_1MHz = 3,
-	AlxClk_Config_McuLpc55S6x_Pll0 = 4,
-	AlxClk_Config_McuLpc55S6x_Pll1 = 5,
-	AlxClk_Config_McuLpc55S6x_RtcOsc_32kHz = 6,
+	AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default = 0,
+	AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_FroOsc_96MHz = 1,	// MF: Hf mean High Speed
+	AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_FroOsc_1MHz = 2,
+	AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_ExtOsc_ = 3,
+	AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_Pll0 = 4,
+	AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_Pll1 = 5,
+	AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_RtcOsc_32kHz = 6,
 } AlxClk_Config;
 
 typedef struct
@@ -70,7 +70,6 @@ typedef struct
 	uint32_t coreSysClk_Ctor;
 	uint32_t mainClk_Ctor;
 	uint32_t fro_Ctor;
-	uint32_t lpo_Ctor;
 
 	// Info
 	bool isInit;
