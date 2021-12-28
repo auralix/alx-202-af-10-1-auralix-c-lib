@@ -382,7 +382,7 @@ void AlxId_Init(AlxId* me)
 								((uint64_t)me->hw.instance.bomVerMinor << 48) |
 								((uint64_t)me->hw.instance.bomVerPatch << 32) |
 								((uint64_t)me->hw.instance.bomVerDate);
-	
+
 	// #7 Set isInit
 	me->isInit = true;
 }
@@ -469,10 +469,11 @@ uint8_t AlxId_GetHwId(AlxId* me)
 }
 const char* AlxId_GetUniqueIdStr(AlxId* me)
 {
-	ALX_ID_ASSERT(me->isInit == true);
 	ALX_ID_ASSERT(me->wasCtorCalled == true);
 
+	#ifdef ALX_STM32
 	return me->stm32Hw.uniqueIdStr;
+	#endif
 }
 uint32_t AlxId_GetSwAppVerDate(AlxId* me)
 {

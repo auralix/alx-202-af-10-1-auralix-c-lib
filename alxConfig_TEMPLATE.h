@@ -54,11 +54,19 @@ extern "C" {
 //#define ALX_STM32L0_CMSIS_VER_REQUIRED 0x01010100 // 1.1.1.0
 //#define ALX_STM32L0_HAL_VER_REQUIRED 0x01010100 // 1.1.1.0
 
+// Platform - LPC8XX //
+//#define ALX_LPC8XX
+//#define ALX_LPC84X
+//#define ALX_LPC80X
+
 // Assert //
 #define _ALX_ASSERT_BKPT_ALL
 
 // Trace //
 #define _ALX_TRACE_ALL
+
+// Optimize //
+//#define ALX_OPTIMIZE_SIZE_ALL
 
 // Submodules //
 //#define ALX_ADC_MCU
