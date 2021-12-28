@@ -47,31 +47,32 @@ void SysTick_Handler(void)
 void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 {
 	// Ldo output
-	me->reg._0x07_VOUT_LDO.val.VOUT_LDO	= VoutLdo3V3;
-	//me->reg._0x07_VOUT_LDO.val.VOUT_LDO = VoutLdo5V;
+	me->reg._07h_VOUT_LDO.val.VOUT_LDO	= VoutLdo_3V3;
+	//me->reg._07h_VOUT_LDO.val.VOUT_LDO = VoutLdo_5V;
 
 	// Vrect treshold
-	me->reg._0x08_VRECT_THD.val.VRECT_UVLO = VRectThd3V3;
+	me->reg._08h_VRECT_THD.val.VRECT_UVLO = VRectThd_3V3;
+
 
 	// Adc enable
-	me->reg._0x0D_ADC_CONTROL.val.ADC_EN = AdcEnabled;
-	me->reg._0x0D_ADC_CONTROL.val.ADC_AVG_EN = AdcAveragingEnabled;
-	me->reg._0x0D_ADC_CONTROL.val.ADC_RATE = AdcContinuousConversion;
+	me->reg._0Dh_ADC_CONTROL.val.ADC_EN = AdcEn_Enabled;
+	me->reg._0Dh_ADC_CONTROL.val.ADC_AVG_EN = AdcAveragingEn_Enabled;
+	me->reg._0Dh_ADC_CONTROL.val.ADC_RATE = AdcRate_ContinuousConversion;
 
 	// Adc sample enable
-	me->reg._0x0E_Sample_EN.val.OTP_ADC_EN = OtpAdcEnabled;
-	me->reg._0x0E_Sample_EN.val.IOUT_ADC_EN	= IOutAdcEnabled;
-	me->reg._0x0E_Sample_EN.val.VOUT_ADC_EN	= VOutAdcEnabled;
-	me->reg._0x0E_Sample_EN.val.IRECT_ADC_EN = IRectAdcEnabled;
-	me->reg._0x0E_Sample_EN.val.VRECT_ADC_EN = VRectAdcEnabled;
-	me->reg._0x0E_Sample_EN.val.VTUNE_ADC_EN = VTuneAdcEnabled;
+	me->reg._0Eh_Sample_EN.val.OTP_ADC_EN = OtpAdcSamplingEn_Enabled;
+	me->reg._0Eh_Sample_EN.val.IOUT_ADC_EN	= IOutAdcSamplingEn_Enabled;
+	me->reg._0Eh_Sample_EN.val.VOUT_ADC_EN	= VOutAdcSamplingEn_Enabled;
+	me->reg._0Eh_Sample_EN.val.IRECT_ADC_EN = IRectAdcSamplingEn_Enabled;
+	me->reg._0Eh_Sample_EN.val.VRECT_ADC_EN = VRectAdcSamplingEn_Enabled;
+	me->reg._0Eh_Sample_EN.val.VTUNE_ADC_EN = VTuneAdcSamplingEn_Enabled;
 
 	// Interrupt mask
-	me->reg._0x04_VRECT_INT_MASK.val.VRECT_RDY_INT_MSK = VRectRdyIntMaskOn;
-	me->reg._0x04_VRECT_INT_MASK.val.VRECT_GOOD_INT_MSK	= VRectGoodIntMaskOn;
-	//me->reg._0x04_VRECT_INT_MASK.val.VRECT_REGHIGH_INT_MSK = VRectRegHighIntMaskOn;
-	//me->reg._0x04_VRECT_INT_MASK.val.VRECT_OVW_MSK = VRectOvWarnIntMaskOn;
-	me->reg._0x06_VOUTLDO_INT_MASK.val.VOUT_SHORT_INT_MASK = VOutLdoShortIntMaskOff;
+	me->reg._04h_VRECT_INT_MASK.val.VRECT_RDY_INT_MSK = VRectRdyIntMask_NotTrig;
+	me->reg._04h_VRECT_INT_MASK.val.VRECT_GOOD_INT_MSK	= VRectGoodIntMask_NotTrig;
+	//me->reg._04h_VRECT_INT_MASK.val.VRECT_REGHIGH_INT_MSK = VRectRegHighIntMask_NotTrig;
+	//me->reg._04h_VRECT_INT_MASK.val.VRECT_OVW_MSK = VRectOvWarnIntMask_NotTrig;
+	me->reg._06h_VOUTLDO_INT_MASK.val.VOUT_SHORT_INT_MASK = VOutLdoShortInt_NotMasked;
 }
 void AlxIoPinIrq_Foreground_Callback_Pin3(void)
 {
