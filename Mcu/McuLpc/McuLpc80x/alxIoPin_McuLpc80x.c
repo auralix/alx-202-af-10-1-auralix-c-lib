@@ -17,7 +17,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -26,23 +26,7 @@
 static swm_port_pin_type_t AlxIoPin_GetSwmPortPinIndex(AlxIoPin* me);
 static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me);
 static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me);
-static swm_select_fixed_pin_t AlxIoPin_GetSwmMFixFunc(AlxIoPin* me);
-static syscon_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPin* me);
-static IRQn_Type AlxIoPin_GetIrqType(AlxIoPin* me);
-static void AlxIoPin_PINT_Init(AlxIoPin* me, PINT_Type* base); // MF: I have to rewrite FSL func without "Periph_Reset" in it so we can init more pins
-
-
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
-void AlxIoPinIrq_Foreground_Callback_Pin0();
-void AlxIoPinIrq_Foreground_Callback_Pin1();
-void AlxIoPinIrq_Foreground_Callback_Pin2();
-void AlxIoPinIrq_Foreground_Callback_Pin3();
-void AlxIoPinIrq_Foreground_Callback_Pin4();
-void AlxIoPinIrq_Foreground_Callback_Pin5();
-void AlxIoPinIrq_Foreground_Callback_Pin6();
-void AlxIoPinIrq_Foreground_Callback_Pin7();
+static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me);
 
 
 //******************************************************************************
@@ -57,12 +41,18 @@ void AlxIoPin_Ctor
 	uint32_t mode,
 	bool isOpenDrain,
 	bool dir,
-	bool val,
-	AlxIoPinIrq* irqPtr
+	bool val
 )
 {
 	// Assert
-	if ((alxDbgPin.pin == pin) && (alxDbgPin.port == port)) { ALX_IO_PIN_ASSERT(false); } // MF: Checks Pin and Port are nat the same as DBG Pin
+	(void)me;
+	(void)port;
+	(void)pin;
+	(void)func;
+	(void)mode;
+	(void)isOpenDrain;
+	(void)dir;
+	(void)val;
 
 	// Parameters
 	me->port = port;
@@ -72,7 +62,6 @@ void AlxIoPin_Ctor
 	me->isOpenDrain = isOpenDrain;
 	me->dir = dir;
 	me->val = val;
-	me->irqPtr = irqPtr;
 
 	// Variables
 	me->swmFunc_isMovable = false;
@@ -83,72 +72,53 @@ void AlxIoPin_Ctor
 }
 void AlxIoPin_Init(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == false);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Set isInit attribute
 	me->isInit = true;
 
-	AlxIoPin_Write(me, me->val); // Set initial output value, before config
+	// #2 Set initial output value, before config
+	AlxIoPin_Write(me, me->val);
 
-	// #2 Init IOCON
+	// #3.1 Get IoconPortPinIndex
 	uint8_t ioconPortPinIndex = AlxPROTECTED_IoPin_GetIoconPortPinIndex(me->pin, me->port);
 
+	// #3.2 Enable IOCON Clk
 	CLOCK_EnableClock(kCLOCK_Iocon);
 
-	// Set Mode
+	// #3.3 Set IOCON Mode
 	AlxPROTECTED_IoPin_SetIoconMode(me->pin, me->port, me->mode);
 
-	// Set Open Drain
-	if (me->isOpenDrain)
-	{
-		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 10U);
-	}
-	else
-	{
-		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U);
-	}
+	// #3.4 Set Open Drain
+	if (me->isOpenDrain)	{ IOCON->PIO[ioconPortPinIndex] |= (0x1 << 10U); }
+	else					{ IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); }
+
+	// #3.5 Disable IOCON Clk
 	CLOCK_DisableClock(kCLOCK_Iocon);
 
-	// #3.1 Init if SWM
+	// #4.1 Init if SWM
 	if (AlxIoPin_CheckIfSwmUsed(me))
 	{
 		CLOCK_EnableClock(kCLOCK_Swm);
 		if (me->swmFunc_isMovable)
 		{
-			// #3.1.1 Init if Movable
+			// #4.1.1 Init if Movable
 			swm_select_movable_t swmMoveFunc = AlxIoPin_GetSwmMoveFunc(me);
 			swm_port_pin_type_t swmPortPinIndex = AlxIoPin_GetSwmPortPinIndex(me);
 			SWM_SetMovablePinSelect(SWM0, swmMoveFunc, swmPortPinIndex);
 		}
 		else
 		{
-			// #3.1.2 Init if Fixed
-			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmMFixFunc(me);
+			// #4.1.2 Init if Fixed
+			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmFixFunc(me);
 			SWM_SetFixedPinSelect(SWM0, swmFixFunc, true);
 		}
 		CLOCK_DisableClock(kCLOCK_Swm);
 	}
 
-	// #3.2 Init if IRQ
-	if (me->func == AlxIoPin_Func_IRQ)
-	{
-		syscon_connection_t irqPortPinSel = AlxIoPin_GetIrqPortPinSel(me);
-		IRQn_Type irqType = AlxIoPin_GetIrqType(me);
-
-		// #3.2.1 Attach IRQ to right Pin
-		SYSCON_AttachSignal(SYSCON, me->irqPtr->irqPin, irqPortPinSel);
-
-		// #3.2.2 Init PINT Periphery
-		AlxIoPin_PINT_Init(me, PINT); // "EnableClk" happens here.
-
-		// #3.2.3 Enable IRQ
-		PINT_PinInterruptConfig(PINT, me->irqPtr->irqPin, me->irqPtr->irqType, ALX_NULL_PTR); // MF: "ALX_NULL_PTR" because we'll use "PIN_INTX_IRQHandler" from startup.s
-		NVIC_SetPriority(irqType, (uint32_t)me->irqPtr->irqPriority); // MF: Set IRQ Priority
-		PINT_EnableCallbackByIndex(PINT, me->irqPtr->irqPin); // MF: Enable IRQ
-	}
-
-	// #3.3 Init if GPIO
+	// #4.2 Init if GPIO
 	if (me->func == AlxIoPin_Func_GPIO)
 	{
 		gpio_pin_config_t gpioConfig;
@@ -156,17 +126,17 @@ void AlxIoPin_Init(AlxIoPin* me)
 		if (me->dir)	gpioConfig.pinDirection = kGPIO_DigitalOutput;
 		else			gpioConfig.pinDirection = kGPIO_DigitalInput;
 
-		gpioConfig.outputLogic = 0U; // Clears output bit
+		gpioConfig.outputLogic = 0U; // MF: Clears output bit
 
 		GPIO_PinInit(GPIO, me->port, me->pin, &gpioConfig);
 	}
 
-	AlxIoPin_Write(me, me->val); // Set initial output value, after config
-
-	ALX_IO_PIN_ASSERT(me->isInit == true);
+	// #5 Set initial output value, after config
+	AlxIoPin_Write(me, me->val);
 }
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
@@ -174,12 +144,12 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	uint8_t ioconPortPinIndex = AlxPROTECTED_IoPin_GetIoconPortPinIndex(me->pin, me->port);
 
 	CLOCK_EnableClock(kCLOCK_Iocon);
-	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U); // Reset Mode (00) Inactive (no pull-down/pull-up)
+	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U); // MF: Reset Mode (00) Inactive (no pull-down/pull-up)
 	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 4U);
-	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); // Reset Open Drain (0)
+	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); // MF: Reset Open Drain (0)
 	CLOCK_DisableClock(kCLOCK_Iocon);
 
-	// #2.1 DeInit SWM if used
+	// #2.1 DeInit if SWM used
 	if (AlxIoPin_CheckIfSwmUsed(me))
 	{
 		CLOCK_EnableClock(kCLOCK_Swm);
@@ -190,19 +160,13 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 		}
 		else
 		{
-			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmMFixFunc(me);
+			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmFixFunc(me);
 			SWM_SetFixedPinSelect(SWM0, swmFixFunc, false);
 		}
 		CLOCK_DisableClock(kCLOCK_Swm);
 	}
 
-	// #2.2 DeInit if IRQ
-	if (me->func == AlxIoPin_Func_IRQ)
-	{
-		PINT_DisableCallbackByIndex(PINT, me->irqPtr->irqPin); // MF: Disable IRQ
-	}
-
-	// #2.3 DeInit if GPIO
+	// #2.2 DeInit if GPIO
 	if (me->func == AlxIoPin_Func_GPIO)
 	{
 		GPIO->DIR[me->port] &= ~(1U << me->pin); // Reset Dir (0)
@@ -213,69 +177,86 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 }
 bool AlxIoPin_Read(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Read Pin
 	if (GPIO_PinRead(GPIO, me->port, me->pin) == 1) { return true; }
 	else { return false; }
 }
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
+	// Assert
 	(void)val;
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Write Pin
 	if (val) { GPIO_PinWrite(GPIO, me->port, me->pin, 1U); }
 	else { GPIO_PinWrite(GPIO, me->port, me->pin, 0U); }
 }
 void AlxIoPin_Set(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Set Pin
 	GPIO_PortSet(GPIO, me->port, (1U << me->pin));
 }
 void AlxIoPin_Reset(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Reset Pin
 	GPIO_PortClear(GPIO, me->port, (1U << me->pin));
 }
 void AlxIoPin_Toggle(AlxIoPin* me)
 {
+	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Toggle Pin
 	GPIO_PortToggle(GPIO, me->port, (1U << me->pin));
 }
 void AlxIoPin_Lock(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_IrqHandler(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_PullNone(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_PullUp(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_PullDown(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_AssertOn(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_AssertOff(AlxIoPin* me)
 {
 	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 
 
@@ -289,7 +270,7 @@ static swm_port_pin_type_t AlxIoPin_GetSwmPortPinIndex(AlxIoPin* me)
 }
 static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me)
 {
-	#if defined(ALX_LPC80x)
+	#if defined(ALX_LPC80X)
 	if (me->func <= 38)
 	{
 		me->swmFunc_isMovable = true;
@@ -302,7 +283,7 @@ static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me)
 	}
 	#endif
 
-	#if defined(ALX_LPC84x)
+	#if defined(ALX_LPC84X)
 	if (me->func <= 59)
 	{
 		me->func_isMovable = true;
@@ -321,7 +302,7 @@ static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->swmFunc_isMovable == true);
 
-	#if defined(ALX_LPC80x)
+	#if defined(ALX_LPC80X)
 	if (me->func == AlxIoPin_Func_Swm_USART0_TXD)		return kSWM_USART0_TXD;
 	if (me->func == AlxIoPin_Func_Swm_USART0_RXD)		return kSWM_USART0_RXD;
 	if (me->func == AlxIoPin_Func_Swm_USART0_RTS)		return kSWM_USART0_RTS;
@@ -373,7 +354,7 @@ static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me)
 	if (me->func == AlxIoPin_Func_Swm_CAPT_YH)			return kSWM_CAPT_YH;
 	#endif
 
-	#if defined(ALX_LPC84x)
+	#if defined(ALX_LPC84X)
 	if (me->func == AlxIoPin_Func_Swm_USART0_TXD)		return kSWM_USART0_TXD;
 	if (me->func == AlxIoPin_Func_Swm_USART0_RXD)		return kSWM_USART0_RXD;
 	if (me->func == AlxIoPin_Func_Swm_USART0_RTS)		return kSWM_USART0_RTS;
@@ -447,12 +428,13 @@ static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me)
 	#endif
 
 	ALX_IO_PIN_ASSERT(false); // We shouldn't get here
+	return ALX_NULL;
 }
-static swm_select_fixed_pin_t AlxIoPin_GetSwmMFixFunc(AlxIoPin* me)
+static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->swmFunc_isMovable == false);
 
-	#if defined(ALX_LPC80x)
+	#if defined(ALX_LPC80X)
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT1)		return kSWM_ACMP_INPUT1;
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT2)		return kSWM_ACMP_INPUT2;
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT3)		return kSWM_ACMP_INPUT3;
@@ -482,7 +464,7 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmMFixFunc(AlxIoPin* me)
 	if (me->func == AlxIoPin_Func_Swm_DAC_OUT0)		return kSWM_DAC_OUT0;
 	#endif
 
-	#if defined(ALX_LPC84x)
+	#if defined(ALX_LPC84X)
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT1)		return kSWM_ACMP_INPUT1;
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT2)		return kSWM_ACMP_INPUT2;
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT3)		return kSWM_ACMP_INPUT3;
@@ -528,165 +510,7 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmMFixFunc(AlxIoPin* me)
 	#endif
 
 	ALX_IO_PIN_ASSERT(false); // We shouldn't get here
-}
-static syscon_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPin* me)
-{
-	if (me->port == 0 && me->pin == 0)				return kSYSCON_GpioPort0Pin0ToPintsel;
-	if (me->port == 0 && me->pin == 1)				return kSYSCON_GpioPort0Pin1ToPintsel;
-	if (me->port == 0 && me->pin == 2)				return kSYSCON_GpioPort0Pin2ToPintsel;
-	if (me->port == 0 && me->pin == 3)				return kSYSCON_GpioPort0Pin3ToPintsel;
-	if (me->port == 0 && me->pin == 4)				return kSYSCON_GpioPort0Pin4ToPintsel;
-	if (me->port == 0 && me->pin == 5)				return kSYSCON_GpioPort0Pin5ToPintsel;
-
-	if (me->port == 0 && me->pin == 7)				return kSYSCON_GpioPort0Pin7ToPintsel;
-	if (me->port == 0 && me->pin == 8)				return kSYSCON_GpioPort0Pin8ToPintsel;
-	if (me->port == 0 && me->pin == 9)				return kSYSCON_GpioPort0Pin9ToPintsel;
-	if (me->port == 0 && me->pin == 10)				return kSYSCON_GpioPort0Pin10ToPintsel;
-	if (me->port == 0 && me->pin == 11)				return kSYSCON_GpioPort0Pin11ToPintsel;
-	if (me->port == 0 && me->pin == 12)				return kSYSCON_GpioPort0Pin12ToPintsel;
-	if (me->port == 0 && me->pin == 13)				return kSYSCON_GpioPort0Pin13ToPintsel;
-	if (me->port == 0 && me->pin == 14)				return kSYSCON_GpioPort0Pin14ToPintsel;
-	if (me->port == 0 && me->pin == 15)				return kSYSCON_GpioPort0Pin15ToPintsel;
-	if (me->port == 0 && me->pin == 16)				return kSYSCON_GpioPort0Pin16ToPintsel;
-	if (me->port == 0 && me->pin == 17)				return kSYSCON_GpioPort0Pin17ToPintsel;
-	if (me->port == 0 && me->pin == 18)				return kSYSCON_GpioPort0Pin18ToPintsel;
-	if (me->port == 0 && me->pin == 19)				return kSYSCON_GpioPort0Pin19ToPintsel;
-	if (me->port == 0 && me->pin == 20)				return kSYSCON_GpioPort0Pin20ToPintsel;
-	if (me->port == 0 && me->pin == 21)				return kSYSCON_GpioPort0Pin21ToPintsel;
-	if (me->port == 0 && me->pin == 22)				return kSYSCON_GpioPort0Pin22ToPintsel;
-	if (me->port == 0 && me->pin == 23)				return kSYSCON_GpioPort0Pin23ToPintsel;
-	if (me->port == 0 && me->pin == 24)				return kSYSCON_GpioPort0Pin24ToPintsel;
-	if (me->port == 0 && me->pin == 25)				return kSYSCON_GpioPort0Pin25ToPintsel;
-	if (me->port == 0 && me->pin == 26)				return kSYSCON_GpioPort0Pin26ToPintsel;
-	if (me->port == 0 && me->pin == 27)				return kSYSCON_GpioPort0Pin27ToPintsel;
-	if (me->port == 0 && me->pin == 28)				return kSYSCON_GpioPort0Pin28ToPintsel;
-	if (me->port == 0 && me->pin == 29)				return kSYSCON_GpioPort0Pin29ToPintsel;
-	if (me->port == 0 && me->pin == 30)				return kSYSCON_GpioPort0Pin30ToPintsel;
-
-	ALX_IO_PIN_ASSERT(false); // We shouldn't get here
-	return 0;
-}
-static IRQn_Type AlxIoPin_GetIrqType(AlxIoPin* me)
-{
-	if (me->irqPtr->irqPin == kPINT_PinInt0)		return PIN_INT0_IRQn;
-	if (me->irqPtr->irqPin == kPINT_PinInt1)		return PIN_INT1_IRQn;
-	if (me->irqPtr->irqPin == kPINT_PinInt2)		return PIN_INT2_IRQn;
-	if (me->irqPtr->irqPin == kPINT_PinInt3)		return PIN_INT3_IRQn;
-	if (me->irqPtr->irqPin == kPINT_PinInt4)		return PIN_INT4_IRQn;
-	if (me->irqPtr->irqPin == kPINT_PinInt5)		return PIN_INT5_IRQn;
-	if (me->irqPtr->irqPin == kPINT_PinInt6)		return PIN_INT6_IRQn;
-	if (me->irqPtr->irqPin == kPINT_PinInt7)		return PIN_INT7_IRQn;
-
-	ALX_IO_PIN_ASSERT(false); // We shouldn't get here
-	return 0;
-}
-static void AlxIoPin_PINT_Init(AlxIoPin* me, PINT_Type* base)
-{
-	ALX_IO_PIN_ASSERT(base != NULL);
-	uint32_t pmcfg = 0;
-	uint8_t pintcount = 0;
-
-	pintcount = FSL_FEATURE_PINT_NUMBER_OF_CONNECTED_OUTPUTS;
-
-	/* Disable all bit slices for pint*/
-	for (uint32_t i = 0; i < pintcount; i++)
-	{
-		pmcfg = pmcfg | ((uint32_t)kPINT_PatternMatchNever << (PININT_BITSLICE_CFG_START + (i * 3U)));
-	}
-
-	CLOCK_EnableClock(kCLOCK_GpioInt);
-
-	/* Disable all pattern match bit slices */
-	base->PMCFG = pmcfg;
-}
-
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin0()
-{
-	ALX_IO_PIN_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin0");
-	ALX_IO_PIN_ASSERT(false);
-}
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin1()
-{
-	ALX_IO_PIN_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin1");
-	ALX_IO_PIN_ASSERT(false);
-}
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin2()
-{
-	ALX_IO_PIN_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin2");
-	ALX_IO_PIN_ASSERT(false);
-}
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin3()
-{
-	ALX_IO_PIN_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin3");
-	ALX_IO_PIN_ASSERT(false);
-}
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin4()
-{
-	ALX_IO_PIN_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin4");
-	ALX_IO_PIN_ASSERT(false);
-}
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin5()
-{
-	ALX_IO_PIN_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin5");
-	ALX_IO_PIN_ASSERT(false);
-}
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin6()
-{
-	ALX_IO_PIN_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin6");
-	ALX_IO_PIN_ASSERT(false);
-}
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin7()
-{
-	ALX_IO_PIN_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin7");
-	ALX_IO_PIN_ASSERT(false);
-}
-
-
-//******************************************************************************
-// IRQ Handlers
-//******************************************************************************
-void PIN_INT0_IRQHandler(void)
-{
-	AlxIoPinIrq_Foreground_Callback_Pin0();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt0); // Clear IRQ Flag
-}
-void PIN_INT1_IRQHandler(void)
-{
-	AlxIoPinIrq_Foreground_Callback_Pin1();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt1); // Clear IRQ Flag
-}
-void PIN_INT2_IRQHandler(void)
-{
-	AlxIoPinIrq_Foreground_Callback_Pin2();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt2); // Clear IRQ Flag
-}
-void PIN_INT3_IRQHandler(void)
-{
-	AlxIoPinIrq_Foreground_Callback_Pin3();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt3); // Clear IRQ Flag
-}
-void PIN_INT4_IRQHandler(void)
-{
-	AlxIoPinIrq_Foreground_Callback_Pin4();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt4); // Clear IRQ Flag
-}
-void PIN_INT5_IRQHandler(void)
-{
-	AlxIoPinIrq_Foreground_Callback_Pin5();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt5); // Clear IRQ Flag
-}
-void PIN_INT6_IRQHandler(void)
-{
-	AlxIoPinIrq_Foreground_Callback_Pin6();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt6); // Clear IRQ Flag
-}
-void PIN_INT7_IRQHandler(void)
-{
-	AlxIoPinIrq_Foreground_Callback_Pin7();
-	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt7); // Clear IRQ Flag
+	return ALX_NULL;
 }
 
 

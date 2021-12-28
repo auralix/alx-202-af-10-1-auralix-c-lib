@@ -27,18 +27,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
-
-
-//******************************************************************************
-// Preprocessor
-//******************************************************************************
-#if defined(ALX_LPC80x)
-#define ALX_ADC_LPC_8XX ADC
-#endif
-#if defined(ALX_LPC84x)
-#define ALX_ADC_LPC_8XX ADC0
-#endif
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -53,7 +42,11 @@ typedef struct
 	// Parameters
 	Alx_Ch* chArr;
 	uint8_t numOfIoPinsAndCh;
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	uint32_t vRef_mV;
+	#else
 	float vRef_V;
+	#endif
 
 	// Variables
 	adc_config_t adcConfig;
@@ -63,20 +56,24 @@ typedef struct
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-} AlxAdc_Mcu;
+} AlxAdc;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxAdcMcu_Ctor
+void AlxAdc_Ctor
 (
-	AlxAdc_Mcu* me,
+	AlxAdc* me,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,
 	uint8_t numOfIoPinsAndCh,
 	AlxClk* clk,
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	uint32_t vRef_mV
+	#else
 	float vRef_V
+	#endif
 );
 
 

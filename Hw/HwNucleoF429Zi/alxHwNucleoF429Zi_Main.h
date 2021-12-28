@@ -31,7 +31,6 @@ extern "C" {
 #include <alxClk.h>
 #include <alxCrc.h>
 #include <alxDac.h>
-#include <alxDbgPin.h>
 #include <alxDelay.h>
 #include <alxFifo.h>
 #include <alxFiltGlitchBool.h>

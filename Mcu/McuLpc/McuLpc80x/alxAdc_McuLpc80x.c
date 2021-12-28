@@ -17,36 +17,55 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
+
+
+//******************************************************************************
+// Private Preprocessor
+//******************************************************************************
+#if defined(ALX_LPC80X)
+#define ALX_ADC_LPC8XX ADC
+#endif
+#if defined(ALX_LPC84X)
+#define ALX_ADC_LPC8XX ADC0
+#endif
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint8_t AlxAdcMcu_GetCh(AlxAdc_Mcu* me, Alx_Ch ch);
-static bool AlxAdcMcu_Ctor_IsSysClkOk(AlxAdc_Mcu* me);
+static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch);
+static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me);
 
 
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
-void AlxAdcMcu_Ctor
+void AlxAdc_Ctor
 (
-	AlxAdc_Mcu* me,
+	AlxAdc* me,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,
 	uint8_t numOfIoPinsAndCh,
 	AlxClk* clk,
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	uint32_t vRef_mV
+	#else
 	float vRef_V
+	#endif
 )
 {
-	//Assert
+	// Assert
 	(void)me;
 	(void)ioPinArr;
 	(void)chArr;
-	ALX_ADC_MCU_ASSERT(numOfIoPinsAndCh <= ALX_ADC_BUFF_LEN);
+	ALX_ADC_ASSERT(numOfIoPinsAndCh <= ALX_ADC_BUFF_LEN);
 	(void)clk;
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	(void)vRef_mV;
+	#else
 	(void)vRef_V;
+	#endif
 
 	// Objects - External
 	me->ioPinArr = ioPinArr;
@@ -55,20 +74,23 @@ void AlxAdcMcu_Ctor
 	// Parameters
 	me->chArr = chArr;
 	me->numOfIoPinsAndCh = numOfIoPinsAndCh;
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	me->vRef_mV = vRef_mV;
+	#else
 	me->vRef_V = vRef_V;
+	#endif
 
 	// Check channel sequence
-	for (uint32_t i = 0; i < numOfIoPinsAndCh - 1; i++)
-		ALX_ADC_MCU_ASSERT(AlxAdcMcu_GetCh(me, chArr[i]) < AlxAdcMcu_GetCh(me, chArr[i + 1])); // Channel sequence must be from low to high number
+	for (uint32_t i = 0; i < numOfIoPinsAndCh - 1; i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) < AlxAdc_GetCh(me, chArr[i + 1])); // Channel sequence must be from low to high number
 
 	// Check clock
-	ALX_ADC_MCU_ASSERT(AlxAdcMcu_Ctor_IsSysClkOk(me));
+	ALX_ADC_ASSERT(AlxAdc_Ctor_IsSysClkOk(me));
 
 	// Variables
-	//me->adcConfig.clockMode = kADC_ClockSynchronousMode;	// Doesn't work on Lpc804
-	me->adcConfig.clockDividerNumber = 0;					// Clkdiv = 0 ensures that sampling rate si appropriate (see User Manual)
+	//me->adcConfig.clockMode = kADC_ClockSynchronousMode;	// MF: Doesn't work on Lpc804
+	me->adcConfig.clockDividerNumber = 0;					// MF: Clkdiv = 0 ensures that sampling rate si appropriate (see User Manual)
 	me->adcConfig.enableLowPowerMode = false;
-	//me->adcConfig.voltageRange = kADC_HighVoltageRange;	// Doesn't work on Lpc804
+	//me->adcConfig.voltageRange = kADC_HighVoltageRange;	// MF: Doesn't work on Lpc804
 
 	me->adcConvSeqConfig.channelMask = 0U;
 	me->adcConvSeqConfig.triggerMask = 0U;
@@ -87,8 +109,9 @@ void AlxAdcMcu_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
-Alx_Status AlxAdcMcu_Init(AlxAdc_Mcu* me)
+Alx_Status AlxAdc_Init(AlxAdc* me)
 {
+	// Assert
 	ALX_ADC_ASSERT(me->isInit == false);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
@@ -101,8 +124,8 @@ Alx_Status AlxAdcMcu_Init(AlxAdc_Mcu* me)
 
 	// #3 Init Clk, Power
 	CLOCK_Select(kADC_Clk_From_Fro);
-	CLOCK_SetClkDivider(kCLOCK_DivAdcClk, me->adcConfig.clockDividerNumber);	// Clkdiv = 0 ensures that sampling rate si appropriate
-	POWER_DisablePD(kPDRUNCFG_PD_ADC0);											// Disabling PD gives power!!!
+	CLOCK_SetClkDivider(kCLOCK_DivAdcClk, me->adcConfig.clockDividerNumber);	// MF: Clkdiv = 0 ensures that sampling rate si appropriate
+	POWER_DisablePD(kPDRUNCFG_PD_ADC0);											// MF: Disabling PD gives power!!!
 
 	// #4 Calibration
 	#if defined(ALX_LPC84x)
@@ -110,19 +133,19 @@ Alx_Status AlxAdcMcu_Init(AlxAdc_Mcu* me)
 	#endif
 
 	// #5 Configure ADC
-	ADC_Init(ALX_ADC_LPC_8XX, &me->adcConfig);
+	ADC_Init(ALX_ADC_LPC8XX, &me->adcConfig);
 
 	// #6.1 Configure Ch for Coversion Cequence A
-	for(uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++)							// Loop through channels to add appropriate channelMask
-		me->adcConvSeqConfig.channelMask |= (1U << AlxAdcMcu_GetCh(me, me->chArr[i]));
+	for(uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++)							// MF: Loop through channels to add appropriate channelMask
+		me->adcConvSeqConfig.channelMask |= (1U << AlxAdc_GetCh(me, me->chArr[i]));
 
 	// #6.2 Configure and Enable Coversion Sequence A
-	ADC_SetConvSeqAConfig(ALX_ADC_LPC_8XX, &me->adcConvSeqConfig);
-	ADC_EnableConvSeqA(ALX_ADC_LPC_8XX, true);
+	ADC_SetConvSeqAConfig(ALX_ADC_LPC8XX, &me->adcConvSeqConfig);
+	ADC_EnableConvSeqA(ALX_ADC_LPC8XX, true);
 
 	// #7 Clear result register
-	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC_8XX);
-	ADC_GetConvSeqAGlobalConversionResult(ALX_ADC_LPC_8XX, &me->adcResult);		// Clears global ADC conversion infomation of sequence A.
+	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC8XX);
+	ADC_GetConvSeqAGlobalConversionResult(ALX_ADC_LPC8XX, &me->adcResult);		// MF: Clears global ADC conversion infomation of sequence A.
 
 	// #8 Set isInit
 	me->isInit = true;
@@ -130,13 +153,14 @@ Alx_Status AlxAdcMcu_Init(AlxAdc_Mcu* me)
 	// #9 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
+Alx_Status AlxAdc_DeInit(AlxAdc* me)
 {
+	// Assert
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
 	// #1 DeInit Clk
-	ADC_Deinit(ALX_ADC_LPC_8XX);
+	ADC_Deinit(ALX_ADC_LPC8XX);
 
 	// #2 Clears all ADC registers and BOTH ConvSeq registers
 	SYSCON->PRESETCTRL0 &= ~(1U << 24U);
@@ -149,37 +173,67 @@ Alx_Status AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
 	for(uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++)
 		AlxIoPin_DeInit((*(me->ioPinArr + i)));
 
-	// #4 Reset isInit
+	// #5 Reset isInit
 	me->isInit = false;
-	
+
+	// #6 Return OK
 	return Alx_Ok;
 }
-float AlxAdcMcu_GetVoltage_V(AlxAdc_Mcu* me, Alx_Ch* ch)
+float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 {
+	// Optimize Guard
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	ALX_ADC_ASSERT(false);
+	return ALX_NULL;
+	#else
+
+	// Assert
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Return Voltage
-	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC_8XX);
-	while (!ADC_GetChannelConversionResult(ALX_ADC_LPC_8XX, AlxAdcMcu_GetCh(me, *ch), &me->adcResult)) {}
+	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC8XX);
+	while (!ADC_GetChannelConversionResult(ALX_ADC_LPC8XX, AlxAdc_GetCh(me, ch), &me->adcResult)) {}
 	return ((me->adcResult.result * me->vRef_V) / 4095);
-	
-	ALX_ADC_MCU_ASSERT(false); // We shouldn't get here
-	return 0;
+
+	ALX_ADC_ASSERT(false); // We shouldn't get here
+	return ALX_NULL;
+	#endif
 }
-float AlxAdcMcu_TempSens_GetTemp_degC(AlxAdc_Mcu* me)
+uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
+{
+	// Optimize Guard
+	#if !(defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	ALX_ADC_ASSERT(false);
+	return ALX_NULL;
+	#else
+
+	// Init Ctor Assert
+	ALX_ADC_ASSERT(me->isInit == true);
+	ALX_ADC_ASSERT(me->wasCtorCalled == true);
+
+	// #1 Return Voltage
+	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC8XX);
+	while (!ADC_GetChannelConversionResult(ALX_ADC_LPC8XX, AlxAdc_GetCh(me, ch), &me->adcResult)) {}
+	return ((me->adcResult.result * me->vRef_mV) / 4095);
+
+	ALX_ADC_ASSERT(false); // We shouldn't get here
+	return ALX_NULL;
+	#endif
+}
+float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
 	// MF: Lpc80x doesn't support internal TempSens_GetTemp
 
-	ALX_ADC_MCU_ASSERT(false); // We shouldn't get here
-	return 0;
+	ALX_ADC_ASSERT(false); // We shouldn't get here
+	return ALX_NULL;
 }
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint8_t AlxAdcMcu_GetCh(AlxAdc_Mcu* me, Alx_Ch ch)
+static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 {
 	if (ch == Alx_Ch_0)		return  0;
 	if (ch == Alx_Ch_1)		return  1;
@@ -195,21 +249,21 @@ static uint8_t AlxAdcMcu_GetCh(AlxAdc_Mcu* me, Alx_Ch ch)
 	if (ch == Alx_Ch_11)	return 11;
 
 	ALX_ADC_ASSERT(false);	// We shouldn't get here
-	return 0;
+	return ALX_NULL;
 }
-static bool AlxAdcMcu_Ctor_IsSysClkOk(AlxAdc_Mcu* me)
+static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me)
 {
-	#if defined(ALX_LPC80x)
+	#if defined(ALX_LPC80X)
 	if (15000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor))
 		return true;
 	else
 		return false;
 
-	ALX_ADC_MCU_ASSERT(false); // We shouldn't get here
-	return 0;
+	ALX_ADC_ASSERT(false); // We shouldn't get here
+	return ALX_NULL;
 	#endif
 
-	#if defined(ALX_LPC81x) || defined(ALX_LPC82x) || defined(ALX_LPC83x) || defined(ALX_LPC84x)
+	#if defined(ALX_LPC81X) || defined(ALX_LPC82X) || defined(ALX_LPC83X) || defined(ALX_LPC84X)
 	// TODO
 	#endif
 }
