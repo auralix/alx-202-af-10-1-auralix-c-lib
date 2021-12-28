@@ -109,6 +109,7 @@ static inline void AlxHwNucleoF429Zi_JsTest_G01_BringUp_Run(AlxHwNucleoF429Zi_Js
 //******************************************************************************
 //******************************************************************************
 
+
 //******************************************************************************
 // Types
 //******************************************************************************
@@ -267,45 +268,7 @@ static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_Run(AlxHwNucleoF429Zi_Js
 // G03 - Crn120
 //******************************************************************************
 //******************************************************************************
-#define PCA9431_DEVICE_ID       0x18
 
-//#define CRN120_ADDRESS              (uint8_t) 0x55
-#define CRN120_BLOCK_LENGTH           (uint8_t) 16
-#define CRN120_MEMA_SESSION_REGISTERS (uint8_t) 0xFE
-/* Block Addresses Defines (MEMA) */
-#define CRN120_MEMA_SERIAL_NUMBER           (uint8_t) 0x00
-#define CRN120_MEMA_CONFIGURATION_REGISTERS (uint8_t) 0x7A
-#define CRN120_MEMA_DYNAMIC_LOCK_BYTES      (uint8_t) 0x78
-/* End Block Addresses Defines (MEMA) */
-
-/* Session Register Addresses Defines (REGA) */
-#define CRN120_REGA_NC_REG            (uint8_t) 0x00
-#define CRN120_REGA_LAST_NDEF_BLOCK   (uint8_t) 0x01
-#define CRN120_REGA_SRAM_MIRROR_BLOCK (uint8_t) 0x02
-#define CRN120_REGA_WDT_LS            (uint8_t) 0x03
-#define CRN120_REGA_WDT_MS            (uint8_t) 0x04
-#define CRN120_REGA_I2C_CLOCK_STR     (uint8_t) 0x05
-#define CRN120_REGA_NS_REG            (uint8_t) 0x06
-
-/* Get Session Registers */
-uint8_t CRN120_Get_nc_reg(uint8_t *p_regdat);
-uint8_t CRN120_Get_last_ndef_block(uint8_t *p_regdat);
-uint8_t CRN120_Get_sram_mirror_block(uint8_t *p_regdat);
-uint8_t CRN120_Get_wtd_ls(uint8_t *p_regdat);
-uint8_t CRN120_Get_wdt_ms(uint8_t *p_regdat);
-uint8_t CRN120_Get_i2c_clock_str(uint8_t *p_regdat);
-uint8_t CRN120_Get_ns_reg(uint8_t *p_regdat);
-/* End Get Session Registers */
-
-/* Set Session Registers */
-uint8_t CRN120_Set_nc_reg(const uint8_t mask, const uint8_t regdat);
-uint8_t CRN120_Set_last_ndef_block(const uint8_t mask, const uint8_t regdat);
-uint8_t CRN120_Set_sram_mirror_block(const uint8_t mask, const uint8_t regdat);
-uint8_t CRN120_Set_wtd_ls(const uint8_t mask, const uint8_t regdat);
-uint8_t CRN120_Set_wdt_ms(const uint8_t mask, const uint8_t regdat);
-uint8_t CRN120_Set_i2c_clock_str(const uint8_t mask, const uint8_t regdat);
-uint8_t CRN120_Set_ns_reg(const uint8_t mask, const uint8_t regdat);
-/* End Set Session Registers */
 
 //******************************************************************************
 // Types
@@ -338,8 +301,9 @@ static inline void AlxHwNucleoF429Zi_JsTest_G03_Crn120_T01_regasession0(AlxHwNuc
 	data[5] = 0x00;
 	data[6] = 0x00;
 
+	uint8_t crn120_mema_session_registers = 0xFE;
 	uint8_t data2[7];
-	data2[0] = CRN120_MEMA_SESSION_REGISTERS;//mema
+	data2[0] = crn120_mema_session_registers;//mema
 	data2[1] = regasession0[0]; //rega
 	data2[2] = 0x01; // mask last zero bit
 	data2[3] = 0x00; // last bit to 0
@@ -353,7 +317,7 @@ static inline void AlxHwNucleoF429Zi_JsTest_G03_Crn120_T01_regasession0(AlxHwNuc
 	{
 		/*		Read		*/
 		// 1. Start condition (with write), address +ACK, mema +ACK, rega +ACK and stop.
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession0, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession0, 1, false, 1, 1000);
 
 		// 2. Start condition (with read)+ACK, read reg data +NAK and stop.
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
@@ -387,11 +351,12 @@ static inline void AlxHwNucleoF429Zi_JsTest_G03_Crn120_T02_regasession1(AlxHwNuc
 	data[5] = 0x00;
 	data[6] = 0x00;
 
+	uint8_t crn120_mema_session_registers = 0xFE;
 	uint8_t crn_DevAdrSend = 0b10101010; // Crn120
 
 	while (1)
 	{
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession1, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession1, 1, false, 1, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
 		AlxDelay_ms(1000);
 	}
@@ -410,11 +375,12 @@ static inline void AlxHwNucleoF429Zi_JsTest_G03_Crn120_T03_regasession2(AlxHwNuc
 	data[5] = 0x00;
 	data[6] = 0x00;
 
+	uint8_t crn120_mema_session_registers = 0xFE;
 	uint8_t crn_DevAdrSend = 0b10101010; // Crn120
 
 	while (1)
 	{
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession2, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession2, 1, false, 1, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
 		AlxDelay_ms(1000);
 	}
@@ -433,11 +399,12 @@ static inline void AlxHwNucleoF429Zi_JsTest_G03_Crn120_T04_regasession3(AlxHwNuc
 	data[5] = 0x00;
 	data[6] = 0x00;
 
+	uint8_t crn120_mema_session_registers = 0xFE;
 	uint8_t crn_DevAdrSend = 0b10101010; // Crn120
 
 	while (1)
 	{
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession3, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession3, 1, false, 1, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
 		AlxDelay_ms(1000);
 	}
@@ -456,11 +423,12 @@ static inline void AlxHwNucleoF429Zi_JsTest_G03_Crn120_T05_regasession4(AlxHwNuc
 	data[5] = 0x00;
 	data[6] = 0x00;
 
+	uint8_t crn120_mema_session_registers = 0xFE;
 	uint8_t crn_DevAdrSend = 0b10101010; // Crn120
 
 	while (1)
 	{
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession4, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession4, 1, false, 1, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
 		AlxDelay_ms(1000);
 	}
@@ -479,11 +447,12 @@ static inline void AlxHwNucleoF429Zi_JsTest_G03_Crn120_T06_regasession5(AlxHwNuc
 	data[5] = 0x00;
 	data[6] = 0x00;
 
+	uint8_t crn120_mema_session_registers = 0xFE;
 	uint8_t crn_DevAdrSend = 0b10101010; // Crn120
 
 	while (1)
 	{
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession5, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession5, 1, false, 1, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
 		AlxDelay_ms(1000);
 	}
@@ -517,8 +486,9 @@ static inline void AlxHwNucleoF429Zi_JsTest_G03_Crn120_T99_TestAllregasession(Al
 	data[5] = 0x00;
 	data[6] = 0x00;
 
+	uint8_t crn120_mema_session_registers = 0xFE;
 	uint8_t data2[7];
-	data2[0] = CRN120_MEMA_SESSION_REGISTERS;//mema
+	data2[0] = crn120_mema_session_registers;//mema
 	data2[1] = regasession0[0]; //rega
 	data2[2] = 0x01; // mask last zero bit
 	data2[3] = 0x00; // last bit to 0
@@ -532,7 +502,7 @@ static inline void AlxHwNucleoF429Zi_JsTest_G03_Crn120_T99_TestAllregasession(Al
 	{
 		/*		Read		*/
 		// 1. Start condition (with write), address +ACK, mema +ACK, rega +ACK and stop.
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession0, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession0, 1, false, 1, 1000);
 
 		// 2. Start condition (with read)+ACK, read reg data +NAK and stop.
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
@@ -551,23 +521,23 @@ static inline void AlxHwNucleoF429Zi_JsTest_G03_Crn120_T99_TestAllregasession(Al
 		}
 		AlxDelay_ms(10);
 
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession1, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession1, 1, false, 1, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
 		AlxDelay_ms(10);
 
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession2, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession2, 1, false, 1, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
 		AlxDelay_ms(10);
 
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession3, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession3, 1, false, 1, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
 		AlxDelay_ms(10);
 
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession4, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession4, 1, false, 1, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
 		AlxDelay_ms(10);
 
-		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, CRN120_MEMA_SESSION_REGISTERS, AlxI2c_Master_MemAddrLen_8bit, regasession5, 1, false, 1, 1000);
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, crn120_mema_session_registers, AlxI2c_Master_MemAddrLen_8bit, regasession5, 1, false, 1, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNucleoF429Zi_Main.alxI2c_I2C2_Master, crn_DevAdrSend, data, 1, 1, 1000);
 		AlxDelay_ms(1000);
 	}
