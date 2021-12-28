@@ -48,9 +48,9 @@
 	- J202_pin 9 -- PCA943X_EN n HwNfcWlcListenerV3_7 [orange wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
 	- pin PA9 on Nucleo-F429ZI [orange wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Nucleo-F429ZI.jpg)  
 #### I2c pull up  
--i2c--pull up **in this case connected to power-supply**  
-	-	J201_pin 2 -- VDD_PULL on HwNfcWlcListenerV3_7 [purple wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
-	-	J202_pin 24 -- GND on HwNfcWlcListenerV3_7 [blue wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
+- i2c--pull up **in this case connected to power-supply**  
+	- J201_pin 2 -- VDD_PULL on HwNfcWlcListenerV3_7 [purple wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
+	- J202_pin 24 -- GND on HwNfcWlcListenerV3_7 [blue wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/Connection_HwWlcListenerV3_7.jpg)  
 		
 #### Connection to saleae logic analyzer  
 - Ch 0 -> I2C.SDA [green wire](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/alxWiki_alxHwNucleoF429Zi_JsTest_AllHw.jpg)  
@@ -78,16 +78,16 @@
 ### **Test list**
 
 #### AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T01_ReadAndClearInterrupt(me)
-		- [i2cAlxPca9431_ReadAndclearInterrupt](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt.jpg)
-	* zoom 1st:  
+- [i2cAlxPca9431_ReadAndclearInterrupt](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt.jpg)
+	- zoom 1st:  
 		- [i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_bin](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_bin.jpg)  
 		- [i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_dec](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_dec.jpg)  
 		- [i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_hex](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_1st_hex.jpg)  
-	* zoom 2nd:  
+	- zoom 2nd:  
 		- [i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_bin](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_bin.jpg)  
 		- [i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_dec](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_dec.jpg)  
 		- [i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_hex](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_2nd_hex.jpg)  
-	* zoom 3rd:  
+	- zoom 3rd:  
 		- [i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_bin](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_bin.jpg)  
 		- [i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_dec](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_dec.jpg)  
 		- [i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_hex](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/i2cAlxPca9431_ReadAndclearInterrupt_zoom_3rd_hex.jpg)  
@@ -111,6 +111,7 @@
 #### AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T99_TestAll(me)
 - all tests of Pca9431 in one test
 [all tests of Pca9431 in one test](../../../Img/test_HwNucleoF429Zi_HwNfcWlcListenerV3_7/allTests.jpg)
+
 ## **G03_Crn120**
 - This test group contains tests for testing Crn120
 ### **Used HW PCBs**  
