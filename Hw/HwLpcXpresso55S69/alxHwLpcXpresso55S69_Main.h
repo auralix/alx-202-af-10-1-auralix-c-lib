@@ -101,23 +101,23 @@ typedef struct
 	//PIO0_6	- Unused
 	//PIO0_7	- Unused
 	//PIO0_8	- Unused
-	AlxIoPin ai_P0_9_ADC_CH4;					// AlxIoPin PCA943X_nINT
+	//PIO0_9	- Unused
 	//PIO0_10	- Unused
 	//PIO0_11	- SWD_CLK
 	//PIO0_12	- SWD_IO
 	//PIO0_13	- combo I2C / MFIO
 	//PIO0_14	- combo I2C / MFIO
 	//PIO0_15	- Unused
-	AlxIoPin io_P0_16_I2C0_SDA;
-	AlxIoPin do_P0_17_I2C0_SCL;
-	AlxIoPin do_P0_18_LED205_RD;
-	AlxIoPin do_P0_19_LED200_GR;
+	//PIO0_16	- Unused
+	//PIO0_17	- Unused
+	//PIO0_18	- Unused
+	//PIO0_19	- Unused
 	//PIO0_20	- Unused
 	//PIO0_21	- Unused
 	//PIO0_22	- Unused
-	AlxIoPin di_P0_23_IRQ1;						//AlxIoPin do_P0_23_LED203_GR;
-	AlxIoPin do_P0_24_PWM1;						//AlxIoPin do_P0_24_LED202_GR;
-	AlxIoPin do_P0_25_PWM2;						//AlxIoPin do_P0_25_LED201_GR;
+	//PIO0_23	- Unused
+	//PIO0_24	- Unused
+	//PIO0_25	- Unused
 	//PIO0_26	- Unused
 	//PIO0_27	- Unused
 	//PIO0_28	- Unused
@@ -133,25 +133,25 @@ typedef struct
 	//PIO1_1	- Unused
 	//PIO1_2	- Unused
 	//PIO1_3	- Unused
-	AlxIoPin do_P1_4_UserLED_BL;
+	AlxIoPin do_P1_4_UsrLED_BL;
 	//PIO1_5	- Unused
-	AlxIoPin do_P1_6_UserLED_RD;
-	AlxIoPin do_P1_7_UserLED_GR;
+	AlxIoPin do_P1_6_UsrLED_RD;
+	AlxIoPin do_P1_7_UsrLED_GR;
 	//PIO1_8	- Unused
-	//AlxIoPin ai_P0_9_ADC_CH4;					// AlxIoPin PCA943X_nINT
-	//PIO1_10	- Unused
-	//AlxIoPin ao_P0_11_CRN_VCC;
+	//PIO1_6	- Unused
+	AlxIoPin do_P1_10_GPIO;
+	//PIO1_11	- Unused
 	//PIO1_12	- Unused
 	//PIO1_13	- Unused
 	//PIO1_14	- Unused
 	//PIO1_15	- Unused
-	//AlxIoPin io_P0_16_I2C0_SDA;
-	//AlxIoPin do_P0_17_I2C0_SCL;
-	//AlxIoPin do_P0_18_LED205_RD;
-	//AlxIoPin do_P0_19_LED200_GR;
+	//PIO1_16	- Unused
+	//PIO1_17	- Unused
+	//PIO1_18	- Unused
+	//PIO1_19	- Unused
 	//PIO1_20	- Unused
 	//PIO1_21	- Unused
-	//PIO1_22	- Unused	-> ALX Trace Handle		//AlxIoPin do_P0_22_LED204_GR;
+	//PIO1_22	- Unused
 	//PIO1_23	- Unused
 	//PIO1_24	- Unused
 	//PIO1_25	- Unused
@@ -184,9 +184,73 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//------------------------------------------------------------------------------
 	// ALX - IoPin
 	//------------------------------------------------------------------------------
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_UserLED_BL, 1, 4, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UserLED_RD, 1, 6, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UserLED_GR, 1, 7, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	// Port 0
+	//PIO0_0	- Unused
+	//PIO0_1	- Unused
+	//PIO0_2	- Unused
+	//PIO0_3	- Unused
+	//PIO0_4	- Unused
+	//PIO0_5	- Unused
+	//PIO0_6	- Unused
+	//PIO0_7	- Unused
+	//PIO0_8	- Unused
+	//PIO0_9	- Unused
+	//PIO0_10	- Unused
+	//PIO0_11	- SWD_CLK
+	//PIO0_12	- SWD_IO
+	//PIO0_13	- combo I2C / MFIO
+	//PIO0_14	- combo I2C / MFIO
+	//PIO0_15	- Unused
+	//PIO0_16	- Unused
+	//PIO0_17	- Unused
+	//PIO0_18	- Unused
+	//PIO0_19	- Unused
+	//PIO0_20	- Unused
+	//PIO0_21	- Unused
+	//PIO0_22	- Unused
+	//PIO0_23	- Unused
+	//PIO0_24	- Unused
+	//PIO0_25	- Unused
+	//PIO0_26	- Unused
+	//PIO0_27	- Unused
+	//PIO0_28	- Unused
+	//PIO0_29	- Unused
+	//PIO0_30	- DBG_UART_TX
+	//PIO0_31	- Unused
+
+	// Port 1
+	//PIO1_0	- Unused
+	//PIO1_1	- Unused
+	//PIO1_2	- Unused
+	//PIO1_3	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_UsrLED_BL,	1,	4,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
+	//PIO1_5	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UsrLED_RD,	1,	6,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UsrLED_GR, 1,	7,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
+	//PIO1_8	- Unused
+	//PIO1_6	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_10_GPIO,		1,	10,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
+	//PIO1_11	- Unused
+	//PIO1_12	- Unused
+	//PIO1_13	- Unused
+	//PIO1_14	- Unused
+	//PIO1_15	- Unused
+	//PIO1_16	- Unused
+	//PIO1_17	- Unused
+	//PIO1_18	- Unused
+	//PIO1_19	- Unused
+	//PIO1_20	- Unused
+	//PIO1_21	- Unused
+	//PIO1_22	- Unused
+	//PIO1_23	- Unused
+	//PIO1_24	- Unused
+	//PIO1_25	- Unused
+	//PIO1_26	- Unused
+	//PIO1_27	- Unused
+	//PIO1_28	- Unused
+	//PIO1_29	- Unused
+	//PIO1_30	- Unused
+	//PIO1_31	- Unused
 
 
 	//------------------------------------------------------------------------------
@@ -217,14 +281,15 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//------------------------------------------------------------------------------
 	// ALX - I2C
 	//------------------------------------------------------------------------------
-	/*AlxI2c_Ctor
+	AlxTrace_Ctor
 	(
-		&me->alxI2c_I2C2_Master,
-		I2C2,
-		&me->alxIoPin.do_PB10_I2C2_SCL,
-		&me->alxIoPin.io_PB11_I2C2_SDA,
-		AlxI2c_Clk_400kHz
-	);*/
+		&alxTrace,
+		0,
+		30,
+		FLEXCOMM0,
+		USART0,
+		AlxGlobal_BaudRate_115200
+	);
 
 
 	//------------------------------------------------------------------------------

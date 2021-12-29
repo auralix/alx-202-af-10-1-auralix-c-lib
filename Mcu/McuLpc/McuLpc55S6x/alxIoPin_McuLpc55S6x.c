@@ -81,6 +81,9 @@ void AlxIoPin_Init(AlxIoPin* me)
 	// #3.1 Enable IOCON Clk
 	CLOCK_EnableClock(kCLOCK_Iocon);
 
+	// #3.2 Set IOCON Mode
+	IOCON_PinMuxSet(IOCON, me->port, me->pin, me->mode);
+
 	// #3.3 Set IOCON Func
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, me->func);
 
