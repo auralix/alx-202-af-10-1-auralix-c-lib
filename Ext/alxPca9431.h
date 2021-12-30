@@ -1223,7 +1223,6 @@ void AlxPca9431_Ctor
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	AlxIoPin* do_SleepEn,
-	AlxIoPin* di_Interrupt,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms

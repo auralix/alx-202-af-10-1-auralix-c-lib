@@ -40,7 +40,6 @@ void AlxPca9431_Ctor
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	AlxIoPin* do_SleepEn,
-	AlxIoPin* di_Interrupt,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
@@ -51,7 +50,6 @@ void AlxPca9431_Ctor
 	// Objects - External
 	me->i2c = i2c;
 	me->do_SleepEn = do_SleepEn;
-	me->di_Interrupt = di_Interrupt;
 
 	// Parameters
 	me->i2cAddr = i2cAddr;
@@ -83,13 +81,12 @@ Alx_Status AlxPca9431_Init(AlxPca9431* me)
 
 	// #1 Init GPIO
 	AlxIoPin_Init(me->do_SleepEn);
-	//AlxIoPin_Init(me->di_Interrupt);
 
 	// #2 Init I2C
 	status = AlxI2c_Init(me->i2c);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_Init"); return status; }
 
-//	// #3 Check if slave ready
+//	// #3 Check if slave ready // -> JS: DIDN'T check & tested
 //	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 1, 1000);
 //	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
 

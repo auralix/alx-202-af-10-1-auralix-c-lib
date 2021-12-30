@@ -323,7 +323,8 @@ static inline void AlxHwNucleoF429Zi_Main_Ctor(AlxHwNucleoF429Zi_Main* me)
 		I2C2,
 		&me->alxIoPin.do_PB10_I2C2_SCL,
 		&me->alxIoPin.io_PB11_I2C2_SDA,
-		AlxI2c_Clk_100kHz	// TV: Can be there 400kHz for PCA?
+		//AlxI2c_Clk_100kHz		// JS: can be used for both crn120 and Pca9431
+		AlxI2c_Clk_400kHz	// TV: Can be there 400kHz for PCA? JS: yes for Pca9431, for crn120 cca 25% worked and 75% fail
 	);
 
 
@@ -350,8 +351,7 @@ static inline void AlxHwNucleoF429Zi_Main_Ctor(AlxHwNucleoF429Zi_Main* me)
 		&me->alxI2c_I2C2_Master,
 		0b11100010,		// I2C address
 		&me->alxIoPin.do_PA9_PCA9431_SLEEP,
-		&me->alxIoPin.di_PC3_PCA9431_nINT,	// TV: This pin init is commented out inside module -> Seems like it is not needed here
-		true,			// i2cCheckWithRead	-> TV: PCA needs to be tested with this enabled
+		true,			// i2cCheckWithRead	-> TV: PCA needs to be tested with this enabled // Js tested and worked
 		3,				// i2cNumOfTries	-> TV: PCA needs to be tested with this at 3 --> But don't need to unit test for now
 		1000			// i2cTimeout_ms
 	);

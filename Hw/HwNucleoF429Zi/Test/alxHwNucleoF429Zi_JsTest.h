@@ -118,6 +118,13 @@ typedef struct
 	// Objects
 	AlxHwNucleoF429Zi_Main alxHwNucleoF429Zi_Main;
 
+	// Live Watch - variabla
+	float LdoVout_Voltage_V;
+	float LdoVout_Current_A;
+	float Rect_Voltage_V;
+	float Rect_Current_A;
+	float SensTemp_C;
+
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
@@ -129,8 +136,6 @@ typedef struct
 //******************************************************************************
 static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T01_ReadAndClearInterrupt(AlxHwNucleoF429Zi_JsTest_G02_Pca9431* me)
 {
-	(void)me;
-
 	while (1)
 	{
 		AlxPca9431_Reg_ReadAndClearInterrupt(&me->alxHwNucleoF429Zi_Main.alxPca9431);
@@ -139,85 +144,54 @@ static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T01_ReadAndClearInterrup
 }
 static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T02_LdoVout_GetVoltage_V(AlxHwNucleoF429Zi_JsTest_G02_Pca9431* me)
 {
-	float LdoVout_Voltage_V = 0;
-
 	while (1)
 	{
-		AlxPca9431_LdoVout_GetVoltage_V(&me->alxHwNucleoF429Zi_Main.alxPca9431, &LdoVout_Voltage_V); // 10 bit ADC
-		AlxTrace_WriteFormat(&alxTrace, "LdoVout_Voltage_V: %f \r\n", LdoVout_Voltage_V);
+		AlxPca9431_LdoVout_GetVoltage_V(&me->alxHwNucleoF429Zi_Main.alxPca9431, &me->LdoVout_Voltage_V); // 10 bit ADC
 		AlxDelay_ms(1000);
 	}
 }
 static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T03_LdoVout_GetCurrent_A(AlxHwNucleoF429Zi_JsTest_G02_Pca9431* me)
 {
-	float LdoVout_Current_A = 0;
-
 	while (1)
 	{
-		AlxPca9431_LdoVout_GetCurrent_A(&me->alxHwNucleoF429Zi_Main.alxPca9431, &LdoVout_Current_A); // 10 bit ADC
-		AlxTrace_WriteFormat(&alxTrace, "LdoVout_GetCurrent_A: %f \r\n", LdoVout_Current_A);
+		AlxPca9431_LdoVout_GetCurrent_A(&me->alxHwNucleoF429Zi_Main.alxPca9431, &me->LdoVout_Current_A); // 10 bit ADC
 		AlxDelay_ms(1000);
 	}
 }
 static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T04_Rect_GetVoltage_V(AlxHwNucleoF429Zi_JsTest_G02_Pca9431* me)
 {
-	float Rect_Voltage_V = 0;
-
 	while (1)
 	{
-		AlxPca9431_Rect_GetVoltage_V(&me->alxHwNucleoF429Zi_Main.alxPca9431, &Rect_Voltage_V); // 10 bit ADC
-		AlxTrace_WriteFormat(&alxTrace, "Rect_Voltage_V: %f \r\n", Rect_Voltage_V);
+		AlxPca9431_Rect_GetVoltage_V(&me->alxHwNucleoF429Zi_Main.alxPca9431, &me->Rect_Voltage_V); // 10 bit ADC
 		AlxDelay_ms(1000);
 	}
 }
 static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T05_Rect_Current_A(AlxHwNucleoF429Zi_JsTest_G02_Pca9431* me)
 {
-	float Rect_Current_A = 0;
-
 	while (1)
 	{
-		AlxPca9431_Rect_GetCurrent_A(&me->alxHwNucleoF429Zi_Main.alxPca9431, &Rect_Current_A); // 10 bit ADC
-		AlxTrace_WriteFormat(&alxTrace, "Rect_Current_A: %f \r\n", Rect_Current_A);
+		AlxPca9431_Rect_GetCurrent_A(&me->alxHwNucleoF429Zi_Main.alxPca9431, &me->Rect_Current_A); // 10 bit ADC
 		AlxDelay_ms(1000);
 	}
 }
 static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T06_SensTemp_C(AlxHwNucleoF429Zi_JsTest_G02_Pca9431* me)
 {
-	float SensTemp_C = 0;
-
 	while (1)
 	{
-		AlxPca9431_TempSens_GetTemp_degC(&me->alxHwNucleoF429Zi_Main.alxPca9431, &SensTemp_C); // 10 bit ADC
-		AlxTrace_WriteFormat(&alxTrace, "SensTemp_C: %f \r\n", SensTemp_C);
+		AlxPca9431_TempSens_GetTemp_degC(&me->alxHwNucleoF429Zi_Main.alxPca9431, &me->SensTemp_C); // 10 bit ADC
 		AlxDelay_ms(1000);
 	}
 }
 static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T99_TestAll(AlxHwNucleoF429Zi_JsTest_G02_Pca9431* me)
 {
-	float LdoVout_Voltage_V = 0;
-	float LdoVout_Current_A = 0;
-	float Rect_Voltage_V = 0;
-	float Rect_Current_A = 0;
-	float SensTemp_C = 0.001;
-
 	while (1)
 	{
 		AlxPca9431_Reg_ReadAndClearInterrupt(&me->alxHwNucleoF429Zi_Main.alxPca9431);
-
-		AlxPca9431_LdoVout_GetVoltage_V(&me->alxHwNucleoF429Zi_Main.alxPca9431, &LdoVout_Voltage_V); // 10 bit ADC
-		AlxTrace_WriteFormat(&alxTrace, "LdoVout_Voltage_V: %f \r\n", LdoVout_Voltage_V);
-
-		AlxPca9431_LdoVout_GetCurrent_A(&me->alxHwNucleoF429Zi_Main.alxPca9431, &LdoVout_Current_A); // 10 bit ADC
-		AlxTrace_WriteFormat(&alxTrace, "LdoVout_GetCurrent_A: %f \r\n", LdoVout_Current_A);
-
-		AlxPca9431_Rect_GetVoltage_V(&me->alxHwNucleoF429Zi_Main.alxPca9431, &Rect_Voltage_V); // 10 bit ADC
-		AlxTrace_WriteFormat(&alxTrace, "Rect_Voltage_V: %f \r\n", Rect_Voltage_V);
-
-		AlxPca9431_Rect_GetCurrent_A(&me->alxHwNucleoF429Zi_Main.alxPca9431, &Rect_Current_A); // 10 bit ADC
-		AlxTrace_WriteFormat(&alxTrace, "Rect_Current_A: %f \r\n", Rect_Current_A);
-
-		AlxPca9431_TempSens_GetTemp_degC(&me->alxHwNucleoF429Zi_Main.alxPca9431, &SensTemp_C); // 10 bit ADC
-		AlxTrace_WriteFormat(&alxTrace, "SensTemp_C: %f \r\n", SensTemp_C);
+		AlxPca9431_LdoVout_GetVoltage_V(&me->alxHwNucleoF429Zi_Main.alxPca9431, &me->LdoVout_Voltage_V); // 10 bit ADC
+		AlxPca9431_LdoVout_GetCurrent_A(&me->alxHwNucleoF429Zi_Main.alxPca9431, &me->LdoVout_Current_A); // 10 bit ADC
+		AlxPca9431_Rect_GetVoltage_V(&me->alxHwNucleoF429Zi_Main.alxPca9431, &me->Rect_Voltage_V); // 10 bit ADC
+		AlxPca9431_Rect_GetCurrent_A(&me->alxHwNucleoF429Zi_Main.alxPca9431, &me->Rect_Current_A); // 10 bit ADC
+		AlxPca9431_TempSens_GetTemp_degC(&me->alxHwNucleoF429Zi_Main.alxPca9431, &me->SensTemp_C); // 10 bit ADC
 		AlxDelay_ms(1000);
 	}
 }
@@ -230,6 +204,13 @@ static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_Ctor(AlxHwNucleoF429Zi_J
 {
 	// Ctor
 	AlxHwNucleoF429Zi_Main_Ctor(&me->alxHwNucleoF429Zi_Main);
+
+	// Live Watch - set default value
+	me->LdoVout_Voltage_V = 0;
+	me->LdoVout_Current_A = 0;
+	me->Rect_Voltage_V = 0;
+	me->Rect_Current_A = 0;
+	me->SensTemp_C = 0.001;
 
 	// Info
 	me->wasCtorCalled = true;
