@@ -79,7 +79,6 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(AlxHwL
 	while (1)
 	{
 		ALX_TRACE_FORMAT("T02_Trace\r\n");
-		//AlxTrace_WriteStr(&alxTrace, "U");
 
 		AlxDelay_ms(500);
 	}

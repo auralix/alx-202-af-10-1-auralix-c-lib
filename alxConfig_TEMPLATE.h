@@ -60,7 +60,7 @@ extern "C" {
 //#define ALX_LPC80X
 
 // Platform - LPC55XXX //
-//#define ALX_LPC55S6x
+//#define ALX_LPC55S6X
 
 // Assert //
 #define _ALX_ASSERT_BKPT_ALL
@@ -78,6 +78,8 @@ extern "C" {
 //#define ALX_TEMP_SENS_RTD_VDIV
 
 // HW //
+//#define ALX_HW_LPC_XPRESSO_55S69_C_TEST
+//#define ALX_HW_LPC_XPRESSO_55S69_CPP_TEST
 //#define ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST
 //#define ALX_HW_NFC_WLC_LISTENER_3_5B_CPP_TEST
 //#define ALX_HW_NUCLEO_F429ZI_C_TEST
