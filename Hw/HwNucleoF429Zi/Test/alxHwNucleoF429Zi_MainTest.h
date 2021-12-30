@@ -41,12 +41,12 @@ typedef struct
 
 	// Gk
 
+	// Jk
+
 	// Js
 	//AlxHwNucleoF429Zi_JsTest_G01_BringUp alxHwNucleoF429Zi_JsTest_G01_BringUp;
 	//AlxHwNucleoF429Zi_JsTest_G02_Pca9431 alxHwNucleoF429Zi_JsTest_G02_Pca9431;
 	//AlxHwNucleoF429Zi_JsTest_G03_Crn120 alxHwNucleoF429Zi_JsTest_G03_Crn120;
-
-	// Jk
 
 	// Mf
 
@@ -88,12 +88,12 @@ static inline void AlxHwNucleoF429Zi_MainTest_Init(AlxHwNucleoF429Zi_MainTest* m
 
 	// Gk
 
+	// Jk
+
 	// Js
 	//AlxHwNucleoF429Zi_JsTest_G01_BringUp_Init(&me->alxHwNucleoF429Zi_JsTest_G01_BringUp);
 	//AlxHwNucleoF429Zi_JsTest_G02_Pca9431_Init(&me->alxHwNucleoF429Zi_JsTest_G02_Pca9431);
 	//AlxHwNucleoF429Zi_JsTest_G03_Crn120_Init(&me->alxHwNucleoF429Zi_JsTest_G03_Crn120);
-
-	// Jk
 
 	// Mf
 
@@ -106,12 +106,12 @@ static inline void AlxHwNucleoF429Zi_MainTest_Run(AlxHwNucleoF429Zi_MainTest* me
 
 	// Gk
 
+	// Jk
+
 	// Js
 	//AlxHwNucleoF429Zi_JsTest_G01_BringUp_Run(&me->alxHwNucleoF429Zi_JsTest_G01_BringUp);
 	//AlxHwNucleoF429Zi_JsTest_G02_Pca9431_Run(&me->alxHwNucleoF429Zi_JsTest_G02_Pca9431);
 	//AlxHwNucleoF429Zi_JsTest_G03_Crn120_Run(&me->alxHwNucleoF429Zi_JsTest_G03_Crn120);
-
-	// Jk
 
 	// Mf
 
