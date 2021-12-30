@@ -300,7 +300,13 @@ typedef enum
 	#endif
 
 	#if defined(ALX_LPC55S6X)
-	AlxClk_Clk_McuLpc55s6x_Dummy = 24,
+	AlxClk_Clk_McuLpc55s6x_CoreSysClk = 24,
+	AlxClk_Clk_McuLpc55s6x_MainClk = 25,
+	AlxClk_Clk_McuLpc55s6x_Fro = 26,
+
+	AlxClk_Clk_McuLpc55s6x_CoreSysClk_Ctor = 27,
+	AlxClk_Clk_McuLpc55s6x_MainClk_Ctor = 28,
+	AlxClk_Clk_McuLpc55s6x_Fro_Ctor = 29,
 	#endif
 } AlxClk_Clk;
 

@@ -83,8 +83,8 @@ extern "C" {
 //******************************************************************************
 // IoPin Functions
 //******************************************************************************
-uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port);
-void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode);
+//uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port);
+//void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode);
 
 
 #endif // Module Guard

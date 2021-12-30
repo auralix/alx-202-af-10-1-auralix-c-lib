@@ -35,7 +35,6 @@ typedef struct
 	// Parameters
 	uint8_t port;
 	uint8_t pin;
-	FLEXCOMM_Type* flexcomm;
 	USART_Type* usart;
 	AlxGlobal_BaudRate baudRate;
 
@@ -56,7 +55,6 @@ void AlxTrace_Ctor
 	AlxTrace* me,
 	uint8_t port,
 	uint8_t pin,
-	FLEXCOMM_Type* flexcomm,
 	USART_Type* usart,
 	AlxGlobal_BaudRate baudRate
 );

@@ -23,6 +23,7 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static void AlxIoPin_ResetIocon(AlxIoPin* me);
 
 
 //******************************************************************************
@@ -42,8 +43,8 @@ void AlxIoPin_Ctor
 {
 	// Assert
 	(void)me;
-	(void)port;
-	(void)pin;
+	ALX_IO_PIN_ASSERT(port == 0 || port == 1);
+	ALX_IO_PIN_ASSERT(pin >= 0 && pin <= 31);
 	(void)func;
 	(void)mode;
 	(void)isOpenDrain;
@@ -58,9 +59,6 @@ void AlxIoPin_Ctor
 	me->isOpenDrain = isOpenDrain;
 	me->dir = dir;
 	me->val = val;
-
-	// Variables
-	//me->swmFunc_isMovable = false;
 
 	// Info
 	me->isInit = false;
@@ -78,43 +76,23 @@ void AlxIoPin_Init(AlxIoPin* me)
 	// #2 Set initial output value, before config
 	AlxIoPin_Write(me, me->val);
 
+	// #3 Set IOCON
 	// #3.1 Enable IOCON Clk
 	CLOCK_EnableClock(kCLOCK_Iocon);
 
-	// #3.2 Set IOCON Mode
-	IOCON_PinMuxSet(IOCON, me->port, me->pin, me->mode);
-
-	// #3.3 Set IOCON Func
+	// #3.2 Set IOCON Func
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, me->func);
+
+	// #3.3 Set IOCON Mode
+	IOCON_PinMuxSet(IOCON, me->port, me->pin, me->mode);
 
 	// #3.4 Set Open Drain
 	if (me->isOpenDrain)	{ IOCON_PinMuxSet(IOCON, me->port, me->pin, IOCON_OPENDRAIN_EN); }
-	//else					{ IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); }
 
 	// #3.5 Disable IOCON Clk
 	CLOCK_DisableClock(kCLOCK_Iocon);
 
-	// #4.1 Init if SWM
-	/*if (AlxIoPin_CheckIfSwmUsed(me))
-	{
-		CLOCK_EnableClock(kCLOCK_Swm);
-		if (me->swmFunc_isMovable)
-		{
-			// #4.1.1 Init if Movable
-			swm_select_movable_t swmMoveFunc = AlxIoPin_GetSwmMoveFunc(me);
-			swm_port_pin_type_t swmPortPinIndex = AlxIoPin_GetSwmPortPinIndex(me);
-			SWM_SetMovablePinSelect(SWM0, swmMoveFunc, swmPortPinIndex);
-		}
-		else
-		{
-			// #4.1.2 Init if Fixed
-			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmFixFunc(me);
-			SWM_SetFixedPinSelect(SWM0, swmFixFunc, true);
-		}
-		CLOCK_DisableClock(kCLOCK_Swm);
-	}*/
-
-	// #4.2 Init if GPIO
+	// #4 Init if GPIO
 	if (me->func == AlxIoPin_Func_GPIO)
 	{
 		gpio_pin_config_t gpioConfig;
@@ -122,7 +100,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 		if (me->dir)	gpioConfig.pinDirection = kGPIO_DigitalOutput;
 		else			gpioConfig.pinDirection = kGPIO_DigitalInput;
 
-		gpioConfig.outputLogic = 0U; // MF: Clears output bit
+		gpioConfig.outputLogic = 0U;	// MF: Clears output bit
 
 		GPIO_PinInit(GPIO, me->port, me->pin, &gpioConfig);
 	}
@@ -136,36 +114,13 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	// #1 DeInit IOCON
-	uint8_t ioconPortPinIndex = AlxPROTECTED_IoPin_GetIoconPortPinIndex(me->pin, me->port);
-
-	/*CLOCK_EnableClock(kCLOCK_Iocon);
-	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U); // MF: Reset Mode (00) Inactive (no pull-down/pull-up)
-	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 4U);
-	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); // MF: Reset Open Drain (0)
-	CLOCK_DisableClock(kCLOCK_Iocon);
-
-	// #2.1 DeInit if SWM used
-	if (AlxIoPin_CheckIfSwmUsed(me))
-	{
-		CLOCK_EnableClock(kCLOCK_Swm);
-		if (me->swmFunc_isMovable)
-		{
-			swm_select_movable_t swmMoveFunc = AlxIoPin_GetSwmMoveFunc(me);
-			SWM_SetMovablePinSelect(SWM0, swmMoveFunc, kSWM_PortPin_Reset);
-		}
-		else
-		{
-			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmFixFunc(me);
-			SWM_SetFixedPinSelect(SWM0, swmFixFunc, false);
-		}
-		CLOCK_DisableClock(kCLOCK_Swm);
-	}*/
+	// #1 Reset IOCON
+	AlxIoPin_ResetIocon(me);
 
 	// #2.2 DeInit if GPIO
 	if (me->func == AlxIoPin_Func_GPIO)
 	{
-		GPIO->DIR[me->port] &= ~(1U << me->pin); // Reset Dir (0)
+		GPIO->DIR[me->port] &= ~(1U << me->pin);	// MF: Reset Dir (0)
 	}
 
 	// #3 Clear isInit attribute
@@ -259,6 +214,16 @@ void AlxIoPin_Config_AssertOff(AlxIoPin* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-
+static void AlxIoPin_ResetIocon(AlxIoPin* me)
+{
+	// #1 Set IOCON to Default Value (User Manual page 338)
+	if		(me->port == 0 && me->pin == 2)		{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x0110); }
+	else if (me->port == 0 && me->pin == 5)		{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x0120); }
+	else if (me->port == 0 && me->pin == 11)	{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x0116); }
+	else if (me->port == 0 && me->pin == 12)	{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x0126); }
+	else if (me->port == 0 && me->pin == 13)	{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x5000); }
+	else if (me->port == 0 && me->pin == 14)	{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x5000); }
+	else										{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x0000); }
+}
 
 #endif // Module Guard
