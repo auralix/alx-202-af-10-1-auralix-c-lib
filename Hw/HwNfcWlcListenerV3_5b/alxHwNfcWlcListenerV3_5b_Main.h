@@ -127,15 +127,21 @@ typedef struct
 
 typedef struct
 {
+	//------------------------------------------------------------------------------
 	// ALX Objects
-	AlxIoPinIrq alxIrqPin_IRQ1;
+	//------------------------------------------------------------------------------
 	AlxI2c alxI2c_I2C0;
 	AlxAdc alxAdc;
 	AlxPwm alxPwm;
-	AlxPca9431 Pca9431;
 
+	AlxIoPinIrq alxIrqPin_IRQ1;
+
+	AlxPca9431 alxPca9431;
+
+	//-----------------------------------------------------------------------------
 	// Auralix HW NFC WLC LISTENER V3_5B C Library Objects
 	AlxHwNfcWlcListenerV3_5b_MainIoPin alxIoPin;
+	//-----------------------------------------------------------------------------
 
 	//--------
 	// Adc
@@ -154,7 +160,9 @@ typedef struct
 	float pwmDutyDefaultArr[2];
 	#endif
 
+	//-----------------------------------------------------------------------------
 	// Info
+	//-----------------------------------------------------------------------------
 	bool wasCtorCalled;
 } AlxHwNfcWlcListenerV3_5b_Main;
 
@@ -175,8 +183,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//P0_5	- Unused
 	//P0_6	- Unused
 	//P0_7	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_8_PCA9431_SLEEP,	0,	8,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLDOWN,	false,	true,	false	); // PCA943X_EN -- Pca9431 sleep
-	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,		0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,		false,	false,	false	); //need this pin for  PCA943X_INT !!!
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_8_PCA9431_SLEEP,	0,	8,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLDOWN,	false,	true,	false	);	// JS: PCA943X_EN -- Pca9431 sleep
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,		0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,		false,	false,	false	);	// JS: need this pin for  PCA943X_INT !!!
 	//P0_10	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC,		0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,		false,	true,	true	);
 	//P0_12	- Unused
@@ -189,7 +197,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_19_LED200_GR,		0,	19,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,		false,	true,	false	);
 	//P0_20	- Unused
 	//P0_21	- Unused
-	//P0_22 DBG_UART_TX	-> ALX Trace Handle																										//AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED204_GR, 0, 22, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	//P0_22 DBG_UART_TX	-> ALX Trace Handle																											//AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED204_GR, 0, 22, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	AlxIoPin_Ctor(&me->alxIoPin.di_P0_23_IRQ1,			0,	23,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,		false,	true,	true	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_23_LED203_GR, 0, 23, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_PWM1,			0,	24,	AlxIoPin_Func_Swm_T0_MAT_CHN1,	IOCON_MODE_INACT,		false,	false,	false	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_LED202_GR, 0, 24, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_PWM2,			0,	25,	AlxIoPin_Func_Swm_T0_MAT_CHN2,	IOCON_MODE_INACT,		false,	false,	false	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_LED201_GR, 0, 25, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
@@ -302,7 +310,23 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 		I2C0,
 		&me->alxIoPin.do_P0_17_I2C0_SCL,
 		&me->alxIoPin.io_P0_16_I2C0_SDA,
-		AlxI2c_Clk_McuLpc80x_BitRate_100kHz_I2cFuncClk_15MHz
+		//AlxI2c_Clk_McuLpc80x_BitRate_100kHz_I2cFuncClk_15MHz // JS: can be used for both crn120 and Pca9431
+		AlxI2c_Clk_McuLpc80x_BitRate_400kHz_I2cFuncClk_15MHz // TV: Can be there 400kHz for PCA? JS:yes for Pca9431,  not tested yet for crn120
+	);
+
+
+	//------------------------------------------------------------------------------
+	// ALX - PCA9431
+	//------------------------------------------------------------------------------
+	AlxPca9431_Ctor
+	(
+		&me->alxPca9431,
+		&me->alxI2c_I2C0,
+		0b11100010,		// I2C address
+		&me->alxIoPin.do_P0_8_PCA9431_SLEEP,
+		true,			// i2cCheckWithRead	-> TV: PCA needs to be tested with this enabled
+		3,				// i2cNumOfTries	-> TV: PCA needs to be tested with this at 3 --> But don't need to unit test for now
+		1000			// i2cTimeout_ms
 	);
 
 

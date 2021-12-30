@@ -21,9 +21,10 @@ extern "C" {
 //#include <alxHwNfcWlcListenerV3_5b_GhTest.h>
 //#include <alxHwNfcWlcListenerV3_5b_GkTest.h>
 //#include <alxHwNfcWlcListenerV3_5b_JkTest.h>
+//#include <alxHwNfcWlcListenerV3_5b_JsTest.h>
 //#include <alxHwNfcWlcListenerV3_5b_MfTest.h>
 //#include <alxHwNfcWlcListenerV3_5b_TvTest.h>
-#include <alxHwNfcWlcListenerV3_5b_JsTest.h>
+
 
 
 //******************************************************************************
@@ -43,17 +44,15 @@ typedef struct
 
 	// Jk
 
+	// Js
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp;
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431 alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431;
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120 alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120;
+
 	// Mf
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp;
 
 	// Tv
-
-	// Js
-	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp;
-	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431 alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431; // don't work yet
-	AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120 alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120;
-
-
 } AlxHwNfcWlcListenerV3_5b_MainTest;
 
 
@@ -74,15 +73,15 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Ctor(AlxHwNfcWlcListenerV3_
 
 	// Jk
 
+	// Js
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+
 	// Mf
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
 
 	// Tv
-
-	// Js
-	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
-	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431); // don't work yet
-	AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
 }
 static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Init(AlxHwNfcWlcListenerV3_5b_MainTest* me)
 {
@@ -92,15 +91,15 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Init(AlxHwNfcWlcListenerV3_
 
 	// Jk
 
+	// Js
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+
 	// Mf
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Init(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
 
 	// Tv
-
-	// Js
-	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
-	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431); // don't work yet
-	AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
 }
 static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Run(AlxHwNfcWlcListenerV3_5b_MainTest* me)
 {
@@ -110,15 +109,15 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Run(AlxHwNfcWlcListenerV3_5
 
 	// Jk
 
+	// Js
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+
 	// Mf
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Run(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
 
 	// Tv
-
-	// Js
-	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
-	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431); // don't work yet
-	AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
 }
 
 

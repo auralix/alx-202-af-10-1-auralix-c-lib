@@ -25,10 +25,6 @@
 //******************************************************************************
 AlxHwNfcWlcListenerV3_5b_MainTest alxHwNfcWlcListenerV3_5b_MainTest = { 0 };
 
-#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_JS_TEST_H)
-AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431  alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431 = { };
-#endif //#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_JS_TEST_H)
-
 //******************************************************************************
 // IRQ Handlers
 //******************************************************************************
@@ -39,26 +35,33 @@ void SysTick_Handler(void)
 
 
 //******************************************************************************
-// Auralix C Library - ALX IoPinIrq Module - Weak Functions
+// Auralix C Library - Weak Functions
 //******************************************************************************
-void AlxIoPinIrq_Foreground_Callback_Pin0()
-{
-	AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
-}
-void AlxIoPinIrq_Foreground_Callback_Pin1()
-{
-	AlxTrace_WriteStr(&alxTrace, "FallEdge\r\n");
-}
 
-//******************************************************************************
-// Auralix C Library - ALX 01 Module - Weak Functions
-//******************************************************************************
+//------------------------------------------------------------------------------
+// Gh
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Gk
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Jk
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Js
+//------------------------------------------------------------------------------
 #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_JS_TEST_H)
 void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 {
 	// Ldo output
 	me->reg._07h_VOUT_LDO.val.VOUT_LDO	= VoutLdo_3V3;
-	//me->reg._07h_VOUT_LDO.val.VOUT_LDO = VoutLdo_5V;
+	//me->reg._07h_VOUT_LDO.val.VOUT_LDO = VoutLdo_5V; // JS: commented
 
 	// Vrect treshold
 	me->reg._08h_VRECT_THD.val.VRECT_UVLO = VRectThd_3V3;
@@ -80,14 +83,43 @@ void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 	// Interrupt mask
 	me->reg._04h_VRECT_INT_MASK.val.VRECT_RDY_INT_MSK = VRectRdyIntMask_NotTrig;
 	me->reg._04h_VRECT_INT_MASK.val.VRECT_GOOD_INT_MSK	= VRectGoodIntMask_NotTrig;
-	//me->reg._04h_VRECT_INT_MASK.val.VRECT_REGHIGH_INT_MSK = VRectRegHighIntMask_NotTrig;
-	//me->reg._04h_VRECT_INT_MASK.val.VRECT_OVW_MSK = VRectOvWarnIntMask_NotTrig;
+	//me->reg._04h_VRECT_INT_MASK.val.VRECT_REGHIGH_INT_MSK = VRectRegHighIntMask_NotTrig;	// JS: commented
+	//me->reg._04h_VRECT_INT_MASK.val.VRECT_OVW_MSK = VRectOvWarnIntMask_NotTrig;			// JS: commented
 	me->reg._06h_VOUTLDO_INT_MASK.val.VOUT_SHORT_INT_MASK = VOutLdoShortInt_NotMasked;
 }
 void AlxIoPinIrq_Foreground_Callback_Pin3(void)
 {
 	AlxTrace_WriteFormat(&alxTrace, "************************	INTERRUPT	*************************\r\n");
 }
+void AlxIoPinIrq_Foreground_Callback_Pin0()
+{
+	AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
+}
+void AlxIoPinIrq_Foreground_Callback_Pin1()
+{
+	AlxTrace_WriteStr(&alxTrace, "FallEdge\r\n");
+}
 #endif //#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_JS_TEST_H)
+
+
+//------------------------------------------------------------------------------
+// Mf
+//------------------------------------------------------------------------------
+#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_MF_TEST_H)
+void AlxIoPinIrq_Foreground_Callback_Pin0()
+{
+	AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
+}
+void AlxIoPinIrq_Foreground_Callback_Pin1()
+{
+	AlxTrace_WriteStr(&alxTrace, "FallEdge\r\n");
+}
+#endif //#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_MF_TEST_H)
+
+
+//------------------------------------------------------------------------------
+// Tv
+//------------------------------------------------------------------------------
+
 
 #endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
