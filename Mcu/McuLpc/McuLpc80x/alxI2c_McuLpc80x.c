@@ -398,7 +398,7 @@ static status_t AlxI2c_MasterStart(AlxI2c* me, I2C_Type* base, uint8_t address, 
 	}
 
 	/* Write Address and RW bit to data register */
-	base->MSTDAT = ((uint32_t)address << 1) | ((uint32_t)direction & 1u);
+	base->MSTDAT = (uint32_t)address; //((uint32_t)address << 1) | ((uint32_t)direction & 1u);******************************************************************************************************************************************************** jakob spremenil
 	/* Start the transfer */
 	base->MSTCTL = I2C_MSTCTL_MSTSTART_MASK;
 
