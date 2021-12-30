@@ -100,8 +100,8 @@ typedef struct
 	//P0_5	- Unused
 	//P0_6	- Unused
 	//P0_7	- Unused
-	AlxIoPin do_P0_8_PCA9431_SLEEP;				// PCA943X_EN -- Pca9431 sleep
-	AlxIoPin ai_P0_9_ADC_CH4;					//need this pin for  PCA943X_INT !!!
+	//P0_8	- Unused
+	AlxIoPin ai_P0_9_ADC_CH4;					// AlxIoPin PCA943X_nINT
 	//P0_10	- Unused
 	AlxIoPin ao_P0_11_CRN_VCC;
 	//P0_12	- Unused
@@ -132,7 +132,6 @@ typedef struct
 	AlxI2c alxI2c_I2C0;
 	AlxAdc alxAdc;
 	AlxPwm alxPwm;
-	AlxPca9431 Pca9431;
 
 	// Auralix HW NFC WLC LISTENER V3_5B C Library Objects
 	AlxHwNfcWlcListenerV3_5b_MainIoPin alxIoPin;
@@ -175,24 +174,24 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//P0_5	- Unused
 	//P0_6	- Unused
 	//P0_7	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_8_PCA9431_SLEEP,	0,	8,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLDOWN,	false,	true,	false	); // PCA943X_EN -- Pca9431 sleep
-	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,		0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,		false,	false,	false	); //need this pin for  PCA943X_INT !!!
+	//P0_8	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,	0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,	false,	false,	false	);
 	//P0_10	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC,		0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,		false,	true,	true	);
+	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC,	0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	true	);
 	//P0_12	- Unused
 	//P0_13	- Unused
 	//P0_14	- Unused
 	//P0_15	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.io_P0_16_I2C0_SDA,		0,	16,	AlxIoPin_Func_Swm_I2C0_SDA,		IOCON_MODE_INACT,		false,	false,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_17_I2C0_SCL,		0,	17,	AlxIoPin_Func_Swm_I2C0_SCL,		IOCON_MODE_INACT,		false,	false,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_18_LED205_RD,		0,	18,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,		false,	true,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_19_LED200_GR,		0,	19,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,		false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.io_P0_16_I2C0_SDA,	0,	16,	AlxIoPin_Func_Swm_I2C0_SDA,		IOCON_MODE_INACT,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_17_I2C0_SCL,	0,	17,	AlxIoPin_Func_Swm_I2C0_SCL,		IOCON_MODE_INACT,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_18_LED205_RD,	0,	18,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_19_LED200_GR,	0,	19,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
 	//P0_20	- Unused
 	//P0_21	- Unused
-	//P0_22 DBG_UART_TX	-> ALX Trace Handle																										//AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED204_GR, 0, 22, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.di_P0_23_IRQ1,			0,	23,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,		false,	true,	true	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_23_LED203_GR, 0, 23, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_PWM1,			0,	24,	AlxIoPin_Func_Swm_T0_MAT_CHN1,	IOCON_MODE_INACT,		false,	false,	false	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_LED202_GR, 0, 24, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_PWM2,			0,	25,	AlxIoPin_Func_Swm_T0_MAT_CHN2,	IOCON_MODE_INACT,		false,	false,	false	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_LED201_GR, 0, 25, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	//P0_22 DBG_UART_TX	-> ALX Trace Handle																									//AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED204_GR, 0, 22, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_23_IRQ1,		0,	23,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_23_LED203_GR, 0, 23, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_PWM1,		0,	24,	AlxIoPin_Func_Swm_T0_MAT_CHN1,	IOCON_MODE_INACT,	false,	false,	false	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_LED202_GR, 0, 24, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_PWM2,		0,	25,	AlxIoPin_Func_Swm_T0_MAT_CHN2,	IOCON_MODE_INACT,	false,	false,	false	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_LED201_GR, 0, 25, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//P0_26	- Unused
 	//P0_27	- Unused
 	//P0_28	- Unused
