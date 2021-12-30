@@ -226,7 +226,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_UsrLED_BL,	1,	4,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
 	//PIO1_5	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UsrLED_RD,	1,	6,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UsrLED_GR, 1,	7,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UsrLED_GR,	1,	7,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
 	//PIO1_8	- Unused
 	//PIO1_6	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_10_GPIO,		1,	10,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
@@ -267,26 +267,11 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//------------------------------------------------------------------------------
 	// ALX - Trace
 	//------------------------------------------------------------------------------
-	/*AlxTrace_Ctor
-	(
-		&alxTrace,
-		GPIOD,
-		GPIO_PIN_5,
-		GPIO_AF7_USART2,
-		USART2,
-		AlxGlobal_BaudRate_115200
-	);*/
-
-
-	//------------------------------------------------------------------------------
-	// ALX - I2C
-	//------------------------------------------------------------------------------
 	AlxTrace_Ctor
 	(
 		&alxTrace,
 		0,
 		30,
-		FLEXCOMM0,
 		USART0,
 		AlxGlobal_BaudRate_115200
 	);

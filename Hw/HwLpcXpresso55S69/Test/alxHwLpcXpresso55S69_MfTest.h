@@ -75,12 +75,12 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(AlxHwL
 {
 	// Assert
 	(void)me;
-	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+
 	while (1)
 	{
 		ALX_TRACE_FORMAT("T02_Trace\r\n");
-		AlxTrace_WriteStr(&alxTrace, "pes\r\n");
-		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+		//AlxTrace_WriteStr(&alxTrace, "U");
+
 		AlxDelay_ms(500);
 	}
 }

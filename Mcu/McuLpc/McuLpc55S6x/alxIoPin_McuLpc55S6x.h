@@ -33,7 +33,6 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	// SWM Movable
 	AlxIoPin_Func_GPIO	= IOCON_FUNC0,
 	AlxIoPin_Func_1		= IOCON_FUNC1,
 	AlxIoPin_Func_2		= IOCON_FUNC2,
@@ -55,13 +54,10 @@ typedef struct
 	uint8_t port;
 	uint8_t pin;
 	AlxIoPin_Iocon_Func func;
-	uint32_t mode;	// MF: PullUp or PulDown
+	uint32_t mode;		// MF: PullUp or PulDown
 	bool isOpenDrain;
-	bool dir;	// MF: True = digital output, False = digital input
+	bool dir;			// MF: True = digital output, False = digital input
 	bool val;
-
-	// Variables
-	//bool swmFunc_isMovable;
 
 	// Info
 	bool isInit;
