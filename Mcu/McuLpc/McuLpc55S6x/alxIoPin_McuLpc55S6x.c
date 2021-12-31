@@ -93,7 +93,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 	CLOCK_DisableClock(kCLOCK_Iocon);
 
 	// #4 Init if GPIO
-	if (me->func == AlxIoPin_Func_GPIO)
+	if (me->func == AlxIoPin_Func_0_GPIO)
 	{
 		gpio_pin_config_t gpioConfig;
 
@@ -118,7 +118,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	AlxIoPin_ResetIocon(me);
 
 	// #2.2 DeInit if GPIO
-	if (me->func == AlxIoPin_Func_GPIO)
+	if (me->func == AlxIoPin_Func_0_GPIO)
 	{
 		GPIO->DIR[me->port] &= ~(1U << me->pin);	// MF: Reset Dir (0)
 	}

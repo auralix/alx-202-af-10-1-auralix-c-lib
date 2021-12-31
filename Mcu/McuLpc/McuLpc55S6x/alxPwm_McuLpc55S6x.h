@@ -1,14 +1,14 @@
 ﻿/**
   ******************************************************************************
-  * @file alxIoPin_McuLpc55S6x.h
-  * @brief Auralix C Library - ALX IO Pin Module
+  * @file alxPwm_McuLpc55S6x.h
+  * @brief Auralix C Library - ALX PWM Module
   * @version $LastChangedRevision: 4270 $
   * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
   ******************************************************************************
   */
 
-#ifndef ALX_IO_PIN_MCU_LPC55S6X_H
-#define ALX_IO_PIN_MCU_LPC55S6X_H
+#ifndef ALX_PWM_MCU_LPC55S6x_H
+#define ALX_PWM_MCU_LPC55S6x_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,6 +20,8 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxIoPin.h"
+#include "alxClk.h"
 
 
 //******************************************************************************
@@ -31,55 +33,52 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
-{
-	AlxIoPin_Func_0_GPIO	= IOCON_FUNC0,
-	AlxIoPin_Func_1			= IOCON_FUNC1,
-	AlxIoPin_Func_2			= IOCON_FUNC2,
-	AlxIoPin_Func_3			= IOCON_FUNC3,
-	AlxIoPin_Func_4			= IOCON_FUNC4,
-	AlxIoPin_Func_5			= IOCON_FUNC5,
-	AlxIoPin_Func_6			= IOCON_FUNC6,
-	AlxIoPin_Func_7			= IOCON_FUNC7,
-	AlxIoPin_Func_8			= IOCON_FUNC8,
-	AlxIoPin_Func_9			= IOCON_FUNC9,
-	AlxIoPin_Func_10		= IOCON_FUNC10,
-	AlxIoPin_Func_11		= IOCON_FUNC11,
-
-	AlxIoPin_Func_IRQ		= IOCON_FUNC0
-} AlxIoPin_Iocon_Func;
-
-
 typedef struct
 {
+	// Objects - External
+	AlxIoPin** ioPinArr;
+	AlxClk* clk;
+
 	// Parameters
-	uint8_t port;
-	uint8_t pin;
-	AlxIoPin_Iocon_Func func;
-	uint32_t mode;		// MF: PullUp or PulDown
-	bool isOpenDrain;
-	bool dir;			// MF: True = digital output, False = digital input
-	bool val;
+	CTIMER_Type* tim;
+	Alx_Ch* chArr;
+	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	uint16_t* dutyDefaultArr_permil;
+	#else
+	float* dutyDefaultArr_pct;
+	#endif
+	uint8_t numOfCh;
+
+	// Variables
+	ctimer_config_t config;		// MF: Prescaler is in "ctimer_config_t"
+	uint32_t srcClk_Hz;			// MF: Timer source clock, which is then divided by prescaler to get timer clock
+	uint32_t periodMax;
+	uint32_t period;
 
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-} AlxIoPin;
+} AlxPwm;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxIoPin_Ctor
+void AlxPwm_Ctor
 (
-	AlxIoPin* me,
-	uint8_t port,
-	uint8_t pin,
-	AlxIoPin_Iocon_Func func,
-	uint32_t mode,
-	bool isOpenDrain,
-	bool dir,
-	bool val
+	AlxPwm* me,
+	CTIMER_Type* tim,
+	AlxIoPin** ioPinArr,
+	Alx_Ch* chArr,
+	uint8_t numOfCh,
+	AlxClk* clk,
+	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	uint16_t* dutyDefaultArr_permil,
+	#else
+	float* dutyDefaultArr_pct,
+	#endif
+	uint32_t prescaler,
+	uint32_t period
 );
 
 
@@ -89,4 +88,4 @@ void AlxIoPin_Ctor
 }
 #endif
 
-#endif // ALX_IO_PIN_MCU_LPC55S6X_H
+#endif // ALX_PWM_MCU_LPC55S6x_H
