@@ -58,19 +58,19 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_T01_Led(AlxHwNfcW
 	// Init
 	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED205_RD);
 	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED200_GR);
-	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED204_GR);
-	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED203_GR);
-	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_24_LED202_GR);
-	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_25_LED201_GR);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED204_GR);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED203_GR);
+	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_24_LED202_GR_PWM1);
+	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_25_LED201_GR_PWM2);
 
 	while (1)
 	{
 		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED205_RD);
 		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED200_GR);
-		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED204_GR);
-		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED203_GR);
-		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_24_LED202_GR);
-		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_25_LED201_GR);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED204_GR);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED203_GR);
+		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_24_LED202_GR_PWM1);
+		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_25_LED201_GR_PWM2);
 
 		AlxDelay_ms(500);
 	}
@@ -181,7 +181,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Run(AlxHwNfcWlcLi
 {
 	AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_T01_Led(me);
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_T02_Trace(me);
-	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_T03_Adc(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_T03_Adc(me); // JS: don't work - remove this adc pin
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_T05_I2c(me);
 }
@@ -305,7 +305,11 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(AlxHwNfcWlcL
 	// Init
 	AlxClk_Init(&alxClk);
 	AlxTrace_Init(&alxTrace);
-	//AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.ioPinIrq); // JS: not imlemented yet
+
+	// IoPinIrq
+	AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIrqPin_IRQ1);
+
+	// AlxPca9431
 	AlxPca9431_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431);
 
 

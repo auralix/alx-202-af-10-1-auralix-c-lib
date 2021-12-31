@@ -97,7 +97,7 @@ void AlxIoPinIrq_Foreground_Callback_Pin0()
 }
 void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
-	AlxTrace_WriteStr(&alxTrace, "FallEdge\r\n");
+	AlxTrace_WriteStr(&alxTrace, "FallEdge	************************	INTERRUPT	*************************\r\n");
 }
 #endif //#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_JS_TEST_H)
 
