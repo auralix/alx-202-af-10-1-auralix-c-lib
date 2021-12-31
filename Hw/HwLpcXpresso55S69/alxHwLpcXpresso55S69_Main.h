@@ -138,8 +138,8 @@ typedef struct
 	AlxIoPin do_P1_6_UsrLED_RD;
 	AlxIoPin do_P1_7_UsrLED_GR;
 	//PIO1_8	- Unused
-	//PIO1_6	- Unused
-	AlxIoPin do_P1_10_GPIO;
+	AlxIoPin do_P1_9_GPIO;
+	//PIO1_10	- Unused
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
 	//PIO1_13	- Unused
@@ -147,7 +147,7 @@ typedef struct
 	//PIO1_15	- Unused
 	//PIO1_16	- Unused
 	//PIO1_17	- Unused
-	//PIO1_18	- Unused
+	AlxIoPin di_P1_18_IRQ1;
 	//PIO1_19	- Unused
 	//PIO1_20	- Unused
 	//PIO1_21	- Unused
@@ -166,10 +166,23 @@ typedef struct
 typedef struct
 {
 	// ALX Objects
+	AlxIoPinIrq alxIrqPin_IRQ1;
 	AlxI2c alxI2c_I2C2_Master;
+	AlxPwm alxPwm;
 
 	// Auralix HW NUCLEO-F429ZI C Library Objects
 	AlxHwLpcXpresso55S69_MainIoPin alxIoPin;
+
+	//--------
+	// Pwm
+	//--------
+	AlxIoPin* pwmIoPinArr[2];
+	Alx_Ch pwmChArr[2];
+	#if defined ALX_OPTIMIZE_SIZE_ALL
+	uint16_t pwmDutyDefaultArr[2];
+	#else
+	float pwmDutyDefaultArr[2];
+	#endif
 
 	// Info
 	bool wasCtorCalled;
@@ -223,13 +236,13 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO1_1	- Unused
 	//PIO1_2	- Unused
 	//PIO1_3	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_UsrLED_BL,	1,	4,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_UsrLED_BL,	1,	4,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false	);
 	//PIO1_5	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UsrLED_RD,	1,	6,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UsrLED_GR,	1,	7,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UsrLED_RD,	1,	6,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UsrLED_GR,	1,	7,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false	);
 	//PIO1_8	- Unused
-	//PIO1_6	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_10_GPIO,		1,	10,	AlxIoPin_Func_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_9_GPIO,		1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false	);
+	//PIO1_10	- Unused
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
 	//PIO1_13	- Unused
@@ -237,7 +250,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO1_15	- Unused
 	//PIO1_16	- Unused
 	//PIO1_17	- Unused
-	//PIO1_18	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.di_P1_18_IRQ1,		1,	18,	AlxIoPin_Func_IRQ,		IOCON_MODE_INACT,	false,	false,	false	);
 	//PIO1_19	- Unused
 	//PIO1_20	- Unused
 	//PIO1_21	- Unused
@@ -254,6 +267,19 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 
 
 	//------------------------------------------------------------------------------
+	// ALX - IrqPin
+	//------------------------------------------------------------------------------
+	AlxIoPinIrq_Ctor
+	(
+		&me->alxIrqPin_IRQ1,
+		&me->alxIoPin.di_P1_18_IRQ1,
+		kPINT_PinInt0,
+		kPINT_PinIntEnableRiseEdge,
+		Alx_IrqPriority_0
+	);
+
+
+	//------------------------------------------------------------------------------
 	// ALX - Clock
 	//------------------------------------------------------------------------------
 	AlxClk_Ctor
@@ -262,6 +288,34 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default,
 		AlxClk_Tick_1ms
 	);
+
+
+	//------------------------------------------------------------------------------
+	// ALX - PWM
+	//------------------------------------------------------------------------------
+	/*me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_PWM1;
+	me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_PWM2;
+	me->pwmChArr[0] = Alx_Ch_1;
+	me->pwmChArr[1] = Alx_Ch_2;
+	#if defined ALX_OPTIMIZE_SIZE_ALL
+	me->pwmDutyDefaultArr[0] = 543U;
+	me->pwmDutyDefaultArr[1] = 123U;
+	#else
+	me->pwmDutyDefaultArr[0] = 12.34f;
+	me->pwmDutyDefaultArr[1] = 50.f;
+	#endif
+	AlxPwm_Ctor
+	(
+		&me->alxPwm,
+		CTIMER0,
+		me->pwmIoPinArr,
+		me->pwmChArr,
+		ALX_ARR_LEN(me->pwmChArr),
+		&alxClk,
+		me->pwmDutyDefaultArr,
+		0,
+		100
+	);*/
 
 
 	//------------------------------------------------------------------------------

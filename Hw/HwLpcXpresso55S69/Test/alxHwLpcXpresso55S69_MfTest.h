@@ -59,14 +59,16 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(AlxHwLpc
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UsrLED_BL);
 	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
-	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_10_GPIO);
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
+	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.di_P1_10_IRQ1);
 
 	while (1)
 	{
 		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UsrLED_BL);
 		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
 		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
-		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_10_GPIO);
+		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
+		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.di_P1_10_IRQ1);
 
 		AlxDelay_ms(500);
 	}
@@ -80,7 +82,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(AlxHwL
 	{
 		ALX_TRACE_FORMAT("T02_Trace\r\n");
 
-		AlxDelay_ms(500);
+		AlxDelay_ms(1000);
 	}
 }
 static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
@@ -168,15 +170,15 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(AlxHwLpcXpr
 	AlxTrace_Init(&alxTrace);
 
 	// IoPinIrq
-	//AlxIoPinIrq_Init(&me->alxHwLpcXpresso55S69_Main.alxIrqPin_IRQ1);	// MF: IoPinIrq is always Inited
+	AlxIoPinIrq_Init(&me->alxHwLpcXpresso55S69_Main.alxIrqPin_IRQ1);	// MF: IoPinIrq is always Inited
 
 	// Info
 	me->isInit = true;
 }
 static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
 {
-	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(me);
-	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(me);
+	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(me);
+	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T05_I2c(me);

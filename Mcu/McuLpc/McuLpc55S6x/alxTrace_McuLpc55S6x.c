@@ -148,7 +148,7 @@ static uint8_t AlxTrace_GetIoconFunc(AlxTrace* me)
 	// #1 Prepare Info Variable
 	bool isErr = true;
 
-	// #2 Get IOCON Func
+	// #2 Get IOCON Func (see Table 340-342 in User Manual on page 343)
 	#if defined(USART0)
 	if (me->usart == USART0)						{ isErr = false; return IOCON_FUNC1; }
 	#endif
