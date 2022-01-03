@@ -197,7 +197,7 @@ static uint8_t AlxTrace_GetIoconFunc(AlxTrace* me)
 	}
 	#endif
 
-	// #3 Assert
+	// Assert
 	if (isErr) { assert(true); }
 	return 0xFF;
 }
@@ -233,7 +233,7 @@ static uint32_t AlxTrace_GetFlexcommId(AlxTrace* me)
 	if (me->usart == USART7)	{ isErr = false; return 7; }
 	#endif
 
-	// #3 Assert
+	// Assert
 	if (isErr) { assert(true); }
 	return 0xFFFFFFFF;
 }
@@ -268,7 +268,7 @@ static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me)
 	if (me->usart == USART7)	{ CLOCK_DisableClock(kCLOCK_FlexComm7); RESET_PeripheralReset(kFC7_RST_SHIFT_RSTn); isErr = false; }
 	#endif
 
-	// #3 Assert
+	// Assert
 	if (isErr) { assert(true); }
 }
 

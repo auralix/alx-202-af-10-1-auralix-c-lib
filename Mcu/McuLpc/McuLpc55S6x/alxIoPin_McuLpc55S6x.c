@@ -80,16 +80,16 @@ void AlxIoPin_Init(AlxIoPin* me)
 	// #3.1 Enable IOCON Clk
 	CLOCK_EnableClock(kCLOCK_Iocon);
 
-	// #3.2 Set IOCON Func
-	IOCON_PinMuxSet(IOCON, me->port, me->pin, me->func);
+	// #3.2 Prepare IOCON variable
+	uint32_t ioconConfig = 0;
+	if		(me->isOpenDrain)					{ ioconConfig = (me->func		| me->mode	| IOCON_OPENDRAIN_EN	); }
+	else if (me->func == AlxIoPin_Func_IRQ)		{ ioconConfig = (IOCON_FUNC0	| me->mode	| IOCON_DIGITAL_EN		); }
+	else										{ ioconConfig = (me->func		| me->mode							); }
 
-	// #3.3 Set IOCON Mode
-	IOCON_PinMuxSet(IOCON, me->port, me->pin, me->mode);
+	// #3.3 Set IOCON
+	IOCON_PinMuxSet(IOCON, me->port, me->pin, ioconConfig);
 
-	// #3.4 Set Open Drain
-	if (me->isOpenDrain)	{ IOCON_PinMuxSet(IOCON, me->port, me->pin, IOCON_OPENDRAIN_EN); }
-
-	// #3.5 Disable IOCON Clk
+	// #3.4 Disable IOCON Clk
 	CLOCK_DisableClock(kCLOCK_Iocon);
 
 	// #4 Init if GPIO
