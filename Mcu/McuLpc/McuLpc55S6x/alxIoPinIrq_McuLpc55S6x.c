@@ -79,26 +79,21 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 	me->isInit = true;
 
 	// #2 Init IoPin
-	AlxIoPin_Init(me->ioPin);	// MF: This Init func doesn't have to be called for IRQ to work
+	AlxIoPin_Init(me->ioPin);
 
-	// #3 Enable Digital Function
-	CLOCK_EnableClock(kCLOCK_Iocon);
-	IOCON_PinMuxSet(IOCON, me->ioPin->port, me->ioPin->pin, IOCON_DIGITAL_EN);
-	CLOCK_DisableClock(kCLOCK_Iocon);
-
-	// #4 Prepare IRQ Pin
+	// #3 Prepare IRQ Pin
 	inputmux_connection_t irqPortPinSel = AlxIoPin_GetIrqPortPinSel(me);
 	IRQn_Type irqType = AlxIoPin_GetIrqType(me);
 
-	// #5 Attach IRQ to right Pin
+	// #4 Attach IRQ to right Pin
 	INPUTMUX_Init(INPUTMUX);	// MF: Enable Inputmux Clk
 	INPUTMUX_AttachSignal(INPUTMUX, me->irqPin, irqPortPinSel);
 	INPUTMUX_Deinit(INPUTMUX);	// MF: Disable Inputmux Clk
 
-	// #6 Init PINT Periphery
+	// #5 Init PINT Periphery
 	PINT_Init(PINT);
 
-	// #7 Enable IRQ
+	// #6 Enable IRQ
 	PINT_PinInterruptConfig(PINT, me->irqPin, me->irqType, ALX_NULL_PTR);	// MF: "ALX_NULL_PTR" because we'll use "PIN_INTX_IRQHandler" from startup.s
 	NVIC_SetPriority(irqType, (uint32_t)me->irqPriority);					// MF: Set IRQ Priority
 	PINT_EnableCallbackByIndex(PINT, me->irqPin);							// MF: Enable IRQ
@@ -118,7 +113,10 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 	// #3 Reser Periph
 	RESET_PeripheralReset(kPINT_RST_SHIFT_RSTn);
 
-	// #4 Clear isInit attribute
+	// #4 DeInit IoPin
+	AlxIoPin_DeInit(me->ioPin);
+
+	// #5 Clear isInit attribute
 	me->isInit = false;
 }
 
@@ -128,6 +126,10 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 //******************************************************************************
 static inputmux_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me)
 {
+	// #1 Get IRQ Port Pin select
+	//-----------
+	// Port 0
+	//-----------
 	if (me->ioPin->port == 0 && me->ioPin->pin == 0)	return kINPUTMUX_GpioPort0Pin0ToPintsel;
 	if (me->ioPin->port == 0 && me->ioPin->pin == 1)	return kINPUTMUX_GpioPort0Pin1ToPintsel;
 	if (me->ioPin->port == 0 && me->ioPin->pin == 2)	return kINPUTMUX_GpioPort0Pin2ToPintsel;
@@ -161,6 +163,9 @@ static inputmux_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me)
 	if (me->ioPin->port == 0 && me->ioPin->pin == 30)	return kINPUTMUX_GpioPort0Pin30ToPintsel;
 	if (me->ioPin->port == 0 && me->ioPin->pin == 31)	return kINPUTMUX_GpioPort0Pin31ToPintsel;
 
+	//-----------
+	// Port 1
+	//-----------
 	if (me->ioPin->port == 1 && me->ioPin->pin == 0)	return kINPUTMUX_GpioPort1Pin0ToPintsel;
 	if (me->ioPin->port == 1 && me->ioPin->pin == 1)	return kINPUTMUX_GpioPort1Pin1ToPintsel;
 	if (me->ioPin->port == 1 && me->ioPin->pin == 2)	return kINPUTMUX_GpioPort1Pin2ToPintsel;
@@ -194,11 +199,13 @@ static inputmux_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me)
 	if (me->ioPin->port == 1 && me->ioPin->pin == 30)	return kINPUTMUX_GpioPort1Pin30ToPintsel;
 	if (me->ioPin->port == 1 && me->ioPin->pin == 31)	return kINPUTMUX_GpioPort1Pin31ToPintsel;
 
+	// Assert
 	ALX_IO_PIN_IRQ_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
 }
 static IRQn_Type AlxIoPin_GetIrqType(AlxIoPinIrq* me)
 {
+	// #1 Get IRQ Type
 	if (me->irqPin == kPINT_PinInt0)	return PIN_INT0_IRQn;
 	if (me->irqPin == kPINT_PinInt1)	return PIN_INT1_IRQn;
 	if (me->irqPin == kPINT_PinInt2)	return PIN_INT2_IRQn;
@@ -208,6 +215,7 @@ static IRQn_Type AlxIoPin_GetIrqType(AlxIoPinIrq* me)
 	if (me->irqPin == kPINT_PinInt6)	return PIN_INT6_IRQn;
 	if (me->irqPin == kPINT_PinInt7)	return PIN_INT7_IRQn;
 
+	// Assert
 	ALX_IO_PIN_IRQ_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
 }

@@ -9,6 +9,10 @@
     - __void AlxIoPin_Config_PullDown(AlxIoPin* me)__
     - __void AlxIoPin_Config_AssertOn(AlxIoPin* me)__
     - __void AlxIoPin_Config_AssertOff(AlxIoPin* me)__
+- These configurations are not implemented/supported:
+    - Slew rate (High-speed) mode
+    - Inverted function
+- TODO - Hnadle when Analog or Digital
 
 ---
 ## Ctor Arguments

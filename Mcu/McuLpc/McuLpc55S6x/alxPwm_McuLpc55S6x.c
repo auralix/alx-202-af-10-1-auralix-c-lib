@@ -32,6 +32,16 @@ static void AlxPwm_UpdatePwmDutyPct(AlxPwm* me, Alx_Ch ch, float duty_pct);
 #endif
 
 
+
+#define IOCON_PIO_DIGITAL_EN 0x0100u
+#define IOCON_PIO_FUNC1 0x01u
+#define IOCON_PIO_FUNC3 0x03u
+#define IOCON_PIO_INV_DI 0x00u
+#define IOCON_PIO_MODE_INACT 0x00u
+#define IOCON_PIO_OPENDRAIN_DI 0x00u
+#define IOCON_PIO_SLEW_STANDARD 0x00u
+
+
 //******************************************************************************
 // Constructor
 //******************************************************************************
@@ -83,8 +93,8 @@ void AlxPwm_Ctor
 	me->numOfCh = numOfCh;
 
 	// Variables
-	me->config.input = kCTIMER_Capture_0;	// MF: This field is ignored when mode is "timer"
 	me->config.mode =  kCTIMER_TimerMode;
+	me->config.input = kCTIMER_Capture_0;	// MF: This field is ignored when mode is "timer"
 	me->config.prescale = prescaler;
 	me->period = period;
 
@@ -106,8 +116,27 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Init GPIO
-	for (uint32_t i = 0; i < me->numOfCh; i++)
-		AlxIoPin_Init((*(me->ioPinArr + i)));
+	/*for (uint32_t i = 0; i < me->numOfCh; i++)
+		AlxIoPin_Init((*(me->ioPinArr + i)));*/
+
+
+	CLOCK_AttachClk(kFRO_HF_to_CTIMER2);
+
+	const uint32_t port1_pin6_config = (/* Pin is configured as CTIMER2_MAT1 */
+	                                    IOCON_PIO_FUNC3 |
+	                                    /* No addition pin function */
+	                                    IOCON_PIO_MODE_INACT |
+	                                    /* Standard mode, output slew rate control is enabled */
+	                                    IOCON_PIO_SLEW_STANDARD |
+	                                    /* Input function is not inverted */
+	                                    IOCON_PIO_INV_DI |
+	                                    /* Enables digital function */
+	                                    IOCON_PIO_DIGITAL_EN |
+	                                    /* Open drain is disabled */
+	                                    IOCON_PIO_OPENDRAIN_DI);
+	/* PORT1 PIN4 (coords: 1) is configured as CTIMER2_MAT1 */
+	IOCON_PinMuxSet(IOCON, 1U, 4U, port1_pin6_config);
+
 
 	// #2 Init CTIMER
 	CTIMER_Init(me->tim, &me->config);	// MF: "Periph_Reset" and "EnableClk" happens here

@@ -46,7 +46,7 @@ typedef enum
 	AlxIoPin_Func_10		= IOCON_FUNC10,
 	AlxIoPin_Func_11		= IOCON_FUNC11,
 
-	AlxIoPin_Func_IRQ		= IOCON_FUNC0
+	AlxIoPin_Func_IRQ		= 100
 } AlxIoPin_Iocon_Func;
 
 

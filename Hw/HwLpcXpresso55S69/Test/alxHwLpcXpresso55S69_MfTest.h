@@ -57,18 +57,16 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(AlxHwLpc
 
 	// Init
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UsrLED_BL);
-	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
-	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
+	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
 	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
-	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.di_P1_10_IRQ1);
 
 	while (1)
 	{
 		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UsrLED_BL);
-		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
-		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
+		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
 		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
-		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.di_P1_10_IRQ1);
 
 		AlxDelay_ms(500);
 	}
@@ -110,7 +108,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(AlxHwLpc
 	(void)me;
 
 	// Init
-	//AlxPwm_Init(&me->alxHwLpcXpresso55S69_Main.alxPwm);
+	AlxPwm_Init(&me->alxHwLpcXpresso55S69_Main.alxPwm);
 
 	// Setup Delay	// MF: To see how duty changes from 50% (set in Ctor) to what is set below
 	AlxDelay_ms(500);
@@ -118,7 +116,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(AlxHwLpc
 	while (1)
 	{
 		#if defined ALX_OPTIMIZE_SIZE_ALL
-		//AlxPwm_SetDuty_permil(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[0], 111);
+		AlxPwm_SetDuty_permil(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[0], 111);
 		//AlxPwm_SetDuty_permil(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[1], 999);
 		#else
 		//AlxPwm_SetDuty_pct(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[0], 10.34f);
@@ -167,7 +165,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(AlxHwLpcXpr
 {
 	// Init
 	AlxClk_Init(&alxClk);
-	AlxTrace_Init(&alxTrace);
+	//AlxTrace_Init(&alxTrace);
 
 	// IoPinIrq
 	AlxIoPinIrq_Init(&me->alxHwLpcXpresso55S69_Main.alxIrqPin_IRQ1);	// MF: IoPinIrq is always Inited
@@ -177,10 +175,10 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(AlxHwLpcXpr
 }
 static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
 {
-	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(me);
+	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(me);
-	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(me);
+	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T05_I2c(me);
 }
 
