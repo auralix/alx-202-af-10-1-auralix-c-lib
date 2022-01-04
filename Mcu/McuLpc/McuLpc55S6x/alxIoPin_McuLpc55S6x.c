@@ -36,6 +36,7 @@ void AlxIoPin_Ctor
 	uint8_t pin,
 	AlxIoPin_Iocon_Func func,
 	uint32_t mode,
+	bool digiMode,
 	bool isOpenDrain,
 	bool dir,
 	bool val
@@ -45,8 +46,11 @@ void AlxIoPin_Ctor
 	(void)me;
 	ALX_IO_PIN_ASSERT(port == 0 || port == 1);
 	ALX_IO_PIN_ASSERT(pin >= 0 && pin <= 31);
+	ALX_IO_PIN_ASSERT(!(port == 0 && pin == 13));	// MF: PIO0_13 is for i2c and will se inited in alxI2c module TODO
+	ALX_IO_PIN_ASSERT(!(port == 0 && pin == 14));	// MF: PIO0_13 is for i2c and will se inited in alxI2c module TODO
 	(void)func;
 	(void)mode;
+	(void)digiMode;
 	(void)isOpenDrain;
 	(void)dir;
 	(void)val;
@@ -56,6 +60,7 @@ void AlxIoPin_Ctor
 	me->pin = pin;
 	me->func = func;
 	me->mode = mode;
+	me->digiMode = digiMode;
 	me->isOpenDrain = isOpenDrain;
 	me->dir = dir;
 	me->val = val;
@@ -77,20 +82,19 @@ void AlxIoPin_Init(AlxIoPin* me)
 	AlxIoPin_Write(me, me->val);
 
 	// #3 Set IOCON
-	// #3.1 Enable IOCON Clk
-	CLOCK_EnableClock(kCLOCK_Iocon);
+	// #3.1 Set IOCON Func
+	IOCON_PinMuxSet(IOCON, me->port, me->pin, me->func);
 
-	// #3.2 Prepare IOCON variable
-	uint32_t ioconConfig = 0;
-	if		(me->isOpenDrain)					{ ioconConfig = (me->func		| me->mode	| IOCON_OPENDRAIN_EN	); }
-	else if (me->func == AlxIoPin_Func_IRQ)		{ ioconConfig = (IOCON_FUNC0	| me->mode	| IOCON_DIGITAL_EN		); }
-	else										{ ioconConfig = (me->func		| me->mode							); }
+	// #3.2 Set IOCON Mode
+	AlxPROTECTED_IoPin_SetIoconMode(me->port, me->pin, me->mode);	// MF: Maybe it doesn't have to be PROTECTED and can be IoPin private func, we will see
 
-	// #3.3 Set IOCON
-	IOCON_PinMuxSet(IOCON, me->port, me->pin, ioconConfig);
+	// #3.3 Set IOCON DigiMode
+	if (me->digiMode)		{ IOCON->PIO[me->port][me->pin] |=  (0x1 << 8U); }
+	else					{ IOCON->PIO[me->port][me->pin] &= ~(0x1 << 8U); }
 
-	// #3.4 Disable IOCON Clk
-	CLOCK_DisableClock(kCLOCK_Iocon);
+	// #3.4 Set IOCON Open Drain
+	if (me->isOpenDrain)	{ IOCON->PIO[me->port][me->pin] |=  (0x1 << 9U); }
+	else					{ IOCON->PIO[me->port][me->pin] &= ~(0x1 << 9U); }
 
 	// #4 Init if GPIO
 	if (me->func == AlxIoPin_Func_0_GPIO)

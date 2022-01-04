@@ -135,8 +135,8 @@ typedef struct
 	//PIO1_3	- Unused
 	AlxIoPin do_P1_4_PWM1;	// Mf: AlxIoPin do_P1_4_UsrLED_BL;
 	//PIO1_5	- Unused
-	AlxIoPin do_P1_6_PWM2;	// MF: AlxIoPin do_P1_6_UsrLED_RD;
-	AlxIoPin do_P1_7_UsrLED_GR;
+	AlxIoPin do_P1_6_UsrLED_RD;
+	AlxIoPin do_P1_7_PWM2;	// Mf: AlxIoPin do_P1_7_UsrLED_GR;
 	//PIO1_8	- Unused
 	AlxIoPin do_P1_9_GPIO;
 	//PIO1_10	- Unused
@@ -176,10 +176,10 @@ typedef struct
 	//--------
 	// Pwm
 	//--------
-	AlxIoPin* pwmIoPinArr[1];
-	Alx_Ch pwmChArr[1];
+	AlxIoPin* pwmIoPinArr[2];
+	Alx_Ch pwmChArr[2];
 	#if defined ALX_OPTIMIZE_SIZE_ALL
-	uint16_t pwmDutyDefaultArr[1];
+	uint16_t pwmDutyDefaultArr[2];
 	#else
 	float pwmDutyDefaultArr[2];
 	#endif
@@ -236,12 +236,12 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO1_1	- Unused
 	//PIO1_2	- Unused
 	//PIO1_3	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_PWM1,			1,	4,	AlxIoPin_Func_0_GPIO,		IOCON_MODE_PULLUP,	false,	true,	false	);	// MF: AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_UsrLED_BL, 1, 4, AlxIoPin_Func_0_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_PWM1,			1,	4,	AlxIoPin_Func_3,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);	// MF: AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_UsrLED_BL, 1, 4, AlxIoPin_Func_0_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//PIO1_5	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_PWM2,			1,	6,	AlxIoPin_Func_0_GPIO,		IOCON_MODE_PULLUP,	false,	true,	false	);	// MF: AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UsrLED_RD, 1, 6, AlxIoPin_Func_0_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UsrLED_GR,		1,	7,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UsrLED_RD,		1,	6,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	false,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_PWM2,			1,	7,	AlxIoPin_Func_3,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);	// MF: AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UsrLED_GR, 1, 6, AlxIoPin_Func_0_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//PIO1_8	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_9_GPIO,			1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_9_GPIO,			1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	false,	false,	true,	false	);
 	//PIO1_10	- Unused
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
@@ -250,7 +250,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO1_15	- Unused
 	//PIO1_16	- Unused
 	//PIO1_17	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.di_P1_18_WakeBtn_IRQ1,	1,	18,	AlxIoPin_Func_IRQ,		IOCON_MODE_INACT,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.di_P1_18_WakeBtn_IRQ1,	1,	18,	AlxIoPin_Func_IRQ,		IOCON_MODE_INACT,	true,	false,	false,	false	);
 	//PIO1_19	- Unused
 	//PIO1_20	- Unused
 	//PIO1_21	- Unused
@@ -285,7 +285,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxClk_Ctor
 	(
 		&alxClk,
-		AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default,
+		AlxClk_Config_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz,
 		AlxClk_Tick_1ms
 	);
 
@@ -294,15 +294,15 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	// ALX - PWM
 	//------------------------------------------------------------------------------
 	me->pwmIoPinArr[0] = &me->alxIoPin.do_P1_4_PWM1;
-	//me->pwmIoPinArr[1] = &me->alxIoPin.do_P1_6_PWM2;
+	me->pwmIoPinArr[1] = &me->alxIoPin.do_P1_7_PWM2;
 	me->pwmChArr[0] = Alx_Ch_1;
-	//me->pwmChArr[1] = Alx_Ch_2;
+	me->pwmChArr[1] = Alx_Ch_2;
 	#if defined ALX_OPTIMIZE_SIZE_ALL
-	me->pwmDutyDefaultArr[0] = 543U;
-	//me->pwmDutyDefaultArr[1] = 123U;
+	me->pwmDutyDefaultArr[0] = 444U;
+	me->pwmDutyDefaultArr[1] = 666U;
 	#else
-	me->pwmDutyDefaultArr[0] = 12.34f;
-	me->pwmDutyDefaultArr[1] = 50.f;
+	me->pwmDutyDefaultArr[0] = 44.44f;
+	me->pwmDutyDefaultArr[1] = 66.66f;
 	#endif
 	AlxPwm_Ctor
 	(
@@ -314,7 +314,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		&alxClk,
 		me->pwmDutyDefaultArr,
 		0,
-		100
+		500
 	);
 
 

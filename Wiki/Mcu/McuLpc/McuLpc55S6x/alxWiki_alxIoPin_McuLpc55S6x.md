@@ -12,7 +12,6 @@
 - These configurations are not implemented/supported:
     - Slew rate (High-speed) mode
     - Inverted function
-- TODO - Hnadle when Analog or Digital
 
 ---
 ## Ctor Arguments

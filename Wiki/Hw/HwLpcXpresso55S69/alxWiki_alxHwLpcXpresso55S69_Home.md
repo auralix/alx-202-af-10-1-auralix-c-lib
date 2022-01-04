@@ -1,5 +1,6 @@
 # ALX HW LPCXpresso55S69 Development Board Home
 ---
+MF: - Pin PIO1_7 (LED Green) is not routed to P18 position 7 as it says in *LPCXpresso55S69_Board_Schematic_RevA2_dec4.pdf*
 
 ## Youtube
 ---
