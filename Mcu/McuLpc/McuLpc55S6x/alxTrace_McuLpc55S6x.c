@@ -77,9 +77,7 @@ void AlxTrace_Ctor
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
 	// #1 Set IoPin Usart Func
-	CLOCK_EnableClock(kCLOCK_Iocon);
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, AlxTrace_GetIoconFunc(me));
-	CLOCK_DisableClock(kCLOCK_Iocon);
 
 	// #2 Init USART	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()". Also, USART0 has the same addres and ID as FLEXCOMM0, USART1 has the same addres and ID as FLEXCOMM1,... that's why I used me->usart in "CLOCK_GetFlexCommInputClock()"
 	if (USART_Init(me->usart, &me->usartConfig, CLOCK_GetFlexCommInputClock(AlxTrace_GetFlexcommId(me))) != kStatus_Success) { return Alx_Err; }
@@ -99,9 +97,7 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 	AlxTrace_FlexcommDisableClkResetPeriph(me);
 
 	// #3 Set Pin to Default Func
-	CLOCK_EnableClock(kCLOCK_Iocon);
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, IOCON_FUNC0);
-	CLOCK_DisableClock(kCLOCK_Iocon);
 
 	// #4 Reset isInit
 	me->isInit = false;

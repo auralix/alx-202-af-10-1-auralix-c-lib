@@ -89,10 +89,13 @@ Alx_Status AlxClk_Init(AlxClk* me)
 	// #7 Set SystemCoreClock
 	me->systemCoreClock = SystemCoreClock;
 
-	// #8 Set isInit
+	// #8 Enable IOCON	// MF: it has to always be on. see: "alxWiki_McuLpc55S6x.md" for more info
+	CLOCK_EnableClock(kCLOCK_Iocon);
+
+	// #9 Set isInit
 	me->isInit = true;
 
-	// #9 Return OK
+	// #10 Return OK
 	return Alx_Ok;
 }
 uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
