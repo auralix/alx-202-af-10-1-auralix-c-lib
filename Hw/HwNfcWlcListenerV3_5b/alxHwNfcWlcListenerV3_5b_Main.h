@@ -177,7 +177,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//------------------------------------------------------------------------------
 	// ALX - IoPin
 	//------------------------------------------------------------------------------
-	AlxIoPin_Ctor(&me->alxIoPin.di_P0_0_UART_RX, 0, 0, AlxIoPin_Func_Swm_USART1_RXD, IOCON_MODE_INACT, false, true, true);							// JS: don't know if good and not tested
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_0_UART_RX,			0,	0,	AlxIoPin_Func_Swm_USART1_RXD,	IOCON_MODE_INACT,	false,	true,	true	);	// JS: don't know if good and not tested
 	//P0_1	- Unused
 	//P0_2	- SWD_IO
 	//P0_3	- SWD_CLK
@@ -187,7 +187,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	AlxIoPin_Ctor(&me->alxIoPin.di_P0_7_CRN_FD_IRQ2,		0,	7,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);	// JS: CRN_FD -- not tested
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_8_PCA943X_EN, 		0,	8,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,	false	);	// JS: PCA943X_EN -- Pca9431 sleep	-- not tested
 	//AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,			0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,	false,	false,	false	);	// JS: commented it,need this pin for  PCA943X_INT , Mf used it for Adc
-	AlxIoPin_Ctor(&me->alxIoPin.di_P0_9_PCA943X_INT_IRQ1,	0,	10, AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);	// JS: PCA943X_I\N\T\ not yet worked
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_9_PCA943X_INT_IRQ1,	0,	9,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);
 	//P0_10	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC,			0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	true	);	// JS: not tested
 	//P0_12	- Unused
