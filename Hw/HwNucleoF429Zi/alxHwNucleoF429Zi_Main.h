@@ -295,8 +295,7 @@ static inline void AlxHwNucleoF429Zi_Main_Ctor(AlxHwNucleoF429Zi_Main* me)
 	AlxClk_Ctor
 	(
 		&alxClk,
-		//AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz
-		AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_25MHz	// JS: Using NUCLEO-F429ZI 2100212 with external 25MHz crystal
+		AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_25MHz	//AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz	// JS: Using NUCLEO-F429ZI 2100212 with external 25MHz crystal
 	);
 
 
@@ -323,8 +322,7 @@ static inline void AlxHwNucleoF429Zi_Main_Ctor(AlxHwNucleoF429Zi_Main* me)
 		I2C2,
 		&me->alxIoPin.do_PB10_I2C2_SCL,
 		&me->alxIoPin.io_PB11_I2C2_SDA,
-		//AlxI2c_Clk_100kHz		// JS: can be used for both crn120 and Pca9431
-		AlxI2c_Clk_400kHz	// TV: Can be there 400kHz for PCA? JS: yes for Pca9431, for crn120 cca 25% worked and 75% fail
+		AlxI2c_Clk_400kHz	//AlxI2c_Clk_100kHz		// JS: 100k Hz can be  used for both crn120 and Pca9431 // TV: Can be there 400kHz for PCA? JS: yes for Pca9431, for crn120 cca 25% worked and 75% fail (too long wires...->too huge loop)
 	);
 
 
