@@ -100,9 +100,9 @@ typedef struct
 	//P0_5	- Unused
 	//P0_6	- Unused
 	AlxIoPin di_P0_7_CRN_FD_IRQ2;
-	AlxIoPin do_P0_8_PCA943X_EN;				// JS: PCA943X_EN -- Pca9431 sleep
-	AlxIoPin di_P0_9_PCA943X_INT_IRQ1;			// JS: PCA943X_I\N\T\
-	//AlxIoPin ai_P0_9_ADC_CH4;					// JS: commented Mf needed this for adc
+	AlxIoPin do_P0_8_PCA943X_EN;			// JS: PCA943X_EN -- Pca9431 sleep
+	AlxIoPin di_P0_9_PCA943X_INT_IRQ1;		// JS: PCA943X_I\N\T\
+	//AlxIoPin ai_P0_9_ADC_CH4;				// JS: commented Mf needed this for adc
 	//P0_10	- Unused
 	AlxIoPin ao_P0_11_CRN_VCC;
 	//P0_12	- Unused
@@ -116,7 +116,7 @@ typedef struct
 	//P0_20	- Unused
 	//P0_21	- Unused
 	AlxIoPin do_P0_22_LED204_GR;
-	//P0_22 DBG_UART_TX	-> ALX Trace Handle		// JS: commented Mf:used it for ALX Trace,		AlxIoPin do_P0_22_LED204_GR;
+	//P0_22 DBG_UART_TX	-> ALX Trace Handle	// JS: commented Mf:used it for ALX Trace,		AlxIoPin do_P0_22_LED204_GR;
 	AlxIoPin do_P0_23_LED203_GR;
 	AlxIoPin do_P0_24_LED202_GR_PWM1;
 	AlxIoPin do_P0_25_LED201_GR_PWM2;
