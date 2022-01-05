@@ -107,7 +107,7 @@ typedef struct
 	//PIO0_12	- SWD_IO
 	//PIO0_13	- combo I2C / MFIO
 	//PIO0_14	- combo I2C / MFIO
-	//PIO0_15	- Unused
+	AlxIoPin ai_P0_15_ADC_CH2;
 	//PIO0_16	- Unused
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
@@ -115,7 +115,7 @@ typedef struct
 	//PIO0_20	- Unused
 	//PIO0_21	- Unused
 	//PIO0_22	- Unused
-	//PIO0_23	- Unused
+	AlxIoPin ai_P0_23_ADC_CH0;
 	//PIO0_24	- Unused
 	//PIO0_25	- Unused
 	//PIO0_26	- Unused
@@ -168,10 +168,17 @@ typedef struct
 	// ALX Objects
 	AlxIoPinIrq alxIrqPin_IRQ1;
 	AlxI2c alxI2c_I2C2_Master;
+	AlxAdc alxAdc;
 	AlxPwm alxPwm;
 
 	// Auralix HW NUCLEO-F429ZI C Library Objects
 	AlxHwLpcXpresso55S69_MainIoPin alxIoPin;
+
+	//--------
+	// Adc
+	//--------
+	AlxIoPin* adcIoPinArr[1];
+	Alx_Ch adcChArr[1];
 
 	//--------
 	// Pwm
@@ -213,7 +220,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO0_12	- SWD_IO
 	//PIO0_13	- combo I2C / MFIO
 	//PIO0_14	- combo I2C / MFIO
-	//PIO0_15	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_15_ADC_CH2,		0,	15,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO0_16	- Unused
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
@@ -221,7 +228,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO0_20	- Unused
 	//PIO0_21	- Unused
 	//PIO0_22	- Unused
-	//PIO0_23	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_23_ADC_CH0,		0,	23,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO0_24	- Unused
 	//PIO0_25	- Unused
 	//PIO0_26	- Unused
@@ -238,10 +245,10 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO1_3	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_PWM1,			1,	4,	AlxIoPin_Func_3,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);	// MF: AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_UsrLED_BL, 1, 4, AlxIoPin_Func_0_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//PIO1_5	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UsrLED_RD,		1,	6,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	false,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UsrLED_RD,		1,	6,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_PWM2,			1,	7,	AlxIoPin_Func_3,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);	// MF: AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UsrLED_GR, 1, 6, AlxIoPin_Func_0_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//PIO1_8	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_9_GPIO,			1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	false,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_9_GPIO,			1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	//PIO1_10	- Unused
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
@@ -289,6 +296,35 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		AlxClk_Tick_1ms
 	);
 
+
+	//------------------------------------------------------------------------------
+	// ALX - Adc
+	//------------------------------------------------------------------------------
+	me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_23_ADC_CH0;
+	//me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_15_ADC_CH2;
+	me->adcChArr[0] = Alx_Ch_0;
+	//me->adcChArr[0] = Alx_Ch_2;
+	#if defined ALX_OPTIMIZE_SIZE_ALL
+	AlxAdc_Ctor
+	(
+		&me->alxAdc,
+		me->adcIoPinArr,
+		me->adcChArr,
+		ALX_ARR_LEN(me->adcIoPinArr),
+		&alxClk,
+		3300U
+	);
+	#else
+	AlxAdc_Ctor
+	(
+		&me->alxAdc,
+		me->adcIoPinArr,
+		me->adcChArr,
+		ALX_ARR_LEN(me->adcIoPinArr),
+		&alxClk,
+		3.3f
+	);
+	#endif
 
 	//------------------------------------------------------------------------------
 	// ALX - PWM
