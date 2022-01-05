@@ -312,20 +312,20 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(AlxHwNfcWlcL
 	// AlxPca9431
 	AlxPca9431_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431);
 
-
 	// Info
 	me->isInit = true;
 }
 	static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Run(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
 {
-//	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T01_ReadAndClearInterrupt(me);
-//	AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T02_LdoVout_GetVoltage_V(me);
-//	AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T03_LdoVout_GetCurrent_A(me);
-//	AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T04_Rect_GetVoltage_V(me);
-//	AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T05_Rect_Current_A(me);
-//	AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T06_SensTemp_C(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T01_ReadAndClearInterrupt(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T02_LdoVout_GetVoltage_V(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T03_LdoVout_GetCurrent_A(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T04_Rect_GetVoltage_V(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T05_Rect_Current_A(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T06_SensTemp_C(me);
 	AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T99_TestAll(me);
 }
+
 
 //******************************************************************************
 //******************************************************************************

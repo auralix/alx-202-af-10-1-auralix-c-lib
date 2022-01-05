@@ -52,6 +52,7 @@ typedef struct
 //******************************************************************************
 static inline void AlxHwNucleoF429Zi_JsTest_G01_BringUp_T01_Led(AlxHwNucleoF429Zi_JsTest_G01_BringUp* me)
 {
+	// Init
 	AlxIoPin_Init(&me->alxHwNucleoF429Zi_Main.alxIoPin.do_PB0_LED1_GR);
 	AlxIoPin_Init(&me->alxHwNucleoF429Zi_Main.alxIoPin.do_PB7_LED2_BL);
 	AlxIoPin_Init(&me->alxHwNucleoF429Zi_Main.alxIoPin.do_PB14_LED3_RD);
@@ -228,12 +229,12 @@ static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_Init(AlxHwNucleoF429Zi_J
 }
 static inline void AlxHwNucleoF429Zi_JsTest_G02_Pca9431_Run(AlxHwNucleoF429Zi_JsTest_G02_Pca9431* me)
 {
-//	AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T01_ReadAndClearInterrupt(me);
-//	AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T02_LdoVout_GetVoltage_V(me);
-//	AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T03_LdoVout_GetCurrent_A(me);
-//	AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T04_Rect_GetVoltage_V(me);
-//	AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T05_Rect_Current_A(me);
-//	AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T06_SensTemp_C(me);
+	//AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T01_ReadAndClearInterrupt(me);
+	//AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T02_LdoVout_GetVoltage_V(me);
+	//AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T03_LdoVout_GetCurrent_A(me);
+	//AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T04_Rect_GetVoltage_V(me);
+	//AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T05_Rect_Current_A(me);
+	//AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T06_SensTemp_C(me);
 	AlxHwNucleoF429Zi_JsTest_G02_Pca9431_T99_TestAll(me);
 }
 

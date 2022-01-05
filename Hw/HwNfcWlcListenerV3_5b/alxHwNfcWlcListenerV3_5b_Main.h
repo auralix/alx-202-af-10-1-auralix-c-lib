@@ -129,9 +129,7 @@ typedef struct
 
 typedef struct
 {
-	//------------------------------------------------------------------------------
 	// ALX Objects
-	//------------------------------------------------------------------------------
 	AlxI2c alxI2c_I2C0;
 	AlxAdc alxAdc;
 	AlxPwm alxPwm;
@@ -322,11 +320,11 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	(
 		&me->alxPca9431,
 		&me->alxI2c_I2C0,
-		0b11100010,		// I2C address
+		0b11100010,		// JS: I2C address
 		&me->alxIoPin.do_P0_8_PCA943X_EN,
-		true,			// i2cCheckWithRead	-> TV: PCA needs to be tested with this enabled
-		3,				// i2cNumOfTries	-> TV: PCA needs to be tested with this at 3 --> But don't need to unit test for now
-		1000			// i2cTimeout_ms
+		true,			// JS: i2cCheckWithRead	-> TV: PCA needs to be tested with this enabled
+		3,				// JS: i2cNumOfTries	-> TV: PCA needs to be tested with this at 3 --> But don't need to unit test for now
+		1000			// JS: i2cTimeout_ms
 	);
 
 
