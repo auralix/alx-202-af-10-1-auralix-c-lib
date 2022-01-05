@@ -100,8 +100,8 @@ typedef struct
 	//P0_5	- Unused
 	//P0_6	- Unused
 	AlxIoPin di_P0_7_CRN_FD_IRQ2;
-	AlxIoPin do_P0_8_PCA943X_EN;				// PCA943X_EN -- Pca9431 sleep
-	AlxIoPin di_P0_9_PCA943X_INT_IRQ1;			// PCA943X_I\N\T\
+	AlxIoPin do_P0_8_PCA943X_EN;				// JS: PCA943X_EN -- Pca9431 sleep
+	AlxIoPin di_P0_9_PCA943X_INT_IRQ1;			// JS: PCA943X_I\N\T\
 	//AlxIoPin ai_P0_9_ADC_CH4;					// JS: commented Mf needed this for adc
 	//P0_10	- Unused
 	AlxIoPin ao_P0_11_CRN_VCC;
@@ -116,7 +116,7 @@ typedef struct
 	//P0_20	- Unused
 	//P0_21	- Unused
 	AlxIoPin do_P0_22_LED204_GR;
-	//P0_22 DBG_UART_TX	-> ALX Trace Handle		//JS : commented Mf:used it for ALX Trace,		AlxIoPin do_P0_22_LED204_GR;
+	//P0_22 DBG_UART_TX	-> ALX Trace Handle		// JS: commented Mf:used it for ALX Trace,		AlxIoPin do_P0_22_LED204_GR;
 	AlxIoPin do_P0_23_LED203_GR;
 	AlxIoPin do_P0_24_LED202_GR_PWM1;
 	AlxIoPin do_P0_25_LED201_GR_PWM2;
@@ -135,15 +135,11 @@ typedef struct
 	AlxI2c alxI2c_I2C0;
 	AlxAdc alxAdc;
 	AlxPwm alxPwm;
-
 	AlxIoPinIrq alxIrqPin_IRQ1;
-
 	AlxPca9431 alxPca9431;
 
-	//-----------------------------------------------------------------------------
 	// Auralix HW NFC WLC LISTENER V3_5B C Library Objects
 	AlxHwNfcWlcListenerV3_5b_MainIoPin alxIoPin;
-	//-----------------------------------------------------------------------------
 
 	//--------
 	// Adc
@@ -162,9 +158,7 @@ typedef struct
 	float pwmDutyDefaultArr[2];
 	#endif
 
-	//-----------------------------------------------------------------------------
 	// Info
-	//-----------------------------------------------------------------------------
 	bool wasCtorCalled;
 } AlxHwNfcWlcListenerV3_5b_Main;
 
@@ -243,10 +237,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	(
 		&alxTrace,
 		0,
-		//22,						// JS: commented, Mf used it for UART_TX AlxTrace
-		4,
-		//USART0,					// JS: commented, Mf used it because had UART_TX AlxTrace on pin 22
-		USART1,
+		4,			//22,			// JS: commented, Mf used it for UART_TX AlxTrace
+		USART1,		//USART0,		// JS: commented, Mf used it because had UART_TX AlxTrace on pin 22
 		AlxGlobal_BaudRate_115200
 	);
 
@@ -319,8 +311,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 		I2C0,
 		&me->alxIoPin.do_P0_17_I2C0_SCL,
 		&me->alxIoPin.io_P0_16_I2C0_SDA,
-		//AlxI2c_Clk_McuLpc80x_BitRate_100kHz_I2cFuncClk_15MHz // JS: can be used for both crn120 and Pca9431
-		AlxI2c_Clk_McuLpc80x_BitRate_400kHz_I2cFuncClk_15MHz // TV: Can be there 400kHz for PCA? JS:yes for Pca9431,  not tested yet for crn120
+		AlxI2c_Clk_McuLpc80x_BitRate_400kHz_I2cFuncClk_15MHz	//	AlxI2c_Clk_McuLpc80x_BitRate_100kHz_I2cFuncClk_15MHz	// TV: Can be there 400kHz for PCA? JS: yes for Pca9431,  not tested yet for crn120
 	);
 
 
