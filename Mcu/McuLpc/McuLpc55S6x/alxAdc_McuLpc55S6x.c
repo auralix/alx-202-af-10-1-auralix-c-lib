@@ -25,6 +25,8 @@
 //******************************************************************************
 static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch);
 static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me);
+static bool AlxAdc_Ctor_CheckCh(AlxAdc* me);
+lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch);
 
 
 //******************************************************************************
@@ -72,15 +74,18 @@ void AlxAdc_Ctor
 	// Check channel sequence
 	for (uint32_t i = 0; i < numOfIoPinsAndCh - 1; i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) < AlxAdc_GetCh(me, chArr[i + 1])); // Channel sequence must be from low to high number
 
+	// Check if right channel
+	ALX_ADC_ASSERT(AlxAdc_Ctor_CheckCh(me));
+
 	// Check clock
 	//ALX_ADC_ASSERT(AlxAdc_Ctor_IsSysClkOk(me));	// MF Assert je bil
 
-	// Variables	// MF: Everything is set to default (see "void LPADC_GetDefault___()" functions)
+	// Variables															// MF: Everything is set to default (see "void LPADC_GetDefault___()" functions) except "adcConfig.referenceVoltageSource" and "adcConvTrigConfig.targetCommandId"
 	me->adcConfig.enableInDozeMode = true;
-	me->adcConfig.conversionAverageMode = kLPADC_ConversionAverage128;	// kLPADC_ConversionAverage1;
-	me->adcConfig.enableAnalogPreliminary = true;	// false
+	me->adcConfig.conversionAverageMode = kLPADC_ConversionAverage1;
+	me->adcConfig.enableAnalogPreliminary = false;
 	me->adcConfig.powerUpDelay = 0x80;
-	me->adcConfig.referenceVoltageSource = kLPADC_ReferenceVoltageAlt2;	// kLPADC_ReferenceVoltageAlt1;
+	me->adcConfig.referenceVoltageSource = kLPADC_ReferenceVoltageAlt2;		// MF: Sets REFSEL beats to VREFH = voltage on VDDA pin in CFG Register
 	me->adcConfig.powerLevelMode = kLPADC_PowerLevelAlt1;
 	me->adcConfig.triggerPriorityPolicy = kLPADC_TriggerPriorityPreemptImmediately;
 	me->adcConfig.enableConvPause = false;
@@ -88,8 +93,8 @@ void AlxAdc_Ctor
 	me->adcConfig.FIFO0Watermark = 0U;
 	me->adcConfig.FIFO1Watermark = 0U;
 
-	me->adcConvCommConfig.sampleChannelMode = kLPADC_SampleChannelSingleEndSideA;
-	me->adcConvCommConfig.channelNumber = 0U;	// 0U -> MF: Tu bo vrjetno treba dat channel not
+	me->adcConvCommConfig.sampleChannelMode = kLPADC_SampleChannelSingleEndSideB;
+	me->adcConvCommConfig.channelNumber = 0U;								// MF: Channel is set before every trigger in "AlxAdc_GetVoltage_mV()"
 	me->adcConvCommConfig.chainedNextCommandNumber = 0U;
 	me->adcConvCommConfig.enableAutoChannelIncrement = false;
 	me->adcConvCommConfig.loopCount = 0U;
@@ -101,7 +106,7 @@ void AlxAdc_Ctor
 	me->adcConvCommConfig.conversionResolutionMode = kLPADC_ConversionResolutionStandard;
 	me->adcConvCommConfig.enableWaitTrigger = false;
 
-	me->adcConvTrigConfig.targetCommandId = 1U;	//0U;
+	me->adcConvTrigConfig.targetCommandId = 1U;								// MF: 0U is not valid, 1U means trigger will be executed on CMD1 (the one we will use) (see User Manual page 777 ans alxWiki)
 	me->adcConvTrigConfig.delayPower = 0U;
 	me->adcConvTrigConfig.priority = 0U;
 	me->adcConvTrigConfig.channelAFIFOSelect = 0U;
@@ -145,15 +150,11 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	LPADC_EnableOffsetCalibration(ADC0, true);
 	LPADC_DoAutoCalibration(ADC0);
 
-	// #6.1 Configure Ch for Coversion
-	for(uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++)							// MF: Loop through channels to add appropriate channelMask
-		me->adcConvCommConfig.channelNumber = AlxAdc_GetCh(me, me->chArr[i]);
+	// #6 Set conversion CMD configuration
+	LPADC_SetConvCommandConfig(ADC0, 1U, &me->adcConvCommConfig);	// MF: 1U means CMD1 is used
 
-	// #6.2 Set conversion CMD configuration
-	LPADC_SetConvCommandConfig(ADC0, 2U, &me->adcConvCommConfig);	// TODO - DEMO_LPADC_USER_CMDID nameso 1U
-
-	// #7 Set Trigger Config
-	LPADC_SetConvTriggerConfig(ADC0, 0U, &me->adcConvTrigConfig);	// TODO
+	// #7 Set Trigger TCTRL Config
+	LPADC_SetConvTriggerConfig(ADC0, 0U, &me->adcConvTrigConfig);	// MF: 0U means TCTRL0 is used
 
 	// #8 Set isInit
 	me->isInit = true;
@@ -220,11 +221,17 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Return Voltage
-	LPADC_DoSoftwareTrigger(ADC0, 1U);	// TODO - Instead of 1U more bit prava zadeva
-	while (!LPADC_GetConvResult(ADC0, &me->adcConvResult, 0U)) {}
-	return (((me->adcConvResult.convValue * me->vRef_mV) / 4095) >> 3U);
+	// #1 Set Channel
+	me->adcConvCommConfig.sampleChannelMode = AlxAdc_SetSampleChannelMode(me, ch);
+	me->adcConvCommConfig.channelNumber = AlxAdc_GetCh(me, ch);
+	LPADC_SetConvCommandConfig(ADC0, 1U, &me->adcConvCommConfig);			// MF: 1U means CMD1 is used
 
+	// #2 Return Voltage
+	LPADC_DoSoftwareTrigger(ADC0, 1U);										// MF: It always has to be 1 I don't understand why
+	while (!LPADC_GetConvResult(ADC0, &me->adcConvResult, 0U)) {}			// MF: 0U is for FIFO A and it is used for "Single ended" comvertion mode that we are using
+	return (((me->adcConvResult.convValue * me->vRef_mV) / 4095) >> 3U);	// MF: I dont understand why shiffting is needed (I copied it from example)
+
+	// Assert
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
 	#endif
@@ -233,6 +240,7 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
 	// MF: Lpc55S6x doesn't support internal TempSens_GetTemp
 
+	// Assert
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
 }
@@ -270,6 +278,45 @@ static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me)
 	else
 		return false;
 
+	ALX_ADC_ASSERT(false); // We shouldn't get here
+	return ALX_NULL;
+}
+static bool AlxAdc_Ctor_CheckCh(AlxAdc* me)
+{
+	// #1 Check IoPins
+	for (uint32_t i = 0; i < me->numOfIoPinsAndCh; i++)
+	{
+		if (!(	(me->chArr[i] == Alx_Ch_0)  ||
+				(me->chArr[i] == Alx_Ch_1)  ||
+				(me->chArr[i] == Alx_Ch_2)  ||
+				(me->chArr[i] == Alx_Ch_3)  ||
+				(me->chArr[i] == Alx_Ch_4)  ||
+				(me->chArr[i] == Alx_Ch_8)  ||
+				(me->chArr[i] == Alx_Ch_9)  ||
+				(me->chArr[i] == Alx_Ch_10) ||
+				(me->chArr[i] == Alx_Ch_11) ||
+				(me->chArr[i] == Alx_Ch_12) ))	{ return false; }
+	}
+
+	// #2 Return
+	return true;
+}
+
+lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch)
+{
+	// #1 Check if channels mode A
+	if ((ch == Alx_Ch_0) || (ch == Alx_Ch_1) || (ch == Alx_Ch_2) || (ch == Alx_Ch_3) || (ch == Alx_Ch_4))
+	{
+		return kLPADC_SampleChannelSingleEndSideA;
+	}
+
+	// #2 Check if channels mode B
+	if ((ch == Alx_Ch_8) || (ch == Alx_Ch_9) || (ch == Alx_Ch_10) || (ch == Alx_Ch_11) || (ch == Alx_Ch_12))
+	{
+		return kLPADC_SampleChannelSingleEndSideB;
+	}
+
+	// Assert
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
 }
