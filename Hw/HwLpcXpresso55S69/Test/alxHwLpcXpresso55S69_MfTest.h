@@ -94,13 +94,13 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(AlxHwLpc
 	while (1)
 	{
 		#if defined ALX_OPTIMIZE_SIZE_ALL
-		//AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", AlxAdc_GetVoltage_mV(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[0]));
-		AlxTrace_WriteFormat(&alxTrace, "Ch8, P2 = %d\r\n", AlxAdc_GetVoltage_mV(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[0]));
+		AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", AlxAdc_GetVoltage_mV(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[0]));
+		AlxTrace_WriteFormat(&alxTrace, "Ch8, P2 = %d\r\n", AlxAdc_GetVoltage_mV(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[1]));
 		#else
 		//AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", AlxAdc_GetVoltage_V(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[0]));
 		#endif
 
-		AlxDelay_ms(1000);
+		AlxDelay_ms(1200);
 	}
 }
 static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)

@@ -107,7 +107,7 @@ typedef struct
 	//PIO0_12	- SWD_IO
 	//PIO0_13	- combo I2C / MFIO
 	//PIO0_14	- combo I2C / MFIO
-	AlxIoPin ai_P0_15_ADC_CH2;
+	AlxIoPin ai_P0_16_ADC_CH2;
 	//PIO0_16	- Unused
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
@@ -177,8 +177,8 @@ typedef struct
 	//--------
 	// Adc
 	//--------
-	AlxIoPin* adcIoPinArr[1];
-	Alx_Ch adcChArr[1];
+	AlxIoPin* adcIoPinArr[2];
+	Alx_Ch adcChArr[2];
 
 	//--------
 	// Pwm
@@ -220,7 +220,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO0_12	- SWD_IO
 	//PIO0_13	- combo I2C / MFIO
 	//PIO0_14	- combo I2C / MFIO
-	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_15_ADC_CH2,		0,	15,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH2,		0,	16,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO0_16	- Unused
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
@@ -301,10 +301,9 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	// ALX - Adc
 	//------------------------------------------------------------------------------
 	me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_23_ADC_CH0;
-	//me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_15_ADC_CH2;
+	me->adcIoPinArr[1] = &me->alxIoPin.ai_P0_16_ADC_CH2;
 	me->adcChArr[0] = Alx_Ch_0;
-	//me->adcChArr[0] = Alx_Ch_2;
-	#if defined ALX_OPTIMIZE_SIZE_ALL
+	me->adcChArr[1] = Alx_Ch_8;
 	AlxAdc_Ctor
 	(
 		&me->alxAdc,
@@ -312,19 +311,13 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		me->adcChArr,
 		ALX_ARR_LEN(me->adcIoPinArr),
 		&alxClk,
+		#if defined ALX_OPTIMIZE_SIZE_ALL
 		3300U
-	);
-	#else
-	AlxAdc_Ctor
-	(
-		&me->alxAdc,
-		me->adcIoPinArr,
-		me->adcChArr,
-		ALX_ARR_LEN(me->adcIoPinArr),
-		&alxClk,
+		#else
 		3.3f
+		#endif
 	);
-	#endif
+
 
 	//------------------------------------------------------------------------------
 	// ALX - PWM
