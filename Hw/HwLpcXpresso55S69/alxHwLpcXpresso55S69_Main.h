@@ -107,7 +107,7 @@ typedef struct
 	//PIO0_12	- SWD_IO
 	//PIO0_13	- combo I2C / MFIO
 	//PIO0_14	- combo I2C / MFIO
-	AlxIoPin ai_P0_16_ADC_CH2;
+	AlxIoPin ai_P0_16_ADC_CH8;
 	//PIO0_16	- Unused
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
@@ -138,7 +138,7 @@ typedef struct
 	AlxIoPin do_P1_6_UsrLED_RD;
 	AlxIoPin do_P1_7_PWM2;	// Mf: AlxIoPin do_P1_7_UsrLED_GR;
 	//PIO1_8	- Unused
-	AlxIoPin do_P1_9_GPIO;
+	AlxIoPin ai_P1_9_ADC_CH12;//AlxIoPin do_P1_9_GPIO;
 	//PIO1_10	- Unused
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
@@ -220,7 +220,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO0_12	- SWD_IO
 	//PIO0_13	- combo I2C / MFIO
 	//PIO0_14	- combo I2C / MFIO
-	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH2,		0,	16,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH8,		0,	16,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO0_16	- Unused
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
@@ -248,7 +248,8 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UsrLED_RD,		1,	6,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_PWM2,			1,	7,	AlxIoPin_Func_3,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);	// MF: AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UsrLED_GR, 1, 6, AlxIoPin_Func_0_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//PIO1_8	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_9_GPIO,			1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
+	//AlxIoPin_Ctor(&me->alxIoPin.do_P1_9_GPIO,			1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P1_9_ADC_CH12,		1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO1_10	- Unused
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
@@ -301,7 +302,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	// ALX - Adc
 	//------------------------------------------------------------------------------
 	me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_23_ADC_CH0;
-	me->adcIoPinArr[1] = &me->alxIoPin.ai_P0_16_ADC_CH2;
+	me->adcIoPinArr[1] = &me->alxIoPin.ai_P0_16_ADC_CH8;
 	me->adcChArr[0] = Alx_Ch_0;
 	me->adcChArr[1] = Alx_Ch_8;
 	AlxAdc_Ctor
