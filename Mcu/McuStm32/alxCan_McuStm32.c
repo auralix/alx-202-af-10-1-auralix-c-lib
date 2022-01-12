@@ -250,6 +250,9 @@ Alx_Status AlxCan_Init(AlxCan* me)
 	if(HAL_FDCAN_ActivateNotification(&me->hcan, FDCAN_IT_TX_FIFO_EMPTY | FDCAN_IT_RX_FIFO0_NEW_MESSAGE, ALX_NULL) != HAL_OK) { ALX_CAN_TRACE("ErrIrq"); return Alx_Err; };
 	#endif
 
+	// #ifdefined above does not work for some reason. Moving this line out of it fixes the issue for G4
+	if(HAL_FDCAN_ActivateNotification(&me->hcan, FDCAN_IT_TX_FIFO_EMPTY | FDCAN_IT_RX_FIFO0_NEW_MESSAGE, ALX_NULL) != HAL_OK) { ALX_CAN_TRACE("ErrIrq"); return Alx_Err; };
+
 	// #6 Enable CAN TX & RX IRQ
 	AlxCan_Periph_EnableIrq(me);
 
