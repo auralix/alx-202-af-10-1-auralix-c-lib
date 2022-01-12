@@ -150,6 +150,25 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T05_I2c(AlxHwLpc
 		AlxDelay_ms(500);
 	}
 }
+	static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T06_Spi(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t srcBuff[64];
+	for (uint32_t i = 0; i < 64; i++)	{ srcBuff[i] = i; }	// MF: Fill buf with 0, 1, 2, ..., 63
+
+	// Init
+	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+
+	while (1)
+	{
+		if (AlxSpi_Master_Write(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuff, sizeof(srcBuff), 1, 1) != Alx_Ok)		{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+
+		AlxDelay_ms(500);
+	}
+}
 
 
 //******************************************************************************
@@ -179,9 +198,10 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Run(AlxHwLpcXpre
 {
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(me);
-	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(me);
+	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T05_I2c(me);
+	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T06_Spi(me);
 }
 
 

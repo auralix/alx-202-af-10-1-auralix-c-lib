@@ -111,9 +111,9 @@ typedef struct
 	//PIO0_16	- Unused
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
-	//PIO0_19	- Unused
-	//PIO0_20	- Unused
-	//PIO0_21	- Unused
+	AlxIoPin di_P0_19_SPI_MISO;
+	AlxIoPin do_P0_20_SPI_MOSI;
+	AlxIoPin do_P0_21_SPI_SCLK;
 	//PIO0_22	- Unused
 	AlxIoPin ai_P0_23_ADC_CH0;
 	//PIO0_24	- Unused
@@ -149,7 +149,7 @@ typedef struct
 	//PIO1_17	- Unused
 	AlxIoPin di_P1_18_WakeBtn_IRQ1;
 	//PIO1_19	- Unused
-	//PIO1_20	- Unused
+	AlxIoPin do_P1_20_SPI_nCS;
 	//PIO1_21	- Unused
 	//PIO1_22	- Unused
 	//PIO1_23	- Unused
@@ -170,6 +170,7 @@ typedef struct
 	AlxI2c alxI2c_I2C2_Master;
 	AlxAdc alxAdc;
 	AlxPwm alxPwm;
+	AlxSpi alxSpi;
 
 	// Auralix HW NUCLEO-F429ZI C Library Objects
 	AlxHwLpcXpresso55S69_MainIoPin alxIoPin;
@@ -224,9 +225,9 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO0_16	- Unused
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
-	//PIO0_19	- Unused
-	//PIO0_20	- Unused
-	//PIO0_21	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_19_SPI_MISO,		0,	19,	AlxIoPin_Func_7,		IOCON_MODE_PULLUP,	true,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_20_SPI_MOSI,		0,	20,	AlxIoPin_Func_7,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_21_SPI_SCLK,		0,	21,	AlxIoPin_Func_7,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	//PIO0_22	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_23_ADC_CH0,		0,	23,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO0_24	- Unused
@@ -261,7 +262,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxIoPin_Ctor(&me->alxIoPin.di_P1_18_WakeBtn_IRQ1,	1,	18,	AlxIoPin_Func_IRQ,		IOCON_MODE_INACT,	true,	false,	false,	false	);
 	//PIO1_19	- Unused
 	//PIO1_20	- Unused
-	//PIO1_21	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_20_SPI_nCS,		1,	20,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	//PIO1_22	- Unused
 	//PIO1_23	- Unused
 	//PIO1_24	- Unused
@@ -275,6 +276,30 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 
 
 	//------------------------------------------------------------------------------
+	// ALX - Clock
+	//------------------------------------------------------------------------------
+	AlxClk_Ctor
+	(
+		&alxClk,
+		AlxClk_Config_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz,
+		AlxClk_Tick_1ms
+	);
+
+
+	//------------------------------------------------------------------------------
+	// ALX - Trace
+	//------------------------------------------------------------------------------
+	AlxTrace_Ctor
+	(
+		&alxTrace,
+		0,
+		30,
+		USART0,
+		AlxGlobal_BaudRate_115200
+	);
+
+
+	//------------------------------------------------------------------------------
 	// ALX - IrqPin
 	//------------------------------------------------------------------------------
 	AlxIoPinIrq_Ctor
@@ -284,17 +309,6 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		kPINT_PinInt0,
 		kPINT_PinIntEnableFallEdge,
 		Alx_IrqPriority_0
-	);
-
-
-	//------------------------------------------------------------------------------
-	// ALX - Clock
-	//------------------------------------------------------------------------------
-	AlxClk_Ctor
-	(
-		&alxClk,
-		AlxClk_Config_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz,
-		AlxClk_Tick_1ms
 	);
 
 
@@ -349,15 +363,19 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 
 
 	//------------------------------------------------------------------------------
-	// ALX - Trace
+	// ALX - SPI
 	//------------------------------------------------------------------------------
-	AlxTrace_Ctor
+	AlxSpi_Ctor
 	(
-		&alxTrace,
-		0,
-		30,
-		USART0,
-		AlxGlobal_BaudRate_115200
+		&me->alxSpi,
+		SPI7,
+		&me->alxIoPin.do_P0_21_SPI_SCLK,
+		&me->alxIoPin.do_P0_20_SPI_MOSI,
+		&me->alxIoPin.di_P0_19_SPI_MISO,
+		&me->alxIoPin.do_P1_20_SPI_nCS,
+		AlxSpi_Mode_2,
+		&alxClk,
+		AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz		//MF: TODO
 	);
 
 
