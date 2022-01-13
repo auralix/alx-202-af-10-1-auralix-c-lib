@@ -186,6 +186,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Run(AlxHwNfcWlcLi
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_T05_I2c(me);
 }
 
+
 //******************************************************************************
 //******************************************************************************
 // G02_Pca9431
@@ -217,7 +218,6 @@ typedef struct
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-
 static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T01_ReadAndClearInterrupt(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
 {
 	while (1)
@@ -234,7 +234,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T02_LdoVout_GetVo
 		AlxDelay_ms(1000);
 	}
 }
-	static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T03_LdoVout_GetCurrent_A(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T03_LdoVout_GetCurrent_A(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
 {
 	while (1)
 	{
@@ -242,7 +242,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T02_LdoVout_GetVo
 		AlxDelay_ms(1000);
 	}
 }
-	static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T04_Rect_GetVoltage_V(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T04_Rect_GetVoltage_V(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
 {
 	while (1)
 	{
@@ -250,7 +250,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T02_LdoVout_GetVo
 		AlxDelay_ms(1000);
 	}
 }
-	static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T05_Rect_Current_A(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T05_Rect_Current_A(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
 {
 	while (1)
 	{
@@ -258,7 +258,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T02_LdoVout_GetVo
 		AlxDelay_ms(1000);
 	}
 }
-	static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T06_SensTemp_C(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T06_SensTemp_C(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
 {
 	while (1)
 	{
@@ -266,7 +266,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T02_LdoVout_GetVo
 		AlxDelay_ms(1000);
 	}
 }
-	static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T99_TestAll(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T99_TestAll(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
 {
 	while (1)
 	{
@@ -284,7 +284,6 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T02_LdoVout_GetVo
 //******************************************************************************
 // Constructor & Functions
 //******************************************************************************
-
 static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
 {
 	// Ctor
@@ -300,7 +299,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(AlxHwNfcWlcL
 	// Info
 	me->wasCtorCalled = true;
 }
-	static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Init(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Init(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
 {
 	// Init
 	AlxClk_Init(&alxClk);
@@ -315,7 +314,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(AlxHwNfcWlcL
 	// Info
 	me->isInit = true;
 }
-	static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Run(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Run(AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431* me)
 {
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T01_ReadAndClearInterrupt(me);
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T02_LdoVout_GetVoltage_V(me);
@@ -607,6 +606,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_T99_TestAllregases
 	}
 }
 
+
 //******************************************************************************
 // Constructor & Functions
 //******************************************************************************
@@ -618,7 +618,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Ctor(AlxHwNfcWlcLi
 	// Info
 	me->wasCtorCalled = true;
 }
-	static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Init(AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120* me)
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Init(AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120* me)
 {
 	// Init
 	AlxClk_Init(&alxClk);
@@ -628,7 +628,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Ctor(AlxHwNfcWlcLi
 	// Info
 	me->isInit = true;
 }
-	static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Run(AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120* me)
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Run(AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120* me)
 {
 	AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_T01_regasession0(me);			// JS: not worked yet
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_T02_regasession1(me);			// JS: not worked yet
@@ -638,6 +638,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Ctor(AlxHwNfcWlcLi
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_T06_regasession5(me);			// JS: not worked yet
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_T99_TestAllregasession(me);	// JS: not worked yet
 }
+
 
 #endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
 
