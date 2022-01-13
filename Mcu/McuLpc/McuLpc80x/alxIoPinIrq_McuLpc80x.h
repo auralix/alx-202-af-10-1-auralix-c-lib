@@ -1,14 +1,14 @@
 ﻿/**
   ******************************************************************************
-  * @file alxDbgPin_McuLpc80x.h
-  * @brief Auralix C Library - ALX Debug Pin Module
+  * @file alxIoPinIrq_McuLpc80x.h
+  * @brief Auralix C Library - ALX IO Pin Module
   * @version $LastChangedRevision: 4270 $
   * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
   ******************************************************************************
   */
 
-#ifndef ALX_DBG_PIN_MCU_LPC80x_H
-#define ALX_DBG_PIN_MCU_LPC80x_H
+#ifndef ALX_IO_PIN_IRQ_MCU_LPC80X_H
+#define ALX_IO_PIN_IRQ_MCU_LPC80X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,12 +20,13 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxIoPin.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -33,36 +34,32 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Parameters
-	uint8_t port;
-	uint8_t pin;
-	uint32_t mode;
+	// Objects - External
+	AlxIoPin* ioPin;
 
 	// Variables
-	gpio_pin_config_t gpioConfig;
+	pint_pin_int_t irqPin;
+	pint_pin_enable_t irqType;
+	Alx_IrqPriority irqPriority;
 
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-} AlxDbgPin;
-
-
-//******************************************************************************
-// Variables
-//******************************************************************************
-extern AlxDbgPin alxDbgPin;
+} AlxIoPinIrq;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxDbgPin_Ctor
+void AlxIoPinIrq_Ctor
 (
-	AlxDbgPin* me,
-	uint8_t port,
-	uint8_t pin,
-	uint32_t mode
+	AlxIoPinIrq* me,
+	AlxIoPin* ioPin,
+	pint_pin_int_t irqPin,
+	pint_pin_enable_t irqType,
+	Alx_IrqPriority irqPriority
 );
+
 
 #endif // Module Guard
 
@@ -70,4 +67,4 @@ void AlxDbgPin_Ctor
 }
 #endif
 
-#endif // ALX_DBG_PIN_MCU_LPC80x_H
+#endif // ALX_IO_PIN_IRQ_MCU_LPC80X_H

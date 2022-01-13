@@ -20,7 +20,6 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxDbgPin.h"
 
 // AlxMcu //
 #if defined(ALX_STM32F1) ||defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
@@ -32,7 +31,7 @@ extern "C" {
 #elif defined(ALX_LPC845)
 #include "alxIoPin_McuLpc84.h"
 
-#elif defined(ALX_LPC80x)
+#elif defined(ALX_LPC80X)
 #include "alxIoPin_McuLpc80x.h"
 
 #else
@@ -61,13 +60,6 @@ typedef struct { bool dummy; } AlxIoPin;
 	#define ALX_IO_PIN_TRACE(...) ALX_TRACE_STD(ALX_IO_PIN_FILE, __VA_ARGS__)
 #else
 	#define ALX_IO_PIN_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_IO_PIN_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_IO_PIN_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_IO_PIN_DBG_PIN(...) do{} while (false)
 #endif
 
 
