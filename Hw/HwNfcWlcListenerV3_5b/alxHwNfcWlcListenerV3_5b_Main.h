@@ -92,20 +92,21 @@ typedef struct
 	//------------------------------------------------------------------------------
 	// Port 0
 	//------------------------------------------------------------------------------
-	//P0_0	- Unused
+	AlxIoPin di_P0_0_UART_RX;
 	//P0_1	- Unused
 	//P0_2	- SWD_IO
 	//P0_3	- SWD_CLK
-	//P0_4	- Unused
+	//P0_4 DBG_UART_TX	-> ALX Trace Handle
 	//P0_5	- Unused
 	//P0_6	- Unused
-	//P0_7	- Unused
-	//P0_8	- Unused
-	AlxIoPin ai_P0_9_ADC_CH4;					// AlxIoPin PCA943X_nINT
+	AlxIoPin di_P0_7_CRN_FD_IRQ2;
+	AlxIoPin do_P0_8_PCA943X_EN;			// JS: PCA943X_EN -- Pca9431 sleep
+	AlxIoPin di_P0_9_PCA943X_INT_IRQ1;		// JS: PCA943X_I\N\T\
+	//AlxIoPin ai_P0_9_ADC_CH4;				// JS: commented Mf needed this for adc
 	//P0_10	- Unused
 	AlxIoPin ao_P0_11_CRN_VCC;
 	//P0_12	- Unused
-	//P0_13	- Unused
+	AlxIoPin di_P0_13_CRN_ED_IRQ3;
 	//P0_14	- Unused
 	//P0_15	- Unused
 	AlxIoPin io_P0_16_I2C0_SDA;
@@ -114,10 +115,11 @@ typedef struct
 	AlxIoPin do_P0_19_LED200_GR;
 	//P0_20	- Unused
 	//P0_21	- Unused
-	//P0_22 DBG_UART_TX	-> ALX Trace Handle		//AlxIoPin do_P0_22_LED204_GR;
-	AlxIoPin di_P0_23_IRQ1;						//AlxIoPin do_P0_23_LED203_GR;
-	AlxIoPin do_P0_24_PWM1;						//AlxIoPin do_P0_24_LED202_GR;
-	AlxIoPin do_P0_25_PWM2;						//AlxIoPin do_P0_25_LED201_GR;
+	AlxIoPin do_P0_22_LED204_GR;
+	//P0_22 DBG_UART_TX	-> ALX Trace Handle	// JS: commented Mf:used it for ALX Trace,		AlxIoPin do_P0_22_LED204_GR;
+	AlxIoPin do_P0_23_LED203_GR;
+	AlxIoPin do_P0_24_LED202_GR_PWM1;
+	AlxIoPin do_P0_25_LED201_GR_PWM2;
 	//P0_26	- Unused
 	//P0_27	- Unused
 	//P0_28	- Unused
@@ -128,10 +130,11 @@ typedef struct
 typedef struct
 {
 	// ALX Objects
-	AlxIoPinIrq alxIrqPin_IRQ1;
 	AlxI2c alxI2c_I2C0;
 	AlxAdc alxAdc;
 	AlxPwm alxPwm;
+	AlxIoPinIrq alxIrqPin_IRQ1;
+	AlxPca9431 alxPca9431;
 
 	// Auralix HW NFC WLC LISTENER V3_5B C Library Objects
 	AlxHwNfcWlcListenerV3_5b_MainIoPin alxIoPin;
@@ -166,32 +169,34 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//------------------------------------------------------------------------------
 	// ALX - IoPin
 	//------------------------------------------------------------------------------
-	//P0_0	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_0_UART_RX,			0,	0,	AlxIoPin_Func_Swm_USART1_RXD,	IOCON_MODE_INACT,	false,	true,	true	);	// JS: don't know if good and not tested
 	//P0_1	- Unused
 	//P0_2	- SWD_IO
 	//P0_3	- SWD_CLK
-	//P0_4	- Unused
+	//P0_4 DBG_UART_TX	-> ALX Trace Handle																											// JS: AlxIoPin_Ctor(&me->alxIoPin.do_P0_4_UART_TX, 0, 4, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//P0_5	- Unused
 	//P0_6	- Unused
-	//P0_7	- Unused
-	//P0_8	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,	0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_7_CRN_FD_IRQ2,		0,	7,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);	// JS: CRN_FD -- not tested
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_8_PCA943X_EN, 		0,	8,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,	false	);	// JS: PCA943X_EN -- Pca9431 sleep	-- not tested
+	//AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,			0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,	false,	false,	false	);	// JS: commented it,need this pin for  PCA943X_INT , Mf used it for Adc
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_9_PCA943X_INT_IRQ1,	0,	9,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);
 	//P0_10	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC,	0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	true	);
+	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC,			0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	true	);	// JS: not tested
 	//P0_12	- Unused
-	//P0_13	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_13_CRN_ED_IRQ3,		0,	13, AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);	// JS: CRN_ED not tested
 	//P0_14	- Unused
 	//P0_15	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.io_P0_16_I2C0_SDA,	0,	16,	AlxIoPin_Func_Swm_I2C0_SDA,		IOCON_MODE_INACT,	false,	false,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_17_I2C0_SCL,	0,	17,	AlxIoPin_Func_Swm_I2C0_SCL,		IOCON_MODE_INACT,	false,	false,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_18_LED205_RD,	0,	18,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_19_LED200_GR,	0,	19,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.io_P0_16_I2C0_SDA,			0,	16,	AlxIoPin_Func_Swm_I2C0_SDA,		IOCON_MODE_INACT,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_17_I2C0_SCL,			0,	17,	AlxIoPin_Func_Swm_I2C0_SCL,		IOCON_MODE_INACT,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_18_LED205_RD,			0,	18,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_19_LED200_GR,			0,	19,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
 	//P0_20	- Unused
 	//P0_21	- Unused
-	//P0_22 DBG_UART_TX	-> ALX Trace Handle																									//AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED204_GR, 0, 22, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.di_P0_23_IRQ1,		0,	23,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_23_LED203_GR, 0, 23, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_PWM1,		0,	24,	AlxIoPin_Func_Swm_T0_MAT_CHN1,	IOCON_MODE_INACT,	false,	false,	false	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_LED202_GR, 0, 24, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_PWM2,		0,	25,	AlxIoPin_Func_Swm_T0_MAT_CHN2,	IOCON_MODE_INACT,	false,	false,	false	);	//AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_LED201_GR, 0, 25, AlxIoPin_Func_GPIO, IOCON_MODE_PULLUP, false, true, false);
+	//P0_22 DBG_UART_TX	-> ALX Trace Handle																											// JS: Mf used it for UART_TX AlxTrace
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED204_GR, 		0,	22, AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_23_LED203_GR, 		0,	23, AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_LED202_GR_PWM1,	0,	24,	AlxIoPin_Func_Swm_T0_MAT_CHN1,	IOCON_MODE_INACT,	false,	false,	false	);	// JS: Mf used it for Pwm
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_LED201_GR_PWM2,	0,	25,	AlxIoPin_Func_Swm_T0_MAT_CHN2,	IOCON_MODE_INACT,	false,	false,	false	);	// JS: Mf used it for Pwm
 	//P0_26	- Unused
 	//P0_27	- Unused
 	//P0_28	- Unused
@@ -205,9 +210,9 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	AlxIoPinIrq_Ctor
 	(
 		&me->alxIrqPin_IRQ1,
-		&me->alxIoPin.di_P0_23_IRQ1,
-		kPINT_PinInt0,
-		kPINT_PinIntEnableRiseEdge,
+		&me->alxIoPin.di_P0_9_PCA943X_INT_IRQ1,
+		kPINT_PinInt1,
+		kPINT_PinIntEnableFallEdge,
 		Alx_IrqPriority_0
 	);
 
@@ -230,8 +235,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	(
 		&alxTrace,
 		0,
-		22,
-		USART0,
+		4,			//22,			// JS: commented, Mf used it for UART_TX AlxTrace
+		USART1,		//USART0,		// JS: commented, Mf used it because had UART_TX AlxTrace on pin 22
 		AlxGlobal_BaudRate_115200
 	);
 
@@ -239,36 +244,39 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//------------------------------------------------------------------------------
 	// ALX - ADC
 	//------------------------------------------------------------------------------
-	me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_9_ADC_CH4;
-	me->adcChArr[0] = Alx_Ch_4;
-	#if defined ALX_OPTIMIZE_SIZE_ALL
-	AlxAdc_Ctor
-	(
-		&me->alxAdc,
-		me->adcIoPinArr,
-		me->adcChArr,
-		ALX_ARR_LEN(me->adcIoPinArr),
-		&alxClk,
-		3300U
-	);
-	#else
-	AlxAdc_Ctor
-	(
-		&me->alxAdc,
-		me->adcIoPinArr,
-		me->adcChArr,
-		ALX_ARR_LEN(me->adcIoPinArr),
-		&alxClk,
-		3.3f
-	);
-	#endif
+
+	// JS: commented all , needed pin P0_9 for Pca943x_int
+
+	//me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_9_ADC_CH4;
+	//me->adcChArr[0] = Alx_Ch_4;
+	//#if defined ALX_OPTIMIZE_SIZE_ALL
+	//AlxAdc_Ctor
+	//(
+	//	&me->alxAdc,
+	//	me->adcIoPinArr,
+	//	me->adcChArr,
+	//	ALX_ARR_LEN(me->adcIoPinArr),
+	//	&alxClk,
+	//	3300U
+	//);
+	//#else
+	//AlxAdc_Ctor
+	//(
+	//	&me->alxAdc,
+	//	me->adcIoPinArr,
+	//	me->adcChArr,
+	//	ALX_ARR_LEN(me->adcIoPinArr),
+	//	&alxClk,
+	//	3.3f
+	//);
+	//#endif
 
 
 	//------------------------------------------------------------------------------
 	// ALX - PWM
 	//------------------------------------------------------------------------------
-	me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_PWM1;
-	me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_PWM2;
+	me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_LED202_GR_PWM1;
+	me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_LED201_GR_PWM2;
 	me->pwmChArr[0] = Alx_Ch_1;
 	me->pwmChArr[1] = Alx_Ch_2;
 	#if defined ALX_OPTIMIZE_SIZE_ALL
@@ -301,7 +309,22 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 		I2C0,
 		&me->alxIoPin.do_P0_17_I2C0_SCL,
 		&me->alxIoPin.io_P0_16_I2C0_SDA,
-		AlxI2c_Clk_McuLpc80x_BitRate_100kHz_I2cFuncClk_15MHz
+		AlxI2c_Clk_McuLpc80x_BitRate_400kHz_I2cFuncClk_15MHz	//	AlxI2c_Clk_McuLpc80x_BitRate_100kHz_I2cFuncClk_15MHz	// TV: Can be there 400kHz for PCA? JS: yes for Pca9431,  not tested yet for crn120
+	);
+
+
+	//------------------------------------------------------------------------------
+	// ALX - PCA9431
+	//------------------------------------------------------------------------------
+	AlxPca9431_Ctor
+	(
+		&me->alxPca9431,
+		&me->alxI2c_I2C0,
+		0b11100010,		// JS: I2C address
+		&me->alxIoPin.do_P0_8_PCA943X_EN,
+		true,			// JS: i2cCheckWithRead	-> TV: PCA needs to be tested with this enabled
+		3,				// JS: i2cNumOfTries	-> TV: PCA needs to be tested with this at 3 --> But don't need to unit test for now
+		1000			// JS: i2cTimeout_ms
 	);
 
 

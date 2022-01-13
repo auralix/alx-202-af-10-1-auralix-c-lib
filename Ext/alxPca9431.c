@@ -40,18 +40,14 @@ void AlxPca9431_Ctor
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	AlxIoPin* do_SleepEn,
-	AlxIoPin* di_Interrupt,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
 )
 {
-	// Parameters - Const
-
 	// Objects - External
 	me->i2c = i2c;
 	me->do_SleepEn = do_SleepEn;
-	me->di_Interrupt = di_Interrupt;
 
 	// Parameters
 	me->i2cAddr = i2cAddr;
@@ -83,13 +79,12 @@ Alx_Status AlxPca9431_Init(AlxPca9431* me)
 
 	// #1 Init GPIO
 	AlxIoPin_Init(me->do_SleepEn);
-	//AlxIoPin_Init(me->di_Interrupt);
 
 	// #2 Init I2C
 	status = AlxI2c_Init(me->i2c);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_Init"); return status; }
 
-//	// #3 Check if slave ready
+//	// #3 Check if slave ready		// JS: DIDN'T check & tested
 //	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 1, 1000);
 //	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
 
@@ -200,7 +195,6 @@ Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V) // 10 
 
 	// #2 TODO
 	Alx_Status status = AlxPca9431_Reg_Read(me, &me->reg._30h_VRECT_ADC_H);
-	//Alx_Status status = AlxPca9431_Reg_ReadMultiAdc(me, &me->reg._30_VRECT_ADC_H);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 	AdcHBitVoltage = me->reg._30h_VRECT_ADC_H.val.raw;
 	AdcBitVoltage = (uint16_t) AdcHBitVoltage;
@@ -268,56 +262,60 @@ Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC)
 	// #3 TODO
 	switch (BitTemp)
 	{
-	case 0:		*temp_degC = -43;	break;
-	case 1:		*temp_degC = -39;	break;
-	case 2:		*temp_degC = -35;	break;
-	case 3:		*temp_degC = -30;	break;
-	case 4:		*temp_degC = -26;	break;
-	case 5:		*temp_degC = -21;	break;
-	case 6:		*temp_degC = -17;	break;
-	case 7:		*temp_degC = -12.5;	break;
-	case 8:		*temp_degC = -8;	break;
-	case 9:		*temp_degC = -4;	break;
-	case 10:	*temp_degC = 0;		break;
-	case 11:	*temp_degC = 5;		break;
-	case 12:	*temp_degC = 9;		break;
-	case 13:	*temp_degC = 13.5;	break;
-	case 14:	*temp_degC = 18;	break;
-	case 15:	*temp_degC = 22.5;	break;
-	case 16:	*temp_degC = 27;	break;
-	case 17:	*temp_degC = 31;	break;
-	case 18:	*temp_degC = 35;	break;
-	case 19:	*temp_degC = 40;	break;
-	case 20:	*temp_degC = 44;	break;
-	case 21:	*temp_degC = 48;	break;
-	case 22:	*temp_degC = 53;	break;
-	case 23:	*temp_degC = 57;	break;
-	case 24:	*temp_degC = 62;	break;
-	case 25:	*temp_degC = 65.5;	break;
-	case 26:	*temp_degC = 71;	break;
-	case 27:	*temp_degC = 75;	break;
-	case 28:	*temp_degC = 79.5;	break;
-	case 29:	*temp_degC = 84;	break;
-	case 30:	*temp_degC = 88;	break;
-	case 31:	*temp_degC = 92;	break;
-	case 32:	*temp_degC = 96;	break;
-	case 33:	*temp_degC = 100.5;	break;
-	case 34:	*temp_degC = 105;	break;
-	case 35:	*temp_degC = 109;	break;
-	case 36:	*temp_degC = 114;	break;
-	case 37:	*temp_degC = 118;	break;
-	case 38:	*temp_degC = 122;	break;
-	case 39:	*temp_degC = 126;	break;
-	case 40:	*temp_degC = 130;	break;
-	case 41:	*temp_degC = 134.5;	break;
-	case 42:	*temp_degC = 138;	break;
-	case 43:	*temp_degC = 141;	break;
-	case 44:	*temp_degC = 145;	break;
-	case 45:	*temp_degC = 148;	break;
-	case 46:	*temp_degC = 152;	break;
-	case 47:	*temp_degC = 156;	break;
-	default:	*temp_degC = 9999.9; ALX_PCA9431_ASSERT(false); return Alx_Err;	break;
+		case 0:		*temp_degC = -43;		break;
+		case 1:		*temp_degC = -39;		break;
+		case 2:		*temp_degC = -35;		break;
+		case 3:		*temp_degC = -30;		break;
+		case 4:		*temp_degC = -26;		break;
+		case 5:		*temp_degC = -21;		break;
+		case 6:		*temp_degC = -17;		break;
+		case 7:		*temp_degC = -12.5;		break;
+		case 8:		*temp_degC = -8;		break;
+		case 9:		*temp_degC = -4;		break;
+		case 10:	*temp_degC = 0;			break;
+		case 11:	*temp_degC = 5;			break;
+		case 12:	*temp_degC = 9;			break;
+		case 13:	*temp_degC = 13.5;		break;
+		case 14:	*temp_degC = 18;		break;
+		case 15:	*temp_degC = 22.5;		break;
+		case 16:	*temp_degC = 27;		break;
+		case 17:	*temp_degC = 31;		break;
+		case 18:	*temp_degC = 35;		break;
+		case 19:	*temp_degC = 40;		break;
+		case 20:	*temp_degC = 44;		break;
+		case 21:	*temp_degC = 48;		break;
+		case 22:	*temp_degC = 53;		break;
+		case 23:	*temp_degC = 57;		break;
+		case 24:	*temp_degC = 62;		break;
+		case 25:	*temp_degC = 65.5;		break;
+		case 26:	*temp_degC = 71;		break;
+		case 27:	*temp_degC = 75;		break;
+		case 28:	*temp_degC = 79.5;		break;
+		case 29:	*temp_degC = 84;		break;
+		case 30:	*temp_degC = 88;		break;
+		case 31:	*temp_degC = 92;		break;
+		case 32:	*temp_degC = 96;		break;
+		case 33:	*temp_degC = 100.5;		break;
+		case 34:	*temp_degC = 105;		break;
+		case 35:	*temp_degC = 109;		break;
+		case 36:	*temp_degC = 114;		break;
+		case 37:	*temp_degC = 118;		break;
+		case 38:	*temp_degC = 122;		break;
+		case 39:	*temp_degC = 126;		break;
+		case 40:	*temp_degC = 130;		break;
+		case 41:	*temp_degC = 134.5;		break;
+		case 42:	*temp_degC = 138;		break;
+		case 43:	*temp_degC = 141;		break;
+		case 44:	*temp_degC = 145;		break;
+		case 45:	*temp_degC = 148;		break;
+		case 46:	*temp_degC = 152;		break;
+		case 47:	*temp_degC = 156;		break;
+		default:	*temp_degC = 9999.9;	ALX_PCA9431_ASSERT(false); return Alx_Err;	break;
 	}
+
+	// Assert
+	ALX_PCA9431_ASSERT(false); // We shouldn't get here
+	return Alx_Err;
 }
 Alx_Status AlxPca9431_VTune_SetVoltage_V(AlxPca9431* me, float* voltage_V) // 0-3.3V 5 bit DAC - TODO
 {

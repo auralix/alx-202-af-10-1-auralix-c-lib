@@ -603,7 +603,7 @@ typedef enum
 	OpcLdoNotLockReturnPresentReg0x12	= 0x12, /*	R/W		12h: Return present register	*/
 	OpcLdoNotLockReturnPresentReg0x13	= 0x13, /*	R/W		13h: Return present register	*/
 	OpcLdoNotLockReturnPresentReg0x14	= 0x14, /*	R/W		14h: Return present register	*/
-	OpcLdoLock = 0x15,							/*	R/W		00h: OCPSET_LOCK[4:0] = 10101, VOUTLDO_OCP register can be accessed to perform I2C “write” command. */
+	OpcLdoLock							= 0x15, /*	R/W		00h: OCPSET_LOCK[4:0] = 10101, VOUTLDO_OCP register can be accessed to perform I2C “write” command. */
 	OpcLdoNotLockReturnPresentReg0x16	= 0x16, /*	R/W		00h: Return present register	*/
 	OpcLdoNotLockReturnPresentReg0x17	= 0x17, /*	R/W		00h: Return present register	*/
 	OpcLdoNotLockReturnPresentReg0x18	= 0x18, /*	R/W		00h: Return present register	*/
@@ -620,7 +620,7 @@ typedef union
 	struct __attribute__((packed))
 	{
 		uint8_t unused_0_2 : 3; // bits 0...2 are unused
-		AlxPca9431_20h_OpcLdoSetLock OCPSET_LOCK : 5;	/* VOUT LDO over current protection setting:	*/
+		AlxPca9431_20h_OpcLdoSetLock OCPSET_LOCK : 5; // VOUT LDO over current protection setting:
 	};
 	uint8_t raw;
 } AlxPca9431_RegVal_20h_OpcLdoSetLock;
@@ -1223,7 +1223,6 @@ void AlxPca9431_Ctor
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	AlxIoPin* do_SleepEn,
-	AlxIoPin* di_Interrupt,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
