@@ -26,7 +26,7 @@ extern "C" {
 #if  defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 #include "alxI2c_McuStm32.h"
 
-#elif defined(ALX_LPC80x)
+#elif defined(ALX_LPC80X)
 #include "alxI2c_McuLpc80x.h"
 
 #else

@@ -105,8 +105,9 @@ typedef enum
 	PullConfig_PullDown = 0b11
 } AlxAdau1961_General_PullConfig;
 
-
-// R0: Clock Control //
+//------------------------------------------------------------------------------
+// R0: Clock Control
+//------------------------------------------------------------------------------
 typedef enum
 {
 	CoreClk_Disabled = 0,
@@ -136,7 +137,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R0_ClockControl;
 
-// R1: PLL Control //
+//------------------------------------------------------------------------------
+// R1: PLL Control
+//------------------------------------------------------------------------------
 typedef enum
 {
 	PllControl_X_1 = 0b00,
@@ -178,7 +181,9 @@ typedef union
 	uint8_t raw[6];
 } AlxAdau1961_RegVal_R1_PllControl;
 
-// R2: Digital Microphone/Jack Detection Control //
+//------------------------------------------------------------------------------
+// R2: Digital Microphone/Jack Detection Control
+//------------------------------------------------------------------------------
 typedef enum
 {
 	JackDetectPolarity_High = 0b0,
@@ -211,7 +216,9 @@ typedef union
 
 //AlxAdau1961_RegVal_R3_Reserved
 
-// R4: Record Mixer Left (Mixer 1) Control 0 //
+//------------------------------------------------------------------------------
+// R4: Record Mixer Left (Mixer 1) Control 0
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -224,7 +231,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R4_RecMixerLeft0;
 
-// R5: Record Mixer Left(Mixer 1) Control 1 //
+//------------------------------------------------------------------------------
+// R5: Record Mixer Left(Mixer 1) Control 1
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -236,7 +245,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R5_RecMixerLeft1;
 
-// R6: Record Mixer Right (Mixer 2) Control 0 //
+//------------------------------------------------------------------------------
+// R6: Record Mixer Right (Mixer 2) Control 0
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -249,7 +260,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R6_RecMixerRight0;
 
-// R7: Record Mixer Right (Mixer 2) Control 1 //
+//------------------------------------------------------------------------------
+// R7: Record Mixer Right (Mixer 2) Control 1
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -261,7 +274,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R7_RecMixerRight1;
 
-// R8: Left Differential Input Volume Control //
+//------------------------------------------------------------------------------
+// R8: Left Differential Input Volume Control
+//------------------------------------------------------------------------------
 typedef enum
 {
 	DiffPGAEnable_Disabled = 0b0,
@@ -282,7 +297,6 @@ typedef union
 	};
 	uint8_t raw;
 } AlxAdau1961_RegVal_R8_LeftDiffInputVol;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -294,7 +308,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R9_RightDiffInputVol;
 
-//R10: Record Microphone Bias Control //
+//------------------------------------------------------------------------------
+//R10: Record Microphone Bias Control
+//------------------------------------------------------------------------------
 typedef enum
 {
 	MicBiasOutputEnable_Disabled = 0b0,
@@ -323,7 +339,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R10_RecordMicBias;
 
-// R11: ALC Control 0 //
+//------------------------------------------------------------------------------
+// R11: ALC Control 0
+//------------------------------------------------------------------------------
 typedef enum
 {
 	ALCSelect_Off       = 0b000,
@@ -360,7 +378,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R11_Alc0;
 
-// R12: ALC Control 1 //
+//------------------------------------------------------------------------------
+// R12: ALC Control 1
+//------------------------------------------------------------------------------
 typedef enum
 {
 	ALCTarget_n28dB5 = 0b0000,
@@ -409,7 +429,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R12_Alc1;
 
-// R13: ALC Control 2 //
+//------------------------------------------------------------------------------
+// R13: ALC Control 2
+//------------------------------------------------------------------------------
 typedef enum
 {
 	ALCDecayTime_24ms     = 0b0000,
@@ -458,7 +480,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R13_Alc2;
 
-// R14: ALC Control 3 //
+//------------------------------------------------------------------------------
+// R14: ALC Control 3
+//------------------------------------------------------------------------------
 typedef enum
 {
 	NoiseGateEnable_Disabled = 0b0,
@@ -482,7 +506,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R14_Alc3;
 
-// R15: Serial Port Control 0 //
+//------------------------------------------------------------------------------
+// R15: Serial Port Control 0
+//------------------------------------------------------------------------------
 typedef enum
 {
 	PortMode_Slave  = 0b0,
@@ -528,7 +554,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R15_SerialPort0;
 
-// R16: Serial Port Control 1 //
+//------------------------------------------------------------------------------
+// R16: Serial Port Control 1
+//------------------------------------------------------------------------------
 typedef enum
 {
 	DataDelay_1  = 0b00,
@@ -572,7 +600,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R16_SerialPort1;
 
-// R17: Converter Control 0 //
+//------------------------------------------------------------------------------
+// R17: Converter Control 0
+//------------------------------------------------------------------------------
 typedef enum
 {
 	ConvSamplRate_fs         = 0b000,
@@ -613,7 +643,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R17_Converter0;
 
-// R18: Converter Control 1 //
+//------------------------------------------------------------------------------
+// R18: Converter Control 1
+//------------------------------------------------------------------------------
 typedef enum
 {
 	ADCSerialDataSelect_FirstPair  = 0b00,
@@ -631,7 +663,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R18_Converter1;
 
-// R19: ADC Control //
+//------------------------------------------------------------------------------
+// R19: ADC Control
+//------------------------------------------------------------------------------
 typedef enum
 {
 	ADCEnable_BothOff = 0b00,
@@ -679,7 +713,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R19_AdcControl;
 
-// R20: Left Input Digital Volume //
+//------------------------------------------------------------------------------
+// R20: Left Input Digital Volume
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -689,7 +725,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R20_LeftDigitalVol;
 
-// R21: Right Input Digital Volume //
+//------------------------------------------------------------------------------
+// R21: Right Input Digital Volume
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -699,7 +737,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R21_RightDigitalVol;
 
-// R22: Playback Mixer Left (Mixer 3) Control 0 //
+//------------------------------------------------------------------------------
+// R22: Playback Mixer Left (Mixer 3) Control 0
+//------------------------------------------------------------------------------
 typedef enum
 {
 	MixInputMute_Muted   = 0b0,
@@ -718,7 +758,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R22_PlayMixerLeft0;
 
-// R23: Playback Mixer Left (Mixer 3) Control 1 //
+//------------------------------------------------------------------------------
+// R23: Playback Mixer Left (Mixer 3) Control 1
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -729,7 +771,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R23_PlayMixerLeft1;
 
-// R24: Playback Mixer Right (Mixer 4) Control 0 //
+//------------------------------------------------------------------------------
+// R24: Playback Mixer Right (Mixer 4) Control 0
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -743,7 +787,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R24_PlayMixerRight0;
 
-// R25: Playback Mixer Right (Mixer 4) Control 1 //
+//------------------------------------------------------------------------------
+// R25: Playback Mixer Right (Mixer 4) Control 1
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -754,7 +800,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R25_PlayMixerRight1;
 
-// R26: Playback L/R Mixer Left (Mixer 5) Line Output Control //
+//------------------------------------------------------------------------------
+// R26: Playback L/R Mixer Left (Mixer 5) Line Output Control
+//------------------------------------------------------------------------------
 typedef enum
 {
 	MixerInputGainBoost_Mute = 0b00,
@@ -773,7 +821,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R26_PlayLrMixerLeft;
 
-// R27: Playback L/R Mixer Right (Mixer 6) Line Output Control //
+//------------------------------------------------------------------------------
+// R27: Playback L/R Mixer Right (Mixer 6) Line Output Control
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -786,7 +836,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R27_PlayLrMixerRight;
 
-// R28: Playback L/R Mixer Mono Output (Mixer 7) Control //
+//------------------------------------------------------------------------------
+// R28: Playback L/R Mixer Mono Output (Mixer 7) Control
+//------------------------------------------------------------------------------
 typedef enum
 {
 	PlaybackMixer7_CommonMode = 0b00,
@@ -804,7 +856,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R28_PlayLrMixerMono;
 
-// R29: Playback Headphone Left Volume Control //
+//------------------------------------------------------------------------------
+// R29: Playback Headphone Left Volume Control
+//------------------------------------------------------------------------------
 typedef enum
 {
 	HPEnable_Disabled = 0b0,
@@ -826,7 +880,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R29_PlayHpLeftVol;
 
-// R30: Playback Headphone Right Volume Control //
+//------------------------------------------------------------------------------
+// R30: Playback Headphone Right Volume Control
+//------------------------------------------------------------------------------
 typedef enum
 {
 	OutputMode_EnableLineOut = 0b0,
@@ -843,7 +899,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R30_PlayHpRightVol;
 
-// R31: Playback Line Output Left Volume Control //
+//------------------------------------------------------------------------------
+// R31: Playback Line Output Left Volume Control
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -855,7 +913,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R31_LineOutputLeftVol;
 
-// R32: Playback Line Output Right Volume Control //
+//------------------------------------------------------------------------------
+// R32: Playback Line Output Right Volume Control
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -867,7 +927,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R32_LineOutputRightVol;
 
-// R33: Playback Mono Output Control //
+//------------------------------------------------------------------------------
+// R33: Playback Mono Output Control
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -879,7 +941,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R33_PlayMonoOutput;
 
-// R34: Playback Pop/Click Suppression //
+//------------------------------------------------------------------------------
+// R34: Playback Pop/Click Suppression
+//------------------------------------------------------------------------------
 typedef enum
 {
 	AnalVolSlew_21ms25 = 0b00,
@@ -910,7 +974,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R34_PopClickSuppress;
 
-// R35: Playback Power Management //
+//------------------------------------------------------------------------------
+// R35: Playback Power Management
+//------------------------------------------------------------------------------
 typedef enum
 {
 	PlaybackChEnable_Disabled = 0b0,
@@ -927,7 +993,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R35_PlayPowerMgmt;
 
-// R36: DAC Control 0 //
+//------------------------------------------------------------------------------
+// R36: DAC Control 0
+//------------------------------------------------------------------------------
 typedef enum
 {
 	DACEnable_BothOff = 0b00,
@@ -965,7 +1033,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R36_DacControl0;
 
-// R37: DAC Control 1 //
+//------------------------------------------------------------------------------
+// R37: DAC Control 1
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -975,7 +1045,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R37_DacControl1;
 
-// R38: DAC Control 2 //
+//------------------------------------------------------------------------------
+// R38: DAC Control 2
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -985,7 +1057,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R38_DacControl2;
 
-// R39: Serial Port Pad Control //
+//------------------------------------------------------------------------------
+// R39: Serial Port Pad Control
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -998,7 +1072,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R39_SerialPortPad;
 
-// R40: Control Port Pad Control 0 //
+//------------------------------------------------------------------------------
+// R40: Control Port Pad Control 0
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -1011,7 +1087,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R40_ControlPortPad0;
 
-// R41: Control Port Pad Control 1 //
+//------------------------------------------------------------------------------
+// R41: Control Port Pad Control 1
+//------------------------------------------------------------------------------
 typedef enum
 {
 	PinDriveStrength_Low  = 0b0,
@@ -1027,7 +1105,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R41_ControlPortPad1;
 
-// R42: Jack Detect Pin Control //
+//------------------------------------------------------------------------------
+// R42: Jack Detect Pin Control
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -1041,7 +1121,9 @@ typedef union
 	uint8_t raw;
 } AlxAdau1961_RegVal_R42_JackDetectPin;
 
-// R67: Dejitter Control //
+//------------------------------------------------------------------------------
+// R67: Dejitter Control
+//------------------------------------------------------------------------------
 typedef enum						// MF: Check if this is good, or al 256 values are needed
 {
 	DejitWindowSize_0 = 0b00000000,
@@ -1492,6 +1574,23 @@ Alx_Status AlxAdau1961_OutLineL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// 
 Alx_Status AlxAdau1961_OutLineR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// Mute -> gain_dB = -120
 
 
+#ifdef __cplusplus
+}
+#endif
+
+#endif // ALX_ADAU1961_H
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1552,10 +1651,3 @@ Alx_Status AlxAdau1961_OutLineR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// 
 //Alx_Status AlxAdau1961_Ch_Out_SetVolume_pct		(AlxAdau1961* me, AlxAdau1961_Ch* ch, float* volume_pct);
 //Alx_Status AlxAdau1961_Ch_Mute					(AlxAdau1961* me, AlxAdau1961_Ch ch);
 //Alx_Status AlxAdau1961_Ch_UnMute				(AlxAdau1961* me, AlxAdau1961_Ch ch);
-
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // ALX_ADAU1961_H

@@ -115,11 +115,15 @@ extern "C" {
 #elif defined(ALX_LPC845)
 #include "alxGlobal_McuLpc84.h"
 
-#elif defined(ALX_LPC80x)
+#elif defined(ALX_LPC80X)
 #include "alxGlobal_McuLpc80x.h"
 
 #elif defined(ALX_PC)
 #include "alxGlobal_Pc.h"
+
+#elif defined(ALX_LPC55S6x)
+//#include "alxGlobal_McuLpc55S6x.h"	// TV: Create this file with this naming system
+#include "fsl_common.h"					// TV: Remove this, only temp file for init compilation
 
 #else
 #error "Please select platform for your application!"
@@ -282,7 +286,7 @@ typedef enum
 	AlxClk_Clk_McuStm32_MainPllInputClk_Ctor = 13,
 	#endif
 
-	#if defined(ALX_LPC8xx) || defined(ALX_LPC80x)
+	#if defined(ALX_LPC8XX) || defined(ALX_LPC80X)
 	AlxClk_Clk_McuLpc8xx_CoreSysClk = 14,
 	AlxClk_Clk_McuLpc8xx_MainClk = 15,
 	AlxClk_Clk_McuLpc8xx_Fro = 16,
@@ -294,6 +298,10 @@ typedef enum
 	AlxClk_Clk_McuLpc8xx_MainClk_Ctor = 21,
 	AlxClk_Clk_McuLpc8xx_Fro_Ctor = 22,
 	AlxClk_Clk_McuLpc8xx_LPO_Ctor = 23,
+	#endif
+
+	#if defined(ALX_LPC55S6x)
+	AlxClk_Clk_McuLpc55s6x_Dummy = 24,
 	#endif
 } AlxClk_Clk;
 
@@ -336,25 +344,8 @@ typedef enum
 //******************************************************************************
 // Functions
 //******************************************************************************
-ALX_INLINE static inline void AlxGlobal_DisableIrq(void)
-{
-	#if defined(ALX_MBED)
-	#else
-		#if defined(__GNUC__)
-		__disable_irq();
-		#endif
-	#endif
-}
-ALX_INLINE static inline void AlxGlobal_EnableIrq(void)
-{
-	#if defined(ALX_MBED)
-	#else
-		#if defined(__GNUC__)
-		__enable_irq();
-		#endif
-	#endif
-}
-
+void AlxGlobal_DisableIrq(void);
+void AlxGlobal_EnableIrq(void);
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
 Alx_Status AlxGlobal_BoundUint32(uint32_t* valPtr, uint32_t valMin, uint32_t valMax);
 Alx_Status AlxGlobal_BoundFloat(float* valPtr, float valMin, float valMax);

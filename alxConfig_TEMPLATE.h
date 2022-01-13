@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file alxConfig.h
-  * @brief ALX Project Specific File
+  * @brief Auralix Library - Configuration File
   * @version $LastChangedRevision: 4315 $
   * @date $LastChangedDate: 2021-03-10 20:00:32 +0100 (Wed, 10 Mar 2021) $
   ******************************************************************************
@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 //******************************************************************************
-// Config
+// Configuration
 //******************************************************************************
 
 // Language C //
@@ -50,9 +50,14 @@ extern "C" {
 //#define ALX_STM32G4_CMSIS_VER_REQUIRED 0x01010100 // 1.1.1.0
 //#define ALX_STM32G4_HAL_VER_REQUIRED 0x01010100 // 1.1.1.0
 
-#define ALX_STM32L0
-#define ALX_STM32L0_CMSIS_VER_REQUIRED 0x01010100 // 1.1.1.0
-#define ALX_STM32L0_HAL_VER_REQUIRED 0x01010100 // 1.1.1.0
+//#define ALX_STM32L0
+//#define ALX_STM32L0_CMSIS_VER_REQUIRED 0x01010100 // 1.1.1.0
+//#define ALX_STM32L0_HAL_VER_REQUIRED 0x01010100 // 1.1.1.0
+
+// Platform - LPC8XX //
+//#define ALX_LPC8XX
+//#define ALX_LPC84X
+//#define ALX_LPC80X
 
 // Assert //
 #define _ALX_ASSERT_BKPT_ALL
@@ -60,11 +65,19 @@ extern "C" {
 // Trace //
 #define _ALX_TRACE_ALL
 
+// Optimize //
+//#define ALX_OPTIMIZE_SIZE_ALL
+
 // Submodules //
-#define ALX_ADC_MCU
+//#define ALX_ADC_MCU
 //#define ALX_DAC_MCU
 //#define ALX_TEMP_SENS_MCU
-#define ALX_TEMP_SENS_RTD_VDIV
+//#define ALX_TEMP_SENS_RTD_VDIV
+
+// HW  //
+//#define ALX_HW_NUCLEO_F429ZI_C_TEST
+//#define ALX_HW_NUCLEO_F429ZI_CPP_TEST
+
 
 #ifdef __cplusplus
 }
