@@ -147,6 +147,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 	// #1 Prepare variables
 	status_t status = kStatus_Fail;
 	uint8_t _memAddr[2] = { (memAddr >> 8) & 0xFF, memAddr & 0xFF};		// MF: Ensures that memAddr bytes are in right order
+	if(memAddrLen == AlxI2c_Master_MemAddrLen_8bit) { _memAddr[0] =	memAddr & 0xFF;	}	// JS: Ensures that memAddr for 1 byte is correct
 	uint8_t _memAddrLen = AlxI2c_GetMemAddrLen(&memAddrLen);
 
 	// #2 Start Timeout
@@ -238,8 +239,9 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 	// #1 Prepare variables
 	status_t status = kStatus_Fail;
 	uint8_t _memAddr[2] = { (memAddr >> 8) & 0xFF, memAddr & 0xFF };	// MF: Ensures that memAddr bytes are in right order
+	if (memAddrLen == AlxI2c_Master_MemAddrLen_8bit) { _memAddr[0] = memAddr & 0xFF; }	// JS: Ensures that memAddr for 1 byte is correct
 	uint8_t _memAddrLen = AlxI2c_GetMemAddrLen(&memAddrLen);
-	uint8_t buff[ALX_I2C_BUFF_LEN] = {0};
+	uint8_t buff[ALX_I2C_BUFF_LEN] = { 0 };
 
 	// #2 Start Timeout
 	AlxTimSw_Start(&me->tim);
@@ -398,7 +400,8 @@ static status_t AlxI2c_MasterStart(AlxI2c* me, I2C_Type* base, uint8_t address, 
 	}
 
 	/* Write Address and RW bit to data register */
-	base->MSTDAT = ((uint32_t)address << 1) | ((uint32_t)direction & 1u);
+	//base->MSTDAT = (uint32_t)((uint32_t)address << 1) | ((uint32_t)direction & 1u); // JS: commented, it create wrong adress for pca9431 and crn120
+	base->MSTDAT = (uint32_t)address | ((uint32_t)direction & 1u); // JS: modify for Pca and Crn
 	/* Start the transfer */
 	base->MSTCTL = I2C_MSTCTL_MSTSTART_MASK;
 
@@ -510,40 +513,40 @@ static status_t AlxI2c_MasterReadBlocking(AlxI2c* me, I2C_Type* base, void* rxBu
 		master_state = (status & I2C_STAT_MSTSTATE_MASK) >> I2C_STAT_MSTSTATE_SHIFT;
 		switch (master_state)
 		{
-		case I2C_STAT_MSTCODE_RXREADY:
-			/* ready to receive next byte */
-			*(buf++) = (uint8_t)base->MSTDAT;
-			if (--rxSize != 0U)
-			{
-				base->MSTCTL = I2C_MSTCTL_MSTCONTINUE_MASK;
-			}
-			else
-			{
-				if ((flags & (uint32_t)kI2C_TransferNoStopFlag) == 0U)
+			case I2C_STAT_MSTCODE_RXREADY:
+				/* ready to receive next byte */
+				*(buf++) = (uint8_t)base->MSTDAT;
+				if (--rxSize != 0U)
 				{
-					/* initiate NAK and stop */
-					base->MSTCTL = I2C_MSTCTL_MSTSTOP_MASK;
-					status = AlxI2c_PendingStatusWait(me, base, timeout);
-
-					if (status == kStatus_I2C_Timeout)
+					base->MSTCTL = I2C_MSTCTL_MSTCONTINUE_MASK;
+				}
+				else
+				{
+					if ((flags & (uint32_t)kI2C_TransferNoStopFlag) == 0U)
 					{
-						ALX_I2C_TRACE("ErrTimeout");
-						return kStatus_I2C_Timeout;
+						/* initiate NAK and stop */
+						base->MSTCTL = I2C_MSTCTL_MSTSTOP_MASK;
+						status = AlxI2c_PendingStatusWait(me, base, timeout);
+
+						if (status == kStatus_I2C_Timeout)
+						{
+							ALX_I2C_TRACE("ErrTimeout");
+							return kStatus_I2C_Timeout;
+						}
 					}
 				}
-			}
-			break;
+				break;
 
-		case I2C_STAT_MSTCODE_NACKADR:
-		case I2C_STAT_MSTCODE_NACKDAT:
-			/* slave nacked the last byte */
-			err = kStatus_I2C_Nak;
-			break;
+			case I2C_STAT_MSTCODE_NACKADR:
+			case I2C_STAT_MSTCODE_NACKDAT:
+				/* slave nacked the last byte */
+				err = kStatus_I2C_Nak;
+				break;
 
-		default:
-			/* unexpected state */
-			err = kStatus_I2C_UnexpectedState;
-			break;
+			default:
+				/* unexpected state */
+				err = kStatus_I2C_UnexpectedState;
+				break;
 		}
 
 		if (err != kStatus_Success) { return err; }
