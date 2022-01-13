@@ -105,8 +105,8 @@ typedef struct
 	//PIO0_10	- Unused
 	//PIO0_11	- SWD_CLK
 	//PIO0_12	- SWD_IO
-	//PIO0_13	- combo I2C / MFIO
-	//PIO0_14	- combo I2C / MFIO
+	//PIO0_13	- Combo I2C / MFIO
+	//PIO0_14	- Combo I2C / MFIO
 	AlxIoPin ai_P0_16_ADC_CH8;
 	//PIO0_16	- Unused
 	//PIO0_17	- Unused
@@ -133,12 +133,12 @@ typedef struct
 	//PIO1_1	- Unused
 	//PIO1_2	- Unused
 	//PIO1_3	- Unused
-	AlxIoPin do_P1_4_PWM1;	// Mf: AlxIoPin do_P1_4_UsrLED_BL;
+	AlxIoPin do_P1_4_PWM1;		// MF: AlxIoPin do_P1_4_UsrLED_BL;
 	//PIO1_5	- Unused
 	AlxIoPin do_P1_6_UsrLED_RD;
-	AlxIoPin do_P1_7_PWM2;	// Mf: AlxIoPin do_P1_7_UsrLED_GR;
+	AlxIoPin do_P1_7_PWM2;		// MF: AlxIoPin do_P1_7_UsrLED_GR;
 	//PIO1_8	- Unused
-	AlxIoPin ai_P1_9_ADC_CH12;//AlxIoPin do_P1_9_GPIO;
+	AlxIoPin ai_P1_9_ADC_CH12;	// MF: AlxIoPin do_P1_9_GPIO;
 	//PIO1_10	- Unused
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
@@ -167,12 +167,11 @@ typedef struct
 {
 	// ALX Objects
 	AlxIoPinIrq alxIrqPin_IRQ1;
-	AlxI2c alxI2c_I2C2_Master;
 	AlxAdc alxAdc;
 	AlxPwm alxPwm;
 	AlxSpi alxSpi;
 
-	// Auralix HW NUCLEO-F429ZI C Library Objects
+	// Auralix HW LPC Xpresso 55S69 C Library Objects
 	AlxHwLpcXpresso55S69_MainIoPin alxIoPin;
 
 	//--------
@@ -219,8 +218,8 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO0_10	- Unused
 	//PIO0_11	- SWD_CLK
 	//PIO0_12	- SWD_IO
-	//PIO0_13	- combo I2C / MFIO
-	//PIO0_14	- combo I2C / MFIO
+	//PIO0_13	- Combo I2C / MFIO
+	//PIO0_14	- Combo I2C / MFIO
 	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH8,		0,	16,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO0_16	- Unused
 	//PIO0_17	- Unused

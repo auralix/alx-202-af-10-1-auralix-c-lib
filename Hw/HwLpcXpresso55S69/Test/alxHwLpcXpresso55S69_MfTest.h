@@ -41,6 +41,17 @@ typedef struct
 	// Objects
 	AlxHwLpcXpresso55S69_Main alxHwLpcXpresso55S69_Main;
 
+	// Variables
+	uint32_t ai_P0_23_ADC_CH0_voltage_mV;
+	uint32_t ai_P0_16_ADC_CH8_voltage_mV;
+	float ai_P0_23_ADC_CH0_voltage_V;
+	float ai_P0_16_ADC_CH8_voltage_V;
+
+	uint32_t do_P1_4_PWM1_duty_permil;
+	uint32_t do_P1_7_PWM2_duty_permil;
+	float do_P1_4_PWM1_duty_pct;
+	float do_P1_7_PWM2_duty_pct;
+
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
@@ -79,7 +90,6 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(AlxHwL
 	while (1)
 	{
 		ALX_TRACE_FORMAT("T02_Trace\r\n");
-
 		AlxDelay_ms(1000);
 	}
 }
@@ -150,7 +160,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T05_I2c(AlxHwLpc
 		AlxDelay_ms(500);
 	}
 }
-	static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T06_Spi(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T06_Spi(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
 {
 	// Assert
 	(void)me;
@@ -179,8 +189,20 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Ctor(AlxHwLpcXpr
 	// Ctor
 	AlxHwLpcXpresso55S69_Main_Ctor(&me->alxHwLpcXpresso55S69_Main);
 
+	// Variables
+	me->ai_P0_23_ADC_CH0_voltage_mV = 0ul;
+	me->ai_P0_16_ADC_CH8_voltage_mV = 0ul;
+	me->ai_P0_23_ADC_CH0_voltage_V = 0.f;
+	me->ai_P0_16_ADC_CH8_voltage_V = 0.f;
+
+	me->do_P1_4_PWM1_duty_permil = 0ul;
+	me->do_P1_7_PWM2_duty_permil = 0ul;
+	me->do_P1_4_PWM1_duty_pct = 0.f;
+	me->do_P1_7_PWM2_duty_pct = 0.f;
+
 	// Info
 	me->wasCtorCalled = true;
+	me->isInit = false;
 }
 static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
 {
@@ -189,7 +211,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(AlxHwLpcXpr
 	AlxTrace_Init(&alxTrace);
 
 	// IoPinIrq
-	AlxIoPinIrq_Init(&me->alxHwLpcXpresso55S69_Main.alxIrqPin_IRQ1);	// MF: IoPinIrq is always Inited
+	AlxIoPinIrq_Init(&me->alxHwLpcXpresso55S69_Main.alxIrqPin_IRQ1);	// MF: IoPinIrq is initialized for all tests
 
 	// Info
 	me->isInit = true;

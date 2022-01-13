@@ -8,12 +8,12 @@
     - When optimization disabled:
         - Ctor - VRef is in volts float
         - Function "uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);" triggers Assert and must not be used
-- The module is implemented for **Single ended A** mode conversiony only
+- The module is implemented for **Single ended** mode conversion only
     - If B mode channel is used, assert is triggered
 - Only one of the TCTRLa registers is actively controlling ADC conversions (User Manual page 776), that's why only TCTRL0 and CMD1 are used regardless of ACH channels used, otherwise it doesn't work.
     - Note that there is no CMD0, there are only CMD1-15, although in Fls indexes are from 0-14
-- Get_Voltage funtions are written only for using 12-bit single ended resolution, that's why shifting for 3U (User Manual page 782) is hardcoded
-- LPC55S6x uses one ADC channel for two Pins (pin pair), meaning PIO0_23 and PIO0_16 are both channel 0, PIO0_10 and PIO0_11 are both channel 1,... For program to work propperly, choose these AlxAdc Channels for following IoPins:
+- Get_Voltage functions are written only for using 12-bit single ended resolution, that's why shifting for 3U (User Manual page 782) is hardcoded
+- LPC55S6x uses one ADC channel for two Pins (pin pair), meaning PIO0_23 and PIO0_16 are both channel 0, PIO0_10 and PIO0_11 are both channel 1,... For program to work properly, choose these AlxAdc Channels for following IoPins:
     - __PIO0_23 = Alx_Ch_0__     // LPC55S6x Ch0 A
     - __PIO0_16 = Alx_Ch_8__     // LPC55S6x Ch0 B
     - __PIO0_10 = Alx_Ch_1__     // LPC55S6x Ch1 A
