@@ -238,8 +238,8 @@ Alx_Status AlxCan_Init(AlxCan* me)
 	#if defined(ALX_STM32G4)
 	if(HAL_FDCAN_Init(&me->hcan) != HAL_OK)																												{ ALX_CAN_TRACE("ErrInit"); return Alx_Err; };
 	if(HAL_FDCAN_ConfigFilter(&me->hcan, &me->fcan) != HAL_OK)																							{ ALX_CAN_TRACE("ErrFilter"); return Alx_Err; };
-	if(HAL_FDCAN_ConfigGlobalFilter(&me->hcan, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE) != HAL_OK)	{ ALX_CAN_TRACE("ErrGlobalFilter"); return Alx_Err; }
-	if(HAL_FDCAN_Start(&me->hcan) != HAL_OK)
+	if(HAL_FDCAN_ConfigGlobalFilter(&me->hcan, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE) != HAL_OK)	{ ALX_CAN_TRACE("ErrGlobalFilter"); return Alx_Err; };
+	if(HAL_FDCAN_Start(&me->hcan) != HAL_OK)																											{ ALX_CAN_TRACE("ErrHCan"); return Alx_Err; };
 	#endif
 
 	// #6 Enable CAN TX & RX IRQ
