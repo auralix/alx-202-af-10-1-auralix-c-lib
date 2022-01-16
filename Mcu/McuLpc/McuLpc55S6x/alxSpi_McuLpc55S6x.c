@@ -23,19 +23,14 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-/*static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me);
-static void AlxSpi_Ctor_ParseMode(AlxSpi* me);
-static Alx_Status AlxSpi_Reset(AlxSpi* me);
-static void AlxSpi_Periph_EnableClk(AlxSpi* me);
-static void AlxSpi_Periph_DisableClk(AlxSpi* me);
-static void AlxSpi_Periph_ForceReset(AlxSpi* me);
-static void AlxSpi_Periph_ReleaseReset(AlxSpi* me);*/
-
-//mf
+//static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me);
+static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries);
 static void AlxSpi_Ctor_ParseMode(AlxSpi* me);
 static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me);
-static void AlxSpi_Periph_ReleaseReset(AlxSpi* me);
+static Alx_Status AlxSpi_Reset(AlxSpi* me);
+static void AlxSpi_Periph_Reset(AlxSpi* me);
 static void AlxSpi_Periph_AttachClk(AlxSpi* me);
+static void AlxSpi_Periph_DisableClk(AlxSpi* me);
 
 //******************************************************************************
 // Constructor
@@ -49,6 +44,7 @@ void AlxSpi_Ctor
 	AlxIoPin* di_MISO,
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
+	spi_ssel_t nCSSel,
 	AlxClk* clk,
 	AlxSpi_Clk spiClk
 )
@@ -74,17 +70,18 @@ void AlxSpi_Ctor
 
 	// Parameters
 	me->mode = mode;
+	me->nCSSel = nCSSel;
 	me->spiClk = spiClk;
 
-	// Variables									// MF: Everything is set to default (see "void SPI_MasterGetDefaultConfig()" function) except "___"
+	// Variables									// MF: Everything is set to default (see "void SPI_MasterGetDefaultConfig()" function) except "me->spiMasterConfig.sselNum"
 	me->spiMasterConfig.enableLoopback				= false;
 	me->spiMasterConfig.enableMaster				= true;
-	me->spiMasterConfig.polarity					= kSPI_ClockPolarityActiveHigh; //todo
-	me->spiMasterConfig.phase						= kSPI_ClockPhaseFirstEdge;//todo
+	me->spiMasterConfig.polarity					= kSPI_ClockPolarityActiveHigh;		// MF: Is set up in "AlxSpi_Ctor_ParseMode()"
+	me->spiMasterConfig.phase						= kSPI_ClockPhaseFirstEdge;			// MF: Is set up in "AlxSpi_Ctor_ParseMode()"
 	me->spiMasterConfig.direction					= kSPI_MsbFirst;
 	me->spiMasterConfig.baudRate_Bps				= 500000U;
 	me->spiMasterConfig.dataWidth					= kSPI_Data8Bits;
-	me->spiMasterConfig.sselNum						= kSPI_Ssel1;	// MF: Default is kSPI_Ssel0 but it doesnt work
+	me->spiMasterConfig.sselNum						= nCSSel;
 	me->spiMasterConfig.sselPol						= kSPI_SpolActiveAllLow;
 	me->spiMasterConfig.txWatermark					= (uint8_t)kSPI_TxFifo0;
 	me->spiMasterConfig.rxWatermark					= (uint8_t)kSPI_RxFifo1;
@@ -94,6 +91,11 @@ void AlxSpi_Ctor
 	me->spiMasterConfig.delayConfig.transferDelay	= 0U;
 
 	AlxSpi_Ctor_ParseMode(me);
+
+	me->spiTransfer.txData = ALX_NULL_PTR;
+	me->spiTransfer.rxData = ALX_NULL_PTR;
+	me->spiTransfer.configFlags = kSPI_FrameAssert;
+	me->spiTransfer.dataSize = 0;
 
 	// Info
 	me->isInit = false;
@@ -117,17 +119,17 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 	AlxIoPin_Init(me->do_nCS);
 
 	// #2 Release SPI Periphery Reset
-	AlxSpi_Periph_ReleaseReset(me);
+	AlxSpi_Periph_Reset(me);
 
 	// #3 Enable SPI Periphery Clock
 	AlxSpi_Periph_AttachClk(me);
 
 	// #4 Init SPI
-	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	// MF: FlexComm Periph reset happens here
+	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	// MF: FlexComm "EnableClk"  and "Periph reset" happens here
 	{
 		ALX_SPI_TRACE("ErrInit");
 		return Alx_Err;
-	};
+	}
 
 	// #5 Set isInit
 	me->isInit = true;
@@ -144,22 +146,19 @@ Alx_Status AlxSpi_DeInit(AlxSpi* me)
 	// #1 DeInit SPI
 	SPI_Deinit(me->spi);
 
-	// #2 Force SPI Periphery Reset
-	//AlxSpi_Periph_ForceReset(me);
+	// #2 Disable SPI Periphery Clock
+	AlxSpi_Periph_DisableClk(me);
 
-	// #3 Disable SPI Periphery Clock
-	//AlxSpi_Periph_DisableClk(me);
-
-	// #4 DeInit GPIO
+	// #3 DeInit GPIO
 	AlxIoPin_DeInit(me->do_SCK);
 	AlxIoPin_DeInit(me->do_MOSI);
 	AlxIoPin_DeInit(me->di_MISO);
 	AlxIoPin_DeInit(me->do_nCS);
 
-	// #5 Reset isInit
+	// #4 Reset isInit
 	me->isInit = false;
 
-	// #6 Return OK
+	// #5 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
@@ -171,39 +170,20 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	(void)writeData;
 	ALX_SPI_ASSERT(0 < len);
 	ALX_SPI_ASSERT(0 < numOfTries);
-	ALX_SPI_ASSERT(0 < timeout_ms);
-
-
-	uint8_t destBuff[64];
-
-	me->spiTransfer.txData = destBuff;
-	me->spiTransfer.txData = writeData;
-	me->spiTransfer.dataSize = len;//sizeof(destBuff);
-	me->spiTransfer.configFlags = kSPI_FrameAssert;
-	if (SPI_MasterTransferBlocking(me->spi, &me->spiTransfer) != kStatus_Success)	{ return Alx_Err; }
+	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
 	// #1 Prepare variables
-	/*HAL_StatusTypeDef status = HAL_ERROR;
+	uint8_t dummy[len];
+	me->spiTransfer.txData = writeData;
+	me->spiTransfer.rxData = dummy;		// MF: We dont need received data
+	me->spiTransfer.dataSize = len;
+	Alx_Status status = Alx_Err;
 
 	// #2 Try SPI write/read
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
-	{
-
-		status = HAL_SPI_Transmit(&me->hspi, writeData, len, timeout_ms);
-		if (status == HAL_OK)
-		{
-			break; // SPI write/read OK
-		}
-		else
-		{
-			ALX_SPI_TRACE("ErrHal");
-			if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("ErrReset"); return Alx_Err;};
-			continue;
-		}
-	}
+	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
 	// #3 If we are here, SPI write/read was OK or number of tries error occured
-	if (status == HAL_OK)
+	if (status == kStatus_Success)
 	{
 		return Alx_Ok;
 	}
@@ -211,7 +191,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	{
 		ALX_SPI_TRACE("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
-	}*/
+	}
 }
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -222,30 +202,20 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	(void)readData;
 	ALX_SPI_ASSERT(0 < len);
 	ALX_SPI_ASSERT(0 < numOfTries);
-	ALX_SPI_ASSERT(0 < timeout_ms);
+	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
 	// #1 Prepare variables
-	/*HAL_StatusTypeDef status = HAL_ERROR;
+	uint8_t dummy[len];
+	me->spiTransfer.txData = dummy;		// MF: We dont need transmited data
+	me->spiTransfer.rxData = readData;
+	me->spiTransfer.dataSize = len;
+	Alx_Status status = Alx_Err;
 
 	// #2 Try SPI write/read
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
-	{
-
-		status = HAL_SPI_Receive(&me->hspi, readData, len, timeout_ms);
-		if (status == HAL_OK)
-		{
-			break; // SPI write/read OK
-		}
-		else
-		{
-			ALX_SPI_TRACE("ErrHal");
-			if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("ErrReset"); return Alx_Err;};
-			continue;
-		}
-	}
+	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
 	// #3 If we are here, SPI write/read was OK or number of tries error occured
-	if (status == HAL_OK)
+	if (status == kStatus_Success)
 	{
 		return Alx_Ok;
 	}
@@ -253,7 +223,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	{
 		ALX_SPI_TRACE("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
-	}*/
+	}
 }
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -265,30 +235,19 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	(void)readData;
 	ALX_SPI_ASSERT(0 < len);
 	ALX_SPI_ASSERT(0 < numOfTries);
-	ALX_SPI_ASSERT(0 < timeout_ms);
+	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
 	// #1 Prepare variables
-	/*HAL_StatusTypeDef status = HAL_ERROR;
+	me->spiTransfer.txData = writeData;
+	me->spiTransfer.rxData = readData;
+	me->spiTransfer.dataSize = len;
+	Alx_Status status = Alx_Err;
 
 	// #2 Try SPI write/read
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
-	{
-
-		status = HAL_SPI_TransmitReceive(&me->hspi, writeData, readData, len, timeout_ms);
-		if (status == HAL_OK)
-		{
-			break; // SPI write/read OK
-		}
-		else
-		{
-			ALX_SPI_TRACE("ErrHal");
-			if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("ErrReset"); return Alx_Err;};
-			continue;
-		}
-	}
+	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
 	// #3 If we are here, SPI write/read was OK or number of tries error occured
-	if (status == HAL_OK)
+	if (status == kStatus_Success)
 	{
 		return Alx_Ok;
 	}
@@ -296,7 +255,7 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	{
 		ALX_SPI_TRACE("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
-	}*/
+	}
 }
 void AlxSpi_Master_AssertCs(AlxSpi* me)
 {
@@ -313,98 +272,127 @@ void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 //******************************************************************************
 static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me)
 {
-	#if defined(Lpc55S6xF4)
-	if((me->hspi.Instance == SPI1) || (me->hspi.Instance == SPI4))
+#if defined(Lpc55S6xF4)
+	if ((me->hspi.Instance == SPI1) || (me->hspi.Instance == SPI4))
 	{
-		if
-		(
+		if (
 			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_5MHz625_Pclk2Apb2_90MHz) ||
-			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz)
-		)
+			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz))
 		{
-			if(90000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
+			if (90000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
 				return true;
 			else
 				return false;
 		}
 	}
-	if((me->hspi.Instance == SPI2) || (me->hspi.Instance == SPI3))
+	if ((me->hspi.Instance == SPI2) || (me->hspi.Instance == SPI3))
 	{
-		if
-		(
+		if (
 			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi2_Spi3_SpiClk_1MHz4_Pclk1Apb1_45MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi2_Spi3_SpiClk_5MHz625_Pclk1Apb1_45MHz) ||
-			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi2_Spi3_SpiClk_11MHz25_Pclk1Apb1_45MHz)
-		)
+			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi2_Spi3_SpiClk_11MHz25_Pclk1Apb1_45MHz))
 		{
-			if(45000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk1Apb1_Ctor))
+			if (45000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk1Apb1_Ctor))
 				return true;
 			else
 				return false;
 		}
 	}
-	#endif
-	#if defined(Lpc55S6xG4)
-	if(me->hspi.Instance == SPI1)
+#endif
+#if defined(Lpc55S6xG4)
+	if (me->hspi.Instance == SPI1)
 	{
-		if(me->spiClk == AlxSpi_Clk_McuLpc55S6xG4_Spi1_Spi4_SpiClk_1MHz33_Pclk2Apb2_170MHz)
+		if (me->spiClk == AlxSpi_Clk_McuLpc55S6xG4_Spi1_Spi4_SpiClk_1MHz33_Pclk2Apb2_170MHz)
 		{
-			if(170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
+			if (170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
 				return true;
 			else
 				return false;
 		}
 	}
-	#if !defined(Lpc55S6xG431xx)
-	if(me->hspi.Instance == SPI4)
+#if !defined(Lpc55S6xG431xx)
+	if (me->hspi.Instance == SPI4)
 	{
-		if(me->spiClk == AlxSpi_Clk_McuLpc55S6xG4_Spi1_Spi4_SpiClk_1MHz33_Pclk2Apb2_170MHz)
+		if (me->spiClk == AlxSpi_Clk_McuLpc55S6xG4_Spi1_Spi4_SpiClk_1MHz33_Pclk2Apb2_170MHz)
 		{
-			if(170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
+			if (170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
 				return true;
 			else
 				return false;
 		}
 	}
-	#endif
-	if((me->hspi.Instance == SPI2) || (me->hspi.Instance == SPI3))
+#endif
+	if ((me->hspi.Instance == SPI2) || (me->hspi.Instance == SPI3))
 	{
-		if(me->spiClk == AlxSpi_Clk_McuLpc55S6xG4_Spi2_Spi3_SpiClk_1MHz33_Pclk1Apb1_170MHz)
+		if (me->spiClk == AlxSpi_Clk_McuLpc55S6xG4_Spi2_Spi3_SpiClk_1MHz33_Pclk1Apb1_170MHz)
 		{
-			if(170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk1Apb1_Ctor))
+			if (170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk1Apb1_Ctor))
 				return true;
 			else
 				return false;
 		}
 	}
-	#endif
-	#if defined(Lpc55S6xL0)
-	if(me->hspi.Instance == SPI1)
+#endif
+#if defined(Lpc55S6xL0)
+	if (me->hspi.Instance == SPI1)
 	{
-		if(me->spiClk == AlxSpi_Clk_McuLpc55S6xL0_Spi1_SpiClk_1MHz_Pclk2Apb2_32MHz)
+		if (me->spiClk == AlxSpi_Clk_McuLpc55S6xL0_Spi1_SpiClk_1MHz_Pclk2Apb2_32MHz)
 		{
-			if(32000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
+			if (32000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
 				return true;
 			else
 				return false;
 		}
 	}
-	if(me->hspi.Instance == SPI2)
+	if (me->hspi.Instance == SPI2)
 	{
-		if(me->spiClk == AlxSpi_Clk_McuLpc55S6xL0_Spi2_SpiClk_1MHz_Pclk1Apb1_32MHz)
+		if (me->spiClk == AlxSpi_Clk_McuLpc55S6xL0_Spi2_SpiClk_1MHz_Pclk1Apb1_32MHz)
 		{
-			if(32000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk1Apb1_Ctor))
+			if (32000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk1Apb1_Ctor))
 				return true;
 			else
 				return false;
 		}
 	}
-	#endif
+#endif
 
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
 }
+static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
+{
+	// #1 Prepare variables
+	status_t status = kStatus_Fail;
+
+	// #2 Try SPI write/read
+	for (uint32_t _try = 1; _try <= numOfTries; _try++)
+	{
+		status = SPI_MasterTransferBlocking(me->spi, &me->spiTransfer);
+		if (status == kStatus_Success)
+		{
+			break; // SPI write OK
+		}
+		else
+		{
+			ALX_SPI_TRACE("ErrFls");
+			if (AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("ErrReset"); return Alx_Err;}
+			continue;
+		}
+	}
+
+	// #3 If we are here, SPI write/read was OK or number of tries error occured
+	if (status == kStatus_Success)
+	{
+		return Alx_Ok;
+	}
+	else
+	{
+		ALX_SPI_TRACE("ErrNumOfTries");
+		return Alx_ErrNumOfTries;
+	}
+}
+
 static void AlxSpi_Ctor_ParseMode(AlxSpi* me)
 {
 	// #1 Parse Mode
@@ -449,7 +437,31 @@ static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me)
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return 0xFFFFFFFF;
 }
-static void AlxSpi_Periph_ReleaseReset(AlxSpi* me)
+static Alx_Status AlxSpi_Reset(AlxSpi* me)
+{
+	// #1 DeInit SPI
+	SPI_Deinit(me->spi);
+
+	// #2 Reset isInit
+	me->isInit = false;
+
+	// #3 Release SPI Periphery Reset
+	AlxSpi_Periph_Reset(me);
+
+	// #4 Init SPI
+	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)
+	{
+		ALX_SPI_TRACE("ErrInit");
+		return Alx_Err;
+	}
+
+	// #5 Set isInit
+	me->isInit = true;
+
+	// #6 Return OK
+	return Alx_Ok;
+}
+static void AlxSpi_Periph_Reset(AlxSpi* me)
 {
 	// #1 Reset FlexComm
 	#if defined(SPI0)
@@ -513,121 +525,38 @@ static void AlxSpi_Periph_AttachClk(AlxSpi* me)
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return;
 }
-
-
-/*static Alx_Status AlxSpi_Reset(AlxSpi* me)
-{
-	// #1 DeInit SPI
-	if (HAL_SPI_DeInit(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("ErrDeInit"); return Alx_Err; }
-	
-	// #2 Force SPI Periphery Reset
-	AlxSpi_Periph_ForceReset(me);
-	
-	// #3 Reset isInit
-	me->isInit = false;
-	
-	// #4 Release SPI Periphery Reset
-	AlxSpi_Periph_ReleaseReset(me);
-	
-	// #5 Init SPI
-	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("ErrInit"); return Alx_Err; }
-	
-	// #6 Set isInit
-	me->isInit = true;
-	
-	// #7 Return OK
-	return Alx_Ok;
-}
-static void AlxSpi_Periph_EnableClk(AlxSpi* me)
-{
-	bool isErr = true;
-
-	#if defined(SPI1)
-	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_CLK_ENABLE(); isErr = false; }
-	#endif
-	#if defined(SPI2)
-	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_CLK_ENABLE(); isErr = false; }
-	#endif
-	#if defined(SPI3)
-	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_CLK_ENABLE(); isErr = false; }
-	#endif
-	#if defined(SPI4)
-	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_CLK_ENABLE(); isErr = false; }
-	#endif
-	#if defined(SPI5)
-	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_CLK_ENABLE(); isErr = false; }
-	#endif
-
-	if(isErr)						{ ALX_SPI_ASSERT(false); } // We shouldn't get here
-}
 static void AlxSpi_Periph_DisableClk(AlxSpi* me)
 {
-	bool isErr = true;
-
+	// #1 Disable FlexComm Clk
+	#if defined(SPI0)
+	if (me->spi == SPI0)	{ CLOCK_DisableClock(kCLOCK_FlexComm0); return; }
+	#endif
 	#if defined(SPI1)
-	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_CLK_DISABLE(); isErr = false; }
+	if (me->spi == SPI1)	{ CLOCK_DisableClock(kCLOCK_FlexComm1); return; }
 	#endif
 	#if defined(SPI2)
-	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_CLK_DISABLE(); isErr = false; }
+	if (me->spi == SPI2)	{ CLOCK_DisableClock(kCLOCK_FlexComm2); return; }
 	#endif
 	#if defined(SPI3)
-	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_CLK_DISABLE(); isErr = false; }
+	if (me->spi == SPI3)	{ CLOCK_DisableClock(kCLOCK_FlexComm3); return; }
 	#endif
 	#if defined(SPI4)
-	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_CLK_DISABLE(); isErr = false; }
+	if (me->spi == SPI4)	{ CLOCK_DisableClock(kCLOCK_FlexComm4); return; }
 	#endif
 	#if defined(SPI5)
-	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_CLK_DISABLE(); isErr = false; }
+	if (me->spi == SPI5)	{ CLOCK_DisableClock(kCLOCK_FlexComm5); return; }
+	#endif
+	#if defined(SPI6)
+	if (me->spi == SPI6)	{ CLOCK_DisableClock(kCLOCK_FlexComm6); return; }
+	#endif
+	#if defined(SPI7)
+	if (me->spi == SPI7)	{ CLOCK_DisableClock(kCLOCK_FlexComm7); return; }
 	#endif
 
-	if(isErr)						{ ALX_SPI_ASSERT(false); } // We shouldn't get here
+	//Assert
+	ALX_SPI_ASSERT(false); // We shouldn't get here
+	return;
 }
-static void AlxSpi_Periph_ForceReset(AlxSpi* me)
-{
-	bool isErr = true;
-
-	#if defined(SPI1)
-	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_FORCE_RESET(); isErr = false; }
-	#endif
-	#if defined(SPI2)
-	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_FORCE_RESET(); isErr = false; }
-	#endif
-	#if defined(SPI3)
-	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_FORCE_RESET(); isErr = false; }
-	#endif
-	#if defined(SPI4)
-	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_FORCE_RESET(); isErr = false; }
-	#endif
-	#if defined(SPI5)
-	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_FORCE_RESET(); isErr = false; }
-	#endif
-
-	if(isErr)						{ ALX_SPI_ASSERT(false); } // We shouldn't get here
-}
-static void AlxSpi_Periph_ReleaseReset(AlxSpi* me)
-{
-	bool isErr = true;
-
-	#if defined(SPI1)
-	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_RELEASE_RESET(); isErr = false; }
-	#endif
-	#if defined(SPI2)
-	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_RELEASE_RESET(); isErr = false; }
-	#endif
-	#if defined(SPI3)
-	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_RELEASE_RESET(); isErr = false; }
-	#endif
-	#if defined(SPI4)
-	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_RELEASE_RESET(); isErr = false; }
-	#endif
-	#if defined(SPI5)
-	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_RELEASE_RESET(); isErr = false; }
-	#endif
-
-	if(isErr)						{ ALX_SPI_ASSERT(false); } // We shouldn't get here
-}*/
-
-
 
 
 #endif

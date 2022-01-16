@@ -35,11 +35,8 @@ typedef enum
 {
 	AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default = 0,
 	AlxClk_Config_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz = 1,
-	/*AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_FroOsc_1MHz = 2,	// MF: To sn si kurblal nekaj - TODO
-	AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_ExtOsc_ = 3,
-	AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_Pll0 = 4,
-	AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_Pll1 = 5,
-	AlxClk_Config_McuLpc55S6x_SysClk_xxxHz_RtcOsc_32kHz = 6,*/
+	AlxClk_Config_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0 = 2,
+	AlxClk_Config_McuLpc55S6x_SysClk_150MHz_ExtOsc_xxMHz = 3	//TODO
 } AlxClk_Config;
 
 typedef struct

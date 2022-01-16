@@ -29,9 +29,11 @@ static bool AlxClk_AreClkNok(AlxClk* me);
 
 static void AlxClk_Ctor_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(AlxClk* me);
 static void AlxClk_Ctor_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz(AlxClk* me);
+static void AlxClk_Ctor_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me);
 
 static void AlxClk_Init_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(AlxClk* me);
 static void AlxClk_Init_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz(AlxClk* me);
+static void AlxClk_Init_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me);
 
 //******************************************************************************
 // Specific Functions
@@ -52,6 +54,8 @@ void AlxClk_Ctor
 
 	if		(me->config == AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default)		{ AlxClk_Ctor_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(me); }
 	else if (me->config == AlxClk_Config_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz)				{ AlxClk_Ctor_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz(me); }
+	else if (me->config == AlxClk_Config_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0)		{ AlxClk_Ctor_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0(me); }
+
 	//else if TODO
 	else																					{ ALX_CLK_ASSERT(false); return; }
 
@@ -74,11 +78,15 @@ Alx_Status AlxClk_Init(AlxClk* me)
 	// #3 Init Clocks
 	if		(me->config == AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default)		{ AlxClk_Init_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(me); }
 	else if (me->config == AlxClk_Config_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz)				{ AlxClk_Init_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz(me); }
+	else if (me->config == AlxClk_Config_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0)		{ AlxClk_Init_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0(me); }
 	//else if TODO
 	else																					{ ALX_CLK_ASSERT(false); return Alx_Err; }
 
+	// #5 Update SystemCoreClock
+	//SystemCoreClockUpdate();
+
 	// #4 Check Clocks
-	if (AlxClk_AreClkNok(me)) { ALX_CLK_TRACE("ErrCheck"); return Alx_Err; }
+	//if (AlxClk_AreClkNok(me)) { ALX_CLK_TRACE("ErrCheck"); return Alx_Err; }
 
 	// #5 Update SystemCoreClock
 	SystemCoreClockUpdate();
@@ -130,25 +138,14 @@ static void AlxClk_PeriphGpio_Reset()
 }
 static bool AlxClk_AreClkNok(AlxClk* me)
 {
-	me->coreSysClk = CLOCK_GetCoreSysClkFreq();
-	//me->mainClk = CLOCK_GetMainClkFreq();
-	//me->fro = CLOCK_GetFroFreq();
+	// #1 Get Clks
+	me->coreSysClk = CLOCK_GetFreq(kCLOCK_BusClk);		//MF: BusClk is "SysClk" because it is divided "MainClk"
+	me->mainClk = CLOCK_GetFreq(kCLOCK_CoreSysClk);		//MF: CoreSysClk is actually "MainClk" (svinjarijo)
 
+	// #2 Check Clks
 	if		(me->coreSysClk != me->coreSysClk_Ctor)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
-	//else if (me->mainClk != me->mainClk_Ctor)			{ ALX_CLK_TRACE("ErrMainClock");	return true; }
-	//else if (me->fro != me->fro)						{ ALX_CLK_TRACE("ErrFro");			return true; }
-
-	if (me->config == AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default)
-	{
-		if (CLOCK_GetCoreSysClkFreq() != 12000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
-	}
-	if (me->config == AlxClk_Config_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz)
-	{
-		if (CLOCK_GetCoreSysClkFreq() != 96000000U)		{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
-	}
-
-	// #4 Return
-	return false;
+	else if (me->mainClk != me->mainClk_Ctor)			{ ALX_CLK_TRACE("ErrMainClock");	return true; }
+	else												{ return false;}
 }
 
 static void AlxClk_Ctor_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(AlxClk* me)
@@ -159,22 +156,82 @@ static void AlxClk_Ctor_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(AlxClk* me
 }
 static void AlxClk_Ctor_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz(AlxClk* me)
 {
-	me->coreSysClk_Ctor = 96000000U;
+	me->coreSysClk_Ctor = 48000000U;
 	me->mainClk_Ctor	= 96000000U;
 	me->fro_Ctor		= 96000000U;
+}
+static void AlxClk_Ctor_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me)
+{
+	me->coreSysClk_Ctor = 75000000U;
+	me->mainClk_Ctor	= 150000000U;
+	me->fro_Ctor		= 12000000U;
 }
 
 static void AlxClk_Init_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default(AlxClk* me)
 {
-	POWER_DisablePD(kPDRUNCFG_PD_FRO192M);	// MF: Ensures FRO is on
+	// #2 Enable FRO
+	POWER_DisablePD(kPDRUNCFG_PD_FRO192M);
 
+	// #1 Select the Main Clk
 	CLOCK_AttachClk(kFRO12M_to_MAIN_CLK);
+
+	// #3 Divide Clk
+	CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1, true);	// MF: Divide mainClk with 1 do get SysClk the same as MainClk
 }
 static void AlxClk_Init_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz(AlxClk* me)
 {
-	POWER_DisablePD(kPDRUNCFG_PD_FRO192M);	// MF: Ensures FRO is on
+	// #1 Enable FRO
+	POWER_DisablePD(kPDRUNCFG_PD_FRO192M);
 
+	// #2 Select the Main Clk
 	CLOCK_AttachClk(kFRO_HF_to_MAIN_CLK);
+
+	// #3 Divide Clk
+	//CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1, true);	// MF: Fuka, ne dela 
+}
+static void AlxClk_Init_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me)
+{
+	// #1 Setup PLL
+	// #1.1 Prepare Variable
+	uint8_t pllN = 12U;
+	uint8_t pllP = 1U;
+	uint16_t pllM = 150U;
+
+	// SELP
+	uint8_t selp = ((pllM / 4U) + 1U);
+	if (selp >= 31U)	{ selp = 31U; }
+
+	// SELI
+	uint8_t seli = 0U;
+	if (pllM >= 8000U)						{ seli = 1U; }
+	if ((8000U > pllM) && (pllM >= 122U))	{ seli = 8000U / pllM; }
+	if (( 122U > pllM) && (pllM >= 1U))		{ seli = ((2U * (pllM / 4U)) + 3U); }
+
+	if (seli >= 63U)						{ seli = 63U; }
+
+	pll_setup_t pllSetup;
+	pllSetup.pllctrl = SYSCON_PLL1CTRL_CLKEN_MASK;// | SYSCON_PLL1CTRL_SELP(selp) | SYSCON_PLL1CTRL_SELI(seli);
+	pllSetup.pllndec = SYSCON_PLL1NDEC_NDIV(pllN);
+	pllSetup.pllpdec = SYSCON_PLL1PDEC_PDIV(pllP);
+	pllSetup.pllmdec = SYSCON_PLL1MDEC_MDIV(pllM);
+	//pllSetup.pllsscg[0] = 0;
+	//pllSetup.pllsscg[1] = 0;
+	pllSetup.pllRate = (((12000000 / pllN) * pllM) / 2 * pllP);//45646433u;//150000000U;
+	pllSetup.flags = PLL_SETUPFLAG_WAITLOCK;
+
+	// #1.2 Setup Freq
+	if (CLOCK_SetPLL1Freq(&pllSetup) != kStatus_PLL_Success) { ALX_CLK_TRACE("ErrSetUpPLL"); ALX_CLK_ASSERT(false); }	// MF: Enabling PLL happend here
+
+	// #2 Select the Pll Clk
+	CLOCK_AttachClk(kFRO12M_to_PLL1);
+
+	// #3 Select the Main Clk
+	CLOCK_AttachClk(kPLL1_to_MAIN_CLK);
+	
+	CLOCK_AttachClk(kMAIN_CLK_to_CLKOUT);
+
+	// #4 Divide Clk
+	//CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1, true);	// MF: Fuka, ne dela 
 }
 
 #endif // Module Guard
