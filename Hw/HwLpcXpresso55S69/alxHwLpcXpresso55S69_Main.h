@@ -107,8 +107,8 @@ typedef struct
 	//PIO0_12	- SWD_IO
 	//PIO0_13	- Combo I2C / MFIO
 	//PIO0_14	- Combo I2C / MFIO
+	//PIO0_15	- Unused
 	AlxIoPin ai_P0_16_ADC_CH8;
-	//PIO0_16	- Unused
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
 	AlxIoPin di_P0_19_SPI_MISO;
@@ -220,8 +220,13 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO0_12	- SWD_IO
 	//PIO0_13	- Combo I2C / MFIO
 	//PIO0_14	- Combo I2C / MFIO
-	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH8,		0,	16,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
-	//PIO0_16	- Unused
+	//PIO0_15	- Unused
+	
+	
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH8, 0, 16, AlxIoPin_Func_2, IOCON_MODE_INACT, true, false, false, false);
+	
+	
+	//AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH8,		0,	16,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.di_P0_19_SPI_MISO,		0,	19,	AlxIoPin_Func_7,		IOCON_MODE_PULLUP,	true,	false,	false,	false	);
@@ -280,7 +285,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxClk_Ctor
 	(
 		&alxClk,
-		AlxClk_Config_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz,
+		AlxClk_Config_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0,
 		AlxClk_Tick_1ms
 	);
 
@@ -373,6 +378,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		&me->alxIoPin.di_P0_19_SPI_MISO,
 		&me->alxIoPin.do_P1_20_SPI_nCS,
 		AlxSpi_Mode_2,
+		kSPI_Ssel1,		// MF: Doesn't work with kSPI_Ssel0 I don't know why
 		&alxClk,
 		AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz		//MF: TODO
 	);

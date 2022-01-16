@@ -73,6 +73,7 @@ typedef struct
 
 	// Parameters
 	AlxSpi_Mode mode;
+	spi_ssel_t nCSSel;
 	AlxSpi_Clk spiClk;
 
 	// Variables
@@ -97,6 +98,7 @@ void AlxSpi_Ctor
 	AlxIoPin* di_MISO,
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
+	spi_ssel_t nCSSel,
 	AlxClk* clk,
 	AlxSpi_Clk spiClk
 );

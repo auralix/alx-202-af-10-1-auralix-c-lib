@@ -71,6 +71,8 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(AlxHwLpc
 	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
+	
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.ai_P0_16_ADC_CH8);
 
 	while (1)
 	{
@@ -166,15 +168,18 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T06_Spi(AlxHwLpc
 	(void)me;
 
 	// Variables
-	uint8_t srcBuff[64];
-	for (uint32_t i = 0; i < 64; i++)	{ srcBuff[i] = i; }	// MF: Fill buf with 0, 1, 2, ..., 63
+	/*uint8_t srcBuff[64];
+	for (uint32_t i = 0; i < 64; i++)	{ srcBuff[i] = i; }	// MF: Fill buf with 0, 1, 2, ..., 63*/
+
+	uint8_t srcBuff[1];
+	srcBuff[0] = 0b10101010;
 
 	// Init
 	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi);
 
 	while (1)
 	{
-		if (AlxSpi_Master_Write(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuff, sizeof(srcBuff), 1, 1) != Alx_Ok)		{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		if (AlxSpi_Master_Write(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuff, sizeof(srcBuff), 1, 0) != Alx_Ok)		{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
 
 		AlxDelay_ms(500);
 	}
@@ -218,7 +223,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(AlxHwLpcXpr
 }
 static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
 {
-	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(me);
+	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(me);
 	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(me);
