@@ -42,26 +42,32 @@ typedef struct
 	AlxHwLpcXpresso55S69_Main alxHwLpcXpresso55S69_Main;
 
 	// Variables
+	#if defined ALX_OPTIMIZE_SIZE_ALL
 	uint32_t ai_P0_23_ADC_CH0_voltage_mV;
 	uint32_t ai_P0_16_ADC_CH8_voltage_mV;
+	#else
 	float ai_P0_23_ADC_CH0_voltage_V;
 	float ai_P0_16_ADC_CH8_voltage_V;
+	#endif
 
+	#if defined ALX_OPTIMIZE_SIZE_ALL
 	uint32_t do_P1_4_PWM1_duty_permil;
 	uint32_t do_P1_7_PWM2_duty_permil;
+	#else
 	float do_P1_4_PWM1_duty_pct;
 	float do_P1_7_PWM2_duty_pct;
+	#endif
 
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
-} AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp;
+} AlxHwLpcXpresso55S69_MfTest_G01_BringUp;
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
 	(void)me;
@@ -84,7 +90,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(AlxHwLpc
 		AlxDelay_ms(500);
 	}
 }
-static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
 	(void)me;
@@ -95,7 +101,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(AlxHwL
 		AlxDelay_ms(1000);
 	}
 }
-static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
 	(void)me;
@@ -106,17 +112,21 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(AlxHwLpc
 	while (1)
 	{
 		#if defined ALX_OPTIMIZE_SIZE_ALL
-		AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", AlxAdc_GetVoltage_mV(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[0]));
-		AlxTrace_WriteFormat(&alxTrace, "Ch8, P2 = %d\r\n", AlxAdc_GetVoltage_mV(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[1]));
+		me->ai_P0_23_ADC_CH0_voltage_mV = AlxAdc_GetVoltage_mV(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[0]);
+		me->ai_P0_16_ADC_CH8_voltage_mV = AlxAdc_GetVoltage_mV(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[1]);
+		AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", me->ai_P0_23_ADC_CH0_voltage_mV);
+		AlxTrace_WriteFormat(&alxTrace, "Ch8, P2 = %d\r\n", me->ai_P0_16_ADC_CH8_voltage_mV);
 		#else
-		AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", AlxAdc_GetVoltage_V(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[0]));
-		AlxTrace_WriteFormat(&alxTrace, "Ch8, P2 = %d\r\n", AlxAdc_GetVoltage_V(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[1]));
+		me->ai_P0_23_ADC_CH0_voltage_V = AlxAdc_GetVoltage_V(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[0]);
+		me->ai_P0_16_ADC_CH8_voltage_V = AlxAdc_GetVoltage_V(&me->alxHwLpcXpresso55S69_Main.alxAdc, me->alxHwLpcXpresso55S69_Main.adcChArr[1]);
+		AlxTrace_WriteFormat(&alxTrace, "Ch0, P1 = %d\r\n", me->ai_P0_23_ADC_CH0_voltage_V);
+		AlxTrace_WriteFormat(&alxTrace, "Ch8, P2 = %d\r\n", me->ai_P0_16_ADC_CH8_voltage_V);
 		#endif
 
 		AlxDelay_ms(1200);
 	}
 }
-static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
 	(void)me;
@@ -130,17 +140,17 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(AlxHwLpc
 	while (1)
 	{
 		#if defined ALX_OPTIMIZE_SIZE_ALL
-		AlxPwm_SetDuty_permil(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[0], 111);
-		AlxPwm_SetDuty_permil(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[1], 999);
+		AlxPwm_SetDuty_permil(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[0], me->do_P1_4_PWM1_duty_permil);
+		AlxPwm_SetDuty_permil(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[1], me->do_P1_7_PWM2_duty_permil);
 		#else
-		AlxPwm_SetDuty_pct(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[0], 11.11f);
-		AlxPwm_SetDuty_pct(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[1], 88.88f);
+		AlxPwm_SetDuty_pct(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[0], me->do_P1_4_PWM1_duty_pct);
+		AlxPwm_SetDuty_pct(&me->alxHwLpcXpresso55S69_Main.alxPwm, me->alxHwLpcXpresso55S69_Main.pwmChArr[1], me->do_P1_7_PWM2_duty_pct);
 		#endif
 
 		AlxDelay_ms(500);
 	}
 }
-static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T05_I2c(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_I2c(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
 	(void)me;
@@ -162,7 +172,7 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T05_I2c(AlxHwLpc
 		AlxDelay_ms(500);
 	}
 }
-static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T06_Spi(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Spi(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
 	(void)me;
@@ -189,27 +199,33 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T06_Spi(AlxHwLpc
 //******************************************************************************
 // Constructor & Functions
 //******************************************************************************
-static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Ctor(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Ctor(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Ctor
 	AlxHwLpcXpresso55S69_Main_Ctor(&me->alxHwLpcXpresso55S69_Main);
 
 	// Variables
+	#if defined ALX_OPTIMIZE_SIZE_ALL
 	me->ai_P0_23_ADC_CH0_voltage_mV = 0ul;
 	me->ai_P0_16_ADC_CH8_voltage_mV = 0ul;
+	#else
 	me->ai_P0_23_ADC_CH0_voltage_V = 0.f;
 	me->ai_P0_16_ADC_CH8_voltage_V = 0.f;
+	#endif
 
-	me->do_P1_4_PWM1_duty_permil = 0ul;
-	me->do_P1_7_PWM2_duty_permil = 0ul;
-	me->do_P1_4_PWM1_duty_pct = 0.f;
-	me->do_P1_7_PWM2_duty_pct = 0.f;
+	#if defined ALX_OPTIMIZE_SIZE_ALL
+	me->do_P1_4_PWM1_duty_permil = 111ul;
+	me->do_P1_7_PWM2_duty_permil = 999ul;
+	#else
+	me->do_P1_4_PWM1_duty_pct = 11.11f;
+	me->do_P1_7_PWM2_duty_pct = 88.88f;
+	#endif
 
 	// Info
 	me->wasCtorCalled = true;
 	me->isInit = false;
 }
-static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Init
 	AlxClk_Init(&alxClk);
@@ -221,14 +237,14 @@ static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(AlxHwLpcXpr
 	// Info
 	me->isInit = true;
 }
-static inline void AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
-	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T01_Led(me);
-	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T02_Trace(me);
-	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T03_Adc(me);
-	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T04_Pwm(me);
-	//AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T05_I2c(me);
-	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_T06_Spi(me);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_I2c(me);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Spi(me);
 }
 
 

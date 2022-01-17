@@ -138,7 +138,7 @@ typedef struct
 	AlxIoPin do_P1_6_UsrLED_RD;
 	AlxIoPin do_P1_7_PWM2;		// MF: AlxIoPin do_P1_7_UsrLED_GR;
 	//PIO1_8	- Unused
-	AlxIoPin ai_P1_9_ADC_CH12;	// MF: AlxIoPin do_P1_9_GPIO;
+	AlxIoPin do_P1_9_GPIO;
 	//PIO1_10	- Unused
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
@@ -253,8 +253,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_6_UsrLED_RD,		1,	6,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_PWM2,			1,	7,	AlxIoPin_Func_3,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);	// MF: AlxIoPin_Ctor(&me->alxIoPin.do_P1_7_UsrLED_GR, 1, 6, AlxIoPin_Func_0_GPIO, IOCON_MODE_PULLUP, false, true, false);
 	//PIO1_8	- Unused
-	//AlxIoPin_Ctor(&me->alxIoPin.do_P1_9_GPIO,			1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.ai_P1_9_ADC_CH12,		1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_9_GPIO,			1,	9,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	//PIO1_10	- Unused
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
@@ -285,7 +284,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxClk_Ctor
 	(
 		&alxClk,
-		AlxClk_Config_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0,
+		AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default,
 		AlxClk_Tick_1ms
 	);
 

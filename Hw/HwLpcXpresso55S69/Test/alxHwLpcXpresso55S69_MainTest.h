@@ -43,7 +43,7 @@ typedef struct
 	// Jk
 
 	// Mf
-	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp alxHwLpcXpresso55S69_Main_MfTest_G01_BringUp;
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp alxHwLpcXpresso55S69_MfTest_G01_BringUp;
 
 	// Tv
 
@@ -68,7 +68,7 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Ctor(AlxHwLpcXpresso55S69_MainT
 	// Jk
 
 	// Mf
-	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Ctor(&me->alxHwLpcXpresso55S69_Main_MfTest_G01_BringUp);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Ctor(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
 
 	// Tv
 }
@@ -81,7 +81,7 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Init(AlxHwLpcXpresso55S69_MainT
 	// Jk
 
 	// Mf
-	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Init(&me->alxHwLpcXpresso55S69_Main_MfTest_G01_BringUp);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
 
 	// Tv
 }
@@ -94,7 +94,7 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Run(AlxHwLpcXpresso55S69_MainTe
 	// Jk
 
 	// Mf
-	AlxHwLpcXpresso55S69_Main_MfTest_G01_BringUp_Run(&me->alxHwLpcXpresso55S69_Main_MfTest_G01_BringUp);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
 
 	// Tv
 }
