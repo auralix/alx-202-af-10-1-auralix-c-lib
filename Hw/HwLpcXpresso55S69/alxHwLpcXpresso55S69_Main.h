@@ -118,7 +118,7 @@ typedef struct
 	AlxIoPin ai_P0_23_ADC_CH0;
 	//PIO0_24	- Unused
 	//PIO0_25	- Unused
-	//PIO0_26	- Unused
+	AlxIoPin do_P0_26_CLKOUT;
 	//PIO0_27	- Unused
 	//PIO0_28	- Unused
 	//PIO0_29	- Unused
@@ -221,12 +221,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO0_13	- Combo I2C / MFIO
 	//PIO0_14	- Combo I2C / MFIO
 	//PIO0_15	- Unused
-	
-	
-	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH8, 0, 16, AlxIoPin_Func_2, IOCON_MODE_INACT, true, false, false, false);
-	
-	
-	//AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH8,		0,	16,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH8,		0,	16,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO0_17	- Unused
 	//PIO0_18	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.di_P0_19_SPI_MISO,		0,	19,	AlxIoPin_Func_7,		IOCON_MODE_PULLUP,	true,	false,	false,	false	);
@@ -236,7 +231,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_23_ADC_CH0,		0,	23,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO0_24	- Unused
 	//PIO0_25	- Unused
-	//PIO0_26	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_26_CLKOUT,		0,	26,	AlxIoPin_Func_2,		IOCON_MODE_INACT,	true,	false,	false,	false	);
 	//PIO0_27	- Unused
 	//PIO0_28	- Unused
 	//PIO0_29	- Unused
@@ -284,7 +279,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxClk_Ctor
 	(
 		&alxClk,
-		AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default,
+		AlxClk_Config_McuLpc55S6x_SysClk_150MHz_ExtOsc_16MHz,
 		AlxClk_Tick_1ms
 	);
 
