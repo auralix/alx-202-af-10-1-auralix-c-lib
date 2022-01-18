@@ -33,10 +33,10 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxClk_Config_McuLpc55S6x_SysClk_12MHz_FroOsc_12MHz_Default = 0,
+	AlxClk_Config_McuLpc55S6x_MainClk_12MHz_SysClk_12MHz_FroOsc_12MHz_Default = 0,	// MF: OK
 	AlxClk_Config_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz = 1,
 	AlxClk_Config_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0 = 2,
-	AlxClk_Config_McuLpc55S6x_SysClk_150MHz_ExtOsc_xxMHz = 3	//TODO
+	AlxClk_Config_McuLpc55S6x_SysClk_150MHz_ExtOsc_16MHz = 3						// MF: OK
 } AlxClk_Config;
 
 typedef struct
