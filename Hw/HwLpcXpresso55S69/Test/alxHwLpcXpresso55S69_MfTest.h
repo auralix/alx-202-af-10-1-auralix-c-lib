@@ -201,22 +201,22 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T07_Clk(AlxHwLpcXpres
 	// Init
 	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_26_CLKOUT);
 
-	if		(alxClk.config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_SysClk_12MHz_FroOsc_12MHz_Default)	// MF. Clock Out on P0_26 should be 1MHz
+	if		(alxClk.config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default)	// MF. Clock Out on P0_26 should be 1MHz
 	{
 		CLOCK_SetClkDiv(kCLOCK_DivClkOut, 12U, true);
 		CLOCK_AttachClk(kMAIN_CLK_to_CLKOUT);
 	}
-	else if (alxClk.config == AlxClk_Config_McuLpc55S6x_SysClk_96MHz_FroOsc_96MHz)	// MF. Clock Out on P0_26 should be 1MHz
+	else if (alxClk.config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz)	// MF. Clock Out on P0_26 should be 1MHz
 	{
 		CLOCK_SetClkDiv(kCLOCK_DivClkOut, 96U, true);
 		CLOCK_AttachClk(kMAIN_CLK_to_CLKOUT);
 	}
-	else if (alxClk.config == AlxClk_Config_McuLpc55S6x_SysClk_150MHz_FroOsc_12MHz_Pll0)	// MF. Clock Out on P0_26 should be 1MHz
+	else if (alxClk.config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0)	// MF. Clock Out on P0_26 should be 1MHz
 	{
 		CLOCK_SetClkDiv(kCLOCK_DivClkOut, 150U, true);
 		CLOCK_AttachClk(kMAIN_CLK_to_CLKOUT);
 	}
-	else if(alxClk.config == AlxClk_Config_McuLpc55S6x_SysClk_150MHz_ExtOsc_16MHz)	// MF. Clock Out on P0_26 should be 1MHz
+	else if (alxClk.config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz)	// MF. Clock Out on P0_26 should be 1MHz
 	{
 		CLOCK_SetClkDiv(kCLOCK_DivClkOut, 150U, true);
 		CLOCK_AttachClk(kMAIN_CLK_to_CLKOUT);
@@ -271,7 +271,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(AlxHwLpcXpresso5
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(me);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_I2c(me);

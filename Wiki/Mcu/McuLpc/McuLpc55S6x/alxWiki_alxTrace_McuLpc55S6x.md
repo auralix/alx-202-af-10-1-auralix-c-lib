@@ -2,6 +2,7 @@
 ---
 ## General
 - Every USART instance uses FLEXCOMM with the same address and ID meaning USART0 has the same address and ID as FLEXCOMM0, USART1 has the same address and ID as FLEXCOMM1,...
+- MainClk is used for FlexComm
 - __USART_Init()__ function handles everything for FlexComm perihp
 - BaudRate is configurable
 - Other hardcoded settings:
@@ -9,7 +10,7 @@
     - Parity: __None__
     - Stop Bits: __1__
     - Flow Control: __None__
-- Trace was tested only on __Port=0 Pin=30__ and __Port=1 Pin=11__ 
+- Trace was tested only on __Port=0 Pin=30__ and __Port=1 Pin=11__
 
 ---
 ## Ctor Arguments
