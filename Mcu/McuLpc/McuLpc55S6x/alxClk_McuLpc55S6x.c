@@ -38,8 +38,9 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(AlxC
 static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me);
 static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(AlxClk* me);
 
+
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxClk_Ctor
 (
@@ -65,6 +66,11 @@ void AlxClk_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 Alx_Status AlxClk_Init(AlxClk* me)
 {
 	// Assert
@@ -107,7 +113,21 @@ Alx_Status AlxClk_Init(AlxClk* me)
 }
 uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 {
-	// TODO
+	// Assert
+	ALX_CLK_ASSERT(me->wasCtorCalled == true);
+
+	if (me->isInit)
+	{
+		if (clk == AlxClk_Clk_McuLpc55s6x_CoreSysClk)		return me->coreSysClk;
+		if (clk == AlxClk_Clk_McuLpc55s6x_MainClk)			return me->mainClk;
+		if (clk == AlxClk_Clk_McuLpc55s6x_Fro)				return me->fro;
+	}
+
+	if (clk == AlxClk_Clk_McuLpc55s6x_CoreSysClk_Ctor)		return me->coreSysClk_Ctor;
+	if (clk == AlxClk_Clk_McuLpc55s6x_MainClk_Ctor)			return me->mainClk_Ctor;
+	if (clk == AlxClk_Clk_McuLpc55s6x_Fro_Ctor)				return me->fro_Ctor;
+
+	// Assert
 	ALX_CLK_ASSERT(false); // We shouldn't get here
 	return 0;
 }
@@ -115,6 +135,7 @@ void AlxClk_Irq_Handle(AlxClk* me)
 {
 	// TODO
 	ALX_CLK_ASSERT(false); // We shouldn't get here
+	return;
 }
 
 
@@ -140,6 +161,7 @@ static bool AlxClk_AreClkNok(AlxClk* me)
 	// #1 Get Clks
 	me->coreSysClk = CLOCK_GetFreq(kCLOCK_BusClk);	//MF: BusClk is "SysClk" because it is divided "MainClk"
 	me->mainClk = CLOCK_GetFreq(kCLOCK_CoreSysClk);	//MF: CoreSysClk is actually "MainClk" (svinjarijo)
+	me->fro = me->fro_Ctor;							// MF: Don't Know if we need it
 
 	// #2 Check Clks
 	if		(me->coreSysClk != me->coreSysClk_Ctor)	{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
@@ -160,11 +182,10 @@ static void AlxClk_SetupPll(AlxClk* me, pll_setup_t* pllSetup, uint32_t inputFre
 	uint8_t selp = ((pllM / 4U) + 1U);
 	if (selp >= 31U)						{ selp = 31U; }
 
-	// #2 Setup Pll Struct
+	// #2 Setup Pll Struct		// MF: pllM is set in "pllsscg[1]" below
 	pllSetup->pllctrl = (SYSCON_PLL0CTRL_CLKEN_MASK | SYSCON_PLL0CTRL_SELI(seli) | SYSCON_PLL0CTRL_SELP(selp));
 	pllSetup->pllndec = SYSCON_PLL0NDEC_NDIV(pllN);
 	pllSetup->pllpdec = SYSCON_PLL0PDEC_PDIV(pllP);
-	//pllSetup->pllmdec = pllM;		// MF: pllM is used in "pllsscg[1]" below
 	pllSetup->pllsscg[0] = 0x0U;
 	pllSetup->pllsscg[1] = (SYSCON_PLL0SSCG1_MDIV_EXT(pllM) | SYSCON_PLL0SSCG1_SEL_EXT_MASK);
 	pllSetup->pllRate = (((inputFreq / pllN) * pllM) / (2 * pllP));
@@ -274,5 +295,6 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(Al
 	// #5 Divide SysClk
 	CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, true);
 }
+
 
 #endif // Module Guard

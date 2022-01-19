@@ -23,14 +23,15 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-//static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me);
 static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries);
+static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me);
 static void AlxSpi_Ctor_ParseMode(AlxSpi* me);
 static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me);
 static Alx_Status AlxSpi_Reset(AlxSpi* me);
 static void AlxSpi_Periph_Reset(AlxSpi* me);
 static void AlxSpi_Periph_AttachClk(AlxSpi* me);
 static void AlxSpi_Periph_DisableClk(AlxSpi* me);
+
 
 //******************************************************************************
 // Constructor
@@ -57,6 +58,7 @@ void AlxSpi_Ctor
 	(void)di_MISO;
 	(void)do_nCS;
 	ALX_SPI_ASSERT((mode == AlxSpi_Mode_0) || (mode == AlxSpi_Mode_1) || (mode == AlxSpi_Mode_2) || (mode == AlxSpi_Mode_3));
+	ALX_SPI_ASSERT((nCSSel == kSPI_Ssel0) || (nCSSel == kSPI_Ssel1) || (nCSSel == kSPI_Ssel2) || (nCSSel == kSPI_Ssel3));
 	(void)clk;
 	//todo
 
@@ -73,13 +75,16 @@ void AlxSpi_Ctor
 	me->nCSSel = nCSSel;
 	me->spiClk = spiClk;
 
-	// Variables									// MF: Everything is set to default (see "void SPI_MasterGetDefaultConfig()" function) except "me->spiMasterConfig.sselNum"
+	// Variables
+	ALX_SPI_ASSERT(AlxSpi_Ctor_IsClkOk(me));
+
+	// MF: Everything is set to default (see "void SPI_MasterGetDefaultConfig()" function) except "me->spiMasterConfig.sselNum" and "me->spiMasterConfig.baudRate_Bps"
 	me->spiMasterConfig.enableLoopback				= false;
 	me->spiMasterConfig.enableMaster				= true;
-	me->spiMasterConfig.polarity					= kSPI_ClockPolarityActiveHigh;		// MF: Is set up in "AlxSpi_Ctor_ParseMode()"
-	me->spiMasterConfig.phase						= kSPI_ClockPhaseFirstEdge;			// MF: Is set up in "AlxSpi_Ctor_ParseMode()"
+	me->spiMasterConfig.polarity					= kSPI_ClockPolarityActiveHigh;		// MF: Is set in "AlxSpi_Ctor_ParseMode()"
+	me->spiMasterConfig.phase						= kSPI_ClockPhaseFirstEdge;			// MF: Is set in "AlxSpi_Ctor_ParseMode()"
 	me->spiMasterConfig.direction					= kSPI_MsbFirst;
-	me->spiMasterConfig.baudRate_Bps				= 500000U;
+	me->spiMasterConfig.baudRate_Bps				= (uint32_t)spiClk;
 	me->spiMasterConfig.dataWidth					= kSPI_Data8Bits;
 	me->spiMasterConfig.sselNum						= nCSSel;
 	me->spiMasterConfig.sselPol						= kSPI_SpolActiveAllLow;
@@ -104,7 +109,7 @@ void AlxSpi_Ctor
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 Alx_Status AlxSpi_Init(AlxSpi* me)
 {
@@ -270,96 +275,6 @@ void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me)
-{
-#if defined(Lpc55S6xF4)
-	if ((me->hspi.Instance == SPI1) || (me->hspi.Instance == SPI4))
-	{
-		if (
-			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz) ||
-			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_5MHz625_Pclk2Apb2_90MHz) ||
-			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz))
-		{
-			if (90000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
-				return true;
-			else
-				return false;
-		}
-	}
-	if ((me->hspi.Instance == SPI2) || (me->hspi.Instance == SPI3))
-	{
-		if (
-			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi2_Spi3_SpiClk_1MHz4_Pclk1Apb1_45MHz) ||
-			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi2_Spi3_SpiClk_5MHz625_Pclk1Apb1_45MHz) ||
-			(me->spiClk == AlxSpi_Clk_McuLpc55S6xF4_Spi2_Spi3_SpiClk_11MHz25_Pclk1Apb1_45MHz))
-		{
-			if (45000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk1Apb1_Ctor))
-				return true;
-			else
-				return false;
-		}
-	}
-#endif
-#if defined(Lpc55S6xG4)
-	if (me->hspi.Instance == SPI1)
-	{
-		if (me->spiClk == AlxSpi_Clk_McuLpc55S6xG4_Spi1_Spi4_SpiClk_1MHz33_Pclk2Apb2_170MHz)
-		{
-			if (170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
-				return true;
-			else
-				return false;
-		}
-	}
-#if !defined(Lpc55S6xG431xx)
-	if (me->hspi.Instance == SPI4)
-	{
-		if (me->spiClk == AlxSpi_Clk_McuLpc55S6xG4_Spi1_Spi4_SpiClk_1MHz33_Pclk2Apb2_170MHz)
-		{
-			if (170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
-				return true;
-			else
-				return false;
-		}
-	}
-#endif
-	if ((me->hspi.Instance == SPI2) || (me->hspi.Instance == SPI3))
-	{
-		if (me->spiClk == AlxSpi_Clk_McuLpc55S6xG4_Spi2_Spi3_SpiClk_1MHz33_Pclk1Apb1_170MHz)
-		{
-			if (170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk1Apb1_Ctor))
-				return true;
-			else
-				return false;
-		}
-	}
-#endif
-#if defined(Lpc55S6xL0)
-	if (me->hspi.Instance == SPI1)
-	{
-		if (me->spiClk == AlxSpi_Clk_McuLpc55S6xL0_Spi1_SpiClk_1MHz_Pclk2Apb2_32MHz)
-		{
-			if (32000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk2Apb2_Ctor))
-				return true;
-			else
-				return false;
-		}
-	}
-	if (me->hspi.Instance == SPI2)
-	{
-		if (me->spiClk == AlxSpi_Clk_McuLpc55S6xL0_Spi2_SpiClk_1MHz_Pclk1Apb1_32MHz)
-		{
-			if (32000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55S6x_Pclk1Apb1_Ctor))
-				return true;
-			else
-				return false;
-		}
-	}
-#endif
-
-	ALX_SPI_ASSERT(false); // We shouldn't get here
-	return ALX_NULL;
-}
 static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 {
 	// #1 Prepare variables
@@ -392,7 +307,16 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 		return Alx_ErrNumOfTries;
 	}
 }
+static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me)
+{
+	// #1 Check that right Spi SCK is used
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default &&	// MF: When MainClk Freq is 12MHz, max Spi SCK is 6MHz
+		me->spiClk > AlxSpi_Clk_McuLpc55S6x_SpiClk_6MHz)	{ return false; }
+	else													{ return true; }
 
+	ALX_SPI_ASSERT(false); // We shouldn't get here
+	return ALX_NULL;
+}
 static void AlxSpi_Ctor_ParseMode(AlxSpi* me)
 {
 	// #1 Parse Mode
@@ -497,28 +421,28 @@ static void AlxSpi_Periph_AttachClk(AlxSpi* me)
 {
 	// #1 Attach Clk to FlexComm
 	#if defined(SPI0)
-	if (me->spi == SPI0)	{ CLOCK_AttachClk(kFRO12M_to_FLEXCOMM0); return; }	// MF: In example there was Clk from FRO12MHz I do not understand which clk is right
+	if (me->spi == SPI0)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM0); return; }	// MF: In example there was Clk from FRO12MHz I do not understand which clk is right
 	#endif
 	#if defined(SPI1)
-	if (me->spi == SPI1)	{ CLOCK_AttachClk(kFRO12M_to_FLEXCOMM1); return; }
+	if (me->spi == SPI1)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM1); return; }
 	#endif
 	#if defined(SPI2)
-	if (me->spi == SPI2)	{ CLOCK_AttachClk(kFRO12M_to_FLEXCOMM2); return; }
+	if (me->spi == SPI2)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM2); return; }
 	#endif
 	#if defined(SPI3)
-	if (me->spi == SPI3)	{ CLOCK_AttachClk(kFRO12M_to_FLEXCOMM3); return; }
+	if (me->spi == SPI3)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM3); return; }
 	#endif
 	#if defined(SPI4)
-	if (me->spi == SPI4)	{ CLOCK_AttachClk(kFRO12M_to_FLEXCOMM4); return; }
+	if (me->spi == SPI4)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM4); return; }
 	#endif
 	#if defined(SPI5)
-	if (me->spi == SPI5)	{ CLOCK_AttachClk(kFRO12M_to_FLEXCOMM5); return; }
+	if (me->spi == SPI5)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM5); return; }
 	#endif
 	#if defined(SPI6)
-	if (me->spi == SPI6)	{ CLOCK_AttachClk(kFRO12M_to_FLEXCOMM6); return; }
+	if (me->spi == SPI6)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM6); return; }
 	#endif
 	#if defined(SPI7)
-	if (me->spi == SPI7)	{ CLOCK_AttachClk(kFRO12M_to_FLEXCOMM7); return; }
+	if (me->spi == SPI7)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM7); return; }
 	#endif
 
 	//Assert

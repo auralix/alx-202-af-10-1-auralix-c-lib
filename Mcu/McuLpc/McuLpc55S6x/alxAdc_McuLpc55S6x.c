@@ -25,11 +25,12 @@
 //******************************************************************************
 static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch);
 static bool AlxAdc_Ctor_CheckCh(AlxAdc* me);
+static void AlxAdc_SetClkDiv(AlxAdc* me);
 lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxAdc_Ctor
 (
@@ -73,11 +74,8 @@ void AlxAdc_Ctor
 	// Check channel sequence
 	for (uint32_t i = 0; i < numOfIoPinsAndCh - 1; i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) <= AlxAdc_GetCh(me, chArr[i + 1]));	// MF: Channel sequence must be from low to high number
 
-	// Check if right channel
+	// Check if right channels are used
 	ALX_ADC_ASSERT(AlxAdc_Ctor_CheckCh(me));
-
-	// Check clock
-	//ALX_ADC_ASSERT(AlxAdc_Ctor_IsSysClkOk(me));	// MF Assert je bil
 
 	// Variables															// MF: Everything is set to default (see "void LPADC_GetDefault___()" functions) except "adcConfig.referenceVoltageSource" and "adcConvTrigConfig.targetCommandId"
 	me->adcConfig.enableInDozeMode = true;
@@ -121,6 +119,11 @@ void AlxAdc_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 Alx_Status AlxAdc_Init(AlxAdc* me)
 {
 	// Assert
@@ -138,9 +141,10 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	RESET_PeripheralReset(kADC0_RST_SHIFT_RSTn);
 
 	// #3 Init Clk, Power
-	CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 8U, true);	// MF: It was present in the example, I don't understand it, I tried different numbers, but only sampling accuray changes
+	//CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 8U, true);	// MF: It was present in the example, I don't understand it, I tried different numbers, but only sampling accuray changes
 	CLOCK_AttachClk(kMAIN_CLK_to_ADC_CLK);
-	POWER_DisablePD(kPDRUNCFG_PD_LDOGPADC);				// MF: Don't know if we need this. It was present in the example, that's why i Added it
+	POWER_DisablePD(kPDRUNCFG_PD_LDOGPADC);
+	AlxAdc_SetClkDiv(me);
 
 	// #4 Init ADC
 	LPADC_Init(ADC0, &me->adcConfig);	// MF: "EnableClk" happens here
@@ -171,7 +175,7 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	LPADC_Deinit(ADC0);		// MF: "DisableClk" happens here
 
 	// #2 DeInit Power
-	POWER_EnablePD(kPDRUNCFG_PD_LDOGPADC);	// MF: Don't know if we need this. It was present in the example, that's why i Added it
+	POWER_EnablePD(kPDRUNCFG_PD_LDOGPADC);
 
 	// #3 DeInit pin for each channel
 	for(uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++)
@@ -201,7 +205,7 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	LPADC_SetConvCommandConfig(ADC0, 1U, &me->adcConvCommConfig);			// MF: 1U means CMD1 is used
 
 	// #2 Return Voltage
-	LPADC_DoSoftwareTrigger(ADC0, 1U);										// MF: It always has to be 1 I don't understand why
+	LPADC_DoSoftwareTrigger(ADC0, 1U);										// MF: It has to be 1 I don't understand why
 	while (!LPADC_GetConvResult(ADC0, &me->adcConvResult, 0U)) {}			// MF: 0U is for FIFO A and it is used for "Single ended" comvertion mode that we are using
 	return (((me->adcConvResult.convValue >> 3U) * me->vRef_V) / 4095);	// MF: When 12-bit single ended resolution is used, first 3 bits are cleared, that's why we need to shift for 3U (see User Manual page 782)
 
@@ -227,7 +231,7 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 	LPADC_SetConvCommandConfig(ADC0, 1U, &me->adcConvCommConfig);			// MF: 1U means CMD1 is used
 
 	// #2 Return Voltage
-	LPADC_DoSoftwareTrigger(ADC0, 1U);										// MF: It always has to be 1 I don't understand why
+	LPADC_DoSoftwareTrigger(ADC0, 1U);										// MF: It has to be 1 I don't understand why
 	while (!LPADC_GetConvResult(ADC0, &me->adcConvResult, 0U)) {}			// MF: 0U is for FIFO A and it is used for "Single ended" comvertion mode that we are using
 	return (((me->adcConvResult.convValue >> 3U) * me->vRef_mV) / 4095);	// MF: When 12-bit single ended resolution is used, first 3 bits are cleared, that's why we need to shift for 3U (see User Manual page 782)
 
@@ -257,7 +261,7 @@ static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	if (ch == Alx_Ch_3)		return 3;
 	if (ch == Alx_Ch_4)		return 4;
 
-	if (ch == Alx_Ch_8)		return 0;	// MF: The LPC55S6x ADC channels. See akxWiki for explanation
+	if (ch == Alx_Ch_8)		return 0;	// MF: The LPC55S6x ADC channels. See alxWiki for explanation
 	if (ch == Alx_Ch_9)		return 1;
 	if (ch == Alx_Ch_10)	return 2;
 	if (ch == Alx_Ch_11)	return 3;
@@ -286,6 +290,18 @@ static bool AlxAdc_Ctor_CheckCh(AlxAdc* me)
 	// #2 Return
 	return true;
 }
+static void AlxAdc_SetClkDiv(AlxAdc* me)
+{
+	// #1 Set Clk Div
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 2U,  true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 20U, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 16U, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 16U, true); return; }
+
+	// Assert
+	ALX_ADC_ASSERT(false); // We shouldn't get here
+	return;
+}
 lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch)
 {
 	// #1 Check if channels mode A
@@ -304,5 +320,6 @@ lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch)
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
 }
+
 
 #endif // Module Guard
