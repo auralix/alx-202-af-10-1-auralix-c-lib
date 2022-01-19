@@ -35,22 +35,14 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	#if defined(ALX_LPC55S6X)
-	AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz = 0,
-	AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_5MHz625_Pclk2Apb2_90MHz = 1
-	/*AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_8,
-	AlxSpi_Clk_McuLpc55S6xF4_Spi2_Spi3_SpiClk_1MHz4_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_32,
-	AlxSpi_Clk_McuLpc55S6xF4_Spi2_Spi3_SpiClk_5MHz625_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_8,
-	AlxSpi_Clk_McuLpc55S6xF4_Spi2_Spi3_SpiClk_11MHz25_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_4,*/
-	#endif
-	#if defined(Lpc55S6xG4)
-	AlxSpi_Clk_McuLpc55S6xG4_Spi1_Spi4_SpiClk_1MHz33_Pclk2Apb2_170MHz = SPI_BAUDRATEPRESCALER_128,
-	AlxSpi_Clk_McuLpc55S6xG4_Spi2_Spi3_SpiClk_1MHz33_Pclk1Apb1_170MHz = SPI_BAUDRATEPRESCALER_128,
-	#endif
-	#if defined(Lpc55S6xL0)
-	AlxSpi_Clk_McuLpc55S6xL0_Spi1_SpiClk_1MHz_Pclk2Apb2_32MHz = SPI_BAUDRATEPRESCALER_32,
-	AlxSpi_Clk_McuLpc55S6xL0_Spi2_SpiClk_1MHz_Pclk1Apb1_32MHz = SPI_BAUDRATEPRESCALER_32,
-	#endif
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_500kHz_Default = 500000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_12MHz = 12000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz = 10000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_6MHz = 6000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_4MHz = 4000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_3MHz = 3000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_2MHz = 2000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_1MHz = 1000000U
 } AlxSpi_Clk;
 
 typedef enum

@@ -27,6 +27,7 @@
             - [alxIoPin_McuLpc55S6x - ALX MCU LPC55S6x IO Pin Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxIoPin_McuLpc55S6x.md)
             - [alxIoPinIrq_McuLpc55S6x - ALX MCU LPC55S6x IO Pin Irq Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxIoPinIrq_McuLpc55S6x.md)
             - [alxPwm_McuLpc55S6x - ALX MCU LPC55S6x PWM Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxPwm_McuLpc55S6x.md)
+            - [alxSpi_McuLpc55S6x - ALX MCU LPC55S6x SPI Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxSpi_McuLpc55S6x.md)
             - [alxTrace_McuLpc55S6x - ALX MCU LPC55S6x Trace Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxTrace_McuLpc55S6x.md)
         - [McuLpc80x](Mcu/McuLpc/McuLpc80x/alxWiki_McuLpc80x.md)
             - [alxAdc_McuLpc80x - ALX MCU LPC80x ADC Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxAdc_McuLpc80x.md)

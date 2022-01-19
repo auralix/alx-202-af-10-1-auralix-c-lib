@@ -1,6 +1,7 @@
 # Auralix C Library - ALX MCU LPC55S6x PWM Module
 ---
 ## General
+- MainClk is used for CTIMER
 - This module has OPTIMIZE SIZE option
     - When optimization enabled:
         - Ctor - Default duties are in permil unsigned
@@ -8,7 +9,6 @@
     - When optimization disabled:
         - Ctor - Default duties are in percent float
         - Function "Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)" triggers Assert and must not be used
-- Attached Clk to CTimer is from FRO HF because it will always be enabled (MF. Is this really true?!?!?)
 - If wrong pins are choosen, the program crashes, and you cannot compile it any more. "J-Flach Lite" has to be used to erase the chip, that's why "AlxPwm_CheckIoPins()" private function was written to eliminate this pitfall
 
 ---

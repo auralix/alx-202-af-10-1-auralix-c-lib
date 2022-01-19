@@ -279,7 +279,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxClk_Ctor
 	(
 		&alxClk,
-		AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0,
+		AlxClk_Config_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz,
 		AlxClk_Tick_1ms
 	);
 
@@ -374,7 +374,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		AlxSpi_Mode_2,
 		kSPI_Ssel1,		// MF: Doesn't work with kSPI_Ssel0 I don't know why
 		&alxClk,
-		AlxSpi_Clk_McuLpc55S6xF4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz		//MF: TODO
+		AlxSpi_Clk_McuLpc55S6x_SpiClk_1MHz
 	);
 
 

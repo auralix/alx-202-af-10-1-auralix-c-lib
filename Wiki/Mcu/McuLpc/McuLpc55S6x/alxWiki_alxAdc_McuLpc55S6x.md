@@ -1,6 +1,10 @@
 # Auralix C Library - ALX MCU LPC55S6x ADC Module
 ---
 ## General
+- Func "float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)" is not implemented
+- MainClk is used for ADC
+- Dividers in func "void AlxAdc_SetClkDiv(AlxAdc* me)" are set based on testing. The ADC is most accurate when input clk is divided with these integers
+    - Max input clk to ADC is 24MHz (User Manual Page 788 subtitle __39.7.3 Power control__)
 - This module has OPTIMIZE SIZE option
     - When optimization enabled:
         - Ctor - VRef is in millivolts unsigned
@@ -10,9 +14,9 @@
         - Function "uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);" triggers Assert and must not be used
 - The module is implemented for **Single ended** mode conversion only
     - If B mode channel is used, assert is triggered
-- Only one of the TCTRLa registers is actively controlling ADC conversions (User Manual page 776), that's why only TCTRL0 and CMD1 are used regardless of ACH channels used, otherwise it doesn't work.
+- Only one of the TCTRLa registers is actively controlling ADC conversions (User Manual page 776 subtitle __39.6.12 Trigger control registers__), that's why only TCTRL0 and CMD1 are used regardless of ACH channels used, otherwise it doesn't work.
     - Note that there is no CMD0, there are only CMD1-15, although in Fls indexes are from 0-14
-- Get_Voltage functions are written only for using 12-bit single ended resolution, that's why shifting for 3U (User Manual page 782) is hardcoded
+- Get_Voltage functions are written only for using 12-bit single ended resolution, that's why shifting for 3U is hardcoded (User Manual page 782 subtitle __39.6.19 ADC data result FIFO register0__)
 - LPC55S6x uses one ADC channel for two Pins (pin pair), meaning PIO0_23 and PIO0_16 are both channel 0, PIO0_10 and PIO0_11 are both channel 1,... For program to work properly, choose these AlxAdc Channels for following IoPins:
     - __PIO0_23 = Alx_Ch_0__     // LPC55S6x Ch0 A
     - __PIO0_16 = Alx_Ch_8__     // LPC55S6x Ch0 B
@@ -24,7 +28,7 @@
     - __PIO1_0  = Alx_Ch_11__    // LPC55S6x Ch3 B
     - __PIO1_8  = Alx_Ch_4__     // LPC55S6x Ch4 A
     - __PIO1_9  = Alx_Ch_12__    // LPC55S6x Ch4 B
-- Reset of everything related to ADC happend in AlxAdc_Init(), that's why there is no reset in AlxAdc_DeInit()
+- Reset of everything related to ADC happend in "AlxAdc_Init()", that's why there is no reset in "AlxAdc_DeInit()"
 
 ---
 ## Ctor Arguments

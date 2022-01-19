@@ -49,7 +49,7 @@ typedef struct
 	uint32_t systemCoreClock;
 	uint32_t coreSysClk;
 	uint32_t mainClk;
-	//uint32_t fro;		// MF: Don't know how we will use it
+	uint32_t fro;		// MF: Don't Know if we need it
 	//uint32_t froHf;	// MF: Don't know how we will use it
 	//uint32_t extClk;	// MF: Don't know how we will use it
 	//uint32_t fro_1m;	// MF: Don't know how we will use it

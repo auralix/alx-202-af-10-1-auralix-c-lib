@@ -27,7 +27,7 @@ static void AlxIoPin_ResetIocon(AlxIoPin* me);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxIoPin_Ctor
 (
@@ -69,6 +69,11 @@ void AlxIoPin_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 void AlxIoPin_Init(AlxIoPin* me)
 {
 	// Assert
