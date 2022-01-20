@@ -8,15 +8,14 @@
 - This module has OPTIMIZE SIZE option
     - When optimization enabled:
         - Ctor - VRef is in millivolts unsigned
-        - Function "float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);" triggers Assert and must not be used
+        - Function "float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)" triggers Assert and must not be used
     - When optimization disabled:
         - Ctor - VRef is in volts float
-        - Function "uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);" triggers Assert and must not be used
-- The module is implemented for **Single ended** mode conversion only
-    - If B mode channel is used, assert is triggered
+        - Function "uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)" triggers Assert and must not be used
+- The module is implemented for __Single ended__ mode conversion only
 - Only one of the TCTRLa registers is actively controlling ADC conversions (User Manual page 776 subtitle __39.6.12 Trigger control registers__), that's why only TCTRL0 and CMD1 are used regardless of ACH channels used, otherwise it doesn't work.
     - Note that there is no CMD0, there are only CMD1-15, although in Fls indexes are from 0-14
-- Get_Voltage functions are written only for using 12-bit single ended resolution, that's why shifting for 3U is hardcoded (User Manual page 782 subtitle __39.6.19 ADC data result FIFO register0__)
+- "Get_Voltage_x()" functions are written only for using 12-bit single ended resolution, that's why shifting for 3U is hardcoded (User Manual page 782 subtitle __39.6.19 ADC data result FIFO register0__)
 - LPC55S6x uses one ADC channel for two Pins (pin pair), meaning PIO0_23 and PIO0_16 are both channel 0, PIO0_10 and PIO0_11 are both channel 1,... For program to work properly, choose these AlxAdc Channels for following IoPins:
     - __PIO0_23 = Alx_Ch_0__     // LPC55S6x Ch0 A
     - __PIO0_16 = Alx_Ch_8__     // LPC55S6x Ch0 B
@@ -29,6 +28,7 @@
     - __PIO1_8  = Alx_Ch_4__     // LPC55S6x Ch4 A
     - __PIO1_9  = Alx_Ch_12__    // LPC55S6x Ch4 B
 - Reset of everything related to ADC happend in "AlxAdc_Init()", that's why there is no reset in "AlxAdc_DeInit()"
+- ADC works with ~1,3% accuracy
 
 ---
 ## Ctor Arguments

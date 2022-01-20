@@ -82,7 +82,7 @@ void AlxAdc_Ctor
 	me->adcConfig.conversionAverageMode = kLPADC_ConversionAverage1;
 	me->adcConfig.enableAnalogPreliminary = false;
 	me->adcConfig.powerUpDelay = 0x80;
-	me->adcConfig.referenceVoltageSource = kLPADC_ReferenceVoltageAlt2;		// MF: Sets REFSEL beats to VREFH = voltage on VDDA pin in CFG Register
+	me->adcConfig.referenceVoltageSource = kLPADC_ReferenceVoltageAlt2;		// MF: Sets REFSEL to VREFH = voltage on VDDA pin in CFG Register
 	me->adcConfig.powerLevelMode = kLPADC_PowerLevelAlt1;
 	me->adcConfig.triggerPriorityPolicy = kLPADC_TriggerPriorityPreemptImmediately;
 	me->adcConfig.enableConvPause = false;
@@ -103,7 +103,7 @@ void AlxAdc_Ctor
 	me->adcConvCommConfig.conversionResolutionMode = kLPADC_ConversionResolutionStandard;
 	me->adcConvCommConfig.enableWaitTrigger = false;
 
-	me->adcConvTrigConfig.targetCommandId = 1U;								// MF: 0U is not valid, 1U means trigger will be executed on CMD1 (the one we will use) (see User Manual page 777 ans alxWiki)
+	me->adcConvTrigConfig.targetCommandId = 1U;								// MF: 0U is not valid, 1U means trigger will be executed on CMD1 (the one we will use) (see User Manual page 777 and alxWiki)
 	me->adcConvTrigConfig.delayPower = 0U;
 	me->adcConvTrigConfig.priority = 0U;
 	me->adcConvTrigConfig.channelAFIFOSelect = 0U;
@@ -141,7 +141,6 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	RESET_PeripheralReset(kADC0_RST_SHIFT_RSTn);
 
 	// #3 Init Clk, Power
-	//CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 8U, true);	// MF: It was present in the example, I don't understand it, I tried different numbers, but only sampling accuray changes
 	CLOCK_AttachClk(kMAIN_CLK_to_ADC_CLK);
 	POWER_DisablePD(kPDRUNCFG_PD_LDOGPADC);
 	AlxAdc_SetClkDiv(me);
@@ -209,6 +208,7 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	while (!LPADC_GetConvResult(ADC0, &me->adcConvResult, 0U)) {}			// MF: 0U is for FIFO A and it is used for "Single ended" comvertion mode that we are using
 	return (((me->adcConvResult.convValue >> 3U) * me->vRef_V) / 4095);	// MF: When 12-bit single ended resolution is used, first 3 bits are cleared, that's why we need to shift for 3U (see User Manual page 782)
 
+	// Assert
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
 	#endif
@@ -255,6 +255,7 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 //******************************************************************************
 static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 {
+	// #1 Return Ch
 	if (ch == Alx_Ch_0)		return 0;
 	if (ch == Alx_Ch_1)		return 1;
 	if (ch == Alx_Ch_2)		return 2;
@@ -267,6 +268,7 @@ static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	if (ch == Alx_Ch_11)	return 3;
 	if (ch == Alx_Ch_12)	return 4;
 
+	// Assert
 	ALX_ADC_ASSERT(false);	// We shouldn't get here
 	return ALX_NULL;
 }

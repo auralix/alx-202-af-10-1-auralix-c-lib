@@ -3,7 +3,7 @@
 ## General
 - Func "void AlxClk_Irq_Handle(AlxClk* me)" is not implemented
 - Svinjarijo
-    - For AHB clock div register (AHBCLKDIV, offset = 0x380) page 78 subtitle __4.5.50 AHB clock divider register__ it is said that reset valuje for DIV = 0X00, but it is 0x01 (meaning SysClk is divided by 2 by default not 1)
+    - For AHB clock div register ((AHBCLKDIV, offset = 0x380) User Manual page 78 subtitle __4.5.50 AHB clock divider register__) it is said that reset valuje for DIV = 0x00, but it is 0x01 (meaning SysClk is divided by 2 by default not 1)
     - There are problems when Clk to IOCON is enabled and disabled, that's why there is only enable in "Alx_Status AlxClk_Init(AlxClk* me)" and no disable anywhere else
         - If Clk to IOCON is enabled and disabled it might happen that SEGGER won't recognize the MCU any more and __J-Flash Lite__ has to be used to erase the chip
 - Posible Configurations:

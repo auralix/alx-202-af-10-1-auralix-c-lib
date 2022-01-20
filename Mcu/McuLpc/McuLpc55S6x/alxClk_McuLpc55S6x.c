@@ -116,6 +116,7 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 	// Assert
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Return Clk Freq
 	if (me->isInit)
 	{
 		if (clk == AlxClk_Clk_McuLpc55s6x_CoreSysClk)		return me->coreSysClk;
@@ -144,6 +145,7 @@ void AlxClk_Irq_Handle(AlxClk* me)
 //******************************************************************************
 static void AlxClk_PeriphGpio_EnableClk()
 {
+	// #1 Enable GPIO
 	CLOCK_EnableClock(kCLOCK_Gpio0);
 	CLOCK_EnableClock(kCLOCK_Gpio1);
 	CLOCK_EnableClock(kCLOCK_Gpio2);	// MF: I'm not sure GPIO2 works on Lpc55S6x
@@ -151,6 +153,7 @@ static void AlxClk_PeriphGpio_EnableClk()
 }
 static void AlxClk_PeriphGpio_Reset()
 {
+	// #1 Reset GPIO
 	RESET_PeripheralReset(kGPIO0_RST_SHIFT_RSTn);
 	RESET_PeripheralReset(kGPIO1_RST_SHIFT_RSTn);
 	RESET_PeripheralReset(kGPIO2_RST_SHIFT_RSTn);	// MF: I'm not sure GPIO2 works on Lpc55S6x
@@ -226,7 +229,7 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Defau
 	// #1 Enable FRO
 	POWER_DisablePD(kPDRUNCFG_PD_FRO192M);
 
-	// #2 Select Main Clk
+	// #2 Attach FRO12 to MainClk
 	CLOCK_AttachClk(kFRO12M_to_MAIN_CLK);
 }
 static void AlxClk_Init_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(AlxClk* me)
@@ -237,7 +240,7 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(AlxC
 	// #2 Enable FRO
 	POWER_DisablePD(kPDRUNCFG_PD_FRO192M);
 
-	// #3 Select Main Clk
+	// #3 Attach FROHF to MainClk
 	CLOCK_AttachClk(kFRO_HF_to_MAIN_CLK);
 
 	// #4 Divide SysClk
@@ -262,7 +265,7 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pl
 	// #3.3 Setup PLL Freq
 	if (CLOCK_SetPLL0Freq(&pll0Setup) != kStatus_PLL_Success) { ALX_CLK_TRACE("ErrSetUpPLL"); ALX_CLK_ASSERT(false); }	// MF: Enabling PLL happend here
 
-	// #4 Select Main Clk
+	// #4 Attach PLL0 to MainClk
 	CLOCK_AttachClk(kPLL0_to_MAIN_CLK);
 
 	// #5 Divide SysClk
@@ -289,7 +292,7 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(Al
 	// #3.3 Setup PLL Freq
 	if (CLOCK_SetPLL0Freq(&pll0Setup) != kStatus_PLL_Success) { ALX_CLK_TRACE("ErrSetUpPLL"); ALX_CLK_ASSERT(false); }	// MF: Enabling PLL happend here
 
-	// #4 Select Main Clk
+	// #4 Attach PLL0 to MainClk
 	CLOCK_AttachClk(kPLL0_to_MAIN_CLK);
 
 	// #5 Divide SysClk

@@ -12,6 +12,7 @@
 - These configurations are not implemented/supported:
     - Slew rate (High-speed) mode
     - Inverted function
+- Private Func "void AlxIoPin_ResetIocon(AlxIoPin* me)" is written based on information in User Manual page 338 Table __333__
 
 ---
 ## Ctor Arguments

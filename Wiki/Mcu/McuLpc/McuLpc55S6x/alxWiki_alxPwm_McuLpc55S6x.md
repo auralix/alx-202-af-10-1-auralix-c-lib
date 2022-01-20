@@ -9,7 +9,7 @@
     - When optimization disabled:
         - Ctor - Default duties are in percent float
         - Function "Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)" triggers Assert and must not be used
-- If wrong pins are choosen, the program crashes, and you cannot compile it any more. "J-Flach Lite" has to be used to erase the chip, that's why "AlxPwm_CheckIoPins()" private function was written to eliminate this pitfall
+- If wrong pins are choosen, the program crashes. SEGGER won't recognize the MCU any more and __J-Flash__ Lite has to be used to erase the chip, that's why "bool AlxPwm_CheckIoPins()" private function was written to eliminate this pitfall
 
 ---
 ## Ctor Arguments
