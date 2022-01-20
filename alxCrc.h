@@ -57,15 +57,13 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxCrc_Config_Ccitt = 0, // Crc8
+	AlxCrc_Config_Ccitt = 0,
 	AlxCrc_Config_Crc16 = 1,
 	AlxCrc_Config_Crc32 = 2
 } AlxCrc_Config;
 
 typedef struct
 {
-	// Objects - External
-
 	// Parameters
 	AlxCrc_Config config;
 
@@ -74,7 +72,6 @@ typedef struct
 
 	// Info
 	bool wasCtorCalled;
-	bool isInit;
 } AlxCrc;
 
 
@@ -94,6 +91,7 @@ void AlxCrc_Ctor
 uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len);
 bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t* validatedCrc);
 uint32_t AlxCrc_GetLen(AlxCrc* me);
+
 
 #ifdef __cplusplus
 }
