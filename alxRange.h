@@ -68,6 +68,7 @@ Alx_Status AlxRange_CheckDouble		(double val, double valMin, double valMax		);
 //Alx_Status AlxRange_CheckArr		(void* val, uint32_t valLenMax					);
 Alx_Status AlxRange_CheckStr		(char* val, uint32_t valLenMax					);
 
+
 #ifdef __cplusplus
 }
 #endif

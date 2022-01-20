@@ -57,12 +57,6 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-
-	// Parameters
-
-	// Variables
-
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
