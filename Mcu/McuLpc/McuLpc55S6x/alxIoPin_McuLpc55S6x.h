@@ -49,12 +49,6 @@ typedef enum
 	AlxIoPin_Func_IRQ		= IOCON_FUNC0	// MF: IRQ has to be configured as GPIO
 } AlxIoPin_Iocon_Func;
 
-typedef enum	// MF: Should we use this insetad of bool?
-{
-	AlxIoPin_AnalMode = 0,
-	AlxIoPin_DigiMode = 1,
-} AlxIoPin_Iocon_DigiMode;
-
 typedef struct
 {
 	// Parameters
@@ -62,7 +56,7 @@ typedef struct
 	uint8_t pin;
 	AlxIoPin_Iocon_Func func;
 	uint32_t mode;		// MF: PullUp or PulDown
-	bool digiMode;
+	bool digiMode;		// MF: True = Digital Mode, False = Analog Mode
 	bool isOpenDrain;
 	bool dir;			// MF: True = digital output, False = digital input
 	bool val;

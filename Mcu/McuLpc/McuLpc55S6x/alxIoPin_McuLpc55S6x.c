@@ -46,8 +46,8 @@ void AlxIoPin_Ctor
 	(void)me;
 	ALX_IO_PIN_ASSERT(port == 0 || port == 1);
 	ALX_IO_PIN_ASSERT(pin >= 0 && pin <= 31);
-	ALX_IO_PIN_ASSERT(!(port == 0 && pin == 13));	// MF: PIO0_13 is for i2c and will se inited in alxI2c module TODO
-	ALX_IO_PIN_ASSERT(!(port == 0 && pin == 14));	// MF: PIO0_13 is for i2c and will se inited in alxI2c module TODO
+	ALX_IO_PIN_ASSERT(!(port == 0 && pin == 13));	// MF: PIO0_13 is for i2c and will be Inited in alxI2c module TODO
+	ALX_IO_PIN_ASSERT(!(port == 0 && pin == 14));	// MF: PIO0_13 is for i2c and will be Inited in alxI2c module TODO
 	(void)func;
 	(void)mode;
 	(void)digiMode;
@@ -234,5 +234,6 @@ static void AlxIoPin_ResetIocon(AlxIoPin* me)
 	else if (me->port == 0 && me->pin == 14)	{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x5000); }
 	else										{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x0000); }
 }
+
 
 #endif // Module Guard

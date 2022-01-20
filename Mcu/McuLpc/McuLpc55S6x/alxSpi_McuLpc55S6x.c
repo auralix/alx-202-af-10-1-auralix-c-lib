@@ -75,14 +75,14 @@ void AlxSpi_Ctor
 	me->nCSSel = nCSSel;
 	me->spiClk = spiClk;
 
-	// Variables
+	// Check if Clk is OK
 	ALX_SPI_ASSERT(AlxSpi_Ctor_IsClkOk(me));
 
-	// MF: Everything is set to default (see "void SPI_MasterGetDefaultConfig()" function) except "me->spiMasterConfig.sselNum" and "me->spiMasterConfig.baudRate_Bps"
+	// Variables																	// MF: Everything is set to default (see "void SPI_MasterGetDefaultConfig()" function) except "me->spiMasterConfig.sselNum" and "me->spiMasterConfig.baudRate_Bps"
 	me->spiMasterConfig.enableLoopback				= false;
 	me->spiMasterConfig.enableMaster				= true;
-	me->spiMasterConfig.polarity					= kSPI_ClockPolarityActiveHigh;		// MF: Is set in "AlxSpi_Ctor_ParseMode()"
-	me->spiMasterConfig.phase						= kSPI_ClockPhaseFirstEdge;			// MF: Is set in "AlxSpi_Ctor_ParseMode()"
+	me->spiMasterConfig.polarity					= kSPI_ClockPolarityActiveHigh;	// MF: Is set in "AlxSpi_Ctor_ParseMode()"
+	me->spiMasterConfig.phase						= kSPI_ClockPhaseFirstEdge;		// MF: Is set in "AlxSpi_Ctor_ParseMode()"
 	me->spiMasterConfig.direction					= kSPI_MsbFirst;
 	me->spiMasterConfig.baudRate_Bps				= (uint32_t)spiClk;
 	me->spiMasterConfig.dataWidth					= kSPI_Data8Bits;
@@ -130,7 +130,7 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 	AlxSpi_Periph_AttachClk(me);
 
 	// #4 Init SPI
-	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	// MF: FlexComm "EnableClk"  and "Periph reset" happens here
+	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	// MF: FlexComm "EnableClk" and "Periph reset" happens here
 	{
 		ALX_SPI_TRACE("ErrInit");
 		return Alx_Err;

@@ -96,7 +96,7 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 	INPUTMUX_Deinit(INPUTMUX);	// MF: Disable Inputmux Clk
 
 	// #5 Init PINT Periphery
-	PINT_Init(PINT);
+	PINT_Init(PINT);			// MF: "EnableClk" and "Periph reset" happens here
 
 	// #6 Enable IRQ
 	PINT_PinInterruptConfig(PINT, me->irqPin, me->irqType, ALX_NULL_PTR);	// MF: "ALX_NULL_PTR" because we'll use "PIN_INTX_IRQHandler" from startup.s
@@ -132,9 +132,9 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 static inputmux_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me)
 {
 	// #1 Get IRQ Port Pin select
-	//-----------
-	// Port 0
-	//-----------
+	////-----------
+	//// Port 0
+	////-----------
 	if (me->ioPin->port == 0 && me->ioPin->pin == 0)	return kINPUTMUX_GpioPort0Pin0ToPintsel;
 	if (me->ioPin->port == 0 && me->ioPin->pin == 1)	return kINPUTMUX_GpioPort0Pin1ToPintsel;
 	if (me->ioPin->port == 0 && me->ioPin->pin == 2)	return kINPUTMUX_GpioPort0Pin2ToPintsel;
@@ -168,9 +168,9 @@ static inputmux_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me)
 	if (me->ioPin->port == 0 && me->ioPin->pin == 30)	return kINPUTMUX_GpioPort0Pin30ToPintsel;
 	if (me->ioPin->port == 0 && me->ioPin->pin == 31)	return kINPUTMUX_GpioPort0Pin31ToPintsel;
 
-	//-----------
-	// Port 1
-	//-----------
+	////-----------
+	//// Port 1
+	////-----------
 	if (me->ioPin->port == 1 && me->ioPin->pin == 0)	return kINPUTMUX_GpioPort1Pin0ToPintsel;
 	if (me->ioPin->port == 1 && me->ioPin->pin == 1)	return kINPUTMUX_GpioPort1Pin1ToPintsel;
 	if (me->ioPin->port == 1 && me->ioPin->pin == 2)	return kINPUTMUX_GpioPort1Pin2ToPintsel;
