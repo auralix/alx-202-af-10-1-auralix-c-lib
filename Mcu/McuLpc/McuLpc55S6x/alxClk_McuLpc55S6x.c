@@ -119,14 +119,14 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 	// #1 Return Clk Freq
 	if (me->isInit)
 	{
-		if (clk == AlxClk_Clk_McuLpc55s6x_CoreSysClk)		return me->coreSysClk;
-		if (clk == AlxClk_Clk_McuLpc55s6x_MainClk)			return me->mainClk;
-		if (clk == AlxClk_Clk_McuLpc55s6x_Fro)				return me->fro;
+		if (clk == AlxClk_Clk_McuLpc55s6x_CoreSysClk)	{ return me->coreSysClk; }
+		if (clk == AlxClk_Clk_McuLpc55s6x_MainClk)		{ return me->mainClk; }
+		if (clk == AlxClk_Clk_McuLpc55s6x_Fro)			{ return me->fro; }
 	}
 
-	if (clk == AlxClk_Clk_McuLpc55s6x_CoreSysClk_Ctor)		return me->coreSysClk_Ctor;
-	if (clk == AlxClk_Clk_McuLpc55s6x_MainClk_Ctor)			return me->mainClk_Ctor;
-	if (clk == AlxClk_Clk_McuLpc55s6x_Fro_Ctor)				return me->fro_Ctor;
+	if (clk == AlxClk_Clk_McuLpc55s6x_CoreSysClk_Ctor)	{ return me->coreSysClk_Ctor; }
+	if (clk == AlxClk_Clk_McuLpc55s6x_MainClk_Ctor)		{ return me->mainClk_Ctor; }
+	if (clk == AlxClk_Clk_McuLpc55s6x_Fro_Ctor)			{ return me->fro_Ctor; }
 
 	// Assert
 	ALX_CLK_ASSERT(false); // We shouldn't get here
@@ -186,40 +186,40 @@ static void AlxClk_SetupPll(AlxClk* me, pll_setup_t* pllSetup, uint32_t inputFre
 	if (selp >= 31U)						{ selp = 31U; }
 
 	// #2 Setup Pll Struct		// MF: pllM is set in "pllsscg[1]" below
-	pllSetup->pllctrl = (SYSCON_PLL0CTRL_CLKEN_MASK | SYSCON_PLL0CTRL_SELI(seli) | SYSCON_PLL0CTRL_SELP(selp));
-	pllSetup->pllndec = SYSCON_PLL0NDEC_NDIV(pllN);
-	pllSetup->pllpdec = SYSCON_PLL0PDEC_PDIV(pllP);
-	pllSetup->pllsscg[0] = 0x0U;
-	pllSetup->pllsscg[1] = (SYSCON_PLL0SSCG1_MDIV_EXT(pllM) | SYSCON_PLL0SSCG1_SEL_EXT_MASK);
-	pllSetup->pllRate = (((inputFreq / pllN) * pllM) / (2 * pllP));
-	pllSetup->flags = PLL_SETUPFLAG_WAITLOCK;
+	pllSetup->pllctrl		= (SYSCON_PLL0CTRL_CLKEN_MASK | SYSCON_PLL0CTRL_SELI(seli) | SYSCON_PLL0CTRL_SELP(selp));
+	pllSetup->pllndec		= SYSCON_PLL0NDEC_NDIV(pllN);
+	pllSetup->pllpdec		= SYSCON_PLL0PDEC_PDIV(pllP);
+	pllSetup->pllsscg[0]	= 0x0U;
+	pllSetup->pllsscg[1]	= (SYSCON_PLL0SSCG1_MDIV_EXT(pllM) | SYSCON_PLL0SSCG1_SEL_EXT_MASK);
+	pllSetup->pllRate		= (((inputFreq / pllN) * pllM) / (2 * pllP));
+	pllSetup->flags			= PLL_SETUPFLAG_WAITLOCK;
 }
 
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default(AlxClk* me)
 {
 	// #1 Set Ctor Clk Freq
-	me->coreSysClk_Ctor = 6000000U;
+	me->coreSysClk_Ctor	= 6000000U;
 	me->mainClk_Ctor	= 12000000U;
 	me->fro_Ctor		= 12000000U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(AlxClk* me)
 {
 	// #1 Set Ctor Clk Freq
-	me->coreSysClk_Ctor = 96000000U;
+	me->coreSysClk_Ctor	= 96000000U;
 	me->mainClk_Ctor	= 96000000U;
 	me->fro_Ctor		= 96000000U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me)
 {
 	// #1 Set Ctor Clk Freq
-	me->coreSysClk_Ctor = 150000000U;
+	me->coreSysClk_Ctor	= 150000000U;
 	me->mainClk_Ctor	= 150000000U;
 	me->fro_Ctor		= 12000000U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(AlxClk* me)
 {
 	// #1 Set Ctor Clk Freq
-	me->coreSysClk_Ctor = 150000000U;
+	me->coreSysClk_Ctor	= 150000000U;
 	me->mainClk_Ctor	= 150000000U;
 	me->fro_Ctor		= 12000000U;
 }

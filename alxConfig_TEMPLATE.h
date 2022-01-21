@@ -85,6 +85,15 @@ extern "C" {
 //#define ALX_HW_NUCLEO_F429ZI_C_TEST
 //#define ALX_HW_NUCLEO_F429ZI_CPP_TEST
 
+// Test //
+//#define ALX_TEST_GH
+//#define ALX_TEST_GK
+//#define ALX_TEST_JK
+//#define ALX_TEST_JS
+//#define ALX_TEST_MF
+//#define ALX_TEST_RK
+//#define ALX_TEST_TV
+
 
 #ifdef __cplusplus
 }

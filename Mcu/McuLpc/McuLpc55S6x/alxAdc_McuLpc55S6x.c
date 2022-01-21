@@ -77,43 +77,43 @@ void AlxAdc_Ctor
 	// Check if right channels are used
 	ALX_ADC_ASSERT(AlxAdc_Ctor_CheckCh(me));
 
-	// Variables															// MF: Everything is set to default (see "void LPADC_GetDefault___()" functions) except "adcConfig.referenceVoltageSource" and "adcConvTrigConfig.targetCommandId"
-	me->adcConfig.enableInDozeMode = true;
-	me->adcConfig.conversionAverageMode = kLPADC_ConversionAverage1;
-	me->adcConfig.enableAnalogPreliminary = false;
-	me->adcConfig.powerUpDelay = 0x80;
-	me->adcConfig.referenceVoltageSource = kLPADC_ReferenceVoltageAlt2;		// MF: Sets REFSEL to VREFH = voltage on VDDA pin in CFG Register
-	me->adcConfig.powerLevelMode = kLPADC_PowerLevelAlt1;
-	me->adcConfig.triggerPriorityPolicy = kLPADC_TriggerPriorityPreemptImmediately;
-	me->adcConfig.enableConvPause = false;
-	me->adcConfig.convPauseDelay = 0U;
-	me->adcConfig.FIFO0Watermark = 0U;
-	me->adcConfig.FIFO1Watermark = 0U;
+	// Variables										// MF: Everything is set to default (see "void LPADC_GetDefault___()" functions) except "adcConfig.referenceVoltageSource" and "adcConvTrigConfig.targetCommandId"
+	me->adcConfig.enableInDozeMode						= true;
+	me->adcConfig.conversionAverageMode					= kLPADC_ConversionAverage1;
+	me->adcConfig.enableAnalogPreliminary				= false;
+	me->adcConfig.powerUpDelay							= 0x80;
+	me->adcConfig.referenceVoltageSource				= kLPADC_ReferenceVoltageAlt2;	// MF: Sets REFSEL to VREFH = voltage on VDDA pin in CFG Register
+	me->adcConfig.powerLevelMode						= kLPADC_PowerLevelAlt1;
+	me->adcConfig.triggerPriorityPolicy					= kLPADC_TriggerPriorityPreemptImmediately;
+	me->adcConfig.enableConvPause						= false;
+	me->adcConfig.convPauseDelay						= 0U;
+	me->adcConfig.FIFO0Watermark						= 0U;
+	me->adcConfig.FIFO1Watermark						= 0U;
 
-	me->adcConvCommConfig.sampleChannelMode = kLPADC_SampleChannelSingleEndSideB;
-	me->adcConvCommConfig.channelNumber = 0U;								// MF: Channel is set before every trigger in "AlxAdc_GetVoltage_x()"
-	me->adcConvCommConfig.chainedNextCommandNumber = 0U;
-	me->adcConvCommConfig.enableAutoChannelIncrement = false;
-	me->adcConvCommConfig.loopCount = 0U;
-	me->adcConvCommConfig.hardwareAverageMode = kLPADC_HardwareAverageCount1;
-	me->adcConvCommConfig.sampleTimeMode = kLPADC_SampleTimeADCK3;
-	me->adcConvCommConfig.hardwareCompareMode = kLPADC_HardwareCompareDisabled;
-	me->adcConvCommConfig.hardwareCompareValueHigh = 0U;
-	me->adcConvCommConfig.hardwareCompareValueLow = 0U;
-	me->adcConvCommConfig.conversionResolutionMode = kLPADC_ConversionResolutionStandard;
-	me->adcConvCommConfig.enableWaitTrigger = false;
+	me->adcConvCommConfig.sampleChannelMode				= kLPADC_SampleChannelSingleEndSideB;
+	me->adcConvCommConfig.channelNumber					= 0U;	// MF: Channel is set before every trigger in "AlxAdc_GetVoltage_x()"
+	me->adcConvCommConfig.chainedNextCommandNumber		= 0U;
+	me->adcConvCommConfig.enableAutoChannelIncrement	= false;
+	me->adcConvCommConfig.loopCount						= 0U;
+	me->adcConvCommConfig.hardwareAverageMode			= kLPADC_HardwareAverageCount1;
+	me->adcConvCommConfig.sampleTimeMode				= kLPADC_SampleTimeADCK3;
+	me->adcConvCommConfig.hardwareCompareMode			= kLPADC_HardwareCompareDisabled;
+	me->adcConvCommConfig.hardwareCompareValueHigh		= 0U;
+	me->adcConvCommConfig.hardwareCompareValueLow		= 0U;
+	me->adcConvCommConfig.conversionResolutionMode		= kLPADC_ConversionResolutionStandard;
+	me->adcConvCommConfig.enableWaitTrigger				= false;
 
-	me->adcConvTrigConfig.targetCommandId = 1U;								// MF: 0U is not valid, 1U means trigger will be executed on CMD1 (the one we will use) (see User Manual page 777 and alxWiki)
-	me->adcConvTrigConfig.delayPower = 0U;
-	me->adcConvTrigConfig.priority = 0U;
-	me->adcConvTrigConfig.channelAFIFOSelect = 0U;
-	me->adcConvTrigConfig.channelBFIFOSelect = 0U;
-	me->adcConvTrigConfig.enableHardwareTrigger = false;
+	me->adcConvTrigConfig.targetCommandId				= 1U;	// MF: 0U is not valid, 1U means trigger will be executed on CMD1 (the one we will use) (see User Manual page 777 and alxWiki)
+	me->adcConvTrigConfig.delayPower					= 0U;
+	me->adcConvTrigConfig.priority						= 0U;
+	me->adcConvTrigConfig.channelAFIFOSelect			= 0U;
+	me->adcConvTrigConfig.channelBFIFOSelect			= 0U;
+	me->adcConvTrigConfig.enableHardwareTrigger			= false;
 
-	me->adcConvResult.commandIdSource = 0U;
-	me->adcConvResult.loopCountIndex = 0U;
-	me->adcConvResult.triggerIdSource = 0U;
-	me->adcConvResult.convValue = 0U;
+	me->adcConvResult.commandIdSource					= 0U;
+	me->adcConvResult.loopCountIndex					= 0U;
+	me->adcConvResult.triggerIdSource					= 0U;
+	me->adcConvResult.convValue							= 0U;
 
 	// Info
 	me->isInit = false;
@@ -221,7 +221,7 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 	return ALX_NULL;
 	#else
 
-	// Init Ctor Assert
+	// Assert
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
@@ -277,16 +277,16 @@ static bool AlxAdc_Ctor_CheckCh(AlxAdc* me)
 	// #1 Check IoPins
 	for (uint32_t i = 0; i < me->numOfIoPinsAndCh; i++)
 	{
-		if (!(	(me->chArr[i] == Alx_Ch_0)  ||
-				(me->chArr[i] == Alx_Ch_1)  ||
-				(me->chArr[i] == Alx_Ch_2)  ||
-				(me->chArr[i] == Alx_Ch_3)  ||
-				(me->chArr[i] == Alx_Ch_4)  ||
-				(me->chArr[i] == Alx_Ch_8)  ||
-				(me->chArr[i] == Alx_Ch_9)  ||
-				(me->chArr[i] == Alx_Ch_10) ||
-				(me->chArr[i] == Alx_Ch_11) ||
-				(me->chArr[i] == Alx_Ch_12) ))	{ return false; }
+		if (!(	(me->chArr[i] == Alx_Ch_0)	||
+				(me->chArr[i] == Alx_Ch_1)	||
+				(me->chArr[i] == Alx_Ch_2)	||
+				(me->chArr[i] == Alx_Ch_3)	||
+				(me->chArr[i] == Alx_Ch_4)	||
+				(me->chArr[i] == Alx_Ch_8)	||
+				(me->chArr[i] == Alx_Ch_9)	||
+				(me->chArr[i] == Alx_Ch_10)	||
+				(me->chArr[i] == Alx_Ch_11)	||
+				(me->chArr[i] == Alx_Ch_12)	))	{ return false; }
 	}
 
 	// #2 Return
