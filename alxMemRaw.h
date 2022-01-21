@@ -24,7 +24,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_MEM_RAW_FILE "alxMemRaw.h"
+#define ALX_MEM_RAW_FILE "alxMemRaw"
 
 // Assert //
 #if defined(_ALX_MEM_RAW_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)

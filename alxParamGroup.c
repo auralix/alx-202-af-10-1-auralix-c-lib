@@ -63,22 +63,22 @@ void AlxParamGroup_Ctor
 //******************************************************************************
 Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == false);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 
-	// #3 Read memory for initNumOfTries
+	// #2 Read memory for initNumOfTries
 	for(uint32_t i = 0; i < me->initNumOfTries; i++)
 	{
-		// #3.1 Read memory
+		// #2.1 Read memory
 		Alx_Status statusAlxMemSafeRead = Alx_Err;
 		statusAlxMemSafeRead = AlxMemSafe_Read(me->memSafe, me->valStoredBuff, me->len);
 		memcpy(me->valBuff, me->valStoredBuff, me->len);
 
-		// #3.2 Handle result
+		// #2.2 Handle result
 		switch(statusAlxMemSafeRead)
 		{
 			case AlxMemSafe_CrcOkSame_UsedCopyA:
@@ -142,7 +142,8 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				else
 				{
 					// Update
-					//AlxParamGroup_ValToStoreBuffToValStoredBuff(me); // Assert since the group is not inited here..
+					me->isInit = true; // isInit has to be set to true here, otherwise assert is triggered when copying default values
+					AlxParamGroup_ValToStoreBuffToValStoredBuff(me);
 
 					// Trace
 					ALX_PARAM_GROUP_TRACE("%s - BothNok_ResToDef");
@@ -163,51 +164,51 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 			}
 		}
 
-		// #3.3 Break
+		// #2.3 Break
 		status = Alx_Ok;
 		break;
 	}
 
-	// #4 Set isInit
+	// #3 Set isInit
 	me->isInit = true;
 
-	// #5 Return
+	// #4 Return
 	return status;
 }
 void AlxParamGroup_Write(AlxParamGroup* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #2 Start writing
+	// #1 Start writing
 	AlxMemSafe_Write(me->memSafe, me->valToStoreBuff, me->len);
 }
 bool AlxParamGroup_IsWriteDone(AlxParamGroup* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #2 Return
+	// #1 Return
 	return AlxMemSafe_IsWriteDone(me->memSafe);
 }
 bool AlxParamGroup_IsWriteErr(AlxParamGroup* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #2 Return
+	// #1 Return
 	return AlxMemSafe_IsWriteErr(me->memSafe);
 }
 bool AlxParamGroup_IsValStoredBuffDiff(AlxParamGroup* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #2 Compare valBuff to valStoredBuff
+	// #1 Compare valBuff to valStoredBuff
 	if (memcmp(me->valBuff, me->valStoredBuff, me->len) != 0)	// Difference detected
 		return true;
 	else
@@ -215,20 +216,20 @@ bool AlxParamGroup_IsValStoredBuffDiff(AlxParamGroup* me)
 }
 void AlxParamGroup_ValBuffToValToStoreBuff(AlxParamGroup* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #2 Copy
+	// #1 Copy
 	memcpy(me->valToStoreBuff, me->valBuff, me->len);
 }
 void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #2 Copy
+	// #1 Copy
 	memcpy(me->valStoredBuff, me->valToStoreBuff, me->len);
 }
 void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me)
@@ -250,10 +251,6 @@ void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me)
 
 		// #2.4 Increment
 		valBuffIndex = valBuffIndex + len;
-
-		// #2.5 Check
-//		uint32_t lenNext = AlxParamItem_GetValLen(*(me->paramItemArr + i + 1));
-//		ALX_PARAM_GROUP_ASSERT((valBuffIndex + lenNext) < me->len);
 	}
 }
 
@@ -270,7 +267,7 @@ static void AlxParamGroup_ParamItemsValDefToValToStoreBuff(AlxParamGroup* me)
 	for (uint32_t i = 0; i < me->numOfParamItems; i++)
 	{
 		// #2.1 Get value pointer
-		void* valPtr = AlxParamItem_GetValPtr(*(me->paramItemArr + i)); // Mislim da ni vredu vrednsot pointerja..
+		void* valPtr = AlxParamItem_GetValPtr(*(me->paramItemArr + i));
 
 		// #2.2 Get value length
 		uint32_t len = AlxParamItem_GetValLen(*(me->paramItemArr + i));
@@ -280,10 +277,6 @@ static void AlxParamGroup_ParamItemsValDefToValToStoreBuff(AlxParamGroup* me)
 
 		// #2.4 Increment
 		valToStoreBuffIndex = valToStoreBuffIndex + len;
-
-		// #2.5 Check
-		//uint32_t lenNext = AlxParamItem_GetValLen(*(me->paramItemArr + i + 1)); // Ta vrstica da error ker v zadnjem ciklu hočemo pogledat neobstoječ člen arraya.. // Al se to vse odstrani al se pa da v if stavek da se preskoci v zadnjem ciklu
-		//ALX_PARAM_GROUP_ASSERT((valToStoreBuffIndex + lenNext) <= me->len); // Chnaged from < // V zadnjem ciklu je tole narobe. Nekak drgač je treba delat to preverjanje ali pa ga sploh ne delat...
 	}
 }
 static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me)
@@ -305,9 +298,5 @@ static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me)
 
 		// #2.4 Increment
 		valStoredBuffIndex = valStoredBuffIndex + len;
-
-		// #2.5 Check
-//		uint32_t lenNext = AlxParamItem_GetValLen(*(me->paramItemArr + i + 1)); // Isti problem ko zgori
-//		ALX_PARAM_GROUP_ASSERT((valStoredBuffIndex + lenNext) < me->len);
 	}
 }

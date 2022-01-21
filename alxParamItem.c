@@ -342,7 +342,6 @@ void AlxParamItem_CtorArr
 	void* valBuff,
 	void* valDefBuff,
 	uint32_t valBuffLen,
-	//uint32_t valBuffDefLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 )
 {
@@ -362,8 +361,6 @@ void AlxParamItem_CtorArr
 	// Variables
 	memcpy(me->valDef.voidPtr, valDef, me->valLen);			// Copy default value to default value buffer
 	memcpy(me->val.voidPtr, me->valDef.voidPtr, me->valLen);// Copy default value buffer to main buffer
-
-	//me->val.voidPtr = valDefBuff;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -408,15 +405,15 @@ void AlxParamItem_CtorStr
 //******************************************************************************
 const char* AlxParamItem_GetName(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Return
+	// #1 Return
 	return me->name;
 }
 uint32_t AlxParamItem_GetId(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
 	// #2 Return
@@ -424,26 +421,26 @@ uint32_t AlxParamItem_GetId(AlxParamItem* me)
 }
 uint32_t AlxParamItem_GetGroupId(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Return
+	// #1 Return
 	return me->groupId;
 }
 AlxParamItem_Type AlxParamItem_GetType(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Return
+	// #1 Return
 	return me->type;
 }
 void* AlxParamItem_GetValPtr(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Return
+	// #1 Return
 	if((me->type == AlxParamItem_Type_Str) || (me->type == AlxParamItem_Type_Arr))
 	{
 		void* ptr;
@@ -454,15 +451,15 @@ void* AlxParamItem_GetValPtr(AlxParamItem* me)
 }
 uint32_t AlxParamItem_GetValLen(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Return
+	// #1 Return
 	return me->valLen;
 }
 void AlxParamItem_SetValToDef(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
 	// #2 Set value to default
@@ -483,114 +480,114 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 }
 uint8_t AlxParamItem_GetValUint8(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint8);
 
-	// #2 Return
+	// #1 Return
 	return me->val.uint8;
 }
 uint16_t AlxParamItem_GetValUint16(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint16);
 
-	// #2 Return
+	// #1 Return
 	return me->val.uint16;
 }
 uint32_t AlxParamItem_GetValUint32(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint32);
 
-	// #2 Return
+	// #1 Return
 	return me->val.uint32;
 }
 uint64_t AlxParamItem_GetValUint64(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint64);
 
-	// #2 Return
+	// #1 Return
 	return me->val.uint64;
 }
 int8_t AlxParamItem_GetValInt8(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int8);
 
-	// #2 Return
+	// #1 Return
 	return me->val.int8;
 }
 int16_t AlxParamItem_GetValInt16(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int16);
 
-	// #2 Return
+	// #1 Return
 	return me->val.int16;
 }
 int32_t AlxParamItem_GetValInt32(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int32);
 
-	// #2 Return
+	// #1 Return
 	return me->val.int32;
 }
 int64_t AlxParamItem_GetValInt64(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int64);
 
-	// #2 Return
+	// #1 Return
 	return me->val.int64;
 }
 float AlxParamItem_GetValFloat(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Float);
 
-	// #2 Return
+	// #1 Return
 	return me->val._float;
 }
 double AlxParamItem_GetValDouble(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Double);
 
-	// #2 Return
+	// #1 Return
 	return me->val._double;
 }
 bool AlxParamItem_GetValBool(AlxParamItem* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Bool);
 
-	// #2 Return
+	// #1 Return
 	return me->val._bool;
 }
 Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint8);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	uint8_t _val = val;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch(me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -630,20 +627,20 @@ Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }
 Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint16);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	uint16_t _val = val;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -683,20 +680,20 @@ Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }
 Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint32);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	uint32_t _val = val;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -736,20 +733,20 @@ Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }
 Alx_Status AlxParamItem_SetValUint64(AlxParamItem* me, uint64_t val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint64);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	uint64_t _val = val;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -789,20 +786,20 @@ Alx_Status AlxParamItem_SetValUint64(AlxParamItem* me, uint64_t val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }
 Alx_Status AlxParamItem_SetValInt8(AlxParamItem* me, int8_t val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int8);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	int8_t _val = val;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -842,20 +839,20 @@ Alx_Status AlxParamItem_SetValInt8(AlxParamItem* me, int8_t val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }
 Alx_Status AlxParamItem_SetValInt16(AlxParamItem* me, int16_t val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int16);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	int16_t _val = val;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -895,20 +892,20 @@ Alx_Status AlxParamItem_SetValInt16(AlxParamItem* me, int16_t val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }
 Alx_Status AlxParamItem_SetValInt32(AlxParamItem* me, int32_t val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int32);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	int32_t _val = val;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -948,20 +945,20 @@ Alx_Status AlxParamItem_SetValInt32(AlxParamItem* me, int32_t val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }
 Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int64);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	int64_t _val = val;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -1001,20 +998,20 @@ Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }
 Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Float);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	float _val = val;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -1054,20 +1051,20 @@ Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }
 Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Double);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	double _val = val;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -1107,59 +1104,59 @@ Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }
 Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Bool);
 	ALX_PARAM_ITEM_ASSERT(val == true || val == false);
 
-	// #2 Handle value
+	// #1 Handle value
 	me->val._bool = val;
 
-	// #3 Return
+	// #2 Return
 	return Alx_Ok;
 }
 void AlxParamItem_GetValArr(AlxParamItem* me, void* val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Arr);
 
-	// #2
+	// #1 Copy
 	memcpy(val, me->val.voidPtr, me->valLen);
 }
 void AlxParamItem_SetValArr(AlxParamItem* me, void* val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Arr);
 
-	// #2
+	// #1 Copy
 	memcpy(me->val.voidPtr, val, me->valLen);
 }
 void AlxParamItem_GetValStr(AlxParamItem* me, char* val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
 
-	// #2
+	// #1 Copy
 	strcpy(val, me->val.charPtr);
 }
 Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 
-	// #3 Handle value out of range
+	// #2 Handle value out of range
 	switch(me->valOutOfRangeHandle)
 	{
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
@@ -1198,6 +1195,6 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 		}
 	}
 
-	// #4 Return
+	// #3 Return
 	return status;
 }

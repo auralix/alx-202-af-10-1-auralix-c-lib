@@ -24,7 +24,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_RANGE_FILE "alxRange.h"
+#define ALX_RANGE_FILE "alxRange"
 
 // Assert //
 #if defined(_ALX_RANGE_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -65,7 +65,7 @@ Alx_Status AlxRange_CheckInt32		(int32_t val, int32_t valMin, int32_t valMax	);
 Alx_Status AlxRange_CheckInt64		(int64_t val, int64_t valMin, int64_t valMax	);
 Alx_Status AlxRange_CheckFloat		(float val, float valMin, float valMax			);
 Alx_Status AlxRange_CheckDouble		(double val, double valMin, double valMax		);
-//Alx_Status AlxRange_CheckArr		(void* val, uint32_t valLenMax					);
+//Alx_Status AlxRange_CheckArr		(void* val, uint32_t valLenMax					);	// TO DO
 Alx_Status AlxRange_CheckStr		(char* val, uint32_t valLenMax					);
 
 
