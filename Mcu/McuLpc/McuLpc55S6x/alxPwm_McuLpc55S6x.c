@@ -86,10 +86,10 @@ void AlxPwm_Ctor
 	me->numOfCh = numOfCh;
 
 	// Variables
-	me->config.mode = kCTIMER_TimerMode;
-	me->config.input = kCTIMER_Capture_0;	// MF: This field is ignored when mode is "timer"
-	me->config.prescale = prescaler;
-	me->period = period;
+	me->config.mode			= kCTIMER_TimerMode;
+	me->config.input		= kCTIMER_Capture_0;	// MF: This field is ignored when mode is "timer"
+	me->config.prescale		= prescaler;
+	me->period				= period;
 
 	AlxPwm_SetSrcClk_SetPrescalerMax(me);
 

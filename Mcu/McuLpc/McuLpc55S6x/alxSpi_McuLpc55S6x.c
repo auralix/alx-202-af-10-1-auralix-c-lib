@@ -97,10 +97,10 @@ void AlxSpi_Ctor
 
 	AlxSpi_Ctor_ParseMode(me);
 
-	me->spiTransfer.txData = ALX_NULL_PTR;
-	me->spiTransfer.rxData = ALX_NULL_PTR;
-	me->spiTransfer.configFlags = kSPI_FrameAssert;
-	me->spiTransfer.dataSize = 0;
+	me->spiTransfer.txData			= ALX_NULL_PTR;
+	me->spiTransfer.rxData			= ALX_NULL_PTR;
+	me->spiTransfer.configFlags		= kSPI_FrameAssert;
+	me->spiTransfer.dataSize		= 0;
 
 	// Info
 	me->isInit = false;
@@ -130,11 +130,7 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 	AlxSpi_Periph_AttachClk(me);
 
 	// #4 Init SPI
-	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	// MF: FlexComm "EnableClk" and "Periph reset" happens here
-	{
-		ALX_SPI_TRACE("ErrInit");
-		return Alx_Err;
-	}
+	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
 
 	// #5 Set isInit
 	me->isInit = true;
@@ -188,15 +184,8 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
 	// #3 If we are here, SPI write/read was OK or number of tries error occured
-	if (status == kStatus_Success)
-	{
-		return Alx_Ok;
-	}
-	else
-	{
-		ALX_SPI_TRACE("ErrNumOfTries");
-		return Alx_ErrNumOfTries;
-	}
+	if (status == kStatus_Success)	{ return Alx_Ok; }
+	else							{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -220,15 +209,8 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
 	// #3 If we are here, SPI write/read was OK or number of tries error occured
-	if (status == kStatus_Success)
-	{
-		return Alx_Ok;
-	}
-	else
-	{
-		ALX_SPI_TRACE("ErrNumOfTries");
-		return Alx_ErrNumOfTries;
-	}
+	if (status == kStatus_Success)	{ return Alx_Ok; }
+	else							{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -252,15 +234,8 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
 	// #3 If we are here, SPI write/read was OK or number of tries error occured
-	if (status == kStatus_Success)
-	{
-		return Alx_Ok;
-	}
-	else
-	{
-		ALX_SPI_TRACE("ErrNumOfTries");
-		return Alx_ErrNumOfTries;
-	}
+	if (status == kStatus_Success)	{ return Alx_Ok; }
+	else							{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 void AlxSpi_Master_AssertCs(AlxSpi* me)
 {
@@ -297,15 +272,8 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 	}
 
 	// #3 If we are here, SPI write/read was OK or number of tries error occured
-	if (status == kStatus_Success)
-	{
-		return Alx_Ok;
-	}
-	else
-	{
-		ALX_SPI_TRACE("ErrNumOfTries");
-		return Alx_ErrNumOfTries;
-	}
+	if (status == kStatus_Success)	{ return Alx_Ok; }
+	else							{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me)
 {
@@ -314,6 +282,7 @@ static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me)
 		me->spiClk > AlxSpi_Clk_McuLpc55S6x_SpiClk_6MHz)	{ return false; }
 	else													{ return true; }
 
+	// Assert
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
 }
@@ -373,11 +342,7 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me)
 	AlxSpi_Periph_Reset(me);
 
 	// #4 Init SPI
-	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)
-	{
-		ALX_SPI_TRACE("ErrInit");
-		return Alx_Err;
-	}
+	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }
 
 	// #5 Set isInit
 	me->isInit = true;

@@ -135,74 +135,74 @@ static inputmux_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me)
 	////-----------
 	//// Port 0
 	////-----------
-	if (me->ioPin->port == 0 && me->ioPin->pin == 0)	return kINPUTMUX_GpioPort0Pin0ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 1)	return kINPUTMUX_GpioPort0Pin1ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 2)	return kINPUTMUX_GpioPort0Pin2ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 3)	return kINPUTMUX_GpioPort0Pin3ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 4)	return kINPUTMUX_GpioPort0Pin4ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 5)	return kINPUTMUX_GpioPort0Pin5ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 6)	return kINPUTMUX_GpioPort0Pin6ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 7)	return kINPUTMUX_GpioPort0Pin7ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 8)	return kINPUTMUX_GpioPort0Pin8ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 9)	return kINPUTMUX_GpioPort0Pin9ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 10)	return kINPUTMUX_GpioPort0Pin10ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 11)	return kINPUTMUX_GpioPort0Pin11ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 12)	return kINPUTMUX_GpioPort0Pin12ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 13)	return kINPUTMUX_GpioPort0Pin13ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 14)	return kINPUTMUX_GpioPort0Pin14ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 15)	return kINPUTMUX_GpioPort0Pin15ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 16)	return kINPUTMUX_GpioPort0Pin16ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 17)	return kINPUTMUX_GpioPort0Pin17ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 18)	return kINPUTMUX_GpioPort0Pin18ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 19)	return kINPUTMUX_GpioPort0Pin19ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 20)	return kINPUTMUX_GpioPort0Pin20ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 21)	return kINPUTMUX_GpioPort0Pin21ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 22)	return kINPUTMUX_GpioPort0Pin22ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 23)	return kINPUTMUX_GpioPort0Pin23ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 24)	return kINPUTMUX_GpioPort0Pin24ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 25)	return kINPUTMUX_GpioPort0Pin25ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 26)	return kINPUTMUX_GpioPort0Pin26ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 27)	return kINPUTMUX_GpioPort0Pin27ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 28)	return kINPUTMUX_GpioPort0Pin28ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 29)	return kINPUTMUX_GpioPort0Pin29ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 30)	return kINPUTMUX_GpioPort0Pin30ToPintsel;
-	if (me->ioPin->port == 0 && me->ioPin->pin == 31)	return kINPUTMUX_GpioPort0Pin31ToPintsel;
+	if (me->ioPin->port == 0 && me->ioPin->pin == 0)	{ return kINPUTMUX_GpioPort0Pin0ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 1)	{ return kINPUTMUX_GpioPort0Pin1ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 2)	{ return kINPUTMUX_GpioPort0Pin2ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 3)	{ return kINPUTMUX_GpioPort0Pin3ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 4)	{ return kINPUTMUX_GpioPort0Pin4ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 5)	{ return kINPUTMUX_GpioPort0Pin5ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 6)	{ return kINPUTMUX_GpioPort0Pin6ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 7)	{ return kINPUTMUX_GpioPort0Pin7ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 8)	{ return kINPUTMUX_GpioPort0Pin8ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 9)	{ return kINPUTMUX_GpioPort0Pin9ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 10)	{ return kINPUTMUX_GpioPort0Pin10ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 11)	{ return kINPUTMUX_GpioPort0Pin11ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 12)	{ return kINPUTMUX_GpioPort0Pin12ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 13)	{ return kINPUTMUX_GpioPort0Pin13ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 14)	{ return kINPUTMUX_GpioPort0Pin14ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 15)	{ return kINPUTMUX_GpioPort0Pin15ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 16)	{ return kINPUTMUX_GpioPort0Pin16ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 17)	{ return kINPUTMUX_GpioPort0Pin17ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 18)	{ return kINPUTMUX_GpioPort0Pin18ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 19)	{ return kINPUTMUX_GpioPort0Pin19ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 20)	{ return kINPUTMUX_GpioPort0Pin20ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 21)	{ return kINPUTMUX_GpioPort0Pin21ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 22)	{ return kINPUTMUX_GpioPort0Pin22ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 23)	{ return kINPUTMUX_GpioPort0Pin23ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 24)	{ return kINPUTMUX_GpioPort0Pin24ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 25)	{ return kINPUTMUX_GpioPort0Pin25ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 26)	{ return kINPUTMUX_GpioPort0Pin26ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 27)	{ return kINPUTMUX_GpioPort0Pin27ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 28)	{ return kINPUTMUX_GpioPort0Pin28ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 29)	{ return kINPUTMUX_GpioPort0Pin29ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 30)	{ return kINPUTMUX_GpioPort0Pin30ToPintsel; }
+	if (me->ioPin->port == 0 && me->ioPin->pin == 31)	{ return kINPUTMUX_GpioPort0Pin31ToPintsel; }
 
 	////-----------
 	//// Port 1
 	////-----------
-	if (me->ioPin->port == 1 && me->ioPin->pin == 0)	return kINPUTMUX_GpioPort1Pin0ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 1)	return kINPUTMUX_GpioPort1Pin1ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 2)	return kINPUTMUX_GpioPort1Pin2ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 3)	return kINPUTMUX_GpioPort1Pin3ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 4)	return kINPUTMUX_GpioPort1Pin4ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 5)	return kINPUTMUX_GpioPort1Pin5ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 6)	return kINPUTMUX_GpioPort1Pin6ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 7)	return kINPUTMUX_GpioPort1Pin7ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 8)	return kINPUTMUX_GpioPort1Pin8ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 9)	return kINPUTMUX_GpioPort1Pin9ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 10)	return kINPUTMUX_GpioPort1Pin10ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 11)	return kINPUTMUX_GpioPort1Pin11ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 12)	return kINPUTMUX_GpioPort1Pin12ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 13)	return kINPUTMUX_GpioPort1Pin13ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 14)	return kINPUTMUX_GpioPort1Pin14ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 15)	return kINPUTMUX_GpioPort1Pin15ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 16)	return kINPUTMUX_GpioPort1Pin16ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 17)	return kINPUTMUX_GpioPort1Pin17ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 18)	return kINPUTMUX_GpioPort1Pin18ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 19)	return kINPUTMUX_GpioPort1Pin19ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 20)	return kINPUTMUX_GpioPort1Pin20ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 21)	return kINPUTMUX_GpioPort1Pin21ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 22)	return kINPUTMUX_GpioPort1Pin22ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 23)	return kINPUTMUX_GpioPort1Pin23ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 24)	return kINPUTMUX_GpioPort1Pin24ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 25)	return kINPUTMUX_GpioPort1Pin25ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 26)	return kINPUTMUX_GpioPort1Pin26ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 27)	return kINPUTMUX_GpioPort1Pin27ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 28)	return kINPUTMUX_GpioPort1Pin28ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 29)	return kINPUTMUX_GpioPort1Pin29ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 30)	return kINPUTMUX_GpioPort1Pin30ToPintsel;
-	if (me->ioPin->port == 1 && me->ioPin->pin == 31)	return kINPUTMUX_GpioPort1Pin31ToPintsel;
+	if (me->ioPin->port == 1 && me->ioPin->pin == 0)	{ return kINPUTMUX_GpioPort1Pin0ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 1)	{ return kINPUTMUX_GpioPort1Pin1ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 2)	{ return kINPUTMUX_GpioPort1Pin2ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 3)	{ return kINPUTMUX_GpioPort1Pin3ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 4)	{ return kINPUTMUX_GpioPort1Pin4ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 5)	{ return kINPUTMUX_GpioPort1Pin5ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 6)	{ return kINPUTMUX_GpioPort1Pin6ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 7)	{ return kINPUTMUX_GpioPort1Pin7ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 8)	{ return kINPUTMUX_GpioPort1Pin8ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 9)	{ return kINPUTMUX_GpioPort1Pin9ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 10)	{ return kINPUTMUX_GpioPort1Pin10ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 11)	{ return kINPUTMUX_GpioPort1Pin11ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 12)	{ return kINPUTMUX_GpioPort1Pin12ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 13)	{ return kINPUTMUX_GpioPort1Pin13ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 14)	{ return kINPUTMUX_GpioPort1Pin14ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 15)	{ return kINPUTMUX_GpioPort1Pin15ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 16)	{ return kINPUTMUX_GpioPort1Pin16ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 17)	{ return kINPUTMUX_GpioPort1Pin17ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 18)	{ return kINPUTMUX_GpioPort1Pin18ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 19)	{ return kINPUTMUX_GpioPort1Pin19ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 20)	{ return kINPUTMUX_GpioPort1Pin20ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 21)	{ return kINPUTMUX_GpioPort1Pin21ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 22)	{ return kINPUTMUX_GpioPort1Pin22ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 23)	{ return kINPUTMUX_GpioPort1Pin23ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 24)	{ return kINPUTMUX_GpioPort1Pin24ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 25)	{ return kINPUTMUX_GpioPort1Pin25ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 26)	{ return kINPUTMUX_GpioPort1Pin26ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 27)	{ return kINPUTMUX_GpioPort1Pin27ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 28)	{ return kINPUTMUX_GpioPort1Pin28ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 29)	{ return kINPUTMUX_GpioPort1Pin29ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 30)	{ return kINPUTMUX_GpioPort1Pin30ToPintsel; }
+	if (me->ioPin->port == 1 && me->ioPin->pin == 31)	{ return kINPUTMUX_GpioPort1Pin31ToPintsel; }
 
 	// Assert
 	ALX_IO_PIN_IRQ_ASSERT(false); // We shouldn't get here
@@ -211,14 +211,14 @@ static inputmux_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me)
 static IRQn_Type AlxIoPin_GetIrqType(AlxIoPinIrq* me)
 {
 	// #1 Get IRQ Type
-	if (me->irqPin == kPINT_PinInt0)	return PIN_INT0_IRQn;
-	if (me->irqPin == kPINT_PinInt1)	return PIN_INT1_IRQn;
-	if (me->irqPin == kPINT_PinInt2)	return PIN_INT2_IRQn;
-	if (me->irqPin == kPINT_PinInt3)	return PIN_INT3_IRQn;
-	if (me->irqPin == kPINT_PinInt4)	return PIN_INT4_IRQn;
-	if (me->irqPin == kPINT_PinInt5)	return PIN_INT5_IRQn;
-	if (me->irqPin == kPINT_PinInt6)	return PIN_INT6_IRQn;
-	if (me->irqPin == kPINT_PinInt7)	return PIN_INT7_IRQn;
+	if (me->irqPin == kPINT_PinInt0)	{ return PIN_INT0_IRQn; }
+	if (me->irqPin == kPINT_PinInt1)	{ return PIN_INT1_IRQn; }
+	if (me->irqPin == kPINT_PinInt2)	{ return PIN_INT2_IRQn; }
+	if (me->irqPin == kPINT_PinInt3)	{ return PIN_INT3_IRQn; }
+	if (me->irqPin == kPINT_PinInt4)	{ return PIN_INT4_IRQn; }
+	if (me->irqPin == kPINT_PinInt5)	{ return PIN_INT5_IRQn; }
+	if (me->irqPin == kPINT_PinInt6)	{ return PIN_INT6_IRQn; }
+	if (me->irqPin == kPINT_PinInt7)	{ return PIN_INT7_IRQn; }
 
 	// Assert
 	ALX_IO_PIN_IRQ_ASSERT(false); // We shouldn't get here

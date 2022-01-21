@@ -35,14 +35,14 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxSpi_Clk_McuLpc55S6x_SpiClk_500kHz_Default = 500000U,
-	AlxSpi_Clk_McuLpc55S6x_SpiClk_12MHz = 12000000U,
-	AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz = 10000000U,
-	AlxSpi_Clk_McuLpc55S6x_SpiClk_6MHz = 6000000U,
-	AlxSpi_Clk_McuLpc55S6x_SpiClk_4MHz = 4000000U,
-	AlxSpi_Clk_McuLpc55S6x_SpiClk_3MHz = 3000000U,
-	AlxSpi_Clk_McuLpc55S6x_SpiClk_2MHz = 2000000U,
-	AlxSpi_Clk_McuLpc55S6x_SpiClk_1MHz = 1000000U
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_500kHz_Default	= 500000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_12MHz				= 12000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz				= 10000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_6MHz				= 6000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_4MHz				= 4000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_3MHz				= 3000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_2MHz				= 2000000U,
+	AlxSpi_Clk_McuLpc55S6x_SpiClk_1MHz				= 1000000U
 } AlxSpi_Clk;
 
 typedef enum

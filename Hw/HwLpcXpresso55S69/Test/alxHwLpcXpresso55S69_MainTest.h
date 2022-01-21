@@ -17,12 +17,23 @@ extern "C" {
 //******************************************************************************
 // Includes
 //******************************************************************************
+#include <alxConfig.h>
 #include <alxHwLpcXpresso55S69_Main.h>
-//#include <alxHwLpcXpresso55S69_GhTest.h>
-//#include <alxHwLpcXpresso55S69_GkTest.h>
-//#include <alxHwLpcXpresso55S69_JkTest.h>
+#if defined(ALX_TEST_GH)
+#include <alxHwLpcXpresso55S69_GhTest.h>
+#endif
+#if defined(ALX_TEST_GK)
+#include <alxHwLpcXpresso55S69_GkTest.h>
+#endif
+#if defined(ALX_TEST_JK)
+#include <alxHwLpcXpresso55S69_JkTest.h>
+#endif
+#if defined(ALX_TEST_MF)
 #include <alxHwLpcXpresso55S69_MfTest.h>
+#endif
+#if defined(ALX_TEST_TV)
 //#include <alxHwLpcXpresso55S69_TvTest.h>
+#endif
 
 
 //******************************************************************************
@@ -36,16 +47,36 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Gh
+	///-------
+	/// Gh
+	///-------
+	#if defined(ALX_TEST_MF)
+	#endif
 
-	// Gk
+	///-------
+	/// Gk
+	///-------
+	#if defined(ALX_TEST_GK)
+	#endif
 
-	// Jk
+	///-------
+	/// Jk
+	///-------
+	#if defined(ALX_TEST_JK)
+	#endif
 
-	// Mf
+	///-------
+	/// Mf
+	///-------
+	#if defined(ALX_TEST_MF)
 	AlxHwLpcXpresso55S69_MfTest_G01_BringUp alxHwLpcXpresso55S69_MfTest_G01_BringUp;
+	#endif
 
-	// Tv
+	///-------
+	/// Tv
+	///-------
+	#if defined(ALX_TEST_TV)
+	#endif
 
 } AlxHwLpcXpresso55S69_MainTest;
 
@@ -61,42 +92,102 @@ extern AlxHwLpcXpresso55S69_MainTest alxHwLpcXpresso55S69_MainTest;
 //******************************************************************************
 static inline void AlxHwLpcXpresso55S69_MainTest_Ctor(AlxHwLpcXpresso55S69_MainTest* me)
 {
-	// Gh
+	///-------
+	/// Gh
+	///-------
+	#if defined(ALX_TEST_GH)
+	#endif
 
-	// Gk
+	///-------
+	/// Gk
+	///-------
+	#if defined(ALX_TEST_GK)
+	#endif
 
-	// Jk
+	///-------
+	/// Jk
+	///-------
+	#if defined(ALX_TEST_JK)
+	#endif
 
-	// Mf
+	///-------
+	/// Mf
+	///-------
+	#if defined(ALX_TEST_MF)
 	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Ctor(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	#endif
 
-	// Tv
+	///-------
+	/// Tv
+	///-------
+	#if defined(ALX_TEST_TV)
+	#endif
 }
 static inline void AlxHwLpcXpresso55S69_MainTest_Init(AlxHwLpcXpresso55S69_MainTest* me)
 {
-	// Gh
+	///-------
+	/// Gh
+	///-------
+	#if defined(ALX_TEST_GH)
+	#endif
 
-	// Gk
+	///-------
+	/// Gk
+	///-------
+	#if defined(ALX_TEST_GK)
+	#endif
 
-	// Jk
+	///-------
+	/// Jk
+	///-------
+	#if defined(ALX_TEST_JK)
+	#endif
 
-	// Mf
+	///-------
+	/// Mf
+	///-------
+	#if defined(ALX_TEST_MF)
 	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	#endif
 
-	// Tv
+	///-------
+	/// Tv
+	///-------
+	#if defined(ALX_TEST_TV)
+	#endif
 }
 static inline void AlxHwLpcXpresso55S69_MainTest_Run(AlxHwLpcXpresso55S69_MainTest* me)
 {
-	// Gh
+	///-------
+	/// Gh
+	///-------
+	#if defined(ALX_TEST_MF)
+	#endif
 
-	// Gk
+	///-------
+	/// Gk
+	///-------
+	#if defined(ALX_TEST_GK)
+	#endif
 
-	// Jk
+	///-------
+	/// Jk
+	///-------
+	#if defined(ALX_TEST_JK)
+	#endif
 
-	// Mf
+	///-------
+	/// Mf
+	///-------
+	#if defined(ALX_TEST_MF)
 	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	#endif
 
-	// Tv
+	///-------
+	/// Tv
+	///-------
+	#if defined(ALX_TEST_TV)
+	#endif
 }
 
 

@@ -56,20 +56,20 @@ void AlxTrace_Ctor
 	me->baudRate = (uint32_t)baudRate;
 
 	// Variables
-	me->usartConfig.baudRate_Bps = (uint32_t)baudRate;
-	me->usartConfig.parityMode = kUSART_ParityDisabled;
-	me->usartConfig.stopBitCount = kUSART_OneStopBit;
-	me->usartConfig.bitCountPerChar = kUSART_8BitsPerChar;
-	me->usartConfig.loopback = false;
-	me->usartConfig.enableRx = false;
-	me->usartConfig.enableTx = true;
-	me->usartConfig.enableContinuousSCLK = false;
-	me->usartConfig.enableMode32k = false;
-	me->usartConfig.enableHardwareFlowControl = false;
-	me->usartConfig.txWatermark = kUSART_TxFifo0;	// MF: I don't understand this
-	me->usartConfig.rxWatermark = kUSART_RxFifo1;	// MF: I don't understand this
-	me->usartConfig.syncMode = kUSART_SyncModeDisabled;
-	me->usartConfig.clockPolarity = kUSART_RxSampleOnFallingEdge;
+	me->usartConfig.baudRate_Bps				= (uint32_t)baudRate;
+	me->usartConfig.parityMode					= kUSART_ParityDisabled;
+	me->usartConfig.stopBitCount				= kUSART_OneStopBit;
+	me->usartConfig.bitCountPerChar				= kUSART_8BitsPerChar;
+	me->usartConfig.loopback					= false;
+	me->usartConfig.enableRx					= false;
+	me->usartConfig.enableTx					= true;
+	me->usartConfig.enableContinuousSCLK		= false;
+	me->usartConfig.enableMode32k				= false;
+	me->usartConfig.enableHardwareFlowControl	= false;
+	me->usartConfig.txWatermark					= kUSART_TxFifo0;	// MF: I don't understand this
+	me->usartConfig.rxWatermark					= kUSART_RxFifo1;	// MF: I don't understand this
+	me->usartConfig.syncMode					= kUSART_SyncModeDisabled;
+	me->usartConfig.clockPolarity				= kUSART_RxSampleOnFallingEdge;
 
 	// Info
 	me->isInit = false;
