@@ -34,7 +34,7 @@ void AlxFifo_Ctor
 	// Parameters
 	me->buff = buff;
 	me->buffLen = buffLen;
-	
+
 	// Variables
 	for (uint32_t i = 0; i < me->buffLen; i++) me->buff[i] = 0;
 	me->head = 0;
@@ -54,7 +54,7 @@ void AlxFifo_Ctor
 void AlxFifo_Flush(AlxFifo* me)
 {
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-	
+
 	for (uint32_t i = 0; i < me->buffLen; i++) me->buff[i] = 0;
 	me->head = 0;
 	me->tail = 0;
@@ -129,7 +129,7 @@ Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint3
 							AlxFifo_ReadByte(me, (uint8_t*)&str[k]);
 						}
 						str[numBytesRead] = '\0';
-										
+
 						if (numRead != NULL) { *numRead = numBytesRead; }
 					}
 					else
@@ -182,7 +182,7 @@ Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len)
 		status = AlxFifo_WriteByte(me, data[i]);
 		if (status != Alx_Ok) return status;
 	}
-	
+
 	return status;
 }
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str)
@@ -194,7 +194,7 @@ Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str)
 uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me)
 {
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-	
+
 	return me->numOfEntries;
 }
 

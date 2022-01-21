@@ -24,7 +24,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_CRC_FILE "alxCrc.h"
+#define ALX_CRC_FILE "alxCrc"
 
 // Assert //
 #if defined(_ALX_CRC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)

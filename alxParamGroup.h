@@ -26,7 +26,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PARAM_GROUP_FILE "alxParamGroup.h"
+#define ALX_PARAM_GROUP_FILE "alxParamGroup"
 
 // Assert //
 #if defined(_ALX_PARAM_GROUP_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
