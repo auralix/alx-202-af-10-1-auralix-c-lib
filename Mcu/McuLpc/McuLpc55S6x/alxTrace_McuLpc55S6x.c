@@ -203,7 +203,10 @@ static uint8_t AlxTrace_GetIoconFunc(AlxTrace* me)
 	#endif
 
 	// Assert
-	if (isErr) { assert(true); }
+	if (isErr)
+	{
+		// We shouldn't get here
+	}
 	return 0xFF;
 }
 
@@ -239,7 +242,10 @@ static uint32_t AlxTrace_GetFlexcommId(AlxTrace* me)
 	#endif
 
 	// Assert
-	if (isErr) { assert(true); }
+	if (isErr)
+	{
+		// We shouldn't get here
+	}
 	return 0xFFFFFFFF;
 }
 static void AlxTrace_AttachClkToFlexcomm(AlxTrace* me)
@@ -274,7 +280,10 @@ static void AlxTrace_AttachClkToFlexcomm(AlxTrace* me)
 	#endif
 
 	// Assert
-	if (isErr) { assert(true); }
+	if (isErr)
+	{
+		// We shouldn't get here
+	}
 }
 static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me)
 {
@@ -308,7 +317,10 @@ static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me)
 	#endif
 
 	// Assert
-	if (isErr) { assert(true); }
+	if (isErr)
+	{
+		// We shouldn't get here
+	}
 }
 
 #endif // Module Guard

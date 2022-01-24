@@ -241,7 +241,7 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 					(ioPinArr[i]->port == 0 && ioPinArr[i]->pin == 31) ||
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 31) ))	{ return false; }
 
-			if (i == (numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
+			if (i == (uint32_t)(numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
 		}
 	#endif
 	#if defined(CTIMER1)
@@ -255,7 +255,7 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 12) ||
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 14) ))	{ return false; }
 
-			if (i == (numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
+			if (i == (uint32_t)(numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
 		}
 	#endif
 	#if defined(CTIMER2)
@@ -269,7 +269,7 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 6)  ||
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 7)  ))	{ return false; }
 
-			if (i == (numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
+			if (i == (uint32_t)(numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
 		}
 	#endif
 	#if defined(CTIMER3)
@@ -281,7 +281,7 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 19) ||
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 21) ))	{ return false; }
 
-			if (i == (numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
+			if (i == (uint32_t)(numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
 		}
 	#endif
 	#if defined(CTIMER4)
@@ -290,7 +290,7 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 		{
 			if (!(	(ioPinArr[i]->port == 0 && ioPinArr[i]->pin == 6)  ))	{ return false; }	// MF: CTIMER4 can have only 1 channel, will we ever use id?
 
-			if (i == (numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
+			if (i == (uint32_t)(numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
 		}
 		#endif
 
