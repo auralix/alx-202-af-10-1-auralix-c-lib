@@ -52,15 +52,15 @@ void AlxSpi_Ctor
 {
 	//Assert
 	(void)me;
-	ALX_SPI_ASSERT((spi == SPI0) || (spi == SPI1) || (spi == SPI2) || (spi == SPI3) || (spi == SPI4) || (spi == SPI5) || (spi == SPI6) || (spi == SPI7));
+	(void)spi;
 	(void)do_SCK;
 	(void)do_MOSI;
 	(void)di_MISO;
 	(void)do_nCS;
-	ALX_SPI_ASSERT((mode == AlxSpi_Mode_0) || (mode == AlxSpi_Mode_1) || (mode == AlxSpi_Mode_2) || (mode == AlxSpi_Mode_3));
-	ALX_SPI_ASSERT((nCSSel == kSPI_Ssel0) || (nCSSel == kSPI_Ssel1) || (nCSSel == kSPI_Ssel2) || (nCSSel == kSPI_Ssel3));
+	(void)mode;
+	(void)nCSSel;
 	(void)clk;
-	//todo
+	(void)spiClk;
 
 	// Objects - External
 	me->spi = spi;
@@ -174,7 +174,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
 	// #1 Prepare variables
-	uint8_t dummy[len];
+	uint8_t* dummy = NULL;
 	me->spiTransfer.txData = writeData;
 	me->spiTransfer.rxData = dummy;		// MF: We dont need received data
 	me->spiTransfer.dataSize = len;
@@ -184,8 +184,8 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
 	// #3 If we are here, SPI write/read was OK or number of tries error occured
-	if (status == kStatus_Success)	{ return Alx_Ok; }
-	else							{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
+	if (status == Alx_Ok)	{ return Alx_Ok; }
+	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -199,7 +199,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
 	// #1 Prepare variables
-	uint8_t dummy[len];
+	uint8_t* dummy = NULL;
 	me->spiTransfer.txData = dummy;		// MF: We dont need transmited data
 	me->spiTransfer.rxData = readData;
 	me->spiTransfer.dataSize = len;
@@ -209,8 +209,8 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
 	// #3 If we are here, SPI write/read was OK or number of tries error occured
-	if (status == kStatus_Success)	{ return Alx_Ok; }
-	else							{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
+	if (status == Alx_Ok)	{ return Alx_Ok; }
+	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -234,15 +234,25 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
 	// #3 If we are here, SPI write/read was OK or number of tries error occured
-	if (status == kStatus_Success)	{ return Alx_Ok; }
-	else							{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
+	if (status == Alx_Ok)	{ return Alx_Ok; }
+	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 void AlxSpi_Master_AssertCs(AlxSpi* me)
 {
+	// Assert
+	ALX_SPI_ASSERT(me->isInit == true);
+	ALX_SPI_ASSERT(me->wasCtorCalled == true);
+	(void)me;
+
 	AlxIoPin_Reset(me->do_nCS);
 }
 void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 {
+	// Assert
+	ALX_SPI_ASSERT(me->isInit == true);
+	ALX_SPI_ASSERT(me->wasCtorCalled == true);
+	(void)me;
+
 	AlxIoPin_Set(me->do_nCS);
 }
 

@@ -259,7 +259,6 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO1_17	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.di_P1_18_WakeBtn_IRQ1,	1,	18,	AlxIoPin_Func_IRQ,		IOCON_MODE_INACT,	true,	false,	false,	false	);
 	//PIO1_19	- Unused
-	//PIO1_20	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_20_SPI_nCS,		1,	20,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	//PIO1_22	- Unused
 	//PIO1_23	- Unused
