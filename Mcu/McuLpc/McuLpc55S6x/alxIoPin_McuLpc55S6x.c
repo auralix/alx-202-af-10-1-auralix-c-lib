@@ -44,10 +44,10 @@ void AlxIoPin_Ctor
 {
 	// Assert
 	(void)me;
-	ALX_IO_PIN_ASSERT(port == 0 || port == 1);
-	ALX_IO_PIN_ASSERT(pin >= 0 && pin <= 31);
-	ALX_IO_PIN_ASSERT(!(port == 0 && pin == 13));	// MF: PIO0_13 is for i2c and will be Inited in alxI2c module TODO
-	ALX_IO_PIN_ASSERT(!(port == 0 && pin == 14));	// MF: PIO0_13 is for i2c and will be Inited in alxI2c module TODO
+	ALX_IO_PIN_ASSERT((port == 0) || (port == 1));
+	ALX_IO_PIN_ASSERT((0 <= pin) && (pin <= 31));
+	ALX_IO_PIN_ASSERT(!((port == 0) && (pin == 13)));	// MF: PIO0_13 is for I2C and will be initialzed in alxI2c module TODO
+	ALX_IO_PIN_ASSERT(!((port == 0) && (pin == 14)));	// MF: PIO0_13 is for I2C and will be initialzed in alxI2c module TODO
 	(void)func;
 	(void)mode;
 	(void)digiMode;
@@ -126,7 +126,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	// #1 Reset IOCON
 	AlxIoPin_ResetIocon(me);
 
-	// #2.2 DeInit if GPIO
+	// #2 DeInit if GPIO
 	if (me->func == AlxIoPin_Func_0_GPIO)
 	{
 		GPIO->DIR[me->port] &= ~(1U << me->pin);	// MF: Reset Dir (0)
@@ -185,36 +185,50 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 }
 void AlxIoPin_Lock(AlxIoPin* me)
 {
+	(void)me;
+
 	// TODO
 	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_IrqHandler(AlxIoPin* me)
 {
+	(void)me;
+
 	// TODO
 	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_PullNone(AlxIoPin* me)
 {
+	(void)me;
+
 	// TODO
 	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_PullUp(AlxIoPin* me)
 {
+	(void)me;
+
 	// TODO
 	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_PullDown(AlxIoPin* me)
 {
+	(void)me;
+
 	// TODO
 	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_AssertOn(AlxIoPin* me)
 {
+	(void)me;
+
 	// TODO
 	ALX_IO_PIN_ASSERT(false);
 }
 void AlxIoPin_Config_AssertOff(AlxIoPin* me)
 {
+	(void)me;
+
 	// TODO
 	ALX_IO_PIN_ASSERT(false);
 }
