@@ -8,13 +8,13 @@
 
 ---
 ## Ctor Arguments
-__AlxSpi* me__ - Pointer to Spi object
-__SPI_Type* spi__ - Spi peripheral base pointer
-__AlxIoPin* do_SCK__ - Pointer to SCK IoPin
-__AlxIoPin* do_MOSI__ - Pointer to MOSI IoPin
-__AlxIoPin* di_MISO__ - Pointer to MISO IoPin
-__AlxIoPin* do_nCS__ - Pointer to nCS IoPin
-__AlxSpi_Mode mode__ - 
-__spi_ssel_t nCSSel__ - Spi nCS select enum
-__AlxClk* clk__ - Pointer to Clk object
-__AlxSpi_Clk spiClk__
+- __AlxSpi* me__ - Pointer to Spi object
+- __SPI_Type* spi__ - Spi peripheral base pointer
+- __AlxIoPin* do_SCK__ - Pointer to SCK IoPin
+- __AlxIoPin* do_MOSI__ - Pointer to MOSI IoPin
+- __AlxIoPin* di_MISO__ - Pointer to MISO IoPin
+- __AlxIoPin* do_nCS__ - Pointer to nCS IoPin
+- __AlxSpi_Mode mode__ - 
+- __spi_ssel_t nCSSel__ - Spi nCS select enum
+- __AlxClk* clk__ - Pointer to Clk object
+- __AlxSpi_Clk spiClk__
