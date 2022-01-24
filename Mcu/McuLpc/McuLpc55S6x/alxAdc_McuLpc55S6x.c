@@ -72,7 +72,7 @@ void AlxAdc_Ctor
 	#endif
 
 	// Check channel sequence
-	for (uint32_t i = 0; i < numOfIoPinsAndCh - 1; i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) <= AlxAdc_GetCh(me, chArr[i + 1]));	// MF: Channel sequence must be from low to high number
+	for (uint32_t i = 0; i < (uint32_t)(numOfIoPinsAndCh - 1); i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) <= AlxAdc_GetCh(me, chArr[i + 1]));	// MF: Channel sequence must be from low to high number
 
 	// Check if right channels are used
 	ALX_ADC_ASSERT(AlxAdc_Ctor_CheckCh(me));
@@ -190,6 +190,8 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 {
 	// Optimize Guard
 	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	(void)me;
+	(void)ch;
 	ALX_ADC_ASSERT(false);
 	return ALX_NULL;
 	#else
@@ -242,6 +244,8 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 }
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
+	(void)me;
+
 	// TODO
 
 	// Assert
@@ -255,6 +259,8 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 //******************************************************************************
 static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 {
+	(void)me;
+
 	// #1 Return Ch
 	if (ch == Alx_Ch_0)		return 0;
 	if (ch == Alx_Ch_1)		return 1;
@@ -306,6 +312,8 @@ static void AlxAdc_SetClkDiv(AlxAdc* me)
 }
 lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch)
 {
+	(void)me;
+
 	// #1 Check if channels mode A
 	if ((ch == Alx_Ch_0) || (ch == Alx_Ch_1) || (ch == Alx_Ch_2 ) || (ch == Alx_Ch_3 ) || (ch == Alx_Ch_4 ))
 	{

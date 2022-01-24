@@ -7,8 +7,8 @@
   ******************************************************************************
   */
 
-#ifndef ALX_ADC_MCU_LPC55S6x_H
-#define ALX_ADC_MCU_LPC55S6x_H
+#ifndef ALX_ADC_MCU_LPC55S6X_H
+#define ALX_ADC_MCU_LPC55S6X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +35,7 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Obejcts - External
+	// Objects - External
 	AlxIoPin** ioPinArr;
 	AlxClk* clk;
 
@@ -84,4 +84,4 @@ void AlxAdc_Ctor
 }
 #endif
 
-#endif // ALX_ADC_MCU_LPC55S6x_H
+#endif // ALX_ADC_MCU_LPC55S6X_H
