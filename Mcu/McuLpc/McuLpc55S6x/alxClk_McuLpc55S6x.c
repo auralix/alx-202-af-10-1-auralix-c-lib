@@ -134,6 +134,8 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 }
 void AlxClk_Irq_Handle(AlxClk* me)
 {
+	(void)me;
+
 	// TODO
 	ALX_CLK_ASSERT(false); // We shouldn't get here
 	return;
@@ -173,6 +175,8 @@ static bool AlxClk_AreClkNok(AlxClk* me)
 }
 static void AlxClk_SetupPll(AlxClk* me, pll_setup_t* pllSetup, uint32_t inputFreq, uint8_t pllN, uint8_t pllP, uint16_t pllM)
 {
+	(void)me;
+
 	// #1 Prepare Variable
 	// #1.1 SELI
 	uint8_t seli = 0U;
@@ -226,6 +230,8 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(Al
 
 static void AlxClk_Init_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default(AlxClk* me)
 {
+	(void)me;
+
 	// #1 Enable FRO
 	POWER_DisablePD(kPDRUNCFG_PD_FRO192M);
 
@@ -234,6 +240,8 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Defau
 }
 static void AlxClk_Init_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(AlxClk* me)
 {
+	(void)me;
+
 	// #1 Set FLASH wait states for core Freq
 	CLOCK_SetFLASHAccessCyclesForFreq(96000000U);
 
