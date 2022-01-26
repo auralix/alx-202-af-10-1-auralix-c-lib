@@ -53,15 +53,15 @@ void AlxParamStore_Ctor
 //******************************************************************************
 Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* statusParamGroup, uint8_t numOfParamGroups)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_STORE_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_STORE_ASSERT(me->isInit == false);
 	ALX_PARAM_STORE_ASSERT(numOfParamGroups == me->numOfParamGroups);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Ok;
 
-	// #3 Init
+	// #2 Init
 	for (uint32_t i = 0; i < me->numOfParamGroups; i++)
 	{
 		statusParamGroup[i] = AlxParamGroup_Init(*(me->paramGroups + i));
@@ -72,19 +72,19 @@ Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* statusParamGroup, u
 		}
 	}
 
-	// #4 Set isInit
+	// #3 Set isInit
 	me->isInit = true;
 
-	// #5 Return
+	// #4 Return
 	return status;
 }
 void AlxParamStore_Handle(AlxParamStore* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_STORE_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_STORE_ASSERT(me->isInit == true);
 
-	// #2 Config
+	// #1 Config
 	switch (me->numOfParamGroups)
 	{
 		case 1:
@@ -111,11 +111,11 @@ void AlxParamStore_Handle(AlxParamStore* me)
 }
 bool AlxParamStore_IsErr(AlxParamStore* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PARAM_STORE_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_STORE_ASSERT(me->isInit == true);
 
-	// #2 Return
+	// #1 Return
 	if (me->st == AlxParamStore_St_Err)
 		return true;
 	else

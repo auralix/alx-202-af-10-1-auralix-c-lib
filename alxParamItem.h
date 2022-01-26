@@ -26,7 +26,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PARAM_ITEM_FILE "alxParamItem.h"
+#define ALX_PARAM_ITEM_FILE "alxParamItem"
 
 // Assert //
 #if defined(_ALX_PARAM_ITEM_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -111,7 +111,7 @@ typedef struct
 	AlxParamItem_Val valMax;
 	uint32_t valLen;			// MF: valBuffLen
 	uint32_t valDefLen;
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle;	// If false out of range val will be ignored
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle;
 
 	// Variables
 	AlxParamItem_Val val;		// MF: valBuff
