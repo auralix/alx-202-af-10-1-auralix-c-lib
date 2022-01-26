@@ -25,7 +25,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PARAM_STORE_FILE "alxParamStore.h"
+#define ALX_PARAM_STORE_FILE "alxParamStore"
 
 // Assert //
 #if defined(_ALX_PARAM_STORE_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -81,7 +81,7 @@ typedef struct
 
 	// SM
 	AlxParamStore_St st;
-	
+
 	// Info
 	bool wasCtorCalled;
 	bool isInit;

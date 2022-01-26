@@ -55,11 +55,8 @@ void AlxMemSafe_Ctor
 	me->buff2 = buff2;
 	me->buff2Len = buff2Len;
 
-
 	// Assert
-	// validate everything
-
-	// Variables
+	// TO DO
 
 	// Info
 	me->wasCtorCalled = true;
@@ -72,14 +69,14 @@ void AlxMemSafe_Ctor
 //******************************************************************************
 Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 {
-	// #1 Assert
+	// Assert
 	ALX_MEM_SAFE_ASSERT(me->wasCtorCalled == true);
 	ALX_MEM_SAFE_ASSERT(len == me->copyLen);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 
-	// #3 Non-Blocking
+	// #2 Non-Blocking
 	if (me->nonBlockingEnable)
 	{
 		// TODO
@@ -87,18 +84,18 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 		return Alx_Err;
 	}
 
-	// #4 Blocking
+	// #3 Blocking
 	else
 	{
-		// #4.1 Prepare variables
+		// #3.1 Prepare variables
 		Alx_Status statusMemRaw = Alx_Err;
 		me->isReadDone = false;
 		me->isReadErr = true;
 
-		// #4.2 Read & Validate CopyA & CopyB
+		// #3.2 Read & Validate CopyA & CopyB
 		for (uint32_t i = 0; i < me->memSafeReadWriteNumOfTries; i++)
 		{
-			// #4.2.1 Read CopyA
+			// #3.2.1 Read CopyA
 
 			// Init
 			statusMemRaw = AlxMemRaw_Init(me->memRaw);
@@ -112,10 +109,10 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 			if(statusMemRaw != Alx_Ok) { ALX_MEM_SAFE_TRACE("ErrDeInit"); continue; }
 
-			// #4.2.2 Check CopyA CRC
+			// #3.2.2 Check CopyA CRC
 			me->isCopyAValid = AlxCrc_IsOk(me->crc, me->buff1, me->copyLenWithCrc, &me->crcCopyA);
 
-			// #4.2.3 Read CopyB
+			// #3.2.3 Read CopyB
 
 			// Init
 			statusMemRaw = AlxMemRaw_Init(me->memRaw);
@@ -129,19 +126,19 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 			if(statusMemRaw != Alx_Ok) { ALX_MEM_SAFE_TRACE("ErrDeInit"); continue; }
 
-			// #4.2.4 Check CopyB CRC
+			// #3.2.4 Check CopyB CRC
 			me->isCopyBValid = AlxCrc_IsOk(me->crc, me->buff2, me->copyLenWithCrc, &me->crcCopyB);
 
-			// #4.2.5 Handle CRC Validity
+			// #3.2.5 Handle CRC Validity
 			{
-				// #4.2.5.1 Both CRC NOK
+				// #3.2.5.1 Both CRC NOK
 				if((me->isCopyAValid == false) && (me->isCopyBValid == false))
 				{
 					// Break
 					status = AlxMemSafe_BothNok_ResetToDef;
 					break;
 				}
-				// #4.2.5.2 Both CRC OK & Same -> Use CopyA
+				// #3.2.5.2 Both CRC OK & Same -> Use CopyA
 				else if ((me->isCopyAValid == true) && (me->isCopyBValid == true) && (me->crcCopyA == me->crcCopyB))
 				{
 					// Use CopyA
@@ -151,7 +148,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					status = AlxMemSafe_CrcOkSame_UsedCopyA;
 					break;
 				}
-				// #4.2.5.3 Both CRC OK & Different -> Use CopyA (CopyA is used because we always write CopyA first)
+				// #3.2.5.3 Both CRC OK & Different -> Use CopyA (CopyA is used because we always write CopyA first)
 				else if ((me->isCopyAValid == true) && (me->isCopyBValid == true) && (me->crcCopyA != me->crcCopyB))
 				{
 					// Update CopyB with CopyA
@@ -175,7 +172,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					status = AlxMemSafe_CrcOkDiff_UsedCopyA;
 					break;
 				}
-				// #4.2.5.4 CopyA OK, CopyB NOK
+				// #3.2.5.4 CopyA OK, CopyB NOK
 				else if ((me->isCopyAValid == true) && (me->isCopyBValid == false))
 				{
 					// Update CopyB with CopyA
@@ -199,7 +196,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					status = AlxMemSafe_CopyAOkCopyBNok_UsedCopyA;
 					break;
 				}
-				// #4.2.5.5 CopyA NOK & CopyB OK
+				// #3.2.5.5 CopyA NOK & CopyB OK
 				else if ((me->isCopyAValid == false) && (me->isCopyBValid == true))
 				{
 					// Update CopyA with CopyB
@@ -223,7 +220,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					status = AlxMemSafe_CopyANokCopyBOk_UsedCopyB;
 					break;
 				}
-				// #4.2.5.6 Assert
+				// #3.2.5.6 Assert
 				else
 				{
 					ALX_MEM_SAFE_ASSERT(false);	// We should not get here
@@ -232,24 +229,24 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			}
 		}
 
-		// #4.3 Set status variables
+		// #3.3 Set status variables
 		me->isReadDone = true;
 		me->isReadErr = false;
 	}
 
-	// #5 Return
+	// #4 Return
 	return status;
 }
 Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 {
-	// #1 Assert
+	// Assert
 	ALX_MEM_SAFE_ASSERT(me->wasCtorCalled == true);
 	ALX_MEM_SAFE_ASSERT(len == me->copyLen);
 
-	// #2 Prepare variables
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 
-	// #3 Non-Blocking
+	// #2 Non-Blocking
 	if (me->nonBlockingEnable)
 	{
 		// TODO
@@ -257,23 +254,23 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 		return Alx_Err;
 	}
 
-	// #4 Blocking
+	// #3 Blocking
 	else
 	{
-		// #4.1 Prepare variables
+		// #3.1 Prepare variables
 		Alx_Status statusMemRaw = Alx_Err;
 		me->isWriteDone = false;
 		me->isWriteErr = true;
 
-		// #4.2 Prepare data to write
+		// #3.2 Prepare data to write
 		me->crcToWrite = AlxCrc_Calc(me->crc, data, len);
 		memcpy(me->buff1, data, len);
 		memcpy(&me->buff1[len], &me->crcToWrite, me->copyCrcLen);
 
-		// #4.3 Write CopyA & CopyB
+		// #3.3 Write CopyA & CopyB
 		for (uint32_t i = 0; i < me->memSafeReadWriteNumOfTries; i++)
 		{
-			// #4.3.1 Write CopyA
+			// #3.3.1 Write CopyA
 
 			// Init
 			statusMemRaw = AlxMemRaw_Init(me->memRaw);
@@ -287,7 +284,7 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 			if(statusMemRaw != Alx_Ok) { ALX_MEM_SAFE_TRACE("ErrDeInit"); continue; }
 
-			// #4.3.2 Write CopyB (use buff1)
+			// #3.3.2 Write CopyB (use buff1)
 
 			// Init
 			statusMemRaw = AlxMemRaw_Init(me->memRaw);
@@ -301,7 +298,7 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 			if(statusMemRaw != Alx_Ok) { ALX_MEM_SAFE_TRACE("ErrDeInit"); continue; }
 
-			// #4.3.3 Break
+			// #3.3.3 Break
 			status = Alx_Ok;
 			me->isWriteDone = true;
 			me->isWriteErr = false;
@@ -309,38 +306,38 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 		}
 	}
 
-	// #5 Return
+	// #4 Return
 	return status;
 }
 bool AlxMemSafe_IsReadDone(AlxMemSafe* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_MEM_SAFE_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Return
+	// #1 Return
 	return me->isReadDone;
 }
 bool AlxMemSafe_IsReadErr(AlxMemSafe* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_MEM_SAFE_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Return
+	// #1 Return
 	return me->isReadErr;
 }
 bool AlxMemSafe_IsWriteDone(AlxMemSafe* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_MEM_SAFE_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Return
+	// #1 Return
 	return me->isWriteDone;
 }
 bool AlxMemSafe_IsWriteErr(AlxMemSafe* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_MEM_SAFE_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Return
+	// #1 Return
 	return me->isWriteErr;
 }
