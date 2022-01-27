@@ -28,15 +28,15 @@ static void AlxClk_PeriphGpio_Reset();
 static bool AlxClk_AreClkNok(AlxClk* me);
 static void AlxClk_SetupPll(AlxClk* me, pll_setup_t* pllSetup, uint32_t inputFreq, uint8_t pllN, uint8_t pllP, uint16_t pllM);
 
-static void AlxClk_Ctor_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default(AlxClk* me);
-static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(AlxClk* me);
-static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me);
-static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(AlxClk* me);
+static void AlxClk_Ctor_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default(AlxClk* me);
+static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz(AlxClk* me);
+static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me);
+static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(AlxClk* me);
 
-static void AlxClk_Init_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default(AlxClk* me);
-static void AlxClk_Init_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(AlxClk* me);
-static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me);
-static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(AlxClk* me);
+static void AlxClk_Init_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default(AlxClk* me);
+static void AlxClk_Init_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz(AlxClk* me);
+static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me);
+static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(AlxClk* me);
 
 
 //******************************************************************************
@@ -56,10 +56,10 @@ void AlxClk_Ctor
 	me->config = config;
 	me->tick = tick;
 
-	if		(me->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default)	{ AlxClk_Ctor_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default(me); }
-	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz)			{ AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0)	{ AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0(me); }
-	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz)			{ AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(me); }
+	if		(me->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default)	{ AlxClk_Ctor_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default(me); }
+	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz)			{ AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz(me); }
+	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0)	{ AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0(me); }
+	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz)			{ AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(me); }
 	else																								{ ALX_CLK_ASSERT(false); return; }
 
 	// Info
@@ -84,31 +84,28 @@ Alx_Status AlxClk_Init(AlxClk* me)
 	AlxClk_PeriphGpio_EnableClk();
 
 	// #3 Init Clocks
-	if		(me->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default)	{ AlxClk_Init_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default(me); }
-	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz)			{ AlxClk_Init_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0)	{ AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0(me); }
-	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz)			{ AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(me); }
+	if		(me->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default)	{ AlxClk_Init_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default(me); }
+	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz)			{ AlxClk_Init_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz(me); }
+	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0)	{ AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0(me); }
+	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz)			{ AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(me); }
 	else																								{ ALX_CLK_ASSERT(false); return Alx_Err; }
 
-	// #4 Check Clocks
-	if (AlxClk_AreClkNok(me)) { ALX_CLK_TRACE("ErrCheck"); return Alx_Err; }
-
-	// #5 Update SystemCoreClock
+	// #4 Update SystemCoreClock
 	SystemCoreClockUpdate();
 
-	// #6 Configure SysTick
+	// #5 Configure SysTick
 	if (SysTick_Config(SystemCoreClock / (1000000U / me->tick)) == 1) { ALX_CLK_TRACE("ErrSysTickConfig"); return Alx_Err; }	// MF: In the example it was 1000000 when setting up SysTick
 
-	// #7 Set SystemCoreClock
-	me->systemCoreClock = SystemCoreClock;
-
-	// #8 Enable IOCON	// MF: it has to always be on. see: "alxWiki_McuLpc55S6x.md" for more info
+	// #6 Enable IOCON	// MF: it has to always be on. see: "alxWiki_McuLpc55S6x.md" for more info
 	CLOCK_EnableClock(kCLOCK_Iocon);
 
-	// #9 Set isInit
+	// #7 Check Clocks
+	if (AlxClk_AreClkNok(me)) { ALX_CLK_TRACE("ErrCheck"); return Alx_Err; }
+
+	// #8 Set isInit
 	me->isInit = true;
 
-	// #10 Return OK
+	// #9 Return OK
 	return Alx_Ok;
 }
 uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
@@ -119,14 +116,14 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 	// #1 Return Clk Freq
 	if (me->isInit)
 	{
-		if (clk == AlxClk_Clk_McuLpc55s6x_CoreSysClk)	{ return me->coreSysClk; }
-		if (clk == AlxClk_Clk_McuLpc55s6x_MainClk)		{ return me->mainClk; }
-		if (clk == AlxClk_Clk_McuLpc55s6x_Fro)			{ return me->fro; }
+		if (clk == AlxClk_Clk_McuLpc55s6x_SystemCoreClock)	{ return me->systemCoreClock; }
+		if (clk == AlxClk_Clk_McuLpc55s6x_AhbClk)			{ return me->ahbClk; }
+		if (clk == AlxClk_Clk_McuLpc55s6x_MainClk)			{ return me->mainClk; }
 	}
 
-	if (clk == AlxClk_Clk_McuLpc55s6x_CoreSysClk_Ctor)	{ return me->coreSysClk_Ctor; }
-	if (clk == AlxClk_Clk_McuLpc55s6x_MainClk_Ctor)		{ return me->mainClk_Ctor; }
-	if (clk == AlxClk_Clk_McuLpc55s6x_Fro_Ctor)			{ return me->fro_Ctor; }
+	if (clk == AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor)	{ return me->systemCoreClock_Ctor; }
+	if (clk == AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor)			{ return me->ahbClk_Ctor; }
+	if (clk == AlxClk_Clk_McuLpc55s6x_MainClk_Ctor)			{ return me->mainClk_Ctor; }
 
 	// Assert
 	ALX_CLK_ASSERT(false); // We shouldn't get here
@@ -164,19 +161,18 @@ static void AlxClk_PeriphGpio_Reset()
 static bool AlxClk_AreClkNok(AlxClk* me)
 {
 	// #1 Get Clks
-	me->coreSysClk = CLOCK_GetFreq(kCLOCK_BusClk);	//MF: BusClk is "SysClk" because it is divided "MainClk"
+	me->systemCoreClock = SystemCoreClock;
+	me->ahbClk = CLOCK_GetFreq(kCLOCK_BusClk);		//MF: BusClk is "SysClk" because it is divided "MainClk"
 	me->mainClk = CLOCK_GetFreq(kCLOCK_CoreSysClk);	//MF: CoreSysClk is actually "MainClk" (svinjarijo)
-	me->fro = me->fro_Ctor;							// MF: Don't Know if we need it
 
 	// #2 Check Clks
-	if		(me->coreSysClk != me->coreSysClk_Ctor)	{ ALX_CLK_TRACE("ErrCoreSysClock");	return true; }
-	else if (me->mainClk != me->mainClk_Ctor)		{ ALX_CLK_TRACE("ErrMainClock");	return true; }
-	else											{ return false; }
+	if		(SystemCoreClock != me->systemCoreClock_Ctor)	{ ALX_CLK_TRACE("ErrSystemCoreClock");	return true; }
+	else if	(me->ahbClk  != me->ahbClk_Ctor )				{ ALX_CLK_TRACE("ErrAhbClock");			return true; }
+	else if	(me->mainClk != me->mainClk_Ctor)				{ ALX_CLK_TRACE("ErrMainClock");		return true; }
+	else													{ return false; }
 }
 static void AlxClk_SetupPll(AlxClk* me, pll_setup_t* pllSetup, uint32_t inputFreq, uint8_t pllN, uint8_t pllP, uint16_t pllM)
 {
-	(void)me;
-
 	// #1 Prepare Variable
 	// #1.1 SELI
 	uint8_t seli = 0U;
@@ -199,49 +195,45 @@ static void AlxClk_SetupPll(AlxClk* me, pll_setup_t* pllSetup, uint32_t inputFre
 	pllSetup->flags			= PLL_SETUPFLAG_WAITLOCK;
 }
 
-static void AlxClk_Ctor_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default(AlxClk* me)
+static void AlxClk_Ctor_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default(AlxClk* me)
 {
 	// #1 Set Ctor Clk Freq
-	me->coreSysClk_Ctor	= 6000000U;
-	me->mainClk_Ctor	= 12000000U;
-	me->fro_Ctor		= 12000000U;
+	me->systemCoreClock_Ctor	= 6000000U;
+	me->ahbClk_Ctor				= 6000000U;
+	me->mainClk_Ctor			= 12000000U;
 }
-static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(AlxClk* me)
+static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz(AlxClk* me)
 {
 	// #1 Set Ctor Clk Freq
-	me->coreSysClk_Ctor	= 96000000U;
-	me->mainClk_Ctor	= 96000000U;
-	me->fro_Ctor		= 96000000U;
+	me->systemCoreClock_Ctor	= 96000000U;
+	me->ahbClk_Ctor				= 96000000U;
+	me->mainClk_Ctor			= 96000000U;
 }
-static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me)
+static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me)
 {
 	// #1 Set Ctor Clk Freq
-	me->coreSysClk_Ctor	= 150000000U;
-	me->mainClk_Ctor	= 150000000U;
-	me->fro_Ctor		= 12000000U;
+	me->systemCoreClock_Ctor	= 150000000U;
+	me->ahbClk_Ctor				= 150000000U;
+	me->mainClk_Ctor			= 150000000U;
 }
-static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(AlxClk* me)
+static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(AlxClk* me)
 {
 	// #1 Set Ctor Clk Freq
-	me->coreSysClk_Ctor	= 150000000U;
-	me->mainClk_Ctor	= 150000000U;
-	me->fro_Ctor		= 12000000U;
+	me->systemCoreClock_Ctor	= 150000000U;
+	me->ahbClk_Ctor				= 150000000U;
+	me->mainClk_Ctor			= 150000000U;
 }
 
-static void AlxClk_Init_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default(AlxClk* me)
+static void AlxClk_Init_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default(AlxClk* me)
 {
-	(void)me;
-
 	// #1 Enable FRO
 	POWER_DisablePD(kPDRUNCFG_PD_FRO192M);
 
 	// #2 Attach FRO12 to MainClk
 	CLOCK_AttachClk(kFRO12M_to_MAIN_CLK);
 }
-static void AlxClk_Init_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(AlxClk* me)
+static void AlxClk_Init_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz(AlxClk* me)
 {
-	(void)me;
-
 	// #1 Set FLASH wait states for core Freq
 	CLOCK_SetFLASHAccessCyclesForFreq(96000000U);
 
@@ -254,7 +246,7 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz(AlxC
 	// #4 Divide SysClk
 	CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, true);
 }
-static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me)
+static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me)
 {
 	// #1 Set FLASH wait states for core Freq
 	CLOCK_SetFLASHAccessCyclesForFreq(150000000U);
@@ -279,11 +271,10 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pl
 	// #5 Divide SysClk
 	CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, true);
 }
-static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz(AlxClk* me)
+static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(AlxClk* me)
 {
 	// #1 Set Up ExtClk
 	if (CLOCK_SetupExtClocking(16000000U) != kStatus_Success) { ALX_CLK_TRACE("ErrSetUpExtClk"); ALX_CLK_ASSERT(false); }	// MF: Enable clk_in and set up crystal Freq. Enabling XTAL32M happens here
-	SYSCON->CLOCK_CTRL |= SYSCON_CLOCK_CTRL_CLKIN_ENA_MASK;					// MF: Enable clk_in from XTAL32M clock
 	ANACTRL->XO32M_CTRL |= ANACTRL_XO32M_CTRL_ENABLE_SYSTEM_CLK_OUT_MASK;	// MF: Enable clk_in to system
 
 	// #2 Set FLASH wait states for core Freq
