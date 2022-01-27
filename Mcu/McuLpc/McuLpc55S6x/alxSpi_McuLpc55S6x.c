@@ -288,7 +288,7 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me)
 {
 	// #1 Check that right Spi SCK is used
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default &&	// MF: When MainClk Freq is 12MHz, max Spi SCK is 6MHz
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default &&	// MF: When MainClk Freq is 12MHz, max Spi SCK is 6MHz
 		me->spiClk > AlxSpi_Clk_McuLpc55S6x_SpiClk_6MHz)	{ return false; }
 	else													{ return true; }
 

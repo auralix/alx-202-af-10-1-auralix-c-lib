@@ -26,7 +26,7 @@
 static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch);
 static bool AlxAdc_Ctor_CheckCh(AlxAdc* me);
 static void AlxAdc_SetClkDiv(AlxAdc* me);
-lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch);
+static lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch);
 
 
 //******************************************************************************
@@ -177,8 +177,8 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	POWER_EnablePD(kPDRUNCFG_PD_LDOGPADC);
 
 	// #3 DeInit pin for each channel
-	for(uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++)
-		AlxIoPin_DeInit((*(me->ioPinArr + i)));
+	for (uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++)
+		{ AlxIoPin_DeInit((*(me->ioPinArr + i))); }
 
 	// #4 Reset isInit
 	me->isInit = false;
@@ -259,20 +259,21 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 //******************************************************************************
 static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 {
+	// Assert
 	(void)me;
 
 	// #1 Return Ch
-	if (ch == Alx_Ch_0)		return 0;
-	if (ch == Alx_Ch_1)		return 1;
-	if (ch == Alx_Ch_2)		return 2;
-	if (ch == Alx_Ch_3)		return 3;
-	if (ch == Alx_Ch_4)		return 4;
+	if (ch == Alx_Ch_0)		{ return 0; }
+	if (ch == Alx_Ch_1)		{ return 1; }
+	if (ch == Alx_Ch_2)		{ return 2; }
+	if (ch == Alx_Ch_3)		{ return 3; }
+	if (ch == Alx_Ch_4)		{ return 4; }
 
-	if (ch == Alx_Ch_8)		return 0;	// MF: The LPC55S6x ADC channels. See alxWiki for explanation
-	if (ch == Alx_Ch_9)		return 1;
-	if (ch == Alx_Ch_10)	return 2;
-	if (ch == Alx_Ch_11)	return 3;
-	if (ch == Alx_Ch_12)	return 4;
+	if (ch == Alx_Ch_8)		{ return 0; }	// MF: The LPC55S6x ADC channels. See alxWiki for explanation
+	if (ch == Alx_Ch_9)		{ return 1; }
+	if (ch == Alx_Ch_10)	{ return 2; }
+	if (ch == Alx_Ch_11)	{ return 3; }
+	if (ch == Alx_Ch_12)	{ return 4; }
 
 	// Assert
 	ALX_ADC_ASSERT(false);	// We shouldn't get here
@@ -301,30 +302,25 @@ static bool AlxAdc_Ctor_CheckCh(AlxAdc* me)
 static void AlxAdc_SetClkDiv(AlxAdc* me)
 {
 	// #1 Set Clk Div
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_SysClk_6MHz_FroOsc_12MHz_Default)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 2U,  true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_SysClk_96MHz_FroOsc_96MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 20U, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_FroOsc_12MHz_Pll0)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 16U, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_SysClk_150MHz_ExtOsc_16MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 16U, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 2U, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 20U, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 16U, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 16U, true); return; }
 
 	// Assert
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return;
 }
-lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch)
+static lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch)
 {
+	// Assert
 	(void)me;
 
 	// #1 Check if channels mode A
-	if ((ch == Alx_Ch_0) || (ch == Alx_Ch_1) || (ch == Alx_Ch_2 ) || (ch == Alx_Ch_3 ) || (ch == Alx_Ch_4 ))
-	{
-		return kLPADC_SampleChannelSingleEndSideA;
-	}
+	if ((ch == Alx_Ch_0) || (ch == Alx_Ch_1) || (ch == Alx_Ch_2 ) || (ch == Alx_Ch_3 ) || (ch == Alx_Ch_4 )) { return kLPADC_SampleChannelSingleEndSideA; }
 
 	// #2 Check if channels mode B
-	if ((ch == Alx_Ch_8) || (ch == Alx_Ch_9) || (ch == Alx_Ch_10) || (ch == Alx_Ch_11) || (ch == Alx_Ch_12))
-	{
-		return kLPADC_SampleChannelSingleEndSideB;
-	}
+	if ((ch == Alx_Ch_8) || (ch == Alx_Ch_9) || (ch == Alx_Ch_10) || (ch == Alx_Ch_11) || (ch == Alx_Ch_12)) { return kLPADC_SampleChannelSingleEndSideB; }
 
 	// Assert
 	ALX_ADC_ASSERT(false); // We shouldn't get here
