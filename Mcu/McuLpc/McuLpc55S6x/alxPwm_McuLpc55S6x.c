@@ -107,10 +107,11 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	// Assert
 	ALX_PWM_ASSERT(me->isInit == false);
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 Init IoPin
 	for (uint32_t i = 0; i < me->numOfCh; i++)
-		AlxIoPin_Init((*(me->ioPinArr + i)));
+		{ AlxIoPin_Init((*(me->ioPinArr + i))); }
 
 	// #2 Enable Clk to CTimer
 	AlxPwm_EnableCtimerClk(me);
@@ -144,6 +145,7 @@ Alx_Status AlxPwm_DeInit(AlxPwm* me)
 	// Assert
 	ALX_PWM_ASSERT(me->isInit == true);
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 DeInit CTIMER
 	CTIMER_Deinit(me->tim);		// MF: "Stop CTIMER" and "DisableClk" happens here
@@ -160,20 +162,19 @@ Alx_Status AlxPwm_DeInit(AlxPwm* me)
 }
 Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 {
-	// Optimize Guard
-	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
-	(void)me;
-	(void)ch;
-	(void)duty_pct;
-	ALX_PWM_ASSERT(false);
-	return ALX_NULL;
-	#else
-
 	// Assert
 	ALX_PWM_ASSERT(me->isInit == true);
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 	(void)ch;
+	(void)duty_pct;
 	ALX_PWM_ASSERT((0.f <= duty_pct) && (duty_pct <= 100.f));
+
+	// Optimize Guard
+	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	ALX_PWM_ASSERT(false);
+	return ALX_NULL;
+	#else
 
 	// #1 Update Duty Cycle
 	for (uint32_t i = 0; i < me->numOfCh; i++)
@@ -192,20 +193,19 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 }
 Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {
-	// Optimize Guard
-	#if !(defined (ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
-	(void)me;
-	(void)ch;
-	(void)duty_permil;
-	ALX_PWM_ASSERT(false);
-	return ALX_NULL;
-	#else
-
 	// Assert
 	ALX_PWM_ASSERT(me->isInit == true);
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 	(void)ch;
-	ALX_PWM_ASSERT((0 <= duty_permil) && (duty_permil <= 1000));
+	(void)duty_permil;
+	ALX_PWM_ASSERT((0U <= duty_permil) && (duty_permil <= 1000U));
+
+	// Optimize Guard
+	#if !(defined (ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	ALX_PWM_ASSERT(false);
+	return ALX_NULL;
+	#else
 
 	// #1 Update Duty Cycle
 	for (uint32_t i = 0; i < me->numOfCh; i++)
@@ -229,6 +229,11 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 //******************************************************************************
 static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t numOfCh)
 {
+	// Assert
+	(void)tim;
+	(void)ioPinArr;
+	(void)numOfCh;
+
 	// #1 Check IoPins
 	#if defined(CTIMER0)
 	if (tim == CTIMER0)
@@ -241,7 +246,7 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 					(ioPinArr[i]->port == 0 && ioPinArr[i]->pin == 31) ||
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 31) ))	{ return false; }
 
-			if (i == (uint32_t)(numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
+			if (i == (uint32_t)(numOfCh - 1))								{ return true;  }	// MF: If all pins are checked, return from function
 		}
 	#endif
 	#if defined(CTIMER1)
@@ -255,7 +260,7 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 12) ||
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 14) ))	{ return false; }
 
-			if (i == (uint32_t)(numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
+			if (i == (uint32_t)(numOfCh - 1))								{ return true;  }	// MF: If all pins are checked, return from function
 		}
 	#endif
 	#if defined(CTIMER2)
@@ -269,7 +274,7 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 6)  ||
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 7)  ))	{ return false; }
 
-			if (i == (uint32_t)(numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
+			if (i == (uint32_t)(numOfCh - 1))								{ return true;  }	// MF: If all pins are checked, return from function
 		}
 	#endif
 	#if defined(CTIMER3)
@@ -281,7 +286,7 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 19) ||
 					(ioPinArr[i]->port == 1 && ioPinArr[i]->pin == 21) ))	{ return false; }
 
-			if (i == (uint32_t)(numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
+			if (i == (uint32_t)(numOfCh - 1))								{ return true;  }	// MF: If all pins are checked, return from function
 		}
 	#endif
 	#if defined(CTIMER4)
@@ -290,7 +295,7 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 		{
 			if (!(	(ioPinArr[i]->port == 0 && ioPinArr[i]->pin == 6)  ))	{ return false; }	// MF: CTIMER4 can have only 1 channel, will we ever use id?
 
-			if (i == (uint32_t)(numOfCh - 1))											{ return true; }	// MF: If all pins are checked, return from function
+			if (i == (uint32_t)(numOfCh - 1))								{ return true;  }	// MF: If all pins are checked, return from function
 		}
 		#endif
 
@@ -299,12 +304,18 @@ static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t nu
 }
 static void AlxPwm_SetSrcClk_SetPrescalerMax(AlxPwm* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Set Clk
 	me->periodMax = 0x0000FFFF;
 	me->srcClk_Hz = AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55s6x_MainClk_Ctor);
 }
 static uint32_t AlxPwm_GetCh(Alx_Ch ch)
 {
+	// Assert
+	(void)ch;
+
 	// #1 Return Ch
 	if (ch == Alx_Ch_0) return kCTIMER_Match_0;
 	if (ch == Alx_Ch_1) return kCTIMER_Match_1;
@@ -317,6 +328,9 @@ static uint32_t AlxPwm_GetCh(Alx_Ch ch)
 }
 static void AlxPwm_EnableCtimerClk(AlxPwm* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Attach MainClk to CTIMER
 	#if defined(CTIMER0)
 	if (me->tim == CTIMER0)		{ CLOCK_AttachClk(kMAIN_CLK_to_CTIMER0); return; }
@@ -341,6 +355,11 @@ static void AlxPwm_EnableCtimerClk(AlxPwm* me)
 #if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 static void AlxPwm_UpdatePwmDutyPermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {
+	// Assert
+	(void)me;
+	(void)ch;
+	(void)duty_permil;
+
 	// #1 Prepare variable
 	uint32_t pulsePeriod = 0;
 
@@ -357,6 +376,11 @@ static void AlxPwm_UpdatePwmDutyPermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_perm
 #else
 static void AlxPwm_UpdatePwmDutyPct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 {
+	// Assert
+	(void)me;
+	(void)ch;
+	(void)duty_pct;
+
 	// #1 Prepare variable
 	uint32_t pulsePeriod = 0;
 

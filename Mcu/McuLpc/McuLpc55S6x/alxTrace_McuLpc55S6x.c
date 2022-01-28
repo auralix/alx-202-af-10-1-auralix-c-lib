@@ -25,7 +25,7 @@
 //******************************************************************************
 static Alx_Status AlxTrace_ReInit(AlxTrace* me);
 static uint8_t AlxTrace_GetIoconFunc(AlxTrace* me);
-static uint32_t AlxTrace_GetFlexcommId(AlxTrace* me);
+static uint32_t AlxTrace_GetFlexCommClkFreq(AlxTrace* me);
 static void AlxTrace_AttachClkToFlexcomm(AlxTrace* me);
 static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me);
 
@@ -82,14 +82,17 @@ void AlxTrace_Ctor
 //******************************************************************************
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Set IoPin Usart Func
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, AlxTrace_GetIoconFunc(me));
 
 	// #2 Attach Clk to FlexComm
 	AlxTrace_AttachClkToFlexcomm(me);
 
-	// #3 Init USART	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()". Also, USART0 has the same addres and ID as FLEXCOMM0, USART1 has the same addres and ID as FLEXCOMM1,... that's why I used me->usart in "CLOCK_GetFlexCommInputClock()"
-	if (USART_Init(me->usart, &me->usartConfig, CLOCK_GetFlexCommInputClock(AlxTrace_GetFlexcommId(me))) != kStatus_Success) { return Alx_Err; }
+	// #3 Init USART	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
+	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_GetFlexCommClkFreq(me)) != kStatus_Success) { return Alx_Err; }
 
 	// #4 Set isInit
 	me->isInit = true;
@@ -99,6 +102,9 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 }
 Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 DeInit USART
 	USART_Deinit(me->usart);
 
@@ -116,6 +122,10 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 }
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
+	// Assert
+	(void)me;
+	(void)str;
+
 	// #1 Write
 	if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
 	{
@@ -133,6 +143,9 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 //******************************************************************************
 static Alx_Status AlxTrace_ReInit(AlxTrace* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 DeInit Trace
 	if (AlxTrace_DeInit(me) != Alx_Ok) { return Alx_Err; }
 
@@ -150,6 +163,9 @@ static Alx_Status AlxTrace_ReInit(AlxTrace* me)
 }
 static uint8_t AlxTrace_GetIoconFunc(AlxTrace* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Prepare Info Variable
 	bool isErr = true;
 
@@ -209,36 +225,38 @@ static uint8_t AlxTrace_GetIoconFunc(AlxTrace* me)
 	}
 	return 0xFF;
 }
-
-static uint32_t AlxTrace_GetFlexcommId(AlxTrace* me)
+static uint32_t AlxTrace_GetFlexCommClkFreq(AlxTrace* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Prepare Info Variable
 	bool isErr = true;
 
-	// #2 Get FlexComm ID
+	// #1 Get FlexComm Clk Freq
 	#if defined(USART0)
-	if (me->usart == USART0)	{ isErr = false; return 0; }
+	if (me->usart == USART0)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(0U); }
 	#endif
 	#if defined(USART1)
-	if (me->usart == USART1)	{ isErr = false; return 1; }
+	if (me->usart == USART1)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(1U); }
 	#endif
 	#if defined(USART2)
-	if (me->usart == USART2)	{ isErr = false; return 2; }
+	if (me->usart == USART2)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(2U); }
 	#endif
 	#if defined(USART3)
-	if (me->usart == USART3)	{ isErr = false; return 3; }
+	if (me->usart == USART3)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(3U); }
 	#endif
 	#if defined(USART4)
-	if (me->usart == USART4)	{ isErr = false; return 4; }
+	if (me->usart == USART4)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(4U); }
 	#endif
 	#if defined(USART5)
-	if (me->usart == USART5)	{ isErr = false; return 5; }
+	if (me->usart == USART5)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(5U); }
 	#endif
 	#if defined(USART6)
-	if (me->usart == USART6)	{ isErr = false; return 6; }
+	if (me->usart == USART6)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(6U); }
 	#endif
 	#if defined(USART7)
-	if (me->usart == USART7)	{ isErr = false; return 7; }
+	if (me->usart == USART7)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(7U); }
 	#endif
 
 	// Assert
@@ -250,6 +268,9 @@ static uint32_t AlxTrace_GetFlexcommId(AlxTrace* me)
 }
 static void AlxTrace_AttachClkToFlexcomm(AlxTrace* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Prepare Info Variable
 	bool isErr = true;
 
@@ -287,6 +308,9 @@ static void AlxTrace_AttachClkToFlexcomm(AlxTrace* me)
 }
 static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Prepare Info Variable
 	bool isErr = true;
 

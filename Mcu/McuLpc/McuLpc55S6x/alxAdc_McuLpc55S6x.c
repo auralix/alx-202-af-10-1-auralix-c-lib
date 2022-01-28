@@ -25,6 +25,7 @@
 //******************************************************************************
 static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch);
 static bool AlxAdc_Ctor_CheckCh(AlxAdc* me);
+static bool AlxAdc_Ctor_IsMainClkOk(AlxAdc* me);
 static void AlxAdc_SetClkDiv(AlxAdc* me);
 static lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_Ch ch);
 
@@ -39,6 +40,7 @@ void AlxAdc_Ctor
 	Alx_Ch* chArr,
 	uint8_t numOfIoPinsAndCh,
 	AlxClk* clk,
+	AlxAdc_Clk adcClk,
 	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	uint32_t vRef_mV
 	#else
@@ -52,6 +54,7 @@ void AlxAdc_Ctor
 	(void)chArr;
 	ALX_ADC_ASSERT(numOfIoPinsAndCh <= ALX_ADC_BUFF_LEN);
 	(void)clk;
+	(void)adcClk;
 	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	(void)vRef_mV;
 	#else
@@ -65,6 +68,7 @@ void AlxAdc_Ctor
 	// Parameters
 	me->chArr = chArr;
 	me->numOfIoPinsAndCh = numOfIoPinsAndCh;
+	me->adcClk = adcClk;
 	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	me->vRef_mV = vRef_mV;
 	#else
@@ -72,10 +76,14 @@ void AlxAdc_Ctor
 	#endif
 
 	// Check channel sequence
-	for (uint32_t i = 0; i < (uint32_t)(numOfIoPinsAndCh - 1); i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) <= AlxAdc_GetCh(me, chArr[i + 1]));	// MF: Channel sequence must be from low to high number
+	for (uint32_t i = 0; i < (uint32_t)(numOfIoPinsAndCh - 1); i++)
+		{ ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) <= AlxAdc_GetCh(me, chArr[i + 1])); }	// MF: Channel sequence must be from low to high number
 
 	// Check if right channels are used
 	ALX_ADC_ASSERT(AlxAdc_Ctor_CheckCh(me));
+
+	// Check if right MainClk is configured
+	ALX_ADC_ASSERT(AlxAdc_Ctor_IsMainClkOk(me));
 
 	// Variables										// MF: Everything is set to default (see "void LPADC_GetDefault___()" functions) except "adcConfig.referenceVoltageSource" and "adcConvTrigConfig.targetCommandId"
 	me->adcConfig.enableInDozeMode						= true;
@@ -129,6 +137,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	// Assert
 	ALX_ADC_ASSERT(me->isInit == false);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 Init one pin for each channel
 	for (uint8_t i = 0; i < me->numOfIoPinsAndCh; i++)
@@ -169,6 +178,7 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	// Assert
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 DeInit Adc
 	LPADC_Deinit(ADC0);		// MF: "DisableClk" happens here
@@ -188,17 +198,17 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 }
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 {
-	// Optimize Guard
-	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
-	(void)me;
-	(void)ch;
-	ALX_ADC_ASSERT(false);
-	return ALX_NULL;
-	#else
-
 	// Assert
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
+	(void)me;
+	(void)ch;
+
+	// Optimize Guard
+	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	ALX_ADC_ASSERT(false);
+	return ALX_NULL;
+	#else
 
 	// #1 Set Channel
 	me->adcConvCommConfig.sampleChannelMode = AlxAdc_SetSampleChannelMode(me, ch);
@@ -217,15 +227,17 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 }
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 {
+	// Assert
+	ALX_ADC_ASSERT(me->isInit == true);
+	ALX_ADC_ASSERT(me->wasCtorCalled == true);
+	(void)me;
+	(void)ch;
+
 	// Optimize Guard
 	#if !(defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
 	ALX_ADC_ASSERT(false);
 	return ALX_NULL;
 	#else
-
-	// Assert
-	ALX_ADC_ASSERT(me->isInit == true);
-	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Set Channel
 	me->adcConvCommConfig.sampleChannelMode = AlxAdc_SetSampleChannelMode(me, ch);
@@ -244,6 +256,7 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 }
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
+	// Assert
 	(void)me;
 
 	// TODO
@@ -261,6 +274,7 @@ static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 {
 	// Assert
 	(void)me;
+	(void)ch;
 
 	// #1 Return Ch
 	if (ch == Alx_Ch_0)		{ return 0; }
@@ -281,6 +295,9 @@ static uint8_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 }
 static bool AlxAdc_Ctor_CheckCh(AlxAdc* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Check IoPins
 	for (uint32_t i = 0; i < me->numOfIoPinsAndCh; i++)
 	{
@@ -299,13 +316,43 @@ static bool AlxAdc_Ctor_CheckCh(AlxAdc* me)
 	// #2 Return
 	return true;
 }
+static bool AlxAdc_Ctor_IsMainClkOk(AlxAdc* me)
+{
+	// Assert
+	(void)me;
+
+	// #1 Check Clk
+	if (me->adcClk == AlxAdc_Clk_McuLpc55S6x_AdcClk_12MHz_MainClk_12MHz)
+	{
+		if (12000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55s6x_MainClk_Ctor))	{ return true;  }
+		else																				{ return false; }
+	}
+	if (me->adcClk == AlxAdc_Clk_McuLpc55S6x_AdcClk_24MHz_MainClk_96MHz)
+	{
+		if (96000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55s6x_MainClk_Ctor))	{ return true;  }
+		else																				{ return false; }
+	}
+	if (me->adcClk == AlxAdc_Clk_McuLpc55S6x_AdcClk_18MHz75_MainClk_150MHz)
+	{
+		if (150000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc55s6x_MainClk_Ctor))	{ return true;  }
+		else																				{ return false; }
+	}
+
+	// Assert
+	ALX_ADC_ASSERT(false); // We shouldn't get here
+	return false;
+}
+
 static void AlxAdc_SetClkDiv(AlxAdc* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Set Clk Div
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 2U, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 20U, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 16U, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, 16U, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
 
 	// Assert
 	ALX_ADC_ASSERT(false); // We shouldn't get here
@@ -315,12 +362,13 @@ static lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_C
 {
 	// Assert
 	(void)me;
+	(void)ch;
 
 	// #1 Check if channels mode A
-	if ((ch == Alx_Ch_0) || (ch == Alx_Ch_1) || (ch == Alx_Ch_2 ) || (ch == Alx_Ch_3 ) || (ch == Alx_Ch_4 )) { return kLPADC_SampleChannelSingleEndSideA; }
+	if ((ch == Alx_Ch_0) || (ch == Alx_Ch_1) || (ch == Alx_Ch_2 ) || (ch == Alx_Ch_3 ) || (ch == Alx_Ch_4 ))	{ return kLPADC_SampleChannelSingleEndSideA; }
 
 	// #2 Check if channels mode B
-	if ((ch == Alx_Ch_8) || (ch == Alx_Ch_9) || (ch == Alx_Ch_10) || (ch == Alx_Ch_11) || (ch == Alx_Ch_12)) { return kLPADC_SampleChannelSingleEndSideB; }
+	if ((ch == Alx_Ch_8) || (ch == Alx_Ch_9) || (ch == Alx_Ch_10) || (ch == Alx_Ch_11) || (ch == Alx_Ch_12))	{ return kLPADC_SampleChannelSingleEndSideB; }
 
 	// Assert
 	ALX_ADC_ASSERT(false); // We shouldn't get here

@@ -33,6 +33,13 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxAdc_Clk_McuLpc55S6x_AdcClk_12MHz_MainClk_12MHz = 1U,		// MF: ClkDiv = 1
+	AlxAdc_Clk_McuLpc55S6x_AdcClk_24MHz_MainClk_96MHz = 4U,		// MF: ClkDiv = 4
+	AlxAdc_Clk_McuLpc55S6x_AdcClk_18MHz75_MainClk_150MHz = 8U	// MF: ClkDiv = 8
+} AlxAdc_Clk;
+
 typedef struct
 {
 	// Objects - External
@@ -42,6 +49,7 @@ typedef struct
 	// Parameters
 	Alx_Ch* chArr;
 	uint8_t numOfIoPinsAndCh;
+	AlxAdc_Clk adcClk;
 	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	uint32_t vRef_mV;
 	#else
@@ -70,6 +78,7 @@ void AlxAdc_Ctor
 	Alx_Ch* chArr,
 	uint8_t numOfIoPinsAndCh,
 	AlxClk* clk,
+	AlxAdc_Clk adcClk,
 	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	uint32_t vRef_mV
 	#else

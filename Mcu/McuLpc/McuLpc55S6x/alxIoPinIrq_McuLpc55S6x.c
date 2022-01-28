@@ -79,6 +79,7 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 	// Assert
 	ALX_IO_PIN_IRQ_ASSERT(me->isInit == false);
 	ALX_IO_PIN_IRQ_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 Set isInit attribute
 	me->isInit = true;
@@ -108,6 +109,7 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 	// Assert
 	ALX_IO_PIN_IRQ_ASSERT(me->isInit == true);
 	ALX_IO_PIN_IRQ_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 DeInit if IRQ
 	PINT_DisableCallbackByIndex(PINT, me->irqPin);	// MF: Disable IRQ
@@ -131,6 +133,9 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 //******************************************************************************
 static inputmux_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Get IRQ Port Pin select
 	////-----------
 	//// Port 0
@@ -210,6 +215,9 @@ static inputmux_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me)
 }
 static IRQn_Type AlxIoPin_GetIrqType(AlxIoPinIrq* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Get IRQ Type
 	if (me->irqPin == kPINT_PinInt0)	{ return PIN_INT0_IRQn; }
 	if (me->irqPin == kPINT_PinInt1)	{ return PIN_INT1_IRQn; }
