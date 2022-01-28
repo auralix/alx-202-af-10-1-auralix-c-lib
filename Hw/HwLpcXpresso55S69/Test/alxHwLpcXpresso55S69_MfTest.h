@@ -76,9 +76,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(AlxHwLpcXpres
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UsrLED_BL);
 	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
-	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
-
-	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.ai_P0_16_ADC_CH8);
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);	// MF: To see toggling with Logic Analyzer
 
 	while (1)
 	{
@@ -150,29 +148,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(AlxHwLpcXpres
 		AlxDelay_ms(500);
 	}
 }
-static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_I2c(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
-{
-	// Assert
-	(void)me;
-
-	// Variables
-	uint8_t devAdrReceive = 0b1010101;
-	uint16_t memAddr = 0x00U;	// MF: Sth is not right here
-	uint8_t i2cData[6] = { 0x0E, 0x00, 0x00, 0x00, 0x00, 0x00 };
-
-	// Init
-	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.ao_P0_11_CRN_VCC);
-	//AlxI2c_Init(&me->alxHwLpcXpresso55S69_Main.alxI2c_I2C0);
-
-	while (1)
-	{
-		//AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c_I2C0, devAdrReceive, memAddr, AlxI2c_Master_MemAddrLen_16bit, i2cData, 1, 20, 100);
-		//AlxI2c_Master_StartWriteMemStop_Single(&i2c, slaveAddr, memAddr, AlxI2c_Master_MemAddrLen_16bit, i2cData[0], true, 5, 100);
-
-		AlxDelay_ms(500);
-	}
-}
-static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Spi(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
 	(void)me;
@@ -188,15 +164,20 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Spi(AlxHwLpcXpres
 
 	while (1)
 	{
+		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
 		if (AlxSpi_Master_Write(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, sizeof(srcBuffWrite), 1, 0) != Alx_Ok)						{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+
+		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
 		if (AlxSpi_Master_Read( &me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffRead,  sizeof(srcBuffRead),  1, 0) != Alx_Ok)						{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
 
 		//if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 1, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
 
 		AlxDelay_ms(500);
 	}
 }
-static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T07_Clk(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Init
 	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_26_CLKOUT);
@@ -270,13 +251,12 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(AlxHwLpcXpresso5
 }
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(me);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(me);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_I2c(me);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Spi(me);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T07_Clk(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me);
 }
 
 

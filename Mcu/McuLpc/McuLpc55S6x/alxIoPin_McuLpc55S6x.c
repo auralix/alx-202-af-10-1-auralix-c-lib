@@ -24,6 +24,7 @@
 // Private Functions
 //******************************************************************************
 static void AlxIoPin_ResetIocon(AlxIoPin* me);
+static void AlxIoPin_SetIoconMode(AlxIoPin* me);
 
 
 //******************************************************************************
@@ -79,6 +80,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == false);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 Set isInit attribute
 	me->isInit = true;
@@ -91,7 +93,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, me->func);
 
 	// #3.2 Set IOCON Mode
-	AlxPROTECTED_IoPin_SetIoconMode(me->port, me->pin, me->mode);	// MF: Maybe it doesn't have to be PROTECTED and can be IoPin private func, we will see
+	AlxIoPin_SetIoconMode(me);
 
 	// #3.3 Set IOCON DigiMode
 	if (me->digiMode)		{ IOCON->PIO[me->port][me->pin] |=  (0x1 << 8U); }
@@ -122,6 +124,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 Reset IOCON
 	AlxIoPin_ResetIocon(me);
@@ -140,6 +143,7 @@ bool AlxIoPin_Read(AlxIoPin* me)
 	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 Read Pin
 	if (GPIO_PinRead(GPIO, me->port, me->pin) == 1) { return true; }
@@ -148,9 +152,10 @@ bool AlxIoPin_Read(AlxIoPin* me)
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
 	// Assert
-	(void)val;
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	(void)me;
+	(void)val;
 
 	// #1 Write Pin
 	if (val) { GPIO_PinWrite(GPIO, me->port, me->pin, 1U); }
@@ -161,6 +166,7 @@ void AlxIoPin_Set(AlxIoPin* me)
 	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 Set Pin
 	GPIO_PortSet(GPIO, me->port, (1U << me->pin));
@@ -170,6 +176,7 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 Reset Pin
 	GPIO_PortClear(GPIO, me->port, (1U << me->pin));
@@ -179,12 +186,14 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	// Assert
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 Toggle Pin
 	GPIO_PortToggle(GPIO, me->port, (1U << me->pin));
 }
 void AlxIoPin_Lock(AlxIoPin* me)
 {
+	// Assert
 	(void)me;
 
 	// TODO
@@ -192,6 +201,7 @@ void AlxIoPin_Lock(AlxIoPin* me)
 }
 void AlxIoPin_IrqHandler(AlxIoPin* me)
 {
+	// Assert
 	(void)me;
 
 	// TODO
@@ -199,6 +209,7 @@ void AlxIoPin_IrqHandler(AlxIoPin* me)
 }
 void AlxIoPin_Config_PullNone(AlxIoPin* me)
 {
+	// Assert
 	(void)me;
 
 	// TODO
@@ -206,6 +217,7 @@ void AlxIoPin_Config_PullNone(AlxIoPin* me)
 }
 void AlxIoPin_Config_PullUp(AlxIoPin* me)
 {
+	// Assert
 	(void)me;
 
 	// TODO
@@ -213,6 +225,7 @@ void AlxIoPin_Config_PullUp(AlxIoPin* me)
 }
 void AlxIoPin_Config_PullDown(AlxIoPin* me)
 {
+	// Assert
 	(void)me;
 
 	// TODO
@@ -220,6 +233,7 @@ void AlxIoPin_Config_PullDown(AlxIoPin* me)
 }
 void AlxIoPin_Config_AssertOn(AlxIoPin* me)
 {
+	// Assert
 	(void)me;
 
 	// TODO
@@ -227,6 +241,7 @@ void AlxIoPin_Config_AssertOn(AlxIoPin* me)
 }
 void AlxIoPin_Config_AssertOff(AlxIoPin* me)
 {
+	// Assert
 	(void)me;
 
 	// TODO
@@ -239,6 +254,9 @@ void AlxIoPin_Config_AssertOff(AlxIoPin* me)
 //******************************************************************************
 static void AlxIoPin_ResetIocon(AlxIoPin* me)
 {
+	//Assert
+	(void)me;
+
 	// #1 Set IOCON to Default Value (User Manual page 338)
 	if		(me->port == 0 && me->pin == 2)		{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x0110); }
 	else if (me->port == 0 && me->pin == 5)		{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x0120); }
@@ -247,6 +265,41 @@ static void AlxIoPin_ResetIocon(AlxIoPin* me)
 	else if (me->port == 0 && me->pin == 13)	{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x5000); }
 	else if (me->port == 0 && me->pin == 14)	{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x5000); }
 	else										{ IOCON_PinMuxSet(IOCON, me->port, me->pin, 0x0000); }
+}
+static void AlxIoPin_SetIoconMode(AlxIoPin* me)
+{
+	//Assert
+	(void)me;
+
+	// #1 Set Iocon Mode
+	if (me->mode == IOCON_MODE_INACT)
+	{
+		IOCON->PIO[me->port][me->pin] &= ~(0x1 << 4U);
+		IOCON->PIO[me->port][me->pin] &= ~(0x1 << 5U);
+		return;
+	}
+	if (me->mode == IOCON_MODE_PULLDOWN)
+	{
+		IOCON->PIO[me->port][me->pin] |=  (0x1 << 4U);
+		IOCON->PIO[me->port][me->pin] &= ~(0x1 << 5U);
+		return;
+	}
+	if (me->mode == IOCON_MODE_PULLUP)
+	{
+		IOCON->PIO[me->port][me->pin] &= ~(0x1 << 4U);
+		IOCON->PIO[me->port][me->pin] |=  (0x1 << 5U);
+		return;
+	}
+	if (me->mode == IOCON_MODE_REPEATER)
+	{
+		IOCON->PIO[me->port][me->pin] |=  (0x1 << 4U);
+		IOCON->PIO[me->port][me->pin] |=  (0x1 << 5U);
+		return;
+	}
+
+	//Assert
+	ALX_IO_PIN_ASSERT(false); // We shouldn't get here
+	return;
 }
 
 

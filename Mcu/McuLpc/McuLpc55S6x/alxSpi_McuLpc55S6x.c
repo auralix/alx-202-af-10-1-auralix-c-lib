@@ -24,7 +24,6 @@
 // Private Functions
 //******************************************************************************
 static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries);
-static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me);
 static void AlxSpi_Ctor_ParseMode(AlxSpi* me);
 static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me);
 static Alx_Status AlxSpi_Reset(AlxSpi* me);
@@ -45,20 +44,18 @@ void AlxSpi_Ctor
 	AlxIoPin* di_MISO,
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
-	spi_ssel_t nCSSel,
 	AlxClk* clk,
 	AlxSpi_Clk spiClk
 )
 {
 	//Assert
 	(void)me;
-	(void)spi;
+	ALX_SPI_ASSERT(!(spi == SPI8));	// SPI8 should not be used
 	(void)do_SCK;
 	(void)do_MOSI;
 	(void)di_MISO;
 	(void)do_nCS;
 	(void)mode;
-	(void)nCSSel;
 	(void)clk;
 	(void)spiClk;
 
@@ -72,13 +69,9 @@ void AlxSpi_Ctor
 
 	// Parameters
 	me->mode = mode;
-	me->nCSSel = nCSSel;
 	me->spiClk = spiClk;
 
-	// Check if Clk is OK
-	ALX_SPI_ASSERT(AlxSpi_Ctor_IsClkOk(me));
-
-	// Variables																	// MF: Everything is set to default (see "void SPI_MasterGetDefaultConfig()" function) except "me->spiMasterConfig.sselNum" and "me->spiMasterConfig.baudRate_Bps"
+	// Variables																	// MF: Everything is set to default (see "void SPI_MasterGetDefaultConfig()" function) except "me->spiMasterConfig.baudRate_Bps"
 	me->spiMasterConfig.enableLoopback				= false;
 	me->spiMasterConfig.enableMaster				= true;
 	me->spiMasterConfig.polarity					= kSPI_ClockPolarityActiveHigh;	// MF: Is set in "AlxSpi_Ctor_ParseMode()"
@@ -86,7 +79,7 @@ void AlxSpi_Ctor
 	me->spiMasterConfig.direction					= kSPI_MsbFirst;
 	me->spiMasterConfig.baudRate_Bps				= (uint32_t)spiClk;
 	me->spiMasterConfig.dataWidth					= kSPI_Data8Bits;
-	me->spiMasterConfig.sselNum						= nCSSel;
+	me->spiMasterConfig.sselNum						= kSPI_Ssel0;
 	me->spiMasterConfig.sselPol						= kSPI_SpolActiveAllLow;
 	me->spiMasterConfig.txWatermark					= (uint8_t)kSPI_TxFifo0;
 	me->spiMasterConfig.rxWatermark					= (uint8_t)kSPI_RxFifo1;
@@ -116,6 +109,7 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 	// Assert
 	ALX_SPI_ASSERT(me->isInit == false);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 Init GPIO
 	AlxIoPin_Init(me->do_SCK);
@@ -143,6 +137,7 @@ Alx_Status AlxSpi_DeInit(AlxSpi* me)
 	// Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
+	(void)me;
 
 	// #1 DeInit SPI
 	SPI_Deinit(me->spi);
@@ -244,6 +239,7 @@ void AlxSpi_Master_AssertCs(AlxSpi* me)
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
+	// #1 Assert nCS
 	AlxIoPin_Reset(me->do_nCS);
 }
 void AlxSpi_Master_DeAssertCs(AlxSpi* me)
@@ -253,6 +249,7 @@ void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
+	// #1 DeAssert nCS
 	AlxIoPin_Set(me->do_nCS);
 }
 
@@ -262,6 +259,10 @@ void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 //******************************************************************************
 static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 {
+	// Assert
+	(void)me;
+	(void)numOfTries;
+
 	// #1 Prepare variables
 	status_t status = kStatus_Fail;
 
@@ -285,19 +286,11 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 	if (status == kStatus_Success)	{ return Alx_Ok; }
 	else							{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
-static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me)
-{
-	// #1 Check that right Spi SCK is used
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default &&	// MF: When MainClk Freq is 12MHz, max Spi SCK is 6MHz
-		me->spiClk > AlxSpi_Clk_McuLpc55S6x_SpiClk_6MHz)	{ return false; }
-	else													{ return true; }
-
-	// Assert
-	ALX_SPI_ASSERT(false); // We shouldn't get here
-	return ALX_NULL;
-}
 static void AlxSpi_Ctor_ParseMode(AlxSpi* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Parse Mode
 	if (me->mode == AlxSpi_Mode_0)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveLow;  me->spiMasterConfig.phase = kSPI_ClockPhaseFirstEdge;  return;}
 	if (me->mode == AlxSpi_Mode_1)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveLow;  me->spiMasterConfig.phase = kSPI_ClockPhaseSecondEdge; return;}
@@ -310,6 +303,9 @@ static void AlxSpi_Ctor_ParseMode(AlxSpi* me)
 }
 static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Get FlexComm Clk Freq
 	#if defined(SPI0)
 	if (me->spi == SPI0)	{ return CLOCK_GetFlexCommClkFreq(0U); }
@@ -342,6 +338,9 @@ static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me)
 }
 static Alx_Status AlxSpi_Reset(AlxSpi* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 DeInit SPI
 	SPI_Deinit(me->spi);
 
@@ -362,6 +361,9 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me)
 }
 static void AlxSpi_Periph_Reset(AlxSpi* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Reset FlexComm
 	#if defined(SPI0)
 	if (me->spi == SPI0)	{ RESET_PeripheralReset(kFC0_RST_SHIFT_RSTn); return; }
@@ -394,6 +396,9 @@ static void AlxSpi_Periph_Reset(AlxSpi* me)
 }
 static void AlxSpi_Periph_AttachClk(AlxSpi* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Attach Clk to FlexComm
 	#if defined(SPI0)
 	if (me->spi == SPI0)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM0); return; }	// MF: In example there was Clk from FRO12MHz I do not understand which clk is right
@@ -426,6 +431,9 @@ static void AlxSpi_Periph_AttachClk(AlxSpi* me)
 }
 static void AlxSpi_Periph_DisableClk(AlxSpi* me)
 {
+	// Assert
+	(void)me;
+
 	// #1 Disable FlexComm Clk
 	#if defined(SPI0)
 	if (me->spi == SPI0)	{ CLOCK_DisableClock(kCLOCK_FlexComm0); return; }

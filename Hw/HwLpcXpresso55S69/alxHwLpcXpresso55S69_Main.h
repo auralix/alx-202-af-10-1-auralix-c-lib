@@ -259,7 +259,8 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO1_17	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.di_P1_18_WakeBtn_IRQ1,	1,	18,	AlxIoPin_Func_IRQ,		IOCON_MODE_INACT,	true,	false,	false,	false	);
 	//PIO1_19	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_20_SPI_nCS,		1,	20,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_20_SPI_nCS,		1,	20,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);	// MF: Spi nCS is config as GPIO and is controlled by SW
+	//PIO1_21	- Unused
 	//PIO1_22	- Unused
 	//PIO1_23	- Unused
 	//PIO1_24	- Unused
@@ -278,7 +279,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxClk_Ctor
 	(
 		&alxClk,
-		AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default,
+		AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz,
 		AlxClk_Tick_1ms
 	);
 
@@ -323,6 +324,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		me->adcChArr,
 		ALX_ARR_LEN(me->adcIoPinArr),
 		&alxClk,
+		AlxAdc_Clk_McuLpc55S6x_AdcClk_18MHz75_MainClk_150MHz,
 		#if defined ALX_OPTIMIZE_SIZE_ALL
 		3300U
 		#else
@@ -371,9 +373,8 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		&me->alxIoPin.di_P0_19_SPI_MISO,
 		&me->alxIoPin.do_P1_20_SPI_nCS,
 		AlxSpi_Mode_2,
-		kSPI_Ssel1,		// MF: Doesn't work with kSPI_Ssel0 I don't know why
 		&alxClk,
-		AlxSpi_Clk_McuLpc55S6x_SpiClk_1MHz
+		AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz
 	);
 
 	// Info

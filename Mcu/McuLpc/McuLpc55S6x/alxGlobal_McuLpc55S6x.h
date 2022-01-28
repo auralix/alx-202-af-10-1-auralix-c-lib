@@ -80,12 +80,6 @@ extern "C" {
 #include "fsl_wwdt.h"
 
 
-//******************************************************************************
-// IoPin Functions
-//******************************************************************************
-void AlxPROTECTED_IoPin_SetIoconMode(uint8_t port, uint8_t pin, uint32_t mode);
-
-
 #endif // Module Guard
 
 #ifdef __cplusplus

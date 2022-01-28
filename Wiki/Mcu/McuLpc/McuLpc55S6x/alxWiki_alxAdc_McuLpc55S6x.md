@@ -3,8 +3,7 @@
 ## General
 - Func "float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)" is not implemented
 - MainClk is used for ADC
-- Dividers in func "void AlxAdc_SetClkDiv(AlxAdc* me)" are set based on testing. The ADC is most accurate when input clk is divided with these integers
-    - Max input clk to ADC is 24MHz (User Manual Page 788 subtitle __39.7.3 Power control__)
+- Max input clk to ADC is 24MHz (User Manual Page 788 subtitle __39.7.3 Power control__)
 - This module has OPTIMIZE SIZE option
     - When optimization enabled:
         - Ctor - VRef is in millivolts unsigned
