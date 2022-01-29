@@ -252,8 +252,8 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(AlxHwLpcXpresso5
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(me);
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me);

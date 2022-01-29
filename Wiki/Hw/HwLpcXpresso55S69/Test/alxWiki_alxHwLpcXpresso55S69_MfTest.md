@@ -5,10 +5,11 @@
 
 ### __Test List__  
 - AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(me)
-	- [Toggled IoPin P1_9](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led_01.jpg) 
+	- ![Toggled IoPin P1_9](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led_01.jpg) 
 - AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me)
-	- [Trace](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace_01.jpg) 
+	- ![Trace](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace_01.jpg) 
 - AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me)
+	- [Get V on IoPin P0_23 AlxCh0 and IoPin P0_16 AlxCh8](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace_01.jpg) 
 - AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me)
 - AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(me)
 - AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me)
