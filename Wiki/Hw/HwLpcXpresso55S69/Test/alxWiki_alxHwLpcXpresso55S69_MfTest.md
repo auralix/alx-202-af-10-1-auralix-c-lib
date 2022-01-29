@@ -37,4 +37,9 @@
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_10](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_10.jpg)
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_11](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_11.jpg)
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(me)__
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_03](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_03.jpg)
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me)__
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_01.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02.jpg)

@@ -162,17 +162,20 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(AlxHwLpcXpres
 	// Init
 	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi);
 
+	// Setup Delay
+	AlxDelay_ms(500);
+
 	while (1)
 	{
+		// Write
 		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
-		if (AlxSpi_Master_Write(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, sizeof(srcBuffWrite), 1, 0) != Alx_Ok)						{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		if (AlxSpi_Master_Write(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, sizeof(srcBuffWrite), 1, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
 		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
 
+		// Read
 		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
-		if (AlxSpi_Master_Read( &me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffRead,  sizeof(srcBuffRead),  1, 0) != Alx_Ok)						{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		if (AlxSpi_Master_Read( &me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffRead,  sizeof(srcBuffRead),  1, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
 		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
-
-		//if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 1, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
 
 		AlxDelay_ms(500);
 	}
@@ -254,9 +257,9 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me);
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(me);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me);
 }
 
 
