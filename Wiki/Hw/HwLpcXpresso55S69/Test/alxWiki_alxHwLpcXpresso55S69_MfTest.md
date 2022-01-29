@@ -3,18 +3,38 @@
 ## __G01_BringUp__
 - Bring Up of Alx modules
 
+### __Configurations__
+- __AlxCk__: AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz
+- __AlxTrace__: AlxGlobal_BaudRate_115200
+- __AlxAdc__: AlxAdc_Clk_McuLpc55S6x_AdcClk_18MHz75_MainClk_150MHz
+- __AlxSpi__: AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz
+
 ### __Test List__  
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(me)__
-	- ![Toggled IoPin P1_9](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led_01.jpg)
-
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led_01.jpg)
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me)__
-	- ![Trace](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace_01.jpg) 
-
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace_01.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace_02.jpg)
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me)__
-	- [Get V on IoPin P0_23 AlxCh0 and IoPin P0_16 AlxCh8](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace_01.jpg) 
-
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_01.jpg)
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_02.jpg)
+	- Optimize Disabled
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_03](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_03.jpg)
+	- Optimize Enabled
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_04](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_04.jpg)
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me)__
-
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_01.jpg)
+	- Optimize Disabled
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_02.jpg)
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_03](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_03.jpg)
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_04](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_04.jpg)
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_05](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_05.jpg)
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_06](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_06.jpg)
+	- Optimize Enabled
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_07](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_07.jpg)
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_08](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_08.jpg)
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_09](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_09.jpg)
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_10](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_10.jpg)
+	- [AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_11](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_11.jpg)
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(me)__
-
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me)__

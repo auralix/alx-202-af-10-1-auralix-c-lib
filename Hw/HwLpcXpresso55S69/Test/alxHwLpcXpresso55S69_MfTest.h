@@ -132,7 +132,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(AlxHwLpcXpres
 	// Init
 	AlxPwm_Init(&me->alxHwLpcXpresso55S69_Main.alxPwm);
 
-	// Setup Delay	// MF: To see how duty changes from 50% (set in Ctor) to what is set below
+	// Setup Delay	// MF: To see how duty changes from what is in Ctor to what is set below
 	AlxDelay_ms(500);
 
 	while (1)
@@ -253,8 +253,8 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55
 {
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me);
 }
