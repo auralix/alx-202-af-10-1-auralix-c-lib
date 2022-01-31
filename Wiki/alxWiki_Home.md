@@ -11,6 +11,7 @@
 - Hw
     - [HwLpcXpresso55S69](Hw/HwLpcXpresso55S69/alxWiki_alxHwLpcXpresso55S69_Home.md)
         - Test
+			- [alxHwLpcXpresso55S69_MfTest - ALX HW LPC Xpresso 55S69 MF Test Module](Hw/HwLpcXpresso55S69/Test/alxWiki_alxHwLpcXpresso55S69_MfTest.md)
     - HwNfcWlcListenerV3_5b
         - Test
             - [alxHwNfcWlcListenerV3_5b_MfTest - ALX HW NFC WLC Listener V3_5b MF Test Module](Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_MfTest.md)
