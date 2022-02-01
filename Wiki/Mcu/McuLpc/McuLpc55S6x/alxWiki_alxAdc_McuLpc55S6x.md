@@ -4,6 +4,7 @@
 - Func "float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)" is not implemented
 - MainClk is used for ADC
 - Max input clk to ADC is 24MHz (User Manual Page 788 subtitle __39.7.3 Power control__)
+	- Divider used for input clk can be 1-8 (values 0-7 in register) (User Manual Page 80 subtitle __4.5.54 ADC clock source divider register__)
 - This module has OPTIMIZE SIZE option
     - When optimization enabled:
         - Ctor - VRef is in millivolts unsigned

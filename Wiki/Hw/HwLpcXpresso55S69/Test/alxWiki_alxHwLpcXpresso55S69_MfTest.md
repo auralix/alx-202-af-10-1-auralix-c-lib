@@ -18,10 +18,13 @@
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me)__
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_01.jpg)
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_02.jpg)
-	- Optimize Disabled
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_03](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_03.jpg)
 	- Optimize Enabled
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_03](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_03.jpg)
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_04](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_04.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_05](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_05.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_06](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_06.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_07](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_07.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_08](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc_08.jpg)
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me)__
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_01.jpg)
 	- Optimize Disabled

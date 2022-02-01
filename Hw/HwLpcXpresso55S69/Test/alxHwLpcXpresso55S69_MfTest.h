@@ -121,7 +121,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(AlxHwLpcXpres
 		AlxTrace_WriteFormat(&alxTrace, "Ch8, P2 = %d\r\n", me->ai_P0_16_ADC_CH8_voltage_V);
 		#endif
 
-		AlxDelay_ms(1200);
+		AlxDelay_ms(20);
 	}
 }
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
@@ -154,10 +154,12 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(AlxHwLpcXpres
 	(void)me;
 
 	// Variables
-	uint8_t srcBuffWrite[1];
-	uint8_t srcBuffRead[1];
+	uint8_t srcBuffWrite[2];
+	uint8_t srcBuffRead[2];
 	srcBuffWrite[0] = 0b11111111;	// MF: Writing (0b1) to 7Fh register returns CTN530 Verion and shoudl be 0x1A
+	srcBuffWrite[1] = 0b11111111;
 	srcBuffRead[0] = 0b00000000;
+	srcBuffRead[1] = 0b00000000;
 
 	// Init
 	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi);
@@ -167,15 +169,18 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(AlxHwLpcXpres
 
 	while (1)
 	{
-		// Write
+		// WriteRead
 		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
-		if (AlxSpi_Master_Write(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, sizeof(srcBuffWrite), 1, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
 		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
 
-		// Read
-		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
-		if (AlxSpi_Master_Read( &me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffRead,  sizeof(srcBuffRead),  1, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+
+		// Read Default Reg
+
+		// Write
+
+		// Read Written rReg
+
 
 		AlxDelay_ms(500);
 	}
@@ -258,8 +263,8 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(me);
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me);
 }
 
 
