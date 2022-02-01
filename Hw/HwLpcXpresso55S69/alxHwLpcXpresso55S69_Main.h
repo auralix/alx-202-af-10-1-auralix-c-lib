@@ -259,7 +259,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO1_17	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.di_P1_18_WakeBtn_IRQ1,	1,	18,	AlxIoPin_Func_IRQ,		IOCON_MODE_INACT,	true,	false,	false,	false	);
 	//PIO1_19	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P1_20_SPI_nCS,		1,	20,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);	// MF: Spi nCS is config as GPIO and is controlled by SW
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_20_SPI_nCS,		1,	20,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	true	);	// MF: Spi nCS is config as GPIO and is controlled by SW
 	//PIO1_21	- Unused
 	//PIO1_22	- Unused
 	//PIO1_23	- Unused

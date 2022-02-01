@@ -39,10 +39,14 @@
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_09](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_09.jpg)
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_10](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_10.jpg)
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_11](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm_11.jpg)
-- __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi(me)__
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01.jpg)
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02.jpg)
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_03](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_03.jpg)
+- __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01(me)__
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01_01.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01_02.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01_03](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01_03.jpg)
+- __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02(me)__
+	- Setup is the same as in AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01(me)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02_01.jpg)
 - __AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me)__
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_01.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02.jpg)
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02.jpg)
