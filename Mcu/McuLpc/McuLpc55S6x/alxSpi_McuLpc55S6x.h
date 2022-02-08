@@ -61,7 +61,6 @@ typedef struct
 	AlxIoPin* do_MOSI;
 	AlxIoPin* di_MISO;
 	AlxIoPin* do_nCS;
-	AlxClk* clk;
 
 	// Parameters
 	AlxSpi_Mode mode;
@@ -89,7 +88,6 @@ void AlxSpi_Ctor
 	AlxIoPin* di_MISO,
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
-	AlxClk* clk,
 	AlxSpi_Clk spiClk
 );
 

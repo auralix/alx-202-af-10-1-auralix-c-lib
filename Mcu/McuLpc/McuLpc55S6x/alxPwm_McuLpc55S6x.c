@@ -110,8 +110,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	(void)me;
 
 	// #1 Init IoPin
-	for (uint32_t i = 0; i < me->numOfCh; i++)
-		{ AlxIoPin_Init((*(me->ioPinArr + i))); }
+	for (uint32_t i = 0; i < me->numOfCh; i++) AlxIoPin_Init((*(me->ioPinArr + i)));
 
 	// #2 Enable Clk to CTimer
 	AlxPwm_EnableCtimerClk(me);
@@ -151,8 +150,7 @@ Alx_Status AlxPwm_DeInit(AlxPwm* me)
 	CTIMER_Deinit(me->tim);		// MF: "Stop CTIMER" and "DisableClk" happens here
 
 	// #2 DeInit GPIO
-	for (uint32_t i = 0; i < me->numOfCh; i++)
-		AlxIoPin_DeInit((*(me->ioPinArr + i)));
+	for (uint32_t i = 0; i < me->numOfCh; i++) AlxIoPin_DeInit((*(me->ioPinArr + i)));
 
 	// #3 Reset isInit
 	me->isInit = false;

@@ -44,7 +44,6 @@ void AlxSpi_Ctor
 	AlxIoPin* di_MISO,
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
-	AlxClk* clk,
 	AlxSpi_Clk spiClk
 )
 {
@@ -56,7 +55,6 @@ void AlxSpi_Ctor
 	(void)di_MISO;
 	(void)do_nCS;
 	(void)mode;
-	(void)clk;
 	(void)spiClk;
 
 	// Objects - External
@@ -65,7 +63,6 @@ void AlxSpi_Ctor
 	me->do_MOSI = do_MOSI;
 	me->di_MISO = di_MISO;
 	me->do_nCS = do_nCS;
-	me->clk = clk;
 
 	// Parameters
 	me->mode = mode;
