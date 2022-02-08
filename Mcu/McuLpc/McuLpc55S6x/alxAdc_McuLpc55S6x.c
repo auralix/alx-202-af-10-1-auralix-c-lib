@@ -76,8 +76,7 @@ void AlxAdc_Ctor
 	#endif
 
 	// Check channel sequence
-	for (uint32_t i = 0; i < (uint32_t)(numOfIoPinsAndCh - 1); i++)
-		{ ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) <= AlxAdc_GetCh(me, chArr[i + 1])); }	// MF: Channel sequence must be from low to high number
+	for (uint32_t i = 0; i < (uint32_t)(numOfIoPinsAndCh - 1); i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) <= AlxAdc_GetCh(me, chArr[i + 1]));	// MF: Channel sequence must be from low to high number
 
 	// Check if right channels are used
 	ALX_ADC_ASSERT(AlxAdc_Ctor_CheckCh(me));
@@ -187,8 +186,7 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	POWER_EnablePD(kPDRUNCFG_PD_LDOGPADC);
 
 	// #3 DeInit pin for each channel
-	for (uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++)
-		{ AlxIoPin_DeInit((*(me->ioPinArr + i))); }
+	for (uint8_t i = 0 ; i < me->numOfIoPinsAndCh; i++) AlxIoPin_DeInit((*(me->ioPinArr + i)));
 
 	// #4 Reset isInit
 	me->isInit = false;

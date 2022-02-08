@@ -176,8 +176,8 @@ static bool AlxClk_AreClkNok(AlxClk* me)
 
 	// #1 Get Clks
 	me->systemCoreClock = SystemCoreClock;
-	me->ahbClk = CLOCK_GetFreq(kCLOCK_BusClk);		//MF: BusClk is "SysClk" because it is divided "MainClk"
-	me->mainClk = CLOCK_GetFreq(kCLOCK_CoreSysClk);	//MF: CoreSysClk is actually "MainClk" (svinjarijo)
+	me->ahbClk = CLOCK_GetFreq(kCLOCK_BusClk);		// MF: BusClk is "SysClk" because it is divided "MainClk"
+	me->mainClk = CLOCK_GetFreq(kCLOCK_CoreSysClk);	// MF: CoreSysClk is actually "MainClk" (svinjarijo)
 
 	// #2 Check Clks
 	if		(SystemCoreClock != me->systemCoreClock_Ctor)	{ ALX_CLK_TRACE("ErrSystemCoreClock");	return true; }
