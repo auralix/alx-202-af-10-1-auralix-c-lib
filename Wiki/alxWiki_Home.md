@@ -11,6 +11,7 @@
 - Hw
     - [HwLpcXpresso55S69](Hw/HwLpcXpresso55S69/alxWiki_alxHwLpcXpresso55S69_Home.md)
         - Test
+			- [alxHwLpcXpresso55S69_MfTest - ALX HW LPC Xpresso 55S69 MF Test Module](Hw/HwLpcXpresso55S69/Test/alxWiki_alxHwLpcXpresso55S69_MfTest.md)
     - HwNfcWlcListenerV3_5b
         - Test
             - [alxHwNfcWlcListenerV3_5b_MfTest - ALX HW NFC WLC Listener V3_5b MF Test Module](Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_MfTest.md)
@@ -21,6 +22,14 @@
 - Mcu
     - McuLpc
         - McuLpc17
+        - [McuLpc55S6x](Mcu/McuLpc/McuLpc55S6x/alxWiki_McuLpc55S6x.md)
+            - [alxAdc_McuLpc55S6x - ALX MCU LPC55S6x ADC Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxAdc_McuLpc55S6x.md)
+            - [alxClk_McuLpc55S6x - ALX MCU LPC55S6x Clock Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxClk_McuLpc55S6x.md)
+            - [alxIoPin_McuLpc55S6x - ALX MCU LPC55S6x IO Pin Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxIoPin_McuLpc55S6x.md)
+            - [alxIoPinIrq_McuLpc55S6x - ALX MCU LPC55S6x IO Pin Irq Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxIoPinIrq_McuLpc55S6x.md)
+            - [alxPwm_McuLpc55S6x - ALX MCU LPC55S6x PWM Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxPwm_McuLpc55S6x.md)
+            - [alxSpi_McuLpc55S6x - ALX MCU LPC55S6x SPI Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxSpi_McuLpc55S6x.md)
+            - [alxTrace_McuLpc55S6x - ALX MCU LPC55S6x Trace Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxTrace_McuLpc55S6x.md)
         - [McuLpc80x](Mcu/McuLpc/McuLpc80x/alxWiki_McuLpc80x.md)
             - [alxAdc_McuLpc80x - ALX MCU LPC80x ADC Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxAdc_McuLpc80x.md)
             - [alxClk_McuLpc80x - ALX MCU LPC80x Clock Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxClk_McuLpc80x.md)

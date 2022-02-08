@@ -34,6 +34,9 @@ extern "C" {
 #elif defined(ALX_LPC80X)
 #include "alxClk_McuLpc80x.h"
 
+#elif defined(ALX_LPC55S6X)
+#include "alxClk_McuLpc55S6x.h"
+
 #else
 typedef struct { bool dummy; } AlxClk;
 #endif

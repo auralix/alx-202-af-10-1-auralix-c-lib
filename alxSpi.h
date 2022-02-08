@@ -26,6 +26,9 @@ extern "C" {
 #if  defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 #include "alxSpi_McuStm32.h"
 
+#elif defined(ALX_LPC55S6X)
+#include "alxSpi_McuLpc55S6x.h"
+
 #else
 typedef struct { bool dummy; } AlxSpi;
 #endif
