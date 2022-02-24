@@ -74,6 +74,95 @@ static inline void AlxHwNucleoF429Zi_TvTest_G01_BringUp_T02_Trace(AlxHwNucleoF42
 		AlxDelay_ms(100);
 	}
 }
+static inline void AlxHwNucleoF429Zi_TvTest_G01_BringUp_T03_MyFun1(uint32_t myVar)
+{
+	(void)myVar;
+}
+static inline void AlxHwNucleoF429Zi_TvTest_G01_BringUp_T03_MyFun2(uintptr_t myVar)
+{
+	(void)myVar;
+}
+static inline void AlxHwNucleoF429Zi_TvTest_G01_BringUp_T03_Typedef(AlxHwNucleoF429Zi_TvTest_G01_BringUp* me)
+{
+	(void)me;
+
+	///
+	/// Typedef
+	///
+
+	// Without using typedef
+	struct MyStruct1
+	{
+		uint8_t myVar1;
+		uint8_t myVar2;
+	};
+
+	struct MyStruct1 myStruct1;
+
+	// With using typedef
+	typedef struct
+	{
+		uint8_t myVar1;
+		uint8_t myVar2;
+	} MyStruct2;
+
+	MyStruct2 myStruct2;
+
+
+
+
+	///
+	/// Function Pointer
+	///
+
+	// Function Pointer declaration
+	void (*myFunPtr1)(uint32_t);
+
+	// Function pointer definition
+	myFunPtr1 = &AlxHwNucleoF429Zi_TvTest_G01_BringUp_T03_MyFun1;
+
+	// Function pointer invoking
+	(*myFunPtr1)(10);
+
+
+	// Function Pointer declaration
+	void (*myFunPtr2)(uint32_t);
+
+	// Function pointer definition (without &)
+	myFunPtr2 = AlxHwNucleoF429Zi_TvTest_G01_BringUp_T03_MyFun1;
+
+	// Function pointer invoking (without *)
+	myFunPtr2(10);
+
+
+	// Function Pointer declaration (with uintptr_t -> an unsigned integer type that is capable of storing a data pointer. Which typically means that it's the same size as a pointer)
+	void (*myFunPtr3)(uintptr_t myUintPtrArg);	// Argument has name, this is also OK, so everything works
+
+	// Function pointer definition (without &)
+	myFunPtr3 = AlxHwNucleoF429Zi_TvTest_G01_BringUp_T03_MyFun2;
+
+	// Function pointer invoking (without *)
+	myFunPtr3(10);
+
+
+
+
+	///
+	/// Function Pointer & Typedef
+	///
+
+	// Typedef function pointer
+	typedef void (*MyFunPtr4)(uintptr_t);
+
+	// Function Pointer declaration
+	MyFunPtr4 myFunPtr4;
+
+	// Function pointer definition (without &)
+	myFunPtr4 = AlxHwNucleoF429Zi_TvTest_G01_BringUp_T03_MyFun2;
+
+	// Function pointer invoking (without *)
+	myFunPtr4(10);
+}
 
 
 //******************************************************************************
@@ -100,6 +189,7 @@ static inline void AlxHwNucleoF429Zi_TvTest_G01_BringUp_Run(AlxHwNucleoF429Zi_Tv
 {
 	AlxHwNucleoF429Zi_TvTest_G01_BringUp_T01_Led(me);
 	//AlxHwNucleoF429Zi_TvTest_G01_BringUp_T02_Trace(me);
+	AlxHwNucleoF429Zi_TvTest_G01_BringUp_T03_Typedef(me);
 }
 
 
