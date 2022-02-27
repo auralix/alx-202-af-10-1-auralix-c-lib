@@ -28,12 +28,15 @@ MF: - Pin PIO1_7 (LED Green) is not routed to P18 position 7 as it says in *LPCX
 ## SW - IDE - Bare-metal
 ---
 - Tested with VisualGDB's GCC 10.3.1 -> Use exactly this version of compiler
+
 ![Img_10](Img_10.png)
 
 - Tested with J-Link Driver version 6.62d (it must relative newer driver because its new MCU)
+
 ![Img_11](Img_11.png)
 
 - VisualDGB Project Creation Steps
+
 ![Img_1](Img_1.png)
 ![Img_2](Img_2.png)
 ![Img_3](Img_3.png)
