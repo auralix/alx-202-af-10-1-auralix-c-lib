@@ -56,6 +56,15 @@ void AlxTrace_Ctor
 	me->baudRate = (uint32_t)baudRate;
 
 	// Variables
+	#if defined(ALX_FREE_RTOS)
+	me->usartRtosConfig.base = me->usart;
+	me->usartRtosConfig.srcclk = 0;									// MF: This will be set in Init because "AlxClk_Init" has to be called first
+	me->usartRtosConfig.baudrate = me->baudRate;
+	me->usartRtosConfig.parity = kUSART_ParityDisabled;
+	me->usartRtosConfig.stopbits = kUSART_OneStopBit;
+	me->usartRtosConfig.buffer = me->rxDummyBuffer;					// MF: Rx won't be used and NULL ptr cannot be used for Rx buff
+	me->usartRtosConfig.buffer_size = sizeof(me->rxDummyBuffer);	// MF: Rx won't be used and NULL ptr cannot be used for Rx buff
+	#else
 	me->usartConfig.baudRate_Bps				= (uint32_t)baudRate;
 	me->usartConfig.parityMode					= kUSART_ParityDisabled;
 	me->usartConfig.stopBitCount				= kUSART_OneStopBit;
@@ -70,6 +79,7 @@ void AlxTrace_Ctor
 	me->usartConfig.rxWatermark					= kUSART_RxFifo1;	// MF: I don't understand this
 	me->usartConfig.syncMode					= kUSART_SyncModeDisabled;
 	me->usartConfig.clockPolarity				= kUSART_RxSampleOnFallingEdge;
+	#endif
 
 	// Info
 	me->isInit = false;
@@ -92,7 +102,13 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	AlxTrace_AttachClkToFlexcomm(me);
 
 	// #3 Init USART	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
+	#if defined(ALX_FREE_RTOS)
+	me->usartRtosConfig.srcclk = AlxTrace_GetFlexCommClkFreq(me);	// MF: Set Clk Freq
+
+	if (USART_RTOS_Init(&me->usartRtosHandle, &me->usartHandle, &me->usartRtosConfig) != kStatus_Success) { return Alx_Err; }
+	#else
 	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_GetFlexCommClkFreq(me)) != kStatus_Success) { return Alx_Err; }
+	#endif
 
 	// #4 Set isInit
 	me->isInit = true;
@@ -106,7 +122,9 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 	(void)me;
 
 	// #1 DeInit USART
-	USART_Deinit(me->usart);
+	#if defined(ALX_FREE_RTOS)
+	USART_RTOS_Deinit(&me->usartRtosHandle);
+	#else	USART_Deinit(me->usart);	#endif
 
 	// #2 Disable FlexComm Clk and Reset FlexComm Perihpery
 	AlxTrace_FlexcommDisableClkResetPeriph(me);
@@ -127,11 +145,19 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 	(void)str;
 
 	// #1 Write
+	#if defined(ALX_FREE_RTOS)
+	if (USART_RTOS_Send(&me->usartRtosHandle, (uint8_t*)str, strlen(str)) != kStatus_Success)
+	{
+		AlxTrace_ReInit(me);
+		return Alx_Err;
+	}
+	#else
 	if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
 	{
 		AlxTrace_ReInit(me);
 		return Alx_Err;
 	}
+	#endif
 
 	// #2 Return OK
 	return Alx_Ok;

@@ -50,7 +50,7 @@ typedef struct
 	///-------
 	/// Gh
 	///-------
-	#if defined(ALX_TEST_MF)
+	#if defined(ALX_TEST_GH)
 	#endif
 
 	///-------
@@ -161,7 +161,7 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Run(AlxHwLpcXpresso55S69_MainTe
 	///-------
 	/// Gh
 	///-------
-	#if defined(ALX_TEST_MF)
+	#if defined(ALX_TEST_GH)
 	#endif
 
 	///-------

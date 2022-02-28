@@ -30,12 +30,32 @@ AlxHwLpcXpresso55S69_MainTest alxHwLpcXpresso55S69_MainTest = { 0 };
 //******************************************************************************
 // IRQ Handlers
 //******************************************************************************
-#if !defined(ALX_FREE_RTOS)
-void SysTick_Handler(void)
+#if defined(ALX_FREE_RTOS)
+void SysTick_Handler(void) /* PRIVILEGED_FUNCTION */
+{
+	// #1 Alx Tick
+	AlxTick_Inc_ms(&alxTick);
+
+	// #2 Rtos Stuff
+	uint32_t ulPreviousMask;
+
+	ulPreviousMask = portSET_INTERRUPT_MASK_FROM_ISR();
+	{
+		/* Increment the RTOS tick. */
+		if (xTaskIncrementTick() != pdFALSE)
+		{
+			/* Pend a context switch. */
+			portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT;
+		}
+	}
+	portCLEAR_INTERRUPT_MASK_FROM_ISR(ulPreviousMask);
+}
+#elsevoid SysTick_Handler(void)
 {
 	AlxTick_Inc_ms(&alxTick);
 }
 #endif
+
 
 
 //******************************************************************************

@@ -63,10 +63,23 @@ typedef struct
 	bool isInit;
 } AlxHwLpcXpresso55S69_MfTest_G01_BringUp;
 
+	//AlxHwLpcXpresso55S69_Main main2 = { 0 };
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+#if defined(ALX_FREE_RTOS)
+static inline void G01_BringUp_T02_Trace_Task(void *pvParameters)
+{
+	while (1)
+	{
+		ALX_TRACE_FORMAT("T02_Trace_Task\r\n");
+
+		AlxDelay_ms(1000);
+	}
+}
+#endif
+
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
@@ -76,28 +89,57 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(AlxHwLpcXpres
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UsrLED_BL);
 	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
-	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);	// MF: To see toggling with Logic Analyzer
+	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);	// MF: To see toggling with Logic Analyzer
 
+	#if defined(ALX_FREE_RTOS)
 	while (1)
 	{
 		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UsrLED_BL);
 		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
 		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
-		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
+		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
+
+		vTaskDelay(100);
+	}
+	#else
+	while (1)
+	{
+		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UsrLED_BL);
+		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
+		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
 
 		AlxDelay_ms(500);
 	}
+	#endif
 }
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
 	(void)me;
 
+	#if defined(ALX_FREE_RTOS)
+	// Set Priotiry
+	NVIC_SetPriority(FLEXCOMM0_IRQn, Alx_IrqPriority_5);
+
+	// Create Rtos Task / Thread
+	xTaskCreate
+	(
+		G01_BringUp_T02_Trace_Task,
+		"Usart_task",
+		configMINIMAL_STACK_SIZE + 100,
+		NULL,
+		(configMAX_PRIORITIES - 1),
+		NULL
+	);
+	#else
 	while (1)
 	{
 		ALX_TRACE_FORMAT("T02_Trace\r\n");
+
 		AlxDelay_ms(1000);
 	}
+	#endif
 }
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
@@ -295,11 +337,11 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(AlxHwLpcXpresso5
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(me);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01(me);
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02(me);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02(me);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(me);
 }
 
