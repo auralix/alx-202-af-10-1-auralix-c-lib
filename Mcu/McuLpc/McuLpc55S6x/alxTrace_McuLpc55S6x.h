@@ -39,7 +39,14 @@ typedef struct
 	AlxGlobal_BaudRate baudRate;
 
 	// Variables
+	#if defined(ALX_FREE_RTOS)
+	struct rtos_usart_config usartRtosConfig;
+	usart_rtos_handle_t usartRtosHandle;
+	struct _usart_handle usartHandle;
+	uint8_t rxDummyBuffer[1];	// MF: Rx won't be used and NULL ptr cannot be used for Rx buff
+	#else
 	usart_config_t usartConfig;
+	#endif
 
 	// Info
 	bool isInit;
