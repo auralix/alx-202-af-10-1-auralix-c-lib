@@ -123,8 +123,10 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 
 	// #1 DeInit USART
 	#if defined(ALX_FREE_RTOS)
-	USART_RTOS_Deinit(&me->usartRtosHandle);
-	#else	USART_Deinit(me->usart);	#endif
+	USART_RTOS_Deinit(&me->usartRtosHandle);	// MF: Always returns Success, so we won't hande return
+	#else
+	USART_Deinit(me->usart);
+	#endif
 
 	// #2 Disable FlexComm Clk and Reset FlexComm Perihpery
 	AlxTrace_FlexcommDisableClkResetPeriph(me);
