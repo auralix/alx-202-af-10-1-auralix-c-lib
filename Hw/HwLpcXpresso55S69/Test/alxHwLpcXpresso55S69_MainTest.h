@@ -70,6 +70,7 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Ctor()
 	///-------
 	#if defined(ALX_TEST_MF)
 	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Ctor();
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Ctor();
 	#endif
 
 	///-------
@@ -103,6 +104,7 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Init()
 	///-------
 	#if defined(ALX_TEST_MF)
 	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init();
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init();
 	#endif
 
 	///-------
@@ -136,6 +138,7 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Run()
 	///-------
 	#if defined(ALX_TEST_MF)
 	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run();
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run();
 	#endif
 
 	///-------

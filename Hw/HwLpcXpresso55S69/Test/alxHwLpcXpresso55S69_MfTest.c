@@ -24,6 +24,6 @@
 // Variables
 //******************************************************************************
 AlxHwLpcXpresso55S69_MfTest_G01_BringUp G01_BringUp = { 0 };
-
+AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos G02_BringUpRtos = { 0 };
 
 #endif // #if defined(ALX_HW_LPC_XPRESSO_55S69_C_TEST)

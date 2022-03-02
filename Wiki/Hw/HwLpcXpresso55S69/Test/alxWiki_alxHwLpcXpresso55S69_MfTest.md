@@ -52,7 +52,7 @@
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02.jpg)
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02.jpg)
 
-## __G01_BringUp - Rtos__
+## __G02_BringUpRtos__
 ---
 - Bring Up of Alx modules using Rtos
 
@@ -67,13 +67,13 @@
 
 ### __Result__
 - __Tasks__
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_AllTasks](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_AllTasks.jpg)
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_Task1creation](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_Task1creation.jpg)
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_Task2creation](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_Task2creation.jpg)
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_Task3creation](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_Task3creation.jpg)
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_Task4creation](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_Task4creation.jpg)
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_StartTasks](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_StartTasks.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_AllTasks](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_AllTasks.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task1creation](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task1creation.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task2creation](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task2creation.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task3creation](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task3creation.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task4creation](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task4creation.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_StartTasks](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_StartTasks.jpg)
 - __Spi Outputs__
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_SpiOutput](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_SpiOutput.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_SpiOutput](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_SpiOutput.jpg)
 - __Trace Output__
-	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_TraceOutput](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Rtos_TraceOutput.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_TraceOutput](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_TraceOutput.jpg)

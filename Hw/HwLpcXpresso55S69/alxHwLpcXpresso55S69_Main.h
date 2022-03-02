@@ -241,7 +241,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 
 	// Port 1
 	//PIO1_0	- Unused
-	
+	//PIO1_1	- Unused
 	//PIO1_2	- Unused
 	//PIO1_3	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_PWM1,			1,	4,	AlxIoPin_Func_3,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);	// MF: AlxIoPin_Ctor(&me->alxIoPin.do_P1_4_UsrLED_BL, 1, 4, AlxIoPin_Func_0_GPIO, IOCON_MODE_PULLUP, false, true, false);

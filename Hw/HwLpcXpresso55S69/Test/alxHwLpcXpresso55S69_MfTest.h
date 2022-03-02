@@ -73,71 +73,6 @@ extern AlxHwLpcXpresso55S69_MfTest_G01_BringUp G01_BringUp;
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-#if defined(ALX_FREE_RTOS)
-static inline void G01_BringUp_T01_Led_Task(void *pvParameters)
-{
-	while (1)
-	{
-		//AlxIoPin_Toggle(&G01_BringUp.alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UsrLED_BL);
-		AlxIoPin_Toggle(&G01_BringUp.alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
-		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
-		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
-
-		//AlxDelay_ms(500);	// MF: Fuka, ko je AlxDelay uporabljen samo en Task dela
-		vTaskDelay(500);
-	}
-}
-static inline void G01_BringUp_T02_Trace_Task(void *pvParameters)
-{
-	while (1)
-	{
-		ALX_TRACE_FORMAT("T02_Trace_Task\r\n");
-
-		vTaskDelay(1000);
-	}
-}
-static inline void G01_BringUp_T05_Spi_01_Task(void *pvParameters)
-{
-	// Variables
-	uint8_t srcBuffWrite[2];
-	uint8_t srcBuffRead[2];
-	srcBuffWrite[0] = 0b11111111; // MF: Writing (0b1) to 7Fh register returns CTN530 Verion and shoudl be 0x1A
-	srcBuffWrite[1] = 0b11111111;
-	srcBuffRead[0] = 0b00000000;
-	srcBuffRead[1] = 0b00000000;
-
-	while (1)
-	{
-		// WriteRead
-		AlxSpi_Master_AssertCs(&G01_BringUp.alxHwLpcXpresso55S69_Main.alxSpi);
-		if (AlxSpi_Master_WriteRead(&G01_BringUp.alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&G01_BringUp.alxHwLpcXpresso55S69_Main.alxSpi);
-
-		vTaskDelay(100);
-	}
-}
-static inline void G01_BringUp_T05_Spi_03_Task(void *pvParameters)
-{
-	// Variables
-	uint8_t srcBuffWrite[2];
-	uint8_t srcBuffRead[2];
-	srcBuffWrite[0] = 0b10001111; // MF: Writing (0b1) to 0x0F register returns Device_ID and shoudl be 0x44
-	srcBuffWrite[1] = 0b10001111;
-	srcBuffRead[0] = 0b00000000;
-	srcBuffRead[1] = 0b00000000;
-
-	while (1)
-	{
-		// WriteRead
-		AlxSpi_Master_AssertCs(&G01_BringUp.alxHwLpcXpresso55S69_Main.alxSpiAcc);
-		if (AlxSpi_Master_WriteRead(&G01_BringUp.alxHwLpcXpresso55S69_Main.alxSpiAcc, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&G01_BringUp.alxHwLpcXpresso55S69_Main.alxSpiAcc);
-
-		vTaskDelay(100);
-	}
-}
-#endif
-
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
@@ -149,24 +84,6 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(AlxHwLpcXpres
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_7_UsrLED_GR);
 	//AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);	// MF: To see toggling with Logic Analyzer
 
-	#if defined(ALX_FREE_RTOS)
-	// Set Priotiry
-	NVIC_SetPriority(GINT0_IRQn, Alx_IrqPriority_5);
-
-	// Create Rtos Task / Thread
-	BaseType_t status = xTaskCreate
-	(
-		G01_BringUp_T01_Led_Task,
-		"G01_BringUp_T01_Led_Task",
-		configMINIMAL_STACK_SIZE + 100,
-		NULL,
-		(configMAX_PRIORITIES - 1),
-		NULL
-	);
-
-	// Check Task Creation Status
-	if (status != pdPASS) { ALX_TRACE_FORMAT("G01_BringUp_T01_Led_Task creaton failed!\r\n"); }
-	#else
 	while (1)
 	{
 		//AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_4_UsrLED_BL);
@@ -176,38 +93,18 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(AlxHwLpcXpres
 
 		AlxDelay_ms(500);
 	}
-	#endif
 }
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
 	// Assert
 	(void)me;
 
-	#if defined(ALX_FREE_RTOS)
-	// Set Priotiry
-	NVIC_SetPriority(FLEXCOMM0_IRQn, Alx_IrqPriority_2);
-
-	// Create Rtos Task / Thread
-	BaseType_t status = xTaskCreate
-	(
-		G01_BringUp_T02_Trace_Task,
-		"G01_BringUp_T02_Trace_Task",
-		configMINIMAL_STACK_SIZE + 100,
-		NULL,
-		(configMAX_PRIORITIES - 1),
-		NULL
-	);
-
-	// Check Task Creation Status
-	if (status != pdPASS) { ALX_TRACE_FORMAT("G01_BringUp_T02_Trace_Task creaton failed!\r\n"); }
-	#else
 	while (1)
 	{
 		ALX_TRACE_FORMAT("T02_Trace\r\n");
 
 		AlxDelay_ms(1000);
 	}
-	#endif
 }
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
@@ -267,26 +164,8 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01(AlxHwLpcXp
 	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi);
 
 	// Setup Delay
-	//AlxDelay_ms(500);
+	AlxDelay_ms(50);
 
-	#if defined(ALX_FREE_RTOS)
-	// Set Priotiry
-	NVIC_SetPriority(FLEXCOMM7_IRQn, Alx_IrqPriority_3);
-
-	// Create Rtos Task / Thread
-	BaseType_t status = xTaskCreate
-	(
-		G01_BringUp_T05_Spi_01_Task,
-		"G01_BringUp_T05_Spi_01_Task",
-		configMINIMAL_STACK_SIZE + 100,
-		NULL,
-		(configMAX_PRIORITIES - 1),
-		NULL
-	);
-
-	// Check Task Creation Status
-	if (status != pdPASS) { ALX_TRACE_FORMAT("G01_BringUp_T05_Spi_01_Task creaton failed!\r\n"); }
-	#else
 	// Variables
 	uint8_t srcBuffWrite[2];
 	uint8_t srcBuffRead[2];
@@ -304,7 +183,6 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01(AlxHwLpcXp
 
 		AlxDelay_ms(500);
 	}
-	#endif
 }
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
@@ -358,43 +236,25 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_03(AlxHwLpcXp
 	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
 
 	// Setup Delay
-	//AlxDelay_ms(500);
+	AlxDelay_ms(500);
 
-	#if defined(ALX_FREE_RTOS)
-	// Set Priotiry
-	NVIC_SetPriority(FLEXCOMM3_IRQn, Alx_IrqPriority_3);
-
-	// Create Rtos Task / Thread
-	BaseType_t status = xTaskCreate
-	(
-		G01_BringUp_T05_Spi_03_Task,
-		"G01_BringUp_T05_Spi_03_Task",
-		configMINIMAL_STACK_SIZE + 100,
-		NULL,
-		(configMAX_PRIORITIES - 1),
-		NULL);
-
-	// Check Task Creation Status
-	if (status != pdPASS) { ALX_TRACE_FORMAT("G01_BringUp_T05_Spi_03_Task creaton failed!\r\n"); }
-	#else
 	// Variables
 	uint8_t srcBuffWrite[2];
 	uint8_t srcBuffRead[2];
-	srcBuffWrite[0] = 0b11111111; // MF: Writing (0b1) to 7Fh register returns CTN530 Verion and shoudl be 0x1A
-	srcBuffWrite[1] = 0b11111111;
+	srcBuffWrite[0] = 0b10001111; // MF: Writing (0b1) to 0x0F register returns Device_ID and shoudl be 0x44
+	srcBuffWrite[1] = 0b10001111;
 	srcBuffRead[0] = 0b00000000;
 	srcBuffRead[1] = 0b00000000;
 
 	while (1)
 	{
 		// WriteRead
-		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
-		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
+		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
 
 		AlxDelay_ms(500);
 	}
-	#endif
 }
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(AlxHwLpcXpresso55S69_MfTest_G01_BringUp* me)
 {
@@ -470,21 +330,240 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init()
 }
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run()
 {
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(&G01_BringUp);
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(&G01_BringUp);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(&G01_BringUp);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(&G01_BringUp);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(&G01_BringUp);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(&G01_BringUp);
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01(&G01_BringUp);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01(&G01_BringUp);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02(&G01_BringUp);
 	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_03(&G01_BringUp);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk(&G01_BringUp);
 }
 
 
+//******************************************************************************
+//******************************************************************************
+// G02_BringUpRtos
+//******************************************************************************
+//******************************************************************************
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Objects
+	AlxHwLpcXpresso55S69_Main alxHwLpcXpresso55S69_Main;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos;
+
+
+//******************************************************************************
+// Variables
+//******************************************************************************
+extern AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos G02_BringUpRtos;
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+#if defined(ALX_FREE_RTOS)
+static inline void G02_BringUpRtos_T01_Led_Task(void *pvParameters)
+{
+	while (1)
+	{
+		AlxIoPin_Toggle(&G02_BringUpRtos.alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+
+		//AlxDelay_ms(500);	// MF: Fuka, ko je AlxDelay uporabljen samo en Task dela
+		vTaskDelay(500);
+	}
+}
+static inline void G02_BringUpRtos_T02_Trace_Task(void *pvParameters)
+{
+	while (1)
+	{
+		ALX_TRACE_FORMAT("T02_Trace_Task\r\n");
+
+		vTaskDelay(1000);
+	}
+}
+static inline void G02_BringUpRtos_T03_Spi_Task(void *pvParameters)
+{
+	// Variables
+	uint8_t srcBuffWrite[2];
+	uint8_t srcBuffRead[2];
+	srcBuffWrite[0] = 0b11111111; // MF: Writing (0b1) to 7Fh register returns CTN530 Verion and shoudl be 0x1A
+	srcBuffWrite[1] = 0b11111111;
+	srcBuffRead[0] = 0b00000000;
+	srcBuffRead[1] = 0b00000000;
+
+	while (1)
+	{
+		// WriteRead
+		AlxSpi_Master_AssertCs(&G02_BringUpRtos.alxHwLpcXpresso55S69_Main.alxSpi);
+		if (AlxSpi_Master_WriteRead(&G02_BringUpRtos.alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&G02_BringUpRtos.alxHwLpcXpresso55S69_Main.alxSpi);
+
+		vTaskDelay(200);
+	}
+}
+static inline void G02_BringUpRtos_T04_Spi_Acc_Task(void *pvParameters)
+{
+	// Variables
+	uint8_t srcBuffWrite[2];
+	uint8_t srcBuffRead[2];
+	srcBuffWrite[0] = 0b10001111; // MF: Writing (0b1) to 0x0F register returns Device_ID and shoudl be 0x44
+	srcBuffWrite[1] = 0b10001111;
+	srcBuffRead[0] = 0b00000000;
+	srcBuffRead[1] = 0b00000000;
+
+	while (1)
+	{
+		// WriteRead
+		AlxSpi_Master_AssertCs(&G02_BringUpRtos.alxHwLpcXpresso55S69_Main.alxSpiAcc);
+		if (AlxSpi_Master_WriteRead(&G02_BringUpRtos.alxHwLpcXpresso55S69_Main.alxSpiAcc, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&G02_BringUpRtos.alxHwLpcXpresso55S69_Main.alxSpiAcc);
+
+		vTaskDelay(200);
+	}
+}
+
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T01_Led(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
+{
+	// Assert
+	(void)me;
+
+	// Init
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+
+	// Set Priotiry
+	NVIC_SetPriority(GINT0_IRQn, Alx_IrqPriority_5);
+
+	// Create Rtos Task / Thread
+	BaseType_t status = xTaskCreate
+	(
+		G02_BringUpRtos_T01_Led_Task,
+		"G02_BringUpRtos_T01_Led_Task",
+		configMINIMAL_STACK_SIZE + 100,
+		NULL,
+		(configMAX_PRIORITIES - 1),
+		NULL);
+
+	// Check Task Creation Status
+	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T01_Led_Task creaton failed!\r\n"); }
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
+{
+	// Assert
+	(void)me;
+
+	// Set Priotiry
+	NVIC_SetPriority(FLEXCOMM0_IRQn, Alx_IrqPriority_2);
+
+	// Create Rtos Task / Thread
+	BaseType_t status = xTaskCreate
+	(
+		G02_BringUpRtos_T02_Trace_Task,
+		"G02_BringUpRtos_T02_Trace_Task",
+		configMINIMAL_STACK_SIZE + 100,
+		NULL,
+		(configMAX_PRIORITIES - 1),
+		NULL);
+
+	// Check Task Creation Status
+	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T02_Trace_Task creaton failed!\r\n"); }
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
+{
+	// Assert
+	(void)me;
+
+	// Init
+	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+
+	// Set Priotiry
+	NVIC_SetPriority(FLEXCOMM7_IRQn, Alx_IrqPriority_3);
+
+	// Create Rtos Task / Thread
+	BaseType_t status = xTaskCreate
+	(
+		G02_BringUpRtos_T03_Spi_Task,
+		"G02_BringUpRtos_T03_Spi_Task",
+		configMINIMAL_STACK_SIZE + 100,
+		NULL,
+		(configMAX_PRIORITIES - 1),
+		NULL);
+
+	// Check Task Creation Status
+	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T03_Spi_Task creaton failed!\r\n"); }
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
+{
+	// Assert
+	(void)me;
+
+	// Init
+	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
+
+	// Set Priotiry
+	NVIC_SetPriority(FLEXCOMM3_IRQn, Alx_IrqPriority_3);
+
+	// Create Rtos Task / Thread
+	BaseType_t status = xTaskCreate
+	(
+		G02_BringUpRtos_T04_Spi_Acc_Task,
+		"G02_BringUpRtos_T04_Spi_Acc_Task",
+		configMINIMAL_STACK_SIZE + 100,
+		NULL,
+		(configMAX_PRIORITIES - 1),
+		NULL);
+
+	// Check Task Creation Status
+	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T04_Spi_Acc_Task creaton failed!\r\n"); }
+}
+
+
+//******************************************************************************
+// Constructor & Functions
+//******************************************************************************
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Ctor()
+{
+	// Ctor
+	AlxHwLpcXpresso55S69_Main_Ctor(&G02_BringUpRtos.alxHwLpcXpresso55S69_Main);
+
+	// Info
+	G02_BringUpRtos.wasCtorCalled = true;
+	G02_BringUpRtos.isInit = false;
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init()
+{
+	// Init
+	AlxClk_Init(&alxClk);
+	AlxTrace_Init(&alxTrace);
+
+	// Info
+	G02_BringUpRtos.isInit = true;
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run()
+{
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T01_Led(&G02_BringUpRtos);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(&G02_BringUpRtos);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(&G02_BringUpRtos);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(&G02_BringUpRtos);
+}
+#endif // #if defined(ALX_FREE_RTOS)
+
+
 #endif // #if defined(ALX_HW_LPC_XPRESSO_55S69_C_TEST)
+
 
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif // ALX_HW_LPC_XPRESSO_55S69_MF_TEST_H
