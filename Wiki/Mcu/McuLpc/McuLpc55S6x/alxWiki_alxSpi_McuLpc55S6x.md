@@ -3,6 +3,8 @@
 ## General
 - Every SPI instance uses FLEXCOMM with the same address and ID meaning SPI0 has the same address and ID as FLEXCOMM0, SPI1 has the same address and ID as FLEXCOMM1,...
 - MainClk is used for FlexComm
+- FreeRtos is implemented for this module
+	- In order use it, define "ALX_FREE_RTOS" has to be enabled in "alxConfig.h"
 - Spi SCK is divided FlexComm Clk, so it can be the same as FlexComm or divided by integer (User Manual Page 707 subtitle __35.7.4 Clocking and date rates__)
 - Func "bool AlxSpi_Ctor_IsClkOk(AlxSpi* me)" only checks that SCK is not too high when MainClk is 12MHz because Init handles the input Freq to Spi
 
