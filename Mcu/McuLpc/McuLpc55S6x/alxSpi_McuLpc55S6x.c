@@ -92,6 +92,10 @@ void AlxSpi_Ctor
 	me->spiTransfer.configFlags		= kSPI_FrameAssert;
 	me->spiTransfer.dataSize		= 0;
 
+	#if defined(ALX_FREE_RTOS)
+	me->spiMasterRtosHandle.base = spi;		// MF: All other parameters are set in "SPI_RTOS_Init()"
+	#endif
+
 	// Info
 	me->isInit = false;
 	me->wasCtorCalled = true;
@@ -121,7 +125,11 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 	AlxSpi_Periph_AttachClk(me);
 
 	// #4 Init SPI
+	#if defined(ALX_FREE_RTOS)
+	if (SPI_RTOS_Init(&me->spiMasterRtosHandle, me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
+	#else
 	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
+	#endif
 
 	// #5 Set isInit
 	me->isInit = true;
@@ -137,7 +145,11 @@ Alx_Status AlxSpi_DeInit(AlxSpi* me)
 	(void)me;
 
 	// #1 DeInit SPI
+	#if defined(ALX_FREE_RTOS)
+	SPI_RTOS_Deinit(&me->spiMasterRtosHandle);	// MF: Always returns Success, so we won't hande return
+	#else
 	SPI_Deinit(me->spi);
+	#endif
 
 	// #2 Disable SPI Periphery Clock
 	AlxSpi_Periph_DisableClk(me);
@@ -266,7 +278,11 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 	// #2 Try SPI write/read
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
+		#if defined(ALX_FREE_RTOS)
+		status = SPI_RTOS_Transfer(&me->spiMasterRtosHandle, &me->spiTransfer);
+		#else
 		status = SPI_MasterTransferBlocking(me->spi, &me->spiTransfer);
+		#endif
 		if (status == kStatus_Success)
 		{
 			break; // SPI write OK
