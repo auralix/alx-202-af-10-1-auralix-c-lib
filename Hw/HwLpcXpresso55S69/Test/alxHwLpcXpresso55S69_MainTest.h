@@ -69,8 +69,8 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Ctor()
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Ctor();
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Ctor();
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Ctor();
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Ctor();
 	#endif
 
 	///-------
@@ -103,8 +103,8 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Init()
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init();
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init();
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init();
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init();
 	#endif
 
 	///-------
@@ -137,8 +137,8 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Run()
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run();
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run();
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run();
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run();
 	#endif
 
 	///-------

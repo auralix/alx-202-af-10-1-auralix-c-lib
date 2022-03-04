@@ -331,7 +331,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init()
 static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run()
 {
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T01_Led(&G01_BringUp);
-	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(&G01_BringUp);
+	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(&G01_BringUp);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T03_Adc(&G01_BringUp);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T04_Pwm(&G01_BringUp);
 	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01(&G01_BringUp);
@@ -440,9 +440,6 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T01_Led(AlxHwLpcX
 	// Init
 	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
 
-	// Set Priotiry
-	NVIC_SetPriority(GINT0_IRQn, Alx_IrqPriority_5);
-
 	// Create Rtos Task / Thread
 	BaseType_t status = xTaskCreate
 	(
@@ -460,9 +457,6 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(AlxHwLp
 {
 	// Assert
 	(void)me;
-
-	// Set Priotiry
-	NVIC_SetPriority(FLEXCOMM0_IRQn, Alx_IrqPriority_2);
 
 	// Create Rtos Task / Thread
 	BaseType_t status = xTaskCreate
@@ -485,9 +479,6 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(AlxHwLpcX
 	// Init
 	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi);
 
-	// Set Priotiry
-	NVIC_SetPriority(FLEXCOMM7_IRQn, Alx_IrqPriority_3);
-
 	// Create Rtos Task / Thread
 	BaseType_t status = xTaskCreate
 	(
@@ -508,9 +499,6 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(AlxHw
 
 	// Init
 	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
-
-	// Set Priotiry
-	NVIC_SetPriority(FLEXCOMM3_IRQn, Alx_IrqPriority_3);
 
 	// Create Rtos Task / Thread
 	BaseType_t status = xTaskCreate
