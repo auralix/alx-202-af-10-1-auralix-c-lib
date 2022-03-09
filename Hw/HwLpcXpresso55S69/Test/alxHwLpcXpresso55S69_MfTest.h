@@ -381,7 +381,6 @@ static inline void G02_BringUpRtos_T01_Led_Task(void *pvParameters)
 		else { continue; }
 
 		AlxDelay_ms(500);	// MF: Fuka, ko je AlxDelay uporabljen samo en Task dela
-		//vTaskDelay(500);
 	}
 }
 static inline void G02_BringUpRtos_T02_Trace_Task(void *pvParameters)
@@ -402,7 +401,6 @@ static inline void G02_BringUpRtos_T02_Trace_Task(void *pvParameters)
 		}
 		else { continue; }
 
-		//vTaskDelay(1000);
 		AlxDelay_ms(1000);
 	}
 }
@@ -434,7 +432,6 @@ static inline void G02_BringUpRtos_T03_Spi_Task(void *pvParameters)
 		}
 		else { continue; }
 
-		//vTaskDelay(200);
 		AlxDelay_ms(200);
 	}
 }
@@ -466,7 +463,6 @@ static inline void G02_BringUpRtos_T04_Spi_Acc_Task(void *pvParameters)
 		}
 		else { continue; }
 
-		//vTaskDelay(200);
 		AlxDelay_ms(200);
 	}
 }
@@ -488,7 +484,6 @@ static inline void G02_BringUpRtos_T05_Trace2_Task(void *pvParameters)
 		}
 		else { continue; }
 
-		//vTaskDelay(1000);
 		AlxDelay_ms(1000);
 	}
 }
