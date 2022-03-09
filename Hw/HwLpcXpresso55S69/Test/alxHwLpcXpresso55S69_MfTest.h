@@ -350,16 +350,12 @@ typedef struct
 	// Objects
 	AlxHwLpcXpresso55S69_Main alxHwLpcXpresso55S69_Main;
 
+	SemaphoreHandle_t Mutex;
+
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
 } AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos;
-
-
-//******************************************************************************
-// Variables
-//******************************************************************************
-//extern AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos G02_BringUpRtos;
 
 
 //******************************************************************************
@@ -368,13 +364,21 @@ typedef struct
 #if defined(ALX_FREE_RTOS)
 static inline void G02_BringUpRtos_T01_Led_Task(void *pvParameters)
 {
-	// #1 Prepare me
+	// Prepare me
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
 
 	while (1)
 	{
-		//AlxIoPin_Toggle(&param.alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
-		AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+		// Lock Mutex
+		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
+		{
+			// Toggle LED
+			AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+
+			// Unlock Mutex
+			xSemaphoreGive(me->Mutex);
+		}
+		else { continue; }
 
 		AlxDelay_ms(500);	// MF: Fuka, ko je AlxDelay uporabljen samo en Task dela
 		//vTaskDelay(500);
@@ -382,9 +386,21 @@ static inline void G02_BringUpRtos_T01_Led_Task(void *pvParameters)
 }
 static inline void G02_BringUpRtos_T02_Trace_Task(void *pvParameters)
 {
+	// Prepare me
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
+
 	while (1)
 	{
-		ALX_TRACE_FORMAT("T02_Trace_Task\r\n");
+		// Lock Mutex
+		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
+		{
+			// Trace
+			ALX_TRACE_FORMAT("T02_Trace_Task\r\n");
+
+			// Unlock Mutex
+			xSemaphoreGive(me->Mutex);
+		}
+		else { continue; }
 
 		//vTaskDelay(1000);
 		AlxDelay_ms(1000);
@@ -392,7 +408,7 @@ static inline void G02_BringUpRtos_T02_Trace_Task(void *pvParameters)
 }
 static inline void G02_BringUpRtos_T03_Spi_Task(void *pvParameters)
 {
-	// #1 Prepare me
+	// Prepare me
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
 
 	// Variables
@@ -405,10 +421,18 @@ static inline void G02_BringUpRtos_T03_Spi_Task(void *pvParameters)
 
 	while (1)
 	{
-		// WriteRead
-		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
-		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+		// Lock Mutex
+		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
+		{
+			// WriteRead
+			AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+			if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+			AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+
+			// Unlock Mutex
+			xSemaphoreGive(me->Mutex);
+		}
+		else { continue; }
 
 		//vTaskDelay(200);
 		AlxDelay_ms(200);
@@ -416,7 +440,7 @@ static inline void G02_BringUpRtos_T03_Spi_Task(void *pvParameters)
 }
 static inline void G02_BringUpRtos_T04_Spi_Acc_Task(void *pvParameters)
 {
-	// #1 Prepare me
+	// Prepare me
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
 
 	// Variables
@@ -429,13 +453,43 @@ static inline void G02_BringUpRtos_T04_Spi_Acc_Task(void *pvParameters)
 
 	while (1)
 	{
-		// WriteRead
-		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
-		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
+		// Lock Mutex
+		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
+		{
+			// WriteRead
+			AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
+			if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+			AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
+
+			// Unlock Mutex
+			xSemaphoreGive(me->Mutex);
+		}
+		else { continue; }
 
 		//vTaskDelay(200);
 		AlxDelay_ms(200);
+	}
+}
+static inline void G02_BringUpRtos_T05_Trace2_Task(void *pvParameters)
+{
+	// Prepare me
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
+
+	while (1)
+	{
+		// Lock Mutex
+		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
+		{
+			// Trace
+			ALX_TRACE_FORMAT("T05_Trace2_Task\r\n");
+
+			// Unlock Mutex
+			xSemaphoreGive(me->Mutex);
+		}
+		else { continue; }
+
+		//vTaskDelay(1000);
+		AlxDelay_ms(1000);
 	}
 }
 
@@ -520,6 +574,24 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(AlxHw
 	// Check Task Creation Status
 	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T04_Spi_Acc_Task creaton failed!\r\n"); }
 }
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
+{
+	// Assert
+	(void)me;
+
+	// Create Rtos Task / Thread
+	BaseType_t status = xTaskCreate
+	(
+		G02_BringUpRtos_T05_Trace2_Task,
+		"G02_BringUpRtos_T05_Trace2_Task",
+		configMINIMAL_STACK_SIZE + 100,
+		me,
+		(configMAX_PRIORITIES - 1),
+		NULL);
+
+	// Check Task Creation Status
+	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T05_Trace2_Task creaton failed!\r\n"); }
+}
 
 
 //******************************************************************************
@@ -540,6 +612,14 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init(AlxHwLpcXpre
 	AlxClk_Init(&alxClk);
 	AlxTrace_Init(&alxTrace);
 
+	// Create Semmaphore
+	me->Mutex = xSemaphoreCreateBinary();
+	if (me->Mutex == NULL)
+	{
+		while(1){}
+	}
+	xSemaphoreGive(me->Mutex);
+
 	// Info
 	me->isInit = true;
 }
@@ -549,6 +629,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(AlxHwLpcXpres
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(me);
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
 }
 #endif // #if defined(ALX_FREE_RTOS)
 
