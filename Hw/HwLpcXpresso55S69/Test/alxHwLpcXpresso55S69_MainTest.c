@@ -33,7 +33,8 @@ AlxHwLpcXpresso55S69_MainTest alxHwLpcXpresso55S69_MainTest = { 0 };
 #if defined(ALX_FREE_RTOS)
 void vApplicationTickHook(void)
 {
-	AlxTick_Inc_ms(&alxTick);
+	uint32_t ticks = 1000 / configTICK_RATE_HZ;
+	AlxTick_IncRange_ms(&alxTick, ticks);
 }
 #elsevoid SysTick_Handler(void)
 {
