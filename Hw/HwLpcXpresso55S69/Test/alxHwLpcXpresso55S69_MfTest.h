@@ -380,7 +380,7 @@ static inline void G02_BringUpRtos_T01_Led_Task(void *pvParameters)
 		}
 		else { continue; }
 
-		AlxDelay_ms(500);	// MF: Fuka, ko je AlxDelay uporabljen samo en Task dela
+		vTaskDelay(500 / portTICK_PERIOD_MS);
 	}
 }
 static inline void G02_BringUpRtos_T02_Trace_Task(void *pvParameters)
@@ -401,7 +401,7 @@ static inline void G02_BringUpRtos_T02_Trace_Task(void *pvParameters)
 		}
 		else { continue; }
 
-		AlxDelay_ms(1000);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
 }
 static inline void G02_BringUpRtos_T03_Spi_Task(void *pvParameters)
@@ -432,7 +432,7 @@ static inline void G02_BringUpRtos_T03_Spi_Task(void *pvParameters)
 		}
 		else { continue; }
 
-		AlxDelay_ms(200);
+		vTaskDelay(200 / portTICK_PERIOD_MS);
 	}
 }
 static inline void G02_BringUpRtos_T04_Spi_Acc_Task(void *pvParameters)
@@ -463,7 +463,7 @@ static inline void G02_BringUpRtos_T04_Spi_Acc_Task(void *pvParameters)
 		}
 		else { continue; }
 
-		AlxDelay_ms(200);
+		vTaskDelay(200 / portTICK_PERIOD_MS);
 	}
 }
 static inline void G02_BringUpRtos_T05_Trace2_Task(void *pvParameters)
@@ -484,7 +484,21 @@ static inline void G02_BringUpRtos_T05_Trace2_Task(void *pvParameters)
 		}
 		else { continue; }
 
-		AlxDelay_ms(1000);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+}
+static inline void G02_BringUpRtos_T06_ThreadSwitching01(void *pvParameters)
+{
+	while (1)
+	{
+		GPIO->NOT[0] = (1U << 1);	// MF Port = 0, Pin = 1
+	}
+}
+static inline void G02_BringUpRtos_T07_ThreadSwitching02(void *pvParameters)
+{
+	while (1)
+	{
+		GPIO->NOT[1] = (1U << 9);	// MF Port = 1, Pin = 9
 	}
 }
 
@@ -587,6 +601,48 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(AlxHwL
 	// Check Task Creation Status
 	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T05_Trace2_Task creaton failed!\r\n"); }
 }
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T06_ThreadSwitching01(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
+{
+	// Assert
+	(void)me;
+
+	// Init
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P0_1_DBG01);
+
+	// Create Rtos Task / Thread
+	BaseType_t status = xTaskCreate
+	(
+		G02_BringUpRtos_T06_ThreadSwitching01,
+		"G02_BringUpRtos_T06_ThreadSwitching01",
+		configMINIMAL_STACK_SIZE,
+		me,
+		(configMAX_PRIORITIES - 1),
+		NULL);
+
+	// Check Task Creation Status
+	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T06_ThreadSwitching01_Task creaton failed!\r\n"); }
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T07_ThreadSwitching02(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
+{
+	// Assert
+	(void)me;
+
+	// Init
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);
+
+	// Create Rtos Task / Thread
+	BaseType_t status = xTaskCreate
+	(
+		G02_BringUpRtos_T07_ThreadSwitching02,
+		"G02_BringUpRtos_T07_ThreadSwitching02",
+		configMINIMAL_STACK_SIZE,
+		me,
+		(configMAX_PRIORITIES - 1),
+		NULL);
+
+	// Check Task Creation Status
+	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T07_ThreadSwitching02_Task creaton failed!\r\n"); }
+}
 
 
 //******************************************************************************
@@ -607,6 +663,10 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init(AlxHwLpcXpre
 	AlxClk_Init(&alxClk);
 	AlxTrace_Init(&alxTrace);
 
+	// IoPinIrq
+	AlxIoPinIrq_Init(&me->alxHwLpcXpresso55S69_Main.alxIrqPin_IRQ1);		// MF: IoPinIrq is initialized for all tests
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);	// MF: Svinjarim
+
 	// Create Semmaphore
 	me->Mutex = xSemaphoreCreateBinary();
 	if (me->Mutex == NULL)
@@ -622,9 +682,11 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(AlxHwLpcXpres
 {
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T01_Led(me);
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T06_ThreadSwitching01(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T07_ThreadSwitching02(me);
 }
 #endif // #if defined(ALX_FREE_RTOS)
 

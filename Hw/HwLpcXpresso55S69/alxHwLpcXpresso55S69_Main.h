@@ -93,7 +93,7 @@ typedef struct
 	/// Port 0
 	///------------------------------------------------------------------------------
 	//PIO0_0	- Unused
-	//PIO0_1	- Unused
+	AlxIoPin do_P0_1_DBG01;
 	AlxIoPin di_P0_2_SPI_ACC_MISO;
 	AlxIoPin do_P0_3_SPI_ACC_MOSI;
 	AlxIoPin do_P0_4_SPI_ACC_nCS;
@@ -143,7 +143,7 @@ typedef struct
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
 	//PIO1_13	- Unused
-	//PIO1_14	- Unused
+	AlxIoPin do_P1_14_DBG02;
 	//PIO1_15	- Unused
 	//PIO1_16	- Unused
 	//PIO1_17	- Unused
@@ -207,7 +207,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	///------------------------------------------------------------------------------
 	// Port 0
 	//PIO0_0	- Unused
-	//PIO0_1	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_1_DBG01,			0,	1,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	AlxIoPin_Ctor(&me->alxIoPin.di_P0_2_SPI_ACC_MISO,	0,	2,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	false,	false	);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_3_SPI_ACC_MOSI,	0,	3,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_4_SPI_ACC_nCS,	0,	4,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	true	); // MF: Spi nCS is config as GPIO and is controlled by SW
@@ -254,7 +254,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
 	//PIO1_13	- Unused
-	//PIO1_14	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_14_DBG02,			0,	1,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	//PIO1_15	- Unused
 	//PIO1_16	- Unused
 	//PIO1_17	- Unused

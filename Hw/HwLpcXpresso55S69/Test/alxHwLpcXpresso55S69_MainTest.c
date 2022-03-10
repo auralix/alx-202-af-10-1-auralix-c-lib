@@ -33,8 +33,7 @@ AlxHwLpcXpresso55S69_MainTest alxHwLpcXpresso55S69_MainTest = { 0 };
 #if defined(ALX_FREE_RTOS)
 void vApplicationTickHook(void)
 {
-	uint32_t ticks = 1000 / configTICK_RATE_HZ;
-	AlxTick_IncRange_ms(&alxTick, ticks);
+	AlxTick_IncRange_ms(&alxTick, (uint64_t)portTICK_PERIOD_MS);
 }
 #elsevoid SysTick_Handler(void)
 {
@@ -72,7 +71,8 @@ void vApplicationTickHook(void)
 #if defined(ALX_TEST_MF)
 void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
-	AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
+	GPIO->NOT[1] = (1U << 9);
+	//AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
 }
 void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
