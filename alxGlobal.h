@@ -95,8 +95,12 @@ extern "C" {
 //******************************************************************************
 #if defined(ALX_FREE_RTOS)
 #include "FreeRTOS.h"
-#include "task.h"
+#include "croutine.h"
+#include "event_groups.h"
+#include "list.h"
 #include "queue.h"
+#include "stream_buffer.h"
+#include "task.h"
 #include "timers.h"
 #endif
 

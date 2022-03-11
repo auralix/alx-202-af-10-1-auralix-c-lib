@@ -35,7 +35,8 @@ void vApplicationTickHook(void)
 {
 	AlxTick_IncRange_ms(&alxTick, (uint64_t)portTICK_PERIOD_MS);
 }
-#elsevoid SysTick_Handler(void)
+#else
+void SysTick_Handler(void)
 {
 	AlxTick_Inc_ms(&alxTick);
 }
@@ -71,8 +72,23 @@ void vApplicationTickHook(void)
 #if defined(ALX_TEST_MF)
 void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
+	// Toggle Pin
 	GPIO->NOT[1] = (1U << 9);
-	//AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
+
+	// Increment Global Variable
+	UBaseType_t returnVal = taskENTER_CRITICAL_FROM_ISR();	// MF: This prevents nested IRQs to occur but it might add delay or miss other IRQs if they’re triggered while in this critical section.
+	G02_counter++;
+	taskEXIT_CRITICAL_FROM_ISR(returnVal);
+
+	// Trace
+	BaseType_t taskWoken = pdFALSE;
+	xSemaphoreGiveFromISR(IsrTraceSem, &taskWoken);
+	portYIELD_FROM_ISR(taskWoken);
+
+	// Trace - Using Notifications
+	/*BaseType_t taskWoken = pdFALSE;
+	vTaskNotifyGiveFromISR(*T10_TraceIsrHandle, &taskWoken);
+	portYIELD_FROM_ISR(taskWoken);*/
 }
 void AlxIoPinIrq_Foreground_Callback_Pin1()
 {

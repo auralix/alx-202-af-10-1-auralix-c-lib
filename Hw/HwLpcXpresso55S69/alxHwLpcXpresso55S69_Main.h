@@ -122,7 +122,7 @@ typedef struct
 	//PIO0_27	- Unused
 	//PIO0_28	- Unused
 	//PIO0_29	- Unused
-	//PIO0_30	- Unused
+	//PIO0_30	- DBG_UART_TX
 	//PIO0_31	- Unused
 
 
