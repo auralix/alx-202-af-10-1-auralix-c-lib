@@ -93,9 +93,11 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(AlxHwLpcXpr
 	// Assert
 	(void)me;
 
+	ALX_TRACE_FORMAT("T02_Trace\r\n");
+
 	while (1)
 	{
-		ALX_TRACE_FORMAT("T02_Trace\r\n");
+		//ALX_TRACE_FORMAT("T02_Trace\r\n");
 
 		AlxDelay_ms(1000);
 	}
@@ -345,6 +347,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(AlxHwLpcXpresso55
 //******************************************************************************
 // Types
 //******************************************************************************
+#if defined(ALX_FREE_RTOS)
 typedef struct
 {
 	// Objects
@@ -370,7 +373,6 @@ extern TaskHandle_t T11_TraceIsrHandle;
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-#if defined(ALX_FREE_RTOS)
 static inline void G02_BringUpRtos_T01_Led_Task(void *pvParameters)
 {
 	// Prepare me

@@ -72,6 +72,7 @@ void SysTick_Handler(void)
 #if defined(ALX_TEST_MF)
 void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
+	#if defined(ALX_FREE_RTOS)
 	// Toggle Pin
 	//GPIO->NOT[1] = (1U << 9);
 
@@ -89,6 +90,9 @@ void AlxIoPinIrq_Foreground_Callback_Pin0()
 	BaseType_t taskWokenNotify = pdFALSE;
 	vTaskNotifyGiveFromISR(T11_TraceIsrHandle, &taskWokenNotify);
 	portYIELD_FROM_ISR(taskWokenNotify);
+	#else
+	AlxTrace_WriteStr(&alxTrace, "ReiseEdge\r\n");
+	#endif
 }
 void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
