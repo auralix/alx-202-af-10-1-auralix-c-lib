@@ -54,6 +54,7 @@ void AlxTrace_Ctor
 	me->pin = pin;
 	me->usart = usart;
 	me->baudRate = (uint32_t)baudRate;
+	AlxTrace_Fifo_Ctor(&me->fifo, me->fifoBuff, sizeof(me->fifoBuff));
 
 	// Variables
 	#if defined(ALX_FREE_RTOS)

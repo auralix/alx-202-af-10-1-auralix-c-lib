@@ -1,14 +1,14 @@
 ﻿/**
   ******************************************************************************
-  * @file alxTrace_McuLpc55S6x.h
-  * @brief Auralix C Library - ALX Trace Module
-  * @version $LastChangedRevision: 4270 $
-  * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
+  * @file alxTrace_Fifo.h
+  * @brief Auralix C Library - ALX Trace FIFO Module
+  * @version $LastChangedRevision: 4937 $
+  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
   ******************************************************************************
   */
 
-#ifndef ALX_TRACE_MCU_LPC55S6X_H
-#define ALX_TRACE_MCU_LPC55S6X_H
+#ifndef ALX_TRACE_FIFO_H
+#define ALX_TRACE_FIFO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,14 +18,12 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTick.h"
-#include "alxTrace_Fifo.h"
 
 
 //******************************************************************************
-// Module Guard
+// Preprocessor
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#define ALX_TRACE_FIFO_FILE "alxTraceFifo"
 
 
 //******************************************************************************
@@ -34,45 +32,43 @@ extern "C" {
 typedef struct
 {
 	// Parameters
-	uint8_t port;
-	uint8_t pin;
-	USART_Type* usart;
-	AlxGlobal_BaudRate baudRate;
-	AlxTrace_Fifo fifo;
-	uint8_t fifoBuff[ALX_TRACE_FIFO_BUFF_LEN];
+	uint8_t* buff;
+	uint32_t buffLen;
 
 	// Variables
-	#if defined(ALX_FREE_RTOS)
-	struct rtos_usart_config usartRtosConfig;
-	usart_rtos_handle_t usartRtosHandle;
-	struct _usart_handle usartHandle;
-	uint8_t rxDummyBuffer[1];	// MF: Rx won't be used and NULL ptr cannot be used for Rx buff
-	#else
-	usart_config_t usartConfig;
-	#endif
+	uint32_t head;
+	uint32_t tail;
+	uint32_t numOfEntries;
+	bool isFull;
+	bool isEmpty;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
-} AlxTrace;
+} AlxTrace_Fifo;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxTrace_Ctor
+void AlxTrace_Fifo_Ctor
 (
-	AlxTrace* me,
-	uint8_t port,
-	uint8_t pin,
-	USART_Type* usart,
-	AlxGlobal_BaudRate baudRate
+	AlxTrace_Fifo* me,
+	uint8_t* buff,
+	uint32_t buffLen
 );
 
-#endif // Module Guard
+
+//******************************************************************************
+// Functions
+//******************************************************************************
+void AlxTrace_Fifo_Flush(AlxTrace_Fifo* me);
+Alx_Status AlxTrace_Fifo_Read(AlxTrace_Fifo* me, uint8_t* data, uint32_t len);
+Alx_Status AlxTrace_Fifo_Write(AlxTrace_Fifo* me, const uint8_t* data, uint32_t len);
+uint32_t AlxTrace_Fifo_GetNumOfEntries(AlxTrace_Fifo* me);
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_TRACE_MCU_LPC55S6X_H
+#endif // ALX_TRACE_FIFO_H
