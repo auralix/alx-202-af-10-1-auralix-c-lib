@@ -20,4 +20,4 @@
 //******************************************************************************
 volatile uint32_t G02_counter = 0;
 volatile SemaphoreHandle_t IsrTraceSem = { 0 };
-TaskHandle_t* T10_TraceIsrHandle = { 0 };
+TaskHandle_t T11_TraceIsrHandle = { 0 };

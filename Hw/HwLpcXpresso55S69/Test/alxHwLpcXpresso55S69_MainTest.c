@@ -73,22 +73,22 @@ void SysTick_Handler(void)
 void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
 	// Toggle Pin
-	GPIO->NOT[1] = (1U << 9);
+	//GPIO->NOT[1] = (1U << 9);
 
 	// Increment Global Variable
 	UBaseType_t returnVal = taskENTER_CRITICAL_FROM_ISR();	// MF: This prevents nested IRQs to occur but it might add delay or miss other IRQs if they’re triggered while in this critical section.
 	G02_counter++;
 	taskEXIT_CRITICAL_FROM_ISR(returnVal);
 
-	// Trace
-	BaseType_t taskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(IsrTraceSem, &taskWoken);
-	portYIELD_FROM_ISR(taskWoken);
+	// Trace - Using Semaphore
+	BaseType_t taskWokenSem = pdFALSE;
+	xSemaphoreGiveFromISR(IsrTraceSem, &taskWokenSem);
+	portYIELD_FROM_ISR(taskWokenSem);
 
 	// Trace - Using Notifications
-	/*BaseType_t taskWoken = pdFALSE;
-	vTaskNotifyGiveFromISR(*T10_TraceIsrHandle, &taskWoken);
-	portYIELD_FROM_ISR(taskWoken);*/
+	BaseType_t taskWokenNotify = pdFALSE;
+	vTaskNotifyGiveFromISR(T11_TraceIsrHandle, &taskWokenNotify);
+	portYIELD_FROM_ISR(taskWokenNotify);
 }
 void AlxIoPinIrq_Foreground_Callback_Pin1()
 {

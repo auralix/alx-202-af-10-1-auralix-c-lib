@@ -364,7 +364,8 @@ typedef struct
 //******************************************************************************
 extern volatile uint32_t G02_counter;
 extern volatile SemaphoreHandle_t IsrTraceSem;
-extern TaskHandle_t* T10_TraceIsrHandle;
+extern TaskHandle_t T11_TraceIsrHandle;
+
 
 //******************************************************************************
 // Private Functions
@@ -561,7 +562,7 @@ static inline void G02_BringUpRtos_T09_TraceGlobVar2(void *pvParameters)
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
 }
-static inline void G02_BringUpRtos_T10_TraceIsr(void *pvParameters)
+static inline void G02_BringUpRtos_T10_TraceIsrSem(void *pvParameters)
 {
 	// Prepare me
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
@@ -575,7 +576,29 @@ static inline void G02_BringUpRtos_T10_TraceIsr(void *pvParameters)
 		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
 		{
 			// Trace
-			ALX_TRACE_FORMAT("WakeUp Button Pressed\r\n");
+			ALX_TRACE_FORMAT("WakeUp Button Pressed - Semaphore\r\n");
+
+			// Unlock Mutex
+			xSemaphoreGive(me->Mutex);
+		}
+		else { continue; }
+	}
+}
+static inline void G02_BringUpRtos_T11_TraceIsrNotify(void *pvParameters)
+{
+	// Prepare me
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
+
+	while (1)
+	{
+		// Wait for IRQ (WakeUp button being pressed) to happen
+		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+		// Lock Mutex
+		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
+		{
+			// Trace
+			ALX_TRACE_FORMAT("WakeUp Button Pressed - Notify\r\n");
 
 			// Unlock Mutex
 			xSemaphoreGive(me->Mutex);
@@ -770,7 +793,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T09_TraceGlobVar2
 	// Check Task Creation Status
 	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T09_TraceGlobVar2 creaton failed!\r\n"); }
 }
-static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsr(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsrSem(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
 {
 	// Assert
 	(void)me;
@@ -778,16 +801,35 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsr(AlxH
 	// Create Rtos Task / Thread
 	BaseType_t status = xTaskCreate
 	(
-		G02_BringUpRtos_T10_TraceIsr,
+		G02_BringUpRtos_T10_TraceIsrSem,
 		"G02_BringUpRtos_T10_TraceIsr",
 		configMINIMAL_STACK_SIZE + 100,
 		me,
 		configMAX_PRIORITIES,
-		T10_TraceIsrHandle
+		NULL
 	);
 
 	// Check Task Creation Status
 	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T10_TraceIsr creaton failed!\r\n"); }
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T11_TraceIsrNotify(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
+{
+	// Assert
+	(void)me;
+
+	// Create Rtos Task / Thread
+	BaseType_t status = xTaskCreate
+	(
+		G02_BringUpRtos_T11_TraceIsrNotify,
+		"G02_BringUpRtos_T11_TraceIsrNotify",
+		configMINIMAL_STACK_SIZE + 100,
+		me,
+		configMAX_PRIORITIES,
+		&T11_TraceIsrHandle
+	);
+
+	// Check Task Creation Status
+	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T11_TraceIsrNotify creaton failed!\r\n"); }
 }
 
 
@@ -811,7 +853,6 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init(AlxHwLpcXpre
 
 	// IoPinIrq
 	AlxIoPinIrq_Init(&me->alxHwLpcXpresso55S69_Main.alxIrqPin_IRQ1);		// MF: IoPinIrq is initialized for all tests
-	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_9_GPIO);	// MF: Svinjarim
 
 	// Create Semmaphore
 	me->Mutex = xSemaphoreCreateBinary();
@@ -837,11 +878,12 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(AlxHwLpcXpres
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T06_ThreadSwitching01(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T06_ThreadSwitching01(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T07_ThreadSwitching02(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T08_TraceGlobVar(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T09_TraceGlobVar2(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsr(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T08_TraceGlobVar(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T09_TraceGlobVar2(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsrSem(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T11_TraceIsrNotify(me);
 }
 #endif // #if defined(ALX_FREE_RTOS)
 
