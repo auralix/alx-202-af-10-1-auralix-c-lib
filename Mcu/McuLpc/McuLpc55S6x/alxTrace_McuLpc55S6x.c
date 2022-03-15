@@ -54,18 +54,8 @@ void AlxTrace_Ctor
 	me->pin = pin;
 	me->usart = usart;
 	me->baudRate = (uint32_t)baudRate;
-	AlxTrace_Fifo_Ctor(&me->fifo, me->fifoBuff, sizeof(me->fifoBuff));
 
 	// Variables
-	#if defined(ALX_FREE_RTOS)
-	me->usartRtosConfig.base = me->usart;
-	me->usartRtosConfig.srcclk = 0;									// MF: This will be set in Init because "AlxClk_Init" has to be called first
-	me->usartRtosConfig.baudrate = me->baudRate;
-	me->usartRtosConfig.parity = kUSART_ParityDisabled;
-	me->usartRtosConfig.stopbits = kUSART_OneStopBit;
-	me->usartRtosConfig.buffer = me->rxDummyBuffer;					// MF: Rx won't be used and NULL ptr cannot be used for Rx buff
-	me->usartRtosConfig.buffer_size = sizeof(me->rxDummyBuffer);	// MF: Rx won't be used and NULL ptr cannot be used for Rx buff
-	#else
 	me->usartConfig.baudRate_Bps				= (uint32_t)baudRate;
 	me->usartConfig.parityMode					= kUSART_ParityDisabled;
 	me->usartConfig.stopBitCount				= kUSART_OneStopBit;
@@ -80,6 +70,8 @@ void AlxTrace_Ctor
 	me->usartConfig.rxWatermark					= kUSART_RxFifo1;	// MF: I don't understand this
 	me->usartConfig.syncMode					= kUSART_SyncModeDisabled;
 	me->usartConfig.clockPolarity				= kUSART_RxSampleOnFallingEdge;
+	#if defined(ALX_FREE_RTOS)
+	me->traceMutex = NULL;	// MF: Mutex is created in "Init()"
 	#endif
 
 	// Info
@@ -102,13 +94,14 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	// #2 Attach Clk to FlexComm
 	AlxTrace_AttachClkToFlexcomm(me);
 
-	// #3 Init USART	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
+	// #3 Init USART
+	// #3.1 Init
+	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_GetFlexCommClkFreq(me)) != kStatus_Success) { return Alx_Err; }	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
 	#if defined(ALX_FREE_RTOS)
-	me->usartRtosConfig.srcclk = AlxTrace_GetFlexCommClkFreq(me);	// MF: Set Clk Freq
-
-	if (USART_RTOS_Init(&me->usartRtosHandle, &me->usartHandle, &me->usartRtosConfig) != kStatus_Success) { return Alx_Err; }
-	#else
-	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_GetFlexCommClkFreq(me)) != kStatus_Success) { return Alx_Err; }
+	// #3.2 Create Mutex
+	me->traceMutex = xSemaphoreCreateBinary();
+	if (me->traceMutex == NULL) { return Alx_Err; }
+	xSemaphoreGive(me->traceMutex);
 	#endif
 
 	// #4 Set isInit
@@ -123,10 +116,9 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 	(void)me;
 
 	// #1 DeInit USART
-	#if defined(ALX_FREE_RTOS)
-	USART_RTOS_Deinit(&me->usartRtosHandle);	// MF: Always returns Success, so we won't hande return
-	#else
 	USART_Deinit(me->usart);
+	#if defined(ALX_FREE_RTOS)
+	vSemaphoreDelete(me->traceMutex);
 	#endif
 
 	// #2 Disable FlexComm Clk and Reset FlexComm Perihpery
@@ -149,11 +141,18 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 
 	// #1 Write
 	#if defined(ALX_FREE_RTOS)
-	if (USART_RTOS_Send(&me->usartRtosHandle, (uint8_t*)str, strlen(str)) != kStatus_Success)
+	if (xSemaphoreTake(me->traceMutex, portMAX_DELAY) == pdTRUE)
 	{
-		AlxTrace_ReInit(me);
-		return Alx_Err;
+		if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
+		{
+			xSemaphoreGive(me->traceMutex);	// MF: Semaphore Goive must happen before because it is deleted and new semaphore is created when "ReInit()"
+			AlxTrace_ReInit(me);
+			return Alx_Err;
+		}
+
+		xSemaphoreGive(me->traceMutex);
 	}
+	else	{ return Alx_Err; }
 	#else
 	if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
 	{

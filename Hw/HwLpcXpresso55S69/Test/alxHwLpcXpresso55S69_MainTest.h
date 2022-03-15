@@ -69,8 +69,8 @@ typedef struct
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp alxHwLpcXpresso55S69_MfTest_G01_BringUp;
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos;
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp alxHwLpcXpresso55S69_MfTest_G01_BringUp;
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos;
 	#endif
 
 	///-------
@@ -115,8 +115,8 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Ctor(AlxHwLpcXpresso55S69_MainT
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Ctor(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Ctor(&me->alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Ctor(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Ctor(&me->alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos);
 	#endif
 
 	///-------
@@ -149,8 +149,8 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Init(AlxHwLpcXpresso55S69_MainT
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init(&me->alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init(&me->alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos);
 	#endif
 
 	///-------
@@ -183,8 +183,8 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Run(AlxHwLpcXpresso55S69_MainTe
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(&me->alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(&me->alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos);
 	#endif
 
 	///-------

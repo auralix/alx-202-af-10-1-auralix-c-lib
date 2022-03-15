@@ -93,11 +93,9 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T02_Trace(AlxHwLpcXpr
 	// Assert
 	(void)me;
 
-	ALX_TRACE_FORMAT("T02_Trace\r\n");
-
 	while (1)
 	{
-		//ALX_TRACE_FORMAT("T02_Trace\r\n");
+		ALX_TRACE_FORMAT("T02_Trace\r\n");
 
 		AlxDelay_ms(1000);
 	}
@@ -396,23 +394,11 @@ static inline void G02_BringUpRtos_T01_Led_Task(void *pvParameters)
 }
 static inline void G02_BringUpRtos_T02_Trace_Task(void *pvParameters)
 {
-	// Prepare me
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
-
 	while (1)
 	{
-		// Lock Mutex
-		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
-		{
-			// Trace
-			ALX_TRACE_FORMAT("T02_Trace_Task\r\n");
+		ALX_TRACE_FORMAT("T02_Trace_Task\r\n");
 
-			// Unlock Mutex
-			xSemaphoreGive(me->Mutex);
-		}
-		else { continue; }
-
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
+		//vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
 }
 static inline void G02_BringUpRtos_T03_Spi_Task(void *pvParameters)
@@ -479,23 +465,11 @@ static inline void G02_BringUpRtos_T04_Spi_Acc_Task(void *pvParameters)
 }
 static inline void G02_BringUpRtos_T05_Trace2_Task(void *pvParameters)
 {
-	// Prepare me
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
-
 	while (1)
 	{
-		// Lock Mutex
-		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
-		{
-			// Trace
-			ALX_TRACE_FORMAT("T05_Trace2_Task\r\n");
+		ALX_TRACE_FORMAT("T05_Trace2_Task\r\n");
 
-			// Unlock Mutex
-			xSemaphoreGive(me->Mutex);
-		}
-		else { continue; }
-
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
+		//vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
 }
 static inline void G02_BringUpRtos_T06_ThreadSwitching01(void *pvParameters)
@@ -876,16 +850,16 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init(AlxHwLpcXpre
 static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
 {
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T01_Led(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T06_ThreadSwitching01(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T06_ThreadSwitching01(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T07_ThreadSwitching02(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T08_TraceGlobVar(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T09_TraceGlobVar2(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsrSem(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T11_TraceIsrNotify(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T11_TraceIsrNotify(me);
 }
 #endif // #if defined(ALX_FREE_RTOS)
 

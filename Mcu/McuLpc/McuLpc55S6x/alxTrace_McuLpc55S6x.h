@@ -38,17 +38,11 @@ typedef struct
 	uint8_t pin;
 	USART_Type* usart;
 	AlxGlobal_BaudRate baudRate;
-	AlxTrace_Fifo fifo;
-	uint8_t fifoBuff[ALX_TRACE_FIFO_BUFF_LEN];
 
 	// Variables
-	#if defined(ALX_FREE_RTOS)
-	struct rtos_usart_config usartRtosConfig;
-	usart_rtos_handle_t usartRtosHandle;
-	struct _usart_handle usartHandle;
-	uint8_t rxDummyBuffer[1];	// MF: Rx won't be used and NULL ptr cannot be used for Rx buff
-	#else
 	usart_config_t usartConfig;
+	#if defined(ALX_FREE_RTOS)
+	SemaphoreHandle_t traceMutex;
 	#endif
 
 	// Info
