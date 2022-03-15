@@ -116,8 +116,10 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 	(void)me;
 
 	// #1 DeInit USART
-	USART_Deinit(me->usart);
+	// #1.1 DeInit
+	USART_Deinit(me->usart);	// MF: Always returns Success, so we won't hande return
 	#if defined(ALX_FREE_RTOS)
+	// #1.2 Delete Mutex
 	vSemaphoreDelete(me->traceMutex);
 	#endif
 
@@ -145,7 +147,7 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 	{
 		if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
 		{
-			xSemaphoreGive(me->traceMutex);	// MF: Semaphore Goive must happen before because it is deleted and new semaphore is created when "ReInit()"
+			xSemaphoreGive(me->traceMutex);		// MF: Semaphore Give must happen before "ReInit()" because "ReInit()" deletes old and creates new semaphore
 			AlxTrace_ReInit(me);
 			return Alx_Err;
 		}
