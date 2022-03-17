@@ -71,7 +71,9 @@ void AlxTrace_Ctor
 	me->usartConfig.syncMode					= kUSART_SyncModeDisabled;
 	me->usartConfig.clockPolarity				= kUSART_RxSampleOnFallingEdge;
 	#if defined(ALX_FREE_RTOS)
-	me->traceMutex = NULL;	// MF: Mutex is created in "Init()"
+	me->traceMutex = xSemaphoreCreateBinary();	// MF: Mutex is created once and won't be deleted during a program
+	if (me->traceMutex == NULL) { }				// MF: Assert should happen if this is true
+	xSemaphoreGive(me->traceMutex);
 	#endif
 
 	// Info
@@ -95,14 +97,7 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	AlxTrace_AttachClkToFlexcomm(me);
 
 	// #3 Init USART
-	// #3.1 Init
 	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_GetFlexCommClkFreq(me)) != kStatus_Success) { return Alx_Err; }	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
-	#if defined(ALX_FREE_RTOS)
-	// #3.2 Create Mutex
-	me->traceMutex = xSemaphoreCreateBinary();
-	if (me->traceMutex == NULL) { return Alx_Err; }
-	xSemaphoreGive(me->traceMutex);
-	#endif
 
 	// #4 Set isInit
 	me->isInit = true;
@@ -116,12 +111,7 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 	(void)me;
 
 	// #1 DeInit USART
-	// #1.1 DeInit
 	USART_Deinit(me->usart);	// MF: Always returns Success, so we won't hande return
-	#if defined(ALX_FREE_RTOS)
-	// #1.2 Delete Mutex
-	vSemaphoreDelete(me->traceMutex);
-	#endif
 
 	// #2 Disable FlexComm Clk and Reset FlexComm Perihpery
 	AlxTrace_FlexcommDisableClkResetPeriph(me);
@@ -147,8 +137,8 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 	{
 		if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
 		{
-			xSemaphoreGive(me->traceMutex);		// MF: Semaphore Give must happen before "ReInit()" because "ReInit()" deletes old and creates new semaphore
 			AlxTrace_ReInit(me);
+			xSemaphoreGive(me->traceMutex);
 			return Alx_Err;
 		}
 
