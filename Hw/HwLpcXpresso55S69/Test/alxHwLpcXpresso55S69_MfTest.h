@@ -398,7 +398,7 @@ static inline void G02_BringUpRtos_T02_Trace_Task(void *pvParameters)
 	{
 		ALX_TRACE_FORMAT("T02_Trace_Task\r\n");
 
-		//vTaskDelay(1000 / portTICK_PERIOD_MS);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
 }
 static inline void G02_BringUpRtos_T03_Spi_Task(void *pvParameters)
@@ -469,7 +469,7 @@ static inline void G02_BringUpRtos_T05_Trace2_Task(void *pvParameters)
 	{
 		ALX_TRACE_FORMAT("T05_Trace2_Task\r\n");
 
-		//vTaskDelay(1000 / portTICK_PERIOD_MS);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
 }
 static inline void G02_BringUpRtos_T06_ThreadSwitching01(void *pvParameters)
