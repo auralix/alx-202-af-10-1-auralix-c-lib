@@ -24,6 +24,7 @@ extern "C" {
 // Module Guard
 //******************************************************************************
 #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
+#if defined(ALX_TEST_MF)
 
 
 //******************************************************************************
@@ -84,7 +85,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T02_Trace(Al
 	{
 		ALX_TRACE_FORMAT("T02_Trace\r\n");
 
-		AlxDelay_ms(500);
+		AlxDelay_ms(1000);
 	}
 }
 static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T03_Adc(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp* me)
@@ -172,7 +173,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Init(AlxHwNf
 	AlxTrace_Init(&alxTrace);
 
 	// IoPinIrq
-	AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIrqPin_IRQ1);	// MF: IoPinIrq is always Inited
+	//AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIrqPin_IRQ1);	// MF: IoPinIrq is always Inited
 
 	// Info
 	me->isInit = true;
@@ -187,6 +188,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Run(AlxHwNfc
 }
 
 
+#endif // #if defined(ALX_TEST_MF)
 #endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
 
 #ifdef __cplusplus

@@ -101,8 +101,8 @@ typedef struct
 	//P0_6	- Unused
 	AlxIoPin di_P0_7_CRN_FD_IRQ2;
 	AlxIoPin do_P0_8_PCA943X_EN;			// JS: PCA943X_EN -- Pca9431 sleep
-	AlxIoPin di_P0_9_PCA943X_INT_IRQ1;		// JS: PCA943X_I\N\T\
-	//AlxIoPin ai_P0_9_ADC_CH4;				// JS: commented Mf needed this for adc
+	AlxIoPin ai_P0_9_ADC_CH4;				// JS: commented Mf needed this for adc
+	//AlxIoPin di_P0_9_PCA943X_INT_IRQ1; // JS: PCA943X_I\N\T\
 	//P0_10	- Unused
 	AlxIoPin ao_P0_11_CRN_VCC;
 	//P0_12	- Unused
@@ -178,8 +178,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//P0_6	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.di_P0_7_CRN_FD_IRQ2,		0,	7,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);	// JS: CRN_FD -- not tested
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_8_PCA943X_EN, 		0,	8,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,	false	);	// JS: PCA943X_EN -- Pca9431 sleep	-- not tested
-	//AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,			0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,	false,	false,	false	);	// JS: commented it,need this pin for  PCA943X_INT , Mf used it for Adc
-	AlxIoPin_Ctor(&me->alxIoPin.di_P0_9_PCA943X_INT_IRQ1,	0,	9,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);
+	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,			0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,	false,	false,	false	);	// JS: commented it,need this pin for  PCA943X_INT , Mf used it for Adc
+	//AlxIoPin_Ctor(&me->alxIoPin.di_P0_9_PCA943X_INT_IRQ1,	0,	9,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);
 	//P0_10	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC,			0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	true	);	// JS: not tested
 	//P0_12	- Unused
@@ -207,14 +207,14 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 	//------------------------------------------------------------------------------
 	// ALX - IRQ
 	//------------------------------------------------------------------------------
-	AlxIoPinIrq_Ctor
+	/*AlxIoPinIrq_Ctor			// MF: Comented. JS used it for PCA943X
 	(
 		&me->alxIrqPin_IRQ1,
 		&me->alxIoPin.di_P0_9_PCA943X_INT_IRQ1,
 		kPINT_PinInt1,
 		kPINT_PinIntEnableFallEdge,
 		Alx_IrqPriority_0
-	);
+	);*/
 
 
 	//------------------------------------------------------------------------------
@@ -247,29 +247,29 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_M
 
 	// JS: commented all , needed pin P0_9 for Pca943x_int
 
-	//me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_9_ADC_CH4;
-	//me->adcChArr[0] = Alx_Ch_4;
-	//#if defined ALX_OPTIMIZE_SIZE_ALL
-	//AlxAdc_Ctor
-	//(
-	//	&me->alxAdc,
-	//	me->adcIoPinArr,
-	//	me->adcChArr,
-	//	ALX_ARR_LEN(me->adcIoPinArr),
-	//	&alxClk,
-	//	3300U
-	//);
-	//#else
-	//AlxAdc_Ctor
-	//(
-	//	&me->alxAdc,
-	//	me->adcIoPinArr,
-	//	me->adcChArr,
-	//	ALX_ARR_LEN(me->adcIoPinArr),
-	//	&alxClk,
-	//	3.3f
-	//);
-	//#endif
+	me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_9_ADC_CH4;
+	me->adcChArr[0] = Alx_Ch_4;
+	#if defined ALX_OPTIMIZE_SIZE_ALL
+	AlxAdc_Ctor
+	(
+		&me->alxAdc,
+		me->adcIoPinArr,
+		me->adcChArr,
+		ALX_ARR_LEN(me->adcIoPinArr),
+		&alxClk,
+		3300U
+	);
+	#else
+	AlxAdc_Ctor
+	(
+		&me->alxAdc,
+		me->adcIoPinArr,
+		me->adcChArr,
+		ALX_ARR_LEN(me->adcIoPinArr),
+		&alxClk,
+		3.3f
+	);
+	#endif
 
 
 	//------------------------------------------------------------------------------
