@@ -155,7 +155,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01(AlxHwLpcXp
 	(void)me;
 
 	// Init
-	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
 
 	// Setup Delay
 	AlxDelay_ms(50);
@@ -171,9 +171,9 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_01(AlxHwLpcXp
 	while (1)
 	{
 		// WriteRead
-		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
-		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
+		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi7, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
 
 		AlxDelay_ms(500);
 	}
@@ -192,7 +192,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02(AlxHwLpcXp
 	srcBuffRead[1] = 0b00000000;
 
 	// Init
-	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
 
 	// Setup Delay
 	AlxDelay_ms(100);
@@ -200,23 +200,23 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_02(AlxHwLpcXp
 	while (1)
 	{
 		// Read default value from Reg
-		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
-		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
+		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi7, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
 
 		// Write
-		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
 		srcBuffWrite[0] = 0b00010000;
 		srcBuffWrite[1] = 0b11111111;	// MF: Write 0xFF to 08h register
-		if (AlxSpi_Master_Write(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+		if (AlxSpi_Master_Write(&me->alxHwLpcXpresso55S69_Main.alxSpi7, srcBuffWrite, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
 
 		// Read written value from Reg
-		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
 		srcBuffWrite[0] = 0b00010001;
 		srcBuffWrite[1] = 0b00000000;
-		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi7, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
 
 		AlxDelay_ms(500);
 	}
@@ -227,7 +227,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_03(AlxHwLpcXp
 	(void)me;
 
 	// Init
-	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
+	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi3);
 
 	// Setup Delay
 	AlxDelay_ms(500);
@@ -243,9 +243,9 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T05_Spi_03(AlxHwLpcXp
 	while (1)
 	{
 		// WriteRead
-		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
-		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
+		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi3);
+		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi3, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi3);
 
 		AlxDelay_ms(500);
 	}
@@ -420,9 +420,9 @@ static inline void G02_BringUpRtos_T03_Spi_Task(void *pvParameters)
 		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
 		{
 			// WriteRead
-			AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
-			if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-			AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+			AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
+			if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi7, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+			AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
 
 			// Unlock Mutex
 			xSemaphoreGive(me->Mutex);
@@ -451,9 +451,9 @@ static inline void G02_BringUpRtos_T04_Spi_Acc_Task(void *pvParameters)
 		if (xSemaphoreTake(me->Mutex, portMAX_DELAY) == pdTRUE)
 		{
 			// WriteRead
-			AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
-			if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
-			AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
+			AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi3);
+			if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi3, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+			AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi3);
 
 			// Unlock Mutex
 			xSemaphoreGive(me->Mutex);
@@ -630,7 +630,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(AlxHwLpcX
 	(void)me;
 
 	// Init
-	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi);
+	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
 
 	// Create Rtos Task / Thread
 	BaseType_t status = xTaskCreate
@@ -652,7 +652,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(AlxHw
 	(void)me;
 
 	// Init
-	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpiAcc);
+	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi3);
 
 	// Create Rtos Task / Thread
 	BaseType_t status = xTaskCreate
@@ -851,15 +851,15 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(AlxHwLpcXpres
 {
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T01_Led(me);
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T06_ThreadSwitching01(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T07_ThreadSwitching02(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T08_TraceGlobVar(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T09_TraceGlobVar2(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsrSem(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T11_TraceIsrNotify(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsrSem(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T11_TraceIsrNotify(me);
 }
 #endif // #if defined(ALX_FREE_RTOS)
 

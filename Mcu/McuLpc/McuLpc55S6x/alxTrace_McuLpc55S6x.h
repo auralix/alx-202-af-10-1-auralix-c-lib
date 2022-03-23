@@ -19,7 +19,9 @@ extern "C" {
 //******************************************************************************
 #include "alxGlobal.h"
 #include "alxTick.h"
-#include "alxTrace_Fifo.h"
+#if defined(ALX_OS)
+#include "alxOsMutex.h"
+#endif
 
 
 //******************************************************************************
@@ -41,8 +43,8 @@ typedef struct
 
 	// Variables
 	usart_config_t usartConfig;
-	#if defined(ALX_FREE_RTOS)
-	SemaphoreHandle_t traceMutex;
+	#if defined(ALX_OS)
+	AlxOsMutex mutex;
 	#endif
 
 	// Info

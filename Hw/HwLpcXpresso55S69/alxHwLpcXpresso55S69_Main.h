@@ -169,8 +169,8 @@ typedef struct
 	AlxIoPinIrq alxIrqPin_IRQ1;
 	AlxAdc alxAdc;
 	AlxPwm alxPwm;
-	AlxSpi alxSpi;
-	AlxSpi alxSpiAcc;
+	AlxSpi alxSpi7;
+	AlxSpi alxSpi3;
 
 	// Auralix HW LPC Xpresso 55S69 C Library Objects
 	AlxHwLpcXpresso55S69_MainIoPin alxIoPin;
@@ -367,7 +367,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	///------------------------------------------------------------------------------
 	AlxSpi_Ctor
 	(
-		&me->alxSpi,
+		&me->alxSpi7,
 		SPI7,
 		&me->alxIoPin.do_P0_21_SPI_SCLK,
 		&me->alxIoPin.do_P0_20_SPI_MOSI,
@@ -378,7 +378,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	);
 	AlxSpi_Ctor
 	(
-		&me->alxSpiAcc,
+		&me->alxSpi3,
 		SPI3,
 		&me->alxIoPin.do_P0_6_SPI_ACC_SCLK,
 		&me->alxIoPin.do_P0_3_SPI_ACC_MOSI,
