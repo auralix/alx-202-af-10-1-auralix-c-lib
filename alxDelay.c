@@ -19,7 +19,7 @@
 void AlxDelay_ns(uint64_t delay_ns)
 {
 	uint64_t ticksStart_ns = AlxTick_Get_ns(&alxTick);
-	while ((AlxTick_Get_ns(&alxTick) - ticksStart_ns) < delay_ns) ;
+	while ((AlxTick_Get_ns(&alxTick) - ticksStart_ns) < delay_ns);
 }
 void AlxDelay_us(uint64_t delay_us)		{ AlxDelay_ns(delay_us  * 1000); }
 void AlxDelay_ms(uint64_t delay_ms)		{ AlxDelay_ns(delay_ms  * 1000000); }
