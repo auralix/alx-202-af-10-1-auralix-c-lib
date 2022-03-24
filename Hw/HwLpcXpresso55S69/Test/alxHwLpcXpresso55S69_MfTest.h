@@ -933,17 +933,17 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init(AlxHwLpcXpre
 static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
 {
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T01_Led(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T06_ThreadSwitching01(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T07_ThreadSwitching02(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T08_TraceGlobVar(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T09_TraceGlobVar2(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsrSem(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T11_TraceIsrNotify(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T12_SpiThrdTest(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T08_TraceGlobVar(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T09_TraceGlobVar2(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsrSem(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T11_TraceIsrNotify(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T12_SpiThrdTest(me);	// MF: This won't work, since alxSpi is NOT thread safe
 }
 #endif // #if defined(ALX_FREE_RTOS)
 
