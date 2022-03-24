@@ -582,6 +582,48 @@ static inline void G02_BringUpRtos_T11_TraceIsrNotify(void *pvParameters)
 		else { continue; }
 	}
 }
+static inline void G02_BringUpRtos_T12_SpiThrdTest_Thrd1(void *pvParameters)
+{
+	// Prepare me
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
+
+	// Variables
+	uint8_t srcBuffWrite[2];
+	uint8_t srcBuffRead[2];
+	srcBuffWrite[0] = 0b11010101;
+	srcBuffWrite[1] = 0b11111111;
+	srcBuffRead[0] = 0b00000000;
+	srcBuffRead[1] = 0b00000000;
+
+	while (1)
+	{
+		// WriteRead
+		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
+		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi7, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
+	}
+}
+static inline void G02_BringUpRtos_T13_SpiThrdTest_Thrd2(void *pvParameters)
+{
+	// Prepare me
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me = (AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos*)pvParameters;
+
+	// Variables
+	uint8_t srcBuffWrite[2];
+	uint8_t srcBuffRead[2];
+	srcBuffWrite[0] = 0b11111111; // MF: Writing (0b1) to 7Fh register returns CTN530 Verion and shoudl be 0x1A
+	srcBuffWrite[1] = 0b11111111;
+	srcBuffRead[0] = 0b00000000;
+	srcBuffRead[1] = 0b00000000;
+
+	while (1)
+	{
+		// WriteRead
+		AlxSpi_Master_AssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
+		if (AlxSpi_Master_WriteRead(&me->alxHwLpcXpresso55S69_Main.alxSpi7, srcBuffWrite, srcBuffRead, sizeof(srcBuffWrite), 2, 0) != Alx_Ok)	{ ALX_TRACE_FORMAT("Pujhnalo\r\n"); }
+		AlxSpi_Master_DeAssertCs(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
+	}
+}
 
 static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T01_Led(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
 {
@@ -807,6 +849,47 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T11_TraceIsrNotif
 	// Check Task Creation Status
 	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T11_TraceIsrNotify creaton failed!\r\n"); }
 }
+static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T12_SpiThrdTest(AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos* me)
+{
+	// Assert
+	(void)me;
+
+	// Init
+	AlxSpi_Init(&me->alxHwLpcXpresso55S69_Main.alxSpi7);
+
+	//--------------------------
+	// Thread 01
+	//--------------------------
+	// Create Rtos Task / Thread
+	BaseType_t status = xTaskCreate
+	(
+		G02_BringUpRtos_T12_SpiThrdTest_Thrd1,
+		"G02_BringUpRtos_T12_SpiThrdTest_Thrd1",
+		configMINIMAL_STACK_SIZE + 100,
+		me,
+		configMAX_PRIORITIES,
+		&T11_TraceIsrHandle
+	);
+
+	//--------------------------
+	// Thread 02
+	//--------------------------
+	// Check Task Creation Status
+	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T12_SpiThrdTest_Thrd1 creaton failed!\r\n"); }
+
+	// Create Rtos Task / Thread
+	status = xTaskCreate
+	(
+		G02_BringUpRtos_T13_SpiThrdTest_Thrd2,
+		"G02_BringUpRtos_T13_SpiThrdTest_Thrd2",
+		configMINIMAL_STACK_SIZE + 100,
+		me,
+		configMAX_PRIORITIES,
+		&T11_TraceIsrHandle);
+
+	// Check Task Creation Status
+	if (status != pdPASS) { ALX_TRACE_FORMAT("G02_BringUpRtos_T13_SpiThrdTest_Thrd2 creaton failed!\r\n"); }
+}
 
 
 //******************************************************************************
@@ -851,15 +934,16 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(AlxHwLpcXpres
 {
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T01_Led(me);
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T02_Trace(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
-	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T03_Spi(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T04_Spi_Acc(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T05_Trace2(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T06_ThreadSwitching01(me);
 	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T07_ThreadSwitching02(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T08_TraceGlobVar(me);
-	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T09_TraceGlobVar2(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T08_TraceGlobVar(me);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T09_TraceGlobVar2(me);
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T10_TraceIsrSem(me);
 	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T11_TraceIsrNotify(me);
+	//AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_T12_SpiThrdTest(me);
 }
 #endif // #if defined(ALX_FREE_RTOS)
 
