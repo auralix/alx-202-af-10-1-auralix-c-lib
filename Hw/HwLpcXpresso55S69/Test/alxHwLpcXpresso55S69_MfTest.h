@@ -24,6 +24,7 @@ extern "C" {
 // Module Guard
 //******************************************************************************
 #if defined(ALX_HW_LPC_XPRESSO_55S69_C_TEST)
+#if defined(ALX_TEST_MF)
 
 
 //******************************************************************************
@@ -947,7 +948,127 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(AlxHwLpcXpres
 }
 #endif // #if defined(ALX_FREE_RTOS)
 
+	//******************************************************************************
+//******************************************************************************
+// G03_IoExpander
+//******************************************************************************
+//******************************************************************************
 
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Objects
+	AlxHwLpcXpresso55S69_Main alxHwLpcXpresso55S69_Main;
+
+	// Semaphores
+	SemaphoreHandle_t Mutex;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxHwLpcXpresso55S69_MfTest_G03_IoExpander;
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T01_ReadAccReg(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander* me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t devAddr = 0b00110000;	// MF: SAO pin si on GND so devAddr = 0x18, last bit = 0b0 (write)
+	uint16_t memAddr = 0x0FU;		// MF: Device_ID (0x0F) Address. Sould return 0x44(b01000100)
+	uint8_t i2cData[1] = { 0 };
+
+	// Init
+	AlxI2c_Init(&me->alxHwLpcXpresso55S69_Main.alxI2c);
+
+	while (1)
+	{
+		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 1, 20, 100);
+
+		AlxDelay_ms(50);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T02_ReadIoExpReg(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t devAddr = 0b01000000; // MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
+	uint16_t memAddr = 0x02U; // MF: Output port 0 Address. Sould return 0xFF(0b11111111) which is default number
+	uint8_t i2cData[1] = { 0 };
+
+	// Init
+	AlxI2c_Init(&me->alxHwLpcXpresso55S69_Main.alxI2c);
+
+	while (1)
+	{
+		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 1, 20, 100);
+
+		AlxDelay_ms(50);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T03_WriteReadIoExpReg(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t devAddr = 0b01000000; // MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
+	uint16_t memAddr = 0x02U; // MF: Output port 0 Address. Sould return 0xFF(0b11111111) which is default number
+	uint8_t i2cData[1] = { 0 };
+
+	// Init
+	AlxI2c_Init(&me->alxHwLpcXpresso55S69_Main.alxI2c);
+
+	while (1)
+	{
+		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 1, 20, 100);
+
+		AlxDelay_ms(50);
+	}
+}
+
+//******************************************************************************
+// Constructor & Functions
+//******************************************************************************
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Ctor(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander* me)
+{
+	// Ctor
+	AlxHwLpcXpresso55S69_Main_Ctor(&me->alxHwLpcXpresso55S69_Main);
+
+	// Info
+	me->wasCtorCalled = true;
+	me->isInit = false;
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Init(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander* me)
+{
+	// Init
+	AlxClk_Init(&alxClk);
+	AlxTrace_Init(&alxTrace);
+
+	// IoPinIrq
+	AlxIoPinIrq_Init(&me->alxHwLpcXpresso55S69_Main.alxIrqPin_IRQ1);		// MF: IoPinIrq is initialized for all tests
+
+	// Info
+	me->isInit = true;
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Run(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander* me)
+{
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T01_ReadAccReg(me);	// MF: This was tested on "2533020201601" Acc meter
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T02_ReadIoExpReg(me);
+	AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T03_WriteReadIoExpReg(me);
+}
+
+
+#endif // #if defined(ALX_TEST_MF)
 #endif // #if defined(ALX_HW_LPC_XPRESSO_55S69_C_TEST)
 
 

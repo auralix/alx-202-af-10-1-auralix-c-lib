@@ -105,8 +105,8 @@ typedef struct
 	//PIO0_10	- Unused
 	//PIO0_11	- SWD_CLK
 	//PIO0_12	- SWD_IO
-	//PIO0_13	- Combo I2C / MFIO
-	//PIO0_14	- Combo I2C / MFIO
+	AlxIoPin do_P0_13_I2C_SDA;
+	AlxIoPin do_P0_14_I2C_SCL;
 	//PIO0_15	- Unused
 	AlxIoPin ai_P0_16_ADC_CH8;
 	//PIO0_17	- Unused
@@ -165,25 +165,27 @@ typedef struct
 
 typedef struct
 {
-	// ALX Objects
-	AlxIoPinIrq alxIrqPin_IRQ1;
-	AlxAdc alxAdc;
-	AlxPwm alxPwm;
-	AlxSpi alxSpi7;
-	AlxSpi alxSpi3;
-
-	// Auralix HW LPC Xpresso 55S69 C Library Objects
+	///---------------------------------------
+	/// ALX - IoPin
+	///---------------------------------------
 	AlxHwLpcXpresso55S69_MainIoPin alxIoPin;
 
-	///--------
-	/// Adc
-	///--------
+	///---------------------------------------
+	/// ALX - IrqPin
+	///---------------------------------------
+	AlxIoPinIrq alxIrqPin_IRQ1;
+
+	///---------------------------------------
+	/// ALX - Adc
+	///---------------------------------------
+	AlxAdc alxAdc;
 	AlxIoPin* adcIoPinArr[2];
 	Alx_Ch adcChArr[2];
 
-	///--------
-	/// Pwm
-	///--------
+	///---------------------------------------
+	/// ALX - Pwm
+	///---------------------------------------
+	AlxPwm alxPwm;
 	AlxIoPin* pwmIoPinArr[2];
 	Alx_Ch pwmChArr[2];
 	#if defined ALX_OPTIMIZE_SIZE_ALL
@@ -191,6 +193,17 @@ typedef struct
 	#else
 	float pwmDutyDefaultArr[2];
 	#endif
+
+	///---------------------------------------
+	/// ALX - Spi
+	///---------------------------------------
+	AlxSpi alxSpi7;
+	AlxSpi alxSpi3;
+
+	///---------------------------------------
+	/// ALX - I2c
+	///---------------------------------------
+	AlxI2c alxI2c;
 
 	// Info
 	bool wasCtorCalled;
@@ -219,8 +232,8 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO0_10	- Unused
 	//PIO0_11	- SWD_CLK
 	//PIO0_12	- SWD_IO
-	//PIO0_13	- Combo I2C / MFIO
-	//PIO0_14	- Combo I2C / MFIO
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_13_I2C_SDA,		0,	13,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	); // MF: Inited in I2c
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_14_I2C_SCL,		0,	14,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	); // MF: Inited in I2c
 	//PIO0_15	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH8,		0,	16,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
 	//PIO0_17	- Unused
@@ -335,7 +348,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 
 
 	///------------------------------------------------------------------------------
-	/// ALX - PWM
+	/// ALX - Pwm
 	///------------------------------------------------------------------------------
 	me->pwmIoPinArr[0] = &me->alxIoPin.do_P1_4_PWM1;
 	me->pwmIoPinArr[1] = &me->alxIoPin.do_P1_7_PWM2;
@@ -363,7 +376,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 
 
 	///------------------------------------------------------------------------------
-	/// ALX - SPI
+	/// ALX - Spi
 	///------------------------------------------------------------------------------
 	AlxSpi_Ctor
 	(
@@ -386,6 +399,19 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		&me->alxIoPin.do_P0_4_SPI_ACC_nCS,
 		AlxSpi_Mode_2,
 		AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz
+	);
+
+
+	///------------------------------------------------------------------------------
+	/// ALX - I2c
+	///------------------------------------------------------------------------------
+	AlxI2c_Ctor
+	(
+		&me->alxI2c,
+		I2C1,
+		&me->alxIoPin.do_P0_14_I2C_SCL,
+		&me->alxIoPin.do_P0_13_I2C_SDA,
+		AlxI2c_Clk_McuLpc55S6x_BitRate_400kHz
 	);
 
 	// Info
