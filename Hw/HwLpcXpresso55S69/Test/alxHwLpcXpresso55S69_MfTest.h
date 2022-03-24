@@ -948,7 +948,8 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(AlxHwLpcXpres
 }
 #endif // #if defined(ALX_FREE_RTOS)
 
-	//******************************************************************************
+
+//******************************************************************************
 //******************************************************************************
 // G03_IoExpander
 //******************************************************************************
@@ -1001,8 +1002,8 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T02_ReadIoExpReg(A
 	(void)me;
 
 	// Variables
-	uint8_t devAddr = 0b01000000; // MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
-	uint16_t memAddr = 0x02U; // MF: Output port 0 Address. Sould return 0xFF(0b11111111) which is default number
+	uint8_t devAddr = 0b01000000;	// MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
+	uint16_t memAddr = 0x02U;		// MF: Output port 0 Address. Sould return 0xFF(0b11111111) which is default number
 	uint8_t i2cData[1] = { 0 };
 
 	// Init
@@ -1021,8 +1022,8 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T03_WriteReadIoExp
 	(void)me;
 
 	// Variables
-	uint8_t devAddr = 0b01000000; // MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
-	uint16_t memAddr = 0x02U; // MF: Output port 0 Address. Sould return 0xFF(0b11111111) which is default number
+	uint8_t devAddr = 0b01000000;	// MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
+	uint16_t memAddr = 0x02U;		// MF: Output port 0 Address. Sould return 0xFF(0b11111111) which is default number
 	uint8_t i2cData[1] = { 0 };
 
 	// Init
@@ -1030,11 +1031,61 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T03_WriteReadIoExp
 
 	while (1)
 	{
-		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 1, 20, 100);
+		// Read Reg before write - Sould return 0xFF(0b11111111)
+		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, 20, 100);
+
+		// Write
+		uint8_t data[2];
+		data[0] = 0b10101010;
+		data[1] = 0b10101010;
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, data, 2, false, 20, 100);
+
+		// Read Reg after write - Sould return 0xAA(0b10101010)
+		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, 20, 100);
 
 		AlxDelay_ms(50);
 	}
 }
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t devAddr = 0b01000000;	// MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
+	uint16_t memAddr = 0x00U;		// MF: Output port 0 Address. Sould return 0xFF(0b11111111) which is default number
+	uint8_t i2cData[2] = { 0 };
+
+	// Init I2c
+	AlxI2c_Init(&me->alxHwLpcXpresso55S69_Main.alxI2c);
+
+	// Write - Config all Pins as "Output"
+	memAddr = 0x06U;
+	i2cData[0] = 0b00000000;
+	i2cData[1] = 0b00000000;
+	AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, true, 20, 100);
+
+	// Set Output port register
+	memAddr = 0x02U;
+
+	while (1)
+	{
+		// Write - Set Pins to LOW
+		i2cData[0] = 0b00000000;
+		i2cData[1] = 0b00000000;
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, true, 20, 100);
+
+		AlxDelay_ms(50);
+
+		// Write -Set Pins to HIGH
+		i2cData[0] = 0b11111111;
+		i2cData[1] = 0b11111111;
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, true, 20, 100);
+
+		AlxDelay_ms(50);
+	}
+}
+
 
 //******************************************************************************
 // Constructor & Functions
@@ -1064,7 +1115,8 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Run(AlxHwLpcXpress
 {
 	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T01_ReadAccReg(me);	// MF: This was tested on "2533020201601" Acc meter
 	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T02_ReadIoExpReg(me);
-	AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T03_WriteReadIoExpReg(me);
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T03_WriteReadIoExpReg(me);
+	AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins(me);
 }
 
 

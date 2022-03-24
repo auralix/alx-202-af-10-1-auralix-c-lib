@@ -73,6 +73,7 @@ extern "C" {
 #include <alxNtcg103jf103ft1s.h>
 #include <alxPca9430.h>
 #include <alxPca9431.h>
+#include "alxPcal6416a.h"
 #include <alxTmp1075.h>
 #include <alxTpa3255.h>
 #include <alxVnh7040.h>
