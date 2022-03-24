@@ -92,10 +92,6 @@ void AlxSpi_Ctor
 	me->spiTransfer.configFlags		= kSPI_FrameAssert;
 	me->spiTransfer.dataSize		= 0;
 
-	#if defined(ALX_FREE_RTOS)
-	AlxOsMutex_Ctor(&me->mutex);
-	#endif
-
 	// Info
 	me->isInit = false;
 	me->wasCtorCalled = true;
@@ -107,82 +103,57 @@ void AlxSpi_Ctor
 //******************************************************************************
 Alx_Status AlxSpi_Init(AlxSpi* me)
 {
-	// #1 Lock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Lock(&me->mutex);
-	#endif
-
-	// #2 Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == false);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #3 Init GPIO
+	// #2 Init GPIO
 	AlxIoPin_Init(me->do_SCK);
 	AlxIoPin_Init(me->do_MOSI);
 	AlxIoPin_Init(me->di_MISO);
 	AlxIoPin_Init(me->do_nCS);
 
-	// #5 Enable SPI Periphery Clock
+	// #3 Enable SPI Periphery Clock
 	AlxSpi_Periph_AttachClk(me);
 
-	// #6 Init SPI
+	// #4 Init SPI
 	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
 
-	// #7 Set isInit
+	// #5 Set isInit
 	me->isInit = true;
 
-	// #8 Unlock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
-	// #9 Return OK
+	// #6 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxSpi_DeInit(AlxSpi* me)
 {
-	// #1 Lock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Lock(&me->mutex);
-	#endif
-
-	// #2 Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #3 DeInit SPI
+	// #2 DeInit SPI
 	SPI_Deinit(me->spi);
 
-	// #4 Disable SPI Periphery Clock
+	// #3 Disable SPI Periphery Clock
 	AlxSpi_Periph_DisableClk(me);
 
-	// #5 DeInit GPIO
+	// #4 DeInit GPIO
 	AlxIoPin_DeInit(me->do_SCK);
 	AlxIoPin_DeInit(me->do_MOSI);
 	AlxIoPin_DeInit(me->di_MISO);
 	AlxIoPin_DeInit(me->do_nCS);
 
-	// #6 Reset isInit
+	// #5 Reset isInit
 	me->isInit = false;
 
-	// #7 Unlock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
-	// #8 Return OK
+	// #6 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// #1 Lock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Lock(&me->mutex);
-	#endif
-
-	// #2 Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -191,33 +162,23 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
-	// #3 Prepare variables
+	// #2 Prepare variables
 	uint8_t* dummy = NULL;
 	me->spiTransfer.txData = writeData;
 	me->spiTransfer.rxData = dummy;		// MF: We dont need received data
 	me->spiTransfer.dataSize = len;
 	Alx_Status status = Alx_Err;
 
-	// #4 Try SPI write/read
+	// #3 Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// #5 Unlock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
-	// #6 If we are here, SPI write/read was OK or number of tries error occured
+	// #4 If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
 	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// #1 Lock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Lock(&me->mutex);
-	#endif
-
-	// #2 Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -226,33 +187,23 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
-	// #3 Prepare variables
+	// #2 Prepare variables
 	uint8_t* dummy = NULL;
 	me->spiTransfer.txData = dummy;		// MF: We dont need transmited data
 	me->spiTransfer.rxData = readData;
 	me->spiTransfer.dataSize = len;
 	Alx_Status status = Alx_Err;
 
-	// #4 Try SPI write/read
+	// #3 Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// #5 Unlock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
-	// #6 If we are here, SPI write/read was OK or number of tries error occured
+	// #4 If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
 	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// #1 Lock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Lock(&me->mutex);
-	#endif
-
-	// #2 Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -262,63 +213,38 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
-	// #3 Prepare variables
+	// #2 Prepare variables
 	me->spiTransfer.txData = writeData;
 	me->spiTransfer.rxData = readData;
 	me->spiTransfer.dataSize = len;
 	Alx_Status status = Alx_Err;
 
-	// #4 Try SPI write/read
+	// #3 Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// #5 Unlock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
-	// #6 If we are here, SPI write/read was OK or number of tries error occured
+	// #4 If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
 	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 void AlxSpi_Master_AssertCs(AlxSpi* me)
 {
-	// #1 Lock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Lock(&me->mutex);
-	#endif
-
-	// #2 Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #3 Assert nCS
+	// #2 Assert nCS
 	AlxIoPin_Reset(me->do_nCS);
-
-	// #4 Unlock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Unlock(&me->mutex);
-	#endif
 }
 void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 {
-	// #1 Lock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Lock(&me->mutex);
-	#endif
-
-	// #2 Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #3 DeAssert nCS
+	// #2 DeAssert nCS
 	AlxIoPin_Set(me->do_nCS);
-
-	// #4 Unlock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Unlock(&me->mutex);
-	#endif
 }
 
 

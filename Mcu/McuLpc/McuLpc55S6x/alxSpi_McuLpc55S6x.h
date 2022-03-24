@@ -69,9 +69,6 @@ typedef struct
 	// Variables
 	spi_master_config_t spiMasterConfig;	// MF: clkPolarity and clkPhase are in this struct
 	spi_transfer_t spiTransfer;
-	#if defined(ALX_OS)
-	AlxOsMutex mutex;
-	#endif
 
 	// Info
 	bool isInit;
