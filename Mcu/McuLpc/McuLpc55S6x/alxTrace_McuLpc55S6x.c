@@ -23,7 +23,7 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static Alx_Status AlxTrace_ReInit(AlxTrace* me);
+static Alx_Status AlxTrace_Reset(AlxTrace* me);
 static uint8_t AlxTrace_GetIoconFunc(AlxTrace* me);
 static uint32_t AlxTrace_GetFlexCommClkFreq(AlxTrace* me);
 static void AlxTrace_AttachClkToFlexcomm(AlxTrace* me);
@@ -70,6 +70,9 @@ void AlxTrace_Ctor
 	me->usartConfig.rxWatermark					= kUSART_RxFifo1;	// MF: I don't understand this
 	me->usartConfig.syncMode					= kUSART_SyncModeDisabled;
 	me->usartConfig.clockPolarity				= kUSART_RxSampleOnFallingEdge;
+	#if defined(ALX_OS)
+	AlxOsMutex_Ctor(&me->mutex);
+	#endif
 
 	// Info
 	me->isInit = false;
@@ -82,58 +85,86 @@ void AlxTrace_Ctor
 //******************************************************************************
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
-	// Assert
-	(void)me;
+	// #1 Lock Mutex
+	#if defined(ALX_OS)
+	AlxOsMutex_Lock(&me->mutex);
+	#endif
 
-	// #1 Set IoPin Usart Func
+	// #2 Set IoPin Usart Func
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, AlxTrace_GetIoconFunc(me));
 
-	// #2 Attach Clk to FlexComm
+	// #3 Attach Clk to FlexComm
 	AlxTrace_AttachClkToFlexcomm(me);
 
-	// #3 Init USART	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
-	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_GetFlexCommClkFreq(me)) != kStatus_Success) { return Alx_Err; }
+	// #4 Init USART
+	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_GetFlexCommClkFreq(me)) != kStatus_Success) { return Alx_Err; }	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
 
-	// #4 Set isInit
+	// #5 Set isInit
 	me->isInit = true;
 
-	// #5 Return OK
+	// #6 Unlock Mutex
+	#if defined(ALX_OS)
+	AlxOsMutex_Unlock(&me->mutex);
+	#endif
+
+	// #7 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
-	// Assert
-	(void)me;
+	// #1 Lock Mutex
+	#if defined(ALX_OS)
+	AlxOsMutex_Lock(&me->mutex);
+	#endif
 
-	// #1 DeInit USART
-	USART_Deinit(me->usart);
+	// #2 DeInit USART
+	USART_Deinit(me->usart);	// MF: Always returns Success, so we won't hande return
 
-	// #2 Disable FlexComm Clk and Reset FlexComm Perihpery
+	// #3 Disable FlexComm Clk and Reset FlexComm Perihpery
 	AlxTrace_FlexcommDisableClkResetPeriph(me);
 
-	// #3 Set Pin to Default Func
+	// #4 Set Pin to Default Func
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, IOCON_FUNC0);
 
-	// #4 Reset isInit
+	// #5 Reset isInit
 	me->isInit = false;
 
-	// #5 Return OK
+	// #6 Unlock Mutex
+	#if defined(ALX_OS)
+	AlxOsMutex_Unlock(&me->mutex);
+	#endif
+
+	// #7 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
-	// Assert
-	(void)me;
-	(void)str;
+	// #1 Lock Mutex
+	#if defined(ALX_OS)
+	AlxOsMutex_Lock(&me->mutex);
+	#endif
 
-	// #1 Write
+	// #2 Write
 	if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
 	{
-		AlxTrace_ReInit(me);
+		// #2.1 Reset
+		AlxTrace_Reset(me);
+
+		// #2.2 Unlock Mutex
+		#if defined(ALX_OS)
+		AlxOsMutex_Unlock(&me->mutex);
+		#endif
+
+		// #2.3 Return Err
 		return Alx_Err;
 	}
 
-	// #2 Return OK
+	// #3 Unlock Mutex
+	#if defined(ALX_OS)
+	AlxOsMutex_Unlock(&me->mutex);
+	#endif
+
+	// #4 Return OK
 	return Alx_Ok;
 }
 
@@ -141,19 +172,27 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static Alx_Status AlxTrace_ReInit(AlxTrace* me)
+static Alx_Status AlxTrace_Reset(AlxTrace* me)
 {
 	// Assert
 	(void)me;
 
 	// #1 DeInit Trace
-	if (AlxTrace_DeInit(me) != Alx_Ok) { return Alx_Err; }
+	// #1.1 DeInit USART
+	USART_Deinit(me->usart); // MF: Always returns Success, so we won't hande return
+
+	// #1.2 Disable FlexComm Clk and Reset FlexComm Perihpery
+	AlxTrace_FlexcommDisableClkResetPeriph(me);
 
 	// #2 Reset isInit
 	me->isInit = false;
 
 	// #3 Init Trace
-	if (AlxTrace_Init(me) != Alx_Ok) { return Alx_Err; }
+	// #3.1 Attach Clk to FlexComm
+	AlxTrace_AttachClkToFlexcomm(me);
+
+	// #3.2 Init USART
+	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_GetFlexCommClkFreq(me)) != kStatus_Success) { return Alx_Err; }	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
 
 	// #4 Set isInit
 	me->isInit = true;

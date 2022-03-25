@@ -25,7 +25,7 @@
 //******************************************************************************
 static swm_port_pin_type_t AlxTrace_GetSwmPortPinIndex(AlxTrace* me);
 static swm_select_movable_t AlxTrace_GetUartFunc(AlxTrace* me);
-static Alx_Status AlxTrace_ReInit(AlxTrace* me);
+static Alx_Status AlxTrace_Reset(AlxTrace* me);
 static void AlxTrace_Periph_SelectClk(AlxTrace* me);
 
 
@@ -77,16 +77,16 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	SWM_SetMovablePinSelect(SWM0, AlxTrace_GetUartFunc(me), AlxTrace_GetSwmPortPinIndex(me));
 	CLOCK_DisableClock(kCLOCK_Swm);
 
-	// #3 Select I2C Periphery Clock
+	// #2 Select I2C Periphery Clock
 	AlxTrace_Periph_SelectClk(me);
 
-	// #4 Init UART
+	// #3 Init UART
 	if (USART_Init(me->usart, &me->usartConfig, CLOCK_GetMainClkFreq()) != kStatus_Success) { return Alx_Err; }		// MF: "Periph_Reset" and "EnableClk" happens here
 
-	// #5 Set isInit
+	// #4 Set isInit
 	me->isInit = true;
 
-	// #6 Return OK
+	// #5 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxTrace_DeInit(AlxTrace* me)
@@ -110,7 +110,7 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 	// #1 Write
 	if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
 	{
-		AlxTrace_ReInit(me);
+		AlxTrace_Reset(me);
 		return Alx_Err;
 	}
 
@@ -147,16 +147,31 @@ static swm_select_movable_t AlxTrace_GetUartFunc(AlxTrace* me)
 
 	else						return 0xFF; // We shouldn't get here
 }
-static Alx_Status AlxTrace_ReInit(AlxTrace* me)
+static Alx_Status AlxTrace_Reset(AlxTrace* me)
 {
 	// #1 DeInit Trace
-	if (AlxTrace_DeInit(me) != Alx_Ok) { return Alx_Err; }
+	// #1.1 DeInit UART
+	USART_Deinit(me->usart); // MF: "DisableClk" happens here
+
+	// #1.2 DeInit SWM
+	CLOCK_EnableClock(kCLOCK_Swm);
+	SWM_SetMovablePinSelect(SWM0, AlxTrace_GetUartFunc(me), kSWM_PortPin_Reset);
+	CLOCK_DisableClock(kCLOCK_Swm);
 
 	// #2 Reset isInit
 	me->isInit = false;
 
 	// #3 Init Trace
-	if (AlxTrace_Init(me) != Alx_Ok) { return Alx_Err; }
+	// #3.1 Init SWM
+	CLOCK_EnableClock(kCLOCK_Swm);
+	SWM_SetMovablePinSelect(SWM0, AlxTrace_GetUartFunc(me), AlxTrace_GetSwmPortPinIndex(me));
+	CLOCK_DisableClock(kCLOCK_Swm);
+
+	// #3.2 Select I2C Periphery Clock
+	AlxTrace_Periph_SelectClk(me);
+
+	// #3.3 Init UART
+	if (USART_Init(me->usart, &me->usartConfig, CLOCK_GetMainClkFreq()) != kStatus_Success) { return Alx_Err; }		// MF: "Periph_Reset" and "EnableClk" happens here
 
 	// #4 Set isInit
 	me->isInit = true;

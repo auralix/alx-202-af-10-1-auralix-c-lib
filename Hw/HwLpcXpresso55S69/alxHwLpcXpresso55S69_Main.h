@@ -93,12 +93,12 @@ typedef struct
 	/// Port 0
 	///------------------------------------------------------------------------------
 	//PIO0_0	- Unused
-	//PIO0_1	- Unused
-	//PIO0_2	- Unused
-	//PIO0_3	- Unused
-	//PIO0_4	- Unused
+	AlxIoPin do_P0_1_DBG01;
+	AlxIoPin di_P0_2_SPI_ACC_MISO;
+	AlxIoPin do_P0_3_SPI_ACC_MOSI;
+	AlxIoPin do_P0_4_SPI_ACC_nCS;
 	//PIO0_5	- Unused
-	//PIO0_6	- Unused
+	AlxIoPin do_P0_6_SPI_ACC_SCLK;
 	//PIO0_7	- Unused
 	//PIO0_8	- Unused
 	//PIO0_9	- Unused
@@ -122,7 +122,7 @@ typedef struct
 	//PIO0_27	- Unused
 	//PIO0_28	- Unused
 	//PIO0_29	- Unused
-	//PIO0_30	- Unused
+	//PIO0_30	- DBG_UART_TX
 	//PIO0_31	- Unused
 
 
@@ -143,7 +143,7 @@ typedef struct
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
 	//PIO1_13	- Unused
-	//PIO1_14	- Unused
+	AlxIoPin do_P1_14_DBG02;
 	//PIO1_15	- Unused
 	//PIO1_16	- Unused
 	//PIO1_17	- Unused
@@ -169,7 +169,8 @@ typedef struct
 	AlxIoPinIrq alxIrqPin_IRQ1;
 	AlxAdc alxAdc;
 	AlxPwm alxPwm;
-	AlxSpi alxSpi;
+	AlxSpi alxSpi7;
+	AlxSpi alxSpi3;
 
 	// Auralix HW LPC Xpresso 55S69 C Library Objects
 	AlxHwLpcXpresso55S69_MainIoPin alxIoPin;
@@ -206,12 +207,12 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	///------------------------------------------------------------------------------
 	// Port 0
 	//PIO0_0	- Unused
-	//PIO0_1	- Unused
-	//PIO0_2	- Unused
-	//PIO0_3	- Unused
-	//PIO0_4	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_1_DBG01,			0,	1,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_2_SPI_ACC_MISO,	0,	2,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_3_SPI_ACC_MOSI,	0,	3,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_4_SPI_ACC_nCS,	0,	4,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	true	); // MF: Spi nCS is config as GPIO and is controlled by SW
 	//PIO0_5	- Unused
-	//PIO0_6	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_6_SPI_ACC_SCLK,	0,	6,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	//PIO0_7	- Unused
 	//PIO0_8	- Unused
 	//PIO0_9	- Unused
@@ -253,7 +254,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO1_11	- Unused
 	//PIO1_12	- Unused
 	//PIO1_13	- Unused
-	//PIO1_14	- Unused
+	AlxIoPin_Ctor(&me->alxIoPin.do_P1_14_DBG02,			0,	1,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_PULLUP,	true,	false,	true,	false	);
 	//PIO1_15	- Unused
 	//PIO1_16	- Unused
 	//PIO1_17	- Unused
@@ -366,12 +367,23 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	///------------------------------------------------------------------------------
 	AlxSpi_Ctor
 	(
-		&me->alxSpi,
+		&me->alxSpi7,
 		SPI7,
 		&me->alxIoPin.do_P0_21_SPI_SCLK,
 		&me->alxIoPin.do_P0_20_SPI_MOSI,
 		&me->alxIoPin.di_P0_19_SPI_MISO,
 		&me->alxIoPin.do_P1_20_SPI_nCS,
+		AlxSpi_Mode_2,
+		AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz
+	);
+	AlxSpi_Ctor
+	(
+		&me->alxSpi3,
+		SPI3,
+		&me->alxIoPin.do_P0_6_SPI_ACC_SCLK,
+		&me->alxIoPin.do_P0_3_SPI_ACC_MOSI,
+		&me->alxIoPin.di_P0_2_SPI_ACC_MISO,
+		&me->alxIoPin.do_P0_4_SPI_ACC_nCS,
 		AlxSpi_Mode_2,
 		AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz
 	);

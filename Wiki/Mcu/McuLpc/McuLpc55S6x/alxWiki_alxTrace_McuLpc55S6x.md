@@ -3,7 +3,9 @@
 ## General
 - Every USART instance uses FLEXCOMM with the same address and ID meaning USART0 has the same address and ID as FLEXCOMM0, USART1 has the same address and ID as FLEXCOMM1,...
 - MainClk is used for FlexComm
-- __USART_Init()__ function handles everything for FlexComm perihp
+- RTOS Thread Safety is implemented for this module
+    - In order use it, "ALX_OS" has to be defined in "alxConfig.h"
+- __USART_Init()__ function handles everything for FlexComm periphery
 - BaudRate is configurable
 - Other hardcoded settings:
     - Data Bits: __8__

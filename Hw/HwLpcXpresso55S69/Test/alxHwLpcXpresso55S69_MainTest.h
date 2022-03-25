@@ -17,7 +17,6 @@ extern "C" {
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include <alxConfig.h>
 #include <alxHwLpcXpresso55S69_Main.h>
 #if defined(ALX_TEST_GH)
 #include <alxHwLpcXpresso55S69_GhTest.h>
@@ -32,7 +31,7 @@ extern "C" {
 #include <alxHwLpcXpresso55S69_MfTest.h>
 #endif
 #if defined(ALX_TEST_TV)
-//#include <alxHwLpcXpresso55S69_TvTest.h>
+#include <alxHwLpcXpresso55S69_TvTest.h>
 #endif
 
 
@@ -69,7 +68,8 @@ typedef struct
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp alxHwLpcXpresso55S69_MfTest_G01_BringUp;
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp alxHwLpcXpresso55S69_MfTest_G01_BringUp;
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos;
 	#endif
 
 	///-------
@@ -77,7 +77,6 @@ typedef struct
 	///-------
 	#if defined(ALX_TEST_TV)
 	#endif
-
 } AlxHwLpcXpresso55S69_MainTest;
 
 
@@ -114,7 +113,8 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Ctor(AlxHwLpcXpresso55S69_MainT
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Ctor(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Ctor(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Ctor(&me->alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos);
 	#endif
 
 	///-------
@@ -147,7 +147,8 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Init(AlxHwLpcXpresso55S69_MainT
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Init(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Init(&me->alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos);
 	#endif
 
 	///-------
@@ -161,7 +162,7 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Run(AlxHwLpcXpresso55S69_MainTe
 	///-------
 	/// Gh
 	///-------
-	#if defined(ALX_TEST_MF)
+	#if defined(ALX_TEST_GH)
 	#endif
 
 	///-------
@@ -180,7 +181,8 @@ static inline void AlxHwLpcXpresso55S69_MainTest_Run(AlxHwLpcXpresso55S69_MainTe
 	/// Mf
 	///-------
 	#if defined(ALX_TEST_MF)
-	AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	//AlxHwLpcXpresso55S69_MfTest_G01_BringUp_Run(&me->alxHwLpcXpresso55S69_MfTest_G01_BringUp);
+	AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(&me->alxHwLpcXpresso55S69_MfTest_G02_BringUpRtos);
 	#endif
 
 	///-------

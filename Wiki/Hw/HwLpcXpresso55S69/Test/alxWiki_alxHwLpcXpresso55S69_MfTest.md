@@ -1,6 +1,7 @@
 # __Auralix C Library - ALX HW LPC Xpresso 55S69 MF Test Module__
 
 ## __G01_BringUp__
+---
 - Bring Up of Alx modules
 
 ### __Configurations__
@@ -50,3 +51,29 @@
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_01](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_01.jpg)
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02.jpg)
 	- ![AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02](Img/AlxHwLpcXpresso55S69_MfTest_G01_BringUp_T06_Clk_02.jpg)
+
+## __G02_BringUpRtos__
+---
+- Bring Up of Alx modules using Rtos
+
+### __Configurations__
+- __AlxCk__: AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz
+- __AlxTrace__: AlxGlobal_BaudRate_115200
+- __AlxAdc__: AlxAdc_Clk_McuLpc55S6x_AdcClk_18MHz75_MainClk_150MHz
+- __AlxSpi__: AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz
+
+### __Test Goal__
+- The goal of this test was to make 3 separate Tasks(Threads) using one for alxTrace and 2 for two different alxSpi modules. In addition to that, I made another Task for toggling Led, meaning 4 Tasks(Threads) were running simultaneously
+
+### __Result__
+- __Tasks__
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_AllTasks](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_AllTasks.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task1creation](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task1creation.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task2creation](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task2creation.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task3creation](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task3creation.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task4creation](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Task4creation.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_StartTasks](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_StartTasks.jpg)
+- __Spi Outputs__
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_SpiOutput](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_SpiOutput.jpg)
+- __Trace Output__
+	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_TraceOutput](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_TraceOutput.jpg)

@@ -1,14 +1,14 @@
 ﻿/**
   ******************************************************************************
-  * @file alxTrace_McuLpc55S6x.h
-  * @brief Auralix C Library - ALX Trace Module
-  * @version $LastChangedRevision: 4270 $
-  * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
+  * @file alxOsMutex.h
+  * @brief Auralix C Library - ALX OS Mutex Module
+  * @version $LastChangedRevision: 4937 $
+  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
   ******************************************************************************
   */
 
-#ifndef ALX_TRACE_MCU_LPC55S6X_H
-#define ALX_TRACE_MCU_LPC55S6X_H
+#ifndef ALX_OS_MUTEX_H
+#define ALX_OS_MUTEX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,16 +18,12 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTick.h"
-#if defined(ALX_OS)
-#include "alxOsMutex.h"
-#endif
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#if defined(ALX_OS)
 
 
 //******************************************************************************
@@ -35,40 +31,41 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Parameters
-	uint8_t port;
-	uint8_t pin;
-	USART_Type* usart;
-	AlxGlobal_BaudRate baudRate;
-
 	// Variables
-	usart_config_t usartConfig;
-	#if defined(ALX_OS)
-	AlxOsMutex mutex;
+	#if defined(ALX_FREE_RTOS)
+	SemaphoreHandle_t mutex;
+	#elif defined (ALX_MBED_OS)
+	// TODO
+	#else
+	#error "Please select OS for your application!"
 	#endif
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
-} AlxTrace;
+} AlxOsMutex;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxTrace_Ctor
+void AlxOsMutex_Ctor
 (
-	AlxTrace* me,
-	uint8_t port,
-	uint8_t pin,
-	USART_Type* usart,
-	AlxGlobal_BaudRate baudRate
+	AlxOsMutex* me
 );
 
-#endif // Module Guard
+
+//******************************************************************************
+// Functions
+//******************************************************************************
+void AlxOsMutex_Lock(AlxOsMutex* me);
+void AlxOsMutex_Unlock(AlxOsMutex* me);
+bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me);	// TV: Not tested
+
+
+#endif // #if defined(ALX_OS)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_TRACE_MCU_LPC55S6X_H
+#endif // ALX_OS_MUTEX_H

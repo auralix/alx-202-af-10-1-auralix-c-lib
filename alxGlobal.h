@@ -91,6 +91,22 @@ extern "C" {
 
 
 //******************************************************************************
+// Includes - FreeRtos
+//******************************************************************************
+#if defined(ALX_FREE_RTOS)
+#include "FreeRTOS.h"
+#include "croutine.h"
+#include "event_groups.h"
+#include "list.h"
+#include "queue.h"
+#include "semphr.h"
+#include "stream_buffer.h"
+#include "task.h"
+#include "timers.h"
+#endif
+
+
+//******************************************************************************
 // Includes - MCU
 //******************************************************************************
 #if defined(ALX_STM32F1)
@@ -118,11 +134,11 @@ extern "C" {
 #elif defined(ALX_LPC80X)
 #include "alxGlobal_McuLpc80x.h"
 
-#elif defined(ALX_PC)
-#include "alxGlobal_Pc.h"
-
 #elif defined(ALX_LPC55S6X)
 #include "alxGlobal_McuLpc55S6x.h"
+
+#elif defined(ALX_PC)
+#include "alxGlobal_Pc.h"
 
 #else
 #error "Please select platform for your application!"
