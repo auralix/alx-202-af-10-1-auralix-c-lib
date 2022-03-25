@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file alxOsMutex.h
-  * @brief Auralix C Library - ALX Os Mutex Module
+  * @brief Auralix C Library - ALX OS Mutex Module
   * @version $LastChangedRevision: 4937 $
   * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
   ******************************************************************************
@@ -31,7 +31,7 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Parameters
+	// Variables
 	#if defined(ALX_FREE_RTOS)
 	SemaphoreHandle_t mutex;
 	#elif defined (ALX_MBED_OS)
@@ -42,7 +42,6 @@ typedef struct
 
 	// Info
 	bool wasCtorCalled;
-	bool isMutexLocked;
 } AlxOsMutex;
 
 
@@ -60,13 +59,13 @@ void AlxOsMutex_Ctor
 //******************************************************************************
 void AlxOsMutex_Lock(AlxOsMutex* me);
 void AlxOsMutex_Unlock(AlxOsMutex* me);
-bool AlxOsMutex_IsMutexLocked(AlxOsMutex* me);
+bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me);	// TV: Not tested
 
 
-#endif // Module Guard
+#endif // #if defined(ALX_OS)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_FIFO_H
+#endif // ALX_OS_MUTEX_H

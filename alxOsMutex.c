@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file alxOsMutex.c
-  * @brief Auralix C Library - ALX Os Mutex Module
+  * @brief Auralix C Library - ALX OS Mutex Module
   * @version $LastChangedRevision: 4270 $
   * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
   ******************************************************************************
@@ -27,9 +27,9 @@ void AlxOsMutex_Ctor
 	AlxOsMutex* me
 )
 {
-	// Parameters
+	// Variables
 	#if defined(ALX_FREE_RTOS)
-	me->mutex = xSemaphoreCreateBinary(); // MF: Mutex is created once and won't be deleted during a program
+	me->mutex = xSemaphoreCreateBinary();	// MF: Mutex is created once and won't be deleted during a program
 	xSemaphoreGive(me->mutex);
 	#elif defined (ALX_MBED_OS)
 	// TODO
@@ -39,7 +39,6 @@ void AlxOsMutex_Ctor
 
 	// Info
 	me->wasCtorCalled = true;
-	me->isMutexLocked = false;
 }
 
 
@@ -48,10 +47,7 @@ void AlxOsMutex_Ctor
 //******************************************************************************
 void AlxOsMutex_Lock(AlxOsMutex* me)
 {
-	// Assert
-	// TODO
-
-	// #1 Lock Mutex
+	// Lock Mutex
 	#if defined(ALX_FREE_RTOS)
 	xSemaphoreTake(me->mutex, portMAX_DELAY);
 	#elif defined (ALX_MBED_OS)
@@ -59,16 +55,10 @@ void AlxOsMutex_Lock(AlxOsMutex* me)
 	#else
 	#error "Please select OS for your application!"
 	#endif
-
-	// #2 Set isMutexLocked
-	me->isMutexLocked = true;
 }
 void AlxOsMutex_Unlock(AlxOsMutex* me)
 {
-	// Assert
-	// TODO
-
-	// #1 Unock Mutex
+	// Unlock Mutex
 	#if defined(ALX_FREE_RTOS)
 	xSemaphoreGive(me->mutex);
 	#elif defined (ALX_MBED_OS)
@@ -76,18 +66,18 @@ void AlxOsMutex_Unlock(AlxOsMutex* me)
 	#else
 	#error "Please select OS for your application!"
 	#endif
-
-	// #2 Reset isMutexLocked
-	me->isMutexLocked = false;
 }
-bool AlxOsMutex_IsMutexLocked(AlxOsMutex* me)
+bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me)
 {
-	// Assert
+	// Get Status
+	#if defined(ALX_FREE_RTOS)
+	return uxSemaphoreGetCount(me->mutex);
+	#elif defined (ALX_MBED_OS)
 	// TODO
-
-	// #1 Return isMutexLocked
-	return me->isMutexLocked;
+	#else
+	#error "Please select OS for your application!"
+	#endif
 }
 
 
-#endif // Module Guard
+#endif // #if defined(ALX_OS)

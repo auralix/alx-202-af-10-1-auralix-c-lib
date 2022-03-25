@@ -17,7 +17,6 @@ extern "C" {
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include <alxConfig.h>
 #include <alxHwLpcXpresso55S69_Main.h>
 #if defined(ALX_TEST_GH)
 #include <alxHwLpcXpresso55S69_GhTest.h>
@@ -32,7 +31,7 @@ extern "C" {
 #include <alxHwLpcXpresso55S69_MfTest.h>
 #endif
 #if defined(ALX_TEST_TV)
-//#include <alxHwLpcXpresso55S69_TvTest.h>
+#include <alxHwLpcXpresso55S69_TvTest.h>
 #endif
 
 
@@ -78,7 +77,6 @@ typedef struct
 	///-------
 	#if defined(ALX_TEST_TV)
 	#endif
-
 } AlxHwLpcXpresso55S69_MainTest;
 
 
