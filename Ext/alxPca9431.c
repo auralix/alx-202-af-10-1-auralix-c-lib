@@ -119,7 +119,7 @@ Alx_Status AlxPca9431_DeInit(AlxPca9431* me)
 	// #4 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V) // 10 bit ADC
+Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V)
 {
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
@@ -150,7 +150,7 @@ Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V) // 
 	// #5 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A) // 10 bit ADC
+Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A)
 {
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
@@ -181,7 +181,7 @@ Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A) // 
 	// #5 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V) // 10 bit ADC
+Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V)
 {
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
@@ -213,7 +213,7 @@ Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V) // 10 
 	// #5 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A) // 10 bit ADC
+Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A)
 {
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
@@ -315,44 +315,6 @@ Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC)
 	// Assert
 	ALX_PCA9431_ASSERT(false); // We shouldn't get here
 	return Alx_Err;
-}
-Alx_Status AlxPca9431_VTune_SetVoltage_V(AlxPca9431* me, float* voltage_V) // 0-3.3V 5 bit DAC - TODO
-{
-	// TODO
-	ALX_PCA9431_ASSERT(false);
-	*voltage_V = 0;
-	return Alx_Err;
-}
-Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V) // 10 bit ADC - TODO
-{
-	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
-
-	// #1 Prepare Vareables
-	uint8_t AdcHBitVoltage = 0;
-	uint8_t AdcLBitVoltage = 0;
-	uint16_t AdcBitVoltage = 0;
-
-	// #2 TODO
-	Alx_Status status = AlxPca9431_Reg_Read(me, &me->reg._32h_VTUNE_ADC_H);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
-	AdcHBitVoltage = me->reg._32h_VTUNE_ADC_H.val.raw;
-	AdcBitVoltage = (uint16_t) AdcHBitVoltage;
-	AdcBitVoltage = AdcBitVoltage << 2;
-
-	// #3 TODO
-	status = AlxPca9431_Reg_Read(me, &me->reg._33h_VTUNE_ADC_L);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
-	AdcLBitVoltage = me->reg._33h_VTUNE_ADC_L.val.raw;
-	AdcLBitVoltage = AdcLBitVoltage >> 6;
-
-	// #4 TODO
-	AdcBitVoltage += AdcLBitVoltage;
-	*voltage_V = AdcBitVoltage * 3.32 / 1000;
-
-	// #5 Return OK
-	return Alx_Ok;
 }
 Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me)
 {
@@ -667,6 +629,52 @@ ALX_WEAK void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 
 
 
+
+
+
+
+
+
+
+
+//Alx_Status AlxPca9431_VTune_SetVoltage_V(AlxPca9431* me, float* voltage_V) // 0-3.3V 5 bit DAC - TODO
+//{
+//	// TODO
+//	ALX_PCA9431_ASSERT(false);
+//	*voltage_V = 0;
+//	return Alx_Err;
+//}
+//Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V) // 10 bit ADC - TODO
+//{
+//	// Assert
+//	ALX_PCA9431_ASSERT(me->isInit == true);
+//	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+//
+//	// #1 Prepare Vareables
+//	uint8_t AdcHBitVoltage = 0;
+//	uint8_t AdcLBitVoltage = 0;
+//	uint16_t AdcBitVoltage = 0;
+//
+//	// #2 TODO
+//	Alx_Status status = AlxPca9431_Reg_Read(me, &me->reg._32h_VTUNE_ADC_H);
+//	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+//	AdcHBitVoltage = me->reg._32h_VTUNE_ADC_H.val.raw;
+//	AdcBitVoltage = (uint16_t) AdcHBitVoltage;
+//	AdcBitVoltage = AdcBitVoltage << 2;
+//
+//	// #3 TODO
+//	status = AlxPca9431_Reg_Read(me, &me->reg._33h_VTUNE_ADC_L);
+//	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+//	AdcLBitVoltage = me->reg._33h_VTUNE_ADC_L.val.raw;
+//	AdcLBitVoltage = AdcLBitVoltage >> 6;
+//
+//	// #4 TODO
+//	AdcBitVoltage += AdcLBitVoltage;
+//	*voltage_V = AdcBitVoltage * 3.32 / 1000;
+//
+//	// #5 Return OK
+//	return Alx_Ok;
+//}
 
 
 

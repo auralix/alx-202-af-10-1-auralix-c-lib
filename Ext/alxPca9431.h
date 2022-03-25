@@ -1203,8 +1203,6 @@ Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A);	//
 Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V);		// 10 bit ADC
 Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A);		// 10 bit ADC
 Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC);	// On chip temperature (-43°C ... +156°C)
-Alx_Status AlxPca9431_VTune_SetVoltage_V(AlxPca9431* me, float* voltage_V);		// 0-3.3V 5 bit DAC - TODO
-Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V);		// 10 bit ADC - TODO
 Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me);
 Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
 
@@ -1240,6 +1238,14 @@ Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
 
 
 
+
+
+
+
+
+
+//Alx_Status AlxPca9431_VTune_SetVoltage_V(AlxPca9431* me, float* voltage_V);		// 0-3.3V 5 bit DAC - TODO
+//Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V);		// 10 bit ADC - TODO
 
 //Alx_Status AlxPca9431_LdoVout_SetVoltage_V(AlxPca9431* me, AlxPca9431_0x07_VOutLdo VoutLdoxV); // 3,3V or 5V => write:  VoutLdo3V3 or. VoutLdo5V
 
