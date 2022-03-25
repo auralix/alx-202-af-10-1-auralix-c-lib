@@ -24,7 +24,7 @@
 // Private Functions
 //******************************************************************************
 static uint8_t AlxI2c_GetMemAddrLen(AlxI2c_Master_MemAddrLen* memAddrLen);
-static Alx_Status AlxI2c_ReInit(AlxI2c* me);
+static Alx_Status AlxI2c_Reset(AlxI2c* me);
 static void AlxI2c_Periph_SelectClk(AlxI2c* me);
 
 // MF: These functions are copied from FSL so that Timeout can be added
@@ -87,16 +87,16 @@ Alx_Status AlxI2c_Init(AlxI2c* me)
 	AlxIoPin_Init(me->io_SCL);
 	AlxIoPin_Init(me->io_SDA);
 
-	// #3 Select I2C Periphery Clock
+	// #2 Select I2C Periphery Clock
 	AlxI2c_Periph_SelectClk(me);
 
-	// #4 Init I2C
+	// #3 Init I2C
 	I2C_MasterInit(me->i2c, &me->i2cConfig, CLOCK_GetMainClkFreq());	// MF: "Periph_Reset" and "EnableClk" happens here. MF: srcClock_Hz = I2cFuncClk = MainClk
 
-	// #5 Set isInit
+	// #4 Set isInit
 	me->isInit = true;
 
-	// #6 Return OK
+	// #5 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxI2c_DeInit(AlxI2c* me)
@@ -161,7 +161,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -170,7 +170,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrWriteSlaveAddr");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -179,7 +179,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -192,7 +192,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		else
 		{
 			ALX_I2C_TRACE("ErrFlsRead");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
 			continue;
 		}
 	}
@@ -254,7 +254,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -263,7 +263,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrWriteSlaveAddr");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -304,7 +304,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		else
 		{
 			ALX_I2C_TRACE("ErrFlsWrite");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
 			continue;
 		}
 	}
@@ -356,16 +356,29 @@ static uint8_t AlxI2c_GetMemAddrLen(AlxI2c_Master_MemAddrLen* memAddrLen)
 	else if (*memAddrLen == AlxI2c_Master_MemAddrLen_16bit)		{ return 2; }
 	else														{ ALX_I2C_ASSERT(false); return 0; }	// MF: We shouldn't get here
 }
-static Alx_Status AlxI2c_ReInit(AlxI2c* me)
+static Alx_Status AlxI2c_Reset(AlxI2c* me)
 {
 	// #1 DeInit I2C
-	if (AlxI2c_DeInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrDeInit"); return Alx_Err; }
+	// #1.1 DeInit I2C
+	I2C_MasterDeinit(me->i2c); // MF: "DisableClk" happens here
+
+	// #1.2 DeInit GPIO
+	AlxIoPin_DeInit(me->io_SCL);
+	AlxIoPin_DeInit(me->io_SDA);
 
 	// #2 Reset isInit
 	me->isInit = false;
 
 	// #3 Init I2C
-	if (AlxI2c_Init(me) != Alx_Ok) { ALX_I2C_TRACE("ErrInit"); return Alx_Err; }
+	// #3.1 Init GPIO
+	AlxIoPin_Init(me->io_SCL);
+	AlxIoPin_Init(me->io_SDA);
+
+	// #3.2 Select I2C Periphery Clock
+	AlxI2c_Periph_SelectClk(me);
+
+	// #3.3 Init I2C
+	I2C_MasterInit(me->i2c, &me->i2cConfig, CLOCK_GetMainClkFreq()); // MF: "Periph_Reset" and "EnableClk" happens here. MF: srcClock_Hz = I2cFuncClk = MainClk
 
 	// #4 Set isInit
 	me->isInit = true;

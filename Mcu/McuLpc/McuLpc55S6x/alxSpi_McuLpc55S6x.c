@@ -23,10 +23,10 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static Alx_Status AlxSpi_Reset(AlxSpi* me);
 static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries);
 static void AlxSpi_Ctor_ParseMode(AlxSpi* me);
 static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me);
-static Alx_Status AlxSpi_Reset(AlxSpi* me);
 static void AlxSpi_Periph_Reset(AlxSpi* me);
 static void AlxSpi_Periph_AttachClk(AlxSpi* me);
 static void AlxSpi_Periph_DisableClk(AlxSpi* me);
@@ -103,19 +103,16 @@ void AlxSpi_Ctor
 //******************************************************************************
 Alx_Status AlxSpi_Init(AlxSpi* me)
 {
-	// Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == false);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #1 Init GPIO
+	// #2 Init GPIO
 	AlxIoPin_Init(me->do_SCK);
 	AlxIoPin_Init(me->do_MOSI);
 	AlxIoPin_Init(me->di_MISO);
 	AlxIoPin_Init(me->do_nCS);
-
-	// #2 Release SPI Periphery Reset
-	AlxSpi_Periph_Reset(me);
 
 	// #3 Enable SPI Periphery Clock
 	AlxSpi_Periph_AttachClk(me);
@@ -131,32 +128,32 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 }
 Alx_Status AlxSpi_DeInit(AlxSpi* me)
 {
-	// Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #1 DeInit SPI
+	// #2 DeInit SPI
 	SPI_Deinit(me->spi);
 
-	// #2 Disable SPI Periphery Clock
+	// #3 Disable SPI Periphery Clock
 	AlxSpi_Periph_DisableClk(me);
 
-	// #3 DeInit GPIO
+	// #4 DeInit GPIO
 	AlxIoPin_DeInit(me->do_SCK);
 	AlxIoPin_DeInit(me->do_MOSI);
 	AlxIoPin_DeInit(me->di_MISO);
 	AlxIoPin_DeInit(me->do_nCS);
 
-	// #4 Reset isInit
+	// #5 Reset isInit
 	me->isInit = false;
 
-	// #5 Return OK
+	// #6 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -165,23 +162,23 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
-	// #1 Prepare variables
+	// #2 Prepare variables
 	uint8_t* dummy = NULL;
 	me->spiTransfer.txData = writeData;
 	me->spiTransfer.rxData = dummy;		// MF: We dont need received data
 	me->spiTransfer.dataSize = len;
 	Alx_Status status = Alx_Err;
 
-	// #2 Try SPI write/read
+	// #3 Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// #3 If we are here, SPI write/read was OK or number of tries error occured
+	// #4 If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
 	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -190,23 +187,23 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
-	// #1 Prepare variables
+	// #2 Prepare variables
 	uint8_t* dummy = NULL;
 	me->spiTransfer.txData = dummy;		// MF: We dont need transmited data
 	me->spiTransfer.rxData = readData;
 	me->spiTransfer.dataSize = len;
 	Alx_Status status = Alx_Err;
 
-	// #2 Try SPI write/read
+	// #3 Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// #3 If we are here, SPI write/read was OK or number of tries error occured
+	// #4 If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
 	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -216,37 +213,37 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
-	// #1 Prepare variables
+	// #2 Prepare variables
 	me->spiTransfer.txData = writeData;
 	me->spiTransfer.rxData = readData;
 	me->spiTransfer.dataSize = len;
 	Alx_Status status = Alx_Err;
 
-	// #2 Try SPI write/read
+	// #3 Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// #3 If we are here, SPI write/read was OK or number of tries error occured
+	// #4 If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
 	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 void AlxSpi_Master_AssertCs(AlxSpi* me)
 {
-	// Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #1 Assert nCS
+	// #2 Assert nCS
 	AlxIoPin_Reset(me->do_nCS);
 }
 void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 {
-	// Assert
+	// #1 Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #1 DeAssert nCS
+	// #2 DeAssert nCS
 	AlxIoPin_Set(me->do_nCS);
 }
 
@@ -254,6 +251,43 @@ void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static Alx_Status AlxSpi_Reset(AlxSpi* me)
+{
+	// #1 DeInit
+	// #1.1 DeInit SPI
+	SPI_Deinit(me->spi);
+
+	// #1.2 Disable SPI Periphery Clock
+	AlxSpi_Periph_DisableClk(me);
+
+	// #1.3 DeInit GPIO
+	AlxIoPin_DeInit(me->do_SCK);
+	AlxIoPin_DeInit(me->do_MOSI);
+	AlxIoPin_DeInit(me->di_MISO);
+	AlxIoPin_DeInit(me->do_nCS);
+
+	// #2 Reset isInit
+	me->isInit = false;
+
+	// #3 Init
+	// #3.1 Init GPIO
+	AlxIoPin_Init(me->do_SCK);
+	AlxIoPin_Init(me->do_MOSI);
+	AlxIoPin_Init(me->di_MISO);
+	AlxIoPin_Init(me->do_nCS);
+
+	// #3.2 Enable SPI Periphery Clock
+	AlxSpi_Periph_AttachClk(me);
+
+	// #3.3 Init SPI
+	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
+
+	// #4 Set isInit
+	me->isInit = true;
+
+	// #5 Return OK
+	return Alx_Ok;
+}
 static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 {
 	// Assert
@@ -332,29 +366,6 @@ static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me)
 	//Assert
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return 0xFFFFFFFF;
-}
-static Alx_Status AlxSpi_Reset(AlxSpi* me)
-{
-	// Assert
-	(void)me;
-
-	// #1 DeInit SPI
-	SPI_Deinit(me->spi);
-
-	// #2 Reset isInit
-	me->isInit = false;
-
-	// #3 Release SPI Periphery Reset
-	AlxSpi_Periph_Reset(me);
-
-	// #4 Init SPI
-	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }
-
-	// #5 Set isInit
-	me->isInit = true;
-
-	// #6 Return OK
-	return Alx_Ok;
 }
 static void AlxSpi_Periph_Reset(AlxSpi* me)
 {
