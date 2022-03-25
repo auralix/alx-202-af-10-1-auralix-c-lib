@@ -1071,8 +1071,8 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins(Alx
 	while (1)
 	{
 		// Write - Set Pins to LOW
-		i2cData[0] = 0b00000000;
-		i2cData[1] = 0b00000000;
+		i2cData[0] = 0b11111110;	//0b00000000
+		i2cData[1] = 0b11111110; //0b00000000
 		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, true, 20, 100);
 
 		AlxDelay_ms(50);
@@ -1081,6 +1081,18 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins(Alx
 		i2cData[0] = 0b11111111;
 		i2cData[1] = 0b11111111;
 		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, true, 20, 100);
+
+		AlxDelay_ms(50);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T05_ModuleInit(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Init I2c
+	AlxPcal6416a_Init(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+
+	while (1)
+	{
+		AlxPcal6416a_IoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a, me->alxHwLpcXpresso55S69_Main.pcal6416aPortPinArr[0]);
 
 		AlxDelay_ms(50);
 	}
@@ -1116,7 +1128,8 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Run(AlxHwLpcXpress
 	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T01_ReadAccReg(me);	// MF: This was tested on "2533020201601" Acc meter
 	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T02_ReadIoExpReg(me);
 	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T03_WriteReadIoExpReg(me);
-	AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins(me);
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins(me);
+	AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T05_ModuleInit(me);
 }
 
 

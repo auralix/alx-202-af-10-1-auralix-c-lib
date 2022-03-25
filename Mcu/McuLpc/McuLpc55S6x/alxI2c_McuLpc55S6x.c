@@ -243,8 +243,13 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 
 	// #1 Prepare variables
 	status_t status = kStatus_Fail;
-	uint8_t _memAddr[2] = { (memAddr >> 8) & 0xFF, memAddr & 0xFF };	// MF: Ensures that memAddr bytes are in right order
-	if (memAddrLen == AlxI2c_Master_MemAddrLen_8bit) { _memAddr[0] = memAddr & 0xFF; }	// JS: Ensures that memAddr for 1 byte is correct
+	//uint8_t _memAddr[2] = { (memAddr >> 8) & 0xFF, memAddr & 0xFF };	// MF: Ensures that memAddr bytes are in right order
+	//if (memAddrLen == AlxI2c_Master_MemAddrLen_8bit) { _memAddr[0] = memAddr & 0xFF; }	// JS: Ensures that memAddr for 1 byte is correct
+	
+	uint8_t _memAddr[2];
+	_memAddr[0] = memAddr & 0xFF;
+	_memAddr[1] = (memAddr >> 8) & 0xFF;
+	
 	uint8_t _memAddrLen = AlxI2c_GetMemAddrLen(&memAddrLen);
 	uint8_t buff[ALX_I2C_BUFF_LEN] = { 0 };
 

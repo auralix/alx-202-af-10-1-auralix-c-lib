@@ -98,6 +98,14 @@ void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
 	AlxTrace_WriteStr(&alxTrace, "FallEdge\r\n");
 }
+
+// G03_IoExpander
+void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me)
+{
+	(void)me;
+	me->reg._06h_Configuration_0.val.P0_0 = false;
+	me->reg._06h_Configuration_0.val.P0_1 = false;
+}
 #endif
 
 ///-------

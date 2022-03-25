@@ -126,7 +126,6 @@ typedef struct
 	//PIO0_30	- DBG_UART_TX
 	//PIO0_31	- Unused
 
-
 	///------------------------------------------------------------------------------
 	/// Port 1
 	///------------------------------------------------------------------------------
@@ -162,6 +161,30 @@ typedef struct
 	//PIO1_29	- Unused
 	//PIO1_30	- Unused
 	//PIO1_31	- Unused
+
+	///------------------------------------------------------------------------------
+	/// Pcal6416a Port 0
+	///------------------------------------------------------------------------------
+	AlxIoPin do_Pcal6416a_P0_0_DBG03;
+	AlxIoPin do_Pcal6416a_P0_1_DBG04;
+	//PIO0_2 - Unused
+	//PIO0_3 - Unused
+	//PIO0_4 - Unused
+	//PIO0_5 - Unused
+	//PIO0_6 - Unused
+	//PIO0_7 - Unused
+
+	///------------------------------------------------------------------------------
+	/// Pcal6416a Port 1
+	///------------------------------------------------------------------------------
+	//PIO1_0 - Unused
+	//PIO1_1 - Unused
+	//PIO1_2 - Unused
+	//PIO1_3 - Unused
+	//PIO1_4 - Unused
+	//PIO1_5 - Unused
+	//PIO1_6 - Unused
+	//PIO1_7 - Unused
 } AlxHwLpcXpresso55S69_MainIoPin;
 
 typedef struct
@@ -205,6 +228,13 @@ typedef struct
 	/// ALX - I2c
 	///---------------------------------------
 	AlxI2c alxI2c;
+
+	///---------------------------------------
+	/// ALX - Pcal6416a
+	///---------------------------------------
+	AlxPcal6416a alxPcal6416a;
+	AlxIoPin* pcal6416aIoPinArr[2];
+	AlxPcal6416a_PortPin pcal6416aPortPinArr[2];
 
 	// Info
 	bool wasCtorCalled;
@@ -413,6 +443,27 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		&me->alxIoPin.do_P0_14_I2C_SCL,
 		&me->alxIoPin.do_P0_13_I2C_SDA,
 		AlxI2c_Clk_McuLpc55S6x_BitRate_400kHz
+	);
+
+
+	///------------------------------------------------------------------------------
+	/// ALX - Pcal6416a
+	///------------------------------------------------------------------------------
+	me->pcal6416aIoPinArr[0] = &me->alxIoPin.do_Pcal6416a_P0_0_DBG03;
+	me->pcal6416aIoPinArr[1] = &me->alxIoPin.do_Pcal6416a_P0_1_DBG04;
+	me->pcal6416aPortPinArr[0] = AlxPcal6416a_P0_0;
+	me->pcal6416aPortPinArr[1] = AlxPcal6416a_P0_1;
+	AlxPcal6416a_Ctor
+	(
+		&me->alxPcal6416a,
+		me->pcal6416aIoPinArr,
+		me->pcal6416aPortPinArr,
+		&me->alxI2c,
+		0b01000000,
+		2,
+		true,
+		5,
+		100
 	);
 
 	// Info
