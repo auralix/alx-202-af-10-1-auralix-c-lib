@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file alxPca9431.c
-  * @brief Auralix C Library - ALX PCA9431 Module
+  * @brief Auralix C Library - ALX NFC WLC Power Receiver with LDO Output PCA9431 Module
   * @version $LastChangedRevision: 5108 $
   * @date $LastChangedDate: 2021-05-14 16:19:47 +0200 (Fri, 14 May 2021) $
   ******************************************************************************
@@ -39,7 +39,6 @@ void AlxPca9431_Ctor
 	AlxPca9431* me,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
-	AlxIoPin* do_SleepEn,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
@@ -47,7 +46,6 @@ void AlxPca9431_Ctor
 {
 	// Objects - External
 	me->i2c = i2c;
-	me->do_SleepEn = do_SleepEn;
 
 	// Parameters
 	me->i2cAddr = i2cAddr;
@@ -75,10 +73,8 @@ Alx_Status AlxPca9431_Init(AlxPca9431* me)
 	ALX_PCA9431_ASSERT(me->isInit == false);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
-
-	// #1 Init GPIO
-	AlxIoPin_Init(me->do_SleepEn);
 
 	// #2 Init I2C
 	status = AlxI2c_Init(me->i2c);
@@ -89,7 +85,7 @@ Alx_Status AlxPca9431_Init(AlxPca9431* me)
 //	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
 
 	// #4 Set registers values to default
-	 AlxPca9431_RegStruct_SetValToDefault(me);
+	AlxPca9431_RegStruct_SetValToDefault(me);
 
 	// #5 Set registers values - WEAK
 	AlxPca9431_RegStruct_SetVal(me);
@@ -110,14 +106,17 @@ Alx_Status AlxPca9431_DeInit(AlxPca9431* me)
 	ALX_PCA9431_ASSERT(me->isInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
-	// #1 DeInit GPIO
-	AlxIoPin_DeInit(me->do_SleepEn);
-	AlxIoPin_DeInit(me->di_Interrupt);
+	// #1 Prepare variables
+	Alx_Status status = Alx_Err;
 
-	// #2 Reset isInit
+	// #2 DeInit I2C
+	status = AlxI2c_DeInit(me->i2c);
+	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err_AlxI2c_DeInit"); return status; }
+
+	// #3 Reset isInit
 	me->isInit = false;
 
-	// #3 Return OK
+	// #4 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V) // 10 bit ADC

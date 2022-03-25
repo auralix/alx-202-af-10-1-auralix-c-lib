@@ -1,14 +1,14 @@
 ﻿/**
   ******************************************************************************
-  * @file alxPca9431.h
-  * @brief Auralix C Library - ALX opis PCA9431 Module
+  * @file alxCrn120.h
+  * @brief Auralix C Library - ALX NFC WLC Communication Receiver CRN120 Module
   * @version $LastChangedRevision: 5305 $
   * @date $LastChangedDate: 2021-06-01 19:13:59 +0200 (Tue, 01 Jun 2021) $
   ******************************************************************************
   */
 
-#ifndef ALX_PCA9430_H
-#define ALX_PCA9430_H
+#ifndef ALX_CRN120_H
+#define ALX_CRN120_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,16 +20,14 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxTimSw.h"
 #include "alxI2c.h"
-
 
 
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_CRN120_FILE "alxCrn120"
-	
+#define ALX_CRN120_FILE "alxCrn120.h"
+
 // Assert //
 #if defined(_ALX_CRN120_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
 #define ALX_CRN120_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CRN120_FILE, expr)
@@ -103,7 +101,7 @@ typedef enum
 	StaticLock_Page_7_Off	= 0b0,		/*	R/W		0: Page_7 read / write		*/
 	StaticLock_Page_7_On	= 0b1		/*	R/W		1: Page_7 read only			*/
 } AlxCrn120_0x00_StaticLock_Page_7;
-	
+
 typedef enum
 {
 	StaticLock_Page_8_Off	= 0b0,		/*	R/W		0: Page_8 read / write		*/
@@ -151,7 +149,7 @@ typedef enum
 	StaticLock_Page_15_Off	= 0b0,		/*	R/W		0: Page_15 read / write		*/
 	StaticLock_Page_15_On	= 0b1		/*	R/W		1: Page_15 read only		*/
 } AlxCrn120_0x00_StaticLock_Page_15;
-	
+
 typedef union
 {
 	struct __attribute__((packed))
@@ -159,7 +157,7 @@ typedef union
 		uint8_t	 Addr									: 8;	/* 	Adrr.									R/W		1 byte			*/
 		uint64_t Serial_number							: 48;	/* 	Serial number (UID)						R/W		6 bytes			*/
 		uint32_t Internal								: 24;	/* 	Internal								R/W		3 bytes			*/
-		
+
 		AlxCrn120_0x00_StaticLock_Block_CC		BLCC	: 1;	/* 	Static lock Block_CC					R/W		1 of 2 bytes	*/
 		AlxCrn120_0x00_StaticLock_Block_9_4	BL9_14	: 1;	/* 	Static lock Block_9_4					R/W		1 of 2 bytes	*/
 		AlxCrn120_0x00_StaticLock_Block_15_10	BL15_10	: 1;	/* 	Static lock Block_15_10					R/W		1 of 2 bytes	*/
@@ -168,7 +166,7 @@ typedef union
 		AlxCrn120_0x00_StaticLock_Page_5		L5		: 1;	/* 	Static lock Page_5						R/W		1 of 2 bytes	*/
 		AlxCrn120_0x00_StaticLock_Page_6		L6		: 1;	/* 	Static lock Page_6						R/W		1 of 2 bytes	*/
 		AlxCrn120_0x00_StaticLock_Page_7		L7		: 1;	/* 	Static lock Page_7						R/W		1 of 2 bytes	*/
-		
+
 		AlxCrn120_0x00_StaticLock_Page_8		L8		: 1;	/* 	Static lock Page_8						R/W		2 of 2 bytes	*/
 		AlxCrn120_0x00_StaticLock_Page_9		L9		: 1;	/* 	Static lock Page_9						R/W		2 of 2 bytes	*/
 		AlxCrn120_0x00_StaticLock_Page_10		L10		: 1;	/* 	Static lock Page_10						R/W		2 of 2 bytes	*/
@@ -177,11 +175,11 @@ typedef union
 		AlxCrn120_0x00_StaticLock_Page_13		L13		: 1;	/* 	Static lock Page_13						R/W		2 of 2 bytes	*/
 		AlxCrn120_0x00_StaticLock_Page_14		L14		: 1;	/* 	Static lock Page_14						R/W		2 of 2 bytes	*/
 		AlxCrn120_0x00_StaticLock_Page_15		L15		: 1;	/* 	Static lock Page_15						R/W		2 of 2 bytes	*/
-		
+
 		uint32_t Capability_Container_CC				: 32;	/* 	Capability Container (CC)				R/W		4 bytes			*/
 	};
 	uint8_t raw[16];
-	
+
 } AlxCrn120_RegBlockVal_0x00_Block_0;
 
 /*******************************************************************************************				Crn120			0x38	*/
@@ -214,7 +212,7 @@ typedef union
 	};
 	uint8_t raw[16];
 } AlxCrn120_RegBlockVal_0x39_Block_39;
-	
+
 /*******************************************************************************************				Crn120			0x3A	*/
 typedef union
 {
@@ -234,9 +232,9 @@ typedef union
 } AlxCrn120_RegBlockVal_0x3A_Block_ConfigurationReg;
 
 /*******************************************************************************************				Crn120_SessionReg	0xFE	*/
-	
+
 	/********		NcReg		******/
-	
+
 typedef enum
 {	/*defines the data flow direction when pass-through mode is enabled*/
 	TransferData_I2C_to_NFC = 0b0,	/*	R/W		0b: from I2C to NFC interface										*/
@@ -244,13 +242,13 @@ typedef enum
 	/*	In case the pass-through mode is NOT enabled, this bit should be set to 1b, otherwise there is no WRITE
 	access from the NFC perspective																					*/
 } AlxCrn120_0xFE_NcReg_0_TransferDir;
-	
+
 typedef enum
 {
 	SramMirrorDisable	= 0b0,	/*	R/W		0b: SRAM mirror disabled													*/
 	SramMirrorEnable	= 0b1	/*	R/W		1b: SRAM mirror enabled and mirrored SRAM starts at page SRAM_MIRROR_BLOCK	*/
 } AlxCrn120_0xFE_NcReg_1_SramMirrorOnOff;
-	
+
 typedef enum
 {	/*defines the event upon which the signal output on the ED pin is pulled low*/
 	RFU							= 0b00, /*	R/W		00b: RFU																						*/
@@ -259,7 +257,7 @@ typedef enum
 	DataReadByNtcOrI2c			= 0b11	/*	R/W		11b: (in pass-through mode NFC-->I2C) if the data is ready to be read from the I2C interface	*/
 										/*			11b: (in pass-through mode I2C--> NFC) if the data is read by the NFC interface					*/
 } AlxCrn120_0xFE_NcReg_2_3_EdOn;
-	
+
 typedef enum
 {	/*defines the event upon which the signal output on the FD pin is released*/
 	FieldOff							= 0b00, /*	R/W		00b: if the field is switched off																																						*/
@@ -268,35 +266,35 @@ typedef enum
 	FieldOffOrReadLastPageByNfcOrI2c	= 0b11	/*	R/W		11b: (if ED_ON = 11b) if the field is switched off or if last data is read by I2C (in pass-through mode NFC ---> I2C) or last data is written by I2C (in pass-through mode I2C---> NFC)	*/
 										/*			11b: (if ED_ON = 00b or 01b or 10b) if the field is switched off																														*/
 } AlxCrn120_0xFE_NcReg_4_5_EdOff;
-	
+
 typedef enum
 {
 	SramPassThroughModeDisable	= 0b0,	/*	R/W		0b: pass-through mode disabled													*/
 	SramPassThroughModeEnable	= 0b1	/*	R/W		1b: pass-through mode using SRAM enabled and SRAM mapped to end of Sector 0.	*/
 } AlxCrn120_0xFE_NcReg_6_PthruOnOff;
-	
+
 typedef enum
 {	/*Enables the NFC disable feature and enables soft reset through I2C repeated start*/
 	NfcSoftResetOn	= 0b0,	/*	R/W		0b: 	*/
 	NfcSoftResetOff	= 0b1	/*	R/W		1b: 	*/
 } AlxCrn120_0xFE_NcReg_7_NfcsI2cRstOnOff;
-	
+
 	/**********			I2C_CLOCK_STR		*******/
-	
+
 typedef enum
 { /*	Enables (1b) or disable (0b) the I2C clock stretching	*/
 	ClockStretchingDisable	= 0b0, /*	R/W		0b:disable	*/
 	ClockStretchingEnable	= 0b1	/*	R/W		1b:Enables 	*/
 } AlxCrn120_0xFE_I2cClockStr_0_ClockStretching;
-	
+
 typedef enum
 { /*	Status bit to show the number of negative PWD_AUTH attempts reached	*/
 	AuthLockNotReached	= 0b0, /*	R/W		0b: PWD_AUTH still possible	*/
 	AuthLockReached		= 0b1	/*	R/W		1b: PWD_AUTH locked		 	*/
 } AlxCrn120_0xFE_I2cClockStr_1_NegAuthReached;
-	
 
-	
+
+
 	/**********		7	NS_REG		*******/
 typedef enum
 { /*	I2C Configuration Lock Bit		*/
@@ -333,13 +331,13 @@ typedef enum
 	MemoryAccessI2cNotLocked	= 0b0, /*	R/W		0b:														*/
 	MemoryAccessI2cLocked		= 0b1	/*	R/W		1b: Memory access is locked to the I2C interface		*/
 } AlxCrn120_0xFE_7_NsReg_6_MemoryAccessI2cLocked;
-	
+
 	typedef enum
 { /*	I2C Configuration Lock Bit		*/
 	NdefDataReadAll		= 0b0, /*	R/W		0b:														*/
 	NdefDataReadNotAll	= 0b1	/*	R/W		1b: all data bytes read from the address specified in LAST_NDEF_BLOCK. Bit is reset to 0b when read		*/
 } AlxCrn120_0xFE_7_NsReg_7_NdefDataRead;
-	
+
 	/**********		8	REG_LOCK		*******/
 typedef enum
 { /*	I2C Configuration Lock Bit		*/
@@ -377,36 +375,35 @@ typedef struct
 	uint8_t addr;
 	uint8_t len;
 	AlxCrn120_RegBlockVal_0x00_Block_0 val;
-} AlxCrn120_RegBlock_0x00_Block_0;	
+} AlxCrn120_RegBlock_0x00_Block_0;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxCrn120_RegBlockVal_0x38_Block_38 val;
-} AlxCrn120_RegBlock_0x38_Block_38;	
-	
+} AlxCrn120_RegBlock_0x38_Block_38;
+
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxCrn120_RegBlockVal_0x39_Block_39 val;
-} AlxCrn120_RegBlock_0x39_Block_39;	
-	
+} AlxCrn120_RegBlock_0x39_Block_39;
+
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxCrn120_RegBlockVal_0x3A_Block_ConfigurationReg val;
-} AlxCrn120_RegBlock_0x3A_Block_ConfigurationReg;	
-	
+} AlxCrn120_RegBlock_0x3A_Block_ConfigurationReg;
+
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxCrn120_RegBlockVal_0xFE_Block_SessionReg val;
-} AlxCrn120_RegBlock_0xFE_Block_SessionReg;	
-	
+} AlxCrn120_RegBlock_0xFE_Block_SessionReg;
 
 
 //******************************************************************************
@@ -419,62 +416,55 @@ typedef struct
 	AlxCrn120_RegBlock_0x39_Block_39					_0x39;
 	AlxCrn120_RegBlock_0x3A_Block_ConfigurationReg		_0x3A_ConfigurationReg;
 	AlxCrn120_RegBlock_0xFE_Block_SessionReg			_0xFE_SessionReg;
-
 } AlxCrn120_RegBlock;
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
-
 typedef struct
-	{
-		// Parameters - Const
+{
+	// Objects - External
+	AlxI2c* i2c;
 
-		// Objects - External
-		AlxI2c* i2c;
-		
-		AlxIoPin* di_EventDetect;		// Event detection
-		AlxIoPin* di_NfcFieldDetect;	// NFC field detection
+	// Parameters
+	uint8_t i2cAddr;
+	bool i2cCheckWithRead;
+	uint8_t i2cNumOfTries;
+	uint16_t i2cTimeout_ms;
 
-		// Parameters
-		uint8_t i2cAddr;
-		//bool i2cCheckWithRead;
-		uint8_t i2cNumOfTries;
-		uint16_t i2cTimeout_ms;
+	// Variables
+	AlxCrn120_RegBlock regblock;
 
-		// Variables
-		AlxCrn120_RegBlock regblock;
+	// Info
+	bool isInit;
+	bool wasCtorCalled;
+} AlxCrn120;
 
-		// Info
-		bool isInit;
-		bool wasCtorCalled;
-	} AlxCrn120;
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-	void AlxCrn120_Ctor
+void AlxCrn120_Ctor
 (
 	AlxCrn120* me,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
-	AlxIoPin* di_EventDetect,	
-	AlxIoPin* di_NfcFieldDetect,
-	//bool i2cCheckWithRead,
+	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
 );
 
+
 //******************************************************************************
 // Functions
 //******************************************************************************
-
 Alx_Status AlxCrn120_Init(AlxCrn120* me);
 Alx_Status AlxCrn120_DeInit(AlxCrn120* me);
-	
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_ADAU1961_H
+#endif // ALX_CRN120_H
