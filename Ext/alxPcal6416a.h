@@ -700,12 +700,12 @@ void AlxPcal6416a_Ctor
 //******************************************************************************
 Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me);
 Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me);
-Alx_Status AlxPcal6416a_Foreground_Handle(AlxPcal6416a* me, AlxPcal6416a_Reg* reg);
+Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me);
 void AlxPcal6416a_IoPin_SetMode(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, AlxPcal6416a_Mode mode);	// MF: Set PullUp or PulDown
-bool AlxPcal6416a_IoPin_Read(AlxIoPin* me, AlxPcal6416a_PortPin pin);
-void AlxPcal6416a_IoPin_Write(AlxIoPin* me, AlxPcal6416a_PortPin pin, bool val);
-void AlxPcal6416a_IoPin_Set(AlxIoPin* me, AlxPcal6416a_PortPin pin);
-void AlxPcal6416a_IoPin_Reset(AlxIoPin* me, AlxPcal6416a_PortPin pin);
+bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
+void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, bool val);
+void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
+void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
 void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
 
 
