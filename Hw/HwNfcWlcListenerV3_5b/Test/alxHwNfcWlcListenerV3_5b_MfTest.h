@@ -181,10 +181,98 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Init(AlxHwNf
 static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Run(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp* me)
 {
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T01_Led(me);
-	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T02_Trace(me);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T02_Trace(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T03_Adc(me);
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T04_Pwm(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T04_Pwm(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T05_I2c(me);
+}
+
+
+//******************************************************************************
+//******************************************************************************
+// G02_I2cCrn120
+//******************************************************************************
+//******************************************************************************
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Objects
+	AlxHwNfcWlcListenerV3_5b_Main alxHwNfcWlcListenerV3_5b_Main;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120;
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T01_Led(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120* me)
+{
+	// Assert
+	(void)me;
+
+	// Init
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED205_RD);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED200_GR);
+
+	while (1)
+	{
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED205_RD);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED200_GR);
+
+		AlxDelay_ms(200);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T02_IsSlaveReady(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120* me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t devAddr = 0b10101010;
+	Alx_Status status;
+
+	// Init I2c
+	AlxI2c_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0);
+
+	while (1)
+	{
+		status = AlxI2c_Master_IsSlaveReady(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0, devAddr, 20, 100);
+
+		AlxDelay_ms(200);
+	}
+}
+
+
+//******************************************************************************
+// Constructor & Functions
+//******************************************************************************
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Ctor(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120* me)
+{
+	// Ctor
+	AlxHwNfcWlcListenerV3_5b_Main_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main);
+
+	// Info
+	me->wasCtorCalled = true;
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Init(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120* me)
+{
+	// Init
+	AlxHwNfcWlcListenerV3_5b_Main_Init(&me->alxHwNfcWlcListenerV3_5b_Main);
+
+	// Info
+	me->isInit = true;
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Run(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120* me)
+{
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T01_Led(me);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T02_IsSlaveReady(me);
 }
 
 
