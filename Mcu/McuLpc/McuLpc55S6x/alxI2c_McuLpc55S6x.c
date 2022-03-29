@@ -23,11 +23,10 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static Alx_Status AlxI2c_Reset(AlxI2c* me);
 static uint8_t AlxI2c_GetMemAddrLen(AlxI2c_Master_MemAddrLen* memAddrLen);
-static Alx_Status AlxI2c_ReInit(AlxI2c* me);
-static uint32_t AlxI2c_GetFlexCommClkFreq(AlxI2c* me);
-static void AlxI2c_Periph_Reset(AlxI2c* me);
 static void AlxI2c_Periph_AttachClk(AlxI2c* me);
+static uint32_t AlxI2c_GetFlexCommClkFreq(AlxI2c* me);
 
 // MF: These functions are copied from FSL so that Timeout can be added
 static status_t AlxI2c_MasterStart(AlxI2c* me, I2C_Type* base, uint8_t address, i2c_direction_t direction, uint16_t timeout);
@@ -83,16 +82,13 @@ void AlxI2c_Ctor
 //******************************************************************************
 Alx_Status AlxI2c_Init(AlxI2c* me)
 {
-	// Assert
+	// #1 Assert
 	ALX_I2C_ASSERT(me->isInit == false);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Init GPIO
+	// #2 Init GPIO
 	AlxIoPin_Init(me->io_SCL);
 	AlxIoPin_Init(me->io_SDA);
-
-	// #2 Release I2C Periphery Reset
-	AlxI2c_Periph_Reset(me);
 
 	// #3 Select I2C Periphery Clock
 	AlxI2c_Periph_AttachClk(me);
@@ -108,21 +104,21 @@ Alx_Status AlxI2c_Init(AlxI2c* me)
 }
 Alx_Status AlxI2c_DeInit(AlxI2c* me)
 {
-	// Assert
+	// #1 Assert
 	ALX_I2C_ASSERT(me->isInit == true);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 
-	// #1 DeInit I2C
+	// #2 DeInit I2C
 	I2C_MasterDeinit(me->i2c);	// MF: "DisableClk" happens here
 
-	// #2 DeInit GPIO
+	// #3 DeInit GPIO
 	AlxIoPin_DeInit(me->io_SCL);
 	AlxIoPin_DeInit(me->io_SDA);
 
-	// #3 Reset isInit
+	// #4 Reset isInit
 	me->isInit = false;
 
-	// #4 Return OK
+	// #5 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxI2c_Master_StartRead(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint16_t timeout_ms)
@@ -147,7 +143,7 @@ Alx_Status AlxI2c_Master_StartRead(AlxI2c* me, uint16_t slaveAddr, uint8_t* data
 	if (status != kStatus_Success)
 	{
 		ALX_I2C_TRACE("ErrStartCondition");
-		if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 	}
 
 	// #5 Return OK
@@ -179,7 +175,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -188,7 +184,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStopCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -237,7 +233,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -246,7 +242,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrWriteSlaveAddr");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -255,7 +251,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -264,7 +260,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrFlsRead");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -273,7 +269,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStopCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -314,7 +310,7 @@ Alx_Status AlxI2c_Master_StartWrite(AlxI2c* me, uint16_t slaveAddr, const uint8_
 	if (status != kStatus_Success)
 	{
 		ALX_I2C_TRACE("ErrStartCondition");
-		if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 	}
 
 	// #5 Return OK
@@ -346,7 +342,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -355,7 +351,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStopCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -411,7 +407,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -420,7 +416,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrWriteSlaveAddr");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -448,39 +444,24 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 					ALX_I2C_TRACE("Read_ErrCheckWithRead");
 					continue;
 				}
-				/*else
-				{
-					// #3.5 Send Stop Condition
-					status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
-					if (status != kStatus_Success)
-					{
-						ALX_I2C_TRACE("ErrStopCondition");
-						if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
-						continue;
-					}
-
-					return Alx_Ok;	// MF: Memory write OK, with check with read
-				}*/
 			}
-			//else
-			//{
-				// #4.3.2 Send Stop Condition
-				status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
-				if (status != kStatus_Success)
-				{
-					ALX_I2C_TRACE("ErrStopCondition");
-					if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
-					continue;
-				}
 
-				// #4.3.3 Return Ok
-				return Alx_Ok;		// MF: Memory write OK, without check with read
-			//}
+			// #4.3.2 Send Stop Condition
+			status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
+			if (status != kStatus_Success)
+			{
+				ALX_I2C_TRACE("ErrStopCondition");
+				if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+				continue;
+			}
+
+			// #4.3.3 Return Ok
+			return Alx_Ok;		// MF: Memory write OK, without check with read
 		}
 		else
 		{
 			ALX_I2C_TRACE("ErrFlsWrite");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 	}
@@ -515,7 +496,7 @@ Alx_Status AlxI2c_Master_Stop(AlxI2c* me, uint16_t timeout_ms)
 	if (status != kStatus_Success)
 	{
 		ALX_I2C_TRACE("ErrStopCondition");
-		if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 	}
 
 	// #5 Return OK
@@ -546,7 +527,7 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -559,7 +540,7 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStopCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
@@ -583,22 +564,29 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint8_t AlxI2c_GetMemAddrLen(AlxI2c_Master_MemAddrLen* memAddrLen)
-{
-	if		(*memAddrLen == AlxI2c_Master_MemAddrLen_8bit)		{ return 1; }
-	else if (*memAddrLen == AlxI2c_Master_MemAddrLen_16bit)		{ return 2; }
-	else														{ ALX_I2C_ASSERT(false); return 0; }	// MF: We shouldn't get here
-}
-static Alx_Status AlxI2c_ReInit(AlxI2c* me)
+static Alx_Status AlxI2c_Reset(AlxI2c* me)
 {
 	// #1 DeInit I2C
-	if (AlxI2c_DeInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrDeInit"); return Alx_Err; }
+	// #1.1 DeInit I2C
+	I2C_MasterDeinit(me->i2c); // MF: "DisableClk" happens here
+
+	// #1.2 DeInit GPIO
+	AlxIoPin_DeInit(me->io_SCL);
+	AlxIoPin_DeInit(me->io_SDA);
 
 	// #2 Reset isInit
 	me->isInit = false;
 
 	// #3 Init I2C
-	if (AlxI2c_Init(me) != Alx_Ok) { ALX_I2C_TRACE("ErrInit"); return Alx_Err; }
+	// #3.1 Init GPIO
+	AlxIoPin_Init(me->io_SCL);
+	AlxIoPin_Init(me->io_SDA);
+
+	// #3.2 Select I2C Periphery Clock
+	AlxI2c_Periph_AttachClk(me);
+
+	// #3.3 Init I2C
+	I2C_MasterInit(me->i2c, &me->i2cConfig, AlxI2c_GetFlexCommClkFreq(me)); // MF: "Periph_Reset" and "EnableClk" happens here. MF: srcClock_Hz = I2cFuncClk = MainClk
 
 	// #4 Set isInit
 	me->isInit = true;
@@ -606,75 +594,11 @@ static Alx_Status AlxI2c_ReInit(AlxI2c* me)
 	// #5 Return OK
 	return Alx_Ok;
 }
-static uint32_t AlxI2c_GetFlexCommClkFreq(AlxI2c* me)
+static uint8_t AlxI2c_GetMemAddrLen(AlxI2c_Master_MemAddrLen* memAddrLen)
 {
-	// Assert
-	(void)me;
-
-	// #1 Attach Clk to FlexComm
-	#if defined(I2C0)
-	if (me->i2c == I2C0)	{ return CLOCK_GetFlexCommClkFreq(0U); }
-	#endif
-	#if defined(I2C1)
-	if (me->i2c == I2C1)	{ return CLOCK_GetFlexCommClkFreq(1U); }
-	#endif
-	#if defined(I2C2)
-	if (me->i2c == I2C2)	{ return CLOCK_GetFlexCommClkFreq(2U); }
-	#endif
-	#if defined(I2C3)
-	if (me->i2c == I2C3)	{ return CLOCK_GetFlexCommClkFreq(3U); }
-	#endif
-	#if defined(I2C4)
-	if (me->i2c == I2C4)	{ return CLOCK_GetFlexCommClkFreq(4U); }
-	#endif
-	#if defined(I2C5)
-	if (me->i2c == I2C5)	{ return CLOCK_GetFlexCommClkFreq(5U); }
-	#endif
-	#if defined(I2C6)
-	if (me->i2c == I2C6)	{ return CLOCK_GetFlexCommClkFreq(6U); }
-	#endif
-	#if defined(I2C7)
-	if (me->i2c == I2C7)	{ return CLOCK_GetFlexCommClkFreq(7U); }
-	#endif
-
-	//Assert
-	ALX_I2C_ASSERT(false); // We shouldn't get here
-	return 0xFFFFFFFF;
-}
-static void AlxI2c_Periph_Reset(AlxI2c* me)
-{
-	// Assert
-	(void)me;
-
-	// #1 Attach Clk to FlexComm
-	#if defined(I2C0)
-	if (me->i2c == I2C0)	{ RESET_PeripheralReset(kFC0_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(I2C1)
-	if (me->i2c == I2C1)	{ RESET_PeripheralReset(kFC1_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(I2C2)
-	if (me->i2c == I2C2)	{ RESET_PeripheralReset(kFC2_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(I2C3)
-	if (me->i2c == I2C3)	{ RESET_PeripheralReset(kFC3_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(I2C4)
-	if (me->i2c == I2C4)	{ RESET_PeripheralReset(kFC4_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(I2C5)
-	if (me->i2c == I2C5)	{ RESET_PeripheralReset(kFC5_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(I2C6)
-	if (me->i2c == I2C6)	{ RESET_PeripheralReset(kFC6_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(I2C7)
-	if (me->i2c == I2C7)	{ RESET_PeripheralReset(kFC7_RST_SHIFT_RSTn); return; }
-	#endif
-
-	//Assert
-	ALX_I2C_ASSERT(false); // We shouldn't get here
-	return;
+	if		(*memAddrLen == AlxI2c_Master_MemAddrLen_8bit)		{ return 1; }
+	else if	(*memAddrLen == AlxI2c_Master_MemAddrLen_16bit)		{ return 2; }
+	else														{ ALX_I2C_ASSERT(false); return 0; }	// MF: We shouldn't get here
 }
 static void AlxI2c_Periph_AttachClk(AlxI2c* me)
 {
@@ -710,6 +634,41 @@ static void AlxI2c_Periph_AttachClk(AlxI2c* me)
 	//Assert
 	ALX_I2C_ASSERT(false); // We shouldn't get here
 	return;
+}
+static uint32_t AlxI2c_GetFlexCommClkFreq(AlxI2c* me)
+{
+	// Assert
+	(void)me;
+
+	// #1 Attach Clk to FlexComm
+	#if defined(I2C0)
+	if (me->i2c == I2C0)	{ return CLOCK_GetFlexCommClkFreq(0U); }
+	#endif
+	#if defined(I2C1)
+	if (me->i2c == I2C1)	{ return CLOCK_GetFlexCommClkFreq(1U); }
+	#endif
+	#if defined(I2C2)
+	if (me->i2c == I2C2)	{ return CLOCK_GetFlexCommClkFreq(2U); }
+	#endif
+	#if defined(I2C3)
+	if (me->i2c == I2C3)	{ return CLOCK_GetFlexCommClkFreq(3U); }
+	#endif
+	#if defined(I2C4)
+	if (me->i2c == I2C4)	{ return CLOCK_GetFlexCommClkFreq(4U); }
+	#endif
+	#if defined(I2C5)
+	if (me->i2c == I2C5)	{ return CLOCK_GetFlexCommClkFreq(5U); }
+	#endif
+	#if defined(I2C6)
+	if (me->i2c == I2C6)	{ return CLOCK_GetFlexCommClkFreq(6U); }
+	#endif
+	#if defined(I2C7)
+	if (me->i2c == I2C7)	{ return CLOCK_GetFlexCommClkFreq(7U); }
+	#endif
+
+	//Assert
+	ALX_I2C_ASSERT(false); // We shouldn't get here
+	return 0xFFFFFFFF;
 }
 static status_t AlxI2c_MasterStart(AlxI2c* me, I2C_Type* base, uint8_t address, i2c_direction_t direction, uint16_t timeout)
 {
