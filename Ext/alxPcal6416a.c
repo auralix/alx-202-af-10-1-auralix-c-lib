@@ -88,8 +88,8 @@ Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me)
 	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_AlxI2c_Init"); return status; }
 
 	// #4 Check if slave ready
-	//status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 3, 1000);
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
+	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 3, 1000);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
 
 	// #5 Set register struct values to default
 	AlxPcal6416a_RegStruct_SetValToDefault(me);
