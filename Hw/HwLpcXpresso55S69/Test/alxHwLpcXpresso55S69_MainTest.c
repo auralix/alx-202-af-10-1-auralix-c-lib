@@ -89,7 +89,7 @@ void AlxIoPinIrq_Foreground_Callback_Pin0()
 	vTaskNotifyGiveFromISR(T11_TraceIsrHandle, &taskWokenNotify);
 	portYIELD_FROM_ISR(taskWokenNotify);
 	#else
-	AlxTrace_WriteStr(&alxTrace, "ReiseEdge\r\n");
+	AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
 	#endif
 }
 void AlxIoPinIrq_Foreground_Callback_Pin1()
@@ -101,9 +101,9 @@ void AlxIoPinIrq_Foreground_Callback_Pin1()
 void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me)
 {
 	(void)me;
-	me->reg._06h_Configuration_0.val.P0_0 = false;	// MF: P0_0 set ad Output
-	me->reg._06h_Configuration_0.val.P0_1 = false;	// MF: P0_1 set ad Output
-	me->reg._06h_Configuration_0.val.P0_2 = true;	// MF: P0_2 set ad Input
+	me->reg._06h_Configuration_0.val.P0_0 = false;	// MF: P0_0 set as Output
+	me->reg._06h_Configuration_0.val.P0_1 = false;	// MF: P0_1 set as Output
+	me->reg._06h_Configuration_0.val.P0_2 = true;	// MF: P0_2 set as Input
 }
 #endif
 

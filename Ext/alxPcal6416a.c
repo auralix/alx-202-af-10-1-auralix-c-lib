@@ -38,23 +38,17 @@ void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me);
 void AlxPcal6416a_Ctor
 (
 	AlxPcal6416a* me,
-	AlxIoPin** ioPinArr,
-	AlxPcal6416a_PortPin* portPinArr,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
-	uint8_t numOfIoPins,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
 )
 {
 	// Objects - External
-	me->ioPinArr = ioPinArr;
 	me->i2c = i2c;
 
 	// Parameters
-	me->portPinArr = portPinArr;
-	me->numOfIoPins = numOfIoPins;
 	me->i2cAddr = i2cAddr;
 	me->i2cCheckWithRead = i2cCheckWithRead;
 	me->i2cNumOfTries = i2cNumOfTries;
@@ -88,7 +82,7 @@ Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me)
 	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_AlxI2c_Init"); return status; }
 
 	// #4 Check if slave ready
-	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 3, 1000);
+	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
 
 	// #5 Set register struct values to default
@@ -99,7 +93,7 @@ Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me)
 
 	// #7 Write all registers
 	status = AlxPcal6416a_Reg_WriteAll(me);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_Reg_WriteAll"); return status;}
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_Reg_WriteAll"); return status; }
 
 	// #8 Set isInit
 	me->isInit = true;
@@ -116,12 +110,12 @@ Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me)
 	// #2 Prepare Variable
 	Alx_Status status = Alx_Err;
 
-	// #3 Set register struct values to zero
-	AlxPcal6416a_RegStruct_SetValToZero(me);
-
-	// #4 DeInit I2c
+	// #3 DeInit I2c
 	status = AlxI2c_DeInit(me->i2c);
 	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_AlxI2c_DeInit"); return status; }
+
+	// #4 Reset isInit
+	me->isInit = false;
 
 	// #5 Return OK
 	return Alx_Ok;
@@ -151,49 +145,6 @@ Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me)
 
 	// #5 Return OK
 	return Alx_Ok;
-}
-void AlxPcal6416a_IoPin_SetMode(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, AlxPcal6416a_Mode mode)
-{
-	// #1 Assert
-	ALX_PCAL6416A_ASSERT(me->isInit == true);
-	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
-
-	// #2.1 Write if Port0 is used
-	if (!(pin & (1 << 3)))
-	{
-		if (mode == AlxPcal6416a_Inact)
-		{
-			me->reg._46h_PullUpPullDownEn_0.val.raw &= ~(1U << pin);	// MF: Disables Pull-up/pull-down
-			return;
-		}
-		else
-		{
-			me->reg._46h_PullUpPullDownEn_0.val.raw |= 1U << pin;		// MF: Enables Pull-up/pull-down
-
-			if (mode == AlxPcal6416a_PullUp)	{ me->reg._48h_PullUpPullDownSel_0.val.raw |=  (1U << pin);	return; }	// MF: Sets PullUp
-			else								{ me->reg._48h_PullUpPullDownSel_0.val.raw &= ~(1U << pin);	return; }	// MF: Sets PullDown
-		}
-	}
-
-	// #2.2 Write if Port1 is used
-	if (pin & (1 << 3))
-	{
-		if (mode == AlxPcal6416a_Inact)
-		{
-			me->reg._47h_PullUpPullDownEn_1.val.raw &= ~(1U << pin); // MF: Disables Pull-up/pull-down
-			return;
-		}
-		else
-		{
-			me->reg._47h_PullUpPullDownEn_1.val.raw |= (1U << pin); // MF: Enables Pull-up/pull-down
-
-			if (mode == AlxPcal6416a_PullUp)	{ me->reg._49h_PullUpPullDownSel_1.val.raw |=  (1U << pin);	return;}	// MF: Sets PullUp
-			else								{ me->reg._49h_PullUpPullDownSel_1.val.raw &= ~(1U << pin);	return;}	// MF: Sets PullDown
-		}
-	}
-
-	// #3 Asset
-	ALX_PCAL6416A_ASSERT(false); // We sould not get here
 }
 bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_PortPin pin)
 {
@@ -287,6 +238,7 @@ void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_PortPin pin)
 	// #3 Asset
 	ALX_PCAL6416A_ASSERT(false);	// We sould not get here
 }
+
 
 //******************************************************************************
 // Private Functions
@@ -520,3 +472,66 @@ ALX_WEAK void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me)
 	ALX_PCAL6416A_TRACE("Define 'AlxAdxl355_RegStruct_SetVal' function in your application.");
 	ALX_PCAL6416A_ASSERT(false);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//void AlxPcal6416a_IoPin_SetMode(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, AlxPcal6416a_Mode mode)
+//{
+//	// #1 Assert
+//	ALX_PCAL6416A_ASSERT(me->isInit == true);
+//	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
+//
+//	// #2.1 Write if Port0 is used
+//	if (!(pin & (1 << 3)))
+//	{
+//		if (mode == AlxPcal6416a_Inact)
+//		{
+//			me->reg._46h_PullUpPullDownEn_0.val.raw &= ~(1U << pin);	// MF: Disables Pull-up/pull-down
+//			return;
+//		}
+//		else
+//		{
+//			me->reg._46h_PullUpPullDownEn_0.val.raw |= 1U << pin;		// MF: Enables Pull-up/pull-down
+//
+//			if (mode == AlxPcal6416a_PullUp)	{ me->reg._48h_PullUpPullDownSel_0.val.raw |=  (1U << pin);	return; }	// MF: Sets PullUp
+//			else								{ me->reg._48h_PullUpPullDownSel_0.val.raw &= ~(1U << pin);	return; }	// MF: Sets PullDown
+//		}
+//	}
+//
+//	// #2.2 Write if Port1 is used
+//	if (pin & (1 << 3))
+//	{
+//		if (mode == AlxPcal6416a_Inact)
+//		{
+//			me->reg._47h_PullUpPullDownEn_1.val.raw &= ~(1U << pin); // MF: Disables Pull-up/pull-down
+//			return;
+//		}
+//		else
+//		{
+//			me->reg._47h_PullUpPullDownEn_1.val.raw |= (1U << pin); // MF: Enables Pull-up/pull-down
+//
+//			if (mode == AlxPcal6416a_PullUp)	{ me->reg._49h_PullUpPullDownSel_1.val.raw |=  (1U << pin);	return;}	// MF: Sets PullUp
+//			else								{ me->reg._49h_PullUpPullDownSel_1.val.raw &= ~(1U << pin);	return;}	// MF: Sets PullDown
+//		}
+//	}
+//
+//	// #3 Asset
+//	ALX_PCAL6416A_ASSERT(false); // We sould not get here
+//}

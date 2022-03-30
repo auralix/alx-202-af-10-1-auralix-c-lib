@@ -964,9 +964,6 @@ typedef struct
 	// Objects
 	AlxHwLpcXpresso55S69_Main alxHwLpcXpresso55S69_Main;
 
-	// Semaphores
-	SemaphoreHandle_t Mutex;
-
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
@@ -1170,7 +1167,7 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T08_ModuleSetReset
 		AlxDelay_ms(80);
 	}
 }
-	static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T08_ModuleWrite(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T08_ModuleWrite(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
 {
 	// Init I2c
 	AlxPcal6416a_Init(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);

@@ -20,15 +20,13 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxTimSw.h"
 #include "alxI2c.h"
-#include "alxI2s.h"
 
 
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PCAL6416A_FILE "alxPcal6416a"
+#define ALX_PCAL6416A_FILE "alxPcal6416a.h"
 
 // Assert //
 #if defined(_ALX_PCAL6416A_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -71,7 +69,6 @@ typedef union
 	};
 	uint8_t raw;
 } AlxPcal6416a_RegVal_00h_InputPort_0;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -106,7 +103,6 @@ typedef union
 	};
 	uint8_t raw;
 } AlxPcal6416a_RegVal_02h_OutputPort_0;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -141,7 +137,6 @@ typedef union
 	};
 	uint8_t raw;
 } AlxPcal6416a_RegVal_04h_PolarityInversion_0;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -176,7 +171,6 @@ typedef union
 	};
 	uint8_t raw;
 } AlxPcal6416a_RegVal_06h_Configuration_0;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -266,7 +260,6 @@ typedef union
 	};
 	uint8_t raw;
 } AlxPcal6416a_RegVal_44h_InputLatch_0;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -301,7 +294,6 @@ typedef union
 	};
 	uint8_t raw;
 } AlxPcal6416a_RegVal_46h_PullUpPullDownEn_0;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -336,7 +328,6 @@ typedef union
 	};
 	uint8_t raw;
 } AlxPcal6416a_RegVal_48h_PullUpPullDownSel_0;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -371,7 +362,6 @@ typedef union
 	};
 	uint8_t raw;
 } AlxPcal6416a_RegVal_4Ah_IrqMask_0;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -406,7 +396,6 @@ typedef union
 	};
 	uint8_t raw;
 } AlxPcal6416a_RegVal_4Ch_IrqStatus_0;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -452,28 +441,24 @@ typedef struct
 	uint8_t len;
 	AlxPcal6416a_RegVal_00h_InputPort_0 val;
 } AlxPcal6416a_Reg_00h_InputPort_0;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPcal6416a_RegVal_01h_InputPort_1 val;
 } AlxPcal6416a_Reg_01h_InputPort_1;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPcal6416a_RegVal_02h_OutputPort_0 val;
 } AlxPcal6416a_Reg_02h_OutputPort_0;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPcal6416a_RegVal_03h_OutputPort_1 val;
 } AlxPcal6416a_Reg_03h_OutputPort_1;
-
 typedef struct
 {
 	uint8_t addr;
@@ -498,7 +483,6 @@ typedef struct
 	uint8_t len;
 	AlxPcal6416a_RegVal_07h_Configuration_1 val;
 } AlxPcal6416a_Reg_07h_Configuration_1;
-
 typedef struct
 {
 	uint8_t addr;
@@ -528,7 +512,7 @@ typedef struct
 	uint8_t addr;
 	uint8_t len;
 	AlxPcal6416a_RegVal_44h_InputLatch_0 val;
-}  AlxPcal6416a_Reg_44h_InputLatch_0;
+} AlxPcal6416a_Reg_44h_InputLatch_0;
 typedef struct
 {
 	uint8_t addr;
@@ -565,28 +549,24 @@ typedef struct
 	uint8_t len;
 	AlxPcal6416a_RegVal_4Ah_IrqMask_0 val;
 } AlxPcal6416a_Reg_4Ah_IrqMask_0;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPcal6416a_RegVal_4Bh_IrqMask_1 val;
 } AlxPcal6416a_Reg_4Bh_IrqMask_1;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPcal6416a_RegVal_4Ch_IrqStatus_0 val;
 } AlxPcal6416a_Reg_4Ch_IrqStatus_0;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPcal6416a_RegVal_4Dh_IrqStatus_1 val;
 } AlxPcal6416a_Reg_4Dh_IrqStatus_1;
-
 typedef struct
 {
 	uint8_t addr;
@@ -654,7 +634,6 @@ typedef enum
 	AlxPcal6416a_PullDown = 0b01,
 	AlxPcal6416a_Inact = 0b10,
 } AlxPcal6416a_Mode;
-
 typedef struct
 {
 	// Objects - External
@@ -684,11 +663,8 @@ typedef struct
 void AlxPcal6416a_Ctor
 (
 	AlxPcal6416a* me,
-	AlxIoPin** ioPinArr,
-	AlxPcal6416a_PortPin* portPinArr,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
-	uint8_t numOfIoPins,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
@@ -701,7 +677,6 @@ void AlxPcal6416a_Ctor
 Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me);
 Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me);
 Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me);
-void AlxPcal6416a_IoPin_SetMode(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, AlxPcal6416a_Mode mode);	// MF: Set PullUp or PulDown
 bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
 void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, bool val);
 void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
@@ -714,3 +689,24 @@ void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
 #endif
 
 #endif // ALX_PCAL6416A_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//void AlxPcal6416a_IoPin_SetMode(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, AlxPcal6416a_Mode mode);	// MF: Set PullUp or PulDown

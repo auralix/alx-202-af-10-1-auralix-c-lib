@@ -73,7 +73,7 @@ extern "C" {
 #include <alxNtcg103jf103ft1s.h>
 #include <alxPca9430.h>
 #include <alxPca9431.h>
-#include "alxPcal6416a.h"
+#include <alxPcal6416a.h>
 #include <alxTmp1075.h>
 #include <alxTpa3255.h>
 #include <alxVnh7040.h>
@@ -106,7 +106,7 @@ typedef struct
 	//PIO0_10	- Unused
 	//PIO0_11	- SWD_CLK
 	//PIO0_12	- SWD_IO
-	AlxIoPin do_P0_13_I2C_SDA;
+	AlxIoPin io_P0_13_I2C_SDA;
 	AlxIoPin do_P0_14_I2C_SCL;
 	//PIO0_15	- Unused
 	AlxIoPin ai_P0_16_ADC_CH8;
@@ -263,7 +263,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	//PIO0_10	- Unused
 	//PIO0_11	- SWD_CLK
 	//PIO0_12	- SWD_IO
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_13_I2C_SDA,		0,	13,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	); // MF: Inited in I2c
+	AlxIoPin_Ctor(&me->alxIoPin.io_P0_13_I2C_SDA,		0,	13,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	); // MF: Inited in I2c
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_14_I2C_SCL,		0,	14,	AlxIoPin_Func_1,		IOCON_MODE_PULLUP,	true,	false,	true,	false	); // MF: Inited in I2c
 	//PIO0_15	- Unused
 	AlxIoPin_Ctor(&me->alxIoPin.ai_P0_16_ADC_CH8,		0,	16,	AlxIoPin_Func_0_GPIO,	IOCON_MODE_INACT,	false,	false,	false,	false	);
@@ -441,7 +441,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		&me->alxI2c,
 		I2C1,
 		&me->alxIoPin.do_P0_14_I2C_SCL,
-		&me->alxIoPin.do_P0_13_I2C_SDA,
+		&me->alxIoPin.io_P0_13_I2C_SDA,
 		AlxI2c_Clk_McuLpc55S6x_BitRate_400kHz
 	);
 
@@ -458,14 +458,11 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 	AlxPcal6416a_Ctor
 	(
 		&me->alxPcal6416a,
-		me->pcal6416aIoPinArr,
-		me->pcal6416aPortPinArr,
 		&me->alxI2c,
-		0b01000000,
-		ALX_ARR_LEN(me->pcal6416aPortPinArr),
-		true,
-		5,
-		100
+		0b01000000,		// i2cAddr
+		true,			// i2cCheckWithRead
+		3,				// i2cNumOfTries
+		1000			// i2cTimeout_ms
 	);
 
 	// Info
