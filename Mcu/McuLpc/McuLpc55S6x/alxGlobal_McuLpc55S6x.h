@@ -39,7 +39,7 @@ extern "C" {
 #include "fsl_ctimer.h"
 #include "fsl_dma.h"
 #include "fsl_flexcomm.h"
-#include "fsl_fro_calib.h"
+//#include "fsl_fro_calib.h"	// TV: LPC55S66 doesn't support this module, LPC55S69 does
 #include "fsl_gint.h"
 #include "fsl_gpio.h"
 #include "fsl_hashcrypt.h"

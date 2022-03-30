@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file alxPca9431.h
-  * @brief Auralix C Library - ALX PCA9431 Module
+  * @brief Auralix C Library - ALX NFC WLC Power Receiver with LDO Output PCA9431 Module
   * @version $LastChangedRevision: 5079 $
   * @date $LastChangedDate: 2021-05-12 19:54:08 +0200 (Wed, 12 May 2021) $
   ******************************************************************************
@@ -26,7 +26,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PCA9431_FILE "alxPca9431"
+#define ALX_PCA9431_FILE "alxPca9431.h"
 
 // Assert //
 #if defined(_ALX_PCA9431_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -928,217 +928,186 @@ typedef struct
 	uint8_t len;
 	AlxPca9431_RegVal_00h_DeviceId val;
 } AlxPca9431_Reg_00h_DeviceId;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_01h_SystemInt val;
 } AlxPca9431_Reg_01h_SystemInt;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_02h_SystemIntMask val;
 } AlxPca9431_Reg_02h_SystemIntMask;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_03h_VRectInt val;
 } AlxPca9431_Reg_03h_VRectInt;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_04h_VRectIntMask val;
 } AlxPca9431_Reg_04h_VRectIntMask;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_05h_VOutLdoInt val;
 } AlxPca9431_Reg_05h_VOutLdoInt;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_06h_VOutLdoIntMask val;
 } AlxPca9431_Reg_06h_VOutLdoIntMask;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_07h_VOutLdo val;
 } AlxPca9431_Reg_07h_VOutLdo;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_08h_VRectThd val;
 } AlxPca9431_Reg_08h_VRectThd;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_09h_VRectOvw val;
 } AlxPca9431_Reg_09h_VRectOvw;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_0Ah_TempThd val;
 } AlxPca9431_Reg_0Ah_TempThd;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_0Bh_WatchdogSoftStartEnMcu val;
 } AlxPca9431_Reg_0Bh_WatchdogSoftStartEnMcu;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_0Ch_VaractorDac val;
 } AlxPca9431_Reg_0Ch_VaractorDac;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_0Dh_AdcControl val;
 } AlxPca9431_Reg_0Dh_AdcControl;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_0Eh_AdcSampleEn val;
 } AlxPca9431_Reg_0Eh_AdcSampleEn;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_0Fh_VPwrLdoConf val;
 } AlxPca9431_Reg_0Fh_VPwrLdoConf;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_10h_Rxir_Conf val;
 } AlxPca9431_Reg_10h_Rxir_Conf;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_20h_OpcLdoSetLock val;
 } AlxPca9431_Reg_20h_OpcLdoSetLock;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_21h_VOutLdoSetOCP val;
 } AlxPca9431_Reg_21h_VOutLdoSetOCP;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_30h_VRectAdcH val;
 } AlxPca9431_Reg_30h_VRectAdcH;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_31h_VRectAdcL val;
 } AlxPca9431_Reg_31h_VRectAdcL;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_32h_VTuneAdcH val;
 } AlxPca9431_Reg_32h_VTuneAdcH;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_33h_VTuneAdcL val;
 } AlxPca9431_Reg_33h_VTuneAdcL;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_34h_VOutAdcH val;
 } AlxPca9431_Reg_34h_VOutAdcH;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_35h_VOutAdcL val;
 } AlxPca9431_Reg_35h_VOutAdcL;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_36h_IOutAdcH val;
 } AlxPca9431_Reg_36h_IOutAdcH;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_37h_IOutAdcL val;
 } AlxPca9431_Reg_37h_IOutAdcL;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_38h_IRectAdcH val;
 } AlxPca9431_Reg_38h_IRectAdcH;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_39h_IRectAdcL val;
 } AlxPca9431_Reg_39h_IRectAdcL;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_3Ah_ChipTempAdcMeas val;
 } AlxPca9431_Reg_3Ah_ChipTempAdcMeas;
-
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxPca9431_RegVal_3Bh_NTCAdcH val;
 } AlxPca9431_Reg_3Bh_NTCAdcH;
-
 typedef struct
 {
 	uint8_t addr;
@@ -1192,12 +1161,8 @@ typedef struct
 //******************************************************************************
 typedef struct
 {
-	// Parameters - Const
-
 	// Objects - External
 	AlxI2c* i2c;
-	AlxIoPin* do_SleepEn;	// enable / disable sleep modo for PCA9431
-	AlxIoPin* di_Interrupt;	// Pca9431 interrupt
 
 	// Parameters
 	uint8_t i2cAddr;
@@ -1222,7 +1187,6 @@ void AlxPca9431_Ctor
 	AlxPca9431* me,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
-	AlxIoPin* do_SleepEn,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
@@ -1234,13 +1198,11 @@ void AlxPca9431_Ctor
 //******************************************************************************
 Alx_Status AlxPca9431_Init(AlxPca9431* me);
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me);
-Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC
-Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A); // 10 bit ADC
-Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC
-Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A); // 10 bit ADC
-Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC); // On chip temperature (-43°C ... +156°C)
-Alx_Status AlxPca9431_VTune_SetVoltage_V(AlxPca9431* me, float* voltage_V); // 0-3.3V 5 bit DAC - TODO
-Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V); // 10 bit ADC - TODO
+Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V);	// 10 bit ADC
+Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A);	// 10 bit ADC
+Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V);		// 10 bit ADC
+Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A);		// 10 bit ADC
+Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC);	// On chip temperature (-43°C ... +156°C)
 Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me);
 Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
 
@@ -1249,7 +1211,7 @@ Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
 }
 #endif
 
-#endif // ALX_ADAU1961_H
+#endif // ALX_PCA9431_H
 
 
 
@@ -1276,6 +1238,14 @@ Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
 
 
 
+
+
+
+
+
+
+//Alx_Status AlxPca9431_VTune_SetVoltage_V(AlxPca9431* me, float* voltage_V);		// 0-3.3V 5 bit DAC - TODO
+//Alx_Status AlxPca9431_VTune_GetVoltage_V(AlxPca9431* me, float* voltage_V);		// 10 bit ADC - TODO
 
 //Alx_Status AlxPca9431_LdoVout_SetVoltage_V(AlxPca9431* me, AlxPca9431_0x07_VOutLdo VoutLdoxV); // 3,3V or 5V => write:  VoutLdo3V3 or. VoutLdo5V
 

@@ -1,6 +1,12 @@
 # ALX HW LPCXpresso55S69 Development Board Home
 ---
-MF: - Pin PIO1_7 (LED Green) is not routed to P18 position 7 as it says in *LPCXpresso55S69_Board_Schematic_RevA2_dec4.pdf*
+- MF: - Pin PIO1_7 (LED Green) is not routed to P18 position 7 as it says in *LPCXpresso55S69_Board_Schematic_RevA2_dec4.pdf*
+- If you __erase FLASH__, with J-Flash Lite, then you can not connect with VisualGDB standard settings, also J-Flash Lite stops working
+    - You need to __disable connect under reset__ in VisualGDB settings, then MCU becomes alive
+    - After that, you can turn on back this feature, it seems when some code is on FLASH, everything works OK
+
+![Img_14](Img_14.png)
+
 
 ## Youtube
 ---

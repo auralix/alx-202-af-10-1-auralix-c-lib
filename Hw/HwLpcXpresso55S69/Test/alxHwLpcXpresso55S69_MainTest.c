@@ -11,7 +11,6 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include <alxConfig.h>
 #include <alxHwLpcXpresso55S69_MainTest.h>
 
 
@@ -24,7 +23,7 @@
 //******************************************************************************
 // Variables
 //******************************************************************************
-AlxHwLpcXpresso55S69_MainTest alxHwLpcXpresso55S69_MainTest = { 0 };
+AlxHwLpcXpresso55S69_MainTest alxHwLpcXpresso55S69_MainTest = {0};
 
 
 //******************************************************************************
@@ -41,7 +40,6 @@ void SysTick_Handler(void)
 	AlxTick_Inc_ms(&alxTick);
 }
 #endif
-
 
 
 //******************************************************************************
@@ -114,5 +112,6 @@ void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me)
 ///-------
 #if defined(ALX_TEST_TV)
 #endif
+
 
 #endif // #if defined(ALX_HW_LPC_XPRESSO_55S69_C_TEST)
