@@ -116,7 +116,7 @@ typedef struct
 	//P0_20	- Unused
 	//P0_21	- Unused
 	AlxIoPin do_P0_22_LED204_GR;
-	//P0_22 DBG_UART_TX	-> ALX Trace Handle	// JS: commented Mf:used it for ALX Trace,		AlxIoPin do_P0_22_LED204_GR;
+	//P0_22 - Unused
 	AlxIoPin do_P0_23_LED203_GR;
 	AlxIoPin do_P0_24_LED202_GR_PWM1;
 	AlxIoPin do_P0_25_LED201_GR_PWM2;

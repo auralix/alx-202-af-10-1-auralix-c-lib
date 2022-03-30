@@ -51,7 +51,7 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_19_LED200_GR,			0,	19,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
 	//P0_20	- Unused
 	//P0_21	- Unused
-	//P0_22 DBG_UART_TX	-> ALX Trace Handle																											// JS: Mf used it for UART_TX AlxTrace
+	//P0_22 - Unused
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED204_GR, 		0,	22, AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_23_LED203_GR, 		0,	23, AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
 	AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_LED202_GR_PWM1,	0,	24,	AlxIoPin_Func_Swm_T0_MAT_CHN1,	IOCON_MODE_INACT,	false,	false,	false	);	// JS: Mf used it for Pwm
@@ -94,8 +94,8 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 	(
 		&alxTrace,
 		0,
-		4,			//22,			// JS: commented, Mf used it for UART_TX AlxTrace
-		USART1,		//USART0,		// JS: commented, Mf used it because had UART_TX AlxTrace on pin 22
+		4,
+		USART1,
 		AlxGlobal_BaudRate_115200
 	);
 
@@ -168,7 +168,7 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 		I2C0,
 		&me->alxIoPin.do_P0_17_I2C0_SCL,
 		&me->alxIoPin.io_P0_16_I2C0_SDA,
-		AlxI2c_Clk_McuLpc80x_BitRate_400kHz	//	AlxI2c_Clk_McuLpc80x_BitRate_100kHz_I2cFuncClk_15MHz	// TV: Can be there 400kHz for PCA? JS: yes for Pca9431,  not tested yet for crn120
+		AlxI2c_Clk_McuLpc80x_BitRate_400kHz
 	);
 
 
