@@ -177,7 +177,16 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 			continue;
 		}
 
-		// #4.2 Send Stop Condition
+		// #4.2 Read Memory
+		status = AlxI2c_MasterReadBlocking(me, me->i2c, data, len, kI2C_TransferDefaultFlag, timeout_ms); // MF: Read data, then Stop
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrFlsRead");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
+
+		// #4.3 Send Stop Condition
 		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
 		if (status != kStatus_Success)
 		{
@@ -186,7 +195,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 			continue;
 		}
 
-		// #4.3 Return Ok
+		// #4.4 Return Ok
 		return Alx_Ok;
 	}
 
@@ -344,7 +353,16 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 			continue;
 		}
 
-		// #4.2 Send Stop Condition
+		// #4.2 Write Slave Address
+		status = AlxI2c_MasterWriteBlocking(me, me->i2c, data, len, kI2C_TransferDefaultFlag, timeout_ms);
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrWriteSlaveAddr");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
+
+		// #4.3 Send Stop Condition
 		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
 		if (status != kStatus_Success)
 		{
@@ -353,7 +371,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 			continue;
 		}
 
-		// #4.3 Return Ok
+		// #4.4 Return Ok
 		return Alx_Ok;
 	}
 
@@ -512,6 +530,7 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 
 	// #2 Prepare variables
 	status_t status = kStatus_Fail;
+	Alx_Status alxStat = Alx_Err;
 	uint32_t flag = 0;
 
 	// #3 Start Timeout
@@ -530,8 +549,13 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		}
 
 		// #4.2 Get status flag and check if NACK was return
-		//flag = I2C_GetStatusFlags(me->i2c);
-		//if (flag & (uint32_t)kStatus_I2C_Addr_Nak) { return AlxI2c_ErrNack; }	// MF: To treba preverit kr ma drugače kot LPC55S69. "kI2C_MasterStartStopErrorFlag" might be used instead
+		flag = I2C_GetStatusFlags(me->i2c);
+		if ((flag & (1 << 1)) && (flag & (1 << 2)))	// MF: Check 2nd and 3rd bit of I2C Status register. If this is true, NACK was returned
+		{
+			status = kStatus_Fail;
+			alxStat = AlxI2c_ErrNack;
+			continue;
+		}
 
 		// #4.3 Send Stop Condition
 		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
@@ -549,6 +573,12 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 	// #5 If we are here, the number of tries error occured
 	if (status != kStatus_Success)
 	{
+		if (alxStat == AlxI2c_ErrNack)
+		{
+			ALX_I2C_TRACE("ErrNack");
+			return AlxI2c_ErrNack;
+		}
+
 		ALX_I2C_TRACE("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
 	}
