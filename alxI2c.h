@@ -30,7 +30,7 @@ extern "C" {
 #include "alxI2c_McuLpc80x.h"
 
 #elif defined(ALX_LPC55S6X)
-# include "alxI2c_McuLpc55S6x.h"
+#include "alxI2c_McuLpc55S6x.h"
 
 #else
 typedef struct { bool dummy; } AlxI2c;
