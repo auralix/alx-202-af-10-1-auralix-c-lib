@@ -6,9 +6,9 @@
 ## Modules
 ---
 - Ext
-    - [alxCrn120 - ALX <description_TODO> CRN120 Module](Ext/alxWiki_alxCrn120.md)
-    - [alxPca9431 - ALX <description_TODO> PCA9431 Module](Ext/alxWiki_alxPca9431.md)
-	- [alxPcal6416a - ALX <description_TODO> PCAL6416A Module](Ext/alxWiki_alxPcal6416a.md)
+    - [alxCrn120 - ALX NFC WLC Communication Receiver CRN120 Module](Ext/alxWiki_alxCrn120.md)
+    - [alxPca9431 - ALX NFC WLC Power Receiver with LDO Output PCA9431 Module](Ext/alxWiki_alxPca9431.md)
+	- [alxPcal6416a - ALX IO Expander PCAL6416A Module](Ext/alxWiki_alxPcal6416a.md)
 - Hw
     - [HwLpcXpresso55S69](Hw/HwLpcXpresso55S69/alxWiki_alxHwLpcXpresso55S69_Home.md)
         - Test

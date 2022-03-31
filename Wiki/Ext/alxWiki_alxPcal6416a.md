@@ -1,4 +1,4 @@
-# Auralix C Library - ALX <description_TODO> PCAl6416A Module  
+# Auralix C Library - ALX IO Expander PCAl6416A Module  
 ---
 ## General
 - Func "Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me)" only handles reading Input registers InputPort_0 and InputPort_1 and writing to Output registers OutputPort_0 and OutputPort_1

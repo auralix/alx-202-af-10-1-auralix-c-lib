@@ -1,4 +1,4 @@
-# Auralix C Library - ALX <description_TODO> CRN120 Module  
+# Auralix C Library - ALX NFC WLC Communication Receiver CRN120 Module  
 ---
 ## Supply of Crn120  
 - CRN120 must be supplied with 3,3V on pin VCC  
