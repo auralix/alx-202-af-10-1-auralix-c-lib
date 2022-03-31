@@ -23,8 +23,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
-#if defined(ALX_TEST_MF)
+#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST) && defined(ALX_TEST_MF)
 
 
 //******************************************************************************
@@ -57,21 +56,17 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_T01_Led(AlxH
 	(void)me;
 
 	// Init
-	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED205_RD);
-	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED200_GR);
-	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED204_GR);
-	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED203_GR);
-	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_24_LED202_GR);
-	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_25_LED201_GR);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED_RD);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED_GR);
+	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED_GR);
+	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED_GR);
 
 	while (1)
 	{
-		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED205_RD);
-		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED200_GR);
-		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED204_GR);
-		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED203_GR);
-		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_24_LED202_GR);
-		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_25_LED201_GR);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED_RD);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED_GR);
+		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED_GR);
+		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED_GR);
 
 		AlxDelay_ms(500);
 	}
@@ -173,7 +168,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Init(AlxHwNf
 	AlxTrace_Init(&alxTrace);
 
 	// IoPinIrq
-	//AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIrqPin_IRQ1);	// MF: IoPinIrq is always Inited
+	//AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoIrqPin_di_P0_9_PCA943X_nINT_IRQ1);	// MF: IoPinIrq is always Inited
 
 	// Info
 	me->isInit = true;
@@ -218,13 +213,13 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T01_Led(Al
 	(void)me;
 
 	// Init
-	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED205_RD);
-	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED200_GR);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED_RD);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED_GR);
 
 	while (1)
 	{
-		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED205_RD);
-		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED200_GR);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED_RD);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED_GR);
 
 		AlxDelay_ms(200);
 	}
@@ -415,7 +410,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Ctor(AlxHw
 static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Init(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120* me)
 {
 	// Init
-	AlxHwNfcWlcListenerV3_5b_Main_Init(&me->alxHwNfcWlcListenerV3_5b_Main);
+	AlxClk_Init(&alxClk);
+	AlxTrace_Init(&alxTrace);
 
 	// Info
 	me->isInit = true;
@@ -431,8 +427,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Run(AlxHwN
 }
 
 
-#endif // #if defined(ALX_TEST_MF)
-#endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
+#endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST) && defined(ALX_TEST_MF)
 
 #ifdef __cplusplus
 }

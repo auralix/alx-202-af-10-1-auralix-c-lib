@@ -23,16 +23,11 @@
 //******************************************************************************
 // Variables
 //******************************************************************************
-AlxHwNfcWlcListenerV3_5b_MainTest alxHwNfcWlcListenerV3_5b_MainTest = { 0 };
+AlxHwNfcWlcListenerV3_5b_MainTest alxHwNfcWlcListenerV3_5b_MainTest = {0};
 
 
 //******************************************************************************
-// IRQ Handlers
-//******************************************************************************
-
-
-//******************************************************************************
-// Auralix C Library - Weak Functions
+// IRQ Handlers & Weak Functions
 //******************************************************************************
 //------------------------------------------------------------------------------
 // Gh
@@ -86,7 +81,7 @@ void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 	//me->reg._04h_VRECT_INT_MASK.val.VRECT_OVW_MSK = VRectOvWarnIntMask_NotTrig;			// JS: commented
 	me->reg._06h_VOUTLDO_INT_MASK.val.VOUT_SHORT_INT_MASK = VOutLdoShortInt_NotMasked;
 }
-void AlxIoPinIrq_Foreground_Callback_Pin3(void)
+void AlxIoPinIrq_Foreground_Callback_Pin3()
 {
 	AlxTrace_WriteFormat(&alxTrace, "************************	INTERRUPT	*************************\r\n");
 }

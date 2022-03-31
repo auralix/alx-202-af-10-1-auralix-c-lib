@@ -56,21 +56,17 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_T01_Led(AlxHwNfcW
 	(void)me;
 
 	// Init
-	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED205_RD);
-	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED200_GR);
-	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED204_GR);
-	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED203_GR);
-	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_24_LED202_GR_PWM1);
-	//AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_25_LED201_GR_PWM2);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED_RD);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED_GR);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED_GR);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED_GR);
 
 	while (1)
 	{
-		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED205_RD);
-		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED200_GR);
-		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED204_GR);
-		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED203_GR);
-		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_24_LED202_GR_PWM1);
-		//AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_25_LED201_GR_PWM2);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_18_LED_RD);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_19_LED_GR);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_22_LED_GR);
+		AlxIoPin_Toggle(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_23_LED_GR);
 
 		AlxDelay_ms(500);
 	}
@@ -172,7 +168,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Init(AlxHwNfcWlcL
 	AlxTrace_Init(&alxTrace);
 
 	// IoPinIrq
-	AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIrqPin_IRQ1);	// MF: IoPinIrq is always Inited
+	AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoIrqPin_di_P0_9_PCA943X_nINT_IRQ1);	// MF: IoPinIrq is always Inited
 
 	// Info
 	me->isInit = true;
@@ -306,7 +302,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Init(AlxHwNfcWlcL
 	AlxTrace_Init(&alxTrace);
 
 	// IoPinIrq
-	AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIrqPin_IRQ1);
+	AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoIrqPin_di_P0_9_PCA943X_nINT_IRQ1);
 
 	// AlxPca9431
 	AlxPca9431_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431);

@@ -92,17 +92,16 @@ typedef struct
 	//------------------------------------------------------------------------------
 	// Port 0
 	//------------------------------------------------------------------------------
-	AlxIoPin di_P0_0_UART_RX;
+	AlxIoPin di_P0_0_UART_RX;	// TV: Used as DBG output pin
 	//P0_1	- Unused
 	//P0_2	- SWD_IO
 	//P0_3	- SWD_CLK
-	//P0_4 DBG_UART_TX	-> ALX Trace Handle
-	//P0_5	- Unused
+	//P0_4	- DBG_UART_TX -> ALX Trace Handle
+	//P0_5	- nRST
 	//P0_6	- Unused
 	AlxIoPin di_P0_7_CRN_FD_IRQ2;
-	AlxIoPin do_P0_8_PCA943X_EN;			// JS: PCA943X_EN -- Pca9431 sleep
-	AlxIoPin ai_P0_9_ADC_CH4;				// JS: commented Mf needed this for adc
-	//AlxIoPin di_P0_9_PCA943X_INT_IRQ1; // JS: PCA943X_I\N\T\
+	AlxIoPin do_P0_8_PCA943X_EN;
+	AlxIoPin di_P0_9_PCA943X_nINT_IRQ1;	// TV: When testing ADC use this: AlxIoPin ai_P0_9_ADC_CH4;
 	//P0_10	- Unused
 	AlxIoPin ao_P0_11_CRN_VCC;
 	//P0_12	- Unused
@@ -111,15 +110,15 @@ typedef struct
 	//P0_15	- Unused
 	AlxIoPin io_P0_16_I2C0_SDA;
 	AlxIoPin do_P0_17_I2C0_SCL;
-	AlxIoPin do_P0_18_LED205_RD;
-	AlxIoPin do_P0_19_LED200_GR;
+	AlxIoPin do_P0_18_LED_RD;
+	AlxIoPin do_P0_19_LED_GR;
 	//P0_20	- Unused
 	//P0_21	- Unused
-	AlxIoPin do_P0_22_LED204_GR;
-	//P0_22 - Unused
-	AlxIoPin do_P0_23_LED203_GR;
-	AlxIoPin do_P0_24_LED202_GR_PWM1;
-	AlxIoPin do_P0_25_LED201_GR_PWM2;
+	AlxIoPin do_P0_22_LED_GR;
+	//P0_22	- Unused
+	AlxIoPin do_P0_23_LED_GR;
+	AlxIoPin do_P0_24_LED_GR_PWM1;
+	AlxIoPin do_P0_25_LED_GR_PWM2;
 	//P0_26	- Unused
 	//P0_27	- Unused
 	//P0_28	- Unused
@@ -140,20 +139,14 @@ typedef struct
 	AlxI2c alxI2c_I2C0;
 
 	//--------------------------------------
-	// ALX - PCA9431
-	//--------------------------------------
-	AlxIoPinIrq alxIrqPin_IRQ1;
-	AlxPca9431 alxPca9431;
-
-	//--------------------------------------
-	// Adc
+	// ALX- ADC
 	//--------------------------------------
 	AlxAdc alxAdc;
 	AlxIoPin* adcIoPinArr[1];
 	Alx_Ch adcChArr[1];
 
 	//--------------------------------------
-	// Pwm
+	// ALX - PWM
 	//--------------------------------------
 	AlxPwm alxPwm;
 	AlxIoPin* pwmIoPinArr[2];
@@ -163,6 +156,12 @@ typedef struct
 	#else
 	float pwmDutyDefaultArr[2];
 	#endif
+
+	//--------------------------------------
+	// ALX - PCA9431
+	//--------------------------------------
+	AlxIoPinIrq alxIoIrqPin_di_P0_9_PCA943X_nINT_IRQ1;
+	AlxPca9431 alxPca9431;
 
 	//--------------------------------------
 	// Info
@@ -182,13 +181,6 @@ extern AlxHwNfcWlcListenerV3_5b_Main alxHwNfcWlcListenerV3_5b_Main;
 // Constructor
 //******************************************************************************
 void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me);
-
-
-//******************************************************************************
-// Functions
-//******************************************************************************
-void AlxHwNfcWlcListenerV3_5b_Main_Init(AlxHwNfcWlcListenerV3_5b_Main* me);
-void AlxHwNfcWlcListenerV3_5b_Main_Handle(AlxHwNfcWlcListenerV3_5b_Main* me);
 
 
 #endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
