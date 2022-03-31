@@ -57,6 +57,7 @@ extern "C" {
 #include "fsl_usart.h"
 #include "fsl_wkt.h"
 #include "fsl_wwdt.h"
+#include "rom_api.h"	// MF: We need this include to directly set FRO Freq -> "LPC_PWRD_API->set_fro_frequency((uint32_t)freq);" This is for optimization purpose
 
 
 //******************************************************************************
