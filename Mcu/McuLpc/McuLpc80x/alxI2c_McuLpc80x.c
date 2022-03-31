@@ -552,8 +552,10 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		flag = I2C_GetStatusFlags(me->i2c);
 		if ((flag & (1 << 1)) && (flag & (1 << 2)))	// MF: Check 2nd and 3rd bit of I2C Status register. If this is true, NACK was returned
 		{
+			ALX_I2C_TRACE("ErrNack");
 			status = kStatus_Fail;
 			alxStat = AlxI2c_ErrNack;
+			continue;
 		}
 
 		// #4.3 Send Stop Condition
@@ -572,12 +574,6 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 	// #5 If we are here, the number of tries error occured
 	if (status != kStatus_Success)
 	{
-		if (alxStat == AlxI2c_ErrNack)
-		{
-			ALX_I2C_TRACE("ErrNack");
-			return AlxI2c_ErrNack;
-		}
-
 		ALX_I2C_TRACE("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
 	}
