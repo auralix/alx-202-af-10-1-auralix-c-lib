@@ -97,6 +97,8 @@
 - ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Setup_02](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Setup_02.jpg)
 
 ### __Test List__ 
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T00_HandleTime__
+	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T00_HandleTime_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T00_HandleTime_01.jpg)
 - __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T01_ReadAccReg(me)__
 	- /
 - __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T02_ReadIoExpReg(me)__
@@ -117,3 +119,5 @@
 	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T08_ModuleSetReset_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T08_ModuleSetReset_01.jpg)
 - __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T09_ModuleWrite(me)__
 	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T09_ModuleWrite_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T09_ModuleWrite_01.jpg)
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T10_ModuleDeinit(me)__
+	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T10_ModuleDeinit_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T10_ModuleDeinit_01.jpg)
