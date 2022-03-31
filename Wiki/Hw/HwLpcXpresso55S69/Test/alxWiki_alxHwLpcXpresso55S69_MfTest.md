@@ -77,3 +77,43 @@
 	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_SpiOutput](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_SpiOutput.jpg)
 - __Trace Output__
 	- ![AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_TraceOutput](Img/AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_TraceOutput.jpg)
+
+## __G03_IoExpander__
+---
+- PCAL6416A IoExpander
+
+### __Configurations__
+- __AlxCk__: AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz
+- __AlxTrace__: AlxGlobal_BaudRate_115200
+- __AlxI2c__: AlxI2c_Clk_McuLpc55S6x_BitRate_400kHz
+
+### __Test Goal__
+- The goal of this test was to test PCAL6416A IoExpander and alxPcal6416a.c/h module
+
+### __Setup__
+- Board
+- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Setup_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Setup_01.jpg)
+- PCAL6416A IoExpander
+- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Setup_02](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Setup_02.jpg)
+
+### __Test List__ 
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T01_ReadAccReg(me)__
+	- /
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T02_ReadIoExpReg(me)__
+	- /
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T03_WriteReadIoExpReg(me)__
+	- /
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins(me)__
+	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins_01.jpg)
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T05_ModuleToggle(me)__
+	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T05_ModuleToggle_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T05_ModuleToggle_01.jpg)
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T06_ReadPins(me)__
+	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T06_ReadPins_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T06_ReadPins_01.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T06_ReadPins_02](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T06_ReadPins_02.jpg)
+	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T06_ReadPins_03](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T06_ReadPins_03.jpg)
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T07_ModuleRead(me)__
+	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T07_ModuleRead_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T07_ModuleRead_01.jpg)
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T08_ModuleSetReset(me)__
+	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T08_ModuleSetReset_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T08_ModuleSetReset_01.jpg)
+- __AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T09_ModuleWrite(me)__
+	- ![AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T09_ModuleWrite_01](Img/AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T09_ModuleWrite_01.jpg)

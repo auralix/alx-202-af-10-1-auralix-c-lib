@@ -4,6 +4,7 @@
 - Func "Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me)" only handles reading Input registers InputPort_0 and InputPort_1 and writing to Output registers OutputPort_0 and OutputPort_1
 	- All configs should be set in "ALX_WEAK void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me)" func
 - IRQs are not implemented
+- Test reports. See "G03_IoExpander": https://bitbucket.org/-auralix-/alx-202-af-10-1_auralixclib/src/develop/Wiki/Hw/HwLpcXpresso55S69/Test/alxWiki_alxHwLpcXpresso55S69_MfTest.md
 
 ---
 ## Ctor Arguments
