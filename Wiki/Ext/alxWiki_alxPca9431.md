@@ -1,4 +1,4 @@
-# Auralix C Library - ALX <description_TODO> PCA9431 Module
+# Auralix C Library - ALX NFC WLC Power Receiver with LDO Output PCA9431 Module
 ---
 ## Supply of PCA9431
 - PCA9431 must be supplied on pin VRECT

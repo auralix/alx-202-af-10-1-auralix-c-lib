@@ -24,6 +24,7 @@ extern "C" {
 // Module Guard
 //******************************************************************************
 #if defined(ALX_HW_LPC_XPRESSO_55S69_C_TEST)
+#if defined(ALX_TEST_MF)
 
 
 //******************************************************************************
@@ -948,6 +949,291 @@ static inline void AlxHwLpcXpresso55S69_MfTest_G02_BringUpRtos_Run(AlxHwLpcXpres
 #endif // #if defined(ALX_FREE_RTOS)
 
 
+//******************************************************************************
+//******************************************************************************
+// G03_IoExpander
+//******************************************************************************
+//******************************************************************************
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Objects
+	AlxHwLpcXpresso55S69_Main alxHwLpcXpresso55S69_Main;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxHwLpcXpresso55S69_MfTest_G03_IoExpander;
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T01_ReadAccReg(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander* me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t devAddr = 0b00110000;	// MF: SAO pin si on GND so devAddr = 0x18, last bit = 0b0 (write)
+	uint16_t memAddr = 0x0FU;		// MF: Device_ID (0x0F) Address. Sould return 0x44(b01000100)
+	uint8_t i2cData[1] = { 0 };
+
+	// Init
+	AlxI2c_Init(&me->alxHwLpcXpresso55S69_Main.alxI2c);
+
+	while (1)
+	{
+		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 1, 20, 100);
+
+		AlxDelay_ms(50);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T02_ReadIoExpReg(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t devAddr = 0b01000000;	// MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
+	uint16_t memAddr = 0x02U;		// MF: Output port 0 Address. Sould return 0xFF(0b11111111) which is default number
+	uint8_t i2cData[1] = { 0 };
+
+	// Init
+	AlxI2c_Init(&me->alxHwLpcXpresso55S69_Main.alxI2c);
+
+	while (1)
+	{
+		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 1, 20, 100);
+
+		AlxDelay_ms(50);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T03_WriteReadIoExpReg(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t devAddr = 0b01000000;	// MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
+	uint16_t memAddr = 0x02U;		// MF: Output port 0 Address. Sould return 0xFF(0b11111111) which is default number
+	uint8_t i2cData[1] = { 0 };
+
+	// Init
+	AlxI2c_Init(&me->alxHwLpcXpresso55S69_Main.alxI2c);
+
+	while (1)
+	{
+		// Read Reg before write - Sould return 0xFF(0b11111111)
+		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, 20, 100);
+
+		// Write
+		uint8_t data[2];
+		data[0] = 0b10101010;
+		data[1] = 0b10101010;
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, data, 2, false, 20, 100);
+
+		// Read Reg after write - Sould return 0xAA(0b10101010)
+		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, 20, 100);
+
+		AlxDelay_ms(50);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t devAddr = 0b01000000;	// MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
+	uint16_t memAddr = 0x00U;
+	uint8_t i2cData[2] = { 0 };
+
+	// Init I2c
+	AlxI2c_Init(&me->alxHwLpcXpresso55S69_Main.alxI2c);
+
+	// Write - Config all Pins as "Output"
+	memAddr = 0x06U;
+	i2cData[0] = 0b00000000;
+	i2cData[1] = 0b00000000;
+	AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, true, 20, 100);
+
+	// Set Output port register
+	memAddr = 0x02U;
+
+	while (1)
+	{
+		// Write - Set Pins to LOW
+		i2cData[0] = 0b00000000;
+		i2cData[1] = 0b00000000;
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, true, 20, 100);
+
+		AlxDelay_ms(50);
+
+		// Write -Set Pins to HIGH
+		i2cData[0] = 0b11111111;
+		i2cData[1] = 0b11111111;
+		AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, true, 20, 100);
+
+		AlxDelay_ms(50);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T05_ModuleToggle(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Init I2c
+	AlxPcal6416a_Init(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+
+	while (1)
+	{
+		AlxPcal6416a_IoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a, AlxPcal6416a_P0_0);
+		AlxPcal6416a_Handle(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+
+		AlxDelay_ms(60);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T06_ReadPins(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Assert
+	(void)me;
+
+	// Variables
+	uint8_t devAddr = 0b01000000; // MF: ADDR pin is on GND so devAddr = 0x20, last bit = 0b0 (write)
+	uint16_t memAddr = 0x00U;
+	uint8_t i2cData[2] = { 0 };
+
+	// Init I2c
+	AlxI2c_Init(&me->alxHwLpcXpresso55S69_Main.alxI2c);
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+
+	// Write - Config all Pins as "Input"
+	memAddr = 0x06U;
+	i2cData[0] = 0b11111111;
+	i2cData[1] = 0b11111111;
+	AlxI2c_Master_StartWriteMemStop_Multi(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, true, 20, 100);
+
+	// Set Input port register
+	memAddr = 0x00U;
+
+	while (1)
+	{
+		AlxI2c_Master_StartReadMemStop(&me->alxHwLpcXpresso55S69_Main.alxI2c, devAddr, memAddr, AlxI2c_Master_MemAddrLen_8bit, i2cData, 2, 20, 100);
+
+		if (i2cData[0] & (1U << AlxPcal6416a_P0_2))	{ AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD); }
+		else										{ AlxIoPin_Set(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD); }
+
+		AlxDelay_ms(100);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T07_ModuleRead(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Variables
+	bool in;
+
+	// Init I2c
+	AlxIoPin_Init(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD);
+	AlxPcal6416a_Init(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+
+	while (1)
+	{
+		in = AlxPcal6416a_IoPin_Read(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a, AlxPcal6416a_P0_2);
+		AlxPcal6416a_Handle(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+
+		if (in == true)	{ AlxIoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD); }
+		else			{ AlxIoPin_Set(&me->alxHwLpcXpresso55S69_Main.alxIoPin.do_P1_6_UsrLED_RD); }
+
+		AlxDelay_ms(150);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T08_ModuleSetReset(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Init I2c
+	AlxPcal6416a_Init(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+
+	while (1)
+	{
+		AlxPcal6416a_IoPin_Set(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a, AlxPcal6416a_P0_0);
+		AlxPcal6416a_Handle(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+		AlxDelay_ms(80);
+
+		AlxPcal6416a_IoPin_Reset(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a, AlxPcal6416a_P0_0);
+		AlxPcal6416a_Handle(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+		AlxDelay_ms(80);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T09_ModuleWrite(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	// Init I2c
+	AlxPcal6416a_Init(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+
+	while (1)
+	{
+		AlxPcal6416a_IoPin_Write(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a, AlxPcal6416a_P0_0, true);
+		AlxPcal6416a_Handle(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+		AlxDelay_ms(100);
+
+		AlxPcal6416a_IoPin_Write(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a, AlxPcal6416a_P0_0, false);
+		AlxPcal6416a_Handle(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+		AlxDelay_ms(100);
+	}
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T10_ModuleDeinit(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander*me)
+{
+	while (1)
+	{
+		AlxPcal6416a_Init(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+		AlxPcal6416a_IoPin_Toggle(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a, AlxPcal6416a_P0_0);
+		AlxPcal6416a_Handle(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+		AlxPcal6416a_DeInit(&me->alxHwLpcXpresso55S69_Main.alxPcal6416a);
+
+		AlxDelay_ms(110);
+	}
+}
+
+
+//******************************************************************************
+// Constructor & Functions
+//******************************************************************************
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Ctor(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander* me)
+{
+	// Ctor
+	AlxHwLpcXpresso55S69_Main_Ctor(&me->alxHwLpcXpresso55S69_Main);
+
+	// Info
+	me->wasCtorCalled = true;
+	me->isInit = false;
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Init(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander* me)
+{
+	// Init
+	AlxClk_Init(&alxClk);
+	AlxTrace_Init(&alxTrace);
+
+	// IoPinIrq
+	AlxIoPinIrq_Init(&me->alxHwLpcXpresso55S69_Main.alxIrqPin_IRQ1);		// MF: IoPinIrq is initialized for all tests
+
+	// Info
+	me->isInit = true;
+}
+static inline void AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_Run(AlxHwLpcXpresso55S69_MfTest_G03_IoExpander* me)
+{
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T01_ReadAccReg(me);		// MF: This was tested on "2533020201601" Acc meter
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T02_ReadIoExpReg(me);
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T03_WriteReadIoExpReg(me);
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T04_TogglePins(me);		// MF: Toggle AlxPcal6416a P0_0
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T05_ModuleToggle(me);		// MF: Toggle AlxPcal6416a P0_0
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T06_ReadPins(me);			// MF: If Input is High on AlxPcal6416a P0_2, RD Led shoul blink
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T07_ModuleRead(me);		// MF: If Input is High on AlxPcal6416a P0_2, RD Led shoul blink
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T08_ModuleSetReset(me);	// MF: Toggle AlxPcal6416a P0_0
+	//AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T09_ModuleWrite(me);		// MF: Toggle AlxPcal6416a P0_0
+	AlxHwLpcXpresso55S69_MfTest_G03_IoExpander_T10_ModuleDeinit(me);		// MF: Toggle AlxPcal6416a P0_0
+}
+
+
+#endif // #if defined(ALX_TEST_MF)
 #endif // #if defined(ALX_HW_LPC_XPRESSO_55S69_C_TEST)
 
 
