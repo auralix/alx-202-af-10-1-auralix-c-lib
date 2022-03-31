@@ -47,8 +47,6 @@ void AlxIoPin_Ctor
 	(void)me;
 	ALX_IO_PIN_ASSERT((port == 0) || (port == 1));
 	ALX_IO_PIN_ASSERT((0 <= pin) && (pin <= 31));
-	ALX_IO_PIN_ASSERT(!((port == 0) && (pin == 13)));	// MF: PIO0_13 is for I2C and will be initialzed in alxI2c module TODO
-	ALX_IO_PIN_ASSERT(!((port == 0) && (pin == 14)));	// MF: PIO0_13 is for I2C and will be initialzed in alxI2c module TODO
 	(void)func;
 	(void)mode;
 	(void)digiMode;
