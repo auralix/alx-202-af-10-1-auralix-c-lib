@@ -554,7 +554,6 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		{
 			status = kStatus_Fail;
 			alxStat = AlxI2c_ErrNack;
-			continue;
 		}
 
 		// #4.3 Send Stop Condition

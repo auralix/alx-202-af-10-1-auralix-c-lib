@@ -295,7 +295,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T03_ReadRe
 		AlxI2c_Master_StartReadStop(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0, devAddr, &REGDAT[6], 1, 1, 1000);
 		AlxDelay_ms(10);
 
-		AlxDelay_ms(200);
+		AlxDelay_ms(500);
 	}
 }
 static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T04_ReadOperation(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120* me)
@@ -313,7 +313,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T04_ReadOp
 		AlxI2c_Master_StartWriteStop(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0, devAddr, &MEMA, 1, 5, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0, devAddr, data, sizeof(data), 5, 1000);
 
-		AlxDelay_ms(200);
+		AlxDelay_ms(500);
 	}
 }
 static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T05_WriteRegOperation(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120* me)
@@ -346,7 +346,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T05_WriteR
 		AlxI2c_Master_StartReadStop(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0, devAddr, &dummy, 1, 1, 1000);
 		AlxDelay_ms(10);
 
-		AlxDelay_ms(200);
+		AlxDelay_ms(500);
 	}
 }
 static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T06_WriteOperation(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120* me)
@@ -396,7 +396,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T06_WriteO
 		AlxI2c_Master_StartWriteStop(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0, devAddr, &MEMA, 1, 5, 1000);
 		AlxI2c_Master_StartReadStop(&me->alxHwNfcWlcListenerV3_5b_Main.alxI2c_I2C0, devAddr, data, sizeof(data), 5, 1000);
 
-		AlxDelay_ms(200);
+		AlxDelay_ms(500);
 	}
 }
 
@@ -423,11 +423,11 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Init(AlxHw
 static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Run(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120* me)
 {
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T01_Led(me);
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T02_IsSlaveReady(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T02_IsSlaveReady(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T03_ReadRegOperation(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T04_ReadOperation(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T05_WriteRegOperation(me);
-	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T06_WriteOperation(me);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_T06_WriteOperation(me);
 }
 
 
