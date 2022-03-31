@@ -23,41 +23,34 @@
 //******************************************************************************
 // Variables
 //******************************************************************************
-AlxHwNfcWlcListenerV3_5b_MainTest alxHwNfcWlcListenerV3_5b_MainTest = { 0 };
+AlxHwNfcWlcListenerV3_5b_MainTest alxHwNfcWlcListenerV3_5b_MainTest = {0};
 
 
 //******************************************************************************
-// IRQ Handlers
+// IRQ Handlers & Weak Functions
 //******************************************************************************
-void SysTick_Handler(void)
-{
-	AlxTick_Inc_ms(&alxTick);
-}
-
-
-//******************************************************************************
-// Auralix C Library - Weak Functions
-//******************************************************************************
-
 //------------------------------------------------------------------------------
 // Gh
 //------------------------------------------------------------------------------
-
+#if defined(ALX_TEST_GH)
+#endif
 
 //------------------------------------------------------------------------------
 // Gk
 //------------------------------------------------------------------------------
-
+#if defined(ALX_TEST_GK)
+#endif
 
 //------------------------------------------------------------------------------
 // Jk
 //------------------------------------------------------------------------------
-
+#if defined(ALX_TEST_JK)
+#endif
 
 //------------------------------------------------------------------------------
 // Js
 //------------------------------------------------------------------------------
-#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_JS_TEST_H)
+#if defined(ALX_TEST_JS)
 void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 {
 	// Ldo output
@@ -88,7 +81,7 @@ void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 	//me->reg._04h_VRECT_INT_MASK.val.VRECT_OVW_MSK = VRectOvWarnIntMask_NotTrig;			// JS: commented
 	me->reg._06h_VOUTLDO_INT_MASK.val.VOUT_SHORT_INT_MASK = VOutLdoShortInt_NotMasked;
 }
-void AlxIoPinIrq_Foreground_Callback_Pin3(void)
+void AlxIoPinIrq_Foreground_Callback_Pin3()
 {
 	AlxTrace_WriteFormat(&alxTrace, "************************	INTERRUPT	*************************\r\n");
 }
@@ -100,13 +93,12 @@ void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
 	AlxTrace_WriteStr(&alxTrace, "FallEdge	************************	INTERRUPT	*************************\r\n");
 }
-#endif //#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_JS_TEST_H)
-
+#endif
 
 //------------------------------------------------------------------------------
 // Mf
 //------------------------------------------------------------------------------
-#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_MF_TEST_H)
+#if defined(ALX_TEST_MF)
 void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
 	AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
@@ -115,12 +107,13 @@ void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
 	AlxTrace_WriteStr(&alxTrace, "FallEdge\r\n");
 }
-#endif //#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_MF_TEST_H)
-
+#endif
 
 //------------------------------------------------------------------------------
 // Tv
 //------------------------------------------------------------------------------
+#if defined(ALX_TEST_TV)
+#endif
 
 
 #endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
