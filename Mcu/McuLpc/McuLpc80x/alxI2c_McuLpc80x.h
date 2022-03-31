@@ -35,8 +35,8 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxI2c_Clk_McuLpc80x_BitRate_100kHz_I2cFuncClk_15MHz = 100000U,
-	AlxI2c_Clk_McuLpc80x_BitRate_400kHz_I2cFuncClk_15MHz = 400000U,
+	AlxI2c_Clk_McuLpc80x_BitRate_100kHz = 100000U,
+	AlxI2c_Clk_McuLpc80x_BitRate_400kHz = 400000U,
 } AlxI2c_Clk;
 
 typedef struct
