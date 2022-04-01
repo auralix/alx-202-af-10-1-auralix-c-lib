@@ -79,6 +79,8 @@ void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 	me->reg._04h_VRECT_INT_MASK.val.VRECT_GOOD_INT_MSK	= VRectGoodIntMask_NotTrig;
 	//me->reg._04h_VRECT_INT_MASK.val.VRECT_REGHIGH_INT_MSK = VRectRegHighIntMask_NotTrig;	// JS: commented
 	//me->reg._04h_VRECT_INT_MASK.val.VRECT_OVW_MSK = VRectOvWarnIntMask_NotTrig;			// JS: commented
+
+	me->reg._05h_VOUTLDO_INT.val.VOUT_SHORT_INT = VOutLdoShortInt_Detect;
 	me->reg._06h_VOUTLDO_INT_MASK.val.VOUT_SHORT_INT_MASK = VOutLdoShortInt_NotMasked;
 }
 void AlxIoPinIrq_Foreground_Callback_Pin3()

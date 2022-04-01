@@ -822,6 +822,9 @@ static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me)
 	status = AlxPca9431_Reg_Write(me, &me->reg._04h_VRECT_INT_MASK		);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_04_VRECT_INT_MASK		"); return status;}
 
+	status = AlxPca9431_Reg_Write(me, &me->reg._05h_VOUTLDO_INT);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_05_VOUTLDO_INT			"); return status; }
+
 	status = AlxPca9431_Reg_Write(me, &me->reg._06h_VOUTLDO_INT_MASK	);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_06_VOUTLDO_INT_MASK		"); return status;}
 
@@ -858,8 +861,8 @@ static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me)
 	status = AlxPca9431_Reg_Write(me, &me->reg._20h_OCPSET_LOCK			);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_20_OCPSET_LOCK			"); return status;}
 
-	//status = AlxPca9431_Reg_Write(me, &me->reg._21h_VOUTLDO_OCP			); // JS: some error don't understand
-	//if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_21_VOUTLDO_OCP			"); return status;}
+	status = AlxPca9431_Reg_Write(me, &me->reg._21h_VOUTLDO_OCP			); // JS: some error don't understand
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_21_VOUTLDO_OCP			"); return status;}
 
 	return Alx_Ok;
 }
