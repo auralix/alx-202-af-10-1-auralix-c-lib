@@ -30,7 +30,7 @@ static IRQn_Type AlxIoPin_GetIrqType(AlxIoPinIrq* me);
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-#if defined(ALX_IO_PIN_IRQ_EXCLUDE_IRQ_HANDLERS)
+#if !defined(ALX_IO_PIN_IRQ_EXCLUDE_IRQ_HANDLERS)
 void AlxIoPinIrq_Foreground_Callback_Pin0();
 void AlxIoPinIrq_Foreground_Callback_Pin1();
 void AlxIoPinIrq_Foreground_Callback_Pin2();
@@ -239,7 +239,7 @@ static IRQn_Type AlxIoPin_GetIrqType(AlxIoPinIrq* me)
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-#if defined(ALX_IO_PIN_IRQ_EXCLUDE_IRQ_HANDLERS)
+#if !defined(ALX_IO_PIN_IRQ_EXCLUDE_IRQ_HANDLERS)
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
 	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin0");
@@ -286,7 +286,7 @@ ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin7()
 //******************************************************************************
 // IRQ Handlers
 //******************************************************************************
-#if defined(ALX_IO_PIN_IRQ_EXCLUDE_IRQ_HANDLERS)
+#if !defined(ALX_IO_PIN_IRQ_EXCLUDE_IRQ_HANDLERS)
 void PIN_INT0_IRQHandler(void)
 {
 	AlxIoPinIrq_Foreground_Callback_Pin0();
