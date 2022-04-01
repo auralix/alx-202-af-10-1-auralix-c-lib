@@ -1199,10 +1199,15 @@ void AlxPca9431_Ctor
 Alx_Status AlxPca9431_Init(AlxPca9431* me);
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me);
 Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V);	// 10 bit ADC
+Alx_Status AlxPca9431_LdoVout_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV);	// 10 bit ADC
 Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A);	// 10 bit ADC
+Alx_Status AlxPca9431_LdoVout_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA);	// 10 bit ADC
 Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V);		// 10 bit ADC
+Alx_Status AlxPca9431_Rect_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV);		// 10 bit ADC
 Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A);		// 10 bit ADC
+Alx_Status AlxPca9431_Rect_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA);		// 10 bit ADC
 Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC);	// On chip temperature (-43°C ... +156°C)
+Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, uint32_t* temp_mDegC);	// On chip temperature (-43°C ... +156°C)
 Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me);
 Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
 
