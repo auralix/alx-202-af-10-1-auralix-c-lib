@@ -54,7 +54,7 @@ static void AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5(Alx
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
-void AlxClk_Ctor
+ALX_WEAK void AlxClk_Ctor
 (
 	AlxClk* me,
 	AlxClk_Config config,
@@ -97,7 +97,7 @@ void AlxClk_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
-Alx_Status AlxClk_Init(AlxClk* me)
+ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
 	// Assert
 	ALX_CLK_ASSERT(me->isInit == false);
@@ -139,7 +139,7 @@ Alx_Status AlxClk_Init(AlxClk* me)
 	// #9 Return OK
 	return Alx_Ok;
 }
-uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
+ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 {
 	// Assert
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
