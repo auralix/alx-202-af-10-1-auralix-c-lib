@@ -200,4 +200,42 @@ void SysTick_Handler(void)
 }
 
 
+//******************************************************************************
+// Auralix C Library - ALX Clock Module - Weak Functions
+//******************************************************************************
+void AlxClk_Ctor
+(
+	AlxClk* me,
+	AlxClk_Config config,
+	AlxClk_Tick tick
+)
+{
+	(void)config;
+	(void)tick;
+
+	me->coreSysClk_Ctor	= 12000000U;
+	me->mainClk_Ctor	= 12000000U;
+	me->fro_Ctor		= 24000000U;
+	//me->lpo_Ctor		=  1000000U;	// MF: We don't need this for program to work
+}
+Alx_Status AlxClk_Init(AlxClk* me)
+{
+	(void)me;
+
+	// Enable Clk to Gpio0
+	*(volatile uint32_t *)(((uint32_t)(&SYSCON->SYSAHBCLKCTRL0)) + CLK_GATE_GET_REG(kCLOCK_Gpio0)) |= 1UL << CLK_GATE_GET_BITS_SHIFT(kCLOCK_Gpio0);
+
+	// Set Fro Osc Freq
+	g_Fro_Osc_Freq = (uint32_t)24000U * 1000UL;	// MF: This has to be set, otherwise "uint32_t CLOCK_GetFroFreq(void)" returns 0
+
+	// Configure SysTick
+	SysTick->LOAD  = (12000U - 1UL);									// set reload register
+	NVIC_SetPriority(SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL);	// set Priority for Systick Interrupt
+	SysTick->VAL   = 0UL;												// Load the SysTick Counter Value
+	SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+
+	return Alx_Ok;
+}
+
+
 #endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
