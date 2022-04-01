@@ -130,29 +130,29 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 	//------------------------------------------------------------------------------
 	// ALX - PWM
 	//------------------------------------------------------------------------------
-	me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_LED_GR_PWM1;
-	me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_LED_GR_PWM2;
-	me->pwmChArr[0] = Alx_Ch_1;
-	me->pwmChArr[1] = Alx_Ch_2;
-	#if defined ALX_OPTIMIZE_SIZE_ALL
-	me->pwmDutyDefaultArr[0] = 543U;
-	me->pwmDutyDefaultArr[1] = 123U;
-	#else
-	me->pwmDutyDefaultArr[0] = 12.34f;
-	me->pwmDutyDefaultArr[1] = 50.f;
-	#endif
-	AlxPwm_Ctor
-	(
-		&me->alxPwm,
-		CTIMER0,
-		me->pwmIoPinArr,
-		me->pwmChArr,
-		ALX_ARR_LEN(me->pwmChArr),
-		&alxClk,
-		me->pwmDutyDefaultArr,
-		0,
-		100
-	);
+	//me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_LED_GR_PWM1;
+	//me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_LED_GR_PWM2;
+	//me->pwmChArr[0] = Alx_Ch_1;
+	//me->pwmChArr[1] = Alx_Ch_2;
+	//#if defined ALX_OPTIMIZE_SIZE_ALL
+	//me->pwmDutyDefaultArr[0] = 543U;
+	//me->pwmDutyDefaultArr[1] = 123U;
+	//#else
+	//me->pwmDutyDefaultArr[0] = 12.34f;
+	//me->pwmDutyDefaultArr[1] = 50.f;
+	//#endif
+	//AlxPwm_Ctor
+	//(
+	//	&me->alxPwm,
+	//	CTIMER0,
+	//	me->pwmIoPinArr,
+	//	me->pwmChArr,
+	//	ALX_ARR_LEN(me->pwmChArr),
+	//	&alxClk,
+	//	me->pwmDutyDefaultArr,
+	//	0,
+	//	100
+	//);
 
 
 	//------------------------------------------------------------------------------

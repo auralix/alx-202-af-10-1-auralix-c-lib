@@ -506,10 +506,6 @@ Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC)
 		case 47:	*temp_degC = 156;		break;
 		default:	*temp_degC = 9999.9;	ALX_PCA9431_ASSERT(false); return Alx_Err;	break;
 	}
-
-	// Assert
-	ALX_PCA9431_ASSERT(false); // We shouldn't get here
-	return Alx_Err;
 	#endif
 }
 Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, uint32_t* temp_mDegC)
@@ -582,13 +578,9 @@ Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, uint32_t* temp_mDeg
 	case 44:	*temp_mDegC = 145000;	break;
 	case 45:	*temp_mDegC = 148000;	break;
 	case 46:	*temp_mDegC = 152000;	break;
-	case 47:	*temp_mDegC = 15600;	break;
+	case 47:	*temp_mDegC = 156000;	break;
 	default:	*temp_mDegC = 9999999;	ALX_PCA9431_ASSERT(false); return Alx_Err;	break;
 	}
-
-	// Assert
-	ALX_PCA9431_ASSERT(false); // We shouldn't get here
-	return Alx_Err;
 	#endif
 }
 Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me)
