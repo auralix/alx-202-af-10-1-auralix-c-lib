@@ -16,13 +16,14 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxCrn120_RegBlockStruct_SetAddr(AlxCrn120* me);
-static void AlxCrn120_RegBlockStruct_SetLen(AlxCrn120* me);
-static void AlxCrn120_RegBlockStruct_SetValToZero(AlxCrn120* me);
-static void AlxCrn120_RegBlockStruct_SetValToDefault(AlxCrn120* me);
-//static Alx_Status AlxPca9430_Reg_Write(AlxPca9430* me, void* reg);
-//static Alx_Status AlxPca9430_Reg_Read(AlxPca9430* me, void* reg);
-//static Alx_Status AlxPca9430_Reg_WriteVal(AlxPca9430* me);
+static void AlxCrn120_RegStruct_SetAddr(AlxCrn120* me);
+static void AlxCrn120_RegStruct_SetLen(AlxCrn120* me);
+static void AlxCrn120_RegStruct_SetValToZero(AlxCrn120* me);
+static void AlxCrn120_RegStruct_SetValToDefault(AlxCrn120* me);
+
+//static Alx_Status AlxCrn120_Reg_Write(AlxCrn120* me, void* reg);
+//static Alx_Status AlxCrn120_Reg_Read(AlxCrn120* me, void* reg);
+//static Alx_Status AlxCrn120_Reg_WriteVal(AlxCrn120* me);
 
 
 //******************************************************************************
@@ -64,62 +65,78 @@ void AlxCrn120_Ctor
 }
 
 
-////******************************************************************************
-//// Functions
-////******************************************************************************
-//Alx_Status AlxPca9430_Init(AlxPca9430* me)
-//{
-//	ALX_PCA9430_ASSERT(me->isInit == false);
-//	ALX_PCA9430_ASSERT(me->wasCtorCalled == true);
-//
-//	Alx_Status status = Alx_Err;
-//
-//	// #1 Init GPIO
-//	AlxIoPin_Init(me->do_SleepEn);
-//	AlxIoPin_Init(me->di_Interrupt);
-//
-//	// #2 Init I2C
-//	status = AlxI2c_Init(me->i2c);
-//	if (status != Alx_Ok) { ALX_PCA9430_TRACE("Err_AlxI2c_Init"); return status; }
-//
-////	// #3 Check if slave ready
-////	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 1, 1000);
-////	if (status != Alx_Ok) { ALX_PCA9430_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
-//
-//	// #4 Set registers values to default
-//	 AlxPca9430_RegStruct_SetValToDefault(me);
-//
-//	// #6 Set registers values - WEAK
-//	AlxPca9430_RegStruct_SetVal(me);
-//
-//	// #7 Write registers
-//	status = AlxPca9430_Reg_WriteVal(me);
-//	if (status != Alx_Ok) { ALX_PCA9430_TRACE("Err_Reg_WriteVal"); return status;}
-//
-//	// #9 Set isInit
-//	me->isInit = true;
-//
-//	// #10 Return OK
-//	return Alx_Ok;
-//}
-//Alx_Status AlxPca9430_DeInit(AlxPca9430* me)
-//{
-//	ALX_PCA9430_ASSERT(me->isInit == true);
-//	ALX_PCA9430_ASSERT(me->wasCtorCalled == true);
-//
-//	// #1 DeInit GPIO
-//	AlxIoPin_DeInit(me->do_SleepEn);
-//	AlxIoPin_DeInit(me->di_Interrupt);
-//
-//	// #2 Reset isInit
-//	me->isInit = false;
-//}
-//
+//******************************************************************************
+// Functions
+//******************************************************************************
+Alx_Status AlxCrn120_Init(AlxCrn120* me)
+{
+	ALX_CRN120_ASSERT(me->isInit == false);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
 
-////******************************************************************************
-//// Private Functions
-////******************************************************************************
-static void AlxCrn120_RegBlockStruct_SetAddr(AlxCrn120* me)
+	Alx_Status status = Alx_Err;
+
+	// #1 Init GPIO
+	//AlxIoPin_Init(me->do_SleepEn);
+	//AlxIoPin_Init(me->di_Interrupt);
+
+	// #2 Init I2C
+	status = AlxI2c_Init(me->i2c);
+	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_AlxI2c_Init"); return status; }
+
+	// #3 Check if slave ready
+	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 1, 1000);
+	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
+
+	// #4 Set registers values to default
+	 AlxPca9430_RegStruct_SetValToDefault(me);
+
+	// #6 Set registers values - WEAK
+	AlxPca9430_RegStruct_SetVal(me);
+
+	// #7 Write registers
+	status = AlxPca9430_Reg_WriteVal(me);
+	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_Reg_WriteVal"); return status;}
+
+	// #9 Set isInit
+	me->isInit = true;
+
+	// #10 Return OK
+	return Alx_Ok;
+}
+Alx_Status AlxCrn120_DeInit(AlxCrn120* me)
+{
+	// #1 Assert
+	ALX_CRN120_ASSERT(me->isInit == true);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Prepare Variable
+	Alx_Status status = Alx_Err;
+
+	// #3 DeInit I2c
+	status = AlxI2c_DeInit(me->i2c);
+	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_AlxI2c_DeInit"); return status; }
+
+	// #4 Reset isInit
+	me->isInit = false;
+
+	// #5 Return OK
+	return Alx_Ok;
+}
+Alx_Status AlxCrn120_Sram(AlxCrn120* me, bool toRead, AlxCrn120_SramAddr addr)
+{
+	// #1 Assert
+	ALX_CRN120_ASSERT(me->isInit == true);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
+
+	// #5 Return OK
+	return Alx_Ok;
+}
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static void AlxCrn120_RegStruct_SetAddr(AlxCrn120* me)
 {
 	me->regblock._0x00						.addr =	0x00;
 	me->regblock._0x38						.addr =	0x38;
@@ -127,7 +144,7 @@ static void AlxCrn120_RegBlockStruct_SetAddr(AlxCrn120* me)
 	me->regblock._0x3A_ConfigurationReg		.addr =	0x3A;
 	me->regblock._0xFE_SessionReg			.addr =	0xFE;
 }
-static void AlxCrn120_RegBlockStruct_SetLen(AlxCrn120* me)
+static void AlxCrn120_RegStruct_SetLen(AlxCrn120* me)
 {
 	me->regblock._0x00						.len = sizeof(me->regblock._0x00						.val);
 	me->regblock._0x38						.len = sizeof(me->regblock._0x38						.val);
@@ -135,7 +152,7 @@ static void AlxCrn120_RegBlockStruct_SetLen(AlxCrn120* me)
 	me->regblock._0x3A_ConfigurationReg		.len = sizeof(me->regblock._0x3A_ConfigurationReg		.val);
 	me->regblock._0xFE_SessionReg			.len = sizeof(me->regblock._0xFE_SessionReg				.val);
 }
-static void AlxCrn120_RegBlockStruct_SetValToZero(AlxCrn120* me)
+static void AlxCrn120_RegStruct_SetValToZero(AlxCrn120* me)
 {
 	me->regblock._0x00						.val.raw[0x0]	= 0b00000000;
 	me->regblock._0x00						.val.raw[0x1]	= 0b00000000;
@@ -222,7 +239,7 @@ static void AlxCrn120_RegBlockStruct_SetValToZero(AlxCrn120* me)
 	me->regblock._0xFE_SessionReg			.val.raw[0xE]	= 0b00000000;
 	me->regblock._0xFE_SessionReg			.val.raw[0xF]	= 0b00000000;
 }
-static void AlxCrn120_RegBlockStruct_SetValToDefault(AlxCrn120* me)
+static void AlxCrn120_RegStruct_SetValToDefault(AlxCrn120* me)
 {
 	me->regblock._0x00						.val.raw[0x0]	= 0b00000000;	/*NISO PRAVILNE VREDNOSTI*/
 	me->regblock._0x00						.val.raw[0x1]	= 0b00000000;	/*NISO PRAVILNE VREDNOSTI*/

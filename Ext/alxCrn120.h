@@ -50,170 +50,261 @@ extern "C" {
 //******************************************************************************
 // Register Values Unions
 //******************************************************************************
-// General Enums //
 
-/*******************************************************************************************				Crn120			0x00	*/
+//------------------------------------------------------------------------------
+// Register 00h
+//------------------------------------------------------------------------------
+typedef enum
+{
+	StaticLock_Block_CC_Off = 0b0,
+	StaticLock_Block_CC_On  = 0b1
+} AlxCrn120_00h_StaticLock_Block_CC;
 
 typedef enum
 {
-	StaticLock_Block_CC_Off	= 0b0,		/*	R/W		0: Block_CC read / write	*/
-	StaticLock_Block_CC_On	= 0b1		/*	R/W		1: Block_CC read only		*/
-} AlxCrn120_0x00_StaticLock_Block_CC;
+	StaticLock_Block_9_4_Off = 0b0,
+	StaticLock_Block_9_4_On  = 0b1
+} AlxCrn120_00h_StaticLock_Block_9_4;
 
 typedef enum
 {
-	StaticLock_Block_9_4_Off	= 0b0, /*	R/W		0: Block_Page_9_4 read / write	*/
-	StaticLock_Block_9_4_On		= 0b1	/*	R/W		1: Block_Page_9_4 read only		*/
-} AlxCrn120_0x00_StaticLock_Block_9_4;
+	StaticLock_Block_15_10_Off = 0b0,
+	StaticLock_Block_15_10_On  = 0b1
+} AlxCrn120_00h_StaticLock_Block_15_10;
 
 typedef enum
 {
-	StaticLock_Block_15_10_Off	= 0b0,	/*	R/W		0: Block_Page_15_10 read / write	*/
-	StaticLock_Block_15_10_On	= 0b1	/*	R/W		1: Block_Page_15_10 read only		*/
-} AlxCrn120_0x00_StaticLock_Block_15_10;
+	StaticLock_Page_CC_Off = 0b0,
+	StaticLock_Page_CC_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_CC;
 
 typedef enum
 {
-	StaticLock_Page_CC_Off	= 0b0,		/*	R/W		0: Page_CC read / write		*/
-	StaticLock_Page_CC_On	= 0b1		/*	R/W		1: Page_CC read only		*/
-} AlxCrn120_0x00_StaticLock_Page_CC;
+	StaticLock_Page_4_Off = 0b0,
+	StaticLock_Page_4_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_4;
 
 typedef enum
 {
-	StaticLock_Page_4_Off	= 0b0,		/*	R/W		0: Page_4 read / write		*/
-	StaticLock_Page_4_On	= 0b1		/*	R/W		1: Page_4 read only			*/
-} AlxCrn120_0x00_StaticLock_Page_4;
+	StaticLock_Page_5_Off = 0b0,
+	StaticLock_Page_5_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_5;
 
 typedef enum
 {
-	StaticLock_Page_5_Off	= 0b0,		/*	R/W		0: Page_5 read / write		*/
-	StaticLock_Page_5_On	= 0b1		/*	R/W		1: Page_5 read only			*/
-} AlxCrn120_0x00_StaticLock_Page_5;
+	StaticLock_Page_6_Off = 0b0,
+	StaticLock_Page_6_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_6;
 
 typedef enum
 {
-	StaticLock_Page_6_Off	= 0b0,		/*	R/W		0: Page_6 read / write		*/
-	StaticLock_Page_6_On	= 0b1		/*	R/W		1: Page_6 read only			*/
-} AlxCrn120_0x00_StaticLock_Page_6;
+	StaticLock_Page_7_Off = 0b0,
+	StaticLock_Page_7_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_7;
 
 typedef enum
 {
-	StaticLock_Page_7_Off	= 0b0,		/*	R/W		0: Page_7 read / write		*/
-	StaticLock_Page_7_On	= 0b1		/*	R/W		1: Page_7 read only			*/
-} AlxCrn120_0x00_StaticLock_Page_7;
+	StaticLock_Page_8_Off = 0b0,
+	StaticLock_Page_8_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_8;
 
 typedef enum
 {
-	StaticLock_Page_8_Off	= 0b0,		/*	R/W		0: Page_8 read / write		*/
-	StaticLock_Page_8_On	= 0b1		/*	R/W		1: Page_8 read only			*/
-} AlxCrn120_0x00_StaticLock_Page_8;
+	StaticLock_Page_9_Off = 0b0,
+	StaticLock_Page_9_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_9;
 
 typedef enum
 {
-	StaticLock_Page_9_Off	= 0b0,		/*	R/W		0: Page_9 read / write		*/
-	StaticLock_Page_9_On	= 0b1		/*	R/W		1: Page_9 read only			*/
-} AlxCrn120_0x00_StaticLock_Page_9;
+	StaticLock_Page_10_Off = 0b0,
+	StaticLock_Page_10_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_10;
 
 typedef enum
 {
-	StaticLock_Page_10_Off	= 0b0,		/*	R/W		0: Page_10 read / write		*/
-	StaticLock_Page_10_On	= 0b1		/*	R/W		1: Page_10 read only		*/
-} AlxCrn120_0x00_StaticLock_Page_10;
+	StaticLock_Page_11_Off = 0b0,
+	StaticLock_Page_11_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_11;
 
 typedef enum
 {
-	StaticLock_Page_11_Off	= 0b0,		/*	R/W		0: Page_11 read / write		*/
-	StaticLock_Page_11_On	= 0b1		/*	R/W		1: Page_11 read only		*/
-} AlxCrn120_0x00_StaticLock_Page_11;
+	StaticLock_Page_12_Off = 0b0,
+	StaticLock_Page_12_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_12;
 
 typedef enum
 {
-	StaticLock_Page_12_Off	= 0b0,		/*	R/W		0: Page_12 read / write		*/
-	StaticLock_Page_12_On	= 0b1		/*	R/W		1: Page_12 read only		*/
-} AlxCrn120_0x00_StaticLock_Page_12;
+	StaticLock_Page_13_Off = 0b0,
+	StaticLock_Page_13_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_13;
 
 typedef enum
 {
-	StaticLock_Page_13_Off	= 0b0,		/*	R/W		0: Page_13 read / write		*/
-	StaticLock_Page_13_On	= 0b1		/*	R/W		1: Page_13 read only		*/
-} AlxCrn120_0x00_StaticLock_Page_13;
+	StaticLock_Page_14_Off = 0b0,
+	StaticLock_Page_14_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_14;
 
 typedef enum
 {
-	StaticLock_Page_14_Off	= 0b0,		/*	R/W		0: Page_14 read / write		*/
-	StaticLock_Page_14_On	= 0b1		/*	R/W		1: Page_14 read only		*/
-} AlxCrn120_0x00_StaticLock_Page_14;
-
-typedef enum
-{
-	StaticLock_Page_15_Off	= 0b0,		/*	R/W		0: Page_15 read / write		*/
-	StaticLock_Page_15_On	= 0b1		/*	R/W		1: Page_15 read only		*/
-} AlxCrn120_0x00_StaticLock_Page_15;
+	StaticLock_Page_15_Off = 0b0,
+	StaticLock_Page_15_On  = 0b1
+} AlxCrn120_00h_StaticLock_Page_15;
 
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t	 Addr									: 8;	/* 	Adrr.									R/W		1 byte			*/
-		uint64_t Serial_number							: 48;	/* 	Serial number (UID)						R/W		6 bytes			*/
-		uint32_t Internal								: 24;	/* 	Internal								R/W		3 bytes			*/
+		uint8_t	 Addr : 8;
+		uint64_t Serial_number : 48;
+		uint32_t Internal : 24;
 
-		AlxCrn120_0x00_StaticLock_Block_CC		BLCC	: 1;	/* 	Static lock Block_CC					R/W		1 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Block_9_4	BL9_14	: 1;	/* 	Static lock Block_9_4					R/W		1 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Block_15_10	BL15_10	: 1;	/* 	Static lock Block_15_10					R/W		1 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_CC		LCC		: 1;	/* 	Static lock Page_CC						R/W		1 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_4		L4		: 1;	/* 	Static lock Page_4						R/W		1 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_5		L5		: 1;	/* 	Static lock Page_5						R/W		1 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_6		L6		: 1;	/* 	Static lock Page_6						R/W		1 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_7		L7		: 1;	/* 	Static lock Page_7						R/W		1 of 2 bytes	*/
+		AlxCrn120_00h_StaticLock_Block_CC BLCC : 1;
+		AlxCrn120_00h_StaticLock_Block_9_4 BL9_14 : 1;
+		AlxCrn120_00h_StaticLock_Block_15_10 BL15_10 : 1;
+		AlxCrn120_00h_StaticLock_Page_CC LCC : 1;
+		AlxCrn120_00h_StaticLock_Page_4 L4 : 1;
+		AlxCrn120_00h_StaticLock_Page_5 L5 : 1;
+		AlxCrn120_00h_StaticLock_Page_6 L6 : 1;
+		AlxCrn120_00h_StaticLock_Page_7 L7 : 1;
+		AlxCrn120_00h_StaticLock_Page_8 L8 : 1;
+		AlxCrn120_00h_StaticLock_Page_9 L9 : 1;
+		AlxCrn120_00h_StaticLock_Page_10 L10 : 1;
+		AlxCrn120_00h_StaticLock_Page_11 L11 : 1;
+		AlxCrn120_00h_StaticLock_Page_12 L12 : 1;
+		AlxCrn120_00h_StaticLock_Page_13 L13 : 1;
+		AlxCrn120_00h_StaticLock_Page_14 L14 : 1;
+		AlxCrn120_00h_StaticLock_Page_15 L15 : 1;
 
-		AlxCrn120_0x00_StaticLock_Page_8		L8		: 1;	/* 	Static lock Page_8						R/W		2 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_9		L9		: 1;	/* 	Static lock Page_9						R/W		2 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_10		L10		: 1;	/* 	Static lock Page_10						R/W		2 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_11		L11		: 1;	/* 	Static lock Page_11						R/W		2 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_12		L12		: 1;	/* 	Static lock Page_12						R/W		2 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_13		L13		: 1;	/* 	Static lock Page_13						R/W		2 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_14		L14		: 1;	/* 	Static lock Page_14						R/W		2 of 2 bytes	*/
-		AlxCrn120_0x00_StaticLock_Page_15		L15		: 1;	/* 	Static lock Page_15						R/W		2 of 2 bytes	*/
-
-		uint32_t Capability_Container_CC				: 32;	/* 	Capability Container (CC)				R/W		4 bytes			*/
+		uint32_t Capability_Container_CC : 32;
 	};
 	uint8_t raw[16];
+} AlxCrn120_RegVal_00h;
 
-} AlxCrn120_RegBlockVal_0x00_Block_0;
-
-/*******************************************************************************************				Crn120			0x38	*/
+//------------------------------------------------------------------------------	// MF Fuka, nevem tocno ce je Protected_user_memory 32bit al 64bit. NFC ma naslove po 4byte, tak da je potemtakem 0xE0 pri NFC enak 0x38 pri I2C, torej bi mogo bit Protected_user_memory 64bit
+// Register 38h
+//------------------------------------------------------------------------------
+typedef enum
+{
+	DynamicLock_Page_16_31_Off = 0b0,
+	DynamicLock_Page_16_31_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_16_31;
+typedef enum
+{
+	DynamicLock_Page_32_47_Off = 0b0,
+	DynamicLock_Page_32_47_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_32_47;
+typedef enum
+{
+	DynamicLock_Page_48_63_Off = 0b0,
+	DynamicLock_Page_48_63_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_48_63;
+typedef enum
+{
+	DynamicLock_Page_64_79_Off = 0b0,
+	DynamicLock_Page_64_79_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_64_79;
+typedef enum
+{
+	DynamicLock_Page_80_95_Off = 0b0,
+	DynamicLock_Page_80_95_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_80_95;
+typedef enum
+{
+	DynamicLock_Page_96_111_Off = 0b0,
+	DynamicLock_Page_96_111_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_96_111;
+typedef enum
+{
+	DynamicLock_Page_112_127_Off = 0b0,
+	DynamicLock_Page_112_127_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_112_127;
+typedef enum
+{
+	DynamicLock_Page_128_143_Off = 0b0,
+	DynamicLock_Page_128_143_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_128_143;
+typedef enum
+{
+	DynamicLock_Page_144_159_Off = 0b0,
+	DynamicLock_Page_144_159_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_144_159;
+typedef enum
+{
+	DynamicLock_Page_160_175_Off = 0b0,
+	DynamicLock_Page_160_175_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_160_175;
+typedef enum
+{
+	DynamicLock_Page_176_191_Off = 0b0,
+	DynamicLock_Page_176_191_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_176_191;
+typedef enum
+{
+	DynamicLock_Page_192_207_Off = 0b0,
+	DynamicLock_Page_192_207_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_192_207;
+typedef enum
+{
+	DynamicLock_Page_208_223_Off = 0b0,
+	DynamicLock_Page_208_223_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_208_223;
+typedef enum
+{
+	DynamicLock_Page_224_225_Off = 0b0,
+	DynamicLock_Page_224_225_On  = 0b1
+} AlxCrn120_38h_DynamicLock_Page_224_225;
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint64_t Protected_user_memory	: 64;		/* 	Last 8 bytes of Protected user memory	R/W		8 bytes			*/
-		uint32_t Dynamic_lock_bytes		: 24;		/* 	Dynamic lock bytes						R/W		3 bytes			*/
-		uint8_t _00h					: 8;		/* 	00h										R/W		1 byte			*/
-		uint32_t RFU					: 24;		/* 	RFU										R/W		3 bytes			*/
-		uint8_t AUTH0					: 8;		/* 	AUTH0									R/W		1 byte			*/
+		uint64_t Protected_user_memory	: 64;
 
+		AlxCrn120_38h_DynamicLock_Page_16_31 L16_31 : 1;
+		AlxCrn120_38h_DynamicLock_Page_32_47 L32_47 : 1;
+		AlxCrn120_38h_DynamicLock_Page_48_63 L48_63 : 1;
+		AlxCrn120_38h_DynamicLock_Page_64_79 L64_79 : 1;
+		AlxCrn120_38h_DynamicLock_Page_80_95 L80_95 : 1;
+		AlxCrn120_38h_DynamicLock_Page_96_111 L96_111 : 1;
+		AlxCrn120_38h_DynamicLock_Page_112_127 L112_127 : 1;
+		AlxCrn120_38h_DynamicLock_Page_128_143 L128_143 : 1;
+		AlxCrn120_38h_DynamicLock_Page_144_159 L144_159 : 1;
+		AlxCrn120_38h_DynamicLock_Page_160_175 L160_175 : 1;
+		AlxCrn120_38h_DynamicLock_Page_176_191 L176_191 : 1;
+		AlxCrn120_38h_DynamicLock_Page_192_207 L192_207 : 1;
+		AlxCrn120_38h_DynamicLock_Page_208_223 L208_223 : 1;
+		AlxCrn120_38h_DynamicLock_Page_224_225 L224_225 : 1;
+		bool unused_6_Rfui : 1;
+		bool unused_7_Rfui : 1;
+		uint8_t unused : 8;		// MF: We won't use 2nd Byte of "Dynamic Lock Bytes"
+		uint8_t _00h : 8;
+
+		uint32_t RFU : 24;
+		uint8_t AUTH0 : 8;
 	};
 	uint8_t raw[16];
-} AlxCrn120_RegBlockVal_0x38_Block_38;
+} AlxCrn120_RegVal_38h;
 
-/*******************************************************************************************				Crn120			0x39	*/
+//------------------------------------------------------------------------------
+// Register 39h
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t ACCESS	: 8;				/* 	ACCESS									R/W		1 byte			*/
-		uint32_t RFU	: 24;				/* 	RFU										R/W		3 bytes			*/
-		uint32_t PWD	: 24;				/* 	PWD										R/W		3 bytes			*/
-		uint16_t PACK	: 16;				/* 	PACK									R/W		2 bytes			*/
-		uint16_t RFU_	: 16;				/* 	RFU										R/W		2 bytes			*/
-		uint8_t PT_I2C	: 8;				/* 	PT_I2C									R/W		1 byte			*/
-		uint32_t RFU_2	: 24;				/* 	RFU										R/W		3 bytes			*/
+		uint8_t ACCESS	: 8;
+		uint32_t RFU	: 24;
+		uint32_t PWD	: 24;
+		uint16_t PACK	: 16;
+		uint16_t RFU_	: 16;
+		uint8_t PT_I2C	: 8;
+		uint32_t RFU_2	: 24;
 	};
 	uint8_t raw[16];
-} AlxCrn120_RegBlockVal_0x39_Block_39;
+} AlxCrn120_RegVal_39h;
 
-/*******************************************************************************************				Crn120			0x3A	*/
+//------------------------------------------------------------------------------
+// Register 3Ah
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -229,12 +320,11 @@ typedef union
 		uint64_t _00h				: 64;	/* 	00h										R		8 bytes			*/
 	};
 	uint8_t raw[16];
-} AlxCrn120_RegBlockVal_0x3A_Block_ConfigurationReg;
+} AlxCrn120_RegVal_3Ah_ConfigurationReg;
 
-/*******************************************************************************************				Crn120_SessionReg	0xFE	*/
-
-	/********		NcReg		******/
-
+//------------------------------------------------------------------------------
+// Register FEh
+//------------------------------------------------------------------------------
 typedef enum
 {	/*defines the data flow direction when pass-through mode is enabled*/
 	TransferData_I2C_to_NFC = 0b0,	/*	R/W		0b: from I2C to NFC interface										*/
@@ -364,7 +454,7 @@ typedef union
 		uint64_t _00h				: 64;	/* 	00h										R		8 bytes			*/
 	};
 	uint8_t raw[16];
-} AlxCrn120_RegBlockVal_0xFE_Block_SessionReg;
+} AlxCrn120_RegVal_FEh_SessionReg;
 
 
 //******************************************************************************
@@ -374,36 +464,36 @@ typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxCrn120_RegBlockVal_0x00_Block_0 val;
-} AlxCrn120_RegBlock_0x00_Block_0;
+	AlxCrn120_RegVal_00h val;
+} AlxCrn120_Reg_00h;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxCrn120_RegBlockVal_0x38_Block_38 val;
-} AlxCrn120_RegBlock_0x38_Block_38;
+	AlxCrn120_RegVal_38h val;
+} AlxCrn120_Reg_38h;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxCrn120_RegBlockVal_0x39_Block_39 val;
-} AlxCrn120_RegBlock_0x39_Block_39;
+	AlxCrn120_RegVal_39h val;
+} AlxCrn120_Reg_39h;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxCrn120_RegBlockVal_0x3A_Block_ConfigurationReg val;
-} AlxCrn120_RegBlock_0x3A_Block_ConfigurationReg;
+	AlxCrn120_RegVal_3Ah_ConfigurationReg val;
+} AlxCrn120_Reg_3Ah_ConfigurationReg;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxCrn120_RegBlockVal_0xFE_Block_SessionReg val;
-} AlxCrn120_RegBlock_0xFE_Block_SessionReg;
+	AlxCrn120_RegVal_FEh_SessionReg val;
+} AlxCrn120_Reg_FEh_SessionReg;
 
 
 //******************************************************************************
@@ -411,17 +501,33 @@ typedef struct
 //******************************************************************************
 typedef struct
 {
-	AlxCrn120_RegBlock_0x00_Block_0						_0x00;
-	AlxCrn120_RegBlock_0x38_Block_38					_0x38;
-	AlxCrn120_RegBlock_0x39_Block_39					_0x39;
-	AlxCrn120_RegBlock_0x3A_Block_ConfigurationReg		_0x3A_ConfigurationReg;
-	AlxCrn120_RegBlock_0xFE_Block_SessionReg			_0xFE_SessionReg;
-} AlxCrn120_RegBlock;
+	AlxCrn120_Reg_00h					_0x00;
+	AlxCrn120_Reg_38h					_0x38;
+	AlxCrn120_Reg_39h					_0x39;
+	AlxCrn120_Reg_3Ah_ConfigurationReg	_0x3A_ConfigurationReg;
+	AlxCrn120_Reg_FEh_SessionReg		_0xFE_SessionReg;
+} AlxCrn120_Reg;
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxCrn120_UsrMemAddr_0x01 = 0x01,
+	AlxCrn120_UsrMemAddr_0x02 = 0x02,
+	AlxCrn120_UsrMemAddr_0x03 = 0x03,
+	AlxCrn120_UsrMemAddr_0x04 = 0x04,
+	// TODO
+	AlxCrn120_UsrMemAddr_0x37 = 0x37,
+} AlxCrn120_UsrMemAddr;
+typedef enum
+{
+	AlxCrn120_SramAddr_0xF8 = 0xF8,
+	AlxCrn120_SramAddr_0xF9 = 0xF9,
+	AlxCrn120_SramAddr_0xFA = 0xFA,
+	AlxCrn120_SramAddr_0xFB = 0xFB
+} AlxCrn120_SramAddr;
 typedef struct
 {
 	// Objects - External
@@ -434,7 +540,7 @@ typedef struct
 	uint16_t i2cTimeout_ms;
 
 	// Variables
-	AlxCrn120_RegBlock regblock;
+	AlxCrn120_Reg regblock;
 
 	// Info
 	bool isInit;
@@ -461,6 +567,8 @@ void AlxCrn120_Ctor
 //******************************************************************************
 Alx_Status AlxCrn120_Init(AlxCrn120* me);
 Alx_Status AlxCrn120_DeInit(AlxCrn120* me);
+Alx_Status AlxCrn120_UsrMem(AlxCrn120* me, bool toRead, AlxCrn120_UsrMemAddr addr); // MF: Addr can be 0x01-0b37 and "9.7 READ and WRITE Operation" have to be used, meaning 16bytes in one read/write
+Alx_Status AlxCrn120_Sram(AlxCrn120* me, bool toRead, AlxCrn120_SramAddr addr); // MF: Addr can be 0xF8, 0xF9, 0xFA or 0xFB and "9.7 READ and WRITE Operation" have to be used, meaning 16bytes in one read/write
 
 
 #ifdef __cplusplus
