@@ -71,9 +71,10 @@ typedef struct
 	/// Js
 	///-------
 	#if defined(ALX_TEST_JS)
-	AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp;
-	AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431 alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431;
-	AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120 alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120;
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp;
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431 alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431;
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120 alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120;
+	AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize alxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize;
 	#endif
 
 	///-------
@@ -125,9 +126,10 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Ctor(AlxHwNfcWlcListenerV3_
 	/// Js
 	///-------
 	#if defined(ALX_TEST_JS)
-	AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
-	AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
-	AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+	AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize);
 	#endif
 
 	///-------
@@ -168,9 +170,10 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Init(AlxHwNfcWlcListenerV3_
 	/// Js
 	///-------
 	#if defined(ALX_TEST_JS)
-	AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
-	AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
-	AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+	AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize);
 	#endif
 
 	///-------
@@ -211,9 +214,10 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Run(AlxHwNfcWlcListenerV3_5
 	/// Js
 	///-------
 	#if defined(ALX_TEST_JS)
-	AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
-	AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
-	AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+	AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize);
 	#endif
 
 	///-------

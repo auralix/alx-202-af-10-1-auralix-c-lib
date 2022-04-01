@@ -83,15 +83,15 @@ void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 }
 void AlxIoPinIrq_Foreground_Callback_Pin3()
 {
-	AlxTrace_WriteFormat(&alxTrace, "************************	INTERRUPT	*************************\r\n");
+	ALX_PCA9431_TRACE(&alxTrace, "************************	INTERRUPT	*************************\r\n");
 }
 void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
-	AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
+	ALX_PCA9431_TRACE(&alxTrace, "RiseEdge\r\n");
 }
 void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
-	AlxTrace_WriteStr(&alxTrace, "FallEdge	************************	INTERRUPT	*************************\r\n");
+	ALX_PCA9431_TRACE(&alxTrace, "FallEdge	************************	INTERRUPT	*************************\r\n");
 }
 #endif
 
