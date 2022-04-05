@@ -43,7 +43,6 @@ Everything is according to new testing system
 	- ![AlxHwNfcWlcListenerV3_5b_Main_JsTest_G04_Pca9431_Optimize_PcaLibSpace](Img/AlxHwNfcWlcListenerV3_5b_Main_JsTest_G04_Pca9431_Optimize_PcaLibSpace.jpg)
 
 ---
----
 # __[alxWiki_Home](../../../alxWiki_Home.md)__
 
-# __[alxWiki_alxPca9431.md](../../Ext/alxWiki_alxPca9431)__
+# __[alxWiki_alxPca9431.md](../../Ext/alxWiki_alxPca9431.md)__

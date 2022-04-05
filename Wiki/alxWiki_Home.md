@@ -16,7 +16,7 @@
     - HwNfcWlcListenerV3_5b
         - Test
             - [alxHwNfcWlcListenerV3_5b_MfTest - ALX HW NFC WLC Listener V3_5b MF Test Module](Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_MfTest.md)
-			- [alxHwNfcWlcListenerV3_5b_MfTest - ALX HW NFC WLC Listener V3_5b JS Test Module](Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_JsTest.md)
+			- [alxHwNfcWlcListenerV3_5b_JsTest - ALX HW NFC WLC Listener V3_5b JS Test Module](Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_JsTest.md)
     - HwNucleoF429Zi
         - Test
             - [alxHwNucleoF429Zi_TvTest - ALX HW Nucleo-F429ZI TV Test Module](Hw/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_TvTest.md)
