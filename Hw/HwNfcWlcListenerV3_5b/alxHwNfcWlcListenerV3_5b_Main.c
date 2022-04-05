@@ -102,6 +102,9 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 	//------------------------------------------------------------------------------
 	// ALX - ADC
 	//------------------------------------------------------------------------------
+
+	// JS: optimize size for Lpc804 MCU
+
 	//me->adcIoPinArr[0] = &me->alxIoPin.ai_P0_9_ADC_CH4;	// TV: When testing ADC use this
 	//me->adcChArr[0] = Alx_Ch_4;
 	//#if defined ALX_OPTIMIZE_SIZE_ALL
@@ -130,6 +133,9 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 	//------------------------------------------------------------------------------
 	// ALX - PWM
 	//------------------------------------------------------------------------------
+
+	// JS: optimize size for Lpc804 MCU
+
 	//me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_LED_GR_PWM1;
 	//me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_LED_GR_PWM2;
 	//me->pwmChArr[0] = Alx_Ch_1;
