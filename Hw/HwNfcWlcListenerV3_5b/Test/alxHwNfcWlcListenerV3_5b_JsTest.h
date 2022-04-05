@@ -753,7 +753,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize_Init(Alx
 	// Init
 	AlxClk_Init(&alxClk);
 	AlxTrace_Init(&alxTrace);
-
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_8_PCA943X_EN);
 	// IoPinIrq
 	//AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoIrqPin_di_P0_9_PCA943X_nINT_IRQ1);
 

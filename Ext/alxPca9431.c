@@ -782,7 +782,7 @@ static void AlxPca9431_RegStruct_SetValToDefault(AlxPca9431* me)
 	me->reg._0Eh_Sample_EN			.val.raw = 0b01111111;
 	me->reg._0Fh_VPWR_CONFIG		.val.raw = 0b10000011;
 	me->reg._10h_RXIR_CONFIG		.val.raw = 0b00000000;
-	me->reg._20h_OCPSET_LOCK		.val.raw = 0b00001000;
+	me->reg._20h_OCPSET_LOCK		.val.raw = 0b10101000;
 	me->reg._21h_VOUTLDO_OCP		.val.raw = 0b00001000;
 	me->reg._30h_VRECT_ADC_H		.val.raw = 0b00000000;
 	me->reg._31h_VRECT_ADC_L		.val.raw = 0b00000000;
@@ -822,9 +822,6 @@ static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me)
 	status = AlxPca9431_Reg_Write(me, &me->reg._04h_VRECT_INT_MASK		);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_04_VRECT_INT_MASK		"); return status;}
 
-	status = AlxPca9431_Reg_Write(me, &me->reg._05h_VOUTLDO_INT);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_05_VOUTLDO_INT			"); return status; }
-
 	status = AlxPca9431_Reg_Write(me, &me->reg._06h_VOUTLDO_INT_MASK	);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_06_VOUTLDO_INT_MASK		"); return status;}
 
@@ -839,9 +836,6 @@ static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me)
 
 	status = AlxPca9431_Reg_Write(me, &me->reg._0Ah_TEMP_THD			);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_0A_TEMP_THD				"); return status;}
-
-	status = AlxPca9431_Reg_Write(me, &me->reg._0Bh_WD_EN_RST			);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_0B_WD_EN_RST				"); return status;}
 
 	status = AlxPca9431_Reg_Write(me, &me->reg._0Ch_Varactor_DAC		);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_0C_Varactor_DAC			"); return status;}
@@ -861,7 +855,7 @@ static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me)
 	status = AlxPca9431_Reg_Write(me, &me->reg._20h_OCPSET_LOCK			);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_20_OCPSET_LOCK			"); return status;}
 
-	status = AlxPca9431_Reg_Write(me, &me->reg._21h_VOUTLDO_OCP			); // JS: some error don't understand
+	status = AlxPca9431_Reg_Write(me, &me->reg._21h_VOUTLDO_OCP			); // JS: repair error - it was locked, beacuse wrong default value in datasheet table 6.
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_21_VOUTLDO_OCP			"); return status;}
 
 	return Alx_Ok;

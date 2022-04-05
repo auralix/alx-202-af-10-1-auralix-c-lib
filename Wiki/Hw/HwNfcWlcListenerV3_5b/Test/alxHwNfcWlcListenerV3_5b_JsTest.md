@@ -1,5 +1,5 @@
-# Auralix C Library - ALX HW NFC WLC Listener V3_5b MF Test Module
-
+# Auralix C Library - ALX HW NFC WLC Listener V3_5b JS Test Module
+---
 ## __G01_BringUp__
 ---
 Everything is according to new testing system
@@ -7,7 +7,6 @@ Everything is according to new testing system
 ## __G02_Pca9431__
 ---
 - Testing I2c Functions using PCA9431
-- Tested by Nucleo not LPC804
 - More : - [alxHwNucleoF429Zi_JsTest - ALX HW Nucleo-F429ZI JS Test Module](../../Hw/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md)
 
 ## __G03_Crn120__
@@ -43,6 +42,8 @@ Everything is according to new testing system
 	- PcaLibSpace
 	- ![AlxHwNfcWlcListenerV3_5b_Main_JsTest_G04_Pca9431_Optimize_PcaLibSpace](Img/AlxHwNfcWlcListenerV3_5b_Main_JsTest_G04_Pca9431_Optimize_PcaLibSpace.jpg)
 
-### __Error using Lpc804 and PCA9431__ 
-	- error in alxPca9431 -> static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me) -> status = AlxPca9431_Reg_Write(me, &me->reg._20h_OCPSET_LOCK	);
-	- ![AlxHwNfcWlcListenerV3_5b_Main_JsTest_G04_Pca9431_Optimize_PcaError](Img/AlxHwNfcWlcListenerV3_5b_Main_JsTest_G04_Pca9431_Optimize_PcaError.jpg)
+---
+---
+# __[alxWiki_Home](../../../alxWiki_Home.md)__
+
+# __[alxWiki_alxPca9431.md](../../Ext/alxWiki_alxPca9431)__
