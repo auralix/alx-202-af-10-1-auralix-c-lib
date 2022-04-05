@@ -103,7 +103,7 @@
 - **uint16_t i2cTimeout_ms**
 
 ---
-# __[alxWiki_Home](../../alxWiki_Home.md)__
+# __[alxWiki_Home](../alxWiki_Home.md)__
 
 # __[alxHwNfcWlcListenerV3_5b_JsTest.md](../Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_JsTest.md)__
 
