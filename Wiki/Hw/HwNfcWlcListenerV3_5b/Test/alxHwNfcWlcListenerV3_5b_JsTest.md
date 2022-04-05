@@ -7,14 +7,14 @@ Everything is according to new testing system
 ## __G02_Pca9431__
 ---
 - Testing I2c Functions using PCA9431
-- More : - [alxHwNucleoF429Zi_JsTest - ALX HW Nucleo-F429ZI JS Test Module](../../Test/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md) 
+- More : - [alxHwNucleoF429Zi_JsTest - ALX HW Nucleo-F429ZI JS Test Module](../../../HwNucleoF429Zi/Test/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md) 
 
 
 ## __G03_Crn120__
 ---
 - Testing I2c Functions using CRN120
 - Tested by Nucleo not LPC804
-- More : - [alxHwNucleoF429Zi_JsTest - ALX HW Nucleo-F429ZI JS Test Module](../../Test/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md) 
+- More : - [alxHwNucleoF429Zi_JsTest - ALX HW Nucleo-F429ZI JS Test Module](../../../HwNucleoF429Zi/Test/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md) 
 
 ## __G04_Pca9431_Optimize__
 ---
@@ -48,4 +48,4 @@ Everything is according to new testing system
 
 # __[alxWiki_alxPca9431.md](../../../Ext/alxWiki_alxPca9431.md)__
 
-# __[alxWiki_alxHwNucleoF429Zi_JsTest.md](../../Test/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md)__
+# __[alxWiki_alxHwNucleoF429Zi_JsTest.md](../../../HwNucleoF429Zi/Test/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md)__
