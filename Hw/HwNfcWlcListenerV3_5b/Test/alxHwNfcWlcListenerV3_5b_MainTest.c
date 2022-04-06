@@ -107,6 +107,10 @@ void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
 	AlxTrace_WriteStr(&alxTrace, "FallEdge\r\n");
 }
+void AlxCrn120_RegStruct_SetVal(me)
+{
+	(void)me;
+}
 #endif
 
 //------------------------------------------------------------------------------

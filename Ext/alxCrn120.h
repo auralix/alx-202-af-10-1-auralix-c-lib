@@ -344,11 +344,6 @@ typedef union
 //------------------------------------------------------------------------------
 typedef enum
 {
-	Access_Nfc_Prot_Write = 0b0,
-	Access_Nfc_Prot_ReadAndWrite = 0b1
-} AlxCrn120_39h_Access_Nfc_Prot;
-typedef enum
-{
 	Access_AuthLim_Disabled        = 0b000,
 	Access_AuthLim_MaxAttempts_2   = 0b001,
 	Access_AuthLim_MaxAttempts_4   = 0b010,
@@ -358,6 +353,11 @@ typedef enum
 	Access_AuthLim_MaxAttempts_64  = 0b110,
 	Access_AuthLim_MaxAttempts_128 = 0b111
 } AlxCrn120_39h_Access_AuthLim;
+typedef enum
+{
+	Access_Nfc_Prot_Write = 0b0,
+	Access_Nfc_Prot_ReadAndWrite = 0b1
+} AlxCrn120_39h_Access_Nfc_Prot;
 typedef enum
 {
 	Pt_I2c_I2cProt_EntireUrsMemAccessible  = 0b00,
@@ -374,9 +374,9 @@ typedef union
 	struct __attribute__((packed))
 	{
 		// #1 ACCESS
-		AlxCrn120_39h_Access_Nfc_Prot NFC_PROT : 1;
-		uint8_t unused_3_6 : 4; // bits 3..6 are unused
 		AlxCrn120_39h_Access_AuthLim AUTHLIM : 3;
+		uint8_t unused_3_6 : 4; // bits 3..6 are unused
+		AlxCrn120_39h_Access_Nfc_Prot NFC_PROT : 1;
 
 		// #2 RFU
 		uint32_t RFU1	: 24;
@@ -455,6 +455,28 @@ typedef union
 	};
 	uint8_t raw[16];
 } AlxCrn120_RegVal_3Ah_ConfigurationReg;
+
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		AlxCrn120_CfgSess_NcReg_TransferDir TRANSFER_DIR : 1;
+		AlxCrn120_CfgSess_NcReg_SramMirror SRAM_MIRROR : 1;
+		AlxCrn120_CfgSess_NcReg_EdOn ED_ON : 2;
+		AlxCrn120_CfgSess_NcReg_EdOff ED_OFF : 2;
+		AlxCrn120_CfgSess_NcReg_PassThroughMode PTHRU : 1;
+		AlxCrn120_CfgSess_NcReg_NfcsI2cRst NFCS_I2C_RST : 1;
+	};
+	uint8_t raw;
+} AlxCrn120_RegVal_3Ah_ConfigReg_0_NcReg;
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t LAST_NDEF_BLOCK : 8;
+	};
+	uint8_t raw;
+} AlxCrn120_RegVal_3Ah_ConfigReg_1_LastNdefBlock;
 
 //------------------------------------------------------------------------------
 // Register FEh
@@ -597,11 +619,11 @@ typedef struct
 //******************************************************************************
 typedef struct
 {
-	AlxCrn120_Reg_00h					_0x00;
-	AlxCrn120_Reg_38h					_0x38;
-	AlxCrn120_Reg_39h					_0x39;
-	AlxCrn120_Reg_3Ah_ConfigurationReg	_0x3A_ConfigurationReg;
-	AlxCrn120_Reg_FEh_SessionReg		_0xFE_SessionReg;
+	AlxCrn120_Reg_00h					_00h;
+	AlxCrn120_Reg_38h					_38h;
+	AlxCrn120_Reg_39h					_39h;
+	AlxCrn120_Reg_3Ah_ConfigurationReg	_3Ah_ConfigurationReg;
+	AlxCrn120_Reg_FEh_SessionReg		_FEh_SessionReg;
 } AlxCrn120_Reg;
 
 
@@ -610,20 +632,22 @@ typedef struct
 //******************************************************************************
 typedef enum
 {
-	AlxCrn120_UsrMemAddr_0x01 = 0x01,
-	AlxCrn120_UsrMemAddr_0x02 = 0x02,
-	AlxCrn120_UsrMemAddr_0x03 = 0x03,
-	AlxCrn120_UsrMemAddr_0x04 = 0x04,
+	// User Memory Addres
+	AlxCrn120_MemAddr_UsrMem_01h = 0x01,
+	AlxCrn120_MemAddr_UsrMem_02h = 0x02,
+	AlxCrn120_MemAddr_UsrMem_03h = 0x03,
+	AlxCrn120_MemAddr_UsrMem_04h = 0x04,
 	// TODO
-	AlxCrn120_UsrMemAddr_0x37 = 0x37,
-} AlxCrn120_UsrMemAddr;
-typedef enum
-{
-	AlxCrn120_SramAddr_0xF8 = 0xF8,
-	AlxCrn120_SramAddr_0xF9 = 0xF9,
-	AlxCrn120_SramAddr_0xFA = 0xFA,
-	AlxCrn120_SramAddr_0xFB = 0xFB
-} AlxCrn120_SramAddr;
+	AlxCrn120_MemAddr_UsrMem_37h = 0x37,
+	//AlxCrn120_MemAddr_UsrMem_38h = 0x38,	// MF: On address 38h, only first 8 Bytes are User (Protected) Memory, not the whole 16 Bytes. We won't use this UsrMem because code would be more complicated
+
+	// SRAM Address
+	AlxCrn120_MemAddr_Sram_F8h = 0xF8,
+	AlxCrn120_MemAddr_Sram_F9h = 0xF9,
+	AlxCrn120_MemAddr_Sram_FAh = 0xFA,
+	AlxCrn120_MemAddr_Sram_FBh = 0xFB
+} AlxCrn120_MemAddr;
+
 typedef struct
 {
 	// Objects - External
@@ -636,7 +660,7 @@ typedef struct
 	uint16_t i2cTimeout_ms;
 
 	// Variables
-	AlxCrn120_Reg regblock;
+	AlxCrn120_Reg reg;
 
 	// Info
 	bool isInit;
@@ -663,11 +687,14 @@ void AlxCrn120_Ctor
 //******************************************************************************
 Alx_Status AlxCrn120_Init(AlxCrn120* me);
 Alx_Status AlxCrn120_DeInit(AlxCrn120* me);
-Alx_Status AlxCrn120_UsrMem(AlxCrn120* me, bool toRead, AlxCrn120_UsrMemAddr addr); // MF: Addr can be 0x01-0b37 and "9.7 READ and WRITE Operation" have to be used, meaning 16bytes in one read/write
-Alx_Status AlxCrn120_Sram(AlxCrn120* me, bool toRead, AlxCrn120_SramAddr addr); // MF: Addr can be 0xF8, 0xF9, 0xFA or 0xFB and "9.7 READ and WRITE Operation" have to be used, meaning 16bytes in one read/write
+Alx_Status AlxCrn120_Reg_Write(AlxCrn120* me, void* reg, uint8_t* data);
+Alx_Status AlxCrn120_Reg_Read(AlxCrn120* me, void* reg, uint8_t* data);
+Alx_Status AlxCrn120_Reg_WriteReg(AlxCrn120* me, void* reg, uint8_t* data, uint8_t byte);
+Alx_Status AlxCrn120_Reg_ReadReg(AlxCrn120* me, void* reg, uint8_t* data, uint8_t byte);
+Alx_Status AlxCrn120_Mem(AlxCrn120* me, AlxCrn120_MemAddr addr, uint8_t* data, bool toWrite);	// MF: "9.7 READ and WRITE Operation" have to be used, meaning 16bytes in one read/write
 
-// TODO - Capability Container (CC) ka jse bo tu kurblalo? treba nastudirat
-
+//Alx_Status AlxCrn120_GetAddr(AlxCrn120* me, uint8_t* addr);
+//Alx_Status AlxCrn120_SetAddr(AlxCrn120* me, uint8_t* addr);
 //Alx_Status AlxCrn120_LockPage(AlxCrn120* me, bool toLock, uint8_t* addr);	// MF: We won't use it at the moment
 
 
