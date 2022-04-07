@@ -28,33 +28,33 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 	//------------------------------------------------------------------------------
 	// ALX - IoPin
 	//------------------------------------------------------------------------------
-	AlxIoPin_Ctor(&me->alxIoPin.di_P0_0_UART_RX,			0,	0,	AlxIoPin_Func_Swm_USART1_RXD,	IOCON_MODE_INACT,	false,	true,	true	);
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_0_UART_RX,			0,	0,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,		false		);	// TV: Will be used as Debug pin
 	//P0_1	- Unused
 	//P0_2	- SWD_IO
 	//P0_3	- SWD_CLK
 	//P0_4	- DBG_UART_TX -> ALX Trace Handle
 	//P0_5	- nRST
 	//P0_6	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.di_P0_7_CRN_FD_IRQ2,		0,	7,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_8_PCA943X_EN, 		0,	8,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,	false	);	// TV: When testing ADC use this: AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,			0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,	false,	false,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.di_P0_9_PCA943X_nINT_IRQ1,	0,	9,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_7_CRN_FD_IRQ2,		0,	7,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	ALX_NULL,	ALX_NULL	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_8_PCA943X_EN, 		0,	8,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,		false		);	// TV: Disable PCA943X Sleep Mode in Init 	// TV: When testing ADC use this: AlxIoPin_Ctor(&me->alxIoPin.ai_P0_9_ADC_CH4,			0,	9,	AlxIoPin_Func_Swm_ADC_CHN4,		IOCON_MODE_INACT,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_9_PCA943X_nINT_IRQ1,	0,	9,	AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	ALX_NULL,	ALX_NULL	);
 	//P0_10	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC,			0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	true	);
+	AlxIoPin_Ctor(&me->alxIoPin.ao_P0_11_CRN_VCC,			0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,		true		);	// TV: Enable CRN120 in Init
 	//P0_12	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.di_P0_13_CRN_ED_IRQ3,		0,	13, AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	true,	true	);
+	AlxIoPin_Ctor(&me->alxIoPin.di_P0_13_CRN_ED_IRQ3,		0,	13, AlxIoPin_Func_IRQ,				IOCON_MODE_INACT,	false,	ALX_NULL,	ALX_NULL	);
 	//P0_14	- Unused
 	//P0_15	- Unused
-	AlxIoPin_Ctor(&me->alxIoPin.io_P0_16_I2C0_SDA,			0,	16,	AlxIoPin_Func_Swm_I2C0_SDA,		IOCON_MODE_INACT,	false,	false,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_17_I2C0_SCL,			0,	17,	AlxIoPin_Func_Swm_I2C0_SCL,		IOCON_MODE_INACT,	false,	false,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_18_LED_RD,			0,	18,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_19_LED_GR,			0,	19,	AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.io_P0_16_I2C0_SDA,			0,	16,	AlxIoPin_Func_Swm_I2C0_SDA,		IOCON_MODE_INACT,	true,	ALX_NULL,	ALX_NULL	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_17_I2C0_SCL,			0,	17,	AlxIoPin_Func_Swm_I2C0_SCL,		IOCON_MODE_INACT,	true,	ALX_NULL,	ALX_NULL	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_18_LED_RD,			0,	18,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,		true		);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_19_LED_GR,			0,	19,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,		true		);
 	//P0_20	- Unused
 	//P0_21	- Unused
 	//P0_22 - Unused
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED_GR, 			0,	22, AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_23_LED_GR, 			0,	23, AlxIoPin_Func_GPIO,				IOCON_MODE_PULLUP,	false,	true,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_LED_GR_PWM1,		0,	24,	AlxIoPin_Func_Swm_T0_MAT_CHN1,	IOCON_MODE_INACT,	false,	false,	false	);
-	AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_LED_GR_PWM2,		0,	25,	AlxIoPin_Func_Swm_T0_MAT_CHN2,	IOCON_MODE_INACT,	false,	false,	false	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_22_LED_GR, 			0,	22, AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,		true		);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_23_LED_GR, 			0,	23, AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,		true		);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_24_LED_GR_PWM1,		0,	24,	AlxIoPin_Func_Swm_T0_MAT_CHN1,	IOCON_MODE_INACT,	false,	ALX_NULL,	ALX_NULL	);
+	AlxIoPin_Ctor(&me->alxIoPin.do_P0_25_LED_GR_PWM2,		0,	25,	AlxIoPin_Func_Swm_T0_MAT_CHN2,	IOCON_MODE_INACT,	false,	ALX_NULL,	ALX_NULL	);
 	//P0_26	- Unused
 	//P0_27	- Unused
 	//P0_28	- Unused
@@ -130,29 +130,29 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 	//------------------------------------------------------------------------------
 	// ALX - PWM
 	//------------------------------------------------------------------------------
-	me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_LED_GR_PWM1;
-	me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_LED_GR_PWM2;
-	me->pwmChArr[0] = Alx_Ch_1;
-	me->pwmChArr[1] = Alx_Ch_2;
-	#if defined ALX_OPTIMIZE_SIZE_ALL
-	me->pwmDutyDefaultArr[0] = 543U;
-	me->pwmDutyDefaultArr[1] = 123U;
-	#else
-	me->pwmDutyDefaultArr[0] = 12.34f;
-	me->pwmDutyDefaultArr[1] = 50.f;
-	#endif
-	AlxPwm_Ctor
-	(
-		&me->alxPwm,
-		CTIMER0,
-		me->pwmIoPinArr,
-		me->pwmChArr,
-		ALX_ARR_LEN(me->pwmChArr),
-		&alxClk,
-		me->pwmDutyDefaultArr,
-		0,
-		100
-	);
+	//me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_LED_GR_PWM1;
+	//me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_LED_GR_PWM2;
+	//me->pwmChArr[0] = Alx_Ch_1;
+	//me->pwmChArr[1] = Alx_Ch_2;
+	//#if defined ALX_OPTIMIZE_SIZE_ALL
+	//me->pwmDutyDefaultArr[0] = 543U;
+	//me->pwmDutyDefaultArr[1] = 123U;
+	//#else
+	//me->pwmDutyDefaultArr[0] = 12.34f;
+	//me->pwmDutyDefaultArr[1] = 50.f;
+	//#endif
+	//AlxPwm_Ctor
+	//(
+	//	&me->alxPwm,
+	//	CTIMER0,
+	//	me->pwmIoPinArr,
+	//	me->pwmChArr,
+	//	ALX_ARR_LEN(me->pwmChArr),
+	//	&alxClk,
+	//	me->pwmDutyDefaultArr,
+	//	0,
+	//	100
+	//);
 
 
 	//------------------------------------------------------------------------------

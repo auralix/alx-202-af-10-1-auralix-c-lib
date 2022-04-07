@@ -20,9 +20,12 @@ static void AlxPca9431_RegStruct_SetAddr(AlxPca9431* me);
 static void AlxPca9431_RegStruct_SetLen(AlxPca9431* me);
 static void AlxPca9431_RegStruct_SetValToZero(AlxPca9431* me);
 static void AlxPca9431_RegStruct_SetValToDefault(AlxPca9431* me);
+
 static Alx_Status AlxPca9431_Reg_Write(AlxPca9431* me, void* reg);
 static Alx_Status AlxPca9431_Reg_Read(AlxPca9431* me, void* reg);
 static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me);
+
+static Alx_Status AlxPca9431_TraceId(AlxPca9431* me);
 
 
 //******************************************************************************
@@ -80,24 +83,28 @@ Alx_Status AlxPca9431_Init(AlxPca9431* me)
 	status = AlxI2c_Init(me->i2c);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_Init"); return status; }
 
-//	// #3 Check if slave ready		// JS: DIDN'T check & tested
-//	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 1, 1000);
-//	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
+	// #3 Check if slave ready
+	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
 
 	// #4 Set registers values to default
 	AlxPca9431_RegStruct_SetValToDefault(me);
 
-	// #5 Set registers values - WEAK
+	// #5 Read ID register & Trace ID
+	status = AlxPca9431_TraceId(me);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_TraceId"); return status; }
+
+	// #6 Set registers values - WEAK
 	AlxPca9431_RegStruct_SetVal(me);
 
-	// #6 Write registers
+	// #7 Write registers
 	status = AlxPca9431_Reg_WriteVal(me);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_Reg_WriteVal"); return status;}
 
-	// #7 Set isInit
+	// #8 Set isInit
 	me->isInit = true;
 
-	// #8 Return OK
+	// #9 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me)
@@ -111,7 +118,7 @@ Alx_Status AlxPca9431_DeInit(AlxPca9431* me)
 
 	// #2 DeInit I2C
 	status = AlxI2c_DeInit(me->i2c);
-	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err_AlxI2c_DeInit"); return status; }
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_DeInit"); return status; }
 
 	// #3 Reset isInit
 	me->isInit = false;
@@ -121,144 +128,338 @@ Alx_Status AlxPca9431_DeInit(AlxPca9431* me)
 }
 Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V)
 {
+	// Optimize Guard
+	#if defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	ALX_PCA9431_ASSERT(false);
+	return ALX_NULL;
+	#else
+
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
+	Alx_Status status = Alx_Err;
 	uint8_t AdcHBitVoltage = 0;
 	uint8_t AdcLBitVoltage = 0;
 	uint16_t AdcBitVoltage = 0;
 
-	// #2 TODO
-	Alx_Status status = AlxPca9431_Reg_Read(me, &me->reg._34h_VOUT_ADC_H);
+	// #2 Read Voltage ADC H Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._34h_VOUT_ADC_H);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 	AdcHBitVoltage = me->reg._34h_VOUT_ADC_H.val.raw;
 	AdcBitVoltage = (uint16_t) AdcHBitVoltage;
 	AdcBitVoltage = AdcBitVoltage << 2;
 
-	// #3 TODO
+	// #3 Read Voltage ADC L Bits
 	status = AlxPca9431_Reg_Read(me, &me->reg._35h_VOUT_ADC_L);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 	AdcLBitVoltage = me->reg._35h_VOUT_ADC_L.val.raw;
 	AdcLBitVoltage = AdcLBitVoltage >> 6;
 
-	// #4 TODO
+	// #4 Conversion
 	AdcBitVoltage += AdcLBitVoltage;
 	*voltage_V = AdcBitVoltage*5.27/1000;
 
 	// #5 Return OK
 	return Alx_Ok;
+	#endif
 }
-Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A)
+Alx_Status AlxPca9431_LdoVout_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV)
 {
+	// Optimize Guard
+	#if !(defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	ALX_PCA9431_ASSERT(false);
+	return ALX_NULL;
+	#else
+
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
+	Alx_Status status = Alx_Err;
+	uint8_t AdcHBitVoltage = 0;
+	uint8_t AdcLBitVoltage = 0;
+	uint16_t AdcBitVoltage = 0;
+
+	// #2 Read Voltage ADC H Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._34h_VOUT_ADC_H);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+	AdcHBitVoltage = me->reg._34h_VOUT_ADC_H.val.raw;
+	AdcBitVoltage = (uint16_t)AdcHBitVoltage;
+	AdcBitVoltage = AdcBitVoltage << 2;
+
+	// #3 Read Voltage ADC L Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._35h_VOUT_ADC_L);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+	AdcLBitVoltage = me->reg._35h_VOUT_ADC_L.val.raw;
+	AdcLBitVoltage = AdcLBitVoltage >> 6;
+
+	// #4 Conversion
+	AdcBitVoltage += AdcLBitVoltage;
+	*voltage_mV = AdcBitVoltage * 527 / 100;	// JS: 5.27 / 1000 V
+
+	// #5 Return OK
+	return Alx_Ok;
+	#endif
+}
+Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A)
+{
+	// Optimize Guard
+	#if defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	ALX_PCA9431_ASSERT(false);
+	return ALX_NULL;
+	#else
+
+	// Assert
+	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+
+	// #1 Prepare Variables
+	Alx_Status status = Alx_Err;
 	uint8_t AdcHBitCurrent = 0;
 	uint8_t AdcLBitCurrent = 0;
 	uint16_t AdcBitCurrent = 0;
 
-	// #2 TODO
-	Alx_Status status = AlxPca9431_Reg_Read(me, &me->reg._36h_IOUT_ADC_H);
+	// #2 Read Current ADC H Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._36h_IOUT_ADC_H);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 	AdcHBitCurrent = me->reg._36h_IOUT_ADC_H.val.raw;
 	AdcBitCurrent = (uint16_t) AdcHBitCurrent;
 	AdcBitCurrent = AdcBitCurrent << 2;
 
-	// #3 TODO
+	// #3 Read Current ADC L Bits
 	status = AlxPca9431_Reg_Read(me, &me->reg._37h_IOUT_ADC_L);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 	AdcLBitCurrent = me->reg._37h_IOUT_ADC_L.val.raw;
 	AdcLBitCurrent = AdcLBitCurrent >> 6;
 
-	// #4 TODO
+	// #4 Conversion
 	AdcBitCurrent += AdcLBitCurrent;
 	*current_A = AdcBitCurrent * 421.8 / 1000000;
 
 	// #5 Return OK
 	return Alx_Ok;
+	#endif
 }
-Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V)
+Alx_Status AlxPca9431_LdoVout_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA)
 {
+	// Optimize Guard
+	#if !(defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	ALX_PCA9431_ASSERT(false);
+	return ALX_NULL;
+	#else
+
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
+	Alx_Status status = Alx_Err;
+	uint8_t AdcHBitCurrent = 0;
+	uint8_t AdcLBitCurrent = 0;
+	uint16_t AdcBitCurrent = 0;
+
+	// #2 Read Current ADC H Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._36h_IOUT_ADC_H);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+	AdcHBitCurrent = me->reg._36h_IOUT_ADC_H.val.raw;
+	AdcBitCurrent = (uint16_t)AdcHBitCurrent;
+	AdcBitCurrent = AdcBitCurrent << 2;
+
+	// #3 Read Current ADC L Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._37h_IOUT_ADC_L);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+	AdcLBitCurrent = me->reg._37h_IOUT_ADC_L.val.raw;
+	AdcLBitCurrent = AdcLBitCurrent >> 6;
+
+	// #4 Conversion
+	AdcBitCurrent += AdcLBitCurrent;
+	*current_uA = AdcBitCurrent * 4218 / 10;	// JS: 421.8 / 1000000 V
+
+	// #5 Return OK
+	return Alx_Ok;
+	#endif
+}
+Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V)
+{
+	// Optimize Guard
+	#if defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	ALX_PCA9431_ASSERT(false);
+	return ALX_NULL;
+	#else
+
+	// Assert
+	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+
+	// #1 Prepare Variables
+	Alx_Status status = Alx_Err;
 	uint8_t AdcHBitVoltage = 0;
 	uint8_t AdcLBitVoltage = 0;
 	uint16_t AdcBitVoltage = 0;
 
-	// #2 TODO
-	Alx_Status status = AlxPca9431_Reg_Read(me, &me->reg._30h_VRECT_ADC_H);
+	// #2 Read Vrect Voltage ADC H Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._30h_VRECT_ADC_H);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 	AdcHBitVoltage = me->reg._30h_VRECT_ADC_H.val.raw;
 	AdcBitVoltage = (uint16_t) AdcHBitVoltage;
 	AdcBitVoltage = AdcBitVoltage << 2;
 
-	// #3 TODO
+	// #3 Read Vrect Voltage ADC L Bits
 	status = AlxPca9431_Reg_Read(me, &me->reg._31h_VRECT_ADC_L);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 	AdcLBitVoltage = me->reg._31h_VRECT_ADC_L.val.raw;
 	AdcLBitVoltage = AdcLBitVoltage >> 6;
 
-	// #4 TODO
+	// #4 Conversion
 	AdcBitVoltage += AdcLBitVoltage;
-	AlxTrace_WriteFormat(&alxTrace, "Test Adc_AdcBitVoltage: %lu \r\n", AdcBitVoltage);
-	*voltage_V = AdcBitVoltage * 15.82 / 1000;;
+	*voltage_V = AdcBitVoltage * 15.82 / 1000;
 
 	// #5 Return OK
 	return Alx_Ok;
+	#endif
 }
-Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A)
+Alx_Status AlxPca9431_Rect_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV)
 {
+	// Optimize Guard
+	#if !(defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	ALX_PCA9431_ASSERT(false);
+	return ALX_NULL;
+	#else
+
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
+	Alx_Status status = Alx_Err;
+	uint8_t AdcHBitVoltage = 0;
+	uint8_t AdcLBitVoltage = 0;
+	uint16_t AdcBitVoltage = 0;
+
+	// #2 Read Vrect Voltage ADC H Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._30h_VRECT_ADC_H);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+	AdcHBitVoltage = me->reg._30h_VRECT_ADC_H.val.raw;
+	AdcBitVoltage = (uint16_t)AdcHBitVoltage;
+	AdcBitVoltage = AdcBitVoltage << 2;
+
+	// #3 Read Vrect Voltage ADC L Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._31h_VRECT_ADC_L);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+	AdcLBitVoltage = me->reg._31h_VRECT_ADC_L.val.raw;
+	AdcLBitVoltage = AdcLBitVoltage >> 6;
+
+	// #4 Conversion
+	AdcBitVoltage += AdcLBitVoltage;
+	*voltage_mV = AdcBitVoltage * 1582 / 100;	// JS: 15.82 / 1000 V
+
+	// #5 Return OK
+	return Alx_Ok;
+	#endif
+}
+Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A)
+{
+	// Optimize Guard
+	#if defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	ALX_PCA9431_ASSERT(false);
+	return ALX_NULL;
+	#else
+
+	// Assert
+	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+
+	// #1 Prepare Variables
+	Alx_Status status = Alx_Err;
 	uint8_t AdcHBitCurrent = 0;
 	uint8_t AdcLBitCurrent = 0;
 	uint16_t AdcBitCurrent = 0;
 
-	// #2 TODO
-	Alx_Status status = AlxPca9431_Reg_Read(me, &me->reg._38h_IRECT_ADC_H);
+	// #2 Read Vrect Current ADC H Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._38h_IRECT_ADC_H);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 	AdcHBitCurrent = me->reg._38h_IRECT_ADC_H.val.raw;
 	AdcBitCurrent = (uint16_t) AdcHBitCurrent;
 	AdcBitCurrent = AdcBitCurrent << 2;
 
-	// #3 TODO
+	// #3 Read Vrect Current ADC L Bits
 	status = AlxPca9431_Reg_Read(me, &me->reg._39h_IRECT_ADC_L);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 	AdcLBitCurrent = me->reg._39h_IRECT_ADC_L.val.raw;
 	AdcLBitCurrent = AdcLBitCurrent >> 6;
 
-	// #4 TODO
+	// #4 Conversion
 	AdcBitCurrent += AdcLBitCurrent;
 	*current_A = AdcBitCurrent * 421.8 / 1000000;
 
 	// #5 Return OK
 	return Alx_Ok;
+	#endif
+}
+Alx_Status AlxPca9431_Rect_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA)
+{
+	// Optimize Guard
+	#if !(defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	ALX_PCA9431_ASSERT(false);
+	return ALX_NULL;
+	#else
+
+	// Assert
+	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+
+	// #1 Prepare Variables
+	Alx_Status status = Alx_Err;
+	uint8_t AdcHBitCurrent = 0;
+	uint8_t AdcLBitCurrent = 0;
+	uint16_t AdcBitCurrent = 0;
+
+	// #2 Read Vrect Current ADC H Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._38h_IRECT_ADC_H);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+	AdcHBitCurrent = me->reg._38h_IRECT_ADC_H.val.raw;
+	AdcBitCurrent = (uint16_t)AdcHBitCurrent;
+	AdcBitCurrent = AdcBitCurrent << 2;
+
+	// #3 Read Vrect Current ADC L Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._39h_IRECT_ADC_L);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+	AdcLBitCurrent = me->reg._39h_IRECT_ADC_L.val.raw;
+	AdcLBitCurrent = AdcLBitCurrent >> 6;
+
+	// #4 Conversion
+	AdcBitCurrent += AdcLBitCurrent;
+	*current_uA = AdcBitCurrent * 4218 / 10;	// JS: 421.8 / 1000000 V
+
+	// #5 Return OK
+	return Alx_Ok;
+	#endif
 }
 Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC)
 {
+	// Optimize Guard
+	#if defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	ALX_PCA9431_ASSERT(false);
+	return ALX_NULL;
+	#else
+
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variable
+	Alx_Status status = Alx_Err;
 	uint8_t BitTemp = 0;
 
-	// #2 TODO
-	Alx_Status status = AlxPca9431_Reg_Read(me, &me->reg._3Ah_TDIE_ADC);
+	// #2 Read Temperature (TDIE) ADC Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._3Ah_TDIE_ADC);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 	BitTemp = me->reg._3Ah_TDIE_ADC.val.raw;
 
-	// #3 TODO
+	// #3 Conversion
 	switch (BitTemp)
 	{
 		case 0:		*temp_degC = -43;		break;
@@ -312,9 +513,88 @@ Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC)
 		default:	*temp_degC = 9999.9;	ALX_PCA9431_ASSERT(false); return Alx_Err;	break;
 	}
 
+	// #4 Return OK
+	return Alx_Ok;
+	#endif
+}
+Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, uint32_t* temp_mDegC)
+{
+	// Optimize Guard
+	#if !(defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	ALX_PCA9431_ASSERT(false);
+	return ALX_NULL;
+	#else
+
 	// Assert
-	ALX_PCA9431_ASSERT(false); // We shouldn't get here
-	return Alx_Err;
+	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+
+	// #1 Prepare Variable
+	Alx_Status status = Alx_Err;
+	uint8_t BitTemp = 0;
+
+	// #2 Read Temperature (TDIE) ADC Bits
+	status = AlxPca9431_Reg_Read(me, &me->reg._3Ah_TDIE_ADC);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+	BitTemp = me->reg._3Ah_TDIE_ADC.val.raw;
+
+	// #3 Conversion
+	switch (BitTemp)
+	{
+		case 0:		*temp_mDegC = -43000;	break;
+		case 1:		*temp_mDegC = -39000;	break;
+		case 2:		*temp_mDegC = -35000;	break;
+		case 3:		*temp_mDegC = -30000;	break;
+		case 4:		*temp_mDegC = -26000;	break;
+		case 5:		*temp_mDegC = -21000;	break;
+		case 6:		*temp_mDegC = -17000;	break;
+		case 7:		*temp_mDegC = -12500;	break;
+		case 8:		*temp_mDegC = -8000;	break;
+		case 9:		*temp_mDegC = -4000;	break;
+		case 10:	*temp_mDegC = 0;		break;
+		case 11:	*temp_mDegC = 5000;		break;
+		case 12:	*temp_mDegC = 9000;		break;
+		case 13:	*temp_mDegC = 13500;	break;
+		case 14:	*temp_mDegC = 18000;	break;
+		case 15:	*temp_mDegC = 22500;	break;
+		case 16:	*temp_mDegC = 27000;	break;
+		case 17:	*temp_mDegC = 31000;	break;
+		case 18:	*temp_mDegC = 35000;	break;
+		case 19:	*temp_mDegC = 40000;	break;
+		case 20:	*temp_mDegC = 44000;	break;
+		case 21:	*temp_mDegC = 48000;	break;
+		case 22:	*temp_mDegC = 53000;	break;
+		case 23:	*temp_mDegC = 57000;	break;
+		case 24:	*temp_mDegC = 62000;	break;
+		case 25:	*temp_mDegC = 65500;	break;
+		case 26:	*temp_mDegC = 71000;	break;
+		case 27:	*temp_mDegC = 75000;	break;
+		case 28:	*temp_mDegC = 79500;	break;
+		case 29:	*temp_mDegC = 84000;	break;
+		case 30:	*temp_mDegC = 88000;	break;
+		case 31:	*temp_mDegC = 92000;	break;
+		case 32:	*temp_mDegC = 96000;	break;
+		case 33:	*temp_mDegC = 100500;	break;
+		case 34:	*temp_mDegC = 105000;	break;
+		case 35:	*temp_mDegC = 109000;	break;
+		case 36:	*temp_mDegC = 114000;	break;
+		case 37:	*temp_mDegC = 118000;	break;
+		case 38:	*temp_mDegC = 122000;	break;
+		case 39:	*temp_mDegC = 126000;	break;
+		case 40:	*temp_mDegC = 130000;	break;
+		case 41:	*temp_mDegC = 134500;	break;
+		case 42:	*temp_mDegC = 138000;	break;
+		case 43:	*temp_mDegC = 141000;	break;
+		case 44:	*temp_mDegC = 145000;	break;
+		case 45:	*temp_mDegC = 148000;	break;
+		case 46:	*temp_mDegC = 152000;	break;
+		case 47:	*temp_mDegC = 156000;	break;
+		default:	*temp_mDegC = 9999999;	ALX_PCA9431_ASSERT(false); return Alx_Err;	break;
+	}
+
+	// #4 Return OK
+	return Alx_Ok;
+	#endif
 }
 Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me)
 {
@@ -322,15 +602,17 @@ Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me)
 	ALX_PCA9431_ASSERT(me->isInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
+	// #1 Prepare Variables
+	Alx_Status status = Alx_Err;
+
+	// #2 Set
 	me->reg._0Bh_WD_EN_RST.val.ECO_EXIT = EcoExt_Exit;
 
-	Alx_Status status = AlxPca9431_Reg_Write(me, &me->reg._0Bh_WD_EN_RST);
+	// #3 Write
+	status = AlxPca9431_Reg_Write(me, &me->reg._0Bh_WD_EN_RST);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Reg__0B_WD_EN_RST -> EcoModo not exit	"); return status; }
 
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Reg__0B_WD_EN_RST -> EcoModo not exit	"); return status;}
-
-	ALX_PCA9431_TRACE("EcoModo exit	");
-
-	// #5 Return OK
+	// #4 Return
 	return Alx_Ok;
 }
 Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me)
@@ -340,50 +622,28 @@ Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me)
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
-	uint8_t SistemIntVal = 0;
-	uint8_t VRectmIntVal = 0;
-	uint8_t VOutLdoIntVal = 0;
-	uint8_t SistemIntVal2 = 0;
-	uint8_t VRectmIntVal2 = 0;
-	uint8_t VOutLdoIntVal2 = 0;
+	Alx_Status status = Alx_Err;
 
-	// #2 TODO
-	Alx_Status status = AlxPca9431_Reg_Read(me, &me->reg._01h_SYSTEM_INT);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Reg_01_SystemInt_ReadAndClear	"); return status;}
-	SistemIntVal = me->reg._01h_SYSTEM_INT.val.raw;
-
-	// #3 TODO
+	// #2 Read & Clear Interrupts
 	status = AlxPca9431_Reg_Read(me, &me->reg._01h_SYSTEM_INT);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Reg_01_SystemInt_ReadAndClear	"); return status;}
-	SistemIntVal2 = me->reg._01h_SYSTEM_INT.val.raw;
-	AlxTrace_WriteFormat(&alxTrace, "Read 1 SistemIntVal: %lu \r\n", SistemIntVal);
-	AlxTrace_WriteFormat(&alxTrace, "Read 2 SistemIntVal: %lu \r\n", SistemIntVal2);
 
-	// #4 TODO
+	status = AlxPca9431_Reg_Read(me, &me->reg._01h_SYSTEM_INT);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Reg_01_SystemInt_ReadAndClear	"); return status;}
+
 	status = AlxPca9431_Reg_Read(me, &me->reg._03h_VRECT_INT);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Reg_03_VRectInt_ReadAndClear 	"); return status;}
-	VRectmIntVal = me->reg._03h_VRECT_INT.val.raw;
 
-	// #5 TODO
 	status = AlxPca9431_Reg_Read(me, &me->reg._03h_VRECT_INT);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Reg_03_VRectInt_ReadAndClear 	"); return status;}
-	VRectmIntVal2 = me->reg._03h_VRECT_INT.val.raw;
-	AlxTrace_WriteFormat(&alxTrace, "Read 1 VRectmIntVal: %lu \r\n", VRectmIntVal);
-	AlxTrace_WriteFormat(&alxTrace, "Read 2 VRectmIntVal: %lu \r\n", VRectmIntVal2);
 
-	// #6 TODO
 	status = AlxPca9431_Reg_Read(me, &me->reg._05h_VOUTLDO_INT);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Reg_05_VOutLdoInt_ReadAndClear	"); return status;}
-	VOutLdoIntVal = me->reg._05h_VOUTLDO_INT.val.raw;
 
-	// #7 TODO
 	status = AlxPca9431_Reg_Read(me, &me->reg._05h_VOUTLDO_INT);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Reg_05_VOutLdoInt_ReadAndClear	"); return status;}
-	VOutLdoIntVal2 = me->reg._05h_VOUTLDO_INT.val.raw;
-	AlxTrace_WriteFormat(&alxTrace, "Read 1 VOutLdoIntVal: %lu \r\n", VOutLdoIntVal);
-	AlxTrace_WriteFormat(&alxTrace, "Read 2 VOutLdoIntVal: %lu \r\n", VOutLdoIntVal2);
 
-	// #8 Return OK
+	// #3 Return
 	return Alx_Ok;
 }
 
@@ -515,7 +775,7 @@ static void AlxPca9431_RegStruct_SetValToDefault(AlxPca9431* me)
 	me->reg._0Eh_Sample_EN			.val.raw = 0b01111111;
 	me->reg._0Fh_VPWR_CONFIG		.val.raw = 0b10000011;
 	me->reg._10h_RXIR_CONFIG		.val.raw = 0b00000000;
-	me->reg._20h_OCPSET_LOCK		.val.raw = 0b00001000;
+	me->reg._20h_OCPSET_LOCK		.val.raw = 0b10101000;
 	me->reg._21h_VOUTLDO_OCP		.val.raw = 0b00001000;
 	me->reg._30h_VRECT_ADC_H		.val.raw = 0b00000000;
 	me->reg._31h_VRECT_ADC_L		.val.raw = 0b00000000;
@@ -549,7 +809,9 @@ static Alx_Status AlxPca9431_Reg_Read(AlxPca9431* me, void* reg)
 }
 static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me)
 {
-	Alx_Status status = AlxPca9431_Reg_Write(me, &me->reg._02h_SYSTEM_INT_MASK);
+	Alx_Status status = Alx_Err;	// TV: Some registers are not handled, there were some undefined problems, we will handle this if needed
+
+	status = AlxPca9431_Reg_Write(me, &me->reg._02h_SYSTEM_INT_MASK);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_02_SYSTEM_INT_MASK		"); return status;}
 
 	status = AlxPca9431_Reg_Write(me, &me->reg._04h_VRECT_INT_MASK		);
@@ -570,9 +832,6 @@ static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me)
 	status = AlxPca9431_Reg_Write(me, &me->reg._0Ah_TEMP_THD			);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_0A_TEMP_THD				"); return status;}
 
-	status = AlxPca9431_Reg_Write(me, &me->reg._0Bh_WD_EN_RST			);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_0B_WD_EN_RST				"); return status;}
-
 	status = AlxPca9431_Reg_Write(me, &me->reg._0Ch_Varactor_DAC		);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_0C_Varactor_DAC			"); return status;}
 
@@ -591,9 +850,28 @@ static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me)
 	status = AlxPca9431_Reg_Write(me, &me->reg._20h_OCPSET_LOCK			);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_20_OCPSET_LOCK			"); return status;}
 
-	status = AlxPca9431_Reg_Write(me, &me->reg._21h_VOUTLDO_OCP			);
+	status = AlxPca9431_Reg_Write(me, &me->reg._21h_VOUTLDO_OCP			);	// JS: repair error - It was locked, because of the wrong default value in datasheet table 6
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_21_VOUTLDO_OCP			"); return status;}
 
+	return Alx_Ok;
+}
+static Alx_Status AlxPca9431_TraceId(AlxPca9431* me)
+{
+	// #1 Prepare variables
+	Alx_Status status = Alx_Err;
+
+	// #2 Read Device ID register
+	status = AlxPca9431_Reg_Read(me, &me->reg._00h_Device_ID);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_00h_Device_ID"); return status; }
+
+	// #3 Trace
+	ALX_PCA9431_TRACE_FORMAT("\r\n");
+	ALX_PCA9431_TRACE_FORMAT("Auralix C Library ALX Wireless Charging Receiver PCA9431 Module Identification:\r\n");
+	ALX_PCA9431_TRACE_FORMAT("- Device ID: 0x%04X\r\n", me->reg._00h_Device_ID.val.ID);
+	ALX_PCA9431_TRACE_FORMAT("- Device Revision: 0x%03X\r\n", me->reg._00h_Device_ID.val.Revision);
+	ALX_PCA9431_TRACE_FORMAT("\r\n");
+
+	// #4 Return OK
 	return Alx_Ok;
 }
 

@@ -203,7 +203,7 @@ typedef struct
 	float LdoVout_Current_A;
 	float Rect_Voltage_V;
 	float Rect_Current_A;
-	float SensTemp_C;
+	float SensTemp_degC;
 
 	// Info
 	bool wasCtorCalled;
@@ -258,7 +258,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T06_SensTemp_C(Al
 {
 	while (1)
 	{
-		AlxPca9431_TempSens_GetTemp_degC(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->SensTemp_C); // 10 bit ADC
+		AlxPca9431_TempSens_GetTemp_degC(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->SensTemp_degC); // 10 bit ADC
 		AlxDelay_ms(1000);
 	}
 }
@@ -271,7 +271,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_T99_TestAll(AlxHw
 		AlxPca9431_LdoVout_GetCurrent_A(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->LdoVout_Current_A); // 10 bit ADC
 		AlxPca9431_Rect_GetVoltage_V(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->Rect_Voltage_V); // 10 bit ADC
 		AlxPca9431_Rect_GetCurrent_A(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->Rect_Current_A); // 10 bit ADC
-		AlxPca9431_TempSens_GetTemp_degC(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->SensTemp_C); // 10 bit ADC
+		AlxPca9431_TempSens_GetTemp_degC(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->SensTemp_degC); // 10 bit ADC
 		AlxDelay_ms(1000);
 	}
 }
@@ -290,7 +290,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(AlxHwNfcWlcL
 	me->LdoVout_Current_A = 0;
 	me->Rect_Voltage_V = 0;
 	me->Rect_Current_A = 0;
-	me->SensTemp_C = 0.001;
+	me->SensTemp_degC = 0.001;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -633,6 +633,145 @@ static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Run(AlxHwNfcWlcLis
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_T05_regasession4(me);			// JS: not worked yet
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_T06_regasession5(me);			// JS: not worked yet
 	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_T99_TestAllregasession(me);	// JS: not worked yet
+}
+
+
+//******************************************************************************
+//******************************************************************************
+// G04_Pca9431_Optimize
+//******************************************************************************
+//******************************************************************************
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Objects
+	AlxHwNfcWlcListenerV3_5b_Main alxHwNfcWlcListenerV3_5b_Main;
+
+	// Live Watch - variabla
+	uint32_t LdoVout_Voltage_mV;
+	uint32_t LdoVout_Current_uA;
+	uint32_t Rect_Voltage_mV;
+	uint32_t Rect_Current_uA;
+	int32_t SensTemp_mDegC;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize;
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T01_ReadAndClearInterrupt(AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize* me)
+{
+	while (1)
+	{
+		AlxPca9431_Reg_ReadAndClearInterrupt(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431);
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T02_LdoVout_GetVoltage_mV(AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize* me)
+{
+	while (1)
+	{
+		AlxPca9431_LdoVout_GetVoltage_mV(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->LdoVout_Voltage_mV); // 10 bit ADC
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T03_LdoVout_GetCurrent_uA(AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize* me)
+{
+	while (1)
+	{
+		AlxPca9431_LdoVout_GetCurrent_uA(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->LdoVout_Current_uA); // 10 bit ADC
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T04_Rect_GetVoltage_mV(AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize* me)
+{
+	while (1)
+	{
+		AlxPca9431_Rect_GetVoltage_mV(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->Rect_Voltage_mV); // 10 bit ADC
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T05_Rect_Current_uA(AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize* me)
+{
+	while (1)
+	{
+		AlxPca9431_Rect_GetCurrent_uA(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->Rect_Current_uA); // 10 bit ADC
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T06_SensTemp_mDegC(AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize* me)
+{
+	while (1)
+	{
+		AlxPca9431_TempSens_GetTemp_mDegC(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->SensTemp_mDegC); // 10 bit ADC
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T99_TestAll(AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize* me)
+{
+	while (1)
+	{
+		AlxPca9431_Reg_ReadAndClearInterrupt(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431);// JS: size 428
+		AlxPca9431_LdoVout_GetVoltage_mV(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->LdoVout_Voltage_mV); // 10 bit ADC // JS: size 284
+		AlxPca9431_LdoVout_GetCurrent_uA(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->LdoVout_Current_uA); // 10 bit ADC // JS: size 280
+		AlxPca9431_Rect_GetVoltage_mV(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->Rect_Voltage_mV); // 10 bit ADC // JS: size 288
+		AlxPca9431_Rect_GetCurrent_uA(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->Rect_Current_uA); // 10 bit ADC // JS: size 288
+		AlxPca9431_TempSens_GetTemp_mDegC(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431, &me->SensTemp_mDegC); // 10 bit ADC // JS: size 780
+		AlxDelay_ms(1000);
+	}
+}
+
+
+//******************************************************************************
+// Constructor & Functions
+//******************************************************************************
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize_Ctor(AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize* me)
+{
+	// Ctor
+	AlxHwNfcWlcListenerV3_5b_Main_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main);
+
+	// Live Watch - set default value
+	me->LdoVout_Voltage_mV = 0;
+	me->LdoVout_Current_uA = 0;
+	me->Rect_Voltage_mV = 0;
+	me->Rect_Current_uA = 0;
+	me->SensTemp_mDegC = -99;
+
+	// Info
+	me->wasCtorCalled = true;
+}
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize_Init(AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize* me)
+{
+	// Init
+	AlxClk_Init(&alxClk);
+	AlxTrace_Init(&alxTrace);
+	AlxIoPin_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoPin.do_P0_8_PCA943X_EN);
+	// IoPinIrq
+	//AlxIoPinIrq_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxIoIrqPin_di_P0_9_PCA943X_nINT_IRQ1);
+
+	// AlxPca9431
+	AlxPca9431_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxPca9431);
+
+	// Info
+	me->isInit = true;
+}
+static inline void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize_Run(AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize* me)
+{
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T01_ReadAndClearInterrupt(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T02_LdoVout_GetVoltage_mV(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T03_LdoVout_GetCurrent_uA(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T04_Rect_GetVoltage_mV(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T05_Rect_Current_uA(me);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T06_SensTemp_mDegC(me);
+	AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T99_TestAll(me);
 }
 
 
