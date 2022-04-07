@@ -164,7 +164,7 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 		&me->alxIoPin.di_P0_9_PCA943X_nINT_IRQ1,
 		kPINT_PinInt1,
 		kPINT_PinIntEnableFallEdge,
-		Alx_IrqPriority_0
+		Alx_IrqPriority_0	// Relevant IRQ vector = PIN_INT0_IRQn, has highest priority among all pin IRQs
 	);
 	AlxPca9431_Ctor
 	(
