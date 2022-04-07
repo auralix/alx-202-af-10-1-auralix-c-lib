@@ -60,7 +60,6 @@ void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 	// Vrect treshold
 	me->reg._08h_VRECT_THD.val.VRECT_UVLO = VRectThd_3V3;
 
-
 	// Adc enable
 	me->reg._0Dh_ADC_CONTROL.val.ADC_EN = AdcEn_Enabled;
 	me->reg._0Dh_ADC_CONTROL.val.ADC_AVG_EN = AdcAveragingEn_Enabled;
@@ -83,17 +82,17 @@ void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 	me->reg._05h_VOUTLDO_INT.val.VOUT_SHORT_INT = VOutLdoShortInt_Detect;
 	me->reg._06h_VOUTLDO_INT_MASK.val.VOUT_SHORT_INT_MASK = VOutLdoShortInt_NotMasked;
 }
-void AlxIoPinIrq_Foreground_Callback_Pin3()
-{
-	ALX_PCA9431_TRACE(&alxTrace, "************************	INTERRUPT	*************************\r\n");
-}
 void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
-	ALX_PCA9431_TRACE(&alxTrace, "RiseEdge\r\n");
+	ALX_TRACE_FORMAT("RiseEdge\r\n");
 }
 void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
-	ALX_PCA9431_TRACE(&alxTrace, "FallEdge	************************	INTERRUPT	*************************\r\n");
+	ALX_TRACE_FORMAT("FallEdge	************************	INTERRUPT	*************************\r\n");
+}
+void AlxIoPinIrq_Foreground_Callback_Pin3()
+{
+	ALX_TRACE_FORMAT("************************	INTERRUPT	*************************\r\n");
 }
 #endif
 
@@ -103,11 +102,11 @@ void AlxIoPinIrq_Foreground_Callback_Pin1()
 #if defined(ALX_TEST_MF)
 void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
-	AlxTrace_WriteStr(&alxTrace, "RiseEdge\r\n");
+	ALX_TRACE_FORMAT(&alxTrace, "RiseEdge\r\n");
 }
 void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
-	AlxTrace_WriteStr(&alxTrace, "FallEdge\r\n");
+	ALX_TRACE_FORMAT(&alxTrace, "FallEdge\r\n");
 }
 #endif
 

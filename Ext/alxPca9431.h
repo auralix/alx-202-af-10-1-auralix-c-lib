@@ -30,20 +30,22 @@ extern "C" {
 
 // Assert //
 #if defined(_ALX_PCA9431_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-#define ALX_PCA9431_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PCA9431_FILE, expr)
+	#define ALX_PCA9431_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PCA9431_FILE, expr)
 #elif defined(_ALX_PCA9431_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-#define ALX_PCA9431_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PCA9431_FILE, expr)
+	#define ALX_PCA9431_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PCA9431_FILE, expr)
 #elif defined(_ALX_PCA9431_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-#define ALX_PCA9431_ASSERT(expr) ALX_ASSERT_RST(ALX_PCA9431_FILE, expr)
+	#define ALX_PCA9431_ASSERT(expr) ALX_ASSERT_RST(ALX_PCA9431_FILE, expr)
 #else
-#define ALX_PCA9431_ASSERT(expr) do{} while (false)
+	#define ALX_PCA9431_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(_ALX_PCA9431_TRACE) || defined(_ALX_TRACE_ALL)
-#define ALX_PCA9431_TRACE(...) ALX_TRACE_STD(ALX_PCA9431_FILE, __VA_ARGS__)
+	#define ALX_PCA9431_TRACE(...) ALX_TRACE_STD(ALX_PCA9431_FILE, __VA_ARGS__)
+	#define ALX_PCA9431_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
-#define ALX_PCA9431_TRACE(...) do{} while (false)
+	#define ALX_PCA9431_TRACE(...) do{} while (false)
+	#define ALX_PCA9431_TRACE_FORMAT(...) do{} while (false)
 #endif
 
 
@@ -1198,16 +1200,16 @@ void AlxPca9431_Ctor
 //******************************************************************************
 Alx_Status AlxPca9431_Init(AlxPca9431* me);
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me);
-Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V);	// 10 bit ADC
-Alx_Status AlxPca9431_LdoVout_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV);	// 10 bit ADC
-Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A);	// 10 bit ADC
-Alx_Status AlxPca9431_LdoVout_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA);	// 10 bit ADC
-Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V);		// 10 bit ADC
-Alx_Status AlxPca9431_Rect_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV);		// 10 bit ADC
-Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A);		// 10 bit ADC
-Alx_Status AlxPca9431_Rect_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA);		// 10 bit ADC
-Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC);	// On chip temperature (-43°C ... +156°C)
-Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, uint32_t* temp_mDegC);	// On chip temperature (-43°C ... +156°C)
+Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V);
+Alx_Status AlxPca9431_LdoVout_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV);
+Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A);
+Alx_Status AlxPca9431_LdoVout_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA);
+Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V);
+Alx_Status AlxPca9431_Rect_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV);
+Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A);
+Alx_Status AlxPca9431_Rect_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA);
+Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC);
+Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, uint32_t* temp_mDegC);
 Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me);
 Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
 

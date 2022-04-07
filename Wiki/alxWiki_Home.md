@@ -8,19 +8,19 @@
 - Ext
     - [alxCrn120 - ALX NFC WLC Communication Receiver CRN120 Module](Ext/alxWiki_alxCrn120.md)
     - [alxPca9431 - ALX NFC WLC Power Receiver with LDO Output PCA9431 Module](Ext/alxWiki_alxPca9431.md)
-	- [alxPcal6416a - ALX IO Expander PCAL6416A Module](Ext/alxWiki_alxPcal6416a.md)
+    - [alxPcal6416a - ALX IO Expander PCAL6416A Module](Ext/alxWiki_alxPcal6416a.md)
 - Hw
     - [HwLpcXpresso55S69](Hw/HwLpcXpresso55S69/alxWiki_alxHwLpcXpresso55S69_Home.md)
         - Test
-			- [alxHwLpcXpresso55S69_MfTest - ALX HW LPC Xpresso 55S69 MF Test Module](Hw/HwLpcXpresso55S69/Test/alxWiki_alxHwLpcXpresso55S69_MfTest.md)
+            - [alxHwLpcXpresso55S69_MfTest - ALX HW LPC Xpresso 55S69 MF Test Module](Hw/HwLpcXpresso55S69/Test/alxWiki_alxHwLpcXpresso55S69_MfTest.md)
     - HwNfcWlcListenerV3_5b
         - Test
             - [alxHwNfcWlcListenerV3_5b_MfTest - ALX HW NFC WLC Listener V3_5b MF Test Module](Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_MfTest.md)
-			- [alxHwNfcWlcListenerV3_5b_JsTest - ALX HW NFC WLC Listener V3_5b JS Test Module](Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_JsTest.md)
+            - [alxHwNfcWlcListenerV3_5b_JsTest - ALX HW NFC WLC Listener V3_5b JS Test Module](Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_JsTest.md)
     - HwNucleoF429Zi
         - Test
             - [alxHwNucleoF429Zi_TvTest - ALX HW Nucleo-F429ZI TV Test Module](Hw/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_TvTest.md)
-			- [alxHwNucleoF429Zi_JsTest - ALX HW Nucleo-F429ZI JS Test Module](Hw/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md)
+            - [alxHwNucleoF429Zi_JsTest - ALX HW Nucleo-F429ZI JS Test Module](Hw/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md)
 - Mcu
     - McuLpc
         - McuLpc17
@@ -43,8 +43,8 @@
             - [alxPwm_McuLpc80x - ALX MCU LPC80x PWM Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxPwm_McuLpc80x.md)
             - [alxTrace_McuLpc80x - ALX MCU LPC80x Trace Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxTrace_McuLpc80x.md)
         - McuLpc84
-	- McuStm32
+    - McuStm32
         - McuStm32F1
         - McuStm32F4
         - McuStm32G4
-        - McuStm32L0	
+        - McuStm32L0
