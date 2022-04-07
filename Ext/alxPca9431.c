@@ -517,7 +517,7 @@ Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC)
 	return Alx_Ok;
 	#endif
 }
-Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, uint32_t* temp_mDegC)
+Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, int32_t* temp_mDegC)
 {
 	// Optimize Guard
 	#if !(defined(ALX_PCA9431_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))

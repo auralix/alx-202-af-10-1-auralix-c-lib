@@ -1209,7 +1209,7 @@ Alx_Status AlxPca9431_Rect_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV);
 Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A);
 Alx_Status AlxPca9431_Rect_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA);
 Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC);
-Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, uint32_t* temp_mDegC);
+Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, int32_t* temp_mDegC);
 Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me);
 Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me);
 
