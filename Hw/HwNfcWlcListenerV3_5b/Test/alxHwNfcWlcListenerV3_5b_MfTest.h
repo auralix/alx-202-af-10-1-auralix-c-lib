@@ -550,7 +550,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T05_Module
 static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T06_ModuleRead(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120* me)
 {
 	// Variables
-	uint8_t data[16]	= { 0x00 };
+	uint8_t data[16] = { 0x00 };
 
 	// Init CRN120
 	AlxCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120);
@@ -575,7 +575,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T06_Module
 static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T07_ModuleWrite(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120* me)
 {
 	// Variables
-	uint8_t data[16]	= { 0x00 };
+	uint8_t data[16] = { 0x00 };
 
 	// Init CRN120
 	AlxCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120);
@@ -618,18 +618,87 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T07_Module
 		AlxDelay_ms(100000);
 	}
 }
-static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T08_ModuleSram(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120* me)
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T08_ModuleSramRead(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120* me)
 {
 	// Variables
-	uint8_t data[16]	= { 0x00 };
+	uint8_t data[60] = { 0x00 };
 
 	// Init CRN120
 	AlxCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120);
 
-	// Read First 16 Bytes of SRAM. All should be 0x00
-	AlxCrn120_Mem(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120, AlxCrn120_MemAddr_Sram_F8h, data, false);
+	while (1)
+	{
+		AlxCrn120_ReadSram(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120, 0xF8, data, sizeof(data));
+
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T09_ModuleSramWrite(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120* me)
+{
+	// Variables
+	uint8_t data[62] = { 0x00 };
+
+	// Init CRN120
+	AlxCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120);
 
 	// Set 16 Bytes
+	/*data[0]  = 0xFF;
+	data[1]  = 0xFF;
+	data[2]  = 0xFF;
+	data[3]  = 0xFF;
+	data[4]  = 0xAA;
+	data[5]  = 0xAA;
+	data[6]  = 0xAA;
+	data[7]  = 0xAA;
+	data[8]  = 0xCC;
+	data[9]  = 0xCC;
+	data[10] = 0xCC;
+	data[11] = 0xCC;
+	data[12] = 0x33;
+	data[13] = 0x33;
+	data[14] = 0x33;
+	data[15] = 0x33;
+	data[16] = 0x11;
+	data[17] = 0x11;
+	data[18] = 0x11;
+	data[19] = 0x11;
+	data[20] = 0xFF;*/
+
+	// Set Bytes
+	for (uint32_t i = 0; i < sizeof(data); i++) { data[i] = i; }
+
+	while (1)
+	{
+		AlxCrn120_WriteSram(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120, 0xF8, data, sizeof(data));
+
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T10_ModuleEepromRead(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120* me)
+{
+	// Variables
+	uint8_t data[7] = { 0x00 };
+
+	// Init CRN120
+	AlxCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120);
+
+	while (1)
+	{
+		// Write
+		AlxCrn120_ReadEeprom(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120, 0x01, data, sizeof(data));
+
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_ModuleEepromWrite(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120* me)
+{
+	// Variables
+	uint8_t data[62] = { 0x00 };
+
+	// Init CRN120
+	AlxCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120);
+
+	// Set Bytes
 	data[0]  = 0xFF;
 	data[1]  = 0xFF;
 	data[2]  = 0xFF;
@@ -646,20 +715,18 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T08_Module
 	data[13] = 0x33;
 	data[14] = 0x33;
 	data[15] = 0x33;
+	data[16] = 0x11;
+	data[17] = 0x11;
+	data[18] = 0x11;
+	data[19] = 0x11;
+	data[20] = 0xFF;
 
-	// Delay
-	AlxDelay_ms(50);
+	// Set Bytes
+	for (uint32_t i = 0; i < sizeof(data); i++) { data[i] = i; }
 
 	while (1)
 	{
-		// Write
-		AlxCrn120_Mem(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120, AlxCrn120_MemAddr_Sram_F8h, data, true);
-
-		// At least ~4ms delay after Write
-		AlxDelay_ms(10);
-
-		// Read First 16 Bytes of SRAM
-		AlxCrn120_Mem(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120, AlxCrn120_MemAddr_Sram_F8h, data, false);
+		AlxCrn120_WriteEeprom(&me->alxHwNfcWlcListenerV3_5b_Main.alxCrn120, 0x05, data, sizeof(data));
 
 		AlxDelay_ms(1000);
 	}
@@ -695,7 +762,10 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_Run(AlxHwN
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T05_ModuleWriteReg(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T06_ModuleRead(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T07_ModuleWrite(me);
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T08_ModuleSram(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T08_ModuleSramRead(me);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T09_ModuleSramWrite(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T10_ModuleEepromRead(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_ModuleEepromWrite(me);
 }
 
 

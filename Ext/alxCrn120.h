@@ -20,6 +20,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxDelay.h"
 #include "alxI2c.h"
 
 
@@ -45,6 +46,17 @@ extern "C" {
 #else
 #define ALX_CRN120_TRACE(...) do{} while (false)
 #endif
+
+// Mem //
+#define ALX_CRN120_BLOCK_LEN 16
+
+#define ALX_CRN120_EEPROM_START 0x01
+#define ALX_CRN120_EEPROM_END 0x38
+#define ALX_CRN120_EEPROM_LEN 888
+
+#define ALX_CRN120_SRAM_START 0xF8
+#define ALX_CRN120_SRAM_END 0xFB
+#define ALX_CRN120_SRAM_LEN 64
 
 
 //******************************************************************************
@@ -630,24 +642,6 @@ typedef struct
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
-{
-	// User Memory Addres
-	AlxCrn120_MemAddr_UsrMem_01h = 0x01,
-	AlxCrn120_MemAddr_UsrMem_02h = 0x02,
-	AlxCrn120_MemAddr_UsrMem_03h = 0x03,
-	AlxCrn120_MemAddr_UsrMem_04h = 0x04,
-	// TODO
-	AlxCrn120_MemAddr_UsrMem_37h = 0x37,
-	//AlxCrn120_MemAddr_UsrMem_38h = 0x38,	// MF: On address 38h, only first 8 Bytes are User (Protected) Memory, not the whole 16 Bytes. We won't use this UsrMem because code would be more complicated
-
-	// SRAM Address
-	AlxCrn120_MemAddr_Sram_F8h = 0xF8,
-	AlxCrn120_MemAddr_Sram_F9h = 0xF9,
-	AlxCrn120_MemAddr_Sram_FAh = 0xFA,
-	AlxCrn120_MemAddr_Sram_FBh = 0xFB
-} AlxCrn120_MemAddr;
-
 typedef struct
 {
 	// Objects - External
@@ -661,6 +655,7 @@ typedef struct
 
 	// Variables
 	AlxCrn120_Reg reg;
+	uint8_t uid[7];
 
 	// Info
 	bool isInit;
@@ -687,15 +682,17 @@ void AlxCrn120_Ctor
 //******************************************************************************
 Alx_Status AlxCrn120_Init(AlxCrn120* me);
 Alx_Status AlxCrn120_DeInit(AlxCrn120* me);
-Alx_Status AlxCrn120_Reg_Write(AlxCrn120* me, void* reg, uint8_t* data);
-Alx_Status AlxCrn120_Reg_Read(AlxCrn120* me, void* reg, uint8_t* data);
-Alx_Status AlxCrn120_Reg_WriteReg(AlxCrn120* me, void* reg, uint8_t* data, uint8_t byte);
-Alx_Status AlxCrn120_Reg_ReadReg(AlxCrn120* me, void* reg, uint8_t* data, uint8_t byte);
-Alx_Status AlxCrn120_Mem(AlxCrn120* me, AlxCrn120_MemAddr addr, uint8_t* data, bool toWrite);	// MF: "9.7 READ and WRITE Operation" have to be used, meaning 16bytes in one read/write
+Alx_Status AlxCrn120_ReadEeprom(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32_t len);
+Alx_Status AlxCrn120_WriteEeprom(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32_t len);
+Alx_Status AlxCrn120_ReadSram(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32_t len);
+Alx_Status AlxCrn120_WriteSram(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32_t len);
 
-//Alx_Status AlxCrn120_GetAddr(AlxCrn120* me, uint8_t* addr);
-//Alx_Status AlxCrn120_SetAddr(AlxCrn120* me, uint8_t* addr);
-//Alx_Status AlxCrn120_LockPage(AlxCrn120* me, bool toLock, uint8_t* addr);	// MF: We won't use it at the moment
+
+//Alx_Status AlxCrn120_Reg_Write(AlxCrn120* me, void* reg, uint8_t* data);
+//Alx_Status AlxCrn120_Reg_Read(AlxCrn120* me, void* reg, uint8_t* data);
+//Alx_Status AlxCrn120_Reg_WriteReg(AlxCrn120* me, void* reg, uint8_t* data, uint8_t byte);
+//Alx_Status AlxCrn120_Reg_ReadReg(AlxCrn120* me, void* reg, uint8_t* data, uint8_t byte);
+//Alx_Status AlxCrn120_Mem(AlxCrn120* me, AlxCrn120_MemAddr addr, uint8_t* data, bool toWrite);	// MF: "9.7 READ and WRITE Operation" have to be used, meaning 16bytes in one read/write
 
 
 #ifdef __cplusplus
