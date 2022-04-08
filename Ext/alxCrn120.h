@@ -525,13 +525,13 @@ typedef enum
 } AlxCrn120_Session_NsReg_SramI2cReady;
 typedef enum
 {
-	NsReg_MemNfcLocked_NotLocked	= 0b0,
-	NsReg_MemNfcLocked_Locked		= 0b1
+	NsReg_MemNfcLocked_NotLocked = 0b0,
+	NsReg_MemNfcLocked_Locked    = 0b1
 } AlxCrn120_Session_NsReg_MemNfcLocked;
 typedef enum
 {
-	NsReg_MemI2cLocked_NotLocked	= 0b0,
-	NsReg_MemI2cLocked_Locked		= 0b1
+	NsReg_MemI2cLocked_NotLocked = 0b0,
+	NsReg_MemI2cLocked_Locked    = 0b1
 } AlxCrn120_Session_NsReg_MemI2cLocked;
 typedef enum
 {
