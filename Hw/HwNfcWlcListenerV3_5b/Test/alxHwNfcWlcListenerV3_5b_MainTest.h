@@ -1,11 +1,8 @@
-/**
-  ******************************************************************************
-  * @file alxHwNfcWlcListenerV3_5b_MainTest.h
-  * @brief Auralix HW NFC WLC Listener V3_5 C Library - Main Test Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+//****************************************************************************
+// @file alxHwNfcWlcListenerV3_5b_MainTest.h
+// @brief Auralix HW NFC WLC Listener V3.5 - Main Test Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//****************************************************************************
 
 #ifndef ALX_HW_NFC_WLC_LISTENER_V3_5B_MAIN_TEST_H
 #define ALX_HW_NFC_WLC_LISTENER_V3_5B_MAIN_TEST_H

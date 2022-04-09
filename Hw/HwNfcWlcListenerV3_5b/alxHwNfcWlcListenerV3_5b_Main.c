@@ -1,11 +1,8 @@
-/**
-  ******************************************************************************
-  * @file alxHwNfcWlcListenerV3_5b_Main.c
-  * @brief Auralix HW NFC WLC Listener V3_5 C Library - Main Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+//****************************************************************************
+// @file alxHwNfcWlcListenerV3_5b_Main.c
+// @brief Auralix HW NFC WLC Listener V3.5 - Main Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//****************************************************************************
 
 
 //******************************************************************************
@@ -67,9 +64,9 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 	//------------------------------------------------------------------------------
 	AlxClk_Ctor
 	(
-		&alxClk,
-		AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz,
-		AlxClk_Tick_1ms
+		ALX_NULL_PTR,
+		ALX_NULL,
+		ALX_NULL
 	);
 
 
@@ -130,29 +127,29 @@ void AlxHwNfcWlcListenerV3_5b_Main_Ctor(AlxHwNfcWlcListenerV3_5b_Main* me)
 	//------------------------------------------------------------------------------
 	// ALX - PWM
 	//------------------------------------------------------------------------------
-	//me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_LED_GR_PWM1;
-	//me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_LED_GR_PWM2;
-	//me->pwmChArr[0] = Alx_Ch_1;
-	//me->pwmChArr[1] = Alx_Ch_2;
-	//#if defined ALX_OPTIMIZE_SIZE_ALL
-	//me->pwmDutyDefaultArr[0] = 543U;
-	//me->pwmDutyDefaultArr[1] = 123U;
-	//#else
-	//me->pwmDutyDefaultArr[0] = 12.34f;
-	//me->pwmDutyDefaultArr[1] = 50.f;
-	//#endif
-	//AlxPwm_Ctor
-	//(
-	//	&me->alxPwm,
-	//	CTIMER0,
-	//	me->pwmIoPinArr,
-	//	me->pwmChArr,
-	//	ALX_ARR_LEN(me->pwmChArr),
-	//	&alxClk,
-	//	me->pwmDutyDefaultArr,
-	//	0,
-	//	100
-	//);
+	me->pwmIoPinArr[0] = &me->alxIoPin.do_P0_24_LED_GR_PWM1;
+	me->pwmIoPinArr[1] = &me->alxIoPin.do_P0_25_LED_GR_PWM2;
+	me->pwmChArr[0] = Alx_Ch_1;
+	me->pwmChArr[1] = Alx_Ch_2;
+	#if defined ALX_OPTIMIZE_SIZE_ALL
+	me->pwmDutyDefaultArr[0] = 543U;
+	me->pwmDutyDefaultArr[1] = 123U;
+	#else
+	me->pwmDutyDefaultArr[0] = 12.34f;
+	me->pwmDutyDefaultArr[1] = 50.f;
+	#endif
+	AlxPwm_Ctor
+	(
+		&me->alxPwm,
+		CTIMER0,
+		me->pwmIoPinArr,
+		me->pwmChArr,
+		ALX_ARR_LEN(me->pwmChArr),
+		&alxClk,
+		me->pwmDutyDefaultArr,
+		0,
+		100
+	);
 
 
 	//------------------------------------------------------------------------------

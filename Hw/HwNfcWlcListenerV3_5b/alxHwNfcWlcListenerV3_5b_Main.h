@@ -1,11 +1,8 @@
-/**
-  ******************************************************************************
-  * @file alxHwNfcWlcListenerV3_5b_Main.h
-  * @brief Auralix HW NFC WLC Listener V3_5 C Library - Main Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+//****************************************************************************
+// @file alxHwNfcWlcListenerV3_5b_Main.h
+// @brief Auralix HW NFC WLC Listener V3.5 - Main Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//****************************************************************************
 
 #ifndef ALX_HW_NFC_WLC_LISTENER_V3_5B_MAIN_H
 #define ALX_HW_NFC_WLC_LISTENER_V3_5B_MAIN_H
@@ -124,14 +121,13 @@ typedef struct
 	//P0_28	- Unused
 	//P0_29	- Unused
 	//P0_30	- Unused
-} AlxHwNfcWlcListenerV3_5b_MainIoPin;
-
+} AlxHwNfcWlcListenerV3_5b_MainAlxIoPin;
 typedef struct
 {
 	//--------------------------------------
 	// ALX - IoPin
 	//--------------------------------------
-	AlxHwNfcWlcListenerV3_5b_MainIoPin alxIoPin;
+	AlxHwNfcWlcListenerV3_5b_MainAlxIoPin alxIoPin;
 
 	//--------------------------------------
 	// ALX - I2C
