@@ -105,6 +105,10 @@ void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
 	ALX_TRACE_FORMAT(&alxTrace, "FallEdge\r\n");
 }
+void AlxCrn120_RegStruct_SetVal(me)
+{
+	(void)me;
+}
 #endif
 
 //------------------------------------------------------------------------------

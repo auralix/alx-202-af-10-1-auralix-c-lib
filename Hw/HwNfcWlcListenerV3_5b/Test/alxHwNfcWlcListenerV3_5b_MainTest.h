@@ -79,7 +79,8 @@ typedef struct
 	///-------
 	#if defined(ALX_TEST_MF)
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp;
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120 alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120;
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120 alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120;
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120 alxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120;
 	#endif
 
 	///-------
@@ -134,7 +135,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Ctor(AlxHwNfcWlcListenerV3_
 	///-------
 	#if defined(ALX_TEST_MF)
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120);
 	#endif
 
 	///-------
@@ -178,7 +180,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Init(AlxHwNfcWlcListenerV3_
 	///-------
 	#if defined(ALX_TEST_MF)
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Init(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120);
 	#endif
 
 	///-------
@@ -222,7 +225,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Run(AlxHwNfcWlcListenerV3_5
 	///-------
 	#if defined(ALX_TEST_MF)
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Run(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Run(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Run(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_Run(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120);
 	#endif
 
 	///-------
