@@ -549,7 +549,12 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		}
 
 		// #4.2 Get status flag and check if NACK was return
-		flag = I2C_GetStatusFlags(me->i2c);
+		do
+		{
+			if (AlxTimSw_IsTimeout_ms(&me->tim, timeout_ms)) { ALX_I2C_TRACE("ErrTimeout"); return (uint32_t)kStatus_I2C_Timeout; }
+
+			flag = I2C_GetStatusFlags(me->i2c);
+		} while ((flag & I2C_STAT_MSTPENDING_MASK) == 0U);
 		if ((flag & (1 << 1)) && (flag & (1 << 2)))	// MF: Check 2nd and 3rd bit of I2C Status register. If this is true, NACK was returned
 		{
 			ALX_I2C_TRACE("ErrNack");
