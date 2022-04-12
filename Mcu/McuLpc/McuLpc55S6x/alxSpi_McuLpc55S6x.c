@@ -323,10 +323,10 @@ static void AlxSpi_Ctor_ParseMode(AlxSpi* me)
 	(void)me;
 
 	// #1 Parse Mode
-	if (me->mode == AlxSpi_Mode_0)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveLow;  me->spiMasterConfig.phase = kSPI_ClockPhaseFirstEdge;  return;}
-	if (me->mode == AlxSpi_Mode_1)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveLow;  me->spiMasterConfig.phase = kSPI_ClockPhaseSecondEdge; return;}
-	if (me->mode == AlxSpi_Mode_2)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveHigh; me->spiMasterConfig.phase = kSPI_ClockPhaseFirstEdge;  return;}
-	if (me->mode == AlxSpi_Mode_3)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveHigh; me->spiMasterConfig.phase = kSPI_ClockPhaseSecondEdge; return;}
+	if (me->mode == AlxSpi_Mode_0)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveHigh; me->spiMasterConfig.phase = kSPI_ClockPhaseFirstEdge; return;}
+	if (me->mode == AlxSpi_Mode_1)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveHigh; me->spiMasterConfig.phase = kSPI_ClockPhaseSecondEdge; return;}
+	if (me->mode == AlxSpi_Mode_2)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveLow; me->spiMasterConfig.phase = kSPI_ClockPhaseFirstEdge; return;}
+	if (me->mode == AlxSpi_Mode_3)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveLow; me->spiMasterConfig.phase = kSPI_ClockPhaseSecondEdge; return;}
 
 	//Assert
 	ALX_SPI_ASSERT(false); // We shouldn't get here
