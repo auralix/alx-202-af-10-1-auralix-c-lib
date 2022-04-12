@@ -486,12 +486,12 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_Init(AlxHwNfcWlcListener
 }
 void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_Run(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120* me)
 {
-	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T02_IsSlaveReady(me);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T02_IsSlaveReady(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T03_ReadUsrMem(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T08_ModuleSramRead(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T09_ModuleSramWrite(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T10_ModuleEepromRead(me);
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_ModuleEepromWrite(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_ModuleEepromWrite(me);
 }
 
 //******************************************************************************
@@ -501,7 +501,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T02_IsSlav
 {
 	// Variables
 	Alx_Status status = Alx_Err;
-	uint8_t devAddr = 0xAB;
+	uint8_t devAddr = 0xAA;
 
 	// Init I2c
 	status = AlxI2c_Init(&me->alxI2c_I2C0);
@@ -511,8 +511,6 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T02_IsSlav
 	{
 		status = AlxI2c_Master_IsSlaveReady(&me->alxI2c_I2C0, devAddr, 3, 1000);	// MF: Fuka, popravi linijo 552 (treba dpoèakat da se flagi nastavijo drugace skos ACK vrne
 		if (status != Alx_Ok) { ALX_BKPT; }
-
-		ALX_TRACE_FORMAT("T02_Trace\r\n");
 
 		AlxDelay_ms(1000);
 	}
