@@ -391,7 +391,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		&me->alxIoPin.do_P0_20_SPI_MOSI,
 		&me->alxIoPin.di_P0_19_SPI_MISO,
 		&me->alxIoPin.do_P1_20_SPI_nCS,
-		AlxSpi_Mode_2,
+		AlxSpi_Mode_0,
 		AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz
 	);
 	AlxSpi_Ctor
@@ -402,7 +402,7 @@ static inline void AlxHwLpcXpresso55S69_Main_Ctor(AlxHwLpcXpresso55S69_Main* me)
 		&me->alxIoPin.do_P0_3_SPI_ACC_MOSI,
 		&me->alxIoPin.di_P0_2_SPI_ACC_MISO,
 		&me->alxIoPin.do_P0_4_SPI_ACC_nCS,
-		AlxSpi_Mode_2,
+		AlxSpi_Mode_0,
 		AlxSpi_Clk_McuLpc55S6x_SpiClk_10MHz
 	);
 
