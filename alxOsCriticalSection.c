@@ -1,6 +1,6 @@
 ﻿//******************************************************************************
-// @file alxOsMutex.c
-// @brief Auralix C Library - ALX OS Thread Module
+// @file alxOsCriticalSection.c
+// @brief Auralix C Library - ALX OS Critical Section Module
 // @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
 //******************************************************************************
 
@@ -8,7 +8,7 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxOsMutex.h"
+#include "alxOsCriticalSection.h"
 
 
 //******************************************************************************
@@ -18,46 +18,18 @@
 
 
 //******************************************************************************
-// Constructor
-//******************************************************************************
-void AlxOsMutex_Ctor
-(
-	AlxOsMutex* me
-)
-{
-	// Variables
-	#if defined(ALX_FREE_RTOS)
-	me->mutex = xSemaphoreCreateBinary();	// MF: Mutex is created once and won't be deleted during a program
-	xSemaphoreGive(me->mutex);
-	#endif
-
-	// Info
-	me->wasCtorCalled = true;
-}
-
-
-//******************************************************************************
 // Functions
 //******************************************************************************
-void AlxOsMutex_Lock(AlxOsMutex* me)
+void AlxOsCriticalSection_Enter(void)
 {
-	// Lock Mutex
 	#if defined(ALX_FREE_RTOS)
-	xSemaphoreTake(me->mutex, portMAX_DELAY);
+	taskENTER_CRITICAL();
 	#endif
 }
-void AlxOsMutex_Unlock(AlxOsMutex* me)
+void AlxOsCriticalSection_Exit(void)
 {
-	// Unlock Mutex
 	#if defined(ALX_FREE_RTOS)
-	xSemaphoreGive(me->mutex);
-	#endif
-}
-bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me)
-{
-	// Get Status
-	#if defined(ALX_FREE_RTOS)
-	return uxSemaphoreGetCount(me->mutex);
+	taskEXIT_CRITICAL();
 	#endif
 }
 
