@@ -466,7 +466,7 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_Ctor(AlxHwNfcWlcListener
 	(
 		&me->alxCrn120,
 		&me->alxI2c_I2C0,
-		0b10101010,	// i2cAddr
+		0xAA,		// i2cAddr
 		true,		// i2cCheckWithRead
 		3,			// i2cNumOfTries
 		1000		// i2cTimeout_ms
@@ -654,6 +654,213 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_Module
 		{
 			if (dataWrite[i] != dataRead[i]) { ALX_BKPT; }
 		}
+
+		AlxDelay_ms(1000);
+	}
+}
+
+
+//************************************************************************************************************************************************************
+//************************************************************************************************************************************************************
+// G04_AlxWlcl
+//************************************************************************************************************************************************************
+//************************************************************************************************************************************************************
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
+static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
+
+
+//******************************************************************************
+// Constructor & Functions
+//******************************************************************************
+void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Ctor(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
+{
+	//------------------------------------------------------------------------------
+	// ALX - IoPin
+	//------------------------------------------------------------------------------
+	AlxIoPin_Ctor(&me->ao_P0_11_CRN_VCC,		0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,		true		);	// TV: Enable CRN120 in Init
+	AlxIoPin_Ctor(&me->io_P0_16_I2C0_SDA,		0,	16,	AlxIoPin_Func_Swm_I2C0_SDA,		IOCON_MODE_INACT,	true,	ALX_NULL,	ALX_NULL	);
+	AlxIoPin_Ctor(&me->do_P0_17_I2C0_SCL,		0,	17,	AlxIoPin_Func_Swm_I2C0_SCL,		IOCON_MODE_INACT,	true,	ALX_NULL,	ALX_NULL	);
+
+	//------------------------------------------------------------------------------
+	// ALX - Clock
+	//------------------------------------------------------------------------------
+	AlxClk_Ctor
+	(
+		&alxClk,
+		AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz,
+		AlxClk_Tick_1ms
+	);
+
+	//------------------------------------------------------------------------------
+	// ALX - Trace
+	//------------------------------------------------------------------------------
+	AlxTrace_Ctor
+	(
+		&alxTrace,
+		0,	// port
+		4,	// pin
+		USART1,
+		AlxGlobal_BaudRate_115200
+	);
+
+	//------------------------------------------------------------------------------
+	// ALX - I2C
+	//------------------------------------------------------------------------------
+	AlxI2c_Ctor
+	(
+		&me->alxI2c_I2C0,
+		I2C0,
+		&me->do_P0_17_I2C0_SCL,
+		&me->io_P0_16_I2C0_SDA,
+		AlxI2c_Clk_McuLpc80x_BitRate_400kHz
+	);
+
+	//------------------------------------------------------------------------------
+	// ALX - CRN120
+	//------------------------------------------------------------------------------
+	AlxCrn120_Ctor
+	(
+		&me->alxCrn120,
+		&me->alxI2c_I2C0,
+		0xAA,	// i2cAddr
+		true,		// i2cCheckWithRead
+		3,			// i2cNumOfTries
+		1000		// i2cTimeout_ms
+	);
+
+	//------------------------------------------------------------------------------
+	// WLCL - MAIN
+	//------------------------------------------------------------------------------
+	WlclMain_Ctor
+	(
+		&me->wlclMain,
+		&me->wlclNfc,
+		&me->wlclPwr
+	);
+
+	//------------------------------------------------------------------------------
+	// WLCL - NFC
+	//------------------------------------------------------------------------------
+	WlclNfc_Ctor
+	(
+		&me->wlclNfc,
+		&me->alxCrn120
+	);
+
+	//------------------------------------------------------------------------------
+	// WLCL - PWR
+	//------------------------------------------------------------------------------
+	WlclPwr_Ctor
+	(
+		&me->wlclPwr
+	);
+
+	// Info
+	me->wasCtorCalled = true;
+}
+void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Init(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
+{
+	// Init
+	AlxClk_Init(&alxClk);
+	AlxTrace_Init(&alxTrace);
+
+	// Info
+	me->isInit = true;
+}
+void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Run(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
+{
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(me);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(me);
+}
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
+{
+	// Variables
+	Alx_Status status = Alx_Err;
+	uint8_t data[20] = { 0x00 };
+
+	// Init I2c
+	status = AlxCrn120_Init(&me->alxCrn120);
+	if (status != Alx_Ok) { ALX_BKPT; }
+
+	while (1)
+	{
+		// #1 Read 00h
+		status = AlxCrn120_ReadEeprom(&me->alxCrn120, 0x00, data, 16);
+		if (status != Alx_Ok) { ALX_BKPT; }
+
+		// #2 Set 00h Data
+		data[0]  = 0xAA;
+		data[12] = 0xE1;
+		data[13] = 0x10;
+		data[14] = 0x6D;
+		data[15] = 0x00;
+
+		// #3 Write 00h - CC
+		status = AlxCrn120_WriteEeprom(&me->alxCrn120, 0x00, data, 16);
+		if (status != Alx_Ok) { ALX_BKPT; }
+
+		// #4 Set 01h Data
+		data[0]  = 0x03;
+		data[1]  = 0x0F;
+		data[2]  = 0xD1;
+		data[3]  = 0x06;
+		data[4]  = 0x06;
+		data[5]  = 0x57;
+		data[6]  = 0x4C;
+		data[7]  = 0x43;
+		data[8]  = 0x43;
+		data[9]  = 0x41;
+		data[10] = 0x50;
+		data[11] = 0x10;
+		data[12] = 0x3E;
+		data[13] = 0x06;
+		data[14] = 0x02;
+		data[15] = 0x02;
+		data[16] = 0x0A;
+		data[17] = 0xFE;
+		data[18] = 0x00;
+		data[19] = 0x00;
+
+		// #5 Write 00h - CC
+		status = AlxCrn120_WriteEeprom(&me->alxCrn120, 0x01, data, 20);
+		if (status != Alx_Ok) { ALX_BKPT; }
+
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
+{
+	// Variables
+	Alx_Status status = Alx_Err;
+	uint8_t data[20] = { 0x00 };
+	me->isBatFul = false;
+
+	// Init I2c
+	status = AlxCrn120_Init(&me->alxCrn120);
+	if (status != Alx_Ok) { ALX_BKPT; }
+
+	while (1)
+	{
+		// #1 Read 01h
+		status = AlxCrn120_ReadEeprom(&me->alxCrn120, 0x01, data, 20);
+		if (status != Alx_Ok) { ALX_BKPT; }
+
+		// #2 Set 01h Data
+		if (me->isBatFul == true)	{ data[12] = 0xBE; }
+		else						{ data[12] = 0x3E; }
+
+		// #3 Write 00h - CC
+		status = AlxCrn120_WriteEeprom(&me->alxCrn120, 0x01, data, 20);	// MF: checkWithRead happens here
+		if (status != Alx_Ok) { ALX_BKPT; }
 
 		AlxDelay_ms(1000);
 	}

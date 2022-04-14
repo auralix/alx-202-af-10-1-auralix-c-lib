@@ -74,6 +74,9 @@ extern "C" {
 #include <alxTpa3255.h>
 #include <alxVnh7040.h>
 
+//#include "alxWlcGlobal.h"
+#include "alxWlclMain.h"
+
 
 //******************************************************************************
 // Module Guard
