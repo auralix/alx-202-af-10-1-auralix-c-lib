@@ -1,5 +1,5 @@
 ﻿//******************************************************************************
-// @file alxOsMutex.c
+// @file alxOsThread.c
 // @brief Auralix C Library - ALX OS Thread Module
 // @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
 //******************************************************************************
@@ -8,7 +8,7 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxOsMutex.h"
+#include "alxOsThread.h"
 
 
 //******************************************************************************
@@ -20,18 +20,30 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxOsMutex_Ctor
+void AlxOsThread_Ctor
 (
-	AlxOsMutex* me
+	AlxOsThread* me,
+	TaskFunction_t pxTaskCode,
+	const char* const pcName,
+	const configSTACK_DEPTH_TYPE usStackDepth,
+	void* const pvParameters,
+	UBaseType_t uxPriority
 )
 {
-	// Variables
 	#if defined(ALX_FREE_RTOS)
-	me->mutex = xSemaphoreCreateBinary();	// MF: Mutex is created once and won't be deleted during a program
-	xSemaphoreGive(me->mutex);
+	// Parameters
+	me->pxTaskCode = pxTaskCode;
+	me->pcName = pcName;
+	me->usStackDepth = usStackDepth;
+	me->pvParameters = pvParameters;
+	me->uxPriority = uxPriority;
+
+	// Variables
+	me->pxCreatedTask = NULL;
 	#endif
 
 	// Info
+	me->wasThreadStarted = false;
 	me->wasCtorCalled = true;
 }
 
@@ -39,26 +51,28 @@ void AlxOsMutex_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxOsMutex_Lock(AlxOsMutex* me)
+Alx_Status AlxOsThread_Start(AlxOsThread* me)
 {
-	// Lock Mutex
+	// #1 Assert
+	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == false);
+	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Start
 	#if defined(ALX_FREE_RTOS)
-	xSemaphoreTake(me->mutex, portMAX_DELAY);
+	BaseType_t status = xTaskCreate
+	(
+		me->pxTaskCode,
+		me->pcName,
+		me->usStackDepth,
+		me->pvParameters,
+		me->uxPriority,
+		me->pxCreatedTask
+	);
+	if (status != pdPASS) { ALX_OS_THREAD_TRACE("Err"); return Alx_Err; }
 	#endif
-}
-void AlxOsMutex_Unlock(AlxOsMutex* me)
-{
-	// Unlock Mutex
-	#if defined(ALX_FREE_RTOS)
-	xSemaphoreGive(me->mutex);
-	#endif
-}
-bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me)
-{
-	// Get Status
-	#if defined(ALX_FREE_RTOS)
-	return uxSemaphoreGetCount(me->mutex);
-	#endif
+
+	// #3 Return
+	return Alx_Ok;
 }
 
 
