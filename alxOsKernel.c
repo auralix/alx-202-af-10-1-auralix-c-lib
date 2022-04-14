@@ -17,38 +17,13 @@
 
 
 //******************************************************************************
-// Constructor
-//******************************************************************************
-void AlxOsKernel_Ctor
-(
-	AlxOsKernel* me
-)
-{
-	// Info
-	me->wasKernelStarted = false;
-	me->wasCtorCalled = true;
-}
-
-
-//******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxOsKernel_Start(AlxOsKernel* me)
+void AlxOsKernel_Start(void)
 {
-	// #1 Assert
-	ALX_OS_KERNEL_ASSERT(me->wasKernelStarted == false);
-	ALX_OS_KERNEL_ASSERT(me->wasCtorCalled == true);
-
-	// #2 Start
 	#if defined(ALX_FREE_RTOS)
 	vTaskStartScheduler();
 	#endif
-
-	// #3 Set wasThreadStarted
-	me->wasKernelStarted = true;
-
-	// #4 Return
-	return Alx_Ok;
 }
 
 
