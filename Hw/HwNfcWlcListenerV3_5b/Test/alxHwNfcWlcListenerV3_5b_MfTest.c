@@ -672,6 +672,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_Module
 //******************************************************************************
 static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
 static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
+static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_xxx(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
 
 
 //******************************************************************************
@@ -775,7 +776,8 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Init(AlxHwNfcWlcListenerV3
 void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Run(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
 {
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(me);
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(me);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_xxx(me);
 }
 
 //******************************************************************************
@@ -861,6 +863,22 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(A
 		// #3 Write 00h - CC
 		status = AlxCrn120_WriteEeprom(&me->alxCrn120, 0x01, data, 20);	// MF: checkWithRead happens here
 		if (status != Alx_Ok) { ALX_BKPT; }
+
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_xxx(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
+{
+	// Variables
+	Alx_Status status = Alx_Err;
+
+	// Init WlclMain
+	status = WlclMain_Init(&me->wlclMain);
+	if (status != Alx_Ok) { ALX_BKPT; }
+
+	while (1)
+	{
+		WlclMain_Handle(&me->wlclMain);
 
 		AlxDelay_ms(1000);
 	}
