@@ -807,8 +807,15 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcA
 		data[15] = 0x00;
 
 		// #3 Write 00h - CC
-		status = AlxCrn120_WriteEeprom(&me->alxCrn120, 0x00, data, 16);
-		if (status != Alx_Ok) { ALX_BKPT; }
+		if (AlxCrn120_IsCheckWithReadEnabled(&me->alxCrn120))
+		{
+			AlxCrn120_CheckWithReadDisable(&me->alxCrn120);
+
+			status = AlxCrn120_WriteEeprom(&me->alxCrn120, 0x00, data, 16);
+			if (status != Alx_Ok) { ALX_BKPT; }
+
+			AlxCrn120_CheckWithReadEnable(&me->alxCrn120);
+		}
 
 		// #4 Set 01h Data
 		data[0]  = 0x03;
@@ -832,7 +839,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcA
 		data[18] = 0x00;
 		data[19] = 0x00;
 
-		// #5 Write 00h - CC
+		// #5 Write 01h - Eeprom
 		status = AlxCrn120_WriteEeprom(&me->alxCrn120, 0x01, data, 20);
 		if (status != Alx_Ok) { ALX_BKPT; }
 

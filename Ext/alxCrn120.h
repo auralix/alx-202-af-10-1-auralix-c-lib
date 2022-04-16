@@ -58,6 +58,8 @@ extern "C" {
 #define ALX_CRN120_SRAM_END 0xFB
 #define ALX_CRN120_SRAM_LEN 64
 
+#define ALX_CRN120_SESSION_REG_BYTE_LEN 7
+
 
 //******************************************************************************
 // Register Values Unions
@@ -642,6 +644,17 @@ typedef struct
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxCrn120_SessionRegByte_NC_REG = 0,
+	AlxCrn120_SessionRegByte_LAST_NDEF_BLOCK = 1,
+	AlxCrn120_SessionRegByte_SRAM_MIRROR_BLOCK = 2,
+	AlxCrn120_SessionRegByte_WDT_LS = 3,
+	AlxCrn120_SessionRegByte_WDT_MS = 4,
+	AlxCrn120_SessionRegByte_I2C_CLOCK_STR = 5,
+	AlxCrn120_SessionRegByte_NS_REG = 6
+} AlxCrn120_SessionRegByte;
+
 typedef struct
 {
 	// Objects - External
@@ -686,6 +699,12 @@ Alx_Status AlxCrn120_ReadEeprom(AlxCrn120*me, uint32_t addr, uint8_t* data, uint
 Alx_Status AlxCrn120_WriteEeprom(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32_t len);
 Alx_Status AlxCrn120_ReadSram(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32_t len);
 Alx_Status AlxCrn120_WriteSram(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32_t len);
+Alx_Status AlxCrn120_ReadSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t* regdat);
+Alx_Status AlxCrn120_WriteSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t regdat, uint8_t mask);
+Alx_Status AlxCrn120_EnableSramMirror(AlxCrn120*me);
+bool AlxCrn120_IsCheckWithReadEnabled(AlxCrn120* me);
+void AlxCrn120_CheckWithReadEnable(AlxCrn120* me);
+void AlxCrn120_CheckWithReadDisable(AlxCrn120* me);
 
 
 //Alx_Status AlxCrn120_Reg_Write(AlxCrn120* me, void* reg, uint8_t* data);

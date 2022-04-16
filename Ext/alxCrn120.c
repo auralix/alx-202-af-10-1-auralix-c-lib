@@ -96,21 +96,21 @@ Alx_Status AlxCrn120_Init(AlxCrn120* me)
 	status = AlxCrn120_ReadBlockLen(me, me->reg._00h.addr, me->uid, sizeof(me->uid));
 	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_ReadBlock"); return status; }
 
-	// #6 Set register struct values to default
-	AlxCrn120_RegStruct_SetValToDefault(me);
+	// #6 Set register struct values to default		// MF: We probbalby don't need this
+	//AlxCrn120_RegStruct_SetValToDefault(me);
 
 	// #7 Set registers values - WEAK
 	AlxCrn120_RegStruct_SetVal(me);
 
-	// #8 Write registers
+	// #8 Write registers							// MF: We probbalby don't need this
 	// #8.1 Write register 00h - CC
-	status = AlxCrn120_WriteBlockLen(me, me->reg._00h.addr, me->reg._00h.val.raw, sizeof(me->reg._00h.val.raw), false);
-	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_WriteBlock"); return status; }
-	AlxDelay_ms(5);	// MF: Eeprom Programing Delay
+	//status = AlxCrn120_WriteBlockLen(me, me->reg._00h.addr, me->reg._00h.val.raw, sizeof(me->reg._00h.val.raw), false);
+	//if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_WriteBlock"); return status; }
+	//AlxDelay_ms(5);	// MF: Eeprom Programing Delay
 
-	// #8.2 Write register FEh - Session
-	status = AlxCrn120_SetSessionReg(me);		// MF: "checkWithRead" isn't handled here
-	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_SetSessionReg"); return status; }
+	// #8.2 Write register FEh - Session			// MF: We probbalby don't need this
+	//status = AlxCrn120_SetSessionReg(me);		// MF: "checkWithRead" isn't handled here
+	//if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_SetSessionReg"); return status; }
 
 	// #9 Set isInit
 	me->isInit = true;
@@ -306,6 +306,154 @@ Alx_Status AlxCrn120_WriteSram(AlxCrn120*me, uint32_t addr, uint8_t* data, uint3
 	// #4 Return OK
 	return Alx_Ok;
 }
+Alx_Status AlxCrn120_ReadSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t* regdat)
+{
+	// #1 Assert
+	ALX_CRN120_ASSERT(me->isInit == true);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
+	ALX_CRN120_ASSERT(regdat != NULL);
+
+	// #2 Prepare variables
+	Alx_Status status = Alx_Err;
+	uint8_t regAddr = *((uint8_t*)&me->reg._FEh_SessionReg);
+
+	// #3 Write address and byte
+	for (uint32_t _tryNo = 1; _tryNo <= me->i2cNumOfTries; _tryNo++)
+	{
+		// #3.1 Write REGDAT
+		status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, (const uint8_t*)&rega, 1, false, me->i2cNumOfTries, me->i2cTimeout_ms);
+		if (status != Alx_Ok)
+		{
+			ALX_CRN120_TRACE("Err_WriteData");
+			continue;
+		}
+
+		status = AlxI2c_Master_StartReadStop(me->i2c, me->i2cAddr, regdat, 1, me->i2cNumOfTries, me->i2cTimeout_ms);
+		if (status != Alx_Ok)
+		{
+			ALX_CRN120_TRACE("Err_ReadData");
+			continue;
+		}
+
+		// #3.2 Return OK
+		return Alx_Ok;
+	}
+
+	// #4 If we are here, the number of tries error occured
+	if (status != Alx_Ok)
+	{
+		ALX_CRN120_TRACE("Err_NumOfTries");
+		return Alx_ErrNumOfTries;
+	}
+
+	// #5 Assert	// We should not get here
+	ALX_CRN120_TRACE(false);
+	return Alx_Err;
+}
+Alx_Status AlxCrn120_WriteSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t regdat, uint8_t mask)
+{
+	// #1 Assert
+	ALX_CRN120_ASSERT(me->isInit == true);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
+	ALX_CRN120_ASSERT(rega != AlxCrn120_SessionRegByte_I2C_CLOCK_STR); // Read Only Byte
+
+	// #2 Prepare variables
+	Alx_Status status = Alx_Err;
+	uint8_t regAddr = *((uint8_t*)&me->reg._FEh_SessionReg);
+	uint8_t dataWrite[3] = { (uint8_t)rega, mask, regdat };
+
+	// #3 Write address and byte
+	for (uint32_t _tryNo = 1; _tryNo <= me->i2cNumOfTries; _tryNo++)
+	{
+		// #3.1 Write REGDAT
+		status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, dataWrite, sizeof(dataWrite), false, me->i2cNumOfTries, me->i2cTimeout_ms);
+		if (status != Alx_Ok)
+		{
+			ALX_CRN120_TRACE("Err_WriteData");
+			continue;
+		}
+
+		// #3.2 Return OK
+		return Alx_Ok;
+	}
+
+	// #4 If we are here, the number of tries error occured
+	if (status != Alx_Ok)
+	{
+		ALX_CRN120_TRACE("Err_NumOfTries");
+		return Alx_ErrNumOfTries;
+	}
+
+	// #5 Assert	// We should not get here
+	ALX_CRN120_TRACE(false);
+	return Alx_Err;
+}
+Alx_Status AlxCrn120_EnableSramMirror(AlxCrn120*me)
+{
+	// #1 Assert
+	ALX_CRN120_ASSERT(me->isInit == true);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Prepare variables
+	Alx_Status status = Alx_Err;
+	uint8_t regAddr = *((uint8_t*)&me->reg._FEh_SessionReg);
+	me->reg._FEh_SessionReg.val.SRAM_MIRROR = NcReg_SramMirror_Enable;
+	uint8_t dataWrite[3] = { (uint8_t)AlxCrn120_SessionRegByte_NC_REG, me->reg._FEh_SessionReg.val.raw[0], me->reg._FEh_SessionReg.val.raw[0] };
+
+	// #3 Write address and byte
+	for (uint32_t _tryNo = 1; _tryNo <= me->i2cNumOfTries; _tryNo++)
+	{
+		// #3.1 Write REGDAT
+		status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, dataWrite, sizeof(dataWrite), false, me->i2cNumOfTries, me->i2cTimeout_ms);
+		if (status != Alx_Ok)
+		{
+			ALX_CRN120_TRACE("Err_WriteData");
+			continue;
+		}
+
+		// #3.2 Return OK
+		return Alx_Ok;
+	}
+
+	// #4 If we are here, the number of tries error occured
+	if (status != Alx_Ok)
+	{
+		ALX_CRN120_TRACE("Err_NumOfTries");
+		return Alx_ErrNumOfTries;
+	}
+
+	// #5 Assert	// We should not get here
+	ALX_CRN120_TRACE(false);
+	return Alx_Err;
+}
+bool AlxCrn120_IsCheckWithReadEnabled(AlxCrn120* me)
+{
+	// #1 Assert
+	ALX_CRN120_ASSERT(me->isInit == true);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Return i2cCheckWithRead
+	return me->i2cCheckWithRead;
+}
+void AlxCrn120_CheckWithReadEnable(AlxCrn120* me)
+{
+	// #1 Assert
+	ALX_CRN120_ASSERT(me->isInit == true);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Enable i2cCheckWithRead
+	me->i2cCheckWithRead = true;
+}
+void AlxCrn120_CheckWithReadDisable(AlxCrn120* me)
+{
+	// #1 Assert
+	ALX_CRN120_ASSERT(me->isInit == true);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Disable i2cCheckWithRead
+	me->i2cCheckWithRead = false;
+}
+
 
 //******************************************************************************
 // Private Functions
