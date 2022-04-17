@@ -672,7 +672,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_Module
 //******************************************************************************
 static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
 static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
-static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_xxx(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
+static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
 
 
 //******************************************************************************
@@ -686,6 +686,7 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Ctor(AlxHwNfcWlcListenerV3
 	AlxIoPin_Ctor(&me->ao_P0_11_CRN_VCC,		0,	11,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	true,		true		);	// TV: Enable CRN120 in Init
 	AlxIoPin_Ctor(&me->io_P0_16_I2C0_SDA,		0,	16,	AlxIoPin_Func_Swm_I2C0_SDA,		IOCON_MODE_INACT,	true,	ALX_NULL,	ALX_NULL	);
 	AlxIoPin_Ctor(&me->do_P0_17_I2C0_SCL,		0,	17,	AlxIoPin_Func_Swm_I2C0_SCL,		IOCON_MODE_INACT,	true,	ALX_NULL,	ALX_NULL	);
+	AlxIoPin_Ctor(&me->di_P0_18_SET_BAT,		0,	18,	AlxIoPin_Func_GPIO,				IOCON_MODE_INACT,	false,	false,		true		);
 
 	//------------------------------------------------------------------------------
 	// ALX - Clock
@@ -777,7 +778,7 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Run(AlxHwNfcWlcListenerV3_
 {
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(me);
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_xxx(me);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample(me);
 }
 
 //******************************************************************************
@@ -874,7 +875,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(A
 		AlxDelay_ms(1000);
 	}
 }
-static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_xxx(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
 {
 	// Variables
 	Alx_Status status = Alx_Err;
@@ -883,9 +884,15 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_xxx(AlxH
 	status = AlxWlclMain_Init(&me->alxWlclMain);
 	if (status != Alx_Ok) { ALX_BKPT; }
 
+	// Init IoPin
+	AlxIoPin_Init(&me->di_P0_18_SET_BAT);
+
 	while (1)
 	{
 		AlxWlclMain_Handle(&me->alxWlclMain);
+
+		if (AlxIoPin_Read(&me->di_P0_18_SET_BAT))	{ me->alxWlclMain.isBatFul = false; }
+		else										{ me->alxWlclMain.isBatFul = true; }
 
 		AlxDelay_ms(1000);
 	}

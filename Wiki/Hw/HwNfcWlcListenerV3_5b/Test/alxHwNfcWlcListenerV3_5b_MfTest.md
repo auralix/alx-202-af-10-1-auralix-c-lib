@@ -64,3 +64,26 @@ Everything is according to new testing system
 	- /
 - __AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_ModuleEepromWrite(me)__
 	- ![AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_ModuleEepromWrite_01](Img/AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_ModuleEepromWrite_01.jpg)
+
+## __G04_AlxWlcl__
+---
+- The goal is to achieve that AlxWlcl works the same as Cili
+
+### __Configurations__
+- __AlxCk__: AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz
+- __AlxTrace__: AlxGlobal_BaudRate_115200
+- __AlxI2c__: AlxI2c_Clk_McuLpc80x_BitRate_400kHz
+
+### __Test List__ 
+- __AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(me)__
+	- /
+- __AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(me)__
+	- /
+- __AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample(me)__
+	- ![AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample_01](Img/AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample_01.jpg)
+	- Pin PIO0_18 set HIGH to simulate Satatic Charging
+	- ![AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample_02](Img/AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample_02.jpg)
+	- ![AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample_03](Img/AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample_03.jpg)
+	- Pin PIO0_18 set LOW to simulate Battery Full
+	- ![AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample_04](Img/AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample_04.jpg)
+	- ![AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample_05](Img/AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample_05.jpg)

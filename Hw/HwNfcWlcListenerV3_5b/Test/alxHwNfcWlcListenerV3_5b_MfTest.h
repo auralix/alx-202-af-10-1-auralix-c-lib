@@ -144,6 +144,7 @@ typedef struct
 	AlxIoPin ao_P0_11_CRN_VCC;
 	AlxIoPin io_P0_16_I2C0_SDA;
 	AlxIoPin do_P0_17_I2C0_SCL;
+	AlxIoPin di_P0_18_SET_BAT;
 
 	//--------------------------------------
 	// ALX - I2C

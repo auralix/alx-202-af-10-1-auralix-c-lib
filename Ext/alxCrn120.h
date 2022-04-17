@@ -701,17 +701,12 @@ Alx_Status AlxCrn120_ReadSram(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32
 Alx_Status AlxCrn120_WriteSram(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32_t len);
 Alx_Status AlxCrn120_ReadSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t* regdat);
 Alx_Status AlxCrn120_WriteSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t regdat, uint8_t mask);
+Alx_Status AlxCrn120_ReadSessionRegAll(AlxCrn120*me, uint8_t* data);
+Alx_Status AlxCrn120_WriteSessionRegAll(AlxCrn120*me, uint8_t* data, uint8_t* mask);
 Alx_Status AlxCrn120_EnableSramMirror(AlxCrn120*me);
 bool AlxCrn120_IsCheckWithReadEnabled(AlxCrn120* me);
 void AlxCrn120_CheckWithReadEnable(AlxCrn120* me);
 void AlxCrn120_CheckWithReadDisable(AlxCrn120* me);
-
-
-//Alx_Status AlxCrn120_Reg_Write(AlxCrn120* me, void* reg, uint8_t* data);
-//Alx_Status AlxCrn120_Reg_Read(AlxCrn120* me, void* reg, uint8_t* data);
-//Alx_Status AlxCrn120_Reg_WriteReg(AlxCrn120* me, void* reg, uint8_t* data, uint8_t byte);
-//Alx_Status AlxCrn120_Reg_ReadReg(AlxCrn120* me, void* reg, uint8_t* data, uint8_t byte);
-//Alx_Status AlxCrn120_Mem(AlxCrn120* me, AlxCrn120_MemAddr addr, uint8_t* data, bool toWrite);	// MF: "9.7 READ and WRITE Operation" have to be used, meaning 16bytes in one read/write
 
 
 #ifdef __cplusplus

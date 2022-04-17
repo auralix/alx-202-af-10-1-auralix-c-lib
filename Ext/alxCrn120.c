@@ -25,12 +25,13 @@ static Alx_Status AlxCrn120_ReadBlock(AlxCrn120* me, uint32_t addr, uint8_t* dat
 static Alx_Status AlxCrn120_WriteBlock(AlxCrn120* me, uint32_t addr, uint8_t* data);
 static Alx_Status AlxCrn120_ReadBlockLen(AlxCrn120* me, uint32_t addr, uint8_t* data, uint32_t len);
 static Alx_Status AlxCrn120_WriteBlockLen(AlxCrn120* me, uint32_t addr, uint8_t* data, uint32_t len, bool checkWithRead);
-static Alx_Status AlxCrn120_SetSessionReg(AlxCrn120* me);
-
+static Alx_Status AlxCrn120_ReadSessionRegByte(AlxCrn120* me, AlxCrn120_SessionRegByte rega, uint8_t* regdat);
+static Alx_Status AlxCrn120_WriteSessionRegByte(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t regdat, uint8_t mask);
 
 //static Alx_Status AlxCrn120_Reg_Write(AlxCrn120* me, void* reg);
 //static Alx_Status AlxCrn120_Reg_Read(AlxCrn120* me, void* reg);
 //static Alx_Status AlxCrn120_Reg_WriteAll(AlxCrn120* me);
+
 
 //******************************************************************************
 // Weak Functions
@@ -315,40 +316,13 @@ Alx_Status AlxCrn120_ReadSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega,
 
 	// #2 Prepare variables
 	Alx_Status status = Alx_Err;
-	uint8_t regAddr = *((uint8_t*)&me->reg._FEh_SessionReg);
 
-	// #3 Write address and byte
-	for (uint32_t _tryNo = 1; _tryNo <= me->i2cNumOfTries; _tryNo++)
-	{
-		// #3.1 Write REGDAT
-		status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, (const uint8_t*)&rega, 1, false, me->i2cNumOfTries, me->i2cTimeout_ms);
-		if (status != Alx_Ok)
-		{
-			ALX_CRN120_TRACE("Err_WriteData");
-			continue;
-		}
+	// #3 Read Byte
+	status = AlxCrn120_ReadSessionRegByte(me, rega, regdat);
+	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_ReadByte"); return status; }
 
-		status = AlxI2c_Master_StartReadStop(me->i2c, me->i2cAddr, regdat, 1, me->i2cNumOfTries, me->i2cTimeout_ms);
-		if (status != Alx_Ok)
-		{
-			ALX_CRN120_TRACE("Err_ReadData");
-			continue;
-		}
-
-		// #3.2 Return OK
-		return Alx_Ok;
-	}
-
-	// #4 If we are here, the number of tries error occured
-	if (status != Alx_Ok)
-	{
-		ALX_CRN120_TRACE("Err_NumOfTries");
-		return Alx_ErrNumOfTries;
-	}
-
-	// #5 Assert	// We should not get here
-	ALX_CRN120_TRACE(false);
-	return Alx_Err;
+	// #4 Return OK
+	return Alx_Ok;
 }
 Alx_Status AlxCrn120_WriteSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t regdat, uint8_t mask)
 {
@@ -359,34 +333,54 @@ Alx_Status AlxCrn120_WriteSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega
 
 	// #2 Prepare variables
 	Alx_Status status = Alx_Err;
-	uint8_t regAddr = *((uint8_t*)&me->reg._FEh_SessionReg);
-	uint8_t dataWrite[3] = { (uint8_t)rega, mask, regdat };
 
-	// #3 Write address and byte
-	for (uint32_t _tryNo = 1; _tryNo <= me->i2cNumOfTries; _tryNo++)
+	// #3 Write Byte
+	status = AlxCrn120_WriteSessionRegByte(me, rega, regdat, mask);
+	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_WriteByte"); return status; }
+
+	// #4 Return OK
+	return Alx_Ok;
+}
+Alx_Status AlxCrn120_ReadSessionRegAll(AlxCrn120*me, uint8_t* data)
+{
+	// #1 Assert
+	ALX_CRN120_ASSERT(me->isInit == true);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
+	ALX_CRN120_ASSERT(data != NULL);
+
+	// #2 Prepare variables
+	Alx_Status status = Alx_Err;
+
+	// #3 Read Session Reg
+	for (uint8_t i = 0; i < ALX_CRN120_SESSION_REG_BYTE_LEN; i++)
 	{
-		// #3.1 Write REGDAT
-		status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, dataWrite, sizeof(dataWrite), false, me->i2cNumOfTries, me->i2cTimeout_ms);
-		if (status != Alx_Ok)
-		{
-			ALX_CRN120_TRACE("Err_WriteData");
-			continue;
-		}
-
-		// #3.2 Return OK
-		return Alx_Ok;
+		status = AlxCrn120_ReadSessionRegByte(me, (AlxCrn120_SessionRegByte)i, &data[i]);
+		if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_ReadData"); return status; }
 	}
 
-	// #4 If we are here, the number of tries error occured
-	if (status != Alx_Ok)
+	// #4 Return OK
+	return Alx_Ok;
+}
+Alx_Status AlxCrn120_WriteSessionRegAll(AlxCrn120*me, uint8_t* data, uint8_t* mask)
+{
+	// #1 Assert
+	ALX_CRN120_ASSERT(me->isInit == true);
+	ALX_CRN120_ASSERT(me->wasCtorCalled == true);
+	ALX_CRN120_ASSERT(data != NULL);
+	ALX_CRN120_ASSERT(mask != NULL);
+
+	// #2 Prepare variables
+	Alx_Status status = Alx_Err;
+
+	// #3 Read Session Reg
+	for (uint8_t i = 0; i < ALX_CRN120_SESSION_REG_BYTE_LEN; i++)
 	{
-		ALX_CRN120_TRACE("Err_NumOfTries");
-		return Alx_ErrNumOfTries;
+		status = AlxCrn120_WriteSessionRegByte(me, (AlxCrn120_SessionRegByte)i, data[i], mask[i]);
+		if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_WriteData"); return Alx_Err; }
 	}
 
-	// #5 Assert	// We should not get here
-	ALX_CRN120_TRACE(false);
-	return Alx_Err;
+	// #4 Return OK
+	return Alx_Ok;
 }
 Alx_Status AlxCrn120_EnableSramMirror(AlxCrn120*me)
 {
@@ -836,31 +830,78 @@ static Alx_Status AlxCrn120_WriteBlockLen(AlxCrn120* me, uint32_t addr, uint8_t*
 	ALX_CRN120_TRACE(false);
 	return Alx_Err;
 }
-static Alx_Status AlxCrn120_SetSessionReg(AlxCrn120* me)
+static Alx_Status AlxCrn120_ReadSessionRegByte(AlxCrn120* me, AlxCrn120_SessionRegByte rega, uint8_t* regdat)
 {
 	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
 	uint8_t regAddr = *((uint8_t*)&me->reg._FEh_SessionReg);
-	uint8_t dataWrite[3] = { 0 };
 
 	// #2 Write address and byte
-	for (uint8_t i = 0; i < 7; i++)
+	for (uint32_t _tryNo = 1; _tryNo <= me->i2cNumOfTries; _tryNo++)
 	{
-		// #2.1 Skip I2C_CLOCK_STR (5th position) because it is read only byte
-		if (i == 5) { continue; }
+		// #2.1 Write REGDAT
+		status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, (const uint8_t*)&rega, 1, false, me->i2cNumOfTries, me->i2cTimeout_ms);
+		if (status != Alx_Ok)
+		{
+			ALX_CRN120_TRACE("Err_WriteData");
+			continue;
+		}
 
-		// #2.2 Set MEMA, REGA and MASK
-		dataWrite[0] = i;
-		dataWrite[1] = me->reg._FEh_SessionReg.val.raw[i];
-		dataWrite[2] = me->reg._FEh_SessionReg.val.raw[i];
+		// #2.2 Read Data
+		status = AlxI2c_Master_StartReadStop(me->i2c, me->i2cAddr, regdat, 1, me->i2cNumOfTries, me->i2cTimeout_ms);
+		if (status != Alx_Ok)
+		{
+			ALX_CRN120_TRACE("Err_ReadData");
+			continue;
+		}
 
-		// #2.3 Write REGDAT
-		status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, dataWrite, sizeof(dataWrite), false, me->i2cNumOfTries, me->i2cTimeout_ms);
-		if (status != Alx_Ok) { ALX_CRN120_TRACE("Err_WriteData"); return status;}
+		// #2.3 Return OK
+		return Alx_Ok;
 	}
 
-	// #3 Return OK
-	return Alx_Ok;
+	// #3 If we are here, the number of tries error occured
+	if (status != Alx_Ok)
+	{
+		ALX_CRN120_TRACE("Err_NumOfTries");
+		return Alx_ErrNumOfTries;
+	}
+
+	// #4 Assert	// We should not get here
+	ALX_CRN120_TRACE(false);
+	return Alx_Err;
+}
+static Alx_Status AlxCrn120_WriteSessionRegByte(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t regdat, uint8_t mask)
+{
+	// #1 Prepare variables
+	Alx_Status status = Alx_Err;
+	uint8_t regAddr = *((uint8_t*)&me->reg._FEh_SessionReg);
+	uint8_t dataWrite[3] = { (uint8_t)rega, mask, regdat };
+
+	// #2 Write address and byte
+	for (uint32_t _tryNo = 1; _tryNo <= me->i2cNumOfTries; _tryNo++)
+	{
+		// #2.1 Write REGDAT
+		status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, dataWrite, sizeof(dataWrite), false, me->i2cNumOfTries, me->i2cTimeout_ms);
+		if (status != Alx_Ok)
+		{
+			ALX_CRN120_TRACE("Err_WriteData");
+			continue;
+		}
+
+		// #2.2 Return OK
+		return Alx_Ok;
+	}
+
+	// #3 If we are here, the number of tries error occured
+	if (status != Alx_Ok)
+	{
+		ALX_CRN120_TRACE("Err_NumOfTries");
+		return Alx_ErrNumOfTries;
+	}
+
+	// #4 Assert	// We should not get here
+	ALX_CRN120_TRACE(false);
+	return Alx_Err;
 }
 
 
