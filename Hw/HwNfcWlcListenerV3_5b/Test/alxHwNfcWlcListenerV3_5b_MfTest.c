@@ -737,28 +737,28 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Ctor(AlxHwNfcWlcListenerV3
 	//------------------------------------------------------------------------------
 	// WLCL - MAIN
 	//------------------------------------------------------------------------------
-	WlclMain_Ctor
+	AlxWlclMain_Ctor
 	(
-		&me->wlclMain,
-		&me->wlclNfc,
-		&me->wlclPwr
+		&me->alxWlclMain,
+		&me->alxWlclNfc,
+		&me->alxWlclPwr
 	);
 
 	//------------------------------------------------------------------------------
 	// WLCL - NFC
 	//------------------------------------------------------------------------------
-	WlclNfc_Ctor
+	AlxWlclNfc_Ctor
 	(
-		&me->wlclNfc,
+		&me->alxWlclNfc,
 		&me->alxCrn120
 	);
 
 	//------------------------------------------------------------------------------
 	// WLCL - PWR
 	//------------------------------------------------------------------------------
-	WlclPwr_Ctor
+	AlxWlclPwr_Ctor
 	(
-		&me->wlclPwr
+		&me->alxWlclPwr
 	);
 
 	// Info
@@ -880,12 +880,12 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_xxx(AlxH
 	Alx_Status status = Alx_Err;
 
 	// Init WlclMain
-	status = WlclMain_Init(&me->wlclMain);
+	status = AlxWlclMain_Init(&me->alxWlclMain);
 	if (status != Alx_Ok) { ALX_BKPT; }
 
 	while (1)
 	{
-		WlclMain_Handle(&me->wlclMain);
+		AlxWlclMain_Handle(&me->alxWlclMain);
 
 		AlxDelay_ms(1000);
 	}

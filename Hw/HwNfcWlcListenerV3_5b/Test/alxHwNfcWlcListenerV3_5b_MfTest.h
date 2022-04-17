@@ -158,17 +158,17 @@ typedef struct
 	//--------------------------------------
 	// WLCL - MAIN
 	//--------------------------------------
-	WlclMain wlclMain;
+	AlxWlclMain alxWlclMain;
 
 	//--------------------------------------
 	// WLCL - NFC
 	//--------------------------------------
-	WlclNfc wlclNfc;
+	AlxWlclNfc alxWlclNfc;
 
 	//--------------------------------------
 	// WLCL - PWR
 	//--------------------------------------
-	WlclPwr wlclPwr;
+	AlxWlclPwr alxWlclPwr;
 
 	//--------------------------------------
 	// Info
