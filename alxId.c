@@ -318,7 +318,9 @@ void AlxId_Init(AlxId* me)
 		// #1 Get HW ID Pin States
 		for (uint32_t i = 0; i < me->hw.idIoPinArrLen; i++)
 		{
+			AlxIoPin_Init(*(me->hw.idIoPinArr + i));
 			me->hw.idIoPinState[i] = AlxIoPin_Read_TriState(*(me->hw.idIoPinArr + i));
+			AlxIoPin_DeInit(*(me->hw.idIoPinArr + i));
 		}
 
 		// #2 Calculate HW ID

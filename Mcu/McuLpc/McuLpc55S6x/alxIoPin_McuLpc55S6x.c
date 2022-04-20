@@ -179,62 +179,6 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	// #2 Toggle Pin
 	GPIO_PortToggle(GPIO, me->port, (1U << me->pin));
 }
-//void AlxIoPin_Lock(AlxIoPin* me)
-//{
-//	// Assert
-//	(void)me;
-//
-//	// TODO
-//	ALX_IO_PIN_ASSERT(false);
-//}
-//void AlxIoPin_IrqHandler(AlxIoPin* me)
-//{
-//	// Assert
-//	(void)me;
-//
-//	// TODO
-//	ALX_IO_PIN_ASSERT(false);
-//}
-//void AlxIoPin_Config_PullNone(AlxIoPin* me)
-//{
-//	// Assert
-//	(void)me;
-//
-//	// TODO
-//	ALX_IO_PIN_ASSERT(false);
-//}
-//void AlxIoPin_Config_PullUp(AlxIoPin* me)
-//{
-//	// Assert
-//	(void)me;
-//
-//	// TODO
-//	ALX_IO_PIN_ASSERT(false);
-//}
-//void AlxIoPin_Config_PullDown(AlxIoPin* me)
-//{
-//	// Assert
-//	(void)me;
-//
-//	// TODO
-//	ALX_IO_PIN_ASSERT(false);
-//}
-//void AlxIoPin_Config_AssertOn(AlxIoPin* me)
-//{
-//	// Assert
-//	(void)me;
-//
-//	// TODO
-//	ALX_IO_PIN_ASSERT(false);
-//}
-//void AlxIoPin_Config_AssertOff(AlxIoPin* me)
-//{
-//	// Assert
-//	(void)me;
-//
-//	// TODO
-//	ALX_IO_PIN_ASSERT(false);
-//}
 AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 {
 	// Assert
