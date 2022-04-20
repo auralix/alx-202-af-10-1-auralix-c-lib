@@ -1,11 +1,8 @@
-﻿/**
-  ******************************************************************************
-  * @file alxIoPin_McuLpc55S6x.h
-  * @brief Auralix C Library - ALX IO Pin Module
-  * @version $LastChangedRevision: 4270 $
-  * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
-  ******************************************************************************
-  */
+﻿//******************************************************************************
+// @file alxIoPin_McuLpc55S6x.h
+// @brief Auralix C Library - ALX IO Pin Module - MCU LPC55S6x
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
 
 #ifndef ALX_IO_PIN_MCU_LPC55S6X_H
 #define ALX_IO_PIN_MCU_LPC55S6X_H

@@ -1,11 +1,8 @@
-﻿/**
-  ******************************************************************************
-  * @file alxIoPin.h
-  * @brief Auralix C Library - ALX IO Pin Module
-  * @version $LastChangedRevision: 5232 $
-  * @date $LastChangedDate: 2021-05-26 12:42:22 +0200 (Wed, 26 May 2021) $
-  ******************************************************************************
-  */
+﻿//******************************************************************************
+// @file alxIoPin.h
+// @brief Auralix C Library - ALX IO Pin Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
 
 #ifndef ALX_IO_PIN_H
 #define ALX_IO_PIN_H
@@ -20,6 +17,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxDelay.h"
 
 // AlxMcu //
 #if defined(ALX_STM32F1) ||defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
@@ -45,7 +43,7 @@ typedef struct { bool dummy; } AlxIoPin;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_IO_PIN_FILE "alxIoPin"
+#define ALX_IO_PIN_FILE "alxIoPin.h"
 
 // Assert //
 #if defined(_ALX_IO_PIN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -67,7 +65,18 @@ typedef struct { bool dummy; } AlxIoPin;
 
 
 //******************************************************************************
-// Specific Functions
+// Types
+//******************************************************************************
+typedef enum
+{
+	AlxIoPin_TriState_HiZ = 0,
+	AlxIoPin_TriState_Hi = 1,
+	AlxIoPin_TriState_Lo = 2
+} AlxIoPin_TriState;
+
+
+//******************************************************************************
+// Functions
 //******************************************************************************
 void AlxIoPin_Init(AlxIoPin* me);
 void AlxIoPin_DeInit(AlxIoPin* me);
@@ -76,22 +85,11 @@ void AlxIoPin_Write(AlxIoPin* me, bool val);
 void AlxIoPin_Set(AlxIoPin* me);
 void AlxIoPin_Reset(AlxIoPin* me);
 void AlxIoPin_Toggle(AlxIoPin* me);
-void AlxIoPin_Lock(AlxIoPin* me);
-void AlxIoPin_IrqHandler(AlxIoPin* me);
-void AlxIoPin_Config_PullNone(AlxIoPin* me);
-void AlxIoPin_Config_PullUp(AlxIoPin* me);
-void AlxIoPin_Config_PullDown(AlxIoPin* me);
-void AlxIoPin_Config_AssertOn(AlxIoPin* me);
-void AlxIoPin_Config_AssertOff(AlxIoPin* me);
-
-
-//******************************************************************************
-// Common Functions
-//******************************************************************************
+AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_IO_PIN_H
+#endif	// #ifndef ALX_IO_PIN_H
