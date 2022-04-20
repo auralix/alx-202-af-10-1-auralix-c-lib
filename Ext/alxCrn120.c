@@ -52,6 +52,9 @@ void AlxCrn120_Ctor
 	uint16_t i2cTimeout_ms
 )
 {
+	// Const
+	me->ALX_CRN120_BLOCK_LEN_test = 16;
+	
 	// Objects - External
 	me->i2c = i2c;
 
@@ -76,6 +79,16 @@ void AlxCrn120_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+Alx_Status AlxCrn120_InitMcuPeriph(AlxCrn120* me)
+{
+	// TODO
+	ALX_CRN120_ASSERT(false);
+}
+Alx_Status AlxCrn120_DeInitMcuPeriph(AlxCrn120* me)
+{
+	// TODO
+	ALX_CRN120_ASSERT(false);
+}
 Alx_Status AlxCrn120_Init(AlxCrn120* me)
 {
 	// #1 Assert
@@ -420,7 +433,7 @@ Alx_Status AlxCrn120_EnableSramMirror(AlxCrn120*me)
 	ALX_CRN120_TRACE(false);
 	return Alx_Err;
 }
-bool AlxCrn120_IsCheckWithReadEnabled(AlxCrn120* me)
+bool AlxCrn120_IsI2cCheckWithReadEnabled(AlxCrn120* me)
 {
 	// #1 Assert
 	ALX_CRN120_ASSERT(me->isInit == true);
@@ -429,7 +442,7 @@ bool AlxCrn120_IsCheckWithReadEnabled(AlxCrn120* me)
 	// #2 Return i2cCheckWithRead
 	return me->i2cCheckWithRead;
 }
-void AlxCrn120_CheckWithReadEnable(AlxCrn120* me)
+void AlxCrn120_I2cCheckWithReadEnable(AlxCrn120* me)
 {
 	// #1 Assert
 	ALX_CRN120_ASSERT(me->isInit == true);
@@ -438,7 +451,7 @@ void AlxCrn120_CheckWithReadEnable(AlxCrn120* me)
 	// #2 Enable i2cCheckWithRead
 	me->i2cCheckWithRead = true;
 }
-void AlxCrn120_CheckWithReadDisable(AlxCrn120* me)
+void AlxCrn120_I2cCheckWithReadDisable(AlxCrn120* me)
 {
 	// #1 Assert
 	ALX_CRN120_ASSERT(me->isInit == true);

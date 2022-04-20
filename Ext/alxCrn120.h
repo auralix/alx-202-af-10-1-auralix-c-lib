@@ -657,6 +657,9 @@ typedef enum
 
 typedef struct
 {
+	// Const
+	uint8_t ALX_CRN120_BLOCK_LEN_test;
+	
 	// Objects - External
 	AlxI2c* i2c;
 
@@ -693,6 +696,8 @@ void AlxCrn120_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+Alx_Status AlxCrn120_InitMcuPeriph(AlxCrn120* me);
+Alx_Status AlxCrn120_DeInitMcuPeriph(AlxCrn120* me);
 Alx_Status AlxCrn120_Init(AlxCrn120* me);
 Alx_Status AlxCrn120_DeInit(AlxCrn120* me);
 Alx_Status AlxCrn120_ReadEeprom(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32_t len);
@@ -704,9 +709,9 @@ Alx_Status AlxCrn120_WriteSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega
 Alx_Status AlxCrn120_ReadSessionRegAll(AlxCrn120*me, uint8_t* data);
 Alx_Status AlxCrn120_WriteSessionRegAll(AlxCrn120*me, uint8_t* data, uint8_t* mask);
 Alx_Status AlxCrn120_EnableSramMirror(AlxCrn120*me);
-bool AlxCrn120_IsCheckWithReadEnabled(AlxCrn120* me);
-void AlxCrn120_CheckWithReadEnable(AlxCrn120* me);
-void AlxCrn120_CheckWithReadDisable(AlxCrn120* me);
+bool AlxCrn120_IsI2cCheckWithReadEnabled(AlxCrn120* me);
+void AlxCrn120_I2cCheckWithReadEnable(AlxCrn120* me);
+void AlxCrn120_I2cCheckWithReadDisable(AlxCrn120* me);
 
 
 #ifdef __cplusplus
