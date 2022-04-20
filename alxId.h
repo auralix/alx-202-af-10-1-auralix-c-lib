@@ -122,7 +122,7 @@ typedef struct
 
 	// Variables
 	AlxId_HwInstance instance; // Not initialized in Ctor
-	AlxId_HwIdIoPinState idIoPinState[ALX_ID_HW_ID_IO_PIN_BUFF_LEN]; // Not initialized in Ctor
+	AlxIoPin_TriState idIoPinState[ALX_ID_HW_ID_IO_PIN_BUFF_LEN]; // Not initialized in Ctor
 } AlxId_Hw;
 
 typedef struct
