@@ -674,6 +674,8 @@ static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(
 static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
 static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
 static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T04_SessReg01(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
+static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T05_TestPca9431(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
+static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T06_MainHandle(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
 
 
 //******************************************************************************
@@ -737,6 +739,27 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Ctor(AlxHwNfcWlcListenerV3
 	);
 
 	//------------------------------------------------------------------------------
+	// ALX - PCA9431
+	//------------------------------------------------------------------------------
+	/*AlxIoPinIrq_Ctor
+	(
+		&me->alxIoIrqPin_di_P0_9_PCA943X_nINT_IRQ1,
+		&me->di_P0_9_PCA943X_nINT_IRQ1,
+		kPINT_PinInt1,
+		kPINT_PinIntEnableFallEdge,
+		Alx_IrqPriority_0	// Relevant IRQ vector = PIN_INT0_IRQn, has highest priority among all pin IRQs
+	);*/
+	AlxPca9431_Ctor
+	(
+		&me->alxPca9431,
+		&me->alxI2c_I2C0,
+		0xE2,	// i2cAddr
+		true,		// i2cCheckWithRead
+		3,			// i2cNumOfTries
+		1000		// i2cTimeout_ms
+	);
+
+	//------------------------------------------------------------------------------
 	// WLCL - MAIN
 	//------------------------------------------------------------------------------
 	AlxWlclMain_Ctor
@@ -764,7 +787,8 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Ctor(AlxHwNfcWlcListenerV3
 	//------------------------------------------------------------------------------
 	AlxWlclPwr_Ctor
 	(
-		&me->alxWlclPwr
+		&me->alxWlclPwr,
+		&me->alxPca9431
 	);
 
 	// Info
@@ -785,6 +809,8 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Run(AlxHwNfcWlcListenerV3_
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(me);
 	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T04_SessReg01(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T05_TestPca9431(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T06_MainHandle(me);
 }
 
 //******************************************************************************
@@ -924,6 +950,49 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T04_SessReg0
 		if (status != Alx_Ok) { ALX_BKPT; }
 
 		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T05_TestPca9431(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
+{
+	// Variables
+	Alx_Status status = Alx_Err;
+	uint32_t data = 555;
+
+	// Init PCA9431
+	status = AlxPca9431_InitPeriph(&me->alxPca9431);
+	if (status != Alx_Ok) { ALX_BKPT; }
+	status = AlxPca9431_Init(&me->alxPca9431);
+	if (status != Alx_Ok) { ALX_BKPT; }
+
+	while (1)
+	{
+		status = AlxPca9431_Rect_GetVoltage_mV(&me->alxPca9431, &data);
+		if (status != Alx_Ok) { ALX_BKPT; }
+
+		AlxTrace_WriteFormat(&alxTrace, "Data = %d\r\n", data);
+
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T06_MainHandle(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
+{
+	// Variables
+	Alx_Status status = Alx_Err;
+
+	// Init WlclMain
+	status = AlxWlclMain_Init(&me->alxWlclMain);
+	if (status != Alx_Ok) { ALX_BKPT; }
+
+	// Init IoPin
+	//AlxIoPin_Init(&me->di_P0_18_SET_BAT);
+	
+	while (1)
+	{
+		AlxWlclMain_Handle(&me->alxWlclMain);
+
+		//if (AlxIoPin_Read(&me->di_P0_18_SET_BAT))	{ me->alxWlclMain.alxWlclNfc_WlcCapMode = AlxWlclNfc_WlcCapMode_StaticWpt; }
+		//else										{ me->alxWlclMain.alxWlclNfc_WlcCapMode = AlxWlclNfc_WlcCapMode_BatteryFull; }
+
 	}
 }
 

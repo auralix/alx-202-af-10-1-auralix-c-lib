@@ -885,6 +885,8 @@ typedef enum
 	ChipTempAdc148C		= 0x2D,
 	ChipTempAdc152C		= 0x2E,
 	ChipTempAdc156C		= 0x2F,
+	ChipTempAdc159C		= 0x30,
+	ChipTempAdc161C		= 0x31
 } AlxPca9431_3Ah_ChipTempAdcMeas;
 typedef union
 {
@@ -1177,6 +1179,7 @@ typedef struct
 
 	// Info
 	bool isInit;
+	bool isPeriphInit;
 	bool wasCtorCalled;
 } AlxPca9431;
 
@@ -1198,6 +1201,8 @@ void AlxPca9431_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+Alx_Status AlxPca9431_InitPeriph(AlxPca9431* me);
+Alx_Status AlxPca9431_DeInitPeriph(AlxPca9431* me);
 Alx_Status AlxPca9431_Init(AlxPca9431* me);
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me);
 Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V);

@@ -105,6 +105,10 @@ void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
 	ALX_TRACE_FORMAT(&alxTrace, "FallEdge\r\n");
 }*/
+void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
+{
+	me->reg._0Dh_ADC_CONTROL.val.ADC_EN = AdcEn_Enabled;	// Enable ADC
+}
 #endif
 
 //------------------------------------------------------------------------------

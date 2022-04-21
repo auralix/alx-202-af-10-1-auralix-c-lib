@@ -63,6 +63,7 @@ void AlxPca9431_Ctor
 
 	// Info
 	me->isInit = false;
+	me->isPeriphInit = false;
 	me->wasCtorCalled = true;
 }
 
@@ -70,36 +71,71 @@ void AlxPca9431_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxPca9431_Init(AlxPca9431* me)
+Alx_Status AlxPca9431_InitPeriph(AlxPca9431* me)
 {
-	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == false);
+	// #1 Assert
+	ALX_PCA9431_ASSERT(me->isPeriphInit == false);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Prepare variables
+	// #2 Prepare variables
 	Alx_Status status = Alx_Err;
 
-	// #2 Init I2C
+	// #3 Init I2C
 	status = AlxI2c_Init(me->i2c);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_Init"); return status; }
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+
+	// #4 Set isInit
+	me->isPeriphInit = true;
+
+	// #5 Return OK
+	return Alx_Ok;
+}
+Alx_Status AlxPca9431_DeInitPeriph(AlxPca9431* me)
+{
+	// #1 Assert
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Prepare variables
+	Alx_Status status = Alx_Err;
+
+	// #3 DeInit I2C
+	status = AlxI2c_DeInit(me->i2c);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
+
+	// #4 Set isInit
+	me->isPeriphInit = false;
+
+	// #5 Return OK
+	return Alx_Ok;
+}
+Alx_Status AlxPca9431_Init(AlxPca9431* me)
+{
+	// #1 Assert
+	ALX_PCA9431_ASSERT(me->isInit == false);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Prepare variables
+	Alx_Status status = Alx_Err;
 
 	// #3 Check if slave ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 
 	// #4 Set registers values to default
 	AlxPca9431_RegStruct_SetValToDefault(me);
 
 	// #5 Read ID register & Trace ID
 	status = AlxPca9431_TraceId(me);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_TraceId"); return status; }
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 
 	// #6 Set registers values - WEAK
 	AlxPca9431_RegStruct_SetVal(me);
 
 	// #7 Write registers
 	status = AlxPca9431_Reg_WriteVal(me);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_Reg_WriteVal"); return status;}
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status;}
 
 	// #8 Set isInit
 	me->isInit = true;
@@ -109,16 +145,17 @@ Alx_Status AlxPca9431_Init(AlxPca9431* me)
 }
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me)
 {
-	// Assert
+	// #1 Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare variables
-	Alx_Status status = Alx_Err;
+	//Alx_Status status = Alx_Err;
 
 	// #2 DeInit I2C
-	status = AlxI2c_DeInit(me->i2c);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_DeInit"); return status; }
+	//status = AlxI2c_DeInit(me->i2c);
+	//if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_DeInit"); return status; }
 
 	// #3 Reset isInit
 	me->isInit = false;
@@ -136,6 +173,7 @@ Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V)
 
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
@@ -175,6 +213,7 @@ Alx_Status AlxPca9431_LdoVout_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV
 
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
@@ -214,6 +253,7 @@ Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A)
 
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
@@ -253,6 +293,7 @@ Alx_Status AlxPca9431_LdoVout_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA
 
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
@@ -292,6 +333,7 @@ Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V)
 
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
@@ -331,6 +373,7 @@ Alx_Status AlxPca9431_Rect_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV)
 
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
@@ -370,6 +413,7 @@ Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A)
 
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
@@ -409,6 +453,7 @@ Alx_Status AlxPca9431_Rect_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA)
 
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
@@ -448,6 +493,7 @@ Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC)
 
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variable
@@ -527,6 +573,7 @@ Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, int32_t* temp_mDegC
 
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variable
@@ -600,6 +647,7 @@ Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me)
 {
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
@@ -619,6 +667,7 @@ Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me)
 {
 	// Assert
 	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Prepare Variables
@@ -862,7 +911,7 @@ static Alx_Status AlxPca9431_TraceId(AlxPca9431* me)
 
 	// #2 Read Device ID register
 	status = AlxPca9431_Reg_Read(me, &me->reg._00h_Device_ID);
-	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_00h_Device_ID"); return status; }
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 
 	// #3 Trace
 	ALX_PCA9431_TRACE_FORMAT("\r\n");

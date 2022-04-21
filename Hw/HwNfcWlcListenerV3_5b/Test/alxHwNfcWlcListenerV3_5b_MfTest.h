@@ -157,6 +157,12 @@ typedef struct
 	AlxCrn120 alxCrn120;
 
 	//--------------------------------------
+	// ALX - PCA9431
+	//--------------------------------------
+	AlxIoPinIrq alxIoIrqPin_di_P0_9_PCA943X_nINT_IRQ1;
+	AlxPca9431 alxPca9431;
+
+	//--------------------------------------
 	// WLCL - MAIN
 	//--------------------------------------
 	AlxWlclMain alxWlclMain;
