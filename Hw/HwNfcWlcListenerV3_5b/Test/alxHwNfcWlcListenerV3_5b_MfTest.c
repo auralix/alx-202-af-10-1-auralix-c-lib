@@ -673,6 +673,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_T11_Module
 static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
 static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
 static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
+static void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T04_SessReg01(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me);
 
 
 //******************************************************************************
@@ -730,9 +731,9 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Ctor(AlxHwNfcWlcListenerV3
 		&me->alxCrn120,
 		&me->alxI2c_I2C0,
 		0xAA,	// i2cAddr
-		true,		// i2cCheckWithRead
-		3,			// i2cNumOfTries
-		1000		// i2cTimeout_ms
+		true,	// i2cCheckWithRead
+		3,		// i2cNumOfTries
+		1000	// i2cTimeout_ms
 	);
 
 	//------------------------------------------------------------------------------
@@ -783,6 +784,7 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Run(AlxHwNfcWlcListenerV3_
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(me);
 	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T04_SessReg01(me);
 }
 
 //******************************************************************************
@@ -795,6 +797,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcA
 	uint8_t data[20] = { 0x00 };
 
 	// Init I2c
+	status = AlxCrn120_InitMcuPeriph(&me->alxCrn120);
+	if (status != Alx_Ok) { ALX_BKPT; }
 	status = AlxCrn120_Init(&me->alxCrn120);
 	if (status != Alx_Ok) { ALX_BKPT; }
 
@@ -895,8 +899,29 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExam
 	{
 		AlxWlclMain_Handle(&me->alxWlclMain);
 
-		if (AlxIoPin_Read(&me->di_P0_18_SET_BAT))	{ me->alxWlclMain.isBatFul = false; }
-		else										{ me->alxWlclMain.isBatFul = true; }
+		if (AlxIoPin_Read(&me->di_P0_18_SET_BAT))	{ me->alxWlclMain.alxWlclNfc_WlcCapMode = AlxWlclNfc_WlcCapMode_StaticWpt; }
+		else										{ me->alxWlclMain.alxWlclNfc_WlcCapMode = AlxWlclNfc_WlcCapMode_BatteryFull; }
+
+		AlxDelay_ms(1000);
+	}
+}
+static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T04_SessReg01(AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl* me)
+{
+	// Variables
+	Alx_Status status = Alx_Err;
+	uint8_t data[7] = { 0x00 };
+
+	// Init I2c
+	status = AlxCrn120_Init(&me->alxCrn120);
+	if (status != Alx_Ok) { ALX_BKPT; }
+
+	status = AlxCrn120_EnableSramMirror(&me->alxCrn120);
+	if (status != Alx_Ok) { ALX_BKPT; }
+
+	while (1)
+	{
+		status = AlxCrn120_ReadSessionRegAll(&me->alxCrn120, data, sizeof(data));
+		if (status != Alx_Ok) { ALX_BKPT; }
 
 		AlxDelay_ms(1000);
 	}

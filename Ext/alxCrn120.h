@@ -43,22 +43,11 @@ extern "C" {
 // Trace //
 #if defined(_ALX_CRN120_TRACE) || defined(_ALX_TRACE_ALL)
 #define ALX_CRN120_TRACE(...) ALX_TRACE_STD(ALX_CRN120_FILE, __VA_ARGS__)
+#define ALX_CRN120_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 #define ALX_CRN120_TRACE(...) do{} while (false)
+#define ALX_CRN120_TRACE_FORMAT(...) do{} while (false)
 #endif
-
-// Mem //
-#define ALX_CRN120_BLOCK_LEN 16
-
-#define ALX_CRN120_EEPROM_START 0x00
-#define ALX_CRN120_EEPROM_END 0x38
-#define ALX_CRN120_EEPROM_LEN 904
-
-#define ALX_CRN120_SRAM_START 0xF8
-#define ALX_CRN120_SRAM_END 0xFB
-#define ALX_CRN120_SRAM_LEN 64
-
-#define ALX_CRN120_SESSION_REG_BYTE_LEN 7
 
 
 //******************************************************************************
@@ -110,21 +99,21 @@ typedef enum
 //------------------------------------------------------------------------------
 typedef enum
 {
-	StaticLock_Block_CC_Off = 0b0,
-	StaticLock_Block_CC_On  = 0b1
-} AlxCrn120_00h_StaticLock_Block_CC;
+	StaticLock_Blk_CC_Off = 0b0,
+	StaticLock_Blk_CC_On  = 0b1
+} AlxCrn120_00h_StaticLock_Blk_CC;
 
 typedef enum
 {
-	StaticLock_Block_9_4_Off = 0b0,
-	StaticLock_Block_9_4_On  = 0b1
-} AlxCrn120_00h_StaticLock_Block_9_4;
+	StaticLock_Blk_9_4_Off = 0b0,
+	StaticLock_Blk_9_4_On  = 0b1
+} AlxCrn120_00h_StaticLock_Blk_9_4;
 
 typedef enum
 {
-	StaticLock_Block_15_10_Off = 0b0,
-	StaticLock_Block_15_10_On  = 0b1
-} AlxCrn120_00h_StaticLock_Block_15_10;
+	StaticLock_Blk_15_10_Off = 0b0,
+	StaticLock_Blk_15_10_On  = 0b1
+} AlxCrn120_00h_StaticLock_Blk_15_10;
 
 typedef enum
 {
@@ -218,9 +207,9 @@ typedef union
 		uint32_t Internal : 24;
 
 		// #4 Static lock bytes
-		AlxCrn120_00h_StaticLock_Block_CC BLCC : 1;
-		AlxCrn120_00h_StaticLock_Block_9_4 BL9_14 : 1;
-		AlxCrn120_00h_StaticLock_Block_15_10 BL15_10 : 1;
+		AlxCrn120_00h_StaticLock_Blk_CC BLCC : 1;
+		AlxCrn120_00h_StaticLock_Blk_9_4 BL9_14 : 1;
+		AlxCrn120_00h_StaticLock_Blk_15_10 BL15_10 : 1;
 		AlxCrn120_00h_StaticLock_Page_CC LCC : 1;
 		AlxCrn120_00h_StaticLock_Page_4 L4 : 1;
 		AlxCrn120_00h_StaticLock_Page_5 L5 : 1;
@@ -239,7 +228,7 @@ typedef union
 		uint32_t Capability_Container_CC : 32;
 	};
 	uint8_t raw[16];
-} AlxCrn120_RegVal_00h;
+} AlxCrn120_BlkVal_00h;
 
 //------------------------------------------------------------------------------
 // Register 38h
@@ -351,7 +340,7 @@ typedef union
 		uint8_t AUTH0 : 8;
 	};
 	uint8_t raw[16];
-} AlxCrn120_RegVal_38h;
+} AlxCrn120_BlkVal_38h;
 
 //------------------------------------------------------------------------------
 // Register 39h
@@ -413,7 +402,7 @@ typedef union
 		uint32_t RFU3	: 24;
 	};
 	uint8_t raw[16];
-} AlxCrn120_RegVal_39h;
+} AlxCrn120_BlkVal_39h;
 
 //------------------------------------------------------------------------------
 // Register 3Ah
@@ -468,7 +457,7 @@ typedef union
 		uint64_t _00h : 64;
 	};
 	uint8_t raw[16];
-} AlxCrn120_RegVal_3Ah_ConfigurationReg;
+} AlxCrn120_BlkVal_3Ah_ConfigurationReg;
 
 typedef union
 {
@@ -490,7 +479,7 @@ typedef union
 		uint8_t LAST_NDEF_BLOCK : 8;
 	};
 	uint8_t raw;
-} AlxCrn120_RegVal_3Ah_ConfigReg_1_LastNdefBlock;
+} AlxCrn120_BlkVal_3Ah_ConfigReg_1_LastNdefBlk;
 
 //------------------------------------------------------------------------------
 // Register FEh
@@ -586,7 +575,7 @@ typedef union
 		uint64_t _00h : 64;
 	};
 	uint8_t raw[16];
-} AlxCrn120_RegVal_FEh_SessionReg;
+} AlxCrn120_BlkVal_FEh_SessionReg;
 
 
 //******************************************************************************
@@ -596,49 +585,49 @@ typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxCrn120_RegVal_00h val;
-} AlxCrn120_Reg_00h;
+	AlxCrn120_BlkVal_00h val;
+} AlxCrn120_Blk_00h;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxCrn120_RegVal_38h val;
-} AlxCrn120_Reg_38h;
+	AlxCrn120_BlkVal_38h val;
+} AlxCrn120_Blk_38h;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxCrn120_RegVal_39h val;
-} AlxCrn120_Reg_39h;
+	AlxCrn120_BlkVal_39h val;
+} AlxCrn120_Blk_39h;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxCrn120_RegVal_3Ah_ConfigurationReg val;
-} AlxCrn120_Reg_3Ah_ConfigurationReg;
+	AlxCrn120_BlkVal_3Ah_ConfigurationReg val;
+} AlxCrn120_Blk_3Ah_ConfigurationReg;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxCrn120_RegVal_FEh_SessionReg val;
-} AlxCrn120_Reg_FEh_SessionReg;
+	AlxCrn120_BlkVal_FEh_SessionReg val;
+} AlxCrn120_Blk_FEh_SessionReg;
 
 
 //******************************************************************************
-// Main Register Structure
+// Main Blockister Structure
 //******************************************************************************
 typedef struct
 {
-	AlxCrn120_Reg_00h					_00h;
-	AlxCrn120_Reg_38h					_38h;
-	AlxCrn120_Reg_39h					_39h;
-	AlxCrn120_Reg_3Ah_ConfigurationReg	_3Ah_ConfigurationReg;
-	AlxCrn120_Reg_FEh_SessionReg		_FEh_SessionReg;
-} AlxCrn120_Reg;
+	AlxCrn120_Blk_00h						_00h;
+	AlxCrn120_Blk_38h						_38h;
+	AlxCrn120_Blk_39h						_39h;
+	AlxCrn120_Blk_3Ah_ConfigurationReg		_3Ah_ConfigurationReg;
+	AlxCrn120_Blk_FEh_SessionReg			_FEh_SessionReg;
+} AlxCrn120_Blk;
 
 
 //******************************************************************************
@@ -658,8 +647,16 @@ typedef enum
 typedef struct
 {
 	// Const
-	uint8_t ALX_CRN120_BLOCK_LEN_test;
-	
+	uint8_t ALX_CRN120_BLOCK_LEN;
+	uint8_t ALX_CRN120_EEPROM_START;
+	uint8_t ALX_CRN120_EEPROM_END;
+	uint16_t ALX_CRN120_EEPROM_LEN;
+	uint8_t ALX_CRN120_SRAM_START;
+	uint8_t ALX_CRN120_SRAM_END;
+	uint8_t ALX_CRN120_SRAM_LEN;
+	uint8_t ALX_CRN120_SESSION_REG_ADDR;
+	uint8_t ALX_CRN120_SESSION_REG_BYTE_LEN;
+
 	// Objects - External
 	AlxI2c* i2c;
 
@@ -670,11 +667,11 @@ typedef struct
 	uint16_t i2cTimeout_ms;
 
 	// Variables
-	AlxCrn120_Reg reg;
 	uint8_t uid[7];
 
 	// Info
 	bool isInit;
+	bool isPeriphInit;
 	bool wasCtorCalled;
 } AlxCrn120;
 
@@ -706,8 +703,8 @@ Alx_Status AlxCrn120_ReadSram(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32
 Alx_Status AlxCrn120_WriteSram(AlxCrn120*me, uint32_t addr, uint8_t* data, uint32_t len);
 Alx_Status AlxCrn120_ReadSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t* regdat);
 Alx_Status AlxCrn120_WriteSessionReg(AlxCrn120*me, AlxCrn120_SessionRegByte rega, uint8_t regdat, uint8_t mask);
-Alx_Status AlxCrn120_ReadSessionRegAll(AlxCrn120*me, uint8_t* data);
-Alx_Status AlxCrn120_WriteSessionRegAll(AlxCrn120*me, uint8_t* data, uint8_t* mask);
+Alx_Status AlxCrn120_ReadSessionRegAll(AlxCrn120*me, uint8_t* data, uint8_t len);
+Alx_Status AlxCrn120_WriteSessionRegAll(AlxCrn120*me, uint8_t* data, uint8_t* mask, uint8_t len);
 Alx_Status AlxCrn120_EnableSramMirror(AlxCrn120*me);
 bool AlxCrn120_IsI2cCheckWithReadEnabled(AlxCrn120* me);
 void AlxCrn120_I2cCheckWithReadEnable(AlxCrn120* me);
