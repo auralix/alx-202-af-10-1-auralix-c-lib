@@ -262,10 +262,9 @@ AlxRtc_DateTime AlxRtc_UnixTimeSecToDateTime(uint64_t unixTime_sec)
 }
 uint64_t AlxRtc_DateTimeToUnixTimeNs(AlxRtc_DateTime dateTime)
 {
-	ALX_RTC_GLOBAL_ASSERT(dateTime.yr <= 99)
+	ALX_RTC_GLOBAL_ASSERT(dateTime.yr <= 99);
 	ALX_RTC_GLOBAL_ASSERT((1 <= dateTime.mo) && (dateTime.mo <= 12));
 	ALX_RTC_GLOBAL_ASSERT((1 <= dateTime.day) && (dateTime.day <= 31));
-	ALX_RTC_GLOBAL_ASSERT((1 <= dateTime.weekDay) && (dateTime.weekDay <= 7));
 	ALX_RTC_GLOBAL_ASSERT(dateTime.hr <= 23);
 	ALX_RTC_GLOBAL_ASSERT(dateTime.min <= 59);
 	ALX_RTC_GLOBAL_ASSERT(dateTime.sec <= 59);
