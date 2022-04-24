@@ -766,7 +766,8 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Ctor(AlxHwNfcWlcListenerV3
 	(
 		&me->alxWlclMain,
 		&me->alxWlclNfc,
-		&me->alxWlclPwr
+		&me->alxWlclPwr,
+		20000U
 	);
 
 	//------------------------------------------------------------------------------
@@ -807,10 +808,10 @@ void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Run(AlxHwNfcWlcListenerV3_
 {
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T01_WriteCcAndNdef(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T02_SetBat(me);
-	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample(me);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExample(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T04_SessReg01(me);
 	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T05_TestPca9431(me);
-	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T06_MainHandle(me);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T06_MainHandle(me);
 }
 
 //******************************************************************************
@@ -916,7 +917,7 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T03_CiliExam
 
 	// Init WlclMain
 	status = AlxWlclMain_Init(&me->alxWlclMain);
-	if (status != Alx_Ok) { ALX_BKPT; }
+	//if (status != Alx_Ok) { ALX_BKPT; }
 
 	// Init IoPin
 	AlxIoPin_Init(&me->di_P0_18_SET_BAT);
@@ -966,7 +967,8 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T05_TestPca9
 
 	while (1)
 	{
-		status = AlxPca9431_Rect_GetVoltage_mV(&me->alxPca9431, &data);
+		//status = AlxPca9431_LdoVout_GetVoltage_mV(&me->alxPca9431, &data);
+		status = AlxPca9431_LdoVout_GetCurrent_uA(&me->alxPca9431, &data);
 		if (status != Alx_Ok) { ALX_BKPT; }
 
 		AlxTrace_WriteFormat(&alxTrace, "Data = %d\r\n", data);
@@ -983,16 +985,9 @@ static inline void AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_T06_MainHand
 	status = AlxWlclMain_Init(&me->alxWlclMain);
 	if (status != Alx_Ok) { ALX_BKPT; }
 
-	// Init IoPin
-	//AlxIoPin_Init(&me->di_P0_18_SET_BAT);
-	
 	while (1)
 	{
 		AlxWlclMain_Handle(&me->alxWlclMain);
-
-		//if (AlxIoPin_Read(&me->di_P0_18_SET_BAT))	{ me->alxWlclMain.alxWlclNfc_WlcCapMode = AlxWlclNfc_WlcCapMode_StaticWpt; }
-		//else										{ me->alxWlclMain.alxWlclNfc_WlcCapMode = AlxWlclNfc_WlcCapMode_BatteryFull; }
-
 	}
 }
 

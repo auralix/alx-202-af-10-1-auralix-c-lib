@@ -35,7 +35,7 @@ extern "C" {
 #elif defined(_ALX_RTC_GLOBAL_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
 	#define ALX_RTC_GLOBAL_ASSERT(expr) ALX_ASSERT_RST(ALX_RTC_GLOBAL_FILE, expr)
 #else
-	#define ALX_RTC_GLOBAL_ASSERT(expr) do{} while (false)
+	#define ALX_RTC_GLOBAL_ASSERT(expr); do{} while (false)
 #endif
 
 // Trace //
