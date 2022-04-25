@@ -127,6 +127,17 @@ void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
 	me->reg._0Eh_Sample_EN.val.VRECT_ADC_EN = VRectAdcSamplingEn_Enabled;
 	me->reg._0Eh_Sample_EN.val.VTUNE_ADC_EN = VTuneAdcSamplingEn_Enabled;
 }
+void AlxAssert_Rst(const char* file, uint32_t line, const char* fun)
+{
+	// #1 Trace
+	//AlxTrace_WriteStd(&alxTrace, file, line, fun, "ASSERT_RST");
+
+	// #2 Indicate Fault with RED LED
+	// TODO
+
+	// #3 Reset MCU
+	NVIC_SystemReset();
+}
 #endif
 
 //------------------------------------------------------------------------------
