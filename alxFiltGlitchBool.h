@@ -68,7 +68,7 @@ typedef struct
 	// Variables
 	bool valRaw;
 	bool valFiltered;
-	
+
 	// Info
 	bool wasCtorCalled;
 } AlxFiltGlitchBool;
@@ -84,7 +84,7 @@ void AlxFiltGlitchBool_Ctor
 	float stableTrueTime_ms,	// Time that val must be stable true to change output state to true
 	float stableFalseTime_ms	// Time that val must be stable false to change output state to false
 );
-	
+
 void AlxFiltGlitchBool_Ctor_us
 (
 	AlxFiltGlitchBool* me,
