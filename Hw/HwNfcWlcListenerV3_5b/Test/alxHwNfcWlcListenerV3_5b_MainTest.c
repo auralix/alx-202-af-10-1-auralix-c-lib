@@ -97,13 +97,35 @@ void AlxIoPinIrq_Foreground_Callback_Pin3()
 // Mf
 //------------------------------------------------------------------------------
 #if defined(ALX_TEST_MF)
-void AlxIoPinIrq_Foreground_Callback_Pin0()
+/*void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
 	ALX_TRACE_FORMAT(&alxTrace, "RiseEdge\r\n");
 }
 void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
 	ALX_TRACE_FORMAT(&alxTrace, "FallEdge\r\n");
+}*/
+void AlxPca9431_RegStruct_SetVal(AlxPca9431* me)
+{
+	// Ldo output
+	me->reg._07h_VOUT_LDO.val.VOUT_LDO	= VoutLdo_3V3;
+	//me->reg._07h_VOUT_LDO.val.VOUT_LDO = VoutLdo_5V; // JS: commented
+
+	// Vrect treshold
+	me->reg._08h_VRECT_THD.val.VRECT_UVLO = VRectThd_3V3;
+
+	// Adc enable
+	me->reg._0Dh_ADC_CONTROL.val.ADC_EN = AdcEn_Enabled;
+	me->reg._0Dh_ADC_CONTROL.val.ADC_AVG_EN = AdcAveragingEn_Enabled;
+	me->reg._0Dh_ADC_CONTROL.val.ADC_RATE = AdcRate_ContinuousConversion;
+
+	// Adc sample enable
+	me->reg._0Eh_Sample_EN.val.OTP_ADC_EN = OtpAdcSamplingEn_Enabled;
+	me->reg._0Eh_Sample_EN.val.IOUT_ADC_EN	= IOutAdcSamplingEn_Enabled;
+	me->reg._0Eh_Sample_EN.val.VOUT_ADC_EN	= VOutAdcSamplingEn_Enabled;
+	me->reg._0Eh_Sample_EN.val.IRECT_ADC_EN = IRectAdcSamplingEn_Enabled;
+	me->reg._0Eh_Sample_EN.val.VRECT_ADC_EN = VRectAdcSamplingEn_Enabled;
+	me->reg._0Eh_Sample_EN.val.VTUNE_ADC_EN = VTuneAdcSamplingEn_Enabled;
 }
 #endif
 

@@ -74,6 +74,9 @@ extern "C" {
 #include <alxTpa3255.h>
 #include <alxVnh7040.h>
 
+//#include "alxWlcGlobal.h"
+#include "alxWlclMain.h"
+
 
 //******************************************************************************
 // Module Guard
@@ -158,6 +161,11 @@ typedef struct
 	//--------------------------------------
 	AlxIoPinIrq alxIoIrqPin_di_P0_9_PCA943X_nINT_IRQ1;
 	AlxPca9431 alxPca9431;
+
+	//--------------------------------------
+	// ALX - CRN120
+	//--------------------------------------
+	AlxCrn120 alxCrn120;
 
 	//--------------------------------------
 	// Info

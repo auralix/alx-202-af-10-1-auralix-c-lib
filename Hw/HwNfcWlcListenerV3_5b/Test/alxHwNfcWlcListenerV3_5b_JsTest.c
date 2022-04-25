@@ -14,7 +14,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
+#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST) && defined(ALX_TEST_JS)
 
 
 //******************************************************************************
@@ -742,4 +742,4 @@ static void AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_T99_TestAll(AlxHwNfcWlcL
 }
 
 
-#endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
+#endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST) && defined(ALX_TEST_JS)
