@@ -448,7 +448,7 @@ typedef union
 		// #7 REG_LOCK
 		AlxCrn120_Config_RegLock_Nfc REG_LOCK_NFC : 1;
 		AlxCrn120_Config_RegLock_I2c REG_LOCK_I2C : 1;
-		int8_t unused_2_7_RFU : 7; // bits 2..7 are unused
+		int8_t unused_2_7_RFU : 6; // bits 2..7 are unused
 
 		// #8 RFU
 		uint8_t RFU : 8;

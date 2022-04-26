@@ -120,18 +120,18 @@ Alx_Status AlxCrn120_Init(AlxCrn120* me)
 	// #2 Prepare Variable
 	Alx_Status status = Alx_Err;
 
-	// #4 Check if slave ready
+	// #3 Check if slave ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err"); return status; }
 
-	// #5 Read ID register & Trace ID
+	// #4 Read ID register & Trace ID
 	status = AlxCrn120_TraceId(me);
 	if (status != Alx_Ok) { ALX_CRN120_TRACE("Err"); return status; }
 
-	// #9 Set isInit
+	// #5 Set isInit
 	me->isInit = true;
 
-	// #10 Return OK
+	// #6 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxCrn120_DeInit(AlxCrn120* me)
