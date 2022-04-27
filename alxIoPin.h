@@ -71,7 +71,8 @@ typedef enum
 {
 	AlxIoPin_TriState_HiZ = 0,
 	AlxIoPin_TriState_Hi = 1,
-	AlxIoPin_TriState_Lo = 2
+	AlxIoPin_TriState_Lo = 2,
+	AlxIoPin_TriState_Undefined = 3
 } AlxIoPin_TriState;
 
 
