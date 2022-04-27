@@ -188,28 +188,28 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 	// #1 Read @ PullUp
 	//------------------------------------------------------------------------------
-	
+
 	// Config PullUp
 	IOCON->PIO[me->port][me->pin] &= ~(0x1 << 4U);
 	IOCON->PIO[me->port][me->pin] |=  (0x1 << 5U);
-	
+
 	// Wait
 	AlxDelay_ms(1);
-	
+
 	// Read
 	bool valPullUp = AlxIoPin_Read(me);
 
 	//------------------------------------------------------------------------------
 	// #2 Read @ PullDown
 	//------------------------------------------------------------------------------
-	
+
 	// Config PullDown
 	IOCON->PIO[me->port][me->pin] |=  (0x1 << 4U);
 	IOCON->PIO[me->port][me->pin] &= ~(0x1 << 5U);
 
 	// Wait
 	AlxDelay_ms(1);
-	
+
 	// Read
 	bool valPullDown = AlxIoPin_Read(me);
 
@@ -230,8 +230,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	}
 	else
 	{
-		ALX_IO_PIN_ASSERT(false);	// We should never get here
-		return ALX_NULL;
+		return AlxIoPin_TriState_Undefined;
 	}
 }
 

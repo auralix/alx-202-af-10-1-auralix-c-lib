@@ -65,7 +65,10 @@ bool AlxMcp73831_IsBatCharging(AlxMcp73831* me)
 	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
 
 	// #2 Return
-	return (AlxIoPin_Read_TriState(me->di_STAT) == AlxIoPin_TriState_Lo) ? true : false;
+	if (AlxIoPin_Read(me->di_STAT) == false)
+		return true;
+	else
+		return false;
 }
 bool AlxMcp73831_IsBatFull(AlxMcp73831* me)
 {
@@ -74,14 +77,44 @@ bool AlxMcp73831_IsBatFull(AlxMcp73831* me)
 	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
 
 	// #2 Return
-	return (AlxIoPin_Read_TriState(me->di_STAT) == AlxIoPin_TriState_Hi) ? true : false;
+	if (AlxIoPin_Read(me->di_STAT) == true)
+		return true;
+	else
+		return false;
 }
-bool AlxMcp73831_IsBatNotPresent(AlxMcp73831* me)
+bool AlxMcp73831_TriState_IsBatCharging(AlxMcp73831* me)
 {
 	// #1 Assert
 	ALX_MCP73831_ASSERT(me->isInit == true);
 	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
 
 	// #2 Return
-	return (AlxIoPin_Read_TriState(me->di_STAT) == AlxIoPin_TriState_HiZ) ? true : false;
+	if (AlxIoPin_Read_TriState(me->di_STAT) == AlxIoPin_TriState_Lo)
+		return true;
+	else
+		return false;
+}
+bool AlxMcp73831_TriState_IsBatFull(AlxMcp73831* me)
+{
+	// #1 Assert
+	ALX_MCP73831_ASSERT(me->isInit == true);
+	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Return
+	if (AlxIoPin_Read_TriState(me->di_STAT) == AlxIoPin_TriState_Hi)
+		return true;
+	else
+		return false;
+}
+bool AlxMcp73831_TriState_IsShutdown(AlxMcp73831* me)
+{
+	// #1 Assert
+	ALX_MCP73831_ASSERT(me->isInit == true);
+	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Return
+	if (AlxIoPin_Read_TriState(me->di_STAT) == AlxIoPin_TriState_HiZ)
+		return true;
+	else
+		return false;
 }

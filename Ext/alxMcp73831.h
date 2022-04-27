@@ -77,7 +77,9 @@ void AlxMcp73831_Init(AlxMcp73831* me);
 void AlxMcp73831_DeInit(AlxMcp73831* me);
 bool AlxMcp73831_IsBatCharging(AlxMcp73831* me);
 bool AlxMcp73831_IsBatFull(AlxMcp73831* me);
-bool AlxMcp73831_IsBatNotPresent(AlxMcp73831* me);
+bool AlxMcp73831_TriState_IsBatCharging(AlxMcp73831* me);
+bool AlxMcp73831_TriState_IsBatFull(AlxMcp73831* me);
+bool AlxMcp73831_TriState_IsShutdown(AlxMcp73831* me);
 
 
 #ifdef __cplusplus
