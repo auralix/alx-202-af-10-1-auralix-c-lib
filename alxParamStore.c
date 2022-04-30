@@ -268,9 +268,9 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 
 				// #1.4 Trace
 				ALX_PARAM_STORE_TRACE("Group1_WriteStart");
-			}
-
+			} 
 			// #2 Transition
+			else
 			{
 				// #2.1 Refresh values
 				AlxParamGroup_ParamItemsValToValBuff(me->paramGroups[0]);
@@ -331,8 +331,8 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 				// #1.4 Trace
 				ALX_PARAM_STORE_TRACE("Group2_WriteStart");
 			}
-
 			// #2 Transition
+			else
 			{
 				// #2.1 Refresh values
 				AlxParamGroup_ParamItemsValToValBuff(me->paramGroups[1]);

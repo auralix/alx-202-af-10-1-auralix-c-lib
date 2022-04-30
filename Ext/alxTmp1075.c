@@ -239,7 +239,7 @@ static Alx_Status AlxTmp1075_TraceId(AlxTmp1075* me)
 	// #2 Trace
 	ALX_TMP1075_TRACE_FORMAT("\r\n");
 	ALX_TMP1075_TRACE_FORMAT("Auralix C Library ALX Temperature Sensor TMP1075 Module Identification:\r\n");
-	ALX_TMP1075_TRACE_FORMAT("- DID: %X\r\n", me->reg.R4_DeviceId.val.DID);
+	ALX_TMP1075_TRACE_FORMAT("- Device ID: %X\r\n", me->reg.R4_DeviceId.val.DID);
 	ALX_TMP1075_TRACE_FORMAT("\r\n");
 
 	// #3 Return OK
