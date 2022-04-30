@@ -825,7 +825,7 @@ static void AlxPca9431_RegStruct_SetValToDefault(AlxPca9431* me)
 	me->reg._0Fh_VPWR_CONFIG		.val.raw = 0b10000011;
 	me->reg._10h_RXIR_CONFIG		.val.raw = 0b00000000;
 	me->reg._20h_OCPSET_LOCK		.val.raw = 0b10101000;
-	me->reg._21h_VOUTLDO_OCP		.val.raw = 0b00001000;
+	me->reg._21h_VOUTLDO_OCP		.val.raw = 0b00011100;
 	me->reg._30h_VRECT_ADC_H		.val.raw = 0b00000000;
 	me->reg._31h_VRECT_ADC_L		.val.raw = 0b00000000;
 	me->reg._32h_VTUNE_ADC_H		.val.raw = 0b00000000;
