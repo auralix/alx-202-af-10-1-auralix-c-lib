@@ -1214,6 +1214,7 @@ Alx_Status AlxPca9431_LdoVout_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV
 Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A);
 Alx_Status AlxPca9431_LdoVout_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA);
 Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V);
+Alx_Status AlxPca9431_Rect_TriggerAdcSample(AlxPca9431* me);
 Alx_Status AlxPca9431_Rect_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV);
 Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A);
 Alx_Status AlxPca9431_Rect_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA);

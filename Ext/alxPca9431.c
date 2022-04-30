@@ -368,7 +368,34 @@ Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V)
 	// #5 Return OK
 	return Alx_Ok;
 	#endif
+} 
+Alx_Status AlxPca9431_Rect_TriggerAdcSample(AlxPca9431* me)
+{ 
+	// #1 Assert
+	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	
+	// #2 Start single shot ADC conversion
+	Alx_Status status = Alx_Err; 
+	me->reg._0Dh_ADC_CONTROL.val.ADC_EN = AdcEn_Enabled; 
+	me->reg._0Dh_ADC_CONTROL.val.ADC_RATE = AdcRate_1ShotConversion;  
+	status = AlxPca9431_Reg_Write(me, &me->reg._0Dh_ADC_CONTROL);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_0D_ADC_CONTROL			"); return status;}
+	
+	// #3 Check if conversion is done
+	for(uint32_t i = 0; i < 10; i++)									// limit retry behaviour
+	{
+		status = AlxPca9431_Reg_Read(me, &me->reg._0Dh_ADC_CONTROL);
+		if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_0D_ADC_CONTROL			"); return status;} 
+		
+		if (me->reg._0Dh_ADC_CONTROL.val.ADC_EN == AdcEn_Disabled)		// When the conversion is done, ADC_EN is set to Dissabled by PCA
+			return Alx_Ok;												// ADC conversion is done 
+	}
+	
+	return Alx_Err;	// ADC failed to sample in defined amount of retries
 }
+
 Alx_Status AlxPca9431_Rect_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV)
 {
 	// Optimize Guard
