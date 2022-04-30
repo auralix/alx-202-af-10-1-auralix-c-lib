@@ -40,6 +40,7 @@ void AlxPca9431_RegStruct_SetVal(AlxPca9431* me);
 void AlxPca9431_Ctor
 (
 	AlxPca9431* me,
+	AlxIoPin* do_PCA_SLEEP_EN,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	bool i2cCheckWithRead,
@@ -48,6 +49,7 @@ void AlxPca9431_Ctor
 )
 {
 	// Objects - External
+	me->do_PCA_SLEEP_EN = do_PCA_SLEEP_EN;
 	me->i2c = i2c;
 
 	// Parameters
@@ -78,8 +80,8 @@ Alx_Status AlxPca9431_InitPeriph(AlxPca9431* me)
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #2 Prepare variables
-	Alx_Status status = Alx_Err;
-
+	Alx_Status status = Alx_Err; 
+	
 	// #3 Init I2C
 	status = AlxI2c_Init(me->i2c);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
@@ -117,30 +119,34 @@ Alx_Status AlxPca9431_Init(AlxPca9431* me)
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
 
 	// #2 Prepare variables
-	Alx_Status status = Alx_Err;
-
-	// #3 Check if slave ready
+	Alx_Status status = Alx_Err; 
+	
+	// #3 Init GPIO
+	AlxIoPin_Init(me->do_PCA_SLEEP_EN);
+	AlxIoPin_Reset(me->do_PCA_SLEEP_EN); 
+	
+	// #4 Check if slave ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 
-	// #4 Set registers values to default
+	// #5 Set registers values to default
 	AlxPca9431_RegStruct_SetValToDefault(me);
 
-	// #5 Read ID register & Trace ID
+	// #6 Read ID register & Trace ID
 	status = AlxPca9431_TraceId(me);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
-
-	// #6 Set registers values - WEAK
+	
+	// #7 Set registers values - WEAK
 	AlxPca9431_RegStruct_SetVal(me);
 
-	// #7 Write registers
+	// #8 Write registers
 	status = AlxPca9431_Reg_WriteVal(me);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status;}
 
-	// #8 Set isInit
+	// #9 Set isInit
 	me->isInit = true;
 
-	// #9 Return OK
+	// #10 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me)
@@ -825,7 +831,7 @@ static void AlxPca9431_RegStruct_SetValToDefault(AlxPca9431* me)
 	me->reg._0Fh_VPWR_CONFIG		.val.raw = 0b10000011;
 	me->reg._10h_RXIR_CONFIG		.val.raw = 0b00000000;
 	me->reg._20h_OCPSET_LOCK		.val.raw = 0b10101000;
-	me->reg._21h_VOUTLDO_OCP		.val.raw = 0b00001000;
+	me->reg._21h_VOUTLDO_OCP		.val.raw = 0b00011100;
 	me->reg._30h_VRECT_ADC_H		.val.raw = 0b00000000;
 	me->reg._31h_VRECT_ADC_L		.val.raw = 0b00000000;
 	me->reg._32h_VTUNE_ADC_H		.val.raw = 0b00000000;
@@ -902,6 +908,32 @@ static Alx_Status AlxPca9431_Reg_WriteVal(AlxPca9431* me)
 	status = AlxPca9431_Reg_Write(me, &me->reg._21h_VOUTLDO_OCP			);	// JS: repair error - It was locked, because of the wrong default value in datasheet table 6
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_21_VOUTLDO_OCP			"); return status;}
 
+	return Alx_Ok;
+}
+Alx_Status AlxPca9431_SleepEnable(AlxPca9431* me)
+{
+	// Assert
+	ALX_PCA9431_ASSERT(me->isInit == true); 
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	
+	// Set GPIO pin to enable sleep mode
+	AlxIoPin_Set(me->do_PCA_SLEEP_EN); 
+	
+	// #4 Return OK
+	return Alx_Ok;
+}
+
+// #4 Return OK
+Alx_Status AlxPca9431_SleepDissable(AlxPca9431* me)
+{
+	// Assert
+	ALX_PCA9431_ASSERT(me->isInit == true); 
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	
+	// Set GPIO pin to dissable sleep mode 
+	AlxIoPin_Reset(me->do_PCA_SLEEP_EN);
+	
+	// #4 Return OK
 	return Alx_Ok;
 }
 static Alx_Status AlxPca9431_TraceId(AlxPca9431* me)

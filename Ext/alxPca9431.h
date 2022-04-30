@@ -1166,6 +1166,7 @@ typedef struct
 typedef struct
 {
 	// Objects - External
+	AlxIoPin* do_PCA_SLEEP_EN;
 	AlxI2c* i2c;
 
 	// Parameters
@@ -1190,6 +1191,7 @@ typedef struct
 void AlxPca9431_Ctor
 (
 	AlxPca9431* me,
+	AlxIoPin* do_PCA_SLEEP_EN,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	bool i2cCheckWithRead,
@@ -1205,6 +1207,8 @@ Alx_Status AlxPca9431_InitPeriph(AlxPca9431* me);
 Alx_Status AlxPca9431_DeInitPeriph(AlxPca9431* me);
 Alx_Status AlxPca9431_Init(AlxPca9431* me);
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me);
+Alx_Status AlxPca9431_SleepEnable(AlxPca9431* me);
+Alx_Status AlxPca9431_SleepDissable(AlxPca9431* me);
 Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V);
 Alx_Status AlxPca9431_LdoVout_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV);
 Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A);
