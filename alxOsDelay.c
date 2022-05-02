@@ -29,11 +29,13 @@ AlxOsDelay alxOsDelay = {0};
 void AlxOsDelay_Ctor
 (
 	AlxOsDelay* me,
-	AlxClk_Tick osTick
+	AlxClk_Tick osTick,
+	bool approxDisable
 )
 {
 	// Parameters
 	me->osTick = osTick;
+	me->approxDisable = approxDisable;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -47,13 +49,18 @@ void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us)
 {
 	// #1 Assert
 	ALX_OS_DELAY_ASSERT(me->wasCtorCalled == true);
-	ALX_OS_DELAY_ASSERT(osDelay_us >= (2 * (uint64_t)me->osTick));
-	ALX_OS_DELAY_ASSERT((osDelay_us % (uint64_t)me->osTick) == 0);
 
-	// #2 Convert to osTick
+	// #2 Check if approximation is disabled
+	if (me->approxDisable)
+	{
+		ALX_OS_DELAY_ASSERT(osDelay_us >= (2 * (uint64_t)me->osTick));
+		ALX_OS_DELAY_ASSERT((osDelay_us % (uint64_t)me->osTick) == 0);
+	}
+
+	// #3 Convert to osTick
 	uint64_t osDelay_osTick = osDelay_us / (uint64_t)me->osTick;
 
-	// #3 Delay
+	// #4 Delay
 	#if defined(ALX_FREE_RTOS)
 	vTaskDelay(osDelay_osTick);
 	#endif

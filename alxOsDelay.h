@@ -56,6 +56,7 @@ typedef struct
 {
 	// Parameters
 	AlxClk_Tick osTick;
+	bool approxDisable;
 
 	// Info
 	bool wasCtorCalled;
@@ -74,7 +75,8 @@ extern AlxOsDelay alxOsDelay;
 void AlxOsDelay_Ctor
 (
 	AlxOsDelay* me,
-	AlxClk_Tick osTick
+	AlxClk_Tick osTick,
+	bool approxDisable
 );
 
 
