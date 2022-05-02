@@ -7,17 +7,23 @@
   ******************************************************************************
   */
 
-#ifndef ALX_GLOBAL_MCU_LPC80x_H
-#define ALX_GLOBAL_MCU_LPC80x_H
+#ifndef ALX_GLOBAL_MCU_LPC80X_H
+#define ALX_GLOBAL_MCU_LPC80X_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //******************************************************************************
+// Includes
+//******************************************************************************
+#include "alxGlobal.h"
+
+
+//******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -31,18 +37,18 @@ extern "C" {
 #include "fsl_crc.h"
 #include "fsl_ctimer.h"
 #include "fsl_dac.h"
-//#include "fsl_dma.h"
+//#include "fsl_dma.h"						// MF: Doesn't work on Lpc804
 #include "fsl_gpio.h"
 #include "fsl_i2c.h"
 #include "fsl_iap.h"
-//#include "fsl_inputmux.h"
-//#include "fsl_inputmux_connections.h"
+//#include "fsl_inputmux.h"					// MF: Doesn't work on Lpc804
+//#include "fsl_inputmux_connections.h"		// MF: Doesn't work on Lpc804
 #include "fsl_iocon.h"
 #include "fsl_mrt.h"
 #include "fsl_pint.h"
 #include "fsl_power.h"
 #include "fsl_reset.h"
-//#include "fsl_sctimer.h"
+//#include "fsl_sctimer.h"					// MF: Doesn't work on Lpc804
 #include "fsl_spi.h"
 #include "fsl_swm.h"
 #include "fsl_swm_connections.h"
@@ -66,4 +72,4 @@ void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode);
 }
 #endif
 
-#endif // ALX_GLOBAL_MCU_LPC80x_H
+#endif // ALX_GLOBAL_MCU_LPC80X_H

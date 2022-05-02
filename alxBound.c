@@ -189,7 +189,7 @@ Alx_Status AlxBound_Double(double* val, double valMin, double valMax)
 /*Alx_Status AlxBound_Arrr(char* valBounded, char* val, uint32_t valLenMax)
 {
 	ALX_BOUND_ASSERT(0 < valLenMax);
-	
+
 	uint32_t valLen = strlen(val);
 	if (valLen >= (valLenMax - 1))
 	{
@@ -202,11 +202,11 @@ Alx_Status AlxBound_Double(double* val, double valMin, double valMax)
 		strcpy(valBounded, val);
 		return Alx_Ok;
 	}
-}*/
+}*/	// TO DO
 Alx_Status AlxBound_Str(char* valBounded, char* val, uint32_t valLenMax)
 {
 	ALX_BOUND_ASSERT(0 < valLenMax);
-	
+
 	uint32_t valLen = strlen(val);
 	if (valLen > (valLenMax - 1))
 	{

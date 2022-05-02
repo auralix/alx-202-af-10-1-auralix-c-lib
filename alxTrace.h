@@ -30,8 +30,11 @@ extern "C" {
 #elif defined(ALX_LPC845)
 #include "alxTrace_McuLpc84.h"
 
-#elif defined(ALX_LPC80x)
+#elif defined(ALX_LPC80X)
 #include "alxTrace_McuLpc80x.h"
+
+#elif defined(ALX_LPC55S6X)
+#include "alxTrace_McuLpc55S6x.h"
 
 #elif defined(ALX_PC) || defined(ALX_MBED)
 #include "alxTrace_Printf.h"

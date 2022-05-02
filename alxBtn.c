@@ -25,7 +25,7 @@ void AlxBtn_Ctor
 )
 {
 	// Ctor
-	AlxTimSw_Ctor(&me->timPressed, false);
+	AlxTimSw_Ctor(&me->timPressed, true);
 	AlxFiltGlitchBool_Ctor(&me->filtGlitchBool, false, filterTime, filterTime);
 	
 	// Parameters Const

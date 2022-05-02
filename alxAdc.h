@@ -32,11 +32,14 @@ extern "C" {
 #elif defined(ALX_LPC845)
 #include "alxAdc_McuLpc84.h"
 
-#elif defined(ALX_LPC80x)
+#elif defined(ALX_LPC80X)
 #include "alxAdc_McuLpc80x.h"
 
+#elif defined(ALX_LPC55S6X)
+#include "alxAdc_McuLpc55S6x.h"
+
 #else
-typedef struct {} AlxAdc_Mcu;
+typedef struct {} AlxAdc;
 #endif
 
 
@@ -70,7 +73,7 @@ typedef struct {} AlxAdc_Mcu;
 Alx_Status AlxAdc_Init(AlxAdc* me);
 Alx_Status AlxAdc_DeInit(AlxAdc* me);
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);
-uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);
+uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);	// MF: Optimized Func
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
 
 

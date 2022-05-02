@@ -17,20 +17,21 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static Alx_Status AlxI2c_Reset(AlxI2c* me);
 static uint8_t AlxI2c_GetMemAddrLen(AlxI2c_Master_MemAddrLen* memAddrLen);
-static Alx_Status AlxI2c_ReInit(AlxI2c* me);
 static void AlxI2c_Periph_SelectClk(AlxI2c* me);
 
-// MF: These functions are copied from FSL so that we can add Timeout 
+// MF: These functions are copied from FSL so that Timeout can be added
 static status_t AlxI2c_MasterStart(AlxI2c* me, I2C_Type* base, uint8_t address, i2c_direction_t direction, uint16_t timeout);
 static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const void* txBuff, size_t txSize, uint32_t flags, uint16_t timeout);
 static status_t AlxI2c_MasterReadBlocking(AlxI2c* me, I2C_Type* base, void* rxBuff, size_t rxSize, uint32_t flags, uint16_t timeout);
+static status_t AlxI2c_MasterStop(AlxI2c* me, I2C_Type *base, uint16_t timeout);
 static uint32_t AlxI2c_PendingStatusWait(AlxI2c* me, I2C_Type* base, uint16_t timeout);
 
 
@@ -46,6 +47,13 @@ void AlxI2c_Ctor
 	AlxI2c_Clk clk
 )
 {
+	// Assert
+	(void)me;
+	(void)i2c;
+	(void)io_SCL;
+	(void)io_SDA;
+	(void)clk;
+
 	// Objects - External
 	me->io_SCL = io_SCL;
 	me->io_SDA = io_SDA;
@@ -56,10 +64,10 @@ void AlxI2c_Ctor
 
 	// Variables
 	me->i2cConfig.enableMaster = true;
-	me->i2cConfig.baudRate_Bps = me->clk; // baudRate = bit rate
+	me->i2cConfig.baudRate_Bps = me->clk;	// MF: baudRate = bit rate
 	me->i2cConfig.enableTimeout = false;
 
-	AlxTimSw_Ctor(&me->timeout_ms, false);
+	AlxTimSw_Ctor(&me->tim, false);
 
 	// Info
 	me->isInit = false;
@@ -72,32 +80,34 @@ void AlxI2c_Ctor
 //******************************************************************************
 Alx_Status AlxI2c_Init(AlxI2c* me)
 {
+	// Assert
 	ALX_I2C_ASSERT(me->isInit == false);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Init GPIO
 	AlxIoPin_Init(me->io_SCL);
 	AlxIoPin_Init(me->io_SDA);
-	
-	// #3 Select I2C Periphery Clock
+
+	// #2 Select I2C Periphery Clock
 	AlxI2c_Periph_SelectClk(me);
 
-	// #4 Init I2C
-	I2C_MasterInit(me->i2c, &me->i2cConfig, 15000000U); // "Periph_Reset" and "EnableClk" happens here. MF: srcClock_Hz = I2cFuncClk = MainClk
+	// #3 Init I2C
+	I2C_MasterInit(me->i2c, &me->i2cConfig, CLOCK_GetMainClkFreq());	// MF: "Periph_Reset" and "EnableClk" happens here. MF: srcClock_Hz = I2cFuncClk = MainClk
 
-	// #5 Set isInit
+	// #4 Set isInit
 	me->isInit = true;
 
-	// #6 Return OK
+	// #5 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxI2c_DeInit(AlxI2c* me)
 {
+	// Assert
 	ALX_I2C_ASSERT(me->isInit == true);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
-	
+
 	// #1 DeInit I2C
-	I2C_MasterDeinit(me->i2c); // "DisableClk" happens here
+	I2C_MasterDeinit(me->i2c);	// MF: "DisableClk" happens here
 
 	// #2 DeInit GPIO
 	AlxIoPin_DeInit(me->io_SCL);
@@ -111,18 +121,98 @@ Alx_Status AlxI2c_DeInit(AlxI2c* me)
 }
 Alx_Status AlxI2c_Master_StartRead(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint16_t timeout_ms)
 {
-	// TODO
-	ALX_I2C_ASSERT(false);
-	return Alx_Err;
+	// #1 Assert
+	ALX_I2C_ASSERT(me->isInit == true);
+	ALX_I2C_ASSERT(me->wasCtorCalled == true);
+	(void)me;
+	(void)slaveAddr;
+	(void)data;
+	ALX_I2C_ASSERT(0 < len);
+	ALX_I2C_ASSERT(0 < timeout_ms);
+
+	// #2 Prepare variables
+	status_t status = kStatus_Fail;
+
+	// #3 Start Timeout
+	AlxTimSw_Start(&me->tim);
+
+	// #4 Send Start Condition
+	status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Read, timeout_ms);
+	if (status != kStatus_Success)
+	{
+		ALX_I2C_TRACE("ErrStartCondition");
+		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+	}
+
+	// #5 Return OK
+	return Alx_Ok;
 }
 Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// TODO
+	// #1 Assert
+	ALX_I2C_ASSERT(me->isInit == true);
+	ALX_I2C_ASSERT(me->wasCtorCalled == true);
+	(void)me;
+	(void)slaveAddr;
+	(void)data;
+	ALX_I2C_ASSERT(0 < len);
+	ALX_I2C_ASSERT(0 < numOfTries);
+	ALX_I2C_ASSERT(0 < timeout_ms);
+
+	// #2 Prepare variables
+	status_t status = kStatus_Fail;
+
+	// #3 Start Timeout
+	AlxTimSw_Start(&me->tim);
+
+	// #4 Try read for number of tries
+	for (uint32_t _tryNo = 1; _tryNo <= numOfTries; _tryNo++)
+	{
+		// #4.1 Send Start Condition
+		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Read, timeout_ms);
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrStartCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
+
+		// #4.2 Read Memory
+		status = AlxI2c_MasterReadBlocking(me, me->i2c, data, len, kI2C_TransferDefaultFlag, timeout_ms); // MF: Read data, then Stop
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrFlsRead");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
+
+		// #4.3 Send Stop Condition
+		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrStopCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
+
+		// #4.4 Return Ok
+		return Alx_Ok;
+	}
+
+	// #5 If we are here, the number of tries error occured
+	if (status != kStatus_Success)
+	{
+		ALX_I2C_TRACE("ErrNumOfTries");
+		return Alx_ErrNumOfTries;
+	}
+
+	// #6 Assert	// We should not get here
 	ALX_I2C_ASSERT(false);
 	return Alx_Err;
 }
 Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
+	// #1 Assert
 	ALX_I2C_ASSERT(me->isInit == true);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -134,74 +224,165 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 	ALX_I2C_ASSERT(0 < numOfTries);
 	ALX_I2C_ASSERT(0 < timeout_ms);
 
-	// #1 Prepare variables
+	// #2 Prepare variables
 	status_t status = kStatus_Fail;
-	uint8_t _memAddr[2] = { (memAddr >> 8) & 0xFF, memAddr & 0xFF}; // Ensures that memAddr bytes are in right order
+	uint8_t _memAddr[2] = { memAddr & 0xFF, (memAddr >> 8) & 0xFF };
 	uint8_t _memAddrLen = AlxI2c_GetMemAddrLen(&memAddrLen);
 
-	// #2 Start Timeout
-	AlxTimSw_Start(&me->timeout_ms);
+	// #3 Start Timeout
+	AlxTimSw_Start(&me->tim);
 
-	// #3 Try read memory for number of tries
+	// #4 Try read memory for number of tries
 	for (uint32_t _tryNo = 1; _tryNo <= numOfTries; _tryNo++)
 	{
-		// #3.1 Send Start Condition
+		// #4.1 Send Start Condition
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
-		// #3.2 Write Slave Address
-		status = AlxI2c_MasterWriteBlocking(me, me->i2c, _memAddr, _memAddrLen, kI2C_TransferDefaultFlag, timeout_ms); // Write memAddr, then Stop
+		// #4.2 Write Slave Address
+		status = AlxI2c_MasterWriteBlocking(me, me->i2c, _memAddr, _memAddrLen, kI2C_TransferDefaultFlag, timeout_ms); // MF: Write memAddr, then Stop
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrWriteSlaveAddr");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
-		// #3.3 Send Start Condition
+		// #4.3 Send Start Condition
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Read, timeout_ms);
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
-		// #3.4 Read Memory
-		status = AlxI2c_MasterReadBlocking(me, me->i2c, data, len, kI2C_TransferDefaultFlag, timeout_ms); // Read data, then Stop
-		if (status == kStatus_Success)
-		{
-			return Alx_Ok; // Memory read OK
-		}
-		else
+		// #4.4 Read Memory
+		status = AlxI2c_MasterReadBlocking(me, me->i2c, data, len, kI2C_TransferDefaultFlag, timeout_ms); // MF: Read data, then Stop
+		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrFlsRead");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
+
+		// #4.5 Send Stop Condition
+		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrStopCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
+
+		// #4.6 Return Ok
+		return Alx_Ok;
 	}
 
-	// #4 If we are here, the number of tries error occured
+	// #5 If we are here, the number of tries error occured
 	if (status != kStatus_Success)
 	{
 		ALX_I2C_TRACE("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
 	}
-}
-Alx_Status AlxI2c_Master_StartWrite(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint16_t timeout_ms)
-{
-	// TODO
+
+	// #6 Assert	// We should not get here
 	ALX_I2C_ASSERT(false);
 	return Alx_Err;
 }
+Alx_Status AlxI2c_Master_StartWrite(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint16_t timeout_ms)
+{
+	// #1 Assert
+	ALX_I2C_ASSERT(me->isInit == true);
+	ALX_I2C_ASSERT(me->wasCtorCalled == true);
+	(void)me;
+	(void)slaveAddr;
+	(void)data;
+	ALX_I2C_ASSERT(0 < len);
+	ALX_I2C_ASSERT(0 < timeout_ms);
+
+	// #2 Prepare variables
+	status_t status = kStatus_Fail;
+
+	// #3 Start Timeout
+	AlxTimSw_Start(&me->tim);
+
+	// #4 Send Start Condition
+	status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
+	if (status != kStatus_Success)
+	{
+		ALX_I2C_TRACE("ErrStartCondition");
+		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+	}
+
+	// #5 Return OK
+	return Alx_Ok;
+}
 Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// TODO
+	// #1 Assert
+	ALX_I2C_ASSERT(me->isInit == true);
+	ALX_I2C_ASSERT(me->wasCtorCalled == true);
+	(void)me;
+	(void)slaveAddr;
+	(void)data;
+	ALX_I2C_ASSERT(0 < len);
+	ALX_I2C_ASSERT(0 < numOfTries);
+	ALX_I2C_ASSERT(0 < timeout_ms);
+
+	// #2 Prepare variables
+	status_t status = kStatus_Fail;
+
+	// #3 Start Timeout
+	AlxTimSw_Start(&me->tim);
+
+	// #4 Try write for number of tries
+	for (uint32_t _tryNo = 1; _tryNo <= numOfTries; _tryNo++)
+	{
+		// #4.1 Send Start Condition
+		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrStartCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
+
+		// #4.2 Write Slave Address
+		status = AlxI2c_MasterWriteBlocking(me, me->i2c, data, len, kI2C_TransferDefaultFlag, timeout_ms);
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrWriteSlaveAddr");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
+
+		// #4.3 Send Stop Condition
+		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrStopCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
+
+		// #4.4 Return Ok
+		return Alx_Ok;
+	}
+
+	// #5 If we are here, the number of tries error occured
+	if (status != kStatus_Success)
+	{
+		ALX_I2C_TRACE("ErrNumOfTries");
+		return Alx_ErrNumOfTries;
+	}
+
+	// #6 Assert	// We should not get here
 	ALX_I2C_ASSERT(false);
 	return Alx_Err;
 }
@@ -211,6 +392,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Single(AlxI2c* me, uint16_t slaveAddr
 }
 Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, const uint8_t* data, uint16_t len, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms)
 {
+	// #1 Assert
 	ALX_I2C_ASSERT(me->isInit == true);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -224,93 +406,121 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 	ALX_I2C_ASSERT(0 < numOfTries);
 	ALX_I2C_ASSERT(0 < timeout_ms);
 
-	// #1 Prepare variables
+	// #2 Prepare variables
 	status_t status = kStatus_Fail;
-	uint8_t _memAddr[2] = { (memAddr >> 8) & 0xFF, memAddr & 0xFF }; // Ensures that memAddr bytes are in right order
+	uint8_t _memAddr[2] = { memAddr & 0xFF, (memAddr >> 8) & 0xFF };
 	uint8_t _memAddrLen = AlxI2c_GetMemAddrLen(&memAddrLen);
-	uint8_t buff[ALX_I2C_BUFF_LEN] = {0};
+	uint8_t buff[ALX_I2C_BUFF_LEN] = { 0 };
 
-	// #2 Start Timeout
-	AlxTimSw_Start(&me->timeout_ms);
+	// #3 Start Timeout
+	AlxTimSw_Start(&me->tim);
 
-	// #3 Try write memory for number of tries
+	// #4 Try write memory for number of tries
 	for (uint32_t _tryNo = 1; _tryNo <= numOfTries; _tryNo++)
 	{
-		// #3.1 Send Start Condition
+		// #4.1 Send Start Condition
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrStartCondition");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
-		// #3.2 Write Slave Address
-		status = AlxI2c_MasterWriteBlocking(me, me->i2c, _memAddr, _memAddrLen, kI2C_TransferNoStopFlag, timeout_ms); // Write memAddr, no Stop
+		// #4.2 Write Slave Address
+		status = AlxI2c_MasterWriteBlocking(me, me->i2c, _memAddr, _memAddrLen, kI2C_TransferNoStopFlag, timeout_ms); // MF: Write memAddr, no Stop
 		if (status != kStatus_Success)
 		{
 			ALX_I2C_TRACE("ErrWriteSlaveAddr");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 
-		// #3.3 Write Memory
-		status = AlxI2c_MasterWriteBlocking(me, me->i2c, data, len, kI2C_TransferNoStartFlag, timeout_ms); // Write data then Stop
+		// #4.3 Write Memory
+		status = AlxI2c_MasterWriteBlocking(me, me->i2c, data, len, kI2C_TransferNoStartFlag, timeout_ms); // MF: Write data then Stop
 		if (status == kStatus_Success)
 		{
-			// If enabled, read & check previously written data
+			// #4.3.1 If enabled, read & check previously written data
 			if (checkWithRead)
 			{
-				Alx_Status status = Alx_Err;
-				status = AlxI2c_Master_StartReadMemStop(me, slaveAddr, memAddr, memAddrLen, buff, len, numOfTries, timeout_ms);
-				if (status == Alx_ErrNumOfTries)
+				Alx_Status alxStat = Alx_Err;
+				alxStat = AlxI2c_Master_StartReadMemStop(me, slaveAddr, memAddr, memAddrLen, buff, len, numOfTries, timeout_ms);
+				if (alxStat == Alx_ErrNumOfTries)
 				{
 					ALX_I2C_TRACE("Read_ErrNumOfTries");
 					continue;
 				}
-				else if (status != Alx_Ok)
-				{ 
+				else if (alxStat != Alx_Ok)
+				{
 					ALX_I2C_ASSERT(false); // We should never get here
 					return Alx_Err;
 				}
-				else if (memcmp(buff, data, len) != 0) // Check previously written data
-				{ 
+				else if (memcmp(buff, data, len) != 0)	// MF: Check previously written data
+				{
 					ALX_I2C_TRACE("Read_ErrCheckWithRead");
 					continue;
 				}
-				else
-				{
-					return Alx_Ok; // Memory write OK, with check with read
-				}
 			}
-			else
+
+			// #4.3.2 Send Stop Condition
+			status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
+			if (status != kStatus_Success)
 			{
-				return Alx_Ok; // Memory write OK, without check with read
+				ALX_I2C_TRACE("ErrStopCondition");
+				if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+				continue;
 			}
+
+			// #4.3.3 Return Ok
+			return Alx_Ok;		// MF: Memory write OK, without check with read
 		}
 		else
 		{
 			ALX_I2C_TRACE("ErrFlsWrite");
-			if (AlxI2c_ReInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReInit"); return Alx_ErrReInit; }
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
 			continue;
 		}
 	}
 
-	// #3 If we are here, write was OK or number of tries error occured
+	// #5 If we are here, write was OK or number of tries error occured
 	if (status != kStatus_Success)
 	{
 		ALX_I2C_TRACE("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
 	}
-}
-Alx_Status AlxI2c_Master_Stop(AlxI2c* me, uint16_t timeout_ms)
-{
-	// TODO
+
+	// #6 Assert	// We should not get here
 	ALX_I2C_ASSERT(false);
 	return Alx_Err;
 }
+Alx_Status AlxI2c_Master_Stop(AlxI2c* me, uint16_t timeout_ms)
+{
+	// #1 Assert
+	ALX_I2C_ASSERT(me->isInit == true);
+	ALX_I2C_ASSERT(me->wasCtorCalled == true);
+	(void)me;
+	ALX_I2C_ASSERT(0 < timeout_ms);
+
+	// #2 Prepare variables
+	status_t status = kStatus_Fail;
+
+	// #3 Start Timeout
+	AlxTimSw_Start(&me->tim);
+
+	// #4 Send Stop Condition
+	status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
+	if (status != kStatus_Success)
+	{
+		ALX_I2C_TRACE("ErrStopCondition");
+		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+	}
+
+	// #5 Return OK
+	return Alx_Ok;
+}
 Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t numOfTries, uint16_t timeout_ms)
 {
+	// #1 Assert
 	ALX_I2C_ASSERT(me->isInit == true);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -318,40 +528,93 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 	ALX_I2C_ASSERT(0 < numOfTries);
 	ALX_I2C_ASSERT(0 < timeout_ms);
 
-	//TODO
-	ALX_I2C_ASSERT(false);
+	// #2 Prepare variables
+	status_t status = kStatus_Fail;
+	Alx_Status alxStat = Alx_Err;
+	uint32_t flag = 0;
 
-	// #1 Try slave
-	/*HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(&me->hi2c, slaveAddr, numOfTries, timeout_ms);
-	if (status != HAL_OK)
+	// #3 Start Timeout
+	AlxTimSw_Start(&me->tim);
+
+	// #4 Try Generate start and send Slave address for number of tries
+	for (uint32_t _tryNo = 1; _tryNo <= numOfTries; _tryNo++)
 	{
-		ALX_I2C_TRACE("ErrHal");
-		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_Err; }
-	}*/
+		// #4.1 Send Start Condition
+		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrStartCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
 
-	return Alx_Ok;
+		// #4.2 Get status flag and check if NACK was return
+		do
+		{
+			if (AlxTimSw_IsTimeout_ms(&me->tim, timeout_ms)) { ALX_I2C_TRACE("ErrTimeout"); return (uint32_t)kStatus_I2C_Timeout; }
+
+			flag = I2C_GetStatusFlags(me->i2c);
+		} while ((flag & I2C_STAT_MSTPENDING_MASK) == 0U);
+		if ((flag & (1 << 1)) && (flag & (1 << 2)))	// MF: Check 2nd and 3rd bit of I2C Status register. If this is true, NACK was returned
+		{
+			ALX_I2C_TRACE("ErrNack");
+			status = kStatus_Fail;
+			alxStat = AlxI2c_ErrNack;
+			continue;
+		}
+
+		// #4.3 Send Stop Condition
+		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
+		if (status != kStatus_Success)
+		{
+			ALX_I2C_TRACE("ErrStopCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("ErrReset"); return Alx_ErrReInit; }
+			continue;
+		}
+
+		// #4.4 Return Ok
+		return Alx_Ok;
+	}
+
+	// #5 If we are here, the number of tries error occured
+	if (status != kStatus_Success)
+	{
+		ALX_I2C_TRACE("ErrNumOfTries");
+		return Alx_ErrNumOfTries;
+	}
+
+	// #6 Assert	// We should not get here
+	ALX_I2C_ASSERT(false);
+	return Alx_Err;
 }
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint8_t AlxI2c_GetMemAddrLen(AlxI2c_Master_MemAddrLen* memAddrLen)
-{
-	if		(*memAddrLen == AlxI2c_Master_MemAddrLen_8bit)		{ return 1; }
-	else if (*memAddrLen == AlxI2c_Master_MemAddrLen_16bit)		{ return 2; }
-	else														{ ALX_I2C_ASSERT(false); return 0; } // We shouldn't get here
-}
-static Alx_Status AlxI2c_ReInit(AlxI2c* me)
+static Alx_Status AlxI2c_Reset(AlxI2c* me)
 {
 	// #1 DeInit I2C
-	if (AlxI2c_DeInit(me) != Alx_Ok) { ALX_I2C_TRACE("ErrDeInit"); return Alx_Err; }
+	// #1.1 DeInit I2C
+	I2C_MasterDeinit(me->i2c); // MF: "DisableClk" happens here
+
+	// #1.2 DeInit GPIO
+	AlxIoPin_DeInit(me->io_SCL);
+	AlxIoPin_DeInit(me->io_SDA);
 
 	// #2 Reset isInit
 	me->isInit = false;
 
 	// #3 Init I2C
-	if (AlxI2c_Init(me) != Alx_Ok) { ALX_I2C_TRACE("ErrInit"); return Alx_Err; }
+	// #3.1 Init GPIO
+	AlxIoPin_Init(me->io_SCL);
+	AlxIoPin_Init(me->io_SDA);
+
+	// #3.2 Select I2C Periphery Clock
+	AlxI2c_Periph_SelectClk(me);
+
+	// #3.3 Init I2C
+	I2C_MasterInit(me->i2c, &me->i2cConfig, CLOCK_GetMainClkFreq()); // MF: "Periph_Reset" and "EnableClk" happens here. MF: srcClock_Hz = I2cFuncClk = MainClk
 
 	// #4 Set isInit
 	me->isInit = true;
@@ -359,10 +622,16 @@ static Alx_Status AlxI2c_ReInit(AlxI2c* me)
 	// #5 Return OK
 	return Alx_Ok;
 }
-static void AlxI2c_Periph_SelectClk(AlxI2c* me)  
+static uint8_t AlxI2c_GetMemAddrLen(AlxI2c_Master_MemAddrLen* memAddrLen)
+{
+	if		(*memAddrLen == AlxI2c_Master_MemAddrLen_8bit)		{ return 1; }
+	else if (*memAddrLen == AlxI2c_Master_MemAddrLen_16bit)		{ return 2; }
+	else														{ ALX_I2C_ASSERT(false); return 0; }	// MF: We shouldn't get here
+}
+static void AlxI2c_Periph_SelectClk(AlxI2c* me)
 {
 	bool isErr = true;
-	
+
 	#if defined(I2C0)
 	if (me->i2c == I2C0)	{ CLOCK_Select(kI2C0_Clk_From_MainClk); isErr = false; }
 	#endif
@@ -375,7 +644,7 @@ static void AlxI2c_Periph_SelectClk(AlxI2c* me)
 	#if defined(I2C3)
 	if (me->i2c == I2C3)	{ CLOCK_Select(kI2C3_Clk_From_MainClk); isErr = false; }
 	#endif
-	
+
 	if(isErr)				{ ALX_I2C_ASSERT(false); } // We shouldn't get here
 }
 static status_t AlxI2c_MasterStart(AlxI2c* me, I2C_Type* base, uint8_t address, i2c_direction_t direction, uint16_t timeout)
@@ -386,7 +655,7 @@ static status_t AlxI2c_MasterStart(AlxI2c* me, I2C_Type* base, uint8_t address, 
 	}
 
 	/* Write Address and RW bit to data register */
-	base->MSTDAT = ((uint32_t)address << 1) | ((uint32_t)direction & 1u);
+	base->MSTDAT = (uint32_t)address | ((uint32_t)direction & 1u);
 	/* Start the transfer */
 	base->MSTCTL = I2C_MSTCTL_MSTSTART_MASK;
 
@@ -411,9 +680,11 @@ static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const voi
 			return kStatus_I2C_Timeout;
 		}
 
+		#if defined ALX_LPC80X	// MF: This is added when ALX_LPC80X is used
 		if ((status & I2C_STAT_MSTARBLOSS_MASK) != 0U) { return kStatus_I2C_ArbitrationLost; }
 
 		if ((status & I2C_STAT_MSTSTSTPERR_MASK) != 0U) { return kStatus_I2C_StartStopError; }
+		#endif
 
 		master_state = (status & I2C_STAT_MSTSTATE_MASK) >> I2C_STAT_MSTSTATE_SHIFT;
 		switch (master_state)
@@ -468,9 +739,11 @@ static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const voi
 		}
 	}
 
+	#if defined ALX_LPC80X	// MF: This is added when ALX_LPC80X is used
 	if ((status & I2C_STAT_MSTARBLOSS_MASK) != 0U) { return kStatus_I2C_ArbitrationLost; }
 
 	if ((status & I2C_STAT_MSTSTSTPERR_MASK) != 0U) { return kStatus_I2C_StartStopError; }
+	#endif
 
 	return kStatus_Success;
 }
@@ -493,54 +766,68 @@ static status_t AlxI2c_MasterReadBlocking(AlxI2c* me, I2C_Type* base, void* rxBu
 			return kStatus_I2C_Timeout;
 		}
 
+		#if defined ALX_LPC80X	// MF: This is added when ALX_LPC80X is used
 		if ((status & (I2C_STAT_MSTARBLOSS_MASK | I2C_STAT_MSTSTSTPERR_MASK)) != 0U) { break; }
+		#endif
 
 		master_state = (status & I2C_STAT_MSTSTATE_MASK) >> I2C_STAT_MSTSTATE_SHIFT;
 		switch (master_state)
 		{
-		case I2C_STAT_MSTCODE_RXREADY:
-			/* ready to receive next byte */
-			*(buf++) = (uint8_t)base->MSTDAT;
-			if (--rxSize != 0U)
-			{
-				base->MSTCTL = I2C_MSTCTL_MSTCONTINUE_MASK;
-			}
-			else
-			{
-				if ((flags & (uint32_t)kI2C_TransferNoStopFlag) == 0U)
+			case I2C_STAT_MSTCODE_RXREADY:
+				/* ready to receive next byte */
+				*(buf++) = (uint8_t)base->MSTDAT;
+				if (--rxSize != 0U)
 				{
-					/* initiate NAK and stop */
-					base->MSTCTL = I2C_MSTCTL_MSTSTOP_MASK;
-					status = AlxI2c_PendingStatusWait(me, base, timeout);
-
-					if (status == kStatus_I2C_Timeout)
+					base->MSTCTL = I2C_MSTCTL_MSTCONTINUE_MASK;
+				}
+				else
+				{
+					if ((flags & (uint32_t)kI2C_TransferNoStopFlag) == 0U)
 					{
-						ALX_I2C_TRACE("ErrTimeout");
-						return kStatus_I2C_Timeout;
+						/* initiate NAK and stop */
+						base->MSTCTL = I2C_MSTCTL_MSTSTOP_MASK;
+						status = AlxI2c_PendingStatusWait(me, base, timeout);
+
+						if (status == kStatus_I2C_Timeout)
+						{
+							ALX_I2C_TRACE("ErrTimeout");
+							return kStatus_I2C_Timeout;
+						}
 					}
 				}
-			}
-			break;
+				break;
 
-		case I2C_STAT_MSTCODE_NACKADR:
-		case I2C_STAT_MSTCODE_NACKDAT:
-			/* slave nacked the last byte */
-			err = kStatus_I2C_Nak;
-			break;
+			case I2C_STAT_MSTCODE_NACKADR:
+			case I2C_STAT_MSTCODE_NACKDAT:
+				/* slave nacked the last byte */
+				err = kStatus_I2C_Nak;
+				break;
 
-		default:
-			/* unexpected state */
-			err = kStatus_I2C_UnexpectedState;
-			break;
+			default:
+				/* unexpected state */
+				err = kStatus_I2C_UnexpectedState;
+				break;
 		}
 
 		if (err != kStatus_Success) { return err; }
 	}
 
+	#if defined ALX_LPC80X	// MF: This is added when ALX_LPC80X is used
 	if ((status & I2C_STAT_MSTARBLOSS_MASK) != 0U) { return kStatus_I2C_ArbitrationLost; }
 
 	if ((status & I2C_STAT_MSTSTSTPERR_MASK) != 0U) { return kStatus_I2C_StartStopError; }
+	#endif
 
+	return kStatus_Success;
+}
+static status_t AlxI2c_MasterStop(AlxI2c* me, I2C_Type *base, uint16_t timeout)
+{
+	if (AlxI2c_PendingStatusWait(me, base, timeout) == (uint32_t)kStatus_I2C_Timeout)
+	{
+		return kStatus_I2C_Timeout;
+	}
+
+	base->MSTCTL = I2C_MSTCTL_MSTSTOP_MASK;
 	return kStatus_Success;
 }
 static uint32_t AlxI2c_PendingStatusWait(AlxI2c* me, I2C_Type* base, uint16_t timeout)
@@ -549,8 +836,8 @@ static uint32_t AlxI2c_PendingStatusWait(AlxI2c* me, I2C_Type* base, uint16_t ti
 
 	do
 	{
-		// Check Timeout
-		if (AlxTimSw_Get_ms(&me->timeout_ms) >= timeout)
+		// MF: Check Timeout
+		if (AlxTimSw_IsTimeout_ms(&me->tim, timeout))
 		{
 			ALX_I2C_TRACE("ErrTimeout");
 			return (uint32_t)kStatus_I2C_Timeout;

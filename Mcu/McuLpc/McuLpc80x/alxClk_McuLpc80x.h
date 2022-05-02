@@ -7,8 +7,8 @@
   ******************************************************************************
   */
 
-#ifndef ALX_CLK_MCU_LPC80x_H
-#define ALX_CLK_MCU_LPC80x_H
+#ifndef ALX_CLK_MCU_LPC80X_H
+#define ALX_CLK_MCU_LPC80X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,7 +25,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -33,7 +33,7 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	#if defined(ALX_LPC80x)
+	#if defined(ALX_LPC80X)
 	AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default = 0,
 	AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz = 1,
 	AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz = 2,
@@ -44,7 +44,7 @@ typedef enum
 	AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz = 7,
 	AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5 = 8,
 	#endif
-	#if defined(ALX_LPC81x) || defined(ALX_LPC82x) || defined(ALX_LPC83x) || defined(ALX_LPC84x)
+	#if defined(ALX_LPC81X) || defined(ALX_LPC82X) || defined(ALX_LPC83X) || defined(ALX_LPC84X)
 	// MF: NOTE - this Mcus will have the same enum
 	#endif
 } AlxClk_Config;
@@ -53,14 +53,15 @@ typedef struct
 {
 	// Parameters
 	AlxClk_Config config;
-	AlxClk_Tick tick;	// TODO
+	AlxClk_Tick tick;
 
 	// Variables
+	uint32_t systemCoreClock;
 	uint32_t coreSysClk;
 	uint32_t mainClk;
 	uint32_t fro;
-	//uint32_t extClk; // MF: Don't know how we will use it
-	//uint32_t frg0; // MF: Don't know how we will use it
+	//uint32_t extClk;	// MF: Don't know how we will use it
+	//uint32_t frg0;	// MF: Don't know how we will use it
 
 	uint32_t coreSysClk_Ctor;
 	uint32_t mainClk_Ctor;
@@ -90,4 +91,4 @@ void AlxClk_Ctor
 }
 #endif
 
-#endif // ALX_CLK_MCU_LPC80x_H
+#endif // ALX_CLK_MCU_LPC80X_H
