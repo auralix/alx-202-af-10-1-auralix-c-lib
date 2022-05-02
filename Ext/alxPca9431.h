@@ -1165,22 +1165,22 @@ typedef struct
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxI2c* i2c;
-
 	// Parameters
+	AlxIoPin* do_SLEEP_EN;
+	AlxI2c* i2c;
 	uint8_t i2cAddr;
 	bool i2cCheckWithRead;
 	uint8_t i2cNumOfTries;
 	uint16_t i2cTimeout_ms;
+	uint8_t adc1ShotConvNumOfTries;	// TV: Maximum number of _0Dh_ADC_CONTROL register reads after ADC 1-shot conversion was triggered to check if conversion was done
 
 	// Variables
 	AlxPca9431_Reg reg;
 
 	// Info
-	bool isInit;
-	bool isPeriphInit;
 	bool wasCtorCalled;
+	bool isPeriphInit;
+	bool isInit;
 } AlxPca9431;
 
 
@@ -1190,11 +1190,13 @@ typedef struct
 void AlxPca9431_Ctor
 (
 	AlxPca9431* me,
+	AlxIoPin* do_SLEEP_EN,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
-	uint16_t i2cTimeout_ms
+	uint16_t i2cTimeout_ms,
+	uint8_t adc1ShotConvNumOfTries
 );
 
 
@@ -1205,6 +1207,9 @@ Alx_Status AlxPca9431_InitPeriph(AlxPca9431* me);
 Alx_Status AlxPca9431_DeInitPeriph(AlxPca9431* me);
 Alx_Status AlxPca9431_Init(AlxPca9431* me);
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me);
+Alx_Status AlxPca9431_Enable(AlxPca9431* me);
+Alx_Status AlxPca9431_Disable(AlxPca9431* me);
+Alx_Status AlxPca9431_TriggerAdc1ShotConv(AlxPca9431* me);
 Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V);
 Alx_Status AlxPca9431_LdoVout_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV);
 Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A);

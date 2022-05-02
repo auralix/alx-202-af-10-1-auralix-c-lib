@@ -40,21 +40,23 @@ void AlxPca9431_RegStruct_SetVal(AlxPca9431* me);
 void AlxPca9431_Ctor
 (
 	AlxPca9431* me,
+	AlxIoPin* do_SLEEP_EN,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
-	uint16_t i2cTimeout_ms
+	uint16_t i2cTimeout_ms,
+	uint8_t adc1ShotConvNumOfTries
 )
 {
-	// Objects - External
-	me->i2c = i2c;
-
 	// Parameters
+	me->do_SLEEP_EN = do_SLEEP_EN;
+	me->i2c = i2c;
 	me->i2cAddr = i2cAddr;
 	me->i2cCheckWithRead = i2cCheckWithRead;
 	me->i2cNumOfTries = i2cNumOfTries;
 	me->i2cTimeout_ms = i2cTimeout_ms;
+	me->adc1ShotConvNumOfTries = adc1ShotConvNumOfTries;
 
 	// Variables
 	AlxPca9431_RegStruct_SetAddr(me);
@@ -62,9 +64,9 @@ void AlxPca9431_Ctor
 	AlxPca9431_RegStruct_SetValToZero(me);
 
 	// Info
-	me->isInit = false;
-	me->isPeriphInit = false;
 	me->wasCtorCalled = true;
+	me->isPeriphInit = false;
+	me->isInit = false;
 }
 
 
@@ -74,47 +76,55 @@ void AlxPca9431_Ctor
 Alx_Status AlxPca9431_InitPeriph(AlxPca9431* me)
 {
 	// #1 Assert
-	ALX_PCA9431_ASSERT(me->isPeriphInit == false);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == false);
+	// isInit -> Don't care
 
 	// #2 Prepare variables
 	Alx_Status status = Alx_Err;
 
-	// #3 Init I2C
+	// #3 Init GPIO
+	AlxIoPin_Init(me->do_SLEEP_EN);
+
+	// #4 Init I2C
 	status = AlxI2c_Init(me->i2c);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 
-	// #4 Set isInit
+	// #5 Set isPeriphInit
 	me->isPeriphInit = true;
 
-	// #5 Return OK
+	// #6 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxPca9431_DeInitPeriph(AlxPca9431* me)
 {
 	// #1 Assert
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	// isInit -> Don't care
 
 	// #2 Prepare variables
 	Alx_Status status = Alx_Err;
 
-	// #3 DeInit I2C
+	// #3 DeInit GPIO
+	AlxIoPin_DeInit(me->do_SLEEP_EN);
+
+	// #4 DeInit I2C
 	status = AlxI2c_DeInit(me->i2c);
 	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status; }
 
-	// #4 Set isInit
+	// #5 Reset isPeriphInit
 	me->isPeriphInit = false;
 
-	// #5 Return OK
+	// #6 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxPca9431_Init(AlxPca9431* me)
 {
 	// #1 Assert
-	ALX_PCA9431_ASSERT(me->isInit == false);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == false);
 
 	// #2 Prepare variables
 	Alx_Status status = Alx_Err;
@@ -146,22 +156,72 @@ Alx_Status AlxPca9431_Init(AlxPca9431* me)
 Alx_Status AlxPca9431_DeInit(AlxPca9431* me)
 {
 	// #1 Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
-	// #1 Prepare variables
-	//Alx_Status status = Alx_Err;
-
-	// #2 DeInit I2C
-	//status = AlxI2c_DeInit(me->i2c);
-	//if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err_AlxI2c_DeInit"); return status; }
+	// #2 DO NOTHING
 
 	// #3 Reset isInit
 	me->isInit = false;
 
 	// #4 Return OK
 	return Alx_Ok;
+}
+Alx_Status AlxPca9431_Enable(AlxPca9431* me)
+{
+	// #1 Assert
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
+
+	// #2 Reset do_SLEEP_EN to disable sleep mode - PCA9431 is now enabled
+	AlxIoPin_Reset(me->do_SLEEP_EN);
+
+	// #3 Return OK
+	return Alx_Ok;
+}
+Alx_Status AlxPca9431_Disable(AlxPca9431* me)
+{
+	// #1 Assert
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
+
+	// #2 Set do_SLEEP_EN to enable sleep mode - PCA9431 is now disabled
+	AlxIoPin_Set(me->do_SLEEP_EN);
+
+	// #3 Return OK
+	return Alx_Ok;
+}
+Alx_Status AlxPca9431_TriggerAdc1ShotConv(AlxPca9431* me)
+{
+	// #1 Assert
+	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
+	ALX_PCA9431_ASSERT(me->reg._0Dh_ADC_CONTROL.val.ADC_RATE == AdcRate_1ShotConversion);	// TV: To use this function ADC must be configured in 1-shot conversion mode
+
+	// #1 Prepare Variables
+	Alx_Status status = Alx_Err;
+
+	// #2 Start single shot ADC conversion
+	me->reg._0Dh_ADC_CONTROL.val.ADC_EN = AdcEn_Enabled;
+	status = AlxPca9431_Reg_Write(me, &me->reg._0Dh_ADC_CONTROL);
+	if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status;}
+
+	// #3 Check if conversion is done
+	for(uint32_t i = 0; i < me->adc1ShotConvNumOfTries; i++)			// GK: Limit retry behaviour
+	{
+		status = AlxPca9431_Reg_Read(me, &me->reg._0Dh_ADC_CONTROL);
+		if (status != Alx_Ok) { ALX_PCA9431_TRACE("Err"); return status;}
+
+		if (me->reg._0Dh_ADC_CONTROL.val.ADC_EN == AdcEn_Disabled)		// GK: When the conversion is done, ADC_EN is set to disabled by PCA
+			return Alx_Ok;												// GK: ADC conversion is done
+	}
+
+	// #4 Return error
+	return Alx_Err;	// GK: ADC failed to sample in defined amount of retries
 }
 Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V)
 {
@@ -172,9 +232,9 @@ Alx_Status AlxPca9431_LdoVout_GetVoltage_V(AlxPca9431* me, float* voltage_V)
 	#else
 
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variables
 	Alx_Status status = Alx_Err;
@@ -212,9 +272,9 @@ Alx_Status AlxPca9431_LdoVout_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV
 	#else
 
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variables
 	Alx_Status status = Alx_Err;
@@ -252,9 +312,9 @@ Alx_Status AlxPca9431_LdoVout_GetCurrent_A(AlxPca9431* me, float* current_A)
 	#else
 
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variables
 	Alx_Status status = Alx_Err;
@@ -292,9 +352,9 @@ Alx_Status AlxPca9431_LdoVout_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA
 	#else
 
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variables
 	Alx_Status status = Alx_Err;
@@ -332,9 +392,9 @@ Alx_Status AlxPca9431_Rect_GetVoltage_V(AlxPca9431* me, float* voltage_V)
 	#else
 
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variables
 	Alx_Status status = Alx_Err;
@@ -372,9 +432,9 @@ Alx_Status AlxPca9431_Rect_GetVoltage_mV(AlxPca9431* me, uint32_t* voltage_mV)
 	#else
 
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variables
 	Alx_Status status = Alx_Err;
@@ -412,9 +472,9 @@ Alx_Status AlxPca9431_Rect_GetCurrent_A(AlxPca9431* me, float* current_A)
 	#else
 
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variables
 	Alx_Status status = Alx_Err;
@@ -452,9 +512,9 @@ Alx_Status AlxPca9431_Rect_GetCurrent_uA(AlxPca9431* me, uint32_t* current_uA)
 	#else
 
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variables
 	Alx_Status status = Alx_Err;
@@ -492,9 +552,9 @@ Alx_Status AlxPca9431_TempSens_GetTemp_degC(AlxPca9431* me, float* temp_degC)
 	#else
 
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variable
 	Alx_Status status = Alx_Err;
@@ -572,9 +632,9 @@ Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, int32_t* temp_mDegC
 	#else
 
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variable
 	Alx_Status status = Alx_Err;
@@ -646,9 +706,9 @@ Alx_Status AlxPca9431_TempSens_GetTemp_mDegC(AlxPca9431* me, int32_t* temp_mDegC
 Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me)
 {
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variables
 	Alx_Status status = Alx_Err;
@@ -666,9 +726,9 @@ Alx_Status AlxPca9431_Exit_EcoMode(AlxPca9431* me)
 Alx_Status AlxPca9431_Reg_ReadAndClearInterrupt(AlxPca9431* me)
 {
 	// Assert
-	ALX_PCA9431_ASSERT(me->isInit == true);
-	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
 	ALX_PCA9431_ASSERT(me->wasCtorCalled == true);
+	ALX_PCA9431_ASSERT(me->isPeriphInit == true);
+	ALX_PCA9431_ASSERT(me->isInit == true);
 
 	// #1 Prepare Variables
 	Alx_Status status = Alx_Err;
@@ -825,7 +885,7 @@ static void AlxPca9431_RegStruct_SetValToDefault(AlxPca9431* me)
 	me->reg._0Fh_VPWR_CONFIG		.val.raw = 0b10000011;
 	me->reg._10h_RXIR_CONFIG		.val.raw = 0b00000000;
 	me->reg._20h_OCPSET_LOCK		.val.raw = 0b10101000;
-	me->reg._21h_VOUTLDO_OCP		.val.raw = 0b00001000;
+	me->reg._21h_VOUTLDO_OCP		.val.raw = 0b00011100;
 	me->reg._30h_VRECT_ADC_H		.val.raw = 0b00000000;
 	me->reg._31h_VRECT_ADC_L		.val.raw = 0b00000000;
 	me->reg._32h_VTUNE_ADC_H		.val.raw = 0b00000000;
