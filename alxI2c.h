@@ -54,7 +54,7 @@ typedef struct { bool dummy; } AlxI2c;
 #endif
 
 // Trace //
-#if defined(_ALX_I2C_TRACE) || defined(_ALX_TRACE_ALL)
+#if (defined(_ALX_I2C_TRACE) || defined(_ALX_TRACE_ALL)) && !defined(ALX_I2C_TRACE_OFF)
 	#define ALX_I2C_TRACE(...) ALX_TRACE_STD(ALX_I2C_FILE, __VA_ARGS__)
 #else
 	#define ALX_I2C_TRACE(...) do{} while (false)
