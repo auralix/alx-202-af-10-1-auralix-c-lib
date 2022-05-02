@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 // Trace //
-#if defined(_ALX_PCAL6416A_TRACE) || defined(_ALX_TRACE_ALL)
+#if (defined(_ALX_PCAL6416A_TRACE) || defined(_ALX_TRACE_ALL)) && !defined(ALX_PCAL6416A_TRACE_OFF)
 	#define ALX_PCAL6416A_TRACE(...) ALX_TRACE_STD(ALX_PCAL6416A_FILE, __VA_ARGS__)
 #else
 	#define ALX_PCAL6416A_TRACE(...) do{} while (false)
@@ -636,13 +636,8 @@ typedef enum
 } AlxPcal6416a_Mode;
 typedef struct
 {
-	// Objects - External
-	AlxIoPin** ioPinArr;
-	AlxI2c* i2c;
-
 	// Parameters
-	AlxPcal6416a_PortPin* portPinArr;
-	uint8_t numOfIoPins;
+	AlxI2c* i2c;
 	uint8_t i2cAddr;
 	bool i2cCheckWithRead;
 	uint8_t i2cNumOfTries;
@@ -652,8 +647,9 @@ typedef struct
 	AlxPcal6416a_Reg reg;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInitPeriph;
+	bool isInit;
 } AlxPcal6416a;
 
 
@@ -674,6 +670,8 @@ void AlxPcal6416a_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+Alx_Status AlxPcal6416a_InitPeriph(AlxPcal6416a* me);
+Alx_Status AlxPcal6416a_DeInitPeriph(AlxPcal6416a* me);
 Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me);
 Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me);
 Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me);
