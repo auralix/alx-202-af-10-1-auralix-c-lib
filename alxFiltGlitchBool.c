@@ -26,15 +26,15 @@ void AlxFiltGlitchBool_Ctor
 {
 	// Ctor
 	AlxTimSw_Ctor(&me->tim, true);
-	
+
 	// Parameters
 	me->stableTrueTime_us = (uint64_t)(stableTrueTime_ms * 1000.f);
 	me->stableFalseTime_us = (uint64_t)(stableFalseTime_ms * 1000.f);
-	
+
 	// Variables
 	me->valRaw = valInitial;
 	me->valFiltered = valInitial;
-	
+
 	// Info
 	me->wasCtorCalled = true;
 }
@@ -49,15 +49,15 @@ void AlxFiltGlitchBool_Ctor_us
 {
 	// Ctor
 	AlxTimSw_Ctor(&me->tim, true);
-	
+
 	// Parameters
 	me->stableTrueTime_us = stableTrueTime_us;
 	me->stableFalseTime_us = stableFalseTime_us;
-	
+
 	// Variables
 	me->valRaw = valInitial;
 	me->valFiltered = valInitial;
-	
+
 	// Info
 	me->wasCtorCalled = true;
 }
@@ -72,7 +72,7 @@ bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in)
 	if (me->valRaw != me->valFiltered) // Unstable state detected
 	{
 		uint64_t unstableTime_us = AlxTimSw_Get_us(&me->tim);
-		
+
 		if (me->valRaw == true) // We are in false state and it becomes unstable, because "in = true"
 		{
 			if (unstableTime_us > me->stableTrueTime_us)
@@ -94,6 +94,6 @@ bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in)
 	{
 		AlxTimSw_Start(&me->tim);
 	}
-	
+
 	return me->valFiltered;
 }

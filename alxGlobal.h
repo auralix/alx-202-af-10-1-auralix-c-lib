@@ -91,6 +91,22 @@ extern "C" {
 
 
 //******************************************************************************
+// Includes - FreeRtos
+//******************************************************************************
+#if defined(ALX_FREE_RTOS)
+#include "FreeRTOS.h"
+#include "croutine.h"
+#include "event_groups.h"
+#include "list.h"
+#include "queue.h"
+#include "semphr.h"
+#include "stream_buffer.h"
+#include "task.h"
+#include "timers.h"
+#endif
+
+
+//******************************************************************************
 // Includes - MCU
 //******************************************************************************
 #if defined(ALX_STM32F1)
@@ -115,8 +131,11 @@ extern "C" {
 #elif defined(ALX_LPC845)
 #include "alxGlobal_McuLpc84.h"
 
-#elif defined(ALX_LPC80x)
+#elif defined(ALX_LPC80X)
 #include "alxGlobal_McuLpc80x.h"
+
+#elif defined(ALX_LPC55S6X)
+#include "alxGlobal_McuLpc55S6x.h"
 
 #elif defined(ALX_PC)
 #include "alxGlobal_Pc.h"
@@ -282,7 +301,7 @@ typedef enum
 	AlxClk_Clk_McuStm32_MainPllInputClk_Ctor = 13,
 	#endif
 
-	#if defined(ALX_LPC8xx) || defined(ALX_LPC80x)
+	#if defined(ALX_LPC8XX) || defined(ALX_LPC80X)
 	AlxClk_Clk_McuLpc8xx_CoreSysClk = 14,
 	AlxClk_Clk_McuLpc8xx_MainClk = 15,
 	AlxClk_Clk_McuLpc8xx_Fro = 16,
@@ -295,6 +314,16 @@ typedef enum
 	AlxClk_Clk_McuLpc8xx_Fro_Ctor = 22,
 	AlxClk_Clk_McuLpc8xx_LPO_Ctor = 23,
 	#endif
+
+	#if defined(ALX_LPC55S6X)
+	AlxClk_Clk_McuLpc55s6x_SystemCoreClock = 24,
+	AlxClk_Clk_McuLpc55s6x_AhbClk = 25,
+	AlxClk_Clk_McuLpc55s6x_MainClk = 26,
+
+	AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor = 27,
+	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor = 28,
+	AlxClk_Clk_McuLpc55s6x_MainClk_Ctor = 29,
+	#endif
 } AlxClk_Clk;
 
 typedef enum
@@ -302,6 +331,11 @@ typedef enum
 	AlxClk_Tick_1us   = 1,
 	AlxClk_Tick_10us  = 10,
 	AlxClk_Tick_100us = 100,
+	AlxClk_Tick_200us = 200,
+	AlxClk_Tick_250us = 250,
+	AlxClk_Tick_300us = 300,
+	AlxClk_Tick_400us = 400,
+	AlxClk_Tick_500us = 500,
 	AlxClk_Tick_1ms   = 1000,
 	AlxClk_Tick_10ms  = 10000,
 	AlxClk_Tick_100ms = 100000,
@@ -336,25 +370,8 @@ typedef enum
 //******************************************************************************
 // Functions
 //******************************************************************************
-ALX_INLINE static inline void AlxGlobal_DisableIrq(void)
-{
-	#if defined(ALX_MBED)
-	#else
-		#if defined(__GNUC__)
-		__disable_irq();
-		#endif
-	#endif
-}
-ALX_INLINE static inline void AlxGlobal_EnableIrq(void)
-{
-	#if defined(ALX_MBED)
-	#else
-		#if defined(__GNUC__)
-		__enable_irq();
-		#endif
-	#endif
-}
-
+void AlxGlobal_DisableIrq(void);
+void AlxGlobal_EnableIrq(void);
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
 Alx_Status AlxGlobal_BoundUint32(uint32_t* valPtr, uint32_t valMin, uint32_t valMax);
 Alx_Status AlxGlobal_BoundFloat(float* valPtr, float valMin, float valMax);

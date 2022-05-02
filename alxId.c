@@ -14,12 +14,6 @@
 
 
 //******************************************************************************
-// Private Functions
-//******************************************************************************
-static AlxId_HwIdIoPinState AlxId_GetHwIdPinState(AlxIoPin* di_HW_ID);
-
-
-//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxId_Ctor
@@ -324,7 +318,9 @@ void AlxId_Init(AlxId* me)
 		// #1 Get HW ID Pin States
 		for (uint32_t i = 0; i < me->hw.idIoPinArrLen; i++)
 		{
-			me->hw.idIoPinState[i] = AlxId_GetHwIdPinState(*(me->hw.idIoPinArr + i));
+			AlxIoPin_Init(*(me->hw.idIoPinArr + i));
+			me->hw.idIoPinState[i] = AlxIoPin_Read_TriState(*(me->hw.idIoPinArr + i));
+			AlxIoPin_DeInit(*(me->hw.idIoPinArr + i));
 		}
 
 		// #2 Calculate HW ID
@@ -382,7 +378,7 @@ void AlxId_Init(AlxId* me)
 								((uint64_t)me->hw.instance.bomVerMinor << 48) |
 								((uint64_t)me->hw.instance.bomVerPatch << 32) |
 								((uint64_t)me->hw.instance.bomVerDate);
-	
+
 	// #7 Set isInit
 	me->isInit = true;
 }
@@ -471,7 +467,9 @@ const char* AlxId_GetUniqueIdStr(AlxId* me)
 {
 	ALX_ID_ASSERT(me->wasCtorCalled == true);
 
+	#ifdef ALX_STM32
 	return me->stm32Hw.uniqueIdStr;
+	#endif
 }
 uint32_t AlxId_GetSwAppVerDate(AlxId* me)
 {
@@ -486,62 +484,4 @@ const char* AlxId_GetSwAppVerStr(AlxId* me)
 	ALX_ID_ASSERT(me->wasCtorCalled == true);
 
 	return me->swApp.verStr;
-}
-
-
-//******************************************************************************
-// Private Functions
-//******************************************************************************
-static AlxId_HwIdIoPinState AlxId_GetHwIdPinState(AlxIoPin* di_HW_ID)
-{
-	//******************************************************************************
-	// #1 Read @ PullUp
-	//******************************************************************************
-	// Config
-	AlxIoPin_Config_PullUp(di_HW_ID);
-	// Init
-	AlxIoPin_Init(di_HW_ID);
-	// Wait
-	AlxDelay_ms(2);
-	// ReadVal
-	bool valPullUp = AlxIoPin_Read(di_HW_ID);
-	// DeInit
-	AlxIoPin_DeInit(di_HW_ID);
-
-
-	//******************************************************************************
-	// #2 Read @ PullDown
-	//******************************************************************************
-	// Config
-	AlxIoPin_Config_PullDown(di_HW_ID);
-	// Init
-	AlxIoPin_Init(di_HW_ID);
-	// Wait
-	AlxDelay_ms(2);
-	// ReadVal
-	bool valPullDown = AlxIoPin_Read(di_HW_ID);
-	// DeInit
-	AlxIoPin_DeInit(di_HW_ID);
-
-
-	//******************************************************************************
-	// #3 Handle Return
-	//******************************************************************************
-	if((valPullUp == true) && (valPullDown == false))
-	{
-		return Alx_IoPinState_Floating;
-	}
-	else if ((valPullUp == true) && (valPullDown == true))
-	{
-		return Alx_IoPinState_High;
-	}
-	else if ((valPullUp == false) && (valPullDown == false))
-	{
-		return Alx_IoPinState_Low;
-	}
-	else
-	{
-		ALX_ID_ASSERT(false); // We should never get here
-		return ALX_NULL;
-	}
 }

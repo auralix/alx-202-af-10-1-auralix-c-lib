@@ -36,10 +36,10 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	AlxCan_Clk_McuStm32F4_CanClk_250kbps_Pclk1Apb1_45MHz = 0,
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	AlxCan_Clk_McuStm32G4_CanClk_250kbps_Pclk1Apb1_170MHz = 0,
 	#endif
 } AlxCan_Clk;
@@ -64,15 +64,15 @@ typedef struct
 	uint32_t rxFifoBuffLen;
 	Alx_IrqPriority txIrqPriority;
 	Alx_IrqPriority rxIrqPriority;
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	#endif
 
 	// Variables
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	CAN_HandleTypeDef hcan;
 	CAN_FilterTypeDef fcan;
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	RCC_PeriphCLKInitTypeDef periphClkInit;
 	FDCAN_HandleTypeDef hcan;
 	FDCAN_FilterTypeDef fcan;
@@ -91,10 +91,10 @@ typedef struct
 void AlxCan_Ctor
 (
 	AlxCan* me,
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	CAN_TypeDef* can,
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	FDCAN_GlobalTypeDef* can,
 	#endif
 	AlxIoPin* do_CAN_TX,

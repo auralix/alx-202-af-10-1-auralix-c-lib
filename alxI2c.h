@@ -26,8 +26,11 @@ extern "C" {
 #if  defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 #include "alxI2c_McuStm32.h"
 
-#elif defined(ALX_LPC80x)
+#elif defined(ALX_LPC80X)
 #include "alxI2c_McuLpc80x.h"
+
+#elif defined(ALX_LPC55S6X)
+#include "alxI2c_McuLpc55S6x.h"
 
 #else
 typedef struct { bool dummy; } AlxI2c;
@@ -51,7 +54,7 @@ typedef struct { bool dummy; } AlxI2c;
 #endif
 
 // Trace //
-#if defined(_ALX_I2C_TRACE) || defined(_ALX_TRACE_ALL)
+#if (defined(_ALX_I2C_TRACE) || defined(_ALX_TRACE_ALL)) && !defined(ALX_I2C_TRACE_OFF)
 	#define ALX_I2C_TRACE(...) ALX_TRACE_STD(ALX_I2C_FILE, __VA_ARGS__)
 #else
 	#define ALX_I2C_TRACE(...) do{} while (false)

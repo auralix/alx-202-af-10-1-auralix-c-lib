@@ -126,7 +126,7 @@ void AlxCan_Ctor
 	//******************************************************************************
 	// STM32F4
 	//******************************************************************************
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	me->hcan.Init.Mode = CAN_MODE_NORMAL;
 	me->hcan.Init.TimeTriggeredMode = DISABLE;
 	me->hcan.Init.AutoBusOff = DISABLE;
@@ -161,7 +161,7 @@ void AlxCan_Ctor
 	//******************************************************************************
 	// STM32G4
 	//******************************************************************************
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	me->periphClkInit.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
 	me->periphClkInit.FdcanClockSelection = RCC_FDCANCLKSOURCE_PCLK1;
 
@@ -225,28 +225,28 @@ Alx_Status AlxCan_Init(AlxCan* me)
 
 	// #4 Enable CAN Periphery Clock
 	AlxCan_Periph_EnableClk(me);
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	if(HAL_RCCEx_PeriphCLKConfig(&me->periphClkInit) != HAL_OK)	{ ALX_CAN_TRACE("ErrPClk"); };
 	#endif
 
 	// #5 Init CAN
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	if(HAL_CAN_Init(&me->hcan) != HAL_OK)						{ ALX_CAN_TRACE("ErrInit"); return Alx_Err; };
 	if(HAL_CAN_ConfigFilter(&me->hcan, &me->fcan) != HAL_OK)	{ ALX_CAN_TRACE("ErrFilter"); return Alx_Err; };
 	if(HAL_CAN_Start(&me->hcan) != HAL_OK)						{ ALX_CAN_TRACE("ErrStart"); return Alx_Err; };
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	if(HAL_FDCAN_Init(&me->hcan) != HAL_OK)																												{ ALX_CAN_TRACE("ErrInit"); return Alx_Err; };
 	if(HAL_FDCAN_ConfigFilter(&me->hcan, &me->fcan) != HAL_OK)																							{ ALX_CAN_TRACE("ErrFilter"); return Alx_Err; };
-	if(HAL_FDCAN_ConfigGlobalFilter(&me->hcan, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE) != HAL_OK)	{ ALX_CAN_TRACE("ErrGlobalFilter"); return Alx_Err; }
-	if(HAL_FDCAN_Start(&me->hcan) != HAL_OK)
+	if(HAL_FDCAN_ConfigGlobalFilter(&me->hcan, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE) != HAL_OK)	{ ALX_CAN_TRACE("ErrGlobalFilter"); return Alx_Err; };
+	if(HAL_FDCAN_Start(&me->hcan) != HAL_OK)																											{ ALX_CAN_TRACE("ErrHCan"); return Alx_Err; };
 	#endif
 
 	// #6 Enable CAN TX & RX IRQ
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	if(HAL_CAN_ActivateNotification(&me->hcan, CAN_IT_TX_MAILBOX_EMPTY | CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) { ALX_CAN_TRACE("ErrIrq"); return Alx_Err; };
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	if(HAL_FDCAN_ActivateNotification(&me->hcan, FDCAN_IT_TX_FIFO_EMPTY | FDCAN_IT_RX_FIFO0_NEW_MESSAGE, ALX_NULL) != HAL_OK) { ALX_CAN_TRACE("ErrIrq"); return Alx_Err; };
 	#endif
 
@@ -265,21 +265,21 @@ Alx_Status AlxCan_DeInit(AlxCan* me)
 	ALX_CAN_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Disable CAN TX & RX IRQ
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	AlxCan_Periph_DisableIrq(me);
 	if(HAL_CAN_DeactivateNotification(&me->hcan, CAN_IT_TX_MAILBOX_EMPTY | CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) { ALX_CAN_TRACE("ErrIrq"); return Alx_Err; };
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	// #1 Disable CAN TX & RX IRQ
 	AlxCan_Periph_DisableIrq(me);
 	if (HAL_FDCAN_DeactivateNotification(&me->hcan, FDCAN_IT_TX_FIFO_EMPTY | FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != HAL_OK) { ALX_CAN_TRACE("ErrIrq"); return Alx_Err; };
 	#endif
 
 	// #2 DeInit CAN
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	if(HAL_CAN_DeInit(&me->hcan) != HAL_OK) { ALX_CAN_TRACE("ErrDeInit"); return Alx_Err; };
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	if(HAL_FDCAN_DeInit(&me->hcan) != HAL_OK) { ALX_CAN_TRACE("ErrDeInit"); return Alx_Err; };
 	#endif
 
@@ -401,10 +401,10 @@ bool AlxCan_IsErr(AlxCan* me)
 }
 void AlxCan_Foreground_Handle(AlxCan* me)
 {
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	HAL_CAN_IRQHandler(&me->hcan);
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	HAL_FDCAN_IRQHandler(&me->hcan);
 	#endif
 }
@@ -415,7 +415,7 @@ void AlxCan_Foreground_Handle(AlxCan* me)
 //******************************************************************************
 static bool AlxCan_Ctor_IsClkOk(AlxCan* me)
 {
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	if
 	(
 		#if defined(CAN1)
@@ -435,7 +435,7 @@ static bool AlxCan_Ctor_IsClkOk(AlxCan* me)
 		}
 	}
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	if
 	(
 		#if defined(FDCAN1)
@@ -635,7 +635,7 @@ static void AlxCan_Periph_DisableIrq(AlxCan* me)
 }
 static void AlxCan_TxMsg_TryAddToHwMailbox(AlxCan* me)
 {
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	while(HAL_CAN_GetTxMailboxesFreeLevel(&me->hcan) != 0)	// Add TX messages to HW mailboxes until all HW mailboxes are full
 	{
 		// #1 Prepare variables
@@ -692,7 +692,7 @@ static void AlxCan_TxMsg_TryAddToHwMailbox(AlxCan* me)
 		}
 	}
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	while(HAL_FDCAN_GetTxFifoFreeLevel(&me->hcan) != 0)	// Add TX messages to CAN TX FIFO until it's full
 	{
 		// #1 Prepare variables
@@ -755,7 +755,7 @@ static void AlxCan_TxMsg_TryAddToHwMailbox(AlxCan* me)
 }
 static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me)
 {
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	while(HAL_CAN_GetRxFifoFillLevel(&me->hcan, me->canRxFifo) != 0)	// Read RX messages from HW RX FIFO until it is empty
 	{
 		// #1 Prepare variables
@@ -811,7 +811,7 @@ static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me)
 		}
 	}
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	while(HAL_FDCAN_GetRxFifoFillLevel(&me->hcan, me->canRxFifo) != 0)	// Read RX messages from HW RX FIFO until it is empty
 	{
 		// #1 Prepare variables
@@ -868,7 +868,7 @@ static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me)
 	}
 	#endif
 }
-#if defined(STM32G4)
+#if defined(ALX_STM32G4)
 static uint32_t AlxCan_GetDataLenCode(uint8_t dataLen)
 {
 	if (dataLen == 0) return FDCAN_DLC_BYTES_0;
@@ -905,7 +905,7 @@ static uint8_t AlxCan_GetDataLen(uint32_t dataLenCode)
 //******************************************************************************
 // Callback Functions
 //******************************************************************************
-#if defined(STM32F4)
+#if defined(ALX_STM32F4)
 void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
 {
 	#if defined(CAN1)
@@ -947,7 +947,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	else								{ ALX_CAN_ASSERT(false); }	// We should never get here
 }
 #endif
-#if defined(STM32G4)
+#if defined(ALX_STM32G4)
 void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hcan)
 {
 	#if defined(FDCAN1)

@@ -1,0 +1,50 @@
+# Auralix C Library Wiki - Home
+---
+- Auralix C Library Wiki currently organizes information from the *Source Code Modules Perspective*
+    - Information is organized in relation to Auralix C Library source code modules
+
+## Modules
+---
+- Ext
+    - [alxCrn120 - ALX NFC WLC Communication Receiver CRN120 Module](Ext/alxWiki_alxCrn120.md)
+    - [alxPca9431 - ALX NFC WLC Power Receiver with LDO Output PCA9431 Module](Ext/alxWiki_alxPca9431.md)
+    - [alxPcal6416a - ALX IO Expander PCAL6416A Module](Ext/alxWiki_alxPcal6416a.md)
+- Hw
+    - [HwLpcXpresso55S69](Hw/HwLpcXpresso55S69/alxWiki_alxHwLpcXpresso55S69_Home.md)
+        - Test
+            - [alxHwLpcXpresso55S69_MfTest - ALX HW LPC Xpresso 55S69 MF Test Module](Hw/HwLpcXpresso55S69/Test/alxWiki_alxHwLpcXpresso55S69_MfTest.md)
+    - HwNfcWlcListenerV3_5b
+        - Test
+            - [alxHwNfcWlcListenerV3_5b_MfTest - ALX HW NFC WLC Listener V3_5b MF Test Module](Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_MfTest.md)
+            - [alxHwNfcWlcListenerV3_5b_JsTest - ALX HW NFC WLC Listener V3_5b JS Test Module](Hw/HwNfcWlcListenerV3_5b/Test/alxHwNfcWlcListenerV3_5b_JsTest.md)
+    - HwNucleoF429Zi
+        - Test
+            - [alxHwNucleoF429Zi_TvTest - ALX HW Nucleo-F429ZI TV Test Module](Hw/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_TvTest.md)
+            - [alxHwNucleoF429Zi_JsTest - ALX HW Nucleo-F429ZI JS Test Module](Hw/HwNucleoF429Zi/Test/alxWiki_alxHwNucleoF429Zi_JsTest.md)
+- Mcu
+    - McuLpc
+        - McuLpc17
+        - [McuLpc55S6x](Mcu/McuLpc/McuLpc55S6x/alxWiki_McuLpc55S6x.md)
+            - [alxAdc_McuLpc55S6x - ALX MCU LPC55S6x ADC Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxAdc_McuLpc55S6x.md)
+            - [alxClk_McuLpc55S6x - ALX MCU LPC55S6x Clock Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxClk_McuLpc55S6x.md)
+            - [alxIoPin_McuLpc55S6x - ALX MCU LPC55S6x IO Pin Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxIoPin_McuLpc55S6x.md)
+            - [alxIoPinIrq_McuLpc55S6x - ALX MCU LPC55S6x IO Pin Irq Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxIoPinIrq_McuLpc55S6x.md)
+            - [alxPwm_McuLpc55S6x - ALX MCU LPC55S6x PWM Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxPwm_McuLpc55S6x.md)
+            - [alxSpi_McuLpc55S6x - ALX MCU LPC55S6x SPI Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxSpi_McuLpc55S6x.md)
+            - [alxTrace_McuLpc55S6x - ALX MCU LPC55S6x Trace Module](Mcu/McuLpc/McuLpc55S6x/alxWiki_alxTrace_McuLpc55S6x.md)
+        - [McuLpc80x](Mcu/McuLpc/McuLpc80x/alxWiki_McuLpc80x.md)
+            - [alxAdc_McuLpc80x - ALX MCU LPC80x ADC Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxAdc_McuLpc80x.md)
+            - [alxClk_McuLpc80x - ALX MCU LPC80x Clock Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxClk_McuLpc80x.md)
+            - [alxDbgPin_McuLpc80x - ALX MCU LPC80x Debug Pin Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxDbgPin_McuLpc80x.md)
+            - [alxGlobal_McuLpc80x - ALX MCU LPC80x Global Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxGlobal_McuLpc80x.md)
+            - [alxI2c_McuLpc80x - ALX MCU LPC80x I2C Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxI2c_McuLpc80x.md)
+            - [alxIoPin_McuLpc80x - ALX MCU LPC80x IO Pin Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxIoPin_McuLpc80x.md)
+            - [alxIoPinIrq_McuLpc80x - ALX MCU LPC80x IO Pin Irq Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxIoPinIrq_McuLpc80x.md)
+            - [alxPwm_McuLpc80x - ALX MCU LPC80x PWM Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxPwm_McuLpc80x.md)
+            - [alxTrace_McuLpc80x - ALX MCU LPC80x Trace Module](Mcu/McuLpc/McuLpc80x/alxWiki_alxTrace_McuLpc80x.md)
+        - McuLpc84
+    - McuStm32
+        - McuStm32F1
+        - McuStm32F4
+        - McuStm32G4
+        - McuStm32L0

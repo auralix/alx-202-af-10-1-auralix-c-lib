@@ -1,0 +1,250 @@
+//****************************************************************************
+// @file alxHwNfcWlcListenerV3_5b_MainTest.h
+// @brief Auralix HW NFC WLC Listener V3.5 - Main Test Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//****************************************************************************
+
+#ifndef ALX_HW_NFC_WLC_LISTENER_V3_5B_MAIN_TEST_H
+#define ALX_HW_NFC_WLC_LISTENER_V3_5B_MAIN_TEST_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+//******************************************************************************
+// Includes
+//******************************************************************************
+#include <alxHwNfcWlcListenerV3_5b_Main.h>
+#if defined(ALX_TEST_GH)
+#include <alxHwNfcWlcListenerV3_5b_GhTest.h>
+#endif
+#if defined(ALX_TEST_GK)
+#include <alxHwNfcWlcListenerV3_5b_GkTest.h>
+#endif
+#if defined(ALX_TEST_JK)
+#include <alxHwNfcWlcListenerV3_5b_JkTest.h>
+#endif
+#if defined(ALX_TEST_JS)
+#include <alxHwNfcWlcListenerV3_5b_JsTest.h>
+#endif
+#if defined(ALX_TEST_MF)
+#include <alxHwNfcWlcListenerV3_5b_MfTest.h>
+#endif
+#if defined(ALX_TEST_TV)
+#include <alxHwNfcWlcListenerV3_5b_TvTest.h>
+#endif
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	///-------
+	/// Gh
+	///-------
+	#if defined(ALX_TEST_GH)
+	#endif
+
+	///-------
+	/// Gk
+	///-------
+	#if defined(ALX_TEST_GK)
+	#endif
+
+	///-------
+	/// Jk
+	///-------
+	#if defined(ALX_TEST_JK)
+	#endif
+
+	///-------
+	/// Js
+	///-------
+	#if defined(ALX_TEST_JS)
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp;
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431 alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431;
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120 alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120;
+	AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize alxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize;
+	#endif
+
+	///-------
+	/// Mf
+	///-------
+	#if defined(ALX_TEST_MF)
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp;
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120 alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120;
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120 alxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120;
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl alxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl;
+	#endif
+
+	///-------
+	/// Tv
+	///-------
+	#if defined(ALX_TEST_TV)
+	#endif
+} AlxHwNfcWlcListenerV3_5b_MainTest;
+
+
+//******************************************************************************
+// Variables
+//******************************************************************************
+extern AlxHwNfcWlcListenerV3_5b_MainTest alxHwNfcWlcListenerV3_5b_MainTest;
+
+
+//******************************************************************************
+// Constructor & Functions
+//******************************************************************************
+static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Ctor(AlxHwNfcWlcListenerV3_5b_MainTest* me)
+{
+	///-------
+	/// Gh
+	///-------
+	#if defined(ALX_TEST_GH)
+	#endif
+
+	///-------
+	/// Gk
+	///-------
+	#if defined(ALX_TEST_GK)
+	#endif
+
+	///-------
+	/// Jk
+	///-------
+	#if defined(ALX_TEST_JK)
+	#endif
+
+	///-------
+	/// Js
+	///-------
+	#if defined(ALX_TEST_JS)
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+	AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize_Ctor(&me->alxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize);
+	#endif
+
+	///-------
+	/// Mf
+	///-------
+	#if defined(ALX_TEST_MF)
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Ctor(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl);
+	#endif
+
+	///-------
+	/// Tv
+	///-------
+	#if defined(ALX_TEST_TV)
+	#endif
+}
+static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Init(AlxHwNfcWlcListenerV3_5b_MainTest* me)
+{
+	///-------
+	/// Gh
+	///-------
+	#if defined(ALX_TEST_GH)
+	#endif
+
+	///-------
+	/// Gk
+	///-------
+	#if defined(ALX_TEST_GK)
+	#endif
+
+	///-------
+	/// Jk
+	///-------
+	#if defined(ALX_TEST_JK)
+	#endif
+
+	///-------
+	/// Js
+	///-------
+	#if defined(ALX_TEST_JS)
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+	AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize_Init(&me->alxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize);
+	#endif
+
+	///-------
+	/// Mf
+	///-------
+	#if defined(ALX_TEST_MF)
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Init(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_Init(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Init(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl);
+	#endif
+
+	///-------
+	/// Tv
+	///-------
+	#if defined(ALX_TEST_TV)
+	#endif
+}
+static inline void AlxHwNfcWlcListenerV3_5b_MainTest_Run(AlxHwNfcWlcListenerV3_5b_MainTest* me)
+{
+	///-------
+	/// Gh
+	///-------
+	#if defined(ALX_TEST_GH)
+	#endif
+
+	///-------
+	/// Gk
+	///-------
+	#if defined(ALX_TEST_GK)
+	#endif
+
+	///-------
+	/// Jk
+	///-------
+	#if defined(ALX_TEST_JK)
+	#endif
+
+	///-------
+	/// Js
+	///-------
+	#if defined(ALX_TEST_JS)
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G02_Pca9431);
+	//AlxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G03_Crn120);
+	AlxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize_Run(&me->alxHwNfcWlcListenerV3_5b_JsTest_G04_Pca9431_Optimize);
+	#endif
+
+	///-------
+	/// Mf
+	///-------
+	#if defined(ALX_TEST_MF)
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp_Run(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G01_BringUp);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120_Run(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G02_I2cCrn120);
+	//AlxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120_Run(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G03_AlxCrn120);
+	AlxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl_Run(&me->alxHwNfcWlcListenerV3_5b_Main_MfTest_G04_AlxWlcl);
+	#endif
+
+	///-------
+	/// Tv
+	///-------
+	#if defined(ALX_TEST_TV)
+	#endif
+}
+
+
+#endif // #if defined(ALX_HW_NFC_WLC_LISTENER_V3_5B_C_TEST)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // ALX_HW_NFC_WLC_LISTENER_V3_5B_MAIN_TEST_H

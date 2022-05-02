@@ -7,8 +7,8 @@
   ******************************************************************************
   */
 
-#ifndef ALX_I2C_MCU_LPC80x_H
-#define ALX_I2C_MCU_LPC80x_H
+#ifndef ALX_I2C_MCU_LPC80X_H
+#define ALX_I2C_MCU_LPC80X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,7 +27,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80x)
+#if defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -35,8 +35,8 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxI2c_Clk_McuLpc80x_BitRate_100kHz_I2cFuncClk_15MHz = 100000U,
-	AlxI2c_Clk_McuLpc80x_BitRate_400kHz_I2cFuncClk_15MHz = 400000U,
+	AlxI2c_Clk_McuLpc80x_BitRate_100kHz = 100000U,
+	AlxI2c_Clk_McuLpc80x_BitRate_400kHz = 400000U,
 } AlxI2c_Clk;
 
 typedef struct
@@ -51,7 +51,7 @@ typedef struct
 
 	// Variables
 	i2c_master_config_t i2cConfig;
-	AlxTimSw timeout_ms;
+	AlxTimSw tim;
 
 	// Info
 	bool isInit;
@@ -78,4 +78,4 @@ void AlxI2c_Ctor
 }
 #endif
 
-#endif // ALX_I2C_MCU_LPC80x_H
+#endif // ALX_I2C_MCU_LPC80X_H

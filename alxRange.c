@@ -175,13 +175,13 @@ Alx_Status AlxRange_CheckDouble(double val, double valMin, double valMax)
 		return Alx_ErrOutOfRangeLen;
 	else
 		return Alx_Ok;
-}*/
+}*/	// TO DO
 Alx_Status AlxRange_CheckStr(char* val, uint32_t valLenMax)
 {
 	ALX_RANGE_ASSERT(0 <= valLenMax);
 
 	uint32_t valLen = strlen(val);
-	if (valLen > (valLenMax - 1))
+	if (valLen > valLenMax )
 		return Alx_ErrOutOfRangeLen;
 	else
 		return Alx_Ok;

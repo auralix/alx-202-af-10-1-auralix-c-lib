@@ -26,7 +26,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_MEM_SAFE_FILE "alxMemSafe.h"
+#define ALX_MEM_SAFE_FILE "alxMemSafe"
 
 // Assert //
 #if defined(_ALX_MEM_SAFE_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -69,13 +69,10 @@ typedef struct
 	uint32_t copyLen;
 	uint32_t copyCrcLen;
 	uint32_t copyLenWithCrc;
-
 	bool nonBlockingEnable;
-	
 	uint8_t memSafeReadWriteNumOfTries;
 	uint8_t memRawReadWriteNumOfTries;
 	uint16_t memRawReadWriteTimeout_ms;
-
 	uint8_t* buff1;
 	uint32_t buff1Len;
 	uint8_t* buff2;
@@ -129,6 +126,7 @@ bool AlxMemSafe_IsReadDone(AlxMemSafe* me);
 bool AlxMemSafe_IsReadErr(AlxMemSafe* me);
 bool AlxMemSafe_IsWriteDone(AlxMemSafe* me);
 bool AlxMemSafe_IsWriteErr(AlxMemSafe* me);
+
 
 #ifdef __cplusplus
 }
