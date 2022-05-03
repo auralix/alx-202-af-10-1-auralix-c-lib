@@ -85,10 +85,10 @@ void AlxTrace_Ctor
 //******************************************************************************
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
-	// #1 Lock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Lock(&me->mutex);
-	#endif
+//	// #1 Lock Mutex
+//	#if defined(ALX_OS)
+//	AlxOsMutex_Lock(&me->mutex);
+//	#endif
 
 	// #2 Set IoPin Usart Func
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, AlxTrace_GetIoconFunc(me));
@@ -102,20 +102,20 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	// #5 Set isInit
 	me->isInit = true;
 
-	// #6 Unlock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Unlock(&me->mutex);
-	#endif
+//	// #6 Unlock Mutex
+//	#if defined(ALX_OS)
+//	AlxOsMutex_Unlock(&me->mutex);
+//	#endif
 
 	// #7 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
-	// #1 Lock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Lock(&me->mutex);
-	#endif
+//	// #1 Lock Mutex
+//	#if defined(ALX_OS)
+//	AlxOsMutex_Lock(&me->mutex);
+//	#endif
 
 	// #2 DeInit USART
 	USART_Deinit(me->usart);	// MF: Always returns Success, so we won't hande return
@@ -129,10 +129,10 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 	// #5 Reset isInit
 	me->isInit = false;
 
-	// #6 Unlock Mutex
-	#if defined(ALX_OS)
-	AlxOsMutex_Unlock(&me->mutex);
-	#endif
+//	// #6 Unlock Mutex
+//	#if defined(ALX_OS)
+//	AlxOsMutex_Unlock(&me->mutex);
+//	#endif
 
 	// #7 Return OK
 	return Alx_Ok;
