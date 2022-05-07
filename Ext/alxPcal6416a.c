@@ -21,15 +21,12 @@ static void AlxPcal6416a_RegStruct_SetLen(AlxPcal6416a* me);
 static void AlxPcal6416a_RegStruct_SetValToZero(AlxPcal6416a* me);
 static void AlxPcal6416a_RegStruct_SetValToDefault(AlxPcal6416a* me);
 
-static Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg);
-static Alx_Status AlxPcal6416a_Reg_Read(AlxPcal6416a* me, void* reg);
-static Alx_Status AlxPcal6416a_Reg_WriteAll(AlxPcal6416a* me);
-
 
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
 void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me);
+Alx_Status AlxPcal6416a_Reg_WriteAll(AlxPcal6416a* me);
 
 
 //******************************************************************************
@@ -152,7 +149,7 @@ Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me)
 	// #4 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me)
+Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inputPort0, bool inputPort1, bool outputPort0, bool outputPort1)
 {
 	// #1 Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
@@ -162,21 +159,29 @@ Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me)
 	// #2 Prepare variables
 	Alx_Status status = Alx_Err;
 
-	// #3 Read registers InputPort_0 and InputPort_1
-	status = AlxPcal6416a_Reg_Read(me, &me->reg._00h_InputPort_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+	// #3 Handle
+	if (inputPort0)
+	{
+		status = AlxPcal6416a_Reg_Read(me, &me->reg._00h_InputPort_0);
+		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+	}
+	if (inputPort1)
+	{
+		status = AlxPcal6416a_Reg_Read(me, &me->reg._01h_InputPort_1);
+		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+	}
+	if (outputPort0)
+	{
+		status = AlxPcal6416a_Reg_Write(me, &me->reg._02h_OutputPort_0);
+		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+	}
+	if (outputPort1)
+	{
+		status = AlxPcal6416a_Reg_Write(me, &me->reg._03h_OutputPort_1);
+		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+	}
 
-	status = AlxPcal6416a_Reg_Read(me, &me->reg._01h_InputPort_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
-
-	// #4 Write registers OutputPort_0 and OutputPort_1
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._02h_OutputPort_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._03h_OutputPort_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
-
-	// #5 Return OK
+	// #4 Return OK
 	return Alx_Ok;
 }
 bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_PortPin pin)
@@ -275,6 +280,38 @@ void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_PortPin pin)
 
 	// #3 Asset
 	ALX_PCAL6416A_ASSERT(false);	// We sould not get here
+}
+Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg)
+{
+	// #1 Prepare variables
+	Alx_Status status = Alx_Err;
+
+	uint8_t regAddr = *((uint8_t*)reg);
+	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+
+	// #2 Write address and data
+	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+
+	// #3 Return OK
+	return Alx_Ok;
+}
+Alx_Status AlxPcal6416a_Reg_Read(AlxPcal6416a* me, void* reg)
+{
+	// #1 Prepare variables
+	Alx_Status status = Alx_Err;
+
+	uint8_t regAddr = *((uint8_t*)reg);
+	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+
+	// #2 Write address and Read data
+	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
+	if(status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err") ; return status ; }
+
+	// #3 Return OK
+	return Alx_Ok;
 }
 
 
@@ -389,39 +426,12 @@ static void AlxPcal6416a_RegStruct_SetValToDefault(AlxPcal6416a* me)
 	//me->reg._4Dh_IrqStatus_1			.val.raw = 0b00000000;	// MF: Read Only Reg
 	me->reg._4Fh_OutputPortConfig		.val.raw = 0b00000000;
 }
-static Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg)
-{
-	// #1 Prepare variables
-	Alx_Status status = Alx_Err;
 
-	uint8_t regAddr = *((uint8_t*)reg);
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
 
-	// #2 Write address and data
-	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
-
-	// #3 Return OK
-	return Alx_Ok;
-}
-static Alx_Status AlxPcal6416a_Reg_Read(AlxPcal6416a* me, void* reg)
-{
-	// #1 Prepare variables
-	Alx_Status status = Alx_Err;
-
-	uint8_t regAddr = *((uint8_t*)reg);
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
-
-	// #2 Write address and Read data
-	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if(status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err") ; return status ; }
-
-	// #3 Return OK
-	return Alx_Ok;
-}
-static Alx_Status AlxPcal6416a_Reg_WriteAll(AlxPcal6416a* me)
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+ALX_WEAK Alx_Status AlxPcal6416a_Reg_WriteAll(AlxPcal6416a* me)
 {
 	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
@@ -499,11 +509,6 @@ static Alx_Status AlxPcal6416a_Reg_WriteAll(AlxPcal6416a* me)
 	// #3 Return Ok
 	return Alx_Ok;
 }
-
-
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
 ALX_WEAK void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me)
 {
 	(void)me;
