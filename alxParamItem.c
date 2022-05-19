@@ -1,11 +1,8 @@
-/**
-  ******************************************************************************
-  * @file alxParamItem.c
-  * @brief Auralix C Library - ALX Parameter Item Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+//******************************************************************************
+// @file alxParamItem.c
+// @brief Auralix C Library - ALX Parameter Item Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
 
 //******************************************************************************
 // Includes
@@ -261,7 +258,7 @@ void AlxParamItem_CtorFloat
 )
 {
 	// Parameters
-		me->type = AlxParamItem_Type_Float;
+	me->type = AlxParamItem_Type_Float;
 	me->name = name;
 	me->id = id;
 	me->groupId = groupId;
@@ -359,8 +356,8 @@ void AlxParamItem_CtorArr
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
-	memcpy(me->valDef.voidPtr, valDef, me->valLen);			// Copy default value to default value buffer
-	memcpy(me->val.voidPtr, me->valDef.voidPtr, me->valLen);// Copy default value buffer to main buffer
+	memcpy(me->valDef.voidPtr, valDef, me->valLen);				// Copy default value to default value buffer
+	memcpy(me->val.voidPtr, me->valDef.voidPtr, me->valLen);	// Copy default value buffer to main buffer
 
 	// Info
 	me->wasCtorCalled = true;
@@ -392,8 +389,8 @@ void AlxParamItem_CtorStr
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
 
 	// Variables
-	strcpy(valDefBuff, valDef); // Save default string to default buffer
-	strcpy(valBuff, valDef);	// Save default string to buffer
+	strcpy(valDefBuff, valDef);			// Save default string to default buffer
+	strcpy(valBuff, valDef);			// Save default string to buffer
 
 	// Info
 	me->wasCtorCalled = true;
@@ -476,7 +473,7 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	else if (me->type == AlxParamItem_Type_Bool)	{ me->val._bool = me->valDef._bool; }
 	else if (me->type == AlxParamItem_Type_Uint16)	{ me->val.voidPtr = me->valDef.voidPtr; }
 	else if (me->type == AlxParamItem_Type_Uint16)	{ strcpy(me->val.charPtr, me->valDef.charPtr); }
-	else											{ ALX_PARAM_ITEM_ASSERT(false); } // We should never get here
+	else											{ ALX_PARAM_ITEM_ASSERT(false); }	// We should never get here
 }
 uint8_t AlxParamItem_GetValUint8(AlxParamItem* me)
 {
@@ -621,7 +618,7 @@ Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}
@@ -674,7 +671,7 @@ Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}
@@ -727,7 +724,7 @@ Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}
@@ -780,7 +777,7 @@ Alx_Status AlxParamItem_SetValUint64(AlxParamItem* me, uint64_t val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}
@@ -833,7 +830,7 @@ Alx_Status AlxParamItem_SetValInt8(AlxParamItem* me, int8_t val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}
@@ -886,7 +883,7 @@ Alx_Status AlxParamItem_SetValInt16(AlxParamItem* me, int16_t val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}
@@ -939,7 +936,7 @@ Alx_Status AlxParamItem_SetValInt32(AlxParamItem* me, int32_t val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}
@@ -992,7 +989,7 @@ Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}
@@ -1045,7 +1042,7 @@ Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}
@@ -1098,7 +1095,7 @@ Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}
@@ -1189,7 +1186,7 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 		}
 		default:
 		{
-			ALX_PARAM_ITEM_ASSERT(false); // We should never get here
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 			status = Alx_Err;
 			break;
 		}

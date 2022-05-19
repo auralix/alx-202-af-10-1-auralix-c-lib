@@ -1,11 +1,9 @@
-/**
-  ******************************************************************************
-  * @file alxCrc.c
-  * @brief Auralix C Library - ALX CRC Module
-  * @version $LastChangedRevision: 4270 $
-  * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
-  ******************************************************************************
-  */
+//******************************************************************************
+// @file alxCrc.c
+// @brief Auralix C Library - ALX CRC Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
+
 
 //******************************************************************************
 // Includes
@@ -14,12 +12,19 @@
 
 
 //******************************************************************************
+// Private Functions
+//******************************************************************************
+static uint32_t AlxCrc_Reflect(uint32_t data, uint8_t nBits);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxCrc_Ctor
 (
 	AlxCrc* me,
-	AlxCrc_Config config)
+	AlxCrc_Config config
+)
 {
 	// Parameters
 	me->config = config;
@@ -30,16 +35,14 @@ void AlxCrc_Ctor
 
 
 //******************************************************************************
-// Private Functions Declarations
-//******************************************************************************
-uint32_t Reflect(uint32_t data, const uint8_t nBits);
-
-
-//******************************************************************************
 // Functions
 //******************************************************************************
 uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 {
+	// #1 Assert
+	ALX_CRC_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Handle CRC calculation
 	switch (me->config)
 	{
 		case AlxCrc_Config_Ccitt:
@@ -50,8 +53,8 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			const uint16_t initialRemainder = 0xFFFF;
 			const uint16_t finalXorValue = 0x0000;
 			uint16_t remainder = initialRemainder;
-			uint32_t byte;
-			uint8_t  bit;
+			uint32_t byte = 0;
+			uint8_t  bit = 0;
 
 			// #2 Perform modulo-2 division, a byte at a time.
 			for (byte = 0; byte < len; ++byte)
@@ -87,14 +90,14 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			const uint16_t initialRemainder = 0x0000;
 			const uint16_t finalXorValue = 0x0000;
 			uint16_t remainder = initialRemainder;
-			uint32_t byte;
-			uint8_t  bit;
+			uint32_t byte = 0;
+			uint8_t  bit = 0;
 
 			// #2 Perform modulo-2 division, a byte at a time.
 			for (byte = 0; byte < len; ++byte)
 			{
 				// #2.1 Bring the next byte into the remainder.
-				remainder ^= (((uint8_t)Reflect((data[byte]), 8)) << (width - 8));
+				remainder ^= (((uint8_t)AlxCrc_Reflect((data[byte]), 8)) << (width - 8));
 
 				// #2.2 Perform modulo-2 division, a bit at a time.
 				for (bit = 8; bit > 0; --bit)
@@ -112,7 +115,7 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			}
 
 			// #3 The final remainder is the CRC result.
-			return (((uint16_t)Reflect((remainder), width)) ^ finalXorValue);
+			return (((uint16_t)AlxCrc_Reflect((remainder), width)) ^ finalXorValue);
 			break;
 		}
 		case AlxCrc_Config_Crc32:
@@ -123,14 +126,14 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			const uint32_t initialRemainder = 0xFFFFFFFF;
 			const uint32_t finalXorValue = 0xFFFFFFFF;
 			uint32_t remainder = initialRemainder;
-			uint32_t byte;
-			uint8_t  bit;
+			uint32_t byte = 0;
+			uint8_t  bit = 0;
 
 			// #2 Perform modulo-2 division, a byte at a time.
 			for (byte = 0; byte < len; ++byte)
 			{
 				// #2.1 Bring the next byte into the remainder.
-				remainder ^= (((uint8_t)Reflect((data[byte]), 8)) << (width - 8));
+				remainder ^= (((uint8_t)AlxCrc_Reflect((data[byte]), 8)) << (width - 8));
 
 				// #2.2 Perform modulo-2 division, a bit at a time.
 				for (bit = 8; bit > 0; --bit)
@@ -148,97 +151,99 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			}
 
 			// #3 The final remainder is the CRC result.
-			return (((uint32_t)Reflect((remainder), width)) ^ finalXorValue);
+			return (((uint32_t)AlxCrc_Reflect((remainder), width)) ^ finalXorValue);
+			break;
+		}
+		default:
+		{
+			ALX_CRC_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
 }
 bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t* validatedCrc)
 {
-	// #1 Prepare variables
-	uint32_t crcLen = 0;
+	// #1 Assert
+	ALX_CRC_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Prepare variables
 	union
 	{
 		uint32_t crcToCheck;
 		uint8_t raw[4];
-	} crc;
+	} crc = {};
 
-	// #2 Get Crc lenght based on cunfiguration
-	switch (me->config)
-	{
-	case AlxCrc_Config_Ccitt:
-		{
-			crcLen = 2;
-			break;
-		}
-	case AlxCrc_Config_Crc16:
-		{
-			crcLen = 2;
-			break;
-		}
-	case AlxCrc_Config_Crc32:
-		{
-			crcLen = 4;
-			break;
-		}
-	}
+	// #3 Get CRC lenght based on configuration
+	uint32_t crcLen = AlxCrc_GetLen(me);
 
-	// #3 Copy Crc from dataWithCrc to local union
+	// #4 Copy CRC from dataWithCrc to local union
 	memcpy(crc.raw, &dataWithCrc[lenWithCrc - crcLen], crcLen);
 
-	// #4 Calculate new Crc with data from dataWithCrc
+	// #5 Calculate new CRC with data from dataWithCrc
 	uint32_t crcCalc = AlxCrc_Calc(me, dataWithCrc, lenWithCrc - crcLen);
 
-	// #5 Check if Crc-s match
+	// #6 Check if CRCs match
 	if (crc.crcToCheck == crcCalc)
 	{
 		*validatedCrc = crcCalc;
 		return true;
 	}
-	else return false;
+	else
+	{
+		return false;
+	}
 }
 uint32_t AlxCrc_GetLen(AlxCrc* me)
 {
+	// #1 Assert
+	ALX_CRC_ASSERT(me->wasCtorCalled == true);
+
+	// #2 Get & return lenght
 	switch (me->config)
 	{
-	case AlxCrc_Config_Ccitt:
+		case AlxCrc_Config_Ccitt:
 		{
 			return 2;
 			break;
 		}
-	case AlxCrc_Config_Crc16:
+		case AlxCrc_Config_Crc16:
 		{
 			return 2;
 			break;
 		}
-	case AlxCrc_Config_Crc32:
+		case AlxCrc_Config_Crc32:
 		{
 			return 4;
 			break;
 		}
+		default:
+		{
+			ALX_CRC_ASSERT(false);	// We should never get here
+			break;
+		}
 	}
-
 }
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-uint32_t Reflect(uint32_t data, const uint8_t nBits)
+static uint32_t AlxCrc_Reflect(uint32_t data, uint8_t nBits)
 {
 	// #1 Prepare variables
 	uint32_t reflection = 0x00000000;
-	uint8_t  bit;
 
-	// #2 Reflect the data about the center bit.
-	for (bit = 0; bit < nBits; ++bit)
+	// #2 Reflect the data about the center bit
+	for (uint8_t bit = 0; bit < nBits; ++bit)
 	{
-		// #3 If the LSB bit is set, set the reflection of it.
+		// #2.1 If the LSB bit is set, set the reflection of it
 		if (data & 0x01)
 		{
 			reflection |= (1 << ((nBits - 1) - bit));
 		}
 		data = (data >> 1);
 	}
-	return (reflection);
+
+	// #3 Return
+	return reflection;
 }

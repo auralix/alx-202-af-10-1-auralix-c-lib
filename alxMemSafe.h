@@ -1,11 +1,8 @@
-/**
-  ******************************************************************************
-  * @file alxMemSafe.h
-  * @brief Auralix C Library - ALX Memory Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+//******************************************************************************
+// @file alxMemSafe.h
+// @brief Auralix C Library - ALX Memory Safe Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
 
 #ifndef ALX_MEM_SAFE_H
 #define ALX_MEM_SAFE_H
@@ -26,7 +23,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_MEM_SAFE_FILE "alxMemSafe"
+#define ALX_MEM_SAFE_FILE "alxMemSafe.h"
 
 // Assert //
 #if defined(_ALX_MEM_SAFE_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -46,24 +43,15 @@ extern "C" {
 	#define ALX_MEM_SAFE_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_MEM_SAFE_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_MEM_SAFE_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_MEM_SAFE_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
+	// Parameters
 	AlxMemRaw* memRaw;
 	AlxCrc* crc;
-
-	// Parameters
 	uint32_t copyAddrA;
 	uint32_t copyAddrB;
 	uint32_t copyLen;
@@ -91,7 +79,6 @@ typedef struct
 
 	// Info
 	bool wasCtorCalled;
-	bool isInit;
 } AlxMemSafe;
 
 
@@ -132,4 +119,4 @@ bool AlxMemSafe_IsWriteErr(AlxMemSafe* me);
 }
 #endif
 
-#endif // ALX_MEM_SAFE_H
+#endif	// #ifndef ALX_MEM_SAFE_H

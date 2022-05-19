@@ -1,11 +1,8 @@
-/**
-  ******************************************************************************
-  * @file alxCrc.h
-  * @brief Auralix C Library - ALX CRC Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+//******************************************************************************
+// @file alxCrc.h
+// @brief Auralix C Library - ALX CRC Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
 
 #ifndef ALX_CRC_H
 #define ALX_CRC_H
@@ -24,7 +21,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_CRC_FILE "alxCrc"
+#define ALX_CRC_FILE "alxCrc.h"
 
 // Assert //
 #if defined(_ALX_CRC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -44,13 +41,6 @@ extern "C" {
 	#define ALX_CRC_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_CRC_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_CRC_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_CRC_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -66,9 +56,6 @@ typedef struct
 {
 	// Parameters
 	AlxCrc_Config config;
-
-	// Variables
-	uint32_t len;
 
 	// Info
 	bool wasCtorCalled;
@@ -97,4 +84,4 @@ uint32_t AlxCrc_GetLen(AlxCrc* me);
 }
 #endif
 
-#endif // ALX_CRC_H
+#endif	// #ifndef ALX_CRC_H
