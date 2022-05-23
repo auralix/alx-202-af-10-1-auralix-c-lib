@@ -47,7 +47,7 @@ void AlxParamStore_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* statusParamGroup, uint8_t numOfParamGroups)
+Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* statusParamGroup, uint32_t numOfParamGroups)
 {
 	// Assert
 	ALX_PARAM_STORE_ASSERT(me->wasCtorCalled == true);

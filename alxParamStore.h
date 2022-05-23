@@ -64,7 +64,7 @@ typedef struct
 {
 	// Parameters
 	AlxParamGroup** paramGroupArr;
-	uint8_t numOfParamGroups;
+	uint32_t numOfParamGroups;
 
 	// Variables
 	AlxParamStore_St st;
@@ -90,7 +90,7 @@ void AlxParamStore_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* status, uint8_t numOfParamGroups);
+Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* status, uint32_t numOfParamGroups);
 void AlxParamStore_Handle(AlxParamStore* me);
 bool AlxParamStore_IsErr(AlxParamStore* me);
 
