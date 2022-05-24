@@ -1,11 +1,8 @@
-﻿/**
-  ******************************************************************************
-  * @file alxParamGroup.c
-  * @brief Auralix C Library - ALX Parameter Group Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+﻿//******************************************************************************
+// @file alxParamGroup.c
+// @brief Auralix C Library - ALX Parameter Group Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
 
 //******************************************************************************
 // Includes
@@ -37,10 +34,8 @@ void AlxParamGroup_Ctor
 	uint8_t initNumOfTries
 )
 {
-	// Objects - External
-	me->memSafe = memSafe;
-
 	// Parameters
+	me->memSafe = memSafe;
 	me->name = name;
 	me->len = len;
 	me->valBuff = valBuff;
@@ -49,8 +44,6 @@ void AlxParamGroup_Ctor
 	me->paramItemArr = paramItemArr;
 	me->numOfParamItems = numOfParamItems;
 	me->initNumOfTries = initNumOfTries;
-
-	// Variables
 
 	// Info
 	me->wasCtorCalled = true;
@@ -85,8 +78,9 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 			{
 				// Update
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
+
 				// Trace
-				ALX_PARAM_GROUP_TRACE("%s - CrcOkSame_UsedCopyA", me->name);
+				ALX_PARAM_GROUP_TRACE("%s_CrcOkSame_UsedCopyA", me->name);
 
 				// Break
 				break;
@@ -97,7 +91,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
 
 				// Trace
-				ALX_PARAM_GROUP_TRACE("%s - CrcOkDiff_UsedCopyA", me->name);
+				ALX_PARAM_GROUP_TRACE("%s_CrcOkDiff_UsedCopyA", me->name);
 
 				// Break
 				break;
@@ -108,7 +102,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
 
 				// Trace
-				ALX_PARAM_GROUP_TRACE("%s - CopyANokCopyBOk_UsedCopyB", me->name);
+				ALX_PARAM_GROUP_TRACE("%s_CopyANokCopyBOk_UsedCopyB", me->name);
 
 				// Break
 				break;
@@ -119,7 +113,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
 
 				// Trace
-				ALX_PARAM_GROUP_TRACE("%s - CopyAOkCopyBNok_UsedCopyA", me->name);
+				ALX_PARAM_GROUP_TRACE("%s_CopyAOkCopyBNok_UsedCopyA", me->name);
 
 				// Break
 				break;
@@ -134,7 +128,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				if (statusAlxMemSafeWrite != Alx_Ok)
 				{
 					// Trace
-					ALX_PARAM_GROUP_TRACE("%s - BothNok_ResetToDef_WriteErr", me->name);
+					ALX_PARAM_GROUP_TRACE("%s_BothNok_ResetToDef_WriteErr", me->name);
 
 					// Continue
 					continue;
@@ -142,11 +136,11 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				else
 				{
 					// Update
-					me->isInit = true; // isInit has to be set to true here, otherwise assert is triggered when copying default values
+					me->isInit = true;	// JK: isInit has to be set to true here, otherwise assert is triggered when copying default values
 					AlxParamGroup_ValToStoreBuffToValStoredBuff(me);
 
 					// Trace
-					ALX_PARAM_GROUP_TRACE("%s - BothNok_ResToDef");
+					ALX_PARAM_GROUP_TRACE("%s_BothNok_ResToDef", me->name);
 
 					// Break
 					break;
@@ -154,12 +148,12 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 			}
 			case Alx_Err:
 			{
-				ALX_PARAM_GROUP_TRACE("%s - Err", me->name);
+				ALX_PARAM_GROUP_TRACE("%s_Err", me->name);
 				continue;
 			}
 			default:
 			{
-				ALX_PARAM_GROUP_ASSERT(false);	// We should not get here
+				ALX_PARAM_GROUP_ASSERT(false);	// We should never get here
 				return Alx_Err;
 			}
 		}

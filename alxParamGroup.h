@@ -1,11 +1,8 @@
-/**
-  ******************************************************************************
-  * @file alxParamGroup.h
-  * @brief Auralix C Library - ALX Parameter Group Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+//******************************************************************************
+// @file alxParamGroup.h
+// @brief Auralix C Library - ALX Parameter Group Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
 
 #ifndef ALX_PARAM_GROUP_H
 #define ALX_PARAM_GROUP_H
@@ -26,7 +23,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PARAM_GROUP_FILE "alxParamGroup"
+#define ALX_PARAM_GROUP_FILE "alxParamGroup.h"
 
 // Assert //
 #if defined(_ALX_PARAM_GROUP_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -46,23 +43,14 @@ extern "C" {
 	#define ALX_PARAM_GROUP_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_PARAM_GROUP_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_PARAM_GROUP_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_PARAM_GROUP_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxMemSafe* memSafe;
-
 	// Parameters
+	AlxMemSafe* memSafe;
 	const char* name;
 	uint32_t len;
 	uint8_t* valBuff;
@@ -71,8 +59,6 @@ typedef struct
 	AlxParamItem** paramItemArr;
 	uint32_t numOfParamItems;
 	uint8_t initNumOfTries;
-
-	// Variables
 
 	// Info
 	bool wasCtorCalled;
@@ -110,8 +96,9 @@ void AlxParamGroup_ValBuffToValToStoreBuff(AlxParamGroup* me);
 void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me);
 void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me);
 
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_PARAM_GROUP_H
+#endif	// #ifndef ALX_PARAM_GROUP_H

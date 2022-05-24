@@ -1,11 +1,8 @@
-/**
-  ******************************************************************************
-  * @file alxMemRaw.h
-  * @brief Auralix C Library - ALX Memory Raw Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+//******************************************************************************
+// @file alxMemRaw.h
+// @brief Auralix C Library - ALX Memory Raw Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
 
 #ifndef ALX_MEM_RAW_H
 #define ALX_MEM_RAW_H
@@ -24,7 +21,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_MEM_RAW_FILE "alxMemRaw"
+#define ALX_MEM_RAW_FILE "alxMemRaw.h"
 
 // Assert //
 #if defined(_ALX_MEM_RAW_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -42,13 +39,6 @@ extern "C" {
 	#define ALX_MEM_RAW_TRACE(...) ALX_TRACE_STD(ALX_MEM_RAW_FILE, __VA_ARGS__)
 #else
 	#define ALX_MEM_RAW_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_MEM_RAW_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_MEM_RAW_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_MEM_RAW_DBG_PIN(...) do{} while (false)
 #endif
 
 
@@ -85,4 +75,4 @@ Alx_Status AlxMemRaw_Write(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t
 }
 #endif
 
-#endif // ALX_MEM_RAW_H
+#endif	// #ifndef ALX_MEM_RAW_H

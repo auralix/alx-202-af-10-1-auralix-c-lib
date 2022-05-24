@@ -20,6 +20,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxDelay.h"
 
 
 //******************************************************************************
@@ -43,7 +44,6 @@ typedef struct
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-	bool isAssertOn;
 } AlxIoPin;
 
 
@@ -58,9 +58,9 @@ void AlxIoPin_Ctor
 	uint32_t mode,
 	uint32_t pull,
 	uint32_t speed,
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
-	uint32_t alternate,	  
-#endif // defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	uint32_t alternate,
+	#endif // defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 	bool val
 );
 

@@ -1,11 +1,9 @@
-/**
-  ******************************************************************************
-  * @file alxMemSafe.c
-  * @brief Auralix C Library - ALX Memory Safe Module
-  * @version $LastChangedRevision: 4270 $
-  * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
-  ******************************************************************************
-  */
+//******************************************************************************
+// @file alxMemSafe.c
+// @brief Auralix C Library - ALX Memory Safe Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
+
 
 //******************************************************************************
 // Includes
@@ -34,33 +32,36 @@ void AlxMemSafe_Ctor
 	uint32_t buff2Len
 )
 {
-	// Objects - External
+	// Parameters
 	me->memRaw = memRaw;
 	me->crc = crc;
-
-	// Parameters
 	me->copyAddrA = copyAddrA;
 	me->copyAddrB = copyAddrB;
 	me->copyLen = copyLen;
 	me->copyCrcLen = AlxCrc_GetLen(crc);
 	me->copyLenWithCrc = copyLen + me->copyCrcLen;
 	me->nonBlockingEnable = nonBlockingEnable;
-
 	me->memSafeReadWriteNumOfTries = memSafeReadWriteNumOfTries;
 	me->memRawReadWriteNumOfTries = memRawReadWriteNumOfTries;
 	me->memRawReadWriteTimeout_ms = memRawReadWriteTimeout_ms;
-
 	me->buff1 = buff1;
 	me->buff1Len = buff1Len;
 	me->buff2 = buff2;
 	me->buff2Len = buff2Len;
 
-	// Assert
-	// TO DO
+	// Variables
+	me->crcCopyA = 0;
+	me->crcCopyB = 0;
+	me->isCopyAValid = false;
+	me->isCopyBValid = false;
+	me->crcToWrite = 0;
+	me->isReadDone = false;
+	me->isReadErr = false;
+	me->isWriteDone = false;
+	me->isWriteErr = false;
 
 	// Info
 	me->wasCtorCalled = true;
-	me->isInit = false;
 }
 
 
@@ -80,7 +81,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 	if (me->nonBlockingEnable)
 	{
 		// TODO
-		ALX_MEM_SAFE_ASSERT(false);	// We should not get here
+		ALX_MEM_SAFE_ASSERT(false);
 		return Alx_Err;
 	}
 
@@ -223,7 +224,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 				// #3.2.5.6 Assert
 				else
 				{
-					ALX_MEM_SAFE_ASSERT(false);	// We should not get here
+					ALX_MEM_SAFE_ASSERT(false);	// We should never get here
 					return Alx_Err;
 				}
 			}
@@ -250,7 +251,7 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 	if (me->nonBlockingEnable)
 	{
 		// TODO
-		ALX_MEM_SAFE_ASSERT(false);	// We should not get here
+		ALX_MEM_SAFE_ASSERT(false);
 		return Alx_Err;
 	}
 

@@ -1,11 +1,8 @@
-/**
-  ******************************************************************************
-  * @file alxParamItem.h
-  * @brief Auralix C Library - ALX Parameter Item Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+//******************************************************************************
+// @file alxParamItem.h
+// @brief Auralix C Library - ALX Parameter Item Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
 
 #ifndef ALX_PARAM_ITEM_H
 #define ALX_PARAM_ITEM_H
@@ -26,7 +23,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PARAM_ITEM_FILE "alxParamItem"
+#define ALX_PARAM_ITEM_FILE "alxParamItem.h"
 
 // Assert //
 #if defined(_ALX_PARAM_ITEM_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -44,13 +41,6 @@ extern "C" {
 	#define ALX_PARAM_ITEM_TRACE(...) ALX_TRACE_STD(ALX_PARAM_ITEM_FILE, __VA_ARGS__)
 #else
 	#define ALX_PARAM_ITEM_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_PARAM_ITEM_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_PARAM_ITEM_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_PARAM_ITEM_DBG_PIN(...) do{} while (false)
 #endif
 
 
@@ -312,4 +302,4 @@ Alx_Status			AlxParamItem_SetValStr		(AlxParamItem* me, char* val);
 }
 #endif
 
-#endif // ALX_PARAM_ITEM_H
+#endif	// #ifndef ALX_PARAM_ITEM_H

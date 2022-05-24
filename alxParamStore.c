@@ -1,11 +1,9 @@
-/**
-  ******************************************************************************
-  * @file alxParamStore.c
-  * @brief Auralix C Library - ALX Parameter Store Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
-  ******************************************************************************
-  */
+//******************************************************************************
+// @file alxParamStore.c
+// @brief Auralix C Library - ALX Parameter Store Module
+// @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+//******************************************************************************
+
 
 //******************************************************************************
 // Includes
@@ -28,19 +26,17 @@ static void AlxParamStore_Handle_4xGroup(AlxParamStore* me);
 void AlxParamStore_Ctor
 (
 	AlxParamStore* me,
-	AlxParamGroup** paramGroups,
+	AlxParamGroup** paramGroupArr,
 	uint32_t numOfParamGroups
 )
 {
 	// Parameters
-	me->paramGroups = paramGroups;
+	me->paramGroupArr = paramGroupArr;
 	me->numOfParamGroups = numOfParamGroups;
 
 	// Variables
-	me->isParamGroupInitErr = false;
-
-	// SM
 	me->st = AlxParamStore_St_Init;
+	me->isParamGroupInitErr = false;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -51,7 +47,7 @@ void AlxParamStore_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* statusParamGroup, uint8_t numOfParamGroups)
+Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* statusParamGroup, uint32_t numOfParamGroups)
 {
 	// Assert
 	ALX_PARAM_STORE_ASSERT(me->wasCtorCalled == true);
@@ -64,7 +60,7 @@ Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* statusParamGroup, u
 	// #2 Init
 	for (uint32_t i = 0; i < me->numOfParamGroups; i++)
 	{
-		statusParamGroup[i] = AlxParamGroup_Init(*(me->paramGroups + i));
+		statusParamGroup[i] = AlxParamGroup_Init(*(me->paramGroupArr + i));
 		if (statusParamGroup[i] == Alx_Err)
 		{
 			me->isParamGroupInitErr = true;
@@ -104,7 +100,7 @@ void AlxParamStore_Handle(AlxParamStore* me)
 		}
 		default:
 		{
-			ALX_PARAM_STORE_ASSERT(false);	// We should not get here
+			ALX_PARAM_STORE_ASSERT(false);	// We should never get here
 			return;
 		}
 	}
@@ -134,7 +130,7 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 {
 	switch (me->st)
 	{
-	case AlxParamStore_St_Init:
+		case AlxParamStore_St_Init:
 		{
 			// #1 Transition
 			if(AlxParamStore_IsParamGroupInitOk(me))
@@ -151,23 +147,23 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 			// #3 Break
 			break;
 		}
-	case AlxParamStore_St_Err:
+		case AlxParamStore_St_Err:
 		{
 			// #1 Do Nothing
 
 			// #2 Break
 			break;
 		}
-	case AlxParamStore_St_CheckingGroup1:
+		case AlxParamStore_St_CheckingGroup1:
 		{
 			// #1 Transition
-			if(AlxParamGroup_IsValStoredBuffDiff(me->paramGroups[0]))
+			if(AlxParamGroup_IsValStoredBuffDiff(me->paramGroupArr[0]))
 			{
 				// #1.1 Prepare values to store
-				AlxParamGroup_ValBuffToValToStoreBuff(me->paramGroups[0]);
+				AlxParamGroup_ValBuffToValToStoreBuff(me->paramGroupArr[0]);
 
 				// #1.2 Start writing
-				AlxParamGroup_Write(me->paramGroups[0]);
+				AlxParamGroup_Write(me->paramGroupArr[0]);
 
 				// #1.3 Change state
 				me->st = AlxParamStore_St_WritingGroup1;
@@ -177,20 +173,20 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 			}
 
 			// #2.1 Refresh values
-			AlxParamGroup_ParamItemsValToValBuff(me->paramGroups[0]);
+			AlxParamGroup_ParamItemsValToValBuff(me->paramGroupArr[0]);
 
 			// #3 Do Nothing
 
 			// #4 Break
 			break;
 		}
-	case AlxParamStore_St_WritingGroup1:
+		case AlxParamStore_St_WritingGroup1:
 		{
 			// #1 Transition
-			if(AlxParamGroup_IsWriteDone(me->paramGroups[0]))
+			if(AlxParamGroup_IsWriteDone(me->paramGroupArr[0]))
 			{
 				// #1.1 Update stored values
-				AlxParamGroup_ValToStoreBuffToValStoredBuff(me->paramGroups[0]);
+				AlxParamGroup_ValToStoreBuffToValStoredBuff(me->paramGroupArr[0]);
 
 				// #1.2 Change state
 				me->st = AlxParamStore_St_CheckingGroup1;
@@ -200,7 +196,7 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 			}
 
 			// #2 Transition
-			else if(AlxParamGroup_IsWriteErr(me->paramGroups[0]))
+			else if(AlxParamGroup_IsWriteErr(me->paramGroupArr[0]))
 			{
 				// #2.1 Change state
 				me->st = AlxParamStore_St_Err;
@@ -214,7 +210,7 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 			// #4 Break
 			break;
 		}
-	default:
+		default:
 		{
 			// #1 Assert
 			ALX_PARAM_STORE_ASSERT(false); 	// We should never get here
@@ -255,25 +251,25 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 		case AlxParamStore_St_CheckingGroup1:
 		{
 			// #1 Transition
-			if(AlxParamGroup_IsValStoredBuffDiff(me->paramGroups[0]))
+			if(AlxParamGroup_IsValStoredBuffDiff(me->paramGroupArr[0]))
 			{
 				// #1.1 Prepare values to store
-				AlxParamGroup_ValBuffToValToStoreBuff(me->paramGroups[0]);
+				AlxParamGroup_ValBuffToValToStoreBuff(me->paramGroupArr[0]);
 
 				// #1.2 Start writing
-				AlxParamGroup_Write(me->paramGroups[0]);
+				AlxParamGroup_Write(me->paramGroupArr[0]);
 
 				// #1.3 Change state
 				me->st = AlxParamStore_St_WritingGroup1;
 
 				// #1.4 Trace
 				ALX_PARAM_STORE_TRACE("Group1_WriteStart");
-			} 
+			}
 			// #2 Transition
 			else
 			{
 				// #2.1 Refresh values
-				AlxParamGroup_ParamItemsValToValBuff(me->paramGroups[0]);
+				AlxParamGroup_ParamItemsValToValBuff(me->paramGroupArr[0]);
 
 				// #2.2 Change state
 				me->st = AlxParamStore_St_CheckingGroup2;
@@ -287,10 +283,10 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 		case AlxParamStore_St_WritingGroup1:
 		{
 			// #1 Transition
-			if (AlxParamGroup_IsWriteDone(me->paramGroups[0]))
+			if (AlxParamGroup_IsWriteDone(me->paramGroupArr[0]))
 			{
 				// #1.1 Update stored values
-				AlxParamGroup_ValToStoreBuffToValStoredBuff(me->paramGroups[0]);
+				AlxParamGroup_ValToStoreBuffToValStoredBuff(me->paramGroupArr[0]);
 
 				// #1.2 Change state
 				me->st = AlxParamStore_St_CheckingGroup2;
@@ -300,7 +296,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 			}
 
 			// #2 Transition
-			else if (AlxParamGroup_IsWriteErr(me->paramGroups[0]))
+			else if (AlxParamGroup_IsWriteErr(me->paramGroupArr[0]))
 			{
 				// #2.1 Change state
 				me->st = AlxParamStore_St_Err;
@@ -317,13 +313,13 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 		case AlxParamStore_St_CheckingGroup2:
 		{
 			// #1 Transition
-			if(AlxParamGroup_IsValStoredBuffDiff(me->paramGroups[1]))
+			if(AlxParamGroup_IsValStoredBuffDiff(me->paramGroupArr[1]))
 			{
 				// #1.1 Prepare values to store
-				AlxParamGroup_ValBuffToValToStoreBuff(me->paramGroups[1]);
+				AlxParamGroup_ValBuffToValToStoreBuff(me->paramGroupArr[1]);
 
 				// #1.2 Start writing
-				AlxParamGroup_Write(me->paramGroups[1]);
+				AlxParamGroup_Write(me->paramGroupArr[1]);
 
 				// #1.3 Change state
 				me->st = AlxParamStore_St_WritingGroup2;
@@ -335,7 +331,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 			else
 			{
 				// #2.1 Refresh values
-				AlxParamGroup_ParamItemsValToValBuff(me->paramGroups[1]);
+				AlxParamGroup_ParamItemsValToValBuff(me->paramGroupArr[1]);
 
 				// #2.2 Change state
 				me->st = AlxParamStore_St_CheckingGroup1;
@@ -349,10 +345,10 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 		case AlxParamStore_St_WritingGroup2:
 		{
 			// #1 Transition
-			if (AlxParamGroup_IsWriteDone(me->paramGroups[1]))
+			if (AlxParamGroup_IsWriteDone(me->paramGroupArr[1]))
 			{
 				// #1.1 Update stored values
-				AlxParamGroup_ValToStoreBuffToValStoredBuff(me->paramGroups[1]);
+				AlxParamGroup_ValToStoreBuffToValStoredBuff(me->paramGroupArr[1]);
 
 				// #1.2 Change state
 				me->st = AlxParamStore_St_CheckingGroup1;
@@ -362,7 +358,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 			}
 
 			// #2 Transition
-			else if (AlxParamGroup_IsWriteErr(me->paramGroups[1]))
+			else if (AlxParamGroup_IsWriteErr(me->paramGroupArr[1]))
 			{
 				// #2.1 Change state
 				me->st = AlxParamStore_St_Err;
