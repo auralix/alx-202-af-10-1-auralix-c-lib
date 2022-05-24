@@ -1,11 +1,11 @@
 ﻿/**
   ******************************************************************************
-  * @file alxFifo.c
-  * @brief Auralix C Library - ALX FIFO Module
-  * @version $LastChangedRevision: 4270 $
-  * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
+  * @file		alxFifo.c
+  * @brief		Auralix C Library - AlxFifo Module
+  * @copyright	Copyright (C) 2022 Auralix d.o.o. All rights reserved.
   ******************************************************************************
   */
+
 
 //******************************************************************************
 // Includes

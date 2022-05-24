@@ -14,3 +14,6 @@ Backup
 event_log
 .visualgdb
 Build
+
+# Doxygen
+Doxygen/Output

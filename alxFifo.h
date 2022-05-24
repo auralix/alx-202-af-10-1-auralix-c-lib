@@ -1,9 +1,8 @@
 ﻿/**
   ******************************************************************************
-  * @file alxFifo.h
-  * @brief Auralix C Library - ALX FIFO Module
-  * @version $LastChangedRevision: 4937 $
-  * @date $LastChangedDate: 2021-05-02 22:05:40 +0200 (Sun, 02 May 2021) $
+  * @file		alxFifo.h
+  * @brief		Auralix C Library - AlxFifo Module
+  * @copyright	Copyright (C) 2022 Auralix d.o.o. All rights reserved.
   ******************************************************************************
   */
 
@@ -25,7 +24,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_FIFO_FILE "alxFifo"
+#define ALX_FIFO_FILE "alxFifo.h"
 
 // Assert //
 #if defined(_ALX_FIFO_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -45,13 +44,6 @@ extern "C" {
 	#define ALX_FIFO_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_FIFO_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_FIFO_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_FIFO_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -61,7 +53,7 @@ typedef struct
 	// Parameters
 	uint8_t* buff;
 	uint32_t buffLen;
-	
+
 	// Variables
 	uint32_t head;
 	uint32_t tail;
@@ -77,6 +69,14 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] buff
+  * @param[in] buffLen
+  * @retval void
+  */
 void AlxFifo_Ctor
 (
 	AlxFifo* me,
@@ -88,12 +88,36 @@ void AlxFifo_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  * @retval void
+  */
 void AlxFifo_Flush(AlxFifo* me);
+
+/**
+  * @brief
+  * @param[in] me
+  * @retval Alx_Ok
+  * @retval Alx_Err
+  * @retval AlxFifo_ErrEmpty
+  */
 Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len);
+
 Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
+
 Alx_Status AlxFifo_Write(AlxFifo* me, uint8_t data);
+
 Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len);
+
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str);
+
+/**
+  * @brief
+  * @param[in] me
+  * @return
+  */
 uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me);
 
 
@@ -101,4 +125,4 @@ uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me);
 }
 #endif
 
-#endif // ALX_FIFO_H
+#endif	// #ifndef ALX_FIFO_H
