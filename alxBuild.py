@@ -73,7 +73,7 @@ def Script(projectDir):
 #define ALX_BUILD_NAME "Engineer"
 #define ALX_BUILD_DATE {buildDate}
 #define ALX_BUILD_NUM 0
-#define ALX_BUILD_HASH {buildHash}
+#define ALX_BUILD_HASH "{buildHash}"
 #define ALX_BUILD_REV 0
 #define ALX_BUILD_FW_VER_MAJOR {fwVerMajorStr}
 #define ALX_BUILD_FW_VER_MINOR {fwVerMinorStr}
