@@ -20,7 +20,7 @@ import sys
 def Script(projectDir):
 	# Print START
 	print("")
-	print("alxBuild.py - START")
+	print("alxBuild.py - Script START")
 
 	# Set gitDir
 	gitDir = pathlib.Path(projectDir).parent
@@ -57,13 +57,13 @@ def Script(projectDir):
 		if (fwVerMajor > 255) or (fwVerMinor > 255) or (fwVerPatch > 255):
 			raise
 	except:
-		print("alxBuild.py - fwVer: valid GIT tag not available, FW version could not be set")
+		print("alxBuild.py - fwVer: No valid GIT tag, FW version could not be set")
 		fwVerMajorStr = "0"
 		fwVerMinorStr = "0"
 		fwVerPatchStr = "0"
-	print("alxBuild.py - fwVerMajorStr: " + fwVerMajorStr)
-	print("alxBuild.py - fwVerMinorStr: " + fwVerMinorStr)
-	print("alxBuild.py - fwVerPatchStr: " + fwVerPatchStr)
+	print("alxBuild.py - fwVerMajor: " + fwVerMajorStr)
+	print("alxBuild.py - fwVerMinor: " + fwVerMinorStr)
+	print("alxBuild.py - fwVerPatch: " + fwVerPatchStr)
 
 	# Prepare output file text
 	outputFileText = """#ifndef ALX_BUILD_GENERATED_H
@@ -89,7 +89,7 @@ def Script(projectDir):
 	print("alxBuild.py - Generated: alxBuild_GENERATED.h")
 
 	# Print
-	print("alxBuild.py - DONE")
+	print("alxBuild.py - Script FINISH")
 	print("")
 
 
