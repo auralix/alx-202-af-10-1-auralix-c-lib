@@ -1,19 +1,7 @@
-# Visual Studio
-.vs
-Debug
-VisualGDB
-*.db
-*.opendb
 *.TMP
 *.tmp
-CodeDB
-VisualGDBCache
-bin
-obj
-Backup
-event_log
-.visualgdb
-Build
-
-# Doxygen
+*.BAK
+*.bak
 Doxygen/Output
+alxBuild_GENERATED.h
+__pycache__
