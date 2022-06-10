@@ -1,5 +1,5 @@
 #*******************************************************************************
-# @file alxScript_CLibBuild.py
+# @file alxBuild.py
 # @brief Auralix Python Library
 # @copyright Copyright (C) 2022 Auralix d.o.o. All rights reserved.
 #*******************************************************************************
@@ -20,21 +20,21 @@ import sys
 def Script(projectDir):
 	# Print START
 	print("")
-	print("alxCLibBuild.py - START")
+	print("alxBuild.py - START")
 
 	# Set gitDir
 	gitDir = pathlib.Path(projectDir).parent
-	print("alxCLibBuild.py - gitDir: " + str(gitDir))
+	print("alxBuild.py - gitDir: " + str(gitDir))
 
 	# Set build date
 	buildDate = datetime.datetime.now().strftime("%y%m%d%H%M")
-	print("alxCLibBuild.py - buildDate: " + buildDate)
+	print("alxBuild.py - buildDate: " + buildDate)
 
 	# Set build hash from GIT hash
 	cmdBuildHash = "git --git-dir=" + str(gitDir) + "\.git rev-parse HEAD"
 	cmdBuildHashCompletedObj = subprocess.run(cmdBuildHash, capture_output=True)
 	buildHash = cmdBuildHashCompletedObj.stdout.decode().rstrip('\n')
-	print("alxCLibBuild.py - buildHash: " + buildHash)
+	print("alxBuild.py - buildHash: " + buildHash)
 
 	# Try to set FW version from GIT tag
 	try:
@@ -42,7 +42,7 @@ def Script(projectDir):
 		cmdBuildTag = "git --git-dir=" + str(gitDir) + "\.git tag --points-at HEAD"
 		cmdBuildTagCompletedObj = subprocess.run(cmdBuildTag, capture_output=True)
 		buildTag = cmdBuildTagCompletedObj.stdout.decode().rstrip('\n')
-		print("alxCLibBuild.py - buildTag: " + buildTag)
+		print("alxBuild.py - buildTag: " + buildTag)
 
 		# Split
 		buildTagList = buildTag.split('.')
@@ -57,13 +57,13 @@ def Script(projectDir):
 		if (fwVerMajor > 255) or (fwVerMinor > 255) or (fwVerPatch > 255):
 			raise
 	except:
-		print("alxCLibBuild.py - fwVer: valid GIT tag not available, FW version could not be set")
+		print("alxBuild.py - fwVer: valid GIT tag not available, FW version could not be set")
 		fwVerMajorStr = "0"
 		fwVerMinorStr = "0"
 		fwVerPatchStr = "0"
-	print("alxCLibBuild.py - fwVerMajorStr: " + fwVerMajorStr)
-	print("alxCLibBuild.py - fwVerMinorStr: " + fwVerMinorStr)
-	print("alxCLibBuild.py - fwVerPatchStr: " + fwVerPatchStr)
+	print("alxBuild.py - fwVerMajorStr: " + fwVerMajorStr)
+	print("alxBuild.py - fwVerMinorStr: " + fwVerMinorStr)
+	print("alxBuild.py - fwVerPatchStr: " + fwVerPatchStr)
 
 	# Prepare output file text
 	outputFileText = """#ifndef ALX_BUILD_GENERATED_H
@@ -86,10 +86,10 @@ def Script(projectDir):
 	# Write output file text
 	outputFilePath = pathlib.Path("alxBuild_GENERATED.h")
 	outputFilePath.write_text(outputFileText)
-	print("alxCLibBuild.py - Generated: alxBuild_GENERATED.h")
+	print("alxBuild.py - Generated: alxBuild_GENERATED.h")
 
 	# Print
-	print("alxCLibBuild.py - DONE")
+	print("alxBuild.py - DONE")
 	print("")
 
 
