@@ -16,4 +16,4 @@
 //******************************************************************************
 // Preprocesor
 //******************************************************************************
-#pragma message "SW Version Date Compiler: " __DATE__ ", " __TIME__
+#pragma message "FW Version Date Compiler: " __DATE__ ", " __TIME__

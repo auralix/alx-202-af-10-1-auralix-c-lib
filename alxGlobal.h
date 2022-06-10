@@ -194,8 +194,6 @@ extern "C" {
 #define ALX_ADC_BUFF_LEN 16
 #define ALX_DAC_BUFF_LEN 2
 #define ALX_PWM_BUFF_LEN 6
-#define ALX_ID_NAME_LEN 40
-#define ALX_ID_HW_ID_IO_PIN_BUFF_LEN 5
 #define ALX_IO_PIN_IRQ_BUFF_LEN 32
 
 #define ALX_NULL 0
