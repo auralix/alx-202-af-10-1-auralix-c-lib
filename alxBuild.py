@@ -70,7 +70,7 @@ def Script(projectDir):
 #define ALX_BUILD_GENERATED_H
 
 
-#define ALX_BUILD_NAME "Engineer"
+#define ALX_BUILD_NAME "VisualGDB Local"
 #define ALX_BUILD_DATE {buildDate}
 #define ALX_BUILD_NUM 0
 #define ALX_BUILD_HASH "{buildHash}"
