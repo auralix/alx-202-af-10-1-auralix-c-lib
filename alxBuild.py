@@ -17,38 +17,38 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(projectDir):
+def Script(vsGdbSolutionDir):
 	# Print START
 	print("")
 	print("alxBuild.py - Script START")
 
 	# Set gitDir
-	gitDir = pathlib.Path(projectDir).parent
+	gitDir = pathlib.Path(vsGdbSolutionDir).parent
 	print("alxBuild.py - gitDir: " + str(gitDir))
 
 	# Set build date
-	buildDate = datetime.datetime.now().strftime("%y%m%d%H%M")
-	print("alxBuild.py - buildDate: " + buildDate)
+	date = datetime.datetime.now().strftime("%y%m%d%H%M")
+	print("alxBuild.py - buildDate: " + date)
 
 	# Set build hash from GIT hash
-	cmdBuildHash = "git --git-dir=" + str(gitDir) + "\.git rev-parse HEAD"
-	cmdBuildHashCompletedObj = subprocess.run(cmdBuildHash, capture_output=True)
-	buildHash = cmdBuildHashCompletedObj.stdout.decode().rstrip('\n')
-	print("alxBuild.py - buildHash: " + buildHash)
+	cmdHash = "git --git-dir=" + str(gitDir) + "\.git rev-parse HEAD"
+	cmdHashCompletedObj = subprocess.run(cmdHash, capture_output=True)
+	_hash = cmdHashCompletedObj.stdout.decode().rstrip('\n')
+	print("alxBuild.py - buildHash: " + _hash)
 
 	# Try to set FW version from GIT tag
 	try:
 		# Get
-		cmdBuildTag = "git --git-dir=" + str(gitDir) + "\.git tag --points-at HEAD"
-		cmdBuildTagCompletedObj = subprocess.run(cmdBuildTag, capture_output=True)
-		buildTag = cmdBuildTagCompletedObj.stdout.decode().rstrip('\n')
-		print("alxBuild.py - buildTag: " + buildTag)
+		cmdTag = "git --git-dir=" + str(gitDir) + "\.git tag --points-at HEAD"
+		cmdTagCompletedObj = subprocess.run(cmdTag, capture_output=True)
+		tag = cmdTagCompletedObj.stdout.decode().rstrip('\n')
+		print("alxBuild.py - buildTag: " + tag)
 
 		# Split
-		buildTagList = buildTag.split('.')
-		fwVerMajorStr = buildTagList[0]
-		fwVerMinorStr = buildTagList[1]
-		fwVerPatchStr = buildTagList[2]
+		tagList = tag.split('.')
+		fwVerMajorStr = tagList[0]
+		fwVerMinorStr = tagList[1]
+		fwVerPatchStr = tagList[2]
 
 		# Check
 		fwVerMajor = int(fwVerMajorStr)
@@ -66,14 +66,14 @@ def Script(projectDir):
 	print("alxBuild.py - fwVerPatch: " + fwVerPatchStr)
 
 	# Prepare output file text
-	outputFileText = """#ifndef ALX_BUILD_GENERATED_H
+	outFileText = """#ifndef ALX_BUILD_GENERATED_H
 #define ALX_BUILD_GENERATED_H
 
 
 #define ALX_BUILD_NAME "VisualGDB Local"
-#define ALX_BUILD_DATE {buildDate}
+#define ALX_BUILD_DATE {date}
 #define ALX_BUILD_NUM 0
-#define ALX_BUILD_HASH "{buildHash}"
+#define ALX_BUILD_HASH "{_hash}"
 #define ALX_BUILD_REV 0
 #define ALX_BUILD_FW_VER_MAJOR {fwVerMajorStr}
 #define ALX_BUILD_FW_VER_MINOR {fwVerMinorStr}
@@ -81,11 +81,11 @@ def Script(projectDir):
 
 
 #endif	// ALX_BUILD_GENERATED_H
-""".format(buildDate=buildDate, buildHash=buildHash, fwVerMajorStr=fwVerMajorStr, fwVerMinorStr=fwVerMinorStr, fwVerPatchStr=fwVerPatchStr)
+""".format(date=date, _hash=_hash, fwVerMajorStr=fwVerMajorStr, fwVerMinorStr=fwVerMinorStr, fwVerPatchStr=fwVerPatchStr)
 
 	# Write output file text
-	outputFilePath = pathlib.Path("alxBuild_GENERATED.h")
-	outputFilePath.write_text(outputFileText)
+	outFilePath = pathlib.Path("alxBuild_GENERATED.h")
+	outFilePath.write_text(outFileText)
 	print("alxBuild.py - Generated: alxBuild_GENERATED.h")
 
 	# Print
@@ -98,7 +98,7 @@ def Script(projectDir):
 #*******************************************************************************
 if __name__ == "__main__":
 	# Prepare param
-	projectDir = sys.argv[1]
+	vsGdbSolutionDir = sys.argv[1]
 
 	# Script
-	Script(projectDir)
+	Script(vsGdbSolutionDir)
