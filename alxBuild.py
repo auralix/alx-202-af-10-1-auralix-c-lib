@@ -17,13 +17,13 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsGdbSolutionDir):
+def Script(vsSolDir):
 	# Print START
 	print("")
 	print("alxBuild.py - Script START")
 
 	# Set gitDir
-	gitDir = pathlib.Path(vsGdbSolutionDir).parent
+	gitDir = pathlib.Path(vsSolDir).parent
 	print("alxBuild.py - gitDir: " + str(gitDir))
 
 	# Set build date
@@ -98,7 +98,7 @@ def Script(vsGdbSolutionDir):
 #*******************************************************************************
 if __name__ == "__main__":
 	# Prepare param
-	vsGdbSolutionDir = sys.argv[1]
+	vsSolDir = sys.argv[1]
 
 	# Script
-	Script(vsGdbSolutionDir)
+	Script(vsSolDir)
