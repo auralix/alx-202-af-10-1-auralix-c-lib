@@ -397,16 +397,17 @@ bool AlxCan_IsErr(AlxCan* me)
 	ALX_CAN_ASSERT(me->isInit == true);
 	ALX_CAN_ASSERT(me->wasCtorCalled == true);
 
-	// Check if bus is in buss off state and set isErr accordingly
+	// Check if bus is in bus off state and set isErr accordingly
+	#if defined(ALX_STM32G4)
 	FDCAN_ProtocolStatusTypeDef protocolStatus;
 	HAL_StatusTypeDef status = HAL_FDCAN_GetProtocolStatus(&me->hcan, &protocolStatus);
-	if (status != HAL_OK
-		||	protocolStatus.BusOff) 
+	if ((status != HAL_OK) || protocolStatus.BusOff)
 		me->isErr = true;
 	else
 		me->isErr = false;
-	
-	// Return status
+	#endif
+
+	// Return
 	return me->isErr;
 }
 void AlxCan_Foreground_Handle(AlxCan* me)
