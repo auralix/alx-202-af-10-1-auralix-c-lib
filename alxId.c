@@ -53,6 +53,7 @@ void AlxId_Ctor
 		me->fwBoot.build.dateComp = ALX_BUILD_DATE_COMP;
 		me->fwBoot.build.num = ALX_BUILD_NUM;
 		strcpy(me->fwBoot.build.hash, ALX_BUILD_HASH);
+		strcpy(me->fwBoot.build.hashShort, ALX_BUILD_HASH_SHORT);
 		me->fwBoot.build.rev = ALX_BUILD_REV;
 
 		// Parameters
@@ -83,6 +84,7 @@ void AlxId_Ctor
 		me->fwApp.build.dateComp = ALX_BUILD_DATE_COMP;
 		me->fwApp.build.num = ALX_BUILD_NUM;
 		strcpy(me->fwApp.build.hash, ALX_BUILD_HASH);
+		strcpy(me->fwApp.build.hashShort, ALX_BUILD_HASH_SHORT);
 		me->fwApp.build.rev = ALX_BUILD_REV;
 
 		// Parameters
@@ -106,6 +108,7 @@ void AlxId_Ctor
 						((uint64_t)me->fwApp.verDate);
 
 		sprintf(me->fwApp.verStr, "%u.%u.%u.%lu.%s", me->fwApp.verMajor, me->fwApp.verMinor, me->fwApp.verPatch, me->fwApp.verDate, me->fwApp.build.hash);
+		sprintf(me->fwApp.binStr, "%lu_%s_%s_%u_%u_%u_%s.bin", me->fwApp.verDate, me->fwApp.artf, me->fwApp.name, me->fwApp.verMajor, me->fwApp.verMinor, me->fwApp.verPatch, me->fwApp.build.hashShort);
 	}
 
 
@@ -391,10 +394,11 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_FORMAT("Auralix C Library ALX ID Module Identification:\r\n");
 	ALX_ID_TRACE_FORMAT("\r\n");
 
-	ALX_ID_TRACE_FORMAT("Firmware:\r\n");
+	ALX_ID_TRACE_FORMAT("FW:\r\n");
 	ALX_ID_TRACE_FORMAT("- artf: %s\r\n", me->fwApp.artf);
 	ALX_ID_TRACE_FORMAT("- name: %s\r\n", me->fwApp.name);
 	ALX_ID_TRACE_FORMAT("- ver: %s\r\n", me->fwApp.verStr);
+	ALX_ID_TRACE_FORMAT("- bin: %s\r\n", me->fwApp.binStr);
 	ALX_ID_TRACE_FORMAT("- job_name: %s\r\n", me->fwApp.build.name);
 	ALX_ID_TRACE_FORMAT("- job_number: %lu\r\n", me->fwApp.build.num);
 	ALX_ID_TRACE_FORMAT("- job_hash: %s\r\n", me->fwApp.build.hash);
@@ -403,7 +407,7 @@ void AlxId_Trace(AlxId* me)
 
 	if (me->fwIsBootloader)
 	{
-		ALX_ID_TRACE_FORMAT("Software Boot:\r\n");
+		ALX_ID_TRACE_FORMAT("FW Boot:\r\n");
 		ALX_ID_TRACE_FORMAT("- artf: %s\r\n", me->fwBoot.artf);
 		ALX_ID_TRACE_FORMAT("- name: %s\r\n", me->fwBoot.name);
 		ALX_ID_TRACE_FORMAT("- ver: %lu.%lu.%lu.%lu\r\n", me->fwBoot.verMajor, me->fwBoot.verMinor, me->fwBoot.verPatch, me->fwBoot.verDate);
@@ -414,7 +418,7 @@ void AlxId_Trace(AlxId* me)
 		ALX_ID_TRACE_FORMAT("\r\n");
 	}
 
-	ALX_ID_TRACE_FORMAT("Hardware:\r\n");
+	ALX_ID_TRACE_FORMAT("HW:\r\n");
 	ALX_ID_TRACE_FORMAT("- pcb_artf: %s\r\n", me->hw.instance.pcbArtf);
 	ALX_ID_TRACE_FORMAT("- pcb_name: %s\r\n", me->hw.instance.pcbName);
 	ALX_ID_TRACE_FORMAT("- pcb_ver: %lu.%lu.%lu.%lu\r\n", me->hw.instance.pcbVerMajor, me->hw.instance.pcbVerMinor, me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
@@ -487,4 +491,11 @@ const char* AlxId_GetFwAppVerStr(AlxId* me)
 	ALX_ID_ASSERT(me->wasCtorCalled == true);
 
 	return me->fwApp.verStr;
+}
+const char* AlxId_GetFwAppBinStr(AlxId* me)
+{
+	ALX_ID_ASSERT(me->isInit == true);
+	ALX_ID_ASSERT(me->wasCtorCalled == true);
+
+	return me->fwApp.binStr;
 }

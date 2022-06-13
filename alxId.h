@@ -29,10 +29,6 @@ extern "C" {
 //******************************************************************************
 #define ALX_ID_FILE "alxId.h"
 #define ALX_ID_NAME_LEN 40
-#define ALX_ID_BUILD_HASH_LEN 50
-#define ALX_ID_FW_VER_STR_LEN 100
-#define ALX_ID_HW_ID_IO_PIN_BUFF_LEN 5
-#define ALX_ID_STM32_HW_UNIQUE_ID_LEN 30
 
 
 //******************************************************************************
@@ -77,7 +73,8 @@ typedef struct
 	uint32_t date;
 	uint32_t dateComp;
 	uint32_t num;
-	char hash[ALX_ID_BUILD_HASH_LEN];
+	char hash[50];
+	char hashShort[8];
 	uint32_t rev;
 } AlxId_Build;
 
@@ -94,7 +91,8 @@ typedef struct
 	uint8_t verPatch;
 	uint32_t verDate;
 	uint64_t ver;
-	char verStr[ALX_ID_FW_VER_STR_LEN];
+	char verStr[100];
+	char binStr[100];
 	bool isBuildJobUsed;
 } AlxId_Fw;
 
@@ -133,7 +131,7 @@ typedef struct
 
 	// Variables
 	AlxId_HwInstance instance; // Not initialized in Ctor
-	AlxIoPin_TriState idIoPinState[ALX_ID_HW_ID_IO_PIN_BUFF_LEN]; // Not initialized in Ctor
+	AlxIoPin_TriState idIoPinState[5]; // Not initialized in Ctor
 } AlxId_Hw;
 
 typedef struct
@@ -202,7 +200,7 @@ typedef struct
 	uint32_t uniqueId0;
 	uint32_t uniqueId1;
 	uint32_t uniqueId2;
-	char uniqueIdStr[ALX_ID_STM32_HW_UNIQUE_ID_LEN];
+	char uniqueIdStr[30];
 } AlxId_Stm32Hw;
 #endif
 
@@ -282,6 +280,7 @@ uint8_t AlxId_GetHwId(AlxId* me);
 const char* AlxId_GetUniqueIdStr(AlxId* me);
 uint32_t AlxId_GetFwAppVerDate(AlxId* me);
 const char* AlxId_GetFwAppVerStr(AlxId* me);
+const char* AlxId_GetFwAppBinStr(AlxId* me);
 
 
 #ifdef __cplusplus

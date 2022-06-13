@@ -24,11 +24,10 @@ def Script(vsSolDir, vsPrjDir):
 
 	# Parse input file
 	date = inFileLines[5][23:]
-	_hash = inFileLines[7][24:64]
-	hashShort = _hash[0:7]
-	fwVerMajor = inFileLines[9][31:]
-	fwVerMinor = inFileLines[10][31:]
-	fwVerPatch = inFileLines[11][31:]
+	hashShort = inFileLines[8][30:37]
+	fwVerMajor = inFileLines[10][31:]
+	fwVerMinor = inFileLines[11][31:]
+	fwVerPatch = inFileLines[12][31:]
 
 	# Set source bin variables
 	binSrcName = pathlib.Path(vsPrjDir).stem + ".bin"

@@ -34,7 +34,9 @@ def Script(vsSolDir):
 	cmdHash = "git --git-dir=" + str(gitDir) + "\.git rev-parse HEAD"
 	cmdHashCompletedObj = subprocess.run(cmdHash, capture_output=True)
 	_hash = cmdHashCompletedObj.stdout.decode().rstrip('\n')
+	hashShort = _hash[0:7]
 	print("alxBuild.py - buildHash: " + _hash)
+	print("alxBuild.py - buildHashShort: " + hashShort)
 
 	# Try to set FW version from GIT tag
 	try:
@@ -74,6 +76,7 @@ def Script(vsSolDir):
 #define ALX_BUILD_DATE {date}
 #define ALX_BUILD_NUM 0
 #define ALX_BUILD_HASH "{_hash}"
+#define ALX_BUILD_HASH_SHORT "{hashShort}"
 #define ALX_BUILD_REV 0
 #define ALX_BUILD_FW_VER_MAJOR {fwVerMajorStr}
 #define ALX_BUILD_FW_VER_MINOR {fwVerMinorStr}
@@ -81,7 +84,7 @@ def Script(vsSolDir):
 
 
 #endif	// ALX_BUILD_GENERATED_H
-""".format(date=date, _hash=_hash, fwVerMajorStr=fwVerMajorStr, fwVerMinorStr=fwVerMinorStr, fwVerPatchStr=fwVerPatchStr)
+""".format(date=date, _hash=_hash, hashShort=hashShort, fwVerMajorStr=fwVerMajorStr, fwVerMinorStr=fwVerMinorStr, fwVerPatchStr=fwVerPatchStr)
 
 	# Write output file text
 	outFilePath = pathlib.Path("alxBuild_GENERATED.h")
