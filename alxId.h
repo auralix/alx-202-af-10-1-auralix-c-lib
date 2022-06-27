@@ -29,6 +29,7 @@ extern "C" {
 //******************************************************************************
 #define ALX_ID_FILE "alxId.h"
 #define ALX_ID_NAME_LEN 40
+#define ALX_ID_HW_ID_IO_PIN_ARR_MAX_LEN 5
 
 
 //******************************************************************************
@@ -131,7 +132,7 @@ typedef struct
 
 	// Variables
 	AlxId_HwInstance instance; // Not initialized in Ctor
-	AlxIoPin_TriState idIoPinState[5]; // Not initialized in Ctor
+	AlxIoPin_TriState idIoPinState[ALX_ID_HW_ID_IO_PIN_ARR_MAX_LEN]; // Not initialized in Ctor
 } AlxId_Hw;
 
 typedef struct
