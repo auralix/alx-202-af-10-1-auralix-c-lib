@@ -19,14 +19,22 @@ extern "C" {
 //******************************************************************************
 #include "alxGlobal.h"
 #include "alxBuild.h"
+#include "alxBuild_GENERATED.h"
 #include "alxIoPin.h"
 #include "alxDelay.h"
 
 
 //******************************************************************************
-// Preprocesor
+// Defines
 //******************************************************************************
-#define ALX_ID_FILE "alxId"
+#define ALX_ID_FILE "alxId.h"
+#define ALX_ID_NAME_LEN 40
+#define ALX_ID_HW_ID_IO_PIN_ARR_MAX_LEN 5
+
+
+//******************************************************************************
+// Macros
+//******************************************************************************
 
 // Assert //
 #if defined(_ALX_ID_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -66,7 +74,8 @@ typedef struct
 	uint32_t date;
 	uint32_t dateComp;
 	uint32_t num;
-	uint32_t hash;
+	char hash[50];
+	char hashShort[8];
 	uint32_t rev;
 } AlxId_Build;
 
@@ -83,9 +92,10 @@ typedef struct
 	uint8_t verPatch;
 	uint32_t verDate;
 	uint64_t ver;
-	char verStr[30];
+	char verStr[100];
+	char binStr[100];
 	bool isBuildJobUsed;
-} AlxId_Sw;
+} AlxId_Fw;
 
 typedef struct
 {
@@ -122,7 +132,7 @@ typedef struct
 
 	// Variables
 	AlxId_HwInstance instance; // Not initialized in Ctor
-	AlxIoPin_TriState idIoPinState[ALX_ID_HW_ID_IO_PIN_BUFF_LEN]; // Not initialized in Ctor
+	AlxIoPin_TriState idIoPinState[ALX_ID_HW_ID_IO_PIN_ARR_MAX_LEN]; // Not initialized in Ctor
 } AlxId_Hw;
 
 typedef struct
@@ -198,8 +208,8 @@ typedef struct
 typedef struct
 {
 	// Objects - Internal
-	AlxId_Sw swApp;
-	AlxId_Sw swBoot;
+	AlxId_Fw fwApp;
+	AlxId_Fw fwBoot;
 	AlxId_Hw hw;
 	AlxId_LangC langC;
 	AlxId_LangCLib langCLib;
@@ -216,7 +226,7 @@ typedef struct
 	#endif
 
 	// Parameters
-	bool swIsBootloader;
+	bool fwIsBootloader;
 	char hwMcuName[ALX_ID_NAME_LEN];
 
 	// Info
@@ -232,13 +242,13 @@ typedef struct
 void AlxId_Ctor
 (
 	AlxId* me,
-	const char* swArtf,
-	const char* swName,
-	uint8_t swVerMajor,
-	uint8_t swVerMinor,
-	uint8_t swVerPatch,
-	bool swIsBuildJobUsed,
-	bool swIsBootloader,
+	const char* fwArtf,
+	const char* fwName,
+	uint8_t fwVerMajor,
+	uint8_t fwVerMinor,
+	uint8_t fwVerPatch,
+	bool fwIsBuildJobUsed,
+	bool fwIsBootloader,
 	AlxId_HwInstance* hwInstanceKnownArr,
 	uint8_t hwInstanceKnownArrLen,
 	uint8_t* hwInstanceHwIdSupportedArr,
@@ -250,13 +260,13 @@ void AlxId_Ctor
 void AlxId_Ctor_NoHwId
 (
 	AlxId* me,
-	const char* swArtf,
-	const char* swName,
-	uint8_t swVerMajor,
-	uint8_t swVerMinor,
-	uint8_t swVerPatch,
-	bool swIsBuildJobUsed,
-	bool swIsBootloader,
+	const char* fwArtf,
+	const char* fwName,
+	uint8_t fwVerMajor,
+	uint8_t fwVerMinor,
+	uint8_t fwVerPatch,
+	bool fwIsBuildJobUsed,
+	bool fwIsBootloader,
 	AlxId_HwInstance hwInstance,
 	const char* hwMcuName
 );
@@ -269,8 +279,9 @@ void AlxId_Init(AlxId* me);
 void AlxId_Trace(AlxId* me);
 uint8_t AlxId_GetHwId(AlxId* me);
 const char* AlxId_GetUniqueIdStr(AlxId* me);
-uint32_t AlxId_GetSwAppVerDate(AlxId* me);
-const char* AlxId_GetSwAppVerStr(AlxId* me);
+uint32_t AlxId_GetFwAppVerDate(AlxId* me);
+const char* AlxId_GetFwAppVerStr(AlxId* me);
+const char* AlxId_GetFwAppBinStr(AlxId* me);
 
 
 #ifdef __cplusplus

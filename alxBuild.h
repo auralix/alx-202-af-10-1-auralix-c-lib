@@ -80,13 +80,6 @@ extern "C" {
 								 (ALX_BUILD_COMP_MIN_CH0   - '0') * 10 + \
 								 (ALX_BUILD_COMP_MIN_CH1   - '0') * 1)
 
-// Build
-#define ALX_BUILD_NAME "Engineer"
-#define ALX_BUILD_DATE 0
-#define ALX_BUILD_NUM 0
-#define ALX_BUILD_HASH 0
-#define ALX_BUILD_REV 0
-
 
 #ifdef __cplusplus
 }
