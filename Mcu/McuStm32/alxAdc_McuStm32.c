@@ -1,11 +1,29 @@
 ﻿/**
   ******************************************************************************
-  * @file AlxAdcStm32F4.c
-  * @brief ALX ADC Module
-  * @version $LastChangedRevision: 5584 $
-  * @date $LastChangedDate: 2021-07-13 17:22:12 +0200 (Tue, 13 Jul 2021) $
+  * @file		alxAdc_McuStm32.c
+  * @brief		Auralix C Library - ALX ADC MCU STM32 Module
+  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  *
+  * @section License
+  *
+  * SPDX-License-Identifier: GPL-3.0-or-later
+  *
+  * This file is part of Auralix C Library.
+  *
+  * Auralix C Library is free software: you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation, either version 3
+  * of the License, or (at your option) any later version.
+  *
+  * Auralix C Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
   ******************************************************************************
-  */
+  **/
 
 //******************************************************************************
 // Includes
@@ -191,7 +209,7 @@ void AlxAdc_Ctor
 	#if defined(STM32G4)
 	// Parameters
 	me->resolution = ADC_RESOLUTION_12B;
-	
+
 	// ADC Common
 	me->hadc.Init.ClockPrescaler = (uint32_t)me->adcClk;
 	me->hadc.Init.Resolution = me->resolution;
@@ -252,7 +270,7 @@ void AlxAdc_Ctor
 	#if defined(STM32L0)
 	// Parameters
 	me->resolution = ADC_RESOLUTION_12B;
-	
+
 	// ADC Common
 	me->hadc.Init.ClockPrescaler = (uint32_t)me->adcClk;
 	me->hadc.Init.Resolution = me->resolution;
@@ -457,7 +475,7 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 			#if (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(STM32F469) && !defined(STM32F479xx) && !defined(STM32F429xx) && !defined(STM32F439xx))
 			int32_t temp_degC = __LL_ADC_CALC_TEMPERATURE(vref_mV, me->buff[i], me->resolution);
 			#endif
-			
+
 			#if defined(ALX_STM32F1) || defined(STM32F469) || defined(STM32F479xx) || defined(STM32F429xx) || defined(STM32F439xx)
 			int32_t temp_degC = 0;// NE DELA
 			ALX_ADC_ASSERT(false); // We shouldn't get here

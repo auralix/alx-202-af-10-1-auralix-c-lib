@@ -1,11 +1,29 @@
 ﻿/**
   ******************************************************************************
-  * @file alxSerialPort.c
-  * @brief Auralix C Library - ALX Serial Port Module
-  * @version $LastChangedRevision: 5216 $
-  * @date $LastChangedDate: 2021-05-24 19:38:05 +0200 (Mon, 24 May 2021) $
+  * @file		alxSerialPort_McuStm32.c
+  * @brief		Auralix C Library - ALX Serial Port MCU STM32 Module
+  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  *
+  * @section License
+  *
+  * SPDX-License-Identifier: GPL-3.0-or-later
+  *
+  * This file is part of Auralix C Library.
+  *
+  * Auralix C Library is free software: you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation, either version 3
+  * of the License, or (at your option) any later version.
+  *
+  * Auralix C Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
   ******************************************************************************
-  */
+  **/
 
 //******************************************************************************
 // Includes
@@ -55,15 +73,15 @@ void AlxSerialPort_Ctor
 {
 	// Objects - Internal
 	AlxFifo_Ctor(&me->rxFifo, rxFifoBuff, rxFifoBuffLen);
-	
+
 	// Objects - External
 	me->do_TX = do_TX;
 	me->di_RX = di_RX;
-	
+
 	// Parameters
 	me->txTimeout_ms = txTimeout_ms;
 	me->rxIrqPriority = rxIrqPriority;
-	
+
 	// Variables
 	me->huart.Instance = uart;
 	me->huart.Init.BaudRate = (uint32_t)baudRate;
@@ -73,7 +91,7 @@ void AlxSerialPort_Ctor
 	me->huart.Init.Mode = UART_MODE_TX_RX;
 	me->huart.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	me->huart.Init.OverSampling = UART_OVERSAMPLING_16;
-	
+
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L0)
 		me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
 		#if defined(ALX_STM32G4)
@@ -82,7 +100,7 @@ void AlxSerialPort_Ctor
 		me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT;
 		me->huart.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
 	#endif
-	
+
 	// Info
 	me->isInit = false;
 	me->wasCtorCalled = true;
@@ -96,30 +114,30 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 {
 	ALX_SERIAL_PORT_ASSERT(me->isInit == false);
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
-	
+
 	// #1 Flush RX FIFO
 	AlxFifo_Flush(&me->rxFifo);
-	
+
 	// #2 Init GPIO
 	AlxIoPin_Init(me->do_TX);
 	AlxIoPin_Init(me->di_RX);
-	
+
 	// #3 Release UART Periphery Reset
 	AlxSerialPort_Periph_ReleaseReset(me);
-	
+
 	// #4 Enable UART Periphery Clock
 	AlxSerialPort_Periph_EnableClk(me);
-	
+
 	// #5 Init UART
 	if(HAL_UART_Init(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("ErrInit"); return Alx_Err; };
-	
+
 	// #6 Enable UART RX IRQ
 	__HAL_UART_ENABLE_IT(&me->huart, UART_IT_RXNE);
 	AlxSerialPort_Periph_EnableRxIrq(me);
-	
+
 	// #7 Set isInit
 	me->isInit = true;
-	
+
 	// #8 Return OK
 	return Alx_Ok;
 }
@@ -127,30 +145,30 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 {
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
-	
+
 	// #1 Disable UART RX IRQ
 	AlxSerialPort_Periph_DisableRxIrq(me);
 	__HAL_UART_DISABLE_IT(&me->huart, UART_IT_RXNE); // We will not clear flag, becasue there are differences between STM32 HALs, flag will be cleared when UART periphery is reset
-	
+
 	// #2 DeInit UART
 	if(HAL_UART_DeInit(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("ErrDeInit"); return Alx_Err; };
-	
+
 	// #3 Force UART Periphery Reset
 	AlxSerialPort_Periph_ForceReset(me);
-	
+
 	// #4 Disable UART Periphery Clock
 	AlxSerialPort_Periph_DisableClk(me);
-	
+
 	// #5 DeInit GPIO
 	AlxIoPin_DeInit(me->do_TX);
 	AlxIoPin_DeInit(me->di_RX);
-	
+
 	// #6 Flush RX FIFO
 	AlxFifo_Flush(&me->rxFifo);
-	
+
 	// #7 Reset isInit
 	me->isInit = false;
-	
+
 	// #8 Return OK
 	return Alx_Ok;
 }
@@ -162,7 +180,7 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 	AlxGlobal_DisableIrq();
 	Alx_Status status = AlxFifo_Read(&me->rxFifo, data, len);
 	AlxGlobal_EnableIrq();
-	
+
 	return status;
 }
 Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead)
@@ -173,34 +191,34 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
 	AlxGlobal_DisableIrq();
 	Alx_Status status = AlxFifo_ReadStrUntil(&me->rxFifo, str, delim, maxLen, numRead);
 	AlxGlobal_EnableIrq();
-	
+
 	return status;
 }
 Alx_Status AlxSerialPort_Write(AlxSerialPort* me, uint8_t data)
 {
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
-	
+
 	return AlxSerialPort_WriteMulti(me, &data, 1);
 }
 Alx_Status AlxSerialPort_WriteMulti(AlxSerialPort* me, const uint8_t* data, uint32_t len)
 {
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
-	
+
 	if(HAL_UART_Transmit(&me->huart, (uint8_t*)data, len, me->txTimeout_ms) != HAL_OK)
 	{
 		ALX_SERIAL_PORT_TRACE("ErrWriteMulti");
 		if(AlxSerialPort_Reset(me) != Alx_Ok) { ALX_SERIAL_PORT_TRACE("ErrReset"); return Alx_Err;};
 	}
-	
+
 	return Alx_Ok;
 }
 Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
 {
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
-	
+
 	return AlxSerialPort_WriteMulti(me, (const uint8_t*)str, strlen(str));
 }
 void AlxSerialPort_Foreground_Handle(AlxSerialPort* me)
@@ -224,32 +242,32 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 	// #1 Disable UART RX IRQ
 	AlxSerialPort_Periph_DisableRxIrq(me);
 	__HAL_UART_DISABLE_IT(&me->huart, UART_IT_RXNE); // We will not clear flag, because of differences between STM32 HALs, flag will be cleared when UART periphery is reset
-	
+
 	// #2 DeInit UART
 	if(HAL_UART_DeInit(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("ErrDeInit"); return Alx_Err; };
-	
+
 	// #3 Force UART Periphery Reset
 	AlxSerialPort_Periph_ForceReset(me);
-	
+
 	// #4 Flush RX FIFO
 	AlxFifo_Flush(&me->rxFifo);
-	
+
 	// #5 Reset isInit
 	me->isInit = false;
-	
+
 	// #6 Release UART Periphery Reset
 	AlxSerialPort_Periph_ReleaseReset(me);
-	
+
 	// #7 Init UART
 	if(HAL_UART_Init(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("ErrInit"); return Alx_Err; };
 
 	// #8 Enable UART RX IRQ
 	__HAL_UART_ENABLE_IT(&me->huart, UART_IT_RXNE);
 	AlxSerialPort_Periph_EnableRxIrq(me);
-	
+
 	// #9 Set isInit
 	me->isInit = true;
-	
+
 	// #10 Return OK
 	return Alx_Ok;
 }

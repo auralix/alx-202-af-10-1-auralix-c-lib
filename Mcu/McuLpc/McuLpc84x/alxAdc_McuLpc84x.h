@@ -1,14 +1,32 @@
 ﻿/**
   ******************************************************************************
-  * @file alxAdc_McuLpc17.h
-  * @brief Auralix C Library - ALX ADC Module
-  * @version $LastChangedRevision: 5455 $
-  * @date $LastChangedDate: 2021-06-21 00:16:06 +0200 (Mon, 21 Jun 2021) $
+  * @file		alxAdc_McuLpc84x.h
+  * @brief		Auralix C Library - ALX ADC MCU LPC84X Module
+  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  *
+  * @section License
+  *
+  * SPDX-License-Identifier: GPL-3.0-or-later
+  *
+  * This file is part of Auralix C Library.
+  *
+  * Auralix C Library is free software: you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation, either version 3
+  * of the License, or (at your option) any later version.
+  *
+  * Auralix C Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
   ******************************************************************************
-  */
+  **/
 
-#ifndef ALX_ADC_MCU_LPC17_H
-#define ALX_ADC_MCU_LPC17_H
+#ifndef ALX_ADC_MCU_LPC84X_H
+#define ALX_ADC_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +44,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17)
+#if defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -39,11 +57,13 @@ typedef struct
 
 	// Parameters
 	uint8_t numChannels;
+	uint8_t adcClkDiv;
 	uint16_t voltageRefP_mV;
 
 	// Variables
-	ADC_CLOCK_SETUP_T adcClkSetup;
-	uint16_t adcResult;
+	adc_config_t adcConfig;
+	adc_conv_seq_config_t adcConvSeqConfig;
+	adc_result_info_t adcResult;
 
 	// Info
 	bool isInit;
@@ -59,6 +79,7 @@ void AlxAdcMcu_Ctor
 	AlxAdc_Mcu* me,
 	AlxIoPin** channels,
 	uint8_t numChannels,
+	uint8_t adcClkDiv,
 	uint16_t voltageRefP_mV
 );
 
@@ -69,4 +90,4 @@ void AlxAdcMcu_Ctor
 }
 #endif
 
-#endif // ALX_ADC_MCU_LPC17_H
+#endif // ALX_ADC_MCU_LPC84X_H

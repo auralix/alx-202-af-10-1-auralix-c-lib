@@ -1,14 +1,32 @@
 ﻿/**
   ******************************************************************************
-  * @file alxGlobalMcuLpc84.h
-  * @brief Auralix C Library - ALX Global Module
-  * @version $LastChangedRevision: 4270 $
-  * @date $LastChangedDate: 2021-03-05 19:02:52 +0100 (Fri, 05 Mar 2021) $
+  * @file		alxGlobalMcuLpc84x.h
+  * @brief		Auralix C Library - ALX Global MCU LPC84X File
+  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  *
+  * @section License
+  *
+  * SPDX-License-Identifier: GPL-3.0-or-later
+  *
+  * This file is part of Auralix C Library.
+  *
+  * Auralix C Library is free software: you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation, either version 3
+  * of the License, or (at your option) any later version.
+  *
+  * Auralix C Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
   ******************************************************************************
-  */
+  **/
 
-#ifndef ALX_GLOBAL_MCU_LPC84_H
-#define ALX_GLOBAL_MCU_LPC84_H
+#ifndef ALX_GLOBAL_MCU_LPC84X_H
+#define ALX_GLOBAL_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,7 +35,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84)
+#if defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -59,4 +77,4 @@ extern "C" {
 }
 #endif
 
-#endif // ALX_GLOBAL_MCU_LPC84_H
+#endif // ALX_GLOBAL_MCU_LPC84X_H

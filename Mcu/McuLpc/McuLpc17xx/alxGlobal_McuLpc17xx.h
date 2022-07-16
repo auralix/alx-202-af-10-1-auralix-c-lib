@@ -1,7 +1,7 @@
-/**
+﻿/**
   ******************************************************************************
-  * @file		alxFtoa.h
-  * @brief		Auralix C Library - ALX Float to ASCII Module - Copied from: https://github.com/antongus/stm32tpl/blob/master/ftoa.h
+  * @file		alxGlobal_McuLpc17xx.h
+  * @brief		Auralix C Library - ALX Global MCU LPC17XX File
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,31 +25,29 @@
   ******************************************************************************
   **/
 
-//******************************************************************************
-// Include Guard
-//******************************************************************************
-#ifndef ALX_FTOA_H
-#define ALX_FTOA_H
+#ifndef ALX_GLOBAL_MCU_LPC17XX_H
+#define ALX_GLOBAL_MCU_LPC17XX_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_LPC17XX)
+
 
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxGlobal.h"
+#include <chip.h>
 
 
-//******************************************************************************
-// Functions
-//******************************************************************************
-char* AlxFtoa(double f, char* buf, int precision);
-
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_FTOA_H
+#endif // ALX_GLOBAL_MCU_LPC17XX_H

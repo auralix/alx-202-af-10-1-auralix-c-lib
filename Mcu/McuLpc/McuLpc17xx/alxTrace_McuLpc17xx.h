@@ -1,14 +1,32 @@
 ﻿/**
   ******************************************************************************
-  * @file alxTrace_McuLpc84.h
-  * @brief Auralix C Library - ALX Trace Module
-  * @version $LastChangedRevision: 5455 $
-  * @date $LastChangedDate: 2021-06-21 00:16:06 +0200 (Mon, 21 Jun 2021) $
+  * @file		alxTrace_McuLpc17xx.h
+  * @brief		Auralix C Library - ALX Trace MCU LPC17XX Module
+  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  *
+  * @section License
+  *
+  * SPDX-License-Identifier: GPL-3.0-or-later
+  *
+  * This file is part of Auralix C Library.
+  *
+  * Auralix C Library is free software: you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation, either version 3
+  * of the License, or (at your option) any later version.
+  *
+  * Auralix C Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
   ******************************************************************************
-  */
+  **/
 
-#ifndef ALX_TRACE_MCU_LPC84_H
-#define ALX_TRACE_MCU_LPC84_H
+#ifndef ALX_TRACE_MCU_LPC17XX_H
+#define ALX_TRACE_MCU_LPC17XX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,7 +42,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84)
+#if defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -35,11 +53,9 @@ typedef struct
 	// Parameters
 	uint8_t port;
 	uint8_t pin;
-	USART_Type* usart;
-	AlxGlobal_BaudRate baudRate;
-
-	// Variables
-	usart_config_t usartConfig;
+	uint8_t func;
+	LPC_USART_T* uart;
+	uint32_t baudRate;
 
 	// Info
 	bool isInit;
@@ -55,27 +71,17 @@ static inline void AlxTrace_Ctor
 	AlxTrace* me,
 	uint8_t port,
 	uint8_t pin,
-	USART_Type* usart,
+	uint8_t func,
+	LPC_USART_T* uart,
 	AlxGlobal_BaudRate baudRate
 )
 {
 	// Parameters
 	me->port = port;
 	me->pin = pin;
-	me->usart = usart;
+	me->func = func;
+	me->uart = uart;
 	me->baudRate = (uint32_t)baudRate;
-
-	// Variables
-	me->usartConfig.baudRate_Bps = (uint32_t)baudRate;
-	me->usartConfig.enableRx = false;
-	me->usartConfig.enableTx = true;
-	me->usartConfig.loopback = false;
-	me->usartConfig.enableContinuousSCLK = false;
-	me->usartConfig.parityMode = kUSART_ParityDisabled;
-	me->usartConfig.stopBitCount = kUSART_OneStopBit;
-	me->usartConfig.bitCountPerChar = kUSART_8BitsPerChar;
-	me->usartConfig.syncMode = kUSART_SyncModeDisabled;
-	me->usartConfig.clockPolarity = kUSART_RxSampleOnFallingEdge;
 
 	// Info
 	me->isInit = false;
@@ -89,4 +95,4 @@ static inline void AlxTrace_Ctor
 }
 #endif
 
-#endif // ALIX_TRACE_MCU_LPC84_H
+#endif // ALX_TRACE_MCU_LPC17XX_H

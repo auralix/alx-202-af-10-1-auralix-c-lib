@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxDac_Mcu.h
-  * @brief		Auralix C Library - ALX DAC Module
+  * @file		alxTrace_McuLpc84x.h
+  * @brief		Auralix C Library - ALX Trace MCU LPC84X Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,8 +25,8 @@
   ******************************************************************************
   **/
 
-#ifndef ALX_DAC_MCU_H
-#define ALX_DAC_MCU_H
+#ifndef ALX_TRACE_MCU_LPC84X_H
+#define ALX_TRACE_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,55 +36,75 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
-#include "alxIoPin.h"
+#include "alxTick.h"
 
-// AlxMcu //
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
-#include "alxDac_McuStm32.h"
 
-#else
-typedef struct {} AlxDac_Mcu;
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_LPC84X)
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Parameters
+	uint8_t port;
+	uint8_t pin;
+	USART_Type* usart;
+	AlxGlobal_BaudRate baudRate;
+
+	// Variables
+	usart_config_t usartConfig;
+
+	// Info
+	bool isInit;
+	bool wasCtorCalled;
+} AlxTrace;
+
+
+//******************************************************************************
+// Constructor
+//******************************************************************************
+static inline void AlxTrace_Ctor
+(
+	AlxTrace* me,
+	uint8_t port,
+	uint8_t pin,
+	USART_Type* usart,
+	AlxGlobal_BaudRate baudRate
+)
+{
+	// Parameters
+	me->port = port;
+	me->pin = pin;
+	me->usart = usart;
+	me->baudRate = (uint32_t)baudRate;
+
+	// Variables
+	me->usartConfig.baudRate_Bps = (uint32_t)baudRate;
+	me->usartConfig.enableRx = false;
+	me->usartConfig.enableTx = true;
+	me->usartConfig.loopback = false;
+	me->usartConfig.enableContinuousSCLK = false;
+	me->usartConfig.parityMode = kUSART_ParityDisabled;
+	me->usartConfig.stopBitCount = kUSART_OneStopBit;
+	me->usartConfig.bitCountPerChar = kUSART_8BitsPerChar;
+	me->usartConfig.syncMode = kUSART_SyncModeDisabled;
+	me->usartConfig.clockPolarity = kUSART_RxSampleOnFallingEdge;
+
+	// Info
+	me->isInit = false;
+	me->wasCtorCalled = true;
+}
+
+
 #endif
-
-
-//******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_DAC_MCU_FILE "alxDac_Mcu"
-
-// Assert //
-#if defined(_ALX_DAC_MCU_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_DAC_MCU_ASSERT(expr) ALX_ASSERT_BKPT(ALX_DAC_MCU_FILE, expr)
-#elif defined(_ALX_DAC_MCU_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_DAC_MCU_ASSERT(expr) ALX_ASSERT_TRACE(ALX_DAC_MCU_FILE, expr)
-#elif defined(_ALX_DAC_MCU_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_DAC_MCU_ASSERT(expr) ALX_ASSERT_RST(ALX_DAC_MCU_FILE, expr)
-#else
-	#define ALX_DAC_MCU_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(_ALX_DAC_MCU_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_DAC_MCU_TRACE(...) ALX_TRACE_STD(ALX_DAC_MCU_FILE, __VA_ARGS__)
-#else
-	#define ALX_DAC_MCU_TRACE(...) do{} while (false)
-#endif
-
-
-//******************************************************************************
-// Functions
-//******************************************************************************
-Alx_Status AlxDacMcu_Init(AlxDac_Mcu* me);
-Alx_Status AlxDacMcu_Init_CalibrateVref(AlxDac_Mcu* me, float* vref_V);
-Alx_Status AlxDacMcu_DeInit(AlxDac_Mcu* me);
-Alx_Status AlxDacMcu_SetVoltage_V(AlxDac_Mcu* me, Alx_Ch* ch, float* voltage_V);
-Alx_Status AlxDacMcu_SetVoltage_V_CalibrateVref(AlxDac_Mcu* me, Alx_Ch* ch, float* voltage_V, float* vref_V);
-
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_DAC_MCU_H
+#endif // ALIX_TRACE_MCU_LPC84X_H

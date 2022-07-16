@@ -1,8 +1,8 @@
 ﻿/**
   ******************************************************************************
   * @file		alxFifo.h
-  * @brief		Auralix C Library - AlxFifo Module
-  * @copyright	Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+  * @brief		Auralix C Library - ALX FIFO Module
+  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_FIFO_H
 #define ALX_FIFO_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -98,9 +102,6 @@ typedef struct
 /**
   * @brief
   * @param[in] me
-  * @param[in] buff
-  * @param[in] buffLen
-  * @retval void
   */
 void AlxFifo_Ctor
 (
@@ -117,31 +118,42 @@ void AlxFifo_Ctor
 /**
   * @brief
   * @param[in] me
-  * @retval void
   */
 void AlxFifo_Flush(AlxFifo* me);
 
 /**
   * @brief
   * @param[in] me
-  * @retval Alx_Ok
-  * @retval Alx_Err
-  * @retval AlxFifo_ErrEmpty
   */
 Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len);
 
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
 
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxFifo_Write(AlxFifo* me, uint8_t data);
 
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len);
 
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str);
 
 /**
   * @brief
   * @param[in] me
-  * @return
   */
 uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me);
 

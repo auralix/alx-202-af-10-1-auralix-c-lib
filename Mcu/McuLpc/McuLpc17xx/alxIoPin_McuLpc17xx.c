@@ -1,23 +1,41 @@
 ﻿/**
   ******************************************************************************
-  * @file alxIoPin_McuLpc17.c
-  * @brief Auralix C Library - ALX IO Pin Module
-  * @version $LastChangedRevision: 5455 $
-  * @date $LastChangedDate: 2021-06-21 00:16:06 +0200 (Mon, 21 Jun 2021) $
+  * @file		alxIoPin_McuLpc17xx.c
+  * @brief		Auralix C Library - ALX IO Pin MCU LPC17XX Module
+  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  *
+  * @section License
+  *
+  * SPDX-License-Identifier: GPL-3.0-or-later
+  *
+  * This file is part of Auralix C Library.
+  *
+  * Auralix C Library is free software: you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation, either version 3
+  * of the License, or (at your option) any later version.
+  *
+  * Auralix C Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
   ******************************************************************************
-  */
+  **/
 
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxIoPin_McuLpc17.h"
+#include "alxIoPin_McuLpc17xx.h"
 #include "alxIoPin.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17)
+#if defined(ALX_LPC17XX)
 
 
 //******************************************************************************

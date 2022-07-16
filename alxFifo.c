@@ -1,8 +1,8 @@
 ﻿/**
   ******************************************************************************
   * @file		alxFifo.c
-  * @brief		Auralix C Library - AlxFifo Module
-  * @copyright	Copyright (C) 2022 Auralix d.o.o. All rights reserved.
+  * @brief		Auralix C Library - ALX FIFO Module
+  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
