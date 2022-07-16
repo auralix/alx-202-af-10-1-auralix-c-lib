@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxBts724g.h
-  * @brief		Auralix C Library - ALX HighSide Switch BTS724G Module
+  * @brief		Auralix C Library - ALX High Side Power Switch BTS724G Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License

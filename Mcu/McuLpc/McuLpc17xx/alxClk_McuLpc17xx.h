@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxTrace_McuLpc84.h
-  * @brief		Auralix C Library - ALX Trace Module
+  * @file		alxClk_McuLpc17xx.h
+  * @brief		Auralix C Library - ALX Clock MCU LPC17XX Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,8 +25,8 @@
   ******************************************************************************
   **/
 
-#ifndef ALX_TRACE_MCU_LPC84_H
-#define ALX_TRACE_MCU_LPC84_H
+#ifndef ALX_CLK_MCU_LPC17XX_H
+#define ALX_CLK_MCU_LPC17XX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,13 +36,14 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTick.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84)
+#if defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -50,52 +51,20 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Parameters
-	uint8_t port;
-	uint8_t pin;
-	USART_Type* usart;
-	AlxGlobal_BaudRate baudRate;
-
-	// Variables
-	usart_config_t usartConfig;
-
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-} AlxTrace;
+} AlxClk;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-static inline void AlxTrace_Ctor
+static inline void AlxClk_Ctor
 (
-	AlxTrace* me,
-	uint8_t port,
-	uint8_t pin,
-	USART_Type* usart,
-	AlxGlobal_BaudRate baudRate
+	AlxClk* me
 )
 {
-	// Parameters
-	me->port = port;
-	me->pin = pin;
-	me->usart = usart;
-	me->baudRate = (uint32_t)baudRate;
-
-	// Variables
-	me->usartConfig.baudRate_Bps = (uint32_t)baudRate;
-	me->usartConfig.enableRx = false;
-	me->usartConfig.enableTx = true;
-	me->usartConfig.loopback = false;
-	me->usartConfig.enableContinuousSCLK = false;
-	me->usartConfig.parityMode = kUSART_ParityDisabled;
-	me->usartConfig.stopBitCount = kUSART_OneStopBit;
-	me->usartConfig.bitCountPerChar = kUSART_8BitsPerChar;
-	me->usartConfig.syncMode = kUSART_SyncModeDisabled;
-	me->usartConfig.clockPolarity = kUSART_RxSampleOnFallingEdge;
-
-	// Info
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
@@ -107,4 +76,4 @@ static inline void AlxTrace_Ctor
 }
 #endif
 
-#endif // ALIX_TRACE_MCU_LPC84_H
+#endif // ALX_CLK_MCU_LPC17XX_H

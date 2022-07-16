@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxAdc_McuLpc84.h
-  * @brief		Auralix C Library - ALX ADC Module
+  * @file		alxTrace_McuLpc84x.h
+  * @brief		Auralix C Library - ALX Trace MCU LPC84X Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,8 +25,8 @@
   ******************************************************************************
   **/
 
-#ifndef ALX_ADC_MCU_LPC84_H
-#define ALX_ADC_MCU_LPC84_H
+#ifndef ALX_TRACE_MCU_LPC84X_H
+#define ALX_TRACE_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,15 +36,13 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
-#include "alxIoPin.h"
+#include "alxTick.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84)
+#if defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -52,36 +50,55 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Obejcts - External
-	AlxIoPin** channels;
-
 	// Parameters
-	uint8_t numChannels;
-	uint8_t adcClkDiv;
-	uint16_t voltageRefP_mV;
+	uint8_t port;
+	uint8_t pin;
+	USART_Type* usart;
+	AlxGlobal_BaudRate baudRate;
 
 	// Variables
-	adc_config_t adcConfig;
-	adc_conv_seq_config_t adcConvSeqConfig;
-	adc_result_info_t adcResult;
+	usart_config_t usartConfig;
 
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-} AlxAdc_Mcu;
+} AlxTrace;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxAdcMcu_Ctor
+static inline void AlxTrace_Ctor
 (
-	AlxAdc_Mcu* me,
-	AlxIoPin** channels,
-	uint8_t numChannels,
-	uint8_t adcClkDiv,
-	uint16_t voltageRefP_mV
-);
+	AlxTrace* me,
+	uint8_t port,
+	uint8_t pin,
+	USART_Type* usart,
+	AlxGlobal_BaudRate baudRate
+)
+{
+	// Parameters
+	me->port = port;
+	me->pin = pin;
+	me->usart = usart;
+	me->baudRate = (uint32_t)baudRate;
+
+	// Variables
+	me->usartConfig.baudRate_Bps = (uint32_t)baudRate;
+	me->usartConfig.enableRx = false;
+	me->usartConfig.enableTx = true;
+	me->usartConfig.loopback = false;
+	me->usartConfig.enableContinuousSCLK = false;
+	me->usartConfig.parityMode = kUSART_ParityDisabled;
+	me->usartConfig.stopBitCount = kUSART_OneStopBit;
+	me->usartConfig.bitCountPerChar = kUSART_8BitsPerChar;
+	me->usartConfig.syncMode = kUSART_SyncModeDisabled;
+	me->usartConfig.clockPolarity = kUSART_RxSampleOnFallingEdge;
+
+	// Info
+	me->isInit = false;
+	me->wasCtorCalled = true;
+}
 
 
 #endif
@@ -90,4 +107,4 @@ void AlxAdcMcu_Ctor
 }
 #endif
 
-#endif // ALX_ADC_MCU_LPC84_H
+#endif // ALIX_TRACE_MCU_LPC84X_H

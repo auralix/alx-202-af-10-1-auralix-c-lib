@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxIoPin_McuLpc17.h
-  * @brief		Auralix C Library - ALX IO Pin Module
+  * @file		alxClk_McuLpc84x.h
+  * @brief		Auralix C Library - ALX Clock MCU LPC84X Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,8 +25,8 @@
   ******************************************************************************
   **/
 
-#ifndef ALX_IO_PIN_MCU_LPC17_H
-#define ALX_IO_PIN_MCU_LPC17_H
+#ifndef ALX_CLK_MCU_LPC84X_H
+#define ALX_CLK_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,7 +43,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17)
+#if defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -52,46 +52,33 @@ extern "C" {
 typedef struct
 {
 	// Parameters
-	uint8_t port;
-	uint8_t pin;
-	uint32_t mode;
-	uint8_t func;
-	bool isOpenDrain;
-	bool dir;
+	clock_main_clk_src_t mainClkSource;
+	uint32_t clkFreq;
+	uint8_t divider;
 
 	// Info
-	bool val;
 	bool isInit;
 	bool wasCtorCalled;
-} AlxIoPin;
+} AlxClk;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-static inline void AlxIoPin_Ctor
+static inline void AlxClk_Ctor
 (
-	AlxIoPin* me,
-	uint8_t port,
-	uint8_t pin,
-	uint32_t mode,
-	uint8_t func,
-	bool isOpenDrain,
-	bool dir,
-	bool val
+	AlxClk* me,
+	clock_main_clk_src_t mainClkSource,
+	uint32_t clkFreq,
+	uint8_t divider
 )
 {
 	// Parameters
-	me->port = port;
-	me->pin = pin;
-	me->mode = mode;
-	me->func = func;
-	me->isOpenDrain = isOpenDrain;
-	me->dir = dir;
-	me->val = val;
+	me->mainClkSource = mainClkSource;
+	me->clkFreq = clkFreq;
+	me->divider = divider;
 
 	// Info
-	me->isInit = false;
 	me->wasCtorCalled = true;
 }
 
@@ -102,4 +89,4 @@ static inline void AlxIoPin_Ctor
 }
 #endif
 
-#endif // ALX_IO_PIN_MCU_LPC17_H
+#endif // ALX_CLK_MCU_LPC84X_H

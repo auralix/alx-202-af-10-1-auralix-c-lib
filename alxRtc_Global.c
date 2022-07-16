@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxRtc_Global.c
-  * @brief		Auralix C Library - ALX RTC Module - Global
+  * @brief		Auralix C Library - ALX RTC Global Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License

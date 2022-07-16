@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxTrace_McuLpc17.h
-  * @brief		Auralix C Library - ALX Trace Module
+  * @file		alxAdc_McuLpc17xx.h
+  * @brief		Auralix C Library - ALX ADC MCU LPC17XX Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,8 +25,8 @@
   ******************************************************************************
   **/
 
-#ifndef ALX_TRACE_MCU_LPC17_H
-#define ALX_TRACE_MCU_LPC17_H
+#ifndef ALX_ADC_MCU_LPC17XX_H
+#define ALX_ADC_MCU_LPC17XX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,13 +36,15 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTick.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+#include "alxIoPin.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17)
+#if defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -50,43 +52,33 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	// Obejcts - External
+	AlxIoPin** channels;
+
 	// Parameters
-	uint8_t port;
-	uint8_t pin;
-	uint8_t func;
-	LPC_USART_T* uart;
-	uint32_t baudRate;
+	uint8_t numChannels;
+	uint16_t voltageRefP_mV;
+
+	// Variables
+	ADC_CLOCK_SETUP_T adcClkSetup;
+	uint16_t adcResult;
 
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-} AlxTrace;
+} AlxAdc_Mcu;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-static inline void AlxTrace_Ctor
+void AlxAdcMcu_Ctor
 (
-	AlxTrace* me,
-	uint8_t port,
-	uint8_t pin,
-	uint8_t func,
-	LPC_USART_T* uart,
-	AlxGlobal_BaudRate baudRate
-)
-{
-	// Parameters
-	me->port = port;
-	me->pin = pin;
-	me->func = func;
-	me->uart = uart;
-	me->baudRate = (uint32_t)baudRate;
-
-	// Info
-	me->isInit = false;
-	me->wasCtorCalled = true;
-}
+	AlxAdc_Mcu* me,
+	AlxIoPin** channels,
+	uint8_t numChannels,
+	uint16_t voltageRefP_mV
+);
 
 
 #endif
@@ -95,4 +87,4 @@ static inline void AlxTrace_Ctor
 }
 #endif
 
-#endif // ALX_TRACE_MCU_LPC17_H
+#endif // ALX_ADC_MCU_LPC17XX_H

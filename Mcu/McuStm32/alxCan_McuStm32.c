@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxCan_McuStm32.c
-  * @brief		Auralix C Library - ALX CAN Module
+  * @brief		Auralix C Library - ALX CAN MCU STM32 Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License

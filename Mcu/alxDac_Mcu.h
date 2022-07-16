@@ -1,6 +1,6 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxAdc_Mcu.h
+  * @file		alxDac_Mcu.h
   * @brief		Auralix C Library - ALX DAC Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *

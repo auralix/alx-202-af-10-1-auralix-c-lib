@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxClk_McuLpc55S6x.h
-  * @brief		Auralix C Library - ALX Clock Module
+  * @brief		Auralix C Library - ALX Clock MCU LPC55S6X Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License

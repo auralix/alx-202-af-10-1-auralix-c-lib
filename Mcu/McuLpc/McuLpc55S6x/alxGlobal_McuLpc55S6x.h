@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxGlobal_McuLpc55S6x.h
-  * @brief		Auralix C Library - ALX Global Module
+  * @brief		Auralix C Library - ALX Global MCU LPC55S6X File
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License

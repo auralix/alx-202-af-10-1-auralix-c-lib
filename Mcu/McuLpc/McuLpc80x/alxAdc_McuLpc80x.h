@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxAdc_McuLpc80x.h
-  * @brief		Auralix C Library - ALX ADC Module
+  * @brief		Auralix C Library - ALX ADC MCU LPC80X Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License

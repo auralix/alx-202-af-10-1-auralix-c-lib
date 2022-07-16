@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxGlobalMcuLpc84.h
-  * @brief		Auralix C Library - ALX Global Module
+  * @file		alxTrace_McuLpc17xx.h
+  * @brief		Auralix C Library - ALX Trace MCU LPC17XX Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,50 +25,68 @@
   ******************************************************************************
   **/
 
-#ifndef ALX_GLOBAL_MCU_LPC84_H
-#define ALX_GLOBAL_MCU_LPC84_H
+#ifndef ALX_TRACE_MCU_LPC17XX_H
+#define ALX_TRACE_MCU_LPC17XX_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //******************************************************************************
-// Module Guard
-//******************************************************************************
-#if defined(ALX_LPC84)
-
-
-//******************************************************************************
 // Includes
 //******************************************************************************
-#include "fsl_acomp.h"
-#include "fsl_adc.h"
-#include "fsl_capt.h"
-#include "fsl_clock.h"
-#include "fsl_common.h"
-#include "fsl_crc.h"
-#include "fsl_ctimer.h"
-#include "fsl_dac.h"
-#include "fsl_dma.h"
-#include "fsl_gpio.h"
-#include "fsl_i2c.h"
-#include "fsl_iap.h"
-#include "fsl_inputmux.h"
-#include "fsl_inputmux_connections.h"
-#include "fsl_iocon.h"
-#include "fsl_mrt.h"
-#include "fsl_pint.h"
-#include "fsl_power.h"
-#include "fsl_reset.h"
-#include "fsl_sctimer.h"
-#include "fsl_spi.h"
-#include "fsl_swm.h"
-#include "fsl_swm_connections.h"
-#include "fsl_syscon.h"
-#include "fsl_syscon_connections.h"
-#include "fsl_usart.h"
-#include "fsl_wkt.h"
-#include "fsl_wwdt.h"
+#include "alxGlobal.h"
+#include "alxTick.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_LPC17XX)
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Parameters
+	uint8_t port;
+	uint8_t pin;
+	uint8_t func;
+	LPC_USART_T* uart;
+	uint32_t baudRate;
+
+	// Info
+	bool isInit;
+	bool wasCtorCalled;
+} AlxTrace;
+
+
+//******************************************************************************
+// Constructor
+//******************************************************************************
+static inline void AlxTrace_Ctor
+(
+	AlxTrace* me,
+	uint8_t port,
+	uint8_t pin,
+	uint8_t func,
+	LPC_USART_T* uart,
+	AlxGlobal_BaudRate baudRate
+)
+{
+	// Parameters
+	me->port = port;
+	me->pin = pin;
+	me->func = func;
+	me->uart = uart;
+	me->baudRate = (uint32_t)baudRate;
+
+	// Info
+	me->isInit = false;
+	me->wasCtorCalled = true;
+}
 
 
 #endif
@@ -77,4 +95,4 @@ extern "C" {
 }
 #endif
 
-#endif // ALX_GLOBAL_MCU_LPC84_H
+#endif // ALX_TRACE_MCU_LPC17XX_H

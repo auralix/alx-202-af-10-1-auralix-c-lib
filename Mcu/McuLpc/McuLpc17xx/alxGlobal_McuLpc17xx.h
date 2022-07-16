@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxClk_McuLpc84.h
-  * @brief		Auralix C Library - ALX Clock Module
+  * @file		alxGlobal_McuLpc17xx.h
+  * @brief		Auralix C Library - ALX Global MCU LPC17XX File
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,62 +25,23 @@
   ******************************************************************************
   **/
 
-#ifndef ALX_CLK_MCU_LPC84_H
-#define ALX_CLK_MCU_LPC84_H
+#ifndef ALX_GLOBAL_MCU_LPC17XX_H
+#define ALX_GLOBAL_MCU_LPC17XX_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //******************************************************************************
-// Includes
-//******************************************************************************
-#include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
-
-
-//******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84)
+#if defined(ALX_LPC17XX)
 
 
 //******************************************************************************
-// Types
+// Includes
 //******************************************************************************
-typedef struct
-{
-	// Parameters
-	clock_main_clk_src_t mainClkSource;
-	uint32_t clkFreq;
-	uint8_t divider;
-
-	// Info
-	bool isInit;
-	bool wasCtorCalled;
-} AlxClk;
-
-
-//******************************************************************************
-// Constructor
-//******************************************************************************
-static inline void AlxClk_Ctor
-(
-	AlxClk* me,
-	clock_main_clk_src_t mainClkSource,
-	uint32_t clkFreq,
-	uint8_t divider
-)
-{
-	// Parameters
-	me->mainClkSource = mainClkSource;
-	me->clkFreq = clkFreq;
-	me->divider = divider;
-
-	// Info
-	me->wasCtorCalled = true;
-}
+#include <chip.h>
 
 
 #endif
@@ -89,4 +50,4 @@ static inline void AlxClk_Ctor
 }
 #endif
 
-#endif // ALX_CLK_MCU_LPC84_H
+#endif // ALX_GLOBAL_MCU_LPC17XX_H

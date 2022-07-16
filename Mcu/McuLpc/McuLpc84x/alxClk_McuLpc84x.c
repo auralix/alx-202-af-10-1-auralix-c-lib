@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxClk_McuLpc84.c
-  * @brief		Auralix C Library - ALX Clock Module
+  * @file		alxClk_McuLpc84x.c
+  * @brief		Auralix C Library - ALX Clock MCU LPC84X Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,14 +28,14 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxClk_McuLpc84.h"
+#include "alxClk_McuLpc84x.h"
 #include "alxClk.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84)
+#if defined(ALX_LPC84X)
 
 
 //******************************************************************************

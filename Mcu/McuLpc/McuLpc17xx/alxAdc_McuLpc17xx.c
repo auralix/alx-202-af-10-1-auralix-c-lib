@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxAdc_McuLpc17.c
-  * @brief		Auralix C Library - ALX ADC Module
+  * @file		alxAdc_McuLpc17xx.c
+  * @brief		Auralix C Library - ALX ADC MCU LPC17XX Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,14 +28,14 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxAdc_McuLpc17.h"
+#include "alxAdc_McuLpc17xx.h"
 #include "alxAdc.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17)
+#if defined(ALX_LPC17XX)
 
 
 //******************************************************************************

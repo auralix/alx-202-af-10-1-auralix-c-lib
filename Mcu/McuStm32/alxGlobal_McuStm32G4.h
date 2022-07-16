@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxGlobal_McuStm32G4.h
-  * @brief		Auralix C Library - ALX Global Module
+  * @brief		Auralix C Library - ALX Global MCU STM32G4 File
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -35,7 +35,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-//#if defined(ALX_STM32G4)
+#if defined(ALX_STM32G4)
 
 
 //******************************************************************************
@@ -98,8 +98,11 @@ extern "C" {
 
 #define ALX_STM32_STR "STM32G4"
 
+
 #endif
 
 #ifdef __cplusplus
 }
-#endif // ALX_GLOBAL_MCU_STM32G4_H
+#endif
+
+#endif	// #ifndef ALX_GLOBAL_MCU_STM32G4_H

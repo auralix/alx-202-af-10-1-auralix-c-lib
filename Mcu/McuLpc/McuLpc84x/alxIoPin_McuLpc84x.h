@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxIoPin_McuLpc84.h
-  * @brief		Auralix C Library - ALX IO Pin Module
+  * @file		alxIoPin_McuLpc84x.h
+  * @brief		Auralix C Library - ALX IO Pin MCU LPC84X Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,8 +25,8 @@
   ******************************************************************************
   **/
 
-#ifndef ALX_IO_PIN_MCU_LPC84_H
-#define ALX_IO_PIN_MCU_LPC84_H
+#ifndef ALX_IO_PIN_MCU_LPC84X_H
+#define ALX_IO_PIN_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,7 +43,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84)
+#if defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -233,4 +233,4 @@ static inline void AlxIoPin_Ctor
 }
 #endif
 
-#endif // ALX_IO_PIN_MCU_LPC84_H
+#endif // ALX_IO_PIN_MCU_LPC84X_H

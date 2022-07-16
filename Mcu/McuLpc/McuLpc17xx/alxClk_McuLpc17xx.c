@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxGlobal_McuLpc17.h
-  * @brief		Auralix C Library - ALX Global Module
+  * @file		alxClk_McuLpc17xx.c
+  * @brief		Auralix C Library - ALX Clock MCU LPC17XX Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,29 +25,40 @@
   ******************************************************************************
   **/
 
-#ifndef ALX_GLOBAL_MCU_LPC17_H
-#define ALX_GLOBAL_MCU_LPC17_H
+//******************************************************************************
+// Includes
+//******************************************************************************
+#include "alxClk_McuLpc17xx.h"
+#include "alxClk.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17)
+#if defined(ALX_LPC17XX)
 
 
 //******************************************************************************
-// Includes
+// Specific Functions
 //******************************************************************************
-#include <chip.h>
+void AlxClk_Init(AlxClk* me)
+{
+	ALX_CLK_ASSERT(me->isInit == false);
+	ALX_CLK_ASSERT(me->wasCtorCalled == true);
 
+	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_GPIO);
 
-#endif
-
-#ifdef __cplusplus
+	me->isInit = true;
 }
-#endif
+void AlxClk_DeInit(AlxClk* me)
+{
+	ALX_CLK_ASSERT(me->isInit == true);
+	ALX_CLK_ASSERT(me->wasCtorCalled == true);
 
-#endif // ALX_GLOBAL_MCU_LPC17XX_H
+	Chip_Clock_DisablePeriphClock(SYSCTL_CLOCK_GPIO);
+
+	me->isInit = false;
+}
+
+
+#endif

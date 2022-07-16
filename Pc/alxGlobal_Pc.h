@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxGlobal_Pc.h
-  * @brief		Auralix C Library - ALX Global Module
+  * @brief		Auralix C Library - ALX Global PC File
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License

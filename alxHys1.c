@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file		alxHys1.c
-  * @brief		Auralix C Library - ALX Hysteresis 2 Module
+  * @brief		Auralix C Library - ALX Hysteresis 1 Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -88,7 +88,7 @@ AlxHys1_St AlxHys1_Process(AlxHys1* me, float in)
 			break;
 		}
 	}
-	
+
 	ALX_HYS1_ASSERT(false); // We should never get here
 	return ALX_NULL;
 }

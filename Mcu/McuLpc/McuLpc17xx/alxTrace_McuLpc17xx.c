@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxClk_McuLpc17.h
-  * @brief		Auralix C Library - ALX Clock Module
+  * @file		alxTrace_McuLpc17xx.c
+  * @brief		Auralix C Library - ALX Trace MCU LPC17XX Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,55 +25,53 @@
   ******************************************************************************
   **/
 
-#ifndef ALX_CLK_MCU_LPC17_H
-#define ALX_CLK_MCU_LPC17_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxGlobal.h"
+#include "alxTrace_McuLpc17xx.h"
 #include "alxTrace.h"
-#include "alxAssert.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17)
+#if defined(ALX_LPC17XX)
 
 
 //******************************************************************************
-// Types
+// Specific Functions
 //******************************************************************************
-typedef struct
+void AlxTrace_Init(AlxTrace* me)
 {
-	// Info
-	bool isInit;
-	bool wasCtorCalled;
-} AlxClk;
+	// GPIO //
+	Chip_IOCON_PinMux(LPC_IOCON, me->port, me->pin, IOCON_MODE_INACT, me->func);
+	Chip_IOCON_DisableOD(LPC_IOCON, me->port, me->pin);
+	Chip_GPIO_SetPinDIR(LPC_GPIO, me->port, me->pin, false);
+	Chip_GPIO_SetPinState(LPC_GPIO, me->port, me->pin, false);
 
+	// UART //
+	Chip_UART_Init(me->uart);
+	Chip_UART_SetBaud(me->uart, me->baudRate);
+	Chip_UART_ConfigData(me->uart, UART_LCR_WLEN8 | UART_LCR_SBS_1BIT | UART_LCR_PARITY_DIS);
+	Chip_UART_SetupFIFOS(me->uart, UART_FCR_FIFO_EN);
+	Chip_UART_TXEnable(me->uart);
 
-//******************************************************************************
-// Constructor
-//******************************************************************************
-static inline void AlxClk_Ctor
-(
-	AlxClk* me
-)
+	me->isInit = true;
+}
+void AlxTrace_DeInit(AlxTrace* me)
 {
+	// TODO
+
 	me->isInit = false;
-	me->wasCtorCalled = true;
+}
+void AlxTrace_WriteStr(AlxTrace* me, const char* str)
+{
+	while (*str)
+	{
+		while ((Chip_UART_ReadLineStatus(me->uart) & UART_LSR_THRE) == false) ; // Wait until TX buffer is empty
+		Chip_UART_SendByte(me->uart, (const uint8_t)*str++);
+	}
 }
 
 
 #endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // ALX_CLK_MCU_LPC17_H

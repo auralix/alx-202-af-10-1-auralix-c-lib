@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxTrace_McuLpc84.c
-  * @brief		Auralix C Library - ALX Trace Module
+  * @file		alxTrace_McuLpc84x.c
+  * @brief		Auralix C Library - ALX Trace MCU LPC84X Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,14 +28,14 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxTrace_McuLpc84.h"
+#include "alxTrace_McuLpc84x.h"
 #include "alxTrace.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84)
+#if defined(ALX_LPC84X)
 
 
 //******************************************************************************

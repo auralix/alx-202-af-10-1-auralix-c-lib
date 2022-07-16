@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxConfig.h
-  * @brief		Auralix Library - Configuration File
+  * @brief		Auralix C Library - ALX Configuration File Template
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
