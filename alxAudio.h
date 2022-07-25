@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_AUDIO_H
 #define ALX_AUDIO_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -99,4 +103,4 @@ float AlxAudio_StereoToMono(float sampleL, float sampleR);
 }
 #endif
 
-#endif // ALX_AUDIO_GLOBAL_H
+#endif // #ifndef ALX_AUDIO_H

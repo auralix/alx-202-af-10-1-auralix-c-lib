@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_INTERP_LIN_H
 #define ALX_INTERP_LIN_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -80,14 +84,14 @@ typedef struct
 	float* yPointArr;
 	uint32_t numOfArrPoints;
 	bool isXpointArrRising;
-	
+
 	// Objects - Internal
-	
-	// Variables;
-	
+
+	// Variables
+
 	// Info
 	bool wasCtorCalled;
-	
+
 } AlxInterpLin;
 
 
@@ -108,11 +112,11 @@ void AlxInterpLin_Ctor
 // Functions
 //******************************************************************************
 Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* y);
-float AlxInterpLin_GetY(AlxInterpLin* me, float x); 
+float AlxInterpLin_GetY(AlxInterpLin* me, float x);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_INTERP_LIN_H
+#endif // #ifndef ALX_INTERP_LIN_H

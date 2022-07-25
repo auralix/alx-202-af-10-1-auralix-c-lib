@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TPA3255_H
 #define ALX_TPA3255_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -80,15 +84,15 @@ typedef struct
 {
 	// Parameters Const
 	float lowLevelTime_ms;
-	
+
 	// Objects - External
 	AlxIoPin* do_nRESET;
 	AlxIoPin* di_nFAULT;
 	AlxIoPin* di_nCLIP_OTW;
-	
+
 	// Objects - Internal
 	AlxTimSw tim; // Timer to ReEnable Ic
-	
+
 	// Parameters
 	float waitTime_ReEnable_ms;
 	float waitTime_Waitning_ms;
@@ -97,10 +101,10 @@ typedef struct
 	AlxTpa3255_status state;
 	bool wasErrAsserted;
 	bool wasWarningAsserted;
-	
+
 	// Info
 	bool isInit;
-	bool wasCtorCalled;	
+	bool wasCtorCalled;
 } AlxTpa3255;
 
 
@@ -136,4 +140,4 @@ void AlxTpa3255_ClearWasWarningAsserted(AlxTpa3255* me);
 }
 #endif
 
-#endif // ALX_TPA3255_H
+#endif // #ifndef ALX_TPA3255_H

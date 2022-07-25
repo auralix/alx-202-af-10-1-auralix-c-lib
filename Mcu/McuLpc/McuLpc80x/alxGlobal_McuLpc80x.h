@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_GLOBAL_MCU_LPC80X_H
 #define ALX_GLOBAL_MCU_LPC80X_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -90,4 +94,4 @@ void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode);
 }
 #endif
 
-#endif // ALX_GLOBAL_MCU_LPC80X_H
+#endif // #ifndef ALX_GLOBAL_MCU_LPC80X_H

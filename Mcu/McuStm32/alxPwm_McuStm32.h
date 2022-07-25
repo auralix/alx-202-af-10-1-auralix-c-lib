@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_PWM_MCU_STM32_H
 #define ALX_PWM_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -56,7 +60,7 @@ typedef struct
 	// Objects - External
 	AlxIoPin** ioPinArr;
 	AlxClk* clk;
-	
+
 	// Parameters
 	Alx_Ch* chArr;
 	float* dutyDefaultArr_pct;
@@ -103,4 +107,4 @@ void AlxPwm_Ctor
 }
 #endif
 
-#endif // ALX_PWM_MCU_STM32_H
+#endif // #ifndef ALX_PWM_MCU_STM32_H

@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_AUDIO_PLAYER_H
 #define ALX_AUDIO_PLAYER_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -79,7 +83,7 @@ typedef struct
 	// Parameters - Const
 	uint8_t TRACK_SAMPLE_R_OFFSET_8bit_Byte;	// Offset of the beginning of right channel sample relative to the beginning of left channel sample
 	uint8_t TRACK_SAMPLE_R_OFFSET_16bit_Byte;
-	
+
 	// Parameters
 	const uint8_t* trackPtr;
 	uint32_t trackLen_Byte;				// Track length in bytes
@@ -133,4 +137,4 @@ bool AlxAudioPlayer_IsPlaying(AlxAudioPlayer* me);
 }
 #endif
 
-#endif // ALX_AUDIO_PLAYER_H
+#endif // #ifndef ALX_AUDIO_PLAYER_H

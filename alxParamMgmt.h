@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_PARAM_MGMT_H
 #define ALX_PARAM_MGMT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -78,7 +82,7 @@ typedef struct
 {
 	// Objects - External
 	AlxParamItem** paramItemArr;
-	
+
 	// Parameters
 	uint32_t numOfParamItems;
 
@@ -117,4 +121,4 @@ void AlxParamMgmt_SetToDefAll(AlxParamMgmt* me);
 }
 #endif
 
-#endif // ALX_PARAM_MGMT_H
+#endif // #ifndef ALX_PARAM_MGMT_H

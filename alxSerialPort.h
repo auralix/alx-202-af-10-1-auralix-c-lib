@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_SERIAL_PORT_H
 #define ALX_SERIAL_PORT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -95,4 +99,4 @@ void AlxSerialPort_Foreground_Handle	(AlxSerialPort* me);
 }
 #endif
 
-#endif // ALX_SERIAL_PORT_H
+#endif // #ifndef ALX_SERIAL_PORT_H

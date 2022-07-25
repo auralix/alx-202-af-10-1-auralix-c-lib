@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_BQ24600_H
 #define ALX_BQ24600_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -86,7 +90,7 @@ typedef struct
 	uint32_t ERROR_STATUS_DETECTION_TRANSITIONS;	// minimum number of STAT pin transitions in one detection window to recognize state as Error
 	uint32_t STATUS_BLINK_HALFPERIOD_TIME_MIN_ms;	// minimum duration of half period on STAT pin when it's blinking [ms]
 	uint32_t STATUS_BLINK_HALFPERIOD_TIME_MAX_ms;	// maximum duration of half period on STAT pin when it's blinking [ms] -> used for stable state detection
-	
+
 	// Objects - External
 	AlxIoPin* do_EN;
 	AlxIoPin* di_nPG;
@@ -140,4 +144,4 @@ bool AlxBq24600_IsErr(AlxBq24600* me);
 }
 #endif
 
-#endif // ALX_BQ24600_H
+#endif // #ifndef ALX_BQ24600_H

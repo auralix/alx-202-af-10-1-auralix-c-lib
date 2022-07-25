@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_BTN_H
 #define ALX_BTN_H
 
@@ -32,12 +35,13 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
 #include "alxAssert.h"
-#include "alxTimSw.h"	
+#include "alxTimSw.h"
 #include "alxFiltGlitchBool.h"
 
 
@@ -83,7 +87,7 @@ typedef struct
 
 	// Objects - Internal
 	AlxTimSw timPressed;	// Timer for PressedShort
-	AlxFiltGlitchBool filtGlitchBool; 
+	AlxFiltGlitchBool filtGlitchBool;
 
 	// Variables
 	bool isPressedOld;
@@ -94,7 +98,7 @@ typedef struct
 	bool wasPressedShort;
 	bool isPressedLong;
 	bool wasPressedLong;
-	
+
 	// Info
 	bool wasCtorCalled;
 } AlxBtn;
@@ -117,7 +121,7 @@ void AlxBtn_Ctor
 //******************************************************************************
 void AlxBtn_Handle(AlxBtn* me, bool in);
 bool AlxBtn_IsPressed(AlxBtn* me); 			// True -> Button is currently pressed
-bool AlxBtn_WasPressed(AlxBtn* me);			
+bool AlxBtn_WasPressed(AlxBtn* me);
 bool AlxBtn_WasReleased(AlxBtn* me);
 bool AlxBtn_IsPressedShort(AlxBtn* me);
 bool AlxBtn_WasPressedShort(AlxBtn* me);
@@ -133,4 +137,4 @@ void AlxBtn_ClearWasPressedLong(AlxBtn* me);
 }
 #endif
 
-#endif // ALX_BTN_H
+#endif // #ifndef ALX_BTN_H

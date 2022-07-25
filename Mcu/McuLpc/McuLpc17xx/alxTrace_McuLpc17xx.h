@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TRACE_MCU_LPC17XX_H
 #define ALX_TRACE_MCU_LPC17XX_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -95,4 +99,4 @@ static inline void AlxTrace_Ctor
 }
 #endif
 
-#endif // ALX_TRACE_MCU_LPC17XX_H
+#endif // #ifndef ALX_TRACE_MCU_LPC17XX_H

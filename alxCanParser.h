@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_CAN_PARSER_H
 #define ALX_CAN_PARSER_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -39,7 +43,7 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxCan.h"
 
-	
+
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
@@ -78,7 +82,7 @@ typedef  enum
 {
 	Big		= 0,	// most significant byte is placed at the byte with the lowest address	// Renamed from: can_endian_big
 	Little	= 1		// least significant byte is placed at the byte with the lowest address // Renamed from: can_endian_little
-}AlxCanParser_Endian;	
+}AlxCanParser_Endian;
 
 
 //******************************************************************************
@@ -101,10 +105,10 @@ uint8_t		AlxCanParser_GetUint8(AlxCan_Msg* msg, uint8_t byteOffset);
 int8_t		AlxCanParser_GetInt8(AlxCan_Msg* msg, uint8_t byteOffset);
 uint16_t	AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 int16_t		AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
-uint32_t	AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset); 
-int32_t		AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset); 
-uint64_t	AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset); 
-int64_t		AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset); 
+uint32_t	AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
+int32_t		AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
+uint64_t	AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
+int64_t		AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 float		AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 double		AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 uint8_t		AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, uint8_t nOfBits);
@@ -114,4 +118,4 @@ uint8_t		AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOf
 }
 #endif
 
-#endif // ALX_CAN_PARSER_H
+#endif // #ifndef ALX_CAN_PARSER_H

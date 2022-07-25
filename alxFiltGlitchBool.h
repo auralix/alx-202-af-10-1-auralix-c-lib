@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_FILT_GLITCH_BOOL_H
 #define ALX_FILT_GLITCH_BOOL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -122,4 +126,4 @@ bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in);
 }
 #endif
 
-#endif // ALX_FILT_GLITCH_BOOL_H
+#endif // #ifndef ALX_FILT_GLITCH_BOOL_H

@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_OS_MUTEX_H
 #define ALX_OS_MUTEX_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -82,4 +86,4 @@ bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me);	// TV: Not tested
 }
 #endif
 
-#endif // ALX_OS_MUTEX_H
+#endif // #ifndef ALX_OS_MUTEX_H

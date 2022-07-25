@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TPL_H
 #define ALX_TPL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -77,12 +81,12 @@ extern "C" {
 typedef struct
 {
 	// Parameters - Const
-	
+
 	// Objects - External
-	
+
 	// Objects - Internal
 	AlxTimSw tim; // Timer to measure how long state is stable
-	
+
 	// Parameters
 	float stableTrueTime_ms;
 	float stableFalseTime_ms;
@@ -90,7 +94,7 @@ typedef struct
 	// Variables
 	bool valRaw;
 	bool valFiltered;
-	
+
 	// Info
 	bool wasCtorCalled;
 } AlxTpl;
@@ -118,4 +122,4 @@ bool AlxTpl_Process(AlxTpl* me, bool in);
 }
 #endif
 
-#endif // ALX_TPL_H
+#endif // #ifndef ALX_TPL_H

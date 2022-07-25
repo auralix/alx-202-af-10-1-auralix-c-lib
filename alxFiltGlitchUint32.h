@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_FILT_GLITCH_UINT32_H
 #define ALX_FILT_GLITCH_UINT32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -86,7 +90,7 @@ typedef struct
 	// Variables
 	uint32_t valOld;
 	uint32_t valFiltered;
-	
+
 	// Info
 	bool wasCtorCalled;
 } AlxFiltGlitchUint32;
@@ -113,4 +117,4 @@ uint32_t AlxFiltGlitchUint32_Process(AlxFiltGlitchUint32* me, uint32_t valNew);
 }
 #endif
 
-#endif // ALX_FILT_GLITCH_UINT32_H
+#endif // #ifndef ALX_FILT_GLITCH_UINT32_H

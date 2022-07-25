@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TEMP_SENS_H
 #define ALX_TEMP_SENS_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -124,4 +128,4 @@ Alx_Status AlxTempSens_GetTemp_degC(AlxTempSens* me, float* temp_degC);
 }
 #endif
 
-#endif // ALX_TEMP_SENS_H
+#endif // #ifndef ALX_TEMP_SENS_H

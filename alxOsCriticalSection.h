@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_OS_CRITICAL_SECTION_H
 #define ALX_OS_CRITICAL_SECTION_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -83,4 +87,4 @@ void AlxOsCriticalSection_Exit(void);
 }
 #endif
 
-#endif // ALX_OS_CRITICAL_SECTION_H
+#endif // #ifndef ALX_OS_CRITICAL_SECTION_H

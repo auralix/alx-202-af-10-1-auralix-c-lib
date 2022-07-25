@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_RTC_GLOBAL_H
 #define ALX_RTC_GLOBAL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -113,4 +117,4 @@ uint64_t AlxRtc_DateTimeToUnixTimeSec(AlxRtc_DateTime dateTime);
 }
 #endif
 
-#endif // ALX_RTC_GLOBAL_H
+#endif // #ifndef ALX_RTC_GLOBAL_H

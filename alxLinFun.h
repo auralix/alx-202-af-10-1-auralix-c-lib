@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_LIN_FUN_H
 #define ALX_LIN_FUN_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -83,18 +87,17 @@ typedef struct
 	float min;
 	float max;
 	bool isLimitOnX;
-	
+
 	// Objects - Internal
-	
-	// Variables;
+
+	// Variables
 	float coefK;
 	float coefN;
-	
+
 	// Info
 	bool wasCtorCalled;
 } AlxLinFun;
-	
-	
+
 typedef struct
 {
 	// Parameters
@@ -105,11 +108,11 @@ typedef struct
 	int32_t min;
 	int32_t max;
 	bool isLimitOnX;
-	
+
 	// Objects - Internal
-	
-	// Variables; 
-	
+
+	// Variables;
+
 	// Info
 	bool wasCtorCalled;
 } AlxLinFunInt;
@@ -129,8 +132,7 @@ void AlxLinFun_Ctor
 	float max,
 	bool isLimitOnX
 );
-	
-	
+
 void AlxLinFunInt_Ctor
 (
 	AlxLinFunInt *me,
@@ -149,17 +151,17 @@ void AlxLinFunInt_Ctor
 //******************************************************************************
 Alx_Status AlxLinFun_GetY_WithStatus(AlxLinFun* me, float x, float* y);
 Alx_Status AlxLinFun_GetX_WithStatus(AlxLinFun* me, float y, float* x);
-float AlxLinFun_GetY(AlxLinFun* me, float x); 
+float AlxLinFun_GetY(AlxLinFun* me, float x);
 float AlxLinFun_GetX(AlxLinFun* me, float y);
-	
-	
-Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y); 
-int32_t AlxLinFunInt_GetY(AlxLinFunInt* me, int32_t x);  
-	
+
+
+Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y);
+int32_t AlxLinFunInt_GetY(AlxLinFunInt* me, int32_t x);
+
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_LIN_FUN_H
+#endif // #ifndef ALX_LIN_FUN_H

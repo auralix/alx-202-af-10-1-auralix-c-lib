@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TEMP_SENS_MCU_H
 #define ALX_TEMP_SENS_MCU_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -84,4 +88,4 @@ float AlxTempSensMcu_GetTemp_degC(AlxTempSens_Mcu* me);
 }
 #endif
 
-#endif // ALX_TEMP_SENS_MCU_H
+#endif // #ifndef ALX_TEMP_SENS_MCU_H

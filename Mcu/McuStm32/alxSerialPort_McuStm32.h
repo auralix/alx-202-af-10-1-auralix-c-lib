@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_SERIAL_PORT_MCU_STM32_H
 #define ALX_SERIAL_PORT_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -99,4 +103,4 @@ void AlxSerialPort_Ctor
 }
 #endif
 
-#endif // ALX_SERIAL_PORT_MCU_STM32_H
+#endif // #ifndef ALX_SERIAL_PORT_MCU_STM32_H

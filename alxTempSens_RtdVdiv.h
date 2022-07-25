@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TEMP_SENS_RTD_VDIV_H
 #define ALX_TEMP_SENS_RTD_VDIV_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -39,7 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxAdc.h"
-#include "alxVdiv.h"	
+#include "alxVdiv.h"
 #include "alxInterpLin.h"
 
 
@@ -88,13 +92,13 @@ typedef struct
 	// Objects - External
 	AlxAdc* adc;
 	AlxInterpLin *interpLin;
-	
+
 	// Objects - Internal
-	
+
 	// Variables
-	
+
 	// Info
-	bool wasCtorCalled; 
+	bool wasCtorCalled;
 } AlxTempSensRtdVdiv;
 
 
@@ -125,4 +129,4 @@ Alx_Status AlxTempSensRtdVdiv_GetTemp_degC(AlxTempSensRtdVdiv* me, float* temp_d
 }
 #endif
 
-#endif // ALX_TEMP_SENS_RTD_VDIV_H
+#endif // #ifndef ALX_TEMP_SENS_RTD_VDIV_H

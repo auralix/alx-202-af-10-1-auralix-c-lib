@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_DAC_MCU_H
 #define ALX_DAC_MCU_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -87,4 +91,4 @@ Alx_Status AlxDacMcu_SetVoltage_V_CalibrateVref(AlxDac_Mcu* me, Alx_Ch* ch, floa
 }
 #endif
 
-#endif // ALX_DAC_MCU_H
+#endif // #ifndef ALX_DAC_MCU_H

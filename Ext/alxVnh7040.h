@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_VNH7040_H
 #define ALX_VNH7040_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -81,7 +85,7 @@ typedef enum
 	AlxVnh7040_Sm_StOk = 0,
 	AlxVnh7040_Sm_StErr = 2
 } AlxVnh7040_Sm_St;
-	
+
 typedef enum
 {
 	AlxVnh7040_Status_Init = 0,
@@ -99,8 +103,7 @@ typedef enum
 	AlxVnh7040_BreakType_Vcc = 1,
 	AlxVnh7040_BreakType_Open = 2
 } AlxVnh7040_BreakType;
-	
-	
+
 typedef enum
 {
 	AlxVnh7040_MonitoringType_HSA   = 0,
@@ -116,9 +119,9 @@ typedef struct
 	uint32_t MULTI_SENS_CURRENT_COEFF;
 	uint32_t MULTI_SENS_ERR_INDICATE_PIN_VOLTAGE_THRESHOLD_mV;
 	int32_t dVSENSE_TC_dT_uV_K;									// uV/K
-	int32_t VSENSE_TC_T0_uV;									// 2076-(25*(-5.5)) uV 
+	int32_t VSENSE_TC_T0_uV;									// 2076-(25*(-5.5)) uV
 	uint32_t dVSENSE_Vcc_k;										// Transfer function for VSENSE_VCC
-	
+
 	// Objects - External
 	AlxAdc* adc;
 	Alx_Ch multiSensAdcCh;
@@ -151,26 +154,26 @@ typedef struct
 	bool do_INB_val;
 //	bool do_SEL0_val;
 //	bool do_SEL1_val;
-	
+
 	AlxVnh7040_Status status;
-	
+
 	uint32_t multiSensAdcVoltage_mV;
 	uint32_t multiSensPinVoltage_mV;
 	uint32_t multiSensVDivCurrent_uA;
-	
+
 	uint32_t currentHsA_mA;
 	uint32_t currentHsB_mA;
 	uint32_t supplyVoltage_mV;
 	volatile int32_t temp_degC;
-	
+
 	bool currentHsA_clamp;
 	bool currentHsB_clamp;
-	
+
 	uint32_t current_mA;
-	
+
 	//	bool isMultiSensErr_BreakGnd_LsB;
 	AlxVnh7040_MonitoringType monitoringTypeSelected;
-	
+
 	// SM
 	AlxVnh7040_Sm_St st;
 
@@ -226,4 +229,4 @@ void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType)
 }
 #endif
 
-#endif // ALX_VNH7040_H
+#endif // #ifndef ALX_VNH7040_H

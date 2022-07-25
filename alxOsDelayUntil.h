@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_OS_DELAY_UNTIL_H
 #define ALX_OS_DELAY_UNTIL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -116,4 +120,4 @@ void AlxOsDelayUntil_hr(AlxOsDelayUntil* me, uint64_t osTimeIncrement_hr);
 }
 #endif
 
-#endif // ALX_OS_DELAY_UNTIL_H
+#endif // #ifndef ALX_OS_DELAY_UNTIL_H

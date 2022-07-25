@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_AUDIO_VOL_H
 #define ALX_AUDIO_VOL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -79,10 +83,10 @@ typedef struct
 	// Parameters
 	float volMin_dB;
 	float volMax_dB;
-	
+
 	// Objects - Internal
 	AlxLinFun linFun_x_pct_y_dB;
-	
+
 	// Variables
 	float pctMax;
 	float volFactor;	// Can be negative value for attenuation
@@ -112,4 +116,4 @@ void AlxAudioVol_Set_dB(AlxAudioVol* me, float vol_dB);
 }
 #endif
 
-#endif // ALX_AUDIO_VOL_H
+#endif // #ifndef ALX_AUDIO_VOL_H

@@ -24,12 +24,17 @@
   * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
   ******************************************************************************
   **/
+
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_RANGE_H
 #define ALX_RANGE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -90,4 +95,4 @@ Alx_Status AlxRange_CheckStr		(char* val, uint32_t valLenMax					);
 }
 #endif
 
-#endif // ALX_RANGE_H
+#endif // #ifndef ALX_RANGE_H
