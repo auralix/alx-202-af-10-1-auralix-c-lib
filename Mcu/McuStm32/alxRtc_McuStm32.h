@@ -40,9 +40,9 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxRtc_Global.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxRtc_Global.h"
 #include "alxIoPin.h"
 #include "alxClk.h"
 

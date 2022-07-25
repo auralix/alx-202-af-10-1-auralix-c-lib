@@ -40,6 +40,7 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxTimSw.h"
 

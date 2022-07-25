@@ -40,8 +40,8 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxAssert.h"
 #include "alxTrace.h"
+#include "alxAssert.h"
 
 #if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 #include "alxSerialPort_McuStm32.h"
