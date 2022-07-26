@@ -32,6 +32,21 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
+// Private Functions Declarations
+//******************************************************************************
+float Get_X(AlxLinFun* me, float y);
+float Get_Y(AlxLinFun* me, float x);
+int32_t Get_X_Int(AlxLinFunInt* me, int32_t y);
+int32_t Get_Y_Int(AlxLinFunInt* me, int32_t x);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxLinFun_Ctor
@@ -65,8 +80,6 @@ void AlxLinFun_Ctor
 	// Check if min is smaller than max
 	ALX_LIN_FUN_ASSERT(me->min < me->max);
 }
-
-
 void AlxLinFunInt_Ctor
 (
 	AlxLinFunInt *me,
@@ -99,14 +112,6 @@ void AlxLinFunInt_Ctor
 	// Check if min is smaller than max
 	ALX_LIN_FUN_ASSERT(me->min < me->max);
 }
-
-//******************************************************************************
-// Private Functions Declarations
-//******************************************************************************
-float Get_X(AlxLinFun* me, float y);
-float Get_Y(AlxLinFun* me, float x);
-int32_t Get_X_Int(AlxLinFunInt* me, int32_t y);
-int32_t Get_Y_Int(AlxLinFunInt* me, int32_t x);
 
 
 //******************************************************************************
@@ -214,10 +219,6 @@ float AlxLinFun_GetX(AlxLinFun* me, float y) // Return float, ignore Alx_Status
 	AlxLinFun_GetX_WithStatus(me, y, &x);
 	return x;
 }
-
-
-
-
 Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y)
 {
 	ALX_LIN_FUN_ASSERT(me->wasCtorCalled);
@@ -270,6 +271,7 @@ int32_t AlxLinFunInt_GetY(AlxLinFunInt* me, int32_t x) // Return float, ignore A
 	return y;
 }
 
+
 //******************************************************************************
 // Private Functions
 //******************************************************************************
@@ -290,3 +292,6 @@ int32_t Get_Y_Int(AlxLinFunInt* me, int32_t x)
 	int32_t y = kx + n;
 	return y;
 }
+
+
+#endif // #if defined(ALX_C_LIB)

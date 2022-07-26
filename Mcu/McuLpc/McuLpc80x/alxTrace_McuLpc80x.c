@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -224,4 +224,4 @@ static void AlxTrace_Periph_SelectClk(AlxTrace* me)
 }
 
 
-#endif // Module Guard
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Variables
 //******************************************************************************
 volatile AlxTick alxTick = {0};
@@ -77,3 +83,6 @@ void AlxTick_Reset(volatile AlxTick* me)
 							// Foreground - IrqHandler (incremnets tick value)
 	AlxGlobal_EnableIrq();	// End of critical section
 }
+
+
+#endif // #if defined(ALX_C_LIB)

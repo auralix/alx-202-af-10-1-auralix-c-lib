@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxTempSensRtdVdiv_Ctor
@@ -92,3 +98,6 @@ Alx_Status AlxTempSensRtdVdiv_GetTemp_degC(AlxTempSensRtdVdiv* me, float* temp_d
 
 	return rtdTemp_degC;
 }
+
+
+#endif // #if defined(ALX_C_LIB)

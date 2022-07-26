@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -709,4 +709,4 @@ static void AlxSerialPort_Periph_DisableRxIrq(AlxSerialPort* me)
 }
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))

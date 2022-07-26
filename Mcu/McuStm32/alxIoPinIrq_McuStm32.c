@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -83,7 +83,7 @@ void AlxIoPinIrq_Ctor
 	(void)irqPriorityArr;
 	ALX_IO_PIN_IRQ_ASSERT((1 <= numOfIoPins) && (numOfIoPins <= 16));
 	for (uint8_t i = 0; i < numOfIoPins - 1; i++) ALX_IO_PIN_IRQ_ASSERT((*(ioPinArr + i))->igpio.Pin != (*(ioPinArr + i + 1))->igpio.Pin);	// All GPIO pin numbers must be different
-		
+
 	// Objects - External
 	me->ioPinArr = ioPinArr;
 
@@ -103,7 +103,7 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 	// #1 Init GPIO
 	for (uint32_t i = 0; i < me->numOfIoPins; i++)
 	AlxIoPin_Init((*(me->ioPinArr + i)));
-	
+
 	// #2 Enable IRQ
 	AlxIoPinIrq_Periph_EnableIrq(me);
 
@@ -117,7 +117,7 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 
 	// #1 Disable IRQ
 	AlxIoPinIrq_Periph_DisableIrq(me);
-	
+
 	// #2 DeInit GPIO
 	for (uint32_t i = 0; i < me->numOfIoPins; i++)
 	AlxIoPin_DeInit((*(me->ioPinArr + i)));
@@ -135,7 +135,7 @@ static void AlxIoPinIrq_Periph_EnableIrq(AlxIoPinIrq* me)
 	for (uint8_t i = 0; i < me->numOfIoPins; i++)
 	{
 		AlxIoPin* ioPin = *(me->ioPinArr + i);
-		
+
 		if (ioPin->igpio.Pin == GPIO_PIN_0)
 		{
 			HAL_NVIC_SetPriority(EXTI0_IRQn, me->irqPriorityArr[i], 0);
@@ -197,7 +197,7 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 	for (uint8_t i = 0; i < me->numOfIoPins; i++)
 	{
 		AlxIoPin* ioPin = *(me->ioPinArr + i);
-		
+
 		if (ioPin->igpio.Pin == GPIO_PIN_0)
 		{
 			HAL_NVIC_DisableIRQ(EXTI0_IRQn);
@@ -252,7 +252,7 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 		{
 			ALX_IO_PIN_IRQ_ASSERT(false); // We shouldn't get here
 		}
-		
+
 		__HAL_GPIO_EXTI_CLEAR_IT(ioPin->igpio.Pin);
 	}
 }
@@ -405,4 +405,4 @@ void EXTI15_10_IRQHandler(void)
 }
 
 
-#endif // Module Guard
+#endif // #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))

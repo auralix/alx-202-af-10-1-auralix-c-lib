@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -286,4 +286,5 @@ static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me)
 	#endif
 }
 
-#endif // Module Guard
+
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

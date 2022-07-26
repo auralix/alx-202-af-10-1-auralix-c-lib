@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -481,4 +481,4 @@ static void AlxIoPin_SetIoconMode(AlxIoPin* me)
 }
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC84X)

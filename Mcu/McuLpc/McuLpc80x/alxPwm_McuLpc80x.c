@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -288,4 +288,4 @@ static void AlxPwm_UpdatePwmDutyPct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 #endif
 
 
-#endif // Module Guard
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

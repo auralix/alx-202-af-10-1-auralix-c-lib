@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -170,4 +170,5 @@ void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode)
 	// MF: Assert cannot be used
 }
 
-#endif // Module Guard
+
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

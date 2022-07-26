@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -871,4 +871,4 @@ static uint32_t AlxI2c_PendingStatusWait(AlxI2c* me, I2C_Type* base, uint16_t ti
 }
 
 
-#endif // Module Guard
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

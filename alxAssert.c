@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Functions
 //******************************************************************************
 void ALX_WEAK AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun)
@@ -52,3 +58,6 @@ void ALX_WEAK AlxAssert_Rst(const char* file, uint32_t line, const char* fun)
 	(void)line;
 	(void)fun;
 }
+
+
+#endif // #if defined(ALX_C_LIB)

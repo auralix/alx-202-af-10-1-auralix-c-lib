@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxTimSw_Ctor
@@ -84,3 +90,6 @@ bool AlxTimSw_IsTimeout_ms(AlxTimSw* me, uint64_t timeout_ms)	{ return AlxTimSw_
 bool AlxTimSw_IsTimeout_sec(AlxTimSw* me, uint64_t timeout_sec)	{ return AlxTimSw_IsTimeout_ns(me, timeout_sec * 1000000000); }
 bool AlxTimSw_IsTimeout_min(AlxTimSw* me, uint64_t timeout_min)	{ return AlxTimSw_IsTimeout_ns(me, timeout_min * 60000000000); }
 bool AlxTimSw_IsTimeout_hr(AlxTimSw* me, uint64_t timeout_hr)	{ return AlxTimSw_IsTimeout_ns(me, timeout_hr * 3600000000000); }
+
+
+#endif // #if defined(ALX_C_LIB)

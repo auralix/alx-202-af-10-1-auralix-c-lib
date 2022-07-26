@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Functions
 //******************************************************************************
 Alx_Status AlxRange_CheckUint8(uint8_t val, uint8_t valMin, uint8_t valMax)
@@ -204,3 +210,6 @@ Alx_Status AlxRange_CheckStr(char* val, uint32_t valLenMax)
 	else
 		return Alx_Ok;
 }
+
+
+#endif // #if defined(ALX_C_LIB)

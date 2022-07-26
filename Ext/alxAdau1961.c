@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Private Functions
 //******************************************************************************
 static void AlxAdau1961_RegStruct_SetAddr(AlxAdau1961* me);
@@ -770,6 +776,10 @@ ALX_WEAK void AlxAdau1961_RegStruct_SetNonClkVal(AlxAdau1961* me)
 	ALX_ADAU1961_TRACE("Define 'AlxAdau1961_RegStruct_SetNonClkVal' function in your application.");
 	ALX_ADAU1961_ASSERT(false);
 }
+
+
+#endif // #if defined(ALX_C_LIB)
+
 
 
 

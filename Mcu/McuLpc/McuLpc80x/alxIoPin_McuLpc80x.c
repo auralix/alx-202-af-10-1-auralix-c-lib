@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -532,4 +532,4 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me)
 }
 
 
-#endif // Module Guard
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

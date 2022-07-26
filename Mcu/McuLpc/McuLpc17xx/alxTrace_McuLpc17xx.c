@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17XX)
+#if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -99,4 +99,4 @@ void AlxTrace_WriteStr(AlxTrace* me, const char* str)
 }
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)

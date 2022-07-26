@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
@@ -492,4 +492,4 @@ static void AlxSpi_Periph_DisableClk(AlxSpi* me)
 }
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)

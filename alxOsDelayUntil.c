@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_OS) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 
 //******************************************************************************
@@ -97,4 +97,4 @@ void AlxOsDelayUntil_min(AlxOsDelayUntil* me, uint64_t osTimeIncrement_min)	{ Al
 void AlxOsDelayUntil_hr(AlxOsDelayUntil* me, uint64_t osTimeIncrement_hr)	{ AlxOsDelay_hr(me, osTimeIncrement_hr * 3600000000); }
 
 
-#endif // #if defined(ALX_FREE_RTOS)
+#endif // #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)

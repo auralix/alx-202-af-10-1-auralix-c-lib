@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED))
+#if defined(ALX_C_LIB) && ((defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
 
 
 //******************************************************************************
@@ -57,7 +57,7 @@ void AlxTrace_Ctor
 	GPIO_TypeDef* port,
 	uint16_t pin,
 #if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
-	uint32_t alternate,	  
+	uint32_t alternate,
 #endif // defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 	USART_TypeDef* uart,
 	AlxGlobal_BaudRate baudRate
@@ -93,7 +93,7 @@ void AlxTrace_Ctor
 		#endif
 		me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	#endif
-	
+
 	// Info
 	me->isInit = false;
 	me->wasCtorCalled = true;
@@ -171,10 +171,10 @@ static Alx_Status AlxTrace_ReInit(AlxTrace* me)
 
 	// #3 Force Trace Periphery Reset
 	AlxTrace_Periph_ForceReset(me);
-	
+
 	// #4 Release Trace Periphery Reset
 	AlxTrace_Periph_ReleaseReset(me);
-	
+
 	// #5 Init Trace
 	if (HAL_UART_Init(&me->huart) != HAL_OK) { return Alx_Err; }
 
@@ -490,4 +490,4 @@ static void AlxTrace_Periph_ReleaseReset(AlxTrace* me)
 }
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && ((defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))

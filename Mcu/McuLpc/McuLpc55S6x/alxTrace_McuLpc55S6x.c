@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
@@ -404,4 +404,5 @@ static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me)
 	}
 }
 
-#endif // Module Guard
+
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)

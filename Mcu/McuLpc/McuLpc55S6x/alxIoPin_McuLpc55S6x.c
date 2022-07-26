@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
@@ -303,4 +303,4 @@ static void AlxIoPin_SetIoconMode(AlxIoPin* me)
 }
 
 
-#endif	// #if defined(ALX_LPC55S6X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)

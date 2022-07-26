@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Private Functions
 //******************************************************************************
 static void AlxTmp1075_RegStruct_SetAddr(AlxTmp1075* me);
@@ -42,6 +48,7 @@ static Alx_Status AlxTmp1075_Reg_Read(AlxTmp1075* me, void* reg);
 static Alx_Status AlxTmp1075_Reg_Write(AlxTmp1075* me, void* reg);
 static Alx_Status AlxTmp1075_Reg_Write_All(AlxTmp1075* me);
 static Alx_Status AlxTmp1075_TraceId(AlxTmp1075* me);
+
 
 //******************************************************************************
 // Weak Functions
@@ -62,10 +69,6 @@ void AlxTmp1075_Ctor
 	uint16_t i2cTimeout_ms
 )
 {
-	// Ctor
-
-	// Parameters Const
-
 	// Objects - External
 	me->i2c = i2c;
 
@@ -78,12 +81,12 @@ void AlxTmp1075_Ctor
 
 	// Variables
 	me->temp_raw = 0;
-	me->temp_degC = 0; 
-	
+	me->temp_degC = 0;
+
 	AlxTmp1075_RegStruct_SetAddr(me);
 	AlxTmp1075_RegStruct_SetLen(me);
 	AlxTmp1075_RegStruct_SetValToZero(me);
-	
+
 	// Info
 	me->isInit = false;
 	me->wasCtorCalled = true;
@@ -107,23 +110,23 @@ Alx_Status AlxTmp1075_Init(AlxTmp1075* me)
 	// #2 Check if slave ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 3, 1000);
 	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
-	
+
 	// #3 Set register struct values to default
 	AlxTmp1075_RegStruct_SetToDefault(me);
-	
+
 	// #4 Set register values - WEAK
 	AlxTmp1075_RegStruct_SetVal(me);
-	
+
 	// #5 Read ID registers & Trace ID
 	status = AlxTmp1075_TraceId(me);
 	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err_TraceId"); return status; }
-	
+
 	// #6 Write registers
 	status = AlxTmp1075_Reg_Write_All(me);
 	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err_Reg_WriteNonClkVal"); return status;}
-	
+
 	me->isInit = true;
-	
+
 	// #7 Return OK
 	return Alx_Ok;
 }
@@ -148,20 +151,20 @@ float AlxTmp1075_GetTemp_degC(AlxTmp1075* me)
 {
 	ALX_TMP1075_ASSERT(me->isInit == true);
 	ALX_TMP1075_ASSERT(me->wasCtorCalled == true);
-	
+
 	// #1 Prepare variables
 	Alx_Status status = Alx_Err;
-	
+
 	// #2 Read temperature data
 	status = AlxTmp1075_Reg_Read(me, &me->reg.R0_Temp);
 	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err_AlxTmp1075_Reg_Read"); }
-	
+
 	// #3 Shift value to get rid of the 4 unused bits
 	me->temp_raw = me->reg.R0_Temp.val.T  >> 4;
-	
+
 	// #4 Calculate
 	me->temp_degC = me->temp_raw  * me->DEG_C_PER_BIT;
-	
+
 	return me->temp_degC;
 }
 
@@ -203,18 +206,18 @@ static void AlxTmp1075_RegStruct_SetToDefault(AlxTmp1075* me)
 static Alx_Status AlxTmp1075_Reg_Read(AlxTmp1075* me, void* reg)
 {
 	Alx_Status status = Alx_Err;
-	
+
 	uint8_t regAddr		= *((uint8_t*)reg);
-	uint8_t regLen		= *((uint8_t*)reg + sizeof(regAddr)); 
+	uint8_t regLen		= *((uint8_t*)reg + sizeof(regAddr));
 	uint16_t *regValPtr	= (uint16_t*)((uint8_t*)reg + sizeof(regAddr) + sizeof(regLen));
 	uint8_t data[2];
-	
+
 	// #1 Read data
 	status =  AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, data, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
-	
+
 	// #2 Merge bytes, convert from big endian to little endian
 	*regValPtr = data[0] << 8 | data[1];
-	
+
 	return status;
 }
 static Alx_Status AlxTmp1075_Reg_Write(AlxTmp1075* me, void* reg)
@@ -223,27 +226,27 @@ static Alx_Status AlxTmp1075_Reg_Write(AlxTmp1075* me, void* reg)
 	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
 	uint16_t *regValPtr	= (uint16_t*)((uint8_t*)reg + sizeof(regAddr) + sizeof(regLen));
 	uint8_t data[2];
-	
+
 	// #1 Divide to bytes, convert from little endian to big endian
 	data[0] = *regValPtr >> 8;
 	data[1] = *regValPtr;
-	
+
 	// #2 Write data
 	return AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, data, regLen, false, me->i2cNumOfTries, me->i2cTimeout_ms);
 }
 static Alx_Status AlxTmp1075_Reg_Write_All(AlxTmp1075* me)
 {
 	Alx_Status status = Alx_Err;
-	
+
 	status = AlxTmp1075_Reg_Write(me, &me->reg.R1_Config	);
 	if (status != Alx_Ok) { ALX_TMP1075_ASSERT("Err_R1_Config	"); return status;}
-	
+
 	status = AlxTmp1075_Reg_Write(me, &me->reg.R2_LimitLow	);
 	if (status != Alx_Ok) { ALX_TMP1075_ASSERT("Err_R2_LimitLow	"); return status;}
-	
+
 	status = AlxTmp1075_Reg_Write(me, &me->reg.R3_LimitHigh	);
 	if (status != Alx_Ok) { ALX_TMP1075_ASSERT("Err_R3_LimitHigh"); return status;}
-	
+
 	return Alx_Ok;
 }
 static Alx_Status AlxTmp1075_TraceId(AlxTmp1075* me)
@@ -270,7 +273,10 @@ static Alx_Status AlxTmp1075_TraceId(AlxTmp1075* me)
 ALX_WEAK void AlxTmp1075_RegStruct_SetVal(AlxTmp1075* me)
 {
 	(void)me;
-	
+
 	ALX_TMP1075_TRACE("Define 'AlxTmp1075_RegStruct_SetVal' function in your application.");
 	ALX_TMP1075_ASSERT(false);
 }
+
+
+#endif // #if defined(ALX_C_LIB)

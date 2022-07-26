@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Private Types
 //******************************************************************************
 typedef enum
@@ -65,7 +71,7 @@ void AlxAudioPlayer_Ctor
 	// Parameters - Const
 	me->TRACK_SAMPLE_R_OFFSET_8bit_Byte = 1;
 	me->TRACK_SAMPLE_R_OFFSET_16bit_Byte = 2;
-	
+
 	// Parameters
 	me->trackPtr = defaultTrackPtr;
 	me->trackLen_Byte = defaultTrackLen_Byte;
@@ -74,7 +80,7 @@ void AlxAudioPlayer_Ctor
 
 	// Variables
 	me->trackSampleIncStep_Byte = AlxAudioPlayer_GetSampleIncStep_Byte(me);
-	me->trackSampleOffset_Byte = (me->trackSampleIncStep_Byte * defaultTrackStartOffset_Sample) % defaultTrackLen_Byte; 
+	me->trackSampleOffset_Byte = (me->trackSampleIncStep_Byte * defaultTrackStartOffset_Sample) % defaultTrackLen_Byte;
 	me->isPlaying = false;
 	me->isLoopOn = false;
 
@@ -176,7 +182,7 @@ void AlxAudioPlayer_LoopOff(AlxAudioPlayer* me)
 void AlxAudioPlayer_LoopConfig(AlxAudioPlayer* me, bool isOn)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
-	
+
 	me->isLoopOn = isOn;
 }
 bool AlxAudioPlayer_IsPlaying(AlxAudioPlayer* me)
@@ -193,7 +199,7 @@ bool AlxAudioPlayer_IsPlaying(AlxAudioPlayer* me)
 static uint8_t AlxAudioPlayer_GetSampleIncStep_Byte(AlxAudioPlayer* me)
 {
 	uint8_t trackSampleIncStep_Byte = 0;
-	
+
 	if
 	(
 		(me->trackEncoding == AlxAudio_Encoding_LinerPcm_Int8) ||
@@ -221,14 +227,14 @@ static uint8_t AlxAudioPlayer_GetSampleIncStep_Byte(AlxAudioPlayer* me)
 	{
 		ALX_AUDIO_PLAYER_ASSERT(false);	// We should never get here
 	}
-	
+
 	return trackSampleIncStep_Byte;
 }
 float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sampleType)
 {
 	// #1 Variables
 	float sampleOut = 0.f;
-	
+
 	// #2 Player is playing
 	if (me->isPlaying)
 	{
@@ -349,7 +355,7 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 					sampleOut = AlxAudio_LinerPcmInt16ToFloat(sampleInt16L);
 				}
 				else if (sampleType == AlxAudioPlayer_SampleType_R)
-				{			
+				{
 					// Right
 					int16_t sampleInt16R = *((volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_16bit_Byte));
 					sampleOut = AlxAudio_LinerPcmInt16ToFloat(sampleInt16R);
@@ -358,7 +364,7 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 				{
 					// Left
 					int16_t sampleInt16L = *((volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte));
-					float sampleFloatL = AlxAudio_LinerPcmInt16ToFloat(sampleInt16L);			
+					float sampleFloatL = AlxAudio_LinerPcmInt16ToFloat(sampleInt16L);
 					// Right
 					int16_t sampleInt16R = *((volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_16bit_Byte));
 					float sampleFloatR = AlxAudio_LinerPcmInt16ToFloat(sampleInt16R);
@@ -382,7 +388,10 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 	{
 		sampleOut = 0.f;	// We will set sample = 0, because player is not playing
 	}
-	
+
 	// #4 Return sample
 	return sampleOut;
 }
+
+
+#endif // #if defined(ALX_C_LIB)

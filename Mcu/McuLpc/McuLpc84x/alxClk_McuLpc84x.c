@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -136,4 +136,4 @@ static void AlxClk_SetExtClk(AlxClk* me, bool sysOsc)
 }
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC84X)

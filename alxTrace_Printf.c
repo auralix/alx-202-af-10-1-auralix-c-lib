@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_PC) || defined(ALX_MBED)
+#if defined(ALX_C_LIB) && (defined(ALX_PC) || defined(ALX_MBED))
 
 
 //******************************************************************************
@@ -74,4 +74,4 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 }
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && (defined(ALX_PC) || defined(ALX_MBED))

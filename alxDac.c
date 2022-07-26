@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Private Functions
 //******************************************************************************
 void AlxDac_SetFuncPtr(AlxDac* me);
@@ -60,7 +66,7 @@ Alx_Status AlxDac_Init(AlxDac* me)
 
 	// #1 Set isInit
 	me->isInit = true;
-	
+
 	// #2 FuncPtr to Init()
 	return (*me->AlxDac_Init_FuncPtr[me->submodule])(me->submodulePtr);
 }
@@ -71,7 +77,7 @@ Alx_Status AlxDac_Init_CalibrateVref(AlxDac* me, float vref_V)
 
 	// #1 Set isInit
 	me->isInit = true;
-	
+
 	// #2 FuncPtr to Init_CalibrateVref()
 	return (*me->AlxDac_Init_CalibrateVref_FuncPtr[me->submodule])(me->submodulePtr, &vref_V);
 }
@@ -82,7 +88,7 @@ Alx_Status AlxDac_DeInit(AlxDac* me)
 
 	// #1 Reset isInit
 	me->isInit = false;
-	
+
 	// #2 FuncPtr to DeInit()
 	return (*me->AlxDac_DeInit_FuncPtr[me->submodule])(me->submodulePtr);
 }
@@ -110,7 +116,7 @@ Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltag
 void AlxDac_SetFuncPtr(AlxDac* me)
 {
 	bool isErr = true;
-	
+
 	#if defined(ALX_DAC_MCU)
 		if (me->submodule == AlxDac_Submodule_Mcu)
 		{
@@ -125,3 +131,6 @@ void AlxDac_SetFuncPtr(AlxDac* me)
 
 	if (isErr) { ALX_DAC_ASSERT(false); }; // We shouldn't get here
 }
+
+
+#endif // #if defined(ALX_C_LIB)

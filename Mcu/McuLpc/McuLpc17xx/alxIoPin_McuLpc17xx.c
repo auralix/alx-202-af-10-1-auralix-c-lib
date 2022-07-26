@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17XX)
+#if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -168,4 +168,4 @@ void AlxIoPin_Config_PullDown(AlxIoPin* me)
 }
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)

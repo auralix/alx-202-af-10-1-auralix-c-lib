@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Private Functions
 //******************************************************************************
 void AlxTempSens_SetFuncPtr(AlxTempSens* me);
@@ -123,3 +129,6 @@ void AlxTempSens_SetFuncPtr(AlxTempSens* me)
 
 	if (isErr) { ALX_TEMP_SENS_ASSERT(false); }; // We shouldn't get here
 }
+
+
+#endif // #if defined(ALX_C_LIB)

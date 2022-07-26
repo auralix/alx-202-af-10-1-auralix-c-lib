@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17XX)
+#if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -137,4 +137,4 @@ static ADC_CHANNEL_T AlxAdcMcu_GetChannel(AlxIoPin* pin)
 }
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)

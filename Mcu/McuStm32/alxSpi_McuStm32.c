@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -160,7 +160,7 @@ Alx_Status AlxSpi_DeInit(AlxSpi* me)
 	return Alx_Ok;
 }
 Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
-{	
+{
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -403,22 +403,22 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me)
 {
 	// #1 DeInit SPI
 	if (HAL_SPI_DeInit(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("ErrDeInit"); return Alx_Err; }
-	
+
 	// #2 Force SPI Periphery Reset
 	AlxSpi_Periph_ForceReset(me);
-	
+
 	// #3 Reset isInit
 	me->isInit = false;
-	
+
 	// #4 Release SPI Periphery Reset
 	AlxSpi_Periph_ReleaseReset(me);
-	
+
 	// #5 Init SPI
 	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("ErrInit"); return Alx_Err; }
-	
+
 	// #6 Set isInit
 	me->isInit = true;
-	
+
 	// #7 Return OK
 	return Alx_Ok;
 }
@@ -512,4 +512,4 @@ static void AlxSpi_Periph_ReleaseReset(AlxSpi* me)
 }
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))

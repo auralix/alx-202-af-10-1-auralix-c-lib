@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 
 //******************************************************************************
@@ -196,8 +196,8 @@ void AlxI2s_Ctor
 	me->sampleBuffRxR = 0;
 	me->isTxChLeft = true;
 	me->isRxChLeft = true;
-	
-	
+
+
 	//******************************************************************************
 	// Info
 	//******************************************************************************
@@ -315,7 +315,7 @@ void AlxI2s_Foreground_Handle(AlxI2s* me)
 		{
 			// Callback
 			AlxI2s_Foreground_Callback_TxL(me);
-				
+
 			// Write data
 			me->hsaiTx.Instance->DR = me->sampleBuffTxL;
 		}
@@ -518,7 +518,8 @@ ALX_WEAK void AlxI2s_Foreground_Callback_RxR(AlxI2s* me)
 	ALX_I2S_ASSERT(false);
 }
 
-#endif
+
+#endif // #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 
 
