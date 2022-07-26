@@ -44,15 +44,15 @@ void AlxTpl_Ctor
 {
 	// Ctor
 	AlxTimSw_Ctor(&me->tim, true);
-	
+
 	// Parameters
 	me->stableTrueTime_ms = stableTrueTime_ms;
 	me->stableFalseTime_ms = stableFalseTime_ms;
-	
+
 	// Variables
 	me->valRaw = valInitial;
 	me->valFiltered = valInitial;
-	
+
 	// Info
 	me->wasCtorCalled = true;
 }
@@ -67,7 +67,7 @@ bool AlxTpl_Process(AlxTpl* me, bool in)
 	if (me->valRaw != me->valFiltered) // Unstable state detected
 	{
 		float unstableTime_ms = AlxTimSw_Get_us(&me->tim) / 1000.f;
-		
+
 		if (me->valRaw == true) // We are in false state and it becomes unstable, because "in = true"
 		{
 			if (unstableTime_ms > me->stableTrueTime_ms)
@@ -89,6 +89,6 @@ bool AlxTpl_Process(AlxTpl* me, bool in)
 	{
 		AlxTimSw_Start(&me->tim);
 	}
-	
+
 	return me->valFiltered;
 }

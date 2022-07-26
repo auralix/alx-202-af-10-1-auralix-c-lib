@@ -28,9 +28,7 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
+#include "alxSerialPort_McuStm32.h"
 #include "alxSerialPort.h"
 
 

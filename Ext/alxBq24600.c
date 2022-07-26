@@ -47,7 +47,7 @@ void AlxBq24600_Ctor
 	me->ERROR_STATUS_DETECTION_TRANSITIONS = 3;
 	me->STATUS_BLINK_HALFPERIOD_TIME_MIN_ms = 900;
 	me->STATUS_BLINK_HALFPERIOD_TIME_MAX_ms = 1100;
-	
+
 	// Ctor
 	AlxTimSw_Ctor(&me->timWindow, false);
 	AlxTimSw_Ctor(&me->timStatHalfperiod, false);
