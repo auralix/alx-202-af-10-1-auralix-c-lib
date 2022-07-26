@@ -45,9 +45,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_RTC_GLOBAL_FILE "alxRtcGlobal"
+#define ALX_RTC_GLOBAL_FILE "alxRtc_Global.h"
 
 // Assert //
 #if defined(_ALX_RTC_GLOBAL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -65,13 +71,6 @@ extern "C" {
 	#define ALX_RTC_GLOBAL_TRACE(...) ALX_TRACE_STD(ALX_RTC_GLOBAL_FILE, __VA_ARGS__)
 #else
 	#define ALX_RTC_GLOBAL_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_RTC_GLOBAL_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_RTC_GLOBAL_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_RTC_GLOBAL_DBG_PIN(...) do{} while (false)
 #endif
 
 
@@ -96,22 +95,105 @@ typedef struct
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_MsUsNsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us, uint16_t ns);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_MsUsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_MsToNs(uint64_t rtcTick_ns, uint16_t ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxRtc_MsUsNsToSecFract(uint16_t ms, uint16_t us, uint16_t ns);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxRtc_NsToMsUsNs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms, uint16_t* us, uint16_t* ns);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxRtc_NsToMsUs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms, uint16_t* us);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxRtc_NsToMs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxRtc_SecFractToMsUsNs(float secFract, uint16_t* ms, uint16_t* us, uint16_t* ns);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeNsToDateTime(uint64_t unixTime_ns);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeUsToDateTime(uint64_t unixTime_us);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeMsToDateTime(uint64_t unixTime_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeSecToDateTime(uint64_t unixTime_sec);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeNs(AlxRtc_DateTime dateTime);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeUs(AlxRtc_DateTime dateTime);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeMs(AlxRtc_DateTime dateTime);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeSec(AlxRtc_DateTime dateTime);
+
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

@@ -44,6 +44,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_ASSERT_BKPT(file, expr) if (expr) {} else { AlxAssert_Bkpt(file, __LINE__, __func__); }
@@ -54,10 +60,27 @@ extern "C" {
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAssert_Trace(const char* file, uint32_t line, const char* fun);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAssert_Rst(const char* file, uint32_t line, const char* fun);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

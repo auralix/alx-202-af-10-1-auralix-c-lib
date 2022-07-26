@@ -51,9 +51,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_VNH7040_FILE "alxVnh7040"
+#define ALX_VNH7040_FILE "alxVnh7040.h"
 
 // Assert //
 #if defined(_ALX_VNH7040_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -187,6 +193,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxVnh7040_Ctor
 (
 	AlxVnh7040* me,
@@ -213,18 +224,75 @@ void AlxVnh7040_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxVnh7040_Init(AlxVnh7040* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxVnh7040_DeInit(AlxVnh7040* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxVnh7040_Handle(AlxVnh7040* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint32_t AlxVnh7040_GetCurrentHsA_mA(AlxVnh7040* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint32_t AlxVnh7040_GetCurrentHsB_mA(AlxVnh7040* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint32_t AlxVnh7040_GetSupplyVoltage_mV(AlxVnh7040* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 int32_t AlxVnh7040_GetTemp_degC(AlxVnh7040* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 int32_t AlxVnh7040_GetIsError(AlxVnh7040* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType);
 
+
+#endif // #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

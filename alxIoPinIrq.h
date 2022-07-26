@@ -59,9 +59,15 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_IO_PIN_IRQ_FILE "alxIoPinIrq"
+#define ALX_IO_PIN_IRQ_FILE "alxIoPinIrq.h"
 
 // Assert //
 #if defined(_ALX_IO_PIN_IRQ_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -85,14 +91,21 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxIoPinIrq_Init(AlxIoPinIrq* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me);
 
 
-//******************************************************************************
-// Common Functions
-//******************************************************************************
-
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

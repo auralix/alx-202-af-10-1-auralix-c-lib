@@ -46,6 +46,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_PARAM_MGMT_FILE "alxParamMgmt.h"
@@ -68,13 +74,6 @@ extern "C" {
 	#define ALX_PARAM_MGMT_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_PARAM_MGMT_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_PARAM_MGMT_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_PARAM_MGMT_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -87,8 +86,6 @@ typedef struct
 	// Parameters
 	uint32_t numOfParamItems;
 
-	// Variables
-
 	// Info
 	bool wasCtorCalled;
 } AlxParamMgmt;
@@ -97,6 +94,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamMgmt_Ctor
 (
 	AlxParamMgmt* me,
@@ -108,15 +110,57 @@ void AlxParamMgmt_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamMgmt_GetByName(AlxParamMgmt* me, const char* name, void* val, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamMgmt_GetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamMgmt_SetByName(AlxParamMgmt* me, const char* name, void* val, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamMgmt_SetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamMgmt_SetToDefByName(AlxParamMgmt* me, const char* name, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamMgmt_SetToDefById(AlxParamMgmt* me, uint32_t id, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamMgmt_SetToDefGroup(AlxParamMgmt* me, uint8_t groupId);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamMgmt_SetToDefAll(AlxParamMgmt* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

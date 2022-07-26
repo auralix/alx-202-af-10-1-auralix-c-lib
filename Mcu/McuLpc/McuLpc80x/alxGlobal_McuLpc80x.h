@@ -45,7 +45,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -84,11 +84,21 @@ extern "C" {
 //******************************************************************************
 // IoPin Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode);
 
 
-#endif // Module Guard
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 #ifdef __cplusplus
 }

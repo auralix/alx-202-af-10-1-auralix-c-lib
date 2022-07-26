@@ -46,9 +46,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_FILT_GLITCH_UINT32_FILE "alxFiltGlitchUint32"
+#define ALX_FILT_GLITCH_UINT32_FILE "alxFiltGlitchUint32.h"
 
 // Assert //
 #if defined(_ALX_FILT_GLITCH_UINT32_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -66,13 +72,6 @@ extern "C" {
 	#define ALX_FILT_GLITCH_UINT32_TRACE(...) ALX_TRACE_STD(ALX_FILT_GLITCH_UINT32_FILE, __VA_ARGS__)
 #else
 	#define ALX_FILT_GLITCH_UINT32_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_FILT_GLITCH_UINT32_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_FILT_GLITCH_UINT32_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_FILT_GLITCH_UINT32_DBG_PIN(...) do{} while (false)
 #endif
 
 
@@ -100,6 +99,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxFiltGlitchUint32_Ctor
 (
 	AlxFiltGlitchUint32* me,
@@ -111,8 +115,15 @@ void AlxFiltGlitchUint32_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint32_t AlxFiltGlitchUint32_Process(AlxFiltGlitchUint32* me, uint32_t valNew);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

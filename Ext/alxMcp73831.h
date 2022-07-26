@@ -46,6 +46,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_MCP73831_FILE "alxMcp73831.h"
@@ -77,17 +83,20 @@ typedef struct
 	// Parameters
 	AlxIoPin* di_STAT;
 
-	// Variables
-
 	// Info
-	bool wasCtorCalled;
 	bool isInit;
+	bool wasCtorCalled;
 } AlxMcp73831;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxMcp73831_Ctor
 (
 	AlxMcp73831* me,
@@ -98,14 +107,51 @@ void AlxMcp73831_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxMcp73831_Init(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxMcp73831_DeInit(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMcp73831_IsBatCharging(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMcp73831_IsBatFull(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMcp73831_TriState_IsBatCharging(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMcp73831_TriState_IsBatFull(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMcp73831_TriState_IsShutdown(AlxMcp73831* me);
 
+
+#endif // #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

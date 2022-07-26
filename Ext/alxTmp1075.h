@@ -48,9 +48,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TMP1075_FILE "alxTmp1075"
+#define ALX_TMP1075_FILE "alxTmp1075.h"
 
 // Assert //
 #if defined(_ALX_TMP1075_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -229,16 +235,10 @@ typedef struct
 //******************************************************************************
 // Types
 //******************************************************************************
-
-
 typedef struct
 {
-	// Parameters Const
-
 	// Objects - External
 	AlxI2c* i2c;
-
-	// Objects - Internal
 
 	// Parameters
 	float DEG_C_PER_BIT;
@@ -261,6 +261,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxTmp1075_Ctor
 (
 	AlxTmp1075* me,
@@ -275,10 +280,27 @@ void AlxTmp1075_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxTmp1075_Init(AlxTmp1075* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxTmp1075_DeInit(AlxTmp1075* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxTmp1075_GetTemp_degC(AlxTmp1075* me);
 
+
+#endif // #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

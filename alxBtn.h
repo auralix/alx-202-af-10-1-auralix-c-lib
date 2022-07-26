@@ -47,9 +47,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_BTN_FILE "alxBtn"
+#define ALX_BTN_FILE "alxBtn.h"
 
 // Assert //
 #if defined(_ALX_BTN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -67,13 +73,6 @@ extern "C" {
 	#define ALX_BTN_TRACE(...) ALX_TRACE_STD(ALX_BTN_FILE, __VA_ARGS__)
 #else
 	#define ALX_BTN_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_BTN_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_BTN_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_BTN_DBG_PIN(...) do{} while (false)
 #endif
 
 
@@ -108,6 +107,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBtn_Ctor
 (
 	AlxBtn* me,
@@ -120,19 +124,81 @@ void AlxBtn_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBtn_Handle(AlxBtn* me, bool in);
-bool AlxBtn_IsPressed(AlxBtn* me); 			// True -> Button is currently pressed
+
+/**
+  * @brief
+  * @param[in] me
+  */
+bool AlxBtn_IsPressed(AlxBtn* me);			// True -> Button is currently pressed
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBtn_WasPressed(AlxBtn* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBtn_WasReleased(AlxBtn* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBtn_IsPressedShort(AlxBtn* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBtn_WasPressedShort(AlxBtn* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBtn_IsPressedLong(AlxBtn* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBtn_WasPressedLong(AlxBtn* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBtn_ClearWasPressed(AlxBtn* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBtn_ClearWasReleased(AlxBtn* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBtn_ClearWasPressedShort(AlxBtn* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBtn_ClearWasPressedLong(AlxBtn* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

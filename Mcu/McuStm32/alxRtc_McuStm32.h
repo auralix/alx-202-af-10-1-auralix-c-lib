@@ -50,7 +50,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 
 //******************************************************************************
@@ -65,8 +65,6 @@ typedef enum
 
 typedef struct
 {
-	// Objects - External
-
 	// Parameters
 	AlxRtc_Clk rtcClk;
 	uint64_t rtcTick_ns;
@@ -93,6 +91,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxRtc_Ctor
 (
 	AlxRtc* me,
@@ -100,7 +103,7 @@ void AlxRtc_Ctor
 );
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 #ifdef __cplusplus
 }

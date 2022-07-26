@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -69,25 +69,21 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-static inline void AlxClk_Ctor
+
+/**
+  * @brief
+  * @param[in] me
+  */
+void AlxClk_Ctor
 (
 	AlxClk* me,
 	clock_main_clk_src_t mainClkSource,
 	uint32_t clkFreq,
 	uint8_t divider
-)
-{
-	// Parameters
-	me->mainClkSource = mainClkSource;
-	me->clkFreq = clkFreq;
-	me->divider = divider;
-
-	// Info
-	me->wasCtorCalled = true;
-}
+);
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 #ifdef __cplusplus
 }

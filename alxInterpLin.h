@@ -45,9 +45,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_INTERP_LIN_FILE "alxInterpLin"
+#define ALX_INTERP_LIN_FILE "alxInterpLin.h"
 
 // Assert //
 #if defined(_ALX_INTERP_LIN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -67,13 +73,6 @@ extern "C" {
 	#define ALX_INTERP_LIN_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_INTERP_LIN_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_INTERP_LIN_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_INTERP_LIN_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -86,19 +85,19 @@ typedef struct
 	uint32_t numOfArrPoints;
 	bool isXpointArrRising;
 
-	// Objects - Internal
-
-	// Variables
-
 	// Info
 	bool wasCtorCalled;
-
 } AlxInterpLin;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxInterpLin_Ctor
 (
 	AlxInterpLin *me,
@@ -112,9 +111,21 @@ void AlxInterpLin_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* y);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxInterpLin_GetY(AlxInterpLin* me, float x);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

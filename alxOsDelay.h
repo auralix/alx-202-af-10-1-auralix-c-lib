@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_OS) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 
 //******************************************************************************
@@ -97,6 +97,11 @@ extern AlxOsDelay alxOsDelay;
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxOsDelay_Ctor
 (
 	AlxOsDelay* me,
@@ -108,14 +113,39 @@ void AlxOsDelay_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxOsDelay_ms(AlxOsDelay* me, uint64_t osDelay_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxOsDelay_sec(AlxOsDelay* me, uint64_t osDelay_sec);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr);
 
 
-#endif // #if defined(ALX_FREE_RTOS)
+#endif // #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 #ifdef __cplusplus
 }

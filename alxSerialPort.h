@@ -52,9 +52,15 @@ typedef struct { bool dummy; } AlxSerialPort;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_SERIAL_PORT_FILE "alxSerialPort"
+#define ALX_SERIAL_PORT_FILE "alxSerialPort.h"
 
 // Assert //
 #if defined(_ALX_SERIAL_PORT_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -74,26 +80,61 @@ typedef struct { bool dummy; } AlxSerialPort;
 	#define ALX_SERIAL_PORT_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_SERIAL_PORT_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_SERIAL_PORT_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_SERIAL_PORT_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
-Alx_Status AlxSerialPort_Init			(AlxSerialPort* me);
-Alx_Status AlxSerialPort_DeInit			(AlxSerialPort* me);
-Alx_Status AlxSerialPort_Read			(AlxSerialPort* me, uint8_t* data, uint32_t len);
-Alx_Status AlxSerialPort_ReadStrUntil	(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
-Alx_Status AlxSerialPort_Write			(AlxSerialPort* me, uint8_t data);
-Alx_Status AlxSerialPort_WriteMulti		(AlxSerialPort* me, const uint8_t* data, uint32_t len);
-Alx_Status AlxSerialPort_WriteStr		(AlxSerialPort* me, const char* str);
-void AlxSerialPort_Foreground_Handle	(AlxSerialPort* me);
 
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxSerialPort_Init(AlxSerialPort* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxSerialPort_Write(AlxSerialPort* me, uint8_t data);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxSerialPort_WriteMulti(AlxSerialPort* me, const uint8_t* data, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+void AlxSerialPort_Foreground_Handle(AlxSerialPort* me);
+
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

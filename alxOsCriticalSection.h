@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_OS) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 
 //******************************************************************************
@@ -77,11 +77,21 @@ extern "C" {
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxOsCriticalSection_Enter(void);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxOsCriticalSection_Exit(void);
 
 
-#endif // #if defined(ALX_FREE_RTOS)
+#endif // #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 #ifdef __cplusplus
 }

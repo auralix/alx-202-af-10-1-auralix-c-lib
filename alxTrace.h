@@ -67,6 +67,12 @@ typedef struct { bool dummy; } AlxTrace;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_TRACE_STR(str) do								{ AlxTrace_WriteStr(&alxTrace, str); } while(false)
@@ -84,19 +90,56 @@ extern AlxTrace alxTrace;
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxTrace_Init(AlxTrace* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxTrace_DeInit(AlxTrace* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str);
 
 
 //******************************************************************************
 // Common Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, const char* format, ...);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr);
 
+
+#endif // #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

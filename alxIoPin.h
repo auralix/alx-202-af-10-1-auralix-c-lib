@@ -66,6 +66,12 @@ typedef struct { bool dummy; } AlxIoPin;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_IO_PIN_FILE "alxIoPin.h"
@@ -104,15 +110,57 @@ typedef enum
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxIoPin_Init(AlxIoPin* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxIoPin_DeInit(AlxIoPin* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxIoPin_Read(AlxIoPin* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxIoPin_Write(AlxIoPin* me, bool val);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxIoPin_Set(AlxIoPin* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxIoPin_Reset(AlxIoPin* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxIoPin_Toggle(AlxIoPin* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

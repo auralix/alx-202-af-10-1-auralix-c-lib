@@ -39,7 +39,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17XX)
+#if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -48,7 +48,7 @@ extern "C" {
 #include <chip.h>
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 #ifdef __cplusplus
 }

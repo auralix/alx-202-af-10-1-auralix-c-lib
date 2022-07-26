@@ -103,7 +103,7 @@ extern "C" {
 #define ALX_STM32_STR "STM32G4"
 
 
-#endif
+#endif // #if defined(ALX_STM32G4)
 
 #ifdef __cplusplus
 }

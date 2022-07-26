@@ -48,6 +48,41 @@ static uint8_t AlxTrace_GetUartResetIndex(AlxTrace* me);
 
 
 //******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxTrace_Ctor
+(
+	AlxTrace* me,
+	uint8_t port,
+	uint8_t pin,
+	USART_Type* usart,
+	AlxGlobal_BaudRate baudRate)
+{
+	// Parameters
+	me->port = port;
+	me->pin = pin;
+	me->usart = usart;
+	me->baudRate = (uint32_t)baudRate;
+
+	// Variables
+	me->usartConfig.baudRate_Bps = (uint32_t)baudRate;
+	me->usartConfig.enableRx = false;
+	me->usartConfig.enableTx = true;
+	me->usartConfig.loopback = false;
+	me->usartConfig.enableContinuousSCLK = false;
+	me->usartConfig.parityMode = kUSART_ParityDisabled;
+	me->usartConfig.stopBitCount = kUSART_OneStopBit;
+	me->usartConfig.bitCountPerChar = kUSART_8BitsPerChar;
+	me->usartConfig.syncMode = kUSART_SyncModeDisabled;
+	me->usartConfig.clockPolarity = kUSART_RxSampleOnFallingEdge;
+
+	// Info
+	me->isInit = false;
+	me->wasCtorCalled = true;
+}
+
+
+//******************************************************************************
 // Specific Functions
 //******************************************************************************
 void AlxTrace_Init(AlxTrace* me)

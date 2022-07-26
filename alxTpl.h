@@ -46,9 +46,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TPL_FILE "alxTpl"
+#define ALX_TPL_FILE "alxTpl.h"
 
 // Assert //
 #if defined(_ALX_TPL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -68,23 +74,12 @@ extern "C" {
 	#define ALX_TPL_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_TPL_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_TPL_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_TPL_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
 //******************************************************************************
 typedef struct
 {
-	// Parameters - Const
-
-	// Objects - External
-
 	// Objects - Internal
 	AlxTimSw tim; // Timer to measure how long state is stable
 
@@ -104,6 +99,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxTpl_Ctor
 (
 	AlxTpl* me,
@@ -116,8 +116,15 @@ void AlxTpl_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxTpl_Process(AlxTpl* me, bool in);
 
+
+#endif // #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

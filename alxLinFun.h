@@ -45,9 +45,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_LIN_FUN_FILE "alxLinFun"
+#define ALX_LIN_FUN_FILE "alxLinFun.h"
 
 // Assert //
 #if defined(_ALX_LIN_FUN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -67,13 +73,6 @@ extern "C" {
 	#define ALX_LIN_FUN_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_LIN_FUN_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_LIN_FUN_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_LIN_FUN_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -88,8 +87,6 @@ typedef struct
 	float min;
 	float max;
 	bool isLimitOnX;
-
-	// Objects - Internal
 
 	// Variables
 	float coefK;
@@ -110,10 +107,6 @@ typedef struct
 	int32_t max;
 	bool isLimitOnX;
 
-	// Objects - Internal
-
-	// Variables;
-
 	// Info
 	bool wasCtorCalled;
 } AlxLinFunInt;
@@ -122,6 +115,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxLinFun_Ctor
 (
 	AlxLinFun *me,
@@ -134,6 +132,10 @@ void AlxLinFun_Ctor
 	bool isLimitOnX
 );
 
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxLinFunInt_Ctor
 (
 	AlxLinFunInt *me,
@@ -150,16 +152,45 @@ void AlxLinFunInt_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxLinFun_GetY_WithStatus(AlxLinFun* me, float x, float* y);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxLinFun_GetX_WithStatus(AlxLinFun* me, float y, float* x);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxLinFun_GetY(AlxLinFun* me, float x);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxLinFun_GetX(AlxLinFun* me, float y);
 
-
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 int32_t AlxLinFunInt_GetY(AlxLinFunInt* me, int32_t x);
 
 
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

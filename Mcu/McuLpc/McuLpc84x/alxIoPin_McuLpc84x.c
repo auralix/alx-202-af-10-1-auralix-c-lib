@@ -50,6 +50,38 @@ static void AlxIoPin_SetIoconMode(AlxIoPin* me);
 
 
 //******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxIoPin_Ctor
+(
+	AlxIoPin* me,
+	uint8_t port,
+	uint8_t pin,
+	AlxIoPin_SwmFunc swmFunc,
+	uint32_t mode,
+	bool isOpenDrain,
+	bool dir,
+	bool val)
+{
+	// Parameters
+	me->port = port;
+	me->pin = pin;
+	me->swmFunc = swmFunc;
+	me->mode = mode;
+	me->isOpenDrain = isOpenDrain;
+	me->dir = dir;
+	me->val = val;
+
+	// Variables
+	me->swmFunc_isMovable = false;
+
+	// Info
+	me->isInit = false;
+	me->wasCtorCalled = true;
+}
+
+
+//******************************************************************************
 // Specific Functions
 //******************************************************************************
 void AlxIoPin_Init(AlxIoPin* me)

@@ -47,6 +47,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_MEM_SAFE_FILE "alxMemSafe.h"
@@ -111,6 +117,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxMemSafe_Ctor
 (
 	AlxMemSafe* me,
@@ -133,13 +144,45 @@ void AlxMemSafe_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMemSafe_IsReadDone(AlxMemSafe* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMemSafe_IsReadErr(AlxMemSafe* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMemSafe_IsWriteDone(AlxMemSafe* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMemSafe_IsWriteErr(AlxMemSafe* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

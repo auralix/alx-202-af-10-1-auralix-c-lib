@@ -46,6 +46,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_PARAM_STORE_FILE "alxParamStore.h"
@@ -105,6 +111,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamStore_Ctor
 (
 	AlxParamStore* me,
@@ -116,10 +127,27 @@ void AlxParamStore_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* status, uint32_t numOfParamGroups);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamStore_Handle(AlxParamStore* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxParamStore_IsErr(AlxParamStore* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

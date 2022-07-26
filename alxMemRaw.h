@@ -45,6 +45,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_MEM_RAW_FILE "alxMemRaw.h"
@@ -82,6 +88,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxMemRaw_Ctor
 (
 	AlxMemRaw* me
@@ -91,11 +102,33 @@ void AlxMemRaw_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxMemRaw_Init(AlxMemRaw* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxMemRaw_DeInit(AlxMemRaw* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxMemRaw_Read(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxMemRaw_Write(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t len, bool checkWithReadEnable, uint8_t numOfTries, uint16_t timeout_ms);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

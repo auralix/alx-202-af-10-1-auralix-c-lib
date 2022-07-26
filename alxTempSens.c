@@ -38,9 +38,14 @@ void AlxTempSens_SetFuncPtr(AlxTempSens* me);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
-void AlxTempSens_Ctor(AlxTempSens* me, AlxTempSens_Submodule submodule, void *submodulePtr)
+void AlxTempSens_Ctor
+(
+	AlxTempSens* me,
+	AlxTempSens_Submodule submodule,
+	void *submodulePtr
+)
 {
 	// Parameters
 	me->submodule = submodule;
@@ -53,6 +58,11 @@ void AlxTempSens_Ctor(AlxTempSens* me, AlxTempSens_Submodule submodule, void *su
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Specific Functions
+//******************************************************************************
 Alx_Status AlxTempSens_Init(AlxTempSens* me)
 {
 	ALX_TEMP_SENS_ASSERT(me->isInit == false);
@@ -60,7 +70,7 @@ Alx_Status AlxTempSens_Init(AlxTempSens* me)
 
 	// #1 Set isInit
 	me->isInit = true;
-	
+
 	// #2 FuncPtr to Init()
 	return (*me->alxTempSens_Init_FuncPtr[me->submodule])(me->submodulePtr);
 }
@@ -71,7 +81,7 @@ Alx_Status AlxTempSens_DeInit(AlxTempSens* me)
 
 	// #1 Reset isInit
 	me->isInit = false;
-	
+
 	// #2 FuncPtr to DeInit()
 	return (*me->alxTempSens_DeInit_FuncPtr[me->submodule])(me->submodulePtr);
 }
@@ -91,7 +101,7 @@ Alx_Status AlxTempSens_GetTemp_degC(AlxTempSens* me, float* temp_degC)
 void AlxTempSens_SetFuncPtr(AlxTempSens* me)
 {
 	bool isErr = true;
-	
+
 	#if defined(ALX_TEMP_SENS_MCU)
 	if (me->submodule == AlxTempSens_Submodule_Mcu)
 	{

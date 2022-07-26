@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17XX)
+#if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -64,17 +64,18 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-static inline void AlxClk_Ctor
+
+/**
+  * @brief
+  * @param[in] me
+  */
+void AlxClk_Ctor
 (
 	AlxClk* me
-)
-{
-	me->isInit = false;
-	me->wasCtorCalled = true;
-}
+);
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 #ifdef __cplusplus
 }

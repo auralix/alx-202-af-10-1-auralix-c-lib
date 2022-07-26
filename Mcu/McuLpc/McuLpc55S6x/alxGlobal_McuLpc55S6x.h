@@ -45,7 +45,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
@@ -102,7 +102,7 @@ extern "C" {
 #include "fsl_wwdt.h"
 
 
-#endif // Module Guard
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 #ifdef __cplusplus
 }

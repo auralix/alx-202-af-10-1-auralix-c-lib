@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -143,6 +143,7 @@ typedef enum
 	AlxIoPin_Func_GPIO = 255U
 } AlxIoPin_Func;
 #endif
+
 #if defined(ALX_LPC84X)
 typedef enum
 {
@@ -266,7 +267,6 @@ typedef enum
 } AlxIoPin_Func;
 #endif
 
-
 typedef struct
 {
 	// Parameters
@@ -290,6 +290,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
@@ -303,7 +308,7 @@ void AlxIoPin_Ctor
 );
 
 
-#endif // Module Guard
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 #ifdef __cplusplus
 }

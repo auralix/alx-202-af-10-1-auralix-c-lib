@@ -54,9 +54,15 @@ typedef struct { bool dummy; } AlxI2s;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_I2S_FILE "alxI2s"
+#define ALX_I2S_FILE "alxI2s.h"
 
 // Assert //
 #if defined(_ALX_I2S_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -78,21 +84,31 @@ typedef struct { bool dummy; } AlxI2s;
 	#define ALX_I2S_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_I2S_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_I2S_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_I2S_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxI2s_Init(AlxI2s* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxI2s_DeInit(AlxI2s* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxI2s_Foreground_Handle(AlxI2s* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

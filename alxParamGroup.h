@@ -47,6 +47,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_PARAM_GROUP_FILE "alxParamGroup.h"
@@ -95,6 +101,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamGroup_Ctor
 (
 	AlxParamGroup* me,
@@ -113,15 +124,57 @@ void AlxParamGroup_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxParamGroup_Init(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamGroup_Write(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxParamGroup_IsWriteDone(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxParamGroup_IsWriteErr(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxParamGroup_IsValStoredBuffDiff(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamGroup_ValBuffToValToStoreBuff(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

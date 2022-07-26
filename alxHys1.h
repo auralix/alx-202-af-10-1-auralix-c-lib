@@ -45,9 +45,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_HYS1_FILE "alxHys1"
+#define ALX_HYS1_FILE "alxHys1.h"
 
 // Assert //
 #if defined(_ALX_HYS1_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -65,13 +71,6 @@ extern "C" {
 	#define ALX_HYS1_TRACE(...) ALX_TRACE_STD(ALX_HYS1_FILE, __VA_ARGS__)
 #else
 	#define ALX_HYS1_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_HYS1_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_HYS1_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_HYS1_DBG_PIN(...) do{} while (false)
 #endif
 
 
@@ -101,6 +100,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxHys1_Ctor
 (
 	AlxHys1* me,
@@ -112,8 +116,15 @@ void AlxHys1_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 AlxHys1_St AlxHys1_Process(AlxHys1* me, float in);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

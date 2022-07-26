@@ -100,7 +100,8 @@ extern "C" {
 #define ALX_STM32_HAL_VER_REQUIRED		ALX_STM32L0_HAL_VER_REQUIRED
 #define ALX_STM32_STR "STM32L0"
 
-#endif
+
+#endif // #if defined(ALX_STM32L0)
 
 #ifdef __cplusplus
 }

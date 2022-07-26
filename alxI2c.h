@@ -60,9 +60,15 @@ typedef struct { bool dummy; } AlxI2c;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_I2C_FILE "alxI2c"
+#define ALX_I2C_FILE "alxI2c.h"
 
 // Assert //
 #if defined(_ALX_I2C_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -82,13 +88,6 @@ typedef struct { bool dummy; } AlxI2c;
 	#define ALX_I2C_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_I2C_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_I2C_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_I2C_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -103,23 +102,75 @@ typedef enum
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxI2c_Init(AlxI2c* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxI2c_DeInit(AlxI2c* me);
-Alx_Status AlxI2c_Master_StartRead					(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint16_t timeout_ms);
-Alx_Status AlxI2c_Master_StartReadStop				(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-Alx_Status AlxI2c_Master_StartReadMemStop			(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-Alx_Status AlxI2c_Master_StartWrite					(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint16_t timeout_ms);
-Alx_Status AlxI2c_Master_StartWriteStop				(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-Alx_Status AlxI2c_Master_StartWriteMemStop_Single	(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t data, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms);
-Alx_Status AlxI2c_Master_StartWriteMemStop_Multi	(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, const uint8_t* data, uint16_t len, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms);
-Alx_Status AlxI2c_Master_Stop						(AlxI2c* me, uint16_t timeout_ms);
-Alx_Status AlxI2c_Master_IsSlaveReady				(AlxI2c* me, uint16_t slaveAddr, uint8_t numOfTries, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxI2c_Master_StartRead(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxI2c_Master_StartWrite(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxI2c_Master_StartWriteMemStop_Single(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t data, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, const uint8_t* data, uint16_t len, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxI2c_Master_Stop(AlxI2c* me, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t numOfTries, uint16_t timeout_ms);
 
 
-//******************************************************************************
-// Common Functions
-//******************************************************************************
-
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_OS) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 
 //******************************************************************************
@@ -101,7 +101,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-#if defined(ALX_FREE_RTOS)
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxOsThread_Ctor
 (
 	AlxOsThread* me,
@@ -111,16 +115,20 @@ void AlxOsThread_Ctor
 	void* const pvParameters,
 	UBaseType_t uxPriority
 );
-#endif
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxOsThread_Start(AlxOsThread* me);
 
 
-#endif // #if defined(ALX_FREE_RTOS)
+#endif // #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 #ifdef __cplusplus
 }

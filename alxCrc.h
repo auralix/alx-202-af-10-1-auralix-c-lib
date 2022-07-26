@@ -45,6 +45,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_CRC_FILE "alxCrc.h"
@@ -91,6 +97,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxCrc_Ctor
 (
 	AlxCrc* me,
@@ -101,10 +112,27 @@ void AlxCrc_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t* validatedCrc);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint32_t AlxCrc_GetLen(AlxCrc* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

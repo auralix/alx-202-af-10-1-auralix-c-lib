@@ -66,9 +66,15 @@ typedef struct {} AlxAdc;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_ADC_FILE "alxAdc"
+#define ALX_ADC_FILE "alxAdc.h"
 
 // Assert //
 #if defined(_ALX_ADC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -92,12 +98,39 @@ typedef struct {} AlxAdc;
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxAdc_Init(AlxAdc* me);
+
+/**
+	* @brief
+	* @param[in] me
+	*/
 Alx_Status AlxAdc_DeInit(AlxAdc* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);	// MF: Optimized Func
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

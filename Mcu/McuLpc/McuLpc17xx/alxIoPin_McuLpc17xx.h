@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17XX)
+#if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -73,7 +73,12 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-static inline void AlxIoPin_Ctor
+
+/**
+  * @brief
+  * @param[in] me
+  */
+void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
 	uint8_t port,
@@ -83,24 +88,10 @@ static inline void AlxIoPin_Ctor
 	bool isOpenDrain,
 	bool dir,
 	bool val
-)
-{
-	// Parameters
-	me->port = port;
-	me->pin = pin;
-	me->mode = mode;
-	me->func = func;
-	me->isOpenDrain = isOpenDrain;
-	me->dir = dir;
-	me->val = val;
-
-	// Info
-	me->isInit = false;
-	me->wasCtorCalled = true;
-}
+);
 
 
-#endif
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 #ifdef __cplusplus
 }

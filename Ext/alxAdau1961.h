@@ -48,9 +48,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_ADAU1961_FILE "alxAdau1961"
+#define ALX_ADAU1961_FILE "alxAdau1961.h"
 
 // Assert //
 #if defined(_ALX_ADAU1961_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -1570,6 +1576,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAdau1961_Ctor
 (
 	AlxAdau1961* me,
@@ -1585,16 +1596,63 @@ void AlxAdau1961_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxAdau1961_Init(AlxAdau1961* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxAdau1961_DeInit(AlxAdau1961* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAdau1961_Foreground_Handle(AlxAdau1961* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxAdau1961_InDiffL_SetGain_dB(AlxAdau1961* me, float gain_dB);		// Mute -> gain_dB = -120
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxAdau1961_InDiffR_SetGain_dB(AlxAdau1961* me, float gain_dB);		// Mute -> gain_dB = -120
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxAdau1961_InAuxL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);		// Mute -> gain_dB = -120
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxAdau1961_InAuxR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);		// Mute -> gain_dB = -120
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxAdau1961_OutLineL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// Mute -> gain_dB = -120
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxAdau1961_OutLineR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// Mute -> gain_dB = -120
 
+
+#endif // #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

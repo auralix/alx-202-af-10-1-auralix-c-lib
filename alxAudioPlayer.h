@@ -46,9 +46,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_AUDIO_PLAYER_FILE "alxAudioPlayer"
+#define ALX_AUDIO_PLAYER_FILE "alxAudioPlayer.h"
 
 // Assert //
 #if defined(_ALX_AUDIO_PLAYER_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -66,13 +72,6 @@ extern "C" {
 	#define ALX_AUDIO_PLAYER_TRACE(...) ALX_TRACE_STD(ALX_AUDIO_PLAYER_FILE, __VA_ARGS__)
 #else
 	#define ALX_AUDIO_PLAYER_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_AUDIO_PLAYER_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_AUDIO_PLAYER_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_AUDIO_PLAYER_DBG_PIN(...) do{} while (false)
 #endif
 
 
@@ -105,6 +104,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioPlayer_Ctor
 (
 	AlxAudioPlayer* me,
@@ -119,20 +123,87 @@ void AlxAudioPlayer_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioPlayer_LoadTrack(AlxAudioPlayer* me, const uint8_t* trackPtr, uint32_t len_Byte, uint32_t startOffset_Sample, AlxAudio_Encoding encoding, bool isMono);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxAudioPlayer_GetSampleL(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxAudioPlayer_GetSampleR(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxAudioPlayer_GetSampleMono(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioPlayer_IncSampleOffset(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioPlayer_Play(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioPlayer_Stop(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioPlayer_Pause(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioPlayer_Replay(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioPlayer_LoopOn(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioPlayer_LoopOff(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioPlayer_LoopConfig(AlxAudioPlayer* me, bool isOn);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxAudioPlayer_IsPlaying(AlxAudioPlayer* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

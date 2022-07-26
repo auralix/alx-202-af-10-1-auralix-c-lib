@@ -46,7 +46,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -72,6 +72,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxTrace_Ctor
 (
 	AlxTrace* me,
@@ -81,7 +86,8 @@ void AlxTrace_Ctor
 	AlxGlobal_BaudRate baudRate
 );
 
-#endif // Module Guard
+
+#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 #ifdef __cplusplus
 }

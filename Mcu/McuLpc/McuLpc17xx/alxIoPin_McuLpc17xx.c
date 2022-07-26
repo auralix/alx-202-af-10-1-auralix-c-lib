@@ -39,6 +39,35 @@
 
 
 //******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxIoPin_Ctor
+(
+	AlxIoPin* me,
+	uint8_t port,
+	uint8_t pin,
+	uint32_t mode,
+	uint8_t func,
+	bool isOpenDrain,
+	bool dir,
+	bool val)
+{
+	// Parameters
+	me->port = port;
+	me->pin = pin;
+	me->mode = mode;
+	me->func = func;
+	me->isOpenDrain = isOpenDrain;
+	me->dir = dir;
+	me->val = val;
+
+	// Info
+	me->isInit = false;
+	me->wasCtorCalled = true;
+}
+
+
+//******************************************************************************
 // Specific Functions
 //******************************************************************************
 void AlxIoPin_Init(AlxIoPin* me)

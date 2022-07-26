@@ -48,9 +48,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TEMP_SENS_RTD_VDIV_FILE "alxTempSens_RtdVdiv"
+#define ALX_TEMP_SENS_RTD_VDIV_FILE "alxTempSens_RtdVdiv.h"
 
 // Assert //
 #if defined(_ALX_TEMP_SENS_RTD_VDIV_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -70,20 +76,13 @@ extern "C" {
 	#define ALX_TEMP_SENS_RTD_VDIV_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_TEMP_SENS_RTD_VDIV_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_TEMP_SENS_RTD_VDIV_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_TEMP_SENS_RTD_VDIV_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
 //******************************************************************************
 typedef struct
 {
-	// Parameters - Const
+	// Parameters
 	Alx_Ch chAdc_Vin;
 	Alx_Ch chAdc_Vout;
 	bool isResRtdLow;
@@ -93,10 +92,6 @@ typedef struct
 	AlxAdc* adc;
 	AlxInterpLin *interpLin;
 
-	// Objects - Internal
-
-	// Variables
-
 	// Info
 	bool wasCtorCalled;
 } AlxTempSensRtdVdiv;
@@ -105,6 +100,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxTempSensRtdVdiv_Ctor
 (
 	AlxTempSensRtdVdiv* me,
@@ -120,10 +120,27 @@ void AlxTempSensRtdVdiv_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxTempSensRtdVdiv_Init(AlxTempSensRtdVdiv* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxTempSensRtdVdiv_DeInit(AlxTempSensRtdVdiv* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxTempSensRtdVdiv_GetTemp_degC(AlxTempSensRtdVdiv* me, float* temp_degC);
 
+
+#endif // #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

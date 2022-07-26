@@ -46,9 +46,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_FILT_GLITCH_BOOL_FILE "alxFiltGlitch"
+#define ALX_FILT_GLITCH_BOOL_FILE "alxFiltGlitch.h"
 
 // Assert //
 #if defined(_ALX_FILT_GLITCH_BOOL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -66,13 +72,6 @@ extern "C" {
 	#define ALX_FILT_GLITCH_BOOL_TRACE(...) ALX_TRACE_STD(ALX_FILT_GLITCH_BOOL_FILE, __VA_ARGS__)
 #else
 	#define ALX_FILT_GLITCH_BOOL_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_FILT_GLITCH_BOOL_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_FILT_GLITCH_BOOL_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_FILT_GLITCH_BOOL_DBG_PIN(...) do{} while (false)
 #endif
 
 
@@ -100,6 +99,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxFiltGlitchBool_Ctor
 (
 	AlxFiltGlitchBool* me,
@@ -108,6 +112,10 @@ void AlxFiltGlitchBool_Ctor
 	float stableFalseTime_ms	// Time that val must be stable false to change output state to false
 );
 
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxFiltGlitchBool_Ctor_us
 (
 	AlxFiltGlitchBool* me,
@@ -120,8 +128,15 @@ void AlxFiltGlitchBool_Ctor_us
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

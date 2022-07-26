@@ -50,6 +50,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
 #define ALX_PWR_FILE "alxPwr.h"
@@ -108,6 +114,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxPwr_Ctor
 (
 	AlxPwr* me,
@@ -127,13 +138,45 @@ void AlxPwr_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxPwr_Init(AlxPwr* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxPwr_DeInit(AlxPwr* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxPwr_Handle(AlxPwr* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxPwr_IsGood(AlxPwr* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxPwr_IsNotGood(AlxPwr* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxPwr_IsErr(AlxPwr* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

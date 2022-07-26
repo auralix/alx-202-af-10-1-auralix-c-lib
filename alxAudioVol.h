@@ -46,9 +46,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_AUDIO_VOL_FILE "alxAudioVol"
+#define ALX_AUDIO_VOL_FILE "alxAudioVol.h"
 
 // Assert //
 #if defined(_ALX_AUDIO_VOL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -66,13 +72,6 @@ extern "C" {
 	#define ALX_AUDIO_VOL_TRACE(...) ALX_TRACE_STD(ALX_AUDIO_VOL_FILE, __VA_ARGS__)
 #else
 	#define ALX_AUDIO_VOL_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_AUDIO_VOL_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_AUDIO_VOL_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_AUDIO_VOL_DBG_PIN(...) do{} while (false)
 #endif
 
 
@@ -97,6 +96,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioVol_Ctor
 (
 	AlxAudioVol* me,
@@ -108,10 +112,27 @@ void AlxAudioVol_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxAudioVol_Process(AlxAudioVol* me, float inSample);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioVol_Set_pct(AlxAudioVol* me, float vol_pct);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxAudioVol_Set_dB(AlxAudioVol* me, float vol_dB);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

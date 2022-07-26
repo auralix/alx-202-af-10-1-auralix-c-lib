@@ -48,9 +48,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_BQ24600_FILE "alxBq24600"
+#define ALX_BQ24600_FILE "alxBq24600.h"
 
 // Assert //
 #if defined(_ALX_BQ24600_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -117,6 +123,11 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBq24600_Ctor
 (
 	AlxBq24600* me,
@@ -129,16 +140,63 @@ void AlxBq24600_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBq24600_Init(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBq24600_DeInit(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBq24600_Handle(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBq24600_Enable(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxBq24600_Disable(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBq24600_IsBatCharging(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBq24600_IsBatFull(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBq24600_IsSleep(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBq24600_IsErr(AlxBq24600* me);
 
+
+#endif // #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
