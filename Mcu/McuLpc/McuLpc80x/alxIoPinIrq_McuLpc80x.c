@@ -60,7 +60,7 @@ void AlxIoPinIrq_Foreground_Callback_Pin7();
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxIoPinIrq_Ctor
 (
@@ -88,6 +88,11 @@ void AlxIoPinIrq_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 {
 	ALX_IO_PIN_IRQ_ASSERT(me->isInit == false);

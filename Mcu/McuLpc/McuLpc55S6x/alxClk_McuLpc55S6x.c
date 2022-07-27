@@ -246,7 +246,6 @@ static void AlxClk_SetupPll(AlxClk* me, pll_setup_t* pllSetup, uint32_t inputFre
 	pllSetup->pllRate		= (((inputFreq / pllN) * pllM) / (2 * pllP));
 	pllSetup->flags			= PLL_SETUPFLAG_WAITLOCK;
 }
-
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default(AlxClk* me)
 {
 	// Assert
@@ -317,7 +316,6 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_12MHz_FroOsc_96MHz(AlxC
 	me->ahbClk_Ctor				= 12000000U;
 	me->mainClk_Ctor			= 96000000U;
 }
-
 static void AlxClk_Init_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default(AlxClk* me)
 {
 	// Assert

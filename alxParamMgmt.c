@@ -59,8 +59,6 @@ void AlxParamMgmt_Ctor
 	// Parameters
 	me->numOfParamItems = numOfParamItems;
 
-	// Variables
-
 	// Info
 	me->wasCtorCalled = true;
 }

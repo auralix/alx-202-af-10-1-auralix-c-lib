@@ -76,8 +76,6 @@ void AlxAdxl355_Ctor
 	// Ctor
 	AlxFifo_Ctor(&me->fifo, fifoBuff, fifoBuffLen);
 
-	// Parameters Const
-
 	// Objects - External
 	me->spi = spi;
 

@@ -48,7 +48,7 @@ static void AlxTrace_Periph_SelectClk(AlxTrace* me);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxTrace_Ctor
 (
@@ -88,6 +88,11 @@ void AlxTrace_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
 	// #1 Init SWM

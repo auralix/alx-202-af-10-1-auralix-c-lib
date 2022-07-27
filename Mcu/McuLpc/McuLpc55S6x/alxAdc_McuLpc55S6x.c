@@ -358,7 +358,6 @@ static bool AlxAdc_Ctor_IsMainClkOk(AlxAdc* me)
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return false;
 }
-
 static void AlxAdc_SetClkDiv(AlxAdc* me)
 {
 	// Assert

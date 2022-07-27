@@ -106,7 +106,7 @@ void AlxSerialPort_Ctor
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 {

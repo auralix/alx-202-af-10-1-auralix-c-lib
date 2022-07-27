@@ -67,7 +67,7 @@ void AlxIoPinIrq_Foreground_Callback_Pin15(void);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxIoPinIrq_Ctor
 (
@@ -95,6 +95,11 @@ void AlxIoPinIrq_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 {
 	ALX_IO_PIN_IRQ_ASSERT(me->isInit == false);
@@ -263,16 +268,16 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 //******************************************************************************
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if		(GPIO_Pin == GPIO_PIN_0 ) AlxIoPinIrq_Foreground_Callback_Pin0 ();
-	else if	(GPIO_Pin == GPIO_PIN_1 ) AlxIoPinIrq_Foreground_Callback_Pin1 ();
-	else if	(GPIO_Pin == GPIO_PIN_2 ) AlxIoPinIrq_Foreground_Callback_Pin2 ();
-	else if	(GPIO_Pin == GPIO_PIN_3 ) AlxIoPinIrq_Foreground_Callback_Pin3 ();
-	else if	(GPIO_Pin == GPIO_PIN_4 ) AlxIoPinIrq_Foreground_Callback_Pin4 ();
-	else if	(GPIO_Pin == GPIO_PIN_5 ) AlxIoPinIrq_Foreground_Callback_Pin5 ();
-	else if	(GPIO_Pin == GPIO_PIN_6 ) AlxIoPinIrq_Foreground_Callback_Pin6 ();
-	else if	(GPIO_Pin == GPIO_PIN_7 ) AlxIoPinIrq_Foreground_Callback_Pin7 ();
-	else if	(GPIO_Pin == GPIO_PIN_8 ) AlxIoPinIrq_Foreground_Callback_Pin8 ();
-	else if	(GPIO_Pin == GPIO_PIN_9 ) AlxIoPinIrq_Foreground_Callback_Pin9 ();
+	if		(GPIO_Pin == GPIO_PIN_0 ) AlxIoPinIrq_Foreground_Callback_Pin0();
+	else if	(GPIO_Pin == GPIO_PIN_1 ) AlxIoPinIrq_Foreground_Callback_Pin1();
+	else if	(GPIO_Pin == GPIO_PIN_2 ) AlxIoPinIrq_Foreground_Callback_Pin2();
+	else if	(GPIO_Pin == GPIO_PIN_3 ) AlxIoPinIrq_Foreground_Callback_Pin3();
+	else if	(GPIO_Pin == GPIO_PIN_4 ) AlxIoPinIrq_Foreground_Callback_Pin4();
+	else if	(GPIO_Pin == GPIO_PIN_5 ) AlxIoPinIrq_Foreground_Callback_Pin5();
+	else if	(GPIO_Pin == GPIO_PIN_6 ) AlxIoPinIrq_Foreground_Callback_Pin6();
+	else if	(GPIO_Pin == GPIO_PIN_7 ) AlxIoPinIrq_Foreground_Callback_Pin7();
+	else if	(GPIO_Pin == GPIO_PIN_8 ) AlxIoPinIrq_Foreground_Callback_Pin8();
+	else if	(GPIO_Pin == GPIO_PIN_9 ) AlxIoPinIrq_Foreground_Callback_Pin9();
 	else if	(GPIO_Pin == GPIO_PIN_10) AlxIoPinIrq_Foreground_Callback_Pin10();
 	else if	(GPIO_Pin == GPIO_PIN_11) AlxIoPinIrq_Foreground_Callback_Pin11();
 	else if	(GPIO_Pin == GPIO_PIN_12) AlxIoPinIrq_Foreground_Callback_Pin12();

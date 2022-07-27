@@ -59,9 +59,9 @@ void AlxPwm_Ctor
 	TIM_TypeDef* tim,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,
-		#if !defined (ALX_PWM_OPTIMIZE_SIZE)
+	#if !defined (ALX_PWM_OPTIMIZE_SIZE)
 	float* dutyDefaultArr_pct,
-		#endif
+	#endif
 	uint8_t numOfCh,
 	AlxClk* clk,
 	uint32_t prescaler,
@@ -73,9 +73,9 @@ void AlxPwm_Ctor
 	(void)tim;
 	(void)ioPinArr;
 	(void)chArr;
-		#if !defined (ALX_PWM_OPTIMIZE_SIZE)
+	#if !defined (ALX_PWM_OPTIMIZE_SIZE)
 	(void)dutyDefaultArr_pct;
-		#endif
+	#endif
 	ALX_PWM_ASSERT(numOfCh <= ALX_PWM_BUFF_LEN);
 	(void)clk;
 	(void)prescaler;
@@ -88,9 +88,9 @@ void AlxPwm_Ctor
 
 	// Parameters
 	me->chArr = chArr;
-		#if !defined (ALX_PWM_OPTIMIZE_SIZE)
+	#if !defined (ALX_PWM_OPTIMIZE_SIZE)
 	me->dutyDefaultArr_pct = dutyDefaultArr_pct;
-		#endif
+	#endif
 	me->numOfCh = numOfCh;
 
 	// Variables

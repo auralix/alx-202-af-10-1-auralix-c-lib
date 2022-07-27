@@ -117,32 +117,32 @@ void AlxBq24600_DeInit(AlxBq24600* me)
 	// #2 Reset isInit
 	me->isInit = false;
 }
-void AlxBq24600_Handle (AlxBq24600* me)
+void AlxBq24600_Handle(AlxBq24600* me)
 {
 	ALX_BQ24600_ASSERT (me->isInit == true);
 	ALX_BQ24600_ASSERT (me->wasCtorCalled == true);
 
 	// #1 count transitions of STAT pin
-	bool statPinState = AlxIoPin_Read (me->di_STAT);
+	bool statPinState = AlxIoPin_Read(me->di_STAT);
 	if (me->oldStatPinState != statPinState)									// if new transition is detected
 	{
 		me->oldStatPinState = statPinState;
 
 		// count transition only if half period was between set limits meaning it has correct frequency for STAT blinking -> eliminate other transitions
-		if (AlxTimSw_Get_ms (&me->timStatHalfperiod) >= me->STATUS_BLINK_HALFPERIOD_TIME_MIN_ms && AlxTimSw_Get_ms (&me->timStatHalfperiod) <= me->STATUS_BLINK_HALFPERIOD_TIME_MAX_ms)
+		if (AlxTimSw_Get_ms(&me->timStatHalfperiod) >= me->STATUS_BLINK_HALFPERIOD_TIME_MIN_ms && AlxTimSw_Get_ms(&me->timStatHalfperiod) <= me->STATUS_BLINK_HALFPERIOD_TIME_MAX_ms)
 			me->nOfStatPinTransitions++;  										// increment new transition
 
-		AlxTimSw_Start (&me->timStatHalfperiod);   								// restart half period timer
+		AlxTimSw_Start(&me->timStatHalfperiod);   								// restart half period timer
 	}
 
 	// #2 restart counting if power good is lost
-	if (AlxIoPin_Read (me->di_nPG))
+	if (AlxIoPin_Read(me->di_nPG))
 		me->nOfStatPinTransitions = 0;  										// restart transitions counting
 
 	// #3 check for end of the window -> perform blink detection procedure
-	if (AlxTimSw_Get_ms (&me->timWindow) >= me->STATUS_DETECTION_WINDOW_TIME_ms)
+	if (AlxTimSw_Get_ms(&me->timWindow) >= me->STATUS_DETECTION_WINDOW_TIME_ms)
 	{
-		AlxTimSw_Start (&me->timWindow);   										// restart window timer
+		AlxTimSw_Start(&me->timWindow);   										// restart window timer
 
 		if (me->nOfStatPinTransitions >= me->ERROR_STATUS_DETECTION_TRANSITIONS)	// if STAT is BLINK
 		{
@@ -160,9 +160,9 @@ void AlxBq24600_Handle (AlxBq24600* me)
 
 	if (me->isStatBlink)
 		me->statusRaw = Bq24600Status_Error;
-	else if (AlxIoPin_Read (me->di_STAT) == false)								// if STAT is LOW
+	else if (AlxIoPin_Read(me->di_STAT) == false)								// if STAT is LOW
 		me->statusRaw = Bq24600Status_Charging;
-	else if (AlxIoPin_Read (me->di_nPG) == false)								// if STAT is HIGH and PG is LOW
+	else if (AlxIoPin_Read(me->di_nPG) == false)								// if STAT is HIGH and PG is LOW
 		me->statusRaw = Bq24600Status_BattFull;
 	else me->statusRaw = Bq24600Status_Sleep;
 
@@ -170,7 +170,7 @@ void AlxBq24600_Handle (AlxBq24600* me)
 	if (statusRawOld != me->statusRaw)
 		AlxTimSw_Start(&me->timStableStatus);
 
-	if (AlxTimSw_Get_ms (&me->timStableStatus) >= me->STATUS_BLINK_HALFPERIOD_TIME_MAX_ms)
+	if (AlxTimSw_Get_ms(&me->timStableStatus) >= me->STATUS_BLINK_HALFPERIOD_TIME_MAX_ms)
 		me->status = me->statusRaw;
 }
 void AlxBq24600_Enable(AlxBq24600* me)

@@ -40,11 +40,11 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-void AlxDac_SetFuncPtr(AlxDac* me);
+static void AlxDac_SetFuncPtr(AlxDac* me);
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 void AlxDac_Ctor(AlxDac* me, AlxDac_Submodule submodule, void *submodulePtr)
 {
@@ -113,7 +113,7 @@ Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltag
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-void AlxDac_SetFuncPtr(AlxDac* me)
+static void AlxDac_SetFuncPtr(AlxDac* me)
 {
 	bool isErr = true;
 

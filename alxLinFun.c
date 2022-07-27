@@ -40,10 +40,10 @@
 //******************************************************************************
 // Private Functions Declarations
 //******************************************************************************
-float Get_X(AlxLinFun* me, float y);
-float Get_Y(AlxLinFun* me, float x);
-int32_t Get_X_Int(AlxLinFunInt* me, int32_t y);
-int32_t Get_Y_Int(AlxLinFunInt* me, int32_t x);
+static float Get_X(AlxLinFun* me, float y);
+static float Get_Y(AlxLinFun* me, float x);
+//static int32_t Get_X_Int(AlxLinFunInt* me, int32_t y);	// TODO
+static int32_t Get_Y_Int(AlxLinFunInt* me, int32_t x);
 
 
 //******************************************************************************
@@ -92,8 +92,6 @@ void AlxLinFunInt_Ctor
 	bool isLimitOnX	// If true, min/max values all applicable for X axis, else for Y axis
 )
 {
-	// Ctor
-
 	// Parameters
 	me->x1 = x1;
 	me->y1 = point1_y;
@@ -102,9 +100,6 @@ void AlxLinFunInt_Ctor
 	me->min = min;
 	me->max = max;
 	me->isLimitOnX = isLimitOnX;
-
-	// Variables
-
 
 	// Info
 	me->wasCtorCalled = true;
@@ -275,15 +270,15 @@ int32_t AlxLinFunInt_GetY(AlxLinFunInt* me, int32_t x) // Return float, ignore A
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-float Get_X(AlxLinFun* me, float y)
+static float Get_X(AlxLinFun* me, float y)
 {
 	return (y - me->coefN) / me->coefK;
 }
-float Get_Y(AlxLinFun* me, float x)
+static float Get_Y(AlxLinFun* me, float x)
 {
 	return (me->coefK * x) + me->coefN;
 }
-int32_t Get_Y_Int(AlxLinFunInt* me, int32_t x)
+static int32_t Get_Y_Int(AlxLinFunInt* me, int32_t x)
 {
 	int32_t dx = me->x2 - me->x1;
 	int32_t dy = me->y2 - me->y1;

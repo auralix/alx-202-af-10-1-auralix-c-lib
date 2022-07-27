@@ -45,7 +45,7 @@ static uint8_t AlxAdcMcu_GetChannel(AlxIoPin* pin);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxAdcMcu_Ctor
 (
@@ -86,6 +86,11 @@ void AlxAdcMcu_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 void AlxAdcMcu_Init(AlxAdc_Mcu* me)
 {
 	ALX_ADC_ASSERT(me->isInit == false);

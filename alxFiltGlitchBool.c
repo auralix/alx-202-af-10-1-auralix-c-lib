@@ -62,7 +62,6 @@ void AlxFiltGlitchBool_Ctor
 	// Info
 	me->wasCtorCalled = true;
 }
-
 void AlxFiltGlitchBool_Ctor_us
 (
 	AlxFiltGlitchBool* me,

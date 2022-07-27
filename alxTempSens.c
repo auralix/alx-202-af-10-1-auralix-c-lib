@@ -40,7 +40,7 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-void AlxTempSens_SetFuncPtr(AlxTempSens* me);
+static void AlxTempSens_SetFuncPtr(AlxTempSens* me);
 
 
 //******************************************************************************
@@ -67,7 +67,7 @@ void AlxTempSens_Ctor
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 Alx_Status AlxTempSens_Init(AlxTempSens* me)
 {
@@ -104,7 +104,7 @@ Alx_Status AlxTempSens_GetTemp_degC(AlxTempSens* me, float* temp_degC)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-void AlxTempSens_SetFuncPtr(AlxTempSens* me)
+static void AlxTempSens_SetFuncPtr(AlxTempSens* me)
 {
 	bool isErr = true;
 

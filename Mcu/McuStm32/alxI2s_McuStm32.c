@@ -60,7 +60,7 @@ void AlxI2s_Foreground_Callback_RxR(AlxI2s* me);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxI2s_Ctor
 (
@@ -79,15 +79,10 @@ void AlxI2s_Ctor
 	Alx_IrqPriority irqPriority
 )
 {
-	//******************************************************************************
 	// Assert
-	//******************************************************************************
 	ALX_I2S_ASSERT((audioMode == SAI_MODEMASTER_TX) || (audioMode == SAI_MODEMASTER_RX));	// Currently only Master Mode is supported
 
-
-	//******************************************************************************
 	// Objects - External
-	//******************************************************************************
 	me->do_MCLK = do_MCLK;
 	me->do_BCLK = do_BCLK;
 	me->do_LRCLK = do_LRCLK;
@@ -95,22 +90,14 @@ void AlxI2s_Ctor
 	me->di_SDI = di_SDI;
 	me->clk = clk;
 
-
-	//******************************************************************************
 	// Parameters
-	//******************************************************************************
 	me->i2sClk = i2sClk;
 	me->protocolDataSize = protocolDataSize;
 	me->isMclkUsed = isMclkUsed;
 	me->irqPriority = irqPriority;
 	ALX_I2S_ASSERT(AlxI2s_Ctor_IsClkOk(me));
 
-
-	//******************************************************************************
-	// Variables
-	//******************************************************************************
-
-	// PLL
+	// Variables - PLL
 	#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx)
 	me->iclk.PeriphClockSelection = RCC_PERIPHCLK_SAI_PLLI2S;	// MF: This sets SAI Input Clk "SAI_CK_x" to 49.142 Mhz
 	me->iclk.PLLI2S.PLLI2SN = 172;
@@ -126,7 +113,7 @@ void AlxI2s_Ctor
 	me->iclk.TIMPresSelection = ALX_NULL;	// Not Used
 	#endif
 
-	// Master/Slave
+	// Variables - Master/Slave
 	if(audioMode == SAI_MODEMASTER_TX)
 	{
 		// TX
@@ -157,7 +144,7 @@ void AlxI2s_Ctor
 	}
 	else { ALX_I2S_ASSERT(false); }	// We shouldn't get here
 
-	// hsaiTx
+	// Variables - hsaiTx
 	me->hsaiTx.Init.SynchroExt = SAI_SYNCEXT_DISABLE;
 	me->hsaiTx.Init.OutputDrive = SAI_OUTPUTDRIVE_DISABLE;
 	me->hsaiTx.Init.NoDivider = SAI_MASTERDIVIDER_ENABLE;
@@ -173,7 +160,7 @@ void AlxI2s_Ctor
 	me->hsaiTx.Init.FirstBit = ALX_NULL;					// TV: Set by HAL_SAI_InitProtocol()
 	me->hsaiTx.Init.ClockStrobing = ALX_NULL;				// TV: Set by HAL_SAI_InitProtocol()
 
-	// hsaiRx
+	// Variables - hsaiRx
 	me->hsaiRx.Init.SynchroExt = SAI_SYNCEXT_DISABLE;
 	me->hsaiRx.Init.OutputDrive = SAI_OUTPUTDRIVE_DISABLE;
 	me->hsaiRx.Init.NoDivider = SAI_MASTERDIVIDER_ENABLE;
@@ -197,13 +184,15 @@ void AlxI2s_Ctor
 	me->isTxChLeft = true;
 	me->isRxChLeft = true;
 
-
-	//******************************************************************************
 	// Info
-	//******************************************************************************
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 Alx_Status AlxI2s_Init(AlxI2s* me)
 {
 	ALX_I2S_ASSERT(me->isInit == false);

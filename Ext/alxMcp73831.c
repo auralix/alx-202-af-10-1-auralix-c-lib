@@ -49,8 +49,6 @@ void AlxMcp73831_Ctor
 	// Parameters
 	me->di_STAT = di_STAT;
 
-	// Variables
-
 	// Info
 	me->wasCtorCalled = true;
 	me->isInit = false;

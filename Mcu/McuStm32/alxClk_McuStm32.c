@@ -119,7 +119,7 @@ ALX_WEAK void AlxClk_Ctor
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
@@ -404,7 +404,6 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_
 	me->mainPllInputClk_Ctor =	8000000UL;		// 8Mhz
 }
 #endif
-
 #if defined(ALX_STM32F4)
 static void AlxClk_Ctor_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default(AlxClk* me)
 {

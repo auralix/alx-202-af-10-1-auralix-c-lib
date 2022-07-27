@@ -115,7 +115,6 @@ void AlxVnh7040_Ctor
 
 	// SM
 	me->st = AlxVnh7040_Sm_StOk;
-
 }
 
 
@@ -150,7 +149,6 @@ void AlxVnh7040_Init(AlxVnh7040* me)
 	// #5 Set isInit
 	me->isInit = true;
 }
-
 void AlxVnh7040_DeInit(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -173,36 +171,30 @@ void AlxVnh7040_DeInit(AlxVnh7040* me)
 	// #3 Reset isInit
 	me->isInit = false;
 }
-
 void AlxVnh7040_Monitoring_Select_HSA(AlxVnh7040* me)
 {
 	AlxIoPin_Write(me->do_SEL0, true);
 	AlxIoPin_Write(me->do_SEL1, false);
 	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_HSA;
 }
-
 void AlxVnh7040_Monitoring_Select_HSB(AlxVnh7040* me)
 {
 	AlxIoPin_Write(me->do_SEL0, false);
 	AlxIoPin_Write(me->do_SEL1, false);
 	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_HSB;
 }
-
 void AlxVnh7040_Monitoring_Select_Tchip(AlxVnh7040* me)
 {
 	AlxIoPin_Write(me->do_SEL0, false);
 	AlxIoPin_Write(me->do_SEL1, true);
 	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_Tchip;
 }
-
 void AlxVnh7040_Monitoring_Select_Vcc(AlxVnh7040* me)
 {
 	AlxIoPin_Write(me->do_SEL0, true);
 	AlxIoPin_Write(me->do_SEL1, true);
 	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_Vcc;
 }
-
-
 void AlxVnh7040_Monitoring (AlxVnh7040* me)
 {
 	int32_t temp;
@@ -282,7 +274,6 @@ void AlxVnh7040_Monitoring (AlxVnh7040* me)
 		}
 	}
 }
-
 void AlxVnh7040_Handle(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -459,7 +450,6 @@ void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil)
 		me->status = AlxVnh7040_Status_RotateCcw;
 	}
 }
-
 uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -510,6 +500,7 @@ int32_t AlxVnh7040_GetIsError (AlxVnh7040* me)
 
 	return me->currentHsA_clamp || me->currentHsB_clamp;	// true-> short circuit or overcurrent protection is acctive on one of half bridges
 }
+
 
 //******************************************************************************
 // Private Functions
