@@ -126,7 +126,7 @@ void AlxId_Ctor
 						((uint64_t)me->fwApp.verDate);
 
 		sprintf(me->fwApp.verStr, "%u.%u.%u.%lu.%s", me->fwApp.verMajor, me->fwApp.verMinor, me->fwApp.verPatch, me->fwApp.verDate, me->fwApp.build.hash);
-		sprintf(me->fwApp.binStr, "%lu_%s_%s_%u_%u_%u_%s.bin", me->fwApp.verDate, me->fwApp.artf, me->fwApp.name, me->fwApp.verMajor, me->fwApp.verMinor, me->fwApp.verPatch, me->fwApp.build.hashShort);
+		sprintf(me->fwApp.binStr, "%lu_%s_%s_V%u-%u-%u_%s.bin", me->fwApp.verDate, me->fwApp.artf, me->fwApp.name, me->fwApp.verMajor, me->fwApp.verMinor, me->fwApp.verPatch, me->fwApp.build.hashShort);
 	}
 
 
