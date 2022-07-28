@@ -89,31 +89,37 @@ typedef struct {} AlxDac_Mcu;
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxDacMcu_Init(AlxDac_Mcu* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] vref_V
   */
 Alx_Status AlxDacMcu_Init_CalibrateVref(AlxDac_Mcu* me, float* vref_V);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxDacMcu_DeInit(AlxDac_Mcu* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ch
+  * @param[in] voltage_V
   */
 Alx_Status AlxDacMcu_SetVoltage_V(AlxDac_Mcu* me, Alx_Ch* ch, float* voltage_V);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ch
+  * @param[in] voltage_V
+  * @param[in] vref_V
   */
 Alx_Status AlxDacMcu_SetVoltage_V_CalibrateVref(AlxDac_Mcu* me, Alx_Ch* ch, float* voltage_V, float* vref_V);
 

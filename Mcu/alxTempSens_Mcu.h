@@ -88,13 +88,13 @@ typedef struct {} AlxTempSens_Mcu;
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxTempSensMcu_Init(AlxTempSens_Mcu* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxTempSensMcu_DeInit(AlxTempSens_Mcu* me);
 

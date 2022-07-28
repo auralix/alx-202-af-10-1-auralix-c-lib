@@ -95,7 +95,8 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] start
   */
 void AlxTimSw_Ctor
 (
@@ -110,13 +111,13 @@ void AlxTimSw_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxTimSw_Start(AlxTimSw* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxTimSw_Stop(AlxTimSw* me);
 
@@ -165,36 +166,42 @@ uint64_t AlxTimSw_Get_hr(AlxTimSw* me);
 /**
   * @brief
   * @param[in] me
+  * @param[in] timeout_ns
   */
 bool AlxTimSw_IsTimeout_ns(AlxTimSw* me, uint64_t timeout_ns);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] timeout_us
   */
 bool AlxTimSw_IsTimeout_us(AlxTimSw* me, uint64_t timeout_us);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] timeout_ms
   */
 bool AlxTimSw_IsTimeout_ms(AlxTimSw* me, uint64_t timeout_ms);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] timeout_sec
   */
 bool AlxTimSw_IsTimeout_sec(AlxTimSw* me, uint64_t timeout_sec);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] timeout_min
   */
 bool AlxTimSw_IsTimeout_min(AlxTimSw* me, uint64_t timeout_min);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] timeout_hr
   */
 bool AlxTimSw_IsTimeout_hr(AlxTimSw* me, uint64_t timeout_hr);
 

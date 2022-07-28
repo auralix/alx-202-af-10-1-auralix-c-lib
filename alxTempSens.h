@@ -119,7 +119,9 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] submodule
+  * @param[in] submodulePtr
   */
 void AlxTempSens_Ctor
 (
@@ -135,13 +137,14 @@ void AlxTempSens_Ctor
 
 /**
   * @brief
+  * @param[in,out] me
   * @param[in] me
   */
 Alx_Status AlxTempSens_Init(AlxTempSens* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxTempSens_DeInit(AlxTempSens* me);
 
@@ -154,6 +157,7 @@ Alx_Status AlxTempSens_DeInit(AlxTempSens* me);
 /**
   * @brief
   * @param[in] me
+  * @param[out] temp_degC
   */
 Alx_Status AlxTempSens_GetTemp_degC(AlxTempSens* me, float* temp_degC);
 

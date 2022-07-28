@@ -75,7 +75,10 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ioPinArr
+  * @param[in] numOfIoPins
+  * @param[in] irqPriorityArr
   */
 void AlxIoPinIrq_Ctor
 (

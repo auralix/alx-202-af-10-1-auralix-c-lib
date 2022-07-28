@@ -98,97 +98,117 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] rtcTick_ns
+  * @param[in] ms
+  * @param[in] us
+  * @param[in] ns
   */
 uint64_t AlxRtc_MsUsNsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us, uint16_t ns);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] rtcTick_ns
+  * @param[in] ms
+  * @param[in] us
   */
 uint64_t AlxRtc_MsUsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] rtcTick_ns
+  * @param[in] ms
   */
 uint64_t AlxRtc_MsToNs(uint64_t rtcTick_ns, uint16_t ms);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] ms
+  * @param[in] us
+  * @param[in] ns
   */
 float AlxRtc_MsUsNsToSecFract(uint16_t ms, uint16_t us, uint16_t ns);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] rtcTick_ns
+  * @param[in] in_ns
+  * @param[out] ms
+  * @param[out] us
+  * @param[out] ns
   */
 void AlxRtc_NsToMsUsNs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms, uint16_t* us, uint16_t* ns);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] rtcTick_ns
+  * @param[in] in_ns
+  * @param[out] ms
+  * @param[out] us
   */
 void AlxRtc_NsToMsUs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms, uint16_t* us);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] rtcTick_ns
+  * @param[in] in_ns
+  * @param[out] ms
   */
 void AlxRtc_NsToMs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] secFract
+  * @param[out] ms
+  * @param[out] us
+  * @param[out] ns
   */
 void AlxRtc_SecFractToMsUsNs(float secFract, uint16_t* ms, uint16_t* us, uint16_t* ns);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] unixTime_ns
   */
 AlxRtc_DateTime AlxRtc_UnixTimeNsToDateTime(uint64_t unixTime_ns);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] unixTime_us
   */
 AlxRtc_DateTime AlxRtc_UnixTimeUsToDateTime(uint64_t unixTime_us);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] unixTime_ms
   */
 AlxRtc_DateTime AlxRtc_UnixTimeMsToDateTime(uint64_t unixTime_ms);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] unixTime_sec
   */
 AlxRtc_DateTime AlxRtc_UnixTimeSecToDateTime(uint64_t unixTime_sec);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] dateTime
   */
 uint64_t AlxRtc_DateTimeToUnixTimeNs(AlxRtc_DateTime dateTime);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] dateTime
   */
 uint64_t AlxRtc_DateTimeToUnixTimeUs(AlxRtc_DateTime dateTime);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] dateTime
   */
 uint64_t AlxRtc_DateTimeToUnixTimeMs(AlxRtc_DateTime dateTime);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] dateTime
   */
 uint64_t AlxRtc_DateTimeToUnixTimeSec(AlxRtc_DateTime dateTime);
 

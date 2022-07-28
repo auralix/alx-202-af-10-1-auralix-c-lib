@@ -117,7 +117,17 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] adc
+  * @param[in] chAdc
+  * @param[in] vdiv_ResHigh_kOhm
+  * @param[in] vdiv_ResLow_kOhm
+  * @param[in] hys2_TopHigh_V
+  * @param[in] hys2_TopLow_V
+  * @param[in] hys2_BotHigh_V
+  * @param[in] hys2_BotLow_V
+  * @param[in] filtGlitchBool_StableTrueTime_ms
+  * @param[in] filtGlitchBool_StableFalseTime_ms
   */
 void AlxPwr_Ctor
 (
@@ -141,19 +151,19 @@ void AlxPwr_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxPwr_Init(AlxPwr* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxPwr_DeInit(AlxPwr* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxPwr_Handle(AlxPwr* me);
 

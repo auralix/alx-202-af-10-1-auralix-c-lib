@@ -84,7 +84,11 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] i2c
+  * @param[in] io_SCL
+  * @param[in] io_SDA
+  * @param[in] clk
   */
 void AlxI2c_Ctor
 (

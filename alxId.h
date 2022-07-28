@@ -268,7 +268,21 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] fwArtf
+  * @param[in] fwName
+  * @param[in] fwVerMajor
+  * @param[in] fwVerMinor
+  * @param[in] fwVerPatch
+  * @param[in] fwIsBuildJobUsed
+  * @param[in] fwIsBootloader
+  * @param[in] hwInstanceKnownArr
+  * @param[in] hwInstanceKnownArrLen
+  * @param[in] hwInstanceHwIdSupportedArr
+  * @param[in] hwInstanceHwIdSupportedArrLen
+  * @param[in] hwIdIoPinArr
+  * @param[in] hwIdIoPinArrLen
+  * @param[in] hwMcuName
   */
 void AlxId_Ctor
 (
@@ -291,7 +305,16 @@ void AlxId_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] fwArtf
+  * @param[in] fwName
+  * @param[in] fwVerMajor
+  * @param[in] fwVerMinor
+  * @param[in] fwVerPatch
+  * @param[in] fwIsBuildJobUsed
+  * @param[in] fwIsBootloader
+  * @param[in] hwInstance
+  * @param[in] hwMcuName
   */
 void AlxId_Ctor_NoHwId
 (
@@ -314,7 +337,7 @@ void AlxId_Ctor_NoHwId
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxId_Init(AlxId* me);
 

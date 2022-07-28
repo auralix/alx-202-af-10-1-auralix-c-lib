@@ -44,7 +44,7 @@ void AlxTempSensRtdVdiv_Ctor
 (
 	AlxTempSensRtdVdiv* me,
 	AlxAdc* adc,
-	AlxInterpLin *interpLin,
+	AlxInterpLin* interpLin,
 	Alx_Ch chAdc_Vin,
 	Alx_Ch chAdc_Vout,
 	bool isResRtdLow,
@@ -60,8 +60,6 @@ void AlxTempSensRtdVdiv_Ctor
 	// Objects - External
 	me->adc = adc;
 	me->interpLin = interpLin;
-
-	// Variables
 
 	// Info
 	me->wasCtorCalled = true;

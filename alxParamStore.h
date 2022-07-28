@@ -114,7 +114,9 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] paramGroupArr
+  * @param[in] numOfParamGroups
   */
 void AlxParamStore_Ctor
 (
@@ -130,13 +132,15 @@ void AlxParamStore_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[out] status
+  * @param[in] numOfParamGroups
   */
 Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* status, uint32_t numOfParamGroups);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxParamStore_Handle(AlxParamStore* me);
 

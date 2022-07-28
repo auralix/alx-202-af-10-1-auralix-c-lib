@@ -606,7 +606,12 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] spi
+  * @param[in] spiNumOfTries
+  * @param[in] spiTimeout_ms
+  * @param[in] fifoBuff
+  * @param[in] fifoBuffLen
   */
 void AlxAdxl355_Ctor
 (
@@ -625,37 +630,40 @@ void AlxAdxl355_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxAdxl355_Init(AlxAdxl355* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxAdxl355_DeInit(AlxAdxl355* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxAdxl355_Enable(AlxAdxl355* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxAdxl355_Disable(AlxAdxl355* me);
 
 /**
   * @brief
   * @param[in] me
+  * @param[out] xyz_g
   */
 Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g);
 
 /**
   * @brief
   * @param[in] me
+  * @param[out] xyz_g
+  * @param[in] len
   */
 Alx_Status AlxAdxl355_GetXyzMulti_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint32_t len);
 

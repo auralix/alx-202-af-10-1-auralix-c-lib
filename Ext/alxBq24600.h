@@ -126,7 +126,10 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] do_EN
+  * @param[in] di_nPG
+  * @param[in] di_STAT
   */
 void AlxBq24600_Ctor
 (
@@ -143,31 +146,31 @@ void AlxBq24600_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBq24600_Init(AlxBq24600* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBq24600_DeInit(AlxBq24600* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBq24600_Handle(AlxBq24600* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBq24600_Enable(AlxBq24600* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBq24600_Disable(AlxBq24600* me);
 

@@ -104,7 +104,12 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] pxTaskCode
+  * @param[in] pcName
+  * @param[in] usStackDepth
+  * @param[in] pvParameters
+  * @param[in] uxPriority
   */
 void AlxOsThread_Ctor
 (
@@ -123,7 +128,7 @@ void AlxOsThread_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxOsThread_Start(AlxOsThread* me);
 

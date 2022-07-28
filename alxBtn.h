@@ -110,7 +110,10 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] valInitial
+  * @param[in] longTime_ms
+  * @param[in] debounceTime
   */
 void AlxBtn_Ctor
 (
@@ -127,73 +130,74 @@ void AlxBtn_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] in
   */
 void AlxBtn_Handle(AlxBtn* me, bool in);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 bool AlxBtn_IsPressed(AlxBtn* me);			// True -> Button is currently pressed
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 bool AlxBtn_WasPressed(AlxBtn* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 bool AlxBtn_WasReleased(AlxBtn* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 bool AlxBtn_IsPressedShort(AlxBtn* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 bool AlxBtn_WasPressedShort(AlxBtn* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 bool AlxBtn_IsPressedLong(AlxBtn* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 bool AlxBtn_WasPressedLong(AlxBtn* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBtn_ClearWasPressed(AlxBtn* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBtn_ClearWasReleased(AlxBtn* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBtn_ClearWasPressedShort(AlxBtn* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBtn_ClearWasPressedLong(AlxBtn* me);
 

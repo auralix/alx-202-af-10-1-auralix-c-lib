@@ -93,43 +93,51 @@ typedef enum
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] inSample
+  * @return
   */
 float AlxAudio_LinerPcmInt8ToFloat(int8_t inSample);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] inSample
+  * @return
   */
 float AlxAudio_LinerPcmUint8ToFloat(uint8_t inSample);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] inSample
+  * @return
   */
 float AlxAudio_LinerPcmInt16ToFloat(int16_t inSample);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] inSample
+  * @return
   */
 float AlxAudio_LinerPcmUint16ToFloat(uint16_t inSample);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] inSample
+  * @return
   */
 int8_t AlxAudio_FloatToLinerPcmInt8(float inSample);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] inSample
+  * @return
   */
 int16_t AlxAudio_FloatToLinerPcmInt16(float inSample);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] sampleL
+  * @param[in] sampleR
+  * @return Stereo sample
   */
 float AlxAudio_StereoToMono(float sampleL, float sampleR);
 

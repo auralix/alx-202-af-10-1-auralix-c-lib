@@ -113,7 +113,18 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] can
+  * @param[in] do_CAN_TX
+  * @param[in] di_CAN_RX
+  * @param[in] clk
+  * @param[in] canClk
+  * @param[in] txFifoBuff
+  * @param[in] txFifoBuffLen
+  * @param[in] rxFifoBuff
+  * @param[in] rxFifoBuffLen
+  * @param[in] txIrqPriority
+  * @param[in] rxIrqPriority
   */
 void AlxCan_Ctor
 (

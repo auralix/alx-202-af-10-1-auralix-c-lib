@@ -102,7 +102,10 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] valInitial
+  * @param[in] stableTrueTime_ms
+  * @param[in] stableFalseTime_ms
   */
 void AlxTpl_Ctor
 (
@@ -119,7 +122,8 @@ void AlxTpl_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] in
   */
 bool AlxTpl_Process(AlxTpl* me, bool in);
 

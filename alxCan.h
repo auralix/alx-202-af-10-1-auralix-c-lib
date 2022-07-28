@@ -101,55 +101,61 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxCan_Init(AlxCan* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxCan_DeInit(AlxCan* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxCan_ReInit(AlxCan* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] msg
   */
 Alx_Status AlxCan_TxMsg(AlxCan* me, AlxCan_Msg msg);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] msg
+  * @param[in] numOfMsg
   */
 Alx_Status AlxCan_TxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] msg
   */
 Alx_Status AlxCan_RxMsg(AlxCan* me, AlxCan_Msg* msg);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] msg
+  * @param[in] numOfMsg
   */
 Alx_Status AlxCan_RxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 bool AlxCan_IsErr(AlxCan* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxCan_Foreground_Handle(AlxCan* me);
 

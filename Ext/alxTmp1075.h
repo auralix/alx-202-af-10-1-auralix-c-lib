@@ -264,14 +264,19 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] i2c
+  * @param[in] i2cAddr
+  * @param[in] i2cCheckWithRead
+  * @param[in] i2cNumOfTries
+  * @param[in] i2cTimeout_ms
   */
 void AlxTmp1075_Ctor
 (
 	AlxTmp1075* me,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
-	bool i2cCheckWithRead, // ???
+	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
 );
@@ -283,13 +288,13 @@ void AlxTmp1075_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxTmp1075_Init(AlxTmp1075* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxTmp1075_DeInit(AlxTmp1075* me);
 

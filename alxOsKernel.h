@@ -80,7 +80,6 @@ extern "C" {
 
 /**
   * @brief
-  * @param[in] me
   */
 void AlxOsKernel_Start(void);
 

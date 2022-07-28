@@ -73,7 +73,7 @@ extern volatile AlxTick alxTick;
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 static inline void AlxTick_Ctor
 (
@@ -130,79 +130,85 @@ uint64_t AlxTick_Get_hr(volatile AlxTick* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxTick_Inc_ns(volatile AlxTick* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxTick_Inc_us(volatile AlxTick* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxTick_Inc_ms(volatile AlxTick* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxTick_Inc_sec(volatile AlxTick* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxTick_Inc_min(volatile AlxTick* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxTick_Inc_hr(volatile AlxTick* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ticks_ns
   */
 void AlxTick_IncRange_ns(volatile AlxTick* me, uint64_t ticks_ns);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ticks_us
   */
 void AlxTick_IncRange_us(volatile AlxTick* me, uint64_t ticks_us);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ticks_ms
   */
 void AlxTick_IncRange_ms(volatile AlxTick* me, uint64_t ticks_ms);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ticks_sec
   */
 void AlxTick_IncRange_sec(volatile AlxTick* me, uint64_t ticks_sec);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ticks_min
   */
 void AlxTick_IncRange_min(volatile AlxTick* me, uint64_t ticks_min);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ticks_hr
   */
 void AlxTick_IncRange_hr(volatile AlxTick* me, uint64_t ticks_hr);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxTick_Reset(volatile AlxTick* me);
 

@@ -399,49 +399,54 @@ typedef enum
 
 /**
   * @brief
-  * @param[in] me
   */
 void AlxGlobal_DisableIrq(void);
 
 /**
   * @brief
-  * @param[in] me
   */
 void AlxGlobal_EnableIrq(void);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] uint64
+  * @param[out] str
   */
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] valPtr
+  * @param[in] valMin
+  * @param[in] valMax
   */
 Alx_Status AlxGlobal_BoundUint32(uint32_t* valPtr, uint32_t valMin, uint32_t valMax);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] valPtr
+  * @param[in] valMin
+  * @param[in] valMax
   */
 Alx_Status AlxGlobal_BoundFloat(float* valPtr, float valMin, float valMax);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] val
   */
 uint32_t AlxGlobal_Round(float val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] val
+  * @param[in] valMin
+  * @param[in] valMax
   */
 bool AlxGlobal_IsOutOfRangeUint8(uint8_t val, uint8_t valMin, uint8_t valMax);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] val
   */
 uint32_t AlxGlobal_Ntohl(uint32_t val);
 

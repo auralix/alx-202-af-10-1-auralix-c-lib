@@ -99,7 +99,9 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] volMin_dB
+  * @param[in] volMax_dB
   */
 void AlxAudioVol_Ctor
 (
@@ -115,19 +117,22 @@ void AlxAudioVol_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] inSample
   */
 float AlxAudioVol_Process(AlxAudioVol* me, float inSample);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] vol_pct
   */
 void AlxAudioVol_Set_pct(AlxAudioVol* me, float vol_pct);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] vol_dB
   */
 void AlxAudioVol_Set_dB(AlxAudioVol* me, float vol_dB);
 

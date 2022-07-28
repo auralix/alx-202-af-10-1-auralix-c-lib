@@ -109,7 +109,17 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] adc
+  * @param[in] ioPinArr
+  * @param[in] numOfIoPins
+  * @param[in] chArr
+  * @param[in] numOfCh
+  * @param[in] clk
+  * @param[in] adcClk
+  * @param[in] samplingTime
+  * @param[in] isVrefInt_V
+  * @param[in] vrefExt_V
   */
 void AlxAdc_Ctor
 (

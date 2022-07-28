@@ -100,7 +100,9 @@ extern AlxOsDelay alxOsDelay;
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] osTick
+  * @param[in] approxDisable
   */
 void AlxOsDelay_Ctor
 (
@@ -117,30 +119,35 @@ void AlxOsDelay_Ctor
 /**
   * @brief
   * @param[in] me
+  * @param[in] osDelay_us
   */
 void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] osDelay_ms
   */
 void AlxOsDelay_ms(AlxOsDelay* me, uint64_t osDelay_ms);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] osDelay_sec
   */
 void AlxOsDelay_sec(AlxOsDelay* me, uint64_t osDelay_sec);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] osDelay_min
   */
 void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] osDelay_hr
   */
 void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr);
 

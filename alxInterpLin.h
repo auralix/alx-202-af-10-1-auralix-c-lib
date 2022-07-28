@@ -96,13 +96,17 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] xPointArr
+  * @param[in] yPointArr
+  * @param[in] numOfArrPoints
+  * @param[in] isisXpointArrRising
   */
 void AlxInterpLin_Ctor
 (
-	AlxInterpLin *me,
-	float *xPointArr,			// Points to 0th element of the X arr.
-	float *yPointArr,			// Points to 0th element of the Y arr.
+	AlxInterpLin* me,
+	float* xPointArr,			// Points to 0th element of the X arr.
+	float* yPointArr,			// Points to 0th element of the Y arr.
 	uint32_t numOfArrPoints,	// Length of the arrays
 	bool isisXpointArrRising	// True if X[n+1] > X[n]
 );
@@ -115,12 +119,15 @@ void AlxInterpLin_Ctor
 /**
   * @brief
   * @param[in] me
+  * @param[in] x
+  * @param[out] y
   */
 Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* y);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] x
   */
 float AlxInterpLin_GetY(AlxInterpLin* me, float x);
 

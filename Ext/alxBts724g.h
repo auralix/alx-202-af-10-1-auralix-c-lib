@@ -114,7 +114,9 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] do_HS_IN
+  * @param[in] di_HS_ST
   */
 void AlxBts724g_Ctor
 (
@@ -130,37 +132,37 @@ void AlxBts724g_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBts724g_Init(AlxBts724g* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBts724g_DeInit(AlxBts724g* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBts724g_Handle(AlxBts724g* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBts724g_SetOut(AlxBts724g* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBts724g_ResetOut(AlxBts724g* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxBts724g_WriteOut(AlxBts724g* me, bool state);
 
@@ -178,13 +180,13 @@ bool AlxBts724g_IsOverTempDetected(AlxBts724g* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 bool AlxBts724g_WasOpenLoadDetected(AlxBts724g* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 bool AlxBts724g_WasOverTempDetected(AlxBts724g* me);
 

@@ -76,7 +76,8 @@ typedef struct
 	Alx_Ch ch[ALX_PWM_BUFF_LEN];
 	#if !defined (ALX_PWM_OPTIMIZE_SIZE)
 	float dutyDefault_pct[ALX_PWM_BUFF_LEN];
-	#endif
+	#endif
+
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
@@ -89,7 +90,15 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] tim
+  * @param[in] ioPinArr
+  * @param[in] chArr
+  * @param[in] dutyDefaultArr_pct
+  * @param[in] numOfCh
+  * @param[in] clk
+  * @param[in] prescaler
+  * @param[in] period
   */
 void AlxPwm_Ctor
 (

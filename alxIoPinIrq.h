@@ -94,13 +94,13 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxIoPinIrq_Init(AlxIoPinIrq* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me);
 

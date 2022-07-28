@@ -102,7 +102,9 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] valInitial
+  * @param[in] stableTime_ms
   */
 void AlxFiltGlitchUint32_Ctor
 (
@@ -118,7 +120,8 @@ void AlxFiltGlitchUint32_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] valNew
   */
 uint32_t AlxFiltGlitchUint32_Process(AlxFiltGlitchUint32* me, uint32_t valNew);
 

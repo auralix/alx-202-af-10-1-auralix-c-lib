@@ -95,7 +95,8 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] di_STAT
   */
 void AlxMcp73831_Ctor
 (
@@ -110,13 +111,13 @@ void AlxMcp73831_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxMcp73831_Init(AlxMcp73831* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxMcp73831_DeInit(AlxMcp73831* me);
 

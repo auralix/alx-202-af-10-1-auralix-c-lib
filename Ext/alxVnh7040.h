@@ -196,7 +196,21 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] adc
+  * @param[in] multiSensAdcCh
+  * @param[in] pwm
+  * @param[in] pwmCh
+  * @param[in] do_PWM
+  * @param[in] do_INA
+  * @param[in] do_INB
+  * @param[in] do_SEL0
+  * @param[in] do_SEL1
+  * @param[in] do_SENS_EN
+  * @param[in] breakTypeDefault
+  * @param[in] multiSensResHigh_ohm
+  * @param[in] multiSensResLow_ohm
+  * @param[in] restartWaitTime_ms
   */
 void AlxVnh7040_Ctor
 (
@@ -227,25 +241,26 @@ void AlxVnh7040_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxVnh7040_Init(AlxVnh7040* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxVnh7040_DeInit(AlxVnh7040* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxVnh7040_Handle(AlxVnh7040* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] duty_permil
   */
 void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil);
 
@@ -287,7 +302,8 @@ int32_t AlxVnh7040_GetIsError(AlxVnh7040* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] breakType
   */
 void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType);
 

@@ -67,7 +67,7 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxClk_Ctor
 (

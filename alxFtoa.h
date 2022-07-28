@@ -80,7 +80,9 @@ extern "C" {
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] f
+  * @param[in,out] buf
+  * @param[in] precision
   */
 char* AlxFtoa(double f, char* buf, int precision);
 

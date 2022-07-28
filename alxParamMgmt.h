@@ -97,7 +97,9 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] paramItemArr
+  * @param[in] numOfParamItems
   */
 void AlxParamMgmt_Ctor
 (
@@ -114,48 +116,65 @@ void AlxParamMgmt_Ctor
 /**
   * @brief
   * @param[in] me
+  * @param[out] name
+  * @param[out] val
+  * @param[in] len
   */
 void AlxParamMgmt_GetByName(AlxParamMgmt* me, const char* name, void* val, uint32_t len);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] id
+  * @param[out] val
+  * @param[in] len
   */
 void AlxParamMgmt_GetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] val
+  * @param[in] len
   */
 void AlxParamMgmt_SetByName(AlxParamMgmt* me, const char* name, void* val, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] id
+  * @param[in] val
+  * @param[in] len
   */
 void AlxParamMgmt_SetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] len
   */
 void AlxParamMgmt_SetToDefByName(AlxParamMgmt* me, const char* name, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] id
+  * @param[in] len
   */
 void AlxParamMgmt_SetToDefById(AlxParamMgmt* me, uint32_t id, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] groupId
   */
 void AlxParamMgmt_SetToDefGroup(AlxParamMgmt* me, uint8_t groupId);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxParamMgmt_SetToDefAll(AlxParamMgmt* me);
 

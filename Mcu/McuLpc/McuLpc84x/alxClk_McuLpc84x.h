@@ -72,7 +72,10 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] mainClkSource
+  * @param[in] clkFreq
+  * @param[in] divider
   */
 void AlxClk_Ctor
 (

@@ -93,13 +93,13 @@ extern AlxTrace alxTrace;
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxTrace_Init(AlxTrace* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxTrace_DeInit(AlxTrace* me);
 

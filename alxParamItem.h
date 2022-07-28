@@ -149,7 +149,14 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorUint8
 (
@@ -165,7 +172,14 @@ void AlxParamItem_CtorUint8
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorUint16
 (
@@ -181,7 +195,14 @@ void AlxParamItem_CtorUint16
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorUint32
 (
@@ -197,7 +218,14 @@ void AlxParamItem_CtorUint32
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorUint64
 (
@@ -213,7 +241,14 @@ void AlxParamItem_CtorUint64
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorInt8
 (
@@ -229,7 +264,14 @@ void AlxParamItem_CtorInt8
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorInt16
 (
@@ -245,7 +287,14 @@ void AlxParamItem_CtorInt16
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorInt32
 (
@@ -261,7 +310,14 @@ void AlxParamItem_CtorInt32
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorInt64
 (
@@ -277,7 +333,14 @@ void AlxParamItem_CtorInt64
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorFloat
 (
@@ -293,7 +356,14 @@ void AlxParamItem_CtorFloat
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorDouble
 (
@@ -309,7 +379,11 @@ void AlxParamItem_CtorDouble
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
   */
 void AlxParamItem_CtorBool
 (
@@ -322,7 +396,15 @@ void AlxParamItem_CtorBool
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valBuff
+  * @param[in] valDefBuff
+  * @param[in] valBuffLen
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorArr
 (
@@ -339,7 +421,15 @@ void AlxParamItem_CtorArr
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valBuff
+  * @param[in] valDefBuff
+  * @param[in] strMaxLen
+  * @param[in] valOutOfRangeHandle
   */
 void AlxParamItem_CtorStr
 (
@@ -397,7 +487,7 @@ uint32_t AlxParamItem_GetValLen(AlxParamItem* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxParamItem_SetValToDef(AlxParamItem* me);
 
@@ -469,91 +559,106 @@ bool AlxParamItem_GetValBool(AlxParamItem* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValUint64(AlxParamItem* me, uint64_t val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValInt8(AlxParamItem* me, int8_t val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValInt16(AlxParamItem* me, int16_t val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValInt32(AlxParamItem* me, int32_t val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val);
 
 /**
   * @brief
   * @param[in] me
+  * @param[out] val
   */
 void AlxParamItem_GetValArr(AlxParamItem* me, void* val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 void AlxParamItem_SetValArr(AlxParamItem* me, void* val);
 
 /**
   * @brief
   * @param[in] me
+  * @param[out] val
   */
 void AlxParamItem_GetValStr(AlxParamItem* me, char* val);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] val
   */
 Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val);
 

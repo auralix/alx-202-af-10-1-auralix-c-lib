@@ -101,31 +101,33 @@ typedef struct {} AlxAdc;
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxAdc_Init(AlxAdc* me);
 
 /**
 	* @brief
-	* @param[in] me
+	* @param[in,out] me
 	*/
 Alx_Status AlxAdc_DeInit(AlxAdc* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ch
   */
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] ch
   */
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);	// MF: Optimized Func
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
 

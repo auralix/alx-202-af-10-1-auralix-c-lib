@@ -118,7 +118,14 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] x1
+  * @param[in] point1_y
+  * @param[in] point2_x
+  * @param[in] point2_y
+  * @param[in] min
+  * @param[in] max
+  * @param[in] isLimitOnX
   */
 void AlxLinFun_Ctor
 (
@@ -134,7 +141,14 @@ void AlxLinFun_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] x1
+  * @param[in] point1_y
+  * @param[in] point2_x
+  * @param[in] point2_y
+  * @param[in] min
+  * @param[in] max
+  * @param[in] isLimitOnX
   */
 void AlxLinFunInt_Ctor
 (
@@ -156,36 +170,45 @@ void AlxLinFunInt_Ctor
 /**
   * @brief
   * @param[in] me
+  * @param[in] x
+  * @param[out] y
   */
 Alx_Status AlxLinFun_GetY_WithStatus(AlxLinFun* me, float x, float* y);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] y
+  * @param[out] x
   */
 Alx_Status AlxLinFun_GetX_WithStatus(AlxLinFun* me, float y, float* x);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] x
   */
 float AlxLinFun_GetY(AlxLinFun* me, float x);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] y
   */
 float AlxLinFun_GetX(AlxLinFun* me, float y);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] x
+  * @param[out] y
   */
 Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] x
   */
 int32_t AlxLinFunInt_GetY(AlxLinFunInt* me, int32_t x);
 

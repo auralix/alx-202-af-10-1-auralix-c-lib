@@ -103,13 +103,19 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] adc
+  * @param[in] interpLin
+  * @param[in] chAdc_Vin
+  * @param[in] chAdc_Vout
+  * @param[in] isResRtdLow
+  * @param[in] resOther_kOhm
   */
 void AlxTempSensRtdVdiv_Ctor
 (
 	AlxTempSensRtdVdiv* me,
 	AlxAdc* adc,
-	AlxInterpLin *interpLin,
+	AlxInterpLin* interpLin,
 	Alx_Ch chAdc_Vin,
 	Alx_Ch chAdc_Vout,
 	bool isResRtdLow,
@@ -123,19 +129,20 @@ void AlxTempSensRtdVdiv_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxTempSensRtdVdiv_Init(AlxTempSensRtdVdiv* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxTempSensRtdVdiv_DeInit(AlxTempSensRtdVdiv* me);
 
 /**
   * @brief
   * @param[in] me
+  * @param[out] temp_degC
   */
 Alx_Status AlxTempSensRtdVdiv_GetTemp_degC(AlxTempSensRtdVdiv* me, float* temp_degC);
 

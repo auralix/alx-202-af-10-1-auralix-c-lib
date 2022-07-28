@@ -91,7 +91,7 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxMemRaw_Ctor
 (
@@ -105,25 +105,36 @@ void AlxMemRaw_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxMemRaw_Init(AlxMemRaw* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxMemRaw_DeInit(AlxMemRaw* me);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] addr
+  * @param[out] data
+  * @param[in] len
+  * @param[in] numOfTries
+  * @param[in] timeout_ms
   */
 Alx_Status AlxMemRaw_Read(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t timeout_ms);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] addr
+  * @param[in] data
+  * @param[in] len
+  * @param[in] checkWithReadEnable
+  * @param[in] numOfTries
+  * @param[in] timeout_ms
   */
 Alx_Status AlxMemRaw_Write(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t len, bool checkWithReadEnable, uint8_t numOfTries, uint16_t timeout_ms);
 

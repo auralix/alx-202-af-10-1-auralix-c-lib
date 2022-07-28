@@ -80,13 +80,11 @@ extern "C" {
 
 /**
   * @brief
-  * @param[in] me
   */
 void AlxOsCriticalSection_Enter(void);
 
 /**
   * @brief
-  * @param[in] me
   */
 void AlxOsCriticalSection_Exit(void);
 

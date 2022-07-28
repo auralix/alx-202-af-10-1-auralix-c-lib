@@ -81,37 +81,37 @@ extern "C" {
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] delay_ns
   */
 void AlxDelay_ns(uint64_t delay_ns);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] delay_us
   */
 void AlxDelay_us(uint64_t delay_us);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] delay_ms
   */
 void AlxDelay_ms(uint64_t delay_ms);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] delay_sec
   */
 void AlxDelay_sec( uint64_t delay_sec);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] delay_min
   */
 void AlxDelay_min(uint64_t delay_min);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in] delay_hr
   */
 void AlxDelay_hr(uint64_t delay_hr);
 

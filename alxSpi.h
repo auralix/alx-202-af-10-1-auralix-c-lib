@@ -92,31 +92,44 @@ typedef struct { bool dummy; } AlxSpi;
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxSpi_Init(AlxSpi* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 Alx_Status AlxSpi_DeInit(AlxSpi* me);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] writeData
+  * @param[in] len
+  * @param[in] numOfTries
+  * @param[in] timeout_ms
   */
 Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
 
 /**
   * @brief
   * @param[in] me
+  * @param[out] readData
+  * @param[in] len
+  * @param[in] numOfTries
+  * @param[in] timeout_ms
   */
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] writeData
+  * @param[out] readData
+  * @param[in] len
+  * @param[in] numOfTries
+  * @param[in] timeout_ms
   */
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
 

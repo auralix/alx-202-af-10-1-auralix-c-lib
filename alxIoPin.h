@@ -113,13 +113,13 @@ typedef enum
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxIoPin_Init(AlxIoPin* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxIoPin_DeInit(AlxIoPin* me);
 
@@ -132,6 +132,7 @@ bool AlxIoPin_Read(AlxIoPin* me);
 /**
   * @brief
   * @param[in] me
+  * @param[in] val
   */
 void AlxIoPin_Write(AlxIoPin* me, bool val);
 

@@ -85,7 +85,14 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] dac
+  * @param[in] ioPinArr
+  * @param[in] chArr
+  * @param[in] setVoltageDefaultArr_V
+  * @param[in] numOfCh
+  * @param[in] isVrefInt_V
+  * @param[in] vrefExt_V
   */
 void AlxDacMcu_Ctor
 (

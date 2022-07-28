@@ -122,7 +122,8 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] config
   */
 void AlxClk_Ctor
 (

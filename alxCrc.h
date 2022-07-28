@@ -100,7 +100,8 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] config
   */
 void AlxCrc_Ctor
 (
@@ -115,19 +116,24 @@ void AlxCrc_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] data
+  * @param[in] len
   */
 uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] dataWithCrc
+  * @param[in] lenWithCrc
+  * @param[in] validatedCrc
   */
 bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t* validatedCrc);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 uint32_t AlxCrc_GetLen(AlxCrc* me);
 

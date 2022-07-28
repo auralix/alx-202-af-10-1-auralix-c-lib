@@ -103,7 +103,9 @@ typedef struct
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] high
+  * @param[in] low
   */
 void AlxHys1_Ctor
 (
@@ -119,7 +121,8 @@ void AlxHys1_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] in
   */
 AlxHys1_St AlxHys1_Process(AlxHys1* me, float in);
 
