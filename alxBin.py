@@ -1,6 +1,6 @@
 #*******************************************************************************
-# @file         alxBin.py
-# @brief        Auralix Python Library
+# @file			alxBin.py
+# @brief		Auralix C Library - ALX .bin Script
 # @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
 #
 # @section License
@@ -23,6 +23,7 @@
 # along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
 #*****************************************************************************
 
+
 #*******************************************************************************
 # Imports
 #*******************************************************************************
@@ -34,7 +35,7 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsSolDir, vsPrjDir):
+def Script(vsSolDir, vsPrjDir, fwName):
 	# Read input file
 	inFilePath = pathlib.Path("alxBuild_GENERATED.h")
 	inFileText = inFilePath.read_text()
@@ -56,11 +57,9 @@ def Script(vsSolDir, vsPrjDir):
 	fwArtf = pathlib.Path(vsPrjDir).stem
 	vsSolArtf = pathlib.Path(vsSolDir).stem
 	vsSolArtfLen = len(vsSolArtf)
-	vsSolArtfName = pathlib.Path(vsSolDir).parent.stem
-	fwName = vsSolArtfName[vsSolArtfLen + 1:]
 
 	# Create clean directory for destination bin
-	binDstDirName = date + "_" + fwArtf + "_" + fwName + "_" + fwVerMajor + "_" + fwVerMinor + "_" + fwVerPatch + "_" + hashShort
+	binDstDirName = date + "_" + fwArtf + "_" + fwName + "_" + "V" + fwVerMajor + "-" + fwVerMinor + "-" + fwVerPatch + "_" + hashShort
 	binDstDir = binSrcDir / binDstDirName
 	shutil.rmtree(binDstDir, ignore_errors=True)
 	pathlib.Path(binDstDir).mkdir(parents=True, exist_ok=True)
@@ -86,6 +85,7 @@ if __name__ == "__main__":
 	# Prepare param
 	vsSolDir = sys.argv[1]
 	vsPrjDir = sys.argv[2]
+	fwName = sys.argv[3]
 
 	# Script
-	Script(vsSolDir, vsPrjDir)
+	Script(vsSolDir, vsPrjDir, fwName)

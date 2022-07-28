@@ -1,6 +1,6 @@
 #*******************************************************************************
-# @file         alxBuild.py
-# @brief        Auralix Python Library
+# @file			alxBuild.py
+# @brief		Auralix C Library - ALX Build Script
 # @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
 #
 # @section License
@@ -22,6 +22,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
 #*****************************************************************************
+
 
 #*******************************************************************************
 # Imports
@@ -62,10 +63,10 @@ def Script(vsSolDir):
 		cmdTag = "git --git-dir=" + str(gitDir) + "\.git tag --points-at HEAD"
 		cmdTagCompletedObj = subprocess.run(cmdTag, capture_output=True)
 		tag = cmdTagCompletedObj.stdout.decode().rstrip('\n')
-		print("alxBuild.py - buildTag: " + tag)
+		tagOnlyNum = tag.lstrip('v')
 
 		# Split
-		tagList = tag.split('.')
+		tagList = tagOnlyNum.split('.')
 		fwVerMajorStr = tagList[0]
 		fwVerMinorStr = tagList[1]
 		fwVerPatchStr = tagList[2]
@@ -81,6 +82,9 @@ def Script(vsSolDir):
 		fwVerMajorStr = "0"
 		fwVerMinorStr = "0"
 		fwVerPatchStr = "0"
+
+	# Print
+	print("alxBuild.py - buildTag: " + tag)
 	print("alxBuild.py - fwVerMajor: " + fwVerMajorStr)
 	print("alxBuild.py - fwVerMinor: " + fwVerMinorStr)
 	print("alxBuild.py - fwVerPatch: " + fwVerPatchStr)
