@@ -39,39 +39,13 @@ extern "C" {
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
+#include "alxGlobal.h"	// TV: alxOsMutex is needed by Trace & Assert so it must NOT contain alxTrace & alxAssert
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
 #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
-
-
-//******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_OS_MUTEX_FILE "alxOsMutex.h"
-
-// Assert //
-#if defined(_ALX_OS_MUTEX_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_MUTEX_FILE, expr)
-#elif defined(_ALX_OS_MUTEX_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_MUTEX_FILE, expr)
-#elif defined(_ALX_OS_MUTEX_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_MUTEX_FILE, expr)
-#else
-	#define ALX_OS_MUTEX_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(_ALX_OS_MUTEX_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_OS_MUTEX_TRACE(...) ALX_TRACE_STD(ALX_OS_MUTEX_FILE, __VA_ARGS__)
-#else
-	#define ALX_OS_MUTEX_TRACE(...) do{} while (false)
-#endif
 
 
 //******************************************************************************
