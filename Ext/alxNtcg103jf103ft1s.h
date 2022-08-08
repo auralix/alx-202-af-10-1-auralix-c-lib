@@ -93,10 +93,10 @@ typedef struct
 extern const AlxNtcg103jf103ft1s alxNtcg103jf103ft1s;
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_NTCG103JF103FT1S_H
+#endif	// #ifndef ALX_NTCG103JF103FT1S_H

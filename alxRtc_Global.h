@@ -219,4 +219,4 @@ uint64_t AlxRtc_DateTimeToUnixTimeSec(AlxRtc_DateTime dateTime);
 }
 #endif
 
-#endif // #ifndef ALX_RTC_GLOBAL_H
+#endif	// #ifndef ALX_RTC_GLOBAL_H

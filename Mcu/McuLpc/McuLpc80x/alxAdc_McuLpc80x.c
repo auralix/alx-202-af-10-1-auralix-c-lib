@@ -292,4 +292,4 @@ static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

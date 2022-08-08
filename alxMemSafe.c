@@ -370,4 +370,4 @@ bool AlxMemSafe_IsWriteErr(AlxMemSafe* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

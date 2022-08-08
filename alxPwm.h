@@ -89,7 +89,7 @@ typedef struct { bool dummy; } AlxPwm;
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 
 /**
@@ -127,4 +127,4 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil);
 }
 #endif
 
-#endif // #ifndef ALX_PWM_H
+#endif	// #ifndef ALX_PWM_H

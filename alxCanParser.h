@@ -86,7 +86,7 @@ typedef enum
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 
 /**
@@ -298,4 +298,4 @@ uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOff
 }
 #endif
 
-#endif // #ifndef ALX_CAN_PARSER_H
+#endif	// #ifndef ALX_CAN_PARSER_H

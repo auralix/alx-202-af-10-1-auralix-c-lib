@@ -168,4 +168,4 @@ void AlxIoPin_Config_PullDown(AlxIoPin* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)

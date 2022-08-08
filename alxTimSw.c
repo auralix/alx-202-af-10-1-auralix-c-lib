@@ -50,7 +50,7 @@ void AlxTimSw_Ctor
 	me->ticksStart_ns = 0;
 	me->isRunning = start;
 
-	//Info
+	// Info
 	me->wasCtorCalled = true;
 }
 
@@ -92,4 +92,4 @@ bool AlxTimSw_IsTimeout_min(AlxTimSw* me, uint64_t timeout_min)	{ return AlxTimS
 bool AlxTimSw_IsTimeout_hr(AlxTimSw* me, uint64_t timeout_hr)	{ return AlxTimSw_IsTimeout_ns(me, timeout_hr * 3600000000000); }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

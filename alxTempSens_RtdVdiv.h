@@ -147,10 +147,10 @@ Alx_Status AlxTempSensRtdVdiv_DeInit(AlxTempSensRtdVdiv* me);
 Alx_Status AlxTempSensRtdVdiv_GetTemp_degC(AlxTempSensRtdVdiv* me, float* temp_degC);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_TEMP_SENS_RTD_VDIV_H
+#endif	// #ifndef ALX_TEMP_SENS_RTD_VDIV_H

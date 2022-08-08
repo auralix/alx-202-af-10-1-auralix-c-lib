@@ -122,4 +122,4 @@ bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

@@ -166,4 +166,4 @@ void AlxCan_Foreground_Handle(AlxCan* me);
 }
 #endif
 
-#endif // #ifndef ALX_CAN_H
+#endif	// #ifndef ALX_CAN_H

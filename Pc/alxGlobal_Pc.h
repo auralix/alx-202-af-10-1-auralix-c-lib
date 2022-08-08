@@ -72,10 +72,10 @@ extern "C" {
 #include <wctype.h>
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_PC)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_PC)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_GLOBAL_PC_H
+#endif	// #ifndef ALX_GLOBAL_PC_H

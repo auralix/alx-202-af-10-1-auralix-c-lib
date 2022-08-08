@@ -45,7 +45,7 @@ void AlxBtn_Ctor
 	AlxBtn* me,
 	bool valInitial,
 	float pressedLongTime_ms,	// min time of long button press [ms]
-	float filterTime	// time of stable button status to change it's state [ms]
+	float filterTime			// time of stable button status to change it's state [ms]
 )
 {
 	// Ctor
@@ -183,4 +183,4 @@ void AlxBtn_ClearWasPressedLong(AlxBtn* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

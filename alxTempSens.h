@@ -168,4 +168,4 @@ Alx_Status AlxTempSens_GetTemp_degC(AlxTempSens* me, float* temp_degC);
 }
 #endif
 
-#endif // #ifndef ALX_TEMP_SENS_H
+#endif	// #ifndef ALX_TEMP_SENS_H

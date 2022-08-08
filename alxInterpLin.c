@@ -151,4 +151,4 @@ float AlxInterpLin_GetY(AlxInterpLin* me, float x)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

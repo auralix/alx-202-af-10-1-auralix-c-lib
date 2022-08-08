@@ -796,31 +796,10 @@ Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg);
 Alx_Status AlxPcal6416a_Reg_Read(AlxPcal6416a* me, void* reg);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_PCAL6416A_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//void AlxPcal6416a_IoPin_SetMode(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, AlxPcal6416a_Mode mode);	// MF: Set PullUp or PulDown
+#endif	// #ifndef ALX_PCAL6416A_H

@@ -114,37 +114,4 @@ void AlxI2s_Foreground_Handle(AlxI2s* me);
 }
 #endif
 
-#endif // #ifndef ALX_I2S_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//void AlxI2s_Start_Write			(AlxI2s* me, uint8_t* data, uint16_t len);
-//void AlxI2s_Stop_Write			(AlxI2s* me);
-//void AlxI2s_Start_Read			(AlxI2s* me, uint8_t* data);
-//void AlxI2s_Stop_Read			(AlxI2s* me);
-//void AlxI2s_Foreground_Handle	(AlxI2s* me);
-//uint8_t AlxI2s_GetFrameLength	(AlxI2s* me);
+#endif	// #ifndef ALX_I2S_H

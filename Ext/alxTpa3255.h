@@ -85,7 +85,7 @@ typedef enum
 	Tpa3255_St_Error,
 	Tpa3255_St_LowLevel,
 	Tpa3255_St_Waiting
-} AlxTpa3255_status;
+} AlxTpa3255_St;
 
 typedef struct
 {
@@ -105,7 +105,7 @@ typedef struct
 	float waitTime_Waitning_ms;
 
 	// Variables
-	AlxTpa3255_status state;
+	AlxTpa3255_St state;
 	bool wasErrAsserted;
 	bool wasWarningAsserted;
 
@@ -208,10 +208,10 @@ void AlxTpa3255_ClearWasErrAsserted(AlxTpa3255* me);
 void AlxTpa3255_ClearWasWarningAsserted(AlxTpa3255* me);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_TPA3255_H
+#endif	// #ifndef ALX_TPA3255_H

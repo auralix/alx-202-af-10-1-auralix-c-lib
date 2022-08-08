@@ -144,4 +144,4 @@ bool AlxMcp73831_TriState_IsShutdown(AlxMcp73831* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

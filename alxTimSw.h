@@ -206,10 +206,10 @@ bool AlxTimSw_IsTimeout_min(AlxTimSw* me, uint64_t timeout_min);
 bool AlxTimSw_IsTimeout_hr(AlxTimSw* me, uint64_t timeout_hr);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_TIM_SW_H
+#endif	// #ifndef ALX_TIM_SW_H

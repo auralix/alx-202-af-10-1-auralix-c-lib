@@ -376,4 +376,4 @@ static void AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5(Alx
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

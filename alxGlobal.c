@@ -133,4 +133,4 @@ uint32_t AlxGlobal_Ntohl(uint32_t val)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

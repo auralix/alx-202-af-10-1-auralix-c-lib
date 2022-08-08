@@ -220,4 +220,4 @@ bool AlxAudioPlayer_IsPlaying(AlxAudioPlayer* me);
 }
 #endif
 
-#endif // #ifndef ALX_AUDIO_PLAYER_H
+#endif	// #ifndef ALX_AUDIO_PLAYER_H

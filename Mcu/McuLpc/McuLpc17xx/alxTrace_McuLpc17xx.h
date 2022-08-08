@@ -91,10 +91,10 @@ void AlxTrace_Ctor
 );
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_TRACE_MCU_LPC17XX_H
+#endif	// #ifndef ALX_TRACE_MCU_LPC17XX_H

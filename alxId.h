@@ -384,4 +384,4 @@ const char* AlxId_GetFwAppBinStr(AlxId* me);
 }
 #endif
 
-#endif // #ifndef ALX_ID_H
+#endif	// #ifndef ALX_ID_H

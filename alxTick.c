@@ -44,6 +44,22 @@ volatile AlxTick alxTick = {0};
 
 
 //******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxTick_Ctor
+(
+	volatile AlxTick* me
+)
+{
+	// Internal
+	me->tick_ns = 0;
+
+	// Info
+	me->wasCtorCalled = true;
+}
+
+
+//******************************************************************************
 // Functions
 //******************************************************************************
 uint64_t AlxTick_Get_ns(volatile AlxTick* me)
@@ -85,4 +101,4 @@ void AlxTick_Reset(volatile AlxTick* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

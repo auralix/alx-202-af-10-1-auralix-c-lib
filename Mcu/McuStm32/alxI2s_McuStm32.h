@@ -137,60 +137,10 @@ void AlxI2s_Ctor
 );
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_I2S_MCU_STM32_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//	uint8_t* txAudioPtr;
-//	uint16_t txAudioSize;
-//	uint16_t txPrtHandle;
-//	uint8_t* rxAudioPtr;
-//	uint16_t rxAudioSize;
-//	uint16_t rxPrtHandle;
-
-//	bool isErr;
-//	bool isTxAudio;
-//	bool isRxAudio;
-//	// TODO Channel TX Flag
-//	// TODO Channel RX Flag
+#endif	// #ifndef ALX_I2S_MCU_STM32_H

@@ -100,4 +100,4 @@ AlxHys1_St AlxHys1_Process(AlxHys1* me, float in)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

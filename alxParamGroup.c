@@ -323,4 +323,4 @@ static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

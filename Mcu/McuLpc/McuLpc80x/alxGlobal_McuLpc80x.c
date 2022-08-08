@@ -171,4 +171,4 @@ void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

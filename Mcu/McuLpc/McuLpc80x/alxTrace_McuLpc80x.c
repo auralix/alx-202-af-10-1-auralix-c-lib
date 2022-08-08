@@ -229,4 +229,4 @@ static void AlxTrace_Periph_SelectClk(AlxTrace* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

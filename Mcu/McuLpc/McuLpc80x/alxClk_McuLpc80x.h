@@ -114,10 +114,10 @@ void AlxClk_Ctor
 );
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_CLK_MCU_LPC80X_H
+#endif	// #ifndef ALX_CLK_MCU_LPC80X_H

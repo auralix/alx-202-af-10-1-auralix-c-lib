@@ -52,4 +52,4 @@ void AlxDelay_min(uint64_t delay_min)	{ AlxDelay_ns(delay_min * 60000000000); }
 void AlxDelay_hr(uint64_t delay_hr)		{ AlxDelay_ns(delay_hr  * 3600000000000); }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

@@ -152,4 +152,4 @@ void AlxSpi_Master_DeAssertCs(AlxSpi* me);
 }
 #endif
 
-#endif // #ifndef ALX_SPI_H
+#endif	// #ifndef ALX_SPI_H

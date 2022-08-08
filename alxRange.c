@@ -190,16 +190,16 @@ Alx_Status AlxRange_CheckDouble(double val, double valMin, double valMax)
 
 	return Alx_Ok;
 }
-/*Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax)
-{
-	ALX_RANGE_ASSERT(0 < valLenMax);
-
-	uint32_t valLen = strlen(val);
-	if (valLen > (valLenMax - 1))
-		return Alx_ErrOutOfRangeLen;
-	else
-		return Alx_Ok;
-}*/	// TO DO
+//Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax)
+//{
+//	ALX_RANGE_ASSERT(0 < valLenMax);
+//
+//	uint32_t valLen = strlen(val);
+//	if (valLen > (valLenMax - 1))
+//		return Alx_ErrOutOfRangeLen;
+//	else
+//		return Alx_Ok;
+//}	// TODO
 Alx_Status AlxRange_CheckStr(char* val, uint32_t valLenMax)
 {
 	ALX_RANGE_ASSERT(0 <= valLenMax);
@@ -212,4 +212,4 @@ Alx_Status AlxRange_CheckStr(char* val, uint32_t valLenMax)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

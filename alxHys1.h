@@ -133,4 +133,4 @@ AlxHys1_St AlxHys1_Process(AlxHys1* me, float in);
 }
 #endif
 
-#endif // #ifndef ALX_HYS1_H
+#endif	// #ifndef ALX_HYS1_H

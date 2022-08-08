@@ -101,7 +101,7 @@ extern AlxClk alxClk;
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 
 /**
@@ -130,4 +130,4 @@ void AlxClk_Irq_Handle(AlxClk* me);
 }
 #endif
 
-#endif // #ifndef ALX_CLK_H
+#endif	// #ifndef ALX_CLK_H

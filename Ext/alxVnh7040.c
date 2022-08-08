@@ -32,10 +32,9 @@
 
 
 //******************************************************************************
-// Private Functions
+// Module Guard
 //******************************************************************************
-static void AlxVnh7040_Reset(AlxVnh7040* me);
-static bool AlxVnh7040_IsMultiSensErrIndicate(AlxVnh7040* me);
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -492,7 +491,6 @@ void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType)
 
 	me->breakType = breakType;
 }
-
 int32_t AlxVnh7040_GetIsError (AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -500,6 +498,29 @@ int32_t AlxVnh7040_GetIsError (AlxVnh7040* me)
 
 	return me->currentHsA_clamp || me->currentHsB_clamp;	// true-> short circuit or overcurrent protection is acctive on one of half bridges
 }
+
+
+#endif	// #if defined(ALX_C_LIB)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+//static void AlxVnh7040_Reset(AlxVnh7040* me);
+//static bool AlxVnh7040_IsMultiSensErrIndicate(AlxVnh7040* me);
+
 
 
 //******************************************************************************

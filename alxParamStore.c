@@ -416,4 +416,4 @@ static void AlxParamStore_Handle_4xGroup(AlxParamStore* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

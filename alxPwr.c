@@ -159,7 +159,8 @@ bool AlxPwr_IsErr(AlxPwr* me)
 	// #2
 	// TV: TODO - IsErr Implementation
 	ALX_PWR_ASSERT(false);
+	return true;
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

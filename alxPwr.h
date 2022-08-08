@@ -192,4 +192,4 @@ bool AlxPwr_IsErr(AlxPwr* me);
 }
 #endif
 
-#endif // #ifndef ALX_PWR_H
+#endif	// #ifndef ALX_PWR_H

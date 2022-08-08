@@ -305,10 +305,10 @@ Alx_Status AlxTmp1075_DeInit(AlxTmp1075* me);
 float AlxTmp1075_GetTemp_degC(AlxTmp1075* me);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_TMP1075_H
+#endif	// #ifndef ALX_TMP1075_H

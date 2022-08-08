@@ -289,4 +289,4 @@ static int32_t Get_Y_Int(AlxLinFunInt* me, int32_t x)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

@@ -136,4 +136,4 @@ static void AlxClk_SetExtClk(AlxClk* me, bool sysOsc)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)

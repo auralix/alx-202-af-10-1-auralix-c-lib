@@ -275,4 +275,4 @@ static uint32_t AlxCrc_Reflect(uint32_t data, uint8_t nBits)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

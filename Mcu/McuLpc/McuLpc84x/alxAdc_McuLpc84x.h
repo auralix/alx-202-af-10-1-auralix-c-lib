@@ -97,10 +97,10 @@ void AlxAdcMcu_Ctor
 );
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_ADC_MCU_LPC84X_H
+#endif	// #ifndef ALX_ADC_MCU_LPC84X_H

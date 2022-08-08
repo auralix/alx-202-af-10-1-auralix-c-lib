@@ -586,4 +586,4 @@ static void AlxCanParser_BitSet(uint8_t *var, uint8_t bit, bool state)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

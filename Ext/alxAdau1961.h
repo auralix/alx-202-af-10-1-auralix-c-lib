@@ -1666,82 +1666,10 @@ Alx_Status AlxAdau1961_OutLineL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// 
 Alx_Status AlxAdau1961_OutLineR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// Mute -> gain_dB = -120
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_ADAU1961_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//typedef enum
-//{
-//	// In
-//	AlxAdau1961_Ch_LIN  = 0,
-//	AlxAdau1961_Ch_RIN  = 1,
-//	AlxAdau1961_Ch_LAUX = 2,
-//	AlxAdau1961_Ch_RAUX = 3,
-//
-//	// Out
-//	AlxAdau1961_Ch_LOUT = 4,
-//	AlxAdau1961_Ch_ROUT = 5
-//} AlxAdau1961_Ch;
-
-
-
-//Alx_Status AlxAdau1961_StartStream				(AlxAdau1961* me);	//TODO
-//Alx_Status AlxAdau1961_StopStream				(AlxAdau1961* me);	//TODO
-///*Alx_Status AlxAdau1961_Dac_SetGain_dB			(AlxAdau1961* me, uint8_t* dacId, float* gain_dB);	//TODO
-//Alx_Status AlxAdau1961_Dac_SetGain_pct			(AlxAdau1961* me, uint8_t* dacId, float* gain_pct);	//TODO
-//Alx_Status AlxAdau1961_Dac_SetVolume_dB			(AlxAdau1961* me, uint8_t* dacId, float* volume_dB);
-//Alx_Status AlxAdau1961_Dac_SetVolume_pct		(AlxAdau1961* me, uint8_t* dacId, float* volume_pct);	//TODO
-//Alx_Status AlxAdau1961_Dac_Mute					(AlxAdau1961* me, uint8_t* dacId);*/
-
-
-
-
-
-
-
-//Alx_Status AlxAdau1961_Ch_Config				(AlxAdau1961* me, AlxAdau1961_Ch* chIn, AlxAdau1961_Ch* chOut);
-//Alx_Status AlxAdau1961_Ch_In_SetGain_dB			(AlxAdau1961* me, AlxAdau1961_Ch* ch, float* gain_dB);	// gain_dB should be uint8_t
-//Alx_Status AlxAdau1961_Ch_In_SetVolume_pct		(AlxAdau1961* me, AlxAdau1961_Ch* ch, float* volume_pct);
-//Alx_Status AlxAdau1961_Ch_Out_SetGain_dB		(AlxAdau1961* me, AlxAdau1961_Ch* ch, float* gain_dB);	// gain_dB should be uint8_t
-//Alx_Status AlxAdau1961_Ch_Out_SetVolume_pct		(AlxAdau1961* me, AlxAdau1961_Ch* ch, float* volume_pct);
-//Alx_Status AlxAdau1961_Ch_Mute					(AlxAdau1961* me, AlxAdau1961_Ch ch);
-//Alx_Status AlxAdau1961_Ch_UnMute				(AlxAdau1961* me, AlxAdau1961_Ch ch);
+#endif	// #ifndef ALX_ADAU1961_H

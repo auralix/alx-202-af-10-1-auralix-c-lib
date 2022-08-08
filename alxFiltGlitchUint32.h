@@ -132,4 +132,4 @@ uint32_t AlxFiltGlitchUint32_Process(AlxFiltGlitchUint32* me, uint32_t valNew);
 }
 #endif
 
-#endif // #ifndef ALX_FILT_GLITCH_UINT32_H
+#endif	// #ifndef ALX_FILT_GLITCH_UINT32_H

@@ -166,4 +166,4 @@ Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltag
 }
 #endif
 
-#endif // #ifndef ALX_DAC_H
+#endif	// #ifndef ALX_DAC_H

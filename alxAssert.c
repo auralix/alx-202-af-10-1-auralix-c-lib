@@ -60,4 +60,4 @@ void ALX_WEAK AlxAssert_Rst(const char* file, uint32_t line, const char* fun)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

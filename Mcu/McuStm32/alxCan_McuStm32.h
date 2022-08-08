@@ -148,10 +148,10 @@ void AlxCan_Ctor
 );
 
 
-#endif // #if defined(ALX_C_LIB) && ((defined(ALX_STM32F4) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED)))
+#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F4) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED)))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_CAN_MCU_STM32_H
+#endif	// #ifndef ALX_CAN_MCU_STM32_H

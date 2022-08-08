@@ -75,17 +75,10 @@ extern volatile AlxTick alxTick;
   * @brief
   * @param[in,out] me
   */
-static inline void AlxTick_Ctor
+void AlxTick_Ctor
 (
 	volatile AlxTick* me
-)
-{
-	// Internal
-	me->tick_ns = 0;
-
-	// Info
-	me->wasCtorCalled = true;
-}
+);
 
 
 //******************************************************************************
@@ -213,10 +206,10 @@ void AlxTick_IncRange_hr(volatile AlxTick* me, uint64_t ticks_hr);
 void AlxTick_Reset(volatile AlxTick* me);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_TICK_H
+#endif	// #ifndef ALX_TICK_H

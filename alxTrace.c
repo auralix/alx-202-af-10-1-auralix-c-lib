@@ -44,7 +44,7 @@ AlxTrace alxTrace = {0};
 
 
 //******************************************************************************
-// Common Functions
+// Functions
 //******************************************************************************
 void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
 {
@@ -99,4 +99,4 @@ void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

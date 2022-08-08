@@ -37,6 +37,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Includes
+//******************************************************************************
+#include "alxGlobal.h"
+
+
+//******************************************************************************
 // Module Guard
 //******************************************************************************
 #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
@@ -75,10 +81,10 @@ extern "C" {
 #include "fsl_wwdt.h"
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_GLOBAL_MCU_LPC84X_H
+#endif	// #ifndef ALX_GLOBAL_MCU_LPC84X_H

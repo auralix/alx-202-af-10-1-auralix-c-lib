@@ -82,7 +82,7 @@ typedef struct { bool dummy; } AlxSerialPort;
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 
 /**
@@ -150,4 +150,4 @@ void AlxSerialPort_Foreground_Handle(AlxSerialPort* me);
 }
 #endif
 
-#endif // #ifndef ALX_SERIAL_PORT_H
+#endif	// #ifndef ALX_SERIAL_PORT_H

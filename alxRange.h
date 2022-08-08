@@ -164,7 +164,7 @@ Alx_Status AlxRange_CheckDouble(double val, double valMin, double valMax);
   * @param[in] valMin
   * @param[in] valMax
   */
-//Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax);	// TO DO
+//Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax);	// TODO
 
 /**
   * @brief
@@ -180,4 +180,4 @@ Alx_Status AlxRange_CheckStr(char* val, uint32_t valLenMax);
 }
 #endif
 
-#endif // #ifndef ALX_RANGE_H
+#endif	// #ifndef ALX_RANGE_H

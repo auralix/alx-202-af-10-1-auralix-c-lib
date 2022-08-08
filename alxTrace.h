@@ -88,7 +88,7 @@ extern AlxTrace alxTrace;
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 
 /**
@@ -108,11 +108,6 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me);
   * @param[in] me
   */
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str);
-
-
-//******************************************************************************
-// Common Functions
-//******************************************************************************
 
 /**
   * @brief
@@ -139,10 +134,10 @@ void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const c
 void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_TRACE_H
+#endif	// #ifndef ALX_TRACE_H

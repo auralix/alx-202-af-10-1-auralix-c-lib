@@ -181,4 +181,4 @@ bool AlxBts724g_WasOverTempDetected(AlxBts724g* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

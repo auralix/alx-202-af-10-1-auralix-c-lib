@@ -405,4 +405,4 @@ static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)

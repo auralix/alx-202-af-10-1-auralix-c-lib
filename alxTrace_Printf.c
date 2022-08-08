@@ -51,7 +51,7 @@ void AlxTrace_Ctor
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
@@ -74,4 +74,4 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && (defined(ALX_PC) || defined(ALX_MBED))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_PC) || defined(ALX_MBED))

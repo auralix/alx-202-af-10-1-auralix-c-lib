@@ -74,4 +74,4 @@ void AlxClk_DeInit(AlxClk* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)

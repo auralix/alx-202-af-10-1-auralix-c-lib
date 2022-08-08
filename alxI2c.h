@@ -220,4 +220,4 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 }
 #endif
 
-#endif // #ifndef ALX_I2C_H
+#endif	// #ifndef ALX_I2C_H

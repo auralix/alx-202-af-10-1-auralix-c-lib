@@ -152,10 +152,10 @@ void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min);
 void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr);
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_OS_DELAY_H
+#endif	// #ifndef ALX_OS_DELAY_H

@@ -168,6 +168,7 @@ float AlxTmp1075_GetTemp_degC(AlxTmp1075* me)
 	return me->temp_degC;
 }
 
+
 //******************************************************************************
 // Private Functions
 //******************************************************************************
@@ -267,6 +268,7 @@ static Alx_Status AlxTmp1075_TraceId(AlxTmp1075* me)
 	return Alx_Ok;
 }
 
+
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
@@ -279,4 +281,4 @@ ALX_WEAK void AlxTmp1075_RegStruct_SetVal(AlxTmp1075* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

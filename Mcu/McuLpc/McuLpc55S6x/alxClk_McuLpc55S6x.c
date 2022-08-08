@@ -460,4 +460,4 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_96MHz_AhbClk_12MHz_FroOsc_96MHz(AlxC
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)

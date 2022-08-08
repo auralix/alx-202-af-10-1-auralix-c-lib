@@ -89,10 +89,10 @@ void AlxOsCriticalSection_Enter(void);
 void AlxOsCriticalSection_Exit(void);
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_OS_CRITICAL_SECTION_H
+#endif	// #ifndef ALX_OS_CRITICAL_SECTION_H

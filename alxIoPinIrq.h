@@ -89,7 +89,7 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 
 /**
@@ -111,4 +111,4 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me);
 }
 #endif
 
-#endif // #ifndef ALX_IO_PIN_IRQ_H
+#endif	// #ifndef ALX_IO_PIN_IRQ_H

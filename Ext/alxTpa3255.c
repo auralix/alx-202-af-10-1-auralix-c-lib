@@ -243,4 +243,4 @@ void AlxTpa3255_ClearWasWarningAsserted(AlxTpa3255* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

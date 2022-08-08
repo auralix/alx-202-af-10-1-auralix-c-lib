@@ -48,10 +48,10 @@ extern "C" {
 #include <chip.h>
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_GLOBAL_MCU_LPC17XX_H
+#endif	// #ifndef ALX_GLOBAL_MCU_LPC17XX_H

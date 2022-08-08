@@ -308,10 +308,10 @@ int32_t AlxVnh7040_GetIsError(AlxVnh7040* me);
 void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_VNH7040_H
+#endif	// #ifndef ALX_VNH7040_H

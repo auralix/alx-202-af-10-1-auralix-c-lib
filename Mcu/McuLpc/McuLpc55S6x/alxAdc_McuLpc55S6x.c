@@ -394,4 +394,4 @@ static lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_C
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)

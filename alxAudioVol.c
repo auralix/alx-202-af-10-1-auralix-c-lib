@@ -103,4 +103,4 @@ void AlxAudioVol_Set_dB(AlxAudioVol* me, float vol_dB)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

@@ -413,4 +413,4 @@ static void AlxPwm_UpdatePwmDutyPct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 #endif
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)

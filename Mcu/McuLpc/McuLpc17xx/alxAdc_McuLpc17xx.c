@@ -142,4 +142,4 @@ static ADC_CHANNEL_T AlxAdcMcu_GetChannel(AlxIoPin* pin)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)

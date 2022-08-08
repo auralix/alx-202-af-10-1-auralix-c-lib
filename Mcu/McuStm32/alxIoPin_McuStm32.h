@@ -99,10 +99,10 @@ void AlxIoPin_Ctor
 );
 
 
-#endif // #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_IO_PIN_MCU_STM32_H
+#endif	// #ifndef ALX_IO_PIN_MCU_STM32_H

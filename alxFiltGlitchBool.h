@@ -149,4 +149,4 @@ bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in);
 }
 #endif
 
-#endif // #ifndef ALX_FILT_GLITCH_BOOL_H
+#endif	// #ifndef ALX_FILT_GLITCH_BOOL_H

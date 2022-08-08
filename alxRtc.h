@@ -233,4 +233,4 @@ Alx_Status AlxRtc_TuneTime_ms(AlxRtc* me, int64_t tuneTime_ms);
 }
 #endif
 
-#endif // #ifndef ALX_RTC_H
+#endif	// #ifndef ALX_RTC_H

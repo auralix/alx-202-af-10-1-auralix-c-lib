@@ -481,4 +481,4 @@ static void AlxIoPin_SetIoconMode(AlxIoPin* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)

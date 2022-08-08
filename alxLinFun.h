@@ -219,4 +219,4 @@ int32_t AlxLinFunInt_GetY(AlxLinFunInt* me, int32_t x);
 }
 #endif
 
-#endif // #ifndef ALX_LIN_FUN_H
+#endif	// #ifndef ALX_LIN_FUN_H

@@ -99,4 +99,4 @@ void AlxAdcMcu_Ctor
 }
 #endif
 
-#endif // #ifndef ALX_ADC_MCU_LPC17XX_H
+#endif	// #ifndef ALX_ADC_MCU_LPC17XX_H

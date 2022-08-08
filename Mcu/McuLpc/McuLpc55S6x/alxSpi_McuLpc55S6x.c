@@ -492,4 +492,4 @@ static void AlxSpi_Periph_DisableClk(AlxSpi* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)

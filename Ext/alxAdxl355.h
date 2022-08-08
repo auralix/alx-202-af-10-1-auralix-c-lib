@@ -680,10 +680,10 @@ float AlxAdxl355_GetTemp_degC(AlxAdxl355* me);
 Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_ADXL355_H
+#endif	// #ifndef ALX_ADXL355_H

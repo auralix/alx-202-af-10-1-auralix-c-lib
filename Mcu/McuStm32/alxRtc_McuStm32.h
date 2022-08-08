@@ -104,10 +104,10 @@ void AlxRtc_Ctor
 );
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_RTC_MCU_STM32_H
+#endif	// #ifndef ALX_RTC_MCU_STM32_H

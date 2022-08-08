@@ -512,4 +512,4 @@ static void AlxSpi_Periph_ReleaseReset(AlxSpi* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))

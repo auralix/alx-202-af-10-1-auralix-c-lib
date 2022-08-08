@@ -148,4 +148,4 @@ float AlxAudio_StereoToMono(float sampleL, float sampleR);
 }
 #endif
 
-#endif // #ifndef ALX_AUDIO_H
+#endif	// #ifndef ALX_AUDIO_H

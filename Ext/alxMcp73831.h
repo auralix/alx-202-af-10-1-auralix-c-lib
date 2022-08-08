@@ -152,10 +152,10 @@ bool AlxMcp73831_TriState_IsBatFull(AlxMcp73831* me);
 bool AlxMcp73831_TriState_IsShutdown(AlxMcp73831* me);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_MCP73831_H
+#endif	// #ifndef ALX_MCP73831_H

@@ -162,7 +162,7 @@ Alx_Status AlxBound_Double(double* val, double valMin, double valMax);
   * @brief
   * @param[in] me
   */
-//Alx_Status AlxBound_Arr(char* val, uint32_t valLenMax);	// TO DO
+//Alx_Status AlxBound_Arr(char* val, uint32_t valLenMax);	// TODO
 
 /**
   * @brief
@@ -179,4 +179,4 @@ Alx_Status AlxBound_Str(char* valBounded, char* val, uint32_t valLenMax);
 }
 #endif
 
-#endif // #ifndef ALX_BOUND_H
+#endif	// #ifndef ALX_BOUND_H

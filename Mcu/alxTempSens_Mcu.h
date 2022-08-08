@@ -105,10 +105,10 @@ Alx_Status AlxTempSensMcu_DeInit(AlxTempSens_Mcu* me);
 float AlxTempSensMcu_GetTemp_degC(AlxTempSens_Mcu* me);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_TEMP_SENS_MCU_H
+#endif	// #ifndef ALX_TEMP_SENS_MCU_H

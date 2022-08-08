@@ -118,4 +118,4 @@ AlxHys2_St AlxHys2_Process(AlxHys2* me, float in)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

@@ -191,10 +191,10 @@ bool AlxBts724g_WasOpenLoadDetected(AlxBts724g* me);
 bool AlxBts724g_WasOverTempDetected(AlxBts724g* me);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_BTS724G_H
+#endif	// #ifndef ALX_BTS724G_H

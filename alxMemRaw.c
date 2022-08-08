@@ -78,4 +78,4 @@ ALX_WEAK Alx_Status AlxMemRaw_Write(AlxMemRaw* me, uint32_t addr, uint8_t* data,
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)

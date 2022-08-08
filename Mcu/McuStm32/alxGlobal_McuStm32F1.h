@@ -37,6 +37,12 @@ extern "C" {
 
 
 //******************************************************************************
+// Includes
+//******************************************************************************
+#include "alxGlobal.h"
+
+
+//******************************************************************************
 // Module Guard
 //******************************************************************************
 #if defined(ALX_STM32F1)
@@ -100,10 +106,10 @@ extern "C" {
 #define ALX_STM32_STR "STM32F1"
 
 
-#endif // #if defined(ALX_STM32F1)
+#endif	// #if defined(ALX_STM32F1)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_GLOBAL_MCU_STM32F1_H
+#endif	// #ifndef ALX_GLOBAL_MCU_STM32F1_H

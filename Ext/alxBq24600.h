@@ -199,10 +199,10 @@ bool AlxBq24600_IsSleep(AlxBq24600* me);
 bool AlxBq24600_IsErr(AlxBq24600* me);
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_BQ24600_H
+#endif	// #ifndef ALX_BQ24600_H

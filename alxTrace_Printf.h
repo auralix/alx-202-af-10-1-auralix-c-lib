@@ -72,10 +72,10 @@ void AlxTrace_Ctor
 );
 
 
-#endif // #if defined(ALX_C_LIB) && (defined(ALX_PC) || defined(ALX_MBED))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_PC) || defined(ALX_MBED))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // #ifndef ALX_TRACE_PRINTF_H
+#endif	// #ifndef ALX_TRACE_PRINTF_H

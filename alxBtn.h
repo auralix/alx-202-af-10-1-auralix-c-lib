@@ -139,7 +139,7 @@ void AlxBtn_Handle(AlxBtn* me, bool in);
   * @brief
   * @param[in,out] me
   */
-bool AlxBtn_IsPressed(AlxBtn* me);			// True -> Button is currently pressed
+bool AlxBtn_IsPressed(AlxBtn* me);	// True -> Button is currently pressed
 
 /**
   * @brief
@@ -208,4 +208,4 @@ void AlxBtn_ClearWasPressedLong(AlxBtn* me);
 }
 #endif
 
-#endif // #ifndef ALX_BTN_H
+#endif	// #ifndef ALX_BTN_H

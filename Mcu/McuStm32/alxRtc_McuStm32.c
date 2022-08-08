@@ -526,4 +526,4 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
 }
 
 
-#endif // #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4)

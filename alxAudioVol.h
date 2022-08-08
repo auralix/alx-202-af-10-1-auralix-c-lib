@@ -143,4 +143,4 @@ void AlxAudioVol_Set_dB(AlxAudioVol* me, float vol_dB);
 }
 #endif
 
-#endif // #ifndef ALX_AUDIO_VOL_H
+#endif	// #ifndef ALX_AUDIO_VOL_H

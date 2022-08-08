@@ -133,4 +133,4 @@ static void AlxDac_SetFuncPtr(AlxDac* me)
 }
 
 
-#endif // #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB)
