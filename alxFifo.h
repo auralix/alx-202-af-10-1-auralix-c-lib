@@ -101,6 +101,7 @@ typedef struct
 
 /**
   * @brief
+  * @param[in,out] me
   * @param[in] me
   */
 void AlxFifo_Ctor
@@ -117,36 +118,46 @@ void AlxFifo_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
 void AlxFifo_Flush(AlxFifo* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[out] data
+  * @param[in] len
   */
 Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[out] str
+  * @param[in] delim
+  * @param[in] maxLen
+  * @param[out] numRead
   */
 Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
 
 /**
   * @brief
   * @param[in] me
+  * @param[in] data
   */
 Alx_Status AlxFifo_Write(AlxFifo* me, uint8_t data);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @param[in] data
+  * @param[in] len
   */
 Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len);
 
 /**
   * @brief
+  * @param[in,out] me
   * @param[in] me
   */
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str);

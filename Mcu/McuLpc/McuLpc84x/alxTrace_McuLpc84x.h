@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TRACE_MCU_LPC84X_H
 #define ALX_TRACE_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -42,7 +46,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -68,43 +72,29 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-static inline void AlxTrace_Ctor
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] port
+  * @param[in] pin
+  * @param[in] usart
+  * @param[in] baudRate
+  */
+void AlxTrace_Ctor
 (
 	AlxTrace* me,
 	uint8_t port,
 	uint8_t pin,
 	USART_Type* usart,
 	AlxGlobal_BaudRate baudRate
-)
-{
-	// Parameters
-	me->port = port;
-	me->pin = pin;
-	me->usart = usart;
-	me->baudRate = (uint32_t)baudRate;
-
-	// Variables
-	me->usartConfig.baudRate_Bps = (uint32_t)baudRate;
-	me->usartConfig.enableRx = false;
-	me->usartConfig.enableTx = true;
-	me->usartConfig.loopback = false;
-	me->usartConfig.enableContinuousSCLK = false;
-	me->usartConfig.parityMode = kUSART_ParityDisabled;
-	me->usartConfig.stopBitCount = kUSART_OneStopBit;
-	me->usartConfig.bitCountPerChar = kUSART_8BitsPerChar;
-	me->usartConfig.syncMode = kUSART_SyncModeDisabled;
-	me->usartConfig.clockPolarity = kUSART_RxSampleOnFallingEdge;
-
-	// Info
-	me->isInit = false;
-	me->wasCtorCalled = true;
-}
+);
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALIX_TRACE_MCU_LPC84X_H
+#endif	// #ifndef ALX_TRACE_MCU_LPC84X_H

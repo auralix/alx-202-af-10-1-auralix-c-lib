@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_SPI_MCU_Lpc55S6x_H
 #define ALX_SPI_MCU_Lpc55S6x_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -45,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
@@ -97,6 +101,18 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] spi
+  * @param[in] do_SCK
+  * @param[in] do_MOSI
+  * @param[in] di_MISO
+  * @param[in] do_nCS
+  * @param[in] mode
+  * @param[in] spiClk
+  */
 void AlxSpi_Ctor
 (
 	AlxSpi* me,
@@ -110,10 +126,10 @@ void AlxSpi_Ctor
 );
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_SPI_MCU_Lpc55S6x_H
+#endif	// #ifndef ALX_SPI_MCU_Lpc55S6x_H

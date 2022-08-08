@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxTpa3255_Ctor
@@ -45,24 +51,24 @@ void AlxTpa3255_Ctor
 {
 	// Ctor
 	AlxTimSw_Ctor(&me->tim, false);
-	
+
 	// Parameters Const
 	me->lowLevelTime_ms = 2;
-	
+
 	// Objects - External
 	me->do_nRESET = do_nRESET;
 	me->di_nFAULT = di_nFAULT;
 	me->di_nCLIP_OTW = di_nCLIP_OTW;
-	
+
 	// Parameters
 	me->waitTime_ReEnable_ms = waitTime_ReEnable_ms;
 	me->waitTime_Waitning_ms = 2;
-	
+
 	// Variables
 	me->state = Tpa3255_St_Ok;
 	me->wasErrAsserted = false;
 	me->wasWarningAsserted = false;
-	
+
 	// Info
 	me->isInit = false;
 	me->wasCtorCalled = true;
@@ -76,12 +82,12 @@ void AlxTpa3255_Init(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == false);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
+
 	// #1 Init GPIO
 	AlxIoPin_Init(me->do_nRESET);
 	AlxIoPin_Init(me->di_nFAULT);
 	AlxIoPin_Init(me->di_nCLIP_OTW);
-	
+
 	// #2 Set isInit
 	me->isInit = true;
 }
@@ -89,13 +95,12 @@ void AlxTpa3255_DeInit(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
-	
+
 	// #1 Init GPIO
 	AlxIoPin_DeInit(me->do_nRESET);
 	AlxIoPin_DeInit(me->di_nFAULT);
 	AlxIoPin_DeInit(me->di_nCLIP_OTW);
-	
+
 	// #2 Reset isInit
 	me->isInit = false;
 }
@@ -103,7 +108,7 @@ void AlxTpa3255_Handle(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
+
 	if (me->waitTime_ReEnable_ms > 0) // functionality is enabled
 	{
 		// #1 Ok state
@@ -156,7 +161,7 @@ void AlxTpa3255_Handle(AlxTpa3255* me)
 		{
 			// Transition
 			if(AlxTimSw_IsTimeout_ms(&me->tim, me->waitTime_Waitning_ms))
-			{				
+			{
 				me->state = Tpa3255_St_Ok; // set Ok
 			}
 			// Do
@@ -164,7 +169,7 @@ void AlxTpa3255_Handle(AlxTpa3255* me)
 			{
 				AlxTpa3255_Enable(me);
 			}
-		}		
+		}
 		// Procesing WAS
 		if(AlxTpa3255_IsErrAsserted(me))
 		{
@@ -184,55 +189,58 @@ void AlxTpa3255_Enable(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
+
 	AlxIoPin_Write(me->do_nRESET, true);
 }
 void AlxTpa3255_Disable(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
+
 	AlxIoPin_Write(me->do_nRESET, false);
 }
 bool AlxTpa3255_IsErrAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
+
 	return (AlxIoPin_Read(me->di_nFAULT)) ? false : true;
 }
 bool AlxTpa3255_IsWarningAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
+
 	return (AlxIoPin_Read(me->di_nCLIP_OTW)) ? false : true;
 }
 bool AlxTpa3255_WasErrAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
+
 	return me->wasErrAsserted;
 }
 bool AlxTpa3255_WasWarningAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
+
 	return me->wasWarningAsserted;
 }
 void AlxTpa3255_ClearWasErrAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
+
 	me->wasErrAsserted = false;
 }
 void AlxTpa3255_ClearWasWarningAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
-	
+
 	me->wasWarningAsserted = false;
 }
+
+
+#endif	// #if defined(ALX_C_LIB)

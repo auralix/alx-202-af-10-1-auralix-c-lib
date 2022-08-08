@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_IO_PIN_MCU_LPC55S6X_H
 #define ALX_IO_PIN_MCU_LPC55S6X_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -43,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
@@ -88,6 +92,19 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] port
+  * @param[in] pin
+  * @param[in] func
+  * @param[in] mode
+  * @param[in] mdigiModee
+  * @param[in] isOpenDrain
+  * @param[in] dir
+  * @param[in] val
+  */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
@@ -102,10 +119,10 @@ void AlxIoPin_Ctor
 );
 
 
-#endif // Module Guard
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_IO_PIN_MCU_LPC55S6X_H
+#endif	// #ifndef ALX_IO_PIN_MCU_LPC55S6X_H

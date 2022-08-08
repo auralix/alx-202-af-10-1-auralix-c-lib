@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_ASSERT_H
 #define ALX_ASSERT_H
 
@@ -32,11 +35,18 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
 #include "alxTrace.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -50,13 +60,36 @@ extern "C" {
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[] file
+  * @param[] line
+  * @param[] fun
+  */
 void AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun);
+
+/**
+  * @brief
+  * @param[] file
+  * @param[] line
+  * @param[] fun
+  */
 void AlxAssert_Trace(const char* file, uint32_t line, const char* fun);
+
+/**
+  * @brief
+  * @param[] file
+  * @param[] line
+  * @param[] fun
+  */
 void AlxAssert_Rst(const char* file, uint32_t line, const char* fun);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_ASSERT_H
+#endif	// #ifndef ALX_ASSERT_H

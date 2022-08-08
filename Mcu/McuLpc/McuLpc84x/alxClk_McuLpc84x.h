@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_CLK_MCU_LPC84X_H
 #define ALX_CLK_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -43,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -65,28 +69,27 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-static inline void AlxClk_Ctor
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] mainClkSource
+  * @param[in] clkFreq
+  * @param[in] divider
+  */
+void AlxClk_Ctor
 (
 	AlxClk* me,
 	clock_main_clk_src_t mainClkSource,
 	uint32_t clkFreq,
 	uint8_t divider
-)
-{
-	// Parameters
-	me->mainClkSource = mainClkSource;
-	me->clkFreq = clkFreq;
-	me->divider = divider;
-
-	// Info
-	me->wasCtorCalled = true;
-}
+);
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_CLK_MCU_LPC84X_H
+#endif	// #ifndef ALX_CLK_MCU_LPC84X_H

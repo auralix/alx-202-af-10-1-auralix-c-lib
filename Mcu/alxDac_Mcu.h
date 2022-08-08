@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_DAC_MCU_H
 #define ALX_DAC_MCU_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -50,9 +54,15 @@ typedef struct {} AlxDac_Mcu;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_DAC_MCU_FILE "alxDac_Mcu"
+#define ALX_DAC_MCU_FILE "alxDac_Mcu.h"
 
 // Assert //
 #if defined(_ALX_DAC_MCU_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -76,15 +86,48 @@ typedef struct {} AlxDac_Mcu;
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxDacMcu_Init(AlxDac_Mcu* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] vref_V
+  */
 Alx_Status AlxDacMcu_Init_CalibrateVref(AlxDac_Mcu* me, float* vref_V);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxDacMcu_DeInit(AlxDac_Mcu* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] ch
+  * @param[in] voltage_V
+  */
 Alx_Status AlxDacMcu_SetVoltage_V(AlxDac_Mcu* me, Alx_Ch* ch, float* voltage_V);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] ch
+  * @param[in] voltage_V
+  * @param[in] vref_V
+  */
 Alx_Status AlxDacMcu_SetVoltage_V_CalibrateVref(AlxDac_Mcu* me, Alx_Ch* ch, float* voltage_V, float* vref_V);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_DAC_MCU_H
+#endif	// #ifndef ALX_DAC_MCU_H

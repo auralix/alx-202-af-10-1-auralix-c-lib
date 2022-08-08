@@ -28,16 +28,14 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
+#include "alxSerialPort_McuStm32.h"
 #include "alxSerialPort.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -108,7 +106,7 @@ void AlxSerialPort_Ctor
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 {
@@ -711,4 +709,4 @@ static void AlxSerialPort_Periph_DisableRxIrq(AlxSerialPort* me)
 }
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))

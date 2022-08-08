@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -70,7 +70,7 @@ static void AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5(Alx
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 ALX_WEAK void AlxClk_Ctor
 (
@@ -115,6 +115,11 @@ ALX_WEAK void AlxClk_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
 	// Assert
@@ -341,7 +346,6 @@ static void AlxClk_Init_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_LP
 	POWER_DisablePD(kPDRUNCFG_PD_LPOSC);		// MF: Ensure LPOSC is on
 	//POWER_EnbaleLPOInDeepPowerDownMode(true);	// MF: Doesn't work on Lpc804
 }
-
 static void AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_1MHz(AlxClk* me)
 {
 	AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(me);
@@ -371,4 +375,5 @@ static void AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5(Alx
 	CLOCK_SetCoreSysClkDiv(2);
 }
 
-#endif // Module Guard
+
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

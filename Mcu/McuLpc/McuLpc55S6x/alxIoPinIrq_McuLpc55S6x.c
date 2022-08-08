@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
@@ -348,4 +348,4 @@ void PIN_INT7_IRQHandler(void)
 #endif
 
 
-#endif // Module Guard
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)

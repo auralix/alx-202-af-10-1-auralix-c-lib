@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_OS_CRITICAL_SECTION_H
 #define ALX_OS_CRITICAL_SECTION_H
 
@@ -32,18 +35,19 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxAssert.h"
 #include "alxTrace.h"
+#include "alxAssert.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_OS) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 
 //******************************************************************************
@@ -73,14 +77,22 @@ extern "C" {
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  */
 void AlxOsCriticalSection_Enter(void);
+
+/**
+  * @brief
+  */
 void AlxOsCriticalSection_Exit(void);
 
 
-#endif // #if defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_OS_CRITICAL_SECTION_H
+#endif	// #ifndef ALX_OS_CRITICAL_SECTION_H

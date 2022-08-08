@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_PARAM_STORE_H
 #define ALX_PARAM_STORE_H
 
@@ -32,12 +35,20 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxParamGroup.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -100,6 +111,13 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] paramGroupArr
+  * @param[in] numOfParamGroups
+  */
 void AlxParamStore_Ctor
 (
 	AlxParamStore* me,
@@ -111,10 +129,29 @@ void AlxParamStore_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[out] status
+  * @param[in] numOfParamGroups
+  */
 Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* status, uint32_t numOfParamGroups);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxParamStore_Handle(AlxParamStore* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxParamStore_IsErr(AlxParamStore* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

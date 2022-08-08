@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_NTCG103JF103FT1S_H
 #define ALX_NTCG103JF103FT1S_H
 
@@ -32,15 +35,44 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
+#define ALX_NTCG103JF103FT1S_FILE "alxNtcg103jf103ft1s.h"
+
+// Assert //
+#if defined(_ALX_NTCG103JF103FT1S_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_NTCG103JF103FT1S_ASSERT(expr) ALX_ASSERT_BKPT(ALX_NTCG103JF103FT1S_FILE, expr)
+#elif defined(_ALX_NTCG103JF103FT1S_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_NTCG103JF103FT1S_ASSERT(expr) ALX_ASSERT_TRACE(ALX_NTCG103JF103FT1S_FILE, expr)
+#elif defined(_ALX_NTCG103JF103FT1S_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_NTCG103JF103FT1S_ASSERT(expr) ALX_ASSERT_RST(ALX_NTCG103JF103FT1S_FILE, expr)
+#else
+	#define ALX_NTCG103JF103FT1S_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(_ALX_NTCG103JF103FT1S_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_NTCG103JF103FT1S_TRACE(...) ALX_TRACE_STD(ALX_NTCG103JF103FT1S_FILE, __VA_ARGS__)
+#else
+	#define ALX_NTCG103JF103FT1S_TRACE(...) do{} while (false)
+#endif
+
 #define ALX_NTCG103JF103FT1S_NUM_OF_POINTS 191
 
 
@@ -61,8 +93,10 @@ typedef struct
 extern const AlxNtcg103jf103ft1s alxNtcg103jf103ft1s;
 
 
+#endif	// #if defined(ALX_C_LIB)
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_NTCG103JF103FT1S_H
+#endif	// #ifndef ALX_NTCG103JF103FT1S_H

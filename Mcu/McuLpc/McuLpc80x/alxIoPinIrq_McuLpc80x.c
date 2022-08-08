@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -60,7 +60,7 @@ void AlxIoPinIrq_Foreground_Callback_Pin7();
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxIoPinIrq_Ctor
 (
@@ -88,6 +88,11 @@ void AlxIoPinIrq_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 {
 	ALX_IO_PIN_IRQ_ASSERT(me->isInit == false);
@@ -295,4 +300,4 @@ void PIN_INT7_IRQHandler(void)
 }
 
 
-#endif // Module Guard
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

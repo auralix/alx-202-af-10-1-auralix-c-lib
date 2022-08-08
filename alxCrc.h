@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_CRC_H
 #define ALX_CRC_H
 
@@ -32,11 +35,19 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -86,6 +97,12 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] config
+  */
 void AlxCrc_Ctor
 (
 	AlxCrc* me,
@@ -96,10 +113,32 @@ void AlxCrc_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] data
+  * @param[in] len
+  */
 uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] dataWithCrc
+  * @param[in] lenWithCrc
+  * @param[in] validatedCrc
+  */
 bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t* validatedCrc);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 uint32_t AlxCrc_GetLen(AlxCrc* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

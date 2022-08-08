@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_SPI_MCU_STM32_H
 #define ALX_SPI_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -45,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -106,6 +110,19 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] spi
+  * @param[in] do_SCK
+  * @param[in] do_MOSI
+  * @param[in] di_MISO
+  * @param[in] do_nCS
+  * @param[in] mode
+  * @param[in] clk
+  * @param[in] spiClk
+  */
 void AlxSpi_Ctor
 (
 	AlxSpi* me,
@@ -120,10 +137,10 @@ void AlxSpi_Ctor
 );
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_SPI_MCU_STM32_H
+#endif	// #ifndef ALX_SPI_MCU_STM32_H

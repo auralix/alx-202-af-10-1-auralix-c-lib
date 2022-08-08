@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -119,7 +119,7 @@ ALX_WEAK void AlxClk_Ctor
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
@@ -391,7 +391,7 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;	// same as cube
 
 	// #4 Set flash latency
-	me->flashLatency = FLASH_LATENCY_1;		// Cube set this to 0, did not work. Googling suggested this is a bug with cube and this should larger than 0. 1 Worked fine. 
+	me->flashLatency = FLASH_LATENCY_1;		// Cube set this to 0, did not work. Googling suggested this is a bug with cube and this should larger than 0. 1 Worked fine.
 
 	// #5 Set expected clocks
 	me->systemCoreClock_Ctor =	64000000UL;		// ??
@@ -404,7 +404,6 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_
 	me->mainPllInputClk_Ctor =	8000000UL;		// 8Mhz
 }
 #endif
-
 #if defined(ALX_STM32F4)
 static void AlxClk_Ctor_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default(AlxClk* me)
 {
@@ -862,4 +861,5 @@ void HAL_RCC_CSSCallback()
 	HAL_NVIC_SystemReset();
 }
 
-#endif
+
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))

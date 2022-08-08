@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TRACE_MCU_LPC17XX_H
 #define ALX_TRACE_MCU_LPC17XX_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -42,7 +46,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17XX)
+#if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -66,7 +70,17 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-static inline void AlxTrace_Ctor
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] port
+  * @param[in] pin
+  * @param[in] func
+  * @param[in] uart
+  * @param[in] baudRate
+  */
+void AlxTrace_Ctor
 (
 	AlxTrace* me,
 	uint8_t port,
@@ -74,25 +88,13 @@ static inline void AlxTrace_Ctor
 	uint8_t func,
 	LPC_USART_T* uart,
 	AlxGlobal_BaudRate baudRate
-)
-{
-	// Parameters
-	me->port = port;
-	me->pin = pin;
-	me->func = func;
-	me->uart = uart;
-	me->baudRate = (uint32_t)baudRate;
-
-	// Info
-	me->isInit = false;
-	me->wasCtorCalled = true;
-}
+);
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_TRACE_MCU_LPC17XX_H
+#endif	// #ifndef ALX_TRACE_MCU_LPC17XX_H

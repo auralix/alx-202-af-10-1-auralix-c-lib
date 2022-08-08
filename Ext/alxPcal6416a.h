@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_PCAL6416A_H
 #define ALX_PCAL6416A_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -39,6 +43,12 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxI2c.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -646,12 +656,14 @@ typedef enum
 	AlxPcal6416a_P1_6 = 0b1110,
 	AlxPcal6416a_P1_7 = 0b1111
 } AlxPcal6416a_PortPin;
+
 typedef enum
 {
 	AlxPcal6416a_PullUp = 0b00,
 	AlxPcal6416a_PullDown = 0b01,
 	AlxPcal6416a_Inact = 0b10,
 } AlxPcal6416a_Mode;
+
 typedef struct
 {
 	// Parameters
@@ -674,6 +686,16 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] i2c
+  * @param[in] i2cAddr
+  * @param[in] i2cCheckWithRead
+  * @param[in] i2cNumOfTries
+  * @param[in] i2cTimeout_ms
+  */
 void AlxPcal6416a_Ctor
 (
 	AlxPcal6416a* me,
@@ -688,43 +710,96 @@ void AlxPcal6416a_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxPcal6416a_InitPeriph(AlxPcal6416a* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxPcal6416a_DeInitPeriph(AlxPcal6416a* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] inputPort0
+  * @param[in] inputPort1
+  * @param[in] outputPort0
+  * @param[in] outputPort1
+  */
 Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inputPort0, bool inputPort1, bool outputPort0, bool outputPort1);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] pin
+  */
 bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] pin
+  * @param[in] val
+  */
 void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, bool val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] pin
+  */
 void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] pin
+  */
 void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] pin
+  */
 void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] reg
+  */
 Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[out] reg
+  */
 Alx_Status AlxPcal6416a_Reg_Read(AlxPcal6416a* me, void* reg);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_PCAL6416A_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//void AlxPcal6416a_IoPin_SetMode(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, AlxPcal6416a_Mode mode);	// MF: Set PullUp or PulDown
+#endif	// #ifndef ALX_PCAL6416A_H

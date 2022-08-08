@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_CAN_H
 #define ALX_CAN_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -49,9 +53,15 @@ typedef struct { bool dummy; } AlxCan;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_CAN_FILE "alxCan"
+#define ALX_CAN_FILE "alxCan.h"
 
 // Assert //
 #if defined(_ALX_CAN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -71,13 +81,6 @@ typedef struct { bool dummy; } AlxCan;
 	#define ALX_CAN_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_CAN_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_CAN_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_CAN_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -95,19 +98,72 @@ typedef struct
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxCan_Init(AlxCan* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxCan_DeInit(AlxCan* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxCan_ReInit(AlxCan* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] msg
+  */
 Alx_Status AlxCan_TxMsg(AlxCan* me, AlxCan_Msg msg);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] msg
+  * @param[in] numOfMsg
+  */
 Alx_Status AlxCan_TxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] msg
+  */
 Alx_Status AlxCan_RxMsg(AlxCan* me, AlxCan_Msg* msg);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] msg
+  * @param[in] numOfMsg
+  */
 Alx_Status AlxCan_RxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 bool AlxCan_IsErr(AlxCan* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxCan_Foreground_Handle(AlxCan* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_CAN_H
+#endif	// #ifndef ALX_CAN_H

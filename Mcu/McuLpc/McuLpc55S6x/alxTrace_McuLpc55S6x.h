@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TRACE_MCU_LPC55S6X_H
 #define ALX_TRACE_MCU_LPC55S6X_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -45,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
@@ -74,6 +78,15 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] port
+  * @param[in] pin
+  * @param[in] usart
+  * @param[in] baudRate
+  */
 void AlxTrace_Ctor
 (
 	AlxTrace* me,
@@ -83,10 +96,11 @@ void AlxTrace_Ctor
 	AlxGlobal_BaudRate baudRate
 );
 
-#endif // Module Guard
+
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_TRACE_MCU_LPC55S6X_H
+#endif	// #ifndef ALX_TRACE_MCU_LPC55S6X_H

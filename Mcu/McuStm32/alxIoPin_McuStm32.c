@@ -35,11 +35,11 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxIoPin_Ctor
 (
@@ -72,6 +72,11 @@ void AlxIoPin_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 void AlxIoPin_Init(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->isInit == false);
@@ -184,4 +189,5 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	}
 }
 
-#endif
+
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))

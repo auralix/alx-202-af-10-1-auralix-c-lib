@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_PWM_MCU_STM32_H
 #define ALX_PWM_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -45,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -56,7 +60,7 @@ typedef struct
 	// Objects - External
 	AlxIoPin** ioPinArr;
 	AlxClk* clk;
-	
+
 	// Parameters
 	Alx_Ch* chArr;
 	float* dutyDefaultArr_pct;
@@ -72,7 +76,8 @@ typedef struct
 	Alx_Ch ch[ALX_PWM_BUFF_LEN];
 	#if !defined (ALX_PWM_OPTIMIZE_SIZE)
 	float dutyDefault_pct[ALX_PWM_BUFF_LEN];
-	#endif
+	#endif
+
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
@@ -82,6 +87,19 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] tim
+  * @param[in] ioPinArr
+  * @param[in] chArr
+  * @param[in] dutyDefaultArr_pct
+  * @param[in] numOfCh
+  * @param[in] clk
+  * @param[in] prescaler
+  * @param[in] period
+  */
 void AlxPwm_Ctor
 (
 	AlxPwm* me,
@@ -97,10 +115,11 @@ void AlxPwm_Ctor
 	uint32_t period
 );
 
-#endif
+
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_PWM_MCU_STM32_H
+#endif	// #ifndef ALX_PWM_MCU_STM32_H

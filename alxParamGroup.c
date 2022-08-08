@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Private Functions
 //******************************************************************************
 static void AlxParamGroup_ParamItemsValDefToValToStoreBuff(AlxParamGroup* me);
@@ -315,3 +321,6 @@ static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me)
 		valStoredBuffIndex = valStoredBuffIndex + len;
 	}
 }
+
+
+#endif	// #if defined(ALX_C_LIB)

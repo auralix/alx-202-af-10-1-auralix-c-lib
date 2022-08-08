@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_RTC_H
 #define ALX_RTC_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -50,9 +54,15 @@ typedef struct { bool dummy; } AlxRtc;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_RTC_FILE "alxRtc"
+#define ALX_RTC_FILE "alxRtc.h"
 
 // Assert //
 #if defined(_ALX_RTC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -72,41 +82,155 @@ typedef struct { bool dummy; } AlxRtc;
 	#define ALX_RTC_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_RTC_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_RTC_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_RTC_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxRtc_Init(AlxRtc* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxRtc_DeInit(AlxRtc* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] dateTime
+  */
 Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[out] dateTime
+  */
 Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 AlxRtc_DateTime AlxRtc_GetDateTime(AlxRtc* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxRtc_IsDateTimeConfigured(AlxRtc* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] unixTime_ns
+  */
 Alx_Status AlxRtc_SetUnixTime_ns(AlxRtc* me, uint64_t unixTime_ns);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] unixTime_us
+  */
 Alx_Status AlxRtc_SetUnixTime_us(AlxRtc* me, uint64_t unixTime_us);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] unixTime_ms
+  */
 Alx_Status AlxRtc_SetUnixTime_ms(AlxRtc* me, uint64_t unixTime_ms);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] unixTime_sec
+  */
 Alx_Status AlxRtc_SetUnixTime_sec(AlxRtc* me, uint64_t unixTime_sec);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] unixTime_ns
+  */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_ns(AlxRtc* me, uint64_t* unixTime_ns);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] unixTime_us
+  */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_us(AlxRtc* me, uint64_t* unixTime_us);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] unixTime_ms
+  */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_ms(AlxRtc* me, uint64_t* unixTime_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] unixTime_sec
+  */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_sec(AlxRtc* me, uint64_t* unixTime_sec);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_GetUnixTime_ns(AlxRtc* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_GetUnixTime_us(AlxRtc* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_GetUnixTime_ms(AlxRtc* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxRtc_GetUnixTime_sec(AlxRtc* me);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] tuneTime_ns
+  */
 Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] tuneTime_us
+  */
 Alx_Status AlxRtc_TuneTime_us(AlxRtc* me, int64_t tuneTime_us);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] tuneTime_ms
+  */
 Alx_Status AlxRtc_TuneTime_ms(AlxRtc* me, int64_t tuneTime_ms);
+
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_RTC_H
+#endif	// #ifndef ALX_RTC_H

@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_PARAM_ITEM_H
 #define ALX_PARAM_ITEM_H
 
@@ -32,13 +35,21 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxBound.h"
 #include "alxRange.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -135,6 +146,18 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorUint8
 (
 	AlxParamItem* me,
@@ -146,6 +169,18 @@ void AlxParamItem_CtorUint8
 	uint8_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorUint16
 (
 	AlxParamItem* me,
@@ -157,6 +192,18 @@ void AlxParamItem_CtorUint16
 	uint16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorUint32
 (
 	AlxParamItem* me,
@@ -168,6 +215,18 @@ void AlxParamItem_CtorUint32
 	uint32_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorUint64
 (
 	AlxParamItem* me,
@@ -179,6 +238,18 @@ void AlxParamItem_CtorUint64
 	uint64_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorInt8
 (
 	AlxParamItem* me,
@@ -190,6 +261,18 @@ void AlxParamItem_CtorInt8
 	int8_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorInt16
 (
 	AlxParamItem* me,
@@ -201,6 +284,18 @@ void AlxParamItem_CtorInt16
 	int16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorInt32
 (
 	AlxParamItem* me,
@@ -212,6 +307,18 @@ void AlxParamItem_CtorInt32
 	int32_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorInt64
 (
 	AlxParamItem* me,
@@ -223,6 +330,18 @@ void AlxParamItem_CtorInt64
 	int64_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorFloat
 (
 	AlxParamItem* me,
@@ -234,6 +353,18 @@ void AlxParamItem_CtorFloat
 	float valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valMin
+  * @param[in] valMax
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorDouble
 (
 	AlxParamItem* me,
@@ -245,6 +376,15 @@ void AlxParamItem_CtorDouble
 	double valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  */
 void AlxParamItem_CtorBool
 (
 	AlxParamItem* me,
@@ -253,6 +393,19 @@ void AlxParamItem_CtorBool
 	uint32_t groupId,
 	bool valDef
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valBuff
+  * @param[in] valDefBuff
+  * @param[in] valBuffLen
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorArr
 (
 	AlxParamItem* me,
@@ -265,6 +418,19 @@ void AlxParamItem_CtorArr
 	uint32_t valBuffLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] name
+  * @param[in] id
+  * @param[in] groupId
+  * @param[in] valDef
+  * @param[in] valBuff
+  * @param[in] valDefBuff
+  * @param[in] strMaxLen
+  * @param[in] valOutOfRangeHandle
+  */
 void AlxParamItem_CtorStr
 (
 	AlxParamItem* me,
@@ -282,42 +448,222 @@ void AlxParamItem_CtorStr
 //******************************************************************************
 // Functions
 //******************************************************************************
-const char*			AlxParamItem_GetName		(AlxParamItem* me);
-uint32_t			AlxParamItem_GetId			(AlxParamItem* me);
-uint32_t			AlxParamItem_GetGroupId		(AlxParamItem* me);
-AlxParamItem_Type	AlxParamItem_GetType		(AlxParamItem* me);
-void*				AlxParamItem_GetValPtr		(AlxParamItem* me);
-uint32_t			AlxParamItem_GetValLen		(AlxParamItem* me);
-void				AlxParamItem_SetValToDef	(AlxParamItem* me);
 
-uint8_t				AlxParamItem_GetValUint8	(AlxParamItem* me);
-uint16_t			AlxParamItem_GetValUint16	(AlxParamItem* me);
-uint32_t			AlxParamItem_GetValUint32	(AlxParamItem* me);
-uint64_t			AlxParamItem_GetValUint64	(AlxParamItem* me);
-int8_t				AlxParamItem_GetValInt8		(AlxParamItem* me);
-int16_t				AlxParamItem_GetValInt16	(AlxParamItem* me);
-int32_t				AlxParamItem_GetValInt32	(AlxParamItem* me);
-int64_t				AlxParamItem_GetValInt64	(AlxParamItem* me);
-float				AlxParamItem_GetValFloat	(AlxParamItem* me);
-double				AlxParamItem_GetValDouble	(AlxParamItem* me);
-bool				AlxParamItem_GetValBool		(AlxParamItem* me);
+/**
+  * @brief
+  * @param[in] me
+  */
+const char* AlxParamItem_GetName(AlxParamItem* me);
 
-Alx_Status			AlxParamItem_SetValUint8	(AlxParamItem* me, uint8_t val	);
-Alx_Status			AlxParamItem_SetValUint16	(AlxParamItem* me, uint16_t val	);
-Alx_Status			AlxParamItem_SetValUint32	(AlxParamItem* me, uint32_t val	);
-Alx_Status			AlxParamItem_SetValUint64	(AlxParamItem* me, uint64_t val	);
-Alx_Status			AlxParamItem_SetValInt8		(AlxParamItem* me, int8_t val	);
-Alx_Status			AlxParamItem_SetValInt16	(AlxParamItem* me, int16_t val	);
-Alx_Status			AlxParamItem_SetValInt32	(AlxParamItem* me, int32_t val	);
-Alx_Status			AlxParamItem_SetValInt64	(AlxParamItem* me, int64_t val	);
-Alx_Status			AlxParamItem_SetValFloat	(AlxParamItem* me, float val	);
-Alx_Status			AlxParamItem_SetValDouble	(AlxParamItem* me, double val	);
-Alx_Status			AlxParamItem_SetValBool		(AlxParamItem* me, bool val		);
+/**
+  * @brief
+  * @param[in] me
+  */
+uint32_t AlxParamItem_GetId(AlxParamItem* me);
 
-void				AlxParamItem_GetValArr		(AlxParamItem* me, void* val);
-void				AlxParamItem_SetValArr		(AlxParamItem* me, void* val);
-void				AlxParamItem_GetValStr		(AlxParamItem* me, char* val);
-Alx_Status			AlxParamItem_SetValStr		(AlxParamItem* me, char* val);
+/**
+  * @brief
+  * @param[in] me
+  */
+uint32_t AlxParamItem_GetGroupId(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+AlxParamItem_Type AlxParamItem_GetType(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+void* AlxParamItem_GetValPtr(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+uint32_t AlxParamItem_GetValLen(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
+void AlxParamItem_SetValToDef(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+uint8_t AlxParamItem_GetValUint8(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+uint16_t AlxParamItem_GetValUint16(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+uint32_t AlxParamItem_GetValUint32(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+uint64_t AlxParamItem_GetValUint64(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+int8_t AlxParamItem_GetValInt8(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+int16_t AlxParamItem_GetValInt16(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+int32_t AlxParamItem_GetValInt32(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+int64_t AlxParamItem_GetValInt64(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+float AlxParamItem_GetValFloat(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+double AlxParamItem_GetValDouble(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+bool AlxParamItem_GetValBool(AlxParamItem* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValUint64(AlxParamItem* me, uint64_t val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValInt8(AlxParamItem* me, int8_t val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValInt16(AlxParamItem* me, int16_t val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValInt32(AlxParamItem* me, int32_t val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[out] val
+  */
+void AlxParamItem_GetValArr(AlxParamItem* me, void* val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+void AlxParamItem_SetValArr(AlxParamItem* me, void* val);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[out] val
+  */
+void AlxParamItem_GetValStr(AlxParamItem* me, char* val);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] val
+  */
+Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val);
+
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

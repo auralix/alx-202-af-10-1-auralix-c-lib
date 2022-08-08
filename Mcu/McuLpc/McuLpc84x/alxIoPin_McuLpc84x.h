@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_IO_PIN_MCU_LPC84X_H
 #define ALX_IO_PIN_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -43,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -167,7 +171,6 @@ typedef enum
 	AlxIoPin_SwmFunc_NO = 255U
 } AlxIoPin_SwmFunc;
 
-
 typedef struct
 {
 	// Parameters
@@ -197,7 +200,19 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-static inline void AlxIoPin_Ctor
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] port
+  * @param[in] pin
+  * @param[in] swmFunc
+  * @param[in] mode
+  * @param[in] isOpenDrain
+  * @param[in] dir
+  * @param[in] val
+  */
+void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
 	uint8_t port,
@@ -207,30 +222,13 @@ static inline void AlxIoPin_Ctor
 	bool isOpenDrain,
 	bool dir,
 	bool val
-)
-{
-	// Parameters
-	me->port = port;
-	me->pin = pin;
-	me->swmFunc = swmFunc;
-	me->mode = mode;
-	me->isOpenDrain = isOpenDrain;
-	me->dir = dir;
-	me->val = val;
-
-	// Variables
-	me-> swmFunc_isMovable = false;
-
-	// Info
-	me->isInit = false;
-	me->wasCtorCalled = true;
-}
+);
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_IO_PIN_MCU_LPC84X_H
+#endif	// #ifndef ALX_IO_PIN_MCU_LPC84X_H

@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_IO_PIN_IRQ_H
 #define ALX_IO_PIN_IRQ_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -55,9 +59,15 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_IO_PIN_IRQ_FILE "alxIoPinIrq"
+#define ALX_IO_PIN_IRQ_FILE "alxIoPinIrq.h"
 
 // Assert //
 #if defined(_ALX_IO_PIN_IRQ_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -79,19 +89,26 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPinIrq_Init(AlxIoPinIrq* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me);
 
 
-//******************************************************************************
-// Common Functions
-//******************************************************************************
-
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_IO_PIN_IRQ_H
+#endif	// #ifndef ALX_IO_PIN_IRQ_H

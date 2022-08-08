@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TIM_SW_H
 #define ALX_TIM_SW_H
 
@@ -32,11 +35,44 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
 #include "alxTick.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
+// Preprocessor
+//******************************************************************************
+#define ALX_TIM_SW_FILE "alxTimSw.h"
+
+// Assert //
+#if defined(_ALX_TIM_SW_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_BKPT(ALX_TIM_SW_FILE, expr)
+#elif defined(_ALX_TIM_SW_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_TRACE(ALX_TIM_SW_FILE, expr)
+#elif defined(_ALX_TIM_SW_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_RST(ALX_TIM_SW_FILE, expr)
+#else
+	#define ALX_TIM_SW_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(_ALX_TIM_SW_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_TIM_SW_TRACE(...) ALX_TRACE_STD(ALX_TIM_SW_FILE, __VA_ARGS__)
+#else
+	#define ALX_TIM_SW_TRACE(...) do{} while (false)
+#endif
 
 
 //******************************************************************************
@@ -56,31 +92,124 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxTimSw_Ctor(AlxTimSw* me, bool start);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] start
+  */
+void AlxTimSw_Ctor
+(
+	AlxTimSw* me,
+	bool start
+);
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTimSw_Start(AlxTimSw* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTimSw_Stop(AlxTimSw* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxTimSw_IsRunning(AlxTimSw* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxTimSw_Get_ns(AlxTimSw* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxTimSw_Get_us(AlxTimSw* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxTimSw_Get_ms(AlxTimSw* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxTimSw_Get_sec(AlxTimSw* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxTimSw_Get_min(AlxTimSw* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint64_t AlxTimSw_Get_hr(AlxTimSw* me);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] timeout_ns
+  */
 bool AlxTimSw_IsTimeout_ns(AlxTimSw* me, uint64_t timeout_ns);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] timeout_us
+  */
 bool AlxTimSw_IsTimeout_us(AlxTimSw* me, uint64_t timeout_us);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] timeout_ms
+  */
 bool AlxTimSw_IsTimeout_ms(AlxTimSw* me, uint64_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] timeout_sec
+  */
 bool AlxTimSw_IsTimeout_sec(AlxTimSw* me, uint64_t timeout_sec);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] timeout_min
+  */
 bool AlxTimSw_IsTimeout_min(AlxTimSw* me, uint64_t timeout_min);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] timeout_hr
+  */
 bool AlxTimSw_IsTimeout_hr(AlxTimSw* me, uint64_t timeout_hr);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_TIM_SW_H
+#endif	// #ifndef ALX_TIM_SW_H

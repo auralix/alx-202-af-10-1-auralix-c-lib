@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxFiltGlitchBool_Ctor
@@ -56,7 +62,6 @@ void AlxFiltGlitchBool_Ctor
 	// Info
 	me->wasCtorCalled = true;
 }
-
 void AlxFiltGlitchBool_Ctor_us
 (
 	AlxFiltGlitchBool* me,
@@ -115,3 +120,6 @@ bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in)
 
 	return me->valFiltered;
 }
+
+
+#endif	// #if defined(ALX_C_LIB)

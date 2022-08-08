@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_INTERP_LIN_H
 #define ALX_INTERP_LIN_H
 
@@ -32,17 +35,25 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_INTERP_LIN_FILE "alxInterpLin"
+#define ALX_INTERP_LIN_FILE "alxInterpLin.h"
 
 // Assert //
 #if defined(_ALX_INTERP_LIN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -62,13 +73,6 @@ extern "C" {
 	#define ALX_INTERP_LIN_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_INTERP_LIN_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_INTERP_LIN_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_INTERP_LIN_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -80,25 +84,29 @@ typedef struct
 	float* yPointArr;
 	uint32_t numOfArrPoints;
 	bool isXpointArrRising;
-	
-	// Objects - Internal
-	
-	// Variables;
-	
+
 	// Info
 	bool wasCtorCalled;
-	
 } AlxInterpLin;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] xPointArr
+  * @param[in] yPointArr
+  * @param[in] numOfArrPoints
+  * @param[in] isisXpointArrRising
+  */
 void AlxInterpLin_Ctor
 (
-	AlxInterpLin *me,
-	float *xPointArr,			// Points to 0th element of the X arr.
-	float *yPointArr,			// Points to 0th element of the Y arr.
+	AlxInterpLin* me,
+	float* xPointArr,			// Points to 0th element of the X arr.
+	float* yPointArr,			// Points to 0th element of the Y arr.
 	uint32_t numOfArrPoints,	// Length of the arrays
 	bool isisXpointArrRising	// True if X[n+1] > X[n]
 );
@@ -107,12 +115,27 @@ void AlxInterpLin_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* y);
-float AlxInterpLin_GetY(AlxInterpLin* me, float x); 
 
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] x
+  * @param[out] y
+  */
+Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* y);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] x
+  */
+float AlxInterpLin_GetY(AlxInterpLin* me, float x);
+
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_INTERP_LIN_H
+#endif	// #ifndef ALX_INTERP_LIN_H

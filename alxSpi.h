@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_SPI_H
 #define ALX_SPI_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -53,9 +57,15 @@ typedef struct { bool dummy; } AlxSpi;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_SPI_FILE "alxSpi"
+#define ALX_SPI_FILE "alxSpi.h"
 
 // Assert //
 #if defined(_ALX_SPI_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -75,28 +85,71 @@ typedef struct { bool dummy; } AlxSpi;
 	#define ALX_SPI_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_SPI_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_SPI_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_SPI_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxSpi_Init(AlxSpi* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxSpi_DeInit(AlxSpi* me);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] writeData
+  * @param[in] len
+  * @param[in] numOfTries
+  * @param[in] timeout_ms
+  */
 Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[out] readData
+  * @param[in] len
+  * @param[in] numOfTries
+  * @param[in] timeout_ms
+  */
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] writeData
+  * @param[out] readData
+  * @param[in] len
+  * @param[in] numOfTries
+  * @param[in] timeout_ms
+  */
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxSpi_Master_AssertCs(AlxSpi* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxSpi_Master_DeAssertCs(AlxSpi* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_SPI_H
+#endif	// #ifndef ALX_SPI_H

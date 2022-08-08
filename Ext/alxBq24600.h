@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_BQ24600_H
 #define ALX_BQ24600_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -44,9 +48,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_BQ24600_FILE "alxBq24600"
+#define ALX_BQ24600_FILE "alxBq24600.h"
 
 // Assert //
 #if defined(_ALX_BQ24600_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -86,7 +96,7 @@ typedef struct
 	uint32_t ERROR_STATUS_DETECTION_TRANSITIONS;	// minimum number of STAT pin transitions in one detection window to recognize state as Error
 	uint32_t STATUS_BLINK_HALFPERIOD_TIME_MIN_ms;	// minimum duration of half period on STAT pin when it's blinking [ms]
 	uint32_t STATUS_BLINK_HALFPERIOD_TIME_MAX_ms;	// maximum duration of half period on STAT pin when it's blinking [ms] -> used for stable state detection
-	
+
 	// Objects - External
 	AlxIoPin* do_EN;
 	AlxIoPin* di_nPG;
@@ -113,6 +123,14 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] do_EN
+  * @param[in] di_nPG
+  * @param[in] di_STAT
+  */
 void AlxBq24600_Ctor
 (
 	AlxBq24600* me,
@@ -125,19 +143,66 @@ void AlxBq24600_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBq24600_Init(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBq24600_DeInit(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBq24600_Handle(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBq24600_Enable(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBq24600_Disable(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBq24600_IsBatCharging(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBq24600_IsBatFull(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBq24600_IsSleep(AlxBq24600* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBq24600_IsErr(AlxBq24600* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_BQ24600_H
+#endif	// #ifndef ALX_BQ24600_H

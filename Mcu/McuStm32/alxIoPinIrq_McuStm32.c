@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -67,7 +67,7 @@ void AlxIoPinIrq_Foreground_Callback_Pin15(void);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxIoPinIrq_Ctor
 (
@@ -83,7 +83,7 @@ void AlxIoPinIrq_Ctor
 	(void)irqPriorityArr;
 	ALX_IO_PIN_IRQ_ASSERT((1 <= numOfIoPins) && (numOfIoPins <= 16));
 	for (uint8_t i = 0; i < numOfIoPins - 1; i++) ALX_IO_PIN_IRQ_ASSERT((*(ioPinArr + i))->igpio.Pin != (*(ioPinArr + i + 1))->igpio.Pin);	// All GPIO pin numbers must be different
-		
+
 	// Objects - External
 	me->ioPinArr = ioPinArr;
 
@@ -95,6 +95,11 @@ void AlxIoPinIrq_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 {
 	ALX_IO_PIN_IRQ_ASSERT(me->isInit == false);
@@ -103,7 +108,7 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 	// #1 Init GPIO
 	for (uint32_t i = 0; i < me->numOfIoPins; i++)
 	AlxIoPin_Init((*(me->ioPinArr + i)));
-	
+
 	// #2 Enable IRQ
 	AlxIoPinIrq_Periph_EnableIrq(me);
 
@@ -117,7 +122,7 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 
 	// #1 Disable IRQ
 	AlxIoPinIrq_Periph_DisableIrq(me);
-	
+
 	// #2 DeInit GPIO
 	for (uint32_t i = 0; i < me->numOfIoPins; i++)
 	AlxIoPin_DeInit((*(me->ioPinArr + i)));
@@ -135,7 +140,7 @@ static void AlxIoPinIrq_Periph_EnableIrq(AlxIoPinIrq* me)
 	for (uint8_t i = 0; i < me->numOfIoPins; i++)
 	{
 		AlxIoPin* ioPin = *(me->ioPinArr + i);
-		
+
 		if (ioPin->igpio.Pin == GPIO_PIN_0)
 		{
 			HAL_NVIC_SetPriority(EXTI0_IRQn, me->irqPriorityArr[i], 0);
@@ -197,7 +202,7 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 	for (uint8_t i = 0; i < me->numOfIoPins; i++)
 	{
 		AlxIoPin* ioPin = *(me->ioPinArr + i);
-		
+
 		if (ioPin->igpio.Pin == GPIO_PIN_0)
 		{
 			HAL_NVIC_DisableIRQ(EXTI0_IRQn);
@@ -252,7 +257,7 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 		{
 			ALX_IO_PIN_IRQ_ASSERT(false); // We shouldn't get here
 		}
-		
+
 		__HAL_GPIO_EXTI_CLEAR_IT(ioPin->igpio.Pin);
 	}
 }
@@ -263,16 +268,16 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 //******************************************************************************
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if		(GPIO_Pin == GPIO_PIN_0 ) AlxIoPinIrq_Foreground_Callback_Pin0 ();
-	else if	(GPIO_Pin == GPIO_PIN_1 ) AlxIoPinIrq_Foreground_Callback_Pin1 ();
-	else if	(GPIO_Pin == GPIO_PIN_2 ) AlxIoPinIrq_Foreground_Callback_Pin2 ();
-	else if	(GPIO_Pin == GPIO_PIN_3 ) AlxIoPinIrq_Foreground_Callback_Pin3 ();
-	else if	(GPIO_Pin == GPIO_PIN_4 ) AlxIoPinIrq_Foreground_Callback_Pin4 ();
-	else if	(GPIO_Pin == GPIO_PIN_5 ) AlxIoPinIrq_Foreground_Callback_Pin5 ();
-	else if	(GPIO_Pin == GPIO_PIN_6 ) AlxIoPinIrq_Foreground_Callback_Pin6 ();
-	else if	(GPIO_Pin == GPIO_PIN_7 ) AlxIoPinIrq_Foreground_Callback_Pin7 ();
-	else if	(GPIO_Pin == GPIO_PIN_8 ) AlxIoPinIrq_Foreground_Callback_Pin8 ();
-	else if	(GPIO_Pin == GPIO_PIN_9 ) AlxIoPinIrq_Foreground_Callback_Pin9 ();
+	if		(GPIO_Pin == GPIO_PIN_0 ) AlxIoPinIrq_Foreground_Callback_Pin0();
+	else if	(GPIO_Pin == GPIO_PIN_1 ) AlxIoPinIrq_Foreground_Callback_Pin1();
+	else if	(GPIO_Pin == GPIO_PIN_2 ) AlxIoPinIrq_Foreground_Callback_Pin2();
+	else if	(GPIO_Pin == GPIO_PIN_3 ) AlxIoPinIrq_Foreground_Callback_Pin3();
+	else if	(GPIO_Pin == GPIO_PIN_4 ) AlxIoPinIrq_Foreground_Callback_Pin4();
+	else if	(GPIO_Pin == GPIO_PIN_5 ) AlxIoPinIrq_Foreground_Callback_Pin5();
+	else if	(GPIO_Pin == GPIO_PIN_6 ) AlxIoPinIrq_Foreground_Callback_Pin6();
+	else if	(GPIO_Pin == GPIO_PIN_7 ) AlxIoPinIrq_Foreground_Callback_Pin7();
+	else if	(GPIO_Pin == GPIO_PIN_8 ) AlxIoPinIrq_Foreground_Callback_Pin8();
+	else if	(GPIO_Pin == GPIO_PIN_9 ) AlxIoPinIrq_Foreground_Callback_Pin9();
 	else if	(GPIO_Pin == GPIO_PIN_10) AlxIoPinIrq_Foreground_Callback_Pin10();
 	else if	(GPIO_Pin == GPIO_PIN_11) AlxIoPinIrq_Foreground_Callback_Pin11();
 	else if	(GPIO_Pin == GPIO_PIN_12) AlxIoPinIrq_Foreground_Callback_Pin12();
@@ -405,4 +410,4 @@ void EXTI15_10_IRQHandler(void)
 }
 
 
-#endif // Module Guard
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))

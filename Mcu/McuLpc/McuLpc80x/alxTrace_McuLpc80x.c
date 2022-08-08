@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -48,7 +48,7 @@ static void AlxTrace_Periph_SelectClk(AlxTrace* me);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxTrace_Ctor
 (
@@ -88,6 +88,11 @@ void AlxTrace_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
 	// #1 Init SWM
@@ -224,4 +229,4 @@ static void AlxTrace_Periph_SelectClk(AlxTrace* me)
 }
 
 
-#endif // Module Guard
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

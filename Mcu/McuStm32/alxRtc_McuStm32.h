@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_RTC_MCU_STM32_H
 #define ALX_RTC_MCU_STM32_H
 
@@ -32,13 +35,14 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxRtc_Global.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxRtc_Global.h"
 #include "alxIoPin.h"
 #include "alxClk.h"
 
@@ -46,7 +50,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 
 //******************************************************************************
@@ -61,8 +65,6 @@ typedef enum
 
 typedef struct
 {
-	// Objects - External
-
 	// Parameters
 	AlxRtc_Clk rtcClk;
 	uint64_t rtcTick_ns;
@@ -89,6 +91,12 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] rtcClk
+  */
 void AlxRtc_Ctor
 (
 	AlxRtc* me,
@@ -96,10 +104,10 @@ void AlxRtc_Ctor
 );
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_RTC_MCU_STM32_H
+#endif	// #ifndef ALX_RTC_MCU_STM32_H

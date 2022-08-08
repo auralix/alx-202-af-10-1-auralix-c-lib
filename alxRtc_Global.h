@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_RTC_GLOBAL_H
 #define ALX_RTC_GLOBAL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -41,9 +45,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_RTC_GLOBAL_FILE "alxRtcGlobal"
+#define ALX_RTC_GLOBAL_FILE "alxRtc_Global.h"
 
 // Assert //
 #if defined(_ALX_RTC_GLOBAL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -61,13 +71,6 @@ extern "C" {
 	#define ALX_RTC_GLOBAL_TRACE(...) ALX_TRACE_STD(ALX_RTC_GLOBAL_FILE, __VA_ARGS__)
 #else
 	#define ALX_RTC_GLOBAL_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_RTC_GLOBAL_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_RTC_GLOBAL_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_RTC_GLOBAL_DBG_PIN(...) do{} while (false)
 #endif
 
 
@@ -92,25 +95,128 @@ typedef struct
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] rtcTick_ns
+  * @param[in] ms
+  * @param[in] us
+  * @param[in] ns
+  */
 uint64_t AlxRtc_MsUsNsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us, uint16_t ns);
+
+/**
+  * @brief
+  * @param[in] rtcTick_ns
+  * @param[in] ms
+  * @param[in] us
+  */
 uint64_t AlxRtc_MsUsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us);
+
+/**
+  * @brief
+  * @param[in] rtcTick_ns
+  * @param[in] ms
+  */
 uint64_t AlxRtc_MsToNs(uint64_t rtcTick_ns, uint16_t ms);
+
+/**
+  * @brief
+  * @param[in] ms
+  * @param[in] us
+  * @param[in] ns
+  */
 float AlxRtc_MsUsNsToSecFract(uint16_t ms, uint16_t us, uint16_t ns);
+
+/**
+  * @brief
+  * @param[in] rtcTick_ns
+  * @param[in] in_ns
+  * @param[out] ms
+  * @param[out] us
+  * @param[out] ns
+  */
 void AlxRtc_NsToMsUsNs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms, uint16_t* us, uint16_t* ns);
+
+/**
+  * @brief
+  * @param[in] rtcTick_ns
+  * @param[in] in_ns
+  * @param[out] ms
+  * @param[out] us
+  */
 void AlxRtc_NsToMsUs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms, uint16_t* us);
+
+/**
+  * @brief
+  * @param[in] rtcTick_ns
+  * @param[in] in_ns
+  * @param[out] ms
+  */
 void AlxRtc_NsToMs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms);
+
+/**
+  * @brief
+  * @param[in] secFract
+  * @param[out] ms
+  * @param[out] us
+  * @param[out] ns
+  */
 void AlxRtc_SecFractToMsUsNs(float secFract, uint16_t* ms, uint16_t* us, uint16_t* ns);
+
+/**
+  * @brief
+  * @param[in] unixTime_ns
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeNsToDateTime(uint64_t unixTime_ns);
+
+/**
+  * @brief
+  * @param[in] unixTime_us
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeUsToDateTime(uint64_t unixTime_us);
+
+/**
+  * @brief
+  * @param[in] unixTime_ms
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeMsToDateTime(uint64_t unixTime_ms);
+
+/**
+  * @brief
+  * @param[in] unixTime_sec
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeSecToDateTime(uint64_t unixTime_sec);
+
+/**
+  * @brief
+  * @param[in] dateTime
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeNs(AlxRtc_DateTime dateTime);
+
+/**
+  * @brief
+  * @param[in] dateTime
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeUs(AlxRtc_DateTime dateTime);
+
+/**
+  * @brief
+  * @param[in] dateTime
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeMs(AlxRtc_DateTime dateTime);
+
+/**
+  * @brief
+  * @param[in] dateTime
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeSec(AlxRtc_DateTime dateTime);
+
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_RTC_GLOBAL_H
+#endif	// #ifndef ALX_RTC_GLOBAL_H

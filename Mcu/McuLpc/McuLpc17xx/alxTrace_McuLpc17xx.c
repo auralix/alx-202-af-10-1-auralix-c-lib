@@ -35,11 +35,36 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17XX)
+#if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
+//******************************************************************************
+void AlxTrace_Ctor
+(
+	AlxTrace* me,
+	uint8_t port,
+	uint8_t pin,
+	uint8_t func,
+	LPC_USART_T* uart,
+	AlxGlobal_BaudRate baudRate)
+{
+	// Parameters
+	me->port = port;
+	me->pin = pin;
+	me->func = func;
+	me->uart = uart;
+	me->baudRate = (uint32_t)baudRate;
+
+	// Info
+	me->isInit = false;
+	me->wasCtorCalled = true;
+}
+
+
+//******************************************************************************
+// Functions
 //******************************************************************************
 void AlxTrace_Init(AlxTrace* me)
 {
@@ -74,4 +99,4 @@ void AlxTrace_WriteStr(AlxTrace* me, const char* str)
 }
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)

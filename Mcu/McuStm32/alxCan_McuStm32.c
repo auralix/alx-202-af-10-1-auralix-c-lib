@@ -28,12 +28,14 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
+#include "alxCan_McuStm32.h"
 #include "alxCan.h"
+
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if (defined(ALX_STM32F4) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED))
+#if defined(ALX_C_LIB) && ((defined(ALX_STM32F4) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED)))
 
 
 //******************************************************************************
@@ -141,9 +143,9 @@ void AlxCan_Ctor
 
 	// Variables
 
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	// STM32F4
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F4)
 	me->hcan.Init.Mode = CAN_MODE_NORMAL;
 	me->hcan.Init.TimeTriggeredMode = DISABLE;
@@ -176,9 +178,9 @@ void AlxCan_Ctor
 	#endif
 
 
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	// STM32G4
-	//******************************************************************************
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32G4)
 	me->periphClkInit.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
 	me->periphClkInit.FdcanClockSelection = RCC_FDCANCLKSOURCE_PCLK1;
@@ -223,7 +225,7 @@ void AlxCan_Ctor
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 Alx_Status AlxCan_Init(AlxCan* me)
 {
@@ -1005,4 +1007,5 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hcan, uint32_t RxFifo0ITs)
 }
 #endif
 
-#endif // (defined(ALX_STM32F4) || defined(ALX_STM32G4)) && defined(HAL_CAN_MODULE_ENABLED)
+
+#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F4) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED)))

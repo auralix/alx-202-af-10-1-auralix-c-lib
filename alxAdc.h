@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_ADC_H
 #define ALX_ADC_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -62,9 +66,15 @@ typedef struct {} AlxAdc;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_ADC_FILE "alxAdc"
+#define ALX_ADC_FILE "alxAdc.h"
 
 // Assert //
 #if defined(_ALX_ADC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -88,15 +98,44 @@ typedef struct {} AlxAdc;
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxAdc_Init(AlxAdc* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxAdc_DeInit(AlxAdc* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] ch
+  */
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);
-uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);	// MF: Optimized Func
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] ch
+  */
+uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);	// MF: Optimized function
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_ADC_H
+#endif	// #ifndef ALX_ADC_H

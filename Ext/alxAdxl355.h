@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_ADXL355_H
 #define ALX_ADXL355_H
 
@@ -32,10 +35,12 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxTimSw.h"
 #include "alxIoPin.h"
@@ -44,9 +49,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_ADXL355_FILE "alxAdxl355"
+#define ALX_ADXL355_FILE "alxAdxl355.h"
 
 // Assert //
 #if defined(_ALX_ADXL355_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -561,8 +572,6 @@ typedef union
 
 typedef struct
 {
-	// Parameters Const
-
 	// Objects - External
 	AlxSpi* spi;
 
@@ -594,6 +603,16 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] spi
+  * @param[in] spiNumOfTries
+  * @param[in] spiTimeout_ms
+  * @param[in] fifoBuff
+  * @param[in] fifoBuffLen
+  */
 void AlxAdxl355_Ctor
 (
 	AlxAdxl355* me,
@@ -608,18 +627,63 @@ void AlxAdxl355_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxAdxl355_Init(AlxAdxl355* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxAdxl355_DeInit(AlxAdxl355* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxAdxl355_Enable(AlxAdxl355* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxAdxl355_Disable(AlxAdxl355* me);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[out] xyz_g
+  */
 Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[out] xyz_g
+  * @param[in] len
+  */
 Alx_Status AlxAdxl355_GetXyzMulti_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint32_t len);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxAdxl355_GetTemp_degC(AlxAdxl355* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_ADXL355_H
+#endif	// #ifndef ALX_ADXL355_H

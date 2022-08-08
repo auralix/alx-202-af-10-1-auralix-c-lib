@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_MCP73831_H
 #define ALX_MCP73831_H
 
@@ -32,13 +35,20 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxAssert.h"
 #include "alxTrace.h"
+#include "alxAssert.h"
 #include "alxIoPin.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -73,17 +83,21 @@ typedef struct
 	// Parameters
 	AlxIoPin* di_STAT;
 
-	// Variables
-
 	// Info
-	bool wasCtorCalled;
 	bool isInit;
+	bool wasCtorCalled;
 } AlxMcp73831;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] di_STAT
+  */
 void AlxMcp73831_Ctor
 (
 	AlxMcp73831* me,
@@ -94,17 +108,54 @@ void AlxMcp73831_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxMcp73831_Init(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxMcp73831_DeInit(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMcp73831_IsBatCharging(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMcp73831_IsBatFull(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMcp73831_TriState_IsBatCharging(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMcp73831_TriState_IsBatFull(AlxMcp73831* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxMcp73831_TriState_IsShutdown(AlxMcp73831* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_MCP73831_H
+#endif	// #ifndef ALX_MCP73831_H

@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_ADC_MCU_STM32_H
 #define ALX_ADC_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -45,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -102,6 +106,21 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] adc
+  * @param[in] ioPinArr
+  * @param[in] numOfIoPins
+  * @param[in] chArr
+  * @param[in] numOfCh
+  * @param[in] clk
+  * @param[in] adcClk
+  * @param[in] samplingTime
+  * @param[in] isVrefInt_V
+  * @param[in] vrefExt_V
+  */
 void AlxAdc_Ctor
 (
 	AlxAdc* me,
@@ -118,10 +137,10 @@ void AlxAdc_Ctor
 );
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_ADC_MCU_STM32_H
+#endif	// #ifndef ALX_ADC_MCU_STM32_H

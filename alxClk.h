@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_CLK_H
 #define ALX_CLK_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -61,9 +65,15 @@ typedef struct { bool dummy; } AlxClk;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_CLK_FILE "alxClk"
+#define ALX_CLK_FILE "alxClk.h"
 
 // Assert //
 #if defined(_ALX_CLK_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -83,13 +93,6 @@ typedef struct { bool dummy; } AlxClk;
 	#define ALX_CLK_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_CLK_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_CLK_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_CLK_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Variables
@@ -98,20 +101,33 @@ extern AlxClk alxClk;
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxClk_Init(AlxClk* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] clk
+  */
 uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxClk_Irq_Handle(AlxClk* me);
 
 
-//******************************************************************************
-// Common Functions
-//******************************************************************************
-
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_CLK_H
+#endif	// #ifndef ALX_CLK_H

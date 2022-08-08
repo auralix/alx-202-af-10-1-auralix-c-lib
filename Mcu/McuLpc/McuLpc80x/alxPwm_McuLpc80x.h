@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_PWM_MCU_LPC80X_H
 #define ALX_PWM_MCU_LPC80X_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -45,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -82,6 +86,20 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] tim
+  * @param[in] ioPinArr
+  * @param[in] chArr
+  * @param[in] numOfCh
+  * @param[in] clk
+  * @param[in] dutyDefaultArr_permil
+  * @param[in] dutyDefaultArr_pct
+  * @param[in] prescaler
+  * @param[in] period
+  */
 void AlxPwm_Ctor
 (
 	AlxPwm* me,
@@ -100,10 +118,10 @@ void AlxPwm_Ctor
 );
 
 
-#endif // Module Guard
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_PWM_MCU_LPC80X_H
+#endif	// #ifndef ALX_PWM_MCU_LPC80X_H

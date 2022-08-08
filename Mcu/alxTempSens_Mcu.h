@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TEMP_SENS_MCU_H
 #define ALX_TEMP_SENS_MCU_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -49,9 +53,15 @@ typedef struct {} AlxTempSens_Mcu;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TEMP_SENS_MCU_FILE "alxTempSens_Mcu"
+#define ALX_TEMP_SENS_MCU_FILE "alxTempSens_Mcu.h"
 
 // Assert //
 #if defined(_ALX_TEMP_SENS_MCU_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -75,13 +85,30 @@ typedef struct {} AlxTempSens_Mcu;
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxTempSensMcu_Init(AlxTempSens_Mcu* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxTempSensMcu_DeInit(AlxTempSens_Mcu* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxTempSensMcu_GetTemp_degC(AlxTempSens_Mcu* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_TEMP_SENS_MCU_H
+#endif	// #ifndef ALX_TEMP_SENS_MCU_H

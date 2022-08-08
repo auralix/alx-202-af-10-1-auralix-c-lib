@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_I2C_MCU_STM32_H
 #define ALX_I2C_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -44,7 +48,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -77,6 +81,15 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] i2c
+  * @param[in] io_SCL
+  * @param[in] io_SDA
+  * @param[in] clk
+  */
 void AlxI2c_Ctor
 (
 	AlxI2c* me,
@@ -87,10 +100,10 @@ void AlxI2c_Ctor
 );
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_I2C_MCU_STM32_H
+#endif	// #ifndef ALX_I2C_MCU_STM32_H

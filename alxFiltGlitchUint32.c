@@ -24,10 +24,17 @@
   * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
   ******************************************************************************
   **/
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxFiltGlitchUint32.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -42,15 +49,15 @@ void AlxFiltGlitchUint32_Ctor
 {
 	// Ctor
 	AlxTimSw_Ctor(&me->tim, true);
-	
+
 	// Parameters
 	me->valInitial = valInitial;
 	me->stableTime_ms = stableTime_ms;
-	
+
 	// Variables
 	me->valOld = valInitial;
 	me->valFiltered = valInitial;
-	
+
 	// Info
 	me->wasCtorCalled = true;
 }
@@ -73,3 +80,6 @@ uint32_t AlxFiltGlitchUint32_Process(AlxFiltGlitchUint32* me, uint32_t valNew)
 	}
 	return me->valFiltered;
 }
+
+
+#endif	// #if defined(ALX_C_LIB)

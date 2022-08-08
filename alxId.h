@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_ID_H
 #define ALX_ID_H
 
@@ -32,10 +35,13 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
 #include "alxBuild.h"
 #include "alxBuild_GENERATED.h"
 #include "alxIoPin.h"
@@ -43,16 +49,18 @@ extern "C" {
 
 
 //******************************************************************************
-// Defines
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
+// Preprocessor
 //******************************************************************************
 #define ALX_ID_FILE "alxId.h"
 #define ALX_ID_NAME_LEN 40
 #define ALX_ID_HW_ID_IO_PIN_ARR_MAX_LEN 5
 
-
-//******************************************************************************
-// Macros
-//******************************************************************************
 
 // Assert //
 #if defined(_ALX_ID_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -257,6 +265,25 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] fwArtf
+  * @param[in] fwName
+  * @param[in] fwVerMajor
+  * @param[in] fwVerMinor
+  * @param[in] fwVerPatch
+  * @param[in] fwIsBuildJobUsed
+  * @param[in] fwIsBootloader
+  * @param[in] hwInstanceKnownArr
+  * @param[in] hwInstanceKnownArrLen
+  * @param[in] hwInstanceHwIdSupportedArr
+  * @param[in] hwInstanceHwIdSupportedArrLen
+  * @param[in] hwIdIoPinArr
+  * @param[in] hwIdIoPinArrLen
+  * @param[in] hwMcuName
+  */
 void AlxId_Ctor
 (
 	AlxId* me,
@@ -275,6 +302,20 @@ void AlxId_Ctor
 	uint8_t hwIdIoPinArrLen,
 	const char* hwMcuName
 );
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] fwArtf
+  * @param[in] fwName
+  * @param[in] fwVerMajor
+  * @param[in] fwVerMinor
+  * @param[in] fwVerPatch
+  * @param[in] fwIsBuildJobUsed
+  * @param[in] fwIsBootloader
+  * @param[in] hwInstance
+  * @param[in] hwMcuName
+  */
 void AlxId_Ctor_NoHwId
 (
 	AlxId* me,
@@ -293,17 +334,54 @@ void AlxId_Ctor_NoHwId
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxId_Init(AlxId* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 void AlxId_Trace(AlxId* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint8_t AlxId_GetHwId(AlxId* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 const char* AlxId_GetUniqueIdStr(AlxId* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 uint32_t AlxId_GetFwAppVerDate(AlxId* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 const char* AlxId_GetFwAppVerStr(AlxId* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 const char* AlxId_GetFwAppBinStr(AlxId* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_ID_H
+#endif	// #ifndef ALX_ID_H

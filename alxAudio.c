@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Functions
 //******************************************************************************
 float AlxAudio_LinerPcmInt8ToFloat(int8_t inSample)
@@ -78,3 +84,6 @@ float AlxAudio_StereoToMono(float sampleL, float sampleR)
 	float outSample = (sampleL + sampleR) / 2.f;
 	return outSample;
 }
+
+
+#endif	// #if defined(ALX_C_LIB)

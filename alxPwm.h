@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_PWM_H
 #define ALX_PWM_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -55,9 +59,15 @@ typedef struct { bool dummy; } AlxPwm;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PWM_FILE "alxPwm"
+#define ALX_PWM_FILE "alxPwm.h"
 
 // Assert //
 #if defined(_ALX_PWM_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -77,25 +87,44 @@ typedef struct { bool dummy; } AlxPwm;
 	#define ALX_PWM_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_PWM_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_PWM_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_PWM_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxPwm_Init(AlxPwm* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxPwm_DeInit(AlxPwm* me);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] ch
+  * @param[in] duty_pct
+  */
 Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] ch
+  * @param[in] duty_permil
+  */
 Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_PWM_H
+#endif	// #ifndef ALX_PWM_H

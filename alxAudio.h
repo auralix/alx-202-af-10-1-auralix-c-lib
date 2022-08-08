@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_AUDIO_H
 #define ALX_AUDIO_H
 
@@ -32,17 +35,25 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_AUDIO_FILE "alxAudio"
+#define ALX_AUDIO_FILE "alxAudio.h"
 
 // Assert //
 #if defined(_ALX_AUDIO_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -62,13 +73,6 @@ extern "C" {
 	#define ALX_AUDIO_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_AUDIO_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_AUDIO_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_AUDIO_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -86,17 +90,62 @@ typedef enum
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 float AlxAudio_LinerPcmInt8ToFloat(int8_t inSample);
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 float AlxAudio_LinerPcmUint8ToFloat(uint8_t inSample);
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 float AlxAudio_LinerPcmInt16ToFloat(int16_t inSample);
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 float AlxAudio_LinerPcmUint16ToFloat(uint16_t inSample);
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 int8_t AlxAudio_FloatToLinerPcmInt8(float inSample);
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 int16_t AlxAudio_FloatToLinerPcmInt16(float inSample);
+
+/**
+  * @brief
+  * @param[in] sampleL
+  * @param[in] sampleR
+  * @return Stereo sample
+  */
 float AlxAudio_StereoToMono(float sampleL, float sampleR);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_AUDIO_GLOBAL_H
+#endif	// #ifndef ALX_AUDIO_H

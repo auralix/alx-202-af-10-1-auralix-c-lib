@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC17XX)
+#if defined(ALX_C_LIB) && defined(ALX_LPC17XX)
 
 
 //******************************************************************************
@@ -45,7 +45,7 @@ static ADC_CHANNEL_T AlxAdcMcu_GetChannel(AlxIoPin* pin);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxAdcMcu_Ctor
 (
@@ -71,6 +71,11 @@ void AlxAdcMcu_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 void AlxAdcMcu_Init(AlxAdc_Mcu* me)
 {
 	ALX_ADC_ASSERT(me->isInit == false);
@@ -137,4 +142,4 @@ static ADC_CHANNEL_T AlxAdcMcu_GetChannel(AlxIoPin* pin)
 }
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC17XX)

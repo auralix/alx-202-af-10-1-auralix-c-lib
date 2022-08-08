@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_I2S_H
 #define ALX_I2S_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -50,9 +54,15 @@ typedef struct { bool dummy; } AlxI2s;
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_I2S_FILE "alxI2s"
+#define ALX_I2S_FILE "alxI2s.h"
 
 // Assert //
 #if defined(_ALX_I2S_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -74,57 +84,34 @@ typedef struct { bool dummy; } AlxI2s;
 	#define ALX_I2S_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_I2S_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_I2S_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_I2S_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxI2s_Init(AlxI2s* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxI2s_DeInit(AlxI2s* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxI2s_Foreground_Handle(AlxI2s* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_I2S_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//void AlxI2s_Start_Write			(AlxI2s* me, uint8_t* data, uint16_t len);
-//void AlxI2s_Stop_Write			(AlxI2s* me);
-//void AlxI2s_Start_Read			(AlxI2s* me, uint8_t* data);
-//void AlxI2s_Stop_Read			(AlxI2s* me);
-//void AlxI2s_Foreground_Handle	(AlxI2s* me);
-//uint8_t AlxI2s_GetFrameLength	(AlxI2s* me);
+#endif	// #ifndef ALX_I2S_H

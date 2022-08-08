@@ -30,6 +30,13 @@
 //******************************************************************************
 #include "alxCanParser.h"
 
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
 //******************************************************************************
 // Private Types
 //******************************************************************************
@@ -45,15 +52,16 @@ typedef union
 	uint8_t bytes[8];
 }AlxCanParser_DoubleUnion;
 
+
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-bool AlxCanParser_BitGet(uint8_t var, uint8_t bit);	
-void AlxCanParser_BitSet(uint8_t *var, uint8_t bit, bool state);
+static bool AlxCanParser_BitGet(uint8_t var, uint8_t bit);
+static void AlxCanParser_BitSet(uint8_t *var, uint8_t bit, bool state);
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 void AlxCanParser_SetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, bool value)
 {
@@ -69,7 +77,7 @@ void AlxCanParser_SetUint8(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t value)
 void AlxCanParser_SetInt8(AlxCan_Msg* msg, uint8_t byteOffset, int8_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));  	// Byte offset out of packet range
-	msg->data[byteOffset] = (uint8_t)value ; 
+	msg->data[byteOffset] = (uint8_t)value ;
 }		// Not tested
 void AlxCanParser_SetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint16_t value)
 {
@@ -218,11 +226,11 @@ void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, float value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));   	// Byte offset out of packet range
-	
+
 	// #1 Prepare variables
 	AlxCanParser_FloatUnion myFloat;
 	myFloat.number = value;
-	
+
 	// #2 Copy data to message according to endian selection
 	switch (endian)
 	{
@@ -245,11 +253,11 @@ void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, double value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));   	// Byte offset out of packet range
-	
+
 	// #1 Prepare variables
 	AlxCanParser_DoubleUnion myDouble;
 	myDouble.number = value;
-	
+
 	// #2 Copy data to message according to endian selection
 	switch(endian)
 	{
@@ -276,7 +284,7 @@ void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 
 	default: break;
 	}
-}	 // Not tested
+}	// Not tested
 void AlxCanParser_SetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, uint8_t nOfBits, uint8_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));  	// Byte offset out of packet range
@@ -284,16 +292,16 @@ void AlxCanParser_SetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset
 	ALX_CAN_PARSER_ASSERT(nOfBits < 8);		// Number of bits out of range
 
 	// #1 Copy enum bits to selected positions
-	for(uint8_t i = 0 ; i < nOfBits ; i++)				
+	for(uint8_t i = 0 ; i < nOfBits ; i++)
 	{
 		AlxCanParser_BitSet(&msg->data[byteOffset], bitOffset + i, AlxCanParser_BitGet(value, i));
 	}
-} // Tested
+}	// Tested
 bool AlxCanParser_GetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));  	// Byte offset out of packet range
 	ALX_CAN_PARSER_ASSERT(bitOffset < 8);		// Bit offset out of byte range
-	
+
 	return AlxCanParser_BitGet(msg->data[byteOffset], bitOffset);
 }	// Tested
 uint8_t AlxCanParser_GetUint8(AlxCan_Msg* msg, uint8_t byteOffset)
@@ -305,12 +313,12 @@ int8_t AlxCanParser_GetInt8(AlxCan_Msg* msg, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));  	// Byte offset out of packet range
 	return (int8_t)msg->data[byteOffset];
-}		// Not tested
+}	// Not tested
 uint16_t AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2)); 	// Byte offset out of packet range
-	
-	// #1 Prepare variables	
+
+	// #1 Prepare variables
 	uint16_t value;
 
 	// #2 Copy data according to endian selection
@@ -331,8 +339,8 @@ uint16_t AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 int16_t	AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2));  	// Byte offset out of packet range
-	
-	// #1 Prepare variables	
+
+	// #1 Prepare variables
 	uint16_t value;
 
 	// #2 Copy data according to endian selection
@@ -353,8 +361,8 @@ int16_t	AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));  	// Byte offset out of packet range
-	
-	// #1 Prepare variables	
+
+	// #1 Prepare variables
 	uint32_t value;
 
 	// #2 Copy data according to endian selection
@@ -380,8 +388,8 @@ uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));  	// Byte offset out of packet range
-	
-	// #1 Prepare variables	
+
+	// #1 Prepare variables
 	int32_t value;
 
 	// #2 Copy data according to endian selection
@@ -407,8 +415,8 @@ int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));  	// Byte offset out of packet range
-	
-	// #1 Prepare variables	
+
+	// #1 Prepare variables
 	uint64_t value;
 
 	// #2 Copy data according to endian selection
@@ -442,8 +450,8 @@ uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));  	// Byte offset out of packet range
-	
-	// #1 Prepare variables	
+
+	// #1 Prepare variables
 	int64_t value;
 
 	// #2 Copy data according to endian selection
@@ -478,9 +486,9 @@ float AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));  	// Byte offset out of packet range
 
-	// #1 Prepare variables	
+	// #1 Prepare variables
 	AlxCanParser_FloatUnion myFloat;
-	
+
 	// #2 Copy data to float union according to endian selection
 	switch (endian)
 	{
@@ -505,9 +513,9 @@ double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));	// Byte offset out of packet range
 
-	// #1 Prepare variables	
+	// #1 Prepare variables
 	AlxCanParser_DoubleUnion myDouble;
-	
+
 	// #2 Copy data to float union according to endian selection
 	switch (endian)
 	{
@@ -533,40 +541,40 @@ uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOff
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));	// Byte offset out of packet range
 	ALX_CAN_PARSER_ASSERT(bitOffset < 8);			// Bit offset out of byte range
 	ALX_CAN_PARSER_ASSERT(nOfBits < 8);			// Number of bits out of range
-	
+
 	// #1 Prepare variables
 	uint8_t value = 0;
-	
+
 	// #2 Set enum bits to selected positions
 	for (uint8_t i = 0; i < nOfBits; i++)				// copy bits to selected positions
 	{
 		AlxCanParser_BitSet(&value, i, AlxCanParser_BitGet(msg->data[byteOffset], bitOffset + i));
 	}
 	return value;
-} // Tested
+}	// Tested
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-bool AlxCanParser_BitGet(uint8_t var, uint8_t bit) 
+static bool AlxCanParser_BitGet(uint8_t var, uint8_t bit)
 {
 	ALX_CAN_PARSER_ASSERT(bit < 8);  		// Bit offset out of byte range
-	
+
 	// #1 Prepare variables
 	uint8_t mask = 0x01;
-	
+
 	// #2 Prepare mask
 	mask = mask << bit;
-	
+
 	// #3 Check bit state
 	if((var&mask) > 0){ return true; }
 	return false;
 }
-void AlxCanParser_BitSet(uint8_t *var, uint8_t bit, bool state)
+static void AlxCanParser_BitSet(uint8_t *var, uint8_t bit, bool state)
 {
 	ALX_CAN_PARSER_ASSERT(bit < 8);  		// Bit offset out of byte range
-	
+
 	// #1 Set bit
 	if(state) {
 		*var |=  (0x01 << bit);
@@ -576,3 +584,6 @@ void AlxCanParser_BitSet(uint8_t *var, uint8_t bit, bool state)
 		*var &= ~(0x01 << bit);
 	}
 }
+
+
+#endif	// #if defined(ALX_C_LIB)

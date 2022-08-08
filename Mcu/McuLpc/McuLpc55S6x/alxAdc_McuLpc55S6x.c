@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC55S6X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
@@ -358,7 +358,6 @@ static bool AlxAdc_Ctor_IsMainClkOk(AlxAdc* me)
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return false;
 }
-
 static void AlxAdc_SetClkDiv(AlxAdc* me)
 {
 	// Assert
@@ -395,4 +394,4 @@ static lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_C
 }
 
 
-#endif // Module Guard
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)

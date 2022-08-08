@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_OS_DELAY_H
 #define ALX_OS_DELAY_H
 
@@ -32,18 +35,19 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxAssert.h"
 #include "alxTrace.h"
+#include "alxAssert.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_OS) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 
 //******************************************************************************
@@ -93,6 +97,13 @@ extern AlxOsDelay alxOsDelay;
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] osTick
+  * @param[in] approxDisable
+  */
 void AlxOsDelay_Ctor
 (
 	AlxOsDelay* me,
@@ -104,17 +115,47 @@ void AlxOsDelay_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] osDelay_us
+  */
 void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] osDelay_ms
+  */
 void AlxOsDelay_ms(AlxOsDelay* me, uint64_t osDelay_ms);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] osDelay_sec
+  */
 void AlxOsDelay_sec(AlxOsDelay* me, uint64_t osDelay_sec);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] osDelay_min
+  */
 void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] osDelay_hr
+  */
 void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr);
 
 
-#endif // #if defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_OS_DELAY_H
+#endif	// #ifndef ALX_OS_DELAY_H

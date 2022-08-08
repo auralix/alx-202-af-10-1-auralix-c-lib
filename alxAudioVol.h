@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_AUDIO_VOL_H
 #define ALX_AUDIO_VOL_H
 
@@ -32,18 +35,26 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxLinFun.h"
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_AUDIO_VOL_FILE "alxAudioVol"
+#define ALX_AUDIO_VOL_FILE "alxAudioVol.h"
 
 // Assert //
 #if defined(_ALX_AUDIO_VOL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -63,13 +74,6 @@ extern "C" {
 	#define ALX_AUDIO_VOL_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_AUDIO_VOL_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_AUDIO_VOL_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_AUDIO_VOL_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -79,10 +83,10 @@ typedef struct
 	// Parameters
 	float volMin_dB;
 	float volMax_dB;
-	
+
 	// Objects - Internal
 	AlxLinFun linFun_x_pct_y_dB;
-	
+
 	// Variables
 	float pctMax;
 	float volFactor;	// Can be negative value for attenuation
@@ -92,6 +96,13 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] volMin_dB
+  * @param[in] volMax_dB
+  */
 void AlxAudioVol_Ctor
 (
 	AlxAudioVol* me,
@@ -103,13 +114,33 @@ void AlxAudioVol_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] inSample
+  */
 float AlxAudioVol_Process(AlxAudioVol* me, float inSample);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] vol_pct
+  */
 void AlxAudioVol_Set_pct(AlxAudioVol* me, float vol_pct);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] vol_dB
+  */
 void AlxAudioVol_Set_dB(AlxAudioVol* me, float vol_dB);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_AUDIO_VOL_H
+#endif	// #ifndef ALX_AUDIO_VOL_H

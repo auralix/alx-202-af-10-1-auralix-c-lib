@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_I2S_MCU_STM32_H
 #define ALX_I2S_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -45,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 
 //******************************************************************************
@@ -96,6 +100,25 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] i2s
+  * @param[in] do_MCLK
+  * @param[in] do_BCLK
+  * @param[in] do_LRCLK
+  * @param[in] do_SDO
+  * @param[in] di_SDI
+  * @param[in] clk
+  * @param[in] i2sClk
+  * @param[in] audioMode
+  * @param[in] dataSize
+  * @param[in] isMclkUsed
+  * @param[in] txIrqPriority
+  * @param[in] me
+  * @param[in] me
+  */
 void AlxI2s_Ctor
 (
 	AlxI2s* me,
@@ -113,60 +136,11 @@ void AlxI2s_Ctor
 	Alx_IrqPriority txIrqPriority
 );
 
-#endif
+
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_I2S_MCU_STM32_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//	uint8_t* txAudioPtr;
-//	uint16_t txAudioSize;
-//	uint16_t txPrtHandle;
-//	uint8_t* rxAudioPtr;
-//	uint16_t rxAudioSize;
-//	uint16_t rxPrtHandle;
-
-//	bool isErr;
-//	bool isTxAudio;
-//	bool isRxAudio;
-//	// TODO Channel TX Flag
-//	// TODO Channel RX Flag
+#endif	// #ifndef ALX_I2S_MCU_STM32_H

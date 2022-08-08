@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_OS_THREAD_H
 #define ALX_OS_THREAD_H
 
@@ -32,18 +35,19 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxAssert.h"
 #include "alxTrace.h"
+#include "alxAssert.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_OS) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 
 //******************************************************************************
@@ -97,7 +101,16 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-#if defined(ALX_FREE_RTOS)
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] pxTaskCode
+  * @param[in] pcName
+  * @param[in] usStackDepth
+  * @param[in] pvParameters
+  * @param[in] uxPriority
+  */
 void AlxOsThread_Ctor
 (
 	AlxOsThread* me,
@@ -107,19 +120,23 @@ void AlxOsThread_Ctor
 	void* const pvParameters,
 	UBaseType_t uxPriority
 );
-#endif
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxOsThread_Start(AlxOsThread* me);
 
 
-#endif // #if defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_OS_THREAD_H
+#endif	// #ifndef ALX_OS_THREAD_H

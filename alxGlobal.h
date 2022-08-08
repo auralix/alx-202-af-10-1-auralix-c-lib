@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_GLOBAL_H
 #define ALX_GLOBAL_H
 
@@ -32,10 +35,11 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes - ALX Config
 //******************************************************************************
-#include <alxConfig.h>
+#include "alxConfig.h"
 
 
 //******************************************************************************
@@ -164,9 +168,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_GLOBAL_FILE "alxGlobal"
+#define ALX_GLOBAL_FILE "alxGlobal.h"
 
 // Assert //
 #if defined(_ALX_GLOBAL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -386,18 +396,65 @@ typedef enum
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  */
 void AlxGlobal_DisableIrq(void);
+
+/**
+  * @brief
+  */
 void AlxGlobal_EnableIrq(void);
+
+/**
+  * @brief
+  * @param[in] uint64
+  * @param[out] str
+  */
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
+
+/**
+  * @brief
+  * @param[in,out] valPtr
+  * @param[in] valMin
+  * @param[in] valMax
+  */
 Alx_Status AlxGlobal_BoundUint32(uint32_t* valPtr, uint32_t valMin, uint32_t valMax);
+
+/**
+  * @brief
+  * @param[in,out] valPtr
+  * @param[in] valMin
+  * @param[in] valMax
+  */
 Alx_Status AlxGlobal_BoundFloat(float* valPtr, float valMin, float valMax);
+
+/**
+  * @brief
+  * @param[in] val
+  */
 uint32_t AlxGlobal_Round(float val);
+
+/**
+  * @brief
+  * @param[in] val
+  * @param[in] valMin
+  * @param[in] valMax
+  */
 bool AlxGlobal_IsOutOfRangeUint8(uint8_t val, uint8_t valMin, uint8_t valMax);
+
+/**
+  * @brief
+  * @param[in] val
+  */
 uint32_t AlxGlobal_Ntohl(uint32_t val);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_GLOBAL_H
+#endif	// #ifndef ALX_GLOBAL_H

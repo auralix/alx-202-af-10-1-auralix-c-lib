@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_BTS724G_H
 #define ALX_BTS724G_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -43,9 +47,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_BTS724G_FILE "alxBts724g"
+#define ALX_BTS724G_FILE "alxBts724g.h"
 
 // Assert //
 #if defined(_ALX_BTS724G_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -101,6 +111,13 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] do_HS_IN
+  * @param[in] di_HS_ST
+  */
 void AlxBts724g_Ctor
 (
 	AlxBts724g* me,
@@ -112,20 +129,72 @@ void AlxBts724g_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBts724g_Init(AlxBts724g* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBts724g_DeInit(AlxBts724g* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBts724g_Handle(AlxBts724g* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBts724g_SetOut(AlxBts724g* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBts724g_ResetOut(AlxBts724g* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBts724g_WriteOut(AlxBts724g* me, bool state);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBts724g_IsOpenLoadDetected(AlxBts724g* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxBts724g_IsOverTempDetected(AlxBts724g* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 bool AlxBts724g_WasOpenLoadDetected(AlxBts724g* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 bool AlxBts724g_WasOverTempDetected(AlxBts724g* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_BTS724G_H
+#endif	// #ifndef ALX_BTS724G_H

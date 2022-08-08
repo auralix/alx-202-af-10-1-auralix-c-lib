@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Private Functions
 //******************************************************************************
 static void AlxAdxl355_RegStruct_SetAddr(AlxAdxl355* me);
@@ -69,8 +75,6 @@ void AlxAdxl355_Ctor
 {
 	// Ctor
 	AlxFifo_Ctor(&me->fifo, fifoBuff, fifoBuffLen);
-
-	// Parameters Const
 
 	// Objects - External
 	me->spi = spi;
@@ -168,17 +172,17 @@ Alx_Status AlxAdxl355_Enable(AlxAdxl355* me)
 {
 	ALX_ADXL355_ASSERT(me->isInit == true);
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
-	
+
 	Alx_Status status = Alx_Err;
-	
+
 	// #1 Flush FIFO
 	AlxFifo_Flush(&me->fifo);
-	
+
 	// #2 Force measurement mode
 	me->reg._0x2D_POWER_CTL.val.Standby = Standby_MeasurementMode;
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2D_POWER_CTL	);
 	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x2D_POWER_CTL	"); return status;}
-	
+
 	// #3 Return OK
 	return Alx_Ok;
 }
@@ -186,17 +190,17 @@ Alx_Status AlxAdxl355_Disable(AlxAdxl355* me)
 {
 	ALX_ADXL355_ASSERT(me->isInit == true);
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
-	
+
 	Alx_Status status = Alx_Err;
-	
+
 	// #1 Flush FIFO
 	AlxFifo_Flush(&me->fifo);
-	
+
 	// #2 Force stanby mode
 	me->reg._0x2D_POWER_CTL.val.Standby = Standby_StandbyMode;
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2D_POWER_CTL	);
 	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x2D_POWER_CTL	"); return status;}
-	
+
 	// #3 Return OK
 	return Alx_Ok;
 }
@@ -559,3 +563,6 @@ ALX_WEAK void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me)
 	ALX_ADXL355_TRACE("Define 'AlxAdxl355_RegStruct_SetVal' function in your application.");
 	ALX_ADXL355_ASSERT(false);
 }
+
+
+#endif	// #if defined(ALX_C_LIB)

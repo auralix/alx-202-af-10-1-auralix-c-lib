@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_AUDIO_PLAYER_H
 #define ALX_AUDIO_PLAYER_H
 
@@ -32,18 +35,26 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxAudio.h"
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_AUDIO_PLAYER_FILE "alxAudioPlayer"
+#define ALX_AUDIO_PLAYER_FILE "alxAudioPlayer.h"
 
 // Assert //
 #if defined(_ALX_AUDIO_PLAYER_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -63,13 +74,6 @@ extern "C" {
 	#define ALX_AUDIO_PLAYER_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_AUDIO_PLAYER_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_AUDIO_PLAYER_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_AUDIO_PLAYER_DBG_PIN(...) do{} while (false)
-#endif
-
 
 //******************************************************************************
 // Types
@@ -79,7 +83,7 @@ typedef struct
 	// Parameters - Const
 	uint8_t TRACK_SAMPLE_R_OFFSET_8bit_Byte;	// Offset of the beginning of right channel sample relative to the beginning of left channel sample
 	uint8_t TRACK_SAMPLE_R_OFFSET_16bit_Byte;
-	
+
 	// Parameters
 	const uint8_t* trackPtr;
 	uint32_t trackLen_Byte;				// Track length in bytes
@@ -100,6 +104,16 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] defaultTrackPtr
+  * @param[in] defaultTrackLen_Byte
+  * @param[in] defaultTrackStartOffset_Sample
+  * @param[in] defaultTrackEncoding
+  * @param[in] isDefaultTrackMono
+  */
 void AlxAudioPlayer_Ctor
 (
 	AlxAudioPlayer* me,
@@ -114,23 +128,96 @@ void AlxAudioPlayer_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] trackPtr
+  * @param[in] len_Byte
+  * @param[in] startOffset_Sample
+  * @param[in] encoding
+  * @param[in] isMono
+  */
 void AlxAudioPlayer_LoadTrack(AlxAudioPlayer* me, const uint8_t* trackPtr, uint32_t len_Byte, uint32_t startOffset_Sample, AlxAudio_Encoding encoding, bool isMono);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 float AlxAudioPlayer_GetSampleL(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 float AlxAudioPlayer_GetSampleR(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 float AlxAudioPlayer_GetSampleMono(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_IncSampleOffset(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_Play(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_Stop(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_Pause(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_Replay(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_LoopOn(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_LoopOff(AlxAudioPlayer* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] isOn
+  */
 void AlxAudioPlayer_LoopConfig(AlxAudioPlayer* me, bool isOn);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 bool AlxAudioPlayer_IsPlaying(AlxAudioPlayer* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_AUDIO_PLAYER_H
+#endif	// #ifndef ALX_AUDIO_PLAYER_H

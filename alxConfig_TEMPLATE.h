@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxConfig.h
-  * @brief		Auralix C Library - ALX Configuration File Template
+  * @brief		Auralix C Library - ALX Configuration File
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -25,13 +25,16 @@
   ******************************************************************************
   **/
 
-
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_CONFIG_H
 #define ALX_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Configuration
@@ -118,4 +121,4 @@ extern "C" {
 }
 #endif
 
-#endif // ALX_CONFIG_H
+#endif	// #ifndef ALX_CONFIG_H

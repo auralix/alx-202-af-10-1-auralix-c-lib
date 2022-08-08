@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_GLOBAL_MCU_LPC80X_H
 #define ALX_GLOBAL_MCU_LPC80X_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -41,7 +45,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -80,14 +84,27 @@ extern "C" {
 //******************************************************************************
 // IoPin Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] pin
+  * @param[in] port
+  */
 uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port);
+
+/**
+  * @brief
+  * @param[in] pin
+  * @param[in] port
+  * @param[in] mode
+  */
 void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode);
 
 
-#endif // Module Guard
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_GLOBAL_MCU_LPC80X_H
+#endif	// #ifndef ALX_GLOBAL_MCU_LPC80X_H

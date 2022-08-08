@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TMP1075_H
 #define ALX_TMP1075_H
 
@@ -32,10 +35,12 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxTimSw.h"
 #include "alxIoPin.h"
@@ -43,9 +48,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TMP1075_FILE "alxTmp1075"
+#define ALX_TMP1075_FILE "alxTmp1075.h"
 
 // Assert //
 #if defined(_ALX_TMP1075_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -71,7 +82,7 @@ extern "C" {
 //******************************************************************************
 // Register Values Unions
 //******************************************************************************
-	
+
 // R0: Temp  //
 typedef union
 {
@@ -81,7 +92,7 @@ typedef union
 	};
 	uint16_t raw;
 } AlxTmp1075_RegVal_R0_Temp;
-	
+
 // R1: Configuration  //
 typedef enum
 {
@@ -137,31 +148,32 @@ typedef union
 	{
 		struct __attribute__((packed))
 		{
-			uint16_t L;	
+			uint16_t L;
 		};
 		uint16_t raw;
 	} AlxTmp1075_RegVal_R2_LimitLow;
-	
+
 // R3: High limit  //
 typedef union
 	{
 		struct __attribute__((packed))
 		{
-			uint16_t H;	
+			uint16_t H;
 		};
 		uint16_t raw;
 	} AlxTmp1075_RegVal_R3_LimitHigh;
-	
+
 // R4: Device ID register  //
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t DID;	
+		uint16_t DID;
 	};
 	uint16_t raw;
 } AlxTmp1075_RegVal_R4_DeviceId;
-	
+
+
 //******************************************************************************
 // Register Group Values Unions
 //******************************************************************************
@@ -200,12 +212,13 @@ typedef struct
 	uint8_t len;
 	AlxTmp1075_RegVal_R4_DeviceId val;
 } AlxTmp1075_Reg_R4_DeviceId;
-	
-	
+
+
 //******************************************************************************
 // Register Group Structures
 //******************************************************************************
-	
+
+
 //******************************************************************************
 // Main Register Structure
 //******************************************************************************
@@ -222,16 +235,10 @@ typedef struct
 //******************************************************************************
 // Types
 //******************************************************************************
-
-
 typedef struct
 {
-	// Parameters Const
-
 	// Objects - External
 	AlxI2c* i2c;
-
-	// Objects - Internal
 
 	// Parameters
 	float DEG_C_PER_BIT;
@@ -244,7 +251,7 @@ typedef struct
 	AlxTmp1075_Reg reg;
 	int16_t temp_raw;
 	float temp_degC;
-	
+
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
@@ -254,12 +261,22 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] i2c
+  * @param[in] i2cAddr
+  * @param[in] i2cCheckWithRead
+  * @param[in] i2cNumOfTries
+  * @param[in] i2cTimeout_ms
+  */
 void AlxTmp1075_Ctor
 (
 	AlxTmp1075* me,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
-	bool i2cCheckWithRead, // ???
+	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
 );
@@ -268,13 +285,30 @@ void AlxTmp1075_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxTmp1075_Init(AlxTmp1075* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxTmp1075_DeInit(AlxTmp1075* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 float AlxTmp1075_GetTemp_degC(AlxTmp1075* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_TMP1075_H
+#endif	// #ifndef ALX_TMP1075_H

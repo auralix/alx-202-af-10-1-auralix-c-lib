@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_V_DIV_H
 #define ALX_V_DIV_H
 
@@ -32,18 +35,26 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxTimSw.h"
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_V_DIV_FILE "alxVdiv"
+#define ALX_V_DIV_FILE "alxVdiv.h"
 
 // Assert //
 #if defined(_ALX_V_DIV_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -63,38 +74,87 @@ extern "C" {
 	#define ALX_V_DIV_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_V_DIV_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_V_DIV_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_V_DIV_DBG_PIN(...) do{} while (false)
-#endif
-
-
-//******************************************************************************
-// Types
-//******************************************************************************
-
-//******************************************************************************
-// Constructor
-//******************************************************************************
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] vin_V
+  * @param[in] resHigh_kOhm
+  * @param[in] resLow_kOhm
+  */
 float AlxVdiv_GetVout_V(float vin_V, float resHigh_kOhm, float resLow_kOhm);
+
+/**
+  * @brief
+  * @param[in] vout_V
+  * @param[in] resHigh_kOhm
+  * @param[in] resLow_kOhm
+  */
 float AlxVdiv_GetVin_V(float vout_V, float resHigh_kOhm, float resLow_kOhm);
+
+/**
+  * @brief
+  * @param[in] vin_V
+  * @param[in] vout_V
+  * @param[in] resLow_kOhm
+  */
 float AlxVdiv_GetResHigh_kOhm(float vin_V, float vout_V, float resLow_kOhm);
+
+/**
+  * @brief
+  * @param[in] vin_V
+  * @param[in] vout_V
+  * @param[in] resHigh_kOhm
+  */
 float AlxVdiv_GetResLow_kOhm(float vin_V, float vout_V, float resHigh_kOhm);
+
+/**
+  * @brief
+  * @param[in] vin_mV
+  * @param[in] resHigh_ohm
+  * @param[in] resLow_ohm
+  */
 uint32_t AlxVdiv_GetVout_mV(uint32_t vin_mV, uint32_t resHigh_ohm, uint32_t resLow_ohm);
+
+/**
+  * @brief
+  * @param[in] vout_mV
+  * @param[in] resHigh_ohm
+  * @param[in] resLow_ohm
+  */
 uint32_t AlxVdiv_GetVin_mV(uint32_t vout_mV, uint32_t resHigh_ohm, uint32_t resLow_ohm);
+
+/**
+  * @brief
+  * @param[in] vin_mV
+  * @param[in] vout_mV
+  * @param[in] resLow_ohm
+  */
 uint32_t AlxVdiv_GetResHigh_ohm(uint32_t vin_mV, uint32_t vout_mV, uint32_t resLow_ohm);
+
+/**
+  * @brief
+  * @param[in] vin_mV
+  * @param[in] vout_mV
+  * @param[in] resHigh_ohm
+  */
 uint32_t AlxVdiv_GetResLow_ohm(uint32_t vin_mV, uint32_t vout_mV, uint32_t resHigh_ohm);
+
+/**
+  * @brief
+  * @param[in] vout_uV
+  * @param[in] resLow_ohm
+  */
 uint32_t AlxVdiv_GetCurrent_uA(uint32_t vout_uV, uint32_t resLow_ohm);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_V_DIV_H
+#endif	// #ifndef ALX_V_DIV_H

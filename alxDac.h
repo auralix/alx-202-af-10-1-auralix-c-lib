@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_DAC_H
 #define ALX_DAC_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -47,9 +51,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_DAC_FILE "alxDac"
+#define ALX_DAC_FILE "alxDac.h"
 
 // Assert //
 #if defined(_ALX_DAC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -69,12 +79,6 @@ extern "C" {
 	#define ALX_DAC_TRACE(...) do{} while (false)
 #endif
 
-// DbgPin //
-#if defined(_ALX_DAC_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_DAC_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_DAC_DBG_PIN(...) do{} while (false)
-#endif
 
 // Number of Submodules //
 #define ALX_DAC_NUM_OF_SUBMODULES 1
@@ -108,18 +112,58 @@ typedef struct
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] submodule
+  * @param[in] submodulePtr
+  */
 void AlxDac_Ctor(AlxDac* me, AlxDac_Submodule submodule, void *submodulePtr);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxDac_Init(AlxDac* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] vref_V
+  */
 Alx_Status AlxDac_Init_CalibrateVref(AlxDac* me, float vref_V);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxDac_DeInit(AlxDac* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] ch
+  * @param[in] voltage_V
+  */
 Alx_Status AlxDac_SetVoltage_V(AlxDac* me, Alx_Ch ch, float voltage_V);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] ch
+  * @param[in] voltage_V
+  * @param[in] vref_V
+  */
 Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltage_V, float vref_V);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_DAC_H
+#endif	// #ifndef ALX_DAC_H

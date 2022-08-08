@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -77,7 +77,7 @@ void AlxI2c_Ctor
 	me->hi2c.Init.OwnAddress2 = 0;
 	me->hi2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	me->hi2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-	
+
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L0)
 	me->hi2c.Init.Timing = AlxI2c_ParseClk(clk);
 	me->hi2c.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
@@ -94,7 +94,7 @@ void AlxI2c_Ctor
 
 
 //******************************************************************************
-// Specific Functions
+// Functions
 //******************************************************************************
 Alx_Status AlxI2c_Init(AlxI2c* me)
 {
@@ -107,13 +107,13 @@ Alx_Status AlxI2c_Init(AlxI2c* me)
 
 	// #2 Release I2C Periphery Reset
 	AlxI2c_Periph_ReleaseReset(me);
-	
+
 	// #3 Enable I2C Periphery Clock
 	AlxI2c_Periph_EnableClk(me);
 
 	// #4 Init I2C
 	if (HAL_I2C_Init(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("ErrInit"); return Alx_Err; }
-	
+
 	// #5 Set isInit
 	me->isInit = true;
 
@@ -124,13 +124,13 @@ Alx_Status AlxI2c_DeInit(AlxI2c* me)
 {
 	ALX_I2C_ASSERT(me->isInit == true);
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
-	
+
 	// #1 DeInit I2C
 	if (HAL_I2C_DeInit(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("ErrDeInit"); return Alx_Err; }
 
 	// #2 Force I2C Periphery Reset
 	AlxI2c_Periph_ForceReset(me);
-	
+
 	// #3 Disable I2C Periphery Clock
 	AlxI2c_Periph_DisableClk(me);
 
@@ -322,12 +322,12 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 					continue;
 				}
 				else if (status != Alx_Ok)
-				{ 
+				{
 					ALX_I2C_ASSERT(false); // We should never get here
 					return Alx_Err;
 				}
 				else if (memcmp(buff, data, len) != 0) // Check previously written data
-				{ 
+				{
 					ALX_I2C_TRACE("Read_ErrCheckWithRead");
 					continue;
 				}
@@ -415,7 +415,7 @@ static Alx_Status AlxI2c_Reset(AlxI2c* me)
 
 	// #4 Release I2C Periphery Reset
 	AlxI2c_Periph_ReleaseReset(me);
-	
+
 	// #5 Init I2C
 	if (HAL_I2C_Init(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("ErrInit"); return Alx_Err; }
 
@@ -428,7 +428,7 @@ static Alx_Status AlxI2c_Reset(AlxI2c* me)
 static void AlxI2c_Periph_EnableClk(AlxI2c* me)
 {
 	bool isErr = true;
-	
+
 	#if defined(I2C1)
 	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_CLK_ENABLE(); isErr = false; }
 	#endif
@@ -441,13 +441,13 @@ static void AlxI2c_Periph_EnableClk(AlxI2c* me)
 	#if defined(I2C4)
 	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_CLK_ENABLE(); isErr = false; }
 	#endif
-	
+
 	if(isErr)						{ ALX_I2C_ASSERT(false); } // We shouldn't get here
 }
 static void AlxI2c_Periph_DisableClk(AlxI2c* me)
 {
 	bool isErr = true;
-	
+
 	#if defined(I2C1)
 	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_CLK_DISABLE(); isErr = false; }
 	#endif
@@ -460,13 +460,13 @@ static void AlxI2c_Periph_DisableClk(AlxI2c* me)
 	#if defined(I2C4)
 	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_CLK_DISABLE(); isErr = false; }
 	#endif
-	
+
 	if(isErr)						{ ALX_I2C_ASSERT(false); } // We shouldn't get here
 }
 static void AlxI2c_Periph_ForceReset(AlxI2c* me)
 {
 	bool isErr = true;
-	
+
 	#if defined(I2C1)
 	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_FORCE_RESET(); isErr = false; }
 	#endif
@@ -479,13 +479,13 @@ static void AlxI2c_Periph_ForceReset(AlxI2c* me)
 	#if defined(I2C4)
 	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_FORCE_RESET(); isErr = false; }
 	#endif
-	
+
 	if(isErr)						{ ALX_I2C_ASSERT(false); } // We shouldn't get here
 }
 static void AlxI2c_Periph_ReleaseReset(AlxI2c* me)
 {
 	bool isErr = true;
-	
+
 	#if defined(I2C1)
 	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_RELEASE_RESET(); isErr = false; }
 	#endif
@@ -498,9 +498,9 @@ static void AlxI2c_Periph_ReleaseReset(AlxI2c* me)
 	#if defined(I2C4)
 	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_RELEASE_RESET(); isErr = false; }
 	#endif
-	
+
 	if(isErr)						{ ALX_I2C_ASSERT(false); } // We shouldn't get here
 }
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))

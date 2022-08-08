@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -48,7 +48,7 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxIoPin_Ctor
 (
@@ -88,6 +88,11 @@ void AlxIoPin_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 void AlxIoPin_Init(AlxIoPin* me)
 {
 	// Assert
@@ -532,4 +537,4 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me)
 }
 
 
-#endif // Module Guard
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

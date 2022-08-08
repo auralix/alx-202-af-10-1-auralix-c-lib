@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Private Functions
 //******************************************************************************
 static bool AlxParamStore_IsParamGroupInitOk(AlxParamStore* me);
@@ -408,3 +414,6 @@ static void AlxParamStore_Handle_4xGroup(AlxParamStore* me)
 	(void)me;
 	ALX_PARAM_STORE_ASSERT(false);
 }
+
+
+#endif	// #if defined(ALX_C_LIB)

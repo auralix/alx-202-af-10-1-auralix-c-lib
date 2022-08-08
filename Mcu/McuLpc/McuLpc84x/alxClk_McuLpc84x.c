@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -49,7 +49,27 @@ static void AlxClk_SetExtClk(AlxClk* me, bool sysOsc);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
+//******************************************************************************
+void AlxClk_Ctor
+(
+	AlxClk* me,
+	clock_main_clk_src_t mainClkSource,
+	uint32_t clkFreq,
+	uint8_t divider)
+{
+	// Parameters
+	me->mainClkSource = mainClkSource;
+	me->clkFreq = clkFreq;
+	me->divider = divider;
+
+	// Info
+	me->wasCtorCalled = true;
+}
+
+
+//******************************************************************************
+// Functions
 //******************************************************************************
 void AlxClk_Init(AlxClk* me)
 {
@@ -74,7 +94,7 @@ void AlxClk_Init(AlxClk* me)
 	CLOCK_SetMainClkSrc(me->mainClkSource); 		// Select main clock in MAINCLKSEL and update MAINCLKUEN
 	CLOCK_SetCoreSysClkDiv(me->divider); 		// Divide main clk to provide the system clk to the core, memories, and the perispherals.
 	SystemCoreClock = (me->clkFreq * 1000U);  	// Set SystemCoreClock variable.
-	
+
 	// #5 Enable LPO
 	POWER_EnbaleLPO(true);
 	//POWER_EnbaleLPOInDeepPowerDownMode(true);
@@ -116,4 +136,4 @@ static void AlxClk_SetExtClk(AlxClk* me, bool sysOsc)
 }
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)

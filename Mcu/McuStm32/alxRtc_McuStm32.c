@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F4)
 
 
 //******************************************************************************
@@ -53,15 +53,11 @@ void AlxRtc_Ctor
 	AlxRtc_Clk rtcClk
 )
 {
-	// Objects - External
-
 	// Parameters
 	me->rtcClk = rtcClk;
 
 	// Private Variables
 	alxRtc_me = me;
-
-	// Variables
 
 	// RTC - Oscillator
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_LSE;
@@ -522,7 +518,6 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
 	if(HAL_RCCEx_PeriphCLKConfig(&alxRtc_me->iclk) != HAL_OK)	{ ALX_RTC_TRACE("ErrClk"); alxRtc_me->isErr = true; };
 	__HAL_RCC_RTC_ENABLE();
 }
-
 void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
 {
 	(void)hrtc;
@@ -531,4 +526,4 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
 }
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4)

@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_PWR_H
 #define ALX_PWR_H
 
@@ -32,17 +35,24 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxAssert.h"
 #include "alxTrace.h"
+#include "alxAssert.h"
 #include "alxAdc.h"
 #include "alxFiltGlitchBool.h"
 #include "alxHys2.h"
 #include "alxIoPin.h"
 #include "alxVdiv.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -104,6 +114,21 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] adc
+  * @param[in] chAdc
+  * @param[in] vdiv_ResHigh_kOhm
+  * @param[in] vdiv_ResLow_kOhm
+  * @param[in] hys2_TopHigh_V
+  * @param[in] hys2_TopLow_V
+  * @param[in] hys2_BotHigh_V
+  * @param[in] hys2_BotLow_V
+  * @param[in] filtGlitchBool_StableTrueTime_ms
+  * @param[in] filtGlitchBool_StableFalseTime_ms
+  */
 void AlxPwr_Ctor
 (
 	AlxPwr* me,
@@ -123,16 +148,48 @@ void AlxPwr_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxPwr_Init(AlxPwr* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxPwr_DeInit(AlxPwr* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxPwr_Handle(AlxPwr* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxPwr_IsGood(AlxPwr* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxPwr_IsNotGood(AlxPwr* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxPwr_IsErr(AlxPwr* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_PWR_H
+#endif	// #ifndef ALX_PWR_H

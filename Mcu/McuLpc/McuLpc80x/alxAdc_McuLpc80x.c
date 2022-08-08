@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
 
 
 //******************************************************************************
@@ -57,7 +57,7 @@ static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me);
 
 
 //******************************************************************************
-// Specific Functions
+// Constructor
 //******************************************************************************
 void AlxAdc_Ctor
 (
@@ -127,6 +127,11 @@ void AlxAdc_Ctor
 	me->isInit = false;
 	me->wasCtorCalled = true;
 }
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
 Alx_Status AlxAdc_Init(AlxAdc* me)
 {
 	// Assert
@@ -286,4 +291,5 @@ static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me)
 	#endif
 }
 
-#endif // Module Guard
+
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

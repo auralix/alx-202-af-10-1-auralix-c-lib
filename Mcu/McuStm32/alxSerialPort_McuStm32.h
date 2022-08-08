@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_SERIAL_PORT_MCU_STM32_H
 #define ALX_SERIAL_PORT_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -45,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -76,6 +80,22 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] uart
+  * @param[in] do_TX
+  * @param[in] di_RX
+  * @param[in] baudRate
+  * @param[in] dataWidth
+  * @param[in] stopBits
+  * @param[in] parity
+  * @param[in] txTimeout_ms
+  * @param[in] rxFifoBuff
+  * @param[in] rxFifoBuffLen
+  * @param[in] rxIrqPriority
+  */
 void AlxSerialPort_Ctor
 (
 	AlxSerialPort* me,
@@ -93,10 +113,10 @@ void AlxSerialPort_Ctor
 );
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_SERIAL_PORT_MCU_STM32_H
+#endif	// #ifndef ALX_SERIAL_PORT_MCU_STM32_H

@@ -32,6 +32,12 @@
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Functions
 //******************************************************************************
 Alx_Status AlxBound_Uint8(uint8_t* val, uint8_t valMin, uint8_t valMax)
@@ -204,23 +210,23 @@ Alx_Status AlxBound_Double(double* val, double valMin, double valMax)
 
 	return Alx_Ok;
 }
-/*Alx_Status AlxBound_Arrr(char* valBounded, char* val, uint32_t valLenMax)
-{
-	ALX_BOUND_ASSERT(0 < valLenMax);
-
-	uint32_t valLen = strlen(val);
-	if (valLen >= (valLenMax - 1))
-	{
-		memcpy(valBounded, val, valLenMax - 1);
-		valBounded[valLenMax - 1] = 0;	// Terminate string
-		return Alx_ErrBoundLen;
-	}
-	else
-	{
-		strcpy(valBounded, val);
-		return Alx_Ok;
-	}
-}*/	// TO DO
+//Alx_Status AlxBound_Arr(char* valBounded, char* val, uint32_t valLenMax)
+//{
+//	ALX_BOUND_ASSERT(0 < valLenMax);
+//
+//	uint32_t valLen = strlen(val);
+//	if (valLen >= (valLenMax - 1))
+//	{
+//		memcpy(valBounded, val, valLenMax - 1);
+//		valBounded[valLenMax - 1] = 0;	// Terminate string
+//		return Alx_ErrBoundLen;
+//	}
+//	else
+//	{
+//		strcpy(valBounded, val);
+//		return Alx_Ok;
+//	}
+//}
 Alx_Status AlxBound_Str(char* valBounded, char* val, uint32_t valLenMax)
 {
 	ALX_BOUND_ASSERT(0 < valLenMax);
@@ -238,3 +244,6 @@ Alx_Status AlxBound_Str(char* valBounded, char* val, uint32_t valLenMax)
 		return Alx_Ok;
 	}
 }
+
+
+#endif	// #if defined(ALX_C_LIB)

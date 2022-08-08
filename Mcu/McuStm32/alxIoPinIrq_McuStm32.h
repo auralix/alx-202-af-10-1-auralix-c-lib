@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_IO_PIN_IRQ_MCU_STM32_H
 #define ALX_IO_PIN_IRQ_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -44,7 +48,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -68,6 +72,14 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] ioPinArr
+  * @param[in] numOfIoPins
+  * @param[in] irqPriorityArr
+  */
 void AlxIoPinIrq_Ctor
 (
 	AlxIoPinIrq* me,
@@ -77,10 +89,10 @@ void AlxIoPinIrq_Ctor
 );
 
 
-#endif // Module Guard
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_IO_PIN_IRQ_MCU_STM32_H
+#endif	// #ifndef ALX_IO_PIN_IRQ_MCU_STM32_H

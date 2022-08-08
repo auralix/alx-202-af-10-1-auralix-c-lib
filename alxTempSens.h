@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TEMP_SENS_H
 #define ALX_TEMP_SENS_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -51,9 +55,15 @@ extern "C" {
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TEMP_SENS_FILE "alxTempSens"
+#define ALX_TEMP_SENS_FILE "alxTempSens.h"
 
 // Assert //
 #if defined(_ALX_TEMP_SENS_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -71,13 +81,6 @@ extern "C" {
 	#define ALX_TEMP_SENS_TRACE(...) ALX_TRACE_STD(ALX_TEMP_SENS_FILE, __VA_ARGS__)
 #else
 	#define ALX_TEMP_SENS_TRACE(...) do{} while (false)
-#endif
-
-// DbgPin //
-#if defined(_ALX_TEMP_SENS_DBG_PIN) || defined(_ALX_DBG_PIN_ALL)
-	#define ALX_TEMP_SENS_DBG_PIN(...) ALX_DBG_PIN_TOGGLE()
-#else
-	#define ALX_TEMP_SENS_DBG_PIN(...) do{} while (false)
 #endif
 
 // Number of Submodules //
@@ -111,17 +114,58 @@ typedef struct
 
 
 //******************************************************************************
+// Constructor
+//******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] submodule
+  * @param[in] submodulePtr
+  */
+void AlxTempSens_Ctor
+(
+	AlxTempSens* me,
+	AlxTempSens_Submodule submodule,
+	void* submodulePtr
+);
+
+
+//******************************************************************************
 // Specific Functions
 //******************************************************************************
-void AlxTempSens_Ctor(AlxTempSens* me, AlxTempSens_Submodule submodule, void* submodulePtr);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] me
+  */
 Alx_Status AlxTempSens_Init(AlxTempSens* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxTempSens_DeInit(AlxTempSens* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 //float AlxTempSens_GetTemp_degC(AlxTempSens* me);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[out] temp_degC
+  */
 Alx_Status AlxTempSens_GetTemp_degC(AlxTempSens* me, float* temp_degC);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_TEMP_SENS_H
+#endif	// #ifndef ALX_TEMP_SENS_H

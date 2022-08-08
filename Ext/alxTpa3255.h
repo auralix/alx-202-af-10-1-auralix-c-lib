@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TPA3255_H
 #define ALX_TPA3255_H
 
@@ -32,19 +35,27 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxTimSw.h"
 #include "alxIoPin.h"
 
 
 //******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TPA3255_FILE "alxTpa3255"
+#define ALX_TPA3255_FILE "alxTpa3255.h"
 
 // Assert //
 #if defined(_ALX_TPA3255_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -74,39 +85,48 @@ typedef enum
 	Tpa3255_St_Error,
 	Tpa3255_St_LowLevel,
 	Tpa3255_St_Waiting
-} AlxTpa3255_status;
+} AlxTpa3255_St;
 
 typedef struct
 {
 	// Parameters Const
 	float lowLevelTime_ms;
-	
+
 	// Objects - External
 	AlxIoPin* do_nRESET;
 	AlxIoPin* di_nFAULT;
 	AlxIoPin* di_nCLIP_OTW;
-	
+
 	// Objects - Internal
 	AlxTimSw tim; // Timer to ReEnable Ic
-	
+
 	// Parameters
 	float waitTime_ReEnable_ms;
 	float waitTime_Waitning_ms;
 
 	// Variables
-	AlxTpa3255_status state;
+	AlxTpa3255_St state;
 	bool wasErrAsserted;
 	bool wasWarningAsserted;
-	
+
 	// Info
 	bool isInit;
-	bool wasCtorCalled;	
+	bool wasCtorCalled;
 } AlxTpa3255;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] di_nRESET
+  * @param[in] do_nFAULT
+  * @param[in] do_nCLIP_OTW
+  * @param[in] waitTime_ReEnable_ms
+  */
 void AlxTpa3255_Ctor
 (
 	AlxTpa3255* me,
@@ -120,20 +140,78 @@ void AlxTpa3255_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_Init(AlxTpa3255* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_DeInit(AlxTpa3255* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_Handle(AlxTpa3255* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_Enable(AlxTpa3255* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_Disable(AlxTpa3255* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxTpa3255_IsErrAsserted(AlxTpa3255* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxTpa3255_IsWarningAsserted(AlxTpa3255* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxTpa3255_WasErrAsserted(AlxTpa3255* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxTpa3255_WasWarningAsserted(AlxTpa3255* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_ClearWasErrAsserted(AlxTpa3255* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_ClearWasWarningAsserted(AlxTpa3255* me);
+
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_TPA3255_H
+#endif	// #ifndef ALX_TPA3255_H

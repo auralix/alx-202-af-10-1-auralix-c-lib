@@ -25,6 +25,9 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_PARAM_GROUP_H
 #define ALX_PARAM_GROUP_H
 
@@ -32,13 +35,21 @@
 extern "C" {
 #endif
 
+
 //******************************************************************************
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxParamItem.h"
 #include "alxMemSafe.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -90,6 +101,20 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] memSafe
+  * @param[in] name
+  * @param[in] len
+  * @param[in] valBuff
+  * @param[in] valStoredBuff
+  * @param[in] valToStoreBuff
+  * @param[in] paramItemArr
+  * @param[in] numOfParamItems
+  * @param[in] initNumOfTries
+  */
 void AlxParamGroup_Ctor
 (
 	AlxParamGroup* me,
@@ -108,15 +133,58 @@ void AlxParamGroup_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] me
+  */
 Alx_Status AlxParamGroup_Init(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxParamGroup_Write(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxParamGroup_IsWriteDone(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxParamGroup_IsWriteErr(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in] me
+  */
 bool AlxParamGroup_IsValStoredBuffDiff(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxParamGroup_ValBuffToValToStoreBuff(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me);
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_ADC_MCU_LPC84X_H
 #define ALX_ADC_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -44,7 +48,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_LPC84X)
+#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 
 //******************************************************************************
@@ -74,6 +78,15 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] channels
+  * @param[in] numChannels
+  * @param[in] adcClkDiv
+  * @param[in] voltageRefP_mV
+  */
 void AlxAdcMcu_Ctor
 (
 	AlxAdc_Mcu* me,
@@ -84,10 +97,10 @@ void AlxAdcMcu_Ctor
 );
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_ADC_MCU_LPC84X_H
+#endif	// #ifndef ALX_ADC_MCU_LPC84X_H

@@ -25,12 +25,22 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_GLOBAL_MCU_STM32L0_H
 #define ALX_GLOBAL_MCU_STM32L0_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+//******************************************************************************
+// Includes
+//******************************************************************************
+#include "alxGlobal.h"
+
 
 //******************************************************************************
 // Module Guard
@@ -96,10 +106,11 @@ extern "C" {
 #define ALX_STM32_HAL_VER_REQUIRED		ALX_STM32L0_HAL_VER_REQUIRED
 #define ALX_STM32_STR "STM32L0"
 
-#endif
+
+#endif	// #if defined(ALX_STM32L0)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_GLOBAL_MCU_STM32L0_H
+#endif	// #ifndef ALX_GLOBAL_MCU_STM32L0_H

@@ -25,12 +25,16 @@
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
 #ifndef ALX_TRACE_MCU_STM32_H
 #define ALX_TRACE_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //******************************************************************************
 // Includes
@@ -41,7 +45,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED))
+#if defined(ALX_C_LIB) && ((defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
 
 
 //******************************************************************************
@@ -65,23 +69,33 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] port
+  * @param[in] pin
+  * @param[in] alternate
+  * @param[in] uart
+  * @param[in] baudRate
+  */
 void AlxTrace_Ctor
 (
 	AlxTrace* me,
 	GPIO_TypeDef* port,
 	uint16_t pin,
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 	uint32_t alternate,
-#endif // defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#endif // #if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 	USART_TypeDef* uart,
 	AlxGlobal_BaudRate baudRate
 );
 
 
-#endif
+#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ALX_TRACE_MCU_STM32_H
+#endif	// #ifndef ALX_TRACE_MCU_STM32_H

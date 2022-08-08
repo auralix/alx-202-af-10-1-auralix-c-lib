@@ -40,13 +40,54 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
+// Preprocessor
+//******************************************************************************
+#define ALX_FTOA_FILE "alxFtoa.h"
+
+// Assert //
+#if defined(_ALX_FTOA_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_FTOA_ASSERT(expr) ALX_ASSERT_BKPT(ALX_FTOA_FILE, expr)
+#elif defined(_ALX_FTOA_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_FTOA_ASSERT(expr) ALX_ASSERT_TRACE(ALX_FTOA_FILE, expr)
+#elif defined(_ALX_FTOA_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_FTOA_ASSERT(expr) ALX_ASSERT_RST(ALX_FTOA_FILE, expr)
+#else
+	#define ALX_FTOA_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(_ALX_FTOA_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_FTOA_TRACE(...) ALX_TRACE_STD(ALX_FTOA_FILE, __VA_ARGS__)
+#else
+	#define ALX_FTOA_TRACE(...) do{} while (false)
+#endif
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] f
+  * @param[in,out] buf
+  * @param[in] precision
+  */
 char* AlxFtoa(double f, char* buf, int precision);
 
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
