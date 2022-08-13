@@ -61,7 +61,7 @@ extern "C" {
 #include "alxAdc_McuLpc55S6x.h"
 
 #else
-typedef struct {} AlxAdc;
+typedef struct { bool dummy; } AlxAdc;
 #endif
 
 

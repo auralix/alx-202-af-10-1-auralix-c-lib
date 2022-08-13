@@ -59,7 +59,7 @@ extern "C" {
 #include "alxTrace_McuLpc55S6x.h"
 
 #elif defined(ALX_PC) || defined(ALX_MBED)
-#include "alxTrace_Printf.h"
+typedef struct { bool dummy; } AlxTrace;
 
 #else
 typedef struct { bool dummy; } AlxTrace;

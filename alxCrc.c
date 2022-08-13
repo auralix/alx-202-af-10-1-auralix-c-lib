@@ -197,7 +197,7 @@ bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t
 	{
 		uint32_t crcToCheck;
 		uint8_t raw[4];
-	} crc = {};
+	} crc = {0};
 
 	// #3 Get CRC lenght based on configuration
 	uint32_t crcLen = AlxCrc_GetLen(me);

@@ -46,6 +46,15 @@ AlxTrace alxTrace = {0};
 //******************************************************************************
 // Functions
 //******************************************************************************
+#if defined(ALX_PC)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
+{
+	(void)me;
+	printf(str);
+
+	return Alx_Ok;
+}
+#endif
 void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
 {
 	char buff[256] = {0};

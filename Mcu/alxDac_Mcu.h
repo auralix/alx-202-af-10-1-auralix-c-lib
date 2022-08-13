@@ -49,7 +49,7 @@ extern "C" {
 #include "alxDac_McuStm32.h"
 
 #else
-typedef struct {} AlxDac_Mcu;
+typedef struct { bool dummy; } AlxDac_Mcu;
 #endif
 
 

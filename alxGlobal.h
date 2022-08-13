@@ -42,9 +42,9 @@ extern "C" {
 #include "alxConfig.h"
 
 
-//******************************************************************************
+//------------------------------------------------------------------------------
 // Includes - Newlib Nano
-//******************************************************************************
+//------------------------------------------------------------------------------
 #if defined(ALX_NEWLIB_NANO)
 #include <assert.h> // All headers from C11 Standard, commented out what not compatible with C99
 #include <complex.h>
@@ -80,9 +80,9 @@ extern "C" {
 #endif
 
 
-//******************************************************************************
+//------------------------------------------------------------------------------
 // Includes - Redlib
-//******************************************************************************
+//------------------------------------------------------------------------------
 #if defined(ALX_REDLIB)
 #include <assert.h>
 #include <ctype.h>
@@ -104,17 +104,17 @@ extern "C" {
 #endif
 
 
-//******************************************************************************
-// Includes - Redlib
-//******************************************************************************
+//------------------------------------------------------------------------------
+// Includes - ARM CMSIS DSP Library
+//------------------------------------------------------------------------------
 #if defined(ALX_CMSIS_DSP)
 #include <arm_math.h>
 #endif
 
 
-//******************************************************************************
-// Includes - FreeRtos
-//******************************************************************************
+//------------------------------------------------------------------------------
+// Includes - FreeRTOS
+//------------------------------------------------------------------------------
 #if defined(ALX_FREE_RTOS)
 #include "FreeRTOS.h"
 #include "croutine.h"
@@ -128,9 +128,45 @@ extern "C" {
 #endif
 
 
-//******************************************************************************
+//------------------------------------------------------------------------------
+// Includes - PC
+//------------------------------------------------------------------------------
+#if defined(ALX_PC)
+#include <assert.h>		// TV: All headers from C11 Standard, commented out everything, so that project compiles
+#include <complex.h>
+#include <ctype.h>
+#include <errno.h>
+#include <fenv.h>
+#include <float.h>
+#include <inttypes.h>
+#include <iso646.h>
+#include <limits.h>
+#include <locale.h>
+#include <math.h>
+#include <setjmp.h>
+#include <signal.h>
+//#include <stdalign.h>
+#include <stdarg.h>
+//#include <stdatomic.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+//#include <stdnoreturn.h>
+#include <string.h>
+#include <tgmath.h>
+//#include <threads.h>
+#include <time.h>
+#include <uchar.h>
+#include <wchar.h>
+#include <wctype.h>
+#endif
+
+
+//------------------------------------------------------------------------------
 // Includes - MCU
-//******************************************************************************
+//------------------------------------------------------------------------------
 #if defined(ALX_STM32F1)
 #include "alxGlobal_McuStm32F1.h"
 #define ALX_STM32
@@ -159,11 +195,6 @@ extern "C" {
 #elif defined(ALX_LPC55S6X)
 #include "alxGlobal_McuLpc55S6x.h"
 
-#elif defined(ALX_PC)
-#include "alxGlobal_Pc.h"
-
-#else
-#error "Please select platform for your application!"
 #endif
 
 
@@ -215,7 +246,6 @@ extern "C" {
 #if defined(_MSC_VER)
 	#define ALX_WEAK
 	#define ALX_BKPT __debugbreak()
-
 #endif
 
 #define ALX_I2C_BUFF_LEN 256
