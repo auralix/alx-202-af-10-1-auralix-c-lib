@@ -46,7 +46,7 @@ AlxTrace alxTrace = {0};
 //******************************************************************************
 // Functions
 //******************************************************************************
-#if defined(ALX_PC)
+#if defined(ALX_PC) || defined(ALX_MBED)
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
 	(void)me;
@@ -109,13 +109,13 @@ void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr)
 {
 	switch (smLevel)
 	{
-	case 0: strcpy(smLevelStr, ""); break;
-	case 1: strcpy(smLevelStr, "____"); break;
-	case 2: strcpy(smLevelStr, "________"); break;
-	case 3: strcpy(smLevelStr, "____________"); break;
-	case 4: strcpy(smLevelStr, "________________"); break;
-	case 5: strcpy(smLevelStr, "____________________"); break;
-	default: strcpy(smLevelStr, ""); break;
+		case 0: strcpy(smLevelStr, ""); break;
+		case 1: strcpy(smLevelStr, "____"); break;
+		case 2: strcpy(smLevelStr, "________"); break;
+		case 3: strcpy(smLevelStr, "____________"); break;
+		case 4: strcpy(smLevelStr, "________________"); break;
+		case 5: strcpy(smLevelStr, "____________________"); break;
+		default: strcpy(smLevelStr, ""); break;
 	}
 }
 
