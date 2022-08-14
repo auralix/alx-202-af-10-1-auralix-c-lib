@@ -47,6 +47,18 @@ AlxTrace alxTrace = {0};
 // Functions
 //******************************************************************************
 #if defined(ALX_PC)
+Alx_Status AlxTrace_Init(AlxTrace* me)
+{
+	(void)me;
+
+	return Alx_Err;
+}
+Alx_Status AlxTrace_DeInit(AlxTrace* me)
+{
+	(void)me;
+
+	return Alx_Err;
+}
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
 	(void)me;
