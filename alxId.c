@@ -500,6 +500,9 @@ const char* AlxId_GetUniqueIdStr(AlxId* me)
 
 	#ifdef ALX_STM32
 	return me->stm32Hw.uniqueIdStr;
+	#else
+	ALX_ID_ASSERT(false);
+	return NULL;
 	#endif
 }
 uint32_t AlxId_GetFwAppVerDate(AlxId* me)
