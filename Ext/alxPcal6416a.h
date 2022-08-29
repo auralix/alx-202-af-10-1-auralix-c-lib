@@ -639,25 +639,6 @@ typedef struct
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
-{
-	AlxPcal6416a_P0_0 = 0b0000,
-	AlxPcal6416a_P0_1 = 0b0001,
-	AlxPcal6416a_P0_2 = 0b0010,
-	AlxPcal6416a_P0_3 = 0b0011,
-	AlxPcal6416a_P0_4 = 0b0100,
-	AlxPcal6416a_P0_5 = 0b0101,
-	AlxPcal6416a_P0_6 = 0b0110,
-	AlxPcal6416a_P0_7 = 0b0111,
-	AlxPcal6416a_P1_0 = 0b1000,
-	AlxPcal6416a_P1_1 = 0b1001,
-	AlxPcal6416a_P1_2 = 0b1010,
-	AlxPcal6416a_P1_3 = 0b1011,
-	AlxPcal6416a_P1_4 = 0b1100,
-	AlxPcal6416a_P1_5 = 0b1101,
-	AlxPcal6416a_P1_6 = 0b1110,
-	AlxPcal6416a_P1_7 = 0b1111
-} AlxPcal6416a_Pin;
 typedef struct
 {
 	// Parameters
@@ -744,7 +725,7 @@ Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inPort0, bool inPort1, boo
   * @param[in] me
   * @param[in] pin
   */
-bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_Pin pin);
+bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, uint8_t port, uint8_t pin);
 
 /**
   * @brief
@@ -752,34 +733,34 @@ bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_Pin pin);
   * @param[in] pin
   * @param[in] val
   */
-void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, AlxPcal6416a_Pin pin, bool val);
+void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, uint8_t port, uint8_t pin, bool val);
 
 /**
   * @brief
   * @param[in,out] me
   * @param[in] pin
   */
-void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, AlxPcal6416a_Pin pin);
+void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, uint8_t port, uint8_t pin);
 
 /**
   * @brief
   * @param[in,out] me
   * @param[in] pin
   */
-void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, AlxPcal6416a_Pin pin);
+void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, uint8_t port, uint8_t pin);
 
 /**
   * @brief
   * @param[in,out] me
   * @param[in] pin
   */
-void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_Pin pin);
+void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, uint8_t port, uint8_t pin);
 
 /**
   * @brief
   * @param[in] me
   */
-Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, AlxPcal6416a_Pin pin, AlxIoPin_TriState* val);
+Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, uint8_t port, uint8_t pin, AlxIoPin_TriState* val);
 
 /**
   * @brief

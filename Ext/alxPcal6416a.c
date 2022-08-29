@@ -55,7 +55,7 @@ static void AlxPcal6416a_RegStruct_SetAddr(AlxPcal6416a* me);
 static void AlxPcal6416a_RegStruct_SetLen(AlxPcal6416a* me);
 static void AlxPcal6416a_RegStruct_SetValToZero(AlxPcal6416a* me);
 static void AlxPcal6416a_RegStruct_SetValToDefault(AlxPcal6416a* me);
-void AlxPcal6416a_IoPin_ConfigPull(AlxPcal6416a* me, AlxPcal6416a_Pin pin, AlxPcal6416a_Pull pull);
+void AlxPcal6416a_IoPin_ConfigPull(AlxPcal6416a* me, uint8_t port, uint8_t pin, AlxPcal6416a_Pull pull);
 
 
 //******************************************************************************
@@ -218,17 +218,19 @@ Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inPort0, bool inPort1, boo
 	// Return
 	return Alx_Ok;
 }
-bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_Pin pin)
+bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 {
 	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
+	ALX_PCAL6416A_ASSERT((port == 0) || (port == 1));
+	ALX_PCAL6416A_ASSERT((0 <= pin) && (pin <= 8));
 
 	// Read if port 0 is used
-	if (!(pin & (1 << 3)))
+	if (port == 0)
 	{
-		if (me->reg._00h_InputPort_0.val.raw & (1U << pin))
+		if (me->reg._00h_InputPort_0.val.raw & (1 << pin))
 		{
 			return true;
 		}
@@ -239,9 +241,9 @@ bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_Pin pin)
 	}
 
 	// Read if port 1 is used
-	if (pin & (1 << 3))
+	else if (port == 1)
 	{
-		if (me->reg._01h_InputPort_1.val.raw & (1U << pin))
+		if (me->reg._01h_InputPort_1.val.raw & (1 << pin))
 		{
 			return true;
 		}
@@ -252,122 +254,105 @@ bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_Pin pin)
 	}
 
 	// Assert
-	ALX_PCAL6416A_ASSERT(false);	// We should not get here
-	return false;
+	else
+	{
+		ALX_PCAL6416A_ASSERT(false);	// We should never get here
+		return false;
+	}
 }
-void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, AlxPcal6416a_Pin pin, bool val)
+void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, uint8_t port, uint8_t pin, bool val)
 {
 	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
+	ALX_PCAL6416A_ASSERT((port == 0) || (port == 1));
+	ALX_PCAL6416A_ASSERT((0 <= pin) && (pin <= 8));
 
 	// Write if port 0 is used
-	if (!(pin & (1 << 3)))
+	if (port == 0)
 	{
 		if (val == true)
 		{
-			me->reg._02h_OutputPort_0.val.raw |=  (1U << pin);
-			return;
+			me->reg._02h_OutputPort_0.val.raw |=  (1 << pin);
 		}
 		else
 		{
-			me->reg._02h_OutputPort_0.val.raw &= ~(1U << pin);
-			return;
+			me->reg._02h_OutputPort_0.val.raw &= ~(1 << pin);
 		}
 	}
 
 	// Write if port 1 is used
-	if (pin & (1 << 3))
+	else if (port == 1)
 	{
 		if (val == true)
 		{
-			me->reg._03h_OutputPort_1.val.raw |=  (1U << pin);
-			return;
+			me->reg._03h_OutputPort_1.val.raw |=  (1 << pin);
 		}
 		else
 		{
-			me->reg._03h_OutputPort_1.val.raw &= ~(1U << pin);
-			return;
+			me->reg._03h_OutputPort_1.val.raw &= ~(1 << pin);
 		}
 	}
 
 	// Assert
-	ALX_PCAL6416A_ASSERT(false);	// We should not get here
+	else
+	{
+		ALX_PCAL6416A_ASSERT(false);	// We should never get here
+	}
 }
-void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, AlxPcal6416a_Pin pin)
+void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 {
 	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
+	ALX_PCAL6416A_ASSERT((port == 0) || (port == 1));
+	ALX_PCAL6416A_ASSERT((0 <= pin) && (pin <= 8));
 
-	// Write if port 0 is used
-	if (!(pin & (1 << 3)))
-	{
-		me->reg._02h_OutputPort_0.val.raw |= (1U << pin);
-		return;
-	}
-
-	// Write if port 1 is used
-	if (pin & (1 << 3))
-	{
-		me->reg._03h_OutputPort_1.val.raw |= (1U << pin);
-		return;
-	}
-
-	// Assert
-	ALX_PCAL6416A_ASSERT(false);	// We should not get here
+	// Set
+	AlxPcal6416a_IoPin_Write(me, port, pin, true);
 }
-void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, AlxPcal6416a_Pin pin)
+void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 {
 	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
+	ALX_PCAL6416A_ASSERT((port == 0) || (port == 1));
+	ALX_PCAL6416A_ASSERT((0 <= pin) && (pin <= 8));
 
-	// Write if port 0 is used
-	if (!(pin & (1 << 3)))
-	{
-		me->reg._02h_OutputPort_0.val.raw &= ~(1U << pin);
-		return;
-	}
-
-	// Write if port 1 is used
-	if (pin & (1 << 3))
-	{
-		me->reg._03h_OutputPort_1.val.raw &= ~(1U << pin);
-		return;
-	}
-
-	// Assert
-	ALX_PCAL6416A_ASSERT(false);	// We should not get here
+	// Reset
+	AlxPcal6416a_IoPin_Write(me, port, pin, false);
 }
-void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_Pin pin)
+void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 {
 	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
+	ALX_PCAL6416A_ASSERT((port == 0) || (port == 1));
+	ALX_PCAL6416A_ASSERT((0 <= pin) && (pin <= 8));
 
 	// Write if port 0 is used
-	if (!(pin & (1 << 3)))
+	if (port == 0)
 	{
-		me->reg._02h_OutputPort_0.val.raw ^= (1U << pin);
-		return;
+		me->reg._02h_OutputPort_0.val.raw ^= (1 << pin);
 	}
 
 	// Write if port 1 is used
-	if (pin & (1 << 3))
+	else if (port == 1)
 	{
-		me->reg._03h_OutputPort_1.val.raw ^= (1U << pin);
-		return;
+		me->reg._03h_OutputPort_1.val.raw ^= (1 << pin);
 	}
 
 	// Assert
-	ALX_PCAL6416A_ASSERT(false);	// We should not get here
+	else
+	{
+		ALX_PCAL6416A_ASSERT(false);	// We should never get here
+	}
 }
-Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, AlxPcal6416a_Pin pin, AlxIoPin_TriState* val)
+Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, uint8_t port, uint8_t pin, AlxIoPin_TriState* val)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -390,7 +375,7 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, AlxPcal6416a_Pin p
 	//------------------------------------------------------------------------------
 
 	// Config PullUp
-	AlxPcal6416a_IoPin_ConfigPull(me, pin, AlxPcal6416a_Pull_Up);
+	AlxPcal6416a_IoPin_ConfigPull(me, port, pin, AlxPcal6416a_Pull_Up);
 
 	// Write pull registers
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
@@ -412,10 +397,10 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, AlxPcal6416a_Pin p
 	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 
 	// Read
-	valPullUp = AlxPcal6416a_IoPin_Read(me, pin);
+	valPullUp = AlxPcal6416a_IoPin_Read(me, port, pin);
 
 	// Disable pull
-	AlxPcal6416a_IoPin_ConfigPull(me, pin, AlxPcal6416a_Pull_None);
+	AlxPcal6416a_IoPin_ConfigPull(me, port, pin, AlxPcal6416a_Pull_None);
 
 	// Write pull registers
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
@@ -433,7 +418,7 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, AlxPcal6416a_Pin p
 	//------------------------------------------------------------------------------
 
 	// Config PullDown
-	AlxPcal6416a_IoPin_ConfigPull(me, pin, AlxPcal6416a_Pull_Down);
+	AlxPcal6416a_IoPin_ConfigPull(me, port, pin, AlxPcal6416a_Pull_Down);
 
 	// Write pull registers
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
@@ -455,10 +440,10 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, AlxPcal6416a_Pin p
 	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 
 	// Read
-	valPullDown = AlxPcal6416a_IoPin_Read(me, pin);
+	valPullDown = AlxPcal6416a_IoPin_Read(me, port, pin);
 
 	// Disable pull
-	AlxPcal6416a_IoPin_ConfigPull(me, pin, AlxPcal6416a_Pull_None);
+	AlxPcal6416a_IoPin_ConfigPull(me, port, pin, AlxPcal6416a_Pull_None);
 
 	// Write pull registers
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
@@ -496,81 +481,6 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, AlxPcal6416a_Pin p
 	// Return
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
-}
-void AlxPcal6416a_IoPin_ConfigPull(AlxPcal6416a* me, AlxPcal6416a_Pin pin, AlxPcal6416a_Pull pull)
-{
-	// If port 0 is used
-	if (!(pin & (1 << 3)))
-	{
-		if (pull == AlxPcal6416a_Pull_None)
-		{
-			// Disable pull
-			me->reg._46h_PullUpPullDownEn_0.val.raw &= ~(1U << pin);
-
-			// Return
-			return;
-		}
-		else
-		{
-			// Enable pull
-			me->reg._46h_PullUpPullDownEn_0.val.raw |= 1U << pin;
-
-			// Config pull
-			if (pull == AlxPcal6416a_Pull_Up)
-			{
-				me->reg._48h_PullUpPullDownSel_0.val.raw |= 1U << pin;
-			}
-			else if (pull == AlxPcal6416a_Pull_Down)
-			{
-				me->reg._48h_PullUpPullDownSel_0.val.raw &= ~(1U << pin);
-			}
-			else
-			{
-				ALX_PCAL6416A_ASSERT(false);	// We should not get here
-			}
-
-			// Return
-			return;
-		}
-	}
-
-	// If port 1 is used
-	if (pin & (1 << 3))
-	{
-		if (pull == AlxPcal6416a_Pull_None)
-		{
-			// Disable pull
-			me->reg._47h_PullUpPullDownEn_1.val.raw &= ~(1U << pin);
-
-			// Return
-			return;
-		}
-		else
-		{
-			// Enable pull
-			me->reg._47h_PullUpPullDownEn_1.val.raw |= 1U << pin;
-
-			// Config pull
-			if (pull == AlxPcal6416a_Pull_Up)
-			{
-				me->reg._49h_PullUpPullDownSel_1.val.raw |= 1U << pin;
-			}
-			else if (pull == AlxPcal6416a_Pull_Down)
-			{
-				me->reg._49h_PullUpPullDownSel_1.val.raw &= ~(1U << pin);
-			}
-			else
-			{
-				ALX_PCAL6416A_ASSERT(false);	// We should not get here
-			}
-
-			// Return
-			return;
-		}
-	}
-
-	// Assert
-	ALX_PCAL6416A_ASSERT(false);	// We should not get here
 }
 Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg)
 {
@@ -720,6 +630,72 @@ static void AlxPcal6416a_RegStruct_SetValToDefault(AlxPcal6416a* me)
 	//me->reg._4Ch_IrqStatus_0			.val.raw = 0b00000000;	// MF: Read Only Reg
 	//me->reg._4Dh_IrqStatus_1			.val.raw = 0b00000000;	// MF: Read Only Reg
 	me->reg._4Fh_OutputPortConfig		.val.raw = 0b00000000;
+}
+void AlxPcal6416a_IoPin_ConfigPull(AlxPcal6416a* me, uint8_t port, uint8_t pin, AlxPcal6416a_Pull pull)
+{
+	// If port 0 is used
+	if (port == 0)
+	{
+		if (pull == AlxPcal6416a_Pull_None)
+		{
+			// Disable pull
+			me->reg._46h_PullUpPullDownEn_0.val.raw &= ~(1 << pin);
+		}
+		else
+		{
+			// Enable pull
+			me->reg._46h_PullUpPullDownEn_0.val.raw |= 1 << pin;
+
+			// Config pull
+			if (pull == AlxPcal6416a_Pull_Up)
+			{
+				me->reg._48h_PullUpPullDownSel_0.val.raw |= 1 << pin;
+			}
+			else if (pull == AlxPcal6416a_Pull_Down)
+			{
+				me->reg._48h_PullUpPullDownSel_0.val.raw &= ~(1 << pin);
+			}
+			else
+			{
+				ALX_PCAL6416A_ASSERT(false);	// We should not get here
+			}
+		}
+	}
+
+	// If port 1 is used
+	else if (port == 1)
+	{
+		if (pull == AlxPcal6416a_Pull_None)
+		{
+			// Disable pull
+			me->reg._47h_PullUpPullDownEn_1.val.raw &= ~(1 << pin);
+		}
+		else
+		{
+			// Enable pull
+			me->reg._47h_PullUpPullDownEn_1.val.raw |= 1 << pin;
+
+			// Config pull
+			if (pull == AlxPcal6416a_Pull_Up)
+			{
+				me->reg._49h_PullUpPullDownSel_1.val.raw |= 1 << pin;
+			}
+			else if (pull == AlxPcal6416a_Pull_Down)
+			{
+				me->reg._49h_PullUpPullDownSel_1.val.raw &= ~(1 << pin);
+			}
+			else
+			{
+				ALX_PCAL6416A_ASSERT(false);	// We should not get here
+			}
+		}
+	}
+
+	// Assert
+	else
+	{
+		ALX_PCAL6416A_ASSERT(false);	// We should never get here
+	}
 }
 
 

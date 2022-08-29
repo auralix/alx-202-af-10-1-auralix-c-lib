@@ -83,12 +83,12 @@ typedef struct
 	// Parameters
 	TaskFunction_t pxTaskCode;
 	const char* pcName;
-	configSTACK_DEPTH_TYPE usStackDepth;
+	uint32_t usStackDepth_byte;
 	void* pvParameters;
 	UBaseType_t uxPriority;
-	AlxClk_Tick osTick;
 
 	// Variables
+	configSTACK_DEPTH_TYPE usStackDepth_word;
 	TaskHandle_t* pxCreatedTask;
 	#endif
 
@@ -107,7 +107,7 @@ typedef struct
   * @param[in,out] me
   * @param[in] pxTaskCode
   * @param[in] pcName
-  * @param[in] usStackDepth
+  * @param[in] usStackDepth_byte
   * @param[in] pvParameters
   * @param[in] uxPriority
   */
@@ -116,7 +116,7 @@ void AlxOsThread_Ctor
 	AlxOsThread* me,
 	TaskFunction_t pxTaskCode,
 	const char* const pcName,
-	const configSTACK_DEPTH_TYPE usStackDepth,
+	uint32_t usStackDepth_byte,
 	void* const pvParameters,
 	UBaseType_t uxPriority
 );
