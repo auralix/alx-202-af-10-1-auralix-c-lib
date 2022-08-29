@@ -78,10 +78,23 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxMcp73831_St_Err = 0,
+	AlxMcp73831_St_Shutdown = 1,
+	AlxMcp73831_St_Charging = 2,
+	AlxMcp73831_St_Standby = 3
+} AlxMcp73831_St;
 typedef struct
 {
 	// Parameters
 	AlxIoPin* di_STAT;
+	bool di_STAT_TriStateReadEnable;
+
+	// Variables
+	AlxMcp73831_St st;
+	AlxIoPin_TriState di_STAT_TriStateVal;
+	bool di_STAT_Val;
 
 	// Info
 	bool isInit;
@@ -97,11 +110,13 @@ typedef struct
   * @brief
   * @param[in,out] me
   * @param[in] di_STAT
+  * @param[in] di_STAT_TriState
   */
 void AlxMcp73831_Ctor
 (
 	AlxMcp73831* me,
-	AlxIoPin* di_STAT
+	AlxIoPin* di_STAT,
+	bool di_STAT_TriStateReadEnable
 );
 
 
@@ -123,33 +138,9 @@ void AlxMcp73831_DeInit(AlxMcp73831* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
   */
-bool AlxMcp73831_IsBatCharging(AlxMcp73831* me);
-
-/**
-  * @brief
-  * @param[in] me
-  */
-bool AlxMcp73831_IsBatFull(AlxMcp73831* me);
-
-/**
-  * @brief
-  * @param[in] me
-  */
-bool AlxMcp73831_TriState_IsBatCharging(AlxMcp73831* me);
-
-/**
-  * @brief
-  * @param[in] me
-  */
-bool AlxMcp73831_TriState_IsBatFull(AlxMcp73831* me);
-
-/**
-  * @brief
-  * @param[in] me
-  */
-bool AlxMcp73831_TriState_IsShutdown(AlxMcp73831* me);
+AlxMcp73831_St AlxMcp73831_GetSt(AlxMcp73831* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

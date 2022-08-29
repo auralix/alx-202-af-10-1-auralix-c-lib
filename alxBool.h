@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxPwr.h
-  * @brief		Auralix C Library - ALX Power Module
+  * @file		alxBool.h
+  * @brief		Auralix C Library - ALX Bool Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_PWR_H
-#define ALX_PWR_H
+#ifndef ALX_BOOL_H
+#define ALX_BOOL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,11 +42,8 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxAdc.h"
 #include "alxFiltGlitchBool.h"
-#include "alxHys2.h"
-#include "alxIoPin.h"
-#include "alxVdiv.h"
+#include "alxTimSw.h"
 
 
 //******************************************************************************
@@ -58,24 +55,24 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PWR_FILE "alxPwr.h"
+#define ALX_BOOL_FILE "alxBool.h"
 
 // Assert //
-#if defined(_ALX_PWR_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PWR_FILE, expr)
-#elif defined(_ALX_PWR_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PWR_FILE, expr)
-#elif defined(_ALX_PWR_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_RST(ALX_PWR_FILE, expr)
+#if defined(_ALX_BOOL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_BOOL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BOOL_FILE, expr)
+#elif defined(_ALX_BOOL_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_BOOL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BOOL_FILE, expr)
+#elif defined(_ALX_BOOL_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_BOOL_ASSERT(expr) ALX_ASSERT_RST(ALX_BOOL_FILE, expr)
 #else
-	#define ALX_PWR_ASSERT(expr) do{} while (false)
+	#define ALX_BOOL_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_PWR_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_PWR_TRACE(...) ALX_TRACE_STD(ALX_PWR_FILE, __VA_ARGS__)
+#if defined(_ALX_BOOL_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_BOOL_TRACE(...) ALX_TRACE_STD(ALX_BOOL_FILE, __VA_ARGS__)
 #else
-	#define ALX_PWR_TRACE(...) do{} while (false)
+	#define ALX_BOOL_TRACE(...) do{} while (false)
 #endif
 
 
@@ -85,27 +82,42 @@ extern "C" {
 typedef struct
 {
 	// Parameters
-	float vdiv_ResHigh_kOhm;
-	float vdiv_ResLow_kOhm;
-	float hys2_TopHigh_V;
-	float hys2_TopLow_V;
-	float hys2_BotHigh_V;
-	float hys2_BotLow_V;
+	bool valInitial;
+	float trueShortTime_ms;
+	float trueLongTime_ms;
+	float falseShortTime_ms;
+	float falseLongTime_ms;
 	float filtGlitchBool_StableTrueTime_ms;
 	float filtGlitchBool_StableFalseTime_ms;
 
 	// Variables
-	AlxHys2 hys2;
-	AlxFiltGlitchBool filtGlitchBool;
-	float adcVal_V;
-	float val_V;
-	AlxHys2_St hys2_St;
-	bool isInRangeRaw;
-	bool isInRangeFiltered;
+	bool valRaw;
+	bool valFiltered;
+	AlxFiltGlitchBool alxFiltGlitchBool;
+
+	AlxTimSw alxTimSw_True;
+	float trueTime_ms;
+	bool isTrue;
+	bool isTrueUpToShortTime;
+	bool isTrueUpToLongTime;
+	bool isTrueForLongTime;
+	bool wasTrue;
+	bool wasTrueForShortTime;
+	bool wasTrueForLongTime;
+
+	AlxTimSw alxTimSw_False;
+	float falseTime_ms;
+	bool isFalse;
+	bool isFalseUpToShortTime;
+	bool isFalseUpToLongTime;
+	bool isFalseForLongTime;
+	bool wasFalse;
+	bool wasFalseForShortTime;
+	bool wasFalseForLongTime;
 
 	// Info
 	bool wasCtorCalled;
-} AlxPwr;
+} AlxBool;
 
 
 //******************************************************************************
@@ -115,26 +127,22 @@ typedef struct
 /**
   * @brief
   * @param[in,out] me
-  * @param[in] adc
-  * @param[in] chAdc
-  * @param[in] vdiv_ResHigh_kOhm
-  * @param[in] vdiv_ResLow_kOhm
-  * @param[in] hys2_TopHigh_V
-  * @param[in] hys2_TopLow_V
-  * @param[in] hys2_BotHigh_V
-  * @param[in] hys2_BotLow_V
+  * @param[in] valInitial
+  * @param[in] trueShortTime_ms
+  * @param[in] trueLongTime_ms
+  * @param[in] falseShortTime_ms
+  * @param[in] falseLongTime_ms
   * @param[in] filtGlitchBool_StableTrueTime_ms
   * @param[in] filtGlitchBool_StableFalseTime_ms
   */
-void AlxPwr_Ctor
+void AlxBool_Ctor
 (
-	AlxPwr* me,
-	float vdiv_ResHigh_kOhm,
-	float vdiv_ResLow_kOhm,
-	float hys2_TopHigh_V,
-	float hys2_TopLow_V,
-	float hys2_BotHigh_V,
-	float hys2_BotLow_V,
+	AlxBool* me,
+	bool valInitial,
+	float trueShortTime_ms,
+	float trueLongTime_ms,
+	float falseShortTime_ms,
+	float falseLongTime_ms,
 	float filtGlitchBool_StableTrueTime_ms,
 	float filtGlitchBool_StableFalseTime_ms
 );
@@ -143,13 +151,27 @@ void AlxPwr_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  * @param[in] adcVal_V
-  */
-bool AlxPwr_Process(AlxPwr* me, float adcVal_V);
+void AlxBool_Update(AlxBool* me, bool val);
+bool AlxBool_IsTrue(AlxBool* me);
+bool AlxBool_IsTrueUpToShortTime(AlxBool* me);
+bool AlxBool_IsTrueUpToLongTime(AlxBool* me);
+bool AlxBool_IsTrueForLongTime(AlxBool* me);
+bool AlxBool_WasTrue(AlxBool* me);
+bool AlxBool_WasTrueForShortTime(AlxBool* me);
+bool AlxBool_WasTrueForLongTime(AlxBool* me);
+void AlxBool_ClearWasTrueFlag(AlxBool* me);
+void AlxBool_ClearWasTrueForShortTimeFlag(AlxBool* me);
+void AlxBool_ClearWasTrueForLongTimeFlag(AlxBool* me);
+bool AlxBool_IsFalse(AlxBool* me);
+bool AlxBool_IsFalseUpToShortTime(AlxBool* me);
+bool AlxBool_IsFalseUpToLongTime(AlxBool* me);
+bool AlxBool_IsFalseForLongTime(AlxBool* me);
+bool AlxBool_WasFalse(AlxBool* me);
+bool AlxBool_WasFalseForShortTime(AlxBool* me);
+bool AlxBool_WasFalseForLongTime(AlxBool* me);
+void AlxBool_ClearWasFalseFlag(AlxBool* me);
+void AlxBool_ClearWasFalseForShortTimeFlag(AlxBool* me);
+void AlxBool_ClearWasFalseForLongTimeFlag(AlxBool* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -158,4 +180,4 @@ bool AlxPwr_Process(AlxPwr* me, float adcVal_V);
 }
 #endif
 
-#endif	// #ifndef ALX_PWR_H
+#endif	// #ifndef ALX_BOOL_H

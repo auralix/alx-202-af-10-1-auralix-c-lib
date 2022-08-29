@@ -42,7 +42,9 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxIoPin.h"
 #include "alxI2c.h"
+#include "alxDelay.h"
 
 
 //******************************************************************************
@@ -655,15 +657,7 @@ typedef enum
 	AlxPcal6416a_P1_5 = 0b1101,
 	AlxPcal6416a_P1_6 = 0b1110,
 	AlxPcal6416a_P1_7 = 0b1111
-} AlxPcal6416a_PortPin;
-
-typedef enum
-{
-	AlxPcal6416a_PullUp = 0b00,
-	AlxPcal6416a_PullDown = 0b01,
-	AlxPcal6416a_Inact = 0b10,
-} AlxPcal6416a_Mode;
-
+} AlxPcal6416a_Pin;
 typedef struct
 {
 	// Parameters
@@ -738,19 +732,19 @@ Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me);
 /**
   * @brief
   * @param[in] me
-  * @param[in] inputPort0
-  * @param[in] inputPort1
-  * @param[in] outputPort0
-  * @param[in] outputPort1
+  * @param[in] inPort0
+  * @param[in] inPort1
+  * @param[in] outPort0
+  * @param[in] outPort1
   */
-Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inputPort0, bool inputPort1, bool outputPort0, bool outputPort1);
+Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inPort0, bool inPort1, bool outPort0, bool outPort1);
 
 /**
   * @brief
   * @param[in] me
   * @param[in] pin
   */
-bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
+bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_Pin pin);
 
 /**
   * @brief
@@ -758,28 +752,34 @@ bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
   * @param[in] pin
   * @param[in] val
   */
-void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, bool val);
+void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, AlxPcal6416a_Pin pin, bool val);
 
 /**
   * @brief
   * @param[in,out] me
   * @param[in] pin
   */
-void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
+void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, AlxPcal6416a_Pin pin);
 
 /**
   * @brief
   * @param[in,out] me
   * @param[in] pin
   */
-void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
+void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, AlxPcal6416a_Pin pin);
 
 /**
   * @brief
   * @param[in,out] me
   * @param[in] pin
   */
-void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_PortPin pin);
+void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_Pin pin);
+
+/**
+  * @brief
+  * @param[in] me
+  */
+Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, AlxPcal6416a_Pin pin, AlxIoPin_TriState* val);
 
 /**
   * @brief

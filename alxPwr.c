@@ -43,8 +43,6 @@
 void AlxPwr_Ctor
 (
 	AlxPwr* me,
-	AlxAdc* adc,
-	Alx_Ch chAdc,
 	float vdiv_ResHigh_kOhm,
 	float vdiv_ResLow_kOhm,
 	float hys2_TopHigh_V,
@@ -56,8 +54,6 @@ void AlxPwr_Ctor
 )
 {
 	// Parameters
-	me->adc = adc;
-	me->chAdc = chAdc;
 	me->vdiv_ResHigh_kOhm = vdiv_ResHigh_kOhm;
 	me->vdiv_ResLow_kOhm = vdiv_ResLow_kOhm;
 	me->hys2_TopHigh_V = hys2_TopHigh_V;
@@ -72,11 +68,10 @@ void AlxPwr_Ctor
 	AlxFiltGlitchBool_Ctor(&me->filtGlitchBool, false, filtGlitchBool_StableTrueTime_ms, filtGlitchBool_StableFalseTime_ms);
 	me->adcVal_V = 0.f;
 	me->val_V = 0.f;
-	me->isGoodRaw = false;
-	me->isGoodFiltered = false;
+	me->isInRangeRaw = false;
+	me->isInRangeFiltered = false;
 
 	// Info
-	me->isInit = false;
 	me->wasCtorCalled = true;
 }
 
@@ -84,82 +79,35 @@ void AlxPwr_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxPwr_Init(AlxPwr* me)
+bool AlxPwr_Process(AlxPwr* me, float adcVal_V)
 {
-	// #1 Assert
-	ALX_PWR_ASSERT(me->isInit == false);
+	// Assert
 	ALX_PWR_ASSERT(me->wasCtorCalled == true);
 
-	// #2
-	// TV: TODO - IsErr Implementation
+	// Set ADC voltage
+	me->adcVal_V = adcVal_V;
 
-	// #3 Set isInit
-	me->isInit = true;
-}
-void AlxPwr_DeInit(AlxPwr* me)
-{
-	// #1 Assert
-	ALX_PWR_ASSERT(me->isInit == true);
-	ALX_PWR_ASSERT(me->wasCtorCalled == true);
-
-	// #2
-	// TV: TODO - IsErr Implementation
-
-	// #3 Reset isInit
-	me->isInit = false;
-}
-void AlxPwr_Handle(AlxPwr* me)
-{
-	// #1 Assert
-	ALX_PWR_ASSERT(me->isInit == true);
-	ALX_PWR_ASSERT(me->wasCtorCalled == true);
-
-	// #2 Get ADC voltage
-	me->adcVal_V = AlxAdc_GetVoltage_V(me->adc, me->chAdc);
-
-	// #3 Calculate PWR voltage
+	// Calculate PWR voltage
 	me->val_V = AlxVdiv_GetVin_V(me->adcVal_V, me->vdiv_ResHigh_kOhm, me->vdiv_ResLow_kOhm);
 
-	// #4 Process Hysteresis
+	// Process hysteresis
 	me->hys2_St = AlxHys2_Process(&me->hys2, me->val_V);
 
-	// #5 Handle Hysteresis State
+	// Handle hysteresis state
 	if (me->hys2_St == AlxHys2_StMid)
-		me->isGoodRaw = true;
+	{
+		me->isInRangeRaw = true;
+	}
 	else
-		me->isGoodRaw = false;
+	{
+		me->isInRangeRaw = false;
+	}
 
-	// #6 Process Filter
-	me->isGoodFiltered = AlxFiltGlitchBool_Process(&me->filtGlitchBool, me->isGoodRaw);
-}
-bool AlxPwr_IsGood(AlxPwr* me)
-{
-	// #1 Assert
-	ALX_PWR_ASSERT(me->isInit == true);
-	ALX_PWR_ASSERT(me->wasCtorCalled == true);
+	// Process filter
+	me->isInRangeFiltered = AlxFiltGlitchBool_Process(&me->filtGlitchBool, me->isInRangeRaw);
 
-	// #2 Return
-	return me->isGoodFiltered;
-}
-bool AlxPwr_IsNotGood(AlxPwr* me)
-{
-	// #1 Assert
-	ALX_PWR_ASSERT(me->isInit == true);
-	ALX_PWR_ASSERT(me->wasCtorCalled == true);
-
-	// #2 Return
-	return !AlxPwr_IsGood(me);
-}
-bool AlxPwr_IsErr(AlxPwr* me)
-{
-	// #1 Assert
-	ALX_PWR_ASSERT(me->isInit == true);
-	ALX_PWR_ASSERT(me->wasCtorCalled == true);
-
-	// #2
-	// TV: TODO - IsErr Implementation
-	ALX_PWR_ASSERT(false);
-	return true;
+	// Return
+	return me->isInRangeFiltered;
 }
 
 

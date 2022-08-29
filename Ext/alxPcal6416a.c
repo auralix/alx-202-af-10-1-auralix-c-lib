@@ -38,19 +38,31 @@
 
 
 //******************************************************************************
+// Private Types
+//******************************************************************************
+typedef enum
+{
+	AlxPcal6416a_Pull_None = 0,
+	AlxPcal6416a_Pull_Up = 1,
+	AlxPcal6416a_Pull_Down = 2
+} AlxPcal6416a_Pull;
+
+
+//******************************************************************************
 // Private Functions
 //******************************************************************************
 static void AlxPcal6416a_RegStruct_SetAddr(AlxPcal6416a* me);
 static void AlxPcal6416a_RegStruct_SetLen(AlxPcal6416a* me);
 static void AlxPcal6416a_RegStruct_SetValToZero(AlxPcal6416a* me);
 static void AlxPcal6416a_RegStruct_SetValToDefault(AlxPcal6416a* me);
+void AlxPcal6416a_IoPin_ConfigPull(AlxPcal6416a* me, AlxPcal6416a_Pin pin, AlxPcal6416a_Pull pull);
 
 
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
 void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me);
-Alx_Status AlxPcal6416a_Reg_WriteAll(AlxPcal6416a* me);
+Alx_Status AlxPcal6416a_RegStruct_Write(AlxPcal6416a* me);
 
 
 //******************************************************************************
@@ -90,251 +102,514 @@ void AlxPcal6416a_Ctor
 //******************************************************************************
 Alx_Status AlxPcal6416a_InitPeriph(AlxPcal6416a* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	ALX_PCAL6416A_ASSERT(me->isInitPeriph == false);
 	// isInit -> Don't care
 
-	// #2 Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// #3 Init I2C
+	// Init I2C
 	status = AlxI2c_Init(me->i2c);
 	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 
-	// #4 Set isInitPeriph
+	// Set isInitPeriph
 	me->isInitPeriph = true;
 
-	// #5 Return OK
+	// Return
 	return Alx_Ok;
 }
 Alx_Status AlxPcal6416a_DeInitPeriph(AlxPcal6416a* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	ALX_PCAL6416A_ASSERT(me->isInitPeriph == true);
 	// isInit -> Don't care
 
-	// #2 Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// #3 DeInit I2C
+	// DeInit I2C
 	status = AlxI2c_DeInit(me->i2c);
 	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 
-	// #4 Reset isInitPeriph
+	// Reset isInitPeriph
 	me->isInitPeriph = false;
 
-	// #5 Return OK
+	// Return
 	return Alx_Ok;
 }
 Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	ALX_PCAL6416A_ASSERT(me->isInitPeriph == true);
 	ALX_PCAL6416A_ASSERT(me->isInit == false);
 
-	// #2 Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// #3 Check if slave is ready
+	// Check if slave is ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 
-	// #4 Set register struct values to default
+	// Set register struct values to default
 	AlxPcal6416a_RegStruct_SetValToDefault(me);
 
-	// #5 Set registers values - WEAK
+	// Set register struct values - WEAK
 	AlxPcal6416a_RegStruct_SetVal(me);
 
-	// #6 Write all registers
-	status = AlxPcal6416a_Reg_WriteAll(me);
+	// Write register struct - WEAK
+	status = AlxPcal6416a_RegStruct_Write(me);
 	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 
-	// #7 Set isInit
+	// Set isInit
 	me->isInit = true;
 
-	// #8 Return OK
+	// Return
 	return Alx_Ok;
 }
 Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	ALX_PCAL6416A_ASSERT(me->isInitPeriph == true);
 	ALX_PCAL6416A_ASSERT(me->isInit == true);
 
-	// #2 DO NOTHING
-
-	// #3 Reset isInit
+	// Reset isInit
 	me->isInit = false;
 
-	// #4 Return OK
+	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inputPort0, bool inputPort1, bool outputPort0, bool outputPort1)
+Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inPort0, bool inPort1, bool outPort0, bool outPort1)
 {
-	// #1 Assert
+	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	ALX_PCAL6416A_ASSERT(me->isInitPeriph == true);
 	ALX_PCAL6416A_ASSERT(me->isInit == true);
 
-	// #2 Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// #3 Handle
-	if (inputPort0)
+	// Handle
+	if (inPort0)
 	{
 		status = AlxPcal6416a_Reg_Read(me, &me->reg._00h_InputPort_0);
-		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 	}
-	if (inputPort1)
+	if (inPort1)
 	{
 		status = AlxPcal6416a_Reg_Read(me, &me->reg._01h_InputPort_1);
-		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 	}
-	if (outputPort0)
+	if (outPort0)
 	{
 		status = AlxPcal6416a_Reg_Write(me, &me->reg._02h_OutputPort_0);
-		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 	}
-	if (outputPort1)
+	if (outPort1)
 	{
 		status = AlxPcal6416a_Reg_Write(me, &me->reg._03h_OutputPort_1);
-		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 	}
 
-	// #4 Return OK
+	// Return
 	return Alx_Ok;
 }
-bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_PortPin pin)
+bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, AlxPcal6416a_Pin pin)
 {
-	// #1 Assert
+	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 
-	// #2.1 Read if Port0 is used
+	// Read if port 0 is used
 	if (!(pin & (1 << 3)))
 	{
-		if (me->reg._00h_InputPort_0.val.raw & (1U << pin))	{ return true; }
-		else												{ return false; }
+		if (me->reg._00h_InputPort_0.val.raw & (1U << pin))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
-	// #2.2 Read if Port1 is used
+	// Read if port 1 is used
 	if (pin & (1 << 3))
 	{
-		if (me->reg._01h_InputPort_1.val.raw & (1U << pin))	{ return true; }
-		else												{ return false; }
+		if (me->reg._01h_InputPort_1.val.raw & (1U << pin))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
-	// #3 Asset
-	ALX_PCAL6416A_ASSERT(false); // We sould not get here
+	// Assert
+	ALX_PCAL6416A_ASSERT(false);	// We should not get here
 	return false;
 }
-void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, AlxPcal6416a_PortPin pin, bool val)
+void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, AlxPcal6416a_Pin pin, bool val)
 {
-	// #1 Assert
+	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 
-	// #2.1 Write if Port0 is used
+	// Write if port 0 is used
 	if (!(pin & (1 << 3)))
 	{
-		if (val == true)	{ me->reg._02h_OutputPort_0.val.raw |=  (1U << pin); return; }
-		else				{ me->reg._02h_OutputPort_0.val.raw &= ~(1U << pin); return; }
+		if (val == true)
+		{
+			me->reg._02h_OutputPort_0.val.raw |=  (1U << pin);
+			return;
+		}
+		else
+		{
+			me->reg._02h_OutputPort_0.val.raw &= ~(1U << pin);
+			return;
+		}
 	}
 
-	// #2.2 Write if Port1 is used
+	// Write if port 1 is used
 	if (pin & (1 << 3))
 	{
-		if (val == true)	{ me->reg._03h_OutputPort_1.val.raw |=  (1U << pin); return; }
-		else				{ me->reg._03h_OutputPort_1.val.raw &= ~(1U << pin); return; }
+		if (val == true)
+		{
+			me->reg._03h_OutputPort_1.val.raw |=  (1U << pin);
+			return;
+		}
+		else
+		{
+			me->reg._03h_OutputPort_1.val.raw &= ~(1U << pin);
+			return;
+		}
 	}
 
-	// #3 Asset
-	ALX_PCAL6416A_ASSERT(false); // We sould not get here
+	// Assert
+	ALX_PCAL6416A_ASSERT(false);	// We should not get here
 }
-void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, AlxPcal6416a_PortPin pin)
+void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, AlxPcal6416a_Pin pin)
 {
-	// #1 Assert
+	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 
-	// #2.1 Write if Port0 is used
-	if (!(pin & (1 << 3)))	{ me->reg._02h_OutputPort_0.val.raw |= (1U << pin); return; }
+	// Write if port 0 is used
+	if (!(pin & (1 << 3)))
+	{
+		me->reg._02h_OutputPort_0.val.raw |= (1U << pin);
+		return;
+	}
 
-	// #2.2 Write if Port1 is used
-	if (pin & (1 << 3))		{ me->reg._03h_OutputPort_1.val.raw |= (1U << pin); return; }
+	// Write if port 1 is used
+	if (pin & (1 << 3))
+	{
+		me->reg._03h_OutputPort_1.val.raw |= (1U << pin);
+		return;
+	}
 
-	// #3 Asset
-	ALX_PCAL6416A_ASSERT(false); // We sould not get here
+	// Assert
+	ALX_PCAL6416A_ASSERT(false);	// We should not get here
 }
-void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, AlxPcal6416a_PortPin pin)
+void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, AlxPcal6416a_Pin pin)
 {
-	// #1 Assert
+	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 
-	// #2.1 Write if Port0 is used
-	if (!(pin & (1 << 3)))	{ me->reg._02h_OutputPort_0.val.raw &= ~(1U << pin); return; }
+	// Write if port 0 is used
+	if (!(pin & (1 << 3)))
+	{
+		me->reg._02h_OutputPort_0.val.raw &= ~(1U << pin);
+		return;
+	}
 
-	// #2.2 Write if Port1 is used
-	if (pin & (1 << 3))		{ me->reg._03h_OutputPort_1.val.raw &= ~(1U << pin); return; }
+	// Write if port 1 is used
+	if (pin & (1 << 3))
+	{
+		me->reg._03h_OutputPort_1.val.raw &= ~(1U << pin);
+		return;
+	}
 
-	// #3 Asset
-	ALX_PCAL6416A_ASSERT(false); // We sould not get here
+	// Assert
+	ALX_PCAL6416A_ASSERT(false);	// We should not get here
 }
-void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_PortPin pin)
+void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, AlxPcal6416a_Pin pin)
 {
-	// #1 Assert
+	// Assert
 	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 
-	// #2.1 Write if Port0 is used
-	if (!(pin & (1 << 3)))	{ me->reg._02h_OutputPort_0.val.raw ^= (1U << pin); return; }
+	// Write if port 0 is used
+	if (!(pin & (1 << 3)))
+	{
+		me->reg._02h_OutputPort_0.val.raw ^= (1U << pin);
+		return;
+	}
 
-	// #2.2 Write if Port1 is used
-	if (pin & (1 << 3))		{ me->reg._03h_OutputPort_1.val.raw ^= (1U << pin); return; }
+	// Write if port 1 is used
+	if (pin & (1 << 3))
+	{
+		me->reg._03h_OutputPort_1.val.raw ^= (1U << pin);
+		return;
+	}
 
-	// #3 Asset
-	ALX_PCAL6416A_ASSERT(false);	// We sould not get here
+	// Assert
+	ALX_PCAL6416A_ASSERT(false);	// We should not get here
+}
+Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, AlxPcal6416a_Pin pin, AlxIoPin_TriState* val)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
+	ALX_PCAL6416A_ASSERT(me->isInitPeriph == true);
+	ALX_PCAL6416A_ASSERT(me->isInit == true);
+
+
+	//------------------------------------------------------------------------------
+	// Local variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
+	bool valPullUp = false;
+	bool valPullDown = false;
+
+
+	//------------------------------------------------------------------------------
+	// Read @ PullUp
+	//------------------------------------------------------------------------------
+
+	// Config PullUp
+	AlxPcal6416a_IoPin_ConfigPull(me, pin, AlxPcal6416a_Pull_Up);
+
+	// Write pull registers
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	// Wait
+	AlxDelay_ms(1);
+
+	// Read input port registers
+	status = AlxPcal6416a_Reg_Read(me, &me->reg._00h_InputPort_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Read(me, &me->reg._01h_InputPort_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	// Read
+	valPullUp = AlxPcal6416a_IoPin_Read(me, pin);
+
+	// Disable pull
+	AlxPcal6416a_IoPin_ConfigPull(me, pin, AlxPcal6416a_Pull_None);
+
+	// Write pull registers
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+
+	//------------------------------------------------------------------------------
+	// Read @ PullDown
+	//------------------------------------------------------------------------------
+
+	// Config PullDown
+	AlxPcal6416a_IoPin_ConfigPull(me, pin, AlxPcal6416a_Pull_Down);
+
+	// Write pull registers
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	// Wait
+	AlxDelay_ms(1);
+
+	// Read input port registers
+	status = AlxPcal6416a_Reg_Read(me, &me->reg._00h_InputPort_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Read(me, &me->reg._01h_InputPort_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	// Read
+	valPullDown = AlxPcal6416a_IoPin_Read(me, pin);
+
+	// Disable pull
+	AlxPcal6416a_IoPin_ConfigPull(me, pin, AlxPcal6416a_Pull_None);
+
+	// Write pull registers
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+
+	//------------------------------------------------------------------------------
+	// Set val
+	//------------------------------------------------------------------------------
+	if ((valPullUp == true) && (valPullDown == false))
+	{
+		*val = AlxIoPin_TriState_HiZ;
+	}
+	else if ((valPullUp == true) && (valPullDown == true))
+	{
+		*val = AlxIoPin_TriState_Hi;
+	}
+	else if ((valPullUp == false) && (valPullDown == false))
+	{
+		*val = AlxIoPin_TriState_Lo;
+	}
+	else
+	{
+		*val = AlxIoPin_TriState_Undefined;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
+}
+void AlxPcal6416a_IoPin_ConfigPull(AlxPcal6416a* me, AlxPcal6416a_Pin pin, AlxPcal6416a_Pull pull)
+{
+	// If port 0 is used
+	if (!(pin & (1 << 3)))
+	{
+		if (pull == AlxPcal6416a_Pull_None)
+		{
+			// Disable pull
+			me->reg._46h_PullUpPullDownEn_0.val.raw &= ~(1U << pin);
+
+			// Return
+			return;
+		}
+		else
+		{
+			// Enable pull
+			me->reg._46h_PullUpPullDownEn_0.val.raw |= 1U << pin;
+
+			// Config pull
+			if (pull == AlxPcal6416a_Pull_Up)
+			{
+				me->reg._48h_PullUpPullDownSel_0.val.raw |= 1U << pin;
+			}
+			else if (pull == AlxPcal6416a_Pull_Down)
+			{
+				me->reg._48h_PullUpPullDownSel_0.val.raw &= ~(1U << pin);
+			}
+			else
+			{
+				ALX_PCAL6416A_ASSERT(false);	// We should not get here
+			}
+
+			// Return
+			return;
+		}
+	}
+
+	// If port 1 is used
+	if (pin & (1 << 3))
+	{
+		if (pull == AlxPcal6416a_Pull_None)
+		{
+			// Disable pull
+			me->reg._47h_PullUpPullDownEn_1.val.raw &= ~(1U << pin);
+
+			// Return
+			return;
+		}
+		else
+		{
+			// Enable pull
+			me->reg._47h_PullUpPullDownEn_1.val.raw |= 1U << pin;
+
+			// Config pull
+			if (pull == AlxPcal6416a_Pull_Up)
+			{
+				me->reg._49h_PullUpPullDownSel_1.val.raw |= 1U << pin;
+			}
+			else if (pull == AlxPcal6416a_Pull_Down)
+			{
+				me->reg._49h_PullUpPullDownSel_1.val.raw &= ~(1U << pin);
+			}
+			else
+			{
+				ALX_PCAL6416A_ASSERT(false);	// We should not get here
+			}
+
+			// Return
+			return;
+		}
+	}
+
+	// Assert
+	ALX_PCAL6416A_ASSERT(false);	// We should not get here
 }
 Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg)
 {
-	// #1 Prepare variables
-	Alx_Status status = Alx_Err;
+	// Assert
+	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
+	ALX_PCAL6416A_ASSERT(me->isInitPeriph == true);
+	// isInit -> Don't care
 
+	// Local variables
+	Alx_Status status = Alx_Err;
 	uint8_t regAddr = *((uint8_t*)reg);
 	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
 
-	// #2 Write address and data
+	// Write
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status;}
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 
-	// #3 Return OK
+	// Return
 	return Alx_Ok;
 }
 Alx_Status AlxPcal6416a_Reg_Read(AlxPcal6416a* me, void* reg)
 {
-	// #1 Prepare variables
-	Alx_Status status = Alx_Err;
+	// Assert
+	ALX_PCAL6416A_ASSERT(me->wasCtorCalled == true);
+	ALX_PCAL6416A_ASSERT(me->isInitPeriph == true);
+	// isInit -> Don't care
 
+	// Local variables
+	Alx_Status status = Alx_Err;
 	uint8_t regAddr = *((uint8_t*)reg);
 	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
 
-	// #2 Write address and Read data
+	// Read
 	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if(status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err") ; return status ; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
 
-	// #3 Return OK
+	// Return
 	return Alx_Ok;
 }
 
@@ -344,7 +619,6 @@ Alx_Status AlxPcal6416a_Reg_Read(AlxPcal6416a* me, void* reg)
 //******************************************************************************
 static void AlxPcal6416a_RegStruct_SetAddr(AlxPcal6416a* me)
 {
-	// #1 Set Address
 	me->reg._00h_InputPort_0			.addr = 0x00;
 	me->reg._01h_InputPort_1			.addr = 0x01;
 	me->reg._02h_OutputPort_0			.addr = 0x02;
@@ -371,7 +645,6 @@ static void AlxPcal6416a_RegStruct_SetAddr(AlxPcal6416a* me)
 }
 static void AlxPcal6416a_RegStruct_SetLen(AlxPcal6416a* me)
 {
-	// #1 Set Lenght
 	me->reg._00h_InputPort_0			.len = sizeof(me->reg._00h_InputPort_0				.val);
 	me->reg._01h_InputPort_1			.len = sizeof(me->reg._01h_InputPort_1				.val);
 	me->reg._02h_OutputPort_0			.len = sizeof(me->reg._02h_OutputPort_0				.val);
@@ -398,7 +671,6 @@ static void AlxPcal6416a_RegStruct_SetLen(AlxPcal6416a* me)
 }
 static void AlxPcal6416a_RegStruct_SetValToZero(AlxPcal6416a* me)
 {
-	// #1 Set values to zero
 	//me->reg._00h_InputPort_0			.val.raw = 0b00000000;	// MF: Read Only Reg
 	//me->reg._01h_InputPort_1			.val.raw = 0b00000000;	// MF: Read Only Reg
 	me->reg._02h_OutputPort_0			.val.raw = 0b00000000;
@@ -425,7 +697,6 @@ static void AlxPcal6416a_RegStruct_SetValToZero(AlxPcal6416a* me)
 }
 static void AlxPcal6416a_RegStruct_SetValToDefault(AlxPcal6416a* me)
 {
-	// #1 Set values to default
 	//me->reg._00h_InputPort_0			.val.raw = 0bXXXXXXXX;	// MF: Read Only Reg
 	//me->reg._01h_InputPort_1			.val.raw = 0bXXXXXXXX;	// MF: Read Only Reg
 	//me->reg._02h_OutputPort_0			.val.raw = 0b11111111;	// TV: We will handle OutputPort config outside of Init
@@ -455,89 +726,89 @@ static void AlxPcal6416a_RegStruct_SetValToDefault(AlxPcal6416a* me)
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-ALX_WEAK Alx_Status AlxPcal6416a_Reg_WriteAll(AlxPcal6416a* me)
-{
-	// #1 Prepare variables
-	Alx_Status status = Alx_Err;
-
-	// #2 Write Registers
-	//status = AlxPcal6416a_Reg_Write(me, &me->reg._00h_InputPort_0			);							// MF: Read Only Reg
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_00h_InputPort_0			"); return status;}
-
-	//status = AlxPcal6416a_Reg_Write(me, &me->reg._01h_InputPort_1			);							// MF: Read Only Reg
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_01h_InputPort_1			"); return status;}
-
-	//status = AlxPcal6416a_Reg_Write(me, &me->reg._02h_OutputPort_0			);						// TV: We will handle OutputPort config outside of Init
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_02h_OutputPort_0			"); return status;}
-
-	//status = AlxPcal6416a_Reg_Write(me, &me->reg._03h_OutputPort_1			);						// TV: We will handle OutputPort config outside of Init
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_03h_OutputPort_1			"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._04h_PolarityInversion_0	);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_04h_PolarityInversion_0	"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._05h_PolarityInversion_1	);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_05h_PolarityInversion_1	"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._06h_Configuration_0		);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_06h_Configuration_0		"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._07h_Configuration_1		);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_00h_InputPort_0			"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._40h_OutputDriveStrength_0	);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_40h_OutputDriveStrength_0	"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._41h_OutputDriveStrength_0	);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_41h_OutputDriveStrength_0	"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._42h_OutputDriveStrength_1	);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_42h_OutputDriveStrength_1	"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._43h_OutputDriveStrength_1	);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_43h_OutputDriveStrength_1	"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._44h_InputLatch_0			);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_44h_InputLatch_0			"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._45h_InputLatch_1			);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_45h_InputLatch_1			"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0	);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_46h_PullUpPullDownEn_0		"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1	);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_47h_PullUpPullDownEn_1		"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0	);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_48h_PullUpPullDownSel_0	"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1	);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_49h_PullUpPullDownSel_1	"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Ah_IrqMask_0				);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_4Ah_IrqMask_0				"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Bh_IrqMask_1				);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_4Bh_IrqMask_1				"); return status;}
-
-	//status = AlxPcal6416a_Reg_Write(me, &me->reg._4Ch_IrqStatus_0			);							// MF: Read Only Reg
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_4Ch_IrqStatus_0			"); return status;}
-
-	//status = AlxPcal6416a_Reg_Write(me, &me->reg._4Dh_IrqStatus_1			);							// MF: Read Only Reg
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_4Dh_IrqStatus_1			"); return status;}
-
-	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Fh_OutputPortConfig		);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err_4Fh_OutputPortConfig		"); return status;}
-
-	// #3 Return Ok
-	return Alx_Ok;
-}
 ALX_WEAK void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me)
 {
 	(void)me;
 	ALX_PCAL6416A_TRACE("Define function!");
 	ALX_PCAL6416A_ASSERT(false);
+}
+ALX_WEAK Alx_Status AlxPcal6416a_RegStruct_Write(AlxPcal6416a* me)
+{
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Write
+	//status = AlxPcal6416a_Reg_Write(me, &me->reg._00h_InputPort_0);		// MF: Read Only Reg
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	//status = AlxPcal6416a_Reg_Write(me, &me->reg._01h_InputPort_1);		// MF: Read Only Reg
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	//status = AlxPcal6416a_Reg_Write(me, &me->reg._02h_OutputPort_0);		// TV: We will handle OutputPort config outside of Init
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	//status = AlxPcal6416a_Reg_Write(me, &me->reg._03h_OutputPort_1);		// TV: We will handle OutputPort config outside of Init
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._04h_PolarityInversion_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._05h_PolarityInversion_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._06h_Configuration_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._07h_Configuration_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._40h_OutputDriveStrength_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._41h_OutputDriveStrength_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._42h_OutputDriveStrength_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._43h_OutputDriveStrength_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._44h_InputLatch_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._45h_InputLatch_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Ah_IrqMask_0);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Bh_IrqMask_1);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	//status = AlxPcal6416a_Reg_Write(me, &me->reg._4Ch_IrqStatus_0);		// MF: Read Only Reg
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	//status = AlxPcal6416a_Reg_Write(me, &me->reg._4Dh_IrqStatus_1);		// MF: Read Only Reg
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Fh_OutputPortConfig);
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+
+	// Return
+	return Alx_Ok;
 }
 
 
