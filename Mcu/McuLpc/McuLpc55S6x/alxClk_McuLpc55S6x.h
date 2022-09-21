@@ -70,7 +70,6 @@ typedef struct
 	AlxClk_Config config;
 	AlxClk_Tick tick;
 
-	// Variables
 	uint32_t systemCoreClock;
 	uint32_t ahbClk;
 	uint32_t mainClk;
@@ -87,8 +86,8 @@ typedef struct
 	uint32_t mainClk_Ctor;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxClk;
 
 
