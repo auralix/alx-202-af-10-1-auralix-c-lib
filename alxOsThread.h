@@ -132,6 +132,12 @@ void AlxOsThread_Ctor
   */
 Alx_Status AlxOsThread_Start(AlxOsThread* me);
 
+/**
+  * @brief
+  * @param[in,out] me
+  */
+void AlxOsThread_Yield(AlxOsThread* me);
+
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 

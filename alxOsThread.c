@@ -92,8 +92,22 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 	if (status != pdPASS) { ALX_OS_THREAD_TRACE("Err"); return Alx_Err; }
 	#endif
 
+	// Set wasThreadStarted
+	me->wasThreadStarted = true;
+
 	// Return
 	return Alx_Ok;
+}
+void AlxOsThread_Yield(AlxOsThread* me)
+{
+	// Assert
+	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == true);
+	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+
+	// Yield
+	#if defined(ALX_FREE_RTOS)
+	taskYIELD();
+	#endif
 }
 
 

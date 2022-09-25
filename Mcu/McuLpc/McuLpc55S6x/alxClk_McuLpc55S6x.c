@@ -115,9 +115,6 @@ Alx_Status AlxClk_Init(AlxClk* me)
 	// Enable GPIO clock
 	AlxClk_GpioPeriph_Clk_Enable(me);
 
-	// Reset GPIO
-	AlxClk_GpioPeriph_Reset(me);
-
 
 	//------------------------------------------------------------------------------
 	// Init MCU Clocks
@@ -197,9 +194,6 @@ Alx_Status AlxClk_DeInit(AlxClk* me)
 	//------------------------------------------------------------------------------
 	// DeInit GPIO Clocks
 	//------------------------------------------------------------------------------
-
-	// Reset GPIO
-	AlxClk_GpioPeriph_Reset(me);
 
 	// Disable GPIO clock
 	AlxClk_GpioPeriph_Clk_Disable(me);
