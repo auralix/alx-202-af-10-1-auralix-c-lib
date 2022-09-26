@@ -364,13 +364,14 @@ static void AlxAdc_SetClkDiv(AlxAdc* me)
 	(void)me;
 
 	// #1 Set Clk Div
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_48MHz_FroOsc_96MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_24MHz_FroOsc_96MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
-	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_12MHz_FroOsc_96MHz)			{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default)				{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz)						{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0)				{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz)						{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_48MHz_FroOsc_96MHz)						{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_24MHz_FroOsc_96MHz)						{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_12MHz_FroOsc_96MHz)						{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
+	if (me->clk->config == AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0_FroOsc_1MHz)	{ CLOCK_SetClkDiv(kCLOCK_DivAdcAsyncClk, (uint32_t)me->adcClk, true); return; }
 
 	// Assert
 	ALX_ADC_ASSERT(false); // We shouldn't get here

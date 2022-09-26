@@ -57,29 +57,29 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxIoPin** ioPinArr;
-	AlxClk* clk;
-
 	// Parameters
 	CTIMER_Type* tim;
+	AlxIoPin** ioPinArr;
 	Alx_Ch* chArr;
+	uint8_t numOfCh;
+	AlxClk* clk;
+	AlxClk_Clk alxClk_Clk;
 	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	uint16_t* dutyDefaultArr_permil;
 	#else
 	float* dutyDefaultArr_pct;
 	#endif
-	uint8_t numOfCh;
+	uint32_t prescaler;
+	uint32_t pwmFreq_Hz;
 
 	// Variables
 	ctimer_config_t config;		// MF: Prescaler is in "ctimer_config_t"
 	uint32_t srcClk_Hz;			// MF: Timer source clock, which is then divided by prescaler to get timer clock
 	uint32_t periodMax;
-	uint32_t period;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxPwm;
 
 
@@ -98,7 +98,7 @@ typedef struct
   * @param[in] dutyDefaultArr_permil
   * @param[in] dutyDefaultArr_pct
   * @param[in] prescaler
-  * @param[in] period
+  * @param[in] pwmFreq_Hz
   */
 void AlxPwm_Ctor
 (
@@ -108,13 +108,14 @@ void AlxPwm_Ctor
 	Alx_Ch* chArr,
 	uint8_t numOfCh,
 	AlxClk* clk,
+	AlxClk_Clk alxClk_Clk,
 	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
 	uint16_t* dutyDefaultArr_permil,
 	#else
 	float* dutyDefaultArr_pct,
 	#endif
 	uint32_t prescaler,
-	uint32_t period
+	uint32_t pwmFreq_Hz
 );
 
 

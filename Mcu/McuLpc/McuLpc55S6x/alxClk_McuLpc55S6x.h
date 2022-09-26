@@ -61,7 +61,8 @@ typedef enum
 	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz = 3,
 	AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_48MHz_FroOsc_96MHz = 4,
 	AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_24MHz_FroOsc_96MHz = 5,
-	AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_12MHz_FroOsc_96MHz = 6
+	AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_12MHz_FroOsc_96MHz = 6,
+	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0_FroOsc_1MHz = 7
 } AlxClk_Config;
 
 typedef struct
@@ -73,6 +74,7 @@ typedef struct
 	uint32_t systemCoreClock;
 	uint32_t ahbClk;
 	uint32_t mainClk;
+	uint32_t froOsc_1MHz;
 	//uint32_t fro;		// MF: Don't Know if we need it
 	//uint32_t froHf;	// MF: Don't know how we will use it
 	//uint32_t extClk;	// MF: Don't know how we will use it
@@ -84,6 +86,7 @@ typedef struct
 	uint32_t systemCoreClock_Ctor;
 	uint32_t ahbClk_Ctor;
 	uint32_t mainClk_Ctor;
+	uint32_t froOsc_1MHz_Ctor;
 
 	// Info
 	bool wasCtorCalled;
