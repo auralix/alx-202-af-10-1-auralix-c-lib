@@ -38,6 +38,12 @@
 
 
 //******************************************************************************
+// Private Functions
+//******************************************************************************
+static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, uint32_t timeout_ms);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxOsEventFlagGroup_Ctor
@@ -63,6 +69,88 @@ void AlxOsEventFlagGroup_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet)
+{
+	// Lock mutex
+	AlxOsMutex_Lock(&me->alxMutex);
+
+	// Assert
+	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
+
+	// Local variables
+	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
+	EventBits_t eventBits_t = 0;
+
+	// Unlock mutex
+	AlxOsMutex_Unlock(&me->alxMutex);
+
+	// Set
+	eventBits_t = xEventGroupSetBits(eventGroupHandle_t, eventFlagsToSet);
+
+	// Set me->eventGroupHandle_t
+	AlxOsMutex_Lock(&me->alxMutex);
+	me->eventGroupHandle_t = eventGroupHandle_t;
+	AlxOsMutex_Unlock(&me->alxMutex);
+
+	// Return
+	return eventBits_t;
+}
+uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsToClear)
+{
+	// Lock mutex
+	AlxOsMutex_Lock(&me->alxMutex);
+
+	// Assert
+	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
+
+	// Local variables
+	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
+	EventBits_t eventBits_t = 0;
+
+	// Unlock mutex
+	AlxOsMutex_Unlock(&me->alxMutex);
+
+	// Clear
+	eventBits_t = xEventGroupClearBits(eventGroupHandle_t, eventFlagsToClear);
+
+	// Set me->eventGroupHandle_t
+	AlxOsMutex_Lock(&me->alxMutex);
+	me->eventGroupHandle_t = eventGroupHandle_t;
+	AlxOsMutex_Unlock(&me->alxMutex);
+
+	// Return
+	return eventBits_t;
+}
+uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsToWait, bool clearEventFlagsOnExit, bool waitForAllEventFlags, uint32_t timeout_ms)
+{
+	// Lock mutex
+	AlxOsMutex_Lock(&me->alxMutex);
+
+	// Assert
+	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
+
+	// Local variables
+	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
+	EventBits_t eventBits_t = 0;
+	uint32_t timeout_osTick = 0;
+
+	// Convert to timeout_osTick
+	timeout_osTick = AlxOsEventFlagGroup_GetTimeout_osTick(me, timeout_ms);
+
+	// Unlock mutex
+	AlxOsMutex_Unlock(&me->alxMutex);
+
+	// Wait
+	eventBits_t = xEventGroupWaitBits(eventGroupHandle_t, eventFlagsToWait, clearEventFlagsOnExit, waitForAllEventFlags, timeout_osTick);
+
+	// Set me->eventGroupHandle_t
+	AlxOsMutex_Lock(&me->alxMutex);
+	me->eventGroupHandle_t = eventGroupHandle_t;
+	AlxOsMutex_Unlock(&me->alxMutex);
+
+	// Return
+	return eventBits_t;
+}
 uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, uint32_t eventFlagsToWait, uint32_t timeout_ms)
 {
 	// Lock mutex
@@ -76,15 +164,8 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	EventBits_t eventBits_t = 0;
 	uint32_t timeout_osTick = 0;
 
-	// Check if approximation is disabled
-	if (me->approxDisable)
-	{
-		ALX_OS_EVENT_FLAG_GROUP_ASSERT((timeout_ms * 1000) >= (2 * (uint32_t)me->osTick));
-		ALX_OS_EVENT_FLAG_GROUP_ASSERT(((timeout_ms * 1000) % (uint32_t)me->osTick) == 0);
-	}
-
 	// Convert to timeout_osTick
-	timeout_osTick = (timeout_ms * 1000) / (uint32_t)me->osTick;
+	timeout_osTick = AlxOsEventFlagGroup_GetTimeout_osTick(me, timeout_ms);
 
 	// Unlock mutex
 	AlxOsMutex_Unlock(&me->alxMutex);
@@ -99,6 +180,26 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 
 	// Return
 	return eventBits_t;
+}
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, uint32_t timeout_ms)
+{
+	// Check if approximation is disabled
+	if (me->approxDisable)
+	{
+		ALX_OS_EVENT_FLAG_GROUP_ASSERT((timeout_ms * 1000) >= (2 * (uint32_t)me->osTick));
+		ALX_OS_EVENT_FLAG_GROUP_ASSERT(((timeout_ms * 1000) % (uint32_t)me->osTick) == 0);
+	}
+
+	// Convert to timeout_osTick
+	uint32_t timeout_osTick = (timeout_ms * 1000) / (uint32_t)me->osTick;
+
+	// Return
+	return timeout_osTick;
 }
 
 

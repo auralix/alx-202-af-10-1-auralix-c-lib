@@ -117,6 +117,30 @@ void AlxOsEventFlagGroup_Ctor
   * @brief
   * @param[in,out] me
   * @param[in] eventFlagsToSet
+  */
+uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] eventFlagsToClear
+  */
+uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsToClear);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] eventFlagsToWait
+  * @param[in] clearEventFlagsOnExit
+  * @param[in] waitForAllEventFlags
+  * @param[in] timeout_ms
+  */
+uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsToWait, bool clearEventFlagsOnExit, bool waitForAllEventFlags, uint32_t timeout_ms);
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] eventFlagsToSet
   * @param[in] eventFlagsToWait
   * @param[in] timeout_ms
   */
