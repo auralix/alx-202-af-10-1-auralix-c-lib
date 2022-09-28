@@ -113,7 +113,7 @@ void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const c
 		char tickStr[50] = {0};
 		AlxGlobal_Uint64ToStr(AlxTick_Get_ms(&alxTick), tickStr);
 
-		AlxTrace_WriteFormat(me, "traceSm;%s;%s%s_%s_%s\r\n", tickStr, smLevelStr, smName, stName, acName, threadSafe);
+		AlxTrace_WriteFormat(me, threadSafe, "traceSm;%s;%s%s_%s_%s\r\n", tickStr, smLevelStr, smName, stName, acName);
 	}
 }
 void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr)
