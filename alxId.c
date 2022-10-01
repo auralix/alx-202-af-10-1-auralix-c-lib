@@ -498,7 +498,11 @@ void AlxId_GetUniqueIdUint8(AlxId* me, uint8_t* uniqueIdUint8, uint8_t len)
 {
 	ALX_ID_ASSERT(me->wasCtorCalled == true);
 
+	#ifdef ALX_STM32
 	memcpy(uniqueIdUint8, me->stm32Hw.uniqueId.uint8, len);
+	#else
+	ALX_ID_ASSERT(false);
+	#endif
 }
 const char* AlxId_GetUniqueIdStr(AlxId* me)
 {
