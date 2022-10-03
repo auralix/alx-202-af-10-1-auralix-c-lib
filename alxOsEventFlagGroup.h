@@ -1,7 +1,7 @@
-/**
+﻿/**
   ******************************************************************************
-  * @file		alxBtn.h
-  * @brief		Auralix C Library - ALX Button Module
+  * @file		alxOsEventFlagGroup.h
+  * @brief		Auralix C Library - ALX OS Event Flag Group Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_BTN_H
-#define ALX_BTN_H
+#ifndef ALX_OS_EVENT_FLAG_GROUP_H
+#define ALX_OS_EVENT_FLAG_GROUP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,37 +42,36 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxTimSw.h"
-#include "alxFiltGlitchBool.h"
+#include "alxOsMutex.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_BTN_FILE "alxBtn.h"
+#define ALX_OS_EVENT_FLAG_GROUP_FILE "alxOsEventFlagGroup.h"
 
 // Assert //
-#if defined(_ALX_BTN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_BTN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BTN_FILE, expr)
-#elif defined(_ALX_BTN_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_BTN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BTN_FILE, expr)
-#elif defined(_ALX_BTN_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_BTN_ASSERT(expr) ALX_ASSERT_RST(ALX_BTN_FILE, expr)
+#if defined(_ALX_OS_EVENT_FLAG_GROUP_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_OS_EVENT_FLAG_GROUP_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_EVENT_FLAG_GROUP_FILE, expr)
+#elif defined(_ALX_OS_EVENT_FLAG_GROUP_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_OS_EVENT_FLAG_GROUP_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_EVENT_FLAG_GROUP_FILE, expr)
+#elif defined(_ALX_OS_EVENT_FLAG_GROUP_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_OS_EVENT_FLAG_GROUP_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_EVENT_FLAG_GROUP_FILE, expr)
 #else
-	#define ALX_BTN_ASSERT(expr) do{} while (false)
+	#define ALX_OS_EVENT_FLAG_GROUP_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_BTN_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_BTN_TRACE(...) ALX_TRACE_STD(ALX_BTN_FILE, __VA_ARGS__)
+#if defined(_ALX_OS_EVENT_FLAG_GROUP_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_OS_EVENT_FLAG_GROUP_TRACE(...) ALX_TRACE_STD(ALX_OS_EVENT_FLAG_GROUP_FILE, __VA_ARGS__)
 #else
-	#define ALX_BTN_TRACE(...) do{} while (false)
+	#define ALX_OS_EVENT_FLAG_GROUP_TRACE(...) do{} while (false)
 #endif
 
 
@@ -82,26 +81,16 @@ extern "C" {
 typedef struct
 {
 	// Parameters
-	float longTime_ms;
-	float filterTime;
-
-	// Objects - Internal
-	AlxTimSw timPressed;	// Timer for PressedShort
-	AlxFiltGlitchBool filtGlitchBool;
+	AlxClk_Tick osTick;
+	bool approxDisable;
 
 	// Variables
-	bool isPressedOld;
-	bool isPressed;
-	bool wasPressed;
-	bool wasReleased;
-	bool isPressedShort;
-	bool wasPressedShort;
-	bool isPressedLong;
-	bool wasPressedLong;
+	EventGroupHandle_t eventGroupHandle_t;
+	AlxOsMutex alxMutex;
 
 	// Info
 	bool wasCtorCalled;
-} AlxBtn;
+} AlxOsEventFlagGroup;
 
 
 //******************************************************************************
@@ -111,16 +100,12 @@ typedef struct
 /**
   * @brief
   * @param[in,out] me
-  * @param[in] valInitial
-  * @param[in] longTime_ms
-  * @param[in] debounceTime
   */
-void AlxBtn_Ctor
+void AlxOsEventFlagGroup_Ctor
 (
-	AlxBtn* me,
-	bool valInitial,	// Initial output filtered value
-	float longTime_ms,	// min time of long button press [ms]
-	float debounceTime	// time of stable button status to change it's state [ms]
+	AlxOsEventFlagGroup* me,
+	AlxClk_Tick osTick,
+	bool approxDisable
 );
 
 
@@ -131,81 +116,41 @@ void AlxBtn_Ctor
 /**
   * @brief
   * @param[in,out] me
-  * @param[in] in
+  * @param[in] eventFlagsToSet
   */
-void AlxBtn_Handle(AlxBtn* me, bool in);
+uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet);
 
 /**
   * @brief
   * @param[in,out] me
+  * @param[in] eventFlagsToClear
   */
-bool AlxBtn_IsPressed(AlxBtn* me);	// True -> Button is currently pressed
+uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsToClear);
 
 /**
   * @brief
   * @param[in,out] me
+  * @param[in] eventFlagsToWait
+  * @param[in] clearEventFlagsOnExit
+  * @param[in] waitForAllEventFlags
+  * @param[in] timeout_ms
   */
-bool AlxBtn_WasPressed(AlxBtn* me);
+uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsToWait, bool clearEventFlagsOnExit, bool waitForAllEventFlags, uint32_t timeout_ms);
 
 /**
   * @brief
   * @param[in,out] me
+  * @param[in] eventFlagsToSet
+  * @param[in] eventFlagsToWait
+  * @param[in] timeout_ms
   */
-bool AlxBtn_WasReleased(AlxBtn* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
-bool AlxBtn_IsPressedShort(AlxBtn* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
-bool AlxBtn_WasPressedShort(AlxBtn* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
-bool AlxBtn_IsPressedLong(AlxBtn* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
-bool AlxBtn_WasPressedLong(AlxBtn* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
-void AlxBtn_ClearWasPressed(AlxBtn* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
-void AlxBtn_ClearWasReleased(AlxBtn* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
-void AlxBtn_ClearWasPressedShort(AlxBtn* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
-void AlxBtn_ClearWasPressedLong(AlxBtn* me);
+uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, uint32_t eventFlagsToWait, uint32_t timeout_ms);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_OS) && defined(ALX_FREE_RTOS)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_BTN_H
+#endif	// #ifndef ALX_OS_EVENT_FLAG_GROUP_H

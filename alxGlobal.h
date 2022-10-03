@@ -375,10 +375,12 @@ typedef enum
 	AlxClk_Clk_McuLpc55s6x_SystemCoreClock = 24,
 	AlxClk_Clk_McuLpc55s6x_AhbClk = 25,
 	AlxClk_Clk_McuLpc55s6x_MainClk = 26,
+	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz = 27,
 
-	AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor = 27,
-	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor = 28,
-	AlxClk_Clk_McuLpc55s6x_MainClk_Ctor = 29,
+	AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor = 28,
+	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor = 29,
+	AlxClk_Clk_McuLpc55s6x_MainClk_Ctor = 30,
+	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor = 31
 	#endif
 } AlxClk_Clk;
 

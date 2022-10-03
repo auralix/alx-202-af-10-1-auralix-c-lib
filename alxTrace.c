@@ -47,27 +47,38 @@ AlxTrace alxTrace = {0};
 // Functions
 //******************************************************************************
 #if defined(ALX_PC) || defined(ALX_MBED)
-Alx_Status AlxTrace_Init(AlxTrace* me)
+Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 {
+	// Void
 	(void)me;
+	(void)threadSafe;
 
+	// Return
 	return Alx_Err;
 }
-Alx_Status AlxTrace_DeInit(AlxTrace* me)
+Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 {
+	// Void
 	(void)me;
+	(void)threadSafe;
 
+	// Return
 	return Alx_Err;
 }
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
 {
+	// Void
 	(void)me;
+	(void)threadSafe;
+
+	// Write
 	printf(str);
 
+	// Return
 	return Alx_Ok;
 }
 #endif
-void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
+void AlxTrace_WriteFormat(AlxTrace* me, bool threadSafe, const char* format, ...)
 {
 	char buff[256] = {0};
 	va_list args = {0};
@@ -76,23 +87,23 @@ void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
 	vsnprintf(buff, 256, format, args);
 	va_end(args);
 
-	AlxTrace_WriteStr(me, buff);
+	AlxTrace_WriteStr(me, buff, threadSafe);
 }
-void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, const char* format, ...)
+void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, bool threadSafe, const char* format, ...)
 {
 	char buff[256] = {0};
 	va_list args = {0};
 
 	AlxGlobal_Uint64ToStr(AlxTick_Get_ms(&alxTick), buff);
-	AlxTrace_WriteFormat(me, "trace;%s;%s;%lu;%s;", buff, file, line, fun);
+	AlxTrace_WriteFormat(me, threadSafe, "trace;%s;%s;%lu;%s;", buff, file, line, fun);
 
 	va_start(args, format);
 	vsnprintf(buff, 256, format, args);
 	va_end(args);
 
-	AlxTrace_WriteFormat(me, "%s\r\n", buff);
+	AlxTrace_WriteFormat(me, threadSafe, "%s\r\n", buff);
 }
-void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName)
+void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName, bool threadSafe)
 {
 	if ((smName != NULL) && (stName != NULL) && (acName != NULL))
 	{
@@ -102,7 +113,7 @@ void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const c
 		char tickStr[50] = {0};
 		AlxGlobal_Uint64ToStr(AlxTick_Get_ms(&alxTick), tickStr);
 
-		AlxTrace_WriteFormat(me, "traceSm;%s;%s%s_%s_%s\r\n", tickStr, smLevelStr, smName, stName, acName);
+		AlxTrace_WriteFormat(me, threadSafe, "traceSm;%s;%s%s_%s_%s\r\n", tickStr, smLevelStr, smName, stName, acName);
 	}
 }
 void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr)

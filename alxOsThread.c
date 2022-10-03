@@ -45,7 +45,7 @@ void AlxOsThread_Ctor
 	AlxOsThread* me,
 	TaskFunction_t pxTaskCode,
 	const char* const pcName,
-	const configSTACK_DEPTH_TYPE usStackDepth,
+	uint32_t usStackDepth_byte,
 	void* const pvParameters,
 	UBaseType_t uxPriority
 )
@@ -54,11 +54,12 @@ void AlxOsThread_Ctor
 	// Parameters
 	me->pxTaskCode = pxTaskCode;
 	me->pcName = pcName;
-	me->usStackDepth = usStackDepth;
+	me->usStackDepth_byte = usStackDepth_byte;
 	me->pvParameters = pvParameters;
 	me->uxPriority = uxPriority;
 
 	// Variables
+	me->usStackDepth_word = usStackDepth_byte / 4;	// TV: FreeRTOS stack is mesured in words, 1 word = 4 bytes
 	me->pxCreatedTask = NULL;
 	#endif
 
@@ -73,17 +74,17 @@ void AlxOsThread_Ctor
 //******************************************************************************
 Alx_Status AlxOsThread_Start(AlxOsThread* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == false);
 	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Start
+	// Start
 	#if defined(ALX_FREE_RTOS)
 	BaseType_t status = xTaskCreate
 	(
 		me->pxTaskCode,
 		me->pcName,
-		me->usStackDepth,
+		me->usStackDepth_word,
 		me->pvParameters,
 		me->uxPriority,
 		me->pxCreatedTask
@@ -91,8 +92,22 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 	if (status != pdPASS) { ALX_OS_THREAD_TRACE("Err"); return Alx_Err; }
 	#endif
 
-	// #3 Return
+	// Set wasThreadStarted
+	me->wasThreadStarted = true;
+
+	// Return
 	return Alx_Ok;
+}
+void AlxOsThread_Yield(AlxOsThread* me)
+{
+	// Assert
+	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == true);
+	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+
+	// Yield
+	#if defined(ALX_FREE_RTOS)
+	taskYIELD();
+	#endif
 }
 
 

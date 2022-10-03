@@ -43,11 +43,18 @@
 void AlxMcp73831_Ctor
 (
 	AlxMcp73831* me,
-	AlxIoPin* di_STAT
+	AlxIoPin* di_STAT,
+	bool di_STAT_TriStateReadEnable
 )
 {
 	// Parameters
 	me->di_STAT = di_STAT;
+	me->di_STAT_TriStateReadEnable = di_STAT_TriStateReadEnable;
+
+	// Variables
+	me->st = AlxMcp73831_St_Err;
+	me->di_STAT_TriStateVal = AlxIoPin_TriState_Undefined;
+	me->di_STAT_Val = true;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -60,87 +67,80 @@ void AlxMcp73831_Ctor
 //******************************************************************************
 void AlxMcp73831_Init(AlxMcp73831* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_MCP73831_ASSERT(me->isInit == false);
 	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Init GPIO
+	// Init GPIO
 	AlxIoPin_Init(me->di_STAT);
 
-	// #3 Set isInit
+	// Set isInit
 	me->isInit = true;
 }
 void AlxMcp73831_DeInit(AlxMcp73831* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_MCP73831_ASSERT(me->isInit == true);
 	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
 
-	// #2 DeInit GPIO
+	// DeInit GPIO
 	AlxIoPin_DeInit(me->di_STAT);
 
-	// #3 Reset isInit
+	// Reset isInit
 	me->isInit = false;
 }
-bool AlxMcp73831_IsBatCharging(AlxMcp73831* me)
+AlxMcp73831_St AlxMcp73831_GetSt(AlxMcp73831* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_MCP73831_ASSERT(me->isInit == true);
 	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Return
-	if (AlxIoPin_Read(me->di_STAT) == false)
-		return true;
-	else
-		return false;
-}
-bool AlxMcp73831_IsBatFull(AlxMcp73831* me)
-{
-	// #1 Assert
-	ALX_MCP73831_ASSERT(me->isInit == true);
-	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
+	// Read GPIO
+	if (me->di_STAT_TriStateReadEnable)
+	{
+		// If tri-state logic read
+		me->di_STAT_TriStateVal = AlxIoPin_Read_TriState(me->di_STAT);
 
-	// #2 Return
-	if (AlxIoPin_Read(me->di_STAT) == true)
-		return true;
+		// Handle result
+		if (me->di_STAT_TriStateVal == AlxIoPin_TriState_Lo)
+		{
+			me->st = AlxMcp73831_St_Charging;
+		}
+		else if (me->di_STAT_TriStateVal == AlxIoPin_TriState_Hi)
+		{
+			me->st = AlxMcp73831_St_Standby;
+		}
+		else if (me->di_STAT_TriStateVal == AlxIoPin_TriState_HiZ)
+		{
+			me->st = AlxMcp73831_St_Shutdown;
+		}
+		else if (me->di_STAT_TriStateVal == AlxIoPin_TriState_Undefined)
+		{
+			me->st = AlxMcp73831_St_Err;
+		}
+		else
+		{
+			ALX_MCP73831_ASSERT(false);	// We should never get here
+		}
+	}
 	else
-		return false;
-}
-bool AlxMcp73831_TriState_IsBatCharging(AlxMcp73831* me)
-{
-	// #1 Assert
-	ALX_MCP73831_ASSERT(me->isInit == true);
-	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
+	{
+		// If binary logic read
+		me->di_STAT_Val = AlxIoPin_Read(me->di_STAT);
 
-	// #2 Return
-	if (AlxIoPin_Read_TriState(me->di_STAT) == AlxIoPin_TriState_Lo)
-		return true;
-	else
-		return false;
-}
-bool AlxMcp73831_TriState_IsBatFull(AlxMcp73831* me)
-{
-	// #1 Assert
-	ALX_MCP73831_ASSERT(me->isInit == true);
-	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
+		// Handle result
+		if (me->di_STAT_Val)
+		{
+			me->st = AlxMcp73831_St_Standby;
+		}
+		else
+		{
+			me->st = AlxMcp73831_St_Charging;
+		}
+	}
 
-	// #2 Return
-	if (AlxIoPin_Read_TriState(me->di_STAT) == AlxIoPin_TriState_Hi)
-		return true;
-	else
-		return false;
-}
-bool AlxMcp73831_TriState_IsShutdown(AlxMcp73831* me)
-{
-	// #1 Assert
-	ALX_MCP73831_ASSERT(me->isInit == true);
-	ALX_MCP73831_ASSERT(me->wasCtorCalled == true);
-
-	// #2 Return
-	if (AlxIoPin_Read_TriState(me->di_STAT) == AlxIoPin_TriState_HiZ)
-		return true;
-	else
-		return false;
+	// Return
+	return me->st;
 }
 
 

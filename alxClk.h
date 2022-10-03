@@ -104,6 +104,12 @@ typedef struct { bool dummy; } AlxClk;
   */
 Alx_Status AlxClk_Init(AlxClk* me);
 
+	/**
+  * @brief
+  * @param[in,out] me
+  */
+Alx_Status AlxClk_DeInit(AlxClk* me);
+
 /**
   * @brief
   * @param[in,out] me

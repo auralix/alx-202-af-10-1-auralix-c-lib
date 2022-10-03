@@ -268,10 +268,10 @@ void AlxId_Ctor
 		#ifdef ALX_STM32G4
 			me->stm32Hw.packageId = (*(uint16_t*)(0x1FFF7500) & 0x001F);
 		#endif
-		me->stm32Hw.uniqueId0 = *(uint32_t*)(UID_BASE);
-		me->stm32Hw.uniqueId1 = *(uint32_t*)(UID_BASE + 4);
-		me->stm32Hw.uniqueId2 = *(uint32_t*)(UID_BASE + 8);
-		sprintf(me->stm32Hw.uniqueIdStr, "%08lX%08lX%08lX", me->stm32Hw.uniqueId2, me->stm32Hw.uniqueId1, me->stm32Hw.uniqueId0);
+		me->stm32Hw.uniqueId.uint32[0] = *(uint32_t*)(UID_BASE);
+		me->stm32Hw.uniqueId.uint32[1] = *(uint32_t*)(UID_BASE + 4);
+		me->stm32Hw.uniqueId.uint32[2] = *(uint32_t*)(UID_BASE + 8);
+		sprintf(me->stm32Hw.uniqueIdStr, "%08lX%08lX%08lX", me->stm32Hw.uniqueId.uint32[2], me->stm32Hw.uniqueId.uint32[1], me->stm32Hw.uniqueId.uint32[0]);
 	#endif
 
 
@@ -493,6 +493,16 @@ uint8_t AlxId_GetHwId(AlxId* me)
 	ALX_ID_ASSERT(me->wasCtorCalled == true);
 
 	return me->hw.instance.id;
+}
+void AlxId_GetUniqueIdUint8(AlxId* me, uint8_t* uniqueIdUint8, uint8_t len)
+{
+	ALX_ID_ASSERT(me->wasCtorCalled == true);
+
+	#ifdef ALX_STM32
+	memcpy(uniqueIdUint8, me->stm32Hw.uniqueId.uint8, len);
+	#else
+	ALX_ID_ASSERT(false);
+	#endif
 }
 const char* AlxId_GetUniqueIdStr(AlxId* me)
 {

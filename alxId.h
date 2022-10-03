@@ -215,6 +215,12 @@ typedef struct
 #endif
 
 #ifdef ALX_STM32
+typedef union
+{
+	uint32_t uint32[3];
+	uint8_t uint8[12];
+} AlxId_Stm32Hw_UniqueId;
+
 typedef struct
 {
 	// Parameters - Const
@@ -224,9 +230,7 @@ typedef struct
 	#ifdef ALX_STM32G4
 		uint32_t packageId;
 	#endif
-	uint32_t uniqueId0;
-	uint32_t uniqueId1;
-	uint32_t uniqueId2;
+	AlxId_Stm32Hw_UniqueId uniqueId;
 	char uniqueIdStr[30];
 } AlxId_Stm32Hw;
 #endif
@@ -352,6 +356,14 @@ void AlxId_Trace(AlxId* me);
   * @param[in] me
   */
 uint8_t AlxId_GetHwId(AlxId* me);
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[out] uniqueIdUint8
+  * @param[in] len
+  */
+void AlxId_GetUniqueIdUint8(AlxId* me, uint8_t* uniqueIdUint8, uint8_t len);
 
 /**
   * @brief
