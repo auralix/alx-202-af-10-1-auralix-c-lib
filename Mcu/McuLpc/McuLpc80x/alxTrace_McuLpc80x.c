@@ -93,7 +93,7 @@ void AlxTrace_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxTrace_Init(AlxTrace* me)
+Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 {
 	// #1 Init SWM
 	CLOCK_EnableClock(kCLOCK_Swm);
@@ -112,7 +112,7 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	// #5 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxTrace_DeInit(AlxTrace* me)
+Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 {
 	// #1 DeInit UART
 	USART_Deinit(me->usart);	// MF: "DisableClk" happens here
@@ -128,7 +128,7 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 	// #4 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
 {
 	// #1 Write
 	if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
