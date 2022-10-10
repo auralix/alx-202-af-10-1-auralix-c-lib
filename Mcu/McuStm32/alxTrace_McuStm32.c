@@ -103,7 +103,7 @@ void AlxTrace_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxTrace_Init(AlxTrace* me)
+Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 {
 	// GPIO //
 	// #1 Init GPIO
@@ -127,7 +127,7 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	// #6 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxTrace_DeInit(AlxTrace* me)
+Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 {
 	// UART //
 	// #1 DeInit Trace
@@ -149,7 +149,7 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 	// #6 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
 {
 	// #1 Write
 	if (HAL_UART_Transmit(&me->huart, (uint8_t*)str, strlen(str), 1000) != HAL_OK)
