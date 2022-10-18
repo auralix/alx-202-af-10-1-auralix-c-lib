@@ -1579,13 +1579,13 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] i2s
-  * @param[in] i2c
-  * @param[in] i2cAddr
-  * @param[in] i2cCheckWithRead
-  * @param[in] i2cNumOfTries
-  * @param[in] i2cTimeout_ms
+  * @param[in,out]	me
+  * @param[in]		i2s
+  * @param[in]		i2c
+  * @param[in]		i2cAddr
+  * @param[in]		i2cCheckWithRead
+  * @param[in]		i2cNumOfTries
+  * @param[in]		i2cTimeout_ms
   */
 void AlxAdau1961_Ctor
 (
@@ -1605,15 +1605,17 @@ void AlxAdau1961_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdau1961_Init(AlxAdau1961* me);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdau1961_DeInit(AlxAdau1961* me);
 
@@ -1625,43 +1627,55 @@ void AlxAdau1961_Foreground_Handle(AlxAdau1961* me);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] gain_dB
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdau1961_InDiffL_SetGain_dB(AlxAdau1961* me, float gain_dB);		// Mute -> gain_dB = -120
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] gain_dB
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdau1961_InDiffR_SetGain_dB(AlxAdau1961* me, float gain_dB);		// Mute -> gain_dB = -120
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] gain_dB
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdau1961_InAuxL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);		// Mute -> gain_dB = -120
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] gain_dB
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdau1961_InAuxR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);		// Mute -> gain_dB = -120
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] gain_dB
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdau1961_OutLineL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// Mute -> gain_dB = -120
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] gain_dB
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdau1961_OutLineR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB);	// Mute -> gain_dB = -120
 

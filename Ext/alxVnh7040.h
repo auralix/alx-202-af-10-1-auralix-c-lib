@@ -196,21 +196,21 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] adc
-  * @param[in] multiSensAdcCh
-  * @param[in] pwm
-  * @param[in] pwmCh
-  * @param[in] do_PWM
-  * @param[in] do_INA
-  * @param[in] do_INB
-  * @param[in] do_SEL0
-  * @param[in] do_SEL1
-  * @param[in] do_SENS_EN
-  * @param[in] breakTypeDefault
-  * @param[in] multiSensResHigh_ohm
-  * @param[in] multiSensResLow_ohm
-  * @param[in] restartWaitTime_ms
+  * @param[in,out]	me
+  * @param[in]		adc
+  * @param[in]		multiSensAdcCh
+  * @param[in]		pwm
+  * @param[in]		pwmCh
+  * @param[in]		do_PWM
+  * @param[in]		do_INA
+  * @param[in]		do_INB
+  * @param[in]		do_SEL0
+  * @param[in]		do_SEL1
+  * @param[in]		do_SENS_EN
+  * @param[in]		breakTypeDefault
+  * @param[in]		multiSensResHigh_ohm
+  * @param[in]		multiSensResLow_ohm
+  * @param[in]		restartWaitTime_ms
   */
 void AlxVnh7040_Ctor
 (
@@ -266,37 +266,43 @@ void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @return
   */
 uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @return
   */
 uint32_t AlxVnh7040_GetCurrentHsA_mA(AlxVnh7040* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @return
   */
 uint32_t AlxVnh7040_GetCurrentHsB_mA(AlxVnh7040* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @return
   */
 uint32_t AlxVnh7040_GetSupplyVoltage_mV(AlxVnh7040* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @return
   */
 int32_t AlxVnh7040_GetTemp_degC(AlxVnh7040* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out] me
+  * @return
   */
 int32_t AlxVnh7040_GetIsError(AlxVnh7040* me);
 

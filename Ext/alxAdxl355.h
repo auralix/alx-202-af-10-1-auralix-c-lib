@@ -606,12 +606,12 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] spi
-  * @param[in] spiNumOfTries
-  * @param[in] spiTimeout_ms
-  * @param[in] fifoBuff
-  * @param[in] fifoBuffLen
+  * @param[in,out]	me
+  * @param[in]		spi
+  * @param[in]		spiNumOfTries
+  * @param[in]		spiTimeout_ms
+  * @param[in]		fifoBuff
+  * @param[in]		fifoBuffLen
   */
 void AlxAdxl355_Ctor
 (
@@ -630,52 +630,67 @@ void AlxAdxl355_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdxl355_Init(AlxAdxl355* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdxl355_DeInit(AlxAdxl355* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdxl355_Enable(AlxAdxl355* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdxl355_Disable(AlxAdxl355* me);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[out] xyz_g
+  * @param[in,out]	me
+  * @param[out]		xyz_g
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[out] xyz_g
-  * @param[in] len
+  * @param[in,out]	me
+  * @param[out]		xyz_g
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdxl355_GetXyzMulti_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 float AlxAdxl355_GetTemp_degC(AlxAdxl355* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me);
 

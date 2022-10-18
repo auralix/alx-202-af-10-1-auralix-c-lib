@@ -88,19 +88,24 @@ typedef struct {} AlxTempSens_Mcu;
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxTempSensMcu_Init(AlxTempSens_Mcu* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxTempSensMcu_DeInit(AlxTempSens_Mcu* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 float AlxTempSensMcu_GetTemp_degC(AlxTempSens_Mcu* me);
 
