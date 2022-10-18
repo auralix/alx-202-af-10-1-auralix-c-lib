@@ -72,12 +72,12 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] port
-  * @param[in] pin
-  * @param[in] alternate
-  * @param[in] uart
-  * @param[in] baudRate
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		alternate
+  * @param[in]		uart
+  * @param[in]		baudRate
   */
 void AlxTrace_Ctor
 (

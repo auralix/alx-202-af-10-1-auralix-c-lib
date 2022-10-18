@@ -90,15 +90,15 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] tim
-  * @param[in] ioPinArr
-  * @param[in] chArr
-  * @param[in] dutyDefaultArr_pct
-  * @param[in] numOfCh
-  * @param[in] clk
-  * @param[in] prescaler
-  * @param[in] period
+  * @param[in,out]	me
+  * @param[in]		tim
+  * @param[in]		ioPinArr
+  * @param[in]		chArr
+  * @param[in]		dutyDefaultArr_pct
+  * @param[in]		numOfCh
+  * @param[in]		clk
+  * @param[in]		prescaler
+  * @param[in]		period
   */
 void AlxPwm_Ctor
 (

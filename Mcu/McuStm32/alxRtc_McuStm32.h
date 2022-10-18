@@ -94,8 +94,8 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] rtcClk
+  * @param[in,out]	me
+  * @param[in]		rtcClk
   */
 void AlxRtc_Ctor
 (

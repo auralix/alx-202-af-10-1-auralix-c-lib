@@ -75,14 +75,14 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] port
-  * @param[in] pin
-  * @param[in] mode
-  * @param[in] pull
-  * @param[in] speed
-  * @param[in] alternate
-  * @param[in] val
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		mode
+  * @param[in]		pull
+  * @param[in]		speed
+  * @param[in]		alternate
+  * @param[in]		val
   */
 void AlxIoPin_Ctor
 (
