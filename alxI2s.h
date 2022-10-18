@@ -91,13 +91,17 @@ typedef struct { bool dummy; } AlxI2s;
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxI2s_Init(AlxI2s* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxI2s_DeInit(AlxI2s* me);
 

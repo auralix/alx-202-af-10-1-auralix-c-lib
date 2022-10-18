@@ -441,44 +441,52 @@ void AlxGlobal_EnableIrq(void);
 
 /**
   * @brief
-  * @param[in] uint64
-  * @param[out] str
+  * @param[in]	uint64
+  * @param[out]	str
   */
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
 
 /**
   * @brief
-  * @param[in,out] valPtr
-  * @param[in] valMin
-  * @param[in] valMax
+  * @param[in,out]	valPtr
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxGlobal_BoundUint32(uint32_t* valPtr, uint32_t valMin, uint32_t valMax);
 
 /**
   * @brief
-  * @param[in,out] valPtr
-  * @param[in] valMin
-  * @param[in] valMax
+  * @param[in,out]	valPtr
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxGlobal_BoundFloat(float* valPtr, float valMin, float valMax);
 
 /**
   * @brief
   * @param[in] val
+  * @return
   */
 uint32_t AlxGlobal_Round(float val);
 
 /**
   * @brief
-  * @param[in] val
-  * @param[in] valMin
-  * @param[in] valMax
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		false
+  * @retval		true
   */
 bool AlxGlobal_IsOutOfRangeUint8(uint8_t val, uint8_t valMin, uint8_t valMax);
 
 /**
   * @brief
   * @param[in] val
+  * @return
   */
 uint32_t AlxGlobal_Ntohl(uint32_t val);
 

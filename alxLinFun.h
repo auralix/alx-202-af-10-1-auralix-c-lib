@@ -118,14 +118,14 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] x1
-  * @param[in] point1_y
-  * @param[in] point2_x
-  * @param[in] point2_y
-  * @param[in] min
-  * @param[in] max
-  * @param[in] isLimitOnX
+  * @param[in,out]	me
+  * @param[in]		x1
+  * @param[in]		point1_y
+  * @param[in]		point2_x
+  * @param[in]		point2_y
+  * @param[in]		min
+  * @param[in]		max
+  * @param[in]		isLimitOnX
   */
 void AlxLinFun_Ctor
 (
@@ -141,14 +141,14 @@ void AlxLinFun_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] x1
-  * @param[in] point1_y
-  * @param[in] point2_x
-  * @param[in] point2_y
-  * @param[in] min
-  * @param[in] max
-  * @param[in] isLimitOnX
+  * @param[in,out]	me
+  * @param[in]		x1
+  * @param[in]		point1_y
+  * @param[in]		point2_x
+  * @param[in]		point2_y
+  * @param[in]		min
+  * @param[in]		max
+  * @param[in]		isLimitOnX
   */
 void AlxLinFunInt_Ctor
 (
@@ -169,17 +169,21 @@ void AlxLinFunInt_Ctor
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] x
-  * @param[out] y
+  * @param[in]	me
+  * @param[in]	x
+  * @param[out]	y
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
   */
 Alx_Status AlxLinFun_GetY_WithStatus(AlxLinFun* me, float x, float* y);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] y
-  * @param[out] x
+  * @param[in]	me
+  * @param[in]	y
+  * @param[out]	x
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
   */
 Alx_Status AlxLinFun_GetX_WithStatus(AlxLinFun* me, float y, float* x);
 
@@ -187,6 +191,7 @@ Alx_Status AlxLinFun_GetX_WithStatus(AlxLinFun* me, float y, float* x);
   * @brief
   * @param[in] me
   * @param[in] x
+  * @return
   */
 float AlxLinFun_GetY(AlxLinFun* me, float x);
 
@@ -194,14 +199,17 @@ float AlxLinFun_GetY(AlxLinFun* me, float x);
   * @brief
   * @param[in] me
   * @param[in] y
+  * @return
   */
 float AlxLinFun_GetX(AlxLinFun* me, float y);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] x
-  * @param[out] y
+  * @param[in]	me
+  * @param[in]	x
+  * @param[out]	y
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
   */
 Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y);
 
@@ -209,6 +217,7 @@ Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y)
   * @brief
   * @param[in] me
   * @param[in] x
+  * @return
   */
 int32_t AlxLinFunInt_GetY(AlxLinFunInt* me, int32_t x);
 
