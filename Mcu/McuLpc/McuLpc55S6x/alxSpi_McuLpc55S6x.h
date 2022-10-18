@@ -104,14 +104,14 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] spi
-  * @param[in] do_SCK
-  * @param[in] do_MOSI
-  * @param[in] di_MISO
-  * @param[in] do_nCS
-  * @param[in] mode
-  * @param[in] spiClk
+  * @param[in,out]	me
+  * @param[in]		spi
+  * @param[in]		do_SCK
+  * @param[in]		do_MOSI
+  * @param[in]		di_MISO
+  * @param[in]		do_nCS
+  * @param[in]		mode
+  * @param[in]		spiClk
   */
 void AlxSpi_Ctor
 (
