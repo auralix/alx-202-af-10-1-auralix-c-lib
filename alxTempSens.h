@@ -137,27 +137,32 @@ void AlxTempSens_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxTempSens_Init(AlxTempSens* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxTempSens_DeInit(AlxTempSens* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
   */
 //float AlxTempSens_GetTemp_degC(AlxTempSens* me);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[out] temp_degC
+  * @param[in,out]	me
+  * @param[out]		temp_degC
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxTempSens_GetTemp_degC(AlxTempSens* me, float* temp_degC);
 

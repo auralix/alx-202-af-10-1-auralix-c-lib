@@ -114,17 +114,17 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] adc
-  * @param[in] chAdc
-  * @param[in] vdiv_ResHigh_kOhm
-  * @param[in] vdiv_ResLow_kOhm
-  * @param[in] hys2_TopHigh_V
-  * @param[in] hys2_TopLow_V
-  * @param[in] hys2_BotHigh_V
-  * @param[in] hys2_BotLow_V
-  * @param[in] filtGlitchBool_StableTrueTime_ms
-  * @param[in] filtGlitchBool_StableFalseTime_ms
+  * @param[in,out]	me
+  * @param[in]		adc
+  * @param[in]		chAdc
+  * @param[in]		vdiv_ResHigh_kOhm
+  * @param[in]		vdiv_ResLow_kOhm
+  * @param[in]		hys2_TopHigh_V
+  * @param[in]		hys2_TopLow_V
+  * @param[in]		hys2_BotHigh_V
+  * @param[in]		hys2_BotLow_V
+  * @param[in]		filtGlitchBool_StableTrueTime_ms
+  * @param[in]		filtGlitchBool_StableFalseTime_ms
   */
 void AlxPwr_Ctor
 (
@@ -146,8 +146,10 @@ void AlxPwr_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] adcVal_V
+  * @param[in,out]	me
+  * @param[in]		adcVal_V
+  * @retval			false
+  * @retval			true
   */
 bool AlxPwr_Process(AlxPwr* me, float adcVal_V);
 

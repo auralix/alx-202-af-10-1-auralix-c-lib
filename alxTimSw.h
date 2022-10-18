@@ -95,8 +95,8 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] start
+  * @param[in,out]	me
+  * @param[in]		start
   */
 void AlxTimSw_Ctor
 (
@@ -123,85 +123,105 @@ void AlxTimSw_Stop(AlxTimSw* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in]	me
+  * @retval		false
+  * @retval		true
   */
 bool AlxTimSw_IsRunning(AlxTimSw* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 uint64_t AlxTimSw_Get_ns(AlxTimSw* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 uint64_t AlxTimSw_Get_us(AlxTimSw* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 uint64_t AlxTimSw_Get_ms(AlxTimSw* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 uint64_t AlxTimSw_Get_sec(AlxTimSw* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 uint64_t AlxTimSw_Get_min(AlxTimSw* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 uint64_t AlxTimSw_Get_hr(AlxTimSw* me);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] timeout_ns
+  * @param[in,out]	me
+  * @param[in]		timeout_ns
+  * @retval			false
+  * @retval			true
   */
 bool AlxTimSw_IsTimeout_ns(AlxTimSw* me, uint64_t timeout_ns);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
   * @param[in] timeout_us
+  * @retval			false
+  * @retval			true
   */
 bool AlxTimSw_IsTimeout_us(AlxTimSw* me, uint64_t timeout_us);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
   * @param[in] timeout_ms
+  * @retval			false
+  * @retval			true
   */
 bool AlxTimSw_IsTimeout_ms(AlxTimSw* me, uint64_t timeout_ms);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
   * @param[in] timeout_sec
+  * @retval			false
+  * @retval			true
   */
 bool AlxTimSw_IsTimeout_sec(AlxTimSw* me, uint64_t timeout_sec);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
   * @param[in] timeout_min
+  * @retval			false
+  * @retval			true
   */
 bool AlxTimSw_IsTimeout_min(AlxTimSw* me, uint64_t timeout_min);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
   * @param[in] timeout_hr
+  * @retval			false
+  * @retval			true
   */
 bool AlxTimSw_IsTimeout_hr(AlxTimSw* me, uint64_t timeout_hr);
 

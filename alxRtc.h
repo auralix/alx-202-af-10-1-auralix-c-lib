@@ -89,140 +89,176 @@ typedef struct { bool dummy; } AlxRtc;
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_Init(AlxRtc* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_DeInit(AlxRtc* me);
 
 /**
-  * @brief
-  * @param[in,out] me
-  * @param[in] dateTime
+  * @param[in,out]	me
+  * @param[in]		dateTime
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[out] dateTime
+  * @param[in,out]	me
+  * @param[out]		dateTime
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 AlxRtc_DateTime AlxRtc_GetDateTime(AlxRtc* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxRtc_IsDateTimeConfigured(AlxRtc* me);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] unixTime_ns
+  * @param[in,out]	me
+  * @param[in]		unixTime_ns
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_SetUnixTime_ns(AlxRtc* me, uint64_t unixTime_ns);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] unixTime_us
+  * @param[in,out]	me
+  * @param[in]		unixTime_us
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_SetUnixTime_us(AlxRtc* me, uint64_t unixTime_us);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] unixTime_ms
+  * @param[in,out]	me
+  * @param[in]		unixTime_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_SetUnixTime_ms(AlxRtc* me, uint64_t unixTime_ms);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] unixTime_sec
+  * @param[in,out]	me
+  * @param[in]		unixTime_sec
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_SetUnixTime_sec(AlxRtc* me, uint64_t unixTime_sec);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] unixTime_ns
+  * @param[in,out]	me
+  * @param[in]		unixTime_ns
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_ns(AlxRtc* me, uint64_t* unixTime_ns);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] unixTime_us
+  * @param[in,out]	me
+  * @param[in]		unixTime_us
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_us(AlxRtc* me, uint64_t* unixTime_us);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] unixTime_ms
+  * @param[in,out]	me
+  * @param[in]		unixTime_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_ms(AlxRtc* me, uint64_t* unixTime_ms);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] unixTime_sec
+  * @param[in,out]	me
+  * @param[in]		unixTime_sec
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_sec(AlxRtc* me, uint64_t* unixTime_sec);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 uint64_t AlxRtc_GetUnixTime_ns(AlxRtc* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 uint64_t AlxRtc_GetUnixTime_us(AlxRtc* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 uint64_t AlxRtc_GetUnixTime_ms(AlxRtc* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @return
   */
 uint64_t AlxRtc_GetUnixTime_sec(AlxRtc* me);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] tuneTime_ns
+  * @param[in,out]	me
+  * @param[in]		tuneTime_ns
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] tuneTime_us
+  * @param[in,out]	me
+  * @param[in]		tuneTime_us
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_TuneTime_us(AlxRtc* me, int64_t tuneTime_us);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] tuneTime_ms
+  * @param[in,out]	me
+  * @param[in]		tuneTime_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxRtc_TuneTime_ms(AlxRtc* me, int64_t tuneTime_ms);
 
