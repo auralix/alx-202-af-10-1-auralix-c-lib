@@ -117,45 +117,55 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] submodule
-  * @param[in] submodulePtr
+  * @param[in,out]	me
+  * @param[in]		submodule
+  * @param[in]		submodulePtr
   */
 void AlxDac_Ctor(AlxDac* me, AlxDac_Submodule submodule, void *submodulePtr);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxDac_Init(AlxDac* me);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] vref_V
+  * @param[in,out]	me
+  * @param[in]		vref_V
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxDac_Init_CalibrateVref(AlxDac* me, float vref_V);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxDac_DeInit(AlxDac* me);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] ch
-  * @param[in] voltage_V
+  * @param[in,out]	me
+  * @param[in]		ch
+  * @param[in]		voltage_V
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxDac_SetVoltage_V(AlxDac* me, Alx_Ch ch, float voltage_V);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] ch
-  * @param[in] voltage_V
-  * @param[in] vref_V
+  * @param[in,out]	me
+  * @param[in]		ch
+  * @param[in]		voltage_V
+  * @param[in]		vref_V
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltage_V, float vref_V);
 
