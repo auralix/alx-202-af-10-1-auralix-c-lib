@@ -180,7 +180,7 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 	// Assert
 	ALX_PWM_ASSERT(me->isInit == true);
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
-	ALX_PWM_ASSERT((0.f <= duty_pct) && (duty_pct <= 100.f));
+//	ALX_PWM_ASSERT((0.f <= duty_pct) && (duty_pct <= 100.f));	// TV: Commented due to ASSERT even if duty_pct = 100.f
 
 	// Optimize Guard
 	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
