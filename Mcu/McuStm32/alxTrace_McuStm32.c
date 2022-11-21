@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && ((defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
+#if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
 
 
 //******************************************************************************
@@ -56,9 +56,9 @@ void AlxTrace_Ctor
 	AlxTrace* me,
 	GPIO_TypeDef* port,
 	uint16_t pin,
-	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 	uint32_t alternate,
-	#endif // defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#endif
 	USART_TypeDef* uart,
 	AlxGlobal_BaudRate baudRate
 )
@@ -72,9 +72,9 @@ void AlxTrace_Ctor
 	me->igpio.Mode = GPIO_MODE_AF_PP;
 	me->igpio.Pull = GPIO_NOPULL;
 	me->igpio.Speed = GPIO_SPEED_HIGH;
-	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 	me->igpio.Alternate = alternate;
-	#endif // defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#endif
 
 	// UART //
 	me->huart.Instance = uart;						// MF: Must be one of "USART_TypeDef" so don't need to check here
@@ -85,13 +85,17 @@ void AlxTrace_Ctor
 	me->huart.Init.Mode = UART_MODE_TX;
 	me->huart.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	me->huart.Init.OverSampling = UART_OVERSAMPLING_16;
-
-	#if defined(ALX_STM32G4) || defined(ALX_STM32L0)
-		me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-		#if defined(ALX_STM32G4)
-		me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-		#endif
-		me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	#if defined(ALX_STM32F0)
+	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	#endif
+	#if defined(ALX_STM32G4)
+	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	#endif
+	#if defined(ALX_STM32L0)
+	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	#endif
 
 	// Info
@@ -495,4 +499,4 @@ static void AlxTrace_Periph_ReleaseReset(AlxTrace* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
+#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
