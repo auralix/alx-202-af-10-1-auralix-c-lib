@@ -167,7 +167,11 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Includes - MCU
 //------------------------------------------------------------------------------
-#if defined(ALX_STM32F1)
+#if defined(ALX_STM32F0)
+#include "alxGlobal_McuStm32F0.h"
+#define ALX_STM32
+
+#elif defined(ALX_STM32F1)
 #include "alxGlobal_McuStm32F1.h"
 #define ALX_STM32
 
