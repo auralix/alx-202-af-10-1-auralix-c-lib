@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -49,9 +49,9 @@ void AlxIoPin_Ctor
 	uint32_t mode,
 	uint32_t pull,
 	uint32_t speed,
-	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 	uint32_t alternate,
-	#endif // defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#endif
 	bool val
 )
 {
@@ -64,9 +64,9 @@ void AlxIoPin_Ctor
 	me->igpio.Mode = mode;
 	me->igpio.Pull = pull;
 	me->igpio.Speed = speed;
-	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 	me->igpio.Alternate = alternate;
-	#endif // defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#endif
 
 	// Info
 	me->isInit = false;
@@ -82,10 +82,10 @@ void AlxIoPin_Init(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == false);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Set isInit attribute
+	// Set isInit
 	me->isInit = true;
 
-	// #2 Init GPIO
+	// Init GPIO
 	AlxIoPin_Write(me, me->val);	// Set initial output value, before config
 	HAL_GPIO_Init((GPIO_TypeDef*)me->port, &me->igpio);
 	AlxIoPin_Write(me, me->val);	// Set initial output value, after config
@@ -95,10 +95,10 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	// #1 DeInit GPIO
+	// DeInit GPIO
 	HAL_GPIO_DeInit((GPIO_TypeDef*)me->port, me->igpio.Pin);
 
-	// #2 Clear isInit attribute
+	// Clear isInit
 	me->isInit = false;
 }
 bool AlxIoPin_Read(AlxIoPin* me)
@@ -190,4 +190,4 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))

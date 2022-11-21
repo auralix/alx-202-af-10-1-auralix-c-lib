@@ -45,7 +45,7 @@ extern "C" {
 #include "alxDelay.h"
 
 // AlxMcu //
-#if defined(ALX_STM32F1) ||defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
 #include "alxIoPin_McuStm32.h"
 
 #elif defined(ALX_LPC1769)
