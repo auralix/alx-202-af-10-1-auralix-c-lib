@@ -89,6 +89,7 @@ extern "C" {
   * @brief
   * @param[in] pin
   * @param[in] port
+  * @return
   */
 uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port);
 

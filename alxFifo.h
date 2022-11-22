@@ -173,7 +173,6 @@ Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len);
   * @brief
   * @param[in,out]	me
   * @param[in]		str
-  * @retval			Alx_Err
   * @retval			Alx_Ok
   * @retval			Alx_Err
   * @retval			AlxFifo_ErrFull

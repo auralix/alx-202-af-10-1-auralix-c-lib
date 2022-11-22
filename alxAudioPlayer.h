@@ -143,18 +143,21 @@ void AlxAudioPlayer_LoadTrack(AlxAudioPlayer* me, const uint8_t* trackPtr, uint3
 /**
   * @brief
   * @param[in,out] me
+  * @return
   */
 float AlxAudioPlayer_GetSampleL(AlxAudioPlayer* me);
 
 /**
   * @brief
   * @param[in,out] me
+  * @return
   */
 float AlxAudioPlayer_GetSampleR(AlxAudioPlayer* me);
 
 /**
   * @brief
   * @param[in,out] me
+  * @return
   */
 float AlxAudioPlayer_GetSampleMono(AlxAudioPlayer* me);
 
@@ -202,14 +205,16 @@ void AlxAudioPlayer_LoopOff(AlxAudioPlayer* me);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] isOn
+  * @param[in,out]	me
+  * @param[in]		isOn
   */
 void AlxAudioPlayer_LoopConfig(AlxAudioPlayer* me, bool isOn);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxAudioPlayer_IsPlaying(AlxAudioPlayer* me);
 

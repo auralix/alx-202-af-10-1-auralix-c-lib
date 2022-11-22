@@ -108,9 +108,9 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] di_STAT
-  * @param[in] di_STAT_TriState
+  * @param[in,out]	me
+  * @param[in]		di_STAT
+  * @param[in]		di_STAT_TriState
   */
 void AlxMcp73831_Ctor
 (
@@ -138,7 +138,11 @@ void AlxMcp73831_DeInit(AlxMcp73831* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			AlxMcp73831_St_Err
+  * @retval			AlxMcp73831_St_Shutdown
+  * @retval			AlxMcp73831_St_Charging
+  * @retval			AlxMcp73831_St_Standby
   */
 AlxMcp73831_St AlxMcp73831_GetSt(AlxMcp73831* me);
 

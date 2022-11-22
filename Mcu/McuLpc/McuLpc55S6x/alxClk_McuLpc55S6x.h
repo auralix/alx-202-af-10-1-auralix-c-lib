@@ -100,9 +100,9 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] config
-  * @param[in] tick
+  * @param[in,out]	me
+  * @param[in]		config
+  * @param[in]		tick
   */
 void AlxClk_Ctor
 (

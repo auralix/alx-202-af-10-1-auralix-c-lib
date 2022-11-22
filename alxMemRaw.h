@@ -105,36 +105,44 @@ void AlxMemRaw_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxMemRaw_Init(AlxMemRaw* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxMemRaw_DeInit(AlxMemRaw* me);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] addr
-  * @param[out] data
-  * @param[in] len
-  * @param[in] numOfTries
-  * @param[in] timeout_ms
+  * @param[in]	me
+  * @param[in]	addr
+  * @param[out]	data
+  * @param[in]	len
+  * @param[in]	numOfTries
+  * @param[in]	timeout_ms
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
   */
 Alx_Status AlxMemRaw_Read(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t timeout_ms);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] addr
-  * @param[in] data
-  * @param[in] len
-  * @param[in] checkWithReadEnable
-  * @param[in] numOfTries
-  * @param[in] timeout_ms
+  * @param[in]	me
+  * @param[in]	addr
+  * @param[in]	data
+  * @param[in]	len
+  * @param[in]	checkWithReadEnable
+  * @param[in]	numOfTries
+  * @param[in]	timeout_ms
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
   */
 Alx_Status AlxMemRaw_Write(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t len, bool checkWithReadEnable, uint8_t numOfTries, uint16_t timeout_ms);
 

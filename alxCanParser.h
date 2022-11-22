@@ -91,116 +91,118 @@ typedef enum
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] byteOffset
-  * @param[in] bitOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		byteOffset
+  * @param[in]		bitOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, bool value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] byteOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		byteOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetUint8(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] byteOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		byteOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetInt8(AlxCan_Msg* msg, uint8_t byteOffset, int8_t value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] endian
-  * @param[in] byteOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint16_t value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] endian
-  * @param[in] byteOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int16_t value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] endian
-  * @param[in] byteOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint32_t value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] endian
-  * @param[in] byteOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int32_t value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] endian
-  * @param[in] byteOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint64_t value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] endian
-  * @param[in] byteOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int64_t value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] endian
-  * @param[in] byteOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, float value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] endian
-  * @param[in] byteOffset
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
   */
 void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, double value);
 
 /**
   * @brief
-  * @param[in,out] msg
-  * @param[in] byteOffset
-  * @param[in] bitOffset
-  * @param[in] nOfBits
-  * @param[in] value
+  * @param[in,out]	msg
+  * @param[in]		byteOffset
+  * @param[in]		bitOffset
+  * @param[in]		nOfBits
+  * @param[in]		value
   */
 void AlxCanParser_SetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, uint8_t nOfBits, uint8_t value);
 
 /**
   * @brief
-  * @param[in] msg
-  * @param[in] byteOffset
-  * @param[in] bitOffset
+  * @param[in]	msg
+  * @param[in]	byteOffset
+  * @param[in]	bitOffset
+  * @retval		false
+  * @retval		true
   */
 bool AlxCanParser_GetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset);
 
@@ -208,6 +210,7 @@ bool AlxCanParser_GetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset)
   * @brief
   * @param[in] msg
   * @param[in] byteOffset
+  * @return
   */
 uint8_t AlxCanParser_GetUint8(AlxCan_Msg* msg, uint8_t byteOffset);
 
@@ -215,6 +218,7 @@ uint8_t AlxCanParser_GetUint8(AlxCan_Msg* msg, uint8_t byteOffset);
   * @brief
   * @param[in] msg
   * @param[in] byteOffset
+  * @return
   */
 int8_t AlxCanParser_GetInt8(AlxCan_Msg* msg, uint8_t byteOffset);
 
@@ -223,6 +227,7 @@ int8_t AlxCanParser_GetInt8(AlxCan_Msg* msg, uint8_t byteOffset);
   * @param[in] msg
   * @param[in] endian
   * @param[in] byteOffset
+  * @return
   */
 uint16_t AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 
@@ -231,6 +236,7 @@ uint16_t AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
   * @param[in] msg
   * @param[in] endian
   * @param[in] byteOffset
+  * @return
   */
 int16_t AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 
@@ -239,6 +245,7 @@ int16_t AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
   * @param[in] msg
   * @param[in] endian
   * @param[in] byteOffset
+  * @return
   */
 uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 
@@ -247,6 +254,7 @@ uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
   * @param[in] msg
   * @param[in] endian
   * @param[in] byteOffset
+  * @return
   */
 int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 
@@ -255,6 +263,7 @@ int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
   * @param[in] msg
   * @param[in] endian
   * @param[in] byteOffset
+  * @return
   */
 uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 
@@ -263,6 +272,7 @@ uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
   * @param[in] msg
   * @param[in] endian
   * @param[in] byteOffset
+  * @return
   */
 int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 
@@ -271,6 +281,7 @@ int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
   * @param[in] msg
   * @param[in] endian
   * @param[in] byteOffset
+  * @return
   */
 float AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 
@@ -279,6 +290,7 @@ float AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
   * @param[in] msg
   * @param[in] endian
   * @param[in] byteOffset
+  * @return
   */
 double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset);
 
@@ -288,6 +300,7 @@ double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
   * @param[in] byteOffset
   * @param[in] bitOffset
   * @param[in] nOfBits
+  * @return
   */
 uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, uint8_t nOfBits);
 

@@ -272,21 +272,21 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] fwArtf
-  * @param[in] fwName
-  * @param[in] fwVerMajor
-  * @param[in] fwVerMinor
-  * @param[in] fwVerPatch
-  * @param[in] fwIsBuildJobUsed
-  * @param[in] fwIsBootloader
-  * @param[in] hwInstanceKnownArr
-  * @param[in] hwInstanceKnownArrLen
-  * @param[in] hwInstanceHwIdSupportedArr
-  * @param[in] hwInstanceHwIdSupportedArrLen
-  * @param[in] hwIdIoPinArr
-  * @param[in] hwIdIoPinArrLen
-  * @param[in] hwMcuName
+  * @param[in,out]	me
+  * @param[in]		fwArtf
+  * @param[in]		fwName
+  * @param[in]		fwVerMajor
+  * @param[in]		fwVerMinor
+  * @param[in]		fwVerPatch
+  * @param[in]		fwIsBuildJobUsed
+  * @param[in]		fwIsBootloader
+  * @param[in]		hwInstanceKnownArr
+  * @param[in]		hwInstanceKnownArrLen
+  * @param[in]		hwInstanceHwIdSupportedArr
+  * @param[in]		hwInstanceHwIdSupportedArrLen
+  * @param[in]		hwIdIoPinArr
+  * @param[in]		hwIdIoPinArrLen
+  * @param[in]		hwMcuName
   */
 void AlxId_Ctor
 (
@@ -309,16 +309,16 @@ void AlxId_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] fwArtf
-  * @param[in] fwName
-  * @param[in] fwVerMajor
-  * @param[in] fwVerMinor
-  * @param[in] fwVerPatch
-  * @param[in] fwIsBuildJobUsed
-  * @param[in] fwIsBootloader
-  * @param[in] hwInstance
-  * @param[in] hwMcuName
+  * @param[in,out]	me
+  * @param[in]		fwArtf
+  * @param[in]		fwName
+  * @param[in]		fwVerMajor
+  * @param[in]		fwVerMinor
+  * @param[in]		fwVerPatch
+  * @param[in]		fwIsBuildJobUsed
+  * @param[in]		fwIsBootloader
+  * @param[in]		hwInstance
+  * @param[in]		hwMcuName
   */
 void AlxId_Ctor_NoHwId
 (
@@ -354,38 +354,43 @@ void AlxId_Trace(AlxId* me);
 /**
   * @brief
   * @param[in] me
+  * @return
   */
 uint8_t AlxId_GetHwId(AlxId* me);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[out] uniqueIdUint8
-  * @param[in] len
+  * @param[in]	me
+  * @param[out]	uniqueIdUint8
+  * @param[in]	len
   */
 void AlxId_GetUniqueIdUint8(AlxId* me, uint8_t* uniqueIdUint8, uint8_t len);
 
 /**
   * @brief
   * @param[in] me
+  * @return
   */
 const char* AlxId_GetUniqueIdStr(AlxId* me);
 
 /**
   * @brief
   * @param[in] me
+  * @return
   */
 uint32_t AlxId_GetFwAppVerDate(AlxId* me);
 
 /**
   * @brief
   * @param[in] me
+  * @return
   */
 const char* AlxId_GetFwAppVerStr(AlxId* me);
 
 /**
   * @brief
   * @param[in] me
+  * @return
   */
 const char* AlxId_GetFwAppBinStr(AlxId* me);
 

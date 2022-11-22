@@ -83,18 +83,18 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] uart
-  * @param[in] do_TX
-  * @param[in] di_RX
-  * @param[in] baudRate
-  * @param[in] dataWidth
-  * @param[in] stopBits
-  * @param[in] parity
-  * @param[in] txTimeout_ms
-  * @param[in] rxFifoBuff
-  * @param[in] rxFifoBuffLen
-  * @param[in] rxIrqPriority
+  * @param[in,out]	me
+  * @param[in]		uart
+  * @param[in]		do_TX
+  * @param[in]		di_RX
+  * @param[in]		baudRate
+  * @param[in]		dataWidth
+  * @param[in]		stopBits
+  * @param[in]		parity
+  * @param[in]		txTimeout_ms
+  * @param[in]		rxFifoBuff
+  * @param[in]		rxFifoBuffLen
+  * @param[in]		rxIrqPriority
   */
 void AlxSerialPort_Ctor
 (
