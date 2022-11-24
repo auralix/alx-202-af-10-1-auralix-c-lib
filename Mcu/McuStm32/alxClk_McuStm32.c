@@ -386,15 +386,19 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz(AlxClk*
 	me->isPwrRegOverDrive = false;
 
 	// #2 Set oscillators
-	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI14 | RCC_OSCILLATORTYPE_HSI48;
-	me->iosc.HSI48State = RCC_HSI48_ON;
+	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_HSI14;
+	me->iosc.HSIState = RCC_HSI_ON;
 	me->iosc.HSI14State = RCC_HSI14_ON;
+	me->iosc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
 	me->iosc.HSI14CalibrationValue = 16;
-	me->iosc.PLL.PLLState = RCC_PLL_NONE;
+	me->iosc.PLL.PLLState = RCC_PLL_ON;
+	me->iosc.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+	me->iosc.PLL.PLLMUL = RCC_PLL_MUL6;
+	me->iosc.PLL.PREDIV = RCC_PREDIV_DIV1;
 
 	// #3 Set clocks
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1;
-	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_HSI48;
+	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 
@@ -407,7 +411,7 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz(AlxClk*
 	me->hclk_Ctor = 48000000UL;
 	me->pclk1Apb1_Ctor = 48000000UL;
 	me->pclk1Apb1Tim_Ctor = 48000000UL;
-	me->mainPllInputClk_Ctor = 0;
+	me->mainPllInputClk_Ctor = 8000000UL;
 }
 static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz(AlxClk* me)
 {
