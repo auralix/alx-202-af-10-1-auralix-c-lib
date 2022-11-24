@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -55,6 +55,12 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
+	#if defined(STM32F0)
+	AlxClk_Config_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hsi_8MHz_Default = 0,
+	AlxClk_Config_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hse_8MHz = 1,
+	AlxClk_Config_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz = 2,
+	AlxClk_Config_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz = 3,
+	#endif
 	#if defined(STM32F1)
 	AlxClk_Config_McuStm32F1_Sysclk_8MHz_Pclk1Apb1_8MHz_Pclk2Apb2_8MHz_Hsi_8MHz_Default = 0,
 	AlxClk_Config_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hsi_8MHz = 1,
@@ -122,8 +128,8 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out]	me
-  * @param[in]		config
+  * @param[in,out] me
+  * @param[in] config
   */
 void AlxClk_Ctor
 (
@@ -132,7 +138,7 @@ void AlxClk_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 #ifdef __cplusplus
 }
