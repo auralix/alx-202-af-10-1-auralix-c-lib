@@ -53,7 +53,7 @@ extern "C" {
 //******************************************************************************
 // Register Values Unions
 //******************************************************************************
-	
+
 // R0: Temp  //
 typedef union
 {
@@ -63,7 +63,7 @@ typedef union
 	};
 	uint16_t raw;
 } AlxTmp1075_RegVal_R0_Temp;
-	
+
 // R1: Configuration  //
 typedef enum
 {
@@ -119,31 +119,31 @@ typedef union
 	{
 		struct __attribute__((packed))
 		{
-			uint16_t L;	
+			uint16_t L;
 		};
 		uint16_t raw;
 	} AlxTmp1075_RegVal_R2_LimitLow;
-	
+
 // R3: High limit  //
 typedef union
 	{
 		struct __attribute__((packed))
 		{
-			uint16_t H;	
+			uint16_t H;
 		};
 		uint16_t raw;
 	} AlxTmp1075_RegVal_R3_LimitHigh;
-	
+
 // R4: Device ID register  //
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t DID;	
+		uint16_t DID;
 	};
 	uint16_t raw;
 } AlxTmp1075_RegVal_R4_DeviceId;
-	
+
 //******************************************************************************
 // Register Group Values Unions
 //******************************************************************************
@@ -182,12 +182,12 @@ typedef struct
 	uint8_t len;
 	AlxTmp1075_RegVal_R4_DeviceId val;
 } AlxTmp1075_Reg_R4_DeviceId;
-	
-	
+
+
 //******************************************************************************
 // Register Group Structures
 //******************************************************************************
-	
+
 //******************************************************************************
 // Main Register Structure
 //******************************************************************************
@@ -226,7 +226,7 @@ typedef struct
 	AlxTmp1075_Reg reg;
 	int16_t temp_raw;
 	float temp_degC;
-	
+
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
@@ -252,6 +252,7 @@ void AlxTmp1075_Ctor
 //******************************************************************************
 Alx_Status AlxTmp1075_Init(AlxTmp1075* me);
 Alx_Status AlxTmp1075_DeInit(AlxTmp1075* me);
+bool AlxTmp1075_IsInit(AlxTmp1075* me);
 float AlxTmp1075_GetTemp_degC(AlxTmp1075* me);
 
 
