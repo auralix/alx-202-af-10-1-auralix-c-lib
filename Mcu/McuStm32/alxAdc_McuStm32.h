@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 
 //******************************************************************************
@@ -57,6 +57,9 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
+	#if defined(STM32F0)
+	AlxAdc_Clk_McuStm32F0_AdcClk_14MHz_Pclk1Apb1_8MHz = ADC_CLOCK_ASYNC_DIV1,
+	#endif
 	#if defined(STM32F1)
 	AlxAdc_Clk_McuStm32F1_AdcClk_4MHz_Pclk2Apb2_8MHz = RCC_ADCPCLK2_DIV2,
 	#endif
@@ -137,7 +140,7 @@ void AlxAdc_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
 
 #ifdef __cplusplus
 }
