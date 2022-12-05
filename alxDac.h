@@ -1,6 +1,6 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxDac.h
+  * @file		AlxDac.h
   * @brief		Auralix C Library - ALX DAC Module
   * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
   *
@@ -45,8 +45,11 @@ extern "C" {
 #include "alxIoPin.h"
 
 // AlxMcu //
-#if defined(ALX_DAC_MCU)
-#include "alxDac_Mcu.h"
+#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#include "alxDac_McuStm32.h"
+
+#else
+typedef struct { bool dummy; } AlxDac;
 #endif
 
 
@@ -80,48 +83,9 @@ extern "C" {
 #endif
 
 
-// Number of Submodules //
-#define ALX_DAC_NUM_OF_SUBMODULES 1
-
-
-//******************************************************************************
-// Types
-//******************************************************************************
-typedef enum
-{
-	AlxDac_Submodule_Mcu = 0
-} AlxDac_Submodule;
-
-typedef struct
-{
-	// Parameters
-	AlxDac_Submodule submodule;
-	void* submodulePtr;
-
-	// FuncPtr
-	Alx_Status(*AlxDac_Init_FuncPtr[ALX_DAC_NUM_OF_SUBMODULES])();
-	Alx_Status(*AlxDac_Init_CalibrateVref_FuncPtr[ALX_DAC_NUM_OF_SUBMODULES])();
-	Alx_Status(*AlxDac_DeInit_FuncPtr[ALX_DAC_NUM_OF_SUBMODULES])();
-	Alx_Status(*AlxDac_SetVoltage_V_FuncPtr[ALX_DAC_NUM_OF_SUBMODULES])();
-	Alx_Status(*AlxDac_SetVoltage_V_CalibrateVref_FuncPtr[ALX_DAC_NUM_OF_SUBMODULES])();
-
-	// Info
-	bool isInit;
-	bool wasCtorCalled;
-} AlxDac;
-
-
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		submodule
-  * @param[in]		submodulePtr
-  */
-void AlxDac_Ctor(AlxDac* me, AlxDac_Submodule submodule, void *submodulePtr);
 
 /**
   * @brief

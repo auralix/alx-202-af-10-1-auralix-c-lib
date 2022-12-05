@@ -76,7 +76,7 @@ typedef struct
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-} AlxDac_Mcu;
+} AlxDac;
 
 
 //******************************************************************************
@@ -94,9 +94,9 @@ typedef struct
   * @param[in]		isVrefInt_V
   * @param[in]		vrefExt_V
   */
-void AlxDacMcu_Ctor
+void AlxDac_Ctor
 (
-	AlxDac_Mcu* me,
+	AlxDac* me,
 	DAC_TypeDef* dac,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,

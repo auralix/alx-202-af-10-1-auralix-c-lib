@@ -29,7 +29,6 @@
 // Includes
 //******************************************************************************
 #include "alxDac_McuStm32.h"
-#include "alxDac_Mcu.h"
 #include "alxDac.h"
 
 
@@ -42,19 +41,19 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint32_t AlxDacMcu_GetCh(Alx_Ch ch);
-static void AlxDacMcu_Periph_EnableClk(AlxDac_Mcu* me);
-static void AlxDacMcu_Periph_DisableClk(AlxDac_Mcu* me);
-static void AlxDacMcu_Periph_ForceReset(AlxDac_Mcu* me);
-static void AlxDacMcu_Periph_ReleaseReset(AlxDac_Mcu* me);
+static uint32_t AlxDac_GetCh(Alx_Ch ch);
+static void AlxDac_Periph_EnableClk(AlxDac* me);
+static void AlxDac_Periph_DisableClk(AlxDac* me);
+static void AlxDac_Periph_ForceReset(AlxDac* me);
+static void AlxDac_Periph_ReleaseReset(AlxDac* me);
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxDacMcu_Ctor
+void AlxDac_Ctor
 (
-	AlxDac_Mcu* me,
+	AlxDac* me,
 	DAC_TypeDef* dac,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,
@@ -70,10 +69,10 @@ void AlxDacMcu_Ctor
 	(void)ioPinArr;
 	(void)chArr;
 	(void)setVoltageDefaultArr_V;
-	ALX_DAC_MCU_ASSERT(numOfCh <= ALX_DAC_BUFF_LEN);
+	ALX_DAC_ASSERT(numOfCh <= ALX_DAC_BUFF_LEN);
 	(void)isVrefInt_V;
 	(void)vrefExt_V;
-	for (uint8_t i = 0; i < numOfCh - 1; i++) ALX_DAC_MCU_ASSERT(chArr[i] < chArr[i + 1]); // Channel sequence must be from low to high number
+	for (uint8_t i = 0; i < numOfCh - 1; i++) ALX_DAC_ASSERT(chArr[i] < chArr[i + 1]); // Channel sequence must be from low to high number
 
 	// Objects - External
 	me->ioPinArr = ioPinArr;
@@ -99,7 +98,7 @@ void AlxDacMcu_Ctor
 		me->setVoltageDefault_V[buffPos] = *(me->setVoltageDefaultArr_V + buffPos);
 
 		#if defined(STM32G4)
-			ALX_DAC_MCU_ASSERT(false); // Not yet implemented!!!
+			ALX_DAC_ASSERT(false); // Not yet implemented!!!
 		#endif
 	}
 
@@ -112,91 +111,91 @@ void AlxDacMcu_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxDacMcu_Init(AlxDac_Mcu* me)
+Alx_Status AlxDac_Init(AlxDac* me)
 {
-	ALX_DAC_MCU_ASSERT(me->isInit == false);
-	ALX_DAC_MCU_ASSERT(me->wasCtorCalled == true);
+	ALX_DAC_ASSERT(me->isInit == false);
+	ALX_DAC_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Init GPIO
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 		AlxIoPin_Init((*(me->ioPinArr + i)));
 
 	// #2 Release DAC Periphery Reset
-	AlxDacMcu_Periph_ReleaseReset(me);
+	AlxDac_Periph_ReleaseReset(me);
 
 	// #3 Enable DAC Periphery Clock
-	AlxDacMcu_Periph_EnableClk(me);
+	AlxDac_Periph_EnableClk(me);
 
 	// #4 Init DAC
-	if(HAL_DAC_Init(&me->hdac) != HAL_OK) { ALX_DAC_MCU_TRACE("ErrInit"); return Alx_Err; }
+	if(HAL_DAC_Init(&me->hdac) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 	// #5 Init DAC Channels
 	for(uint32_t i = 0; i < me->numOfCh; i++)
-		if(HAL_DAC_ConfigChannel(&me->hdac, &me->chdac[i], AlxDacMcu_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_MCU_TRACE("ErrInitCh"); return Alx_Err; }
+		if(HAL_DAC_ConfigChannel(&me->hdac, &me->chdac[i], AlxDac_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 	// #6 Set isInit
 	me->isInit = true;
 
 	// #7 Set DAC Channels Default Set Voltage
 	for(uint32_t i = 0; i < me->numOfCh; i++)
-		if(AlxDacMcu_SetVoltage_V(me, &me->ch[i], &me->setVoltageDefault_V[i]) != Alx_Ok) { ALX_DAC_MCU_TRACE("ErrSetDuty"); return Alx_Err; }
+		if(AlxDac_SetVoltage_V(me, me->ch[i], me->setVoltageDefault_V[i]) != Alx_Ok) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 	// #8 Start DAC Channels
 	for(uint32_t i = 0; i < me->numOfCh; i++)
-		if(HAL_DAC_Start(&me->hdac, AlxDacMcu_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_MCU_TRACE("ErrStart"); return Alx_Err; }
+		if(HAL_DAC_Start(&me->hdac, AlxDac_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 	// #9 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxDacMcu_Init_CalibrateVref(AlxDac_Mcu* me, float* vref_V)
+Alx_Status AlxDac_Init_CalibrateVref(AlxDac* me, float vref_V)
 {
-	ALX_DAC_MCU_ASSERT(me->isInit == false);
-	ALX_DAC_MCU_ASSERT(me->wasCtorCalled == true);
+	ALX_DAC_ASSERT(me->isInit == false);
+	ALX_DAC_ASSERT(me->wasCtorCalled == true);
 
 	// #1 Init GPIO
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 		AlxIoPin_Init((*(me->ioPinArr + i)));
 
 	// #2 Release DAC Periphery Reset
-	AlxDacMcu_Periph_ReleaseReset(me);
+	AlxDac_Periph_ReleaseReset(me);
 
 	// #3 Enable DAC Periphery Clock
-	AlxDacMcu_Periph_EnableClk(me);
+	AlxDac_Periph_EnableClk(me);
 
 	// #4 Init DAC
-	if(HAL_DAC_Init(&me->hdac) != HAL_OK) { ALX_DAC_MCU_TRACE("ErrInit"); return Alx_Err; }
+	if(HAL_DAC_Init(&me->hdac) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 	// #5 Init DAC Channels
 	for(uint32_t i = 0; i < me->numOfCh; i++)
-		if(HAL_DAC_ConfigChannel(&me->hdac, &me->chdac[i], AlxDacMcu_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_MCU_TRACE("ErrInitCh"); return Alx_Err; }
+		if(HAL_DAC_ConfigChannel(&me->hdac, &me->chdac[i], AlxDac_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 	// #6 Set isInit
 	me->isInit = true;
 
 	// #7 Set DAC Channels Default Set Voltage
 	for(uint32_t i = 0; i < me->numOfCh; i++)
-		if(AlxDacMcu_SetVoltage_V_CalibrateVref(me, &me->ch[i], &me->setVoltageDefault_V[i], vref_V) != Alx_Ok) { ALX_DAC_MCU_TRACE("ErrSetDuty"); return Alx_Err; }
+		if(AlxDac_SetVoltage_V_CalibrateVref(me, me->ch[i], me->setVoltageDefault_V[i], vref_V) != Alx_Ok) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 	// #8 Start DAC Channels
 	for(uint32_t i = 0; i < me->numOfCh; i++)
-		if(HAL_DAC_Start(&me->hdac, AlxDacMcu_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_MCU_TRACE("ErrStart"); return Alx_Err; }
+		if(HAL_DAC_Start(&me->hdac, AlxDac_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 	// #9 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxDacMcu_DeInit(AlxDac_Mcu* me)
+Alx_Status AlxDac_DeInit(AlxDac* me)
 {
-	ALX_DAC_MCU_ASSERT(me->isInit == true);
-	ALX_DAC_MCU_ASSERT(me->wasCtorCalled == true);
+	ALX_DAC_ASSERT(me->isInit == true);
+	ALX_DAC_ASSERT(me->wasCtorCalled == true);
 
 	// #1 DeInit DAC
-	if(HAL_DAC_DeInit(&me->hdac) != HAL_OK) { ALX_DAC_MCU_TRACE("ErrDeInit"); return Alx_Err; }
+	if(HAL_DAC_DeInit(&me->hdac) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 	// #2 Force DAC Periphery Reset
-	AlxDacMcu_Periph_ForceReset(me);
+	AlxDac_Periph_ForceReset(me);
 
 	// #3 Disable DAC Periphery Clock
-	AlxDacMcu_Periph_DisableClk(me);
+	AlxDac_Periph_DisableClk(me);
 
 	// #4 DeInit GPIO
 	for (uint32_t i = 0; i < me->numOfCh; i++)
@@ -208,22 +207,22 @@ Alx_Status AlxDacMcu_DeInit(AlxDac_Mcu* me)
 	// #6 Return OK
 	return Alx_Ok;
 }
-Alx_Status AlxDacMcu_SetVoltage_V(AlxDac_Mcu* me, Alx_Ch* ch, float* voltage_V)
+Alx_Status AlxDac_SetVoltage_V(AlxDac* me, Alx_Ch ch, float voltage_V)
 {
-	ALX_DAC_MCU_ASSERT(me->isInit == true);
-	ALX_DAC_MCU_ASSERT(me->wasCtorCalled == true);
-	ALX_DAC_MCU_ASSERT(me->isVrefInt_V == false);
+	ALX_DAC_ASSERT(me->isInit == true);
+	ALX_DAC_ASSERT(me->wasCtorCalled == true);
+	ALX_DAC_ASSERT(me->isVrefInt_V == false);
 
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (me->ch[i] == *ch)
+		if (me->ch[i] == ch)
 		{
 			// #1 Bond Set Voltage
-			float dacVoltage_V = *voltage_V;
-			if(AlxGlobal_BoundFloat(&dacVoltage_V, 0, me->vrefExt_V) != Alx_Ok) { ALX_DAC_MCU_TRACE("ErrBond"); return Alx_Err; }
+			float dacVoltage_V = voltage_V;
+			if(AlxGlobal_BoundFloat(&dacVoltage_V, 0, me->vrefExt_V) != Alx_Ok) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 			// #2 Get Channel
-			uint32_t dacCh = AlxDacMcu_GetCh(*ch);
+			uint32_t dacCh = AlxDac_GetCh(ch);
 
 			// #3 Get Data
 			uint32_t dacVoltage_mV = (uint32_t)(dacVoltage_V * 1000.f);
@@ -231,47 +230,47 @@ Alx_Status AlxDacMcu_SetVoltage_V(AlxDac_Mcu* me, Alx_Ch* ch, float* voltage_V)
 			uint32_t dacData = __LL_DAC_CALC_VOLTAGE_TO_DATA(vrefExt_mV, dacVoltage_mV, me->resolution);
 
 			// #4 Set Voltage
-			if(HAL_DAC_SetValue(&me->hdac, dacCh, me->resolution, dacData) != HAL_OK) { ALX_DAC_MCU_TRACE("ErrSetVal"); return Alx_Err; }
+			if(HAL_DAC_SetValue(&me->hdac, dacCh, me->resolution, dacData) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 			// #5 Return OK
 			return Alx_Ok;
 		}
 	}
 
-	ALX_DAC_MCU_ASSERT(false); // We shouldn't get here
+	ALX_DAC_ASSERT(false); // We shouldn't get here
 	return Alx_Err;
 }
-Alx_Status AlxDacMcu_SetVoltage_V_CalibrateVref(AlxDac_Mcu* me, Alx_Ch* ch, float* voltage_V, float* vref_V)
+Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltage_V, float vref_V)
 {
-	ALX_DAC_MCU_ASSERT(me->isInit == true);
-	ALX_DAC_MCU_ASSERT(me->wasCtorCalled == true);
-	ALX_DAC_MCU_ASSERT(me->isVrefInt_V == true);
+	ALX_DAC_ASSERT(me->isInit == true);
+	ALX_DAC_ASSERT(me->wasCtorCalled == true);
+	ALX_DAC_ASSERT(me->isVrefInt_V == true);
 
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (me->ch[i] == *ch)
+		if (me->ch[i] == ch)
 		{
 			// #1 Bond Set Voltage
-			float dacVoltage_V = *voltage_V;
-			if(AlxGlobal_BoundFloat(&dacVoltage_V, 0, *vref_V) != Alx_Ok) { ALX_DAC_MCU_TRACE("ErrBond"); return Alx_Err; }
+			float dacVoltage_V = voltage_V;
+			if(AlxGlobal_BoundFloat(&dacVoltage_V, 0, vref_V) != Alx_Ok) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 			// #2 Get Channel
-			uint32_t dacCh = AlxDacMcu_GetCh(*ch);
+			uint32_t dacCh = AlxDac_GetCh(ch);
 
 			// #3 Get Data
 			uint32_t dacVoltage_mV = (uint32_t)(dacVoltage_V * 1000.f);
-			uint32_t vref_mV = (uint32_t)(*vref_V * 1000.f);
+			uint32_t vref_mV = (uint32_t)(vref_V * 1000.f);
 			uint32_t dacData = __LL_DAC_CALC_VOLTAGE_TO_DATA(vref_mV, dacVoltage_mV, me->resolution);
 
 			// #4 Set Voltage
-			if(HAL_DAC_SetValue(&me->hdac, dacCh, me->resolution, dacData) != HAL_OK) { ALX_DAC_MCU_TRACE("ErrSetVal"); return Alx_Err; }
+			if(HAL_DAC_SetValue(&me->hdac, dacCh, me->resolution, dacData) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 
 			// #5 Return OK
 			return Alx_Ok;
 		}
 	}
 
-	ALX_DAC_MCU_ASSERT(false); // We shouldn't get here
+	ALX_DAC_ASSERT(false); // We shouldn't get here
 	return Alx_Err;
 }
 
@@ -279,7 +278,7 @@ Alx_Status AlxDacMcu_SetVoltage_V_CalibrateVref(AlxDac_Mcu* me, Alx_Ch* ch, floa
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint32_t AlxDacMcu_GetCh(Alx_Ch ch)
+static uint32_t AlxDac_GetCh(Alx_Ch ch)
 {
 	if(ch == Alx_Ch_1 ) return DAC_CHANNEL_1;
 	#if defined(STM32F4) || \
@@ -290,7 +289,7 @@ static uint32_t AlxDacMcu_GetCh(Alx_Ch ch)
 	ALX_DAC_ASSERT(false); // We shouldn't get here
 	return 0;
 }
-static void AlxDacMcu_Periph_EnableClk(AlxDac_Mcu* me)
+static void AlxDac_Periph_EnableClk(AlxDac* me)
 {
 	bool isErr = true;
 
@@ -307,9 +306,9 @@ static void AlxDacMcu_Periph_EnableClk(AlxDac_Mcu* me)
 	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_CLK_ENABLE(); isErr = false; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_MCU_ASSERT(false); } // We shouldn't get here
+	if(isErr)						{ ALX_DAC_ASSERT(false); } // We shouldn't get here
 }
-static void AlxDacMcu_Periph_DisableClk(AlxDac_Mcu* me)
+static void AlxDac_Periph_DisableClk(AlxDac* me)
 {
 	bool isErr = true;
 
@@ -326,9 +325,9 @@ static void AlxDacMcu_Periph_DisableClk(AlxDac_Mcu* me)
 	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_CLK_DISABLE(); isErr = false; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_MCU_ASSERT(false); } // We shouldn't get here
+	if(isErr)						{ ALX_DAC_ASSERT(false); } // We shouldn't get here
 }
-static void AlxDacMcu_Periph_ForceReset(AlxDac_Mcu* me)
+static void AlxDac_Periph_ForceReset(AlxDac* me)
 {
 	bool isErr = true;
 
@@ -345,9 +344,9 @@ static void AlxDacMcu_Periph_ForceReset(AlxDac_Mcu* me)
 	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_FORCE_RESET(); isErr = false; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_MCU_ASSERT(false); } // We shouldn't get here
+	if(isErr)						{ ALX_DAC_ASSERT(false); } // We shouldn't get here
 }
-static void AlxDacMcu_Periph_ReleaseReset(AlxDac_Mcu* me)
+static void AlxDac_Periph_ReleaseReset(AlxDac* me)
 {
 	bool isErr = true;
 
@@ -364,7 +363,7 @@ static void AlxDacMcu_Periph_ReleaseReset(AlxDac_Mcu* me)
 	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_RELEASE_RESET(); isErr = false; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_MCU_ASSERT(false); } // We shouldn't get here
+	if(isErr)						{ ALX_DAC_ASSERT(false); } // We shouldn't get here
 }
 
 
