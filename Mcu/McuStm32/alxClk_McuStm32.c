@@ -67,6 +67,7 @@ static void AlxClk_Ctor_McuStm32L0_Sysclk_524kHz_Pclk1Apb1_524kHz_Pclk2Apb2_524k
 #if defined(STM32L4)
 static void AlxClk_Ctor_McuStm32L4_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Msi_4MHz_Default(AlxClk* me);
 static void AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz(AlxClk* me);
+static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(AlxClk* me);
 #endif
 
 
@@ -110,6 +111,7 @@ ALX_WEAK void AlxClk_Ctor
 	#if defined(STM32L4)
 	if		(me->config == AlxClk_Config_McuStm32L4_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Msi_4MHz_Default)					{ AlxClk_Ctor_McuStm32L4_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Msi_4MHz_Default(me);		me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz)						{ AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz_BackupHsi_16Mhz)	{ AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(me);			me->backupHsiEnable = true;	}
 	#endif
 	else																														{ ALX_CLK_ASSERT(false); return; } // We shouldn't get here
 
@@ -153,6 +155,9 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 			#endif
 			#if defined(STM32G4)
 			if (me->config == AlxClk_Config_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz_BackupHsi_16Mhz)	{ AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true; }
+			#endif
+			#if defined(STM32L4)
+			if (me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz_BackupHsi_16Mhz)	{ AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true; }
 			#endif
 			else																														{ ALX_CLK_ASSERT(false); return Alx_Err; } // We shouldn't get here
 
@@ -903,7 +908,6 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Msi
 	me->pclk2Apb2_Ctor = 4000000UL;
 	me->pclk1Apb1Tim_Ctor = 4000000UL;
 	me->pclk2Apb2Tim_Ctor = 4000000UL;
-	me->mainPllInputClk_Ctor = 0;
 }
 static void AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz(AlxClk* me)
 {
@@ -912,17 +916,17 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 	me->isPwrRegOverDrive = false;
 
 	// #2 Set oscillators
-	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
 	me->iosc.HSIState = RCC_HSI_ON;
 	me->iosc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
 	me->iosc.LSIState = RCC_LSI_OFF;
-	me->iosc.HSI48State = RCC_HSI48_OFF;
+	me->iosc.HSI48State = RCC_HSI48_ON;
 	me->iosc.MSIState = RCC_MSI_OFF;
 	me->iosc.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
 	me->iosc.MSIClockRange = RCC_MSIRANGE_5;
-	me->iosc.PLL.PLLState = RCC_PLL_OFF;
+	me->iosc.PLL.PLLState = RCC_PLL_NONE;
 	me->iosc.PLL.PLLSource = 0;
 	me->iosc.PLL.PLLM = 0;
 	me->iosc.PLL.PLLN = 0;
@@ -948,7 +952,50 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 	me->pclk2Apb2_Ctor = 16000000UL;
 	me->pclk1Apb1Tim_Ctor = 16000000UL;
 	me->pclk2Apb2Tim_Ctor = 16000000UL;
-	me->mainPllInputClk_Ctor = 0;
+}
+static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(AlxClk* me)
+{
+	// #1 Set voltage regulator scale
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;
+	me->isPwrRegOverDrive = false;
+
+	// #2 Set oscillators
+	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_HSI;
+	me->iosc.HSEState = RCC_HSE_OFF;
+	me->iosc.LSEState = RCC_LSE_OFF;
+	me->iosc.HSIState = RCC_HSI_ON;
+	me->iosc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	me->iosc.LSIState = RCC_LSI_OFF;
+	me->iosc.HSI48State = RCC_HSI48_ON;
+	me->iosc.MSIState = RCC_MSI_OFF;
+	me->iosc.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
+	me->iosc.MSIClockRange = RCC_MSIRANGE_5;
+	me->iosc.PLL.PLLState = RCC_PLL_ON;
+	me->iosc.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+	me->iosc.PLL.PLLM = 2;
+	me->iosc.PLL.PLLN = 30;
+	me->iosc.PLL.PLLP = RCC_PLLP_DIV2;
+	me->iosc.PLL.PLLQ = RCC_PLLP_DIV2;
+	me->iosc.PLL.PLLR = RCC_PLLP_DIV2;
+
+	// #3 Set clocks
+	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
+	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
+
+	// #4 Set flash latency
+	me->flashLatency = FLASH_LATENCY_5;
+
+	// #5 Set expected clocks
+	me->systemCoreClock_Ctor = 120000000UL;
+	me->sysclk_Ctor = 120000000UL;
+	me->hclk_Ctor = 120000000UL;
+	me->pclk1Apb1_Ctor = 120000000UL;
+	me->pclk2Apb2_Ctor = 120000000UL;
+	me->pclk1Apb1Tim_Ctor = 120000000UL;
+	me->pclk2Apb2Tim_Ctor = 120000000UL;
 }
 #endif
 

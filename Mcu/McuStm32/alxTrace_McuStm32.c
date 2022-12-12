@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
+#if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)) && (!defined(ALX_MBED)))
 
 
 //******************************************************************************
@@ -56,7 +56,7 @@ void AlxTrace_Ctor
 	AlxTrace* me,
 	GPIO_TypeDef* port,
 	uint16_t pin,
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	uint32_t alternate,
 	#endif
 	USART_TypeDef* uart,
@@ -72,7 +72,7 @@ void AlxTrace_Ctor
 	me->igpio.Mode = GPIO_MODE_AF_PP;
 	me->igpio.Pull = GPIO_NOPULL;
 	me->igpio.Speed = GPIO_SPEED_HIGH;
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	me->igpio.Alternate = alternate;
 	#endif
 
@@ -97,6 +97,11 @@ void AlxTrace_Ctor
 	#endif
 	#if defined(ALX_STM32L0)
 	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	#endif
+	#if defined(ALX_STM32L4)
+	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
 	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	#endif
 
@@ -501,4 +506,4 @@ static void AlxTrace_Periph_ReleaseReset(AlxTrace* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
+#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)) && (!defined(ALX_MBED)))
