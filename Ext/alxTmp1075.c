@@ -147,6 +147,11 @@ Alx_Status AlxTmp1075_DeInit(AlxTmp1075* me)
 	// #3 Return OK
 	return Alx_Ok;
 }
+bool AlxTmp1075_IsInit(AlxTmp1075* me)
+{
+	// #1 Return isInit
+	return me->isInit ;
+}
 float AlxTmp1075_GetTemp_degC(AlxTmp1075* me)
 {
 	ALX_TMP1075_ASSERT(me->isInit == true);
