@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -316,6 +316,63 @@ void AlxAdc_Ctor
 	me->hdma.Init.Priority = DMA_PRIORITY_LOW;
 	#endif
 
+
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(STM32L4)
+	// Parameters
+	me->resolution = ADC_RESOLUTION_12B;
+
+	// ADC Common
+	me->hadc.Init.ClockPrescaler = (uint32_t)me->adcClk;
+	me->hadc.Init.Resolution = me->resolution;
+	me->hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+	me->hadc.Init.ScanConvMode = ADC_SCAN_ENABLE;
+	me->hadc.Init.EOCSelection = ADC_EOC_SEQ_CONV;
+	me->hadc.Init.LowPowerAutoWait = DISABLE;
+	me->hadc.Init.ContinuousConvMode = ENABLE;
+	me->hadc.Init.NbrOfConversion = me->numOfCh;
+	me->hadc.Init.DiscontinuousConvMode = DISABLE;
+	me->hadc.Init.NbrOfDiscConversion = 0;
+	me->hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+	me->hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+	me->hadc.Init.DMAContinuousRequests = ENABLE;
+	me->hadc.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+	me->hadc.Init.OversamplingMode = DISABLE;
+	me->hadc.Init.Oversampling.Ratio = 0;
+	me->hadc.Init.Oversampling.RightBitShift = 0;
+	me->hadc.Init.Oversampling.TriggeredMode = 0;
+	me->hadc.Init.Oversampling.OversamplingStopReset = 0;
+
+	// ADC Channel
+	for (uint32_t buffPos = 0; buffPos < me->numOfCh; buffPos++)
+	{
+		me->chadc[buffPos].Channel = AlxAdc_GetCh(me, *(me->chArr + buffPos));
+		me->chadc[buffPos].Rank = AlxAdc_GetRank(buffPos);
+		me->chadc[buffPos].SamplingTime = samplingTime;
+		me->chadc[buffPos].SingleDiff = ADC_SINGLE_ENDED;
+		me->chadc[buffPos].OffsetNumber = ADC_OFFSET_NONE;
+		me->chadc[buffPos].Offset = 0;
+		me->ch[buffPos] = *(me->chArr + buffPos);
+	}
+
+	// DMA
+	if (me->hadc.Instance == ADC1)
+	{
+		me->dma = DMA1;
+		me->hdma.Instance = DMA1_Channel1;
+		me->hdma.Init.Request = DMA_REQUEST_ADC1;
+	}
+	me->hdma.Init.Direction = DMA_PERIPH_TO_MEMORY;
+	me->hdma.Init.PeriphInc = DMA_PINC_DISABLE;
+	me->hdma.Init.MemInc = DMA_MINC_ENABLE;
+	me->hdma.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+	me->hdma.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+	me->hdma.Init.Mode = DMA_CIRCULAR;
+	me->hdma.Init.Priority = DMA_PRIORITY_LOW;
+	#endif
+
 	// Info
 	me->isInit = false;
 	me->wasCtorCalled = true;
@@ -358,7 +415,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	// #7 Calibrate ADC
 	if(HAL_ADCEx_Calibration_Start(&me->hadc) != HAL_OK) { ALX_ADC_TRACE("AdcCalibErr"); return Alx_Err; }
 	#endif
-	#if defined(STM32G4) || defined(STM32L0)
+	#if defined(STM32G4) || defined(STM32L0) || defined(ALX_STM32L4)
 	// #7 Calibrate ADC
 	if(HAL_ADCEx_Calibration_Start(&me->hadc, ADC_SINGLE_ENDED) != HAL_OK) { ALX_ADC_TRACE("AdcCalibErr"); return Alx_Err; }
 	#endif
@@ -472,7 +529,7 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 	{
 		if (me->ch[i] == Alx_Ch_McuStm32_TempSens)
 		{
-			#if (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(STM32F469) && !defined(STM32F479xx) && !defined(STM32F429xx) && !defined(STM32F439xx))
+			#if (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)) && (!defined(STM32F469) && !defined(STM32F479xx) && !defined(STM32F429xx) && !defined(STM32F439xx))
 			int32_t temp_degC = __LL_ADC_CALC_TEMPERATURE(vref_mV, me->buff[i], me->resolution);
 			#endif
 
@@ -524,6 +581,9 @@ static void AlxAdc_PeriphAdc_EnableClk(AlxAdc* me)
 		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_CLK_ENABLE(); isErr = false; }
 		#endif
 	#endif
+	#if defined(STM32L4)
+		__HAL_RCC_ADC_CLK_ENABLE(); isErr = false;
+	#endif
 
 	if(isErr)							{ ALX_ADC_ASSERT(false); } // We shouldn't get here
 }
@@ -558,6 +618,9 @@ static void AlxAdc_PeriphAdc_DisableClk(AlxAdc* me)
 		#if defined(ADC4)
 		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_CLK_DISABLE(); isErr = false; }
 		#endif
+	#endif
+	#if defined(STM32L4)
+		__HAL_RCC_ADC_CLK_DISABLE(); isErr = false;
 	#endif
 
 	if(isErr)							{ ALX_ADC_ASSERT(false); } // We shouldn't get here
@@ -596,6 +659,9 @@ static void AlxAdc_PeriphAdc_ForceReset(AlxAdc* me)
 		#if defined(ADC4)
 		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_FORCE_RESET(); isErr = false; }
 		#endif
+	#endif
+	#if defined(STM32L4)
+		__HAL_RCC_ADC_FORCE_RESET(); isErr = false;
 	#endif
 
 	if(isErr)							{ ALX_ADC_ASSERT(false); } // We shouldn't get here
@@ -638,12 +704,15 @@ static void AlxAdc_PeriphAdc_ReleaseReset(AlxAdc* me)
 		if (me->hadc.Instance == ADC5)	{ __HAL_RCC_ADC345_RELEASE_RESET(); isErr = false; }
 		#endif
 	#endif
+	#if defined(STM32L4)
+		__HAL_RCC_ADC_RELEASE_RESET(); isErr = false;
+	#endif
 
 	if(isErr)							{ ALX_ADC_ASSERT(false); } // We shouldn't get here
 }
 static void AlxAdc_PeriphDma_EnableClk(AlxAdc* me)
 {
-	#if defined(STM32G4)
+	#if defined(STM32G4) || defined(ALX_STM32L4)
 		__HAL_RCC_DMAMUX1_CLK_ENABLE();
 	#endif
 
@@ -663,7 +732,7 @@ static void AlxAdc_PeriphDma_EnableClk(AlxAdc* me)
 }
 static void AlxAdc_PeriphDma_DisableClk(AlxAdc* me)
 {
-	#if defined(STM32G4)
+	#if defined(STM32G4) || defined(ALX_STM32L4)
 		__HAL_RCC_DMAMUX1_CLK_DISABLE();
 	#endif
 
@@ -687,11 +756,11 @@ static void AlxAdc_PeriphDma_ForceReset(AlxAdc* me)
 	(void)me;
 	#endif
 
-	#if defined(STM32G4)
+	#if defined(STM32G4) || defined(ALX_STM32L4)
 		__HAL_RCC_DMAMUX1_FORCE_RESET();
 	#endif
 
-	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	bool isErr = true;
 
 	#if defined(DMA1)
@@ -713,11 +782,11 @@ static void AlxAdc_PeriphDma_ReleaseReset(AlxAdc* me)
 	(void)me;
 	#endif
 
-	#if defined(STM32G4)
+	#if defined(STM32G4) || defined(ALX_STM32L4)
 		__HAL_RCC_DMAMUX1_RELEASE_RESET();
 	#endif
 
-	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	bool isErr = true;
 
 	#if defined(DMA1)
@@ -892,6 +961,35 @@ static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return 0;
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(STM32L4)
+	if(ch == Alx_Ch_McuStm32_Vref)		return ADC_CHANNEL_VREFINT; // Ch0
+	if(ch == Alx_Ch_1 )					return ADC_CHANNEL_1 ;
+	if(ch == Alx_Ch_2 )					return ADC_CHANNEL_2 ;
+	if(ch == Alx_Ch_3 )					return ADC_CHANNEL_3 ;
+	if(ch == Alx_Ch_4 )					return ADC_CHANNEL_4 ;
+	if(ch == Alx_Ch_5 )					return ADC_CHANNEL_5 ;
+	if(ch == Alx_Ch_6 )					return ADC_CHANNEL_6 ;
+	if(ch == Alx_Ch_7 )					return ADC_CHANNEL_7 ;
+	if(ch == Alx_Ch_8 )					return ADC_CHANNEL_8 ;
+	if(ch == Alx_Ch_9 )					return ADC_CHANNEL_9 ;
+	if(ch == Alx_Ch_10)					return ADC_CHANNEL_10;
+	if(ch == Alx_Ch_11)					return ADC_CHANNEL_11;
+	if(ch == Alx_Ch_12)					return ADC_CHANNEL_12;
+	if(ch == Alx_Ch_13)					return ADC_CHANNEL_13;
+	if(ch == Alx_Ch_14)					return ADC_CHANNEL_14;
+	if(ch == Alx_Ch_15)					return ADC_CHANNEL_15;
+	if(ch == Alx_Ch_16)					return ADC_CHANNEL_16;
+	if(ch == Alx_Ch_McuStm32_TempSens)	return ADC_CHANNEL_TEMPSENSOR; // Ch17
+	if(ch == Alx_Ch_McuStm32_Vbat)		return ADC_CHANNEL_VBAT; // Ch18
+
+	ALX_ADC_ASSERT(false); // We shouldn't get here
+	return 0;
+	#endif
 }
 static uint32_t AlxAdc_GetRank(uint8_t buffPos)
 {
@@ -944,6 +1042,15 @@ static uint32_t AlxAdc_GetRank(uint8_t buffPos)
 	//------------------------------------------------------------------------------
 	#if defined(STM32L0)
 	return ALX_NULL;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(STM32L4)
+	ALX_ADC_ASSERT((0 <= buffPos) && (buffPos <= 15));
+	return buffPos + 1;
 	#endif
 }
 static bool AlxAdc_Ctor_IsPclk2Apb2Ok(AlxAdc* me)
@@ -1028,7 +1135,24 @@ static bool AlxAdc_Ctor_IsPclk2Apb2Ok(AlxAdc* me)
 	ALX_ADC_ASSERT(false); // We shouldn't get here
 	return 0;
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(STM32L4)
+	if (me->adcClk == AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Pclk2Apb2_120MHz)
+	{
+		if(120000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
+			return true;
+		else
+			return false;
+	}
+
+	ALX_ADC_ASSERT(false); // We shouldn't get here
+	return 0;
+	#endif
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))

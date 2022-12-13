@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -104,7 +104,7 @@ void AlxPwm_Ctor
 	me->htim.Init.Period = me->period;
 	me->htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // Not relevant for PWM, used by dead-time generators & digital filters
 	me->htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L4)
 	me->htim.Init.RepetitionCounter = 0;
 	#endif
 
@@ -117,7 +117,7 @@ void AlxPwm_Ctor
 		me->chtim[buffPos].Pulse = 0;
 		me->chtim[buffPos].OCPolarity = TIM_OCPOLARITY_HIGH;  // Will will use active high, so duty = 100% output is high, duty = 0% output is low
 		me->chtim[buffPos].OCFastMode = TIM_OCFAST_DISABLE;
-		#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4)
+		#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L4)
 		me->chtim[buffPos].OCNPolarity = TIM_OCNPOLARITY_HIGH;
 		me->chtim[buffPos].OCIdleState = TIM_OCIDLESTATE_RESET;  // Only relevant if OCN is used with dead time
 		me->chtim[buffPos].OCNIdleState = TIM_OCNIDLESTATE_RESET;
@@ -568,7 +568,7 @@ static void AlxPwm_SetSrcClk_SetPrescalerMax(AlxPwm* me)
 	#if defined(TIM2)
 	if (me->htim.Instance == TIM2)
 	{
-		#if defined(ALX_STM32F4) || defined(ALX_STM32G4)
+		#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L4)
 			me->periodMax = 0xFFFFFFFF;
 		#elif defined(ALX_STM32F1) || defined(ALX_STM32L0)
 			me->periodMax = 0x0000FFFF;
@@ -589,7 +589,7 @@ static void AlxPwm_SetSrcClk_SetPrescalerMax(AlxPwm* me)
 	#if defined(TIM5)
 	if (me->htim.Instance == TIM5)
 	{
-		#if defined(ALX_STM32F4) || defined(ALX_STM32G4)
+		#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L4)
 			me->periodMax = 0xFFFFFFFF;
 		#elif
 			#error
@@ -678,4 +678,4 @@ static Alx_Status AlxPwm_Init_RemapIoPin(AlxPwm* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))

@@ -996,6 +996,7 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 	me->pclk2Apb2_Ctor = 120000000UL;
 	me->pclk1Apb1Tim_Ctor = 120000000UL;
 	me->pclk2Apb2Tim_Ctor = 120000000UL;
+	me->mainPllInputClk_Ctor = 16000000UL;
 }
 #endif
 

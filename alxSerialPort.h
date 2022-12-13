@@ -43,7 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 
-#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 #include "alxSerialPort_McuStm32.h"
 
 #else
