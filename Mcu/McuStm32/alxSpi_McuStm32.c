@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -93,7 +93,7 @@ void AlxSpi_Ctor
 	me->hspi.Init.TIMode = SPI_TIMODE_DISABLE;
 	me->hspi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
 	me->hspi.Init.CRCPolynomial = 0x0007;
-	#if defined(ALX_STM32G4)
+	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
 	me->hspi.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
 	me->hspi.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
 	#endif
@@ -386,6 +386,34 @@ static bool AlxSpi_Ctor_IsClkOk(AlxSpi* me)
 		}
 	}
 	#endif
+	#if defined(STM32L4)
+	if (me->hspi.Instance == SPI1)
+	{
+		if (
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_7MHz5_Pclk2Apb2_120MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_15MHz_Pclk2Apb2_120MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_30MHz_Pclk2Apb2_120MHz))
+		{
+			if (120000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
+				return true;
+			else
+				return false;
+		}
+	}
+	if ((me->hspi.Instance == SPI2) || (me->hspi.Instance == SPI3))
+	{
+		if (
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_7MHz5_Pclk1Apb1_120MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_15MHz_Pclk1Apb1_120MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_30MHz_Pclk1Apb1_120MHz))
+		{
+			if (120000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
+				return true;
+			else
+				return false;
+		}
+	}
+	#endif
 
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
@@ -512,4 +540,4 @@ static void AlxSpi_Periph_ReleaseReset(AlxSpi* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
