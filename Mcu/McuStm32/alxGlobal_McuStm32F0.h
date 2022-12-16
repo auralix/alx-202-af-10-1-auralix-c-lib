@@ -83,7 +83,20 @@ extern "C" {
 // Preprocessor
 //******************************************************************************
 
-// AlxId //
+//------------------------------------------------------------------------------
+// ALX MCU - SerialPort
+//------------------------------------------------------------------------------
+#define USART3_IRQn		USART3_8_IRQn
+#define USART4_5_IRQn	USART3_8_IRQn
+#define USART3_IRQn		USART3_8_IRQn
+#define USART6_IRQn		USART3_8_IRQn
+#define USART7_IRQn		USART3_8_IRQn
+#define USART8_IRQn		USART3_8_IRQn
+
+
+//------------------------------------------------------------------------------
+// ALX - ID
+//------------------------------------------------------------------------------
 #define ALX_STM32_CMSIS_VERSION_MAIN	__STM32F0_DEVICE_VERSION_MAIN
 #define ALX_STM32_CMSIS_VERSION_SUB1	__STM32F0_DEVICE_VERSION_SUB1
 #define ALX_STM32_CMSIS_VERSION_SUB2	__STM32F0_DEVICE_VERSION_SUB2
