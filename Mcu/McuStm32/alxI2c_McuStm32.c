@@ -166,7 +166,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 	// Local variables
 	HAL_StatusTypeDef status = HAL_ERROR;
 
-	// Try read memory for number of tries
+	// Try read for number of tries
 	for(uint32_t _try = 1 ; _try <= numOfTries ; _try++)
 	{
 		status = HAL_I2C_Master_Receive(&me->hi2c, slaveAddr, data, len, timeout_ms);
@@ -211,7 +211,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 	HAL_StatusTypeDef status = HAL_ERROR;
 	uint16_t _memAddrLen = AlxI2c_ParseMemAddrLen(memAddrLen);
 
-	// Try read memory for number of tries
+	// Try read for number of tries
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
 		status = HAL_I2C_Mem_Read(&me->hi2c, slaveAddr, memAddr, _memAddrLen, data, len, timeout_ms);
@@ -258,7 +258,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 	// Local variables
 	HAL_StatusTypeDef status = HAL_ERROR;
 
-	// Try write memory for number of tries
+	// Try write for number of tries
 	for(uint32_t _try = 1 ; _try <= numOfTries ; _try++)
 	{
 		status = HAL_I2C_Master_Transmit(&me->hi2c, slaveAddr,(uint8_t*)data, len, timeout_ms);
@@ -310,7 +310,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 	uint16_t _memAddrLen = AlxI2c_ParseMemAddrLen(memAddrLen);
 	uint8_t buff[ALX_I2C_BUFF_LEN] = {};
 
-	// Try write memory for number of tries
+	// Try write for number of tries
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
 		status = HAL_I2C_Mem_Write(&me->hi2c, slaveAddr, memAddr, _memAddrLen, (uint8_t*)data, len, timeout_ms);

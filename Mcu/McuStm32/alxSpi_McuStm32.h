@@ -93,15 +93,14 @@ typedef enum
 
 typedef struct
 {
-	// Objects - External
+	// Parameters
+	SPI_TypeDef* spi;
 	AlxIoPin* do_SCK;
 	AlxIoPin* do_MOSI;
 	AlxIoPin* di_MISO;
 	AlxIoPin* do_nCS;
-	AlxClk* clk;
-
-	// Parameters
 	AlxSpi_Mode mode;
+	AlxClk* clk;
 	AlxSpi_Clk spiClk;
 
 	// Variables
@@ -110,8 +109,8 @@ typedef struct
 	SPI_HandleTypeDef hspi;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxSpi;
 
 
