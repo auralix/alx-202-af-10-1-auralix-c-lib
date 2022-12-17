@@ -43,6 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxIoPin.h"
+#include "alxBound.h"
 
 
 //******************************************************************************
@@ -56,14 +57,15 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxIoPin** ioPinArr;
+	// Const
+	uint32_t RESOLUTION;
 
 	// Parameters
+	DAC_TypeDef* dac;
+	AlxIoPin** ioPinArr;
 	Alx_Ch* chArr;
 	float* setVoltageDefaultArr_V;
 	uint8_t numOfCh;
-	uint32_t resolution;
 	bool isVrefInt_V;
 	float vrefExt_V;
 
@@ -74,8 +76,8 @@ typedef struct
 	float setVoltageDefault_V[ALX_DAC_BUFF_LEN];
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxDac;
 
 

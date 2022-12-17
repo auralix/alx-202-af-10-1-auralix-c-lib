@@ -462,26 +462,6 @@ void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
 
 /**
   * @brief
-  * @param[in,out]	valPtr
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxGlobal_BoundUint32(uint32_t* valPtr, uint32_t valMin, uint32_t valMax);
-
-/**
-  * @brief
-  * @param[in,out]	valPtr
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxGlobal_BoundFloat(float* valPtr, float valMin, float valMax);
-
-/**
-  * @brief
   * @param[in] val
   * @return
   */
