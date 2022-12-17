@@ -127,20 +127,11 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
   * @brief
   * @param[in,out]	me
   * @param[in]		data
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxSerialPort_Write(AlxSerialPort* me, uint8_t data);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		data
   * @param[in]		len
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxSerialPort_WriteMulti(AlxSerialPort* me, const uint8_t* data, uint32_t len);
+Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len);
 
 /**
   * @brief
@@ -155,7 +146,7 @@ Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str);
   * @brief
   * @param[in,out]	me
   */
-void AlxSerialPort_Foreground_Handle(AlxSerialPort* me);
+void AlxSerialPort_IrqHandle(AlxSerialPort* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

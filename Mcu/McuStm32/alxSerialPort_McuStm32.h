@@ -57,23 +57,26 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - Internal
-	AlxFifo rxFifo;
-
-	// Objects - External
+	// Parameters
+	USART_TypeDef* uart;
 	AlxIoPin* do_TX;
 	AlxIoPin* di_RX;
-
-	// Parameters
+	AlxGlobal_BaudRate baudRate;
+	uint32_t dataWidth;
+	uint32_t stopBits;
+	uint32_t parity;
 	uint16_t txTimeout_ms;
+	uint8_t* rxFifoBuff;
+	uint32_t rxFifoBuffLen;
 	Alx_IrqPriority rxIrqPriority;
 
 	// Variables
 	UART_HandleTypeDef huart;
+	AlxFifo rxFifo;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxSerialPort;
 
 
