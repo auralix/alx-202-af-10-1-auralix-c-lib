@@ -93,19 +93,26 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_I2C_MCU_STM32_CLK_100kHz 0 // TODO
-#define ALX_I2C_MCU_STM32_CLK_400kHz 0x40B285C2 // _400kHz_8MHz_100nsRise_10nsFall_AnalogFiltOn_DigitalFilt0, on STM32F3 -> Used I2C timing configuration tool (AN4235) and the associated software STSW-STM32126, measured 380kHz, if analog filter is disabled we can get 400kHz..
-//0x60400D28 _400kHz_8MHz_100nsRise_10nsFall_AnalogFiltOn_DigitalFilt0
-//0x40B285C2 _100kHz_8MHz_100nsRise_100nsFall_AnalogFiltOn_DigitalFilt0
+
+//------------------------------------------------------------------------------
+// ALX MCU - I2C
+//------------------------------------------------------------------------------
+#define ALX_I2C_MCU_STM32_CLK_100kHz 0				// TODO
+#define ALX_I2C_MCU_STM32_CLK_400kHz 0x40B285C2		// _400kHz_8MHz_100nsRise_10nsFall_AnalogFiltOn_DigitalFilt0, on STM32F3 -> Used I2C timing configuration tool (AN4235) and the associated software STSW-STM32126, measured 380kHz, if analog filter is disabled we can get 400kHz..
+													// 0x60400D28 _400kHz_8MHz_100nsRise_10nsFall_AnalogFiltOn_DigitalFilt0
+													// 0x40B285C2 _100kHz_8MHz_100nsRise_100nsFall_AnalogFiltOn_DigitalFilt0
+
+
+//------------------------------------------------------------------------------
+// ALX - ID
+//------------------------------------------------------------------------------
 #define ALX_STM32_CMSIS_VERSION_MAIN	__STM32G4_CMSIS_VERSION_MAIN
 #define ALX_STM32_CMSIS_VERSION_SUB1	__STM32G4_CMSIS_VERSION_SUB1
 #define ALX_STM32_CMSIS_VERSION_SUB2	__STM32G4_CMSIS_VERSION_SUB2
 #define ALX_STM32_CMSIS_VERSION_RC		__STM32G4_CMSIS_VERSION_RC
 #define ALX_STM32_CMSIS_VERSION			__STM32G4_CMSIS_VERSION
-
 #define ALX_STM32_CMSIS_VER_REQUIRED	ALX_STM32G4_CMSIS_VER_REQUIRED
 #define ALX_STM32_HAL_VER_REQUIRED		ALX_STM32G4_HAL_VER_REQUIRED
-
 #define ALX_STM32_STR "STM32G4"
 
 

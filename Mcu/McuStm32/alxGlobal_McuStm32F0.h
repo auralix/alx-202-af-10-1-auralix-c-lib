@@ -45,7 +45,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F0)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F0)
 
 
 //******************************************************************************
@@ -83,7 +83,9 @@ extern "C" {
 // Preprocessor
 //******************************************************************************
 
-// AlxId //
+//------------------------------------------------------------------------------
+// ALX - ID
+//------------------------------------------------------------------------------
 #define ALX_STM32_CMSIS_VERSION_MAIN	__STM32F0_DEVICE_VERSION_MAIN
 #define ALX_STM32_CMSIS_VERSION_SUB1	__STM32F0_DEVICE_VERSION_SUB1
 #define ALX_STM32_CMSIS_VERSION_SUB2	__STM32F0_DEVICE_VERSION_SUB2
@@ -94,7 +96,7 @@ extern "C" {
 #define ALX_STM32_STR "STM32F0"
 
 
-#endif	// #if defined(ALX_STM32F0)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F0)
 
 #ifdef __cplusplus
 }

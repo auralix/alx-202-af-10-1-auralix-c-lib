@@ -40,6 +40,9 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#if defined(ALX_OS)
+#include "alxOsMutex.h"
+#endif
 
 
 //******************************************************************************
@@ -53,16 +56,22 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	// Const
+	uint32_t TIMEOUT_ms;
+
 	// Parameters
 	GPIO_TypeDef* port;
-
-	// Variables
 	GPIO_InitTypeDef igpio;
 	UART_HandleTypeDef huart;
 
+	// Variables
+	#if defined(ALX_OS)
+	AlxOsMutex mutex;
+	#endif
+
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxTrace;
 
 

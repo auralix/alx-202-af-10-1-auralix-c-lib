@@ -58,14 +58,12 @@ typedef struct
 {
 	// Parameters
 	GPIO_TypeDef* port;
+	GPIO_InitTypeDef igpio;
 	bool val;
 
-	// Variables
-	GPIO_InitTypeDef igpio;
-
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxIoPin;
 
 
