@@ -162,7 +162,7 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 			#if defined(STM32G4)
 			if (me->config == AlxClk_Config_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz_BackupHsi_16Mhz)	{ AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true;	}
 			#endif
-			else																													{ALX_CLK_ASSERT(false); return Alx_Err; } // We shouldn't get here
+			else																													{ ALX_CLK_ASSERT(false); return Alx_Err; } // We shouldn't get here
 
 			// Set wasCtorCalled
 			me->wasCtorCalled = true;
