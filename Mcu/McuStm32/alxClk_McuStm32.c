@@ -95,26 +95,26 @@ ALX_WEAK void AlxClk_Ctor
 	else if	(me->config == AlxClk_Config_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hse_8MHz)										{ AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hse_8MHz(me);								me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz)										{ AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz(me);								me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz)										{ AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz(me);								me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz_BackupHsi_8Mhz)						{ AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz(me);								me->backupHsiEnable = true;		}
+	else if	(me->config == AlxClk_Config_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz_BackupHsi_8MHz)						{ AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz(me);								me->backupHsiEnable = true;		}
 	#endif
 	#if defined(ALX_STM32F1)
 	if		(me->config == AlxClk_Config_McuStm32F1_Sysclk_8MHz_Pclk1Apb1_8MHz_Pclk2Apb2_8MHz_Hsi_8MHz_Default)					{ AlxClk_Ctor_McuStm32F1_Sysclk_8MHz_Pclk1Apb1_8MHz_Pclk2Apb2_8MHz_Hsi_8MHz_Default(me);		me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hsi_8MHz)						{ AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hsi_8MHz(me);				me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hse_8MHz)						{ AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hse_8MHz(me);				me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hse_8MHz_BackupHsi_8Mhz)		{ AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hse_8MHz(me);				me->backupHsiEnable = true;		}
+	else if	(me->config == AlxClk_Config_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hse_8MHz_BackupHsi_8MHz)		{ AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hse_8MHz(me);				me->backupHsiEnable = true;		}
 	#endif
 	#if defined(ALX_STM32F4)
 	if		(me->config == AlxClk_Config_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default)				{ AlxClk_Ctor_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default(me);	me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz)					{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz)					{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz(me);			me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz_BackupHsi_16Mhz)	{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz(me);			me->backupHsiEnable = true;		}
+	else if	(me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz_BackupHsi_16MHz)	{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz(me);			me->backupHsiEnable = true;		}
 	else if	(me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_25MHz)					{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_25MHz(me);			me->backupHsiEnable = false;	}
 	#endif
 	#if defined(ALX_STM32G4)
 	if		(me->config == AlxClk_Config_McuStm32G4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default)				{ AlxClk_Ctor_McuStm32G4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default(me);	me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hsi_16MHz)					{ AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz)					{ AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz(me);			me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz_BackupHsi_16Mhz)	{ AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz(me);			me->backupHsiEnable = true;		}
+	else if	(me->config == AlxClk_Config_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz_BackupHsi_16MHz)	{ AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz(me);			me->backupHsiEnable = true;		}
 	#endif
 	#if defined(ALX_STM32L0)
 	if		(me->config == AlxClk_Config_McuStm32L0_Sysclk_2MHz1_Pclk1Apb1_2MHz1_Pclk2Apb2_2MHz1_Msi_2MHz1_Default)				{ AlxClk_Ctor_McuStm32L0_Sysclk_2MHz1_Pclk1Apb1_2MHz1_Pclk2Apb2_2MHz1_Msi_2MHz1_Default(me);	me->backupHsiEnable = false;	}
@@ -125,11 +125,11 @@ ALX_WEAK void AlxClk_Ctor
 	if		(me->config == AlxClk_Config_McuStm32L4_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Msi_4MHz_Default)					{ AlxClk_Ctor_McuStm32L4_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Msi_4MHz_Default(me);		me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz)						{ AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz)					{ AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_12MHz_BackupHsi_16Mhz)	{ ALX_CLK_ASSERT(false); me->backupHsiEnable = true; }	// TODO
+	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_12MHz_BackupHsi_16MHz)	{ ALX_CLK_ASSERT(false); me->backupHsiEnable = true; }	// TODO
 	#endif
 	else																														{ ALX_CLK_ASSERT(false); return; }	// We should not get here
-
 	me->isBackupHsiUsed = false;
+
 	me->systemCoreClock = 0;
 	me->sysclk = 0;
 	me->hclk = 0;
@@ -148,8 +148,8 @@ ALX_WEAK void AlxClk_Ctor
 ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
 	// Assert
-	//ALX_CLK_ASSERT(me->isInit == false);
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
+	//ALX_CLK_ASSERT(me->isInit == false);
 
 	// If backup HSI enabled, enable CSS
 	if (me->backupHsiEnable)
@@ -168,19 +168,19 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 
 			// Ctor
 			#if defined(ALX_STM32F0)
-			if (me->config == AlxClk_Config_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz_BackupHsi_8Mhz)						{ AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz(me);						me->isBackupHsiUsed = true;	}
+			if (me->config == AlxClk_Config_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz_BackupHsi_8MHz)						{ AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz(me);						me->isBackupHsiUsed = true;	}
 			#endif
 			#if defined(ALX_STM32F1)
-			if (me->config == AlxClk_Config_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hse_8MHz_BackupHsi_8Mhz)		{ AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hsi_8MHz(me);		me->isBackupHsiUsed = true;	}
+			if (me->config == AlxClk_Config_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hse_8MHz_BackupHsi_8MHz)		{ AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hsi_8MHz(me);		me->isBackupHsiUsed = true;	}
 			#endif
 			#if defined(ALX_STM32F4)
-			if (me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz_BackupHsi_16Mhz)		{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true;	}
+			if (me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz_BackupHsi_16MHz)		{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true;	}
 			#endif
 			#if defined(ALX_STM32G4)
-			if (me->config == AlxClk_Config_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz_BackupHsi_16Mhz)	{ AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true;	}
+			if (me->config == AlxClk_Config_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz_BackupHsi_16MHz)	{ AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true;	}
 			#endif
 			#if defined(ALX_STM32L4)
-			if (me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_12MHz_BackupHsi_16Mhz)	{ AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true; }
+			if (me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_12MHz_BackupHsi_16MHz)	{ AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true; }
 			#endif
 			else																													{ ALX_CLK_ASSERT(false); return Alx_Err; } // We should not get here
 
@@ -264,7 +264,7 @@ ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 	if(clk == AlxClk_Clk_McuStm32_MainPllInputClk_Ctor )	return me->mainPllInputClk_Ctor;
 
 	ALX_CLK_ASSERT(false);	// We should not get here
-	return Alx_Err;
+	return ALX_NULL;
 }
 void AlxClk_Irq_Handle(AlxClk* me)
 {
@@ -604,7 +604,7 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_
 	me->pclk2Apb2_Ctor =		64000000UL;		// 64 MHz OK - same as cube
 	me->pclk1Apb1Tim_Ctor =		64000000UL;		// 64 MHz OK - same as cube
 	me->pclk2Apb2Tim_Ctor =		64000000UL;		// 64 MHz OK - same as cube
-	me->mainPllInputClk_Ctor =	8000000UL;		// 8Mhz
+	me->mainPllInputClk_Ctor =	8000000UL;		// 8MHz
 }
 #endif
 #if defined(ALX_STM32F4)

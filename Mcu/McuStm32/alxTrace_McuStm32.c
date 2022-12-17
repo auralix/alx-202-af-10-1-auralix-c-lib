@@ -68,6 +68,14 @@ void AlxTrace_Ctor
 
 	// Parameters
 	me->port = port;
+	me->pin = pin;
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	me->alternate = alternate;
+	#endif
+	me->uart = uart;
+	me->baudRate = baudRate;
+
+	// Variables
 	me->igpio.Pin = pin;
 	me->igpio.Mode = GPIO_MODE_AF_PP;
 	me->igpio.Pull = GPIO_NOPULL;
@@ -101,8 +109,6 @@ void AlxTrace_Ctor
 	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
 	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	#endif
-
-	// Variables
 	#if defined(ALX_OS)
 	AlxOsMutex_Ctor(&me->mutex);
 	#endif

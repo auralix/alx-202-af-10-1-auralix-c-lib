@@ -58,8 +58,17 @@ typedef struct
 {
 	// Parameters
 	GPIO_TypeDef* port;
-	GPIO_InitTypeDef igpio;
+	uint16_t pin;
+	uint32_t mode;
+	uint32_t pull;
+	uint32_t speed;
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	uint32_t alternate;
+	#endif
 	bool val;
+
+	// Variables
+	GPIO_InitTypeDef igpio;
 
 	// Info
 	bool wasCtorCalled;

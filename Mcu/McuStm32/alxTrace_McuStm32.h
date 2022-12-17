@@ -61,10 +61,16 @@ typedef struct
 
 	// Parameters
 	GPIO_TypeDef* port;
-	GPIO_InitTypeDef igpio;
-	UART_HandleTypeDef huart;
+	uint16_t pin;
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	uint32_t alternate;
+	#endif
+	USART_TypeDef* uart;
+	AlxGlobal_BaudRate baudRate;
 
 	// Variables
+	GPIO_InitTypeDef igpio;
+	UART_HandleTypeDef huart;
 	#if defined(ALX_OS)
 	AlxOsMutex mutex;
 	#endif

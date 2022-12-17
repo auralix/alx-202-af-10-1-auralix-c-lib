@@ -57,6 +57,16 @@ void AlxIoPin_Ctor
 {
 	// Parameters
 	me->port = port;
+	me->pin = pin;
+	me->mode = mode;
+	me->pull = pull;
+	me->speed = speed;
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	me->alternate = alternate;
+	#endif
+	me->val = val;
+
+	// Variables
 	me->igpio.Pin = pin;
 	me->igpio.Mode = mode;
 	me->igpio.Pull = pull;
@@ -64,7 +74,6 @@ void AlxIoPin_Ctor
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	me->igpio.Alternate = alternate;
 	#endif
-	me->val = val;
 
 	// Info
 	me->wasCtorCalled = true;
