@@ -351,7 +351,7 @@ typedef enum
 	AlxClk_Clk_McuStm32_Sysclk,
 	AlxClk_Clk_McuStm32_Hclk,
 	AlxClk_Clk_McuStm32_Pclk1Apb1,
-	#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	AlxClk_Clk_McuStm32_Pclk2Apb2,
 	#endif
 
@@ -359,11 +359,11 @@ typedef enum
 	AlxClk_Clk_McuStm32_Sysclk_Ctor,
 	AlxClk_Clk_McuStm32_Hclk_Ctor,
 	AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor,
-	#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor,
 	#endif
 	AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor,
-	#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	AlxClk_Clk_McuStm32_Pclk2Apb2Tim_Ctor,
 	#endif
 
