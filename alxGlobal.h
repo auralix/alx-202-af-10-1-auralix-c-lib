@@ -347,48 +347,54 @@ typedef enum
 typedef enum
 {
 	#if defined(ALX_STM32)
-	AlxClk_Clk_McuStm32_SystemCoreClock = 0,
-	AlxClk_Clk_McuStm32_Sysclk = 1,
-	AlxClk_Clk_McuStm32_Hclk = 2,
-	AlxClk_Clk_McuStm32_Pclk1Apb1 = 3,
-	AlxClk_Clk_McuStm32_Pclk2Apb2 = 4,
+	AlxClk_Clk_McuStm32_SystemCoreClock,
+	AlxClk_Clk_McuStm32_Sysclk,
+	AlxClk_Clk_McuStm32_Hclk,
+	AlxClk_Clk_McuStm32_Pclk1Apb1,
+	#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+	AlxClk_Clk_McuStm32_Pclk2Apb2,
+	#endif
 
-	AlxClk_Clk_McuStm32_SystemCoreClock_Ctor = 5,
-	AlxClk_Clk_McuStm32_Sysclk_Ctor = 6,
-	AlxClk_Clk_McuStm32_Hclk_Ctor = 7,
-	AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor = 8,
-	AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor = 9,
-	AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor = 10,
-	AlxClk_Clk_McuStm32_Pclk2Apb2Tim_Ctor = 11,
+	AlxClk_Clk_McuStm32_SystemCoreClock_Ctor,
+	AlxClk_Clk_McuStm32_Sysclk_Ctor,
+	AlxClk_Clk_McuStm32_Hclk_Ctor,
+	AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor,
+	#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+	AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor,
+	#endif
+	AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor,
+	#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+	AlxClk_Clk_McuStm32_Pclk2Apb2Tim_Ctor,
+	#endif
 
-	AlxClk_Clk_McuStm32_MainPllClk = 12,
-	AlxClk_Clk_McuStm32_MainPllInputClk_Ctor = 13,
+	AlxClk_Clk_McuStm32_MainPllClk,
+	AlxClk_Clk_McuStm32_MainPllInputClk_Ctor,
 	#endif
 
 	#if defined(ALX_LPC8XX) || defined(ALX_LPC80X)
-	AlxClk_Clk_McuLpc8xx_CoreSysClk = 14,
-	AlxClk_Clk_McuLpc8xx_MainClk = 15,
-	AlxClk_Clk_McuLpc8xx_Fro = 16,
-	AlxClk_Clk_McuLpc8xx_FroDiv = 17,
-	AlxClk_Clk_McuLpc8xx_ExtClk = 18,
-	AlxClk_Clk_McuLpc8xx_Frg0 = 19,
+	AlxClk_Clk_McuLpc8xx_CoreSysClk,
+	AlxClk_Clk_McuLpc8xx_MainClk,
+	AlxClk_Clk_McuLpc8xx_Fro,
+	AlxClk_Clk_McuLpc8xx_FroDiv,
+	AlxClk_Clk_McuLpc8xx_ExtClk,
+	AlxClk_Clk_McuLpc8xx_Frg0,
 
-	AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor = 20,
-	AlxClk_Clk_McuLpc8xx_MainClk_Ctor = 21,
-	AlxClk_Clk_McuLpc8xx_Fro_Ctor = 22,
-	AlxClk_Clk_McuLpc8xx_LPO_Ctor = 23,
+	AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor,
+	AlxClk_Clk_McuLpc8xx_MainClk_Ctor,
+	AlxClk_Clk_McuLpc8xx_Fro_Ctor,
+	AlxClk_Clk_McuLpc8xx_LPO_Ctor,
 	#endif
 
 	#if defined(ALX_LPC55S6X)
-	AlxClk_Clk_McuLpc55s6x_SystemCoreClock = 24,
-	AlxClk_Clk_McuLpc55s6x_AhbClk = 25,
-	AlxClk_Clk_McuLpc55s6x_MainClk = 26,
-	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz = 27,
+	AlxClk_Clk_McuLpc55s6x_SystemCoreClock,
+	AlxClk_Clk_McuLpc55s6x_AhbClk,
+	AlxClk_Clk_McuLpc55s6x_MainClk,
+	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz,
 
-	AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor = 28,
-	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor = 29,
-	AlxClk_Clk_McuLpc55s6x_MainClk_Ctor = 30,
-	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor = 31
+	AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor,
+	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor,
+	AlxClk_Clk_McuLpc55s6x_MainClk_Ctor,
+	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor,
 	#endif
 } AlxClk_Clk;
 

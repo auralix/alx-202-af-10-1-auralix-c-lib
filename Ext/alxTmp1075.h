@@ -305,6 +305,14 @@ Alx_Status AlxTmp1075_DeInit(AlxTmp1075* me);
 /**
   * @brief
   * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
+bool AlxTmp1075_IsInit(AlxTmp1075* me);
+
+/**
+  * @brief
+  * @param[in,out]	me
   * @return
   */
 float AlxTmp1075_GetTemp_degC(AlxTmp1075* me);
