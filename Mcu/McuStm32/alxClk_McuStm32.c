@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -161,6 +161,9 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 			#endif
 			#if defined(STM32G4)
 			if (me->config == AlxClk_Config_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz_BackupHsi_16Mhz)	{ AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true;	}
+			#endif
+			#if defined(STM32L4)
+			if (me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz_BackupHsi_16Mhz)	{ AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true; }
 			#endif
 			else																													{ ALX_CLK_ASSERT(false); return Alx_Err; } // We shouldn't get here
 
@@ -1050,4 +1053,4 @@ void HAL_RCC_CSSCallback()
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
