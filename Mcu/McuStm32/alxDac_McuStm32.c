@@ -326,6 +326,9 @@ static Alx_Status AlxDac_Init_Private(AlxDac* me, bool calibrateVref, float vref
 		if (HAL_DAC_ConfigChannel(&me->hdac, &me->chdac[i], AlxDac_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 	}
 
+	// Set isInit
+	me->isInit = true;
+
 	// Set DAC channels default voltage
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
@@ -344,9 +347,6 @@ static Alx_Status AlxDac_Init_Private(AlxDac* me, bool calibrateVref, float vref
 	{
 		if (HAL_DAC_Start(&me->hdac, AlxDac_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
 	}
-
-	// Set isInit
-	me->isInit = true;
 
 	// Return
 	return Alx_Ok;

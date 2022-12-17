@@ -56,16 +56,14 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxIoPin** ioPinArr;
-
 	// Parameters
+	AlxIoPin** ioPinArr;
 	uint8_t numOfIoPins;
 	Alx_IrqPriority* irqPriorityArr;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxIoPinIrq;
 
 
