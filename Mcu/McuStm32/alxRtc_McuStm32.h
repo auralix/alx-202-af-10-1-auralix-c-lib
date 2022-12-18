@@ -67,24 +67,22 @@ typedef struct
 {
 	// Parameters
 	AlxRtc_Clk rtcClk;
-	uint64_t rtcTick_ns;
 
 	// Variables
 	RCC_OscInitTypeDef iosc;
 	RCC_PeriphCLKInitTypeDef iclk;
 	RTC_HandleTypeDef hrtc;
+	uint64_t rtcTick_ns;
 	uint32_t PRER_Expected;
-
 	AlxRtc_DateTime lastSetDateTime;
 	uint32_t lastSetSubSec;
 	uint64_t lastSetUnixTime_ns;
-
 	bool isDateTimeConfigured;
 
 	// Info
-	bool isErr;
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
+	bool isErr;
 } AlxRtc;
 
 

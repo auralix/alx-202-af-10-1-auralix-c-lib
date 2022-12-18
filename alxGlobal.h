@@ -278,14 +278,6 @@ typedef enum
 
 typedef enum
 {
-	Alx_Bit_8  =  8,
-	Alx_Bit_16 = 16,
-	Alx_Bit_32 = 32,
-	Alx_Bit_64 = 64
-} Alx_Bit;
-
-typedef enum
-{
 	Alx_Ok = 0,
 	Alx_Err = 1,
 	Alx_ErrReInit = 2,
@@ -453,23 +445,6 @@ void AlxGlobal_EnableIrq(void);
   * @param[out]	str
   */
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
-
-/**
-  * @brief
-  * @param[in] val
-  * @return
-  */
-uint32_t AlxGlobal_Round(float val);
-
-/**
-  * @brief
-  * @param[in]	val
-  * @param[in]	valMin
-  * @param[in]	valMax
-  * @retval		false
-  * @retval		true
-  */
-bool AlxGlobal_IsOutOfRangeUint8(uint8_t val, uint8_t valMin, uint8_t valMax);
 
 /**
   * @brief
