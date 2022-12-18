@@ -57,6 +57,9 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	// Defines
+	#define ALX_PWM_BUFF_LEN 6
+
 	// Parameters
 	TIM_TypeDef* tim;
 	AlxIoPin** ioPinArr;

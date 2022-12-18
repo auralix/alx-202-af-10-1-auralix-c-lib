@@ -62,6 +62,9 @@ typedef enum
 
 typedef struct
 {
+	// Defines
+	#define ALX_I2C_BUFF_LEN 256
+
 	// Parameters
 	I2C_TypeDef* i2c;
 	AlxIoPin* io_SCL;

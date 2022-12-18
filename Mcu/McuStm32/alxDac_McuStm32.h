@@ -57,6 +57,9 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	// Defines
+	#define ALX_DAC_BUFF_LEN 2
+
 	// Const
 	uint32_t RESOLUTION;
 

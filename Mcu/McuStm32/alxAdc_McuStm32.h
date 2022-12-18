@@ -78,6 +78,9 @@ typedef enum
 
 typedef struct
 {
+	// Defines
+	#define ALX_ADC_BUFF_LEN 16
+
 	// Const
 	uint32_t RESOLUTION;
 

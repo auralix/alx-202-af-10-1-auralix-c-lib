@@ -41,9 +41,9 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint32_t AlxPwm_GetCh(Alx_Ch ch);
 static void AlxPwm_SetSrcClk_SetPeriodMax(AlxPwm* me);
 static Alx_Status AlxPwm_RemapIoPin(AlxPwm* me);
+static uint32_t AlxPwm_GetCh(Alx_Ch ch);
 static void AlxPwm_Periph_EnableClk(AlxPwm* me);
 static void AlxPwm_Periph_DisableClk(AlxPwm* me);
 static void AlxPwm_Periph_ForceReset(AlxPwm* me);
@@ -320,20 +320,6 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint32_t AlxPwm_GetCh(Alx_Ch ch)
-{
-	if(ch == Alx_Ch_1 ) return TIM_CHANNEL_1;
-	if(ch == Alx_Ch_2 ) return TIM_CHANNEL_2;
-	if(ch == Alx_Ch_3 ) return TIM_CHANNEL_3;
-	if(ch == Alx_Ch_4 ) return TIM_CHANNEL_4;
-	#if defined(ALX_STM32G4)
-	if(ch == Alx_Ch_5 ) return TIM_CHANNEL_5;
-	if(ch == Alx_Ch_6 ) return TIM_CHANNEL_6;
-	#endif
-
-	ALX_PWM_ASSERT(false);	// We should not get here
-	return ALX_NULL;
-}
 static void AlxPwm_SetSrcClk_SetPeriodMax(AlxPwm* me)
 {
 	bool isErr = true;
@@ -447,6 +433,20 @@ static Alx_Status AlxPwm_RemapIoPin(AlxPwm* me)
 	}
 
 	return Alx_Ok;
+}
+static uint32_t AlxPwm_GetCh(Alx_Ch ch)
+{
+	if(ch == Alx_Ch_1 ) return TIM_CHANNEL_1;
+	if(ch == Alx_Ch_2 ) return TIM_CHANNEL_2;
+	if(ch == Alx_Ch_3 ) return TIM_CHANNEL_3;
+	if(ch == Alx_Ch_4 ) return TIM_CHANNEL_4;
+	#if defined(ALX_STM32G4)
+	if(ch == Alx_Ch_5 ) return TIM_CHANNEL_5;
+	if(ch == Alx_Ch_6 ) return TIM_CHANNEL_6;
+	#endif
+
+	ALX_PWM_ASSERT(false);	// We should not get here
+	return ALX_NULL;
 }
 static void AlxPwm_Periph_EnableClk(AlxPwm* me)
 {
