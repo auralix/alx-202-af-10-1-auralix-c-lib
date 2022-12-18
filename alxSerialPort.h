@@ -146,7 +146,7 @@ Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str);
   * @brief
   * @param[in,out]	me
   */
-void AlxSerialPort_IrqHandle(AlxSerialPort* me);
+void AlxSerialPort_IrqHandler(AlxSerialPort* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

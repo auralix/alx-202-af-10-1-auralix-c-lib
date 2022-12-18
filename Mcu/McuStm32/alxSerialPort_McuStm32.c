@@ -246,7 +246,7 @@ Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
 	// Return
 	return AlxSerialPort_Write(me, (const uint8_t*)str, strlen(str));
 }
-void AlxSerialPort_IrqHandle(AlxSerialPort* me)
+void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 {
 	#if defined(ALX_STM32F4)
 	// Overrun error handling, periphery doesn't have overrun error disable functionality.
