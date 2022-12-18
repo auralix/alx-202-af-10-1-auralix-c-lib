@@ -375,6 +375,7 @@ ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin15()
 //******************************************************************************
 // IRQ Handlers
 //******************************************************************************
+#if !defined(ALX_IO_PIN_IRQ_HANDLERS_OFF)
 void EXTI0_IRQHandler(void)
 {
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
@@ -412,6 +413,7 @@ void EXTI15_10_IRQHandler(void)
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
 }
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
