@@ -56,7 +56,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TEMP_SENS_RTD_VDIV_FILE "alxTempSens_RtdVdiv.h"
+#define ALX_TEMP_SENS_RTD_VDIV_FILE "alxTempSensRtdVdiv.h"
 
 // Assert //
 #if defined(_ALX_TEMP_SENS_RTD_VDIV_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)

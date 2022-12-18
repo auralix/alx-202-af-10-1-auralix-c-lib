@@ -56,6 +56,9 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	// Defines
+	#define ALX_IO_PIN_IRQ_BUFF_LEN 32
+
 	// Parameters
 	AlxIoPin** ioPinArr;
 	uint8_t numOfIoPins;
