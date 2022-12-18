@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -57,7 +57,7 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_64,
 	AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_5MHz625_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_16,
 	AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_8,
@@ -65,13 +65,21 @@ typedef enum
 	AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_5MHz625_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_8,
 	AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_11MHz25_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_4,
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	AlxSpi_Clk_McuStm32G4_Spi1_Spi4_SpiClk_1MHz33_Pclk2Apb2_170MHz = SPI_BAUDRATEPRESCALER_128,
 	AlxSpi_Clk_McuStm32G4_Spi2_Spi3_SpiClk_1MHz33_Pclk1Apb1_170MHz = SPI_BAUDRATEPRESCALER_128,
 	#endif
-	#if defined(STM32L0)
+	#if defined(ALX_STM32L0)
 	AlxSpi_Clk_McuStm32L0_Spi1_SpiClk_1MHz_Pclk2Apb2_32MHz = SPI_BAUDRATEPRESCALER_32,
 	AlxSpi_Clk_McuStm32L0_Spi2_SpiClk_1MHz_Pclk1Apb1_32MHz = SPI_BAUDRATEPRESCALER_32,
+	#endif
+	#if defined(ALX_STM32L4)
+	AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_7MHz5_Pclk2Apb2_120MHz = SPI_BAUDRATEPRESCALER_16,
+	AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_15MHz_Pclk2Apb2_120MHz = SPI_BAUDRATEPRESCALER_8,
+	AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_30MHz_Pclk2Apb2_120MHz = SPI_BAUDRATEPRESCALER_4,
+	AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_7MHz5_Pclk1Apb1_120MHz = SPI_BAUDRATEPRESCALER_16,
+	AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_15MHz_Pclk1Apb1_120MHz = SPI_BAUDRATEPRESCALER_8,
+	AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_30MHz_Pclk1Apb1_120MHz = SPI_BAUDRATEPRESCALER_4,
 	#endif
 } AlxSpi_Clk;
 
@@ -85,15 +93,14 @@ typedef enum
 
 typedef struct
 {
-	// Objects - External
+	// Parameters
+	SPI_TypeDef* spi;
 	AlxIoPin* do_SCK;
 	AlxIoPin* do_MOSI;
 	AlxIoPin* di_MISO;
 	AlxIoPin* do_nCS;
-	AlxClk* clk;
-
-	// Parameters
 	AlxSpi_Mode mode;
+	AlxClk* clk;
 	AlxSpi_Clk spiClk;
 
 	// Variables
@@ -102,8 +109,8 @@ typedef struct
 	SPI_HandleTypeDef hspi;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxSpi;
 
 
@@ -137,7 +144,7 @@ void AlxSpi_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

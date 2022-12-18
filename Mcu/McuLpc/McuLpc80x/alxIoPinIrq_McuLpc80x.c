@@ -49,6 +49,7 @@ static void AlxIoPin_PINT_Init(AlxIoPinIrq* me, PINT_Type* base);	// MF: I had t
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
+#if !defined(ALX_IO_PIN_IRQ_HANDLERS_OFF)
 void AlxIoPinIrq_Foreground_Callback_Pin0();
 void AlxIoPinIrq_Foreground_Callback_Pin1();
 void AlxIoPinIrq_Foreground_Callback_Pin2();
@@ -57,6 +58,7 @@ void AlxIoPinIrq_Foreground_Callback_Pin4();
 void AlxIoPinIrq_Foreground_Callback_Pin5();
 void AlxIoPinIrq_Foreground_Callback_Pin6();
 void AlxIoPinIrq_Foreground_Callback_Pin7();
+#endif
 
 
 //******************************************************************************
@@ -210,9 +212,11 @@ static void AlxIoPin_PINT_Init(AlxIoPinIrq* me, PINT_Type* base)
 	base->PMCFG = pmcfg;
 }
 
+
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
+#if !defined(ALX_IO_PIN_IRQ_HANDLERS_OFF)
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
 	ALX_IO_PIN_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin0");
@@ -253,11 +257,13 @@ ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin7()
 	ALX_IO_PIN_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin7");
 	ALX_IO_PIN_ASSERT(false);
 }
+#endif
 
 
 //******************************************************************************
 // IRQ Handlers
 //******************************************************************************
+#if !defined(ALX_IO_PIN_IRQ_HANDLERS_OFF)
 void PIN_INT0_IRQHandler(void)
 {
 	AlxIoPinIrq_Foreground_Callback_Pin0();
@@ -298,6 +304,7 @@ void PIN_INT7_IRQHandler(void)
 	AlxIoPinIrq_Foreground_Callback_Pin7();
 	PINT_PinInterruptClrStatus(PINT, kPINT_PinInt7);	// MF: Clear IRQ Flag
 }
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)

@@ -57,10 +57,10 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	AlxI2s_Clk_McuStm32F4_SampleFreq_16kHz_SaiClk_49MHz143_MainPllInputClk_2MHz = SAI_AUDIO_FREQUENCY_16K,
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	#endif
 } AlxI2s_Clk;
 

@@ -45,7 +45,7 @@ extern "C" {
 #include "alxRtc_Global.h"
 
 // AlxMcu //
-#if defined(ALX_STM32F4)
+#if (defined(ALX_STM32F4) || defined(ALX_STM32L4))
 #include "alxRtc_McuStm32.h"
 
 #else

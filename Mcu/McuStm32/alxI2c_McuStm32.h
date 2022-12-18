@@ -48,7 +48,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -56,25 +56,27 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxI2c_Clk_100kHz = 100U,
-	AlxI2c_Clk_400kHz = 400U
+	AlxI2c_Clk_100kHz = 100,
+	AlxI2c_Clk_400kHz = 400
 } AlxI2c_Clk;
 
 typedef struct
 {
-	// Objects - External
-	AlxIoPin* io_SCL;
-	AlxIoPin* io_SDA;
+	// Defines
+	#define ALX_I2C_BUFF_LEN 256
 
 	// Parameters
+	I2C_TypeDef* i2c;
+	AlxIoPin* io_SCL;
+	AlxIoPin* io_SDA;
 	AlxI2c_Clk clk;
 
 	// Variables
 	I2C_HandleTypeDef hi2c;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxI2c;
 
 
@@ -100,7 +102,7 @@ void AlxI2c_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

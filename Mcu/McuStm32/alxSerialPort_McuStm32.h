@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -57,23 +57,26 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - Internal
-	AlxFifo rxFifo;
-
-	// Objects - External
+	// Parameters
+	USART_TypeDef* uart;
 	AlxIoPin* do_TX;
 	AlxIoPin* di_RX;
-
-	// Parameters
+	AlxGlobal_BaudRate baudRate;
+	uint32_t dataWidth;
+	uint32_t stopBits;
+	uint32_t parity;
 	uint16_t txTimeout_ms;
+	uint8_t* rxFifoBuff;
+	uint32_t rxFifoBuffLen;
 	Alx_IrqPriority rxIrqPriority;
 
 	// Variables
 	UART_HandleTypeDef huart;
+	AlxFifo rxFifo;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxSerialPort;
 
 
@@ -113,7 +116,7 @@ void AlxSerialPort_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

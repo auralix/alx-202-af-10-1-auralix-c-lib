@@ -45,7 +45,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F0)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F0)
 
 
 //******************************************************************************
@@ -107,7 +107,7 @@ extern "C" {
 #define ALX_STM32_STR "STM32F0"
 
 
-#endif	// #if defined(ALX_STM32F0)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F0)
 
 #ifdef __cplusplus
 }

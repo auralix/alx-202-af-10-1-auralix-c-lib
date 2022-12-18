@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -48,22 +48,22 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me);
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-void AlxIoPinIrq_Foreground_Callback_Pin0 (void);
-void AlxIoPinIrq_Foreground_Callback_Pin1 (void);
-void AlxIoPinIrq_Foreground_Callback_Pin2 (void);
-void AlxIoPinIrq_Foreground_Callback_Pin3 (void);
-void AlxIoPinIrq_Foreground_Callback_Pin4 (void);
-void AlxIoPinIrq_Foreground_Callback_Pin5 (void);
-void AlxIoPinIrq_Foreground_Callback_Pin6 (void);
-void AlxIoPinIrq_Foreground_Callback_Pin7 (void);
-void AlxIoPinIrq_Foreground_Callback_Pin8 (void);
-void AlxIoPinIrq_Foreground_Callback_Pin9 (void);
-void AlxIoPinIrq_Foreground_Callback_Pin10(void);
-void AlxIoPinIrq_Foreground_Callback_Pin11(void);
-void AlxIoPinIrq_Foreground_Callback_Pin12(void);
-void AlxIoPinIrq_Foreground_Callback_Pin13(void);
-void AlxIoPinIrq_Foreground_Callback_Pin14(void);
-void AlxIoPinIrq_Foreground_Callback_Pin15(void);
+void AlxIoPinIrq_IrqCallback_Pin0(void);
+void AlxIoPinIrq_IrqCallback_Pin1(void);
+void AlxIoPinIrq_IrqCallback_Pin2(void);
+void AlxIoPinIrq_IrqCallback_Pin3(void);
+void AlxIoPinIrq_IrqCallback_Pin4(void);
+void AlxIoPinIrq_IrqCallback_Pin5(void);
+void AlxIoPinIrq_IrqCallback_Pin6(void);
+void AlxIoPinIrq_IrqCallback_Pin7(void);
+void AlxIoPinIrq_IrqCallback_Pin8(void);
+void AlxIoPinIrq_IrqCallback_Pin9(void);
+void AlxIoPinIrq_IrqCallback_Pin10(void);
+void AlxIoPinIrq_IrqCallback_Pin11(void);
+void AlxIoPinIrq_IrqCallback_Pin12(void);
+void AlxIoPinIrq_IrqCallback_Pin13(void);
+void AlxIoPinIrq_IrqCallback_Pin14(void);
+void AlxIoPinIrq_IrqCallback_Pin15(void);
 
 
 //******************************************************************************
@@ -84,16 +84,14 @@ void AlxIoPinIrq_Ctor
 	ALX_IO_PIN_IRQ_ASSERT((1 <= numOfIoPins) && (numOfIoPins <= 16));
 	for (uint8_t i = 0; i < numOfIoPins - 1; i++) ALX_IO_PIN_IRQ_ASSERT((*(ioPinArr + i))->igpio.Pin != (*(ioPinArr + i + 1))->igpio.Pin);	// All GPIO pin numbers must be different
 
-	// Objects - External
-	me->ioPinArr = ioPinArr;
-
 	// Parameters
+	me->ioPinArr = ioPinArr;
 	me->numOfIoPins = numOfIoPins;
 	me->irqPriorityArr = irqPriorityArr;
 
 	// Info
-	me->isInit = false;
 	me->wasCtorCalled = true;
+	me->isInit = false;
 }
 
 
@@ -102,32 +100,38 @@ void AlxIoPinIrq_Ctor
 //******************************************************************************
 void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 {
-	ALX_IO_PIN_IRQ_ASSERT(me->isInit == false);
+	// Assert
 	ALX_IO_PIN_IRQ_ASSERT(me->wasCtorCalled == true);
+	ALX_IO_PIN_IRQ_ASSERT(me->isInit == false);
 
-	// #1 Init GPIO
+	// Init GPIO
 	for (uint32_t i = 0; i < me->numOfIoPins; i++)
-	AlxIoPin_Init((*(me->ioPinArr + i)));
+	{
+		AlxIoPin_Init((*(me->ioPinArr + i)));
+	}
 
-	// #2 Enable IRQ
+	// Enable IRQ
 	AlxIoPinIrq_Periph_EnableIrq(me);
 
-	// #3 Set isInit
+	// Set isInit
 	me->isInit = true;
 }
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 {
-	ALX_IO_PIN_IRQ_ASSERT(me->isInit == true);
+	// Assert
 	ALX_IO_PIN_IRQ_ASSERT(me->wasCtorCalled == true);
+	ALX_IO_PIN_IRQ_ASSERT(me->isInit == true);
 
-	// #1 Disable IRQ
+	// Disable IRQ
 	AlxIoPinIrq_Periph_DisableIrq(me);
 
-	// #2 DeInit GPIO
+	// DeInit GPIO
 	for (uint32_t i = 0; i < me->numOfIoPins; i++)
-	AlxIoPin_DeInit((*(me->ioPinArr + i)));
+	{
+		AlxIoPin_DeInit((*(me->ioPinArr + i)));
+	}
 
-	// #3 Reset isInit
+	// Clear isInit
 	me->isInit = false;
 }
 
@@ -193,7 +197,7 @@ static void AlxIoPinIrq_Periph_EnableIrq(AlxIoPinIrq* me)
 		}
 		else
 		{
-			ALX_IO_PIN_IRQ_ASSERT(false); // We shouldn't get here
+			ALX_IO_PIN_IRQ_ASSERT(false);	// We should not get here
 		}
 	}
 }
@@ -255,7 +259,7 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 		}
 		else
 		{
-			ALX_IO_PIN_IRQ_ASSERT(false); // We shouldn't get here
+			ALX_IO_PIN_IRQ_ASSERT(false);	// We should not get here
 		}
 
 		__HAL_GPIO_EXTI_CLEAR_IT(ioPin->igpio.Pin);
@@ -268,102 +272,102 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 //******************************************************************************
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if		(GPIO_Pin == GPIO_PIN_0 ) AlxIoPinIrq_Foreground_Callback_Pin0();
-	else if	(GPIO_Pin == GPIO_PIN_1 ) AlxIoPinIrq_Foreground_Callback_Pin1();
-	else if	(GPIO_Pin == GPIO_PIN_2 ) AlxIoPinIrq_Foreground_Callback_Pin2();
-	else if	(GPIO_Pin == GPIO_PIN_3 ) AlxIoPinIrq_Foreground_Callback_Pin3();
-	else if	(GPIO_Pin == GPIO_PIN_4 ) AlxIoPinIrq_Foreground_Callback_Pin4();
-	else if	(GPIO_Pin == GPIO_PIN_5 ) AlxIoPinIrq_Foreground_Callback_Pin5();
-	else if	(GPIO_Pin == GPIO_PIN_6 ) AlxIoPinIrq_Foreground_Callback_Pin6();
-	else if	(GPIO_Pin == GPIO_PIN_7 ) AlxIoPinIrq_Foreground_Callback_Pin7();
-	else if	(GPIO_Pin == GPIO_PIN_8 ) AlxIoPinIrq_Foreground_Callback_Pin8();
-	else if	(GPIO_Pin == GPIO_PIN_9 ) AlxIoPinIrq_Foreground_Callback_Pin9();
-	else if	(GPIO_Pin == GPIO_PIN_10) AlxIoPinIrq_Foreground_Callback_Pin10();
-	else if	(GPIO_Pin == GPIO_PIN_11) AlxIoPinIrq_Foreground_Callback_Pin11();
-	else if	(GPIO_Pin == GPIO_PIN_12) AlxIoPinIrq_Foreground_Callback_Pin12();
-	else if	(GPIO_Pin == GPIO_PIN_13) AlxIoPinIrq_Foreground_Callback_Pin13();
-	else if	(GPIO_Pin == GPIO_PIN_14) AlxIoPinIrq_Foreground_Callback_Pin14();
-	else if	(GPIO_Pin == GPIO_PIN_15) AlxIoPinIrq_Foreground_Callback_Pin15();
-	else	ALX_IO_PIN_IRQ_ASSERT(false);	// We shouldn't get here
+	if		(GPIO_Pin == GPIO_PIN_0 ) AlxIoPinIrq_IrqCallback_Pin0();
+	else if	(GPIO_Pin == GPIO_PIN_1 ) AlxIoPinIrq_IrqCallback_Pin1();
+	else if	(GPIO_Pin == GPIO_PIN_2 ) AlxIoPinIrq_IrqCallback_Pin2();
+	else if	(GPIO_Pin == GPIO_PIN_3 ) AlxIoPinIrq_IrqCallback_Pin3();
+	else if	(GPIO_Pin == GPIO_PIN_4 ) AlxIoPinIrq_IrqCallback_Pin4();
+	else if	(GPIO_Pin == GPIO_PIN_5 ) AlxIoPinIrq_IrqCallback_Pin5();
+	else if	(GPIO_Pin == GPIO_PIN_6 ) AlxIoPinIrq_IrqCallback_Pin6();
+	else if	(GPIO_Pin == GPIO_PIN_7 ) AlxIoPinIrq_IrqCallback_Pin7();
+	else if	(GPIO_Pin == GPIO_PIN_8 ) AlxIoPinIrq_IrqCallback_Pin8();
+	else if	(GPIO_Pin == GPIO_PIN_9 ) AlxIoPinIrq_IrqCallback_Pin9();
+	else if	(GPIO_Pin == GPIO_PIN_10) AlxIoPinIrq_IrqCallback_Pin10();
+	else if	(GPIO_Pin == GPIO_PIN_11) AlxIoPinIrq_IrqCallback_Pin11();
+	else if	(GPIO_Pin == GPIO_PIN_12) AlxIoPinIrq_IrqCallback_Pin12();
+	else if	(GPIO_Pin == GPIO_PIN_13) AlxIoPinIrq_IrqCallback_Pin13();
+	else if	(GPIO_Pin == GPIO_PIN_14) AlxIoPinIrq_IrqCallback_Pin14();
+	else if	(GPIO_Pin == GPIO_PIN_15) AlxIoPinIrq_IrqCallback_Pin15();
+	else	ALX_IO_PIN_IRQ_ASSERT(false);	// We should not get here
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin0()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin0()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin0");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin1()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin1()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin1");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin2()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin2()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin2");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin3()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin3()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin3");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin4()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin4()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin4");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin5()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin5()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin5");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin6()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin6()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin6");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin7()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin7()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin7");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin8()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin8()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin8");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin9()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin9()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin9");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin10()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin10()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin10");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin11()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin11()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin11");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin12()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin12()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin12");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin13()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin13()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin13");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin14()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin14()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin14");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin15()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin15()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin15");
+	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
 
@@ -371,6 +375,7 @@ ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin15()
 //******************************************************************************
 // IRQ Handlers
 //******************************************************************************
+#if !defined(ALX_IO_PIN_IRQ_HANDLERS_OFF)
 void EXTI0_IRQHandler(void)
 {
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
@@ -408,6 +413,7 @@ void EXTI15_10_IRQHandler(void)
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
 }
+#endif
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))

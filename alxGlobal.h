@@ -187,6 +187,10 @@ extern "C" {
 #include "alxGlobal_McuStm32L0.h"
 #define ALX_STM32
 
+#elif defined(ALX_STM32L4)
+#include "alxGlobal_McuStm32L4.h"
+#define ALX_STM32
+
 #elif defined(ALX_LPC1769)
 #include "alxGlobal_McuLpc17.h"
 
@@ -252,12 +256,6 @@ extern "C" {
 	#define ALX_BKPT __debugbreak()
 #endif
 
-#define ALX_I2C_BUFF_LEN 256
-#define ALX_ADC_BUFF_LEN 16
-#define ALX_DAC_BUFF_LEN 2
-#define ALX_PWM_BUFF_LEN 6
-#define ALX_IO_PIN_IRQ_BUFF_LEN 32
-
 #define ALX_NULL 0
 #define ALX_NULL_PTR NULL
 
@@ -277,14 +275,6 @@ typedef enum
 	AlxGlobal_BaudRate_4000000 = 4000000,
 	AlxGlobal_BaudRate_8000000 = 8000000
 } AlxGlobal_BaudRate;
-
-typedef enum
-{
-	Alx_Bit_8  =  8,
-	Alx_Bit_16 = 16,
-	Alx_Bit_32 = 32,
-	Alx_Bit_64 = 64
-} Alx_Bit;
 
 typedef enum
 {
@@ -347,7 +337,7 @@ typedef enum
 	AlxClk_Clk_McuStm32_Sysclk,
 	AlxClk_Clk_McuStm32_Hclk,
 	AlxClk_Clk_McuStm32_Pclk1Apb1,
-	#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	AlxClk_Clk_McuStm32_Pclk2Apb2,
 	#endif
 
@@ -355,11 +345,11 @@ typedef enum
 	AlxClk_Clk_McuStm32_Sysclk_Ctor,
 	AlxClk_Clk_McuStm32_Hclk_Ctor,
 	AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor,
-	#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor,
 	#endif
 	AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor,
-	#if (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	AlxClk_Clk_McuStm32_Pclk2Apb2Tim_Ctor,
 	#endif
 
@@ -455,43 +445,6 @@ void AlxGlobal_EnableIrq(void);
   * @param[out]	str
   */
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
-
-/**
-  * @brief
-  * @param[in,out]	valPtr
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxGlobal_BoundUint32(uint32_t* valPtr, uint32_t valMin, uint32_t valMax);
-
-/**
-  * @brief
-  * @param[in,out]	valPtr
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxGlobal_BoundFloat(float* valPtr, float valMin, float valMax);
-
-/**
-  * @brief
-  * @param[in] val
-  * @return
-  */
-uint32_t AlxGlobal_Round(float val);
-
-/**
-  * @brief
-  * @param[in]	val
-  * @param[in]	valMin
-  * @param[in]	valMax
-  * @retval		false
-  * @retval		true
-  */
-bool AlxGlobal_IsOutOfRangeUint8(uint8_t val, uint8_t valMin, uint8_t valMax);
 
 /**
   * @brief
