@@ -46,11 +46,11 @@ Alx_Status AlxRange_CheckUint8(uint8_t val, uint8_t valMin, uint8_t valMax)
 
 	if (val < valMin)
 	{
-		return Alx_ErrOutOfRangeMin;
+		return AlxRange_ErrMin;
 	}
 	else if (val > valMax)
 	{
-		return Alx_ErrOutOfRangeMax;
+		return AlxRange_ErrMax;
 	}
 
 	return Alx_Ok;
@@ -61,11 +61,11 @@ Alx_Status AlxRange_CheckUint16(uint16_t val, uint16_t valMin, uint16_t valMax)
 
 	if (val < valMin)
 	{
-		return Alx_ErrOutOfRangeMin;
+		return AlxRange_ErrMin;
 	}
 	else if (val > valMax)
 	{
-		return Alx_ErrOutOfRangeMax;
+		return AlxRange_ErrMax;
 	}
 
 	return Alx_Ok;
@@ -76,11 +76,11 @@ Alx_Status AlxRange_CheckUint32(uint32_t val, uint32_t valMin, uint32_t valMax)
 
 	if (val < valMin)
 	{
-		return Alx_ErrOutOfRangeMin;
+		return AlxRange_ErrMin;
 	}
 	else if (val > valMax)
 	{
-		return Alx_ErrOutOfRangeMax;
+		return AlxRange_ErrMax;
 	}
 
 	return Alx_Ok;
@@ -91,11 +91,11 @@ Alx_Status AlxRange_CheckUint64(uint64_t val, uint64_t valMin, uint64_t valMax)
 
 	if (val < valMin)
 	{
-		return Alx_ErrOutOfRangeMin;
+		return AlxRange_ErrMin;
 	}
 	else if (val > valMax)
 	{
-		return Alx_ErrOutOfRangeMax;
+		return AlxRange_ErrMax;
 	}
 
 	return Alx_Ok;
@@ -106,11 +106,11 @@ Alx_Status AlxRange_CheckInt8(int8_t val, int8_t valMin, int8_t valMax)
 
 	if (val < valMin)
 	{
-		return Alx_ErrOutOfRangeMin;
+		return AlxRange_ErrMin;
 	}
 	else if (val > valMax)
 	{
-		return Alx_ErrOutOfRangeMax;
+		return AlxRange_ErrMax;
 	}
 
 	return Alx_Ok;
@@ -121,11 +121,11 @@ Alx_Status AlxRange_CheckInt16(int16_t val, int16_t valMin, int16_t valMax)
 
 	if (val < valMin)
 	{
-		return Alx_ErrOutOfRangeMin;
+		return AlxRange_ErrMin;
 	}
 	else if (val > valMax)
 	{
-		return Alx_ErrOutOfRangeMax;
+		return AlxRange_ErrMax;
 	}
 
 	return Alx_Ok;
@@ -136,11 +136,11 @@ Alx_Status AlxRange_CheckInt32(int32_t val, int32_t valMin, int32_t valMax)
 
 	if (val < valMin)
 	{
-		return Alx_ErrOutOfRangeMin;
+		return AlxRange_ErrMin;
 	}
 	else if (val > valMax)
 	{
-		return Alx_ErrOutOfRangeMax;
+		return AlxRange_ErrMax;
 	}
 
 	return Alx_Ok;
@@ -151,11 +151,11 @@ Alx_Status AlxRange_CheckInt64(int64_t val, int64_t valMin, int64_t valMax)
 
 	if (val < valMin)
 	{
-		return Alx_ErrOutOfRangeMin;
+		return AlxRange_ErrMin;
 	}
 	else if (val > valMax)
 	{
-		return Alx_ErrOutOfRangeMax;
+		return AlxRange_ErrMax;
 	}
 
 	return Alx_Ok;
@@ -166,11 +166,11 @@ Alx_Status AlxRange_CheckFloat(float val, float valMin, float valMax)
 
 	if (val < valMin)
 	{
-		return Alx_ErrOutOfRangeMin;
+		return AlxRange_ErrMin;
 	}
 	else if (val > valMax)
 	{
-		return Alx_ErrOutOfRangeMax;
+		return AlxRange_ErrMax;
 	}
 
 	return Alx_Ok;
@@ -181,34 +181,31 @@ Alx_Status AlxRange_CheckDouble(double val, double valMin, double valMax)
 
 	if (val < valMin)
 	{
-		return Alx_ErrOutOfRangeMin;
+		return AlxRange_ErrMin;
 	}
 	else if (val > valMax)
 	{
-		return Alx_ErrOutOfRangeMax;
+		return AlxRange_ErrMax;
 	}
 
 	return Alx_Ok;
 }
-//Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax)
+//Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax)	// TODO
 //{
-//	ALX_RANGE_ASSERT(0 < valLenMax);
-//
-//	uint32_t valLen = strlen(val);
-//	if (valLen > (valLenMax - 1))
-//		return Alx_ErrOutOfRangeLen;
-//	else
-//		return Alx_Ok;
-//}	// TODO
-Alx_Status AlxRange_CheckStr(char* val, uint32_t valLenMax)
+//}
+Alx_Status AlxRange_CheckStr(char* val, uint32_t valMaxLenWithNullTerm)
 {
-	ALX_RANGE_ASSERT(0 <= valLenMax);
+	ALX_RANGE_ASSERT(1 < valMaxLenWithNullTerm);	// We want more than 1, because of null terminator
 
-	uint32_t valLen = strlen(val);
-	if (valLen > valLenMax )
-		return Alx_ErrOutOfRangeLen;
+	uint32_t valLenWithNullTerm = strlen(val) + 1;	// Add +1 for null terminator
+	if (valLenWithNullTerm > valMaxLenWithNullTerm)
+	{
+		return AlxRange_ErrLen;
+	}
 	else
+	{
 		return Alx_Ok;
+	}
 }
 
 

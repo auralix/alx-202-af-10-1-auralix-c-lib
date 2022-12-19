@@ -191,11 +191,11 @@ Alx_Status AlxRange_CheckDouble(double val, double valMin, double valMax);
 /**
   * @brief
   * @param[in]	val
-  * @param[in]	valLenMax
+  * @param[in]	valMaxLenWithNullTerm
   * @retval		Alx_Ok
   * @retval		Alx_Err
   */
-Alx_Status AlxRange_CheckStr(char* val, uint32_t valLenMax);
+Alx_Status AlxRange_CheckStr(char* val, uint32_t valMaxLenWithNullTerm);
 
 
 #endif	// #if defined(ALX_C_LIB)

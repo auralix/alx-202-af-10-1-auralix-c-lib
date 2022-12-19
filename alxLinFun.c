@@ -123,12 +123,12 @@ Alx_Status AlxLinFun_GetX_WithStatus(AlxLinFun* me, float y, float* x)
 		if (xRaw < me->min)				// Check if X is out of bounds
 		{
 			*x = me->min;				// Clip X at X min
-			return Alx_ErrOutOfRangeMin;
+			return AlxRange_ErrMin;
 		}
 		else if (xRaw > me->max)		// Check if X is out of bounds
 		{
 			*x = me->max;				// Clip X at X max
-			return Alx_ErrOutOfRangeMax;
+			return AlxRange_ErrMax;
 		}
 		else
 		{
@@ -141,12 +141,12 @@ Alx_Status AlxLinFun_GetX_WithStatus(AlxLinFun* me, float y, float* x)
 		if (y < me->min)				// Check if Y is out of bounds
 		{
 			*x = Get_X(me, me->min);	// Clip Y at Y min
-			return Alx_ErrOutOfRangeMin;
+			return AlxRange_ErrMin;
 		}
 		else if (y > me->max)			// Check if Y is out of bounds
 		{
 			*x = Get_X(me, me->max);	// Clip Y at Y max
-			return Alx_ErrOutOfRangeMax;
+			return AlxRange_ErrMax;
 		}
 		else
 		{
@@ -164,12 +164,12 @@ Alx_Status AlxLinFun_GetY_WithStatus(AlxLinFun* me, float x, float* y)
 		if (x < me->min)				// Check if X is out of bounds
 		{
 			*y = Get_Y(me, me->min);	// Clip X at X min
-			return Alx_ErrOutOfRangeMin;
+			return AlxRange_ErrMin;
 		}
 		else if (x > me->max)			// Check if X is out of bounds
 		{
 			*y = Get_Y(me, me->max);	// Clip X at X max
-			return Alx_ErrOutOfRangeMax;
+			return AlxRange_ErrMax;
 		}
 		else
 		{
@@ -184,12 +184,12 @@ Alx_Status AlxLinFun_GetY_WithStatus(AlxLinFun* me, float x, float* y)
 		if (yRaw < me->min)				// Check if Y is out of bounds
 		{
 			*y = me->min;				// Clip Y at Y min
-			return Alx_ErrOutOfRangeMin;
+			return AlxRange_ErrMin;
 		}
 		else if (yRaw > me->max)		// Check if Y is out of bounds
 		{
 			*y = me->max;				// Clip Y at Y max
-			return Alx_ErrOutOfRangeMax;
+			return AlxRange_ErrMax;
 		}
 		else
 		{
@@ -223,12 +223,12 @@ Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y)
 		if (x < me->min)					// Check if X is out of bounds
 		{
 			*y = Get_Y_Int(me, me->min);	// Clip X at X min
-			return Alx_ErrOutOfRangeMin;
+			return AlxRange_ErrMin;
 		}
 		else if (x > me->max)				// Check if X is out of bounds
 		{
 			*y = Get_Y_Int(me, me->max);	// Clip X at X max
-			return Alx_ErrOutOfRangeMax;
+			return AlxRange_ErrMax;
 		}
 		else
 		{
@@ -243,12 +243,12 @@ Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y)
 		if (yRaw < me->min)				// Check if Y is out of bounds
 		{
 			*y = me->min;				// Clip Y at Y min
-			return Alx_ErrOutOfRangeMin;
+			return AlxRange_ErrMin;
 		}
 		else if (yRaw > me->max)		// Check if Y is out of bounds
 		{
 			*y = me->max;				// Clip Y at Y max
-			return Alx_ErrOutOfRangeMax;
+			return AlxRange_ErrMax;
 		}
 		else
 		{

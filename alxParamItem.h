@@ -44,6 +44,7 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxBound.h"
 #include "alxRange.h"
+#include "alxFtoa.h"
 
 
 //******************************************************************************
@@ -81,27 +82,27 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxParamItem_Type_Uint8 = 0,
-	AlxParamItem_Type_Uint16 = 1,
-	AlxParamItem_Type_Uint32 = 2,
-	AlxParamItem_Type_Uint64 = 3,
-	AlxParamItem_Type_Int8 = 4,
-	AlxParamItem_Type_Int16 = 5,
-	AlxParamItem_Type_Int32 = 6,
-	AlxParamItem_Type_Int64 = 7,
-	AlxParamItem_Type_Float = 8,
-	AlxParamItem_Type_Double = 9,
-	AlxParamItem_Type_Bool = 10,
-	AlxParamItem_Type_Arr = 11,
-	AlxParamItem_Type_Str = 12,
-	AlxParamItem_Type_None = 255
+	AlxParamItem_Type_Uint8,
+	AlxParamItem_Type_Uint16,
+	AlxParamItem_Type_Uint32,
+	AlxParamItem_Type_Uint64,
+	AlxParamItem_Type_Int8,
+	AlxParamItem_Type_Int16,
+	AlxParamItem_Type_Int32,
+	AlxParamItem_Type_Int64,
+	AlxParamItem_Type_Float,
+	AlxParamItem_Type_Double,
+	AlxParamItem_Type_Bool,
+	AlxParamItem_Type_Arr,
+	AlxParamItem_Type_Str,
+	AlxParamItem_Type_None
 } AlxParamItem_Type;
 
 typedef enum
 {
-	AlxParamItem_ValOutOfRangeHandle_Assert = 0,
-	AlxParamItem_ValOutOfRangeHandle_Ignore = 1,
-	AlxParamItem_ValOutOfRangeHandle_Bound = 2
+	AlxParamItem_ValOutOfRangeHandle_Assert,
+	AlxParamItem_ValOutOfRangeHandle_Ignore,
+	AlxParamItem_ValOutOfRangeHandle_Bound
 } AlxParamItem_ValOutOfRangeHandle;
 
 typedef union
@@ -117,26 +118,31 @@ typedef union
 	float _float;
 	double _double;
 	bool _bool;
-	void* voidPtr;
-	char* charPtr;
+	void* arr;
+	char* str;
 } AlxParamItem_Val;
 
 typedef struct
 {
+	// Defines
+	#define ALX_PARAM_ITEM_BUFF_LEN 128
+	#define ALX_PARAM_ITEM_FTOA_PRECISION 6
+
 	// Parameters
 	AlxParamItem_Type type;
 	const char* name;
 	uint32_t id;
 	uint32_t groupId;
-	AlxParamItem_Val valDef;	// MF: valDefBuff
+	AlxParamItem_Val valDef;
 	AlxParamItem_Val valMin;
 	AlxParamItem_Val valMax;
-	uint32_t valLen;			// MF: valBuffLen
-	uint32_t valDefLen;
+	uint32_t valLen;
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle;
+	uint8_t* buff;
+	uint32_t buffLen;
 
 	// Variables
-	AlxParamItem_Val val;		// MF: valBuff
+	AlxParamItem_Val val;
 
 	// Info
 	bool wasCtorCalled;
@@ -426,10 +432,9 @@ void AlxParamItem_CtorArr
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
-  * @param[in]		valBuff
-  * @param[in]		valDefBuff
-  * @param[in]		strMaxLen
   * @param[in]		valOutOfRangeHandle
+  * @param[in,out]	buff
+  * @param[in]		buffLen
   */
 void AlxParamItem_CtorStr
 (
@@ -438,10 +443,9 @@ void AlxParamItem_CtorStr
 	uint32_t id,
 	uint32_t groupId,
 	const char* valDef,
-	char* valBuff,
-	char* valDefBuff,
-	uint32_t strMaxLen,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	uint8_t* buff,
+	uint32_t buffLen
 );
 
 
@@ -690,6 +694,63 @@ Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val);
   * @brief
   * @param[in,out]	me
   * @param[out]		val
+  * @param[in]		maxLenWithNullTerm
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxParamItem_GetValUint16_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
+  * @param[in]		maxLenWithNullTerm
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxParamItem_GetValFloat_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
+  * @param[in]		maxLenWithNullTerm
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxParamItem_GetValBool_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxParamItem_SetValUint16_StrFormat(AlxParamItem* me, char* val);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxParamItem_SetValFloat_StrFormat(AlxParamItem* me, char* val);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxParamItem_SetValBool_StrFormat(AlxParamItem* me, char* val);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
   */
 void AlxParamItem_GetValArr(AlxParamItem* me, void* val);
 
@@ -704,8 +765,11 @@ void AlxParamItem_SetValArr(AlxParamItem* me, void* val);
   * @brief
   * @param[in,out]	me
   * @param[out]		val
+  * @param[in]		maxLenWithNullTerm
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
-void AlxParamItem_GetValStr(AlxParamItem* me, char* val);
+Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
 
 /**
   * @brief
