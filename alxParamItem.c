@@ -384,7 +384,7 @@ void AlxParamItem_CtorArr
 	const char* name,
 	uint32_t id,
 	uint32_t groupId,
-	void* valDef,		// TODO!!!
+	void* valDef,
 	void* valBuff,
 	void* valDefBuff,
 	uint32_t valBuffLen,
@@ -488,7 +488,7 @@ void* AlxParamItem_GetValPtr(AlxParamItem* me)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
 	// Return
-	if ((me->type == AlxParamItem_Type_Arr) || (me->type == AlxParamItem_Type_Str))	// TODO!!!
+	if ((me->type == AlxParamItem_Type_Arr) || (me->type == AlxParamItem_Type_Str))
 	{
 		void* ptr = NULL;
 		memcpy(&ptr, &me->val, 4);
@@ -512,21 +512,63 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Set value to default
-	if		(me->type == AlxParamItem_Type_Uint8)	{ me->val.uint8 = me->valDef.uint8; }
-	else if (me->type == AlxParamItem_Type_Uint16)	{ me->val.uint16 = me->valDef.uint16; }
-	else if (me->type == AlxParamItem_Type_Uint32)	{ me->val.uint32 = me->valDef.uint32; }
-	else if (me->type == AlxParamItem_Type_Uint64)	{ me->val.uint64 = me->valDef.uint64; }
-	else if (me->type == AlxParamItem_Type_Int8)	{ me->val.int8 = me->valDef.int8; }
-	else if (me->type == AlxParamItem_Type_Int16)	{ me->val.int16 = me->valDef.int16; }
-	else if (me->type == AlxParamItem_Type_Int32)	{ me->val.int32 = me->valDef.int32; }
-	else if (me->type == AlxParamItem_Type_Int64)	{ me->val.int64 = me->valDef.int64; }
-	else if (me->type == AlxParamItem_Type_Float)	{ me->val._float = me->valDef._float; }
-	else if (me->type == AlxParamItem_Type_Double)	{ me->val._double = me->valDef._double; }
-	else if (me->type == AlxParamItem_Type_Bool)	{ me->val._bool = me->valDef._bool; }
-	else if (me->type == AlxParamItem_Type_Arr)		{ me->val.arr = me->valDef.arr; }			// TODO!!!
-	else if (me->type == AlxParamItem_Type_Str)		{ strcpy(me->val.str, me->valDef.str); }
-	else											{ ALX_PARAM_ITEM_ASSERT(false); }	// We should never get here
+	// Set value to default
+	if (me->type == AlxParamItem_Type_Uint8)
+	{
+		me->val.uint8 = me->valDef.uint8;
+	}
+	else if (me->type == AlxParamItem_Type_Uint16)
+	{
+		me->val.uint16 = me->valDef.uint16;
+	}
+	else if (me->type == AlxParamItem_Type_Uint32)
+	{
+		me->val.uint32 = me->valDef.uint32;
+	}
+	else if (me->type == AlxParamItem_Type_Uint64)
+	{
+		me->val.uint64 = me->valDef.uint64;
+	}
+	else if (me->type == AlxParamItem_Type_Int8)
+	{
+		me->val.int8 = me->valDef.int8;
+	}
+	else if (me->type == AlxParamItem_Type_Int16)
+	{
+		me->val.int16 = me->valDef.int16;
+	}
+	else if (me->type == AlxParamItem_Type_Int32)
+	{
+		me->val.int32 = me->valDef.int32;
+	}
+	else if (me->type == AlxParamItem_Type_Int64)
+	{
+		me->val.int64 = me->valDef.int64;
+	}
+	else if (me->type == AlxParamItem_Type_Float)
+	{
+		me->val._float = me->valDef._float;
+	}
+	else if (me->type == AlxParamItem_Type_Double)
+	{
+		me->val._double = me->valDef._double;
+	}
+	else if (me->type == AlxParamItem_Type_Bool)
+	{
+		me->val._bool = me->valDef._bool;
+	}
+	else if (me->type == AlxParamItem_Type_Arr)
+	{
+		me->val.arr = me->valDef.arr;
+	}
+	else if (me->type == AlxParamItem_Type_Str)
+	{
+		strcpy(me->val.str, me->valDef.str);
+	}
+	else
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
+	}
 }
 uint8_t AlxParamItem_GetValUint8(AlxParamItem* me)
 {
