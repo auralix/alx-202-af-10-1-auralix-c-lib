@@ -76,9 +76,6 @@ void AlxSpi_Ctor
 	me->clk = clk;
 	me->spiClk = spiClk;
 
-	// Check clock
-	ALX_SPI_ASSERT(AlxSpi_IsClkOk(me));
-
 	// Variables
 	AlxSpi_ParseMode(me);
 	me->hspi.Instance = spi;
@@ -97,6 +94,9 @@ void AlxSpi_Ctor
 	me->hspi.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
 	me->hspi.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
 	#endif
+
+	// Check clock
+	ALX_SPI_ASSERT(AlxSpi_IsClkOk(me));
 
 	// Info
 	me->wasCtorCalled = true;

@@ -43,7 +43,7 @@
 void AlxParamItem_CtorUint8
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint8_t valDef,
@@ -54,7 +54,7 @@ void AlxParamItem_CtorUint8
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Uint8;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef.uint8 = valDef;
@@ -74,7 +74,7 @@ void AlxParamItem_CtorUint8
 void AlxParamItem_CtorUint16
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint16_t valDef,
@@ -85,7 +85,7 @@ void AlxParamItem_CtorUint16
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Uint16;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef.uint16 = valDef;
@@ -105,7 +105,7 @@ void AlxParamItem_CtorUint16
 void AlxParamItem_CtorUint32
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint32_t valDef,
@@ -116,7 +116,7 @@ void AlxParamItem_CtorUint32
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Uint32;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef.uint32 = valDef;
@@ -136,7 +136,7 @@ void AlxParamItem_CtorUint32
 void AlxParamItem_CtorUint64
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint64_t valDef,
@@ -147,7 +147,7 @@ void AlxParamItem_CtorUint64
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Uint64;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef.uint64 = valDef;
@@ -167,7 +167,7 @@ void AlxParamItem_CtorUint64
 void AlxParamItem_CtorInt8
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int8_t valDef,
@@ -178,7 +178,7 @@ void AlxParamItem_CtorInt8
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Int8;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef.int8 = valDef;
@@ -198,7 +198,7 @@ void AlxParamItem_CtorInt8
 void AlxParamItem_CtorInt16
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int16_t valDef,
@@ -209,7 +209,7 @@ void AlxParamItem_CtorInt16
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Int16;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef.int16 = valDef;
@@ -229,7 +229,7 @@ void AlxParamItem_CtorInt16
 void AlxParamItem_CtorInt32
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int32_t valDef,
@@ -240,7 +240,7 @@ void AlxParamItem_CtorInt32
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Int32;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef.int32 = valDef;
@@ -260,7 +260,7 @@ void AlxParamItem_CtorInt32
 void AlxParamItem_CtorInt64
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int64_t valDef,
@@ -271,7 +271,7 @@ void AlxParamItem_CtorInt64
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Int64;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef.int64 = valDef;
@@ -291,7 +291,7 @@ void AlxParamItem_CtorInt64
 void AlxParamItem_CtorFloat
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	float valDef,
@@ -302,7 +302,7 @@ void AlxParamItem_CtorFloat
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Float;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef._float = valDef;
@@ -322,7 +322,7 @@ void AlxParamItem_CtorFloat
 void AlxParamItem_CtorDouble
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	double valDef,
@@ -333,7 +333,7 @@ void AlxParamItem_CtorDouble
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Double;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef._double = valDef;
@@ -353,7 +353,7 @@ void AlxParamItem_CtorDouble
 void AlxParamItem_CtorBool
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	bool valDef
@@ -361,7 +361,7 @@ void AlxParamItem_CtorBool
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Bool;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef._bool = valDef;
@@ -381,7 +381,7 @@ void AlxParamItem_CtorBool
 void AlxParamItem_CtorArr
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	void* valDef,
@@ -393,7 +393,7 @@ void AlxParamItem_CtorArr
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Arr;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->val.arr = valBuff;
@@ -413,7 +413,7 @@ void AlxParamItem_CtorArr
 void AlxParamItem_CtorStr
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	const char* valDef,
@@ -427,7 +427,7 @@ void AlxParamItem_CtorStr
 
 	// Parameters
 	me->type = AlxParamItem_Type_Str;
-	me->name = name;
+	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
 	me->valDef.str = (char*)valDef;
@@ -450,13 +450,13 @@ void AlxParamItem_CtorStr
 //******************************************************************************
 // Functions
 //******************************************************************************
-const char* AlxParamItem_GetName(AlxParamItem* me)
+const char* AlxParamItem_GetKey(AlxParamItem* me)
 {
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
 	// Return
-	return me->name;
+	return me->key;
 }
 uint32_t AlxParamItem_GetId(AlxParamItem* me)
 {
@@ -488,11 +488,15 @@ void* AlxParamItem_GetValPtr(AlxParamItem* me)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
 	// Return
-	if ((me->type == AlxParamItem_Type_Arr) || (me->type == AlxParamItem_Type_Str))
+	if (me->type == AlxParamItem_Type_Arr)
 	{
 		void* ptr = NULL;
 		memcpy(&ptr, &me->val, 4);
 		return ptr;
+	}
+	else if (me->type == AlxParamItem_Type_Str)
+	{
+		return me->val.str;
 	}
 	else
 	{
@@ -1392,7 +1396,23 @@ Alx_Status AlxParamItem_SetValBool_StrFormat(AlxParamItem* me, char* val)
 	{
 		valNum = true;
 	}
+	else if (strcmp(val, "True") == 0)
+	{
+		valNum = true;
+	}
+	else if (strcmp(val, "TRUE") == 0)
+	{
+		valNum = true;
+	}
 	else if (strcmp(val, "false") == 0)
+	{
+		valNum = false;
+	}
+	else if (strcmp(val, "False") == 0)
+	{
+		valNum = false;
+	}
+	else if (strcmp(val, "FALSE") == 0)
 	{
 		valNum = false;
 	}
@@ -1427,7 +1447,6 @@ Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWi
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
-	ALX_PARAM_ITEM_ASSERT(maxLenWithNullTerm <= me->buffLen);
 
 	// Check & Copy if OK
 	Alx_Status status = AlxRange_CheckStr(me->val.str, maxLenWithNullTerm);

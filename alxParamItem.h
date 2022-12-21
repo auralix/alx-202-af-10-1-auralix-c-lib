@@ -130,7 +130,7 @@ typedef struct
 
 	// Parameters
 	AlxParamItem_Type type;
-	const char* name;
+	const char* key;
 	uint32_t id;
 	uint32_t groupId;
 	AlxParamItem_Val valDef;
@@ -156,7 +156,7 @@ typedef struct
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -167,7 +167,7 @@ typedef struct
 void AlxParamItem_CtorUint8
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint8_t valDef,
@@ -179,7 +179,7 @@ void AlxParamItem_CtorUint8
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -190,7 +190,7 @@ void AlxParamItem_CtorUint8
 void AlxParamItem_CtorUint16
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint16_t valDef,
@@ -202,7 +202,7 @@ void AlxParamItem_CtorUint16
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -213,7 +213,7 @@ void AlxParamItem_CtorUint16
 void AlxParamItem_CtorUint32
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint32_t valDef,
@@ -225,7 +225,7 @@ void AlxParamItem_CtorUint32
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -236,7 +236,7 @@ void AlxParamItem_CtorUint32
 void AlxParamItem_CtorUint64
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint64_t valDef,
@@ -248,7 +248,7 @@ void AlxParamItem_CtorUint64
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -259,7 +259,7 @@ void AlxParamItem_CtorUint64
 void AlxParamItem_CtorInt8
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int8_t valDef,
@@ -271,7 +271,7 @@ void AlxParamItem_CtorInt8
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -282,7 +282,7 @@ void AlxParamItem_CtorInt8
 void AlxParamItem_CtorInt16
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int16_t valDef,
@@ -294,7 +294,7 @@ void AlxParamItem_CtorInt16
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -305,7 +305,7 @@ void AlxParamItem_CtorInt16
 void AlxParamItem_CtorInt32
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int32_t valDef,
@@ -317,7 +317,7 @@ void AlxParamItem_CtorInt32
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -328,7 +328,7 @@ void AlxParamItem_CtorInt32
 void AlxParamItem_CtorInt64
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int64_t valDef,
@@ -340,7 +340,7 @@ void AlxParamItem_CtorInt64
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -351,7 +351,7 @@ void AlxParamItem_CtorInt64
 void AlxParamItem_CtorFloat
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	float valDef,
@@ -363,7 +363,7 @@ void AlxParamItem_CtorFloat
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -374,7 +374,7 @@ void AlxParamItem_CtorFloat
 void AlxParamItem_CtorDouble
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	double valDef,
@@ -386,7 +386,7 @@ void AlxParamItem_CtorDouble
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -394,7 +394,7 @@ void AlxParamItem_CtorDouble
 void AlxParamItem_CtorBool
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	bool valDef
@@ -403,7 +403,7 @@ void AlxParamItem_CtorBool
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -415,7 +415,7 @@ void AlxParamItem_CtorBool
 void AlxParamItem_CtorArr
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	void* valDef,
@@ -428,7 +428,7 @@ void AlxParamItem_CtorArr
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		name
+  * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
   * @param[in]		valDef
@@ -439,7 +439,7 @@ void AlxParamItem_CtorArr
 void AlxParamItem_CtorStr
 (
 	AlxParamItem* me,
-	const char* name,
+	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	const char* valDef,
@@ -458,7 +458,7 @@ void AlxParamItem_CtorStr
   * @param[in,out]	me
   * @return
   */
-const char* AlxParamItem_GetName(AlxParamItem* me);
+const char* AlxParamItem_GetKey(AlxParamItem* me);
 
 /**
   * @brief
