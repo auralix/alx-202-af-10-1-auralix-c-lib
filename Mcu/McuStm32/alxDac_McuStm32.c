@@ -120,9 +120,17 @@ void AlxDac_Ctor
 		me->chdac[buffPos].DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
 		#endif
 
-		#if defined(ALX_STM32L4)	// TODO set whole structure!!!
-		me->chdac[buffPos].DAC_Trigger = DAC_TRIGGER_NONE;
+		#if defined(ALX_STM32L4)
+		me->chdac[buffPos].DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
+		me->chdac[buffPos].DAC_HighFrequency = DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE;
 		me->chdac[buffPos].DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
+		me->chdac[buffPos].DAC_Trigger = DAC_TRIGGER_NONE;
+		me->chdac[buffPos].DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
+		me->chdac[buffPos].DAC_SampleAndHoldConfig.DAC_HoldTime = 0;
+		me->chdac[buffPos].DAC_SampleAndHoldConfig.DAC_RefreshTime = 0;
+		me->chdac[buffPos].DAC_SampleAndHoldConfig.DAC_SampleTime = 0;
+		me->chdac[buffPos].DAC_UserTrimming = DAC_TRIMMING_FACTORY;
+		me->chdac[buffPos].DAC_TrimmingValue = 1;
 		#endif
 
 		#if defined(ALX_STM32G4)
