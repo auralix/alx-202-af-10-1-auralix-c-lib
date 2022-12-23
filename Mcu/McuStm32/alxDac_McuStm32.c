@@ -128,9 +128,9 @@ void AlxDac_Ctor
 		me->chdac[buffPos].DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
 		me->chdac[buffPos].DAC_UserTrimming = DAC_TRIMMING_FACTORY;
 		me->chdac[buffPos].DAC_TrimmingValue = 1;
+		me->chdac[buffPos].DAC_SampleAndHoldConfig.DAC_SampleTime = 0;
 		me->chdac[buffPos].DAC_SampleAndHoldConfig.DAC_HoldTime = 0;
 		me->chdac[buffPos].DAC_SampleAndHoldConfig.DAC_RefreshTime = 0;
-		me->chdac[buffPos].DAC_SampleAndHoldConfig.DAC_SampleTime = 0;
 		#endif
 
 		#if defined(ALX_STM32G4)
