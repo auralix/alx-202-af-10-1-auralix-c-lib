@@ -138,6 +138,8 @@ typedef struct
 	AlxParamItem_Val valMax;
 	uint32_t valLen;
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle;
+	float* enumArr;
+	uint8_t numOfEnums;
 	uint8_t* buff;
 	uint32_t buffLen;
 
@@ -357,7 +359,9 @@ void AlxParamItem_CtorFloat
 	float valDef,
 	float valMin,
 	float valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	float* enumArr,
+	uint8_t numOfEnums
 );
 
 /**

@@ -38,6 +38,12 @@
 
 
 //******************************************************************************
+// Private Functions
+//******************************************************************************
+static bool AlxParamItem_IsEnumOnList_Float(AlxParamItem* me, float enumVal, float* enumArr, uint8_t numOfEnums);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxParamItem_CtorUint8
@@ -297,7 +303,9 @@ void AlxParamItem_CtorFloat
 	float valDef,
 	float valMin,
 	float valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	float* enumArr,
+	uint8_t numOfEnums
 )
 {
 	// Parameters
@@ -310,11 +318,28 @@ void AlxParamItem_CtorFloat
 	me->valMax._float = valMax;
 	me->valLen = sizeof(float);
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
+	me->enumArr = enumArr;
+	me->numOfEnums = numOfEnums;
 	me->buff = ALX_NULL_PTR;
 	me->buffLen = ALX_NULL;
 
 	// Variables
 	me->val._float = valDef;
+
+	// Check if enum
+	if (me->enumArr != NULL)
+	{
+		// Check if enum number is from low to high
+		for (uint8_t i = 0; i < numOfEnums - 1; i++)
+		{
+			ALX_PARAM_ITEM_ASSERT(enumArr[i] < enumArr[i + 1]);	// Enums must be from low to high number
+		}
+
+		// Check if enum number is on the list
+		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList_Float(me, valDef, enumArr, numOfEnums) == true);
+		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList_Float(me, valMin, enumArr, numOfEnums) == true);
+		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList_Float(me, valMax, enumArr, numOfEnums) == true);
+	}
 
 	// Info
 	me->wasCtorCalled = true;
@@ -679,12 +704,6 @@ Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint8);
 
-	// Return if already set
-	if (val == me->val.uint8)
-	{
-		return AlxParamItem_AlreadySet;
-	}
-
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t _val = val;
@@ -737,12 +756,6 @@ Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val)
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint16);
-
-	// Return if already set
-	if (val == me->val.uint16)
-	{
-		return AlxParamItem_AlreadySet;
-	}
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -797,12 +810,6 @@ Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint32);
 
-	// Return if already set
-	if (val == me->val.uint32)
-	{
-		return AlxParamItem_AlreadySet;
-	}
-
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint32_t _val = val;
@@ -855,12 +862,6 @@ Alx_Status AlxParamItem_SetValUint64(AlxParamItem* me, uint64_t val)
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint64);
-
-	// Return if already set
-	if (val == me->val.uint64)
-	{
-		return AlxParamItem_AlreadySet;
-	}
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -915,12 +916,6 @@ Alx_Status AlxParamItem_SetValInt8(AlxParamItem* me, int8_t val)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int8);
 
-	// Return if already set
-	if (val == me->val.int8)
-	{
-		return AlxParamItem_AlreadySet;
-	}
-
 	// Local variables
 	Alx_Status status = Alx_Err;
 	int8_t _val = val;
@@ -973,12 +968,6 @@ Alx_Status AlxParamItem_SetValInt16(AlxParamItem* me, int16_t val)
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int16);
-
-	// Return if already set
-	if (val == me->val.int16)
-	{
-		return AlxParamItem_AlreadySet;
-	}
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -1033,12 +1022,6 @@ Alx_Status AlxParamItem_SetValInt32(AlxParamItem* me, int32_t val)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int32);
 
-	// Return if already set
-	if (val == me->val.int32)
-	{
-		return AlxParamItem_AlreadySet;
-	}
-
 	// Local variables
 	Alx_Status status = Alx_Err;
 	int32_t _val = val;
@@ -1091,12 +1074,6 @@ Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val)
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Int64);
-
-	// Return if already set
-	if (val == me->val.int64)
-	{
-		return AlxParamItem_AlreadySet;
-	}
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -1151,15 +1128,20 @@ Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Float);
 
-	// Return if already set
-	if (val == me->val._float)
-	{
-		return AlxParamItem_AlreadySet;
-	}
-
 	// Local variables
 	Alx_Status status = Alx_Err;
 	float _val = val;
+	bool isEnumOnList = false;
+
+	// Check if enum is on the list
+	if (me->enumArr != NULL)
+	{
+		isEnumOnList = AlxParamItem_IsEnumOnList_Float(me, _val, me->enumArr, me->numOfEnums);
+	}
+	else
+	{
+		isEnumOnList = true;
+	}
 
 	// Handle value out of range
 	switch (me->valOutOfRangeHandle)
@@ -1167,7 +1149,7 @@ Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
 		{
 			status = AlxRange_CheckFloat(_val, me->valMin._float, me->valMax._float);
-			if (status == Alx_Ok)
+			if ((status == Alx_Ok) && isEnumOnList)
 			{
 				me->val._float = _val;
 			}
@@ -1181,7 +1163,7 @@ Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 		case AlxParamItem_ValOutOfRangeHandle_Ignore:
 		{
 			status = AlxRange_CheckFloat(_val, me->valMin._float, me->valMax._float);
-			if (status == Alx_Ok)
+			if ((status == Alx_Ok) && isEnumOnList)
 			{
 				me->val._float = _val;
 			}
@@ -1209,12 +1191,6 @@ Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val)
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Double);
-
-	// Return if already set
-	if (val == me->val._double)
-	{
-		return AlxParamItem_AlreadySet;
-	}
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -1269,12 +1245,6 @@ Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Bool);
 	ALX_PARAM_ITEM_ASSERT(val == true || val == false);
-
-	// Return if already set
-	if (val == me->val._bool)
-	{
-		return AlxParamItem_AlreadySet;
-	}
 
 	// Set
 	me->val._bool = val;
@@ -1464,12 +1434,6 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
 
-	// Return if already set
-	if (strcmp(val, me->val.str) == 0)
-	{
-		return AlxParamItem_AlreadySet;
-	}
-
 	// Local variables
 	Alx_Status status = Alx_Err;
 
@@ -1517,6 +1481,26 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 
 	// Return
 	return status;
+}
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static bool AlxParamItem_IsEnumOnList_Float(AlxParamItem* me, float enumVal, float* enumArr, uint8_t numOfEnums)
+{
+	// Check if enum number is on the list
+	for (uint8_t i = 0; i < numOfEnums; i++)
+	{
+		if (enumVal == enumArr[i])
+		{
+			// Return
+			return true;	// Number is on the list
+		}
+	}
+
+	// Return
+	return false;	// Number is NOT on the list
 }
 
 
