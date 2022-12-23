@@ -292,7 +292,6 @@ typedef enum
 	AlxMemSafe_CopyANokCopyBOk_UsedCopyB,
 	AlxMemSafe_CopyAOkCopyBNok_UsedCopyA,
 	AlxMemSafe_BothNok_ResetToDef,
-	AlxParamItem_AlreadySet,
 	AlxParamItem_ErrConv,
 	AlxRange_ErrMin,
 	AlxRange_ErrMax,
