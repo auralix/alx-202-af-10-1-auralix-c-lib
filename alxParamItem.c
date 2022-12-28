@@ -1131,16 +1131,24 @@ Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 	// Local variables
 	Alx_Status status = Alx_Err;
 	float _val = val;
-	bool isEnumOnList = false;
 
-	// Check if enum is on the list
+	// Check if enum
 	if (me->enumArr != NULL)
 	{
-		isEnumOnList = AlxParamItem_IsEnumOnList_Float(me, _val, me->enumArr, me->numOfEnums);
-	}
-	else
-	{
-		isEnumOnList = true;
+		// Check if enum is on the list
+		bool isEnumOnList = AlxParamItem_IsEnumOnList_Float(me, _val, me->enumArr, me->numOfEnums);
+		if (isEnumOnList == false)
+		{
+			// If handle assert selected, then assert, else return
+			if (me->valOutOfRangeHandle == AlxParamItem_ValOutOfRangeHandle_Assert)
+			{
+				ALX_PARAM_ITEM_ASSERT(false);
+				status = Alx_Err;
+			}
+
+			// Return
+			return AlxParamItem_ErrEnum;
+		}
 	}
 
 	// Handle value out of range
@@ -1149,7 +1157,7 @@ Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 		case AlxParamItem_ValOutOfRangeHandle_Assert:
 		{
 			status = AlxRange_CheckFloat(_val, me->valMin._float, me->valMax._float);
-			if ((status == Alx_Ok) && isEnumOnList)
+			if (status == Alx_Ok)
 			{
 				me->val._float = _val;
 			}
@@ -1163,7 +1171,7 @@ Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 		case AlxParamItem_ValOutOfRangeHandle_Ignore:
 		{
 			status = AlxRange_CheckFloat(_val, me->valMin._float, me->valMax._float);
-			if ((status == Alx_Ok) && isEnumOnList)
+			if (status == Alx_Ok)
 			{
 				me->val._float = _val;
 			}
