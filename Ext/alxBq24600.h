@@ -126,10 +126,10 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] do_EN
-  * @param[in] di_nPG
-  * @param[in] di_STAT
+  * @param[in,out]	me
+  * @param[in]		do_EN
+  * @param[in]		di_nPG
+  * @param[in]		di_STAT
   */
 void AlxBq24600_Ctor
 (
@@ -176,25 +176,33 @@ void AlxBq24600_Disable(AlxBq24600* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxBq24600_IsBatCharging(AlxBq24600* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxBq24600_IsBatFull(AlxBq24600* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxBq24600_IsSleep(AlxBq24600* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxBq24600_IsErr(AlxBq24600* me);
 

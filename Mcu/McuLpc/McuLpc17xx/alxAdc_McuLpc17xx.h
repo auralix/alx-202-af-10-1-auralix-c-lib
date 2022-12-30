@@ -79,10 +79,10 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] channels
-  * @param[in] numChannels
-  * @param[in] voltageRefP_mV
+  * @param[in,out]	me
+  * @param[in]		channels
+  * @param[in]		numChannels
+  * @param[in]		voltageRefP_mV
   */
 void AlxAdcMcu_Ctor
 (

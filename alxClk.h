@@ -44,7 +44,7 @@ extern "C" {
 #include "alxAssert.h"
 
 // AlxMcu //
-#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 #include "alxClk_McuStm32.h"
 
 #elif defined(ALX_LPC1769)
@@ -100,20 +100,25 @@ typedef struct { bool dummy; } AlxClk;
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxClk_Init(AlxClk* me);
 
 	/**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxClk_DeInit(AlxClk* me);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] clk
+  * @param[in,out]	me
+  * @param[in]		clk
+  * @return
   */
 uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk);
 

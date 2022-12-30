@@ -76,11 +76,11 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] ioPin
-  * @param[in] irqPin
-  * @param[in] irqType
-  * @param[in] irqPriority
+  * @param[in,out]	me
+  * @param[in]		ioPin
+  * @param[in]		irqPin
+  * @param[in]		irqType
+  * @param[in]		irqPriority
   */
 void AlxIoPinIrq_Ctor
 (

@@ -95,7 +95,9 @@ void AlxOsMutex_Unlock(AlxOsMutex* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in]	me
+  * @retval		false
+  * @retval		true
   */
 bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me);	// TV: Not tested
 

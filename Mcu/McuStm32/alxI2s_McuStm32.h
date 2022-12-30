@@ -57,10 +57,10 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	AlxI2s_Clk_McuStm32F4_SampleFreq_16kHz_SaiClk_49MHz143_MainPllInputClk_2MHz = SAI_AUDIO_FREQUENCY_16K,
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	#endif
 } AlxI2s_Clk;
 
@@ -103,21 +103,21 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] i2s
-  * @param[in] do_MCLK
-  * @param[in] do_BCLK
-  * @param[in] do_LRCLK
-  * @param[in] do_SDO
-  * @param[in] di_SDI
-  * @param[in] clk
-  * @param[in] i2sClk
-  * @param[in] audioMode
-  * @param[in] dataSize
-  * @param[in] isMclkUsed
-  * @param[in] txIrqPriority
-  * @param[in] me
-  * @param[in] me
+  * @param[in,out]	me
+  * @param[in]		i2s
+  * @param[in]		do_MCLK
+  * @param[in]		do_BCLK
+  * @param[in]		do_LRCLK
+  * @param[in]		do_SDO
+  * @param[in]		di_SDI
+  * @param[in]		clk
+  * @param[in]		i2sClk
+  * @param[in]		audioMode
+  * @param[in]		dataSize
+  * @param[in]		isMclkUsed
+  * @param[in]		txIrqPriority
+  * @param[in]		me
+  * @param[in]		me
   */
 void AlxI2s_Ctor
 (

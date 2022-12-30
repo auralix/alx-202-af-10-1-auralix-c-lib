@@ -48,7 +48,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -58,14 +58,21 @@ typedef struct
 {
 	// Parameters
 	GPIO_TypeDef* port;
+	uint16_t pin;
+	uint32_t mode;
+	uint32_t pull;
+	uint32_t speed;
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	uint32_t alternate;
+	#endif
 	bool val;
 
 	// Variables
 	GPIO_InitTypeDef igpio;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxIoPin;
 
 
@@ -75,14 +82,14 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] port
-  * @param[in] pin
-  * @param[in] mode
-  * @param[in] pull
-  * @param[in] speed
-  * @param[in] alternate
-  * @param[in] val
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		mode
+  * @param[in]		pull
+  * @param[in]		speed
+  * @param[in]		alternate
+  * @param[in]		val
   */
 void AlxIoPin_Ctor
 (
@@ -92,14 +99,14 @@ void AlxIoPin_Ctor
 	uint32_t mode,
 	uint32_t pull,
 	uint32_t speed,
-	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	uint32_t alternate,
-	#endif // defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#endif
 	bool val
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

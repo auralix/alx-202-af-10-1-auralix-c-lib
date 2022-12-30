@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -57,34 +57,42 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	#if defined(STM32F1)
+	#if defined(ALX_STM32F1)
 	AlxAdc_Clk_McuStm32F1_AdcClk_4MHz_Pclk2Apb2_8MHz = RCC_ADCPCLK2_DIV2,
 	#endif
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	AlxAdc_Clk_McuStm32F4_AdcClk_22MHz5_Pclk2Apb2_90MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
 	AlxAdc_Clk_McuStm32F4_AdcClk_11MHz25_Pclk2Apb2_90MHz = ADC_CLOCK_SYNC_PCLK_DIV8,
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	AlxAdc_Clk_McuStm32G4_AdcClk_42MHz5_Pclk2Apb2_170MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
 	#endif
-	#if defined(STM32L0)
+	#if defined(ALX_STM32L0)
 	AlxAdc_Clk_McuStm32L0_AdcClk_525kHz_Pclk2Apb2_2MHz1 = ADC_CLOCK_SYNC_PCLK_DIV4,
 	AlxAdc_Clk_McuStm32L0_AdcClk_8MHz_Pclk2Apb2_32MHz = ADC_CLOCK_SYNC_PCLK_DIV4
+	#endif
+	#if defined(ALX_STM32L4)
+	AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Sysclk_120MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
 	#endif
 } AlxAdc_Clk;
 
 typedef struct
 {
-	// Objects - External
-	AlxIoPin** ioPinArr;
-	AlxClk* clk;
+	// Defines
+	#define ALX_ADC_BUFF_LEN 16
+
+	// Const
+	uint32_t RESOLUTION;
 
 	// Parameters
+	ADC_TypeDef* adc;
+	AlxIoPin** ioPinArr;
 	uint8_t numOfIoPins;
 	Alx_Ch* chArr;
 	uint8_t numOfCh;
+	AlxClk* clk;
 	AlxAdc_Clk adcClk;
-	uint32_t resolution;
+	uint32_t samplingTime;
 	bool isVrefInt_V;
 	float vrefExt_V;
 
@@ -98,8 +106,8 @@ typedef struct
 	uint32_t buff[ALX_ADC_BUFF_LEN];
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxAdc;
 
 
@@ -109,17 +117,17 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] adc
-  * @param[in] ioPinArr
-  * @param[in] numOfIoPins
-  * @param[in] chArr
-  * @param[in] numOfCh
-  * @param[in] clk
-  * @param[in] adcClk
-  * @param[in] samplingTime
-  * @param[in] isVrefInt_V
-  * @param[in] vrefExt_V
+  * @param[in,out]	me
+  * @param[in]		adc
+  * @param[in]		ioPinArr
+  * @param[in]		numOfIoPins
+  * @param[in]		chArr
+  * @param[in]		numOfCh
+  * @param[in]		clk
+  * @param[in]		adcClk
+  * @param[in]		samplingTime
+  * @param[in]		isVrefInt_V
+  * @param[in]		vrefExt_V
   */
 void AlxAdc_Ctor
 (
@@ -137,7 +145,7 @@ void AlxAdc_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

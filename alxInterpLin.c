@@ -88,12 +88,12 @@ Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* yPtr)
 		if (x < *(me->xPointArr)) // If x is smaller than dataX[0], clip y at minimum dataY[0] and return AlxStatus
 		{
 			*yPtr = *(me->yPointArr);
-			return Alx_ErrOutOfRangeMin;				// Out of Range Min
+			return AlxRange_ErrMin;				// Out of Range Min
 		}
 		if (x > *(me->xPointArr + me->numOfArrPoints - 1)) // If x is bigger than dataX[last element], clip y at maximum dataY[last element]
 		{
 			*yPtr = *(me->yPointArr + me->numOfArrPoints - 1);
-			return Alx_ErrOutOfRangeMax;				// Out of Range Max
+			return AlxRange_ErrMax;				// Out of Range Max
 		}
 
 		// Search for the indexes of the numbers surrounding inserted x
@@ -112,13 +112,13 @@ Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* yPtr)
 		if (x < *(me->xPointArr + me->numOfArrPoints - 1)) // If x is smaller than dataX[last element], clip y at minimum dataY[last element]
 		{
 			*yPtr = *(me->yPointArr + me->numOfArrPoints - 1);
-			return Alx_ErrOutOfRangeMin;				// Out of Range Min
+			return AlxRange_ErrMin;				// Out of Range Min
 		}
 
 		if (x > *(me->xPointArr)) // If x is larger than dataX[0], clip y at maximum dataY[0]
 		{
 			*yPtr =  *(me->yPointArr);
-			return Alx_ErrOutOfRangeMax; 				// Out of Range Max
+			return AlxRange_ErrMax; 				// Out of Range Max
 		}
 
 		// Search for the indexes of the numbers surrounding inserted x

@@ -84,6 +84,7 @@ extern "C" {
   * @param[in] vin_V
   * @param[in] resHigh_kOhm
   * @param[in] resLow_kOhm
+  * @return
   */
 float AlxVdiv_GetVout_V(float vin_V, float resHigh_kOhm, float resLow_kOhm);
 
@@ -92,6 +93,7 @@ float AlxVdiv_GetVout_V(float vin_V, float resHigh_kOhm, float resLow_kOhm);
   * @param[in] vout_V
   * @param[in] resHigh_kOhm
   * @param[in] resLow_kOhm
+  * @return
   */
 float AlxVdiv_GetVin_V(float vout_V, float resHigh_kOhm, float resLow_kOhm);
 
@@ -100,6 +102,7 @@ float AlxVdiv_GetVin_V(float vout_V, float resHigh_kOhm, float resLow_kOhm);
   * @param[in] vin_V
   * @param[in] vout_V
   * @param[in] resLow_kOhm
+  * @return
   */
 float AlxVdiv_GetResHigh_kOhm(float vin_V, float vout_V, float resLow_kOhm);
 
@@ -108,6 +111,7 @@ float AlxVdiv_GetResHigh_kOhm(float vin_V, float vout_V, float resLow_kOhm);
   * @param[in] vin_V
   * @param[in] vout_V
   * @param[in] resHigh_kOhm
+  * @return
   */
 float AlxVdiv_GetResLow_kOhm(float vin_V, float vout_V, float resHigh_kOhm);
 
@@ -116,6 +120,7 @@ float AlxVdiv_GetResLow_kOhm(float vin_V, float vout_V, float resHigh_kOhm);
   * @param[in] vin_mV
   * @param[in] resHigh_ohm
   * @param[in] resLow_ohm
+  * @return
   */
 uint32_t AlxVdiv_GetVout_mV(uint32_t vin_mV, uint32_t resHigh_ohm, uint32_t resLow_ohm);
 
@@ -124,6 +129,7 @@ uint32_t AlxVdiv_GetVout_mV(uint32_t vin_mV, uint32_t resHigh_ohm, uint32_t resL
   * @param[in] vout_mV
   * @param[in] resHigh_ohm
   * @param[in] resLow_ohm
+  * @return
   */
 uint32_t AlxVdiv_GetVin_mV(uint32_t vout_mV, uint32_t resHigh_ohm, uint32_t resLow_ohm);
 
@@ -132,6 +138,7 @@ uint32_t AlxVdiv_GetVin_mV(uint32_t vout_mV, uint32_t resHigh_ohm, uint32_t resL
   * @param[in] vin_mV
   * @param[in] vout_mV
   * @param[in] resLow_ohm
+  * @return
   */
 uint32_t AlxVdiv_GetResHigh_ohm(uint32_t vin_mV, uint32_t vout_mV, uint32_t resLow_ohm);
 
@@ -140,6 +147,7 @@ uint32_t AlxVdiv_GetResHigh_ohm(uint32_t vin_mV, uint32_t vout_mV, uint32_t resL
   * @param[in] vin_mV
   * @param[in] vout_mV
   * @param[in] resHigh_ohm
+  * @return
   */
 uint32_t AlxVdiv_GetResLow_ohm(uint32_t vin_mV, uint32_t vout_mV, uint32_t resHigh_ohm);
 
@@ -147,6 +155,7 @@ uint32_t AlxVdiv_GetResLow_ohm(uint32_t vin_mV, uint32_t vout_mV, uint32_t resHi
   * @brief
   * @param[in] vout_uV
   * @param[in] resLow_ohm
+  * @return
   */
 uint32_t AlxVdiv_GetCurrent_uA(uint32_t vout_uV, uint32_t resLow_ohm);
 

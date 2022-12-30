@@ -104,12 +104,12 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] pxTaskCode
-  * @param[in] pcName
-  * @param[in] usStackDepth_byte
-  * @param[in] pvParameters
-  * @param[in] uxPriority
+  * @param[in,out]	me
+  * @param[in]		pxTaskCode
+  * @param[in]		pcName
+  * @param[in]		usStackDepth_byte
+  * @param[in]		pvParameters
+  * @param[in]		uxPriority
   */
 void AlxOsThread_Ctor
 (
@@ -128,7 +128,9 @@ void AlxOsThread_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxOsThread_Start(AlxOsThread* me);
 

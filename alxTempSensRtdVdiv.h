@@ -56,7 +56,7 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TEMP_SENS_RTD_VDIV_FILE "alxTempSens_RtdVdiv.h"
+#define ALX_TEMP_SENS_RTD_VDIV_FILE "alxTempSensRtdVdiv.h"
 
 // Assert //
 #if defined(_ALX_TEMP_SENS_RTD_VDIV_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -103,13 +103,13 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] adc
-  * @param[in] interpLin
-  * @param[in] chAdc_Vin
-  * @param[in] chAdc_Vout
-  * @param[in] isResRtdLow
-  * @param[in] resOther_kOhm
+  * @param[in,out]	me
+  * @param[in]		adc
+  * @param[in]		interpLin
+  * @param[in]		chAdc_Vin
+  * @param[in]		chAdc_Vout
+  * @param[in]		isResRtdLow
+  * @param[in]		resOther_kOhm
   */
 void AlxTempSensRtdVdiv_Ctor
 (
@@ -129,20 +129,26 @@ void AlxTempSensRtdVdiv_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxTempSensRtdVdiv_Init(AlxTempSensRtdVdiv* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxTempSensRtdVdiv_DeInit(AlxTempSensRtdVdiv* me);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[out] temp_degC
+  * @param[in,out]	me
+  * @param[out]		temp_degC
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxTempSensRtdVdiv_GetTemp_degC(AlxTempSensRtdVdiv* me, float* temp_degC);
 

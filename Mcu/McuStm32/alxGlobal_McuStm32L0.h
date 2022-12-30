@@ -45,7 +45,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32L0)
+#if defined(ALX_C_LIB) && defined(ALX_STM32L0)
 
 
 //******************************************************************************
@@ -86,17 +86,25 @@ extern "C" {
 // Preprocessor
 //******************************************************************************
 
-// AlxI2c_McuStm32
-#define ALX_I2C_MCU_STM32_CLK_100kHz 0 // TODO
-#define ALX_I2C_MCU_STM32_CLK_400kHz 0x0010020A // _400kHz_8MHz_100nsRise_10nsFall_AnalogFiltOn_DigitalFilt0, on STM32F3 -> Used I2C timing configuration tool (AN4235) and the associated software STSW-STM32126, measured 380kHz, if analog filter is disabled we can get 400kHz..
-
-// AlxDac_McuStm32
+//------------------------------------------------------------------------------
+// ALX MCU - DAC
+//------------------------------------------------------------------------------
 #define __HAL_RCC_DAC1_CLK_ENABLE		__HAL_RCC_DAC_CLK_ENABLE
 #define __HAL_RCC_DAC1_CLK_DISABLE		__HAL_RCC_DAC_CLK_DISABLE
 #define __HAL_RCC_DAC1_FORCE_RESET		__HAL_RCC_DAC_FORCE_RESET
 #define __HAL_RCC_DAC1_RELEASE_RESET	__HAL_RCC_DAC_RELEASE_RESET
 
-// AlxId //
+
+//------------------------------------------------------------------------------
+// ALX MCU - I2C
+//------------------------------------------------------------------------------
+#define ALX_I2C_MCU_STM32_CLK_100kHz 0				// TODO
+#define ALX_I2C_MCU_STM32_CLK_400kHz 0x0010020A		// _400kHz_8MHz_100nsRise_10nsFall_AnalogFiltOn_DigitalFilt0, on STM32F3 -> Used I2C timing configuration tool (AN4235) and the associated software STSW-STM32126, measured 380kHz, if analog filter is disabled we can get 400kHz..
+
+
+//------------------------------------------------------------------------------
+// ALX - ID
+//------------------------------------------------------------------------------
 #define ALX_STM32_CMSIS_VERSION_MAIN	__STM32L0xx_CMSIS_VERSION_MAIN
 #define ALX_STM32_CMSIS_VERSION_SUB1	__STM32L0xx_CMSIS_VERSION_SUB1
 #define ALX_STM32_CMSIS_VERSION_SUB2	__STM32L0xx_CMSIS_VERSION_SUB2
@@ -107,7 +115,7 @@ extern "C" {
 #define ALX_STM32_STR "STM32L0"
 
 
-#endif	// #if defined(ALX_STM32L0)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32L0)
 
 #ifdef __cplusplus
 }

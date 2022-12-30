@@ -359,7 +359,7 @@ void AlxI2s_Foreground_Handle(AlxI2s* me)
 //******************************************************************************
 static bool AlxI2s_Ctor_IsClkOk(AlxI2s* me)
 {
-	#if defined(STM32F4)
+	#if defined(ALX_STM32F4)
 	if(me->i2sClk == AlxI2s_Clk_McuStm32F4_SampleFreq_16kHz_SaiClk_49MHz143_MainPllInputClk_2MHz)
 	{
 		if(2000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_MainPllInputClk_Ctor))
@@ -369,7 +369,7 @@ static bool AlxI2s_Ctor_IsClkOk(AlxI2s* me)
 	}
 
 	#endif
-	#if defined(STM32G4)
+	#if defined(ALX_STM32G4)
 	#endif
 
 	ALX_I2S_ASSERT(false); // We shouldn't get here

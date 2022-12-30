@@ -43,7 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 #include "alxSerialPort_McuStm32.h"
 
 #else
@@ -87,61 +87,66 @@ typedef struct { bool dummy; } AlxSerialPort;
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxSerialPort_Init(AlxSerialPort* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[out] data
-  * @param[in] len
+  * @param[in,out]	me
+  * @param[out]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[out] str
-  * @param[in] delim
-  * @param[in] maxLen
-  * @param[out] numRead
+  * @param[in,out]	me
+  * @param[out]		str
+  * @param[in]		delim
+  * @param[in]		maxLen
+  * @param[out]		numRead
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] data
+  * @param[in,out]	me
+  * @param[in]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
-Alx_Status AlxSerialPort_Write(AlxSerialPort* me, uint8_t data);
+Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] data
-  * @param[in] len
-  */
-Alx_Status AlxSerialPort_WriteMulti(AlxSerialPort* me, const uint8_t* data, uint32_t len);
-
-/**
-  * @brief
-  * @param[in] me
-  * @param[in] str
+  * @param[in,out]	me
+  * @param[in]		str
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
   */
-void AlxSerialPort_Foreground_Handle(AlxSerialPort* me);
+void AlxSerialPort_IrqHandler(AlxSerialPort* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

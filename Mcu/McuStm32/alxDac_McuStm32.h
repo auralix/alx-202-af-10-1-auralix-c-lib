@@ -43,12 +43,13 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxIoPin.h"
+#include "alxBound.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -56,14 +57,18 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxIoPin** ioPinArr;
+	// Defines
+	#define ALX_DAC_BUFF_LEN 2
+
+	// Const
+	uint32_t RESOLUTION;
 
 	// Parameters
+	DAC_TypeDef* dac;
+	AlxIoPin** ioPinArr;
 	Alx_Ch* chArr;
 	float* setVoltageDefaultArr_V;
 	uint8_t numOfCh;
-	uint32_t resolution;
 	bool isVrefInt_V;
 	float vrefExt_V;
 
@@ -74,9 +79,9 @@ typedef struct
 	float setVoltageDefault_V[ALX_DAC_BUFF_LEN];
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
-} AlxDac_Mcu;
+	bool isInit;
+} AlxDac;
 
 
 //******************************************************************************
@@ -85,18 +90,18 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] dac
-  * @param[in] ioPinArr
-  * @param[in] chArr
-  * @param[in] setVoltageDefaultArr_V
-  * @param[in] numOfCh
-  * @param[in] isVrefInt_V
-  * @param[in] vrefExt_V
+  * @param[in,out]	me
+  * @param[in]		dac
+  * @param[in]		ioPinArr
+  * @param[in]		chArr
+  * @param[in]		setVoltageDefaultArr_V
+  * @param[in]		numOfCh
+  * @param[in]		isVrefInt_V
+  * @param[in]		vrefExt_V
   */
-void AlxDacMcu_Ctor
+void AlxDac_Ctor
 (
-	AlxDac_Mcu* me,
+	AlxDac* me,
 	DAC_TypeDef* dac,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,
@@ -107,7 +112,7 @@ void AlxDacMcu_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

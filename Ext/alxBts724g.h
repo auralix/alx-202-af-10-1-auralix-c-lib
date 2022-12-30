@@ -114,9 +114,9 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] do_HS_IN
-  * @param[in] di_HS_ST
+  * @param[in,out]	me
+  * @param[in]		do_HS_IN
+  * @param[in]		di_HS_ST
   */
 void AlxBts724g_Ctor
 (
@@ -168,25 +168,33 @@ void AlxBts724g_WriteOut(AlxBts724g* me, bool state);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxBts724g_IsOpenLoadDetected(AlxBts724g* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxBts724g_IsOverTempDetected(AlxBts724g* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxBts724g_WasOpenLoadDetected(AlxBts724g* me);
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxBts724g_WasOverTempDetected(AlxBts724g* me);
 

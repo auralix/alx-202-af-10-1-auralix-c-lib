@@ -106,11 +106,11 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] topHigh
-  * @param[in] topLow
-  * @param[in] botHigh
-  * @param[in] botLow
+  * @param[in,out]	me
+  * @param[in]		topHigh
+  * @param[in]		topLow
+  * @param[in]		botHigh
+  * @param[in]		botLow
   */
 void AlxHys2_Ctor
 (
@@ -128,8 +128,11 @@ void AlxHys2_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] in
+  * @param[in,out]	me
+  * @param[in]		in
+  * @retval			AlxHys2_StTop
+  * @retval			AlxHys2_StMid
+  * @retval			AlxHys2_StBot
   */
 AlxHys2_St AlxHys2_Process(AlxHys2* me, float in);
 

@@ -45,15 +45,14 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_STM32F1)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F1)
 
 
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include <stm32f1xx_hal.h>
-#include <stm32_hal_legacy.h>
-
+#include "stm32f1xx_hal.h"
+#include "stm32_hal_legacy.h"
 #include "stm32f1xx_ll_adc.h"
 #include "stm32f1xx_ll_bus.h"
 #include "stm32f1xx_ll_cortex.h"
@@ -81,21 +80,15 @@ extern "C" {
 // Preprocessor
 //******************************************************************************
 
-//// AlxI2c_McuStm32
-//#define ALX_I2C_MCU_STM32_CLK_100kHz (AlxI2c_Clk_100kHz * 1000)
-//#define ALX_I2C_MCU_STM32_CLK_400kHz (AlxI2c_Clk_400kHz * 1000)
+//------------------------------------------------------------------------------
+// ALX MCU - ADC
+//------------------------------------------------------------------------------
+#define __LL_ADC_CALC_VREFANALOG_VOLTAGE(__VREFINT_ADC_DATA__,__ADC_RESOLUTION__) ((4095UL * 1200UL) / __VREFINT_ADC_DATA__)
 
-// AlxAdc_McuStm32
-#define __LL_ADC_CALC_VREFANALOG_VOLTAGE(__VREFINT_ADC_DATA__,__ADC_RESOLUTION__) \
-		((4095UL * 1200UL) / __VREFINT_ADC_DATA__)
 
-//// AlxDac_McuStm32
-//#define __HAL_RCC_DAC1_CLK_ENABLE		__HAL_RCC_DAC_CLK_ENABLE
-//#define __HAL_RCC_DAC1_CLK_DISABLE		__HAL_RCC_DAC_CLK_DISABLE
-//#define __HAL_RCC_DAC1_FORCE_RESET		__HAL_RCC_DAC_FORCE_RESET
-//#define __HAL_RCC_DAC1_RELEASE_RESET	__HAL_RCC_DAC_RELEASE_RESET
-
-// AlxId //
+//------------------------------------------------------------------------------
+// ALX - ID
+//------------------------------------------------------------------------------
 #define ALX_STM32_CMSIS_VERSION_MAIN	__STM32F1_CMSIS_VERSION_MAIN
 #define ALX_STM32_CMSIS_VERSION_SUB1	__STM32F1_CMSIS_VERSION_SUB1
 #define ALX_STM32_CMSIS_VERSION_SUB2	__STM32F1_CMSIS_VERSION_SUB2
@@ -106,7 +99,7 @@ extern "C" {
 #define ALX_STM32_STR "STM32F1"
 
 
-#endif	// #if defined(ALX_STM32F1)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F1)
 
 #ifdef __cplusplus
 }

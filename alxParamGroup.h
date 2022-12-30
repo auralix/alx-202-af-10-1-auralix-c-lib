@@ -104,16 +104,16 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] memSafe
-  * @param[in] name
-  * @param[in] len
-  * @param[in] valBuff
-  * @param[in] valStoredBuff
-  * @param[in] valToStoreBuff
-  * @param[in] paramItemArr
-  * @param[in] numOfParamItems
-  * @param[in] initNumOfTries
+  * @param[in,out]	me
+  * @param[in]		memSafe
+  * @param[in]		name
+  * @param[in]		len
+  * @param[in]		valBuff
+  * @param[in]		valStoredBuff
+  * @param[in]		valToStoreBuff
+  * @param[in]		paramItemArr
+  * @param[in]		numOfParamItems
+  * @param[in]		initNumOfTries
   */
 void AlxParamGroup_Ctor
 (
@@ -136,8 +136,9 @@ void AlxParamGroup_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxParamGroup_Init(AlxParamGroup* me);
 
@@ -149,19 +150,25 @@ void AlxParamGroup_Write(AlxParamGroup* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxParamGroup_IsWriteDone(AlxParamGroup* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxParamGroup_IsWriteErr(AlxParamGroup* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxParamGroup_IsValStoredBuffDiff(AlxParamGroup* me);
 

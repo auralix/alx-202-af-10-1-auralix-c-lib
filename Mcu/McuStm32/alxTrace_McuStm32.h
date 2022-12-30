@@ -40,12 +40,15 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#if defined(ALX_OS)
+#include "alxOsMutex.h"
+#endif
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && ((defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
+#if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)) && (!defined(ALX_MBED)))
 
 
 //******************************************************************************
@@ -53,16 +56,28 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	// Const
+	uint32_t TIMEOUT_ms;
+
 	// Parameters
 	GPIO_TypeDef* port;
+	uint16_t pin;
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	uint32_t alternate;
+	#endif
+	USART_TypeDef* uart;
+	AlxGlobal_BaudRate baudRate;
 
 	// Variables
 	GPIO_InitTypeDef igpio;
 	UART_HandleTypeDef huart;
+	#if defined(ALX_OS)
+	AlxOsMutex mutex;
+	#endif
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxTrace;
 
 
@@ -72,27 +87,27 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] port
-  * @param[in] pin
-  * @param[in] alternate
-  * @param[in] uart
-  * @param[in] baudRate
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		alternate
+  * @param[in]		uart
+  * @param[in]		baudRate
   */
 void AlxTrace_Ctor
 (
 	AlxTrace* me,
 	GPIO_TypeDef* port,
 	uint16_t pin,
-	#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	uint32_t alternate,
-	#endif // #if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)
+	#endif
 	USART_TypeDef* uart,
 	AlxGlobal_BaudRate baudRate
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0)) && (!defined(ALX_MBED)))
+#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)) && (!defined(ALX_MBED)))
 
 #ifdef __cplusplus
 }

@@ -102,10 +102,10 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] valInitial
-  * @param[in] stableTrueTime_ms
-  * @param[in] stableFalseTime_ms
+  * @param[in,out]	me
+  * @param[in]		valInitial
+  * @param[in]		stableTrueTime_ms
+  * @param[in]		stableFalseTime_ms
   */
 void AlxFiltGlitchBool_Ctor
 (
@@ -117,10 +117,10 @@ void AlxFiltGlitchBool_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] valInitial
-  * @param[in] stableTrueTime_us
-  * @param[in] stableFalseTime_us
+  * @param[in,out]	me
+  * @param[in]		valInitial
+  * @param[in]		stableTrueTime_us
+  * @param[in]		stableFalseTime_us
   */
 void AlxFiltGlitchBool_Ctor_us
 (
@@ -137,8 +137,10 @@ void AlxFiltGlitchBool_Ctor_us
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] in
+  * @param[in,out]	me
+  * @param[in]		in
+  * @retval			false
+  * @retval			true
   */
 bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in);
 

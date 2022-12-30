@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_STM32F4)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -53,10 +53,17 @@ void AlxRtc_Ctor
 	AlxRtc_Clk rtcClk
 )
 {
+	//------------------------------------------------------------------------------
 	// Parameters
+	//------------------------------------------------------------------------------
 	me->rtcClk = rtcClk;
 
-	// Private Variables
+
+	//------------------------------------------------------------------------------
+	// Variables
+	//------------------------------------------------------------------------------
+
+	// Private variables
 	alxRtc_me = me;
 
 	// RTC - Oscillator
@@ -79,7 +86,7 @@ void AlxRtc_Ctor
 	}
 	else
 	{
-		ALX_RTC_ASSERT(false);	// We shouldn't get here
+		ALX_RTC_ASSERT(false);	// We should not get here
 		return;
 	}
 	me->iosc.HSIState = ALX_NULL;
@@ -91,9 +98,10 @@ void AlxRtc_Ctor
 	me->iosc.PLL.PLLN = ALX_NULL;
 	me->iosc.PLL.PLLP = ALX_NULL;
 	me->iosc.PLL.PLLQ = ALX_NULL;
-	#if defined(STM32F410Tx) || defined(STM32F410Cx) || defined(STM32F410Rx) || defined(STM32F446xx) || defined(STM32F469xx) ||\
-		defined(STM32F479xx) || defined(STM32F412Zx) || defined(STM32F412Vx) || defined(STM32F412Rx) || defined(STM32F412Cx) ||\
-		defined(STM32F413xx) || defined(STM32F423xx)
+	#if defined(STM32F410Tx) || defined(STM32F410Cx) || defined(STM32F410Rx) || defined(STM32F446xx) || defined(STM32F469xx) || \
+		defined(STM32F479xx) || defined(STM32F412Zx) || defined(STM32F412Vx) || defined(STM32F412Rx) || defined(STM32F412Cx) || \
+		defined(STM32F413xx) || defined(STM32F423xx) || \
+		defined(ALX_STM32L4)
 	me->iosc.PLL.PLLR = ALX_NULL;
 	#endif
 
@@ -128,12 +136,12 @@ void AlxRtc_Ctor
 	}
 	else
 	{
-		ALX_RTC_ASSERT(false);	// We shouldn't get here
+		ALX_RTC_ASSERT(false);	// We should not get here
 		return;
 	}
 	__HAL_RTC_RESET_HANDLE_STATE(&me->hrtc);
 
-	// Internal
+	// Variables
 	me->lastSetDateTime.yr = 0;
 	me->lastSetDateTime.mo = 0;
 	me->lastSetDateTime.day = 0;
@@ -145,13 +153,16 @@ void AlxRtc_Ctor
 	me->lastSetDateTime.us = 0;
 	me->lastSetDateTime.ns = 0;
 	me->lastSetSubSec = 0;
-
+	me->lastSetUnixTime_ns = 0;
 	me->isDateTimeConfigured = false;
 
+
+	//------------------------------------------------------------------------------
 	// Info
-	me->isErr = false;
-	me->isInit = false;
+	//------------------------------------------------------------------------------
 	me->wasCtorCalled = true;
+	me->isInit = false;
+	me->isErr = false;
 }
 
 
@@ -160,16 +171,17 @@ void AlxRtc_Ctor
 //******************************************************************************
 Alx_Status AlxRtc_Init(AlxRtc* me)
 {
-	ALX_RTC_ASSERT(me->isInit == false);
+	// Assert
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
+	ALX_RTC_ASSERT(me->isInit == false);
 
-	// #1 Reset isErr
+	// Clear isErr
 	me->isErr = false;
 
-	// #2 Set isInit -> We need to do this here because IsDateTimeConfigured need this
+	// Set isInit -> We need to do this here because IsDateTimeConfigured need this
 	me->isInit = true;
 
-	// #3 Init RTC
+	// Init RTC
 	if
 	(
 		(AlxRtc_IsDateTimeConfigured(me) == false) ||
@@ -182,7 +194,7 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 			(me->isErr == true)
 		)
 		{
-			ALX_RTC_TRACE("ErrInit");
+			ALX_RTC_TRACE("Err");
 			me->isErr = true;
 			me->isInit = false;
 			return Alx_Err;
@@ -193,34 +205,33 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 		HAL_RTC_MspInit(&me->hrtc);
 	}
 
-//	if (HAL_RTCEx_SetCalibrationOutPut(&me->hrtc, RTC_CALIBOUTPUT_512HZ) != HAL_OK) { ALX_RTC_TRACE("ErrCalibOutInit"); me->isErr = true; return Alx_Err; }
-
-	// #4 Return OK
+	// Return
 	return Alx_Ok;
 }
 Alx_Status AlxRtc_DeInit(AlxRtc* me)
 {
-	ALX_RTC_ASSERT(me->isInit == true);
+	// Assert
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
+	ALX_RTC_ASSERT(me->isInit == true);
 
-	// #1 DeInit RTC
-	if (HAL_RTC_DeInit(&me->hrtc) != HAL_OK) { ALX_RTC_TRACE("ErrDeInit"); me->isErr = true; return Alx_Err; }
+	// DeInit RTC
+	if (HAL_RTC_DeInit(&me->hrtc) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; }
 
-	// #2 Reset isDateTimeConfigured
+	// Reset register PRER value & clear isDateTimeConfigured
 	HAL_RTCEx_BKUPWrite(&me->hrtc, RTC_BKP_DR0, 0);
 	me->isDateTimeConfigured = false;
 
-	// #3 Reset isInit
+	// Clear isInit
 	me->isInit = false;
 
-	// #4 Return OK
+	// Return
 	return Alx_Ok;
 }
 Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 {
-	ALX_RTC_ASSERT(me->isInit == true);
+	// Assert
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
-
+	ALX_RTC_ASSERT(me->isInit == true);
 	ALX_RTC_ASSERT(dateTime.yr <= 99)
 	ALX_RTC_ASSERT((1 <= dateTime.mo) && (dateTime.mo <= 12));
 	ALX_RTC_ASSERT((1 <= dateTime.day) && (dateTime.day <= 31));
@@ -232,7 +243,7 @@ Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 	ALX_RTC_ASSERT(dateTime.us == 0);
 	ALX_RTC_ASSERT(dateTime.ns == 0);
 
-	// #1 Set Time to Zero
+	// Set time to zero
 	RTC_TimeTypeDef sTimeZero;
 	sTimeZero.Hours = 0;
 	sTimeZero.Minutes = 0;
@@ -242,22 +253,22 @@ Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 	sTimeZero.SecondFraction = ALX_NULL;
 	sTimeZero.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
 	sTimeZero.StoreOperation = RTC_STOREOPERATION_RESET;
-	if(HAL_RTC_SetTime(&me->hrtc, &sTimeZero, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("ErrSetTimeZero"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTC_SetTime(&me->hrtc, &sTimeZero, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
 
-	// #2 Set Date
+	// Set date
 	RTC_DateTypeDef sDate;
 	sDate.WeekDay = dateTime.weekDay;
 	sDate.Month = dateTime.mo;
 	sDate.Date = dateTime.day;
 	sDate.Year = dateTime.yr;
-	if(HAL_RTC_SetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("ErrSetDate"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTC_SetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
 
 	me->lastSetDateTime.yr = dateTime.yr;
 	me->lastSetDateTime.mo = dateTime.mo;
 	me->lastSetDateTime.day = dateTime.day;
 	me->lastSetDateTime.weekDay = dateTime.weekDay;
 
-	// #3 Set Time
+	// Set time
 	RTC_TimeTypeDef sTime;
 	sTime.Hours = dateTime.hr;
 	sTime.Minutes = dateTime.min;
@@ -267,7 +278,7 @@ Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 	sTime.SecondFraction = ALX_NULL;
 	sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
 	sTime.StoreOperation = RTC_STOREOPERATION_RESET;
-	if(HAL_RTC_SetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("ErrSetTime"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTC_SetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
 
 	me->lastSetDateTime.hr = dateTime.hr;
 	me->lastSetDateTime.min = dateTime.min;
@@ -276,37 +287,38 @@ Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 	me->lastSetDateTime.us = dateTime.us;
 	me->lastSetSubSec = 0;
 
-	// #4 Write backup register to mark that DateTime is configured
+	// Write backup register to mark that DateTime is configured & set isDateTimeConfigured
 	HAL_RTCEx_BKUPWrite(&me->hrtc, RTC_BKP_DR0, 0x000032F2);
 	me->isDateTimeConfigured = true;
 
-	// #5 Return OK
+	// Return
 	return Alx_Ok;
 }
 Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 {
-	ALX_RTC_ASSERT(me->isInit == true);
+	// Assert
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
+	ALX_RTC_ASSERT(me->isInit == true);
 
-	// #1 Get Time
+	// Get time
 	RTC_TimeTypeDef sTime;
-	if(HAL_RTC_GetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("ErrGetTime"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTC_GetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
 
-	// #2 Set hr, min, sec
+	// Set hr, min, sec
 	dateTime->hr = sTime.Hours;
 	dateTime->min = sTime.Minutes;
 	dateTime->sec = sTime.Seconds;
 
-	// #3 Calculate secFract
+	// Calculate secFract
 	float secFract = ((float)sTime.SecondFraction - (float)sTime.SubSeconds) / ((float)sTime.SecondFraction + 1.f);
 
-	// #4 Handle if SS Larger than PREDIV_S, then secFract will be negative
+	// Handle if SS Larger than PREDIV_S, then secFract will be negative
 	if(secFract < 0.f)
 	{
-		// #3.1 Make secFract positive
+		// Make secFract positive
 		secFract = secFract * (-1.f);	// Make positive
 
-		// #3.2 Handle if hr, min, sec are 0
+		// Handle if hr, min, sec are 0
 		if (dateTime->sec == 0)								// If sec are 0, we must substract min
 		{
 			if (dateTime->min == 0)							// If min are 0, we must substract hr
@@ -334,32 +346,40 @@ Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 		}
 	}
 
-	// #5 Set ms, us, ns
+	// Set ms, us, ns
 	AlxRtc_SecFractToMsUsNs(secFract, &dateTime->ms, &dateTime->us, &dateTime->ns);
 
-	// #6 Get Date
+	// Get date
 	RTC_DateTypeDef sDate;
-	if(HAL_RTC_GetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("ErrGetDate"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTC_GetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
 
-	// #7 Set yr, mo, day, weekDay
+	// Set yr, mo, day, weekDay
 	dateTime->yr = sDate.Year;
 	dateTime->mo = sDate.Month;
 	dateTime->day = sDate.Date;
 	dateTime->weekDay = sDate.WeekDay;
 
-	// #8 Return OK
+	// Return
 	return Alx_Ok;
 }
 AlxRtc_DateTime AlxRtc_GetDateTime(AlxRtc* me)
 {
+	// Assert
+	ALX_RTC_ASSERT(me->wasCtorCalled == true);
+	ALX_RTC_ASSERT(me->isInit == true);
+
+	// Get
 	AlxRtc_DateTime temp = {};
-	if(AlxRtc_GetDateTimeWithStatus(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false) ; return temp ; }
+	if(AlxRtc_GetDateTimeWithStatus(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false); return temp; }
+
+	// Return
 	return temp;
 }
 bool AlxRtc_IsDateTimeConfigured(AlxRtc* me)
 {
-	ALX_RTC_ASSERT(me->isInit == true);
+	// Assert
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
+	ALX_RTC_ASSERT(me->isInit == true);
 
 	if (HAL_RTCEx_BKUPRead(&me->hrtc, RTC_BKP_DR0) == 0x000032F2)	// Read backup register to check if DateTime is configured
 		return true;
@@ -368,15 +388,16 @@ bool AlxRtc_IsDateTimeConfigured(AlxRtc* me)
 }
 Alx_Status AlxRtc_SetUnixTime_ns(AlxRtc* me, uint64_t unixTime_ns)
 {
-	ALX_RTC_ASSERT(me->isInit == true);
+	// Assert
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
+	ALX_RTC_ASSERT(me->isInit == true);
 
-	// #1 Set Time
+	// Set
 	AlxRtc_DateTime dateTime = AlxRtc_UnixTimeNsToDateTime(unixTime_ns);
-	if(AlxRtc_SetDateTime(me, dateTime) != Alx_Ok) { ALX_RTC_TRACE("ErrSetTime"); me->isErr = true; return Alx_Err; };
+	if(AlxRtc_SetDateTime(me, dateTime) != Alx_Ok) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
 	me->lastSetUnixTime_ns = unixTime_ns;
 
-	// #2 Return OK
+	// Return
 	return Alx_Ok;
 }
 Alx_Status AlxRtc_SetUnixTime_us(AlxRtc* me, uint64_t unixTime_us)
@@ -393,15 +414,16 @@ Alx_Status AlxRtc_SetUnixTime_sec(AlxRtc* me, uint64_t unixTime_sec)
 }
 Alx_Status AlxRtc_GetUnixTimeWithStatus_ns(AlxRtc* me, uint64_t* unixTime_ns)
 {
-	ALX_RTC_ASSERT(me->isInit == true);
+	// Assert
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
+	ALX_RTC_ASSERT(me->isInit == true);
 
-	// #1 Get Time
+	// Get time
 	AlxRtc_DateTime dateTime;
-	if(AlxRtc_GetDateTimeWithStatus(me, &dateTime) != Alx_Ok) { ALX_RTC_TRACE("ErrGetTime"); me->isErr = true; return Alx_Err; };
+	if(AlxRtc_GetDateTimeWithStatus(me, &dateTime) != Alx_Ok) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
 	*unixTime_ns = AlxRtc_DateTimeToUnixTimeNs(dateTime);
 
-	// #2 Return OK
+	// Return
 	return Alx_Ok;
 }
 Alx_Status AlxRtc_GetUnixTimeWithStatus_us(AlxRtc* me, uint64_t* unixTime_us)
@@ -431,49 +453,51 @@ Alx_Status AlxRtc_GetUnixTimeWithStatus_sec(AlxRtc* me, uint64_t* unixTime_sec)
 uint64_t AlxRtc_GetUnixTime_ns(AlxRtc* me)
 {
 	uint64_t temp = 0;
-	if(AlxRtc_GetUnixTimeWithStatus_ns(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false) ; return temp ; }
+	if(AlxRtc_GetUnixTimeWithStatus_ns(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false); return temp; }
 	return temp;
 }
 uint64_t AlxRtc_GetUnixTime_us(AlxRtc* me)
 {
 	uint64_t temp = 0;
-	if(AlxRtc_GetUnixTimeWithStatus_us(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false) ; return temp ; }
+	if(AlxRtc_GetUnixTimeWithStatus_us(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false); return temp; }
 	return temp;
 }
 uint64_t AlxRtc_GetUnixTime_ms(AlxRtc* me)
 {
 	uint64_t temp = 0;
-	if(AlxRtc_GetUnixTimeWithStatus_ms(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false) ; return temp ; }
+	if(AlxRtc_GetUnixTimeWithStatus_ms(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false); return temp; }
 	return temp;
 }
 uint64_t AlxRtc_GetUnixTime_sec(AlxRtc* me)
 {
 	uint64_t temp = 0;
-	if(AlxRtc_GetUnixTimeWithStatus_sec(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false) ; return temp ; }
+	if(AlxRtc_GetUnixTimeWithStatus_sec(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false); return temp; }
 	return temp;
 }
 Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns)
 {
-	ALX_RTC_ASSERT(me->isInit == true);
+	// Assert
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
+	ALX_RTC_ASSERT(me->isInit == true);
+
+	// Bound
 	if (tuneTime_ns < -990000000) tuneTime_ns = -990000000;	// Max tunning is +990000000ns = +990ms
 	if (tuneTime_ns > +990000000) tuneTime_ns = +990000000;	// Max tunning is -990000000ns = -990ms
 
-	if(tuneTime_ns == 0) return Alx_Ok;	// No tune needed
+	// Check if no tuning is needed
+	if (tuneTime_ns == 0) return Alx_Ok;	// No tuning needed
 
-	// #1 Calculate number of tick to add to sub seconds register
+	// Calculate number of tick to add to sub seconds register
 	uint16_t numOfTickToAdd = 0;
 	uint32_t ShiftAdd1S = 0;
 	if (tuneTime_ns > 0)
 	{
-		//float numOfTickToAddFloat = (float)tuneTime_ns / (float)me->rtcTick_ns;
 		float numOfTickToAddFloat = (1.f - ((float)tuneTime_ns / 1000000000.f)) * ((float)me->hrtc.Init.SynchPrediv + 1.f);		// According to reference manual: Advance (seconds) = ( 1 - ( SUBFS / ( PREDIV_S + 1 ) ) )
 		numOfTickToAdd = (uint16_t)numOfTickToAddFloat;
 		ShiftAdd1S = RTC_SHIFTADD1S_SET;
 	}
 	else if (tuneTime_ns < 0)
 	{
-		//float numOfTickToAddFloat = ((float)tuneTime_ns * (-1.f)) / (float)me->rtcTick_ns;
 		float numOfTickToAddFloat = (((float)tuneTime_ns / 1000000000.f)* (-1.f) ) * ((float)me->hrtc.Init.SynchPrediv + 1.f);	// According to reference manual: Delay (seconds) = SUBFS / ( PREDIV_S + 1 )
 		numOfTickToAdd = (uint16_t)numOfTickToAddFloat;
 		ShiftAdd1S = RTC_SHIFTADD1S_RESET;
@@ -483,18 +507,19 @@ Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns)
 		ALX_RTC_ASSERT(false);	// We should not get here
 	}
 
-	if(numOfTickToAdd == 0) return Alx_Ok;	// No tune needed
+	// Check if no tuning is needed
+	if(numOfTickToAdd == 0) return Alx_Ok;	// No tuning needed
 
-	// #2 Read sub seconds register and calculate ssrAfterAdd
+	// Read sub seconds register and calculate ssrAfterAdd
 	uint32_t ssr = me->hrtc.Instance->SSR;
 
-	// #3 Check if overflow occurs
+	// Check if overflow occurs
 	if (ssr > 0x00007FFF) return Alx_Err;
 
-	// #4 Tune
+	// Tune
 	if(HAL_RTCEx_SetSynchroShift(&me->hrtc, ShiftAdd1S, numOfTickToAdd) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
 
-	// #5 Return
+	// Return
 	return Alx_Ok;
 }
 Alx_Status AlxRtc_TuneTime_us(AlxRtc* me, int64_t tuneTime_us)
@@ -514,8 +539,8 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
 {
 	(void)hrtc;
 
-	if(HAL_RCC_OscConfig(&alxRtc_me->iosc) != HAL_OK)			{ ALX_RTC_TRACE("ErrOsc"); alxRtc_me->isErr = true; };
-	if(HAL_RCCEx_PeriphCLKConfig(&alxRtc_me->iclk) != HAL_OK)	{ ALX_RTC_TRACE("ErrClk"); alxRtc_me->isErr = true; };
+	if(HAL_RCC_OscConfig(&alxRtc_me->iosc) != HAL_OK)			{ ALX_RTC_TRACE("Err"); alxRtc_me->isErr = true; };
+	if(HAL_RCCEx_PeriphCLKConfig(&alxRtc_me->iclk) != HAL_OK)	{ ALX_RTC_TRACE("Err"); alxRtc_me->isErr = true; };
 	__HAL_RCC_RTC_ENABLE();
 }
 void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
@@ -526,4 +551,4 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32L4))

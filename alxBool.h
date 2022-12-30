@@ -151,26 +151,161 @@ void AlxBool_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  */
 void AlxBool_Update(AlxBool* me, bool val);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_IsTrue(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_IsTrueUpToShortTime(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_IsTrueUpToLongTime(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_IsTrueForLongTime(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_WasTrue(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_WasTrueForShortTime(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_WasTrueForLongTime(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxBool_ClearWasTrueFlag(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxBool_ClearWasTrueForShortTimeFlag(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxBool_ClearWasTrueForLongTimeFlag(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_IsFalse(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_IsFalseUpToShortTime(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_IsFalseUpToLongTime(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_IsFalseForLongTime(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_WasFalse(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_WasFalseForShortTime(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBool_WasFalseForLongTime(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxBool_ClearWasFalseFlag(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxBool_ClearWasFalseForShortTimeFlag(AlxBool* me);
+	
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxBool_ClearWasFalseForLongTimeFlag(AlxBool* me);
 
 

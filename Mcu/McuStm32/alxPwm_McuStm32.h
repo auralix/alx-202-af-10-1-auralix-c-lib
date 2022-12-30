@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -57,20 +57,26 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxIoPin** ioPinArr;
-	AlxClk* clk;
+	// Defines
+	#define ALX_PWM_BUFF_LEN 6
 
 	// Parameters
+	TIM_TypeDef* tim;
+	AlxIoPin** ioPinArr;
 	Alx_Ch* chArr;
-	float* dutyDefaultArr_pct;
 	uint8_t numOfCh;
-
-	// Variables
-	uint32_t srcClk_Hz; // Timer source clock, which is then divided by prescaler to get timer clock
-	uint32_t periodMax;
+	AlxClk* clk;
+	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	uint16_t* dutyDefaultArr_permil;
+	#else
+	float* dutyDefaultArr_pct;
+	#endif
 	uint32_t prescaler;
 	uint32_t period;
+
+	// Variables
+	uint32_t srcClk_Hz;	// Timer source clock, which is then divided by prescaler to get timer clock
+	uint32_t periodMax;
 	TIM_HandleTypeDef htim;
 	TIM_OC_InitTypeDef chtim[ALX_PWM_BUFF_LEN];
 	Alx_Ch ch[ALX_PWM_BUFF_LEN];
@@ -79,8 +85,8 @@ typedef struct
 	#endif
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxPwm;
 
 
@@ -90,15 +96,16 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] tim
-  * @param[in] ioPinArr
-  * @param[in] chArr
-  * @param[in] dutyDefaultArr_pct
-  * @param[in] numOfCh
-  * @param[in] clk
-  * @param[in] prescaler
-  * @param[in] period
+  * @param[in,out]	me
+  * @param[in]		tim
+  * @param[in]		ioPinArr
+  * @param[in]		chArr
+  * @param[in]		numOfCh
+  * @param[in]		clk
+  * @param[in]		dutyDefaultArr_permil
+  * @param[in]		dutyDefaultArr_pct
+  * @param[in]		prescaler
+  * @param[in]		period
   */
 void AlxPwm_Ctor
 (
@@ -106,17 +113,19 @@ void AlxPwm_Ctor
 	TIM_TypeDef* tim,
 	AlxIoPin** ioPinArr,
 	Alx_Ch* chArr,
-	#if !defined (ALX_PWM_OPTIMIZE_SIZE)
-	float* dutyDefaultArr_pct,
-	#endif
 	uint8_t numOfCh,
  	AlxClk* clk,
+	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	uint16_t* dutyDefaultArr_permil,
+	#else
+	float* dutyDefaultArr_pct,
+	#endif
 	uint32_t prescaler,
 	uint32_t period
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

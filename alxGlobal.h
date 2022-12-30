@@ -167,7 +167,11 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Includes - MCU
 //------------------------------------------------------------------------------
-#if defined(ALX_STM32F1)
+#if defined(ALX_STM32F0)
+#include "alxGlobal_McuStm32F0.h"
+#define ALX_STM32
+
+#elif defined(ALX_STM32F1)
 #include "alxGlobal_McuStm32F1.h"
 #define ALX_STM32
 
@@ -181,6 +185,10 @@ extern "C" {
 
 #elif defined(ALX_STM32L0)
 #include "alxGlobal_McuStm32L0.h"
+#define ALX_STM32
+
+#elif defined(ALX_STM32L4)
+#include "alxGlobal_McuStm32L4.h"
 #define ALX_STM32
 
 #elif defined(ALX_LPC1769)
@@ -248,12 +256,6 @@ extern "C" {
 	#define ALX_BKPT __debugbreak()
 #endif
 
-#define ALX_I2C_BUFF_LEN 256
-#define ALX_ADC_BUFF_LEN 16
-#define ALX_DAC_BUFF_LEN 2
-#define ALX_PWM_BUFF_LEN 6
-#define ALX_IO_PIN_IRQ_BUFF_LEN 32
-
 #define ALX_NULL 0
 #define ALX_NULL_PTR NULL
 
@@ -276,34 +278,25 @@ typedef enum
 
 typedef enum
 {
-	Alx_Bit_8  =  8,
-	Alx_Bit_16 = 16,
-	Alx_Bit_32 = 32,
-	Alx_Bit_64 = 64
-} Alx_Bit;
-
-typedef enum
-{
 	Alx_Ok = 0,
 	Alx_Err = 1,
-	Alx_ErrReInit = 2,
-	Alx_ErrNumOfTries = 3,
-	Alx_ErrOutOfRangeMin = 4,
-	Alx_ErrOutOfRangeMax = 5,
-	AlxI2c_ErrNack = 6,
-	AlxI2c_ErrTimeout = 7,
-	AlxFifo_ErrFull = 8,
-	AlxFifo_ErrEmpty = 9,
-	AlxFifo_ErrNoDelim = 10,
-	Alx_ErrOutOfRangeLen = 11,
-	Alx_ErrBoundMin = 12,
-	Alx_ErrBoundMax = 13,
-	Alx_ErrBoundLen = 14,
-	AlxMemSafe_CrcOkSame_UsedCopyA = 15,
-	AlxMemSafe_CrcOkDiff_UsedCopyA = 16,
-	AlxMemSafe_CopyANokCopyBOk_UsedCopyB = 17,
-	AlxMemSafe_CopyAOkCopyBNok_UsedCopyA = 18,
-	AlxMemSafe_BothNok_ResetToDef = 19
+	Alx_ErrNumOfTries,
+	AlxBound_ErrMin,
+	AlxBound_ErrMax,
+	AlxBound_ErrLen,
+	AlxFifo_ErrFull,
+	AlxFifo_ErrEmpty,
+	AlxFifo_ErrNoDelim,
+	AlxMemSafe_CrcOkSame_UsedCopyA,
+	AlxMemSafe_CrcOkDiff_UsedCopyA,
+	AlxMemSafe_CopyANokCopyBOk_UsedCopyB,
+	AlxMemSafe_CopyAOkCopyBNok_UsedCopyA,
+	AlxMemSafe_BothNok_ResetToDef,
+	AlxParamItem_ErrConv,
+	AlxParamItem_ErrEnum,
+	AlxRange_ErrMin,
+	AlxRange_ErrMax,
+	AlxRange_ErrLen
 } Alx_Status;
 
 typedef enum
@@ -339,48 +332,54 @@ typedef enum
 typedef enum
 {
 	#if defined(ALX_STM32)
-	AlxClk_Clk_McuStm32_SystemCoreClock = 0,
-	AlxClk_Clk_McuStm32_Sysclk = 1,
-	AlxClk_Clk_McuStm32_Hclk = 2,
-	AlxClk_Clk_McuStm32_Pclk1Apb1 = 3,
-	AlxClk_Clk_McuStm32_Pclk2Apb2 = 4,
+	AlxClk_Clk_McuStm32_SystemCoreClock,
+	AlxClk_Clk_McuStm32_Sysclk,
+	AlxClk_Clk_McuStm32_Hclk,
+	AlxClk_Clk_McuStm32_Pclk1Apb1,
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	AlxClk_Clk_McuStm32_Pclk2Apb2,
+	#endif
 
-	AlxClk_Clk_McuStm32_SystemCoreClock_Ctor = 5,
-	AlxClk_Clk_McuStm32_Sysclk_Ctor = 6,
-	AlxClk_Clk_McuStm32_Hclk_Ctor = 7,
-	AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor = 8,
-	AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor = 9,
-	AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor = 10,
-	AlxClk_Clk_McuStm32_Pclk2Apb2Tim_Ctor = 11,
+	AlxClk_Clk_McuStm32_SystemCoreClock_Ctor,
+	AlxClk_Clk_McuStm32_Sysclk_Ctor,
+	AlxClk_Clk_McuStm32_Hclk_Ctor,
+	AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor,
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor,
+	#endif
+	AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor,
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	AlxClk_Clk_McuStm32_Pclk2Apb2Tim_Ctor,
+	#endif
 
-	AlxClk_Clk_McuStm32_MainPllClk = 12,
-	AlxClk_Clk_McuStm32_MainPllInputClk_Ctor = 13,
+	AlxClk_Clk_McuStm32_MainPllClk,
+	AlxClk_Clk_McuStm32_MainPllInputClk_Ctor,
 	#endif
 
 	#if defined(ALX_LPC8XX) || defined(ALX_LPC80X)
-	AlxClk_Clk_McuLpc8xx_CoreSysClk = 14,
-	AlxClk_Clk_McuLpc8xx_MainClk = 15,
-	AlxClk_Clk_McuLpc8xx_Fro = 16,
-	AlxClk_Clk_McuLpc8xx_FroDiv = 17,
-	AlxClk_Clk_McuLpc8xx_ExtClk = 18,
-	AlxClk_Clk_McuLpc8xx_Frg0 = 19,
+	AlxClk_Clk_McuLpc8xx_CoreSysClk,
+	AlxClk_Clk_McuLpc8xx_MainClk,
+	AlxClk_Clk_McuLpc8xx_Fro,
+	AlxClk_Clk_McuLpc8xx_FroDiv,
+	AlxClk_Clk_McuLpc8xx_ExtClk,
+	AlxClk_Clk_McuLpc8xx_Frg0,
 
-	AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor = 20,
-	AlxClk_Clk_McuLpc8xx_MainClk_Ctor = 21,
-	AlxClk_Clk_McuLpc8xx_Fro_Ctor = 22,
-	AlxClk_Clk_McuLpc8xx_LPO_Ctor = 23,
+	AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor,
+	AlxClk_Clk_McuLpc8xx_MainClk_Ctor,
+	AlxClk_Clk_McuLpc8xx_Fro_Ctor,
+	AlxClk_Clk_McuLpc8xx_LPO_Ctor,
 	#endif
 
 	#if defined(ALX_LPC55S6X)
-	AlxClk_Clk_McuLpc55s6x_SystemCoreClock = 24,
-	AlxClk_Clk_McuLpc55s6x_AhbClk = 25,
-	AlxClk_Clk_McuLpc55s6x_MainClk = 26,
-	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz = 27,
+	AlxClk_Clk_McuLpc55s6x_SystemCoreClock,
+	AlxClk_Clk_McuLpc55s6x_AhbClk,
+	AlxClk_Clk_McuLpc55s6x_MainClk,
+	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz,
 
-	AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor = 28,
-	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor = 29,
-	AlxClk_Clk_McuLpc55s6x_MainClk_Ctor = 30,
-	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor = 31
+	AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor,
+	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor,
+	AlxClk_Clk_McuLpc55s6x_MainClk_Ctor,
+	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor,
 	#endif
 } AlxClk_Clk;
 
@@ -441,44 +440,15 @@ void AlxGlobal_EnableIrq(void);
 
 /**
   * @brief
-  * @param[in] uint64
-  * @param[out] str
+  * @param[in]	uint64
+  * @param[out]	str
   */
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
 
 /**
   * @brief
-  * @param[in,out] valPtr
-  * @param[in] valMin
-  * @param[in] valMax
-  */
-Alx_Status AlxGlobal_BoundUint32(uint32_t* valPtr, uint32_t valMin, uint32_t valMax);
-
-/**
-  * @brief
-  * @param[in,out] valPtr
-  * @param[in] valMin
-  * @param[in] valMax
-  */
-Alx_Status AlxGlobal_BoundFloat(float* valPtr, float valMin, float valMax);
-
-/**
-  * @brief
   * @param[in] val
-  */
-uint32_t AlxGlobal_Round(float val);
-
-/**
-  * @brief
-  * @param[in] val
-  * @param[in] valMin
-  * @param[in] valMax
-  */
-bool AlxGlobal_IsOutOfRangeUint8(uint8_t val, uint8_t valMin, uint8_t valMax);
-
-/**
-  * @brief
-  * @param[in] val
+  * @return
   */
 uint32_t AlxGlobal_Ntohl(uint32_t val);
 

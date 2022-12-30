@@ -120,20 +120,20 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] memRaw
-  * @param[in] crc
-  * @param[in] copyAddrA
-  * @param[in] copyAddrB
-  * @param[in] copyLen
-  * @param[in] nonBlockingEnable
-  * @param[in] memSafeReadWriteNumOfTries
-  * @param[in] memRawReadWriteNumOfTries
-  * @param[in] memRawReadWriteTimeout_ms
-  * @param[in] buff1
-  * @param[in] buff1Len
-  * @param[in] buff2
-  * @param[in] buff2Len
+  * @param[in,out]	me
+  * @param[in]		memRaw
+  * @param[in]		crc
+  * @param[in]		copyAddrA
+  * @param[in]		copyAddrB
+  * @param[in]		copyLen
+  * @param[in]		nonBlockingEnable
+  * @param[in]		memSafeReadWriteNumOfTries
+  * @param[in]		memRawReadWriteNumOfTries
+  * @param[in]		memRawReadWriteTimeout_ms
+  * @param[in]		buff1
+  * @param[in]		buff1Len
+  * @param[in]		buff2
+  * @param[in]		buff2Len
   */
 void AlxMemSafe_Ctor
 (
@@ -160,41 +160,53 @@ void AlxMemSafe_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[out] data
-  * @param[in] len
+  * @param[in,out]	me
+  * @param[out]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len);
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] data
-  * @param[in] len
+  * @param[in,out]	me
+  * @param[in]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
 Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxMemSafe_IsReadDone(AlxMemSafe* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxMemSafe_IsReadErr(AlxMemSafe* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxMemSafe_IsWriteDone(AlxMemSafe* me);
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxMemSafe_IsWriteErr(AlxMemSafe* me);
 

@@ -48,7 +48,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -56,16 +56,17 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxIoPin** ioPinArr;
+	// Defines
+	#define ALX_IO_PIN_IRQ_BUFF_LEN 32
 
 	// Parameters
+	AlxIoPin** ioPinArr;
 	uint8_t numOfIoPins;
 	Alx_IrqPriority* irqPriorityArr;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxIoPinIrq;
 
 
@@ -75,10 +76,10 @@ typedef struct
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] ioPinArr
-  * @param[in] numOfIoPins
-  * @param[in] irqPriorityArr
+  * @param[in,out]	me
+  * @param[in]		ioPinArr
+  * @param[in]		numOfIoPins
+  * @param[in]		irqPriorityArr
   */
 void AlxIoPinIrq_Ctor
 (
@@ -89,7 +90,7 @@ void AlxIoPinIrq_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }
