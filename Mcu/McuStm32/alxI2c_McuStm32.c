@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -77,7 +77,7 @@ void AlxI2c_Ctor
 	me->hi2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	me->hi2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 
-	#if defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	me->hi2c.Init.Timing = AlxI2c_ParseClk(clk);
 	me->hi2c.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
 	#endif
@@ -510,4 +510,4 @@ static void AlxI2c_Periph_ReleaseReset(AlxI2c* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
