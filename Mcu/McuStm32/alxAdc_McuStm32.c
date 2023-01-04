@@ -148,13 +148,14 @@ void AlxAdc_Ctor
 	me->hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
 	me->hadc.Init.DMAContinuousRequests = ENABLE;
 	me->hadc.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+	me->hadc.Init.SamplingTimeCommon = samplingTime;
 
 	// ADC Channel
 	for (uint32_t buffPos = 0; buffPos < numOfCh; buffPos++)
 	{
 		me->chadc[buffPos].Channel = AlxAdc_GetCh(me, *(chArr + buffPos));
 		me->chadc[buffPos].Rank = AlxAdc_GetRank(buffPos);
-		me->chadc[buffPos].SamplingTime = samplingTime;
+		me->chadc[buffPos].SamplingTime = ALX_NULL;
 		me->ch[buffPos] = *(chArr + buffPos);
 	}
 
@@ -171,7 +172,7 @@ void AlxAdc_Ctor
 	me->hdma.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
 	me->hdma.Init.Mode = DMA_CIRCULAR;
 	me->hdma.Init.Priority = DMA_PRIORITY_LOW;
-#endif
+	#endif
 
 
 	//------------------------------------------------------------------------------
