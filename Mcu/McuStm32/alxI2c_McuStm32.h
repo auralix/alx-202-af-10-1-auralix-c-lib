@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxI2c_McuStm32.h
   * @brief		Auralix C Library - ALX I2C MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *

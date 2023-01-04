@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxNtcg103jf103ft1s.h
   * @brief		Auralix C Library - ALX NTC Thermistors NTCG103JF103FT1S Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *

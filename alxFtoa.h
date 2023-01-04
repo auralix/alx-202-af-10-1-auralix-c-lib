@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxFtoa.h
   * @brief		Auralix C Library - ALX Float to ASCII Module - Copied from: https://github.com/antongus/stm32tpl/blob/master/ftoa.h
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *

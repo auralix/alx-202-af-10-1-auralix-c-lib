@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxTrace_McuLpc55S6x.h
   * @brief		Auralix C Library - ALX Trace MCU LPC55S6X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
