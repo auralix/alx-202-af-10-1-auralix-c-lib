@@ -58,9 +58,6 @@ extern "C" {
 // Preprocessor
 //******************************************************************************
 #define ALX_ID_FILE "alxId.h"
-#define ALX_ID_NAME_LEN 40
-#define ALX_ID_HW_ID_IO_PIN_ARR_MAX_LEN 5
-
 
 // Assert //
 #if defined(_ALX_ID_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
@@ -84,31 +81,38 @@ extern "C" {
 
 
 //******************************************************************************
+// Defines
+//******************************************************************************
+#define ALX_ID_NAME_LEN 40
+#define ALX_ID_FW_BUILD_HASH_LEN 50
+#define ALX_ID_FW_BUILD_HASH_SHORT_LEN 8
+#define ALX_ID_FW_VER_STR_LEN 100
+#define ALX_ID_FW_BIN_STR_LEN 100
+#define ALX_ID_HW_ID_IO_PIN_ARR_LEN 5
+#define ALX_ID_HW_STM32_MCU_UNIQUE_ID_LEN_uint32 3
+#define ALX_ID_HW_STM32_MCU_UNIQUE_ID_LEN_uint8 12
+#define ALX_ID_HW_STM32_MCU_UNIQUE_ID_STR_LEN 30
+
+
+//******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
-{
-	Alx_IoPinState_Floating = 0,
-	Alx_IoPinState_High = 1,
-	Alx_IoPinState_Low = 2
-} AlxId_HwIdIoPinState;
-
 typedef struct
 {
-	// Parameters - Const
+	// Const
 	char name[ALX_ID_NAME_LEN];
 	uint32_t date;
 	uint32_t dateComp;
 	uint32_t num;
-	char hash[50];
-	char hashShort[8];
+	char hash[ALX_ID_FW_BUILD_HASH_LEN];
+	char hashShort[ALX_ID_FW_BUILD_HASH_SHORT_LEN];
 	uint32_t rev;
-} AlxId_Build;
+} AlxId_Fw_Build;
 
 typedef struct
 {
-	// Parameters - Const
-	AlxId_Build build;
+	// Const
+	AlxId_Fw_Build build;
 
 	// Parameters
 	char artf[ALX_ID_NAME_LEN];
@@ -116,152 +120,167 @@ typedef struct
 	uint8_t verMajor;
 	uint8_t verMinor;
 	uint8_t verPatch;
+	bool isBuildJobUsed;
+	bool isBootloader;
+
+	// Variables
 	uint32_t verDate;
 	uint64_t ver;
-	char verStr[100];
-	char binStr[100];
-	bool isBuildJobUsed;
+	char verStr[ALX_ID_FW_VER_STR_LEN];
+	char binStr[ALX_ID_FW_BIN_STR_LEN];
 } AlxId_Fw;
 
 typedef struct
 {
-	uint8_t id;
-
-	char pcbArtf[ALX_ID_NAME_LEN];
-	char pcbName[ALX_ID_NAME_LEN];
-	uint8_t pcbVerMajor;
-	uint8_t pcbVerMinor;
-	uint8_t pcbVerPatch;
-	uint32_t pcbVerDate;
-	uint64_t pcbVer;
-
-	char bomArtf[ALX_ID_NAME_LEN];
-	char bomName[ALX_ID_NAME_LEN];
-	uint8_t bomVerMajor;
-	uint8_t bomVerMinor;
-	uint8_t bomVerPatch;
-	uint32_t bomVerDate;
-	uint64_t bomVer;
-} AlxId_HwInstance;
-
-typedef struct
-{
-	// Objects - External
-	AlxId_HwInstance* instanceKnownArr;
-	uint8_t* instanceHwIdSupportedArr;
-	AlxIoPin** idIoPinArr;
-
-	// Parameters
-	uint8_t instanceKnownArrLen;
-	uint8_t instanceHwIdSupportedArrLen;
-	uint8_t idIoPinArrLen;
-
-	// Variables
-	AlxId_HwInstance instance; // Not initialized in Ctor
-	AlxIoPin_TriState idIoPinState[ALX_ID_HW_ID_IO_PIN_ARR_MAX_LEN]; // Not initialized in Ctor
-} AlxId_Hw;
-
-typedef struct
-{
-	// Parameters - Const
+	// Const
 	uint32_t ver;
 	uint32_t verMinRequired;
-} AlxId_LangC;
+} AlxId_Fw_LangC;
 
 typedef struct
 {
-	// Parameters - Const
+	// Const
 	char name[ALX_ID_NAME_LEN];
 	uint32_t verMajor;
 	uint32_t verMinor;
 	uint32_t verPatch;
 	uint32_t ver;
 	uint32_t verMinRequired;
-} AlxId_LangCLib;
+} AlxId_Fw_LangCLib;
 
 typedef struct
 {
-	// Parameters - Const
+	// Const
 	char name[ALX_ID_NAME_LEN];
 	uint32_t verMajor;
 	uint32_t verMinor;
 	uint32_t verPatch;
 	uint32_t ver;
 	uint32_t verMinRequired;
-} AlxId_Comp;
+} AlxId_Fw_Comp;
 
 #ifdef ALX_CMSIS_CORE
 typedef struct
 {
-	// Parameters - Const
+	// Const
 	uint32_t verMajor;
 	uint32_t verMinor;
 	uint32_t ver;
 	uint32_t verRequired;
-} AlxId_CmsisCore;
+} AlxId_Fw_CmsisCore;
 #endif
 
 #ifdef ALX_STM32
 typedef struct
 {
-	// Parameters - Const
+	// Const
 	uint32_t verMajor;
 	uint32_t verMinor;
 	uint32_t verPatch;
 	uint32_t verRc;
 	uint32_t ver;
 	uint32_t verRequired;
-} AlxId_Stm32;
+} AlxId_Fw_Stm32;
 #endif
+
+typedef struct
+{
+	// Parameters
+	uint8_t id;
+	char pcbArtf[ALX_ID_NAME_LEN];
+	char pcbName[ALX_ID_NAME_LEN];
+	uint8_t pcbVerMajor;
+	uint8_t pcbVerMinor;
+	uint8_t pcbVerPatch;
+	uint32_t pcbVerDate;
+	char bomArtf[ALX_ID_NAME_LEN];
+	char bomName[ALX_ID_NAME_LEN];
+	uint8_t bomVerMajor;
+	uint8_t bomVerMinor;
+	uint8_t bomVerPatch;
+	uint32_t bomVerDate;
+
+	// Variables
+	uint64_t pcbVer;
+	char pcbVerStr[ALX_ID_FW_VER_STR_LEN];
+	uint64_t bomVer;
+	char bomVerStr[ALX_ID_FW_VER_STR_LEN];
+} AlxId_HwInstance;
+
+typedef struct
+{
+	// Parameters
+	AlxId_HwInstance* instanceKnownArr;
+	uint8_t instanceKnownArrLen;
+	uint8_t* instanceHwIdSupportedArr;
+	uint8_t instanceHwIdSupportedArrLen;
+	AlxIoPin** idIoPinArr;
+	uint8_t idIoPinArrLen;
+	char mcuName[ALX_ID_NAME_LEN];
+
+	// Variables
+	AlxId_HwInstance instance;
+	AlxIoPin_TriState idIoPinState[ALX_ID_HW_ID_IO_PIN_ARR_LEN];
+} AlxId_Hw;
 
 #ifdef ALX_STM32
 typedef union
 {
-	uint32_t uint32[3];
-	uint8_t uint8[12];
-} AlxId_Stm32Hw_UniqueId;
+	uint32_t uint32[ALX_ID_HW_STM32_MCU_UNIQUE_ID_LEN_uint32];
+	uint8_t uint8[ALX_ID_HW_STM32_MCU_UNIQUE_ID_LEN_uint8];
+} AlxId_Hw_Stm32_McuUniqueId;
 
 typedef struct
 {
-	// Parameters - Const
+	// Const
 	uint32_t deviceId;
 	uint32_t revisionId;
 	uint32_t flashSize_kB;
 	#ifdef ALX_STM32G4
-		uint32_t packageId;
+	uint32_t packageId;
 	#endif
-	AlxId_Stm32Hw_UniqueId uniqueId;
-	char uniqueIdStr[30];
-} AlxId_Stm32Hw;
+	AlxId_Hw_Stm32_McuUniqueId mcuUniqueId;
+	char mcuUniqueIdStr[ALX_ID_HW_STM32_MCU_UNIQUE_ID_STR_LEN];
+} AlxId_Hw_Stm32;
 #endif
 
 typedef struct
 {
-	// Objects - Internal
-	AlxId_Fw fwApp;
-	AlxId_Fw fwBoot;
-	AlxId_Hw hw;
-	AlxId_LangC langC;
-	AlxId_LangCLib langCLib;
-	AlxId_Comp comp;
-
-	#ifdef ALX_CMSIS_CORE
-	AlxId_CmsisCore cmsisCore;
-	#endif
-
-	#ifdef ALX_STM32
-	AlxId_Stm32 stm32HalCmsis;
-	AlxId_Stm32 stm32HalDriver;
-	AlxId_Stm32Hw stm32Hw;
-	#endif
+	//------------------------------------------------------------------------------
+	// FW
+	//------------------------------------------------------------------------------
 
 	// Parameters
-	bool fwIsBootloader;
-	char hwMcuName[ALX_ID_NAME_LEN];
+	AlxId_Fw fwApp;
+	AlxId_Fw fwBoot;
+	AlxId_Fw_LangC fwLangC;
+	AlxId_Fw_LangCLib fwLangCLib;
+	AlxId_Fw_Comp fwComp;
+	#ifdef ALX_CMSIS_CORE
+	AlxId_Fw_CmsisCore fwCmsisCore;
+	#endif
+	#ifdef ALX_STM32
+	AlxId_Fw_Stm32 fwStm32HalCmsis;
+	AlxId_Fw_Stm32 fwStm32HalDriver;
+	#endif
 
+
+	//------------------------------------------------------------------------------
+	// HW
+	//------------------------------------------------------------------------------
+
+	// Parameters
+	AlxId_Hw hw;
+	#ifdef ALX_STM32
+	AlxId_Hw_Stm32 hwStm32;
+	#endif
+
+
+	//------------------------------------------------------------------------------
 	// Info
-	bool isInit;
+	//------------------------------------------------------------------------------
 	bool wasCtorCalled;
+	bool isInit;
 	bool isHwIdUsed;
 } AlxId;
 
@@ -269,25 +288,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		fwArtf
-  * @param[in]		fwName
-  * @param[in]		fwVerMajor
-  * @param[in]		fwVerMinor
-  * @param[in]		fwVerPatch
-  * @param[in]		fwIsBuildJobUsed
-  * @param[in]		fwIsBootloader
-  * @param[in]		hwInstanceKnownArr
-  * @param[in]		hwInstanceKnownArrLen
-  * @param[in]		hwInstanceHwIdSupportedArr
-  * @param[in]		hwInstanceHwIdSupportedArrLen
-  * @param[in]		hwIdIoPinArr
-  * @param[in]		hwIdIoPinArrLen
-  * @param[in]		hwMcuName
-  */
 void AlxId_Ctor
 (
 	AlxId* me,
@@ -306,20 +306,6 @@ void AlxId_Ctor
 	uint8_t hwIdIoPinArrLen,
 	const char* hwMcuName
 );
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		fwArtf
-  * @param[in]		fwName
-  * @param[in]		fwVerMajor
-  * @param[in]		fwVerMinor
-  * @param[in]		fwVerPatch
-  * @param[in]		fwIsBuildJobUsed
-  * @param[in]		fwIsBootloader
-  * @param[in]		hwInstance
-  * @param[in]		hwMcuName
-  */
 void AlxId_Ctor_NoHwId
 (
 	AlxId* me,
@@ -338,61 +324,36 @@ void AlxId_Ctor_NoHwId
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxId_Init(AlxId* me);
-
-/**
-  * @brief
-  * @param[in] me
-  */
 void AlxId_Trace(AlxId* me);
-
-/**
-  * @brief
-  * @param[in] me
-  * @return
-  */
-uint8_t AlxId_GetHwId(AlxId* me);
-
-/**
-  * @brief
-  * @param[in]	me
-  * @param[out]	uniqueIdUint8
-  * @param[in]	len
-  */
-void AlxId_GetUniqueIdUint8(AlxId* me, uint8_t* uniqueIdUint8, uint8_t len);
-
-/**
-  * @brief
-  * @param[in] me
-  * @return
-  */
-const char* AlxId_GetUniqueIdStr(AlxId* me);
-
-/**
-  * @brief
-  * @param[in] me
-  * @return
-  */
+const char* AlxId_GetFwAppArtf(AlxId* me);
+const char* AlxId_GetFwAppName(AlxId* me);
+uint8_t AlxId_GetFwAppVerMajor(AlxId* me);
+uint8_t AlxId_GetFwAppVerMinor(AlxId* me);
+uint8_t AlxId_GetFwAppVerPatch(AlxId* me);
 uint32_t AlxId_GetFwAppVerDate(AlxId* me);
-
-/**
-  * @brief
-  * @param[in] me
-  * @return
-  */
+uint64_t AlxId_GetFwAppVer(AlxId* me);
 const char* AlxId_GetFwAppVerStr(AlxId* me);
-
-/**
-  * @brief
-  * @param[in] me
-  * @return
-  */
 const char* AlxId_GetFwAppBinStr(AlxId* me);
+const char* AlxId_GetHwPcbArtf(AlxId* me);
+const char* AlxId_GetHwPcbName(AlxId* me);
+uint8_t AlxId_GetHwPcbVerMajor(AlxId* me);
+uint8_t AlxId_GetHwPcbVerMinor(AlxId* me);
+uint8_t AlxId_GetHwPcbVerPatch(AlxId* me);
+uint32_t AlxId_GetHwPcbVerDate(AlxId* me);
+uint64_t AlxId_GetHwPcbVer(AlxId* me);
+const char* AlxId_GetHwPcbVerStr(AlxId* me);
+const char* AlxId_GetHwBomArtf(AlxId* me);
+const char* AlxId_GetHwBomName(AlxId* me);
+uint8_t AlxId_GetHwBomVerMajor(AlxId* me);
+uint8_t AlxId_GetHwBomVerMinor(AlxId* me);
+uint8_t AlxId_GetHwBomVerPatch(AlxId* me);
+uint32_t AlxId_GetHwBomVerDate(AlxId* me);
+uint64_t AlxId_GetHwBomVer(AlxId* me);
+const char* AlxId_GetHwBomVerStr(AlxId* me);
+uint8_t AlxId_GetHwId(AlxId* me);
+void AlxId_GetHwMcuUniqueIdUint8(AlxId* me, uint8_t* uniqueIdUint8, uint8_t len);
+const char* AlxId_GetHwMcuUniqueIdStr(AlxId* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
