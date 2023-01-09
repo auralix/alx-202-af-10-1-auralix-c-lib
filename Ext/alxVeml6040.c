@@ -68,36 +68,58 @@ Alx_Status AlxVeml6040_Init(AlxVeml6040* me)
 	// Assert
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == false);
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxVeml6040_DeInit(AlxVeml6040* me)
 {
 	// Assert
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxVeml6040_GetR_raw(AlxVeml6040* me, uint16_t* R_raw)
 {
 	// Assert
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
+
+	// Return
+	*R_raw = 0;
+	return Alx_Ok;
 }
 Alx_Status AlxVeml6040_GetG_raw(AlxVeml6040* me, uint16_t* G_raw)
 {
 	// Assert
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
+
+	// Return
+	*G_raw = 0;
+	return Alx_Ok;
 }
 Alx_Status AlxVeml6040_GetB_raw(AlxVeml6040* me, uint16_t* B_raw)
 {
 	// Assert
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
+
+	// Return
+	*B_raw = 0;
+	return Alx_Ok;
 }
 Alx_Status AlxVeml6040_GetW_raw(AlxVeml6040* me, uint16_t* W_raw)
 {
 	// Assert
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
+
+	// Return
+	*W_raw = 0;
+	return Alx_Ok;
 }
 
 
