@@ -35,6 +35,7 @@ import sys
 # Script
 #*******************************************************************************
 def Script(brief, cVsCpp, prefix, name1, name2="", name3="", name4=""):
+
 	# Local variables
 	prefixLow =		prefix.lower()
 	prefixUp =		prefix.upper()
@@ -186,6 +187,9 @@ void {prefixCap}{nameCap}_Handle({prefixCap}{nameCap}* me);
 	# Create file
 	filePath.write_text(fileText)
 
+	# Print
+	print("Created - " + prefixLow + nameCap + ".h")
+
 def _CreateFile_c(brief, prefixLow, prefixUp, prefixCap, nameUp, nameCap):
 	# Local variables
 	filePath = pathlib.Path(prefixLow + nameCap + ".c")
@@ -255,6 +259,9 @@ void {prefixCap}{nameCap}_Handle({prefixCap}{nameCap}* me)
 
 	# Create file
 	filePath.write_text(fileText)
+
+	# Print
+	print("Created - " + prefixLow + nameCap + ".c")
 
 def _CreateFile_hpp(brief, prefixLow, prefixUp, prefixCap, nameUp, nameCap):
 	# Local variables
@@ -393,6 +400,9 @@ namespace {prefixCap}
 
 	# Create file
 	filePath.write_text(fileText)
+
+	# Print
+	print("Created - " + prefixLow + nameCap + ".hpp")
 
 
 #*******************************************************************************
