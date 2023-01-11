@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file		alxVeml6040.c
-  * @brief		Auralix C Library - ALX Light Sensor VEML604 Module
+  * @brief		Auralix C Library - ALX Light Sensor VEML6040 Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -78,10 +78,8 @@ void AlxVeml6040_Ctor
 	uint16_t i2cTimeout_ms
 )
 {
-	// Objects - External
-	me->i2c = i2c;
-
 	// Parameters
+	me->i2c = i2c;
 	me->i2cAddr = i2cAddr;
 	me->i2cCheckWithRead = i2cCheckWithRead;
 	me->i2cNumOfTries = i2cNumOfTries;
@@ -114,16 +112,16 @@ Alx_Status AlxVeml6040_Init(AlxVeml6040* me)
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == false);
 
-	// Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
 
 	// Init I2C
 	status = AlxI2c_Init(me->i2c);
-	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err_AlxI2c_Init"); return status; }
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
 	// Check if slave ready
-	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 3, 1000);
-	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err_AlxI2c_IsSlaveReady"); return status; }
+	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
 	// Set register struct values to default
 	AlxVeml6040_RegStruct_SetToDefault(me);
@@ -133,12 +131,12 @@ Alx_Status AlxVeml6040_Init(AlxVeml6040* me)
 
 	// Write registers
 	status = AlxVeml6040_Reg_Write_All(me);
-	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err_Reg_WriteNonClkVal"); return status;}
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
 	// Set isInit
 	me->isInit = true;
 
-	// Return OK
+	// Return
 	return Alx_Ok;
 }
 
@@ -154,17 +152,19 @@ Alx_Status AlxVeml6040_DeInit(AlxVeml6040* me)
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
 
-	// Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
+
+	// TV: TODO Disable IC, so that is stops sampling light sensor
 
 	// DeInit I2C
 	status = AlxI2c_DeInit(me->i2c);
-	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err_AlxI2c_DeInit"); return status; }
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
 	// Reset isInit
 	me->isInit = false;
 
-	// Return OK
+	// Return
 	return Alx_Ok;
 }
 
@@ -181,15 +181,17 @@ Alx_Status AlxVeml6040_GetR_raw(AlxVeml6040* me, uint16_t* R_raw)
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
 
-	// Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// Read R color data
+	// Read
 	status = AlxVeml6040_Reg_Read(me, &me->reg._0x08_R_DATA);
-	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err_AlxVeml6040_GetR_raw"); return status; }
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
-	// Return OK and data
+	// Set
 	*R_raw = me->reg._0x08_R_DATA.val.raw;
+
+	// Return
 	return Alx_Ok;
 }
 
@@ -206,15 +208,17 @@ Alx_Status AlxVeml6040_GetG_raw(AlxVeml6040* me, uint16_t* G_raw)
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
 
-	// Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// Read G color data
+	// Read
 	status = AlxVeml6040_Reg_Read(me, &me->reg._0x09_G_DATA);
-	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err_AlxVeml6040_GetG_raw"); return status; }
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
-	// Return OK and data
+	// Set
 	*G_raw = me->reg._0x09_G_DATA.val.raw;
+
+	// Return
 	return Alx_Ok;
 }
 
@@ -231,15 +235,17 @@ Alx_Status AlxVeml6040_GetB_raw(AlxVeml6040* me, uint16_t* B_raw)
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
 
-	// Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// Read B color data
+	// Read
 	status = AlxVeml6040_Reg_Read(me, &me->reg._0x0A_B_DATA);
-	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err_AlxVeml6040_GetB_raw"); return status; }
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
-	// Return OK and data
+	// Set
 	*B_raw = me->reg._0x0A_B_DATA.val.raw;
+
+	// Return
 	return Alx_Ok;
 }
 
@@ -256,15 +262,17 @@ Alx_Status AlxVeml6040_GetW_raw(AlxVeml6040* me, uint16_t* W_raw)
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
 
-	// Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// Read W color data
+	// Read
 	status = AlxVeml6040_Reg_Read(me, &me->reg._0x0B_W_DATA);
-	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err_AlxVeml6040_GetW_raw"); return status; }
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
-	// Return OK and data
+	// Set
 	*W_raw = me->reg._0x0B_W_DATA.val.raw;
+
+	// Return
 	return Alx_Ok;
 }
 
@@ -317,7 +325,7 @@ static Alx_Status AlxVeml6040_Reg_Write(AlxVeml6040* me, void* reg)
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
-	// Return OK
+	// Return
 	return Alx_Ok;
 }
 static Alx_Status AlxVeml6040_Reg_Write_All(AlxVeml6040* me)
@@ -327,9 +335,9 @@ static Alx_Status AlxVeml6040_Reg_Write_All(AlxVeml6040* me)
 
 	// Write
 	status = AlxVeml6040_Reg_Write(me, &me->reg._0x00_CONF	);
-	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err_0x00_CONF"); return status;}
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
-	// Return OK
+	// Return
 	return Alx_Ok;
 }
 static Alx_Status AlxVeml6040_Reg_Read(AlxVeml6040* me, void* reg)
@@ -344,7 +352,7 @@ static Alx_Status AlxVeml6040_Reg_Read(AlxVeml6040* me, void* reg)
 	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
-	// Return OK
+	// Return
 	return Alx_Ok;
 }
 
@@ -358,7 +366,7 @@ ALX_WEAK void AlxVeml6040_RegStruct_SetVal(AlxVeml6040* me)
 	(void)me;
 
 	// Assert
-	ALX_VEML6040_TRACE("Define 'AlxVeml6040_RegStruct_SetVal' function in your application.");
+	ALX_VEML6040_TRACE("Err");
 	ALX_VEML6040_ASSERT(false);
 }
 

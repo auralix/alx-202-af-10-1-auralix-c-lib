@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file		alxVeml6040.h
-  * @brief		Auralix C Library - ALX Light Sensor VEML604 Module
+  * @brief		Auralix C Library - ALX Light Sensor VEML6040 Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -116,9 +116,9 @@ typedef union
 		AlxVeml6040_RegEnum_0x00_ColorSensorEnable SD : 1;
 		AlxVeml6040_RegEnum_0x00_ModeSelect AF : 1;
 		AlxVeml6040_RegEnum_0x00_TriggerEnable TRIG : 1;
-		uint8_t unused_3 : 1;  // bit 3 is unused
+		uint8_t unused_3 : 1;
 		AlxVeml6040_RegEnum_0x00_IntegrationTimeSelect IT : 3;
-		uint8_t unused_7 : 1;  // bit 7 is unused
+		uint8_t unused_7 : 1;
 	};
 	uint16_t raw;
 } AlxVeml6040_RegVal_0x00_CONF;
@@ -181,11 +181,6 @@ typedef union
 
 
 //******************************************************************************
-// Register Group Values Unions
-//******************************************************************************
-
-
-//******************************************************************************
 // Register Structures
 //******************************************************************************
 typedef struct
@@ -221,11 +216,6 @@ typedef struct
 
 
 //******************************************************************************
-// Register Group Structures
-//******************************************************************************
-
-
-//******************************************************************************
 // Main Register Structure
 //******************************************************************************
 typedef struct
@@ -245,10 +235,8 @@ typedef struct
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxI2c* i2c;
-
 	// Parameters
+	AlxI2c* i2c;
 	uint8_t i2cAddr;
 	bool i2cCheckWithRead;
 	uint8_t i2cNumOfTries;
