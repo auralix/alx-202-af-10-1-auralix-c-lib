@@ -51,6 +51,11 @@ void AlxVeml6040_Ctor
 )
 {
 	// Parameters
+	me->i2c = i2c;
+	me->i2cAddr = i2cAddr;
+	me->i2cCheckWithRead = i2cCheckWithRead;
+	me->i2cNumOfTries = i2cNumOfTries;
+	me->i2cTimeout_ms = i2cTimeout_ms;
 
 	// Variables
 
@@ -87,6 +92,24 @@ Alx_Status AlxVeml6040_GetR_raw(AlxVeml6040* me, uint16_t* R_raw)
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == true);
 
+
+	//------------------------------------------------------------------------------
+	// Local variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
+	uint16_t slaveAddr = 0x10;
+	uint8_t* data = 0x00;
+	uint16_t len = 1;
+	uint16_t timeout_ms = 100;
+	status = AlxI2c_Init(me->i2c);
+	status = AlxI2c_Master_StartRead(me->i2c, slaveAddr, data, len, timeout_ms);
+
+	//------------------------------------------------------------------------------
+	// Read @ Red color  lux
+	//------------------------------------------------------------------------------
+	//status = AlxPcal6416a_Reg_Read(me, &me->reg._00h_InputPort_0);
+	//if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
+
 	// Return
 	*R_raw = 0;
 	return Alx_Ok;
@@ -119,6 +142,44 @@ Alx_Status AlxVeml6040_GetW_raw(AlxVeml6040* me, uint16_t* W_raw)
 
 	// Return
 	*W_raw = 0;
+	return Alx_Ok;
+}
+Alx_Status AlxVeml6040_Reg_Write(AlxVeml6040* me, void* reg)
+{
+	// Assert
+	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
+	ALX_VEML6040_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+	uint8_t regAddr = *((uint8_t*)reg);
+	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+
+	// Write
+	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxVeml6040_Reg_Read(AlxVeml6040* me, void* reg)
+{
+	// Assert
+	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
+	ALX_VEML6040_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+	uint8_t regAddr = *((uint8_t*)reg);
+	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+
+	// Read
+	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
+
+	// Return
 	return Alx_Ok;
 }
 

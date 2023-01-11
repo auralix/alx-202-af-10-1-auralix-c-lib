@@ -83,7 +83,12 @@ extern "C" {
 typedef struct
 {
 	// Parameters
-
+	AlxI2c* i2c;
+	uint8_t i2cAddr;
+	bool i2cCheckWithRead;
+	uint8_t i2cNumOfTries;
+	uint16_t i2cTimeout_ms;
+	
 	// Variables
 
 	// Info
