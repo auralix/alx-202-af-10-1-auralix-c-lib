@@ -134,7 +134,7 @@ typedef union
 		uint8_t R_DATA_L;
 		uint8_t R_DATA_H;
 	};
-	uint8_t raw[2];
+	uint16_t raw;
 } AlxVeml6040_RegVal_0x08_R_DATA;
 
 
@@ -148,7 +148,7 @@ typedef union
 		uint8_t G_DATA_L;
 		uint8_t G_DATA_H;
 	};
-	uint8_t raw[2];
+	uint16_t raw;
 } AlxVeml6040_RegVal_0x09_G_DATA;
 
 
@@ -162,7 +162,7 @@ typedef union
 		uint8_t B_DATA_L;
 		uint8_t B_DATA_H;
 	};
-	uint8_t raw[2];
+	uint16_t raw;
 } AlxVeml6040_RegVal_0x0A_B_DATA;
 
 
@@ -176,7 +176,7 @@ typedef union
 		uint8_t W_DATA_L;
 		uint8_t W_DATA_H;
 	};
-	uint8_t raw[2];
+	uint16_t raw;
 } AlxVeml6040_RegVal_0x0B_W_DATA;
 
 
@@ -245,24 +245,43 @@ typedef struct
 //******************************************************************************
 typedef struct
 {
-	// Parameters
+	// Objects - External
 	AlxI2c* i2c;
+
+	// Parameters
 	uint8_t i2cAddr;
+	uint8_t i2cMemAddr;
+	AlxI2c_Master_MemAddrLen i2cMemAddrLen;
 	bool i2cCheckWithRead;
 	uint8_t i2cNumOfTries;
 	uint16_t i2cTimeout_ms;
 
 	// Variables
+	AlxVeml6040_Reg reg;
+	uint16_t r_16bit;
+	uint16_t g_16bit;
+	uint16_t b_16bit;
+	uint16_t w_16bit;
 
 	// Info
-	bool wasCtorCalled;
 	bool isInit;
+	bool wasCtorCalled;
 } AlxVeml6040;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+	/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		i2c
+  * @param[in]		i2cAddr
+  * @param[in]		i2cCheckWithRead
+  * @param[in]		i2cNumOfTries
+  * @param[in]		i2cTimeout_ms
+  */
 void AlxVeml6040_Ctor
 (
 	AlxVeml6040* me,
@@ -277,11 +296,65 @@ void AlxVeml6040_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_Init(AlxVeml6040* me);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_DeInit(AlxVeml6040* me);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
+bool AlxVeml6040_IsInit(AlxVeml6040* me);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		R_raw
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_GetR_raw(AlxVeml6040* me, uint16_t* R_raw);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		G_raw
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_GetG_raw(AlxVeml6040* me, uint16_t* G_raw);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		B_raw
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_GetB_raw(AlxVeml6040* me, uint16_t* B_raw);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		W_raw
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_GetW_raw(AlxVeml6040* me, uint16_t* W_raw);
 
 
