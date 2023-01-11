@@ -74,7 +74,13 @@ Alx_Status AlxVeml6040_Init(AlxVeml6040* me)
 	ALX_VEML6040_ASSERT(me->wasCtorCalled == true);
 	ALX_VEML6040_ASSERT(me->isInit == false);
 
-	// Return
+	Alx_Status status = Alx_Err;
+
+	// #1 Init I2C
+	status = AlxI2c_Init(me->i2c);
+	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err_AlxI2c_Init"); return status; }
+
+	// #9 Return OK
 	return Alx_Ok;
 }
 Alx_Status AlxVeml6040_DeInit(AlxVeml6040* me)

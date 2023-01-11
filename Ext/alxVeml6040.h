@@ -78,6 +78,109 @@ extern "C" {
 
 
 //******************************************************************************
+// Register Values Unions
+//******************************************************************************
+
+
+//******************************************************************************
+// Address: 0x00, Reset: 0x01 0x00, Name: CONF
+//******************************************************************************
+typedef enum
+{
+	ColorSensor_Enabled		= 0,
+	ColorSensor_Disabled	= 1
+} AlxVeml6040_RegEnum_0x00_ColorSensorEnable;
+typedef enum
+{
+	AutoMode	= 0,
+	ForceMode	= 1
+} AlxVeml6040_RegEnum_0x00_ModeSelect;
+typedef enum
+{
+	TriggerDisabled	= 0,
+	TriggerEnabled	= 1
+} AlxVeml6040_RegEnum_0x00_TriggerEnable;
+typedef enum
+{
+	IntegrationTimeSelect_40_ms		= 0b000,
+	IntegrationTimeSelect_80_ms		= 0b001,
+	IntegrationTimeSelect_160_ms	= 0b010,
+	IntegrationTimeSelect_320_ms	= 0b011,
+	IntegrationTimeSelect_640_ms	= 0b100,
+	IntegrationTimeSelect_1280_ms	= 0b101
+} AlxVeml6040_RegEnum_0x00_IntegrationTimeSelect;
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		AlxVeml6040_RegEnum_0x00_ColorSensorEnable SD : 1;
+		AlxVeml6040_RegEnum_0x00_ModeSelect AF : 1;
+		AlxVeml6040_RegEnum_0x00_TriggerEnable TRIG : 1;
+		uint8_t unused_3 : 1;  // bit 3 is unused
+		AlxVeml6040_RegEnum_0x00_IntegrationTimeSelect IT : 3;
+		uint8_t unused_7 : 1;  // bit 7 is unused
+	};
+	uint16_t raw;
+} AlxVeml6040_RegVal_0x00_Config;
+
+
+//******************************************************************************
+// Address: 0x08, Reset: 0x00 0x00, Name: R_DATA
+//******************************************************************************
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t R_DATA_L;
+		uint8_t R_DATA_H;
+	};
+	uint8_t raw[2];
+} AlxVeml6040_RegVal_0x08_R_DATA;
+
+
+//******************************************************************************
+// Address: 0x09, Reset: 0x00 0x00, Name: G_DATA
+//******************************************************************************
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t G_DATA_L;
+		uint8_t G_DATA_H;
+	};
+	uint8_t raw[2];
+} AlxVeml6040_RegVal_0x09_G_DATA;
+
+
+//******************************************************************************
+// Address: 0x0A, Reset: 0x00 0x00, Name: B_DATA
+//******************************************************************************
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t B_DATA_L;
+		uint8_t B_DATA_H;
+	};
+	uint8_t raw[2];
+} AlxVeml6040_RegVal_0x0A_B_DATA;
+
+
+//******************************************************************************
+// Address: 0x0B, Reset: 0x00 0x00, Name: W_DATA
+//******************************************************************************
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t W_DATA_L;
+		uint8_t W_DATA_H;
+	};
+	uint8_t raw[2];
+} AlxVeml6040_RegVal_0x0B_W_DATA;
+
+
+//******************************************************************************
 // Types
 //******************************************************************************
 typedef struct
@@ -88,7 +191,7 @@ typedef struct
 	bool i2cCheckWithRead;
 	uint8_t i2cNumOfTries;
 	uint16_t i2cTimeout_ms;
-	
+
 	// Variables
 
 	// Info
