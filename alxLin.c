@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		alxSerialPort_McuStm32.h
-  * @brief		Auralix C Library - ALX Serial Port MCU STM32 Module
+  * @file		alxLin.c
+  * @brief		Auralix C Library - ALX LIN Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -26,102 +26,113 @@
   **/
 
 //******************************************************************************
-// Include Guard
-//******************************************************************************
-#ifndef ALX_SERIAL_PORT_MCU_STM32_H
-#define ALX_SERIAL_PORT_MCU_STM32_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-//******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
-#include "alxFifo.h"
-#include "alxIoPin.h"
+#include "alxLin.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
-// Types
+// Private Functions
 //******************************************************************************
-typedef struct
-{
-	// Parameters
-	USART_TypeDef* uart;
-	AlxIoPin* do_TX;
-	AlxIoPin* di_RX;
-	AlxGlobal_BaudRate baudRate;
-	uint32_t dataWidth;
-	uint32_t stopBits;
-	uint32_t parity;
-	uint16_t txTimeout_ms;
-	uint8_t* rxFifoBuff;
-	uint32_t rxFifoBuffLen;
-	Alx_IrqPriority rxIrqPriority;
-	bool linEnable;
-
-	// Variables
-	UART_HandleTypeDef huart;
-	AlxFifo rxFifo;
-
-	// Info
-	bool wasCtorCalled;
-	bool isInit;
-} AlxSerialPort;
+static uint8_t AlxLin_GetProtectedId(uint8_t id);
+static uint8_t AlxLin_GetEnhancedChecksum(uint8_t id, uint8_t* data, uint8_t len);
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		uart
-  * @param[in]		do_TX
-  * @param[in]		di_RX
-  * @param[in]		baudRate
-  * @param[in]		dataWidth
-  * @param[in]		stopBits
-  * @param[in]		parity
-  * @param[in]		txTimeout_ms
-  * @param[in]		rxFifoBuff
-  * @param[in]		rxFifoBuffLen
-  * @param[in]		rxIrqPriority
-  */
-void AlxSerialPort_Ctor
+void AlxLin_Ctor
 (
-	AlxSerialPort* me,
-	USART_TypeDef* uart,
-	AlxIoPin* do_TX,
-	AlxIoPin* di_RX,
-	AlxGlobal_BaudRate baudRate,
-	uint32_t dataWidth,
-	uint32_t stopBits,
-	uint32_t parity,
-	uint16_t txTimeout_ms,
-	uint8_t* rxFifoBuff,
-	uint32_t rxFifoBuffLen,
-	Alx_IrqPriority rxIrqPriority,
-	bool linEnable
-);
+	AlxLin* me,
+	AlxSerialPort* alxSerialPort
+)
+{
+	// Parameters
+	me->alxSerialPort = alxSerialPort;
 
+	// Variables
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
-
-#ifdef __cplusplus
+	// Info
+	me->wasCtorCalled = true;
+	me->isInit = false;
 }
-#endif
 
-#endif	// #ifndef ALX_SERIAL_PORT_MCU_STM32_H
+
+//******************************************************************************
+// Functions
+//******************************************************************************
+Alx_Status AlxLin_Init(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInit == false);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Init serial port
+	status = AlxSerialPort_Init(me->alxSerialPort);
+	if (status != Alx_Ok) { ALX_LIN_TRACE("Err"); return status; }
+
+	// Set isInit
+	me->isInit = true;
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxLin_DeInit(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// DeInit serial port
+	status = AlxSerialPort_DeInit(me->alxSerialPort);
+	if (status != Alx_Ok) { ALX_LIN_TRACE("Err"); return status; }
+
+	// Clear isInit
+	me->isInit = false;
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxLin_TxFrame(AlxLin* me, AlxLin_Payload* frame)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxLin_RxFrame(AlxLin* me, AlxLin_Payload* frame)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Return
+	return Alx_Ok;
+}
+void AlxLin_IrqHandler(AlxLin* me)
+{
+	AlxSerialPort_IrqHandler(me->alxSerialPort);
+}
+
+
+#endif	// #if defined(ALX_C_LIB)

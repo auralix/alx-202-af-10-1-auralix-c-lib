@@ -66,7 +66,8 @@ void AlxSerialPort_Ctor
 	uint16_t txTimeout_ms,
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
-	Alx_IrqPriority rxIrqPriority
+	Alx_IrqPriority rxIrqPriority,
+	bool linEnable
 )
 {
 	// Parameters
@@ -81,13 +82,23 @@ void AlxSerialPort_Ctor
 	me->rxFifoBuff = rxFifoBuff;
 	me->rxFifoBuffLen = rxFifoBuffLen;
 	me->rxIrqPriority = rxIrqPriority;
+	me->linEnable = linEnable;
 
 	// Variables
 	me->huart.Instance = uart;
 	me->huart.Init.BaudRate = (uint32_t)baudRate;
-	me->huart.Init.WordLength = dataWidth;
-	me->huart.Init.StopBits = stopBits;
-	me->huart.Init.Parity = parity;
+	if (linEnable)
+	{
+		me->huart.Init.WordLength = UART_WORDLENGTH_8B;
+		me->huart.Init.StopBits = UART_STOPBITS_1;
+		me->huart.Init.Parity = UART_PARITY_NONE;
+	}
+	else
+	{
+		me->huart.Init.WordLength = dataWidth;
+		me->huart.Init.StopBits = stopBits;
+		me->huart.Init.Parity = parity;
+	}
 	me->huart.Init.Mode = UART_MODE_TX_RX;
 	me->huart.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	me->huart.Init.OverSampling = UART_OVERSAMPLING_16;
@@ -149,7 +160,16 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 	AlxSerialPort_Periph_EnableClk(me);
 
 	// Init UART
-	if(HAL_UART_Init(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+	if (me->linEnable)
+	{
+		#if defined(ALX_STM32F0)
+		if(HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_10B) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		#endif
+	}
+	else
+	{
+		if(HAL_UART_Init(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+	}
 
 	// Enable UART RX IRQ
 	__HAL_UART_ENABLE_IT(&me->huart, UART_IT_RXNE);
@@ -198,6 +218,7 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
+	ALX_SERIAL_PORT_ASSERT(me->linEnable == false);
 
 	// Read
 	AlxGlobal_DisableIrq();
@@ -228,6 +249,12 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
 	// Write
+	if (me->linEnable)
+	{
+		#if defined(ALX_STM32F0)
+		if(HAL_LIN_SendBreak(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		#endif
+	}
 	if(HAL_UART_Transmit(&me->huart, (uint8_t*)data, len, me->txTimeout_ms) != HAL_OK)
 	{
 		ALX_SERIAL_PORT_TRACE("Err");
@@ -242,6 +269,7 @@ Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
+	ALX_SERIAL_PORT_ASSERT(me->linEnable == false);
 
 	// Return
 	return AlxSerialPort_Write(me, (const uint8_t*)str, strlen(str));
