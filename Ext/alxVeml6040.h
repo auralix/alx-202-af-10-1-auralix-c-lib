@@ -121,7 +121,7 @@ typedef union
 		uint8_t unused_7 : 1;  // bit 7 is unused
 	};
 	uint16_t raw;
-} AlxVeml6040_RegVal_0x00_Config;
+} AlxVeml6040_RegVal_0x00_CONF;
 
 
 //******************************************************************************
@@ -178,6 +178,66 @@ typedef union
 	};
 	uint8_t raw[2];
 } AlxVeml6040_RegVal_0x0B_W_DATA;
+
+
+//******************************************************************************
+// Register Group Values Unions
+//******************************************************************************
+
+
+//******************************************************************************
+// Register Structures
+//******************************************************************************
+typedef struct
+{
+	uint8_t addr;
+	uint8_t len;
+	AlxVeml6040_RegVal_0x00_CONF val;
+}AlxVeml6040_Reg_0x00_CONF;
+typedef struct
+{
+	uint8_t addr;
+	uint8_t len;
+	AlxVeml6040_RegVal_0x08_R_DATA val;
+} AlxVeml6040_Reg_0x08_R_DATA;
+typedef struct
+{
+	uint8_t addr;
+	uint8_t len;
+	AlxVeml6040_RegVal_0x09_G_DATA val;
+} AlxVeml6040_Reg_0x09_G_DATA;
+typedef struct
+{
+	uint8_t addr;
+	uint8_t len;
+	AlxVeml6040_RegVal_0x0A_B_DATA val;
+} AlxVeml6040_Reg_0x0A_B_DATA;
+typedef struct
+{
+	uint8_t addr;
+	uint8_t len;
+	AlxVeml6040_RegVal_0x0B_W_DATA val;
+} AlxVeml6040_Reg_0x0B_W_DATA;
+
+
+//******************************************************************************
+// Register Group Structures
+//******************************************************************************
+
+
+//******************************************************************************
+// Main Register Structure
+//******************************************************************************
+typedef struct
+{
+	AlxVeml6040_Reg_0x00_CONF	_0x00_CONF;
+	AlxVeml6040_Reg_0x08_R_DATA	_0x08_R_DATA;
+	AlxVeml6040_Reg_0x09_G_DATA	_0x09_G_DATA;
+	AlxVeml6040_Reg_0x0A_B_DATA	_0x0A_B_DATA;
+	AlxVeml6040_Reg_0x0B_W_DATA	_0x0B_W_DATA;
+} AlxVeml6040_Reg;
+
+
 
 
 //******************************************************************************
