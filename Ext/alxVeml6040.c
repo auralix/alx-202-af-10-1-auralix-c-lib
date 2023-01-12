@@ -158,7 +158,7 @@ Alx_Status AlxVeml6040_DeInit(AlxVeml6040* me)
 	// Set register struct values to default
 	AlxVeml6040_RegStruct_SetToDefault(me);
 
-	// Write registers - Disabled IC
+	// Write registers
 	status = AlxVeml6040_Reg_Write_All(me);
 	if (status != Alx_Ok) { ALX_VEML6040_TRACE("Err"); return status; }
 
