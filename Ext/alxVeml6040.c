@@ -155,7 +155,8 @@ Alx_Status AlxVeml6040_DeInit(AlxVeml6040* me)
 	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// TV: TODO Disable IC, so that is stops sampling light sensor
+	// Disabled IC
+	AlxVeml6040_RegStruct_SetToDefault(me);
 
 	// DeInit I2C
 	status = AlxI2c_DeInit(me->i2c);
