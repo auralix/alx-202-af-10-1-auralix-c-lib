@@ -41,6 +41,10 @@
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  */
 void AlxGlobal_DisableIrq(void)
 {
 	#if defined(ALX_MBED)
@@ -50,6 +54,10 @@ void AlxGlobal_DisableIrq(void)
 		#endif
 	#endif
 }
+
+/**
+  * @brief
+  */
 void AlxGlobal_EnableIrq(void)
 {
 	#if defined(ALX_MBED)
@@ -59,6 +67,12 @@ void AlxGlobal_EnableIrq(void)
 		#endif
 	#endif
 }
+
+/**
+  * @brief
+  * @param[in]	uint64
+  * @param[out]	str
+  */
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str)
 {
 	uint32_t num1 = uint64 / 1000000000000000UL;
@@ -78,6 +92,12 @@ void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str)
 	else
 		snprintf (str, 50, "%lu%05lu%05lu%05lu", num1, num2, num3, num4);
 }
+
+/**
+  * @brief
+  * @param[in] val
+  * @return
+  */
 uint32_t AlxGlobal_Ntohl(uint32_t val)
 {
 	uint32_t ret = (val & 0xff) << 24;

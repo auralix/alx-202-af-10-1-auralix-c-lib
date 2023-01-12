@@ -40,6 +40,13 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		valInitial
+  * @param[in]		stableTime_ms
+  */
 void AlxFiltGlitchUint32_Ctor
 (
 	AlxFiltGlitchUint32* me,
@@ -66,6 +73,13 @@ void AlxFiltGlitchUint32_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		valNew
+  * @return
+  */
 uint32_t AlxFiltGlitchUint32_Process(AlxFiltGlitchUint32* me, uint32_t valNew)
 {
 	if (me->valOld != valNew) // Change detected

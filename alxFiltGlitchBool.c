@@ -40,6 +40,14 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		valInitial
+  * @param[in]		stableTrueTime_ms
+  * @param[in]		stableFalseTime_ms
+  */
 void AlxFiltGlitchBool_Ctor
 (
 	AlxFiltGlitchBool* me,
@@ -62,6 +70,14 @@ void AlxFiltGlitchBool_Ctor
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		valInitial
+  * @param[in]		stableTrueTime_us
+  * @param[in]		stableFalseTime_us
+  */
 void AlxFiltGlitchBool_Ctor_us
 (
 	AlxFiltGlitchBool* me,
@@ -89,6 +105,14 @@ void AlxFiltGlitchBool_Ctor_us
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		in
+  * @retval			false
+  * @retval			true
+  */
 bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in)
 {
 	me->valRaw = in;
