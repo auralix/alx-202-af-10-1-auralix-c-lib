@@ -88,7 +88,7 @@ void AlxParamItem_CtorUint16
 	uint16_t valMin,
 	uint16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
-	void* enumArr,
+	uint16_t* enumArr,
 	uint8_t numOfEnums
 )
 {
@@ -114,10 +114,9 @@ void AlxParamItem_CtorUint16
 	if (me->enumArr != NULL)
 	{
 		// Check if enum number is from low to high
-		uint16_t* _enumArr = enumArr;
 		for (uint8_t i = 0; i < numOfEnums - 1; i++)
 		{
-			ALX_PARAM_ITEM_ASSERT(_enumArr[i] < _enumArr[i + 1]);	// Enums must be from low to high number
+			ALX_PARAM_ITEM_ASSERT(enumArr[i] < enumArr[i + 1]);	// Enums must be from low to high number
 		}
 
 		// Check if enum number is on the list
@@ -325,7 +324,7 @@ void AlxParamItem_CtorFloat
 	float valMin,
 	float valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
-	void* enumArr,
+	float* enumArr,
 	uint8_t numOfEnums
 )
 {
@@ -351,10 +350,9 @@ void AlxParamItem_CtorFloat
 	if (me->enumArr != NULL)
 	{
 		// Check if enum number is from low to high
-		float* _enumArr = enumArr;
 		for (uint8_t i = 0; i < numOfEnums - 1; i++)
 		{
-			ALX_PARAM_ITEM_ASSERT(_enumArr[i] < _enumArr[i + 1]);	// Enums must be from low to high number
+			ALX_PARAM_ITEM_ASSERT(enumArr[i] < enumArr[i + 1]);	// Enums must be from low to high number
 		}
 
 		// Check if enum number is on the list

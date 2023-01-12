@@ -201,7 +201,7 @@ void AlxParamItem_CtorUint16
 	uint16_t valMin,
 	uint16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
-	void* enumArr,
+	uint16_t* enumArr,
 	uint8_t numOfEnums
 );
 
@@ -364,7 +364,7 @@ void AlxParamItem_CtorFloat
 	float valMin,
 	float valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
-	void* enumArr,
+	float* enumArr,
 	uint8_t numOfEnums
 );
 
