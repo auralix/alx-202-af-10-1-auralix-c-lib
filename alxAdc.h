@@ -98,44 +98,10 @@ typedef struct { bool dummy; } AlxAdc;
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxAdc_Init(AlxAdc* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxAdc_DeInit(AlxAdc* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		ch
-  * @return
-  */
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		ch
-  * @return
-  */
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);	// MF: Optimized function
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @return
-  */
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
 
 

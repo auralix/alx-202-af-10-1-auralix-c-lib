@@ -63,22 +63,52 @@ static void AlxCanParser_BitSet(uint8_t *var, uint8_t bit, bool state);
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		byteOffset
+  * @param[in]		bitOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, bool value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset < 8);	// Byte offset out of packet range
 	ALX_CAN_PARSER_ASSERT(bitOffset < 8);		// Bit offset out of byte range
 	AlxCanParser_BitSet(&msg->data[byteOffset], bitOffset, value);
 }	// Tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		byteOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetUint8(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1)); 	// Byte offset out of packet range
 	msg->data[byteOffset] = value;
 }	// Not tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		byteOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetInt8(AlxCan_Msg* msg, uint8_t byteOffset, int8_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));  	// Byte offset out of packet range
 	msg->data[byteOffset] = (uint8_t)value ;
 }		// Not tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint16_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2)); 	// Byte offset out of packet range
@@ -99,6 +129,14 @@ void AlxCanParser_SetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	default: break;
 	}
 }	// Tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int16_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2)); 	// Byte offset out of packet range
@@ -119,6 +157,14 @@ void AlxCanParser_SetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 	default: break;
 	}
 }	// Not tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint32_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4)); 	// Byte offset out of packet range
@@ -141,6 +187,14 @@ void AlxCanParser_SetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	default: break;
 	}
 }	// Not tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int32_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));  	// Byte offset out of packet range
@@ -163,6 +217,14 @@ void AlxCanParser_SetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 	default: break;
 	}
 }	// Not tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint64_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));  	// Byte offset out of packet range
@@ -193,6 +255,14 @@ void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	default: break;
 	}
 }	// Not tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int64_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));   	// Byte offset out of packet range
@@ -223,6 +293,14 @@ void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 	default: break;
 	}
 }	// Not tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, float value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));   	// Byte offset out of packet range
@@ -250,6 +328,14 @@ void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 	default: break;
 	}
 }		// Not tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		endian
+  * @param[in]		byteOffset
+  * @param[in]		value
+  */
 void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, double value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));   	// Byte offset out of packet range
@@ -285,6 +371,15 @@ void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	default: break;
 	}
 }	// Not tested
+
+/**
+  * @brief
+  * @param[in,out]	msg
+  * @param[in]		byteOffset
+  * @param[in]		bitOffset
+  * @param[in]		nOfBits
+  * @param[in]		value
+  */
 void AlxCanParser_SetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, uint8_t nOfBits, uint8_t value)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));  	// Byte offset out of packet range
@@ -297,6 +392,15 @@ void AlxCanParser_SetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset
 		AlxCanParser_BitSet(&msg->data[byteOffset], bitOffset + i, AlxCanParser_BitGet(value, i));
 	}
 }	// Tested
+
+/**
+  * @brief
+  * @param[in]	msg
+  * @param[in]	byteOffset
+  * @param[in]	bitOffset
+  * @retval		false
+  * @retval		true
+  */
 bool AlxCanParser_GetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));  	// Byte offset out of packet range
@@ -304,16 +408,38 @@ bool AlxCanParser_GetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset)
 
 	return AlxCanParser_BitGet(msg->data[byteOffset], bitOffset);
 }	// Tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] byteOffset
+  * @return
+  */
 uint8_t AlxCanParser_GetUint8(AlxCan_Msg* msg, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1)); 	// Byte offset out of packet range
 	return msg->data[byteOffset];
 }	// Tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] byteOffset
+  * @return
+  */
 int8_t AlxCanParser_GetInt8(AlxCan_Msg* msg, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));  	// Byte offset out of packet range
 	return (int8_t)msg->data[byteOffset];
 }	// Not tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] endian
+  * @param[in] byteOffset
+  * @return
+  */
 uint16_t AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2)); 	// Byte offset out of packet range
@@ -336,6 +462,14 @@ uint16_t AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	}
 	return value;
 }	// Not Tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] endian
+  * @param[in] byteOffset
+  * @return
+  */
 int16_t	AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2));  	// Byte offset out of packet range
@@ -358,6 +492,14 @@ int16_t	AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	}
 	return (int16_t)value;
 }	// Not tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] endian
+  * @param[in] byteOffset
+  * @return
+  */
 uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));  	// Byte offset out of packet range
@@ -385,6 +527,14 @@ uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 
 	return value;
 }	// Tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] endian
+  * @param[in] byteOffset
+  * @return
+  */
 int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));  	// Byte offset out of packet range
@@ -412,6 +562,14 @@ int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 
 	return value;
 } 	// Not tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] endian
+  * @param[in] byteOffset
+  * @return
+  */
 uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));  	// Byte offset out of packet range
@@ -447,6 +605,14 @@ uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 
 	return value;
 } // Not tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] endian
+  * @param[in] byteOffset
+  * @return
+  */
 int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));  	// Byte offset out of packet range
@@ -482,6 +648,14 @@ int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 
 	return value;
 } 	// Not tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] endian
+  * @param[in] byteOffset
+  * @return
+  */
 float AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));  	// Byte offset out of packet range
@@ -509,6 +683,14 @@ float AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	}
 	return myFloat.number;
 } 	// Not tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] endian
+  * @param[in] byteOffset
+  * @return
+  */
 double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));	// Byte offset out of packet range
@@ -536,6 +718,15 @@ double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	}
 	return myDouble.number;
 }	// Not tested
+
+/**
+  * @brief
+  * @param[in] msg
+  * @param[in] byteOffset
+  * @param[in] bitOffset
+  * @param[in] nOfBits
+  * @return
+  */
 uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, uint8_t nOfBits)
 {
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));	// Byte offset out of packet range

@@ -77,124 +77,17 @@ extern "C" {
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	val
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Uint8(uint8_t* val, uint8_t valMin, uint8_t valMax);
-
-/**
-  * @brief
-  * @param[in,out]	val
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Uint16(uint16_t* val, uint16_t valMin, uint16_t valMax);
-
-/**
-  * @brief
-  * @param[in,out]	val
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Uint32(uint32_t* val, uint32_t valMin, uint32_t valMax);
-
-/**
-  * @brief
-  * @param[in,out]	val
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Uint64(uint64_t* val, uint64_t valMin, uint64_t valMax);
-
-/**
-  * @brief
-  * @param[in,out]	val
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Int8(int8_t* val, int8_t valMin, int8_t valMax);
-
-/**
-  * @brief
-  * @param[in,out]	val
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Int16(int16_t* val, int16_t valMin, int16_t valMax);
-
-/**
-  * @brief
-  * @param[in,out]	val
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Int32(int32_t* val, int32_t valMin, int32_t valMax);
-
-/**
-  * @brief
-  * @param[in,out]	val
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Int64(int64_t* val, int64_t valMin, int64_t valMax);
-
-/**
-  * @brief
-  * @param[in,out]	val
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Float(float* val, float valMin, float valMax);
-
-/**
-  * @brief
-  * @param[in,out]	val
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Double(double* val, double valMin, double valMax);
-
-/**
-  * @brief
-  * @param[in]	val
-  * @param[in]	valLenMax
-  * @retval		Alx_Ok
-  * @retval		Alx_Err
-  */
 //Alx_Status AlxBound_Arr(char* val, uint32_t valLenMax);	// TODO
-
-/**
-  * @brief
-  * @param[in,out]	valBounded
-  * @param[in,out]	val
-  * @param[in]		valMaxLenWithNullTerm
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxBound_Str(char* valBounded, char* val, uint32_t valMaxLenWithNullTerm);
 
 

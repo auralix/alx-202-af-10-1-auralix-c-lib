@@ -78,15 +78,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		channels
-  * @param[in]		numChannels
-  * @param[in]		adcClkDiv
-  * @param[in]		voltageRefP_mV
-  */
 void AlxAdcMcu_Ctor
 (
 	AlxAdc_Mcu* me,

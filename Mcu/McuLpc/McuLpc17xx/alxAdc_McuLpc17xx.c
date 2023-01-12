@@ -47,6 +47,14 @@ static ADC_CHANNEL_T AlxAdcMcu_GetChannel(AlxIoPin* pin);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		channels
+  * @param[in]		numChannels
+  * @param[in]		voltageRefP_mV
+  */
 void AlxAdcMcu_Ctor
 (
 	AlxAdc_Mcu* me,
@@ -76,6 +84,11 @@ void AlxAdcMcu_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxAdcMcu_Init(AlxAdc_Mcu* me)
 {
 	ALX_ADC_ASSERT(me->isInit == false);
@@ -91,6 +104,11 @@ void AlxAdcMcu_Init(AlxAdc_Mcu* me)
 	Chip_ADC_Init(LPC_ADC, &me->adcClkSetup);
 	Chip_ADC_SetBurstCmd(LPC_ADC, DISABLE);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
 {
 	ALX_ADC_ASSERT(me->isInit == true);
@@ -105,6 +123,13 @@ void AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
 	// #3 DeInit pin for each channel
 	for(uint8_t i = 0 ; i < me->numChannels ; i++)	{ AlxIoPin_DeInit(*(me->channels + i)); }
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		channel
+  * @return
+  */
 uint32_t AlxAdcMcu_GetVoltage_mV(AlxAdc_Mcu* me, AlxIoPin* channel)
 {
 	ALX_ADC_ASSERT(me->isInit == true);

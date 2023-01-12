@@ -80,6 +80,12 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		config
+  */
 ALX_WEAK void AlxClk_Ctor
 (
 	AlxClk* me,
@@ -145,6 +151,13 @@ ALX_WEAK void AlxClk_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
 	// Assert
@@ -235,6 +248,13 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		clk
+  * @return
+  */
 ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 {
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
@@ -266,6 +286,11 @@ ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 	ALX_CLK_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxClk_Irq_Handle(AlxClk* me)
 {
 	(void)me;

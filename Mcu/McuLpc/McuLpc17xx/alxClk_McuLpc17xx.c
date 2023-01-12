@@ -41,6 +41,11 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxClk_Ctor
 (
 	AlxClk* me
@@ -54,6 +59,11 @@ void AlxClk_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxClk_Init(AlxClk* me)
 {
 	ALX_CLK_ASSERT(me->isInit == false);
@@ -63,6 +73,11 @@ void AlxClk_Init(AlxClk* me)
 
 	me->isInit = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxClk_DeInit(AlxClk* me)
 {
 	ALX_CLK_ASSERT(me->isInit == true);

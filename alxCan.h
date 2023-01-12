@@ -98,81 +98,14 @@ typedef struct
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxCan_Init(AlxCan* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxCan_DeInit(AlxCan* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxCan_ReInit(AlxCan* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		msg
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxCan_TxMsg(AlxCan* me, AlxCan_Msg msg);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		msg
-  * @param[in]		numOfMsg
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxCan_TxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		msg
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxCan_RxMsg(AlxCan* me, AlxCan_Msg* msg);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		msg
-  * @param[in]		numOfMsg
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxCan_RxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxCan_IsErr(AlxCan* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxCan_Foreground_Handle(AlxCan* me);
 
 

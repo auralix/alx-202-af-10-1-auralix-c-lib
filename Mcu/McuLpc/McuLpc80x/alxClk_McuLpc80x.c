@@ -72,6 +72,13 @@ static void AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5(Alx
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		config
+  * @param[in]		tick
+  */
 ALX_WEAK void AlxClk_Ctor
 (
 	AlxClk* me,
@@ -120,6 +127,13 @@ ALX_WEAK void AlxClk_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
 	// Assert
@@ -162,6 +176,13 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	// #9 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		clk
+  * @return
+  */
 ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 {
 	// Assert
@@ -191,6 +212,11 @@ ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 	ALX_CLK_ASSERT(false); // We shouldn't get here
 	return 0;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxClk_Irq_Handle(AlxClk* me)
 {
 	// TODO

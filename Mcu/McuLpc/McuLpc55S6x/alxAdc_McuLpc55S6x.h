@@ -93,18 +93,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		ioPinArr
-  * @param[in]		chArr
-  * @param[in]		numOfIoPinsAndCh
-  * @param[in]		clk
-  * @param[in]		adcClk
-  * @param[in]		vRef_mV
-  * @param[in]		vRef_V
-  */
 void AlxAdc_Ctor
 (
 	AlxAdc* me,
