@@ -89,7 +89,9 @@ void AlxTempSensRtdVdiv_Ctor
   */
 Alx_Status AlxTempSensRtdVdiv_Init(AlxTempSensRtdVdiv* me)
 {
+	(void)me;
 	ALX_TEMP_SENS_RTD_VDIV_ASSERT(false);
+	return 0;
 }
 
 /**
@@ -100,7 +102,9 @@ Alx_Status AlxTempSensRtdVdiv_Init(AlxTempSensRtdVdiv* me)
   */
 Alx_Status AlxTempSensRtdVdiv_DeInit(AlxTempSensRtdVdiv* me)
 {
+	(void)me;
 	ALX_TEMP_SENS_RTD_VDIV_ASSERT(false);
+	return 0;
 }
 
 /**
