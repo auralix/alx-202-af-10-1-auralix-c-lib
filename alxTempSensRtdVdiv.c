@@ -40,6 +40,17 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		adc
+  * @param[in]		interpLin
+  * @param[in]		chAdc_Vin
+  * @param[in]		chAdc_Vout
+  * @param[in]		isResRtdLow
+  * @param[in]		resOther_kOhm
+  */
 void AlxTempSensRtdVdiv_Ctor
 (
 	AlxTempSensRtdVdiv* me,
@@ -69,14 +80,36 @@ void AlxTempSensRtdVdiv_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTempSensRtdVdiv_Init(AlxTempSensRtdVdiv* me)
 {
 	ALX_TEMP_SENS_RTD_VDIV_ASSERT(false);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTempSensRtdVdiv_DeInit(AlxTempSensRtdVdiv* me)
 {
 	ALX_TEMP_SENS_RTD_VDIV_ASSERT(false);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		temp_degC
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTempSensRtdVdiv_GetTemp_degC(AlxTempSensRtdVdiv* me, float* temp_degC)
 {
 	ALX_TEMP_SENS_RTD_VDIV_ASSERT(me->wasCtorCalled == true);

@@ -40,6 +40,24 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		memRaw
+  * @param[in]		crc
+  * @param[in]		copyAddrA
+  * @param[in]		copyAddrB
+  * @param[in]		copyLen
+  * @param[in]		nonBlockingEnable
+  * @param[in]		memSafeReadWriteNumOfTries
+  * @param[in]		memRawReadWriteNumOfTries
+  * @param[in]		memRawReadWriteTimeout_ms
+  * @param[in]		buff1
+  * @param[in]		buff1Len
+  * @param[in]		buff2
+  * @param[in]		buff2Len
+  */
 void AlxMemSafe_Ctor
 (
 	AlxMemSafe* me,
@@ -94,6 +112,15 @@ void AlxMemSafe_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 {
 	// Assert
@@ -264,6 +291,15 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 	// #4 Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 {
 	// Assert
@@ -336,6 +372,13 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 	// #4 Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxMemSafe_IsReadDone(AlxMemSafe* me)
 {
 	// Assert
@@ -344,6 +387,13 @@ bool AlxMemSafe_IsReadDone(AlxMemSafe* me)
 	// #1 Return
 	return me->isReadDone;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxMemSafe_IsReadErr(AlxMemSafe* me)
 {
 	// Assert
@@ -352,6 +402,13 @@ bool AlxMemSafe_IsReadErr(AlxMemSafe* me)
 	// #1 Return
 	return me->isReadErr;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxMemSafe_IsWriteDone(AlxMemSafe* me)
 {
 	// Assert
@@ -360,6 +417,13 @@ bool AlxMemSafe_IsWriteDone(AlxMemSafe* me)
 	// #1 Return
 	return me->isWriteDone;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxMemSafe_IsWriteErr(AlxMemSafe* me)
 {
 	// Assert

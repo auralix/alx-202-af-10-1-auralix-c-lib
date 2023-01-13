@@ -40,6 +40,25 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		adc
+  * @param[in]		multiSensAdcCh
+  * @param[in]		pwm
+  * @param[in]		pwmCh
+  * @param[in]		do_PWM
+  * @param[in]		do_INA
+  * @param[in]		do_INB
+  * @param[in]		do_SEL0
+  * @param[in]		do_SEL1
+  * @param[in]		do_SENS_EN
+  * @param[in]		breakTypeDefault
+  * @param[in]		multiSensResHigh_ohm
+  * @param[in]		multiSensResLow_ohm
+  * @param[in]		restartWaitTime_ms
+  */
 void AlxVnh7040_Ctor
 (
 	AlxVnh7040* me,
@@ -120,6 +139,11 @@ void AlxVnh7040_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxVnh7040_Init(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -148,6 +172,11 @@ void AlxVnh7040_Init(AlxVnh7040* me)
 	// #5 Set isInit
 	me->isInit = true;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxVnh7040_DeInit(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -273,6 +302,11 @@ void AlxVnh7040_Monitoring (AlxVnh7040* me)
 		}
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxVnh7040_Handle(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -390,6 +424,12 @@ void AlxVnh7040_Handle(AlxVnh7040* me)
 		ALX_VNH7040_ASSERT(false);	// We should never get here
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] duty_permil
+  */
 void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -449,6 +489,12 @@ void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil)
 		me->status = AlxVnh7040_Status_RotateCcw;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -456,6 +502,12 @@ uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me)
 
 	return me->current_mA;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 uint32_t AlxVnh7040_GetCurrentHsA_mA(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -463,6 +515,12 @@ uint32_t AlxVnh7040_GetCurrentHsA_mA(AlxVnh7040* me)
 
 	return me->currentHsA_mA;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 uint32_t AlxVnh7040_GetCurrentHsB_mA(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -470,6 +528,12 @@ uint32_t AlxVnh7040_GetCurrentHsB_mA(AlxVnh7040* me)
 
 	return me->currentHsB_mA;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 uint32_t AlxVnh7040_GetSupplyVoltage_mV(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -477,6 +541,12 @@ uint32_t AlxVnh7040_GetSupplyVoltage_mV(AlxVnh7040* me)
 
 	return me->supplyVoltage_mV;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 int32_t AlxVnh7040_GetTemp_degC(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -484,6 +554,12 @@ int32_t AlxVnh7040_GetTemp_degC(AlxVnh7040* me)
 
 	return me->temp_degC;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -491,6 +567,12 @@ void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType)
 
 	me->breakType = breakType;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] breakType
+  */
 int32_t AlxVnh7040_GetIsError (AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);

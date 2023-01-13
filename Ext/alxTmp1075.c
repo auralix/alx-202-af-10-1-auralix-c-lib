@@ -59,6 +59,16 @@ void AlxTmp1075_RegStruct_SetVal(AlxTmp1075* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		i2c
+  * @param[in]		i2cAddr
+  * @param[in]		i2cCheckWithRead
+  * @param[in]		i2cNumOfTries
+  * @param[in]		i2cTimeout_ms
+  */
 void AlxTmp1075_Ctor
 (
 	AlxTmp1075* me,
@@ -96,6 +106,13 @@ void AlxTmp1075_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTmp1075_Init(AlxTmp1075* me)
 {
 	ALX_TMP1075_ASSERT(me->isInit == false);
@@ -130,6 +147,13 @@ Alx_Status AlxTmp1075_Init(AlxTmp1075* me)
 	// #7 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTmp1075_DeInit(AlxTmp1075* me)
 {
 	ALX_TMP1075_ASSERT(me->isInit == true);
@@ -147,11 +171,24 @@ Alx_Status AlxTmp1075_DeInit(AlxTmp1075* me)
 	// #3 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxTmp1075_IsInit(AlxTmp1075* me)
 {
 	// #1 Return isInit
 	return me->isInit;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 float AlxTmp1075_GetTemp_degC(AlxTmp1075* me)
 {
 	ALX_TMP1075_ASSERT(me->isInit == true);

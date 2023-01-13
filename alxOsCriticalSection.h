@@ -77,15 +77,7 @@ extern "C" {
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  */
 void AlxOsCriticalSection_Enter(void);
-
-/**
-  * @brief
-  */
 void AlxOsCriticalSection_Exit(void);
 
 

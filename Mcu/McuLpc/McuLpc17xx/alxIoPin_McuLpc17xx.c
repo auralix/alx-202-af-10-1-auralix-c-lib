@@ -41,6 +41,18 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		mode
+  * @param[in]		func
+  * @param[in]		isOpenDrain
+  * @param[in]		dir
+  * @param[in]		val
+  */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
@@ -70,6 +82,11 @@ void AlxIoPin_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Init(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->isInit == false);
@@ -88,6 +105,11 @@ void AlxIoPin_Init(AlxIoPin* me)
 
 	AlxIoPin_Write(me, me->val);  // Set initial output value, after config
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->isInit == true);
@@ -101,14 +123,13 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	// #2 Clear isInit attribute
 	me->isInit = false;
 }
-void AlxIoPin_ReInit(AlxIoPin* me)
-{
-	ALX_IO_PIN_ASSERT(me->isInit == true);
-	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	AlxIoPin_DeInit(me);
-	AlxIoPin_Init(me);
-}
+/**
+  * @brief
+  * @param[in,out] me
+  * @retval		false
+  * @retval		true
+  */
 bool AlxIoPin_Read(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->isInit == true);
@@ -117,6 +138,12 @@ bool AlxIoPin_Read(AlxIoPin* me)
 	bool val = Chip_GPIO_GetPinState(LPC_GPIO, me->port, me->pin);
 	return val;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in]	val
+  */
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
 	(void)val;
@@ -125,6 +152,11 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 
 	Chip_GPIO_SetPinState(LPC_GPIO, me->port, me->pin, val);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Set(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->isInit == true);
@@ -132,6 +164,11 @@ void AlxIoPin_Set(AlxIoPin* me)
 
 	Chip_GPIO_SetPinState(LPC_GPIO, me->port, me->pin, true);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Reset(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->isInit == true);
@@ -139,6 +176,11 @@ void AlxIoPin_Reset(AlxIoPin* me)
 
 	Chip_GPIO_SetPinState(LPC_GPIO, me->port, me->pin, false);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Toggle(AlxIoPin* me)
 {
 	ALX_IO_PIN_ASSERT(me->isInit == true);
@@ -146,25 +188,19 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 
 	Chip_GPIO_SetPinToggle(LPC_GPIO, me->port, me->pin);
 }
-void AlxIoPin_Lock(AlxIoPin* me)
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @retval			AlxIoPin_TriState_HiZ
+  * @retval			AlxIoPin_TriState_Hi
+  * @retval			AlxIoPin_TriState_Lo
+  * @retval			AlxIoPin_TriState_Undefined
+  */
+AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 {
 	// TODO
-}
-void AlxIoPin_IrqHandler(AlxIoPin* me)
-{
-	// TODO
-}
-void AlxIoPin_Config_PullNone(AlxIoPin* me)
-{
-	// TODO
-}
-void AlxIoPin_Config_PullUp(AlxIoPin* me)
-{
-	// TODO
-}
-void AlxIoPin_Config_PullDown(AlxIoPin* me)
-{
-	// TODO
+	ALX_IO_PIN_ASSERT(false);
 }
 
 

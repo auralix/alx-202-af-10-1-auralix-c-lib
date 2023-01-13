@@ -48,6 +48,19 @@ static void AlxIoPin_SetIoconMode(AlxIoPin* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		func
+  * @param[in]		mode
+  * @param[in]		mdigiModee
+  * @param[in]		isOpenDrain
+  * @param[in]		dir
+  * @param[in]		val
+  */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
@@ -91,6 +104,11 @@ void AlxIoPin_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Init(AlxIoPin* me)
 {
 	// #1 Assert
@@ -134,6 +152,11 @@ void AlxIoPin_Init(AlxIoPin* me)
 	// #6 Set initial output value, after config
 	AlxIoPin_Write(me, me->val);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
 	// #1 Assert
@@ -152,6 +175,13 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	// #4 Reset isInit
 	me->isInit = false;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @retval		false
+  * @retval		true
+  */
 bool AlxIoPin_Read(AlxIoPin* me)
 {
 	// #1 Assert
@@ -162,6 +192,12 @@ bool AlxIoPin_Read(AlxIoPin* me)
 	if (GPIO_PinRead(GPIO, me->port, me->pin) == 1) { return true; }
 	else { return false; }
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in]	val
+  */
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
 	// #1 Assert
@@ -172,6 +208,11 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 	if (val) { GPIO_PinWrite(GPIO, me->port, me->pin, 1U); }
 	else { GPIO_PinWrite(GPIO, me->port, me->pin, 0U); }
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Set(AlxIoPin* me)
 {
 	// #1 Assert
@@ -181,6 +222,11 @@ void AlxIoPin_Set(AlxIoPin* me)
 	// #2 Set Pin
 	GPIO_PortSet(GPIO, me->port, (1U << me->pin));
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Reset(AlxIoPin* me)
 {
 	// #1 Assert
@@ -190,6 +236,11 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	// #2 Reset Pin
 	GPIO_PortClear(GPIO, me->port, (1U << me->pin));
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Toggle(AlxIoPin* me)
 {
 	// #1 Assert
@@ -199,6 +250,15 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	// #2 Toggle Pin
 	GPIO_PortToggle(GPIO, me->port, (1U << me->pin));
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @retval			AlxIoPin_TriState_HiZ
+  * @retval			AlxIoPin_TriState_Hi
+  * @retval			AlxIoPin_TriState_Lo
+  * @retval			AlxIoPin_TriState_Undefined
+  */
 AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 {
 	// Assert

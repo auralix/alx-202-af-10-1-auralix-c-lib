@@ -90,70 +90,12 @@ extern AlxTrace alxTrace;
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		threadSafe
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		threadSafe
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		str
-  * @param[in]		threadSafe
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		threadSafe
-  * @param[in]		format
-  */
 void AlxTrace_WriteFormat(AlxTrace* me, bool threadSafe, const char* format, ...);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		file
-  * @param[in]		line
-  * @param[in]		fun
-  * @param[in]		threadSafe
-  * @param[in]		format
-  */
 void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, bool threadSafe, const char* format, ...);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		smLevel
-  * @param[in]		smName
-  * @param[in]		stName
-  * @param[in]		acName
-  * @param[in]		threadSafe
-  */
 void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName, bool threadSafe);
-
-/**
-  * @brief
-  * @param[in]	smLevel
-  * @param[in]	smLevelStr
-  */
 void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr);
 
 

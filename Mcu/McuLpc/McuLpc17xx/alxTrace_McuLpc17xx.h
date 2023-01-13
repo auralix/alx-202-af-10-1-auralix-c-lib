@@ -70,16 +70,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		port
-  * @param[in]		pin
-  * @param[in]		func
-  * @param[in]		uart
-  * @param[in]		baudRate
-  */
 void AlxTrace_Ctor
 (
 	AlxTrace* me,

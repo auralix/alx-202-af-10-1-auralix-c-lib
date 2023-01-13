@@ -46,6 +46,18 @@ static bool AlxParamItem_IsEnumOnList_Float(AlxParamItem* me, float enumVal, flo
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorUint8
 (
 	AlxParamItem* me,
@@ -77,6 +89,18 @@ void AlxParamItem_CtorUint8
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorUint16
 (
 	AlxParamItem* me,
@@ -108,6 +132,18 @@ void AlxParamItem_CtorUint16
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorUint32
 (
 	AlxParamItem* me,
@@ -139,6 +175,18 @@ void AlxParamItem_CtorUint32
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorUint64
 (
 	AlxParamItem* me,
@@ -170,6 +218,18 @@ void AlxParamItem_CtorUint64
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorInt8
 (
 	AlxParamItem* me,
@@ -201,6 +261,18 @@ void AlxParamItem_CtorInt8
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorInt16
 (
 	AlxParamItem* me,
@@ -232,6 +304,18 @@ void AlxParamItem_CtorInt16
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorInt32
 (
 	AlxParamItem* me,
@@ -263,6 +347,18 @@ void AlxParamItem_CtorInt32
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorInt64
 (
 	AlxParamItem* me,
@@ -294,6 +390,18 @@ void AlxParamItem_CtorInt64
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorFloat
 (
 	AlxParamItem* me,
@@ -344,6 +452,18 @@ void AlxParamItem_CtorFloat
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorDouble
 (
 	AlxParamItem* me,
@@ -375,6 +495,15 @@ void AlxParamItem_CtorDouble
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  */
 void AlxParamItem_CtorBool
 (
 	AlxParamItem* me,
@@ -403,6 +532,19 @@ void AlxParamItem_CtorBool
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valBuff
+  * @param[in]		valDefBuff
+  * @param[in]		valBuffLen
+  * @param[in]		valOutOfRangeHandle
+  */
 void AlxParamItem_CtorArr
 (
 	AlxParamItem* me,
@@ -435,6 +577,18 @@ void AlxParamItem_CtorArr
 	// Info
 	me->wasCtorCalled = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valOutOfRangeHandle
+  * @param[in,out]	buff
+  * @param[in]		buffLen
+  */
 void AlxParamItem_CtorStr
 (
 	AlxParamItem* me,
@@ -475,6 +629,12 @@ void AlxParamItem_CtorStr
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 const char* AlxParamItem_GetKey(AlxParamItem* me)
 {
 	// Assert
@@ -483,6 +643,12 @@ const char* AlxParamItem_GetKey(AlxParamItem* me)
 	// Return
 	return me->key;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint32_t AlxParamItem_GetId(AlxParamItem* me)
 {
 	// Assert
@@ -491,6 +657,12 @@ uint32_t AlxParamItem_GetId(AlxParamItem* me)
 	// Return
 	return me->id;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint32_t AlxParamItem_GetGroupId(AlxParamItem* me)
 {
 	// Assert
@@ -499,6 +671,25 @@ uint32_t AlxParamItem_GetGroupId(AlxParamItem* me)
 	// Return
 	return me->groupId;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retva			AlxParamItem_Type_Uint8
+  * @retva			AlxParamItem_Type_Uint16
+  * @retva			AlxParamItem_Type_Uint32
+  * @retva			AlxParamItem_Type_Uint64
+  * @retva			AlxParamItem_Type_Int8
+  * @retva			AlxParamItem_Type_Int16
+  * @retva			AlxParamItem_Type_Int32
+  * @retva			AlxParamItem_Type_Int64
+  * @retva			AlxParamItem_Type_Float
+  * @retva			AlxParamItem_Type_Double
+  * @retva			AlxParamItem_Type_Bool
+  * @retva			AlxParamItem_Type_Arr
+  * @retva			AlxParamItem_Type_Str
+  * @retva			AlxParamItem_Type_None
+  */
 AlxParamItem_Type AlxParamItem_GetType(AlxParamItem* me)
 {
 	// Assert
@@ -507,6 +698,11 @@ AlxParamItem_Type AlxParamItem_GetType(AlxParamItem* me)
 	// Return
 	return me->type;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void* AlxParamItem_GetValPtr(AlxParamItem* me)
 {
 	// Assert
@@ -528,6 +724,12 @@ void* AlxParamItem_GetValPtr(AlxParamItem* me)
 		return &me->val;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint32_t AlxParamItem_GetValLen(AlxParamItem* me)
 {
 	// Assert
@@ -536,6 +738,11 @@ uint32_t AlxParamItem_GetValLen(AlxParamItem* me)
 	// Return
 	return me->valLen;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxParamItem_SetValToDef(AlxParamItem* me)
 {
 	// Assert
@@ -599,6 +806,12 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint8_t AlxParamItem_GetValUint8(AlxParamItem* me)
 {
 	// Assert
@@ -608,6 +821,12 @@ uint8_t AlxParamItem_GetValUint8(AlxParamItem* me)
 	// Return
 	return me->val.uint8;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint16_t AlxParamItem_GetValUint16(AlxParamItem* me)
 {
 	// Assert
@@ -617,6 +836,12 @@ uint16_t AlxParamItem_GetValUint16(AlxParamItem* me)
 	// Return
 	return me->val.uint16;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint32_t AlxParamItem_GetValUint32(AlxParamItem* me)
 {
 	// Assert
@@ -626,6 +851,12 @@ uint32_t AlxParamItem_GetValUint32(AlxParamItem* me)
 	// Return
 	return me->val.uint32;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint64_t AlxParamItem_GetValUint64(AlxParamItem* me)
 {
 	// Assert
@@ -635,6 +866,12 @@ uint64_t AlxParamItem_GetValUint64(AlxParamItem* me)
 	// Return
 	return me->val.uint64;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 int8_t AlxParamItem_GetValInt8(AlxParamItem* me)
 {
 	// Assert
@@ -644,6 +881,12 @@ int8_t AlxParamItem_GetValInt8(AlxParamItem* me)
 	// Return
 	return me->val.int8;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 int16_t AlxParamItem_GetValInt16(AlxParamItem* me)
 {
 	// Assert
@@ -653,6 +896,12 @@ int16_t AlxParamItem_GetValInt16(AlxParamItem* me)
 	// Return
 	return me->val.int16;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 int32_t AlxParamItem_GetValInt32(AlxParamItem* me)
 {
 	// Assert
@@ -662,6 +911,12 @@ int32_t AlxParamItem_GetValInt32(AlxParamItem* me)
 	// Return
 	return me->val.int32;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 int64_t AlxParamItem_GetValInt64(AlxParamItem* me)
 {
 	// Assert
@@ -671,6 +926,12 @@ int64_t AlxParamItem_GetValInt64(AlxParamItem* me)
 	// Return
 	return me->val.int64;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 float AlxParamItem_GetValFloat(AlxParamItem* me)
 {
 	// Assert
@@ -680,6 +941,12 @@ float AlxParamItem_GetValFloat(AlxParamItem* me)
 	// Return
 	return me->val._float;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 double AlxParamItem_GetValDouble(AlxParamItem* me)
 {
 	// Assert
@@ -689,6 +956,13 @@ double AlxParamItem_GetValDouble(AlxParamItem* me)
 	// Return
 	return me->val._double;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxParamItem_GetValBool(AlxParamItem* me)
 {
 	// Assert
@@ -698,6 +972,14 @@ bool AlxParamItem_GetValBool(AlxParamItem* me)
 	// Return
 	return me->val._bool;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val)
 {
 	// Assert
@@ -751,6 +1033,14 @@ Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val)
 {
 	// Assert
@@ -804,6 +1094,14 @@ Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val)
 {
 	// Assert
@@ -857,6 +1155,14 @@ Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValUint64(AlxParamItem* me, uint64_t val)
 {
 	// Assert
@@ -910,6 +1216,14 @@ Alx_Status AlxParamItem_SetValUint64(AlxParamItem* me, uint64_t val)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValInt8(AlxParamItem* me, int8_t val)
 {
 	// Assert
@@ -963,6 +1277,14 @@ Alx_Status AlxParamItem_SetValInt8(AlxParamItem* me, int8_t val)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValInt16(AlxParamItem* me, int16_t val)
 {
 	// Assert
@@ -1016,6 +1338,14 @@ Alx_Status AlxParamItem_SetValInt16(AlxParamItem* me, int16_t val)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValInt32(AlxParamItem* me, int32_t val)
 {
 	// Assert
@@ -1069,6 +1399,14 @@ Alx_Status AlxParamItem_SetValInt32(AlxParamItem* me, int32_t val)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val)
 {
 	// Assert
@@ -1122,6 +1460,14 @@ Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 {
 	// Assert
@@ -1194,6 +1540,14 @@ Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val)
 {
 	// Assert
@@ -1247,6 +1601,14 @@ Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val)
 {
 	// Assert
@@ -1260,6 +1622,15 @@ Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
+  * @param[in]		maxLenWithNullTerm
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_GetValUint16_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
 {
 	// Assert
@@ -1281,6 +1652,15 @@ Alx_Status AlxParamItem_GetValUint16_StrFormat(AlxParamItem* me, char* val, uint
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
+  * @param[in]		maxLenWithNullTerm
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_GetValFloat_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
 {
 	// Assert
@@ -1302,6 +1682,15 @@ Alx_Status AlxParamItem_GetValFloat_StrFormat(AlxParamItem* me, char* val, uint3
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
+  * @param[in]		maxLenWithNullTerm
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_GetValBool_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
 {
 	// Assert
@@ -1330,6 +1719,14 @@ Alx_Status AlxParamItem_GetValBool_StrFormat(AlxParamItem* me, char* val, uint32
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValUint16_StrFormat(AlxParamItem* me, char* val)
 {
 	// Assert
@@ -1346,6 +1743,14 @@ Alx_Status AlxParamItem_SetValUint16_StrFormat(AlxParamItem* me, char* val)
 	// Return
 	return AlxParamItem_SetValUint16(me, valNum);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValFloat_StrFormat(AlxParamItem* me, char* val)
 {
 	// Assert
@@ -1362,6 +1767,14 @@ Alx_Status AlxParamItem_SetValFloat_StrFormat(AlxParamItem* me, char* val)
 	// Return
 	return AlxParamItem_SetValFloat(me, valNum);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValBool_StrFormat(AlxParamItem* me, char* val)
 {
 	// Assert
@@ -1402,6 +1815,12 @@ Alx_Status AlxParamItem_SetValBool_StrFormat(AlxParamItem* me, char* val)
 	// Return
 	return AlxParamItem_SetValBool(me, valNum);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
+  */
 void AlxParamItem_GetValArr(AlxParamItem* me, void* val)
 {
 	// Assert
@@ -1411,6 +1830,12 @@ void AlxParamItem_GetValArr(AlxParamItem* me, void* val)
 	// Copy
 	memcpy(val, me->val.arr, me->valLen);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  */
 void AlxParamItem_SetValArr(AlxParamItem* me, void* val)
 {
 	// Assert
@@ -1420,6 +1845,15 @@ void AlxParamItem_SetValArr(AlxParamItem* me, void* val)
 	// Set
 	memcpy(me->val.arr, val, me->valLen);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
+  * @param[in]		maxLenWithNullTerm
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
 {
 	// Assert
@@ -1436,6 +1870,14 @@ Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWi
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 {
 	// Assert

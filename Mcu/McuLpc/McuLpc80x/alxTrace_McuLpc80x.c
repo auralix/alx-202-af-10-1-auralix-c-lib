@@ -50,6 +50,15 @@ static void AlxTrace_Periph_SelectClk(AlxTrace* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		usart
+  * @param[in]		baudRate
+  */
 void AlxTrace_Ctor
 (
 	AlxTrace* me,
@@ -93,6 +102,14 @@ void AlxTrace_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 {
 	// #1 Init SWM
@@ -112,6 +129,14 @@ Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 	// #5 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 {
 	// #1 DeInit UART
@@ -128,6 +153,15 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 	// #4 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		str
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
 {
 	// #1 Write

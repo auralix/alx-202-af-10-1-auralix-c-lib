@@ -40,6 +40,16 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		i2c
+  * @param[in]		i2cAddr
+  * @param[in]		i2cCheckWithRead
+  * @param[in]		i2cNumOfTries
+  * @param[in]		i2cTimeout_ms
+  */
 void AlxVeml6040_Ctor
 (
 	AlxVeml6040* me,
@@ -63,6 +73,13 @@ void AlxVeml6040_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_Init(AlxVeml6040* me)
 {
 	// Assert
@@ -72,6 +89,13 @@ Alx_Status AlxVeml6040_Init(AlxVeml6040* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_DeInit(AlxVeml6040* me)
 {
 	// Assert
@@ -81,6 +105,14 @@ Alx_Status AlxVeml6040_DeInit(AlxVeml6040* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		R_raw
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_GetR_raw(AlxVeml6040* me, uint16_t* R_raw)
 {
 	// Assert
@@ -91,6 +123,14 @@ Alx_Status AlxVeml6040_GetR_raw(AlxVeml6040* me, uint16_t* R_raw)
 	*R_raw = 0;
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		G_raw
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_GetG_raw(AlxVeml6040* me, uint16_t* G_raw)
 {
 	// Assert
@@ -101,6 +141,14 @@ Alx_Status AlxVeml6040_GetG_raw(AlxVeml6040* me, uint16_t* G_raw)
 	*G_raw = 0;
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		B_raw
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_GetB_raw(AlxVeml6040* me, uint16_t* B_raw)
 {
 	// Assert
@@ -111,6 +159,14 @@ Alx_Status AlxVeml6040_GetB_raw(AlxVeml6040* me, uint16_t* B_raw)
 	*B_raw = 0;
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		W_raw
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxVeml6040_GetW_raw(AlxVeml6040* me, uint16_t* W_raw)
 {
 	// Assert

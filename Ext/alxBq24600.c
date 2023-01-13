@@ -40,6 +40,14 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		do_EN
+  * @param[in]		di_nPG
+  * @param[in]		di_STAT
+  */
 void AlxBq24600_Ctor
 (
 	AlxBq24600* me,
@@ -80,6 +88,11 @@ void AlxBq24600_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBq24600_Init(AlxBq24600* me)
 {
 	ALX_BQ24600_ASSERT(me->isInit == false);
@@ -104,6 +117,11 @@ void AlxBq24600_Init(AlxBq24600* me)
 	me->nOfStatPinTransitions = 0;
 	me->isStatBlink = false;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBq24600_DeInit(AlxBq24600* me)
 {
 	ALX_BQ24600_ASSERT(me->isInit == true);
@@ -117,6 +135,11 @@ void AlxBq24600_DeInit(AlxBq24600* me)
 	// #2 Reset isInit
 	me->isInit = false;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBq24600_Handle(AlxBq24600* me)
 {
 	ALX_BQ24600_ASSERT (me->isInit == true);
@@ -173,6 +196,11 @@ void AlxBq24600_Handle(AlxBq24600* me)
 	if (AlxTimSw_Get_ms(&me->timStableStatus) >= me->STATUS_BLINK_HALFPERIOD_TIME_MAX_ms)
 		me->status = me->statusRaw;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBq24600_Enable(AlxBq24600* me)
 {
 	ALX_BQ24600_ASSERT(me->isInit == true);
@@ -180,6 +208,11 @@ void AlxBq24600_Enable(AlxBq24600* me)
 
 	AlxIoPin_Write(me->do_EN, true);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxBq24600_Disable(AlxBq24600* me)
 {
 	ALX_BQ24600_ASSERT(me->isInit == true);
@@ -187,6 +220,13 @@ void AlxBq24600_Disable(AlxBq24600* me)
 
 	AlxIoPin_Write(me->do_EN, false);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBq24600_IsBatCharging(AlxBq24600* me)
 {
 	ALX_BQ24600_ASSERT(me->isInit == true);
@@ -194,6 +234,13 @@ bool AlxBq24600_IsBatCharging(AlxBq24600* me)
 
 	return (me->status == Bq24600Status_Charging) ? true : false;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBq24600_IsBatFull(AlxBq24600* me)
 {
 	ALX_BQ24600_ASSERT(me->isInit == true);
@@ -201,6 +248,13 @@ bool AlxBq24600_IsBatFull(AlxBq24600* me)
 
 	return (me->status == Bq24600Status_BattFull) ? true : false;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBq24600_IsSleep(AlxBq24600* me)
 {
 	ALX_BQ24600_ASSERT(me->isInit == true);
@@ -208,6 +262,13 @@ bool AlxBq24600_IsSleep(AlxBq24600* me)
 
 	return (me->status == Bq24600Status_Sleep) ? true : false;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxBq24600_IsErr(AlxBq24600* me)
 {
 	ALX_BQ24600_ASSERT(me->isInit == true);

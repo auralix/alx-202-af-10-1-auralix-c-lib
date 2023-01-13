@@ -73,18 +73,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		port
-  * @param[in]		pin
-  * @param[in]		mode
-  * @param[in]		func
-  * @param[in]		isOpenDrain
-  * @param[in]		dir
-  * @param[in]		val
-  */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
