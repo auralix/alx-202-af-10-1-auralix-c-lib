@@ -180,6 +180,19 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 /**
   * @brief
   * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+ALX_WEAK Alx_Status AlxClk_DeInit(AlxClk* me)
+{
+	// TODO
+	ALX_CLK_ASSERT(false);
+	return Alx_Err;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
   * @param[in]		clk
   * @return
   */

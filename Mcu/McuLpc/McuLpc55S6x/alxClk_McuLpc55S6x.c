@@ -121,7 +121,7 @@ void AlxClk_Ctor
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxClk_Init(AlxClk* me)
+ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -183,7 +183,7 @@ Alx_Status AlxClk_Init(AlxClk* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxClk_DeInit(AlxClk* me)
+ALX_WEAK Alx_Status AlxClk_DeInit(AlxClk* me)
 {
 	//------------------------------------------------------------------------------
 	// Assert

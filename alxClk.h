@@ -98,13 +98,6 @@ typedef struct { bool dummy; } AlxClk;
 // Functions
 //******************************************************************************
 Alx_Status AlxClk_Init(AlxClk* me);
-
-	/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxClk_DeInit(AlxClk* me);
 uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk);
 void AlxClk_Irq_Handle(AlxClk* me);

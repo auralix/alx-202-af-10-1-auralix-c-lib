@@ -83,8 +83,10 @@ void AlxClk_Ctor
 /**
   * @brief
   * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
-void AlxClk_Init(AlxClk* me)
+ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
 	ALX_CLK_ASSERT(me->isInit == false);
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
@@ -116,8 +118,10 @@ void AlxClk_Init(AlxClk* me)
 /**
   * @brief
   * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
-void AlxClk_DeInit(AlxClk* me)
+ALX_WEAK Alx_Status AlxClk_DeInit(AlxClk* me)
 {
 	ALX_CLK_ASSERT(me->isInit == true);
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
@@ -127,6 +131,8 @@ void AlxClk_DeInit(AlxClk* me)
 	CLOCK_DisableClock(kCLOCK_Gpio1);
 
 	me->isInit = false;
+
+	return Alx_Ok;
 }
 
 
