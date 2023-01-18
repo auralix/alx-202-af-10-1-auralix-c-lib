@@ -41,6 +41,7 @@
 // Private Functions
 //******************************************************************************
 static bool AlxParamItem_IsEnumOnList_Float(AlxParamItem* me, float enumVal, float* enumArr, uint8_t numOfEnums);
+static bool AlxParamItem_IsEnumOnList_Uint16(AlxParamItem* me, uint16_t enumVal, uint16_t* enumArr, uint8_t numOfEnums);
 
 
 //******************************************************************************
@@ -110,7 +111,9 @@ void AlxParamItem_CtorUint16
 	uint16_t valDef,
 	uint16_t valMin,
 	uint16_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	uint16_t* enumArr,
+	uint8_t numOfEnums
 )
 {
 	// Parameters
@@ -123,11 +126,28 @@ void AlxParamItem_CtorUint16
 	me->valMax.uint16 = valMax;
 	me->valLen = sizeof(uint16_t);
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
+	me->enumArr = enumArr;
+	me->numOfEnums = numOfEnums;
 	me->buff = ALX_NULL_PTR;
 	me->buffLen = ALX_NULL;
 
 	// Variables
 	me->val.uint16 = valDef;
+
+	// Check if enum
+	if (me->enumArr != NULL)
+	{
+		// Check if enum number is from low to high
+		for (uint8_t i = 0; i < numOfEnums - 1; i++)
+		{
+			ALX_PARAM_ITEM_ASSERT(enumArr[i] < enumArr[i + 1]);	// Enums must be from low to high number
+		}
+
+		// Check if enum number is on the list
+		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList_Uint16(me, valDef, enumArr, numOfEnums) == true);
+		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList_Uint16(me, valMin, enumArr, numOfEnums) == true);
+		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList_Uint16(me, valMax, enumArr, numOfEnums) == true);
+	}
 
 	// Info
 	me->wasCtorCalled = true;
@@ -1051,6 +1071,25 @@ Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val)
 	Alx_Status status = Alx_Err;
 	uint16_t _val = val;
 
+	// Check if enum
+	if (me->enumArr != NULL)
+	{
+		// Check if enum is on the list
+		bool isEnumOnList = AlxParamItem_IsEnumOnList_Uint16(me, _val, me->enumArr, me->numOfEnums);
+		if (isEnumOnList == false)
+		{
+			// If handle assert selected, then assert, else return
+			if (me->valOutOfRangeHandle == AlxParamItem_ValOutOfRangeHandle_Assert)
+			{
+				ALX_PARAM_ITEM_ASSERT(false);
+				status = Alx_Err;
+			}
+
+			// Return
+			return AlxParamItem_ErrEnum;
+		}
+	}
+
 	// Handle value out of range
 	switch (me->valOutOfRangeHandle)
 	{
@@ -1937,6 +1976,21 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static bool AlxParamItem_IsEnumOnList_Uint16(AlxParamItem* me, uint16_t enumVal, uint16_t* enumArr, uint8_t numOfEnums)
+{
+	// Check if enum number is on the list
+	for (uint8_t i = 0; i < numOfEnums; i++)
+	{
+		if (enumVal == enumArr[i])
+		{
+			// Return
+			return true;	// Number is on the list
+		}
+	}
+
+	// Return
+	return false;	// Number is NOT on the list
+}
 static bool AlxParamItem_IsEnumOnList_Float(AlxParamItem* me, float enumVal, float* enumArr, uint8_t numOfEnums)
 {
 	// Check if enum number is on the list
