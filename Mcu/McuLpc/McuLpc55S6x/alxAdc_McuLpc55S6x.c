@@ -51,6 +51,18 @@ static lpadc_sample_channel_mode_t AlxAdc_SetSampleChannelMode(AlxAdc* me, Alx_C
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		ioPinArr
+  * @param[in]		chArr
+  * @param[in]		numOfIoPinsAndCh
+  * @param[in]		clk
+  * @param[in]		adcClk
+  * @param[in]		vRef_mV
+  * @param[in]		vRef_V
+  */
 void AlxAdc_Ctor
 (
 	AlxAdc* me,
@@ -149,6 +161,13 @@ void AlxAdc_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdc_Init(AlxAdc* me)
 {
 	// Assert
@@ -190,6 +209,13 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	// #9 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdc_DeInit(AlxAdc* me)
 {
 	// Assert
@@ -212,6 +238,13 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	// #5 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		ch
+  * @return
+  */
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 {
 	// Assert
@@ -241,6 +274,13 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	return ALX_NULL;
 	#endif
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		ch
+  * @return
+  */
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 {
 	// Assert
@@ -270,6 +310,12 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 	return ALX_NULL;
 	#endif
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
 	// Assert

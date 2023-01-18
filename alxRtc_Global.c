@@ -57,6 +57,15 @@ static uint8_t AlxRtc_MonthDaysTable[2][12] =
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] rtcTick_ns
+  * @param[in] ms
+  * @param[in] us
+  * @param[in] ns
+  * @return
+  */
 uint64_t AlxRtc_MsUsNsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us, uint16_t ns)
 {
 	ALX_RTC_GLOBAL_ASSERT(ms <= 999);
@@ -67,14 +76,37 @@ uint64_t AlxRtc_MsUsNsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us, uint16
 	uint64_t _subSec = _ns / rtcTick_ns;
 	return _subSec;
 }
+
+/**
+  * @brief
+  * @param[in] rtcTick_ns
+  * @param[in] ms
+  * @param[in] us
+  * @return
+  */
 uint64_t AlxRtc_MsUsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us)
 {
 	return AlxRtc_MsUsNsToNs(rtcTick_ns, ms, us, 0);	// Round to lower integer
 }
+
+/**
+  * @brief
+  * @param[in] rtcTick_ns
+  * @param[in] ms
+  * @return
+  */
 uint64_t AlxRtc_MsToNs(uint64_t rtcTick_ns, uint16_t ms)
 {
 	return AlxRtc_MsUsNsToNs(rtcTick_ns, ms, 0, 0);	// Round to lower integer
 }
+
+/**
+  * @brief
+  * @param[in] ms
+  * @param[in] us
+  * @param[in] ns
+  * @return
+  */
 float AlxRtc_MsUsNsToSecFract(uint16_t ms, uint16_t us, uint16_t ns)
 {
 	ALX_RTC_GLOBAL_ASSERT(ms <= 999);
@@ -88,6 +120,15 @@ float AlxRtc_MsUsNsToSecFract(uint16_t ms, uint16_t us, uint16_t ns)
 
 	return secFract;
 }
+
+/**
+  * @brief
+  * @param[in]	rtcTick_ns
+  * @param[in]	in_ns
+  * @param[out]	ms
+  * @param[out]	us
+  * @param[out]	ns
+  */
 void AlxRtc_NsToMsUsNs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms, uint16_t* us, uint16_t* ns)
 {
 	ALX_RTC_GLOBAL_ASSERT((rtcTick_ns * in_ns) <= 999999999);
@@ -118,17 +159,40 @@ void AlxRtc_NsToMsUsNs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms, uint16
 	*us = (uint16_t)_us;
 	*ns = (uint16_t)_ns;
 }
+
+/**
+  * @brief
+  * @param[in]	rtcTick_ns
+  * @param[in]	in_ns
+  * @param[out]	ms
+  * @param[out]	us
+  */
 void AlxRtc_NsToMsUs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms, uint16_t* us)
 {
 	uint16_t ns = 0;	// Round to lower integer
 	AlxRtc_NsToMsUsNs(rtcTick_ns, in_ns, ms, us, &ns);
 }
+
+/**
+  * @brief
+  * @param[in]	rtcTick_ns
+  * @param[in]	in_ns
+  * @param[out]	ms
+  */
 void AlxRtc_NsToMs(uint64_t rtcTick_ns, uint64_t in_ns, uint16_t* ms)
 {
 	uint16_t ns = 0;	// Round to lower integer
 	uint16_t us = 0;	// Round to lower integer
 	AlxRtc_NsToMsUsNs(rtcTick_ns, in_ns, ms, &us, &ns);
 }
+
+/**
+  * @brief
+  * @param[in]	secFract
+  * @param[out]	ms
+  * @param[out]	us
+  * @param[out]	ns
+  */
 void AlxRtc_SecFractToMsUsNs(float secFract, uint16_t* ms, uint16_t* us, uint16_t* ns)
 {
 	ALX_RTC_GLOBAL_ASSERT((0.f <= secFract) && (secFract < 1.f));
@@ -160,6 +224,12 @@ void AlxRtc_SecFractToMsUsNs(float secFract, uint16_t* ms, uint16_t* us, uint16_
 	*us = (uint16_t)_us;
 	*ns = (uint16_t)_ns;
 }
+
+/**
+  * @brief
+  * @param[in] unixTime_ns
+  * @return
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeNsToDateTime(uint64_t unixTime_ns)
 {
 	ALX_RTC_GLOBAL_ASSERT(946684800000000000 <= unixTime_ns);	// Must be larger than: Date and time (GMT): Saturday, January 1, 2000 0:00:00
@@ -272,18 +342,42 @@ AlxRtc_DateTime AlxRtc_UnixTimeNsToDateTime(uint64_t unixTime_ns)
 	// Return
 	return dateTime;
 }
+
+/**
+  * @brief
+  * @param[in] unixTime_us
+  * @return
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeUsToDateTime(uint64_t unixTime_us)
 {
 	return AlxRtc_UnixTimeNsToDateTime(unixTime_us * 1000);
 }
+
+/**
+  * @brief
+  * @param[in] unixTime_ms
+  * @return
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeMsToDateTime(uint64_t unixTime_ms)
 {
 	return AlxRtc_UnixTimeNsToDateTime(unixTime_ms * 1000000);
 }
+
+/**
+  * @brief
+  * @param[in] unixTime_sec
+  * @return
+  */
 AlxRtc_DateTime AlxRtc_UnixTimeSecToDateTime(uint64_t unixTime_sec)
 {
 	return AlxRtc_UnixTimeNsToDateTime(unixTime_sec * 1000000000);
 }
+
+/**
+  * @brief
+  * @param[in] dateTime
+  * @return
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeNs(AlxRtc_DateTime dateTime)
 {
 	ALX_RTC_GLOBAL_ASSERT(dateTime.yr <= 99);
@@ -328,14 +422,32 @@ uint64_t AlxRtc_DateTimeToUnixTimeNs(AlxRtc_DateTime dateTime)
 
 	return nsSinceEpoch;
 }
+
+/**
+  * @brief
+  * @param[in] dateTime
+  * @return
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeUs(AlxRtc_DateTime dateTime)
 {
 	return AlxRtc_DateTimeToUnixTimeNs(dateTime) / 1000ull;
 }
+
+/**
+  * @brief
+  * @param[in] dateTime
+  * @return
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeMs(AlxRtc_DateTime dateTime)
 {
 	return AlxRtc_DateTimeToUnixTimeNs(dateTime) / 1000000ull;
 }
+
+/**
+  * @brief
+  * @param[in] dateTime
+  * @return
+  */
 uint64_t AlxRtc_DateTimeToUnixTimeSec(AlxRtc_DateTime dateTime)
 {
 	return AlxRtc_DateTimeToUnixTimeNs(dateTime) / 1000000000ull;

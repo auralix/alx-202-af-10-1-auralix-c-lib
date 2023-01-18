@@ -58,6 +58,21 @@ static bool AlxAdc_IsClkOk(AlxAdc* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		adc
+  * @param[in]		ioPinArr
+  * @param[in]		numOfIoPins
+  * @param[in]		chArr
+  * @param[in]		numOfCh
+  * @param[in]		clk
+  * @param[in]		adcClk
+  * @param[in]		samplingTime
+  * @param[in]		isVrefInt_V
+  * @param[in]		vrefExt_V
+  */
 void AlxAdc_Ctor
 (
 	AlxAdc* me,
@@ -452,6 +467,13 @@ void AlxAdc_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdc_Init(AlxAdc* me)
 {
 	// Assert
@@ -509,6 +531,13 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdc_DeInit(AlxAdc* me)
 {
 	// Assert
@@ -541,6 +570,13 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		ch
+  * @return
+  */
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 {
 	// Assert
@@ -576,6 +612,13 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	ALX_ADC_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		ch
+  * @return
+  */
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 {
 	// Assert
@@ -606,6 +649,12 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 	ALX_ADC_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
 	// Assert

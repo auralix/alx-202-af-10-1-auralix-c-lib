@@ -93,15 +93,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		xPointArr
-  * @param[in]		yPointArr
-  * @param[in]		numOfArrPoints
-  * @param[in]		isisXpointArrRising
-  */
 void AlxInterpLin_Ctor
 (
 	AlxInterpLin* me,
@@ -115,23 +106,7 @@ void AlxInterpLin_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in]	me
-  * @param[in]	x
-  * @param[out] y
-  * @retval		Alx_Ok
-  * @retval		Alx_Err
-  */
 Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* y);
-
-/**
-  * @brief
-  * @param[in] me
-  * @param[in] x
-  * @return
-  */
 float AlxInterpLin_GetY(AlxInterpLin* me, float x);
 
 

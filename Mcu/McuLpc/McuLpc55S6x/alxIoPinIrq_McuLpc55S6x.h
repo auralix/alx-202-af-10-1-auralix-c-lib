@@ -73,15 +73,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		ioPin
-  * @param[in]		irqPin
-  * @param[in]		irqType
-  * @param[in]		irqPriority
-  */
 void AlxIoPinIrq_Ctor
 (
 	AlxIoPinIrq* me,

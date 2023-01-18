@@ -40,6 +40,13 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		di_STAT
+  * @param[in]		di_STAT_TriState
+  */
 void AlxMcp73831_Ctor
 (
 	AlxMcp73831* me,
@@ -65,6 +72,11 @@ void AlxMcp73831_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxMcp73831_Init(AlxMcp73831* me)
 {
 	// Assert
@@ -77,6 +89,11 @@ void AlxMcp73831_Init(AlxMcp73831* me)
 	// Set isInit
 	me->isInit = true;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxMcp73831_DeInit(AlxMcp73831* me)
 {
 	// Assert
@@ -89,6 +106,15 @@ void AlxMcp73831_DeInit(AlxMcp73831* me)
 	// Reset isInit
 	me->isInit = false;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			AlxMcp73831_St_Err
+  * @retval			AlxMcp73831_St_Shutdown
+  * @retval			AlxMcp73831_St_Charging
+  * @retval			AlxMcp73831_St_Standby
+  */
 AlxMcp73831_St AlxMcp73831_GetSt(AlxMcp73831* me)
 {
 	// Assert

@@ -118,15 +118,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		di_nRESET
-  * @param[in]		do_nFAULT
-  * @param[in]		do_nCLIP_OTW
-  * @param[in]		waitTime_ReEnable_ms
-  */
 void AlxTpa3255_Ctor
 (
 	AlxTpa3255* me,
@@ -140,79 +131,16 @@ void AlxTpa3255_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxTpa3255_Init(AlxTpa3255* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxTpa3255_DeInit(AlxTpa3255* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxTpa3255_Handle(AlxTpa3255* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxTpa3255_Enable(AlxTpa3255* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxTpa3255_Disable(AlxTpa3255* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxTpa3255_IsErrAsserted(AlxTpa3255* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxTpa3255_IsWarningAsserted(AlxTpa3255* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxTpa3255_WasErrAsserted(AlxTpa3255* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxTpa3255_WasWarningAsserted(AlxTpa3255* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxTpa3255_ClearWasErrAsserted(AlxTpa3255* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxTpa3255_ClearWasWarningAsserted(AlxTpa3255* me);
 
 

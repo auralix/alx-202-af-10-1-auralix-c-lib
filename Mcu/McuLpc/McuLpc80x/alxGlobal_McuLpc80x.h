@@ -84,21 +84,7 @@ extern "C" {
 //******************************************************************************
 // IoPin Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in] pin
-  * @param[in] port
-  * @return
-  */
 uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port);
-
-/**
-  * @brief
-  * @param[in] pin
-  * @param[in] port
-  * @param[in] mode
-  */
 void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode);
 
 

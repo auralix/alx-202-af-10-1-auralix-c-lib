@@ -63,6 +63,15 @@ void AlxIoPinIrq_Foreground_Callback_Pin7();
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		ioPin
+  * @param[in]		irqPin
+  * @param[in]		irqType
+  * @param[in]		irqPriority
+  */
 void AlxIoPinIrq_Ctor
 (
 	AlxIoPinIrq* me,
@@ -94,6 +103,11 @@ void AlxIoPinIrq_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 {
 	// Assert
@@ -124,6 +138,11 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 	NVIC_SetPriority(irqType, (uint32_t)me->irqPriority);					// MF: Set IRQ Priority
 	PINT_EnableCallbackByIndex(PINT, me->irqPin);							// MF: Enable IRQ
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 {
 	// Assert

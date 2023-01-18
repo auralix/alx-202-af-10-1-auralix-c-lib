@@ -111,13 +111,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		paramGroupArr
-  * @param[in]		numOfParamGroups
-  */
 void AlxParamStore_Ctor
 (
 	AlxParamStore* me,
@@ -129,29 +122,8 @@ void AlxParamStore_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		status
-  * @param[in]		numOfParamGroups
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* status, uint32_t numOfParamGroups);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  */
 void AlxParamStore_Handle(AlxParamStore* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxParamStore_IsErr(AlxParamStore* me);
 
 

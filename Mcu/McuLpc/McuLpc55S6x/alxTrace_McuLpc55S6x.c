@@ -51,6 +51,15 @@ static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		usart
+  * @param[in]		baudRate
+  */
 void AlxTrace_Ctor
 (
 	AlxTrace* me,
@@ -101,6 +110,14 @@ void AlxTrace_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 {
 	// Lock Mutex
@@ -128,6 +145,14 @@ Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 {
 	// Lock Mutex
@@ -155,6 +180,15 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		str
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
 {
 	// Lock Mutex

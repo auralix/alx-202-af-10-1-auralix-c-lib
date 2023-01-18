@@ -69,14 +69,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		mainClkSource
-  * @param[in]		clkFreq
-  * @param[in]		divider
-  */
 void AlxClk_Ctor
 (
 	AlxClk* me,

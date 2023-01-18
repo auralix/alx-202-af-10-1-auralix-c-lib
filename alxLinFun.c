@@ -49,6 +49,18 @@ static int32_t Get_Y_Int(AlxLinFunInt* me, int32_t x);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		x1
+  * @param[in]		point1_y
+  * @param[in]		point2_x
+  * @param[in]		point2_y
+  * @param[in]		min
+  * @param[in]		max
+  * @param[in]		isLimitOnX
+  */
 void AlxLinFun_Ctor
 (
 	AlxLinFun *me,
@@ -80,6 +92,18 @@ void AlxLinFun_Ctor
 	// Check if min is smaller than max
 	ALX_LIN_FUN_ASSERT(me->min < me->max);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		x1
+  * @param[in]		point1_y
+  * @param[in]		point2_x
+  * @param[in]		point2_y
+  * @param[in]		min
+  * @param[in]		max
+  * @param[in]		isLimitOnX
+  */
 void AlxLinFunInt_Ctor
 (
 	AlxLinFunInt *me,
@@ -112,6 +136,15 @@ void AlxLinFunInt_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in]	me
+  * @param[in]	x
+  * @param[out]	y
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxLinFun_GetX_WithStatus(AlxLinFun* me, float y, float* x)
 {
 	ALX_LIN_FUN_ASSERT(me->wasCtorCalled);
@@ -155,6 +188,15 @@ Alx_Status AlxLinFun_GetX_WithStatus(AlxLinFun* me, float y, float* x)
 		}
 	}
 }
+
+/**
+  * @brief
+  * @param[in]	me
+  * @param[in]	y
+  * @param[out]	x
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxLinFun_GetY_WithStatus(AlxLinFun* me, float x, float* y)
 {
 	ALX_LIN_FUN_ASSERT(me->wasCtorCalled);
@@ -198,6 +240,13 @@ Alx_Status AlxLinFun_GetY_WithStatus(AlxLinFun* me, float x, float* y)
 		}
 	}
 }
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] x
+  * @return
+  */
 float AlxLinFun_GetY(AlxLinFun* me, float x) // Return float, ignore Alx_Status
 {
 	ALX_LIN_FUN_ASSERT(me->wasCtorCalled);
@@ -206,6 +255,13 @@ float AlxLinFun_GetY(AlxLinFun* me, float x) // Return float, ignore Alx_Status
 	AlxLinFun_GetY_WithStatus(me, x, &y);
 	return y;
 }
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] y
+  * @return
+  */
 float AlxLinFun_GetX(AlxLinFun* me, float y) // Return float, ignore Alx_Status
 {
 	ALX_LIN_FUN_ASSERT(me->wasCtorCalled);
@@ -214,6 +270,15 @@ float AlxLinFun_GetX(AlxLinFun* me, float y) // Return float, ignore Alx_Status
 	AlxLinFun_GetX_WithStatus(me, y, &x);
 	return x;
 }
+
+/**
+  * @brief
+  * @param[in]	me
+  * @param[in]	x
+  * @param[out]	y
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y)
 {
 	ALX_LIN_FUN_ASSERT(me->wasCtorCalled);
@@ -257,6 +322,13 @@ Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y)
 		}
 	}
 }
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] x
+  * @return
+  */
 int32_t AlxLinFunInt_GetY(AlxLinFunInt* me, int32_t x) // Return float, ignore Alx_Status
 {
 	ALX_LIN_FUN_ASSERT(me->wasCtorCalled);

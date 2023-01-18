@@ -51,6 +51,14 @@ static void AlxClk_SetExtClk(AlxClk* me, bool sysOsc);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		mainClkSource
+  * @param[in]		clkFreq
+  * @param[in]		divider
+  */
 void AlxClk_Ctor
 (
 	AlxClk* me,
@@ -71,7 +79,14 @@ void AlxClk_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxClk_Init(AlxClk* me)
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
 	ALX_CLK_ASSERT(me->isInit == false);
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
@@ -99,7 +114,14 @@ void AlxClk_Init(AlxClk* me)
 	POWER_EnbaleLPO(true);
 	//POWER_EnbaleLPOInDeepPowerDownMode(true);
 }
-void AlxClk_DeInit(AlxClk* me)
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+ALX_WEAK Alx_Status AlxClk_DeInit(AlxClk* me)
 {
 	ALX_CLK_ASSERT(me->isInit == true);
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
@@ -109,6 +131,8 @@ void AlxClk_DeInit(AlxClk* me)
 	CLOCK_DisableClock(kCLOCK_Gpio1);
 
 	me->isInit = false;
+
+	return Alx_Ok;
 }
 
 

@@ -40,6 +40,13 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		volMin_dB
+  * @param[in]		volMax_dB
+  */
 void AlxAudioVol_Ctor
 (
 	AlxAudioVol* me,
@@ -63,6 +70,13 @@ void AlxAudioVol_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		inSample
+  * @return
+  */
 float AlxAudioVol_Process(AlxAudioVol* me, float inSample)
 {
 	ALX_AUDIO_VOL_ASSERT((-1.f <= inSample) && (inSample <= 1.f));
@@ -77,6 +91,12 @@ float AlxAudioVol_Process(AlxAudioVol* me, float inSample)
 	// #3 Return
 	return outSample;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		vol_pct
+  */
 void AlxAudioVol_Set_pct(AlxAudioVol* me, float vol_pct)
 {
 	ALX_AUDIO_VOL_ASSERT((0.f <= vol_pct) && (vol_pct <= me->pctMax));
@@ -95,6 +115,12 @@ void AlxAudioVol_Set_pct(AlxAudioVol* me, float vol_pct)
 		AlxAudioVol_Set_dB(me, vol_dB);
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		vol_dB
+  */
 void AlxAudioVol_Set_dB(AlxAudioVol* me, float vol_dB)
 {
 	ALX_AUDIO_VOL_ASSERT((me->volMin_dB <= vol_dB) && (vol_dB <= me->volMax_dB));

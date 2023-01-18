@@ -53,6 +53,22 @@ static void AlxSerialPort_Periph_DisableRxIrq(AlxSerialPort* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		uart
+  * @param[in]		do_TX
+  * @param[in]		di_RX
+  * @param[in]		baudRate
+  * @param[in]		dataWidth
+  * @param[in]		stopBits
+  * @param[in]		parity
+  * @param[in]		txTimeout_ms
+  * @param[in]		rxFifoBuff
+  * @param[in]		rxFifoBuffLen
+  * @param[in]		rxIrqPriority
+  */
 void AlxSerialPort_Ctor
 (
 	AlxSerialPort* me,
@@ -140,6 +156,13 @@ void AlxSerialPort_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 {
 	// Assert
@@ -181,6 +204,13 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 {
 	// Assert
@@ -213,6 +243,15 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 {
 	// Assert
@@ -228,6 +267,17 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		str
+  * @param[in]		delim
+  * @param[in]		maxLen
+  * @param[out]		numRead
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead)
 {
 	// Assert
@@ -242,6 +292,15 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len)
 {
 	// Assert
@@ -264,6 +323,14 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		str
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
 {
 	// Assert
@@ -274,6 +341,11 @@ Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
 	// Return
 	return AlxSerialPort_Write(me, (const uint8_t*)str, strlen(str));
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 {
 	#if defined(ALX_STM32F4)

@@ -91,17 +91,7 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxIoPinIrq_Init(AlxIoPinIrq* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me);
 
 

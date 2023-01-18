@@ -123,14 +123,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		do_EN
-  * @param[in]		di_nPG
-  * @param[in]		di_STAT
-  */
 void AlxBq24600_Ctor
 (
 	AlxBq24600* me,
@@ -143,67 +135,14 @@ void AlxBq24600_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBq24600_Init(AlxBq24600* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBq24600_DeInit(AlxBq24600* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBq24600_Handle(AlxBq24600* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBq24600_Enable(AlxBq24600* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBq24600_Disable(AlxBq24600* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBq24600_IsBatCharging(AlxBq24600* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBq24600_IsBatFull(AlxBq24600* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBq24600_IsSleep(AlxBq24600* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBq24600_IsErr(AlxBq24600* me);
 
 

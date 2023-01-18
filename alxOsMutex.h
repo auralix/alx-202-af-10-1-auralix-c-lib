@@ -66,11 +66,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxOsMutex_Ctor
 (
 	AlxOsMutex* me
@@ -80,25 +75,8 @@ void AlxOsMutex_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in] me
-  */
 void AlxOsMutex_Lock(AlxOsMutex* me);
-
-/**
-  * @brief
-  * @param[in] me
-  */
 void AlxOsMutex_Unlock(AlxOsMutex* me);
-
-/**
-  * @brief
-  * @param[in]	me
-  * @retval		false
-  * @retval		true
-  */
 bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me);	// TV: Not tested
 
 

@@ -104,16 +104,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  * @param[in] defaultTrackPtr
-  * @param[in] defaultTrackLen_Byte
-  * @param[in] defaultTrackStartOffset_Sample
-  * @param[in] defaultTrackEncoding
-  * @param[in] isDefaultTrackMono
-  */
 void AlxAudioPlayer_Ctor
 (
 	AlxAudioPlayer* me,
@@ -128,94 +118,18 @@ void AlxAudioPlayer_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  * @param[in] trackPtr
-  * @param[in] len_Byte
-  * @param[in] startOffset_Sample
-  * @param[in] encoding
-  * @param[in] isMono
-  */
 void AlxAudioPlayer_LoadTrack(AlxAudioPlayer* me, const uint8_t* trackPtr, uint32_t len_Byte, uint32_t startOffset_Sample, AlxAudio_Encoding encoding, bool isMono);
-
-/**
-  * @brief
-  * @param[in,out] me
-  * @return
-  */
 float AlxAudioPlayer_GetSampleL(AlxAudioPlayer* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  * @return
-  */
 float AlxAudioPlayer_GetSampleR(AlxAudioPlayer* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  * @return
-  */
 float AlxAudioPlayer_GetSampleMono(AlxAudioPlayer* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxAudioPlayer_IncSampleOffset(AlxAudioPlayer* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxAudioPlayer_Play(AlxAudioPlayer* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxAudioPlayer_Stop(AlxAudioPlayer* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxAudioPlayer_Pause(AlxAudioPlayer* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxAudioPlayer_Replay(AlxAudioPlayer* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxAudioPlayer_LoopOn(AlxAudioPlayer* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxAudioPlayer_LoopOff(AlxAudioPlayer* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		isOn
-  */
 void AlxAudioPlayer_LoopConfig(AlxAudioPlayer* me, bool isOn);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxAudioPlayer_IsPlaying(AlxAudioPlayer* me);
 
 

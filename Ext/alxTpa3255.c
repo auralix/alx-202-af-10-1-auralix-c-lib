@@ -40,6 +40,15 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		di_nRESET
+  * @param[in]		do_nFAULT
+  * @param[in]		do_nCLIP_OTW
+  * @param[in]		waitTime_ReEnable_ms
+  */
 void AlxTpa3255_Ctor
 (
 	AlxTpa3255* me,
@@ -78,6 +87,11 @@ void AlxTpa3255_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_Init(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == false);
@@ -91,6 +105,11 @@ void AlxTpa3255_Init(AlxTpa3255* me)
 	// #2 Set isInit
 	me->isInit = true;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_DeInit(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
@@ -104,6 +123,11 @@ void AlxTpa3255_DeInit(AlxTpa3255* me)
 	// #2 Reset isInit
 	me->isInit = false;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_Handle(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
@@ -185,6 +209,11 @@ void AlxTpa3255_Handle(AlxTpa3255* me)
 		AlxIoPin_Write(me->do_nRESET, true);
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_Enable(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
@@ -192,6 +221,11 @@ void AlxTpa3255_Enable(AlxTpa3255* me)
 
 	AlxIoPin_Write(me->do_nRESET, true);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_Disable(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
@@ -199,6 +233,13 @@ void AlxTpa3255_Disable(AlxTpa3255* me)
 
 	AlxIoPin_Write(me->do_nRESET, false);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxTpa3255_IsErrAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
@@ -206,6 +247,13 @@ bool AlxTpa3255_IsErrAsserted(AlxTpa3255* me)
 
 	return (AlxIoPin_Read(me->di_nFAULT)) ? false : true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxTpa3255_IsWarningAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
@@ -213,6 +261,13 @@ bool AlxTpa3255_IsWarningAsserted(AlxTpa3255* me)
 
 	return (AlxIoPin_Read(me->di_nCLIP_OTW)) ? false : true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxTpa3255_WasErrAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
@@ -220,6 +275,13 @@ bool AlxTpa3255_WasErrAsserted(AlxTpa3255* me)
 
 	return me->wasErrAsserted;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxTpa3255_WasWarningAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
@@ -227,6 +289,11 @@ bool AlxTpa3255_WasWarningAsserted(AlxTpa3255* me)
 
 	return me->wasWarningAsserted;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_ClearWasErrAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);
@@ -234,6 +301,11 @@ void AlxTpa3255_ClearWasErrAsserted(AlxTpa3255* me)
 
 	me->wasErrAsserted = false;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxTpa3255_ClearWasWarningAsserted(AlxTpa3255* me)
 {
 	ALX_TPA3255_ASSERT(me->isInit == true);

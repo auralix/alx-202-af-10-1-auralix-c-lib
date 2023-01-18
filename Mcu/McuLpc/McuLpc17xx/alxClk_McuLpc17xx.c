@@ -41,6 +41,11 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxClk_Ctor
 (
 	AlxClk* me
@@ -54,7 +59,14 @@ void AlxClk_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxClk_Init(AlxClk* me)
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
 	ALX_CLK_ASSERT(me->isInit == false);
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
@@ -62,8 +74,17 @@ void AlxClk_Init(AlxClk* me)
 	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_GPIO);
 
 	me->isInit = true;
+
+	return Alx_Ok;
 }
-void AlxClk_DeInit(AlxClk* me)
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+ALX_WEAK Alx_Status AlxClk_DeInit(AlxClk* me)
 {
 	ALX_CLK_ASSERT(me->isInit == true);
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
@@ -71,6 +92,8 @@ void AlxClk_DeInit(AlxClk* me)
 	Chip_Clock_DisablePeriphClock(SYSCTL_CLOCK_GPIO);
 
 	me->isInit = false;
+
+	return Alx_Ok;
 }
 
 

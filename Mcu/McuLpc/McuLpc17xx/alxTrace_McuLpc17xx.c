@@ -41,6 +41,16 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		func
+  * @param[in]		uart
+  * @param[in]		baudRate
+  */
 void AlxTrace_Ctor
 (
 	AlxTrace* me,
@@ -66,7 +76,15 @@ void AlxTrace_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxTrace_Init(AlxTrace* me)
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 {
 	// GPIO //
 	Chip_IOCON_PinMux(LPC_IOCON, me->port, me->pin, IOCON_MODE_INACT, me->func);
@@ -83,13 +101,30 @@ void AlxTrace_Init(AlxTrace* me)
 
 	me->isInit = true;
 }
-void AlxTrace_DeInit(AlxTrace* me)
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 {
 	// TODO
 
 	me->isInit = false;
 }
-void AlxTrace_WriteStr(AlxTrace* me, const char* str)
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		str
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
 {
 	while (*str)
 	{

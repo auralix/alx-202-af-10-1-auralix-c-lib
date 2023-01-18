@@ -49,6 +49,13 @@ static void AlxParamStore_Handle_4xGroup(AlxParamStore* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		paramGroupArr
+  * @param[in]		numOfParamGroups
+  */
 void AlxParamStore_Ctor
 (
 	AlxParamStore* me,
@@ -73,6 +80,15 @@ void AlxParamStore_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		status
+  * @param[in]		numOfParamGroups
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* statusParamGroup, uint32_t numOfParamGroups)
 {
 	// Assert
@@ -100,6 +116,11 @@ Alx_Status AlxParamStore_Init(AlxParamStore* me, Alx_Status* statusParamGroup, u
 	// #4 Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxParamStore_Handle(AlxParamStore* me)
 {
 	// Assert
@@ -131,6 +152,13 @@ void AlxParamStore_Handle(AlxParamStore* me)
 		}
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxParamStore_IsErr(AlxParamStore* me)
 {
 	// Assert

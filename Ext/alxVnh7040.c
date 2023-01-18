@@ -38,8 +38,37 @@
 
 
 //******************************************************************************
+// Private Functions
+//******************************************************************************
+static void AlxVnh7040_Monitoring_Select_HSA(AlxVnh7040* me);
+static void AlxVnh7040_Monitoring_Select_HSB(AlxVnh7040* me);
+static void AlxVnh7040_Monitoring_Select_Tchip(AlxVnh7040* me);
+static void AlxVnh7040_Monitoring_Select_Vcc(AlxVnh7040* me);
+static void AlxVnh7040_Monitoring (AlxVnh7040* me);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		adc
+  * @param[in]		multiSensAdcCh
+  * @param[in]		pwm
+  * @param[in]		pwmCh
+  * @param[in]		do_PWM
+  * @param[in]		do_INA
+  * @param[in]		do_INB
+  * @param[in]		do_SEL0
+  * @param[in]		do_SEL1
+  * @param[in]		do_SENS_EN
+  * @param[in]		breakTypeDefault
+  * @param[in]		multiSensResHigh_ohm
+  * @param[in]		multiSensResLow_ohm
+  * @param[in]		restartWaitTime_ms
+  */
 void AlxVnh7040_Ctor
 (
 	AlxVnh7040* me,
@@ -120,6 +149,11 @@ void AlxVnh7040_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxVnh7040_Init(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -148,6 +182,11 @@ void AlxVnh7040_Init(AlxVnh7040* me)
 	// #5 Set isInit
 	me->isInit = true;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxVnh7040_DeInit(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -170,109 +209,11 @@ void AlxVnh7040_DeInit(AlxVnh7040* me)
 	// #3 Reset isInit
 	me->isInit = false;
 }
-void AlxVnh7040_Monitoring_Select_HSA(AlxVnh7040* me)
-{
-	AlxIoPin_Write(me->do_SEL0, true);
-	AlxIoPin_Write(me->do_SEL1, false);
-	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_HSA;
-}
-void AlxVnh7040_Monitoring_Select_HSB(AlxVnh7040* me)
-{
-	AlxIoPin_Write(me->do_SEL0, false);
-	AlxIoPin_Write(me->do_SEL1, false);
-	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_HSB;
-}
-void AlxVnh7040_Monitoring_Select_Tchip(AlxVnh7040* me)
-{
-	AlxIoPin_Write(me->do_SEL0, false);
-	AlxIoPin_Write(me->do_SEL1, true);
-	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_Tchip;
-}
-void AlxVnh7040_Monitoring_Select_Vcc(AlxVnh7040* me)
-{
-	AlxIoPin_Write(me->do_SEL0, true);
-	AlxIoPin_Write(me->do_SEL1, true);
-	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_Vcc;
-}
-void AlxVnh7040_Monitoring (AlxVnh7040* me)
-{
-	int32_t temp;
 
-	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
-	ALX_VNH7040_ASSERT(me->isInit == true);
-
-	if(AlxTimSw_Get_us(&me->timMonitoringPeriod) >= me->MONITORING_PERIOD_MIN_us)
-	{
-		AlxTimSw_Start (&me->timMonitoringPeriod);
-
-		// get value on multisense pin
-		me->multiSensAdcVoltage_mV = AlxAdc_GetVoltage_mV(me->adc, me->multiSensAdcCh);
-		me->multiSensPinVoltage_mV = AlxVdiv_GetVin_mV(me->multiSensAdcVoltage_mV, me->multiSensResHigh_ohm, me->multiSensResLow_ohm);
-		me->multiSensVDivCurrent_uA = AlxVdiv_GetCurrent_uA(me->multiSensAdcVoltage_mV * 1000, me->multiSensResLow_ohm);
-
-		// cycle thru all possibilities
-		switch (me->monitoringTypeSelected)
-		{
-			case AlxVnh7040_MonitoringType_HSA:
-			// get HSA current
-			if (me->multiSensPinVoltage_mV > me->MULTI_SENS_ERR_INDICATE_PIN_VOLTAGE_THRESHOLD_mV)	// check for error flag
-			{
-				// error flag asserted
-				me->currentHsA_clamp = true;
-				me->currentHsA_mA = 0;
-			}
-			else
-			{
-				// operational
-				me->currentHsA_clamp = false;
-				me->currentHsA_mA = (me->multiSensVDivCurrent_uA * me->MULTI_SENS_CURRENT_COEFF) / 1000;
-			}
-
-			// jump to next measurement - HSB
-			AlxVnh7040_Monitoring_Select_HSB (me);
-			break;
-
-			case AlxVnh7040_MonitoringType_HSB:
-			// get HSB current
-			if (me->multiSensPinVoltage_mV > me->MULTI_SENS_ERR_INDICATE_PIN_VOLTAGE_THRESHOLD_mV)	// check for error flag
-			{
-				// error flag asserted
-				me->currentHsB_clamp = true;
-				me->currentHsB_mA = 0;
-			}
-			else
-			{
-				// operational
-				me->currentHsB_clamp = false;
-				me->currentHsB_mA = (me->multiSensVDivCurrent_uA * me->MULTI_SENS_CURRENT_COEFF) / 1000;
-			}
-
-			// jump to next measurement - Tchip
-			AlxVnh7040_Monitoring_Select_Tchip (me);
-			break;
-
-			case AlxVnh7040_MonitoringType_Tchip:
-			// get Tchip temperature
-			me->temp_degC = ((int32_t)(me->multiSensPinVoltage_mV * 1000) - me->VSENSE_TC_T0_uV) / me->dVSENSE_TC_dT_uV_K;
-
-			// jump to next measurement - Vcc
-			AlxVnh7040_Monitoring_Select_Vcc (me);
-			break;
-
-			case AlxVnh7040_MonitoringType_Vcc:
-			// get Vcc voltage
-			me->supplyVoltage_mV = me->multiSensPinVoltage_mV * me->dVSENSE_Vcc_k;
-
-			// jump to next measurement - HSA
-			AlxVnh7040_Monitoring_Select_HSA (me);
-			break;
-
-			default:
-				ALX_VNH7040_ASSERT (false);  // We should never get here
-				break;
-		}
-	}
-}
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxVnh7040_Handle(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -390,6 +331,12 @@ void AlxVnh7040_Handle(AlxVnh7040* me)
 		ALX_VNH7040_ASSERT(false);	// We should never get here
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] duty_permil
+  */
 void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -449,6 +396,12 @@ void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil)
 		me->status = AlxVnh7040_Status_RotateCcw;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -456,6 +409,12 @@ uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me)
 
 	return me->current_mA;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 uint32_t AlxVnh7040_GetCurrentHsA_mA(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -463,6 +422,12 @@ uint32_t AlxVnh7040_GetCurrentHsA_mA(AlxVnh7040* me)
 
 	return me->currentHsA_mA;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 uint32_t AlxVnh7040_GetCurrentHsB_mA(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -470,6 +435,12 @@ uint32_t AlxVnh7040_GetCurrentHsB_mA(AlxVnh7040* me)
 
 	return me->currentHsB_mA;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 uint32_t AlxVnh7040_GetSupplyVoltage_mV(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -477,6 +448,12 @@ uint32_t AlxVnh7040_GetSupplyVoltage_mV(AlxVnh7040* me)
 
 	return me->supplyVoltage_mV;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 int32_t AlxVnh7040_GetTemp_degC(AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -484,13 +461,12 @@ int32_t AlxVnh7040_GetTemp_degC(AlxVnh7040* me)
 
 	return me->temp_degC;
 }
-void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType)
-{
-	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
-	ALX_VNH7040_ASSERT(me->isInit == true);
 
-	me->breakType = breakType;
-}
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] breakType
+  */
 int32_t AlxVnh7040_GetIsError (AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
@@ -499,98 +475,126 @@ int32_t AlxVnh7040_GetIsError (AlxVnh7040* me)
 	return me->currentHsA_clamp || me->currentHsB_clamp;	// true-> short circuit or overcurrent protection is acctive on one of half bridges
 }
 
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
+void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType)
+{
+	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
+	ALX_VNH7040_ASSERT(me->isInit == true);
+
+	me->breakType = breakType;
+}
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static void AlxVnh7040_Monitoring_Select_HSA(AlxVnh7040* me)
+{
+	AlxIoPin_Write(me->do_SEL0, true);
+	AlxIoPin_Write(me->do_SEL1, false);
+	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_HSA;
+}
+static void AlxVnh7040_Monitoring_Select_HSB(AlxVnh7040* me)
+{
+	AlxIoPin_Write(me->do_SEL0, false);
+	AlxIoPin_Write(me->do_SEL1, false);
+	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_HSB;
+}
+static void AlxVnh7040_Monitoring_Select_Tchip(AlxVnh7040* me)
+{
+	AlxIoPin_Write(me->do_SEL0, false);
+	AlxIoPin_Write(me->do_SEL1, true);
+	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_Tchip;
+}
+static void AlxVnh7040_Monitoring_Select_Vcc(AlxVnh7040* me)
+{
+	AlxIoPin_Write(me->do_SEL0, true);
+	AlxIoPin_Write(me->do_SEL1, true);
+	me->monitoringTypeSelected = AlxVnh7040_MonitoringType_Vcc;
+}
+static void AlxVnh7040_Monitoring (AlxVnh7040* me)
+{
+	int32_t temp;
+
+	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
+	ALX_VNH7040_ASSERT(me->isInit == true);
+
+	if(AlxTimSw_Get_us(&me->timMonitoringPeriod) >= me->MONITORING_PERIOD_MIN_us)
+	{
+		AlxTimSw_Start (&me->timMonitoringPeriod);
+
+		// get value on multisense pin
+		me->multiSensAdcVoltage_mV = AlxAdc_GetVoltage_mV(me->adc, me->multiSensAdcCh);
+		me->multiSensPinVoltage_mV = AlxVdiv_GetVin_mV(me->multiSensAdcVoltage_mV, me->multiSensResHigh_ohm, me->multiSensResLow_ohm);
+		me->multiSensVDivCurrent_uA = AlxVdiv_GetCurrent_uA(me->multiSensAdcVoltage_mV * 1000, me->multiSensResLow_ohm);
+
+		// cycle thru all possibilities
+		switch (me->monitoringTypeSelected)
+		{
+			case AlxVnh7040_MonitoringType_HSA:
+			// get HSA current
+			if (me->multiSensPinVoltage_mV > me->MULTI_SENS_ERR_INDICATE_PIN_VOLTAGE_THRESHOLD_mV)	// check for error flag
+			{
+				// error flag asserted
+				me->currentHsA_clamp = true;
+				me->currentHsA_mA = 0;
+			}
+			else
+			{
+				// operational
+				me->currentHsA_clamp = false;
+				me->currentHsA_mA = (me->multiSensVDivCurrent_uA * me->MULTI_SENS_CURRENT_COEFF) / 1000;
+			}
+
+			// jump to next measurement - HSB
+			AlxVnh7040_Monitoring_Select_HSB (me);
+			break;
+
+			case AlxVnh7040_MonitoringType_HSB:
+			// get HSB current
+			if (me->multiSensPinVoltage_mV > me->MULTI_SENS_ERR_INDICATE_PIN_VOLTAGE_THRESHOLD_mV)	// check for error flag
+			{
+				// error flag asserted
+				me->currentHsB_clamp = true;
+				me->currentHsB_mA = 0;
+			}
+			else
+			{
+				// operational
+				me->currentHsB_clamp = false;
+				me->currentHsB_mA = (me->multiSensVDivCurrent_uA * me->MULTI_SENS_CURRENT_COEFF) / 1000;
+			}
+
+			// jump to next measurement - Tchip
+			AlxVnh7040_Monitoring_Select_Tchip (me);
+			break;
+
+			case AlxVnh7040_MonitoringType_Tchip:
+			// get Tchip temperature
+			me->temp_degC = ((int32_t)(me->multiSensPinVoltage_mV * 1000) - me->VSENSE_TC_T0_uV) / me->dVSENSE_TC_dT_uV_K;
+
+			// jump to next measurement - Vcc
+			AlxVnh7040_Monitoring_Select_Vcc (me);
+			break;
+
+			case AlxVnh7040_MonitoringType_Vcc:
+			// get Vcc voltage
+			me->supplyVoltage_mV = me->multiSensPinVoltage_mV * me->dVSENSE_Vcc_k;
+
+			// jump to next measurement - HSA
+			AlxVnh7040_Monitoring_Select_HSA (me);
+			break;
+
+			default:
+				ALX_VNH7040_ASSERT (false);  // We should never get here
+				break;
+		}
+	}
+}
+
 
 #endif	// #if defined(ALX_C_LIB)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//******************************************************************************
-// Private Functions
-//******************************************************************************
-//static void AlxVnh7040_Reset(AlxVnh7040* me);
-//static bool AlxVnh7040_IsMultiSensErrIndicate(AlxVnh7040* me);
-
-
-
-//******************************************************************************
-// Private Functions
-//******************************************************************************
-//static void AlxVnh7040_Reset(AlxVnh7040* me)
-//{
-//	// #1 DeInit VNH7040
-//	AlxVnh7040_DeInit(me);
-//
-//	// #2 Wait
-//	AlxDelay_ms(2);
-//
-//	// #3 Init VNH7040
-//	AlxVnh7040_Init(me);
-//}
-//static bool AlxVnh7040_IsMultiSensErrIndicate(AlxVnh7040* me)
-//{
-//	if (me->multiSensPinVoltage_mV > me->MULTI_SENS_ERR_INDICATE_PIN_VOLTAGE_THRESHOLD_mV)
-//		return true;
-//	else
-//		return false;
-//}
-
-
-
-
-
-
-
-
-
-
-
-
-//
-//	// #2 State - OK
-//	if (me->st == AlxVnh7040_Sm_StOk)
-//	{
-////		// Transition
-////		if (AlxVnh7040_IsMultiSensErrIndicate(me))
-////		{
-////			AlxTimSw_Start(&me->tim);
-////			me->st = AlxVnh7040_Sm_StErr;
-////		}
-////		// Do
-////		else
-////		{
-//
-//
-//
-////		}
-//	}
-//	// #3 State - Error
-//	else if (me->st == AlxVnh7040_Sm_StErr)
-//	{
-//		// Transition
-//		if (AlxTimSw_IsTimeout_ms(&me->tim, me->restartWaitTime_ms))
-//		{
-//			AlxVnh7040_Reset(me);
-//			me->st = AlxVnh7040_Sm_StOk;
-//		}
-//		// Do
-//		else
-//		{
-//			// Do Nothing
-//		}
-//	}
-//	// #4 Assert
-//	else
-//	{
-//		ALX_VNH7040_ASSERT(false);	// We should never get here
-//	}

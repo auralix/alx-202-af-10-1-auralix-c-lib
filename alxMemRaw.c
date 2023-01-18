@@ -40,6 +40,11 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 ALX_WEAK void AlxMemRaw_Ctor
 (
 	AlxMemRaw* me
@@ -52,24 +57,64 @@ ALX_WEAK void AlxMemRaw_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 ALX_WEAK Alx_Status AlxMemRaw_Init(AlxMemRaw* me)
 {
 	(void)me;
 	ALX_MEM_RAW_ASSERT(false);
 	return 0;
 }
+Alx_Status AlxMemRaw_Init(AlxMemRaw* me);
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 ALX_WEAK Alx_Status AlxMemRaw_DeInit(AlxMemRaw* me)
 {
 	(void)me;
 	ALX_MEM_RAW_ASSERT(false);
 	return 0;
 }
+
+/**
+  * @brief
+  * @param[in]	me
+  * @param[in]	addr
+  * @param[out]	data
+  * @param[in]	len
+  * @param[in]	numOfTries
+  * @param[in]	timeout_ms
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 ALX_WEAK Alx_Status AlxMemRaw_Read(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	(void)me;
 	ALX_MEM_RAW_ASSERT(false);
 	return 0;
 }
+
+/**
+  * @brief
+  * @param[in]	me
+  * @param[in]	addr
+  * @param[in]	data
+  * @param[in]	len
+  * @param[in]	checkWithReadEnable
+  * @param[in]	numOfTries
+  * @param[in]	timeout_ms
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 ALX_WEAK Alx_Status AlxMemRaw_Write(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t len, bool checkWithReadEnable, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	(void)me;

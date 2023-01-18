@@ -40,6 +40,13 @@
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in]	file
+  * @param[in]	line
+  * @param[in]	fun
+  */
 void ALX_WEAK AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun)
 {
 	(void)file;
@@ -48,10 +55,24 @@ void ALX_WEAK AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun)
 
 	ALX_BKPT;
 }
+
+/**
+  * @brief
+  * @param[in]	file
+  * @param[in]	line
+  * @param[in]	fun
+  */
 void ALX_WEAK AlxAssert_Trace(const char* file, uint32_t line, const char* fun)
 {
 	AlxTrace_WriteStd(&alxTrace, file, line, fun, true, "ASSERT");
 }
+
+/**
+  * @brief
+  * @param[in]	file
+  * @param[in]	line
+  * @param[in]	fun
+  */
 void ALX_WEAK AlxAssert_Rst(const char* file, uint32_t line, const char* fun)
 {
 	(void)file;

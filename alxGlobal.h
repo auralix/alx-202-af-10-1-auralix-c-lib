@@ -427,29 +427,9 @@ typedef enum
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  */
 void AlxGlobal_DisableIrq(void);
-
-/**
-  * @brief
-  */
 void AlxGlobal_EnableIrq(void);
-
-/**
-  * @brief
-  * @param[in]	uint64
-  * @param[out]	str
-  */
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
-
-/**
-  * @brief
-  * @param[in] val
-  * @return
-  */
 uint32_t AlxGlobal_Ntohl(uint32_t val);
 
 

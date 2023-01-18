@@ -40,6 +40,12 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		osTick
+  */
 void AlxOsDelayUntil_Ctor
 (
 	AlxOsDelayUntil* me,
@@ -63,6 +69,11 @@ void AlxOsDelayUntil_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxOsDelayUntil_Init(AlxOsDelayUntil* me)
 {
 	// #1 Assert
@@ -75,6 +86,12 @@ void AlxOsDelayUntil_Init(AlxOsDelayUntil* me)
 	// #3 Set isInit
 	me->isInit = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		osDelayUntilIncrement_us
+  */
 void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osTimeIncrement_us)
 {
 	// #1 Assert
@@ -91,9 +108,33 @@ void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osTimeIncrement_us)
 	vTaskDelayUntil(&me->xLastWakeTime, osTimeIncrement_osTick);
 	#endif
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		osTimeIncrement_ms
+  */
 void AlxOsDelayUntil_ms(AlxOsDelayUntil* me, uint64_t osTimeIncrement_ms)	{ AlxOsDelay_ms(me, osTimeIncrement_ms * 1000); }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		osTimeIncrement_sec
+  */
 void AlxOsDelayUntil_sec(AlxOsDelayUntil* me, uint64_t osTimeIncrement_sec)	{ AlxOsDelay_sec(me, osTimeIncrement_sec * 1000000); }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		osTimeIncrement_min
+  */
 void AlxOsDelayUntil_min(AlxOsDelayUntil* me, uint64_t osTimeIncrement_min)	{ AlxOsDelay_min(me, osTimeIncrement_min * 60000000); }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		osTimeIncrement_hr
+  */
 void AlxOsDelayUntil_hr(AlxOsDelayUntil* me, uint64_t osTimeIncrement_hr)	{ AlxOsDelay_hr(me, osTimeIncrement_hr * 3600000000); }
 
 

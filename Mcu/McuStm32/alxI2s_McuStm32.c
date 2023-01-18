@@ -62,6 +62,25 @@ void AlxI2s_Foreground_Callback_RxR(AlxI2s* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		i2s
+  * @param[in]		do_MCLK
+  * @param[in]		do_BCLK
+  * @param[in]		do_LRCLK
+  * @param[in]		do_SDO
+  * @param[in]		di_SDI
+  * @param[in]		clk
+  * @param[in]		i2sClk
+  * @param[in]		audioMode
+  * @param[in]		dataSize
+  * @param[in]		isMclkUsed
+  * @param[in]		txIrqPriority
+  * @param[in]		me
+  * @param[in]		me
+  */
 void AlxI2s_Ctor
 (
 	AlxI2s* me,
@@ -193,6 +212,13 @@ void AlxI2s_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2s_Init(AlxI2s* me)
 {
 	ALX_I2S_ASSERT(me->isInit == false);
@@ -246,6 +272,13 @@ Alx_Status AlxI2s_Init(AlxI2s* me)
 	// #10 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2s_DeInit(AlxI2s* me)
 {
 	ALX_I2S_ASSERT(me->isInit == true);
@@ -294,6 +327,11 @@ Alx_Status AlxI2s_DeInit(AlxI2s* me)
 	// #7 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxI2s_Foreground_Handle(AlxI2s* me)
 {
 	// #1 Check if TX FIFO NOT full IRQ occurred

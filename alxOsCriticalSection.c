@@ -40,12 +40,20 @@
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  */
 void AlxOsCriticalSection_Enter(void)
 {
 	#if defined(ALX_FREE_RTOS)
 	taskENTER_CRITICAL();
 	#endif
 }
+
+/**
+  * @brief
+  */
 void AlxOsCriticalSection_Exit(void)
 {
 	#if defined(ALX_FREE_RTOS)

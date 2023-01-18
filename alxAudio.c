@@ -40,28 +40,58 @@
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 float AlxAudio_LinerPcmInt8ToFloat(int8_t inSample)
 {
 	float outSample = (float)inSample / 128.f;
 	return outSample;
 }
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 float AlxAudio_LinerPcmUint8ToFloat(uint8_t inSample)
 {
 	uint8_t sampleUint8 = inSample - (uint8_t)128;	// Converts decimal to 2's complement
 	float outSample = (float)((int8_t)sampleUint8 / 128.f);
 	return outSample;
 }
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 float AlxAudio_LinerPcmInt16ToFloat(int16_t inSample)
 {
 	float outSample = (float)(inSample / 32768.f);
 	return outSample;
 }
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 float AlxAudio_LinerPcmUint16ToFloat(uint16_t inSample)
 {
 	uint16_t dummy = inSample - 32768U;	// Converts decimal to 2's complement
 	float outSample = (float)((int16_t)dummy / 32768.f);
 	return outSample;
 }
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 int8_t AlxAudio_FloatToLinerPcmInt8(float inSample)
 {
 	ALX_AUDIO_ASSERT((-1.f <= inSample) && (inSample <= 1.f));
@@ -69,6 +99,12 @@ int8_t AlxAudio_FloatToLinerPcmInt8(float inSample)
 	int8_t outSample = (int8_t)(inSample * 127.f);
 	return outSample;
 }
+
+/**
+  * @brief
+  * @param[in] inSample
+  * @return
+  */
 int16_t AlxAudio_FloatToLinerPcmInt16(float inSample)
 {
 	ALX_AUDIO_ASSERT((-1.f <= inSample) && (inSample <= 1.f));
@@ -76,6 +112,13 @@ int16_t AlxAudio_FloatToLinerPcmInt16(float inSample)
 	int16_t outSample = (int16_t)(inSample * 32767.f);
 	return outSample;
 }
+
+/**
+  * @brief
+  * @param[in] sampleL
+  * @param[in] sampleR
+  * @return Stereo sample
+  */
 float AlxAudio_StereoToMono(float sampleL, float sampleR)
 {
 	ALX_AUDIO_ASSERT((-1.f <= sampleL) && (sampleL <= 1.f));

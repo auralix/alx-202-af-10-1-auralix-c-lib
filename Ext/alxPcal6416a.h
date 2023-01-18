@@ -661,16 +661,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		i2c
-  * @param[in]		i2cAddr
-  * @param[in]		i2cCheckWithRead
-  * @param[in]		i2cNumOfTries
-  * @param[in]		i2cTimeout_ms
-  */
 void AlxPcal6416a_Ctor
 (
 	AlxPcal6416a* me,
@@ -685,113 +675,18 @@ void AlxPcal6416a_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxPcal6416a_InitPeriph(AlxPcal6416a* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxPcal6416a_DeInitPeriph(AlxPcal6416a* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		inPort0
-  * @param[in]		inPort1
-  * @param[in]		outPort0
-  * @param[in]		outPort1
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inPort0, bool inPort1, bool outPort0, bool outPort1);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		pin
-  * @retval			false
-  * @retval			true
-  */
 bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, uint8_t port, uint8_t pin);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		pin
-  * @param[in]		val
-  */
 void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, uint8_t port, uint8_t pin, bool val);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		pin
-  */
 void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, uint8_t port, uint8_t pin);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		pin
-  */
 void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, uint8_t port, uint8_t pin);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		pin
-  */
 void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, uint8_t port, uint8_t pin);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, uint8_t port, uint8_t pin, AlxIoPin_TriState* val);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		reg
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		reg
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxPcal6416a_Reg_Read(AlxPcal6416a* me, void* reg);
 
 

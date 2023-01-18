@@ -60,29 +60,8 @@ extern "C" {
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in]	file
-  * @param[in]	line
-  * @param[in]	fun
-  */
 void AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun);
-
-/**
-  * @brief
-  * @param[in]	file
-  * @param[in]	line
-  * @param[in]	fun
-  */
 void AlxAssert_Trace(const char* file, uint32_t line, const char* fun);
-
-/**
-  * @brief
-  * @param[in]	file
-  * @param[in]	line
-  * @param[in]	fun
-  */
 void AlxAssert_Rst(const char* file, uint32_t line, const char* fun);
 
 

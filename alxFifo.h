@@ -98,13 +98,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in,out]	buff
-  * @param[in]		buffLen
-  */
 void AlxFifo_Ctor
 (
 	AlxFifo* me,
@@ -116,74 +109,12 @@ void AlxFifo_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  */
 void AlxFifo_Flush(AlxFifo* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		data
-  * @param[in]		len
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  * @retval			AlxFifo_ErrEmpty
-  */
 Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		str
-  * @param[in]		delim
-  * @param[in]		maxLen
-  * @param[out]		numRead
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  * @retval			AlxFifo_ErrEmpty
-  * @retval			AlxFifo_ErrNoDelim
-  */
 Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		data
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  * @retval			AlxFifo_ErrFull
-  */
 Alx_Status AlxFifo_Write(AlxFifo* me, uint8_t data);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		data
-  * @param[in]		len
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  * @retval			AlxFifo_ErrFull
-  */
 Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		str
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  * @retval			AlxFifo_ErrFull
-  */
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @return
-  */
 uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me);
 
 
