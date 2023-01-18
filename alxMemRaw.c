@@ -70,7 +70,6 @@ ALX_WEAK Alx_Status AlxMemRaw_Init(AlxMemRaw* me)
 	ALX_MEM_RAW_ASSERT(false);
 	return 0;
 }
-Alx_Status AlxMemRaw_Init(AlxMemRaw* me);
 
 /**
   * @brief

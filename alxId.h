@@ -185,26 +185,25 @@ typedef struct
 
 typedef struct
 {
-	// Parameters
 	uint8_t id;
+
 	char pcbArtf[ALX_ID_NAME_LEN];
 	char pcbName[ALX_ID_NAME_LEN];
 	uint8_t pcbVerMajor;
 	uint8_t pcbVerMinor;
 	uint8_t pcbVerPatch;
 	uint32_t pcbVerDate;
+	uint64_t pcbVer;						// Variable
+	char pcbVerStr[ALX_ID_FW_VER_STR_LEN];	// Variable
+
 	char bomArtf[ALX_ID_NAME_LEN];
 	char bomName[ALX_ID_NAME_LEN];
 	uint8_t bomVerMajor;
 	uint8_t bomVerMinor;
 	uint8_t bomVerPatch;
 	uint32_t bomVerDate;
-
-	// Variables
-	uint64_t pcbVer;
-	char pcbVerStr[ALX_ID_FW_VER_STR_LEN];
-	uint64_t bomVer;
-	char bomVerStr[ALX_ID_FW_VER_STR_LEN];
+	uint64_t bomVer;						// Variable
+	char bomVerStr[ALX_ID_FW_VER_STR_LEN];	// Variable
 } AlxId_HwInstance;
 
 typedef struct

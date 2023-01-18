@@ -97,6 +97,7 @@ void AlxMemRaw_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+Alx_Status AlxMemRaw_Init(AlxMemRaw* me);
 Alx_Status AlxMemRaw_DeInit(AlxMemRaw* me);
 Alx_Status AlxMemRaw_Read(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t timeout_ms);
 Alx_Status AlxMemRaw_Write(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t len, bool checkWithReadEnable, uint8_t numOfTries, uint16_t timeout_ms);
