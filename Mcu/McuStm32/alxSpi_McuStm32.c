@@ -399,9 +399,13 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 	{
 		if
 		(
+			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_350kHz_Pclk2Apb2_90MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_700kHz_Pclk2Apb2_90MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_5MHz625_Pclk2Apb2_90MHz) ||
-			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz)
+			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_22MHz5_Pclk2Apb2_90MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_45MHz_Pclk2Apb2_90MHz)
 		)
 		{
 			if(90000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
