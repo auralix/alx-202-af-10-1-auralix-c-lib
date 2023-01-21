@@ -82,17 +82,8 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	uint8_t id;
-	uint8_t dataLen;
-	uint8_t data[8];
-} AlxLin_Payload;
-
-typedef struct
-{
 	// Parameters
 	AlxSerialPort* alxSerialPort;
-
-	// Variables
 
 	// Info
 	bool wasCtorCalled;
@@ -115,8 +106,8 @@ void AlxLin_Ctor
 //******************************************************************************
 Alx_Status AlxLin_Init(AlxLin* me);
 Alx_Status AlxLin_DeInit(AlxLin* me);
-Alx_Status AlxLin_TxFrame(AlxLin* me, AlxLin_Payload* frame);
-Alx_Status AlxLin_RxFrame(AlxLin* me, AlxLin_Payload* frame);
+Alx_Status AlxLin_Master_Publish(AlxLin* me, uint8_t id, uint8_t* data, uint8_t len);
+Alx_Status AlxLin_Master_Subscribe(AlxLin* me, uint8_t id, uint8_t* data, uint8_t len, uint8_t slaveResponseWaitTime_ms, uint8_t numOfTries);
 void AlxLin_IrqHandler(AlxLin* me);
 
 

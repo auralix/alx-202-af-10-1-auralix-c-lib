@@ -265,15 +265,16 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxGlobal_BaudRate_9600    = 9600,
-	AlxGlobal_BaudRate_115200  = 115200,
-	AlxGlobal_BaudRate_800000  = 800000,
-	AlxGlobal_BaudRate_921600  = 921600,
-	AlxGlobal_BaudRate_1000000 = 1000000,
-	AlxGlobal_BaudRate_1600000 = 1600000,
-	AlxGlobal_BaudRate_2000000 = 2000000,
-	AlxGlobal_BaudRate_4000000 = 4000000,
-	AlxGlobal_BaudRate_8000000 = 8000000
+	AlxGlobal_BaudRate_9600		= 9600,
+	AlxGlobal_BaudRate_19200	= 19200,
+	AlxGlobal_BaudRate_115200	= 115200,
+	AlxGlobal_BaudRate_800000	= 800000,
+	AlxGlobal_BaudRate_921600	= 921600,
+	AlxGlobal_BaudRate_1000000	= 1000000,
+	AlxGlobal_BaudRate_1600000	= 1600000,
+	AlxGlobal_BaudRate_2000000	= 2000000,
+	AlxGlobal_BaudRate_4000000	= 4000000,
+	AlxGlobal_BaudRate_8000000	= 8000000
 } AlxGlobal_BaudRate;
 
 typedef enum

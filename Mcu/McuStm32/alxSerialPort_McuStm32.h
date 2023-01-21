@@ -55,6 +55,13 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxSerialPort_Lin_Disable,
+	AlxSerialPort_Lin_EnableMaster,
+	AlxSerialPort_Lin_EnableSlave
+} AlxSerialPort_Lin;
+
 typedef struct
 {
 	// Parameters
@@ -69,7 +76,7 @@ typedef struct
 	uint8_t* rxFifoBuff;
 	uint32_t rxFifoBuffLen;
 	Alx_IrqPriority rxIrqPriority;
-	bool linEnable;
+	AlxSerialPort_Lin lin;
 
 	// Variables
 	UART_HandleTypeDef huart;
@@ -98,7 +105,7 @@ void AlxSerialPort_Ctor
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
 	Alx_IrqPriority rxIrqPriority,
-	bool linEnable
+	AlxSerialPort_Lin lin
 );
 
 

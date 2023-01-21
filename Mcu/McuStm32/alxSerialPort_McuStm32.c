@@ -83,9 +83,17 @@ void AlxSerialPort_Ctor
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
 	Alx_IrqPriority rxIrqPriority,
-	bool linEnable
+	AlxSerialPort_Lin lin
 )
 {
+	// Assert
+	if (lin != AlxSerialPort_Lin_Disable)
+	{
+		ALX_SERIAL_PORT_ASSERT(dataWidth == UART_WORDLENGTH_8B);
+		ALX_SERIAL_PORT_ASSERT(stopBits == UART_STOPBITS_1);
+		ALX_SERIAL_PORT_ASSERT(parity == UART_PARITY_NONE);
+	}
+
 	// Parameters
 	me->uart = uart;
 	me->do_TX = do_TX;
@@ -98,23 +106,14 @@ void AlxSerialPort_Ctor
 	me->rxFifoBuff = rxFifoBuff;
 	me->rxFifoBuffLen = rxFifoBuffLen;
 	me->rxIrqPriority = rxIrqPriority;
-	me->linEnable = linEnable;
+	me->lin = lin;
 
 	// Variables
 	me->huart.Instance = uart;
 	me->huart.Init.BaudRate = (uint32_t)baudRate;
-	if (linEnable)
-	{
-		me->huart.Init.WordLength = UART_WORDLENGTH_8B;
-		me->huart.Init.StopBits = UART_STOPBITS_1;
-		me->huart.Init.Parity = UART_PARITY_NONE;
-	}
-	else
-	{
-		me->huart.Init.WordLength = dataWidth;
-		me->huart.Init.StopBits = stopBits;
-		me->huart.Init.Parity = parity;
-	}
+	me->huart.Init.WordLength = dataWidth;
+	me->huart.Init.StopBits = stopBits;
+	me->huart.Init.Parity = parity;
 	me->huart.Init.Mode = UART_MODE_TX_RX;
 	me->huart.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	me->huart.Init.OverSampling = UART_OVERSAMPLING_16;
@@ -183,10 +182,10 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 	AlxSerialPort_Periph_EnableClk(me);
 
 	// Init UART
-	if (me->linEnable)
+	if (me->lin != AlxSerialPort_Lin_Disable)
 	{
 		#if defined(ALX_STM32F0)
-		if(HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_10B) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		if(HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
 		#endif
 	}
 	else
@@ -257,7 +256,6 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
-	ALX_SERIAL_PORT_ASSERT(me->linEnable == false);
 
 	// Read
 	AlxGlobal_DisableIrq();
@@ -283,6 +281,7 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
+	ALX_SERIAL_PORT_ASSERT(me->lin == AlxSerialPort_Lin_Disable);
 
 	// Read
 	AlxGlobal_DisableIrq();
@@ -308,7 +307,7 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
 	// Write
-	if (me->linEnable)
+	if (me->lin != AlxSerialPort_Lin_Disable)
 	{
 		#if defined(ALX_STM32F0)
 		if(HAL_LIN_SendBreak(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
@@ -336,7 +335,7 @@ Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
-	ALX_SERIAL_PORT_ASSERT(me->linEnable == false);
+	ALX_SERIAL_PORT_ASSERT(me->lin == AlxSerialPort_Lin_Disable);
 
 	// Return
 	return AlxSerialPort_Write(me, (const uint8_t*)str, strlen(str));
@@ -357,6 +356,15 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 	// No overrun error handling, overrun error must be disabled @ Uart initialization.
 	uint8_t data = LL_USART_ReceiveData8(me->huart.Instance);	// Clears RXNE = 0
 	AlxFifo_Write(&me->rxFifo, data);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+void AlxSerialPort_FlushRxFifo(AlxSerialPort* me)
+{
+	AlxFifo_Flush(&me->rxFifo);
 }
 
 
