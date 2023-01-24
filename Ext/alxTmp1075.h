@@ -59,7 +59,7 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t T;
+		int16_t T;
 	};
 	uint16_t raw;
 } AlxTmp1075_RegVal_R0_Temp;
