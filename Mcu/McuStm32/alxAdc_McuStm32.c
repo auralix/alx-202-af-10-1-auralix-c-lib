@@ -509,7 +509,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	}
 
 	// Calibrate ADC
-	#if defined(ALX_STM32F1)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F1)
 	if(HAL_ADCEx_Calibration_Start(&me->hadc) != HAL_OK) { ALX_ADC_TRACE("Err"); return Alx_Err; }
 	#endif
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
