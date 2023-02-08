@@ -43,6 +43,7 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxTrace.h"
 #include "alxSerialPort.h"
+#include "alxOsDelay.h"
 
 
 //******************************************************************************
@@ -82,6 +83,9 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	// Defines
+	#define ALX_LIN_BUFF_LEN 250
+
 	// Parameters
 	AlxSerialPort* alxSerialPort;
 
@@ -106,8 +110,8 @@ void AlxLin_Ctor
 //******************************************************************************
 Alx_Status AlxLin_Init(AlxLin* me);
 Alx_Status AlxLin_DeInit(AlxLin* me);
-Alx_Status AlxLin_Master_Publish(AlxLin* me, uint8_t id, uint8_t* data, uint8_t len);
-Alx_Status AlxLin_Master_Subscribe(AlxLin* me, uint8_t id, uint8_t* data, uint8_t len, uint8_t slaveResponseWaitTime_ms, uint8_t numOfTries);
+Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLenEnable, uint32_t maxLen, uint32_t* actualLen);
+Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLenEnable);
 void AlxLin_IrqHandler(AlxLin* me);
 
 

@@ -367,6 +367,16 @@ void AlxSerialPort_FlushRxFifo(AlxSerialPort* me)
 	AlxFifo_Flush(&me->rxFifo);
 }
 
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
+uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
+{
+	return AlxFifo_GetNumOfEntries(&me->rxFifo);
+}
+
 
 //******************************************************************************
 // Private Functions
