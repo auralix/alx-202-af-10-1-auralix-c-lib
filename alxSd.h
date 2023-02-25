@@ -84,27 +84,22 @@ extern "C" {
 typedef struct
 {
 	// Defines
-	#define DATA_0xFF_LEN 520
-	#define BLOCK_LEN 512
+	#define ALX_SD_DATA_0xFF_LEN 520
+	#define ALX_SD_BLOCK_LEN 512
 
 	// Const
-	uint8_t DATA_0xFF[DATA_0xFF_LEN];
+	uint8_t DATA_0xFF[ALX_SD_DATA_0xFF_LEN];
 	uint8_t NUM_OF_PWR_UP_CLK_CYCLES;
 
 	// Parameters
 	AlxSpi* alxSpi;
 	uint8_t spiNumOfTries;
 	uint16_t spiTimeout_ms;
-	uint8_t initDeInitNumOfTries;
-	uint16_t initDeInitInitialAndNewTryWaitTime_ms;
-	uint16_t cmdRespTimeout_ms;
+	uint16_t cmdRespR1Timeout_ms;
 	uint16_t acmd41Timeout_ms;
-	uint16_t blockReadTokenFeTimeout_ms;
-	uint16_t blockWriteDataAcceptedTokenTimeout_ms;
-	uint16_t blockWriteSdBusyTimeout_ms;
-
-	// Variables
-	uint32_t var;
+	uint16_t blockReadStartTokenTimeout_ms;
+	uint16_t blockWriteStartTokenTimeout_ms;
+	uint16_t blockWriteStopTokenTimeout_ms;
 
 	// Info
 	bool wasCtorCalled;
@@ -121,23 +116,21 @@ void AlxSd_Ctor
 	AlxSpi* alxSpi,
 	uint8_t spiNumOfTries,
 	uint16_t spiTimeout_ms,
-	uint8_t initDeInitNumOfTries,
-	uint16_t initDeInitInitialAndNewTryWaitTime_ms,
-	uint16_t cmdRespTimeout_ms,
+	uint16_t cmdRespR1Timeout_ms,
 	uint16_t acmd41Timeout_ms,
-	uint16_t blockReadTokenFeTimeout_ms,
-	uint16_t blockWriteDataAcceptedTokenTimeout_ms,
-	uint16_t blockWriteSdBusyTimeout_ms
+	uint16_t blockReadStartTokenTimeout_ms,
+	uint16_t blockWriteStartTokenTimeout_ms,
+	uint16_t blockWriteStopTokenTimeout_ms
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxSd_Init(AlxSd* me);
-Alx_Status AlxSd_DeInit(AlxSd* me);
-Alx_Status AlxSd_ReadBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries);
-Alx_Status AlxSd_WriteBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries);
+Alx_Status AlxSd_Init(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
+Alx_Status AlxSd_DeInit(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
+Alx_Status AlxSd_ReadBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
+Alx_Status AlxSd_WriteBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
 
 
 #endif	// #if defined(ALX_C_LIB)
