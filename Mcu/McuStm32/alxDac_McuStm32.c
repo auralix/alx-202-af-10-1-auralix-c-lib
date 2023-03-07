@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxDac_McuStm32.c
   * @brief		Auralix C Library - ALX DAC MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -53,6 +53,18 @@ static void AlxDac_Periph_ReleaseReset(AlxDac* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		dac
+  * @param[in]		ioPinArr
+  * @param[in]		chArr
+  * @param[in]		setVoltageDefaultArr_V
+  * @param[in]		numOfCh
+  * @param[in]		isVrefInt_V
+  * @param[in]		vrefExt_V
+  */
 void AlxDac_Ctor
 (
 	AlxDac* me,
@@ -150,6 +162,13 @@ void AlxDac_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxDac_Init(AlxDac* me)
 {
 	// Assert
@@ -159,6 +178,14 @@ Alx_Status AlxDac_Init(AlxDac* me)
 	// Return
 	return AlxDac_Init_Private(me, false, ALX_NULL);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		vref_V
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxDac_Init_CalibrateVref(AlxDac* me, float vref_V)
 {
 	// Assert
@@ -168,6 +195,13 @@ Alx_Status AlxDac_Init_CalibrateVref(AlxDac* me, float vref_V)
 	// Return
 	return AlxDac_Init_Private(me, true, vref_V);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxDac_DeInit(AlxDac* me)
 {
 	// Assert
@@ -195,6 +229,15 @@ Alx_Status AlxDac_DeInit(AlxDac* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		ch
+  * @param[in]		voltage_V
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxDac_SetVoltage_V(AlxDac* me, Alx_Ch ch, float voltage_V)
 {
 	// Assert
@@ -205,6 +248,16 @@ Alx_Status AlxDac_SetVoltage_V(AlxDac* me, Alx_Ch ch, float voltage_V)
 	// Return
 	return AlxDac_SetVoltage_V_Private(me, ch, voltage_V, me->vrefExt_V);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		ch
+  * @param[in]		voltage_V
+  * @param[in]		vref_V
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltage_V, float vref_V)
 {
 	// Assert

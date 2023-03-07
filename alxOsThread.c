@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxOsThread.c
   * @brief		Auralix C Library - ALX OS Thread Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -40,6 +40,16 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		pxTaskCode
+  * @param[in]		pcName
+  * @param[in]		usStackDepth_byte
+  * @param[in]		pvParameters
+  * @param[in]		uxPriority
+  */
 void AlxOsThread_Ctor
 (
 	AlxOsThread* me,
@@ -72,6 +82,13 @@ void AlxOsThread_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxOsThread_Start(AlxOsThread* me)
 {
 	// Assert
@@ -98,6 +115,11 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxOsThread_Yield(AlxOsThread* me)
 {
 	// Assert

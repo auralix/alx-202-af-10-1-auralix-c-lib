@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxOsCriticalSection.c
   * @brief		Auralix C Library - ALX OS Critical Section Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -40,12 +40,20 @@
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  */
 void AlxOsCriticalSection_Enter(void)
 {
 	#if defined(ALX_FREE_RTOS)
 	taskENTER_CRITICAL();
 	#endif
 }
+
+/**
+  * @brief
+  */
 void AlxOsCriticalSection_Exit(void)
 {
 	#if defined(ALX_FREE_RTOS)

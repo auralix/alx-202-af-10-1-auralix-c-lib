@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxGlobal_McuLpc80x.c
   * @brief		Auralix C Library - ALX Global MCU LPC80X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -40,6 +40,13 @@
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] pin
+  * @param[in] port
+  * @return
+  */
 uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port)
 {
 	#if defined(ALX_LPC80X)
@@ -135,6 +142,13 @@ uint8_t AlxPROTECTED_IoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port)
 	// MF: Assert cannot be used
 	return 255;
 }
+
+/**
+  * @brief
+  * @param[in] pin
+  * @param[in] port
+  * @param[in] mode
+  */
 void AlxPROTECTED_IoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode)
 {
 	uint8_t ioconPortPinIndex = AlxPROTECTED_IoPin_GetIoconPortPinIndex(pin, port);

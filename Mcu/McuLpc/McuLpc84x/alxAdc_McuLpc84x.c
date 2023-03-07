@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxAdc_McuLpc84x.c
   * @brief		Auralix C Library - ALX ADC MCU LPC84X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -47,6 +47,15 @@ static uint8_t AlxAdcMcu_GetChannel(AlxIoPin* pin);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		channels
+  * @param[in]		numChannels
+  * @param[in]		adcClkDiv
+  * @param[in]		voltageRefP_mV
+  */
 void AlxAdcMcu_Ctor
 (
 	AlxAdc_Mcu* me,
@@ -91,6 +100,13 @@ void AlxAdcMcu_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 void AlxAdcMcu_Init(AlxAdc_Mcu* me)
 {
 	ALX_ADC_ASSERT(me->isInit == false);
@@ -127,6 +143,13 @@ void AlxAdcMcu_Init(AlxAdc_Mcu* me)
 
 	ALX_ADC_ASSERT(me->isInit == true);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 void AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
 {
 	ALX_ADC_ASSERT(me->isInit == true);
@@ -148,6 +171,13 @@ void AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
 	// #4 Set isInit attribute
 	me->isInit = false;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		pin
+  * @return
+  */
 uint32_t AlxAdcMcu_GetVoltage_mV(AlxAdc_Mcu* me, AlxIoPin* pin)
 {
 	ALX_ADC_ASSERT(me->isInit == true);

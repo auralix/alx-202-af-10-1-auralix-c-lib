@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxI2c_McuStm32.c
   * @brief		Auralix C Library - ALX I2C MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -53,6 +53,15 @@ static void AlxI2c_Periph_ReleaseReset(AlxI2c* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		i2c
+  * @param[in]		io_SCL
+  * @param[in]		io_SDA
+  * @param[in]		clk
+  */
 void AlxI2c_Ctor
 (
 	AlxI2c* me,
@@ -77,7 +86,7 @@ void AlxI2c_Ctor
 	me->hi2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	me->hi2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 
-	#if defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	me->hi2c.Init.Timing = AlxI2c_ParseClk(clk);
 	me->hi2c.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
 	#endif
@@ -95,6 +104,13 @@ void AlxI2c_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_Init(AlxI2c* me)
 {
 	// Assert
@@ -120,6 +136,13 @@ Alx_Status AlxI2c_Init(AlxI2c* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_DeInit(AlxI2c* me)
 {
 	// Assert
@@ -145,12 +168,35 @@ Alx_Status AlxI2c_DeInit(AlxI2c* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		slaveAddr
+  * @param[out]		data
+  * @param[in]		len
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_Master_StartRead(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint16_t timeout_ms)
 {
 	// TODO
 	ALX_I2C_ASSERT(false);
 	return Alx_Err;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		slaveAddr
+  * @param[out]		data
+  * @param[in]		len
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	// Assert
@@ -193,6 +239,20 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		return Alx_ErrNumOfTries;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		slaveAddr
+  * @param[in]		memAddr
+  * @param[in]		memAddrLen
+  * @param[out]		data
+  * @param[in]		len
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	// Assert
@@ -238,12 +298,35 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		return Alx_ErrNumOfTries;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		slaveAddr
+  * @param[in]		data
+  * @param[in]		len
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_Master_StartWrite(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint16_t timeout_ms)
 {
 	// TODO
 	ALX_I2C_ASSERT(false);
 	return Alx_Err;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		slaveAddr
+  * @param[in]		data
+  * @param[in]		len
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	// Assert
@@ -285,10 +368,39 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		return Alx_ErrNumOfTries;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		slaveAddr
+  * @param[in]		memAddr
+  * @param[in]		memAddrLen
+  * @param[in]		data
+  * @param[in]		checkWithRead
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_Master_StartWriteMemStop_Single(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t data, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	return AlxI2c_Master_StartWriteMemStop_Multi(me, slaveAddr, memAddr, memAddrLen, &data, 1, checkWithRead, numOfTries, timeout_ms);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		slaveAddr
+  * @param[in]		memAddr
+  * @param[in]		memAddrLen
+  * @param[in]		data
+  * @param[in]		len
+  * @param[in]		checkWithRead
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, const uint8_t* data, uint16_t len, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	// Assert
@@ -365,12 +477,30 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		return Alx_ErrNumOfTries;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_Master_Stop(AlxI2c* me, uint16_t timeout_ms)
 {
 	// TODO
 	ALX_I2C_ASSERT(false);
 	return Alx_Err;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		slaveAddr
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	// Assert
@@ -510,4 +640,4 @@ static void AlxI2c_Periph_ReleaseReset(AlxI2c* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))

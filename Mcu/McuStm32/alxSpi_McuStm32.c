@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxSpi_McuStm32.c
   * @brief		Auralix C Library - ALX SPI MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -53,6 +53,19 @@ static void AlxSpi_Periph_ReleaseReset(AlxSpi* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		spi
+  * @param[in]		do_SCK
+  * @param[in]		do_MOSI
+  * @param[in]		di_MISO
+  * @param[in]		do_nCS
+  * @param[in]		mode
+  * @param[in]		clk
+  * @param[in]		spiClk
+  */
 void AlxSpi_Ctor
 (
 	AlxSpi* me,
@@ -107,6 +120,13 @@ void AlxSpi_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSpi_Init(AlxSpi* me)
 {
 	// Assert
@@ -134,6 +154,13 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSpi_DeInit(AlxSpi* me)
 {
 	// Assert
@@ -161,6 +188,17 @@ Alx_Status AlxSpi_DeInit(AlxSpi* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		writeData
+  * @param[in]		len
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	// Assert
@@ -202,6 +240,17 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 		return Alx_ErrNumOfTries;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		readData
+  * @param[in]		len
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	// Assert
@@ -243,6 +292,18 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 		return Alx_ErrNumOfTries;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		writeData
+  * @param[out]		readData
+  * @param[in]		len
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	// Assert
@@ -285,10 +346,20 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 		return Alx_ErrNumOfTries;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxSpi_Master_AssertCs(AlxSpi* me)
 {
 	AlxIoPin_Reset(me->do_nCS);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 {
 	AlxIoPin_Set(me->do_nCS);
@@ -328,9 +399,13 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 	{
 		if
 		(
+			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_350kHz_Pclk2Apb2_90MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_700kHz_Pclk2Apb2_90MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_5MHz625_Pclk2Apb2_90MHz) ||
-			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz)
+			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_22MHz5_Pclk2Apb2_90MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_45MHz_Pclk2Apb2_90MHz)
 		)
 		{
 			if(90000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))

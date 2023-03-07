@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxTrace_McuLpc17xx.h
   * @brief		Auralix C Library - ALX Trace MCU LPC17XX Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -70,16 +70,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		port
-  * @param[in]		pin
-  * @param[in]		func
-  * @param[in]		uart
-  * @param[in]		baudRate
-  */
 void AlxTrace_Ctor
 (
 	AlxTrace* me,

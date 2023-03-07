@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxIoPin_McuStm32.c
   * @brief		Auralix C Library - ALX IO Pin MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -41,6 +41,18 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		mode
+  * @param[in]		pull
+  * @param[in]		speed
+  * @param[in]		alternate
+  * @param[in]		val
+  */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
@@ -84,6 +96,11 @@ void AlxIoPin_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Init(AlxIoPin* me)
 {
 	// Assert
@@ -98,6 +115,11 @@ void AlxIoPin_Init(AlxIoPin* me)
 	HAL_GPIO_Init((GPIO_TypeDef*)me->port, &me->igpio);
 	AlxIoPin_Write(me, me->val);							// Set initial output value, after config
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
 	// Assert
@@ -110,6 +132,13 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	// Clear isInit
 	me->isInit = false;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @retval		false
+  * @retval		true
+  */
 bool AlxIoPin_Read(AlxIoPin* me)
 {
 	// Assert
@@ -119,6 +148,12 @@ bool AlxIoPin_Read(AlxIoPin* me)
 	// Read
 	return HAL_GPIO_ReadPin((GPIO_TypeDef*)me->port, me->igpio.Pin);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in]	val
+  */
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
 	// Assert
@@ -128,6 +163,11 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 	// Write
 	HAL_GPIO_WritePin((GPIO_TypeDef*)me->port, me->igpio.Pin, (GPIO_PinState)val);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Set(AlxIoPin* me)
 {
 	// Assert
@@ -137,6 +177,11 @@ void AlxIoPin_Set(AlxIoPin* me)
 	// Set
 	HAL_GPIO_WritePin((GPIO_TypeDef*)me->port, me->igpio.Pin, (GPIO_PinState)true);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Reset(AlxIoPin* me)
 {
 	// Assert
@@ -146,6 +191,11 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	// Reset
 	HAL_GPIO_WritePin((GPIO_TypeDef*)me->port, me->igpio.Pin, (GPIO_PinState)false);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Toggle(AlxIoPin* me)
 {
 	// Assert
@@ -155,6 +205,15 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	// Toggle
 	HAL_GPIO_TogglePin((GPIO_TypeDef*)me->port, me->igpio.Pin);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @retval			AlxIoPin_TriState_HiZ
+  * @retval			AlxIoPin_TriState_Hi
+  * @retval			AlxIoPin_TriState_Lo
+  * @retval			AlxIoPin_TriState_Undefined
+  */
 AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 {
 	//------------------------------------------------------------------------------

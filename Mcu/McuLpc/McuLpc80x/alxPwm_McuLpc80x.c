@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxPwm_McuLpc80x.c
   * @brief		Auralix C Library - ALX PWM MCU LPC80X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -53,6 +53,20 @@ static void AlxPwm_UpdatePwmDutyPct(AlxPwm* me, Alx_Ch ch, float duty_pct);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		tim
+  * @param[in]		ioPinArr
+  * @param[in]		chArr
+  * @param[in]		numOfCh
+  * @param[in]		clk
+  * @param[in]		dutyDefaultArr_permil
+  * @param[in]		dutyDefaultArr_pct
+  * @param[in]		prescaler
+  * @param[in]		period
+  */
 void AlxPwm_Ctor
 (
 	AlxPwm* me,
@@ -117,6 +131,11 @@ void AlxPwm_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxPwm_Init(AlxPwm* me)
 {
 	// Assert
@@ -151,6 +170,11 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	// #6 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 Alx_Status AlxPwm_DeInit(AlxPwm* me)
 {
 	// Assert
@@ -170,6 +194,13 @@ Alx_Status AlxPwm_DeInit(AlxPwm* me)
 	// #4 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] ch
+  * @param[in] duty_pct
+  */
 Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 {
 	// Optimize Guard
@@ -202,6 +233,13 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 	return Alx_Err;
 	#endif
 }
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] ch
+  * @param[in] duty_permil
+  */
 Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {
 	// Optimize Guard

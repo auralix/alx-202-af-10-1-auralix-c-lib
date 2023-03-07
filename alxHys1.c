@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxHys1.c
   * @brief		Auralix C Library - ALX Hysteresis 1 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -40,6 +40,13 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		high
+  * @param[in]		low
+  */
 void AlxHys1_Ctor
 (
 	AlxHys1* me,
@@ -62,6 +69,14 @@ void AlxHys1_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		in
+  * @retval			AlxHys1_StHigh
+  * @retval			AlxHys1_StLow
+  */
 AlxHys1_St AlxHys1_Process(AlxHys1* me, float in)
 {
 	switch(me->st)

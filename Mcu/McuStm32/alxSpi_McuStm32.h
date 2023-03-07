@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxSpi_McuStm32.h
   * @brief		Auralix C Library - ALX SPI MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -58,9 +58,13 @@ extern "C" {
 typedef enum
 {
 	#if defined(ALX_STM32F4)
+	AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_350kHz_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_256,
+	AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_700kHz_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_128,
 	AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_64,
 	AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_5MHz625_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_16,
 	AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_8,
+	AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_22MHz5_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_4,
+	AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_45MHz_Pclk2Apb2_90MHz = SPI_BAUDRATEPRESCALER_2,
 	AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_1MHz4_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_32,
 	AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_5MHz625_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_8,
 	AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_11MHz25_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_4,
@@ -117,19 +121,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		spi
-  * @param[in]		do_SCK
-  * @param[in]		do_MOSI
-  * @param[in]		di_MISO
-  * @param[in]		do_nCS
-  * @param[in]		mode
-  * @param[in]		clk
-  * @param[in]		spiClk
-  */
 void AlxSpi_Ctor
 (
 	AlxSpi* me,

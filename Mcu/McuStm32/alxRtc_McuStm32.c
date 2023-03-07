@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxRtc_McuStm32.c
   * @brief		Auralix C Library - ALX RTC MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -47,6 +47,12 @@ static AlxRtc* alxRtc_me = NULL;
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		rtcClk
+  */
 void AlxRtc_Ctor
 (
 	AlxRtc* me,
@@ -169,6 +175,13 @@ void AlxRtc_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_Init(AlxRtc* me)
 {
 	// Assert
@@ -208,6 +221,13 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_DeInit(AlxRtc* me)
 {
 	// Assert
@@ -227,6 +247,13 @@ Alx_Status AlxRtc_DeInit(AlxRtc* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @param[in,out]	me
+  * @param[in]		dateTime
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 {
 	// Assert
@@ -294,6 +321,14 @@ Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		dateTime
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 {
 	// Assert
@@ -362,6 +397,12 @@ Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 AlxRtc_DateTime AlxRtc_GetDateTime(AlxRtc* me)
 {
 	// Assert
@@ -375,6 +416,13 @@ AlxRtc_DateTime AlxRtc_GetDateTime(AlxRtc* me)
 	// Return
 	return temp;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxRtc_IsDateTimeConfigured(AlxRtc* me)
 {
 	// Assert
@@ -386,6 +434,14 @@ bool AlxRtc_IsDateTimeConfigured(AlxRtc* me)
 	else
 		return false;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		unixTime_ns
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_SetUnixTime_ns(AlxRtc* me, uint64_t unixTime_ns)
 {
 	// Assert
@@ -400,18 +456,50 @@ Alx_Status AlxRtc_SetUnixTime_ns(AlxRtc* me, uint64_t unixTime_ns)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		unixTime_us
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_SetUnixTime_us(AlxRtc* me, uint64_t unixTime_us)
 {
 	return AlxRtc_SetUnixTime_ns(me, unixTime_us * 1000ull);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		unixTime_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_SetUnixTime_ms(AlxRtc* me, uint64_t unixTime_ms)
 {
 	return AlxRtc_SetUnixTime_ns(me, unixTime_ms * 1000000ull);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		unixTime_sec
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_SetUnixTime_sec(AlxRtc* me, uint64_t unixTime_sec)
 {
 	return AlxRtc_SetUnixTime_ns(me, unixTime_sec * 1000000000ull);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		unixTime_ns
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_ns(AlxRtc* me, uint64_t* unixTime_ns)
 {
 	// Assert
@@ -426,6 +514,14 @@ Alx_Status AlxRtc_GetUnixTimeWithStatus_ns(AlxRtc* me, uint64_t* unixTime_ns)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		unixTime_us
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_us(AlxRtc* me, uint64_t* unixTime_us)
 {
 	uint64_t ns = 0;
@@ -434,6 +530,14 @@ Alx_Status AlxRtc_GetUnixTimeWithStatus_us(AlxRtc* me, uint64_t* unixTime_us)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		unixTime_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_ms(AlxRtc* me, uint64_t* unixTime_ms)
 {
 	uint64_t ns = 0;
@@ -442,6 +546,14 @@ Alx_Status AlxRtc_GetUnixTimeWithStatus_ms(AlxRtc* me, uint64_t* unixTime_ms)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		unixTime_sec
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_GetUnixTimeWithStatus_sec(AlxRtc* me, uint64_t* unixTime_sec)
 {
 	uint64_t ns = 0;
@@ -450,30 +562,62 @@ Alx_Status AlxRtc_GetUnixTimeWithStatus_sec(AlxRtc* me, uint64_t* unixTime_sec)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint64_t AlxRtc_GetUnixTime_ns(AlxRtc* me)
 {
 	uint64_t temp = 0;
 	if(AlxRtc_GetUnixTimeWithStatus_ns(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false); return temp; }
 	return temp;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint64_t AlxRtc_GetUnixTime_us(AlxRtc* me)
 {
 	uint64_t temp = 0;
 	if(AlxRtc_GetUnixTimeWithStatus_us(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false); return temp; }
 	return temp;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint64_t AlxRtc_GetUnixTime_ms(AlxRtc* me)
 {
 	uint64_t temp = 0;
 	if(AlxRtc_GetUnixTimeWithStatus_ms(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false); return temp; }
 	return temp;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint64_t AlxRtc_GetUnixTime_sec(AlxRtc* me)
 {
 	uint64_t temp = 0;
 	if(AlxRtc_GetUnixTimeWithStatus_sec(me, &temp) != Alx_Ok) { ALX_RTC_ASSERT(false); return temp; }
 	return temp;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		tuneTime_ns
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns)
 {
 	// Assert
@@ -522,10 +666,26 @@ Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		tuneTime_us
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_TuneTime_us(AlxRtc* me, int64_t tuneTime_us)
 {
 	return AlxRtc_TuneTime_ns(me, tuneTime_us * 1000ull);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		tuneTime_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxRtc_TuneTime_ms(AlxRtc* me, int64_t tuneTime_ms)
 {
 	return AlxRtc_TuneTime_ns(me, tuneTime_ms * 1000000ull);

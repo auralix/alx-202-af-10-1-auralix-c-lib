@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxFifo.c
   * @brief		Auralix C Library - ALX FIFO Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -48,6 +48,13 @@ static uint8_t* AlxFifo_GetTailPtr(AlxFifo* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in,out]	buff
+  * @param[in]		buffLen
+  */
 void AlxFifo_Ctor
 (
 	AlxFifo* me,
@@ -75,6 +82,11 @@ void AlxFifo_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxFifo_Flush(AlxFifo* me)
 {
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
@@ -86,6 +98,16 @@ void AlxFifo_Flush(AlxFifo* me)
 	me->isFull = false;
 	me->isEmpty = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  * @retval			AlxFifo_ErrEmpty
+  */
 Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len)
 {
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
@@ -100,6 +122,19 @@ Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len)
 
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		str
+  * @param[in]		delim
+  * @param[in]		maxLen
+  * @param[out]		numRead
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  * @retval			AlxFifo_ErrEmpty
+  * @retval			AlxFifo_ErrNoDelim
+  */
 Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead)
 {
 	// #0 Assert
@@ -188,6 +223,15 @@ Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint3
 
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		data
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  * @retval			AlxFifo_ErrFull
+  */
 Alx_Status AlxFifo_Write(AlxFifo* me, uint8_t data)
 {
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
@@ -195,6 +239,16 @@ Alx_Status AlxFifo_Write(AlxFifo* me, uint8_t data)
 
 	return AlxFifo_WriteMulti(me, &data, 1);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  * @retval			AlxFifo_ErrFull
+  */
 Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len)
 {
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
@@ -209,12 +263,27 @@ Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len)
 
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		str
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  * @retval			AlxFifo_ErrFull
+  */
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str)
 {
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
 
 	return AlxFifo_WriteMulti(me, (uint8_t*)str, strlen(str));
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me)
 {
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);

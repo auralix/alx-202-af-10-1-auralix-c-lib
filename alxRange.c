@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxRange.c
   * @brief		Auralix C Library - ALX Range Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -40,6 +40,15 @@
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckUint8(uint8_t val, uint8_t valMin, uint8_t valMax)
 {
 	ALX_RANGE_ASSERT(valMin <= valMax);
@@ -55,6 +64,15 @@ Alx_Status AlxRange_CheckUint8(uint8_t val, uint8_t valMin, uint8_t valMax)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckUint16(uint16_t val, uint16_t valMin, uint16_t valMax)
 {
 	ALX_RANGE_ASSERT(valMin <= valMax);
@@ -70,6 +88,15 @@ Alx_Status AlxRange_CheckUint16(uint16_t val, uint16_t valMin, uint16_t valMax)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckUint32(uint32_t val, uint32_t valMin, uint32_t valMax)
 {
 	ALX_RANGE_ASSERT(valMin <= valMax);
@@ -85,6 +112,15 @@ Alx_Status AlxRange_CheckUint32(uint32_t val, uint32_t valMin, uint32_t valMax)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckUint64(uint64_t val, uint64_t valMin, uint64_t valMax)
 {
 	ALX_RANGE_ASSERT(valMin <= valMax);
@@ -100,6 +136,15 @@ Alx_Status AlxRange_CheckUint64(uint64_t val, uint64_t valMin, uint64_t valMax)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckInt8(int8_t val, int8_t valMin, int8_t valMax)
 {
 	ALX_RANGE_ASSERT(valMin <= valMax);
@@ -115,6 +160,15 @@ Alx_Status AlxRange_CheckInt8(int8_t val, int8_t valMin, int8_t valMax)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckInt16(int16_t val, int16_t valMin, int16_t valMax)
 {
 	ALX_RANGE_ASSERT(valMin <= valMax);
@@ -130,6 +184,15 @@ Alx_Status AlxRange_CheckInt16(int16_t val, int16_t valMin, int16_t valMax)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckInt32(int32_t val, int32_t valMin, int32_t valMax)
 {
 	ALX_RANGE_ASSERT(valMin <= valMax);
@@ -145,6 +208,15 @@ Alx_Status AlxRange_CheckInt32(int32_t val, int32_t valMin, int32_t valMax)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckInt64(int64_t val, int64_t valMin, int64_t valMax)
 {
 	ALX_RANGE_ASSERT(valMin <= valMax);
@@ -160,6 +232,15 @@ Alx_Status AlxRange_CheckInt64(int64_t val, int64_t valMin, int64_t valMax)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckFloat(float val, float valMin, float valMax)
 {
 	ALX_RANGE_ASSERT(valMin <= valMax);
@@ -175,6 +256,15 @@ Alx_Status AlxRange_CheckFloat(float val, float valMin, float valMax)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckDouble(double val, double valMin, double valMax)
 {
 	ALX_RANGE_ASSERT(valMin <= valMax);
@@ -190,9 +280,28 @@ Alx_Status AlxRange_CheckDouble(double val, double valMin, double valMax)
 
 	return Alx_Ok;
 }
-//Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax)	// TODO
-//{
-//}
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMin
+  * @param[in]	valMax
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
+Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax)
+{
+	// TODO
+	ALX_RANGE_ASSERT(false);
+}
+
+/**
+  * @brief
+  * @param[in]	val
+  * @param[in]	valMaxLenWithNullTerm
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxRange_CheckStr(char* val, uint32_t valMaxLenWithNullTerm)
 {
 	ALX_RANGE_ASSERT(1 < valMaxLenWithNullTerm);	// We want more than 1, because of null terminator

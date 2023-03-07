@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxAdau1961.c
   * @brief		Auralix C Library - ALX Audio Codec ADAU1961 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -62,6 +62,17 @@ void AlxAdau1961_RegStruct_SetNonClkVal(AlxAdau1961* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		i2s
+  * @param[in]		i2c
+  * @param[in]		i2cAddr
+  * @param[in]		i2cCheckWithRead
+  * @param[in]		i2cNumOfTries
+  * @param[in]		i2cTimeout_ms
+  */
 void AlxAdau1961_Ctor
 (
 	AlxAdau1961* me,
@@ -118,6 +129,13 @@ void AlxAdau1961_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdau1961_Init(AlxAdau1961* me)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == false);
@@ -173,6 +191,13 @@ Alx_Status AlxAdau1961_Init(AlxAdau1961* me)
 	// #10 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdau1961_DeInit(AlxAdau1961* me)
 {
 	// TODO
@@ -180,10 +205,23 @@ Alx_Status AlxAdau1961_DeInit(AlxAdau1961* me)
 
 	return Alx_Err;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAdau1961_Foreground_Handle(AlxAdau1961* me)
 {
 	AlxI2s_Foreground_Handle(me->i2s);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdau1961_InDiffL_SetGain_dB(AlxAdau1961* me, float gain_dB)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == true);
@@ -238,6 +276,14 @@ Alx_Status AlxAdau1961_InDiffL_SetGain_dB(AlxAdau1961* me, float gain_dB)
 	// #4 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdau1961_InDiffR_SetGain_dB(AlxAdau1961* me, float gain_dB)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == true);
@@ -292,6 +338,14 @@ Alx_Status AlxAdau1961_InDiffR_SetGain_dB(AlxAdau1961* me, float gain_dB)
 	// #4 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdau1961_InAuxL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == true);
@@ -318,6 +372,14 @@ Alx_Status AlxAdau1961_InAuxL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB)
 	// #4 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdau1961_InAuxR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == true);
@@ -344,6 +406,14 @@ Alx_Status AlxAdau1961_InAuxR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB)
 	// #4 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdau1961_OutLineL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == true);
@@ -372,6 +442,14 @@ Alx_Status AlxAdau1961_OutLineL_SetGain_dB(AlxAdau1961* me, int8_t gain_dB)
 	// #4 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		gain_dB
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxAdau1961_OutLineR_SetGain_dB(AlxAdau1961* me, int8_t gain_dB)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == true);

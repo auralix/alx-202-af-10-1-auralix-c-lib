@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxAudioPlayer.c
   * @brief		Auralix C Library - ALX Audio Player Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -58,6 +58,16 @@ static float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleT
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] defaultTrackPtr
+  * @param[in] defaultTrackLen_Byte
+  * @param[in] defaultTrackStartOffset_Sample
+  * @param[in] defaultTrackEncoding
+  * @param[in] isDefaultTrackMono
+  */
 void AlxAudioPlayer_Ctor
 (
 	AlxAudioPlayer* me,
@@ -92,6 +102,16 @@ void AlxAudioPlayer_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in] trackPtr
+  * @param[in] len_Byte
+  * @param[in] startOffset_Sample
+  * @param[in] encoding
+  * @param[in] isMono
+  */
 void AlxAudioPlayer_LoadTrack(AlxAudioPlayer* me, const uint8_t* trackPtr, uint32_t len_Byte, uint32_t startOffset_Sample, AlxAudio_Encoding encoding, bool isMono)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
@@ -106,24 +126,47 @@ void AlxAudioPlayer_LoadTrack(AlxAudioPlayer* me, const uint8_t* trackPtr, uint3
 	me->trackSampleIncStep_Byte = AlxAudioPlayer_GetSampleIncStep_Byte(me);
 	me->trackSampleOffset_Byte = (me->trackSampleIncStep_Byte * startOffset_Sample) % len_Byte;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 float AlxAudioPlayer_GetSampleL(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
 
 	return AlxAudioPlayer_GetSample(me, AlxAudioPlayer_SampleType_L);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 float AlxAudioPlayer_GetSampleR(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
 
 	return AlxAudioPlayer_GetSample(me, AlxAudioPlayer_SampleType_R);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 float AlxAudioPlayer_GetSampleMono(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
 
 	return AlxAudioPlayer_GetSample(me, AlxAudioPlayer_SampleType_Mono);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_IncSampleOffset(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
@@ -141,12 +184,22 @@ void AlxAudioPlayer_IncSampleOffset(AlxAudioPlayer* me)
 		me->trackSampleOffset_Byte = (me->trackSampleOffset_Byte + me->trackSampleIncStep_Byte) % me->trackLen_Byte;	// Increment offset, rewind if necessary
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_Play(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
 
 	me->isPlaying = true;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_Stop(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
@@ -154,12 +207,22 @@ void AlxAudioPlayer_Stop(AlxAudioPlayer* me)
 	me->trackSampleOffset_Byte = 0;	// Rewind current track to beginning
 	me->isPlaying = false;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_Pause(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
 
 	me->isPlaying = false;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_Replay(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
@@ -167,24 +230,47 @@ void AlxAudioPlayer_Replay(AlxAudioPlayer* me)
 	AlxAudioPlayer_Stop(me);
 	AlxAudioPlayer_Play(me);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_LoopOn(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
 
 	me->isLoopOn = true;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxAudioPlayer_LoopOff(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
 
 	me->isLoopOn = false;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		isOn
+  */
 void AlxAudioPlayer_LoopConfig(AlxAudioPlayer* me, bool isOn)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);
 
 	me->isLoopOn = isOn;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxAudioPlayer_IsPlaying(AlxAudioPlayer* me)
 {
 	ALX_AUDIO_PLAYER_ASSERT(me->wasCtorCalled == true);

@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxClk_McuLpc55S6x.c
   * @brief		Auralix C Library - ALX Clock MCU LPC55S6X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -69,6 +69,13 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pl
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		config
+  * @param[in]		tick
+  */
 void AlxClk_Ctor
 (
 	AlxClk* me,
@@ -107,7 +114,14 @@ void AlxClk_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxClk_Init(AlxClk* me)
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -162,7 +176,14 @@ Alx_Status AlxClk_Init(AlxClk* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxClk_DeInit(AlxClk* me)
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+ALX_WEAK Alx_Status AlxClk_DeInit(AlxClk* me)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -221,6 +242,13 @@ Alx_Status AlxClk_DeInit(AlxClk* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		clk
+  * @return
+  */
 uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 {
 	// Assert
@@ -244,6 +272,11 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 	ALX_CLK_ASSERT(false);	// We shouldn't get here
 	return 0;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxClk_Irq_Handle(AlxClk* me)
 {
 	// Assert

@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxClk_McuLpc84x.h
   * @brief		Auralix C Library - ALX Clock MCU LPC84X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -69,14 +69,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		mainClkSource
-  * @param[in]		clkFreq
-  * @param[in]		divider
-  */
 void AlxClk_Ctor
 (
 	AlxClk* me,

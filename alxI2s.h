@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxI2s.h
   * @brief		Auralix C Library - ALX I2S Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -88,27 +88,8 @@ typedef struct { bool dummy; } AlxI2s;
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2s_Init(AlxI2s* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2s_DeInit(AlxI2s* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxI2s_Foreground_Handle(AlxI2s* me);
 
 

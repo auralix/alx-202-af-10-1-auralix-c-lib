@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxIoPinIrq_McuLpc80x.h
   * @brief		Auralix C Library - ALX IO Pin IRQ MCU LPC80X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -73,15 +73,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		ioPin
-  * @param[in]		irqPin
-  * @param[in]		irqType
-  * @param[in]		irqPriority
-  */
 void AlxIoPinIrq_Ctor
 (
 	AlxIoPinIrq* me,

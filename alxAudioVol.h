@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxAudioVol.h
   * @brief		Auralix C Library - ALX Audio Volume Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -96,13 +96,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		volMin_dB
-  * @param[in]		volMax_dB
-  */
 void AlxAudioVol_Ctor
 (
 	AlxAudioVol* me,
@@ -114,27 +107,8 @@ void AlxAudioVol_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		inSample
-  * @return
-  */
 float AlxAudioVol_Process(AlxAudioVol* me, float inSample);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		vol_pct
-  */
 void AlxAudioVol_Set_pct(AlxAudioVol* me, float vol_pct);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		vol_dB
-  */
 void AlxAudioVol_Set_dB(AlxAudioVol* me, float vol_dB);
 
 

@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxGlobal_McuStm32L0.h
   * @brief		Auralix C Library - ALX Global MCU STM32L0 File
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *

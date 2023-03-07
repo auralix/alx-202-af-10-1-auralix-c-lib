@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxSpi.h
   * @brief		Auralix C Library - ALX SPI Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -89,70 +89,12 @@ typedef struct { bool dummy; } AlxSpi;
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSpi_Init(AlxSpi* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSpi_DeInit(AlxSpi* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		writeData
-  * @param[in]		len
-  * @param[in]		numOfTries
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		readData
-  * @param[in]		len
-  * @param[in]		numOfTries
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		writeData
-  * @param[out]		readData
-  * @param[in]		len
-  * @param[in]		numOfTries
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  */
 void AlxSpi_Master_AssertCs(AlxSpi* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  */
 void AlxSpi_Master_DeAssertCs(AlxSpi* me);
 
 

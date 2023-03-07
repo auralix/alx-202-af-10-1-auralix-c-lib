@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxSpi_McuLpc55S6x.h
   * @brief		Auralix C Library - ALX SPI MCU LPC55S6X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -101,18 +101,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		spi
-  * @param[in]		do_SCK
-  * @param[in]		do_MOSI
-  * @param[in]		di_MISO
-  * @param[in]		do_nCS
-  * @param[in]		mode
-  * @param[in]		spiClk
-  */
 void AlxSpi_Ctor
 (
 	AlxSpi* me,

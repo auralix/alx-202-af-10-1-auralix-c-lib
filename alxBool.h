@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxBool.h
   * @brief		Auralix C Library - ALX Bool Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -123,18 +123,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  * @param[in] valInitial
-  * @param[in] trueShortTime_ms
-  * @param[in] trueLongTime_ms
-  * @param[in] falseShortTime_ms
-  * @param[in] falseLongTime_ms
-  * @param[in] filtGlitchBool_StableTrueTime_ms
-  * @param[in] filtGlitchBool_StableFalseTime_ms
-  */
 void AlxBool_Ctor
 (
 	AlxBool* me,
@@ -151,161 +139,26 @@ void AlxBool_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		val
-  */
 void AlxBool_Update(AlxBool* me, bool val);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		val
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_IsTrue(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_IsTrueUpToShortTime(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_IsTrueUpToLongTime(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_IsTrueForLongTime(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_WasTrue(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_WasTrueForShortTime(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_WasTrueForLongTime(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  */
 void AlxBool_ClearWasTrueFlag(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  */
 void AlxBool_ClearWasTrueForShortTimeFlag(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  */
 void AlxBool_ClearWasTrueForLongTimeFlag(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_IsFalse(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_IsFalseUpToShortTime(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_IsFalseUpToLongTime(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_IsFalseForLongTime(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_WasFalse(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_WasFalseForShortTime(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBool_WasFalseForLongTime(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  */
 void AlxBool_ClearWasFalseFlag(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  */
 void AlxBool_ClearWasFalseForShortTimeFlag(AlxBool* me);
-	
-/**
-  * @brief
-  * @param[in,out]	me
-  */
 void AlxBool_ClearWasFalseForLongTimeFlag(AlxBool* me);
 
 

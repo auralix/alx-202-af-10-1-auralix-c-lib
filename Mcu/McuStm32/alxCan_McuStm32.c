@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxCan_McuStm32.c
   * @brief		Auralix C Library - ALX CAN MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -69,6 +69,22 @@ static uint8_t AlxCan_GetDataLen(uint32_t lenCode);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		can
+  * @param[in]		do_CAN_TX
+  * @param[in]		di_CAN_RX
+  * @param[in]		clk
+  * @param[in]		canClk
+  * @param[in]		txFifoBuff
+  * @param[in]		txFifoBuffLen
+  * @param[in]		rxFifoBuff
+  * @param[in]		rxFifoBuffLen
+  * @param[in]		txIrqPriority
+  * @param[in]		rxIrqPriority
+  */
 void AlxCan_Ctor
 (
 	AlxCan* me,
@@ -227,6 +243,13 @@ void AlxCan_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxCan_Init(AlxCan* me)
 {
 	ALX_CAN_ASSERT(me->isInit == false);
@@ -279,6 +302,13 @@ Alx_Status AlxCan_Init(AlxCan* me)
 	// #8 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxCan_DeInit(AlxCan* me)
 {
 	ALX_CAN_ASSERT(me->isInit == true);
@@ -326,6 +356,13 @@ Alx_Status AlxCan_DeInit(AlxCan* me)
 	// #8 Return OK
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxCan_ReInit(AlxCan* me)
 {
 	if(AlxCan_DeInit(me) != Alx_Ok) return Alx_Err;
@@ -333,10 +370,27 @@ Alx_Status AlxCan_ReInit(AlxCan* me)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		msg
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxCan_TxMsg(AlxCan* me, AlxCan_Msg msg)
 {
 	return AlxCan_TxMsgMulti(me, &msg, 1);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		msg
+  * @param[in]		numOfMsg
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxCan_TxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg)
 {
 	ALX_CAN_ASSERT(me->isInit == true);
@@ -375,10 +429,27 @@ Alx_Status AlxCan_TxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg)
 	// #4 Return status
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		msg
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxCan_RxMsg(AlxCan* me, AlxCan_Msg* msg)
 {
 	return AlxCan_RxMsgMulti(me, msg, 1);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		msg
+  * @param[in]		numOfMsg
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxCan_RxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg)
 {
 	ALX_CAN_ASSERT(me->isInit == true);
@@ -412,6 +483,13 @@ Alx_Status AlxCan_RxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg)
 	// #3 Return status
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxCan_IsErr(AlxCan* me)
 {
 	ALX_CAN_ASSERT(me->isInit == true);
@@ -430,6 +508,11 @@ bool AlxCan_IsErr(AlxCan* me)
 	// Return
 	return me->isErr;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxCan_Foreground_Handle(AlxCan* me)
 {
 	#if defined(ALX_STM32F4)

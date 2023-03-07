@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxSerialPort_McuStm32.c
   * @brief		Auralix C Library - ALX Serial Port MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -53,6 +53,22 @@ static void AlxSerialPort_Periph_DisableRxIrq(AlxSerialPort* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		uart
+  * @param[in]		do_TX
+  * @param[in]		di_RX
+  * @param[in]		baudRate
+  * @param[in]		dataWidth
+  * @param[in]		stopBits
+  * @param[in]		parity
+  * @param[in]		txTimeout_ms
+  * @param[in]		rxFifoBuff
+  * @param[in]		rxFifoBuffLen
+  * @param[in]		rxIrqPriority
+  */
 void AlxSerialPort_Ctor
 (
 	AlxSerialPort* me,
@@ -66,9 +82,18 @@ void AlxSerialPort_Ctor
 	uint16_t txTimeout_ms,
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
-	Alx_IrqPriority rxIrqPriority
+	Alx_IrqPriority rxIrqPriority,
+	AlxSerialPort_Lin lin
 )
 {
+	// Assert
+	if (lin != AlxSerialPort_Lin_Disable)
+	{
+		ALX_SERIAL_PORT_ASSERT(dataWidth == UART_WORDLENGTH_8B);
+		ALX_SERIAL_PORT_ASSERT(stopBits == UART_STOPBITS_1);
+		ALX_SERIAL_PORT_ASSERT(parity == UART_PARITY_NONE);
+	}
+
 	// Parameters
 	me->uart = uart;
 	me->do_TX = do_TX;
@@ -81,6 +106,7 @@ void AlxSerialPort_Ctor
 	me->rxFifoBuff = rxFifoBuff;
 	me->rxFifoBuffLen = rxFifoBuffLen;
 	me->rxIrqPriority = rxIrqPriority;
+	me->lin = lin;
 
 	// Variables
 	me->huart.Instance = uart;
@@ -129,6 +155,13 @@ void AlxSerialPort_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 {
 	// Assert
@@ -149,7 +182,16 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 	AlxSerialPort_Periph_EnableClk(me);
 
 	// Init UART
-	if(HAL_UART_Init(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+	if (me->lin != AlxSerialPort_Lin_Disable)
+	{
+		#if defined(ALX_STM32F0)
+		if(HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		#endif
+	}
+	else
+	{
+		if(HAL_UART_Init(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+	}
 
 	// Enable UART RX IRQ
 	__HAL_UART_ENABLE_IT(&me->huart, UART_IT_RXNE);
@@ -161,6 +203,13 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 {
 	// Assert
@@ -193,6 +242,15 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 {
 	// Assert
@@ -207,11 +265,23 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		str
+  * @param[in]		delim
+  * @param[in]		maxLen
+  * @param[out]		numRead
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead)
 {
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
+	ALX_SERIAL_PORT_ASSERT(me->lin == AlxSerialPort_Lin_Disable);
 
 	// Read
 	AlxGlobal_DisableIrq();
@@ -221,6 +291,15 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
 	// Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		data
+  * @param[in]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len)
 {
 	// Assert
@@ -228,6 +307,12 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
 	// Write
+	if (me->lin != AlxSerialPort_Lin_Disable)
+	{
+		#if defined(ALX_STM32F0)
+		if(HAL_LIN_SendBreak(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		#endif
+	}
 	if(HAL_UART_Transmit(&me->huart, (uint8_t*)data, len, me->txTimeout_ms) != HAL_OK)
 	{
 		ALX_SERIAL_PORT_TRACE("Err");
@@ -237,15 +322,29 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		str
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
 {
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
+	ALX_SERIAL_PORT_ASSERT(me->lin == AlxSerialPort_Lin_Disable);
 
 	// Return
 	return AlxSerialPort_Write(me, (const uint8_t*)str, strlen(str));
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 {
 	#if defined(ALX_STM32F4)
@@ -257,6 +356,25 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 	// No overrun error handling, overrun error must be disabled @ Uart initialization.
 	uint8_t data = LL_USART_ReceiveData8(me->huart.Instance);	// Clears RXNE = 0
 	AlxFifo_Write(&me->rxFifo, data);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+void AlxSerialPort_FlushRxFifo(AlxSerialPort* me)
+{
+	AlxFifo_Flush(&me->rxFifo);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
+uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
+{
+	return AlxFifo_GetNumOfEntries(&me->rxFifo);
 }
 
 

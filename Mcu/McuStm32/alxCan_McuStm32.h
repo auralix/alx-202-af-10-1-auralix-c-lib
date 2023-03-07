@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxCan_McuStm32.h
   * @brief		Auralix C Library - ALX CAN MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -110,22 +110,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		can
-  * @param[in]		do_CAN_TX
-  * @param[in]		di_CAN_RX
-  * @param[in]		clk
-  * @param[in]		canClk
-  * @param[in]		txFifoBuff
-  * @param[in]		txFifoBuffLen
-  * @param[in]		rxFifoBuff
-  * @param[in]		rxFifoBuffLen
-  * @param[in]		txIrqPriority
-  * @param[in]		rxIrqPriority
-  */
 void AlxCan_Ctor
 (
 	AlxCan* me,

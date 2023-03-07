@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxI2c.h
   * @brief		Auralix C Library - ALX I2C Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -45,7 +45,7 @@ extern "C" {
 #include "alxIoPin.h"
 
 // AlxMcu //
-#if  defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+#if  defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 #include "alxI2c_McuStm32.h"
 
 #elif defined(ALX_LPC80X)
@@ -102,137 +102,16 @@ typedef enum
 //******************************************************************************
 // Specific Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_Init(AlxI2c* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_DeInit(AlxI2c* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		slaveAddr
-  * @param[out]		data
-  * @param[in]		len
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_Master_StartRead(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		slaveAddr
-  * @param[out]		data
-  * @param[in]		len
-  * @param[in]		numOfTries
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		slaveAddr
-  * @param[in]		memAddr
-  * @param[in]		memAddrLen
-  * @param[out]		data
-  * @param[in]		len
-  * @param[in]		numOfTries
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		slaveAddr
-  * @param[in]		data
-  * @param[in]		len
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_Master_StartWrite(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		slaveAddr
-  * @param[in]		data
-  * @param[in]		len
-  * @param[in]		numOfTries
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		slaveAddr
-  * @param[in]		memAddr
-  * @param[in]		memAddrLen
-  * @param[in]		data
-  * @param[in]		checkWithRead
-  * @param[in]		numOfTries
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_Master_StartWriteMemStop_Single(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t data, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		slaveAddr
-  * @param[in]		memAddr
-  * @param[in]		memAddrLen
-  * @param[in]		data
-  * @param[in]		len
-  * @param[in]		checkWithRead
-  * @param[in]		numOfTries
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, const uint8_t* data, uint16_t len, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_Master_Stop(AlxI2c* me, uint16_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		slaveAddr
-  * @param[in]		numOfTries
-  * @param[in]		timeout_ms
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t numOfTries, uint16_t timeout_ms);
 
 

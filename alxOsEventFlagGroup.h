@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxOsEventFlagGroup.h
   * @brief		Auralix C Library - ALX OS Event Flag Group Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -96,11 +96,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxOsEventFlagGroup_Ctor
 (
 	AlxOsEventFlagGroup* me,
@@ -112,42 +107,9 @@ void AlxOsEventFlagGroup_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		eventFlagsToSet
-  * @return
-  */
 uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		eventFlagsToClear
-  * @return
-  */
 uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsToClear);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		eventFlagsToWait
-  * @param[in]		clearEventFlagsOnExit
-  * @param[in]		waitForAllEventFlags
-  * @param[in]		timeout_ms
-  * @return
-  */
 uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsToWait, bool clearEventFlagsOnExit, bool waitForAllEventFlags, uint32_t timeout_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		eventFlagsToSet
-  * @param[in]		eventFlagsToWait
-  * @param[in]		timeout_ms
-  * @return
-  */
 uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, uint32_t eventFlagsToWait, uint32_t timeout_ms);
 
 

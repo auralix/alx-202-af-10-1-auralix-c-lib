@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxI2s_McuStm32.h
   * @brief		Auralix C Library - ALX I2S MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -100,25 +100,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		i2s
-  * @param[in]		do_MCLK
-  * @param[in]		do_BCLK
-  * @param[in]		do_LRCLK
-  * @param[in]		do_SDO
-  * @param[in]		di_SDI
-  * @param[in]		clk
-  * @param[in]		i2sClk
-  * @param[in]		audioMode
-  * @param[in]		dataSize
-  * @param[in]		isMclkUsed
-  * @param[in]		txIrqPriority
-  * @param[in]		me
-  * @param[in]		me
-  */
 void AlxI2s_Ctor
 (
 	AlxI2s* me,

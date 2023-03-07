@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxParamGroup.c
   * @brief		Auralix C Library - ALX Parameter Group Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -47,6 +47,20 @@ static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		memSafe
+  * @param[in]		name
+  * @param[in]		len
+  * @param[in]		valBuff
+  * @param[in]		valStoredBuff
+  * @param[in]		valToStoreBuff
+  * @param[in]		paramItemArr
+  * @param[in]		numOfParamItems
+  * @param[in]		initNumOfTries
+  */
 void AlxParamGroup_Ctor
 (
 	AlxParamGroup* me,
@@ -81,6 +95,13 @@ void AlxParamGroup_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 {
 	// Assert
@@ -196,6 +217,11 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 	// #4 Return
 	return status;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxParamGroup_Write(AlxParamGroup* me)
 {
 	// Assert
@@ -205,6 +231,13 @@ void AlxParamGroup_Write(AlxParamGroup* me)
 	// #1 Start writing
 	AlxMemSafe_Write(me->memSafe, me->valToStoreBuff, me->len);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxParamGroup_IsWriteDone(AlxParamGroup* me)
 {
 	// Assert
@@ -214,6 +247,13 @@ bool AlxParamGroup_IsWriteDone(AlxParamGroup* me)
 	// #1 Return
 	return AlxMemSafe_IsWriteDone(me->memSafe);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxParamGroup_IsWriteErr(AlxParamGroup* me)
 {
 	// Assert
@@ -223,6 +263,13 @@ bool AlxParamGroup_IsWriteErr(AlxParamGroup* me)
 	// #1 Return
 	return AlxMemSafe_IsWriteErr(me->memSafe);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
 bool AlxParamGroup_IsValStoredBuffDiff(AlxParamGroup* me)
 {
 	// Assert
@@ -235,6 +282,11 @@ bool AlxParamGroup_IsValStoredBuffDiff(AlxParamGroup* me)
 	else
 		return false;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxParamGroup_ValBuffToValToStoreBuff(AlxParamGroup* me)
 {
 	// Assert
@@ -244,6 +296,11 @@ void AlxParamGroup_ValBuffToValToStoreBuff(AlxParamGroup* me)
 	// #1 Copy
 	memcpy(me->valToStoreBuff, me->valBuff, me->len);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me)
 {
 	// Assert
@@ -253,6 +310,11 @@ void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me)
 	// #1 Copy
 	memcpy(me->valStoredBuff, me->valToStoreBuff, me->len);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me)
 {
 	// #1 Prepare variables

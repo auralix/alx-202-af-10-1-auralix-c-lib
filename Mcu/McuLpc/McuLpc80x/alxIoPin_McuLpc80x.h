@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxIoPin_McuLpc80x.h
   * @brief		Auralix C Library - ALX IO Pin MCU LPC80X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -290,18 +290,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		port
-  * @param[in]		pin
-  * @param[in]		func
-  * @param[in]		mode
-  * @param[in]		isOpenDrain
-  * @param[in]		dir
-  * @param[in]		val
-  */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,

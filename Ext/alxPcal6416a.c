@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxPcal6416a.c
   * @brief		Auralix C Library - ALX IO Expander PCAL6416A Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -68,6 +68,16 @@ Alx_Status AlxPcal6416a_RegStruct_Write(AlxPcal6416a* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		i2c
+  * @param[in]		i2cAddr
+  * @param[in]		i2cCheckWithRead
+  * @param[in]		i2cNumOfTries
+  * @param[in]		i2cTimeout_ms
+  */
 void AlxPcal6416a_Ctor
 (
 	AlxPcal6416a* me,
@@ -100,6 +110,13 @@ void AlxPcal6416a_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxPcal6416a_InitPeriph(AlxPcal6416a* me)
 {
 	// Assert
@@ -120,6 +137,13 @@ Alx_Status AlxPcal6416a_InitPeriph(AlxPcal6416a* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxPcal6416a_DeInitPeriph(AlxPcal6416a* me)
 {
 	// Assert
@@ -140,6 +164,13 @@ Alx_Status AlxPcal6416a_DeInitPeriph(AlxPcal6416a* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me)
 {
 	// Assert
@@ -170,6 +201,13 @@ Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me)
 {
 	// Assert
@@ -183,6 +221,17 @@ Alx_Status AlxPcal6416a_DeInit(AlxPcal6416a* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		inPort0
+  * @param[in]		inPort1
+  * @param[in]		outPort0
+  * @param[in]		outPort1
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inPort0, bool inPort1, bool outPort0, bool outPort1)
 {
 	// Assert
@@ -218,6 +267,15 @@ Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inPort0, bool inPort1, boo
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @retval			false
+  * @retval			true
+  */
 bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 {
 	// Assert
@@ -260,6 +318,14 @@ bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 		return false;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		val
+  */
 void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, uint8_t port, uint8_t pin, bool val)
 {
 	// Assert
@@ -301,6 +367,13 @@ void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, uint8_t port, uint8_t pin, bool 
 		ALX_PCAL6416A_ASSERT(false);	// We should never get here
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  */
 void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 {
 	// Assert
@@ -313,6 +386,13 @@ void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 	// Set
 	AlxPcal6416a_IoPin_Write(me, port, pin, true);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  */
 void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 {
 	// Assert
@@ -325,6 +405,13 @@ void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 	// Reset
 	AlxPcal6416a_IoPin_Write(me, port, pin, false);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  */
 void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 {
 	// Assert
@@ -352,6 +439,16 @@ void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 		ALX_PCAL6416A_ASSERT(false);	// We should never get here
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, uint8_t port, uint8_t pin, AlxIoPin_TriState* val)
 {
 	//------------------------------------------------------------------------------
@@ -482,6 +579,14 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, uint8_t port, uint
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		reg
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg)
 {
 	// Assert
@@ -502,6 +607,14 @@ Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		reg
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxPcal6416a_Reg_Read(AlxPcal6416a* me, void* reg)
 {
 	// Assert

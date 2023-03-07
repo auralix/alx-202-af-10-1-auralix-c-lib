@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxFtoa.c
   * @brief		Auralix C Library - ALX Float to ASCII Module - Copied from: https://github.com/antongus/stm32tpl/blob/master/ftoa.c
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -65,6 +65,13 @@ static const double rounders[MAX_PRECISION + 1] =
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in] f
+  * @param[in,out] buf
+  * @param[in] precision
+  */
 char* AlxFtoa(double f, char* buf, int precision)
 {
 	char * ptr = buf;

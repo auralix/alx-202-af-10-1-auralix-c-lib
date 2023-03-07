@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxIoPin_McuLpc80x.c
   * @brief		Auralix C Library - ALX IO Pin MCU LPC80X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -50,6 +50,18 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		func
+  * @param[in]		mode
+  * @param[in]		isOpenDrain
+  * @param[in]		dir
+  * @param[in]		val
+  */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
@@ -93,6 +105,11 @@ void AlxIoPin_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Init(AlxIoPin* me)
 {
 	// Assert
@@ -157,6 +174,11 @@ void AlxIoPin_Init(AlxIoPin* me)
 	// #5 Set initial output value, after config
 	AlxIoPin_Write(me, me->val);
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
 	// Assert
@@ -198,6 +220,13 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	// #3 Clear isInit attribute
 	me->isInit = false;
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @retval		false
+  * @retval		true
+  */
 bool AlxIoPin_Read(AlxIoPin* me)
 {
 	// Assert
@@ -208,6 +237,12 @@ bool AlxIoPin_Read(AlxIoPin* me)
 	if (GPIO_PinRead(GPIO, me->port, me->pin) == 1) { return true; }
 	else { return false; }
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @param[in]	val
+  */
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
 	// Assert
@@ -219,6 +254,11 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 	if (val) { GPIO_PinWrite(GPIO, me->port, me->pin, 1U); }
 	else { GPIO_PinWrite(GPIO, me->port, me->pin, 0U); }
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Set(AlxIoPin* me)
 {
 	// Assert
@@ -228,6 +268,11 @@ void AlxIoPin_Set(AlxIoPin* me)
 	// #1 Set Pin
 	GPIO_PortSet(GPIO, me->port, (1U << me->pin));
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Reset(AlxIoPin* me)
 {
 	// Assert
@@ -237,6 +282,11 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	// #1 Reset Pin
 	GPIO_PortClear(GPIO, me->port, (1U << me->pin));
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPin_Toggle(AlxIoPin* me)
 {
 	// Assert
@@ -246,37 +296,16 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	// #1 Toggle Pin
 	GPIO_PortToggle(GPIO, me->port, (1U << me->pin));
 }
-void AlxIoPin_Lock(AlxIoPin* me)
-{
-	// TODO
-	ALX_IO_PIN_ASSERT(false);
-}
-void AlxIoPin_IrqHandler(AlxIoPin* me)
-{
-	// TODO
-	ALX_IO_PIN_ASSERT(false);
-}
-void AlxIoPin_Config_PullNone(AlxIoPin* me)
-{
-	// TODO
-	ALX_IO_PIN_ASSERT(false);
-}
-void AlxIoPin_Config_PullUp(AlxIoPin* me)
-{
-	// TODO
-	ALX_IO_PIN_ASSERT(false);
-}
-void AlxIoPin_Config_PullDown(AlxIoPin* me)
-{
-	// TODO
-	ALX_IO_PIN_ASSERT(false);
-}
-void AlxIoPin_Config_AssertOn(AlxIoPin* me)
-{
-	// TODO
-	ALX_IO_PIN_ASSERT(false);
-}
-void AlxIoPin_Config_AssertOff(AlxIoPin* me)
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @retval			AlxIoPin_TriState_HiZ
+  * @retval			AlxIoPin_TriState_Hi
+  * @retval			AlxIoPin_TriState_Lo
+  * @retval			AlxIoPin_TriState_Undefined
+  */
+AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 {
 	// TODO
 	ALX_IO_PIN_ASSERT(false);

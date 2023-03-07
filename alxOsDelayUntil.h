@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxOsDelayUntil.h
   * @brief		Auralix C Library - ALX OS Delay Until Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -96,12 +96,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osTick
-  */
 void AlxOsDelayUntil_Ctor
 (
 	AlxOsDelayUntil* me,
@@ -112,46 +106,11 @@ void AlxOsDelayUntil_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxOsDelayUntil_Init(AlxOsDelayUntil* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelayUntilIncrement_us
-  */
 void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osDelayUntilIncrement_us);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osTimeIncrement_ms
-  */
 void AlxOsDelayUntil_ms(AlxOsDelayUntil* me, uint64_t osTimeIncrement_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osTimeIncrement_sec
-  */
 void AlxOsDelayUntil_sec(AlxOsDelayUntil* me, uint64_t osTimeIncrement_sec);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osTimeIncrement_min
-  */
 void AlxOsDelayUntil_min(AlxOsDelayUntil* me, uint64_t osTimeIncrement_min);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osTimeIncrement_hr
-  */
 void AlxOsDelayUntil_hr(AlxOsDelayUntil* me, uint64_t osTimeIncrement_hr);
 
 

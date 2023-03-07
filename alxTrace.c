@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxTrace.c
   * @brief		Auralix C Library - ALX Trace Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -47,6 +47,14 @@ AlxTrace alxTrace = {0};
 // Functions
 //******************************************************************************
 #if defined(ALX_PC) || defined(ALX_MBED)
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 {
 	// Void
@@ -56,6 +64,14 @@ Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 	// Return
 	return Alx_Err;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 {
 	// Void
@@ -65,6 +81,15 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 	// Return
 	return Alx_Err;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		str
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
 {
 	// Void
@@ -78,6 +103,13 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
 	return Alx_Ok;
 }
 #endif
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @param[in]		format
+  */
 void AlxTrace_WriteFormat(AlxTrace* me, bool threadSafe, const char* format, ...)
 {
 	char buff[256] = {0};
@@ -89,6 +121,16 @@ void AlxTrace_WriteFormat(AlxTrace* me, bool threadSafe, const char* format, ...
 
 	AlxTrace_WriteStr(me, buff, threadSafe);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		file
+  * @param[in]		line
+  * @param[in]		fun
+  * @param[in]		threadSafe
+  * @param[in]		format
+  */
 void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, bool threadSafe, const char* format, ...)
 {
 	char buff[256] = {0};
@@ -103,6 +145,16 @@ void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char
 
 	AlxTrace_WriteFormat(me, threadSafe, "%s\r\n", buff);
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		smLevel
+  * @param[in]		smName
+  * @param[in]		stName
+  * @param[in]		acName
+  * @param[in]		threadSafe
+  */
 void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName, bool threadSafe)
 {
 	if ((smName != NULL) && (stName != NULL) && (acName != NULL))
@@ -116,6 +168,12 @@ void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const c
 		AlxTrace_WriteFormat(me, threadSafe, "traceSm;%s;%s%s_%s_%s\r\n", tickStr, smLevelStr, smName, stName, acName);
 	}
 }
+
+/**
+  * @brief
+  * @param[in]	smLevel
+  * @param[in]	smLevelStr
+  */
 void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr)
 {
 	switch (smLevel)

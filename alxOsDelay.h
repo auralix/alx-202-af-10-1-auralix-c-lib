@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxOsDelay.h
   * @brief		Auralix C Library - ALX OS Delay Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -97,13 +97,6 @@ extern AlxOsDelay alxOsDelay;
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osTick
-  * @param[in]		approxDisable
-  */
 void AlxOsDelay_Ctor
 (
 	AlxOsDelay* me,
@@ -115,40 +108,10 @@ void AlxOsDelay_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_us
-  */
 void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_ms
-  */
 void AlxOsDelay_ms(AlxOsDelay* me, uint64_t osDelay_ms);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_sec
-  */
 void AlxOsDelay_sec(AlxOsDelay* me, uint64_t osDelay_sec);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_min
-  */
 void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_hr
-  */
 void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr);
 
 

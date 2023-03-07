@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxInterpLin.c
   * @brief		Auralix C Library - ALX Linear Interpolation Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -40,6 +40,15 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		xPointArr
+  * @param[in]		yPointArr
+  * @param[in]		numOfArrPoints
+  * @param[in]		isisXpointArrRising
+  */
 void AlxInterpLin_Ctor
 (
 	AlxInterpLin* me,
@@ -74,6 +83,15 @@ void AlxInterpLin_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in]	me
+  * @param[in]	x
+  * @param[out] y
+  * @retval		Alx_Ok
+  * @retval		Alx_Err
+  */
 Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* yPtr)
 {
 	uint32_t index0 = 0;
@@ -143,6 +161,13 @@ Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* yPtr)
 
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in] me
+  * @param[in] x
+  * @return
+  */
 float AlxInterpLin_GetY(AlxInterpLin* me, float x)
 {
 	float y;

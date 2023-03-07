@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxBts724g.h
   * @brief		Auralix C Library - ALX High Side Power Switch BTS724G Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -111,13 +111,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		do_HS_IN
-  * @param[in]		di_HS_ST
-  */
 void AlxBts724g_Ctor
 (
 	AlxBts724g* me,
@@ -129,73 +122,15 @@ void AlxBts724g_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBts724g_Init(AlxBts724g* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBts724g_DeInit(AlxBts724g* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBts724g_Handle(AlxBts724g* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBts724g_SetOut(AlxBts724g* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBts724g_ResetOut(AlxBts724g* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxBts724g_WriteOut(AlxBts724g* me, bool state);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBts724g_IsOpenLoadDetected(AlxBts724g* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBts724g_IsOverTempDetected(AlxBts724g* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBts724g_WasOpenLoadDetected(AlxBts724g* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
 bool AlxBts724g_WasOverTempDetected(AlxBts724g* me);
 
 

@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxIoPin_McuStm32.h
   * @brief		Auralix C Library - ALX IO Pin MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -79,18 +79,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		port
-  * @param[in]		pin
-  * @param[in]		mode
-  * @param[in]		pull
-  * @param[in]		speed
-  * @param[in]		alternate
-  * @param[in]		val
-  */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,

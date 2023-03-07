@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		AlxDac.h
-  * @brief		Auralix C Library - ALX DAC Module
+  * @file		alxLin.h
+  * @brief		Auralix C Library - ALX LIN Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_DAC_H
-#define ALX_DAC_H
+#ifndef ALX_LIN_H
+#define ALX_LIN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,17 +40,10 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxIoPin.h"
-
-// AlxMcu //
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-#include "alxDac_McuStm32.h"
-
-#else
-typedef struct { bool dummy; } AlxDac;
-#endif
+#include "alxTrace.h"
+#include "alxSerialPort.h"
+#include "alxOsDelay.h"
 
 
 //******************************************************************************
@@ -62,35 +55,64 @@ typedef struct { bool dummy; } AlxDac;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_DAC_FILE "alxDac.h"
+#define ALX_LIN_FILE "alxLin.h"
 
 // Assert //
-#if defined(_ALX_DAC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_DAC_FILE, expr)
-#elif defined(_ALX_DAC_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_DAC_FILE, expr)
-#elif defined(_ALX_DAC_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_RST(ALX_DAC_FILE, expr)
+#if defined(_ALX_LIN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_LIN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LIN_FILE, expr)
+#elif defined(_ALX_LIN_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_LIN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LIN_FILE, expr)
+#elif defined(_ALX_LIN_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_LIN_ASSERT(expr) ALX_ASSERT_RST(ALX_LIN_FILE, expr)
 #else
-	#define ALX_DAC_ASSERT(expr) do{} while (false)
+	#define ALX_LIN_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_DAC_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_DAC_TRACE(...) ALX_TRACE_STD(ALX_DAC_FILE, __VA_ARGS__)
+#if defined(_ALX_LIN_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_LIN_TRACE(...) ALX_TRACE_STD(ALX_LIN_FILE, __VA_ARGS__)
+	#define ALX_LIN_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
-	#define ALX_DAC_TRACE(...) do{} while (false)
+	#define ALX_LIN_TRACE(...) do{} while (false)
+	#define ALX_LIN_TRACE_FORMAT(...) do{} while (false)
 #endif
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Defines
+	#define ALX_LIN_BUFF_LEN 250
+
+	// Parameters
+	AlxSerialPort* alxSerialPort;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxLin;
+
+
+//******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxLin_Ctor
+(
+	AlxLin* me,
+	AlxSerialPort* alxSerialPort
+);
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxDac_Init(AlxDac* me);
-Alx_Status AlxDac_Init_CalibrateVref(AlxDac* me, float vref_V);
-Alx_Status AlxDac_DeInit(AlxDac* me);
-Alx_Status AlxDac_SetVoltage_V(AlxDac* me, Alx_Ch ch, float voltage_V);
-Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltage_V, float vref_V);
+Alx_Status AlxLin_Init(AlxLin* me);
+Alx_Status AlxLin_DeInit(AlxLin* me);
+Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLenEnable, uint32_t maxLen, uint32_t* actualLen);
+Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLenEnable);
+void AlxLin_IrqHandler(AlxLin* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -99,4 +121,4 @@ Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltag
 }
 #endif
 
-#endif	// #ifndef ALX_DAC_H
+#endif	// #ifndef ALX_LIN_H

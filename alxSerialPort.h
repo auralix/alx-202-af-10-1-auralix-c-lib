@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxSerialPort.h
   * @brief		Auralix C Library - ALX Serial Port Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -84,68 +84,14 @@ typedef struct { bool dummy; } AlxSerialPort;
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSerialPort_Init(AlxSerialPort* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		data
-  * @param[in]		len
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		str
-  * @param[in]		delim
-  * @param[in]		maxLen
-  * @param[out]		numRead
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		data
-  * @param[in]		len
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		str
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  */
+void AlxSerialPort_FlushRxFifo(AlxSerialPort* me);
+uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me);
 void AlxSerialPort_IrqHandler(AlxSerialPort* me);
 
 

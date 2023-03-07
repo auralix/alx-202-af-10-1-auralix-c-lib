@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxOsMutex.h
   * @brief		Auralix C Library - ALX OS Mutex Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -66,11 +66,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxOsMutex_Ctor
 (
 	AlxOsMutex* me
@@ -80,25 +75,8 @@ void AlxOsMutex_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in] me
-  */
 void AlxOsMutex_Lock(AlxOsMutex* me);
-
-/**
-  * @brief
-  * @param[in] me
-  */
 void AlxOsMutex_Unlock(AlxOsMutex* me);
-
-/**
-  * @brief
-  * @param[in]	me
-  * @retval		false
-  * @retval		true
-  */
 bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me);	// TV: Not tested
 
 

@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxClk.h
   * @brief		Auralix C Library - ALX Clock Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -97,35 +97,9 @@ typedef struct { bool dummy; } AlxClk;
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxClk_Init(AlxClk* me);
-
-	/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxClk_DeInit(AlxClk* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		clk
-  * @return
-  */
 uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxClk_Irq_Handle(AlxClk* me);
 
 

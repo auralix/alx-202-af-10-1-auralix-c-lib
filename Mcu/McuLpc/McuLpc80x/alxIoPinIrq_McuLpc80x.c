@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxIoPinIrq_McuLpc80x.c
   * @brief		Auralix C Library - ALX IO Pin IRQ MCU LPC80X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -64,6 +64,15 @@ void AlxIoPinIrq_Foreground_Callback_Pin7();
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		ioPin
+  * @param[in]		irqPin
+  * @param[in]		irqType
+  * @param[in]		irqPriority
+  */
 void AlxIoPinIrq_Ctor
 (
 	AlxIoPinIrq* me,
@@ -95,6 +104,11 @@ void AlxIoPinIrq_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 {
 	ALX_IO_PIN_IRQ_ASSERT(me->isInit == false);
@@ -121,6 +135,11 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 	NVIC_SetPriority(irqType, (uint32_t)me->irqPriority);					// MF: Set IRQ Priority
 	PINT_EnableCallbackByIndex(PINT, me->irqPin);							// MF: Enable IRQ
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 {
 	ALX_IO_PIN_IRQ_ASSERT(me->isInit == true);

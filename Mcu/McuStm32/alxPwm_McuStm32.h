@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxPwm_McuStm32.h
   * @brief		Auralix C Library - ALX PWM MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -93,20 +93,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		tim
-  * @param[in]		ioPinArr
-  * @param[in]		chArr
-  * @param[in]		numOfCh
-  * @param[in]		clk
-  * @param[in]		dutyDefaultArr_permil
-  * @param[in]		dutyDefaultArr_pct
-  * @param[in]		prescaler
-  * @param[in]		period
-  */
 void AlxPwm_Ctor
 (
 	AlxPwm* me,

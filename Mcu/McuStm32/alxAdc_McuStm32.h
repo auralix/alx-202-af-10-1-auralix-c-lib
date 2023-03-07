@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxAdc_McuStm32.h
   * @brief		Auralix C Library - ALX ADC MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -57,6 +57,9 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
+	#if defined(ALX_STM32F0)
+	AlxAdc_Clk_McuStm32F0_AdcClk_12MHz_Pclk1Apb1_48MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
+	#endif
 	#if defined(ALX_STM32F1)
 	AlxAdc_Clk_McuStm32F1_AdcClk_4MHz_Pclk2Apb2_8MHz = RCC_ADCPCLK2_DIV2,
 	#endif
@@ -114,21 +117,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		adc
-  * @param[in]		ioPinArr
-  * @param[in]		numOfIoPins
-  * @param[in]		chArr
-  * @param[in]		numOfCh
-  * @param[in]		clk
-  * @param[in]		adcClk
-  * @param[in]		samplingTime
-  * @param[in]		isVrefInt_V
-  * @param[in]		vrefExt_V
-  */
 void AlxAdc_Ctor
 (
 	AlxAdc* me,
@@ -145,7 +133,7 @@ void AlxAdc_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

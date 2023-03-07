@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxSerialPort_McuStm32.h
   * @brief		Auralix C Library - ALX Serial Port MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -55,6 +55,13 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxSerialPort_Lin_Disable,
+	AlxSerialPort_Lin_EnableMaster,
+	AlxSerialPort_Lin_EnableSlave
+} AlxSerialPort_Lin;
+
 typedef struct
 {
 	// Parameters
@@ -69,6 +76,7 @@ typedef struct
 	uint8_t* rxFifoBuff;
 	uint32_t rxFifoBuffLen;
 	Alx_IrqPriority rxIrqPriority;
+	AlxSerialPort_Lin lin;
 
 	// Variables
 	UART_HandleTypeDef huart;
@@ -83,22 +91,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		uart
-  * @param[in]		do_TX
-  * @param[in]		di_RX
-  * @param[in]		baudRate
-  * @param[in]		dataWidth
-  * @param[in]		stopBits
-  * @param[in]		parity
-  * @param[in]		txTimeout_ms
-  * @param[in]		rxFifoBuff
-  * @param[in]		rxFifoBuffLen
-  * @param[in]		rxIrqPriority
-  */
 void AlxSerialPort_Ctor
 (
 	AlxSerialPort* me,
@@ -112,7 +104,8 @@ void AlxSerialPort_Ctor
 	uint16_t txTimeout_ms,
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
-	Alx_IrqPriority rxIrqPriority
+	Alx_IrqPriority rxIrqPriority,
+	AlxSerialPort_Lin lin
 );
 
 

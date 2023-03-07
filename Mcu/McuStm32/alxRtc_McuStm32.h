@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxRtc_McuStm32.h
   * @brief		Auralix C Library - ALX RTC MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -89,12 +89,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		rtcClk
-  */
 void AlxRtc_Ctor
 (
 	AlxRtc* me,

@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxCrc.c
   * @brief		Auralix C Library - ALX CRC Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -46,6 +46,12 @@ static uint32_t AlxCrc_Reflect(uint32_t data, uint8_t nBits);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		config
+  */
 void AlxCrc_Ctor
 (
 	AlxCrc* me,
@@ -63,6 +69,14 @@ void AlxCrc_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		data
+  * @param[in]		len
+  * @return
+  */
 uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 {
 	// #1 Assert
@@ -187,6 +201,16 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 		}
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		dataWithCrc
+  * @param[in]		lenWithCrc
+  * @param[in]		validatedCrc
+  * @retval			false
+  * @retval			true
+  */
 bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t* validatedCrc)
 {
 	// #1 Assert
@@ -219,6 +243,12 @@ bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t
 		return false;
 	}
 }
+
+/**
+  * @brief
+  * @param[in,out] me
+  * @return
+  */
 uint32_t AlxCrc_GetLen(AlxCrc* me)
 {
 	// #1 Assert

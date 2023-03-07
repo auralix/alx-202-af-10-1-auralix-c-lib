@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxGlobal.h
   * @brief		Auralix C Library - ALX Global Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -265,15 +265,16 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxGlobal_BaudRate_9600    = 9600,
-	AlxGlobal_BaudRate_115200  = 115200,
-	AlxGlobal_BaudRate_800000  = 800000,
-	AlxGlobal_BaudRate_921600  = 921600,
-	AlxGlobal_BaudRate_1000000 = 1000000,
-	AlxGlobal_BaudRate_1600000 = 1600000,
-	AlxGlobal_BaudRate_2000000 = 2000000,
-	AlxGlobal_BaudRate_4000000 = 4000000,
-	AlxGlobal_BaudRate_8000000 = 8000000
+	AlxGlobal_BaudRate_9600		= 9600,
+	AlxGlobal_BaudRate_19200	= 19200,
+	AlxGlobal_BaudRate_115200	= 115200,
+	AlxGlobal_BaudRate_800000	= 800000,
+	AlxGlobal_BaudRate_921600	= 921600,
+	AlxGlobal_BaudRate_1000000	= 1000000,
+	AlxGlobal_BaudRate_1600000	= 1600000,
+	AlxGlobal_BaudRate_2000000	= 2000000,
+	AlxGlobal_BaudRate_4000000	= 4000000,
+	AlxGlobal_BaudRate_8000000	= 8000000
 } AlxGlobal_BaudRate;
 
 typedef enum
@@ -427,29 +428,9 @@ typedef enum
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  */
 void AlxGlobal_DisableIrq(void);
-
-/**
-  * @brief
-  */
 void AlxGlobal_EnableIrq(void);
-
-/**
-  * @brief
-  * @param[in]	uint64
-  * @param[out]	str
-  */
 void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str);
-
-/**
-  * @brief
-  * @param[in] val
-  * @return
-  */
 uint32_t AlxGlobal_Ntohl(uint32_t val);
 
 

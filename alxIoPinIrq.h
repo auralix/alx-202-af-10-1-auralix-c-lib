@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxIoPinIrq.h
   * @brief		Auralix C Library - ALX IO Pin IRQ Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -91,17 +91,7 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxIoPinIrq_Init(AlxIoPinIrq* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me);
 
 

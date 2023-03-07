@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxFiltGlitchUint32.h
   * @brief		Auralix C Library - ALX Fliter Glitch Uint32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -99,13 +99,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		valInitial
-  * @param[in]		stableTime_ms
-  */
 void AlxFiltGlitchUint32_Ctor
 (
 	AlxFiltGlitchUint32* me,
@@ -117,13 +110,6 @@ void AlxFiltGlitchUint32_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		valNew
-  * @return
-  */
 uint32_t AlxFiltGlitchUint32_Process(AlxFiltGlitchUint32* me, uint32_t valNew);
 
 

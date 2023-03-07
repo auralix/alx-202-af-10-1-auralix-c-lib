@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * @file		alxMemSafe.h
-  * @brief		Auralix C Library - ALX Memory Safe Module
+  * @file		alxSd.h
+  * @brief		Auralix C Library - ALX SD Card Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_MEM_SAFE_H
-#define ALX_MEM_SAFE_H
+#ifndef ALX_SD_H
+#define ALX_SD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,10 +40,10 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxMemRaw.h"
-#include "alxCrc.h"
+#include "alxTrace.h"
+#include "alxSpi.h"
+#include "alxTimSw.h"
 
 
 //******************************************************************************
@@ -55,24 +55,26 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_MEM_SAFE_FILE "alxMemSafe.h"
+#define ALX_SD_FILE "alxSd.h"
 
 // Assert //
-#if defined(_ALX_MEM_SAFE_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_MEM_SAFE_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MEM_SAFE_FILE, expr)
-#elif defined(_ALX_MEM_SAFE_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_MEM_SAFE_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MEM_SAFE_FILE, expr)
-#elif defined(_ALX_MEM_SAFE_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_MEM_SAFE_ASSERT(expr) ALX_ASSERT_RST(ALX_MEM_SAFE_FILE, expr)
+#if defined(_ALX_SD_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_SD_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SD_FILE, expr)
+#elif defined(_ALX_SD_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_SD_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SD_FILE, expr)
+#elif defined(_ALX_SD_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_SD_ASSERT(expr) ALX_ASSERT_RST(ALX_SD_FILE, expr)
 #else
-	#define ALX_MEM_SAFE_ASSERT(expr) do{} while (false)
+	#define ALX_SD_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_MEM_SAFE_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_MEM_SAFE_TRACE(...) ALX_TRACE_STD(ALX_MEM_SAFE_FILE, __VA_ARGS__)
+#if defined(_ALX_SD_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_SD_TRACE(...) ALX_TRACE_STD(ALX_SD_FILE, __VA_ARGS__)
+	#define ALX_SD_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
-	#define ALX_MEM_SAFE_TRACE(...) do{} while (false)
+	#define ALX_SD_TRACE(...) do{} while (false)
+	#define ALX_SD_TRACE_FORMAT(...) do{} while (false)
 #endif
 
 
@@ -81,70 +83,54 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Parameters
-	AlxMemRaw* memRaw;
-	AlxCrc* crc;
-	uint32_t copyAddrA;
-	uint32_t copyAddrB;
-	uint32_t copyLen;
-	uint32_t copyCrcLen;
-	uint32_t copyLenWithCrc;
-	bool nonBlockingEnable;
-	uint8_t memSafeReadWriteNumOfTries;
-	uint8_t memRawReadWriteNumOfTries;
-	uint16_t memRawReadWriteTimeout_ms;
-	uint8_t* buff1;
-	uint32_t buff1Len;
-	uint8_t* buff2;
-	uint32_t buff2Len;
+	// Defines
+	#define ALX_SD_DATA_0xFF_LEN 520
+	#define ALX_SD_BLOCK_LEN 512
 
-	// Variables
-	uint32_t crcCopyA;
-	uint32_t crcCopyB;
-	bool isCopyAValid;
-	bool isCopyBValid;
-	uint32_t crcToWrite;
-	bool isReadDone;
-	bool isReadErr;
-	bool isWriteDone;
-	bool isWriteErr;
+	// Const
+	uint8_t DATA_0xFF[ALX_SD_DATA_0xFF_LEN];
+	uint8_t NUM_OF_PWR_UP_CLK_CYCLES;
+
+	// Parameters
+	AlxSpi* alxSpi;
+	uint8_t spiNumOfTries;
+	uint16_t spiTimeout_ms;
+	uint16_t cmdRespR1Timeout_ms;
+	uint16_t acmd41Timeout_ms;
+	uint16_t blockReadStartTokenTimeout_ms;
+	uint16_t blockWriteStartTokenTimeout_ms;
+	uint16_t blockWriteStopTokenTimeout_ms;
 
 	// Info
 	bool wasCtorCalled;
-} AlxMemSafe;
+	bool isInit;
+} AlxSd;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxMemSafe_Ctor
+void AlxSd_Ctor
 (
-	AlxMemSafe* me,
-	AlxMemRaw* memRaw,
-	AlxCrc* crc,
-	uint32_t copyAddrA,
-	uint32_t copyAddrB,
-	uint32_t copyLen,
-	bool nonBlockingEnable,
-	uint8_t memSafeReadWriteNumOfTries,
-	uint8_t memRawReadWriteNumOfTries,
-	uint16_t memRawReadWriteTimeout_ms,
-	uint8_t* buff1,
-	uint32_t buff1Len,
-	uint8_t* buff2,
-	uint32_t buff2Len
+	AlxSd* me,
+	AlxSpi* alxSpi,
+	uint8_t spiNumOfTries,
+	uint16_t spiTimeout_ms,
+	uint16_t cmdRespR1Timeout_ms,
+	uint16_t acmd41Timeout_ms,
+	uint16_t blockReadStartTokenTimeout_ms,
+	uint16_t blockWriteStartTokenTimeout_ms,
+	uint16_t blockWriteStopTokenTimeout_ms
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len);
-Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len);
-bool AlxMemSafe_IsReadDone(AlxMemSafe* me);
-bool AlxMemSafe_IsReadErr(AlxMemSafe* me);
-bool AlxMemSafe_IsWriteDone(AlxMemSafe* me);
-bool AlxMemSafe_IsWriteErr(AlxMemSafe* me);
+Alx_Status AlxSd_Init(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
+Alx_Status AlxSd_DeInit(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
+Alx_Status AlxSd_ReadBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
+Alx_Status AlxSd_WriteBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -153,4 +139,4 @@ bool AlxMemSafe_IsWriteErr(AlxMemSafe* me);
 }
 #endif
 
-#endif	// #ifndef ALX_MEM_SAFE_H
+#endif	// #ifndef ALX_SD_H

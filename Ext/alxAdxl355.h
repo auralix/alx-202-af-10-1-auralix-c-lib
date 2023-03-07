@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxAdxl355.h
   * @brief		Auralix C Library - ALX Accelerometer ADXL355 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -603,16 +603,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		spi
-  * @param[in]		spiNumOfTries
-  * @param[in]		spiTimeout_ms
-  * @param[in]		fifoBuff
-  * @param[in]		fifoBuffLen
-  */
 void AlxAdxl355_Ctor
 (
 	AlxAdxl355* me,
@@ -627,71 +617,13 @@ void AlxAdxl355_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxAdxl355_Init(AlxAdxl355* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxAdxl355_DeInit(AlxAdxl355* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxAdxl355_Enable(AlxAdxl355* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxAdxl355_Disable(AlxAdxl355* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		xyz_g
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		xyz_g
-  * @param[in]		len
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxAdxl355_GetXyzMulti_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint32_t len);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @return
-  */
 float AlxAdxl355_GetTemp_degC(AlxAdxl355* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
 Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me);
 
 

@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxMcp73831.h
   * @brief		Auralix C Library - ALX Battery Charger MCP73831 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -105,13 +105,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		di_STAT
-  * @param[in]		di_STAT_TriState
-  */
 void AlxMcp73831_Ctor
 (
 	AlxMcp73831* me,
@@ -123,27 +116,8 @@ void AlxMcp73831_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxMcp73831_Init(AlxMcp73831* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxMcp73831_DeInit(AlxMcp73831* me);
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			AlxMcp73831_St_Err
-  * @retval			AlxMcp73831_St_Shutdown
-  * @retval			AlxMcp73831_St_Charging
-  * @retval			AlxMcp73831_St_Standby
-  */
 AlxMcp73831_St AlxMcp73831_GetSt(AlxMcp73831* me);
 
 

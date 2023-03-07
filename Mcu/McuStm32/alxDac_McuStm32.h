@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxDac_McuStm32.h
   * @brief		Auralix C Library - ALX DAC MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -87,18 +87,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		dac
-  * @param[in]		ioPinArr
-  * @param[in]		chArr
-  * @param[in]		setVoltageDefaultArr_V
-  * @param[in]		numOfCh
-  * @param[in]		isVrefInt_V
-  * @param[in]		vrefExt_V
-  */
 void AlxDac_Ctor
 (
 	AlxDac* me,

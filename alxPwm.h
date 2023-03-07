@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxPwm.h
   * @brief		Auralix C Library - ALX PWM Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -91,33 +91,9 @@ typedef struct { bool dummy; } AlxPwm;
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 Alx_Status AlxPwm_Init(AlxPwm* me);
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 Alx_Status AlxPwm_DeInit(AlxPwm* me);
-
-/**
-  * @brief
-  * @param[in] me
-  * @param[in] ch
-  * @param[in] duty_pct
-  */
 Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct);
-
-/**
-  * @brief
-  * @param[in] me
-  * @param[in] ch
-  * @param[in] duty_permil
-  */
 Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil);
 
 

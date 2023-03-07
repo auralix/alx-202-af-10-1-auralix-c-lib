@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxIoPinIrq_McuStm32.h
   * @brief		Auralix C Library - ALX IO Pin IRQ MCU STM32 Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -73,14 +73,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		ioPinArr
-  * @param[in]		numOfIoPins
-  * @param[in]		irqPriorityArr
-  */
 void AlxIoPinIrq_Ctor
 (
 	AlxIoPinIrq* me,

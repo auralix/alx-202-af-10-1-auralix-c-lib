@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxTrace_McuLpc84x.c
   * @brief		Auralix C Library - ALX Trace MCU LPC84X Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -50,6 +50,15 @@ static uint8_t AlxTrace_GetUartResetIndex(AlxTrace* me);
 //******************************************************************************
 // Constructor
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		port
+  * @param[in]		pin
+  * @param[in]		usart
+  * @param[in]		baudRate
+  */
 void AlxTrace_Ctor
 (
 	AlxTrace* me,
@@ -85,6 +94,14 @@ void AlxTrace_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 void AlxTrace_Init(AlxTrace* me)
 {
 	// #1 Init SWM
@@ -98,6 +115,14 @@ void AlxTrace_Init(AlxTrace* me)
 
 	me->isInit = true;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 void AlxTrace_DeInit(AlxTrace* me)
 {
 	// #1 DeInit UART
@@ -110,6 +135,15 @@ void AlxTrace_DeInit(AlxTrace* me)
 
 	me->isInit = false;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		str
+  * @param[in]		threadSafe
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 void AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
 	USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str));

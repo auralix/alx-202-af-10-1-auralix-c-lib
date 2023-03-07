@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file		alxFiltGlitchBool.h
   * @brief		Auralix C Library - ALX Fliter Glitch Bool Module
-  * @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -99,14 +99,6 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		valInitial
-  * @param[in]		stableTrueTime_ms
-  * @param[in]		stableFalseTime_ms
-  */
 void AlxFiltGlitchBool_Ctor
 (
 	AlxFiltGlitchBool* me,
@@ -114,14 +106,6 @@ void AlxFiltGlitchBool_Ctor
 	float stableTrueTime_ms,	// Time that val must be stable true to change output state to true
 	float stableFalseTime_ms	// Time that val must be stable false to change output state to false
 );
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		valInitial
-  * @param[in]		stableTrueTime_us
-  * @param[in]		stableFalseTime_us
-  */
 void AlxFiltGlitchBool_Ctor_us
 (
 	AlxFiltGlitchBool* me,
@@ -134,14 +118,6 @@ void AlxFiltGlitchBool_Ctor_us
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		in
-  * @retval			false
-  * @retval			true
-  */
 bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in);
 
 
