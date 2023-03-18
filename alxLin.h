@@ -43,6 +43,7 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxTrace.h"
 #include "alxSerialPort.h"
+#include "alxTimSw.h"
 #include "alxOsDelay.h"
 
 
@@ -91,7 +92,8 @@ typedef struct
 
 	// Info
 	bool wasCtorCalled;
-	bool isInit;
+	bool isInitMaster;
+	bool isInitSlave;
 } AlxLin;
 
 
@@ -108,10 +110,15 @@ void AlxLin_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxLin_Init(AlxLin* me);
-Alx_Status AlxLin_DeInit(AlxLin* me);
-Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLenEnable, uint32_t maxLen, uint32_t* actualLen);
+Alx_Status AlxLin_Master_Init(AlxLin* me);
+Alx_Status AlxLin_Master_DeInit(AlxLin* me);
+Alx_Status AlxLin_Slave_Init(AlxLin* me);
+Alx_Status AlxLin_Slave_DeInit(AlxLin* me);
+bool AlxLin_Master_IsInit(AlxLin* me);
+bool AlxLin_Slave_IsInit(AlxLin* me);
+Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLenEnable, uint32_t variableLenEnable_maxLen, uint32_t* variableLenEnable_actualLen);
 Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLenEnable);
+Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t len, uint16_t timeout_ms, uint8_t numOfTries, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms);
 void AlxLin_IrqHandler(AlxLin* me);
 
 

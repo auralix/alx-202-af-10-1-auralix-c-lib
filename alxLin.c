@@ -40,6 +40,8 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static Alx_Status AlxLin_Init(AlxLin* me, bool isMaster);
+static Alx_Status AlxLin_DeInit(AlxLin* me, bool isMaster);
 static uint8_t AlxLin_GetDataLenFromId(uint8_t id);
 static uint8_t AlxLin_CalcProtectedId(uint8_t id);
 static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, uint32_t len);
@@ -65,7 +67,8 @@ void AlxLin_Ctor
 
 	// Info
 	me->wasCtorCalled = true;
-	me->isInit = false;
+	me->isInitMaster = false;
+	me->isInitSlave = false;
 }
 
 
@@ -79,24 +82,15 @@ void AlxLin_Ctor
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLin_Init(AlxLin* me)
+Alx_Status AlxLin_Master_Init(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInit == false);
-
-	// Local variables
-	Alx_Status status = Alx_Err;
-
-	// Init serial port
-	status = AlxSerialPort_Init(me->alxSerialPort);
-	if (status != Alx_Ok) { ALX_LIN_TRACE("Err"); return status; }
-
-	// Set isInit
-	me->isInit = true;
+	ALX_LIN_ASSERT(me->isInitMaster == false);
+	ALX_LIN_ASSERT(me->isInitSlave == false);
 
 	// Return
-	return Alx_Ok;
+	return AlxLin_Init(me, true);
 }
 
 /**
@@ -105,24 +99,79 @@ Alx_Status AlxLin_Init(AlxLin* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLin_DeInit(AlxLin* me)
+Alx_Status AlxLin_Master_DeInit(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInit == true);
-
-	// Local variables
-	Alx_Status status = Alx_Err;
-
-	// DeInit serial port
-	status = AlxSerialPort_DeInit(me->alxSerialPort);
-	if (status != Alx_Ok) { ALX_LIN_TRACE("Err"); return status; }
-
-	// Clear isInit
-	me->isInit = false;
+	ALX_LIN_ASSERT(me->isInitMaster == true);
+	ALX_LIN_ASSERT(me->isInitSlave == false);
 
 	// Return
-	return Alx_Ok;
+	return AlxLin_DeInit(me, true);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxLin_Slave_Init(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInitMaster == false);
+	ALX_LIN_ASSERT(me->isInitSlave == false);
+
+	// Return
+	return AlxLin_Init(me, false);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxLin_Slave_DeInit(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInitMaster == false);
+	ALX_LIN_ASSERT(me->isInitSlave == true);
+
+	// Return
+	return AlxLin_DeInit(me, false);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
+bool AlxLin_Master_IsInit(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return me->isInitMaster;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
+bool AlxLin_Slave_IsInit(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return me->isInitSlave;
 }
 
 /**
@@ -150,36 +199,40 @@ Alx_Status AlxLin_DeInit(AlxLin* me)
   *														Frame response data length
   *														How fast is slave device, how quickly after received frame header does it start transmitting frame response
   *													This operation is blocking, so it's recommend that the wait time is not too large
+  * @param[in]		numOfTries					Number of tries
   * @param[in]		variableLenEnable			Bool for specifying if variable data length is enabled
-  * @param[in]		maxLen						Maximum frame response data length, that the user of this function can receive
-  *													If received frame response data length > maxLen, Alx_Err is returned
-  * @param[out]		actualLen					Pointer to variable which will be set with actual frame response data length received after successful communication
+  * @param[in]		variableLenEnable_maxLen	Maximum frame response data length, that the user of this function can receive
+  *													If received frame response data length > variableLenEnable_maxLen, Alx_Err is returned
+  *													ONLY APPLICABLE if variableLenEnable = true
+  * @param[out]		variableLenEnable_actualLen	Pointer to variable which will be set with actual frame response data length received after successful communication
+  *													ONLY APPLICABLE if variableLenEnable = true
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLenEnable, uint32_t maxLen, uint32_t* actualLen)
+Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLenEnable, uint32_t variableLenEnable_maxLen, uint32_t* variableLenEnable_actualLen)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isInitMaster == true);
+	ALX_LIN_ASSERT(me->isInitSlave == false);
 	ALX_LIN_ASSERT((0 <= id) && (id <= 0x3F));
 	if (variableLenEnable)
 	{
 		ALX_LIN_ASSERT(len == 0);
-		ALX_LIN_ASSERT((0 < maxLen) && (maxLen <= ALX_LIN_BUFF_LEN));
+		ALX_LIN_ASSERT((0 < variableLenEnable_maxLen) && (variableLenEnable_maxLen <= ALX_LIN_BUFF_LEN));
 	}
 	else
 	{
 		ALX_LIN_ASSERT(len == AlxLin_GetDataLenFromId(id));
-		ALX_LIN_ASSERT(maxLen == 0);
-		ALX_LIN_ASSERT(actualLen == ALX_NULL);
+		ALX_LIN_ASSERT(variableLenEnable_maxLen == 0);
+		ALX_LIN_ASSERT(variableLenEnable_actualLen == ALX_NULL);
 	}
 
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t protectedId = AlxLin_CalcProtectedId(id);
 	uint8_t txFrame[2] = {};						// SYNC + Protected ID
-	uint8_t rxFrame[3 + ALX_LIN_BUFF_LEN + 1] = {};	// Break + SYNC + Protected ID + Data Length + Enhanced Checksum
+	uint8_t rxFrame[3 + ALX_LIN_BUFF_LEN + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
 	uint32_t rxFrameDataLen = 0;
 
 	// Try for number of tries
@@ -214,7 +267,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		rxFrameDataLen = rxFrameLen - 4;	// We must subtract: Break, SYNC, Protected ID, Enhanced Checksum
 		if (variableLenEnable)
 		{
-			if (rxFrameDataLen > maxLen)
+			if (rxFrameDataLen > variableLenEnable_maxLen)
 			{
 				ALX_LIN_TRACE("Err");
 				status = Alx_Err;
@@ -275,7 +328,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 	// Return frame response actual data length
 	if (variableLenEnable)
 	{
-		*actualLen = rxFrameDataLen;
+		*variableLenEnable_actualLen = rxFrameDataLen;
 	}
 
 	// Return
@@ -308,7 +361,8 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isInitMaster == true);
+	ALX_LIN_ASSERT(me->isInitSlave == false);
 	ALX_LIN_ASSERT((0 <= id) && (id <= 0x3F));
 	if (variableLenEnable)
 	{
@@ -323,7 +377,7 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 	Alx_Status status = Alx_Err;
 	uint8_t protectedId = AlxLin_CalcProtectedId(id);
 	uint8_t enhancedChecksum = AlxLin_CalcEnhancedChecksum(protectedId, data, len);
-	uint8_t txFrame[2 + ALX_LIN_BUFF_LEN + 1] = {};	// SYNC + Protected ID + Data Length + Enhanced Checksum
+	uint8_t txFrame[2 + ALX_LIN_BUFF_LEN + 1] = {};	// SYNC + Protected ID + Data + Enhanced Checksum
 
 	// Prepare frame header + frame response
 	// Break								// Frame Header Break - Send automatically by STM32 HW
@@ -333,7 +387,7 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 	txFrame[2 + len] = enhancedChecksum;	// Frame Response Enhanced Checksum
 
 	// Transmit frame header + frame response
-	uint8_t txFrameLen = 2 + len + 1;	// SYNC + Protected ID + Data Length + Enhanced Checksum
+	uint8_t txFrameLen = 2 + len + 1;	// SYNC + Protected ID + Data + Enhanced Checksum
 	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
 	if (status != Alx_Ok)
 	{
@@ -345,6 +399,151 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 	return Alx_Ok;
 }
 
+/**
+  * @brief													As a LIN slave device, receive frame header or receive frame header & frame response from master device
+  *																AlxLin_Slave_RxFrameHeader_RxFrameResponse
+  * @param[in,out]	me
+  * @param[in]		id										Pointer to variable which will be set with ID which was received in the frame header
+  * @param[out]		data									Pointer to location to which received frame response data will be copied
+  * @param[in]		len										Received frame response data length which will be read
+  * @param[in]		timeout_ms								Time in ms for which, we as LIN slave device, will wait after RX FIFO Flush for master device to transmit whole frame response with specified data length
+  * @param[in]		numOfTries								Number of tries
+  * @param[in]		rxFifoNumOfEntriesNewCheckWaitTime_ms	Time in ms for which we will wait for new RX FIFO number of entries check
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t len, uint16_t timeout_ms, uint8_t numOfTries, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInitMaster == false);
+	ALX_LIN_ASSERT(me->isInitSlave == true);
+	ALX_LIN_ASSERT((0 <= len) && (len <= ALX_LIN_BUFF_LEN));
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+	uint8_t id_Actual = 0;
+	uint8_t rxFrame[3 + ALX_LIN_BUFF_LEN + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
+	uint32_t rxFrameLen_Actual = 0;
+	uint32_t rxFrameLen_Expected = 0;
+
+	// Set rxFrameLen_Expected
+	if (len == 0)
+	{
+		rxFrameLen_Expected = 3;	// Break, SYNC, Protected ID
+	}
+	else
+	{
+		rxFrameLen_Expected = 3 + len + 1;	// Break + SYNC + Protected ID + Data + Enhanced Checksum
+	}
+
+	// Try for number of tries
+	for (uint32_t _try = 1; _try <= numOfTries; _try++)
+	{
+		// Flush serial port RX FIFO
+		AlxSerialPort_FlushRxFifo(me->alxSerialPort);
+
+		// Create timer
+		AlxTimSw alxTimSw;
+		AlxTimSw_Ctor(&alxTimSw, false);
+
+		// Start timer
+		AlxTimSw_Start(&alxTimSw);
+
+		// Wait for master to transmit whole frame response with specified data length
+		while (1)
+		{
+			// Check if serial port RX FIFO number of entries is OK
+			rxFrameLen_Actual = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);
+
+			// Check if data length is OK
+			if(rxFrameLen_Actual == rxFrameLen_Expected)
+			{
+				status = Alx_Ok;
+				break;
+			}
+
+			// Delay
+			#ifdef ALX_OS
+			AlxOsDelay_ms(&alxOsDelay, rxFifoNumOfEntriesNewCheckWaitTime_ms);
+			#else
+			AlxDelay_ms(rxFifoNumOfEntriesNewCheckWaitTime_ms);
+			#endif
+
+			// Check if timeout
+			if (AlxTimSw_IsTimeout_ms(&alxTimSw, timeout_ms))
+			{
+				ALX_LIN_TRACE("Err");
+				status = Alx_Err;
+				break;
+			}
+		}
+
+		// If we are here and status is NOT OK, timeout occured
+		if (status != Alx_Ok)
+		{
+			ALX_LIN_TRACE("Err");
+			status = Alx_Err;
+			continue;
+		}
+
+		// Read received frame from serial port RX FIFO
+		status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen_Actual);
+		if (status != Alx_Ok)
+		{
+			ALX_LIN_TRACE("Err");
+			status = Alx_Err;
+			continue;
+		}
+
+		// Check if protected ID is OK
+		uint8_t protectedId_Actual = rxFrame[2];
+		id_Actual = rxFrame[2] & 0x3F;
+		uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
+		if (protectedId_Actual != protectedId_Expected)
+		{
+			ALX_LIN_TRACE("Err");
+			status = Alx_Err;
+			continue;
+		}
+
+		// Check if enhanced checksum is OK
+		if (5 <= rxFrameLen_Actual)
+		{
+			uint8_t enhancedChecksum_Actual = rxFrame[3 + len];
+			uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId_Actual, &rxFrame[3], len);
+			if (enhancedChecksum_Actual != enhancedChecksum_Expected)
+			{
+				ALX_LIN_TRACE("Err");
+				status = Alx_Err;
+				continue;
+			}
+		}
+
+		// Break
+		break;
+	}
+
+	// If we are here and status is NOT OK, number of tries error occured
+	if (status != Alx_Ok)
+	{
+		return Alx_ErrNumOfTries;
+	}
+
+	// Return protected ID
+	*id = id_Actual;
+
+	// Return frame response data
+	memcpy(data, &rxFrame[3], len);
+
+	// Return
+	return Alx_Ok;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxLin_IrqHandler(AlxLin* me)
 {
 	AlxSerialPort_IrqHandler(me->alxSerialPort);
@@ -354,6 +553,50 @@ void AlxLin_IrqHandler(AlxLin* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static Alx_Status AlxLin_Init(AlxLin* me, bool isMaster)
+{
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Init serial port
+	status = AlxSerialPort_Init(me->alxSerialPort);
+	if (status != Alx_Ok) { ALX_LIN_TRACE("Err"); return status; }
+
+	// Info
+	if (isMaster)
+	{
+		me->isInitMaster = true;
+	}
+	else
+	{
+		me->isInitSlave = true;
+	}
+
+	// Return
+	return Alx_Ok;
+}
+static Alx_Status AlxLin_DeInit(AlxLin* me, bool isMaster)
+{
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// DeInit serial port
+	status = AlxSerialPort_DeInit(me->alxSerialPort);
+	if (status != Alx_Ok) { ALX_LIN_TRACE("Err"); return status; }
+
+	// Info
+	if (isMaster)
+	{
+		me->isInitMaster = false;
+	}
+	else
+	{
+		me->isInitSlave = false;
+	}
+
+	// Return
+	return Alx_Ok;
+}
 static uint8_t AlxLin_GetDataLenFromId(uint8_t id)
 {
 	// Get
