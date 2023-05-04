@@ -110,13 +110,13 @@ Alx_Status AlxIna228_InitPeriph(AlxIna228* me);
 Alx_Status AlxIna228_DeInitPeriph(AlxIna228* me);
 Alx_Status AlxIna228_Init(AlxIna228* me);
 Alx_Status AlxIna228_DeInit(AlxIna228* me);
-float AlxIna228_GetShuntVoltage_V(AlxIna228* me);
-float AlxIna228_GetBusVoltage_V(AlxIna228* me);
-float AlxIna228_GetTemp_DegC(AlxIna228* me);
-float AlxIna228_GetCurrent_A(AlxIna228* me);
-float AlxIna228_GetPower_W(AlxIna228* me);
-float AlxIna228_GetEnergy_J(AlxIna228* me);
-float AlxIna228_GetCharge_C(AlxIna228* me);
+Alx_Status AlxIna228_GetShuntVoltage_V(AlxIna228* me, float* voltage_V);
+Alx_Status AlxIna228_GetBusVoltage_V(AlxIna228* me, float* voltage_V);
+Alx_Status AlxIna228_GetTemp_degC(AlxIna228* me, float* temp_degC);
+Alx_Status AlxIna228_GetCurrent_A(AlxIna228* me, float* current_A);
+Alx_Status AlxIna228_GetPower_W(AlxIna228* me, float* power_W);
+Alx_Status AlxIna228_GetEnergy_J(AlxIna228* me, float* energy_J);
+Alx_Status AlxIna228_GetCharge_C(AlxIna228* me, float* charge_C);
 
 
 #endif	// #if defined(ALX_C_LIB)

@@ -94,7 +94,7 @@ Alx_Status AlxIna228_DeInit(AlxIna228* me)
 {
 	// We can just reset IC, so after that we know all registers are set to default values
 }
-float AlxIna228_GetShuntVoltage_V(AlxIna228* me)
+Alx_Status AlxIna228_GetShuntVoltage_V(AlxIna228* me, float* voltage_V)
 {
 	//4h VSHUNT Shunt Voltage Measurement 24 Go
 	// Differential voltage measured across the shunt output. Two's complement value.
@@ -103,33 +103,33 @@ float AlxIna228_GetShuntVoltage_V(AlxIna228* me)
 	// 312.5 nV/LSB when ADCRANGE = 0
 	// 78.125 nV/LSB when ADCRANGE = 1
 }
-float AlxIna228_GetBusVoltage_V(AlxIna228* me)
+Alx_Status AlxIna228_GetBusVoltage_V(AlxIna228* me, float* voltage_V)
 {
 	//5h VBUS Bus Voltage Measurement 24 Go
 	// Bus voltage output. Two's complement value, however always positive.
 	// Return Volts (always positive value)
 	// Conversion factor: 195.3125 uV/LSB
 }
-float AlxIna228_GetTemp_DegC(AlxIna228* me)
+Alx_Status AlxIna228_GetTemp_degC(AlxIna228* me, float* temp_degC)
 {
 	//6h DIETEMP Temperature Measurement 16 Go
 	// Internal die temperature measurement. Two's complement value.
 	// return DegreeCelsius (positive or negative)
 	// Conversion factor: 7.8125 mDegC/LSB
 }
-float AlxIna228_GetCurrent_A(AlxIna228* me)
+Alx_Status AlxIna228_GetCurrent_A(AlxIna228* me, float* current_A)
 {
 	//7h CURRENT Current Result 24 Go
 }
-float AlxIna228_GetPower_W(AlxIna228* me)
+Alx_Status AlxIna228_GetPower_W(AlxIna228* me, float* power_W)
 {
 	//8h POWER Power Result 24 Go
 }
-float AlxIna228_GetEnergy_J(AlxIna228* me)
+Alx_Status AlxIna228_GetEnergy_J(AlxIna228* me, float* energy_J)
 {
 	//9h ENERGY Energy Result 40 Go
 }
-float AlxIna228_GetCharge_C(AlxIna228* me)
+Alx_Status AlxIna228_GetCharge_C(AlxIna228* me, float* charge_C)
 {
 	//Ah CHARGE Charge Result 40 Go
 }
