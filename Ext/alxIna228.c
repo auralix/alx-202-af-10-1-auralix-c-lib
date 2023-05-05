@@ -47,12 +47,12 @@ static void AlxIna228_RegStruct_SetToDefault(AlxIna228* me);
 static Alx_Status AlxIna228_Reg_Write(AlxIna228* me, void* reg);
 static Alx_Status AlxIna228_Reg_Write_All(AlxIna228* me);
 static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg);
-
+static Alx_Status AlxIna228_TraceId(AlxIna228* me);
 
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-void AlxVeml6040_RegStruct_SetVal(AlxIna228* me);
+void AlxIna228_RegStruct_SetVal(AlxIna228* me);
 
 
 
@@ -78,9 +78,9 @@ void AlxIna228_Ctor
 	me->i2cTimeout_ms = i2cTimeout_ms;
 
 	// Variables
-	AlxVeml6040_RegStruct_SetAddr(me);
-	AlxVeml6040_RegStruct_SetLen(me);
-	AlxVeml6040_RegStruct_SetValToZero(me);
+	AlxIna228_RegStruct_SetAddr(me);
+	AlxIna228_RegStruct_SetLen(me);
+	AlxIna228_RegStruct_SetValToZero(me);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -93,14 +93,72 @@ void AlxIna228_Ctor
 //******************************************************************************
 Alx_Status AlxIna228_InitPeriph(AlxIna228* me)
 {
-	// I2C Init
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInit == false);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Init I2C
+	status = AlxI2c_Init(me->i2c);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxI2c_Init"); return status; }
+
+	// Check if slave ready
+	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxI2c_Master_IsSlaveReady"); return status; }
+
+	// Set register struct values to default
+	AlxIna228_RegStruct_SetToDefault(me);
+
+	// Set register values - WEAK
+	AlxIna228_RegStruct_SetVal(me);
+
+	// Write registers
+	status = AlxIna228_Reg_Write_All(me);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxIna228_Reg_Write_All"); return status; }
+
+	// Set isInit
+	me->isInit = true;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxIna228_DeInitPeriph(AlxIna228* me)
 {
-	// I2C DeInit
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Set register struct values to default
+	AlxIna228_RegStruct_SetToDefault(me);
+
+	// Write registers
+	status = AlxIna228_Reg_Write_All(me);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxIna228_Reg_Write_All"); return status; }
+
+	// DeInit I2C
+	status = AlxI2c_DeInit(me->i2c);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxI2c_DeInit"); return status; }
+
+	// Reset isInit
+	me->isInit = false;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxIna228_Init(AlxIna228* me)
 {
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
 	// Set needed configuration
 	//0h CONFIG Configuration 16 Go
 	//1h ADC_CONFIG ADC Configuration 16 Go
@@ -119,6 +177,14 @@ Alx_Status AlxIna228_Init(AlxIna228* me)
 	// Can read & print IDs
 	//3Eh MANUFACTURER_ID Manufacturer ID 16 Go
 	//3Fh DEVICE_ID Device ID 16 Go
+	AlxIna228_TraceId(me);
+
+	// Write registers
+	status = AlxIna228_Reg_Write_All(me);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxIna228_Reg_Write_All"); return status; }
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxIna228_DeInit(AlxIna228* me)
 {
@@ -132,6 +198,23 @@ Alx_Status AlxIna228_GetShuntVoltage_V(AlxIna228* me, float* voltage_V)
 	// Also take into account how is IC configured:
 	// 312.5 nV/LSB when ADCRANGE = 0
 	// 78.125 nV/LSB when ADCRANGE = 1
+
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Read
+	status = AlxIna228_Reg_Read(me, &me->reg._0x04_VSHUNT);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x04_VSHUNT"); return status; }
+
+	// Set
+	*voltage_V = me->reg._0x04_VSHUNT.val.VSHUNT_nVoltage;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxIna228_GetBusVoltage_V(AlxIna228* me, float* voltage_V)
 {
@@ -139,6 +222,23 @@ Alx_Status AlxIna228_GetBusVoltage_V(AlxIna228* me, float* voltage_V)
 	// Bus voltage output. Two's complement value, however always positive.
 	// Return Volts (always positive value)
 	// Conversion factor: 195.3125 uV/LSB
+
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Read
+	status = AlxIna228_Reg_Read(me, &me->reg._0x05_VBUS);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x05_VBUS"); return status; }
+
+	// Set
+	*voltage_V = me->reg._0x05_VBUS.val.VBUS_uVoltage;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxIna228_GetTemp_degC(AlxIna228* me, float* temp_degC)
 {
@@ -146,22 +246,99 @@ Alx_Status AlxIna228_GetTemp_degC(AlxIna228* me, float* temp_degC)
 	// Internal die temperature measurement. Two's complement value.
 	// return DegreeCelsius (positive or negative)
 	// Conversion factor: 7.8125 mDegC/LSB
+
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Read
+	status = AlxIna228_Reg_Read(me, &me->reg._0x06_DIETEMP);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x06_DIETEMP"); return status; }
+
+	// Set
+	*temp_degC = me->reg._0x06_DIETEMP.val.DIETEMP_mDegC;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxIna228_GetCurrent_A(AlxIna228* me, float* current_A)
 {
-	//7h CURRENT Current Result 24 Go
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Read
+	status = AlxIna228_Reg_Read(me, &me->reg._0x07_CURRENT);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x07_CURRENT"); return status; }
+
+	// Set
+	*current_A = me->reg._0x07_CURRENT.val.CURRENT_Amperes;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxIna228_GetPower_W(AlxIna228* me, float* power_W)
 {
-	//8h POWER Power Result 24 Go
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Read
+	status = AlxIna228_Reg_Read(me, &me->reg._0x08_POWER);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x08_POWER"); return status; }
+
+	// Set
+	*power_W = me->reg._0x08_POWER.val.POWER_Watts;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxIna228_GetEnergy_J(AlxIna228* me, float* energy_J)
 {
-	//9h ENERGY Energy Result 40 Go
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Read
+	status = AlxIna228_Reg_Read(me, &me->reg._0x09_ENERGY);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x09_ENERGY"); return status; }
+
+	// Set
+	*energy_J = me->reg._0x09_ENERGY.val.ENERGY_Joules;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxIna228_GetCharge_C(AlxIna228* me, float* charge_C)
 {
-	//Ah CHARGE Charge Result 40 Go
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Read
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0A_CHARGE);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0A_CHARGE"); return status; }
+
+	// Set
+	*charge_C = me->reg._0x0A_CHARGE.val.CHARGE_Coulombs;
+
+	// Return
+	return Alx_Ok;
 }
 
 
@@ -271,7 +448,7 @@ static Alx_Status AlxIna228_Reg_Write(AlxIna228* me, void* reg)
 
 	// Write
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxI2c_Master_StartWriteMemStop_Multi"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -360,13 +537,13 @@ static Alx_Status AlxIna228_TraceId(AlxIna228* me)
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-ALX_WEAK void AlxVeml6040_RegStruct_SetVal(AlxIna228* me)
+ALX_WEAK void AlxIna228_RegStruct_SetVal(AlxIna228* me)
 {
 	// Local variables
 	(void)me;
 
 	// Assert
-	ALX_INA228_TRACE("Err");
+	ALX_INA228_TRACE("Define 'AlxIna228_RegStruct_SetVal' function in your application.");
 	ALX_INA228_ASSERT(false);
 }
 

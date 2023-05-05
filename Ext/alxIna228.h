@@ -219,7 +219,7 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t TEMPCO_ppm_degree : 14;
+		uint16_t TEMPCO_ppm_DegC : 14;
 		uint8_t unused_14_15 : 2;
 	};
 	uint16_t raw;
@@ -261,7 +261,7 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t DIETEMP_mDegree : 16;
+		uint16_t DIETEMP_mDegC : 16;
 	};
 	uint16_t raw;
 } AlxIna228_RegVal_0x06_DIETEMP;
@@ -484,7 +484,7 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t TOL_mDegree : 16;
+		uint16_t TOL_mDegC : 16;
 	};
 	uint16_t raw;
 } AlxIna228_RegVal_0x10_TEMP_LIMIT;
