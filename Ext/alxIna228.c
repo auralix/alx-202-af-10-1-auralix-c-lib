@@ -170,35 +170,95 @@ Alx_Status AlxIna228_GetCharge_C(AlxIna228* me, float* charge_C)
 //******************************************************************************
 static void AlxIna228_RegStruct_SetAddr(AlxIna228* me)
 {
-	me->reg._0x00_CONF		.addr = 0x00;
-	me->reg._0x08_R_DATA	.addr = 0x08;
-	me->reg._0x09_G_DATA	.addr = 0x09;
-	me->reg._0x0A_B_DATA	.addr = 0x0A;
-	me->reg._0x0B_W_DATA	.addr = 0x0B;
+	me->reg._0x00_CONFIG			.addr = 0x00;
+	me->reg._0x01_ADC_CONFIG		.addr = 0x01;
+	me->reg._0x02_SHUNT_CAL			.addr = 0x02;
+	me->reg._0x03_SHUNT_TEMPCO		.addr = 0x03;
+	me->reg._0x04_VSHUNT			.addr = 0x04;
+	me->reg._0x05_VBUS				.addr = 0x05;
+	me->reg._0x06_DIETEMP			.addr = 0x06;
+	me->reg._0x07_CURRENT			.addr = 0x07;
+	me->reg._0x08_POWER				.addr = 0x08;
+	me->reg._0x09_ENERGY			.addr = 0x09;
+	me->reg._0x0A_CHARGE			.addr = 0x0A;
+	me->reg._0x0B_DIAG_ALRT			.addr = 0x0B;
+	me->reg._0x0C_SOVL				.addr = 0x0C;
+	me->reg._0x0D_SUVL				.addr = 0x0D;
+	me->reg._0x0E_BOVL				.addr = 0x0E;
+	me->reg._0x0F_BUVL				.addr = 0x0F;
+	me->reg._0x10_TEMP_LIMIT		.addr = 0x10;
+	me->reg._0x11_PWR_LIMIT			.addr = 0x11;
+	me->reg._0x3E_MANUFACTURER_ID	.addr = 0x3E;
+	me->reg._0x3F_DEVICE_ID			.addr = 0x3F;
 }
 static void AlxIna228_RegStruct_SetLen(AlxIna228* me)
 {
-	me->reg._0x00_CONF		.len = sizeof(me->reg._0x00_CONF	.val);
-	me->reg._0x08_R_DATA	.len = sizeof(me->reg._0x08_R_DATA	.val);
-	me->reg._0x09_G_DATA	.len = sizeof(me->reg._0x09_G_DATA	.val);
-	me->reg._0x0A_B_DATA	.len = sizeof(me->reg._0x0A_B_DATA	.val);
-	me->reg._0x0B_W_DATA	.len = sizeof(me->reg._0x0B_W_DATA	.val);
+	me->reg._0x00_CONFIG			.len = sizeof(me->reg._0x00_CONFIG			.val);
+	me->reg._0x01_ADC_CONFIG		.len = sizeof(me->reg._0x01_ADC_CONFIG		.val);
+	me->reg._0x02_SHUNT_CAL			.len = sizeof(me->reg._0x02_SHUNT_CAL		.val);
+	me->reg._0x03_SHUNT_TEMPCO		.len = sizeof(me->reg._0x03_SHUNT_TEMPCO	.val);
+	me->reg._0x04_VSHUNT			.len = sizeof(me->reg._0x04_VSHUNT			.val);
+	me->reg._0x05_VBUS				.len = sizeof(me->reg._0x05_VBUS			.val);
+	me->reg._0x06_DIETEMP			.len = sizeof(me->reg._0x06_DIETEMP			.val);
+	me->reg._0x07_CURRENT			.len = sizeof(me->reg._0x07_CURRENT			.val);
+	me->reg._0x08_POWER				.len = sizeof(me->reg._0x08_POWER			.val);
+	me->reg._0x09_ENERGY			.len = sizeof(me->reg._0x09_ENERGY			.val);
+	me->reg._0x0A_CHARGE			.len = sizeof(me->reg._0x0A_CHARGE			.val);
+	me->reg._0x0B_DIAG_ALRT			.len = sizeof(me->reg._0x0B_DIAG_ALRT		.val);
+	me->reg._0x0C_SOVL				.len = sizeof(me->reg._0x0C_SOVL			.val);
+	me->reg._0x0D_SUVL				.len = sizeof(me->reg._0x0D_SUVL			.val);
+	me->reg._0x0E_BOVL				.len = sizeof(me->reg._0x0E_BOVL			.val);
+	me->reg._0x0F_BUVL				.len = sizeof(me->reg._0x0F_BUVL			.val);
+	me->reg._0x10_TEMP_LIMIT		.len = sizeof(me->reg._0x10_TEMP_LIMIT		.val);
+	me->reg._0x11_PWR_LIMIT			.len = sizeof(me->reg._0x11_PWR_LIMIT		.val);
+	me->reg._0x3E_MANUFACTURER_ID	.len = sizeof(me->reg._0x3E_MANUFACTURER_ID	.val);
+	me->reg._0x3F_DEVICE_ID			.len = sizeof(me->reg._0x3F_DEVICE_ID		.val);
 }
 static void AlxIna228_RegStruct_SetValToZero(AlxIna228* me)
 {
-	me->reg._0x00_CONF		.val.raw = 0x0000;
-	me->reg._0x08_R_DATA	.val.raw = 0x0000;
-	me->reg._0x09_G_DATA	.val.raw = 0x0000;
-	me->reg._0x0A_B_DATA	.val.raw = 0x0000;
-	me->reg._0x0B_W_DATA	.val.raw = 0x0000;
+	me->reg._0x00_CONFIG			.val.raw = 0x0000;
+	me->reg._0x01_ADC_CONFIG		.val.raw = 0x0000;
+	me->reg._0x02_SHUNT_CAL			.val.raw = 0x0000;
+	me->reg._0x03_SHUNT_TEMPCO		.val.raw = 0x0000;
+	me->reg._0x04_VSHUNT			.val.raw = 0x0000;
+	me->reg._0x05_VBUS				.val.raw = 0x0000;
+	me->reg._0x06_DIETEMP			.val.raw = 0x0000;
+	me->reg._0x07_CURRENT			.val.raw = 0x0000;
+	me->reg._0x08_POWER				.val.raw = 0x0000;
+	me->reg._0x09_ENERGY			.val.raw = 0x0000;
+	me->reg._0x0A_CHARGE			.val.raw = 0x0000;
+	me->reg._0x0B_DIAG_ALRT			.val.raw = 0x0000;
+	me->reg._0x0C_SOVL				.val.raw = 0x0000;
+	me->reg._0x0D_SUVL				.val.raw = 0x0000;
+	me->reg._0x0E_BOVL				.val.raw = 0x0000;
+	me->reg._0x0F_BUVL				.val.raw = 0x0000;
+	me->reg._0x10_TEMP_LIMIT		.val.raw = 0x0000;
+	me->reg._0x11_PWR_LIMIT			.val.raw = 0x0000;
+	me->reg._0x3E_MANUFACTURER_ID	.val.raw = 0x0000;
+	me->reg._0x3F_DEVICE_ID			.val.raw = 0x0000;
 }
 static void AlxIna228_RegStruct_SetToDefault(AlxIna228* me)
 {
-	me->reg._0x00_CONF		.val.raw = 0x0001;
-	me->reg._0x08_R_DATA	.val.raw = 0x0000;
-	me->reg._0x09_G_DATA	.val.raw = 0x0000;
-	me->reg._0x0A_B_DATA	.val.raw = 0x0000;
-	me->reg._0x0B_W_DATA	.val.raw = 0x0000;
+	me->reg._0x00_CONFIG			.val.raw = 0x0000;
+	me->reg._0x01_ADC_CONFIG		.val.raw = 0xFB68;
+	me->reg._0x02_SHUNT_CAL			.val.raw = 0x1000;
+	me->reg._0x03_SHUNT_TEMPCO		.val.raw = 0x0000;
+	me->reg._0x04_VSHUNT			.val.raw = 0x0000;
+	me->reg._0x05_VBUS				.val.raw = 0x0000;
+	me->reg._0x06_DIETEMP			.val.raw = 0x0000;
+	me->reg._0x07_CURRENT			.val.raw = 0x0000;
+	me->reg._0x08_POWER				.val.raw = 0x0000;
+	me->reg._0x09_ENERGY			.val.raw = 0x0000;
+	me->reg._0x0A_CHARGE			.val.raw = 0x0000;
+	me->reg._0x0B_DIAG_ALRT			.val.raw = 0x0001;
+	me->reg._0x0C_SOVL				.val.raw = 0x7FFF;
+	me->reg._0x0D_SUVL				.val.raw = 0x8000;
+	me->reg._0x0E_BOVL				.val.raw = 0x7FFF;
+	me->reg._0x0F_BUVL				.val.raw = 0x0000;
+	me->reg._0x10_TEMP_LIMIT		.val.raw = 0x7FFF;
+	me->reg._0x11_PWR_LIMIT			.val.raw = 0xFFFF;
+	me->reg._0x3E_MANUFACTURER_ID	.val.raw = 0x5449;
+	me->reg._0x3F_DEVICE_ID			.val.raw = 0x2281;
 }
 
 static Alx_Status AlxIna228_Reg_Write(AlxIna228* me, void* reg)
@@ -222,8 +282,38 @@ static Alx_Status AlxIna228_Reg_Write_All(AlxIna228* me)
 	Alx_Status status = Alx_Err;
 
 	// Write
-	status = AlxIna228_Reg_Write(me, &me->reg._0x00_CONF	);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err"); return status; }
+	status = AlxIna228_Reg_Write(me, &me->reg._0x00_CONFIG);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x00_CONFIG"); return status; }
+
+	status = AlxIna228_Reg_Write(me, &me->reg._0x01_ADC_CONFIG);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x01_ADC_CONFIG"); return status; }
+
+	status = AlxIna228_Reg_Write(me, &me->reg._0x02_SHUNT_CAL);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x02_SHUNT_CAL"); return status; }
+
+	status = AlxIna228_Reg_Write(me, &me->reg._0x03_SHUNT_TEMPCO);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x03_SHUNT_TEMPCO"); return status; }
+
+	status = AlxIna228_Reg_Write(me, &me->reg._0x0B_DIAG_ALRT);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0B_DIAG_ALRT"); return status; }
+
+	status = AlxIna228_Reg_Write(me, &me->reg._0x0C_SOVL);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0C_SOVL"); return status; }
+
+	status = AlxIna228_Reg_Write(me, &me->reg._0x0D_SUVL);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0D_SUVL"); return status; }
+
+	status = AlxIna228_Reg_Write(me, &me->reg._0x0E_BOVL);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0E_BOVL"); return status; }
+
+	status = AlxIna228_Reg_Write(me, &me->reg._0x0F_BUVL);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0F_BUVL"); return status; }
+
+	status = AlxIna228_Reg_Write(me, &me->reg._0x10_TEMP_LIMIT);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x10_TEMP_LIMIT"); return status; }
+
+	status = AlxIna228_Reg_Write(me, &me->reg._0x11_PWR_LIMIT);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x11_PWR_LIMIT"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -241,6 +331,28 @@ static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg)
 	if (status != Alx_Ok) { ALX_INA228_TRACE("Err"); return status; }
 
 	// Return
+	return Alx_Ok;
+}
+static Alx_Status AlxIna228_TraceId(AlxIna228* me)
+{
+	Alx_Status status = Alx_Err;
+
+	// #1 Read ID registers
+	status = AlxIna228_Reg_Read(me, &me->reg._0x3E_MANUFACTURER_ID	);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x3E_MANUFACTURER_ID	"); return status;}
+
+	status = AlxIna228_Reg_Read(me, &me->reg._0x3F_DEVICE_ID	);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x3F_DEVICE_ID	"); return status;}
+
+	// #2 Trace
+	ALX_INA228_TRACE_FORMAT("\r\n");
+	ALX_INA228_TRACE_FORMAT("Auralix C Library - ALX Current Monitor INA228 Module Identification:\r\n");
+	ALX_INA228_TRACE_FORMAT("- MANUFACTURER_ID: 0x%02X\r\n", me->reg._0x3E_MANUFACTURER_ID.val.MANFID);
+	ALX_INA228_TRACE_FORMAT("- DEVICE_ID.REV_ID: 0x%02X\r\n", me->reg._0x3F_DEVICE_ID.val.REV_ID);
+	ALX_INA228_TRACE_FORMAT("- DEVICE_ID.DIEID: 0x%02X\r\n", me->reg._0x3F_DEVICE_ID.val.DIEID);
+	ALX_INA228_TRACE_FORMAT("\r\n");
+
+	// #3 Return OK
 	return Alx_Ok;
 }
 
