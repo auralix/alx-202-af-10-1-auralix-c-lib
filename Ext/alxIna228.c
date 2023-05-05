@@ -38,19 +38,49 @@
 
 
 //******************************************************************************
+// Private Functions
+//******************************************************************************
+static void AlxIna228_RegStruct_SetAddr(AlxIna228* me);
+static void AlxIna228_RegStruct_SetLen(AlxIna228* me);
+static void AlxIna228_RegStruct_SetValToZero(AlxIna228* me);
+static void AlxIna228_RegStruct_SetToDefault(AlxIna228* me);
+static Alx_Status AlxIna228_Reg_Write(AlxIna228* me, void* reg);
+static Alx_Status AlxIna228_Reg_Write_All(AlxIna228* me);
+static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg);
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+void AlxVeml6040_RegStruct_SetVal(AlxIna228* me);
+
+
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxIna228_Ctor
 (
 	AlxIna228* me,
-	uint32_t* param
+	AlxI2c* i2c,
+	uint8_t i2cAddr,
+	bool i2cCheckWithRead,
+	uint8_t i2cNumOfTries,
+	uint16_t i2cTimeout_ms
 )
 {
 	// Parameters
-	me->param = param;
+	me->i2c = i2c;
+	me->i2cAddr = i2cAddr;
+	me->i2cCheckWithRead = i2cCheckWithRead;
+	me->i2cNumOfTries = i2cNumOfTries;
+	me->i2cTimeout_ms = i2cTimeout_ms;
 
 	// Variables
-	me->var = 0;
+	AlxVeml6040_RegStruct_SetAddr(me);
+	AlxVeml6040_RegStruct_SetLen(me);
+	AlxVeml6040_RegStruct_SetValToZero(me);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -132,6 +162,100 @@ Alx_Status AlxIna228_GetEnergy_J(AlxIna228* me, float* energy_J)
 Alx_Status AlxIna228_GetCharge_C(AlxIna228* me, float* charge_C)
 {
 	//Ah CHARGE Charge Result 40 Go
+}
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static void AlxIna228_RegStruct_SetAddr(AlxIna228* me)
+{
+	me->reg._0x00_CONF		.addr = 0x00;
+	me->reg._0x08_R_DATA	.addr = 0x08;
+	me->reg._0x09_G_DATA	.addr = 0x09;
+	me->reg._0x0A_B_DATA	.addr = 0x0A;
+	me->reg._0x0B_W_DATA	.addr = 0x0B;
+}
+static void AlxIna228_RegStruct_SetLen(AlxIna228* me)
+{
+	me->reg._0x00_CONF		.len = sizeof(me->reg._0x00_CONF	.val);
+	me->reg._0x08_R_DATA	.len = sizeof(me->reg._0x08_R_DATA	.val);
+	me->reg._0x09_G_DATA	.len = sizeof(me->reg._0x09_G_DATA	.val);
+	me->reg._0x0A_B_DATA	.len = sizeof(me->reg._0x0A_B_DATA	.val);
+	me->reg._0x0B_W_DATA	.len = sizeof(me->reg._0x0B_W_DATA	.val);
+}
+static void AlxIna228_RegStruct_SetValToZero(AlxIna228* me)
+{
+	me->reg._0x00_CONF		.val.raw = 0x0000;
+	me->reg._0x08_R_DATA	.val.raw = 0x0000;
+	me->reg._0x09_G_DATA	.val.raw = 0x0000;
+	me->reg._0x0A_B_DATA	.val.raw = 0x0000;
+	me->reg._0x0B_W_DATA	.val.raw = 0x0000;
+}
+static void AlxIna228_RegStruct_SetToDefault(AlxIna228* me)
+{
+	me->reg._0x00_CONF		.val.raw = 0x0001;
+	me->reg._0x08_R_DATA	.val.raw = 0x0000;
+	me->reg._0x09_G_DATA	.val.raw = 0x0000;
+	me->reg._0x0A_B_DATA	.val.raw = 0x0000;
+	me->reg._0x0B_W_DATA	.val.raw = 0x0000;
+}
+
+static Alx_Status AlxIna228_Reg_Write(AlxIna228* me, void* reg)
+{
+	// Local variables
+	Alx_Status status = Alx_Err;
+	uint8_t regAddr = *((uint8_t*)reg);
+	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+
+	// Write
+	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err"); return status; }
+
+	// Return
+	return Alx_Ok;
+}
+static Alx_Status AlxIna228_Reg_Write_All(AlxIna228* me)
+{
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Write
+	status = AlxIna228_Reg_Write(me, &me->reg._0x00_CONF	);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err"); return status; }
+
+	// Return
+	return Alx_Ok;
+}
+static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg)
+{
+	// Local variables
+	Alx_Status status = Alx_Err;
+	uint8_t regAddr = *((uint8_t*)reg);
+	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+
+	// Read
+	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err"); return status; }
+
+	// Return
+	return Alx_Ok;
+}
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+ALX_WEAK void AlxVeml6040_RegStruct_SetVal(AlxIna228* me)
+{
+	// Local variables
+	(void)me;
+
+	// Assert
+	ALX_INA228_TRACE("Err");
+	ALX_INA228_ASSERT(false);
 }
 
 
