@@ -47,7 +47,7 @@ static void AlxIna228_RegStruct_SetToDefault(AlxIna228* me);
 static Alx_Status AlxIna228_Reg_Write(AlxIna228* me, void* reg);
 static Alx_Status AlxIna228_Reg_Write_All(AlxIna228* me);
 static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg);
-static Alx_Status AlxIna228_TraceId(AlxIna228* me);
+//static Alx_Status AlxIna228_TraceId(AlxIna228* me);
 
 //******************************************************************************
 // Weak Functions
@@ -154,7 +154,7 @@ Alx_Status AlxIna228_Init(AlxIna228* me)
 {
 	// Assert
 	ALX_INA228_ASSERT(me->wasCtorCalled == true);
-	ALX_INA228_ASSERT(me->isInit == true);
+	ALX_INA228_ASSERT(me->isInit == false);
 
 	// Local variables
 	Alx_Status status = Alx_Err;

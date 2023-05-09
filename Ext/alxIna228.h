@@ -733,6 +733,7 @@ Alx_Status AlxIna228_GetPower_W(AlxIna228* me, float* power_W);
 Alx_Status AlxIna228_GetEnergy_J(AlxIna228* me, float* energy_J);
 Alx_Status AlxIna228_GetCharge_C(AlxIna228* me, float* charge_C);
 
+Alx_Status AlxIna228_TraceId(AlxIna228* me);
 
 #endif	// #if defined(ALX_C_LIB)
 
