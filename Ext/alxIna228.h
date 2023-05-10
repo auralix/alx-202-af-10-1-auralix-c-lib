@@ -510,8 +510,9 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t MANFID : 16;
+		uint16_t MANFID;
 	};
+	uint8_t rawArray8bytes[2];
 	uint16_t raw;
 } AlxIna228_RegVal_0x3E_MANUFACTURER_ID;
 
@@ -523,9 +524,10 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t REV_ID : 4;
+		uint8_t REV_ID : 4;
 		uint16_t DIEID : 12;
 	};
+	uint8_t rawArray8bytes[2];
 	uint16_t raw;
 } AlxIna228_RegVal_0x3F_DEVICE_ID;
 

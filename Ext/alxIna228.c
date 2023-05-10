@@ -154,7 +154,7 @@ Alx_Status AlxIna228_Init(AlxIna228* me)
 {
 	// Assert
 	ALX_INA228_ASSERT(me->wasCtorCalled == true);
-	ALX_INA228_ASSERT(me->isInit == false);
+	ALX_INA228_ASSERT(me->isInit == true);
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -341,6 +341,43 @@ Alx_Status AlxIna228_GetCharge_C(AlxIna228* me, float* charge_C)
 	return Alx_Ok;
 }
 
+Alx_Status AlxIna228_TraceId(AlxIna228* me)
+{
+	Alx_Status status = Alx_Err;
+	uint8_t Raw_8[2];
+
+	// #1 Read ID registers
+	status = AlxIna228_Reg_Read(me, &me->reg._0x3E_MANUFACTURER_ID);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x3E_MANUFACTURER_ID	"); return status;}
+
+	// copyed the 1. and 2. data
+	Raw_8[0] = me->reg._0x3E_MANUFACTURER_ID.val.rawArray8bytes[0];
+	Raw_8[1] = me->reg._0x3E_MANUFACTURER_ID.val.rawArray8bytes[1];
+	// flipped the 1. and 2. data
+	me->reg._0x3E_MANUFACTURER_ID.val.rawArray8bytes[0] = Raw_8[1];
+	me->reg._0x3E_MANUFACTURER_ID.val.rawArray8bytes[1] = Raw_8[0];
+
+	status = AlxIna228_Reg_Read(me, &me->reg._0x3F_DEVICE_ID);
+	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x3F_DEVICE_ID	"); return status;}
+
+	// copyed the 1. and 2. data
+	Raw_8[0] = me->reg._0x3F_DEVICE_ID.val.rawArray8bytes[0];
+	Raw_8[1] = me->reg._0x3F_DEVICE_ID.val.rawArray8bytes[1];
+	// flipped the 1. and 2. data
+	me->reg._0x3F_DEVICE_ID.val.rawArray8bytes[0] = Raw_8[1];
+	me->reg._0x3F_DEVICE_ID.val.rawArray8bytes[1] = Raw_8[0];
+
+	// #2 Trace
+	ALX_INA228_TRACE_FORMAT("\r\n");
+	ALX_INA228_TRACE_FORMAT("Auralix C Library - ALX Current Monitor INA228 Module Identification:\r\n");
+	ALX_INA228_TRACE_FORMAT("- MANUFACTURER_ID: 0x%02X\r\n", me->reg._0x3E_MANUFACTURER_ID.val.MANFID);
+	ALX_INA228_TRACE_FORMAT("- DEVICE_ID.REV_ID: 0x%02X\r\n", me->reg._0x3F_DEVICE_ID.val.REV_ID);
+	ALX_INA228_TRACE_FORMAT("- DEVICE_ID.DIEID: 0x%02X\r\n", me->reg._0x3F_DEVICE_ID.val.DIEID);
+	ALX_INA228_TRACE_FORMAT("\r\n");
+
+	// #3 Return OK
+	return Alx_Ok;
+}
 
 //******************************************************************************
 // Private Functions
@@ -411,31 +448,39 @@ static void AlxIna228_RegStruct_SetValToZero(AlxIna228* me)
 	me->reg._0x0F_BUVL				.val.raw = 0x0000;
 	me->reg._0x10_TEMP_LIMIT		.val.raw = 0x0000;
 	me->reg._0x11_PWR_LIMIT			.val.raw = 0x0000;
+	me->reg._0x3E_MANUFACTURER_ID	.val.rawArray8bytes[0] = 0x00;
+	me->reg._0x3E_MANUFACTURER_ID	.val.rawArray8bytes[1] = 0x00;
 	me->reg._0x3E_MANUFACTURER_ID	.val.raw = 0x0000;
+	me->reg._0x3F_DEVICE_ID			.val.rawArray8bytes[0] = 0x00;
+	me->reg._0x3F_DEVICE_ID			.val.rawArray8bytes[1] = 0x00;
 	me->reg._0x3F_DEVICE_ID			.val.raw = 0x0000;
 }
 static void AlxIna228_RegStruct_SetToDefault(AlxIna228* me)
 {
-	me->reg._0x00_CONFIG			.val.raw = 0x0000;
-	me->reg._0x01_ADC_CONFIG		.val.raw = 0xFB68;
-	me->reg._0x02_SHUNT_CAL			.val.raw = 0x1000;
-	me->reg._0x03_SHUNT_TEMPCO		.val.raw = 0x0000;
-	me->reg._0x04_VSHUNT			.val.raw = 0x0000;
-	me->reg._0x05_VBUS				.val.raw = 0x0000;
-	me->reg._0x06_DIETEMP			.val.raw = 0x0000;
-	me->reg._0x07_CURRENT			.val.raw = 0x0000;
-	me->reg._0x08_POWER				.val.raw = 0x0000;
-	me->reg._0x09_ENERGY			.val.raw = 0x0000;
-	me->reg._0x0A_CHARGE			.val.raw = 0x0000;
-	me->reg._0x0B_DIAG_ALRT			.val.raw = 0x0001;
-	me->reg._0x0C_SOVL				.val.raw = 0x7FFF;
-	me->reg._0x0D_SUVL				.val.raw = 0x8000;
-	me->reg._0x0E_BOVL				.val.raw = 0x7FFF;
-	me->reg._0x0F_BUVL				.val.raw = 0x0000;
-	me->reg._0x10_TEMP_LIMIT		.val.raw = 0x7FFF;
-	me->reg._0x11_PWR_LIMIT			.val.raw = 0xFFFF;
-	me->reg._0x3E_MANUFACTURER_ID	.val.raw = 0x5449;
-	me->reg._0x3F_DEVICE_ID			.val.raw = 0x2281;
+	me->reg._0x00_CONFIG.val.raw = 0x0000;
+	me->reg._0x01_ADC_CONFIG.val.raw = 0xFB68;
+	me->reg._0x02_SHUNT_CAL.val.raw = 0x1000;
+	me->reg._0x03_SHUNT_TEMPCO.val.raw = 0x0000;
+	me->reg._0x04_VSHUNT.val.raw = 0x0000;
+	me->reg._0x05_VBUS.val.raw = 0x0000;
+	me->reg._0x06_DIETEMP.val.raw = 0x0000;
+	me->reg._0x07_CURRENT.val.raw = 0x0000;
+	me->reg._0x08_POWER.val.raw = 0x0000;
+	me->reg._0x09_ENERGY.val.raw = 0x0000;
+	me->reg._0x0A_CHARGE.val.raw = 0x0000;
+	me->reg._0x0B_DIAG_ALRT.val.raw = 0x0001;
+	me->reg._0x0C_SOVL.val.raw = 0x7FFF;
+	me->reg._0x0D_SUVL.val.raw = 0x8000;
+	me->reg._0x0E_BOVL.val.raw = 0x7FFF;
+	me->reg._0x0F_BUVL.val.raw = 0x0000;
+	me->reg._0x10_TEMP_LIMIT.val.raw = 0x7FFF;
+	me->reg._0x11_PWR_LIMIT.val.raw = 0xFFFF;
+	me->reg._0x3E_MANUFACTURER_ID.val.rawArray8bytes[0] = 0x54;
+	me->reg._0x3E_MANUFACTURER_ID.val.rawArray8bytes[1] = 0x49;
+	me->reg._0x3E_MANUFACTURER_ID.val.raw = 0x5449;
+	me->reg._0x3F_DEVICE_ID.val.rawArray8bytes[0] = 0x22;
+	me->reg._0x3F_DEVICE_ID.val.rawArray8bytes[1] = 0x81;
+	me->reg._0x3F_DEVICE_ID.val.raw = 0x2281;
 }
 
 static Alx_Status AlxIna228_Reg_Write(AlxIna228* me, void* reg)
@@ -508,28 +553,6 @@ static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg)
 	if (status != Alx_Ok) { ALX_INA228_TRACE("Err"); return status; }
 
 	// Return
-	return Alx_Ok;
-}
-static Alx_Status AlxIna228_TraceId(AlxIna228* me)
-{
-	Alx_Status status = Alx_Err;
-
-	// #1 Read ID registers
-	status = AlxIna228_Reg_Read(me, &me->reg._0x3E_MANUFACTURER_ID	);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x3E_MANUFACTURER_ID	"); return status;}
-
-	status = AlxIna228_Reg_Read(me, &me->reg._0x3F_DEVICE_ID	);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x3F_DEVICE_ID	"); return status;}
-
-	// #2 Trace
-	ALX_INA228_TRACE_FORMAT("\r\n");
-	ALX_INA228_TRACE_FORMAT("Auralix C Library - ALX Current Monitor INA228 Module Identification:\r\n");
-	ALX_INA228_TRACE_FORMAT("- MANUFACTURER_ID: 0x%02X\r\n", me->reg._0x3E_MANUFACTURER_ID.val.MANFID);
-	ALX_INA228_TRACE_FORMAT("- DEVICE_ID.REV_ID: 0x%02X\r\n", me->reg._0x3F_DEVICE_ID.val.REV_ID);
-	ALX_INA228_TRACE_FORMAT("- DEVICE_ID.DIEID: 0x%02X\r\n", me->reg._0x3F_DEVICE_ID.val.DIEID);
-	ALX_INA228_TRACE_FORMAT("\r\n");
-
-	// #3 Return OK
 	return Alx_Ok;
 }
 
