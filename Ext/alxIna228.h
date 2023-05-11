@@ -231,12 +231,12 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
-	{
-		uint8_t unused_0_3 : 4;
-		uint32_t VSHUNT_nVoltage : 20;
-	};
-	uint16_t raw;
+    struct __attribute__((packed))
+    {
+		int8_t unused_0_3 : 4;
+		int32_t VSHUNT_nVoltage : 20;
+    };
+	int8_t raw[3];
 } AlxIna228_RegVal_0x04_VSHUNT;
 
 
@@ -247,10 +247,10 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t unused_0_3 : 4;
-		uint32_t VBUS_uVoltage : 20;
+		int8_t unused_0_3 : 4;
+		int32_t VBUS_uVoltage : 20;
 	};
-	uint16_t raw;
+	int8_t raw[3];
 } AlxIna228_RegVal_0x05_VBUS;
 
 
@@ -261,9 +261,9 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t DIETEMP_mDegC : 16;
+		int16_t DIETEMP_mDegC;
 	};
-	uint16_t raw;
+	int16_t raw;
 } AlxIna228_RegVal_0x06_DIETEMP;
 
 
@@ -274,10 +274,10 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t unused_0_3 : 4;
-		uint32_t CURRENT_Amperes : 20;
+		int8_t unused_0_3 : 4;
+		int32_t CURRENT_Amperes : 20;
 	};
-	uint16_t raw;
+	int8_t raw[3];
 } AlxIna228_RegVal_0x07_CURRENT;
 
 
@@ -290,7 +290,7 @@ typedef union
 	{
 		uint32_t POWER_Watts : 24;
 	};
-	uint16_t raw;
+	uint8_t raw[3];
 } AlxIna228_RegVal_0x08_POWER;
 
 
@@ -303,7 +303,7 @@ typedef union
 	{
 		uint64_t ENERGY_Joules : 40;
 	};
-	uint16_t raw;
+	uint8_t raw[5];
 } AlxIna228_RegVal_0x09_ENERGY;
 
 
@@ -314,9 +314,9 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint64_t CHARGE_Coulombs : 40;
+		int64_t CHARGE_Coulombs : 40;
 	};
-	uint16_t raw;
+	int8_t raw[5];
 } AlxIna228_RegVal_0x0A_CHARGE;
 
 
@@ -430,9 +430,9 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t SOVL_uVoltage : 16;
+		int16_t SOVL_uVoltage;
 	};
-	uint16_t raw;
+	int16_t raw;
 } AlxIna228_RegVal_0x0C_SOVL;
 
 
@@ -443,9 +443,9 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t SUVL_uVoltage : 16;
+		int16_t SUVL_uVoltage;
 	};
-	uint16_t raw;
+	int16_t raw;
 } AlxIna228_RegVal_0x0D_SUVL;
 
 
@@ -484,9 +484,9 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t TOL_mDegC : 16;
+		int16_t TOL_mDegC;
 	};
-	uint16_t raw;
+	int16_t raw;
 } AlxIna228_RegVal_0x10_TEMP_LIMIT;
 
 
@@ -497,7 +497,7 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t POL : 16;
+		uint16_t POL;
 	};
 	uint16_t raw;
 } AlxIna228_RegVal_0x11_PWR_LIMIT;
@@ -512,7 +512,6 @@ typedef union
 	{
 		uint16_t MANFID;
 	};
-	uint8_t rawArray8bytes[2];
 	uint16_t raw;
 } AlxIna228_RegVal_0x3E_MANUFACTURER_ID;
 
@@ -527,7 +526,6 @@ typedef union
 		uint8_t REV_ID : 4;
 		uint16_t DIEID : 12;
 	};
-	uint8_t rawArray8bytes[2];
 	uint16_t raw;
 } AlxIna228_RegVal_0x3F_DEVICE_ID;
 
@@ -696,12 +694,18 @@ typedef struct
 	bool i2cCheckWithRead;
 	uint8_t i2cNumOfTries;
 	uint16_t i2cTimeout_ms;
+	AlxIna228_RegEnum_0x00_ADCRANGE adcRange;
+	float shuntRes_Ohm;
+	float shuntResTemp_ppmPerDegC;
 
 	// Variables
 	AlxIna228_Reg reg;
+	float conversionCurrentLsbFactor;
+	uint16_t conversionShuntFactor;
 
 	// Info
 	bool isInit;
+	bool isInitPeriph;
 	bool wasCtorCalled;
 } AlxIna228;
 
@@ -716,7 +720,10 @@ void AlxIna228_Ctor
 	uint8_t i2cAddr,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
-	uint16_t i2cTimeout_ms
+	uint16_t i2cTimeout_ms,
+	AlxIna228_RegEnum_0x00_ADCRANGE adcRange,
+	float shuntRes_Ohm,
+	float shuntResTemp_ppmPerDegC
 );
 
 
@@ -734,8 +741,8 @@ Alx_Status AlxIna228_GetCurrent_A(AlxIna228* me, float* current_A);
 Alx_Status AlxIna228_GetPower_W(AlxIna228* me, float* power_W);
 Alx_Status AlxIna228_GetEnergy_J(AlxIna228* me, float* energy_J);
 Alx_Status AlxIna228_GetCharge_C(AlxIna228* me, float* charge_C);
-
-Alx_Status AlxIna228_TraceId(AlxIna228* me);
+Alx_Status AlxIna228_ResetEnergyAndCharge(AlxIna228* me);
+Alx_Status AlxIna228_ResetSystem(AlxIna228* me);
 
 #endif	// #if defined(ALX_C_LIB)
 
