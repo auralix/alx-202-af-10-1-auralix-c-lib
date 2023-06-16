@@ -57,6 +57,9 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	// Defines
+	#define ALX_ADC_BUFF_LEN 16
+
 	// Obejcts - External
 	AlxIoPin** ioPinArr;
 	AlxClk* clk;
