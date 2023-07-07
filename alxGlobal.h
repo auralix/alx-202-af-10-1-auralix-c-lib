@@ -179,6 +179,10 @@ extern "C" {
 #include "alxGlobal_McuStm32F4.h"
 #define ALX_STM32
 
+#elif defined(ALX_STM32F7)
+#include "alxGlobal_McuStm32F7.h"
+#define ALX_STM32
+
 #elif defined(ALX_STM32G4)
 #include "alxGlobal_McuStm32G4.h"
 #define ALX_STM32
