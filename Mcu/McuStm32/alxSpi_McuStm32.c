@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -103,7 +103,7 @@ void AlxSpi_Ctor
 	me->hspi.Init.TIMode = SPI_TIMODE_DISABLE;
 	me->hspi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
 	me->hspi.Init.CRCPolynomial = 0x0007;
-	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4)
 	me->hspi.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
 	me->hspi.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
 	#endif
@@ -430,6 +430,48 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 		}
 	}
 	#endif
+	#if defined(ALX_STM32F7)
+	if((me->hspi.Instance == SPI1) || (me->hspi.Instance == SPI4) || (me->hspi.Instance == SPI5) || (me->hspi.Instance == SPI6))
+	{
+		if
+		(
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_422kHz_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_844kHz_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_1MHz688_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_3MHz375_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_6MHz75_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_13MHz5_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_27MHz_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_54MHz_Pclk2Apb2_108MHz)
+		)
+		{
+			if(108000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
+				return true;
+			else
+				return false;
+		}
+	}
+	if((me->hspi.Instance == SPI2) || (me->hspi.Instance == SPI3))
+	{
+		if
+		(
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_211kHz_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_422kHz_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_844kHz_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_1MHz688_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_3MHz375_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_6MHz75_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_13MHz5_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_27MHz_Pclk1Apb1_54MHz)
+		)
+		{
+			if(54000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
+				return true;
+			else
+				return false;
+		}
+	}
+	#endif
 	#if defined(ALX_STM32G4)
 	if(me->hspi.Instance == SPI1)
 	{
@@ -550,6 +592,9 @@ static void AlxSpi_Periph_EnableClk(AlxSpi* me)
 	#if defined(SPI5)
 	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_CLK_ENABLE(); isErr = false; }
 	#endif
+	#if defined(SPI6)
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_CLK_ENABLE(); isErr = false; }
+	#endif
 
 	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
 }
@@ -571,6 +616,9 @@ static void AlxSpi_Periph_DisableClk(AlxSpi* me)
 	#endif
 	#if defined(SPI5)
 	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_CLK_DISABLE(); isErr = false; }
+	#endif
+	#if defined(SPI6)
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_CLK_DISABLE(); isErr = false; }
 	#endif
 
 	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
@@ -594,6 +642,9 @@ static void AlxSpi_Periph_ForceReset(AlxSpi* me)
 	#if defined(SPI5)
 	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_FORCE_RESET(); isErr = false; }
 	#endif
+	#if defined(SPI6)
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_FORCE_RESET(); isErr = false; }
+	#endif
 
 	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
 }
@@ -616,9 +667,12 @@ static void AlxSpi_Periph_ReleaseReset(AlxSpi* me)
 	#if defined(SPI5)
 	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_RELEASE_RESET(); isErr = false; }
 	#endif
+	#if defined(SPI6)
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_RELEASE_RESET(); isErr = false; }
+	#endif
 
 	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
