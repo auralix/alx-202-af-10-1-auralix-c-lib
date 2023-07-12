@@ -158,11 +158,10 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
   * @brief
   * @param[in,out]	me
   * @param[in]		str
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
 	// #1 Write
 	if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)

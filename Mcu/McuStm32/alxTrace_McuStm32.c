@@ -131,10 +131,6 @@ void AlxTrace_Ctor
 	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	#endif
 
-	#if defined(ALX_OS)
-	AlxOsMutex_Ctor(&me->mutex);
-	#endif
-
 	// Info
 	me->wasCtorCalled = true;
 	me->isInit = false;
@@ -148,17 +144,11 @@ void AlxTrace_Ctor
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
+Alx_Status AlxTrace_Init(AlxTrace* me)
 {
-	// Lock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Lock(&me->mutex);
-	#endif
-
 	// Init GPIO
 	HAL_GPIO_WritePin(me->port, me->igpio.Pin, (GPIO_PinState)false);	// Set initial output value, before config
 	HAL_GPIO_Init(me->port, &me->igpio);
@@ -176,11 +166,6 @@ Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 	// Set isInit
 	me->isInit = true;
 
-	// Unlock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
 	// Return
 	return Alx_Ok;
 }
@@ -188,17 +173,11 @@ Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
+Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
-	// Lock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Lock(&me->mutex);
-	#endif
-
 	// DeInit UART
 	if (HAL_UART_DeInit(&me->huart) != HAL_OK) { return Alx_Err; }
 
@@ -214,11 +193,6 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 	// Clear isInit
 	me->isInit = false;
 
-	// Unlock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
 	// Return
 	return Alx_Ok;
 }
@@ -227,36 +201,20 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
   * @brief
   * @param[in,out]	me
   * @param[in]		str
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
-	// Lock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Lock(&me->mutex);
-	#endif
-
 	// Write
 	if (HAL_UART_Transmit(&me->huart, (uint8_t*)str, strlen(str), me->TIMEOUT_ms) != HAL_OK)
 	{
 		// Reset
 		AlxTrace_Reset(me);
 
-		// Unlock mutex
-		#if defined(ALX_OS)
-		if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-		#endif
-
 		// Return
 		return Alx_Err;
 	}
-
-	// Unlock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-	#endif
 
 	// Return
 	return Alx_Ok;

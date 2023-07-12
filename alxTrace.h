@@ -75,10 +75,10 @@ typedef struct { bool dummy; } AlxTrace;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TRACE_STR(str) do								{ AlxTrace_WriteStr(&alxTrace, str, true); } while(false)
-#define ALX_TRACE_FORMAT(...) do							{ AlxTrace_WriteFormat(&alxTrace, true, __VA_ARGS__); } while(false)
-#define ALX_TRACE_STD(file, ...) do							{ AlxTrace_WriteStd(&alxTrace, file, __LINE__, __func__, true, __VA_ARGS__); } while(false)
-#define ALX_TRACE_SM(smLevel, smName, stName, acName) do	{ AlxTrace_WriteSm(&alxTrace, smLevel, smName, stName, acName, true); } while(false)
+#define ALX_TRACE_STR(str) do								{ AlxTrace_WriteStr(&alxTrace, str); } while(false)
+#define ALX_TRACE_FORMAT(...) do							{ AlxTrace_WriteFormat(&alxTrace, __VA_ARGS__); } while(false)
+#define ALX_TRACE_STD(file, ...) do							{ AlxTrace_WriteStd(&alxTrace, file, __LINE__, __func__, __VA_ARGS__); } while(false)
+#define ALX_TRACE_SM(smLevel, smName, stName, acName) do	{ AlxTrace_WriteSm(&alxTrace, smLevel, smName, stName, acName); } while(false)
 
 
 //******************************************************************************
@@ -90,12 +90,12 @@ extern AlxTrace alxTrace;
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe);
-Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe);
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe);
-void AlxTrace_WriteFormat(AlxTrace* me, bool threadSafe, const char* format, ...);
-void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, bool threadSafe, const char* format, ...);
-void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName, bool threadSafe);
+Alx_Status AlxTrace_Init(AlxTrace* me);
+Alx_Status AlxTrace_DeInit(AlxTrace* me);
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str);
+void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...);
+void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, const char* format, ...);
+void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName);
 void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr);
 
 

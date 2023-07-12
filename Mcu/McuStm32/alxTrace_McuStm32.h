@@ -40,9 +40,6 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#if defined(ALX_OS)
-#include "alxOsMutex.h"
-#endif
 
 
 //******************************************************************************
@@ -71,9 +68,6 @@ typedef struct
 	// Variables
 	GPIO_InitTypeDef igpio;
 	UART_HandleTypeDef huart;
-	#if defined(ALX_OS)
-	AlxOsMutex mutex;
-	#endif
 
 	// Info
 	bool wasCtorCalled;

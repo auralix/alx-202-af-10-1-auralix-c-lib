@@ -98,7 +98,6 @@ void AlxTrace_Ctor
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
@@ -119,7 +118,6 @@ void AlxTrace_Init(AlxTrace* me)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
@@ -140,7 +138,6 @@ void AlxTrace_DeInit(AlxTrace* me)
   * @brief
   * @param[in,out]	me
   * @param[in]		str
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
