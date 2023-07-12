@@ -44,6 +44,12 @@ AlxTrace alxTrace = {0};
 
 
 //******************************************************************************
+// Weak Functions
+//******************************************************************************
+void AlxTrace_WriteStr_Callback(AlxTrace* me, const char* str, bool threadSafe);
+
+
+//******************************************************************************
 // Functions
 //******************************************************************************
 #if defined(ALX_PC) || defined(ALX_MBED)
@@ -119,7 +125,7 @@ void AlxTrace_WriteFormat(AlxTrace* me, bool threadSafe, const char* format, ...
 	vsnprintf(buff, 256, format, args);
 	va_end(args);
 
-	AlxTrace_WriteStr(me, buff, threadSafe);
+	AlxTrace_WriteStr_Callback(me, buff, threadSafe);
 }
 
 /**
@@ -186,6 +192,15 @@ void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr)
 		case 5: strcpy(smLevelStr, "____________________"); break;
 		default: strcpy(smLevelStr, ""); break;
 	}
+}
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+ALX_WEAK void AlxTrace_WriteStr_Callback(AlxTrace* me, const char* str, bool threadSafe)
+{
+	AlxTrace_WriteStr(me, str, threadSafe);
 }
 
 
