@@ -44,15 +44,15 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t chAdcData : 14;
-		uint8_t chAdcData_ZeroPadding : 2;
+		uint16_t chData : 14;
+		uint8_t chData_ZeroPadding : 2;
 		uint8_t chNum : 4;
 		uint8_t devAddr : 2;
 		uint8_t chVoltageRangeLsb3 : 3;
 		uint8_t unused_6_0 : 7;
 	};
 	uint8_t raw[4];
-} AlxAds8678_ChAdcDataFrame;
+} AlxAds8678_ChDataFrame;
 
 
 //******************************************************************************
@@ -65,7 +65,7 @@ static void AlxAds8678_RegStruct_SetToDefault(AlxAds8678* me);
 static Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg);
 static Alx_Status AlxAds8678_Reg_Write(AlxAds8678* me, void* reg);
 static Alx_Status AlxAds8678_Reg_WriteAll(AlxAds8678* me);
-static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, AlxAds8678_ChAdcDataFrame* chAdcDataFrame);
+static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, AlxAds8678_ChDataFrame* chDataFrame);
 static Alx_Status AlxAds8678_Cmd_Write_AutoRst(AlxAds8678* me);
 static bool AlxAds8678_IsChEnabled(AlxAds8678* me, uint8_t chNum);
 static AlxAds8678_RegEnum_0x05_0x0C_Range_CHn AlxAds8678_GetChRegEnumChVoltageRange(AlxAds8678* me, uint8_t chNum);
@@ -231,23 +231,23 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 		if (AlxAds8678_IsChEnabled(me, chNum))
 		{
 			// Write NO_OP command
-			AlxAds8678_ChAdcDataFrame chAdcDataFrame = {};
-			status = AlxAds8678_Cmd_Write_NoOp(me, &chAdcDataFrame);
+			AlxAds8678_ChDataFrame chDataFrame = {};
+			status = AlxAds8678_Cmd_Write_NoOp(me, &chDataFrame);
 			if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
 
 			// Check channel number
-			if(chAdcDataFrame.chNum != chNum) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+			if(chDataFrame.chNum != chNum) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
 
 			// Check device address
-			if(chAdcDataFrame.devAddr != me->reg._0x03_FeatureSelect.val.DEV) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+			if(chDataFrame.devAddr != me->reg._0x03_FeatureSelect.val.DEV) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
 
 			// Check channel voltage range
 			AlxAds8678_RegEnum_0x05_0x0C_Range_CHn regEnumChVoltageRange = AlxAds8678_GetChRegEnumChVoltageRange(me, chNum);
 			uint8_t chVoltageRangeLsb3 = regEnumChVoltageRange & 0x07;
-			if(chAdcDataFrame.chVoltageRangeLsb3 != chVoltageRangeLsb3) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+			if(chDataFrame.chVoltageRangeLsb3 != chVoltageRangeLsb3) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
 
 			// Prepare
-			float chAdcData = (float)(chAdcDataFrame.chAdcData >> 2);
+			float chAdcData = (float)(chDataFrame.chData >> 2);
 			float chVoltagePerBit_V = 0;
 			float chVoltageOffset_V = 0;
 			AlxAds8678_RegEnumChVoltageRangeToChVoltageRangeParam(regEnumChVoltageRange, &chVoltagePerBit_V, &chVoltageOffset_V);
@@ -440,7 +440,7 @@ static Alx_Status AlxAds8678_Reg_WriteAll(AlxAds8678* me)
 	// Return
 	return Alx_Ok;
 }
-static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, AlxAds8678_ChAdcDataFrame* chAdcDataFrame)
+static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, AlxAds8678_ChDataFrame* chDataFrame)
 {
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -465,8 +465,8 @@ static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, AlxAds8678_ChAdcData
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
 
-	// Set chAdcData
-	memcpy(chAdcDataFrame->raw, &dataReadArr[2], 4);
+	// Set
+	memcpy(chDataFrame->raw, &dataReadArr[2], 4);
 
 	// Return
 	return Alx_Ok;
