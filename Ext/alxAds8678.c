@@ -44,8 +44,8 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint16_t chData : 14;
-		uint8_t chData_ZeroPadding : 2;
+		uint8_t chData_MSB;
+		uint8_t chData_LSB;
 		uint8_t chNum : 4;
 		uint8_t devAddr : 2;
 		uint8_t chVoltageRangeLsb3 : 3;
@@ -121,6 +121,9 @@ Alx_Status AlxAds8678_InitPeriph(AlxAds8678* me)
 	// Local variables
 	Alx_Status status = Alx_Err;
 
+	// Init GPIO
+	AlxIoPin_Init(me->do_nRST);
+
 	// Init SPI
 	status = AlxSpi_Init(me->spi);
 	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
@@ -144,6 +147,9 @@ Alx_Status AlxAds8678_DeInitPeriph(AlxAds8678* me)
 	// DeInit SPI
 	status = AlxSpi_DeInit(me->spi);
 	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+
+	// DeInit GPIO
+	AlxIoPin_DeInit(me->do_nRST);
 
 	// Clear isInitPeriph
 	me->isInitPeriph = false;
@@ -171,7 +177,7 @@ Alx_Status AlxAds8678_Init(AlxAds8678* me)
 	AlxIoPin_Set(me->do_nRST);
 
 	// Wait for device to wake-up
-	AlxDelay_ms(20);
+	AlxDelay_ms(100);
 
 	// Write registers
 	status = AlxAds8678_Reg_WriteAll(me);
@@ -235,25 +241,27 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 			status = AlxAds8678_Cmd_Write_NoOp(me, &chDataFrame);
 			if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
 
-			// Check channel number
-			if(chDataFrame.chNum != chNum) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
-
-			// Check device address
-			if(chDataFrame.devAddr != me->reg._0x03_FeatureSelect.val.DEV) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+//			// Check channel number
+//			if(chDataFrame.chNum != chNum) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+//
+//			// Check device address
+//			if(chDataFrame.devAddr != me->reg._0x03_FeatureSelect.val.DEV) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
 
 			// Check channel voltage range
 			AlxAds8678_RegEnum_0x05_0x0C_Range_CHn regEnumChVoltageRange = AlxAds8678_GetChRegEnumChVoltageRange(me, chNum);
-			uint8_t chVoltageRangeLsb3 = regEnumChVoltageRange & 0x07;
-			if(chDataFrame.chVoltageRangeLsb3 != chVoltageRangeLsb3) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+//			uint8_t chVoltageRangeLsb3 = regEnumChVoltageRange & 0x07;
+//			if(chDataFrame.chVoltageRangeLsb3 != chVoltageRangeLsb3) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
 
 			// Prepare
-			float chAdcData = (float)(chDataFrame.chData >> 2);
+			uint16_t chDataUint16_LeftJustified = (chDataFrame.chData_MSB << 8) | (chDataFrame.chData_LSB);
+			uint16_t chDataUint16_RightJustified = chDataUint16_LeftJustified >> 2;
+			float chDataFloat = (float)(chDataUint16_RightJustified);
 			float chVoltagePerBit_V = 0;
 			float chVoltageOffset_V = 0;
 			AlxAds8678_RegEnumChVoltageRangeToChVoltageRangeParam(regEnumChVoltageRange, &chVoltagePerBit_V, &chVoltageOffset_V);
 
 			// Set
-			chVoltageAll_V->chVoltage_V[chNum] = (chAdcData * chVoltagePerBit_V) - chVoltageOffset_V;
+			chVoltageAll_V->chVoltage_V[chNum] = (chDataFloat * chVoltagePerBit_V) + chVoltageOffset_V;
 			chVoltageAll_V->isEnabled[chNum] = true;
 		}
 		else
@@ -341,10 +349,6 @@ static Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)
 	// Assert CS
 	AlxSpi_Master_AssertCs(me->spi);
 
-	// Generate 24 clock cycles
-	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, sizeof(dataWriteArr), me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS8678_TRACE("Err"); return status; }
-
 	// Prepare
 	dataWriteArr[0] = (regAddr << 1) | 0x00;	// Register address and read/write info - LSB must be set to 0 for read operation
 	dataWriteArr[1] = 0x00;						// Dummy byte
@@ -375,10 +379,6 @@ static Alx_Status AlxAds8678_Reg_Write(AlxAds8678* me, void* reg)
 
 	// Assert CS
 	AlxSpi_Master_AssertCs(me->spi);
-
-	// Generate 24 clock cycles
-	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, sizeof(dataWriteArr), me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS8678_TRACE("Err"); return status; }
 
 	// Prepare
 	dataWriteArr[0] = (regAddr << 1) | 0x01;	// Register address and read/write info - LSB must be set to 1 for write operation
