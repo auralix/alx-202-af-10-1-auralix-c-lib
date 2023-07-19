@@ -76,7 +76,8 @@ void AlxSpi_Ctor
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
 	AlxClk* clk,
-	AlxSpi_Clk spiClk
+	AlxSpi_Clk spiClk,
+	bool isWriteReadLowLevel
 )
 {
 	// Parameters
@@ -88,6 +89,7 @@ void AlxSpi_Ctor
 	me->mode = mode;
 	me->clk = clk;
 	me->spiClk = spiClk;
+	me->isWriteReadLowLevel = isWriteReadLowLevel;
 
 	// Variables
 	AlxSpi_ParseMode(me);
@@ -147,6 +149,13 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 
 	// Init SPI
 	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+
+	// If write/read low level, set FIFO threshold & enable SPI
+	if (me->isWriteReadLowLevel)
+	{
+		LL_SPI_SetRxFIFOThreshold(me->hspi.Instance, LL_SPI_RX_FIFO_TH_QUARTER);
+		LL_SPI_Enable(me->hspi.Instance);
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -306,7 +315,9 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
   */
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	ALX_SPI_ASSERT(me->isInit == true);
 	(void)me;
@@ -316,34 +327,88 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 < timeout_ms);
 
-	// Local variables
-	HAL_StatusTypeDef status = HAL_ERROR;
 
-	// Try write/read for number of tries
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
+	//------------------------------------------------------------------------------
+	// Check HAL vs LL
+	//------------------------------------------------------------------------------
+	if (me->isWriteReadLowLevel == false)
 	{
-		status = HAL_SPI_TransmitReceive(&me->hspi, writeData, readData, len, timeout_ms);
+		//------------------------------------------------------------------------------
+		// HAL
+		//------------------------------------------------------------------------------
+
+		// Local variables
+		HAL_StatusTypeDef status = HAL_ERROR;
+
+		// Try write/read for number of tries
+		for (uint32_t _try = 1; _try <= numOfTries; _try++)
+		{
+			status = HAL_SPI_TransmitReceive(&me->hspi, writeData, readData, len, timeout_ms);
+			if (status == HAL_OK)
+			{
+				break;	// Write/Read OK
+			}
+			else
+			{
+				ALX_SPI_TRACE("Err");
+				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+				continue;
+			}
+		}
+
+		// If we are here, write/read was OK or number of tries error occured
 		if (status == HAL_OK)
 		{
-			break;	// Write/Read OK
+			return Alx_Ok;
 		}
 		else
 		{
 			ALX_SPI_TRACE("Err");
-			if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("Err"); return Alx_Err; };
-			continue;
+			return Alx_ErrNumOfTries;
 		}
-	}
-
-	// If we are here, write/read was OK or number of tries error occured
-	if (status == HAL_OK)
-	{
-		return Alx_Ok;
 	}
 	else
 	{
-		ALX_SPI_TRACE("Err");
-		return Alx_ErrNumOfTries;
+		//------------------------------------------------------------------------------
+		// LL
+		//------------------------------------------------------------------------------
+
+		// Local variables
+		uint16_t lenToWrite = len;
+		uint16_t lenToRead = len;
+		uint16_t writeIndex = 0;
+		uint16_t readIndex = 0;
+
+		// Execute write/read
+		while(lenToRead > 0)
+		{
+			// If TXE = 1 (transmit buffer empty) and lenToWrite > 0 (we got some data to write)
+			if
+			(
+				(LL_SPI_IsActiveFlag_TXE(me->hspi.Instance)) &&
+				(lenToWrite > 0)
+			)
+			{
+				// Write
+				LL_SPI_TransmitData8(me->hspi.Instance, writeData[writeIndex++]);
+
+				// Decrement
+				lenToWrite--;
+			}
+
+			// If RXNE = 1 (receive buffer not empty)
+			if(LL_SPI_IsActiveFlag_RXNE(me->hspi.Instance))
+			{
+				// Read
+				readData[readIndex++] = LL_SPI_ReceiveData8(me->hspi.Instance);
+
+				// Decrement
+				lenToRead--;
+			}
+		}
+
+		// Return
+		return Alx_Ok;
 	}
 }
 
@@ -385,6 +450,13 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me)
 
 	// Init SPI
 	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; }
+
+	// If write/read low level, set FIFO threshold & enable SPI
+	if (me->isWriteReadLowLevel)
+	{
+		LL_SPI_SetRxFIFOThreshold(me->hspi.Instance, LL_SPI_RX_FIFO_TH_QUARTER);
+		LL_SPI_Enable(me->hspi.Instance);
+	}
 
 	// Set isInit
 	me->isInit = true;

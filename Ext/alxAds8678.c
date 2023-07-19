@@ -59,7 +59,7 @@ static void AlxAds8678_RegStruct_SetToDefault(AlxAds8678* me);
 static Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg);
 static Alx_Status AlxAds8678_Reg_Write(AlxAds8678* me, void* reg);
 static Alx_Status AlxAds8678_Reg_WriteAll(AlxAds8678* me);
-static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, AlxAds8678_ChDataFrame* chDataFrame);
+static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, uint8_t* dataReadArr);
 static Alx_Status AlxAds8678_Cmd_Write_AutoRst(AlxAds8678* me);
 static bool AlxAds8678_IsChEnabled(AlxAds8678* me, uint8_t chNum);
 static AlxAds8678_RegEnum_0x05_0x0C_Range_CHn AlxAds8678_GetChRegEnumChVoltageRange(AlxAds8678* me, uint8_t chNum);
@@ -215,7 +215,6 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 	ALX_ADS8678_ASSERT(me->wasCtorCalled == true);
 	ALX_ADS8678_ASSERT(me->isInitPeriph == true);
 	ALX_ADS8678_ASSERT(me->isInit == true);
-	ALX_ADS8678_ASSERT(me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr_DevAddr_InRange);	// We want full channel output format for data checking
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -230,23 +229,61 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 		// If channel enabled, get & set channel voltage, else set channel voltage to zero
 		if (AlxAds8678_IsChEnabled(me, chNum))
 		{
-			// Write NO_OP command
+			// Local variables
 			AlxAds8678_ChDataFrame chDataFrame = {};
-			status = AlxAds8678_Cmd_Write_NoOp(me, &chDataFrame);
+
+			// Write NO_OP command
+			uint8_t dataReadArr[6] = {};
+			status = AlxAds8678_Cmd_Write_NoOp(me, dataReadArr);
 			if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
 
 			// Check channel number
-			if(chDataFrame.chNum != chNum) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+			if
+			(
+				(me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr) ||
+				(me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr_DevAddr) ||
+				(me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr_DevAddr_InRange)
+			)
+			{
+				// Parse
+				chDataFrame.chNum = (dataReadArr[4] & 0xF0) >> 4;
+
+				// Check
+				if(chDataFrame.chNum != chNum) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+			}
 
 			// Check device address
-			if(chDataFrame.devAddr != me->reg._0x03_FeatureSelect.val.DEV) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+			if
+			(
+				(me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr_DevAddr) ||
+				(me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr_DevAddr_InRange)
+			)
+			{
+				// Parse
+				chDataFrame.devAddr = (dataReadArr[4] & 0x0C) >> 2;
+
+				// Check
+				if(chDataFrame.devAddr != me->reg._0x03_FeatureSelect.val.DEV) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+			}
 
 			// Check channel voltage range
-			AlxAds8678_RegEnum_0x05_0x0C_Range_CHn regEnumChVoltageRange = AlxAds8678_GetChRegEnumChVoltageRange(me, chNum);
-			uint8_t chVoltageRangeLsb3 = regEnumChVoltageRange & 0x07;
-			if(chDataFrame.chVoltageRangeLsb3 != chVoltageRangeLsb3) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+			AlxAds8678_RegEnum_0x05_0x0C_Range_CHn regEnumChVoltageRange = 0;
+			if (me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr_DevAddr_InRange)
+			{
+				// Parse
+				uint8_t chVoltageRangeLsb3_MSB = dataReadArr[4] & 0x03;
+				uint8_t chVoltageRangeLsb3_LSB = dataReadArr[5] & 0x80;
+				chDataFrame.chVoltageRangeLsb3 = (chVoltageRangeLsb3_MSB << 1) | (chVoltageRangeLsb3_LSB >> 7);
+
+				// Check
+				regEnumChVoltageRange = AlxAds8678_GetChRegEnumChVoltageRange(me, chNum);
+				uint8_t chVoltageRangeLsb3 = regEnumChVoltageRange & 0x07;
+				if(chDataFrame.chVoltageRangeLsb3 != chVoltageRangeLsb3) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+			}
 
 			// Prepare
+			uint16_t chData_LeftJustified = (dataReadArr[2] << 8) | dataReadArr[3];
+			chDataFrame.chData_RightJustified = chData_LeftJustified >> 2;
 			float chDataFloat = (float)(chDataFrame.chData_RightJustified);
 			float chVoltagePerBit_V = 0;
 			float chVoltageOffset_V = 0;
@@ -432,12 +469,11 @@ static Alx_Status AlxAds8678_Reg_WriteAll(AlxAds8678* me)
 	// Return
 	return Alx_Ok;
 }
-static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, AlxAds8678_ChDataFrame* chDataFrame)
+static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, uint8_t* dataReadArr)
 {
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t dataWriteArr[6] = {};
-	uint8_t dataReadArr[6] = {};
 
 	// Assert CS
 	AlxSpi_Master_AssertCs(me->spi);
@@ -450,27 +486,26 @@ static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, AlxAds8678_ChDataFra
 	dataWriteArr[4] = 0x00;
 	dataWriteArr[5] = 0x00;
 
+	// Prepare write/read lenght
+	uint16_t len = 0;
+	if (me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv)
+		len = 4;
+	else if	(me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr)
+		len = 5;
+	else if	(me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr_DevAddr)
+		len = 5;
+	else if	(me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr_DevAddr_InRange)
+		len = 6;
+	else
+		ALX_ADS8678_ASSERT(false);	// We shouldn't get here
+
+
 	// Write NO_OP command
-	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, sizeof(dataWriteArr), me->spiNumOfTries, me->spiTimeout_ms);
+	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, len, me->spiNumOfTries, me->spiTimeout_ms);
 	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS8678_TRACE("Err"); return status; }
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
-
-	// Set chData
-	uint16_t chData_LeftJustified = (dataReadArr[2] << 8) | dataReadArr[3];
-	chDataFrame->chData_RightJustified = chData_LeftJustified >> 2;
-
-	// Set chNum
-	chDataFrame->chNum = (dataReadArr[4] & 0xF0) >> 4;
-
-	// Set devAddr
-	chDataFrame->devAddr = (dataReadArr[4] & 0x0C) >> 2;
-
-	// Set chVoltageRangeLsb3
-	uint8_t chVoltageRangeLsb3_MSB = dataReadArr[4] & 0x03;
-	uint8_t chVoltageRangeLsb3_LSB = dataReadArr[5] & 0x80;
-	chDataFrame->chVoltageRangeLsb3 = (chVoltageRangeLsb3_MSB << 1) | (chVoltageRangeLsb3_LSB >> 7);
 
 	// Return
 	return Alx_Ok;

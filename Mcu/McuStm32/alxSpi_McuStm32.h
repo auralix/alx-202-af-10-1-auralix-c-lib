@@ -124,6 +124,7 @@ typedef struct
 	AlxSpi_Mode mode;
 	AlxClk* clk;
 	AlxSpi_Clk spiClk;
+	bool isWriteReadLowLevel;
 
 	// Variables
 	uint32_t clkPolarity;
@@ -149,7 +150,8 @@ void AlxSpi_Ctor
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
 	AlxClk* clk,
-	AlxSpi_Clk spiClk
+	AlxSpi_Clk spiClk,
+	bool isWriteReadLowLevel
 );
 
 
