@@ -153,7 +153,9 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 	// If write/read low level, set FIFO threshold & enable SPI
 	if (me->isWriteReadLowLevel)
 	{
+		#if defined(ALX_STM32F7)
 		LL_SPI_SetRxFIFOThreshold(me->hspi.Instance, LL_SPI_RX_FIFO_TH_QUARTER);
+		#endif
 		LL_SPI_Enable(me->hspi.Instance);
 	}
 
@@ -454,7 +456,9 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me)
 	// If write/read low level, set FIFO threshold & enable SPI
 	if (me->isWriteReadLowLevel)
 	{
+		#if defined(ALX_STM32F7)
 		LL_SPI_SetRxFIFOThreshold(me->hspi.Instance, LL_SPI_RX_FIFO_TH_QUARTER);
+		#endif
 		LL_SPI_Enable(me->hspi.Instance);
 	}
 
