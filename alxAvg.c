@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_CMSIS_DSP)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -87,7 +87,12 @@ float AlxAvg_Process(AlxAvg* me, float in)
 	if(me->shiftCount == me->shiftThreshold)
 	{
 		// Calculate new average
-		arm_mean_f32(me->buff, me->buffLen, &me->avg);
+		float sum = 0;
+		for (uint32_t i = 0; i < me->buffLen; i++)
+		{
+			sum = sum + me->buff[i];
+		}
+		me->avg = sum / me->buffLen;
 
 		// Reset shift counter
 		me->shiftCount = 0;
@@ -98,4 +103,4 @@ float AlxAvg_Process(AlxAvg* me, float in)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_CMSIS_DSP)
+#endif	// #if defined(ALX_C_LIB)

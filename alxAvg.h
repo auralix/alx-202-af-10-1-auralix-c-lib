@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_CMSIS_DSP)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -112,7 +112,7 @@ void AlxAvg_Ctor
 float AlxAvg_Process(AlxAvg* me, float in);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_CMSIS_DSP)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
