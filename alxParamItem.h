@@ -298,6 +298,7 @@ void AlxParamItem_CtorArr
 void AlxParamItem_CtorStr
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,

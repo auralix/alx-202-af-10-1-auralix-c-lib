@@ -152,7 +152,7 @@ Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* buff,
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxParamKvStore_Remove(AlxParamKvStore* me, char* key)
+Alx_Status AlxParamKvStore_Remove(AlxParamKvStore* me, const char* key)
 {
 	// Assert
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);

@@ -106,7 +106,7 @@ Alx_Status AlxParamKvStore_Init(AlxParamKvStore* me);
 Alx_Status AlxParamKvStore_DeInit(AlxParamKvStore* me);
 Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* buff, uint32_t len, uint32_t* actualLen);
 Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* buff, uint32_t len);
-Alx_Status AlxParamKvStore_Remove(AlxParamKvStore* me, char* key);
+Alx_Status AlxParamKvStore_Remove(AlxParamKvStore* me, const char* key);
 
 
 #endif	// #if defined(ALX_C_LIB)
