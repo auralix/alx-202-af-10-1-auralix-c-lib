@@ -1,24 +1,99 @@
-/*
- * lfs utility functions
- *
- * Copyright (c) 2022, The littlefs authors.
- * Copyright (c) 2017, Arm Limited. All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- */
-#ifndef LFS_UTIL_H
-#define LFS_UTIL_H
+/**
+  ******************************************************************************
+  * @file		alxLfsConfig.h
+  * @brief		Auralix C Library - ALX Little Fail-Safe File System Config File
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
+  *
+  * @section License
+  *
+  * SPDX-License-Identifier: GPL-3.0-or-later
+  *
+  * This file is part of Auralix C Library.
+  *
+  * Auralix C Library is free software: you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation, either version 3
+  * of the License, or (at your option) any later version.
+  *
+  * Auralix C Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
+  ******************************************************************************
+  **/
 
+//******************************************************************************
+// Include Guard
+//******************************************************************************
+#ifndef ALX_LFS_CONFIG_H
+#define ALX_LFS_CONFIG_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+//******************************************************************************
+// Includes
+//******************************************************************************
+#include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+
+
+//******************************************************************************
+// Module Guard
+//******************************************************************************
+#if defined(ALX_C_LIB) && defined(ALX_LFS)
+
+
+//******************************************************************************
+// Preprocessor
+//******************************************************************************
+#define ALX_LFS_CONFIG_FILE "alxLfsConfig.h"
+
+// Assert //
+#if defined(_LFS_CONFIG_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+    #define LFS_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LFS_CONFIG_FILE, expr)
+#elif defined(_LFS_CONFIG_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+    #define LFS_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LFS_CONFIG_FILE, expr)
+#elif defined(_LFS_CONFIG_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+    #define LFS_ASSERT(expr) ALX_ASSERT_RST(ALX_LFS_CONFIG_FILE, expr)
+#else
+    #define LFS_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(_LFS_CONFIG_TRACE) || defined(_ALX_TRACE_ALL)
+    //#define LFS_TRACE(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+    #define LFS_DEBUG(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+    #define LFS_WARN(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+    #define LFS_ERROR(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+#else
+    #define LFS_TRACE(...) do{} while (false)
+    #define LFS_DEBUG(...) do{} while (false)
+    #define LFS_WARN(...) do{} while (false)
+    #define LFS_ERROR(...) do{} while (false)
+#endif
+
+
+//******************************************************************************
+// lfs.util.h - Copied Stuff
+//******************************************************************************
 // Users can override lfs_util.h with their own configuration by defining
 // LFS_CONFIG as a header file to include (-DLFS_CONFIG=lfs_config.h).
 //
 // If LFS_CONFIG is used, none of the default utils will be emitted and must be
 // provided by the config file. To start, I would suggest copying lfs_util.h
 // and modifying as needed.
-#ifdef LFS_CONFIG
-#define LFS_STRINGIZE(x) LFS_STRINGIZE2(x)
-#define LFS_STRINGIZE2(x) #x
-#include LFS_STRINGIZE(LFS_CONFIG)
-#else
+//#ifdef LFS_CONFIG                             // TV: Commented
+//#define LFS_STRINGIZE(x) LFS_STRINGIZE2(x)
+//#define LFS_STRINGIZE2(x) #x
+//#include LFS_STRINGIZE(LFS_CONFIG)
+//#else
 
 // System includes
 #include <stdint.h>
@@ -39,10 +114,10 @@
 #include <stdio.h>
 #endif
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+//#ifdef __cplusplus    // TV: Commented
+//extern "C"
+//{
+//#endif
 
 
 // Macros, may be replaced by system specific wrappers. Arguments to these
@@ -212,7 +287,23 @@ static inline uint32_t lfs_tobe32(uint32_t a) {
 }
 
 // Calculate CRC-32 with polynomial = 0x04c11db7
-uint32_t lfs_crc(uint32_t crc, const void *buffer, size_t size);
+static inline uint32_t lfs_crc(uint32_t crc, const void *buffer, size_t size) {     // TV: Added implementation, copied from lfs_util.c
+    static const uint32_t rtable[16] = {
+        0x00000000, 0x1db71064, 0x3b6e20c8, 0x26d930ac,
+        0x76dc4190, 0x6b6b51f4, 0x4db26158, 0x5005713c,
+        0xedb88320, 0xf00f9344, 0xd6d6a3e8, 0xcb61b38c,
+        0x9b64c2b0, 0x86d3d2d4, 0xa00ae278, 0xbdbdf21c,
+    };
+
+    const uint8_t *data = buffer;
+
+    for (size_t i = 0; i < size; i++) {
+        crc = (crc >> 4) ^ rtable[(crc ^ (data[i] >> 0)) & 0xf];
+        crc = (crc >> 4) ^ rtable[(crc ^ (data[i] >> 4)) & 0xf];
+    }
+
+    return crc;
+}
 
 // Allocate memory, only used if buffers are not provided to littlefs
 // Note, memory must be 64-bit aligned
@@ -235,9 +326,10 @@ static inline void lfs_free(void *p) {
 }
 
 
+#endif  // #if defined(ALX_C_LIB) && defined(ALX_LFS)   // TV: Added
+
 #ifdef __cplusplus
-} /* extern "C" */
+}
 #endif
 
-#endif
-#endif
+#endif  // #ifndef ALX_LFS_CONFIG_H
