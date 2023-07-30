@@ -127,7 +127,7 @@ int32_t AlxFs_Format(AlxFs* me)
 	// Return
 	return status;
 }
-int32_t AlxFs_Remove(AlxFs* me, char* path)
+int32_t AlxFs_Remove(AlxFs* me, const char* path)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -140,7 +140,7 @@ int32_t AlxFs_Remove(AlxFs* me, char* path)
 	// Return
 	return status;
 }
-int32_t AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, char* path, int32_t flags)
+int32_t AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);

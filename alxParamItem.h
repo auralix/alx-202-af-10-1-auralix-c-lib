@@ -45,6 +45,7 @@ extern "C" {
 #include "alxBound.h"
 #include "alxRange.h"
 #include "alxFtoa.h"
+#include "alxParamKvStore.h"
 
 
 //******************************************************************************
@@ -72,8 +73,10 @@ extern "C" {
 // Trace //
 #if defined(_ALX_PARAM_ITEM_TRACE) || defined(_ALX_TRACE_ALL)
 	#define ALX_PARAM_ITEM_TRACE(...) ALX_TRACE_STD(ALX_PARAM_ITEM_FILE, __VA_ARGS__)
+	#define ALX_PARAM_ITEM_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_PARAM_ITEM_TRACE(...) do{} while (false)
+	#define ALX_PARAM_ITEM_TRACE_FORMAT(...) do{} while (false)
 #endif
 
 
@@ -130,6 +133,7 @@ typedef struct
 
 	// Parameters
 	AlxParamItem_Type type;
+	AlxParamKvStore* paramKvStore;
 	const char* key;
 	uint32_t id;
 	uint32_t groupId;
@@ -168,6 +172,7 @@ void AlxParamItem_CtorUint8
 void AlxParamItem_CtorUint16
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
@@ -247,6 +252,7 @@ void AlxParamItem_CtorInt64
 void AlxParamItem_CtorFloat
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
@@ -271,6 +277,7 @@ void AlxParamItem_CtorDouble
 void AlxParamItem_CtorBool
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
@@ -343,6 +350,8 @@ void AlxParamItem_GetValArr(AlxParamItem* me, void* val);
 void AlxParamItem_SetValArr(AlxParamItem* me, void* val);
 Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
 Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val);
+Alx_Status AlxParamItem_LoadVal(AlxParamItem* me);
+Alx_Status AlxParamItem_StoreVal(AlxParamItem* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

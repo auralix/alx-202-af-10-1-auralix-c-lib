@@ -105,6 +105,7 @@ void AlxParamItem_CtorUint8
 void AlxParamItem_CtorUint16
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
@@ -118,6 +119,7 @@ void AlxParamItem_CtorUint16
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Uint16;
+	me->paramKvStore = paramKvStore;
 	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
@@ -425,6 +427,7 @@ void AlxParamItem_CtorInt64
 void AlxParamItem_CtorFloat
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
@@ -438,6 +441,7 @@ void AlxParamItem_CtorFloat
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Float;
+	me->paramKvStore = paramKvStore;
 	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
@@ -527,6 +531,7 @@ void AlxParamItem_CtorDouble
 void AlxParamItem_CtorBool
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
@@ -535,6 +540,7 @@ void AlxParamItem_CtorBool
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Bool;
+	me->paramKvStore = paramKvStore;
 	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
@@ -1970,6 +1976,144 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 
 	// Return
 	return status;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
+Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+
+	// Local variables
+	const char* key = "";
+	uint32_t valLen = 0;
+	uint32_t actualValLen = 0;
+	void* buff = NULL;
+	Alx_Status status = Alx_Err;
+
+	// Get key
+	key = AlxParamItem_GetKey(me);
+
+	// Get value length
+	valLen = AlxParamItem_GetValLen(me);
+
+	// Allocate memory
+	buff = (uint8_t*)calloc(valLen, sizeof(uint8_t));
+	if(buff == NULL) { ALX_PARAM_ITEM_TRACE("Err"); free(buff); return Alx_Err; }
+
+	// Get value from Param KV Store
+	status = AlxParamKvStore_Get(me->paramKvStore, key, buff, valLen, &actualValLen);
+	if (status != Alx_Ok)
+	{
+		// Trace
+		ALX_PARAM_ITEM_TRACE_FORMAT("ALX param KV store get error - Key not found, default will be used - %s\r\n", key);
+
+		// Free memory
+		free(buff);
+
+		// Return
+		return Alx_Ok;
+	}
+
+	// Set Param Item
+	if (me->type == AlxParamItem_Type_Uint16)
+	{
+		uint16_t val = 0;
+		memcpy(&val, buff, valLen);
+		status = AlxParamItem_SetValUint16(me, val);
+	}
+	else if (me->type == AlxParamItem_Type_Float)
+	{
+		float val = 0;
+		memcpy(&val, buff, valLen);
+		status = AlxParamItem_SetValFloat(me, val);
+	}
+	else if (me->type == AlxParamItem_Type_Bool)
+	{
+		bool val = 0;
+		memcpy(&val, buff, valLen);
+		status = AlxParamItem_SetValBool(me, val);
+	}
+	else
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
+		return Alx_Err;
+	}
+
+	// Free memory
+	free(buff);
+
+	// If Param Item set error
+	if (status != Alx_Ok)
+	{
+		// Remove Param KV Store key
+		status = AlxParamKvStore_Remove(me->paramKvStore, key);
+		if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE("Err"); return Alx_Err; }
+
+		// Trace
+		ALX_PARAM_ITEM_TRACE_FORMAT("ALX param KV store read OK - ALX param item set error - Key was removed, default will be used - %s\r\n", key);
+	}
+
+	// Return
+	return Alx_Ok;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
+Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+
+	// Local variables
+	const char* key = "";
+	uint32_t valLen = 0;
+	Alx_Status status = Alx_Err;
+
+	// Get key
+	key = AlxParamItem_GetKey(me);
+
+	// Get value length
+	valLen = AlxParamItem_GetValLen(me);
+
+	// Set Param KV Store
+	if (me->type == AlxParamItem_Type_Uint16)
+	{
+		uint16_t val = AlxParamItem_GetValUint16(me);
+		status = AlxParamKvStore_Set(me->paramKvStore, key, &val, valLen);
+	}
+	else if (me->type == AlxParamItem_Type_Float)
+	{
+		float val = AlxParamItem_GetValFloat(me);
+		status = AlxParamKvStore_Set(me->paramKvStore, key, &val, valLen);
+	}
+	else if (me->type == AlxParamItem_Type_Bool)
+	{
+		bool val = AlxParamItem_GetValBool(me);
+		status = AlxParamKvStore_Set(me->paramKvStore, key, &val, valLen);
+	}
+	else
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
+		return Alx_Err;
+	}
+
+	// If Param KV Store set error
+	if(status != Alx_Ok)
+	{
+		ALX_PARAM_ITEM_TRACE("Err");
+		return Alx_Err;
+	}
+
+	// Return
+	return Alx_Ok;
 }
 
 

@@ -99,7 +99,7 @@ Alx_Status AlxParamKvStore_DeInit(AlxParamKvStore* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, char* key, void* buff, uint32_t len, uint32_t* actualLen)
+Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* buff, uint32_t len, uint32_t* actualLen)
 {
 	// Assert
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);
@@ -111,7 +111,7 @@ Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, char* key, void* buff, uint3
 	int64_t statusActualLen = -1;
 
 	// Open File
-	status = AlxFs_FileOpen(me->fs, &file, key, LFS_O_RDONLY | LFS_O_CREAT);
+	status = AlxFs_FileOpen(me->fs, &file, key, LFS_O_RDONLY);
 	if(status != 0) { ALX_PARAM_KV_STORE_TRACE("Err"); return Alx_Err; }
 
 	// Read File
@@ -126,7 +126,7 @@ Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, char* key, void* buff, uint3
 	*actualLen = (uint32_t)statusActualLen;
 	return Alx_Ok;
 }
-Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, char* key, void* buff, uint32_t len)
+Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* buff, uint32_t len)
 {
 	// Assert
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);
