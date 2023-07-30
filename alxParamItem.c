@@ -42,6 +42,7 @@
 //******************************************************************************
 static bool AlxParamItem_IsEnumOnList_Float(AlxParamItem* me, float enumVal, float* enumArr, uint8_t numOfEnums);
 static bool AlxParamItem_IsEnumOnList_Uint16(AlxParamItem* me, uint16_t enumVal, uint16_t* enumArr, uint8_t numOfEnums);
+static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me);
 
 
 //******************************************************************************
@@ -94,6 +95,7 @@ void AlxParamItem_CtorUint8
 /**
   * @brief
   * @param[in,out]	me
+  * @param[in]		paramKvStore
   * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
@@ -416,6 +418,7 @@ void AlxParamItem_CtorInt64
 /**
   * @brief
   * @param[in,out]	me
+  * @param[in]		paramKvStore
   * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
@@ -523,6 +526,7 @@ void AlxParamItem_CtorDouble
 /**
   * @brief
   * @param[in,out]	me
+  * @param[in]		paramKvStore
   * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
@@ -607,6 +611,7 @@ void AlxParamItem_CtorArr
 /**
   * @brief
   * @param[in,out]	me
+  * @param[in]		paramKvStore
   * @param[in]		key
   * @param[in]		id
   * @param[in]		groupId
@@ -633,6 +638,7 @@ void AlxParamItem_CtorStr
 
 	// Parameters
 	me->type = AlxParamItem_Type_Str;
+	me->paramKvStore = paramKvStore;
 	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
@@ -736,20 +742,7 @@ void* AlxParamItem_GetValPtr(AlxParamItem* me)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
 	// Return
-	if (me->type == AlxParamItem_Type_Arr)
-	{
-		void* ptr = NULL;
-		memcpy(&ptr, &me->val, 4);
-		return ptr;
-	}
-	else if (me->type == AlxParamItem_Type_Str)
-	{
-		return me->val.str;
-	}
-	else
-	{
-		return &me->val;
-	}
+	return AlxParamItem_GetValPtr_Private(me);
 }
 
 /**
@@ -2080,8 +2073,11 @@ Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
+	// Get value pointer
+	void* valPtr = AlxParamItem_GetValPtr_Private(me);
+
 	// Set Param KV Store
-	Alx_Status status = AlxParamKvStore_Set(me->paramKvStore, me->key, &me->val, me->valLen);
+	Alx_Status status = AlxParamKvStore_Set(me->paramKvStore, me->key, valPtr, me->valLen);
 	if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE("Err"); return Alx_Err; }
 
 	// Return
@@ -2121,6 +2117,23 @@ static bool AlxParamItem_IsEnumOnList_Float(AlxParamItem* me, float enumVal, flo
 
 	// Return
 	return false;	// Number is NOT on the list
+}
+static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me)
+{
+	if (me->type == AlxParamItem_Type_Arr)
+	{
+		void* ptr = NULL;
+		memcpy(&ptr, &me->val, 4);
+		return ptr;
+	}
+	else if (me->type == AlxParamItem_Type_Str)
+	{
+		return me->val.str;
+	}
+	else
+	{
+		return &me->val;
+	}
 }
 
 
