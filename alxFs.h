@@ -50,7 +50,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LFS)
+#if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7))
 
 
 //******************************************************************************
@@ -120,7 +120,7 @@ int32_t AlxFs_FileRead(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
 int32_t AlxFs_FileWrite(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7))
 
 #ifdef __cplusplus
 }
