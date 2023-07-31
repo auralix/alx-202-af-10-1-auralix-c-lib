@@ -310,7 +310,12 @@ static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block)
 	FLASH_EraseInitTypeDef xErase_Config = {};
 	xErase_Config.TypeErase = FLASH_TYPEERASE_SECTORS;
 	xErase_Config.Banks = ALX_NULL;
+	#if defined(ALX_STM32F4)
 	xErase_Config.Sector = FLASH_SECTOR_12 + block;
+	#endif
+	#if defined(ALX_STM32F7)
+	xErase_Config.Sector = FLASH_SECTOR_10 + block;
+	#endif
 	xErase_Config.NbSectors = 1;
 	xErase_Config.VoltageRange = FLASH_VOLTAGE_RANGE_3;
 	HAL_StatusTypeDef xHAL_Status = HAL_FLASHEx_Erase(&xErase_Config, &ulPageError);
@@ -336,13 +341,13 @@ static int AlxFs_Lfs_SyncBlock(const struct lfs_config* c)
 //******************************************************************************
 ALX_WEAK void AlxFs_Lfs_SetConfig(AlxFs* me)
 {
-	me->lfsAddr = 0x08100000;
-
 	me->lfsConfig.read  = AlxFs_Lfs_ReadBlock;
 	me->lfsConfig.prog  = AlxFs_Lfs_ProgBlock;
 	me->lfsConfig.erase = AlxFs_Lfs_EraseBlock;
 	me->lfsConfig.sync  = AlxFs_Lfs_SyncBlock;
 
+	#if defined(ALX_STM32F4)
+	me->lfsAddr = 0x08100000;
 	me->lfsConfig.read_size = 1;
 	me->lfsConfig.prog_size = 4;
 	me->lfsConfig.block_size = 16 * 1024;
@@ -350,6 +355,18 @@ ALX_WEAK void AlxFs_Lfs_SetConfig(AlxFs* me)
 	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
 	me->lfsConfig.cache_size = 16;
 	me->lfsConfig.lookahead_size = 8;
+	#endif
+
+	#if defined(ALX_STM32F7)
+	me->lfsAddr = 0x08180000;
+	me->lfsConfig.read_size = 1;
+	me->lfsConfig.prog_size = 4;
+	me->lfsConfig.block_size = 256 * 1024;
+	me->lfsConfig.block_count = 2;
+	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
+	me->lfsConfig.cache_size = 16;
+	me->lfsConfig.lookahead_size = 8;
+	#endif
 }
 
 
