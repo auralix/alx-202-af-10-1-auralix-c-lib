@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -107,7 +107,8 @@ void AlxRtc_Ctor
 	#if defined(STM32F410Tx) || defined(STM32F410Cx) || defined(STM32F410Rx) || defined(STM32F446xx) || defined(STM32F469xx) || \
 		defined(STM32F479xx) || defined(STM32F412Zx) || defined(STM32F412Vx) || defined(STM32F412Rx) || defined(STM32F412Cx) || \
 		defined(STM32F413xx) || defined(STM32F423xx) || \
-		defined(ALX_STM32L4)
+		defined(ALX_STM32L4) || \
+		defined (STM32F765xx) || defined (STM32F767xx) || defined (STM32F769xx) || defined (STM32F777xx) || defined (STM32F779xx)
 	me->iosc.PLL.PLLR = ALX_NULL;
 	#endif
 
@@ -201,6 +202,7 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 	 	(me->hrtc.Instance->PRER != me->PRER_Expected)	// Check if register PRER value is NOK
 	)
 	{
+		// Init
 		if
 		(
 			(HAL_RTC_Init(&me->hrtc) != HAL_OK) ||
@@ -212,10 +214,17 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 			me->isInit = false;
 			return Alx_Err;
 		}
+
+		// Trace
+		ALX_RTC_TRACE_FORMAT("ALX RTC date-time NOT configured, counting from default\r\n");
 	}
 	else
 	{
+		// Init
 		HAL_RTC_MspInit(&me->hrtc);
+
+		// Trace
+		ALX_RTC_TRACE_FORMAT("ALX RTC date-time configured\r\n");
 	}
 
 	// Return
@@ -711,4 +720,4 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))

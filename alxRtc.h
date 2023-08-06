@@ -45,7 +45,7 @@ extern "C" {
 #include "alxRtc_Global.h"
 
 // AlxMcu //
-#if (defined(ALX_STM32F4) || defined(ALX_STM32L4))
+#if (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 #include "alxRtc_McuStm32.h"
 
 #else
@@ -78,8 +78,10 @@ typedef struct { bool dummy; } AlxRtc;
 // Trace //
 #if defined(_ALX_RTC_TRACE) || defined(_ALX_TRACE_ALL)
 	#define ALX_RTC_TRACE(...) ALX_TRACE_STD(ALX_RTC_FILE, __VA_ARGS__)
+	#define ALX_RTC_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_RTC_TRACE(...) do{} while (false)
+	#define ALX_RTC_TRACE_FORMAT(...) do{} while (false)
 #endif
 
 
