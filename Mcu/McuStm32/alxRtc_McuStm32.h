@@ -58,15 +58,29 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxRtc_Clk_McuStm32_SyncClk_1Hz_AsynClk_256Hz_RtcClk_32kHz768_LseCrystal_32kHz768_Default = 0,
-	AlxRtc_Clk_McuStm32_SyncClk_1Hz_AsynClk_32kHz768_RtcClk_32kHz768_LseCrystal_32kHz768 = 1,
-	AlxRtc_Clk_McuStm32_SyncClk_1Hz_AsynClk_32kHz768_RtcClk_32kHz768_LseOscillator_32kHz768 = 2,
+	AlxRtc_Clk_McuStm32_SyncClk_1Hz_AsynClk_256Hz_RtcClk_32kHz768_LseCrystal_32kHz768_Default,
+	AlxRtc_Clk_McuStm32_SyncClk_1Hz_AsynClk_32kHz768_RtcClk_32kHz768_LseCrystal_32kHz768,
+	AlxRtc_Clk_McuStm32_SyncClk_1Hz_AsynClk_32kHz768_RtcClk_32kHz768_LseOscillator_32kHz768,
 } AlxRtc_Clk;
+
+typedef enum
+{
+	#if defined(ALX_STM32F4)
+	AlxRtc_LseDrive_NotSupported = ALX_NULL,
+	#endif
+	#if defined(ALX_STM32F7) || defined(ALX_STM32L4)
+	AlxRtc_LseDrive_McuStm32_Low = RCC_LSEDRIVE_LOW,
+	AlxRtc_LseDrive_McuStm32_MediumLow = RCC_LSEDRIVE_MEDIUMLOW,
+	AlxRtc_LseDrive_McuStm32_MediumHigh = RCC_LSEDRIVE_MEDIUMHIGH,
+	AlxRtc_LseDrive_McuStm32_High = RCC_LSEDRIVE_HIGH
+	#endif
+} AlxRtc_LseDrive;
 
 typedef struct
 {
 	// Parameters
 	AlxRtc_Clk rtcClk;
+	AlxRtc_LseDrive lseDrive;
 
 	// Variables
 	RCC_OscInitTypeDef iosc;
@@ -92,7 +106,8 @@ typedef struct
 void AlxRtc_Ctor
 (
 	AlxRtc* me,
-	AlxRtc_Clk rtcClk
+	AlxRtc_Clk rtcClk,
+	AlxRtc_LseDrive lseDrive
 );
 
 

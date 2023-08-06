@@ -52,17 +52,20 @@ static AlxRtc* alxRtc_me = NULL;
   * @brief
   * @param[in,out]	me
   * @param[in]		rtcClk
+  * @param[in]		lseDrive
   */
 void AlxRtc_Ctor
 (
 	AlxRtc* me,
-	AlxRtc_Clk rtcClk
+	AlxRtc_Clk rtcClk,
+	AlxRtc_LseDrive lseDrive
 )
 {
 	//------------------------------------------------------------------------------
 	// Parameters
 	//------------------------------------------------------------------------------
 	me->rtcClk = rtcClk;
+	me->lseDrive = lseDrive;
 
 
 	//------------------------------------------------------------------------------
@@ -706,16 +709,32 @@ Alx_Status AlxRtc_TuneTime_ms(AlxRtc* me, int64_t tuneTime_ms)
 //******************************************************************************
 void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
 {
+	// Local variables
 	(void)hrtc;
 
+	// Init LSE drive
+	#if defined(ALX_STM32F4)
+	// Not supported
+	#endif
+	#if defined(ALX_STM32F7) || defined(ALX_STM32L4)
+	HAL_PWR_EnableBkUpAccess();
+	__HAL_RCC_LSEDRIVE_CONFIG(alxRtc_me->lseDrive);
+	HAL_PWR_DisableBkUpAccess();
+	#endif
+
+	// Init clocks
 	if(HAL_RCC_OscConfig(&alxRtc_me->iosc) != HAL_OK)			{ ALX_RTC_TRACE("Err"); alxRtc_me->isErr = true; };
 	if(HAL_RCCEx_PeriphCLKConfig(&alxRtc_me->iclk) != HAL_OK)	{ ALX_RTC_TRACE("Err"); alxRtc_me->isErr = true; };
+
+	// Enable
 	__HAL_RCC_RTC_ENABLE();
 }
 void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
 {
+	// Local variables
 	(void)hrtc;
 
+	// Disable
 	__HAL_RCC_RTC_DISABLE();
 }
 
