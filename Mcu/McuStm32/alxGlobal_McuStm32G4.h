@@ -94,14 +94,6 @@ extern "C" {
 // Preprocessor
 //******************************************************************************
 
-//------------------------------------------------------------------------------
-// ALX MCU - I2C
-//------------------------------------------------------------------------------
-#define ALX_I2C_MCU_STM32_CLK_100kHz 0				// TODO
-#define ALX_I2C_MCU_STM32_CLK_400kHz 0x40B285C2		// _400kHz_8MHz_100nsRise_10nsFall_AnalogFiltOn_DigitalFilt0, on STM32F3 -> Used I2C timing configuration tool (AN4235) and the associated software STSW-STM32126, measured 380kHz, if analog filter is disabled we can get 400kHz..
-													// 0x60400D28 _400kHz_8MHz_100nsRise_10nsFall_AnalogFiltOn_DigitalFilt0
-													// 0x40B285C2 _100kHz_8MHz_100nsRise_100nsFall_AnalogFiltOn_DigitalFilt0
-
 
 //------------------------------------------------------------------------------
 // ALX - ID
