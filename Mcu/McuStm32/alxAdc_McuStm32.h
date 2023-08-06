@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -66,6 +66,9 @@ typedef enum
 	#if defined(ALX_STM32F4)
 	AlxAdc_Clk_McuStm32F4_AdcClk_22MHz5_Pclk2Apb2_90MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
 	AlxAdc_Clk_McuStm32F4_AdcClk_11MHz25_Pclk2Apb2_90MHz = ADC_CLOCK_SYNC_PCLK_DIV8,
+	#endif
+	#if defined(ALX_STM32F7)
+	AlxAdc_Clk_McuStm32F7_AdcClk_27MHz_Pclk2Apb2_108MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
 	#endif
 	#if defined(ALX_STM32G4)
 	AlxAdc_Clk_McuStm32G4_AdcClk_42MHz5_Pclk2Apb2_170MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
@@ -100,7 +103,9 @@ typedef struct
 	float vrefExt_V;
 
 	// Variables
+	#if defined(ALX_STM32F1)
 	RCC_PeriphCLKInitTypeDef iclk;
+	#endif
 	ADC_HandleTypeDef hadc;
 	DMA_TypeDef* dma;
 	DMA_HandleTypeDef hdma;
@@ -133,7 +138,7 @@ void AlxAdc_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

@@ -45,7 +45,7 @@ extern "C" {
 #include "alxIoPin.h"
 
 // AlxMcu //
-#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 #include "alxAdc_McuStm32.h"
 
 #elif defined(ALX_LPC1769)
