@@ -69,6 +69,7 @@ extern "C" {
 #include "alxInterpLin.h"
 #include "alxIoPin.h"
 #include "alxIoPinIrq.h"
+#include "alxLfsConfig.h"
 #include "alxLin.h"
 #include "alxLinFun.h"
 #include "alxMemRaw.h"
