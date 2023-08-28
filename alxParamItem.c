@@ -40,8 +40,9 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static bool AlxParamItem_IsEnumOnList_Float(AlxParamItem* me, float enumVal, float* enumArr, uint8_t numOfEnums);
+static bool AlxParamItem_IsEnumOnList_Uint8(AlxParamItem* me, uint8_t enumVal, uint8_t* enumArr, uint8_t numOfEnums);
 static bool AlxParamItem_IsEnumOnList_Uint16(AlxParamItem* me, uint16_t enumVal, uint16_t* enumArr, uint8_t numOfEnums);
+static bool AlxParamItem_IsEnumOnList_Float(AlxParamItem* me, float enumVal, float* enumArr, uint8_t numOfEnums);
 static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me);
 
 
@@ -63,17 +64,21 @@ static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me);
 void AlxParamItem_CtorUint8
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint8_t valDef,
 	uint8_t valMin,
 	uint8_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	uint8_t* enumArr,
+	uint8_t numOfEnums
 )
 {
 	// Parameters
 	me->type = AlxParamItem_Type_Uint8;
+	me->paramKvStore = paramKvStore;
 	me->key = key;
 	me->id = id;
 	me->groupId = groupId;
@@ -82,11 +87,28 @@ void AlxParamItem_CtorUint8
 	me->valMax.uint8 = valMax;
 	me->valLen = sizeof(uint8_t);
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
+	me->enumArr = enumArr;
+	me->numOfEnums = numOfEnums;
 	me->buff = ALX_NULL_PTR;
 	me->buffLen = ALX_NULL;
 
 	// Variables
 	me->val.uint8 = valDef;
+
+	// Check if enum
+	if (me->enumArr != NULL)
+	{
+		// Check if enum number is from low to high
+		for (uint8_t i = 0; i < numOfEnums - 1; i++)
+		{
+			ALX_PARAM_ITEM_ASSERT(enumArr[i] < enumArr[i + 1]);	// Enums must be from low to high number
+		}
+
+		// Check if enum number is on the list
+		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList_Uint8(me, valDef, enumArr, numOfEnums) == true);
+		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList_Uint8(me, valMin, enumArr, numOfEnums) == true);
+		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList_Uint8(me, valMax, enumArr, numOfEnums) == true);
+	}
 
 	// Info
 	me->wasCtorCalled = true;
@@ -1010,6 +1032,25 @@ Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val)
 	Alx_Status status = Alx_Err;
 	uint8_t _val = val;
 
+	// Check if enum
+	if (me->enumArr != NULL)
+	{
+		// Check if enum is on the list
+		bool isEnumOnList = AlxParamItem_IsEnumOnList_Uint8(me, _val, me->enumArr, me->numOfEnums);
+		if (isEnumOnList == false)
+		{
+			// If handle assert selected, then assert, else return
+			if (me->valOutOfRangeHandle == AlxParamItem_ValOutOfRangeHandle_Assert)
+			{
+				ALX_PARAM_ITEM_ASSERT(false);
+				status = Alx_Err;
+			}
+
+			// Return
+			return AlxParamItem_ErrEnum;
+		}
+	}
+
 	// Handle value out of range
 	switch(me->valOutOfRangeHandle)
 	{
@@ -1670,6 +1711,36 @@ Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
+Alx_Status AlxParamItem_GetValUint8_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint8);
+	ALX_PARAM_ITEM_ASSERT(maxLenWithNullTerm <= ALX_PARAM_ITEM_BUFF_LEN);
+
+	// Convert
+	char valStr[ALX_PARAM_ITEM_BUFF_LEN] = "";
+	ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%u", me->val.uint8) >= 0);
+
+	// Check & Copy if OK
+	Alx_Status status = AlxRange_CheckStr(valStr, maxLenWithNullTerm);
+	if (status == Alx_Ok)
+	{
+		strcpy(val, valStr);
+	}
+
+	// Return
+	return status;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
+  * @param[in]		maxLenWithNullTerm
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_GetValUint16_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
 {
 	// Assert
@@ -1757,6 +1828,30 @@ Alx_Status AlxParamItem_GetValBool_StrFormat(AlxParamItem* me, char* val, uint32
 
 	// Return
 	return status;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxParamItem_SetValUint8_StrFormat(AlxParamItem* me, char* val)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint8);
+
+	// Convert
+	uint8_t valNum = 0;
+	if (sscanf(val, "%hu", &valNum) != 1)
+	{
+		return AlxParamItem_ErrConv;
+	}
+
+	// Return
+	return AlxParamItem_SetValUint8(me, valNum);
 }
 
 /**
@@ -2088,6 +2183,21 @@ Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static bool AlxParamItem_IsEnumOnList_Uint8(AlxParamItem* me, uint8_t enumVal, uint8_t* enumArr, uint8_t numOfEnums)
+{
+	// Check if enum number is on the list
+	for (uint8_t i = 0; i < numOfEnums; i++)
+	{
+		if (enumVal == enumArr[i])
+		{
+			// Return
+			return true;	// Number is on the list
+		}
+	}
+
+	// Return
+	return false;	// Number is NOT on the list
+}
 static bool AlxParamItem_IsEnumOnList_Uint16(AlxParamItem* me, uint16_t enumVal, uint16_t* enumArr, uint8_t numOfEnums)
 {
 	// Check if enum number is on the list

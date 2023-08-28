@@ -161,13 +161,16 @@ typedef struct
 void AlxParamItem_CtorUint8
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint8_t valDef,
 	uint8_t valMin,
 	uint8_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	uint8_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorUint16
 (
@@ -341,9 +344,11 @@ Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val);
 Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val);
 Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val);
 Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val);
+Alx_Status AlxParamItem_GetValUint8_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
 Alx_Status AlxParamItem_GetValUint16_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
 Alx_Status AlxParamItem_GetValFloat_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
 Alx_Status AlxParamItem_GetValBool_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
+Alx_Status AlxParamItem_SetValUint8_StrFormat(AlxParamItem* me, char* val);
 Alx_Status AlxParamItem_SetValUint16_StrFormat(AlxParamItem* me, char* val);
 Alx_Status AlxParamItem_SetValFloat_StrFormat(AlxParamItem* me, char* val);
 Alx_Status AlxParamItem_SetValBool_StrFormat(AlxParamItem* me, char* val);
