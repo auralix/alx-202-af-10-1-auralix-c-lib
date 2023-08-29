@@ -136,7 +136,7 @@ extern "C" {
 #include "lwip/api.h"
 #include "lwip/tcpip.h"
 #include "lwip/dhcp.h"
-//#include "lwip/sockets.h"	// TV: TODO, conflict with read macro in lwIP with alxLfsConfig.h which includes lfs.h, moved include in alxInc.h
+//#include "lwip/sockets.h"	// TV: TODO, conflict with read macro in lwIP with alxLfsConfig.h which includes lfs.h, must be seperately included when needed
 #endif
 
 
