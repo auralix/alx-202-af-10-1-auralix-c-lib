@@ -115,6 +115,9 @@ extern "C" {
 #include "alxVeml6040.h"
 #include "alxVnh7040.h"
 
+#if defined(ALX_LW_IP)
+#include "lwip/sockets.h"
+#endif
 
 #ifdef __cplusplus
 }
