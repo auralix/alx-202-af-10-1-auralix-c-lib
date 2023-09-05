@@ -68,6 +68,7 @@ typedef enum
 	AlxAdc_Clk_McuStm32F4_AdcClk_11MHz25_Pclk2Apb2_90MHz = ADC_CLOCK_SYNC_PCLK_DIV8,
 	#endif
 	#if defined(ALX_STM32F7)
+	AlxAdc_Clk_McuStm32F7_AdcClk_13MHz5_Pclk2Apb2_108MHz = ADC_CLOCK_SYNC_PCLK_DIV8,
 	AlxAdc_Clk_McuStm32F7_AdcClk_27MHz_Pclk2Apb2_108MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
 	#endif
 	#if defined(ALX_STM32G4)

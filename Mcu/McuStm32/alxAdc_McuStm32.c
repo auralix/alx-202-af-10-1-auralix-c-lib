@@ -1288,7 +1288,11 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 	// STM32F7
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F7)
-	if(me->adcClk == AlxAdc_Clk_McuStm32F7_AdcClk_27MHz_Pclk2Apb2_108MHz)
+	if
+	(
+		(me->adcClk == AlxAdc_Clk_McuStm32F7_AdcClk_13MHz5_Pclk2Apb2_108MHz) ||
+		(me->adcClk == AlxAdc_Clk_McuStm32F7_AdcClk_27MHz_Pclk2Apb2_108MHz)
+	)
 	{
 		if(108000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
 			return true;
