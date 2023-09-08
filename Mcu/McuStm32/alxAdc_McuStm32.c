@@ -727,6 +727,7 @@ static void AlxAdc_PeriphAdc_EnableClk(AlxAdc* me)
 		#endif
 	#endif
 	#if defined(ALX_STM32L4)
+		(void)me;
 		__HAL_RCC_ADC_CLK_ENABLE(); isErr = false;
 	#endif
 
@@ -765,6 +766,7 @@ static void AlxAdc_PeriphAdc_DisableClk(AlxAdc* me)
 		#endif
 	#endif
 	#if defined(ALX_STM32L4)
+		(void)me;
 		__HAL_RCC_ADC_CLK_DISABLE(); isErr = false;
 	#endif
 
@@ -789,6 +791,7 @@ static void AlxAdc_PeriphAdc_ForceReset(AlxAdc* me)
 		#endif
 	#endif
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
+		(void)me;
 		__HAL_RCC_ADC_FORCE_RESET(); isErr = false;
 	#endif
 	#if defined(ALX_STM32G4)
@@ -827,6 +830,7 @@ static void AlxAdc_PeriphAdc_ReleaseReset(AlxAdc* me)
 		#endif
 	#endif
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
+		(void)me;
 		__HAL_RCC_ADC_RELEASE_RESET(); isErr = false;
 	#endif
 	#if defined(ALX_STM32G4)
@@ -852,7 +856,7 @@ static void AlxAdc_PeriphAdc_ReleaseReset(AlxAdc* me)
 static void AlxAdc_PeriphDma_EnableClk(AlxAdc* me)
 {
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-	__HAL_RCC_DMAMUX1_CLK_ENABLE();
+//	__HAL_RCC_DMAMUX1_CLK_ENABLE();		// TV: TODO
 	#endif
 
 	bool isErr = true;
@@ -872,7 +876,7 @@ static void AlxAdc_PeriphDma_EnableClk(AlxAdc* me)
 static void AlxAdc_PeriphDma_DisableClk(AlxAdc* me)
 {
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-	__HAL_RCC_DMAMUX1_CLK_DISABLE();
+//	__HAL_RCC_DMAMUX1_CLK_DISABLE();		// TV: TODO
 	#endif
 
 	bool isErr = true;
@@ -896,7 +900,7 @@ static void AlxAdc_PeriphDma_ForceReset(AlxAdc* me)
 	#endif
 
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-	__HAL_RCC_DMAMUX1_FORCE_RESET();
+//	__HAL_RCC_DMAMUX1_FORCE_RESET();		// TV: TODO
 	#endif
 
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
@@ -922,7 +926,7 @@ static void AlxAdc_PeriphDma_ReleaseReset(AlxAdc* me)
 	#endif
 
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-	__HAL_RCC_DMAMUX1_RELEASE_RESET();
+//	__HAL_RCC_DMAMUX1_RELEASE_RESET();		// TV: TODO
 	#endif
 
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
