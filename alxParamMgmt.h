@@ -80,10 +80,8 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxParamItem** paramItemArr;
-
 	// Parameters
+	AlxParamItem* paramItemArr;
 	uint32_t numOfParamItems;
 
 	// Info
@@ -97,20 +95,32 @@ typedef struct
 void AlxParamMgmt_Ctor
 (
 	AlxParamMgmt* me,
-	AlxParamItem** paramItemArr,
-	uint8_t numOfParamItems
+	AlxParamItem* paramItemArr,
+	uint32_t numOfParamItems
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxParamMgmt_GetByName(AlxParamMgmt* me, const char* name, void* val, uint32_t len);
-void AlxParamMgmt_GetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
-void AlxParamMgmt_SetByName(AlxParamMgmt* me, const char* name, void* val, uint32_t len);
-void AlxParamMgmt_SetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
-void AlxParamMgmt_SetToDefByName(AlxParamMgmt* me, const char* name, uint32_t len);
-void AlxParamMgmt_SetToDefById(AlxParamMgmt* me, uint32_t id, uint32_t len);
+uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me);
+const char* AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index);
+AlxParamItem_Type AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index);
+Alx_Status AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val, uint32_t maxLenWithNullTerm);
+
+
+Alx_Status AlxParamMgmt_ByKey_GetId(AlxParamMgmt* me, const char* key, uint32_t* id);
+Alx_Status AlxParamMgmt_ByKey_GetGroupId(AlxParamMgmt* me, const char* key, uint32_t* groupId);
+Alx_Status AlxParamMgmt_ByKey_GetType(AlxParamMgmt* me, const char* key, AlxParamItem_Type* type);
+Alx_Status AlxParamMgmt_ByKey_GetValPtr(AlxParamMgmt* me, const char* key, void* valPtr);
+Alx_Status AlxParamMgmt_ByKey_GetValLen(AlxParamMgmt* me, const char* key, uint32_t* valLen);
+Alx_Status AlxParamMgmt_ById_GetKey(AlxParamMgmt* me, uint32_t id, char* key);
+Alx_Status AlxParamMgmt_GetByKey(AlxParamMgmt* me, const char* key, void* val, uint32_t len);
+Alx_Status AlxParamMgmt_GetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
+Alx_Status AlxParamMgmt_SetByKey(AlxParamMgmt* me, const char* key, void* val, uint32_t len);
+Alx_Status AlxParamMgmt_SetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
+Alx_Status AlxParamMgmt_SetToDefByKey(AlxParamMgmt* me, const char* key, uint32_t len);
+Alx_Status AlxParamMgmt_SetToDefById(AlxParamMgmt* me, uint32_t id, uint32_t len);
 void AlxParamMgmt_SetToDefGroup(AlxParamMgmt* me, uint8_t groupId);
 void AlxParamMgmt_SetToDefAll(AlxParamMgmt* me);
 

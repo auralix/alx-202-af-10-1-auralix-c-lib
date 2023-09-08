@@ -38,12 +38,6 @@
 
 
 //******************************************************************************
-// Private Functions
-//******************************************************************************
-//static void AlxParamMgmt_Ctor(AlxParamMgmt);
-
-
-//******************************************************************************
 // Constructor
 //******************************************************************************
 
@@ -56,14 +50,12 @@
 void AlxParamMgmt_Ctor
 (
 	AlxParamMgmt* me,
-	AlxParamItem** paramItemArr,
-	uint8_t numOfParamItems
+	AlxParamItem* paramItemArr,
+	uint32_t numOfParamItems
 )
 {
-	// Objects - External
-	me->paramItemArr = paramItemArr;
-
 	// Parameters
+	me->paramItemArr = paramItemArr;
 	me->numOfParamItems = numOfParamItems;
 
 	// Info
@@ -74,138 +66,111 @@ void AlxParamMgmt_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		name
-  * @param[out]		val
-  * @param[in]		len
-  */
-void AlxParamMgmt_GetByName(AlxParamMgmt* me, const char* name, void* val, uint32_t len)
+uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me)
 {
-	// On HOLD, we must define system for this
-
-
-
-	// #1 Assert
+	// Assert
 	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Search by name
-	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	// Return
+	return me->numOfParamItems;
+}
+const char* AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_MGMT_ASSERT(index < me->numOfParamItems);
+
+	// Get pointer
+	AlxParamItem* ptr = &me->paramItemArr[index];
+
+	// Return
+	return AlxParamItem_GetKey(ptr);
+}
+AlxParamItem_Type AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_MGMT_ASSERT(index < me->numOfParamItems);
+
+	// Get pointer
+	AlxParamItem* ptr = &me->paramItemArr[index];
+
+	// Return
+	return AlxParamItem_GetType(ptr);
+}
+Alx_Status AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val, uint32_t maxLenWithNullTerm)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_MGMT_ASSERT(index < me->numOfParamItems);
+
+	// Get pointer
+	AlxParamItem* ptr = &me->paramItemArr[index];
+
+	// Get type
+	AlxParamItem_Type type = AlxParamItem_GetType(ptr);
+
+	// Execute
+	Alx_Status status = Alx_Err;
+	if (type == AlxParamItem_Type_Uint8)
 	{
-		// #2.1 Get name
-		const char* paramItem_Name = AlxParamItem_GetName(*(me->paramItemArr + i));
-
-		// #2.2 Compare
-		if ((strcmp(name, paramItem_Name) == 0))
-		{
-			// #2.2.1 Get type
-			AlxParamItem_Type paramItem_Type = AlxParamItem_GetType(*(me->paramItemArr + i));
-
-			// #2.2.2 Get value length
-			uint32_t paramItem_ValLen = AlxParamItem_GetValLen(*(me->paramItemArr + i));
-
-			// #2.2.3 Check value length
-			ALX_PARAM_MGMT_ASSERT(paramItem_ValLen == len);
-
-			switch (paramItem_Type)
-			{
-				case AlxParamItem_Type_Uint8:
-				{
-					uint8_t uint8 = AlxParamItem_GetValUint8(*(me->paramItemArr + i));
-					memcpy(val, &uint8, len);
-					break;
-				}
-				default:
-				{
-					ALX_PARAM_MGMT_ASSERT(false);	// We should never get here
-					break;
-				}
-			}
-
-
-		}
+		status = AlxParamItem_GetValUint8_StrFormat(ptr, val, maxLenWithNullTerm);
+	}
+	else if (type == AlxParamItem_Type_Uint16)
+	{
+		status = AlxParamItem_GetValUint16_StrFormat(ptr, val, maxLenWithNullTerm);
+	}
+	else if (type == AlxParamItem_Type_Uint32)
+	{
+		ALX_PARAM_MGMT_ASSERT(false);
+	}
+	else if (type == AlxParamItem_Type_Uint64)
+	{
+		ALX_PARAM_MGMT_ASSERT(false);
+	}
+	else if (type == AlxParamItem_Type_Int8)
+	{
+		ALX_PARAM_MGMT_ASSERT(false);
+	}
+	else if (type == AlxParamItem_Type_Int16)
+	{
+		ALX_PARAM_MGMT_ASSERT(false);
+	}
+	else if (type == AlxParamItem_Type_Int32)
+	{
+		ALX_PARAM_MGMT_ASSERT(false);
+	}
+	else if (type == AlxParamItem_Type_Int64)
+	{
+		ALX_PARAM_MGMT_ASSERT(false);
+	}
+	else if (type == AlxParamItem_Type_Float)
+	{
+		status = AlxParamItem_GetValFloat_StrFormat(ptr, val, maxLenWithNullTerm);
+	}
+	else if (type == AlxParamItem_Type_Double)
+	{
+		ALX_PARAM_MGMT_ASSERT(false);
+	}
+	else if (type == AlxParamItem_Type_Bool)
+	{
+		status = AlxParamItem_GetValBool_StrFormat(ptr, val, maxLenWithNullTerm);
+	}
+	else if (type == AlxParamItem_Type_Arr)
+	{
+		ALX_PARAM_MGMT_ASSERT(false);
+	}
+	else if (type == AlxParamItem_Type_Str)
+	{
+		status = AlxParamItem_GetValUint8_StrFormat(ptr, val, maxLenWithNullTerm);
+	}
+	else
+	{
+		ALX_PARAM_MGMT_ASSERT(false);	// We should never get here
 	}
 
-	ALX_PARAM_MGMT_ASSERT(false);	// We should never get here (user entered "Name" that doesn't exist)
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		id
-  * @param[out]		val
-  * @param[in]		len
-  */
-void AlxParamMgmt_GetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len)
-{
-
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		name
-  * @param[in]		val
-  * @param[in]		len
-  */
-void AlxParamMgmt_SetByName(AlxParamMgmt* me, const char* name, void* val, uint32_t len)
-{
-
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		id
-  * @param[in]		val
-  * @param[in]		len
-  */
-void AlxParamMgmt_SetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len)
-{
-
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		name
-  * @param[in]		len
-  */
-void AlxParamMgmt_SetToDefByName(AlxParamMgmt* me, const char* name, uint32_t len)
-{
-
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		id
-  * @param[in]		len
-  */
-void AlxParamMgmt_SetToDefById(AlxParamMgmt* me, uint32_t id, uint32_t len)
-{
-
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		groupId
-  */
-void AlxParamMgmt_SetToDefGroup(AlxParamMgmt* me, uint8_t groupId)
-{
-
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  */
-void AlxParamMgmt_SetToDefAll(AlxParamMgmt* me)
-{
-
+	// Return
+	return status;
 }
 
 
