@@ -1330,7 +1330,7 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(AlxClk* me)
 {
 	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;
+//	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;		// TV: TODO
 	me->isPwrRegOverDrive = ALX_NULL;
 
 	// Set oscillators
@@ -1360,7 +1360,7 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
 	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_5;
+//	me->flashLatency = FLASH_LATENCY_5;		// TV: TODO
 
 	// Set expected clocks
 	me->systemCoreClock_Ctor = 120000000;

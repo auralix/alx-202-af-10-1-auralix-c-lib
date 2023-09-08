@@ -427,7 +427,7 @@ void AlxAdc_Ctor
 	me->hadc.Init.Oversampling.RightBitShift = ALX_NULL;
 	me->hadc.Init.Oversampling.TriggeredMode = ALX_NULL;
 	me->hadc.Init.Oversampling.OversamplingStopReset = ALX_NULL;
-	me->hadc.Init.DFSDMConfig = ADC_DFSDM_MODE_DISABLE;
+//	me->hadc.Init.DFSDMConfig = ADC_DFSDM_MODE_DISABLE;		// TV: TODO
 
 	// ADC Channel
 	for (uint32_t buffPos = 0; buffPos < numOfCh; buffPos++)
@@ -446,7 +446,7 @@ void AlxAdc_Ctor
 	{
 		me->dma = DMA1;
 		me->hdma.Instance = DMA1_Channel1;
-		me->hdma.Init.Request = DMA_REQUEST_ADC1;
+//		me->hdma.Init.Request = DMA_REQUEST_ADC1;		// TV: TODO
 	}
 	me->hdma.Init.Direction = DMA_PERIPH_TO_MEMORY;
 	me->hdma.Init.PeriphInc = DMA_PINC_DISABLE;

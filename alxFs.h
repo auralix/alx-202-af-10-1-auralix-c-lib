@@ -44,6 +44,8 @@ extern "C" {
 #include "alxAssert.h"
 #if defined(ALX_LFS)
 #include "lfs.h"
+#else
+typedef struct { bool dummy; } AlxFs;
 #endif
 
 

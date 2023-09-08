@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_LFS)
 
 
 //******************************************************************************
@@ -167,4 +167,4 @@ Alx_Status AlxParamKvStore_Remove(AlxParamKvStore* me, const char* key)
 }
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS)

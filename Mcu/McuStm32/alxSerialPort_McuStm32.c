@@ -145,7 +145,7 @@ void AlxSerialPort_Ctor
 
 	#if defined(ALX_STM32L4)
 	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+//	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;		// TV: TODO
 	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT;
 	me->huart.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
 	#endif
