@@ -50,7 +50,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && ((defined(ALX_STM32F4) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED)))
+#if defined(ALX_C_LIB) && (((defined(ALX_STM32F4) || defined(ALX_STM32L4)) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED)))
 
 
 //******************************************************************************
@@ -59,38 +59,36 @@ extern "C" {
 typedef enum
 {
 	#if defined(ALX_STM32F4)
-	AlxCan_Clk_McuStm32F4_CanClk_250kbps_Pclk1Apb1_45MHz = 0,
+	AlxCan_Clk_McuStm32F4_CanClk_250kbps_Pclk1Apb1_45MHz,
 	#endif
 	#if defined(ALX_STM32G4)
-	AlxCan_Clk_McuStm32G4_CanClk_250kbps_Pclk1Apb1_170MHz = 0,
+	AlxCan_Clk_McuStm32G4_CanClk_250kbps_Pclk1Apb1_170MHz,
+	#endif
+	#if defined(ALX_STM32L4)
+	AlxCan_Clk_McuStm32L4_CanClk_250kbps_Pclk1Apb1_80MHz,
 	#endif
 } AlxCan_Clk;
 
 typedef struct
 {
-	// Objects - Internal
-	AlxFifo txFifo;
-	AlxFifo rxFifo;
-
-	// Objects - External
+	// Parameters
+	CAN_TypeDef* can;
 	AlxIoPin* do_CAN_TX;
 	AlxIoPin* di_CAN_RX;
 	AlxClk* clk;
-
-	// Parameters
 	AlxCan_Clk canClk;
-	uint32_t canRxFifo;
 	uint8_t* txFifoBuff;
 	uint32_t txFifoBuffLen;
 	uint8_t* rxFifoBuff;
 	uint32_t rxFifoBuffLen;
 	Alx_IrqPriority txIrqPriority;
 	Alx_IrqPriority rxIrqPriority;
-	#if defined(ALX_STM32G4)
-	#endif
 
 	// Variables
-	#if defined(ALX_STM32F4)
+	AlxFifo txFifo;
+	AlxFifo rxFifo;
+	uint32_t canRxFifo;
+	#if defined(ALX_STM32F4) || defined(ALX_STM32L4)
 	CAN_HandleTypeDef hcan;
 	CAN_FilterTypeDef fcan;
 	#endif
@@ -113,7 +111,7 @@ typedef struct
 void AlxCan_Ctor
 (
 	AlxCan* me,
-	#if defined(ALX_STM32F4)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32L4)
 	CAN_TypeDef* can,
 	#endif
 	#if defined(ALX_STM32G4)
@@ -132,7 +130,7 @@ void AlxCan_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F4) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED)))
+#endif	// #if defined(ALX_C_LIB) && (((defined(ALX_STM32F4) || defined(ALX_STM32L4)) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED)))
 
 #ifdef __cplusplus
 }

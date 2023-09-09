@@ -45,7 +45,7 @@ extern "C" {
 #include "alxIoPin.h"
 
 // AlxMcu //
-#if (defined(ALX_STM32F4) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED))
+#if ((defined(ALX_STM32F4) || defined(ALX_STM32L4)) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED))
 #include "alxCan_McuStm32.h"
 #else
 typedef struct { bool dummy; } AlxCan;
