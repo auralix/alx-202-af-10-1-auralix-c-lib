@@ -190,10 +190,10 @@ void AlxCan_Ctor
 	#if defined(ALX_STM32L4)
 	if(me->canClk == AlxCan_Clk_McuStm32L4_CanClk_250kbps_Pclk1Apb1_80MHz)
 	{
-		// Used calculator: http://www.bittiming.can-wiki.info/#STMicro, Target SamplePoint = 87.5%, Actual BitRate = 250kbps +/-0%, Actual SamplePoint = 88.9%, SJW = 1
-		me->hcan.Init.Prescaler = 10;
+		// Used calculator: http://www.bittiming.can-wiki.info/#STMicro, Target SamplePoint = 87.5%, Actual BitRate = 250kbps +/-0%, Actual SamplePoint = 87.5%, SJW = 1
+		me->hcan.Init.Prescaler = 20;
 		me->hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-		me->hcan.Init.TimeSeg1 = CAN_BS1_15TQ;
+		me->hcan.Init.TimeSeg1 = CAN_BS1_13TQ;
 		me->hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
 	}
 	else { ALX_CAN_ASSERT(false); return; } // We shouldn't get here
