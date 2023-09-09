@@ -609,6 +609,18 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 	{
 		if
 		(
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_5MHz_Pclk2Apb2_80MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_10MHz_Pclk2Apb2_80MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_20MHz_Pclk2Apb2_80MHz)
+		)
+		{
+			if (80000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
+				return true;
+			else
+				return false;
+		}
+		else if
+		(
 			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_7MHz5_Pclk2Apb2_120MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_15MHz_Pclk2Apb2_120MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_30MHz_Pclk2Apb2_120MHz)
@@ -623,6 +635,18 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 	if ((me->hspi.Instance == SPI2) || (me->hspi.Instance == SPI3))
 	{
 		if
+		(
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_5MHz_Pclk1Apb1_80MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_10MHz_Pclk1Apb1_80MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_20MHz_Pclk1Apb1_80MHz)
+		)
+		{
+			if (80000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
+				return true;
+			else
+				return false;
+		}
+		else if
 		(
 			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_7MHz5_Pclk1Apb1_120MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_15MHz_Pclk1Apb1_120MHz) ||
