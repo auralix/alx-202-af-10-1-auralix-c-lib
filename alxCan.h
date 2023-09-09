@@ -106,7 +106,7 @@ Alx_Status AlxCan_TxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg);
 Alx_Status AlxCan_RxMsg(AlxCan* me, AlxCan_Msg* msg);
 Alx_Status AlxCan_RxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg);
 bool AlxCan_IsErr(AlxCan* me);
-void AlxCan_Foreground_Handle(AlxCan* me);
+void AlxCan_IrqHandler(AlxCan* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

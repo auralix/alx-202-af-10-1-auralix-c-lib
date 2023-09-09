@@ -540,7 +540,7 @@ bool AlxCan_IsErr(AlxCan* me)
   * @brief
   * @param[in,out] me
   */
-void AlxCan_Foreground_Handle(AlxCan* me)
+void AlxCan_IrqHandler(AlxCan* me)
 {
 	#if defined(ALX_STM32F4) || defined(ALX_STM32L4)
 	HAL_CAN_IRQHandler(&me->hcan);
