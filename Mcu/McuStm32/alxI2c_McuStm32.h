@@ -78,7 +78,9 @@ typedef enum
 	AlxI2c_Clk_McuStm32L0_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_32MHz = 0x0060112F,		// TV: TODO, test
 	#endif
 	#if defined(ALX_STM32L4)
-	AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_0ns_FallTime_0ns_Pclk1Apb1_120MHz = 0x307075B1,	// TV: TODO, add config for 100ns rise/fall time
+	AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_0ns_FallTime_0ns_Pclk1Apb1_80MHz = 0x10909CEC,	// TV: TODO, add config for 100ns rise/fall time
+	AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_0ns_FallTime_0ns_Pclk1Apb1_80MHz = 0x00702991,
+	AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_0ns_FallTime_0ns_Pclk1Apb1_120MHz = 0x307075B1,
 	AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_0ns_FallTime_0ns_Pclk1Apb1_120MHz = 0x00B03FDB,
 	#endif
 } AlxI2c_Clk;

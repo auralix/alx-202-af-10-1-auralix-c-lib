@@ -598,10 +598,25 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 	#if defined(ALX_STM32L4)
 	if
 	(
+		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_0ns_FallTime_0ns_Pclk1Apb1_80MHz) ||
+		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_0ns_FallTime_0ns_Pclk1Apb1_80MHz)
+	)
+	{
+		if(80000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
+			return true;
+		else
+			return false;
+	}
+	else if
+	(
 		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_0ns_FallTime_0ns_Pclk1Apb1_120MHz) ||
 		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_0ns_FallTime_0ns_Pclk1Apb1_120MHz)
 	)
 	{
+		#if !defined(PWR_CR5_R1MODE)
+		ALX_I2C_ASSERT(false);
+		#endif
+
 		if(120000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
 			return true;
 		else
