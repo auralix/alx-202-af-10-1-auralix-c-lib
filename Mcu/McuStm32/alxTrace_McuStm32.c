@@ -127,7 +127,9 @@ void AlxTrace_Ctor
 
 	#if defined(ALX_STM32L4)
 	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-//	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;		// TV: TODO
+	#if defined(USART_PRESC_PRESCALER)
+	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+	#endif
 	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	#endif
 
