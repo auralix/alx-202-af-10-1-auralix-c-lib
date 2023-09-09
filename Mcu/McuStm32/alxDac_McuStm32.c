@@ -133,7 +133,9 @@ void AlxDac_Ctor
 		#endif
 
 		#if defined(ALX_STM32L4)
-//		me->chdac[buffPos].DAC_HighFrequency = DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE;		// TV: TODO
+		#if defined (STM32L4P5xx) || defined (STM32L4Q5xx) || defined (STM32L4R5xx) || defined (STM32L4R7xx) || defined (STM32L4R9xx) || defined (STM32L4S5xx) || defined (STM32L4S7xx) || defined(STM32L4S9xx)
+		me->chdac[buffPos].DAC_HighFrequency = DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE;
+		#endif
 		me->chdac[buffPos].DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
 		me->chdac[buffPos].DAC_Trigger = DAC_TRIGGER_NONE;
 		me->chdac[buffPos].DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;

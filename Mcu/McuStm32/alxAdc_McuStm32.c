@@ -427,7 +427,9 @@ void AlxAdc_Ctor
 	me->hadc.Init.Oversampling.RightBitShift = ALX_NULL;
 	me->hadc.Init.Oversampling.TriggeredMode = ALX_NULL;
 	me->hadc.Init.Oversampling.OversamplingStopReset = ALX_NULL;
-//	me->hadc.Init.DFSDMConfig = ADC_DFSDM_MODE_DISABLE;		// TV: TODO
+	#if defined(ADC_CFGR_DFSDMCFG) && defined(DFSDM1_Channel0)
+	me->hadc.Init.DFSDMConfig = ADC_DFSDM_MODE_DISABLE;
+	#endif
 
 	// ADC Channel
 	for (uint32_t buffPos = 0; buffPos < numOfCh; buffPos++)
@@ -446,7 +448,11 @@ void AlxAdc_Ctor
 	{
 		me->dma = DMA1;
 		me->hdma.Instance = DMA1_Channel1;
-//		me->hdma.Init.Request = DMA_REQUEST_ADC1;		// TV: TODO
+		#if defined(DMAMUX1)
+		me->hdma.Init.Request = DMA_REQUEST_ADC1;
+		#else
+		me->hdma.Init.Request = DMA_REQUEST_0;
+		#endif
 	}
 	me->hdma.Init.Direction = DMA_PERIPH_TO_MEMORY;
 	me->hdma.Init.PeriphInc = DMA_PINC_DISABLE;
@@ -856,7 +862,9 @@ static void AlxAdc_PeriphAdc_ReleaseReset(AlxAdc* me)
 static void AlxAdc_PeriphDma_EnableClk(AlxAdc* me)
 {
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-//	__HAL_RCC_DMAMUX1_CLK_ENABLE();		// TV: TODO
+	#if defined(DMAMUX1)
+	__HAL_RCC_DMAMUX1_CLK_ENABLE();
+	#endif
 	#endif
 
 	bool isErr = true;
@@ -876,7 +884,9 @@ static void AlxAdc_PeriphDma_EnableClk(AlxAdc* me)
 static void AlxAdc_PeriphDma_DisableClk(AlxAdc* me)
 {
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-//	__HAL_RCC_DMAMUX1_CLK_DISABLE();		// TV: TODO
+	#if defined(DMAMUX1)
+	__HAL_RCC_DMAMUX1_CLK_DISABLE();
+	#endif
 	#endif
 
 	bool isErr = true;
@@ -900,7 +910,9 @@ static void AlxAdc_PeriphDma_ForceReset(AlxAdc* me)
 	#endif
 
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-//	__HAL_RCC_DMAMUX1_FORCE_RESET();		// TV: TODO
+	#if defined(DMAMUX1)
+	__HAL_RCC_DMAMUX1_FORCE_RESET();
+	#endif
 	#endif
 
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
@@ -926,7 +938,9 @@ static void AlxAdc_PeriphDma_ReleaseReset(AlxAdc* me)
 	#endif
 
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-//	__HAL_RCC_DMAMUX1_RELEASE_RESET();		// TV: TODO
+	#if defined(DMAMUX1)
+	__HAL_RCC_DMAMUX1_RELEASE_RESET();
+	#endif
 	#endif
 
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
@@ -1354,7 +1368,14 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 	// STM32L4
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32L4)
-	if (me->adcClk == AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Sysclk_120MHz)
+	if (me->adcClk == AlxAdc_Clk_McuStm32L4_AdcClk_20MHz_Sysclk_80MHz)
+	{
+		if(80000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
+			return true;
+		else
+			return false;
+	}
+	else if (me->adcClk == AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Sysclk_120MHz)
 	{
 		if(120000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
 			return true;
