@@ -66,6 +66,11 @@ void AlxParamMgmt_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me)
 {
 	// Assert
@@ -74,6 +79,11 @@ uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me)
 	// Return
 	return me->numOfParamItems;
 }
+
+
+//------------------------------------------------------------------------------
+// By Index
+//------------------------------------------------------------------------------
 const char* AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index)
 {
 	// Assert
@@ -107,66 +117,40 @@ Alx_Status AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t inde
 	// Get pointer
 	AlxParamItem* ptr = &me->paramItemArr[index];
 
-	// Get type
-	AlxParamItem_Type type = AlxParamItem_GetType(ptr);
+	// Get val
+	Alx_Status status = AlxParamItem_GetVal_StrFormat(ptr, val, maxLenWithNullTerm);
 
-	// Execute
+	// Return
+	return status;
+}
+
+
+//------------------------------------------------------------------------------
+// By Key
+//------------------------------------------------------------------------------
+Alx_Status AlxParamMgmt_ByKey_SetVal_StrFormat(AlxParamMgmt* me, char* key, char* val)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Local variables
 	Alx_Status status = Alx_Err;
-	if (type == AlxParamItem_Type_Uint8)
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
 	{
-		status = AlxParamItem_GetValUint8_StrFormat(ptr, val, maxLenWithNullTerm);
-	}
-	else if (type == AlxParamItem_Type_Uint16)
-	{
-		status = AlxParamItem_GetValUint16_StrFormat(ptr, val, maxLenWithNullTerm);
-	}
-	else if (type == AlxParamItem_Type_Uint32)
-	{
-		ALX_PARAM_MGMT_ASSERT(false);
-	}
-	else if (type == AlxParamItem_Type_Uint64)
-	{
-		ALX_PARAM_MGMT_ASSERT(false);
-	}
-	else if (type == AlxParamItem_Type_Int8)
-	{
-		ALX_PARAM_MGMT_ASSERT(false);
-	}
-	else if (type == AlxParamItem_Type_Int16)
-	{
-		ALX_PARAM_MGMT_ASSERT(false);
-	}
-	else if (type == AlxParamItem_Type_Int32)
-	{
-		ALX_PARAM_MGMT_ASSERT(false);
-	}
-	else if (type == AlxParamItem_Type_Int64)
-	{
-		ALX_PARAM_MGMT_ASSERT(false);
-	}
-	else if (type == AlxParamItem_Type_Float)
-	{
-		status = AlxParamItem_GetValFloat_StrFormat(ptr, val, maxLenWithNullTerm);
-	}
-	else if (type == AlxParamItem_Type_Double)
-	{
-		ALX_PARAM_MGMT_ASSERT(false);
-	}
-	else if (type == AlxParamItem_Type_Bool)
-	{
-		status = AlxParamItem_GetValBool_StrFormat(ptr, val, maxLenWithNullTerm);
-	}
-	else if (type == AlxParamItem_Type_Arr)
-	{
-		ALX_PARAM_MGMT_ASSERT(false);
-	}
-	else if (type == AlxParamItem_Type_Str)
-	{
-		status = AlxParamItem_GetValUint8_StrFormat(ptr, val, maxLenWithNullTerm);
-	}
-	else
-	{
-		ALX_PARAM_MGMT_ASSERT(false);	// We should never get here
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get key
+		const char* _key = AlxParamItem_GetKey(ptr);
+
+		// If key match, set value
+		if (strcmp(key, _key) == 0)
+		{
+			status = AlxParamItem_SetVal_StrFormat(ptr, val);
+			break;
+		}
 	}
 
 	// Return

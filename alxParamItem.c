@@ -1836,7 +1836,7 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 
 
 //------------------------------------------------------------------------------
-// Get String Format
+// Get & Set String Format
 //------------------------------------------------------------------------------
 
 /**
@@ -1847,130 +1847,95 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxParamItem_GetValUint8_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
+Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
 {
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint8);
 	ALX_PARAM_ITEM_ASSERT(maxLenWithNullTerm <= ALX_PARAM_ITEM_BUFF_LEN);
 
-	// Convert
+	// Local variables
+	Alx_Status status = Alx_Err;
 	char valStr[ALX_PARAM_ITEM_BUFF_LEN] = "";
-	ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%u", me->val.uint8) >= 0);
 
-	// Check & Copy if OK
-	Alx_Status status = AlxRange_CheckStr(valStr, maxLenWithNullTerm);
-	if (status == Alx_Ok)
+	// Convert
+	if (me->type == AlxParamItem_Type_Uint8)
 	{
-		strcpy(val, valStr);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%u", me->val.uint8) >= 0);
 	}
-
-	// Return
-	return status;
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		val
-  * @param[in]		maxLenWithNullTerm
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxParamItem_GetValUint16_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint16);
-	ALX_PARAM_ITEM_ASSERT(maxLenWithNullTerm <= ALX_PARAM_ITEM_BUFF_LEN);
-
-	// Convert
-	char valStr[ALX_PARAM_ITEM_BUFF_LEN] = "";
-	ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%u", me->val.uint16) >= 0);
-
-	// Check & Copy if OK
-	Alx_Status status = AlxRange_CheckStr(valStr, maxLenWithNullTerm);
-	if (status == Alx_Ok)
+	else if (me->type == AlxParamItem_Type_Uint16)
 	{
-		strcpy(val, valStr);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%u", me->val.uint16) >= 0);
 	}
-
-	// Return
-	return status;
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		val
-  * @param[in]		maxLenWithNullTerm
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxParamItem_GetValFloat_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Float);
-	ALX_PARAM_ITEM_ASSERT(maxLenWithNullTerm <= ALX_PARAM_ITEM_BUFF_LEN);
-
-	// Convert
-	char valStr[ALX_PARAM_ITEM_BUFF_LEN] = "";
-	AlxFtoa(me->val._float, valStr, ALX_PARAM_ITEM_FTOA_PRECISION);
-
-	// Check & Copy if OK
-	Alx_Status status = AlxRange_CheckStr(valStr, maxLenWithNullTerm);
-	if (status == Alx_Ok)
+	else if (me->type == AlxParamItem_Type_Uint32)
 	{
-		strcpy(val, valStr);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%lu", me->val.uint32) >= 0);
 	}
-
-	// Return
-	return status;
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		val
-  * @param[in]		maxLenWithNullTerm
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxParamItem_GetValBool_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Bool);
-	ALX_PARAM_ITEM_ASSERT(maxLenWithNullTerm <= ALX_PARAM_ITEM_BUFF_LEN);
-
-	// Convert
-	char valStr[ALX_PARAM_ITEM_BUFF_LEN] = "";
-	if (me->val._bool)
+	else if (me->type == AlxParamItem_Type_Uint64)
 	{
-		strcpy(valStr, "true");
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+	}
+	else if (me->type == AlxParamItem_Type_Int8)
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+	}
+	else if (me->type == AlxParamItem_Type_Int16)
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+	}
+	else if (me->type == AlxParamItem_Type_Int32)
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+	}
+	else if (me->type == AlxParamItem_Type_Int64)
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+	}
+	else if (me->type == AlxParamItem_Type_Float)
+	{
+		AlxFtoa(me->val._float, valStr, ALX_PARAM_ITEM_FTOA_PRECISION);
+	}
+	else if (me->type == AlxParamItem_Type_Double)
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+	}
+	else if (me->type == AlxParamItem_Type_Bool)
+	{
+		if (me->val._bool)
+		{
+			strcpy(valStr, "true");
+		}
+		else
+		{
+			strcpy(valStr, "false");
+		}
+	}
+	else if (me->type == AlxParamItem_Type_Arr)
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+	}
+	else if (me->type == AlxParamItem_Type_Str)
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
 	}
 	else
 	{
-		strcpy(valStr, "false");
+		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
 
-	// Check & Copy if OK
-	Alx_Status status = AlxRange_CheckStr(valStr, maxLenWithNullTerm);
-	if (status == Alx_Ok)
+	// Check
+	status = AlxRange_CheckStr(valStr, maxLenWithNullTerm);
+	if (status != Alx_Ok)
 	{
-		strcpy(val, valStr);
+		return status;
 	}
+
+	// Copy
+	strcpy(val, valStr);
 
 	// Return
 	return status;
 }
 
-
-//------------------------------------------------------------------------------
-// Set String Format
-//------------------------------------------------------------------------------
-
 /**
   * @brief
   * @param[in,out]	me
@@ -1978,117 +1943,123 @@ Alx_Status AlxParamItem_GetValBool_StrFormat(AlxParamItem* me, char* val, uint32
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxParamItem_SetValUint8_StrFormat(AlxParamItem* me, char* val)
+Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 {
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint8);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
 
 	// Convert
-	uint8_t valNum = 0;
-	if (sscanf(val, "%hu", &valNum) != 1)
+	if (me->type == AlxParamItem_Type_Uint8)
 	{
-		return AlxParamItem_ErrConv;
+		uint8_t valNum = 0;
+		if (sscanf(val, "%hu", &valNum) != 1)
+		{
+			return AlxParamItem_ErrConv;
+		}
+		status = AlxParamItem_SetValUint8(me, valNum);
 	}
-
-	// Return
-	return AlxParamItem_SetValUint8(me, valNum);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		val
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxParamItem_SetValUint16_StrFormat(AlxParamItem* me, char* val)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Uint16);
-
-	// Convert
-	uint16_t valNum = 0;
-	if (sscanf(val, "%hu", &valNum) != 1)
+	else if (me->type == AlxParamItem_Type_Uint16)
 	{
-		return AlxParamItem_ErrConv;
+		uint16_t valNum = 0;
+		if (sscanf(val, "%hu", &valNum) != 1)
+		{
+			return AlxParamItem_ErrConv;
+		}
+		status = AlxParamItem_SetValUint16(me, valNum);
 	}
-
-	// Return
-	return AlxParamItem_SetValUint16(me, valNum);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		val
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxParamItem_SetValFloat_StrFormat(AlxParamItem* me, char* val)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Float);
-
-	// Convert
-	float valNum = 0;
-	if (sscanf(val, "%f", &valNum) != 1)
+	else if (me->type == AlxParamItem_Type_Uint32)
 	{
-		return AlxParamItem_ErrConv;
+		uint32_t valNum = 0;
+		if (sscanf(val, "%lu", &valNum) != 1)
+		{
+			return AlxParamItem_ErrConv;
+		}
+		status = AlxParamItem_SetValUint32(me, valNum);
 	}
-
-	// Return
-	return AlxParamItem_SetValFloat(me, valNum);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		val
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxParamItem_SetValBool_StrFormat(AlxParamItem* me, char* val)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Bool);
-
-	// Convert
-	bool valNum = false;
-	if (strcmp(val, "true") == 0)
+	else if (me->type == AlxParamItem_Type_Uint64)
 	{
-		valNum = true;
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
 	}
-	else if (strcmp(val, "True") == 0)
+	else if (me->type == AlxParamItem_Type_Int8)
 	{
-		valNum = true;
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
 	}
-	else if (strcmp(val, "TRUE") == 0)
+	else if (me->type == AlxParamItem_Type_Int16)
 	{
-		valNum = true;
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
 	}
-	else if (strcmp(val, "false") == 0)
+	else if (me->type == AlxParamItem_Type_Int32)
 	{
-		valNum = false;
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
 	}
-	else if (strcmp(val, "False") == 0)
+	else if (me->type == AlxParamItem_Type_Int64)
 	{
-		valNum = false;
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
 	}
-	else if (strcmp(val, "FALSE") == 0)
+	else if (me->type == AlxParamItem_Type_Float)
 	{
-		valNum = false;
+		float valNum = 0;
+		if (sscanf(val, "%f", &valNum) != 1)
+		{
+			return AlxParamItem_ErrConv;
+		}
+		status = AlxParamItem_SetValFloat(me, valNum);
+	}
+	else if (me->type == AlxParamItem_Type_Double)
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+	}
+	else if (me->type == AlxParamItem_Type_Bool)
+	{
+		bool valNum = false;
+		if (strcmp(val, "true") == 0)
+		{
+			valNum = true;
+		}
+		else if (strcmp(val, "True") == 0)
+		{
+			valNum = true;
+		}
+		else if (strcmp(val, "TRUE") == 0)
+		{
+			valNum = true;
+		}
+		else if (strcmp(val, "false") == 0)
+		{
+			valNum = false;
+		}
+		else if (strcmp(val, "False") == 0)
+		{
+			valNum = false;
+		}
+		else if (strcmp(val, "FALSE") == 0)
+		{
+			valNum = false;
+		}
+		else
+		{
+			return AlxParamItem_ErrConv;
+		}
+		status = AlxParamItem_SetValBool(me, valNum);
+	}
+	else if (me->type == AlxParamItem_Type_Arr)
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+	}
+	else if (me->type == AlxParamItem_Type_Str)
+	{
+		ALX_PARAM_ITEM_ASSERT(false);	// TODO
 	}
 	else
 	{
-		return AlxParamItem_ErrConv;
+		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
 
 	// Return
-	return AlxParamItem_SetValBool(me, valNum);
+	return status;
 }
 
 

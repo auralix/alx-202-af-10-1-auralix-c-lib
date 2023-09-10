@@ -103,12 +103,36 @@ void AlxParamMgmt_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me);
+
+
+//------------------------------------------------------------------------------
+// By Index
+//------------------------------------------------------------------------------
 const char* AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index);
 AlxParamItem_Type AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index);
 Alx_Status AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val, uint32_t maxLenWithNullTerm);
 
 
+//------------------------------------------------------------------------------
+// By Key
+//------------------------------------------------------------------------------
+Alx_Status AlxParamMgmt_ByKey_SetVal_StrFormat(AlxParamMgmt* me, char* key, char* val);
+
+
+//------------------------------------------------------------------------------
+// By ID
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// TODO
+//------------------------------------------------------------------------------
 Alx_Status AlxParamMgmt_ByKey_GetId(AlxParamMgmt* me, const char* key, uint32_t* id);
 Alx_Status AlxParamMgmt_ByKey_GetGroupId(AlxParamMgmt* me, const char* key, uint32_t* groupId);
 Alx_Status AlxParamMgmt_ByKey_GetType(AlxParamMgmt* me, const char* key, AlxParamItem_Type* type);
