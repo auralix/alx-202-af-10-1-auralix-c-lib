@@ -685,6 +685,10 @@ void AlxParamItem_CtorStr
 // Functions
 //******************************************************************************
 
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
+
 /**
   * @brief
   * @param[in,out]	me
@@ -848,6 +852,11 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
 }
+
+
+//------------------------------------------------------------------------------
+// Get
+//------------------------------------------------------------------------------
 
 /**
   * @brief
@@ -1014,6 +1023,51 @@ bool AlxParamItem_GetValBool(AlxParamItem* me)
 	// Return
 	return me->val._bool;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
+  */
+void AlxParamItem_GetValArr(AlxParamItem* me, void* val)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Arr);
+
+	// Copy
+	memcpy(val, me->val.arr, me->valLen);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		val
+  * @param[in]		maxLenWithNullTerm
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
+
+	// Check & Copy if OK
+	Alx_Status status = AlxRange_CheckStr(me->val.str, maxLenWithNullTerm);
+	if (status == Alx_Ok)
+	{
+		strcpy(val, me->val.str);
+	}
+
+	// Return
+	return status;
+}
+
+
+//------------------------------------------------------------------------------
+// Set
+//------------------------------------------------------------------------------
 
 /**
   * @brief
@@ -1706,6 +1760,88 @@ Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val)
 /**
   * @brief
   * @param[in,out]	me
+  * @param[in]		val
+  */
+void AlxParamItem_SetValArr(AlxParamItem* me, void* val)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Arr);
+
+	// Set
+	memcpy(me->val.arr, val, me->valLen);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Handle value out of range
+	switch(me->valOutOfRangeHandle)
+	{
+		case AlxParamItem_ValOutOfRangeHandle_Assert:
+		{
+			status = AlxRange_CheckStr(val, me->buffLen);
+			if (status == Alx_Ok)
+			{
+				strcpy(me->val.str, val);
+				me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
+			}
+			else
+			{
+				ALX_PARAM_ITEM_ASSERT(false);
+				status = Alx_Err;
+			}
+			break;
+		}
+		case AlxParamItem_ValOutOfRangeHandle_Ignore:
+		{
+			status = AlxRange_CheckStr(val, me->buffLen);
+			if (status == Alx_Ok)
+			{
+				strcpy(me->val.str, val);
+				me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
+			}
+			break;
+		}
+		case AlxParamItem_ValOutOfRangeHandle_Bound:
+		{
+			status = AlxBound_Str(me->val.str, val, me->buffLen);
+			me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
+			break;
+		}
+		default:
+		{
+			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
+			status = Alx_Err;
+			break;
+		}
+	}
+
+	// Return
+	return status;
+}
+
+
+//------------------------------------------------------------------------------
+// Get String Format
+//------------------------------------------------------------------------------
+
+/**
+  * @brief
+  * @param[in,out]	me
   * @param[out]		val
   * @param[in]		maxLenWithNullTerm
   * @retval			Alx_Ok
@@ -1830,6 +1966,11 @@ Alx_Status AlxParamItem_GetValBool_StrFormat(AlxParamItem* me, char* val, uint32
 	return status;
 }
 
+
+//------------------------------------------------------------------------------
+// Set String Format
+//------------------------------------------------------------------------------
+
 /**
   * @brief
   * @param[in,out]	me
@@ -1950,122 +2091,10 @@ Alx_Status AlxParamItem_SetValBool_StrFormat(AlxParamItem* me, char* val)
 	return AlxParamItem_SetValBool(me, valNum);
 }
 
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		val
-  */
-void AlxParamItem_GetValArr(AlxParamItem* me, void* val)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Arr);
 
-	// Copy
-	memcpy(val, me->val.arr, me->valLen);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		val
-  */
-void AlxParamItem_SetValArr(AlxParamItem* me, void* val)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Arr);
-
-	// Set
-	memcpy(me->val.arr, val, me->valLen);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[out]		val
-  * @param[in]		maxLenWithNullTerm
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
-
-	// Check & Copy if OK
-	Alx_Status status = AlxRange_CheckStr(me->val.str, maxLenWithNullTerm);
-	if (status == Alx_Ok)
-	{
-		strcpy(val, me->val.str);
-	}
-
-	// Return
-	return status;
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		val
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
-
-	// Local variables
-	Alx_Status status = Alx_Err;
-
-	// Handle value out of range
-	switch(me->valOutOfRangeHandle)
-	{
-		case AlxParamItem_ValOutOfRangeHandle_Assert:
-		{
-			status = AlxRange_CheckStr(val, me->buffLen);
-			if (status == Alx_Ok)
-			{
-				strcpy(me->val.str, val);
-				me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
-			}
-			else
-			{
-				ALX_PARAM_ITEM_ASSERT(false);
-				status = Alx_Err;
-			}
-			break;
-		}
-		case AlxParamItem_ValOutOfRangeHandle_Ignore:
-		{
-			status = AlxRange_CheckStr(val, me->buffLen);
-			if (status == Alx_Ok)
-			{
-				strcpy(me->val.str, val);
-				me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
-			}
-			break;
-		}
-		case AlxParamItem_ValOutOfRangeHandle_Bound:
-		{
-			status = AlxBound_Str(me->val.str, val, me->buffLen);
-			me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
-			break;
-		}
-		default:
-		{
-			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-			status = Alx_Err;
-			break;
-		}
-	}
-
-	// Return
-	return status;
-}
+//------------------------------------------------------------------------------
+// Load & Store
+//------------------------------------------------------------------------------
 
 /**
   * @brief

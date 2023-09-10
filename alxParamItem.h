@@ -315,6 +315,11 @@ void AlxParamItem_CtorStr
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 const char* AlxParamItem_GetKey(AlxParamItem* me);
 uint32_t AlxParamItem_GetId(AlxParamItem* me);
 uint32_t AlxParamItem_GetGroupId(AlxParamItem* me);
@@ -322,6 +327,11 @@ AlxParamItem_Type AlxParamItem_GetType(AlxParamItem* me);
 void* AlxParamItem_GetValPtr(AlxParamItem* me);
 uint32_t AlxParamItem_GetValLen(AlxParamItem* me);
 void AlxParamItem_SetValToDef(AlxParamItem* me);
+
+
+//------------------------------------------------------------------------------
+// Get
+//------------------------------------------------------------------------------
 uint8_t AlxParamItem_GetValUint8(AlxParamItem* me);
 uint16_t AlxParamItem_GetValUint16(AlxParamItem* me);
 uint32_t AlxParamItem_GetValUint32(AlxParamItem* me);
@@ -333,6 +343,13 @@ int64_t AlxParamItem_GetValInt64(AlxParamItem* me);
 float AlxParamItem_GetValFloat(AlxParamItem* me);
 double AlxParamItem_GetValDouble(AlxParamItem* me);
 bool AlxParamItem_GetValBool(AlxParamItem* me);
+void AlxParamItem_GetValArr(AlxParamItem* me, void* val);
+Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
+
+
+//------------------------------------------------------------------------------
+// Set
+//------------------------------------------------------------------------------
 Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val);
 Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val);
 Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val);
@@ -344,18 +361,31 @@ Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val);
 Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val);
 Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val);
 Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val);
+void AlxParamItem_SetValArr(AlxParamItem* me, void* val);
+Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val);
+
+
+//------------------------------------------------------------------------------
+// Get String Format
+//------------------------------------------------------------------------------
 Alx_Status AlxParamItem_GetValUint8_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
 Alx_Status AlxParamItem_GetValUint16_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
 Alx_Status AlxParamItem_GetValFloat_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
 Alx_Status AlxParamItem_GetValBool_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
+
+
+//------------------------------------------------------------------------------
+// Set String Format
+//------------------------------------------------------------------------------
 Alx_Status AlxParamItem_SetValUint8_StrFormat(AlxParamItem* me, char* val);
 Alx_Status AlxParamItem_SetValUint16_StrFormat(AlxParamItem* me, char* val);
 Alx_Status AlxParamItem_SetValFloat_StrFormat(AlxParamItem* me, char* val);
 Alx_Status AlxParamItem_SetValBool_StrFormat(AlxParamItem* me, char* val);
-void AlxParamItem_GetValArr(AlxParamItem* me, void* val);
-void AlxParamItem_SetValArr(AlxParamItem* me, void* val);
-Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
-Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val);
+
+
+//------------------------------------------------------------------------------
+// Load & Store
+//------------------------------------------------------------------------------
 Alx_Status AlxParamItem_LoadVal(AlxParamItem* me);
 Alx_Status AlxParamItem_StoreVal(AlxParamItem* me);
 
