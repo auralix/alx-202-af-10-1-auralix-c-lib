@@ -97,8 +97,7 @@ typedef enum
 	AlxParamItem_Type_Double,
 	AlxParamItem_Type_Bool,
 	AlxParamItem_Type_Arr,
-	AlxParamItem_Type_Str,
-	AlxParamItem_Type_None
+	AlxParamItem_Type_Str
 } AlxParamItem_Type;
 
 typedef enum
@@ -189,68 +188,86 @@ void AlxParamItem_CtorUint16
 void AlxParamItem_CtorUint32
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint32_t valDef,
 	uint32_t valMin,
 	uint32_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	uint32_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorUint64
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint64_t valDef,
 	uint64_t valMin,
 	uint64_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	uint64_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorInt8
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int8_t valDef,
 	int8_t valMin,
 	int8_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	int8_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorInt16
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int16_t valDef,
 	int16_t valMin,
 	int16_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	int16_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorInt32
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int32_t valDef,
 	int32_t valMin,
 	int32_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	int32_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorInt64
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int64_t valDef,
 	int64_t valMin,
 	int64_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	int64_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorFloat
 (
@@ -269,13 +286,16 @@ void AlxParamItem_CtorFloat
 void AlxParamItem_CtorDouble
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	double valDef,
 	double valMin,
 	double valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	double* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorBool
 (
