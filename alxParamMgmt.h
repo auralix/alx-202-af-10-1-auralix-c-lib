@@ -109,6 +109,8 @@ void AlxParamMgmt_Ctor
 // General
 //------------------------------------------------------------------------------
 uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me);
+void AlxParamMgmt_SetValToDef_Group(AlxParamMgmt* me, uint32_t groupId);
+void AlxParamMgmt_SetValToDef_All(AlxParamMgmt* me);
 
 
 //------------------------------------------------------------------------------
@@ -145,8 +147,6 @@ Alx_Status AlxParamMgmt_SetByKey(AlxParamMgmt* me, const char* key, void* val, u
 Alx_Status AlxParamMgmt_SetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
 Alx_Status AlxParamMgmt_SetToDefByKey(AlxParamMgmt* me, const char* key, uint32_t len);
 Alx_Status AlxParamMgmt_SetToDefById(AlxParamMgmt* me, uint32_t id, uint32_t len);
-void AlxParamMgmt_SetToDefGroup(AlxParamMgmt* me, uint8_t groupId);
-void AlxParamMgmt_SetToDefAll(AlxParamMgmt* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

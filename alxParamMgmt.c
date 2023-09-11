@@ -79,6 +79,42 @@ uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me)
 	// Return
 	return me->numOfParamItems;
 }
+void AlxParamMgmt_SetValToDef_Group(AlxParamMgmt* me, uint32_t groupId)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get groupId
+		uint32_t _groupId = AlxParamItem_GetGroupId(ptr);
+
+		// If groupId match, set value to default
+		if (groupId == _groupId)
+		{
+			AlxParamItem_SetValToDef(ptr);
+		}
+	}
+}
+void AlxParamMgmt_SetValToDef_All(AlxParamMgmt* me)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Set value to default
+		AlxParamItem_SetValToDef(ptr);
+	}
+}
 
 
 //------------------------------------------------------------------------------
