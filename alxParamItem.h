@@ -326,7 +326,6 @@ uint32_t AlxParamItem_GetGroupId(AlxParamItem* me);
 AlxParamItem_Type AlxParamItem_GetType(AlxParamItem* me);
 void* AlxParamItem_GetValPtr(AlxParamItem* me);
 uint32_t AlxParamItem_GetValLen(AlxParamItem* me);
-void AlxParamItem_SetValToDef(AlxParamItem* me);
 
 
 //------------------------------------------------------------------------------
@@ -363,6 +362,12 @@ Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val);
 Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val);
 void AlxParamItem_SetValArr(AlxParamItem* me, void* val);
 Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val);
+
+
+//------------------------------------------------------------------------------
+// Set Default
+//------------------------------------------------------------------------------
+void AlxParamItem_SetValToDef(AlxParamItem* me);
 
 
 //------------------------------------------------------------------------------

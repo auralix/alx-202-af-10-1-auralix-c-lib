@@ -109,12 +109,10 @@ void AlxParamMgmt_Ctor
 // General
 //------------------------------------------------------------------------------
 uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me);
-void AlxParamMgmt_SetValToDef_Group(AlxParamMgmt* me, uint32_t groupId);
-void AlxParamMgmt_SetValToDef_All(AlxParamMgmt* me);
 
 
 //------------------------------------------------------------------------------
-// By Index
+// Get & Set By Index
 //------------------------------------------------------------------------------
 const char* AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index);
 AlxParamItem_Type AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index);
@@ -122,14 +120,30 @@ Alx_Status AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t inde
 
 
 //------------------------------------------------------------------------------
-// By Key
+// Get & Set By Key
 //------------------------------------------------------------------------------
 Alx_Status AlxParamMgmt_ByKey_SetVal_StrFormat(AlxParamMgmt* me, char* key, char* val);
 
 
 //------------------------------------------------------------------------------
-// By ID
+// Get & Set By ID
 //------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Set Default
+//------------------------------------------------------------------------------
+void AlxParamMgmt_SetValToDef_Group(AlxParamMgmt* me, uint32_t groupId);
+void AlxParamMgmt_SetValToDef_All(AlxParamMgmt* me);
+
+
+//------------------------------------------------------------------------------
+// Load & Store
+//------------------------------------------------------------------------------
+Alx_Status AlxParamMgmt_LoadVal_Group(AlxParamMgmt* me, uint32_t groupId);
+Alx_Status AlxParamMgmt_LoadVal_All(AlxParamMgmt* me);
+Alx_Status AlxParamMgmt_StoreVal_Group(AlxParamMgmt* me, uint32_t groupId);
+Alx_Status AlxParamMgmt_StoreVal_All(AlxParamMgmt* me);
 
 
 //------------------------------------------------------------------------------

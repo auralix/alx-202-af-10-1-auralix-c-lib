@@ -79,42 +79,6 @@ uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me)
 	// Return
 	return me->numOfParamItems;
 }
-void AlxParamMgmt_SetValToDef_Group(AlxParamMgmt* me, uint32_t groupId)
-{
-	// Assert
-	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
-
-	// Loop through all parameters
-	for (uint32_t i = 0; i < me->numOfParamItems; i++)
-	{
-		// Get pointer
-		AlxParamItem* ptr = &me->paramItemArr[i];
-
-		// Get groupId
-		uint32_t _groupId = AlxParamItem_GetGroupId(ptr);
-
-		// If groupId match, set value to default
-		if (groupId == _groupId)
-		{
-			AlxParamItem_SetValToDef(ptr);
-		}
-	}
-}
-void AlxParamMgmt_SetValToDef_All(AlxParamMgmt* me)
-{
-	// Assert
-	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
-
-	// Loop through all parameters
-	for (uint32_t i = 0; i < me->numOfParamItems; i++)
-	{
-		// Get pointer
-		AlxParamItem* ptr = &me->paramItemArr[i];
-
-		// Set value to default
-		AlxParamItem_SetValToDef(ptr);
-	}
-}
 
 
 //------------------------------------------------------------------------------
@@ -169,9 +133,6 @@ Alx_Status AlxParamMgmt_ByKey_SetVal_StrFormat(AlxParamMgmt* me, char* key, char
 	// Assert
 	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
 
-	// Local variables
-	Alx_Status status = Alx_Err;
-
 	// Loop through all parameters
 	for (uint32_t i = 0; i < me->numOfParamItems; i++)
 	{
@@ -184,13 +145,162 @@ Alx_Status AlxParamMgmt_ByKey_SetVal_StrFormat(AlxParamMgmt* me, char* key, char
 		// If key match, set value
 		if (strcmp(key, _key) == 0)
 		{
-			status = AlxParamItem_SetVal_StrFormat(ptr, val);
-			break;
+			// Set
+			Alx_Status status = AlxParamItem_SetVal_StrFormat(ptr, val);
+
+			// Return
+			return status;
 		}
 	}
 
-	// Return
-	return status;
+	// If we are here, key was not found, so we return ERROR
+	return Alx_Err;
+}
+
+
+//------------------------------------------------------------------------------
+// Set Default
+//------------------------------------------------------------------------------
+void AlxParamMgmt_SetValToDef_Group(AlxParamMgmt* me, uint32_t groupId)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get groupId
+		uint32_t _groupId = AlxParamItem_GetGroupId(ptr);
+
+		// If groupId match, set value to default
+		if (groupId == _groupId)
+		{
+			AlxParamItem_SetValToDef(ptr);
+		}
+	}
+}
+void AlxParamMgmt_SetValToDef_All(AlxParamMgmt* me)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Set value to default
+		AlxParamItem_SetValToDef(ptr);
+	}
+}
+
+
+//------------------------------------------------------------------------------
+// Load & Store
+//------------------------------------------------------------------------------
+Alx_Status AlxParamMgmt_LoadVal_Group(AlxParamMgmt* me, uint32_t groupId)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get groupId
+		uint32_t _groupId = AlxParamItem_GetGroupId(ptr);
+
+		// If groupId match, load value
+		if (groupId == _groupId)
+		{
+			Alx_Status status = AlxParamItem_LoadVal(ptr);
+			if (status != Alx_Ok)
+			{
+				return status;
+			}
+		}
+	}
+
+	// If we are here, all parameters were loaded successfully, so we return OK
+	return Alx_Ok;
+}
+Alx_Status AlxParamMgmt_LoadVal_All(AlxParamMgmt* me)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Load value
+		Alx_Status status = AlxParamItem_LoadVal(ptr);
+		if (status != Alx_Ok)
+		{
+			return status;
+		}
+	}
+
+	// If we are here, all parameters were loaded successfully, so we return OK
+	return Alx_Ok;
+}
+Alx_Status AlxParamMgmt_StoreVal_Group(AlxParamMgmt* me, uint32_t groupId)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get groupId
+		uint32_t _groupId = AlxParamItem_GetGroupId(ptr);
+
+		// If groupId match, store value
+		if (groupId == _groupId)
+		{
+			Alx_Status status = AlxParamItem_StoreVal(ptr);
+			if (status != Alx_Ok)
+			{
+				return status;
+			}
+		}
+	}
+
+	// If we are here, all parameters were stored successfully, so we return OK
+	return Alx_Ok;
+}
+Alx_Status AlxParamMgmt_StoreVal_All(AlxParamMgmt* me)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Store value
+		Alx_Status status = AlxParamItem_StoreVal(ptr);
+		if (status != Alx_Ok)
+		{
+			return status;
+		}
+	}
+
+	// If we are here, all parameters were stored successfully, so we return OK
+	return Alx_Ok;
 }
 
 
