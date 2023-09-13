@@ -96,6 +96,18 @@ const char* AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index)
 	// Return
 	return AlxParamItem_GetKey(ptr);
 }
+uint32_t AlxParamMgmt_ByIndex_GetGroupId(AlxParamMgmt* me, uint32_t index)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_MGMT_ASSERT(index < me->numOfParamItems);
+
+	// Get pointer
+	AlxParamItem* ptr = &me->paramItemArr[index];
+
+	// Return
+	return AlxParamItem_GetGroupId(ptr);
+}
 AlxParamItem_Type AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index)
 {
 	// Assert

@@ -115,6 +115,7 @@ uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me);
 // Get & Set By Index
 //------------------------------------------------------------------------------
 const char* AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index);
+uint32_t AlxParamMgmt_ByIndex_GetGroupId(AlxParamMgmt* me, uint32_t index);
 AlxParamItem_Type AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index);
 Alx_Status AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val, uint32_t maxLenWithNullTerm);
 
