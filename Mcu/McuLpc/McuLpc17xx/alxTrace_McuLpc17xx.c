@@ -80,11 +80,10 @@ void AlxTrace_Ctor
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
+Alx_Status AlxTrace_Init(AlxTrace* me)
 {
 	// GPIO //
 	Chip_IOCON_PinMux(LPC_IOCON, me->port, me->pin, IOCON_MODE_INACT, me->func);
@@ -105,11 +104,10 @@ Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
+Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
 	// TODO
 
@@ -120,11 +118,10 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
   * @brief
   * @param[in,out]	me
   * @param[in]		str
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
 	while (*str)
 	{

@@ -707,7 +707,7 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		{
 			ALX_I2C_TRACE("ErrNack");
 			status = kStatus_Fail;
-			alxStat = AlxI2c_Err;
+			alxStat = Alx_Err;
 			continue;
 		}
 

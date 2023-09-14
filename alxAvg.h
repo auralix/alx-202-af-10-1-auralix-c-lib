@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		alxSerialPort.h
-  * @brief		Auralix C Library - ALX Serial Port Module
+  * @file		alxAvg.h
+  * @brief		Auralix C Library - ALX Average Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_SERIAL_PORT_H
-#define ALX_SERIAL_PORT_H
+#ifndef ALX_AVG_H
+#define ALX_AVG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,13 +43,6 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 
-#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-#include "alxSerialPort_McuStm32.h"
-
-#else
-typedef struct { bool dummy; } AlxSerialPort;
-#endif
-
 
 //******************************************************************************
 // Module Guard
@@ -60,39 +53,63 @@ typedef struct { bool dummy; } AlxSerialPort;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_SERIAL_PORT_FILE "alxSerialPort.h"
+#define ALX_AVG_FILE "alxAvg.h"
 
 // Assert //
-#if defined(_ALX_SERIAL_PORT_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SERIAL_PORT_FILE, expr)
-#elif defined(_ALX_SERIAL_PORT_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SERIAL_PORT_FILE, expr)
-#elif defined(_ALX_SERIAL_PORT_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_RST(ALX_SERIAL_PORT_FILE, expr)
+#if defined(_ALX_AVG_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_BKPT(ALX_AVG_FILE, expr)
+#elif defined(_ALX_AVG_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_TRACE(ALX_AVG_FILE, expr)
+#elif defined(_ALX_AVG_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_RST(ALX_AVG_FILE, expr)
 #else
-	#define ALX_SERIAL_PORT_ASSERT(expr) do{} while (false)
+	#define ALX_AVG_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_SERIAL_PORT_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_SERIAL_PORT_TRACE(...) ALX_TRACE_STD(ALX_SERIAL_PORT_FILE, __VA_ARGS__)
+#if defined(_ALX_AVG_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_AVG_TRACE(...) ALX_TRACE_STD(ALX_AVG_FILE, __VA_ARGS__)
 #else
-	#define ALX_SERIAL_PORT_TRACE(...) do{} while (false)
+	#define ALX_AVG_TRACE(...) do{} while (false)
 #endif
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Parameters
+	float* buff;
+	uint32_t buffLen;
+	uint32_t shiftThreshold;
+
+	// Variables
+	uint32_t buffIndex;
+	uint32_t shiftCount;
+	float avg;
+
+	// Info
+	bool wasCtorCalled;
+} AlxAvg;
+
+
+//******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxAvg_Ctor
+(
+	AlxAvg* me,
+	float* buff,
+	uint32_t buffLen,
+	uint32_t shiftThreshold
+);
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxSerialPort_Init(AlxSerialPort* me);
-Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me);
-Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len);
-Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
-Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len);
-Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str);
-void AlxSerialPort_FlushRxFifo(AlxSerialPort* me);
-uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me);
-void AlxSerialPort_IrqHandler(AlxSerialPort* me);
+float AlxAvg_Process(AlxAvg* me, float in);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -101,4 +118,4 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me);
 }
 #endif
 
-#endif	// #ifndef ALX_SERIAL_PORT_H
+#endif	// #ifndef ALX_AVG_H

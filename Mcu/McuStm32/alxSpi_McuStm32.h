@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -68,6 +68,24 @@ typedef enum
 	AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_1MHz4_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_32,
 	AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_5MHz625_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_8,
 	AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_11MHz25_Pclk1Apb1_45MHz = SPI_BAUDRATEPRESCALER_4,
+	#endif
+	#if defined(ALX_STM32F7)
+	AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_422kHz_Pclk2Apb2_108MHz = SPI_BAUDRATEPRESCALER_256,
+	AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_844kHz_Pclk2Apb2_108MHz = SPI_BAUDRATEPRESCALER_128,
+	AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_1MHz688_Pclk2Apb2_108MHz = SPI_BAUDRATEPRESCALER_64,
+	AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_3MHz375_Pclk2Apb2_108MHz = SPI_BAUDRATEPRESCALER_32,
+	AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_6MHz75_Pclk2Apb2_108MHz = SPI_BAUDRATEPRESCALER_16,
+	AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_13MHz5_Pclk2Apb2_108MHz = SPI_BAUDRATEPRESCALER_8,
+	AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_27MHz_Pclk2Apb2_108MHz = SPI_BAUDRATEPRESCALER_4,
+	AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_54MHz_Pclk2Apb2_108MHz = SPI_BAUDRATEPRESCALER_2,
+	AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_211kHz_Pclk1Apb1_54MHz = SPI_BAUDRATEPRESCALER_256,
+	AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_422kHz_Pclk1Apb1_54MHz = SPI_BAUDRATEPRESCALER_256,
+	AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_844kHz_Pclk1Apb1_54MHz = SPI_BAUDRATEPRESCALER_128,
+	AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_1MHz688_Pclk1Apb1_54MHz = SPI_BAUDRATEPRESCALER_64,
+	AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_3MHz375_Pclk1Apb1_54MHz = SPI_BAUDRATEPRESCALER_32,
+	AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_6MHz75_Pclk1Apb1_54MHz = SPI_BAUDRATEPRESCALER_8,
+	AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_13MHz5_Pclk1Apb1_54MHz = SPI_BAUDRATEPRESCALER_4,
+	AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_27MHz_Pclk1Apb1_54MHz = SPI_BAUDRATEPRESCALER_2,
 	#endif
 	#if defined(ALX_STM32G4)
 	AlxSpi_Clk_McuStm32G4_Spi1_Spi4_SpiClk_1MHz33_Pclk2Apb2_170MHz = SPI_BAUDRATEPRESCALER_128,
@@ -106,6 +124,7 @@ typedef struct
 	AlxSpi_Mode mode;
 	AlxClk* clk;
 	AlxSpi_Clk spiClk;
+	bool isWriteReadLowLevel;
 
 	// Variables
 	uint32_t clkPolarity;
@@ -131,11 +150,12 @@ void AlxSpi_Ctor
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
 	AlxClk* clk,
-	AlxSpi_Clk spiClk
+	AlxSpi_Clk spiClk,
+	bool isWriteReadLowLevel
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

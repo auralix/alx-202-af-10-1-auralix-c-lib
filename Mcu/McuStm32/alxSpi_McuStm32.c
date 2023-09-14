@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -76,7 +76,8 @@ void AlxSpi_Ctor
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
 	AlxClk* clk,
-	AlxSpi_Clk spiClk
+	AlxSpi_Clk spiClk,
+	bool isWriteReadLowLevel
 )
 {
 	// Parameters
@@ -88,6 +89,7 @@ void AlxSpi_Ctor
 	me->mode = mode;
 	me->clk = clk;
 	me->spiClk = spiClk;
+	me->isWriteReadLowLevel = isWriteReadLowLevel;
 
 	// Variables
 	AlxSpi_ParseMode(me);
@@ -103,7 +105,7 @@ void AlxSpi_Ctor
 	me->hspi.Init.TIMode = SPI_TIMODE_DISABLE;
 	me->hspi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
 	me->hspi.Init.CRCPolynomial = 0x0007;
-	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4)
 	me->hspi.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
 	me->hspi.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
 	#endif
@@ -147,6 +149,15 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 
 	// Init SPI
 	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+
+	// If write/read low level, set FIFO threshold & enable SPI
+	if (me->isWriteReadLowLevel)
+	{
+		#if defined(ALX_STM32F7)
+		LL_SPI_SetRxFIFOThreshold(me->hspi.Instance, LL_SPI_RX_FIFO_TH_QUARTER);
+		#endif
+		LL_SPI_Enable(me->hspi.Instance);
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -306,7 +317,9 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
   */
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	ALX_SPI_ASSERT(me->isInit == true);
 	(void)me;
@@ -316,34 +329,88 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 < timeout_ms);
 
-	// Local variables
-	HAL_StatusTypeDef status = HAL_ERROR;
 
-	// Try write/read for number of tries
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
+	//------------------------------------------------------------------------------
+	// Check HAL vs LL
+	//------------------------------------------------------------------------------
+	if (me->isWriteReadLowLevel == false)
 	{
-		status = HAL_SPI_TransmitReceive(&me->hspi, writeData, readData, len, timeout_ms);
+		//------------------------------------------------------------------------------
+		// HAL
+		//------------------------------------------------------------------------------
+
+		// Local variables
+		HAL_StatusTypeDef status = HAL_ERROR;
+
+		// Try write/read for number of tries
+		for (uint32_t _try = 1; _try <= numOfTries; _try++)
+		{
+			status = HAL_SPI_TransmitReceive(&me->hspi, writeData, readData, len, timeout_ms);
+			if (status == HAL_OK)
+			{
+				break;	// Write/Read OK
+			}
+			else
+			{
+				ALX_SPI_TRACE("Err");
+				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+				continue;
+			}
+		}
+
+		// If we are here, write/read was OK or number of tries error occured
 		if (status == HAL_OK)
 		{
-			break;	// Write/Read OK
+			return Alx_Ok;
 		}
 		else
 		{
 			ALX_SPI_TRACE("Err");
-			if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("Err"); return Alx_Err; };
-			continue;
+			return Alx_ErrNumOfTries;
 		}
-	}
-
-	// If we are here, write/read was OK or number of tries error occured
-	if (status == HAL_OK)
-	{
-		return Alx_Ok;
 	}
 	else
 	{
-		ALX_SPI_TRACE("Err");
-		return Alx_ErrNumOfTries;
+		//------------------------------------------------------------------------------
+		// LL
+		//------------------------------------------------------------------------------
+
+		// Local variables
+		uint16_t lenToWrite = len;
+		uint16_t lenToRead = len;
+		uint16_t writeIndex = 0;
+		uint16_t readIndex = 0;
+
+		// Execute write/read
+		while(lenToRead > 0)
+		{
+			// If TXE = 1 (transmit buffer empty) and lenToWrite > 0 (we got some data to write)
+			if
+			(
+				(LL_SPI_IsActiveFlag_TXE(me->hspi.Instance)) &&
+				(lenToWrite > 0)
+			)
+			{
+				// Write
+				LL_SPI_TransmitData8(me->hspi.Instance, writeData[writeIndex++]);
+
+				// Decrement
+				lenToWrite--;
+			}
+
+			// If RXNE = 1 (receive buffer not empty)
+			if(LL_SPI_IsActiveFlag_RXNE(me->hspi.Instance))
+			{
+				// Read
+				readData[readIndex++] = LL_SPI_ReceiveData8(me->hspi.Instance);
+
+				// Decrement
+				lenToRead--;
+			}
+		}
+
+		// Return
+		return Alx_Ok;
 	}
 }
 
@@ -386,6 +453,15 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me)
 	// Init SPI
 	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; }
 
+	// If write/read low level, set FIFO threshold & enable SPI
+	if (me->isWriteReadLowLevel)
+	{
+		#if defined(ALX_STM32F7)
+		LL_SPI_SetRxFIFOThreshold(me->hspi.Instance, LL_SPI_RX_FIFO_TH_QUARTER);
+		#endif
+		LL_SPI_Enable(me->hspi.Instance);
+	}
+
 	// Set isInit
 	me->isInit = true;
 
@@ -424,6 +500,48 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 		)
 		{
 			if(45000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
+				return true;
+			else
+				return false;
+		}
+	}
+	#endif
+	#if defined(ALX_STM32F7)
+	if((me->hspi.Instance == SPI1) || (me->hspi.Instance == SPI4) || (me->hspi.Instance == SPI5) || (me->hspi.Instance == SPI6))
+	{
+		if
+		(
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_422kHz_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_844kHz_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_1MHz688_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_3MHz375_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_6MHz75_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_13MHz5_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_27MHz_Pclk2Apb2_108MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_54MHz_Pclk2Apb2_108MHz)
+		)
+		{
+			if(108000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
+				return true;
+			else
+				return false;
+		}
+	}
+	if((me->hspi.Instance == SPI2) || (me->hspi.Instance == SPI3))
+	{
+		if
+		(
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_211kHz_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_422kHz_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_844kHz_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_1MHz688_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_3MHz375_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_6MHz75_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_13MHz5_Pclk1Apb1_54MHz) ||
+			(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_27MHz_Pclk1Apb1_54MHz)
+		)
+		{
+			if(54000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
 				return true;
 			else
 				return false;
@@ -550,6 +668,9 @@ static void AlxSpi_Periph_EnableClk(AlxSpi* me)
 	#if defined(SPI5)
 	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_CLK_ENABLE(); isErr = false; }
 	#endif
+	#if defined(SPI6)
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_CLK_ENABLE(); isErr = false; }
+	#endif
 
 	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
 }
@@ -571,6 +692,9 @@ static void AlxSpi_Periph_DisableClk(AlxSpi* me)
 	#endif
 	#if defined(SPI5)
 	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_CLK_DISABLE(); isErr = false; }
+	#endif
+	#if defined(SPI6)
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_CLK_DISABLE(); isErr = false; }
 	#endif
 
 	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
@@ -594,6 +718,9 @@ static void AlxSpi_Periph_ForceReset(AlxSpi* me)
 	#if defined(SPI5)
 	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_FORCE_RESET(); isErr = false; }
 	#endif
+	#if defined(SPI6)
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_FORCE_RESET(); isErr = false; }
+	#endif
 
 	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
 }
@@ -616,9 +743,12 @@ static void AlxSpi_Periph_ReleaseReset(AlxSpi* me)
 	#if defined(SPI5)
 	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_RELEASE_RESET(); isErr = false; }
 	#endif
+	#if defined(SPI6)
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_RELEASE_RESET(); isErr = false; }
+	#endif
 
 	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))

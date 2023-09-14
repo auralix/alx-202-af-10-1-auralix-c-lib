@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)) && (!defined(ALX_MBED)))
+#if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)) && (!defined(ALX_MBED)))
 
 
 //******************************************************************************
@@ -66,7 +66,7 @@ void AlxTrace_Ctor
 	AlxTrace* me,
 	GPIO_TypeDef* port,
 	uint16_t pin,
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	uint32_t alternate,
 	#endif
 	USART_TypeDef* uart,
@@ -79,7 +79,7 @@ void AlxTrace_Ctor
 	// Parameters
 	me->port = port;
 	me->pin = pin;
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	me->alternate = alternate;
 	#endif
 	me->uart = uart;
@@ -90,9 +90,11 @@ void AlxTrace_Ctor
 	me->igpio.Mode = GPIO_MODE_AF_PP;
 	me->igpio.Pull = GPIO_NOPULL;
 	me->igpio.Speed = GPIO_SPEED_HIGH;
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	me->igpio.Alternate = alternate;
 	#endif
+
 	me->huart.Instance = uart;
 	me->huart.Init.BaudRate = (uint32_t)baudRate;
 	me->huart.Init.WordLength = UART_WORDLENGTH_8B;
@@ -101,26 +103,32 @@ void AlxTrace_Ctor
 	me->huart.Init.Mode = UART_MODE_TX;
 	me->huart.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	me->huart.Init.OverSampling = UART_OVERSAMPLING_16;
+
 	#if defined(ALX_STM32F0)
 	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
 	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	#endif
+
+	#if defined(ALX_STM32F7)
+	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	#endif
+
 	#if defined(ALX_STM32G4)
 	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
 	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
 	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	#endif
+
 	#if defined(ALX_STM32L0)
 	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
 	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 	#endif
+
 	#if defined(ALX_STM32L4)
 	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
 	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
 	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-	#endif
-	#if defined(ALX_OS)
-	AlxOsMutex_Ctor(&me->mutex);
 	#endif
 
 	// Info
@@ -136,17 +144,11 @@ void AlxTrace_Ctor
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
+Alx_Status AlxTrace_Init(AlxTrace* me)
 {
-	// Lock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Lock(&me->mutex);
-	#endif
-
 	// Init GPIO
 	HAL_GPIO_WritePin(me->port, me->igpio.Pin, (GPIO_PinState)false);	// Set initial output value, before config
 	HAL_GPIO_Init(me->port, &me->igpio);
@@ -164,11 +166,6 @@ Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 	// Set isInit
 	me->isInit = true;
 
-	// Unlock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
 	// Return
 	return Alx_Ok;
 }
@@ -176,17 +173,11 @@ Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
+Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
-	// Lock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Lock(&me->mutex);
-	#endif
-
 	// DeInit UART
 	if (HAL_UART_DeInit(&me->huart) != HAL_OK) { return Alx_Err; }
 
@@ -202,11 +193,6 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 	// Clear isInit
 	me->isInit = false;
 
-	// Unlock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
 	// Return
 	return Alx_Ok;
 }
@@ -215,36 +201,20 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
   * @brief
   * @param[in,out]	me
   * @param[in]		str
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
-	// Lock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Lock(&me->mutex);
-	#endif
-
 	// Write
 	if (HAL_UART_Transmit(&me->huart, (uint8_t*)str, strlen(str), me->TIMEOUT_ms) != HAL_OK)
 	{
 		// Reset
 		AlxTrace_Reset(me);
 
-		// Unlock mutex
-		#if defined(ALX_OS)
-		if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-		#endif
-
 		// Return
 		return Alx_Err;
 	}
-
-	// Unlock mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-	#endif
 
 	// Return
 	return Alx_Ok;
@@ -583,4 +553,4 @@ static void AlxTrace_Periph_ReleaseReset(AlxTrace* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)) && (!defined(ALX_MBED)))
+#endif	// #if defined(ALX_C_LIB) && ((defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)) && (!defined(ALX_MBED)))

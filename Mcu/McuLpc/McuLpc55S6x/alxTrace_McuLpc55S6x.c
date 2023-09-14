@@ -97,9 +97,6 @@ void AlxTrace_Ctor
 	me->usartConfig.rxWatermark					= kUSART_RxFifo1;	// MF: I don't understand this
 	me->usartConfig.syncMode					= kUSART_SyncModeDisabled;
 	me->usartConfig.clockPolarity				= kUSART_RxSampleOnFallingEdge;
-	#if defined(ALX_OS)
-	AlxOsMutex_Ctor(&me->mutex);
-	#endif
 
 	// Info
 	me->isInit = false;
@@ -114,17 +111,11 @@ void AlxTrace_Ctor
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
+Alx_Status AlxTrace_Init(AlxTrace* me)
 {
-	// Lock Mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Lock(&me->mutex);
-	#endif
-
 	// Set IoPin Usart Func
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, AlxTrace_GetIoconFunc(me));
 
@@ -137,11 +128,6 @@ Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 	// Set isInit
 	me->isInit = true;
 
-	// Unlock Mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
 	// Return
 	return Alx_Ok;
 }
@@ -149,17 +135,11 @@ Alx_Status AlxTrace_Init(AlxTrace* me, bool threadSafe)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
+Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
-	// Lock Mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Lock(&me->mutex);
-	#endif
-
 	// DeInit USART
 	USART_Deinit(me->usart);	// MF: Always returns Success, so we won't hande return
 
@@ -172,11 +152,6 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
 	// Reset isInit
 	me->isInit = false;
 
-	// Unlock Mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-	#endif
-
 	// Return
 	return Alx_Ok;
 }
@@ -185,36 +160,20 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me, bool threadSafe)
   * @brief
   * @param[in,out]	me
   * @param[in]		str
-  * @param[in]		threadSafe
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str, bool threadSafe)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
-	// Lock Mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Lock(&me->mutex);
-	#endif
-
 	// Write
 	if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
 	{
 		// Reset
 		AlxTrace_Reset(me);
 
-		// Unlock Mutex
-		#if defined(ALX_OS)
-		if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-		#endif
-
 		// Return
 		return Alx_Err;
 	}
-
-	// Unlock Mutex
-	#if defined(ALX_OS)
-	if (threadSafe) AlxOsMutex_Unlock(&me->mutex);
-	#endif
 
 	// Return
 	return Alx_Ok;

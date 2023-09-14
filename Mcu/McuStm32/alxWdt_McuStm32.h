@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxSerialPort.h
-  * @brief		Auralix C Library - ALX Serial Port Module
+  * @file		alxWdt_McuStm32.h
+  * @brief		Auralix C Library - ALX Watchdog Timer MCU STM32 Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_SERIAL_PORT_H
-#define ALX_SERIAL_PORT_H
+#ifndef ALX_WDT_MCU_STM32_H
+#define ALX_WDT_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,62 +43,55 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 
-#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-#include "alxSerialPort_McuStm32.h"
-
-#else
-typedef struct { bool dummy; } AlxSerialPort;
-#endif
-
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7))
 
 
 //******************************************************************************
-// Preprocessor
+// Types
 //******************************************************************************
-#define ALX_SERIAL_PORT_FILE "alxSerialPort.h"
+typedef enum
+{
+	AlxWdt_Config_McuStm32_WdtTimeout_512ms_WdtClk_8kHz_Lsi_32kHz,
+	AlxWdt_Config_McuStm32_WdtTimeout_1024ms_WdtClk_4kHz_Lsi_32kHz,
+	AlxWdt_Config_McuStm32_WdtTimeout_2048ms_WdtClk_2kHz_Lsi_32kHz,
+	AlxWdt_Config_McuStm32_WdtTimeout_4096ms_WdtClk_1kHz_Lsi_32kHz,
+	AlxWdt_Config_McuStm32_WdtTimeout_8192ms_WdtClk_500Hz_Lsi_32kHz,
+	AlxWdt_Config_McuStm32_WdtTimeout_16384ms_WdtClk_250Hz_Lsi_32kHz,
+	AlxWdt_Config_McuStm32_WdtTimeout_32768ms_WdtClk_125Hz_Lsi_32kHz
+} AlxWdt_Config;
 
-// Assert //
-#if defined(_ALX_SERIAL_PORT_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SERIAL_PORT_FILE, expr)
-#elif defined(_ALX_SERIAL_PORT_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SERIAL_PORT_FILE, expr)
-#elif defined(_ALX_SERIAL_PORT_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_RST(ALX_SERIAL_PORT_FILE, expr)
-#else
-	#define ALX_SERIAL_PORT_ASSERT(expr) do{} while (false)
-#endif
+typedef struct
+{
+	// Parameters
+	AlxWdt_Config config;
 
-// Trace //
-#if defined(_ALX_SERIAL_PORT_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_SERIAL_PORT_TRACE(...) ALX_TRACE_STD(ALX_SERIAL_PORT_FILE, __VA_ARGS__)
-#else
-	#define ALX_SERIAL_PORT_TRACE(...) do{} while (false)
-#endif
+	// Variables
+	IWDG_HandleTypeDef hiwdg;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxWdt;
 
 
 //******************************************************************************
-// Functions
+// Constructor
 //******************************************************************************
-Alx_Status AlxSerialPort_Init(AlxSerialPort* me);
-Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me);
-Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len);
-Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
-Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len);
-Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str);
-void AlxSerialPort_FlushRxFifo(AlxSerialPort* me);
-uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me);
-void AlxSerialPort_IrqHandler(AlxSerialPort* me);
+void AlxWdt_Ctor
+(
+	AlxWdt* me,
+	AlxWdt_Config config
+);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7))
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_SERIAL_PORT_H
+#endif	// #ifndef ALX_WDT_MCU_STM32_H

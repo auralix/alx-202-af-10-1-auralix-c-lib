@@ -40,10 +40,6 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTick.h"
-#if defined(ALX_OS)
-#include "alxOsMutex.h"
-#endif
 
 
 //******************************************************************************
@@ -65,9 +61,6 @@ typedef struct
 
 	// Variables
 	usart_config_t usartConfig;
-	#if defined(ALX_OS)
-	AlxOsMutex mutex;
-	#endif
 
 	// Info
 	bool isInit;
