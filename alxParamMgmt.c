@@ -89,6 +89,18 @@ const char* AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index)
 	// Return
 	return AlxParamItem_GetKey(ptr);
 }
+uint32_t AlxParamMgmt_ByIndex_GetId(AlxParamMgmt* me, uint32_t index)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_MGMT_ASSERT(index < me->numOfParamItems);
+
+	// Get pointer
+	AlxParamItem* ptr = &me->paramItemArr[index];
+
+	// Return
+	return AlxParamItem_GetId(ptr);
+}
 uint32_t AlxParamMgmt_ByIndex_GetGroupId(AlxParamMgmt* me, uint32_t index)
 {
 	// Assert
@@ -112,6 +124,30 @@ AlxParamItem_Type AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index)
 
 	// Return
 	return AlxParamItem_GetType(ptr);
+}
+void* AlxParamMgmt_ByIndex_GetValPtr(AlxParamMgmt* me, uint32_t index)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_MGMT_ASSERT(index < me->numOfParamItems);
+
+	// Get pointer
+	AlxParamItem* ptr = &me->paramItemArr[index];
+
+	// Return
+	return AlxParamItem_GetValPtr(ptr);
+}
+uint32_t AlxParamMgmt_ByIndex_GetValLen(AlxParamMgmt* me, uint32_t index)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_MGMT_ASSERT(index < me->numOfParamItems);
+
+	// Get pointer
+	AlxParamItem* ptr = &me->paramItemArr[index];
+
+	// Return
+	return AlxParamItem_GetValLen(ptr);
 }
 Alx_Status AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val, uint32_t maxLenWithNullTerm)
 {
@@ -166,7 +202,7 @@ Alx_Status AlxParamMgmt_ByKey_SetVal_StrFormat(AlxParamMgmt* me, char* key, char
 //------------------------------------------------------------------------------
 // By ID
 //------------------------------------------------------------------------------
-uint32_t AlxParamMgmt_ById_GetValLen(AlxParamMgmt* me, uint32_t id)
+Alx_Status AlxParamMgmt_ById_GetValLen(AlxParamMgmt* me, uint32_t id, uint32_t* valLen)
 {
 	// Assert
 	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
@@ -184,10 +220,13 @@ uint32_t AlxParamMgmt_ById_GetValLen(AlxParamMgmt* me, uint32_t id)
 		if (id == _id)
 		{
 			// Get
-			uint32_t valLen = AlxParamItem_GetValLen(ptr);
+			uint32_t _valLen = AlxParamItem_GetValLen(ptr);
+
+			// Set
+			*valLen = _valLen;
 
 			// Return
-			return valLen;
+			return Alx_Ok;
 		}
 	}
 
