@@ -112,23 +112,32 @@ uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me);
 
 
 //------------------------------------------------------------------------------
-// Get & Set By Index
+// By Index
 //------------------------------------------------------------------------------
-const char* AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index);
-uint32_t AlxParamMgmt_ByIndex_GetGroupId(AlxParamMgmt* me, uint32_t index);
-AlxParamItem_Type AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index);
-Alx_Status AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val, uint32_t maxLenWithNullTerm);
+const char*			AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index);
+uint32_t			AlxParamMgmt_ByIndex_GetId(AlxParamMgmt* me, uint32_t index);
+uint32_t			AlxParamMgmt_ByIndex_GetGroupId(AlxParamMgmt* me, uint32_t index);
+AlxParamItem_Type	AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index);
+void*				AlxParamMgmt_ByIndex_GetValPtr(AlxParamMgmt* me, uint32_t index);
+uint32_t			AlxParamMgmt_ByIndex_GetValLen(AlxParamMgmt* me, uint32_t index);
+Alx_Status			AlxParamMgmt_ByIndex_Get(AlxParamMgmt* me, uint32_t index, void* val, uint32_t len);
+Alx_Status			AlxParamMgmt_ByIndex_Set(AlxParamMgmt* me, uint32_t index, void* val, uint32_t len);
+Alx_Status			AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val, uint32_t maxLenWithNullTerm);
+Alx_Status			AlxParamMgmt_ByIndex_SetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val);
 
 
 //------------------------------------------------------------------------------
-// Get & Set By Key
+// By Key
 //------------------------------------------------------------------------------
-Alx_Status AlxParamMgmt_ByKey_SetVal_StrFormat(AlxParamMgmt* me, char* key, char* val);
+Alx_Status			AlxParamMgmt_ByKey_SetVal_StrFormat(AlxParamMgmt* me, char* key, char* val);
 
 
 //------------------------------------------------------------------------------
-// Get & Set By ID
+// By ID
 //------------------------------------------------------------------------------
+uint32_t			AlxParamMgmt_ById_GetValLen(AlxParamMgmt* me, uint32_t id);
+Alx_Status			AlxParamMgmt_ById_Get(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
+Alx_Status			AlxParamMgmt_ById_Set(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
 
 
 //------------------------------------------------------------------------------
@@ -145,23 +154,6 @@ Alx_Status AlxParamMgmt_LoadVal_Group(AlxParamMgmt* me, uint32_t groupId);
 Alx_Status AlxParamMgmt_LoadVal_All(AlxParamMgmt* me);
 Alx_Status AlxParamMgmt_StoreVal_Group(AlxParamMgmt* me, uint32_t groupId);
 Alx_Status AlxParamMgmt_StoreVal_All(AlxParamMgmt* me);
-
-
-//------------------------------------------------------------------------------
-// TODO
-//------------------------------------------------------------------------------
-Alx_Status AlxParamMgmt_ByKey_GetId(AlxParamMgmt* me, const char* key, uint32_t* id);
-Alx_Status AlxParamMgmt_ByKey_GetGroupId(AlxParamMgmt* me, const char* key, uint32_t* groupId);
-Alx_Status AlxParamMgmt_ByKey_GetType(AlxParamMgmt* me, const char* key, AlxParamItem_Type* type);
-Alx_Status AlxParamMgmt_ByKey_GetValPtr(AlxParamMgmt* me, const char* key, void* valPtr);
-Alx_Status AlxParamMgmt_ByKey_GetValLen(AlxParamMgmt* me, const char* key, uint32_t* valLen);
-Alx_Status AlxParamMgmt_ById_GetKey(AlxParamMgmt* me, uint32_t id, char* key);
-Alx_Status AlxParamMgmt_GetByKey(AlxParamMgmt* me, const char* key, void* val, uint32_t len);
-Alx_Status AlxParamMgmt_GetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
-Alx_Status AlxParamMgmt_SetByKey(AlxParamMgmt* me, const char* key, void* val, uint32_t len);
-Alx_Status AlxParamMgmt_SetById(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len);
-Alx_Status AlxParamMgmt_SetToDefByKey(AlxParamMgmt* me, const char* key, uint32_t len);
-Alx_Status AlxParamMgmt_SetToDefById(AlxParamMgmt* me, uint32_t id, uint32_t len);
 
 
 #endif	// #if defined(ALX_C_LIB)

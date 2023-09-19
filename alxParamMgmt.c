@@ -40,13 +40,6 @@
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		paramItemArr
-  * @param[in]		numOfParamItems
-  */
 void AlxParamMgmt_Ctor
 (
 	AlxParamMgmt* me,
@@ -166,6 +159,113 @@ Alx_Status AlxParamMgmt_ByKey_SetVal_StrFormat(AlxParamMgmt* me, char* key, char
 	}
 
 	// If we are here, key was not found, so we return ERROR
+	return Alx_Err;
+}
+
+
+//------------------------------------------------------------------------------
+// By ID
+//------------------------------------------------------------------------------
+uint32_t AlxParamMgmt_ById_GetValLen(AlxParamMgmt* me, uint32_t id)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get id
+		uint32_t _id = AlxParamItem_GetId(ptr);
+
+		// If id match, set value
+		if (id == _id)
+		{
+			// Get
+			uint32_t valLen = AlxParamItem_GetValLen(ptr);
+
+			// Return
+			return valLen;
+		}
+	}
+
+	// If we are here, id was not found, so we return ERROR
+	return Alx_Err;
+}
+Alx_Status AlxParamMgmt_ById_Get(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get id
+		uint32_t _id = AlxParamItem_GetId(ptr);
+
+		// If id match, get value
+		if (id == _id)
+		{
+			// Get valPtr
+			void* valPtr = AlxParamItem_GetValPtr(ptr);
+
+			// Get valLen
+			uint32_t valLen = AlxParamItem_GetValLen(ptr);
+
+			// Check len
+			ALX_PARAM_MGMT_ASSERT(len >= valLen);
+
+			// Copy
+			memcpy(val, valPtr, valLen);
+
+			// Return
+			return Alx_Ok;
+		}
+	}
+
+	// If we are here, id was not found, so we return ERROR
+	return Alx_Err;
+}
+Alx_Status AlxParamMgmt_ById_Set(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get id
+		uint32_t _id = AlxParamItem_GetId(ptr);
+
+		// If id match, get value
+		if (id == _id)
+		{
+			// Get valPtr
+			void* valPtr = AlxParamItem_GetValPtr(ptr);
+
+			// Get valLen
+			uint32_t valLen = AlxParamItem_GetValLen(ptr);
+
+			// Check len
+			ALX_PARAM_MGMT_ASSERT(len >= valLen);
+
+			// Copy
+			memcpy(valPtr, val, valLen);
+
+			// Return
+			return Alx_Ok;
+		}
+	}
+
+	// If we are here, id was not found, so we return ERROR
 	return Alx_Err;
 }
 
