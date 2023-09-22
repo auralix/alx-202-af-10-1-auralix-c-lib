@@ -101,7 +101,7 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		Ads114s08_RegEnum_0x00_DEV_ID : 3;
+		Ads114s08_RegEnum_0x00_DEV_ID DEV_ID: 3;
 		uint8_t RESERVED : 5;
 	};
 	uint8_t raw;
@@ -133,50 +133,50 @@ typedef union
 //------------------------------------------------------------------------------
 typedef enum
 {
-	MUXP_AIN0       = 0000,
-	MUXP_AIN1       = 0001,
-	MUXP_AIN2       = 0010,
-	MUXP_AIN3       = 0011,
-	MUXP_AIN4       = 0100,
-	MUXP_AIN5       = 0101,
-	MUXP_AIN6       = 0110,
-	MUXP_AIN7       = 0111,
-	MUXP_AIN8       = 1000,
-	MUXP_AIN9       = 1001,
-	MUXP_AIN10      = 1010,
-	MUXP_AIN11      = 1011,
-	MUXP_AINCOM     = 1100,
-	MUXP_Reserved13 = 1101,
-	MUXP_Reserved14 = 1110,
-	MUXP_Reserved   = 1111
+	MUXP_AIN0       = 0b0000,
+	MUXP_AIN1       = 0b0001,
+	MUXP_AIN2       = 0b0010,
+	MUXP_AIN3       = 0b0011,
+	MUXP_AIN4       = 0b0100,
+	MUXP_AIN5       = 0b0101,
+	MUXP_AIN6       = 0b0110,
+	MUXP_AIN7       = 0b0111,
+	MUXP_AIN8       = 0b1000,
+	MUXP_AIN9       = 0b1001,
+	MUXP_AIN10      = 0b1010,
+	MUXP_AIN11      = 0b1011,
+	MUXP_AINCOM     = 0b1100,
+	MUXP_Reserved13 = 0b1101,
+	MUXP_Reserved14 = 0b1110,
+	MUXP_Reserved   = 0b1111
 } Ads114s08_RegEnum_0x02_MUXP;
 
 typedef enum
 {
-	MUXN_AIN0       = 0000,
-	MUXN_AIN1       = 0001,
-	MUXN_AIN2       = 0010,
-	MUXN_AIN3       = 0011,
-	MUXN_AIN4       = 0100,
-	MUXN_AIN5       = 0101,
-	MUXN_AIN6       = 0110,
-	MUXN_AIN7       = 0111,
-	MUXN_AIN8       = 1000,
-	MUXN_AIN9       = 1001,
-	MUXN_AIN10      = 1010,
-	MUXN_AIN11      = 1011,
-	MUXN_AINCOM     = 1100,
-	MUXN_Reserved13 = 1101,
-	MUXN_Reserved14 = 1110,
-	MUXN_Reserved   = 1111
+	MUXN_AIN0       = 0b0000,
+	MUXN_AIN1       = 0b0001,
+	MUXN_AIN2       = 0b0010,
+	MUXN_AIN3       = 0b0011,
+	MUXN_AIN4       = 0b0100,
+	MUXN_AIN5       = 0b0101,
+	MUXN_AIN6       = 0b0110,
+	MUXN_AIN7       = 0b0111,
+	MUXN_AIN8       = 0b1000,
+	MUXN_AIN9       = 0b1001,
+	MUXN_AIN10      = 0b1010,
+	MUXN_AIN11      = 0b1011,
+	MUXN_AINCOM     = 0b1100,
+	MUXN_Reserved13 = 0b1101,
+	MUXN_Reserved14 = 0b1110,
+	MUXN_Reserved   = 0b1111
 } Ads114s08_RegEnum_0x02_MUXN;
 
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		Ads114s08_RegEnum_0x02_MUXN : 4;
-		Ads114s08_RegEnum_0x02_MUXP : 4;
+		Ads114s08_RegEnum_0x02_MUXN MUXN : 4;
+		Ads114s08_RegEnum_0x02_MUXP MUXP : 4;
 	};
 	uint8_t raw;
 	} Ads114s08_RegVal_0x02_INPMUX;
@@ -188,46 +188,46 @@ typedef union
 
 typedef enum
 {
-	MUXP_14xtmod   = 000,
-	MUXP_25xtmod   = 001,
-	MUXP_64xtmod   = 010,
-	MUXP_256xtmod  = 011,
-	MUXP_1024xtmod = 100,
-	MUXP_2048xtmod = 101,
-	MUXP_4096xtmod = 110,
-	MUXP_1xtmod    = 111
+	MUXP_14xtmod   = 0b000,
+	MUXP_25xtmod   = 0b001,
+	MUXP_64xtmod   = 0b010,
+	MUXP_256xtmod  = 0b011,
+	MUXP_1024xtmod = 0b100,
+	MUXP_2048xtmod = 0b101,
+	MUXP_4096xtmod = 0b110,
+	MUXP_1xtmod    = 0b111
 } Ads114s08_RegEnum_0x03_DELAY;
 
 typedef enum
 {
-	PGA_EN_PgaIsDisableed	= 00,
-	PGA_EN_PgaIsEnabled		= 01,
-	PGA_EN_Reserved2		= 10,
-	PGA_EN_Reserved3		= 11
+	PGA_EN_PgaIsDisableed	= 0b00,
+	PGA_EN_PgaIsEnabled		= 0b01,
+	PGA_EN_Reserved2		= 0b10,
+	PGA_EN_Reserved3		= 0b11
 } Ads114s08_RegEnum_0x03_PGA_EN;
 
 typedef enum
 {
-	GAIN_1		= 000,
-	GAIN_2		= 001,
-	GAIN_4		= 010,
-	GAIN_8		= 011,
-	GAIN_16		= 100,
-	GAIN_32		= 101,
-	GAIN_64		= 110,
-	GAIN_128	= 111
+	PGA_GAIN_1		= 0b000,
+	PGA_GAIN_2		= 0b001,
+	PGA_GAIN_4		= 0b010,
+	PGA_GAIN_8		= 0b011,
+	PGA_GAIN_16		= 0b100,
+	PGA_GAIN_32		= 0b101,
+	PGA_GAIN_64		= 0b110,
+	PGA_GAIN_128	= 0b111
 } Ads114s08_RegEnum_0x03_GAIN;
 
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		Ads114s08_RegEnum_0x03_GAIN GAIN : 3;
-		Ads114s08_RegEnum_0x03_PGA_EN PGA_EN : 2;
-		Ads114s08_RegEnum_0x03_DELAY DELAY : 3;
+		Ads114s08_RegEnum_0x03_GAIN		GAIN : 3;
+		Ads114s08_RegEnum_0x03_PGA_EN	PGA_EN : 2;
+		Ads114s08_RegEnum_0x03_DELAY	DELAY : 3;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x03_PGA;
+} Ads114s08_RegVal_0x03_PGA;
 
 
 //------------------------------------------------------------------------------
@@ -341,13 +341,13 @@ typedef union
 //------------------------------------------------------------------------------
 typedef enum
 {
-	FL_RAIL_EN_Dissabled		= 0b0,
-	FL_RAIL_EN_Enabled			= 0b1
+	FL_RAIL_EN_Dissabled	= 0b0,
+	FL_RAIL_EN_Enabled		= 0b1
 } Ads114s08_RegEnum_0x06_FL_RAIL_EN;
 typedef enum
 {
-	PSW_Open			= 0b0,
-	PSW_Closed			= 0b1
+	PSW_Open	= 0b0,
+	PSW_Closed	= 0b1
 } Ads114s08_RegEnum_0x06_PSW;
 typedef enum
 {
@@ -507,14 +507,14 @@ typedef union
 //------------------------------------------------------------------------------
 typedef enum
 {
-	SYS_MON_Disabled					= 000,
-	SYS_MON_Pga_AvddAvss_Div2           = 001,
-	SYS_MON_InternalTempSense           = 010,
-	SYS_MON_AvddAvss_Div4               = 011,
-	SYS_MON_Dvdd_Div4                   = 100,
-	SYS_MON_BurnOutCurrentSrcEn_0_2uA   = 101,
-	SYS_MON_BurnOutCurrentSrcEn_1uA     = 110,
-	SYS_MON_BurnOutCurrentSrcEn_10uA    = 111
+	SYS_MON_Disabled					= 0b000,
+	SYS_MON_Pga_AvddAvss_Div2           = 0b001,
+	SYS_MON_InternalTempSense           = 0b010,
+	SYS_MON_AvddAvss_Div4               = 0b011,
+	SYS_MON_Dvdd_Div4                   = 0b100,
+	SYS_MON_BurnOutCurrentSrcEn_0_2uA   = 0b101,
+	SYS_MON_BurnOutCurrentSrcEn_1uA     = 0b110,
+	SYS_MON_BurnOutCurrentSrcEn_10uA    = 0b111
 } Ads114s08_RegEnum_0x09_SYS_MON;
 typedef enum
 {
@@ -820,7 +820,7 @@ typedef struct
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void Ads114s08_Ctor
+void AlxAds114s08_Ctor
 (
 AlxAds114s08* me,
 AlxSpi* spi,
@@ -834,15 +834,16 @@ AlxIoPin* do_nRST);
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status Ads114s08_InitPeriph(AlxAds114s08* me);
-Alx_Status Ads114s08_DeInitPeriph(AlxAds114s08* me);
-Alx_Status Ads114s08_Init(AlxAds114s08* me);
-Alx_Status Ads114s08_GetChVoltage_mV(AlxAds114s08* me, float chVoltage_mV[]);
-Alx_Status Ads114s08_DeInit(AlxAds114s08* me);
-Alx_Status Ads114s08_GetPgaShorted_mV(AlxAds114s08* me, float* pgaShortedVoltage_mV);
-Alx_Status Ads114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTemp_degC);
-Alx_Status Ads114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV);
-Alx_Status Ads114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV);
+Alx_Status AlxAds114s08_InitPeriph(AlxAds114s08* me);
+Alx_Status AlxAds114s08_DeInitPeriph(AlxAds114s08* me);
+Alx_Status AlxAds114s08_Init(AlxAds114s08* me);
+	Alx_Status AlxAds114s08_GetChVoltage_mV(AlxAds114s08* me, uint8_t chNum, float* chVoltage_mV, bool* isOutOfRange);
+Alx_Status AlxAds114s08_DeInit(AlxAds114s08* me);
+Alx_Status AlxAds114s08_GetPgaShorted_mV(AlxAds114s08* me, float* pgaShortedVoltage_mV);
+Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTemp_degC);
+Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV);
+Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV);
+Alx_Status AlxAds114s08_GetDevId(AlxAds114s08* me, Ads114s08_RegEnum_0x00_DEV_ID* DEV_ID);
 
 #endif	// #if defined(ALX_C_LIB)
 
