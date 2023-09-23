@@ -414,6 +414,9 @@ Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltag
 			ALX_ADS114S08_TRACE("Err");
 			return Alx_Err;
 		}
+
+		// Delay
+		AlxOsDelay_ms(&alxOsDelay, 10);
 	};
 
 	//------------------------------------------------------------------------------
