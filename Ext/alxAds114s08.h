@@ -43,6 +43,8 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxTrace.h"
 #include "alxSpi.h"
+#include "alxTimSw.h"
+#include "alxInterpLin.h"
 
 
 //******************************************************************************
@@ -76,6 +78,15 @@ extern "C" {
 	#define ALX_ADS114S08_TRACE_FORMAT(...) do{} while (false)
 #endif
 
+
+//******************************************************************************
+// Enums
+//******************************************************************************
+typedef enum
+{
+	thermocoupleType_K,
+	thermocoupleType_S
+} Ads114s08_ThermocoupleType;
 
 //******************************************************************************
 // Register Values Unions
@@ -806,9 +817,16 @@ typedef struct
 	AlxIoPin* di_nDRDY;
 	AlxIoPin* do_START;
 	AlxIoPin* do_nRST;
+	uint32_t CONVERSION_TIMEOUT_ms;
+
+	AlxInterpLin transferFun_thermocoupleS_degC_mV;
+	AlxInterpLin transferFun_thermocoupleS_mV_degC; 
 
 	// Variables
 	AlxAds114s08_Reg reg;
+
+	// Timeout timer
+	AlxTimSw timeoutTimer;
 
 	// Info
 	bool isInit;
@@ -844,6 +862,11 @@ Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTe
 Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV);
 Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV);
 Alx_Status AlxAds114s08_GetDevId(AlxAds114s08* me, Ads114s08_RegEnum_0x00_DEV_ID* DEV_ID);
+Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC(AlxAds114s08* me,
+Ads114s08_ThermocoupleType thermocoupleType,
+float thermocoupleVoltage_mV,
+float coldJunctionTemp_degC,
+float* thermocoupleTemperatureCompnsated_degC);
 
 #endif	// #if defined(ALX_C_LIB)
 
