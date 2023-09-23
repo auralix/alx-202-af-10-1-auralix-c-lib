@@ -1,4 +1,4 @@
-/**
+﻿/**
   ******************************************************************************
   * @file		alxAds114s08.c
   * @brief		Auralix C Library - ALX Current Monitor ADS114S08 Module
@@ -56,6 +56,7 @@ static Alx_Status AlxAds114s08_Reg_Write(AlxAds114s08* me, void* reg);
 static Alx_Status AlxAds114s08_Reg_WriteAndRead(AlxAds114s08* me, void* reg);
 static Alx_Status AlxAds114s08_Reg_WriteAll(AlxAds114s08* me);
 Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltage_raw);
+Alx_Status AlxAds114s08_Convert_raw_mV(AlxAds114s08* me, int16_t chVoltage_raw, float* chVoltage_mV, bool* isOutOfRange);
 
 //******************************************************************************
 // Weak Functions
@@ -290,58 +291,73 @@ Alx_Status AlxAds114s08_GetChVoltage_mV(AlxAds114s08* me, uint8_t chNum, float* 
 	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
 
 	//------------------------------------------------------------------------------
-	// Peerform ADC Conversion, Create Sample in blocking mode
+	// Perform ADC Conversion, Create Sample in blocking mode
 	//------------------------------------------------------------------------------
 	int16_t chVoltage_raw = 0;
 	status = AlxAds114s08_PerformAdcConversion(me, &chVoltage_raw);
 	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
 
-
-	//------------------------------------------------------------------------------
-	// Check if vlaue Out Of Range
-	//------------------------------------------------------------------------------
-	int16_t positive_limit = (int16_t)(32767 * 0.95);	// approximately 31128
-	int16_t negative_limit = (int16_t)(-32768 * 0.95);	// approximately -31129
-	if (chVoltage_raw >= positive_limit || chVoltage_raw <= negative_limit)
-	{
-		*isOutOfRange = true;
-	}
-	else
-	{
-		*isOutOfRange = false;
-	}
-
 	//------------------------------------------------------------------------------
 	// Convert to mV
 	//------------------------------------------------------------------------------
-	float vref_mV = 2500.f;
-	float pgaMultiplier = 0;
-	if (me->reg.reg_0x03_PGA.val.PGA_EN == PGA_EN_PgaIsEnabled)
-	{
-		switch (me->reg.reg_0x03_PGA.val.GAIN)
-		{
-		case PGA_GAIN_1:	pgaMultiplier = 1; break;
-		case PGA_GAIN_2:	pgaMultiplier = 2; break;
-		case PGA_GAIN_4:	pgaMultiplier = 4; break;
-		case PGA_GAIN_8:	pgaMultiplier = 8; break;
-		case PGA_GAIN_16:	pgaMultiplier = 16; break;
-		case PGA_GAIN_32:	pgaMultiplier = 32; break;
-		case PGA_GAIN_64:	pgaMultiplier = 64; break;
-		case PGA_GAIN_128:	pgaMultiplier = 128; break;
-		default: ALX_ADS114S08_ASSERT(false);
-		}
-	}
-	else
-	{
-		pgaMultiplier = 1;
-	}
-	float multiplier = (vref_mV / 32767.f) / pgaMultiplier;
-	*chVoltage_mV = (float)chVoltage_raw * multiplier;
+	status = AlxAds114s08_Convert_raw_mV(me, chVoltage_raw, chVoltage_mV, isOutOfRange);
 
 	// Return
 	return Alx_Ok;
 }
 
+Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTemp_degC)
+{
+	// Assert
+	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
+	ALX_ADS114S08_ASSERT(me->isInitPeriph == true);
+	ALX_ADS114S08_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	//------------------------------------------------------------------------------
+	// Configure registers
+	//------------------------------------------------------------------------------
+	AlxAds114s08_RegStruct_SetToDefault(me);
+//	me->reg.reg_0x02_INPMUX.val.MUXN = MUXN_Reserved;
+//	me->reg.reg_0x02_INPMUX.val.MUXN = MUXN_Reserved;
+	me->reg.reg_0x03_PGA.val.GAIN = PGA_GAIN_4;
+	me->reg.reg_0x03_PGA.val.PGA_EN = PGA_EN_PgaIsEnabled;
+	me->reg.reg_0x04_DATARATE.val.G_CHOP = G_CHOP_Enabled;
+	me->reg.reg_0x04_DATARATE.val.DR = DR_20sps;
+	me->reg.reg_0x04_DATARATE.val.MODE = MODE_SingleConversion;
+//	me->reg.reg_0x05_REF.val.REFP_BUF = REFP_BUF_Enabled;
+//	me->reg.reg_0x05_REF.val.REFN_BUF = REFN_BUF_Disabled;
+	me->reg.reg_0x05_REF.val.REFSEL = REFSEL_Internal2_5Vref;
+	me->reg.reg_0x05_REF.val.REFCON = REFCON_InternalRefAlwaysOn;
+	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_InternalTempSense;
+	status = AlxAds114s08_Reg_WriteAll(me);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Perform ADC Conversion, Create Sample in blocking mode
+	//------------------------------------------------------------------------------
+	int16_t adcVoltage_raw = 0;
+	status = AlxAds114s08_PerformAdcConversion(me, &adcVoltage_raw);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Convert to mV
+	//------------------------------------------------------------------------------
+	bool isOutOfRange = true;
+	float adcVoltage_mV = -99999999;
+	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Convert to degC
+	//------------------------------------------------------------------------------
+	*internalTemp_degC = 25.f + (adcVoltage_mV - 129.f) / 0.403f;
+
+	// Return
+	return Alx_Ok;
+}
 Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltage_raw)
 {
 	// Assert
@@ -386,10 +402,56 @@ Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltag
 	return Alx_Ok;
 }
 
-Alx_Status AlxAds114s08_Convert_raw_mV(AlxAds114s08* me, uint8_t chNum, float* chVoltage_mV, bool* isOutOfRange)
+Alx_Status AlxAds114s08_Convert_raw_mV(AlxAds114s08* me, int16_t chVoltage_raw, float* chVoltage_mV, bool* isOutOfRange)
 {
-	//  Todo
-	return Alx_Err;
+	// Assert
+	ALX_ADS114S08_ASSERT(me->reg.reg_0x05_REF.val.REFSEL == REFSEL_Internal2_5Vref);
+	ALX_ADS114S08_ASSERT(me->reg.reg_0x05_REF.val.REFCON == REFCON_InternalRefAlwaysOn);
+
+	//------------------------------------------------------------------------------
+	// Check if value is close to Out Of Range
+	//------------------------------------------------------------------------------
+	int16_t positive_limit = (int16_t)(32767 * 0.95); // approximately 31128
+	int16_t negative_limit = (int16_t)(-32768 * 0.95); // approximately -31129
+	if (chVoltage_raw >= positive_limit || chVoltage_raw <= negative_limit)
+	{
+		*isOutOfRange = true;
+	}
+	else
+	{
+		*isOutOfRange = false;
+	}
+
+	//------------------------------------------------------------------------------
+	// Define multiplier
+	//------------------------------------------------------------------------------
+	float vref_mV = 2500.f;
+	float pgaMultiplier = 0;
+	if (me->reg.reg_0x03_PGA.val.PGA_EN == PGA_EN_PgaIsEnabled)
+	{
+		switch (me->reg.reg_0x03_PGA.val.GAIN)
+		{
+		case PGA_GAIN_1:	pgaMultiplier = 1; break;
+		case PGA_GAIN_2:	pgaMultiplier = 2; break;
+		case PGA_GAIN_4:	pgaMultiplier = 4; break;
+		case PGA_GAIN_8:	pgaMultiplier = 8; break;
+		case PGA_GAIN_16:	pgaMultiplier = 16; break;
+		case PGA_GAIN_32:	pgaMultiplier = 32; break;
+		case PGA_GAIN_64:	pgaMultiplier = 64; break;
+		case PGA_GAIN_128:	pgaMultiplier = 128; break;
+		default: ALX_ADS114S08_ASSERT(false);
+		}
+	}
+	else
+	{
+		pgaMultiplier = 1;
+	}
+	float multiplier = (vref_mV / 32767.f) / pgaMultiplier;
+
+	//------------------------------------------------------------------------------
+	// Prform Multiplication
+	//------------------------------------------------------------------------------
+	*chVoltage_mV = (float)chVoltage_raw * multiplier;
 
 	// Return
 	return Alx_Ok;
