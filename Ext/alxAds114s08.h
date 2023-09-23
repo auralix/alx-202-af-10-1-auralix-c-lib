@@ -43,8 +43,11 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxTrace.h"
 #include "alxSpi.h"
-#include "alxTimSw.h"
 #include "alxInterpLin.h"
+
+#include "alxTimSw.h"
+#include "alxOsMutex.h"
+#include "alxOsDelay.h"
 
 
 //******************************************************************************

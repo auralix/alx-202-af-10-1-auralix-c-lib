@@ -527,8 +527,6 @@ static void AlxAds114s08_RegStruct_SetAddr(AlxAds114s08* me)
 	me->reg.reg_0x0F_FSCAL1.addr	=	0x0F;
 	me->reg.reg_0x10_GPIODAT.addr	=	0x10;
 	me->reg.reg_0x11_GPIOCON.addr	=	0x11;
-
-
 }
 static void AlxAds114s08_RegStruct_SetLen(AlxAds114s08* me)
 {
@@ -550,7 +548,6 @@ static void AlxAds114s08_RegStruct_SetLen(AlxAds114s08* me)
 	me->reg.reg_0x0F_FSCAL1.len		= sizeof(me->reg.reg_0x0F_FSCAL1.val);
 	me->reg.reg_0x10_GPIODAT.len	= sizeof(me->reg.reg_0x10_GPIODAT.val);
 	me->reg.reg_0x11_GPIOCON.len	= sizeof(me->reg.reg_0x11_GPIOCON.val);
-
 }
 static void AlxAds114s08_RegStruct_SetValToZero(AlxAds114s08* me)
 {
@@ -899,7 +896,7 @@ Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC(AlxAds114s08* me,
 	Ads114s08_ThermocoupleType thermocoupleType,
 	float thermocoupleVoltage_mV,
 	float coldJunctionTemp_degC,
-	float* thermocoupleTemperatureCompnsated_degC)
+	float* thermocoupleTemperatureCompensated_degC)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -908,7 +905,7 @@ Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC(AlxAds114s08* me,
 	float coldJunctionCompensationVoltage_mV;
 	AlxInterpLin_GetY_WithStatus(&me->transferFun_thermocoupleS_degC_mV, coldJunctionTemp_degC, &coldJunctionCompensationVoltage_mV);
 	float thermocoupleVotlageCompensated_mV = thermocoupleVoltage_mV + coldJunctionCompensationVoltage_mV;
-	AlxInterpLin_GetY_WithStatus(&me->transferFun_thermocoupleS_mV_degC, thermocoupleVotlageCompensated_mV, thermocoupleTemperatureCompnsated_degC);
+	AlxInterpLin_GetY_WithStatus(&me->transferFun_thermocoupleS_mV_degC, thermocoupleVotlageCompensated_mV, thermocoupleTemperatureCompensated_degC);
 
 	return Alx_Ok;
 }
