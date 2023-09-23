@@ -820,7 +820,7 @@ typedef struct
 	uint32_t CONVERSION_TIMEOUT_ms;
 
 	AlxInterpLin transferFun_thermocoupleS_degC_mV;
-	AlxInterpLin transferFun_thermocoupleS_mV_degC; 
+	AlxInterpLin transferFun_thermocoupleS_mV_degC;
 
 	// Variables
 	AlxAds114s08_Reg reg;
@@ -857,7 +857,7 @@ Alx_Status AlxAds114s08_DeInitPeriph(AlxAds114s08* me);
 Alx_Status AlxAds114s08_Init(AlxAds114s08* me);
 Alx_Status AlxAds114s08_DeInit(AlxAds114s08* me);
 Alx_Status AlxAds114s08_GetChVoltage_mV(AlxAds114s08* me, uint8_t chNum, float* chVoltage_mV, bool* isOutOfRange);
-Alx_Status AlxAds114s08_GetPgaShorted_mV(AlxAds114s08* me, float* pgaShortedVoltage_mV);
+Alx_Status AlxAds114s08_GetPgaShorted_uV(AlxAds114s08* me, float* pgaShortedVoltage_uV);
 Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTemp_degC);
 Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV);
 Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV);

@@ -745,20 +745,155 @@ static Alx_Status AlxAds114s08_Reg_WriteAll(AlxAds114s08* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxAds114s08_GetPgaShorted_mV(AlxAds114s08* me, float* pgaShortedVoltage_mV)
+Alx_Status AlxAds114s08_GetPgaShorted_uV(AlxAds114s08* me, float* pgaShortedVoltage_uV)
 {
-	// ToDo
-	return Alx_Err;
+	// Assert
+	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
+	ALX_ADS114S08_ASSERT(me->isInitPeriph == true);
+	ALX_ADS114S08_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	//------------------------------------------------------------------------------
+	// Configure registers
+	//------------------------------------------------------------------------------
+	AlxAds114s08_RegStruct_SetToDefault(me);
+	me->reg.reg_0x02_INPMUX.val.MUXN = MUXN_AIN0;
+	me->reg.reg_0x02_INPMUX.val.MUXP = MUXP_AIN1;
+	me->reg.reg_0x03_PGA.val.GAIN = PGA_GAIN_128;
+	me->reg.reg_0x03_PGA.val.PGA_EN = PGA_EN_PgaIsEnabled;
+	me->reg.reg_0x04_DATARATE.val.G_CHOP = G_CHOP_Dissabled;
+	me->reg.reg_0x04_DATARATE.val.DR = DR_20sps;
+	me->reg.reg_0x04_DATARATE.val.MODE = MODE_SingleConversion;
+	me->reg.reg_0x05_REF.val.REFSEL = REFSEL_Internal2_5Vref;
+	me->reg.reg_0x05_REF.val.REFCON = REFCON_InternalRefAlwaysOn;
+	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_Pga_AvddAvss_Div2;
+	status = AlxAds114s08_Reg_WriteAll(me);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Perform ADC Conversion, Create Sample in blocking mode
+	//------------------------------------------------------------------------------
+	int16_t adcVoltage_raw = 0;
+	status = AlxAds114s08_PerformAdcConversion(me, &adcVoltage_raw, me->CONVERSION_TIMEOUT_ms);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Convert to mV
+	//------------------------------------------------------------------------------
+	bool isOutOfRange = true;
+	float adcVoltage_mV = -99999999; // set out of range value
+	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Convert to degC
+	//------------------------------------------------------------------------------
+	*pgaShortedVoltage_uV = adcVoltage_mV * 2000.f;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV)
 {
-	// ToDo
-	return Alx_Err;
+	// Assert
+	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
+	ALX_ADS114S08_ASSERT(me->isInitPeriph == true);
+	ALX_ADS114S08_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	//------------------------------------------------------------------------------
+	// Configure registers
+	//------------------------------------------------------------------------------
+	AlxAds114s08_RegStruct_SetToDefault(me);
+	me->reg.reg_0x02_INPMUX.val.MUXN = MUXN_AIN0;
+	me->reg.reg_0x02_INPMUX.val.MUXP = MUXP_AIN1;
+	me->reg.reg_0x03_PGA.val.GAIN = PGA_GAIN_1;
+	me->reg.reg_0x03_PGA.val.PGA_EN = PGA_EN_PgaIsEnabled;
+	me->reg.reg_0x04_DATARATE.val.G_CHOP = G_CHOP_Dissabled;
+	me->reg.reg_0x04_DATARATE.val.DR = DR_20sps;
+	me->reg.reg_0x04_DATARATE.val.MODE = MODE_SingleConversion;
+	me->reg.reg_0x05_REF.val.REFSEL = REFSEL_Internal2_5Vref;
+	me->reg.reg_0x05_REF.val.REFCON = REFCON_InternalRefAlwaysOn;
+	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_AvddAvss_Div4;
+	status = AlxAds114s08_Reg_WriteAll(me);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Perform ADC Conversion, Create Sample in blocking mode
+	//------------------------------------------------------------------------------
+	int16_t adcVoltage_raw = 0;
+	status = AlxAds114s08_PerformAdcConversion(me, &adcVoltage_raw, me->CONVERSION_TIMEOUT_ms);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Convert to mV
+	//------------------------------------------------------------------------------
+	bool isOutOfRange = true;
+	float adcVoltage_mV = -99999999; // set out of range value
+	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Convert to degC
+	//------------------------------------------------------------------------------
+	*avddAvss_mV = adcVoltage_mV * 4.0f;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV)
 {
-	// ToDo
-	return Alx_Err;
+	// Assert
+	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
+	ALX_ADS114S08_ASSERT(me->isInitPeriph == true);
+	ALX_ADS114S08_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	//------------------------------------------------------------------------------
+	// Configure registers
+	//------------------------------------------------------------------------------
+	AlxAds114s08_RegStruct_SetToDefault(me);
+	me->reg.reg_0x02_INPMUX.val.MUXN = MUXN_AIN0;
+	me->reg.reg_0x02_INPMUX.val.MUXP = MUXP_AIN1;
+	me->reg.reg_0x03_PGA.val.GAIN = PGA_GAIN_1;
+	me->reg.reg_0x03_PGA.val.PGA_EN = PGA_EN_PgaIsEnabled;
+	me->reg.reg_0x04_DATARATE.val.G_CHOP = G_CHOP_Dissabled;
+	me->reg.reg_0x04_DATARATE.val.DR = DR_20sps;
+	me->reg.reg_0x04_DATARATE.val.MODE = MODE_SingleConversion;
+	me->reg.reg_0x05_REF.val.REFSEL = REFSEL_Internal2_5Vref;
+	me->reg.reg_0x05_REF.val.REFCON = REFCON_InternalRefAlwaysOn;
+	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_Dvdd_Div4;
+	status = AlxAds114s08_Reg_WriteAll(me);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Perform ADC Conversion, Create Sample in blocking mode
+	//------------------------------------------------------------------------------
+	int16_t adcVoltage_raw = 0;
+	status = AlxAds114s08_PerformAdcConversion(me, &adcVoltage_raw, me->CONVERSION_TIMEOUT_ms);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Convert to mV
+	//------------------------------------------------------------------------------
+	bool isOutOfRange = true;
+	float adcVoltage_mV = -99999999; // set out of range value
+	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
+	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+
+	//------------------------------------------------------------------------------
+	// Convert to degC
+	//------------------------------------------------------------------------------
+	*dvdd_mV = adcVoltage_mV * 4.0f;
+
+	// Return
+	return Alx_Ok;
 }
 Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC(AlxAds114s08* me,
 	Ads114s08_ThermocoupleType thermocoupleType,
