@@ -301,10 +301,10 @@ static Alx_Status AlxTmp1075_TraceId(AlxTmp1075* me)
 	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err_R4_DeviceId	"); return status;}
 
 	// #2 Trace
-	ALX_TMP1075_TRACE_FORMAT("\r\n");
-	ALX_TMP1075_TRACE_FORMAT("Auralix C Library ALX Temperature Sensor TMP1075 Module Identification:\r\n");
-	ALX_TMP1075_TRACE_FORMAT("- Device ID: %X\r\n", me->reg.R4_DeviceId.val.DID);
-	ALX_TMP1075_TRACE_FORMAT("\r\n");
+	//ALX_TMP1075_TRACE_FORMAT("\r\n");
+	//ALX_TMP1075_TRACE_FORMAT("Auralix C Library ALX Temperature Sensor TMP1075 Module Identification:\r\n");
+	//ALX_TMP1075_TRACE_FORMAT("- Device ID: %X\r\n", me->reg.R4_DeviceId.val.DID);
+	//ALX_TMP1075_TRACE_FORMAT("\r\n");
 
 	// #3 Return OK
 	return Alx_Ok;
