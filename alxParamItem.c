@@ -1201,53 +1201,8 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->type == AlxParamItem_Type_Str);
 
-	// Local variables
-	Alx_Status status = Alx_Err;
-
-	// Handle value out of range
-	switch(me->valOutOfRangeHandle)
-	{
-		case AlxParamItem_ValOutOfRangeHandle_Assert:
-		{
-			status = AlxRange_CheckStr(val, me->buffLen);
-			if (status == Alx_Ok)
-			{
-				strcpy(me->val.str, val);
-				me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
-			}
-			else
-			{
-				ALX_PARAM_ITEM_ASSERT(false);
-				status = Alx_Err;
-			}
-			break;
-		}
-		case AlxParamItem_ValOutOfRangeHandle_Ignore:
-		{
-			status = AlxRange_CheckStr(val, me->buffLen);
-			if (status == Alx_Ok)
-			{
-				strcpy(me->val.str, val);
-				me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
-			}
-			break;
-		}
-		case AlxParamItem_ValOutOfRangeHandle_Bound:
-		{
-			status = AlxBound_Str(me->val.str, val, me->buffLen);
-			me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
-			break;
-		}
-		default:
-		{
-			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-			status = Alx_Err;
-			break;
-		}
-	}
-
-	// Return
-	return status;
+	// Set
+	return AlxParamItem_SetVal(me, val);
 }
 
 
@@ -1338,15 +1293,59 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
   */
 Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	ALX_PARAM_ITEM_ASSERT(maxLenWithNullTerm <= ALX_PARAM_ITEM_BUFF_LEN);
+	if (me->type != AlxParamItem_Type_Str)
+	{
+		ALX_PARAM_ITEM_ASSERT(maxLenWithNullTerm <= ALX_PARAM_ITEM_BUFF_LEN);
+	}
 
+
+	//------------------------------------------------------------------------------
 	// Local variables
+	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	char valStr[ALX_PARAM_ITEM_BUFF_LEN] = "";
 
+
+
+
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	// Handle String
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	if (me->type == AlxParamItem_Type_Str)
+	{
+		// Check
+		status = AlxRange_CheckStr(me->val.str, maxLenWithNullTerm);
+		if (status != Alx_Ok)
+		{
+			return status;
+		}
+
+		// Copy
+		strcpy(val, me->val.str);
+
+		// Return
+		return status;
+	}
+
+
+
+
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	// Handle Uint8/16/32/64, Int8/16/32/64, Float, Double, Bool
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+
+
+	//------------------------------------------------------------------------------
 	// Convert
+	//------------------------------------------------------------------------------
 	if (me->type == AlxParamItem_Type_Uint8)
 	{
 		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%u", me->val.uint8) >= 0);
@@ -1404,24 +1403,33 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->type == AlxParamItem_Type_Str)
 	{
-		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
 	else
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
 
+
+	//------------------------------------------------------------------------------
 	// Check
+	//------------------------------------------------------------------------------
 	status = AlxRange_CheckStr(valStr, maxLenWithNullTerm);
 	if (status != Alx_Ok)
 	{
 		return status;
 	}
 
+
+	//------------------------------------------------------------------------------
 	// Copy
+	//------------------------------------------------------------------------------
 	strcpy(val, valStr);
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return status;
 }
 
@@ -1434,24 +1442,36 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
   */
 Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
+
+	//------------------------------------------------------------------------------
 	// Local variables
+	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 
+
+	//------------------------------------------------------------------------------
 	// Convert
+	//------------------------------------------------------------------------------
 	if (me->type == AlxParamItem_Type_Uint8)
 	{
+		// Convert
 		uint8_t valNum = 0;
 		if (sscanf(val, "%hu", &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+
+		// Set
 		status = AlxParamItem_SetValUint8(me, valNum);
 	}
 	else if (me->type == AlxParamItem_Type_Uint16)
 	{
+		// Convert
 		uint16_t valNum = 0;
 		if (sscanf(val, "%hu", &valNum) != 1)
 		{
@@ -1461,11 +1481,14 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	}
 	else if (me->type == AlxParamItem_Type_Uint32)
 	{
+		// Convert
 		uint32_t valNum = 0;
 		if (sscanf(val, "%lu", &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+
+		// Set
 		status = AlxParamItem_SetValUint32(me, valNum);
 	}
 	else if (me->type == AlxParamItem_Type_Uint64)
@@ -1474,29 +1497,38 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	}
 	else if (me->type == AlxParamItem_Type_Int8)
 	{
+		// Convert
 		int8_t valNum = 0;
 		if (sscanf(val, "%hd", &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+
+		// Set
 		status = AlxParamItem_SetValInt8(me, valNum);
 	}
 	else if (me->type == AlxParamItem_Type_Int16)
 	{
+		// Convert
 		int16_t valNum = 0;
 		if (sscanf(val, "%hd", &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+
+		// Set
 		status = AlxParamItem_SetValInt16(me, valNum);
 	}
 	else if (me->type == AlxParamItem_Type_Int32)
 	{
+		// Convert
 		int32_t valNum = 0;
 		if (sscanf(val, "%ld", &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+
+		// Set
 		status = AlxParamItem_SetValInt32(me, valNum);
 	}
 	else if (me->type == AlxParamItem_Type_Int64)
@@ -1505,24 +1537,31 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	}
 	else if (me->type == AlxParamItem_Type_Float)
 	{
+		// Convert
 		float valNum = 0;
 		if (sscanf(val, "%f", &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+
+		// Set
 		status = AlxParamItem_SetValFloat(me, valNum);
 	}
 	else if (me->type == AlxParamItem_Type_Double)
 	{
+		// Convert
 		double valNum = 0;
 		if (sscanf(val, "%lf", &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+
+		// Set
 		status = AlxParamItem_SetValDouble(me, valNum);
 	}
 	else if (me->type == AlxParamItem_Type_Bool)
 	{
+		// Convert
 		bool valNum = false;
 		if (strcmp(val, "true") == 0)
 		{
@@ -1552,6 +1591,8 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		{
 			return AlxParamItem_ErrConv;
 		}
+
+		// Set
 		status = AlxParamItem_SetValBool(me, valNum);
 	}
 	else if (me->type == AlxParamItem_Type_Arr)
@@ -1560,14 +1601,18 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	}
 	else if (me->type == AlxParamItem_Type_Str)
 	{
-		ALX_PARAM_ITEM_ASSERT(false);	// TODO
+		// Set
+		status = AlxParamItem_SetValStr(me, val);
 	}
 	else
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return status;
 }
 
@@ -1863,7 +1908,7 @@ static bool AlxParamItem_AreEnumArrValFromLowToHigh(AlxParamItem* me)
 	}
 
 	// If we are here, enum array values are from low to high, so return true
-	return false;
+	return true;
 }
 static bool AlxParamItem_IsEnumOnList(AlxParamItem* me, void* enumVal)
 {
@@ -2031,7 +2076,9 @@ static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me)
 static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 {
 	//------------------------------------------------------------------------------
-	// Handle Bool, Array, String
+	//------------------------------------------------------------------------------
+	// Handle Bool
+	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
 	if (me->type == AlxParamItem_Type_Bool)
 	{
@@ -2039,18 +2086,14 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 		me->val._bool = _val;
 		return Alx_Ok;
 	}
-	else if (me->type == AlxParamItem_Type_Arr)
-	{
-		ALX_PARAM_ITEM_ASSERT(false);	// TODO
-	}
-	else if (me->type == AlxParamItem_Type_Str)
-	{
-		ALX_PARAM_ITEM_ASSERT(false);	// TODO
-	}
+
+
 
 
 	//------------------------------------------------------------------------------
-	// Handle Uint8/16/32/64, Int8/16/32/64, Float, Double
+	//------------------------------------------------------------------------------
+	// Handle Uint8/16/32/64, Int8/16/32/64, Float, Double, String
+	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
 
 	// Local variables
@@ -2179,7 +2222,13 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 		}
 		else if (me->type == AlxParamItem_Type_Str)
 		{
-			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
+			char* _val = (char*)val;
+			status = AlxRange_CheckStr(_val, me->buffLen);
+			if (status == Alx_Ok)
+			{
+				strcpy(me->val.str, _val);
+				me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
+			}
 		}
 		else
 		{
@@ -2266,7 +2315,9 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 		}
 		else if (me->type == AlxParamItem_Type_Str)
 		{
-			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
+			char* _val = (char*)val;
+			status = AlxBound_Str(me->val.str, _val, me->buffLen);
+			me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
 		}
 		else
 		{
