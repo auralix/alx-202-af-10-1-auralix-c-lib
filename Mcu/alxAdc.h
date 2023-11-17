@@ -44,21 +44,20 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxIoPin.h"
 
-// AlxMcu //
 #if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 #include "alxAdc_McuStm32.h"
 
-#elif defined(ALX_LPC1769)
-#include "alxAdc_McuLpc17.h"
+#elif defined(ALX_LPC17XX)
+#include "alxAdc_McuLpc17xx.h"
 
-#elif defined(ALX_LPC845)
-#include "alxAdc_McuLpc84.h"
+#elif defined(ALX_LPC55S6X)
+#include "alxAdc_McuLpc55S6x.h"
 
 #elif defined(ALX_LPC80X)
 #include "alxAdc_McuLpc80x.h"
 
-#elif defined(ALX_LPC55S6X)
-#include "alxAdc_McuLpc55S6x.h"
+#elif defined(ALX_LPC84X)
+#include "alxAdc_McuLpc84x.h"
 
 #else
 typedef struct { bool dummy; } AlxAdc;

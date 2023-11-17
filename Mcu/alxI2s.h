@@ -44,7 +44,6 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxIoPin.h"
 
-// AlxMcu //
 #if defined(ALX_STM32F4)
 #include "alxI2s_McuStm32.h"
 

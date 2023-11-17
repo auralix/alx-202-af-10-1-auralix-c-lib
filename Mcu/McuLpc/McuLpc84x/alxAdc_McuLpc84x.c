@@ -41,7 +41,7 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint8_t AlxAdcMcu_GetChannel(AlxIoPin* pin);
+static uint8_t AlxAdc_GetChannel(AlxIoPin* pin);
 
 
 //******************************************************************************
@@ -56,9 +56,9 @@ static uint8_t AlxAdcMcu_GetChannel(AlxIoPin* pin);
   * @param[in]		adcClkDiv
   * @param[in]		voltageRefP_mV
   */
-void AlxAdcMcu_Ctor
+void AlxAdc_Ctor
 (
-	AlxAdc_Mcu* me,
+	AlxAdc* me,
 	AlxIoPin** channels,
 	uint8_t numChannels,
 	uint8_t adcClkDiv,
@@ -107,7 +107,7 @@ void AlxAdcMcu_Ctor
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-void AlxAdcMcu_Init(AlxAdc_Mcu* me)
+Alx_Status AlxAdc_Init(AlxAdc* me)
 {
 	ALX_ADC_ASSERT(me->isInit == false);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
@@ -132,7 +132,7 @@ void AlxAdcMcu_Init(AlxAdc_Mcu* me)
 	// #6 Configure coversion sequence A
 	for(uint8_t i = 0 ; i < me->numChannels ; i++)	// Loop through channels to add appropriate channelMask
 	{
-		me->adcConvSeqConfig.channelMask |= (1U << AlxAdcMcu_GetChannel(*(me->channels + i)));
+		me->adcConvSeqConfig.channelMask |= (1U << AlxAdc_GetChannel(*(me->channels + i)));
 	}
 	ADC_SetConvSeqAConfig(ADC0, &me->adcConvSeqConfig);
 	ADC_EnableConvSeqA(ADC0, true);
@@ -150,7 +150,7 @@ void AlxAdcMcu_Init(AlxAdc_Mcu* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-void AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
+Alx_Status AlxAdc_DeInit(AlxAdc* me)
 {
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
@@ -178,12 +178,12 @@ void AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
   * @param[in]		pin
   * @return
   */
-uint32_t AlxAdcMcu_GetVoltage_mV(AlxAdc_Mcu* me, AlxIoPin* pin)
+uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 {
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
-	uint8_t ch = AlxAdcMcu_GetChannel(pin);
+//	uint8_t ch = AlxAdc_GetChannel(pin);	// TV: TODO
 	ADC_DoSoftwareTriggerConvSeqA(ADC0);
 	while (!ADC_GetChannelConversionResult(ADC0, ch, &me->adcResult)) {}
 	return ((me->adcResult.result * me->voltageRefP_mV) / 4095);	// Returns mV
@@ -193,7 +193,7 @@ uint32_t AlxAdcMcu_GetVoltage_mV(AlxAdc_Mcu* me, AlxIoPin* pin)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint8_t AlxAdcMcu_GetChannel(AlxIoPin* pin)
+static uint8_t AlxAdc_GetChannel(AlxIoPin* pin)
 {
 	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN0)		return 0U;
 	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN1)		return 1U;

@@ -43,15 +43,14 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 
-// AlxMcu //
 #if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 #include "alxPwm_McuStm32.h"
 
-#elif defined(ALX_LPC80X)
-#include "alxPwm_McuLpc80x.h"
-
 #elif defined(ALX_LPC55S6X)
 #include "alxPwm_McuLpc55S6x.h"
+
+#elif defined(ALX_LPC80X)
+#include "alxPwm_McuLpc80x.h"
 
 #else
 typedef struct { bool dummy; } AlxPwm;

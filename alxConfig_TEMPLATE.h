@@ -119,7 +119,7 @@ extern "C" {
 //#define ALX_LPC17XX
 //#define ALX_LPC55S6X
 //#define ALX_LPC80X
-//#define ALX_LPC84X
+#define ALX_LPC84X
 
 
 //------------------------------------------------------------------------------

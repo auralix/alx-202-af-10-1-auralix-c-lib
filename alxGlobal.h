@@ -192,7 +192,7 @@ extern "C" {
 #elif defined(ALX_LPC80X)
 #include "alxGlobal_McuLpc80x.h"
 
-#elif defined(ALX_LPC84x)
+#elif defined(ALX_LPC84X)
 #include "alxGlobal_McuLpc84x.h"
 
 #endif
@@ -349,7 +349,7 @@ typedef enum
 	AlxClk_Clk_McuStm32_MainPllInputClk_Ctor,
 	#endif
 
-	#if defined(ALX_LPC80X) || defined(ALX_LPC84x)
+	#if defined(ALX_LPC80X) || defined(ALX_LPC84X)
 	AlxClk_Clk_McuLpc8xx_CoreSysClk,
 	AlxClk_Clk_McuLpc8xx_MainClk,
 	AlxClk_Clk_McuLpc8xx_Fro,

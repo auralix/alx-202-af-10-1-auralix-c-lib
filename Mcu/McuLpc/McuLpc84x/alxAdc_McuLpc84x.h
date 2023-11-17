@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_ADC_MCU_LPC84X_H
-#define ALX_ADC_MCU_LPC84X_H
+#ifndef ALX_ADC_LPC84X_H
+#define ALX_ADC_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,15 +72,15 @@ typedef struct
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-} AlxAdc_Mcu;
+} AlxAdc;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxAdcMcu_Ctor
+void AlxAdc_Ctor
 (
-	AlxAdc_Mcu* me,
+	AlxAdc* me,
 	AlxIoPin** channels,
 	uint8_t numChannels,
 	uint8_t adcClkDiv,
@@ -94,4 +94,4 @@ void AlxAdcMcu_Ctor
 }
 #endif
 
-#endif	// #ifndef ALX_ADC_MCU_LPC84X_H
+#endif	// #ifndef ALX_ADC_LPC84X_H

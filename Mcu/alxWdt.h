@@ -43,7 +43,6 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 
-// AlxMcu //
 #if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 #include "alxWdt_McuStm32.h"
 

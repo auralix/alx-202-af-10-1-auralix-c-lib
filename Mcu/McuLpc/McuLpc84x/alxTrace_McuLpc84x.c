@@ -101,7 +101,7 @@ void AlxTrace_Ctor
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-void AlxTrace_Init(AlxTrace* me)
+Alx_Status AlxTrace_Init(AlxTrace* me)
 {
 	// #1 Init SWM
 	CLOCK_EnableClock(kCLOCK_Swm);
@@ -121,7 +121,7 @@ void AlxTrace_Init(AlxTrace* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-void AlxTrace_DeInit(AlxTrace* me)
+Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
 	// #1 DeInit UART
 	USART_Deinit(me->usart);	// DeInit Clk and clears all USARTs Registers
@@ -141,7 +141,7 @@ void AlxTrace_DeInit(AlxTrace* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-void AlxTrace_WriteStr(AlxTrace* me, const char* str)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
 	USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str));
 }
