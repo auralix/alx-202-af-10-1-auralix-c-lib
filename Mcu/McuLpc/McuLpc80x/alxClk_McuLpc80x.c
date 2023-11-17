@@ -41,15 +41,14 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxClk_PeriphGpio_EnableClk();
-static void AlxClk_PeriphGpio_Reset();
+static void AlxClk_PeriphGpio_EnableClk(AlxClk* me);
+static void AlxClk_PeriphGpio_Reset(AlxClk* me);
 static bool AlxClk_AreClkNok(AlxClk* me);
 
 static void AlxClk_SetFro(AlxClk* me);
 //static void AlxClk_SetExtClk(AlxClk* me, bool sysOsc);	// MF: Don't know how we will use it
 //static void AlxClk_SetSysPll(AlxClk* me);					// MF: Doesn't work on Lpc804
 
-#if defined(ALX_LPC80X)
 static void AlxClk_Ctor_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(AlxClk* me);
 static void AlxClk_Ctor_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(AlxClk* me);
 static void AlxClk_Ctor_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(AlxClk* me);
@@ -63,10 +62,6 @@ static void AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_
 static void AlxClk_Init_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_7MHz5(AlxClk* me);
 static void AlxClk_Init_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz(AlxClk* me);
 static void AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5(AlxClk* me);
-#endif
-#if defined(ALX_LPC81X) || defined(ALX_LPC82X) || defined(ALX_LPC83X) || defined(ALX_LPC84X)
-// TODO
-#endif
 
 
 //******************************************************************************
@@ -101,22 +96,17 @@ ALX_WEAK void AlxClk_Ctor
 	//me->extClk = 0;	// MF: Don't know how we will use it
 	//me->frg0 = 0;		// MF: Don't know how we will use it
 
-	#if defined(ALX_LPC80X)
 	// MF: Ctor depends on FRO OSC, that's why only 3 different Ctors (for 30, 24 and 18MHz)
-	if		(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default)		{ AlxClk_Ctor_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz)				{ AlxClk_Ctor_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz)				{ AlxClk_Ctor_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz_LPO_1MHz)	{ AlxClk_Ctor_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_LPO_1MHz)	{ AlxClk_Ctor_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_1MHz)		{ AlxClk_Ctor_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_7MHz5)				{ AlxClk_Ctor_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz)				{ AlxClk_Ctor_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5)				{ AlxClk_Ctor_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(me); }
-	#endif
-	#if defined(ALX_LPC81X) || defined(ALX_LPC82X) || defined(ALX_LPC83X) || defined(ALX_LPC84X)
-	// MF: NOTE - this Mcus will have the same enum
-	#endif
-	else																									{ ALX_CLK_ASSERT(false); return; }
+	if		(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default)		{ AlxClk_Ctor_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(me);	}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz)				{ AlxClk_Ctor_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(me);			}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz)				{ AlxClk_Ctor_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(me);				}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz_LPO_1MHz)	{ AlxClk_Ctor_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(me);			}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_LPO_1MHz)	{ AlxClk_Ctor_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(me);	}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_1MHz)		{ AlxClk_Ctor_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(me);				}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_7MHz5)				{ AlxClk_Ctor_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(me);			}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz)				{ AlxClk_Ctor_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(me);	}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5)				{ AlxClk_Ctor_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(me);				}
+	else																									{ ALX_CLK_ASSERT(false); return;													}
 
 	// Info
 	me->isInit = false;
@@ -140,40 +130,40 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	ALX_CLK_ASSERT(me->isInit == false);
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Reset GPIO Periphery
-	AlxClk_PeriphGpio_Reset();
+	// Reset GPIO periphery
+	AlxClk_PeriphGpio_Reset(me);
 
-	// #2 Enable GPIO Periphery clock
-	AlxClk_PeriphGpio_EnableClk();
+	// Enable GPIO periphery clocks
+	AlxClk_PeriphGpio_EnableClk(me);
 
-	// #3 Init Clocks
-	if		(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default)		{ AlxClk_Init_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz)				{ AlxClk_Init_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz)				{ AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz_LPO_1MHz)	{ AlxClk_Init_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz_LPO_1MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_LPO_1MHz)	{ AlxClk_Init_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_LPO_1MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_1MHz)		{ AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_1MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_7MHz5)				{ AlxClk_Init_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_7MHz5(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz)				{ AlxClk_Init_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz(me); }
-	else if (me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5)				{ AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5(me);}
-	else																									{ ALX_CLK_ASSERT(false); return Alx_Err; }
+	// Init clocks
+	if		(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default)		{ AlxClk_Init_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(me);	}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz)				{ AlxClk_Init_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz(me);			}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz)				{ AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz(me);				}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz_LPO_1MHz)	{ AlxClk_Init_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz_LPO_1MHz(me);	}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_LPO_1MHz)	{ AlxClk_Init_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_LPO_1MHz(me);	}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_1MHz)		{ AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_1MHz(me);		}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_7MHz5)				{ AlxClk_Init_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_7MHz5(me);			}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz)				{ AlxClk_Init_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz(me);				}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5)				{ AlxClk_Init_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5(me);				}
+	else																									{ ALX_CLK_ASSERT(false); return Alx_Err;											}
 
-	// #4 Check Clocks
-	if (AlxClk_AreClkNok(me)) { ALX_CLK_TRACE("ErrCheck"); return Alx_Err; }
+	// Check clocks
+	if (AlxClk_AreClkNok(me)) { ALX_CLK_TRACE("Err"); return Alx_Err; }
 
-	// #5 Update SystemCoreClock
+	// Update SystemCoreClock
 	SystemCoreClockUpdate();
 
-	// #6 Configure SysTick
-	if (SysTick_Config(SystemCoreClock / (1000000U / me->tick)) == 1) { ALX_CLK_TRACE("ErrSysTickConfig"); return Alx_Err; }	// MF: In the example it was 1000000 when setting up SysTick
+	// Configure SysTick
+	if (SysTick_Config(SystemCoreClock / (1000000U / me->tick)) == 1) { ALX_CLK_TRACE("Err"); return Alx_Err; }	// MF: In the example it was 1000000 when setting up SysTick
 
-	// #7 Set SystemCoreClock
+	// Set SystemCoreClock
 	me->systemCoreClock = SystemCoreClock;
 
-	// #8 Set isInit
+	// Set isInit
 	me->isInit = true;
 
-	// #9 Return OK
+	// Return
 	return Alx_Ok;
 }
 
@@ -198,12 +188,11 @@ ALX_WEAK Alx_Status AlxClk_DeInit(AlxClk* me)
   */
 ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 {
-	// Assert
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
 
 	if (me->isInit)
 	{
-		if (clk == AlxClk_Clk_McuLpc8xx_CoreSysClk)		return me->coreSysClk;	// MF: tu variable nakurim
+		if (clk == AlxClk_Clk_McuLpc8xx_CoreSysClk)		return me->coreSysClk;
 		if (clk == AlxClk_Clk_McuLpc8xx_MainClk)		return me->mainClk;
 		if (clk == AlxClk_Clk_McuLpc8xx_Fro)			return me->fro;
 		if (clk == AlxClk_Clk_McuLpc8xx_FroDiv)			return me->fro >> 1U;
@@ -215,15 +204,18 @@ ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 	if (clk == AlxClk_Clk_McuLpc8xx_MainClk_Ctor)		return me->mainClk_Ctor;
 	if (clk == AlxClk_Clk_McuLpc8xx_Fro_Ctor)			return me->fro_Ctor;
 
-	if (me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz_LPO_1MHz ||
-		me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_LPO_1MHz ||
-		me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_1MHz)
+	if
+	(
+		(me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz_LPO_1MHz) ||
+		(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_LPO_1MHz) ||
+		(me->config == AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz_LPO_1MHz)
+	)
 	{
 		if (clk == AlxClk_Clk_McuLpc8xx_LPO_Ctor)		return me->lpo_Ctor;
 	}
 
-	ALX_CLK_ASSERT(false); // We shouldn't get here
-	return 0;
+	ALX_CLK_ASSERT(false);	// We should not get here
+	return ALX_NULL;
 }
 
 /**
@@ -240,13 +232,13 @@ void AlxClk_Irq_Handle(AlxClk* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxClk_PeriphGpio_EnableClk()
+static void AlxClk_PeriphGpio_EnableClk(AlxClk* me)
 {
 	CLOCK_EnableClock(kCLOCK_Gpio0);
 
 	//CLOCK_EnableClock(kCLOCK_Gpio1);					// MF: Doesn't work on Lpc804
 }
-static void AlxClk_PeriphGpio_Reset()
+static void AlxClk_PeriphGpio_Reset(AlxClk* me)
 {
 	RESET_PeripheralReset(kGPIO0_RST_N_SHIFT_RSTn);
 
