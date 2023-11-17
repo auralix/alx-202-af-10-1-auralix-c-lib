@@ -110,9 +110,15 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	CLOCK_SetCoreSysClkDiv(me->divider); 		// Divide main clk to provide the system clk to the core, memories, and the perispherals.
 	SystemCoreClock = (me->clkFreq * 1000U);  	// Set SystemCoreClock variable.
 
+	// #6 Configure SysTick
+	if (SysTick_Config(SystemCoreClock / (1000000U / 1000)) == 1) { ALX_CLK_TRACE("ErrSysTickConfig"); return Alx_Err; }	// MF: In the example it was 1000000 when setting up SysTick
+
 	// #5 Enable LPO
 	POWER_EnbaleLPO(true);
 	//POWER_EnbaleLPOInDeepPowerDownMode(true);
+
+	// Return
+	return Alx_Ok;
 }
 
 /**
