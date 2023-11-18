@@ -53,11 +53,8 @@ extern "C" {
 #elif defined(ALX_LPC55S6X)
 #include "alxAdc_McuLpc55S6x.h"
 
-#elif defined(ALX_LPC80X)
+#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
 #include "alxAdc_McuLpc80x.h"
-
-#elif defined(ALX_LPC84X)
-#include "alxAdc_McuLpc84x.h"
 
 #else
 typedef struct { bool dummy; } AlxAdc;
