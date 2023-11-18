@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && (defined(ALX_LPC80X) || defined(ALX_LPC84X))
 
 
 //******************************************************************************
@@ -97,7 +97,7 @@ void AlxI2c_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_LPC80X) || defined(ALX_LPC84X))
 
 #ifdef __cplusplus
 }
