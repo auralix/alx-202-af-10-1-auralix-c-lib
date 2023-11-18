@@ -53,10 +53,7 @@ extern "C" {
 #elif defined(ALX_LPC55S6X)
 #include "alxIoPin_McuLpc55S6x.h"
 
-#elif defined(ALX_LPC80X)
-#include "alxIoPin_McuLpc80x.h"
-
-#elif defined(ALX_LPC84X)
+#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
 #include "alxIoPin_McuLpc80x.h"
 
 #else

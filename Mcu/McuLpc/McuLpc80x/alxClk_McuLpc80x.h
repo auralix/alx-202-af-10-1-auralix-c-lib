@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && (defined(ALX_LPC80X) || defined(ALX_LPC84X))
 
 
 //******************************************************************************
@@ -55,6 +55,7 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
+	#if defined(ALX_LPC80X)
 	AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default,
 	AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz,
 	AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_9MHz,
@@ -64,6 +65,11 @@ typedef enum
 	AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_7MHz5,
 	AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_6MHz,
 	AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5,
+	#endif
+	#if defined(ALX_LPC84X)
+	AlxClk_Config_McuLpc84x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default,
+	AlxClk_Config_McuLpc84x_FroOsc_30MHz_Mainclk_30MHz_CoreSysClk_30MHz,
+	#endif
 } AlxClk_Config;	// MF: NOTE - defined(ALX_LPC81X) || defined(ALX_LPC82X) || defined(ALX_LPC83X) || defined(ALX_LPC84X) this MCUs will have the same enum
 
 typedef struct
@@ -77,13 +83,10 @@ typedef struct
 	uint32_t coreSysClk;
 	uint32_t mainClk;
 	uint32_t fro;
-	//uint32_t extClk;	// MF: Don't know how we will use it
-	//uint32_t frg0;	// MF: Don't know how we will use it
 
 	uint32_t coreSysClk_Ctor;
 	uint32_t mainClk_Ctor;
 	uint32_t fro_Ctor;
-	uint32_t lpo_Ctor;
 
 	// Info
 	bool isInit;
@@ -102,7 +105,7 @@ void AlxClk_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_LPC80X) || defined(ALX_LPC84X))
 
 #ifdef __cplusplus
 }
