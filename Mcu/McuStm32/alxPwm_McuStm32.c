@@ -75,7 +75,7 @@ void AlxPwm_Ctor
 	Alx_Ch* chArr,
 	uint8_t numOfCh,
  	AlxClk* clk,
-	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	uint16_t* dutyDefaultArr_permil,
 	#else
 	float* dutyDefaultArr_pct,
@@ -93,7 +93,7 @@ void AlxPwm_Ctor
 	(void)chArr;
 	ALX_PWM_ASSERT(numOfCh <= ALX_PWM_BUFF_LEN);
 	(void)clk;
-	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	(void)dutyDefaultArr_permil;
 	#else
 	(void)dutyDefaultArr_pct;
@@ -110,7 +110,7 @@ void AlxPwm_Ctor
 	me->chArr = chArr;
 	me->numOfCh = numOfCh;
 	me->clk = clk;
-	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	me->dutyDefaultArr_permil = dutyDefaultArr_permil;
 	#else
 	me->dutyDefaultArr_pct = dutyDefaultArr_pct;
@@ -153,7 +153,7 @@ void AlxPwm_Ctor
 		me->chtim[buffPos].OCNIdleState = TIM_OCNIDLESTATE_RESET;
 		#endif
 		me->ch[buffPos] = *(me->chArr + buffPos);
-		#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+		#if defined(ALX_PWM_OPTIMIZE_SIZE)
 		me->dutyDefaultArr_permil[buffPos] = *(me->dutyDefaultArr_permil + buffPos);
 		#else
 		me->dutyDefault_pct[buffPos] = *(me->dutyDefaultArr_pct + buffPos);
@@ -214,7 +214,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	me->isInit = true;
 
 	// Set TIM_PWM channels default duty
-	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
 		if (AlxPwm_SetDuty_permil(me, me->ch[i], me->dutyDefault_permil[i]) != Alx_Ok) { ALX_PWM_TRACE("Err"); return Alx_Err; }
@@ -283,7 +283,7 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 	ALX_PWM_ASSERT((0.f <= duty_pct) && (duty_pct <= 100.f));
 
 	// Optimize guard
-	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	ALX_PWM_ASSERT(false);
 	return Alx_Err;
 	#else
@@ -326,7 +326,7 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 	ALX_PWM_ASSERT((0 <= duty_permil) && (duty_permil <= 1000));
 
 	// Optimize guard
-	#if !(defined (ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	#if !(defined (ALX_PWM_OPTIMIZE_SIZE))
 	ALX_PWM_ASSERT(false);
 	return ALX_NULL;
 	#else

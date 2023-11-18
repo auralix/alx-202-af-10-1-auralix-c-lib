@@ -162,7 +162,7 @@ extern "C" {
 // Optimize Size
 //------------------------------------------------------------------------------
 //#define ALX_ADC_OPTIMIZE_SIZE
-//#define ALX_OPTIMIZE_SIZE_ALL
+//#define ALX_PWM_OPTIMIZE_SIZE
 
 
 #ifdef __cplusplus

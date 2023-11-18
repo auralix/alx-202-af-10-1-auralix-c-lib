@@ -71,7 +71,7 @@ void AlxAdc_Ctor
 	uint8_t numOfIoPinsAndCh,
 	AlxClk* clk,
 	AlxAdc_Clk adcClk,
-	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
 	uint32_t vRef_mV
 	#else
 	float vRef_V
@@ -85,7 +85,7 @@ void AlxAdc_Ctor
 	ALX_ADC_ASSERT(numOfIoPinsAndCh <= ALX_ADC_BUFF_LEN);
 	(void)clk;
 	(void)adcClk;
-	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
 	(void)vRef_mV;
 	#else
 	(void)vRef_V;
@@ -99,7 +99,7 @@ void AlxAdc_Ctor
 	me->chArr = chArr;
 	me->numOfIoPinsAndCh = numOfIoPinsAndCh;
 	me->adcClk = adcClk;
-	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
 	me->vRef_mV = vRef_mV;
 	#else
 	me->vRef_V = vRef_V;
@@ -254,7 +254,7 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	(void)ch;
 
 	// Optimize Guard
-	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
 	ALX_ADC_ASSERT(false);
 	return ALX_NULL;
 	#else
@@ -290,7 +290,7 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 	(void)ch;
 
 	// Optimize Guard
-	#if !(defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	#if !(defined(ALX_ADC_OPTIMIZE_SIZE))
 	ALX_ADC_ASSERT(false);
 	return ALX_NULL;
 	#else

@@ -72,7 +72,7 @@ typedef struct
 	Alx_Ch* chArr;
 	uint8_t numOfIoPinsAndCh;
 	AlxAdc_Clk adcClk;
-	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
 	uint32_t vRef_mV;
 	#else
 	float vRef_V;
@@ -101,7 +101,7 @@ void AlxAdc_Ctor
 	uint8_t numOfIoPinsAndCh,
 	AlxClk* clk,
 	AlxAdc_Clk adcClk,
-	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
 	uint32_t vRef_mV
 	#else
 	float vRef_V
