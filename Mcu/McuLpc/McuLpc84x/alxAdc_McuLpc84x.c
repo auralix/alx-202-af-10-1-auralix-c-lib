@@ -195,20 +195,20 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 //******************************************************************************
 static uint8_t AlxAdc_GetChannel(AlxIoPin* pin)
 {
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN0)		return 0U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN1)		return 1U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN2)		return 2U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN3)		return 3U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN4)		return 4U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN5)		return 5U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN6)		return 6U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN7)		return 7U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN8)		return 8U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN9)		return 9U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN10)		return 10U;
-	if (pin->swmFunc == AlxIoPin_SwmFunc_ADC_CHN11)		return 11U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN0)	return 0U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN1)	return 1U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN2)	return 2U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN3)	return 3U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN4)	return 4U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN5)	return 5U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN6)	return 6U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN7)	return 7U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN8)	return 8U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN9)	return 9U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN10)	return 10U;
+	if (pin->func == AlxIoPin_Func_Swm_ADC_CHN11)	return 11U;
 
-	else												return 0xFF;	// We shouldn't get here
+	else											return 0xFF;	// We shouldn't get here
 }
 
 

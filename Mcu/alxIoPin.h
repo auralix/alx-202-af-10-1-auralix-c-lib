@@ -57,7 +57,7 @@ extern "C" {
 #include "alxIoPin_McuLpc80x.h"
 
 #elif defined(ALX_LPC84X)
-#include "alxIoPin_McuLpc84x.h"
+#include "alxIoPin_McuLpc80x.h"
 
 #else
 typedef struct { bool dummy; } AlxIoPin;
