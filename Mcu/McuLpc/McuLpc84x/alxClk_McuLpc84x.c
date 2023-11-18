@@ -41,11 +41,11 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxClk_SetFro(AlxClk* me);
-static void AlxClk_SetExtClk(AlxClk* me, bool sysOsc);
-//static void AlxClk_SetWdtOsc(AlxClk* me); // TODO
-//static void AlxClk_SetFroDiv(AlxClk* me);
-//static void AlxClk_SetSysPll(AlxClk* me);
+static void AlxClk_PeriphGpio_EnableClk(AlxClk* me);
+static void AlxClk_PeriphGpio_Reset(AlxClk* me);
+static bool AlxClk_AreClkNok(AlxClk* me);
+static void AlxClk_Ctor_McuLpc84x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(AlxClk* me);
+static void AlxClk_Ctor_McuLpc84x_FroOsc_30MHz_Mainclk_30MHz_CoreSysClk_30MHz(AlxClk* me);
 
 
 //******************************************************************************
@@ -55,23 +55,34 @@ static void AlxClk_SetExtClk(AlxClk* me, bool sysOsc);
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		mainClkSource
-  * @param[in]		clkFreq
-  * @param[in]		divider
+  * @param[in]		config
+  * @param[in]		tick
   */
-void AlxClk_Ctor
+ALX_WEAK void AlxClk_Ctor
 (
 	AlxClk* me,
-	clock_main_clk_src_t mainClkSource,
-	uint32_t clkFreq,
-	uint8_t divider)
+	AlxClk_Config config,
+	AlxClk_Tick tick
+)
 {
+	// Assert
+	ALX_CLK_ASSERT(tick >= AlxClk_Tick_100us);
+
 	// Parameters
-	me->mainClkSource = mainClkSource;
-	me->clkFreq = clkFreq;
-	me->divider = divider;
+	me->config = config;
+	me->tick = tick;
+
+	// Variables
+	me->coreSysClk = 0;
+	me->mainClk = 0;
+	me->fro = 0;
+
+	if		(me->config == AlxClk_Config_McuLpc84x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default)		{ ALX_CLK_ASSERT(false); return;													}	// TODO
+	else if	(me->config == AlxClk_Config_McuLpc84x_FroOsc_30MHz_Mainclk_30MHz_CoreSysClk_30MHz)				{ AlxClk_Ctor_McuLpc84x_FroOsc_30MHz_Mainclk_30MHz_CoreSysClk_30MHz(me);			}
+	else																									{ ALX_CLK_ASSERT(false); return;													}
 
 	// Info
+	me->isInit = false;
 	me->wasCtorCalled = true;
 }
 
@@ -88,34 +99,38 @@ void AlxClk_Ctor
   */
 ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
+	// Assert
 	ALX_CLK_ASSERT(me->isInit == false);
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Set isInit attribute
+	// Reset GPIO periphery
+	AlxClk_PeriphGpio_Reset(me);
+
+	// Enable GPIO periphery clocks
+	AlxClk_PeriphGpio_EnableClk(me);
+
+	// Init
+	POWER_DisablePD(kPDRUNCFG_PD_FRO_OUT);		// MF: Ensures FRO is on
+	POWER_DisablePD(kPDRUNCFG_PD_FRO);			// MF: Ensures FRO is on
+	CLOCK_SetFroOscFreq(kCLOCK_FroOscOut30M);	// MF: Set up FRO freq
+	CLOCK_SetFroOutClkSrc(kCLOCK_FroSrcFroOsc);	// MF: Set FRO clock source direct from FRO oscillator // Doesn't work on Lpc804
+	CLOCK_SetMainClkSrc(kCLOCK_MainClkSrcFro);	// MF: Select FRO for Main Clk
+	CLOCK_SetCoreSysClkDiv(1);					// MF: Divide main clk to provide the system clk to the core, memories, and the peripherals
+
+	// Check clocks
+	if (AlxClk_AreClkNok(me)) { ALX_CLK_TRACE("Err"); return Alx_Err; }
+
+	// Update SystemCoreClock
+	SystemCoreClockUpdate();
+
+	// Configure SysTick
+	if (SysTick_Config(SystemCoreClock / (1000000U / me->tick)) == 1) { ALX_CLK_TRACE("Err"); return Alx_Err; }	// MF: In the example it was 1000000 when setting up SysTick
+
+	// Set SystemCoreClock
+	me->systemCoreClock = SystemCoreClock;
+
+	// Set isInit
 	me->isInit = true;
-
-	// #2 Enable GPIO clock
-	CLOCK_EnableClock(kCLOCK_Gpio0);
-	CLOCK_EnableClock(kCLOCK_Gpio1);
-
-	// #3 Set up clk Source
-	if(me->mainClkSource == kCLOCK_MainClkSrcFro)		{ AlxClk_SetFro(me); }
-	if (me->mainClkSource == kCLOCK_MainClkSrcExtClk)	{ AlxClk_SetExtClk(me, true); }	// 2nd argument shouldn be hardcoded!!!
-	//if (me->mainClkSource == kCLOCK_MainClkSrcWdtOsc) // TODO
-	//if (me->mainClkSource == kCLOCK_MainClkSrcFroDiv)
-	//if (me->mainClkSource == kCLOCK_MainClkSrcSysPll)
-
-	// #4 Configure the main clock and system clock
-	CLOCK_SetMainClkSrc(me->mainClkSource); 		// Select main clock in MAINCLKSEL and update MAINCLKUEN
-	CLOCK_SetCoreSysClkDiv(me->divider); 		// Divide main clk to provide the system clk to the core, memories, and the perispherals.
-	SystemCoreClock = (me->clkFreq * 1000U);  	// Set SystemCoreClock variable.
-
-	// #6 Configure SysTick
-	if (SysTick_Config(SystemCoreClock / (1000000U / 1000)) == 1) { ALX_CLK_TRACE("ErrSysTickConfig"); return Alx_Err; }	// MF: In the example it was 1000000 when setting up SysTick
-
-	// #5 Enable LPO
-	POWER_EnbaleLPO(true);
-	//POWER_EnbaleLPOInDeepPowerDownMode(true);
 
 	// Return
 	return Alx_Ok;
@@ -129,40 +144,83 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
   */
 ALX_WEAK Alx_Status AlxClk_DeInit(AlxClk* me)
 {
-	ALX_CLK_ASSERT(me->isInit == true);
+	// TODO
+	ALX_CLK_ASSERT(false);
+	return Alx_Err;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		clk
+  * @return
+  */
+ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
+{
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Enable GPIO clock
-	CLOCK_DisableClock(kCLOCK_Gpio0);
-	CLOCK_DisableClock(kCLOCK_Gpio1);
+	if (me->isInit)
+	{
+		if (clk == AlxClk_Clk_McuLpc8xx_CoreSysClk)		return me->coreSysClk;
+		if (clk == AlxClk_Clk_McuLpc8xx_MainClk)		return me->mainClk;
+		if (clk == AlxClk_Clk_McuLpc8xx_Fro)			return me->fro;
+	}
 
-	me->isInit = false;
+	if (clk == AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor)	return me->coreSysClk_Ctor;
+	if (clk == AlxClk_Clk_McuLpc8xx_MainClk_Ctor)		return me->mainClk_Ctor;
+	if (clk == AlxClk_Clk_McuLpc8xx_Fro_Ctor)			return me->fro_Ctor;
 
-	return Alx_Ok;
+	ALX_CLK_ASSERT(false);	// We should not get here
+	return ALX_NULL;
+}
+
+/**
+  * @brief
+  * @param[in,out] me
+  */
+void AlxClk_Irq_Handle(AlxClk* me)
+{
+	// TODO
+	ALX_CLK_ASSERT(false);
 }
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxClk_SetFro(AlxClk* me)
+static void AlxClk_PeriphGpio_EnableClk(AlxClk* me)
 {
-	POWER_DisablePD(kPDRUNCFG_PD_FRO_OUT);    	// Ensure FRO is on
-	POWER_DisablePD(kPDRUNCFG_PD_FRO);    		// Ensure FRO is on
-	CLOCK_SetFroOscFreq(me->clkFreq);    		// Set up FRO freq
-	CLOCK_SetFroOutClkSrc(kCLOCK_FroSrcFroOsc); 	// Set FRO clock source direct from FRO oscillator
+	CLOCK_EnableClock(kCLOCK_Gpio0);
+	CLOCK_EnableClock(kCLOCK_Gpio1);
 }
-static void AlxClk_SetExtClk(AlxClk* me, bool sysOsc)
+static void AlxClk_PeriphGpio_Reset(AlxClk* me)
 {
-	if (sysOsc)
-	{
-		POWER_DisablePD(kPDRUNCFG_PD_SYSOSC);    // Ensure Crystal Oscillator is on
-		CLOCK_Select(kEXT_Clk_From_SysOsc);    	// Select system oscillator as an external clockk
-	}
-	else
-	{
-		CLOCK_Select(kEXT_Clk_From_ClkIn); 		// Select clk_in (direct from external IO) as an external clk
-	}
+	RESET_PeripheralReset(kGPIO0_RST_N_SHIFT_RSTn);
+	RESET_PeripheralReset(kGPIO1_RST_N_SHIFT_RSTn);
+}
+static bool AlxClk_AreClkNok(AlxClk* me)
+{
+	me->coreSysClk = CLOCK_GetCoreSysClkFreq();
+	me->mainClk = CLOCK_GetMainClkFreq();
+	me->fro = CLOCK_GetFroFreq();
+
+	if		(me->coreSysClk != me->coreSysClk_Ctor)		{ ALX_CLK_TRACE("Err");	return true; }
+	else if (me->mainClk != me->mainClk_Ctor)			{ ALX_CLK_TRACE("Err");	return true; }
+	else if (me->fro != me->fro_Ctor)					{ ALX_CLK_TRACE("Err");	return true; }
+
+	return false;
+}
+static void AlxClk_Ctor_McuLpc84x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default(AlxClk* me)
+{
+	me->coreSysClk_Ctor			= 12000000U;
+	me->mainClk_Ctor			= 12000000U;
+	me->fro_Ctor				= 24000000U;
+}
+static void AlxClk_Ctor_McuLpc84x_FroOsc_30MHz_Mainclk_30MHz_CoreSysClk_30MHz(AlxClk* me)
+{
+	me->coreSysClk_Ctor			= 30000000U;
+	me->mainClk_Ctor			= 30000000U;
+	me->fro_Ctor				= 30000000U;
 }
 
 

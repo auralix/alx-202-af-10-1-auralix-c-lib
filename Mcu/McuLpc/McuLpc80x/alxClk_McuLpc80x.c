@@ -235,13 +235,11 @@ void AlxClk_Irq_Handle(AlxClk* me)
 static void AlxClk_PeriphGpio_EnableClk(AlxClk* me)
 {
 	CLOCK_EnableClock(kCLOCK_Gpio0);
-
 	//CLOCK_EnableClock(kCLOCK_Gpio1);					// MF: Doesn't work on Lpc804
 }
 static void AlxClk_PeriphGpio_Reset(AlxClk* me)
 {
 	RESET_PeripheralReset(kGPIO0_RST_N_SHIFT_RSTn);
-
 	//RESET_PeripheralReset(kGPIO1_RST_N_SHIFT_RSTn);	// MF: Doesn't work on Lpc804
 }
 static void AlxClk_SetFro(AlxClk* me)

@@ -53,12 +53,27 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxClk_Config_McuLpc84x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default,
+	AlxClk_Config_McuLpc84x_FroOsc_30MHz_Mainclk_30MHz_CoreSysClk_30MHz
+} AlxClk_Config;	// MF: NOTE - defined(ALX_LPC81X) || defined(ALX_LPC82X) || defined(ALX_LPC83X) || defined(ALX_LPC84X) this MCUs will have the same enum
+
 typedef struct
 {
 	// Parameters
-	clock_main_clk_src_t mainClkSource;
-	uint32_t clkFreq;
-	uint8_t divider;
+	AlxClk_Config config;
+	AlxClk_Tick tick;
+
+	// Variables
+	uint32_t systemCoreClock;
+	uint32_t coreSysClk;
+	uint32_t mainClk;
+	uint32_t fro;
+
+	uint32_t coreSysClk_Ctor;
+	uint32_t mainClk_Ctor;
+	uint32_t fro_Ctor;
 
 	// Info
 	bool isInit;
@@ -72,9 +87,8 @@ typedef struct
 void AlxClk_Ctor
 (
 	AlxClk* me,
-	clock_main_clk_src_t mainClkSource,
-	uint32_t clkFreq,
-	uint8_t divider
+	AlxClk_Config config,
+	AlxClk_Tick tick
 );
 
 
