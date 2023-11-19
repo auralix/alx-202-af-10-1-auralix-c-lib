@@ -39,7 +39,49 @@ extern "C" {
 //******************************************************************************
 // Includes
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// ALX - EXT
+//------------------------------------------------------------------------------
+#include "alxAdau1961.h"
+#include "alxAds8678.h"
+#include "alxAds114s08.h"
+#include "alxAdxl355.h"
+#include "alxBq24600.h"
+#include "alxBts724g.h"
+#include "alxIna228.h"
+#include "alxMcp73831.h"
+#include "alxNtcg103jf103ft1s.h"
+#include "alxPcal6416a.h"
+#include "alxTmp1075.h"
+#include "alxTpa3255.h"
+#include "alxVeml6040.h"
+#include "alxVnh7040.h"
+
+
+//------------------------------------------------------------------------------
+// ALX - MCU
+//------------------------------------------------------------------------------
 #include "alxAdc.h"
+#include "alxCan.h"
+#include "alxClk.h"
+#include "alxDac.h"
+#include "alxI2c.h"
+#include "alxI2s.h"
+#include "alxIoPin.h"
+#include "alxIoPinIrq.h"
+#include "alxPwm.h"
+#include "alxRtc.h"
+#include "alxSerialPort.h"
+#include "alxSpi.h"
+#include "alxTrace.h"
+#include "alxWdt.h"
+
+
+//------------------------------------------------------------------------------
+// ALX
+//------------------------------------------------------------------------------
 #include "alxAssert.h"
 #include "alxAudio.h"
 #include "alxAudioPlayer.h"
@@ -48,11 +90,8 @@ extern "C" {
 #include "alxBool.h"
 #include "alxBound.h"
 #include "alxBuild.h"
-#include "alxCan.h"
 #include "alxCanParser.h"
-#include "alxClk.h"
 #include "alxCrc.h"
-#include "alxDac.h"
 #include "alxDelay.h"
 #include "alxFifo.h"
 #include "alxFiltGlitchBool.h"
@@ -62,13 +101,9 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxHys1.h"
 #include "alxHys2.h"
-#include "alxI2c.h"
-#include "alxI2s.h"
 #include "alxId.h"
 #include "alxInc.h"
 #include "alxInterpLin.h"
-#include "alxIoPin.h"
-#include "alxIoPinIrq.h"
 #include "alxLfsConfig.h"
 #include "alxLin.h"
 #include "alxLinFun.h"
@@ -86,35 +121,15 @@ extern "C" {
 #include "alxParamKvStore.h"
 #include "alxParamMgmt.h"
 #include "alxParamStore.h"
-#include "alxPwm.h"
 #include "alxPwr.h"
 #include "alxRange.h"
-#include "alxRtc.h"
+#include "alxRotSw.h"
 #include "alxRtc_Global.h"
 #include "alxSd.h"
-#include "alxSerialPort.h"
-#include "alxSpi.h"
 #include "alxTempSensRtdVdiv.h"
 #include "alxTick.h"
 #include "alxTimSw.h"
-#include "alxTrace.h"
 #include "alxVdiv.h"
-#include "alxWdt.h"
-
-#include "alxAdau1961.h"
-#include "alxAds8678.h"
-#include "alxAds114s08.h"
-#include "alxAdxl355.h"
-#include "alxBq24600.h"
-#include "alxBts724g.h"
-#include "alxIna228.h"
-#include "alxMcp73831.h"
-#include "alxNtcg103jf103ft1s.h"
-#include "alxPcal6416a.h"
-#include "alxTmp1075.h"
-#include "alxTpa3255.h"
-#include "alxVeml6040.h"
-#include "alxVnh7040.h"
 
 
 #ifdef __cplusplus
