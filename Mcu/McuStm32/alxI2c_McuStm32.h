@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -58,8 +58,8 @@ extern "C" {
 typedef enum
 {
 	#if defined(ALX_STM32F0)
-	AlxI2c_Clk_McuStm32F0_I2cClk_100kHz_0ns_FallTime_0ns_Hsi_8MHz = 0x2000090E,	// TV: TODO, add config for 100ns rise/fall time
-	AlxI2c_Clk_McuStm32F0_I2cClk_400kHz_0ns_FallTime_0ns_Hsi_8MHz = 0x0000020B,
+	AlxI2c_Clk_McuStm32F0_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Hsi_8MHz = 0x2000090E,	// TV: TODO, add config for 100ns rise/fall time
+	AlxI2c_Clk_McuStm32F0_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Hsi_8MHz = 0x0000020B,
 	#endif
 	#if defined(ALX_STM32F4)
 	AlxI2c_Clk_McuStm32F4_I2cClk_100kHz_Pclk1Apb1_45MHz = 100000,
@@ -78,10 +78,16 @@ typedef enum
 	AlxI2c_Clk_McuStm32L0_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_32MHz = 0x0060112F,		// TV: TODO, test
 	#endif
 	#if defined(ALX_STM32L4)
-	AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_0ns_FallTime_0ns_Pclk1Apb1_80MHz = 0x10909CEC,	// TV: TODO, add config for 100ns rise/fall time
-	AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_0ns_FallTime_0ns_Pclk1Apb1_80MHz = 0x00702991,
-	AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_0ns_FallTime_0ns_Pclk1Apb1_120MHz = 0x307075B1,
-	AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_0ns_FallTime_0ns_Pclk1Apb1_120MHz = 0x00B03FDB,
+	AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_80MHz = 0x10909CEC,	// TV: TODO, add config for 100ns rise/fall time
+	AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_80MHz = 0x00702991,
+	AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_120MHz = 0x307075B1,
+	AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_120MHz = 0x00B03FDB,
+	#endif
+	#if defined(ALX_STM32U5)
+	AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz = 0x30D29DE4,
+	AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz = 0x10F32A82,
+	AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz = 0x30D29DE4,
+	AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz = 0x10F32A82,
 	#endif
 } AlxI2c_Clk;
 
@@ -120,7 +126,7 @@ void AlxI2c_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
 
 #ifdef __cplusplus
 }

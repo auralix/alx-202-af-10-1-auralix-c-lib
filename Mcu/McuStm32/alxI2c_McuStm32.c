@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -88,7 +88,7 @@ void AlxI2c_Ctor
 	me->hi2c.Init.OwnAddress2 = ALX_NULL;
 	me->hi2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	me->hi2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
 	me->hi2c.Init.Timing = (uint32_t)i2cClk;
 	me->hi2c.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
 	#endif
@@ -598,8 +598,8 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 	#if defined(ALX_STM32L4)
 	if
 	(
-		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_0ns_FallTime_0ns_Pclk1Apb1_80MHz) ||
-		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_0ns_FallTime_0ns_Pclk1Apb1_80MHz)
+		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_80MHz) ||
+		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_80MHz)
 	)
 	{
 		if(80000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
@@ -609,8 +609,8 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 	}
 	else if
 	(
-		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_0ns_FallTime_0ns_Pclk1Apb1_120MHz) ||
-		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_0ns_FallTime_0ns_Pclk1Apb1_120MHz)
+		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_120MHz) ||
+		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_120MHz)
 	)
 	{
 		#if !defined(PWR_CR5_R1MODE)
@@ -621,6 +621,36 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 			return true;
 		else
 			return false;
+	}
+	#endif
+	#if defined(ALX_STM32U5)
+	if ((me->hi2c.Instance == I2C1) || (me->hi2c.Instance == I2C2) || (me->hi2c.Instance == I2C4))
+	{
+		if
+		(
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz)
+		)
+		{
+			if(160000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
+				return true;
+			else
+				return false;
+		}
+	}
+	if (me->hi2c.Instance == I2C3)
+	{
+		if
+		(
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz)
+		)
+		{
+			if(160000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk3Apb3_Ctor))
+				return true;
+			else
+				return false;
+		}
 	}
 	#endif
 
@@ -752,4 +782,4 @@ static void AlxI2c_Periph_ReleaseReset(AlxI2c* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))

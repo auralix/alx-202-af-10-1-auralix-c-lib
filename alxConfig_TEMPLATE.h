@@ -115,11 +115,15 @@ extern "C" {
 //#define ALX_STM32L4_CMSIS_VER_REQUIRED 0x01010100 // 1.1.1.0
 //#define ALX_STM32L4_HAL_VER_REQUIRED 0x01010100 // 1.1.1.0
 
+//#define ALX_STM32U5
+//#define ALX_STM32U5_CMSIS_VER_REQUIRED 0x01010100 // 1.1.1.0
+//#define ALX_STM32U5_HAL_VER_REQUIRED 0x01010100 // 1.1.1.0
+
 // HW - LPC
 //#define ALX_LPC17XX
 //#define ALX_LPC55S6X
 //#define ALX_LPC80X
-#define ALX_LPC84X
+//#define ALX_LPC84X
 
 
 //------------------------------------------------------------------------------
