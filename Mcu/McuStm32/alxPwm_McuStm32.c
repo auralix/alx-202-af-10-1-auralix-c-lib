@@ -508,295 +508,287 @@ static uint32_t AlxPwm_GetCh(Alx_Ch ch)
 //------------------------------------------------------------------------------
 static void AlxPwm_Periph_EnableClk(AlxPwm* me)
 {
-	bool isErr = true;
-
 	#if defined(TIM1)
-	if (me->htim.Instance == TIM1)	{ __HAL_RCC_TIM1_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM1)	{ __HAL_RCC_TIM1_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM2)
-	if (me->htim.Instance == TIM2)	{ __HAL_RCC_TIM2_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM2)	{ __HAL_RCC_TIM2_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM3)
-	if (me->htim.Instance == TIM3)	{ __HAL_RCC_TIM3_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM3)	{ __HAL_RCC_TIM3_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM4)
-	if (me->htim.Instance == TIM4)	{ __HAL_RCC_TIM4_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM4)	{ __HAL_RCC_TIM4_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM5)
-	if (me->htim.Instance == TIM5)	{ __HAL_RCC_TIM5_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM5)	{ __HAL_RCC_TIM5_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM6)
-	if (me->htim.Instance == TIM6)	{ __HAL_RCC_TIM6_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM6)	{ __HAL_RCC_TIM6_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM7)
-	if (me->htim.Instance == TIM7)	{ __HAL_RCC_TIM7_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM7)	{ __HAL_RCC_TIM7_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM8)
-	if (me->htim.Instance == TIM8)	{ __HAL_RCC_TIM8_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM8)	{ __HAL_RCC_TIM8_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM9)
-	if (me->htim.Instance == TIM9)	{ __HAL_RCC_TIM9_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM9)	{ __HAL_RCC_TIM9_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM10)
-	if (me->htim.Instance == TIM10)	{ __HAL_RCC_TIM10_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM10)	{ __HAL_RCC_TIM10_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM11)
-	if (me->htim.Instance == TIM11)	{ __HAL_RCC_TIM11_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM11)	{ __HAL_RCC_TIM11_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM12)
-	if (me->htim.Instance == TIM12)	{ __HAL_RCC_TIM12_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM12)	{ __HAL_RCC_TIM12_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM13)
-	if (me->htim.Instance == TIM13)	{ __HAL_RCC_TIM13_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM13)	{ __HAL_RCC_TIM13_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM14)
-	if (me->htim.Instance == TIM14)	{ __HAL_RCC_TIM14_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM14)	{ __HAL_RCC_TIM14_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM15)
-	if (me->htim.Instance == TIM15)	{ __HAL_RCC_TIM15_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM15)	{ __HAL_RCC_TIM15_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM16)
-	if (me->htim.Instance == TIM16)	{ __HAL_RCC_TIM16_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM16)	{ __HAL_RCC_TIM16_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM17)
-	if (me->htim.Instance == TIM17)	{ __HAL_RCC_TIM17_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM17)	{ __HAL_RCC_TIM17_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM18)
-	if (me->htim.Instance == TIM18)	{ __HAL_RCC_TIM18_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM18)	{ __HAL_RCC_TIM18_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM19)
-	if (me->htim.Instance == TIM19)	{ __HAL_RCC_TIM19_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM19)	{ __HAL_RCC_TIM19_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM20)
-	if (me->htim.Instance == TIM20)	{ __HAL_RCC_TIM20_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM20)	{ __HAL_RCC_TIM20_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM21)
-	if (me->htim.Instance == TIM21)	{ __HAL_RCC_TIM21_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM21)	{ __HAL_RCC_TIM21_CLK_ENABLE(); return; }
 	#endif
 	#if defined(TIM22)
-	if (me->htim.Instance == TIM22)	{ __HAL_RCC_TIM22_CLK_ENABLE(); isErr = false; }
+	if (me->htim.Instance == TIM22)	{ __HAL_RCC_TIM22_CLK_ENABLE(); return; }
 	#endif
 
-	if(isErr)						{ ALX_PWM_ASSERT(false); }	// We should not get here
+	ALX_PWM_ASSERT(false);	// We should not get here
 }
 static void AlxPwm_Periph_DisableClk(AlxPwm* me)
 {
-	bool isErr = true;
-
 	#if defined(TIM1)
-	if (me->htim.Instance == TIM1)	{ __HAL_RCC_TIM1_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM1)	{ __HAL_RCC_TIM1_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM2)
-	if (me->htim.Instance == TIM2)	{ __HAL_RCC_TIM2_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM2)	{ __HAL_RCC_TIM2_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM3)
-	if (me->htim.Instance == TIM3)	{ __HAL_RCC_TIM3_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM3)	{ __HAL_RCC_TIM3_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM4)
-	if (me->htim.Instance == TIM4)	{ __HAL_RCC_TIM4_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM4)	{ __HAL_RCC_TIM4_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM5)
-	if (me->htim.Instance == TIM5)	{ __HAL_RCC_TIM5_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM5)	{ __HAL_RCC_TIM5_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM6)
-	if (me->htim.Instance == TIM6)	{ __HAL_RCC_TIM6_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM6)	{ __HAL_RCC_TIM6_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM7)
-	if (me->htim.Instance == TIM7)	{ __HAL_RCC_TIM7_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM7)	{ __HAL_RCC_TIM7_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM8)
-	if (me->htim.Instance == TIM8)	{ __HAL_RCC_TIM8_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM8)	{ __HAL_RCC_TIM8_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM9)
-	if (me->htim.Instance == TIM9)	{ __HAL_RCC_TIM9_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM9)	{ __HAL_RCC_TIM9_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM10)
-	if (me->htim.Instance == TIM10)	{ __HAL_RCC_TIM10_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM10)	{ __HAL_RCC_TIM10_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM11)
-	if (me->htim.Instance == TIM11)	{ __HAL_RCC_TIM11_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM11)	{ __HAL_RCC_TIM11_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM12)
-	if (me->htim.Instance == TIM12)	{ __HAL_RCC_TIM12_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM12)	{ __HAL_RCC_TIM12_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM13)
-	if (me->htim.Instance == TIM13)	{ __HAL_RCC_TIM13_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM13)	{ __HAL_RCC_TIM13_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM14)
-	if (me->htim.Instance == TIM14)	{ __HAL_RCC_TIM14_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM14)	{ __HAL_RCC_TIM14_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM15)
-	if (me->htim.Instance == TIM15)	{ __HAL_RCC_TIM15_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM15)	{ __HAL_RCC_TIM15_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM16)
-	if (me->htim.Instance == TIM16)	{ __HAL_RCC_TIM16_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM16)	{ __HAL_RCC_TIM16_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM17)
-	if (me->htim.Instance == TIM17)	{ __HAL_RCC_TIM17_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM17)	{ __HAL_RCC_TIM17_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM18)
-	if (me->htim.Instance == TIM18)	{ __HAL_RCC_TIM18_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM18)	{ __HAL_RCC_TIM18_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM19)
-	if (me->htim.Instance == TIM19)	{ __HAL_RCC_TIM19_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM19)	{ __HAL_RCC_TIM19_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM20)
-	if (me->htim.Instance == TIM20)	{ __HAL_RCC_TIM20_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM20)	{ __HAL_RCC_TIM20_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM21)
-	if (me->htim.Instance == TIM21)	{ __HAL_RCC_TIM21_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM21)	{ __HAL_RCC_TIM21_CLK_DISABLE(); return; }
 	#endif
 	#if defined(TIM22)
-	if (me->htim.Instance == TIM22)	{ __HAL_RCC_TIM22_CLK_DISABLE(); isErr = false; }
+	if (me->htim.Instance == TIM22)	{ __HAL_RCC_TIM22_CLK_DISABLE(); return; }
 	#endif
 
-	if(isErr)						{ ALX_PWM_ASSERT(false); }	// We should not get here
+	ALX_PWM_ASSERT(false);	// We should not get here
 }
 static void AlxPwm_Periph_ForceReset(AlxPwm* me)
 {
-	bool isErr = true;
-
 	#if defined(TIM1)
-	if (me->htim.Instance == TIM1)	{ __HAL_RCC_TIM1_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM1)	{ __HAL_RCC_TIM1_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM2)
-	if (me->htim.Instance == TIM2)	{ __HAL_RCC_TIM2_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM2)	{ __HAL_RCC_TIM2_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM3)
-	if (me->htim.Instance == TIM3)	{ __HAL_RCC_TIM3_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM3)	{ __HAL_RCC_TIM3_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM4)
-	if (me->htim.Instance == TIM4)	{ __HAL_RCC_TIM4_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM4)	{ __HAL_RCC_TIM4_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM5)
-	if (me->htim.Instance == TIM5)	{ __HAL_RCC_TIM5_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM5)	{ __HAL_RCC_TIM5_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM6)
-	if (me->htim.Instance == TIM6)	{ __HAL_RCC_TIM6_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM6)	{ __HAL_RCC_TIM6_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM7)
-	if (me->htim.Instance == TIM7)	{ __HAL_RCC_TIM7_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM7)	{ __HAL_RCC_TIM7_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM8)
-	if (me->htim.Instance == TIM8)	{ __HAL_RCC_TIM8_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM8)	{ __HAL_RCC_TIM8_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM9)
-	if (me->htim.Instance == TIM9)	{ __HAL_RCC_TIM9_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM9)	{ __HAL_RCC_TIM9_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM10)
-	if (me->htim.Instance == TIM10)	{ __HAL_RCC_TIM10_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM10)	{ __HAL_RCC_TIM10_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM11)
-	if (me->htim.Instance == TIM11)	{ __HAL_RCC_TIM11_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM11)	{ __HAL_RCC_TIM11_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM12)
-	if (me->htim.Instance == TIM12)	{ __HAL_RCC_TIM12_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM12)	{ __HAL_RCC_TIM12_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM13)
-	if (me->htim.Instance == TIM13)	{ __HAL_RCC_TIM13_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM13)	{ __HAL_RCC_TIM13_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM14)
-	if (me->htim.Instance == TIM14)	{ __HAL_RCC_TIM14_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM14)	{ __HAL_RCC_TIM14_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM15)
-	if (me->htim.Instance == TIM15)	{ __HAL_RCC_TIM15_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM15)	{ __HAL_RCC_TIM15_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM16)
-	if (me->htim.Instance == TIM16)	{ __HAL_RCC_TIM16_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM16)	{ __HAL_RCC_TIM16_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM17)
-	if (me->htim.Instance == TIM17)	{ __HAL_RCC_TIM17_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM17)	{ __HAL_RCC_TIM17_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM18)
-	if (me->htim.Instance == TIM18)	{ __HAL_RCC_TIM18_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM18)	{ __HAL_RCC_TIM18_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM19)
-	if (me->htim.Instance == TIM19)	{ __HAL_RCC_TIM19_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM19)	{ __HAL_RCC_TIM19_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM20)
-	if (me->htim.Instance == TIM20)	{ __HAL_RCC_TIM20_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM20)	{ __HAL_RCC_TIM20_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM21)
-	if (me->htim.Instance == TIM21)	{ __HAL_RCC_TIM21_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM21)	{ __HAL_RCC_TIM21_FORCE_RESET(); return; }
 	#endif
 	#if defined(TIM22)
-	if (me->htim.Instance == TIM22)	{ __HAL_RCC_TIM22_FORCE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM22)	{ __HAL_RCC_TIM22_FORCE_RESET(); return; }
 	#endif
 
-	if(isErr)						{ ALX_PWM_ASSERT(false); }	// We should not get here
+	ALX_PWM_ASSERT(false);	// We should not get here
 }
 static void AlxPwm_Periph_ReleaseReset(AlxPwm* me)
 {
-	bool isErr = true;
-
 	#if defined(TIM1)
-	if (me->htim.Instance == TIM1)	{ __HAL_RCC_TIM1_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM1)	{ __HAL_RCC_TIM1_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM2)
-	if (me->htim.Instance == TIM2)	{ __HAL_RCC_TIM2_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM2)	{ __HAL_RCC_TIM2_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM3)
-	if (me->htim.Instance == TIM3)	{ __HAL_RCC_TIM3_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM3)	{ __HAL_RCC_TIM3_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM4)
-	if (me->htim.Instance == TIM4)	{ __HAL_RCC_TIM4_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM4)	{ __HAL_RCC_TIM4_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM5)
-	if (me->htim.Instance == TIM5)	{ __HAL_RCC_TIM5_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM5)	{ __HAL_RCC_TIM5_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM6)
-	if (me->htim.Instance == TIM6)	{ __HAL_RCC_TIM6_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM6)	{ __HAL_RCC_TIM6_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM7)
-	if (me->htim.Instance == TIM7)	{ __HAL_RCC_TIM7_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM7)	{ __HAL_RCC_TIM7_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM8)
-	if (me->htim.Instance == TIM8)	{ __HAL_RCC_TIM8_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM8)	{ __HAL_RCC_TIM8_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM9)
-	if (me->htim.Instance == TIM9)	{ __HAL_RCC_TIM9_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM9)	{ __HAL_RCC_TIM9_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM10)
-	if (me->htim.Instance == TIM10)	{ __HAL_RCC_TIM10_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM10)	{ __HAL_RCC_TIM10_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM11)
-	if (me->htim.Instance == TIM11)	{ __HAL_RCC_TIM11_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM11)	{ __HAL_RCC_TIM11_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM12)
-	if (me->htim.Instance == TIM12)	{ __HAL_RCC_TIM12_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM12)	{ __HAL_RCC_TIM12_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM13)
-	if (me->htim.Instance == TIM13)	{ __HAL_RCC_TIM13_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM13)	{ __HAL_RCC_TIM13_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM14)
-	if (me->htim.Instance == TIM14)	{ __HAL_RCC_TIM14_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM14)	{ __HAL_RCC_TIM14_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM15)
-	if (me->htim.Instance == TIM15)	{ __HAL_RCC_TIM15_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM15)	{ __HAL_RCC_TIM15_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM16)
-	if (me->htim.Instance == TIM16)	{ __HAL_RCC_TIM16_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM16)	{ __HAL_RCC_TIM16_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM17)
-	if (me->htim.Instance == TIM17)	{ __HAL_RCC_TIM17_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM17)	{ __HAL_RCC_TIM17_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM18)
-	if (me->htim.Instance == TIM18)	{ __HAL_RCC_TIM18_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM18)	{ __HAL_RCC_TIM18_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM19)
-	if (me->htim.Instance == TIM19)	{ __HAL_RCC_TIM19_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM19)	{ __HAL_RCC_TIM19_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM20)
-	if (me->htim.Instance == TIM20)	{ __HAL_RCC_TIM20_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM20)	{ __HAL_RCC_TIM20_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM21)
-	if (me->htim.Instance == TIM21)	{ __HAL_RCC_TIM21_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM21)	{ __HAL_RCC_TIM21_RELEASE_RESET(); return; }
 	#endif
 	#if defined(TIM22)
-	if (me->htim.Instance == TIM22)	{ __HAL_RCC_TIM22_RELEASE_RESET(); isErr = false; }
+	if (me->htim.Instance == TIM22)	{ __HAL_RCC_TIM22_RELEASE_RESET(); return; }
 	#endif
 
-	if(isErr)						{ ALX_PWM_ASSERT(false); }	// We should not get here
+	ALX_PWM_ASSERT(false);	// We should not get here
 }
 
 

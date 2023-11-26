@@ -702,103 +702,95 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 }
 static void AlxI2c_Periph_EnableClk(AlxI2c* me)
 {
-	bool isErr = true;
-
 	#if defined(I2C1)
-	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_CLK_ENABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_CLK_ENABLE(); return; }
 	#endif
 	#if defined(I2C2)
-	if (me->hi2c.Instance == I2C2)	{ __HAL_RCC_I2C2_CLK_ENABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C2)	{ __HAL_RCC_I2C2_CLK_ENABLE(); return; }
 	#endif
 	#if defined(I2C3)
-	if (me->hi2c.Instance == I2C3)	{ __HAL_RCC_I2C3_CLK_ENABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C3)	{ __HAL_RCC_I2C3_CLK_ENABLE(); return; }
 	#endif
 	#if defined(I2C4)
-	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_CLK_ENABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_CLK_ENABLE(); return; }
 	#endif
 	#if defined(I2C5)
-	if (me->hi2c.Instance == I2C5)	{ __HAL_RCC_I2C5_CLK_ENABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C5)	{ __HAL_RCC_I2C5_CLK_ENABLE(); return; }
 	#endif
 	#if defined(I2C6)
-	if (me->hi2c.Instance == I2C6)	{ __HAL_RCC_I2C6_CLK_ENABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C6)	{ __HAL_RCC_I2C6_CLK_ENABLE(); return; }
 	#endif
 
-	if(isErr)						{ ALX_I2C_ASSERT(false); }	// We should not get here
+	ALX_I2C_ASSERT(false);	// We should not get here
 }
 static void AlxI2c_Periph_DisableClk(AlxI2c* me)
 {
-	bool isErr = true;
-
 	#if defined(I2C1)
-	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_CLK_DISABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_CLK_DISABLE(); return; }
 	#endif
 	#if defined(I2C2)
-	if (me->hi2c.Instance == I2C2)	{ __HAL_RCC_I2C2_CLK_DISABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C2)	{ __HAL_RCC_I2C2_CLK_DISABLE(); return; }
 	#endif
 	#if defined(I2C3)
-	if (me->hi2c.Instance == I2C3)	{ __HAL_RCC_I2C3_CLK_DISABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C3)	{ __HAL_RCC_I2C3_CLK_DISABLE(); return; }
 	#endif
 	#if defined(I2C4)
-	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_CLK_DISABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_CLK_DISABLE(); return; }
 	#endif
 	#if defined(I2C5)
-	if (me->hi2c.Instance == I2C5)	{ __HAL_RCC_I2C5_CLK_DISABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C5)	{ __HAL_RCC_I2C5_CLK_DISABLE(); return; }
 	#endif
 	#if defined(I2C6)
-	if (me->hi2c.Instance == I2C6)	{ __HAL_RCC_I2C6_CLK_DISABLE(); isErr = false; }
+	if (me->hi2c.Instance == I2C6)	{ __HAL_RCC_I2C6_CLK_DISABLE(); return; }
 	#endif
 
-	if(isErr)						{ ALX_I2C_ASSERT(false); }	// We should not get here
+	ALX_I2C_ASSERT(false);	// We should not get here
 }
 static void AlxI2c_Periph_ForceReset(AlxI2c* me)
 {
-	bool isErr = true;
-
 	#if defined(I2C1)
-	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_FORCE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_FORCE_RESET(); return; }
 	#endif
 	#if defined(I2C2)
-	if (me->hi2c.Instance == I2C2)	{ __HAL_RCC_I2C2_FORCE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C2)	{ __HAL_RCC_I2C2_FORCE_RESET(); return; }
 	#endif
 	#if defined(I2C3)
-	if (me->hi2c.Instance == I2C3)	{ __HAL_RCC_I2C3_FORCE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C3)	{ __HAL_RCC_I2C3_FORCE_RESET(); return; }
 	#endif
 	#if defined(I2C4)
-	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_FORCE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_FORCE_RESET(); return; }
 	#endif
 	#if defined(I2C5)
-	if (me->hi2c.Instance == I2C5)	{ __HAL_RCC_I2C5_FORCE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C5)	{ __HAL_RCC_I2C5_FORCE_RESET(); return; }
 	#endif
 	#if defined(I2C6)
-	if (me->hi2c.Instance == I2C6)	{ __HAL_RCC_I2C6_FORCE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C6)	{ __HAL_RCC_I2C6_FORCE_RESET(); return; }
 	#endif
 
-	if(isErr)						{ ALX_I2C_ASSERT(false); }	// We should not get here
+	ALX_I2C_ASSERT(false);	// We should not get here
 }
 static void AlxI2c_Periph_ReleaseReset(AlxI2c* me)
 {
-	bool isErr = true;
-
 	#if defined(I2C1)
-	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_RELEASE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C1)	{ __HAL_RCC_I2C1_RELEASE_RESET(); return; }
 	#endif
 	#if defined(I2C2)
-	if (me->hi2c.Instance == I2C2)	{ __HAL_RCC_I2C2_RELEASE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C2)	{ __HAL_RCC_I2C2_RELEASE_RESET(); return; }
 	#endif
 	#if defined(I2C3)
-	if (me->hi2c.Instance == I2C3)	{ __HAL_RCC_I2C3_RELEASE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C3)	{ __HAL_RCC_I2C3_RELEASE_RESET(); return; }
 	#endif
 	#if defined(I2C4)
-	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_RELEASE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C4)	{ __HAL_RCC_I2C4_RELEASE_RESET(); return; }
 	#endif
 	#if defined(I2C5)
-	if (me->hi2c.Instance == I2C5)	{ __HAL_RCC_I2C5_RELEASE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C5)	{ __HAL_RCC_I2C5_RELEASE_RESET(); return; }
 	#endif
 	#if defined(I2C6)
-	if (me->hi2c.Instance == I2C6)	{ __HAL_RCC_I2C6_RELEASE_RESET(); isErr = false; }
+	if (me->hi2c.Instance == I2C6)	{ __HAL_RCC_I2C6_RELEASE_RESET(); return; }
 	#endif
 
-	if(isErr)						{ ALX_I2C_ASSERT(false); }	// We should not get here
+	ALX_I2C_ASSERT(false);	// We should not get here
 }
 
 

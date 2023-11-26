@@ -876,75 +876,62 @@ static bool AlxCan_Ctor_IsClkOk(AlxCan* me)
 }
 static void AlxCan_Periph_EnableClk(AlxCan* me)
 {
-	bool isErr = true;
-
 	#if defined(CAN1)
-	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_CLK_ENABLE(); isErr = false; }
+	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_CLK_ENABLE(); return; }
 	#endif
 	#if defined(CAN2)
-	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_CLK_ENABLE(); isErr = false; }
+	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_CLK_ENABLE(); return; }
 	#endif
 	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
-	__HAL_RCC_FDCAN_CLK_ENABLE(); isErr = false;
+	__HAL_RCC_FDCAN_CLK_ENABLE(); return;
 	#endif
 
-	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
+	ALX_CAN_ASSERT(false);	// We should not get here
 }
 static void AlxCan_Periph_DisableClk(AlxCan* me)
 {
-	bool isErr = true;
-
 	#if defined(CAN1)
-	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_CLK_DISABLE(); isErr = false; }
+	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_CLK_DISABLE(); return; }
 	#endif
 	#if defined(CAN2)
-	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_CLK_DISABLE(); isErr = false; }
+	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_CLK_DISABLE(); return; }
 	#endif
-
 	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
-	__HAL_RCC_FDCAN_CLK_DISABLE(); isErr = false;
+	__HAL_RCC_FDCAN_CLK_DISABLE(); return;
 	#endif
 
-	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
+	ALX_CAN_ASSERT(false);	// We should not get here
 }
 static void AlxCan_Periph_ForceReset(AlxCan* me)
 {
-	bool isErr = true;
-
 	#if defined(CAN1)
-	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_FORCE_RESET(); isErr = false; }
+	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_FORCE_RESET(); return; }
 	#endif
 	#if defined(CAN2)
-	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_FORCE_RESET(); isErr = false; }
+	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_FORCE_RESET(); return; }
 	#endif
-
 	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
-	 __HAL_RCC_FDCAN_FORCE_RESET(); isErr = false;
+	 __HAL_RCC_FDCAN_FORCE_RESET(); return;
 	#endif
 
-	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
+	ALX_CAN_ASSERT(false);	// We should not get here
 }
 static void AlxCan_Periph_ReleaseReset(AlxCan* me)
 {
-	bool isErr = true;
-
 	#if defined(CAN1)
-	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_RELEASE_RESET(); isErr = false; }
+	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_RELEASE_RESET(); return; }
 	#endif
 	#if defined(CAN2)
-	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_RELEASE_RESET(); isErr = false; }
+	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_RELEASE_RESET(); return; }
 	#endif
-
 	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
-	__HAL_RCC_FDCAN_RELEASE_RESET(); isErr = false;
+	__HAL_RCC_FDCAN_RELEASE_RESET(); return;
 	#endif
 
-	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
+	ALX_CAN_ASSERT(false);	// We should not get here
 }
 static void AlxCan_Periph_EnableIrq(AlxCan* me)
 {
-	bool isErr = true;
-
 	#if defined(CAN1)
 	if (me->hcan.Instance == CAN1)
 	{
@@ -952,7 +939,7 @@ static void AlxCan_Periph_EnableIrq(AlxCan* me)
 		HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
 		HAL_NVIC_SetPriority(CAN1_RX0_IRQn, me->rxIrqPriority, 0);
 		HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
-		isErr = false;
+		return;
 	}
 	#endif
 	#if defined(CAN2)
@@ -962,16 +949,15 @@ static void AlxCan_Periph_EnableIrq(AlxCan* me)
 		HAL_NVIC_EnableIRQ(CAN2_TX_IRQn);
 		HAL_NVIC_SetPriority(CAN2_RX0_IRQn, me->rxIrqPriority, 0);
 		HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
-		isErr = false;
+		return;
 	}
 	#endif
-
 	#if defined(FDCAN1)
 	if (me->hcan.Instance == FDCAN1)
 	{
 		HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, me->txIrqPriority, 0);
 		HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
-		isErr = false;
+		return;
 	}
 	#endif
 	#if defined(FDCAN2)
@@ -979,7 +965,7 @@ static void AlxCan_Periph_EnableIrq(AlxCan* me)
 	{
 		HAL_NVIC_SetPriority(FDCAN2_IT0_IRQn, me->txIrqPriority, 0);
 		HAL_NVIC_EnableIRQ(FDCAN2_IT0_IRQn);
-		isErr = false;
+		return;
 	}
 	#endif
 	#if defined(FDCAN3)
@@ -987,16 +973,14 @@ static void AlxCan_Periph_EnableIrq(AlxCan* me)
 	{
 		HAL_NVIC_SetPriority(FDCAN3_IT0_IRQn, me->txIrqPriority, 0);
 		HAL_NVIC_EnableIRQ(FDCAN3_IT0_IRQn);
-		isErr = false;
+		return;
 	}
 	#endif
 
-	if(isErr) { ALX_CAN_ASSERT(false); } // We shouldn't get here
+	ALX_CAN_ASSERT(false);	// We should not get here
 }
 static void AlxCan_Periph_DisableIrq(AlxCan* me)
 {
-	bool isErr = true;
-
 	#if defined(CAN1)
 	if (me->hcan.Instance == CAN1)
 	{
@@ -1004,7 +988,7 @@ static void AlxCan_Periph_DisableIrq(AlxCan* me)
 		HAL_NVIC_ClearPendingIRQ(CAN1_TX_IRQn);
 		HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
 		HAL_NVIC_ClearPendingIRQ(CAN1_RX0_IRQn);
-		isErr = false;
+		return;
 	}
 	#endif
 	#if defined(CAN2)
@@ -1014,16 +998,15 @@ static void AlxCan_Periph_DisableIrq(AlxCan* me)
 		HAL_NVIC_ClearPendingIRQ(CAN2_TX_IRQn);
 		HAL_NVIC_DisableIRQ(CAN2_RX0_IRQn);
 		HAL_NVIC_ClearPendingIRQ(CAN2_RX0_IRQn);
-		isErr = false;
+		return;
 	}
 	#endif
-
 	#if defined(FDCAN1)
 	if (me->hcan.Instance == FDCAN1)
 	{
 		HAL_NVIC_DisableIRQ(FDCAN1_IT0_IRQn);
 		HAL_NVIC_ClearPendingIRQ(FDCAN1_IT0_IRQn);
-		isErr = false;
+		return;
 	}
 	#endif
 	#if defined(FDCAN2)
@@ -1031,7 +1014,7 @@ static void AlxCan_Periph_DisableIrq(AlxCan* me)
 	{
 		HAL_NVIC_DisableIRQ(FDCAN2_IT0_IRQn);
 		HAL_NVIC_ClearPendingIRQ(FDCAN2_IT0_IRQn);
-		isErr = false;
+		return;
 	}
 	#endif
 	#if defined(FDCAN3)
@@ -1039,11 +1022,11 @@ static void AlxCan_Periph_DisableIrq(AlxCan* me)
 	{
 		HAL_NVIC_DisableIRQ(FDCAN3_IT0_IRQn);
 		HAL_NVIC_ClearPendingIRQ(FDCAN3_IT0_IRQn);
-		isErr = false;
+		return;
 	}
 	#endif
 
-	if(isErr) { ALX_CAN_ASSERT(false); } // We shouldn't get here
+	ALX_CAN_ASSERT(false);	// We should not get here
 }
 
 

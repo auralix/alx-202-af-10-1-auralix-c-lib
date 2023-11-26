@@ -425,101 +425,69 @@ static bool AlxI2s_Ctor_IsClkOk(AlxI2s* me)
 }
 static void AlxI2s_Periph_EnableClk(AlxI2s* me)
 {
-	bool isErr = true;
-
 	#if defined(SAI1)
-	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))	{ __HAL_RCC_SAI1_CLK_ENABLE(); isErr = false; }
+	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))	{ __HAL_RCC_SAI1_CLK_ENABLE(); return; }
 	#endif
 	#if defined(SAI2)
-	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))	{ __HAL_RCC_SAI2_CLK_ENABLE(); isErr = false; }
+	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))	{ __HAL_RCC_SAI2_CLK_ENABLE(); return; }
 	#endif
 
-	if(isErr) { ALX_I2S_ASSERT(false); }	// We shouldn't get here
+	ALX_I2S_ASSERT(false);	// We should not get here
 }
 static void AlxI2s_Periph_DisableClk(AlxI2s* me)
 {
-	bool isErr = true;
-
 	#if defined(SAI1)
-	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))	{ __HAL_RCC_SAI1_CLK_DISABLE(); isErr = false; }
+	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))	{ __HAL_RCC_SAI1_CLK_DISABLE(); return; }
 	#endif
 	#if defined(SAI2)
-	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))	{ __HAL_RCC_SAI2_CLK_DISABLE(); isErr = false; }
+	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))	{ __HAL_RCC_SAI2_CLK_DISABLE(); return; }
 	#endif
 
-	if(isErr) { ALX_I2S_ASSERT(false); }	// We shouldn't get here
+	ALX_I2S_ASSERT(false);	// We should not get here
 }
 static void AlxI2s_Periph_ForceReset(AlxI2s* me)
 {
-	bool isErr = true;
-
 	#if defined(SAI1)
-	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))	{ __HAL_RCC_SAI1_FORCE_RESET(); isErr = false; }
+	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))	{ __HAL_RCC_SAI1_FORCE_RESET(); return; }
 	#endif
 	#if defined(SAI2)
-	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))	{ __HAL_RCC_SAI2_FORCE_RESET(); isErr = false; }
+	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))	{ __HAL_RCC_SAI2_FORCE_RESET(); return; }
 	#endif
 
-	if(isErr) { ALX_I2S_ASSERT(false); }	// We shouldn't get here
+	ALX_I2S_ASSERT(false);	// We should not get here
 }
 static void AlxI2s_Periph_ReleaseReset(AlxI2s* me)
 {
-	bool isErr = true;
-
 	#if defined(SAI1)
-	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))	{ __HAL_RCC_SAI1_RELEASE_RESET(); isErr = false; }
+	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))	{ __HAL_RCC_SAI1_RELEASE_RESET(); return; }
 	#endif
 	#if defined(SAI2)
-	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))	{ __HAL_RCC_SAI2_RELEASE_RESET(); isErr = false; }
+	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))	{ __HAL_RCC_SAI2_RELEASE_RESET(); return; }
 	#endif
 
-	if(isErr) { ALX_I2S_ASSERT(false); }	// We shouldn't get here
+	ALX_I2S_ASSERT(false);	// We should not get here
 }
 static void AlxI2s_Periph_EnableIrq(AlxI2s* me)
 {
-	bool isErr = true;
-
 	#ifdef SAI1
-	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))
-	{
-		HAL_NVIC_SetPriority(SAI1_IRQn, me->irqPriority, 0);
-		HAL_NVIC_EnableIRQ(SAI1_IRQn);
-		isErr = false;
-	}
+	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))	{ HAL_NVIC_SetPriority(SAI1_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(SAI1_IRQn); return; }
 	#endif
 	#ifdef SAI2
-	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))
-	{
-		HAL_NVIC_SetPriority(SAI2_IRQn, me->irqPriority, 0);
-		HAL_NVIC_EnableIRQ(SAI2_IRQn);
-		isErr = false;
-	}
+	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))	{ HAL_NVIC_SetPriority(SAI2_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(SAI2_IRQn); return; }
 	#endif
 
-	if(isErr) { ALX_I2S_ASSERT(false); }	// We shouldn't get here
+	ALX_I2S_ASSERT(false);	// We should not get here
 }
 static void AlxI2s_Periph_DisableIrq(AlxI2s* me)
 {
-	bool isErr = true;
-
 	#ifdef SAI1
-	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))
-	{
-		HAL_NVIC_DisableIRQ(SAI1_IRQn);
-		HAL_NVIC_ClearPendingIRQ(SAI1_IRQn);
-		isErr = false;
-	}
+	if ((me->hsaiTx.Instance == SAI1_Block_A) || (me->hsaiTx.Instance == SAI1_Block_B))	{ HAL_NVIC_DisableIRQ(SAI1_IRQn); HAL_NVIC_ClearPendingIRQ(SAI1_IRQn); return; }
 	#endif
 	#ifdef SAI2
-	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))
-	{
-		HAL_NVIC_DisableIRQ(SAI2_IRQn);
-		HAL_NVIC_ClearPendingIRQ(SAI2_IRQn);
-		isErr = false;
-	}
+	if ((me->hsaiTx.Instance == SAI2_Block_A) || (me->hsaiTx.Instance == SAI2_Block_B))	{ HAL_NVIC_DisableIRQ(SAI2_IRQn); HAL_NVIC_ClearPendingIRQ(SAI2_IRQn); return; }
 	#endif
 
-	if(isErr) { ALX_I2S_ASSERT(false); }	// We shouldn't get here
+	ALX_I2S_ASSERT(false);	// We should not get here
 }
 
 

@@ -1150,262 +1150,246 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 }
 static void AlxAdc_Periph_Adc_EnableClk(AlxAdc* me)
 {
-	bool isErr = true;
-
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L0)
 		#if defined(ADC1)
-		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC1_CLK_ENABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC1_CLK_ENABLE(); return; }
 		#endif
 		#if defined(ADC2)
-		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC2_CLK_ENABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC2_CLK_ENABLE(); return; }
 		#endif
 		#if defined(ADC3)
-		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC3_CLK_ENABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC3_CLK_ENABLE(); return; }
 		#endif
 		#if defined(ADC4)
-		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC4_CLK_ENABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC4_CLK_ENABLE(); return; }
 		#endif
 	#endif
 	#if defined(ALX_STM32G4)
 		#if defined(ADC1)
-		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC12_CLK_ENABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC12_CLK_ENABLE(); return; }
 		#endif
 		#if defined(ADC2)
-		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC12_CLK_ENABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC12_CLK_ENABLE(); return; }
 		#endif
 		#if defined(ADC3)
-		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC345_CLK_ENABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC345_CLK_ENABLE(); return; }
 		#endif
 		#if defined(ADC4)
-		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_CLK_ENABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_CLK_ENABLE(); return; }
 		#endif
 	#endif
 	#if defined(ALX_STM32L4)
 		(void)me;
-		__HAL_RCC_ADC_CLK_ENABLE(); isErr = false;
+		__HAL_RCC_ADC_CLK_ENABLE(); return;
 	#endif
 
-	if(isErr)							{ ALX_ADC_ASSERT(false); }	// We should not get here
+	ALX_ADC_ASSERT(false);	// We should not get here
 }
 static void AlxAdc_Periph_Adc_DisableClk(AlxAdc* me)
 {
-	bool isErr = true;
-
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L0)
 		#if defined(ADC1)
-		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC1_CLK_DISABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC1_CLK_DISABLE(); return; }
 		#endif
 		#if defined(ADC2)
-		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC2_CLK_DISABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC2_CLK_DISABLE(); return; }
 		#endif
 		#if defined(ADC3)
-		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC3_CLK_DISABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC3_CLK_DISABLE(); return; }
 		#endif
 		#if defined(ADC4)
-		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC4_CLK_DISABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC4_CLK_DISABLE(); return; }
 		#endif
 	#endif
 	#if defined(ALX_STM32G4)
 		#if defined(ADC1)
-		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC12_CLK_DISABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC12_CLK_DISABLE(); return; }
 		#endif
 		#if defined(ADC2)
-		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC12_CLK_DISABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC12_CLK_DISABLE(); return; }
 		#endif
 		#if defined(ADC3)
-		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC345_CLK_DISABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC345_CLK_DISABLE(); return; }
 		#endif
 		#if defined(ADC4)
-		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_CLK_DISABLE(); isErr = false; }
+		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_CLK_DISABLE(); return; }
 		#endif
 	#endif
 	#if defined(ALX_STM32L4)
 		(void)me;
-		__HAL_RCC_ADC_CLK_DISABLE(); isErr = false;
+		__HAL_RCC_ADC_CLK_DISABLE(); return;
 	#endif
 
-	if(isErr)							{ ALX_ADC_ASSERT(false); }	// We should not get here
+	ALX_ADC_ASSERT(false);	// We should not get here
 }
 static void AlxAdc_Periph_Adc_ForceReset(AlxAdc* me)
 {
-	bool isErr = true;
-
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32L0)
 		#if defined(ADC1)
-		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC1_FORCE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC1_FORCE_RESET(); return; }
 		#endif
 		#if defined(ADC2)
-		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC2_FORCE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC2_FORCE_RESET(); return; }
 		#endif
 		#if defined(ADC3)
-		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC3_FORCE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC3_FORCE_RESET(); return; }
 		#endif
 		#if defined(ADC4)
-		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC4_FORCE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC4_FORCE_RESET(); return; }
 		#endif
 	#endif
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
 		(void)me;
-		__HAL_RCC_ADC_FORCE_RESET(); isErr = false;
+		__HAL_RCC_ADC_FORCE_RESET(); return;
 	#endif
 	#if defined(ALX_STM32G4)
 		#if defined(ADC1)
-		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC12_FORCE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC12_FORCE_RESET(); return; }
 		#endif
 		#if defined(ADC2)
-		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC12_FORCE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC12_FORCE_RESET(); return; }
 		#endif
 		#if defined(ADC3)
-		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC345_FORCE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC345_FORCE_RESET(); return; }
 		#endif
 		#if defined(ADC4)
-		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_FORCE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_FORCE_RESET(); return; }
 		#endif
 	#endif
 
-	if(isErr)							{ ALX_ADC_ASSERT(false); }	// We should not get here
+	ALX_ADC_ASSERT(false);	// We should not get here
 }
 static void AlxAdc_Periph_Adc_ReleaseReset(AlxAdc* me)
 {
-	bool isErr = true;
-
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32L0)
 		#if defined(ADC1)
-		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC1_RELEASE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC1_RELEASE_RESET(); return; }
 		#endif
 		#if defined(ADC2)
-		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC2_RELEASE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC2_RELEASE_RESET(); return; }
 		#endif
 		#if defined(ADC3)
-		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC3_RELEASE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC3_RELEASE_RESET(); return; }
 		#endif
 		#if defined(ADC4)
-		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC4_RELEASE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC4_RELEASE_RESET(); return; }
 		#endif
 	#endif
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
 		(void)me;
-		__HAL_RCC_ADC_RELEASE_RESET(); isErr = false;
+		__HAL_RCC_ADC_RELEASE_RESET(); return;
 	#endif
 	#if defined(ALX_STM32G4)
 		#if defined(ADC1)
-		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC12_RELEASE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC1)	{ __HAL_RCC_ADC12_RELEASE_RESET(); return; }
 		#endif
 		#if defined(ADC2)
-		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC12_RELEASE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC2)	{ __HAL_RCC_ADC12_RELEASE_RESET(); return; }
 		#endif
 		#if defined(ADC3)
-		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC345_RELEASE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC3)	{ __HAL_RCC_ADC345_RELEASE_RESET(); return; }
 		#endif
 		#if defined(ADC4)
-		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_RELEASE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC4)	{ __HAL_RCC_ADC345_RELEASE_RESET(); return; }
 		#endif
 		#if defined(ADC5)
-		if (me->hadc.Instance == ADC5)	{ __HAL_RCC_ADC345_RELEASE_RESET(); isErr = false; }
+		if (me->hadc.Instance == ADC5)	{ __HAL_RCC_ADC345_RELEASE_RESET(); return; }
 		#endif
 	#endif
 
-	if(isErr)							{ ALX_ADC_ASSERT(false); }	// We should not get here
+	ALX_ADC_ASSERT(false);	// We should not get here
 }
 static void AlxAdc_Periph_Dma_EnableClk(AlxAdc* me)
 {
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-	#if defined(DMAMUX1)
-	__HAL_RCC_DMAMUX1_CLK_ENABLE();
+		#if defined(DMAMUX1)
+		__HAL_RCC_DMAMUX1_CLK_ENABLE();
+		#endif
 	#endif
-	#endif
-
-	bool isErr = true;
 
 	#if defined(DMA1)
-	if (me->dma == DMA1)	{ __HAL_RCC_DMA1_CLK_ENABLE(); isErr = false; }
+	if (me->dma == DMA1)	{ __HAL_RCC_DMA1_CLK_ENABLE(); return; }
 	#endif
 	#if defined(DMA2)
-	if (me->dma == DMA2)	{ __HAL_RCC_DMA2_CLK_ENABLE(); isErr = false; }
+	if (me->dma == DMA2)	{ __HAL_RCC_DMA2_CLK_ENABLE(); return; }
 	#endif
 	#if defined(DMA3)
-	if (me->dma == DMA3)	{ __HAL_RCC_DMA3_CLK_ENABLE(); isErr = false; }
+	if (me->dma == DMA3)	{ __HAL_RCC_DMA3_CLK_ENABLE(); return; }
 	#endif
 
-	if(isErr)				{ ALX_ADC_ASSERT(false); }	// We should not get here
+	ALX_ADC_ASSERT(false);	// We should not get here
 }
 static void AlxAdc_Periph_Dma_DisableClk(AlxAdc* me)
 {
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-	#if defined(DMAMUX1)
-	__HAL_RCC_DMAMUX1_CLK_DISABLE();
+		#if defined(DMAMUX1)
+		__HAL_RCC_DMAMUX1_CLK_DISABLE();
+		#endif
 	#endif
-	#endif
-
-	bool isErr = true;
 
 	#if defined(DMA1)
-	if (me->dma == DMA1)	{ __HAL_RCC_DMA1_CLK_DISABLE(); isErr = false; }
+	if (me->dma == DMA1)	{ __HAL_RCC_DMA1_CLK_DISABLE(); return; }
 	#endif
 	#if defined(DMA2)
-	if (me->dma == DMA2)	{ __HAL_RCC_DMA2_CLK_DISABLE(); isErr = false; }
+	if (me->dma == DMA2)	{ __HAL_RCC_DMA2_CLK_DISABLE(); return; }
 	#endif
 	#if defined(DMA3)
-	if (me->dma == DMA3)	{ __HAL_RCC_DMA3_CLK_DISABLE(); isErr = false; }
+	if (me->dma == DMA3)	{ __HAL_RCC_DMA3_CLK_DISABLE(); return; }
 	#endif
 
-	if(isErr)				{ ALX_ADC_ASSERT(false); }	// We should not get here
+	ALX_ADC_ASSERT(false);	// We should not get here
 }
 static void AlxAdc_Periph_Dma_ForceReset(AlxAdc* me)
 {
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F1)
-	(void)me;
+	return;
 	#endif
 
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-	#if defined(DMAMUX1)
-	__HAL_RCC_DMAMUX1_FORCE_RESET();
-	#endif
+		#if defined(DMAMUX1)
+		__HAL_RCC_DMAMUX1_FORCE_RESET();
+		#endif
 	#endif
 
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-	bool isErr = true;
+		#if defined(DMA1)
+		if (me->dma == DMA1)	{ __HAL_RCC_DMA1_FORCE_RESET(); return; }
+		#endif
+		#if defined(DMA2)
+		if (me->dma == DMA2)	{ __HAL_RCC_DMA2_FORCE_RESET(); return; }
+		#endif
+		#if defined(DMA3)
+		if (me->dma == DMA3)	{ __HAL_RCC_DMA3_FORCE_RESET(); return; }
+		#endif
+	#endif
 
-	#if defined(DMA1)
-	if (me->dma == DMA1)	{ __HAL_RCC_DMA1_FORCE_RESET(); isErr = false; }
-	#endif
-	#if defined(DMA2)
-	if (me->dma == DMA2)	{ __HAL_RCC_DMA2_FORCE_RESET(); isErr = false; }
-	#endif
-	#if defined(DMA3)
-	if (me->dma == DMA3)	{ __HAL_RCC_DMA3_FORCE_RESET(); isErr = false; }
-	#endif
-
-	if(isErr)				{ ALX_ADC_ASSERT(false); }	// We should not get here
-	#endif
+	ALX_ADC_ASSERT(false);	// We should not get here
 }
 static void AlxAdc_Periph_Dma_ReleaseReset(AlxAdc* me)
 {
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F1)
-	(void)me;
+	return;
 	#endif
 
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L4)
-	#if defined(DMAMUX1)
-	__HAL_RCC_DMAMUX1_RELEASE_RESET();
-	#endif
+		#if defined(DMAMUX1)
+		__HAL_RCC_DMAMUX1_RELEASE_RESET();
+		#endif
 	#endif
 
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-	bool isErr = true;
+		#if defined(DMA1)
+		if (me->dma == DMA1)	{ __HAL_RCC_DMA1_RELEASE_RESET(); return; }
+		#endif
+		#if defined(DMA2)
+		if (me->dma == DMA2)	{ __HAL_RCC_DMA2_RELEASE_RESET(); return; }
+		#endif
+		#if defined(DMA3)
+		if (me->dma == DMA3)	{ __HAL_RCC_DMA3_RELEASE_RESET(); return; }
+		#endif
+	#endif
 
-	#if defined(DMA1)
-	if (me->dma == DMA1)	{ __HAL_RCC_DMA1_RELEASE_RESET(); isErr = false; }
-	#endif
-	#if defined(DMA2)
-	if (me->dma == DMA2)	{ __HAL_RCC_DMA2_RELEASE_RESET(); isErr = false; }
-	#endif
-	#if defined(DMA3)
-	if (me->dma == DMA3)	{ __HAL_RCC_DMA3_RELEASE_RESET(); isErr = false; }
-	#endif
-
-	if(isErr)				{ ALX_ADC_ASSERT(false); }	// We should not get here
-	#endif
+	ALX_ADC_ASSERT(false);	// We should not get here
 }
 
 

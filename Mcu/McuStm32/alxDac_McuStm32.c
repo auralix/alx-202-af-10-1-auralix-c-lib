@@ -392,79 +392,71 @@ static uint32_t AlxDac_GetCh(Alx_Ch ch)
 //------------------------------------------------------------------------------
 static void AlxDac_Periph_EnableClk(AlxDac* me)
 {
-	bool isErr = true;
-
 	#if defined(DAC1)
-	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_CLK_ENABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_CLK_ENABLE(); return; }
 	#endif
 	#if defined(DAC2)
-	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_CLK_ENABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_CLK_ENABLE(); return; }
 	#endif
 	#if defined(DAC3)
-	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_CLK_ENABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_CLK_ENABLE(); return; }
 	#endif
 	#if defined(DAC4)
-	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_CLK_ENABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_CLK_ENABLE(); return; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_ASSERT(false); }	// We should not get here
+	ALX_DAC_ASSERT(false);	// We should not get here
 }
 static void AlxDac_Periph_DisableClk(AlxDac* me)
 {
-	bool isErr = true;
-
 	#if defined(DAC1)
-	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_CLK_DISABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_CLK_DISABLE(); return; }
 	#endif
 	#if defined(DAC2)
-	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_CLK_DISABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_CLK_DISABLE(); return; }
 	#endif
 	#if defined(DAC3)
-	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_CLK_DISABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_CLK_DISABLE(); return; }
 	#endif
 	#if defined(DAC4)
-	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_CLK_DISABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_CLK_DISABLE(); return; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_ASSERT(false); }	// We should not get here
+	ALX_DAC_ASSERT(false);	// We should not get here
 }
 static void AlxDac_Periph_ForceReset(AlxDac* me)
 {
-	bool isErr = true;
-
 	#if defined(DAC1)
-	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_FORCE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_FORCE_RESET(); return; }
 	#endif
 	#if defined(DAC2)
-	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_FORCE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_FORCE_RESET(); return; }
 	#endif
 	#if defined(DAC3)
-	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_FORCE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_FORCE_RESET(); return; }
 	#endif
 	#if defined(DAC4)
-	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_FORCE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_FORCE_RESET(); return; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_ASSERT(false); }	// We should not get here
+	ALX_DAC_ASSERT(false);	// We should not get here
 }
 static void AlxDac_Periph_ReleaseReset(AlxDac* me)
 {
-	bool isErr = true;
-
 	#if defined(DAC1)
-	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_RELEASE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_RELEASE_RESET(); return; }
 	#endif
 	#if defined(DAC2)
-	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_RELEASE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_RELEASE_RESET(); return; }
 	#endif
 	#if defined(DAC3)
-	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_RELEASE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_RELEASE_RESET(); return; }
 	#endif
 	#if defined(DAC4)
-	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_RELEASE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_RELEASE_RESET(); return; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_ASSERT(false); }	// We should not get here
+	ALX_DAC_ASSERT(false);	// We should not get here
 }
 
 

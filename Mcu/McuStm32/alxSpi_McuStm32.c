@@ -695,103 +695,95 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 }
 static void AlxSpi_Periph_EnableClk(AlxSpi* me)
 {
-	bool isErr = true;
-
 	#if defined(SPI1)
-	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_CLK_ENABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_CLK_ENABLE(); return; }
 	#endif
 	#if defined(SPI2)
-	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_CLK_ENABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_CLK_ENABLE(); return; }
 	#endif
 	#if defined(SPI3)
-	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_CLK_ENABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_CLK_ENABLE(); return; }
 	#endif
 	#if defined(SPI4)
-	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_CLK_ENABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_CLK_ENABLE(); return; }
 	#endif
 	#if defined(SPI5)
-	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_CLK_ENABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_CLK_ENABLE(); return; }
 	#endif
 	#if defined(SPI6)
-	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_CLK_ENABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_CLK_ENABLE(); return; }
 	#endif
 
-	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
+	ALX_SPI_ASSERT(false);	// We should not get here
 }
 static void AlxSpi_Periph_DisableClk(AlxSpi* me)
 {
-	bool isErr = true;
-
 	#if defined(SPI1)
-	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_CLK_DISABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_CLK_DISABLE(); return; }
 	#endif
 	#if defined(SPI2)
-	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_CLK_DISABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_CLK_DISABLE(); return; }
 	#endif
 	#if defined(SPI3)
-	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_CLK_DISABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_CLK_DISABLE(); return; }
 	#endif
 	#if defined(SPI4)
-	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_CLK_DISABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_CLK_DISABLE(); return; }
 	#endif
 	#if defined(SPI5)
-	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_CLK_DISABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_CLK_DISABLE(); return; }
 	#endif
 	#if defined(SPI6)
-	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_CLK_DISABLE(); isErr = false; }
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_CLK_DISABLE(); return; }
 	#endif
 
-	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
+	ALX_SPI_ASSERT(false);	// We should not get here
 }
 static void AlxSpi_Periph_ForceReset(AlxSpi* me)
 {
-	bool isErr = true;
-
 	#if defined(SPI1)
-	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_FORCE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_FORCE_RESET(); return; }
 	#endif
 	#if defined(SPI2)
-	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_FORCE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_FORCE_RESET(); return; }
 	#endif
 	#if defined(SPI3)
-	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_FORCE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_FORCE_RESET(); return; }
 	#endif
 	#if defined(SPI4)
-	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_FORCE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_FORCE_RESET(); return; }
 	#endif
 	#if defined(SPI5)
-	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_FORCE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_FORCE_RESET(); return; }
 	#endif
 	#if defined(SPI6)
-	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_FORCE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_FORCE_RESET(); return; }
 	#endif
 
-	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
+	ALX_SPI_ASSERT(false);	// We should not get here
 }
 static void AlxSpi_Periph_ReleaseReset(AlxSpi* me)
 {
-	bool isErr = true;
-
 	#if defined(SPI1)
-	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_RELEASE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI1)	{ __HAL_RCC_SPI1_RELEASE_RESET(); return; }
 	#endif
 	#if defined(SPI2)
-	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_RELEASE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI2)	{ __HAL_RCC_SPI2_RELEASE_RESET(); return; }
 	#endif
 	#if defined(SPI3)
-	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_RELEASE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI3)	{ __HAL_RCC_SPI3_RELEASE_RESET(); return; }
 	#endif
 	#if defined(SPI4)
-	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_RELEASE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI4)	{ __HAL_RCC_SPI4_RELEASE_RESET(); return; }
 	#endif
 	#if defined(SPI5)
-	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_RELEASE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI5)	{ __HAL_RCC_SPI5_RELEASE_RESET(); return; }
 	#endif
 	#if defined(SPI6)
-	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_RELEASE_RESET(); isErr = false; }
+	if (me->hspi.Instance == SPI6)	{ __HAL_RCC_SPI6_RELEASE_RESET(); return; }
 	#endif
 
-	if(isErr)						{ ALX_SPI_ASSERT(false); }	// We should not get here
+	ALX_SPI_ASSERT(false);	// We should not get here
 }
 
 

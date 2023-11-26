@@ -442,441 +442,429 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 }
 static void AlxSerialPort_Periph_EnableClk(AlxSerialPort* me)
 {
-	bool isErr = true;
-
 	#ifdef USART1
-	if (me->huart.Instance == USART1)		{ __HAL_RCC_USART1_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == USART1)	{ __HAL_RCC_USART1_CLK_ENABLE(); return; }
 	#endif
 	#ifdef USART2
-	if (me->huart.Instance == USART2)		{ __HAL_RCC_USART2_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == USART2)	{ __HAL_RCC_USART2_CLK_ENABLE(); return; }
 	#endif
 	#ifdef USART3
-	if (me->huart.Instance == USART3)		{ __HAL_RCC_USART3_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == USART3)	{ __HAL_RCC_USART3_CLK_ENABLE(); return; }
 	#endif
 	#ifdef USART4
-	if (me->huart.Instance == USART4)		{ __HAL_RCC_USART4_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == USART4)	{ __HAL_RCC_USART4_CLK_ENABLE(); return; }
 	#endif
 	#ifdef USART5
-	if (me->huart.Instance == USART5)		{ __HAL_RCC_USART5_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == USART5)	{ __HAL_RCC_USART5_CLK_ENABLE(); return; }
 	#endif
 	#ifdef USART6
-	if (me->huart.Instance == USART6)		{ __HAL_RCC_USART6_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == USART6)	{ __HAL_RCC_USART6_CLK_ENABLE(); return; }
 	#endif
 	#ifdef USART7
-	if (me->huart.Instance == USART7)		{ __HAL_RCC_USART7_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == USART7)	{ __HAL_RCC_USART7_CLK_ENABLE(); return; }
 	#endif
 	#ifdef USART8
-	if (me->huart.Instance == USART8)		{ __HAL_RCC_USART8_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == USART8)	{ __HAL_RCC_USART8_CLK_ENABLE(); return; }
 	#endif
 	#ifdef USART9
-	if (me->huart.Instance == USART9)		{ __HAL_RCC_USART9_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == USART9)	{ __HAL_RCC_USART9_CLK_ENABLE(); return; }
 	#endif
 	#ifdef USART10
-	if (me->huart.Instance == USART10)		{ __HAL_RCC_USART10_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == USART10)	{ __HAL_RCC_USART10_CLK_ENABLE(); return; }
 	#endif
 	#ifdef UART1
-	if (me->huart.Instance == UART1)		{ __HAL_RCC_UART1_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == UART1)	{ __HAL_RCC_UART1_CLK_ENABLE(); return; }
 	#endif
 	#ifdef UART2
-	if (me->huart.Instance == UART2)		{ __HAL_RCC_UART2_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == UART2)	{ __HAL_RCC_UART2_CLK_ENABLE(); return; }
 	#endif
 	#ifdef UART3
-	if (me->huart.Instance == UART3)		{ __HAL_RCC_UART3_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == UART3)	{ __HAL_RCC_UART3_CLK_ENABLE(); return; }
 	#endif
 	#ifdef UART4
-	if (me->huart.Instance == UART4)		{ __HAL_RCC_UART4_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == UART4)	{ __HAL_RCC_UART4_CLK_ENABLE(); return; }
 	#endif
 	#ifdef UART5
-	if (me->huart.Instance == UART5)		{ __HAL_RCC_UART5_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == UART5)	{ __HAL_RCC_UART5_CLK_ENABLE(); return; }
 	#endif
 	#ifdef UART6
-	if (me->huart.Instance == UART6)		{ __HAL_RCC_UART6_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == UART6)	{ __HAL_RCC_UART6_CLK_ENABLE(); return; }
 	#endif
 	#ifdef UART7
-	if (me->huart.Instance == UART7)		{ __HAL_RCC_UART7_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == UART7)	{ __HAL_RCC_UART7_CLK_ENABLE(); return; }
 	#endif
 	#ifdef UART8
-	if (me->huart.Instance == UART8)		{ __HAL_RCC_UART8_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == UART8)	{ __HAL_RCC_UART8_CLK_ENABLE(); return; }
 	#endif
 	#ifdef UART9
-	if (me->huart.Instance == UART9)		{ __HAL_RCC_UART9_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == UART9)	{ __HAL_RCC_UART9_CLK_ENABLE(); return; }
 	#endif
 	#ifdef UART10
-	if (me->huart.Instance == UART10)		{ __HAL_RCC_UART10_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == UART10)	{ __HAL_RCC_UART10_CLK_ENABLE(); return; }
 	#endif
 	#ifdef LPUART1
-	if (me->huart.Instance == LPUART1)		{ __HAL_RCC_LPUART1_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == LPUART1)	{ __HAL_RCC_LPUART1_CLK_ENABLE(); return; }
 	#endif
 	#ifdef LPUART2
-	if (me->huart.Instance == LPUART2)		{ __HAL_RCC_LPUART2_CLK_ENABLE(); isErr = false; }
+	if (me->huart.Instance == LPUART2)	{ __HAL_RCC_LPUART2_CLK_ENABLE(); return; }
 	#endif
 
-	if(isErr)								{ ALX_SERIAL_PORT_ASSERT(false); }	// We should not get here
+	ALX_SERIAL_PORT_ASSERT(false);	// We should not get here
 }
 static void AlxSerialPort_Periph_DisableClk(AlxSerialPort* me)
 {
-	bool isErr = true;
-
 	#ifdef USART1
-	if (me->huart.Instance == USART1)		{ __HAL_RCC_USART1_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == USART1)	{ __HAL_RCC_USART1_CLK_DISABLE(); return; }
 	#endif
 	#ifdef USART2
-	if (me->huart.Instance == USART2)		{ __HAL_RCC_USART2_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == USART2)	{ __HAL_RCC_USART2_CLK_DISABLE(); return; }
 	#endif
 	#ifdef USART3
-	if (me->huart.Instance == USART3)		{ __HAL_RCC_USART3_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == USART3)	{ __HAL_RCC_USART3_CLK_DISABLE(); return; }
 	#endif
 	#ifdef USART4
-	if (me->huart.Instance == USART4)		{ __HAL_RCC_USART4_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == USART4)	{ __HAL_RCC_USART4_CLK_DISABLE(); return; }
 	#endif
 	#ifdef USART5
-	if (me->huart.Instance == USART5)		{ __HAL_RCC_USART5_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == USART5)	{ __HAL_RCC_USART5_CLK_DISABLE(); return; }
 	#endif
 	#ifdef USART6
-	if (me->huart.Instance == USART6)		{ __HAL_RCC_USART6_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == USART6)	{ __HAL_RCC_USART6_CLK_DISABLE(); return; }
 	#endif
 	#ifdef USART7
-	if (me->huart.Instance == USART7)		{ __HAL_RCC_USART7_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == USART7)	{ __HAL_RCC_USART7_CLK_DISABLE(); return; }
 	#endif
 	#ifdef USART8
-	if (me->huart.Instance == USART8)		{ __HAL_RCC_USART8_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == USART8)	{ __HAL_RCC_USART8_CLK_DISABLE(); return; }
 	#endif
 	#ifdef USART9
-	if (me->huart.Instance == USART9)		{ __HAL_RCC_USART9_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == USART9)	{ __HAL_RCC_USART9_CLK_DISABLE(); return; }
 	#endif
 	#ifdef USART10
-	if (me->huart.Instance == USART10)		{ __HAL_RCC_USART10_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == USART10)	{ __HAL_RCC_USART10_CLK_DISABLE(); return; }
 	#endif
 	#ifdef UART1
-	if (me->huart.Instance == UART1)		{ __HAL_RCC_UART1_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == UART1)	{ __HAL_RCC_UART1_CLK_DISABLE(); return; }
 	#endif
 	#ifdef UART2
-	if (me->huart.Instance == UART2)		{ __HAL_RCC_UART2_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == UART2)	{ __HAL_RCC_UART2_CLK_DISABLE(); return; }
 	#endif
 	#ifdef UART3
-	if (me->huart.Instance == UART3)		{ __HAL_RCC_UART3_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == UART3)	{ __HAL_RCC_UART3_CLK_DISABLE(); return; }
 	#endif
 	#ifdef UART4
-	if (me->huart.Instance == UART4)		{ __HAL_RCC_UART4_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == UART4)	{ __HAL_RCC_UART4_CLK_DISABLE(); return; }
 	#endif
 	#ifdef UART5
-	if (me->huart.Instance == UART5)		{ __HAL_RCC_UART5_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == UART5)	{ __HAL_RCC_UART5_CLK_DISABLE(); return; }
 	#endif
 	#ifdef UART6
-	if (me->huart.Instance == UART6)		{ __HAL_RCC_UART6_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == UART6)	{ __HAL_RCC_UART6_CLK_DISABLE(); return; }
 	#endif
 	#ifdef UART7
-	if (me->huart.Instance == UART7)		{ __HAL_RCC_UART7_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == UART7)	{ __HAL_RCC_UART7_CLK_DISABLE(); return; }
 	#endif
 	#ifdef UART8
-	if (me->huart.Instance == UART8)		{ __HAL_RCC_UART8_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == UART8)	{ __HAL_RCC_UART8_CLK_DISABLE(); return; }
 	#endif
 	#ifdef UART9
-	if (me->huart.Instance == UART9)		{ __HAL_RCC_UART9_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == UART9)	{ __HAL_RCC_UART9_CLK_DISABLE(); return; }
 	#endif
 	#ifdef UART10
-	if (me->huart.Instance == UART10)		{ __HAL_RCC_UART10_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == UART10)	{ __HAL_RCC_UART10_CLK_DISABLE(); return; }
 	#endif
 	#ifdef LPUART1
-	if (me->huart.Instance == LPUART1)		{ __HAL_RCC_LPUART1_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == LPUART1)	{ __HAL_RCC_LPUART1_CLK_DISABLE(); return; }
 	#endif
 	#ifdef LPUART2
-	if (me->huart.Instance == LPUART2)		{ __HAL_RCC_LPUART2_CLK_DISABLE(); isErr = false; }
+	if (me->huart.Instance == LPUART2)	{ __HAL_RCC_LPUART2_CLK_DISABLE(); return; }
 	#endif
 
-	if(isErr)								{ ALX_SERIAL_PORT_ASSERT(false); }	// We should not get here
+	ALX_SERIAL_PORT_ASSERT(false);	// We should not get here
 }
 static void AlxSerialPort_Periph_ForceReset(AlxSerialPort* me)
 {
-	bool isErr = true;
-
 	#ifdef USART1
-	if (me->huart.Instance == USART1)		{ __HAL_RCC_USART1_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART1)	{ __HAL_RCC_USART1_FORCE_RESET(); return; }
 	#endif
 	#ifdef USART2
-	if (me->huart.Instance == USART2)		{ __HAL_RCC_USART2_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART2)	{ __HAL_RCC_USART2_FORCE_RESET(); return; }
 	#endif
 	#ifdef USART3
-	if (me->huart.Instance == USART3)		{ __HAL_RCC_USART3_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART3)	{ __HAL_RCC_USART3_FORCE_RESET(); return; }
 	#endif
 	#ifdef USART4
-	if (me->huart.Instance == USART4)		{ __HAL_RCC_USART4_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART4)	{ __HAL_RCC_USART4_FORCE_RESET(); return; }
 	#endif
 	#ifdef USART5
-	if (me->huart.Instance == USART5)		{ __HAL_RCC_USART5_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART5)	{ __HAL_RCC_USART5_FORCE_RESET(); return; }
 	#endif
 	#ifdef USART6
-	if (me->huart.Instance == USART6)		{ __HAL_RCC_USART6_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART6)	{ __HAL_RCC_USART6_FORCE_RESET(); return; }
 	#endif
 	#ifdef USART7
-	if (me->huart.Instance == USART7)		{ __HAL_RCC_USART7_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART7)	{ __HAL_RCC_USART7_FORCE_RESET(); return; }
 	#endif
 	#ifdef USART8
-	if (me->huart.Instance == USART8)		{ __HAL_RCC_USART8_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART8)	{ __HAL_RCC_USART8_FORCE_RESET(); return; }
 	#endif
 	#ifdef USART9
-	if (me->huart.Instance == USART9)		{ __HAL_RCC_USART9_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART9)	{ __HAL_RCC_USART9_FORCE_RESET(); return; }
 	#endif
 	#ifdef USART10
-	if (me->huart.Instance == USART10)		{ __HAL_RCC_USART10_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART10)	{ __HAL_RCC_USART10_FORCE_RESET(); return; }
 	#endif
 	#ifdef UART1
-	if (me->huart.Instance == UART1)		{ __HAL_RCC_UART1_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART1)	{ __HAL_RCC_UART1_FORCE_RESET(); return; }
 	#endif
 	#ifdef UART2
-	if (me->huart.Instance == UART2)		{ __HAL_RCC_UART2_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART2)	{ __HAL_RCC_UART2_FORCE_RESET(); return; }
 	#endif
 	#ifdef UART3
-	if (me->huart.Instance == UART3)		{ __HAL_RCC_UART3_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART3)	{ __HAL_RCC_UART3_FORCE_RESET(); return; }
 	#endif
 	#ifdef UART4
-	if (me->huart.Instance == UART4)		{ __HAL_RCC_UART4_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART4)	{ __HAL_RCC_UART4_FORCE_RESET(); return; }
 	#endif
 	#ifdef UART5
-	if (me->huart.Instance == UART5)		{ __HAL_RCC_UART5_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART5)	{ __HAL_RCC_UART5_FORCE_RESET(); return; }
 	#endif
 	#ifdef UART6
-	if (me->huart.Instance == UART6)		{ __HAL_RCC_UART6_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART6)	{ __HAL_RCC_UART6_FORCE_RESET(); return; }
 	#endif
 	#ifdef UART7
-	if (me->huart.Instance == UART7)		{ __HAL_RCC_UART7_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART7)	{ __HAL_RCC_UART7_FORCE_RESET(); return; }
 	#endif
 	#ifdef UART8
-	if (me->huart.Instance == UART8)		{ __HAL_RCC_UART8_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART8)	{ __HAL_RCC_UART8_FORCE_RESET(); return; }
 	#endif
 	#ifdef UART9
-	if (me->huart.Instance == UART9)		{ __HAL_RCC_UART9_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART9)	{ __HAL_RCC_UART9_FORCE_RESET(); return; }
 	#endif
 	#ifdef UART10
-	if (me->huart.Instance == UART10)		{ __HAL_RCC_UART10_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART10)	{ __HAL_RCC_UART10_FORCE_RESET(); return; }
 	#endif
 	#ifdef LPUART1
-	if (me->huart.Instance == LPUART1)		{ __HAL_RCC_LPUART1_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == LPUART1)	{ __HAL_RCC_LPUART1_FORCE_RESET(); return; }
 	#endif
 	#ifdef LPUART2
-	if (me->huart.Instance == LPUART2)		{ __HAL_RCC_LPUART2_FORCE_RESET(); isErr = false; }
+	if (me->huart.Instance == LPUART2)	{ __HAL_RCC_LPUART2_FORCE_RESET(); return; }
 	#endif
 
-	if(isErr)								{ ALX_SERIAL_PORT_ASSERT(false); }	// We should not get here
+	ALX_SERIAL_PORT_ASSERT(false);	// We should not get here
 }
 static void AlxSerialPort_Periph_ReleaseReset(AlxSerialPort* me)
 {
-	bool isErr = true;
-
 	#ifdef USART1
-	if (me->huart.Instance == USART1)		{ __HAL_RCC_USART1_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART1)	{ __HAL_RCC_USART1_RELEASE_RESET(); return; }
 	#endif
 	#ifdef USART2
-	if (me->huart.Instance == USART2)		{ __HAL_RCC_USART2_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART2)	{ __HAL_RCC_USART2_RELEASE_RESET(); return; }
 	#endif
 	#ifdef USART3
-	if (me->huart.Instance == USART3)		{ __HAL_RCC_USART3_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART3)	{ __HAL_RCC_USART3_RELEASE_RESET(); return; }
 	#endif
 	#ifdef USART4
-	if (me->huart.Instance == USART4)		{ __HAL_RCC_USART4_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART4)	{ __HAL_RCC_USART4_RELEASE_RESET(); return; }
 	#endif
 	#ifdef USART5
-	if (me->huart.Instance == USART5)		{ __HAL_RCC_USART5_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART5)	{ __HAL_RCC_USART5_RELEASE_RESET(); return; }
 	#endif
 	#ifdef USART6
-	if (me->huart.Instance == USART6)		{ __HAL_RCC_USART6_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART6)	{ __HAL_RCC_USART6_RELEASE_RESET(); return; }
 	#endif
 	#ifdef USART7
-	if (me->huart.Instance == USART7)		{ __HAL_RCC_USART7_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART7)	{ __HAL_RCC_USART7_RELEASE_RESET(); return; }
 	#endif
 	#ifdef USART8
-	if (me->huart.Instance == USART8)		{ __HAL_RCC_USART8_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART8)	{ __HAL_RCC_USART8_RELEASE_RESET(); return; }
 	#endif
 	#ifdef USART9
-	if (me->huart.Instance == USART9)		{ __HAL_RCC_USART9_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART9)	{ __HAL_RCC_USART9_RELEASE_RESET(); return; }
 	#endif
 	#ifdef USART10
-	if (me->huart.Instance == USART10)		{ __HAL_RCC_USART10_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == USART10)	{ __HAL_RCC_USART10_RELEASE_RESET(); return; }
 	#endif
 	#ifdef UART1
-	if (me->huart.Instance == UART1)		{ __HAL_RCC_UART1_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART1)	{ __HAL_RCC_UART1_RELEASE_RESET(); return; }
 	#endif
 	#ifdef UART2
-	if (me->huart.Instance == UART2)		{ __HAL_RCC_UART2_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART2)	{ __HAL_RCC_UART2_RELEASE_RESET(); return; }
 	#endif
 	#ifdef UART3
-	if (me->huart.Instance == UART3)		{ __HAL_RCC_UART3_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART3)	{ __HAL_RCC_UART3_RELEASE_RESET(); return; }
 	#endif
 	#ifdef UART4
-	if (me->huart.Instance == UART4)		{ __HAL_RCC_UART4_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART4)	{ __HAL_RCC_UART4_RELEASE_RESET(); return; }
 	#endif
 	#ifdef UART5
-	if (me->huart.Instance == UART5)		{ __HAL_RCC_UART5_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART5)	{ __HAL_RCC_UART5_RELEASE_RESET(); return; }
 	#endif
 	#ifdef UART6
-	if (me->huart.Instance == UART6)		{ __HAL_RCC_UART6_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART6)	{ __HAL_RCC_UART6_RELEASE_RESET(); return; }
 	#endif
 	#ifdef UART7
-	if (me->huart.Instance == UART7)		{ __HAL_RCC_UART7_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART7)	{ __HAL_RCC_UART7_RELEASE_RESET(); return; }
 	#endif
 	#ifdef UART8
-	if (me->huart.Instance == UART8)		{ __HAL_RCC_UART8_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART8)	{ __HAL_RCC_UART8_RELEASE_RESET(); return; }
 	#endif
 	#ifdef UART9
-	if (me->huart.Instance == UART9)		{ __HAL_RCC_UART9_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART9)	{ __HAL_RCC_UART9_RELEASE_RESET(); return; }
 	#endif
 	#ifdef UART10
-	if (me->huart.Instance == UART10)		{ __HAL_RCC_UART10_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == UART10)	{ __HAL_RCC_UART10_RELEASE_RESET(); return; }
 	#endif
 	#ifdef LPUART1
-	if (me->huart.Instance == LPUART1)		{ __HAL_RCC_LPUART1_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == LPUART1)	{ __HAL_RCC_LPUART1_RELEASE_RESET(); return; }
 	#endif
 	#ifdef LPUART2
-	if (me->huart.Instance == LPUART2)		{ __HAL_RCC_LPUART2_RELEASE_RESET(); isErr = false; }
+	if (me->huart.Instance == LPUART2)	{ __HAL_RCC_LPUART2_RELEASE_RESET(); return; }
 	#endif
 
-	if(isErr)								{ ALX_SERIAL_PORT_ASSERT(false); }	// We should not get here
+	ALX_SERIAL_PORT_ASSERT(false);	// We should not get here
 }
 static void AlxSerialPort_Periph_EnableIrq(AlxSerialPort* me)
 {
-	bool isErr = true;
-
 	#ifdef USART1
-	if (me->huart.Instance == USART1)		{ HAL_NVIC_SetPriority(USART1_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART1_IRQn); isErr = false; }
+	if (me->huart.Instance == USART1)	{ HAL_NVIC_SetPriority(USART1_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART1_IRQn); return; }
 	#endif
 	#ifdef USART2
-	if (me->huart.Instance == USART2)		{ HAL_NVIC_SetPriority(USART2_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART2_IRQn); isErr = false; }
+	if (me->huart.Instance == USART2)	{ HAL_NVIC_SetPriority(USART2_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART2_IRQn); return; }
 	#endif
 	#ifdef USART3
-	if (me->huart.Instance == USART3)		{ HAL_NVIC_SetPriority(USART3_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART3_IRQn); isErr = false; }
+	if (me->huart.Instance == USART3)	{ HAL_NVIC_SetPriority(USART3_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART3_IRQn); return; }
 	#endif
 	#ifdef USART4
-	if (me->huart.Instance == USART4)		{ HAL_NVIC_SetPriority(USART4_5_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART4_5_IRQn); isErr = false; }
+	if (me->huart.Instance == USART4)	{ HAL_NVIC_SetPriority(USART4_5_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART4_5_IRQn); return; }
 	#endif
 	#ifdef USART5
-	if (me->huart.Instance == USART5)		{ HAL_NVIC_SetPriority(USART4_5_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART4_5_IRQn); isErr = false; }
+	if (me->huart.Instance == USART5)	{ HAL_NVIC_SetPriority(USART4_5_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART4_5_IRQn); return; }
 	#endif
 	#ifdef USART6
-	if (me->huart.Instance == USART6)		{ HAL_NVIC_SetPriority(USART6_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART6_IRQn); isErr = false; }
+	if (me->huart.Instance == USART6)	{ HAL_NVIC_SetPriority(USART6_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART6_IRQn); return; }
 	#endif
 	#ifdef USART7
-	if (me->huart.Instance == USART7)		{ HAL_NVIC_SetPriority(USART7_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART7_IRQn); isErr = false; }
+	if (me->huart.Instance == USART7)	{ HAL_NVIC_SetPriority(USART7_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART7_IRQn); return; }
 	#endif
 	#ifdef USART8
-	if (me->huart.Instance == USART8)		{ HAL_NVIC_SetPriority(USART8_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART8_IRQn); isErr = false; }
+	if (me->huart.Instance == USART8)	{ HAL_NVIC_SetPriority(USART8_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART8_IRQn); return; }
 	#endif
 	#ifdef USART9
-	if (me->huart.Instance == USART9)		{ HAL_NVIC_SetPriority(USART9_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART9_IRQn); isErr = false; }
+	if (me->huart.Instance == USART9)	{ HAL_NVIC_SetPriority(USART9_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART9_IRQn); return; }
 	#endif
 	#ifdef USART10
-	if (me->huart.Instance == USART10)		{ HAL_NVIC_SetPriority(USART10_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART10_IRQn); isErr = false; }
+	if (me->huart.Instance == USART10)	{ HAL_NVIC_SetPriority(USART10_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART10_IRQn); return; }
 	#endif
 	#ifdef UART1
-	if (me->huart.Instance == UART1)		{ HAL_NVIC_SetPriority(UART1_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART1_IRQn); isErr = false; }
+	if (me->huart.Instance == UART1)	{ HAL_NVIC_SetPriority(UART1_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART1_IRQn); return; }
 	#endif
 	#ifdef UART2
-	if (me->huart.Instance == UART2)		{ HAL_NVIC_SetPriority(UART2_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART2_IRQn); isErr = false; }
+	if (me->huart.Instance == UART2)	{ HAL_NVIC_SetPriority(UART2_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART2_IRQn); return; }
 	#endif
 	#ifdef UART3
-	if (me->huart.Instance == UART3)		{ HAL_NVIC_SetPriority(UART3_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART3_IRQn); isErr = false; }
+	if (me->huart.Instance == UART3)	{ HAL_NVIC_SetPriority(UART3_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART3_IRQn); return; }
 	#endif
 	#ifdef UART4
-	if (me->huart.Instance == UART4)		{ HAL_NVIC_SetPriority(UART4_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART4_IRQn); isErr = false; }
+	if (me->huart.Instance == UART4)	{ HAL_NVIC_SetPriority(UART4_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART4_IRQn); return; }
 	#endif
 	#ifdef UART5
-	if (me->huart.Instance == UART5)		{ HAL_NVIC_SetPriority(UART5_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART5_IRQn); isErr = false; }
+	if (me->huart.Instance == UART5)	{ HAL_NVIC_SetPriority(UART5_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART5_IRQn); return; }
 	#endif
 	#ifdef UART6
-	if (me->huart.Instance == UART6)		{ HAL_NVIC_SetPriority(UART6_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART6_IRQn); isErr = false; }
+	if (me->huart.Instance == UART6)	{ HAL_NVIC_SetPriority(UART6_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART6_IRQn); return; }
 	#endif
 	#ifdef UART7
-	if (me->huart.Instance == UART7)		{ HAL_NVIC_SetPriority(UART7_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART7_IRQn); isErr = false; }
+	if (me->huart.Instance == UART7)	{ HAL_NVIC_SetPriority(UART7_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART7_IRQn); return; }
 	#endif
 	#ifdef UART8
-	if (me->huart.Instance == UART8)		{ HAL_NVIC_SetPriority(UART8_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART8_IRQn); isErr = false; }
+	if (me->huart.Instance == UART8)	{ HAL_NVIC_SetPriority(UART8_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART8_IRQn); return; }
 	#endif
 	#ifdef UART9
-	if (me->huart.Instance == UART9)		{ HAL_NVIC_SetPriority(UART9_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART9_IRQn); isErr = false; }
+	if (me->huart.Instance == UART9)	{ HAL_NVIC_SetPriority(UART9_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART9_IRQn); return; }
 	#endif
 	#ifdef UART10
-	if (me->huart.Instance == UART10)		{ HAL_NVIC_SetPriority(UART10_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART10_IRQn); isErr = false; }
+	if (me->huart.Instance == UART10)	{ HAL_NVIC_SetPriority(UART10_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART10_IRQn); return; }
 	#endif
 	#ifdef LPUART1
-	if (me->huart.Instance == LPUART1)		{ HAL_NVIC_SetPriority(LPUART1_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(LPUART1_IRQn); isErr = false; }
+	if (me->huart.Instance == LPUART1)	{ HAL_NVIC_SetPriority(LPUART1_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(LPUART1_IRQn); return; }
 	#endif
 	#ifdef LPUART2
-	if (me->huart.Instance == LPUART2)		{ HAL_NVIC_SetPriority(LPUART2_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(LPUART2_IRQn); isErr = false; }
+	if (me->huart.Instance == LPUART2)	{ HAL_NVIC_SetPriority(LPUART2_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(LPUART2_IRQn); return; }
 	#endif
 
-	if(isErr)								{ ALX_SERIAL_PORT_ASSERT(false); }	// We should not get here
+	ALX_SERIAL_PORT_ASSERT(false);	// We should not get here
 }
 static void AlxSerialPort_Periph_DisableIrq(AlxSerialPort* me)
 {
-	bool isErr = true;
-
 	#ifdef USART1
-	if (me->huart.Instance == USART1)		{ HAL_NVIC_DisableIRQ(USART1_IRQn); HAL_NVIC_ClearPendingIRQ(USART1_IRQn); isErr = false; }
+	if (me->huart.Instance == USART1)	{ HAL_NVIC_DisableIRQ(USART1_IRQn); HAL_NVIC_ClearPendingIRQ(USART1_IRQn); return; }
 	#endif
 	#ifdef USART2
-	if (me->huart.Instance == USART2)		{ HAL_NVIC_DisableIRQ(USART2_IRQn); HAL_NVIC_ClearPendingIRQ(USART2_IRQn); isErr = false; }
+	if (me->huart.Instance == USART2)	{ HAL_NVIC_DisableIRQ(USART2_IRQn); HAL_NVIC_ClearPendingIRQ(USART2_IRQn); return; }
 	#endif
 	#ifdef USART3
-	if (me->huart.Instance == USART3)		{ HAL_NVIC_DisableIRQ(USART3_IRQn); HAL_NVIC_ClearPendingIRQ(USART3_IRQn); isErr = false; }
+	if (me->huart.Instance == USART3)	{ HAL_NVIC_DisableIRQ(USART3_IRQn); HAL_NVIC_ClearPendingIRQ(USART3_IRQn); return; }
 	#endif
 	#ifdef USART4
-	if (me->huart.Instance == USART4)		{ HAL_NVIC_DisableIRQ(USART4_5_IRQn); HAL_NVIC_ClearPendingIRQ(USART4_5_IRQn);isErr = false; }
+	if (me->huart.Instance == USART4)	{ HAL_NVIC_DisableIRQ(USART4_5_IRQn); HAL_NVIC_ClearPendingIRQ(USART4_5_IRQn); return; }
 	#endif
 	#ifdef USART5
-	if (me->huart.Instance == USART5)		{ HAL_NVIC_DisableIRQ(USART4_5_IRQn); HAL_NVIC_ClearPendingIRQ(USART4_5_IRQn);isErr = false; }
+	if (me->huart.Instance == USART5)	{ HAL_NVIC_DisableIRQ(USART4_5_IRQn); HAL_NVIC_ClearPendingIRQ(USART4_5_IRQn); return; }
 	#endif
 	#ifdef USART6
-	if (me->huart.Instance == USART6)		{ HAL_NVIC_DisableIRQ(USART6_IRQn); HAL_NVIC_ClearPendingIRQ(USART6_IRQn); isErr = false; }
+	if (me->huart.Instance == USART6)	{ HAL_NVIC_DisableIRQ(USART6_IRQn); HAL_NVIC_ClearPendingIRQ(USART6_IRQn); return; }
 	#endif
 	#ifdef USART7
-	if (me->huart.Instance == USART7)		{ HAL_NVIC_DisableIRQ(USART7_IRQn); HAL_NVIC_ClearPendingIRQ(USART7_IRQn); isErr = false; }
+	if (me->huart.Instance == USART7)	{ HAL_NVIC_DisableIRQ(USART7_IRQn); HAL_NVIC_ClearPendingIRQ(USART7_IRQn); return; }
 	#endif
 	#ifdef USART8
-	if (me->huart.Instance == USART8)		{ HAL_NVIC_DisableIRQ(USART8_IRQn); HAL_NVIC_ClearPendingIRQ(USART8_IRQn); isErr = false; }
+	if (me->huart.Instance == USART8)	{ HAL_NVIC_DisableIRQ(USART8_IRQn); HAL_NVIC_ClearPendingIRQ(USART8_IRQn); return; }
 	#endif
 	#ifdef USART9
-	if (me->huart.Instance == USART9)		{ HAL_NVIC_DisableIRQ(USART9_IRQn); HAL_NVIC_ClearPendingIRQ(USART9_IRQn); isErr = false; }
+	if (me->huart.Instance == USART9)	{ HAL_NVIC_DisableIRQ(USART9_IRQn); HAL_NVIC_ClearPendingIRQ(USART9_IRQn); return; }
 	#endif
 	#ifdef USART10
-	if (me->huart.Instance == USART10)		{ HAL_NVIC_DisableIRQ(USART10_IRQn); HAL_NVIC_ClearPendingIRQ(USART10_IRQn); isErr = false; }
+	if (me->huart.Instance == USART10)	{ HAL_NVIC_DisableIRQ(USART10_IRQn); HAL_NVIC_ClearPendingIRQ(USART10_IRQn); return; }
 	#endif
 	#ifdef UART1
-	if (me->huart.Instance == UART1)		{ HAL_NVIC_DisableIRQ(UART1_IRQn); HAL_NVIC_ClearPendingIRQ(UART1_IRQn); isErr = false; }
+	if (me->huart.Instance == UART1)	{ HAL_NVIC_DisableIRQ(UART1_IRQn); HAL_NVIC_ClearPendingIRQ(UART1_IRQn); return; }
 	#endif
 	#ifdef UART2
-	if (me->huart.Instance == UART2)		{ HAL_NVIC_DisableIRQ(UART2_IRQn); HAL_NVIC_ClearPendingIRQ(UART2_IRQn); isErr = false; }
+	if (me->huart.Instance == UART2)	{ HAL_NVIC_DisableIRQ(UART2_IRQn); HAL_NVIC_ClearPendingIRQ(UART2_IRQn); return; }
 	#endif
 	#ifdef UART3
-	if (me->huart.Instance == UART3)		{ HAL_NVIC_DisableIRQ(UART3_IRQn); HAL_NVIC_ClearPendingIRQ(UART3_IRQn); isErr = false; }
+	if (me->huart.Instance == UART3)	{ HAL_NVIC_DisableIRQ(UART3_IRQn); HAL_NVIC_ClearPendingIRQ(UART3_IRQn); return; }
 	#endif
 	#ifdef UART4
-	if (me->huart.Instance == UART4)		{ HAL_NVIC_DisableIRQ(UART4_IRQn); HAL_NVIC_ClearPendingIRQ(UART4_IRQn); isErr = false; }
+	if (me->huart.Instance == UART4)	{ HAL_NVIC_DisableIRQ(UART4_IRQn); HAL_NVIC_ClearPendingIRQ(UART4_IRQn); return; }
 	#endif
 	#ifdef UART5
-	if (me->huart.Instance == UART5)		{ HAL_NVIC_DisableIRQ(UART5_IRQn); HAL_NVIC_ClearPendingIRQ(UART5_IRQn); isErr = false; }
+	if (me->huart.Instance == UART5)	{ HAL_NVIC_DisableIRQ(UART5_IRQn); HAL_NVIC_ClearPendingIRQ(UART5_IRQn); return; }
 	#endif
 	#ifdef UART6
-	if (me->huart.Instance == UART6)		{ HAL_NVIC_DisableIRQ(UART6_IRQn); HAL_NVIC_ClearPendingIRQ(UART6_IRQn); isErr = false; }
+	if (me->huart.Instance == UART6)	{ HAL_NVIC_DisableIRQ(UART6_IRQn); HAL_NVIC_ClearPendingIRQ(UART6_IRQn); return; }
 	#endif
 	#ifdef UART7
-	if (me->huart.Instance == UART7)		{ HAL_NVIC_DisableIRQ(UART7_IRQn); HAL_NVIC_ClearPendingIRQ(UART7_IRQn); isErr = false; }
+	if (me->huart.Instance == UART7)	{ HAL_NVIC_DisableIRQ(UART7_IRQn); HAL_NVIC_ClearPendingIRQ(UART7_IRQn); return; }
 	#endif
 	#ifdef UART8
-	if (me->huart.Instance == UART8)		{ HAL_NVIC_DisableIRQ(UART8_IRQn); HAL_NVIC_ClearPendingIRQ(UART8_IRQn); isErr = false; }
+	if (me->huart.Instance == UART8)	{ HAL_NVIC_DisableIRQ(UART8_IRQn); HAL_NVIC_ClearPendingIRQ(UART8_IRQn); return; }
 	#endif
 	#ifdef UART9
-	if (me->huart.Instance == UART9)		{ HAL_NVIC_DisableIRQ(UART9_IRQn); HAL_NVIC_ClearPendingIRQ(UART9_IRQn); isErr = false; }
+	if (me->huart.Instance == UART9)	{ HAL_NVIC_DisableIRQ(UART9_IRQn); HAL_NVIC_ClearPendingIRQ(UART9_IRQn); return; }
 	#endif
 	#ifdef UART10
-	if (me->huart.Instance == UART10)		{ HAL_NVIC_DisableIRQ(UART10_IRQn); HAL_NVIC_ClearPendingIRQ(UART10_IRQn); isErr = false; }
+	if (me->huart.Instance == UART10)	{ HAL_NVIC_DisableIRQ(UART10_IRQn); HAL_NVIC_ClearPendingIRQ(UART10_IRQn); return; }
 	#endif
 	#ifdef LPUART1
-	if (me->huart.Instance == LPUART1)		{ HAL_NVIC_DisableIRQ(LPUART1_IRQn); HAL_NVIC_ClearPendingIRQ(LPUART1_IRQn); isErr = false; }
+	if (me->huart.Instance == LPUART1)	{ HAL_NVIC_DisableIRQ(LPUART1_IRQn); HAL_NVIC_ClearPendingIRQ(LPUART1_IRQn); return; }
 	#endif
 	#ifdef LPUART2
-	if (me->huart.Instance == LPUART2)		{ HAL_NVIC_DisableIRQ(LPUART2_IRQn); HAL_NVIC_ClearPendingIRQ(LPUART2_IRQn); isErr = false; }
+	if (me->huart.Instance == LPUART2)	{ HAL_NVIC_DisableIRQ(LPUART2_IRQn); HAL_NVIC_ClearPendingIRQ(LPUART2_IRQn); return; }
 	#endif
 
-	if(isErr)								{ ALX_SERIAL_PORT_ASSERT(false); }	// We should not get here
+	ALX_SERIAL_PORT_ASSERT(false);	// We should not get here
 }
 
 
