@@ -583,9 +583,17 @@ static Alx_Status AlxI2c_Reset(AlxI2c* me)
 }
 static bool AlxI2c_IsClkOk(AlxI2c* me)
 {
+	//------------------------------------------------------------------------------
+	// STM32F0
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F0)
 	return true;	// Always ok, HSI clock is directly used for I2C periphery
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32F4
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F4)
 	if
 	(
@@ -599,6 +607,11 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 			return false;
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32F7
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F7)
 	if
 	(
@@ -612,6 +625,11 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 			return false;
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32G4
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32G4)
 	if
 	(
@@ -625,6 +643,11 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 			return false;
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L0
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32L0)
 	if
 	(
@@ -638,6 +661,11 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 			return false;
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32L4)
 	if
 	(
@@ -650,7 +678,7 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 		else
 			return false;
 	}
-	else if
+	if
 	(
 		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_120MHz) ||
 		(me->i2cClk == AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_120MHz)
@@ -666,6 +694,11 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 			return false;
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32U5
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32U5)
 	if ((me->hi2c.Instance == I2C1) || (me->hi2c.Instance == I2C2) || (me->hi2c.Instance == I2C4))
 	{
@@ -697,7 +730,11 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 	}
 	#endif
 
-	ALX_I2C_ASSERT(false);	// We should't get here
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_I2C_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }
 static void AlxI2c_Periph_EnableClk(AlxI2c* me)

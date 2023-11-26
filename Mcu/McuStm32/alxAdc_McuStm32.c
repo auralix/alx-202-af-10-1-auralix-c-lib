@@ -1016,9 +1016,6 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 		else
 			return false;
 	}
-
-	ALX_ADC_ASSERT(false);	// We should not get here
-	return ALX_NULL;
 	#endif
 
 
@@ -1033,9 +1030,6 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 		else
 			return false;
 	}
-
-	ALX_ADC_ASSERT(false);	// We should not get here
-	return ALX_NULL;
 	#endif
 
 
@@ -1057,9 +1051,6 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 		else
 			return false;
 	}
-
-	ALX_ADC_ASSERT(false);	// We should not get here
-	return ALX_NULL;
 	#endif
 
 
@@ -1078,9 +1069,6 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 		else
 			return false;
 	}
-
-	ALX_ADC_ASSERT(false);	// We should not get here
-	return ALX_NULL;
 	#endif
 
 
@@ -1095,9 +1083,6 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 		else
 			return false;
 	}
-
-	ALX_ADC_ASSERT(false);	// We should not get here
-	return ALX_NULL;
 	#endif
 
 
@@ -1119,9 +1104,6 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 		else
 			return false;
 	}
-
-	ALX_ADC_ASSERT(false);	// We should not get here
-	return ALX_NULL;
 	#endif
 
 
@@ -1131,22 +1113,26 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 	#if defined(ALX_STM32L4)
 	if (me->adcClk == AlxAdc_Clk_McuStm32L4_AdcClk_20MHz_Sysclk_80MHz)
 	{
-		if(80000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
+		if(80000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Sysclk_Ctor))
 			return true;
 		else
 			return false;
 	}
-	else if (me->adcClk == AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Sysclk_120MHz)
+	if (me->adcClk == AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Sysclk_120MHz)
 	{
-		if(120000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor))
+		if(120000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Sysclk_Ctor))
 			return true;
 		else
 			return false;
 	}
+	#endif
 
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
 	ALX_ADC_ASSERT(false);	// We should not get here
 	return ALX_NULL;
-	#endif
 }
 static void AlxAdc_Periph_Adc_EnableClk(AlxAdc* me)
 {

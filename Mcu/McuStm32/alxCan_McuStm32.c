@@ -843,6 +843,9 @@ static uint8_t AlxCan_GetDataLen(uint32_t dataLenCode)
 //------------------------------------------------------------------------------
 static bool AlxCan_Ctor_IsClkOk(AlxCan* me)
 {
+	//------------------------------------------------------------------------------
+	// STM32F4
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F4)
 	if(me->canClk == AlxCan_Clk_McuStm32F4_CanClk_250kbps_Pclk1Apb1_45MHz)
 	{
@@ -852,6 +855,11 @@ static bool AlxCan_Ctor_IsClkOk(AlxCan* me)
 			return false;
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32G4
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32G4)
 	if (me->canClk == AlxCan_Clk_McuStm32G4_CanClk_250kbps_Pclk1Apb1_170MHz)
 	{
@@ -861,6 +869,11 @@ static bool AlxCan_Ctor_IsClkOk(AlxCan* me)
 			return false;
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32L4)
 	if(me->canClk == AlxCan_Clk_McuStm32L4_CanClk_250kbps_Pclk1Apb1_80MHz)
 	{
@@ -871,7 +884,11 @@ static bool AlxCan_Ctor_IsClkOk(AlxCan* me)
 	}
 	#endif
 
-	ALX_CAN_ASSERT(false); // We shouldn't get here
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_CAN_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }
 static void AlxCan_Periph_EnableClk(AlxCan* me)

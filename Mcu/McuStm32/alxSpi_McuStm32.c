@@ -499,6 +499,9 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me)
 }
 static bool AlxSpi_IsClkOk(AlxSpi* me)
 {
+	//------------------------------------------------------------------------------
+	// STM32F4
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F4)
 	if((me->hspi.Instance == SPI1) || (me->hspi.Instance == SPI4))
 	{
@@ -535,6 +538,11 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 		}
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32F7
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F7)
 	if((me->hspi.Instance == SPI1) || (me->hspi.Instance == SPI4) || (me->hspi.Instance == SPI5) || (me->hspi.Instance == SPI6))
 	{
@@ -577,6 +585,11 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 		}
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32G4
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32G4)
 	if(me->hspi.Instance == SPI1)
 	{
@@ -611,6 +624,11 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 		}
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L0
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32L0)
 	if(me->hspi.Instance == SPI1)
 	{
@@ -633,6 +651,11 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 		}
 	}
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32L4)
 	if (me->hspi.Instance == SPI1)
 	{
@@ -690,6 +713,10 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 	}
 	#endif
 
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
 	ALX_SPI_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }
