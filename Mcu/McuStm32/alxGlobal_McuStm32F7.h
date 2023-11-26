@@ -88,6 +88,18 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
+// ALX - MCU - ADC
+//------------------------------------------------------------------------------
+#define __HAL_RCC_ADC1_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
+#define __HAL_RCC_ADC2_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
+#define __HAL_RCC_ADC3_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
+
+#define __HAL_RCC_ADC1_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
+#define __HAL_RCC_ADC2_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
+#define __HAL_RCC_ADC3_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
+
+
+//------------------------------------------------------------------------------
 // ALX - ID
 //------------------------------------------------------------------------------
 #define ALX_STM32_CMSIS_VERSION_MAIN	__STM32F7_CMSIS_VERSION_MAIN

@@ -84,14 +84,23 @@ extern "C" {
 // Preprocessor
 //******************************************************************************
 
+
 //------------------------------------------------------------------------------
-// ALX MCU - ADC
+// ALX - MCU - ADC
 //------------------------------------------------------------------------------
+#define __HAL_RCC_ADC1_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
+#define __HAL_RCC_ADC2_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
+#define __HAL_RCC_ADC3_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
+
+#define __HAL_RCC_ADC1_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
+#define __HAL_RCC_ADC2_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
+#define __HAL_RCC_ADC3_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
+
 #define __LL_ADC_CALC_VREFANALOG_VOLTAGE(__VREFINT_ADC_DATA__,__ADC_RESOLUTION__) (((uint32_t)(*VREFINT_CAL_ADDR) * VREFINT_CAL_VREF) / __LL_ADC_CONVERT_DATA_RESOLUTION((__VREFINT_ADC_DATA__),(__ADC_RESOLUTION__),LL_ADC_RESOLUTION_12B))
 
 
 //------------------------------------------------------------------------------
-// ALX MCU - DAC
+// ALX - MCU - DAC
 //------------------------------------------------------------------------------
 #define __HAL_RCC_DAC1_CLK_ENABLE		__HAL_RCC_DAC_CLK_ENABLE
 #define __HAL_RCC_DAC1_CLK_DISABLE		__HAL_RCC_DAC_CLK_DISABLE
