@@ -51,6 +51,22 @@ static AlxCan* alxCan_Can3 = NULL;
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
+static void AlxCan_TxMsg_TryAddToHwMailbox(AlxCan* me);
+static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me);
+#if defined(ALX_STM32G4)
+static uint32_t AlxCan_GetDataLenCode(uint8_t len);
+static uint8_t AlxCan_GetDataLen(uint32_t lenCode);
+#endif
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static bool AlxCan_Ctor_IsClkOk(AlxCan* me);
 static void AlxCan_Periph_EnableClk(AlxCan* me);
 static void AlxCan_Periph_DisableClk(AlxCan* me);
@@ -58,12 +74,6 @@ static void AlxCan_Periph_ForceReset(AlxCan* me);
 static void AlxCan_Periph_ReleaseReset(AlxCan* me);
 static void AlxCan_Periph_EnableIrq(AlxCan* me);
 static void AlxCan_Periph_DisableIrq(AlxCan* me);
-static void AlxCan_TxMsg_TryAddToHwMailbox(AlxCan* me);
-static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me);
-#if defined(ALX_STM32G4)
-static uint32_t AlxCan_GetDataLenCode(uint8_t len);
-static uint8_t AlxCan_GetDataLen(uint32_t lenCode);
-#endif
 
 
 //******************************************************************************
@@ -554,210 +564,11 @@ void AlxCan_IrqHandler(AlxCan* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static bool AlxCan_Ctor_IsClkOk(AlxCan* me)
-{
-	#if defined(ALX_STM32F4)
-	if(me->canClk == AlxCan_Clk_McuStm32F4_CanClk_250kbps_Pclk1Apb1_45MHz)
-	{
-		if(45000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
-			return true;
-		else
-			return false;
-	}
-	#endif
-	#if defined(ALX_STM32G4)
-	if (me->canClk == AlxCan_Clk_McuStm32G4_CanClk_250kbps_Pclk1Apb1_170MHz)
-	{
-		if (170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
-			return true;
-		else
-			return false;
-	}
-	#endif
-	#if defined(ALX_STM32L4)
-	if(me->canClk == AlxCan_Clk_McuStm32L4_CanClk_250kbps_Pclk1Apb1_80MHz)
-	{
-		if(80000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
-			return true;
-		else
-			return false;
-	}
-	#endif
 
-	ALX_CAN_ASSERT(false); // We shouldn't get here
-	return ALX_NULL;
-}
-static void AlxCan_Periph_EnableClk(AlxCan* me)
-{
-	bool isErr = true;
 
-	#if defined(CAN1)
-	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_CLK_ENABLE(); isErr = false; }
-	#endif
-	#if defined(CAN2)
-	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_CLK_ENABLE(); isErr = false; }
-	#endif
-	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
-	__HAL_RCC_FDCAN_CLK_ENABLE(); isErr = false;
-	#endif
-
-	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
-}
-static void AlxCan_Periph_DisableClk(AlxCan* me)
-{
-	bool isErr = true;
-
-	#if defined(CAN1)
-	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_CLK_DISABLE(); isErr = false; }
-	#endif
-	#if defined(CAN2)
-	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_CLK_DISABLE(); isErr = false; }
-	#endif
-
-	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
-	__HAL_RCC_FDCAN_CLK_DISABLE(); isErr = false;
-	#endif
-
-	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
-}
-static void AlxCan_Periph_ForceReset(AlxCan* me)
-{
-	bool isErr = true;
-
-	#if defined(CAN1)
-	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_FORCE_RESET(); isErr = false; }
-	#endif
-	#if defined(CAN2)
-	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_FORCE_RESET(); isErr = false; }
-	#endif
-
-	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
-	 __HAL_RCC_FDCAN_FORCE_RESET(); isErr = false;
-	#endif
-
-	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
-}
-static void AlxCan_Periph_ReleaseReset(AlxCan* me)
-{
-	bool isErr = true;
-
-	#if defined(CAN1)
-	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_RELEASE_RESET(); isErr = false; }
-	#endif
-	#if defined(CAN2)
-	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_RELEASE_RESET(); isErr = false; }
-	#endif
-
-	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
-	__HAL_RCC_FDCAN_RELEASE_RESET(); isErr = false;
-	#endif
-
-	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
-}
-static void AlxCan_Periph_EnableIrq(AlxCan* me)
-{
-	bool isErr = true;
-
-	#if defined(CAN1)
-	if (me->hcan.Instance == CAN1)
-	{
-		HAL_NVIC_SetPriority(CAN1_TX_IRQn, me->txIrqPriority, 0);
-		HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
-		HAL_NVIC_SetPriority(CAN1_RX0_IRQn, me->rxIrqPriority, 0);
-		HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
-		isErr = false;
-	}
-	#endif
-	#if defined(CAN2)
-	if (me->hcan.Instance == CAN2)
-	{
-		HAL_NVIC_SetPriority(CAN2_TX_IRQn, me->txIrqPriority, 0);
-		HAL_NVIC_EnableIRQ(CAN2_TX_IRQn);
-		HAL_NVIC_SetPriority(CAN2_RX0_IRQn, me->rxIrqPriority, 0);
-		HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
-		isErr = false;
-	}
-	#endif
-
-	#if defined(FDCAN1)
-	if (me->hcan.Instance == FDCAN1)
-	{
-		HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, me->txIrqPriority, 0);
-		HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
-		isErr = false;
-	}
-	#endif
-	#if defined(FDCAN2)
-	if (me->hcan.Instance == FDCAN2)
-	{
-		HAL_NVIC_SetPriority(FDCAN2_IT0_IRQn, me->txIrqPriority, 0);
-		HAL_NVIC_EnableIRQ(FDCAN2_IT0_IRQn);
-		isErr = false;
-	}
-	#endif
-	#if defined(FDCAN3)
-	if (me->hcan.Instance == FDCAN3)
-	{
-		HAL_NVIC_SetPriority(FDCAN3_IT0_IRQn, me->txIrqPriority, 0);
-		HAL_NVIC_EnableIRQ(FDCAN3_IT0_IRQn);
-		isErr = false;
-	}
-	#endif
-
-	if(isErr) { ALX_CAN_ASSERT(false); } // We shouldn't get here
-}
-static void AlxCan_Periph_DisableIrq(AlxCan* me)
-{
-	bool isErr = true;
-
-	#if defined(CAN1)
-	if (me->hcan.Instance == CAN1)
-	{
-		HAL_NVIC_DisableIRQ(CAN1_TX_IRQn);
-		HAL_NVIC_ClearPendingIRQ(CAN1_TX_IRQn);
-		HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
-		HAL_NVIC_ClearPendingIRQ(CAN1_RX0_IRQn);
-		isErr = false;
-	}
-	#endif
-	#if defined(CAN2)
-	if (me->hcan.Instance == CAN2)
-	{
-		HAL_NVIC_DisableIRQ(CAN2_TX_IRQn);
-		HAL_NVIC_ClearPendingIRQ(CAN2_TX_IRQn);
-		HAL_NVIC_DisableIRQ(CAN2_RX0_IRQn);
-		HAL_NVIC_ClearPendingIRQ(CAN2_RX0_IRQn);
-		isErr = false;
-	}
-	#endif
-
-	#if defined(FDCAN1)
-	if (me->hcan.Instance == FDCAN1)
-	{
-		HAL_NVIC_DisableIRQ(FDCAN1_IT0_IRQn);
-		HAL_NVIC_ClearPendingIRQ(FDCAN1_IT0_IRQn);
-		isErr = false;
-	}
-	#endif
-	#if defined(FDCAN2)
-	if (me->hcan.Instance == FDCAN2)
-	{
-		HAL_NVIC_DisableIRQ(FDCAN2_IT0_IRQn);
-		HAL_NVIC_ClearPendingIRQ(FDCAN2_IT0_IRQn);
-		isErr = false;
-	}
-	#endif
-	#if defined(FDCAN3)
-	if (me->hcan.Instance == FDCAN3)
-	{
-		HAL_NVIC_DisableIRQ(FDCAN3_IT0_IRQn);
-		HAL_NVIC_ClearPendingIRQ(FDCAN3_IT0_IRQn);
-		isErr = false;
-	}
-	#endif
-
-	if(isErr) { ALX_CAN_ASSERT(false); } // We shouldn't get here
-}
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static void AlxCan_TxMsg_TryAddToHwMailbox(AlxCan* me)
 {
 	#if defined(ALX_STM32F4) || defined(ALX_STM32L4)
@@ -1025,6 +836,215 @@ static uint8_t AlxCan_GetDataLen(uint32_t dataLenCode)
 	return 0;
 }
 #endif
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
+static bool AlxCan_Ctor_IsClkOk(AlxCan* me)
+{
+	#if defined(ALX_STM32F4)
+	if(me->canClk == AlxCan_Clk_McuStm32F4_CanClk_250kbps_Pclk1Apb1_45MHz)
+	{
+		if(45000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
+			return true;
+		else
+			return false;
+	}
+	#endif
+	#if defined(ALX_STM32G4)
+	if (me->canClk == AlxCan_Clk_McuStm32G4_CanClk_250kbps_Pclk1Apb1_170MHz)
+	{
+		if (170000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
+			return true;
+		else
+			return false;
+	}
+	#endif
+	#if defined(ALX_STM32L4)
+	if(me->canClk == AlxCan_Clk_McuStm32L4_CanClk_250kbps_Pclk1Apb1_80MHz)
+	{
+		if(80000000UL == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
+			return true;
+		else
+			return false;
+	}
+	#endif
+
+	ALX_CAN_ASSERT(false); // We shouldn't get here
+	return ALX_NULL;
+}
+static void AlxCan_Periph_EnableClk(AlxCan* me)
+{
+	bool isErr = true;
+
+	#if defined(CAN1)
+	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_CLK_ENABLE(); isErr = false; }
+	#endif
+	#if defined(CAN2)
+	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_CLK_ENABLE(); isErr = false; }
+	#endif
+	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
+	__HAL_RCC_FDCAN_CLK_ENABLE(); isErr = false;
+	#endif
+
+	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
+}
+static void AlxCan_Periph_DisableClk(AlxCan* me)
+{
+	bool isErr = true;
+
+	#if defined(CAN1)
+	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_CLK_DISABLE(); isErr = false; }
+	#endif
+	#if defined(CAN2)
+	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_CLK_DISABLE(); isErr = false; }
+	#endif
+
+	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
+	__HAL_RCC_FDCAN_CLK_DISABLE(); isErr = false;
+	#endif
+
+	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
+}
+static void AlxCan_Periph_ForceReset(AlxCan* me)
+{
+	bool isErr = true;
+
+	#if defined(CAN1)
+	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_FORCE_RESET(); isErr = false; }
+	#endif
+	#if defined(CAN2)
+	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_FORCE_RESET(); isErr = false; }
+	#endif
+
+	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
+	 __HAL_RCC_FDCAN_FORCE_RESET(); isErr = false;
+	#endif
+
+	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
+}
+static void AlxCan_Periph_ReleaseReset(AlxCan* me)
+{
+	bool isErr = true;
+
+	#if defined(CAN1)
+	if (me->hcan.Instance == CAN1)	{ __HAL_RCC_CAN1_RELEASE_RESET(); isErr = false; }
+	#endif
+	#if defined(CAN2)
+	if (me->hcan.Instance == CAN2)	{ __HAL_RCC_CAN2_RELEASE_RESET(); isErr = false; }
+	#endif
+
+	#if defined(FDCAN1) || defined(FDCAN2) || defined(FDCAN3)
+	__HAL_RCC_FDCAN_RELEASE_RESET(); isErr = false;
+	#endif
+
+	if(isErr)						{ ALX_CAN_ASSERT(false); } // We shouldn't get here
+}
+static void AlxCan_Periph_EnableIrq(AlxCan* me)
+{
+	bool isErr = true;
+
+	#if defined(CAN1)
+	if (me->hcan.Instance == CAN1)
+	{
+		HAL_NVIC_SetPriority(CAN1_TX_IRQn, me->txIrqPriority, 0);
+		HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
+		HAL_NVIC_SetPriority(CAN1_RX0_IRQn, me->rxIrqPriority, 0);
+		HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
+		isErr = false;
+	}
+	#endif
+	#if defined(CAN2)
+	if (me->hcan.Instance == CAN2)
+	{
+		HAL_NVIC_SetPriority(CAN2_TX_IRQn, me->txIrqPriority, 0);
+		HAL_NVIC_EnableIRQ(CAN2_TX_IRQn);
+		HAL_NVIC_SetPriority(CAN2_RX0_IRQn, me->rxIrqPriority, 0);
+		HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
+		isErr = false;
+	}
+	#endif
+
+	#if defined(FDCAN1)
+	if (me->hcan.Instance == FDCAN1)
+	{
+		HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, me->txIrqPriority, 0);
+		HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
+		isErr = false;
+	}
+	#endif
+	#if defined(FDCAN2)
+	if (me->hcan.Instance == FDCAN2)
+	{
+		HAL_NVIC_SetPriority(FDCAN2_IT0_IRQn, me->txIrqPriority, 0);
+		HAL_NVIC_EnableIRQ(FDCAN2_IT0_IRQn);
+		isErr = false;
+	}
+	#endif
+	#if defined(FDCAN3)
+	if (me->hcan.Instance == FDCAN3)
+	{
+		HAL_NVIC_SetPriority(FDCAN3_IT0_IRQn, me->txIrqPriority, 0);
+		HAL_NVIC_EnableIRQ(FDCAN3_IT0_IRQn);
+		isErr = false;
+	}
+	#endif
+
+	if(isErr) { ALX_CAN_ASSERT(false); } // We shouldn't get here
+}
+static void AlxCan_Periph_DisableIrq(AlxCan* me)
+{
+	bool isErr = true;
+
+	#if defined(CAN1)
+	if (me->hcan.Instance == CAN1)
+	{
+		HAL_NVIC_DisableIRQ(CAN1_TX_IRQn);
+		HAL_NVIC_ClearPendingIRQ(CAN1_TX_IRQn);
+		HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
+		HAL_NVIC_ClearPendingIRQ(CAN1_RX0_IRQn);
+		isErr = false;
+	}
+	#endif
+	#if defined(CAN2)
+	if (me->hcan.Instance == CAN2)
+	{
+		HAL_NVIC_DisableIRQ(CAN2_TX_IRQn);
+		HAL_NVIC_ClearPendingIRQ(CAN2_TX_IRQn);
+		HAL_NVIC_DisableIRQ(CAN2_RX0_IRQn);
+		HAL_NVIC_ClearPendingIRQ(CAN2_RX0_IRQn);
+		isErr = false;
+	}
+	#endif
+
+	#if defined(FDCAN1)
+	if (me->hcan.Instance == FDCAN1)
+	{
+		HAL_NVIC_DisableIRQ(FDCAN1_IT0_IRQn);
+		HAL_NVIC_ClearPendingIRQ(FDCAN1_IT0_IRQn);
+		isErr = false;
+	}
+	#endif
+	#if defined(FDCAN2)
+	if (me->hcan.Instance == FDCAN2)
+	{
+		HAL_NVIC_DisableIRQ(FDCAN2_IT0_IRQn);
+		HAL_NVIC_ClearPendingIRQ(FDCAN2_IT0_IRQn);
+		isErr = false;
+	}
+	#endif
+	#if defined(FDCAN3)
+	if (me->hcan.Instance == FDCAN3)
+	{
+		HAL_NVIC_DisableIRQ(FDCAN3_IT0_IRQn);
+		HAL_NVIC_ClearPendingIRQ(FDCAN3_IT0_IRQn);
+		isErr = false;
+	}
+	#endif
+
+	if(isErr) { ALX_CAN_ASSERT(false); } // We shouldn't get here
+}
 
 
 //******************************************************************************

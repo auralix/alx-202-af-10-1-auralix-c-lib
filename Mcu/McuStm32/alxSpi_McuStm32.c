@@ -41,9 +41,19 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static bool AlxSpi_IsClkOk(AlxSpi* me);
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static void AlxSpi_ParseMode(AlxSpi* me);
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static Alx_Status AlxSpi_Reset(AlxSpi* me);
+static bool AlxSpi_IsClkOk(AlxSpi* me);
 static void AlxSpi_Periph_EnableClk(AlxSpi* me);
 static void AlxSpi_Periph_DisableClk(AlxSpi* me);
 static void AlxSpi_Periph_ForceReset(AlxSpi* me);
@@ -436,6 +446,25 @@ void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
+static void AlxSpi_ParseMode(AlxSpi* me)
+{
+	if (me->mode == AlxSpi_Mode_0) { me->clkPolarity = SPI_POLARITY_LOW; me->clkPhase = SPI_PHASE_1EDGE; return; }
+	if (me->mode == AlxSpi_Mode_1) { me->clkPolarity = SPI_POLARITY_LOW; me->clkPhase = SPI_PHASE_2EDGE; return; }
+	if (me->mode == AlxSpi_Mode_2) { me->clkPolarity = SPI_POLARITY_HIGH; me->clkPhase = SPI_PHASE_1EDGE; return; }
+	if (me->mode == AlxSpi_Mode_3) { me->clkPolarity = SPI_POLARITY_HIGH; me->clkPhase = SPI_PHASE_2EDGE; return; }
+
+	ALX_SPI_ASSERT(false);	// We should not get here
+}
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static Alx_Status AlxSpi_Reset(AlxSpi* me)
 {
 	// DeInit SPI
@@ -663,15 +692,6 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 
 	ALX_SPI_ASSERT(false);	// We should not get here
 	return ALX_NULL;
-}
-static void AlxSpi_ParseMode(AlxSpi* me)
-{
-	if (me->mode == AlxSpi_Mode_0) { me->clkPolarity = SPI_POLARITY_LOW; me->clkPhase = SPI_PHASE_1EDGE; return; }
-	if (me->mode == AlxSpi_Mode_1) { me->clkPolarity = SPI_POLARITY_LOW; me->clkPhase = SPI_PHASE_2EDGE; return; }
-	if (me->mode == AlxSpi_Mode_2) { me->clkPolarity = SPI_POLARITY_HIGH; me->clkPhase = SPI_PHASE_1EDGE; return; }
-	if (me->mode == AlxSpi_Mode_3) { me->clkPolarity = SPI_POLARITY_HIGH; me->clkPhase = SPI_PHASE_2EDGE; return; }
-
-	ALX_SPI_ASSERT(false);	// We should not get here
 }
 static void AlxSpi_Periph_EnableClk(AlxSpi* me)
 {

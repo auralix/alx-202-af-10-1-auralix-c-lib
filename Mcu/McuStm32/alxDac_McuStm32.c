@@ -41,9 +41,19 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static Alx_Status AlxDac_Init_Private(AlxDac* me, bool calibrateVref, float vref_V);
 static Alx_Status AlxDac_SetVoltage_V_Private(AlxDac* me, Alx_Ch ch, float voltage_V, float vref_V);
 static uint32_t AlxDac_GetCh(Alx_Ch ch);
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static void AlxDac_Periph_EnableClk(AlxDac* me);
 static void AlxDac_Periph_DisableClk(AlxDac* me);
 static void AlxDac_Periph_ForceReset(AlxDac* me);
@@ -275,6 +285,11 @@ Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltag
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static Alx_Status AlxDac_Init_Private(AlxDac* me, bool calibrateVref, float vref_V)
 {
 	// Init GPIO
@@ -371,6 +386,10 @@ static uint32_t AlxDac_GetCh(Alx_Ch ch)
 	return ALX_NULL;
 }
 
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static void AlxDac_Periph_EnableClk(AlxDac* me)
 {
 	bool isErr = true;

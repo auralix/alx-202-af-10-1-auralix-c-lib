@@ -41,9 +41,19 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static uint16_t AlxI2c_ParseMemAddrLen(AlxI2c_Master_MemAddrLen memAddrLen);
-static bool AlxI2c_IsClkOk(AlxI2c* me);
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static Alx_Status AlxI2c_Reset(AlxI2c* me);
+static bool AlxI2c_IsClkOk(AlxI2c* me);
 static void AlxI2c_Periph_EnableClk(AlxI2c* me);
 static void AlxI2c_Periph_DisableClk(AlxI2c* me);
 static void AlxI2c_Periph_ForceReset(AlxI2c* me);
@@ -532,11 +542,44 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static uint16_t AlxI2c_ParseMemAddrLen(AlxI2c_Master_MemAddrLen memAddrLen)
 {
 	if		(memAddrLen == AlxI2c_Master_MemAddrLen_8bit)	{ return I2C_MEMADD_SIZE_8BIT; }
 	else if	(memAddrLen == AlxI2c_Master_MemAddrLen_16bit)	{ return I2C_MEMADD_SIZE_16BIT; }
 	else													{ ALX_I2C_ASSERT(false); return ALX_NULL; }	// We should not get here
+}
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
+static Alx_Status AlxI2c_Reset(AlxI2c* me)
+{
+	// DeInit I2C
+	if (HAL_I2C_DeInit(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+
+	// Force I2C periphery reset
+	AlxI2c_Periph_ForceReset(me);
+
+	// Clear isInit
+	me->isInit = false;
+
+	// Release I2C periphery reset
+	AlxI2c_Periph_ReleaseReset(me);
+
+	// Init I2C
+	if (HAL_I2C_Init(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+
+	// Set isInit
+	me->isInit = true;
+
+	// Return
+	return Alx_Ok;
 }
 static bool AlxI2c_IsClkOk(AlxI2c* me)
 {
@@ -656,29 +699,6 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 
 	ALX_I2C_ASSERT(false);	// We should't get here
 	return ALX_NULL;
-}
-static Alx_Status AlxI2c_Reset(AlxI2c* me)
-{
-	// DeInit I2C
-	if (HAL_I2C_DeInit(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("Err"); return Alx_Err; }
-
-	// Force I2C periphery reset
-	AlxI2c_Periph_ForceReset(me);
-
-	// Clear isInit
-	me->isInit = false;
-
-	// Release I2C periphery reset
-	AlxI2c_Periph_ReleaseReset(me);
-
-	// Init I2C
-	if (HAL_I2C_Init(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("Err"); return Alx_Err; }
-
-	// Set isInit
-	me->isInit = true;
-
-	// Return
-	return Alx_Ok;
 }
 static void AlxI2c_Periph_EnableClk(AlxI2c* me)
 {

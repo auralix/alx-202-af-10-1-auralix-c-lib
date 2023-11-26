@@ -41,13 +41,18 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me);
 static void AlxSerialPort_Periph_EnableClk(AlxSerialPort* me);
 static void AlxSerialPort_Periph_DisableClk(AlxSerialPort* me);
 static void AlxSerialPort_Periph_ForceReset(AlxSerialPort* me);
 static void AlxSerialPort_Periph_ReleaseReset(AlxSerialPort* me);
-static void AlxSerialPort_Periph_EnableRxIrq(AlxSerialPort* me);
-static void AlxSerialPort_Periph_DisableRxIrq(AlxSerialPort* me);
+static void AlxSerialPort_Periph_EnableIrq(AlxSerialPort* me);
+static void AlxSerialPort_Periph_DisableIrq(AlxSerialPort* me);
 
 
 //******************************************************************************
@@ -210,7 +215,7 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 
 	// Enable UART RX IRQ
 	__HAL_UART_ENABLE_IT(&me->huart, UART_IT_RXNE);
-	AlxSerialPort_Periph_EnableRxIrq(me);
+	AlxSerialPort_Periph_EnableIrq(me);
 
 	// Set isInit
 	me->isInit = true;
@@ -232,7 +237,7 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
 	// Disable UART RX IRQ
-	AlxSerialPort_Periph_DisableRxIrq(me);
+	AlxSerialPort_Periph_DisableIrq(me);
 	__HAL_UART_DISABLE_IT(&me->huart, UART_IT_RXNE);	// We will not clear flag, because of the differences between STM32 HALs, flag will be cleared when UART periphery is reset
 
 	// DeInit UART
@@ -396,10 +401,15 @@ uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 {
 	// Disable UART RX IRQ
-	AlxSerialPort_Periph_DisableRxIrq(me);
+	AlxSerialPort_Periph_DisableIrq(me);
 	__HAL_UART_DISABLE_IT(&me->huart, UART_IT_RXNE);	// We will not clear flag, because of the differences between STM32 HALs, flag will be cleared when UART periphery is reset
 
 	// DeInit UART
@@ -422,7 +432,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 
 	// Enable UART RX IRQ
 	__HAL_UART_ENABLE_IT(&me->huart, UART_IT_RXNE);
-	AlxSerialPort_Periph_EnableRxIrq(me);
+	AlxSerialPort_Periph_EnableIrq(me);
 
 	// Set isInit
 	me->isInit = true;
@@ -722,7 +732,7 @@ static void AlxSerialPort_Periph_ReleaseReset(AlxSerialPort* me)
 
 	if(isErr)								{ ALX_SERIAL_PORT_ASSERT(false); }	// We should not get here
 }
-static void AlxSerialPort_Periph_EnableRxIrq(AlxSerialPort* me)
+static void AlxSerialPort_Periph_EnableIrq(AlxSerialPort* me)
 {
 	bool isErr = true;
 
@@ -795,7 +805,7 @@ static void AlxSerialPort_Periph_EnableRxIrq(AlxSerialPort* me)
 
 	if(isErr)								{ ALX_SERIAL_PORT_ASSERT(false); }	// We should not get here
 }
-static void AlxSerialPort_Periph_DisableRxIrq(AlxSerialPort* me)
+static void AlxSerialPort_Periph_DisableIrq(AlxSerialPort* me)
 {
 	bool isErr = true;
 

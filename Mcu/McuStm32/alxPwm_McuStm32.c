@@ -41,9 +41,19 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static void AlxPwm_SetSrcClk_SetPeriodMax(AlxPwm* me);
 static Alx_Status AlxPwm_RemapIoPin(AlxPwm* me);
 static uint32_t AlxPwm_GetCh(Alx_Ch ch);
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static void AlxPwm_Periph_EnableClk(AlxPwm* me);
 static void AlxPwm_Periph_DisableClk(AlxPwm* me);
 static void AlxPwm_Periph_ForceReset(AlxPwm* me);
@@ -358,6 +368,11 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static void AlxPwm_SetSrcClk_SetPeriodMax(AlxPwm* me)
 {
 	bool isErr = true;
@@ -486,6 +501,11 @@ static uint32_t AlxPwm_GetCh(Alx_Ch ch)
 	ALX_PWM_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static void AlxPwm_Periph_EnableClk(AlxPwm* me)
 {
 	bool isErr = true;

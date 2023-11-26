@@ -41,8 +41,11 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxClk_PeriphGpio_EnableClk(AlxClk* me);
-static bool AlxClk_AreClkNok(AlxClk* me);
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 #if defined(ALX_STM32F0)
 static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hsi_8MHz_Default(AlxClk* me);
 static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hse_8MHz(AlxClk* me);
@@ -88,6 +91,13 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz(AlxClk* me);
 static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz(AlxClk* me);
 #endif
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
+static bool AlxCan_Ctor_IsClkOk(AlxClk* me);
+static void AlxClk_Periph_Gpio_EnableClk(AlxClk* me);
 
 
 //******************************************************************************
@@ -252,7 +262,7 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	}
 
 	// Enable GPIO periphery clocks
-	AlxClk_PeriphGpio_EnableClk(me);
+	AlxClk_Periph_Gpio_EnableClk(me);
 
 	// Enable PWR periphery clock
 	__HAL_RCC_PWR_CLK_ENABLE();
@@ -280,7 +290,7 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	if(HAL_RCC_ClockConfig(&me->iclk, me->flashLatency) != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; }
 
 	// Check clocks
-	if(AlxClk_AreClkNok(me)) { ALX_CLK_TRACE("Err"); return Alx_Err; }
+	if(AlxCan_Ctor_IsClkOk(me) == false) { ALX_CLK_TRACE("Err"); return Alx_Err; }
 
 	// Set isInit
 	me->isInit = true;
@@ -360,76 +370,11 @@ void AlxClk_Irq_Handle(AlxClk* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxClk_PeriphGpio_EnableClk(AlxClk* me)
-{
-	#if defined(GPIOA)
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	#endif
-	#if defined(GPIOB)
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-	#endif
-	#if defined(GPIOC)
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-	#endif
-	#if defined(GPIOD)
-	__HAL_RCC_GPIOD_CLK_ENABLE();
-	#endif
-	#if defined(GPIOE)
-	__HAL_RCC_GPIOE_CLK_ENABLE();
-	#endif
-	#if defined(GPIOF)
-	__HAL_RCC_GPIOF_CLK_ENABLE();
-	#endif
-	#if defined(GPIOG)
-	__HAL_RCC_GPIOG_CLK_ENABLE();
-	#endif
-	#if defined(GPIOH)
-	__HAL_RCC_GPIOH_CLK_ENABLE();
-	#endif
-	#if defined(GPIOI)
-	__HAL_RCC_GPIOI_CLK_ENABLE();
-	#endif
-	#if defined(GPIOJ)
-	__HAL_RCC_GPIOJ_CLK_ENABLE();
-	#endif
-	#if defined(GPIOK)
-	__HAL_RCC_GPIOK_CLK_ENABLE();
-	#endif
-	#if defined(GPIOL)
-	__HAL_RCC_GPIOL_CLK_ENABLE();
-	#endif
-	#if defined(GPIOM)
-	__HAL_RCC_GPIOM_CLK_ENABLE();
-	#endif
-	#if defined(GPION)
-	__HAL_RCC_GPION_CLK_ENABLE();
-	#endif
-}
-static bool AlxClk_AreClkNok(AlxClk* me)
-{
-	me->systemCoreClock = SystemCoreClock;
-	me->sysclk = HAL_RCC_GetSysClockFreq();
-	me->hclk = HAL_RCC_GetHCLKFreq();
-	me->pclk1Apb1 = HAL_RCC_GetPCLK1Freq();
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-	me->pclk2Apb2 = HAL_RCC_GetPCLK2Freq();
-	#endif
-	#if defined(ALX_STM32U5)
-	me->pclk3Apb3 = HAL_RCC_GetPCLK3Freq();
-	#endif
 
-	if		(SystemCoreClock != me->systemCoreClock_Ctor)	{ ALX_CLK_TRACE("Err");	return true; }
-	else if	(me->sysclk != me->sysclk_Ctor)					{ ALX_CLK_TRACE("Err");	return true; }
-	else if	(me->hclk != me->hclk_Ctor)						{ ALX_CLK_TRACE("Err");	return true; }
-	else if	(me->pclk1Apb1 != me->pclk1Apb1_Ctor)			{ ALX_CLK_TRACE("Err");	return true; }
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-	else if	(me->pclk2Apb2 != me->pclk2Apb2_Ctor)			{ ALX_CLK_TRACE("Err");	return true; }
-	#endif
-	#if defined(ALX_STM32U5)
-	else if	(me->pclk3Apb3 != me->pclk3Apb3_Ctor)			{ ALX_CLK_TRACE("Err");	return true; }
-	#endif
-	else													{ return false; }
-}
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 #if defined(ALX_STM32F0)
 static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hsi_8MHz_Default(AlxClk* me)
 {
@@ -1724,6 +1669,85 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160M
 	me->mainPllInputClk_Ctor = HSE_VALUE / me->iosc.PLL.PLLM;
 }
 #endif
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
+static bool AlxCan_Ctor_IsClkOk(AlxClk* me)
+{
+	// Prepare
+	me->systemCoreClock = SystemCoreClock;
+	me->sysclk = HAL_RCC_GetSysClockFreq();
+	me->hclk = HAL_RCC_GetHCLKFreq();
+	me->pclk1Apb1 = HAL_RCC_GetPCLK1Freq();
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	me->pclk2Apb2 = HAL_RCC_GetPCLK2Freq();
+	#endif
+	#if defined(ALX_STM32U5)
+	me->pclk3Apb3 = HAL_RCC_GetPCLK3Freq();
+	#endif
+
+	// Check
+	if (SystemCoreClock != me->systemCoreClock_Ctor)	{ ALX_CLK_TRACE("Err");	return false; }
+	if (me->sysclk != me->sysclk_Ctor)					{ ALX_CLK_TRACE("Err");	return false; }
+	if (me->hclk != me->hclk_Ctor)						{ ALX_CLK_TRACE("Err");	return false; }
+	if (me->pclk1Apb1 != me->pclk1Apb1_Ctor)			{ ALX_CLK_TRACE("Err");	return false; }
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	if (me->pclk2Apb2 != me->pclk2Apb2_Ctor)			{ ALX_CLK_TRACE("Err");	return false; }
+	#endif
+	#if defined(ALX_STM32U5)
+	if (me->pclk3Apb3 != me->pclk3Apb3_Ctor)			{ ALX_CLK_TRACE("Err");	return false; }
+	#endif
+
+	// Return
+	return true;
+}
+static void AlxClk_Periph_Gpio_EnableClk(AlxClk* me)
+{
+	#if defined(GPIOA)
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	#endif
+	#if defined(GPIOB)
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	#endif
+	#if defined(GPIOC)
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	#endif
+	#if defined(GPIOD)
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	#endif
+	#if defined(GPIOE)
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+	#endif
+	#if defined(GPIOF)
+	__HAL_RCC_GPIOF_CLK_ENABLE();
+	#endif
+	#if defined(GPIOG)
+	__HAL_RCC_GPIOG_CLK_ENABLE();
+	#endif
+	#if defined(GPIOH)
+	__HAL_RCC_GPIOH_CLK_ENABLE();
+	#endif
+	#if defined(GPIOI)
+	__HAL_RCC_GPIOI_CLK_ENABLE();
+	#endif
+	#if defined(GPIOJ)
+	__HAL_RCC_GPIOJ_CLK_ENABLE();
+	#endif
+	#if defined(GPIOK)
+	__HAL_RCC_GPIOK_CLK_ENABLE();
+	#endif
+	#if defined(GPIOL)
+	__HAL_RCC_GPIOL_CLK_ENABLE();
+	#endif
+	#if defined(GPIOM)
+	__HAL_RCC_GPIOM_CLK_ENABLE();
+	#endif
+	#if defined(GPION)
+	__HAL_RCC_GPION_CLK_ENABLE();
+	#endif
+}
 
 
 //******************************************************************************
