@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -82,15 +82,16 @@ typedef enum
 	AlxAdc_Clk_McuStm32L4_AdcClk_20MHz_Sysclk_80MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
 	AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Sysclk_120MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
 	#endif
+	#if defined(ALX_STM32U5)
+	AlxAdc_Clk_McuStm32U5_AdcClk_20MHz_Hclk_160MHz = ADC_CLOCK_ASYNC_DIV8,
+	#endif
 } AlxAdc_Clk;
 
 typedef struct
 {
 	// Defines
 	#define ALX_ADC_BUFF_LEN 16
-
-	// Const
-	uint32_t RESOLUTION;
+	#define ALX_ADC_RESOLUTION ADC_RESOLUTION_12B
 
 	// Parameters
 	ADC_TypeDef* adc;
@@ -140,7 +141,7 @@ void AlxAdc_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
 
 #ifdef __cplusplus
 }
