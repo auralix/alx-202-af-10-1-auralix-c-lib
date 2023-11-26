@@ -563,6 +563,11 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	AlxAdc_Periph_Adc_EnableClk(me);
 	AlxAdc_Periph_Dma_EnableClk(me);
 
+	// Init PWR
+	#if defined(ALX_STM32U5)
+	HAL_PWREx_EnableVddA();
+	#endif
+
 	// Init ADC clock
 	#if defined(ALX_STM32F1)
 	if(HAL_RCCEx_PeriphCLKConfig(&me->iclk) != HAL_OK) { ALX_ADC_TRACE("Err"); return Alx_Err; };
