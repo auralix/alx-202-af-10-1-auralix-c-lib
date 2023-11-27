@@ -100,7 +100,7 @@ uint8_t AlxRotSw_GetCode(AlxRotSw* me)
 	ALX_ROT_SW_ASSERT(me->wasCtorCalled == true);
 	ALX_ROT_SW_ASSERT(me->isInit == true);
 
-	// TODO
+	// TV: TODO
 	ALX_ROT_SW_ASSERT(false);
 
 	// Return

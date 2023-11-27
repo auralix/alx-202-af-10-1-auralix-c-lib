@@ -602,7 +602,7 @@ static void AlxCan_TxMsg_TryAddToHwMailbox(AlxCan* me)
 			}
 			else // Standard ID
 			{
-				halTxMsg.StdId = alxTxMsg.id;	// TODO assert if above 2048
+				halTxMsg.StdId = alxTxMsg.id;	// TV: TODO, assert if above 2048
 				halTxMsg.ExtId = 0;
 				halTxMsg.IDE = CAN_ID_STD;
 			}
@@ -735,7 +735,7 @@ static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me)
 		alxStatus = AlxFifo_WriteMulti(&me->rxFifo, (uint8_t*)&alxRxMsg, sizeof(AlxCan_Msg));
 		if (alxStatus == AlxFifo_ErrFull)
 		{
-			// TODO: Decide if we will handle ALX RX FIFO overflow as error, or we will discard overflow data..
+			// TV: TODO, decide if we will handle ALX RX FIFO overflow as error, or we will discard overflow data..
 			// For now we will discard additional overflow data..
 			//me->isErr = true;	// ALX FIFO RX is full, we will handle this the same way as HAL error, module goes to error state
 			return;
@@ -791,7 +791,7 @@ static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me)
 		alxStatus = AlxFifo_WriteMulti(&me->rxFifo, (uint8_t*)&alxRxMsg, sizeof(AlxCan_Msg));
 		if (alxStatus == AlxFifo_ErrFull)
 		{
-			// TODO: Decide if we will handle ALX RX FIFO overflow as error, or we will discard overflow data..
+			// TV: TODO, decide if we will handle ALX RX FIFO overflow as error, or we will discard overflow data..
 			// For now we will discard additional overflow data..
 			//me->isErr = true;	// ALX FIFO RX is full, we will handle this the same way as HAL error, module goes to error state
 			return;

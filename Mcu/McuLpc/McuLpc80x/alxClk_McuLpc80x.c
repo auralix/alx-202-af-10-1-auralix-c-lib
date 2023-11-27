@@ -149,7 +149,7 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
   */
 ALX_WEAK Alx_Status AlxClk_DeInit(AlxClk* me)
 {
-	// TODO
+	// TV: TODO
 	ALX_CLK_ASSERT(false);
 	return Alx_Err;
 }
@@ -185,7 +185,7 @@ ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
   */
 void AlxClk_Irq_Handle(AlxClk* me)
 {
-	// TODO
+	// TV: TODO
 	ALX_CLK_ASSERT(false);
 }
 

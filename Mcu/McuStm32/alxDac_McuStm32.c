@@ -158,7 +158,7 @@ void AlxDac_Ctor
 		#endif
 
 		#if defined(ALX_STM32G4)
-		ALX_DAC_ASSERT(false);	// TODO - Not yet implemented
+		ALX_DAC_ASSERT(false);	// TV: TODO
 		#endif
 	}
 

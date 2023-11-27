@@ -109,8 +109,7 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
   */
 Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
-	// TODO
-
+	// TV: TODO
 	me->isInit = false;
 }
 

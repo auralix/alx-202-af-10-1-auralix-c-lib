@@ -163,7 +163,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 
 	// Calibrate ADC
 	#if defined(ALX_LPC84X)
-//	while(ADC_DoSelfCalibration(ALX_ADC_LPC8XX, (CLOCK_GetFreq(kCLOCK_Fro) / CLOCK_GetClkDivider(kCLOCK_DivAdcClk))) == false) {}	// TV: TODO seems like we need to reconfigure ADC clock to 500kHz priorir calibration..
+//	while(ADC_DoSelfCalibration(ALX_ADC_LPC8XX, (CLOCK_GetFreq(kCLOCK_Fro) / CLOCK_GetClkDivider(kCLOCK_DivAdcClk))) == false) {}	// TV: TODO, seems like we need to configure ADC clock to 500 kHz prior calibration..
 	#endif
 
 	// Init ADC

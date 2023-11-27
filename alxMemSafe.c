@@ -133,7 +133,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 	// #2 Non-Blocking
 	if (me->nonBlockingEnable)
 	{
-		// TODO
+		// TV: TODO
 		ALX_MEM_SAFE_ASSERT(false);
 		return Alx_Err;
 	}
@@ -312,7 +312,7 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 	// #2 Non-Blocking
 	if (me->nonBlockingEnable)
 	{
-		// TODO
+		// TV: TODO
 		ALX_MEM_SAFE_ASSERT(false);
 		return Alx_Err;
 	}

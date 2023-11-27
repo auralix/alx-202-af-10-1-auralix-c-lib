@@ -131,7 +131,7 @@ void AlxRtc_Ctor
 		me->hrtc.Init.SynchPrediv = 256 - 1;
 		me->rtcTick_ns = 3906250;	// 1000000000 / 256 = 3906250ns
 
-		ALX_RTC_ASSERT(false);	// TODO - Handle if SS Larger than PREDIV_S
+		ALX_RTC_ASSERT(false);	// TV: TODO, handle if SS Larger than PREDIV_S
 	}
 	else if
 	(

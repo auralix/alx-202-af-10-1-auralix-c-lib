@@ -196,7 +196,7 @@ Alx_Status AlxI2c_DeInit(AlxI2c* me)
   */
 Alx_Status AlxI2c_Master_StartRead(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint16_t timeout_ms)
 {
-	// TODO
+	// TV: TODO
 	ALX_I2C_ASSERT(false);
 	return Alx_Err;
 }
@@ -326,7 +326,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
   */
 Alx_Status AlxI2c_Master_StartWrite(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint16_t timeout_ms)
 {
-	// TODO
+	// TV: TODO
 	ALX_I2C_ASSERT(false);
 	return Alx_Err;
 }
@@ -502,7 +502,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
   */
 Alx_Status AlxI2c_Master_Stop(AlxI2c* me, uint16_t timeout_ms)
 {
-	// TODO
+	// TV: TODO
 	ALX_I2C_ASSERT(false);
 	return Alx_Err;
 }

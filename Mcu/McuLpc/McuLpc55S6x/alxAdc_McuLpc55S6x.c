@@ -321,7 +321,7 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 	// Assert
 	(void)me;
 
-	// TODO
+	// TV: TODO
 
 	// Assert
 	ALX_ADC_ASSERT(false); // We shouldn't get here

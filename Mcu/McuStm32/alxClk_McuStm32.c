@@ -160,16 +160,16 @@ ALX_WEAK void AlxClk_Ctor
 	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz)						{ AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hsi_16MHz)						{ AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hse_8MHz)						{ AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hse_8MHz(me);				me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hse_8MHz_BackupHsi_16MHz)		{ ALX_CLK_ASSERT(false); me->backupHsiEnable = true; }	// TODO
+	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hse_8MHz_BackupHsi_16MHz)		{ ALX_CLK_ASSERT(false); me->backupHsiEnable = true; }	// TV: TODO
 	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz)					{ AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_12MHz_BackupHsi_16MHz)	{ ALX_CLK_ASSERT(false); me->backupHsiEnable = true; }	// TODO
+	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_12MHz_BackupHsi_16MHz)	{ ALX_CLK_ASSERT(false); me->backupHsiEnable = true; }	// TV: TODO
 	#endif
 	#if defined(ALX_STM32U5)
 	if		(me->config == AlxClk_Config_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default)						{ AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default(me);		me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Pclk3Apb3_16MHz_Hsi_16MHz)							{ AlxClk_Ctor_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Pclk3Apb3_16MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz)						{ AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz)						{ AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz(me);			me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz_BackupHsi_16MHz)		{ ALX_CLK_ASSERT(false); me->backupHsiEnable = true; }	// TODO
+	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Pclk3Apb3_16MHz_Hsi_16MHz)							{ AlxClk_Ctor_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Pclk3Apb3_16MHz_Hsi_16MHz(me);		me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz)						{ AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz(me);	me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz)						{ AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz(me);	me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz_BackupHsi_16MHz)		{ ALX_CLK_ASSERT(false); me->backupHsiEnable = true; }	// TV: TODO
 	#endif
 	else																																			{ ALX_CLK_ASSERT(false); return; }	// We should not get here
 	me->isBackupHsiUsed = false;
@@ -307,7 +307,7 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
   */
 ALX_WEAK Alx_Status AlxClk_DeInit(AlxClk* me)
 {
-	// TODO
+	// TV: TODO
 	ALX_CLK_ASSERT(false);
 	return Alx_Err;
 }
@@ -708,11 +708,11 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz
 	me->iosc.PLL.PLLM = 8;	// VCO frequency = 2MHz, it must be between 1MHz and 2MHz, recommended is 2MHz to limit PLL jitter
 	me->iosc.PLL.PLLN = 180;
 	me->iosc.PLL.PLLP = RCC_PLLP_DIV2;
-	me->iosc.PLL.PLLQ = 15;	// TODO
+	me->iosc.PLL.PLLQ = 15;	// TV: TODO
 	#if defined(STM32F410Tx) || defined(STM32F410Cx) || defined(STM32F410Rx) || defined(STM32F446xx) || defined(STM32F469xx) ||\
 		defined(STM32F479xx) || defined(STM32F412Zx) || defined(STM32F412Vx) || defined(STM32F412Rx) || defined(STM32F412Cx) ||\
 		defined(STM32F413xx) || defined(STM32F423xx)
-	me->iosc.PLL.PLLR = 0;	// TODO
+	me->iosc.PLL.PLLR = 0;	// TV: TODO
 	#endif
 
 	// Set clocks
@@ -758,11 +758,11 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz
 	me->iosc.PLL.PLLM = 6;	// VCO frequency = 2MHz, it must be between 1MHz and 2MHz, recommended is 2MHz to limit PLL jitter
 	me->iosc.PLL.PLLN = 180;
 	me->iosc.PLL.PLLP = RCC_PLLP_DIV2;
-	me->iosc.PLL.PLLQ = 15;	// TODO
+	me->iosc.PLL.PLLQ = 15;	// TV: TODO
 	#if defined(STM32F410Tx) || defined(STM32F410Cx) || defined(STM32F410Rx) || defined(STM32F446xx) || defined(STM32F469xx) ||\
 		defined(STM32F479xx) || defined(STM32F412Zx) || defined(STM32F412Vx) || defined(STM32F412Rx) || defined(STM32F412Cx) ||\
 		defined(STM32F413xx) || defined(STM32F423xx)
-	me->iosc.PLL.PLLR = 0;	// TODO
+	me->iosc.PLL.PLLR = 0;	// TV: TODO
 	#endif
 
 	// Set clocks
@@ -808,11 +808,11 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz
 	me->iosc.PLL.PLLM = 25;	// VCO frequency = 1MHz, it must be between 1MHz and 2MHz, recommended is 2MHz to limit PLL jitter
 	me->iosc.PLL.PLLN = 360;
 	me->iosc.PLL.PLLP = RCC_PLLP_DIV2;
-	me->iosc.PLL.PLLQ = 15;	// TODO
+	me->iosc.PLL.PLLQ = 15;	// TV: TODO
 	#if defined(STM32F410Tx) || defined(STM32F410Cx) || defined(STM32F410Rx) || defined(STM32F446xx) || defined(STM32F469xx) ||\
 		defined(STM32F479xx) || defined(STM32F412Zx) || defined(STM32F412Vx) || defined(STM32F412Rx) || defined(STM32F412Cx) ||\
 		defined(STM32F413xx) || defined(STM32F423xx)
-	me->iosc.PLL.PLLR = 0;	// TODO
+	me->iosc.PLL.PLLR = 0;	// TV: TODO
 	#endif
 
 	// Set clocks
