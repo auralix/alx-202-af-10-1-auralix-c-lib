@@ -64,6 +64,9 @@ typedef enum
 
 typedef struct
 {
+	// Defines
+	#define ALX_ADC_BUFF_LEN 16
+
 	// Objects - External
 	AlxIoPin** ioPinArr;
 	AlxClk* clk;
