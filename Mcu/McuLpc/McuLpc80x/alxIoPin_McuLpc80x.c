@@ -42,11 +42,11 @@
 // Private Functions
 //******************************************************************************
 static swm_port_pin_type_t AlxIoPin_GetSwmPortPinIndex(AlxIoPin* me);
-static uint8_t AlxIoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port);
+static uint8_t AlxIoPin_GetIoconPortPinIndex(AlxIoPin* me);
 static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me);
 static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me);
 static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me);
-static void AlxIoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode);
+static void AlxIoPin_SetIoconMode(AlxIoPin* me);
 
 
 //******************************************************************************
@@ -115,13 +115,13 @@ void AlxIoPin_Init(AlxIoPin* me)
 	AlxIoPin_Write(me, me->val);
 
 	// Get IoconPortPinIndex
-	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(me->pin, me->port);
+	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(me);
 
 	// Enable IOCON clock
 	CLOCK_EnableClock(kCLOCK_Iocon);
 
 	// Set IOCON mode
-	AlxIoPin_SetIoconMode(me->pin, me->port, me->mode);
+	AlxIoPin_SetIoconMode(me);
 
 	// Set open-drain
 	if (me->isOpenDrain)
@@ -195,7 +195,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
 	// DeInit IOCON
-	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(me->pin, me->port);
+	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(me);
 
 	// Enable IOCON clock
 	CLOCK_EnableClock(kCLOCK_Iocon);
@@ -339,8 +339,68 @@ void AlxIoPin_Toggle(AlxIoPin* me)
   */
 AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 {
-	// TV: TODO
-	ALX_IO_PIN_ASSERT(false);
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	ALX_IO_PIN_ASSERT(me->isInit == true);
+
+
+	//------------------------------------------------------------------------------
+	// Get IoconPortPinIndex
+	//------------------------------------------------------------------------------
+	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(me);
+
+
+	//------------------------------------------------------------------------------
+	// Read @ PullUp
+	//------------------------------------------------------------------------------
+
+	// Config PullUp
+	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U);
+	IOCON->PIO[ioconPortPinIndex] |= (0x1 << 4U);
+
+	// Wait
+	AlxDelay_ms(1);
+
+	// Read
+	bool valPullUp = AlxIoPin_Read(me);
+
+
+	//------------------------------------------------------------------------------
+	// Read @ PullDown
+	//------------------------------------------------------------------------------
+
+	// Config PullDown
+	IOCON->PIO[ioconPortPinIndex] |= (0x1 << 3U);
+	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 4U);
+
+	// Wait
+	AlxDelay_ms(1);
+
+	// Read
+	bool valPullDown = AlxIoPin_Read(me);
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	if ((valPullUp == true) && (valPullDown == false))
+	{
+		return AlxIoPin_TriState_HiZ;
+	}
+	else if ((valPullUp == true) && (valPullDown == true))
+	{
+		return AlxIoPin_TriState_Hi;
+	}
+	else if ((valPullUp == false) && (valPullDown == false))
+	{
+		return AlxIoPin_TriState_Lo;
+	}
+	else
+	{
+		return AlxIoPin_TriState_Undefined;
+	}
 }
 
 
@@ -358,96 +418,96 @@ static swm_port_pin_type_t AlxIoPin_GetSwmPortPinIndex(AlxIoPin* me)
 		return (me->pin + 32U);
 	}
 }
-static uint8_t AlxIoPin_GetIoconPortPinIndex(uint8_t pin, uint8_t port)
+static uint8_t AlxIoPin_GetIoconPortPinIndex(AlxIoPin* me)
 {
 	#if defined(ALX_LPC80X)
-	if (pin == 17)		return 0;
-	if (pin == 13)		return 1;
-	if (pin == 12)		return 2;
-	if (pin == 5)		return 3;
-	if (pin == 4)		return 4;
-	if (pin == 3)		return 5;
-	if (pin == 2)		return 6;
-	if (pin == 11)		return 7;
-	if (pin == 10)		return 8;
-	if (pin == 16)		return 9;
-	if (pin == 15)		return 10;
-	if (pin == 1)		return 11;
-	if (pin == 21)		return 12;
-	if (pin == 9)		return 13;
-	if (pin == 8)		return 14;
-	if (pin == 7)		return 15;
-	if (pin == 29)		return 16;
-	if (pin == 0)		return 17;
-	if (pin == 14)		return 18;
-	if (pin == 28)		return 19;
-	if (pin == 27)		return 20;
-	if (pin == 26)		return 21;
-	if (pin == 20)		return 22;
-	if (pin == 30)		return 23;
-	if (pin == 19)		return 24;
-	if (pin == 25)		return 25;
-	if (pin == 24)		return 26;
-	if (pin == 23)		return 27;
-	if (pin == 22)		return 28;
-	if (pin == 18)		return 29;
+	if (me->pin == 17)		return 0;
+	if (me->pin == 13)		return 1;
+	if (me->pin == 12)		return 2;
+	if (me->pin == 5)		return 3;
+	if (me->pin == 4)		return 4;
+	if (me->pin == 3)		return 5;
+	if (me->pin == 2)		return 6;
+	if (me->pin == 11)		return 7;
+	if (me->pin == 10)		return 8;
+	if (me->pin == 16)		return 9;
+	if (me->pin == 15)		return 10;
+	if (me->pin == 1)		return 11;
+	if (me->pin == 21)		return 12;
+	if (me->pin == 9)		return 13;
+	if (me->pin == 8)		return 14;
+	if (me->pin == 7)		return 15;
+	if (me->pin == 29)		return 16;
+	if (me->pin == 0)		return 17;
+	if (me->pin == 14)		return 18;
+	if (me->pin == 28)		return 19;
+	if (me->pin == 27)		return 20;
+	if (me->pin == 26)		return 21;
+	if (me->pin == 20)		return 22;
+	if (me->pin == 30)		return 23;
+	if (me->pin == 19)		return 24;
+	if (me->pin == 25)		return 25;
+	if (me->pin == 24)		return 26;
+	if (me->pin == 23)		return 27;
+	if (me->pin == 22)		return 28;
+	if (me->pin == 18)		return 29;
 	#endif
 
 	#if defined(ALX_LPC84X)
-	if (port == 0 && pin == 17)		return 0;
-	if (port == 0 && pin == 13)		return 1;
-	if (port == 0 && pin == 12)		return 2;
-	if (port == 0 && pin == 5)		return 3;
-	if (port == 0 && pin == 4)		return 4;
-	if (port == 0 && pin == 3)		return 5;
-	if (port == 0 && pin == 2)		return 6;
-	if (port == 0 && pin == 11)		return 7;
-	if (port == 0 && pin == 10)		return 8;
-	if (port == 0 && pin == 16)		return 9;
-	if (port == 0 && pin == 15)		return 10;
-	if (port == 0 && pin == 1)		return 11;
-	if (port == 0 && pin == 9)		return 13;
-	if (port == 0 && pin == 8)		return 14;
-	if (port == 0 && pin == 7)		return 15;
-	if (port == 0 && pin == 6)		return 16;
-	if (port == 0 && pin == 0)		return 17;
-	if (port == 0 && pin == 14)		return 18;
-	if (port == 0 && pin == 28)		return 20;
-	if (port == 0 && pin == 27)		return 21;
-	if (port == 0 && pin == 26)		return 22;
-	if (port == 0 && pin == 25)		return 23;
-	if (port == 0 && pin == 24)		return 24;
-	if (port == 0 && pin == 23)		return 25;
-	if (port == 0 && pin == 22)		return 26;
-	if (port == 0 && pin == 21)		return 27;
-	if (port == 0 && pin == 20)		return 28;
-	if (port == 0 && pin == 19)		return 29;
-	if (port == 0 && pin == 18)		return 30;
-	if (port == 1 && pin == 8)		return 31;
-	if (port == 1 && pin == 9)		return 32;
-	if (port == 1 && pin == 12)		return 33;
-	if (port == 1 && pin == 13)		return 34;
-	if (port == 0 && pin == 31)		return 35;
-	if (port == 1 && pin == 0)		return 36;
-	if (port == 1 && pin == 1)		return 37;
-	if (port == 1 && pin == 2)		return 38;
-	if (port == 1 && pin == 14)		return 39;
-	if (port == 1 && pin == 15)		return 40;
-	if (port == 1 && pin == 3)		return 41;
-	if (port == 1 && pin == 4)		return 42;
-	if (port == 1 && pin == 5)		return 43;
-	if (port == 1 && pin == 16)		return 44;
-	if (port == 1 && pin == 17)		return 45;
-	if (port == 1 && pin == 6)		return 46;
-	if (port == 1 && pin == 18)		return 47;
-	if (port == 1 && pin == 19)		return 48;
-	if (port == 1 && pin == 7)		return 49;
-	if (port == 0 && pin == 29)		return 50;
-	if (port == 0 && pin == 30)		return 51;
-	if (port == 1 && pin == 20)		return 52;
-	if (port == 1 && pin == 21)		return 53;
-	if (port == 1 && pin == 11)		return 54;
-	if (port == 1 && pin == 10)		return 55;
+	if ((me->port == 0) && (me->pin == 17))		return 0;
+	if ((me->port == 0) && (me->pin == 13))		return 1;
+	if ((me->port == 0) && (me->pin == 12))		return 2;
+	if ((me->port == 0) && (me->pin == 5))		return 3;
+	if ((me->port == 0) && (me->pin == 4))		return 4;
+	if ((me->port == 0) && (me->pin == 3))		return 5;
+	if ((me->port == 0) && (me->pin == 2))		return 6;
+	if ((me->port == 0) && (me->pin == 11))		return 7;
+	if ((me->port == 0) && (me->pin == 10))		return 8;
+	if ((me->port == 0) && (me->pin == 16))		return 9;
+	if ((me->port == 0) && (me->pin == 15))		return 10;
+	if ((me->port == 0) && (me->pin == 1))		return 11;
+	if ((me->port == 0) && (me->pin == 9))		return 13;
+	if ((me->port == 0) && (me->pin == 8))		return 14;
+	if ((me->port == 0) && (me->pin == 7))		return 15;
+	if ((me->port == 0) && (me->pin == 6))		return 16;
+	if ((me->port == 0) && (me->pin == 0))		return 17;
+	if ((me->port == 0) && (me->pin == 14))		return 18;
+	if ((me->port == 0) && (me->pin == 28))		return 20;
+	if ((me->port == 0) && (me->pin == 27))		return 21;
+	if ((me->port == 0) && (me->pin == 26))		return 22;
+	if ((me->port == 0) && (me->pin == 25))		return 23;
+	if ((me->port == 0) && (me->pin == 24))		return 24;
+	if ((me->port == 0) && (me->pin == 23))		return 25;
+	if ((me->port == 0) && (me->pin == 22))		return 26;
+	if ((me->port == 0) && (me->pin == 21))		return 27;
+	if ((me->port == 0) && (me->pin == 20))		return 28;
+	if ((me->port == 0) && (me->pin == 19))		return 29;
+	if ((me->port == 0) && (me->pin == 18))		return 30;
+	if ((me->port == 1) && (me->pin == 8))		return 31;
+	if ((me->port == 1) && (me->pin == 9))		return 32;
+	if ((me->port == 1) && (me->pin == 12))		return 33;
+	if ((me->port == 1) && (me->pin == 13))		return 34;
+	if ((me->port == 0) && (me->pin == 31))		return 35;
+	if ((me->port == 1) && (me->pin == 0))		return 36;
+	if ((me->port == 1) && (me->pin == 1))		return 37;
+	if ((me->port == 1) && (me->pin == 2))		return 38;
+	if ((me->port == 1) && (me->pin == 14))		return 39;
+	if ((me->port == 1) && (me->pin == 15))		return 40;
+	if ((me->port == 1) && (me->pin == 3))		return 41;
+	if ((me->port == 1) && (me->pin == 4))		return 42;
+	if ((me->port == 1) && (me->pin == 5))		return 43;
+	if ((me->port == 1) && (me->pin == 16))		return 44;
+	if ((me->port == 1) && (me->pin == 17))		return 45;
+	if ((me->port == 1) && (me->pin == 6))		return 46;
+	if ((me->port == 1) && (me->pin == 18))		return 47;
+	if ((me->port == 1) && (me->pin == 19))		return 48;
+	if ((me->port == 1) && (me->pin == 7))		return 49;
+	if ((me->port == 0) && (me->pin == 29))		return 50;
+	if ((me->port == 0) && (me->pin == 30))		return 51;
+	if ((me->port == 1) && (me->pin == 20))		return 52;
+	if ((me->port == 1) && (me->pin == 21))		return 53;
+	if ((me->port == 1) && (me->pin == 11))		return 54;
+	if ((me->port == 1) && (me->pin == 10))		return 55;
 	#endif
 
 	// MF: Assert cannot be used
@@ -697,32 +757,29 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(false);	// We shouldn't get here
 	return ALX_NULL;
 }
-static void AlxIoPin_SetIoconMode(uint8_t pin, uint8_t port, uint32_t mode)
+static void AlxIoPin_SetIoconMode(AlxIoPin* me)
 {
-	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(pin, port);
+	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(me);
 
-	if (mode == IOCON_MODE_INACT)
+	if (me->mode == IOCON_MODE_INACT)
 	{
 		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U);
 		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 4U);
 		return;
 	}
-
-	if (mode == IOCON_MODE_PULLDOWN)
+	if (me->mode == IOCON_MODE_PULLDOWN)
 	{
 		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 3U);
 		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 4U);
 		return;
 	}
-
-	if (mode == IOCON_MODE_PULLUP)
+	if (me->mode == IOCON_MODE_PULLUP)
 	{
 		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U);
 		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 4U);
 		return;
 	}
-
-	if (mode == IOCON_MODE_REPEATER)
+	if (me->mode == IOCON_MODE_REPEATER)
 	{
 		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 3U);
 		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 4U);
