@@ -89,12 +89,17 @@ typedef enum
 
 typedef struct
 {
+	// Defines
+	#define ALX_ROT_SW_IO_PIN_VAL_ARR_LEN 8
+
 	// Parameters
 	AlxIoPin** ioPinArr;
 	uint8_t ioPinArrLen;
 	AlxRotSw_CodeType codeType;
 
 	// Variables
+	bool ioPinValArr[ALX_ROT_SW_IO_PIN_VAL_ARR_LEN];
+	uint32_t code;
 
 	// Info
 	bool wasCtorCalled;
@@ -119,7 +124,7 @@ void AlxRotSw_Ctor
 //******************************************************************************
 void AlxRotSw_Init(AlxRotSw* me);
 void AlxRotSw_DeInit(AlxRotSw* me);
-uint8_t AlxRotSw_GetCode(AlxRotSw* me);
+uint32_t AlxRotSw_GetCode(AlxRotSw* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

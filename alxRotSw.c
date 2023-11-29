@@ -48,12 +48,17 @@ void AlxRotSw_Ctor
 	AlxRotSw_CodeType codeType
 )
 {
+	// Assert
+	ALX_ROT_SW_ASSERT(ioPinArrLen <= ALX_ROT_SW_IO_PIN_VAL_ARR_LEN);
+
 	// Parameters
 	me->ioPinArr = ioPinArr;
 	me->ioPinArrLen = ioPinArrLen;
 	me->codeType = codeType;
 
 	// Variables
+	memset(me->ioPinValArr, 0, sizeof(me->ioPinValArr));
+	me->code = 0;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -94,17 +99,55 @@ void AlxRotSw_DeInit(AlxRotSw* me)
 	// Clear isInit
 	me->isInit = false;
 }
-uint8_t AlxRotSw_GetCode(AlxRotSw* me)
+uint32_t AlxRotSw_GetCode(AlxRotSw* me)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_ROT_SW_ASSERT(me->wasCtorCalled == true);
 	ALX_ROT_SW_ASSERT(me->isInit == true);
 
-	// TV: TODO
-	ALX_ROT_SW_ASSERT(false);
 
+	//------------------------------------------------------------------------------
+	// Get
+	//------------------------------------------------------------------------------
+	for (uint32_t i = 0; i < me->ioPinArrLen; i++)
+	{
+		me->ioPinValArr[i] = AlxIoPin_Read((*(me->ioPinArr + i)));
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Calculate
+	//------------------------------------------------------------------------------
+	me->code = 0;
+	if (me->codeType == AlxRotSw_CodeType_Real)
+	{
+		for (uint32_t i = 0; i < me->ioPinArrLen; i++)
+		{
+			me->code = me->code + (uint32_t)me->ioPinValArr[i] * (uint32_t)(1 << i);	// TV: For size optimization we use bitwise shifting to compute 2^i
+		}
+	}
+	else if (me->codeType == AlxRotSw_CodeType_Complement)
+	{
+		// TV: TODO
+		ALX_ROT_SW_ASSERT(false);
+	}
+	else if (me->codeType == AlxRotSw_CodeType_Gray)
+	{
+		// TV: TODO
+		ALX_ROT_SW_ASSERT(false);
+	}
+	else
+	{
+		ALX_ROT_SW_ASSERT(false);	// We should not get here
+	}
+
+
+	//------------------------------------------------------------------------------
 	// Return
-	return 0;
+	//------------------------------------------------------------------------------
+	return me->code;
 }
 
 
