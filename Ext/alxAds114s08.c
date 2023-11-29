@@ -416,7 +416,7 @@ Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltag
 		}
 
 		// Delay
-		#ifdef ALX_OS
+		#if defined(ALX_FREE_RTOS)
 		AlxOsDelay_ms(&alxOsDelay, 10);
 		#else
 		AlxDelay_ms(10);

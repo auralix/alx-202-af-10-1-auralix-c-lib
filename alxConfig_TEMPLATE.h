@@ -54,7 +54,6 @@ extern "C" {
 //#define ALX_PC
 #define ALX_NEWLIB_NANO
 //#define ALX_CMSIS_DSP
-//#define ALX_OS
 //#define ALX_FREE_RTOS
 //#define ALX_LW_IP
 //#define ALX_LFS

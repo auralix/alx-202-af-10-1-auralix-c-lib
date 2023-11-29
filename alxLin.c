@@ -256,7 +256,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		}
 
 		// Wait for slave to transmit whole frame response
-		#ifdef ALX_OS
+		#if defined(ALX_FREE_RTOS)
 		AlxOsDelay_ms(&alxOsDelay, slaveResponseWaitTime_ms);
 		#else
 		AlxDelay_ms(slaveResponseWaitTime_ms);
@@ -464,7 +464,7 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 			}
 
 			// Delay
-			#ifdef ALX_OS
+			#if defined(ALX_FREE_RTOS)
 			AlxOsDelay_ms(&alxOsDelay, rxFifoNumOfEntriesNewCheckWaitTime_ms);
 			#else
 			AlxDelay_ms(rxFifoNumOfEntriesNewCheckWaitTime_ms);
