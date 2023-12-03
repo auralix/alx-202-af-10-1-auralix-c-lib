@@ -1540,7 +1540,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 
 	// Set clocks
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_PCLK3;
-	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
@@ -1594,7 +1594,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160M
 
 	// Set clocks
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_PCLK3;
-	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
@@ -1648,7 +1648,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160M
 
 	// Set clocks
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_PCLK3;
-	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
