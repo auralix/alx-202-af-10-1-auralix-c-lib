@@ -112,6 +112,11 @@ typedef struct
 	ADC_HandleTypeDef hadc;
 	DMA_TypeDef* dma;
 	DMA_HandleTypeDef hdma;
+	#if defined(ALX_STM32U5)
+	DMA_NodeConfTypeDef ncdma;
+	DMA_NodeTypeDef ndma;
+	DMA_QListTypeDef qdma;
+	#endif
 	ADC_ChannelConfTypeDef chadc[ALX_ADC_BUFF_LEN];
 	Alx_Ch ch[ALX_ADC_BUFF_LEN];
 	uint32_t buff[ALX_ADC_BUFF_LEN];

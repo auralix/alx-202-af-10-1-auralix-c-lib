@@ -518,10 +518,36 @@ void AlxAdc_Ctor
 	if (me->hadc.Instance == ADC1)
 	{
 		me->dma = GPDMA1;
-		me->hdma.Instance = GPDMA1_Channel0;			// TV: TODO, don't understand
-		me->hdma.Init.Request = GPDMA1_REQUEST_ADC1;	// TV: TODO, don't understand
+		me->hdma.Instance = GPDMA1_Channel0;
+		me->ncdma.Init.Request = GPDMA1_REQUEST_ADC1;
 	}
-	ALX_ADC_ASSERT(false);	// TV: TODO, don't understand, DMA normal vs DMA linked list, offical STM32CubeU5 example has ADC4 with DMA linked list..
+	me->hdma.InitLinkedList.Priority = DMA_LOW_PRIORITY_LOW_WEIGHT;
+	me->hdma.InitLinkedList.LinkStepMode = DMA_LSM_FULL_EXECUTION;
+	me->hdma.InitLinkedList.LinkAllocatedPort = DMA_LINK_ALLOCATED_PORT0;
+	me->hdma.InitLinkedList.TransferEventMode = DMA_TCEM_LAST_LL_ITEM_TRANSFER;
+	me->hdma.InitLinkedList.LinkedListMode = DMA_LINKEDLIST_CIRCULAR;
+
+	me->ncdma.NodeType = DMA_GPDMA_LINEAR_NODE;
+	me->ncdma.Init.BlkHWRequest = DMA_BREQ_SINGLE_BURST;
+	me->ncdma.Init.Direction = DMA_PERIPH_TO_MEMORY;
+	me->ncdma.Init.SrcInc = DMA_SINC_FIXED;
+	me->ncdma.Init.DestInc = DMA_DINC_INCREMENTED;
+	me->ncdma.Init.SrcDataWidth = DMA_SRC_DATAWIDTH_WORD;
+	me->ncdma.Init.DestDataWidth = DMA_DEST_DATAWIDTH_WORD;
+	me->ncdma.Init.SrcBurstLength = 1;
+	me->ncdma.Init.DestBurstLength = 1;
+	me->ncdma.Init.TransferAllocatedPort = DMA_SRC_ALLOCATED_PORT0|DMA_DEST_ALLOCATED_PORT0;
+	me->ncdma.Init.TransferEventMode = DMA_TCEM_BLOCK_TRANSFER;
+	me->ncdma.Init.Mode = DMA_NORMAL;
+	me->ncdma.DataHandlingConfig.DataExchange = DMA_EXCHANGE_NONE;
+	me->ncdma.DataHandlingConfig.DataAlignment = DMA_DATA_RIGHTALIGN_ZEROPADDED;
+	me->ncdma.TriggerConfig.TriggerMode = ALX_NULL;
+	me->ncdma.TriggerConfig.TriggerPolarity = DMA_TRIG_POLARITY_MASKED;
+	me->ncdma.TriggerConfig.TriggerSelection = ALX_NULL;
+	memset(&me->ncdma.RepeatBlockConfig, 0, sizeof(me->ncdma.RepeatBlockConfig));
+	me->ncdma.SrcAddress = 0;
+	me->ncdma.DstAddress = 0;
+	me->ncdma.DataSize = 0;
 	#endif
 
 
@@ -594,7 +620,17 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	#endif
 
 	// Init DMA
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 	if(HAL_DMA_Init(&me->hdma) != HAL_OK) { ALX_ADC_TRACE("Err"); return Alx_Err; }
+	#endif
+	#if defined(ALX_STM32U5)
+	if(HAL_DMAEx_List_BuildNode(&me->ncdma, &me->ndma) != HAL_OK) { ALX_ADC_TRACE("Err"); return Alx_Err; }
+	if(HAL_DMAEx_List_InsertNode(&me->qdma, NULL, &me->ndma) != HAL_OK) { ALX_ADC_TRACE("Err"); return Alx_Err; }
+	if(HAL_DMAEx_List_SetCircularMode(&me->qdma) != HAL_OK) { ALX_ADC_TRACE("Err"); return Alx_Err; }
+	if(HAL_DMAEx_List_Init(&me->hdma) != HAL_OK) { ALX_ADC_TRACE("Err"); return Alx_Err; }
+	if(HAL_DMAEx_List_LinkQ(&me->hdma, &me->qdma) != HAL_OK) { ALX_ADC_TRACE("Err"); return Alx_Err; }
+	if(HAL_DMA_ConfigChannelAttributes(&me->hdma, DMA_CHANNEL_PRIV) != HAL_OK) { ALX_ADC_TRACE("Err"); return Alx_Err; }
+	#endif
 
 	// Link ADC & DMA
 	__HAL_LINKDMA(&me->hadc, DMA_Handle, me->hdma);
@@ -1002,7 +1038,6 @@ static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	// STM32L4
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32L4)
-	if(ch == Alx_Ch_McuStm32_Vref)		return ADC_CHANNEL_VREFINT;		// Ch0
 	if(ch == Alx_Ch_1)					return ADC_CHANNEL_1;
 	if(ch == Alx_Ch_2)					return ADC_CHANNEL_2;
 	if(ch == Alx_Ch_3)					return ADC_CHANNEL_3;
@@ -1019,6 +1054,7 @@ static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	if(ch == Alx_Ch_14)					return ADC_CHANNEL_14;
 	if(ch == Alx_Ch_15)					return ADC_CHANNEL_15;
 	if(ch == Alx_Ch_16)					return ADC_CHANNEL_16;
+	if(ch == Alx_Ch_McuStm32_Vref)		return ADC_CHANNEL_VREFINT;		// Ch0
 	if(ch == Alx_Ch_McuStm32_TempSens)	return ADC_CHANNEL_TEMPSENSOR;	// Ch17
 	if(ch == Alx_Ch_McuStm32_Vbat)		return ADC_CHANNEL_VBAT;		// Ch18
 	#endif
@@ -1028,7 +1064,6 @@ static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	// STM32U5
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32U5)
-	if(ch == Alx_Ch_McuStm32_Vref)		return ADC_CHANNEL_VREFINT;		// Ch0
 	if(ch == Alx_Ch_1)					return ADC_CHANNEL_1;
 	if(ch == Alx_Ch_2)					return ADC_CHANNEL_2;
 	if(ch == Alx_Ch_3)					return ADC_CHANNEL_3;
@@ -1045,6 +1080,7 @@ static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	if(ch == Alx_Ch_14)					return ADC_CHANNEL_14;
 	if(ch == Alx_Ch_15)					return ADC_CHANNEL_15;
 	if(ch == Alx_Ch_16)					return ADC_CHANNEL_16;
+	if(ch == Alx_Ch_McuStm32_Vref)		return ADC_CHANNEL_VREFINT;		// Ch0
 	if(ch == Alx_Ch_McuStm32_Vbat)		return ADC_CHANNEL_VBAT;		// Ch18
 	if(ch == Alx_Ch_McuStm32_TempSens)	return ADC_CHANNEL_TEMPSENSOR;	// Ch19
 	#endif
