@@ -47,6 +47,7 @@
 // Specific
 //------------------------------------------------------------------------------
 static uint32_t AlxAdc_GetVref_mV(AlxAdc* me);
+static uint32_t AlxAdc_GetClkPrescaler(AlxAdc* me);
 static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch);
 static uint32_t AlxAdc_GetRank(uint8_t buffPos);
 
@@ -151,7 +152,7 @@ void AlxAdc_Ctor
 
 	// ADC Common
 	me->hadc.Instance = adc;
-	me->hadc.Init.ClockPrescaler = (uint32_t)adcClk;
+	me->hadc.Init.ClockPrescaler = AlxAdc_GetClkPrescaler(me);
 	me->hadc.Init.Resolution = ALX_ADC_RESOLUTION;
 	me->hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
 	me->hadc.Init.ScanConvMode = ADC_SCAN_DIRECTION_FORWARD;
@@ -199,7 +200,7 @@ void AlxAdc_Ctor
 	// ADC Clock
 	me->iclk.PeriphClockSelection = RCC_PERIPHCLK_ADC;
 	me->iclk.RTCClockSelection = ALX_NULL;
-	me->iclk.AdcClockSelection = (uint32_t)adcClk;
+	me->iclk.AdcClockSelection = AlxAdc_GetClkPrescaler(me);
 	me->iclk.UsbClockSelection = ALX_NULL;
 
 	// ADC Common
@@ -244,7 +245,7 @@ void AlxAdc_Ctor
 
 	// ADC Common
 	me->hadc.Instance = adc;
-	me->hadc.Init.ClockPrescaler = (uint32_t)adcClk;
+	me->hadc.Init.ClockPrescaler = AlxAdc_GetClkPrescaler(me);
 	me->hadc.Init.Resolution = ALX_ADC_RESOLUTION;
 	me->hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
 	me->hadc.Init.ScanConvMode = ENABLE;
@@ -295,7 +296,7 @@ void AlxAdc_Ctor
 
 	// ADC Common
 	me->hadc.Instance = adc;
-	me->hadc.Init.ClockPrescaler = (uint32_t)adcClk;
+	me->hadc.Init.ClockPrescaler = AlxAdc_GetClkPrescaler(me);
 	me->hadc.Init.Resolution = ALX_ADC_RESOLUTION;
 	me->hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
 	me->hadc.Init.GainCompensation = 0;
@@ -355,7 +356,7 @@ void AlxAdc_Ctor
 
 	// ADC Common
 	me->hadc.Instance = adc;
-	me->hadc.Init.ClockPrescaler = (uint32_t)adcClk;
+	me->hadc.Init.ClockPrescaler = AlxAdc_GetClkPrescaler(me);
 	me->hadc.Init.Resolution = ALX_ADC_RESOLUTION;
 	me->hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
 	me->hadc.Init.ScanConvMode = ADC_SCAN_ENABLE;
@@ -407,7 +408,7 @@ void AlxAdc_Ctor
 
 	// ADC Common
 	me->hadc.Instance = adc;
-	me->hadc.Init.ClockPrescaler = (uint32_t)adcClk;
+	me->hadc.Init.ClockPrescaler = AlxAdc_GetClkPrescaler(me);
 	me->hadc.Init.Resolution = ALX_ADC_RESOLUTION;
 	me->hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
 	me->hadc.Init.ScanConvMode = ADC_SCAN_ENABLE;
@@ -470,7 +471,7 @@ void AlxAdc_Ctor
 
 	// ADC Common
 	me->hadc.Instance = adc;
-	me->hadc.Init.ClockPrescaler = (uint32_t)adcClk;
+	me->hadc.Init.ClockPrescaler = AlxAdc_GetClkPrescaler(me);
 	me->hadc.Init.Resolution = ALX_ADC_RESOLUTION;
 	me->hadc.Init.GainCompensation = 0;
 	me->hadc.Init.ScanConvMode = ADC_SCAN_ENABLE;
@@ -857,6 +858,82 @@ static uint32_t AlxAdc_GetVref_mV(AlxAdc* me)
 	}
 
 	// Assert
+	ALX_ADC_ASSERT(false);	// We should not get here
+	return ALX_NULL;
+}
+static uint32_t AlxAdc_GetClkPrescaler(AlxAdc* me)
+{
+	//------------------------------------------------------------------------------
+	// STM32F0
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32F0)
+	if(me->adcClk == AlxAdc_Clk_McuStm32F0_AdcClk_12MHz_Pclk1Apb1_48MHz)		return ADC_CLOCK_SYNC_PCLK_DIV4;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32F1
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32F1)
+	if(me->adcClk == AlxAdc_Clk_McuStm32F1_AdcClk_4MHz_Pclk2Apb2_8MHz)			return RCC_ADCPCLK2_DIV2;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32F4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32F4)
+	if(me->adcClk == AlxAdc_Clk_McuStm32F4_AdcClk_11MHz25_Pclk2Apb2_90MHz)		return ADC_CLOCK_SYNC_PCLK_DIV8;
+	if(me->adcClk == AlxAdc_Clk_McuStm32F4_AdcClk_22MHz5_Pclk2Apb2_90MHz)		return ADC_CLOCK_SYNC_PCLK_DIV4;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32F7
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32F7)
+	if(me->adcClk == AlxAdc_Clk_McuStm32F7_AdcClk_13MHz5_Pclk2Apb2_108MHz)		return ADC_CLOCK_SYNC_PCLK_DIV8;
+	if(me->adcClk == AlxAdc_Clk_McuStm32F7_AdcClk_27MHz_Pclk2Apb2_108MHz)		return ADC_CLOCK_SYNC_PCLK_DIV4;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32G4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32G4)
+	if(me->adcClk == AlxAdc_Clk_McuStm32G4_AdcClk_42MHz5_Pclk2Apb2_170MHz)		return ADC_CLOCK_SYNC_PCLK_DIV4;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L0
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L0)
+	if(me->adcClk == AlxAdc_Clk_McuStm32L0_AdcClk_525kHz_Pclk2Apb2_2MHz1)		return ADC_CLOCK_SYNC_PCLK_DIV4;
+	if(me->adcClk == AlxAdc_Clk_McuStm32L0_AdcClk_8MHz_Pclk2Apb2_32MHz)			return ADC_CLOCK_SYNC_PCLK_DIV4;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L4)
+	if(me->adcClk == AlxAdc_Clk_McuStm32L4_AdcClk_20MHz_Sysclk_80MHz)			return ADC_CLOCK_SYNC_PCLK_DIV4;
+	if(me->adcClk == AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Sysclk_120MHz)			return ADC_CLOCK_SYNC_PCLK_DIV4;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32U5
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32U5)
+	if(me->adcClk == AlxAdc_Clk_McuStm32U5_AdcClk_20MHz_Hclk_160MHz)			return ADC_CLOCK_ASYNC_DIV8;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
 	ALX_ADC_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }

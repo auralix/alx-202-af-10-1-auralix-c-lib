@@ -47,6 +47,7 @@
 // Specific
 //------------------------------------------------------------------------------
 static void AlxSpi_ParseMode(AlxSpi* me);
+static uint32_t AlxSpi_GetClkPrescaler(AlxSpi* me);
 
 
 //------------------------------------------------------------------------------
@@ -110,7 +111,7 @@ void AlxSpi_Ctor
 	me->hspi.Init.CLKPolarity = me->clkPolarity;
 	me->hspi.Init.CLKPhase = me->clkPhase;
 	me->hspi.Init.NSS = SPI_NSS_SOFT;
-	me->hspi.Init.BaudRatePrescaler = (uint32_t)spiClk;
+	me->hspi.Init.BaudRatePrescaler = AlxSpi_GetClkPrescaler(me);
 	me->hspi.Init.FirstBit = SPI_FIRSTBIT_MSB;
 	me->hspi.Init.TIMode = SPI_TIMODE_DISABLE;
 	me->hspi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -459,6 +460,91 @@ static void AlxSpi_ParseMode(AlxSpi* me)
 	if (me->mode == AlxSpi_Mode_3) { me->clkPolarity = SPI_POLARITY_HIGH; me->clkPhase = SPI_PHASE_2EDGE; return; }
 
 	ALX_SPI_ASSERT(false);	// We should not get here
+}
+static uint32_t AlxSpi_GetClkPrescaler(AlxSpi* me)
+{
+	//------------------------------------------------------------------------------
+	// STM32F4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32F4)
+	if(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_350kHz_Pclk2Apb2_90MHz)		return SPI_BAUDRATEPRESCALER_256;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_700kHz_Pclk2Apb2_90MHz)		return SPI_BAUDRATEPRESCALER_128;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_1MHz4_Pclk2Apb2_90MHz)		return SPI_BAUDRATEPRESCALER_64;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_5MHz625_Pclk2Apb2_90MHz)	return SPI_BAUDRATEPRESCALER_16;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_11MHz25_Pclk2Apb2_90MHz)	return SPI_BAUDRATEPRESCALER_8;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_22MHz5_Pclk2Apb2_90MHz)		return SPI_BAUDRATEPRESCALER_4;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi1_Spi4_SpiClk_45MHz_Pclk2Apb2_90MHz)		return SPI_BAUDRATEPRESCALER_2;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_1MHz4_Pclk1Apb1_45MHz)		return SPI_BAUDRATEPRESCALER_32;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_5MHz625_Pclk1Apb1_45MHz)	return SPI_BAUDRATEPRESCALER_8;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F4_Spi2_Spi3_SpiClk_11MHz25_Pclk1Apb1_45MHz)	return SPI_BAUDRATEPRESCALER_4;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32F7
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32F7)
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_422kHz_Pclk2Apb2_108MHz)		return SPI_BAUDRATEPRESCALER_256;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_844kHz_Pclk2Apb2_108MHz)		return SPI_BAUDRATEPRESCALER_128;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_1MHz688_Pclk2Apb2_108MHz)		return SPI_BAUDRATEPRESCALER_64;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_3MHz375_Pclk2Apb2_108MHz)		return SPI_BAUDRATEPRESCALER_32;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_6MHz75_Pclk2Apb2_108MHz)		return SPI_BAUDRATEPRESCALER_16;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_13MHz5_Pclk2Apb2_108MHz)		return SPI_BAUDRATEPRESCALER_8;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_27MHz_Pclk2Apb2_108MHz)		return SPI_BAUDRATEPRESCALER_4;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi1_Spi4_Spi5_Spi6_SpiClk_54MHz_Pclk2Apb2_108MHz)		return SPI_BAUDRATEPRESCALER_2;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_211kHz_Pclk1Apb1_54MHz)					return SPI_BAUDRATEPRESCALER_256;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_422kHz_Pclk1Apb1_54MHz)					return SPI_BAUDRATEPRESCALER_128;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_844kHz_Pclk1Apb1_54MHz)					return SPI_BAUDRATEPRESCALER_64;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_1MHz688_Pclk1Apb1_54MHz)				return SPI_BAUDRATEPRESCALER_32;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_3MHz375_Pclk1Apb1_54MHz)				return SPI_BAUDRATEPRESCALER_16;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_6MHz75_Pclk1Apb1_54MHz)					return SPI_BAUDRATEPRESCALER_8;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_13MHz5_Pclk1Apb1_54MHz)					return SPI_BAUDRATEPRESCALER_4;
+	if(me->spiClk == AlxSpi_Clk_McuStm32F7_Spi2_Spi3_SpiClk_27MHz_Pclk1Apb1_54MHz)					return SPI_BAUDRATEPRESCALER_2;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32G4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32G4)
+	if(me->spiClk == AlxSpi_Clk_McuStm32G4_Spi1_Spi4_SpiClk_1MHz33_Pclk2Apb2_170MHz)	return SPI_BAUDRATEPRESCALER_128;
+	if(me->spiClk == AlxSpi_Clk_McuStm32G4_Spi2_Spi3_SpiClk_1MHz33_Pclk1Apb1_170MHz)	return SPI_BAUDRATEPRESCALER_128;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L0
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L0)
+	if(me->spiClk == AlxSpi_Clk_McuStm32L0_Spi1_SpiClk_1MHz_Pclk2Apb2_32MHz)			return SPI_BAUDRATEPRESCALER_32;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L0_Spi2_SpiClk_1MHz_Pclk1Apb1_32MHz)			return SPI_BAUDRATEPRESCALER_32;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L4)
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_5MHz_Pclk2Apb2_80MHz)			return SPI_BAUDRATEPRESCALER_16;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_10MHz_Pclk2Apb2_80MHz)			return SPI_BAUDRATEPRESCALER_8;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_20MHz_Pclk2Apb2_80MHz)			return SPI_BAUDRATEPRESCALER_4;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_7MHz5_Pclk2Apb2_120MHz)			return SPI_BAUDRATEPRESCALER_16;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_15MHz_Pclk2Apb2_120MHz)			return SPI_BAUDRATEPRESCALER_8;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi1_SpiClk_30MHz_Pclk2Apb2_120MHz)			return SPI_BAUDRATEPRESCALER_4;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_5MHz_Pclk1Apb1_80MHz)		return SPI_BAUDRATEPRESCALER_16;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_10MHz_Pclk1Apb1_80MHz)		return SPI_BAUDRATEPRESCALER_8;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_20MHz_Pclk1Apb1_80MHz)		return SPI_BAUDRATEPRESCALER_4;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_7MHz5_Pclk1Apb1_120MHz)		return SPI_BAUDRATEPRESCALER_16;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_15MHz_Pclk1Apb1_120MHz)		return SPI_BAUDRATEPRESCALER_8;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_30MHz_Pclk1Apb1_120MHz)		return SPI_BAUDRATEPRESCALER_4;
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_SPI_ASSERT(false);	// We should not get here
+	return ALX_NULL;
 }
 
 
