@@ -269,6 +269,11 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	// Enable PWR periphery clock
 	__HAL_RCC_PWR_CLK_ENABLE();
 
+	// Enable GPIO PWR
+	#if defined(ALX_STM32L4)
+	HAL_PWREx_EnableVddIO2();
+	#endif
+
 	// Init power regulator
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
 	if(HAL_PWREx_ControlVoltageScaling(me->pwrRegVoltageScale) != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; };
