@@ -1430,7 +1430,7 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 	me->iosc.PLL.PLLSource = RCC_PLLSOURCE_HSI;
 	me->iosc.PLL.PLLM = 2;
 	me->iosc.PLL.PLLN = 30;
-	me->iosc.PLL.PLLP = RCC_PLLP_DIV2;
+	me->iosc.PLL.PLLP = RCC_PLLP_DIV5;
 	me->iosc.PLL.PLLQ = RCC_PLLP_DIV2;
 	me->iosc.PLL.PLLR = RCC_PLLP_DIV2;
 
@@ -1479,7 +1479,7 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 	me->iosc.PLL.PLLSource = RCC_PLLSOURCE_HSE;
 	me->iosc.PLL.PLLM = 5;
 	me->iosc.PLL.PLLN = 48;
-	me->iosc.PLL.PLLP = RCC_PLLP_DIV2;
+	me->iosc.PLL.PLLP = RCC_PLLP_DIV5;
 	me->iosc.PLL.PLLQ = RCC_PLLP_DIV2;
 	me->iosc.PLL.PLLR = RCC_PLLP_DIV2;
 
