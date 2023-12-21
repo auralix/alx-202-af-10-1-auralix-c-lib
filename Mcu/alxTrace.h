@@ -42,7 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTick.h"
 
-#if (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)) && (!defined(ALX_MBED))
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
 #include "alxTrace_McuStm32.h"
 
 #elif defined(ALX_LPC17XX)
@@ -54,7 +54,7 @@ extern "C" {
 #elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
 #include "alxTrace_McuLpc80x.h"
 
-#elif defined(ALX_PC) || defined(ALX_MBED)
+#elif defined(ALX_PC)
 typedef struct { bool dummy; } AlxTrace;
 
 #else
