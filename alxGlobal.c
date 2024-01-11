@@ -47,11 +47,8 @@
   */
 void AlxGlobal_DisableIrq(void)
 {
-	#if defined(ALX_MBED)
-	#else
-		#if defined(__GNUC__)
-		__disable_irq();
-		#endif
+	#if defined(__GNUC__)
+	__disable_irq();
 	#endif
 }
 
@@ -60,11 +57,8 @@ void AlxGlobal_DisableIrq(void)
   */
 void AlxGlobal_EnableIrq(void)
 {
-	#if defined(ALX_MBED)
-	#else
-		#if defined(__GNUC__)
-		__enable_irq();
-		#endif
+	#if defined(__GNUC__)
+	__enable_irq();
 	#endif
 }
 
