@@ -83,7 +83,7 @@ void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char
 	char buff[256] = {0};
 	va_list args = {0};
 
-	AlxGlobal_Uint64ToStr(AlxTick_Get_ms(&alxTick), buff);
+	AlxGlobal_Ulltoa(AlxTick_Get_ms(&alxTick), buff);
 	AlxTrace_WriteFormat(me, "trace;%s;%s;%lu;%s;", buff, file, line, fun);
 
 	va_start(args, format);
@@ -109,7 +109,7 @@ void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const c
 		AlxTrace_GetSmLevelStr(smLevel, smLevelStr);
 
 		char tickStr[50] = {0};
-		AlxGlobal_Uint64ToStr(AlxTick_Get_ms(&alxTick), tickStr);
+		AlxGlobal_Ulltoa(AlxTick_Get_ms(&alxTick), tickStr);
 
 		AlxTrace_WriteFormat(me, "traceSm;%s;%s%s_%s_%s\r\n", tickStr, smLevelStr, smName, stName, acName);
 	}
