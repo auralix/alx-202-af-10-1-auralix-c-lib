@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxSpi.h
-  * @brief		Auralix C Library - ALX SPI Module
+  * @file		alxWdt.h
+  * @brief		Auralix C Library - ALX Watchdog Timer Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_SPI_H
-#define ALX_SPI_H
+#ifndef ALX_WDT_H
+#define ALX_WDT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,17 +42,12 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxIoPin.h"
 
-// AlxMcu //
-#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-#include "alxSpi_McuStm32.h"
-
-#elif defined(ALX_LPC55S6X)
-#include "alxSpi_McuLpc55S6x.h"
+#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+#include "alxWdt_McuStm32.h"
 
 #else
-typedef struct { bool dummy; } AlxSpi;
+typedef struct { bool dummy; } AlxWdt;
 #endif
 
 
@@ -65,37 +60,32 @@ typedef struct { bool dummy; } AlxSpi;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_SPI_FILE "alxSpi.h"
+#define ALX_WDT_FILE "alxWdt.h"
 
 // Assert //
-#if defined(_ALX_SPI_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SPI_FILE, expr)
-#elif defined(_ALX_SPI_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SPI_FILE, expr)
-#elif defined(_ALX_SPI_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_RST(ALX_SPI_FILE, expr)
+#if defined(_ALX_WDT_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_WDT_FILE, expr)
+#elif defined(_ALX_WDT_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_WDT_FILE, expr)
+#elif defined(_ALX_WDT_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_RST(ALX_WDT_FILE, expr)
 #else
-	#define ALX_SPI_ASSERT(expr) do{} while (false)
+	#define ALX_WDT_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_SPI_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_SPI_TRACE(...) ALX_TRACE_STD(ALX_SPI_FILE, __VA_ARGS__)
+#if defined(_ALX_WDT_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_WDT_TRACE(...) ALX_TRACE_STD(ALX_WDT_FILE, __VA_ARGS__)
 #else
-	#define ALX_SPI_TRACE(...) do{} while (false)
+	#define ALX_WDT_TRACE(...) do{} while (false)
 #endif
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxSpi_Init(AlxSpi* me);
-Alx_Status AlxSpi_DeInit(AlxSpi* me);
-Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms);
-void AlxSpi_Master_AssertCs(AlxSpi* me);
-void AlxSpi_Master_DeAssertCs(AlxSpi* me);
+Alx_Status AlxWdt_Init(AlxWdt* me);
+Alx_Status AlxWdt_Refresh(AlxWdt* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -104,4 +94,4 @@ void AlxSpi_Master_DeAssertCs(AlxSpi* me);
 }
 #endif
 
-#endif	// #ifndef ALX_SPI_H
+#endif	// #ifndef ALX_WDT_H

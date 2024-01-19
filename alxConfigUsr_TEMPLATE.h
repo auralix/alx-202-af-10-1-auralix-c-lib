@@ -1,8 +1,9 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxTrace_McuLpc84x.h
-  * @brief		Auralix C Library - ALX Trace MCU LPC84X Module
+  * @file		alxConfigUsr.h
+  * @brief		Auralix C Library - ALX Configuration File - User
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
+  ******************************************************************************
   *
   * @section License
   *
@@ -25,11 +26,12 @@
   ******************************************************************************
   **/
 
+
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_TRACE_MCU_LPC84X_H
-#define ALX_TRACE_MCU_LPC84X_H
+#ifndef ALX_CONFIG_USR_H
+#define ALX_CONFIG_USR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,55 +39,13 @@ extern "C" {
 
 
 //******************************************************************************
-// Includes
+// Configuration
 //******************************************************************************
-#include "alxGlobal.h"
-#include "alxTick.h"
+//#undef XXX
 
-
-//******************************************************************************
-// Module Guard
-//******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
-
-
-//******************************************************************************
-// Types
-//******************************************************************************
-typedef struct
-{
-	// Parameters
-	uint8_t port;
-	uint8_t pin;
-	USART_Type* usart;
-	AlxGlobal_BaudRate baudRate;
-
-	// Variables
-	usart_config_t usartConfig;
-
-	// Info
-	bool isInit;
-	bool wasCtorCalled;
-} AlxTrace;
-
-
-//******************************************************************************
-// Constructor
-//******************************************************************************
-void AlxTrace_Ctor
-(
-	AlxTrace* me,
-	uint8_t port,
-	uint8_t pin,
-	USART_Type* usart,
-	AlxGlobal_BaudRate baudRate
-);
-
-
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_TRACE_MCU_LPC84X_H
+#endif	// #ifndef ALX_CONFIG_USR_H

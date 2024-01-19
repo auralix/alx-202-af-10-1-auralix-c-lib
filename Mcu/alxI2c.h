@@ -44,15 +44,14 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxIoPin.h"
 
-// AlxMcu //
-#if  defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
 #include "alxI2c_McuStm32.h"
-
-#elif defined(ALX_LPC80X)
-#include "alxI2c_McuLpc80x.h"
 
 #elif defined(ALX_LPC55S6X)
 #include "alxI2c_McuLpc55S6x.h"
+
+#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
+#include "alxI2c_McuLpc80x.h"
 
 #else
 typedef struct { bool dummy; } AlxI2c;

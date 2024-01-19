@@ -336,7 +336,7 @@ Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me)
 	status = AlxFifo_WriteMulti(&me->fifo, (uint8_t*)&me->xyz_g, sizeof(AlxAdxl355_Xyz_g));
 	if (status == AlxFifo_ErrFull)
 	{
-		// TODO: Decide if we will handle FIFO overflow as error, or we will discard overflow data..
+		// TV: TODO, decide if we will handle FIFO overflow as error, or we will discard overflow data..
 		// For now we will discard additional overflow data..
 		return status;
 	}

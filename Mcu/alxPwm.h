@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxGlobalMcuLpc84x.h
-  * @brief		Auralix C Library - ALX Global MCU LPC84X File
+  * @file		alxPwm.h
+  * @brief		Auralix C Library - ALX PWM Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_GLOBAL_MCU_LPC84X_H
-#define ALX_GLOBAL_MCU_LPC84X_H
+#ifndef ALX_PWM_H
+#define ALX_PWM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,51 +40,66 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+
+#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+#include "alxPwm_McuStm32.h"
+
+#elif defined(ALX_LPC55S6X)
+#include "alxPwm_McuLpc55S6x.h"
+
+#elif defined(ALX_LPC80X)
+#include "alxPwm_McuLpc80x.h"
+
+#else
+typedef struct { bool dummy; } AlxPwm;
+#endif
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
-// Includes
+// Preprocessor
 //******************************************************************************
-#include "fsl_acomp.h"
-#include "fsl_adc.h"
-#include "fsl_capt.h"
-#include "fsl_clock.h"
-#include "fsl_common.h"
-#include "fsl_crc.h"
-#include "fsl_ctimer.h"
-#include "fsl_dac.h"
-#include "fsl_dma.h"
-#include "fsl_gpio.h"
-#include "fsl_i2c.h"
-#include "fsl_iap.h"
-#include "fsl_inputmux.h"
-#include "fsl_inputmux_connections.h"
-#include "fsl_iocon.h"
-#include "fsl_mrt.h"
-#include "fsl_pint.h"
-#include "fsl_power.h"
-#include "fsl_reset.h"
-#include "fsl_sctimer.h"
-#include "fsl_spi.h"
-#include "fsl_swm.h"
-#include "fsl_swm_connections.h"
-#include "fsl_syscon.h"
-#include "fsl_syscon_connections.h"
-#include "fsl_usart.h"
-#include "fsl_wkt.h"
-#include "fsl_wwdt.h"
+#define ALX_PWM_FILE "alxPwm.h"
+
+// Assert //
+#if defined(_ALX_PWM_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PWM_FILE, expr)
+#elif defined(_ALX_PWM_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PWM_FILE, expr)
+#elif defined(_ALX_PWM_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_RST(ALX_PWM_FILE, expr)
+#else
+	#define ALX_PWM_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(_ALX_PWM_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_PWM_TRACE(...) ALX_TRACE_STD(ALX_PWM_FILE, __VA_ARGS__)
+#else
+	#define ALX_PWM_TRACE(...) do{} while (false)
+#endif
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
+//******************************************************************************
+// Functions
+//******************************************************************************
+Alx_Status AlxPwm_Init(AlxPwm* me);
+Alx_Status AlxPwm_DeInit(AlxPwm* me);
+Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct);
+Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil);
+
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_GLOBAL_MCU_LPC84X_H
+#endif	// #ifndef ALX_PWM_H

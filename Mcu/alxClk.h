@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxIoPinIrq.h
-  * @brief		Auralix C Library - ALX IO Pin IRQ Module
+  * @file		alxClk.h
+  * @brief		Auralix C Library - ALX Clock Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_IO_PIN_IRQ_H
-#define ALX_IO_PIN_IRQ_H
+#ifndef ALX_CLK_H
+#define ALX_CLK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,18 +43,20 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 
-// AlxMcu //
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-#include "alxIoPinIrq_McuStm32.h"
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+#include "alxClk_McuStm32.h"
 
-#elif defined(ALX_LPC80X)
-#include "alxIoPinIrq_McuLpc80x.h"
+#elif defined(ALX_LPC17XX)
+#include "alxClk_McuLpc17xx.h"
 
 #elif defined(ALX_LPC55S6X)
-#include "alxIoPinIrq_McuLpc55S6x.h"
+#include "alxClk_McuLpc55S6x.h"
+
+#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
+#include "alxClk_McuLpc80x.h"
 
 #else
-typedef struct { bool dummy; } AlxIoPinIrq;
+typedef struct { bool dummy; } AlxClk;
 #endif
 
 
@@ -67,32 +69,34 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_IO_PIN_IRQ_FILE "alxIoPinIrq.h"
+#define ALX_CLK_FILE "alxClk.h"
 
 // Assert //
-#if defined(_ALX_IO_PIN_IRQ_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_IO_PIN_IRQ_ASSERT(expr) ALX_ASSERT_BKPT(ALX_IO_PIN_IRQ_FILE, expr)
-#elif defined(_ALX_IO_PIN_IRQ_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_IO_PIN_IRQ_ASSERT(expr) ALX_ASSERT_TRACE(ALX_IO_PIN_IRQ_FILE, expr)
-#elif defined(_ALX_IO_PIN_IRQ_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_IO_PIN_IRQ_ASSERT(expr) ALX_ASSERT_RST(ALX_IO_PIN_IRQ_FILE, expr)
+#if defined(_ALX_CLK_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CLK_FILE, expr)
+#elif defined(_ALX_CLK_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_TRACE(ALX_CLK_FILE, expr)
+#elif defined(_ALX_CLK_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_RST(ALX_CLK_FILE, expr)
 #else
-	#define ALX_IO_PIN_IRQ_ASSERT(expr) do{} while (false)
+	#define ALX_CLK_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_IO_PIN_IRQ_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_IO_PIN_IRQ_TRACE(...) ALX_TRACE_STD(ALX_IO_PIN_IRQ_FILE, __VA_ARGS__)
+#if defined(_ALX_CLK_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_CLK_TRACE(...) ALX_TRACE_STD(ALX_CLK_FILE, __VA_ARGS__)
 #else
-	#define ALX_IO_PIN_IRQ_TRACE(...) do{} while (false)
+	#define ALX_CLK_TRACE(...) do{} while (false)
 #endif
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxIoPinIrq_Init(AlxIoPinIrq* me);
-void AlxIoPinIrq_DeInit(AlxIoPinIrq* me);
+Alx_Status AlxClk_Init(AlxClk* me);
+Alx_Status AlxClk_DeInit(AlxClk* me);
+uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk);
+void AlxClk_Irq_Handle(AlxClk* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -101,4 +105,4 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me);
 }
 #endif
 
-#endif	// #ifndef ALX_IO_PIN_IRQ_H
+#endif	// #ifndef ALX_CLK_H

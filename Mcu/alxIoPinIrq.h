@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxAdc_McuLpc84x.h
-  * @brief		Auralix C Library - ALX ADC MCU LPC84X Module
+  * @file		alxIoPinIrq.h
+  * @brief		Auralix C Library - ALX IO Pin IRQ Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_ADC_MCU_LPC84X_H
-#define ALX_ADC_MCU_LPC84X_H
+#ifndef ALX_IO_PIN_IRQ_H
+#define ALX_IO_PIN_IRQ_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,56 +42,62 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxIoPin.h"
+
+#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+#include "alxIoPinIrq_McuStm32.h"
+
+#elif defined(ALX_LPC55S6X)
+#include "alxIoPinIrq_McuLpc55S6x.h"
+
+#elif defined(ALX_LPC80X)
+#include "alxIoPinIrq_McuLpc80x.h"
+
+#else
+typedef struct { bool dummy; } AlxIoPinIrq;
+#endif
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
-// Types
+// Preprocessor
 //******************************************************************************
-typedef struct
-{
-	// Obejcts - External
-	AlxIoPin** channels;
+#define ALX_IO_PIN_IRQ_FILE "alxIoPinIrq.h"
 
-	// Parameters
-	uint8_t numChannels;
-	uint8_t adcClkDiv;
-	uint16_t voltageRefP_mV;
+// Assert //
+#if defined(_ALX_IO_PIN_IRQ_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_IO_PIN_IRQ_ASSERT(expr) ALX_ASSERT_BKPT(ALX_IO_PIN_IRQ_FILE, expr)
+#elif defined(_ALX_IO_PIN_IRQ_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_IO_PIN_IRQ_ASSERT(expr) ALX_ASSERT_TRACE(ALX_IO_PIN_IRQ_FILE, expr)
+#elif defined(_ALX_IO_PIN_IRQ_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_IO_PIN_IRQ_ASSERT(expr) ALX_ASSERT_RST(ALX_IO_PIN_IRQ_FILE, expr)
+#else
+	#define ALX_IO_PIN_IRQ_ASSERT(expr) do{} while (false)
+#endif
 
-	// Variables
-	adc_config_t adcConfig;
-	adc_conv_seq_config_t adcConvSeqConfig;
-	adc_result_info_t adcResult;
-
-	// Info
-	bool isInit;
-	bool wasCtorCalled;
-} AlxAdc_Mcu;
+// Trace //
+#if defined(_ALX_IO_PIN_IRQ_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_IO_PIN_IRQ_TRACE(...) ALX_TRACE_STD(ALX_IO_PIN_IRQ_FILE, __VA_ARGS__)
+#else
+	#define ALX_IO_PIN_IRQ_TRACE(...) do{} while (false)
+#endif
 
 
 //******************************************************************************
-// Constructor
+// Functions
 //******************************************************************************
-void AlxAdcMcu_Ctor
-(
-	AlxAdc_Mcu* me,
-	AlxIoPin** channels,
-	uint8_t numChannels,
-	uint8_t adcClkDiv,
-	uint16_t voltageRefP_mV
-);
+void AlxIoPinIrq_Init(AlxIoPinIrq* me);
+void AlxIoPinIrq_DeInit(AlxIoPinIrq* me);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_ADC_MCU_LPC84X_H
+#endif	// #ifndef ALX_IO_PIN_IRQ_H

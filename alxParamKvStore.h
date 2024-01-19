@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		alxI2s.h
-  * @brief		Auralix C Library - ALX I2S Module
+  * @file		alxParamKvStore.h
+  * @brief		Auralix C Library - ALX Parameter Key-Value Store Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_I2S_H
-#define ALX_I2S_H
+#ifndef ALX_PARAM_KV_STORE_H
+#define ALX_PARAM_KV_STORE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,15 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxIoPin.h"
-
-// AlxMcu //
-#if defined(ALX_STM32F4)
-#include "alxI2s_McuStm32.h"
-
-#else
-typedef struct { bool dummy; } AlxI2s;
-#endif
+#include "alxFs.h"
 
 
 //******************************************************************************
@@ -62,35 +54,59 @@ typedef struct { bool dummy; } AlxI2s;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_I2S_FILE "alxI2s.h"
+#define ALX_PARAM_KV_STORE_FILE "alxParamKvStore.h"
 
 // Assert //
-#if defined(_ALX_I2S_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_BKPT(ALX_I2S_FILE, expr)
-#elif defined(_ALX_I2S_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_TRACE(ALX_I2S_FILE, expr)
-#elif defined(_ALX_I2S_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_RST(ALX_I2S_FILE, expr)
-#elif defined(_ALX_I2S_ASSERT_MOCK) || defined(_ALX_ASSERT_MOCK_ALL)
-	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_MOCK(ALX_I2S_FILE, expr)
+#if defined(_ALX_PARAM_KV_STORE_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PARAM_KV_STORE_FILE, expr)
+#elif defined(_ALX_PARAM_KV_STORE_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PARAM_KV_STORE_FILE, expr)
+#elif defined(_ALX_PARAM_KV_STORE_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_RST(ALX_PARAM_KV_STORE_FILE, expr)
 #else
-	#define ALX_I2S_ASSERT(expr) do{} while (false)
+	#define ALX_PARAM_KV_STORE_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_I2S_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_I2S_TRACE(...) ALX_TRACE_STD(ALX_I2S_FILE, __VA_ARGS__)
+#if defined(_ALX_PARAM_KV_STORE_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_PARAM_KV_STORE_TRACE(...) ALX_TRACE_STD(ALX_PARAM_KV_STORE_FILE, __VA_ARGS__)
 #else
-	#define ALX_I2S_TRACE(...) do{} while (false)
+	#define ALX_PARAM_KV_STORE_TRACE(...) do{} while (false)
 #endif
 
 
 //******************************************************************************
-// Specific Functions
+// Types
 //******************************************************************************
-Alx_Status AlxI2s_Init(AlxI2s* me);
-Alx_Status AlxI2s_DeInit(AlxI2s* me);
-void AlxI2s_Foreground_Handle(AlxI2s* me);
+typedef struct
+{
+	// Parameters
+	AlxFs* fs;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxParamKvStore;
+
+
+//******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxParamKvStore_Ctor
+(
+	AlxParamKvStore* me,
+	AlxFs* fs
+);
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
+Alx_Status AlxParamKvStore_Init(AlxParamKvStore* me);
+Alx_Status AlxParamKvStore_DeInit(AlxParamKvStore* me);
+Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* buff, uint32_t len, uint32_t* actualLen);
+Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* buff, uint32_t len);
+Alx_Status AlxParamKvStore_Remove(AlxParamKvStore* me, const char* key);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -99,4 +115,4 @@ void AlxI2s_Foreground_Handle(AlxI2s* me);
 }
 #endif
 
-#endif	// #ifndef ALX_I2S_H
+#endif	// #ifndef ALX_PARAM_KV_STORE_H

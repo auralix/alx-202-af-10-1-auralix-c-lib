@@ -106,6 +106,7 @@ typedef struct
 	uint32_t num;
 	char hash[ALX_ID_FW_BUILD_HASH_LEN];
 	char hashShort[ALX_ID_FW_BUILD_HASH_SHORT_LEN];
+	uint32_t hashShortUint32;
 	uint32_t rev;
 } AlxId_Fw_Build;
 
@@ -332,6 +333,7 @@ uint8_t AlxId_GetFwAppVerMinor(AlxId* me);
 uint8_t AlxId_GetFwAppVerPatch(AlxId* me);
 uint32_t AlxId_GetFwAppVerDate(AlxId* me);
 uint64_t AlxId_GetFwAppVer(AlxId* me);
+uint32_t AlxId_GetFwAppHashShort(AlxId* me);
 const char* AlxId_GetFwAppVerStr(AlxId* me);
 const char* AlxId_GetFwAppBinStr(AlxId* me);
 const char* AlxId_GetHwPcbArtf(AlxId* me);
@@ -351,6 +353,7 @@ uint32_t AlxId_GetHwBomVerDate(AlxId* me);
 uint64_t AlxId_GetHwBomVer(AlxId* me);
 const char* AlxId_GetHwBomVerStr(AlxId* me);
 uint8_t AlxId_GetHwId(AlxId* me);
+void AlxId_GetHwMcuUniqueIdUint32(AlxId* me, uint32_t* uniqueIdUint32, uint8_t len);
 void AlxId_GetHwMcuUniqueIdUint8(AlxId* me, uint8_t* uniqueIdUint8, uint8_t len);
 const char* AlxId_GetHwMcuUniqueIdStr(AlxId* me);
 

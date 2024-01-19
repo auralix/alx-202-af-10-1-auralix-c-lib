@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxAdc.h
-  * @brief		Auralix C Library - ALX ADC Module
+  * @file		alxRotSw.h
+  * @brief		Auralix C Library - ALX Rotary Switch Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_ADC_H
-#define ALX_ADC_H
+#ifndef ALX_ROT_SW_H
+#define ALX_ROT_SW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,26 +44,6 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxIoPin.h"
 
-// AlxMcu //
-#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-#include "alxAdc_McuStm32.h"
-
-#elif defined(ALX_LPC1769)
-#include "alxAdc_McuLpc17.h"
-
-#elif defined(ALX_LPC845)
-#include "alxAdc_McuLpc84.h"
-
-#elif defined(ALX_LPC80X)
-#include "alxAdc_McuLpc80x.h"
-
-#elif defined(ALX_LPC55S6X)
-#include "alxAdc_McuLpc55S6x.h"
-
-#else
-typedef struct { bool dummy; } AlxAdc;
-#endif
-
 
 //******************************************************************************
 // Module Guard
@@ -74,35 +54,77 @@ typedef struct { bool dummy; } AlxAdc;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_ADC_FILE "alxAdc.h"
+#define ALX_ROT_SW_FILE "alxRotSw.h"
 
 // Assert //
-#if defined(_ALX_ADC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADC_FILE, expr)
-#elif defined(_ALX_ADC_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADC_FILE, expr)
-#elif defined(_ALX_ADC_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_RST(ALX_ADC_FILE, expr)
+#if defined(_ALX_ROT_SW_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_ROT_SW_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ROT_SW_FILE, expr)
+#elif defined(_ALX_ROT_SW_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_ROT_SW_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ROT_SW_FILE, expr)
+#elif defined(_ALX_ROT_SW_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_ROT_SW_ASSERT(expr) ALX_ASSERT_RST(ALX_ROT_SW_FILE, expr)
 #else
-	#define ALX_ADC_ASSERT(expr) do{} while (false)
+	#define ALX_ROT_SW_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_ADC_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_ADC_TRACE(...) ALX_TRACE_STD(ALX_ADC_FILE, __VA_ARGS__)
+#if defined(_ALX_ROT_SW_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_ROT_SW_TRACE(...) ALX_TRACE_STD(ALX_ROT_SW_FILE, __VA_ARGS__)
+	#define ALX_ROT_SW_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
-	#define ALX_ADC_TRACE(...) do{} while (false)
+	#define ALX_ROT_SW_TRACE(...) do{} while (false)
+	#define ALX_ROT_SW_TRACE_FORMAT(...) do{} while (false)
 #endif
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef enum
+{
+	AlxRotSw_CodeType_Real,
+	AlxRotSw_CodeType_Complement,
+	AlxRotSw_CodeType_Gray
+} AlxRotSw_CodeType;
+
+typedef struct
+{
+	// Defines
+	#define ALX_ROT_SW_IO_PIN_VAL_ARR_LEN 8
+
+	// Parameters
+	AlxIoPin** ioPinArr;
+	uint8_t ioPinArrLen;
+	AlxRotSw_CodeType codeType;
+
+	// Variables
+	bool ioPinValArr[ALX_ROT_SW_IO_PIN_VAL_ARR_LEN];
+	uint32_t code;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxRotSw;
+
+
+//******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxRotSw_Ctor
+(
+	AlxRotSw* me,
+	AlxIoPin** ioPinArr,
+	uint8_t ioPinArrLen,
+	AlxRotSw_CodeType codeType
+);
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxAdc_Init(AlxAdc* me);
-Alx_Status AlxAdc_DeInit(AlxAdc* me);
-float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);
-uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);	// MF: Optimized function
-float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
+void AlxRotSw_Init(AlxRotSw* me);
+void AlxRotSw_DeInit(AlxRotSw* me);
+uint32_t AlxRotSw_GetCode(AlxRotSw* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -111,4 +133,4 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
 }
 #endif
 
-#endif	// #ifndef ALX_ADC_H
+#endif	// #ifndef ALX_ROT_SW_H

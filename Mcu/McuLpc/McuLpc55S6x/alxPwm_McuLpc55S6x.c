@@ -44,7 +44,7 @@
 static bool AlxPwm_CheckIoPins(CTIMER_Type* tim, AlxIoPin** ioPinArr, uint8_t numOfCh);
 static uint32_t AlxPwm_GetCh(Alx_Ch ch);
 static void AlxPwm_EnableCtimerClk(AlxPwm* me);
-#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+#if defined(ALX_PWM_OPTIMIZE_SIZE)
 static void AlxPwm_UpdatePwmDutyPermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil);
 #else
 static void AlxPwm_UpdatePwmDutyPct(AlxPwm* me, Alx_Ch ch, float duty_pct);
@@ -77,7 +77,7 @@ void AlxPwm_Ctor
 	uint8_t numOfCh,
 	AlxClk* clk,
 	AlxClk_Clk alxClk_Clk,
-	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	uint16_t* dutyDefaultArr_permil,
 	#else
 	float* dutyDefaultArr_pct,
@@ -94,7 +94,7 @@ void AlxPwm_Ctor
 	ALX_PWM_ASSERT(numOfCh <= 3);														// MF: Only match registers 0, 1, 2 can be used for PWM Output. Match register 3 is for cycle lenght (freq or period)
 	(void)clk;
 	ALX_PWM_ASSERT((alxClk_Clk == AlxClk_Clk_McuLpc55s6x_MainClk_Ctor) || (alxClk_Clk == AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor));
-	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	(void)dutyDefaultArr_permil;
 	#else
 	(void)dutyDefaultArr_pct;
@@ -111,7 +111,7 @@ void AlxPwm_Ctor
 	me->numOfCh = numOfCh;
 	me->clk = clk;
 	me->alxClk_Clk = alxClk_Clk;
-	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	me->dutyDefaultArr_permil = dutyDefaultArr_permil;
 	#else
 	me->dutyDefaultArr_pct = dutyDefaultArr_pct;
@@ -158,7 +158,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	// Init CTIMER Channels
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+		#if defined(ALX_PWM_OPTIMIZE_SIZE)
 		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), me->dutyDefaultArr_permil[i] / 10, me->pwmFreq_Hz, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; }	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period). Divide duty by 10 to get pct from permil
 		AlxPwm_UpdatePwmDutyPermil(me, me->chArr[i], me->dutyDefaultArr_permil[i]);	// MF: To setup duty in permil because FLS can not handle it
 		#else
@@ -214,7 +214,7 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 //	ALX_PWM_ASSERT((0.f <= duty_pct) && (duty_pct <= 100.f));	// TV: Commented due to ASSERT even if duty_pct = 100.f
 
 	// Optimize Guard
-	#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	ALX_PWM_ASSERT(false);
 	return ALX_NULL;
 	#else
@@ -249,7 +249,7 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 	ALX_PWM_ASSERT((0U <= duty_permil) && (duty_permil <= 1000U));
 
 	// Optimize Guard
-	#if !(defined (ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL))
+	#if !(defined (ALX_PWM_OPTIMIZE_SIZE))
 	ALX_PWM_ASSERT(false);
 	return ALX_NULL;
 	#else
@@ -404,7 +404,7 @@ static void AlxPwm_EnableCtimerClk(AlxPwm* me)
 	ALX_PWM_ASSERT(false);	// We shouldn't get here
 	return;
 }
-#if defined(ALX_PWM_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+#if defined(ALX_PWM_OPTIMIZE_SIZE)
 static void AlxPwm_UpdatePwmDutyPermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {
 	// Prepare variable

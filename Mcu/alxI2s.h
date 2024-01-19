@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxClk_McuLpc84x.h
-  * @brief		Auralix C Library - ALX Clock MCU LPC84X Module
+  * @file		alxI2s.h
+  * @brief		Auralix C Library - ALX I2S Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_CLK_MCU_LPC84X_H
-#define ALX_CLK_MCU_LPC84X_H
+#ifndef ALX_I2S_H
+#define ALX_I2S_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,46 +42,60 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxIoPin.h"
+
+#if defined(ALX_STM32F4)
+#include "alxI2s_McuStm32.h"
+
+#else
+typedef struct { bool dummy; } AlxI2s;
+#endif
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
-// Types
+// Preprocessor
 //******************************************************************************
-typedef struct
-{
-	// Parameters
-	clock_main_clk_src_t mainClkSource;
-	uint32_t clkFreq;
-	uint8_t divider;
+#define ALX_I2S_FILE "alxI2s.h"
 
-	// Info
-	bool isInit;
-	bool wasCtorCalled;
-} AlxClk;
+// Assert //
+#if defined(_ALX_I2S_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_BKPT(ALX_I2S_FILE, expr)
+#elif defined(_ALX_I2S_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_TRACE(ALX_I2S_FILE, expr)
+#elif defined(_ALX_I2S_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_RST(ALX_I2S_FILE, expr)
+#elif defined(_ALX_I2S_ASSERT_MOCK) || defined(_ALX_ASSERT_MOCK_ALL)
+	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_MOCK(ALX_I2S_FILE, expr)
+#else
+	#define ALX_I2S_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(_ALX_I2S_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_I2S_TRACE(...) ALX_TRACE_STD(ALX_I2S_FILE, __VA_ARGS__)
+#else
+	#define ALX_I2S_TRACE(...) do{} while (false)
+#endif
 
 
 //******************************************************************************
-// Constructor
+// Specific Functions
 //******************************************************************************
-void AlxClk_Ctor
-(
-	AlxClk* me,
-	clock_main_clk_src_t mainClkSource,
-	uint32_t clkFreq,
-	uint8_t divider
-);
+Alx_Status AlxI2s_Init(AlxI2s* me);
+Alx_Status AlxI2s_DeInit(AlxI2s* me);
+void AlxI2s_Foreground_Handle(AlxI2s* me);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_CLK_MCU_LPC84X_H
+#endif	// #ifndef ALX_I2S_H

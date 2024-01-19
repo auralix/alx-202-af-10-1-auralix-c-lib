@@ -612,7 +612,7 @@ Alx_Status AlxSd_SpiMode_SendCmd8(AlxSd* me)
 	cmd[4] = 0xAA;	// Check Pattern = 0xAA
 	cmd[5] = 0x87;	// CRC, shifted 1 bit left, bit0 = 1
 
-	uint8_t expectedRespR7[4] = {};	// TV: TODO check response
+	uint8_t expectedRespR7[4] = {};	// TV: TODO, check response
 	expectedRespR7[0] = 0x00;
 	expectedRespR7[1] = 0x00;
 	expectedRespR7[2] = 0x00;
@@ -727,7 +727,7 @@ Alx_Status AlxSd_SpiMode_SendCmd58_SdIdle(AlxSd* me)
 	cmd[4] = 0x00;
 	cmd[5] = 0x01;	// CRC not needed
 
-	uint8_t expectedRespR3[4] = {};	// TV: TODO check response
+	uint8_t expectedRespR3[4] = {};	// TV: TODO, check response
 	expectedRespR3[0] = 0x00;
 	expectedRespR3[1] = 0x00;
 	expectedRespR3[2] = 0x00;
@@ -751,7 +751,7 @@ Alx_Status AlxSd_SpiMode_SendCmd58_SdReady(AlxSd* me)
 	cmd[4] = 0x00;
 	cmd[5] = 0x01;	// CRC not needed
 
-	uint8_t expectedRespR3[4] = {};	// TV: TODO check response
+	uint8_t expectedRespR3[4] = {};	// TV: TODO, check response
 	expectedRespR3[0] = 0x00;
 	expectedRespR3[1] = 0x00;
 	expectedRespR3[2] = 0x00;

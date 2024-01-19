@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxTrace.h
-  * @brief		Auralix C Library - ALX Trace Module
+  * @file		AlxDac.h
+  * @brief		Auralix C Library - ALX DAC Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_TRACE_H
-#define ALX_TRACE_H
+#ifndef ALX_DAC_H
+#define ALX_DAC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,29 +40,15 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTick.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+#include "alxIoPin.h"
 
-// AlxMcu //
-#if (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)) && (!defined(ALX_MBED))
-#include "alxTrace_McuStm32.h"
-
-#elif defined(ALX_LPC1769)
-#include "alxTrace_McuLpc17.h"
-
-#elif defined(ALX_LPC845)
-#include "alxTrace_McuLpc84.h"
-
-#elif defined(ALX_LPC80X)
-#include "alxTrace_McuLpc80x.h"
-
-#elif defined(ALX_LPC55S6X)
-#include "alxTrace_McuLpc55S6x.h"
-
-#elif defined(ALX_PC) || defined(ALX_MBED)
-typedef struct { bool dummy; } AlxTrace;
+#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+#include "alxDac_McuStm32.h"
 
 #else
-typedef struct { bool dummy; } AlxTrace;
+typedef struct { bool dummy; } AlxDac;
 #endif
 
 
@@ -75,28 +61,35 @@ typedef struct { bool dummy; } AlxTrace;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TRACE_STR(str) do								{ AlxTrace_WriteStr(&alxTrace, str); } while(false)
-#define ALX_TRACE_FORMAT(...) do							{ AlxTrace_WriteFormat(&alxTrace, __VA_ARGS__); } while(false)
-#define ALX_TRACE_STD(file, ...) do							{ AlxTrace_WriteStd(&alxTrace, file, __LINE__, __func__, __VA_ARGS__); } while(false)
-#define ALX_TRACE_SM(smLevel, smName, stName, acName) do	{ AlxTrace_WriteSm(&alxTrace, smLevel, smName, stName, acName); } while(false)
+#define ALX_DAC_FILE "alxDac.h"
 
+// Assert //
+#if defined(_ALX_DAC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_DAC_FILE, expr)
+#elif defined(_ALX_DAC_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_DAC_FILE, expr)
+#elif defined(_ALX_DAC_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_RST(ALX_DAC_FILE, expr)
+#else
+	#define ALX_DAC_ASSERT(expr) do{} while (false)
+#endif
 
-//******************************************************************************
-// Variables
-//******************************************************************************
-extern AlxTrace alxTrace;
+// Trace //
+#if defined(_ALX_DAC_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_DAC_TRACE(...) ALX_TRACE_STD(ALX_DAC_FILE, __VA_ARGS__)
+#else
+	#define ALX_DAC_TRACE(...) do{} while (false)
+#endif
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxTrace_Init(AlxTrace* me);
-Alx_Status AlxTrace_DeInit(AlxTrace* me);
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str);
-void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...);
-void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, const char* format, ...);
-void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName);
-void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr);
+Alx_Status AlxDac_Init(AlxDac* me);
+Alx_Status AlxDac_Init_CalibrateVref(AlxDac* me, float vref_V);
+Alx_Status AlxDac_DeInit(AlxDac* me);
+Alx_Status AlxDac_SetVoltage_V(AlxDac* me, Alx_Ch ch, float voltage_V);
+Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltage_V, float vref_V);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -105,4 +98,4 @@ void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr);
 }
 #endif
 
-#endif	// #ifndef ALX_TRACE_H
+#endif	// #ifndef ALX_DAC_H

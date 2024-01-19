@@ -86,20 +86,14 @@ extern "C" {
 // Preprocessor
 //******************************************************************************
 
+
 //------------------------------------------------------------------------------
-// ALX MCU - DAC
+// ALX - MCU - DAC
 //------------------------------------------------------------------------------
 #define __HAL_RCC_DAC1_CLK_ENABLE		__HAL_RCC_DAC_CLK_ENABLE
 #define __HAL_RCC_DAC1_CLK_DISABLE		__HAL_RCC_DAC_CLK_DISABLE
 #define __HAL_RCC_DAC1_FORCE_RESET		__HAL_RCC_DAC_FORCE_RESET
 #define __HAL_RCC_DAC1_RELEASE_RESET	__HAL_RCC_DAC_RELEASE_RESET
-
-
-//------------------------------------------------------------------------------
-// ALX MCU - I2C
-//------------------------------------------------------------------------------
-#define ALX_I2C_MCU_STM32_CLK_100kHz 0				// TODO
-#define ALX_I2C_MCU_STM32_CLK_400kHz 0x0010020A		// _400kHz_8MHz_100nsRise_10nsFall_AnalogFiltOn_DigitalFilt0, on STM32F3 -> Used I2C timing configuration tool (AN4235) and the associated software STSW-STM32126, measured 380kHz, if analog filter is disabled we can get 400kHz..
 
 
 //------------------------------------------------------------------------------

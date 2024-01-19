@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -52,17 +52,20 @@ static AlxRtc* alxRtc_me = NULL;
   * @brief
   * @param[in,out]	me
   * @param[in]		rtcClk
+  * @param[in]		lseDrive
   */
 void AlxRtc_Ctor
 (
 	AlxRtc* me,
-	AlxRtc_Clk rtcClk
+	AlxRtc_Clk rtcClk,
+	AlxRtc_LseDrive lseDrive
 )
 {
 	//------------------------------------------------------------------------------
 	// Parameters
 	//------------------------------------------------------------------------------
 	me->rtcClk = rtcClk;
+	me->lseDrive = lseDrive;
 
 
 	//------------------------------------------------------------------------------
@@ -107,7 +110,8 @@ void AlxRtc_Ctor
 	#if defined(STM32F410Tx) || defined(STM32F410Cx) || defined(STM32F410Rx) || defined(STM32F446xx) || defined(STM32F469xx) || \
 		defined(STM32F479xx) || defined(STM32F412Zx) || defined(STM32F412Vx) || defined(STM32F412Rx) || defined(STM32F412Cx) || \
 		defined(STM32F413xx) || defined(STM32F423xx) || \
-		defined(ALX_STM32L4)
+		defined(ALX_STM32L4) || \
+		defined (STM32F765xx) || defined (STM32F767xx) || defined (STM32F769xx) || defined (STM32F777xx) || defined (STM32F779xx)
 	me->iosc.PLL.PLLR = ALX_NULL;
 	#endif
 
@@ -127,7 +131,7 @@ void AlxRtc_Ctor
 		me->hrtc.Init.SynchPrediv = 256 - 1;
 		me->rtcTick_ns = 3906250;	// 1000000000 / 256 = 3906250ns
 
-		ALX_RTC_ASSERT(false);	// TODO - Handle if SS Larger than PREDIV_S
+		ALX_RTC_ASSERT(false);	// TV: TODO, handle if SS Larger than PREDIV_S
 	}
 	else if
 	(
@@ -201,6 +205,7 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 	 	(me->hrtc.Instance->PRER != me->PRER_Expected)	// Check if register PRER value is NOK
 	)
 	{
+		// Init
 		if
 		(
 			(HAL_RTC_Init(&me->hrtc) != HAL_OK) ||
@@ -212,10 +217,17 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 			me->isInit = false;
 			return Alx_Err;
 		}
+
+		// Trace
+		ALX_RTC_TRACE_FORMAT("ALX RTC date-time NOT configured, counting from default\r\n");
 	}
 	else
 	{
+		// Init
 		HAL_RTC_MspInit(&me->hrtc);
+
+		// Trace
+		ALX_RTC_TRACE_FORMAT("ALX RTC date-time configured\r\n");
 	}
 
 	// Return
@@ -697,18 +709,34 @@ Alx_Status AlxRtc_TuneTime_ms(AlxRtc* me, int64_t tuneTime_ms)
 //******************************************************************************
 void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
 {
+	// Local variables
 	(void)hrtc;
 
+	// Init LSE drive
+	#if defined(ALX_STM32F4)
+	// Not supported
+	#endif
+	#if defined(ALX_STM32F7) || defined(ALX_STM32L4)
+	HAL_PWR_EnableBkUpAccess();
+	__HAL_RCC_LSEDRIVE_CONFIG(alxRtc_me->lseDrive);
+	HAL_PWR_DisableBkUpAccess();
+	#endif
+
+	// Init clocks
 	if(HAL_RCC_OscConfig(&alxRtc_me->iosc) != HAL_OK)			{ ALX_RTC_TRACE("Err"); alxRtc_me->isErr = true; };
 	if(HAL_RCCEx_PeriphCLKConfig(&alxRtc_me->iclk) != HAL_OK)	{ ALX_RTC_TRACE("Err"); alxRtc_me->isErr = true; };
+
+	// Enable
 	__HAL_RCC_RTC_ENABLE();
 }
 void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
 {
+	// Local variables
 	(void)hrtc;
 
+	// Disable
 	__HAL_RCC_RTC_DISABLE();
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))

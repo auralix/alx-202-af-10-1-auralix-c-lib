@@ -42,7 +42,7 @@
 //******************************************************************************
 static float Get_X(AlxLinFun* me, float y);
 static float Get_Y(AlxLinFun* me, float x);
-//static int32_t Get_X_Int(AlxLinFunInt* me, int32_t y);	// TODO
+//static int32_t Get_X_Int(AlxLinFunInt* me, int32_t y);	// TV: TODO
 static int32_t Get_Y_Int(AlxLinFunInt* me, int32_t x);
 
 

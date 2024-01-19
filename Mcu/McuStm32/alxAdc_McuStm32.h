@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -58,24 +58,32 @@ extern "C" {
 typedef enum
 {
 	#if defined(ALX_STM32F0)
-	AlxAdc_Clk_McuStm32F0_AdcClk_12MHz_Pclk1Apb1_48MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
+	AlxAdc_Clk_McuStm32F0_AdcClk_12MHz_Pclk1Apb1_48MHz,
 	#endif
 	#if defined(ALX_STM32F1)
-	AlxAdc_Clk_McuStm32F1_AdcClk_4MHz_Pclk2Apb2_8MHz = RCC_ADCPCLK2_DIV2,
+	AlxAdc_Clk_McuStm32F1_AdcClk_4MHz_Pclk2Apb2_8MHz,
 	#endif
 	#if defined(ALX_STM32F4)
-	AlxAdc_Clk_McuStm32F4_AdcClk_22MHz5_Pclk2Apb2_90MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
-	AlxAdc_Clk_McuStm32F4_AdcClk_11MHz25_Pclk2Apb2_90MHz = ADC_CLOCK_SYNC_PCLK_DIV8,
+	AlxAdc_Clk_McuStm32F4_AdcClk_11MHz25_Pclk2Apb2_90MHz,
+	AlxAdc_Clk_McuStm32F4_AdcClk_22MHz5_Pclk2Apb2_90MHz,
+	#endif
+	#if defined(ALX_STM32F7)
+	AlxAdc_Clk_McuStm32F7_AdcClk_13MHz5_Pclk2Apb2_108MHz,
+	AlxAdc_Clk_McuStm32F7_AdcClk_27MHz_Pclk2Apb2_108MHz,
 	#endif
 	#if defined(ALX_STM32G4)
-	AlxAdc_Clk_McuStm32G4_AdcClk_42MHz5_Pclk2Apb2_170MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
+	AlxAdc_Clk_McuStm32G4_AdcClk_42MHz5_Pclk2Apb2_170MHz,
 	#endif
 	#if defined(ALX_STM32L0)
-	AlxAdc_Clk_McuStm32L0_AdcClk_525kHz_Pclk2Apb2_2MHz1 = ADC_CLOCK_SYNC_PCLK_DIV4,
-	AlxAdc_Clk_McuStm32L0_AdcClk_8MHz_Pclk2Apb2_32MHz = ADC_CLOCK_SYNC_PCLK_DIV4
+	AlxAdc_Clk_McuStm32L0_AdcClk_525kHz_Pclk2Apb2_2MHz1,
+	AlxAdc_Clk_McuStm32L0_AdcClk_8MHz_Pclk2Apb2_32MHz,
 	#endif
 	#if defined(ALX_STM32L4)
-	AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Sysclk_120MHz = ADC_CLOCK_SYNC_PCLK_DIV4,
+	AlxAdc_Clk_McuStm32L4_AdcClk_20MHz_Sysclk_80MHz,
+	AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Sysclk_120MHz,
+	#endif
+	#if defined(ALX_STM32U5)
+	AlxAdc_Clk_McuStm32U5_AdcClk_20MHz_Hclk_160MHz,
 	#endif
 } AlxAdc_Clk;
 
@@ -83,9 +91,7 @@ typedef struct
 {
 	// Defines
 	#define ALX_ADC_BUFF_LEN 16
-
-	// Const
-	uint32_t RESOLUTION;
+	#define ALX_ADC_RESOLUTION ADC_RESOLUTION_12B
 
 	// Parameters
 	ADC_TypeDef* adc;
@@ -100,10 +106,17 @@ typedef struct
 	float vrefExt_V;
 
 	// Variables
+	#if defined(ALX_STM32F1)
 	RCC_PeriphCLKInitTypeDef iclk;
+	#endif
 	ADC_HandleTypeDef hadc;
 	DMA_TypeDef* dma;
 	DMA_HandleTypeDef hdma;
+	#if defined(ALX_STM32U5)
+	DMA_NodeConfTypeDef ncdma;
+	DMA_NodeTypeDef ndma;
+	DMA_QListTypeDef qdma;
+	#endif
 	ADC_ChannelConfTypeDef chadc[ALX_ADC_BUFF_LEN];
 	Alx_Ch ch[ALX_ADC_BUFF_LEN];
 	uint32_t buff[ALX_ADC_BUFF_LEN];
@@ -133,7 +146,7 @@ void AlxAdc_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
 
 #ifdef __cplusplus
 }

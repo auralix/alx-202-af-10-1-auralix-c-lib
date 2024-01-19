@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && (defined(ALX_LPC80X) || defined(ALX_LPC84X))
 
 
 //******************************************************************************
@@ -60,14 +60,12 @@ typedef struct
 	// Defines
 	#define ALX_ADC_BUFF_LEN 16
 
-	// Obejcts - External
-	AlxIoPin** ioPinArr;
-	AlxClk* clk;
-
 	// Parameters
+	AlxIoPin** ioPinArr;
 	Alx_Ch* chArr;
 	uint8_t numOfIoPinsAndCh;
-	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	AlxClk* clk;
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
 	uint32_t vRef_mV;
 	#else
 	float vRef_V;
@@ -94,7 +92,7 @@ void AlxAdc_Ctor
 	Alx_Ch* chArr,
 	uint8_t numOfIoPinsAndCh,
 	AlxClk* clk,
-	#if defined(ALX_ADC_OPTIMIZE_SIZE) || defined(ALX_OPTIMIZE_SIZE_ALL)
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
 	uint32_t vRef_mV
 	#else
 	float vRef_V
@@ -102,7 +100,7 @@ void AlxAdc_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_LPC80X) || defined(ALX_LPC84X))
 
 #ifdef __cplusplus
 }

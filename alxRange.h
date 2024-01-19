@@ -87,7 +87,7 @@ Alx_Status AlxRange_CheckInt32(int32_t val, int32_t valMin, int32_t valMax);
 Alx_Status AlxRange_CheckInt64(int64_t val, int64_t valMin, int64_t valMax);
 Alx_Status AlxRange_CheckFloat(float val, float valMin, float valMax);
 Alx_Status AlxRange_CheckDouble(double val, double valMin, double valMax);
-Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax); // TODO
+Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax);	// TV: TODO
 Alx_Status AlxRange_CheckStr(char* val, uint32_t valMaxLenWithNullTerm);
 
 

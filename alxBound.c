@@ -308,7 +308,7 @@ Alx_Status AlxBound_Double(double* val, double valMin, double valMax)
   * @retval		Alx_Ok
   * @retval		Alx_Err
   */
-//Alx_Status AlxBound_Arr(char* valBounded, char* val, uint32_t valLenMax)	// TODO
+//Alx_Status AlxBound_Arr(char* valBounded, char* val, uint32_t valLenMax)	// TV: TODO
 //{
 //}
 

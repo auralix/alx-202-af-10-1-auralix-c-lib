@@ -41,9 +41,19 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static Alx_Status AlxDac_Init_Private(AlxDac* me, bool calibrateVref, float vref_V);
 static Alx_Status AlxDac_SetVoltage_V_Private(AlxDac* me, Alx_Ch ch, float voltage_V, float vref_V);
 static uint32_t AlxDac_GetCh(Alx_Ch ch);
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static void AlxDac_Periph_EnableClk(AlxDac* me);
 static void AlxDac_Periph_DisableClk(AlxDac* me);
 static void AlxDac_Periph_ForceReset(AlxDac* me);
@@ -133,7 +143,9 @@ void AlxDac_Ctor
 		#endif
 
 		#if defined(ALX_STM32L4)
-		me->chdac[buffPos].DAC_HighFrequency = DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE;
+		#if defined (STM32L4P5xx) || defined (STM32L4Q5xx) || defined (STM32L4R5xx) || defined (STM32L4R7xx) || defined (STM32L4R9xx) || defined (STM32L4S5xx) || defined (STM32L4S7xx) || defined(STM32L4S9xx)
+		me->chdac[buffPos].DAC_HighFrequency = DAC_HIGH_FREQUENCY_INTERFACE_MODE_AUTOMATIC;
+		#endif
 		me->chdac[buffPos].DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
 		me->chdac[buffPos].DAC_Trigger = DAC_TRIGGER_NONE;
 		me->chdac[buffPos].DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
@@ -146,7 +158,7 @@ void AlxDac_Ctor
 		#endif
 
 		#if defined(ALX_STM32G4)
-		ALX_DAC_ASSERT(false);	// TODO - Not yet implemented
+		ALX_DAC_ASSERT(false);	// TV: TODO
 		#endif
 	}
 
@@ -273,6 +285,11 @@ Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltag
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static Alx_Status AlxDac_Init_Private(AlxDac* me, bool calibrateVref, float vref_V)
 {
 	// Init GPIO
@@ -369,81 +386,77 @@ static uint32_t AlxDac_GetCh(Alx_Ch ch)
 	return ALX_NULL;
 }
 
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static void AlxDac_Periph_EnableClk(AlxDac* me)
 {
-	bool isErr = true;
-
 	#if defined(DAC1)
-	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_CLK_ENABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_CLK_ENABLE(); return; }
 	#endif
 	#if defined(DAC2)
-	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_CLK_ENABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_CLK_ENABLE(); return; }
 	#endif
 	#if defined(DAC3)
-	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_CLK_ENABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_CLK_ENABLE(); return; }
 	#endif
 	#if defined(DAC4)
-	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_CLK_ENABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_CLK_ENABLE(); return; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_ASSERT(false); }	// We should not get here
+	ALX_DAC_ASSERT(false);	// We should not get here
 }
 static void AlxDac_Periph_DisableClk(AlxDac* me)
 {
-	bool isErr = true;
-
 	#if defined(DAC1)
-	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_CLK_DISABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_CLK_DISABLE(); return; }
 	#endif
 	#if defined(DAC2)
-	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_CLK_DISABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_CLK_DISABLE(); return; }
 	#endif
 	#if defined(DAC3)
-	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_CLK_DISABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_CLK_DISABLE(); return; }
 	#endif
 	#if defined(DAC4)
-	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_CLK_DISABLE(); isErr = false; }
+	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_CLK_DISABLE(); return; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_ASSERT(false); }	// We should not get here
+	ALX_DAC_ASSERT(false);	// We should not get here
 }
 static void AlxDac_Periph_ForceReset(AlxDac* me)
 {
-	bool isErr = true;
-
 	#if defined(DAC1)
-	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_FORCE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_FORCE_RESET(); return; }
 	#endif
 	#if defined(DAC2)
-	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_FORCE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_FORCE_RESET(); return; }
 	#endif
 	#if defined(DAC3)
-	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_FORCE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_FORCE_RESET(); return; }
 	#endif
 	#if defined(DAC4)
-	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_FORCE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_FORCE_RESET(); return; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_ASSERT(false); }	// We should not get here
+	ALX_DAC_ASSERT(false);	// We should not get here
 }
 static void AlxDac_Periph_ReleaseReset(AlxDac* me)
 {
-	bool isErr = true;
-
 	#if defined(DAC1)
-	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_RELEASE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC1)	{ __HAL_RCC_DAC1_RELEASE_RESET(); return; }
 	#endif
 	#if defined(DAC2)
-	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_RELEASE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC2)	{ __HAL_RCC_DAC2_RELEASE_RESET(); return; }
 	#endif
 	#if defined(DAC3)
-	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_RELEASE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC3)	{ __HAL_RCC_DAC3_RELEASE_RESET(); return; }
 	#endif
 	#if defined(DAC4)
-	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_RELEASE_RESET(); isErr = false; }
+	if (me->hdac.Instance == DAC4)	{ __HAL_RCC_DAC4_RELEASE_RESET(); return; }
 	#endif
 
-	if(isErr)						{ ALX_DAC_ASSERT(false); }	// We should not get here
+	ALX_DAC_ASSERT(false);	// We should not get here
 }
 
 

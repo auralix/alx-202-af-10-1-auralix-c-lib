@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxIoPin.h
-  * @brief		Auralix C Library - ALX IO Pin Module
+  * @file		alxAdc.h
+  * @brief		Auralix C Library - ALX ADC Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_IO_PIN_H
-#define ALX_IO_PIN_H
+#ifndef ALX_ADC_H
+#define ALX_ADC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,26 +42,22 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxDelay.h"
+#include "alxIoPin.h"
 
-// AlxMcu //
-#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-#include "alxIoPin_McuStm32.h"
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+#include "alxAdc_McuStm32.h"
 
-#elif defined(ALX_LPC1769)
-#include "alxIoPin_McuLpc17.h"
-
-#elif defined(ALX_LPC845)
-#include "alxIoPin_McuLpc84.h"
-
-#elif defined(ALX_LPC80X)
-#include "alxIoPin_McuLpc80x.h"
+#elif defined(ALX_LPC17XX)
+#include "alxAdc_McuLpc17xx.h"
 
 #elif defined(ALX_LPC55S6X)
-#include "alxIoPin_McuLpc55S6x.h"
+#include "alxAdc_McuLpc55S6x.h"
+
+#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
+#include "alxAdc_McuLpc80x.h"
 
 #else
-typedef struct { bool dummy; } AlxIoPin;
+typedef struct { bool dummy; } AlxAdc;
 #endif
 
 
@@ -74,50 +70,35 @@ typedef struct { bool dummy; } AlxIoPin;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_IO_PIN_FILE "alxIoPin.h"
+#define ALX_ADC_FILE "alxAdc.h"
 
 // Assert //
-#if defined(_ALX_IO_PIN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_IO_PIN_FILE, expr)
-#elif defined(_ALX_IO_PIN_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_IO_PIN_FILE, expr)
-#elif defined(_ALX_IO_PIN_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_RST(ALX_IO_PIN_FILE, expr)
+#if defined(_ALX_ADC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADC_FILE, expr)
+#elif defined(_ALX_ADC_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADC_FILE, expr)
+#elif defined(_ALX_ADC_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_RST(ALX_ADC_FILE, expr)
 #else
-	#define ALX_IO_PIN_ASSERT(expr) do{} while (false)
+	#define ALX_ADC_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_IO_PIN_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_IO_PIN_TRACE(...) ALX_TRACE_STD(ALX_IO_PIN_FILE, __VA_ARGS__)
+#if defined(_ALX_ADC_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_ADC_TRACE(...) ALX_TRACE_STD(ALX_ADC_FILE, __VA_ARGS__)
 #else
-	#define ALX_IO_PIN_TRACE(...) do{} while (false)
+	#define ALX_ADC_TRACE(...) do{} while (false)
 #endif
-
-
-//******************************************************************************
-// Types
-//******************************************************************************
-typedef enum
-{
-	AlxIoPin_TriState_HiZ = 0,
-	AlxIoPin_TriState_Hi = 1,
-	AlxIoPin_TriState_Lo = 2,
-	AlxIoPin_TriState_Undefined = 3
-} AlxIoPin_TriState;
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxIoPin_Init(AlxIoPin* me);
-void AlxIoPin_DeInit(AlxIoPin* me);
-bool AlxIoPin_Read(AlxIoPin* me);
-void AlxIoPin_Write(AlxIoPin* me, bool val);
-void AlxIoPin_Set(AlxIoPin* me);
-void AlxIoPin_Reset(AlxIoPin* me);
-void AlxIoPin_Toggle(AlxIoPin* me);
-AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me);
+Alx_Status AlxAdc_Init(AlxAdc* me);
+Alx_Status AlxAdc_DeInit(AlxAdc* me);
+float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);
+uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);
+float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -126,4 +107,4 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me);
 }
 #endif
 
-#endif	// #ifndef ALX_IO_PIN_H
+#endif	// #ifndef ALX_ADC_H

@@ -41,6 +41,11 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static void AlxIoPinIrq_Periph_EnableIrq(AlxIoPinIrq* me);
 static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me);
 
@@ -157,6 +162,11 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 static void AlxIoPinIrq_Periph_EnableIrq(AlxIoPinIrq* me)
 {
 	for (uint8_t i = 0; i < me->numOfIoPins; i++)
@@ -308,82 +318,82 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	else if	(GPIO_Pin == GPIO_PIN_15) AlxIoPinIrq_IrqCallback_Pin15();
 	else	ALX_IO_PIN_IRQ_ASSERT(false);	// We should not get here
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin0()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin0(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin1()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin1(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin2()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin2(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin3()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin3(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin4()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin4(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin5()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin5(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin6()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin6(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin7()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin7(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin8()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin8(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin9()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin9(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin10()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin10(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin11()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin11(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin12()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin12(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin13()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin13(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin14()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin14(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
-ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin15()
+ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin15(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
 	ALX_IO_PIN_IRQ_ASSERT(false);

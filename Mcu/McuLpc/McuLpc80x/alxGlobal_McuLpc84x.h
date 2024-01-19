@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxWdt.h
-  * @brief		Auralix C Library - ALX Watchdog Timer Module
+  * @file		alxGlobalMcuLpc84x.h
+  * @brief		Auralix C Library - ALX Global MCU LPC84X File
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_WDT_H
-#define ALX_WDT_H
+#ifndef ALX_GLOBAL_MCU_LPC84X_H
+#define ALX_GLOBAL_MCU_LPC84X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,59 +40,54 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
-
-// AlxMcu //
-#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
-#include "alxWdt_McuStm32.h"
-
-#else
-typedef struct { bool dummy; } AlxWdt;
-#endif
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 
 //******************************************************************************
-// Preprocessor
+// Includes
 //******************************************************************************
-#define ALX_WDT_FILE "alxWdt.h"
+#include "fsl_acomp.h"
+#include "fsl_adc.h"
+#include "fsl_capt.h"
+#include "fsl_clock.h"
+#include "fsl_common.h"
+#include "fsl_common_arm.h"
+#include "fsl_crc.h"
+#include "fsl_ctimer.h"
+#include "fsl_dac.h"
+#include "fsl_device_registers.h"
+#include "fsl_dma.h"
+#include "fsl_gpio.h"
+#include "fsl_i2c.h"
+#include "fsl_i2c_dma.h"
+#include "fsl_iap.h"
+#include "fsl_inputmux.h"
+#include "fsl_inputmux_connections.h"
+#include "fsl_iocon.h"
+#include "fsl_mrt.h"
+#include "fsl_pint.h"
+#include "fsl_power.h"
+#include "fsl_reset.h"
+#include "fsl_sctimer.h"
+#include "fsl_spi.h"
+#include "fsl_swm.h"
+#include "fsl_swm_connections.h"
+#include "fsl_syscon.h"
+#include "fsl_syscon_connections.h"
+#include "fsl_usart.h"
+#include "fsl_wkt.h"
+#include "fsl_wwdt.h"
 
-// Assert //
-#if defined(_ALX_WDT_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_WDT_FILE, expr)
-#elif defined(_ALX_WDT_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_WDT_FILE, expr)
-#elif defined(_ALX_WDT_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_RST(ALX_WDT_FILE, expr)
-#else
-	#define ALX_WDT_ASSERT(expr) do{} while (false)
-#endif
 
-// Trace //
-#if defined(_ALX_WDT_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_WDT_TRACE(...) ALX_TRACE_STD(ALX_WDT_FILE, __VA_ARGS__)
-#else
-	#define ALX_WDT_TRACE(...) do{} while (false)
-#endif
-
-
-//******************************************************************************
-// Functions
-//******************************************************************************
-Alx_Status AlxWdt_Init(AlxWdt* me);
-Alx_Status AlxWdt_Refresh(AlxWdt* me);
-
-
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC84X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_WDT_H
+#endif	// #ifndef ALX_GLOBAL_MCU_LPC84X_H

@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && (defined(ALX_LPC80X) || defined(ALX_LPC84X))
 
 
 //******************************************************************************
@@ -147,7 +147,7 @@ typedef enum
 #if defined(ALX_LPC84X)
 typedef enum
 {
-	// Movable
+	// SWM Movable
 	AlxIoPin_Func_Swm_USART0_TXD = 0U,
 	AlxIoPin_Func_Swm_USART0_RXD = 1U,
 	AlxIoPin_Func_Swm_USART0_RTS = 2U,
@@ -215,7 +215,7 @@ typedef enum
 	AlxIoPin_Func_Swm_T0_CAP_CHN1 = 58U,
 	AlxIoPin_Func_Swm_T0_CAP_CHN2 = 59U,
 
-	// Fixed
+	// SWM Fixed
 	AlxIoPin_Func_Swm_ACMP_INPUT1 = 60U,
 	AlxIoPin_Func_Swm_ACMP_INPUT2 = 61U,
 	AlxIoPin_Func_Swm_ACMP_INPUT3 = 62U,
@@ -303,7 +303,7 @@ void AlxIoPin_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_LPC80X) || defined(ALX_LPC84X))
 
 #ifdef __cplusplus
 }

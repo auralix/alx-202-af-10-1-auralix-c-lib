@@ -92,6 +92,7 @@ void AlxId_Ctor
 		me->fwBoot.build.num = ALX_BUILD_NUM;
 		strcpy(me->fwBoot.build.hash, ALX_BUILD_HASH);
 		strcpy(me->fwBoot.build.hashShort, ALX_BUILD_HASH_SHORT);
+		ALX_ID_ASSERT(sscanf(ALX_BUILD_HASH_SHORT, "%lx", &me->fwBoot.build.hashShortUint32) == 1);
 		me->fwBoot.build.rev = ALX_BUILD_REV;
 
 		// Parameters
@@ -128,6 +129,7 @@ void AlxId_Ctor
 		me->fwApp.build.num = ALX_BUILD_NUM;
 		strcpy(me->fwApp.build.hash, ALX_BUILD_HASH);
 		strcpy(me->fwApp.build.hashShort, ALX_BUILD_HASH_SHORT);
+		ALX_ID_ASSERT(sscanf(ALX_BUILD_HASH_SHORT, "%lx", &me->fwApp.build.hashShortUint32) == 1);
 		me->fwApp.build.rev = ALX_BUILD_REV;
 
 		// Parameters
@@ -698,6 +700,21 @@ uint32_t AlxId_GetFwAppVerDate(AlxId* me)
   * @param[in,out]	me
   * @return
   */
+uint32_t AlxId_GetFwAppHashShort(AlxId* me)
+{
+	// Assert
+	ALX_ID_ASSERT(me->wasCtorCalled == true);
+	ALX_ID_ASSERT(me->isInit == true);
+
+	// Return
+	return me->fwApp.build.hashShortUint32;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
 uint64_t AlxId_GetFwAppVer(AlxId* me)
 {
 	// Assert
@@ -991,6 +1008,25 @@ uint8_t AlxId_GetHwId(AlxId* me)
 
 	// Return
 	return me->hw.instance.id;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]	uniqueIdUint32
+  * @param[in]	len
+  */
+void AlxId_GetHwMcuUniqueIdUint32(AlxId* me, uint32_t* uniqueIdUint32, uint8_t len)
+{
+	// Assert
+	ALX_ID_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	#ifdef ALX_STM32
+	memcpy(uniqueIdUint32, me->hwStm32.mcuUniqueId.uint32, len);
+	#else
+	ALX_ID_ASSERT(false);
+	#endif
 }
 
 /**

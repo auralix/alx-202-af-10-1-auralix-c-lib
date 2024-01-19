@@ -35,16 +35,18 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#if defined(ALX_C_LIB) && (defined(ALX_LPC80X) || defined(ALX_LPC84X))
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
 static swm_port_pin_type_t AlxIoPin_GetSwmPortPinIndex(AlxIoPin* me);
+static uint8_t AlxIoPin_GetIoconPortPinIndex(AlxIoPin* me);
 static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me);
 static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me);
 static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me);
+static void AlxIoPin_SetIoconMode(AlxIoPin* me);
 
 
 //******************************************************************************
@@ -74,16 +76,6 @@ void AlxIoPin_Ctor
 	bool val
 )
 {
-	// Assert
-	(void)me;
-	(void)port;
-	(void)pin;
-	(void)func;
-	(void)mode;
-	(void)isOpenDrain;
-	(void)dir;
-	(void)val;
-
 	// Parameters
 	me->port = port;
 	me->pin = pin;
@@ -116,62 +108,79 @@ void AlxIoPin_Init(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == false);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Set isInit attribute
+	// Set isInit
 	me->isInit = true;
 
-	// #2 Set initial output value, before config
+	// Set initial output value, before config
 	AlxIoPin_Write(me, me->val);
 
-	// #3.1 Get IoconPortPinIndex
-	uint8_t ioconPortPinIndex = AlxPROTECTED_IoPin_GetIoconPortPinIndex(me->pin, me->port);
+	// Get IoconPortPinIndex
+	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(me);
 
-	// #3.2 Enable IOCON Clk
+	// Enable IOCON clock
 	CLOCK_EnableClock(kCLOCK_Iocon);
 
-	// #3.3 Set IOCON Mode
-	AlxPROTECTED_IoPin_SetIoconMode(me->pin, me->port, me->mode);
+	// Set IOCON mode
+	AlxIoPin_SetIoconMode(me);
 
-	// #3.4 Set Open Drain
-	if (me->isOpenDrain)	{ IOCON->PIO[ioconPortPinIndex] |= (0x1 << 10U); }
-	else					{ IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); }
+	// Set open-drain
+	if (me->isOpenDrain)
+	{
+		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 10U);
+	}
+	else
+	{
+		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U);
+	}
 
-	// #3.5 Disable IOCON Clk
+	// Disable IOCON clock
 	CLOCK_DisableClock(kCLOCK_Iocon);
 
-	// #4.1 Init if SWM
+	// Init SWM if used
 	if (AlxIoPin_CheckIfSwmUsed(me))
 	{
+		// Enable SWM clock
 		CLOCK_EnableClock(kCLOCK_Swm);
+
+		// Init SWM
 		if (me->swmFunc_isMovable)
 		{
-			// #4.1.1 Init if Movable
+			// If Movable
 			swm_select_movable_t swmMoveFunc = AlxIoPin_GetSwmMoveFunc(me);
 			swm_port_pin_type_t swmPortPinIndex = AlxIoPin_GetSwmPortPinIndex(me);
 			SWM_SetMovablePinSelect(SWM0, swmMoveFunc, swmPortPinIndex);
 		}
 		else
 		{
-			// #4.1.2 Init if Fixed
+			// If Fixed
 			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmFixFunc(me);
 			SWM_SetFixedPinSelect(SWM0, swmFixFunc, true);
 		}
+
+		// Disable SWM clock
 		CLOCK_DisableClock(kCLOCK_Swm);
 	}
 
-	// #4.2 Init if GPIO
+	// Init GPIO if used
 	if (me->func == AlxIoPin_Func_GPIO)
 	{
-		gpio_pin_config_t gpioConfig;
+		// Prepare
+		gpio_pin_config_t gpioConfig = {};
+		if (me->dir)
+		{
+			gpioConfig.pinDirection = kGPIO_DigitalOutput;
+		}
+		else
+		{
+			gpioConfig.pinDirection = kGPIO_DigitalInput;
+		}
+		gpioConfig.outputLogic = 0U;	// MF: Clears output bit
 
-		if (me->dir)	gpioConfig.pinDirection = kGPIO_DigitalOutput;
-		else			gpioConfig.pinDirection = kGPIO_DigitalInput;
-
-		gpioConfig.outputLogic = 0U; // MF: Clears output bit
-
+		// Init
 		GPIO_PinInit(GPIO, me->port, me->pin, &gpioConfig);
 	}
 
-	// #5 Set initial output value, after config
+	// Set initial output value, after config
 	AlxIoPin_Write(me, me->val);
 }
 
@@ -185,39 +194,51 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	// #1 DeInit IOCON
-	uint8_t ioconPortPinIndex = AlxPROTECTED_IoPin_GetIoconPortPinIndex(me->pin, me->port);
+	// DeInit IOCON
+	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(me);
 
+	// Enable IOCON clock
 	CLOCK_EnableClock(kCLOCK_Iocon);
-	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U); // MF: Reset Mode (00) Inactive (no pull-down/pull-up)
+
+	// Reset
+	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U);		// MF: Reset Mode (00) Inactive (no pull-down/pull-up)
 	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 4U);
-	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U); // MF: Reset Open Drain (0)
+	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 10U);		// MF: Reset Open Drain (0)
+
+	// Disable IOCON clock
 	CLOCK_DisableClock(kCLOCK_Iocon);
 
-	// #2.1 DeInit if SWM used
+	// DeInit SWM if used
 	if (AlxIoPin_CheckIfSwmUsed(me))
 	{
+		// Enable SWM clock
 		CLOCK_EnableClock(kCLOCK_Swm);
+
+		// DeInit SWM
 		if (me->swmFunc_isMovable)
 		{
+			// If Movable
 			swm_select_movable_t swmMoveFunc = AlxIoPin_GetSwmMoveFunc(me);
 			SWM_SetMovablePinSelect(SWM0, swmMoveFunc, kSWM_PortPin_Reset);
 		}
 		else
 		{
+			// If Fixed
 			swm_select_fixed_pin_t swmFixFunc = AlxIoPin_GetSwmFixFunc(me);
 			SWM_SetFixedPinSelect(SWM0, swmFixFunc, false);
 		}
+
+		// Disable SWM clock
 		CLOCK_DisableClock(kCLOCK_Swm);
 	}
 
-	// #2.2 DeInit if GPIO
+	// DeInit GPIO if used
 	if (me->func == AlxIoPin_Func_GPIO)
 	{
-		GPIO->DIR[me->port] &= ~(1U << me->pin); // Reset Dir (0)
+		GPIO->DIR[me->port] &= ~(1U << me->pin);		// MF: Reset Dir (0)
 	}
 
-	// #3 Clear isInit attribute
+	// Clear isInit
 	me->isInit = false;
 }
 
@@ -233,9 +254,15 @@ bool AlxIoPin_Read(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Read Pin
-	if (GPIO_PinRead(GPIO, me->port, me->pin) == 1) { return true; }
-	else { return false; }
+	// Read
+	if (GPIO_PinRead(GPIO, me->port, me->pin) == 1)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /**
@@ -246,13 +273,18 @@ bool AlxIoPin_Read(AlxIoPin* me)
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
 	// Assert
-	(void)val;
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Write Pin
-	if (val) { GPIO_PinWrite(GPIO, me->port, me->pin, 1U); }
-	else { GPIO_PinWrite(GPIO, me->port, me->pin, 0U); }
+	// Write
+	if (val)
+	{
+		GPIO_PinWrite(GPIO, me->port, me->pin, 1U);
+	}
+	else
+	{
+		GPIO_PinWrite(GPIO, me->port, me->pin, 0U);
+	}
 }
 
 /**
@@ -265,7 +297,7 @@ void AlxIoPin_Set(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Set Pin
+	// Set
 	GPIO_PortSet(GPIO, me->port, (1U << me->pin));
 }
 
@@ -279,7 +311,7 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Reset Pin
+	// Reset
 	GPIO_PortClear(GPIO, me->port, (1U << me->pin));
 }
 
@@ -293,7 +325,7 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Toggle Pin
+	// Toggle
 	GPIO_PortToggle(GPIO, me->port, (1U << me->pin));
 }
 
@@ -307,8 +339,68 @@ void AlxIoPin_Toggle(AlxIoPin* me)
   */
 AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 {
-	// TODO
-	ALX_IO_PIN_ASSERT(false);
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	ALX_IO_PIN_ASSERT(me->isInit == true);
+
+
+	//------------------------------------------------------------------------------
+	// Get IoconPortPinIndex
+	//------------------------------------------------------------------------------
+	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(me);
+
+
+	//------------------------------------------------------------------------------
+	// Read @ PullUp
+	//------------------------------------------------------------------------------
+
+	// Config PullUp
+	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U);
+	IOCON->PIO[ioconPortPinIndex] |= (0x1 << 4U);
+
+	// Wait
+	AlxDelay_ms(1);
+
+	// Read
+	bool valPullUp = AlxIoPin_Read(me);
+
+
+	//------------------------------------------------------------------------------
+	// Read @ PullDown
+	//------------------------------------------------------------------------------
+
+	// Config PullDown
+	IOCON->PIO[ioconPortPinIndex] |= (0x1 << 3U);
+	IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 4U);
+
+	// Wait
+	AlxDelay_ms(1);
+
+	// Read
+	bool valPullDown = AlxIoPin_Read(me);
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	if ((valPullUp == true) && (valPullDown == false))
+	{
+		return AlxIoPin_TriState_HiZ;
+	}
+	else if ((valPullUp == true) && (valPullDown == true))
+	{
+		return AlxIoPin_TriState_Hi;
+	}
+	else if ((valPullUp == false) && (valPullDown == false))
+	{
+		return AlxIoPin_TriState_Lo;
+	}
+	else
+	{
+		return AlxIoPin_TriState_Undefined;
+	}
 }
 
 
@@ -317,8 +409,109 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 //******************************************************************************
 static swm_port_pin_type_t AlxIoPin_GetSwmPortPinIndex(AlxIoPin* me)
 {
-	if (me->port == 0)		return me->pin;
-	else					return (me->pin + 32U);
+	if (me->port == 0)
+	{
+		return me->pin;
+	}
+	else
+	{
+		return (me->pin + 32U);
+	}
+}
+static uint8_t AlxIoPin_GetIoconPortPinIndex(AlxIoPin* me)
+{
+	#if defined(ALX_LPC80X)
+	if (me->pin == 17)		return 0;
+	if (me->pin == 13)		return 1;
+	if (me->pin == 12)		return 2;
+	if (me->pin == 5)		return 3;
+	if (me->pin == 4)		return 4;
+	if (me->pin == 3)		return 5;
+	if (me->pin == 2)		return 6;
+	if (me->pin == 11)		return 7;
+	if (me->pin == 10)		return 8;
+	if (me->pin == 16)		return 9;
+	if (me->pin == 15)		return 10;
+	if (me->pin == 1)		return 11;
+	if (me->pin == 21)		return 12;
+	if (me->pin == 9)		return 13;
+	if (me->pin == 8)		return 14;
+	if (me->pin == 7)		return 15;
+	if (me->pin == 29)		return 16;
+	if (me->pin == 0)		return 17;
+	if (me->pin == 14)		return 18;
+	if (me->pin == 28)		return 19;
+	if (me->pin == 27)		return 20;
+	if (me->pin == 26)		return 21;
+	if (me->pin == 20)		return 22;
+	if (me->pin == 30)		return 23;
+	if (me->pin == 19)		return 24;
+	if (me->pin == 25)		return 25;
+	if (me->pin == 24)		return 26;
+	if (me->pin == 23)		return 27;
+	if (me->pin == 22)		return 28;
+	if (me->pin == 18)		return 29;
+	#endif
+
+	#if defined(ALX_LPC84X)
+	if ((me->port == 0) && (me->pin == 17))		return 0;
+	if ((me->port == 0) && (me->pin == 13))		return 1;
+	if ((me->port == 0) && (me->pin == 12))		return 2;
+	if ((me->port == 0) && (me->pin == 5))		return 3;
+	if ((me->port == 0) && (me->pin == 4))		return 4;
+	if ((me->port == 0) && (me->pin == 3))		return 5;
+	if ((me->port == 0) && (me->pin == 2))		return 6;
+	if ((me->port == 0) && (me->pin == 11))		return 7;
+	if ((me->port == 0) && (me->pin == 10))		return 8;
+	if ((me->port == 0) && (me->pin == 16))		return 9;
+	if ((me->port == 0) && (me->pin == 15))		return 10;
+	if ((me->port == 0) && (me->pin == 1))		return 11;
+	if ((me->port == 0) && (me->pin == 9))		return 13;
+	if ((me->port == 0) && (me->pin == 8))		return 14;
+	if ((me->port == 0) && (me->pin == 7))		return 15;
+	if ((me->port == 0) && (me->pin == 6))		return 16;
+	if ((me->port == 0) && (me->pin == 0))		return 17;
+	if ((me->port == 0) && (me->pin == 14))		return 18;
+	if ((me->port == 0) && (me->pin == 28))		return 20;
+	if ((me->port == 0) && (me->pin == 27))		return 21;
+	if ((me->port == 0) && (me->pin == 26))		return 22;
+	if ((me->port == 0) && (me->pin == 25))		return 23;
+	if ((me->port == 0) && (me->pin == 24))		return 24;
+	if ((me->port == 0) && (me->pin == 23))		return 25;
+	if ((me->port == 0) && (me->pin == 22))		return 26;
+	if ((me->port == 0) && (me->pin == 21))		return 27;
+	if ((me->port == 0) && (me->pin == 20))		return 28;
+	if ((me->port == 0) && (me->pin == 19))		return 29;
+	if ((me->port == 0) && (me->pin == 18))		return 30;
+	if ((me->port == 1) && (me->pin == 8))		return 31;
+	if ((me->port == 1) && (me->pin == 9))		return 32;
+	if ((me->port == 1) && (me->pin == 12))		return 33;
+	if ((me->port == 1) && (me->pin == 13))		return 34;
+	if ((me->port == 0) && (me->pin == 31))		return 35;
+	if ((me->port == 1) && (me->pin == 0))		return 36;
+	if ((me->port == 1) && (me->pin == 1))		return 37;
+	if ((me->port == 1) && (me->pin == 2))		return 38;
+	if ((me->port == 1) && (me->pin == 14))		return 39;
+	if ((me->port == 1) && (me->pin == 15))		return 40;
+	if ((me->port == 1) && (me->pin == 3))		return 41;
+	if ((me->port == 1) && (me->pin == 4))		return 42;
+	if ((me->port == 1) && (me->pin == 5))		return 43;
+	if ((me->port == 1) && (me->pin == 16))		return 44;
+	if ((me->port == 1) && (me->pin == 17))		return 45;
+	if ((me->port == 1) && (me->pin == 6))		return 46;
+	if ((me->port == 1) && (me->pin == 18))		return 47;
+	if ((me->port == 1) && (me->pin == 19))		return 48;
+	if ((me->port == 1) && (me->pin == 7))		return 49;
+	if ((me->port == 0) && (me->pin == 29))		return 50;
+	if ((me->port == 0) && (me->pin == 30))		return 51;
+	if ((me->port == 1) && (me->pin == 20))		return 52;
+	if ((me->port == 1) && (me->pin == 21))		return 53;
+	if ((me->port == 1) && (me->pin == 11))		return 54;
+	if ((me->port == 1) && (me->pin == 10))		return 55;
+	#endif
+
+	// MF: Assert cannot be used
+	return 255;
 }
 static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me)
 {
@@ -338,17 +531,17 @@ static bool AlxIoPin_CheckIfSwmUsed(AlxIoPin* me)
 	#if defined(ALX_LPC84X)
 	if (me->func <= 59)
 	{
-		me->func_isMovable = true;
+		me->swmFunc_isMovable = true;
 		return true;
 	}
 	if ((me->func > 59) && (me->func <= 98))
 	{
-		me->func_isMovable = false;
+		me->swmFunc_isMovable = false;
 		return true;
 	}
 	#endif
 
-	else { return false; }
+	return false;
 }
 static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me)
 {
@@ -479,7 +672,7 @@ static swm_select_movable_t AlxIoPin_GetSwmMoveFunc(AlxIoPin* me)
 	if (me->func == AlxIoPin_Func_Swm_T0_CAP_CHN2)		return kSWM_T0_CAP_CHN2;
 	#endif
 
-	ALX_IO_PIN_ASSERT(false); // We shouldn't get here
+	ALX_IO_PIN_ASSERT(false);	// We shouldn't get here
 	return ALX_NULL;
 }
 static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me)
@@ -513,7 +706,7 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me)
 	if (me->func == AlxIoPin_Func_Swm_ADC_CHN11)		return kSWM_ADC_CHN11;
 
 	if (me->func == AlxIoPin_Func_Swm_ACMP_INPUT5)		return kSWM_ACMP_INPUT5;
-	if (me->func == AlxIoPin_Func_Swm_DAC_OUT0)		return kSWM_DAC_OUT0;
+	if (me->func == AlxIoPin_Func_Swm_DAC_OUT0)			return kSWM_DAC_OUT0;
 	#endif
 
 	#if defined(ALX_LPC84X)
@@ -561,9 +754,40 @@ static swm_select_fixed_pin_t AlxIoPin_GetSwmFixFunc(AlxIoPin* me)
 	if (me->func == AlxIoPin_Func_Swm_CAPT_YH)			return kSWM_CAPT_YH;
 	#endif
 
-	ALX_IO_PIN_ASSERT(false); // We shouldn't get here
+	ALX_IO_PIN_ASSERT(false);	// We shouldn't get here
 	return ALX_NULL;
+}
+static void AlxIoPin_SetIoconMode(AlxIoPin* me)
+{
+	uint8_t ioconPortPinIndex = AlxIoPin_GetIoconPortPinIndex(me);
+
+	if (me->mode == IOCON_MODE_INACT)
+	{
+		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U);
+		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 4U);
+		return;
+	}
+	if (me->mode == IOCON_MODE_PULLDOWN)
+	{
+		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 3U);
+		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 4U);
+		return;
+	}
+	if (me->mode == IOCON_MODE_PULLUP)
+	{
+		IOCON->PIO[ioconPortPinIndex] &= ~(0x1 << 3U);
+		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 4U);
+		return;
+	}
+	if (me->mode == IOCON_MODE_REPEATER)
+	{
+		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 3U);
+		IOCON->PIO[ioconPortPinIndex] |= (0x1 << 4U);
+		return;
+	}
+
+	ALX_IO_PIN_ASSERT(false);	// We shouldn't get here
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC80X)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_LPC80X) || defined(ALX_LPC84X))

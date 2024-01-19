@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		AlxDac.h
-  * @brief		Auralix C Library - ALX DAC Module
+  * @file		alxIoPin.h
+  * @brief		Auralix C Library - ALX IO Pin Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_DAC_H
-#define ALX_DAC_H
+#ifndef ALX_IO_PIN_H
+#define ALX_IO_PIN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,14 +42,22 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxIoPin.h"
+#include "alxDelay.h"
 
-// AlxMcu //
-#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-#include "alxDac_McuStm32.h"
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+#include "alxIoPin_McuStm32.h"
+
+#elif defined(ALX_LPC17XX)
+#include "alxIoPin_McuLpc17xx.h"
+
+#elif defined(ALX_LPC55S6X)
+#include "alxIoPin_McuLpc55S6x.h"
+
+#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
+#include "alxIoPin_McuLpc80x.h"
 
 #else
-typedef struct { bool dummy; } AlxDac;
+typedef struct { bool dummy; } AlxIoPin;
 #endif
 
 
@@ -62,35 +70,50 @@ typedef struct { bool dummy; } AlxDac;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_DAC_FILE "alxDac.h"
+#define ALX_IO_PIN_FILE "alxIoPin.h"
 
 // Assert //
-#if defined(_ALX_DAC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_DAC_FILE, expr)
-#elif defined(_ALX_DAC_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_DAC_FILE, expr)
-#elif defined(_ALX_DAC_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_RST(ALX_DAC_FILE, expr)
+#if defined(_ALX_IO_PIN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_IO_PIN_FILE, expr)
+#elif defined(_ALX_IO_PIN_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_IO_PIN_FILE, expr)
+#elif defined(_ALX_IO_PIN_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_RST(ALX_IO_PIN_FILE, expr)
 #else
-	#define ALX_DAC_ASSERT(expr) do{} while (false)
+	#define ALX_IO_PIN_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_DAC_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_DAC_TRACE(...) ALX_TRACE_STD(ALX_DAC_FILE, __VA_ARGS__)
+#if defined(_ALX_IO_PIN_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_IO_PIN_TRACE(...) ALX_TRACE_STD(ALX_IO_PIN_FILE, __VA_ARGS__)
 #else
-	#define ALX_DAC_TRACE(...) do{} while (false)
+	#define ALX_IO_PIN_TRACE(...) do{} while (false)
 #endif
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef enum
+{
+	AlxIoPin_TriState_HiZ = 0,
+	AlxIoPin_TriState_Hi = 1,
+	AlxIoPin_TriState_Lo = 2,
+	AlxIoPin_TriState_Undefined = 3
+} AlxIoPin_TriState;
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxDac_Init(AlxDac* me);
-Alx_Status AlxDac_Init_CalibrateVref(AlxDac* me, float vref_V);
-Alx_Status AlxDac_DeInit(AlxDac* me);
-Alx_Status AlxDac_SetVoltage_V(AlxDac* me, Alx_Ch ch, float voltage_V);
-Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltage_V, float vref_V);
+void AlxIoPin_Init(AlxIoPin* me);
+void AlxIoPin_DeInit(AlxIoPin* me);
+bool AlxIoPin_Read(AlxIoPin* me);
+void AlxIoPin_Write(AlxIoPin* me, bool val);
+void AlxIoPin_Set(AlxIoPin* me);
+void AlxIoPin_Reset(AlxIoPin* me);
+void AlxIoPin_Toggle(AlxIoPin* me);
+AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -99,4 +122,4 @@ Alx_Status AlxDac_SetVoltage_V_CalibrateVref(AlxDac* me, Alx_Ch ch, float voltag
 }
 #endif
 
-#endif	// #ifndef ALX_DAC_H
+#endif	// #ifndef ALX_IO_PIN_H

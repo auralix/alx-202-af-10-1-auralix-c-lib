@@ -45,6 +45,7 @@ extern "C" {
 #include "alxBound.h"
 #include "alxRange.h"
 #include "alxFtoa.h"
+#include "alxParamKvStore.h"
 
 
 //******************************************************************************
@@ -72,8 +73,10 @@ extern "C" {
 // Trace //
 #if defined(_ALX_PARAM_ITEM_TRACE) || defined(_ALX_TRACE_ALL)
 	#define ALX_PARAM_ITEM_TRACE(...) ALX_TRACE_STD(ALX_PARAM_ITEM_FILE, __VA_ARGS__)
+	#define ALX_PARAM_ITEM_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_PARAM_ITEM_TRACE(...) do{} while (false)
+	#define ALX_PARAM_ITEM_TRACE_FORMAT(...) do{} while (false)
 #endif
 
 
@@ -94,8 +97,7 @@ typedef enum
 	AlxParamItem_Type_Double,
 	AlxParamItem_Type_Bool,
 	AlxParamItem_Type_Arr,
-	AlxParamItem_Type_Str,
-	AlxParamItem_Type_None
+	AlxParamItem_Type_Str
 } AlxParamItem_Type;
 
 typedef enum
@@ -130,6 +132,7 @@ typedef struct
 
 	// Parameters
 	AlxParamItem_Type type;
+	AlxParamKvStore* paramKvStore;
 	const char* key;
 	uint32_t id;
 	uint32_t groupId;
@@ -157,17 +160,21 @@ typedef struct
 void AlxParamItem_CtorUint8
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint8_t valDef,
 	uint8_t valMin,
 	uint8_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	uint8_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorUint16
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
@@ -181,72 +188,91 @@ void AlxParamItem_CtorUint16
 void AlxParamItem_CtorUint32
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint32_t valDef,
 	uint32_t valMin,
 	uint32_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	uint32_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorUint64
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	uint64_t valDef,
 	uint64_t valMin,
 	uint64_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	uint64_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorInt8
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int8_t valDef,
 	int8_t valMin,
 	int8_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	int8_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorInt16
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int16_t valDef,
 	int16_t valMin,
 	int16_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	int16_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorInt32
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int32_t valDef,
 	int32_t valMin,
 	int32_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	int32_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorInt64
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	int64_t valDef,
 	int64_t valMin,
 	int64_t valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	int64_t* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorFloat
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
@@ -260,17 +286,21 @@ void AlxParamItem_CtorFloat
 void AlxParamItem_CtorDouble
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
 	double valDef,
 	double valMin,
 	double valMax,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	double* enumArr,
+	uint8_t numOfEnums
 );
 void AlxParamItem_CtorBool
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
@@ -291,6 +321,7 @@ void AlxParamItem_CtorArr
 void AlxParamItem_CtorStr
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
 	const char* key,
 	uint32_t id,
 	uint32_t groupId,
@@ -304,13 +335,22 @@ void AlxParamItem_CtorStr
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 const char* AlxParamItem_GetKey(AlxParamItem* me);
 uint32_t AlxParamItem_GetId(AlxParamItem* me);
 uint32_t AlxParamItem_GetGroupId(AlxParamItem* me);
 AlxParamItem_Type AlxParamItem_GetType(AlxParamItem* me);
 void* AlxParamItem_GetValPtr(AlxParamItem* me);
 uint32_t AlxParamItem_GetValLen(AlxParamItem* me);
-void AlxParamItem_SetValToDef(AlxParamItem* me);
+
+
+//------------------------------------------------------------------------------
+// Get
+//------------------------------------------------------------------------------
 uint8_t AlxParamItem_GetValUint8(AlxParamItem* me);
 uint16_t AlxParamItem_GetValUint16(AlxParamItem* me);
 uint32_t AlxParamItem_GetValUint32(AlxParamItem* me);
@@ -322,6 +362,13 @@ int64_t AlxParamItem_GetValInt64(AlxParamItem* me);
 float AlxParamItem_GetValFloat(AlxParamItem* me);
 double AlxParamItem_GetValDouble(AlxParamItem* me);
 bool AlxParamItem_GetValBool(AlxParamItem* me);
+void AlxParamItem_GetValArr(AlxParamItem* me, void* val);
+Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
+
+
+//------------------------------------------------------------------------------
+// Set
+//------------------------------------------------------------------------------
 Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val);
 Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val);
 Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val);
@@ -333,16 +380,28 @@ Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val);
 Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val);
 Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val);
 Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val);
-Alx_Status AlxParamItem_GetValUint16_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
-Alx_Status AlxParamItem_GetValFloat_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
-Alx_Status AlxParamItem_GetValBool_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
-Alx_Status AlxParamItem_SetValUint16_StrFormat(AlxParamItem* me, char* val);
-Alx_Status AlxParamItem_SetValFloat_StrFormat(AlxParamItem* me, char* val);
-Alx_Status AlxParamItem_SetValBool_StrFormat(AlxParamItem* me, char* val);
-void AlxParamItem_GetValArr(AlxParamItem* me, void* val);
 void AlxParamItem_SetValArr(AlxParamItem* me, void* val);
-Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
 Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val);
+
+
+//------------------------------------------------------------------------------
+// Set Default
+//------------------------------------------------------------------------------
+void AlxParamItem_SetValToDef(AlxParamItem* me);
+
+
+//------------------------------------------------------------------------------
+// Get & Set String Format
+//------------------------------------------------------------------------------
+Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t maxLenWithNullTerm);
+Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val);
+
+
+//------------------------------------------------------------------------------
+// Load & Store
+//------------------------------------------------------------------------------
+Alx_Status AlxParamItem_LoadVal(AlxParamItem* me);
+Alx_Status AlxParamItem_StoreVal(AlxParamItem* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

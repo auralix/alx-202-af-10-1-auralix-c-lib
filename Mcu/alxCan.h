@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxOsDelayUntil.h
-  * @brief		Auralix C Library - ALX OS Delay Until Module
+  * @file		alxCan.h
+  * @brief		Auralix C Library - ALX CAN Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_OS_DELAY_UNTIL_H
-#define ALX_OS_DELAY_UNTIL_H
+#ifndef ALX_CAN_H
+#define ALX_CAN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,35 +42,43 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxIoPin.h"
+
+#if ((defined(ALX_STM32F4) || defined(ALX_STM32L4)) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED))
+#include "alxCan_McuStm32.h"
+
+#else
+typedef struct { bool dummy; } AlxCan;
+#endif
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_OS_DELAY_UNTIL_FILE "alxOsDelayUntil.h"
+#define ALX_CAN_FILE "alxCan.h"
 
 // Assert //
-#if defined(_ALX_OS_DELAY_UNTIL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_DELAY_UNTIL_FILE, expr)
-#elif defined(_ALX_OS_DELAY_UNTIL_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_DELAY_UNTIL_FILE, expr)
-#elif defined(_ALX_OS_DELAY_UNTIL_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_DELAY_UNTIL_FILE, expr)
+#if defined(_ALX_CAN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CAN_FILE, expr)
+#elif defined(_ALX_CAN_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_CAN_FILE, expr)
+#elif defined(_ALX_CAN_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_RST(ALX_CAN_FILE, expr)
 #else
-	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) do{} while (false)
+	#define ALX_CAN_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_OS_DELAY_UNTIL_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_OS_DELAY_UNTIL_TRACE(...) ALX_TRACE_STD(ALX_OS_DELAY_UNTIL_FILE, __VA_ARGS__)
+#if defined(_ALX_CAN_TRACE) || defined(_ALX_TRACE_ALL)
+	#define ALX_CAN_TRACE(...) ALX_TRACE_STD(ALX_CAN_FILE, __VA_ARGS__)
 #else
-	#define ALX_OS_DELAY_UNTIL_TRACE(...) do{} while (false)
+	#define ALX_CAN_TRACE(...) do{} while (false)
 #endif
 
 
@@ -79,45 +87,32 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Parameters
-	AlxClk_Tick osTick;
-
-	// Variables
-	#if defined(ALX_FREE_RTOS)
-	TickType_t xLastWakeTime;
-	#endif
-
-	// Info
-	bool isInit;
-	bool wasCtorCalled;
-} AlxOsDelayUntil;
-
-
-//******************************************************************************
-// Constructor
-//******************************************************************************
-void AlxOsDelayUntil_Ctor
-(
-	AlxOsDelayUntil* me,
-	AlxClk_Tick osTick
-);
+	uint32_t id;
+	bool isExtendedId;	// false = Standard
+	bool isDataFrame;	// false = Remote
+	uint8_t dataLen;
+	uint8_t data[8];
+} AlxCan_Msg;
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxOsDelayUntil_Init(AlxOsDelayUntil* me);
-void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osDelayUntilIncrement_us);
-void AlxOsDelayUntil_ms(AlxOsDelayUntil* me, uint64_t osTimeIncrement_ms);
-void AlxOsDelayUntil_sec(AlxOsDelayUntil* me, uint64_t osTimeIncrement_sec);
-void AlxOsDelayUntil_min(AlxOsDelayUntil* me, uint64_t osTimeIncrement_min);
-void AlxOsDelayUntil_hr(AlxOsDelayUntil* me, uint64_t osTimeIncrement_hr);
+Alx_Status AlxCan_Init(AlxCan* me);
+Alx_Status AlxCan_DeInit(AlxCan* me);
+Alx_Status AlxCan_ReInit(AlxCan* me);
+Alx_Status AlxCan_TxMsg(AlxCan* me, AlxCan_Msg msg);
+Alx_Status AlxCan_TxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg);
+Alx_Status AlxCan_RxMsg(AlxCan* me, AlxCan_Msg* msg);
+Alx_Status AlxCan_RxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg);
+bool AlxCan_IsErr(AlxCan* me);
+void AlxCan_IrqHandler(AlxCan* me);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_OS_DELAY_UNTIL_H
+#endif	// #ifndef ALX_CAN_H

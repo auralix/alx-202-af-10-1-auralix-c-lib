@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -93,8 +93,14 @@ void AlxWdt_Ctor
 		me->hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
 		me->hiwdg.Init.Reload = 0x0FFF;
 	}
-	#if defined(ALX_STM32F7)
+
+	#if defined(ALX_STM32F7) || defined(ALX_STM32L4)
 	me->hiwdg.Init.Window = IWDG_WINDOW_DISABLE;
+	#endif
+
+	#if defined(ALX_STM32U5)
+	me->hiwdg.Init.Window = IWDG_WINDOW_DISABLE;
+	me->hiwdg.Init.EWI = IWDG_EWI_DISABLE;
 	#endif
 
 	// Info
@@ -149,4 +155,4 @@ Alx_Status AlxWdt_Refresh(AlxWdt* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))

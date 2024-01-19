@@ -47,11 +47,8 @@
   */
 void AlxGlobal_DisableIrq(void)
 {
-	#if defined(ALX_MBED)
-	#else
-		#if defined(__GNUC__)
-		__disable_irq();
-		#endif
+	#if defined(__GNUC__)
+	__disable_irq();
 	#endif
 }
 
@@ -60,11 +57,8 @@ void AlxGlobal_DisableIrq(void)
   */
 void AlxGlobal_EnableIrq(void)
 {
-	#if defined(ALX_MBED)
-	#else
-		#if defined(__GNUC__)
-		__enable_irq();
-		#endif
+	#if defined(__GNUC__)
+	__enable_irq();
 	#endif
 }
 
@@ -73,7 +67,7 @@ void AlxGlobal_EnableIrq(void)
   * @param[in]	uint64
   * @param[out]	str
   */
-void AlxGlobal_Uint64ToStr(uint64_t uint64, char* str)
+void AlxGlobal_Ulltoa(uint64_t uint64, char* str)
 {
 	uint32_t num1 = uint64 / 1000000000000000UL;
 	uint64_t foo1 = uint64 - ((uint64_t)num1 * 1000000000000000UL);

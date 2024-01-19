@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxClk.h
-  * @brief		Auralix C Library - ALX Clock Module
+  * @file		alxTrace.h
+  * @brief		Auralix C Library - ALX Trace Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_CLK_H
-#define ALX_CLK_H
+#ifndef ALX_TRACE_H
+#define ALX_TRACE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,27 +40,25 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
+#include "alxTick.h"
 
-// AlxMcu //
-#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-#include "alxClk_McuStm32.h"
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+#include "alxTrace_McuStm32.h"
 
-#elif defined(ALX_LPC1769)
-#include "alxClk_McuLpc17.h"
-
-#elif defined(ALX_LPC845)
-#include "alxClk_McuLpc84.h"
-
-#elif defined(ALX_LPC80X)
-#include "alxClk_McuLpc80x.h"
+#elif defined(ALX_LPC17XX)
+#include "alxTrace_McuLpc17xx.h"
 
 #elif defined(ALX_LPC55S6X)
-#include "alxClk_McuLpc55S6x.h"
+#include "alxTrace_McuLpc55S6x.h"
+
+#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
+#include "alxTrace_McuLpc80x.h"
+
+#elif defined(ALX_PC)
+typedef struct { bool dummy; } AlxTrace;
 
 #else
-typedef struct { bool dummy; } AlxClk;
+typedef struct { bool dummy; } AlxTrace;
 #endif
 
 
@@ -73,34 +71,28 @@ typedef struct { bool dummy; } AlxClk;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_CLK_FILE "alxClk.h"
+#define ALX_TRACE_STR(str) do								{ AlxTrace_WriteStr(&alxTrace, str); } while(false)
+#define ALX_TRACE_FORMAT(...) do							{ AlxTrace_WriteFormat(&alxTrace, __VA_ARGS__); } while(false)
+#define ALX_TRACE_STD(file, ...) do							{ AlxTrace_WriteStd(&alxTrace, file, __LINE__, __func__, __VA_ARGS__); } while(false)
+#define ALX_TRACE_SM(smLevel, smName, stName, acName) do	{ AlxTrace_WriteSm(&alxTrace, smLevel, smName, stName, acName); } while(false)
 
-// Assert //
-#if defined(_ALX_CLK_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CLK_FILE, expr)
-#elif defined(_ALX_CLK_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_TRACE(ALX_CLK_FILE, expr)
-#elif defined(_ALX_CLK_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_RST(ALX_CLK_FILE, expr)
-#else
-	#define ALX_CLK_ASSERT(expr) do{} while (false)
-#endif
 
-// Trace //
-#if defined(_ALX_CLK_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_CLK_TRACE(...) ALX_TRACE_STD(ALX_CLK_FILE, __VA_ARGS__)
-#else
-	#define ALX_CLK_TRACE(...) do{} while (false)
-#endif
+//******************************************************************************
+// Variables
+//******************************************************************************
+extern AlxTrace alxTrace;
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxClk_Init(AlxClk* me);
-Alx_Status AlxClk_DeInit(AlxClk* me);
-uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk);
-void AlxClk_Irq_Handle(AlxClk* me);
+Alx_Status AlxTrace_Init(AlxTrace* me);
+Alx_Status AlxTrace_DeInit(AlxTrace* me);
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str);
+void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...);
+void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, const char* format, ...);
+void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName);
+void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -109,4 +101,4 @@ void AlxClk_Irq_Handle(AlxClk* me);
 }
 #endif
 
-#endif	// #ifndef ALX_CLK_H
+#endif	// #ifndef ALX_TRACE_H
