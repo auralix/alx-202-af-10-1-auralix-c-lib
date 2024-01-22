@@ -80,12 +80,13 @@ typedef struct
 
 	// Variables
 	uint32_t systemCoreClock;
-	uint32_t coreSysClk;
 	uint32_t mainClk;
+	uint32_t ahbClk;
 	uint32_t fro;
 
-	uint32_t coreSysClk_Ctor;
+	uint32_t systemCoreClock_Ctor;
 	uint32_t mainClk_Ctor;
+	uint32_t ahbClk_Ctor;
 	uint32_t fro_Ctor;
 
 	// Info

@@ -360,17 +360,15 @@ typedef enum
 	#endif
 
 	#if defined(ALX_LPC80X) || defined(ALX_LPC84X)
-	AlxClk_Clk_McuLpc8xx_CoreSysClk,
+	AlxClk_Clk_McuLpc8xx_SystemCoreClock,
 	AlxClk_Clk_McuLpc8xx_MainClk,
+	AlxClk_Clk_McuLpc8xx_AhbClk,
 	AlxClk_Clk_McuLpc8xx_Fro,
-	AlxClk_Clk_McuLpc8xx_FroDiv,
-	AlxClk_Clk_McuLpc8xx_ExtClk,
-	AlxClk_Clk_McuLpc8xx_Frg0,
 
-	AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor,
+	AlxClk_Clk_McuLpc8xx_SystemCoreClock_Ctor,
 	AlxClk_Clk_McuLpc8xx_MainClk_Ctor,
+	AlxClk_Clk_McuLpc8xx_AhbClk_Ctor,
 	AlxClk_Clk_McuLpc8xx_Fro_Ctor,
-	AlxClk_Clk_McuLpc8xx_LPO_Ctor,
 	#endif
 
 	#if defined(ALX_LPC55S6X)

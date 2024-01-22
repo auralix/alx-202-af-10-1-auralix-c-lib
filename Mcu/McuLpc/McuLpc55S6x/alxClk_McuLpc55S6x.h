@@ -73,6 +73,7 @@ typedef struct
 	AlxClk_Config config;
 	AlxClk_Tick tick;
 
+	// Variables
 	uint32_t systemCoreClock;
 	uint32_t ahbClk;
 	uint32_t mainClk;

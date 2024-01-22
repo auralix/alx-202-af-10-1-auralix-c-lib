@@ -94,6 +94,7 @@ void AlxClk_Ctor
 	me->config = config;
 	me->tick = tick;
 
+	// Variables
 	if		(me->config == AlxClk_Config_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default)				{ AlxClk_Ctor_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default(me); }
 	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_12MHz_FroOsc_96MHz)						{ AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_12MHz_FroOsc_96MHz(me); }
 	else if (me->config == AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_24MHz_FroOsc_96MHz)						{ AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_24MHz_FroOsc_96MHz(me); }
