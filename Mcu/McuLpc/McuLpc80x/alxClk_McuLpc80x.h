@@ -67,8 +67,8 @@ typedef enum
 	AlxClk_Config_McuLpc80x_FroOsc_18MHz_Mainclk_9MHz_CoreSysClk_4MHz5,
 	#endif
 	#if defined(ALX_LPC84X)
-	AlxClk_Config_McuLpc84x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default,
-	AlxClk_Config_McuLpc84x_FroOsc_30MHz_Mainclk_30MHz_CoreSysClk_30MHz,
+	AlxClk_Config_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Default,
+	AlxClk_Config_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz,
 	#endif
 } AlxClk_Config;	// MF: NOTE - defined(ALX_LPC81X) || defined(ALX_LPC82X) || defined(ALX_LPC83X) || defined(ALX_LPC84X) this MCUs will have the same enum
 
@@ -82,12 +82,12 @@ typedef struct
 	uint32_t systemCoreClock;
 	uint32_t mainClk;
 	uint32_t ahbClk;
-	uint32_t fro;
+	uint32_t froOsc;
 
 	uint32_t systemCoreClock_Ctor;
 	uint32_t mainClk_Ctor;
 	uint32_t ahbClk_Ctor;
-	uint32_t fro_Ctor;
+	uint32_t froOsc_Ctor;
 
 	// Info
 	bool isInit;
