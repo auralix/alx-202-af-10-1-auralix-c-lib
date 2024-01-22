@@ -51,9 +51,11 @@
 #if defined(ALX_LPC84X)
 static void AlxClk_Ctor_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Default(AlxClk* me);
 static void AlxClk_Ctor_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz(AlxClk* me);
+static void AlxClk_Ctor_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_ExtClk_12MHz(AlxClk* me);
 
 static void AlxClk_Init_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Default(AlxClk* me);
 static void AlxClk_Init_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz(AlxClk* me);
+static void AlxClk_Init_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_ExtClk_12MHz(AlxClk* me);
 #endif
 
 
@@ -97,6 +99,7 @@ ALX_WEAK void AlxClk_Ctor
 	#if defined(ALX_LPC84X)
 	if		(me->config == AlxClk_Config_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Default)		{ AlxClk_Ctor_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Default(me);	}
 	else if	(me->config == AlxClk_Config_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz)				{ AlxClk_Ctor_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz(me);			}
+	else if	(me->config == AlxClk_Config_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_ExtClk_12MHz)				{ AlxClk_Ctor_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_ExtClk_12MHz(me);			}
 	#endif
 	else																								{ ALX_CLK_ASSERT(false); return;												}	// We should not get here
 
@@ -104,6 +107,7 @@ ALX_WEAK void AlxClk_Ctor
 	me->mainClk = 0;
 	me->ahbClk = 0;
 	me->froOsc = 0;
+	me->extClk = 0;
 
 	// Info
 	me->isInit = false;
@@ -141,6 +145,7 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	#if defined(ALX_LPC84X)
 	if		(me->config == AlxClk_Config_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Default)		{ AlxClk_Init_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Default(me);	}
 	else if	(me->config == AlxClk_Config_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz)				{ AlxClk_Init_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz(me);			}
+	else if	(me->config == AlxClk_Config_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_ExtClk_12MHz)				{ AlxClk_Init_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_ExtClk_12MHz(me);			}
 	#endif
 	else																								{ ALX_CLK_ASSERT(false); return Alx_Err;										}	// We should not get here
 
@@ -190,13 +195,15 @@ ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 		if (clk == AlxClk_Clk_McuLpc8xx_SystemCoreClock)	return me->systemCoreClock;
 		if (clk == AlxClk_Clk_McuLpc8xx_MainClk)			return me->mainClk;
 		if (clk == AlxClk_Clk_McuLpc8xx_AhbClk)				return me->ahbClk;
-		if (clk == AlxClk_Clk_McuLpc8xx_Fro)				return me->froOsc;
+		if (clk == AlxClk_Clk_McuLpc8xx_FroOsc)				return me->froOsc;
+		if (clk == AlxClk_Clk_McuLpc8xx_ExtClk)				return me->extClk;
 	}
 
 	if (clk == AlxClk_Clk_McuLpc8xx_SystemCoreClock_Ctor)	return me->systemCoreClock_Ctor;
 	if (clk == AlxClk_Clk_McuLpc8xx_MainClk_Ctor)			return me->mainClk_Ctor;
 	if (clk == AlxClk_Clk_McuLpc8xx_AhbClk_Ctor)			return me->ahbClk_Ctor;
-	if (clk == AlxClk_Clk_McuLpc8xx_Fro_Ctor)				return me->froOsc_Ctor;
+	if (clk == AlxClk_Clk_McuLpc8xx_FroOsc_Ctor)			return me->froOsc_Ctor;
+	if (clk == AlxClk_Clk_McuLpc8xx_ExtClk_Ctor)			return me->extClk_Ctor;
 
 	// Assert
 	ALX_CLK_ASSERT(false);	// We should not get here
@@ -230,7 +237,8 @@ static void AlxClk_Ctor_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Defaul
 	me->systemCoreClock_Ctor	= 12000000U;
 	me->mainClk_Ctor			= 12000000U;
 	me->ahbClk_Ctor				= 12000000U;
-	me->froOsc_Ctor				= 24000000U;
+	me->froOsc_Ctor				= 12000000U;
+	me->extClk_Ctor				= 0U;
 }
 static void AlxClk_Ctor_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz(AlxClk* me)
 {
@@ -238,13 +246,21 @@ static void AlxClk_Ctor_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz(AlxClk
 	me->mainClk_Ctor			= 30000000U;
 	me->ahbClk_Ctor				= 30000000U;
 	me->froOsc_Ctor				= 30000000U;
+	me->extClk_Ctor				= 0U;
+}
+static void AlxClk_Ctor_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_ExtClk_12MHz(AlxClk* me)
+{
+	me->systemCoreClock_Ctor	= 30000000U;
+	me->mainClk_Ctor			= 30000000U;
+	me->ahbClk_Ctor				= 30000000U;
+	me->froOsc_Ctor				= 24000000U;
+	me->extClk_Ctor				= 12000000U;
 }
 
 static void AlxClk_Init_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Default(AlxClk* me)
 {
 	(void)me;
 	ALX_CLK_ASSERT(false);	// TV: TODO
-
 }
 static void AlxClk_Init_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz(AlxClk* me)
 {
@@ -252,10 +268,16 @@ static void AlxClk_Init_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz(AlxClk
 
 	POWER_DisablePD(kPDRUNCFG_PD_FRO_OUT);		// MF: Ensures FRO is on
 	POWER_DisablePD(kPDRUNCFG_PD_FRO);			// MF: Ensures FRO is on
-	CLOCK_SetFroOscFreq(kCLOCK_FroOscOut30M);	// MF: Set up FRO freq
+	CLOCK_SetFroOscFreq(kCLOCK_FroOscOut30M);	// MF: Set up FRO frequency
 	CLOCK_SetFroOutClkSrc(kCLOCK_FroSrcFroOsc);	// MF: Set FRO clock source direct from FRO oscillator // Doesn't work on Lpc804
-	CLOCK_SetMainClkSrc(kCLOCK_MainClkSrcFro);	// MF: Select FRO for Main Clk
-	CLOCK_SetCoreSysClkDiv(1);					// MF: Divide main clk to provide the system clk to the core, memories, and the peripheral
+
+	CLOCK_SetMainClkSrc(kCLOCK_MainClkSrcFro);	// MF: Select FRO for Main clock
+	CLOCK_SetCoreSysClkDiv(1);					// MF: Divide main clock to provide the system AHB clock to the core, memories and the peripherals
+}
+static void AlxClk_Init_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_ExtClk_12MHz(AlxClk* me)
+{
+	(void)me;
+	ALX_CLK_ASSERT(false);	// TV: TODO
 }
 #endif
 
@@ -270,12 +292,14 @@ static bool AlxClk_IsClkOk(AlxClk* me)
 	me->mainClk = CLOCK_GetMainClkFreq();
 	me->ahbClk = CLOCK_GetCoreSysClkFreq();
 	me->froOsc = CLOCK_GetFroFreq();
+	me->extClk = CLOCK_GetExtClkFreq();
 
 	// Check
 	if (SystemCoreClock != me->systemCoreClock_Ctor)	{ ALX_CLK_TRACE("Err");	return false; }
 	if (me->mainClk != me->mainClk_Ctor)				{ ALX_CLK_TRACE("Err");	return false; }
 	if (me->ahbClk != me->ahbClk_Ctor)					{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->froOsc != me->froOsc_Ctor)						{ ALX_CLK_TRACE("Err");	return false; }
+	if (me->froOsc != me->froOsc_Ctor)					{ ALX_CLK_TRACE("Err");	return false; }
+	if (me->extClk != me->extClk_Ctor)					{ ALX_CLK_TRACE("Err");	return false; }
 
 	// Return
 	return true;
