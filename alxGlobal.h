@@ -377,14 +377,16 @@ typedef enum
 
 	#if defined(ALX_LPC55S6X)
 	AlxClk_Clk_McuLpc55s6x_SystemCoreClock,
-	AlxClk_Clk_McuLpc55s6x_AhbClk,
 	AlxClk_Clk_McuLpc55s6x_MainClk,
+	AlxClk_Clk_McuLpc55s6x_AhbClk,
 	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz,
+	AlxClk_Clk_McuLpc55s6x_WdtOsc,
 
 	AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor,
-	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor,
 	AlxClk_Clk_McuLpc55s6x_MainClk_Ctor,
+	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor,
 	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor,
+	AlxClk_Clk_McuLpc55s6x_WdtOsc_Ctor,
 	#endif
 } AlxClk_Clk;
 

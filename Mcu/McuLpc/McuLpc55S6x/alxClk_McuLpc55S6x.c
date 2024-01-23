@@ -111,6 +111,7 @@ void AlxClk_Ctor
 	me->ahbClk = 0;
 	me->mainClk = 0;
 	me->froOsc_1MHz = 0;
+	me->wdtOsc = 0;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -270,12 +271,14 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 		if (clk == AlxClk_Clk_McuLpc55s6x_AhbClk)			{ return me->ahbClk; }
 		if (clk == AlxClk_Clk_McuLpc55s6x_MainClk)			{ return me->mainClk; }
 		if (clk == AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz)		{ return me->froOsc_1MHz; }
+		if (clk == AlxClk_Clk_McuLpc55s6x_WdtOsc)			{ return me->wdtOsc; }
 	}
 
 	if (clk == AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor)	{ return me->systemCoreClock_Ctor; }
 	if (clk == AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor)			{ return me->ahbClk_Ctor; }
 	if (clk == AlxClk_Clk_McuLpc55s6x_MainClk_Ctor)			{ return me->mainClk_Ctor; }
 	if (clk == AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor)		{ return me->froOsc_1MHz_Ctor; }
+	if (clk == AlxClk_Clk_McuLpc55s6x_WdtOsc_Ctor)			{ return me->wdtOsc_Ctor; }
 
 	// Assert
 	ALX_CLK_ASSERT(false);	// We shouldn't get here
@@ -340,11 +343,13 @@ static bool AlxClk_AreClkNok(AlxClk* me)
 	me->ahbClk = CLOCK_GetFreq(kCLOCK_BusClk);		// MF: BusClk is "SysClk" because it is divided "MainClk"
 	me->mainClk = CLOCK_GetFreq(kCLOCK_CoreSysClk);	// MF: CoreSysClk is actually "MainClk" (svinjarijo)
 	me->froOsc_1MHz = me->froOsc_1MHz_Ctor;			// TV: Can't check
+	me->wdtOsc = CLOCK_GetWdtClkFreq();
 
 	// Check clocks
 	if		(SystemCoreClock != me->systemCoreClock_Ctor)	{ ALX_CLK_TRACE("Err");	return true; }
 	else if	(me->ahbClk  != me->ahbClk_Ctor )				{ ALX_CLK_TRACE("Err");	return true; }
 	else if	(me->mainClk != me->mainClk_Ctor)				{ ALX_CLK_TRACE("Err");	return true; }
+	else if	(me->wdtOsc != me->wdtOsc_Ctor)					{ ALX_CLK_TRACE("Err");	return true; }
 	else													{ return false; }
 }
 static void AlxClk_SetupPll(AlxClk* me, pll_setup_t* pllSetup, uint32_t inputFreq, uint8_t pllN, uint8_t pllP, uint16_t pllM)
@@ -379,6 +384,7 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Defau
 	me->ahbClk_Ctor				= 6000000U;
 	me->mainClk_Ctor			= 12000000U;
 	me->froOsc_1MHz_Ctor		= 0U;
+	me->wdtOsc_Ctor				= 0U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_12MHz_FroOsc_96MHz(AlxClk* me)
 {
@@ -386,6 +392,7 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_12MHz_FroOsc_96MHz(AlxC
 	me->ahbClk_Ctor				= 12000000U;
 	me->mainClk_Ctor			= 96000000U;
 	me->froOsc_1MHz_Ctor		= 0U;
+	me->wdtOsc_Ctor				= 0U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_24MHz_FroOsc_96MHz(AlxClk* me)
 {
@@ -393,6 +400,7 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_24MHz_FroOsc_96MHz(AlxC
 	me->ahbClk_Ctor				= 24000000U;
 	me->mainClk_Ctor			= 96000000U;
 	me->froOsc_1MHz_Ctor		= 0U;
+	me->wdtOsc_Ctor				= 0U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_48MHz_FroOsc_96MHz(AlxClk* me)
 {
@@ -400,6 +408,7 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_48MHz_FroOsc_96MHz(AlxC
 	me->ahbClk_Ctor				= 48000000U;
 	me->mainClk_Ctor			= 96000000U;
 	me->froOsc_1MHz_Ctor		= 0U;
+	me->wdtOsc_Ctor				= 0U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz(AlxClk* me)
 {
@@ -407,6 +416,7 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz(AlxC
 	me->ahbClk_Ctor				= 96000000U;
 	me->mainClk_Ctor			= 96000000U;
 	me->froOsc_1MHz_Ctor		= 0U;
+	me->wdtOsc_Ctor				= 0U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0(AlxClk* me)
 {
@@ -414,6 +424,7 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pl
 	me->ahbClk_Ctor				= 150000000U;
 	me->mainClk_Ctor			= 150000000U;
 	me->froOsc_1MHz_Ctor		= 0U;
+	me->wdtOsc_Ctor				= 0U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0_FroOsc_1MHz(AlxClk* me)
 {
@@ -421,6 +432,7 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pl
 	me->ahbClk_Ctor				= 150000000U;
 	me->mainClk_Ctor			= 150000000U;
 	me->froOsc_1MHz_Ctor		= 1000000U;
+	me->wdtOsc_Ctor				= 1000000U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(AlxClk* me)
 {
@@ -428,6 +440,7 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(Al
 	me->ahbClk_Ctor				= 150000000U;
 	me->mainClk_Ctor			= 150000000U;
 	me->froOsc_1MHz_Ctor		= 0U;
+	me->wdtOsc_Ctor				= 0U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz_Pll0(AlxClk* me)
 {
@@ -435,6 +448,7 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz_Pl
 	me->ahbClk_Ctor				= 150000000U;
 	me->mainClk_Ctor			= 150000000U;
 	me->froOsc_1MHz_Ctor		= 0U;
+	me->wdtOsc_Ctor				= 0U;
 }
 static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz_Pll0_FroOsc_1MHz(AlxClk* me)
 {
@@ -442,6 +456,7 @@ static void AlxClk_Ctor_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz_Pl
 	me->ahbClk_Ctor				= 150000000U;
 	me->mainClk_Ctor			= 150000000U;
 	me->froOsc_1MHz_Ctor		= 1000000U;
+	me->wdtOsc_Ctor				= 1000000U;
 }
 
 static void AlxClk_Init_McuLpc55S6x_MainClk_12MHz_AhbClk_6MHz_FroOsc_12MHz_Default(AlxClk* me)
@@ -566,6 +581,9 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pl
 	// Enable FRO 1MHz
 	POWER_DisablePD(kPDRUNCFG_PD_FRO1M);
 	SYSCON->CLOCK_CTRL |= (1 << 6);
+
+	// Enable WDT Oscillator 1MHz
+	CLOCK_SetClkDiv(kCLOCK_DivWdtClk, 1U, true);
 }
 static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(AlxClk* me)
 {
@@ -624,6 +642,9 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz_Pl
 	// Enable FRO 1MHz
 	POWER_DisablePD(kPDRUNCFG_PD_FRO1M);
 	SYSCON->CLOCK_CTRL |= (1 << 6);
+
+	// Enable WDT Oscillator 1MHz
+	CLOCK_SetClkDiv(kCLOCK_DivWdtClk, 1U, true);
 }
 
 

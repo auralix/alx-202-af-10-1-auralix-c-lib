@@ -78,18 +78,13 @@ typedef struct
 	uint32_t ahbClk;
 	uint32_t mainClk;
 	uint32_t froOsc_1MHz;
-	//uint32_t fro;		// MF: Don't Know if we need it
-	//uint32_t froHf;	// MF: Don't know how we will use it
-	//uint32_t extClk;	// MF: Don't know how we will use it
-	//uint32_t fro_1m;	// MF: Don't know how we will use it
-	//uint32_t pll0;	// MF: Don't know how we will use it
-	//uint32_t pll1;	// MF: Don't know how we will use it
-	//uint32_t rtc_32k;	// MF: Don't know how we will use it
+	uint32_t wdtOsc;
 
 	uint32_t systemCoreClock_Ctor;
 	uint32_t ahbClk_Ctor;
 	uint32_t mainClk_Ctor;
 	uint32_t froOsc_1MHz_Ctor;
+	uint32_t wdtOsc_Ctor;
 
 	// Info
 	bool wasCtorCalled;

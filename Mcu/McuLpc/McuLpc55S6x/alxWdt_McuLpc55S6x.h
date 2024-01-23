@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxWdt.h
-  * @brief		Auralix C Library - ALX Watchdog Timer Module
+  * @file		alxWdt_McuLpc55S6x.h
+  * @brief		Auralix C Library - ALX Watchdog Timer MCU LPC80X Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_WDT_H
-#define ALX_WDT_H
+#ifndef ALX_WDT_MCU_LPC55S6X_H
+#define ALX_WDT_MCU_LPC55S6X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,62 +42,53 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-
-#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-#include "alxWdt_McuStm32.h"
-
-#elif defined(ALX_LPC55S6X)
-#include "alxWdt_McuLpc55S6x.h"
-
-#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
-#include "alxWdt_McuLpc80x.h"
-
-#else
-typedef struct { bool dummy; } AlxWdt;
-#endif
+#include "alxClk.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
-// Preprocessor
+// Types
 //******************************************************************************
-#define ALX_WDT_FILE "alxWdt.h"
+typedef enum
+{
+	AlxWdt_Config_McuLpc55S6x_WdtTimeout_4000ms_WdtClk_250kHz_WdtOsc_1MHz	// TV: ATTENTION, WDT oscillator is generated from FRO_1MHz and has +/-15% tolerance!
+} AlxWdt_Config;
 
-// Assert //
-#if defined(ALX_WDT_ASSERT_BKPT_ENABLE)
-	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_WDT_FILE, expr)
-#elif defined(ALX_WDT_ASSERT_TRACE_ENABLE)
-	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_WDT_FILE, expr)
-#elif defined(ALX_WDT_ASSERT_RST_ENABLE)
-	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_RST(ALX_WDT_FILE, expr)
-#else
-	#define ALX_WDT_ASSERT(expr) do{} while (false)
-#endif
+typedef struct
+{
+	// Parameters
+	AlxWdt_Config config;
+	AlxClk* clk;
 
-// Trace //
-#if defined(ALX_WDT_TRACE_ENABLE)
-	#define ALX_WDT_TRACE(...) ALX_TRACE_STD(ALX_WDT_FILE, __VA_ARGS__)
-#else
-	#define ALX_WDT_TRACE(...) do{} while (false)
-#endif
+	// Variables
+	wwdt_config_t wwdtConfig;
+
+	// Info
+	bool isInit;
+	bool wasCtorCalled;
+} AlxWdt;
 
 
 //******************************************************************************
-// Functions
+// Constructor
 //******************************************************************************
-Alx_Status AlxWdt_Init(AlxWdt* me);
-Alx_Status AlxWdt_Refresh(AlxWdt* me);
+void AlxWdt_Ctor
+(
+	AlxWdt* me,
+	AlxWdt_Config config,
+	AlxClk* clk
+);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_WDT_H
+#endif	// #ifndef ALX_WDT_MCU_LPC55S6X_H
