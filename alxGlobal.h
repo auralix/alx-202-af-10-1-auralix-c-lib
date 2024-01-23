@@ -365,12 +365,14 @@ typedef enum
 	AlxClk_Clk_McuLpc8xx_AhbClk,
 	AlxClk_Clk_McuLpc8xx_FroOsc,
 	AlxClk_Clk_McuLpc8xx_ExtClk,
+	AlxClk_Clk_McuLpc8xx_WdtOsc,
 
 	AlxClk_Clk_McuLpc8xx_SystemCoreClock_Ctor,
 	AlxClk_Clk_McuLpc8xx_MainClk_Ctor,
 	AlxClk_Clk_McuLpc8xx_AhbClk_Ctor,
 	AlxClk_Clk_McuLpc8xx_FroOsc_Ctor,
 	AlxClk_Clk_McuLpc8xx_ExtClk_Ctor,
+	AlxClk_Clk_McuLpc8xx_WdtOsc_Ctor,
 	#endif
 
 	#if defined(ALX_LPC55S6X)

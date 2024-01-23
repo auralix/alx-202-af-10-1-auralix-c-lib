@@ -42,6 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxClk.h"
 
 
 //******************************************************************************
@@ -62,6 +63,7 @@ typedef struct
 {
 	// Parameters
 	AlxWdt_Config config;
+	AlxClk* clk;
 
 	// Variables
 	wwdt_config_t wwdtConfig;
@@ -78,7 +80,8 @@ typedef struct
 void AlxWdt_Ctor
 (
 	AlxWdt* me,
-	AlxWdt_Config config
+	AlxWdt_Config config,
+	AlxClk* clk
 );
 
 

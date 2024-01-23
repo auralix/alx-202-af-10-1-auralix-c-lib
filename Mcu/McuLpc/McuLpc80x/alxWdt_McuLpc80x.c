@@ -39,6 +39,12 @@
 
 
 //******************************************************************************
+// Private Functions
+//******************************************************************************
+static bool AlxWdt_IsClkOk(AlxWdt* me);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 
@@ -49,11 +55,13 @@
 void AlxWdt_Ctor
 (
 	AlxWdt* me,
-	AlxWdt_Config config
+	AlxWdt_Config config,
+	AlxClk* clk
 )
 {
 	// Parameters
 	me->config = config;
+	me->clk = clk;
 
 	// Variables
 	me->wwdtConfig.enableWwdt = true;
@@ -71,6 +79,9 @@ void AlxWdt_Ctor
 	{
 		ALX_WDT_ASSERT(false);	// We should not get here
 	}
+
+	// Check clock
+	ALX_WDT_ASSERT(AlxWdt_IsClkOk(me));
 
 	// Info
 	me->isInit = false;
@@ -93,14 +104,6 @@ Alx_Status AlxWdt_Init(AlxWdt* me)
 	// Assert
 	ALX_WDT_ASSERT(me->wasCtorCalled == true);
 	ALX_WDT_ASSERT(me->isInit == false);
-
-	// Init WDT Oscillator
-	CLOCK_InitWdtOsc(kCLOCK_WdtAnaFreq600KHZ, 3);	// TV: We will set WDT oscillator to fixed 200kHz
-	POWER_DisablePD(kPDRUNCFG_PD_WDT_OSC);
-
-	// Check WDT Clock
-	uint32_t wdtClk_Hz = CLOCK_GetFreq(kCLOCK_WdtOsc) / 4;	// TV: WDT clock is always WDT oscillator clock divided by 4
-	if(wdtClk_Hz != me->wwdtConfig.clockFreq_Hz){ ALX_WDT_TRACE("Err"); return Alx_Err; }
 
 	// Init WDT
 	WWDT_Init(WWDT, &me->wwdtConfig);
@@ -129,6 +132,24 @@ Alx_Status AlxWdt_Refresh(AlxWdt* me)
 
 	// Return
 	return Alx_Ok;
+}
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static bool AlxWdt_IsClkOk(AlxWdt* me)
+{
+	if (me->config == AlxWdt_Config_McuLpc80x_WdtTimeout_4000ms_WdtClk_50kHz_WdtOsc_200kHz)
+	{
+		if(200000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc8xx_WdtOsc_Ctor))
+			return true;
+		else
+			return false;
+	}
+
+	ALX_WDT_ASSERT(false);	// We should not get here
+	return ALX_NULL;
 }
 
 
