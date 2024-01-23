@@ -64,20 +64,18 @@ typedef struct { bool dummy; } AlxI2s;
 #define ALX_I2S_FILE "alxI2s.h"
 
 // Assert //
-#if defined(_ALX_I2S_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_I2S_ASSERT_BKPT_ENABLE)
 	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_BKPT(ALX_I2S_FILE, expr)
-#elif defined(_ALX_I2S_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_I2S_ASSERT_TRACE_ENABLE)
 	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_TRACE(ALX_I2S_FILE, expr)
-#elif defined(_ALX_I2S_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_I2S_ASSERT_RST_ENABLE)
 	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_RST(ALX_I2S_FILE, expr)
-#elif defined(_ALX_I2S_ASSERT_MOCK) || defined(_ALX_ASSERT_MOCK_ALL)
-	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_MOCK(ALX_I2S_FILE, expr)
 #else
 	#define ALX_I2S_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_I2S_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_I2S_TRACE_ENABLE)
 	#define ALX_I2S_TRACE(...) ALX_TRACE_STD(ALX_I2S_FILE, __VA_ARGS__)
 #else
 	#define ALX_I2S_TRACE(...) do{} while (false)

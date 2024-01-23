@@ -73,18 +73,18 @@ typedef struct { bool dummy; } AlxIoPin;
 #define ALX_IO_PIN_FILE "alxIoPin.h"
 
 // Assert //
-#if defined(_ALX_IO_PIN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_IO_PIN_ASSERT_BKPT_ENABLE)
 	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_IO_PIN_FILE, expr)
-#elif defined(_ALX_IO_PIN_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_IO_PIN_ASSERT_TRACE_ENABLE)
 	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_IO_PIN_FILE, expr)
-#elif defined(_ALX_IO_PIN_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_IO_PIN_ASSERT_RST_ENABLE)
 	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_RST(ALX_IO_PIN_FILE, expr)
 #else
 	#define ALX_IO_PIN_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_IO_PIN_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_IO_PIN_TRACE_ENABLE)
 	#define ALX_IO_PIN_TRACE(...) ALX_TRACE_STD(ALX_IO_PIN_FILE, __VA_ARGS__)
 #else
 	#define ALX_IO_PIN_TRACE(...) do{} while (false)

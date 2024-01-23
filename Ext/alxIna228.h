@@ -57,18 +57,18 @@ extern "C" {
 #define ALX_INA228_FILE "alxIna228.h"
 
 // Assert //
-#if defined(_ALX_INA228_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_INA228_ASSERT_BKPT_ENABLE)
 	#define ALX_INA228_ASSERT(expr) ALX_ASSERT_BKPT(ALX_INA228_FILE, expr)
-#elif defined(_ALX_INA228_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_INA228_ASSERT_TRACE_ENABLE)
 	#define ALX_INA228_ASSERT(expr) ALX_ASSERT_TRACE(ALX_INA228_FILE, expr)
-#elif defined(_ALX_INA228_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_INA228_ASSERT_RST_ENABLE)
 	#define ALX_INA228_ASSERT(expr) ALX_ASSERT_RST(ALX_INA228_FILE, expr)
 #else
 	#define ALX_INA228_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_INA228_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_INA228_TRACE_ENABLE)
 	#define ALX_INA228_TRACE(...) ALX_TRACE_STD(ALX_INA228_FILE, __VA_ARGS__)
 	#define ALX_INA228_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else

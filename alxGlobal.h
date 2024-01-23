@@ -214,18 +214,18 @@ extern "C" {
 #define ALX_GLOBAL_FILE "alxGlobal.h"
 
 // Assert //
-#if defined(_ALX_GLOBAL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_GLOBAL_ASSERT_BKPT)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_GLOBAL_FILE, expr)
-#elif defined(_ALX_GLOBAL_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_GLOBAL_ASSERT_TRACE)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_GLOBAL_FILE, expr)
-#elif defined(_ALX_GLOBAL_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_GLOBAL_ASSERT_RST)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_RST(ALX_GLOBAL_FILE, expr)
 #else
 	#define ALX_GLOBAL_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_GLOBAL_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_GLOBAL_TRACE)
 	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_STD(ALX_GLOBAL_FILE, __VA_ARGS__)
 #else
 	#define ALX_GLOBAL_TRACE(...) do{} while (false)

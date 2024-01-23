@@ -59,18 +59,18 @@ extern "C" {
 #define ALX_ADAU1961_FILE "alxAdau1961.h"
 
 // Assert //
-#if defined(_ALX_ADAU1961_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_ADAU1961_ASSERT_BKPT_ENABLE)
 	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADAU1961_FILE, expr)
-#elif defined(_ALX_ADAU1961_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_ADAU1961_ASSERT_TRACE_ENABLE)
 	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADAU1961_FILE, expr)
-#elif defined(_ALX_ADAU1961_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_ADAU1961_ASSERT_RST_ENABLE)
 	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_RST(ALX_ADAU1961_FILE, expr)
 #else
 	#define ALX_ADAU1961_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_ADAU1961_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_ADAU1961_TRACE_ENABLE)
 	#define ALX_ADAU1961_TRACE(...) ALX_TRACE_STD(ALX_ADAU1961_FILE, __VA_ARGS__)
 #else
 	#define ALX_ADAU1961_TRACE(...) do{} while (false)

@@ -56,18 +56,18 @@ extern "C" {
 #define ALX_LFS_CONFIG_FILE "alxLfsConfig.h"
 
 // Assert //
-#if defined(_LFS_CONFIG_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_LFS_CONFIG_ASSERT_BKPT_ENABLE)
     #define LFS_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LFS_CONFIG_FILE, expr)
-#elif defined(_LFS_CONFIG_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_LFS_CONFIG_ASSERT_TRACE_ENABLE)
     #define LFS_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LFS_CONFIG_FILE, expr)
-#elif defined(_LFS_CONFIG_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_LFS_CONFIG_ASSERT_RST_ENABLE)
     #define LFS_ASSERT(expr) ALX_ASSERT_RST(ALX_LFS_CONFIG_FILE, expr)
 #else
     #define LFS_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_LFS_CONFIG_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_LFS_CONFIG_TRACE_ENABLE)
     //#define LFS_TRACE(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
     #define LFS_DEBUG(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
     #define LFS_WARN(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)

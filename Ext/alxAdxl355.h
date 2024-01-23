@@ -60,18 +60,18 @@ extern "C" {
 #define ALX_ADXL355_FILE "alxAdxl355.h"
 
 // Assert //
-#if defined(_ALX_ADXL355_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_ADXL355_ASSERT_BKPT_ENABLE)
 	#define ALX_ADXL355_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADXL355_FILE, expr)
-#elif defined(_ALX_ADXL355_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_ADXL355_ASSERT_TRACE_ENABLE)
 	#define ALX_ADXL355_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADXL355_FILE, expr)
-#elif defined(_ALX_ADXL355_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_ADXL355_ASSERT_RST_ENABLE)
 	#define ALX_ADXL355_ASSERT(expr) ALX_ASSERT_RST(ALX_ADXL355_FILE, expr)
 #else
 	#define ALX_ADXL355_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_ADXL355_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_ADXL355_TRACE_ENABLE)
 	#define ALX_ADXL355_TRACE(...) ALX_TRACE_STD(ALX_ADXL355_FILE, __VA_ARGS__)
 	#define ALX_ADXL355_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else

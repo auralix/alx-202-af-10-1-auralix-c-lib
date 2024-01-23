@@ -56,18 +56,18 @@ extern "C" {
 #define ALX_AUDIO_FILE "alxAudio.h"
 
 // Assert //
-#if defined(_ALX_AUDIO_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_AUDIO_ASSERT_BKPT_ENABLE)
 	#define ALX_AUDIO_ASSERT(expr) ALX_ASSERT_BKPT(ALX_AUDIO_FILE, expr)
-#elif defined(_ALX_AUDIO_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_AUDIO_ASSERT_TRACE_ENABLE)
 	#define ALX_AUDIO_ASSERT(expr) ALX_ASSERT_TRACE(ALX_AUDIO_FILE, expr)
-#elif defined(_ALX_AUDIO_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_AUDIO_ASSERT_RST_ENABLE)
 	#define ALX_AUDIO_ASSERT(expr) ALX_ASSERT_RST(ALX_AUDIO_FILE, expr)
 #else
 	#define ALX_AUDIO_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_AUDIO_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_AUDIO_TRACE_ENABLE)
 	#define ALX_AUDIO_TRACE(...) ALX_TRACE_STD(ALX_AUDIO_FILE, __VA_ARGS__)
 #else
 	#define ALX_AUDIO_TRACE(...) do{} while (false)

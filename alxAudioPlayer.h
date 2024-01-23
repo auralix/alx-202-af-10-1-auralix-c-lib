@@ -57,18 +57,18 @@ extern "C" {
 #define ALX_AUDIO_PLAYER_FILE "alxAudioPlayer.h"
 
 // Assert //
-#if defined(_ALX_AUDIO_PLAYER_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_AUDIO_PLAYER_ASSERT_BKPT_ENABLE)
 	#define ALX_AUDIO_PLAYER_ASSERT(expr) ALX_ASSERT_BKPT(ALX_AUDIO_PLAYER_FILE, expr)
-#elif defined(_ALX_AUDIO_PLAYER_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_AUDIO_PLAYER_ASSERT_TRACE_ENABLE)
 	#define ALX_AUDIO_PLAYER_ASSERT(expr) ALX_ASSERT_TRACE(ALX_AUDIO_PLAYER_FILE, expr)
-#elif defined(_ALX_AUDIO_PLAYER_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_AUDIO_PLAYER_ASSERT_RST_ENABLE)
 	#define ALX_AUDIO_PLAYER_ASSERT(expr) ALX_ASSERT_RST(ALX_AUDIO_PLAYER_FILE, expr)
 #else
 	#define ALX_AUDIO_PLAYER_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_AUDIO_PLAYER_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_AUDIO_PLAYER_TRACE_ENABLE)
 	#define ALX_AUDIO_PLAYER_TRACE(...) ALX_TRACE_STD(ALX_AUDIO_PLAYER_FILE, __VA_ARGS__)
 #else
 	#define ALX_AUDIO_PLAYER_TRACE(...) do{} while (false)
