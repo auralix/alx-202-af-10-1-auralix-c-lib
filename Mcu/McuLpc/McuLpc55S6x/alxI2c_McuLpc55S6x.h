@@ -66,12 +66,10 @@ typedef struct
 	// Defines
 	#define ALX_I2C_BUFF_LEN 256
 
-	// Objects - External
-	AlxIoPin* io_SCL;
-	AlxIoPin* io_SDA;
-
 	// Parameters
 	I2C_Type* i2c;
+	AlxIoPin* io_SCL;
+	AlxIoPin* io_SDA;
 	AlxI2c_Clk clk;
 
 	// Variables

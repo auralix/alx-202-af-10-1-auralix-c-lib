@@ -77,14 +77,12 @@ typedef enum
 
 typedef struct
 {
-	// Objects - External
+	// Parameters
 	SPI_Type* spi;
 	AlxIoPin* do_SCK;
 	AlxIoPin* do_MOSI;
 	AlxIoPin* di_MISO;
 	AlxIoPin* do_nCS;
-
-	// Parameters
 	AlxSpi_Mode mode;
 	AlxSpi_Clk spiClk;
 

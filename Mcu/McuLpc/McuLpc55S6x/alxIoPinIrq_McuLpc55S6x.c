@@ -81,13 +81,6 @@ void AlxIoPinIrq_Ctor
 	Alx_IrqPriority irqPriority
 )
 {
-	// Assert
-	(void)me;
-	(void)ioPin;
-	(void)irqPin;
-	(void)irqType;
-	(void)irqPriority;
-
 	// Parameters
 	me->ioPin = ioPin;
 	me->irqPin = irqPin;
@@ -115,25 +108,25 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 	ALX_IO_PIN_IRQ_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #1 Set isInit attribute
+	// Set isInit attribute
 	me->isInit = true;
 
-	// #2 Init IoPin
+	// Init IoPin
 	AlxIoPin_Init(me->ioPin);
 
-	// #3 Prepare IRQ Pin
+	// Prepare IRQ Pin
 	inputmux_connection_t irqPortPinSel = AlxIoPin_GetIrqPortPinSel(me);
 	IRQn_Type irqType = AlxIoPin_GetIrqType(me);
 
-	// #4 Attach IRQ to right Pin
+	// Attach IRQ to right Pin
 	INPUTMUX_Init(INPUTMUX);	// MF: Enable Inputmux Clk
 	INPUTMUX_AttachSignal(INPUTMUX, me->irqPin, irqPortPinSel);
 	INPUTMUX_Deinit(INPUTMUX);	// MF: Disable Inputmux Clk
 
-	// #5 Init PINT Periphery
+	// Init PINT Periphery
 	PINT_Init(PINT);			// MF: "EnableClk" and "Periph reset" happens here
 
-	// #6 Enable IRQ
+	// Enable IRQ
 	PINT_PinInterruptConfig(PINT, me->irqPin, me->irqType, ALX_NULL_PTR);	// MF: "ALX_NULL_PTR" because we'll use "PIN_INTX_IRQHandler" from startup.s
 	NVIC_SetPriority(irqType, (uint32_t)me->irqPriority);					// MF: Set IRQ Priority
 	PINT_EnableCallbackByIndex(PINT, me->irqPin);							// MF: Enable IRQ
@@ -150,19 +143,19 @@ void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 	ALX_IO_PIN_IRQ_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #1 DeInit if IRQ
+	// DeInit if IRQ
 	PINT_DisableCallbackByIndex(PINT, me->irqPin);	// MF: Disable IRQ
 
-	// #2 Disable Clk
+	// Disable Clk
 	CLOCK_DisableClock(kCLOCK_Pint);
 
-	// #3 Reser Periph
+	// Reser Periph
 	RESET_PeripheralReset(kPINT_RST_SHIFT_RSTn);
 
-	// #4 DeInit IoPin
+	// DeInit IoPin
 	AlxIoPin_DeInit(me->ioPin);
 
-	// #5 Clear isInit attribute
+	// Clear isInit attribute
 	me->isInit = false;
 }
 
@@ -175,7 +168,7 @@ static inputmux_connection_t AlxIoPin_GetIrqPortPinSel(AlxIoPinIrq* me)
 	// Assert
 	(void)me;
 
-	// #1 Get IRQ Port Pin select
+	// Get IRQ Port Pin select
 	////-----------
 	//// Port 0
 	////-----------
@@ -257,7 +250,7 @@ static IRQn_Type AlxIoPin_GetIrqType(AlxIoPinIrq* me)
 	// Assert
 	(void)me;
 
-	// #1 Get IRQ Type
+	// Get IRQ Type
 	if (me->irqPin == kPINT_PinInt0)	{ return PIN_INT0_IRQn; }
 	if (me->irqPin == kPINT_PinInt1)	{ return PIN_INT1_IRQn; }
 	if (me->irqPin == kPINT_PinInt2)	{ return PIN_INT2_IRQn; }

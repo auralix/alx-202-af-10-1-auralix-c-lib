@@ -78,17 +78,7 @@ void AlxAdc_Ctor
 )
 {
 	// Assert
-	(void)me;
-	(void)ioPinArr;
-	(void)chArr;
 	ALX_ADC_ASSERT(numOfIoPinsAndCh <= ALX_ADC_BUFF_LEN);
-	(void)clk;
-	(void)adcClk;
-	#if defined(ALX_ADC_OPTIMIZE_SIZE)
-	(void)vRef_mV;
-	#else
-	(void)vRef_V;
-	#endif
 
 	// Parameters
 	me->ioPinArr = ioPinArr;

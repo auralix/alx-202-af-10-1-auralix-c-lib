@@ -77,24 +77,15 @@ void AlxSpi_Ctor
 	AlxSpi_Clk spiClk
 )
 {
-	//Assert
-	(void)me;
+	// Assert
 	ALX_SPI_ASSERT(!(spi == SPI8));	// SPI8 should not be used
-	(void)do_SCK;
-	(void)do_MOSI;
-	(void)di_MISO;
-	(void)do_nCS;
-	(void)mode;
-	(void)spiClk;
 
-	// Objects - External
+	// Parameters
 	me->spi = spi;
 	me->do_SCK = do_SCK;
 	me->do_MOSI = do_MOSI;
 	me->di_MISO = di_MISO;
 	me->do_nCS = do_nCS;
-
-	// Parameters
 	me->mode = mode;
 	me->spiClk = spiClk;
 
@@ -140,27 +131,27 @@ void AlxSpi_Ctor
   */
 Alx_Status AlxSpi_Init(AlxSpi* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_SPI_ASSERT(me->isInit == false);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #2 Init GPIO
+	// Init GPIO
 	AlxIoPin_Init(me->do_SCK);
 	AlxIoPin_Init(me->do_MOSI);
 	AlxIoPin_Init(me->di_MISO);
 	AlxIoPin_Init(me->do_nCS);
 
-	// #3 Enable SPI Periphery Clock
+	// Enable SPI Periphery Clock
 	AlxSpi_Periph_AttachClk(me);
 
-	// #4 Init SPI
+	// Init SPI
 	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
 
-	// #5 Set isInit
+	// Set isInit
 	me->isInit = true;
 
-	// #6 Return OK
+	// Return OK
 	return Alx_Ok;
 }
 
@@ -172,27 +163,27 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
   */
 Alx_Status AlxSpi_DeInit(AlxSpi* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #2 DeInit SPI
+	// DeInit SPI
 	SPI_Deinit(me->spi);
 
-	// #3 Disable SPI Periphery Clock
+	// Disable SPI Periphery Clock
 	AlxSpi_Periph_DisableClk(me);
 
-	// #4 DeInit GPIO
+	// DeInit GPIO
 	AlxIoPin_DeInit(me->do_SCK);
 	AlxIoPin_DeInit(me->do_MOSI);
 	AlxIoPin_DeInit(me->di_MISO);
 	AlxIoPin_DeInit(me->do_nCS);
 
-	// #5 Reset isInit
+	// Reset isInit
 	me->isInit = false;
 
-	// #6 Return OK
+	// Return OK
 	return Alx_Ok;
 }
 
@@ -208,7 +199,7 @@ Alx_Status AlxSpi_DeInit(AlxSpi* me)
   */
 Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// #1 Assert
+	// Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -217,17 +208,17 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
-	// #2 Prepare variables
+	// Prepare variables
 	uint8_t* dummy = NULL;
 	me->spiTransfer.txData = writeData;
 	me->spiTransfer.rxData = dummy;		// MF: We dont need received data
 	me->spiTransfer.dataSize = len;
 	Alx_Status status = Alx_Err;
 
-	// #3 Try SPI write/read
+	// Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// #4 If we are here, SPI write/read was OK or number of tries error occured
+	// If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
 	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
@@ -244,7 +235,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
   */
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// #1 Assert
+	// Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -253,17 +244,17 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
-	// #2 Prepare variables
+	// Prepare variables
 	uint8_t* dummy = NULL;
 	me->spiTransfer.txData = dummy;		// MF: We dont need transmited data
 	me->spiTransfer.rxData = readData;
 	me->spiTransfer.dataSize = len;
 	Alx_Status status = Alx_Err;
 
-	// #3 Try SPI write/read
+	// Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// #4 If we are here, SPI write/read was OK or number of tries error occured
+	// If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
 	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
@@ -281,7 +272,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
   */
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	// #1 Assert
+	// Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
@@ -291,16 +282,16 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	ALX_SPI_ASSERT(0 < numOfTries);
 	ALX_SPI_ASSERT(0 == timeout_ms);	// MF: Timeout won't be used
 
-	// #2 Prepare variables
+	// Prepare variables
 	me->spiTransfer.txData = writeData;
 	me->spiTransfer.rxData = readData;
 	me->spiTransfer.dataSize = len;
 	Alx_Status status = Alx_Err;
 
-	// #3 Try SPI write/read
+	// Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// #4 If we are here, SPI write/read was OK or number of tries error occured
+	// If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
 	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
@@ -311,12 +302,12 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
   */
 void AlxSpi_Master_AssertCs(AlxSpi* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #2 Assert nCS
+	// Assert nCS
 	AlxIoPin_Reset(me->do_nCS);
 }
 
@@ -326,12 +317,12 @@ void AlxSpi_Master_AssertCs(AlxSpi* me)
   */
 void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_SPI_ASSERT(me->isInit == true);
 	ALX_SPI_ASSERT(me->wasCtorCalled == true);
 	(void)me;
 
-	// #2 DeAssert nCS
+	// DeAssert nCS
 	AlxIoPin_Set(me->do_nCS);
 }
 
@@ -341,39 +332,37 @@ void AlxSpi_Master_DeAssertCs(AlxSpi* me)
 //******************************************************************************
 static Alx_Status AlxSpi_Reset(AlxSpi* me)
 {
-	// #1 DeInit
-	// #1.1 DeInit SPI
+	// DeInit SPI
 	SPI_Deinit(me->spi);
 
-	// #1.2 Disable SPI Periphery Clock
+	// Disable SPI Periphery Clock
 	AlxSpi_Periph_DisableClk(me);
 
-	// #1.3 DeInit GPIO
+	// DeInit GPIO
 	AlxIoPin_DeInit(me->do_SCK);
 	AlxIoPin_DeInit(me->do_MOSI);
 	AlxIoPin_DeInit(me->di_MISO);
 	AlxIoPin_DeInit(me->do_nCS);
 
-	// #2 Reset isInit
+	// Reset isInit
 	me->isInit = false;
 
-	// #3 Init
-	// #3.1 Init GPIO
+	// Init GPIO
 	AlxIoPin_Init(me->do_SCK);
 	AlxIoPin_Init(me->do_MOSI);
 	AlxIoPin_Init(me->di_MISO);
 	AlxIoPin_Init(me->do_nCS);
 
-	// #3.2 Enable SPI Periphery Clock
+	// Enable SPI Periphery Clock
 	AlxSpi_Periph_AttachClk(me);
 
-	// #3.3 Init SPI
+	// Init SPI
 	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
 
-	// #4 Set isInit
+	// Set isInit
 	me->isInit = true;
 
-	// #5 Return OK
+	// Return OK
 	return Alx_Ok;
 }
 static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
@@ -382,10 +371,10 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 	(void)me;
 	(void)numOfTries;
 
-	// #1 Prepare variables
+	// Prepare variables
 	status_t status = kStatus_Fail;
 
-	// #2 Try SPI write/read
+	// Try SPI write/read
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
 		status = SPI_MasterTransferBlocking(me->spi, &me->spiTransfer);
@@ -401,7 +390,7 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 		}
 	}
 
-	// #3 If we are here, SPI write/read was OK or number of tries error occured
+	// If we are here, SPI write/read was OK or number of tries error occured
 	if (status == kStatus_Success)	{ return Alx_Ok; }
 	else							{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
@@ -410,13 +399,13 @@ static void AlxSpi_Ctor_ParseMode(AlxSpi* me)
 	// Assert
 	(void)me;
 
-	// #1 Parse Mode
+	// Parse Mode
 	if (me->mode == AlxSpi_Mode_0)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveHigh; me->spiMasterConfig.phase = kSPI_ClockPhaseFirstEdge; return;}
 	if (me->mode == AlxSpi_Mode_1)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveHigh; me->spiMasterConfig.phase = kSPI_ClockPhaseSecondEdge; return;}
 	if (me->mode == AlxSpi_Mode_2)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveLow; me->spiMasterConfig.phase = kSPI_ClockPhaseFirstEdge; return;}
 	if (me->mode == AlxSpi_Mode_3)	{ me->spiMasterConfig.polarity = kSPI_ClockPolarityActiveLow; me->spiMasterConfig.phase = kSPI_ClockPhaseSecondEdge; return;}
 
-	//Assert
+	// Assert
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return;
 }
@@ -425,7 +414,7 @@ static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me)
 	// Assert
 	(void)me;
 
-	// #1 Get FlexComm Clk Freq
+	// Get FlexComm Clk Freq
 	#if defined(SPI0)
 	if (me->spi == SPI0)	{ return CLOCK_GetFlexCommClkFreq(0U); }
 	#endif
@@ -451,7 +440,7 @@ static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me)
 	if (me->spi == SPI7)	{ return CLOCK_GetFlexCommClkFreq(7U); }
 	#endif
 
-	//Assert
+	// Assert
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return 0xFFFFFFFF;
 }
@@ -460,7 +449,7 @@ static void AlxSpi_Periph_Reset(AlxSpi* me)
 	// Assert
 	(void)me;
 
-	// #1 Reset FlexComm
+	// Reset FlexComm
 	#if defined(SPI0)
 	if (me->spi == SPI0)	{ RESET_PeripheralReset(kFC0_RST_SHIFT_RSTn); return; }
 	#endif
@@ -486,7 +475,7 @@ static void AlxSpi_Periph_Reset(AlxSpi* me)
 	if (me->spi == SPI7)	{ RESET_PeripheralReset(kFC7_RST_SHIFT_RSTn); return; }
 	#endif
 
-	//Assert
+	// Assert
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return;
 }
@@ -495,7 +484,7 @@ static void AlxSpi_Periph_AttachClk(AlxSpi* me)
 	// Assert
 	(void)me;
 
-	// #1 Attach Clk to FlexComm
+	// Attach Clk to FlexComm
 	#if defined(SPI0)
 	if (me->spi == SPI0)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM0); return; }	// MF: In example there was Clk from FRO12MHz I do not understand which clk is right
 	#endif
@@ -521,7 +510,7 @@ static void AlxSpi_Periph_AttachClk(AlxSpi* me)
 	if (me->spi == SPI7)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM7); return; }
 	#endif
 
-	//Assert
+	// Assert
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return;
 }
@@ -530,7 +519,7 @@ static void AlxSpi_Periph_DisableClk(AlxSpi* me)
 	// Assert
 	(void)me;
 
-	// #1 Disable FlexComm Clk
+	// Disable FlexComm Clk
 	#if defined(SPI0)
 	if (me->spi == SPI0)	{ CLOCK_DisableClock(kCLOCK_FlexComm0); return; }
 	#endif
@@ -556,7 +545,7 @@ static void AlxSpi_Periph_DisableClk(AlxSpi* me)
 	if (me->spi == SPI7)	{ CLOCK_DisableClock(kCLOCK_FlexComm7); return; }
 	#endif
 
-	//Assert
+	// Assert
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return;
 }
