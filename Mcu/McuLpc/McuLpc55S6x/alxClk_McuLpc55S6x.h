@@ -60,11 +60,11 @@ typedef enum
 	AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_24MHz_FroOsc_96MHz,
 	AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_48MHz_FroOsc_96MHz,
 	AlxClk_Config_McuLpc55S6x_MainClk_96MHz_AhbClk_96MHz_FroOsc_96MHz,
-	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0,
-	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Pll0_FroOsc_1MHz,
+	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz,
+	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_FroOsc_1MHz_WdtOsc_1MHz,
 	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz,
-	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz_Pll0,
-	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz_Pll0_FroOsc_1MHz
+	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz,
+	AlxClk_Config_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz_FroOsc_1MHz_WdtOsc_1MHz
 } AlxClk_Config;
 
 typedef struct
@@ -75,14 +75,14 @@ typedef struct
 
 	// Variables
 	uint32_t systemCoreClock;
-	uint32_t ahbClk;
 	uint32_t mainClk;
+	uint32_t ahbClk;
 	uint32_t froOsc_1MHz;
 	uint32_t wdtOsc;
 
 	uint32_t systemCoreClock_Ctor;
-	uint32_t ahbClk_Ctor;
 	uint32_t mainClk_Ctor;
+	uint32_t ahbClk_Ctor;
 	uint32_t froOsc_1MHz_Ctor;
 	uint32_t wdtOsc_Ctor;
 
