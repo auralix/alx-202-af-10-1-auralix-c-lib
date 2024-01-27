@@ -140,8 +140,8 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 
 	// Init
 	#if defined(ALX_LPC80X)
-	if		(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default)		{ ALX_CLK_ASSERT(false); return;													}
-	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz)				{ ALX_CLK_ASSERT(false); return;													}
+	if		(me->config == AlxClk_Config_McuLpc80x_FroOsc_24MHz_Mainclk_12MHz_CoreSysClk_12MHz_Default)		{ ALX_CLK_ASSERT(false); return Alx_Err;											}
+	else if	(me->config == AlxClk_Config_McuLpc80x_FroOsc_30MHz_Mainclk_15MHz_CoreSysClk_15MHz)				{ ALX_CLK_ASSERT(false); return Alx_Err;											}
 	#endif
 	#if defined(ALX_LPC84X)
 	if		(me->config == AlxClk_Config_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Default)			{ AlxClk_Init_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Default(me);		}
@@ -240,7 +240,7 @@ static void AlxClk_Ctor_McuLpc84x_MainClk_12MHz_AhbClk_12MHz_FroOsc_24MHz_Defaul
 	me->systemCoreClock_Ctor	= 12000000U;
 	me->mainClk_Ctor			= 12000000U;
 	me->ahbClk_Ctor				= 12000000U;
-	me->froOsc_Ctor				= 12000000U;
+	me->froOsc_Ctor				= 24000000U;
 	me->extClk_Ctor				= 0U;
 	me->wdtOsc_Ctor				= 0U;
 }
@@ -302,7 +302,12 @@ static bool AlxClk_IsClkOk(AlxClk* me)
 	me->ahbClk = CLOCK_GetCoreSysClkFreq();
 	me->froOsc = CLOCK_GetFroFreq();
 	me->extClk = CLOCK_GetExtClkFreq();
+	#if defined(ALX_LPC80X)
+	me->wdtOsc = CLOCK_GetFreq(kCLOCK_LPOsc);
+	#endif
+	#if defined(ALX_LPC84X)
 	me->wdtOsc = CLOCK_GetFreq(kCLOCK_WdtOsc);
+	#endif
 
 	// Check
 	if (SystemCoreClock != me->systemCoreClock_Ctor)	{ ALX_CLK_TRACE("Err");	return false; }
@@ -318,12 +323,16 @@ static bool AlxClk_IsClkOk(AlxClk* me)
 static void AlxClk_Periph_Gpio_Reset(void)
 {
 	RESET_PeripheralReset(kGPIO0_RST_N_SHIFT_RSTn);
+	#if defined(ALX_LPC84X)
 	RESET_PeripheralReset(kGPIO1_RST_N_SHIFT_RSTn);
+	#endif
 }
 static void AlxClk_Periph_Gpio_EnableClk(void)
 {
 	CLOCK_EnableClock(kCLOCK_Gpio0);
+	#if defined(ALX_LPC84X)
 	CLOCK_EnableClock(kCLOCK_Gpio1);
+	#endif
 }
 
 
