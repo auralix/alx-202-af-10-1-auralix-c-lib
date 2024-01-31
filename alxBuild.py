@@ -57,8 +57,8 @@ def Script(vsSolDir):
 		hashShort = _hash[0:7]
 	else:
 		print("alxBuild.py - Not a GIT repo, hash could not be set")
-		_hash = "abcd"
-		hashShort = "abcd"
+		_hash = "abcdefabcdefabcdefabcdefabcdefabcdefabcd"
+		hashShort = "abcdefa"
 	print("alxBuild.py - buildHash: " + _hash)
 	print("alxBuild.py - buildHashShort: " + hashShort)
 
