@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7))
+#if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -203,6 +203,7 @@ static int AlxFs_Lfs_ReadBlock(const struct lfs_config* c, lfs_block_t block, lf
 	HAL_FLASH_Unlock();
 
 	// Clear all FLASH flags
+	#if defined(ALX_STM32F4)
 	__HAL_FLASH_CLEAR_FLAG
 	(
 		FLASH_FLAG_EOP |
@@ -210,15 +211,26 @@ static int AlxFs_Lfs_ReadBlock(const struct lfs_config* c, lfs_block_t block, lf
 		FLASH_FLAG_WRPERR |
 		FLASH_FLAG_PGAERR |
 		FLASH_FLAG_PGPERR |
-		#if defined(ALX_STM32F4)
 		FLASH_FLAG_PGSERR |
 		FLASH_FLAG_RDERR |
-		#endif
-		#if defined(ALX_STM32F7)
-		FLASH_FLAG_ERSERR |
-		#endif
 		FLASH_FLAG_BSY
 	);
+	#endif
+	#if defined(ALX_STM32F7)
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_PGPERR |
+		FLASH_FLAG_ERSERR |
+		FLASH_FLAG_BSY
+	);
+	#endif
+	#if defined(ALX_STM32L4)
+	// TODO
+	#endif
 
 	// Set addrSrc
 	uint32_t src_address = alxFs_me->lfsAddr + block * c->block_size + off;
@@ -238,6 +250,7 @@ static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lf
 	HAL_FLASH_Unlock();
 
 	// Clear all FLASH flags
+	#if defined(ALX_STM32F4)
 	__HAL_FLASH_CLEAR_FLAG
 	(
 		FLASH_FLAG_EOP |
@@ -245,15 +258,26 @@ static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lf
 		FLASH_FLAG_WRPERR |
 		FLASH_FLAG_PGAERR |
 		FLASH_FLAG_PGPERR |
-		#if defined(ALX_STM32F4)
 		FLASH_FLAG_PGSERR |
 		FLASH_FLAG_RDERR |
-		#endif
-		#if defined(ALX_STM32F7)
-		FLASH_FLAG_ERSERR |
-		#endif
 		FLASH_FLAG_BSY
 	);
+	#endif
+	#if defined(ALX_STM32F7)
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_PGPERR |
+		FLASH_FLAG_ERSERR |
+		FLASH_FLAG_BSY
+	);
+	#endif
+	#if defined(ALX_STM32L4)
+	// TODO
+	#endif
 
 	// Loop
 	uint32_t n_rows = size / c->prog_size;
@@ -265,6 +289,7 @@ static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lf
 		uint32_t* src_address_ptr = (uint32_t*)(buffer + i_row * 4);	// Multiply by 4 because we write 4 bytes at the time
 
 		// Program
+		#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 		HAL_StatusTypeDef xHAL_Status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, dest_address, *src_address_ptr);
 		if(xHAL_Status != HAL_OK)
 		{
@@ -274,6 +299,10 @@ static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lf
 			// Return
 			return -1;
 		}
+		#endif
+		#if defined(ALX_STM32L4)
+		// TODO
+		#endif
 	}
 
 	// Lock FLASH
@@ -288,6 +317,7 @@ static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block)
 	HAL_FLASH_Unlock();
 
 	// Clear all FLASH flags
+	#if defined(ALX_STM32F4)
 	__HAL_FLASH_CLEAR_FLAG
 	(
 		FLASH_FLAG_EOP |
@@ -295,30 +325,52 @@ static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block)
 		FLASH_FLAG_WRPERR |
 		FLASH_FLAG_PGAERR |
 		FLASH_FLAG_PGPERR |
-		#if defined(ALX_STM32F4)
 		FLASH_FLAG_PGSERR |
 		FLASH_FLAG_RDERR |
-		#endif
-		#if defined(ALX_STM32F7)
-		FLASH_FLAG_ERSERR |
-		#endif
 		FLASH_FLAG_BSY
 	);
+	#endif
+	#if defined(ALX_STM32F7)
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_PGPERR |
+		FLASH_FLAG_ERSERR |
+		FLASH_FLAG_BSY
+	);
+	#endif
+	#if defined(ALX_STM32L4)
+	// TODO
+	#endif
 
 	// Erase
+	#if defined(ALX_STM32F4)
 	uint32_t ulPageError = 0;
 	FLASH_EraseInitTypeDef xErase_Config = {};
 	xErase_Config.TypeErase = FLASH_TYPEERASE_SECTORS;
 	xErase_Config.Banks = ALX_NULL;
-	#if defined(ALX_STM32F4)
 	xErase_Config.Sector = FLASH_SECTOR_12 + block;
-	#endif
-	#if defined(ALX_STM32F7)
-	xErase_Config.Sector = FLASH_SECTOR_10 + block;
-	#endif
 	xErase_Config.NbSectors = 1;
 	xErase_Config.VoltageRange = FLASH_VOLTAGE_RANGE_3;
 	HAL_StatusTypeDef xHAL_Status = HAL_FLASHEx_Erase(&xErase_Config, &ulPageError);
+	#endif
+	#if defined(ALX_STM32F7)
+	uint32_t ulPageError = 0;
+	FLASH_EraseInitTypeDef xErase_Config = {};
+	xErase_Config.TypeErase = FLASH_TYPEERASE_SECTORS;
+	xErase_Config.Banks = ALX_NULL;
+	xErase_Config.Sector = FLASH_SECTOR_10 + block;
+	xErase_Config.NbSectors = 1;
+	xErase_Config.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+	HAL_StatusTypeDef xHAL_Status = HAL_FLASHEx_Erase(&xErase_Config, &ulPageError);
+	#endif
+	#if defined(ALX_STM32L4)
+	HAL_StatusTypeDef xHAL_Status = HAL_ERROR;
+	// TODO
+	#endif
 
 	// Lock FLASH
 	HAL_FLASH_Lock();
@@ -367,7 +419,11 @@ ALX_WEAK void AlxFs_Lfs_SetConfig(AlxFs* me)
 	me->lfsConfig.cache_size = 16;
 	me->lfsConfig.lookahead_size = 8;
 	#endif
+
+	#if defined(ALX_STM32L4)
+	// TODO
+	#endif
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7))
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
