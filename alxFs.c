@@ -229,7 +229,27 @@ static int AlxFs_Lfs_ReadBlock(const struct lfs_config* c, lfs_block_t block, lf
 	);
 	#endif
 	#if defined(ALX_STM32L4)
-	// TODO
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_PROGERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_SIZERR |
+		FLASH_FLAG_PGSERR |
+		FLASH_FLAG_MISERR |
+		FLASH_FLAG_FASTERR |
+		FLASH_FLAG_RDERR |
+		FLASH_FLAG_OPTVERR |
+		FLASH_FLAG_BSY |
+		FLASH_FLAG_ECCC |
+		FLASH_FLAG_ECCD
+	);
+	if (__HAL_FLASH_GET_FLAG(FLASH_FLAG_PEMPTY) != 0)
+	{
+		__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_PEMPTY);
+	}
 	#endif
 
 	// Set addrSrc
@@ -276,20 +296,40 @@ static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lf
 	);
 	#endif
 	#if defined(ALX_STM32L4)
-	// TODO
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_PROGERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_SIZERR |
+		FLASH_FLAG_PGSERR |
+		FLASH_FLAG_MISERR |
+		FLASH_FLAG_FASTERR |
+		FLASH_FLAG_RDERR |
+		FLASH_FLAG_OPTVERR |
+		FLASH_FLAG_BSY |
+		FLASH_FLAG_ECCC |
+		FLASH_FLAG_ECCD
+	);
+	if (__HAL_FLASH_GET_FLAG(FLASH_FLAG_PEMPTY) != 0)
+	{
+		__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_PEMPTY);
+	}
 	#endif
 
 	// Loop
 	uint32_t n_rows = size / c->prog_size;
 	for(uint32_t i_row = 0; i_row < n_rows; i_row++)
 	{
+		#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 		// Local variables
 		uint32_t block_base_addr = alxFs_me->lfsAddr + block * c->block_size;
 		uint32_t dest_address = block_base_addr + off + i_row * 4;		// Multiply by 4 because we write 4 bytes at the time
 		uint32_t* src_address_ptr = (uint32_t*)(buffer + i_row * 4);	// Multiply by 4 because we write 4 bytes at the time
 
 		// Program
-		#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 		HAL_StatusTypeDef xHAL_Status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, dest_address, *src_address_ptr);
 		if(xHAL_Status != HAL_OK)
 		{
@@ -301,7 +341,21 @@ static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lf
 		}
 		#endif
 		#if defined(ALX_STM32L4)
-		// TODO
+		// Local variables
+		uint32_t block_base_addr = alxFs_me->lfsAddr + block * c->block_size;
+		uint32_t dest_address = block_base_addr + off + i_row * 8;		// Multiply by 8 because we write 8 bytes at the time
+		uint64_t* src_address_ptr = (uint64_t*)(buffer + i_row * 8);	// Multiply by 8 because we write 8 bytes at the time
+
+		// Program
+		HAL_StatusTypeDef xHAL_Status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, dest_address, *src_address_ptr);
+		if(xHAL_Status != HAL_OK)
+		{
+			// Lock FLASH
+			HAL_FLASH_Lock();
+
+			// Return
+			return -1;
+		}
 		#endif
 	}
 
@@ -343,7 +397,27 @@ static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block)
 	);
 	#endif
 	#if defined(ALX_STM32L4)
-	// TODO
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_PROGERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_SIZERR |
+		FLASH_FLAG_PGSERR |
+		FLASH_FLAG_MISERR |
+		FLASH_FLAG_FASTERR |
+		FLASH_FLAG_RDERR |
+		FLASH_FLAG_OPTVERR |
+		FLASH_FLAG_BSY |
+		FLASH_FLAG_ECCC |
+		FLASH_FLAG_ECCD
+	);
+	if (__HAL_FLASH_GET_FLAG(FLASH_FLAG_PEMPTY) != 0)
+	{
+		__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_PEMPTY);
+	}
 	#endif
 
 	// Erase
@@ -368,8 +442,13 @@ static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block)
 	HAL_StatusTypeDef xHAL_Status = HAL_FLASHEx_Erase(&xErase_Config, &ulPageError);
 	#endif
 	#if defined(ALX_STM32L4)
-	HAL_StatusTypeDef xHAL_Status = HAL_ERROR;
-	// TODO
+	uint32_t ulPageError = 0;
+	FLASH_EraseInitTypeDef xErase_Config = {};
+	xErase_Config.TypeErase = FLASH_TYPEERASE_PAGES;
+	xErase_Config.Banks = FLASH_BANK_2;
+	xErase_Config.Page = block;
+	xErase_Config.NbPages = 1;
+	HAL_StatusTypeDef xHAL_Status = HAL_FLASHEx_Erase(&xErase_Config, &ulPageError);
 	#endif
 
 	// Lock FLASH
@@ -421,7 +500,14 @@ ALX_WEAK void AlxFs_Lfs_SetConfig(AlxFs* me)
 	#endif
 
 	#if defined(ALX_STM32L4)
-	// TODO
+	me->lfsAddr = 0x08100000;
+	me->lfsConfig.read_size = 1;
+	me->lfsConfig.prog_size = 8;
+	me->lfsConfig.block_size = 4 * 1024;
+	me->lfsConfig.block_count = 16;
+	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
+	me->lfsConfig.cache_size = 16;
+	me->lfsConfig.lookahead_size = 8;
 	#endif
 }
 
