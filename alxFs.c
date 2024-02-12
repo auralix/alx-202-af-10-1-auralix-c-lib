@@ -504,7 +504,7 @@ ALX_WEAK void AlxFs_Lfs_SetConfig(AlxFs* me)
 	me->lfsConfig.read_size = 1;
 	me->lfsConfig.prog_size = 8;
 	me->lfsConfig.block_size = 4 * 1024;
-	me->lfsConfig.block_count = 16;
+	me->lfsConfig.block_count = 32;
 	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
 	me->lfsConfig.cache_size = 16;
 	me->lfsConfig.lookahead_size = 8;
