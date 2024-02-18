@@ -704,6 +704,19 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 	{
 		if
 		(
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_16MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_16MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_16MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_16MHz)
+		)
+		{
+			if(16000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
+				return true;
+			else
+				return false;
+		}
+		if
+		(
 			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_160MHz) ||
 			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz) ||
 			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_160MHz) ||
@@ -720,10 +733,23 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 	{
 		if
 		(
-			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_160MHz) ||
-			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz) ||
-			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_160MHz) ||
-			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_160MHz)
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk3Apb3_16MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk3Apb3_16MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk3Apb3_16MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk3Apb3_16MHz)
+		)
+		{
+			if(16000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk3Apb3_Ctor))
+				return true;
+			else
+				return false;
+		}
+		if
+		(
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk3Apb3_160MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk3Apb3_160MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk3Apb3_160MHz) ||
+			(me->i2cClk == AlxI2c_Clk_McuStm32U5_I2c3_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk3Apb3_160MHz)
 		)
 		{
 			if(160000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk3Apb3_Ctor))

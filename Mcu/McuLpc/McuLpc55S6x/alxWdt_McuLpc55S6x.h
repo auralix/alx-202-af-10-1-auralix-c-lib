@@ -1,7 +1,7 @@
-/**
+﻿/**
   ******************************************************************************
-  * @file		alxTimSw.h
-  * @brief		Auralix C Library - ALX Timer SW Module
+  * @file		alxWdt_McuLpc55S6x.h
+  * @brief		Auralix C Library - ALX Watchdog Timer MCU LPC80X Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_TIM_SW_H
-#define ALX_TIM_SW_H
+#ifndef ALX_WDT_MCU_LPC55S6X_H
+#define ALX_WDT_MCU_LPC55S6X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,87 +42,53 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxTick.h"
+#include "alxClk.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
-
-
-//******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_TIM_SW_FILE "alxTimSw.h"
-
-// Assert //
-#if defined(ALX_TIM_SW_ASSERT_BKPT_ENABLE)
-	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_BKPT(ALX_TIM_SW_FILE, expr)
-#elif defined(ALX_TIM_SW_ASSERT_TRACE_ENABLE)
-	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_TRACE(ALX_TIM_SW_FILE, expr)
-#elif defined(ALX_TIM_SW_ASSERT_RST_ENABLE)
-	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_RST(ALX_TIM_SW_FILE, expr)
-#else
-	#define ALX_TIM_SW_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(ALX_TIM_SW_TRACE_ENABLE)
-	#define ALX_TIM_SW_TRACE(...) ALX_TRACE_STD(ALX_TIM_SW_FILE, __VA_ARGS__)
-#else
-	#define ALX_TIM_SW_TRACE(...) do{} while (false)
-#endif
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxWdt_Config_McuLpc55S6x_WdtTimeout_4000ms_WdtClk_250kHz_WdtOsc_1MHz	// TV: ATTENTION, WDT oscillator is generated from FRO_1MHz and has +/-15% tolerance!
+} AlxWdt_Config;
+
 typedef struct
 {
-	// Variables
-	uint64_t ticksStart_ns;
-	bool isRunning;
+	// Parameters
+	AlxWdt_Config config;
+	AlxClk* clk;
 
-	//Info
+	// Variables
+	wwdt_config_t wwdtConfig;
+
+	// Info
+	bool isInit;
 	bool wasCtorCalled;
-} AlxTimSw;
+} AlxWdt;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxTimSw_Ctor
+void AlxWdt_Ctor
 (
-	AlxTimSw* me,
-	bool start
+	AlxWdt* me,
+	AlxWdt_Config config,
+	AlxClk* clk
 );
 
 
-//******************************************************************************
-// Functions
-//******************************************************************************
-void AlxTimSw_Start(AlxTimSw* me);
-void AlxTimSw_Stop(AlxTimSw* me);
-bool AlxTimSw_IsRunning(AlxTimSw* me);
-uint64_t AlxTimSw_Get_ns(AlxTimSw* me);
-uint64_t AlxTimSw_Get_us(AlxTimSw* me);
-uint64_t AlxTimSw_Get_ms(AlxTimSw* me);
-uint64_t AlxTimSw_Get_sec(AlxTimSw* me);
-uint64_t AlxTimSw_Get_min(AlxTimSw* me);
-uint64_t AlxTimSw_Get_hr(AlxTimSw* me);
-bool AlxTimSw_IsTimeout_ns(AlxTimSw* me, uint64_t timeout_ns);
-bool AlxTimSw_IsTimeout_us(AlxTimSw* me, uint64_t timeout_us);
-bool AlxTimSw_IsTimeout_ms(AlxTimSw* me, uint64_t timeout_ms);
-bool AlxTimSw_IsTimeout_sec(AlxTimSw* me, uint64_t timeout_sec);
-bool AlxTimSw_IsTimeout_min(AlxTimSw* me, uint64_t timeout_min);
-bool AlxTimSw_IsTimeout_hr(AlxTimSw* me, uint64_t timeout_hr);
-
-
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_TIM_SW_H
+#endif	// #ifndef ALX_WDT_MCU_LPC55S6X_H

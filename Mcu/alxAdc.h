@@ -73,18 +73,18 @@ typedef struct { bool dummy; } AlxAdc;
 #define ALX_ADC_FILE "alxAdc.h"
 
 // Assert //
-#if defined(_ALX_ADC_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_ADC_ASSERT_BKPT_ENABLE)
 	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADC_FILE, expr)
-#elif defined(_ALX_ADC_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_ADC_ASSERT_TRACE_ENABLE)
 	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADC_FILE, expr)
-#elif defined(_ALX_ADC_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_ADC_ASSERT_RST_ENABLE)
 	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_RST(ALX_ADC_FILE, expr)
 #else
 	#define ALX_ADC_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_ADC_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_ADC_TRACE_ENABLE)
 	#define ALX_ADC_TRACE(...) ALX_TRACE_STD(ALX_ADC_FILE, __VA_ARGS__)
 #else
 	#define ALX_ADC_TRACE(...) do{} while (false)

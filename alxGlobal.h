@@ -214,18 +214,18 @@ extern "C" {
 #define ALX_GLOBAL_FILE "alxGlobal.h"
 
 // Assert //
-#if defined(_ALX_GLOBAL_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_GLOBAL_ASSERT_BKPT)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_GLOBAL_FILE, expr)
-#elif defined(_ALX_GLOBAL_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_GLOBAL_ASSERT_TRACE)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_GLOBAL_FILE, expr)
-#elif defined(_ALX_GLOBAL_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_GLOBAL_ASSERT_RST)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_RST(ALX_GLOBAL_FILE, expr)
 #else
 	#define ALX_GLOBAL_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_GLOBAL_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_GLOBAL_TRACE)
 	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_STD(ALX_GLOBAL_FILE, __VA_ARGS__)
 #else
 	#define ALX_GLOBAL_TRACE(...) do{} while (false)
@@ -360,29 +360,33 @@ typedef enum
 	#endif
 
 	#if defined(ALX_LPC80X) || defined(ALX_LPC84X)
-	AlxClk_Clk_McuLpc8xx_CoreSysClk,
+	AlxClk_Clk_McuLpc8xx_SystemCoreClock,
 	AlxClk_Clk_McuLpc8xx_MainClk,
-	AlxClk_Clk_McuLpc8xx_Fro,
-	AlxClk_Clk_McuLpc8xx_FroDiv,
+	AlxClk_Clk_McuLpc8xx_AhbClk,
+	AlxClk_Clk_McuLpc8xx_FroOsc,
 	AlxClk_Clk_McuLpc8xx_ExtClk,
-	AlxClk_Clk_McuLpc8xx_Frg0,
+	AlxClk_Clk_McuLpc8xx_WdtOsc,
 
-	AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor,
+	AlxClk_Clk_McuLpc8xx_SystemCoreClock_Ctor,
 	AlxClk_Clk_McuLpc8xx_MainClk_Ctor,
-	AlxClk_Clk_McuLpc8xx_Fro_Ctor,
-	AlxClk_Clk_McuLpc8xx_LPO_Ctor,
+	AlxClk_Clk_McuLpc8xx_AhbClk_Ctor,
+	AlxClk_Clk_McuLpc8xx_FroOsc_Ctor,
+	AlxClk_Clk_McuLpc8xx_ExtClk_Ctor,
+	AlxClk_Clk_McuLpc8xx_WdtOsc_Ctor,
 	#endif
 
 	#if defined(ALX_LPC55S6X)
 	AlxClk_Clk_McuLpc55s6x_SystemCoreClock,
-	AlxClk_Clk_McuLpc55s6x_AhbClk,
 	AlxClk_Clk_McuLpc55s6x_MainClk,
+	AlxClk_Clk_McuLpc55s6x_AhbClk,
 	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz,
+	AlxClk_Clk_McuLpc55s6x_WdtOsc,
 
 	AlxClk_Clk_McuLpc55s6x_SystemCoreClock_Ctor,
-	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor,
 	AlxClk_Clk_McuLpc55s6x_MainClk_Ctor,
+	AlxClk_Clk_McuLpc55s6x_AhbClk_Ctor,
 	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor,
+	AlxClk_Clk_McuLpc55s6x_WdtOsc_Ctor,
 	#endif
 } AlxClk_Clk;
 

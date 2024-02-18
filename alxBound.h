@@ -56,18 +56,18 @@ extern "C" {
 #define ALX_BOUND_FILE "alxBound.h"
 
 // Assert //
-#if defined(_ALX_BOUND_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_BOUND_ASSERT_BKPT_ENABLE)
 	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BOUND_FILE, expr)
-#elif defined(_ALX_BOUND_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_BOUND_ASSERT_TRACE_ENABLE)
 	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BOUND_FILE, expr)
-#elif defined(_ALX_BOUND_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_BOUND_ASSERT_RST_ENABLE)
 	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_RST(ALX_BOUND_FILE, expr)
 #else
 	#define ALX_BOUND_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_BOUND_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_BOUND_TRACE_ENABLE)
 	#define ALX_BOUND_TRACE(...) ALX_TRACE_STD(ALX_BOUND_FILE, __VA_ARGS__)
 #else
 	#define ALX_BOUND_TRACE(...) do{} while (false)

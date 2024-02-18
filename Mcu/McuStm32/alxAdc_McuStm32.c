@@ -927,6 +927,7 @@ static uint32_t AlxAdc_GetClkPrescaler(AlxAdc* me)
 	// STM32U5
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32U5)
+	if(me->adcClk == AlxAdc_Clk_McuStm32U5_AdcClk_16MHz_Hclk_16MHz)				return ADC_CLOCK_ASYNC_DIV1;
 	if(me->adcClk == AlxAdc_Clk_McuStm32U5_AdcClk_20MHz_Hclk_160MHz)			return ADC_CLOCK_ASYNC_DIV8;
 	#endif
 
@@ -1351,6 +1352,13 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 	// STM32U5
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32U5)
+	if(me->adcClk == AlxAdc_Clk_McuStm32U5_AdcClk_16MHz_Hclk_16MHz)
+	{
+		if(16000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Hclk_Ctor))
+			return true;
+		else
+			return false;
+	}
 	if(me->adcClk == AlxAdc_Clk_McuStm32U5_AdcClk_20MHz_Hclk_160MHz)
 	{
 		if(160000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Hclk_Ctor))

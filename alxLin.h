@@ -59,18 +59,18 @@ extern "C" {
 #define ALX_LIN_FILE "alxLin.h"
 
 // Assert //
-#if defined(_ALX_LIN_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
+#if defined(ALX_LIN_ASSERT_BKPT_ENABLE)
 	#define ALX_LIN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LIN_FILE, expr)
-#elif defined(_ALX_LIN_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
+#elif defined(ALX_LIN_ASSERT_TRACE_ENABLE)
 	#define ALX_LIN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LIN_FILE, expr)
-#elif defined(_ALX_LIN_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
+#elif defined(ALX_LIN_ASSERT_RST_ENABLE)
 	#define ALX_LIN_ASSERT(expr) ALX_ASSERT_RST(ALX_LIN_FILE, expr)
 #else
 	#define ALX_LIN_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_LIN_TRACE) || defined(_ALX_TRACE_ALL)
+#if defined(ALX_LIN_TRACE_ENABLE)
 	#define ALX_LIN_TRACE(...) ALX_TRACE_STD(ALX_LIN_FILE, __VA_ARGS__)
 	#define ALX_LIN_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else

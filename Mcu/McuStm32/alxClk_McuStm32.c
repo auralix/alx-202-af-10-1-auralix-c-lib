@@ -97,7 +97,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160M
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
-static bool AlxClk_Ctor_IsClkOk(AlxClk* me);
+static bool AlxClk_IsClkOk(AlxClk* me);
 static void AlxClk_Periph_Gpio_EnableClk(AlxClk* me);
 
 
@@ -297,7 +297,7 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	if(HAL_RCC_ClockConfig(&me->iclk, me->flashLatency) != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; }
 
 	// Check clocks
-	if(AlxClk_Ctor_IsClkOk(me) == false) { ALX_CLK_TRACE("Err"); return Alx_Err; }
+	if(AlxClk_IsClkOk(me) == false) { ALX_CLK_TRACE("Err"); return Alx_Err; }
 
 	// Set isInit
 	me->isInit = true;
@@ -1730,7 +1730,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160M
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
-static bool AlxClk_Ctor_IsClkOk(AlxClk* me)
+static bool AlxClk_IsClkOk(AlxClk* me)
 {
 	// Prepare
 	me->systemCoreClock = SystemCoreClock;

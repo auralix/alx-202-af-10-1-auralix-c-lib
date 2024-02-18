@@ -61,7 +61,7 @@ extern "C" {
 #include "fsl_ctimer.h"
 #include "fsl_dma.h"
 #include "fsl_flexcomm.h"
-#include "fsl_fro_calib.h"	// TV: LPC55S66 doesn't support this module, LPC55S69 does
+//#include "fsl_fro_calib.h"	// TV: LPC55S66 doesn't support this module, LPC55S69 does
 #include "fsl_gint.h"
 #include "fsl_gpio.h"
 #include "fsl_hashcrypt.h"
@@ -82,8 +82,8 @@ extern "C" {
 #include "fsl_ostimer.h"
 #include "fsl_pint.h"
 #include "fsl_plu.h"
-#include "fsl_powerquad.h"
-#include "fsl_powerquad_data.h"
+//#include "fsl_powerquad.h"		// TV: LPC55S66 doesn't support this module, LPC55S69 does
+//#include "fsl_powerquad_data.h"	// TV: LPC55S66 doesn't support this module, LPC55S69 does
 #include "fsl_power.h"
 //#include "fsl_prince.h"	// MF: error: redeclaration of enumerator 'kSECURE_FALSE'
 #include "fsl_puf.h"

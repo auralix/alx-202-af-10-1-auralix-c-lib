@@ -56,10 +56,8 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxIoPin* ioPin;
-
 	// Variables
+	AlxIoPin* ioPin;
 	pint_pin_int_t irqPin;
 	pint_pin_enable_t irqType;
 	Alx_IrqPriority irqPriority;

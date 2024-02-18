@@ -52,8 +52,13 @@ def Script(vsSolDir):
 	# Set build hash from GIT hash
 	cmdHash = "git --git-dir=" + str(gitDir) + "\.git rev-parse HEAD"
 	cmdHashCompletedObj = subprocess.run(cmdHash, capture_output=True)
-	_hash = cmdHashCompletedObj.stdout.decode().rstrip('\n')
-	hashShort = _hash[0:7]
+	if cmdHashCompletedObj.returncode == 0:
+		_hash = cmdHashCompletedObj.stdout.decode().rstrip('\n')
+		hashShort = _hash[0:7]
+	else:
+		print("alxBuild.py - Not a GIT repo, hash could not be set")
+		_hash = "abcdefabcdefabcdefabcdefabcdefabcdefabcd"
+		hashShort = "abcdefa"
 	print("alxBuild.py - buildHash: " + _hash)
 	print("alxBuild.py - buildHashShort: " + hashShort)
 
@@ -79,6 +84,7 @@ def Script(vsSolDir):
 			raise
 	except:
 		print("alxBuild.py - fwVer: No valid GIT tag, FW version could not be set")
+		tag ="v0.0.0"
 		fwVerMajorStr = "0"
 		fwVerMinorStr = "0"
 		fwVerPatchStr = "0"

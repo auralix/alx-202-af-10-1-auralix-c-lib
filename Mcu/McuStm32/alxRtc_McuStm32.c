@@ -271,7 +271,7 @@ Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 	// Assert
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
 	ALX_RTC_ASSERT(me->isInit == true);
-	ALX_RTC_ASSERT(dateTime.yr <= 99)
+	ALX_RTC_ASSERT(dateTime.yr <= 99);
 	ALX_RTC_ASSERT((1 <= dateTime.mo) && (dateTime.mo <= 12));
 	ALX_RTC_ASSERT((1 <= dateTime.day) && (dateTime.day <= 31));
 	ALX_RTC_ASSERT((1 <= dateTime.weekDay) && (dateTime.weekDay <= 7));

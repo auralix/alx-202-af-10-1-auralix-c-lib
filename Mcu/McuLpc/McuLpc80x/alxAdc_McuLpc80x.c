@@ -332,7 +332,7 @@ static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me)
 	// LPC80X
 	//------------------------------------------------------------------------------
 	#if defined(ALX_LPC80X)
-	if (15000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor))
+	if (15000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc8xx_AhbClk_Ctor))
 		return true;
 	else
 		return false;
@@ -346,7 +346,7 @@ static bool AlxAdc_Ctor_IsSysClkOk(AlxAdc* me)
 	// LPC84X
 	//------------------------------------------------------------------------------
 	#if defined(ALX_LPC84X)
-	if (30000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc8xx_CoreSysClk_Ctor))
+	if (30000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuLpc8xx_AhbClk_Ctor))
 		return true;
 	else
 		return false;

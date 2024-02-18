@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_V_DIV_H
-#define ALX_V_DIV_H
+#ifndef ALX_VDIV_H
+#define ALX_VDIV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +42,6 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxTimSw.h"
 
 
 //******************************************************************************
@@ -54,24 +53,24 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_V_DIV_FILE "alxVdiv.h"
+#define ALX_VDIV_FILE "alxVdiv.h"
 
 // Assert //
-#if defined(_ALX_V_DIV_ASSERT_BKPT) || defined(_ALX_ASSERT_BKPT_ALL)
-	#define ALX_V_DIV_ASSERT(expr) ALX_ASSERT_BKPT(ALX_V_DIV_FILE, expr)
-#elif defined(_ALX_V_DIV_ASSERT_TRACE) || defined(_ALX_ASSERT_TRACE_ALL)
-	#define ALX_V_DIV_ASSERT(expr) ALX_ASSERT_TRACE(ALX_V_DIV_FILE, expr)
-#elif defined(_ALX_V_DIV_ASSERT_RST) || defined(_ALX_ASSERT_RST_ALL)
-	#define ALX_V_DIV_ASSERT(expr) ALX_ASSERT_RST(ALX_V_DIV_FILE, expr)
+#if defined(ALX_VDIV_ASSERT_BKPT_ENABLE)
+	#define ALX_VDIV_ASSERT(expr) ALX_ASSERT_BKPT(ALX_VDIV_FILE, expr)
+#elif defined(ALX_VDIV_ASSERT_TRACE_ENABLE)
+	#define ALX_VDIV_ASSERT(expr) ALX_ASSERT_TRACE(ALX_VDIV_FILE, expr)
+#elif defined(ALX_VDIV_ASSERT_RST_ENABLE)
+	#define ALX_VDIV_ASSERT(expr) ALX_ASSERT_RST(ALX_VDIV_FILE, expr)
 #else
-	#define ALX_V_DIV_ASSERT(expr) do{} while (false)
+	#define ALX_VDIV_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(_ALX_V_DIV_TRACE) || defined(_ALX_TRACE_ALL)
-	#define ALX_V_DIV_TRACE(...) ALX_TRACE_STD(ALX_V_DIV_FILE, __VA_ARGS__)
+#if defined(ALX_VDIV_TRACE_ENABLE)
+	#define ALX_VDIV_TRACE(...) ALX_TRACE_STD(ALX_VDIV_FILE, __VA_ARGS__)
 #else
-	#define ALX_V_DIV_TRACE(...) do{} while (false)
+	#define ALX_VDIV_TRACE(...) do{} while (false)
 #endif
 
 
@@ -95,4 +94,4 @@ uint32_t AlxVdiv_GetCurrent_uA(uint32_t vout_uV, uint32_t resLow_ohm);
 }
 #endif
 
-#endif	// #ifndef ALX_V_DIV_H
+#endif	// #ifndef ALX_VDIV_H
