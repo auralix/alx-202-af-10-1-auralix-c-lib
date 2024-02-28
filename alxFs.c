@@ -465,7 +465,6 @@ static int AlxFs_Lfs_SyncBlock(const struct lfs_config* c)
 	// Return
 	return 0;
 }
-
 #ifdef LFS_THREADSAFE
 static int AlxFs_Lfs_Lock(const struct lfs_config* c)
 {
@@ -486,6 +485,7 @@ static int AlxFs_Lfs_Unlock(const struct lfs_config* c)
 }
 #endif
 
+
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
@@ -499,6 +499,7 @@ ALX_WEAK void AlxFs_Lfs_SetConfig(AlxFs* me)
 	me->lfsConfig.lock = AlxFs_Lfs_Lock;
 	me->lfsConfig.unlock = AlxFs_Lfs_Unlock;
 	#endif
+
 	#if defined(ALX_STM32F4)
 	me->lfsAddr = 0x08100000;
 	me->lfsConfig.read_size = 1;
