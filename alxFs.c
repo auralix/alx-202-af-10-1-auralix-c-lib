@@ -82,7 +82,7 @@ void AlxFs_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-int32_t AlxFs_Mount(AlxFs* me)
+Alx_Status AlxFs_Mount(AlxFs* me)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -90,15 +90,15 @@ int32_t AlxFs_Mount(AlxFs* me)
 
 	// Mount
 	int32_t status = lfs_mount(&me->lfs, &me->lfsConfig);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Set isMounted
 	me->isMounted = true;
 
 	// Return
-	return status;
+	return Alx_Ok;
 }
-int32_t AlxFs_UnMount(AlxFs* me)
+Alx_Status AlxFs_UnMount(AlxFs* me)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -106,15 +106,15 @@ int32_t AlxFs_UnMount(AlxFs* me)
 
 	// UnMount
 	int32_t status = lfs_unmount(&me->lfs);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Clear isMounted
 	me->isMounted = false;
 
 	// Return
-	return status;
+	return Alx_Ok;
 }
-int32_t AlxFs_Format(AlxFs* me)
+Alx_Status AlxFs_Format(AlxFs* me)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -122,12 +122,12 @@ int32_t AlxFs_Format(AlxFs* me)
 
 	// Format
 	int32_t status = lfs_format(&me->lfs, &me->lfsConfig);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return status;
+	return Alx_Ok;
 }
-int32_t AlxFs_Remove(AlxFs* me, const char* path)
+Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -135,12 +135,12 @@ int32_t AlxFs_Remove(AlxFs* me, const char* path)
 
 	// Remove file/directory
 	int32_t status = lfs_remove(&me->lfs, path);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return status;
+	return Alx_Ok;
 }
-int32_t AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags)
+Alx_Status AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -148,12 +148,12 @@ int32_t AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t fl
 
 	// Open file
 	int32_t status = lfs_file_open(&me->lfs, &file->lsfFile, path, flags);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return status;
+	return Alx_Ok;
 }
-int32_t AlxFs_FileClose(AlxFs* me, AlxFs_File* file)
+Alx_Status AlxFs_FileClose(AlxFs* me, AlxFs_File* file)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -161,10 +161,10 @@ int32_t AlxFs_FileClose(AlxFs* me, AlxFs_File* file)
 
 	// Close file
 	int32_t status = lfs_file_close(&me->lfs, &file->lsfFile);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return status;
+	return Alx_Ok;
 }
 int32_t AlxFs_FileRead(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
 {
@@ -192,19 +192,19 @@ int32_t AlxFs_FileWrite(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
 	// Return
 	return statusActualLen;
 }
-int32_t AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
-{
-	// Assert
-	ALX_FS_ASSERT(me->wasCtorCalled == true);
-	ALX_FS_ASSERT(me->isMounted == true);
-
-	// Close file
-	int32_t status = lfs_file_sync(&me->lfs, &file->lsfFile);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
-
-	// Return
-	return status;
-}
+//int32_t AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
+//{
+//	// Assert
+//	ALX_FS_ASSERT(me->wasCtorCalled == true);
+//	ALX_FS_ASSERT(me->isMounted == true);
+//
+//	// Close file
+//	int32_t status = lfs_file_sync(&me->lfs, &file->lsfFile);
+//	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+//
+//	// Return
+//	return status;
+//}
 
 
 //******************************************************************************

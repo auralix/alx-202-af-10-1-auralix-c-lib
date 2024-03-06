@@ -113,12 +113,12 @@ void AlxFs_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-int32_t AlxFs_Mount(AlxFs* me);
-int32_t AlxFs_UnMount(AlxFs* me);
-int32_t AlxFs_Format(AlxFs* me);
-int32_t AlxFs_Remove(AlxFs* me, const char* path);
-int32_t AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags);
-int32_t AlxFs_FileClose(AlxFs* me, AlxFs_File* file);
+Alx_Status AlxFs_Mount(AlxFs* me);
+Alx_Status AlxFs_UnMount(AlxFs* me);
+Alx_Status AlxFs_Format(AlxFs* me);
+Alx_Status AlxFs_Remove(AlxFs* me, const char* path);
+Alx_Status AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags);
+Alx_Status AlxFs_FileClose(AlxFs* me, AlxFs_File* file);
 int32_t AlxFs_FileRead(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
 int32_t AlxFs_FileWrite(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
 
