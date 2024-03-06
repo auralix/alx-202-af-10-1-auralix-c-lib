@@ -192,6 +192,19 @@ int32_t AlxFs_FileWrite(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
 	// Return
 	return statusActualLen;
 }
+int32_t AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Close file
+	int32_t status = lfs_file_sync(&me->lfs, &file->lsfFile);
+	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+
+	// Return
+	return status;
+}
 
 
 //******************************************************************************
