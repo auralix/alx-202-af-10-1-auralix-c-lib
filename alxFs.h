@@ -117,10 +117,10 @@ Alx_Status AlxFs_Mount(AlxFs* me);
 Alx_Status AlxFs_UnMount(AlxFs* me);
 Alx_Status AlxFs_Format(AlxFs* me);
 Alx_Status AlxFs_Remove(AlxFs* me, const char* path);
-Alx_Status AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags);
-Alx_Status AlxFs_FileClose(AlxFs* me, AlxFs_File* file);
-int32_t AlxFs_FileRead(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
-int32_t AlxFs_FileWrite(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
+Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags);
+Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file);
+int32_t AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
+int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))

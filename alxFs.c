@@ -140,7 +140,7 @@ Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags)
+Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -153,7 +153,7 @@ Alx_Status AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_FileClose(AlxFs* me, AlxFs_File* file)
+Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -166,7 +166,7 @@ Alx_Status AlxFs_FileClose(AlxFs* me, AlxFs_File* file)
 	// Return
 	return Alx_Ok;
 }
-int32_t AlxFs_FileRead(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
+int32_t AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -179,7 +179,7 @@ int32_t AlxFs_FileRead(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
 	// Return
 	return statusActualLen;
 }
-int32_t AlxFs_FileWrite(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
+int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);

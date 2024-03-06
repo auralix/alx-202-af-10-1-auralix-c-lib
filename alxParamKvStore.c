@@ -116,15 +116,15 @@ Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* buff,
 	int64_t statusActualLen = -1;
 
 	// Open File
-	status = AlxFs_FileOpen(me->fs, &file, key, LFS_O_RDONLY);
+	status = AlxFs_File_Open(me->fs, &file, key, LFS_O_RDONLY);
 	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Read File
-	statusActualLen = AlxFs_FileRead(me->fs, &file, buff, len);
+	statusActualLen = AlxFs_File_Read(me->fs, &file, buff, len);
 	if(statusActualLen < 0) { ALX_PARAM_KV_STORE_TRACE("Err"); return Alx_Err; }
 
 	// Close File
-	status = AlxFs_FileClose(me->fs, &file);
+	status = AlxFs_File_Close(me->fs, &file);
 	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Return
@@ -145,15 +145,15 @@ Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* buff,
 	int64_t statusActualLen = -1;
 
 	// Open File
-	status = AlxFs_FileOpen(me->fs, &file, key, LFS_O_WRONLY | LFS_O_CREAT);
+	status = AlxFs_File_Open(me->fs, &file, key, LFS_O_WRONLY | LFS_O_CREAT);
 	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Write File
-	statusActualLen = AlxFs_FileWrite(me->fs, &file, buff, len);
+	statusActualLen = AlxFs_File_Write(me->fs, &file, buff, len);
 	if(statusActualLen != len) { ALX_PARAM_KV_STORE_TRACE("Err"); return Alx_Err; }
 
 	// Close File
-	status = AlxFs_FileClose(me->fs, &file);
+	status = AlxFs_File_Close(me->fs, &file);
 	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Return
