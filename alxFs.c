@@ -88,7 +88,7 @@ Alx_Status AlxFs_Mount(AlxFs* me)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	// isMounted -> Don't care
 
-	// Mount
+	// Do
 	int32_t status = lfs_mount(&me->lfs, &me->lfsConfig);
 	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
@@ -104,7 +104,7 @@ Alx_Status AlxFs_UnMount(AlxFs* me)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	// isMounted -> Don't care
 
-	// UnMount
+	// Do
 	int32_t status = lfs_unmount(&me->lfs);
 	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
@@ -120,7 +120,7 @@ Alx_Status AlxFs_Format(AlxFs* me)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	// isMounted -> Don't care
 
-	// Format
+	// Do
 	int32_t status = lfs_format(&me->lfs, &me->lfsConfig);
 	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
@@ -133,7 +133,7 @@ Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Remove file/directory
+	// Do
 	int32_t status = lfs_remove(&me->lfs, path);
 	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
@@ -146,7 +146,7 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, int32_
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Open file
+	// Do
 	int32_t status = lfs_file_open(&me->lfs, &file->lsfFile, path, flags);
 	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
@@ -159,7 +159,7 @@ Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Close file
+	// Do
 	int32_t status = lfs_file_close(&me->lfs, &file->lsfFile);
 	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
@@ -172,7 +172,7 @@ int32_t AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Read file
+	// Do
 	int64_t statusActualLen = lfs_file_read(&me->lfs, &file->lsfFile, buff, len);
 	if(statusActualLen < 0) { ALX_FS_TRACE("Err"); return statusActualLen; }
 
@@ -185,26 +185,65 @@ int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Write file
+	// Do
 	int64_t statusActualLen = lfs_file_write(&me->lfs, &file->lsfFile, buff, len);
 	if(statusActualLen != len) { ALX_FS_TRACE("Err"); return statusActualLen; }
 
 	// Return
 	return statusActualLen;
 }
-//int32_t AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
-//{
-//	// Assert
-//	ALX_FS_ASSERT(me->wasCtorCalled == true);
-//	ALX_FS_ASSERT(me->isMounted == true);
-//
-//	// Close file
-//	int32_t status = lfs_file_sync(&me->lfs, &file->lsfFile);
-//	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
-//
-//	// Return
-//	return status;
-//}
+Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int32_t status = lfs_file_sync(&me->lfs, &file->lsfFile);
+	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+int32_t AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, int32_t whence)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int32_t statusNewFilePosition = lfs_file_seek(&me->lfs, &file->lsfFile, offset, whence);
+	if(statusNewFilePosition < 0) { ALX_FS_TRACE("Err"); return statusNewFilePosition; }
+
+	// Return
+	return statusNewFilePosition;
+}
+int32_t AlxFs_File_Tell(AlxFs* me, AlxFs_File* file)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int32_t statusCurrentFilePosition = lfs_file_tell(&me->lfs, &file->lsfFile);
+	if(statusCurrentFilePosition < 0) { ALX_FS_TRACE("Err"); return statusCurrentFilePosition; }
+
+	// Return
+	return statusCurrentFilePosition;
+}
+int32_t AlxFs_File_Size(AlxFs* me, AlxFs_File* file)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int32_t statusFileSize = lfs_file_size(&me->lfs, &file->lsfFile);
+	if(statusFileSize < 0) { ALX_FS_TRACE("Err"); return statusFileSize; }
+
+	// Return
+	return statusFileSize;
+}
 
 
 //******************************************************************************

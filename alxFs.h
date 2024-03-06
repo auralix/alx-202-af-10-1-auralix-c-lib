@@ -121,6 +121,10 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, int32_
 Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file);
 int32_t AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
 int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
+Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file);
+int32_t AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, int32_t whence);
+int32_t AlxFs_File_Tell(AlxFs* me, AlxFs_File* file);
+int32_t AlxFs_File_Size(AlxFs* me, AlxFs_File* file);
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
