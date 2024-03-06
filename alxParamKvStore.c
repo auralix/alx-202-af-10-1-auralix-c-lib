@@ -60,7 +60,6 @@ void AlxParamKvStore_Ctor
 //******************************************************************************
 Alx_Status AlxParamKvStore_Init(AlxParamKvStore* me)
 {
-	#if defined(ALX_LFS)
 	// Assert
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_KV_STORE_ASSERT(me->isInit == false);
@@ -83,11 +82,9 @@ Alx_Status AlxParamKvStore_Init(AlxParamKvStore* me)
 
 	// Return
 	return Alx_Ok;
-	#endif
 }
 Alx_Status AlxParamKvStore_DeInit(AlxParamKvStore* me)
 {
-	#if defined(ALX_LFS)
 	// Assert
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_KV_STORE_ASSERT(me->isInit == true);
@@ -101,11 +98,9 @@ Alx_Status AlxParamKvStore_DeInit(AlxParamKvStore* me)
 
 	// Return
 	return Alx_Ok;
-	#endif
 }
 Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* buff, uint32_t len, uint32_t* actualLen)
 {
-	#if defined(ALX_LFS)
 	// Assert
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_KV_STORE_ASSERT(me->isInit == true);
@@ -116,7 +111,7 @@ Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* buff,
 	int64_t statusActualLen = -1;
 
 	// Open File
-	status = AlxFs_File_Open(me->fs, &file, key, LFS_O_RDONLY);
+	status = AlxFs_File_Open(me->fs, &file, key, "r");
 	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Read File
@@ -130,11 +125,9 @@ Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* buff,
 	// Return
 	*actualLen = (uint32_t)statusActualLen;
 	return Alx_Ok;
-	#endif
 }
 Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* buff, uint32_t len)
 {
-	#if defined(ALX_LFS)
 	// Assert
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_KV_STORE_ASSERT(me->isInit == true);
@@ -145,7 +138,7 @@ Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* buff,
 	int64_t statusActualLen = -1;
 
 	// Open File
-	status = AlxFs_File_Open(me->fs, &file, key, LFS_O_WRONLY | LFS_O_CREAT);
+	status = AlxFs_File_Open(me->fs, &file, key, "w");
 	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Write File
@@ -158,11 +151,9 @@ Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* buff,
 
 	// Return
 	return Alx_Ok;
-	#endif
 }
 Alx_Status AlxParamKvStore_Remove(AlxParamKvStore* me, const char* key)
 {
-	#if defined(ALX_LFS)
 	// Assert
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_KV_STORE_ASSERT(me->isInit == true);
@@ -173,8 +164,7 @@ Alx_Status AlxParamKvStore_Remove(AlxParamKvStore* me, const char* key)
 
 	// Return
 	return Alx_Ok;
-	#endif
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS)
+#endif	// #if defined(ALX_C_LIB)

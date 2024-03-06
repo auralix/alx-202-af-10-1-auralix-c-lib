@@ -117,7 +117,7 @@ Alx_Status AlxFs_Mount(AlxFs* me);
 Alx_Status AlxFs_UnMount(AlxFs* me);
 Alx_Status AlxFs_Format(AlxFs* me);
 Alx_Status AlxFs_Remove(AlxFs* me, const char* path);
-Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags);
+Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const char* mode);
 Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file);
 int32_t AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
 int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);

@@ -140,14 +140,33 @@ Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags)
+Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const char* mode)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Set mode flags
+	int32_t modeFlags = 0;
+	if (0 == strcmp(mode, "r"))
+	{
+		modeFlags = LFS_O_RDONLY;
+	}
+	else if (0 == strcmp(mode, "w"))
+	{
+		modeFlags = LFS_O_WRONLY | LFS_O_CREAT;
+	}
+	else if (0 == strcmp(mode, "a"))
+	{
+		modeFlags = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND;
+	}
+	else
+	{
+		ALX_FS_ASSERT(false);	// We should never get here
+	}
+
 	// Do
-	int32_t status = lfs_file_open(&me->lfs, &file->lsfFile, path, flags);
+	int32_t status = lfs_file_open(&me->lfs, &file->lsfFile, path, modeFlags);
 	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
