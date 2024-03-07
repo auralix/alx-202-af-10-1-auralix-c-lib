@@ -83,6 +83,12 @@ typedef struct { bool dummy; } AlxFs;
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxFs_Config_Lfs_FlashInt,
+	AlxFs_Config_Lfs_Mmc
+} AlxFs_Config;
+
 typedef struct
 {
 	lfs_file_t lsfFile;
@@ -90,6 +96,10 @@ typedef struct
 
 typedef struct
 {
+	// Parameters
+	void* alxBlockDevice;
+	AlxFs_Config config;
+
 	// Variables
 	lfs_t lfs;
 	uint32_t lfsAddr;
@@ -106,7 +116,9 @@ typedef struct
 //******************************************************************************
 void AlxFs_Ctor
 (
-	AlxFs* me
+	AlxFs* me,
+	void* alxBlockDevice,
+	AlxFs_Config config
 );
 
 

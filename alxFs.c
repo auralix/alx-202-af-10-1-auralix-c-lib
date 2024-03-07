@@ -46,16 +46,30 @@ static AlxFs* alxFs_me = NULL;
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static int AlxFs_Lfs_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size);
-static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
-static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block);
-static int AlxFs_Lfs_SyncBlock(const struct lfs_config* c);
 
 
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
-void AlxFs_Lfs_SetConfig(AlxFs* me);
+//------------------------------------------------------------------------------
+// Flash - Internal
+//------------------------------------------------------------------------------
+static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me);
+static int AlxFs_Lfs_FlashInt_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size);
+static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
+static int AlxFs_Lfs_FlashInt_EraseBlock(const struct lfs_config* c, lfs_block_t block);
+static int AlxFs_Lfs_FlashInt_SyncBlock(const struct lfs_config* c);
+static int AlxFs_Lfs_FlashInt_Lock(const struct lfs_config* c);
+static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c);
+
+
+//------------------------------------------------------------------------------
+// MMC
+//------------------------------------------------------------------------------
+static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me);
+static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size);
+static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
+static int AlxFs_Lfs_Mmc_EraseBlock(const struct lfs_config* c, lfs_block_t block);
+static int AlxFs_Lfs_Mmc_SyncBlock(const struct lfs_config* c);
+static int AlxFs_Lfs_Mmc_Lock(const struct lfs_config* c);
+static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c);
 
 
 //******************************************************************************
@@ -63,15 +77,22 @@ void AlxFs_Lfs_SetConfig(AlxFs* me);
 //******************************************************************************
 void AlxFs_Ctor
 (
-	AlxFs* me
+	AlxFs* me,
+	void* alxBlockDevice,
+	AlxFs_Config config
 )
 {
 	// Private Variables
 	alxFs_me = me;
 
+	// Parameters
+	me->alxBlockDevice = alxBlockDevice;
+	me->config = config;
+
 	// Variables
-	memset(&me->lfs, 0, sizeof(me->lfs));
-	AlxFs_Lfs_SetConfig(me);
+	if		(me->config == AlxFs_Config_Lfs_FlashInt)	{ AlxFs_Lfs_FlashInt_Ctor(me);	}
+	else if	(me->config == AlxFs_Config_Lfs_Mmc)		{ AlxFs_Lfs_Mmc_Ctor(me);		}
+	else												{ ALX_FS_ASSERT(false);			}	// We should never get here
 
 	// Info
 	me->wasCtorCalled = true;
@@ -268,7 +289,56 @@ int32_t AlxFs_File_Size(AlxFs* me, AlxFs_File* file)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static int AlxFs_Lfs_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size)
+
+
+//------------------------------------------------------------------------------
+// Flash - Internal
+//------------------------------------------------------------------------------
+static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me)
+{
+	memset(&me->lfs, 0, sizeof(me->lfs));
+
+	me->lfsConfig.read  = AlxFs_Lfs_FlashInt_ReadBlock;
+	me->lfsConfig.prog  = AlxFs_Lfs_FlashInt_ProgBlock;
+	me->lfsConfig.erase = AlxFs_Lfs_FlashInt_EraseBlock;
+	me->lfsConfig.sync  = AlxFs_Lfs_FlashInt_SyncBlock;
+	me->lfsConfig.lock = AlxFs_Lfs_FlashInt_Lock;
+	me->lfsConfig.unlock = AlxFs_Lfs_FlashInt_Unlock;
+
+	#if defined(ALX_STM32F4)
+	me->lfsAddr = 0x08100000;
+	me->lfsConfig.read_size = 1;
+	me->lfsConfig.prog_size = 4;
+	me->lfsConfig.block_size = 16 * 1024;
+	me->lfsConfig.block_count = 4;
+	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
+	me->lfsConfig.cache_size = 16;
+	me->lfsConfig.lookahead_size = 8;
+	#endif
+
+	#if defined(ALX_STM32F7)
+	me->lfsAddr = 0x08180000;
+	me->lfsConfig.read_size = 1;
+	me->lfsConfig.prog_size = 4;
+	me->lfsConfig.block_size = 256 * 1024;
+	me->lfsConfig.block_count = 2;
+	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
+	me->lfsConfig.cache_size = 16;
+	me->lfsConfig.lookahead_size = 8;
+	#endif
+
+	#if defined(ALX_STM32L4)
+	me->lfsAddr = 0x08100000;
+	me->lfsConfig.read_size = 1;
+	me->lfsConfig.prog_size = 8;
+	me->lfsConfig.block_size = 4 * 1024;
+	me->lfsConfig.block_count = 32;
+	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
+	me->lfsConfig.cache_size = 16;
+	me->lfsConfig.lookahead_size = 8;
+	#endif
+}
+static int AlxFs_Lfs_FlashInt_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size)
 {
 	// Unlock FLASH
 	HAL_FLASH_Unlock();
@@ -335,7 +405,7 @@ static int AlxFs_Lfs_ReadBlock(const struct lfs_config* c, lfs_block_t block, lf
 	// Return
 	return 0;
 }
-static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size)
+static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size)
 {
 	// Unlock FLASH
 	HAL_FLASH_Unlock();
@@ -436,7 +506,7 @@ static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lf
 	// Return
 	return 0;
 }
-static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block)
+static int AlxFs_Lfs_FlashInt_EraseBlock(const struct lfs_config* c, lfs_block_t block)
 {
 	// Unlock FLASH
 	HAL_FLASH_Unlock();
@@ -528,7 +598,7 @@ static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block)
 	// Return
 	return xHAL_Status == HAL_OK ? 0 : -1;
 }
-static int AlxFs_Lfs_SyncBlock(const struct lfs_config* c)
+static int AlxFs_Lfs_FlashInt_SyncBlock(const struct lfs_config* c)
 {
 	// Local variables
 	(void)c;
@@ -536,8 +606,15 @@ static int AlxFs_Lfs_SyncBlock(const struct lfs_config* c)
 	// Return
 	return 0;
 }
-#ifdef LFS_THREADSAFE
-static int AlxFs_Lfs_Lock(const struct lfs_config* c)
+static int AlxFs_Lfs_FlashInt_Lock(const struct lfs_config* c)
+{
+	// Local variables
+	(void)c;
+
+	// Return
+	return 0;
+}
+static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c)
 {
 	// Local variables
 	(void)c;
@@ -546,7 +623,22 @@ static int AlxFs_Lfs_Lock(const struct lfs_config* c)
 	return 0;
 }
 
-static int AlxFs_Lfs_Unlock(const struct lfs_config* c)
+
+//------------------------------------------------------------------------------
+// MMC
+//------------------------------------------------------------------------------
+static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
+{
+	memset(&me->lfs, 0, sizeof(me->lfs));
+
+	me->lfsConfig.read  = AlxFs_Lfs_Mmc_ReadBlock;
+	me->lfsConfig.prog  = AlxFs_Lfs_Mmc_ProgBlock;
+	me->lfsConfig.erase = AlxFs_Lfs_Mmc_EraseBlock;
+	me->lfsConfig.sync  = AlxFs_Lfs_Mmc_SyncBlock;
+	me->lfsConfig.lock = AlxFs_Lfs_Mmc_Lock;
+	me->lfsConfig.unlock = AlxFs_Lfs_Mmc_Unlock;
+}
+static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size)
 {
 	// Local variables
 	(void)c;
@@ -554,55 +646,45 @@ static int AlxFs_Lfs_Unlock(const struct lfs_config* c)
 	// Return
 	return 0;
 }
-#endif
-
-
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
-ALX_WEAK void AlxFs_Lfs_SetConfig(AlxFs* me)
+static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size)
 {
-	me->lfsConfig.read  = AlxFs_Lfs_ReadBlock;
-	me->lfsConfig.prog  = AlxFs_Lfs_ProgBlock;
-	me->lfsConfig.erase = AlxFs_Lfs_EraseBlock;
-	me->lfsConfig.sync  = AlxFs_Lfs_SyncBlock;
-	#ifdef LFS_THREADSAFE
-	me->lfsConfig.lock = AlxFs_Lfs_Lock;
-	me->lfsConfig.unlock = AlxFs_Lfs_Unlock;
-	#endif
+	// Local variables
+	(void)c;
 
-	#if defined(ALX_STM32F4)
-	me->lfsAddr = 0x08100000;
-	me->lfsConfig.read_size = 1;
-	me->lfsConfig.prog_size = 4;
-	me->lfsConfig.block_size = 16 * 1024;
-	me->lfsConfig.block_count = 4;
-	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
-	me->lfsConfig.cache_size = 16;
-	me->lfsConfig.lookahead_size = 8;
-	#endif
+	// Return
+	return 0;
+}
+static int AlxFs_Lfs_Mmc_EraseBlock(const struct lfs_config* c, lfs_block_t block)
+{
+	// Local variables
+	(void)c;
 
-	#if defined(ALX_STM32F7)
-	me->lfsAddr = 0x08180000;
-	me->lfsConfig.read_size = 1;
-	me->lfsConfig.prog_size = 4;
-	me->lfsConfig.block_size = 256 * 1024;
-	me->lfsConfig.block_count = 2;
-	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
-	me->lfsConfig.cache_size = 16;
-	me->lfsConfig.lookahead_size = 8;
-	#endif
+	// Return
+	return 0;
+}
+static int AlxFs_Lfs_Mmc_SyncBlock(const struct lfs_config* c)
+{
+	// Local variables
+	(void)c;
 
-	#if defined(ALX_STM32L4)
-	me->lfsAddr = 0x08100000;
-	me->lfsConfig.read_size = 1;
-	me->lfsConfig.prog_size = 8;
-	me->lfsConfig.block_size = 4 * 1024;
-	me->lfsConfig.block_count = 32;
-	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
-	me->lfsConfig.cache_size = 16;
-	me->lfsConfig.lookahead_size = 8;
-	#endif
+	// Return
+	return 0;
+}
+static int AlxFs_Lfs_Mmc_Lock(const struct lfs_config* c)
+{
+	// Local variables
+	(void)c;
+
+	// Return
+	return 0;
+}
+static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c)
+{
+	// Local variables
+	(void)c;
+
+	// Return
+	return 0;
 }
 
 
