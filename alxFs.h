@@ -42,18 +42,16 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxMmc.h"
 #if defined(ALX_LFS)
 #include "lfs.h"
-#else
-typedef struct { bool dummy; } AlxFs_File;
-typedef struct { bool dummy; } AlxFs;
 #endif
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -91,19 +89,24 @@ typedef enum
 
 typedef struct
 {
+	#if defined(ALX_LFS)
 	lfs_file_t lsfFile;
+	#endif
+	bool dummy;
 } AlxFs_File;
 
 typedef struct
 {
 	// Parameters
-	void* alxBlockDevice;
 	AlxFs_Config config;
+	AlxMmc* alxMmc;
 
 	// Variables
+	#if defined(ALX_LFS)
 	lfs_t lfs;
-	uint32_t lfsAddr;
 	struct lfs_config lfsConfig;
+	#endif
+	uint32_t lfsAddr;
 
 	// Info
 	bool wasCtorCalled;
@@ -117,8 +120,8 @@ typedef struct
 void AlxFs_Ctor
 (
 	AlxFs* me,
-	void* alxBlockDevice,
-	AlxFs_Config config
+	AlxFs_Config config,
+	AlxMmc* alxMmc
 );
 
 
@@ -139,7 +142,7 @@ int32_t AlxFs_File_Tell(AlxFs* me, AlxFs_File* file);
 int32_t AlxFs_File_Size(AlxFs* me, AlxFs_File* file);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }
