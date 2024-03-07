@@ -213,7 +213,7 @@ int32_t AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	int64_t statusActualLen = lfs_file_read(&me->lfs, &file->lsfFile, buff, len);
+	int32_t statusActualLen = lfs_file_read(&me->lfs, &file->lsfFile, buff, len);
 	if(statusActualLen < 0) { ALX_FS_TRACE("Err"); return statusActualLen; }
 
 	// Return
@@ -226,7 +226,7 @@ int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	int64_t statusActualLen = lfs_file_write(&me->lfs, &file->lsfFile, buff, len);
+	int32_t statusActualLen = lfs_file_write(&me->lfs, &file->lsfFile, buff, len);
 	if(statusActualLen != len) { ALX_FS_TRACE("Err"); return statusActualLen; }
 
 	// Return
