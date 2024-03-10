@@ -200,7 +200,7 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const 
 	}
 
 	// Do
-	int status = lfs_file_open(&me->lfs, &file->lsfFile, path, modeFlags);
+	int status = lfs_file_open(&me->lfs, &file->lfsFile, path, modeFlags);
 	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
@@ -213,7 +213,7 @@ Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file)
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	int status = lfs_file_close(&me->lfs, &file->lsfFile);
+	int status = lfs_file_close(&me->lfs, &file->lfsFile);
 	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
@@ -226,7 +226,7 @@ Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	lfs_ssize_t statusLenActual = lfs_file_read(&me->lfs, &file->lsfFile, data, (lfs_size_t)lenMax);
+	lfs_ssize_t statusLenActual = lfs_file_read(&me->lfs, &file->lfsFile, data, (lfs_size_t)lenMax);
 	if(statusLenActual < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
@@ -290,7 +290,7 @@ Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t le
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	lfs_ssize_t statusLenActual = lfs_file_write(&me->lfs, &file->lsfFile, data, (lfs_size_t)len);
+	lfs_ssize_t statusLenActual = lfs_file_write(&me->lfs, &file->lfsFile, data, (lfs_size_t)len);
 	if(statusLenActual != (lfs_ssize_t)len) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
@@ -312,7 +312,7 @@ Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	int status = lfs_file_sync(&me->lfs, &file->lsfFile);
+	int status = lfs_file_sync(&me->lfs, &file->lfsFile);
 	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
@@ -325,7 +325,7 @@ Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, uint32_t offset, AlxFs_F
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	lfs_soff_t statusFilePositionNew = lfs_file_seek(&me->lfs, &file->lsfFile, (lfs_soff_t)offset, (int)origin);
+	lfs_soff_t statusFilePositionNew = lfs_file_seek(&me->lfs, &file->lfsFile, (lfs_soff_t)offset, (int)origin);
 	if(statusFilePositionNew < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
@@ -339,7 +339,7 @@ Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* filePositionCu
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	lfs_soff_t statusFilePositionCurrent = lfs_file_tell(&me->lfs, &file->lsfFile);
+	lfs_soff_t statusFilePositionCurrent = lfs_file_tell(&me->lfs, &file->lfsFile);
 	if(statusFilePositionCurrent < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
@@ -353,11 +353,63 @@ Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* fileSize)
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	lfs_soff_t statusFileSize = lfs_file_size(&me->lfs, &file->lsfFile);
+	lfs_soff_t statusFileSize = lfs_file_size(&me->lfs, &file->lfsFile);
 	if(statusFileSize < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
 	*fileSize = (uint32_t)statusFileSize;
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_mkdir(&me->lfs, path);
+	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_dir_open(&me->lfs, &dir->lfsDir, path);
+	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_dir_close(&me->lfs, &dir->lfsDir);
+	if(status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_dir_read(&me->lfs, &dir->lfsDir, &info->lfsInfo);
+	if(status != 1) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
 	return Alx_Ok;
 }
 

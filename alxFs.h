@@ -100,10 +100,26 @@ typedef enum
 typedef struct
 {
 	#if defined(ALX_LFS)
-	lfs_file_t lsfFile;
+	lfs_file_t lfsFile;
 	#endif
 	bool dummy;
 } AlxFs_File;
+
+typedef struct
+{
+	#if defined(ALX_LFS)
+	lfs_dir_t lfsDir;
+	#endif
+	bool dummy;
+} AlxFs_Dir;
+
+typedef struct
+{
+	#if defined(ALX_LFS)
+	struct lfs_info lfsInfo;
+	#endif
+	bool dummy;
+} AlxFs_Info;
 
 typedef struct
 {
@@ -153,6 +169,10 @@ Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file);
 Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, uint32_t offset, AlxFs_File_Seek_Origin origin, uint32_t* filePositionNew);
 Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* filePositionCurrent);
 Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* fileSize);
+Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path);
+Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path);
+Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir);
+Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info);
 
 
 #endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
