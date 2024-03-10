@@ -233,6 +233,56 @@ Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len
 	*lenActual = (uint32_t)statusLenActual;
 	return Alx_Ok;
 }
+Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const char* delim, uint32_t lenMax, uint32_t* lenActual)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+	ALX_FS_ASSERT(strlen(delim) == 1);	// Only single char delim supported
+
+	// Local variables
+	uint32_t i = 0;
+
+	// Loop
+	for (i = 0; i < (lenMax - 1); i++)
+	{
+		// Local variables
+		char ch = 0;
+		uint32_t readLenActual = 0;
+
+		// Read char
+		Alx_Status status = AlxFs_File_Read(me, file, &ch, 1, &readLenActual);
+		if (status != Alx_Ok)			// If error
+		{
+			return Alx_Err;
+		}
+		else if (readLenActual == 0)	// If end-of-file
+		{
+			break;
+		}
+		else if (readLenActual != 1)	// Assert
+		{
+			ALX_FS_ASSERT(false);		// We should never get here
+		}
+
+		// Store char
+		str[i] = ch;
+
+		// Check if char is delim
+		if (ch == *delim)
+		{
+			i++;	// Increment i to include delim in str[i]
+			break;
+		}
+	}
+
+	// Null-terminate string
+	str[i] = '\0';
+
+	// Return
+	*lenActual = i;
+	return Alx_Ok;
+}
 Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len)
 {
 	// Assert
@@ -246,7 +296,7 @@ Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t le
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, const char* str)
+Alx_Status AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, char* str)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
