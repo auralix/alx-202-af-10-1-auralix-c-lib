@@ -268,7 +268,7 @@ Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
 	// Return
 	return Alx_Ok;
 }
-int32_t AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, uint32_t offset, AlxFs_File_Seek_Origin origin)
+Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, uint32_t offset, AlxFs_File_Seek_Origin origin, uint32_t* filePositionNew)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -276,12 +276,13 @@ int32_t AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, uint32_t offset, AlxFs_File
 
 	// Do
 	lfs_soff_t statusFilePositionNew = lfs_file_seek(&me->lfs, &file->lsfFile, (lfs_soff_t)offset, (int)origin);
-	if(statusFilePositionNew < 0) { ALX_FS_TRACE("Err"); return statusFilePositionNew; }
+	if(statusFilePositionNew < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return statusFilePositionNew;
+	*filePositionNew = (uint32_t)statusFilePositionNew;
+	return Alx_Ok;
 }
-int32_t AlxFs_File_Tell(AlxFs* me, AlxFs_File* file)
+Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* filePositionCurrent)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -289,12 +290,13 @@ int32_t AlxFs_File_Tell(AlxFs* me, AlxFs_File* file)
 
 	// Do
 	lfs_soff_t statusFilePositionCurrent = lfs_file_tell(&me->lfs, &file->lsfFile);
-	if(statusFilePositionCurrent < 0) { ALX_FS_TRACE("Err"); return statusFilePositionCurrent; }
+	if(statusFilePositionCurrent < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return statusFilePositionCurrent;
+	*filePositionCurrent = (uint32_t)statusFilePositionCurrent;
+	return Alx_Ok;
 }
-int32_t AlxFs_File_Size(AlxFs* me, AlxFs_File* file)
+Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* fileSize)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -302,10 +304,11 @@ int32_t AlxFs_File_Size(AlxFs* me, AlxFs_File* file)
 
 	// Do
 	lfs_soff_t statusFileSize = lfs_file_size(&me->lfs, &file->lsfFile);
-	if(statusFileSize < 0) { ALX_FS_TRACE("Err"); return statusFileSize; }
+	if(statusFileSize < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return statusFileSize;
+	*fileSize = (uint32_t)statusFileSize;
+	return Alx_Ok;
 }
 
 
