@@ -147,6 +147,7 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const 
 Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file);
 int32_t AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len);
 int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len);
+int32_t AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, const char* str);
 Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file);
 int32_t AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, uint32_t offset, AlxFs_File_Seek_Origin origin);
 int32_t AlxFs_File_Tell(AlxFs* me, AlxFs_File* file);

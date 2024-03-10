@@ -245,6 +245,15 @@ int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len)
 	// Return
 	return statusLenActual;
 }
+int32_t AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, const char* str)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Return
+	return AlxFs_File_Write(me, file, (void*)str, strlen(str));
+}
 Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
 {
 	// Assert
