@@ -407,7 +407,15 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 
 	// Do
 	int status = lfs_dir_read(&me->lfs, &dir->lfsDir, &info->lfsInfo);
-	if(status != 1) { ALX_FS_TRACE("Err"); return Alx_Err; }
+	if(status == 0)
+	{
+		return AlxFs_DirEnd;
+	}
+	else if(status != 1)
+	{
+		ALX_FS_TRACE("Err");
+		return Alx_Err;
+	}
 
 	// Return
 	return Alx_Ok;

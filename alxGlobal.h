@@ -293,7 +293,8 @@ typedef enum
 	AlxParamItem_ErrEnum,
 	AlxRange_ErrMin,
 	AlxRange_ErrMax,
-	AlxRange_ErrLen
+	AlxRange_ErrLen,
+	AlxFs_DirEnd
 } Alx_Status;
 
 typedef enum
