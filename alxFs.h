@@ -87,6 +87,16 @@ typedef enum
 	AlxFs_Config_Lfs_Mmc
 } AlxFs_Config;
 
+typedef enum
+{
+	#if defined(ALX_LFS)
+	AlxFs_File_Seek_Origin_Set = LFS_SEEK_SET,
+	AlxFs_File_Seek_Origin_Cur = LFS_SEEK_CUR,
+	AlxFs_File_Seek_Origin_End = LFS_SEEK_END,
+	#endif
+	AlxFs_File_Seek_Origin_Dummy = 99
+} AlxFs_File_Seek_Origin;
+
 typedef struct
 {
 	#if defined(ALX_LFS)
@@ -132,12 +142,13 @@ Alx_Status AlxFs_Mount(AlxFs* me);
 Alx_Status AlxFs_UnMount(AlxFs* me);
 Alx_Status AlxFs_Format(AlxFs* me);
 Alx_Status AlxFs_Remove(AlxFs* me, const char* path);
+Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew);
 Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const char* mode);
 Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file);
-int32_t AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
-int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
+int32_t AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len);
+int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len);
 Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file);
-int32_t AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, int32_t whence);
+int32_t AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, uint32_t offset, AlxFs_File_Seek_Origin origin);
 int32_t AlxFs_File_Tell(AlxFs* me, AlxFs_File* file);
 int32_t AlxFs_File_Size(AlxFs* me, AlxFs_File* file);
 
