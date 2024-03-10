@@ -219,20 +219,21 @@ Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file)
 	// Return
 	return Alx_Ok;
 }
-int32_t AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len)
+Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t lenMax, uint32_t* lenActual)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	lfs_ssize_t statusLenActual = lfs_file_read(&me->lfs, &file->lsfFile, data, (lfs_size_t)len);
-	if(statusLenActual < 0) { ALX_FS_TRACE("Err"); return statusLenActual; }
+	lfs_ssize_t statusLenActual = lfs_file_read(&me->lfs, &file->lsfFile, data, (lfs_size_t)lenMax);
+	if(statusLenActual < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return statusLenActual;
+	*lenActual = (uint32_t)statusLenActual;
+	return Alx_Ok;
 }
-int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len)
+Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -240,12 +241,12 @@ int32_t AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len)
 
 	// Do
 	lfs_ssize_t statusLenActual = lfs_file_write(&me->lfs, &file->lsfFile, data, (lfs_size_t)len);
-	if(statusLenActual != (lfs_ssize_t)len) { ALX_FS_TRACE("Err"); return statusLenActual; }
+	if(statusLenActual != (lfs_ssize_t)len) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return statusLenActual;
+	return Alx_Ok;
 }
-int32_t AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, const char* str)
+Alx_Status AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, const char* str)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);

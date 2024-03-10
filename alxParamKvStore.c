@@ -99,7 +99,7 @@ Alx_Status AlxParamKvStore_DeInit(AlxParamKvStore* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* buff, uint32_t len, uint32_t* actualLen)
+Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* data, uint32_t lenMax, uint32_t* lenActual)
 {
 	// Assert
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);
@@ -108,25 +108,23 @@ Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* buff,
 	// Local variables
 	AlxFs_File file;
 	Alx_Status status = Alx_Err;
-	int64_t statusActualLen = -1;
 
 	// Open File
 	status = AlxFs_File_Open(me->fs, &file, key, "r");
 	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Read File
-	statusActualLen = AlxFs_File_Read(me->fs, &file, buff, len);
-	if(statusActualLen < 0) { ALX_PARAM_KV_STORE_TRACE("Err"); return Alx_Err; }
+	status = AlxFs_File_Read(me->fs, &file, data, lenMax, lenActual);
+	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Close File
 	status = AlxFs_File_Close(me->fs, &file);
 	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Return
-	*actualLen = (uint32_t)statusActualLen;
 	return Alx_Ok;
 }
-Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* buff, uint32_t len)
+Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* data, uint32_t len)
 {
 	// Assert
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);
@@ -135,15 +133,14 @@ Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* buff,
 	// Local variables
 	AlxFs_File file;
 	Alx_Status status = Alx_Err;
-	int64_t statusActualLen = -1;
 
 	// Open File
 	status = AlxFs_File_Open(me->fs, &file, key, "w");
 	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Write File
-	statusActualLen = AlxFs_File_Write(me->fs, &file, buff, len);
-	if(statusActualLen != len) { ALX_PARAM_KV_STORE_TRACE("Err"); return Alx_Err; }
+	status = AlxFs_File_Write(me->fs, &file, data, len);
+	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
 
 	// Close File
 	status = AlxFs_File_Close(me->fs, &file);
