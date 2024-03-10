@@ -420,6 +420,50 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 	// Return
 	return Alx_Ok;
 }
+Alx_Status AlxFs_Dir_Trace(AlxFs* me, AlxFs_Dir* dir)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Loop
+	while (1)
+	{
+		// Read
+		AlxFs_Info info = {};
+		Alx_Status status = AlxFs_Dir_Read(me, dir, &info);
+		if (status == AlxFs_DirEnd)
+		{
+			break;
+		}
+		else if (status != Alx_Ok)
+		{
+			ALX_FS_TRACE("Err");
+			return status;
+		}
+
+		// Prepare
+		char str[ALX_FS_NAME_LEN_MAX] = "";
+		if (info.lfsInfo.type == LFS_TYPE_REG)
+		{
+			sprintf(str, "FILE - %s - %lu B", info.lfsInfo.name, info.lfsInfo.size);
+		}
+		else if (info.lfsInfo.type == LFS_TYPE_DIR)
+		{
+			sprintf(str, "DIR - %s", info.lfsInfo.name);
+		}
+		else
+		{
+			ALX_FS_ASSERT(false);	// We should never get here
+		}
+
+		// Trace
+		ALX_FS_TRACE_FORMAT("%s\r\n", str);
+	}
+
+	// Return
+	return Alx_Ok;
+}
 
 
 //******************************************************************************
