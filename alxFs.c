@@ -135,6 +135,31 @@ Alx_Status AlxFs_UnMount(AlxFs* me)
 	// Return
 	return Alx_Ok;
 }
+Alx_Status AlxFs_MountFormat(AlxFs* me)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	// isMounted -> Don't care
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Try to mount, if error, then format & mount
+	status = AlxFs_Mount(me);
+	if (status != Alx_Ok)
+	{
+		// Format
+		status = AlxFs_Format(me);
+		if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+		// Mount
+		status = AlxFs_Mount(me);
+		if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+	}
+
+	// Return
+	return Alx_Ok;
+}
 Alx_Status AlxFs_Format(AlxFs* me)
 {
 	// Assert

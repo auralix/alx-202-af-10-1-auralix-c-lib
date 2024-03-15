@@ -108,6 +108,7 @@ extern "C" {
 #include "alxLfsConfig.h"
 #include "alxLin.h"
 #include "alxLinFun.h"
+#include "alxLogger.h"
 #include "alxMemRaw.h"
 #include "alxMemSafe.h"
 #include "alxOsCriticalSection.h"

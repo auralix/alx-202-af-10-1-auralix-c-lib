@@ -43,6 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxFs.h"
+#include "alxCrc.h"
 
 
 //******************************************************************************
@@ -80,14 +81,42 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint32_t magicNumber;
+		uint32_t version;
+		int64_t idLogReadOldest;
+		int64_t idLogReadNewest;
+		int64_t idLogReadNext;
+		int64_t idLogWriteOldest;
+		int64_t idLogWriteNewest;
+		int64_t idLogWriteNext;
+		int64_t idFileReadOldest;
+		int64_t idFileReadNewest;
+		int64_t idFileReadNext;
+		int64_t idFileWriteOldest;
+		int64_t idFileWriteNewest;
+		int64_t idFileWriteNext;
+		uint16_t crc;
+	};
+	uint8_t raw[4 + 4 + 12*8 + 2];
+} AlxLogger_Info;
+
 typedef struct
 {
 	// Defines
+	#define ALX_LOGGER_INFO_FILENAME "AlxLoggerInfo.bin"
+	#define ALX_LOGGER_INFO_MAGIC_NUMBER 0x002DCA5D
+	#define ALX_LOGGER_INFO_VERSION 1
 
 	// Parameters
 	AlxFs* alxFs;
 
 	// Variables
+	AlxLogger_Info info;
+	AlxCrc alxCrc;
 
 	// Info
 	bool wasCtorCalled;

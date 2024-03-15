@@ -161,6 +161,7 @@ void AlxFs_Ctor
 //******************************************************************************
 Alx_Status AlxFs_Mount(AlxFs* me);
 Alx_Status AlxFs_UnMount(AlxFs* me);
+Alx_Status AlxFs_MountFormat(AlxFs* me);
 Alx_Status AlxFs_Format(AlxFs* me);
 Alx_Status AlxFs_Remove(AlxFs* me, const char* path);
 Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew);
