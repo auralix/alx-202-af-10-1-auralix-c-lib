@@ -115,7 +115,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	me->isInit = true;
 
 	// Return
-	return Alx_Err;
+	return Alx_Ok;
 }
 Alx_Status AlxLogger_DeInit(AlxLogger* me)
 {
@@ -281,7 +281,7 @@ static Alx_Status AlxLogger_SetInfoToDefault(AlxLogger* me)
 	}
 
 	// Write
-	status = AlxFs_File_Read(me->alxFs, &file, &me->info, sizeof(me->info));
+	status = AlxFs_File_Write(me->alxFs, &file, &me->info, sizeof(me->info));
 	if (status != Alx_Ok)
 	{
 		AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
@@ -296,6 +296,9 @@ static Alx_Status AlxLogger_SetInfoToDefault(AlxLogger* me)
 		ALX_FS_TRACE("Err");
 		return status;
 	}
+
+	// Return
+	return Alx_Ok;
 }
 
 
