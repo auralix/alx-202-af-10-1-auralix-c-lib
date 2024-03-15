@@ -110,6 +110,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	ALX_LOGGER_TRACE_FORMAT("- idFileWriteNewest = %ld\r\n", (int32_t)me->info.idFileWriteNewest);
 	ALX_LOGGER_TRACE_FORMAT("- idFileWriteNext = %ld\r\n", (int32_t)me->info.idFileWriteNext);
 	ALX_LOGGER_TRACE_FORMAT("- crc = 0x%04X\r\n", me->info.crc);
+	ALX_LOGGER_TRACE_FORMAT("\r\n");
 
 	// Set isInit
 	me->isInit = true;
