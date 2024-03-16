@@ -263,7 +263,7 @@ static Alx_Status AlxLogger_Fs_CheckInfo(AlxLogger* me)
 	bool isCrcOk = false;
 
 	// Open
-	status = AlxFs_File_Open(me->alxFs, &file, ALX_LOGGER_INFO_FILENAME, "r");
+	status = AlxFs_File_Open(me->alxFs, &file, ALX_LOGGER_INFO_FILE_PATH, "r");
 	if(status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err");
@@ -403,7 +403,7 @@ static Alx_Status AlxLogger_Fs_CreateInfo(AlxLogger* me)
 	me->info.crc = AlxCrc_Calc(&me->alxCrc, (uint8_t*)&me->info, infoLenWithoutCrc);
 
 	// Open
-	status = AlxFs_File_Open(me->alxFs, &file, ALX_LOGGER_INFO_FILENAME, "w");
+	status = AlxFs_File_Open(me->alxFs, &file, ALX_LOGGER_INFO_FILE_PATH, "w");
 	if(status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err");
@@ -436,8 +436,8 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 	Alx_Status status = Alx_Err;
 	AlxFs_Dir dir = {};
 	AlxFs_File file = {};
-	char dirName[16] = "";
-	char fileName[16] = "";
+	char dirPath[64] = "";
+	char filePath[64] = "";
 	uint32_t dirAddr = 0;
 	uint32_t fileAddr = 0;
 	AlxTimSw alxTimSw_DirFilePrepSingle;
@@ -459,20 +459,20 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 		AlxTimSw_Start(&alxTimSw_DirFilePrepSingle);
 
 		// Make dir
-		sprintf(dirName, "/Dir_%04lu", dirAddr);
-		status = AlxFs_Dir_Make(me->alxFs, dirName);
+		sprintf(dirPath, "/Dir_%05lu", dirAddr);
+		status = AlxFs_Dir_Make(me->alxFs, dirPath);
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 		// Open dir
-		status = AlxFs_Dir_Open(me->alxFs, &dir, dirName);
+		status = AlxFs_Dir_Open(me->alxFs, &dir, dirPath);
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 		// Create files
 		for (uint32_t i = 0; i < me->numOfFilesPerDir; i++)
 		{
 			// Open file
-			sprintf(fileName, "%04lu.csv", fileAddr);
-			status = AlxFs_File_Open(me->alxFs, &file, fileName, "w");
+			sprintf(filePath, "%s/%05lu.csv", dirPath, fileAddr);
+			status = AlxFs_File_Open(me->alxFs, &file, filePath, "w");
 			if (status != Alx_Ok)
 			{
 				AlxFs_Dir_Close(me->alxFs, &dir);	// Will not handle return
@@ -499,7 +499,7 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 
 		// Trace
 		uint32_t dirFilePrepSingle_sec = AlxTimSw_Get_sec(&alxTimSw_DirFilePrepSingle);
-		ALX_LOGGER_TRACE_FORMAT("Created %s with %lu files in %lu sec\r\n", dirName, me->numOfFilesPerDir, dirFilePrepSingle_sec);
+		ALX_LOGGER_TRACE_FORMAT("Created %s with %lu files in %lu sec\r\n", dirPath, me->numOfFilesPerDir, dirFilePrepSingle_sec);
 	}
 
 	// Trace

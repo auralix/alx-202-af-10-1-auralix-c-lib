@@ -130,7 +130,7 @@ typedef union
 typedef struct
 {
 	// Defines
-	#define ALX_LOGGER_INFO_FILENAME "AlxLoggerInfo.bin"
+	#define ALX_LOGGER_INFO_FILE_PATH "/AlxLoggerInfo.bin"
 	#define ALX_LOGGER_INFO_MAGIC_NUMBER 0x002DCA5D
 	#define ALX_LOGGER_INFO_VERSION 1
 
