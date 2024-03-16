@@ -87,21 +87,38 @@ typedef union
 	{
 		uint32_t magicNumber;
 		uint32_t version;
-		int64_t idLogReadOldest;
-		int64_t idLogReadNewest;
+
 		int64_t idLogReadNext;
-		int64_t idLogWriteOldest;
-		int64_t idLogWriteNewest;
+		int64_t idLogReadNewest;
+		int64_t idLogReadOldest;
 		int64_t idLogWriteNext;
-		int64_t idFileReadOldest;
-		int64_t idFileReadNewest;
-		int64_t idFileReadNext;
-		int64_t idFileWriteOldest;
-		int64_t idFileWriteNewest;
-		int64_t idFileWriteNext;
+		int64_t idLogWriteNewest;
+		int64_t idLogWriteOldest;
+
+		int64_t addrLineReadNext;
+		int64_t addrLineReadNewest;
+		int64_t addrLineReadOldest;
+		int64_t addrLineWriteNext;
+		int64_t addrLineWriteNewest;
+		int64_t addrLineWriteOldest;
+
+		int64_t addrFileReadNext;
+		int64_t addrFileReadNewest;
+		int64_t addrFileReadOldest;
+		int64_t addrFileWriteNext;
+		int64_t addrFileWriteNewest;
+		int64_t addrFileWriteOldest;
+
+		int64_t addrDirReadNext;
+		int64_t addrDirReadNewest;
+		int64_t addrDirReadOldest;
+		int64_t addrDirWriteNext;
+		int64_t addrDirWriteNewest;
+		int64_t addrDirWriteOldest;
+
 		uint16_t crc;
 	};
-	uint8_t raw[4 + 4 + 12*8 + 2];
+	uint8_t raw[4 + 4 + 24*8 + 2];
 } AlxLogger_Info;
 
 typedef struct
