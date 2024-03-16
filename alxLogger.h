@@ -88,6 +88,12 @@ typedef union
 		uint32_t magicNumber;
 		uint32_t version;
 
+		uint32_t numOfDir;
+		uint32_t numOfFilesPerDir;
+		uint32_t numOfLogsPerFile;
+		uint32_t numOfFiles;
+		uint64_t numOfLogsMax;
+
 		int64_t idLogReadNext;
 		int64_t idLogReadNewest;
 		int64_t idLogReadOldest;
@@ -118,7 +124,7 @@ typedef union
 
 		uint16_t crc;
 	};
-	uint8_t raw[4 + 4 + 24*8 + 2];
+	uint8_t raw[2*4 + 4*4+8 + 4*(6*8) + 2];
 } AlxLogger_Info;
 
 typedef struct
@@ -130,10 +136,15 @@ typedef struct
 
 	// Parameters
 	AlxFs* alxFs;
+	uint32_t numOfDir;
+	uint32_t numOfFilesPerDir;
+	uint32_t numOfLogsPerFile;
 
 	// Variables
 	AlxLogger_Info info;
 	AlxCrc alxCrc;
+	uint32_t numOfFiles;
+	uint64_t numOfLogsMax;
 
 	// Info
 	bool wasCtorCalled;
@@ -147,7 +158,10 @@ typedef struct
 void AlxLogger_Ctor
 (
 	AlxLogger* me,
-	AlxFs* alxFs
+	AlxFs* alxFs,
+	uint32_t numOfDir,
+	uint32_t numOfFilesPerDir,
+	uint32_t numOfLogsPerFile
 );
 
 
