@@ -126,8 +126,7 @@ typedef struct
 typedef struct
 {
 	// Defines
-	#define ALX_FS_NAME_LEN_MAX 256
-	#define ALX_FS_FILE_TRACE_BUFF_LEN 512
+	#define ALX_FS_BUFF_LEN 512
 
 	// Parameters
 	AlxFs_Config config;
@@ -176,12 +175,12 @@ Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file);
 Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, uint32_t offset, AlxFs_File_Seek_Origin origin, uint32_t* filePositionNew);
 Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* filePositionCurrent);
 Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* fileSize);
-Alx_Status AlxFs_File_Trace(AlxFs* me, AlxFs_File* file);
+Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path);
 Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path);
 Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path);
 Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir);
 Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info);
-Alx_Status AlxFs_Dir_Trace(AlxFs* me, AlxFs_Dir* dir);
+Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace);
 
 
 #endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))

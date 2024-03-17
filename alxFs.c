@@ -385,7 +385,7 @@ Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* fileSize)
 	*fileSize = (uint32_t)statusFileSize;
 	return Alx_Ok;
 }
-Alx_Status AlxFs_File_Trace(AlxFs* me, AlxFs_File* file)
+Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -393,21 +393,36 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, AlxFs_File* file)
 
 	// Local variables
 	Alx_Status status = Alx_Err;
+	AlxFs_File file = {};
 	uint32_t fileSize = 0;
 	uint32_t fileSizeTraced = 0;
-	uint8_t buff[ALX_FS_FILE_TRACE_BUFF_LEN+1] =  {};	// Add +1 for string null-terminator
+	uint8_t buff[ALX_FS_BUFF_LEN+1] = {};	// Add +1 for string null-terminator
 	uint32_t lenActual = 0;
 
-	// Get fileSize
-	status = AlxFs_File_Size(me, file, &fileSize);
+	// Open
+	status = AlxFs_File_Open(me, &file, path, "r");
 	if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+	// Get fileSize
+	status = AlxFs_File_Size(me, &file, &fileSize);
+	if(status != Alx_Ok)
+	{
+		AlxFs_File_Close(me, &file);	// Will not handle return
+		ALX_FS_TRACE("Err");
+		return status;
+	}
 
 	// Loop
 	while (1)
 	{
 		// Read
-		status = AlxFs_File_Read(me, file, buff, ALX_FS_FILE_TRACE_BUFF_LEN, &lenActual);
-		if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+		status = AlxFs_File_Read(me, &file, buff, ALX_FS_BUFF_LEN, &lenActual);
+		if(status != Alx_Ok)
+		{
+			AlxFs_File_Close(me, &file);	// Will not handle return
+			ALX_FS_TRACE("Err");
+			return status;
+		}
 
 		// Trace
 		ALX_FS_TRACE_FORMAT("%s", buff);
@@ -421,6 +436,10 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, AlxFs_File* file)
 			break;
 		}
 	}
+
+	// Close
+	status = AlxFs_File_Close(me, &file);
+	if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -485,46 +504,80 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_Dir_Trace(AlxFs* me, AlxFs_Dir* dir)
+Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	Alx_Status status = Alx_Err;
+	AlxFs_Dir dir = {};
+	AlxFs_Info info = {};
+	char buff[ALX_FS_BUFF_LEN] = {};
+
+	// Open
+	status = AlxFs_Dir_Open(me, &dir, path);
+	if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
 	// Loop
 	while (1)
 	{
 		// Read
-		AlxFs_Info info = {};
-		Alx_Status status = AlxFs_Dir_Read(me, dir, &info);
+		status = AlxFs_Dir_Read(me, &dir, &info);
 		if (status == AlxFs_DirEnd)
 		{
 			break;
 		}
 		else if (status != Alx_Ok)
 		{
+			AlxFs_Dir_Close(me, &dir);	// Will not handle return
 			ALX_FS_TRACE("Err");
 			return status;
 		}
 
-		// Prepare
-		char str[ALX_FS_NAME_LEN_MAX] = "";
+		// Trace
 		if (info.lfsInfo.type == LFS_TYPE_REG)
 		{
-			sprintf(str, "FILE - %s - %lu B", info.lfsInfo.name, info.lfsInfo.size);
+			// Prepare
+			sprintf(buff, "FILE - %s - %lu B\r\n", info.lfsInfo.name, info.lfsInfo.size);
+
+			// Trace
+			ALX_FS_TRACE_FORMAT("%s", buff);
+
+			// If fileTrace enabled
+			if (fileTrace)
+			{
+				// Prepare
+				sprintf(buff, "%s/%s", path, info.lfsInfo.name);
+
+				// Trace
+				status = AlxFs_File_Trace(me, buff);
+				if(status != Alx_Ok)
+				{
+					AlxFs_Dir_Close(me, &dir);	// Will not handle return
+					ALX_FS_TRACE("Err");
+					return status;
+				}
+			}
 		}
 		else if (info.lfsInfo.type == LFS_TYPE_DIR)
 		{
-			sprintf(str, "DIR - %s", info.lfsInfo.name);
+			// Prepare
+			sprintf(buff, "DIR - %s\r\n", info.lfsInfo.name);
+
+			// Trace
+			ALX_FS_TRACE_FORMAT("%s", buff);
 		}
 		else
 		{
 			ALX_FS_ASSERT(false);	// We should never get here
 		}
-
-		// Trace
-		ALX_FS_TRACE_FORMAT("%s\r\n", str);
 	}
+
+	// Close
+	status = AlxFs_Dir_Close(me, &dir);
+	if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 	// Return
 	return Alx_Ok;
