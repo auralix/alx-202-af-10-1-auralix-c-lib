@@ -399,6 +399,9 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	uint8_t buff[ALX_FS_BUFF_LEN+1] = {};	// Add +1 for string null-terminator
 	uint32_t lenActual = 0;
 
+	// Trace
+	ALX_FS_TRACE_FORMAT("AlxFs - File '%s' Trace\r\n", path);
+
 	// Open
 	status = AlxFs_File_Open(me, &file, path, "r");
 	if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
@@ -440,6 +443,9 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	// Close
 	status = AlxFs_File_Close(me, &file);
 	if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+	// Trace
+	ALX_FS_TRACE_FORMAT("\r\n");
 
 	// Return
 	return Alx_Ok;
@@ -516,6 +522,9 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 	AlxFs_Info info = {};
 	char buff[ALX_FS_BUFF_LEN] = {};
 
+	// Trace
+	ALX_FS_TRACE_FORMAT("AlxFs - Dir '%s' Trace\r\n", path);
+
 	// Open
 	status = AlxFs_Dir_Open(me, &dir, path);
 	if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
@@ -578,6 +587,9 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 	// Close
 	status = AlxFs_Dir_Close(me, &dir);
 	if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+	// Trace
+	ALX_FS_TRACE_FORMAT("\r\n");
 
 	// Return
 	return Alx_Ok;

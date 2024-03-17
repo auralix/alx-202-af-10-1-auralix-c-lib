@@ -87,7 +87,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 
 	// Trace intro
 	ALX_LOGGER_TRACE_FORMAT("\r\n");
-	ALX_LOGGER_TRACE_FORMAT("Auralix C Library - ALX Logger Module:\r\n");
+	ALX_LOGGER_TRACE_FORMAT("AlxLogger - Init Started\r\n");
 
 	// Prepare FS
 	Alx_Status status = AlxLogger_Fs_Prepare(me);
@@ -95,7 +95,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 
 	// Trace info
 	ALX_LOGGER_TRACE_FORMAT("\r\n");
-	ALX_LOGGER_TRACE_FORMAT("Info:\r\n");
+	ALX_LOGGER_TRACE_FORMAT("AlxLogger - Info\r\n");
 	ALX_LOGGER_TRACE_FORMAT("- magicNumber = 0x%08lX\r\n", me->info.magicNumber);
 	ALX_LOGGER_TRACE_FORMAT("- version = %lu\r\n", me->info.version);
 
@@ -481,7 +481,7 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 
 	// Trace
 	ALX_LOGGER_TRACE_FORMAT("\r\n");
-	ALX_LOGGER_TRACE_FORMAT("Started creating dir & files:\r\n");
+	ALX_LOGGER_TRACE_FORMAT("AlxLogger - Started Creating Dir & Files\r\n");
 
 	// Start timer
 	AlxTimSw_Start(&alxTimSw_DirFilePrepAll);
@@ -533,7 +533,7 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 
 		// Trace
 		uint32_t dirFilePrepSingle_sec = AlxTimSw_Get_sec(&alxTimSw_DirFilePrepSingle);
-		ALX_LOGGER_TRACE_FORMAT("Created %s with %lu files in %lu sec\r\n", dirPath, me->numOfFilesPerDir, dirFilePrepSingle_sec);
+		ALX_LOGGER_TRACE_FORMAT("Created dir '%s' with %lu files in %lu sec\r\n", dirPath, me->numOfFilesPerDir, dirFilePrepSingle_sec);
 	}
 
 	// Trace
