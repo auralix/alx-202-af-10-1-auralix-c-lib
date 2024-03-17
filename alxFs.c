@@ -385,6 +385,46 @@ Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* fileSize)
 	*fileSize = (uint32_t)statusFileSize;
 	return Alx_Ok;
 }
+Alx_Status AlxFs_File_Trace(AlxFs* me, AlxFs_File* file)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+	uint32_t fileSize = 0;
+	uint32_t fileSizeTraced = 0;
+	uint8_t buff[ALX_FS_FILE_TRACE_BUFF_LEN+1] =  {};	// Add +1 for string null-terminator
+	uint32_t lenActual = 0;
+
+	// Get fileSize
+	status = AlxFs_File_Size(me, file, &fileSize);
+	if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+	// Loop
+	while (1)
+	{
+		// Read
+		status = AlxFs_File_Read(me, file, buff, ALX_FS_FILE_TRACE_BUFF_LEN, &lenActual);
+		if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+		// Trace
+		ALX_FS_TRACE_FORMAT("%s", buff);
+
+		// Increment fileSizeTraced
+		fileSizeTraced = fileSizeTraced + lenActual;
+
+		// If done, break
+		if (fileSizeTraced >= fileSize)
+		{
+			break;
+		}
+	}
+
+	// Return
+	return Alx_Ok;
+}
 Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path)
 {
 	// Assert
