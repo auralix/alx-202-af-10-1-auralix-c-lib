@@ -194,7 +194,7 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, char* str)
 
 	// Open
 	char filePath[64] = "";
-	sprintf(filePath, "/%05lu/%05lu.csv", (uint32_t)me->info.addrDirWrite, (uint32_t)me->info.addrFileWrite);
+	sprintf(filePath, "/%lu/%lu.csv", (uint32_t)me->info.addrDirWrite, (uint32_t)me->info.addrFileWrite);
 	status = AlxFs_File_Open(me->alxFs, &file, filePath, "a");
 	if(status != Alx_Ok)
 	{
@@ -231,19 +231,24 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, char* str)
 	me->info.addrLineWrite++;
 	if (me->info.addrLineWrite >= me->numOfLogsPerFile)
 	{
+		// Reset
+		me->info.addrLineWrite = 0;
+
 		// addrFile
 		me->info.addrFileWrite++;
 		if (me->info.addrFileWrite >= me->numOfFilesPerDir)
 		{
+			// Reset
+			me->info.addrFileWrite = 0;
+
 			// addrDir
 			me->info.addrDirWrite++;
 			if (me->info.addrDirWrite >= me->numOfDir)
 			{
-				me->info.addrLineWrite = 0;
-				me->info.addrFileWrite = 0;
+				// Reset
 				me->info.addrDirWrite = 0;
 
-				// We must delete oldest logs, truncate whole file, or multiple files..
+				// TV: TODO - We must delete oldest logs, truncate whole file, or multiple files..
 			}
 		}
 	}
@@ -472,8 +477,6 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 	AlxFs_File file = {};
 	char dirPath[64] = "";
 	char filePath[64] = "";
-	uint32_t dirAddr = 0;
-	uint32_t fileAddr = 0;
 	AlxTimSw alxTimSw_DirFilePrepSingle;
 	AlxTimSw alxTimSw_DirFilePrepAll;
 	AlxTimSw_Ctor(&alxTimSw_DirFilePrepSingle, false);
@@ -487,13 +490,13 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 	AlxTimSw_Start(&alxTimSw_DirFilePrepAll);
 
 	// Create directories
-	for(dirAddr = 0; dirAddr < me->numOfFiles; dirAddr = dirAddr + me->numOfFilesPerDir)
+	for(uint32_t i = 0; i < me->numOfFilesPerDir; i++)
 	{
 		// Start timer
 		AlxTimSw_Start(&alxTimSw_DirFilePrepSingle);
 
 		// Make dir
-		sprintf(dirPath, "/%05lu", dirAddr);
+		sprintf(dirPath, "/%lu", i);
 		status = AlxFs_Dir_Make(me->alxFs, dirPath);
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
@@ -502,10 +505,10 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 		// Create files
-		for (uint32_t i = 0; i < me->numOfFilesPerDir; i++)
+		for (uint32_t y = 0; y < me->numOfFilesPerDir; y++)
 		{
 			// Open file
-			sprintf(filePath, "%s/%05lu.csv", dirPath, fileAddr);
+			sprintf(filePath, "%s/%lu.csv", dirPath, y);
 			status = AlxFs_File_Open(me->alxFs, &file, filePath, "w");
 			if (status != Alx_Ok)
 			{
@@ -522,9 +525,6 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 				ALX_FS_TRACE("Err");
 				return status;
 			}
-
-			// Increment
-			fileAddr++;
 		}
 
 		// Close dir
