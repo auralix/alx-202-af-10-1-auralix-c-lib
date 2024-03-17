@@ -114,6 +114,7 @@ typedef struct
 	#define ALX_LOGGER_INFO_FILE_PATH "/AlxLoggerInfo.bin"
 	#define ALX_LOGGER_INFO_MAGIC_NUMBER 0x002DCA5D
 	#define ALX_LOGGER_INFO_VERSION 1
+	#define ALX_LOGGER_LOG_LEN_MAX 512
 
 	// Parameters
 	AlxFs* alxFs;
