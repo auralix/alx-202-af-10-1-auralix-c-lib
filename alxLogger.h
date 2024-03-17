@@ -81,37 +81,36 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef union
+typedef struct
 {
-	struct __attribute__((packed))
-	{
-		uint32_t magicNumber;
-		uint32_t version;
+	uint32_t magicNumber;
+	uint32_t version;
 
-		uint32_t numOfDir;
-		uint32_t numOfFilesPerDir;
-		uint32_t numOfLogsPerFile;
-		uint32_t numOfFiles;
-		uint64_t numOfLogsMax;
+	uint32_t numOfDir;
+	uint32_t numOfFilesPerDir;
+	uint32_t numOfLogsPerFile;
+	uint32_t numOfFiles;
+	uint64_t numOfLogsMax;
 
-		int64_t idLogRead;
-		int64_t idLogWrite;
+	uint64_t idLogRead;
+	uint64_t idLogWrite;
 
-		int64_t addrLineRead;
-		int64_t addrLineWrite;
-		int64_t addrFileRead;
-		int64_t addrFileWrite;
-		int64_t addrDirRead;
-		int64_t addrDirWrite;
+	uint32_t addrPosRead;
+	uint32_t addrPosWrite;
+	uint32_t addrLineRead;
+	uint32_t addrLineWrite;
+	uint32_t addrFileRead;
+	uint32_t addrFileWrite;
+	uint32_t addrDirRead;
+	uint32_t addrDirWrite;
 
-		uint16_t crc;
-	};
-	uint8_t raw[2*4 + 4*4+8 + 2*8 +6*8 + 2];
+	uint16_t crc;
 } AlxLogger_Info;
 
 typedef struct
 {
 	// Defines
+	#define ALX_LOGGER_PATH_LEN_MAX 128
 	#define ALX_LOGGER_INFO_FILE_PATH "/AlxLoggerInfo.bin"
 	#define ALX_LOGGER_INFO_MAGIC_NUMBER 0x002DCA5D
 	#define ALX_LOGGER_INFO_VERSION 1
