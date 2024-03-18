@@ -69,6 +69,7 @@ void AlxLogger_Ctor
 	AlxCrc_Ctor(&me->alxCrc, AlxCrc_Config_Ccitt);
 	me->numOfFiles = me->numOfFilesPerDir * me->numOfDir;
 	me->numOfLogsMax = me->numOfFiles * me->numOfLogsPerFile;
+	me->numOfLogsPerDir = me->numOfFilesPerDir * me->numOfLogsPerFile;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -102,8 +103,6 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	ALX_LOGGER_TRACE_FORMAT("- numOfDir = %lu\r\n", me->info.numOfDir);
 	ALX_LOGGER_TRACE_FORMAT("- numOfFilesPerDir = %lu\r\n", me->info.numOfFilesPerDir);
 	ALX_LOGGER_TRACE_FORMAT("- numOfLogsPerFile = %lu\r\n", me->info.numOfLogsPerFile);
-	ALX_LOGGER_TRACE_FORMAT("- numOfFiles = %lu\r\n", me->info.numOfFiles);
-	ALX_LOGGER_TRACE_FORMAT("- numOfLogsMax = %lu\r\n", (uint32_t)me->info.numOfLogsMax);
 
 	ALX_LOGGER_TRACE_FORMAT("- idLogRead = %lu\r\n", (uint32_t)me->info.idLogRead);
 	ALX_LOGGER_TRACE_FORMAT("- idLogWrite = %lu\r\n", (uint32_t)me->info.idLogWrite);
@@ -359,8 +358,49 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, char* str)
 			{
 				// Reset
 				me->info.addrDirWrite = 0;
+			}
 
-				// TV: TODO - We must delete oldest logs, truncate whole file, or multiple files..
+			// If needed, discard oldest logs by incrementing addrDirRead
+			if (me->info.addrDirWrite == me->info.addrDirRead)
+			{
+				// Increment idLogRead to next nearest multiple
+				uint64_t remainder = me->info.idLogRead % me->numOfLogsPerDir;
+				uint64_t delta = me->numOfLogsPerDir - remainder;
+				me->info.idLogRead = me->info.idLogRead + delta;
+
+				// Reset
+				me->info.addrPosRead = 0;
+				me->info.addrLineRead = 0;
+				me->info.addrFileRead = 0;
+
+				// addrDir
+				me->info.addrDirRead++;
+				if (me->info.addrDirRead >= me->numOfDir)
+				{
+					// Reset
+					me->info.addrDirRead = 0;
+				}
+			}
+
+			// Clear next dir
+			for (uint32_t i = 0; i < me->numOfFilesPerDir; i++)
+			{
+				// Open
+				sprintf(filePath, "/%lu/%lu.csv", me->info.addrDirWrite, i);
+				status = AlxFs_File_Open(me->alxFs, &file, filePath, "w");
+				if (status != Alx_Ok)
+				{
+					ALX_FS_TRACE("Err");
+					return status;
+				}
+
+				// Close
+				status = AlxFs_File_Close(me->alxFs, &file);
+				if (status != Alx_Ok)
+				{
+					ALX_FS_TRACE("Err");
+					return status;
+				}
 			}
 		}
 	}
@@ -509,20 +549,6 @@ static Alx_Status AlxLogger_Fs_CheckInfo(AlxLogger* me)
 		return Alx_Err;
 	}
 
-	// Check number of files
-	if (me->info.numOfFiles != me->numOfFiles)
-	{
-		ALX_FS_TRACE("Err");
-		return Alx_Err;
-	}
-
-	// Check number of logs max
-	if (me->info.numOfLogsMax != me->numOfLogsMax)
-	{
-		ALX_FS_TRACE("Err");
-		return Alx_Err;
-	}
-
 	// Return
 	return Alx_Ok;
 }
@@ -539,8 +565,6 @@ static Alx_Status AlxLogger_Fs_CreateInfo(AlxLogger* me)
 	me->info.numOfDir = me->numOfDir;
 	me->info.numOfFilesPerDir = me->numOfFilesPerDir;
 	me->info.numOfLogsPerFile = me->numOfLogsPerFile;
-	me->info.numOfFiles = me->numOfFiles;
-	me->info.numOfLogsMax = me->numOfLogsMax;
 
 	me->info.idLogRead = 0;
 	me->info.idLogWrite = 0;

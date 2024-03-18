@@ -89,8 +89,6 @@ typedef struct
 	uint32_t numOfDir;
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
-	uint32_t numOfFiles;
-	uint64_t numOfLogsMax;
 
 	uint64_t idLogRead;
 	uint64_t idLogWrite;
@@ -127,6 +125,7 @@ typedef struct
 	AlxCrc alxCrc;
 	uint32_t numOfFiles;
 	uint64_t numOfLogsMax;
+	uint64_t numOfLogsPerDir;
 
 	// Info
 	bool wasCtorCalled;
