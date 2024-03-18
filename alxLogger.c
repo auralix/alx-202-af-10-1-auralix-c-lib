@@ -91,7 +91,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 
 	// Prepare FS
 	Alx_Status status = AlxLogger_Fs_Prepare(me);
-	if(status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 	// Trace info
 	ALX_LOGGER_TRACE_FORMAT("\r\n");
@@ -202,9 +202,9 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* str)
 	//------------------------------------------------------------------------------
 
 	// Open
-	sprintf(filePath, "/%lu/%lu.csv", (uint32_t)me->info.addrDirRead, (uint32_t)me->info.addrFileRead);
+	sprintf(filePath, "/%lu/%lu.csv", me->info.addrDirRead, me->info.addrFileRead);
 	status = AlxFs_File_Open(me->alxFs, &file, filePath, "r");
-	if(status != Alx_Ok)
+	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err");
 		return status;
@@ -213,7 +213,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* str)
 	// Seek
 	uint32_t filePositionNew = 0;
 	status = AlxFs_File_Seek(me->alxFs, &file, me->info.addrPosRead, AlxFs_File_Seek_Origin_Set, &filePositionNew);
-	if(status != Alx_Ok)
+	if (status != Alx_Ok)
 	{
 		AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
 		ALX_FS_TRACE("Err");
@@ -231,7 +231,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* str)
 
 	// Close
 	status = AlxFs_File_Close(me->alxFs, &file);
-	if(status != Alx_Ok)
+	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err");
 		return status;
@@ -302,9 +302,9 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, char* str)
 	//------------------------------------------------------------------------------
 
 	// Open
-	sprintf(filePath, "/%lu/%lu.csv", (uint32_t)me->info.addrDirWrite, (uint32_t)me->info.addrFileWrite);
+	sprintf(filePath, "/%lu/%lu.csv", me->info.addrDirWrite, me->info.addrFileWrite);
 	status = AlxFs_File_Open(me->alxFs, &file, filePath, "a");
-	if(status != Alx_Ok)
+	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err");
 		return status;
@@ -321,7 +321,7 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, char* str)
 
 	// Close
 	status = AlxFs_File_Close(me->alxFs, &file);
-	if(status != Alx_Ok)
+	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err");
 		return status;
@@ -436,7 +436,7 @@ static Alx_Status AlxLogger_Fs_CheckInfo(AlxLogger* me)
 
 	// Open
 	status = AlxFs_File_Open(me->alxFs, &file, ALX_LOGGER_INFO_FILE_PATH, "r");
-	if(status != Alx_Ok)
+	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err");
 		return status;
@@ -453,14 +453,14 @@ static Alx_Status AlxLogger_Fs_CheckInfo(AlxLogger* me)
 
 	// Close
 	status = AlxFs_File_Close(me->alxFs, &file);
-	if(status != Alx_Ok)
+	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err");
 		return status;
 	}
 
 	// Check length
-	if(lenActual != sizeof(me->info))
+	if (lenActual != sizeof(me->info))
 	{
 		ALX_FS_TRACE("Err");
 		return Alx_Err;
@@ -468,56 +468,56 @@ static Alx_Status AlxLogger_Fs_CheckInfo(AlxLogger* me)
 
 	// Check CRC
 	isCrcOk = AlxCrc_IsOk(&me->alxCrc, (uint8_t*)&me->info, sizeof(me->info), &validatedCrc);
-	if(isCrcOk != true)
+	if (isCrcOk != true)
 	{
 		ALX_FS_TRACE("Err");
 		return Alx_Err;
 	}
 
 	// Check magic number
-	if(me->info.magicNumber != ALX_LOGGER_INFO_MAGIC_NUMBER)
+	if (me->info.magicNumber != ALX_LOGGER_INFO_MAGIC_NUMBER)
 	{
 		ALX_FS_TRACE("Err");
 		return Alx_Err;
 	}
 
 	// Check version
-	if(me->info.version != ALX_LOGGER_INFO_VERSION)
+	if (me->info.version != ALX_LOGGER_INFO_VERSION)
 	{
 		ALX_FS_TRACE("Err");
 		return Alx_Err;
 	}
 
 	// Check number of directories
-	if(me->info.numOfDir != me->numOfDir)
+	if (me->info.numOfDir != me->numOfDir)
 	{
 		ALX_FS_TRACE("Err");
 		return Alx_Err;
 	}
 
 	// Check number of files per directory
-	if(me->info.numOfFilesPerDir != me->numOfFilesPerDir)
+	if (me->info.numOfFilesPerDir != me->numOfFilesPerDir)
 	{
 		ALX_FS_TRACE("Err");
 		return Alx_Err;
 	}
 
 	// Check number of logs per file
-	if(me->info.numOfLogsPerFile != me->numOfLogsPerFile)
+	if (me->info.numOfLogsPerFile != me->numOfLogsPerFile)
 	{
 		ALX_FS_TRACE("Err");
 		return Alx_Err;
 	}
 
 	// Check number of files
-	if(me->info.numOfFiles != me->numOfFiles)
+	if (me->info.numOfFiles != me->numOfFiles)
 	{
 		ALX_FS_TRACE("Err");
 		return Alx_Err;
 	}
 
 	// Check number of logs max
-	if(me->info.numOfLogsMax != me->numOfLogsMax)
+	if (me->info.numOfLogsMax != me->numOfLogsMax)
 	{
 		ALX_FS_TRACE("Err");
 		return Alx_Err;
@@ -560,7 +560,7 @@ static Alx_Status AlxLogger_Fs_CreateInfo(AlxLogger* me)
 
 	// Open
 	status = AlxFs_File_Open(me->alxFs, &file, ALX_LOGGER_INFO_FILE_PATH, "w");
-	if(status != Alx_Ok)
+	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err");
 		return status;
@@ -577,7 +577,7 @@ static Alx_Status AlxLogger_Fs_CreateInfo(AlxLogger* me)
 
 	// Close
 	status = AlxFs_File_Close(me->alxFs, &file);
-	if(status != Alx_Ok)
+	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err");
 		return status;
@@ -607,7 +607,7 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 	AlxTimSw_Start(&alxTimSw_DirFilePrepAll);
 
 	// Create directories
-	for(uint32_t i = 0; i < me->numOfFilesPerDir; i++)
+	for (uint32_t i = 0; i < me->numOfFilesPerDir; i++)
 	{
 		// Start timer
 		AlxTimSw_Start(&alxTimSw_DirFilePrepSingle);
