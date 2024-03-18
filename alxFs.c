@@ -213,7 +213,7 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const 
 	}
 	else if (0 == strcmp(mode, "w"))
 	{
-		modeFlags = LFS_O_WRONLY | LFS_O_CREAT;
+		modeFlags = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC;
 	}
 	else if (0 == strcmp(mode, "a"))
 	{
@@ -343,7 +343,7 @@ Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, uint32_t offset, AlxFs_File_Seek_Origin origin, uint32_t* positionNew)
+Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_File_Seek_Origin origin, uint32_t* positionNew)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
