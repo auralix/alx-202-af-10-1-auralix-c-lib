@@ -112,7 +112,7 @@ void AlxMmc_Ctor
 	me->hmmc.Instance = mmc;
 	me->hmmc.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
 	me->hmmc.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
-	me->hmmc.Init.BusWide = SDMMC_BUS_WIDE_8B;
+	me->hmmc.Init.BusWide = SDMMC_BUS_WIDE_1B;
 	me->hmmc.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
 	me->hmmc.Init.ClockDiv = 0;
 	me->hmmc.Init.Transceiver = SDMMC_TRANSCEIVER_DISABLE;

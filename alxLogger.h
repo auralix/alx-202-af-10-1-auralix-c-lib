@@ -150,12 +150,10 @@ void AlxLogger_Ctor
 // Functions
 //******************************************************************************
 Alx_Status AlxLogger_Init(AlxLogger* me);
-Alx_Status AlxLogger_DeInit(AlxLogger* me);
-Alx_Status AlxLogger_Handle(AlxLogger* me);
-Alx_Status AlxLogger_Trace_ReadLog(AlxLogger* me, char* str);
-Alx_Status AlxLogger_Trace_WriteLog(AlxLogger* me, char* str);
-Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* str);
-Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, char* str);
+Alx_Status AlxLogger_Trace_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs);
+Alx_Status AlxLogger_Trace_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs);
+Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs);
+Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs);
 
 
 #endif	// #if defined(ALX_C_LIB)

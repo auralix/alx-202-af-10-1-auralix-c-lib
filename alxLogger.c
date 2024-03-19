@@ -125,19 +125,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_DeInit(AlxLogger* me)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	ALX_LOGGER_ASSERT(me->isInit == true);
-
-	// Clear isInit
-	me->isInit = false;
-
-	// Return
-	return Alx_Ok;
-}
-Alx_Status AlxLogger_Handle(AlxLogger* me)
+Alx_Status AlxLogger_Trace_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -146,7 +134,7 @@ Alx_Status AlxLogger_Handle(AlxLogger* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_Trace_ReadLog(AlxLogger* me, char* str)
+Alx_Status AlxLogger_Trace_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -155,16 +143,7 @@ Alx_Status AlxLogger_Trace_ReadLog(AlxLogger* me, char* str)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_Trace_WriteLog(AlxLogger* me, char* str)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	ALX_LOGGER_ASSERT(me->isInit == true);
-
-	// Return
-	return Alx_Ok;
-}
-Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* str)
+Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -220,7 +199,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* str)
 	}
 
 	// Read
-	status = AlxFs_File_ReadStrUntil(me->alxFs, &file, str, "\n", ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
+	status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, "\n", ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
 	if (status != Alx_Ok)
 	{
 		AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
@@ -278,7 +257,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* str)
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, char* str)
+Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -293,7 +272,7 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, char* str)
 	Alx_Status status = Alx_Err;
 	AlxFs_File file = {};
 	char filePath[ALX_LOGGER_PATH_LEN_MAX] = "";
-	uint32_t writeLen = strlen(str);
+	uint32_t writeLen = strlen(log);
 
 
 	//------------------------------------------------------------------------------
@@ -310,7 +289,7 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, char* str)
 	}
 
 	// Write
-	status = AlxFs_File_WriteStr(me->alxFs, &file, str);
+	status = AlxFs_File_WriteStr(me->alxFs, &file, log);
 	if (status != Alx_Ok)
 	{
 		AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
