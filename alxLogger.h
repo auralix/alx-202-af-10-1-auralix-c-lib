@@ -119,6 +119,7 @@ typedef struct
 	uint32_t numOfDir;
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
+	const char* logDelim;
 
 	// Variables
 	AlxLogger_Info info;
@@ -142,7 +143,8 @@ void AlxLogger_Ctor
 	AlxFs* alxFs,
 	uint32_t numOfDir,
 	uint32_t numOfFilesPerDir,
-	uint32_t numOfLogsPerFile
+	uint32_t numOfLogsPerFile,
+	const char* logDelim
 );
 
 
@@ -151,9 +153,9 @@ void AlxLogger_Ctor
 //******************************************************************************
 Alx_Status AlxLogger_Init(AlxLogger* me);
 Alx_Status AlxLogger_Trace_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs);
-Alx_Status AlxLogger_Trace_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs);
+Alx_Status AlxLogger_Trace_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs, bool appendLogDelim);
 Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs);
-Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs);
+Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs, bool appendLogDelim);
 
 
 #endif	// #if defined(ALX_C_LIB)

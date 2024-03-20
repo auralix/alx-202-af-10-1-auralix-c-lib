@@ -57,7 +57,8 @@ void AlxLogger_Ctor
 	AlxFs* alxFs,
 	uint32_t numOfDir,
 	uint32_t numOfFilesPerDir,
-	uint32_t numOfLogsPerFile
+	uint32_t numOfLogsPerFile,
+	const char* logDelim
 )
 {
 	// Parameters
@@ -65,6 +66,7 @@ void AlxLogger_Ctor
 	me->numOfDir = numOfDir;
 	me->numOfFilesPerDir = numOfFilesPerDir;
 	me->numOfLogsPerFile = numOfLogsPerFile;
+	me->logDelim = logDelim;
 
 	// Variables
 	memset(&me->info, 0, sizeof(me->info));
@@ -133,14 +135,20 @@ Alx_Status AlxLogger_Trace_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
 	ALX_LOGGER_ASSERT(me->isInit == true);
 
+	// TV: TODO
+	ALX_LOGGER_ASSERT(false);
+
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_Trace_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs)
+Alx_Status AlxLogger_Trace_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs, bool appendLogDelim)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
 	ALX_LOGGER_ASSERT(me->isInit == true);
+
+	// TV: TODO
+	ALX_LOGGER_ASSERT(false);
 
 	// Return
 	return Alx_Ok;
@@ -152,6 +160,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
 	ALX_LOGGER_ASSERT(me->isInit == true);
+	ALX_LOGGER_ASSERT(numOfLogs == 1);	// Only single log handling supported
 
 
 	//------------------------------------------------------------------------------
@@ -201,7 +210,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 	}
 
 	// Read
-	status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, "\n", ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
+	status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
 	if (status != Alx_Ok)
 	{
 		AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
@@ -259,13 +268,14 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs)
+Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs, bool appendLogDelim)
 {
 	//------------------------------------------------------------------------------
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
 	ALX_LOGGER_ASSERT(me->isInit == true);
+	ALX_LOGGER_ASSERT(numOfLogs == 1);	// Only single log handling supported
 
 
 	//------------------------------------------------------------------------------
@@ -290,13 +300,25 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numO
 		return status;
 	}
 
-	// Write
+	// Write log
 	status = AlxFs_File_WriteStr(me->alxFs, &file, log);
 	if (status != Alx_Ok)
 	{
 		AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
 		ALX_FS_TRACE("Err");
 		return status;
+	}
+
+	// Write log delimiter
+	if (appendLogDelim)
+	{
+		status = AlxFs_File_WriteStr(me->alxFs, &file, me->logDelim);
+		if (status != Alx_Ok)
+		{
+			AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
+			ALX_FS_TRACE("Err");
+			return status;
+		}
 	}
 
 	// Close
@@ -783,7 +805,7 @@ static Alx_Status AlxLogger_Fs_RepairWriteFile(AlxLogger* me)
 	while (true)
 	{
 		// Read
-		status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, "\n", ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
+		status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
 		if ((status == AlxFs_ErrNoDelim) && (readLenActual == 0))
 		{
 			// Break, we reached end of file, all lines are OK
