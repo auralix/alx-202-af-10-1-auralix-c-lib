@@ -41,9 +41,10 @@
 // Private Functions
 //******************************************************************************
 static Alx_Status AlxLogger_Fs_Prepare(AlxLogger* me);
-static Alx_Status AlxLogger_Fs_CheckInfo(AlxLogger* me);
-static Alx_Status AlxLogger_Fs_CreateInfo(AlxLogger* me);
+static Alx_Status AlxLogger_Fs_LoadAndCheckInfo(AlxLogger* me);
+static Alx_Status AlxLogger_Fs_StoreInfo(AlxLogger* me, bool storeDefault);
 static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me);
+static Alx_Status AlxLogger_Fs_RepairWriteFile(AlxLogger* me);
 
 
 //******************************************************************************
@@ -176,7 +177,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 
 
 	//------------------------------------------------------------------------------
-	// Read File
+	// Read
 	//------------------------------------------------------------------------------
 
 	// Open
@@ -217,7 +218,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 
 
 	//------------------------------------------------------------------------------
-	// Handle ID & Addresses
+	// Handle IDs & Addresses
 	//------------------------------------------------------------------------------
 
 	// idLog
@@ -276,7 +277,7 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numO
 
 
 	//------------------------------------------------------------------------------
-	// Write File
+	// Write
 	//------------------------------------------------------------------------------
 
 	// Open
@@ -307,7 +308,7 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numO
 
 
 	//------------------------------------------------------------------------------
-	// Handle ID & Addresses
+	// Handle IDs & Addresses
 	//------------------------------------------------------------------------------
 
 	// idLog
@@ -386,6 +387,16 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numO
 
 
 	//------------------------------------------------------------------------------
+	// Store Info
+	//------------------------------------------------------------------------------
+	if (me->info.addrLineWrite == 0)	// Every new file
+	{
+		status = AlxLogger_Fs_StoreInfo(me, false);
+		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+	}
+
+
+	//------------------------------------------------------------------------------
 	// Return
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
@@ -398,7 +409,7 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numO
 static Alx_Status AlxLogger_Fs_Prepare(AlxLogger* me)
 {
 	//------------------------------------------------------------------------------
-	// Local variables
+	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 
@@ -412,9 +423,17 @@ static Alx_Status AlxLogger_Fs_Prepare(AlxLogger* me)
 		status = AlxFs_Mount(me->alxFs);
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); break; }
 
-		// Check info
-		status = AlxLogger_Fs_CheckInfo(me);
+		// Load & Check info
+		status = AlxLogger_Fs_LoadAndCheckInfo(me);
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); break; }
+
+		// Repair write file
+		status = AlxLogger_Fs_RepairWriteFile(me);
+		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+		// Store info
+		status = AlxLogger_Fs_StoreInfo(me, false);
+		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 		// Return
 		return Alx_Ok;
@@ -437,21 +456,28 @@ static Alx_Status AlxLogger_Fs_Prepare(AlxLogger* me)
 	status = AlxLogger_Fs_CreateDirFile(me);
 	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
-	// Create info
-	status = AlxLogger_Fs_CreateInfo(me);
+	// Store default info
+	status = AlxLogger_Fs_StoreInfo(me, true);
 	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 	// Return
 	return Alx_Ok;
 }
-static Alx_Status AlxLogger_Fs_CheckInfo(AlxLogger* me)
+static Alx_Status AlxLogger_Fs_LoadAndCheckInfo(AlxLogger* me)
 {
-	// Local variables
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	AlxFs_File file = {};
 	uint32_t lenActual = 0;
 	uint32_t validatedCrc = 0;
 	bool isCrcOk = false;
+
+
+	//------------------------------------------------------------------------------
+	// Load
+	//------------------------------------------------------------------------------
 
 	// Open
 	status = AlxFs_File_Open(me->alxFs, &file, ALX_LOGGER_INFO_FILE_PATH, "r");
@@ -477,6 +503,11 @@ static Alx_Status AlxLogger_Fs_CheckInfo(AlxLogger* me)
 		ALX_FS_TRACE("Err");
 		return status;
 	}
+
+
+	//------------------------------------------------------------------------------
+	// Check
+	//------------------------------------------------------------------------------
 
 	// Check length
 	if (lenActual != sizeof(me->info))
@@ -528,38 +559,54 @@ static Alx_Status AlxLogger_Fs_CheckInfo(AlxLogger* me)
 		return Alx_Err;
 	}
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
-static Alx_Status AlxLogger_Fs_CreateInfo(AlxLogger* me)
+static Alx_Status AlxLogger_Fs_StoreInfo(AlxLogger* me, bool storeDefault)
 {
-	// Local variables
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	AlxFs_File file = {};
 
-	// Prepare info
-	me->info.magicNumber = ALX_LOGGER_INFO_MAGIC_NUMBER;
-	me->info.version = ALX_LOGGER_INFO_VERSION;
 
-	me->info.numOfDir = me->numOfDir;
-	me->info.numOfFilesPerDir = me->numOfFilesPerDir;
-	me->info.numOfLogsPerFile = me->numOfLogsPerFile;
+	//------------------------------------------------------------------------------
+	// Prepare
+	//------------------------------------------------------------------------------
+	if (storeDefault)
+	{
+		me->info.magicNumber = ALX_LOGGER_INFO_MAGIC_NUMBER;
+		me->info.version = ALX_LOGGER_INFO_VERSION;
 
-	me->info.idLogRead = 0;
-	me->info.idLogWrite = 0;
+		me->info.numOfDir = me->numOfDir;
+		me->info.numOfFilesPerDir = me->numOfFilesPerDir;
+		me->info.numOfLogsPerFile = me->numOfLogsPerFile;
 
-	me->info.addrPosRead = 0;
-	me->info.addrPosWrite = 0;
-	me->info.addrLineRead = 0;
-	me->info.addrLineWrite = 0;
-	me->info.addrFileRead = 0;
-	me->info.addrFileWrite = 0;
-	me->info.addrDirRead = 0;
-	me->info.addrDirWrite = 0;
+		me->info.idLogRead = 0;
+		me->info.idLogWrite = 0;
+
+		me->info.addrPosRead = 0;
+		me->info.addrPosWrite = 0;
+		me->info.addrLineRead = 0;
+		me->info.addrLineWrite = 0;
+		me->info.addrFileRead = 0;
+		me->info.addrFileWrite = 0;
+		me->info.addrDirRead = 0;
+		me->info.addrDirWrite = 0;
+	}
 
 	uint32_t crcLen = AlxCrc_GetLen(&me->alxCrc);
 	uint32_t infoLenWithoutCrc = sizeof(me->info) - crcLen;
 	me->info.crc = AlxCrc_Calc(&me->alxCrc, (uint8_t*)&me->info, infoLenWithoutCrc);
+
+
+	//------------------------------------------------------------------------------
+	// Store
+	//------------------------------------------------------------------------------
 
 	// Open
 	status = AlxFs_File_Open(me->alxFs, &file, ALX_LOGGER_INFO_FILE_PATH, "w");
@@ -586,12 +633,17 @@ static Alx_Status AlxLogger_Fs_CreateInfo(AlxLogger* me)
 		return status;
 	}
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
 static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 {
-	// Local variables
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	AlxFs_Dir dir = {};
 	AlxFs_File file = {};
@@ -601,6 +653,11 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 	AlxTimSw alxTimSw_DirFilePrepAll;
 	AlxTimSw_Ctor(&alxTimSw_DirFilePrepSingle, false);
 	AlxTimSw_Ctor(&alxTimSw_DirFilePrepAll, false);
+
+
+	//------------------------------------------------------------------------------
+	// Create Dir & Files
+	//------------------------------------------------------------------------------
 
 	// Trace
 	ALX_LOGGER_TRACE_FORMAT("\r\n");
@@ -660,7 +717,86 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 	uint32_t dirFilePrepAllTime_sec = AlxTimSw_Get_sec(&alxTimSw_DirFilePrepAll);
 	ALX_LOGGER_TRACE_FORMAT("Created %lu dir with %lu files, total %lu files in %lu sec\r\n", me->numOfDir, me->numOfFilesPerDir, me->numOfFiles, dirFilePrepAllTime_sec);
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
+}
+static Alx_Status AlxLogger_Fs_RepairWriteFile(AlxLogger* me)
+{
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
+	AlxFs_File file = {};
+	char filePath[ALX_LOGGER_PATH_LEN_MAX] = "";
+	char log[ALX_LOGGER_LOG_LEN_MAX] = "";
+	uint32_t readLenActual = 0;
+
+
+	//------------------------------------------------------------------------------
+	// Repair
+	//------------------------------------------------------------------------------
+
+	// Open
+	sprintf(filePath, "/%lu/%lu.csv", me->info.addrDirWrite, me->info.addrFileWrite);
+	status = AlxFs_File_Open(me->alxFs, &file, filePath, "r+");
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err");
+		return status;
+	}
+
+	// Read lines until end-of-file or last corrupted line
+	while (true)
+	{
+		// Read
+		status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, "\n", ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
+		if ((status == AlxFs_ErrNoDelim) && (readLenActual == 0))
+		{
+			// Break, we reached end of file, all lines are OK
+			break;
+		}
+		else if (status == AlxFs_ErrNoDelim)
+		{
+			// Truncate, with this we eliminate last corrupted line
+			status = AlxFs_File_Truncate(me->alxFs, &file, me->info.addrPosWrite);
+			if (status != Alx_Ok)
+			{
+				AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
+				ALX_FS_TRACE("Err");
+				return status;
+			}
+
+			// Break
+			break;
+		}
+		else if (status != Alx_Ok)
+		{
+			AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
+			ALX_FS_TRACE("Err");
+			return status;
+		}
+
+		// Increment addr
+		me->info.addrPosWrite = me->info.addrPosWrite + readLenActual;
+		me->info.addrLineWrite++;
+	}
+
+
+	// Close
+	status = AlxFs_File_Close(me->alxFs, &file);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err");
+		return status;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
 

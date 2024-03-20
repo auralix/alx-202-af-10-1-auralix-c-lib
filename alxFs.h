@@ -170,7 +170,7 @@ Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file);
 Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len, uint32_t* lenActual);
 Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const char* delim, uint32_t len, uint32_t* lenActual);
 Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len);
-Alx_Status AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, char* str);
+Alx_Status AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, const char* str);
 Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file);
 Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_File_Seek_Origin origin, uint32_t* positionNew);
 Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* position);

@@ -219,6 +219,18 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const 
 	{
 		modeFlags = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND;
 	}
+	else if (0 == strcmp(mode, "r+"))
+	{
+		modeFlags = LFS_O_RDWR;
+	}
+	else if (0 == strcmp(mode, "w+"))
+	{
+		modeFlags = LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC;
+	}
+	else if (0 == strcmp(mode, "a+"))
+	{
+		modeFlags = LFS_O_RDWR | LFS_O_CREAT | LFS_O_APPEND;
+	}
 	else
 	{
 		ALX_FS_ASSERT(false);	// We should never get here
@@ -266,6 +278,7 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 	ALX_FS_ASSERT(strlen(delim) == 1);	// Only single char delim supported
 
 	// Local variables
+	Alx_Status status = AlxFs_ErrNoDelim;
 	uint32_t i = 0;
 
 	// Loop
@@ -276,16 +289,20 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 		uint32_t readLenActual = 0;
 
 		// Read char
-		Alx_Status status = AlxFs_File_Read(me, file, &ch, 1, &readLenActual);
-		if (status != Alx_Ok)			// If error
+		Alx_Status statusRead = AlxFs_File_Read(me, file, &ch, 1, &readLenActual);
+		if ((statusRead == Alx_Ok) && (readLenActual == 0))
 		{
-			return Alx_Err;
-		}
-		else if (readLenActual == 0)	// If end-of-file
-		{
+			// Break, we reached end of file, status already AlxFs_ErrNoDelim
 			break;
 		}
-		else if (readLenActual != 1)	// Assert
+		if (statusRead != Alx_Ok)
+		{
+			// Break, error occured, trace, change status to Alx_Err
+			ALX_FS_TRACE("Err");
+			status = Alx_Err;
+			break;
+		}
+		else if (readLenActual != 1)
 		{
 			ALX_FS_ASSERT(false);		// We should never get here
 		}
@@ -296,7 +313,9 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 		// Check if char is delim
 		if (ch == *delim)
 		{
-			i++;	// Increment i to include delim in str[i]
+			// Break, we found delimiter, increment i for correct null-termination, change status to Alx_Ok
+			i++;
+			status = Alx_Ok;
 			break;
 		}
 	}
@@ -306,7 +325,7 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 
 	// Return
 	*lenActual = i;
-	return Alx_Ok;
+	return status;
 }
 Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len)
 {
@@ -321,7 +340,7 @@ Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t le
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, char* str)
+Alx_Status AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, const char* str)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -519,7 +538,7 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 	int status = lfs_dir_read(&me->lfs, &dir->lfsDir, &info->lfsInfo);
 	if (status == 0)
 	{
-		return AlxFs_DirEnd;
+		return AlxFs_EndOfDir;
 	}
 	else if (status != 1)
 	{
@@ -554,7 +573,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 	{
 		// Read
 		status = AlxFs_Dir_Read(me, &dir, &info);
-		if (status == AlxFs_DirEnd)
+		if (status == AlxFs_EndOfDir)
 		{
 			break;
 		}
