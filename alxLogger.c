@@ -601,15 +601,15 @@ static Alx_Status AlxLogger_Fs_StoreInfo(AlxLogger* me, bool storeDefault)
 		me->info.numOfLogsPerFile = me->numOfLogsPerFile;
 
 		me->info.idRead = 0;
-		me->info.idWrite = 0;
-
 		me->info.addrReadPosition = 0;
-		me->info.addrWritePosition = 0;
 		me->info.addrReadLine = 0;
-		me->info.addrWriteLine = 0;
 		me->info.addrReadFile = 0;
-		me->info.addrWriteFile = 0;
 		me->info.addrReadDir = 0;
+
+		me->info.idWrite = 0;
+		me->info.addrWritePosition = 0;
+		me->info.addrWriteLine = 0;
+		me->info.addrWriteFile = 0;
 		me->info.addrWriteDir = 0;
 	}
 
