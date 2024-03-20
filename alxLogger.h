@@ -90,17 +90,17 @@ typedef struct
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
 
-	uint64_t idLogRead;
-	uint64_t idLogWrite;
+	uint64_t idRead;
+	uint32_t addrReadPosition;
+	uint32_t addrReadLine;
+	uint32_t addrReadFile;
+	uint32_t addrReadDir;
 
-	uint32_t addrPosRead;
-	uint32_t addrPosWrite;
-	uint32_t addrLineRead;
-	uint32_t addrLineWrite;
-	uint32_t addrFileRead;
-	uint32_t addrFileWrite;
-	uint32_t addrDirRead;
-	uint32_t addrDirWrite;
+	uint64_t idWrite;
+	uint32_t addrWritePosition;
+	uint32_t addrWriteLine;
+	uint32_t addrWriteFile;
+	uint32_t addrWriteDir;
 
 	uint16_t crc;
 } AlxLogger_Info;

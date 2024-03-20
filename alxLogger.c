@@ -43,7 +43,8 @@
 static Alx_Status AlxLogger_Fs_Prepare(AlxLogger* me);
 static Alx_Status AlxLogger_Fs_LoadAndCheckInfo(AlxLogger* me);
 static Alx_Status AlxLogger_Fs_StoreInfo(AlxLogger* me, bool storeDefault);
-static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me);
+static Alx_Status AlxLogger_Fs_CreateDirAndFiles(AlxLogger* me);
+static Alx_Status AlxLogger_Fs_ClearWriteDir(AlxLogger* me);
 static Alx_Status AlxLogger_Fs_RepairWriteFile(AlxLogger* me);
 
 
@@ -105,17 +106,17 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	ALX_LOGGER_TRACE_FORMAT("- numOfFilesPerDir = %lu\r\n", me->info.numOfFilesPerDir);
 	ALX_LOGGER_TRACE_FORMAT("- numOfLogsPerFile = %lu\r\n", me->info.numOfLogsPerFile);
 
-	ALX_LOGGER_TRACE_FORMAT("- idLogRead = %lu\r\n", (uint32_t)me->info.idLogRead);
-	ALX_LOGGER_TRACE_FORMAT("- idLogWrite = %lu\r\n", (uint32_t)me->info.idLogWrite);
+	ALX_LOGGER_TRACE_FORMAT("- idRead = %lu\r\n", (uint32_t)me->info.idRead);
+	ALX_LOGGER_TRACE_FORMAT("- addrReadPosition = %lu\r\n", me->info.addrReadPosition);
+	ALX_LOGGER_TRACE_FORMAT("- addrReadLine = %lu\r\n", me->info.addrReadLine);
+	ALX_LOGGER_TRACE_FORMAT("- addrReadFile = %lu\r\n", me->info.addrReadFile);
+	ALX_LOGGER_TRACE_FORMAT("- addrReadDir = %lu\r\n", me->info.addrReadDir);
 
-	ALX_LOGGER_TRACE_FORMAT("- addrPosRead = %lu\r\n", me->info.addrPosRead);
-	ALX_LOGGER_TRACE_FORMAT("- addrPosWrite = %lu\r\n", me->info.addrPosWrite);
-	ALX_LOGGER_TRACE_FORMAT("- addrLineRead = %lu\r\n", me->info.addrLineRead);
-	ALX_LOGGER_TRACE_FORMAT("- addrLineWrite = %lu\r\n", me->info.addrLineWrite);
-	ALX_LOGGER_TRACE_FORMAT("- addrFileRead = %lu\r\n", me->info.addrFileRead);
-	ALX_LOGGER_TRACE_FORMAT("- addrFileWrite = %lu\r\n", me->info.addrFileWrite);
-	ALX_LOGGER_TRACE_FORMAT("- addrDirRead = %lu\r\n", me->info.addrDirRead);
-	ALX_LOGGER_TRACE_FORMAT("- addrDirWrite = %lu\r\n", me->info.addrDirWrite);
+	ALX_LOGGER_TRACE_FORMAT("- idWrite = %lu\r\n", (uint32_t)me->info.idWrite);
+	ALX_LOGGER_TRACE_FORMAT("- addrWritePosition = %lu\r\n", me->info.addrWritePosition);
+	ALX_LOGGER_TRACE_FORMAT("- addrWriteLine = %lu\r\n", me->info.addrWriteLine);
+	ALX_LOGGER_TRACE_FORMAT("- addrWriteFile = %lu\r\n", me->info.addrWriteFile);
+	ALX_LOGGER_TRACE_FORMAT("- addrWriteDir = %lu\r\n", me->info.addrWriteDir);
 
 	ALX_LOGGER_TRACE_FORMAT("- crc = 0x%04X\r\n", me->info.crc);
 	ALX_LOGGER_TRACE_FORMAT("\r\n");
@@ -165,7 +166,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 	// Check idLogDelta
 	//------------------------------------------------------------------------------
-	int64_t idLogDelta = me->info.idLogWrite - me->info.idLogRead;
+	int64_t idLogDelta = me->info.idWrite - me->info.idRead;
 	if (idLogDelta == 0)
 	{
 		return AlxLogger_ErrNoReadLog;
@@ -181,7 +182,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 
 	// Open
-	sprintf(filePath, "/%lu/%lu.csv", me->info.addrDirRead, me->info.addrFileRead);
+	sprintf(filePath, "/%lu/%lu.csv", me->info.addrReadDir, me->info.addrReadFile);
 	status = AlxFs_File_Open(me->alxFs, &file, filePath, "r");
 	if (status != Alx_Ok)
 	{
@@ -191,7 +192,7 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 
 	// Seek
 	uint32_t filePositionNew = 0;
-	status = AlxFs_File_Seek(me->alxFs, &file, me->info.addrPosRead, AlxFs_File_Seek_Origin_Set, &filePositionNew);
+	status = AlxFs_File_Seek(me->alxFs, &file, me->info.addrReadPosition, AlxFs_File_Seek_Origin_Set, &filePositionNew);
 	if (status != Alx_Ok)
 	{
 		AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
@@ -222,32 +223,32 @@ Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 
 	// idLog
-	me->info.idLogRead++;
+	me->info.idRead++;
 
 	// addrPos
-	me->info.addrPosRead = me->info.addrPosRead + readLenActual;
+	me->info.addrReadPosition = me->info.addrReadPosition + readLenActual;
 
 	// addrLine
-	me->info.addrLineRead++;
-	if (me->info.addrLineRead >= me->numOfLogsPerFile)
+	me->info.addrReadLine++;
+	if (me->info.addrReadLine >= me->numOfLogsPerFile)
 	{
 		// Reset
-		me->info.addrPosRead = 0;
-		me->info.addrLineRead = 0;
+		me->info.addrReadPosition = 0;
+		me->info.addrReadLine = 0;
 
 		// addrFile
-		me->info.addrFileRead++;
-		if (me->info.addrFileRead >= me->numOfFilesPerDir)
+		me->info.addrReadFile++;
+		if (me->info.addrReadFile >= me->numOfFilesPerDir)
 		{
 			// Reset
-			me->info.addrFileRead = 0;
+			me->info.addrReadFile = 0;
 
 			// addrDir
-			me->info.addrDirRead++;
-			if (me->info.addrDirRead >= me->numOfDir)
+			me->info.addrReadDir++;
+			if (me->info.addrReadDir >= me->numOfDir)
 			{
 				// Reset
-				me->info.addrDirRead = 0;
+				me->info.addrReadDir = 0;
 			}
 		}
 	}
@@ -281,7 +282,7 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numO
 	//------------------------------------------------------------------------------
 
 	// Open
-	sprintf(filePath, "/%lu/%lu.csv", me->info.addrDirWrite, me->info.addrFileWrite);
+	sprintf(filePath, "/%lu/%lu.csv", me->info.addrWriteDir, me->info.addrWriteFile);
 	status = AlxFs_File_Open(me->alxFs, &file, filePath, "a");
 	if (status != Alx_Ok)
 	{
@@ -312,75 +313,62 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numO
 	//------------------------------------------------------------------------------
 
 	// idLog
-	me->info.idLogWrite++;
+	me->info.idWrite++;
 
 	// addrPos
-	me->info.addrPosWrite = me->info.addrPosWrite + writeLen;
+	me->info.addrWritePosition = me->info.addrWritePosition + writeLen;
 
 	// addrLine
-	me->info.addrLineWrite++;
-	if (me->info.addrLineWrite >= me->numOfLogsPerFile)
+	me->info.addrWriteLine++;
+	if (me->info.addrWriteLine >= me->numOfLogsPerFile)
 	{
 		// Reset
-		me->info.addrPosWrite = 0;
-		me->info.addrLineWrite = 0;
+		me->info.addrWritePosition = 0;
+		me->info.addrWriteLine = 0;
 
 		// addrFile
-		me->info.addrFileWrite++;
-		if (me->info.addrFileWrite >= me->numOfFilesPerDir)
+		me->info.addrWriteFile++;
+		if (me->info.addrWriteFile >= me->numOfFilesPerDir)
 		{
 			// Reset
-			me->info.addrFileWrite = 0;
+			me->info.addrWriteFile = 0;
 
 			// addrDir
-			me->info.addrDirWrite++;
-			if (me->info.addrDirWrite >= me->numOfDir)
+			me->info.addrWriteDir++;
+			if (me->info.addrWriteDir >= me->numOfDir)
 			{
 				// Reset
-				me->info.addrDirWrite = 0;
+				me->info.addrWriteDir = 0;
 			}
 
 			// If needed, discard oldest logs by incrementing addrDirRead
-			if (me->info.addrDirWrite == me->info.addrDirRead)
+			if (me->info.addrWriteDir == me->info.addrReadDir)
 			{
 				// Increment idLogRead to next nearest multiple
-				uint64_t remainder = me->info.idLogRead % me->numOfLogsPerDir;
+				uint64_t remainder = me->info.idRead % me->numOfLogsPerDir;
 				uint64_t delta = me->numOfLogsPerDir - remainder;
-				me->info.idLogRead = me->info.idLogRead + delta;
+				me->info.idRead = me->info.idRead + delta;
 
 				// Reset
-				me->info.addrPosRead = 0;
-				me->info.addrLineRead = 0;
-				me->info.addrFileRead = 0;
+				me->info.addrReadPosition = 0;
+				me->info.addrReadLine = 0;
+				me->info.addrReadFile = 0;
 
 				// addrDir
-				me->info.addrDirRead++;
-				if (me->info.addrDirRead >= me->numOfDir)
+				me->info.addrReadDir++;
+				if (me->info.addrReadDir >= me->numOfDir)
 				{
 					// Reset
-					me->info.addrDirRead = 0;
+					me->info.addrReadDir = 0;
 				}
 			}
 
-			// Clear next dir
-			for (uint32_t i = 0; i < me->numOfFilesPerDir; i++)
+			// Clear next write dir
+			status = AlxLogger_Fs_ClearWriteDir(me);
+			if (status != Alx_Ok)
 			{
-				// Open
-				sprintf(filePath, "/%lu/%lu.csv", me->info.addrDirWrite, i);
-				status = AlxFs_File_Open(me->alxFs, &file, filePath, "w");
-				if (status != Alx_Ok)
-				{
-					ALX_FS_TRACE("Err");
-					return status;
-				}
-
-				// Close
-				status = AlxFs_File_Close(me->alxFs, &file);
-				if (status != Alx_Ok)
-				{
-					ALX_FS_TRACE("Err");
-					return status;
-				}
+				ALX_FS_TRACE("Err");
+				return status;
 			}
 		}
 	}
@@ -389,10 +377,14 @@ Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numO
 	//------------------------------------------------------------------------------
 	// Store Info
 	//------------------------------------------------------------------------------
-	if (me->info.addrLineWrite == 0)	// Every new file
+	if (me->info.addrWriteLine == 0)	// Every new file
 	{
 		status = AlxLogger_Fs_StoreInfo(me, false);
-		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_FS_TRACE("Err");
+			return status;
+		}
 	}
 
 
@@ -453,7 +445,7 @@ static Alx_Status AlxLogger_Fs_Prepare(AlxLogger* me)
 	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 	// Create directories & files
-	status = AlxLogger_Fs_CreateDirFile(me);
+	status = AlxLogger_Fs_CreateDirAndFiles(me);
 	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 	// Store default info
@@ -586,17 +578,17 @@ static Alx_Status AlxLogger_Fs_StoreInfo(AlxLogger* me, bool storeDefault)
 		me->info.numOfFilesPerDir = me->numOfFilesPerDir;
 		me->info.numOfLogsPerFile = me->numOfLogsPerFile;
 
-		me->info.idLogRead = 0;
-		me->info.idLogWrite = 0;
+		me->info.idRead = 0;
+		me->info.idWrite = 0;
 
-		me->info.addrPosRead = 0;
-		me->info.addrPosWrite = 0;
-		me->info.addrLineRead = 0;
-		me->info.addrLineWrite = 0;
-		me->info.addrFileRead = 0;
-		me->info.addrFileWrite = 0;
-		me->info.addrDirRead = 0;
-		me->info.addrDirWrite = 0;
+		me->info.addrReadPosition = 0;
+		me->info.addrWritePosition = 0;
+		me->info.addrReadLine = 0;
+		me->info.addrWriteLine = 0;
+		me->info.addrReadFile = 0;
+		me->info.addrWriteFile = 0;
+		me->info.addrReadDir = 0;
+		me->info.addrWriteDir = 0;
 	}
 
 	uint32_t crcLen = AlxCrc_GetLen(&me->alxCrc);
@@ -639,7 +631,7 @@ static Alx_Status AlxLogger_Fs_StoreInfo(AlxLogger* me, bool storeDefault)
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
-static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
+static Alx_Status AlxLogger_Fs_CreateDirAndFiles(AlxLogger* me)
 {
 	//------------------------------------------------------------------------------
 	// Local Variables
@@ -723,6 +715,45 @@ static Alx_Status AlxLogger_Fs_CreateDirFile(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
+static Alx_Status AlxLogger_Fs_ClearWriteDir(AlxLogger* me)
+{
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
+	AlxFs_File file = {};
+	char filePath[ALX_LOGGER_PATH_LEN_MAX] = "";
+
+
+	//------------------------------------------------------------------------------
+	// Clear
+	//------------------------------------------------------------------------------
+	for (uint32_t i = 0; i < me->numOfFilesPerDir; i++)
+	{
+		// Open
+		sprintf(filePath, "/%lu/%lu.csv", me->info.addrWriteDir, i);
+		status = AlxFs_File_Open(me->alxFs, &file, filePath, "w");
+		if (status != Alx_Ok)
+		{
+			ALX_FS_TRACE("Err");
+			return status;
+		}
+
+		// Close
+		status = AlxFs_File_Close(me->alxFs, &file);
+		if (status != Alx_Ok)
+		{
+			ALX_FS_TRACE("Err");
+			return status;
+		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
+}
 static Alx_Status AlxLogger_Fs_RepairWriteFile(AlxLogger* me)
 {
 	//------------------------------------------------------------------------------
@@ -740,7 +771,7 @@ static Alx_Status AlxLogger_Fs_RepairWriteFile(AlxLogger* me)
 	//------------------------------------------------------------------------------
 
 	// Open
-	sprintf(filePath, "/%lu/%lu.csv", me->info.addrDirWrite, me->info.addrFileWrite);
+	sprintf(filePath, "/%lu/%lu.csv", me->info.addrWriteDir, me->info.addrWriteFile);
 	status = AlxFs_File_Open(me->alxFs, &file, filePath, "r+");
 	if (status != Alx_Ok)
 	{
@@ -761,7 +792,7 @@ static Alx_Status AlxLogger_Fs_RepairWriteFile(AlxLogger* me)
 		else if (status == AlxFs_ErrNoDelim)
 		{
 			// Truncate, with this we eliminate last corrupted line
-			status = AlxFs_File_Truncate(me->alxFs, &file, me->info.addrPosWrite);
+			status = AlxFs_File_Truncate(me->alxFs, &file, me->info.addrWritePosition);
 			if (status != Alx_Ok)
 			{
 				AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
@@ -780,8 +811,8 @@ static Alx_Status AlxLogger_Fs_RepairWriteFile(AlxLogger* me)
 		}
 
 		// Increment addr
-		me->info.addrPosWrite = me->info.addrPosWrite + readLenActual;
-		me->info.addrLineWrite++;
+		me->info.addrWritePosition = me->info.addrWritePosition + readLenActual;
+		me->info.addrWriteLine++;
 	}
 
 
