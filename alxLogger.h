@@ -117,10 +117,10 @@ typedef struct
 {
 	// Defines
 	#define ALX_LOGGER_PATH_LEN_MAX 128
-	#define ALX_LOGGER_INFO_FILE_PATH "/AlxLoggerMetadata.bin"
-	#define ALX_LOGGER_INFO_MAGIC_NUMBER 0x002DCA5D
-	#define ALX_LOGGER_INFO_VERSION 1
 	#define ALX_LOGGER_LOG_LEN_MAX 512
+	#define ALX_LOGGER_METADATA_FILE_PATH "/AlxLoggerMetadata.bin"
+	#define ALX_LOGGER_METADATA_MAGIC_NUMBER 0x002DCA5D
+	#define ALX_LOGGER_METADATA_VERSION 1
 
 	// Parameters
 	AlxFs* alxFs;
@@ -166,6 +166,8 @@ Alx_Status AlxLogger_Init(AlxLogger* me);
 Alx_Status AlxLogger_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs);
 Alx_Status AlxLogger_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs, bool appendLogDelim);
 Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
+AlxLogger_Metadata AlxLogger_GetMetadata(AlxLogger* me);
+AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
