@@ -81,6 +81,23 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxLogger_StoreMetadata_Config_StoreDefault,
+	AlxLogger_StoreMetadata_Config_StoreCurrent,
+	AlxLogger_StoreMetadata_Config_StoreRead,
+	AlxLogger_StoreMetadata_Config_StoreWrite
+} AlxLogger_StoreMetadata_Config;
+
+typedef struct
+{
+	uint64_t id;
+	uint32_t position;
+	uint32_t line;
+	uint32_t file;
+	uint32_t dir;
+} AlxLogger_Metadata_ReadWrite;
+
 typedef struct
 {
 	uint32_t magicNumber;
@@ -90,26 +107,17 @@ typedef struct
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
 
-	uint64_t idRead;
-	uint32_t addrReadPosition;
-	uint32_t addrReadLine;
-	uint32_t addrReadFile;
-	uint32_t addrReadDir;
-
-	uint64_t idWrite;
-	uint32_t addrWritePosition;
-	uint32_t addrWriteLine;
-	uint32_t addrWriteFile;
-	uint32_t addrWriteDir;
+	AlxLogger_Metadata_ReadWrite read;
+	AlxLogger_Metadata_ReadWrite write;
 
 	uint16_t crc;
-} AlxLogger_Info;
+} AlxLogger_Metadata;
 
 typedef struct
 {
 	// Defines
 	#define ALX_LOGGER_PATH_LEN_MAX 128
-	#define ALX_LOGGER_INFO_FILE_PATH "/AlxLoggerInfo.bin"
+	#define ALX_LOGGER_INFO_FILE_PATH "/AlxLoggerMetadata.bin"
 	#define ALX_LOGGER_INFO_MAGIC_NUMBER 0x002DCA5D
 	#define ALX_LOGGER_INFO_VERSION 1
 	#define ALX_LOGGER_LOG_LEN_MAX 512
@@ -121,12 +129,15 @@ typedef struct
 	uint32_t numOfLogsPerFile;
 	const char* logDelim;
 
-	// Variables
-	AlxLogger_Info info;
-	AlxCrc alxCrc;
+	// Parameters - Private
 	uint32_t numOfFiles;
 	uint64_t numOfLogsMax;
 	uint64_t numOfLogsPerDir;
+
+	// Variables
+	AlxLogger_Metadata md;
+	AlxLogger_Metadata mdStored;
+	AlxCrc alxCrc;
 
 	// Info
 	bool wasCtorCalled;
@@ -152,10 +163,9 @@ void AlxLogger_Ctor
 // Functions
 //******************************************************************************
 Alx_Status AlxLogger_Init(AlxLogger* me);
-Alx_Status AlxLogger_Trace_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs);
-Alx_Status AlxLogger_Trace_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs, bool appendLogDelim);
-Alx_Status AlxLogger_Data_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs);
-Alx_Status AlxLogger_Data_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs, bool appendLogDelim);
+Alx_Status AlxLogger_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs);
+Alx_Status AlxLogger_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs, bool appendLogDelim);
+Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
 
 
 #endif	// #if defined(ALX_C_LIB)
