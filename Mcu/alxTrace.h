@@ -75,6 +75,7 @@ typedef struct { bool dummy; } AlxTrace;
 #define ALX_TRACE_FORMAT(...) do							{ AlxTrace_WriteFormat(&alxTrace, __VA_ARGS__); } while(false)
 #define ALX_TRACE_STD(file, ...) do							{ AlxTrace_WriteStd(&alxTrace, file, __LINE__, __func__, __VA_ARGS__); } while(false)
 #define ALX_TRACE_SM(smLevel, smName, stName, acName) do	{ AlxTrace_WriteSm(&alxTrace, smLevel, smName, stName, acName); } while(false)
+#define ALX_TRACE_LEN_MAX 256
 
 
 //******************************************************************************

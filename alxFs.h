@@ -126,7 +126,7 @@ typedef struct
 typedef struct
 {
 	// Defines
-	#define ALX_FS_BUFF_LEN 512
+	#define ALX_FS_BUFF_LEN 256
 
 	// Parameters
 	AlxFs_Config config;

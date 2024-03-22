@@ -441,7 +441,7 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	AlxFs_File file = {};
 	uint32_t fileSize = 0;
 	uint32_t fileSizeTraced = 0;
-	uint8_t buff[ALX_FS_BUFF_LEN+1] = {};	// Add +1 for string null-terminator
+	uint8_t buff[ALX_FS_BUFF_LEN] = {};
 	uint32_t lenActual = 0;
 
 	// Open
@@ -461,7 +461,8 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	while (true)
 	{
 		// Read
-		status = AlxFs_File_Read(me, &file, buff, ALX_FS_BUFF_LEN, &lenActual);
+		memset(buff, 0, sizeof(buff));
+		status = AlxFs_File_Read(me, &file, buff, sizeof(buff)-1, &lenActual);	// Subtract -1 for string null-terminator
 		if (status != Alx_Ok)
 		{
 			AlxFs_File_Close(me, &file);	// Will not handle return

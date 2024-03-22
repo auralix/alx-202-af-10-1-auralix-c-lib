@@ -60,14 +60,14 @@ void AlxTrace_WriteStr_Callback(AlxTrace* me, const char* str);
   */
 void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
 {
-	char buff[256] = {0};
-	va_list args = {0};
+	char str[ALX_TRACE_LEN_MAX] = {};
+	va_list args = {};
 
 	va_start(args, format);
-	vsnprintf(buff, 256, format, args);
+	vsnprintf(str, sizeof(str), format, args);
 	va_end(args);
 
-	AlxTrace_WriteStr_Callback(me, buff);
+	AlxTrace_WriteStr_Callback(me, str);
 }
 
 /**
@@ -80,17 +80,17 @@ void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
   */
 void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, const char* format, ...)
 {
-	char buff[256] = {0};
-	va_list args = {0};
+	char str[ALX_TRACE_LEN_MAX] = {};
+	va_list args = {};
 
-	AlxGlobal_Ulltoa(AlxTick_Get_ms(&alxTick), buff);
-	AlxTrace_WriteFormat(me, "trace;%s;%s;%lu;%s;", buff, file, line, fun);
+	AlxGlobal_Ulltoa(AlxTick_Get_ms(&alxTick), str);
+	AlxTrace_WriteFormat(me, "trace;%s;%s;%lu;%s;", str, file, line, fun);
 
 	va_start(args, format);
-	vsnprintf(buff, 256, format, args);
+	vsnprintf(str, sizeof(str), format, args);
 	va_end(args);
 
-	AlxTrace_WriteFormat(me, "%s\r\n", buff);
+	AlxTrace_WriteFormat(me, "%s\r\n", str);
 }
 
 /**
@@ -105,10 +105,10 @@ void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const c
 {
 	if ((smName != NULL) && (stName != NULL) && (acName != NULL))
 	{
-		char smLevelStr[50] = {0};
+		char smLevelStr[50] = {};
 		AlxTrace_GetSmLevelStr(smLevel, smLevelStr);
 
-		char tickStr[50] = {0};
+		char tickStr[50] = {};
 		AlxGlobal_Ulltoa(AlxTick_Get_ms(&alxTick), tickStr);
 
 		AlxTrace_WriteFormat(me, "traceSm;%s;%s%s_%s_%s\r\n", tickStr, smLevelStr, smName, stName, acName);
