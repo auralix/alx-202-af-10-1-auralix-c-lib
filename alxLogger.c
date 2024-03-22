@@ -134,7 +134,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
+Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -214,7 +214,7 @@ Alx_Status AlxLogger_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 		//------------------------------------------------------------------------------
 		// Read Log
 		//------------------------------------------------------------------------------
-		status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log + readLenTotal, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLen);
+		status = AlxFs_File_ReadStrUntil(me->alxFs, &file, logs + readLenTotal, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLen);
 		if (status != Alx_Ok)
 		{
 			AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
@@ -301,7 +301,7 @@ Alx_Status AlxLogger_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 	return status;
 }
-Alx_Status AlxLogger_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs)
+Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -348,19 +348,19 @@ Alx_Status AlxLogger_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs
 		if (numOfLogsPerFileRemaining > numOfLogs)
 		{
 			numOfLogsToWrite = numOfLogs;
-			writeLen = strlen(log);
+			writeLen = strlen(logs);
 		}
 		else
 		{
 			numOfLogsToWrite = numOfLogsPerFileRemaining;
-			writeLen = AlxLogger_GetNumOfLogsEndPosition(me, (void*)log + writeLenTotal, numOfLogsToWrite);
+			writeLen = AlxLogger_GetNumOfLogsEndPosition(me, (void*)logs + writeLenTotal, numOfLogsToWrite);
 		}
 
 
 		//------------------------------------------------------------------------------
 		// Write
 		//------------------------------------------------------------------------------
-		status = AlxFs_File_Write(me->alxFs, &file, (void*)log + writeLenTotal, writeLen);
+		status = AlxFs_File_Write(me->alxFs, &file, (void*)logs + writeLenTotal, writeLen);
 		if (status != Alx_Ok)
 		{
 			AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
@@ -497,7 +497,7 @@ Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config
 	// Store
 	return AlxLogger_StoreMetadata_Private(me, config);
 }
-AlxLogger_Metadata AlxLogger_GetMetadata(AlxLogger* me)
+AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
