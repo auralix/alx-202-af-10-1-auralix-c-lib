@@ -46,6 +46,7 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me);
 static Alx_Status AlxLogger_RepairWriteFile(AlxLogger* me);
 static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me);
+static bool AlxLogger_IsReadLogAvailable(AlxLogger* me);
 
 
 //******************************************************************************
@@ -139,7 +140,6 @@ Alx_Status AlxLogger_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
 	ALX_LOGGER_ASSERT(me->isInit == true);
-	ALX_LOGGER_ASSERT(numOfLogs == 1);	// Only single log handling supported
 
 
 	//------------------------------------------------------------------------------
@@ -149,55 +149,144 @@ Alx_Status AlxLogger_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 	AlxFs_File file = {};
 	char filePath[ALX_LOGGER_PATH_LEN_MAX] = "";
 	uint32_t readLenActual = 0;
+	uint32_t readLenTotal = 0;
+	uint32_t logNum = 0;
 
 
 	//------------------------------------------------------------------------------
-	// Check idLogDelta
+	// Loop
 	//------------------------------------------------------------------------------
-	int64_t idLogDelta = me->md.write.id - me->md.read.id;
-	if (idLogDelta == 0)
+	while (true)
 	{
-		return AlxLogger_ErrNoReadLog;
-	}
-	else if (idLogDelta < 0)
-	{
-		ALX_LOGGER_ASSERT(false);	// We should never get here
+		//------------------------------------------------------------------------------
+		// Handle First Log & First Line
+		//------------------------------------------------------------------------------
+		if (logNum == 0)
+		{
+			// Check if read log available
+			if (AlxLogger_IsReadLogAvailable(me) == false)
+			{
+				// Return
+				return AlxLogger_ErrNoReadLog;
+			}
+
+			// Open
+			sprintf(filePath, "/%lu/%lu.csv", me->md.read.dir, me->md.read.file);
+			status = AlxFs_File_Open(me->alxFs, &file, filePath, "r");
+			if (status != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err");
+				return status;
+			}
+
+			// Seek
+			uint32_t filePositionNew = 0;
+			status = AlxFs_File_Seek(me->alxFs, &file, me->md.read.position, AlxFs_File_Seek_Origin_Set, &filePositionNew);
+			if (status != Alx_Ok)
+			{
+				AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
+				ALX_FS_TRACE("Err");
+				return status;
+			}
+		}
+		else if (me->md.read.line == 0)
+		{
+			// Close existing file
+			status = AlxFs_File_Close(me->alxFs, &file);
+			if (status != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err");
+				return status;
+			}
+
+			// Open new file
+			sprintf(filePath, "/%lu/%lu.csv", me->md.read.dir, me->md.read.file);
+			status = AlxFs_File_Open(me->alxFs, &file, filePath, "r");
+			if (status != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err");
+				return status;
+			}
+		}
+
+
+		//------------------------------------------------------------------------------
+		// Read Log
+		//------------------------------------------------------------------------------
+		status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log + readLenTotal, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
+		if (status != Alx_Ok)
+		{
+			AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
+			ALX_FS_TRACE("Err");
+			return status;
+		}
+
+
+		//------------------------------------------------------------------------------
+		// Handle IDs & Addresses
+		//------------------------------------------------------------------------------
+
+		// idLog
+		me->md.read.id++;
+
+		// addrPos
+		me->md.read.position = me->md.read.position + readLenActual;
+
+		// addrLine
+		me->md.read.line++;
+		if (me->md.read.line >= me->numOfLogsPerFile)
+		{
+			// Reset
+			me->md.read.position = 0;
+			me->md.read.line = 0;
+
+			// addrFile
+			me->md.read.file++;
+			if (me->md.read.file >= me->numOfFilesPerDir)
+			{
+				// Reset
+				me->md.read.file = 0;
+
+				// addrDir
+				me->md.read.dir++;
+				if (me->md.read.dir >= me->numOfDir)
+				{
+					// Reset
+					me->md.read.dir = 0;
+				}
+			}
+		}
+
+
+		//------------------------------------------------------------------------------
+		// Increment logNum, readLenTotal
+		//------------------------------------------------------------------------------
+		logNum++;
+		readLenTotal = readLenTotal + readLenActual;
+
+
+
+		//------------------------------------------------------------------------------
+		// Handle Last Log & Check if Read Log Available
+		//------------------------------------------------------------------------------
+		if (logNum == numOfLogs)
+		{
+			// Break
+			status = Alx_Ok;
+			break;
+		}
+		else if (AlxLogger_IsReadLogAvailable(me) == false)
+		{
+			// Break
+			status =  AlxLogger_ErrNoReadLog;
+			break;
+		}
 	}
 
 
 	//------------------------------------------------------------------------------
-	// Read
-	//------------------------------------------------------------------------------
-
-	// Open
-	sprintf(filePath, "/%lu/%lu.csv", me->md.read.dir, me->md.read.file);
-	status = AlxFs_File_Open(me->alxFs, &file, filePath, "r");
-	if (status != Alx_Ok)
-	{
-		ALX_FS_TRACE("Err");
-		return status;
-	}
-
-	// Seek
-	uint32_t filePositionNew = 0;
-	status = AlxFs_File_Seek(me->alxFs, &file, me->md.read.position, AlxFs_File_Seek_Origin_Set, &filePositionNew);
-	if (status != Alx_Ok)
-	{
-		AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
-		ALX_FS_TRACE("Err");
-		return status;
-	}
-
-	// Read
-	status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
-	if (status != Alx_Ok)
-	{
-		AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
-		ALX_FS_TRACE("Err");
-		return status;
-	}
-
 	// Close
+	//------------------------------------------------------------------------------
 	status = AlxFs_File_Close(me->alxFs, &file);
 	if (status != Alx_Ok)
 	{
@@ -207,45 +296,9 @@ Alx_Status AlxLogger_ReadLog(AlxLogger* me, char* log, uint32_t numOfLogs)
 
 
 	//------------------------------------------------------------------------------
-	// Handle IDs & Addresses
-	//------------------------------------------------------------------------------
-
-	// idLog
-	me->md.read.id++;
-
-	// addrPos
-	me->md.read.position = me->md.read.position + readLenActual;
-
-	// addrLine
-	me->md.read.line++;
-	if (me->md.read.line >= me->numOfLogsPerFile)
-	{
-		// Reset
-		me->md.read.position = 0;
-		me->md.read.line = 0;
-
-		// addrFile
-		me->md.read.file++;
-		if (me->md.read.file >= me->numOfFilesPerDir)
-		{
-			// Reset
-			me->md.read.file = 0;
-
-			// addrDir
-			me->md.read.dir++;
-			if (me->md.read.dir >= me->numOfDir)
-			{
-				// Reset
-				me->md.read.dir = 0;
-			}
-		}
-	}
-
-
-	//------------------------------------------------------------------------------
 	// Return
 	//------------------------------------------------------------------------------
-	return Alx_Ok;
+	return status;
 }
 Alx_Status AlxLogger_WriteLog(AlxLogger* me, const char* log, uint32_t numOfLogs, bool appendLogDelim)
 {
@@ -922,6 +975,22 @@ static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me)
 	// Return
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
+}
+static bool AlxLogger_IsReadLogAvailable(AlxLogger* me)
+{
+	int64_t idLogDelta = me->md.write.id - me->md.read.id;
+	if (idLogDelta > 0)
+	{
+		return true;
+	}
+	else if (idLogDelta == 0)
+	{
+		return false;
+	}
+	else if (idLogDelta < 0)
+	{
+		ALX_LOGGER_ASSERT(false);	// We should never get here
+	}
 }
 
 
