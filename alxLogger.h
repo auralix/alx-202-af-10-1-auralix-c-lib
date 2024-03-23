@@ -131,7 +131,8 @@ typedef struct
 
 	// Parameters - Private
 	uint32_t numOfFiles;
-	uint64_t numOfLogsPerDir;
+	uint32_t numOfLogsMax;
+	uint32_t numOfLogsPerDir;
 
 	// Variables
 	AlxLogger_Metadata md;

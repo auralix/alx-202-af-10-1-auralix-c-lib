@@ -72,6 +72,7 @@ void AlxLogger_Ctor
 
 	// Parameters - Private
 	me->numOfFiles = me->numOfFilesPerDir * me->numOfDir;
+	me->numOfLogsMax = me->numOfFiles * me->numOfLogsPerFile;
 	me->numOfLogsPerDir = me->numOfFilesPerDir * me->numOfLogsPerFile;
 
 	// Variables
@@ -272,27 +273,32 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 		//------------------------------------------------------------------------------
 		if (logNum == numOfLogs)
 		{
+			// Close
+			status = AlxFs_File_Close(me->alxFs, &file);
+			if (status != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err");
+				return status;
+			}
+
 			// Break
 			status = Alx_Ok;
 			break;
 		}
 		else if (AlxLogger_IsReadLogAvailable(me) == false)
 		{
+			// Close
+			status = AlxFs_File_Close(me->alxFs, &file);
+			if (status != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err");
+				return status;
+			}
+
 			// Break
 			status =  AlxLogger_ErrNoReadLog;
 			break;
 		}
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Close
-	//------------------------------------------------------------------------------
-	status = AlxFs_File_Close(me->alxFs, &file);
-	if (status != Alx_Ok)
-	{
-		ALX_FS_TRACE("Err");
-		return status;
 	}
 
 
@@ -542,6 +548,9 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		status = AlxLogger_LoadMetadata(me);
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); break; }
 
+		// Set metadata current
+		me->md = me->mdStored;
+
 		// Repair write file
 		status = AlxLogger_RepairWriteFile(me);
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
@@ -574,6 +583,9 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 	// Store default metadata
 	status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreDefault);
 	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+	// Set metadata current
+	me->md = me->mdStored;
 
 	// Return
 	return Alx_Ok;
@@ -679,7 +691,6 @@ static Alx_Status AlxLogger_LoadMetadata(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	// Set
 	//------------------------------------------------------------------------------
-	me->md = mdTemp;
 	me->mdStored = mdTemp;
 
 
@@ -843,7 +854,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 	AlxTimSw_Start(&alxTimSw_DirFilePrepAll);
 
 	// Create directories
-	for (uint32_t i = 0; i < me->numOfFilesPerDir; i++)
+	for (uint32_t i = 0; i < me->numOfDir; i++)
 	{
 		// Start timer
 		AlxTimSw_Start(&alxTimSw_DirFilePrepSingle);
@@ -892,6 +903,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 	// Trace
 	uint32_t dirFilePrepAllTime_sec = AlxTimSw_Get_sec(&alxTimSw_DirFilePrepAll);
 	ALX_LOGGER_TRACE_FORMAT("Created %lu dir with %lu files, total %lu files in %lu sec\r\n", me->numOfDir, me->numOfFilesPerDir, me->numOfFiles, dirFilePrepAllTime_sec);
+	ALX_LOGGER_TRACE_FORMAT("Each file has %lu logs, so max number of logs is %lu\r\n", me->numOfLogsPerFile, me->numOfLogsMax);
 
 
 	//------------------------------------------------------------------------------
