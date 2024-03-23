@@ -131,7 +131,6 @@ typedef struct
 
 	// Parameters - Private
 	uint32_t numOfFiles;
-	uint64_t numOfLogsMax;
 	uint64_t numOfLogsPerDir;
 
 	// Variables
@@ -163,7 +162,7 @@ void AlxLogger_Ctor
 // Functions
 //******************************************************************************
 Alx_Status AlxLogger_Init(AlxLogger* me);
-Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs);
+Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual);
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs);
 Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
 AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me);

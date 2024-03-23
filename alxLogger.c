@@ -72,7 +72,6 @@ void AlxLogger_Ctor
 
 	// Parameters - Private
 	me->numOfFiles = me->numOfFilesPerDir * me->numOfDir;
-	me->numOfLogsMax = me->numOfFiles * me->numOfLogsPerFile;
 	me->numOfLogsPerDir = me->numOfFilesPerDir * me->numOfLogsPerFile;
 
 	// Variables
@@ -134,7 +133,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs)
+Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -168,6 +167,7 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs)
 			if (AlxLogger_IsReadLogAvailable(me) == false)
 			{
 				// Return
+				*numOfLogsActual = logNum;
 				return AlxLogger_ErrNoReadLog;
 			}
 
@@ -299,6 +299,7 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 	// Return
 	//------------------------------------------------------------------------------
+	*numOfLogsActual = logNum;
 	return status;
 }
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
