@@ -128,6 +128,10 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	ALX_LOGGER_TRACE_FORMAT("- crc = 0x%04X\r\n", me->md.crc);
 	ALX_LOGGER_TRACE_FORMAT("\r\n");
 
+	int64_t numOfReadLogsAvailable = me->md.write.id - me->md.read.id;
+	ALX_LOGGER_TRACE_FORMAT("Number of read logs available = %ld\r\n", (int32_t)numOfReadLogsAvailable);
+	ALX_LOGGER_TRACE_FORMAT("\r\n");
+
 	// Set isInit
 	me->isInit = true;
 
@@ -328,6 +332,7 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 	uint32_t writeLenTotal = 0;
 	int64_t numOfLogsPerFileRemaining = 0;
 	uint32_t numOfLogsToWrite = 0;
+	bool wereOldestReadLogsDiscarded = false;
 
 
 	//------------------------------------------------------------------------------
@@ -440,6 +445,9 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 						// Reset
 						me->md.read.dir = 0;
 					}
+
+					// Set
+					wereOldestReadLogsDiscarded = true;
 				}
 
 				// Clear next write dir
@@ -456,12 +464,23 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 
 
 		//------------------------------------------------------------------------------
-		// Store Metadata Every New File
+		// Store Metadata
 		//------------------------------------------------------------------------------
-		if (me->md.write.line == 0)
+		if (wereOldestReadLogsDiscarded)	// If oldest read logs were discared, store read & write
 		{
 			LL_GPIO_SetOutputPin(GPIOE, GPIO_PIN_11);	// TV: TODO
-			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreWrite);
+			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWrite);
+			LL_GPIO_ResetOutputPin(GPIOE, GPIO_PIN_11);	// TV: TODO
+			if (status != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err");
+				return status;
+			}
+		}
+		else if (me->md.write.line == 0)	// If new file, store write only
+		{
+			LL_GPIO_SetOutputPin(GPIOE, GPIO_PIN_11);	// TV: TODO
+			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreWriteOnly);
 			LL_GPIO_ResetOutputPin(GPIOE, GPIO_PIN_11);	// TV: TODO
 			if (status != Alx_Ok)
 			{
@@ -556,7 +575,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 		// Store metadata
-		status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreCurrent);
+		status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWrite);
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 		// Return
@@ -733,7 +752,7 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.write.file		= 0;
 		mdTemp.write.dir		= 0;
 	}
-	else if (config == AlxLogger_StoreMetadata_Config_StoreCurrent)
+	else if (config == AlxLogger_StoreMetadata_Config_StoreReadWrite)
 	{
 		mdTemp.read.id			= me->md.read.id;
 		mdTemp.read.position	= me->md.read.position;
@@ -747,7 +766,7 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.write.file		= me->md.write.file;
 		mdTemp.write.dir		= me->md.write.dir;
 	}
-	else if (config == AlxLogger_StoreMetadata_Config_StoreRead)
+	else if (config == AlxLogger_StoreMetadata_Config_StoreReadOnly)
 	{
 		mdTemp.read.id			= me->md.read.id;
 		mdTemp.read.position	= me->md.read.position;
@@ -761,7 +780,7 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.write.file		= me->mdStored.write.file;
 		mdTemp.write.dir		= me->mdStored.write.dir;
 	}
-	else if (config == AlxLogger_StoreMetadata_Config_StoreWrite)
+	else if (config == AlxLogger_StoreMetadata_Config_StoreWriteOnly)
 	{
 		mdTemp.read.id			= me->mdStored.read.id;
 		mdTemp.read.position	= me->mdStored.read.position;
@@ -1029,16 +1048,16 @@ static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me)
 static bool AlxLogger_IsReadLogAvailable(AlxLogger* me)
 {
 	bool isReadLogAvailable = false;
-	int64_t idLogDelta = me->md.write.id - me->md.read.id;
-	if (idLogDelta > 0)
+	int64_t numOfReadLogsAvailable = me->md.write.id - me->md.read.id;
+	if (numOfReadLogsAvailable > 0)
 	{
 		isReadLogAvailable = true;
 	}
-	else if (idLogDelta == 0)
+	else if (numOfReadLogsAvailable == 0)
 	{
 		isReadLogAvailable = false;
 	}
-	else if (idLogDelta < 0)
+	else if (numOfReadLogsAvailable < 0)
 	{
 		ALX_LOGGER_ASSERT(false);	// We should never get here
 	}

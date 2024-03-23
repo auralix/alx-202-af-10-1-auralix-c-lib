@@ -84,12 +84,12 @@ extern "C" {
 typedef enum
 {
 	AlxLogger_StoreMetadata_Config_StoreDefault,
-	AlxLogger_StoreMetadata_Config_StoreCurrent,
-	AlxLogger_StoreMetadata_Config_StoreRead,
-	AlxLogger_StoreMetadata_Config_StoreWrite
+	AlxLogger_StoreMetadata_Config_StoreReadWrite,
+	AlxLogger_StoreMetadata_Config_StoreReadOnly,
+	AlxLogger_StoreMetadata_Config_StoreWriteOnly
 } AlxLogger_StoreMetadata_Config;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint64_t id;
 	uint32_t position;
@@ -98,7 +98,7 @@ typedef struct
 	uint32_t dir;
 } AlxLogger_Metadata_ReadWrite;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint32_t magicNumber;
 	uint32_t version;
