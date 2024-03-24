@@ -369,7 +369,7 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 		//------------------------------------------------------------------------------
 		// Prepare
 		//------------------------------------------------------------------------------
-		numOfLogsPerFileRemaining = me->numOfLogsPerFile - me->md.write.line;
+		numOfLogsPerFileRemaining = (int64_t)me->numOfLogsPerFile - (int64_t)me->md.write.line;
 		ALX_LOGGER_ASSERT(numOfLogsPerFileRemaining > 0);
 		if (numOfLogsPerFileRemaining > numOfLogs)
 		{
@@ -960,6 +960,13 @@ static Alx_Status AlxLogger_RepairWriteFile(AlxLogger* me)
 
 
 	//------------------------------------------------------------------------------
+	// Trace
+	//------------------------------------------------------------------------------
+	ALX_LOGGER_TRACE_FORMAT("\r\n");
+	ALX_LOGGER_TRACE_FORMAT("AlxLogger - Repair Current Write File Started\r\n");
+
+
+	//------------------------------------------------------------------------------
 	// Repair
 	//------------------------------------------------------------------------------
 
@@ -972,6 +979,16 @@ static Alx_Status AlxLogger_RepairWriteFile(AlxLogger* me)
 		return status;
 	}
 
+	// Seek
+	uint32_t filePositionNew = 0;
+	status = AlxFs_File_Seek(me->alxFs, &file, me->md.write.position, AlxFs_File_Seek_Origin_Set, &filePositionNew);
+	if (status != Alx_Ok)
+	{
+		AlxFs_File_Close(me->alxFs, &file);	// Will not handle return
+		ALX_FS_TRACE("Err");
+		return status;
+	}
+
 	// Read lines until end-of-file or last corrupted line
 	while (true)
 	{
@@ -979,7 +996,10 @@ static Alx_Status AlxLogger_RepairWriteFile(AlxLogger* me)
 		status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
 		if ((status == AlxFs_ErrNoDelim) && (readLenActual == 0))
 		{
-			// Break, we reached end of file, all lines are OK
+			// Trace
+			ALX_LOGGER_TRACE_FORMAT("Reached end of file, all lines are OK\r\n");
+
+			// Break
 			break;
 		}
 		else if (status == AlxFs_ErrNoDelim)
@@ -993,6 +1013,9 @@ static Alx_Status AlxLogger_RepairWriteFile(AlxLogger* me)
 				return status;
 			}
 
+			// Trace
+			ALX_LOGGER_TRACE_FORMAT("Found and eliminated last corrupted line: %s\r\n", log);
+
 			// Break
 			break;
 		}
@@ -1004,6 +1027,7 @@ static Alx_Status AlxLogger_RepairWriteFile(AlxLogger* me)
 		}
 
 		// Increment addr
+		me->md.write.id++;
 		me->md.write.position = me->md.write.position + readLenActual;
 		me->md.write.line++;
 	}
@@ -1080,8 +1104,8 @@ static bool AlxLogger_IsLogToReadAvailable(AlxLogger* me)
 static uint32_t AlxLogger_GetNumOfLogsToRead_Private(AlxLogger* me)
 {
 	// Calculate
-	int64_t numOfLogsToRead = me->md.write.id - me->md.read.id;
-	ALX_LOGGER_ASSERT(0 <= numOfLogsToRead);
+	int64_t numOfLogsToRead = (int64_t)me->md.write.id - (int64_t)me->md.read.id;
+	ALX_LOGGER_ASSERT(numOfLogsToRead >= 0);
 
 	// Return
 	return (uint32_t)numOfLogsToRead;
