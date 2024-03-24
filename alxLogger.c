@@ -465,9 +465,7 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 				}
 
 				// Clear next write dir
-				LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);	// TV: TODO
 				status = AlxLogger_ClearWriteDir(me);
-				LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);	// TV: TODO
 				if (status != Alx_Ok)
 				{
 					ALX_FS_TRACE("Err");
@@ -482,9 +480,7 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 		//------------------------------------------------------------------------------
 		if (wereOldestReadLogsDiscarded)	// If oldest read logs were discared, store read & write
 		{
-			LL_GPIO_SetOutputPin(GPIOE, GPIO_PIN_11);	// TV: TODO
 			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWrite);
-			LL_GPIO_ResetOutputPin(GPIOE, GPIO_PIN_11);	// TV: TODO
 			if (status != Alx_Ok)
 			{
 				ALX_FS_TRACE("Err");
@@ -493,9 +489,7 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 		}
 		else if (me->md.write.line == 0)	// If new file, store write only
 		{
-			LL_GPIO_SetOutputPin(GPIOE, GPIO_PIN_11);	// TV: TODO
 			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreWrite);
-			LL_GPIO_ResetOutputPin(GPIOE, GPIO_PIN_11);	// TV: TODO
 			if (status != Alx_Ok)
 			{
 				ALX_FS_TRACE("Err");
