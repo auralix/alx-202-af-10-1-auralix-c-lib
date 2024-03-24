@@ -85,8 +85,8 @@ typedef enum
 {
 	AlxLogger_StoreMetadata_Config_StoreDefault,
 	AlxLogger_StoreMetadata_Config_StoreReadWrite,
-	AlxLogger_StoreMetadata_Config_StoreReadOnly,
-	AlxLogger_StoreMetadata_Config_StoreWriteOnly
+	AlxLogger_StoreMetadata_Config_StoreRead,
+	AlxLogger_StoreMetadata_Config_StoreWrite
 } AlxLogger_StoreMetadata_Config;
 
 typedef struct __attribute__((packed))
@@ -165,6 +165,7 @@ void AlxLogger_Ctor
 Alx_Status AlxLogger_Init(AlxLogger* me);
 Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual);
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs);
+uint32_t AlxLogger_GetNumOfLogsToRead(AlxLogger* me);
 Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
 AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me);
 AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me);
