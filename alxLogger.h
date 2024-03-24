@@ -163,6 +163,7 @@ void AlxLogger_Ctor
 // Functions
 //******************************************************************************
 Alx_Status AlxLogger_Init(AlxLogger* me);
+Alx_Status AlxLogger_Format(AlxLogger* me);
 Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual);
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs);
 uint32_t AlxLogger_GetNumOfLogsToRead(AlxLogger* me);

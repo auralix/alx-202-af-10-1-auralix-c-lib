@@ -130,11 +130,24 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	ALX_LOGGER_TRACE_FORMAT("\r\n");
 
 	uint32_t numOfLogsToRead = AlxLogger_GetNumOfLogsToRead_Private(me);
-	ALX_LOGGER_TRACE_FORMAT("Number of logs-to-read available = %lu\r\n", numOfLogsToRead);
+	ALX_LOGGER_TRACE_FORMAT("Number of available logs-to-read = %lu\r\n", numOfLogsToRead);
 	ALX_LOGGER_TRACE_FORMAT("\r\n");
 
 	// Set isInit
 	me->isInit = true;
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxLogger_Format(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	ALX_LOGGER_ASSERT(me->isInit == true);
+
+	// Format
+	Alx_Status status = AlxFs_Format(me->alxFs);
+	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -519,7 +532,7 @@ uint32_t AlxLogger_GetNumOfLogsToRead(AlxLogger* me)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	ALX_LOGGER_ASSERT(me->isInit == true);
+	// isInit -> Don't care
 
 	// Return
 	return AlxLogger_GetNumOfLogsToRead_Private(me);
@@ -1074,7 +1087,7 @@ static uint32_t AlxLogger_GetNumOfLogsToRead_Private(AlxLogger* me)
 {
 	// Calculate
 	int64_t numOfLogsToRead = me->md.write.id - me->md.read.id;
-	ALX_LOGGER_ASSERT(numOfLogsToRead < 0);
+	ALX_LOGGER_ASSERT(0 <= numOfLogsToRead);
 
 	// Return
 	return (uint32_t)numOfLogsToRead;
