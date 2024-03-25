@@ -1065,13 +1065,13 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 			return status;
 		}
 
+		// Trace
+		ALX_LOGGER_TRACE_FORMAT("[%lu] %s", me->md.write.line, log);
+
 		// Increment addr
 		me->md.write.id++;
 		me->md.write.position = me->md.write.position + readLenActual;
 		me->md.write.line++;
-
-		// Trace
-		ALX_LOGGER_TRACE_FORMAT("%s", log);
 	}
 
 
