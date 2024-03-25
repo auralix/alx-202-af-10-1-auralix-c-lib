@@ -64,6 +64,10 @@ Alx_Status AlxParamKvStore_Init(AlxParamKvStore* me)
 	ALX_PARAM_KV_STORE_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_KV_STORE_ASSERT(me->isInit == false);
 
+	// Trace
+	ALX_PARAM_KV_STORE_TRACE_FORMAT("\r\n");
+	ALX_PARAM_KV_STORE_TRACE_FORMAT("AlxParamKvStore - Init started\r\n");
+
 	// Try to mount FS, if error, then format & mount
 	Alx_Status status = AlxFs_Mount(me->fs);
 	if (status != Alx_Ok)

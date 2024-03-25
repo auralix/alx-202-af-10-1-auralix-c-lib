@@ -192,6 +192,10 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
 	ALX_RTC_ASSERT(me->isInit == false);
 
+	// Trace
+	ALX_RTC_TRACE_FORMAT("\r\n");
+	ALX_RTC_TRACE_FORMAT("AlxRtc - Init started\r\n");
+
 	// Clear isErr
 	me->isErr = false;
 
@@ -219,7 +223,7 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 		}
 
 		// Trace
-		ALX_RTC_TRACE_FORMAT("ALX RTC date-time NOT configured, counting from default\r\n");
+		ALX_RTC_TRACE_FORMAT("AlxRtc - Date-Time NOT configured, counting from default\r\n");
 	}
 	else
 	{
@@ -227,7 +231,7 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 		HAL_RTC_MspInit(&me->hrtc);
 
 		// Trace
-		ALX_RTC_TRACE_FORMAT("ALX RTC date-time configured\r\n");
+		ALX_RTC_TRACE_FORMAT("AlxRtc - Date-Time configured\r\n");
 	}
 
 	// Return

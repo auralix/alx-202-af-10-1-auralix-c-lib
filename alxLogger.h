@@ -130,9 +130,9 @@ typedef struct
 	const char* logDelim;
 
 	// Parameters - Private
-	uint32_t numOfFiles;
-	uint32_t numOfLogsMax;
-	uint32_t numOfLogsPerDir;
+	uint32_t numOfFilesTotal;
+	uint32_t numOfLogsTotal;
+	uint32_t numOfLogsPerDirTotal;
 
 	// Variables
 	AlxLogger_Metadata md;

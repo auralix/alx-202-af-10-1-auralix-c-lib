@@ -70,8 +70,10 @@ extern "C" {
 // Trace //
 #if defined(ALX_PARAM_KV_STORE_TRACE_ENABLE)
 	#define ALX_PARAM_KV_STORE_TRACE(...) ALX_TRACE_STD(ALX_PARAM_KV_STORE_FILE, __VA_ARGS__)
+	#define ALX_PARAM_KV_STORE_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_PARAM_KV_STORE_TRACE(...) do{} while (false)
+	#define ALX_PARAM_KV_STORE_TRACE_FORMAT(...) do{} while (false)
 #endif
 
 
