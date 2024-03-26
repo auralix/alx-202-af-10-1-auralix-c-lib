@@ -1656,7 +1656,7 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 	if (status != Alx_Ok)
 	{
 		// Trace
-		ALX_PARAM_ITEM_TRACE_FORMAT("ALX param KV store get error - Key not found, default will be used - %s\r\n", me->key);
+		ALX_PARAM_ITEM_TRACE_FORMAT("AlxParamItem - KV store get ERROR - Key not found, default will be used - %s\r\n", me->key);
 
 		// Free memory
 		free(buff);
@@ -1679,7 +1679,7 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 		if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE("Err"); return Alx_Err; }
 
 		// Trace
-		ALX_PARAM_ITEM_TRACE_FORMAT("ALX param KV store read OK - ALX param item set error - Key was removed, default will be used - %s\r\n", me->key);
+		ALX_PARAM_ITEM_TRACE_FORMAT("AlxParamItem - KV store read OK, param item set ERROR - Key was removed, default will be used - %s\r\n", me->key);
 	}
 
 	// Return

@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxTrace.h
-  * @brief		Auralix C Library - ALX Trace Module
+  * @file		alxMmc.h
+  * @brief		Auralix C Library - ALX MMC Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_TRACE_H
-#define ALX_TRACE_H
+#ifndef ALX_MMC_H
+#define ALX_MMC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,25 +40,14 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTick.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
 
-#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-#include "alxTrace_McuStm32.h"
-
-#elif defined(ALX_LPC17XX)
-#include "alxTrace_McuLpc17xx.h"
-
-#elif defined(ALX_LPC55S6X)
-#include "alxTrace_McuLpc55S6x.h"
-
-#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
-#include "alxTrace_McuLpc80x.h"
-
-#elif defined(ALX_PC)
-typedef struct { bool dummy; } AlxTrace;
+#if defined(ALX_STM32L4)
+#include "alxMmc_McuStm32.h"
 
 #else
-typedef struct { bool dummy; } AlxTrace;
+typedef struct { bool dummy; } AlxMmc;
 #endif
 
 
@@ -71,29 +60,34 @@ typedef struct { bool dummy; } AlxTrace;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TRACE_STR(str) do								{ AlxTrace_WriteStr(&alxTrace, str); } while(false)
-#define ALX_TRACE_FORMAT(...) do							{ AlxTrace_WriteFormat(&alxTrace, __VA_ARGS__); } while(false)
-#define ALX_TRACE_STD(file, ...) do							{ AlxTrace_WriteStd(&alxTrace, file, __LINE__, __func__, __VA_ARGS__); } while(false)
-#define ALX_TRACE_SM(smLevel, smName, stName, acName) do	{ AlxTrace_WriteSm(&alxTrace, smLevel, smName, stName, acName); } while(false)
-#define ALX_TRACE_LEN_MAX 256
+#define ALX_MMC_FILE "alxMmc.h"
 
+// Assert //
+#if defined(ALX_MMC_ASSERT_BKPT_ENABLE)
+	#define ALX_MMC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MMC_FILE, expr)
+#elif defined(ALX_MMC_ASSERT_TRACE_ENABLE)
+	#define ALX_MMC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MMC_FILE, expr)
+#elif defined(ALX_MMC_ASSERT_RST_ENABLE)
+	#define ALX_MMC_ASSERT(expr) ALX_ASSERT_RST(ALX_MMC_FILE, expr)
+#else
+	#define ALX_MMC_ASSERT(expr) do{} while (false)
+#endif
 
-//******************************************************************************
-// Variables
-//******************************************************************************
-extern AlxTrace alxTrace;
+// Trace //
+#if defined(ALX_MMC_TRACE_ENABLE)
+	#define ALX_MMC_TRACE(...) ALX_TRACE_STD(ALX_MMC_FILE, __VA_ARGS__)
+#else
+	#define ALX_MMC_TRACE(...) do{} while (false)
+#endif
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxTrace_Init(AlxTrace* me);
-Alx_Status AlxTrace_DeInit(AlxTrace* me);
-Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str);
-void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...);
-void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, const char* format, ...);
-void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName);
-void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr);
+Alx_Status AlxMmc_Init(AlxMmc* me);
+Alx_Status AlxMmc_DeInit(AlxMmc* me);
+Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
+Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -102,4 +96,4 @@ void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr);
 }
 #endif
 
-#endif	// #ifndef ALX_TRACE_H
+#endif	// #ifndef ALX_MMC_H

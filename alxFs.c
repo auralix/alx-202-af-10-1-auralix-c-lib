@@ -38,24 +38,32 @@
 
 
 //******************************************************************************
-// Private Variables
-//******************************************************************************
-static AlxFs* alxFs_me = NULL;
-
-
-//******************************************************************************
 // Private Functions
 //******************************************************************************
-static int AlxFs_Lfs_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size);
-static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
-static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block);
-static int AlxFs_Lfs_SyncBlock(const struct lfs_config* c);
 
 
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
-void AlxFs_Lfs_SetConfig(AlxFs* me);
+//------------------------------------------------------------------------------
+// Flash - Internal
+//------------------------------------------------------------------------------
+static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me);
+static int AlxFs_Lfs_FlashInt_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size);
+static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
+static int AlxFs_Lfs_FlashInt_EraseBlock(const struct lfs_config* c, lfs_block_t block);
+static int AlxFs_Lfs_FlashInt_SyncBlock(const struct lfs_config* c);
+static int AlxFs_Lfs_FlashInt_Lock(const struct lfs_config* c);
+static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c);
+
+
+//------------------------------------------------------------------------------
+// MMC
+//------------------------------------------------------------------------------
+static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me);
+static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size);
+static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
+static int AlxFs_Lfs_Mmc_EraseBlock(const struct lfs_config* c, lfs_block_t block);
+static int AlxFs_Lfs_Mmc_SyncBlock(const struct lfs_config* c);
+static int AlxFs_Lfs_Mmc_Lock(const struct lfs_config* c);
+static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c);
 
 
 //******************************************************************************
@@ -63,15 +71,28 @@ void AlxFs_Lfs_SetConfig(AlxFs* me);
 //******************************************************************************
 void AlxFs_Ctor
 (
-	AlxFs* me
+	AlxFs* me,
+	AlxFs_Config config,
+	AlxMmc* alxMmc
 )
 {
-	// Private Variables
-	alxFs_me = me;
+	// Parameters
+	me->config = config;
+	me->alxMmc = alxMmc;
 
 	// Variables
-	memset(&me->lfs, 0, sizeof(me->lfs));
-	AlxFs_Lfs_SetConfig(me);
+	if (me->config == AlxFs_Config_Lfs_FlashInt)
+	{
+		AlxFs_Lfs_FlashInt_Ctor(me);
+	}
+	else if	(me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		AlxFs_Lfs_Mmc_Ctor(me);
+	}
+	else
+	{
+		ALX_FS_ASSERT(false);	// We should never get here
+	}
 
 	// Info
 	me->wasCtorCalled = true;
@@ -82,122 +103,596 @@ void AlxFs_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-int32_t AlxFs_Mount(AlxFs* me)
+Alx_Status AlxFs_Mount(AlxFs* me)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	// isMounted -> Don't care
 
-	// Mount
-	int32_t status = lfs_mount(&me->lfs, &me->lfsConfig);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	// Do
+	int status = lfs_mount(&me->lfs, &me->lfsConfig);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Set isMounted
 	me->isMounted = true;
 
 	// Return
-	return status;
+	return Alx_Ok;
 }
-int32_t AlxFs_UnMount(AlxFs* me)
+Alx_Status AlxFs_UnMount(AlxFs* me)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	// isMounted -> Don't care
 
-	// UnMount
-	int32_t status = lfs_unmount(&me->lfs);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	// Do
+	int status = lfs_unmount(&me->lfs);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Clear isMounted
 	me->isMounted = false;
 
 	// Return
-	return status;
+	return Alx_Ok;
 }
-int32_t AlxFs_Format(AlxFs* me)
+Alx_Status AlxFs_MountFormat(AlxFs* me)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	// isMounted -> Don't care
 
-	// Format
-	int32_t status = lfs_format(&me->lfs, &me->lfsConfig);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Try to mount, if error, then format & mount
+	status = AlxFs_Mount(me);
+	if (status != Alx_Ok)
+	{
+		// Format
+		status = AlxFs_Format(me);
+		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+		// Mount
+		status = AlxFs_Mount(me);
+		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+	}
 
 	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Format(AlxFs* me)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	// isMounted -> Don't care
+
+	// Do
+	int status = lfs_format(&me->lfs, &me->lfsConfig);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_remove(&me->lfs, path);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_rename(&me->lfs, pathOld, pathNew);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const char* mode)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Set mode flags
+	int modeFlags = 0;
+	if (0 == strcmp(mode, "r"))
+	{
+		modeFlags = LFS_O_RDONLY;
+	}
+	else if (0 == strcmp(mode, "w"))
+	{
+		modeFlags = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC;
+	}
+	else if (0 == strcmp(mode, "a"))
+	{
+		modeFlags = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND;
+	}
+	else if (0 == strcmp(mode, "r+"))
+	{
+		modeFlags = LFS_O_RDWR;
+	}
+	else if (0 == strcmp(mode, "w+"))
+	{
+		modeFlags = LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC;
+	}
+	else if (0 == strcmp(mode, "a+"))
+	{
+		modeFlags = LFS_O_RDWR | LFS_O_CREAT | LFS_O_APPEND;
+	}
+	else
+	{
+		ALX_FS_ASSERT(false);	// We should never get here
+	}
+
+	// Do
+	int status = lfs_file_open(&me->lfs, &file->lfsFile, path, modeFlags);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_file_close(&me->lfs, &file->lfsFile);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len, uint32_t* lenActual)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	lfs_ssize_t statusLenActual = lfs_file_read(&me->lfs, &file->lfsFile, data, (lfs_size_t)len);
+	if (statusLenActual < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	*lenActual = (uint32_t)statusLenActual;
+	return Alx_Ok;
+}
+Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const char* delim, uint32_t len, uint32_t* lenActual)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+	ALX_FS_ASSERT(strlen(delim) == 1);	// Only single char delim supported
+
+	// Local variables
+	Alx_Status status = AlxFs_ErrNoDelim;
+	uint32_t i = 0;
+
+	// Loop
+	for (i = 0; i < (len - 1); i++)
+	{
+		// Local variables
+		char ch = 0;
+		uint32_t readLenActual = 0;
+
+		// Read char
+		Alx_Status statusRead = AlxFs_File_Read(me, file, &ch, 1, &readLenActual);
+		if ((statusRead == Alx_Ok) && (readLenActual == 0))
+		{
+			// Break, we reached end of file, status already AlxFs_ErrNoDelim
+			break;
+		}
+		if (statusRead != Alx_Ok)
+		{
+			// Break, error occured, trace, change status to Alx_Err
+			ALX_FS_TRACE("Err");
+			status = Alx_Err;
+			break;
+		}
+		else if (readLenActual != 1)
+		{
+			ALX_FS_ASSERT(false);		// We should never get here
+		}
+
+		// Store char
+		str[i] = ch;
+
+		// Check if char is delim
+		if (ch == *delim)
+		{
+			// Break, we found delimiter, increment i for correct null-termination, change status to Alx_Ok
+			i++;
+			status = Alx_Ok;
+			break;
+		}
+	}
+
+	// Null-terminate string
+	str[i] = '\0';
+
+	// Return
+	*lenActual = i;
 	return status;
 }
-int32_t AlxFs_Remove(AlxFs* me, const char* path)
+Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Remove file/directory
-	int32_t status = lfs_remove(&me->lfs, path);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	// Do
+	lfs_ssize_t statusLenActual = lfs_file_write(&me->lfs, &file->lfsFile, data, (lfs_size_t)len);
+	if (statusLenActual != (lfs_ssize_t)len) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return status;
+	return Alx_Ok;
 }
-int32_t AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags)
+Alx_Status AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, const char* str)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Open file
-	int32_t status = lfs_file_open(&me->lfs, &file->lsfFile, path, flags);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
-
 	// Return
-	return status;
+	return AlxFs_File_Write(me, file, (void*)str, strlen(str));
 }
-int32_t AlxFs_FileClose(AlxFs* me, AlxFs_File* file)
+Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Close file
-	int32_t status = lfs_file_close(&me->lfs, &file->lsfFile);
-	if(status != 0) { ALX_FS_TRACE("Err"); return status; }
+	// Do
+	int status = lfs_file_sync(&me->lfs, &file->lfsFile);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return status;
+	return Alx_Ok;
 }
-int32_t AlxFs_FileRead(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
+Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_File_Seek_Origin origin, uint32_t* positionNew)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Read file
-	int64_t statusActualLen = lfs_file_read(&me->lfs, &file->lsfFile, buff, len);
-	if(statusActualLen < 0) { ALX_FS_TRACE("Err"); return statusActualLen; }
+	// Do
+	lfs_soff_t statusPositionNew = lfs_file_seek(&me->lfs, &file->lfsFile, (lfs_soff_t)offset, (int)origin);
+	if (statusPositionNew < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return statusActualLen;
+	*positionNew = (uint32_t)statusPositionNew;
+	return Alx_Ok;
 }
-int32_t AlxFs_FileWrite(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len)
+Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* position)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Write file
-	int64_t statusActualLen = lfs_file_write(&me->lfs, &file->lsfFile, buff, len);
-	if(statusActualLen != len) { ALX_FS_TRACE("Err"); return statusActualLen; }
+	// Do
+	lfs_soff_t statusPosition = lfs_file_tell(&me->lfs, &file->lfsFile);
+	if (statusPosition < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
-	return statusActualLen;
+	*position = (uint32_t)statusPosition;
+	return Alx_Ok;
+}
+Alx_Status AlxFs_File_Rewind(AlxFs* me, AlxFs_File* file)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_file_rewind(&me->lfs, &file->lfsFile);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* size)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	lfs_soff_t statusSize = lfs_file_size(&me->lfs, &file->lfsFile);
+	if (statusSize < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	*size = (uint32_t)statusSize;
+	return Alx_Ok;
+}
+Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_file_truncate(&me->lfs, &file->lfsFile, (lfs_off_t)size);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+	AlxFs_File file = {};
+	uint32_t fileSize = 0;
+	uint32_t fileSizeTraced = 0;
+	uint8_t buff[ALX_FS_BUFF_LEN] = {};
+	uint32_t lenActual = 0;
+
+	// Open
+	status = AlxFs_File_Open(me, &file, path, "r");
+	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+	// Get fileSize
+	status = AlxFs_File_Size(me, &file, &fileSize);
+	if (status != Alx_Ok)
+	{
+		AlxFs_File_Close(me, &file);	// Will not handle return
+		ALX_FS_TRACE("Err");
+		return status;
+	}
+
+	// Loop
+	while (true)
+	{
+		// Read
+		memset(buff, 0, sizeof(buff));
+		status = AlxFs_File_Read(me, &file, buff, sizeof(buff)-1, &lenActual);	// Subtract -1 for string null-terminator
+		if (status != Alx_Ok)
+		{
+			AlxFs_File_Close(me, &file);	// Will not handle return
+			ALX_FS_TRACE("Err");
+			return status;
+		}
+
+		// Trace
+		ALX_FS_TRACE_FORMAT("%s", buff);
+
+		// Increment fileSizeTraced
+		fileSizeTraced = fileSizeTraced + lenActual;
+
+		// If done, break
+		if (fileSizeTraced >= fileSize)
+		{
+			break;
+		}
+	}
+
+	// Close
+	status = AlxFs_File_Close(me, &file);
+	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_mkdir(&me->lfs, path);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_dir_open(&me->lfs, &dir->lfsDir, path);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_dir_close(&me->lfs, &dir->lfsDir);
+	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Do
+	int status = lfs_dir_read(&me->lfs, &dir->lfsDir, &info->lfsInfo);
+	if (status == 0)
+	{
+		return AlxFs_EndOfDir;
+	}
+	else if (status != 1)
+	{
+		ALX_FS_TRACE("Err");
+		return Alx_Err;
+	}
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+	AlxFs_Dir dir = {};
+	AlxFs_Info info = {};
+	char buff[ALX_FS_BUFF_LEN] = {};
+
+	// Trace
+	ALX_FS_TRACE_FORMAT("AlxFs - Dir '%s' Trace\r\n", path);
+
+	// Open
+	status = AlxFs_Dir_Open(me, &dir, path);
+	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+	// Loop
+	while (true)
+	{
+		// Read
+		status = AlxFs_Dir_Read(me, &dir, &info);
+		if (status == AlxFs_EndOfDir)
+		{
+			break;
+		}
+		else if (status != Alx_Ok)
+		{
+			AlxFs_Dir_Close(me, &dir);	// Will not handle return
+			ALX_FS_TRACE("Err");
+			return status;
+		}
+
+		// Trace
+		if (info.lfsInfo.type == LFS_TYPE_REG)
+		{
+			// Prepare
+			sprintf(buff, "FILE - %s - %lu B\r\n", info.lfsInfo.name, info.lfsInfo.size);
+
+			// Trace
+			ALX_FS_TRACE_FORMAT("%s", buff);
+
+			// If fileTrace enabled
+			if (fileTrace)
+			{
+				// Prepare
+				sprintf(buff, "%s/%s", path, info.lfsInfo.name);
+
+				// Trace
+				status = AlxFs_File_Trace(me, buff);
+				if (status != Alx_Ok)
+				{
+					AlxFs_Dir_Close(me, &dir);	// Will not handle return
+					ALX_FS_TRACE("Err");
+					return status;
+				}
+			}
+		}
+		else if (info.lfsInfo.type == LFS_TYPE_DIR)
+		{
+			// Prepare
+			sprintf(buff, "DIR - %s\r\n", info.lfsInfo.name);
+
+			// Trace
+			ALX_FS_TRACE_FORMAT("%s", buff);
+		}
+		else
+		{
+			ALX_FS_ASSERT(false);	// We should never get here
+		}
+	}
+
+	// Close
+	status = AlxFs_Dir_Close(me, &dir);
+	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+
+	// Trace
+	ALX_FS_TRACE_FORMAT("\r\n");
+
+	// Return
+	return Alx_Ok;
 }
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static int AlxFs_Lfs_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size)
+
+
+//------------------------------------------------------------------------------
+// Flash - Internal
+//------------------------------------------------------------------------------
+static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me)
+{
+	memset(&me->lfs, 0, sizeof(me->lfs));
+
+	me->lfsConfig.context = me;
+
+	me->lfsConfig.read  = AlxFs_Lfs_FlashInt_ReadBlock;
+	me->lfsConfig.prog  = AlxFs_Lfs_FlashInt_ProgBlock;
+	me->lfsConfig.erase = AlxFs_Lfs_FlashInt_EraseBlock;
+	me->lfsConfig.sync  = AlxFs_Lfs_FlashInt_SyncBlock;
+	#if defined(LFS_THREADSAFE)
+	me->lfsConfig.lock = AlxFs_Lfs_FlashInt_Lock;
+	me->lfsConfig.unlock = AlxFs_Lfs_FlashInt_Unlock;
+	#endif
+
+	#if defined(ALX_STM32F4)
+	me->lfsAddr = 0x08100000;
+	me->lfsConfig.read_size = 1;
+	me->lfsConfig.prog_size = 4;
+	me->lfsConfig.block_size = 16 * 1024;
+	me->lfsConfig.block_count = 4;
+	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
+	me->lfsConfig.cache_size = 16;
+	me->lfsConfig.lookahead_size = 8;
+	#endif
+
+	#if defined(ALX_STM32F7)
+	me->lfsAddr = 0x08180000;
+	me->lfsConfig.read_size = 1;
+	me->lfsConfig.prog_size = 4;
+	me->lfsConfig.block_size = 256 * 1024;
+	me->lfsConfig.block_count = 2;
+	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
+	me->lfsConfig.cache_size = 16;
+	me->lfsConfig.lookahead_size = 8;
+	#endif
+
+	#if defined(ALX_STM32L4)
+	me->lfsAddr = 0x08100000;
+	me->lfsConfig.read_size = 1;
+	me->lfsConfig.prog_size = 8;
+	me->lfsConfig.block_size = 4 * 1024;
+	me->lfsConfig.block_count = 32;
+	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
+	me->lfsConfig.cache_size = 16;
+	me->lfsConfig.lookahead_size = 8;
+	#endif
+}
+static int AlxFs_Lfs_FlashInt_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size)
 {
 	// Unlock FLASH
 	HAL_FLASH_Unlock();
@@ -253,6 +748,7 @@ static int AlxFs_Lfs_ReadBlock(const struct lfs_config* c, lfs_block_t block, lf
 	#endif
 
 	// Set addrSrc
+	AlxFs* alxFs_me = (AlxFs*)c->context;
 	uint32_t src_address = alxFs_me->lfsAddr + block * c->block_size + off;
 
 	// Read
@@ -262,9 +758,9 @@ static int AlxFs_Lfs_ReadBlock(const struct lfs_config* c, lfs_block_t block, lf
 	HAL_FLASH_Lock();
 
 	// Return
-	return 0;
+	return LFS_ERR_OK;
 }
-static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size)
+static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size)
 {
 	// Unlock FLASH
 	HAL_FLASH_Unlock();
@@ -321,40 +817,42 @@ static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lf
 
 	// Loop
 	uint32_t n_rows = size / c->prog_size;
-	for(uint32_t i_row = 0; i_row < n_rows; i_row++)
+	for (uint32_t i_row = 0; i_row < n_rows; i_row++)
 	{
 		#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 		// Local variables
+		AlxFs* alxFs_me = (AlxFs*)c->context;
 		uint32_t block_base_addr = alxFs_me->lfsAddr + block * c->block_size;
 		uint32_t dest_address = block_base_addr + off + i_row * 4;		// Multiply by 4 because we write 4 bytes at the time
 		uint32_t* src_address_ptr = (uint32_t*)(buffer + i_row * 4);	// Multiply by 4 because we write 4 bytes at the time
 
 		// Program
 		HAL_StatusTypeDef xHAL_Status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, dest_address, *src_address_ptr);
-		if(xHAL_Status != HAL_OK)
+		if (xHAL_Status != HAL_OK)
 		{
 			// Lock FLASH
 			HAL_FLASH_Lock();
 
 			// Return
-			return -1;
+			return LFS_ERR_IO;
 		}
 		#endif
 		#if defined(ALX_STM32L4)
 		// Local variables
+		AlxFs* alxFs_me = (AlxFs*)c->context;
 		uint32_t block_base_addr = alxFs_me->lfsAddr + block * c->block_size;
 		uint32_t dest_address = block_base_addr + off + i_row * 8;		// Multiply by 8 because we write 8 bytes at the time
 		uint64_t* src_address_ptr = (uint64_t*)(buffer + i_row * 8);	// Multiply by 8 because we write 8 bytes at the time
 
 		// Program
 		HAL_StatusTypeDef xHAL_Status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, dest_address, *src_address_ptr);
-		if(xHAL_Status != HAL_OK)
+		if (xHAL_Status != HAL_OK)
 		{
 			// Lock FLASH
 			HAL_FLASH_Lock();
 
 			// Return
-			return -1;
+			return LFS_ERR_IO;
 		}
 		#endif
 	}
@@ -363,9 +861,9 @@ static int AlxFs_Lfs_ProgBlock(const struct lfs_config* c, lfs_block_t block, lf
 	HAL_FLASH_Lock();
 
 	// Return
-	return 0;
+	return LFS_ERR_OK;
 }
-static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block)
+static int AlxFs_Lfs_FlashInt_EraseBlock(const struct lfs_config* c, lfs_block_t block)
 {
 	// Unlock FLASH
 	HAL_FLASH_Unlock();
@@ -455,84 +953,133 @@ static int AlxFs_Lfs_EraseBlock(const struct lfs_config* c, lfs_block_t block)
 	HAL_FLASH_Lock();
 
 	// Return
-	return xHAL_Status == HAL_OK ? 0 : -1;
+	return xHAL_Status == HAL_OK ? LFS_ERR_OK : LFS_ERR_IO;
 }
-static int AlxFs_Lfs_SyncBlock(const struct lfs_config* c)
+static int AlxFs_Lfs_FlashInt_SyncBlock(const struct lfs_config* c)
 {
 	// Local variables
 	(void)c;
 
 	// Return
-	return 0;
+	return LFS_ERR_OK;
 }
-#ifdef LFS_THREADSAFE
-static int AlxFs_Lfs_Lock(const struct lfs_config* c)
+#if defined(LFS_THREADSAFE)
+static int AlxFs_Lfs_FlashInt_Lock(const struct lfs_config* c)
 {
 	// Local variables
 	(void)c;
 
 	// Return
-	return 0;
+	return LFS_ERR_OK;
 }
-
-static int AlxFs_Lfs_Unlock(const struct lfs_config* c)
+static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c)
 {
 	// Local variables
 	(void)c;
 
 	// Return
-	return 0;
+	return LFS_ERR_OK;
 }
 #endif
 
 
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
-ALX_WEAK void AlxFs_Lfs_SetConfig(AlxFs* me)
+//------------------------------------------------------------------------------
+// MMC
+//------------------------------------------------------------------------------
+static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
 {
-	me->lfsConfig.read  = AlxFs_Lfs_ReadBlock;
-	me->lfsConfig.prog  = AlxFs_Lfs_ProgBlock;
-	me->lfsConfig.erase = AlxFs_Lfs_EraseBlock;
-	me->lfsConfig.sync  = AlxFs_Lfs_SyncBlock;
-	#ifdef LFS_THREADSAFE
-	me->lfsConfig.lock = AlxFs_Lfs_Lock;
-	me->lfsConfig.unlock = AlxFs_Lfs_Unlock;
+	memset(&me->lfs, 0, sizeof(me->lfs));
+
+	me->lfsConfig.context = me;
+
+	me->lfsConfig.read  = AlxFs_Lfs_Mmc_ReadBlock;
+	me->lfsConfig.prog  = AlxFs_Lfs_Mmc_ProgBlock;
+	me->lfsConfig.erase = AlxFs_Lfs_Mmc_EraseBlock;
+	me->lfsConfig.sync  = AlxFs_Lfs_Mmc_SyncBlock;
+	#if defined(LFS_THREADSAFE)
+	me->lfsConfig.lock = AlxFs_Lfs_Mmc_Lock;
+	me->lfsConfig.unlock = AlxFs_Lfs_Mmc_Unlock;
 	#endif
 
-	#if defined(ALX_STM32F4)
-	me->lfsAddr = 0x08100000;
-	me->lfsConfig.read_size = 1;
-	me->lfsConfig.prog_size = 4;
-	me->lfsConfig.block_size = 16 * 1024;
-	me->lfsConfig.block_count = 4;
+	me->lfsConfig.read_size = 512;
+	me->lfsConfig.prog_size = 512;
+	me->lfsConfig.block_size = 512;
+	me->lfsConfig.block_count = 62160896;
 	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
-	me->lfsConfig.cache_size = 16;
-	me->lfsConfig.lookahead_size = 8;
-	#endif
-
-	#if defined(ALX_STM32F7)
-	me->lfsAddr = 0x08180000;
-	me->lfsConfig.read_size = 1;
-	me->lfsConfig.prog_size = 4;
-	me->lfsConfig.block_size = 256 * 1024;
-	me->lfsConfig.block_count = 2;
-	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
-	me->lfsConfig.cache_size = 16;
-	me->lfsConfig.lookahead_size = 8;
-	#endif
-
-	#if defined(ALX_STM32L4)
-	me->lfsAddr = 0x08100000;
-	me->lfsConfig.read_size = 1;
-	me->lfsConfig.prog_size = 8;
-	me->lfsConfig.block_size = 4 * 1024;
-	me->lfsConfig.block_count = 32;
-	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
-	me->lfsConfig.cache_size = 16;
-	me->lfsConfig.lookahead_size = 8;
-	#endif
+	me->lfsConfig.cache_size = 512;
+	me->lfsConfig.lookahead_size = 32;
 }
+static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size)
+{
+	// Local variables
+	(void)c;
+	(void)off;
+	(void)size;
+
+	// Read
+	AlxFs* alxFs_me = (AlxFs*)c->context;
+	Alx_Status status = AlxMmc_ReadBlock(alxFs_me->alxMmc, 1, block, (uint8_t*)buffer, 512, 1, 10);
+	if (status != Alx_Ok)
+	{
+		return LFS_ERR_IO;
+	}
+
+	// Return
+	return LFS_ERR_OK;
+}
+static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size)
+{
+	// Local variables
+	(void)c;
+	(void)off;
+	(void)size;
+
+	// Write
+	AlxFs* alxFs_me = (AlxFs*)c->context;
+	Alx_Status status = AlxMmc_WriteBlock(alxFs_me->alxMmc, 1, block, (uint8_t*)buffer, 512, 1, 10);
+	if (status != Alx_Ok)
+	{
+		return LFS_ERR_IO;
+	}
+
+	// Return
+	return LFS_ERR_OK;
+}
+static int AlxFs_Lfs_Mmc_EraseBlock(const struct lfs_config* c, lfs_block_t block)
+{
+	// Local variables
+	(void)c;
+	(void)block;
+
+	// Return
+	return LFS_ERR_OK;
+}
+static int AlxFs_Lfs_Mmc_SyncBlock(const struct lfs_config* c)
+{
+	// Local variables
+	(void)c;
+
+	// Return
+	return LFS_ERR_OK;
+}
+#if defined(LFS_THREADSAFE)
+static int AlxFs_Lfs_Mmc_Lock(const struct lfs_config* c)
+{
+	// Local variables
+	(void)c;
+
+	// Return
+	return LFS_ERR_OK;
+}
+static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c)
+{
+	// Local variables
+	(void)c;
+
+	// Return
+	return LFS_ERR_OK;
+}
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))

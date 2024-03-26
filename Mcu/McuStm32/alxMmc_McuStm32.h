@@ -1,7 +1,7 @@
-/**
+﻿/**
   ******************************************************************************
-  * @file		alxParamKvStore.h
-  * @brief		Auralix C Library - ALX Parameter Key-Value Store Module
+  * @file		alxMmc_McuStm32.h
+  * @brief		Auralix C Library - ALX MMC MCU STM32 Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_PARAM_KV_STORE_H
-#define ALX_PARAM_KV_STORE_H
+#ifndef ALX_MMC_MCU_STM32_H
+#define ALX_MMC_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,39 +42,14 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxFs.h"
+#include "alxIoPin.h"
+#include "alxTimSw.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
-
-
-//******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_PARAM_KV_STORE_FILE "alxParamKvStore.h"
-
-// Assert //
-#if defined(ALX_PARAM_KV_STORE_ASSERT_BKPT_ENABLE)
-	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PARAM_KV_STORE_FILE, expr)
-#elif defined(ALX_PARAM_KV_STORE_ASSERT_TRACE_ENABLE)
-	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PARAM_KV_STORE_FILE, expr)
-#elif defined(ALX_PARAM_KV_STORE_ASSERT_RST_ENABLE)
-	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_RST(ALX_PARAM_KV_STORE_FILE, expr)
-#else
-	#define ALX_PARAM_KV_STORE_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(ALX_PARAM_KV_STORE_TRACE_ENABLE)
-	#define ALX_PARAM_KV_STORE_TRACE(...) ALX_TRACE_STD(ALX_PARAM_KV_STORE_FILE, __VA_ARGS__)
-	#define ALX_PARAM_KV_STORE_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
-#else
-	#define ALX_PARAM_KV_STORE_TRACE(...) do{} while (false)
-	#define ALX_PARAM_KV_STORE_TRACE_FORMAT(...) do{} while (false)
-#endif
+#if defined(ALX_C_LIB) && defined(ALX_STM32L4)
 
 
 //******************************************************************************
@@ -82,39 +57,65 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	// Defines
+	#define ALX_MMC_BLOCK_LEN 512
+
 	// Parameters
-	AlxFs* fs;
+	MMC_TypeDef* mmc;
+	AlxIoPin* do_nRST;
+	AlxIoPin* do_CLK;
+	AlxIoPin* do_CMD;
+	AlxIoPin* io_DAT0;
+	AlxIoPin* io_DAT1;
+	AlxIoPin* io_DAT2;
+	AlxIoPin* io_DAT3;
+	AlxIoPin* io_DAT4;
+	AlxIoPin* io_DAT5;
+	AlxIoPin* io_DAT6;
+	AlxIoPin* io_DAT7;
+	uint16_t blockReadWriteTimeout_ms;
+	uint16_t waitForTransferStateTimeout_ms;
+
+	// Variables
+	RCC_PeriphCLKInitTypeDef iclk;
+	MMC_HandleTypeDef hmmc;
+	HAL_MMC_CardCIDTypeDef cid;
+	HAL_MMC_CardCSDTypeDef csd;
+	HAL_MMC_CardInfoTypeDef info;
 
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
-} AlxParamKvStore;
+} AlxMmc;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxParamKvStore_Ctor
+void AlxMmc_Ctor
 (
-	AlxParamKvStore* me,
-	AlxFs* fs
+	AlxMmc* me,
+	MMC_TypeDef* mmc,
+	AlxIoPin* do_nRST,
+	AlxIoPin* do_CLK,
+	AlxIoPin* do_CMD,
+	AlxIoPin* io_DAT0,
+	AlxIoPin* io_DAT1,
+	AlxIoPin* io_DAT2,
+	AlxIoPin* io_DAT3,
+	AlxIoPin* io_DAT4,
+	AlxIoPin* io_DAT5,
+	AlxIoPin* io_DAT6,
+	AlxIoPin* io_DAT7,
+	uint16_t blockReadWriteTimeout_ms,
+	uint16_t waitForTransferStateTimeout_ms
 );
 
 
-//******************************************************************************
-// Functions
-//******************************************************************************
-Alx_Status AlxParamKvStore_Init(AlxParamKvStore* me);
-Alx_Status AlxParamKvStore_DeInit(AlxParamKvStore* me);
-Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* data, uint32_t lenMax, uint32_t* lenActual);
-Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* data, uint32_t len);
-Alx_Status AlxParamKvStore_Remove(AlxParamKvStore* me, const char* key);
-
-
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32L4)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_PARAM_KV_STORE_H
+#endif	// #ifndef ALX_MMC_MCU_STM32_H

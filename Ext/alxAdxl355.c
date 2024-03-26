@@ -516,7 +516,7 @@ static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me)
 
 	// #2 Trace
 	ALX_ADXL355_TRACE_FORMAT("\r\n");
-	ALX_ADXL355_TRACE_FORMAT("Auralix C Library ALX Accelerometer ADXL355 Module Identification:\r\n");
+	ALX_ADXL355_TRACE_FORMAT("AlxAdxl355 - Trace\r\n");
 	ALX_ADXL355_TRACE_FORMAT("- DEVID_AD: 0x%02X\r\n", me->reg._0x00_DEVID_AD.val.DEVID_AD);
 	ALX_ADXL355_TRACE_FORMAT("- DEVID_MST: 0x%02X\r\n", me->reg._0x01_DEVID_MST.val.DEVID_MST);
 	ALX_ADXL355_TRACE_FORMAT("- PARTID: 0x%02X\r\n", me->reg._0x02_PARTID.val.PARTID);

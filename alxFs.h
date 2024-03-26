@@ -42,18 +42,16 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxMmc.h"
 #if defined(ALX_LFS)
 #include "lfs.h"
-#else
-typedef struct { bool dummy; } AlxFs_File;
-typedef struct { bool dummy; } AlxFs;
 #endif
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -75,25 +73,71 @@ typedef struct { bool dummy; } AlxFs;
 // Trace //
 #if defined(ALX_FS_TRACE_ENABLE)
 	#define ALX_FS_TRACE(...) ALX_TRACE_STD(ALX_FS_FILE, __VA_ARGS__)
+	#define ALX_FS_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_FS_TRACE(...) do{} while (false)
+	#define ALX_FS_TRACE_FORMAT(...) do{} while (false)
 #endif
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxFs_Config_Lfs_FlashInt,
+	AlxFs_Config_Lfs_Mmc
+} AlxFs_Config;
+
+typedef enum
+{
+	#if defined(ALX_LFS)
+	AlxFs_File_Seek_Origin_Set = LFS_SEEK_SET,
+	AlxFs_File_Seek_Origin_Cur = LFS_SEEK_CUR,
+	AlxFs_File_Seek_Origin_End = LFS_SEEK_END,
+	#endif
+	AlxFs_File_Seek_Origin_Dummy = 99
+} AlxFs_File_Seek_Origin;
+
 typedef struct
 {
-	lfs_file_t lsfFile;
+	#if defined(ALX_LFS)
+	lfs_file_t lfsFile;
+	#endif
+	bool dummy;
 } AlxFs_File;
 
 typedef struct
 {
+	#if defined(ALX_LFS)
+	lfs_dir_t lfsDir;
+	#endif
+	bool dummy;
+} AlxFs_Dir;
+
+typedef struct
+{
+	#if defined(ALX_LFS)
+	struct lfs_info lfsInfo;
+	#endif
+	bool dummy;
+} AlxFs_Info;
+
+typedef struct
+{
+	// Defines
+	#define ALX_FS_BUFF_LEN 256
+
+	// Parameters
+	AlxFs_Config config;
+	AlxMmc* alxMmc;
+
 	// Variables
+	#if defined(ALX_LFS)
 	lfs_t lfs;
-	uint32_t lfsAddr;
 	struct lfs_config lfsConfig;
+	#endif
+	uint32_t lfsAddr;
 
 	// Info
 	bool wasCtorCalled;
@@ -106,24 +150,42 @@ typedef struct
 //******************************************************************************
 void AlxFs_Ctor
 (
-	AlxFs* me
+	AlxFs* me,
+	AlxFs_Config config,
+	AlxMmc* alxMmc
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-int32_t AlxFs_Mount(AlxFs* me);
-int32_t AlxFs_UnMount(AlxFs* me);
-int32_t AlxFs_Format(AlxFs* me);
-int32_t AlxFs_Remove(AlxFs* me, const char* path);
-int32_t AlxFs_FileOpen(AlxFs* me, AlxFs_File* file, const char* path, int32_t flags);
-int32_t AlxFs_FileClose(AlxFs* me, AlxFs_File* file);
-int32_t AlxFs_FileRead(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
-int32_t AlxFs_FileWrite(AlxFs* me, AlxFs_File* file, void* buff, uint32_t len);
+Alx_Status AlxFs_Mount(AlxFs* me);
+Alx_Status AlxFs_UnMount(AlxFs* me);
+Alx_Status AlxFs_MountFormat(AlxFs* me);
+Alx_Status AlxFs_Format(AlxFs* me);
+Alx_Status AlxFs_Remove(AlxFs* me, const char* path);
+Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew);
+Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const char* mode);
+Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file);
+Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len, uint32_t* lenActual);
+Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const char* delim, uint32_t len, uint32_t* lenActual);
+Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len);
+Alx_Status AlxFs_File_WriteStr(AlxFs* me, AlxFs_File* file, const char* str);
+Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file);
+Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_File_Seek_Origin origin, uint32_t* positionNew);
+Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* position);
+Alx_Status AlxFs_File_Rewind(AlxFs* me, AlxFs_File* file);
+Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* size);
+Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size);
+Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path);
+Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path);
+Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path);
+Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir);
+Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info);
+Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

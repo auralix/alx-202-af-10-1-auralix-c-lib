@@ -504,8 +504,7 @@ void AlxId_Trace(AlxId* me)
 	// Intro
 	//------------------------------------------------------------------------------
 	ALX_ID_TRACE_FORMAT("\r\n");
-	ALX_ID_TRACE_FORMAT("Auralix C Library ALX ID Module Identification:\r\n");
-	ALX_ID_TRACE_FORMAT("\r\n");
+	ALX_ID_TRACE_FORMAT("AlxId.h - Trace\r\n");
 
 
 	//------------------------------------------------------------------------------
@@ -601,7 +600,6 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_FORMAT("- package ID: %#lX\r\n", me->stm32Hw.packageId);
 	#endif
 	ALX_ID_TRACE_FORMAT("- MCU unique ID: %s\r\n", me->hwStm32.mcuUniqueIdStr);
-	ALX_ID_TRACE_FORMAT("\r\n");
 	#endif
 }
 
