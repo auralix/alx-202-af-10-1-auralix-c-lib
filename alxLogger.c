@@ -47,7 +47,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me);
 static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me);
 static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me);
 static bool AlxLogger_IsLogToReadAvailable(AlxLogger* me);
-static uint32_t AlxLogger_GetNumOfLogsToRead_Private(AlxLogger* me);
+static uint32_t AlxLogger_GetNumOfLogsToReadAvailable_Private(AlxLogger* me);
 static uint32_t AlxLogger_GetNumOfLogsEndPosition(AlxLogger* me, const char* logs, uint32_t numOfLogs);
 
 
@@ -105,7 +105,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 	// Trace
-	uint32_t numOfLogsToReadAvailable = AlxLogger_GetNumOfLogsToRead_Private(me);
+	uint32_t numOfLogsToReadAvailable = AlxLogger_GetNumOfLogsToReadAvailable_Private(me);
 	ALX_LOGGER_TRACE_FORMAT("AlxLogger - Totals\r\n");
 	ALX_LOGGER_TRACE_FORMAT("- numOfFilesTotal = %lu\r\n", me->numOfFilesTotal);
 	ALX_LOGGER_TRACE_FORMAT("- numOfLogsTotal = %lu\r\n", me->numOfLogsTotal);
@@ -501,14 +501,14 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 	return status;
 }
-uint32_t AlxLogger_GetNumOfLogsToRead(AlxLogger* me)
+uint32_t AlxLogger_GetNumOfLogsToReadAvailable(AlxLogger* me)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
 	// isInit -> Don't care
 
 	// Return
-	return AlxLogger_GetNumOfLogsToRead_Private(me);
+	return AlxLogger_GetNumOfLogsToReadAvailable_Private(me);
 }
 Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config)
 {
@@ -1145,7 +1145,7 @@ static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me)
 static bool AlxLogger_IsLogToReadAvailable(AlxLogger* me)
 {
 	// Get
-	uint32_t numOfLogsToRead = AlxLogger_GetNumOfLogsToRead_Private(me);
+	uint32_t numOfLogsToRead = AlxLogger_GetNumOfLogsToReadAvailable_Private(me);
 
 	// Return
 	if (numOfLogsToRead > 0)
@@ -1157,7 +1157,7 @@ static bool AlxLogger_IsLogToReadAvailable(AlxLogger* me)
 		return false;
 	}
 }
-static uint32_t AlxLogger_GetNumOfLogsToRead_Private(AlxLogger* me)
+static uint32_t AlxLogger_GetNumOfLogsToReadAvailable_Private(AlxLogger* me)
 {
 	// Calculate
 	int64_t numOfLogsToRead = (int64_t)me->md.write.id - (int64_t)me->md.read.id;
