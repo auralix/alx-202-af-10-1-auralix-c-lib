@@ -654,8 +654,10 @@ static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me)
 	me->lfsConfig.prog  = AlxFs_Lfs_FlashInt_ProgBlock;
 	me->lfsConfig.erase = AlxFs_Lfs_FlashInt_EraseBlock;
 	me->lfsConfig.sync  = AlxFs_Lfs_FlashInt_SyncBlock;
+	#if defined(LFS_THREADSAFE)
 	me->lfsConfig.lock = AlxFs_Lfs_FlashInt_Lock;
 	me->lfsConfig.unlock = AlxFs_Lfs_FlashInt_Unlock;
+	#endif
 
 	#if defined(ALX_STM32F4)
 	me->lfsAddr = 0x08100000;
@@ -961,6 +963,7 @@ static int AlxFs_Lfs_FlashInt_SyncBlock(const struct lfs_config* c)
 	// Return
 	return LFS_ERR_OK;
 }
+#if defined(LFS_THREADSAFE)
 static int AlxFs_Lfs_FlashInt_Lock(const struct lfs_config* c)
 {
 	// Local variables
@@ -977,6 +980,7 @@ static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c)
 	// Return
 	return LFS_ERR_OK;
 }
+#endif
 
 
 //------------------------------------------------------------------------------
@@ -992,8 +996,10 @@ static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
 	me->lfsConfig.prog  = AlxFs_Lfs_Mmc_ProgBlock;
 	me->lfsConfig.erase = AlxFs_Lfs_Mmc_EraseBlock;
 	me->lfsConfig.sync  = AlxFs_Lfs_Mmc_SyncBlock;
+	#if defined(LFS_THREADSAFE)
 	me->lfsConfig.lock = AlxFs_Lfs_Mmc_Lock;
 	me->lfsConfig.unlock = AlxFs_Lfs_Mmc_Unlock;
+	#endif
 
 	me->lfsConfig.read_size = 512;
 	me->lfsConfig.prog_size = 512;
@@ -1056,6 +1062,7 @@ static int AlxFs_Lfs_Mmc_SyncBlock(const struct lfs_config* c)
 	// Return
 	return LFS_ERR_OK;
 }
+#if defined(LFS_THREADSAFE)
 static int AlxFs_Lfs_Mmc_Lock(const struct lfs_config* c)
 {
 	// Local variables
@@ -1072,6 +1079,7 @@ static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c)
 	// Return
 	return LFS_ERR_OK;
 }
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
