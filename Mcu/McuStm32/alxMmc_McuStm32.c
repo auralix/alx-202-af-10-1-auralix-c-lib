@@ -41,13 +41,18 @@
 //******************************************************************************
 // Private Variables
 //******************************************************************************
-static volatile  uint8_t  WriteStatus = 0, ReadStatus = 0;
+#if defined(SDMMC1)
+static AlxMmc* alxMmc_Sdmmc1_me = NULL;
+#endif
+#if defined(SDMMC2)
+static AlxMmc* alxMmc_Sdmmc2_me = NULL;
+#endif
 
 
 //------------------------------------------------------------------------------
 // Specific
 //------------------------------------------------------------------------------
-static Alx_Status AlxMmc_WaitForDmaReadWriteComplete(AlxMmc* me, bool read);
+static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read);
 static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me);
 
 
@@ -87,13 +92,21 @@ void AlxMmc_Ctor
 	AlxIoPin* io_DAT5,
 	AlxIoPin* io_DAT6,
 	AlxIoPin* io_DAT7,
-	uint16_t blockReadWriteTimeout_ms,
+	uint16_t dmaReadWriteTimeout_ms,
 	uint16_t waitForTransferStateTimeout_ms,
 	Alx_IrqPriority irqPriority
 )
 {
 	// Assert
 	ALX_MMC_ASSERT(mmc == SDMMC1);	// Currently only SDMMC1 is supported
+
+	// Private variables
+	#if defined(SDMMC1)
+	alxMmc_Sdmmc1_me = me;
+	#endif
+	#if defined(SDMMC2)
+	alxMmc_Sdmmc2_me = me;
+	#endif
 
 	// Parameters
 	me->mmc = mmc;
@@ -108,7 +121,7 @@ void AlxMmc_Ctor
 	me->io_DAT5 = io_DAT5;
 	me->io_DAT6 = io_DAT6;
 	me->io_DAT7 = io_DAT7;
-	me->blockReadWriteTimeout_ms = blockReadWriteTimeout_ms;
+	me->dmaReadWriteTimeout_ms = dmaReadWriteTimeout_ms;
 	me->waitForTransferStateTimeout_ms = waitForTransferStateTimeout_ms;
 	me->irqPriority = irqPriority;
 
@@ -122,6 +135,8 @@ void AlxMmc_Ctor
 	me->hmmc.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
 	me->hmmc.Init.ClockDiv = 0;
 	me->hmmc.Init.Transceiver = SDMMC_TRANSCEIVER_DISABLE;
+	me->isDmaReadDone = false;
+	me->isDmaWriteDone = false;
 
 	// Check clock
 	ALX_MMC_ASSERT(AlxMmc_IsClkOk(me));
@@ -245,9 +260,6 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 	ALX_MMC_ASSERT(me->isInit == true);
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
 
-	ReadStatus = 0;
-	uint32_t timeout;
-
 
 	//------------------------------------------------------------------------------
 	// Try
@@ -256,8 +268,10 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 	// Try for number of tries
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
+		// Clear
+		me->isDmaReadDone = false;
+
 		// Read
-//		HAL_StatusTypeDef statusHal = HAL_MMC_ReadBlocks(&me->hmmc, data, addr, numOfBlocks, me->blockReadWriteTimeout_ms);
 		HAL_StatusTypeDef statusHal = HAL_MMC_ReadBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
@@ -267,14 +281,9 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 			continue;
 		}
 
-
-		/* Wait for the Rading process is completed or a timeout occurs */
-		timeout = HAL_GetTick();
-		while((ReadStatus == 0) && ((HAL_GetTick() - timeout) < 1000*30))
-		{
-		}
-		/* in case of a timeout return error */
-		if (ReadStatus == 0)
+		// Wait
+		Alx_Status statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, true);
+		if (statusAlx != Alx_Ok)
 		{
 			ALX_MMC_TRACE("Err");
 			if (AlxMmc_Reset(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
@@ -282,10 +291,8 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 			continue;
 		}
 
-
 		// Wait
-		ReadStatus = 0;
-		Alx_Status statusAlx = AlxMmc_WaitForTransferState(me);
+		statusAlx = AlxMmc_WaitForTransferState(me);
 		if (statusAlx != Alx_Ok)
 		{
 			ALX_MMC_TRACE("Err");
@@ -315,9 +322,6 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	ALX_MMC_ASSERT(me->isInit == true);
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
 
-	WriteStatus = 0;
-	uint32_t timeout = HAL_GetTick();
-
 
 	//------------------------------------------------------------------------------
 	// Try
@@ -326,8 +330,10 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	// Try for number of tries
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
+		// Clear
+		me->isDmaWriteDone = false;
+
 		// Read
-//		HAL_StatusTypeDef statusHal = HAL_MMC_WriteBlocks(&me->hmmc, data, addr, numOfBlocks, me->blockReadWriteTimeout_ms);
 		HAL_StatusTypeDef statusHal = HAL_MMC_WriteBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
@@ -337,13 +343,9 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 			continue;
 		}
 
-
-		/* Wait for the Rading process is completed or a timeout occurs */
-		while((WriteStatus == 0) && ((HAL_GetTick() - timeout) < 1000*30))
-		{
-		}
-		/* in case of a timeout return error */
-		if (WriteStatus == 0)
+		// Wait
+		Alx_Status statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, false);
+		if (statusAlx != Alx_Ok)
 		{
 			ALX_MMC_TRACE("Err");
 			if (AlxMmc_Reset(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
@@ -351,10 +353,8 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 			continue;
 		}
 
-
 		// Wait
-		WriteStatus = 0;
-		Alx_Status statusAlx = AlxMmc_WaitForTransferState(me);
+		statusAlx = AlxMmc_WaitForTransferState(me);
 		if (statusAlx != Alx_Ok)
 		{
 			ALX_MMC_TRACE("Err");
@@ -389,7 +389,7 @@ void AlxMmc_IrqHandler(AlxMmc* me)
 //------------------------------------------------------------------------------
 // Specific
 //------------------------------------------------------------------------------
-static Alx_Status AlxMmc_WaitForDmaReadWriteComplete(AlxMmc* me, bool read)
+static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read)
 {
 	// Local variables
 	AlxTimSw alxTimSw;
@@ -401,23 +401,24 @@ static Alx_Status AlxMmc_WaitForDmaReadWriteComplete(AlxMmc* me, bool read)
 	// Loop
 	while (true)
 	{
+		// Check state
 		if (read)
 		{
-			if (ReadStatus)
+			if (me->isDmaReadDone)
 			{
 				return Alx_Ok;
 			}
 		}
 		else	// write
 		{
-			if (WriteStatus)
+			if (me->isDmaWriteDone)
 			{
 				return Alx_Ok;
 			}
 		}
 
 		// Check if timeout
-		if (AlxTimSw_IsTimeout_ms(&alxTimSw, me->blockReadWriteTimeout_ms))
+		if (AlxTimSw_IsTimeout_ms(&alxTimSw, me->dmaReadWriteTimeout_ms))
 		{
 			return Alx_Err;
 		}
@@ -463,6 +464,10 @@ static Alx_Status AlxMmc_Reset(AlxMmc* me)
 
 	// Force MMC periphery reset
 	AlxMmc_Periph_ForceReset(me);
+
+	// Clear variables
+	me->isDmaReadDone = false;
+	me->isDmaWriteDone = false;
 
 	// Clear isInit
 	me->isInit = false;
@@ -571,13 +576,23 @@ static void AlxMmc_Periph_DisableIrq(AlxMmc* me)
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-void HAL_MMC_TxCpltCallback(MMC_HandleTypeDef *hmmc)
-{
-	WriteStatus = 1;
-}
 void HAL_MMC_RxCpltCallback(MMC_HandleTypeDef *hmmc)
 {
-	ReadStatus = 1;
+	#if defined(SDMMC1)
+	alxMmc_Sdmmc1_me->isDmaReadDone = true;
+	#endif
+	#if defined(SDMMC2)
+	alxMmc_Sdmmc2_me->isDmaReadDone = true;
+	#endif
+}
+void HAL_MMC_TxCpltCallback(MMC_HandleTypeDef *hmmc)
+{
+	#if defined(SDMMC1)
+	alxMmc_Sdmmc1_me->isDmaWriteDone = true;
+	#endif
+	#if defined(SDMMC2)
+	alxMmc_Sdmmc2_me->isDmaWriteDone = true;
+	#endif
 }
 
 

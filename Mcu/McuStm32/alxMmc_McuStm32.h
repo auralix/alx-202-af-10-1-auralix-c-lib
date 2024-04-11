@@ -73,7 +73,7 @@ typedef struct
 	AlxIoPin* io_DAT5;
 	AlxIoPin* io_DAT6;
 	AlxIoPin* io_DAT7;
-	uint16_t blockReadWriteTimeout_ms;
+	uint16_t dmaReadWriteTimeout_ms;
 	uint16_t waitForTransferStateTimeout_ms;
 	Alx_IrqPriority irqPriority;
 
@@ -83,6 +83,8 @@ typedef struct
 	HAL_MMC_CardCIDTypeDef cid;
 	HAL_MMC_CardCSDTypeDef csd;
 	HAL_MMC_CardInfoTypeDef info;
+	bool isDmaReadDone;
+	bool isDmaWriteDone;
 
 	// Info
 	bool wasCtorCalled;
@@ -108,7 +110,7 @@ void AlxMmc_Ctor
 	AlxIoPin* io_DAT5,
 	AlxIoPin* io_DAT6,
 	AlxIoPin* io_DAT7,
-	uint16_t blockReadWriteTimeout_ms,
+	uint16_t dmaReadWriteTimeout_ms,
 	uint16_t waitForTransferStateTimeout_ms,
 	Alx_IrqPriority irqPriority
 );
