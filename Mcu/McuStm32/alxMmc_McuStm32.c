@@ -39,13 +39,15 @@
 
 
 //******************************************************************************
-// Private Functions
+// Private Variables
 //******************************************************************************
+static volatile  uint8_t  WriteStatus = 0, ReadStatus = 0;
 
 
 //------------------------------------------------------------------------------
 // Specific
 //------------------------------------------------------------------------------
+static Alx_Status AlxMmc_WaitForDmaReadWriteComplete(AlxMmc* me, bool read);
 static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me);
 
 
@@ -58,6 +60,8 @@ static void AlxMmc_Periph_EnableClk(AlxMmc* me);
 static void AlxMmc_Periph_DisableClk(AlxMmc* me);
 static void AlxMmc_Periph_ForceReset(AlxMmc* me);
 static void AlxMmc_Periph_ReleaseReset(AlxMmc* me);
+static void AlxMmc_Periph_EnableIrq(AlxMmc* me);
+static void AlxMmc_Periph_DisableIrq(AlxMmc* me);
 
 
 //******************************************************************************
@@ -84,7 +88,8 @@ void AlxMmc_Ctor
 	AlxIoPin* io_DAT6,
 	AlxIoPin* io_DAT7,
 	uint16_t blockReadWriteTimeout_ms,
-	uint16_t waitForTransferStateTimeout_ms
+	uint16_t waitForTransferStateTimeout_ms,
+	Alx_IrqPriority irqPriority
 )
 {
 	// Assert
@@ -105,6 +110,7 @@ void AlxMmc_Ctor
 	me->io_DAT7 = io_DAT7;
 	me->blockReadWriteTimeout_ms = blockReadWriteTimeout_ms;
 	me->waitForTransferStateTimeout_ms = waitForTransferStateTimeout_ms;
+	me->irqPriority = irqPriority;
 
 	// Variables
 	me->iclk.PeriphClockSelection = RCC_PERIPHCLK_SDMMC1;
@@ -112,7 +118,7 @@ void AlxMmc_Ctor
 	me->hmmc.Instance = mmc;
 	me->hmmc.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
 	me->hmmc.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
-	me->hmmc.Init.BusWide = SDMMC_BUS_WIDE_1B;
+	me->hmmc.Init.BusWide = SDMMC_BUS_WIDE_8B;
 	me->hmmc.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
 	me->hmmc.Init.ClockDiv = 0;
 	me->hmmc.Init.Transceiver = SDMMC_TRANSCEIVER_DISABLE;
@@ -169,6 +175,9 @@ Alx_Status AlxMmc_Init(AlxMmc* me)
 	// Enable SDMMC periphery clock
 	AlxMmc_Periph_EnableClk(me);
 
+	// Init IRQ
+	AlxMmc_Periph_EnableIrq(me);
+
 	// Init SDMMC
 	if (HAL_MMC_Init(&me->hmmc) != HAL_OK) { ALX_MMC_TRACE("Err"); return Alx_Err; }					// TV: Communication with MMC
 
@@ -195,6 +204,9 @@ Alx_Status AlxMmc_DeInit(AlxMmc* me)
 	// Assert
 	ALX_MMC_ASSERT(me->wasCtorCalled == true);
 	ALX_MMC_ASSERT(me->isInit == true);
+
+	// DeInit IRQ
+	AlxMmc_Periph_DisableIrq(me);
 
 	// DeInit MMC
 	if (HAL_MMC_DeInit(&me->hmmc) != HAL_OK) { ALX_MMC_TRACE("Err"); return Alx_Err; }
@@ -233,6 +245,9 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 	ALX_MMC_ASSERT(me->isInit == true);
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
 
+	ReadStatus = 0;
+	uint32_t timeout;
+
 
 	//------------------------------------------------------------------------------
 	// Try
@@ -242,7 +257,8 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
 		// Read
-		HAL_StatusTypeDef statusHal = HAL_MMC_ReadBlocks(&me->hmmc, data, addr, numOfBlocks, me->blockReadWriteTimeout_ms);
+//		HAL_StatusTypeDef statusHal = HAL_MMC_ReadBlocks(&me->hmmc, data, addr, numOfBlocks, me->blockReadWriteTimeout_ms);
+		HAL_StatusTypeDef statusHal = HAL_MMC_ReadBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
 			ALX_MMC_TRACE("Err");
@@ -251,7 +267,24 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 			continue;
 		}
 
+
+		/* Wait for the Rading process is completed or a timeout occurs */
+		timeout = HAL_GetTick();
+		while((ReadStatus == 0) && ((HAL_GetTick() - timeout) < 1000*30))
+		{
+		}
+		/* in case of a timeout return error */
+		if (ReadStatus == 0)
+		{
+			ALX_MMC_TRACE("Err");
+			if (AlxMmc_Reset(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+			AlxDelay_ms(newTryWaitTime_ms);
+			continue;
+		}
+
+
 		// Wait
+		ReadStatus = 0;
 		Alx_Status statusAlx = AlxMmc_WaitForTransferState(me);
 		if (statusAlx != Alx_Ok)
 		{
@@ -282,6 +315,9 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	ALX_MMC_ASSERT(me->isInit == true);
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
 
+	WriteStatus = 0;
+	uint32_t timeout = HAL_GetTick();
+
 
 	//------------------------------------------------------------------------------
 	// Try
@@ -291,7 +327,8 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
 		// Read
-		HAL_StatusTypeDef statusHal = HAL_MMC_WriteBlocks(&me->hmmc, data, addr, numOfBlocks, me->blockReadWriteTimeout_ms);
+//		HAL_StatusTypeDef statusHal = HAL_MMC_WriteBlocks(&me->hmmc, data, addr, numOfBlocks, me->blockReadWriteTimeout_ms);
+		HAL_StatusTypeDef statusHal = HAL_MMC_WriteBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
 			ALX_MMC_TRACE("Err");
@@ -300,7 +337,23 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 			continue;
 		}
 
+
+		/* Wait for the Rading process is completed or a timeout occurs */
+		while((WriteStatus == 0) && ((HAL_GetTick() - timeout) < 1000*30))
+		{
+		}
+		/* in case of a timeout return error */
+		if (WriteStatus == 0)
+		{
+			ALX_MMC_TRACE("Err");
+			if (AlxMmc_Reset(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+			AlxDelay_ms(newTryWaitTime_ms);
+			continue;
+		}
+
+
 		// Wait
+		WriteStatus = 0;
 		Alx_Status statusAlx = AlxMmc_WaitForTransferState(me);
 		if (statusAlx != Alx_Ok)
 		{
@@ -322,6 +375,10 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	// Return
 	return Alx_ErrNumOfTries;
 }
+void AlxMmc_IrqHandler(AlxMmc* me)
+{
+	HAL_MMC_IRQHandler(&me->hmmc);
+}
 
 
 //******************************************************************************
@@ -332,6 +389,40 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 //------------------------------------------------------------------------------
 // Specific
 //------------------------------------------------------------------------------
+static Alx_Status AlxMmc_WaitForDmaReadWriteComplete(AlxMmc* me, bool read)
+{
+	// Local variables
+	AlxTimSw alxTimSw;
+	AlxTimSw_Ctor(&alxTimSw, false);
+
+	// Start timer
+	AlxTimSw_Start(&alxTimSw);
+
+	// Loop
+	while (true)
+	{
+		if (read)
+		{
+			if (ReadStatus)
+			{
+				return Alx_Ok;
+			}
+		}
+		else	// write
+		{
+			if (WriteStatus)
+			{
+				return Alx_Ok;
+			}
+		}
+
+		// Check if timeout
+		if (AlxTimSw_IsTimeout_ms(&alxTimSw, me->blockReadWriteTimeout_ms))
+		{
+			return Alx_Err;
+		}
+	}
+}
 static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me)
 {
 	// Local variables
@@ -342,7 +433,7 @@ static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me)
 	AlxTimSw_Start(&alxTimSw);
 
 	// Loop
-	while (1)
+	while (true)
 	{
 		// Get state
 		HAL_MMC_CardStateTypeDef state = HAL_MMC_GetCardState(&me->hmmc);
@@ -452,6 +543,41 @@ static void AlxMmc_Periph_ReleaseReset(AlxMmc* me)
 	#endif
 
 	ALX_MMC_ASSERT(false);	// We should not get here
+}
+static void AlxMmc_Periph_EnableIrq(AlxMmc* me)
+{
+	#if defined(SDMMC1)
+	if (me->hmmc.Instance == SDMMC1)	{ HAL_NVIC_SetPriority(SDMMC1_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(SDMMC1_IRQn); return; }
+	#endif
+	#if defined(SDMMC2)
+	if (me->hmmc.Instance == SDMMC2)	{ HAL_NVIC_SetPriority(SDMMC2_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(SDMMC2_IRQn); return; }
+	#endif
+
+	ALX_MMC_ASSERT(false);	// We should not get here
+}
+static void AlxMmc_Periph_DisableIrq(AlxMmc* me)
+{
+	#if defined(SDMMC1)
+	if (me->hmmc.Instance == SDMMC1)	{ HAL_NVIC_DisableIRQ(SDMMC1_IRQn); HAL_NVIC_ClearPendingIRQ(SDMMC1_IRQn); return; }
+	#endif
+	#if defined(SDMMC2)
+	if (me->hmmc.Instance == SDMMC2)	{ HAL_NVIC_DisableIRQ(SDMMC2_IRQn); HAL_NVIC_ClearPendingIRQ(SDMMC2_IRQn); return; }
+	#endif
+
+	ALX_MMC_ASSERT(false);	// We should not get here
+}
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+void HAL_MMC_TxCpltCallback(MMC_HandleTypeDef *hmmc)
+{
+	WriteStatus = 1;
+}
+void HAL_MMC_RxCpltCallback(MMC_HandleTypeDef *hmmc)
+{
+	ReadStatus = 1;
 }
 
 
