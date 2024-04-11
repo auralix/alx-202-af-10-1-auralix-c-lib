@@ -1021,9 +1021,9 @@ static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block
 	AlxFs* alxFs_me = (AlxFs*)c->context;
 	uint32_t numOfBlocks = size / 512;
 	uint32_t blockAddr = (block * c->block_size + off) / 512;
-	LL_GPIO_SetOutputPin(GPIOC, GPIO_PIN_3);	// di_ADC_nDRDY - DBG9
+//	LL_GPIO_SetOutputPin(GPIOC, GPIO_PIN_3);	// di_ADC_nDRDY - DBG9
 	Alx_Status status = AlxMmc_ReadBlock(alxFs_me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 1, 1000);
-	LL_GPIO_ResetOutputPin(GPIOC, GPIO_PIN_3);	// di_ADC_nDRDY - DBG9
+//	LL_GPIO_ResetOutputPin(GPIOC, GPIO_PIN_3);	// di_ADC_nDRDY - DBG9
 	if (status != Alx_Ok)
 	{
 		return LFS_ERR_IO;
@@ -1043,9 +1043,9 @@ static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block
 	AlxFs* alxFs_me = (AlxFs*)c->context;
 	uint32_t numOfBlocks = size / 512;
 	uint32_t blockAddr = (block * c->block_size + off) / 512;
-	LL_GPIO_SetOutputPin(GPIOF, GPIO_PIN_14);	// do_ADC_I2C_SCL - DBG10
+//	LL_GPIO_SetOutputPin(GPIOF, GPIO_PIN_14);	// do_ADC_I2C_SCL - DBG10
 	Alx_Status status = AlxMmc_WriteBlock(alxFs_me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 1, 1000);
-	LL_GPIO_ResetOutputPin(GPIOF, GPIO_PIN_14);	// do_ADC_I2C_SCL - DBG10
+//	LL_GPIO_ResetOutputPin(GPIOF, GPIO_PIN_14);	// do_ADC_I2C_SCL - DBG10
 	if (status != Alx_Ok)
 	{
 		return LFS_ERR_IO;
@@ -1060,8 +1060,8 @@ static int AlxFs_Lfs_Mmc_EraseBlock(const struct lfs_config* c, lfs_block_t bloc
 	(void)c;
 	(void)block;
 
-	LL_GPIO_SetOutputPin(GPIOF, GPIO_PIN_15);	// io_ADC_I2C_SDA - DBG11
-	LL_GPIO_ResetOutputPin(GPIOF, GPIO_PIN_15);	// io_ADC_I2C_SDA - DBG11
+//	LL_GPIO_SetOutputPin(GPIOF, GPIO_PIN_15);	// io_ADC_I2C_SDA - DBG11
+//	LL_GPIO_ResetOutputPin(GPIOF, GPIO_PIN_15);	// io_ADC_I2C_SDA - DBG11
 
 	// Return
 	return LFS_ERR_OK;
