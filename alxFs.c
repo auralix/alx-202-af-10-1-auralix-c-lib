@@ -1001,12 +1001,13 @@ static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
 	me->lfsConfig.unlock = AlxFs_Lfs_Mmc_Unlock;
 	#endif
 
-	me->lfsConfig.read_size = 512;
-	me->lfsConfig.prog_size = 512;
-	me->lfsConfig.block_size = 512;
+	#define ALX_FS_MULTIPLY 8
+	me->lfsConfig.read_size = 512*ALX_FS_MULTIPLY;
+	me->lfsConfig.prog_size = 512*ALX_FS_MULTIPLY;
+	me->lfsConfig.block_size = 512*ALX_FS_MULTIPLY;
 	me->lfsConfig.block_count = 62160896;
 	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
-	me->lfsConfig.cache_size = 512;
+	me->lfsConfig.cache_size = 512*ALX_FS_MULTIPLY;
 	me->lfsConfig.lookahead_size = 32;
 }
 static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size)
@@ -1018,7 +1019,11 @@ static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block
 
 	// Read
 	AlxFs* alxFs_me = (AlxFs*)c->context;
-	Alx_Status status = AlxMmc_ReadBlock(alxFs_me->alxMmc, 1, block, (uint8_t*)buffer, 512, 1, 10);
+	uint32_t numOfBlocks = size / 512;
+	uint32_t blockAddr = (block * c->block_size + off) / 512;
+//	LL_GPIO_SetOutputPin(GPIOC, GPIO_PIN_3);	// di_ADC_nDRDY - DBG9
+	Alx_Status status = AlxMmc_ReadBlock(alxFs_me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 1, 1000);
+//	LL_GPIO_ResetOutputPin(GPIOC, GPIO_PIN_3);	// di_ADC_nDRDY - DBG9
 	if (status != Alx_Ok)
 	{
 		return LFS_ERR_IO;
@@ -1036,7 +1041,11 @@ static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block
 
 	// Write
 	AlxFs* alxFs_me = (AlxFs*)c->context;
-	Alx_Status status = AlxMmc_WriteBlock(alxFs_me->alxMmc, 1, block, (uint8_t*)buffer, 512, 1, 10);
+	uint32_t numOfBlocks = size / 512;
+	uint32_t blockAddr = (block * c->block_size + off) / 512;
+//	LL_GPIO_SetOutputPin(GPIOF, GPIO_PIN_14);	// do_ADC_I2C_SCL - DBG10
+	Alx_Status status = AlxMmc_WriteBlock(alxFs_me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 1, 1000);
+//	LL_GPIO_ResetOutputPin(GPIOF, GPIO_PIN_14);	// do_ADC_I2C_SCL - DBG10
 	if (status != Alx_Ok)
 	{
 		return LFS_ERR_IO;
@@ -1050,6 +1059,9 @@ static int AlxFs_Lfs_Mmc_EraseBlock(const struct lfs_config* c, lfs_block_t bloc
 	// Local variables
 	(void)c;
 	(void)block;
+
+//	LL_GPIO_SetOutputPin(GPIOF, GPIO_PIN_15);	// io_ADC_I2C_SDA - DBG11
+//	LL_GPIO_ResetOutputPin(GPIOF, GPIO_PIN_15);	// io_ADC_I2C_SDA - DBG11
 
 	// Return
 	return LFS_ERR_OK;

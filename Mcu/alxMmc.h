@@ -88,6 +88,7 @@ Alx_Status AlxMmc_Init(AlxMmc* me);
 Alx_Status AlxMmc_DeInit(AlxMmc* me);
 Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
 Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t newTryWaitTime_ms);
+void AlxMmc_IrqHandler(AlxMmc* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
