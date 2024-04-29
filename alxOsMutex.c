@@ -95,7 +95,7 @@ void AlxOsMutex_Unlock(AlxOsMutex* me)
   * @retval		false
   * @retval		true
   */
-bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me)
+bool AlxOsMutex_IsUnlocked(AlxOsMutex* me)
 {
 	// Get Status
 	#if defined(ALX_FREE_RTOS)

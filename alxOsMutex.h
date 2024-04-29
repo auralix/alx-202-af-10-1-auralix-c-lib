@@ -103,7 +103,7 @@ void AlxOsMutex_Ctor
 //******************************************************************************
 void AlxOsMutex_Lock(AlxOsMutex* me);
 void AlxOsMutex_Unlock(AlxOsMutex* me);
-bool AlxOsMutex_IsMutexUnlocked(AlxOsMutex* me);	// TV: Not tested
+bool AlxOsMutex_IsUnlocked(AlxOsMutex* me);
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
