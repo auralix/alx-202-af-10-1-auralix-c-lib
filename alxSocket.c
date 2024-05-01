@@ -47,16 +47,14 @@
 //******************************************************************************
 void AlxSocket_Ctor
 (
-	AlxSocket* me,
-	AlxNet* alxNet,
-	AlxSocket_Protocol protocol
+	AlxSocket* me
 )
 {
 	// Parameters
-	me->alxNet = alxNet;
-	me->protocol = protocol;
 
 	// Variables
+	me->alxNet = NULL;
+	me->protocol = AlxSocket_Protocol_Undefined;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -67,7 +65,7 @@ void AlxSocket_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxSocket_Open(AlxSocket* me)
+Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol protocol)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
@@ -84,8 +82,6 @@ Alx_Status AlxSocket_Open(AlxSocket* me)
 
 	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/sockets.h
 	// int lwip_socket(int domain, int type, int protocol);
-
-	// We will use Ctor for network_interface & protocol definition for socket, Open will be used then to use then for allocation this type of socket
 
 	// Return
 	return Alx_Ok;
@@ -110,7 +106,7 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxSocket_Connect(AlxSocket* me, uint8_t* ip, uint8_t ipLen, uint16_t port)
+Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);

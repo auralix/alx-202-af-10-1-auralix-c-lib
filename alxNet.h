@@ -79,11 +79,18 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxNet_Config_Wiznet,
+	AlxNet_Config_Cellular
+} AlxNet_Config;
+
 typedef struct
 {
 	// Defines
 
 	// Parameters
+	AlxNet_Config config;
 
 	// Variables
 
@@ -98,13 +105,29 @@ typedef struct
 //******************************************************************************
 void AlxNet_Ctor
 (
-	AlxNet* me
+	AlxNet* me,
+	AlxNet_Config config
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+Alx_Status AlxNet_Connect(AlxNet* me);
+Alx_Status AlxNet_Disconnect(AlxNet* me);
+bool AlxNet_IsConnected(AlxNet* me);
+void AlxNet_SetMac(AlxNet* me, const char* mac);
+void AlxNet_SetIp(AlxNet* me, const char* ip);
+void AlxNet_SetNetmask(AlxNet* me, const char* netmask);
+void AlxNet_SetGateway(AlxNet* me, const char* gateway);
+const char* AlxNet_GetMac(AlxNet* me);
+const char* AlxNet_GetIp(AlxNet* me);
+const char* AlxNet_GetNetmask(AlxNet* me);
+const char* AlxNet_GetGateway(AlxNet* me);
+void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip);
+Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip);
+void AlxNet_Dhcp_Enable(AlxNet* me, bool enable);
+bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

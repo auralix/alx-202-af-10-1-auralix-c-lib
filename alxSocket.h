@@ -82,8 +82,9 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxSocket_Protocol_Tcp,
+	AlxSocket_Protocol_Undefined,
 	AlxSocket_Protocol_Udp,
+	AlxSocket_Protocol_Tcp,
 	AlxSocket_Protocol_Tls
 } AlxSocket_Protocol;
 
@@ -92,10 +93,10 @@ typedef struct
 	// Defines
 
 	// Parameters
-	AlxNet* alxNet;
-	AlxSocket_Protocol protocol;
 
 	// Variables
+	AlxNet* alxNet;
+	AlxSocket_Protocol protocol;
 
 	// Info
 	bool wasCtorCalled;
@@ -108,18 +109,16 @@ typedef struct
 //******************************************************************************
 void AlxSocket_Ctor
 (
-	AlxSocket* me,
-	AlxNet* alxNet,
-	AlxSocket_Protocol protocol
+	AlxSocket* me
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxSocket_Open(AlxSocket* me);
+Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol protocol);
 Alx_Status AlxSocket_Close(AlxSocket* me);
-Alx_Status AlxSocket_Connect(AlxSocket* me, uint8_t* ip, uint8_t ipLen, uint16_t port);
+Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port);
 Alx_Status AlxSocket_Bind(AlxSocket* me, uint16_t port);
 Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog);
 AlxSocket* AlxSocket_Accept(AlxSocket* me);
