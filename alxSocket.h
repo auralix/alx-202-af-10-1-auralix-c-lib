@@ -42,6 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxNet.h"
 
 
 //******************************************************************************
@@ -79,17 +80,26 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxSocket_Protocol_Tcp,
+	AlxSocket_Protocol_Udp,
+	AlxSocket_Protocol_Tls
+} AlxSocket_Protocol;
+
 typedef struct
 {
 	// Defines
 
 	// Parameters
+	AlxNet* alxNet;
+	AlxSocket_Protocol protocol;
 
 	// Variables
 
 	// Info
 	bool wasCtorCalled;
-	bool isInit;
+	bool isOpened;
 } AlxSocket;
 
 
@@ -98,13 +108,24 @@ typedef struct
 //******************************************************************************
 void AlxSocket_Ctor
 (
-	AlxSocket* me
+	AlxSocket* me,
+	AlxNet* alxNet,
+	AlxSocket_Protocol protocol
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+Alx_Status AlxSocket_Open(AlxSocket* me);
+Alx_Status AlxSocket_Close(AlxSocket* me);
+Alx_Status AlxSocket_Connect(AlxSocket* me, uint8_t* ip, uint8_t ipLen, uint16_t port);
+Alx_Status AlxSocket_Bind(AlxSocket* me, uint16_t port);
+Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog);
+AlxSocket* AlxSocket_Accept(AlxSocket* me);
+int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len);
+int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len);
+void AlxSocket_SetTimeout_ms(AlxSocket* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
