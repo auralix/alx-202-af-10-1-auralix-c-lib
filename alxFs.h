@@ -85,8 +85,11 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
+	AlxFs_Config_Undefined,
+	#if defined(ALX_LFS)
 	AlxFs_Config_Lfs_FlashInt,
 	AlxFs_Config_Lfs_Mmc
+	#endif
 } AlxFs_Config;
 
 typedef enum
