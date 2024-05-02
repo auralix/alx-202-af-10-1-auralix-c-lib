@@ -85,7 +85,9 @@ typedef struct
 	bool approxDisable;
 
 	// Variables
+	#if defined(ALX_FREE_RTOS)
 	EventGroupHandle_t eventGroupHandle_t;
+	#endif
 	AlxOsMutex alxMutex;
 
 	// Info

@@ -76,14 +76,16 @@ void AlxOsDelayUntil_Ctor
   */
 void AlxOsDelayUntil_Init(AlxOsDelayUntil* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_OS_DELAY_UNTIL_ASSERT(me->isInit == false);
 	ALX_OS_DELAY_UNTIL_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Set xLastWakeTime
+	// Set xLastWakeTime
+	#if defined(ALX_FREE_RTOS)
 	me->xLastWakeTime = xTaskGetTickCount();
+	#endif
 
-	// #3 Set isInit
+	// Set isInit
 	me->isInit = true;
 }
 
