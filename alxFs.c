@@ -205,31 +205,31 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const 
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Set mode flags
-	int modeFlags = 0;
+	// Prepare modeConfig
+	int modeConfig = 0;
 	if (0 == strcmp(mode, "r"))
 	{
-		modeFlags = LFS_O_RDONLY;
+		modeConfig = LFS_O_RDONLY;
 	}
 	else if (0 == strcmp(mode, "w"))
 	{
-		modeFlags = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC;
+		modeConfig = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC;
 	}
 	else if (0 == strcmp(mode, "a"))
 	{
-		modeFlags = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND;
+		modeConfig = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND;
 	}
 	else if (0 == strcmp(mode, "r+"))
 	{
-		modeFlags = LFS_O_RDWR;
+		modeConfig = LFS_O_RDWR;
 	}
 	else if (0 == strcmp(mode, "w+"))
 	{
-		modeFlags = LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC;
+		modeConfig = LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC;
 	}
 	else if (0 == strcmp(mode, "a+"))
 	{
-		modeFlags = LFS_O_RDWR | LFS_O_CREAT | LFS_O_APPEND;
+		modeConfig = LFS_O_RDWR | LFS_O_CREAT | LFS_O_APPEND;
 	}
 	else
 	{
@@ -237,7 +237,7 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const 
 	}
 
 	// Do
-	int status = lfs_file_open(&me->lfs, &file->lfsFile, path, modeFlags);
+	int status = lfs_file_open(&me->lfs, &file->lfsFile, path, modeConfig);
 	if (status != 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return
@@ -368,8 +368,27 @@ Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_Fi
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Prepare originConfig
+	int originConfig = 0;
+	if (origin == AlxFs_File_Seek_Origin_Set)
+	{
+		originConfig = LFS_SEEK_SET;
+	}
+	else if(origin == AlxFs_File_Seek_Origin_Cur)
+	{
+		originConfig = LFS_SEEK_CUR;
+	}
+	else if(origin == AlxFs_File_Seek_Origin_End)
+	{
+		originConfig = LFS_SEEK_END;
+	}
+	else
+	{
+		ALX_FS_ASSERT(false);	// We should never get here
+	}
+
 	// Do
-	lfs_soff_t statusPositionNew = lfs_file_seek(&me->lfs, &file->lfsFile, (lfs_soff_t)offset, (int)origin);
+	lfs_soff_t statusPositionNew = lfs_file_seek(&me->lfs, &file->lfsFile, (lfs_soff_t)offset, originConfig);
 	if (statusPositionNew < 0) { ALX_FS_TRACE("Err"); return Alx_Err; }
 
 	// Return

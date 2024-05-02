@@ -91,12 +91,9 @@ typedef enum
 
 typedef enum
 {
-	#if defined(ALX_LFS)
-	AlxFs_File_Seek_Origin_Set = LFS_SEEK_SET,
-	AlxFs_File_Seek_Origin_Cur = LFS_SEEK_CUR,
-	AlxFs_File_Seek_Origin_End = LFS_SEEK_END,
-	#endif
-	AlxFs_File_Seek_Origin_Dummy = 99
+	AlxFs_File_Seek_Origin_Set,
+	AlxFs_File_Seek_Origin_Cur,
+	AlxFs_File_Seek_Origin_End
 } AlxFs_File_Seek_Origin;
 
 typedef struct
