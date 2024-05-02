@@ -48,7 +48,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -113,7 +113,7 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, uint32_t eventFlagsToWait, uint32_t timeout_ms);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

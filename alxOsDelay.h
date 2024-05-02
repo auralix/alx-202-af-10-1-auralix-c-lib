@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -115,7 +115,7 @@ void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min);
 void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

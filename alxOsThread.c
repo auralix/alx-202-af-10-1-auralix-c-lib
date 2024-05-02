@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -44,33 +44,33 @@
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		pxTaskCode
-  * @param[in]		pcName
-  * @param[in]		usStackDepth_byte
-  * @param[in]		pvParameters
-  * @param[in]		uxPriority
+  * @param[in]		func
+  * @param[in]		name
+  * @param[in]		stackLen_byte
+  * @param[in]		param
+  * @param[in]		priority
   */
 void AlxOsThread_Ctor
 (
 	AlxOsThread* me,
-	TaskFunction_t pxTaskCode,
-	const char* const pcName,
-	uint32_t usStackDepth_byte,
-	void* const pvParameters,
-	UBaseType_t uxPriority
+	void (*func)(void*),
+	const char* name,
+	uint32_t stackLen_byte,
+	void* param,
+	uint32_t priority
 )
 {
-	#if defined(ALX_FREE_RTOS)
 	// Parameters
-	me->pxTaskCode = pxTaskCode;
-	me->pcName = pcName;
-	me->usStackDepth_byte = usStackDepth_byte;
-	me->pvParameters = pvParameters;
-	me->uxPriority = uxPriority;
+	me->func = func;
+	me->name = name;
+	me->stackLen_byte = stackLen_byte;
+	me->param = param;
+	me->priority = priority;
 
 	// Variables
-	me->usStackDepth_word = usStackDepth_byte / 4;	// TV: FreeRTOS stack is mesured in words, 1 word = 4 bytes
-	me->pxCreatedTask = NULL;
+	#if defined(ALX_FREE_RTOS)
+	me->stackLen_word = stackLen_byte / 4;	// TV: FreeRTOS stack is mesured in words, 1 word = 4 bytes
+	me->taskHandle = NULL;
 	#endif
 
 	// Info
@@ -99,12 +99,12 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 	#if defined(ALX_FREE_RTOS)
 	BaseType_t status = xTaskCreate
 	(
-		me->pxTaskCode,
-		me->pcName,
-		me->usStackDepth_word,
-		me->pvParameters,
-		me->uxPriority,
-		me->pxCreatedTask
+		(TaskFunction_t)me->func,
+		me->name,
+		me->stackLen_word,
+		me->param,
+		(UBaseType_t)me->priority,
+		me->taskHandle
 	);
 	if (status != pdPASS) { ALX_OS_THREAD_TRACE("Err"); return Alx_Err; }
 	#endif
@@ -133,4 +133,4 @@ void AlxOsThread_Yield(AlxOsThread* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB)

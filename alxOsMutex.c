@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -104,4 +104,4 @@ bool AlxOsMutex_IsUnlocked(AlxOsMutex* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB)

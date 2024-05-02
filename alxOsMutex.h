@@ -71,7 +71,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -106,7 +106,7 @@ void AlxOsMutex_Unlock(AlxOsMutex* me);
 bool AlxOsMutex_IsUnlocked(AlxOsMutex* me);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

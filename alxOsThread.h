@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -79,17 +79,17 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	#if defined(ALX_FREE_RTOS)
 	// Parameters
-	TaskFunction_t pxTaskCode;
-	const char* pcName;
-	uint32_t usStackDepth_byte;
-	void* pvParameters;
-	UBaseType_t uxPriority;
+	void (*func)(void*);
+	const char* name;
+	uint32_t stackLen_byte;
+	void* param;
+	uint32_t priority;
 
 	// Variables
-	configSTACK_DEPTH_TYPE usStackDepth_word;
-	TaskHandle_t* pxCreatedTask;
+	#if defined(ALX_FREE_RTOS)
+	configSTACK_DEPTH_TYPE stackLen_word;
+	TaskHandle_t* taskHandle;
 	#endif
 
 	// Info
@@ -104,11 +104,11 @@ typedef struct
 void AlxOsThread_Ctor
 (
 	AlxOsThread* me,
-	TaskFunction_t pxTaskCode,
-	const char* const pcName,
-	uint32_t usStackDepth_byte,
-	void* const pvParameters,
-	UBaseType_t uxPriority
+	void (*func)(void*),
+	const char* name,
+	uint32_t stackLen_byte,
+	void* param,
+	uint32_t priority
 );
 
 
@@ -119,7 +119,7 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me);
 void AlxOsThread_Yield(AlxOsThread* me);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
