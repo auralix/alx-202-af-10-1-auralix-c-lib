@@ -81,8 +81,10 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
+	#if defined(ALX_WIZNET)
 	AlxNet_Config_Wiznet,
-	AlxNet_Config_Cellular
+	#endif
+	AlxNet_Config_FreeRtos_Cellular
 } AlxNet_Config;
 
 typedef struct

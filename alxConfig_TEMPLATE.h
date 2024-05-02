@@ -57,6 +57,7 @@ extern "C" {
 //#define ALX_FREE_RTOS
 //#define ALX_LW_IP
 //#define ALX_LFS
+//#define ALX_WIZNET
 //#define ALX_MBED
 //#define ALX_MBED_CLOUD_CLIENT
 

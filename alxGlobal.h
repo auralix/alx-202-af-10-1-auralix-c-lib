@@ -153,6 +153,18 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
+// Wiznet
+//------------------------------------------------------------------------------
+#if defined(ALX_WIZNET)
+//#include "w5500.h"		// TV: TODO, project doesn't compile if included
+//#include "socket.h"		// TV: TODO, project doesn't compile if included
+//#include "wizchip_conf.h"	// TV: TODO, project doesn't compile if included
+#include "dhcp.h"
+#include "dns.h"
+#endif
+
+
+//------------------------------------------------------------------------------
 // MCU
 //------------------------------------------------------------------------------
 #if defined(ALX_STM32F0)
