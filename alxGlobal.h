@@ -141,6 +141,14 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
+// FreeRTOS Cellular Interface
+//------------------------------------------------------------------------------
+#if defined(ALX_FREE_RTOS_CELLULAR)
+// TV: TODO, add files
+#endif
+
+
+//------------------------------------------------------------------------------
 // lwIP
 //------------------------------------------------------------------------------
 #if defined(ALX_LW_IP)
@@ -156,11 +164,7 @@ extern "C" {
 // Wiznet
 //------------------------------------------------------------------------------
 #if defined(ALX_WIZNET)
-//#include "w5500.h"		// TV: TODO, project doesn't compile if included
-//#include "socket.h"		// TV: TODO, project doesn't compile if included
-//#include "wizchip_conf.h"	// TV: TODO, project doesn't compile if included
-#include "dhcp.h"
-#include "dns.h"
+// TV: TODO, add files
 #endif
 
 
