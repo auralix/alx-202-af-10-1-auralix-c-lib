@@ -59,7 +59,7 @@ static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c);
 //------------------------------------------------------------------------------
 // MMC
 //------------------------------------------------------------------------------
-#if defined(ALX_LFS)
+#if defined(ALX_LFS) && defined(ALX_STM32L4)
 static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me);
 static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size);
 static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
@@ -93,6 +93,8 @@ void AlxFs_Ctor
 	{
 		AlxFs_Lfs_FlashInt_Ctor(me);
 	}
+	#endif
+	#if defined(ALX_LFS) && defined(ALX_STM32L4)
 	else if	(me->config == AlxFs_Config_Lfs_Mmc)
 	{
 		AlxFs_Lfs_Mmc_Ctor(me);
@@ -1074,7 +1076,7 @@ static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c)
 //------------------------------------------------------------------------------
 // MMC
 //------------------------------------------------------------------------------
-#if defined(ALX_LFS)
+#if defined(ALX_LFS) && defined(ALX_STM32L4)
 static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
 {
 	memset(&me->lfs, 0, sizeof(me->lfs));

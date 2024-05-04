@@ -44,6 +44,7 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxFs.h"
 #include "alxCrc.h"
+#include "alxTimSw.h"
 
 
 //******************************************************************************
