@@ -35,7 +35,7 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsSolDir, vsPrjDir, fwName):
+def Script(vsTargetPath, fwName):
 	# Read input file
 	inFilePath = pathlib.Path("alxBuild_GENERATED.h")
 	inFileText = inFilePath.read_text()
@@ -49,14 +49,12 @@ def Script(vsSolDir, vsPrjDir, fwName):
 	fwVerPatch = inFileLines[12][31:]
 
 	# Set source bin variables
-	binSrcName = pathlib.Path(vsPrjDir).stem + ".bin"
-	binSrcDir = pathlib.Path(vsSolDir, "VisualGDB", "Debug")	# Relative path: VisualGDB\Debug
+	binSrcName = pathlib.Path(vsTargetPath).stem + ".bin"
+	binSrcDir = pathlib.Path(vsTargetPath).parent
 	binSrcPath = binSrcDir / binSrcName
 
-	# Set fwArtf & fwName
-	fwArtf = pathlib.Path(vsPrjDir).stem
-	vsSolArtf = pathlib.Path(vsSolDir).stem
-	vsSolArtfLen = len(vsSolArtf)
+	# Set fwArtf
+	fwArtf = pathlib.Path(vsTargetPath).stem
 
 	# Create clean directory for destination bin
 	binDstDirName = date + "_" + fwArtf + "_" + fwName + "_" + "V" + fwVerMajor + "-" + fwVerMinor + "-" + fwVerPatch + "_" + hashShort
@@ -83,9 +81,8 @@ def Script(vsSolDir, vsPrjDir, fwName):
 #*******************************************************************************
 if __name__ == "__main__":
 	# Prepare param
-	vsSolDir = sys.argv[1]
-	vsPrjDir = sys.argv[2]
-	fwName = sys.argv[3]
+	vsTargetPath = sys.argv[1]
+	fwName = sys.argv[2]
 
 	# Script
-	Script(vsSolDir, vsPrjDir, fwName)
+	Script(vsTargetPath, fwName)
