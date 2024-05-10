@@ -36,7 +36,7 @@ import subprocess
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, imgSlotSize):
+def Script(vsTargetPath, bootBinPath, imgSlotSize, bootSize):
 	# Print START
 	print("")
 	print("alxBoot.py - Script START")
@@ -53,10 +53,27 @@ def Script(vsTargetPath, imgSlotSize):
 	fwVerMinor = inFileLines[11][31:]
 	fwVerPatch = inFileLines[12][31:]
 
+	# Boot
+	bootBinPath = pathlib.Path(bootBinPath)
+	outputFilePath = bootBinPath.with_stem(bootBinPath.stem + "_Padded")
+	bootData = bootBinPath.read_bytes()
+	paddingSize = int(bootSize, 16) - len(bootData)
+	paddingData = b'\xFF' * paddingSize
+	paddedData = bootData + paddingData
+	outputFilePath.write_bytes(paddedData)
+
 	# Set source bin variables
 	binSrcName = pathlib.Path(vsTargetPath).stem + ".bin"
 	binSrcDir = pathlib.Path(vsTargetPath).parent
 	binSrcPath = binSrcDir / binSrcName
+
+	# Rename
+	binRawName = pathlib.Path(vsTargetPath).stem + "_Raw.bin"
+	binRawPath = binSrcDir / binRawName
+	binSrcPath.rename(binRawPath)
+
+	binSignedName = pathlib.Path(vsTargetPath).stem + "_Signed.bin"
+	binSignedPath = binSrcDir / binSignedName
 
 	# Set imgtool variables
 	imgtoolPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "mcuboot" / "scripts" / "imgtool.py"
@@ -75,10 +92,24 @@ def Script(vsTargetPath, imgSlotSize):
 		fwVerMinor=fwVerMinor,
 		fwVerPatch=fwVerPatch,
 		date=date,
-		binSrcPathIn=binSrcPath,
-		binSrcPathOut=binSrcPath
+		binSrcPathIn=binRawPath,
+		binSrcPathOut=binSignedPath
 	)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True)
+
+	# Combine
+	paddedBinPath = outputFilePath
+	signedBinPath = binSignedPath
+
+	finalOutputName = pathlib.Path(vsTargetPath).stem + ".bin"
+	finalOutputPath = binSrcDir / finalOutputName
+
+	paddedData = paddedBinPath.read_bytes()
+	signedData = signedBinPath.read_bytes()
+
+	combinedData = paddedData + signedData
+
+	finalOutputPath.write_bytes(combinedData)
 
 	# Print
 	print("alxBoot.py - Script FINISH")
@@ -91,7 +122,9 @@ def Script(vsTargetPath, imgSlotSize):
 if __name__ == "__main__":
 	# Prepare param
 	vsTargetPath = sys.argv[1]
-	imgSlotSize = sys.argv[2]
+	bootBinPath = sys.argv[2]
+	imgSlotSize = sys.argv[3]
+	bootSize = sys.argv[4]
 
 	# Script
-	Script(vsTargetPath, imgSlotSize)
+	Script(vsTargetPath, bootBinPath, imgSlotSize, bootSize)
