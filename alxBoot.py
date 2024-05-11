@@ -127,8 +127,8 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 if __name__ == "__main__":
 	# Prepare param
 	vsTargetPath = sys.argv[1]
-	imgSlotSize = sys.argv[3]
-	bootSize = sys.argv[4]
+	imgSlotSize = sys.argv[2]
+	bootSize = sys.argv[3]
 
 	# Script
 	Script(vsTargetPath, imgSlotSize, bootSize)
