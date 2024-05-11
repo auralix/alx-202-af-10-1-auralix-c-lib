@@ -79,7 +79,8 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 
 	# Calculate application data offset and size
 	appStartOffset = bootSize + headerSize
-	appData = originalData[appStartOffset:]
+	appEndOffset = len(originalData) - trailerSize
+	appData = originalData[appStartOffset:appEndOffset]
 
 	# Write the extracted application data to a temporary file
 	appTmpPath.write_bytes(appData)
