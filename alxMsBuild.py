@@ -37,12 +37,12 @@ import subprocess
 # Script
 #*******************************************************************************
 def Script():
-    cmd = r'call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat"'
-    cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+	cmd = r'call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" && msbuild "C:\AuralixGitHub\alx-202-af-12-nucleo-f429zi-c-fw\ALX-202-AF-12\ALX-202-AF-12.sln" /p:Configuration=FwUp'
+	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
-    # Print the output and errors
-    print(cmdCompletedObj.stdout)
-    print(cmdCompletedObj.stderr, file=sys.stderr)
+	# Print the output and errors
+	print(cmdCompletedObj.stdout)
+	print(cmdCompletedObj.stderr, file=sys.stderr)
 
 
 #*******************************************************************************
