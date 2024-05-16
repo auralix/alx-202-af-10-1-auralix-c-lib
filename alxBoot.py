@@ -62,28 +62,7 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix('.bin')
 
 	# Define paths for temporary and final files
-	#appTmpPath = binSrcPath.with_name('app_data.bin')
 	signedAppPath = binSrcPath.with_name(binSrcPath.stem + '_signed' + binSrcPath.suffix)
-	#finalOutputPath = binSrcPath  # This will be the final output with the original name
-	#rawFilePath = binSrcPath.with_name(binSrcPath.stem + '_raw.bin')
-
-	## Check if the raw file already exists and delete it if it does
-	#if rawFilePath.exists():
-	#	rawFilePath.unlink()
-
-	## Rename the original file to raw file
-	#binSrcPath.rename(rawFilePath)
-
-	## Read the original (now raw) file
-	#originalData = rawFilePath.read_bytes()
-
-	## Calculate application data offset and size
-	#appStartOffset = bootSize + headerSize
-	#appEndOffset = len(originalData) - trailerSize
-	#appData = originalData[appStartOffset:appEndOffset]
-
-	## Write the extracted application data to a temporary file
-	#appTmpPath.write_bytes(appData)
 
 	# Set imgtool variables
 	imgtoolPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "mcuboot" / "scripts" / "imgtool.py"
@@ -111,16 +90,29 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 	print(cmdCompletedObj.stdout)
 	print(cmdCompletedObj.stderr, file=sys.stderr)
 
+	# Read the signed application data
+	signedAppData = signedAppPath.read_bytes()
 
-	## Read the signed application data
-	#signedAppData = signedAppPath.read_bytes()
+	# Extract header and trailer bytes
+	header = signedAppData[:headerSize]
+	trailer = signedAppData[-trailerSize:]
 
-	## Create the final combined file
-	#finalData = (
-	#	originalData[:bootSize] +
-	#	signedAppData
-	#)
-	#finalOutputPath.write_bytes(finalData)
+	# Convert to C array format
+	def to_c_array(data):
+		return ', '.join(f'0x{byte:02X}' for byte in data)
+
+	headerArray = to_c_array(header)
+	trailerArray = to_c_array(trailer)
+
+	# Write to headerTrailer.h
+	headerTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "ALX-202-AF-10-1_AuralixCLib" / "alxBoot_HeaderTrailer_GENERATED.h"
+	#headerTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "alx-202-af-10-1-auralix-c-lib" / "headerTrailer.h"
+	headerTrailerContent = (
+		f'static inline volatile uint8_t header[{headerSize}] __attribute__((section(".header"), used)) = {{ {headerArray} }};\n'
+		f'static inline volatile uint8_t trailer[{trailerSize}] __attribute__((section(".trailer"), used)) = {{ {trailerArray} }};\n'
+	)
+
+	headerTrailerPath.write_text(headerTrailerContent)
 
 	# Print
 	print("alxBoot.py - Script FINISH")
@@ -138,3 +130,26 @@ if __name__ == "__main__":
 
 	# Script
 	Script(vsTargetPath, imgSlotSize, bootSize)
+
+	#appTmpPath = binSrcPath.with_name('app_data.bin')
+
+		#finalOutputPath = binSrcPath  # This will be the final output with the original name
+	#rawFilePath = binSrcPath.with_name(binSrcPath.stem + '_raw.bin')
+
+	## Check if the raw file already exists and delete it if it does
+	#if rawFilePath.exists():
+	#	rawFilePath.unlink()
+
+	## Rename the original file to raw file
+	#binSrcPath.rename(rawFilePath)
+
+	## Read the original (now raw) file
+	#originalData = rawFilePath.read_bytes()
+
+	## Calculate application data offset and size
+	#appStartOffset = bootSize + headerSize
+	#appEndOffset = len(originalData) - trailerSize
+	#appData = originalData[appStartOffset:appEndOffset]
+
+	## Write the extracted application data to a temporary file
+	#appTmpPath.write_bytes(appData)
