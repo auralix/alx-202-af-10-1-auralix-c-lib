@@ -62,28 +62,28 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix('.bin')
 
 	# Define paths for temporary and final files
-	appTmpPath = binSrcPath.with_name('app_data.bin')
-	signedAppPath = binSrcPath.with_name('app_data_signed.bin')
-	finalOutputPath = binSrcPath  # This will be the final output with the original name
-	rawFilePath = binSrcPath.with_name(binSrcPath.stem + '_raw.bin')
+	#appTmpPath = binSrcPath.with_name('app_data.bin')
+	signedAppPath = binSrcPath.with_name(binSrcPath.stem + '_signed' + binSrcPath.suffix)
+	#finalOutputPath = binSrcPath  # This will be the final output with the original name
+	#rawFilePath = binSrcPath.with_name(binSrcPath.stem + '_raw.bin')
 
-	# Check if the raw file already exists and delete it if it does
-	if rawFilePath.exists():
-		rawFilePath.unlink()
+	## Check if the raw file already exists and delete it if it does
+	#if rawFilePath.exists():
+	#	rawFilePath.unlink()
 
-	# Rename the original file to raw file
-	binSrcPath.rename(rawFilePath)
+	## Rename the original file to raw file
+	#binSrcPath.rename(rawFilePath)
 
-	# Read the original (now raw) file
-	originalData = rawFilePath.read_bytes()
+	## Read the original (now raw) file
+	#originalData = rawFilePath.read_bytes()
 
-	# Calculate application data offset and size
-	appStartOffset = bootSize + headerSize
-	appEndOffset = len(originalData) - trailerSize
-	appData = originalData[appStartOffset:appEndOffset]
+	## Calculate application data offset and size
+	#appStartOffset = bootSize + headerSize
+	#appEndOffset = len(originalData) - trailerSize
+	#appData = originalData[appStartOffset:appEndOffset]
 
-	# Write the extracted application data to a temporary file
-	appTmpPath.write_bytes(appData)
+	## Write the extracted application data to a temporary file
+	#appTmpPath.write_bytes(appData)
 
 	# Set imgtool variables
 	imgtoolPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "mcuboot" / "scripts" / "imgtool.py"
@@ -102,20 +102,25 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 		fwVerMinor=fwVerMinor,
 		fwVerPatch=fwVerPatch,
 		date=date,
-		binSrcPathIn=appTmpPath,
+		binSrcPathIn=binSrcPath,
 		binSrcPathOut=signedAppPath
 	)
-	cmdCompletedObj = subprocess.run(cmd, capture_output=True)
+	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
-	# Read the signed application data
-	signedAppData = signedAppPath.read_bytes()
+	# Print the output and errors for debugging
+	print(cmdCompletedObj.stdout)
+	print(cmdCompletedObj.stderr, file=sys.stderr)
 
-	# Create the final combined file
-	finalData = (
-		originalData[:bootSize] +
-		signedAppData
-	)
-	finalOutputPath.write_bytes(finalData)
+
+	## Read the signed application data
+	#signedAppData = signedAppPath.read_bytes()
+
+	## Create the final combined file
+	#finalData = (
+	#	originalData[:bootSize] +
+	#	signedAppData
+	#)
+	#finalOutputPath.write_bytes(finalData)
 
 	# Print
 	print("alxBoot.py - Script FINISH")
