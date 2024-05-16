@@ -1,0 +1,6 @@
+r
+h
+loadbin C:\AuralixGitHub\alx-202-af-12-nucleo-f429zi-c-fw\ALX-202-AF-12\VisualGDB\Debug\ALX-202-AF-12-1.bin 0x08000000
+r
+g
+q

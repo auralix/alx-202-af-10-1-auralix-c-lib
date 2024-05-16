@@ -105,14 +105,14 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 	trailerArray = to_c_array(trailer)
 
 	# Write to headerTrailer.h
-	headerTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "ALX-202-AF-10-1_AuralixCLib" / "alxBoot_GENERATED.h"
-	#headerTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "alx-202-af-10-1-auralix-c-lib" / "alxBoot_GENERATED.h"
+	#headerTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "ALX-202-AF-10-1_AuralixCLib" / "alxBoot_GENERATED.h"
+	headerTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "alx-202-af-10-1-auralix-c-lib" / "alxBoot_GENERATED.h"
 
 	headerTrailerContent = (
 		"#ifndef ALX_BOOT_GENERATED_H\n"
 		"#define ALX_BOOT_GENERATED_H\n\n"
-		f'static volatile unsigned char header[{headerSize}] __attribute__((section(".header"), used)) = {{ {headerArray} }};\n'
-		f'static volatile unsigned char trailer[{trailerSize}] __attribute__((section(".trailer"), used)) = {{ {trailerArray} }};\n\n'
+		f'static const unsigned char header[{headerSize}] __attribute__((section(".header"), used)) = {{ {headerArray} }};\n'
+		f'static const unsigned char trailer[{trailerSize}] __attribute__((section(".trailer"), used)) = {{ {trailerArray} }};\n\n'
 		"#endif // ALX_BOOT_GENERATED_H\n"
 	)
 
