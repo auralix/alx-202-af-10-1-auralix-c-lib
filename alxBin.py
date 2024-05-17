@@ -49,12 +49,12 @@ def Script(vsTargetPath, fwName):
 	fwVerPatch = inFileLines[12][31:]
 
 	# Set source bin variables
-	binSrcName = pathlib.Path(vsTargetPath).stem + ".bin"
-	binSrcDir = pathlib.Path(vsTargetPath).parent
-	binSrcPath = binSrcDir / binSrcName
+	binSrcPath = pathlib.Path(vsTargetPath).with_suffix(".bin")
+	binSrcDir = binSrcPath.parent
+	binSrcName = binSrcPath.name
 
 	# Set fwArtf
-	fwArtf = pathlib.Path(vsTargetPath).stem
+	fwArtf = binSrcPath.stem
 
 	# Create clean directory for destination bin
 	binDstDirName = date + "_" + fwArtf + "_" + fwName + "_" + "V" + fwVerMajor + "-" + fwVerMinor + "-" + fwVerPatch + "_" + hashShort
