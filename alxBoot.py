@@ -62,7 +62,18 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix('.bin')
 
 	# Define paths for temporary and final files
+	appTmpPath = binSrcPath.with_name(binSrcPath.stem + '_pure' + binSrcPath.suffix)
 	signedAppPath = binSrcPath.with_name(binSrcPath.stem + '_signed' + binSrcPath.suffix)
+
+	originalData = binSrcPath.read_bytes()
+
+	# Calculate application data offset and size
+	appStartOffset = headerSize
+	appEndOffset = len(originalData) - trailerSize
+	appData = originalData[appStartOffset:appEndOffset]
+
+	# Write the extracted application data to a temporary file
+	appTmpPath.write_bytes(appData)
 
 	# Set imgtool variables
 	imgtoolPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "mcuboot" / "scripts" / "imgtool.py"
@@ -81,7 +92,7 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 		fwVerMinor=fwVerMinor,
 		fwVerPatch=fwVerPatch,
 		date=date,
-		binSrcPathIn=binSrcPath,
+		binSrcPathIn=appTmpPath,
 		binSrcPathOut=signedAppPath
 	)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
@@ -137,7 +148,7 @@ if __name__ == "__main__":
 
 	#appTmpPath = binSrcPath.with_name('app_data.bin')
 
-		#finalOutputPath = binSrcPath  # This will be the final output with the original name
+	#finalOutputPath = binSrcPath  # This will be the final output with the original name
 	#rawFilePath = binSrcPath.with_name(binSrcPath.stem + '_raw.bin')
 
 	## Check if the raw file already exists and delete it if it does
