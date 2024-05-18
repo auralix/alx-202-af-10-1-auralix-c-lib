@@ -100,8 +100,8 @@ static const unsigned char boot [{binLen}] __attribute__((section(".boot"), used
 """.format(binDstName=binDstName, binLen=binLen, binArr=binArr)
 
 		# Write bootloader header file text
-		bootHdrSrcPath = binSrcDir / "alxBoot_GENERATED.h"
-		bootHdrSrcPath.write_text(bootHdrText)
+		bootHdrPath = pathlib.Path("alxBoot_GENERATED.h")
+		bootHdrPath.write_text(bootHdrText)
 		bootHdrDstPath = binDstDir / bootHdrDstName
 		bootHdrDstPath.write_text(bootHdrText)
 
