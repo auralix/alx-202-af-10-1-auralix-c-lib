@@ -97,6 +97,7 @@ def Script(vsTargetPath, fwName, bootHdr=False, bootHdrLen=0):
 		bootHdrText = """#ifndef ALX_BOOT_GENERATED_H
 #define ALX_BOOT_GENERATED_H
 
+
 // {binDstName}
 #if defined(ALX_BUILD_CONFIG_DEBUG)
 static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boot"), used)) = {{{bootHdrArr}}};
@@ -104,6 +105,7 @@ static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boo
 #if defined(ALX_BUILD_CONFIG_FW_UP)
 static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boot"), used)) = {{{bootHdrArrFF}}};
 #endif
+
 
 #endif	// ALX_BOOT_GENERATED_H
 """.format(binDstName=binDstName, bootHdrLenHexStr=bootHdrLenHexStr, bootHdrArr=bootHdrArr, bootHdrArrFF=bootHdrArrFF)
