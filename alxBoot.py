@@ -68,7 +68,7 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 	originalData = binSrcPath.read_bytes()
 
 	# Calculate application data offset and size
-	appStartOffset = headerSize
+	appStartOffset = bootSize + headerSize
 	appEndOffset = len(originalData) - trailerSize
 	appData = originalData[appStartOffset:appEndOffset]
 
@@ -118,15 +118,24 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 	# Write to headerTrailer.h
 	headerTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "alx-202-af-10-1-auralix-c-lib" / "alxBoot2_GENERATED.h"
 
-	headerTrailerContent = (
-		"#ifndef ALX_BOOT2_GENERATED_H\n"
-		"#define ALX_BOOT2_GENERATED_H\n\n"
-		f'static const unsigned char header[{headerSize}] __attribute__((section(".header"), used)) = {{ {headerArray} }};\n'
-		f'static const unsigned char trailer[{trailerSize}] __attribute__((section(".trailer"), used)) = {{ {trailerArray} }};\n\n'
-		"#endif // ALX_BOOT2_GENERATED_H\n"
-	)
+	headerTrailerContent = """#ifndef ALX_BOOT2_GENERATED_H
+#define ALX_BOOT2_GENERATED_H
 
-	#headerTrailerPath.write_text(headerTrailerContent)
+
+#if defined(ALX_BUILD_CONFIG_DEBUG)
+static const unsigned char header[{headerSize}] __attribute__((section(".header"), used)) = {{{headerArray}}};
+static const unsigned char trailer[{trailerSize}] __attribute__((section(".trailer"), used)) = {{{trailerArray}}};
+#endif
+#if defined(ALX_BUILD_CONFIG_FW_UP)
+static const unsigned char header[{headerSize}] __attribute__((section(".header"), used)) = {{0xBB, 0xBB, 0xBB, 0xBB}};
+static const unsigned char trailer[{trailerSize}] __attribute__((section(".trailer"), used)) = {{0xCC, 0xCC, 0xCC, 0xCC}};
+#endif
+
+
+#endif	// ALX_BOOT2_GENERATED_H
+""".format(headerSize=headerSize, headerArray=headerArray, trailerSize=trailerSize, trailerArray=trailerArray)
+
+	headerTrailerPath.write_text(headerTrailerContent)
 
 	# Print
 	print("alxBoot.py - Script FINISH")
@@ -167,3 +176,13 @@ if __name__ == "__main__":
 
 	## Write the extracted application data to a temporary file
 	#appTmpPath.write_bytes(appData)
+
+
+
+		#headerTrailerContent = (
+	#	"#ifndef ALX_BOOT2_GENERATED_H\n"
+	#	"#define ALX_BOOT2_GENERATED_H\n\n"
+	#	f'static const unsigned char header[{headerSize}] __attribute__((section(".header"), used)) = {{ {headerArray} }};\n'
+	#	f'static const unsigned char trailer[{trailerSize}] __attribute__((section(".trailer"), used)) = {{ {trailerArray} }};\n\n'
+	#	"#endif // ALX_BOOT2_GENERATED_H\n"
+	#)
