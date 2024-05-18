@@ -35,7 +35,7 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, fwName, bootHdr=False, bootHdrLen=0):
+def Script(vsTargetPath, fwName, bootHdr, bootHdrLenHexStr):
 	# Print START
 	print("")
 	print("alxBin.py - START")
@@ -80,16 +80,18 @@ def Script(vsTargetPath, fwName, bootHdr=False, bootHdrLen=0):
 	print("Generated: " + binDstName)
 
 	# If bootloader header generation enabled
-	if bootHdr:
+	if bootHdr == "True":
 		# Read bin
 		binData = binSrcPath.read_bytes()
 		binLen = len(binData)
 
 		# Set bootHdr variables
 		bootHdrDstName = binDstDirName + ".h"
-		bootHdrLenHexStr = f"0x{bootHdrLen:X}"
+		bootHdrLen = int(bootHdrLenHexStr, 16)
+
 		bootHdrData = binData + bytes([0xFF] * (bootHdrLen - binLen))
 		bootHdrArr = ", ".join(f"0x{byte:02X}" for byte in bootHdrData)
+
 		bootHdrDataFF = bytes([0xFF] * bootHdrLen)
 		bootHdrArrFF = ", ".join(f"0x{byte:02X}" for byte in bootHdrDataFF)
 
@@ -133,10 +135,10 @@ if __name__ == "__main__":
 	fwName = sys.argv[2]
 	if len(sys.argv) > 3:
 		bootHdr = sys.argv[3]
-		bootHdrLen = sys.argv[4]
+		bootHdrLenHexStr = sys.argv[4]
 	else:
-		bootHdr = False
-		bootHdrLen = 0
+		bootHdr = "False"
+		bootHdrLenHexStr = "0x00000000"
 
 	# Script
-	Script(vsTargetPath, fwName, bootHdr, bootHdrLen)
+	Script(vsTargetPath, fwName, bootHdr, bootHdrLenHexStr)
