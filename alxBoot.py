@@ -126,7 +126,7 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 		"#endif // ALX_BOOT2_GENERATED_H\n"
 	)
 
-	headerTrailerPath.write_text(headerTrailerContent)
+	#headerTrailerPath.write_text(headerTrailerContent)
 
 	# Print
 	print("alxBoot.py - Script FINISH")
