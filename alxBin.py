@@ -35,7 +35,7 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, fwName, bootHdr=False):
+def Script(vsTargetPath, fwName, bootHdr=False, bootHdrLen=0):
 	# Print START
 	print("")
 	print("alxBin.py - START")
@@ -81,23 +81,32 @@ def Script(vsTargetPath, fwName, bootHdr=False):
 
 	# If bootloader header generation enabled
 	if bootHdr:
-		# Set bootHdrDstName
-		bootHdrDstName = binDstDirName + ".h"
-
 		# Read bin
 		binData = binSrcPath.read_bytes()
 		binLen = len(binData)
-		binArr = ', '.join(f'0x{byte:02X}' for byte in binData)
+
+		# Set bootHdr variables
+		bootHdrDstName = binDstDirName + ".h"
+		bootHdrLenHexStr = f"0x{bootHdrLen:X}"
+		bootHdrData = binData + bytes([0xFF] * (bootHdrLen - binLen))
+		bootHdrArr = ", ".join(f"0x{byte:02X}" for byte in bootHdrData)
+		bootHdrDataFF = bytes([0xFF] * bootHdrLen)
+		bootHdrArrFF = ", ".join(f"0x{byte:02X}" for byte in bootHdrDataFF)
 
 		# Prepare bootloader header file text
 		bootHdrText = """#ifndef ALX_BOOT_GENERATED_H
 #define ALX_BOOT_GENERATED_H
 
 // {binDstName}
-static const unsigned char boot [{binLen}] __attribute__((section(".boot"), used)) = {{{binArr}}};
+#if defined(ALX_BUILD_CONFIG_DEBUG)
+static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boot"), used)) = {{{bootHdrArr}}};
+#endif
+#if defined(ALX_BUILD_CONFIG_FW_UP)
+static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boot"), used)) = {{{bootHdrArrFF}}};
+#endif
 
 #endif	// ALX_BOOT_GENERATED_H
-""".format(binDstName=binDstName, binLen=binLen, binArr=binArr)
+""".format(binDstName=binDstName, bootHdrLenHexStr=bootHdrLenHexStr, bootHdrArr=bootHdrArr, bootHdrArrFF=bootHdrArrFF)
 
 		# Write bootloader header file text
 		bootHdrSrcPath = binSrcDir / "alxBoot_GENERATED.h"
@@ -122,8 +131,10 @@ if __name__ == "__main__":
 	fwName = sys.argv[2]
 	if len(sys.argv) > 3:
 		bootHdr = sys.argv[3]
+		bootHdrLen = sys.argv[4]
 	else:
 		bootHdr = False
+		bootHdrLen = 0
 
 	# Script
-	Script(vsTargetPath, fwName, bootHdr)
+	Script(vsTargetPath, fwName, bootHdr, bootHdrLen)
