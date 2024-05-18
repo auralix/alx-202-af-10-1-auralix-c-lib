@@ -36,7 +36,7 @@ import sys
 # Script
 #*******************************************************************************
 def Script(vsTargetPath, fwName, bootHdr, bootHdrLenHexStr):
-	# Print START
+	# Print
 	print("")
 	print("alxBin.py - START")
 

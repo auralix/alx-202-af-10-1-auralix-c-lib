@@ -28,7 +28,6 @@
 # Imports
 #*******************************************************************************
 import pathlib
-import shutil
 import sys
 import subprocess
 
@@ -36,8 +35,8 @@ import subprocess
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, imgSlotSize, bootSize):
-	# Print START
+def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
+	# Print
 	print("")
 	print("alxBoot.py - Script START")
 
@@ -53,89 +52,86 @@ def Script(vsTargetPath, imgSlotSize, bootSize):
 	fwVerMinor = inFileLines[11][31:]
 	fwVerPatch = inFileLines[12][31:]
 
-	# Convert boot size from hex to int
-	bootSize = int(bootSize, 16)
-	headerSize = 0x200  # 512 bytes
-	trailerSize = 0x28  # 40 bytes
+	# Set lenghts
+	bootLen = int(bootLenHexStr, 16)
+	headerLen = 0x200  # 512 bytes
+	trailerLen = 0x28  # 40 bytes
 
-	# Set source bin variables
+	# Read source bin
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix('.bin')
+	binData = binSrcPath.read_bytes()
+	binLen = len(binData)
 
-	# Define paths for temporary and final files
-	appTmpPath = binSrcPath.with_name(binSrcPath.stem + '_pure' + binSrcPath.suffix)
-	signedAppPath = binSrcPath.with_name(binSrcPath.stem + '_signed' + binSrcPath.suffix)
+	# Extract application data
+	appStartOffset = bootLen + headerLen
+	appEndOffset = binLen - trailerLen
+	appData = binData[appStartOffset:appEndOffset]
 
-	originalData = binSrcPath.read_bytes()
+	# Write extracted application data to raw bin
+	binRawPath = binSrcPath.with_name(binSrcPath.stem + '_Raw' + binSrcPath.suffix)
+	binRawPath.write_bytes(appData)
 
-	# Calculate application data offset and size
-	appStartOffset = bootSize + headerSize
-	appEndOffset = len(originalData) - trailerSize
-	appData = originalData[appStartOffset:appEndOffset]
+	# Set signed bin path
+	binSignedPath = binSrcPath.with_name(binSrcPath.stem + '_Signed' + binSrcPath.suffix)
 
-	# Write the extracted application data to a temporary file
-	appTmpPath.write_bytes(appData)
-
-	# Set imgtool variables
+	# Set imgtool path
 	imgtoolPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "mcuboot" / "scripts" / "imgtool.py"
 
-	# Run cmd
+	# Run imgtool
 	cmd = (r"python {imgtoolPath} sign"
 		r" --header-size 0x200"
 		r" --pad-header"
 		r" --slot-size {imgSlotSize}"
 		r" --version {fwVerMajor}.{fwVerMinor}.{fwVerPatch}+{date}"
-		r" {binSrcPathIn}"
-		r" {binSrcPathOut}").format(
+		r" {binPathIn}"
+		r" {binPathOut}").format(
 		imgtoolPath=imgtoolPath,
 		imgSlotSize=imgSlotSize,
 		fwVerMajor=fwVerMajor,
 		fwVerMinor=fwVerMinor,
 		fwVerPatch=fwVerPatch,
 		date=date,
-		binSrcPathIn=appTmpPath,
-		binSrcPathOut=signedAppPath
+		binPathIn=binRawPath,
+		binPathOut=binSignedPath
 	)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
-	# Print the output and errors for debugging
+	# Print imgtool
 	print(cmdCompletedObj.stdout)
 	print(cmdCompletedObj.stderr, file=sys.stderr)
 
-	# Read the signed application data
-	signedAppData = signedAppPath.read_bytes()
+	# Read signed bin
+	binSignedData = binSignedPath.read_bytes()
 
-	# Extract header and trailer bytes
-	header = signedAppData[:headerSize]
-	trailer = signedAppData[-trailerSize:]
+	# Extract signed bin header & trailer
+	binSignedHeader = binSignedData[:headerLen]
+	binSignedTrailer = binSignedData[-trailerLen:]
 
-	# Convert to C array format
-	def to_c_array(data):
-		return ', '.join(f'0x{byte:02X}' for byte in data)
+	# Prepare signed bin header & trailer variables
+	binSignedHeaderArr = ", ".join(f"0x{byte:02X}" for byte in binSignedHeader)
+	binSignedTrailerArr = ", ".join(f"0x{byte:02X}" for byte in binSignedTrailer)
+	binSignedHeaderTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "alx-202-af-10-1-auralix-c-lib" / "alxBoot2_GENERATED.h"
 
-	headerArray = to_c_array(header)
-	trailerArray = to_c_array(trailer)
-
-	# Write to headerTrailer.h
-	headerTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "alx-202-af-10-1-auralix-c-lib" / "alxBoot2_GENERATED.h"
-
-	headerTrailerContent = """#ifndef ALX_BOOT2_GENERATED_H
+	# Prepare signed bin header & trailer file text
+	binSignedHeaderTrailerText = """#ifndef ALX_BOOT2_GENERATED_H
 #define ALX_BOOT2_GENERATED_H
 
 
 #if defined(ALX_BUILD_CONFIG_DEBUG)
-static const unsigned char header[{headerSize}] __attribute__((section(".header"), used)) = {{{headerArray}}};
-static const unsigned char trailer[{trailerSize}] __attribute__((section(".trailer"), used)) = {{{trailerArray}}};
+static const unsigned char header[{headerLen}] __attribute__((section(".header"), used)) = {{{binSignedHeaderArr}}};
+static const unsigned char trailer[{trailerLen}] __attribute__((section(".trailer"), used)) = {{{binSignedTrailerArr}}};
 #endif
 #if defined(ALX_BUILD_CONFIG_FW_UP)
-static const unsigned char header[{headerSize}] __attribute__((section(".header"), used)) = {{0xBB, 0xBB, 0xBB, 0xBB}};
-static const unsigned char trailer[{trailerSize}] __attribute__((section(".trailer"), used)) = {{0xCC, 0xCC, 0xCC, 0xCC}};
+static const unsigned char header[{headerLen}] __attribute__((section(".header"), used)) = {{0xBB, 0xBB, 0xBB, 0xBB}};
+static const unsigned char trailer[{trailerLen}] __attribute__((section(".trailer"), used)) = {{0xCC, 0xCC, 0xCC, 0xCC}};
 #endif
 
 
 #endif	// ALX_BOOT2_GENERATED_H
-""".format(headerSize=headerSize, headerArray=headerArray, trailerSize=trailerSize, trailerArray=trailerArray)
+""".format(headerLen=headerLen, binSignedHeaderArr=binSignedHeaderArr, trailerLen=trailerLen, binSignedTrailerArr=binSignedTrailerArr)
 
-	headerTrailerPath.write_text(headerTrailerContent)
+	# Write signed bin header & trailer file text
+	binSignedHeaderTrailerPath.write_text(binSignedHeaderTrailerText)
 
 	# Print
 	print("alxBoot.py - Script FINISH")
@@ -153,36 +149,3 @@ if __name__ == "__main__":
 
 	# Script
 	Script(vsTargetPath, imgSlotSize, bootSize)
-
-	#appTmpPath = binSrcPath.with_name('app_data.bin')
-
-	#finalOutputPath = binSrcPath  # This will be the final output with the original name
-	#rawFilePath = binSrcPath.with_name(binSrcPath.stem + '_raw.bin')
-
-	## Check if the raw file already exists and delete it if it does
-	#if rawFilePath.exists():
-	#	rawFilePath.unlink()
-
-	## Rename the original file to raw file
-	#binSrcPath.rename(rawFilePath)
-
-	## Read the original (now raw) file
-	#originalData = rawFilePath.read_bytes()
-
-	## Calculate application data offset and size
-	#appStartOffset = bootSize + headerSize
-	#appEndOffset = len(originalData) - trailerSize
-	#appData = originalData[appStartOffset:appEndOffset]
-
-	## Write the extracted application data to a temporary file
-	#appTmpPath.write_bytes(appData)
-
-
-
-		#headerTrailerContent = (
-	#	"#ifndef ALX_BOOT2_GENERATED_H\n"
-	#	"#define ALX_BOOT2_GENERATED_H\n\n"
-	#	f'static const unsigned char header[{headerSize}] __attribute__((section(".header"), used)) = {{ {headerArray} }};\n'
-	#	f'static const unsigned char trailer[{trailerSize}] __attribute__((section(".trailer"), used)) = {{ {trailerArray} }};\n\n'
-	#	"#endif // ALX_BOOT2_GENERATED_H\n"
-	#)
