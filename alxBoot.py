@@ -66,6 +66,7 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 	appStartOffset = bootLen + headerLen
 	appEndOffset = binLen - trailerLen
 	appData = binData[appStartOffset:appEndOffset]
+	appDataLen = len(appData)
 
 	# Write extracted application data to raw bin
 	binRawPath = binSrcPath.with_name(binSrcPath.stem + '_Raw' + binSrcPath.suffix)
@@ -83,6 +84,7 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 		r" --pad-header"
 		r" --slot-size {imgSlotSize}"
 		r" --version {fwVerMajor}.{fwVerMinor}.{fwVerPatch}+{date}"
+		r" --pad"
 		r" {binPathIn}"
 		r" {binPathOut}").format(
 		imgtoolPath=imgtoolPath,
@@ -105,7 +107,9 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 
 	# Extract signed bin header & trailer
 	binSignedHeader = binSignedData[:headerLen]
-	binSignedTrailer = binSignedData[-trailerLen:]
+	binSignedTrailerStartOffset = headerLen + appDataLen
+	binSignedTrailerEndOffset = binSignedTrailerStartOffset + trailerLen
+	binSignedTrailer = binSignedData[binSignedTrailerStartOffset:binSignedTrailerEndOffset]
 
 	# Prepare signed bin header & trailer variables
 	binSignedHeaderArr = ", ".join(f"0x{byte:02X}" for byte in binSignedHeader)
