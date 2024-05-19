@@ -35,7 +35,7 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, fwName, bootHdr, bootHdrLenHexStr):
+def Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr):
 	# Print
 	print("")
 	print("alxBin.py - START")
@@ -55,7 +55,6 @@ def Script(vsTargetPath, fwName, bootHdr, bootHdrLenHexStr):
 	# Set source bin variables
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix(".bin")
 	binSrcDir = binSrcPath.parent
-	binSrcName = binSrcPath.name
 
 	# Set fwArtf
 	fwArtf = binSrcPath.stem
@@ -63,21 +62,35 @@ def Script(vsTargetPath, fwName, bootHdr, bootHdrLenHexStr):
 	# Set destination bin variables
 	binDstDirName = date + "_" + fwArtf + "_" + fwName + "_" + "V" + fwVerMajor + "-" + fwVerMinor + "-" + fwVerPatch + "_" + hashShort
 	binDstDir = binSrcDir / binDstDirName
-	binDstPath = binDstDir / binSrcName
 	binDstName = binDstDirName + ".bin"
 
 	# Create clean directory for destination bin
 	shutil.rmtree(binDstDir, ignore_errors=True)
 	pathlib.Path(binDstDir).mkdir(parents=True, exist_ok=True)
 
-	# Copy source bin to destination bin directory
-	shutil.copy(binSrcPath, binDstDir)
-
-	# Rename source bin to destination bin
-	binDstPath = binDstPath.rename(binDstDir / binDstName)
+	# Copy source bin to destination bin directory & rename it to destination bin
+	shutil.copy2(binSrcPath, binDstDir / binDstName)
 
 	# Print
 	print("Generated: " + binDstName)
+
+	# If _Raw & _Signed copy enabled
+	if binRawSigned == "True":
+		# Set source bin variables
+		binRawSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Raw' + binSrcPath.suffix)
+		binSignedSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Signed' + binSrcPath.suffix)
+
+		# Set destination bin variables
+		binRawDstName = binDstDirName + "_Raw.bin"
+		binSignedDstName = binDstDirName + "_Signed.bin"
+
+		# Copy source bin to destination bin directory & rename it to destination bin
+		shutil.copy2(binRawSrcPath, binDstDir / binRawDstName)
+		shutil.copy2(binSignedSrcPath, binDstDir / binSignedDstName)
+
+		# Print
+		print("Generated: " + binRawDstName)
+		print("Generated: " + binSignedDstName)
 
 	# If bootloader header generation enabled
 	if bootHdr == "True":
@@ -134,11 +147,15 @@ if __name__ == "__main__":
 	vsTargetPath = sys.argv[1]
 	fwName = sys.argv[2]
 	if len(sys.argv) > 3:
-		bootHdr = sys.argv[3]
-		bootHdrLenHexStr = sys.argv[4]
+		binRawSigned = sys.argv[3]
+	else:
+		binRawSigned = "False"
+	if len(sys.argv) > 4:
+		bootHdr = sys.argv[4]
+		bootHdrLenHexStr = sys.argv[5]
 	else:
 		bootHdr = "False"
 		bootHdrLenHexStr = "0x00000000"
 
 	# Script
-	Script(vsTargetPath, fwName, bootHdr, bootHdrLenHexStr)
+	Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr)
