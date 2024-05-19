@@ -38,7 +38,7 @@ import subprocess
 def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 	# Print
 	print("")
-	print("alxBoot.py - Script START")
+	print("alxBoot.py - START")
 
 	# Read input file
 	inFilePath = pathlib.Path("alxBuild_GENERATED.h")
@@ -138,7 +138,7 @@ static const unsigned char trailer[{trailerLen}] __attribute__((section(".traile
 	binSignedHeaderTrailerPath.write_text(binSignedHeaderTrailerText)
 
 	# Print
-	print("alxBoot.py - Script FINISH")
+	print("alxBoot.py - FINISH")
 	print("")
 
 
@@ -146,7 +146,7 @@ static const unsigned char trailer[{trailerLen}] __attribute__((section(".traile
 # Run Guard
 #*******************************************************************************
 if __name__ == "__main__":
-	# Prepare param
+	# Prepare
 	vsTargetPath = sys.argv[1]
 	imgSlotSize = sys.argv[2]
 	bootSize = sys.argv[3]

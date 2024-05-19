@@ -135,7 +135,7 @@ static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boo
 		print("Generated: " + bootHdrDstName)
 
 	# Print
-	print("alxBin.py - Script FINISH")
+	print("alxBin.py - FINISH")
 	print("")
 
 
@@ -143,7 +143,7 @@ static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boo
 # Run Guard
 #*******************************************************************************
 if __name__ == "__main__":
-	# Prepare param
+	# Prepare
 	vsTargetPath = sys.argv[1]
 	fwName = sys.argv[2]
 	if len(sys.argv) > 3:

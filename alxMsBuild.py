@@ -27,8 +27,6 @@
 #*******************************************************************************
 # Imports
 #*******************************************************************************
-import pathlib
-import shutil
 import sys
 import subprocess
 
@@ -36,20 +34,31 @@ import subprocess
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script():
-	cmd = r'call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" && msbuild "C:\AuralixGitHub\alx-202-af-12-nucleo-f429zi-c-fw\ALX-202-AF-12\ALX-202-AF-12.sln" /p:Configuration=FwUp'
+def Script(vsSolPath):
+	# Print
+	print("")
+	print("alxMsBuild.py - START")
+
+	# Run
+	cmd = (r'call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" &&'
+		r' msbuild "{vsSolPath}" /p:Configuration=FwUp').format(vsSolPath=vsSolPath)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
-	# Print the output and errors
+	# Print
 	print(cmdCompletedObj.stdout)
 	print(cmdCompletedObj.stderr, file=sys.stderr)
+
+	# Print
+	print("alxMsBuild.py - FINISH")
+	print("")
 
 
 #*******************************************************************************
 # Run Guard
 #*******************************************************************************
 if __name__ == "__main__":
-	# Prepare param
+	# Prepare
+	vsSolPath = sys.argv[1]
 
 	# Script
-	Script()
+	Script(vsSolPath)

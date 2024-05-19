@@ -37,9 +37,9 @@ import sys
 # Script
 #*******************************************************************************
 def Script(vsSolDir):
-	# Print START
+	# Print
 	print("")
-	print("alxBuild.py - Script START")
+	print("alxBuild.py - START")
 
 	# Set gitDir
 	gitDir = pathlib.Path(vsSolDir).parent
@@ -120,7 +120,7 @@ def Script(vsSolDir):
 	print("alxBuild.py - Generated: alxBuild_GENERATED.h")
 
 	# Print
-	print("alxBuild.py - Script FINISH")
+	print("alxBuild.py - FINISH")
 	print("")
 
 
@@ -128,7 +128,7 @@ def Script(vsSolDir):
 # Run Guard
 #*******************************************************************************
 if __name__ == "__main__":
-	# Prepare param
+	# Prepare
 	vsSolDir = sys.argv[1]
 
 	# Script
