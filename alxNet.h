@@ -42,8 +42,11 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-
-
+#include "alxSpi.h"
+#include "alxIoPin.h"
+#include "alxOsMutex.h"
+	
+	
 //******************************************************************************
 // Module Guard
 //******************************************************************************
@@ -96,28 +99,50 @@ typedef struct
 
 	// Parameters
 	AlxNet_Config config;
-
+	AlxSpi* alxSpi;
+	AlxIoPin* do_nRST;
+	AlxIoPin* di_nINT;
+	bool enable_dhcp;
+	
 	// Variables
-
+	AlxOsMutex alxMutex;
+	char mac[18]; // MAC in string format -> "00:18:10:3A:B8:39"
+	char ip[16];	// IP, Netmask, gateway, dns in string format -> "123.123.123.123"
+	char netmask[16];
+	char gateway[16];
+	char dns[4][16];
+	
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
+	bool isNetConnected;
 } AlxNet;
 
-
+typedef enum
+{
+	DnsTaskRunning,
+	DnsTaskTimeout,
+	DnsTaskSuccess
+} DnsTaskState;
+	
 //******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxNet_Ctor
 (
 	AlxNet* me,
-	AlxNet_Config config
+	AlxNet_Config config,
+	AlxSpi* alxSpi,
+	AlxIoPin* do_nRST,
+	AlxIoPin* di_nINT
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+Alx_Status AlxNet_Init(AlxNet* me);
+
 Alx_Status AlxNet_Connect(AlxNet* me);
 Alx_Status AlxNet_Disconnect(AlxNet* me);
 bool AlxNet_IsConnected(AlxNet* me);

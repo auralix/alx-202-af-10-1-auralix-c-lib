@@ -90,6 +90,17 @@ typedef enum
 
 typedef struct
 {
+	int wiz_socket;
+	uint8_t wiz_protocol;
+	uint8_t dst_ip[4];
+	uint16_t dst_port;
+	uint16_t my_port;
+	bool wiz_sock_opened;
+	int backlog;
+} AlxWizSocketData;
+	
+typedef struct
+{
 	// Defines
 
 	// Parameters
@@ -97,13 +108,14 @@ typedef struct
 	// Variables
 	AlxNet* alxNet;
 	AlxSocket_Protocol protocol;
-
+	AlxWizSocketData socket_data;
+	
 	// Info
 	bool wasCtorCalled;
 	bool isOpened;
 } AlxSocket;
 
-
+	
 //******************************************************************************
 // Constructor
 //******************************************************************************
