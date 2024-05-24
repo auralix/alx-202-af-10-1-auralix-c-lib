@@ -120,6 +120,7 @@ void AlxPwr_Ctor
 	float hys2_TopLow_V,
 	float hys2_BotHigh_V,
 	float hys2_BotLow_V,
+	bool filtGlitchBool_valInitial,
 	float filtGlitchBool_StableTrueTime_ms,
 	float filtGlitchBool_StableFalseTime_ms
 );

@@ -1,7 +1,7 @@
 #*******************************************************************************
 # @file			alxBin.py
 # @brief		Auralix C Library - ALX .bin Script
-# @copyright	Copyright (C) 2020-2022 Auralix d.o.o. All rights reserved.
+# @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
 #
 # @section License
 #
@@ -35,7 +35,11 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsSolDir, vsPrjDir, fwName):
+def Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr):
+	# Print
+	print("")
+	print("alxBin.py - START")
+
 	# Read input file
 	inFilePath = pathlib.Path("alxBuild_GENERATED.h")
 	inFileText = inFilePath.read_text()
@@ -49,32 +53,89 @@ def Script(vsSolDir, vsPrjDir, fwName):
 	fwVerPatch = inFileLines[12][31:]
 
 	# Set source bin variables
-	binSrcName = pathlib.Path(vsPrjDir).stem + ".bin"
-	binSrcDir = pathlib.Path(vsSolDir, "VisualGDB", "Debug")	# Relative path: VisualGDB\Debug
-	binSrcPath = binSrcDir / binSrcName
+	binSrcPath = pathlib.Path(vsTargetPath).with_suffix(".bin")
+	binSrcDir = binSrcPath.parent
 
-	# Set fwArtf & fwName
-	fwArtf = pathlib.Path(vsPrjDir).stem
-	vsSolArtf = pathlib.Path(vsSolDir).stem
-	vsSolArtfLen = len(vsSolArtf)
+	# Set fwArtf
+	fwArtf = binSrcPath.stem
 
-	# Create clean directory for destination bin
+	# Set destination bin variables
 	binDstDirName = date + "_" + fwArtf + "_" + fwName + "_" + "V" + fwVerMajor + "-" + fwVerMinor + "-" + fwVerPatch + "_" + hashShort
 	binDstDir = binSrcDir / binDstDirName
+	binDstName = binDstDirName + ".bin"
+
+	# Create clean directory for destination bin
 	shutil.rmtree(binDstDir, ignore_errors=True)
 	pathlib.Path(binDstDir).mkdir(parents=True, exist_ok=True)
 
-	# Copy source bin to destination bin directory
-	shutil.copy(binSrcPath, binDstDir)
-
-	# Rename source bin to destination bin
-	binDstPath = binDstDir / binSrcName
-	binDstPath = binDstPath.rename(binDstDir / (binDstDirName + ".bin"))
+	# Copy source bin to destination bin directory & rename it to destination bin
+	shutil.copy2(binSrcPath, binDstDir / binDstName)
 
 	# Print
-	print("")
-	print("alxBin.py - Generated:")
-	print(binDstPath.name)
+	print("Generated: " + binDstName)
+
+	# If _Raw & _Signed copy enabled
+	if binRawSigned == "True":
+		# Set source bin variables
+		binRawSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Raw' + binSrcPath.suffix)
+		binSignedSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Signed' + binSrcPath.suffix)
+
+		# Set destination bin variables
+		binRawDstName = binDstDirName + "_Raw.bin"
+		binSignedDstName = binDstDirName + "_Signed.bin"
+
+		# Copy source bin to destination bin directory & rename it to destination bin
+		shutil.copy2(binRawSrcPath, binDstDir / binRawDstName)
+		shutil.copy2(binSignedSrcPath, binDstDir / binSignedDstName)
+
+		# Print
+		print("Generated: " + binRawDstName)
+		print("Generated: " + binSignedDstName)
+
+	# If bootloader header generation enabled
+	if bootHdr == "True":
+		# Read bin
+		binData = binSrcPath.read_bytes()
+		binLen = len(binData)
+
+		# Set bootHdr variables
+		bootHdrDstName = binDstDirName + ".h"
+		bootHdrLen = int(bootHdrLenHexStr, 16)
+
+		bootHdrData = binData + bytes([0xFF] * (bootHdrLen - binLen))
+		bootHdrArr = ", ".join(f"0x{byte:02X}" for byte in bootHdrData)
+
+		bootHdrDataFF = bytes([0xFF] * bootHdrLen)
+		bootHdrArrFF = ", ".join(f"0x{byte:02X}" for byte in bootHdrDataFF)
+
+		# Prepare bootloader header file text
+		bootHdrText = """#ifndef ALX_BOOT_GENERATED_H
+#define ALX_BOOT_GENERATED_H
+
+
+// {binDstName}
+#if defined(ALX_BUILD_CONFIG_DEBUG)
+static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boot"), used)) = {{{bootHdrArr}}};
+#endif
+#if defined(ALX_BUILD_CONFIG_FW_UP)
+static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boot"), used)) = {{{bootHdrArrFF}}};
+#endif
+
+
+#endif	// ALX_BOOT_GENERATED_H
+""".format(binDstName=binDstName, bootHdrLenHexStr=bootHdrLenHexStr, bootHdrArr=bootHdrArr, bootHdrArrFF=bootHdrArrFF)
+
+		# Write bootloader header file text
+		bootHdrSrcPath = binSrcDir / "alxBoot_GENERATED.h"
+		bootHdrSrcPath.write_text(bootHdrText)
+		bootHdrDstPath = binDstDir / bootHdrDstName
+		bootHdrDstPath.write_text(bootHdrText)
+
+		# Print
+		print("Generated: " + bootHdrDstName)
+
+	# Print
+	print("alxBin.py - FINISH")
 	print("")
 
 
@@ -82,10 +143,19 @@ def Script(vsSolDir, vsPrjDir, fwName):
 # Run Guard
 #*******************************************************************************
 if __name__ == "__main__":
-	# Prepare param
-	vsSolDir = sys.argv[1]
-	vsPrjDir = sys.argv[2]
-	fwName = sys.argv[3]
+	# Prepare
+	vsTargetPath = sys.argv[1]
+	fwName = sys.argv[2]
+	if len(sys.argv) > 3:
+		binRawSigned = sys.argv[3]
+	else:
+		binRawSigned = "False"
+	if len(sys.argv) > 4:
+		bootHdr = sys.argv[4]
+		bootHdrLenHexStr = sys.argv[5]
+	else:
+		bootHdr = "False"
+		bootHdrLenHexStr = "0x00000000"
 
 	# Script
-	Script(vsSolDir, vsPrjDir, fwName)
+	Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr)

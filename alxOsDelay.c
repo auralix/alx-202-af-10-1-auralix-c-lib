@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -80,20 +80,20 @@ void AlxOsDelay_Ctor
   */
 void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us)
 {
-	// #1 Assert
+	// Assert
 	ALX_OS_DELAY_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Check if approximation is disabled
+	// Check if approximation is disabled
 	if (me->approxDisable)
 	{
 		ALX_OS_DELAY_ASSERT(osDelay_us >= (2 * (uint64_t)me->osTick));
 		ALX_OS_DELAY_ASSERT((osDelay_us % (uint64_t)me->osTick) == 0);
 	}
 
-	// #3 Convert to osTick
+	// Convert to osTick
 	uint64_t osDelay_osTick = osDelay_us / (uint64_t)me->osTick;
 
-	// #4 Delay
+	// Delay
 	#if defined(ALX_FREE_RTOS)
 	vTaskDelay(osDelay_osTick);
 	#endif
@@ -128,4 +128,4 @@ void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min)	{ AlxOsDelay_us(me, os
 void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr)		{ AlxOsDelay_us(me, osDelay_hr * 3600000000); }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB)

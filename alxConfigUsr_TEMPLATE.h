@@ -3,7 +3,6 @@
   * @file		alxConfigUsr.h
   * @brief		Auralix C Library - ALX Configuration File - User
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
-  ******************************************************************************
   *
   * @section License
   *
@@ -25,7 +24,6 @@
   * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
   ******************************************************************************
   **/
-
 
 //******************************************************************************
 // Include Guard

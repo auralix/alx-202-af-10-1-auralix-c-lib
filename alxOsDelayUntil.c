@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -76,14 +76,16 @@ void AlxOsDelayUntil_Ctor
   */
 void AlxOsDelayUntil_Init(AlxOsDelayUntil* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_OS_DELAY_UNTIL_ASSERT(me->isInit == false);
 	ALX_OS_DELAY_UNTIL_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Set xLastWakeTime
+	// Set xLastWakeTime
+	#if defined(ALX_FREE_RTOS)
 	me->xLastWakeTime = xTaskGetTickCount();
+	#endif
 
-	// #3 Set isInit
+	// Set isInit
 	me->isInit = true;
 }
 
@@ -94,16 +96,16 @@ void AlxOsDelayUntil_Init(AlxOsDelayUntil* me)
   */
 void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osTimeIncrement_us)
 {
-	// #1 Assert
+	// Assert
 	ALX_OS_DELAY_UNTIL_ASSERT(me->isInit == true);
 	ALX_OS_DELAY_UNTIL_ASSERT(me->wasCtorCalled == true);
 	ALX_OS_DELAY_UNTIL_ASSERT(osTimeIncrement_us >= (2 * (uint64_t)me->osTick));
 	ALX_OS_DELAY_UNTIL_ASSERT((osTimeIncrement_us % (uint64_t)me->osTick) == 0);
 
-	// #2 Convert to osTick
+	// Convert to osTick
 	uint64_t osTimeIncrement_osTick = osTimeIncrement_us / (uint64_t)me->osTick;
 
-	// #3 Delay
+	// Delay
 	#if defined(ALX_FREE_RTOS)
 	vTaskDelayUntil(&me->xLastWakeTime, osTimeIncrement_osTick);
 	#endif
@@ -138,4 +140,4 @@ void AlxOsDelayUntil_min(AlxOsDelayUntil* me, uint64_t osTimeIncrement_min)	{ Al
 void AlxOsDelayUntil_hr(AlxOsDelayUntil* me, uint64_t osTimeIncrement_hr)	{ AlxOsDelay_hr(me, osTimeIncrement_hr * 3600000000); }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB)

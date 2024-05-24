@@ -141,6 +141,14 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
+// FreeRTOS Cellular Interface
+//------------------------------------------------------------------------------
+#if defined(ALX_FREE_RTOS_CELLULAR)
+// TV: TODO, add files
+#endif
+
+
+//------------------------------------------------------------------------------
 // lwIP
 //------------------------------------------------------------------------------
 #if defined(ALX_LW_IP)
@@ -149,6 +157,14 @@ extern "C" {
 #include "lwip/tcpip.h"
 #include "lwip/dhcp.h"
 //#include "lwip/sockets.h"	// TV: TODO, conflict with read macro in lwIP with alxLfsConfig.h which includes lfs.h, must be seperately included when needed
+#endif
+
+
+//------------------------------------------------------------------------------
+// Wiznet
+//------------------------------------------------------------------------------
+#if defined(ALX_WIZNET)
+// TV: TODO, add files
 #endif
 
 

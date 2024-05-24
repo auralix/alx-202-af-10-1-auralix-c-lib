@@ -64,6 +64,7 @@ void AlxPwr_Ctor
 	float hys2_TopLow_V,
 	float hys2_BotHigh_V,
 	float hys2_BotLow_V,
+	bool filtGlitchBool_valInitial,
 	float filtGlitchBool_StableTrueTime_ms,
 	float filtGlitchBool_StableFalseTime_ms
 )
@@ -80,11 +81,11 @@ void AlxPwr_Ctor
 
 	// Variables
 	AlxHys2_Ctor(&me->hys2, hys2_TopHigh_V, hys2_TopLow_V, hys2_BotHigh_V, hys2_BotLow_V);
-	AlxFiltGlitchBool_Ctor(&me->filtGlitchBool, false, filtGlitchBool_StableTrueTime_ms, filtGlitchBool_StableFalseTime_ms);
+	AlxFiltGlitchBool_Ctor(&me->filtGlitchBool, filtGlitchBool_valInitial, filtGlitchBool_StableTrueTime_ms, filtGlitchBool_StableFalseTime_ms);
 	me->adcVal_V = 0.f;
 	me->val_V = 0.f;
-	me->isInRangeRaw = false;
-	me->isInRangeFiltered = false;
+	me->isInRangeRaw = filtGlitchBool_valInitial;
+	me->isInRangeFiltered = filtGlitchBool_valInitial;
 
 	// Info
 	me->wasCtorCalled = true;

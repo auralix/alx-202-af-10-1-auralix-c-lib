@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -63,7 +63,9 @@ void AlxOsEventFlagGroup_Ctor
 	me->approxDisable = approxDisable;
 
 	// Variables
+	#if defined(ALX_FREE_RTOS)
 	me->eventGroupHandle_t = xEventGroupCreate();	// TV: EventGroup is created once and won't be deleted during a program
+	#endif
 	AlxOsMutex_Ctor(&me->alxMutex);
 
 	// Info
@@ -83,6 +85,9 @@ void AlxOsEventFlagGroup_Ctor
   */
 uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet)
 {
+	#if defined(ALX_FREE_RTOS)
+
+
 	// Lock mutex
 	AlxOsMutex_Lock(&me->alxMutex);
 
@@ -106,6 +111,9 @@ uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToS
 
 	// Return
 	return eventBits_t;
+
+
+	#endif
 }
 
 /**
@@ -116,6 +124,9 @@ uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToS
   */
 uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsToClear)
 {
+	#if defined(ALX_FREE_RTOS)
+
+
 	// Lock mutex
 	AlxOsMutex_Lock(&me->alxMutex);
 
@@ -139,6 +150,9 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
 
 	// Return
 	return eventBits_t;
+
+
+	#endif
 }
 
 /**
@@ -152,6 +166,9 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
   */
 uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsToWait, bool clearEventFlagsOnExit, bool waitForAllEventFlags, uint32_t timeout_ms)
 {
+	#if defined(ALX_FREE_RTOS)
+
+
 	// Lock mutex
 	AlxOsMutex_Lock(&me->alxMutex);
 
@@ -179,6 +196,9 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 
 	// Return
 	return eventBits_t;
+
+
+	#endif
 }
 
 /**
@@ -191,6 +211,9 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
   */
 uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, uint32_t eventFlagsToWait, uint32_t timeout_ms)
 {
+	#if defined(ALX_FREE_RTOS)
+
+
 	// Lock mutex
 	AlxOsMutex_Lock(&me->alxMutex);
 
@@ -218,6 +241,9 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 
 	// Return
 	return eventBits_t;
+
+
+	#endif
 }
 
 
@@ -226,6 +252,9 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 //******************************************************************************
 static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, uint32_t timeout_ms)
 {
+	#if defined(ALX_FREE_RTOS)
+
+
 	// Check if approximation is disabled
 	if (me->approxDisable)
 	{
@@ -238,7 +267,10 @@ static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, u
 
 	// Return
 	return timeout_osTick;
+
+
+	#endif
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_FREE_RTOS)
+#endif	// #if defined(ALX_C_LIB)

@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxOsMutex.h
-  * @brief		Auralix C Library - ALX OS Mutex Module
+  * @file		alxSocket.h
+  * @brief		Auralix C Library - ALX Socket Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_OS_MUTEX_H
-#define ALX_OS_MUTEX_H
+#ifndef ALX_SOCKET_H
+#define ALX_SOCKET_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,30 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-
-
-//******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_OS_MUTEX_FILE "alxOsMutex.h"
-
-// Assert //
-#if defined(ALX_OS_MUTEX_ASSERT_BKPT_ENABLE)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_MUTEX_FILE, expr)
-#elif defined(ALX_OS_MUTEX_ASSERT_TRACE_ENABLE)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_MUTEX_FILE, expr)
-#elif defined(ALX_OS_MUTEX_ASSERT_RST_ENABLE)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_MUTEX_FILE, expr)
-#else
-	#define ALX_OS_MUTEX_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(ALX_OS_MUTEX_TRACE_ENABLE)
-	#define ALX_OS_MUTEX_TRACE(...) ALX_TRACE_STD(ALX_OS_MUTEX_FILE, __VA_ARGS__)
-#else
-	#define ALX_OS_MUTEX_TRACE(...) do{} while (false)
-#endif
+#include "alxNet.h"
 
 
 //******************************************************************************
@@ -75,35 +52,79 @@ extern "C" {
 
 
 //******************************************************************************
+// Preprocessor
+//******************************************************************************
+#define ALX_SOCKET_FILE "alxSocket.h"
+
+// Assert //
+#if defined(ALX_SOCKET_ASSERT_BKPT_ENABLE)
+	#define ALX_SOCKET_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SOCKET_FILE, expr)
+#elif defined(ALX_SOCKET_ASSERT_TRACE_ENABLE)
+	#define ALX_SOCKET_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SOCKET_FILE, expr)
+#elif defined(ALX_SOCKET_ASSERT_RST_ENABLE)
+	#define ALX_SOCKET_ASSERT(expr) ALX_ASSERT_RST(ALX_SOCKET_FILE, expr)
+#else
+	#define ALX_SOCKET_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(ALX_SOCKET_TRACE_ENABLE)
+	#define ALX_SOCKET_TRACE(...) ALX_TRACE_STD(ALX_SOCKET_FILE, __VA_ARGS__)
+	#define ALX_SOCKET_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
+#else
+	#define ALX_SOCKET_TRACE(...) do{} while (false)
+	#define ALX_SOCKET_TRACE_FORMAT(...) do{} while (false)
+#endif
+
+
+//******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxSocket_Protocol_Undefined,
+	AlxSocket_Protocol_Udp,
+	AlxSocket_Protocol_Tcp,
+	AlxSocket_Protocol_Tls
+} AlxSocket_Protocol;
+
 typedef struct
 {
+	// Defines
+
+	// Parameters
+
 	// Variables
-	#if defined(ALX_FREE_RTOS)
-	SemaphoreHandle_t mutex;
-	#endif
+	AlxNet* alxNet;
+	AlxSocket_Protocol protocol;
 
 	// Info
 	bool wasCtorCalled;
-} AlxOsMutex;
+	bool isOpened;
+} AlxSocket;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxOsMutex_Ctor
+void AlxSocket_Ctor
 (
-	AlxOsMutex* me
+	AlxSocket* me
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxOsMutex_Lock(AlxOsMutex* me);
-void AlxOsMutex_Unlock(AlxOsMutex* me);
-bool AlxOsMutex_IsUnlocked(AlxOsMutex* me);
+Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol protocol);
+Alx_Status AlxSocket_Close(AlxSocket* me);
+Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port);
+Alx_Status AlxSocket_Bind(AlxSocket* me, uint16_t port);
+Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog);
+AlxSocket* AlxSocket_Accept(AlxSocket* me);
+int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len);
+int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len);
+void AlxSocket_SetTimeout_ms(AlxSocket* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -112,4 +133,4 @@ bool AlxOsMutex_IsUnlocked(AlxOsMutex* me);
 }
 #endif
 
-#endif	// #ifndef ALX_OS_MUTEX_H
+#endif	// #ifndef ALX_SOCKET_H
