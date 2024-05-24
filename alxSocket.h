@@ -109,6 +109,7 @@ typedef struct
 	AlxNet* alxNet;
 	AlxSocket_Protocol protocol;
 	AlxWizSocketData socket_data;
+	uint32_t timeout;
 	
 	// Info
 	bool wasCtorCalled;
@@ -136,8 +137,7 @@ Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog);
 AlxSocket* AlxSocket_Accept(AlxSocket* me);
 int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len);
 int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len);
-void AlxSocket_SetTimeout_ms(AlxSocket* me);
-
+void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms);
 
 #endif	// #if defined(ALX_C_LIB)
 
