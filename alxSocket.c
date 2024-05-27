@@ -205,6 +205,10 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 		wiz_sock_release(me->socket_data.wiz_socket);
 		if (me->socket_data.wiz_sock_opened)
 		{
+			if ((me->protocol == AlxSocket_Protocol_Tcp) || (me->protocol == AlxSocket_Protocol_Tls))
+			{
+				disconnect(me->socket_data.wiz_socket);
+			}
 			close(me->socket_data.wiz_socket);
 		}
 		me->socket_data.wiz_socket = -1;
@@ -324,7 +328,7 @@ Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog)
 				return Alx_Err;
 			}
 			me->socket_data.backlog = backlog;
-			return listen(me->socket_data.wiz_socket);
+			return listen(me->socket_data.wiz_socket) == SOCK_OK ? Alx_Ok : Alx_Err;
 			break;
 		default:
 			break;
@@ -364,7 +368,9 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 			}
 			tmpSn_SR = getSn_SR(me->socket_data.wiz_socket);
 		} while ((tmpSn_SR != SOCK_ESTABLISHED) && (tmpSn_SR != SOCK_CLOSE_WAIT));
-
+		me->isOpened = true;
+		me->socket_data.wiz_sock_opened = true;
+		
 		// find available socket for listening fotr new connects
 		int8_t available_wiz_socket = wiz_sock_alloc(AlxSocket_Protocol_Tcp);
 		if ((available_wiz_socket < 0) || (me->socket_data.backlog == 0))
@@ -374,7 +380,10 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 		}
 	
 		// copy all data to server socket
-		me->socket_data.backlog--;
+		if (me->socket_data.backlog > 0)
+		{
+			me->socket_data.backlog--;
+		}
 		AlxSocket* new_socket = &wiz_server_sockets[available_wiz_socket];
 		memcpy(new_socket,
 			me,
@@ -543,7 +552,7 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 					{
 						break;
 					}
-					if (AlxTick_Get_ms(&alxTick) - timer_start >= me->timeout)
+					if ((AlxTick_Get_ms(&alxTick) - timer_start >= me->timeout) || (received_total > 0))
 					{
 						break;
 					}
@@ -580,7 +589,7 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 					{
 						break;
 					}
-					if (AlxTick_Get_ms(&alxTick) - timer_start >= me->timeout)
+					if ((AlxTick_Get_ms(&alxTick) - timer_start >= me->timeout) || (received_total > 0))
 					{
 						break;
 					}
@@ -614,10 +623,8 @@ void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms)
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
 
-	if (me->alxNet->config == AlxNet_Config_Wiznet)
-	{
-		me->timeout = timeout_ms;
-	}
+	me->timeout = timeout_ms;
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// Seems like we need to implemented it by out own
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h

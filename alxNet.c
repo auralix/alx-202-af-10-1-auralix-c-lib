@@ -504,7 +504,7 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 	// NOTE: If DHCP enabled, it must also trigger handling of DHCP client
 
 	// Return
-	return Alx_Err;
+	return Alx_Ok;
 }
 Alx_Status AlxNet_Disconnect(AlxNet* me)
 {
