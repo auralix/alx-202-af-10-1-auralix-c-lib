@@ -76,6 +76,7 @@ static wiz_NetInfo wiz_net_info =
 static uint8_t wiz_buffer[WIZ_BUFFER_SIZE];
 static uint64_t dhcp_ip_leased_until = 0;
 static AlxOsMutex alxDhcpMutex;
+static bool dhcp_isRunning = false;
 
 static uint8_t dns_target_domain[256];
 static uint8_t dns_response_ip[4];
@@ -210,9 +211,11 @@ static void dhcp_task(void *argument)
 	reg_dhcp_cbfunc(wizchip_dhcp_assign, wizchip_dhcp_assign, wizchip_dhcp_conflict);
 	while (1)
 	{
+		dhcp_isRunning = false;
 		AlxOsMutex_Lock(&alxDhcpMutex); // blocks if DHCP is disabled
 		// open a ssocket to get socket number only
 		// DHCP is handled by ioLibrary
+		dhcp_isRunning = true;
 		if (AlxSocket_Open(&alxDhcpSocket, me, AlxSocket_Protocol_Udp) == Alx_Ok)
 		{
 			while (1)
@@ -416,7 +419,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 		.func = dhcp_task,
 		.name = "DHCP_Task",
 		.param = (void*) me,
-		.priority = 2,
+		.priority = 3,
 		.stackLen_word = DHCP_THREAD_STACK_SIZE,
 		.taskHandle = NULL,
 	};
@@ -430,7 +433,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 		.func = dns_task,
 		.name = "DNS_Task",
 		.param = (void*) me,
-		.priority = 2,
+		.priority = 3,
 		.stackLen_word = DHCP_THREAD_STACK_SIZE,
 		.taskHandle = NULL,
 	};
@@ -441,7 +444,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 		.func = tick_task,
 		.name = "TICK_Task",
 		.param = (void*) me,
-		.priority = 3,
+		.priority = 5,
 		.stackLen_word = DHCP_THREAD_STACK_SIZE,
 		.taskHandle = NULL,
 	};
@@ -776,10 +779,18 @@ void AlxNet_Dhcp_Enable(AlxNet* me, bool enable)
 	{
 		AlxOsMutex_Unlock(&alxDhcpMutex);
 		me->enable_dhcp = true;
+		while (!dhcp_isRunning)
+		{
+			AlxOsDelay_ms(&alxOsDelay, 1);
+		}
 	}
 	else
 	{
 		me->enable_dhcp = false;
+		while (dhcp_isRunning)
+		{
+			AlxOsDelay_ms(&alxOsDelay, 1);
+		}
 	}
 	AlxOsMutex_Unlock(&me->alxMutex);
 	
