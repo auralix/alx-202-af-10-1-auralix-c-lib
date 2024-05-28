@@ -50,7 +50,8 @@
   * @param[in]		fwVerMinor
   * @param[in]		fwVerPatch
   * @param[in]		fwIsBuildJobUsed
-  * @param[in]		fwIsBootloader
+  * @param[in]		fwIsBootUsed
+  * @param[in]		fwBootIdAddr
   * @param[in]		hwInstanceKnownArr
   * @param[in]		hwInstanceKnownArrLen
   * @param[in]		hwInstanceHwIdSupportedArr
@@ -68,7 +69,8 @@ void AlxId_Ctor
 	uint8_t fwVerMinor,
 	uint8_t fwVerPatch,
 	bool fwIsBuildJobUsed,
-	bool fwIsBootloader,
+	bool fwIsBootUsed,
+	uint32_t fwBootIdAddr,
 	AlxId_HwInstance* hwInstanceKnownArr,
 	uint8_t hwInstanceKnownArrLen,
 	uint8_t* hwInstanceHwIdSupportedArr,
@@ -79,11 +81,53 @@ void AlxId_Ctor
 )
 {
 	//------------------------------------------------------------------------------
-	// FW
+	// FW - App
 	//------------------------------------------------------------------------------
-	me->fwBoot.isBootloader = fwIsBootloader;
-	me->fwApp.isBootloader = fwIsBootloader;
-	if (fwIsBootloader == true)
+
+	// Const
+	strcpy(me->fwApp.build.name, ALX_BUILD_NAME);
+	me->fwApp.build.date = ALX_BUILD_DATE;
+	me->fwApp.build.dateComp = ALX_BUILD_DATE_COMP;
+	me->fwApp.build.num = ALX_BUILD_NUM;
+	strcpy(me->fwApp.build.hash, ALX_BUILD_HASH);
+	strcpy(me->fwApp.build.hashShort, ALX_BUILD_HASH_SHORT);
+	ALX_ID_ASSERT(sscanf(ALX_BUILD_HASH_SHORT, "%lx", &me->fwApp.build.hashShortUint32) == 1);
+	me->fwApp.build.rev = ALX_BUILD_REV;
+
+	// Parameters
+	strcpy(me->fwApp.artf, fwArtf);
+	strcpy(me->fwApp.name, fwName);
+	me->fwApp.verMajor = fwVerMajor;
+	me->fwApp.verMinor = fwVerMinor;
+	me->fwApp.verPatch = fwVerPatch;
+	me->fwApp.isBuildJobUsed = fwIsBuildJobUsed;
+
+	// Variables
+	if (me->fwApp.isBuildJobUsed)
+	{
+		me->fwApp.verDate = me->fwApp.build.date;
+	}
+	else
+	{
+		me->fwApp.verDate = me->fwApp.build.dateComp;
+	}
+	me->fwApp.ver =
+	(
+		((uint64_t)me->fwApp.verMajor << 56) |
+		((uint64_t)me->fwApp.verMinor << 48) |
+		((uint64_t)me->fwApp.verPatch << 32) |
+		((uint64_t)me->fwApp.verDate)
+	);
+	sprintf(me->fwApp.verStr, "%u.%u.%u.%lu.%s", me->fwApp.verMajor, me->fwApp.verMinor, me->fwApp.verPatch, me->fwApp.verDate, me->fwApp.build.hash);
+	sprintf(me->fwApp.binStr, "%lu_%s_%s_V%u-%u-%u_%s.bin", me->fwApp.verDate, me->fwApp.artf, me->fwApp.name, me->fwApp.verMajor, me->fwApp.verMinor, me->fwApp.verPatch, me->fwApp.build.hashShort);
+
+
+	//------------------------------------------------------------------------------
+	// FW - Boot
+	//------------------------------------------------------------------------------
+	me->fwIsBootUsed = fwIsBootUsed;
+	me->fwBootIdAddr = fwBootIdAddr;
+	if (me->fwIsBootUsed)
 	{
 		// Const
 		strcpy(me->fwBoot.build.name, ALX_BUILD_NAME);
@@ -119,50 +163,8 @@ void AlxId_Ctor
 			((uint64_t)me->fwBoot.verPatch << 32) |
 			((uint64_t)me->fwBoot.verDate)
 		);
-	}
-	else if (fwIsBootloader == false)
-	{
-		// Const
-		strcpy(me->fwApp.build.name, ALX_BUILD_NAME);
-		me->fwApp.build.date = ALX_BUILD_DATE;
-		me->fwApp.build.dateComp = ALX_BUILD_DATE_COMP;
-		me->fwApp.build.num = ALX_BUILD_NUM;
-		strcpy(me->fwApp.build.hash, ALX_BUILD_HASH);
-		strcpy(me->fwApp.build.hashShort, ALX_BUILD_HASH_SHORT);
-		ALX_ID_ASSERT(sscanf(ALX_BUILD_HASH_SHORT, "%lx", &me->fwApp.build.hashShortUint32) == 1);
-		me->fwApp.build.rev = ALX_BUILD_REV;
-
-		// Parameters
-		strcpy(me->fwApp.artf, fwArtf);
-		strcpy(me->fwApp.name, fwName);
-		me->fwApp.verMajor = fwVerMajor;
-		me->fwApp.verMinor = fwVerMinor;
-		me->fwApp.verPatch = fwVerPatch;
-		me->fwApp.isBuildJobUsed = fwIsBuildJobUsed;
-
-		// Variables
-		if (me->fwApp.isBuildJobUsed)
-		{
-			me->fwApp.verDate = me->fwApp.build.date;
-		}
-		else
-		{
-			me->fwApp.verDate = me->fwApp.build.dateComp;
-		}
-		me->fwApp.ver =
-		(
-			((uint64_t)me->fwApp.verMajor << 56) |
-			((uint64_t)me->fwApp.verMinor << 48) |
-			((uint64_t)me->fwApp.verPatch << 32) |
-			((uint64_t)me->fwApp.verDate)
-		);
-		sprintf(me->fwApp.verStr, "%u.%u.%u.%lu.%s", me->fwApp.verMajor, me->fwApp.verMinor, me->fwApp.verPatch, me->fwApp.verDate, me->fwApp.build.hash);
-		sprintf(me->fwApp.binStr, "%lu_%s_%s_V%u-%u-%u_%s.bin", me->fwApp.verDate, me->fwApp.artf, me->fwApp.name, me->fwApp.verMajor, me->fwApp.verMinor, me->fwApp.verPatch, me->fwApp.build.hashShort);
-	}
-	else
-	{
-		ALX_ID_ASSERT(false);	// We should never get here
-		return;
+		sprintf(me->fwBoot.verStr, "%u.%u.%u.%lu.%s", me->fwBoot.verMajor, me->fwBoot.verMinor, me->fwBoot.verPatch, me->fwBoot.verDate, me->fwBoot.build.hash);
+		sprintf(me->fwBoot.binStr, "%lu_%s_%s_V%u-%u-%u_%s.bin", me->fwBoot.verDate, me->fwBoot.artf, me->fwBoot.name, me->fwBoot.verMajor, me->fwBoot.verMinor, me->fwBoot.verPatch, me->fwBoot.build.hashShort);
 	}
 
 
@@ -325,7 +327,8 @@ void AlxId_Ctor
   * @param[in]		fwVerMinor
   * @param[in]		fwVerPatch
   * @param[in]		fwIsBuildJobUsed
-  * @param[in]		fwIsBootloader
+  * @param[in]		fwIsBootUsed
+  * @param[in]		fwBootIdAddr
   * @param[in]		hwInstance
   * @param[in]		hwMcuName
   */
@@ -338,7 +341,8 @@ void AlxId_Ctor_NoHwId
 	uint8_t fwVerMinor,
 	uint8_t fwVerPatch,
 	bool fwIsBuildJobUsed,
-	bool fwIsBootloader,
+	bool fwIsBootUsed,
+	uint32_t fwBootIdAddr,
 	AlxId_HwInstance hwInstance,
 	const char* hwMcuName
 )
@@ -355,7 +359,8 @@ void AlxId_Ctor_NoHwId
 		fwVerMinor,
 		fwVerPatch,
 		fwIsBuildJobUsed,
-		fwIsBootloader,
+		fwIsBootUsed,
+		fwBootIdAddr,
 		NULL,
 		ALX_NULL,
 		NULL,
@@ -521,7 +526,7 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_FORMAT("- job_revision: %lu\r\n", me->fwApp.build.rev);
 	ALX_ID_TRACE_FORMAT("\r\n");
 
-	if (me->fwBoot.isBootloader)
+	if (me->fwIsBootUsed)
 	{
 		ALX_ID_TRACE_FORMAT("FW Boot:\r\n");
 		ALX_ID_TRACE_FORMAT("- artf: %s\r\n", me->fwBoot.artf);

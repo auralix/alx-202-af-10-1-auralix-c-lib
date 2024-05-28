@@ -122,7 +122,6 @@ typedef struct __attribute__((packed))
 	uint8_t verMinor;
 	uint8_t verPatch;
 	bool isBuildJobUsed;
-	bool isBootloader;
 
 	// Variables
 	uint32_t verDate;
@@ -257,9 +256,9 @@ typedef struct
 	//------------------------------------------------------------------------------
 	// FW
 	//------------------------------------------------------------------------------
-
-	// Parameters
 	AlxId_Fw fwApp;
+	bool fwIsBootUsed;
+	uint32_t fwBootIdAddr;
 	AlxId_Fw fwBoot;
 	AlxId_Fw_LangC fwLangC;
 	AlxId_Fw_LangCLib fwLangCLib;
@@ -276,8 +275,6 @@ typedef struct
 	//------------------------------------------------------------------------------
 	// HW
 	//------------------------------------------------------------------------------
-
-	// Parameters
 	AlxId_Hw hw;
 	#ifdef ALX_STM32
 	AlxId_Hw_Stm32 hwStm32;
@@ -305,7 +302,8 @@ void AlxId_Ctor
 	uint8_t fwVerMinor,
 	uint8_t fwVerPatch,
 	bool fwIsBuildJobUsed,
-	bool fwIsBootloader,
+	bool fwIsBootUsed,
+	uint32_t fwBootIdAddr,
 	AlxId_HwInstance* hwInstanceKnownArr,
 	uint8_t hwInstanceKnownArrLen,
 	uint8_t* hwInstanceHwIdSupportedArr,
@@ -323,7 +321,8 @@ void AlxId_Ctor_NoHwId
 	uint8_t fwVerMinor,
 	uint8_t fwVerPatch,
 	bool fwIsBuildJobUsed,
-	bool fwIsBootloader,
+	bool fwIsBootUsed,
+	uint32_t fwBootIdAddr,
 	AlxId_HwInstance hwInstance,
 	const char* hwMcuName
 );
