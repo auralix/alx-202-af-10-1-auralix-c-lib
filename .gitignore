@@ -5,5 +5,5 @@
 Doxygen/Output
 alxBuild_GENERATED.h
 alxBoot_GENERATED.h
-alxBoot2_GENERATED.h
+alxBootMetadata_GENERATED.h
 __pycache__

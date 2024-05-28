@@ -54,8 +54,10 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 
 	# Set lenghts
 	bootLen = int(bootLenHexStr, 16)
-	headerLen = 0x200  # 512 bytes
-	trailerLen = 0x28  # 40 bytes
+	headerLenStr = r'0x0200'	# 512 bytes
+	trailerLenStr =  r'0x0028'	# 40 bytes
+	headerLen = int(headerLenStr, 16)
+	trailerLen = int(trailerLenStr, 16)
 
 	# Read source bin
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix('.bin')
@@ -114,25 +116,25 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 	# Prepare signed bin header & trailer variables
 	binSignedHeaderArr = ", ".join(f"0x{byte:02X}" for byte in binSignedHeader)
 	binSignedTrailerArr = ", ".join(f"0x{byte:02X}" for byte in binSignedTrailer)
-	binSignedHeaderTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "alx-202-af-10-1-auralix-c-lib" / "alxBoot2_GENERATED.h"
+	binSignedHeaderTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "alx-202-af-10-1-auralix-c-lib" / "alxBootMetadata_GENERATED.h"
 
 	# Prepare signed bin header & trailer file text
-	binSignedHeaderTrailerText = """#ifndef ALX_BOOT2_GENERATED_H
-#define ALX_BOOT2_GENERATED_H
+	binSignedHeaderTrailerText = """#ifndef ALX_BOOT_METADATA_GENERATED_H
+#define ALX_BOOT_METADATA_GENERATED_H
 
 
 #if defined(ALX_BUILD_CONFIG_DEBUG)
-static const unsigned char header[{headerLen}] __attribute__((section(".header"), used)) = {{{binSignedHeaderArr}}};
-static const unsigned char trailer[{trailerLen}] __attribute__((section(".trailer"), used)) = {{{binSignedTrailerArr}}};
+static const unsigned char app_header[{headerLenStr}] __attribute__((section(".app_header"), used)) = {{{binSignedHeaderArr}}};
+static const unsigned char app_trailer[{trailerLenStr}] __attribute__((section(".app_trailer"), used)) = {{{binSignedTrailerArr}}};
 #endif
 #if defined(ALX_BUILD_CONFIG_FW_UP)
-static const unsigned char header[{headerLen}] __attribute__((section(".header"), used)) = {{0xBB, 0xBB, 0xBB, 0xBB}};
-static const unsigned char trailer[{trailerLen}] __attribute__((section(".trailer"), used)) = {{0xCC, 0xCC, 0xCC, 0xCC}};
+static const unsigned char app_header[{headerLenStr}] __attribute__((section(".app_header"), used)) = {{0xDE, 0xAD, 0xBE, 0xEF}};
+static const unsigned char app_trailer[{trailerLenStr}] __attribute__((section(".app_trailer"), used)) = {{0xDE, 0xAD, 0xBE, 0xEF}};
 #endif
 
 
-#endif	// ALX_BOOT2_GENERATED_H
-""".format(headerLen=headerLen, binSignedHeaderArr=binSignedHeaderArr, trailerLen=trailerLen, binSignedTrailerArr=binSignedTrailerArr)
+#endif	// ALX_BOOT_METADATA_GENERATED_H
+""".format(headerLenStr=headerLenStr, binSignedHeaderArr=binSignedHeaderArr, trailerLenStr=trailerLenStr, binSignedTrailerArr=binSignedTrailerArr)
 
 	# Write signed bin header & trailer file text
 	binSignedHeaderTrailerPath.write_text(binSignedHeaderTrailerText)
