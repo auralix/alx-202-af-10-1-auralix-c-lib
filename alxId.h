@@ -97,7 +97,7 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef struct
+typedef struct __attribute__((packed))
 {
 	// Const
 	char name[ALX_ID_NAME_LEN];
@@ -110,7 +110,7 @@ typedef struct
 	uint32_t rev;
 } AlxId_Fw_Build;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	// Const
 	AlxId_Fw_Build build;
@@ -243,6 +243,14 @@ typedef struct
 	char mcuUniqueIdStr[ALX_ID_HW_STM32_MCU_UNIQUE_ID_STR_LEN];
 } AlxId_Hw_Stm32;
 #endif
+
+typedef struct __attribute__((packed))
+{
+	uint32_t magicNum;
+	uint32_t ver;
+
+	AlxId_Fw fw;
+} AlxId_BootId;
 
 typedef struct
 {
