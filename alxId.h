@@ -132,6 +132,16 @@ typedef struct __attribute__((packed))
 	char binStr[ALX_ID_FW_BIN_STR_LEN];
 } AlxId_Fw;
 
+typedef struct __attribute__((packed))
+{
+	uint32_t magicNum;
+	uint32_t ver;
+
+	AlxId_Fw fwBoot;
+
+	uint16_t crc;
+} AlxId_FwBootId;
+
 typedef struct
 {
 	// Const
@@ -245,16 +255,6 @@ typedef struct
 } AlxId_Hw_Stm32;
 #endif
 
-typedef struct __attribute__((packed))
-{
-	uint32_t magicNum;
-	uint32_t ver;
-
-	AlxId_Fw fw;
-
-	uint16_t crc;
-} AlxId_BootId;
-
 typedef struct
 {
 	//------------------------------------------------------------------------------
@@ -263,7 +263,7 @@ typedef struct
 	AlxId_Fw fwApp;
 	bool fwIsBootUsed;
 	uint32_t fwBootIdAddr;
-	AlxId_Fw fwBoot;
+	AlxId_FwBootId fwBootId;
 	AlxId_Fw_LangC fwLangC;
 	AlxId_Fw_LangCLib fwLangCLib;
 	AlxId_Fw_Comp fwComp;
