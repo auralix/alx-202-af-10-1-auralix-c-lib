@@ -86,10 +86,10 @@ def Script(vsSolDir):
 			raise
 	except:
 		print("alxBuild.py - fwVer: No valid GIT tag, FW version could not be set")
-		tag ="v255.255.255"
-		fwVerMajorStr = "255"
-		fwVerMinorStr = "255"
-		fwVerPatchStr = "255"
+		tag ="v0.0.0"
+		fwVerMajorStr = "0"
+		fwVerMinorStr = "0"
+		fwVerPatchStr = "0"
 
 	# Print
 	print("alxBuild.py - buildTag: " + tag)

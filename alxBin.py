@@ -48,9 +48,9 @@ def Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr):
 	# Parse input file
 	date = inFileLines[5][23:]
 	hashShort = inFileLines[8][30:37]
-	fwVerMajor = inFileLines[10][31:]
-	fwVerMinor = inFileLines[11][31:]
-	fwVerPatch = inFileLines[12][31:]
+	fwVerMajor = inFileLines[11][31:]
+	fwVerMinor = inFileLines[12][31:]
+	fwVerPatch = inFileLines[13][31:]
 
 	# Set source bin variables
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix(".bin")

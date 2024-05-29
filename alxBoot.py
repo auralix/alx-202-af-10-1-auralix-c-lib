@@ -48,9 +48,9 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 	# Parse input file
 	date = inFileLines[5][23:]
 	hashShort = inFileLines[8][30:37]
-	fwVerMajor = inFileLines[10][31:]
-	fwVerMinor = inFileLines[11][31:]
-	fwVerPatch = inFileLines[12][31:]
+	fwVerMajor = inFileLines[11][31:]
+	fwVerMinor = inFileLines[12][31:]
+	fwVerPatch = inFileLines[13][31:]
 
 	# Set lenghts
 	bootLen = int(bootLenHexStr, 16)
@@ -98,6 +98,7 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 		binPathIn=binRawPath,
 		binPathOut=binSignedPath
 	)
+	print("imgtool.py - cmd:" + cmd)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
 	# Print imgtool
