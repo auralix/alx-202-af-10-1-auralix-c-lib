@@ -84,14 +84,16 @@ extern "C" {
 // Defines
 //******************************************************************************
 #define ALX_ID_NAME_LEN 40
-#define ALX_ID_FW_BUILD_HASH_LEN 50
+#define ALX_ID_FW_BUILD_HASH_LEN 48
 #define ALX_ID_FW_BUILD_HASH_SHORT_LEN 8
-#define ALX_ID_FW_VER_STR_LEN 100
-#define ALX_ID_FW_BIN_STR_LEN 100
+#define ALX_ID_FW_VER_STR_LEN 96
+#define ALX_ID_FW_BIN_STR_LEN 96
 #define ALX_ID_HW_ID_IO_PIN_ARR_LEN 5
 #define ALX_ID_HW_STM32_MCU_UNIQUE_ID_LEN_uint32 3
 #define ALX_ID_HW_STM32_MCU_UNIQUE_ID_LEN_uint8 12
-#define ALX_ID_HW_STM32_MCU_UNIQUE_ID_STR_LEN 30
+#define ALX_ID_HW_STM32_MCU_UNIQUE_ID_STR_LEN 32
+#define ALX_ID_BOOT_ID_MAGIC_NUM 0x00B0071D
+#define ALX_ID_BOOT_ID_VER 1
 
 
 //******************************************************************************
@@ -249,6 +251,8 @@ typedef struct __attribute__((packed))
 	uint32_t ver;
 
 	AlxId_Fw fw;
+
+	uint16_t crc;
 } AlxId_BootId;
 
 typedef struct
