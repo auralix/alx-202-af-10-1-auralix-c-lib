@@ -45,8 +45,8 @@ extern "C" {
 #include "alxSpi.h"
 #include "alxIoPin.h"
 #include "alxOsMutex.h"
-	
-	
+
+
 //******************************************************************************
 // Module Guard
 //******************************************************************************
@@ -93,6 +93,17 @@ typedef enum
 	#endif
 } AlxNet_Config;
 
+#if defined(ALX_FREE_RTOS_CELLULAR)
+typedef struct
+{
+	// Cellular context
+	CellularHandle_t handle;
+	CellularCommInterface_t * CommIntf; // UART interface
+	CellularSimCardStatus_t simStatus;
+	CellularServiceStatus_t serviceStatus;
+}AlxNet_Cellular;
+#endif
+
 typedef struct
 {
 	// Defines
@@ -103,7 +114,10 @@ typedef struct
 	AlxIoPin* do_nRST;
 	AlxIoPin* di_nINT;
 	bool enable_dhcp;
-	
+
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	AlxNet_Cellular cellular;
+	#endif
 	// Variables
 	AlxOsMutex alxMutex;
 	char mac[18]; // MAC in string format -> "00:18:10:3A:B8:39"
@@ -111,7 +125,7 @@ typedef struct
 	char netmask[16];
 	char gateway[16];
 	char dns[4][16];
-	
+
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
@@ -124,7 +138,7 @@ typedef enum
 	DnsTaskTimeout,
 	DnsTaskSuccess
 } DnsTaskState;
-	
+
 //******************************************************************************
 // Constructor
 //******************************************************************************

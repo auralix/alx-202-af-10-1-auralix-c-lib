@@ -57,6 +57,16 @@
 #define DNS_RETRY_COUNT 1 // 3 sec.
 
 #define WIZ_BUFFER_SIZE 2048
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+#ifndef CELLULAR_APN_NAME
+#error "CELLULAR_APN_NAME is not defined in cellular_config.h"
+#endif
+#define CELLULAR_SIM_CARD_WAIT_INTERVAL_MS       ( 500UL )
+#define CELLULAR_MAX_SIM_RETRY                   ( 5U )
+#define CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS    ( 1000UL )
+
+#endif
 //******************************************************************************
 // Private Variables
 //******************************************************************************
@@ -84,6 +94,10 @@ static DnsTaskState dns_retval;
 static AlxOsMutex alxDnsMutex;
 
 AlxSocket alxDhcpSocket, alxDnsSocket;
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+extern CellularCommInterface_t CellularCommInterface;
+#endif
 
 //******************************************************************************
 // Private Functions
@@ -369,7 +383,11 @@ void AlxNet_Ctor
 	me->di_nINT = di_nINT;
 	// Variables
 	AlxOsMutex_Ctor(&me->alxMutex);
-	
+
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	me->cellular.CommIntf = &CellularCommInterface;
+	#endif
+
 	// Info
 	me->wasCtorCalled = true;
 	me->isInit = false;
@@ -393,63 +411,224 @@ Alx_Status AlxNet_Init(AlxNet *me)
 	}
 	instance_guard = true;
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
-	// Set Callbacks and SPI for ioLibrary_Driver
-	reg_wizchip_cris_cbfunc(CrisEnter, CrisExit);
-	reg_wizchip_cs_cbfunc(Select, Unselect);
-	reg_wizchip_spi_cbfunc(ReadByte, WriteByte);
-	reg_wizchip_spiburst_cbfunc(ReadBurst, WriteBurst);
-	 
-	// Init SPI
-	AlxOsMutex_Ctor(&alxSpiMutex);
-	alxSpi = me->alxSpi;
-	
-	AlxNet_Disconnect(me);
-	
-	if (AlxSpi_Init(me->alxSpi) != Alx_Ok) 
+
+	if (me->config == AlxNet_Config_Wiznet)
 	{
-		return Alx_Err;
+		// Set Callbacks and SPI for ioLibrary_Driver
+		reg_wizchip_cris_cbfunc(CrisEnter, CrisExit);
+		reg_wizchip_cs_cbfunc(Select, Unselect);
+		reg_wizchip_spi_cbfunc(ReadByte, WriteByte);
+		reg_wizchip_spiburst_cbfunc(ReadBurst, WriteBurst);
+
+		// Init SPI
+		AlxOsMutex_Ctor(&alxSpiMutex);
+		alxSpi = me->alxSpi;
+
+		AlxNet_Disconnect(me);
+
+		if (AlxSpi_Init(me->alxSpi) != Alx_Ok)
+		{
+			return Alx_Err;
+		}
+
+		// start DHCP
+		AlxOsMutex_Ctor(&alxDhcpMutex);
+		AlxOsMutex_Lock(&alxDhcpMutex);
+		AlxSocket_Ctor(&alxDhcpSocket);
+		AlxOsThread dhcp_thread = {
+			.func = dhcp_task,
+			.name = "DHCP_Task",
+			.param = (void*) me,
+			.priority = 3,
+			.stackLen_word = DHCP_THREAD_STACK_SIZE,
+			.taskHandle = NULL,
+		};
+		AlxOsThread_Start(&dhcp_thread);
+
+		// start DNS
+		AlxOsMutex_Ctor(&alxDnsMutex);
+		AlxOsMutex_Lock(&alxDnsMutex);
+		AlxSocket_Ctor(&alxDnsSocket);
+		AlxOsThread dns_thread = {
+			.func = dns_task,
+			.name = "DNS_Task",
+			.param = (void*) me,
+			.priority = 3,
+			.stackLen_word = DHCP_THREAD_STACK_SIZE,
+			.taskHandle = NULL,
+		};
+		AlxOsThread_Start(&dns_thread);
+
+		// start 1 sec tick
+		AlxOsThread tick_thread = {
+			.func = tick_task,
+			.name = "TICK_Task",
+			.param = (void*) me,
+			.priority = 5,
+			.stackLen_word = DHCP_THREAD_STACK_SIZE,
+			.taskHandle = NULL,
+		};
+		AlxOsThread_Start(&tick_thread);
 	}
-	
-	// start DHCP
-	AlxOsMutex_Ctor(&alxDhcpMutex);
-	AlxOsMutex_Lock(&alxDhcpMutex);
-	AlxSocket_Ctor(&alxDhcpSocket);
-	AlxOsThread dhcp_thread = { 
-		.func = dhcp_task,
-		.name = "DHCP_Task",
-		.param = (void*) me,
-		.priority = 3,
-		.stackLen_word = DHCP_THREAD_STACK_SIZE,
-		.taskHandle = NULL,
-	};
-	AlxOsThread_Start(&dhcp_thread);
-	
-	// start DNS
-	AlxOsMutex_Ctor(&alxDnsMutex);
-	AlxOsMutex_Lock(&alxDnsMutex);
-	AlxSocket_Ctor(&alxDnsSocket);
-	AlxOsThread dns_thread = { 
-		.func = dns_task,
-		.name = "DNS_Task",
-		.param = (void*) me,
-		.priority = 3,
-		.stackLen_word = DHCP_THREAD_STACK_SIZE,
-		.taskHandle = NULL,
-	};
-	AlxOsThread_Start(&dns_thread);
-	
-	// start 1 sec tick
-	AlxOsThread tick_thread = { 
-		.func = tick_task,
-		.name = "TICK_Task",
-		.param = (void*) me,
-		.priority = 5,
-		.stackLen_word = DHCP_THREAD_STACK_SIZE,
-		.taskHandle = NULL,
-	};
-	AlxOsThread_Start(&tick_thread);
-	
+
+	// Initialize CELLULAR stack
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		CellularError_t cellularStatus = CELLULAR_SUCCESS;
+		uint8_t tries = 0;
+		CellularHandle_t CellularHandle = me->cellular.handle;
+		CellularCommInterface_t * pCommIntf = me->cellular.CommIntf;
+		CellularSimCardStatus_t simStatus = me->cellular.simStatus;
+		CellularServiceStatus_t serviceStatus = me->cellular.serviceStatus;
+
+		CellularPdnConfig_t pdnConfig = { CELLULAR_PDN_CONTEXT_IPV4, CELLULAR_PDN_AUTH_NONE, CELLULAR_APN_NAME, "", "" };
+		CellularPdnStatus_t PdnStatusBuffers[CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U] = { 0 };
+
+		uint32_t timeoutCountLimit = (60000 / CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS) + 1U;
+		uint32_t timeoutCount = 0;
+		uint8_t NumStatus = 0;
+		bool pdnStatus = false;
+		uint32_t i = 0U;
+		uint8_t CellularContext = CELLULAR_PDN_CONTEXT_ID;
+		char localIP[CELLULAR_IP_ADDRESS_MAX_SIZE] = { '\0' };
+
+		cellularStatus = Cellular_Init(&CellularHandle, pCommIntf);
+		if (cellularStatus != CELLULAR_SUCCESS) {
+			ALX_NET_TRACE_FORMAT("Cellular_Init failure %d\r\n", cellularStatus);
+		}
+		else {
+			/* wait until SIM is ready */
+			for (tries = 0; tries < CELLULAR_MAX_SIM_RETRY; tries++) {
+				cellularStatus = Cellular_GetSimCardStatus(CellularHandle, &simStatus);
+
+				if ((cellularStatus == CELLULAR_SUCCESS) &&
+				    ((simStatus.simCardState == CELLULAR_SIM_CARD_INSERTED) &&
+				      (simStatus.simCardLockState == CELLULAR_SIM_CARD_READY))) {
+					ALX_NET_TRACE_FORMAT(("Cellular SIM okay\r\n"));
+					break;
+				}
+				else {
+					ALX_NET_TRACE_FORMAT("Cellular SIM card state %d, Lock State %d <<<\r\n",
+						simStatus.simCardState,
+						simStatus.simCardLockState);
+				}
+
+				vTaskDelay(pdMS_TO_TICKS(CELLULAR_SIM_CARD_WAIT_INTERVAL_MS));
+			}
+
+			if (cellularStatus != CELLULAR_SUCCESS) {
+				ALX_NET_TRACE_FORMAT(("Cellular SIM failure\r\n"));
+			}
+		}
+
+		/* Setup the PDN config. */
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			cellularStatus = Cellular_SetPdnConfig(CellularHandle, CellularContext, &pdnConfig);
+
+			if (cellularStatus != CELLULAR_SUCCESS) {
+				ALX_NET_TRACE_FORMAT("Cellular_SetPdnConfig failure %d\r\n", cellularStatus);
+			}
+		}
+
+		/* Rescan network. */
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			cellularStatus = Cellular_RfOff(CellularHandle);
+
+			if (cellularStatus != CELLULAR_SUCCESS) {
+				ALX_NET_TRACE_FORMAT("Cellular_RfOff failure %d\r\n", cellularStatus);
+			}
+		}
+
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			cellularStatus = Cellular_RfOn(CellularHandle);
+
+			if (cellularStatus != CELLULAR_SUCCESS) {
+				ALX_NET_TRACE_FORMAT("Cellular_RfOn failure %d\r\n", cellularStatus);
+			}
+		}
+
+		/* Get service status. */
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			while (timeoutCount < timeoutCountLimit) {
+				cellularStatus = Cellular_GetServiceStatus(CellularHandle, &serviceStatus);
+
+				if ((cellularStatus == CELLULAR_SUCCESS) &&
+				    ((serviceStatus.psRegistrationStatus == REGISTRATION_STATUS_REGISTERED_HOME) ||
+				      (serviceStatus.psRegistrationStatus == REGISTRATION_STATUS_ROAMING_REGISTERED))) {
+					ALX_NET_TRACE_FORMAT("Cellular module registered\r\n");
+					break;
+				}
+
+				timeoutCount++;
+
+				if (timeoutCount >= timeoutCountLimit) {
+					ALX_NET_TRACE_FORMAT("Cellular module can't be registered\r\n");
+				}
+
+				vTaskDelay(pdMS_TO_TICKS(CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS));
+			}
+		}
+
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			cellularStatus = Cellular_ActivatePdn(CellularHandle, CellularContext);
+
+			if (cellularStatus != CELLULAR_SUCCESS) {
+				ALX_NET_TRACE_FORMAT("Cellular_ActivatePdn failure %d\r\n", cellularStatus);
+			}
+		}
+
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			cellularStatus = Cellular_GetIPAddress(CellularHandle, CellularContext, localIP, sizeof(localIP));
+			if (cellularStatus != CELLULAR_SUCCESS) {
+				ALX_NET_TRACE_FORMAT("Cellular_GetIPAddress failure %d\r\n", cellularStatus);
+			}
+		}
+
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			cellularStatus = Cellular_GetPdnStatus(CellularHandle, PdnStatusBuffers, (CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U), &NumStatus);
+			if (cellularStatus != CELLULAR_SUCCESS) {
+				ALX_NET_TRACE_FORMAT("Cellular_GetPdnStatus failure %d\r\n", cellularStatus);
+			}
+		}
+
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			for (i = 0U; i < NumStatus; i++) {
+				if ((PdnStatusBuffers[i].contextId == CellularContext) && (PdnStatusBuffers[i].state == 1)) {
+					pdnStatus = true;
+					break;
+				}
+			}
+
+			if (pdnStatus == false) {
+				ALX_NET_TRACE_FORMAT("Cellular PDN is not activated <<<");
+			}
+		}
+
+		// Modems onboard TCPIP stack has DNS already set, so no need to set it here.
+
+		//if (cellularStatus == CELLULAR_SUCCESS)
+		//{
+		//	cellularStatus = Cellular_SetDns(CellularHandle, CellularContext, CELLULAR_DNS_IP);
+		//
+		//	if (cellularStatus != CELLULAR_SUCCESS)
+		//	{
+		//		ALX_NET_TRACE_FORMAT("Cellular_SetDns failure %d\r\n", cellularStatus);
+		//	}
+		//	ALX_NET_TRACE_FORMAT("Cellular_SetDns SET: %s\r\n", CELLULAR_DNS_IP);
+		//
+		//}
+
+		if ((cellularStatus == CELLULAR_SUCCESS) && (pdnStatus == true)) {
+			ALX_NET_TRACE_FORMAT("Cellular module registered, IP address %s\r\n", localIP);
+		}
+		else {
+			return Alx_Err;
+		}
+
+	}
+	#endif
+
 	me->isInit = true;
 	return Alx_Ok;
 }

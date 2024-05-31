@@ -144,7 +144,10 @@ extern "C" {
 // FreeRTOS Cellular Interface
 //------------------------------------------------------------------------------
 #if defined(ALX_FREE_RTOS_CELLULAR)
-// TV: TODO, add files
+#include "cellular_config.h"
+#include "cellular_comm_interface.h"
+#include "cellular_api.h"
+#include "cellular_types.h"
 #endif
 
 
