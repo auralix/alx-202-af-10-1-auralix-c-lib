@@ -216,12 +216,12 @@ static void wizchip_dhcp_conflict(void)
 }
 static void dhcp_task(void *argument)
 {
-	AlxNet* me = (AlxNet*) argument; 
+	AlxNet* me = (AlxNet*) argument;
 	int retval = 0;
 	uint8_t link;
 	uint32_t dhcp_retry = 0;
 	dhcp_mode state = NETINFO_STATIC;
-	
+
 	reg_dhcp_cbfunc(wizchip_dhcp_assign, wizchip_dhcp_assign, wizchip_dhcp_conflict);
 	while (1)
 	{
@@ -243,7 +243,7 @@ static void dhcp_task(void *argument)
 						dhcp_ip_leased_until = 0;
 						state = NETINFO_DHCP;
 					}
-			
+
 					if ((state == NETINFO_DHCP) && !me->enable_dhcp)
 					{
 						ALX_TRACE_FORMAT("DHCP client stopped\r\n");
@@ -251,7 +251,7 @@ static void dhcp_task(void *argument)
 						state = NETINFO_STATIC;
 						break; // break to mutex
 					}
-			
+
 					if (state == NETINFO_DHCP)
 					{
 						link = wizphy_getphylink();
@@ -302,7 +302,7 @@ static void dns_task(void *argument)
 {
 	AlxNet* me = (AlxNet*) argument;
 	uint8_t dns_ip[4];
-			
+
 	while (1)
 	{
 		AlxOsMutex_Lock(&alxDnsMutex);
@@ -400,10 +400,10 @@ void AlxNet_Ctor
 Alx_Status AlxNet_Init(AlxNet *me)
 {
 	ALX_NET_ASSERT(me->isInit == false);
-	
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	ALX_NET_ASSERT(instance_guard == false);
-	
+
 	// only one instance allowed
 	if (instance_guard)
 	{
@@ -412,6 +412,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 	instance_guard = true;
 	AlxOsMutex_Unlock(&me->alxMutex);
 
+	#if defined(ALX_WIZNET)
 	if (me->config == AlxNet_Config_Wiznet)
 	{
 		// Set Callbacks and SPI for ioLibrary_Driver
@@ -470,6 +471,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 		};
 		AlxOsThread_Start(&tick_thread);
 	}
+	#endif
 
 	// Initialize CELLULAR stack
 	#if defined(ALX_FREE_RTOS_CELLULAR)
@@ -477,41 +479,29 @@ Alx_Status AlxNet_Init(AlxNet *me)
 	{
 		CellularError_t cellularStatus = CELLULAR_SUCCESS;
 		uint8_t tries = 0;
-		CellularHandle_t CellularHandle = me->cellular.handle;
-		CellularCommInterface_t * pCommIntf = me->cellular.CommIntf;
-		CellularSimCardStatus_t simStatus = me->cellular.simStatus;
-		CellularServiceStatus_t serviceStatus = me->cellular.serviceStatus;
-
-		CellularPdnConfig_t pdnConfig = { CELLULAR_PDN_CONTEXT_IPV4, CELLULAR_PDN_AUTH_NONE, CELLULAR_APN_NAME, "", "" };
-		CellularPdnStatus_t PdnStatusBuffers[CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U] = { 0 };
 
 		uint32_t timeoutCountLimit = (60000 / CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS) + 1U;
 		uint32_t timeoutCount = 0;
-		uint8_t NumStatus = 0;
-		bool pdnStatus = false;
 		uint32_t i = 0U;
-		uint8_t CellularContext = CELLULAR_PDN_CONTEXT_ID;
-		char localIP[CELLULAR_IP_ADDRESS_MAX_SIZE] = { '\0' };
 
-		cellularStatus = Cellular_Init(&CellularHandle, pCommIntf);
+		cellularStatus = Cellular_Init(&me->cellular.handle, me->cellular.CommIntf);
 		if (cellularStatus != CELLULAR_SUCCESS) {
 			ALX_NET_TRACE_FORMAT("Cellular_Init failure %d\r\n", cellularStatus);
 		}
 		else {
 			/* wait until SIM is ready */
 			for (tries = 0; tries < CELLULAR_MAX_SIM_RETRY; tries++) {
-				cellularStatus = Cellular_GetSimCardStatus(CellularHandle, &simStatus);
+				cellularStatus = Cellular_GetSimCardStatus(me->cellular.handle, &me->cellular.simStatus);
 
 				if ((cellularStatus == CELLULAR_SUCCESS) &&
-				    ((simStatus.simCardState == CELLULAR_SIM_CARD_INSERTED) &&
-				      (simStatus.simCardLockState == CELLULAR_SIM_CARD_READY))) {
-					ALX_NET_TRACE_FORMAT(("Cellular SIM okay\r\n"));
+				    ((me->cellular.simStatus.simCardState == CELLULAR_SIM_CARD_INSERTED) &&
+				      (me->cellular.simStatus.simCardLockState == CELLULAR_SIM_CARD_READY))) {
 					break;
 				}
 				else {
 					ALX_NET_TRACE_FORMAT("Cellular SIM card state %d, Lock State %d <<<\r\n",
-						simStatus.simCardState,
-						simStatus.simCardLockState);
+						me->cellular.simStatus.simCardState,
+						me->cellular.simStatus.simCardLockState);
 				}
 
 				vTaskDelay(pdMS_TO_TICKS(CELLULAR_SIM_CARD_WAIT_INTERVAL_MS));
@@ -522,18 +512,9 @@ Alx_Status AlxNet_Init(AlxNet *me)
 			}
 		}
 
-		/* Setup the PDN config. */
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_SetPdnConfig(CellularHandle, CellularContext, &pdnConfig);
-
-			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_FORMAT("Cellular_SetPdnConfig failure %d\r\n", cellularStatus);
-			}
-		}
-
 		/* Rescan network. */
 		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_RfOff(CellularHandle);
+			cellularStatus = Cellular_RfOff(me->cellular.handle);
 
 			if (cellularStatus != CELLULAR_SUCCESS) {
 				ALX_NET_TRACE_FORMAT("Cellular_RfOff failure %d\r\n", cellularStatus);
@@ -541,7 +522,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 		}
 
 		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_RfOn(CellularHandle);
+			cellularStatus = Cellular_RfOn(me->cellular.handle);
 
 			if (cellularStatus != CELLULAR_SUCCESS) {
 				ALX_NET_TRACE_FORMAT("Cellular_RfOn failure %d\r\n", cellularStatus);
@@ -551,12 +532,11 @@ Alx_Status AlxNet_Init(AlxNet *me)
 		/* Get service status. */
 		if (cellularStatus == CELLULAR_SUCCESS) {
 			while (timeoutCount < timeoutCountLimit) {
-				cellularStatus = Cellular_GetServiceStatus(CellularHandle, &serviceStatus);
+				cellularStatus = Cellular_GetServiceStatus(me->cellular.handle, &me->cellular.serviceStatus);
 
 				if ((cellularStatus == CELLULAR_SUCCESS) &&
-				    ((serviceStatus.psRegistrationStatus == REGISTRATION_STATUS_REGISTERED_HOME) ||
-				      (serviceStatus.psRegistrationStatus == REGISTRATION_STATUS_ROAMING_REGISTERED))) {
-					ALX_NET_TRACE_FORMAT("Cellular module registered\r\n");
+				    ((me->cellular.serviceStatus.psRegistrationStatus == REGISTRATION_STATUS_REGISTERED_HOME) ||
+				      (me->cellular.serviceStatus.psRegistrationStatus == REGISTRATION_STATUS_ROAMING_REGISTERED))) {
 					break;
 				}
 
@@ -570,46 +550,13 @@ Alx_Status AlxNet_Init(AlxNet *me)
 			}
 		}
 
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_ActivatePdn(CellularHandle, CellularContext);
 
-			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_FORMAT("Cellular_ActivatePdn failure %d\r\n", cellularStatus);
-			}
-		}
-
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_GetIPAddress(CellularHandle, CellularContext, localIP, sizeof(localIP));
-			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_FORMAT("Cellular_GetIPAddress failure %d\r\n", cellularStatus);
-			}
-		}
-
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_GetPdnStatus(CellularHandle, PdnStatusBuffers, (CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U), &NumStatus);
-			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_FORMAT("Cellular_GetPdnStatus failure %d\r\n", cellularStatus);
-			}
-		}
-
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			for (i = 0U; i < NumStatus; i++) {
-				if ((PdnStatusBuffers[i].contextId == CellularContext) && (PdnStatusBuffers[i].state == 1)) {
-					pdnStatus = true;
-					break;
-				}
-			}
-
-			if (pdnStatus == false) {
-				ALX_NET_TRACE_FORMAT("Cellular PDN is not activated <<<");
-			}
-		}
 
 		// Modems onboard TCPIP stack has DNS already set, so no need to set it here.
 
 		//if (cellularStatus == CELLULAR_SUCCESS)
 		//{
-		//	cellularStatus = Cellular_SetDns(CellularHandle, CellularContext, CELLULAR_DNS_IP);
+		//	cellularStatus = Cellular_SetDns(me->cellular.handle, CellularContext, CELLULAR_DNS_IP);
 		//
 		//	if (cellularStatus != CELLULAR_SUCCESS)
 		//	{
@@ -619,13 +566,9 @@ Alx_Status AlxNet_Init(AlxNet *me)
 		//
 		//}
 
-		if ((cellularStatus == CELLULAR_SUCCESS) && (pdnStatus == true)) {
-			ALX_NET_TRACE_FORMAT("Cellular module registered, IP address %s\r\n", localIP);
-		}
-		else {
+		if(cellularStatus != CELLULAR_SUCCESS) {
 			return Alx_Err;
 		}
-
 	}
 	#endif
 
@@ -638,34 +581,111 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 
-	AlxOsMutex_Lock(&me->alxMutex);
-	uint8_t temp;
-	uint32_t start = AlxTick_Get_ms(&alxTick);
-	do
+	#if defined(ALX_WIZNET)
+	if (me->config == AlxNet_Config_Wiznet)
 	{
-		if (ctlwizchip(CW_GET_PHYLINK, (void *)&temp) == -1)
+		AlxOsMutex_Lock(&me->alxMutex);
+		uint8_t temp;
+		uint32_t start = AlxTick_Get_ms(&alxTick);
+		do
 		{
-			ALX_NET_TRACE_FORMAT("Unknown PHY link status\r\n");
+			if (ctlwizchip(CW_GET_PHYLINK, (void *)&temp) == -1)
+			{
+				ALX_NET_TRACE_FORMAT("Unknown PHY link status\r\n");
+				AlxOsMutex_Unlock(&me->alxMutex);
+				return Alx_Err;
+			}
+			if (AlxTick_Get_ms(&alxTick) - start > CONNECT_TIMEOUT)
+			{
+				AlxOsMutex_Unlock(&me->alxMutex);
+				return Alx_ErrNumOfTries;
+			}
+		} while (temp == PHY_LINK_OFF);
+
+		uint8_t rx_tx_buff_sizes[] = { 2, 2, 2, 2, 2, 2, 2, 2 };
+		if (wizchip_init(rx_tx_buff_sizes, rx_tx_buff_sizes) != 0)
+		{
 			AlxOsMutex_Unlock(&me->alxMutex);
 			return Alx_Err;
 		}
-		if (AlxTick_Get_ms(&alxTick) - start > CONNECT_TIMEOUT)
-		{
-			AlxOsMutex_Unlock(&me->alxMutex);
-			return Alx_ErrNumOfTries;
-		}
-	} while (temp == PHY_LINK_OFF);
 
-	uint8_t rx_tx_buff_sizes[] = {2, 2, 2, 2, 2, 2, 2, 2};
-	if (wizchip_init(rx_tx_buff_sizes, rx_tx_buff_sizes) != 0)
-	{
+		me->isNetConnected = true;
 		AlxOsMutex_Unlock(&me->alxMutex);
-		return Alx_Err;
 	}
-	
-	me->isNetConnected = true;
-	AlxOsMutex_Unlock(&me->alxMutex);
-	
+	#endif
+
+	// Connect CELLULAR to PDN (Packet Data Network)
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		AlxOsMutex_Lock(&me->alxMutex);
+
+		CellularError_t cellularStatus = CELLULAR_SUCCESS;
+		me->cellular.cellularContext = CELLULAR_PDN_CONTEXT_ID;
+		char localIP[CELLULAR_IP_ADDRESS_MAX_SIZE] = { '\0' };
+		uint8_t NumStatus = 0;
+		bool pdnStatus = false;
+
+		CellularPdnConfig_t pdnConfig = { CELLULAR_PDN_CONTEXT_IPV4, CELLULAR_PDN_AUTH_NONE, CELLULAR_APN_NAME, "", "" };
+		CellularPdnStatus_t PdnStatusBuffers[CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U] = { 0 };
+
+		/* Setup the PDN config. */
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			cellularStatus = Cellular_SetPdnConfig(me->cellular.handle, me->cellular.cellularContext, &pdnConfig);
+
+			if (cellularStatus != CELLULAR_SUCCESS) {
+				ALX_NET_TRACE_FORMAT("Cellular_SetPdnConfig failure %d\r\n", cellularStatus);
+			}
+		}
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			cellularStatus = Cellular_ActivatePdn(me->cellular.handle, me->cellular.cellularContext);
+
+			if (cellularStatus != CELLULAR_SUCCESS) {
+				ALX_NET_TRACE_FORMAT("Cellular_ActivatePdn failure %d\r\n", cellularStatus);
+			}
+		}
+
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			cellularStatus = Cellular_GetIPAddress(me->cellular.handle, me->cellular.cellularContext, me->ip, sizeof(me->ip));
+			if (cellularStatus != CELLULAR_SUCCESS)
+			{
+				ALX_NET_TRACE_FORMAT("Cellular_GetIPAddress failure %d\r\n", cellularStatus);
+			}
+			else
+			{
+				ALX_NET_TRACE_FORMAT("Cellular: Got IP: %s\r\n", me->ip);
+			}
+		}
+
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			cellularStatus = Cellular_GetPdnStatus(me->cellular.handle, PdnStatusBuffers, (CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U), &NumStatus);
+			if (cellularStatus != CELLULAR_SUCCESS) {
+				ALX_NET_TRACE_FORMAT("Cellular_GetPdnStatus failure %d\r\n", cellularStatus);
+			}
+		}
+
+		if (cellularStatus == CELLULAR_SUCCESS) {
+			for (int i = 0U; i < NumStatus; i++) {
+				if ((PdnStatusBuffers[i].contextId == me->cellular.cellularContext) && (PdnStatusBuffers[i].state == 1)) {
+					pdnStatus = true;
+					break;
+				}
+			}
+
+			if (pdnStatus == false) {
+				ALX_NET_TRACE_FORMAT("Cellular PDN is not activated <<<");
+			}
+		}
+
+		if (pdnStatus != true || cellularStatus != CELLULAR_SUCCESS) {
+			AlxOsMutex_Unlock(&me->alxMutex);
+			return Alx_Err;
+		}
+
+		AlxOsMutex_Unlock(&me->alxMutex);
+	}
+#endif
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/W5500/w5500.h
 	// TODO detailed analysis
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -692,22 +712,44 @@ Alx_Status AlxNet_Disconnect(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
-	
-	AlxOsMutex_Lock(&me->alxMutex);
-	AlxIoPin_Reset(me->do_nRST); // Reset W5500
-	AlxDelay_ms(10);
-	AlxIoPin_Set(me->do_nRST);
-	AlxDelay_ms(10);
 
-	memset(me->mac, 0, sizeof(me->mac));
-	memset(me->ip, 0, sizeof(me->ip));
-	memset(me->netmask, 0, sizeof(me->netmask));
-	memset(me->gateway, 0, sizeof(me->gateway));
-	memset(me->mac, 0, sizeof(me->mac));
-	memset(me->dns, 0, sizeof(me->dns));
+	#if defined(ALX_WIZNET)
+	if (me->config == AlxNet_Config_Wiznet)
+	{
+		AlxOsMutex_Lock(&me->alxMutex);
+		AlxIoPin_Reset(me->do_nRST); // Reset W5500
+		AlxDelay_ms(10);
+		AlxIoPin_Set(me->do_nRST);
+		AlxDelay_ms(10);
 
-	me->isNetConnected = false;
-	AlxOsMutex_Unlock(&me->alxMutex);
+		memset(me->mac, 0, sizeof(me->mac));
+		memset(me->ip, 0, sizeof(me->ip));
+		memset(me->netmask, 0, sizeof(me->netmask));
+		memset(me->gateway, 0, sizeof(me->gateway));
+		memset(me->mac, 0, sizeof(me->mac));
+		memset(me->dns, 0, sizeof(me->dns));
+
+		me->isNetConnected = false;
+		AlxOsMutex_Unlock(&me->alxMutex);
+	}
+	#endif
+
+	// Connect CELLULAR to PDN (Packet Data Network)
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		CellularError_t cellularStatus = CELLULAR_SUCCESS;
+		AlxOsMutex_Lock(&me->alxMutex);
+
+		cellularStatus = Cellular_DeactivatePdn(me->cellular.handle, me->cellular.cellularContext);
+
+		if (cellularStatus != CELLULAR_SUCCESS) {
+			AlxOsMutex_Unlock(&me->alxMutex);
+			return Alx_Err;
+		}
+	}
+	#endif
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/W5500/w5500.h
 	// TODO detailed analysis
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -750,13 +792,13 @@ void AlxNet_SetMac(AlxNet* me, const char* mac)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(mac) == 17);
-		
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	str2mac(mac, wiz_net_info.mac);
 	strcpy(me->mac, mac);
 	setSHAR(wiz_net_info.mac);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/W5500/w5500.h
 	// TODO detailed analysis
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -790,7 +832,7 @@ void AlxNet_SetIp(AlxNet* me, const char* ip)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(ip) < sizeof(me->ip));
-	
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->ip, ip);
 	uint8_t addr[4];
@@ -803,7 +845,7 @@ void AlxNet_SetNetmask(AlxNet* me, const char* netmask)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(netmask) < sizeof(me->netmask));
-	
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->netmask, netmask);
 	uint8_t addr[4];
@@ -816,7 +858,7 @@ void AlxNet_SetGateway(AlxNet* me, const char* gateway)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(gateway) < sizeof(me->gateway));
-	
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->gateway, gateway);
 	uint8_t addr[4];
@@ -828,13 +870,13 @@ const char* AlxNet_GetMac(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
-		
+
 	uint8_t bin_mac[6];
 	AlxOsMutex_Lock(&me->alxMutex);
 	getSHAR(bin_mac);
 	mac2str(bin_mac, me->mac);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// Return
 	return me->mac;
 }
@@ -843,12 +885,23 @@ const char* AlxNet_GetIp(AlxNet* me)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 
-	uint8_t addr[4];
-	AlxOsMutex_Lock(&me->alxMutex);
-	getSIPR(addr);
-	ip2str(addr, me->ip);
-	AlxOsMutex_Unlock(&me->alxMutex);
-	
+	#if defined(ALX_WIZNET)
+	if(me->config == AlxNet_Config_Wiznet)
+	{
+		uint8_t addr[4];
+		AlxOsMutex_Lock(&me->alxMutex);
+		getSIPR(addr);
+		ip2str(addr, me->ip);
+		AlxOsMutex_Unlock(&me->alxMutex);
+	}
+	#endif
+
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	else if(me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		// If cellular, just return me->ip.
+	}
+	#endif
 	// Return
 	return me->ip;
 }
@@ -862,7 +915,7 @@ const char* AlxNet_GetNetmask(AlxNet* me)
 	getSIPR(addr);
 	ip2str(addr, me->netmask);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// Return
 	return me->netmask;
 }
@@ -876,7 +929,7 @@ const char* AlxNet_GetGateway(AlxNet* me)
 	getGAR(addr);
 	ip2str(addr, me->gateway);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// Return
 	return me->gateway;
 }
@@ -886,11 +939,11 @@ void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(dnsId < 4);
 	ALX_NET_ASSERT(strlen(ip) < sizeof(me->ip));
-	
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->dns[dnsId], ip);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DNS/dns.h
 	// int8_t DNS_run(uint8_t * dns_ip, uint8_t * name, uint8_t * ip_from_dns);
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -909,17 +962,17 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(hostname) < sizeof(dns_target_domain));
-	
-	AlxOsMutex_Lock(&me->alxMutex);	
+
+	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy((char *)dns_target_domain, hostname);
 	dns_retval = DnsTaskRunning;
 	AlxOsMutex_Unlock(&alxDnsMutex);
-	
+
 	while (dns_retval == DnsTaskRunning)
 	{
 		// timeout in DNS task
 	}
-	
+
 	switch (dns_retval)
 	{
 	case DnsTaskSuccess:
@@ -933,7 +986,7 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 		break;
 	}
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DNS/dns.h
 	// int8_t DNS_run(uint8_t * dns_ip, uint8_t * name, uint8_t * ip_from_dns);
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -972,7 +1025,7 @@ void AlxNet_Dhcp_Enable(AlxNet* me, bool enable)
 		}
 	}
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DHCP/dhcp.h
 	// TODO detailed analysis
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h

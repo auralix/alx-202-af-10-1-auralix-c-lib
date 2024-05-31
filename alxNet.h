@@ -101,6 +101,7 @@ typedef struct
 	CellularCommInterface_t * CommIntf; // UART interface
 	CellularSimCardStatus_t simStatus;
 	CellularServiceStatus_t serviceStatus;
+	uint8_t cellularContext;	// Cellular context id
 }AlxNet_Cellular;
 #endif
 
