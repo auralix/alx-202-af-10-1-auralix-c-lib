@@ -59,7 +59,7 @@
  */
 
 /* Uncomment to enable the overwrite-only code path. */
-/* #define MCUBOOT_OVERWRITE_ONLY */
+#define MCUBOOT_OVERWRITE_ONLY	// TV: Uncommented
 
 #ifdef MCUBOOT_OVERWRITE_ONLY
 /* Uncomment to only erase and overwrite those primary slot sectors needed
@@ -86,7 +86,7 @@
 /* Uncomment to use ARM's mbedTLS cryptographic primitives */
 /* #define MCUBOOT_USE_MBED_TLS */
 /* Uncomment to use Tinycrypt's. */
-/* #define MCUBOOT_USE_TINYCRYPT */
+#define MCUBOOT_USE_TINYCRYPT	// TV: Uncommented
 
 /*
  * Always check the signature of the image in the primary slot before booting,
@@ -101,11 +101,11 @@
 
 /* Uncomment if your flash map API supports flash_area_get_sectors().
  * See the flash APIs for more details. */
-/* #define MCUBOOT_USE_FLASH_AREA_GET_SECTORS */
+#define MCUBOOT_USE_FLASH_AREA_GET_SECTORS	// TV: Uncommented
 
 /* Default maximum number of flash sectors per image slot; change
  * as desirable. */
-#define MCUBOOT_MAX_IMG_SECTORS 128
+//#define MCUBOOT_MAX_IMG_SECTORS 128	// TV: Commented, shall be defined in alxBootConfigUsr.h
 
 /* Default number of separately updateable images; change in case of
  * multiple images. */
@@ -134,7 +134,7 @@
  *
  *    MCUBOOT_LOG_ERR > MCUBOOT_LOG_WRN > MCUBOOT_LOG_INF > MCUBOOT_LOG_DBG
  */
-#define MCUBOOT_HAVE_LOGGING 1
+//#define MCUBOOT_HAVE_LOGGING 1	// TV: Commented
 
 /*
  * Assertions
@@ -157,6 +157,7 @@
  * #define MCUBOOT_WATCHDOG_FEED()
  *    do { do watchdog feeding here! } while (0)
  */
+#define MCUBOOT_WATCHDOG_FEED()		// TV: Added
 
 /* If a OS ports support single thread mode or is bare-metal then:
  * This macro implements call that switches CPU to an idle state, from which
@@ -164,8 +165,10 @@
  *
  * Otherwise this macro should be no-op.
  */
-#define MCUBOOT_CPU_IDLE() \
-    do {                   \
-    } while (0)
+//#define MCUBOOT_CPU_IDLE() \	// TV: Commented
+//    do {                   \
+//    } while (0)
+
+#include "alxBootConfigUsr.h"	// TV: Added
 
 #endif /* __MCUBOOT_CONFIG_H__ */
