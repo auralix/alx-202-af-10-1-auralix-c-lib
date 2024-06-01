@@ -137,8 +137,7 @@
  *
  *    MCUBOOT_LOG_ERR > MCUBOOT_LOG_WRN > MCUBOOT_LOG_INF > MCUBOOT_LOG_DBG
  */
-#define MCUBOOT_HAVE_LOGGING 1
-#define MCUBOOT_LOG_LEVEL 4	// TV: Added
+//#define MCUBOOT_HAVE_LOGGING 1	// TV: Changed
 
 /*
  * Assertions

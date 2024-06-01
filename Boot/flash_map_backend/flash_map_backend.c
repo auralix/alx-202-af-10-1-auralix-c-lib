@@ -20,6 +20,7 @@
 #include "sysflash/sysflash.h"
 
 #include "alxGlobal_McuStm32F4.h"
+#include "alxTrace.h"
 
 #define FLASH_PAGE_SIZE (128 * 1024)
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
