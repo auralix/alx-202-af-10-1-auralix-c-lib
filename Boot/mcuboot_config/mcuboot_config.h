@@ -59,12 +59,12 @@
  */
 
 /* Uncomment to enable the overwrite-only code path. */
-#define MCUBOOT_OVERWRITE_ONLY
+/* #define MCUBOOT_OVERWRITE_ONLY */
 
 #ifdef MCUBOOT_OVERWRITE_ONLY
 /* Uncomment to only erase and overwrite those primary slot sectors needed
  * to install the new image, rather than the entire image slot. */
-//#define MCUBOOT_OVERWRITE_ONLY_FAST	// TV: Changed
+/* #define MCUBOOT_OVERWRITE_ONLY_FAST */
 #endif
 
 /* Uncomment to enable the direct-xip code path. */
@@ -86,7 +86,7 @@
 /* Uncomment to use ARM's mbedTLS cryptographic primitives */
 /* #define MCUBOOT_USE_MBED_TLS */
 /* Uncomment to use Tinycrypt's. */
-#define MCUBOOT_USE_TINYCRYPT
+/* #define MCUBOOT_USE_TINYCRYPT */
 
 /*
  * Always check the signature of the image in the primary slot before booting,
@@ -101,18 +101,15 @@
 
 /* Uncomment if your flash map API supports flash_area_get_sectors().
  * See the flash APIs for more details. */
-#define MCUBOOT_USE_FLASH_AREA_GET_SECTORS
+/* #define MCUBOOT_USE_FLASH_AREA_GET_SECTORS */
 
 /* Default maximum number of flash sectors per image slot; change
  * as desirable. */
-#define MCUBOOT_MAX_IMG_SECTORS 7	// TV: Changed
+#define MCUBOOT_MAX_IMG_SECTORS 128
 
 /* Default number of separately updateable images; change in case of
  * multiple images. */
 #define MCUBOOT_IMAGE_NUMBER 1
-
-/* Uncomment if there is only one slot. */
-/* #define MCUBOOT_SINGLE_APPLICATION_SLOT 1 */
 
 /*
  * Logging
@@ -137,7 +134,7 @@
  *
  *    MCUBOOT_LOG_ERR > MCUBOOT_LOG_WRN > MCUBOOT_LOG_INF > MCUBOOT_LOG_DBG
  */
-//#define MCUBOOT_HAVE_LOGGING 1	// TV: Changed
+#define MCUBOOT_HAVE_LOGGING 1
 
 /*
  * Assertions
@@ -160,9 +157,6 @@
  * #define MCUBOOT_WATCHDOG_FEED()
  *    do { do watchdog feeding here! } while (0)
  */
-#define MCUBOOT_WATCHDOG_FEED()                                                                    \
-	do {                                                                                       \
-	} while (0)
 
 /* If a OS ports support single thread mode or is bare-metal then:
  * This macro implements call that switches CPU to an idle state, from which
@@ -170,41 +164,8 @@
  *
  * Otherwise this macro should be no-op.
  */
-#define MCUBOOT_CPU_IDLE()                                                                         \
-	do {                                                                                       \
-	} while (0)
-
-/*
- * Currently there is no configuration option, for this platform,
- * that enables the system specific mcumgr commands in mcuboot
- */
-#define MCUBOOT_PERUSER_MGMT_GROUP_ENABLED 0
-
-/*
- * Serial recovery
- */
-
-/* Uncomment to enable serial recovery. */
-//#define MCUBOOT_SERIAL	// TV: Changed
-
-#ifdef MCUBOOT_SERIAL
-/* Uncomment to wait for a DFU command on the serial port before
- * continuing with the boot process. */
-#define MCUBOOT_SERIAL_WAIT_FOR_DFU
-#define MCUBOOT_SERIAL_WAIT_FOR_DFU_TIMEOUT 2000
-
-/* Uncomment to enable serial recovery in the bootloader. */
-#define MCUBOOT_SERIAL_RECOVERY
-#endif
-
-/*
- * The option enables code, currently in boot_serial, that attempts
- * to erase flash progressively, as update fragments are received,
- * instead of erasing whole image size of flash area after receiving
- * first frame.
- * Enabling this options prevents stalling the beginning of transfer
- * for the time needed to erase large chunk of flash.
- */
-/* #define MCUBOOT_ERASE_PROGRESSIVELY */
+#define MCUBOOT_CPU_IDLE() \
+    do {                   \
+    } while (0)
 
 #endif /* __MCUBOOT_CONFIG_H__ */

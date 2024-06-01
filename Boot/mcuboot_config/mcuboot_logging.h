@@ -24,12 +24,3 @@
   * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
   ******************************************************************************
   **/
-
-//******************************************************************************
-// Include Guard
-//******************************************************************************
-#ifndef ALX_MCU_BOOT_LOGGING_H
-#define ALX_MCU_BOOT_LOGGING_H
-
-
-#endif	// #ifndef ALX_MCU_BOOT_LOGGING_H
