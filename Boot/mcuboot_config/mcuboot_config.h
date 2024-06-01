@@ -64,7 +64,7 @@
 #ifdef MCUBOOT_OVERWRITE_ONLY
 /* Uncomment to only erase and overwrite those primary slot sectors needed
  * to install the new image, rather than the entire image slot. */
-#define MCUBOOT_OVERWRITE_ONLY_FAST
+//#define MCUBOOT_OVERWRITE_ONLY_FAST	// TV: Changed
 #endif
 
 /* Uncomment to enable the direct-xip code path. */
@@ -105,7 +105,7 @@
 
 /* Default maximum number of flash sectors per image slot; change
  * as desirable. */
-#define MCUBOOT_MAX_IMG_SECTORS 64
+#define MCUBOOT_MAX_IMG_SECTORS 7	// TV: Changed
 
 /* Default number of separately updateable images; change in case of
  * multiple images. */
@@ -138,6 +138,7 @@
  *    MCUBOOT_LOG_ERR > MCUBOOT_LOG_WRN > MCUBOOT_LOG_INF > MCUBOOT_LOG_DBG
  */
 #define MCUBOOT_HAVE_LOGGING 1
+#define MCUBOOT_LOG_LEVEL 4	// TV: Added
 
 /*
  * Assertions
@@ -185,7 +186,7 @@
  */
 
 /* Uncomment to enable serial recovery. */
-#define MCUBOOT_SERIAL
+//#define MCUBOOT_SERIAL	// TV: Changed
 
 #ifdef MCUBOOT_SERIAL
 /* Uncomment to wait for a DFU command on the serial port before

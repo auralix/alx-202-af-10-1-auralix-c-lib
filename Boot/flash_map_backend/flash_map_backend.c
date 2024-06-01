@@ -19,22 +19,18 @@
 #include "flash_map_backend/flash_map_backend.h"
 #include "sysflash/sysflash.h"
 
-#include "main.h"
+#include "alxGlobal_McuStm32F4.h"
 
-#ifdef MCUBOOT_SINGLE_APPLICATION_SLOT
-#define BOOTLOADER_SIZE (28 * 1024)
-#define IMAGE_SIZE      (100 * 1024)
-#define SCRATCH_SIZE    (0 * 1024)
-#else
-#define BOOTLOADER_SIZE (28 * 1024)
-#define IMAGE_SIZE      (48 * 1024)
-#define SCRATCH_SIZE    (4 * 1024)
-#endif
-
+#define FLASH_PAGE_SIZE (128 * 1024)
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+#define MCUBOOT_LOG_DBG(_fmt, ...) do{AlxTrace_WriteFormat(&alxTrace, _fmt "\r\n", ##__VA_ARGS__);} while (false)
+#define BOOTLOADER_SIZE (128 * 1024)
+#define IMAGE_SIZE      (896 * 1024)
 #define BOOTLOADER_OFFSET      (FLASH_BASE)
-#define IMAGE_PRIMARY_OFFSET   (BOOTLOADER_OFFSET + BOOTLOADER_SIZE)
-#define IMAGE_SECONDARY_OFFSET (IMAGE_PRIMARY_OFFSET + IMAGE_SIZE)
-#define SCRATCH_OFFSET         (IMAGE_SECONDARY_OFFSET + IMAGE_SIZE)
+#define IMAGE_PRIMARY_OFFSET   (0x08020000UL)
+#define IMAGE_SECONDARY_OFFSET (0x08120000UL)
+#define FLASH_AREA_BOOTLOADER 255
+#define FLASH_DEVICE_INTERNAL_FLASH 0
 
 static const struct flash_area bootloader = {
 	.fa_id = FLASH_AREA_BOOTLOADER,
@@ -44,31 +40,25 @@ static const struct flash_area bootloader = {
 };
 
 static const struct flash_area primary_img = {
-	.fa_id = FLASH_AREA_IMAGE_0_PRIMARY,
+	.fa_id = PRIMARY_ID,	// TV: Changed
 	.fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
 	.fa_off = IMAGE_PRIMARY_OFFSET,
 	.fa_size = IMAGE_SIZE,
 };
 
 static const struct flash_area secondary_img = {
-	.fa_id = FLASH_AREA_IMAGE_0_SECONDARY,
+	.fa_id = SECONDARY_ID,	// TV: Changed
 	.fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
 	.fa_off = IMAGE_SECONDARY_OFFSET,
 	.fa_size = IMAGE_SIZE,
 };
 
-static const struct flash_area scratch_img = {
-	.fa_id = FLASH_AREA_IMAGE_SCRATCH,
-	.fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
-	.fa_off = SCRATCH_OFFSET,
-	.fa_size = SCRATCH_SIZE,
-};
+// static const struct flash_area scratch_img = {	// TV: Removed
 
 static const struct flash_area *s_flash_areas[] = {
 	&bootloader,
 	&primary_img,
-	&secondary_img,
-	&scratch_img,
+	&secondary_img	// TV: Changed
 };
 
 static uint32_t prv_get_flash_page(uint32_t addr)
@@ -76,18 +66,32 @@ static uint32_t prv_get_flash_page(uint32_t addr)
 	return (addr - FLASH_BASE) / FLASH_PAGE_SIZE;
 }
 
-static bool prv_flash_erase(uint32_t addr, uint32_t len)
+static bool prv_flash_erase(uint32_t addr, uint32_t len)	// TV: Changed
 {
-	uint32_t first_page = prv_get_flash_page(addr);
-	uint32_t last_page = prv_get_flash_page(addr + len - 1);
-	uint32_t nb_pages = last_page - first_page + 1;
+	uint32_t first_page = 0;
+	uint32_t last_page = 0;
+	uint32_t nb_pages = 0;
+
+	if (addr < 0x08100000)
+	{
+		first_page = prv_get_flash_page(addr) + 4;
+		last_page = prv_get_flash_page(addr + len - 1) + 4;
+		nb_pages = last_page - first_page + 1;
+	}
+	else
+	{
+		first_page = prv_get_flash_page(addr) + 8;
+		last_page = prv_get_flash_page(addr + len - 1) + 8;
+		nb_pages = last_page - first_page + 1;
+	}
 
 	uint32_t page_error = 0;
 	FLASH_EraseInitTypeDef erase_init = {
-		.TypeErase = FLASH_TYPEERASE_PAGES,
-		.Banks = FLASH_BANK_1,
-		.Page = first_page,
-		.NbPages = nb_pages,
+		.TypeErase = FLASH_TYPEERASE_SECTORS,
+		.Banks = ALX_NULL,
+		.Sector = first_page,
+		.NbSectors = nb_pages,
+		.VoltageRange = FLASH_VOLTAGE_RANGE_3,
 	};
 
 	HAL_FLASH_Unlock();
@@ -101,17 +105,17 @@ static bool prv_flash_erase(uint32_t addr, uint32_t len)
 	return true;
 }
 
-static bool prv_flash_write(uint32_t addr, const void *src, uint32_t len)
+static bool prv_flash_write(uint32_t addr, const void *src, uint32_t len)	// TV: Changed
 {
 	HAL_StatusTypeDef status;
-	uint64_t double_word;
+	uint32_t word;
 
 	HAL_FLASH_Unlock();
 
-	for (uint32_t i = 0; i < len; i += sizeof(uint64_t)) {
+	for (uint32_t i = 0; i < len; i += sizeof(uint32_t)) {
 
-		memcpy(&double_word, src + i, sizeof(uint64_t));
-		status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, addr + i, double_word);
+		memcpy(&word, src + i, sizeof(uint32_t));
+		status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr + i, word);
 
 		if (status != HAL_OK) {
 			BOOT_LOG_ERR("%s: HAL_FLASH_Program failed", __func__);
@@ -142,16 +146,7 @@ static const struct flash_area *prv_lookup_flash_area(uint8_t id)
 	return NULL;
 }
 
-int flash_device_base(uint8_t fd_id, uintptr_t *ret)
-{
-	if (fd_id != FLASH_DEVICE_INTERNAL_FLASH) {
-		BOOT_LOG_ERR("invalid flash ID %d; expected %d", fd_id,
-			     FLASH_DEVICE_INTERNAL_FLASH);
-		return -1;
-	}
-	*ret = 0;
-	return 0;
-}
+// int flash_device_base(uint8_t fd_id, uintptr_t *ret)		// TV: Removed
 
 int flash_area_open(uint8_t id, const struct flash_area **fa)
 {
@@ -298,4 +293,10 @@ int flash_area_id_from_multi_image_slot(int image_index, int slot)
 int flash_area_id_from_image_slot(int slot)
 {
 	return flash_area_id_from_multi_image_slot(0, slot);
+}
+
+int flash_area_id_to_multi_image_slot(int image_index, int area_id)		// TV: Added
+{
+	// TV: TODO
+	return -1;
 }

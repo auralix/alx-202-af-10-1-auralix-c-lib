@@ -20,6 +20,7 @@
 #define __MCUBOOT_LOGGING_H__
 
 #include <stdio.h>
+#include "alxTrace.h"	// TV: Added
 
 #define MCUBOOT_LOG_LEVEL_OFF     0
 #define MCUBOOT_LOG_LEVEL_ERROR   1
@@ -42,7 +43,7 @@
 #if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_ERROR
 #define MCUBOOT_LOG_ERR(_fmt, ...)                                                                 \
 	do {                                                                                       \
-		printf("[ERR] " _fmt "\r\n", ##__VA_ARGS__);                                       \
+		AlxTrace_WriteFormat(&alxTrace, "[ERR] " _fmt "\r\n", ##__VA_ARGS__);	/* TV: Changed */                                     \
 	} while (0)
 #else
 #define MCUBOOT_LOG_ERR(...) IGNORE(__VA_ARGS__)
@@ -51,7 +52,7 @@
 #if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_WARNING
 #define MCUBOOT_LOG_WRN(_fmt, ...)                                                                 \
 	do {                                                                                       \
-		printf("[WRN] " _fmt "\r\n", ##__VA_ARGS__);                                       \
+		AlxTrace_WriteFormat(&alxTrace, "[WRN] " _fmt "\r\n", ##__VA_ARGS__);	/* TV: Changed */                                       \
 	} while (0)
 #else
 #define MCUBOOT_LOG_WRN(...) IGNORE(__VA_ARGS__)
@@ -60,7 +61,7 @@
 #if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_INFO
 #define MCUBOOT_LOG_INF(_fmt, ...)                                                                 \
 	do {                                                                                       \
-		printf("[INF] " _fmt "\r\n", ##__VA_ARGS__);                                       \
+		AlxTrace_WriteFormat(&alxTrace, "[INF] " _fmt "\r\n", ##__VA_ARGS__);	/* TV: Changed */                                       \
 	} while (0)
 #else
 #define MCUBOOT_LOG_INF(...) IGNORE(__VA_ARGS__)
