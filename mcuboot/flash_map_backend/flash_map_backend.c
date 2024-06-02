@@ -36,7 +36,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_MCU_BOOT)
 
 
 //******************************************************************************
@@ -394,67 +394,121 @@ static bool prv_flash_read(uint32_t addr, void* dst, uint32_t len)
 }
 static bool prv_flash_write(uint32_t addr, const void* src, uint32_t len)
 {
-	HAL_StatusTypeDef status;
-	uint32_t word;
-
+	// Unlock FLASH
 	HAL_FLASH_Unlock();
 
-	for (uint32_t i = 0; i < len; i += sizeof(uint32_t))
-	{
-		memcpy(&word, src + i, sizeof(uint32_t));
-		status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr + i, word);
+	// Clear all FLASH flags
+	#if defined(ALX_STM32F4)
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_PGPERR |
+		FLASH_FLAG_PGSERR |
+		FLASH_FLAG_RDERR |
+		FLASH_FLAG_BSY
+	);
+	#endif
 
+	// Loop
+	#if defined(ALX_STM32F4)
+	for (uint32_t i = 0; i < len; i = i + sizeof(uint32_t))
+	{
+		// Prepare
+		uint32_t data = 0;
+		memcpy(&data, src + i, sizeof(uint32_t));
+
+		// Write
+		HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr + i, data);
 		if (status != HAL_OK)
 		{
+			// Trace
 			ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: HAL_FLASH_Program failed\r\n", __func__);
+
+			// Lock FLASH
 			HAL_FLASH_Lock();
+
+			// Return
 			return false;
 		}
 	}
+	#endif
 
+	// Lock FLASH
 	HAL_FLASH_Lock();
+
+	// Return
 	return true;
 }
 static bool prv_flash_erase(uint32_t addr, uint32_t len)
 {
-	uint32_t first_page = 0;
-	uint32_t last_page = 0;
-	uint32_t nb_pages = 0;
+	// Unlock FLASH
+	HAL_FLASH_Unlock();
 
+	// Clear all FLASH flags
+	#if defined(ALX_STM32F4)
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_PGPERR |
+		FLASH_FLAG_PGSERR |
+		FLASH_FLAG_RDERR |
+		FLASH_FLAG_BSY
+	);
+	#endif
+
+	// Prepare
+	#if defined(ALX_STM32F4)
+	uint32_t firstSector = 0;
+	uint32_t lastSector = 0;
+	uint32_t numOfSectorsToErase = 0;
 	if (addr < 0x08100000)
 	{
-		first_page = prv_get_flash_page(addr) + 4;
-		last_page = prv_get_flash_page(addr + len - 1) + 4;
-		nb_pages = last_page - first_page + 1;
+		firstSector = prv_get_flash_page(addr) + 4;
+		lastSector = prv_get_flash_page(addr + len - 1) + 4;
+		numOfSectorsToErase = lastSector - firstSector + 1;
 	}
 	else
 	{
-		first_page = prv_get_flash_page(addr) + 8;
-		last_page = prv_get_flash_page(addr + len - 1) + 8;
-		nb_pages = last_page - first_page + 1;
+		firstSector = prv_get_flash_page(addr) + 8;
+		lastSector = prv_get_flash_page(addr + len - 1) + 8;
+		numOfSectorsToErase = lastSector - firstSector + 1;
 	}
-
-	uint32_t page_error = 0;
-	FLASH_EraseInitTypeDef erase_init =
+	FLASH_EraseInitTypeDef eraseInitStruct =
 	{
 		.TypeErase = FLASH_TYPEERASE_SECTORS,
 		.Banks = ALX_NULL,
-		.Sector = first_page,
-		.NbSectors = nb_pages,
+		.Sector = firstSector,
+		.NbSectors = numOfSectorsToErase,
 		.VoltageRange = FLASH_VOLTAGE_RANGE_3,
 	};
+	uint32_t sectorError = 0;
+	#endif
 
-	HAL_FLASH_Unlock();
-	if (HAL_FLASHEx_Erase(&erase_init, &page_error) != HAL_OK)
+	// Erase
+	if (HAL_FLASHEx_Erase(&eraseInitStruct, &sectorError) != HAL_OK)
 	{
-		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: HAL_FLASHEx_Erase failed error: %d\r\n", __func__, (int)page_error);
+		// Trace
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: HAL_FLASHEx_Erase failed error: %d\r\n", __func__, (int)sectorError);
+
+		// Lock FLASH
 		HAL_FLASH_Lock();
+
+		// Return
 		return false;
 	}
 
+	// Lock FLASH
 	HAL_FLASH_Lock();
+
+	// Return
 	return true;
 }
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_MCU_BOOT)

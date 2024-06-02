@@ -105,7 +105,7 @@
 
 /* Default maximum number of flash sectors per image slot; change
  * as desirable. */
-//#define MCUBOOT_MAX_IMG_SECTORS 128	// TV: Commented, shall be defined in alxBootConfigUsr.h
+//#define MCUBOOT_MAX_IMG_SECTORS 128	// TV: Commented, shall be defined in mcuboot_config_usr.h
 
 /* Default number of separately updateable images; change in case of
  * multiple images. */
