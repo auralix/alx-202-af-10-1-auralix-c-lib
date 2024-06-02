@@ -53,6 +53,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 //#define ALX_PC
 #define ALX_NEWLIB_NANO
+//#define ALX_MCU_BOOT
 //#define ALX_CMSIS_DSP
 //#define ALX_FREE_RTOS
 //#define ALX_FREE_RTOS_CELLULAR
@@ -437,6 +438,9 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Trace
 //------------------------------------------------------------------------------
+
+// ALX - BOOT
+#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_ENABLE
 
 // ALX - EXT
 #define ALX_ADAU1961_TRACE_ENABLE
