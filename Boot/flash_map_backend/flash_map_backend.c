@@ -69,12 +69,6 @@
 // Private Defines
 //******************************************************************************
 #define ALX_MCU_BOOT_FLASH_DEVICE_ID 0
-#define FLASH_PAGE_SIZE (128 * 1024)
-#define BOOTLOADER_SIZE (128 * 1024)
-#define IMAGE_SIZE      (896 * 1024)
-#define BOOTLOADER_OFFSET      (FLASH_BASE)
-#define IMAGE_PRIMARY_OFFSET   (0x08020000UL)
-#define IMAGE_SECONDARY_OFFSET (0x08120000UL)
 
 
 //******************************************************************************
@@ -84,22 +78,22 @@ static const struct flash_area bootloader =
 {
 	.fa_id = 255,
 	.fa_device_id = ALX_MCU_BOOT_FLASH_DEVICE_ID,
-	.fa_off = BOOTLOADER_OFFSET,
-	.fa_size = BOOTLOADER_SIZE,
+	.fa_off = ALX_MCU_BOOT_BOOTLOADER_OFFSET,
+	.fa_size = ALX_MCU_BOOT_BOOTLOADER_SIZE,
 };
 static const struct flash_area primary_img =
 {
 	.fa_id = PRIMARY_ID,
 	.fa_device_id = ALX_MCU_BOOT_FLASH_DEVICE_ID,
-	.fa_off = IMAGE_PRIMARY_OFFSET,
-	.fa_size = IMAGE_SIZE,
+	.fa_off = ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET,
+	.fa_size = ALX_MCU_BOOT_IMAGE_SIZE,
 };
 static const struct flash_area secondary_img =
 {
 	.fa_id = SECONDARY_ID,
 	.fa_device_id = ALX_MCU_BOOT_FLASH_DEVICE_ID,
-	.fa_off = IMAGE_SECONDARY_OFFSET,
-	.fa_size = IMAGE_SIZE,
+	.fa_off = ALX_MCU_BOOT_IMAGE_SECONDARY_OFFSET,
+	.fa_size = ALX_MCU_BOOT_IMAGE_SIZE,
 };
 static const struct flash_area* s_flash_areas[] =
 {
@@ -231,7 +225,7 @@ int flash_area_erase(const struct flash_area* fap, uint32_t off, uint32_t len)
 	{
 		return -1;
 	}
-	if ((len % FLASH_PAGE_SIZE) != 0 || (off % FLASH_PAGE_SIZE) != 0)
+	if ((len % ALX_MCU_BOOT_FLASH_SECTOR_SIZE) != 0 || (off % ALX_MCU_BOOT_FLASH_SECTOR_SIZE) != 0)
 	{
 		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Not aligned on sector Offset: 0x%x Length: 0x%x\r\n", __func__, (int)off, (int)len);
 		return -1;
@@ -310,7 +304,7 @@ int flash_area_get_sectors(int fa_id, uint32_t* count, struct flash_sector* sect
 	//------------------------------------------------------------------------------
 	// Get
 	//------------------------------------------------------------------------------
-	const size_t sector_size = FLASH_PAGE_SIZE;
+	const size_t sector_size = ALX_MCU_BOOT_FLASH_SECTOR_SIZE;
 	uint32_t total_count = 0;
 	for (size_t off = 0; off < fa->fa_size; off = off + sector_size)
 	{
@@ -371,7 +365,7 @@ static uint32_t prv_get_flash_page(uint32_t addr)
 {
 	// TV: Copied from: https://github.com/hcd-bdltd/stm32g4-mcuboot/blob/68c9c7d36feb7a70120a7f94f6ddd3e6907c8a23/boot/src/flash_map_backend/flash_map_backend.c
 
-	return (addr - FLASH_BASE) / FLASH_PAGE_SIZE;
+	return (addr - FLASH_BASE) / ALX_MCU_BOOT_FLASH_SECTOR_SIZE;
 }
 static const struct flash_area* prv_lookup_flash_area(uint8_t id)
 {

@@ -49,7 +49,7 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// ALX - Global - C/C++
+// ALX - Global
 //------------------------------------------------------------------------------
 //#define ALX_PC
 #define ALX_NEWLIB_NANO
@@ -65,7 +65,18 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// ALX - ID - C/C++
+// ALX - BOOT - MCUboot FLASH Map Backend Module
+//------------------------------------------------------------------------------
+//#define ALX_MCU_BOOT_FLASH_SECTOR_SIZE		(128 * 1024)
+//#define ALX_MCU_BOOT_BOOTLOADER_SIZE		(128 * 1024)
+//#define ALX_MCU_BOOT_IMAGE_SIZE				(896 * 1024)
+//#define ALX_MCU_BOOT_BOOTLOADER_OFFSET		(0x08000000)
+//#define ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET	(0x08020000)
+//#define ALX_MCU_BOOT_IMAGE_SECONDARY_OFFSET	(0x08120000)
+
+
+//------------------------------------------------------------------------------
+// ALX - ID
 //------------------------------------------------------------------------------
 
 // FW - Language C
@@ -129,7 +140,7 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// ALX - MCU - IO Pin IRQ - C/C++
+// ALX - MCU - IO Pin IRQ
 //------------------------------------------------------------------------------
 //#define ALX_IO_PIN_IRQ_HANDLERS_OFF
 
