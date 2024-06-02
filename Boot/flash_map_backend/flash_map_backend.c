@@ -161,7 +161,7 @@ int flash_area_read(const struct flash_area* fap, uint32_t off, void* dst, uint3
 	// Read
 	//------------------------------------------------------------------------------
 	const uint32_t addr = fap->fa_off + off;
-	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);
+//	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
 	bool success = prv_flash_read(addr, dst, len);
 	if (!success)
 	{
@@ -199,7 +199,7 @@ int flash_area_write(const struct flash_area* fap, uint32_t off, const void* src
 	// Write
 	//------------------------------------------------------------------------------
 	const uint32_t addr = fap->fa_off + off;
-	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);
+//	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
 	bool success = prv_flash_write(addr, src, len);
 	if (!success)
 	{
@@ -236,7 +236,7 @@ int flash_area_erase(const struct flash_area* fap, uint32_t off, uint32_t len)
 	// Erase
 	//------------------------------------------------------------------------------
 	const uint32_t addr = fap->fa_off + off;
-	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);
+//	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
 	bool success = prv_flash_erase(addr, len);
 	if (!success)
 	{
