@@ -1,6 +1,6 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxBootConfigUsr.h
+  * @file		mcuboot_config_usr.h
   * @brief		Auralix C Library - ALX MCUboot Configuration File - User
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_BOOT_CONFIG_USR_H
-#define ALX_BOOT_CONFIG_USR_H
+#ifndef __MCUBOOT_CONFIG_USR_H__
+#define __MCUBOOT_CONFIG_USR_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,10 +40,11 @@ extern "C" {
 // Configuration
 //******************************************************************************
 #define MCUBOOT_MAX_IMG_SECTORS 7
+#define MCUBOOT_LOG_LEVEL 4
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_BOOT_CONFIG_USR_H
+#endif	// #ifndef __MCUBOOT_CONFIG_USR_H__

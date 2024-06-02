@@ -134,7 +134,7 @@
  *
  *    MCUBOOT_LOG_ERR > MCUBOOT_LOG_WRN > MCUBOOT_LOG_INF > MCUBOOT_LOG_DBG
  */
-//#define MCUBOOT_HAVE_LOGGING 1	// TV: Commented
+#define MCUBOOT_HAVE_LOGGING 1
 
 /*
  * Assertions
@@ -169,6 +169,6 @@
 //    do {                   \
 //    } while (0)
 
-#include "alxBootConfigUsr.h"	// TV: Added
+#include "mcuboot_config_usr.h"	// TV: Added
 
 #endif /* __MCUBOOT_CONFIG_H__ */
