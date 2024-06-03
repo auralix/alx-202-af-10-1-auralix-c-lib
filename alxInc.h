@@ -89,6 +89,7 @@ extern "C" {
 #include "alxAudioVol.h"
 #include "alxAvg.h"
 #include "alxBool.h"
+#include "alxBoot.h"
 #include "alxBound.h"
 #include "alxBuild.h"
 #include "alxCanParser.h"

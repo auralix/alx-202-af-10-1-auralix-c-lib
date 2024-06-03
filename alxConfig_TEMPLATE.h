@@ -198,6 +198,9 @@ extern "C" {
 //// AlxTrace
 //#define ALX_WDT_ASSERT_BKPT_ENABLE
 //
+//// ALX - mcuboot
+//#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT_BKPT_ENABLE
+//
 //// ALX
 //// AlxAssert
 //#define ALX_AUDIO_ASSERT_BKPT_ENABLE
@@ -205,6 +208,7 @@ extern "C" {
 //#define ALX_AUDIO_VOL_ASSERT_BKPT_ENABLE
 //#define ALX_AVG_ASSERT_BKPT_ENABLE
 //#define ALX_BOOL_ASSERT_BKPT_ENABLE
+//#define ALX_BOOT_ASSERT_BKPT_ENABLE
 //#define ALX_BOUND_ASSERT_BKPT_ENABLE
 //// AlxBuild
 //#define ALX_CAN_PARSER_ASSERT_BKPT_ENABLE
@@ -293,6 +297,9 @@ extern "C" {
 //// AlxTrace
 //#define ALX_WDT_ASSERT_TRACE_ENABLE
 //
+//// ALX - mcuboot
+//#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT_TRACE_ENABLE
+//
 //// ALX
 //// AlxAssert
 //#define ALX_AUDIO_ASSERT_TRACE_ENABLE
@@ -300,6 +307,7 @@ extern "C" {
 //#define ALX_AUDIO_VOL_ASSERT_TRACE_ENABLE
 //#define ALX_AVG_ASSERT_TRACE_ENABLE
 //#define ALX_BOOL_ASSERT_TRACE_ENABLE
+//#define ALX_BOOT_ASSERT_TRACE_ENABLE
 //#define ALX_BOUND_ASSERT_TRACE_ENABLE
 //// AlxBuild
 //#define ALX_CAN_PARSER_ASSERT_TRACE_ENABLE
@@ -388,6 +396,9 @@ extern "C" {
 // AlxTrace
 #define ALX_WDT_ASSERT_RST_ENABLE
 
+// ALX - mcuboot
+#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT_RST_ENABLE
+
 // ALX
 // AlxAssert
 #define ALX_AUDIO_ASSERT_RST_ENABLE
@@ -395,6 +406,7 @@ extern "C" {
 #define ALX_AUDIO_VOL_ASSERT_RST_ENABLE
 #define ALX_AVG_ASSERT_RST_ENABLE
 #define ALX_BOOL_ASSERT_RST_ENABLE
+#define ALX_BOOT_ASSERT_RST_ENABLE
 #define ALX_BOUND_ASSERT_RST_ENABLE
 // AlxBuild
 #define ALX_CAN_PARSER_ASSERT_RST_ENABLE
@@ -450,9 +462,6 @@ extern "C" {
 // Trace
 //------------------------------------------------------------------------------
 
-// ALX - BOOT
-#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_ENABLE
-
 // ALX - EXT
 #define ALX_ADAU1961_TRACE_ENABLE
 #define ALX_ADS8678_TRACE_ENABLE
@@ -486,6 +495,9 @@ extern "C" {
 // AlxTrace
 #define ALX_WDT_TRACE_ENABLE
 
+// ALX - mcuboot
+#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_ENABLE
+
 // ALX
 // AlxAssert
 #define ALX_AUDIO_TRACE_ENABLE
@@ -493,6 +505,7 @@ extern "C" {
 #define ALX_AUDIO_VOL_TRACE_ENABLE
 #define ALX_AVG_TRACE_ENABLE
 #define ALX_BOOL_TRACE_ENABLE
+#define ALX_BOOT_TRACE_ENABLE
 #define ALX_BOUND_TRACE_ENABLE
 // AlxBuild
 #define ALX_CAN_PARSER_TRACE_ENABLE
