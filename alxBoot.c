@@ -62,7 +62,7 @@ void AlxBoot_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxBoot_PrepareApp(AlxBoot* me)
+Alx_Status AlxBoot_Prepare(AlxBoot* me)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -141,7 +141,7 @@ Alx_Status AlxBoot_PrepareApp(AlxBoot* me)
 	// Return
 	return Alx_Ok;
 }
-void AlxBoot_JumpToApp(AlxBoot* me)
+void AlxBoot_Jump(AlxBoot* me)
 {
 	//------------------------------------------------------------------------------
 	// Assert
