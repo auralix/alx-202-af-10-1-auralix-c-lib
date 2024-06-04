@@ -67,12 +67,13 @@ extern "C" {
 //------------------------------------------------------------------------------
 // ALX - BOOT - MCUboot FLASH Map Backend Module
 //------------------------------------------------------------------------------
-//#define ALX_MCU_BOOT_FLASH_SECTOR_SIZE		(128 * 1024)
-//#define ALX_MCU_BOOT_BOOTLOADER_SIZE		(128 * 1024)
-//#define ALX_MCU_BOOT_IMAGE_SIZE				(896 * 1024)
-//#define ALX_MCU_BOOT_BOOTLOADER_OFFSET		(0x08000000)
-//#define ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET	(0x08020000)
-//#define ALX_MCU_BOOT_IMAGE_SECONDARY_OFFSET	(0x08120000)
+//#define ALX_MCU_BOOT_FLASH_DEVICE_ID 0
+//#define ALX_MCU_BOOT_FLASH_SECTOR_SIZE (128*1024)
+//#define ALX_MCU_BOOT_BOOTLOADER_SIZE (128*1024)
+//#define ALX_MCU_BOOT_IMAGE_SIZE (896*1024)
+//#define ALX_MCU_BOOT_BOOTLOADER_OFFSET (0x08000000)
+//#define ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET (0x08020000)
+//#define ALX_MCU_BOOT_IMAGE_SECONDARY_OFFSET (0x08120000)
 
 
 //------------------------------------------------------------------------------

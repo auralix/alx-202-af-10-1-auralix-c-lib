@@ -86,9 +86,14 @@ typedef struct
 	// Parameters
 
 	// Variables
+	struct boot_rsp rsp;
+	uint32_t addrVt;
+	uint32_t addrMsp;
+	uint32_t addrJmp;
 
 	// Info
 	bool wasCtorCalled;
+	bool isAppPrepared;
 } AlxBoot;
 
 
@@ -104,7 +109,8 @@ void AlxBoot_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxBoot_Run(AlxBoot* me);
+Alx_Status AlxBoot_PrepareApp(AlxBoot* me);
+void AlxBoot_JumpToApp(AlxBoot* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
