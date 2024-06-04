@@ -82,10 +82,6 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Defines
-
-	// Parameters
-
 	// Variables
 	struct boot_rsp rsp;
 	uint32_t addrVt;
@@ -94,7 +90,7 @@ typedef struct
 
 	// Info
 	bool wasCtorCalled;
-	bool isAppPrepared;
+	bool isPrepared;
 } AlxBoot;
 
 

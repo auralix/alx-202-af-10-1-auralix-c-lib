@@ -80,8 +80,6 @@ void AlxBoot_Ctor
 	AlxBoot* me
 )
 {
-	// Parameters
-
 	// Variables
 	memset(&me->rsp, 0, sizeof(me->rsp));
 	me->addrVt = 0;
@@ -90,7 +88,7 @@ void AlxBoot_Ctor
 
 	// Info
 	me->wasCtorCalled = true;
-	me->isAppPrepared = false;
+	me->isPrepared = false;
 }
 
 
@@ -103,20 +101,22 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_BOOT_ASSERT(me->wasCtorCalled == true);
-	ALX_BOOT_ASSERT(me->isAppPrepared == false);
+	ALX_BOOT_ASSERT(me->isPrepared == false);
 
 
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
 	ALX_BOOT_TRACE_FORMAT("\r\n");
-	ALX_BOOT_TRACE_FORMAT("AlxBoot - PrepareApp started\r\n");
-	ALX_BOOT_TRACE_FORMAT("\r\n");
+	ALX_BOOT_TRACE_FORMAT("AlxBoot - Prepare START\r\n");
 
 
 	//------------------------------------------------------------------------------
 	// Execute boot_go
 	//------------------------------------------------------------------------------
+
+	// Trace
+	ALX_BOOT_TRACE_FORMAT("AlxBoot - boot_go START\r\n");
 
 	// Execute
 	fih_ret status = boot_go(&me->rsp);
@@ -134,8 +134,7 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	}
 
 	// Trace
-	ALX_BOOT_TRACE_FORMAT("\r\n");
-	ALX_BOOT_TRACE_FORMAT("AlxBoot - boot_go OK\r\n");
+	ALX_BOOT_TRACE_FORMAT("AlxBoot - boot_go FINISH\r\n");
 	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_magic = 0x%08lX\r\n", me->rsp.br_hdr->ih_magic);
 	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_load_addr = 0x%08lX\r\n", me->rsp.br_hdr->ih_load_addr);
 	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_hdr_size = 0x%04lX\r\n", me->rsp.br_hdr->ih_hdr_size);
@@ -160,7 +159,6 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	me->addrJmp = *(volatile uint32_t*)(me->addrVt + 4);
 
 	// Trace
-	ALX_BOOT_TRACE_FORMAT("AlxBoot - App address set\r\n");
 	ALX_BOOT_TRACE_FORMAT("- addrVt = 0x%08lX\r\n", me->addrVt);
 	ALX_BOOT_TRACE_FORMAT("- addrMsp = 0x%08lX\r\n", me->addrMsp);
 	ALX_BOOT_TRACE_FORMAT("- addrJmp = 0x%08lX\r\n", me->addrJmp);
@@ -170,8 +168,11 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	// Return
 	//------------------------------------------------------------------------------
 
+	// Trace
+	ALX_BOOT_TRACE_FORMAT("AlxBoot - Prepare FINISH, ready to jump to application\r\n");
+
 	// Set isInit
-	me->isAppPrepared = true;
+	me->isPrepared = true;
 
 	// Return
 	return Alx_Ok;
@@ -182,7 +183,7 @@ void AlxBoot_Jump(AlxBoot* me)
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_BOOT_ASSERT(me->wasCtorCalled == true);
-	ALX_BOOT_ASSERT(me->isAppPrepared == true);
+	ALX_BOOT_ASSERT(me->isPrepared == true);
 
 
 	//------------------------------------------------------------------------------
