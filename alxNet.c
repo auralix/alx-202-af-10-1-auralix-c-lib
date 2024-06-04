@@ -965,29 +965,42 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(hostname) < sizeof(dns_target_domain));
 
-	AlxOsMutex_Lock(&me->alxMutex);
-	strcpy((char *)dns_target_domain, hostname);
-	dns_retval = DnsTaskRunning;
-	AlxOsMutex_Unlock(&alxDnsMutex);
-
-	while (dns_retval == DnsTaskRunning)
+	if (me->config == AlxNet_Config_Wiznet)
 	{
-		// timeout in DNS task
+		AlxOsMutex_Lock(&me->alxMutex);
+		strcpy((char *)dns_target_domain, hostname);
+		dns_retval = DnsTaskRunning;
+		AlxOsMutex_Unlock(&alxDnsMutex);
+
+		while (dns_retval == DnsTaskRunning)
+		{
+			// timeout in DNS task
+		}
+
+		switch (dns_retval)
+		{
+		case DnsTaskSuccess:
+			ip2str(dns_response_ip, ip);
+			AlxOsMutex_Unlock(&me->alxMutex);
+			return Alx_Ok;
+		case DnsTaskTimeout:
+			AlxOsMutex_Unlock(&me->alxMutex);
+			return Alx_ErrNumOfTries;
+		default:
+			break;
+		}
+		AlxOsMutex_Unlock(&me->alxMutex);
 	}
 
-	switch (dns_retval)
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-	case DnsTaskSuccess:
-		ip2str(dns_response_ip, ip);
-		AlxOsMutex_Unlock(&me->alxMutex);
-		return Alx_Ok;
-	case DnsTaskTimeout:
-		AlxOsMutex_Unlock(&me->alxMutex);
-		return Alx_ErrNumOfTries;
-	default:
-		break;
+		CellularError_t ret;
+		ret = Cellular_GetHostByName(me->cellular.handle, me->cellular.cellularContext, hostname, ip);
+		if (ret != CELLULAR_SUCCESS) return Alx_Err;
+		else return Alx_Ok;
 	}
-	AlxOsMutex_Unlock(&me->alxMutex);
+	#endif
 
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DNS/dns.h
 	// int8_t DNS_run(uint8_t * dns_ip, uint8_t * name, uint8_t * ip_from_dns);
