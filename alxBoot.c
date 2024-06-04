@@ -162,6 +162,7 @@ void AlxBoot_JumpToApp(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	void(*pf)(void) = (void(*)(void))(me->addrJmp);	// Cast jump address to function pointer
 	__disable_irq();								// Disable global interrupts
+	SCB->VTOR = (uint32_t)me->addrVt;
 	__set_MSP(me->addrMsp);							// Set app's stack pointer
 	(*pf)();										// Dereference function pointer, jumps to addrJmp address, there is located app's Reset Handler address.
 													// Compiler automatically handles, that the real jump address is odd number, so it automatically adds +1 to addrJmp,
