@@ -747,6 +747,8 @@ Alx_Status AlxNet_Disconnect(AlxNet* me)
 			AlxOsMutex_Unlock(&me->alxMutex);
 			return Alx_Err;
 		}
+
+		AlxOsMutex_Unlock(&me->alxMutex);
 	}
 	#endif
 

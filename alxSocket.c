@@ -79,6 +79,10 @@ void AlxSocket_Ctor
 	}
 	me->timeout = SOCKET_DEFAULT_TIMEOUT;
 
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	// Cannot perform any return value check here
+	me->cellular_socket.event_group = xEventGroupCreate();
+	#endif
 	// Info
 	me->wasCtorCalled = true;
 	me->isOpened = false;
@@ -116,7 +120,40 @@ static uint16_t wiz_any_port(void)
 	if(port_number++ == 0xFFF0) port_number = 0xc000;
 	return port_number;
 }
+//******************************************************************************
+// Static Cellular Functions
+//******************************************************************************
+#if defined(ALX_FREE_RTOS_CELLULAR)
 
+static void CellularSocketOpenCallback( CellularUrcEvent_t urcEvent,
+	CellularSocketHandle_t socketHandle,
+	void * pCallbackContext)
+{
+	UNUSED(socketHandle);
+	if (pCallbackContext == NULL) return;
+	AlxSocket *me = (AlxSocket*)(pCallbackContext);
+	me->cellular_socket.URC_error = urcEvent;
+	xEventGroupSetBits(me->cellular_socket.event_group, EVENT_BITS_SOCKET_CONNECT);
+}
+
+static void CellularSocketCloseCallback(CellularSocketHandle_t socketHandle,
+	void * pCallbackContext)
+{
+	UNUSED(socketHandle);
+	if (pCallbackContext == NULL) return;
+	AlxSocket *me = (AlxSocket*)(pCallbackContext);
+	xEventGroupSetBits(me->cellular_socket.event_group, EVENT_BITS_SOCKET_CLOSE);
+}
+
+static void CellularSocketDataReadyCallback(CellularSocketHandle_t socketHandle,
+	void * pCallbackContext)
+{
+	UNUSED(socketHandle);
+	if (pCallbackContext == NULL) return;
+	AlxSocket *me = (AlxSocket*)(pCallbackContext);
+	xEventGroupSetBits(me->cellular_socket.event_group, EVENT_BITS_SOCKET_DATA_READY);
+}
+#endif
 //******************************************************************************
 // Functions
 //******************************************************************************
@@ -177,6 +214,7 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
 	{
+		int ret = Alx_Ok;
 		CellularError_t cellularStatus = CELLULAR_SUCCESS;
 		CellularSocketProtocol_t socket_protocol;
 
@@ -194,13 +232,48 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 			return Alx_Err;
 		}
 
-		cellularStatus = Cellular_CreateSocket(me->alxNet->cellular.handle, me->alxNet->cellular.cellularContext, CELLULAR_SOCKET_DOMAIN_AF_INET, CELLULAR_SOCKET_TYPE_DGRAM, socket_protocol, &me->cellular_socket.socket);
+		cellularStatus = Cellular_CreateSocket(me->alxNet->cellular.handle,
+												me->alxNet->cellular.cellularContext,
+												CELLULAR_SOCKET_DOMAIN_AF_INET,
+												CELLULAR_SOCKET_TYPE_DGRAM,
+												socket_protocol,
+												&me->cellular_socket.socket);
 		if (cellularStatus == CELLULAR_SUCCESS)
 		{
 			me->protocol = protocol;
 			me->cellular_socket.protocol = socket_protocol;
 		}
+
+		cellularStatus = Cellular_SocketRegisterSocketOpenCallback(me->alxNet->cellular.handle,
+																	me->cellular_socket.socket,
+																	&CellularSocketOpenCallback,
+																	me);
+		if (cellularStatus != CELLULAR_SUCCESS)
+		{
+			return Alx_Err;
+		}
+
+		cellularStatus = Cellular_SocketRegisterClosedCallback(me->alxNet->cellular.handle,
+																me->cellular_socket.socket,
+																&CellularSocketCloseCallback,
+																me);
+		if (cellularStatus != CELLULAR_SUCCESS)
+		{
+			return Alx_Err;
+		}
+
+		cellularStatus = Cellular_SocketRegisterDataReadyCallback(me->alxNet->cellular.handle,
+																	me->cellular_socket.socket,
+																	&CellularSocketDataReadyCallback,
+																	me);
+		if (cellularStatus != CELLULAR_SUCCESS)
+		{
+			return Alx_Err;
+		}
+
+		return ret;
 	}
+	#endif
 
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// int8_t  socket(uint8_t sn, uint8_t protocol, uint16_t port, uint8_t flag);
@@ -242,6 +315,16 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 		me->socket_data.wiz_socket = -1;
 		return Alx_Ok;
 	}
+
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		if (NULL == me->cellular_socket.socket) return Alx_Err;
+		CellularError_t cellularStatus = CELLULAR_SUCCESS;
+		cellularStatus = Cellular_SocketClose(me->alxNet->cellular.handle, me->cellular_socket.socket);
+		if (cellularStatus == CELLULAR_SUCCESS) return Alx_Ok;
+	}
+	#endif
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// int8_t  disconnect(uint8_t sn); -> First FIN packet for TCP
 	// int8_t  close(uint8_t sn); -> Then standard close
@@ -290,6 +373,44 @@ Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port)
 		}
 		return Alx_Ok;
 	}
+
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		if (NULL == me->cellular_socket.socket) return Alx_Err;
+		if (NULL == ip) return Alx_Err;
+
+		strncpy(me->cellular_socket.sockAddr.ipAddress.ipAddress, ip, CELLULAR_IP_ADDRESS_MAX_SIZE + 1);
+		me->cellular_socket.sockAddr.ipAddress.ipAddressType = CELLULAR_IP_ADDRESS_V4;
+		me->cellular_socket.sockAddr.port = port;
+
+		if (me->protocol == AlxSocket_Protocol_Tcp)
+		{
+			CellularError_t cellularStatus = CELLULAR_SUCCESS;
+			cellularStatus = Cellular_SocketConnect(me->alxNet->cellular.handle,
+													me->cellular_socket.socket,
+													CELLULAR_ACCESSMODE_BUFFER,
+													&me->cellular_socket.sockAddr);
+
+			EventBits_t socketConnectBits;
+			socketConnectBits = xEventGroupWaitBits(me->cellular_socket.event_group, EVENT_BITS_SOCKET_CONNECT, true, false, pdMS_TO_TICKS(me->timeout));
+			if (socketConnectBits & EVENT_BITS_SOCKET_CONNECT)
+			{
+				if (me->cellular_socket.URC_error != CELLULAR_URC_SOCKET_OPENED)
+				{
+					return Alx_Err;
+				}
+			}
+			else
+			{
+				// TIMEOUT occured
+				return Alx_Err;
+			}
+		}
+
+		return Alx_Ok;
+	}
+	#endif
 	//socket(me->socket_data.wiz_socket, me->socket_data.wiz_protocol, 0, 0)
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// int8_t  connect(uint8_t sn, uint8_t * addr, uint16_t port);

@@ -100,12 +100,19 @@ typedef struct
 } AlxWizSocketData;
 
 #if defined(ALX_FREE_RTOS_CELLULAR)
+
+// Event group bits
+#define EVENT_BITS_SOCKET_CONNECT		0x01
+#define EVENT_BITS_SOCKET_DATA_READY	0x02
+#define EVENT_BITS_SOCKET_CLOSE			0x04
+
 typedef struct
 {
 	CellularSocketHandle_t socket;
 	CellularSocketProtocol_t protocol;
-	uint8_t dst_ip[4];
-	uint16_t dst_port;
+	EventGroupHandle_t event_group;	// event group used to dispatch events from cellular callbacks
+	CellularUrcEvent_t URC_error;	// Unsolicited return code from cellular stack
+	CellularSocketAddress_t sockAddr;
 	uint16_t my_port;
 	bool cellular_sock_opened;
 	int backlog;
