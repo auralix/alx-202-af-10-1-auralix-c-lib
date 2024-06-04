@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_MCU_BOOT)
 
 
 //******************************************************************************
@@ -113,7 +113,7 @@ Alx_Status AlxBoot_PrepareApp(AlxBoot* me);
 void AlxBoot_JumpToApp(AlxBoot* me);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_MCU_BOOT)
 
 #ifdef __cplusplus
 }

@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_MCU_BOOT)
 
 
 //******************************************************************************
@@ -163,4 +163,4 @@ void AlxBoot_JumpToApp(AlxBoot* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_MCU_BOOT)
