@@ -98,7 +98,20 @@ typedef struct
 	bool wiz_sock_opened;
 	int backlog;
 } AlxWizSocketData;
-	
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+typedef struct
+{
+	CellularSocketHandle_t socket;
+	CellularSocketProtocol_t protocol;
+	uint8_t dst_ip[4];
+	uint16_t dst_port;
+	uint16_t my_port;
+	bool cellular_sock_opened;
+	int backlog;
+}AlxCellularSocketData;
+#endif
+
 typedef struct
 {
 	// Defines
@@ -109,14 +122,17 @@ typedef struct
 	AlxNet* alxNet;
 	AlxSocket_Protocol protocol;
 	AlxWizSocketData socket_data;
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	AlxCellularSocketData cellular_socket;
+	#endif
 	uint32_t timeout;
-	
+
 	// Info
 	bool wasCtorCalled;
 	bool isOpened;
 } AlxSocket;
 
-	
+
 //******************************************************************************
 // Constructor
 //******************************************************************************
