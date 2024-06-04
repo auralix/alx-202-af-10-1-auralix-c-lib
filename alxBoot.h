@@ -42,6 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxId.h"
 
 
 //******************************************************************************

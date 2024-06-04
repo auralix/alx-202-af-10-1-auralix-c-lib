@@ -38,6 +38,41 @@
 
 
 //******************************************************************************
+// Private Variables
+//******************************************************************************
+static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
+{
+	.magicNum = ALX_ID_BOOT_ID_MAGIC_NUM,
+	.ver = ALX_ID_BOOT_ID_VER,
+	.fwBoot =
+	{
+		.build =
+		{
+			.name = ALX_BUILD_NAME,
+			.date = ALX_BUILD_DATE,
+			.dateComp = ALX_BUILD_DATE_COMP,
+			.num = ALX_BUILD_NUM,
+			.hash = ALX_BUILD_HASH,
+			.hashShort = ALX_BUILD_HASH_SHORT,
+			.hashShortUint32 = ALX_BUILD_HASH_SHORT_UINT32,
+			.rev = ALX_BUILD_REV
+		},
+		.artf = ALX_BOOT_ID_FW_ARTF,
+		.name = ALX_BOOT_ID_FW_NAME,
+		.verMajor = ALX_BUILD_FW_VER_MAJOR,
+		.verMinor = ALX_BUILD_FW_VER_MINOR,
+		.verPatch = ALX_BUILD_FW_VER_PATCH,
+		.isBuildJobUsed = true,
+		.verDate = 0,	// Will be set by AlxId
+		.ver = 0,		// Will be set by AlxId
+		.verStr = "",	// Will be set by AlxId
+		.binStr = ""	// Will be set by AlxId
+	},
+	.crc = 0			// For future use
+};
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxBoot_Ctor
