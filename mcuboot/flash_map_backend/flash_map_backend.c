@@ -485,6 +485,7 @@ static bool prv_flash_erase(uint32_t addr, uint32_t len)
 	#endif
 
 	// Erase
+	#if defined(ALX_STM32F4)
 	if (HAL_FLASHEx_Erase(&eraseInitStruct, &sectorError) != HAL_OK)
 	{
 		// Trace
@@ -496,6 +497,7 @@ static bool prv_flash_erase(uint32_t addr, uint32_t len)
 		// Return
 		return false;
 	}
+	#endif
 
 	// Lock FLASH
 	HAL_FLASH_Lock();
