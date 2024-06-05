@@ -189,12 +189,36 @@ void AlxBoot_Jump(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	// Jump
 	//------------------------------------------------------------------------------
-	void(*fp)(void) = (void(*)(void))(me->addrJmp);	// Cast jump address to function pointer
-	__disable_irq();								// Disable global interrupts
-	SCB->VTOR = (uint32_t)me->addrVt;				// Set Vector Table Offset Register to the app's vector table address
-	__set_MSP(me->addrMsp);							// Set app's stack pointer
-	(*fp)();										// Dereference function pointer, jumps to addrJmp address, there is located app's Reset Handler address
-													// Compiler automatically handles, that the real jump address is odd number, so it automatically adds +1 to addrJmp, this is needed for all ARM Cortex-M series processor (for THUMB instruction execution)
+
+	// Disable global IRQ
+	__disable_irq();
+
+	// Disable all NVIC IRQ
+	for (uint32_t i = 0; i < ALX_ARR_LEN(NVIC->ICER); i++)
+	{
+		NVIC->ICER[i] = 0xFFFFFFFF;
+	}
+
+	// Clear all pending NVIC IRQ
+	for (uint32_t i = 0; i < ALX_ARR_LEN(NVIC->ICPR); i++)
+	{
+		NVIC->ICPR[i] = 0xFFFFFFFF;
+	}
+
+	// Set VTOR to the app's vector table address
+	SCB->VTOR = (uint32_t)me->addrVt;
+
+	// Set app's stack pointer
+	__set_MSP(me->addrMsp);
+
+	// Ensure that app starts in privileged mode and uses MSP
+	__set_CONTROL(0x00);
+
+	// Ensure that all previous ARM's core register changes are completed
+	__ISB();
+
+	// Jump to app's reset handler
+	((void(*)(void))me->addrJmp)();	// Cast jump address to function pointer & then execute it - Compiler automatically handles, that the real jump address is odd number, so it automatically adds +1 to addrJmp, this is needed for all ARM Cortex-M series processor (for THUMB instruction execution)
 }
 
 
