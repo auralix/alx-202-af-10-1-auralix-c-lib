@@ -114,10 +114,10 @@ static const struct flash_area* s_flash_areas[] =
 // Private Functions
 //******************************************************************************
 static uint32_t prv_get_flash_page(uint32_t addr);
-static const struct flash_area* prv_lookup_flash_area(uint8_t id);
-static bool prv_flash_read(uint32_t addr, void* dst, uint32_t len);
-static bool prv_flash_write(uint32_t addr, const void* src, uint32_t len);
-static bool prv_flash_erase(uint32_t addr, uint32_t len);
+static const struct flash_area* Flash_GetArea(uint8_t id);
+static bool Flash_Read(uint32_t addr, void* dst, uint32_t len);
+static bool Flash_Write(uint32_t addr, const void* src, uint32_t len);
+static bool Flash_Erase(uint32_t addr, uint32_t len);
 
 
 //******************************************************************************
@@ -131,7 +131,7 @@ int flash_area_open(uint8_t id, const struct flash_area** fapp)
 	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: ID=%d\r\n", __func__, (int)id);
 
 	// Get
-	const struct flash_area* area = prv_lookup_flash_area(id);
+	const struct flash_area* area = Flash_GetArea(id);
 
 	// Return
 	*fapp = area;
@@ -169,7 +169,7 @@ int flash_area_read(const struct flash_area* fap, uint32_t off, void* dst, uint3
 	//------------------------------------------------------------------------------
 	const uint32_t addr = fap->fa_off + off;
 //	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
-	bool success = prv_flash_read(addr, dst, len);
+	bool success = Flash_Read(addr, dst, len);
 	if (!success)
 	{
 		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Flash read failed\r\n", __func__);
@@ -207,7 +207,7 @@ int flash_area_write(const struct flash_area* fap, uint32_t off, const void* src
 	//------------------------------------------------------------------------------
 	const uint32_t addr = fap->fa_off + off;
 //	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
-	bool success = prv_flash_write(addr, src, len);
+	bool success = Flash_Write(addr, src, len);
 	if (!success)
 	{
 		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Flash write failed\r\n", __func__);
@@ -244,7 +244,7 @@ int flash_area_erase(const struct flash_area* fap, uint32_t off, uint32_t len)
 	//------------------------------------------------------------------------------
 	const uint32_t addr = fap->fa_off + off;
 //	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
-	bool success = prv_flash_erase(addr, len);
+	bool success = Flash_Erase(addr, len);
 	if (!success)
 	{
 		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Flash erase failed\r\n", __func__);
@@ -301,7 +301,7 @@ int flash_area_get_sectors(int fa_id, uint32_t* count, struct flash_sector* sect
 	//------------------------------------------------------------------------------
 	// Check
 	//------------------------------------------------------------------------------
-	const struct flash_area* fa = prv_lookup_flash_area(fa_id);
+	const struct flash_area* fa = Flash_GetArea(fa_id);
 	if (fa->fa_device_id != ALX_MCU_BOOT_FLASH_DEVICE_ID)
 	{
 		return -1;
@@ -374,7 +374,7 @@ static uint32_t prv_get_flash_page(uint32_t addr)
 
 	return (addr - FLASH_BASE) / ALX_MCU_BOOT_FLASH_SECTOR_SIZE;
 }
-static const struct flash_area* prv_lookup_flash_area(uint8_t id)
+static const struct flash_area* Flash_GetArea(uint8_t id)
 {
 	// TV: Copied from: https://github.com/hcd-bdltd/stm32g4-mcuboot/blob/68c9c7d36feb7a70120a7f94f6ddd3e6907c8a23/boot/src/flash_map_backend/flash_map_backend.c
 
@@ -389,7 +389,7 @@ static const struct flash_area* prv_lookup_flash_area(uint8_t id)
 
 	return NULL;
 }
-static bool prv_flash_read(uint32_t addr, void* dst, uint32_t len)
+static bool Flash_Read(uint32_t addr, void* dst, uint32_t len)
 {
 	// TV: Copied from: https://github.com/hcd-bdltd/stm32g4-mcuboot/blob/68c9c7d36feb7a70120a7f94f6ddd3e6907c8a23/boot/src/flash_map_backend/flash_map_backend.c
 
@@ -399,7 +399,7 @@ static bool prv_flash_read(uint32_t addr, void* dst, uint32_t len)
 	// Return
 	return true;
 }
-static bool prv_flash_write(uint32_t addr, const void* src, uint32_t len)
+static bool Flash_Write(uint32_t addr, const void* src, uint32_t len)
 {
 	//------------------------------------------------------------------------------
 	// Unlock FLASH
@@ -484,7 +484,7 @@ static bool prv_flash_write(uint32_t addr, const void* src, uint32_t len)
 	//------------------------------------------------------------------------------
 	return true;
 }
-static bool prv_flash_erase(uint32_t addr, uint32_t len)
+static bool Flash_Erase(uint32_t addr, uint32_t len)
 {
 	//------------------------------------------------------------------------------
 	// Unlock FLASH
