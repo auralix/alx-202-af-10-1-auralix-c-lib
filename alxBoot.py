@@ -82,7 +82,7 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 
 	# Run imgtool
 	cmd = (r"python {imgtoolPath} sign"
-		r" --header-size 0x200"
+		r" --header-size {headerLenStr}"
 		r" --pad-header"
 		r" --slot-size {imgSlotLenHexStr}"
 		r" --version {fwVerMajor}.{fwVerMinor}.{fwVerPatch}+{date}"
@@ -90,6 +90,7 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 		r" {binPathIn}"
 		r" {binPathOut}").format(
 		imgtoolPath=imgtoolPath,
+		headerLenStr=headerLenStr,
 		imgSlotLenHexStr=imgSlotLenHexStr,
 		fwVerMajor=fwVerMajor,
 		fwVerMinor=fwVerMinor,
