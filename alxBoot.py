@@ -35,7 +35,7 @@ import subprocess
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
+def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	# Print
 	print("")
 	print("alxBoot.py - START")
@@ -52,7 +52,7 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 	fwVerMinor = inFileLines[12][31:]
 	fwVerPatch = inFileLines[13][31:]
 
-	# Set lenghts
+	# Set lengths
 	bootLen = int(bootLenHexStr, 16)
 	headerLenStr = r'0x0200'	# 512 bytes
 	trailerLenStr =  r'0x0028'	# 40 bytes
@@ -84,13 +84,13 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 	cmd = (r"python {imgtoolPath} sign"
 		r" --header-size 0x200"
 		r" --pad-header"
-		r" --slot-size {imgSlotSize}"
+		r" --slot-size {imgSlotLenHexStr}"
 		r" --version {fwVerMajor}.{fwVerMinor}.{fwVerPatch}+{date}"
 		r" --pad"
 		r" {binPathIn}"
 		r" {binPathOut}").format(
 		imgtoolPath=imgtoolPath,
-		imgSlotSize=imgSlotSize,
+		imgSlotLenHexStr=imgSlotLenHexStr,
 		fwVerMajor=fwVerMajor,
 		fwVerMinor=fwVerMinor,
 		fwVerPatch=fwVerPatch,
@@ -151,8 +151,8 @@ static const unsigned char app_trailer[{trailerLenStr}] __attribute__((section("
 if __name__ == "__main__":
 	# Prepare
 	vsTargetPath = sys.argv[1]
-	imgSlotSize = sys.argv[2]
-	bootSize = sys.argv[3]
+	imgSlotLenHexStr = sys.argv[2]
+	bootLenHexStr = sys.argv[3]
 
 	# Script
-	Script(vsTargetPath, imgSlotSize, bootSize)
+	Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr)
