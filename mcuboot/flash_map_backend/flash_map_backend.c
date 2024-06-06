@@ -72,6 +72,10 @@
 #define HAL_FLASH_PROGRAM_TYPE FLASH_TYPEPROGRAM_WORD
 #define HAL_FLASH_PROGRAM_LEN 4
 #endif
+#if defined(ALX_STM32L4)
+#define HAL_FLASH_PROGRAM_TYPE FLASH_TYPEPROGRAM_DOUBLEWORD
+#define HAL_FLASH_PROGRAM_LEN 8
+#endif
 
 
 //******************************************************************************
@@ -404,7 +408,7 @@ static bool prv_flash_write(uint32_t addr, const void* src, uint32_t len)
 
 
 	//------------------------------------------------------------------------------
-	// Clear All FLASH Flags
+	// Clear FLASH Flags
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F4)
 	__HAL_FLASH_CLEAR_FLAG
@@ -418,6 +422,29 @@ static bool prv_flash_write(uint32_t addr, const void* src, uint32_t len)
 		FLASH_FLAG_RDERR |
 		FLASH_FLAG_BSY
 	);
+	#endif
+	#if defined(ALX_STM32L4)
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_PROGERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_SIZERR |
+		FLASH_FLAG_PGSERR |
+		FLASH_FLAG_MISERR |
+		FLASH_FLAG_FASTERR |
+		FLASH_FLAG_RDERR |
+		FLASH_FLAG_OPTVERR |
+		FLASH_FLAG_BSY |
+		FLASH_FLAG_ECCC |
+		FLASH_FLAG_ECCD
+	);
+	if (__HAL_FLASH_GET_FLAG(FLASH_FLAG_PEMPTY) != 0)
+	{
+		__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_PEMPTY);
+	}
 	#endif
 
 
@@ -459,10 +486,15 @@ static bool prv_flash_write(uint32_t addr, const void* src, uint32_t len)
 }
 static bool prv_flash_erase(uint32_t addr, uint32_t len)
 {
+	//------------------------------------------------------------------------------
 	// Unlock FLASH
+	//------------------------------------------------------------------------------
 	HAL_FLASH_Unlock();
 
-	// Clear all FLASH flags
+
+	//------------------------------------------------------------------------------
+	// Clear FLASH Flags
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F4)
 	__HAL_FLASH_CLEAR_FLAG
 	(
@@ -476,12 +508,40 @@ static bool prv_flash_erase(uint32_t addr, uint32_t len)
 		FLASH_FLAG_BSY
 	);
 	#endif
+	#if defined(ALX_STM32L4)
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_PROGERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_SIZERR |
+		FLASH_FLAG_PGSERR |
+		FLASH_FLAG_MISERR |
+		FLASH_FLAG_FASTERR |
+		FLASH_FLAG_RDERR |
+		FLASH_FLAG_OPTVERR |
+		FLASH_FLAG_BSY |
+		FLASH_FLAG_ECCC |
+		FLASH_FLAG_ECCD
+	);
+	if (__HAL_FLASH_GET_FLAG(FLASH_FLAG_PEMPTY) != 0)
+	{
+		__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_PEMPTY);
+	}
+	#endif
 
+
+	//------------------------------------------------------------------------------
 	// Prepare
-	#if defined(ALX_STM32F4)
+	//------------------------------------------------------------------------------
 	uint32_t firstSector = 0;
 	uint32_t lastSector = 0;
 	uint32_t numOfSectorsToErase = 0;
+	FLASH_EraseInitTypeDef eraseInitStruct = {};
+	uint32_t sectorError = 0;
+	#if defined(ALX_STM32F4)
 	if (addr < 0x08100000)
 	{
 		firstSector = prv_get_flash_page(addr) + 4;
@@ -494,19 +554,20 @@ static bool prv_flash_erase(uint32_t addr, uint32_t len)
 		lastSector = prv_get_flash_page(addr + len - 1) + 8;
 		numOfSectorsToErase = lastSector - firstSector + 1;
 	}
-	FLASH_EraseInitTypeDef eraseInitStruct =
-	{
-		.TypeErase = FLASH_TYPEERASE_SECTORS,
-		.Banks = ALX_NULL,
-		.Sector = firstSector,
-		.NbSectors = numOfSectorsToErase,
-		.VoltageRange = FLASH_VOLTAGE_RANGE_3,
-	};
-	uint32_t sectorError = 0;
+	eraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
+	eraseInitStruct.Banks = ALX_NULL;
+	eraseInitStruct.Sector = firstSector;
+	eraseInitStruct.NbSectors = numOfSectorsToErase;
+	eraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+	#endif
+	#if defined(ALX_STM32L4)
+	// TODO
 	#endif
 
-	// Erase
-	#if defined(ALX_STM32F4)
+
+	//------------------------------------------------------------------------------
+	// Erase FLASH
+	//------------------------------------------------------------------------------
 	if (HAL_FLASHEx_Erase(&eraseInitStruct, &sectorError) != HAL_OK)
 	{
 		// Trace
@@ -518,12 +579,17 @@ static bool prv_flash_erase(uint32_t addr, uint32_t len)
 		// Return
 		return false;
 	}
-	#endif
 
+
+	//------------------------------------------------------------------------------
 	// Lock FLASH
+	//------------------------------------------------------------------------------
 	HAL_FLASH_Lock();
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return true;
 }
 
