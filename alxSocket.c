@@ -440,6 +440,13 @@ Alx_Status AlxSocket_Bind(AlxSocket* me, uint16_t port)
 		me->socket_data.my_port = port;
 		return Alx_Ok;
 	}
+
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return AlxNet_NotSupported;
+	}
+	#endif
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// * There are @b bind() and @b accept() functions in @b Berkeley SOCKET API but, not in @b WIZnet SOCKET API. Because socket() of WIZnet is not only creating a SOCKET but also binding a local port number, ...
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -484,6 +491,13 @@ Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog)
 		}
 		return Alx_Ok;
 	}
+
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return AlxNet_NotSupported;
+	}
+	#endif
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// int8_t  listen(uint8_t sn);
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -552,6 +566,13 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 		}
 		return NULL;
 	}
+
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return NULL;
+	}
+	#endif
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// * There are @b bind() and @b accept() functions in @b Berkeley SOCKET API but, not in @b WIZnet SOCKET API. Because socket() of WIZnet is not only creating a SOCKET but also binding a local port number, ...
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -648,6 +669,46 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 		}
 		return SOCK_ERROR;
 	}
+
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		if (NULL == me->cellular_socket.socket) return 0;
+		CellularError_t cellularStatus = CELLULAR_SUCCESS;
+		uint32_t sent_length = 0;
+		uint32_t sent_total = 0;
+
+		switch (me->protocol)
+		{
+		case AlxSocket_Protocol_Tcp:
+		case AlxSocket_Protocol_Tls:
+			while (1)
+			{
+				cellularStatus = Cellular_SocketSend(me->alxNet->cellular.handle, me->cellular_socket.socket, data + sent_total, len - sent_total, &sent_length);
+				if (cellularStatus != CELLULAR_SUCCESS) return 0;
+
+				if (sent_length <= 0)
+				{
+					return sent_length;
+				}
+
+				sent_total += sent_length;
+				if (sent_total >= len)
+				{
+					break;
+				}
+				SOCKET_YIELD();
+			}
+
+			return sent_total;
+
+		case AlxSocket_Protocol_Udp:
+			return 0;
+		default:
+			break;
+		}
+	}
+	#endif
 
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// int32_t send(uint8_t sn, uint8_t * buf, uint16_t len);
@@ -752,6 +813,55 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 		}
 		return SOCK_ERROR;
 	}
+
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		switch (me->protocol)
+		{
+			case AlxSocket_Protocol_Tcp:
+			case AlxSocket_Protocol_Tls:
+			{
+				uint32_t received_total = 0;
+				uint32_t received_chunk = 0;
+				EventBits_t socketBits;
+				socketBits = xEventGroupWaitBits(me->cellular_socket.event_group, EVENT_BITS_SOCKET_DATA_READY, true, false, pdMS_TO_TICKS(me->timeout));
+				if (socketBits & EVENT_BITS_SOCKET_DATA_READY)
+				{
+					while (1)
+					{
+						CellularError_t ret = Cellular_SocketRecv(me->alxNet->cellular.handle, me->cellular_socket.socket, data + received_total, len - received_total, &received_chunk);
+						if (ret != CELLULAR_SUCCESS)
+						{
+							return 0;
+						}
+
+						if (received_chunk <= len)
+						{
+							return received_chunk;
+						}
+
+						received_total += received_chunk;
+
+						if (received_total >= len)
+						{
+							return received_total;
+						}
+
+						SOCKET_YIELD();
+					}
+				}
+				else
+				{
+					//timeout
+					return 0;
+				}
+			}
+			default: break;
+		}
+
+	}
+	#endif
 
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// int32_t recv(uint8_t sn, uint8_t * buf, uint16_t len);
