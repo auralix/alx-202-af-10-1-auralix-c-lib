@@ -98,7 +98,7 @@ typedef struct
 	bool wiz_sock_opened;
 	int backlog;
 } AlxWizSocketData;
-	
+
 typedef struct
 {
 	// Defines
@@ -110,13 +110,13 @@ typedef struct
 	AlxSocket_Protocol protocol;
 	AlxWizSocketData socket_data;
 	uint32_t timeout;
-	
+
 	// Info
 	bool wasCtorCalled;
 	bool isOpened;
 } AlxSocket;
 
-	
+
 //******************************************************************************
 // Constructor
 //******************************************************************************

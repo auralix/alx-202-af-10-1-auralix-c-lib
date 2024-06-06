@@ -78,7 +78,7 @@ void AlxSocket_Ctor
 		AlxOsMutex_Ctor(&alxSocketAllocMutex);
 	}
 	me->timeout = SOCKET_DEFAULT_TIMEOUT;
-		
+
 	// Info
 	me->wasCtorCalled = true;
 	me->isOpened = false;
@@ -123,24 +123,24 @@ static uint16_t wiz_any_port(void)
 Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol protocol)
 {
 	UNUSED(alxNet);
-	
+
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
 
 	me->alxNet = alxNet;
 	me->protocol = protocol;
 	me->isOpened = true;
-	
+
 	if (me->alxNet->config == AlxNet_Config_Wiznet)
 	{
 		Alx_Status ret = Alx_Ok;
 		uint8_t Sn_Protocol;
-	
+
 		if (me->socket_data.wiz_socket != -1)
 		{
 			return Alx_Err;
 		}
-	
+
 		switch (protocol)
 		{
 		case AlxSocket_Protocol_Udp:
@@ -155,7 +155,7 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 			ret = Alx_Err;
 			break;
 		}
-		
+
 		if (Sn_Protocol != Sn_MR_CLOSE)
 		{
 			int8_t free_sock = wiz_sock_alloc(Sn_Protocol);
@@ -173,7 +173,7 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 		}
 		return ret;
 	}
-		
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// int8_t  socket(uint8_t sn, uint8_t protocol, uint16_t port, uint8_t flag);
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -201,15 +201,26 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 		{
 			return Alx_Err;
 		}
-	
+
 		wiz_sock_release(me->socket_data.wiz_socket);
 		if (me->socket_data.wiz_sock_opened)
 		{
 			if ((me->protocol == AlxSocket_Protocol_Tcp) || (me->protocol == AlxSocket_Protocol_Tls))
 			{
-				disconnect(me->socket_data.wiz_socket);
+				if (getSn_SR(me->socket_data.wiz_socket) == SOCK_ESTABLISHED)
+				{
+					disconnect(me->socket_data.wiz_socket);
+				}
+				else
+				{
+					close(me->socket_data.wiz_socket);
+				}
 			}
-			close(me->socket_data.wiz_socket);
+			else
+			{
+				close(me->socket_data.wiz_socket);
+			}
+			me->socket_data.wiz_sock_opened = false;
 		}
 		me->socket_data.wiz_socket = -1;
 		return Alx_Ok;
@@ -247,7 +258,7 @@ Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port)
 		me->socket_data.dst_ip[2] = addr[2];
 		me->socket_data.dst_ip[3] = addr[3];
 		me->socket_data.dst_port = port;
-	
+
 		if ((me->protocol == AlxSocket_Protocol_Tcp) || (me->protocol == AlxSocket_Protocol_Tls))
 		{
 			if (socket(me->socket_data.wiz_socket, Sn_MR_TCP, me->socket_data.my_port, 0) != me->socket_data.wiz_socket)
@@ -311,14 +322,14 @@ Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-	
+
 	if (me->alxNet->config == AlxNet_Config_Wiznet)
 	{
 		if (me->socket_data.wiz_socket == -1)
 		{
 			return SOCKERR_SOCKNUM;
 		}
-	
+
 		switch (me->protocol)
 		{
 		case AlxSocket_Protocol_Tcp:
@@ -353,7 +364,7 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-	
+
 	if (me->alxNet->config == AlxNet_Config_Wiznet)
 	{
 		// wait until clent conents to the socket
@@ -370,7 +381,7 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 		} while ((tmpSn_SR != SOCK_ESTABLISHED) && (tmpSn_SR != SOCK_CLOSE_WAIT));
 		me->isOpened = true;
 		me->socket_data.wiz_sock_opened = true;
-		
+
 		// find available socket for listening fotr new connects
 		int8_t available_wiz_socket = wiz_sock_alloc(AlxSocket_Protocol_Tcp);
 		if ((available_wiz_socket < 0) || (me->socket_data.backlog == 0))
@@ -378,7 +389,7 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 			// no available sockets, but client has connected to server socket
 			return (me);
 		}
-	
+
 		// copy all data to server socket
 		if (me->socket_data.backlog > 0)
 		{
@@ -390,7 +401,7 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 			sizeof(AlxSocket));
 		new_socket->socket_data.wiz_socket = me->socket_data.wiz_socket;
 		me->socket_data.wiz_socket = available_wiz_socket;
-	
+
 		// start listening
 		if ((me->protocol == AlxSocket_Protocol_Tcp) || (me->protocol == AlxSocket_Protocol_Tls))
 		{
@@ -421,14 +432,14 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-	
+
 	if (me->alxNet->config == AlxNet_Config_Wiznet)
 	{
 		if (me->socket_data.wiz_socket == -1)
 		{
 			return SOCKERR_SOCKNUM;
 		}
-	
+
 		switch (me->protocol)
 		{
 		case AlxSocket_Protocol_Tcp:
@@ -438,7 +449,7 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 				uint64_t timer_start = AlxTick_Get_ms(&alxTick);
 				while (1)
 				{
-					if (getSn_SR(me->socket_data.wiz_socket) != SOCK_ESTABLISHED) 
+					if (getSn_SR(me->socket_data.wiz_socket) != SOCK_ESTABLISHED)
 					{
 						return SOCKERR_SOCKSTATUS;
 					}
@@ -468,7 +479,7 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 					socket(me->socket_data.wiz_socket, Sn_MR_UDP, me->socket_data.my_port, 0x00);
 					me->socket_data.wiz_sock_opened = true;
 				}
-				
+
 				uint32_t sent_total = 0;
 				uint64_t timer_start = AlxTick_Get_ms(&alxTick);
 				while (1)
@@ -499,7 +510,7 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 		}
 		return SOCK_ERROR;
 	}
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// int32_t send(uint8_t sn, uint8_t * buf, uint16_t len);
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -518,14 +529,14 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-	
+
 	if (me->alxNet->config == AlxNet_Config_Wiznet)
 	{
 		if (me->socket_data.wiz_socket == -1)
 		{
 			return SOCKERR_SOCKNUM;
 		}
-	
+
 		switch (me->protocol)
 		{
 		case AlxSocket_Protocol_Tcp:
@@ -535,7 +546,7 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 				uint64_t timer_start = AlxTick_Get_ms(&alxTick);
 				while (1)
 				{
-					if (getSn_SR(me->socket_data.wiz_socket) != SOCK_ESTABLISHED) 
+					if (getSn_SR(me->socket_data.wiz_socket) != SOCK_ESTABLISHED)
 					{
 						return SOCKERR_SOCKSTATUS;
 					}
@@ -569,7 +580,7 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 					socket(me->socket_data.wiz_socket, Sn_MR_UDP, me->socket_data.my_port, 0x00);
 					me->socket_data.wiz_sock_opened = true;
 				}
-				
+
 				uint8_t srv_ip[4];
 				uint16_t srv_port;
 				uint32_t received_total = 0;
@@ -578,7 +589,7 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 				{
 					if (getSn_RX_RSR(me->socket_data.wiz_socket) > 0)
 					{
-						int received_chunk = recvfrom(me->socket_data.wiz_socket, data + received_total, len - received_total, srv_ip, &srv_port); 
+						int received_chunk = recvfrom(me->socket_data.wiz_socket, data + received_total, len - received_total, srv_ip, &srv_port);
 						if (received_chunk <= 0)
 						{
 							return received_chunk;
@@ -603,7 +614,7 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 		}
 		return SOCK_ERROR;
 	}
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/socket.h
 	// int32_t recv(uint8_t sn, uint8_t * buf, uint16_t len);
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h

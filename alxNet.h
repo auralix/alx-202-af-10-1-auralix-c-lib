@@ -45,8 +45,8 @@ extern "C" {
 #include "alxSpi.h"
 #include "alxIoPin.h"
 #include "alxOsMutex.h"
-	
-	
+
+
 //******************************************************************************
 // Module Guard
 //******************************************************************************
@@ -78,6 +78,11 @@ extern "C" {
 	#define ALX_NET_TRACE_FORMAT(...) do{} while (false)
 #endif
 
+//******************************************************************************
+// Defines
+//******************************************************************************
+#define ALX_NET_IP_ADDRESS_SIZE 16
+#define ALX_NET_MAC_SIZE 18
 
 //******************************************************************************
 // Types
@@ -103,18 +108,17 @@ typedef struct
 	AlxIoPin* do_nRST;
 	AlxIoPin* di_nINT;
 	bool enable_dhcp;
-	
+
 	// Variables
 	AlxOsMutex alxMutex;
-	char mac[18]; // MAC in string format -> "00:18:10:3A:B8:39"
-	char ip[16];	// IP, Netmask, gateway, dns in string format -> "123.123.123.123"
-	char netmask[16];
-	char gateway[16];
-	char dns[4][16];
-	
+	char mac[ALX_NET_MAC_SIZE]; // MAC in string format -> "00:18:10:3A:B8:39"
+	char ip[ALX_NET_IP_ADDRESS_SIZE]; // IP, Netmask, gateway, dns in string format -> "123.123.123.123"
+	char netmask[ALX_NET_IP_ADDRESS_SIZE];
+	char gateway[ALX_NET_IP_ADDRESS_SIZE];
+	char dns[4][ALX_NET_IP_ADDRESS_SIZE];
+
 	// Info
 	bool wasCtorCalled;
-	bool isInit;
 	bool isNetConnected;
 } AlxNet;
 
@@ -124,7 +128,7 @@ typedef enum
 	DnsTaskTimeout,
 	DnsTaskSuccess
 } DnsTaskState;
-	
+
 //******************************************************************************
 // Constructor
 //******************************************************************************

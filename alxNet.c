@@ -50,10 +50,9 @@
 //******************************************************************************
 #define CONNECT_TIMEOUT 5000
 
-#define DHCP_THREAD_STACK_SIZE 2048
-#define DHCP_RETRY_COUNT 5
+#define THREAD_STACK_SIZE_WORDS 2048
+#define THREAD_PRIORITY 3
 
-#define SOCKET_DNS 1
 #define DNS_RETRY_COUNT 1 // 3 sec.
 
 #define WIZ_BUFFER_SIZE 2048
@@ -134,10 +133,10 @@ static void Unselect(void) {
 	AlxIoPin_Set(alxSpi->do_nCS);
 }
 static void ReadBurst(uint8_t* buff, uint16_t len) {
-	ALX_NET_ASSERT(AlxSpi_Master_Read(alxSpi, buff, len, 1, 100) == Alx_Ok);
+	ALX_NET_ASSERT(AlxSpi_Master_Read(alxSpi, buff, len, 2, 2000) == Alx_Ok);
 }
 static void WriteBurst(uint8_t* buff, uint16_t len) {
-	ALX_NET_ASSERT(AlxSpi_Master_Write(alxSpi, buff, len, 1, 100) == Alx_Ok);
+	ALX_NET_ASSERT(AlxSpi_Master_Write(alxSpi, buff, len, 2, 2000) == Alx_Ok);
 }
 static uint8_t ReadByte(void) {
 	uint8_t byte;
@@ -202,12 +201,12 @@ static void wizchip_dhcp_conflict(void)
 }
 static void dhcp_task(void *argument)
 {
-	AlxNet* me = (AlxNet*) argument; 
+	AlxNet* me = (AlxNet*) argument;
 	int retval = 0;
 	uint8_t link;
 	uint32_t dhcp_retry = 0;
 	dhcp_mode state = NETINFO_STATIC;
-	
+
 	reg_dhcp_cbfunc(wizchip_dhcp_assign, wizchip_dhcp_assign, wizchip_dhcp_conflict);
 	while (1)
 	{
@@ -229,7 +228,7 @@ static void dhcp_task(void *argument)
 						dhcp_ip_leased_until = 0;
 						state = NETINFO_DHCP;
 					}
-			
+
 					if ((state == NETINFO_DHCP) && !me->enable_dhcp)
 					{
 						ALX_TRACE_FORMAT("DHCP client stopped\r\n");
@@ -237,7 +236,7 @@ static void dhcp_task(void *argument)
 						state = NETINFO_STATIC;
 						break; // break to mutex
 					}
-			
+
 					if (state == NETINFO_DHCP)
 					{
 						link = wizphy_getphylink();
@@ -288,7 +287,7 @@ static void dns_task(void *argument)
 {
 	AlxNet* me = (AlxNet*) argument;
 	uint8_t dns_ip[4];
-			
+
 	while (1)
 	{
 		AlxOsMutex_Lock(&alxDnsMutex);
@@ -369,10 +368,9 @@ void AlxNet_Ctor
 	me->di_nINT = di_nINT;
 	// Variables
 	AlxOsMutex_Ctor(&me->alxMutex);
-	
+
 	// Info
 	me->wasCtorCalled = true;
-	me->isInit = false;
 }
 
 
@@ -381,77 +379,75 @@ void AlxNet_Ctor
 //******************************************************************************
 Alx_Status AlxNet_Init(AlxNet *me)
 {
-	ALX_NET_ASSERT(me->isInit == false);
-	
 	AlxOsMutex_Lock(&me->alxMutex);
-	ALX_NET_ASSERT(instance_guard == false);
-	
-	// only one instance allowed
-	if (instance_guard)
+	if (instance_guard == false)
 	{
-		return Alx_Err;
+		// only one instance allowed
+		if (instance_guard)
+		{
+			return Alx_Err;
+		}
+		instance_guard = true;
+		AlxOsMutex_Unlock(&me->alxMutex);
+
+		// Set Callbacks and SPI for ioLibrary_Driver
+		reg_wizchip_cris_cbfunc(CrisEnter, CrisExit);
+		reg_wizchip_cs_cbfunc(Select, Unselect);
+		reg_wizchip_spi_cbfunc(ReadByte, WriteByte);
+		reg_wizchip_spiburst_cbfunc(ReadBurst, WriteBurst);
+
+		// Init SPI
+		AlxOsMutex_Ctor(&alxSpiMutex);
+		alxSpi = me->alxSpi;
+
+		AlxNet_Disconnect(me);
+
+		if (AlxSpi_Init(me->alxSpi) != Alx_Ok)
+		{
+			return Alx_Err;
+		}
+
+		// start DHCP
+		AlxOsMutex_Ctor(&alxDhcpMutex);
+		AlxOsMutex_Lock(&alxDhcpMutex);
+		AlxSocket_Ctor(&alxDhcpSocket);
+		AlxOsThread dhcp_thread;
+		AlxOsThread_Ctor(&dhcp_thread,
+			dhcp_task,
+			"DHCP_Task",
+			THREAD_STACK_SIZE_WORDS * 4,
+			(void *)me,
+			THREAD_PRIORITY);
+		AlxOsThread_Start(&dhcp_thread);
+
+		// start DNS
+		AlxOsMutex_Ctor(&alxDnsMutex);
+		AlxOsMutex_Lock(&alxDnsMutex);
+		AlxSocket_Ctor(&alxDnsSocket);
+		AlxOsThread dns_thread;
+		AlxOsThread_Ctor(&dns_thread,
+			dns_task,
+			"DNS_Task",
+			THREAD_STACK_SIZE_WORDS * 4,
+			(void *)me,
+			THREAD_PRIORITY);
+		AlxOsThread_Start(&dns_thread);
+
+		// start 1 sec tick
+		AlxOsThread tick_thread;
+		AlxOsThread_Ctor(&tick_thread,
+			tick_task,
+			"TICK_Task",
+			THREAD_STACK_SIZE_WORDS * 4,
+			(void *)me,
+			THREAD_PRIORITY);
+		AlxOsThread_Start(&tick_thread);
+
+		AlxOsMutex_Unlock(&me->alxMutex);
+		return Alx_Ok;
 	}
-	instance_guard = true;
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
-	// Set Callbacks and SPI for ioLibrary_Driver
-	reg_wizchip_cris_cbfunc(CrisEnter, CrisExit);
-	reg_wizchip_cs_cbfunc(Select, Unselect);
-	reg_wizchip_spi_cbfunc(ReadByte, WriteByte);
-	reg_wizchip_spiburst_cbfunc(ReadBurst, WriteBurst);
-	 
-	// Init SPI
-	AlxOsMutex_Ctor(&alxSpiMutex);
-	alxSpi = me->alxSpi;
-	
-	AlxNet_Disconnect(me);
-	
-	if (AlxSpi_Init(me->alxSpi) != Alx_Ok) 
-	{
-		return Alx_Err;
-	}
-	
-	// start DHCP
-	AlxOsMutex_Ctor(&alxDhcpMutex);
-	AlxOsMutex_Lock(&alxDhcpMutex);
-	AlxSocket_Ctor(&alxDhcpSocket);
-	AlxOsThread dhcp_thread = { 
-		.func = dhcp_task,
-		.name = "DHCP_Task",
-		.param = (void*) me,
-		.priority = 3,
-		.stackLen_word = DHCP_THREAD_STACK_SIZE,
-		.taskHandle = NULL,
-	};
-	AlxOsThread_Start(&dhcp_thread);
-	
-	// start DNS
-	AlxOsMutex_Ctor(&alxDnsMutex);
-	AlxOsMutex_Lock(&alxDnsMutex);
-	AlxSocket_Ctor(&alxDnsSocket);
-	AlxOsThread dns_thread = { 
-		.func = dns_task,
-		.name = "DNS_Task",
-		.param = (void*) me,
-		.priority = 3,
-		.stackLen_word = DHCP_THREAD_STACK_SIZE,
-		.taskHandle = NULL,
-	};
-	AlxOsThread_Start(&dns_thread);
-	
-	// start 1 sec tick
-	AlxOsThread tick_thread = { 
-		.func = tick_task,
-		.name = "TICK_Task",
-		.param = (void*) me,
-		.priority = 5,
-		.stackLen_word = DHCP_THREAD_STACK_SIZE,
-		.taskHandle = NULL,
-	};
-	AlxOsThread_Start(&tick_thread);
-	
-	me->isInit = true;
-	return Alx_Ok;
+	return Alx_Err;
 }
 
 Alx_Status AlxNet_Connect(AlxNet* me)
@@ -483,10 +479,10 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 		AlxOsMutex_Unlock(&me->alxMutex);
 		return Alx_Err;
 	}
-	
+
 	me->isNetConnected = true;
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/W5500/w5500.h
 	// TODO detailed analysis
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -513,7 +509,7 @@ Alx_Status AlxNet_Disconnect(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
-	
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	AlxIoPin_Reset(me->do_nRST); // Reset W5500
 	AlxDelay_ms(10);
@@ -571,13 +567,13 @@ void AlxNet_SetMac(AlxNet* me, const char* mac)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(mac) == 17);
-		
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	str2mac(mac, wiz_net_info.mac);
 	strcpy(me->mac, mac);
 	setSHAR(wiz_net_info.mac);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/W5500/w5500.h
 	// TODO detailed analysis
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -611,7 +607,7 @@ void AlxNet_SetIp(AlxNet* me, const char* ip)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(ip) < sizeof(me->ip));
-	
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->ip, ip);
 	uint8_t addr[4];
@@ -624,7 +620,7 @@ void AlxNet_SetNetmask(AlxNet* me, const char* netmask)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(netmask) < sizeof(me->netmask));
-	
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->netmask, netmask);
 	uint8_t addr[4];
@@ -637,25 +633,25 @@ void AlxNet_SetGateway(AlxNet* me, const char* gateway)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(gateway) < sizeof(me->gateway));
-	
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->gateway, gateway);
 	uint8_t addr[4];
 	str2ip(gateway, addr);
-	setSUBR(addr);
+	setGAR(addr);
 	AlxOsMutex_Unlock(&me->alxMutex);
 }
 const char* AlxNet_GetMac(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
-		
+
 	uint8_t bin_mac[6];
 	AlxOsMutex_Lock(&me->alxMutex);
 	getSHAR(bin_mac);
 	mac2str(bin_mac, me->mac);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// Return
 	return me->mac;
 }
@@ -669,7 +665,7 @@ const char* AlxNet_GetIp(AlxNet* me)
 	getSIPR(addr);
 	ip2str(addr, me->ip);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// Return
 	return me->ip;
 }
@@ -680,10 +676,10 @@ const char* AlxNet_GetNetmask(AlxNet* me)
 
 	uint8_t addr[4];
 	AlxOsMutex_Lock(&me->alxMutex);
-	getSIPR(addr);
+	getSUBR(addr);
 	ip2str(addr, me->netmask);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// Return
 	return me->netmask;
 }
@@ -697,7 +693,7 @@ const char* AlxNet_GetGateway(AlxNet* me)
 	getGAR(addr);
 	ip2str(addr, me->gateway);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// Return
 	return me->gateway;
 }
@@ -707,11 +703,11 @@ void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(dnsId < 4);
 	ALX_NET_ASSERT(strlen(ip) < sizeof(me->ip));
-	
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->dns[dnsId], ip);
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DNS/dns.h
 	// int8_t DNS_run(uint8_t * dns_ip, uint8_t * name, uint8_t * ip_from_dns);
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -730,17 +726,17 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(hostname) < sizeof(dns_target_domain));
-	
-	AlxOsMutex_Lock(&me->alxMutex);	
+
+	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy((char *)dns_target_domain, hostname);
 	dns_retval = DnsTaskRunning;
 	AlxOsMutex_Unlock(&alxDnsMutex);
-	
+
 	while (dns_retval == DnsTaskRunning)
 	{
 		// timeout in DNS task
 	}
-	
+
 	switch (dns_retval)
 	{
 	case DnsTaskSuccess:
@@ -754,7 +750,7 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 		break;
 	}
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DNS/dns.h
 	// int8_t DNS_run(uint8_t * dns_ip, uint8_t * name, uint8_t * ip_from_dns);
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
@@ -793,7 +789,7 @@ void AlxNet_Dhcp_Enable(AlxNet* me, bool enable)
 		}
 	}
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DHCP/dhcp.h
 	// TODO detailed analysis
 	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
