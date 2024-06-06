@@ -66,6 +66,15 @@
 
 
 //******************************************************************************
+// Private Defines
+//******************************************************************************
+#if defined(ALX_STM32F4)
+#define HAL_FLASH_PROGRAM_TYPE FLASH_TYPEPROGRAM_WORD
+#define HAL_FLASH_PROGRAM_LEN 4
+#endif
+
+
+//******************************************************************************
 // Private Variables
 //******************************************************************************
 static const struct flash_area bootloader =
@@ -268,7 +277,7 @@ uint32_t flash_area_align(const struct flash_area* fap)
 	// NOTE: The smallest unit a flash write can occur along, image trailers will be scaled by this size
 
 	// Return
-	return 8;	// 64-bit aligned, TV: TODO !!!
+	return HAL_FLASH_PROGRAM_LEN;
 }
 uint8_t flash_area_erased_val(const struct flash_area* fap)
 {
@@ -388,10 +397,15 @@ static bool prv_flash_read(uint32_t addr, void* dst, uint32_t len)
 }
 static bool prv_flash_write(uint32_t addr, const void* src, uint32_t len)
 {
+	//------------------------------------------------------------------------------
 	// Unlock FLASH
+	//------------------------------------------------------------------------------
 	HAL_FLASH_Unlock();
 
-	// Clear all FLASH flags
+
+	//------------------------------------------------------------------------------
+	// Clear All FLASH Flags
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F4)
 	__HAL_FLASH_CLEAR_FLAG
 	(
@@ -406,16 +420,18 @@ static bool prv_flash_write(uint32_t addr, const void* src, uint32_t len)
 	);
 	#endif
 
-	// Loop
-	#if defined(ALX_STM32F4)
-	for (uint32_t i = 0; i < len; i = i + sizeof(uint32_t))
+
+	//------------------------------------------------------------------------------
+	// Write FLASH
+	//------------------------------------------------------------------------------
+	for (uint32_t i = 0; i < len; i = i + HAL_FLASH_PROGRAM_LEN)
 	{
 		// Prepare
 		uint32_t data = 0;
-		memcpy(&data, src + i, sizeof(uint32_t));
+		memcpy(&data, src + i, HAL_FLASH_PROGRAM_LEN);
 
 		// Write
-		HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr + i, data);
+		HAL_StatusTypeDef status = HAL_FLASH_Program(HAL_FLASH_PROGRAM_TYPE, addr + i, data);
 		if (status != HAL_OK)
 		{
 			// Trace
@@ -428,12 +444,17 @@ static bool prv_flash_write(uint32_t addr, const void* src, uint32_t len)
 			return false;
 		}
 	}
-	#endif
 
+
+	//------------------------------------------------------------------------------
 	// Lock FLASH
+	//------------------------------------------------------------------------------
 	HAL_FLASH_Lock();
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return true;
 }
 static bool prv_flash_erase(uint32_t addr, uint32_t len)
