@@ -104,7 +104,7 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 		me->stackLen_word,
 		me->param,
 		(UBaseType_t)me->priority,
-		me->taskHandle
+		&me->taskHandle
 	);
 	if (status != pdPASS) { ALX_OS_THREAD_TRACE("Err"); return Alx_Err; }
 	#endif
@@ -132,5 +132,20 @@ void AlxOsThread_Yield(AlxOsThread* me)
 	#endif
 }
 
+/**
+  * @brief
+  * @param[in,out] me
+  */
+void AlxOsThread_Terminate(AlxOsThread* me)
+{
+	// Assert
+	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == true);
+	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+
+	// Terminate
+#if defined(ALX_FREE_RTOS)
+	vTaskDelete(me->taskHandle);
+#endif
+}
 
 #endif	// #if defined(ALX_C_LIB)
