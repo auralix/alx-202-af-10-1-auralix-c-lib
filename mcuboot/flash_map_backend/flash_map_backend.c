@@ -376,11 +376,11 @@ static uint32_t Flash_GetBankNum(uint32_t addr)
 
 	// Prepare
 	#if defined(ALX_STM32F4) || defined(ALX_STM32L4)
-	if ((0x08000000 <= addr) || (addr < 0x08100000))
+	if ((0x08000000 <= addr) && (addr < 0x08100000))
 	{
 		bankNum = 1;
 	}
-	else if ((0x08100000 <= addr) || (addr < 0x08200000))
+	else if ((0x08100000 <= addr) && (addr < 0x08200000))
 	{
 		bankNum = 2;
 	}
