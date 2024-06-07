@@ -113,7 +113,7 @@ static const struct flash_area* s_flash_areas[] =
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint32_t prv_get_flash_page(uint32_t addr);
+static uint32_t Flash_GetSectorNum(uint32_t addr);
 static const struct flash_area* Flash_GetArea(uint8_t id);
 static bool Flash_Read(uint32_t addr, void* dst, uint32_t len);
 static bool Flash_Write(uint32_t addr, const void* src, uint32_t len);
@@ -368,7 +368,7 @@ int flash_area_id_to_multi_image_slot(int image_index, int area_id)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint32_t prv_get_flash_page(uint32_t addr)
+static uint32_t Flash_GetSectorNum(uint32_t addr)
 {
 	// TV: Copied from: https://github.com/hcd-bdltd/stm32g4-mcuboot/blob/68c9c7d36feb7a70120a7f94f6ddd3e6907c8a23/boot/src/flash_map_backend/flash_map_backend.c
 
@@ -544,14 +544,14 @@ static bool Flash_Erase(uint32_t addr, uint32_t len)
 	#if defined(ALX_STM32F4)
 	if (addr < 0x08100000)
 	{
-		firstSector = prv_get_flash_page(addr) + 4;
-		lastSector = prv_get_flash_page(addr + len - 1) + 4;
+		firstSector = Flash_GetSectorNum(addr) + 4;
+		lastSector = Flash_GetSectorNum(addr + len - 1) + 4;
 		numOfSectorsToErase = lastSector - firstSector + 1;
 	}
 	else
 	{
-		firstSector = prv_get_flash_page(addr) + 8;
-		lastSector = prv_get_flash_page(addr + len - 1) + 8;
+		firstSector = Flash_GetSectorNum(addr) + 8;
+		lastSector = Flash_GetSectorNum(addr + len - 1) + 8;
 		numOfSectorsToErase = lastSector - firstSector + 1;
 	}
 	eraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
