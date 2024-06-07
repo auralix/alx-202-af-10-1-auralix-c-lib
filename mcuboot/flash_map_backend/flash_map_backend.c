@@ -113,6 +113,7 @@ static const struct flash_area* s_flash_areas[] =
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static uint32_t Flash_GetBankNum(uint32_t addr);
 static uint32_t Flash_GetSectorNum(uint32_t addr);
 static const struct flash_area* Flash_GetArea(uint8_t id);
 static bool Flash_Read(uint32_t addr, void* dst, uint32_t len);
@@ -368,11 +369,76 @@ int flash_area_id_to_multi_image_slot(int image_index, int area_id)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static uint32_t Flash_GetBankNum(uint32_t addr)
+{
+	// Local variables
+	uint32_t bankNum = 0;
+
+	// Prepare
+	#if defined(ALX_STM32F4) || defined(ALX_STM32L4)
+	if ((0x08000000 <= addr) || (addr < 0x08100000))
+	{
+		bankNum = 1;
+	}
+	else if ((0x08100000 <= addr) || (addr < 0x08200000))
+	{
+		bankNum = 2;
+	}
+	else
+	{
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(false);	// We should never get here
+	}
+	#endif
+
+	// Return
+	return bankNum;
+}
 static uint32_t Flash_GetSectorNum(uint32_t addr)
 {
-	// TV: Copied from: https://github.com/hcd-bdltd/stm32g4-mcuboot/blob/68c9c7d36feb7a70120a7f94f6ddd3e6907c8a23/boot/src/flash_map_backend/flash_map_backend.c
+	// Local variables
+	uint32_t sectorNum = 0;
 
-	return (addr - FLASH_BASE) / ALX_MCU_BOOT_FLASH_SECTOR_SIZE;
+	// Prepare
+	#if defined(ALX_STM32F4)
+	if ((0x08000000 <= addr) && (addr < 0x08010000))
+	{
+		//sectorNum = 0 + (addr - 0x08000000) / 0x4000;		// Sector 0..3 - 16kB
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(false);		// Not supported
+	}
+	else if ((0x08010000 <= addr) && (addr < 0x08020000))
+	{
+		//sectorNum = 4;									// Sector 4 - 64kB
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(false);		// Not supported
+	}
+	else if ((0x08020000 <= addr) && (addr < 0x08100000))
+	{
+		sectorNum = 5 + (addr - 0x08020000) / 0x20000;		// Sectors 5..11 - 128kB
+	}
+	else if ((0x08100000 <= addr) && (addr < 0x08110000))
+	{
+		//sectorNum = 12 + (addr - 0x08100000) / 0x4000;	// Sector 12..15 - 16kB
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(false);		// Not supported
+	}
+	else if ((0x08110000 <= addr) && (addr < 0x08120000))
+	{
+		//sectorNum = 16;									// Sector 16 - 64kB
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(false);		// Not supported
+	}
+	else if ((0x08120000 <= addr) && (addr < 0x08200000))
+	{
+		sectorNum = 17 + (addr - 0x08120000) / 0x20000;		// Sectors 5..11 - 128kB
+	}
+	else
+	{
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(false);		// We should never get here
+	}
+	#endif
+	#if defined(ALX_STM32L4)
+	sectorNum = (addr - 0x08000000) / ALX_MCU_BOOT_FLASH_SECTOR_SIZE;
+	#endif
+
+	// Return
+	return sectorNum;
 }
 static const struct flash_area* Flash_GetArea(uint8_t id)
 {
@@ -536,27 +602,18 @@ static bool Flash_Erase(uint32_t addr, uint32_t len)
 	//------------------------------------------------------------------------------
 	// Prepare
 	//------------------------------------------------------------------------------
-	uint32_t firstSector = 0;
-	uint32_t lastSector = 0;
-	uint32_t numOfSectorsToErase = 0;
+	uint32_t bankNum = Flash_GetBankNum(addr);
+	uint32_t byteAddrFirst = addr;
+	uint32_t byteAddrLast = addr + len - 1;
+	uint32_t sectorNumFirst = Flash_GetSectorNum(byteAddrFirst);
+	uint32_t sectorNumLast = Flash_GetSectorNum(byteAddrLast);
+	uint32_t numOfSectorsToErase = sectorNumLast - sectorNumFirst + 1;
 	FLASH_EraseInitTypeDef eraseInitStruct = {};
 	uint32_t sectorError = 0;
 	#if defined(ALX_STM32F4)
-	if (addr < 0x08100000)
-	{
-		firstSector = Flash_GetSectorNum(addr) + 4;
-		lastSector = Flash_GetSectorNum(addr + len - 1) + 4;
-		numOfSectorsToErase = lastSector - firstSector + 1;
-	}
-	else
-	{
-		firstSector = Flash_GetSectorNum(addr) + 8;
-		lastSector = Flash_GetSectorNum(addr + len - 1) + 8;
-		numOfSectorsToErase = lastSector - firstSector + 1;
-	}
 	eraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
-	eraseInitStruct.Banks = ALX_NULL;
-	eraseInitStruct.Sector = firstSector;
+	eraseInitStruct.Banks = bankNum;
+	eraseInitStruct.Sector = sectorNumFirst;
 	eraseInitStruct.NbSectors = numOfSectorsToErase;
 	eraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
 	#endif
