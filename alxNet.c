@@ -735,6 +735,7 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 	while (dns_retval == DnsTaskRunning)
 	{
 		// timeout in DNS task
+		AlxOsDelay_ms(&alxOsDelay, 20);
 	}
 
 	switch (dns_retval)
