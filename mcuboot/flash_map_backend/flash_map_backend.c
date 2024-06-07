@@ -618,7 +618,10 @@ static bool Flash_Erase(uint32_t addr, uint32_t len)
 	eraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
 	#endif
 	#if defined(ALX_STM32L4)
-	// TODO
+	eraseInitStruct.TypeErase = FLASH_TYPEERASE_PAGES;
+	eraseInitStruct.Banks = bankNum;
+	eraseInitStruct.Page = sectorNumFirst;
+	eraseInitStruct.NbPages = numOfSectorsToErase;
 	#endif
 
 
