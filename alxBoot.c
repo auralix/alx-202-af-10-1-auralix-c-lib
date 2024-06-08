@@ -29,6 +29,10 @@
 // Includes
 //******************************************************************************
 #include "alxBoot.h"
+#if defined(ALX_BOOT_A)
+#include ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE
+#include "alxBootMetadata_GENERATED.h"
+#endif
 
 
 //******************************************************************************
