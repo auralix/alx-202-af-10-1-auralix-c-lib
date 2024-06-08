@@ -520,7 +520,7 @@ static bool Flash_Write(uint32_t addr, const void* src, uint32_t len)
 	for (uint32_t i = 0; i < len; i = i + HAL_FLASH_PROGRAM_LEN)
 	{
 		// Prepare
-		uint32_t data = 0;
+		uint64_t data = 0;
 		memcpy(&data, src + i, HAL_FLASH_PROGRAM_LEN);
 
 		// Write
