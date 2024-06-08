@@ -34,12 +34,13 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_MCU_BOOT)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
 // Private Variables
 //******************************************************************************
+#if defined(ALX_BOOT_B)
 static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 {
 	.magicNum = ALX_ID_BOOT_ID_MAGIC_NUM,
@@ -57,8 +58,8 @@ static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 			.hashShortUint32 = ALX_BUILD_HASH_SHORT_UINT32,
 			.rev = ALX_BUILD_REV
 		},
-		.artf = ALX_BOOT_ID_FW_ARTF,
-		.name = ALX_BOOT_ID_FW_NAME,
+		.artf = ALX_BOOT_B_ID_FW_ARTF,
+		.name = ALX_BOOT_B_ID_FW_NAME,
 		.verMajor = ALX_BUILD_FW_VER_MAJOR,
 		.verMinor = ALX_BUILD_FW_VER_MINOR,
 		.verPatch = ALX_BUILD_FW_VER_PATCH,
@@ -70,6 +71,7 @@ static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 	},
 	.crc = 0			// For future use
 };
+#endif
 
 
 //******************************************************************************
@@ -81,7 +83,9 @@ void AlxBoot_Ctor
 )
 {
 	// Variables
+	#if defined(ALX_BOOT_B)
 	memset(&me->rsp, 0, sizeof(me->rsp));
+	#endif
 	me->addrVt = 0;
 	me->addrMsp = 0;
 	me->addrJmp = 0;
@@ -95,6 +99,7 @@ void AlxBoot_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+#if defined(ALX_BOOT_B)
 Alx_Status AlxBoot_Prepare(AlxBoot* me)
 {
 	//------------------------------------------------------------------------------
@@ -220,6 +225,7 @@ void AlxBoot_Jump(AlxBoot* me)
 	// Jump to app's reset handler
 	((void(*)(void))me->addrJmp)();	// Cast jump address to function pointer & then execute it - Compiler automatically handles, that the real jump address is odd number, so it automatically adds +1 to addrJmp, this is needed for all ARM Cortex-M series processor (for THUMB instruction execution)
 }
+#endif
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_MCU_BOOT)
+#endif	// #if defined(ALX_C_LIB)

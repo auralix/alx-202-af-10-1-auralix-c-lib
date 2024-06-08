@@ -48,7 +48,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_MCU_BOOT)
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -83,7 +83,9 @@ extern "C" {
 typedef struct
 {
 	// Variables
+	#if defined(ALX_BOOT_B)
 	struct boot_rsp rsp;
+	#endif
 	uint32_t addrVt;
 	uint32_t addrMsp;
 	uint32_t addrJmp;
@@ -110,7 +112,7 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me);
 void AlxBoot_Jump(AlxBoot* me);
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_MCU_BOOT)
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

@@ -77,10 +77,10 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// ALX - ALX - Bootloader
+// ALX - Bootloader
 //------------------------------------------------------------------------------
-//#define ALX_BOOT_ID_FW_ARTF "ALX-202-AF-27-1"
-//#define ALX_BOOT_ID_FW_NAME "NucleoF429Zi_Boot_CFw"
+//#define ALX_BOOT_B_ID_FW_ARTF "ALX-202-AF-27-1"
+//#define ALX_BOOT_B_ID_FW_NAME "NucleoF429Zi_Boot_CFw"
 
 
 //------------------------------------------------------------------------------
