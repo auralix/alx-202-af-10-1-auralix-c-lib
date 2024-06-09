@@ -98,6 +98,18 @@ typedef enum
 	#endif
 } AlxNet_Config;
 
+#if defined(ALX_FREE_RTOS_CELLULAR)
+typedef struct
+{
+	// Cellular context
+	CellularHandle_t handle;
+	CellularCommInterface_t * CommIntf; // UART interface
+	CellularSimCardStatus_t simStatus;
+	CellularServiceStatus_t serviceStatus;
+	uint8_t cellularContext;	// Cellular context id
+}AlxNet_Cellular;
+#endif
+
 typedef struct
 {
 	// Defines
@@ -109,6 +121,9 @@ typedef struct
 	AlxIoPin* di_nINT;
 	bool enable_dhcp;
 
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	AlxNet_Cellular cellular;
+	#endif
 	// Variables
 	AlxOsMutex alxMutex;
 	char mac[ALX_NET_MAC_SIZE]; // MAC in string format -> "00:18:10:3A:B8:39"
