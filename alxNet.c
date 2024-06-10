@@ -649,10 +649,6 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 			{
 				ALX_NET_TRACE_FORMAT("Cellular_GetIPAddress failure %d\r\n", cellularStatus);
 			}
-			else
-			{
-				ALX_NET_TRACE_FORMAT("Cellular: Got IP: %s\r\n", me->ip);
-			}
 		}
 
 		if (cellularStatus == CELLULAR_SUCCESS) {
@@ -679,7 +675,7 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 			AlxOsMutex_Unlock(&me->alxMutex);
 			return Alx_Err;
 		}
-
+		me->isNetConnected = true;
 		AlxOsMutex_Unlock(&me->alxMutex);
 	}
 #endif
@@ -1069,6 +1065,11 @@ bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me)
 
 	// Return
 	return (AlxTick_Get_sec(&alxTick) < dhcp_ip_leased_until);
+}
+
+AlxNet_Config Alx_GetNetInterface(AlxNet *me)
+{
+	return me->config;
 }
 
 

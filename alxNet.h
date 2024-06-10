@@ -177,6 +177,8 @@ void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip);
 Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip);
 void AlxNet_Dhcp_Enable(AlxNet* me, bool enable);
 bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me);
+AlxNet_Config Alx_GetNetInterface(AlxNet* me);
+
 
 
 #endif	// #if defined(ALX_C_LIB)
