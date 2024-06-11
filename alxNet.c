@@ -789,6 +789,14 @@ void AlxNet_SetMac(AlxNet* me, const char* mac)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(mac) == 17);
 
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	str2mac(mac, wiz_net_info.mac);
 	strcpy(me->mac, mac);
@@ -829,6 +837,14 @@ void AlxNet_SetIp(AlxNet* me, const char* ip)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(ip) < sizeof(me->ip));
 
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->ip, ip);
 	uint8_t addr[4];
@@ -841,6 +857,14 @@ void AlxNet_SetNetmask(AlxNet* me, const char* netmask)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(netmask) < sizeof(me->netmask));
+
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
 
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->netmask, netmask);
@@ -855,6 +879,14 @@ void AlxNet_SetGateway(AlxNet* me, const char* gateway)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(gateway) < sizeof(me->gateway));
 
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->gateway, gateway);
 	uint8_t addr[4];
@@ -866,6 +898,14 @@ const char* AlxNet_GetMac(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
+
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return NULL;
+	}
+	#endif
 
 	uint8_t bin_mac[6];
 	AlxOsMutex_Lock(&me->alxMutex);
@@ -906,6 +946,14 @@ const char* AlxNet_GetNetmask(AlxNet* me)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return NULL;
+	}
+	#endif
+
 	uint8_t addr[4];
 	AlxOsMutex_Lock(&me->alxMutex);
 	getSUBR(addr);
@@ -919,6 +967,14 @@ const char* AlxNet_GetGateway(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
+
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return NULL;
+	}
+	#endif
 
 	uint8_t addr[4];
 	AlxOsMutex_Lock(&me->alxMutex);
@@ -935,6 +991,14 @@ void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(dnsId < 4);
 	ALX_NET_ASSERT(strlen(ip) < sizeof(me->ip));
+
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
 
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->dns[dnsId], ip);
@@ -1015,6 +1079,14 @@ void AlxNet_Dhcp_Enable(AlxNet* me, bool enable)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
+
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
 
 	AlxOsMutex_Lock(&me->alxMutex);
 	if (enable)
