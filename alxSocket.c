@@ -161,12 +161,11 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 {
 	UNUSED(alxNet);
 
-	// Assert
-	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-
 	me->alxNet = alxNet;
 	me->protocol = protocol;
-	me->isOpened = true;
+
+	// Assert
+	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
 
 	if (me->alxNet->config == AlxNet_Config_Wiznet)
 	{
@@ -208,6 +207,9 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 				ret = AlxBound_ErrMax;
 			}
 		}
+
+		me->isOpened = true;
+
 		return ret;
 	}
 
@@ -243,6 +245,10 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 			me->protocol = protocol;
 			me->cellular_socket.protocol = socket_protocol;
 		}
+		else
+		{
+			return Alx_Err;
+		}
 
 		cellularStatus = Cellular_SocketRegisterSocketOpenCallback(me->alxNet->cellular.handle,
 																	me->cellular_socket.socket,
@@ -270,6 +276,8 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 		{
 			return Alx_Err;
 		}
+
+		me->isOpened = true;
 
 		return ret;
 	}
@@ -356,6 +364,8 @@ Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port)
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
 
+	if (me->isOpened == false) return Alx_Err;
+
 	if (me->alxNet->config == AlxNet_Config_Wiznet)
 	{
 		if (me->socket_data.wiz_socket == -1)
@@ -395,29 +405,30 @@ Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port)
 		me->cellular_socket.sockAddr.ipAddress.ipAddressType = CELLULAR_IP_ADDRESS_V4;
 		me->cellular_socket.sockAddr.port = port;
 
-		if (me->protocol == AlxSocket_Protocol_Tcp)
-		{
-			CellularError_t cellularStatus = CELLULAR_SUCCESS;
-			cellularStatus = Cellular_SocketConnect(me->alxNet->cellular.handle,
-													me->cellular_socket.socket,
-													CELLULAR_ACCESSMODE_BUFFER,
-													&me->cellular_socket.sockAddr);
 
-			EventBits_t socketConnectBits;
-			socketConnectBits = xEventGroupWaitBits(me->cellular_socket.event_group, EVENT_BITS_SOCKET_CONNECT, true, false, pdMS_TO_TICKS(me->timeout));
-			if (socketConnectBits & EVENT_BITS_SOCKET_CONNECT)
+		CellularError_t cellularStatus = CELLULAR_SUCCESS;
+		cellularStatus = Cellular_SocketConnect(me->alxNet->cellular.handle,
+												me->cellular_socket.socket,
+												CELLULAR_ACCESSMODE_BUFFER,
+												&me->cellular_socket.sockAddr);
+		if (cellularStatus != CELLULAR_SUCCESS) {
+			return Alx_Err;
+		}
+		EventBits_t socketConnectBits;
+		socketConnectBits = xEventGroupWaitBits(me->cellular_socket.event_group, EVENT_BITS_SOCKET_CONNECT, true, false, pdMS_TO_TICKS(me->timeout));
+		if (socketConnectBits & EVENT_BITS_SOCKET_CONNECT)
+		{
+			if (me->cellular_socket.URC_error != CELLULAR_URC_SOCKET_OPENED)
 			{
-				if (me->cellular_socket.URC_error != CELLULAR_URC_SOCKET_OPENED)
-				{
-					return Alx_Err;
-				}
-			}
-			else
-			{
-				// TIMEOUT occured
 				return Alx_Err;
 			}
 		}
+		else
+		{
+			// TIMEOUT occured
+			return AlxNet_Timeout;
+		}
+
 
 		return Alx_Ok;
 	}
@@ -693,6 +704,7 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 		{
 		case AlxSocket_Protocol_Tcp:
 		case AlxSocket_Protocol_Tls:
+		case AlxSocket_Protocol_Udp:
 			while (1)
 			{
 				cellularStatus = Cellular_SocketSend(me->alxNet->cellular.handle, me->cellular_socket.socket, data + sent_total, len - sent_total, &sent_length);
@@ -712,11 +724,8 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 			}
 
 			return sent_total;
-
-		case AlxSocket_Protocol_Udp:
-			return 0;
 		default:
-			break;
+			return 0;
 		}
 	}
 	#endif
@@ -832,6 +841,7 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 		{
 			case AlxSocket_Protocol_Tcp:
 			case AlxSocket_Protocol_Tls:
+			case AlxSocket_Protocol_Udp:
 			{
 				uint32_t received_total = 0;
 				uint32_t received_chunk = 0;
