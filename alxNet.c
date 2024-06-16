@@ -620,7 +620,6 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 
 		CellularError_t cellularStatus = CELLULAR_SUCCESS;
 		me->cellular.cellularContext = CELLULAR_PDN_CONTEXT_ID;
-		char localIP[CELLULAR_IP_ADDRESS_MAX_SIZE] = { '\0' };
 		uint8_t NumStatus = 0;
 		bool pdnStatus = false;
 
