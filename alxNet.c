@@ -362,6 +362,30 @@ static void tick_task(void *argument)
 		AlxOsDelay_ms(&alxOsDelay, 1000);
 	}
 }
+#if defined(ALX_FREE_RTOS_CELLULAR)
+static void cellular_info_task(void *argument)
+{
+	AlxNet* me = (AlxNet*) argument;
+	CellularSimCardInfo_t simInfo = { 0 };
+	CellularModemInfo_t modemInfo = { 0 };
+	CellularSignalInfo_t signalInfo = { 0 };
+	CellularPdnConfig_t pdnInfo = { 0 };
+
+	while (1)
+	{
+		//CellularError_t ret = Cellular_GetSignalInfo(me->cellular.handle, &signalInfo);
+		//if (ret != CELLULAR_SUCCESS)
+		//{
+		//	ALX_NET_TRACE_FORMAT("Error signal info: %d\r\n", ret);
+		//}
+		//else
+		//
+		//ALX_NET_TRACE_FORMAT("RSSI bars: %d\r\n", signalInfo.bars);
+		//AlxOsDelay_ms(&alxOsDelay, 5000);
+	}
+
+}
+#endif
 
 //******************************************************************************
 // Constructor
@@ -476,12 +500,14 @@ Alx_Status AlxNet_Init(AlxNet *me)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
+
+		AlxOsMutex_Lock(&me->alxMutex);
+
 		CellularError_t cellularStatus = CELLULAR_SUCCESS;
 		uint8_t tries = 0;
 
 		uint32_t timeoutCountLimit = (60000 / CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS) + 1U;
 		uint32_t timeoutCount = 0;
-		uint32_t i = 0U;
 
 		cellularStatus = Cellular_Init(&me->cellular.handle, me->cellular.CommIntf);
 		if (cellularStatus != CELLULAR_SUCCESS) {
@@ -549,21 +575,17 @@ Alx_Status AlxNet_Init(AlxNet *me)
 			}
 		}
 
+		// Create a task that will monitor cellular diagnostics
+		AlxOsThread cellular_info_thread;
+		AlxOsThread_Ctor(&cellular_info_thread,
+			cellular_info_task,
+			"Cellular_info_task",
+			1024,
+			(void *)me,
+			THREAD_PRIORITY);
+		AlxOsThread_Start(&cellular_info_thread);
 
-
-		// Modems onboard TCPIP stack has DNS already set, so no need to set it here.
-
-		//if (cellularStatus == CELLULAR_SUCCESS)
-		//{
-		//	cellularStatus = Cellular_SetDns(me->cellular.handle, CellularContext, CELLULAR_DNS_IP);
-		//
-		//	if (cellularStatus != CELLULAR_SUCCESS)
-		//	{
-		//		ALX_NET_TRACE_FORMAT("Cellular_SetDns failure %d\r\n", cellularStatus);
-		//	}
-		//	ALX_NET_TRACE_FORMAT("Cellular_SetDns SET: %s\r\n", CELLULAR_DNS_IP);
-		//
-		//}
+		AlxOsMutex_Unlock(&me->alxMutex);
 
 		if(cellularStatus != CELLULAR_SUCCESS) {
 			return Alx_Err;
