@@ -56,6 +56,7 @@
 
 static uint8_t wiz_socks[_WIZCHIP_SOCK_NUM_] = { Sn_MR_CLOSE, };
 static AlxOsMutex alxSocketAllocMutex;
+static AlxOsMutex socketMutex;
 
 static AlxSocket wiz_server_sockets[_WIZCHIP_SOCK_NUM_]; // memory fror new sockets when accepting connections
 static volatile uint8_t socketConnectBits = 0;
@@ -77,6 +78,11 @@ void AlxSocket_Ctor
 	{
 		AlxOsMutex_Ctor(&alxSocketAllocMutex);
 	}
+	if (!socketMutex.wasCtorCalled)
+	{
+		AlxOsMutex_Ctor(&socketMutex);
+	}
+
 	me->timeout = SOCKET_DEFAULT_TIMEOUT;
 
 	#if defined(ALX_FREE_RTOS_CELLULAR)
@@ -156,9 +162,10 @@ static void CellularSocketDataReadyCallback(CellularSocketHandle_t socketHandle,
 
 	//if (pCallbackContext == NULL) return;
 	//AlxSocket *me = (AlxSocket*)(pCallbackContext);
-	////ALX_SOCKET_TRACE_FORMAT("EVENT_BITS_SOCKET_DATA_READY\r\n");
+	//ALX_SOCKET_TRACE_FORMAT("EVENT_BITS_SOCKET_DATA_READY\r\n");
 	//xEventGroupSetBits(me->cellular_socket.event_group, EVENT_BITS_SOCKET_DATA_READY);
 }
+
 #endif
 //******************************************************************************
 // Functions
@@ -855,29 +862,42 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 			{
 				uint32_t received_total = 0;
 				uint32_t received_chunk = 0;
-
+				uint32_t total = 0;
+				AlxOsMutex_Lock(&socketMutex);
+				uint64_t timer_start = AlxTick_Get_ms(&alxTick);
 				while (1)
 				{
 					CellularError_t ret = Cellular_SocketRecv(me->alxNet->cellular.handle, me->cellular_socket.socket, data + received_total, len - received_total, &received_chunk);
 					if (ret != CELLULAR_SUCCESS)
 					{
-						return 0;
+						total = 0;
+						break;
 					}
 
 					if (received_chunk <= len)
 					{
-						return received_chunk;
+						total = received_chunk;
+						if(total != 0) break;
 					}
 
 					received_total += received_chunk;
 
 					if (received_total >= len)
 					{
-						return received_total;
+						total = received_total;
+						break;
+					}
+
+					if ((AlxTick_Get_ms(&alxTick) - timer_start >= me->timeout) || (received_total > 0))
+					{
+						break;
 					}
 
 					SOCKET_YIELD();
 				}
+
+				AlxOsMutex_Unlock(&socketMutex);
+				return total;
 			}
 			default: break;
 		}
