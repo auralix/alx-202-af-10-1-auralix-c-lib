@@ -90,6 +90,37 @@ typedef enum
 
 typedef struct
 {
+	int wiz_socket;
+	uint8_t wiz_protocol;
+	uint8_t dst_ip[4];
+	uint16_t dst_port;
+	uint16_t my_port;
+	bool wiz_sock_opened;
+	int backlog;
+} AlxWizSocketData;
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+
+// Event group bits
+#define EVENT_BITS_SOCKET_CONNECT		0x01
+#define EVENT_BITS_SOCKET_DATA_READY	0x02
+#define EVENT_BITS_SOCKET_CLOSE			0x04
+
+typedef struct
+{
+	CellularSocketHandle_t socket;
+	CellularSocketProtocol_t protocol;
+	EventGroupHandle_t event_group;	// event group used to dispatch events from cellular callbacks
+	CellularUrcEvent_t URC_error;	// Unsolicited return code from cellular stack
+	CellularSocketAddress_t sockAddr;
+	uint16_t my_port;
+	bool cellular_sock_opened;
+	int backlog;
+}AlxCellularSocketData;
+#endif
+
+typedef struct
+{
 	// Defines
 
 	// Parameters
@@ -97,6 +128,11 @@ typedef struct
 	// Variables
 	AlxNet* alxNet;
 	AlxSocket_Protocol protocol;
+	AlxWizSocketData socket_data;
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	AlxCellularSocketData cellular_socket;
+	#endif
+	uint32_t timeout;
 
 	// Info
 	bool wasCtorCalled;
@@ -124,8 +160,7 @@ Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog);
 AlxSocket* AlxSocket_Accept(AlxSocket* me);
 int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len);
 int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len);
-void AlxSocket_SetTimeout_ms(AlxSocket* me);
-
+void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms);
 
 #endif	// #if defined(ALX_C_LIB)
 

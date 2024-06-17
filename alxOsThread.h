@@ -89,7 +89,7 @@ typedef struct
 	// Variables
 	#if defined(ALX_FREE_RTOS)
 	configSTACK_DEPTH_TYPE stackLen_word;
-	TaskHandle_t* taskHandle;
+	TaskHandle_t taskHandle;
 	#endif
 
 	// Info
@@ -117,7 +117,7 @@ void AlxOsThread_Ctor
 //******************************************************************************
 Alx_Status AlxOsThread_Start(AlxOsThread* me);
 void AlxOsThread_Yield(AlxOsThread* me);
-
+void AlxOsThread_Terminate(AlxOsThread* me);
 
 #endif	// #if defined(ALX_C_LIB)
 
