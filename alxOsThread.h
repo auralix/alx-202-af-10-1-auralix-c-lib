@@ -119,6 +119,7 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me);
 void AlxOsThread_Yield(AlxOsThread* me);
 void AlxOsThread_Terminate(AlxOsThread* me);
 
+
 #endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
