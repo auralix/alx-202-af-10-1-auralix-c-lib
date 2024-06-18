@@ -173,12 +173,12 @@ static void print_network_information(wiz_NetInfo net_info)
 	if (net_info.dhcp == NETINFO_DHCP)
 	{
 		ALX_TRACE_FORMAT("==========================================\r\n");
-		ALX_TRACE_FORMAT(" %s network configuration : DHCP\r\n\n", (char *)tmp_str);
+		ALX_TRACE_FORMAT(" %s network configuration : DHCP\r\n", (char *)tmp_str);
 	}
 	else
 	{
 		ALX_TRACE_FORMAT("==========================================\r\n");
-		ALX_TRACE_FORMAT(" %s network configuration : static\r\n\n", (char *)tmp_str);
+		ALX_TRACE_FORMAT(" %s network configuration : static\r\n", (char *)tmp_str);
 	}
 
 	ALX_TRACE_FORMAT(" MAC         : %02X:%02X:%02X:%02X:%02X:%02X\r\n", net_info.mac[0], net_info.mac[1], net_info.mac[2], net_info.mac[3], net_info.mac[4], net_info.mac[5]);
