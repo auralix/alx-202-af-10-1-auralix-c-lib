@@ -102,7 +102,21 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 
 	// Prepare FS
 	Alx_Status status = AlxLogger_Prepare(me);
-	if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		// Trace
+		ALX_FS_TRACE("AlxLogger - Prepare FATAL ERROR, format will occur");
+
+		// Format
+		Alx_Status statusFormat = AlxFs_Format(me->alxFs);
+		if (statusFormat != Alx_Ok)
+		{
+			ALX_FS_TRACE("AlxLogger - Format FATAL ERROR, all we can do is just return Alx_Err");
+		}
+
+		// Return
+		return Alx_Err;
+	}
 
 	// Trace
 	uint32_t numOfLogsToReadAvailable = AlxLogger_GetNumOfLogsToReadAvailable_Private(me);
