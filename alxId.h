@@ -84,20 +84,22 @@ extern "C" {
 // Defines
 //******************************************************************************
 #define ALX_ID_NAME_LEN 40
-#define ALX_ID_FW_BUILD_HASH_LEN 50
+#define ALX_ID_FW_BUILD_HASH_LEN 48
 #define ALX_ID_FW_BUILD_HASH_SHORT_LEN 8
-#define ALX_ID_FW_VER_STR_LEN 100
-#define ALX_ID_FW_BIN_STR_LEN 100
+#define ALX_ID_FW_VER_STR_LEN 96
+#define ALX_ID_FW_BIN_STR_LEN 96
 #define ALX_ID_HW_ID_IO_PIN_ARR_LEN 5
 #define ALX_ID_HW_STM32_MCU_UNIQUE_ID_LEN_uint32 3
 #define ALX_ID_HW_STM32_MCU_UNIQUE_ID_LEN_uint8 12
-#define ALX_ID_HW_STM32_MCU_UNIQUE_ID_STR_LEN 30
+#define ALX_ID_HW_STM32_MCU_UNIQUE_ID_STR_LEN 32
+#define ALX_ID_BOOT_ID_MAGIC_NUM 0x00B0071D
+#define ALX_ID_BOOT_ID_VER 1
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef struct
+typedef struct __attribute__((packed))
 {
 	// Const
 	char name[ALX_ID_NAME_LEN];
@@ -110,7 +112,7 @@ typedef struct
 	uint32_t rev;
 } AlxId_Fw_Build;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	// Const
 	AlxId_Fw_Build build;
@@ -122,7 +124,6 @@ typedef struct
 	uint8_t verMinor;
 	uint8_t verPatch;
 	bool isBuildJobUsed;
-	bool isBootloader;
 
 	// Variables
 	uint32_t verDate;
@@ -130,6 +131,16 @@ typedef struct
 	char verStr[ALX_ID_FW_VER_STR_LEN];
 	char binStr[ALX_ID_FW_BIN_STR_LEN];
 } AlxId_Fw;
+
+typedef struct __attribute__((packed))
+{
+	uint32_t magicNum;
+	uint32_t ver;
+
+	AlxId_Fw fwBoot;
+
+	uint16_t crc;
+} AlxId_FwBootId;
 
 typedef struct
 {
@@ -249,10 +260,10 @@ typedef struct
 	//------------------------------------------------------------------------------
 	// FW
 	//------------------------------------------------------------------------------
-
-	// Parameters
 	AlxId_Fw fwApp;
-	AlxId_Fw fwBoot;
+	bool fwIsBootUsed;
+	uint32_t fwBootIdAddr;
+	AlxId_FwBootId fwBootId;
 	AlxId_Fw_LangC fwLangC;
 	AlxId_Fw_LangCLib fwLangCLib;
 	AlxId_Fw_Comp fwComp;
@@ -268,8 +279,6 @@ typedef struct
 	//------------------------------------------------------------------------------
 	// HW
 	//------------------------------------------------------------------------------
-
-	// Parameters
 	AlxId_Hw hw;
 	#ifdef ALX_STM32
 	AlxId_Hw_Stm32 hwStm32;
@@ -297,7 +306,8 @@ void AlxId_Ctor
 	uint8_t fwVerMinor,
 	uint8_t fwVerPatch,
 	bool fwIsBuildJobUsed,
-	bool fwIsBootloader,
+	bool fwIsBootUsed,
+	uint32_t fwBootIdAddr,
 	AlxId_HwInstance* hwInstanceKnownArr,
 	uint8_t hwInstanceKnownArrLen,
 	uint8_t* hwInstanceHwIdSupportedArr,
@@ -315,7 +325,8 @@ void AlxId_Ctor_NoHwId
 	uint8_t fwVerMinor,
 	uint8_t fwVerPatch,
 	bool fwIsBuildJobUsed,
-	bool fwIsBootloader,
+	bool fwIsBootUsed,
+	uint32_t fwBootIdAddr,
 	AlxId_HwInstance hwInstance,
 	const char* hwMcuName
 );

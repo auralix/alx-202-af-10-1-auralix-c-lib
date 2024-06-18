@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		alxOsThread.h
-  * @brief		Auralix C Library - ALX OS Thread Module
+  * @file		mcuboot_logging.h
+  * @brief		Auralix C Library - ALX MCUboot Logging File
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_OS_THREAD_H
-#define ALX_OS_THREAD_H
+#ifndef __MCUBOOT_LOGGING_H__
+#define __MCUBOOT_LOGGING_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,73 +51,45 @@ extern "C" {
 
 
 //******************************************************************************
-// Preprocessor
+// Defines
 //******************************************************************************
-#define ALX_OS_THREAD_FILE "alxOsThread.h"
+#define MCUBOOT_LOG_MODULE_DECLARE(domain)
+#define MCUBOOT_LOG_MODULE_REGISTER(domain)
+#define MCUBOOT_LOG_LEVEL_OFF		0
+#define MCUBOOT_LOG_LEVEL_ERROR		1
+#define MCUBOOT_LOG_LEVEL_WARNING	2
+#define MCUBOOT_LOG_LEVEL_INFO		3
+#define MCUBOOT_LOG_LEVEL_DEBUG		4
 
-// Assert //
-#if defined(ALX_OS_THREAD_ASSERT_BKPT_ENABLE)
-	#define ALX_OS_THREAD_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_THREAD_FILE, expr)
-#elif defined(ALX_OS_THREAD_ASSERT_TRACE_ENABLE)
-	#define ALX_OS_THREAD_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_THREAD_FILE, expr)
-#elif defined(ALX_OS_THREAD_ASSERT_RST_ENABLE)
-	#define ALX_OS_THREAD_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_THREAD_FILE, expr)
+
+//******************************************************************************
+// Trace Macros
+//******************************************************************************
+#if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_ERROR
+#define MCUBOOT_LOG_ERR(_fmt, ...) do { AlxTrace_WriteFormat(&alxTrace, "[ERR] " _fmt "\r\n", ##__VA_ARGS__); } while (false)
 #else
-	#define ALX_OS_THREAD_ASSERT(expr) do{} while (false)
+#define MCUBOOT_LOG_ERR(...) IGNORE(__VA_ARGS__)
 #endif
 
-// Trace //
-#if defined(ALX_OS_THREAD_TRACE_ENABLE)
-	#define ALX_OS_THREAD_TRACE(...) ALX_TRACE_STD(ALX_OS_THREAD_FILE, __VA_ARGS__)
+#if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_WARNING
+#define MCUBOOT_LOG_WRN(_fmt, ...) do { AlxTrace_WriteFormat(&alxTrace, "[WRN] " _fmt "\r\n", ##__VA_ARGS__); } while (false)
 #else
-	#define ALX_OS_THREAD_TRACE(...) do{} while (false)
+#define MCUBOOT_LOG_WRN(...) IGNORE(__VA_ARGS__)
 #endif
 
+#if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_INFO
+#define MCUBOOT_LOG_INF(_fmt, ...) do { AlxTrace_WriteFormat(&alxTrace, "[INF] " _fmt "\r\n", ##__VA_ARGS__); } while (false)
+#else
+#define MCUBOOT_LOG_INF(...) IGNORE(__VA_ARGS__)
+#endif
 
-//******************************************************************************
-// Types
-//******************************************************************************
-typedef struct
-{
-	// Parameters
-	void (*func)(void*);
-	const char* name;
-	uint32_t stackLen_byte;
-	void* param;
-	uint32_t priority;
+#if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_DEBUG
+#define MCUBOOT_LOG_DBG(_fmt, ...) do { AlxTrace_WriteFormat(&alxTrace, "[DBG] " _fmt "\r\n", ##__VA_ARGS__); } while (false)
+#else
+#define MCUBOOT_LOG_DBG(...) IGNORE(__VA_ARGS__)
+#endif
 
-	// Variables
-	#if defined(ALX_FREE_RTOS)
-	configSTACK_DEPTH_TYPE stackLen_word;
-	TaskHandle_t taskHandle;
-	#endif
-
-	// Info
-	bool wasThreadStarted;
-	bool wasCtorCalled;
-} AlxOsThread;
-
-
-//******************************************************************************
-// Constructor
-//******************************************************************************
-void AlxOsThread_Ctor
-(
-	AlxOsThread* me,
-	void (*func)(void*),
-	const char* name,
-	uint32_t stackLen_byte,
-	void* param,
-	uint32_t priority
-);
-
-
-//******************************************************************************
-// Functions
-//******************************************************************************
-Alx_Status AlxOsThread_Start(AlxOsThread* me);
-void AlxOsThread_Yield(AlxOsThread* me);
-void AlxOsThread_Terminate(AlxOsThread* me);
+#define MCUBOOT_LOG_SIM(...) IGNORE(__VA_ARGS__)
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -126,4 +98,4 @@ void AlxOsThread_Terminate(AlxOsThread* me);
 }
 #endif
 
-#endif	// #ifndef ALX_OS_THREAD_H
+#endif	// #ifndef __MCUBOOT_LOGGING_H__

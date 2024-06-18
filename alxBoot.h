@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxOsThread.h
-  * @brief		Auralix C Library - ALX OS Thread Module
+  * @file		alxBoot.h
+  * @brief		Auralix C Library - ALX Bootloader Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_OS_THREAD_H
-#define ALX_OS_THREAD_H
+#ifndef ALX_BOOT_H
+#define ALX_BOOT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,6 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxId.h"
 
 
 //******************************************************************************
@@ -53,24 +54,26 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_OS_THREAD_FILE "alxOsThread.h"
+#define ALX_BOOT_FILE "alxBoot.h"
 
 // Assert //
-#if defined(ALX_OS_THREAD_ASSERT_BKPT_ENABLE)
-	#define ALX_OS_THREAD_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_THREAD_FILE, expr)
-#elif defined(ALX_OS_THREAD_ASSERT_TRACE_ENABLE)
-	#define ALX_OS_THREAD_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_THREAD_FILE, expr)
-#elif defined(ALX_OS_THREAD_ASSERT_RST_ENABLE)
-	#define ALX_OS_THREAD_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_THREAD_FILE, expr)
+#if defined(ALX_BOOT_ASSERT_BKPT_ENABLE)
+	#define ALX_BOOT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BOOT_FILE, expr)
+#elif defined(ALX_BOOT_ASSERT_TRACE_ENABLE)
+	#define ALX_BOOT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BOOT_FILE, expr)
+#elif defined(ALX_BOOT_ASSERT_RST_ENABLE)
+	#define ALX_BOOT_ASSERT(expr) ALX_ASSERT_RST(ALX_BOOT_FILE, expr)
 #else
-	#define ALX_OS_THREAD_ASSERT(expr) do{} while (false)
+	#define ALX_BOOT_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(ALX_OS_THREAD_TRACE_ENABLE)
-	#define ALX_OS_THREAD_TRACE(...) ALX_TRACE_STD(ALX_OS_THREAD_FILE, __VA_ARGS__)
+#if defined(ALX_BOOT_TRACE_ENABLE)
+	#define ALX_BOOT_TRACE(...) ALX_TRACE_STD(ALX_BOOT_FILE, __VA_ARGS__)
+	#define ALX_BOOT_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
-	#define ALX_OS_THREAD_TRACE(...) do{} while (false)
+	#define ALX_BOOT_TRACE(...) do{} while (false)
+	#define ALX_BOOT_TRACE_FORMAT(...) do{} while (false)
 #endif
 
 
@@ -79,45 +82,34 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Parameters
-	void (*func)(void*);
-	const char* name;
-	uint32_t stackLen_byte;
-	void* param;
-	uint32_t priority;
-
 	// Variables
-	#if defined(ALX_FREE_RTOS)
-	configSTACK_DEPTH_TYPE stackLen_word;
-	TaskHandle_t taskHandle;
+	#if defined(ALX_BOOT_B)
+	struct boot_rsp rsp;
 	#endif
+	uint32_t addrVt;
+	uint32_t addrMsp;
+	uint32_t addrJmp;
 
 	// Info
-	bool wasThreadStarted;
 	bool wasCtorCalled;
-} AlxOsThread;
+	bool isPrepared;
+} AlxBoot;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxOsThread_Ctor
+void AlxBoot_Ctor
 (
-	AlxOsThread* me,
-	void (*func)(void*),
-	const char* name,
-	uint32_t stackLen_byte,
-	void* param,
-	uint32_t priority
+	AlxBoot* me
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxOsThread_Start(AlxOsThread* me);
-void AlxOsThread_Yield(AlxOsThread* me);
-void AlxOsThread_Terminate(AlxOsThread* me);
+Alx_Status AlxBoot_Prepare(AlxBoot* me);
+void AlxBoot_Jump(AlxBoot* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -126,4 +118,4 @@ void AlxOsThread_Terminate(AlxOsThread* me);
 }
 #endif
 
-#endif	// #ifndef ALX_OS_THREAD_H
+#endif	// #ifndef ALX_BOOT_H

@@ -44,6 +44,7 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxFs.h"
 #include "alxCrc.h"
+#include "alxTimSw.h"
 
 
 //******************************************************************************
@@ -138,6 +139,8 @@ typedef struct
 	AlxLogger_Metadata md;
 	AlxLogger_Metadata mdStored;
 	AlxCrc alxCrc;
+	uint32_t numOfDirCreated;
+	uint32_t numOfFilesPerDirCreated;
 
 	// Info
 	bool wasCtorCalled;

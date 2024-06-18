@@ -51,7 +51,7 @@
 #define CONNECT_TIMEOUT 5000
 
 #define THREAD_STACK_SIZE_WORDS 2048
-#define THREAD_PRIORITY 3
+#define THREAD_PRIORITY 1
 
 #define DNS_RETRY_COUNT 1 // 3 sec.
 
@@ -173,12 +173,12 @@ static void print_network_information(wiz_NetInfo net_info)
 	if (net_info.dhcp == NETINFO_DHCP)
 	{
 		ALX_TRACE_FORMAT("==========================================\r\n");
-		ALX_TRACE_FORMAT(" %s network configuration : DHCP\r\n\n", (char *)tmp_str);
+		ALX_TRACE_FORMAT(" %s network configuration : DHCP\r\n", (char *)tmp_str);
 	}
 	else
 	{
 		ALX_TRACE_FORMAT("==========================================\r\n");
-		ALX_TRACE_FORMAT(" %s network configuration : static\r\n\n", (char *)tmp_str);
+		ALX_TRACE_FORMAT(" %s network configuration : static\r\n", (char *)tmp_str);
 	}
 
 	ALX_TRACE_FORMAT(" MAC         : %02X:%02X:%02X:%02X:%02X:%02X\r\n", net_info.mac[0], net_info.mac[1], net_info.mac[2], net_info.mac[3], net_info.mac[4], net_info.mac[5]);
@@ -211,6 +211,7 @@ static void wizchip_dhcp_conflict(void)
 	while (1)
 	{
 		AlxOsDelay_ms(&alxOsDelay, 1000 * 1000);
+		//ALX_NET_ASSERT(false);
 	}
 }
 static void dhcp_task(void *argument)
@@ -696,25 +697,6 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 	}
 #endif
 
-	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/W5500/w5500.h
-	// TODO detailed analysis
-	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
-	// virtual int connect();
-	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DHCP/dhcp.h
-	// TODO detailed analysis
-
-	// https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/include/netsocket/NetworkInterface.h
-	// virtual nsapi_error_t connect() = 0;
-
-	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/netif.h
-	// struct netif *netif_add(struct netif *netif, const ip4_addr_t *ipaddr, const ip4_addr_t *netmask, const ip4_addr_t *gw, void *state, netif_init_fn init, netif_input_fn input);
-	// void netif_set_default(struct netif *netif);
-	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/dhcp.h
-	// err_t dhcp_start(struct netif *netif);
-	// u8_t dhcp_supplied_address(const struct netif *netif);
-
-	// NOTE: If DHCP enabled, it must also trigger handling of DHCP client
-
 	// Return
 	return Alx_Ok;
 }
@@ -762,21 +744,6 @@ Alx_Status AlxNet_Disconnect(AlxNet* me)
 	}
 	#endif
 
-	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/W5500/w5500.h
-	// TODO detailed analysis
-	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
-	// virtual int disconnect();
-	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DHCP/dhcp.h
-	// TODO detailed analysis
-
-	// https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/include/netsocket/NetworkInterface.h
-	// virtual nsapi_error_t disconnect() = 0;
-
-	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/netif.h
-	// TODO detailed analysis
-	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/dhcp.h
-	// TODO detailed analysis
-
 	// Return
 	return Alx_Ok;
 }
@@ -784,17 +751,6 @@ bool AlxNet_IsConnected(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
-
-	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/W5500/w5500.h
-	// TODO detailed analysis
-	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
-	// Doesn't have it
-
-	// https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/include/netsocket/NetworkInterface.h
-	// virtual nsapi_connection_status_t get_connection_status() const;
-
-	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/netif.h
-	// #define netif_is_up(netif) (((netif)->flags & NETIF_FLAG_UP) ? (u8_t)1 : (u8_t)0)
 
 	// Return
 	return me->isNetConnected;
@@ -818,34 +774,6 @@ void AlxNet_SetMac(AlxNet* me, const char* mac)
 	strcpy(me->mac, mac);
 	setSHAR(wiz_net_info.mac);
 	AlxOsMutex_Unlock(&me->alxMutex);
-
-	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Ethernet/W5500/w5500.h
-	// TODO detailed analysis
-	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
-	// Doesn't have it
-
-	// https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/include/netsocket/NetworkInterface.h
-	//	set_mac_address
-	//	set_ip_address
-	//	set_network(ip, netmask, gateway)
-	//	get_mac_address
-	//	get_ip_address
-	//	get_netmask
-	//	get_gateway
-
-	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/netif.h
-	// netifStruct.hwaddr[0]
-	// ip_addr_set_zero_ip4
-	// ip4_addr1_val
-	// ip4_addr2_val
-	// ip4_addr3_val
-	// ip4_addr4_val
-	// netif_ip4_addr
-	// netif_ip4_netmask
-	// netif_ip4_gw
-
-	// MAC in string format -> "00:18:10:3A:B8:39"
-	// IP, Netmask, gateway in string format -> "123.123.123.123"
 }
 void AlxNet_SetIp(AlxNet* me, const char* ip)
 {
@@ -1019,19 +947,6 @@ void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip)
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->dns[dnsId], ip);
 	AlxOsMutex_Unlock(&me->alxMutex);
-
-	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DNS/dns.h
-	// int8_t DNS_run(uint8_t * dns_ip, uint8_t * name, uint8_t * ip_from_dns);
-	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
-	// bool setDnsServerIP(const char* ip_address);
-
-	// https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/include/netsocket/NetworkInterface.h
-	// virtual nsapi_error_t add_dns_server(const SocketAddress &address, const char *interface_name);
-
-	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/dns.h
-	// dns_setserver(u8_t numdns, const ip_addr_t *dnsserver);
-
-	// NOTE: Seems like we will need to handle array of DNS IPs, lets start with array len max = 3
 }
 Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 {
@@ -1077,17 +992,6 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 	}
 	#endif
 
-	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DNS/dns.h
-	// int8_t DNS_run(uint8_t * dns_ip, uint8_t * name, uint8_t * ip_from_dns);
-	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
-	// virtual nsapi_error_t gethostbyname(const char *host, SocketAddress *address, nsapi_version_t version = NSAPI_UNSPEC, const char *interface_name = NULL);
-
-	// https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/include/netsocket/NetworkInterface.h
-	// virtual nsapi_error_t gethostbyname(const char *host, SocketAddress *address, nsapi_version_t version = NSAPI_UNSPEC, const char *interface_name = NULL);
-
-	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/dns.h
-	// err_t dns_gethostbyname(const char *hostname, ip_addr_t *addr, dns_found_callback found, void *callback_arg);
-
 	// Return
 	return Alx_Err;
 }
@@ -1123,33 +1027,11 @@ void AlxNet_Dhcp_Enable(AlxNet* me, bool enable)
 		}
 	}
 	AlxOsMutex_Unlock(&me->alxMutex);
-
-	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DHCP/dhcp.h
-	// TODO detailed analysis
-	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
-	// It can't be directly enabled, but can be enabled/disabled via specific functions
-
-	// https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/include/netsocket/NetworkInterface.h
-	// virtual nsapi_error_t set_dhcp(bool dhcp);
-
-	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/dhcp.h
-	// TODO detailed analysis
 }
 bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
-
-	// https://github.com/Wiznet/ioLibrary_Driver/blob/master/Internet/DHCP/dhcp.h
-	// TODO detailed analysis
-	// https://github.com/WIZnet-MbedEthernet/WIZnetInterface/blob/master/WIZnetInterface.h
-	// Doesn't have it
-
-	// https://github.com/ARMmbed/mbed-os/blob/master/connectivity/netsocket/include/netsocket/NetworkInterface.h
-	// Doesn't have it
-
-	// https://github.com/lwip-tcpip/lwip/blob/master/src/include/lwip/dhcp.h
-	// u8_t dhcp_supplied_address(const struct netif *netif);
 
 	// Return
 	return (AlxTick_Get_sec(&alxTick) < dhcp_ip_leased_until);

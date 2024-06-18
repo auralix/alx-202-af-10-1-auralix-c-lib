@@ -49,10 +49,11 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// ALX - Global - C/C++
+// ALX - Global
 //------------------------------------------------------------------------------
 //#define ALX_PC
 #define ALX_NEWLIB_NANO
+//#define ALX_MCU_BOOT
 //#define ALX_CMSIS_DSP
 //#define ALX_FREE_RTOS
 //#define ALX_FREE_RTOS_CELLULAR
@@ -64,7 +65,30 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// ALX - ID - C/C++
+// ALX - mcuboot - MCUboot FLASH Map Backend Module
+//------------------------------------------------------------------------------
+//#define ALX_MCU_BOOT_FLASH_DEVICE_ID 0
+//#define ALX_MCU_BOOT_FLASH_SECTOR_SIZE (128*1024) // 128kB - 131072, 0x00020000
+//#define ALX_MCU_BOOT_BOOTLOADER_SIZE (128*1024) // 128kB - 131072, 0x00020000
+//#define ALX_MCU_BOOT_IMAGE_SIZE (896*1024) // 896kB - 917504, 0x000E0000
+//#define ALX_MCU_BOOT_BOOTLOADER_OFFSET (0x08000000)
+//#define ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET (0x08020000)
+//#define ALX_MCU_BOOT_IMAGE_SECONDARY_OFFSET (0x08120000))
+
+
+//------------------------------------------------------------------------------
+// ALX - Bootloader
+//------------------------------------------------------------------------------
+//#define ALX_BOOT_A
+//#define ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE "alxBoot_GENERATED.h"
+//#define ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE "2406071858_ALX-202-AF-27-1_NucleoF429Zi_Boot_CFw_V0-0-0_9f672fc.h"
+//#define ALX_BOOT_B
+//#define ALX_BOOT_B_ID_FW_ARTF "ALX-202-AF-27-1"
+//#define ALX_BOOT_B_ID_FW_NAME "NucleoF429Zi_Boot_CFw"
+
+
+//------------------------------------------------------------------------------
+// ALX - ID
 //------------------------------------------------------------------------------
 
 // FW - Language C
@@ -128,7 +152,7 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// ALX - MCU - IO Pin IRQ - C/C++
+// ALX - MCU - IO Pin IRQ
 //------------------------------------------------------------------------------
 //#define ALX_IO_PIN_IRQ_HANDLERS_OFF
 
@@ -186,6 +210,9 @@ extern "C" {
 //// AlxTrace
 //#define ALX_WDT_ASSERT_BKPT_ENABLE
 //
+//// ALX - mcuboot
+//#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT_BKPT_ENABLE
+//
 //// ALX
 //// AlxAssert
 //#define ALX_AUDIO_ASSERT_BKPT_ENABLE
@@ -193,6 +220,7 @@ extern "C" {
 //#define ALX_AUDIO_VOL_ASSERT_BKPT_ENABLE
 //#define ALX_AVG_ASSERT_BKPT_ENABLE
 //#define ALX_BOOL_ASSERT_BKPT_ENABLE
+//#define ALX_BOOT_ASSERT_BKPT_ENABLE
 //#define ALX_BOUND_ASSERT_BKPT_ENABLE
 //// AlxBuild
 //#define ALX_CAN_PARSER_ASSERT_BKPT_ENABLE
@@ -281,6 +309,9 @@ extern "C" {
 //// AlxTrace
 //#define ALX_WDT_ASSERT_TRACE_ENABLE
 //
+//// ALX - mcuboot
+//#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT_TRACE_ENABLE
+//
 //// ALX
 //// AlxAssert
 //#define ALX_AUDIO_ASSERT_TRACE_ENABLE
@@ -288,6 +319,7 @@ extern "C" {
 //#define ALX_AUDIO_VOL_ASSERT_TRACE_ENABLE
 //#define ALX_AVG_ASSERT_TRACE_ENABLE
 //#define ALX_BOOL_ASSERT_TRACE_ENABLE
+//#define ALX_BOOT_ASSERT_TRACE_ENABLE
 //#define ALX_BOUND_ASSERT_TRACE_ENABLE
 //// AlxBuild
 //#define ALX_CAN_PARSER_ASSERT_TRACE_ENABLE
@@ -376,6 +408,9 @@ extern "C" {
 // AlxTrace
 #define ALX_WDT_ASSERT_RST_ENABLE
 
+// ALX - mcuboot
+#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT_RST_ENABLE
+
 // ALX
 // AlxAssert
 #define ALX_AUDIO_ASSERT_RST_ENABLE
@@ -383,6 +418,7 @@ extern "C" {
 #define ALX_AUDIO_VOL_ASSERT_RST_ENABLE
 #define ALX_AVG_ASSERT_RST_ENABLE
 #define ALX_BOOL_ASSERT_RST_ENABLE
+#define ALX_BOOT_ASSERT_RST_ENABLE
 #define ALX_BOUND_ASSERT_RST_ENABLE
 // AlxBuild
 #define ALX_CAN_PARSER_ASSERT_RST_ENABLE
@@ -471,6 +507,9 @@ extern "C" {
 // AlxTrace
 #define ALX_WDT_TRACE_ENABLE
 
+// ALX - mcuboot
+#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_ENABLE
+
 // ALX
 // AlxAssert
 #define ALX_AUDIO_TRACE_ENABLE
@@ -478,6 +517,7 @@ extern "C" {
 #define ALX_AUDIO_VOL_TRACE_ENABLE
 #define ALX_AVG_TRACE_ENABLE
 #define ALX_BOOL_TRACE_ENABLE
+#define ALX_BOOT_TRACE_ENABLE
 #define ALX_BOUND_TRACE_ENABLE
 // AlxBuild
 #define ALX_CAN_PARSER_TRACE_ENABLE

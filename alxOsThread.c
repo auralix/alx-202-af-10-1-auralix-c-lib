@@ -143,9 +143,10 @@ void AlxOsThread_Terminate(AlxOsThread* me)
 	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
 
 	// Terminate
-#if defined(ALX_FREE_RTOS)
+	#if defined(ALX_FREE_RTOS)
 	vTaskDelete(me->taskHandle);
-#endif
+	#endif
 }
+
 
 #endif	// #if defined(ALX_C_LIB)
