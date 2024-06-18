@@ -129,10 +129,6 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 static const unsigned char app_header[{headerLenStr}] __attribute__((section(".app_header"), used)) = {{{binSignedHeaderArr}}};
 static const unsigned char app_trailer[{trailerLenStr}] __attribute__((section(".app_trailer"), used)) = {{{binSignedTrailerArr}}};
 #endif
-#if defined(ALX_BUILD_CONFIG_FW_UP)
-static const unsigned char app_header[{headerLenStr}] __attribute__((section(".app_header"), used)) = {{0xDE, 0xAD, 0xBE, 0xEF}};
-static const unsigned char app_trailer[{trailerLenStr}] __attribute__((section(".app_trailer"), used)) = {{0xDE, 0xAD, 0xBE, 0xEF}};
-#endif
 
 
 #endif	// ALX_BOOT_METADATA_GENERATED_H

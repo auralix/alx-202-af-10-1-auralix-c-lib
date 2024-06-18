@@ -30,8 +30,14 @@
 //******************************************************************************
 #include "alxBoot.h"
 #if defined(ALX_BOOT_A)
-#include ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE
-#include "alxBootMetadata_GENERATED.h"
+	#include ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE
+	#if defined(ALX_BUILD_CONFIG_DEBUG)
+		#include "alxBootMetadata_GENERATED.h"
+	#endif
+	#if defined(ALX_BUILD_CONFIG_FW_UP)
+		static const unsigned char app_header[0x0200] __attribute__((section(".app_header"), used)) = {0xDE, 0xAD, 0xBE, 0xEF};
+		static const unsigned char app_trailer[0x0028] __attribute__((section(".app_trailer"), used)) = {0xDE, 0xAD, 0xBE, 0xEF};
+	#endif
 #endif
 
 
