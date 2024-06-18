@@ -381,7 +381,7 @@ static void cellular_info_task(void *argument)
 		//else
 		//
 		//ALX_NET_TRACE_FORMAT("RSSI bars: %d\r\n", signalInfo.bars);
-		//AlxOsDelay_ms(&alxOsDelay, 5000);
+		AlxOsDelay_ms(&alxOsDelay, 5000);
 	}
 
 }
@@ -500,9 +500,6 @@ Alx_Status AlxNet_Init(AlxNet *me)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-
-		AlxOsMutex_Lock(&me->alxMutex);
-
 		CellularError_t cellularStatus = CELLULAR_SUCCESS;
 		uint8_t tries = 0;
 
@@ -576,16 +573,14 @@ Alx_Status AlxNet_Init(AlxNet *me)
 		}
 
 		// Create a task that will monitor cellular diagnostics
-		AlxOsThread cellular_info_thread;
-		AlxOsThread_Ctor(&cellular_info_thread,
-			cellular_info_task,
-			"Cellular_info_task",
-			1024,
-			(void *)me,
-			THREAD_PRIORITY);
-		AlxOsThread_Start(&cellular_info_thread);
-
-		AlxOsMutex_Unlock(&me->alxMutex);
+		//AlxOsThread cellular_info_thread;
+		//AlxOsThread_Ctor(&cellular_info_thread,
+		//	cellular_info_task,
+		//	"Cellular_info_task",
+		//	1024,
+		//	(void *)me,
+		//	THREAD_PRIORITY);
+		//AlxOsThread_Start(&cellular_info_thread);
 
 		if(cellularStatus != CELLULAR_SUCCESS) {
 			return Alx_Err;
