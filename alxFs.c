@@ -1096,7 +1096,7 @@ static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
 	me->lfsConfig.read_size = 512*ALX_FS_MULTIPLY;
 	me->lfsConfig.prog_size = 512*ALX_FS_MULTIPLY;
 	me->lfsConfig.block_size = 512*ALX_FS_MULTIPLY;
-	me->lfsConfig.block_count = 62160896;
+	me->lfsConfig.block_count = 62160896;	// 62160896 * 512 bytes = ~32GB
 	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
 	me->lfsConfig.cache_size = 512*ALX_FS_MULTIPLY;
 	me->lfsConfig.lookahead_size = 32;

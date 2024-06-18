@@ -80,6 +80,8 @@ void AlxLogger_Ctor
 	memset(&me->md, 0, sizeof(me->md));
 	memset(&me->mdStored, 0, sizeof(me->mdStored));
 	AlxCrc_Ctor(&me->alxCrc, AlxCrc_Config_Ccitt);
+	me->numOfDirCreated = 0;
+	me->numOfFilesPerDirCreated = 0;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -935,13 +937,13 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 	AlxTimSw_Start(&alxTimSw_DirFilePrepAll);
 
 	// Create directories
-	for (uint32_t i = 0; i < me->numOfDir; i++)
+	for (me->numOfDirCreated = 0; me->numOfDirCreated < me->numOfDir; me->numOfDirCreated++)
 	{
 		// Start timer
 		AlxTimSw_Start(&alxTimSw_DirFilePrepSingle);
 
 		// Make dir
-		sprintf(dirPath, "/%lu", i);
+		sprintf(dirPath, "/%lu", me->numOfDirCreated);
 		status = AlxFs_Dir_Make(me->alxFs, dirPath);
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
@@ -950,10 +952,10 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 		if (status != Alx_Ok) { ALX_FS_TRACE("Err"); return status; }
 
 		// Create files
-		for (uint32_t y = 0; y < me->numOfFilesPerDir; y++)
+		for (me->numOfFilesPerDirCreated = 0; me->numOfFilesPerDirCreated < me->numOfFilesPerDir; me->numOfFilesPerDirCreated++)
 		{
 			// Open file
-			sprintf(filePath, "%s/%lu.csv", dirPath, y);
+			sprintf(filePath, "%s/%lu.csv", dirPath, me->numOfFilesPerDirCreated);
 			status = AlxFs_File_Open(me->alxFs, &file, filePath, "w");
 			if (status != Alx_Ok)
 			{
