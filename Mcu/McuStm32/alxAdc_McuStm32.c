@@ -962,7 +962,9 @@ static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	if(ch == Alx_Ch_15)					return ADC_CHANNEL_15;
 	if(ch == Alx_Ch_McuStm32_TempSens)	return ADC_CHANNEL_TEMPSENSOR;	// Ch16
 	if(ch == Alx_Ch_McuStm32_Vref)		return ADC_CHANNEL_VREFINT;		// Ch17
+	#if !defined(STM32F030x6) && !defined(STM32F030x8) && !defined(STM32F070x6) && !defined(STM32F070xB) && !defined(STM32F030xC)
 	if(ch == Alx_Ch_McuStm32_Vbat)		return ADC_CHANNEL_VBAT;		// Ch18
+	#endif
 	#endif
 
 

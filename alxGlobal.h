@@ -176,7 +176,10 @@ extern "C" {
 // Wiznet
 //------------------------------------------------------------------------------
 #if defined(ALX_WIZNET)
-// TV: TODO, add files
+#include "w5500.h"
+#include "socket.h"
+#include "dhcp.h"
+#include "dns.h"
 #endif
 
 

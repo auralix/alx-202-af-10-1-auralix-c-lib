@@ -50,7 +50,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
 
 
 //******************************************************************************
@@ -179,7 +179,7 @@ void AlxNet_Dhcp_Enable(AlxNet* me, bool enable);
 bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
 
 #ifdef __cplusplus
 }

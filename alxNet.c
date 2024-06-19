@@ -36,14 +36,12 @@
 #include "alxOsThread.h"
 #include "alxSocket.h"
 
-#include "socket.h"
-#include "dhcp.h"
-#include "dns.h"
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
+
 
 //******************************************************************************
 // Defines
@@ -959,4 +957,4 @@ bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me)
 //******************************************************************************
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
