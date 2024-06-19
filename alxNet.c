@@ -35,6 +35,11 @@
 #include "alxOsDelay.h"
 #include "alxOsThread.h"
 #include "alxSocket.h"
+#if defined(ALX_WIZNET)
+#include "socket.h"
+#include "dhcp.h"
+#include "dns.h"
+#endif
 
 
 //******************************************************************************

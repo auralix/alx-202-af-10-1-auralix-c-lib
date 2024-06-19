@@ -33,6 +33,10 @@
 #include "alxOsDelay.h"
 #include "alxOsThread.h"
 #include "alxTick.h"
+#if defined(ALX_WIZNET)
+#include "socket.h"
+#include "w5500.h"
+#endif
 
 
 //******************************************************************************
