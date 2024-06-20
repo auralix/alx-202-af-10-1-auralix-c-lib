@@ -87,12 +87,19 @@ extern "C" {
 //------------------------------------------------------------------------------
 // ALX - MCU - SerialPort
 //------------------------------------------------------------------------------
+#if defined(STM32F030x6) || defined(STM32F030x8) || defined(STM32F070x6) || defined(STM32F070xB) || defined(STM32F030xC)
+#define USART3_IRQn		USART3_6_IRQn
+#define USART4_5_IRQn	USART3_6_IRQn
+#define USART6_IRQn		USART3_6_IRQn
+#define USART7_IRQn		USART3_6_IRQn
+#define USART8_IRQn		USART3_6_IRQn
+#else
 #define USART3_IRQn		USART3_8_IRQn
 #define USART4_5_IRQn	USART3_8_IRQn
-#define USART3_IRQn		USART3_8_IRQn
 #define USART6_IRQn		USART3_8_IRQn
 #define USART7_IRQn		USART3_8_IRQn
 #define USART8_IRQn		USART3_8_IRQn
+#endif
 
 
 //------------------------------------------------------------------------------
