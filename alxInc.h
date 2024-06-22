@@ -93,6 +93,7 @@ extern "C" {
 #include "alxBound.h"
 #include "alxBuild.h"
 #include "alxCanParser.h"
+#include "alxCli.h"
 #include "alxCrc.h"
 #include "alxDelay.h"
 #include "alxFifo.h"
