@@ -84,16 +84,14 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Defines
-	#define ALX_CLI_BUFF_LEN 2000
-
 	// Parameters
 	AlxSerialPort* alxSerialPort;
 	AlxId* alxId;
 	AlxParamMgmt* alxParamMgmt;
+	void* buff;
+	uint32_t buffLen;
 
 	// Variables
-	char buff[ALX_CLI_BUFF_LEN];
 
 	// Info
 	bool wasCtorCalled;
@@ -108,7 +106,9 @@ void AlxCli_Ctor
 	AlxCli* me,
 	AlxSerialPort* alxSerialPort,
 	AlxId* alxId,
-	AlxParamMgmt* alxParamMgmt
+	AlxParamMgmt* alxParamMgmt,
+	void* buff,
+	uint32_t buffLen
 );
 
 

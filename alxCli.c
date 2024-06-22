@@ -53,13 +53,17 @@ void AlxCli_Ctor
 	AlxCli* me,
 	AlxSerialPort* alxSerialPort,
 	AlxId* alxId,
-	AlxParamMgmt* alxParamMgmt
+	AlxParamMgmt* alxParamMgmt,
+	void* buff,
+	uint32_t buffLen
 )
 {
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
 	me->alxId = alxId;
 	me->alxParamMgmt = alxParamMgmt;
+	me->buff = buff;
+	me->buffLen = buffLen;
 
 	// Variables
 
@@ -83,7 +87,7 @@ void AlxCli_Handle(AlxCli* me)
 	// Handle Command
 	//------------------------------------------------------------------------------
 	uint32_t cmdLen = 0;
-	if (AlxSerialPort_ReadStrUntil(me->alxSerialPort, me->buff, "\r\n", sizeof(me->buff), &cmdLen) == Alx_Ok)
+	if (AlxSerialPort_ReadStrUntil(me->alxSerialPort, me->buff, "\r\n", me->buffLen, &cmdLen) == Alx_Ok)
 	{
 		//------------------------------------------------------------------------------
 		// Append \r\n
