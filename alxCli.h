@@ -88,6 +88,7 @@ typedef struct
 	AlxSerialPort* alxSerialPort;
 	AlxId* alxId;
 	AlxParamMgmt* alxParamMgmt;
+	bool prettyJsonResp;
 	void* buff;
 	uint32_t buffLen;
 
@@ -107,6 +108,7 @@ void AlxCli_Ctor
 	AlxSerialPort* alxSerialPort,
 	AlxId* alxId,
 	AlxParamMgmt* alxParamMgmt,
+	bool prettyJsonResp,
 	void* buff,
 	uint32_t buffLen
 );

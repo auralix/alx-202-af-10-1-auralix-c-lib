@@ -40,9 +40,9 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxCli_PrepareResponse_StatusSuccess(AlxCli* me);
-static void AlxCli_PrepareResponse_StatusError_InvalidCommand(AlxCli* me);
-static void AlxCli_PrepareResponse_StatusError_InvalidArguments(AlxCli* me);
+static void AlxCli_PrepResp_Success(AlxCli* me);
+static void AlxCli_PrepResp_ErrCmd(AlxCli* me);
+static void AlxCli_PrepResp_ErrArg(AlxCli* me);
 
 
 //******************************************************************************
@@ -54,6 +54,7 @@ void AlxCli_Ctor
 	AlxSerialPort* alxSerialPort,
 	AlxId* alxId,
 	AlxParamMgmt* alxParamMgmt,
+	bool prettyJsonResp,
 	void* buff,
 	uint32_t buffLen
 )
@@ -62,6 +63,7 @@ void AlxCli_Ctor
 	me->alxSerialPort = alxSerialPort;
 	me->alxId = alxId;
 	me->alxParamMgmt = alxParamMgmt;
+	me->prettyJsonResp = prettyJsonResp;
 	me->buff = buff;
 	me->buffLen = buffLen;
 
@@ -101,7 +103,7 @@ void AlxCli_Handle(AlxCli* me)
 		if (strcmp(me->buff, "reset\r\n") == 0)
 		{
 			// Prepare response
-			AlxCli_PrepareResponse_StatusSuccess(me);
+			AlxCli_PrepResp_Success(me);
 
 			// Send response
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
@@ -131,40 +133,80 @@ void AlxCli_Handle(AlxCli* me)
 			const char* hwMcuUniqueIdStr = AlxId_GetHwMcuUniqueIdStr(me->alxId);
 
 			// Prepare response
-			sprintf
-			(
-				me->buff,
-				"{\r\n"
-				"    \"status\":\"success\",\r\n"
-				"    \"data\":\r\n"
-				"    {\r\n"
-				"        \"fwArtf\":\"%s\",\r\n"
-				"        \"fwName\":\"%s\",\r\n"
-				"        \"fwVerStr\":\"%s\",\r\n"
-				"        \"fwBinStr\":\"%s\",\r\n"
-				"        \"hwPcbArtf\":\"%s\",\r\n"
-				"        \"hwPcbName\":\"%s\",\r\n"
-				"        \"hwPcbVerStr\":\"%s\",\r\n"
-				"        \"hwBomArtf\":\"%s\",\r\n"
-				"        \"hwBomName\":\"%s\",\r\n"
-				"        \"hwBomVerStr\":\"%s\",\r\n"
-				"        \"hwId\":%u,\r\n"
-				"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
-				"    }\r\n"
-				"}\r\n",
-				fwArtf,
-				fwName,
-				fwVerStr,
-				fwBinStr,
-				hwPcbArtf,
-				hwPcbName,
-				hwPcbVerStr,
-				hwBomArtf,
-				hwBomName,
-				hwBomVerStr,
-				hwId,
-				hwMcuUniqueIdStr
-			);
+			if (me->prettyJsonResp)
+			{
+				sprintf
+				(
+					me->buff,
+					"{\r\n"
+					"    \"status\":\"success\",\r\n"
+					"    \"data\":\r\n"
+					"    {\r\n"
+					"        \"fwArtf\":\"%s\",\r\n"
+					"        \"fwName\":\"%s\",\r\n"
+					"        \"fwVerStr\":\"%s\",\r\n"
+					"        \"fwBinStr\":\"%s\",\r\n"
+					"        \"hwPcbArtf\":\"%s\",\r\n"
+					"        \"hwPcbName\":\"%s\",\r\n"
+					"        \"hwPcbVerStr\":\"%s\",\r\n"
+					"        \"hwBomArtf\":\"%s\",\r\n"
+					"        \"hwBomName\":\"%s\",\r\n"
+					"        \"hwBomVerStr\":\"%s\",\r\n"
+					"        \"hwId\":%u,\r\n"
+					"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
+					"    }\r\n"
+					"}\r\n",
+					fwArtf,
+					fwName,
+					fwVerStr,
+					fwBinStr,
+					hwPcbArtf,
+					hwPcbName,
+					hwPcbVerStr,
+					hwBomArtf,
+					hwBomName,
+					hwBomVerStr,
+					hwId,
+					hwMcuUniqueIdStr
+				);
+			}
+			else
+			{
+				sprintf
+				(
+					me->buff,
+					"{"
+						"\"status\":\"success\","
+						"\"data\":"
+						"{"
+							"\"fwArtf\":\"%s\","
+							"\"fwName\":\"%s\","
+							"\"fwVerStr\":\"%s\","
+							"\"fwBinStr\":\"%s\","
+							"\"hwPcbArtf\":\"%s\","
+							"\"hwPcbName\":\"%s\","
+							"\"hwPcbVerStr\":\"%s\","
+							"\"hwBomArtf\":\"%s\","
+							"\"hwBomName\":\"%s\","
+							"\"hwBomVerStr\":\"%s\","
+							"\"hwId\":%u,"
+							"\"hwMcuUniqueIdStr\":\"%s\""
+						"}"
+					"}\r\n",
+					fwArtf,
+					fwName,
+					fwVerStr,
+					fwBinStr,
+					hwPcbArtf,
+					hwPcbName,
+					hwPcbVerStr,
+					hwBomArtf,
+					hwBomName,
+					hwBomVerStr,
+					hwId,
+					hwMcuUniqueIdStr
+				);
+			}
 
 			// Send response
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
@@ -177,7 +219,7 @@ void AlxCli_Handle(AlxCli* me)
 		else
 		{
 			// Prepare response
-			AlxCli_PrepareResponse_StatusError_InvalidCommand(me);
+			AlxCli_PrepResp_ErrCmd(me);
 
 			// Send response
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
@@ -189,38 +231,80 @@ void AlxCli_Handle(AlxCli* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxCli_PrepareResponse_StatusSuccess(AlxCli* me)
+static void AlxCli_PrepResp_Success(AlxCli* me)
 {
-	sprintf
-	(
-		me->buff,
-		"{\r\n"
-		"    \"status\":\"success\",\r\n"
-		"    \"data\":null\r\n"
-		"}\r\n"
-	);
+	if (me->prettyJsonResp)
+	{
+		sprintf
+		(
+			me->buff,
+			"{\r\n"
+			"    \"status\":\"success\",\r\n"
+			"    \"data\":null\r\n"
+			"}\r\n"
+		);
+	}
+	else
+	{
+		sprintf
+		(
+			me->buff,
+			"{"
+				"\"status\":\"success\","
+				"\"data\":null"
+			"}\r\n"
+		);
+	}
 }
-static void AlxCli_PrepareResponse_StatusError_InvalidCommand(AlxCli* me)
+static void AlxCli_PrepResp_ErrCmd(AlxCli* me)
 {
-	sprintf
-	(
-		me->buff,
-		"{\r\n"
-		"    \"status\":\"error\",\r\n"
-		"    \"message\":\"Invalid command\"\r\n"
-		"}\r\n"
-	);
+	if (me->prettyJsonResp)
+	{
+		sprintf
+		(
+			me->buff,
+			"{\r\n"
+			"    \"status\":\"error\",\r\n"
+			"    \"message\":\"Invalid command\"\r\n"
+			"}\r\n"
+		);
+	}
+	else
+	{
+		sprintf
+		(
+			me->buff,
+			"{"
+				"\"status\":\"error\","
+				"\"message\":\"Invalid command\""
+			"}\r\n"
+		);
+	}
 }
-static void AlxCli_PrepareResponse_StatusError_InvalidArguments(AlxCli* me)
+static void AlxCli_PrepResp_ErrArg(AlxCli* me)
 {
-	sprintf
-	(
-		me->buff,
-		"{\r\n"
-		"    \"status\":\"error\",\r\n"
-		"    \"message\":\"Invalid arguments\"\r\n"
-		"}\r\n"
-	);
+	if (me->prettyJsonResp)
+	{
+		sprintf
+		(
+			me->buff,
+			"{\r\n"
+			"    \"status\":\"error\",\r\n"
+			"    \"message\":\"Invalid arguments\"\r\n"
+			"}\r\n"
+		);
+	}
+	else
+	{
+		sprintf
+		(
+			me->buff,
+			"{"
+				"\"status\":\"error\","
+				"\"message\":\"Invalid arguments\""
+			"}\r\n"
+		);
+	}
 }
 
 
