@@ -119,93 +119,199 @@ void AlxCli_Handle(AlxCli* me)
 		else if (strcmp(me->buff, "id\r\n") == 0)
 		{
 			// Get
-			const char* fwArtf = AlxId_GetFwAppArtf(me->alxId);
-			const char* fwName = AlxId_GetFwAppName(me->alxId);
-			const char* fwVerStr = AlxId_GetFwAppVerStr(me->alxId);
-			const char* fwBinStr = AlxId_GetFwAppBinStr(me->alxId);
+			bool fwIsBootUsed = AlxId_GetFwIsBootUsed(me->alxId);
+
+			const char* fwArtf = AlxId_GetFwArtf(me->alxId);
+			const char* fwName = AlxId_GetFwName(me->alxId);
+			const char* fwVerStr = AlxId_GetFwVerStr(me->alxId);
+			const char* fwBinStr = AlxId_GetFwBinStr(me->alxId);
+
+			const char* fwBootArtf = AlxId_GetFwBootArtf(me->alxId);
+			const char* fwBootName = AlxId_GetFwBootName(me->alxId);
+			const char* fwBootVerStr = AlxId_GetFwBootVerStr(me->alxId);
+			const char* fwBootBinStr = AlxId_GetFwBootBinStr(me->alxId);
+
 			const char* hwPcbArtf = AlxId_GetHwPcbArtf(me->alxId);
 			const char* hwPcbName = AlxId_GetHwPcbName(me->alxId);
 			const char* hwPcbVerStr = AlxId_GetHwPcbVerStr(me->alxId);
+
 			const char* hwBomArtf = AlxId_GetHwBomArtf(me->alxId);
 			const char* hwBomName = AlxId_GetHwBomName(me->alxId);
 			const char* hwBomVerStr = AlxId_GetHwBomVerStr(me->alxId);
+
 			uint8_t hwId = AlxId_GetHwId(me->alxId);
 			const char* hwMcuUniqueIdStr = AlxId_GetHwMcuUniqueIdStr(me->alxId);
 
 			// Prepare response
 			if (me->prettyJsonResp)
 			{
-				sprintf
-				(
-					me->buff,
-					"{\r\n"
-					"    \"status\":\"success\",\r\n"
-					"    \"data\":\r\n"
-					"    {\r\n"
-					"        \"fwArtf\":\"%s\",\r\n"
-					"        \"fwName\":\"%s\",\r\n"
-					"        \"fwVerStr\":\"%s\",\r\n"
-					"        \"fwBinStr\":\"%s\",\r\n"
-					"        \"hwPcbArtf\":\"%s\",\r\n"
-					"        \"hwPcbName\":\"%s\",\r\n"
-					"        \"hwPcbVerStr\":\"%s\",\r\n"
-					"        \"hwBomArtf\":\"%s\",\r\n"
-					"        \"hwBomName\":\"%s\",\r\n"
-					"        \"hwBomVerStr\":\"%s\",\r\n"
-					"        \"hwId\":%u,\r\n"
-					"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
-					"    }\r\n"
-					"}\r\n",
-					fwArtf,
-					fwName,
-					fwVerStr,
-					fwBinStr,
-					hwPcbArtf,
-					hwPcbName,
-					hwPcbVerStr,
-					hwBomArtf,
-					hwBomName,
-					hwBomVerStr,
-					hwId,
-					hwMcuUniqueIdStr
-				);
+				if (fwIsBootUsed)
+				{
+					sprintf
+					(
+						me->buff,
+						"{\r\n"
+						"    \"status\":\"success\",\r\n"
+						"    \"data\":\r\n"
+						"    {\r\n"
+						"        \"fwArtf\":\"%s\",\r\n"
+						"        \"fwName\":\"%s\",\r\n"
+						"        \"fwVerStr\":\"%s\",\r\n"
+						"        \"fwBinStr\":\"%s\",\r\n"
+						"        \"fwBootArtf\":\"%s\",\r\n"
+						"        \"fwBootName\":\"%s\",\r\n"
+						"        \"fwBootVerStr\":\"%s\",\r\n"
+						"        \"fwBootBinStr\":\"%s\",\r\n"
+						"        \"hwPcbArtf\":\"%s\",\r\n"
+						"        \"hwPcbName\":\"%s\",\r\n"
+						"        \"hwPcbVerStr\":\"%s\",\r\n"
+						"        \"hwBomArtf\":\"%s\",\r\n"
+						"        \"hwBomName\":\"%s\",\r\n"
+						"        \"hwBomVerStr\":\"%s\",\r\n"
+						"        \"hwId\":%u,\r\n"
+						"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
+						"    }\r\n"
+						"}\r\n",
+						fwArtf,
+						fwName,
+						fwVerStr,
+						fwBinStr,
+						fwBootArtf,
+						fwBootName,
+						fwBootVerStr,
+						fwBootBinStr,
+						hwPcbArtf,
+						hwPcbName,
+						hwPcbVerStr,
+						hwBomArtf,
+						hwBomName,
+						hwBomVerStr,
+						hwId,
+						hwMcuUniqueIdStr
+					);
+				}
+				else
+				{
+					sprintf
+					(
+						me->buff,
+						"{\r\n"
+						"    \"status\":\"success\",\r\n"
+						"    \"data\":\r\n"
+						"    {\r\n"
+						"        \"fwArtf\":\"%s\",\r\n"
+						"        \"fwName\":\"%s\",\r\n"
+						"        \"fwVerStr\":\"%s\",\r\n"
+						"        \"fwBinStr\":\"%s\",\r\n"
+						"        \"hwPcbArtf\":\"%s\",\r\n"
+						"        \"hwPcbName\":\"%s\",\r\n"
+						"        \"hwPcbVerStr\":\"%s\",\r\n"
+						"        \"hwBomArtf\":\"%s\",\r\n"
+						"        \"hwBomName\":\"%s\",\r\n"
+						"        \"hwBomVerStr\":\"%s\",\r\n"
+						"        \"hwId\":%u,\r\n"
+						"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
+						"    }\r\n"
+						"}\r\n",
+						fwArtf,
+						fwName,
+						fwVerStr,
+						fwBinStr,
+						hwPcbArtf,
+						hwPcbName,
+						hwPcbVerStr,
+						hwBomArtf,
+						hwBomName,
+						hwBomVerStr,
+						hwId,
+						hwMcuUniqueIdStr
+					);
+				}
 			}
 			else
 			{
-				sprintf
-				(
-					me->buff,
-					"{"
-						"\"status\":\"success\","
-						"\"data\":"
+				if (fwIsBootUsed)
+				{
+					sprintf
+					(
+						me->buff,
 						"{"
-							"\"fwArtf\":\"%s\","
-							"\"fwName\":\"%s\","
-							"\"fwVerStr\":\"%s\","
-							"\"fwBinStr\":\"%s\","
-							"\"hwPcbArtf\":\"%s\","
-							"\"hwPcbName\":\"%s\","
-							"\"hwPcbVerStr\":\"%s\","
-							"\"hwBomArtf\":\"%s\","
-							"\"hwBomName\":\"%s\","
-							"\"hwBomVerStr\":\"%s\","
-							"\"hwId\":%u,"
-							"\"hwMcuUniqueIdStr\":\"%s\""
-						"}"
-					"}\r\n",
-					fwArtf,
-					fwName,
-					fwVerStr,
-					fwBinStr,
-					hwPcbArtf,
-					hwPcbName,
-					hwPcbVerStr,
-					hwBomArtf,
-					hwBomName,
-					hwBomVerStr,
-					hwId,
-					hwMcuUniqueIdStr
-				);
+							"\"status\":\"success\","
+							"\"data\":"
+							"{"
+								"\"fwArtf\":\"%s\","
+								"\"fwName\":\"%s\","
+								"\"fwVerStr\":\"%s\","
+								"\"fwBinStr\":\"%s\","
+								"\"fwBootArtf\":\"%s\","
+								"\"fwBootName\":\"%s\","
+								"\"fwBootVerStr\":\"%s\","
+								"\"fwBootBinStr\":\"%s\","
+								"\"hwPcbArtf\":\"%s\","
+								"\"hwPcbName\":\"%s\","
+								"\"hwPcbVerStr\":\"%s\","
+								"\"hwBomArtf\":\"%s\","
+								"\"hwBomName\":\"%s\","
+								"\"hwBomVerStr\":\"%s\","
+								"\"hwId\":%u,"
+								"\"hwMcuUniqueIdStr\":\"%s\""
+							"}"
+						"}\r\n",
+						fwArtf,
+						fwName,
+						fwVerStr,
+						fwBinStr,
+						fwBootArtf,
+						fwBootName,
+						fwBootVerStr,
+						fwBootBinStr,
+						hwPcbArtf,
+						hwPcbName,
+						hwPcbVerStr,
+						hwBomArtf,
+						hwBomName,
+						hwBomVerStr,
+						hwId,
+						hwMcuUniqueIdStr
+					);
+				}
+				else
+				{
+					sprintf
+					(
+						me->buff,
+						"{"
+							"\"status\":\"success\","
+							"\"data\":"
+							"{"
+								"\"fwArtf\":\"%s\","
+								"\"fwName\":\"%s\","
+								"\"fwVerStr\":\"%s\","
+								"\"fwBinStr\":\"%s\","
+								"\"hwPcbArtf\":\"%s\","
+								"\"hwPcbName\":\"%s\","
+								"\"hwPcbVerStr\":\"%s\","
+								"\"hwBomArtf\":\"%s\","
+								"\"hwBomName\":\"%s\","
+								"\"hwBomVerStr\":\"%s\","
+								"\"hwId\":%u,"
+								"\"hwMcuUniqueIdStr\":\"%s\""
+							"}"
+						"}\r\n",
+						fwArtf,
+						fwName,
+						fwVerStr,
+						fwBinStr,
+						hwPcbArtf,
+						hwPcbName,
+						hwPcbVerStr,
+						hwBomArtf,
+						hwBomName,
+						hwBomVerStr,
+						hwId,
+						hwMcuUniqueIdStr
+					);
+				}
 			}
 
 			// Send response

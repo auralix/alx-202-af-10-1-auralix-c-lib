@@ -134,11 +134,10 @@ typedef struct __attribute__((packed))
 
 typedef struct __attribute__((packed))
 {
+	// Const
 	uint32_t magicNum;
 	uint32_t ver;
-
-	AlxId_Fw fwBoot;
-
+	AlxId_Fw fw;
 	uint16_t crc;
 } AlxId_FwBootId;
 
@@ -237,6 +236,7 @@ typedef struct
 #ifdef ALX_STM32
 typedef union
 {
+	// Const
 	uint32_t uint32[ALX_ID_HW_STM32_MCU_UNIQUE_ID_LEN_uint32];
 	uint8_t uint8[ALX_ID_HW_STM32_MCU_UNIQUE_ID_LEN_uint8];
 } AlxId_Hw_Stm32_McuUniqueId;
@@ -260,7 +260,7 @@ typedef struct
 	//------------------------------------------------------------------------------
 	// FW
 	//------------------------------------------------------------------------------
-	AlxId_Fw fwApp;
+	AlxId_Fw fw;
 	bool fwIsBootUsed;
 	uint32_t fwBootIdAddr;
 	AlxId_FwBootId fwBootId;
@@ -335,18 +335,49 @@ void AlxId_Ctor_NoHwId
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
 void AlxId_Init(AlxId* me);
 void AlxId_Trace(AlxId* me);
-const char* AlxId_GetFwAppArtf(AlxId* me);
-const char* AlxId_GetFwAppName(AlxId* me);
-uint8_t AlxId_GetFwAppVerMajor(AlxId* me);
-uint8_t AlxId_GetFwAppVerMinor(AlxId* me);
-uint8_t AlxId_GetFwAppVerPatch(AlxId* me);
-uint32_t AlxId_GetFwAppVerDate(AlxId* me);
-uint64_t AlxId_GetFwAppVer(AlxId* me);
-uint32_t AlxId_GetFwAppHashShort(AlxId* me);
-const char* AlxId_GetFwAppVerStr(AlxId* me);
-const char* AlxId_GetFwAppBinStr(AlxId* me);
+bool AlxId_GetFwIsBootUsed(AlxId* me);
+
+
+//------------------------------------------------------------------------------
+// FW
+//------------------------------------------------------------------------------
+const char* AlxId_GetFwArtf(AlxId* me);
+const char* AlxId_GetFwName(AlxId* me);
+uint8_t AlxId_GetFwVerMajor(AlxId* me);
+uint8_t AlxId_GetFwVerMinor(AlxId* me);
+uint8_t AlxId_GetFwVerPatch(AlxId* me);
+uint32_t AlxId_GetFwVerDate(AlxId* me);
+uint64_t AlxId_GetFwVer(AlxId* me);
+uint32_t AlxId_GetFwHashShort(AlxId* me);
+const char* AlxId_GetFwVerStr(AlxId* me);
+const char* AlxId_GetFwBinStr(AlxId* me);
+
+
+//------------------------------------------------------------------------------
+// FW - Bootloader
+//------------------------------------------------------------------------------
+const char* AlxId_GetFwBootArtf(AlxId* me);
+const char* AlxId_GetFwBootName(AlxId* me);
+uint8_t AlxId_GetFwBootVerMajor(AlxId* me);
+uint8_t AlxId_GetFwBootVerMinor(AlxId* me);
+uint8_t AlxId_GetFwBootVerPatch(AlxId* me);
+uint32_t AlxId_GetFwBootVerDate(AlxId* me);
+uint64_t AlxId_GetFwBootVer(AlxId* me);
+uint32_t AlxId_GetFwBootHashShort(AlxId* me);
+const char* AlxId_GetFwBootVerStr(AlxId* me);
+const char* AlxId_GetFwBootBinStr(AlxId* me);
+
+
+//------------------------------------------------------------------------------
+// HW - PCB
+//------------------------------------------------------------------------------
 const char* AlxId_GetHwPcbArtf(AlxId* me);
 const char* AlxId_GetHwPcbName(AlxId* me);
 uint8_t AlxId_GetHwPcbVerMajor(AlxId* me);
@@ -355,6 +386,11 @@ uint8_t AlxId_GetHwPcbVerPatch(AlxId* me);
 uint32_t AlxId_GetHwPcbVerDate(AlxId* me);
 uint64_t AlxId_GetHwPcbVer(AlxId* me);
 const char* AlxId_GetHwPcbVerStr(AlxId* me);
+
+
+//------------------------------------------------------------------------------
+// HW - BOM
+//------------------------------------------------------------------------------
 const char* AlxId_GetHwBomArtf(AlxId* me);
 const char* AlxId_GetHwBomName(AlxId* me);
 uint8_t AlxId_GetHwBomVerMajor(AlxId* me);
@@ -363,6 +399,11 @@ uint8_t AlxId_GetHwBomVerPatch(AlxId* me);
 uint32_t AlxId_GetHwBomVerDate(AlxId* me);
 uint64_t AlxId_GetHwBomVer(AlxId* me);
 const char* AlxId_GetHwBomVerStr(AlxId* me);
+
+
+//------------------------------------------------------------------------------
+// HW - ID
+//------------------------------------------------------------------------------
 uint8_t AlxId_GetHwId(AlxId* me);
 void AlxId_GetHwMcuUniqueIdUint32(AlxId* me, uint32_t* uniqueIdUint32, uint8_t len);
 void AlxId_GetHwMcuUniqueIdUint8(AlxId* me, uint8_t* uniqueIdUint8, uint8_t len);
