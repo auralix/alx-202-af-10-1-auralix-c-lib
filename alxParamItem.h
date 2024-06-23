@@ -131,7 +131,7 @@ typedef struct
 	#define ALX_PARAM_ITEM_FTOA_PRECISION 6
 
 	// Parameters
-	AlxParamItem_DataType dtype;
+	AlxParamItem_DataType dataType;
 	AlxParamKvStore* paramKvStore;
 	const char* key;
 	uint32_t id;
