@@ -114,16 +114,16 @@ uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me);
 //------------------------------------------------------------------------------
 // By Index
 //------------------------------------------------------------------------------
-const char*			AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index);
-uint32_t			AlxParamMgmt_ByIndex_GetId(AlxParamMgmt* me, uint32_t index);
-uint32_t			AlxParamMgmt_ByIndex_GetGroupId(AlxParamMgmt* me, uint32_t index);
-AlxParamItem_Type	AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index);
-void*				AlxParamMgmt_ByIndex_GetValPtr(AlxParamMgmt* me, uint32_t index);
-uint32_t			AlxParamMgmt_ByIndex_GetValLen(AlxParamMgmt* me, uint32_t index);
-Alx_Status			AlxParamMgmt_ByIndex_Get(AlxParamMgmt* me, uint32_t index, void* val, uint32_t len);	// TV: TODO
-Alx_Status			AlxParamMgmt_ByIndex_Set(AlxParamMgmt* me, uint32_t index, void* val, uint32_t len);	// TV: TODO
-Alx_Status			AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val, uint32_t maxLenWithNullTerm);
-Alx_Status			AlxParamMgmt_ByIndex_SetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val);	// TV: TODO
+const char*				AlxParamMgmt_ByIndex_GetKey(AlxParamMgmt* me, uint32_t index);
+uint32_t				AlxParamMgmt_ByIndex_GetId(AlxParamMgmt* me, uint32_t index);
+uint32_t				AlxParamMgmt_ByIndex_GetGroupId(AlxParamMgmt* me, uint32_t index);
+AlxParamItem_DataType	AlxParamMgmt_ByIndex_GetDataType(AlxParamMgmt* me, uint32_t index);
+void*					AlxParamMgmt_ByIndex_GetValPtr(AlxParamMgmt* me, uint32_t index);
+uint32_t				AlxParamMgmt_ByIndex_GetValLen(AlxParamMgmt* me, uint32_t index);
+Alx_Status				AlxParamMgmt_ByIndex_Get(AlxParamMgmt* me, uint32_t index, void* val, uint32_t len);	// TV: TODO
+Alx_Status				AlxParamMgmt_ByIndex_Set(AlxParamMgmt* me, uint32_t index, void* val, uint32_t len);	// TV: TODO
+Alx_Status				AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val, uint32_t maxLenWithNullTerm);
+Alx_Status				AlxParamMgmt_ByIndex_SetVal_StrFormat(AlxParamMgmt* me, uint32_t index, char* val);		// TV: TODO
 
 
 //------------------------------------------------------------------------------

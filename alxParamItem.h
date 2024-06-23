@@ -85,20 +85,20 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxParamItem_Type_Uint8,
-	AlxParamItem_Type_Uint16,
-	AlxParamItem_Type_Uint32,
-	AlxParamItem_Type_Uint64,
-	AlxParamItem_Type_Int8,
-	AlxParamItem_Type_Int16,
-	AlxParamItem_Type_Int32,
-	AlxParamItem_Type_Int64,
-	AlxParamItem_Type_Float,
-	AlxParamItem_Type_Double,
-	AlxParamItem_Type_Bool,
-	AlxParamItem_Type_Arr,
-	AlxParamItem_Type_Str
-} AlxParamItem_Type;
+	AlxParamItem_DataType_Uint8,
+	AlxParamItem_DataType_Uint16,
+	AlxParamItem_DataType_Uint32,
+	AlxParamItem_DataType_Uint64,
+	AlxParamItem_DataType_Int8,
+	AlxParamItem_DataType_Int16,
+	AlxParamItem_DataType_Int32,
+	AlxParamItem_DataType_Int64,
+	AlxParamItem_DataType_Float,
+	AlxParamItem_DataType_Double,
+	AlxParamItem_DataType_Bool,
+	AlxParamItem_DataType_Arr,
+	AlxParamItem_DataType_Str
+} AlxParamItem_DataType;
 
 typedef enum
 {
@@ -131,7 +131,7 @@ typedef struct
 	#define ALX_PARAM_ITEM_FTOA_PRECISION 6
 
 	// Parameters
-	AlxParamItem_Type type;
+	AlxParamItem_DataType dtype;
 	AlxParamKvStore* paramKvStore;
 	const char* key;
 	uint32_t id;
@@ -343,7 +343,7 @@ void AlxParamItem_CtorStr
 const char* AlxParamItem_GetKey(AlxParamItem* me);
 uint32_t AlxParamItem_GetId(AlxParamItem* me);
 uint32_t AlxParamItem_GetGroupId(AlxParamItem* me);
-AlxParamItem_Type AlxParamItem_GetType(AlxParamItem* me);
+AlxParamItem_DataType AlxParamItem_GetDataType(AlxParamItem* me);
 void* AlxParamItem_GetValPtr(AlxParamItem* me);
 uint32_t AlxParamItem_GetValLen(AlxParamItem* me);
 

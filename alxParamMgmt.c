@@ -113,7 +113,7 @@ uint32_t AlxParamMgmt_ByIndex_GetGroupId(AlxParamMgmt* me, uint32_t index)
 	// Return
 	return AlxParamItem_GetGroupId(ptr);
 }
-AlxParamItem_Type AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index)
+AlxParamItem_DataType AlxParamMgmt_ByIndex_GetDataType(AlxParamMgmt* me, uint32_t index)
 {
 	// Assert
 	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
@@ -123,7 +123,7 @@ AlxParamItem_Type AlxParamMgmt_ByIndex_GetType(AlxParamMgmt* me, uint32_t index)
 	AlxParamItem* ptr = &me->paramItemArr[index];
 
 	// Return
-	return AlxParamItem_GetType(ptr);
+	return AlxParamItem_GetDataType(ptr);
 }
 void* AlxParamMgmt_ByIndex_GetValPtr(AlxParamMgmt* me, uint32_t index)
 {
