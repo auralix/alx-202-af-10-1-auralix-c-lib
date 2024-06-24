@@ -91,11 +91,9 @@ typedef struct
 	AlxSerialPort* alxSerialPort;
 	AlxId* alxId;
 	AlxParamMgmt* alxParamMgmt;
-	bool prettyJsonResp;
+	bool prettyJsonEnable;
 	void* buff;
 	uint32_t buffLen;
-
-	// Variables
 
 	// Info
 	bool wasCtorCalled;
@@ -111,7 +109,7 @@ void AlxCli_Ctor
 	AlxSerialPort* alxSerialPort,
 	AlxId* alxId,
 	AlxParamMgmt* alxParamMgmt,
-	bool prettyJsonResp,
+	bool prettyJsonEnable,
 	void* buff,
 	uint32_t buffLen
 );
@@ -121,6 +119,7 @@ void AlxCli_Ctor
 // Functions
 //******************************************************************************
 void AlxCli_Handle(AlxCli* me);
+void AlxCli_PrettyJsonEnable(AlxCli* me, bool prettyJsonEnable);
 
 
 #endif	// #if defined(ALX_C_LIB)

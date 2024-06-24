@@ -55,7 +55,7 @@ void AlxCli_Ctor
 	AlxSerialPort* alxSerialPort,
 	AlxId* alxId,
 	AlxParamMgmt* alxParamMgmt,
-	bool prettyJsonResp,
+	bool prettyJsonEnable,
 	void* buff,
 	uint32_t buffLen
 )
@@ -64,11 +64,9 @@ void AlxCli_Ctor
 	me->alxSerialPort = alxSerialPort;
 	me->alxId = alxId;
 	me->alxParamMgmt = alxParamMgmt;
-	me->prettyJsonResp = prettyJsonResp;
+	me->prettyJsonEnable = prettyJsonEnable;
 	me->buff = buff;
 	me->buffLen = buffLen;
-
-	// Variables
 
 	// Info
 	me->wasCtorCalled = true;
@@ -144,7 +142,7 @@ void AlxCli_Handle(AlxCli* me)
 			const char* hwMcuUniqueIdStr = AlxId_GetHwMcuUniqueIdStr(me->alxId);
 
 			// Prepare response
-			if (me->prettyJsonResp)
+			if (me->prettyJsonEnable)
 			{
 				if (fwIsBootUsed)
 				{
@@ -455,6 +453,14 @@ void AlxCli_Handle(AlxCli* me)
 		}
 	}
 }
+void AlxCli_PrettyJsonEnable(AlxCli* me, bool prettyJsonEnable)
+{
+	// Assert
+	ALX_CLI_ASSERT(me->wasCtorCalled == true);
+
+	// Set
+	me->prettyJsonEnable = prettyJsonEnable;
+}
 
 
 //******************************************************************************
@@ -467,7 +473,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 	//------------------------------------------------------------------------------
 
 	// Prepare
-	if (me->prettyJsonResp)
+	if (me->prettyJsonEnable)
 	{
 		strcpy
 		(
@@ -536,7 +542,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 		// If string type add double quote (") around value, Else just use value
 		if (dataType == AlxParamItem_Str)
 		{
-			if (me->prettyJsonResp)
+			if (me->prettyJsonEnable)
 			{
 				sprintf(me->buff, "        \"%s\":\"%s\"", key, val);
 			}
@@ -547,7 +553,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 		}
 		else
 		{
-			if (me->prettyJsonResp)
+			if (me->prettyJsonEnable)
 			{
 				sprintf(me->buff, "        \"%s\":%s", key, val);
 			}
@@ -564,7 +570,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 			((paramTypeCheck == false) && (i < (numOfParamItems - 1)))
 		)
 		{
-			if (me->prettyJsonResp)
+			if (me->prettyJsonEnable)
 			{
 				strcat(me->buff, ",\r\n");
 			}
@@ -575,13 +581,13 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 		}
 		else
 		{
-			if (me->prettyJsonResp)
+			if (me->prettyJsonEnable)
 			{
 				strcat(me->buff, "\r\n");
 			}
 			else
 			{
-				// Do Nothing
+				// Do nothing
 			}
 		}
 
@@ -595,7 +601,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 	//------------------------------------------------------------------------------
 
 	// Prepare
-	if (me->prettyJsonResp)
+	if (me->prettyJsonEnable)
 	{
 		strcpy
 		(
@@ -619,7 +625,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 }
 static void AlxCli_PrepResp_Success(AlxCli* me)
 {
-	if (me->prettyJsonResp)
+	if (me->prettyJsonEnable)
 	{
 		sprintf
 		(
@@ -644,7 +650,7 @@ static void AlxCli_PrepResp_Success(AlxCli* me)
 }
 static void AlxCli_PrepResp_ErrCmd(AlxCli* me)
 {
-	if (me->prettyJsonResp)
+	if (me->prettyJsonEnable)
 	{
 		sprintf
 		(
@@ -669,7 +675,7 @@ static void AlxCli_PrepResp_ErrCmd(AlxCli* me)
 }
 static void AlxCli_PrepResp_ErrArg(AlxCli* me)
 {
-	if (me->prettyJsonResp)
+	if (me->prettyJsonEnable)
 	{
 		sprintf
 		(
