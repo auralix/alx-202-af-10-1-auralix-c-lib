@@ -97,9 +97,27 @@ void AlxCli_Handle(AlxCli* me)
 
 
 		//------------------------------------------------------------------------------
+		// Help Command
+		//------------------------------------------------------------------------------
+		if (strcmp(me->buff, "help\r\n") == 0)
+		{
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "help         Get all available commands and their descriptions\r\n") == Alx_Ok);
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "reset        Trigger device reset\r\n") == Alx_Ok);
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "id           Get device ID info\r\n") == Alx_Ok);
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get          Get all device properties\r\n") == Alx_Ok);
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-param    Get all device parameters\r\n") == Alx_Ok);
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-var      Get all device variables\r\n") == Alx_Ok);
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-flag     Get all device flags\r\n") == Alx_Ok);
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-const    Get all device constants\r\n") == Alx_Ok);
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-trig     Get all device triggers\r\n") == Alx_Ok);
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "set-param    Set specified device value: set-param --key <param_key> --val <param_val_to_set>\r\n") == Alx_Ok);
+		}
+
+
+		//------------------------------------------------------------------------------
 		// Reset Command
 		//------------------------------------------------------------------------------
-		if (strcmp(me->buff, "reset\r\n") == 0)
+		else if (strcmp(me->buff, "reset\r\n") == 0)
 		{
 			// Prepare response
 			AlxCli_PrepResp_Success(me);
@@ -113,7 +131,7 @@ void AlxCli_Handle(AlxCli* me)
 
 
 		//------------------------------------------------------------------------------
-		// Get ID Command
+		// ID Command
 		//------------------------------------------------------------------------------
 		else if (strcmp(me->buff, "id\r\n") == 0)
 		{
@@ -627,7 +645,7 @@ static void AlxCli_PrepResp_Success(AlxCli* me)
 {
 	if (me->prettyJsonEnable)
 	{
-		sprintf
+		strcpy
 		(
 			me->buff,
 			"{\r\n"
@@ -638,7 +656,7 @@ static void AlxCli_PrepResp_Success(AlxCli* me)
 	}
 	else
 	{
-		sprintf
+		strcpy
 		(
 			me->buff,
 			"{"
@@ -652,7 +670,7 @@ static void AlxCli_PrepResp_ErrCmd(AlxCli* me)
 {
 	if (me->prettyJsonEnable)
 	{
-		sprintf
+		strcpy
 		(
 			me->buff,
 			"{\r\n"
@@ -663,7 +681,7 @@ static void AlxCli_PrepResp_ErrCmd(AlxCli* me)
 	}
 	else
 	{
-		sprintf
+		strcpy
 		(
 			me->buff,
 			"{"
@@ -677,7 +695,7 @@ static void AlxCli_PrepResp_ErrArg(AlxCli* me)
 {
 	if (me->prettyJsonEnable)
 	{
-		sprintf
+		strcpy
 		(
 			me->buff,
 			"{\r\n"
@@ -688,7 +706,7 @@ static void AlxCli_PrepResp_ErrArg(AlxCli* me)
 	}
 	else
 	{
-		sprintf
+		strcpy
 		(
 			me->buff,
 			"{"
