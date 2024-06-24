@@ -393,8 +393,8 @@ void AlxCli_Handle(AlxCli* me)
 				//------------------------------------------------------------------------------
 				// Parse
 				//------------------------------------------------------------------------------
-				char key[128] = "";
-				char val[128] = "";
+				char key[ALX_CLI_BUFF_LEN] = "";
+				char val[ALX_CLI_BUFF_LEN] = "";
 				int sscanfStatus = sscanf
 				(
 					me->buff,
@@ -530,7 +530,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 		AlxParamItem_DataType dataType = AlxParamMgmt_ByIndex_GetDataType(me->alxParamMgmt, i);
 
 		// Get value in string format
-		char val[32] = "";
+		char val[ALX_CLI_BUFF_LEN] = "";
 		AlxParamMgmt_ByIndex_GetVal_StrFormat(me->alxParamMgmt, i, val, sizeof(val));
 
 		// If string type add double quote (") around value, Else just use value
