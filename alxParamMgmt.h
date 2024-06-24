@@ -109,6 +109,7 @@ void AlxParamMgmt_Ctor
 // General
 //------------------------------------------------------------------------------
 uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me);
+uint32_t AlxParamMgmt_GetNumOfParamTypeItems(AlxParamMgmt* me, AlxParamItem_ParamType paramType);
 
 
 //------------------------------------------------------------------------------

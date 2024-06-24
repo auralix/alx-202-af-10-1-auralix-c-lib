@@ -497,7 +497,13 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 	//------------------------------------------------------------------------------
 	// JSON Body
 	//------------------------------------------------------------------------------
+
+	// Local variables
 	uint32_t numOfParamItems = AlxParamMgmt_GetNumOfParamItems(me->alxParamMgmt);
+	uint32_t numOfParamTypeItems = AlxParamMgmt_GetNumOfParamTypeItems(me->alxParamMgmt, paramType);
+	uint32_t paramTypeItemsIndex = 0;
+
+	// Loop through all parameters
 	for (uint32_t i = 0; i < numOfParamItems; i++)
 	{
 		// If param type check enabled
@@ -506,10 +512,14 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 			// Get param type
 			AlxParamItem_ParamType _paramType = AlxParamMgmt_ByIndex_GetParamType(me->alxParamMgmt, i);
 
-			// Check param type, if NOT specified, continue
+			// Check param type, if NOT selected, continue, Else increment
 			if (_paramType != paramType)
 			{
 				continue;
+			}
+			else
+			{
+				paramTypeItemsIndex++;
 			}
 		}
 
@@ -548,7 +558,11 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 		}
 
 		// If NOT last line in loop, add comma
-		if (i < (numOfParamItems - 1))
+		if
+		(
+			((paramTypeCheck == true) && (paramTypeItemsIndex != numOfParamTypeItems)) ||
+			((paramTypeCheck == false) && (i < (numOfParamItems - 1)))
+		)
 		{
 			if (me->prettyJsonResp)
 			{

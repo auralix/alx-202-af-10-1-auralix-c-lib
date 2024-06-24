@@ -72,6 +72,30 @@ uint32_t AlxParamMgmt_GetNumOfParamItems(AlxParamMgmt* me)
 	// Return
 	return me->numOfParamItems;
 }
+uint32_t AlxParamMgmt_GetNumOfParamTypeItems(AlxParamMgmt* me, AlxParamItem_ParamType paramType)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Local variables
+	uint32_t numOfParamTypeItems = 0;
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get param type
+		AlxParamItem_ParamType _paramType = AlxParamMgmt_ByIndex_GetParamType(me, i);
+
+		// If selected param type, increment
+		if (_paramType == paramType)
+		{
+			numOfParamTypeItems++;
+		}
+	}
+
+	// Return
+	return numOfParamTypeItems;
+}
 
 
 //------------------------------------------------------------------------------
