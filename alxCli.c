@@ -40,6 +40,7 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType paramType);
 static void AlxCli_PrepResp_Success(AlxCli* me);
 static void AlxCli_PrepResp_ErrCmd(AlxCli* me);
 static void AlxCli_PrepResp_ErrArg(AlxCli* me);
@@ -320,6 +321,128 @@ void AlxCli_Handle(AlxCli* me)
 
 
 		//------------------------------------------------------------------------------
+		// Get Command
+		//------------------------------------------------------------------------------
+		else if (strcmp(me->buff, "get\r\n") == 0)
+		{
+			AlxCli_Get(me, false, ALX_NULL);
+		}
+
+
+		//------------------------------------------------------------------------------
+		// Get Parameters Command
+		//------------------------------------------------------------------------------
+		else if (strcmp(me->buff, "get-param\r\n") == 0)
+		{
+			AlxCli_Get(me, true, AlxParamItem_Param);
+		}
+
+
+		//------------------------------------------------------------------------------
+		// Get Variables Command
+		//------------------------------------------------------------------------------
+		else if (strcmp(me->buff, "get-var\r\n") == 0)
+		{
+			AlxCli_Get(me, true, AlxParamItem_Var);
+		}
+
+
+		//------------------------------------------------------------------------------
+		// Get Flags Command
+		//------------------------------------------------------------------------------
+		else if (strcmp(me->buff, "get-flag\r\n") == 0)
+		{
+			AlxCli_Get(me, true, AlxParamItem_Flag);
+		}
+
+
+		//------------------------------------------------------------------------------
+		// Get Constants Command
+		//------------------------------------------------------------------------------
+		else if (strcmp(me->buff, "get-const\r\n") == 0)
+		{
+			AlxCli_Get(me, true, AlxParamItem_Const);
+		}
+
+
+		//------------------------------------------------------------------------------
+		// Get Triggers Command
+		//------------------------------------------------------------------------------
+		else if (strcmp(me->buff, "get-trig\r\n") == 0)
+		{
+			AlxCli_Get(me, true, AlxParamItem_Trig);
+		}
+
+
+		//------------------------------------------------------------------------------
+		// Set Parameter Command
+		//------------------------------------------------------------------------------
+		else if (strncmp(me->buff, "set-param", strlen("set-param")) == 0)
+		{
+			//------------------------------------------------------------------------------
+			// Local Variables
+			//------------------------------------------------------------------------------
+			Alx_Status status = Alx_Err;
+
+
+			//------------------------------------------------------------------------------
+			// Handle
+			//------------------------------------------------------------------------------
+			while (1)
+			{
+				//------------------------------------------------------------------------------
+				// Parse
+				//------------------------------------------------------------------------------
+				char key[128] = "";
+				char val[128] = "";
+				int sscanfStatus = sscanf
+				(
+					me->buff,
+					"set-param --key %s --val %s",
+					key,
+					val
+				);
+				if (sscanfStatus != 2)
+				{
+					status = Alx_Err;
+					break;
+				}
+
+
+				//------------------------------------------------------------------------------
+				// Set
+				//------------------------------------------------------------------------------
+				status = AlxParamMgmt_ByKey_SetVal_StrFormat(me->alxParamMgmt, key, val);
+
+
+				//------------------------------------------------------------------------------
+				// Break
+				//------------------------------------------------------------------------------
+				break;
+			}
+
+
+			//------------------------------------------------------------------------------
+			// Prepare Response
+			//------------------------------------------------------------------------------
+			if (status == Alx_Ok)
+			{
+				AlxCli_PrepResp_Success(me);
+			}
+			else
+			{
+				AlxCli_PrepResp_ErrArg(me);
+			}
+
+
+			//------------------------------------------------------------------------------
+			// Send Response
+			//------------------------------------------------------------------------------
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+		}
+
+
+		//------------------------------------------------------------------------------
 		// Invalid Command
 		//------------------------------------------------------------------------------
 		else
@@ -337,6 +460,149 @@ void AlxCli_Handle(AlxCli* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType paramType)
+{
+	//------------------------------------------------------------------------------
+	// JSON Header
+	//------------------------------------------------------------------------------
+
+	// Prepare
+	if (me->prettyJsonResp)
+	{
+		strcpy
+		(
+			me->buff,
+			"{\r\n"
+			"    \"status\":\"success\",\r\n"
+			"    \"data\":\r\n"
+			"    {\r\n"
+		);
+	}
+	else
+	{
+		strcpy
+		(
+			me->buff,
+			"{"
+				"\"status\":\"success\","
+				"\"data\":"
+				"{"
+		);
+	}
+
+	// Send
+	ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+
+
+	//------------------------------------------------------------------------------
+	// JSON Body
+	//------------------------------------------------------------------------------
+	uint32_t numOfParamItems = AlxParamMgmt_GetNumOfParamItems(me->alxParamMgmt);
+	for (uint32_t i = 0; i < numOfParamItems; i++)
+	{
+		// If param type check enabled
+		if (paramTypeCheck)
+		{
+			// Get param type
+			AlxParamItem_ParamType _paramType = AlxParamMgmt_ByIndex_GetParamType(me->alxParamMgmt, i);
+
+			// Check param type, if NOT specified, continue
+			if (_paramType != paramType)
+			{
+				continue;
+			}
+		}
+
+		// Get key
+		const char* key = AlxParamMgmt_ByIndex_GetKey(me->alxParamMgmt, i);
+
+		// Get data type
+		AlxParamItem_DataType dataType = AlxParamMgmt_ByIndex_GetDataType(me->alxParamMgmt, i);
+
+		// Get value in string format
+		char val[32] = "";
+		AlxParamMgmt_ByIndex_GetVal_StrFormat(me->alxParamMgmt, i, val, sizeof(val));
+
+		// If string type add double quote (") around value, Else just use value
+		if (dataType == AlxParamItem_Str)
+		{
+			if (me->prettyJsonResp)
+			{
+				sprintf(me->buff, "        \"%s\":\"%s\"", key, val);
+			}
+			else
+			{
+				sprintf(me->buff, "\"%s\":\"%s\"", key, val);
+			}
+		}
+		else
+		{
+			if (me->prettyJsonResp)
+			{
+				sprintf(me->buff, "        \"%s\":%s", key, val);
+			}
+			else
+			{
+				sprintf(me->buff, "\"%s\":%s", key, val);
+			}
+		}
+
+		// If NOT last line in loop, add comma
+		if (i < (numOfParamItems - 1))
+		{
+			if (me->prettyJsonResp)
+			{
+				strcat(me->buff, ",\r\n");
+			}
+			else
+			{
+				strcat(me->buff, ",");
+			}
+		}
+		else
+		{
+			if (me->prettyJsonResp)
+			{
+				strcat(me->buff, "\r\n");
+			}
+			else
+			{
+				// Do Nothing
+			}
+		}
+
+		// Send
+		ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+	}
+
+
+	//------------------------------------------------------------------------------
+	// JSON Footer
+	//------------------------------------------------------------------------------
+
+	// Prepare
+	if (me->prettyJsonResp)
+	{
+		strcpy
+		(
+			me->buff,
+			"    }\r\n"
+			"}\r\n"
+		);
+	}
+	else
+	{
+		strcpy
+		(
+			me->buff,
+				"}"
+			"}\r\n"
+		);
+	}
+
+	// Send
+	ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+}
 static void AlxCli_PrepResp_Success(AlxCli* me)
 {
 	if (me->prettyJsonResp)
