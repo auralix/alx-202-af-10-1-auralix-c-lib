@@ -110,7 +110,7 @@ void AlxCli_Handle(AlxCli* me)
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-flag     Get all device flags\r\n") == Alx_Ok);
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-const    Get all device constants\r\n") == Alx_Ok);
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-trig     Get all device triggers\r\n") == Alx_Ok);
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "set-param    Set specified device value: set-param --key <param_key> --val <param_val_to_set>\r\n") == Alx_Ok);
+			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "set-param    Set specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\r\n") == Alx_Ok);
 		}
 
 
