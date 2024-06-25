@@ -106,6 +106,7 @@ typedef struct
 	CellularCommInterface_t * CommIntf; // UART interface
 	CellularSimCardStatus_t simStatus;
 	CellularServiceStatus_t serviceStatus;
+	cellularSignalQuality_t signalQuality;
 	uint8_t cellularContext;	// Cellular context id
 }AlxNet_Cellular;
 #endif
@@ -178,6 +179,7 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip);
 void AlxNet_Dhcp_Enable(AlxNet* me, bool enable);
 bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me);
 AlxNet_Config Alx_GetNetInterface(AlxNet* me);
+void Alx_GetCellularSignalQuality(AlxNet *me, uint8_t *rssi, uint8_t *ber);
 
 
 

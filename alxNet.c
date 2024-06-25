@@ -370,22 +370,11 @@ static void tick_task(void *argument)
 static void cellular_info_task(void *argument)
 {
 	AlxNet* me = (AlxNet*) argument;
-	CellularSimCardInfo_t simInfo = { 0 };
-	CellularModemInfo_t modemInfo = { 0 };
-	CellularSignalInfo_t signalInfo = { 0 };
-	CellularPdnConfig_t pdnInfo = { 0 };
-
 	while (1)
 	{
-		//CellularError_t ret = Cellular_GetSignalInfo(me->cellular.handle, &signalInfo);
-		//if (ret != CELLULAR_SUCCESS)
-		//{
-		//	ALX_NET_TRACE_FORMAT("Error signal info: %d\r\n", ret);
-		//}
-		//else
-		//
-		//ALX_NET_TRACE_FORMAT("RSSI bars: %d\r\n", signalInfo.bars);
-		AlxOsDelay_ms(&alxOsDelay, 5000);
+		Cellular_GetInfo(me->cellular.handle, &me->cellular.signalQuality) ;
+		//ALX_TRACE_FORMAT("CELLULAR RSSI: %d\r\n", signalInfo.rssi);
+		AlxOsDelay_ms(&alxOsDelay, 1000);
 	}
 
 }
@@ -577,14 +566,14 @@ Alx_Status AlxNet_Init(AlxNet *me)
 		}
 
 		// Create a task that will monitor cellular diagnostics
-		//AlxOsThread cellular_info_thread;
-		//AlxOsThread_Ctor(&cellular_info_thread,
-		//	cellular_info_task,
-		//	"Cellular_info_task",
-		//	1024,
-		//	(void *)me,
-		//	THREAD_PRIORITY);
-		//AlxOsThread_Start(&cellular_info_thread);
+		AlxOsThread cellular_info_thread;
+		AlxOsThread_Ctor(&cellular_info_thread,
+			cellular_info_task,
+			"Cellular_info_task",
+			1024,
+			(void *)me,
+			THREAD_PRIORITY);
+		AlxOsThread_Start(&cellular_info_thread);
 
 		if(cellularStatus != CELLULAR_SUCCESS) {
 			return Alx_Err;
@@ -1044,6 +1033,16 @@ AlxNet_Config Alx_GetNetInterface(AlxNet *me)
 {
 	return me->config;
 }
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+void Alx_GetCellularSignalQuality(AlxNet *me, uint8_t *rssi, uint8_t *ber)
+{
+	if(rssi != NULL)
+		*rssi = me->cellular.signalQuality.rssi;
+	if(ber != NULL)
+		*ber = me->cellular.signalQuality.ber;
+}
+#endif
 
 
 //******************************************************************************

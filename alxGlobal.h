@@ -157,6 +157,7 @@ extern "C" {
 #include "cellular_comm_interface.h"
 #include "cellular_api.h"
 #include "cellular_types.h"
+#include "cellular_api_ext.h"
 #endif
 
 
