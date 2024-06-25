@@ -85,26 +85,35 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxParamItem_Type_Uint8,
-	AlxParamItem_Type_Uint16,
-	AlxParamItem_Type_Uint32,
-	AlxParamItem_Type_Uint64,
-	AlxParamItem_Type_Int8,
-	AlxParamItem_Type_Int16,
-	AlxParamItem_Type_Int32,
-	AlxParamItem_Type_Int64,
-	AlxParamItem_Type_Float,
-	AlxParamItem_Type_Double,
-	AlxParamItem_Type_Bool,
-	AlxParamItem_Type_Arr,
-	AlxParamItem_Type_Str
-} AlxParamItem_Type;
+	AlxParamItem_Uint8,
+	AlxParamItem_Uint16,
+	AlxParamItem_Uint32,
+	AlxParamItem_Uint64,
+	AlxParamItem_Int8,
+	AlxParamItem_Int16,
+	AlxParamItem_Int32,
+	AlxParamItem_Int64,
+	AlxParamItem_Float,
+	AlxParamItem_Double,
+	AlxParamItem_Bool,
+	AlxParamItem_Arr,
+	AlxParamItem_Str
+} AlxParamItem_DataType;
 
 typedef enum
 {
-	AlxParamItem_ValOutOfRangeHandle_Assert,
-	AlxParamItem_ValOutOfRangeHandle_Ignore,
-	AlxParamItem_ValOutOfRangeHandle_Bound
+	AlxParamItem_Param,
+	AlxParamItem_Var,
+	AlxParamItem_Flag,
+	AlxParamItem_Const,
+	AlxParamItem_Trig
+} AlxParamItem_ParamType;
+
+typedef enum
+{
+	AlxParamItem_Assert,
+	AlxParamItem_Ignore,
+	AlxParamItem_Bound
 } AlxParamItem_ValOutOfRangeHandle;
 
 typedef union
@@ -131,10 +140,12 @@ typedef struct
 	#define ALX_PARAM_ITEM_FTOA_PRECISION 6
 
 	// Parameters
-	AlxParamItem_Type type;
+	AlxParamItem_DataType dataType;
 	AlxParamKvStore* paramKvStore;
+	AlxParamItem_ParamType paramType;
 	const char* key;
 	uint32_t id;
+	const char* groupKey;
 	uint32_t groupId;
 	AlxParamItem_Val valDef;
 	AlxParamItem_Val valMin;
@@ -161,8 +172,10 @@ void AlxParamItem_CtorUint8
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	uint8_t valDef,
 	uint8_t valMin,
@@ -175,8 +188,10 @@ void AlxParamItem_CtorUint16
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	uint16_t valDef,
 	uint16_t valMin,
@@ -189,8 +204,10 @@ void AlxParamItem_CtorUint32
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	uint32_t valDef,
 	uint32_t valMin,
@@ -203,8 +220,10 @@ void AlxParamItem_CtorUint64
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	uint64_t valDef,
 	uint64_t valMin,
@@ -217,8 +236,10 @@ void AlxParamItem_CtorInt8
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	int8_t valDef,
 	int8_t valMin,
@@ -231,8 +252,10 @@ void AlxParamItem_CtorInt16
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	int16_t valDef,
 	int16_t valMin,
@@ -245,8 +268,10 @@ void AlxParamItem_CtorInt32
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	int32_t valDef,
 	int32_t valMin,
@@ -259,8 +284,10 @@ void AlxParamItem_CtorInt64
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	int64_t valDef,
 	int64_t valMin,
@@ -273,8 +300,10 @@ void AlxParamItem_CtorFloat
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	float valDef,
 	float valMin,
@@ -287,8 +316,10 @@ void AlxParamItem_CtorDouble
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	double valDef,
 	double valMin,
@@ -301,16 +332,21 @@ void AlxParamItem_CtorBool
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	bool valDef
 );
 void AlxParamItem_CtorArr
 (
 	AlxParamItem* me,
+	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	void* valDef,
 	void* valBuff,
@@ -322,8 +358,10 @@ void AlxParamItem_CtorStr
 (
 	AlxParamItem* me,
 	AlxParamKvStore* paramKvStore,
+	AlxParamItem_ParamType paramType,
 	const char* key,
 	uint32_t id,
+	const char* groupKey,
 	uint32_t groupId,
 	const char* valDef,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
@@ -340,10 +378,12 @@ void AlxParamItem_CtorStr
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
+AlxParamItem_DataType AlxParamItem_GetDataType(AlxParamItem* me);
+AlxParamItem_ParamType AlxParamItem_GetParamType(AlxParamItem* me);
 const char* AlxParamItem_GetKey(AlxParamItem* me);
 uint32_t AlxParamItem_GetId(AlxParamItem* me);
+const char* AlxParamItem_GetGroupKey(AlxParamItem* me);
 uint32_t AlxParamItem_GetGroupId(AlxParamItem* me);
-AlxParamItem_Type AlxParamItem_GetType(AlxParamItem* me);
 void* AlxParamItem_GetValPtr(AlxParamItem* me);
 uint32_t AlxParamItem_GetValLen(AlxParamItem* me);
 

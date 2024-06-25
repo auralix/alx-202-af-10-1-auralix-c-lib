@@ -33,14 +33,17 @@
 #include "alxOsDelay.h"
 #include "alxOsThread.h"
 #include "alxTick.h"
-
+#if defined(ALX_WIZNET)
 #include "socket.h"
 #include "w5500.h"
+#endif
+
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
+
 
 //******************************************************************************
 // Private Defines
@@ -844,4 +847,4 @@ void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms)
 //******************************************************************************
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))

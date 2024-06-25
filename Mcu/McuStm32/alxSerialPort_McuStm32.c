@@ -204,7 +204,7 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 	// Init UART
 	if (me->lin != AlxSerialPort_Lin_Disable)
 	{
-		#if defined(ALX_STM32F0)
+		#if defined(ALX_STM32F0) && defined(USART_CR2_LINEN)
 		if(HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
 		#endif
 	}
@@ -329,7 +329,7 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	// Write
 	if (me->lin != AlxSerialPort_Lin_Disable)
 	{
-		#if defined(ALX_STM32F0)
+		#if defined(ALX_STM32F0) && defined(USART_CR2_LINEN)
 		if(HAL_LIN_SendBreak(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
 		#endif
 	}

@@ -35,15 +35,18 @@
 #include "alxOsDelay.h"
 #include "alxOsThread.h"
 #include "alxSocket.h"
-
+#if defined(ALX_WIZNET)
 #include "socket.h"
 #include "dhcp.h"
 #include "dns.h"
+#endif
+
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
+
 
 //******************************************************************************
 // Defines
@@ -1048,4 +1051,4 @@ AlxNet_Config Alx_GetNetInterface(AlxNet *me)
 //******************************************************************************
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))

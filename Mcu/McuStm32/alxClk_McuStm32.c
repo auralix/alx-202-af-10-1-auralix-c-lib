@@ -398,7 +398,9 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hsi_8MHz_Default(A
 	me->iosc.HSI14State = RCC_HSI14_OFF;
 	me->iosc.HSI14CalibrationValue = RCC_HSI14CALIBRATION_DEFAULT;
 	me->iosc.LSIState = RCC_LSI_OFF;
+	#if defined(RCC_HSI48_SUPPORT)
 	me->iosc.HSI48State = RCC_HSI48_OFF;
+	#endif
 	me->iosc.PLL.PLLState = RCC_PLL_NONE;
 	me->iosc.PLL.PLLSource = ALX_NULL;
 	me->iosc.PLL.PLLMUL = ALX_NULL;
@@ -418,7 +420,6 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hsi_8MHz_Default(A
 	me->sysclk_Ctor = 8000000;
 	me->hclk_Ctor = 8000000;
 	me->pclk1Apb1_Ctor = 8000000;
-	me->pclk2Apb2_Ctor = 0;
 	me->pclk1Apb1Tim_Ctor = 8000000;
 	me->pclk2Apb2Tim_Ctor = 0;
 	me->mainPllInputClk_Ctor = 0;
@@ -438,7 +439,9 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hse_8MHz(AlxClk* m
 	me->iosc.HSI14State = RCC_HSI14_OFF;
 	me->iosc.HSI14CalibrationValue = RCC_HSI14CALIBRATION_DEFAULT;
 	me->iosc.LSIState = RCC_LSI_OFF;
+	#if defined(RCC_HSI48_SUPPORT)
 	me->iosc.HSI48State = RCC_HSI48_OFF;
+	#endif
 	me->iosc.PLL.PLLState = RCC_PLL_NONE;
 	me->iosc.PLL.PLLSource = ALX_NULL;
 	me->iosc.PLL.PLLMUL = ALX_NULL;
@@ -458,7 +461,6 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hse_8MHz(AlxClk* m
 	me->sysclk_Ctor = 8000000;
 	me->hclk_Ctor = 8000000;
 	me->pclk1Apb1_Ctor = 8000000;
-	me->pclk2Apb2_Ctor = 0;
 	me->pclk1Apb1Tim_Ctor = 8000000;
 	me->pclk2Apb2Tim_Ctor = 0;
 	me->mainPllInputClk_Ctor = 0;
@@ -478,7 +480,9 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz(AlxClk*
 	me->iosc.HSI14State = RCC_HSI14_OFF;
 	me->iosc.HSI14CalibrationValue = RCC_HSI14CALIBRATION_DEFAULT;
 	me->iosc.LSIState = RCC_LSI_OFF;
+	#if defined(RCC_HSI48_SUPPORT)
 	me->iosc.HSI48State = RCC_HSI48_OFF;
+	#endif
 	me->iosc.PLL.PLLState = RCC_PLL_ON;
 	me->iosc.PLL.PLLSource = RCC_PLLSOURCE_HSI;
 	me->iosc.PLL.PLLMUL = RCC_PLL_MUL6;
@@ -498,7 +502,6 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz(AlxClk*
 	me->sysclk_Ctor = 48000000;
 	me->hclk_Ctor = 48000000;
 	me->pclk1Apb1_Ctor = 48000000;
-	me->pclk2Apb2_Ctor = 0;
 	me->pclk1Apb1Tim_Ctor = 48000000;
 	me->pclk2Apb2Tim_Ctor = 0;
 	me->mainPllInputClk_Ctor = 8000000;
@@ -518,7 +521,9 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz(AlxClk*
 	me->iosc.HSI14State = RCC_HSI14_OFF;
 	me->iosc.HSI14CalibrationValue = RCC_HSI14CALIBRATION_DEFAULT;
 	me->iosc.LSIState = RCC_LSI_OFF;
+	#if defined(RCC_HSI48_SUPPORT)
 	me->iosc.HSI48State = RCC_HSI48_OFF;
+	#endif
 	me->iosc.PLL.PLLState = RCC_PLL_ON;
 	me->iosc.PLL.PLLSource = RCC_PLLSOURCE_HSE;
 	me->iosc.PLL.PLLMUL = RCC_PLL_MUL6;
@@ -538,7 +543,6 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz(AlxClk*
 	me->sysclk_Ctor = 48000000;
 	me->hclk_Ctor = 48000000;
 	me->pclk1Apb1_Ctor = 48000000;
-	me->pclk2Apb2_Ctor = 0;
 	me->pclk1Apb1Tim_Ctor = 48000000;
 	me->pclk2Apb2Tim_Ctor = 0;
 	me->mainPllInputClk_Ctor = 8000000;

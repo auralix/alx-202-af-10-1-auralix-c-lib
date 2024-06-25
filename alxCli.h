@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxWdt_McuStm32.h
-  * @brief		Auralix C Library - ALX Watchdog Timer MCU STM32 Module
+  * @file		alxCli.h
+  * @brief		Auralix C Library - ALX CLI Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_WDT_MCU_STM32_H
-#define ALX_WDT_MCU_STM32_H
+#ifndef ALX_CLI_H
+#define ALX_CLI_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,56 +42,90 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxSerialPort.h"
+#include "alxId.h"
+#include "alxParamMgmt.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
+// Preprocessor
+//******************************************************************************
+#define ALX_CLI_FILE "alxCli.h"
+
+// Assert //
+#if defined(ALX_CLI_ASSERT_BKPT_ENABLE)
+	#define ALX_CLI_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CLI_FILE, expr)
+#elif defined(ALX_CLI_ASSERT_TRACE_ENABLE)
+	#define ALX_CLI_ASSERT(expr) ALX_ASSERT_TRACE(ALX_CLI_FILE, expr)
+#elif defined(ALX_CLI_ASSERT_RST_ENABLE)
+	#define ALX_CLI_ASSERT(expr) ALX_ASSERT_RST(ALX_CLI_FILE, expr)
+#else
+	#define ALX_CLI_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(ALX_CLI_TRACE_ENABLE)
+	#define ALX_CLI_TRACE(...) ALX_TRACE_STD(ALX_CLI_FILE, __VA_ARGS__)
+	#define ALX_CLI_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
+#else
+	#define ALX_CLI_TRACE(...) do{} while (false)
+	#define ALX_CLI_TRACE_FORMAT(...) do{} while (false)
+#endif
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
-{
-	AlxWdt_Config_McuStm32_WdtTimeout_512ms_WdtClk_8kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_1024ms_WdtClk_4kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_2048ms_WdtClk_2kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_4096ms_WdtClk_1kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_8192ms_WdtClk_500Hz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_16384ms_WdtClk_250Hz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_32768ms_WdtClk_125Hz_Lsi_32kHz
-} AlxWdt_Config;
-
 typedef struct
 {
-	// Parameters
-	AlxWdt_Config config;
+	// Defines
+	#define ALX_CLI_BUFF_LEN 128
 
-	// Variables
-	IWDG_HandleTypeDef hiwdg;
+	// Parameters
+	AlxSerialPort* alxSerialPort;
+	AlxId* alxId;
+	AlxParamMgmt* alxParamMgmt;
+	bool prettyJsonEnable;
+	void* buff;
+	uint32_t buffLen;
 
 	// Info
 	bool wasCtorCalled;
-	bool isInit;
-} AlxWdt;
+} AlxCli;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxWdt_Ctor
+void AlxCli_Ctor
 (
-	AlxWdt* me,
-	AlxWdt_Config config
+	AlxCli* me,
+	AlxSerialPort* alxSerialPort,
+	AlxId* alxId,
+	AlxParamMgmt* alxParamMgmt,
+	bool prettyJsonEnable,
+	void* buff,
+	uint32_t buffLen
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+//******************************************************************************
+// Functions
+//******************************************************************************
+void AlxCli_Handle(AlxCli* me);
+void AlxCli_PrettyJsonEnable(AlxCli* me, bool prettyJsonEnable);
+
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_WDT_MCU_STM32_H
+#endif	// #ifndef ALX_CLI_H

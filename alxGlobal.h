@@ -176,7 +176,7 @@ extern "C" {
 // Wiznet
 //------------------------------------------------------------------------------
 #if defined(ALX_WIZNET)
-// TV: TODO, add files
+// TV: TODO
 #endif
 
 
