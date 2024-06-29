@@ -366,6 +366,19 @@ static void tick_task(void *argument)
 		AlxOsDelay_ms(&alxOsDelay, 1000);
 	}
 }
+#if defined(ALX_FREE_RTOS_CELLULAR)
+static void cellular_info_task(void *argument)
+{
+	AlxNet* me = (AlxNet*) argument;
+	while (1)
+	{
+		Cellular_GetInfo(me->cellular.handle, &me->cellular.signalQuality) ;
+		//ALX_TRACE_FORMAT("CELLULAR RSSI: %d\r\n", signalInfo.rssi);
+		AlxOsDelay_ms(&alxOsDelay, 1000);
+	}
+
+}
+#endif
 
 //******************************************************************************
 // Constructor
@@ -485,7 +498,6 @@ Alx_Status AlxNet_Init(AlxNet *me)
 
 		uint32_t timeoutCountLimit = (60000 / CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS) + 1U;
 		uint32_t timeoutCount = 0;
-		uint32_t i = 0U;
 
 		cellularStatus = Cellular_Init(&me->cellular.handle, me->cellular.CommIntf);
 		if (cellularStatus != CELLULAR_SUCCESS) {
@@ -553,21 +565,15 @@ Alx_Status AlxNet_Init(AlxNet *me)
 			}
 		}
 
-
-
-		// Modems onboard TCPIP stack has DNS already set, so no need to set it here.
-
-		//if (cellularStatus == CELLULAR_SUCCESS)
-		//{
-		//	cellularStatus = Cellular_SetDns(me->cellular.handle, CellularContext, CELLULAR_DNS_IP);
-		//
-		//	if (cellularStatus != CELLULAR_SUCCESS)
-		//	{
-		//		ALX_NET_TRACE_FORMAT("Cellular_SetDns failure %d\r\n", cellularStatus);
-		//	}
-		//	ALX_NET_TRACE_FORMAT("Cellular_SetDns SET: %s\r\n", CELLULAR_DNS_IP);
-		//
-		//}
+		// Create a task that will monitor cellular diagnostics
+		AlxOsThread cellular_info_thread;
+		AlxOsThread_Ctor(&cellular_info_thread,
+			cellular_info_task,
+			"Cellular_info_task",
+			1024,
+			(void *)me,
+			THREAD_PRIORITY);
+		AlxOsThread_Start(&cellular_info_thread);
 
 		if(cellularStatus != CELLULAR_SUCCESS) {
 			return Alx_Err;
@@ -624,7 +630,6 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 
 		CellularError_t cellularStatus = CELLULAR_SUCCESS;
 		me->cellular.cellularContext = CELLULAR_PDN_CONTEXT_ID;
-		char localIP[CELLULAR_IP_ADDRESS_MAX_SIZE] = { '\0' };
 		uint8_t NumStatus = 0;
 		bool pdnStatus = false;
 
@@ -653,10 +658,6 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 			{
 				ALX_NET_TRACE_FORMAT("Cellular_GetIPAddress failure %d\r\n", cellularStatus);
 			}
-			else
-			{
-				ALX_NET_TRACE_FORMAT("Cellular: Got IP: %s\r\n", me->ip);
-			}
 		}
 
 		if (cellularStatus == CELLULAR_SUCCESS) {
@@ -683,7 +684,7 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 			AlxOsMutex_Unlock(&me->alxMutex);
 			return Alx_Err;
 		}
-
+		me->isNetConnected = true;
 		AlxOsMutex_Unlock(&me->alxMutex);
 	}
 #endif
@@ -752,6 +753,14 @@ void AlxNet_SetMac(AlxNet* me, const char* mac)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(mac) == 17);
 
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	str2mac(mac, wiz_net_info.mac);
 	strcpy(me->mac, mac);
@@ -763,6 +772,14 @@ void AlxNet_SetIp(AlxNet* me, const char* ip)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(ip) < sizeof(me->ip));
+
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
 
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->ip, ip);
@@ -777,6 +794,14 @@ void AlxNet_SetNetmask(AlxNet* me, const char* netmask)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(netmask) < sizeof(me->netmask));
 
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->netmask, netmask);
 	uint8_t addr[4];
@@ -790,6 +815,14 @@ void AlxNet_SetGateway(AlxNet* me, const char* gateway)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(gateway) < sizeof(me->gateway));
 
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->gateway, gateway);
 	uint8_t addr[4];
@@ -801,6 +834,14 @@ const char* AlxNet_GetMac(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
+
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return NULL;
+	}
+	#endif
 
 	uint8_t bin_mac[6];
 	AlxOsMutex_Lock(&me->alxMutex);
@@ -841,6 +882,14 @@ const char* AlxNet_GetNetmask(AlxNet* me)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return NULL;
+	}
+	#endif
+
 	uint8_t addr[4];
 	AlxOsMutex_Lock(&me->alxMutex);
 	getSUBR(addr);
@@ -854,6 +903,14 @@ const char* AlxNet_GetGateway(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
+
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return NULL;
+	}
+	#endif
 
 	uint8_t addr[4];
 	AlxOsMutex_Lock(&me->alxMutex);
@@ -870,6 +927,14 @@ void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(dnsId < 4);
 	ALX_NET_ASSERT(strlen(ip) < sizeof(me->ip));
+
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
 
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->dns[dnsId], ip);
@@ -927,6 +992,14 @@ void AlxNet_Dhcp_Enable(AlxNet* me, bool enable)
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 
+	// Cellular does not support this feature
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return;
+	}
+	#endif
+
 	AlxOsMutex_Lock(&me->alxMutex);
 	if (enable)
 	{
@@ -955,6 +1028,62 @@ bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me)
 	// Return
 	return (AlxTick_Get_sec(&alxTick) < dhcp_ip_leased_until);
 }
+
+AlxNet_Config Alx_GetNetInterface(AlxNet *me)
+{
+	return me->config;
+}
+
+static int8_t parse_cellular_rssi_to_dbm(uint8_t input)
+{
+	if (input == 0) {
+		return -113;
+	}
+	else if (input == 1) {
+		return -111;
+	}
+	else if (input >= 2 && input <= 30) {
+		return -109 + (input - 2) * 2;
+	}
+	else if (input == 31) {
+		return -51;
+	}
+	else if (input == 99) {
+		return 1; // Not known or not detectable
+	}
+	else if (input == 100) {
+		return -116;
+	}
+	else if (input == 101) {
+		return -115;
+	}
+	else if (input >= 102 && input <= 190) {
+		return -114 + (input - 102);
+	}
+	else if (input == 191) {
+		return -25;	// -25dbm or greater
+	}
+	else if (input == 199) {
+		return 1; // Not known or not detectable
+	}
+	else if (input >= 100 && input <= 199) {
+		return -114 + (input - 100); // Extended for TD-SCDMA
+	}
+	else {
+		return 1; // Invalid input
+	}
+}
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+void Alx_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber)
+{
+	if (rssi != NULL) {
+		*rssi = parse_cellular_rssi_to_dbm(me->cellular.signalQuality.rssi);
+	}
+	if(ber != NULL)
+		*ber = me->cellular.signalQuality.ber;
+}
+#endif
 
 
 //******************************************************************************

@@ -81,7 +81,7 @@ extern "C" {
 //******************************************************************************
 // Defines
 //******************************************************************************
-#define ALX_NET_IP_ADDRESS_SIZE 16
+#define ALX_NET_IP_ADDRESS_SIZE 45
 #define ALX_NET_MAC_SIZE 18
 
 //******************************************************************************
@@ -106,6 +106,7 @@ typedef struct
 	CellularCommInterface_t * CommIntf; // UART interface
 	CellularSimCardStatus_t simStatus;
 	CellularServiceStatus_t serviceStatus;
+	cellularSignalQuality_t signalQuality;
 	uint8_t cellularContext;	// Cellular context id
 }AlxNet_Cellular;
 #endif
@@ -177,6 +178,10 @@ void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip);
 Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip);
 void AlxNet_Dhcp_Enable(AlxNet* me, bool enable);
 bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me);
+AlxNet_Config Alx_GetNetInterface(AlxNet* me);
+#if defined(ALX_FREE_RTOS_CELLULAR)
+void Alx_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber);
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
