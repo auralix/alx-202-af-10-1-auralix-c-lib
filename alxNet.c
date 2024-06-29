@@ -1034,11 +1034,52 @@ AlxNet_Config Alx_GetNetInterface(AlxNet *me)
 	return me->config;
 }
 
-#if defined(ALX_FREE_RTOS_CELLULAR)
-void Alx_GetCellularSignalQuality(AlxNet *me, uint8_t *rssi, uint8_t *ber)
+static int8_t parse_cellular_rssi_to_dbm(uint8_t input)
 {
-	if(rssi != NULL)
-		*rssi = me->cellular.signalQuality.rssi;
+	if (input == 0) {
+		return -113;
+	}
+	else if (input == 1) {
+		return -111;
+	}
+	else if (input >= 2 && input <= 30) {
+		return -109 + (input - 2) * 2;
+	}
+	else if (input == 31) {
+		return -51;
+	}
+	else if (input == 99) {
+		return 1; // Not known or not detectable
+	}
+	else if (input == 100) {
+		return -116;
+	}
+	else if (input == 101) {
+		return -115;
+	}
+	else if (input >= 102 && input <= 190) {
+		return -114 + (input - 102);
+	}
+	else if (input == 191) {
+		return -25;	// -25dbm or greater
+	}
+	else if (input == 199) {
+		return 1; // Not known or not detectable
+	}
+	else if (input >= 100 && input <= 199) {
+		return -114 + (input - 100); // Extended for TD-SCDMA
+	}
+	else {
+		return 1; // Invalid input
+	}
+}
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+void Alx_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber)
+{
+	if (rssi != NULL) {
+		*rssi = parse_cellular_rssi_to_dbm(me->cellular.signalQuality.rssi);
+	}
 	if(ber != NULL)
 		*ber = me->cellular.signalQuality.ber;
 }

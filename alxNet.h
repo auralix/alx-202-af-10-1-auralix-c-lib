@@ -179,8 +179,9 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip);
 void AlxNet_Dhcp_Enable(AlxNet* me, bool enable);
 bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me);
 AlxNet_Config Alx_GetNetInterface(AlxNet* me);
-void Alx_GetCellularSignalQuality(AlxNet *me, uint8_t *rssi, uint8_t *ber);
-
+#if defined(ALX_FREE_RTOS_CELLULAR)
+void Alx_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber);
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
