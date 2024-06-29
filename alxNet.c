@@ -757,7 +757,7 @@ void AlxNet_SetMac(AlxNet* me, const char* mac)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		return;
+		ALX_NET_ASSERT(0); // Assert, as cellular cannot call this functionality
 	}
 	#endif
 
@@ -777,7 +777,7 @@ void AlxNet_SetIp(AlxNet* me, const char* ip)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		return;
+		ALX_NET_ASSERT(0); // Assert, as cellular cannot call this functionality
 	}
 	#endif
 
@@ -798,7 +798,7 @@ void AlxNet_SetNetmask(AlxNet* me, const char* netmask)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		return;
+		ALX_NET_ASSERT(0); // Assert, as cellular cannot call this functionality
 	}
 	#endif
 
@@ -819,7 +819,7 @@ void AlxNet_SetGateway(AlxNet* me, const char* gateway)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		return;
+		ALX_NET_ASSERT(0); // Assert, as cellular cannot call this functionality
 	}
 	#endif
 
@@ -839,7 +839,7 @@ const char* AlxNet_GetMac(AlxNet* me)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		return NULL;
+		ALX_NET_ASSERT(0); // Assert, as cellular cannot call this functionality
 	}
 	#endif
 
@@ -886,7 +886,7 @@ const char* AlxNet_GetNetmask(AlxNet* me)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		return NULL;
+		ALX_NET_ASSERT(0); // Assert, as cellular cannot call this functionality
 	}
 	#endif
 
@@ -908,7 +908,7 @@ const char* AlxNet_GetGateway(AlxNet* me)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		return NULL;
+		ALX_NET_ASSERT(0); // Assert, as cellular cannot call this functionality
 	}
 	#endif
 
@@ -932,7 +932,7 @@ void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		return;
+		ALX_NET_ASSERT(0); // Assert, as cellular cannot call this functionality
 	}
 	#endif
 
@@ -996,7 +996,7 @@ void AlxNet_Dhcp_Enable(AlxNet* me, bool enable)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		return;
+		ALX_NET_ASSERT(0);	// Assert, as cellular cannot call this functionality
 	}
 	#endif
 
