@@ -53,7 +53,7 @@
 //******************************************************************************
 #define CONNECT_TIMEOUT 5000
 
-#define THREAD_STACK_SIZE_WORDS 2048
+#define THREAD_STACK_SIZE_WORDS 512
 #define THREAD_PRIORITY 1
 
 #define DNS_RETRY_COUNT 1 // 3 sec.
@@ -610,8 +610,9 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 			}
 		} while (temp == PHY_LINK_OFF);
 
-		uint8_t rx_tx_buff_sizes[] = { 2, 2, 2, 2, 2, 2, 2, 2 };
-		if (wizchip_init(rx_tx_buff_sizes, rx_tx_buff_sizes) != 0)
+		uint8_t rx_buff_sizes[] = { 2, 2, 2, 2, 2, 2, 2, 2 };
+		uint8_t tx_buff_sizes[] = { 2, 2, 2, 2, 2, 2, 2, 2 };
+		if (wizchip_init(tx_buff_sizes, rx_buff_sizes) != 0)
 		{
 			AlxOsMutex_Unlock(&me->alxMutex);
 			return Alx_Err;

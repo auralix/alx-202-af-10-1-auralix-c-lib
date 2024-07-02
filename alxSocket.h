@@ -44,6 +44,11 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxNet.h"
 
+#if defined(ALX_MBEDTLS)
+#include "mbedtls/x509.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/ssl.h"
+#endif
 
 //******************************************************************************
 // Module Guard
@@ -99,9 +104,32 @@ typedef struct
 	int backlog;
 } AlxWizSocketData;
 
+typedef enum
+{
+	SSL_INITIALIZED_CACERT = 1,
+	SSL_INITIALIZED_CLCERT,
+	SSL_INITIALIZED_CLKEY,
+	SSL_INITIALIZED_DRBG_CONTEXT,
+	SSL_INITIALIZED_SSL_CONFIG,
+	SSL_INITIALIZED_SSL_CONTEXT,
+} AlxSslInitStateType;
+
+#if defined(ALX_MBEDTLS)
+typedef struct
+{
+	mbedtls_x509_crt x509_ca_certificate;
+	mbedtls_x509_crt x509_cl_certificate;
+	mbedtls_pk_context pkey;
+	mbedtls_ctr_drbg_context drbg_context;
+	mbedtls_ssl_config ssl_config;
+	mbedtls_ssl_context ssl_context;
+	AlxSslInitStateType init_state;
+} AlxTlsData;
+#endif
+
 #if defined(ALX_FREE_RTOS_CELLULAR)
 
-// Event group bits
+	// Event group bits
 #define EVENT_BITS_SOCKET_CONNECT		0x01
 #define EVENT_BITS_SOCKET_DATA_READY	0x02
 #define EVENT_BITS_SOCKET_CLOSE			0x04
@@ -128,9 +156,14 @@ typedef struct
 	// Variables
 	AlxNet* alxNet;
 	AlxSocket_Protocol protocol;
+	#if defined(ALX_WIZNET)
 	AlxWizSocketData socket_data;
+	#endif
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	AlxCellularSocketData cellular_socket;
+	#endif
+	#if defined(ALX_MBEDTLS)
+	AlxTlsData tls_data;
 	#endif
 	uint32_t timeout;
 
@@ -161,6 +194,9 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me);
 int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len);
 int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len);
 void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms);
+#if defined(ALX_MBEDTLS)
+Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_cn, const unsigned char *ca_cert, const unsigned char *cl_cert, const unsigned char *cl_key);
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
