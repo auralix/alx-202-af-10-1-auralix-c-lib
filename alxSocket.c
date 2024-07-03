@@ -64,72 +64,6 @@ static AlxSocket wiz_server_sockets[_WIZCHIP_SOCK_NUM_]; // memory fror new sock
 
 static AlxOsMutex socketMutex;
 static volatile uint8_t socketConnectBits = 0;
-//******************************************************************************
-// Static TLS functions
-//******************************************************************************
-#if defined(ALX_MBEDTLS)
-static int sslRandomCallback(void *p_rng, unsigned char *output, size_t output_len)
-{
-	UNUSED(p_rng);
-	int i;
-
-	if (output_len <= 0)
-	{
-		return 1;
-	}
-
-	for (i = 0; i < output_len; i++)
-	{
-		*output++ = rand() % 0xff;
-	}
-
-	srand(rand());
-
-	return 0;
-}
-static void sslFree(AlxTlsData* tls)
-{
-	if (tls->init_state >= SSL_INITIALIZED_CACERT)
-	{
-		mbedtls_x509_crt_free(&tls->x509_ca_certificate);
-	}
-	if(tls->init_state  >= SSL_INITIALIZED_CLCERT)
-	{
-		mbedtls_x509_crt_free(&tls->x509_cl_certificate);
-	}
-	if (tls->init_state  >= SSL_INITIALIZED_CLKEY)
-	{
-		mbedtls_pk_free(&tls->pkey);
-	}
-	if (tls->init_state  >= SSL_INITIALIZED_DRBG_CONTEXT)
-	{
-		mbedtls_ctr_drbg_free(&tls->drbg_context);
-	}
-	if (tls->init_state  >= SSL_INITIALIZED_SSL_CONFIG)
-	{
-		mbedtls_ssl_config_free(&tls->ssl_config);
-	}
-	if (tls->init_state  >= SSL_INITIALIZED_SSL_CONTEXT)
-	{
-		mbedtls_ssl_free(&tls->ssl_context);
-	}
-}
-#if defined(ALX_WIZNET)
-static int wiz_recv(AlxSocket* me, void* data, uint32_t len);
-static int wiz_send(AlxSocket* me, void* data, uint32_t len);
-
-static int wiz_sslRecv(void *ctx, unsigned char *buf, size_t len)
-{
-	int ret = wiz_recv(ctx, buf, len);
-	return ret;
-}
-static int wiz_sslSend(void *ctx, const unsigned char *buf, size_t len)
-{
-	int ret = wiz_send(ctx, (unsigned char *)buf, len);
-	return ret;
-}
-#endif // if defined(ALX_WIZNET)
-#endif // if defined(MBED_TLS)
 
 //******************************************************************************
 // Constructor
@@ -304,8 +238,187 @@ static void CellularSocketDataReadyCallback(CellularSocketHandle_t socketHandle,
 	//ALX_SOCKET_TRACE_FORMAT("EVENT_BITS_SOCKET_DATA_READY\r\n");
 	//xEventGroupSetBits(me->cellular_socket.event_group, EVENT_BITS_SOCKET_DATA_READY);
 }
+static int cell_send(AlxSocket* me, void* data, uint32_t len)
+{
+	uint32_t sent_length = 0;
+	uint32_t sent_total = 0;
 
+	while (1)
+	{
+		CellularError_t cellularStatus = Cellular_SocketSend(me->alxNet->cellular.handle, me->cellular_socket.socket, data + sent_total, len - sent_total, &sent_length);
+		if (cellularStatus != CELLULAR_SUCCESS) return -1;
+
+		if (sent_length <= 0)
+		{
+			return sent_length;
+		}
+
+		sent_total += sent_length;
+		if (sent_total >= len)
+		{
+			break;
+		}
+		SOCKET_YIELD();
+	}
+
+	return sent_total;
+}
+
+static int cell_recv(AlxSocket* me, void* data, uint32_t len)
+{
+	uint32_t received_total = 0;
+	uint32_t received_chunk = 0;
+	int32_t total = 0;
+	AlxOsMutex_Lock(&socketMutex);
+	uint64_t timer_start = AlxTick_Get_ms(&alxTick);
+	while (1)
+	{
+		CellularError_t ret = Cellular_SocketRecv(me->alxNet->cellular.handle, me->cellular_socket.socket, data + received_total, len - received_total, &received_chunk);
+		if (ret != CELLULAR_SUCCESS)
+		{
+			total = -1;
+			break;
+		}
+
+		if (received_chunk <= len)
+		{
+			total = received_chunk;
+			if (total != 0) break;
+		}
+
+		received_total += received_chunk;
+
+		if (received_total >= len)
+		{
+			total = received_total;
+			break;
+		}
+
+		if ((AlxTick_Get_ms(&alxTick) - timer_start >= me->timeout) || (received_total > 0))
+		{
+			break;
+		}
+
+		SOCKET_YIELD();
+	}
+
+	AlxOsMutex_Unlock(&socketMutex);
+	return total;
+}
 #endif
+
+//******************************************************************************
+// Static TLS functions
+//******************************************************************************
+#if defined(ALX_MBEDTLS)
+static int sslRandomCallback(void *p_rng, unsigned char *output, size_t output_len)
+{
+	UNUSED(p_rng);
+	int i;
+
+	if (output_len <= 0)
+	{
+		return 1;
+	}
+
+	for (i = 0; i < output_len; i++)
+	{
+		*output++ = rand() % 0xff;
+	}
+
+	srand(rand());
+
+	return 0;
+}
+static void sslFree(AlxTlsData* tls)
+{
+	if (tls->init_state >= SSL_INITIALIZED_CACERT)
+	{
+		mbedtls_x509_crt_free(&tls->x509_ca_certificate);
+	}
+	if (tls->init_state  >= SSL_INITIALIZED_CLCERT)
+	{
+		mbedtls_x509_crt_free(&tls->x509_cl_certificate);
+	}
+	if (tls->init_state  >= SSL_INITIALIZED_CLKEY)
+	{
+		mbedtls_pk_free(&tls->pkey);
+	}
+	if (tls->init_state  >= SSL_INITIALIZED_DRBG_CONTEXT)
+	{
+		mbedtls_ctr_drbg_free(&tls->drbg_context);
+	}
+	if (tls->init_state  >= SSL_INITIALIZED_SSL_CONFIG)
+	{
+		mbedtls_ssl_config_free(&tls->ssl_config);
+	}
+	if (tls->init_state  >= SSL_INITIALIZED_SSL_CONTEXT)
+	{
+		mbedtls_ssl_free(&tls->ssl_context);
+	}
+}
+
+static int sslRecv(void *ctx, unsigned char *buf, size_t len)
+{
+	AlxSocket* me = (AlxSocket*)ctx;
+	int ret = Alx_Err;
+
+#if defined (ALX_WIZNET)
+	if (me->alxNet->config == AlxNet_Config_Wiznet)
+	{
+		ret = wiz_recv(ctx, buf, len);
+	}
+#endif
+#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		ret = cell_recv(ctx, buf, len);
+	}
+#endif
+	return ret;
+}
+static int sslSend(void *ctx, const unsigned char *buf, size_t len)
+{
+	AlxSocket* me = (AlxSocket*)ctx;
+	int ret = Alx_Err;
+
+#if defined (ALX_WIZNET)
+	if (me->alxNet->config == AlxNet_Config_Wiznet)
+	{
+		ret = wiz_send(ctx, (unsigned char *)buf, len);
+	}
+#endif
+#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		ret = cell_send(ctx, (unsigned char *)buf, len);
+	}
+#endif
+	return ret;
+}
+static Alx_Status sslHandshake(AlxSocket *me)
+{
+	int status;
+	while ((status = mbedtls_ssl_handshake(&me->tls_data.ssl_context)) != 0)
+	{
+		if (status != MBEDTLS_ERR_SSL_WANT_READ && status != MBEDTLS_ERR_SSL_WANT_WRITE)
+		{
+			ALX_SOCKET_TRACE_FORMAT("TLS handshake error: 0x%X\r\n", status);
+			sslFree(&me->tls_data);
+			return Alx_Err;
+		}
+	}
+	if ((status = mbedtls_ssl_get_verify_result(&me->tls_data.ssl_context)) != 0)
+	{
+		ALX_SOCKET_TRACE_FORMAT("TLS verify_result error 0x%X\r\n", status);
+		sslFree(&me->tls_data);
+		return Alx_Err;
+	}
+	ALX_SOCKET_TRACE_FORMAT("TLS handshake successful\r\n");
+	return Alx_Ok;
+}
+#endif // if defined(MBED_TLS)
+
 //******************************************************************************
 // Functions
 //******************************************************************************
@@ -379,11 +492,10 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 		case AlxSocket_Protocol_Udp:
 			socket_protocol = CELLULAR_SOCKET_PROTOCOL_UDP;
 			break;
+		case AlxSocket_Protocol_Tls:
 		case AlxSocket_Protocol_Tcp:
 			socket_protocol = CELLULAR_SOCKET_PROTOCOL_TCP;
 			break;
-		case AlxSocket_Protocol_Tls:
-			return Alx_Err;
 		default:
 			return Alx_Err;
 		}
@@ -489,6 +601,13 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
 	{
+		if (me->protocol == AlxSocket_Protocol_Tls)
+		{
+			while (mbedtls_ssl_close_notify(&me->tls_data.ssl_context) == MBEDTLS_ERR_SSL_WANT_WRITE)
+			{
+			}
+			sslFree(&me->tls_data);
+		}
 		if (NULL == me->cellular_socket.socket) return Alx_Err;
 		CellularError_t cellularStatus = CELLULAR_SUCCESS;
 		cellularStatus = Cellular_SocketClose(me->alxNet->cellular.handle, me->cellular_socket.socket);
@@ -535,22 +654,7 @@ Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port)
 		}
 		if (me->protocol == AlxSocket_Protocol_Tls)
 		{
-			int status;
-			while ((status = mbedtls_ssl_handshake(&me->tls_data.ssl_context)) != 0)
-			{
-				if (status != MBEDTLS_ERR_SSL_WANT_READ && status != MBEDTLS_ERR_SSL_WANT_WRITE)
-				{
-					ALX_SOCKET_TRACE_FORMAT("TLS handshake error: 0x%X\r\n", status);
-					sslFree(&me->tls_data);
-					return Alx_Err;
-				}
-			}
-			if ((status = mbedtls_ssl_get_verify_result(&me->tls_data.ssl_context)) != 0)
-			{
-				ALX_SOCKET_TRACE_FORMAT("TLS verify_result error 0x%X\r\n", status);
-				sslFree(&me->tls_data);
-				return Alx_Err;
-			}
+			return sslHandshake(me);
 		}
 		return Alx_Ok;
 	}
@@ -592,6 +696,10 @@ Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port)
 			return AlxNet_Timeout;
 		}
 
+		if (me->protocol == AlxSocket_Protocol_Tls)
+		{
+			return sslHandshake(me);
+		}
 
 		return Alx_Ok;
 	}
@@ -804,36 +912,18 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
 	{
 		if (NULL == me->cellular_socket.socket) return 0;
-		CellularError_t cellularStatus = CELLULAR_SUCCESS;
-		uint32_t sent_length = 0;
-		uint32_t sent_total = 0;
 
 		switch (me->protocol)
 		{
-		case AlxSocket_Protocol_Tcp:
 		case AlxSocket_Protocol_Tls:
+			return mbedtls_ssl_write(&me->tls_data.ssl_context, data, len);
+			break;
+		case AlxSocket_Protocol_Tcp:
 		case AlxSocket_Protocol_Udp:
-			while (1)
-			{
-				cellularStatus = Cellular_SocketSend(me->alxNet->cellular.handle, me->cellular_socket.socket, data + sent_total, len - sent_total, &sent_length);
-				if (cellularStatus != CELLULAR_SUCCESS) return 0;
-
-				if (sent_length <= 0)
-				{
-					return sent_length;
-				}
-
-				sent_total += sent_length;
-				if (sent_total >= len)
-				{
-					break;
-				}
-				SOCKET_YIELD();
-			}
-
-			return sent_total;
+			return cell_send(me, data, len);
+			break;
 		default:
-			return 0;
+			break;
 		}
 	}
 	#endif
@@ -915,50 +1005,15 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 	{
 		switch (me->protocol)
 		{
-			case AlxSocket_Protocol_Tcp:
-			case AlxSocket_Protocol_Tls:
-			case AlxSocket_Protocol_Udp:
-			{
-				uint32_t received_total = 0;
-				uint32_t received_chunk = 0;
-				uint32_t total = 0;
-				AlxOsMutex_Lock(&socketMutex);
-				uint64_t timer_start = AlxTick_Get_ms(&alxTick);
-				while (1)
-				{
-					CellularError_t ret = Cellular_SocketRecv(me->alxNet->cellular.handle, me->cellular_socket.socket, data + received_total, len - received_total, &received_chunk);
-					if (ret != CELLULAR_SUCCESS)
-					{
-						total = 0;
-						break;
-					}
-
-					if (received_chunk <= len)
-					{
-						total = received_chunk;
-						if(total != 0) break;
-					}
-
-					received_total += received_chunk;
-
-					if (received_total >= len)
-					{
-						total = received_total;
-						break;
-					}
-
-					if ((AlxTick_Get_ms(&alxTick) - timer_start >= me->timeout) || (received_total > 0))
-					{
-						break;
-					}
-
-					SOCKET_YIELD();
-				}
-
-				AlxOsMutex_Unlock(&socketMutex);
-				return total;
-			}
-			default: break;
+		case AlxSocket_Protocol_Tls:
+			return mbedtls_ssl_read(&me->tls_data.ssl_context, data, len);
+			break;
+		case AlxSocket_Protocol_Tcp:
+		case AlxSocket_Protocol_Udp:
+			return cell_recv(me, data, len);
+			break;
+		default:
+			break;
 		}
 
 	}
@@ -1046,12 +1101,7 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_cn, const unsigne
 		return Alx_Err;
 	}
 
-	#if defined(ALX_WIZNET)
-	if (me->alxNet->config == AlxNet_Config_Wiznet)
-	{
-		mbedtls_ssl_set_bio(&me->tls_data.ssl_context, me, wiz_sslSend, wiz_sslRecv, NULL);
-	}
-	#endif
+	mbedtls_ssl_set_bio(&me->tls_data.ssl_context, me, sslSend, sslRecv, NULL);
 
 	if (mbedtls_ssl_set_hostname(&me->tls_data.ssl_context, server_cn) != 0)
 	{
