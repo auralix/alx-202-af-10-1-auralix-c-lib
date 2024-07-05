@@ -111,6 +111,7 @@ extern "C" {
 #include "alxLin.h"
 #include "alxLinFun.h"
 #include "alxLogger.h"
+#include "alxMath.h"
 #include "alxMemRaw.h"
 #include "alxMemSafe.h"
 #include "alxNet.h"
