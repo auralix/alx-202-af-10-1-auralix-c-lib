@@ -51,8 +51,10 @@ static int AlxFs_Lfs_FlashInt_ReadBlock(const struct lfs_config* c, lfs_block_t 
 static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
 static int AlxFs_Lfs_FlashInt_EraseBlock(const struct lfs_config* c, lfs_block_t block);
 static int AlxFs_Lfs_FlashInt_SyncBlock(const struct lfs_config* c);
+#if defined(LFS_THREADSAFE)
 static int AlxFs_Lfs_FlashInt_Lock(const struct lfs_config* c);
 static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c);
+#endif
 #endif
 
 
@@ -65,8 +67,10 @@ static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block
 static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
 static int AlxFs_Lfs_Mmc_EraseBlock(const struct lfs_config* c, lfs_block_t block);
 static int AlxFs_Lfs_Mmc_SyncBlock(const struct lfs_config* c);
+#if defined(LFS_THREADSAFE)
 static int AlxFs_Lfs_Mmc_Lock(const struct lfs_config* c);
 static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c);
+#endif
 #endif
 
 
@@ -77,12 +81,20 @@ void AlxFs_Ctor
 (
 	AlxFs* me,
 	AlxFs_Config config,
-	AlxMmc* alxMmc
+	AlxMmc* alxMmc,
+	AlxIoPin* do_DBG_ReadBlock,
+	AlxIoPin* do_DBG_WriteBlock,
+	AlxIoPin* do_DBG_EraseBlock,
+	AlxIoPin* do_DBG_SyncBlock
 )
 {
 	// Parameters
 	me->config = config;
 	me->alxMmc = alxMmc;
+	me->do_DBG_ReadBlock = do_DBG_ReadBlock;
+	me->do_DBG_WriteBlock = do_DBG_WriteBlock;
+	me->do_DBG_EraseBlock = do_DBG_EraseBlock;
+	me->do_DBG_SyncBlock = do_DBG_SyncBlock;
 
 	// Variables
 	if (me->config == AlxFs_Config_Undefined)
@@ -119,6 +131,14 @@ Alx_Status AlxFs_Mount(AlxFs* me)
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	// isMounted -> Don't care
+	#if defined(ALX_LFS)
+	ALX_FS_ASSERT(me->lfsConfig.block_size % me->lfsConfig.read_size == 0);
+	ALX_FS_ASSERT(me->lfsConfig.block_size % me->lfsConfig.prog_size == 0);
+	ALX_FS_ASSERT(me->lfsConfig.cache_size % me->lfsConfig.read_size == 0);
+	ALX_FS_ASSERT(me->lfsConfig.cache_size % me->lfsConfig.prog_size == 0);
+	ALX_FS_ASSERT(me->lfsConfig.block_size % me->lfsConfig.cache_size == 0);
+	ALX_FS_ASSERT(me->lfsConfig.lookahead_size % 8 == 0);
+	#endif
 
 	// Do
 	#if defined(ALX_LFS)
@@ -1079,10 +1099,11 @@ static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c)
 #if defined(ALX_LFS) && defined(ALX_STM32L4)
 static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
 {
+	// General
 	memset(&me->lfs, 0, sizeof(me->lfs));
-
 	me->lfsConfig.context = me;
 
+	// Functions
 	me->lfsConfig.read  = AlxFs_Lfs_Mmc_ReadBlock;
 	me->lfsConfig.prog  = AlxFs_Lfs_Mmc_ProgBlock;
 	me->lfsConfig.erase = AlxFs_Lfs_Mmc_EraseBlock;
@@ -1092,7 +1113,8 @@ static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
 	me->lfsConfig.unlock = AlxFs_Lfs_Mmc_Unlock;
 	#endif
 
-	#define ALX_FS_MULTIPLY 8
+	// Parameters
+	#define ALX_FS_MULTIPLY 16
 	me->lfsConfig.read_size = 512*ALX_FS_MULTIPLY;
 	me->lfsConfig.prog_size = 512*ALX_FS_MULTIPLY;
 	me->lfsConfig.block_size = 512*ALX_FS_MULTIPLY;
@@ -1103,20 +1125,19 @@ static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
 }
 static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size)
 {
-	// Local variables
-	(void)c;
-	(void)off;
-	(void)size;
-
-	// Read
-	AlxFs* alxFs_me = (AlxFs*)c->context;
+	// Prepare
+	Alx_Status status = Alx_Err;
+	AlxFs* me = (AlxFs*)c->context;
 	uint32_t numOfBlocks = size / 512;
 	uint32_t blockAddr = (block * c->block_size + off) / 512;
-//	LL_GPIO_SetOutputPin(GPIOC, GPIO_PIN_3);	// di_ADC_nDRDY - DBG9
-	Alx_Status status = AlxMmc_ReadBlock(alxFs_me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 1, 1000);
-//	LL_GPIO_ResetOutputPin(GPIOC, GPIO_PIN_3);	// di_ADC_nDRDY - DBG9
+
+	// Read
+	if(me->do_DBG_ReadBlock != NULL) AlxIoPin_Set(me->do_DBG_ReadBlock);
+	status = AlxMmc_ReadBlock(me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 3, 100);
+	if(me->do_DBG_ReadBlock != NULL) AlxIoPin_Reset(me->do_DBG_ReadBlock);
 	if (status != Alx_Ok)
 	{
+		ALX_FS_TRACE("Err: %d", status);
 		return LFS_ERR_IO;
 	}
 
@@ -1125,20 +1146,19 @@ static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block
 }
 static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size)
 {
-	// Local variables
-	(void)c;
-	(void)off;
-	(void)size;
-
-	// Write
-	AlxFs* alxFs_me = (AlxFs*)c->context;
+	// Prepare
+	Alx_Status status = Alx_Err;
+	AlxFs* me = (AlxFs*)c->context;
 	uint32_t numOfBlocks = size / 512;
 	uint32_t blockAddr = (block * c->block_size + off) / 512;
-//	LL_GPIO_SetOutputPin(GPIOF, GPIO_PIN_14);	// do_ADC_I2C_SCL - DBG10
-	Alx_Status status = AlxMmc_WriteBlock(alxFs_me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 1, 1000);
-//	LL_GPIO_ResetOutputPin(GPIOF, GPIO_PIN_14);	// do_ADC_I2C_SCL - DBG10
+
+	// Write
+	if(me->do_DBG_WriteBlock != NULL) AlxIoPin_Set(me->do_DBG_WriteBlock);
+	status = AlxMmc_WriteBlock(me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 3, 100);
+	if(me->do_DBG_WriteBlock != NULL) AlxIoPin_Reset(me->do_DBG_WriteBlock);
 	if (status != Alx_Ok)
 	{
+		ALX_FS_TRACE("Err: %d", status);
 		return LFS_ERR_IO;
 	}
 
@@ -1147,20 +1167,25 @@ static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block
 }
 static int AlxFs_Lfs_Mmc_EraseBlock(const struct lfs_config* c, lfs_block_t block)
 {
-	// Local variables
-	(void)c;
+	// Prepare
+	AlxFs* me = (AlxFs*)c->context;
 	(void)block;
 
-//	LL_GPIO_SetOutputPin(GPIOF, GPIO_PIN_15);	// io_ADC_I2C_SDA - DBG11
-//	LL_GPIO_ResetOutputPin(GPIOF, GPIO_PIN_15);	// io_ADC_I2C_SDA - DBG11
+	// Toggle
+	if(me->do_DBG_EraseBlock != NULL) AlxIoPin_Set(me->do_DBG_EraseBlock);
+	if(me->do_DBG_EraseBlock != NULL) AlxIoPin_Reset(me->do_DBG_EraseBlock);
 
 	// Return
 	return LFS_ERR_OK;
 }
 static int AlxFs_Lfs_Mmc_SyncBlock(const struct lfs_config* c)
 {
-	// Local variables
-	(void)c;
+	// Prepare
+	AlxFs* me = (AlxFs*)c->context;
+
+	// Toggle
+	if(me->do_DBG_SyncBlock != NULL) AlxIoPin_Set(me->do_DBG_SyncBlock);
+	if(me->do_DBG_SyncBlock != NULL) AlxIoPin_Reset(me->do_DBG_SyncBlock);
 
 	// Return
 	return LFS_ERR_OK;

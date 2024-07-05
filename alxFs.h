@@ -42,6 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxIoPin.h"
 #include "alxMmc.h"
 #if defined(ALX_LFS)
 #include "lfs.h"
@@ -135,6 +136,10 @@ typedef struct
 	// Parameters
 	AlxFs_Config config;
 	AlxMmc* alxMmc;
+	AlxIoPin* do_DBG_ReadBlock;
+	AlxIoPin* do_DBG_WriteBlock;
+	AlxIoPin* do_DBG_EraseBlock;
+	AlxIoPin* do_DBG_SyncBlock;
 
 	// Variables
 	#if defined(ALX_LFS)
@@ -156,7 +161,11 @@ void AlxFs_Ctor
 (
 	AlxFs* me,
 	AlxFs_Config config,
-	AlxMmc* alxMmc
+	AlxMmc* alxMmc,
+	AlxIoPin* do_DBG_ReadBlock,
+	AlxIoPin* do_DBG_WriteBlock,
+	AlxIoPin* do_DBG_EraseBlock,
+	AlxIoPin* do_DBG_SyncBlock
 );
 
 
