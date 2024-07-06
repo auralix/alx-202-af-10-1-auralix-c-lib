@@ -43,7 +43,11 @@
 void AlxMath_Ctor(AlxMath* me)
 {
 	// Variables
-	memset(&me->data, 0, sizeof(me->data));
+	me->data.count = 0;
+	me->data.sum = 0;
+	me->data.avg = 0;
+	me->data.min = 4294967295;
+	me->data.max = 0;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -53,7 +57,7 @@ void AlxMath_Ctor(AlxMath* me)
 //******************************************************************************
 // Functions
 //******************************************************************************
-AlxMath_Data AlxMath_Process(AlxMath* me, float in)
+AlxMath_Data AlxMath_Process(AlxMath* me, uint32_t in)
 {
 	// Assert
 	ALX_MATH_ASSERT(me->wasCtorCalled == true);
@@ -65,7 +69,7 @@ AlxMath_Data AlxMath_Process(AlxMath* me, float in)
 	me->data.sum = me->data.sum + in;
 
 	// Update average
-	me->data.avg = me->data.sum / (float)me->data.count;
+	me->data.avg = me->data.sum / me->data.count;
 
 	// Update min
 	if (in < me->data.min)

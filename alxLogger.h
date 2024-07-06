@@ -46,6 +46,7 @@ extern "C" {
 #include "alxCrc.h"
 #include "alxTimSw.h"
 #include "alxIoPin.h"
+#include "alxMath.h"
 
 
 //******************************************************************************
@@ -146,6 +147,10 @@ typedef struct
 	AlxCrc alxCrc;
 	uint32_t numOfDirCreated;
 	uint32_t numOfFilesPerDirCreated;
+	AlxMath alxMath_ReadTime_ms;
+	AlxMath alxMath_WriteTime_ms;
+	AlxMath_Data alxMath_Data_ReadTime_ms;
+	AlxMath_Data alxMath_Data_WriteTime_ms;
 
 	// Info
 	bool wasCtorCalled;
@@ -182,6 +187,8 @@ uint32_t AlxLogger_GetNumOfLogsToReadAvailable(AlxLogger* me);
 Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
 AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me);
 AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me);
+AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me);
+AlxMath_Data AlxLogger_GetMath_Data_WriteTime_ms(AlxLogger* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

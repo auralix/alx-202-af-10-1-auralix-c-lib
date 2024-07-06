@@ -90,6 +90,10 @@ void AlxLogger_Ctor
 	AlxCrc_Ctor(&me->alxCrc, AlxCrc_Config_Ccitt);
 	me->numOfDirCreated = 0;
 	me->numOfFilesPerDirCreated = 0;
+	AlxMath_Ctor(&me->alxMath_ReadTime_ms);
+	AlxMath_Ctor(&me->alxMath_WriteTime_ms);
+	memset(&me->alxMath_Data_ReadTime_ms, 0, sizeof(me->alxMath_Data_ReadTime_ms));
+	memset(&me->alxMath_Data_WriteTime_ms, 0, sizeof(me->alxMath_Data_WriteTime_ms));
 
 	// Info
 	me->wasCtorCalled = true;
@@ -185,11 +189,15 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 	uint32_t readLen = 0;
 	uint32_t readLenTotal = 0;
 	uint32_t positionNew = 0;
+	AlxTimSw alxTimSw;
+	AlxTimSw_Ctor(&alxTimSw, false);
+	uint32_t readTime_ms = 0;
 
 
 	//------------------------------------------------------------------------------
 	// Loop
 	//------------------------------------------------------------------------------
+	AlxTimSw_Start(&alxTimSw);
 	if(me->do_DBG_Read != NULL) AlxIoPin_Set(me->do_DBG_Read);
 	while (true)
 	{
@@ -201,9 +209,9 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 			// Check if log-to-read available
 			if (AlxLogger_IsLogToReadAvailable(me) == false)
 			{
-				// Return
-				*numOfLogsActual = logNum;
-				return AlxLogger_ErrNoReadLog;
+				// Break
+				status = AlxLogger_ErrNoReadLog;
+				break;
 			}
 
 			// Open
@@ -311,7 +319,6 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 		readLenTotal = readLenTotal + readLen;
 
 
-
 		//------------------------------------------------------------------------------
 		// Handle Last Log & Check if Log-To-Read Available
 		//------------------------------------------------------------------------------
@@ -347,6 +354,8 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 		}
 	}
 	if(me->do_DBG_Read != NULL) AlxIoPin_Reset(me->do_DBG_Read);
+	readTime_ms = AlxTimSw_Get_ms(&alxTimSw);
+	me->alxMath_Data_ReadTime_ms = AlxMath_Process(&me->alxMath_ReadTime_ms, readTime_ms);
 
 
 	//------------------------------------------------------------------------------
@@ -376,11 +385,15 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 	int64_t numOfLogsPerFileRemaining = 0;
 	uint32_t numOfLogsToWrite = 0;
 	bool wereOldestReadLogsDiscarded = false;
+	AlxTimSw alxTimSw;
+	AlxTimSw_Ctor(&alxTimSw, false);
+	uint32_t writeTime_ms = 0;
 
 
 	//------------------------------------------------------------------------------
 	// Loop
 	//------------------------------------------------------------------------------
+	AlxTimSw_Start(&alxTimSw);
 	if(me->do_DBG_Write != NULL) AlxIoPin_Set(me->do_DBG_Write);
 	while (true)
 	{
@@ -552,6 +565,8 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 		}
 	}
 	if(me->do_DBG_Write != NULL) AlxIoPin_Reset(me->do_DBG_Write);
+	writeTime_ms = AlxTimSw_Get_ms(&alxTimSw);
+	me->alxMath_Data_WriteTime_ms = AlxMath_Process(&me->alxMath_WriteTime_ms, writeTime_ms);
 
 
 	//------------------------------------------------------------------------------
@@ -594,6 +609,24 @@ AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me)
 
 	// Return
 	return me->mdStored;
+}
+AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Return
+	return me->alxMath_Data_ReadTime_ms;
+}
+AlxMath_Data AlxLogger_GetMath_Data_WriteTime_ms(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Return
+	return me->alxMath_Data_WriteTime_ms;
 }
 
 

@@ -80,10 +80,10 @@ extern "C" {
 typedef struct
 {
 	uint32_t count;
-	float sum;
-	float avg;
-	float min;
-	float max;
+	uint64_t sum;
+	uint32_t avg;
+	uint32_t min;
+	uint32_t max;
 } AlxMath_Data;
 
 typedef struct
@@ -105,7 +105,7 @@ void AlxMath_Ctor(AlxMath* me);
 //******************************************************************************
 // Functions
 //******************************************************************************
-AlxMath_Data AlxMath_Process(AlxMath* me, float in);
+AlxMath_Data AlxMath_Process(AlxMath* me, uint32_t in);
 
 
 #endif	// #if defined(ALX_C_LIB)
