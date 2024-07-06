@@ -145,8 +145,8 @@ typedef struct
 	#if defined(ALX_LFS)
 	lfs_t lfs;
 	struct lfs_config lfsConfig;
-	#endif
 	uint32_t lfsAddr;
+	#endif
 
 	// Info
 	bool wasCtorCalled;

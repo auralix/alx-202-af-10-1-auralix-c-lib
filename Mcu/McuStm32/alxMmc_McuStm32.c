@@ -61,7 +61,7 @@ static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me);
 //------------------------------------------------------------------------------
 static Alx_Status AlxMmc_Init_Private(AlxMmc* me);
 static Alx_Status AlxMmc_DeInit_Private(AlxMmc* me);
-static Alx_Status AlxMmc_Reset(AlxMmc* me);
+static Alx_Status AlxMmc_ReInit(AlxMmc* me);
 static bool AlxMmc_IsClkOk(AlxMmc* me);
 static void AlxMmc_Periph_EnableClk(AlxMmc* me);
 static void AlxMmc_Periph_DisableClk(AlxMmc* me);
@@ -137,8 +137,8 @@ void AlxMmc_Ctor
 	me->hmmc.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
 	me->hmmc.Init.ClockDiv = 0;
 	me->hmmc.Init.Transceiver = SDMMC_TRANSCEIVER_DISABLE;
-	me->isDmaReadDone = false;
-	me->isDmaWriteDone = false;
+	me->dmaReadDone = false;
+	me->dmaWriteDone = false;
 
 	// Check clock
 	ALX_MMC_ASSERT(AlxMmc_IsClkOk(me));
@@ -195,15 +195,19 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
 		// Clear
-		me->isDmaReadDone = false;
+		me->dmaReadDone = false;
 
 		// Read
 		statusHal = HAL_MMC_ReadBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
-			ALX_MMC_TRACE("Err: %d", statusHal);
-			statusAlx = AlxMmc_Reset(me);
-			if (statusAlx != Alx_Ok) { ALX_MMC_TRACE("Err: %d", statusAlx); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaReadDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
@@ -212,9 +216,13 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, true);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err: %d", statusAlx);
-			statusAlx = AlxMmc_Reset(me);
-			if (statusAlx != Alx_Ok) { ALX_MMC_TRACE("Err: %d", statusAlx); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
@@ -223,9 +231,13 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusAlx = AlxMmc_WaitForTransferState(me);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err: %d", statusAlx);
-			statusAlx = AlxMmc_Reset(me);
-			if (statusAlx != Alx_Ok) { ALX_MMC_TRACE("Err: %d", statusAlx); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
@@ -267,15 +279,19 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
 		// Clear
-		me->isDmaWriteDone = false;
+		me->dmaWriteDone = false;
 
 		// Read
 		statusHal = HAL_MMC_WriteBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
-			ALX_MMC_TRACE("Err: %d", statusHal);
-			statusAlx = AlxMmc_Reset(me);
-			if (statusAlx != Alx_Ok) { ALX_MMC_TRACE("Err: %d", statusAlx); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaWriteDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
@@ -284,9 +300,13 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, false);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err: %d", statusAlx);
-			statusAlx = AlxMmc_Reset(me);
-			if (statusAlx != Alx_Ok) { ALX_MMC_TRACE("Err: %d", statusAlx); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
@@ -295,9 +315,13 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusAlx = AlxMmc_WaitForTransferState(me);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err: %d", statusAlx);
-			statusAlx = AlxMmc_Reset(me);
-			if (statusAlx != Alx_Ok) { ALX_MMC_TRACE("Err: %d", statusAlx); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
@@ -343,14 +367,14 @@ static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read)
 		// Check state
 		if (read)
 		{
-			if (me->isDmaReadDone)
+			if (me->dmaReadDone)
 			{
 				return Alx_Ok;
 			}
 		}
 		else	// write
 		{
-			if (me->isDmaWriteDone)
+			if (me->dmaWriteDone)
 			{
 				return Alx_Ok;
 			}
@@ -429,7 +453,11 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 
 	// Init clock
 	statusHal = HAL_RCCEx_PeriphCLKConfig(&me->iclk);
-	if (statusHal != HAL_OK) { ALX_MMC_TRACE("Err: %d", statusHal); return Alx_Err; }
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
 
 	// Release MMC periphery reset
 	AlxMmc_Periph_ReleaseReset(me);
@@ -442,23 +470,43 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 
 	// Init MMC - Communication with MMC
 	statusHal = HAL_MMC_Init(&me->hmmc);
-	if (statusHal != HAL_OK) { ALX_MMC_TRACE("Err: %d", statusHal); return Alx_Err; }
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
 
 	// Wait for Transfer State - Communication with MMC
 	statusAlx = AlxMmc_WaitForTransferState(me);
-	if (statusAlx != Alx_Ok) { ALX_MMC_TRACE("Err: %d", statusAlx); return Alx_Err; }
+	if (statusAlx != Alx_Ok)
+	{
+		ALX_MMC_TRACE("Err: %d", statusAlx);
+		return Alx_Err;
+	}
 
 	// Get CID - NO Commucination with MMC - Uses data which is aquired from HAL_MMC_Init
 	statusHal = HAL_MMC_GetCardCID(&me->hmmc, &me->cid);
-	if (statusHal != HAL_OK) { ALX_MMC_TRACE("Err: %d", statusHal); return Alx_Err; }
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
 
 	// Get CSD - Communication with MMC
 	statusHal = HAL_MMC_GetCardCSD(&me->hmmc, &me->csd);
-	if (statusHal != HAL_OK) { ALX_MMC_TRACE("Err: %d", statusHal); return Alx_Err; }
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
 
 	// Get Info - NO Commucination with MMC - Uses data which is aquired from HAL_MMC_GetCardCSD
 	statusHal = HAL_MMC_GetCardInfo(&me->hmmc, &me->info);
-	if (statusHal != HAL_OK) { ALX_MMC_TRACE("Err: %d", statusHal); return Alx_Err; }
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -476,7 +524,11 @@ static Alx_Status AlxMmc_DeInit_Private(AlxMmc* me)
 
 	// DeInit MMC
 	statusHal = HAL_MMC_DeInit(&me->hmmc);
-	if (statusHal != HAL_OK) { ALX_MMC_TRACE("Err: %d", statusHal); return Alx_Err; }
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
 
 	// Force MMC periphery reset
 	AlxMmc_Periph_ForceReset(me);
@@ -503,7 +555,7 @@ static Alx_Status AlxMmc_DeInit_Private(AlxMmc* me)
 	// Return
 	return Alx_Ok;
 }
-static Alx_Status AlxMmc_Reset(AlxMmc* me)
+static Alx_Status AlxMmc_ReInit(AlxMmc* me)
 {
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -601,7 +653,7 @@ void HAL_MMC_RxCpltCallback(MMC_HandleTypeDef *hmmc)
 	(void)hmmc;
 
 	#if defined(SDMMC1)
-	alxMmc_Sdmmc1_me->isDmaReadDone = true;
+	alxMmc_Sdmmc1_me->dmaReadDone = true;
 	#endif
 	#if defined(SDMMC2)
 	alxMmc_Sdmmc2_me->isDmaReadDone = true;
@@ -612,7 +664,7 @@ void HAL_MMC_TxCpltCallback(MMC_HandleTypeDef *hmmc)
 	(void)hmmc;
 
 	#if defined(SDMMC1)
-	alxMmc_Sdmmc1_me->isDmaWriteDone = true;
+	alxMmc_Sdmmc1_me->dmaWriteDone = true;
 	#endif
 	#if defined(SDMMC2)
 	alxMmc_Sdmmc2_me->isDmaWriteDone = true;

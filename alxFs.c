@@ -143,7 +143,11 @@ Alx_Status AlxFs_Mount(AlxFs* me)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_mount(&me->lfs, &me->lfsConfig);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d", status);
+		return Alx_Err;
+	}
 	#endif
 
 	// Set isMounted
@@ -161,7 +165,11 @@ Alx_Status AlxFs_UnMount(AlxFs* me)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_unmount(&me->lfs);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d", status);
+		return Alx_Err;
+	}
 	#endif
 
 	// Clear isMounted
@@ -185,11 +193,19 @@ Alx_Status AlxFs_MountFormat(AlxFs* me)
 	{
 		// Format
 		status = AlxFs_Format(me);
-		if (status != Alx_Ok) { ALX_FS_TRACE("Err: %d", status); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_FS_TRACE("Err: %d", status);
+			return status;
+		}
 
 		// Mount
 		status = AlxFs_Mount(me);
-		if (status != Alx_Ok) { ALX_FS_TRACE("Err: %d", status); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_FS_TRACE("Err: %d", status);
+			return status;
+		}
 	}
 
 	// Return
@@ -204,7 +220,11 @@ Alx_Status AlxFs_Format(AlxFs* me)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_format(&me->lfs, &me->lfsConfig);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d", status);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -219,7 +239,11 @@ Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_remove(&me->lfs, path);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -234,7 +258,11 @@ Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_rename(&me->lfs, pathOld, pathNew);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d, pathOld=%s, pathNew=%s", status, pathOld, pathNew);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -292,7 +320,11 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const 
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_file_open(&me->lfs, &file->lfsFile, path, modeConfig);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s, mode=%s", status, path, mode);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -307,7 +339,11 @@ Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_file_close(&me->lfs, &file->lfsFile);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d", status);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -321,9 +357,13 @@ Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len
 
 	// Do
 	#if defined(ALX_LFS)
-	lfs_ssize_t statusLenActual = lfs_file_read(&me->lfs, &file->lfsFile, data, (lfs_size_t)len);
-	if (statusLenActual < 0) { ALX_FS_TRACE("Err: statusLenActual=%d, len=%u", statusLenActual, len); return Alx_Err; }
-	*lenActual = (uint32_t)statusLenActual;
+	lfs_ssize_t _lenActual = lfs_file_read(&me->lfs, &file->lfsFile, data, (lfs_size_t)len);
+	if (_lenActual < 0)
+	{
+		ALX_FS_TRACE("Err: lenActual=%d, len=%u", _lenActual, len);
+		return Alx_Err;
+	}
+	*lenActual = (uint32_t)_lenActual;
 	#endif
 
 	// Return
@@ -338,26 +378,25 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 
 	// Local variables
 	Alx_Status status = AlxFs_ErrNoDelim;
-	uint32_t i = 0;
+	Alx_Status statusRead = Alx_Err;
+	uint32_t _lenActual = 0;
+	char ch = 0;
+	uint32_t readLenActual = 0;
 
 	// Loop
-	for (i = 0; i < (len - 1); i++)
+	for (_lenActual = 0; _lenActual < (len - 1); _lenActual++)
 	{
-		// Local variables
-		char ch = 0;
-		uint32_t readLenActual = 0;
-
 		// Read char
-		Alx_Status statusRead = AlxFs_File_Read(me, file, &ch, 1, &readLenActual);
+		statusRead = AlxFs_File_Read(me, file, &ch, 1, &readLenActual);
 		if ((statusRead == Alx_Ok) && (readLenActual == 0))
 		{
 			// Break, we reached end of file, status already AlxFs_ErrNoDelim
 			break;
 		}
-		if (statusRead != Alx_Ok)
+		else if (statusRead != Alx_Ok)
 		{
 			// Break, error occured, trace, change status to Alx_Err
-			ALX_FS_TRACE("Err: statusRead=%d, readLenActual=%u", statusRead, readLenActual);
+			ALX_FS_TRACE("Err: %d, ch=%d, readLenActual=%u, lenActual=%u, len=%u, delim=%s", statusRead, ch, readLenActual, _lenActual, len, delim);
 			status = Alx_Err;
 			break;
 		}
@@ -367,23 +406,23 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 		}
 
 		// Store char
-		str[i] = ch;
+		str[_lenActual] = ch;
 
 		// Check if char is delim
 		if (ch == *delim)
 		{
 			// Break, we found delimiter, increment i for correct null-termination, change status to Alx_Ok
-			i++;
+			_lenActual++;
 			status = Alx_Ok;
 			break;
 		}
 	}
 
 	// Null-terminate string
-	str[i] = '\0';
+	str[_lenActual] = '\0';
 
 	// Return
-	*lenActual = i;
+	*lenActual = _lenActual;
 	return status;
 }
 Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t len)
@@ -394,8 +433,12 @@ Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t le
 
 	// Do
 	#if defined(ALX_LFS)
-	lfs_ssize_t statusLenActual = lfs_file_write(&me->lfs, &file->lfsFile, data, (lfs_size_t)len);
-	if (statusLenActual != (lfs_ssize_t)len){ ALX_FS_TRACE("Err: statusLenActual=%d, len=%u", statusLenActual, len); return Alx_Err; }
+	lfs_ssize_t lenActual = lfs_file_write(&me->lfs, &file->lfsFile, data, (lfs_size_t)len);
+	if (lenActual != (lfs_ssize_t)len)
+	{
+		ALX_FS_TRACE("Err: lenActual=%d, len=%u", lenActual, len);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -419,7 +462,11 @@ Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_file_sync(&me->lfs, &file->lfsFile);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d", status);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -432,23 +479,23 @@ Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_Fi
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Prepare originConfig
-	int originConfig = 0;
+	int _origin = 0;
 	if (origin == AlxFs_File_Seek_Origin_Set)
 	{
 		#if defined(ALX_LFS)
-		originConfig = LFS_SEEK_SET;
+		_origin = LFS_SEEK_SET;
 		#endif
 	}
 	else if(origin == AlxFs_File_Seek_Origin_Cur)
 	{
 		#if defined(ALX_LFS)
-		originConfig = LFS_SEEK_CUR;
+		_origin = LFS_SEEK_CUR;
 		#endif
 	}
 	else if(origin == AlxFs_File_Seek_Origin_End)
 	{
 		#if defined(ALX_LFS)
-		originConfig = LFS_SEEK_END;
+		_origin = LFS_SEEK_END;
 		#endif
 	}
 	else
@@ -458,9 +505,13 @@ Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_Fi
 
 	// Do
 	#if defined(ALX_LFS)
-	lfs_soff_t statusPositionNew = lfs_file_seek(&me->lfs, &file->lfsFile, (lfs_soff_t)offset, originConfig);
-	if (statusPositionNew < 0) { ALX_FS_TRACE("Err: %d", statusPositionNew); return Alx_Err; }
-	*positionNew = (uint32_t)statusPositionNew;
+	lfs_soff_t _positionNew = lfs_file_seek(&me->lfs, &file->lfsFile, (lfs_soff_t)offset, _origin);
+	if (_positionNew < 0)
+	{
+		ALX_FS_TRACE("Err: positionNew=%d, offset=%d, _origin=%d", _positionNew, offset, _origin);
+		return Alx_Err;
+	}
+	*positionNew = (uint32_t)_positionNew;
 	#endif
 
 	// Return
@@ -474,9 +525,13 @@ Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* position)
 
 	// Do
 	#if defined(ALX_LFS)
-	lfs_soff_t statusPosition = lfs_file_tell(&me->lfs, &file->lfsFile);
-	if (statusPosition < 0) { ALX_FS_TRACE("Err, %d", statusPosition); return Alx_Err; }
-	*position = (uint32_t)statusPosition;
+	lfs_soff_t _position = lfs_file_tell(&me->lfs, &file->lfsFile);
+	if (_position < 0)
+	{
+		ALX_FS_TRACE("Err: %d", _position);
+		return Alx_Err;
+	}
+	*position = (uint32_t)_position;
 	#endif
 
 	// Return
@@ -491,7 +546,11 @@ Alx_Status AlxFs_File_Rewind(AlxFs* me, AlxFs_File* file)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_file_rewind(&me->lfs, &file->lfsFile);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d", status);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -505,9 +564,13 @@ Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* size)
 
 	// Do
 	#if defined(ALX_LFS)
-	lfs_soff_t statusSize = lfs_file_size(&me->lfs, &file->lfsFile);
-	if (statusSize < 0) { ALX_FS_TRACE("Err: %d", statusSize); return Alx_Err; }
-	*size = (uint32_t)statusSize;
+	lfs_soff_t _size = lfs_file_size(&me->lfs, &file->lfsFile);
+	if (_size < 0)
+	{
+		ALX_FS_TRACE("Err: %d", _size);
+		return Alx_Err;
+	}
+	*size = (uint32_t)_size;
 	#endif
 
 	// Return
@@ -522,7 +585,11 @@ Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_file_truncate(&me->lfs, &file->lfsFile, (lfs_off_t)size);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d, size=%u", status, size);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -540,18 +607,23 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	uint32_t fileSize = 0;
 	uint32_t fileSizeTraced = 0;
 	uint8_t buff[ALX_FS_BUFF_LEN] = {};
+	uint32_t len = sizeof(buff)-1;	// Subtract -1 for string null-terminator
 	uint32_t lenActual = 0;
 
 	// Open
 	status = AlxFs_File_Open(me, &file, path, "r");
-	if (status != Alx_Ok) { ALX_FS_TRACE("Err: %d", status); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		return status;
+	}
 
 	// Get fileSize
 	status = AlxFs_File_Size(me, &file, &fileSize);
 	if (status != Alx_Ok)
 	{
-		AlxFs_File_Close(me, &file);	// Will not handle return
-		ALX_FS_TRACE("Err: %d", status);
+		ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u", status, path, fileSize);
+		AlxFs_File_Close(me, &file);	// Will not handle return, TV: TODO
 		return status;
 	}
 
@@ -560,11 +632,11 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	{
 		// Read
 		memset(buff, 0, sizeof(buff));
-		status = AlxFs_File_Read(me, &file, buff, sizeof(buff)-1, &lenActual);	// Subtract -1 for string null-terminator
+		status = AlxFs_File_Read(me, &file, buff, len, &lenActual);
 		if (status != Alx_Ok)
 		{
-			AlxFs_File_Close(me, &file);	// Will not handle return
-			ALX_FS_TRACE("Err: %d", status);
+			ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u, len=%u, lenActual=%u", status, path, fileSize, len, lenActual);
+			AlxFs_File_Close(me, &file);	// Will not handle return, TV: TODO
 			return status;
 		}
 
@@ -582,8 +654,7 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	}
 
 	// Close
-	status = AlxFs_File_Close(me, &file);
-	if (status != Alx_Ok) { ALX_FS_TRACE("Err: %d", status); return status; }
+	AlxFs_File_Close(me, &file);	// Will not handle return, TV: TODO
 
 	// Return
 	return Alx_Ok;
@@ -597,7 +668,11 @@ Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_mkdir(&me->lfs, path);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -612,7 +687,11 @@ Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_dir_open(&me->lfs, &dir->lfsDir, path);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -627,7 +706,11 @@ Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir)
 	// Do
 	#if defined(ALX_LFS)
 	int status = lfs_dir_close(&me->lfs, &dir->lfsDir);
-	if (status != 0) { ALX_FS_TRACE("Err: %d", status); return Alx_Err; }
+	if (status != 0)
+	{
+		ALX_FS_TRACE("Err: %d", status);
+		return Alx_Err;
+	}
 	#endif
 
 	// Return
@@ -673,7 +756,11 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 
 	// Open
 	status = AlxFs_Dir_Open(me, &dir, path);
-	if (status != Alx_Ok) { ALX_FS_TRACE("Err: %d", status); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
+		return status;
+	}
 
 	// Loop
 	#if defined(ALX_LFS)
@@ -687,8 +774,8 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 		}
 		else if (status != Alx_Ok)
 		{
-			AlxFs_Dir_Close(me, &dir);	// Will not handle return
-			ALX_FS_TRACE("Err: %d", status);
+			ALX_FS_TRACE("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
+			AlxFs_Dir_Close(me, &dir);	// Will not handle return, TV: TODO
 			return status;
 		}
 
@@ -711,8 +798,8 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 				status = AlxFs_File_Trace(me, buff);
 				if (status != Alx_Ok)
 				{
-					AlxFs_Dir_Close(me, &dir);	// Will not handle return
-					ALX_FS_TRACE("Err: %d", status);
+					ALX_FS_TRACE("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
+					AlxFs_Dir_Close(me, &dir);	// Will not handle return, TV: TODO
 					return status;
 				}
 			}
@@ -733,8 +820,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 	#endif
 
 	// Close
-	status = AlxFs_Dir_Close(me, &dir);
-	if (status != Alx_Ok) { ALX_FS_TRACE("Err: %d", status); return status; }
+	AlxFs_Dir_Close(me, &dir);	// Will not handle return, TV: TODO
 
 	// Trace
 	ALX_FS_TRACE_FORMAT("\r\n");
@@ -755,10 +841,16 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 #if defined(ALX_LFS)
 static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me)
 {
+	//------------------------------------------------------------------------------
+	// General
+	//------------------------------------------------------------------------------
 	memset(&me->lfs, 0, sizeof(me->lfs));
-
 	me->lfsConfig.context = me;
 
+
+	//------------------------------------------------------------------------------
+	// Functions
+	//------------------------------------------------------------------------------
 	me->lfsConfig.read  = AlxFs_Lfs_FlashInt_ReadBlock;
 	me->lfsConfig.prog  = AlxFs_Lfs_FlashInt_ProgBlock;
 	me->lfsConfig.erase = AlxFs_Lfs_FlashInt_EraseBlock;
@@ -768,6 +860,10 @@ static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me)
 	me->lfsConfig.unlock = AlxFs_Lfs_FlashInt_Unlock;
 	#endif
 
+
+	//------------------------------------------------------------------------------
+	// Parameters
+	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F4)
 	me->lfsAddr = 0x08100000;
 	me->lfsConfig.read_size = 1;
@@ -1099,11 +1195,16 @@ static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c)
 #if defined(ALX_LFS) && defined(ALX_STM32L4)
 static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
 {
+	//------------------------------------------------------------------------------
 	// General
+	//------------------------------------------------------------------------------
 	memset(&me->lfs, 0, sizeof(me->lfs));
 	me->lfsConfig.context = me;
 
+
+	//------------------------------------------------------------------------------
 	// Functions
+	//------------------------------------------------------------------------------
 	me->lfsConfig.read  = AlxFs_Lfs_Mmc_ReadBlock;
 	me->lfsConfig.prog  = AlxFs_Lfs_Mmc_ProgBlock;
 	me->lfsConfig.erase = AlxFs_Lfs_Mmc_EraseBlock;
@@ -1113,7 +1214,10 @@ static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)
 	me->lfsConfig.unlock = AlxFs_Lfs_Mmc_Unlock;
 	#endif
 
+
+	//------------------------------------------------------------------------------
 	// Parameters
+	//------------------------------------------------------------------------------
 	#define ALX_FS_MULTIPLY 16
 	me->lfsConfig.read_size = 512*ALX_FS_MULTIPLY;
 	me->lfsConfig.prog_size = 512*ALX_FS_MULTIPLY;

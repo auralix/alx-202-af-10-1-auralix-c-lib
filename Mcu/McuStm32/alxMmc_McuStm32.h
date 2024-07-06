@@ -83,8 +83,8 @@ typedef struct
 	HAL_MMC_CardCIDTypeDef cid;
 	HAL_MMC_CardCSDTypeDef csd;
 	HAL_MMC_CardInfoTypeDef info;
-	bool isDmaReadDone;
-	bool isDmaWriteDone;
+	bool dmaReadDone;
+	bool dmaWriteDone;
 
 	// Info
 	bool wasCtorCalled;
