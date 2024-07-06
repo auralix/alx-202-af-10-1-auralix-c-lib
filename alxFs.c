@@ -623,7 +623,12 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u", status, path, fileSize);
-		AlxFs_File_Close(me, &file);	// Will not handle return, TV: TODO
+		Alx_Status statusClose = AlxFs_File_Close(me, &file);
+		if (statusClose != Alx_Ok)
+		{
+			ALX_FS_TRACE("Err: %d, path=%s", statusClose, path);
+			// TV: TODO - Handle close error
+		}
 		return status;
 	}
 
@@ -636,7 +641,12 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 		if (status != Alx_Ok)
 		{
 			ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u, len=%u, lenActual=%u", status, path, fileSize, len, lenActual);
-			AlxFs_File_Close(me, &file);	// Will not handle return, TV: TODO
+			Alx_Status statusClose = AlxFs_File_Close(me, &file);
+			if (statusClose != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err: %d, path=%s", statusClose, path);
+				// TV: TODO - Handle close error
+			}
 			return status;
 		}
 
@@ -654,7 +664,13 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	}
 
 	// Close
-	AlxFs_File_Close(me, &file);	// Will not handle return, TV: TODO
+	status = AlxFs_File_Close(me, &file);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		// TV: TODO - Handle close error
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -775,7 +791,12 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 		else if (status != Alx_Ok)
 		{
 			ALX_FS_TRACE("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
-			AlxFs_Dir_Close(me, &dir);	// Will not handle return, TV: TODO
+			Alx_Status statusClose = AlxFs_Dir_Close(me, &dir);
+			if (statusClose != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err: %d, path=%s", status, path);
+				// TV: TODO - Handle close error
+			}
 			return status;
 		}
 
@@ -799,7 +820,12 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 				if (status != Alx_Ok)
 				{
 					ALX_FS_TRACE("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
-					AlxFs_Dir_Close(me, &dir);	// Will not handle return, TV: TODO
+					Alx_Status statusClose = AlxFs_Dir_Close(me, &dir);
+					if (statusClose != Alx_Ok)
+					{
+						ALX_FS_TRACE("Err: %d, path=%s", status, path);
+						// TV: TODO - Handle close error
+					}
 					return status;
 				}
 			}
@@ -820,7 +846,13 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 	#endif
 
 	// Close
-	AlxFs_Dir_Close(me, &dir);	// Will not handle return, TV: TODO
+	status = AlxFs_Dir_Close(me, &dir);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		// TV: TODO - Handle close error
+		return status;
+	}
 
 	// Trace
 	ALX_FS_TRACE_FORMAT("\r\n");
