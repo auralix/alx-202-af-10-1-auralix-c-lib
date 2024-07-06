@@ -61,7 +61,11 @@ void AlxLogger_Ctor
 	uint32_t numOfDir,
 	uint32_t numOfFilesPerDir,
 	uint32_t numOfLogsPerFile,
-	const char* logDelim
+	const char* logDelim,
+	AlxIoPin* do_DBG_Read,
+	AlxIoPin* do_DBG_Write,
+	AlxIoPin* do_DBG_StoreReadMetadata,
+	AlxIoPin* do_DBG_StoreWriteMetadata
 )
 {
 	// Parameters
@@ -70,6 +74,10 @@ void AlxLogger_Ctor
 	me->numOfFilesPerDir = numOfFilesPerDir;
 	me->numOfLogsPerFile = numOfLogsPerFile;
 	me->logDelim = logDelim;
+	me->do_DBG_Read = do_DBG_Read;
+	me->do_DBG_Write = do_DBG_Write;
+	me->do_DBG_StoreReadMetadata = do_DBG_StoreReadMetadata;
+	me->do_DBG_StoreWriteMetadata = do_DBG_StoreWriteMetadata;
 
 	// Parameters - Private
 	me->numOfFilesTotal = me->numOfFilesPerDir * me->numOfDir;
@@ -182,6 +190,7 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 	//------------------------------------------------------------------------------
 	// Loop
 	//------------------------------------------------------------------------------
+	if(me->do_DBG_Read != NULL) AlxIoPin_Set(me->do_DBG_Read);
 	while (true)
 	{
 		//------------------------------------------------------------------------------
@@ -337,6 +346,7 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 			break;
 		}
 	}
+	if(me->do_DBG_Read != NULL) AlxIoPin_Reset(me->do_DBG_Read);
 
 
 	//------------------------------------------------------------------------------
@@ -371,6 +381,7 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 	// Loop
 	//------------------------------------------------------------------------------
+	if(me->do_DBG_Write != NULL) AlxIoPin_Set(me->do_DBG_Write);
 	while (true)
 	{
 		//------------------------------------------------------------------------------
@@ -540,6 +551,7 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 			break;
 		}
 	}
+	if(me->do_DBG_Write != NULL) AlxIoPin_Reset(me->do_DBG_Write);
 
 
 	//------------------------------------------------------------------------------
@@ -874,6 +886,9 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 
 	if (config == AlxLogger_StoreMetadata_Config_StoreDefault)
 	{
+		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreReadMetadata);
+		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreWriteMetadata);
+
 		mdTemp.read.id			= 0;
 		mdTemp.read.pos			= 0;
 		mdTemp.read.line		= 0;
@@ -888,6 +903,9 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 	}
 	else if (config == AlxLogger_StoreMetadata_Config_StoreReadWrite)
 	{
+		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreReadMetadata);
+		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreWriteMetadata);
+
 		mdTemp.read.id			= me->md.read.id;
 		mdTemp.read.pos			= me->md.read.pos;
 		mdTemp.read.line		= me->md.read.line;
@@ -902,6 +920,9 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 	}
 	else if (config == AlxLogger_StoreMetadata_Config_StoreRead)
 	{
+		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreReadMetadata);
+		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Reset(me->do_DBG_StoreWriteMetadata);
+
 		mdTemp.read.id			= me->md.read.id;
 		mdTemp.read.pos			= me->md.read.pos;
 		mdTemp.read.line		= me->md.read.line;
@@ -916,6 +937,9 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 	}
 	else if (config == AlxLogger_StoreMetadata_Config_StoreWrite)
 	{
+		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Reset(me->do_DBG_StoreReadMetadata);
+		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreWriteMetadata);
+
 		mdTemp.read.id			= me->mdStored.read.id;
 		mdTemp.read.pos			= me->mdStored.read.pos;
 		mdTemp.read.line		= me->mdStored.read.line;
@@ -983,6 +1007,8 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 	//------------------------------------------------------------------------------
 	// Return
 	//------------------------------------------------------------------------------
+	if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Reset(me->do_DBG_StoreReadMetadata);
+	if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Reset(me->do_DBG_StoreWriteMetadata);
 	return Alx_Ok;
 }
 static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)

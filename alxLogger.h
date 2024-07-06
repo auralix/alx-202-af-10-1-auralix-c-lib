@@ -45,6 +45,7 @@ extern "C" {
 #include "alxFs.h"
 #include "alxCrc.h"
 #include "alxTimSw.h"
+#include "alxIoPin.h"
 
 
 //******************************************************************************
@@ -129,6 +130,10 @@ typedef struct
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
 	const char* logDelim;
+	AlxIoPin* do_DBG_Read;
+	AlxIoPin* do_DBG_Write;
+	AlxIoPin* do_DBG_StoreReadMetadata;
+	AlxIoPin* do_DBG_StoreWriteMetadata;
 
 	// Parameters - Private
 	uint32_t numOfFilesTotal;
@@ -158,7 +163,11 @@ void AlxLogger_Ctor
 	uint32_t numOfDir,
 	uint32_t numOfFilesPerDir,
 	uint32_t numOfLogsPerFile,
-	const char* logDelim
+	const char* logDelim,
+	AlxIoPin* do_DBG_Read,
+	AlxIoPin* do_DBG_Write,
+	AlxIoPin* do_DBG_StoreReadMetadata,
+	AlxIoPin* do_DBG_StoreWriteMetadata
 );
 
 
