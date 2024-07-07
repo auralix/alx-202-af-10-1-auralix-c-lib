@@ -44,6 +44,7 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxIoPin.h"
 #include "alxTimSw.h"
+#include "alxClk.h"
 
 
 //******************************************************************************
@@ -55,6 +56,21 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	#if defined(ALX_STM32L4)
+	AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz,
+	AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz,
+	AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz,
+	AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz,
+	AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz,
+	AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz,
+	AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz,
+	AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz,
+	AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz,
+	#endif
+} AlxMmc_Clk;
+
 typedef struct
 {
 	// Defines
@@ -73,6 +89,8 @@ typedef struct
 	AlxIoPin* io_DAT5;
 	AlxIoPin* io_DAT6;
 	AlxIoPin* io_DAT7;
+	AlxClk* clk;
+	AlxMmc_Clk mmcClk;
 	uint16_t dmaReadWriteTimeout_ms;
 	uint16_t waitForTransferStateTimeout_ms;
 	Alx_IrqPriority irqPriority;
@@ -110,6 +128,8 @@ void AlxMmc_Ctor
 	AlxIoPin* io_DAT5,
 	AlxIoPin* io_DAT6,
 	AlxIoPin* io_DAT7,
+	AlxClk* clk,
+	AlxMmc_Clk mmcClk,
 	uint16_t dmaReadWriteTimeout_ms,
 	uint16_t waitForTransferStateTimeout_ms,
 	Alx_IrqPriority irqPriority

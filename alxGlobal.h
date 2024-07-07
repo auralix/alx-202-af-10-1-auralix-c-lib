@@ -388,9 +388,12 @@ typedef enum
 	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
 	AlxClk_Clk_McuStm32_Pclk2Apb2Tim_Ctor,
 	#endif
-
 	AlxClk_Clk_McuStm32_MainPllClk,
 	AlxClk_Clk_McuStm32_MainPllInputClk_Ctor,
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	AlxClk_Clk_McuStm32_PllP_Ctor,
+	AlxClk_Clk_McuStm32_PllQ_Ctor,
+	#endif
 	#endif
 
 	#if defined(ALX_LPC80X) || defined(ALX_LPC84X)

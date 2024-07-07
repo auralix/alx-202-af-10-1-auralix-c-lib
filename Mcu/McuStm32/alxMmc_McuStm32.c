@@ -52,6 +52,8 @@ static AlxMmc* alxMmc_Sdmmc2_me = NULL;
 //------------------------------------------------------------------------------
 // Specific
 //------------------------------------------------------------------------------
+static uint32_t AlxMmc_GetBusWidth(AlxMmc* me);
+static uint32_t AlxMmc_GetClkDiv(AlxMmc* me);
 static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read);
 static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me);
 
@@ -94,6 +96,8 @@ void AlxMmc_Ctor
 	AlxIoPin* io_DAT5,
 	AlxIoPin* io_DAT6,
 	AlxIoPin* io_DAT7,
+	AlxClk* clk,
+	AlxMmc_Clk mmcClk,
 	uint16_t dmaReadWriteTimeout_ms,
 	uint16_t waitForTransferStateTimeout_ms,
 	Alx_IrqPriority irqPriority
@@ -123,6 +127,8 @@ void AlxMmc_Ctor
 	me->io_DAT5 = io_DAT5;
 	me->io_DAT6 = io_DAT6;
 	me->io_DAT7 = io_DAT7;
+	me->clk = clk;
+	me->mmcClk = mmcClk;
 	me->dmaReadWriteTimeout_ms = dmaReadWriteTimeout_ms;
 	me->waitForTransferStateTimeout_ms = waitForTransferStateTimeout_ms;
 	me->irqPriority = irqPriority;
@@ -133,9 +139,9 @@ void AlxMmc_Ctor
 	me->hmmc.Instance = mmc;
 	me->hmmc.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
 	me->hmmc.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
-	me->hmmc.Init.BusWide = SDMMC_BUS_WIDE_8B;
+	me->hmmc.Init.BusWide = AlxMmc_GetBusWidth(me);
 	me->hmmc.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
-	me->hmmc.Init.ClockDiv = 0;
+	me->hmmc.Init.ClockDiv = AlxMmc_GetClkDiv(me);
 	me->hmmc.Init.Transceiver = SDMMC_TRANSCEIVER_DISABLE;
 	me->dmaReadDone = false;
 	me->dmaWriteDone = false;
@@ -352,6 +358,90 @@ void AlxMmc_IrqHandler(AlxMmc* me)
 //------------------------------------------------------------------------------
 // Specific
 //------------------------------------------------------------------------------
+static uint32_t AlxMmc_GetBusWidth(AlxMmc* me)
+{
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L4)
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz)
+	)
+	{
+		return SDMMC_BUS_WIDE_1B;
+	}
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz)
+	)
+	{
+		return SDMMC_BUS_WIDE_4B;
+	}
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+	)
+	{
+		return SDMMC_BUS_WIDE_8B;
+	}
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_MMC_ASSERT(false);	// We should not get here
+	return ALX_NULL;
+}
+static uint32_t AlxMmc_GetClkDiv(AlxMmc* me)
+{
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L4)
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz)
+	)
+	{
+		return 2;
+	}
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz)
+	)
+	{
+		return 1;
+	}
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+	)
+	{
+		return 0;
+	}
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_MMC_ASSERT(false);	// We should not get here
+	return ALX_NULL;
+}
 static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read)
 {
 	// Local variables
@@ -573,9 +663,36 @@ static Alx_Status AlxMmc_ReInit(AlxMmc* me)
 }
 static bool AlxMmc_IsClkOk(AlxMmc* me)
 {
-	// TODO
-	(void)me;
-	return true;
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L4)
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+	)
+	{
+		if(48000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_PllP_Ctor))
+			return true;
+		else
+			return false;
+	}
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_MMC_ASSERT(false);	// We should not get here
+	return ALX_NULL;
 }
 static void AlxMmc_Periph_EnableClk(AlxMmc* me)
 {
