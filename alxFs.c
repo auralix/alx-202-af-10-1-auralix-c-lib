@@ -103,7 +103,13 @@ void AlxFs_Ctor
 	#if defined(ALX_LFS) && defined(ALX_STM32L4)
 	else if	(me->config == AlxFs_Config_Fatfs_Mmc)
 	{
-		// TV: TODO
+		memset(&me->fatfs, 0, sizeof(me->fatfs));
+		me->fatfsMkfsOpt.fmt = FM_FAT32;
+		me->fatfsMkfsOpt.n_fat = 1;
+		me->fatfsMkfsOpt.align = 0;
+		me->fatfsMkfsOpt.n_root = ALX_NULL;
+		me->fatfsMkfsOpt.au_size = 0;
+		memset(&me->fatfsMkfsBuff, 0, sizeof(me->fatfsMkfsBuff));
 	}
 	#endif
 	#if defined(ALX_LFS)
@@ -257,7 +263,7 @@ Alx_Status AlxFs_Format(AlxFs* me)
 	#if defined(ALX_FATFS)
 	if (me->config == AlxFs_Config_Fatfs_Mmc)
 	{
-		// TV: TODO
+		status = f_mkfs(ALX_FS_FATFS_PATH, &me->fatfsMkfsOpt, me->fatfsMkfsBuff, sizeof(me->fatfsMkfsBuff));
 	}
 	#endif
 	#if defined(ALX_LFS)
@@ -283,15 +289,29 @@ Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		status = f_unlink(path);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_remove(&me->lfs, path);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_remove(&me->lfs, path);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d, path=%s", status, path);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;
@@ -302,15 +322,29 @@ Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		status = f_rename(pathOld, pathNew);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_rename(&me->lfs, pathOld, pathNew);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_rename(&me->lfs, pathOld, pathNew);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d, pathOld=%s, pathNew=%s", status, pathOld, pathNew);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;

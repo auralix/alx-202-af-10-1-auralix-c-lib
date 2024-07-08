@@ -146,6 +146,7 @@ typedef struct
 	#define ALX_FS_BUFF_LEN 256
 	#if defined(ALX_FATFS)
 	#define ALX_FS_FATFS_PATH "0:/"
+	#define ALX_FS_FATFS_MKFS_BUFF_LEN 512
 	#endif
 
 	// Parameters
@@ -159,6 +160,8 @@ typedef struct
 	// Variables
 	#if defined(ALX_FATFS)
 	FATFS fatfs;
+	MKFS_PARM fatfsMkfsOpt;
+	uint8_t fatfsMkfsBuff[ALX_FS_FATFS_MKFS_BUFF_LEN];
 	#endif
 	#if defined(ALX_LFS)
 	lfs_t lfs;

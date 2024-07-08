@@ -165,7 +165,6 @@ extern "C" {
 // FatFS
 //------------------------------------------------------------------------------
 #if defined(ALX_FATFS)
-#include "ffconf.h"
 #include "ff.h"
 #endif
 
