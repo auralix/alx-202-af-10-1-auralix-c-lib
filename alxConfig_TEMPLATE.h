@@ -58,6 +58,7 @@ extern "C" {
 //#define ALX_FREE_RTOS
 //#define ALX_FREE_RTOS_CELLULAR
 //#define ALX_LW_IP
+//#define ALX_FATFS
 //#define ALX_LFS
 //#define ALX_WIZNET
 //#define ALX_MBED

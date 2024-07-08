@@ -100,6 +100,12 @@ void AlxFs_Ctor
 	if (me->config == AlxFs_Config_Undefined)
 	{
 	}
+	#if defined(ALX_LFS) && defined(ALX_STM32L4)
+	else if	(me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		// TV: TODO
+	}
+	#endif
 	#if defined(ALX_LFS)
 	else if (me->config == AlxFs_Config_Lfs_FlashInt)
 	{
@@ -131,24 +137,37 @@ Alx_Status AlxFs_Mount(AlxFs* me)
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	// isMounted -> Don't care
-	#if defined(ALX_LFS)
-	ALX_FS_ASSERT(me->lfsConfig.block_size % me->lfsConfig.read_size == 0);
-	ALX_FS_ASSERT(me->lfsConfig.block_size % me->lfsConfig.prog_size == 0);
-	ALX_FS_ASSERT(me->lfsConfig.cache_size % me->lfsConfig.read_size == 0);
-	ALX_FS_ASSERT(me->lfsConfig.cache_size % me->lfsConfig.prog_size == 0);
-	ALX_FS_ASSERT(me->lfsConfig.block_size % me->lfsConfig.cache_size == 0);
-	ALX_FS_ASSERT(me->lfsConfig.lookahead_size % 8 == 0);
-	#endif
+
+	// Local variables
+	int status = -1;
 
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		status = f_mount(&me->fatfs, ALX_FS_FATFS_PATH, 1);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_mount(&me->lfs, &me->lfsConfig);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		ALX_FS_ASSERT(me->lfsConfig.block_size % me->lfsConfig.read_size == 0);
+		ALX_FS_ASSERT(me->lfsConfig.block_size % me->lfsConfig.prog_size == 0);
+		ALX_FS_ASSERT(me->lfsConfig.cache_size % me->lfsConfig.read_size == 0);
+		ALX_FS_ASSERT(me->lfsConfig.cache_size % me->lfsConfig.prog_size == 0);
+		ALX_FS_ASSERT(me->lfsConfig.block_size % me->lfsConfig.cache_size == 0);
+		ALX_FS_ASSERT(me->lfsConfig.lookahead_size % 8 == 0);
+
+		status = lfs_mount(&me->lfs, &me->lfsConfig);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d", status);
 		return Alx_Err;
 	}
-	#endif
 
 	// Set isMounted
 	me->isMounted = true;
@@ -162,15 +181,29 @@ Alx_Status AlxFs_UnMount(AlxFs* me)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	// isMounted -> Don't care
 
+	// Local variables
+	int status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		status = f_unmount(ALX_FS_FATFS_PATH);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_unmount(&me->lfs);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_unmount(&me->lfs);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d", status);
 		return Alx_Err;
 	}
-	#endif
 
 	// Clear isMounted
 	me->isMounted = false;
@@ -217,15 +250,29 @@ Alx_Status AlxFs_Format(AlxFs* me)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	// isMounted -> Don't care
 
+	// Local variables
+	int status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		// TV: TODO
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_format(&me->lfs, &me->lfsConfig);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_format(&me->lfs, &me->lfsConfig);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d", status);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;
