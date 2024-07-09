@@ -100,7 +100,7 @@ void AlxFs_Ctor
 	if (me->config == AlxFs_Config_Undefined)
 	{
 	}
-	#if defined(ALX_LFS) && defined(ALX_STM32L4)
+	#if defined(ALX_FATFS) && defined(ALX_STM32L4)
 	else if	(me->config == AlxFs_Config_Fatfs_Mmc)
 	{
 		memset(&me->fatfs, 0, sizeof(me->fatfs));
@@ -145,7 +145,7 @@ Alx_Status AlxFs_Mount(AlxFs* me)
 	// isMounted -> Don't care
 
 	// Local variables
-	int status = -1;
+	int32_t status = -1;
 
 	// Do
 	#if defined(ALX_FATFS)
@@ -188,7 +188,7 @@ Alx_Status AlxFs_UnMount(AlxFs* me)
 	// isMounted -> Don't care
 
 	// Local variables
-	int status = -1;
+	int32_t status = -1;
 
 	// Do
 	#if defined(ALX_FATFS)
@@ -257,7 +257,7 @@ Alx_Status AlxFs_Format(AlxFs* me)
 	// isMounted -> Don't care
 
 	// Local variables
-	int status = -1;
+	int32_t status = -1;
 
 	// Do
 	#if defined(ALX_FATFS)
@@ -290,7 +290,7 @@ Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Local variables
-	int status = -1;
+	int32_t status = -1;
 
 	// Do
 	#if defined(ALX_FATFS)
@@ -323,7 +323,7 @@ Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew)
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Local variables
-	int status = -1;
+	int32_t status = -1;
 
 	// Do
 	#if defined(ALX_FATFS)
@@ -351,62 +351,104 @@ Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew)
 }
 Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const char* mode)
 {
+	// https://en.cppreference.com/w/c/io/fopen
+	// http://elm-chan.org/fsw/ff/doc/open.html
+
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Prepare modeConfig
-	int modeConfig = 0;
-	if (0 == strcmp(mode, "r"))
-	{
-		#if defined(ALX_LFS)
-		modeConfig = LFS_O_RDONLY;
-		#endif
-	}
-	else if (0 == strcmp(mode, "w"))
-	{
-		#if defined(ALX_LFS)
-		modeConfig = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC;
-		#endif
-	}
-	else if (0 == strcmp(mode, "a"))
-	{
-		#if defined(ALX_LFS)
-		modeConfig = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND;
-		#endif
-	}
-	else if (0 == strcmp(mode, "r+"))
-	{
-		#if defined(ALX_LFS)
-		modeConfig = LFS_O_RDWR;
-		#endif
-	}
-	else if (0 == strcmp(mode, "w+"))
-	{
-		#if defined(ALX_LFS)
-		modeConfig = LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC;
-		#endif
-	}
-	else if (0 == strcmp(mode, "a+"))
-	{
-		#if defined(ALX_LFS)
-		modeConfig = LFS_O_RDWR | LFS_O_CREAT | LFS_O_APPEND;
-		#endif
-	}
-	else
-	{
-		ALX_FS_ASSERT(false);	// We should never get here
-	}
+	// Local variables
+	int32_t status = -1;
 
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		// Local variables
+		uint8_t fatfsMode = 0;
+
+		// Prepare
+		if (0 == strcmp(mode, "r"))
+		{
+			fatfsMode = FA_READ;
+		}
+		else if (0 == strcmp(mode, "w"))
+		{
+			fatfsMode = FA_WRITE | FA_CREATE_ALWAYS;
+		}
+		else if (0 == strcmp(mode, "a"))
+		{
+			fatfsMode = FA_WRITE | FA_OPEN_APPEND;
+		}
+		else if (0 == strcmp(mode, "r+"))
+		{
+			fatfsMode = FA_READ | FA_WRITE;
+		}
+		else if (0 == strcmp(mode, "w+"))
+		{
+			fatfsMode = FA_READ | FA_WRITE | FA_CREATE_ALWAYS;
+		}
+		else if (0 == strcmp(mode, "a+"))
+		{
+			fatfsMode = FA_READ | FA_WRITE | FA_OPEN_APPEND;
+		}
+		else
+		{
+			ALX_FS_ASSERT(false);	// We should never get here
+		}
+
+		// Do
+		status = f_open(&file->fatfsFile, path, fatfsMode);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_file_open(&me->lfs, &file->lfsFile, path, modeConfig);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		// Local variables
+		int32_t lfsMode = 0;
+
+		// Prepare
+		if (0 == strcmp(mode, "r"))
+		{
+			lfsMode = LFS_O_RDONLY;
+		}
+		else if (0 == strcmp(mode, "w"))
+		{
+			lfsMode = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC;
+		}
+		else if (0 == strcmp(mode, "a"))
+		{
+			lfsMode = LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND;
+		}
+		else if (0 == strcmp(mode, "r+"))
+		{
+			lfsMode = LFS_O_RDWR;
+		}
+		else if (0 == strcmp(mode, "w+"))
+		{
+			lfsMode = LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC;
+		}
+		else if (0 == strcmp(mode, "a+"))
+		{
+			lfsMode = LFS_O_RDWR | LFS_O_CREAT | LFS_O_APPEND;
+		}
+		else
+		{
+			ALX_FS_ASSERT(false);	// We should never get here
+		}
+
+		// Do
+		status = lfs_file_open(&me->lfs, &file->lfsFile, path, lfsMode);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d, path=%s, mode=%s", status, path, mode);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;
@@ -417,15 +459,29 @@ Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int32_t status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		status = f_close(&file->fatfsFile);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_file_close(&me->lfs, &file->lfsFile);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_file_close(&me->lfs, &file->lfsFile);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d", status);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;
@@ -437,14 +493,30 @@ Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	#if defined(ALX_LFS)
-	lfs_ssize_t _lenActual = lfs_file_read(&me->lfs, &file->lfsFile, data, (lfs_size_t)len);
-	if (_lenActual < 0)
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
 	{
-		ALX_FS_TRACE("Err: lenActual=%d, len=%u", _lenActual, len);
-		return Alx_Err;
+		unsigned int _lenActual = 0;
+		int32_t status = f_read(&file->fatfsFile, data, len, &_lenActual);
+		if (status != 0)
+		{
+			ALX_FS_TRACE("Err: %d, lenActual=%d, len=%u", status, _lenActual, len);
+			return Alx_Err;
+		}
+		*lenActual = (uint32_t)_lenActual;
 	}
-	*lenActual = (uint32_t)_lenActual;
+	#endif
+	#if defined(ALX_LFS)
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		int32_t _lenActual = lfs_file_read(&me->lfs, &file->lfsFile, data, len);
+		if (_lenActual < 0)
+		{
+			ALX_FS_TRACE("Err: lenActual=%d, len=%u", _lenActual, len);
+			return Alx_Err;
+		}
+		*lenActual = (uint32_t)_lenActual;
+	}
 	#endif
 
 	// Return
@@ -513,12 +585,27 @@ Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t le
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Do
-	#if defined(ALX_LFS)
-	lfs_ssize_t lenActual = lfs_file_write(&me->lfs, &file->lfsFile, data, (lfs_size_t)len);
-	if (lenActual != (lfs_ssize_t)len)
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
 	{
-		ALX_FS_TRACE("Err: lenActual=%d, len=%u", lenActual, len);
-		return Alx_Err;
+		unsigned int lenActual = 0;
+		int32_t status = f_write(&file->fatfsFile, data, len, &lenActual);
+		if ((status != 0) || (lenActual != len))
+		{
+			ALX_FS_TRACE("Err: %d, lenActual=%d, len=%u", status, lenActual, len);
+			return Alx_Err;
+		}
+	}
+	#endif
+	#if defined(ALX_LFS)
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		int32_t lenActual = lfs_file_write(&me->lfs, &file->lfsFile, data, len);
+		if (lenActual != (int32_t)len)
+		{
+			ALX_FS_TRACE("Err: lenActual=%d, len=%u", lenActual, len);
+			return Alx_Err;
+		}
 	}
 	#endif
 
@@ -540,15 +627,29 @@ Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int32_t status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		status = f_sync(&file->fatfsFile);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_file_sync(&me->lfs, &file->lfsFile);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_file_sync(&me->lfs, &file->lfsFile);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d", status);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;
@@ -559,40 +660,78 @@ Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_Fi
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
-	// Prepare originConfig
-	int _origin = 0;
-	if (origin == AlxFs_File_Seek_Origin_Set)
-	{
-		#if defined(ALX_LFS)
-		_origin = LFS_SEEK_SET;
-		#endif
-	}
-	else if(origin == AlxFs_File_Seek_Origin_Cur)
-	{
-		#if defined(ALX_LFS)
-		_origin = LFS_SEEK_CUR;
-		#endif
-	}
-	else if(origin == AlxFs_File_Seek_Origin_End)
-	{
-		#if defined(ALX_LFS)
-		_origin = LFS_SEEK_END;
-		#endif
-	}
-	else
-	{
-		ALX_FS_ASSERT(false);	// We should never get here
-	}
-
 	// Do
-	#if defined(ALX_LFS)
-	lfs_soff_t _positionNew = lfs_file_seek(&me->lfs, &file->lfsFile, (lfs_soff_t)offset, _origin);
-	if (_positionNew < 0)
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
 	{
-		ALX_FS_TRACE("Err: positionNew=%d, offset=%d, _origin=%d", _positionNew, offset, _origin);
-		return Alx_Err;
+		// Local variables
+		int32_t fatfsPositionNew = 0;
+
+		// Prepare
+		if (origin == AlxFs_File_Seek_Origin_Set)
+		{
+			fatfsPositionNew = offset;
+		}
+		else if(origin == AlxFs_File_Seek_Origin_Cur)
+		{
+			fatfsPositionNew = f_tell(&file->fatfsFile) + offset;
+		}
+		else if(origin == AlxFs_File_Seek_Origin_End)
+		{
+			fatfsPositionNew = f_size(&file->fatfsFile) + offset;
+		}
+		else
+		{
+			ALX_FS_ASSERT(false);	// We should never get here
+		}
+
+		// Do
+		int32_t status = f_lseek(&file->fatfsFile, fatfsPositionNew);
+		if (status != 0)
+		{
+			ALX_FS_TRACE("Err: %d, fatfsPositionNew=%d, offset=%d, origin=%d", status, fatfsPositionNew, offset, origin);
+			return Alx_Err;
+		}
+
+		// Return
+		*positionNew = (uint32_t)fatfsPositionNew;
 	}
-	*positionNew = (uint32_t)_positionNew;
+	#endif
+	#if defined(ALX_LFS)
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		// Local variables
+		int lfsOrigin = 0;
+
+		// Prepare
+		if (origin == AlxFs_File_Seek_Origin_Set)
+		{
+			lfsOrigin = LFS_SEEK_SET;
+		}
+		else if(origin == AlxFs_File_Seek_Origin_Cur)
+		{
+			lfsOrigin = LFS_SEEK_CUR;
+		}
+		else if(origin == AlxFs_File_Seek_Origin_End)
+		{
+			lfsOrigin = LFS_SEEK_END;
+		}
+		else
+		{
+			ALX_FS_ASSERT(false);	// We should never get here
+		}
+
+		// Do
+		int32_t lfsPositionNew = lfs_file_seek(&me->lfs, &file->lfsFile, (lfs_soff_t)offset, lfsOrigin);
+		if (lfsPositionNew < 0)
+		{
+			ALX_FS_TRACE("Err: lfsPositionNew=%d, offset=%d, origin=%d", lfsPositionNew, offset, origin);
+			return Alx_Err;
+		}
+
+		// Return
+		*positionNew = (uint32_t)lfsPositionNew;
+	}
 	#endif
 
 	// Return
@@ -604,18 +743,32 @@ Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* position)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int32_t _position = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		_position = f_tell(&file->fatfsFile);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	lfs_soff_t _position = lfs_file_tell(&me->lfs, &file->lfsFile);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		_position = lfs_file_tell(&me->lfs, &file->lfsFile);
+	}
+	#endif
+
+	// Trace
 	if (_position < 0)
 	{
 		ALX_FS_TRACE("Err: %d", _position);
 		return Alx_Err;
 	}
-	*position = (uint32_t)_position;
-	#endif
 
 	// Return
+	*position = (uint32_t)_position;
 	return Alx_Ok;
 }
 Alx_Status AlxFs_File_Rewind(AlxFs* me, AlxFs_File* file)
@@ -624,15 +777,29 @@ Alx_Status AlxFs_File_Rewind(AlxFs* me, AlxFs_File* file)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int32_t status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		status = f_rewind(&file->fatfsFile);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_file_rewind(&me->lfs, &file->lfsFile);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_file_rewind(&me->lfs, &file->lfsFile);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d", status);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;
@@ -643,18 +810,32 @@ Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* size)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int32_t _size = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		_size = f_size(&file->fatfsFile);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	lfs_soff_t _size = lfs_file_size(&me->lfs, &file->lfsFile);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		_size = lfs_file_size(&me->lfs, &file->lfsFile);
+	}
+	#endif
+
+	// Trace
 	if (_size < 0)
 	{
 		ALX_FS_TRACE("Err: %d", _size);
 		return Alx_Err;
 	}
-	*size = (uint32_t)_size;
-	#endif
 
 	// Return
+	*size = (uint32_t)_size;
 	return Alx_Ok;
 }
 Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
@@ -663,15 +844,36 @@ Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int32_t status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		// Move file pointer to the new end of the file, with this we can expand or shrink file
+		status = f_lseek(&file->fatfsFile, size);
+
+		// If f_lseek OK, truncate file at the current file pointer
+		if (status == 0)
+		{
+			status = f_truncate(&file->fatfsFile);
+		}
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_file_truncate(&me->lfs, &file->lfsFile, (lfs_off_t)size);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_file_truncate(&me->lfs, &file->lfsFile, size);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d, size=%u", status, size);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;
@@ -762,15 +964,29 @@ Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int32_t status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		status = f_mkdir(path);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_mkdir(&me->lfs, path);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_mkdir(&me->lfs, path);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d, path=%s", status, path);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;
@@ -781,15 +997,29 @@ Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int32_t status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		status = f_opendir(&dir->fatfsDir, path);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_dir_open(&me->lfs, &dir->lfsDir, path);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_dir_open(&me->lfs, &dir->lfsDir, path);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d, path=%s", status, path);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;
@@ -800,15 +1030,29 @@ Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int32_t status = -1;
+
 	// Do
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		status = f_closedir(&dir->fatfsDir);
+	}
+	#endif
 	#if defined(ALX_LFS)
-	int status = lfs_dir_close(&me->lfs, &dir->lfsDir);
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+	{
+		status = lfs_dir_close(&me->lfs, &dir->lfsDir);
+	}
+	#endif
+
+	// Trace
 	if (status != 0)
 	{
 		ALX_FS_TRACE("Err: %d", status);
 		return Alx_Err;
 	}
-	#endif
 
 	// Return
 	return Alx_Ok;
@@ -819,17 +1063,38 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
 
+	// Local variables
+	int32_t status = -1;
+
 	// Do
-	#if defined(ALX_LFS)
-	int status = lfs_dir_read(&me->lfs, &dir->lfsDir, &info->lfsInfo);
-	if (status == 0)
+	#if defined(ALX_FATFS)
+	if (me->config == AlxFs_Config_Fatfs_Mmc)
 	{
-		return AlxFs_EndOfDir;
+		status = f_readdir(&dir->fatfsDir, &info->fatfsInfo);
+		if (status != 0)
+		{
+			ALX_FS_TRACE("Err: %d", status);
+			return Alx_Err;
+		}
+		else if (strcmp(info->fatfsInfo.fname, "") == 0)
+		{
+			return AlxFs_EndOfDir;
+		}
 	}
-	else if (status != 1)
+	#endif
+	#if defined(ALX_LFS)
+	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
 	{
-		ALX_FS_TRACE("Err: %d", status);
-		return Alx_Err;
+		status = lfs_dir_read(&me->lfs, &dir->lfsDir, &info->lfsInfo);
+		if (status == 0)
+		{
+			return AlxFs_EndOfDir;
+		}
+		else if (status != 1)
+		{
+			ALX_FS_TRACE("Err: %d", status);
+			return Alx_Err;
+		}
 	}
 	#endif
 
@@ -860,7 +1125,6 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 	}
 
 	// Loop
-	#if defined(ALX_LFS)
 	while (true)
 	{
 		// Read
@@ -881,11 +1145,55 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 			return status;
 		}
 
+		// Prepare
+		bool isFile = false;
+		#if defined(ALX_FATFS)
+		if (me->config == AlxFs_Config_Fatfs_Mmc)
+		{
+			if (info.fatfsInfo.fattrib & AM_DIR)
+			{
+				isFile = false;
+			}
+			else
+			{
+				isFile = true;
+			}
+		}
+		#endif
+		#if defined(ALX_LFS)
+		if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+		{
+			if (info.lfsInfo.type == LFS_TYPE_REG)
+			{
+				isFile = true;
+			}
+			else if (info.lfsInfo.type == LFS_TYPE_DIR)
+			{
+				isFile = false;
+			}
+			else
+			{
+				ALX_FS_ASSERT(false);	// We should never get here
+			}
+		}
+		#endif
+
 		// Trace
-		if (info.lfsInfo.type == LFS_TYPE_REG)
+		if (isFile)
 		{
 			// Prepare
-			sprintf(buff, "FILE - %s - %lu B\r\n", info.lfsInfo.name, info.lfsInfo.size);
+			#if defined(ALX_FATFS)
+			if (me->config == AlxFs_Config_Fatfs_Mmc)
+			{
+				sprintf(buff, "FILE - %s - %lu B\r\n", info.fatfsInfo.fname, info.fatfsInfo.fsize);
+			}
+			#endif
+			#if defined(ALX_LFS)
+			if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+			{
+				sprintf(buff, "FILE - %s - %lu B\r\n", info.lfsInfo.name, info.lfsInfo.size);
+			}
+			#endif
 
 			// Trace
 			ALX_FS_TRACE_FORMAT("%s", buff);
@@ -894,7 +1202,18 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 			if (fileTrace)
 			{
 				// Prepare
-				sprintf(buff, "%s/%s", path, info.lfsInfo.name);
+				#if defined(ALX_FATFS)
+				if (me->config == AlxFs_Config_Fatfs_Mmc)
+				{
+					sprintf(buff, "%s/%s", path, info.fatfsInfo.fname);
+				}
+				#endif
+				#if defined(ALX_LFS)
+				if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+				{
+					sprintf(buff, "%s/%s", path, info.lfsInfo.name);
+				}
+				#endif
 
 				// Trace
 				status = AlxFs_File_Trace(me, buff);
@@ -911,20 +1230,26 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 				}
 			}
 		}
-		else if (info.lfsInfo.type == LFS_TYPE_DIR)
+		else
 		{
 			// Prepare
-			sprintf(buff, "DIR - %s\r\n", info.lfsInfo.name);
+			#if defined(ALX_FATFS)
+			if (me->config == AlxFs_Config_Fatfs_Mmc)
+			{
+				sprintf(buff, "DIR - %s\r\n", info.fatfsInfo.fname);
+			}
+			#endif
+			#if defined(ALX_LFS)
+			if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
+			{
+				sprintf(buff, "DIR - %s\r\n", info.lfsInfo.name);
+			}
+			#endif
 
 			// Trace
 			ALX_FS_TRACE_FORMAT("%s", buff);
 		}
-		else
-		{
-			ALX_FS_ASSERT(false);	// We should never get here
-		}
 	}
-	#endif
 
 	// Close
 	status = AlxFs_Dir_Close(me, &dir);
