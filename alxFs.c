@@ -38,12 +38,24 @@
 
 
 //******************************************************************************
+// Private Variables
+//******************************************************************************
+static AlxFs* alxFs_Fatfs_Mmc_me = NULL;
+
+
+//******************************************************************************
 // Private Functions
 //******************************************************************************
 
 
 //------------------------------------------------------------------------------
-// Flash - Internal
+// Fatfs_Mmc
+//------------------------------------------------------------------------------
+static void AlxFs_Fatfs_Mmc_Ctor(AlxFs* me);
+
+
+//------------------------------------------------------------------------------
+// Lfs_FlashInt
 //------------------------------------------------------------------------------
 #if defined(ALX_LFS)
 static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me);
@@ -59,7 +71,7 @@ static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c);
 
 
 //------------------------------------------------------------------------------
-// MMC
+// Lfs_Mmc
 //------------------------------------------------------------------------------
 #if defined(ALX_LFS) && defined(ALX_STM32L4)
 static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me);
@@ -96,20 +108,14 @@ void AlxFs_Ctor
 	me->do_DBG_EraseBlock = do_DBG_EraseBlock;
 	me->do_DBG_SyncBlock = do_DBG_SyncBlock;
 
-	// Variables
+	// Ctor
 	if (me->config == AlxFs_Config_Undefined)
 	{
 	}
 	#if defined(ALX_FATFS) && defined(ALX_STM32L4)
-	else if	(me->config == AlxFs_Config_Fatfs_Mmc)
+	else if (me->config == AlxFs_Config_Fatfs_Mmc)
 	{
-		memset(&me->fatfs, 0, sizeof(me->fatfs));
-		me->fatfsMkfsOpt.fmt = FM_FAT32;
-		me->fatfsMkfsOpt.n_fat = 1;
-		me->fatfsMkfsOpt.align = 0;
-		me->fatfsMkfsOpt.n_root = ALX_NULL;
-		me->fatfsMkfsOpt.au_size = 0;
-		memset(&me->fatfsMkfsBuff, 0, sizeof(me->fatfsMkfsBuff));
+		AlxFs_Fatfs_Mmc_Ctor(me);
 	}
 	#endif
 	#if defined(ALX_LFS)
@@ -1274,7 +1280,111 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 
 
 //------------------------------------------------------------------------------
-// Flash - Internal
+// Fatfs_Mmc
+//------------------------------------------------------------------------------
+static void AlxFs_Fatfs_Mmc_Ctor(AlxFs* me)
+{
+	//------------------------------------------------------------------------------
+	// Private Variables
+	//------------------------------------------------------------------------------
+	alxFs_Fatfs_Mmc_me = me;
+
+
+	//------------------------------------------------------------------------------
+	// Variables
+	//------------------------------------------------------------------------------
+	memset(&me->fatfs, 0, sizeof(me->fatfs));
+	me->fatfsMkfsOpt.fmt = FM_FAT32;
+	me->fatfsMkfsOpt.n_fat = 1;
+	me->fatfsMkfsOpt.align = 0;
+	me->fatfsMkfsOpt.n_root = ALX_NULL;
+	me->fatfsMkfsOpt.au_size = 0;
+	memset(&me->fatfsMkfsBuff, 0, sizeof(me->fatfsMkfsBuff));
+}
+DSTATUS disk_initialize (BYTE pdrv)
+{
+	(void)pdrv;
+
+	return RES_OK;
+}
+DSTATUS disk_status (BYTE pdrv)
+{
+	(void)pdrv;
+
+	return RES_OK;
+}
+DRESULT disk_read (BYTE pdrv, BYTE* buff, LBA_t sector, UINT count)
+{
+	(void)pdrv;
+
+	if(alxFs_Fatfs_Mmc_me->do_DBG_ReadBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_me->do_DBG_ReadBlock);
+	Alx_Status status = AlxMmc_ReadBlock(alxFs_Fatfs_Mmc_me->alxMmc, count, sector, buff, count * 512, 3, 100);
+	if(alxFs_Fatfs_Mmc_me->do_DBG_ReadBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_me->do_DBG_ReadBlock);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d", status);
+		return RES_ERROR;
+	}
+
+	return RES_OK;
+}
+DRESULT disk_write (BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count)
+{
+	(void)pdrv;
+
+	if(alxFs_Fatfs_Mmc_me->do_DBG_WriteBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_me->do_DBG_WriteBlock);
+	Alx_Status status = AlxMmc_WriteBlock(alxFs_Fatfs_Mmc_me->alxMmc, count, sector, (uint8_t*)buff, count * 512, 3, 100);
+	if(alxFs_Fatfs_Mmc_me->do_DBG_WriteBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_me->do_DBG_WriteBlock);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d", status);
+		return RES_ERROR;
+	}
+
+	return RES_OK;
+}
+DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff)
+{
+	(void)pdrv;
+
+	switch (cmd)
+	{
+		case CTRL_SYNC:
+		{
+			Alx_Status status = AlxMmc_WaitForTransferState(alxFs_Fatfs_Mmc_me->alxMmc);
+			if (status != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err: %d", status);
+				return RES_NOTRDY;
+			}
+
+			return RES_OK;
+		}
+		case GET_SECTOR_COUNT:
+		{
+			*(LBA_t*)buff = 62160896;
+			return RES_OK;
+		}
+		case GET_SECTOR_SIZE:
+		{
+			*(WORD*)buff = 512;
+			return RES_OK;
+		}
+		case GET_BLOCK_SIZE:
+		{
+			*(DWORD*)buff = 1;	// TV: Seems like this shall be the same as erasable block size, but we can use simplification approach and set it to 1
+			return RES_OK;
+		}
+		default:
+		{
+			return RES_PARERR;
+		}
+	}
+}
+
+
+//------------------------------------------------------------------------------
+// Lfs_FlashInt
 //------------------------------------------------------------------------------
 #if defined(ALX_LFS)
 static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me)
@@ -1628,7 +1738,7 @@ static int AlxFs_Lfs_FlashInt_Unlock(const struct lfs_config* c)
 
 
 //------------------------------------------------------------------------------
-// MMC
+// Lfs_Mmc
 //------------------------------------------------------------------------------
 #if defined(ALX_LFS) && defined(ALX_STM32L4)
 static void AlxFs_Lfs_Mmc_Ctor(AlxFs* me)

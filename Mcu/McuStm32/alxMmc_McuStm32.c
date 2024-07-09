@@ -55,7 +55,7 @@ static AlxMmc* alxMmc_Sdmmc2_me = NULL;
 static uint32_t AlxMmc_GetBusWidth(AlxMmc* me);
 static uint32_t AlxMmc_GetClkDiv(AlxMmc* me);
 static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read);
-static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me);
+static Alx_Status AlxMmc_WaitForTransferState_Private(AlxMmc* me);
 
 
 //------------------------------------------------------------------------------
@@ -234,7 +234,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		}
 
 		// Wait
-		statusAlx = AlxMmc_WaitForTransferState(me);
+		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
 			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
@@ -318,7 +318,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		}
 
 		// Wait
-		statusAlx = AlxMmc_WaitForTransferState(me);
+		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
 			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
@@ -343,6 +343,15 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 
 	// Return
 	return Alx_ErrNumOfTries;
+}
+Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me)
+{
+	// Assert
+	ALX_MMC_ASSERT(me->wasCtorCalled == true);
+	ALX_MMC_ASSERT(me->isInit == true);
+
+	// Return
+	return AlxMmc_WaitForTransferState_Private(me);
 }
 void AlxMmc_IrqHandler(AlxMmc* me)
 {
@@ -477,7 +486,7 @@ static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read)
 		}
 	}
 }
-static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me)
+static Alx_Status AlxMmc_WaitForTransferState_Private(AlxMmc* me)
 {
 	// Local variables
 	AlxTimSw alxTimSw;
@@ -567,7 +576,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	}
 
 	// Wait for Transfer State - Communication with MMC
-	statusAlx = AlxMmc_WaitForTransferState(me);
+	statusAlx = AlxMmc_WaitForTransferState_Private(me);
 	if (statusAlx != Alx_Ok)
 	{
 		ALX_MMC_TRACE("Err: %d", statusAlx);
