@@ -539,7 +539,7 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 	Alx_Status status = AlxFs_ErrNoDelim;
 	Alx_Status statusRead = Alx_Err;
 	uint32_t _lenActual = 0;
-	char ch = 0;
+	char ch __attribute__((aligned(4))) = 0;
 	uint32_t readLenActual = 0;
 
 	// Loop
