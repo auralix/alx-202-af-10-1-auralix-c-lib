@@ -91,6 +91,8 @@ typedef struct
 	AlxIoPin* io_DAT7;
 	AlxClk* clk;
 	AlxMmc_Clk mmcClk;
+	uint8_t* dmaReadWriteBuffAlign4;
+	uint32_t dmaReadWriteBuffAlign4Len;
 	uint16_t dmaReadWriteTimeout_ms;
 	uint16_t waitForTransferStateTimeout_ms;
 	Alx_IrqPriority irqPriority;
@@ -130,6 +132,8 @@ void AlxMmc_Ctor
 	AlxIoPin* io_DAT7,
 	AlxClk* clk,
 	AlxMmc_Clk mmcClk,
+	uint8_t* dmaReadWriteBuffAlign4,
+	uint32_t dmaReadWriteBuffAlign4Len,
 	uint16_t dmaReadWriteTimeout_ms,
 	uint16_t waitForTransferStateTimeout_ms,
 	Alx_IrqPriority irqPriority

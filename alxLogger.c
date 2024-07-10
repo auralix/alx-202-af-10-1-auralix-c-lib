@@ -62,7 +62,6 @@ void AlxLogger_Ctor
 	uint32_t numOfFilesPerDir,
 	uint32_t numOfLogsPerFile,
 	const char* logDelim,
-	uint32_t writeBuffAlign4DynamicLen,
 	AlxIoPin* do_DBG_Read,
 	AlxIoPin* do_DBG_Write,
 	AlxIoPin* do_DBG_StoreReadMetadata,
@@ -75,7 +74,6 @@ void AlxLogger_Ctor
 	me->numOfFilesPerDir = numOfFilesPerDir;
 	me->numOfLogsPerFile = numOfLogsPerFile;
 	me->logDelim = logDelim;
-	me->writeBuffAlign4DynamicLen = writeBuffAlign4DynamicLen;
 	me->do_DBG_Read = do_DBG_Read;
 	me->do_DBG_Write = do_DBG_Write;
 	me->do_DBG_StoreReadMetadata = do_DBG_StoreReadMetadata;
@@ -431,13 +429,9 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 		//------------------------------------------------------------------------------
 		// Write
 		//------------------------------------------------------------------------------
-		char* buffAlign4 = calloc(me->writeBuffAlign4DynamicLen, sizeof(char));
-		ALX_LOGGER_ASSERT(buffAlign4 != NULL);
-		memcpy(buffAlign4, (void*)logs + writeLenTotal, writeLen);
-		status = AlxFs_File_Write(me->alxFs, &file, buffAlign4, writeLen);
+		status = AlxFs_File_Write(me->alxFs, &file, (void*)logs + writeLenTotal, writeLen);
 		if (status != Alx_Ok)
 		{
-			free(buffAlign4);
 			ALX_LOGGER_TRACE("Err: %d, path=%s, writeLen=%u, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, writeLen, logNum, writeLenTotal, numOfLogs);
 			Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 			if (statusClose != Alx_Ok)
@@ -447,7 +441,6 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 			}
 			return status;
 		}
-		free(buffAlign4);
 
 
 		//------------------------------------------------------------------------------
@@ -794,7 +787,7 @@ static Alx_Status AlxLogger_LoadMetadata(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	AlxFs_File file = {};
-	AlxLogger_Metadata mdTemp __attribute__((aligned(4))) = {};
+	AlxLogger_Metadata mdTemp = {};
 	uint32_t lenActual = 0;
 	uint32_t validatedCrc = 0;
 	bool isCrcOk = false;

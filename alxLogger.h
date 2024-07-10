@@ -131,7 +131,6 @@ typedef struct
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
 	const char* logDelim;
-	uint32_t writeBuffAlign4DynamicLen;
 	AlxIoPin* do_DBG_Read;
 	AlxIoPin* do_DBG_Write;
 	AlxIoPin* do_DBG_StoreReadMetadata;
@@ -170,7 +169,6 @@ void AlxLogger_Ctor
 	uint32_t numOfFilesPerDir,
 	uint32_t numOfLogsPerFile,
 	const char* logDelim,
-	uint32_t writeBuffAlign4DynamicLen,
 	AlxIoPin* do_DBG_Read,
 	AlxIoPin* do_DBG_Write,
 	AlxIoPin* do_DBG_StoreReadMetadata,
