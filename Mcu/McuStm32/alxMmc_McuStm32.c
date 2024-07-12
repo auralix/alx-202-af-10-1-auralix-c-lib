@@ -55,7 +55,7 @@ static AlxMmc* alxMmc_Sdmmc2_me = NULL;
 static uint32_t AlxMmc_GetBusWidth(AlxMmc* me);
 static uint32_t AlxMmc_GetClkDiv(AlxMmc* me);
 static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read);
-static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me);
+static Alx_Status AlxMmc_WaitForTransferState_Private(AlxMmc* me);
 
 
 //------------------------------------------------------------------------------
@@ -98,6 +98,8 @@ void AlxMmc_Ctor
 	AlxIoPin* io_DAT7,
 	AlxClk* clk,
 	AlxMmc_Clk mmcClk,
+	uint8_t* dmaReadWriteBuffAlign4,
+	uint32_t dmaReadWriteBuffAlign4Len,
 	uint16_t dmaReadWriteTimeout_ms,
 	uint16_t waitForTransferStateTimeout_ms,
 	Alx_IrqPriority irqPriority
@@ -129,6 +131,8 @@ void AlxMmc_Ctor
 	me->io_DAT7 = io_DAT7;
 	me->clk = clk;
 	me->mmcClk = mmcClk;
+	me->dmaReadWriteBuffAlign4 = dmaReadWriteBuffAlign4;
+	me->dmaReadWriteBuffAlign4Len = dmaReadWriteBuffAlign4Len;
 	me->dmaReadWriteTimeout_ms = dmaReadWriteTimeout_ms;
 	me->waitForTransferStateTimeout_ms = waitForTransferStateTimeout_ms;
 	me->irqPriority = irqPriority;
@@ -184,6 +188,8 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 	ALX_MMC_ASSERT(me->wasCtorCalled == true);
 	ALX_MMC_ASSERT(me->isInit == true);
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
+	ALX_MMC_ASSERT(((uintptr_t)data & 0x3) == 0);	// Check data address 4-byte alignment, requred for DMA
+	// TV: TODO - Implement dmaReadWriteBuffAlign4Len
 
 
 	//------------------------------------------------------------------------------
@@ -234,7 +240,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		}
 
 		// Wait
-		statusAlx = AlxMmc_WaitForTransferState(me);
+		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
 			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
@@ -268,6 +274,8 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	ALX_MMC_ASSERT(me->wasCtorCalled == true);
 	ALX_MMC_ASSERT(me->isInit == true);
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
+	ALX_MMC_ASSERT(len <= me->dmaReadWriteBuffAlign4Len);
+	ALX_MMC_ASSERT(((uintptr_t)me->dmaReadWriteBuffAlign4 & 0x3) == 0);	// Check data address 4-byte alignment, requred for DMA
 
 
 	//------------------------------------------------------------------------------
@@ -275,6 +283,13 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	//------------------------------------------------------------------------------
 	HAL_StatusTypeDef statusHal = HAL_ERROR;
 	Alx_Status statusAlx = Alx_Err;
+
+
+	//------------------------------------------------------------------------------
+	// Prepare
+	//------------------------------------------------------------------------------
+	memset(me->dmaReadWriteBuffAlign4, 0, me->dmaReadWriteBuffAlign4Len);
+	memcpy(me->dmaReadWriteBuffAlign4, data, len);
 
 
 	//------------------------------------------------------------------------------
@@ -288,7 +303,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		me->dmaWriteDone = false;
 
 		// Read
-		statusHal = HAL_MMC_WriteBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
+		statusHal = HAL_MMC_WriteBlocks_DMA(&me->hmmc, me->dmaReadWriteBuffAlign4, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
 			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaWriteDone);
@@ -318,7 +333,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		}
 
 		// Wait
-		statusAlx = AlxMmc_WaitForTransferState(me);
+		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
 			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
@@ -343,6 +358,15 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 
 	// Return
 	return Alx_ErrNumOfTries;
+}
+Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me)
+{
+	// Assert
+	ALX_MMC_ASSERT(me->wasCtorCalled == true);
+	ALX_MMC_ASSERT(me->isInit == true);
+
+	// Return
+	return AlxMmc_WaitForTransferState_Private(me);
 }
 void AlxMmc_IrqHandler(AlxMmc* me)
 {
@@ -477,7 +501,7 @@ static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read)
 		}
 	}
 }
-static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me)
+static Alx_Status AlxMmc_WaitForTransferState_Private(AlxMmc* me)
 {
 	// Local variables
 	AlxTimSw alxTimSw;
@@ -567,7 +591,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	}
 
 	// Wait for Transfer State - Communication with MMC
-	statusAlx = AlxMmc_WaitForTransferState(me);
+	statusAlx = AlxMmc_WaitForTransferState_Private(me);
 	if (statusAlx != Alx_Ok)
 	{
 		ALX_MMC_TRACE("Err: %d", statusAlx);

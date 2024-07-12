@@ -91,6 +91,9 @@ extern "C" {
 typedef enum
 {
 	AlxFs_Config_Undefined,
+	#if defined(ALX_FATFS)
+	AlxFs_Config_Fatfs_Mmc,
+	#endif
 	#if defined(ALX_LFS)
 	AlxFs_Config_Lfs_FlashInt,
 	AlxFs_Config_Lfs_Mmc
@@ -106,6 +109,9 @@ typedef enum
 
 typedef struct
 {
+	#if defined(ALX_FATFS)
+	FIL fatfsFile;
+	#endif
 	#if defined(ALX_LFS)
 	lfs_file_t lfsFile;
 	#endif
@@ -114,6 +120,9 @@ typedef struct
 
 typedef struct
 {
+	#if defined(ALX_FATFS)
+	DIR fatfsDir;
+	#endif
 	#if defined(ALX_LFS)
 	lfs_dir_t lfsDir;
 	#endif
@@ -122,6 +131,9 @@ typedef struct
 
 typedef struct
 {
+	#if defined(ALX_FATFS)
+	FILINFO fatfsInfo;
+	#endif
 	#if defined(ALX_LFS)
 	struct lfs_info lfsInfo;
 	#endif
@@ -132,6 +144,10 @@ typedef struct
 {
 	// Defines
 	#define ALX_FS_BUFF_LEN 256
+	#if defined(ALX_FATFS)
+	#define ALX_FS_FATFS_PATH "0:/"
+	#define ALX_FS_FATFS_MKFS_BUFF_LEN 512
+	#endif
 
 	// Parameters
 	AlxFs_Config config;
@@ -142,6 +158,11 @@ typedef struct
 	AlxIoPin* do_DBG_SyncBlock;
 
 	// Variables
+	#if defined(ALX_FATFS)
+	FATFS fatfs;
+	MKFS_PARM fatfsMkfsOpt;
+	uint8_t fatfsMkfsBuff[ALX_FS_FATFS_MKFS_BUFF_LEN];
+	#endif
 	#if defined(ALX_LFS)
 	lfs_t lfs;
 	struct lfs_config lfsConfig;

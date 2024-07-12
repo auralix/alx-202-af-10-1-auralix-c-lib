@@ -121,7 +121,7 @@ typedef struct
 	// Defines
 	#define ALX_LOGGER_PATH_LEN_MAX 128
 	#define ALX_LOGGER_LOG_LEN_MAX 256
-	#define ALX_LOGGER_METADATA_FILE_PATH "/AlxLoggerMetadata.bin"
+	#define ALX_LOGGER_METADATA_FILE_PATH "/md.bin"
 	#define ALX_LOGGER_METADATA_MAGIC_NUMBER 0x002DCA5D
 	#define ALX_LOGGER_METADATA_VERSION 1
 
