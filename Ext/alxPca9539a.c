@@ -176,8 +176,17 @@ Alx_Status AlxPca9539a_Init(AlxPca9539a* me)
 {
 	// Assert
 	ALX_PCA9539A_ASSERT(me->wasCtorCalled == true);
-	ALX_PCA9539A_ASSERT(me->isInitPeriph == true);
 	ALX_PCA9539A_ASSERT(me->isInit == false);
+
+	// Multiple drivers use the same I2C instance, so it could already be initialized.
+	if (me->i2c->isInit == false)
+	{
+		AlxPca9539a_InitPeriph(me);
+	}
+	else
+	{
+		me->isInitPeriph = true;
+	}
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -216,6 +225,7 @@ Alx_Status AlxPca9539a_DeInit(AlxPca9539a* me)
 	ALX_PCA9539A_ASSERT(me->isInitPeriph == true);
 	ALX_PCA9539A_ASSERT(me->isInit == true);
 
+	AlxPca9539a_DeInitPeriph(me);
 	// Reset isInit
 	me->isInit = false;
 
