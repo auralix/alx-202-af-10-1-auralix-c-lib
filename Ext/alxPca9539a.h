@@ -328,10 +328,11 @@ Alx_Status AlxPca9539a_InitPeriph(AlxPca9539a* me);
 Alx_Status AlxPca9539a_DeInitPeriph(AlxPca9539a* me);
 Alx_Status AlxPca9539a_Init(AlxPca9539a* me);
 Alx_Status AlxPca9539a_DeInit(AlxPca9539a* me);
-Alx_Status AlxPca9539a_Handle(AlxPca9539a* me, bool inPort0, bool inPort1, bool outPort0, bool outPort1);
+Alx_Status AlxPca9539a_Handle(AlxPca9539a* me);
 Alx_Status AlxPca9539a_irqHandle(AlxPca9539a* me);
 
 bool AlxPca9539a_IoPin_Read(AlxPca9539a* me, uint8_t port, uint8_t pin);
+uint8_t AlxPca9539a_Read_Port_Raw(AlxPca9539a* me, uint8_t port);
 void AlxPca9539a_IoPin_Write(AlxPca9539a* me, uint8_t port, uint8_t pin, bool val);
 void AlxPca9539a_IoPin_Set(AlxPca9539a* me, uint8_t port, uint8_t pin);
 void AlxPca9539a_IoPin_Reset(AlxPca9539a* me, uint8_t port, uint8_t pin);

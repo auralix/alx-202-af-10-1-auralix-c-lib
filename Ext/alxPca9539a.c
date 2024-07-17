@@ -224,16 +224,12 @@ Alx_Status AlxPca9539a_DeInit(AlxPca9539a* me)
 }
 
 /**
-  * @brief
+  * @brief Poll function
   * @param[in,out]	me
-  * @param[in]		inPort0
-  * @param[in]		inPort1
-  * @param[in]		outPort0
-  * @param[in]		outPort1
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxPca9539a_Handle(AlxPca9539a* me, bool inPort0, bool inPort1, bool outPort0, bool outPort1)
+Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 {
 	// Assert
 	ALX_PCA9539A_ASSERT(me->wasCtorCalled == true);
@@ -244,26 +240,18 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me, bool inPort0, bool inPort1, bool 
 	Alx_Status status = Alx_Err;
 
 	// Handle
-	if (inPort0)
-	{
-		status = AlxPca9539a_Reg_Read(me, &me->reg._00h_InputPort_0);
-		if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
-	}
-	if (inPort1)
-	{
-		status = AlxPca9539a_Reg_Read(me, &me->reg._01h_InputPort_1);
-		if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
-	}
-	if (outPort0)
-	{
-		status = AlxPca9539a_Reg_Write(me, &me->reg._02h_OutputPort_0);
-		if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
-	}
-	if (outPort1)
-	{
-		status = AlxPca9539a_Reg_Write(me, &me->reg._03h_OutputPort_1);
-		if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
-	}
+
+	status = AlxPca9539a_Reg_Read(me, &me->reg._00h_InputPort_0);
+	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+
+	status = AlxPca9539a_Reg_Read(me, &me->reg._01h_InputPort_1);
+	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+
+	status = AlxPca9539a_Reg_Write(me, &me->reg._02h_OutputPort_0);
+	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+
+	status = AlxPca9539a_Reg_Write(me, &me->reg._03h_OutputPort_1);
+	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -352,7 +340,7 @@ bool AlxPca9539a_IoPin_Read(AlxPca9539a* me, uint8_t port, uint8_t pin)
   * @param[in]		pin
   * @param[in]		val
   */
-void AlxPca9539a_Read_Port_Raw(AlxPca9539a* me, uint8_t port, uint8_t *val)
+uint8_t AlxPca9539a_Read_Port_Raw(AlxPca9539a* me, uint8_t port)
 {
 	// Assert
 	ALX_PCA9539A_ASSERT(me->wasCtorCalled == true);
@@ -362,12 +350,12 @@ void AlxPca9539a_Read_Port_Raw(AlxPca9539a* me, uint8_t port, uint8_t *val)
 
 	if(port == 0)
 	{
-		*val = me->reg._00h_InputPort_0.val.raw;
+		return me->reg._00h_InputPort_0.val.raw;
 	}
 
 	else if(port == 1)
 	{
-		*val = me->reg._01h_InputPort_1.val.raw;
+		return me->reg._01h_InputPort_1.val.raw;
 	}
 }
 
