@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxIoPin.h
-  * @brief		Auralix C Library - ALX IO Pin Module
+  * @file		alxIoPin_McuZephyr.h
+  * @brief		Auralix C Library - ALX IO Pin MCU Zephyr Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_IO_PIN_H
-#define ALX_IO_PIN_H
+#ifndef ALX_IO_PIN_MCU_ZEPHYR_H
+#define ALX_IO_PIN_MCU_ZEPHYR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,85 +44,45 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxDelay.h"
 
-#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-#include "alxIoPin_McuStm32.h"
-
-#elif defined(ALX_LPC17XX)
-#include "alxIoPin_McuLpc17xx.h"
-
-#elif defined(ALX_LPC55S6X)
-#include "alxIoPin_McuLpc55S6x.h"
-
-#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
-#include "alxIoPin_McuLpc80x.h"
-
-#elif defined(ALX_ZEPHYR)
-#include "alxIoPin_McuZephyr.h"
-
-#else
-typedef struct { bool dummy; } AlxIoPin;
-#endif
-
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
-
-
-//******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_IO_PIN_FILE "alxIoPin.h"
-
-// Assert //
-#if defined(ALX_IO_PIN_ASSERT_BKPT_ENABLE)
-	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_IO_PIN_FILE, expr)
-#elif defined(ALX_IO_PIN_ASSERT_TRACE_ENABLE)
-	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_IO_PIN_FILE, expr)
-#elif defined(ALX_IO_PIN_ASSERT_RST_ENABLE)
-	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_RST(ALX_IO_PIN_FILE, expr)
-#else
-	#define ALX_IO_PIN_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(ALX_IO_PIN_TRACE_ENABLE)
-	#define ALX_IO_PIN_TRACE(...) ALX_TRACE_STD(ALX_IO_PIN_FILE, __VA_ARGS__)
-#else
-	#define ALX_IO_PIN_TRACE(...) do{} while (false)
-#endif
+#if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
+typedef struct
 {
-	AlxIoPin_TriState_HiZ = 0,
-	AlxIoPin_TriState_Hi = 1,
-	AlxIoPin_TriState_Lo = 2,
-	AlxIoPin_TriState_Undefined = 3
-} AlxIoPin_TriState;
+	// Parameters
+	const struct device* port;
+	gpio_pin_t pin;
+	gpio_flags_t flags;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxIoPin;
 
 
 //******************************************************************************
-// Functions
+// Constructor
 //******************************************************************************
-void AlxIoPin_Init(AlxIoPin* me);
-void AlxIoPin_DeInit(AlxIoPin* me);
-bool AlxIoPin_Read(AlxIoPin* me);
-void AlxIoPin_Write(AlxIoPin* me, bool val);
-void AlxIoPin_Set(AlxIoPin* me);
-void AlxIoPin_Reset(AlxIoPin* me);
-void AlxIoPin_Toggle(AlxIoPin* me);
-AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me);
+void AlxIoPin_Ctor
+(
+	AlxIoPin* me,
+	const char* port,
+	gpio_pin_t pin,
+	gpio_flags_t flags
+);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_IO_PIN_H
+#endif	// #ifndef ALX_IO_PIN_MCU_ZEPHYR_H
