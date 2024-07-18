@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxBq25890.h
-  * @brief		Auralix C Library - ALX IO Expander BQ25890 Module
+  * @brief		Auralix C Library - ALX Battery charger
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -171,7 +171,7 @@ void AlxBq25890_Ctor
 (
 	AlxBq25890* me,
 	AlxI2c* i2c,
-	uint16_t IINLIM,
+	uint8_t IINLIM,
 	bool JEITA_VSET,
 	bool BATFET_DIS
 );

@@ -47,7 +47,6 @@
 static void AlxBq25890_RegStruct_SetAddr(AlxBq25890* me);
 static void AlxBq25890_RegStruct_SetLen(AlxBq25890* me);
 static Alx_Status AlxBq25890_RegStruct_SetValToDefault(AlxBq25890* me);
-static void AlxBq25890_RegStruct_SetValToZero(AlxBq25890* me);
 
 //******************************************************************************
 // Weak Functions
@@ -72,7 +71,7 @@ void AlxBq25890_Ctor
 (
 	AlxBq25890* me,
 	AlxI2c* i2c,
-	uint16_t IINLIM,
+	uint8_t IINLIM,
 	bool JEITA_VSET,
 	bool BATFET_DIS
 )
@@ -81,7 +80,6 @@ void AlxBq25890_Ctor
 	// Variables
 	AlxBq25890_RegStruct_SetAddr(me);
 	AlxBq25890_RegStruct_SetLen(me);
-	AlxBq25890_RegStruct_SetValToZero(me);
 
 	// Parameters
 	me->i2c = i2c;
