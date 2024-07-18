@@ -97,6 +97,9 @@ void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us)
 	#if defined(ALX_FREE_RTOS)
 	vTaskDelay(osDelay_osTick);
 	#endif
+	#if defined(ALX_ZEPHYR)
+	k_sleep(K_USEC(osDelay_us));
+	#endif
 }
 
 /**
@@ -104,28 +107,40 @@ void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us)
   * @param[in,out]	me
   * @param[in]		osDelay_ms
   */
-void AlxOsDelay_ms(AlxOsDelay* me, uint64_t osDelay_ms)		{ AlxOsDelay_us(me, osDelay_ms * 1000); }
+void AlxOsDelay_ms(AlxOsDelay* me, uint64_t osDelay_ms)
+{
+	AlxOsDelay_us(me, osDelay_ms * 1000);
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		osDelay_sec
   */
-void AlxOsDelay_sec(AlxOsDelay* me, uint64_t osDelay_sec)	{ AlxOsDelay_us(me, osDelay_sec * 1000000); }
+void AlxOsDelay_sec(AlxOsDelay* me, uint64_t osDelay_sec)
+{
+	AlxOsDelay_us(me, osDelay_sec * 1000000);
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		osDelay_min
   */
-void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min)	{ AlxOsDelay_us(me, osDelay_min * 60000000); }
+void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min)
+{
+	AlxOsDelay_us(me, osDelay_min * 60000000);
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		osDelay_hr
   */
-void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr)		{ AlxOsDelay_us(me, osDelay_hr * 3600000000); }
+void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr)
+{
+	AlxOsDelay_us(me, osDelay_hr * 3600000000);
+}
 
 
 #endif	// #if defined(ALX_C_LIB)
