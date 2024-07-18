@@ -65,7 +65,7 @@ void AlxMax17263_Ctor
 
 	// Parameters
 	me->i2c = i2c;
-	me->i2cAddr = 0x6A;
+	me->i2cAddr = MAX1726X_I2C_ADDR;
 	me->i2cCheckWithRead = true;
 	me->i2cNumOfTries = 3;
 	me->i2cTimeout_ms = 500;
@@ -203,8 +203,8 @@ void maxim_max1726x_write_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_d
 	//maxim_max32660_i2c1_write(MAX1726X_I2C_ADDR, i2c_data, 3, 0);
 
 		// Write
-	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
+	AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 3, me->i2cTimeout_ms);
+	//if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
 
 }
 
@@ -214,16 +214,16 @@ void maxim_max1726x_read_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_da
 	uint8_t i2c_data[2];
 
 	i2c_data[0] = reg_addr;
-	maxim_max32660_i2c1_write(MAX1726X_I2C_ADDR, i2c_data, 1, 1);
+	AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 1, me->i2cTimeout_ms);
 
-	maxim_max32660_i2c1_read(MAX1726X_I2C_ADDR, i2c_data, 2, 0);
+	AlxI2c_Master_StartRead(me->i2c, me->i2cAddr, i2c_data, 2, me->i2cTimeout_ms);
 
 	*reg_data = i2c_data[1];
 	*reg_data = ((*reg_data) << 8) | i2c_data[0];
 }
 
 /* ************************************************************************* */
-uint8_t maxim_max1726x_write_and_verify_reg(uint8_t reg_addr, uint16_t *reg_data)
+uint8_t maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data)
 {
 	uint8_t i2c_data[3];
 	uint16_t readback_data;
@@ -236,16 +236,16 @@ uint8_t maxim_max1726x_write_and_verify_reg(uint8_t reg_addr, uint16_t *reg_data
 		i2c_data[0] = reg_addr;
 		i2c_data[1] = (*reg_data) & 0xFF;
 		i2c_data[2] = (*reg_data) >> 8;
-		maxim_max32660_i2c1_write(MAX1726X_I2C_ADDR, i2c_data, 3, 0);
+		AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 3, me->i2cTimeout_ms);
 
-		delay(480000); // about 10ms
+		AlxDelay_ms(10); // about 10ms
 
 		i2c_data[0] = reg_addr;
-		maxim_max32660_i2c1_write(MAX1726X_I2C_ADDR, i2c_data, 1, 1);
+		AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 1, me->i2cTimeout_ms);
 
 		i2c_data[0] = 0x00;
 		i2c_data[1] = 0x00;
-		maxim_max32660_i2c1_read(MAX1726X_I2C_ADDR, i2c_data, 2, 0);
+		AlxI2c_Master_StartRead(me->i2c, me->i2cAddr, i2c_data, 2, me->i2cTimeout_ms);
 		readback_data = i2c_data[1];
 		readback_data = (readback_data << 8) | i2c_data[0];
 
@@ -263,9 +263,9 @@ uint8_t maxim_max1726x_write_and_verify_reg(uint8_t reg_addr, uint16_t *reg_data
 }
 
 /* ************************************************************************* */
-uint8_t maxim_max1726x_check_por(void)
+uint8_t maxim_max1726x_check_por(AlxMax17263* me)
 {
-	maxim_max1726x_read_reg(MAX1726X_STATUS_REG, &max1726x_regs[MAX1726X_STATUS_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_STATUS_REG, &max1726x_regs[MAX1726X_STATUS_REG]);
 
 	if ((max1726x_regs[MAX1726X_STATUS_REG] & 0x0002) == 0x0000)
 	{
@@ -278,30 +278,30 @@ uint8_t maxim_max1726x_check_por(void)
 }
 
 /* ************************************************************************* */
-uint8_t maxim_max1726x_clear_por(void)
+uint8_t maxim_max1726x_clear_por(AlxMax17263* me)
 {
-	maxim_max1726x_read_reg(MAX1726X_STATUS_REG, &max1726x_regs[MAX1726X_STATUS_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_STATUS_REG, &max1726x_regs[MAX1726X_STATUS_REG]);
 
 	max1726x_regs[MAX1726X_STATUS_REG] = max1726x_regs[MAX1726X_STATUS_REG] & 0xFFFD;
 
-	return maxim_max1726x_write_and_verify_reg(MAX1726X_STATUS_REG, &max1726x_regs[MAX1726X_STATUS_REG]);
+	return maxim_max1726x_write_and_verify_reg(me, MAX1726X_STATUS_REG, &max1726x_regs[MAX1726X_STATUS_REG]);
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_wait_dnr(void)
+void maxim_max1726x_wait_dnr(AlxMax17263* me)
 {
-	maxim_max1726x_read_reg(MAX1726X_FSTAT_REG, &max1726x_regs[MAX1726X_FSTAT_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_FSTAT_REG, &max1726x_regs[MAX1726X_FSTAT_REG]);
 
 	while ((max1726x_regs[MAX1726X_FSTAT_REG] & 0x0001) == 0x0001)
 	{
-		delay(480000); // about 10ms
-		maxim_max1726x_read_reg(MAX1726X_FSTAT_REG, &max1726x_regs[MAX1726X_FSTAT_REG]);
+		AlxDelay_ms(10); // about 10ms
+		maxim_max1726x_read_reg(me, MAX1726X_FSTAT_REG, &max1726x_regs[MAX1726X_FSTAT_REG]);
 	}
 
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_initialize_ez_config(void)
+void maxim_max1726x_initialize_ez_config(AlxMax17263* me)
 {
 	uint16_t tempdata;
 
@@ -315,14 +315,14 @@ void maxim_max1726x_initialize_ez_config(void)
 
 
 	/// Store original HibCFG value
-	maxim_max1726x_read_reg(MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
 
 	/// Exit Hibernate Mode step
 	tempdata = 0x0090;
-	maxim_max1726x_write_reg(0x60, &tempdata);
+	maxim_max1726x_write_reg(me, 0x60, &tempdata);
 	tempdata = 0x0000;
-	maxim_max1726x_write_reg(MAX1726X_HIBCFG_REG, &tempdata);
-	maxim_max1726x_write_reg(0x60, &tempdata);
+	maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &tempdata);
+	maxim_max1726x_write_reg(me, 0x60, &tempdata);
 
 	/// OPTION 1 EZ Config (No INI file is needed)
 	max1726x_regs[MAX1726X_DESIGNCAP_REG] = max1726x_ez_config.designcap;
@@ -330,28 +330,28 @@ void maxim_max1726x_initialize_ez_config(void)
 	max1726x_regs[MAX1726X_VEMPTY_REG] = max1726x_ez_config.vempty;
 	max1726x_regs[MAX1726X_MODELCFG_REG] = max1726x_ez_config.modelcfg;
 
-	maxim_max1726x_write_reg(MAX1726X_DESIGNCAP_REG, &max1726x_regs[MAX1726X_DESIGNCAP_REG]);
-	maxim_max1726x_write_reg(MAX1726X_ICHGTERM_REG, &max1726x_regs[MAX1726X_ICHGTERM_REG]);
-	maxim_max1726x_write_reg(MAX1726X_VEMPTY_REG, &max1726x_regs[MAX1726X_VEMPTY_REG]);
-	maxim_max1726x_write_reg(MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_DESIGNCAP_REG, &max1726x_regs[MAX1726X_DESIGNCAP_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_ICHGTERM_REG, &max1726x_regs[MAX1726X_ICHGTERM_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_VEMPTY_REG, &max1726x_regs[MAX1726X_VEMPTY_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
 
 
 	//Poll ModelCFG.Refresh bit, do not continue until ModelCFG.Refresh==0
-	maxim_max1726x_read_reg(MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
 
 	while ((max1726x_regs[MAX1726X_MODELCFG_REG] & 0x8000) == 0x8000)
 	{
 		delay(480000); // about 10ms
-		maxim_max1726x_read_reg(MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
+		maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
 	}
 
 	/// Restore Original HibCFG value
-	maxim_max1726x_write_reg(MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
 
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_initialize_short_ini(void)
+void maxim_max1726x_initialize_short_ini(AlxMax17263* me)
 {
 	uint16_t tempdata;
 
@@ -372,14 +372,14 @@ void maxim_max1726x_initialize_short_ini(void)
 
 
 	/// Store original HibCFG value
-	maxim_max1726x_read_reg(MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
 
 	/// Exit Hibernate Mode step
 	tempdata = 0x0090;
-	maxim_max1726x_write_reg(0x60, &tempdata);
+	maxim_max1726x_write_reg(me, 0x60, &tempdata);
 	tempdata = 0x0000;
-	maxim_max1726x_write_reg(MAX1726X_HIBCFG_REG, &tempdata);
-	maxim_max1726x_write_reg(0x60, &tempdata);
+	maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &tempdata);
+	maxim_max1726x_write_reg(me, 0x60, &tempdata);
 
 	/// OPTION 2 Custom Short INI without OCV Table
 	max1726x_regs[MAX1726X_DESIGNCAP_REG] = max1726x_short_ini.designcap;
@@ -395,37 +395,37 @@ void maxim_max1726x_initialize_short_ini(void)
 	max1726x_regs[MAX1726X_RCOMP0_REG] = max1726x_short_ini.rcomp0;
 	max1726x_regs[MAX1726X_TEMPCO_REG] = max1726x_short_ini.tempco;
 
-	maxim_max1726x_write_reg(MAX1726X_DESIGNCAP_REG, &max1726x_regs[MAX1726X_DESIGNCAP_REG]);
-	maxim_max1726x_write_reg(MAX1726X_ICHGTERM_REG, &max1726x_regs[MAX1726X_ICHGTERM_REG]);
-	maxim_max1726x_write_reg(MAX1726X_VEMPTY_REG, &max1726x_regs[MAX1726X_VEMPTY_REG]);
-	// maxim_max1726x_write_and_verify_reg(MAX1726X_LEARNCFG_REG, &max1726x_regs[MAX1726X_LEARNCFG_REG]);	// optional
-	// maxim_max1726x_write_and_verify_reg(MAX1726X_FULLSOCTHR_REG, &max1726x_regs[MAX1726X_FULLSOCTHR_REG]);	// optional
-	maxim_max1726x_write_reg(MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_DESIGNCAP_REG, &max1726x_regs[MAX1726X_DESIGNCAP_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_ICHGTERM_REG, &max1726x_regs[MAX1726X_ICHGTERM_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_VEMPTY_REG, &max1726x_regs[MAX1726X_VEMPTY_REG]);
+	// maxim_max1726x_write_and_verify_reg(me, MAX1726X_LEARNCFG_REG, &max1726x_regs[MAX1726X_LEARNCFG_REG]);	// optional
+	// maxim_max1726x_write_and_verify_reg(me, MAX1726X_FULLSOCTHR_REG, &max1726x_regs[MAX1726X_FULLSOCTHR_REG]);	// optional
+	maxim_max1726x_write_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
 
 
 	//Poll ModelCFG.Refresh bit, do not continue until ModelCFG.Refresh==0
-	maxim_max1726x_read_reg(MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
 
 	while ((max1726x_regs[MAX1726X_MODELCFG_REG] & 0x8000) == 0x8000)
 	{
 		delay(480000); // about 10ms
-		maxim_max1726x_read_reg(MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
+		maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
 	}
 
-	maxim_max1726x_write_reg(MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]);
-	maxim_max1726x_write_reg(MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]);
-	maxim_max1726x_write_reg(MAX1726X_QRTABLE00_REG, &max1726x_regs[MAX1726X_QRTABLE00_REG]);
-	maxim_max1726x_write_reg(MAX1726X_QRTABLE10_REG, &max1726x_regs[MAX1726X_QRTABLE10_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_QRTABLE00_REG, &max1726x_regs[MAX1726X_QRTABLE00_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_QRTABLE10_REG, &max1726x_regs[MAX1726X_QRTABLE10_REG]);
 	// maxim_max1726x_write_reg(MAX1726X_QRTABLE20_REG, &max1726x_regs[MAX1726X_QRTABLE20_REG]);	// optional
 	// maxim_max1726x_write_reg(MAX1726X_QRTABLE30_REG, &max1726x_regs[MAX1726X_QRTABLE30_REG]);	// optional
 
 	/// Restore Original HibCFG value
-	maxim_max1726x_write_reg(MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
 
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_initialize_full_ini(void)
+void maxim_max1726x_initialize_full_ini(AlxMax17263* me)
 {
 	uint16_t tempdata;
 	uint8_t ret;
@@ -492,14 +492,14 @@ void maxim_max1726x_initialize_full_ini(void)
 
 
 	/// Store original HibCFG value
-	maxim_max1726x_read_reg(MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
 
 	/// Exit Hibernate Mode step
 	tempdata = 0x0090;
-	maxim_max1726x_write_reg(0x60, &tempdata);
+	maxim_max1726x_write_reg(me, 0x60, &tempdata);
 	tempdata = 0x0000;
-	maxim_max1726x_write_reg(MAX1726X_HIBCFG_REG, &tempdata);
-	maxim_max1726x_write_reg(0x60, &tempdata);
+	maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &tempdata);
+	maxim_max1726x_write_reg(me, 0x60, &tempdata);
 
 	/// OPTION 3 Custom Full INI with OCV Table
 	max1726x_regs[MAX1726X_DESIGNCAP_REG] = max1726x_full_ini.designcap;
@@ -529,12 +529,12 @@ void maxim_max1726x_initialize_full_ini(void)
 	while (ret != 0)
 	{
 		/// Unlock Model Access
-		maxim_max1726x_unlock_model_data();
+		maxim_max1726x_unlock_model_data(me);
 
-		delay(480000); // about 10ms
+		AlxDelay_ms(10); // about 10ms
 
 		/// Write/Read/Verify the Custom Model Data
-		ret = maxim_max1726x_write_model_data(max1726x_full_ini.modeldata0, max1726x_full_ini.modeldata1);
+		ret = maxim_max1726x_write_model_data(me, max1726x_full_ini.modeldata0, max1726x_full_ini.modeldata1);
 	}
 
 	/// Lock Model Access
@@ -542,110 +542,110 @@ void maxim_max1726x_initialize_full_ini(void)
 	while (ret != 0)
 	{
 		/// Lock Model Access
-		maxim_max1726x_lock_model_data();
+		maxim_max1726x_lock_model_data(me);
 
-		delay(480000); // about 10ms
+		AlxDelay_ms(10); // about 10ms
 
-		ret = maxim_max1726x_verify_model_data_locked();
+		ret = maxim_max1726x_verify_model_data_locked(me);
 	}
 
 	/// Write Custom Parameters
 	max1726x_regs[MAX1726X_REPCAP_REG] = 0x0000;
-	maxim_max1726x_write_reg(MAX1726X_REPCAP_REG, &max1726x_regs[MAX1726X_REPCAP_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_REPCAP_REG, &max1726x_regs[MAX1726X_REPCAP_REG]);
 
-	maxim_max1726x_write_reg(MAX1726X_DESIGNCAP_REG, &max1726x_regs[MAX1726X_DESIGNCAP_REG]);
-	maxim_max1726x_write_reg(MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_DESIGNCAP_REG, &max1726x_regs[MAX1726X_DESIGNCAP_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]);
 
 
 	max1726x_regs[MAX1726X_DQACC_REG] = max1726x_regs[MAX1726X_DESIGNCAP_REG] / 2;
 	max1726x_regs[MAX1726X_DPACC_REG] = 0x0C80;
-	maxim_max1726x_write_reg(MAX1726X_DQACC_REG, &max1726x_regs[MAX1726X_DQACC_REG]);
-	maxim_max1726x_write_reg(MAX1726X_DPACC_REG, &max1726x_regs[MAX1726X_DPACC_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_DQACC_REG, &max1726x_regs[MAX1726X_DQACC_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_DPACC_REG, &max1726x_regs[MAX1726X_DPACC_REG]);
 
-	maxim_max1726x_write_reg(MAX1726X_ICHGTERM_REG, &max1726x_regs[MAX1726X_ICHGTERM_REG]);
-	maxim_max1726x_write_reg(MAX1726X_VEMPTY_REG, &max1726x_regs[MAX1726X_VEMPTY_REG]);
-	maxim_max1726x_write_reg(MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]);
-	maxim_max1726x_write_reg(MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]);
-	maxim_max1726x_write_reg(MAX1726X_QRTABLE00_REG, &max1726x_regs[MAX1726X_QRTABLE00_REG]);
-	maxim_max1726x_write_reg(MAX1726X_QRTABLE10_REG, &max1726x_regs[MAX1726X_QRTABLE10_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_ICHGTERM_REG, &max1726x_regs[MAX1726X_ICHGTERM_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_VEMPTY_REG, &max1726x_regs[MAX1726X_VEMPTY_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_QRTABLE00_REG, &max1726x_regs[MAX1726X_QRTABLE00_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_QRTABLE10_REG, &max1726x_regs[MAX1726X_QRTABLE10_REG]);
 
-	// maxim_max1726x_write_reg(MAX1726X_QRTABLE20_REG, &max1726x_regs[MAX1726X_QRTABLE20_REG]);			// optional
-	// maxim_max1726x_write_reg(MAX1726X_QRTABLE30_REG, &max1726x_regs[MAX1726X_QRTABLE30_REG]);			// optional
-	// maxim_max1726x_write_and_verify_reg(MAX1726X_LEARNCFG_REG, &max1726x_regs[MAX1726X_LEARNCFG_REG]);	// optional
-	// maxim_max1726x_write_reg(MAX1726X_RELAXCFG_REG, &max1726x_regs[MAX1726X_RELAXCFG_REG]);				// optional
-	// maxim_max1726x_write_reg(MAX1726X_CONFIG_REG, &max1726x_regs[MAX1726X_CONFIG_REG]);					// optional
-	// maxim_max1726x_write_reg(MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);				// optional
-	// maxim_max1726x_write_reg(MAX1726X_FULLSOCTHR_REG, &max1726x_regs[MAX1726X_FULLSOCTHR_REG]);			// optional
-	// maxim_max1726x_write_reg(MAX1726X_TGAIN_REG, &max1726x_regs[MAX1726X_TGAIN_REG]);					// optional
-	// maxim_max1726x_write_reg(MAX1726X_TOFF_REG, &max1726x_regs[MAX1726X_TOFF_REG]);						// optional
-	// maxim_max1726x_write_reg(MAX1726X_CURVE_REG, &max1726x_regs[MAX1726X_CURVE_REG]);					// optional
+	// maxim_max1726x_write_reg(me, MAX1726X_QRTABLE20_REG, &max1726x_regs[MAX1726X_QRTABLE20_REG]);			// optional
+	// maxim_max1726x_write_reg(me, MAX1726X_QRTABLE30_REG, &max1726x_regs[MAX1726X_QRTABLE30_REG]);			// optional
+	// maxim_max1726x_write_and_verify_reg(me, MAX1726X_LEARNCFG_REG, &max1726x_regs[MAX1726X_LEARNCFG_REG]);	// optional
+	// maxim_max1726x_write_reg(me, MAX1726X_RELAXCFG_REG, &max1726x_regs[MAX1726X_RELAXCFG_REG]);				// optional
+	// maxim_max1726x_write_reg(me, MAX1726X_CONFIG_REG, &max1726x_regs[MAX1726X_CONFIG_REG]);					// optional
+	// maxim_max1726x_write_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);				// optional
+	// maxim_max1726x_write_reg(me, MAX1726X_FULLSOCTHR_REG, &max1726x_regs[MAX1726X_FULLSOCTHR_REG]);			// optional
+	// maxim_max1726x_write_reg(me, MAX1726X_TGAIN_REG, &max1726x_regs[MAX1726X_TGAIN_REG]);					// optional
+	// maxim_max1726x_write_reg(me, MAX1726X_TOFF_REG, &max1726x_regs[MAX1726X_TOFF_REG]);						// optional
+	// maxim_max1726x_write_reg(me, MAX1726X_CURVE_REG, &max1726x_regs[MAX1726X_CURVE_REG]);					// optional
 
 
 
 	/// Initiate Model Loading, by setting the LdMdl bit in the Config2 register
-	maxim_max1726x_read_reg(MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
 	max1726x_regs[MAX1726X_CONFIG2_REG] = max1726x_regs[MAX1726X_CONFIG2_REG] | 0x0020;
-	maxim_max1726x_write_reg(MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
 
 
 	/// Poll Config2.LdMdl bit, do not continue until Config2.LdMdl==0
-	maxim_max1726x_read_reg(MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
 
 	while ((max1726x_regs[MAX1726X_CONFIG2_REG] & 0x0020) == 0x0020)
 	{
 		delay(480000); // about 10ms
-		maxim_max1726x_read_reg(MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
+		maxim_max1726x_read_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
 	}
 
 	/// Update QRTable20 and QRTable30
-	maxim_max1726x_write_and_verify_reg(MAX1726X_QRTABLE20_REG, &max1726x_regs[MAX1726X_QRTABLE20_REG]);
-	maxim_max1726x_write_and_verify_reg(MAX1726X_QRTABLE30_REG, &max1726x_regs[MAX1726X_QRTABLE30_REG]);
+	maxim_max1726x_write_and_verify_reg(me, MAX1726X_QRTABLE20_REG, &max1726x_regs[MAX1726X_QRTABLE20_REG]);
+	maxim_max1726x_write_and_verify_reg(me, MAX1726X_QRTABLE30_REG, &max1726x_regs[MAX1726X_QRTABLE30_REG]);
 
 
 	/// Restore Original HibCFG value
-	maxim_max1726x_write_reg(MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
+	maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
 
 
 }
 
 /* ************************************************************************* */
-float maxim_max1726x_get_repcap(float Rsense)
+float maxim_max1726x_get_repcap(AlxMax17263* me, float Rsense)
 {
 	float repcap;
-	maxim_max1726x_read_reg(MAX1726X_REPCAP_REG, &max1726x_regs[MAX1726X_REPCAP_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_REPCAP_REG, &max1726x_regs[MAX1726X_REPCAP_REG]);
 
 	repcap = (float)max1726x_regs[MAX1726X_REPCAP_REG] * 5.0f / (float)Rsense;
 	return repcap;
 }
 
 /* ************************************************************************* */
-float maxim_max1726x_get_repsoc(void)
+float maxim_max1726x_get_repsoc(AlxMax17263* me)
 {
 	float repsoc;
-	maxim_max1726x_read_reg(MAX1726X_REPSOC_REG, &max1726x_regs[MAX1726X_REPSOC_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_REPSOC_REG, &max1726x_regs[MAX1726X_REPSOC_REG]);
 
 	repsoc = (float)max1726x_regs[MAX1726X_REPSOC_REG] / 256.0f;
 	return repsoc;
 }
 
 /* ************************************************************************* */
-float maxim_max1726x_get_tte(void)
+float maxim_max1726x_get_tte(AlxMax17263* me)
 {
 	float tte;
-	maxim_max1726x_read_reg(MAX1726X_TTE_REG, &max1726x_regs[MAX1726X_TTE_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_TTE_REG, &max1726x_regs[MAX1726X_TTE_REG]);
 
 	tte = (float)max1726x_regs[MAX1726X_TTE_REG] * 5.625f;
 	return tte;
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_save_learned_parameters(max1726x_learned_parameters_t *lp)
+void maxim_max1726x_save_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp)
 {
-	maxim_max1726x_read_reg(MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]);
-	maxim_max1726x_read_reg(MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]);
-	maxim_max1726x_read_reg(MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]);
-	maxim_max1726x_read_reg(MAX1726X_CYCLES_REG, &max1726x_regs[MAX1726X_CYCLES_REG]);
-	maxim_max1726x_read_reg(MAX1726X_FULLCAPNOM_REG, &max1726x_regs[MAX1726X_FULLCAPNOM_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_CYCLES_REG, &max1726x_regs[MAX1726X_CYCLES_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_FULLCAPNOM_REG, &max1726x_regs[MAX1726X_FULLCAPNOM_REG]);
 
 
 	lp->saved_rcomp0 = max1726x_regs[MAX1726X_RCOMP0_REG];
@@ -656,7 +656,7 @@ void maxim_max1726x_save_learned_parameters(max1726x_learned_parameters_t *lp)
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_restore_learned_parameters(max1726x_learned_parameters_t *lp)
+void maxim_max1726x_restore_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp)
 {
 	max1726x_regs[MAX1726X_RCOMP0_REG] = lp->saved_rcomp0;
 	max1726x_regs[MAX1726X_TEMPCO_REG] = lp->saved_tempco;
@@ -667,34 +667,34 @@ void maxim_max1726x_restore_learned_parameters(max1726x_learned_parameters_t *lp
 	max1726x_regs[MAX1726X_DQACC_REG] = (lp->saved_fullcapnom) / 2;
 
 
-	maxim_max1726x_write_and_verify_reg(MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]);
-	maxim_max1726x_write_and_verify_reg(MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]);
-	maxim_max1726x_write_and_verify_reg(MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]);
-	maxim_max1726x_write_and_verify_reg(MAX1726X_DPACC_REG, &max1726x_regs[MAX1726X_DPACC_REG]);
-	maxim_max1726x_write_and_verify_reg(MAX1726X_DQACC_REG, &max1726x_regs[MAX1726X_DQACC_REG]);
-	maxim_max1726x_write_and_verify_reg(MAX1726X_CYCLES_REG, &max1726x_regs[MAX1726X_CYCLES_REG]);
+	maxim_max1726x_write_and_verify_reg(me, MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]);
+	maxim_max1726x_write_and_verify_reg(me, MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]);
+	maxim_max1726x_write_and_verify_reg(me, MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]);
+	maxim_max1726x_write_and_verify_reg(me, MAX1726X_DPACC_REG, &max1726x_regs[MAX1726X_DPACC_REG]);
+	maxim_max1726x_write_and_verify_reg(me, MAX1726X_DQACC_REG, &max1726x_regs[MAX1726X_DQACC_REG]);
+	maxim_max1726x_write_and_verify_reg(me, MAX1726X_CYCLES_REG, &max1726x_regs[MAX1726X_CYCLES_REG]);
 
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_get_serial_number(uint16_t *sn)
+void maxim_max1726x_get_serial_number(AlxMax17263* me, uint16_t *sn)
 {
 
-	maxim_max1726x_read_reg(MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
 
 	// clear AtRateEn bit and DPEn bit in Config2 register
 	max1726x_regs[MAX1726X_CONFIG2_REG] = max1726x_regs[MAX1726X_CONFIG2_REG] & 0xCFFF;
-	maxim_max1726x_write_and_verify_reg(MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
-	delay(1920000); // about 40ms
+	maxim_max1726x_write_and_verify_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
+	AlxDelay_ms(40);
 
-	maxim_max1726x_read_reg(MAX1726X_MAXPEAKPOWER_REG, &max1726x_regs[MAX1726X_MAXPEAKPOWER_REG]);
-	maxim_max1726x_read_reg(MAX1726X_SUSPEAKPOWER_REG, &max1726x_regs[MAX1726X_SUSPEAKPOWER_REG]);
-	maxim_max1726x_read_reg(MAX1726X_MPPCURRENT_REG, &max1726x_regs[MAX1726X_MPPCURRENT_REG]);
-	maxim_max1726x_read_reg(MAX1726X_SPPCURRENT_REG, &max1726x_regs[MAX1726X_SPPCURRENT_REG]);
-	maxim_max1726x_read_reg(MAX1726X_ATQRESIDUAL_REG, &max1726x_regs[MAX1726X_ATQRESIDUAL_REG]);
-	maxim_max1726x_read_reg(MAX1726X_ATTTE_REG, &max1726x_regs[MAX1726X_ATTTE_REG]);
-	maxim_max1726x_read_reg(MAX1726X_ATAVSOC_REG, &max1726x_regs[MAX1726X_ATAVSOC_REG]);
-	maxim_max1726x_read_reg(MAX1726X_ATAVCAP_REG, &max1726x_regs[MAX1726X_ATAVCAP_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_MAXPEAKPOWER_REG, &max1726x_regs[MAX1726X_MAXPEAKPOWER_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_SUSPEAKPOWER_REG, &max1726x_regs[MAX1726X_SUSPEAKPOWER_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_MPPCURRENT_REG, &max1726x_regs[MAX1726X_MPPCURRENT_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_SPPCURRENT_REG, &max1726x_regs[MAX1726X_SPPCURRENT_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_ATQRESIDUAL_REG, &max1726x_regs[MAX1726X_ATQRESIDUAL_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_ATTTE_REG, &max1726x_regs[MAX1726X_ATTTE_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_ATAVSOC_REG, &max1726x_regs[MAX1726X_ATAVSOC_REG]);
+	maxim_max1726x_read_reg(me, MAX1726X_ATAVCAP_REG, &max1726x_regs[MAX1726X_ATAVCAP_REG]);
 
 
 	sn[0] = max1726x_regs[MAX1726X_MAXPEAKPOWER_REG];
@@ -709,23 +709,23 @@ void maxim_max1726x_get_serial_number(uint16_t *sn)
 
 	// set AtRateEn bit and DPEn bit in Config2 register
 	max1726x_regs[MAX1726X_CONFIG2_REG] = max1726x_regs[MAX1726X_CONFIG2_REG] | 0x3000;
-	maxim_max1726x_write_and_verify_reg(MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
+	maxim_max1726x_write_and_verify_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
 	delay(1920000); // about 40ms
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_unlock_model_data(void)
+void maxim_max1726x_unlock_model_data(AlxMax17263* me)
 {
 	uint16_t tempdata;
 
 	tempdata = 0x0059;
-	maxim_max1726x_write_reg(0x62, &tempdata);
+	maxim_max1726x_write_reg(me, 0x62, &tempdata);
 	tempdata = 0x00C4;
-	maxim_max1726x_write_reg(0x63, &tempdata);
+	maxim_max1726x_write_reg(me, 0x63, &tempdata);
 }
 
 /* ************************************************************************* */
-uint8_t maxim_max1726x_write_model_data(uint16_t *data0, uint16_t *data1)
+uint8_t maxim_max1726x_write_model_data(AlxMax17263* me, uint16_t *data0, uint16_t *data1)
 {
 	uint8_t err_num;
 
@@ -737,22 +737,22 @@ uint8_t maxim_max1726x_write_model_data(uint16_t *data0, uint16_t *data1)
 
 	for (i = 0; i < 16; i++)
 	{
-		maxim_max1726x_write_reg(MAX1726X_MODELDATA0_START_REG + i, &data0[i]);
+		maxim_max1726x_write_reg(me, MAX1726X_MODELDATA0_START_REG + i, &data0[i]);
 	}
 	for (i = 0; i < 16; i++)
 	{
-		maxim_max1726x_write_reg(MAX1726X_MODELDATA1_START_REG + i, &data1[i]);
+		maxim_max1726x_write_reg(me, MAX1726X_MODELDATA1_START_REG + i, &data1[i]);
 	}
 
 	delay(480000); // about 10ms
 
 	for (i = 0; i < 16; i++)
 	{
-		maxim_max1726x_read_reg(MAX1726X_MODELDATA0_START_REG + i, &readback0[i]);
+		maxim_max1726x_read_reg(me, MAX1726X_MODELDATA0_START_REG + i, &readback0[i]);
 	}
 	for (i = 0; i < 16; i++)
 	{
-		maxim_max1726x_read_reg(MAX1726X_MODELDATA1_START_REG + i, &readback1[i]);
+		maxim_max1726x_read_reg(me, MAX1726X_MODELDATA1_START_REG + i, &readback1[i]);
 	}
 
 	for (i = 0; i < 16; i++)
@@ -773,17 +773,17 @@ uint8_t maxim_max1726x_write_model_data(uint16_t *data0, uint16_t *data1)
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_lock_model_data(void)
+void maxim_max1726x_lock_model_data(AlxMax17263* me)
 {
 	uint16_t tempdata;
 
 	tempdata = 0x0000;
-	maxim_max1726x_write_reg(0x62, &tempdata);
-	maxim_max1726x_write_reg(0x63, &tempdata);
+	maxim_max1726x_write_reg(me, 0x62, &tempdata);
+	maxim_max1726x_write_reg(me, 0x63, &tempdata);
 }
 
 /* ************************************************************************* */
-uint8_t maxim_max1726x_verify_model_data_locked(void)
+uint8_t maxim_max1726x_verify_model_data_locked(AlxMax17263* me)
 {
 	uint8_t err_num;
 	uint8_t i;
@@ -795,11 +795,11 @@ uint8_t maxim_max1726x_verify_model_data_locked(void)
 
 	for (i = 0; i < 16; i++)
 	{
-		maxim_max1726x_read_reg(MAX1726X_MODELDATA0_START_REG + i, &readback0[i]);
+		maxim_max1726x_read_reg(me, MAX1726X_MODELDATA0_START_REG + i, &readback0[i]);
 	}
 	for (i = 0; i < 16; i++)
 	{
-		maxim_max1726x_read_reg(MAX1726X_MODELDATA1_START_REG + i, &readback1[i]);
+		maxim_max1726x_read_reg(me, MAX1726X_MODELDATA1_START_REG + i, &readback1[i]);
 	}
 
 	for (i = 0; i < 16; i++)

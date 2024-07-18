@@ -344,7 +344,7 @@ void AlxMax17263_Ctor
  * @param      Register value (2 byte).
  * @retval     void.
  */
-void maxim_max1726x_write_reg(uint8_t reg_addr, uint16_t *reg_data);
+	void maxim_max1726x_write_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data);
 
 /****************************************************************************/
 /**
@@ -354,7 +354,7 @@ void maxim_max1726x_write_reg(uint8_t reg_addr, uint16_t *reg_data);
  * @param      Register value (2 byte).
  * @retval     void.
  */
-void maxim_max1726x_read_reg(uint8_t reg_addr, uint16_t *reg_data);
+	void maxim_max1726x_read_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data);
 
 /****************************************************************************/
 /**
@@ -364,7 +364,7 @@ void maxim_max1726x_read_reg(uint8_t reg_addr, uint16_t *reg_data);
  * @param      Register value (2 byte).
  * @retval     Status: 0 - no error; 1 - error.
  */
-uint8_t maxim_max1726x_write_and_verify_reg(uint8_t reg_addr, uint16_t *reg_data);
+	uint8_t maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data);
 
 /****************************************************************************/
 /**
@@ -373,7 +373,7 @@ uint8_t maxim_max1726x_write_and_verify_reg(uint8_t reg_addr, uint16_t *reg_data
  * @param      void.
  * @retval     State: 0 - no por; 1 - por assert.
  */
-uint8_t maxim_max1726x_check_por(void);
+	uint8_t maxim_max1726x_check_por(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -382,7 +382,7 @@ uint8_t maxim_max1726x_check_por(void);
  * @param      void.
  * @retval     Status: 0 - no error; 1 - error.
  */
-uint8_t maxim_max1726x_clear_por(void);
+	uint8_t maxim_max1726x_clear_por(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -391,7 +391,7 @@ uint8_t maxim_max1726x_clear_por(void);
  * @param      void.
  * @retval     void.
  */
-void maxim_max1726x_wait_dnr(void);
+	void maxim_max1726x_wait_dnr(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -401,7 +401,7 @@ void maxim_max1726x_wait_dnr(void);
  * @param      void.
  * @retval     void.
  */
-void maxim_max1726x_initialize_ez_config(void);
+	void maxim_max1726x_initialize_ez_config(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -412,7 +412,7 @@ void maxim_max1726x_initialize_ez_config(void);
  * @param      void.
  * @retval     void.
  */
-void maxim_max1726x_initialize_short_ini(void);
+	void maxim_max1726x_initialize_short_ini(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -423,7 +423,7 @@ void maxim_max1726x_initialize_short_ini(void);
  * @param      void.
  * @retval     void.
  */
-void maxim_max1726x_initialize_full_ini(void);
+	void maxim_max1726x_initialize_full_ini(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -432,7 +432,7 @@ void maxim_max1726x_initialize_full_ini(void);
  * @param      Rsense value (in mOhm).
  * @retval     RepCap value (in mAh).
  */
-float maxim_max1726x_get_repcap(float Rsense);
+	float maxim_max1726x_get_repcap(AlxMax17263* me, float Rsense);
 
 /****************************************************************************/
 /**
@@ -441,7 +441,7 @@ float maxim_max1726x_get_repcap(float Rsense);
  * @param      void.
  * @retval     RepSoc value (in percentage).
  */
-float maxim_max1726x_get_repsoc(void);
+	float maxim_max1726x_get_repsoc(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -450,7 +450,7 @@ float maxim_max1726x_get_repsoc(void);
  * @param      void.
  * @retval     TTE (in second).
  */
-float maxim_max1726x_get_tte(void);
+	float maxim_max1726x_get_tte(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -459,7 +459,7 @@ float maxim_max1726x_get_tte(void);
  * @param      max1726x learned parameters.
  * @retval     void.
  */
-void maxim_max1726x_save_learned_parameters(max1726x_learned_parameters_t *lp);
+	void maxim_max1726x_save_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp);
 
 /****************************************************************************/
 /**
@@ -468,7 +468,7 @@ void maxim_max1726x_save_learned_parameters(max1726x_learned_parameters_t *lp);
  * @param      max1726x learned parameters.
  * @retval     void.
  */
-void maxim_max1726x_restore_learned_parameters(max1726x_learned_parameters_t *lp);
+	void maxim_max1726x_restore_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp);
 
 /****************************************************************************/
 /**
@@ -477,7 +477,7 @@ void maxim_max1726x_restore_learned_parameters(max1726x_learned_parameters_t *lp
  * @param      max1726x serial number.
  * @retval     void.
  */
-void maxim_max1726x_get_serial_number(uint16_t *sn);
+	void maxim_max1726x_get_serial_number(AlxMax17263* me, uint16_t *sn);
 
 /****************************************************************************/
 /**
@@ -486,7 +486,7 @@ void maxim_max1726x_get_serial_number(uint16_t *sn);
  * @param      void.
  * @retval     void.
  */
-void maxim_max1726x_unlock_model_data(void);
+	void maxim_max1726x_unlock_model_data(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -496,7 +496,7 @@ void maxim_max1726x_unlock_model_data(void);
  * @param      Sencod 16 word.
  * @retval     Number of error word.
  */
-uint8_t maxim_max1726x_write_model_data(uint16_t *data0, uint16_t *data1);
+	uint8_t maxim_max1726x_write_model_data(AlxMax17263* me, uint16_t *data0, uint16_t *data1);
 
 /****************************************************************************/
 /**
@@ -505,7 +505,7 @@ uint8_t maxim_max1726x_write_model_data(uint16_t *data0, uint16_t *data1);
  * @param      void.
  * @retval     void.
  */
-void maxim_max1726x_lock_model_data(void);
+	void maxim_max1726x_lock_model_data(AlxMax17263* me);
 
 
 /****************************************************************************/
@@ -514,7 +514,7 @@ void maxim_max1726x_lock_model_data(void);
  * @param      void.
  * @retval     Number of error word.
  */
-uint8_t maxim_max1726x_verify_model_data_locked(void);
+	uint8_t maxim_max1726x_verify_model_data_locked(AlxMax17263* me);
 
 #endif	// #if defined(ALX_C_LIB)
 
