@@ -434,6 +434,8 @@ typedef enum
 	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor,
 	AlxClk_Clk_McuLpc55s6x_WdtOsc_Ctor,
 	#endif
+
+	AlxClk_Clk_Dummy
 } AlxClk_Clk;
 
 typedef enum
