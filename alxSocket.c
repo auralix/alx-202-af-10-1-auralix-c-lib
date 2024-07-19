@@ -580,12 +580,21 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 			{
 				if (getSn_SR(me->socket_data.wiz_socket) == SOCK_ESTABLISHED)
 				{
-					disconnect(me->socket_data.wiz_socket);
+					//disconnect(me->socket_data.wiz_socket);
+					setSn_CR(me->socket_data.wiz_socket, Sn_CR_DISCON);
+					// wait to process the command...
+					while (getSn_CR(me->socket_data.wiz_socket))
+						;
+					uint64_t timer_start = AlxTick_Get_ms(&alxTick);
+					while (getSn_SR(me->socket_data.wiz_socket) != SOCK_CLOSED)
+					{
+						if (AlxTick_Get_ms(&alxTick) - timer_start >= me->timeout)
+						{
+							break;
+						}
+					}
 				}
-				else
-				{
-					close(me->socket_data.wiz_socket);
-				}
+				close(me->socket_data.wiz_socket);
 			}
 			else
 			{
