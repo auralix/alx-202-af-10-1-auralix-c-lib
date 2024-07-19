@@ -57,9 +57,12 @@ extern "C" {
 typedef struct
 {
 	// Parameters
-	const struct device* port;
+	const char* deviceName;
 	gpio_pin_t pin;
 	gpio_flags_t flags;
+
+	// Variables
+	const struct device* device;
 
 	// Info
 	bool wasCtorCalled;
@@ -73,7 +76,7 @@ typedef struct
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
-	const char* port,
+	const char* deviceName,
 	gpio_pin_t pin,
 	gpio_flags_t flags
 );

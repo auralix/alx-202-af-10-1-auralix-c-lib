@@ -45,11 +45,6 @@
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		port
-  * @param[in]		pin
-  * @param[in]		alternate
-  * @param[in]		uart
-  * @param[in]		baudRate
   */
 void AlxTrace_Ctor
 (
@@ -57,7 +52,7 @@ void AlxTrace_Ctor
 )
 {
 	// Variables
-	me->uartDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+	me->device = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
 
 	// Info
 	me->wasCtorCalled = true;
@@ -77,8 +72,8 @@ void AlxTrace_Ctor
   */
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
-	// Check
-	if (me->uartDevice == NULL)
+	// Assert
+	if (me->device == NULL)
 	{
 		return Alx_Err;
 	}
@@ -117,7 +112,7 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 	// Write
 	while (*str)
 	{
-		uart_poll_out(me->uartDevice, *str++);
+		uart_poll_out(me->device, *str++);
 	}
 
 	// Return

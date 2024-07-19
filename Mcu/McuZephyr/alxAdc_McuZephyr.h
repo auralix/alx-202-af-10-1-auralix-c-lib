@@ -59,16 +59,17 @@ typedef struct
 {
 	// Defines
 	#define ALX_ADC_BUFF_LEN 8
+	#define ALX_ADC_RESOLUTION 12
 
 	// Parameters
-	const char* adcName;
+	const char* deviceName;
 	Alx_Ch* chArr;
 	uint8_t numOfCh;
+	enum adc_gain gain;
 
 	// Variables
-	const struct device* adc;
-	struct adc_channel_cfg chadc[ALX_ADC_BUFF_LEN];
-	Alx_Ch ch[ALX_ADC_BUFF_LEN];
+	const struct device* device;
+	struct adc_channel_cfg ch[ALX_ADC_BUFF_LEN];
 
 	// Info
 	bool wasCtorCalled;
@@ -82,9 +83,10 @@ typedef struct
 void AlxAdc_Ctor
 (
 	AlxAdc* me,
-	const char* adcName,
+	const char* deviceName,
 	Alx_Ch* chArr,
-	uint8_t numOfCh
+	uint8_t numOfCh,
+	enum adc_gain gain
 );
 
 

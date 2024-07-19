@@ -39,40 +39,49 @@
 
 
 //******************************************************************************
+// Private Functions
+//******************************************************************************
+uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 
 /**
   * @brief
   * @param[in,out]	me
+  * @param[in]		deviceName
+  * @param[in]		chArr
+  * @param[in]		numOfCh
+  * @param[in]		gain
   */
 void AlxAdc_Ctor
 (
 	AlxAdc* me,
-	const char* adcName,
+	const char* deviceName,
 	Alx_Ch* chArr,
-	uint8_t numOfCh
+	uint8_t numOfCh,
+	enum adc_gain gain
 )
 {
 	// Parameters
-	me->adcName = adcName;
+	me->deviceName = deviceName;
 	me->chArr = chArr;
 	me->numOfCh = numOfCh;
+	me->gain = gain;
 
 	// Variables
-	me->adc = device_get_binding(adcName);
-
-	// ADC Channel
+	me->device = device_get_binding(deviceName);
 	for (uint32_t i = 0; i < numOfCh; i++)
 	{
-		me->chadc[i].gain = ADC_GAIN_1_4;
-		me->chadc[i].reference = ADC_REF_VDD_1_4;
-		me->chadc[i].acquisition_time = ADC_ACQ_TIME_DEFAULT;
-		me->chadc[i].channel_id = chArr[i];
-		me->chadc[i].differential = 0;
-		me->chadc[i].input_positive = chArr[i];
-		me->chadc[i].input_negative = 0;
-		me->ch[i] = chArr[i];
+		me->ch[i].gain = gain;
+		me->ch[i].reference = ADC_REF_INTERNAL;
+		me->ch[i].acquisition_time = ADC_ACQ_TIME_DEFAULT;
+		me->ch[i].channel_id = chArr[i];
+		me->ch[i].differential = 0;
+		me->ch[i].input_positive = chArr[i];
+		me->ch[i].input_negative = 0;
 	}
 
 	// Info
@@ -96,13 +105,15 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 	ALX_ADC_ASSERT(me->isInit == false);
+	ALX_ADC_ASSERT(me->device != NULL);
 
-	// Init ADC channels
+	// Init
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (adc_channel_setup(me->adc, &me->chadc[i]) != 0)
+		int32_t status = adc_channel_setup(me->device, &me->ch[i]);
+		if (status != 0)
 		{
-			ALX_ADC_TRACE("Err");
+			ALX_ADC_TRACE("Err: %d", status);
 			return Alx_Err;
 		}
 	}
@@ -145,52 +156,12 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 	ALX_ADC_ASSERT(me->isInit == true);
 
-	// Get reference voltage
-	uint32_t vref_mV = 3300;
+	// Get
+	uint32_t voltage_mV = AlxAdc_GetVoltage_mV_Private(me, ch);
+	float voltage_V = (float)voltage_mV / 1000.f;
 
-	// Get channel voltage
-	for (uint32_t i = 0; i < me->numOfCh; i++)
-	{
-		if (ch == Alx_Ch_McuStm32_Vref)
-		{
-			// Get
-			float vref_V = (float)vref_mV / 1000.f;
-
-			// Return
-			return vref_V;
-		}
-		else if (me->ch[i] == ch)
-		{
-			// Prepare
-			uint16_t sample = 0;
-
-			struct adc_sequence sequence;
-			sequence.options = NULL;
-			sequence.channels = BIT(ch);
-			sequence.buffer = &sample;
-			sequence.buffer_size = sizeof(sample);
-			sequence.resolution = 12;
-			sequence.oversampling = 0;
-			sequence.calibrate = false;
-
-			// Get
-			if (adc_read(me->adc, &sequence) != 0)
-			{
-				ALX_ADC_TRACE("ADC read error");
-				return ALX_NULL;
-			}
-
-			// Prepare
-			float voltage_V = ((float)sample / 4096.f) * 3.3f;
-
-			// Return
-			return voltage_V;
-		}
-	}
-
-	// Assert
-	ALX_ADC_ASSERT(false);	// We should not get here
-	return ALX_NULL;
+	// Return
+	return voltage_V;
 }
 
 /**
@@ -205,9 +176,8 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 	ALX_ADC_ASSERT(me->isInit == true);
 
-	// Assert
-	ALX_ADC_ASSERT(false);	// We should not get here
-	return ALX_NULL;
+	// Return
+	return AlxAdc_GetVoltage_mV_Private(me, ch);
 }
 
 /**
@@ -217,13 +187,58 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
   */
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
-	// Assert
-	ALX_ADC_ASSERT(me->wasCtorCalled == true);
-	ALX_ADC_ASSERT(me->isInit == true);
-
-	// Assert
-	ALX_ADC_ASSERT(false);	// We should not get here
+	// Unsupported
+	ALX_ADC_ASSERT(false);
 	return ALX_NULL;
+}
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
+{
+	// Local variables
+	int32_t status = 0;
+	uint16_t vref_mV = 0;
+	uint16_t voltage_raw = 0;
+	int32_t voltage_mV = 0;
+	struct adc_sequence sequence = {};
+
+	// Get vref
+	vref_mV = adc_ref_internal(me->device);
+	if (vref_mV == 0)
+	{
+		ALX_ADC_TRACE("Err: %u", vref_mV);
+		return 0;
+	}
+
+	// Get voltage
+	sequence.options = NULL;
+	sequence.channels = BIT(ch);
+	sequence.buffer = &voltage_raw;
+	sequence.buffer_size = sizeof(voltage_raw);
+	sequence.resolution = ALX_ADC_RESOLUTION;
+	sequence.oversampling = 0;
+	sequence.calibrate = false;
+	status = adc_read(me->device, &sequence);
+	if (status != 0)
+	{
+		ALX_ADC_TRACE("Err: %d", status);
+		return 0;
+	}
+
+	// Prepare
+	voltage_mV = voltage_raw;
+	status = adc_raw_to_millivolts(vref_mV, me->gain, ALX_ADC_RESOLUTION, &voltage_mV);
+	if (status != 0)
+	{
+		ALX_ADC_TRACE("Err: %d", status);
+		return 0;
+	}
+
+	// Return
+	return voltage_mV;
 }
 
 

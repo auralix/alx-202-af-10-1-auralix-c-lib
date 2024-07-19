@@ -45,26 +45,25 @@
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		port
+  * @param[in]		deviceName
   * @param[in]		pin
-  * @param[in]		mode
-  * @param[in]		pull
-  * @param[in]		speed
-  * @param[in]		alternate
-  * @param[in]		val
+  * @param[in]		flags
   */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
-	const char* port,
+	const char* deviceName,
 	gpio_pin_t pin,
 	gpio_flags_t flags
 )
 {
 	// Parameters
-	me->port = device_get_binding(port);
+	me->deviceName = deviceName;
 	me->pin = pin;
 	me->flags = flags;
+
+	// Variables
+	me->device = device_get_binding(deviceName);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -78,17 +77,17 @@ void AlxIoPin_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPin_Init(AlxIoPin* me)
 {
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 	ALX_IO_PIN_ASSERT(me->isInit == false);
+	ALX_IO_PIN_ASSERT(me->device != NULL);
 
 	// Init
-	ALX_IO_PIN_ASSERT(me->port != NULL);
-	int32_t status = gpio_pin_configure(me->port, me->pin, me->flags);
+	int32_t status = gpio_pin_configure(me->device, me->pin, me->flags);
 	ALX_IO_PIN_ASSERT(status == 0);
 
 	// Set isInit
@@ -97,7 +96,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
@@ -106,7 +105,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// DeInit
-	int32_t status = gpio_pin_configure(me->port, me->pin, GPIO_DISCONNECTED);
+	int32_t status = gpio_pin_configure(me->device, me->pin, GPIO_DISCONNECTED);
 	ALX_IO_PIN_ASSERT(status == 0);
 
 	// Clear isInit
@@ -115,9 +114,9 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 
 /**
   * @brief
-  * @param[in,out] me
-  * @retval		false
-  * @retval		true
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxIoPin_Read(AlxIoPin* me)
 {
@@ -126,13 +125,13 @@ bool AlxIoPin_Read(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Read
-	return gpio_pin_get(me->port, me->pin);
+	return gpio_pin_get(me->device, me->pin);
 }
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in]	val
+  * @param[in,out]	me
+  * @param[in]		val
   */
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
@@ -141,13 +140,13 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Write
-	int32_t status = gpio_pin_set(me->port, me->pin, val);
+	int32_t status = gpio_pin_set(me->device, me->pin, val);
 	ALX_IO_PIN_ASSERT(status == 0);
 }
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPin_Set(AlxIoPin* me)
 {
@@ -156,13 +155,13 @@ void AlxIoPin_Set(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Set
-	int32_t status = gpio_pin_set(me->port, me->pin, 1);
+	int32_t status = gpio_pin_set(me->device, me->pin, 1);
 	ALX_IO_PIN_ASSERT(status == 0);
 }
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPin_Reset(AlxIoPin* me)
 {
@@ -171,13 +170,13 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Reset
-	int32_t status = gpio_pin_set(me->port, me->pin, 0);
+	int32_t status = gpio_pin_set(me->device, me->pin, 0);
 	ALX_IO_PIN_ASSERT(status == 0);
 }
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPin_Toggle(AlxIoPin* me)
 {
@@ -186,13 +185,13 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Toggle
-	int32_t status = gpio_pin_toggle(me->port, me->pin);
+	int32_t status = gpio_pin_toggle(me->device, me->pin);
 	ALX_IO_PIN_ASSERT(status == 0);
 }
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @retval			AlxIoPin_TriState_HiZ
   * @retval			AlxIoPin_TriState_Hi
   * @retval			AlxIoPin_TriState_Lo
@@ -212,7 +211,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 
 	// Config PullUp
-	int32_t status = gpio_pin_configure(me->port, me->pin, GPIO_PULL_UP);
+	int32_t status = gpio_pin_configure(me->device, me->pin, GPIO_PULL_UP);
 	ALX_IO_PIN_ASSERT(status == 0);
 
 	// Wait
@@ -227,7 +226,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 
 	// Config PullDown
-	status = gpio_pin_configure(me->port, me->pin, GPIO_PULL_DOWN);
+	status = gpio_pin_configure(me->device, me->pin, GPIO_PULL_DOWN);
 	ALX_IO_PIN_ASSERT(status == 0);
 
 	// Wait

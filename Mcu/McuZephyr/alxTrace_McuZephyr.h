@@ -54,7 +54,7 @@ extern "C" {
 typedef struct
 {
 	// Variables
-	const struct device* uartDevice;
+	const struct device* device;
 
 	// Info
 	bool wasCtorCalled;
