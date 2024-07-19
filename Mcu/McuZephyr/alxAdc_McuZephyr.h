@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxAdc.h
-  * @brief		Auralix C Library - ALX ADC Module
+  * @file		alxAdc_McuZephyr.h
+  * @brief		Auralix C Library - ALX ADC MCU Zephyr Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_ADC_H
-#define ALX_ADC_H
+#ifndef ALX_ADC_MCU_ZEPHYR_H
+#define ALX_ADC_MCU_ZEPHYR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,71 +43,55 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxIoPin.h"
-
-#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-#include "alxAdc_McuStm32.h"
-
-#elif defined(ALX_LPC17XX)
-#include "alxAdc_McuLpc17xx.h"
-
-#elif defined(ALX_LPC55S6X)
-#include "alxAdc_McuLpc55S6x.h"
-
-#elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
-#include "alxAdc_McuLpc80x.h"
-
-#elif defined(ALX_ZEPHYR)
-#include "alxAdc_McuZephyr.h"
-
-#else
-typedef struct { bool dummy; } AlxAdc;
-#endif
+#include "alxClk.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 
 //******************************************************************************
-// Preprocessor
+// Types
 //******************************************************************************
-#define ALX_ADC_FILE "alxAdc.h"
+typedef struct
+{
+	// Defines
+	#define ALX_ADC_BUFF_LEN 8
 
-// Assert //
-#if defined(ALX_ADC_ASSERT_BKPT_ENABLE)
-	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADC_FILE, expr)
-#elif defined(ALX_ADC_ASSERT_TRACE_ENABLE)
-	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADC_FILE, expr)
-#elif defined(ALX_ADC_ASSERT_RST_ENABLE)
-	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_RST(ALX_ADC_FILE, expr)
-#else
-	#define ALX_ADC_ASSERT(expr) do{} while (false)
-#endif
+	// Parameters
+	const char* adcName;
+	Alx_Ch* chArr;
+	uint8_t numOfCh;
 
-// Trace //
-#if defined(ALX_ADC_TRACE_ENABLE)
-	#define ALX_ADC_TRACE(...) ALX_TRACE_STD(ALX_ADC_FILE, __VA_ARGS__)
-#else
-	#define ALX_ADC_TRACE(...) do{} while (false)
-#endif
+	// Variables
+	const struct device* adc;
+	struct adc_channel_cfg chadc[ALX_ADC_BUFF_LEN];
+	Alx_Ch ch[ALX_ADC_BUFF_LEN];
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxAdc;
 
 
 //******************************************************************************
-// Functions
+// Constructor
 //******************************************************************************
-Alx_Status AlxAdc_Init(AlxAdc* me);
-Alx_Status AlxAdc_DeInit(AlxAdc* me);
-float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);
-uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);
-float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
+void AlxAdc_Ctor
+(
+	AlxAdc* me,
+	const char* adcName,
+	Alx_Ch* chArr,
+	uint8_t numOfCh
+);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_ADC_H
+#endif	// #ifndef ALX_ADC_MCU_ZEPHYR_H
