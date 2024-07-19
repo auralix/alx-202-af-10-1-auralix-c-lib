@@ -367,6 +367,8 @@ uint8_t AlxPca9539a_Read_Port_Raw(AlxPca9539a* me, uint8_t port)
 	{
 		return me->reg._01h_InputPort_1.val.raw;
 	}
+
+	return Alx_Ok;
 }
 
 /**

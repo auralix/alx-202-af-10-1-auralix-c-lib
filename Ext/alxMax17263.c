@@ -200,9 +200,7 @@ void maxim_max1726x_write_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_d
 	i2c_data[0] = reg_addr;
 	i2c_data[1] = (*reg_data) & 0xFF;
 	i2c_data[2] = (*reg_data) >> 8;
-	//maxim_max32660_i2c1_write(MAX1726X_I2C_ADDR, i2c_data, 3, 0);
 
-		// Write
 	AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 3, me->i2cTimeout_ms);
 	//if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
 
@@ -213,10 +211,21 @@ void maxim_max1726x_read_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_da
 {
 	uint8_t i2c_data[2];
 
-	i2c_data[0] = reg_addr;
-	AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 1, me->i2cTimeout_ms);
+	//i2c_data[0] = reg_addr;
+	//AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 1, me->i2cTimeout_ms);
 
-	AlxI2c_Master_StartRead(me->i2c, me->i2cAddr, i2c_data, 2, me->i2cTimeout_ms);
+	// Example https://github.com/analogdevicesinc/MAXREFDES1260/blob/4bd0c99d12e87625e8813a0806b3705cad43d62b/firmware/Source/max1726x.c#L72
+	// requires repeated start. I2C MEM operations implement it so use this instead of normal write.
+	AlxI2c_Master_StartReadMemStop(me->i2c,
+									me->i2cAddr,
+									reg_addr,
+									AlxI2c_Master_MemAddrLen_16bit,
+									i2c_data,
+									2,
+									me->i2cNumOfTries,
+									me->i2cTimeout_ms);
+
+	//AlxI2c_Master_StartRead(me->i2c, me->i2cAddr, i2c_data, 2, me->i2cTimeout_ms);
 
 	*reg_data = i2c_data[1];
 	*reg_data = ((*reg_data) << 8) | i2c_data[0];
@@ -240,12 +249,17 @@ uint8_t maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, u
 
 		AlxDelay_ms(10); // about 10ms
 
-		i2c_data[0] = reg_addr;
-		AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 1, me->i2cTimeout_ms);
-
 		i2c_data[0] = 0x00;
 		i2c_data[1] = 0x00;
-		AlxI2c_Master_StartRead(me->i2c, me->i2cAddr, i2c_data, 2, me->i2cTimeout_ms);
+		i2c_data[2] = 0x00;
+		AlxI2c_Master_StartReadMemStop(me->i2c,
+										me->i2cAddr,
+										reg_addr,
+										AlxI2c_Master_MemAddrLen_16bit,
+										i2c_data,
+										2,
+										me->i2cNumOfTries,
+										me->i2cTimeout_ms);
 		readback_data = i2c_data[1];
 		readback_data = (readback_data << 8) | i2c_data[0];
 
@@ -341,7 +355,7 @@ void maxim_max1726x_initialize_ez_config(AlxMax17263* me)
 
 	while ((max1726x_regs[MAX1726X_MODELCFG_REG] & 0x8000) == 0x8000)
 	{
-		delay(480000); // about 10ms
+		AlxDelay_ms(10); // about 10ms
 		maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
 	}
 
@@ -408,7 +422,7 @@ void maxim_max1726x_initialize_short_ini(AlxMax17263* me)
 
 	while ((max1726x_regs[MAX1726X_MODELCFG_REG] & 0x8000) == 0x8000)
 	{
-		delay(480000); // about 10ms
+		AlxDelay_ms(10); // about 10ms
 		maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
 	}
 
@@ -593,7 +607,7 @@ void maxim_max1726x_initialize_full_ini(AlxMax17263* me)
 
 	while ((max1726x_regs[MAX1726X_CONFIG2_REG] & 0x0020) == 0x0020)
 	{
-		delay(480000); // about 10ms
+		AlxDelay_ms(10); // about 10ms
 		maxim_max1726x_read_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
 	}
 
@@ -710,7 +724,7 @@ void maxim_max1726x_get_serial_number(AlxMax17263* me, uint16_t *sn)
 	// set AtRateEn bit and DPEn bit in Config2 register
 	max1726x_regs[MAX1726X_CONFIG2_REG] = max1726x_regs[MAX1726X_CONFIG2_REG] | 0x3000;
 	maxim_max1726x_write_and_verify_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
-	delay(1920000); // about 40ms
+	AlxDelay_ms(40); // about 40ms
 }
 
 /* ************************************************************************* */
@@ -744,7 +758,7 @@ uint8_t maxim_max1726x_write_model_data(AlxMax17263* me, uint16_t *data0, uint16
 		maxim_max1726x_write_reg(me, MAX1726X_MODELDATA1_START_REG + i, &data1[i]);
 	}
 
-	delay(480000); // about 10ms
+	AlxDelay_ms(10); // about 10ms
 
 	for (i = 0; i < 16; i++)
 	{

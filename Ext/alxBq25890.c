@@ -83,8 +83,8 @@ void AlxBq25890_Ctor
 
 	// Parameters
 	me->i2c = i2c;
-	me->i2cAddr = 0x6A;
-	me->i2cCheckWithRead = true;
+	me->i2cAddr = 0xD4; //0x6A;
+	me->i2cCheckWithRead = false;
 	me->i2cNumOfTries = 3;
 	me->i2cTimeout_ms = 500;
 
@@ -176,7 +176,8 @@ Alx_Status AlxBq25890_Init(AlxBq25890* me)
 	// Multiple drivers use the same I2C instance, so it could already be initialized.
 	if (me->i2c->isInit == false)
 	{
-		AlxBq25890_InitPeriph(me);
+		status = AlxBq25890_InitPeriph(me);
+		if (status != Alx_Ok) return status;
 	}
 	else
 	{
@@ -242,8 +243,11 @@ Alx_Status AlxBq25890_Handle(AlxBq25890* me)
 	Alx_Status status = Alx_Err;
 
 	// Handle
+	status = AlxBq25890_Reg_Read(me, &me->reg.REG_00);
+	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
+	status = AlxBq25890_Reg_Read(me, &me->reg.REG_09);
+	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
 
-	// Return
 	return Alx_Ok;
 }
 
@@ -266,8 +270,12 @@ Alx_Status AlxBq25890_Reg_Read(AlxBq25890* me, void* reg)
 	uint8_t regAddr = *((uint8_t*)reg);
 	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
-
+	//uint8_t data[2] = { 0 };
+	//data[0] = regAddr;
 	// Read
+	//status = AlxI2c_Master_StartReadStop(me->i2c, me->i2cAddr, data, 1, me->i2cNumOfTries, me->i2cTimeout_ms);
+	//memcpy(regValPtr, &data[0], 1);
+
 	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
 
