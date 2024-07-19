@@ -416,9 +416,11 @@ void AlxId_Init(AlxId* me)
 	//------------------------------------------------------------------------------
 	// If HW ID is used
 	//------------------------------------------------------------------------------
-	me->hw.instance.id = 0;
 	if (me->isHwIdUsed)
 	{
+		// Set // TV: TODO - Even needed?
+		me->hw.instance.id = 0;
+
 		// Get HW ID pin states
 		for (uint32_t i = 0; i < me->hw.idIoPinArrLen; i++)
 		{
