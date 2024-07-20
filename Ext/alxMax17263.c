@@ -163,9 +163,17 @@ Alx_Status AlxMax17263_Init(AlxMax17263* me)
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_MAX17263_TRACE("Err"); return status; }
 
+	// Check for power on reset. If it happened, reconfigure the IC,
+	// otherwise handle (poll) ICs data.
+	AlxMax17263_Handle(me);
+
+	// Get ICs serial number
+	uint16_t sn[8] = { 0 };
+	maxim_max1726x_get_serial_number(me, sn);
+	snprintf(me->user_data.serial, sizeof(me->user_data.serial), "%04x%04x%04x%04x%04x%04x%04x%04x", sn[7], sn[6], sn[5], sn[4], sn[3], sn[2], sn[1], sn[0]);
+
 	// Set isInit
 	me->isInit = true;
-
 	// Return
 	return Alx_Ok;
 }
@@ -190,6 +198,41 @@ Alx_Status AlxMax17263_DeInit(AlxMax17263* me)
 	return Alx_Ok;
 }
 
+/**
+  * @brief Poll MAX fuel gauge and handle changes
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxMax17263_Handle(AlxMax17263* me)
+{
+	if (1 == maxim_max1726x_check_por(me))
+	{
+		me->user_data.reset_happened = true;
+
+		//ALX_MAX17263_TRACE("Power on reset happened\r\n");
+
+		maxim_max1726x_wait_dnr(me);
+		maxim_max1726x_initialize_ez_config(me);
+		maxim_max1726x_clear_por(me);
+		//ALX_MAX17263_TRACE("MAX serial number: %s\r\n", sn_str);
+
+	}
+	else
+	{
+		me->user_data.reset_happened = false;
+
+		me->user_data.RepSOC = maxim_max1726x_get_repsoc(me);
+		me->user_data.RepCAP = maxim_max1726x_get_repcap(me, 5);
+
+		//ALX_MAX17263_TRACE("repsoc: %f\r\n", repsoc);
+
+		// Goto step 3.2
+	}
+
+	return Alx_Ok;
+}
+
 /**** Functions ****/
 
 /* ************************************************************************* */
@@ -201,7 +244,7 @@ void maxim_max1726x_write_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_d
 	i2c_data[1] = (*reg_data) & 0xFF;
 	i2c_data[2] = (*reg_data) >> 8;
 
-	AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 3, me->i2cTimeout_ms);
+	AlxI2c_Master_StartWriteStop(me->i2c, me->i2cAddr, i2c_data, 3, me->i2cNumOfTries, me->i2cTimeout_ms);
 	//if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
 
 }
@@ -211,21 +254,16 @@ void maxim_max1726x_read_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_da
 {
 	uint8_t i2c_data[2];
 
-	//i2c_data[0] = reg_addr;
-	//AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 1, me->i2cTimeout_ms);
-
 	// Example https://github.com/analogdevicesinc/MAXREFDES1260/blob/4bd0c99d12e87625e8813a0806b3705cad43d62b/firmware/Source/max1726x.c#L72
 	// requires repeated start. I2C MEM operations implement it so use this instead of normal write.
 	AlxI2c_Master_StartReadMemStop(me->i2c,
 									me->i2cAddr,
 									reg_addr,
-									AlxI2c_Master_MemAddrLen_16bit,
+									AlxI2c_Master_MemAddrLen_8bit,
 									i2c_data,
 									2,
 									me->i2cNumOfTries,
 									me->i2cTimeout_ms);
-
-	//AlxI2c_Master_StartRead(me->i2c, me->i2cAddr, i2c_data, 2, me->i2cTimeout_ms);
 
 	*reg_data = i2c_data[1];
 	*reg_data = ((*reg_data) << 8) | i2c_data[0];
@@ -245,9 +283,9 @@ uint8_t maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, u
 		i2c_data[0] = reg_addr;
 		i2c_data[1] = (*reg_data) & 0xFF;
 		i2c_data[2] = (*reg_data) >> 8;
-		AlxI2c_Master_StartWrite(me->i2c, me->i2cAddr, i2c_data, 3, me->i2cTimeout_ms);
+		AlxI2c_Master_StartWriteStop(me->i2c, me->i2cAddr, i2c_data, 3, me->i2cNumOfTries, me->i2cTimeout_ms);
 
-		AlxDelay_ms(10); // about 10ms
+		AlxOsDelay_ms(&alxOsDelay, 10); // about 10ms
 
 		i2c_data[0] = 0x00;
 		i2c_data[1] = 0x00;
@@ -255,7 +293,7 @@ uint8_t maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, u
 		AlxI2c_Master_StartReadMemStop(me->i2c,
 										me->i2cAddr,
 										reg_addr,
-										AlxI2c_Master_MemAddrLen_16bit,
+										AlxI2c_Master_MemAddrLen_8bit,
 										i2c_data,
 										2,
 										me->i2cNumOfTries,
@@ -308,7 +346,7 @@ void maxim_max1726x_wait_dnr(AlxMax17263* me)
 
 	while ((max1726x_regs[MAX1726X_FSTAT_REG] & 0x0001) == 0x0001)
 	{
-		AlxDelay_ms(10); // about 10ms
+		AlxOsDelay_ms(&alxOsDelay, 10); // about 10ms
 		maxim_max1726x_read_reg(me, MAX1726X_FSTAT_REG, &max1726x_regs[MAX1726X_FSTAT_REG]);
 	}
 
@@ -355,7 +393,7 @@ void maxim_max1726x_initialize_ez_config(AlxMax17263* me)
 
 	while ((max1726x_regs[MAX1726X_MODELCFG_REG] & 0x8000) == 0x8000)
 	{
-		AlxDelay_ms(10); // about 10ms
+		AlxOsDelay_ms(&alxOsDelay, 10); // about 10ms
 		maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
 	}
 
@@ -422,7 +460,7 @@ void maxim_max1726x_initialize_short_ini(AlxMax17263* me)
 
 	while ((max1726x_regs[MAX1726X_MODELCFG_REG] & 0x8000) == 0x8000)
 	{
-		AlxDelay_ms(10); // about 10ms
+		AlxOsDelay_ms(&alxOsDelay, 10); // about 10ms
 		maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
 	}
 
@@ -545,7 +583,7 @@ void maxim_max1726x_initialize_full_ini(AlxMax17263* me)
 		/// Unlock Model Access
 		maxim_max1726x_unlock_model_data(me);
 
-		AlxDelay_ms(10); // about 10ms
+		AlxOsDelay_ms(&alxOsDelay, 10); // about 10ms
 
 		/// Write/Read/Verify the Custom Model Data
 		ret = maxim_max1726x_write_model_data(me, max1726x_full_ini.modeldata0, max1726x_full_ini.modeldata1);
@@ -558,7 +596,7 @@ void maxim_max1726x_initialize_full_ini(AlxMax17263* me)
 		/// Lock Model Access
 		maxim_max1726x_lock_model_data(me);
 
-		AlxDelay_ms(10); // about 10ms
+		AlxOsDelay_ms(&alxOsDelay, 10); // about 10ms
 
 		ret = maxim_max1726x_verify_model_data_locked(me);
 	}
@@ -607,7 +645,7 @@ void maxim_max1726x_initialize_full_ini(AlxMax17263* me)
 
 	while ((max1726x_regs[MAX1726X_CONFIG2_REG] & 0x0020) == 0x0020)
 	{
-		AlxDelay_ms(10); // about 10ms
+		AlxOsDelay_ms(&alxOsDelay, 10); // about 10ms
 		maxim_max1726x_read_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
 	}
 
@@ -699,7 +737,7 @@ void maxim_max1726x_get_serial_number(AlxMax17263* me, uint16_t *sn)
 	// clear AtRateEn bit and DPEn bit in Config2 register
 	max1726x_regs[MAX1726X_CONFIG2_REG] = max1726x_regs[MAX1726X_CONFIG2_REG] & 0xCFFF;
 	maxim_max1726x_write_and_verify_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
-	AlxDelay_ms(40);
+	AlxOsDelay_ms(&alxOsDelay, 40);
 
 	maxim_max1726x_read_reg(me, MAX1726X_MAXPEAKPOWER_REG, &max1726x_regs[MAX1726X_MAXPEAKPOWER_REG]);
 	maxim_max1726x_read_reg(me, MAX1726X_SUSPEAKPOWER_REG, &max1726x_regs[MAX1726X_SUSPEAKPOWER_REG]);
@@ -724,7 +762,7 @@ void maxim_max1726x_get_serial_number(AlxMax17263* me, uint16_t *sn)
 	// set AtRateEn bit and DPEn bit in Config2 register
 	max1726x_regs[MAX1726X_CONFIG2_REG] = max1726x_regs[MAX1726X_CONFIG2_REG] | 0x3000;
 	maxim_max1726x_write_and_verify_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
-	AlxDelay_ms(40); // about 40ms
+	AlxOsDelay_ms(&alxOsDelay, 40); // about 40ms
 }
 
 /* ************************************************************************* */
@@ -758,7 +796,7 @@ uint8_t maxim_max1726x_write_model_data(AlxMax17263* me, uint16_t *data0, uint16
 		maxim_max1726x_write_reg(me, MAX1726X_MODELDATA1_START_REG + i, &data1[i]);
 	}
 
-	AlxDelay_ms(10); // about 10ms
+	AlxOsDelay_ms(&alxOsDelay, 10); // about 10ms
 
 	for (i = 0; i < 16; i++)
 	{

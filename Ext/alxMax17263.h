@@ -45,6 +45,7 @@ extern "C" {
 #include "alxIoPin.h"
 #include "alxI2c.h"
 #include "alxDelay.h"
+#include "alxOsDelay.h"
 
 
 //******************************************************************************
@@ -307,6 +308,17 @@ extern max1726x_short_ini_t max1726x_short_ini;
 extern max1726x_full_ini_t max1726x_full_ini;
 extern max1726x_learned_parameters_t max1726x_learned_parameters;
 
+typedef struct
+{
+	bool reset_happened;
+	float RepSOC;
+	float RepCAP;
+	float FulLCAP;
+	float TTE;
+	float TTF;
+	float Cycles;
+	char serial[32 + 1];
+}max1726_user_data_t;
 
 typedef struct
 {
@@ -316,6 +328,9 @@ typedef struct
 	bool i2cCheckWithRead;
 	uint8_t i2cNumOfTries;
 	uint16_t i2cTimeout_ms;
+
+	//user data
+	max1726_user_data_t user_data;
 
 	// Info
 	bool wasCtorCalled;
@@ -332,6 +347,11 @@ void AlxMax17263_Ctor
 	AlxMax17263* me,
 	AlxI2c* i2c
 );
+
+Alx_Status AlxMax17263_Init(AlxMax17263* me);
+Alx_Status AlxMax17263_DeInit(AlxMax17263* me);
+Alx_Status AlxMax17263_Handle(AlxMax17263* me);
+
 
 /**** Function Prototypes ****/
 // Refer to "MAX1726x-Software-Implementation-user-guide.pdf"
