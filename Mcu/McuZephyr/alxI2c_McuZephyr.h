@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxAdc_McuZephyr.h
-  * @brief		Auralix C Library - ALX ADC MCU Zephyr Module
+  * @file		alxI2c_McuZephyr.h
+  * @brief		Auralix C Library - ALX I2C MCU Zephyr Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_ADC_MCU_ZEPHYR_H
-#define ALX_ADC_MCU_ZEPHYR_H
+#ifndef ALX_I2C_MCU_ZEPHYR_H
+#define ALX_I2C_MCU_ZEPHYR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,38 +53,38 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxI2c_Clk_McuZephyr_100kHz = 100000,
+	AlxI2c_Clk_McuZephyr_400kHz = 400000
+} AlxI2c_Clk;
+
 typedef struct
 {
 	// Defines
-	#define ALX_ADC_BUFF_LEN 8
-	#define ALX_ADC_RESOLUTION 12
+	#define ALX_I2C_BUFF_LEN 256
 
 	// Parameters
 	const char* deviceName;
-	Alx_Ch* chArr;
-	uint8_t numOfCh;
-	enum adc_gain gain;
+	AlxI2c_Clk i2cClk;
 
 	// Variables
 	const struct device* device;
-	struct adc_channel_cfg ch[ALX_ADC_BUFF_LEN];
 
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
-} AlxAdc;
+} AlxI2c;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxAdc_Ctor
+void AlxI2c_Ctor
 (
-	AlxAdc* me,
+	AlxI2c* me,
 	const char* deviceName,
-	Alx_Ch* chArr,
-	uint8_t numOfCh,
-	enum adc_gain gain
+	AlxI2c_Clk i2cClk
 );
 
 
@@ -94,4 +94,4 @@ void AlxAdc_Ctor
 }
 #endif
 
-#endif	// #ifndef ALX_ADC_MCU_ZEPHYR_H
+#endif	// #ifndef ALX_I2C_MCU_ZEPHYR_H
