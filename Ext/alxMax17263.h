@@ -78,6 +78,8 @@ extern "C" {
 #endif
 
 
+#define RSENSE 5
+
 /**** MAX1726X I2C ADDRESS ****/
 #define	MAX1726X_I2C_ADDR					0x6C
 
@@ -311,12 +313,21 @@ extern max1726x_learned_parameters_t max1726x_learned_parameters;
 typedef struct
 {
 	bool reset_happened;
+	// Model gauge m5
+	/****************/
 	float RepSOC;
 	float RepCAP;
 	float FulLCAP;
 	float TTE;
 	float TTF;
 	float Cycles;
+	/****************/
+	//Other register data
+	/****************/
+	float AvgVCell;
+	float AvgCurrent;
+	float AvgTA;
+
 	char serial[32 + 1];
 }max1726_user_data_t;
 
@@ -364,7 +375,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      Register value (2 byte).
  * @retval     void.
  */
-	void maxim_max1726x_write_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data);
+Alx_Status maxim_max1726x_write_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data);
 
 /****************************************************************************/
 /**
@@ -374,7 +385,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      Register value (2 byte).
  * @retval     void.
  */
-	void maxim_max1726x_read_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data);
+Alx_Status maxim_max1726x_read_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data);
 
 /****************************************************************************/
 /**
@@ -384,7 +395,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      Register value (2 byte).
  * @retval     Status: 0 - no error; 1 - error.
  */
-	uint8_t maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data);
+Alx_Status maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data);
 
 /****************************************************************************/
 /**
@@ -393,7 +404,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      void.
  * @retval     State: 0 - no por; 1 - por assert.
  */
-	uint8_t maxim_max1726x_check_por(AlxMax17263* me);
+uint8_t maxim_max1726x_check_por(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -401,8 +412,8 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  *
  * @param      void.
  * @retval     Status: 0 - no error; 1 - error.
- */
-	uint8_t maxim_max1726x_clear_por(AlxMax17263* me);
+*/
+Alx_Status maxim_max1726x_clear_por(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -411,7 +422,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      void.
  * @retval     void.
  */
-	void maxim_max1726x_wait_dnr(AlxMax17263* me);
+Alx_Status maxim_max1726x_wait_dnr(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -421,7 +432,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      void.
  * @retval     void.
  */
-	void maxim_max1726x_initialize_ez_config(AlxMax17263* me);
+Alx_Status maxim_max1726x_initialize_ez_config(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -432,7 +443,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      void.
  * @retval     void.
  */
-	void maxim_max1726x_initialize_short_ini(AlxMax17263* me);
+void maxim_max1726x_initialize_short_ini(AlxMax17263* me);
 
 /****************************************************************************/
 /**
@@ -443,7 +454,17 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      void.
  * @retval     void.
  */
-	void maxim_max1726x_initialize_full_ini(AlxMax17263* me);
+void maxim_max1726x_initialize_full_ini(AlxMax17263* me);
+
+/****************************************************************************/
+/**
+ * @brief      Get max1726x custom register data
+ *
+ * @param      reg: register address
+ * @retval     *value: data read
+ */
+Alx_Status maxim_max1726x_get_data(AlxMax17263* me, uint8_t reg, float *value);
+
 
 /****************************************************************************/
 /**
@@ -452,7 +473,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      Rsense value (in mOhm).
  * @retval     RepCap value (in mAh).
  */
-	float maxim_max1726x_get_repcap(AlxMax17263* me, float Rsense);
+Alx_Status maxim_max1726x_get_repcap(AlxMax17263* me, float Rsense, float *value);
 
 /****************************************************************************/
 /**
@@ -461,7 +482,16 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      void.
  * @retval     RepSoc value (in percentage).
  */
-	float maxim_max1726x_get_repsoc(AlxMax17263* me);
+Alx_Status maxim_max1726x_get_repsoc(AlxMax17263* me, float *value);
+
+/****************************************************************************/
+/**
+* @brief      Get max1726x RepSoc value
+*
+* @param      void.
+* @retval     RepSoc value (in percentage).
+*/
+Alx_Status maxim_max1726x_get_fullcaprep(AlxMax17263* me, float *value);
 
 /****************************************************************************/
 /**
@@ -470,7 +500,52 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      void.
  * @retval     TTE (in second).
  */
-	float maxim_max1726x_get_tte(AlxMax17263* me);
+Alx_Status maxim_max1726x_get_tte(AlxMax17263* me, float *value);
+
+/****************************************************************************/
+/**
+ * @brief      Get max1726x Cycles value
+ *
+ * @param      void.
+ * @retval     Cycles.
+ */
+Alx_Status maxim_max1726x_get_cycles(AlxMax17263* me, float *value);
+
+/****************************************************************************/
+/**
+ * @brief      Get max1726x TTF value
+ *
+ * @param      void.
+ * @retval     TTF.
+ */
+Alx_Status maxim_max1726x_get_ttf(AlxMax17263* me, float *value);
+
+/****************************************************************************/
+/**
+	* @brief      Get max1726x avgVcell value
+	*
+	* @param      void.
+	* @retval     avgVcell.
+	*/
+Alx_Status maxim_max1726x_get_avgvcell(AlxMax17263* me, float *value);
+
+/****************************************************************************/
+/**
+ * @brief      Get max1726x avgCurrent value
+ *
+ * @param      void.
+ * @retval     avgCurrent.
+ */
+Alx_Status maxim_max1726x_get_avgcurr(AlxMax17263* me, float *value);
+
+	/****************************************************************************/
+/**
+ * @brief      Get max1726x avgTA value
+ *
+ * @param      void.
+ * @retval     avgTA.
+ */
+Alx_Status maxim_max1726x_get_avgta(AlxMax17263* me, float *value);
 
 /****************************************************************************/
 /**
@@ -497,7 +572,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me);
  * @param      max1726x serial number.
  * @retval     void.
  */
-	void maxim_max1726x_get_serial_number(AlxMax17263* me, uint16_t *sn);
+	Alx_Status maxim_max1726x_get_serial_number(AlxMax17263* me, uint16_t *sn);
 
 /****************************************************************************/
 /**

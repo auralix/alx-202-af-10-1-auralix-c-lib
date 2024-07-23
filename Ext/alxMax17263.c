@@ -169,7 +169,9 @@ Alx_Status AlxMax17263_Init(AlxMax17263* me)
 
 	// Get ICs serial number
 	uint16_t sn[8] = { 0 };
-	maxim_max1726x_get_serial_number(me, sn);
+	status = maxim_max1726x_get_serial_number(me, sn);
+	if (status != Alx_Ok) { ALX_MAX17263_TRACE("Err"); return status; }
+
 	snprintf(me->user_data.serial, sizeof(me->user_data.serial), "%04x%04x%04x%04x%04x%04x%04x%04x", sn[7], sn[6], sn[5], sn[4], sn[3], sn[2], sn[1], sn[0]);
 
 	// Set isInit
@@ -222,8 +224,15 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me)
 	{
 		me->user_data.reset_happened = false;
 
-		me->user_data.RepSOC = maxim_max1726x_get_repsoc(me);
-		me->user_data.RepCAP = maxim_max1726x_get_repcap(me, 5);
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPSOC_REG, &me->user_data.RepSOC)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPCAP_REG, &me->user_data.RepCAP)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TTE_REG, &me->user_data.TTE)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TTF_REG, &me->user_data.TTF)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_FULLCAP_REG, &me->user_data.FulLCAP)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_CYCLES_REG, &me->user_data.Cycles)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGCURRENT_REG, &me->user_data.AvgCurrent)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGTA_REG, &me->user_data.AvgTA)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGVCELL_REG, &me->user_data.AvgVCell)) return Alx_Err;
 
 		//ALX_MAX17263_TRACE("repsoc: %f\r\n", repsoc);
 
@@ -236,7 +245,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me)
 /**** Functions ****/
 
 /* ************************************************************************* */
-void maxim_max1726x_write_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data)
+Alx_Status maxim_max1726x_write_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data)
 {
 	uint8_t i2c_data[3];
 
@@ -244,19 +253,18 @@ void maxim_max1726x_write_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_d
 	i2c_data[1] = (*reg_data) & 0xFF;
 	i2c_data[2] = (*reg_data) >> 8;
 
-	AlxI2c_Master_StartWriteStop(me->i2c, me->i2cAddr, i2c_data, 3, me->i2cNumOfTries, me->i2cTimeout_ms);
-	//if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
-
+	return AlxI2c_Master_StartWriteStop(me->i2c, me->i2cAddr, i2c_data, 3, me->i2cNumOfTries, me->i2cTimeout_ms);
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_read_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data)
+Alx_Status maxim_max1726x_read_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data)
 {
+	Alx_Status ret;
 	uint8_t i2c_data[2];
 
 	// Example https://github.com/analogdevicesinc/MAXREFDES1260/blob/4bd0c99d12e87625e8813a0806b3705cad43d62b/firmware/Source/max1726x.c#L72
 	// requires repeated start. I2C MEM operations implement it so use this instead of normal write.
-	AlxI2c_Master_StartReadMemStop(me->i2c,
+	ret = AlxI2c_Master_StartReadMemStop(me->i2c,
 									me->i2cAddr,
 									reg_addr,
 									AlxI2c_Master_MemAddrLen_8bit,
@@ -267,10 +275,11 @@ void maxim_max1726x_read_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_da
 
 	*reg_data = i2c_data[1];
 	*reg_data = ((*reg_data) << 8) | i2c_data[0];
+	return ret;
 }
 
 /* ************************************************************************* */
-uint8_t maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data)
+Alx_Status maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, uint16_t *reg_data)
 {
 	uint8_t i2c_data[3];
 	uint16_t readback_data;
@@ -303,7 +312,7 @@ uint8_t maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, u
 
 		if (readback_data == (*reg_data))
 		{
-			return 0; 	// no error
+			return Alx_Ok; 	// no error
 		}
 		else
 		{
@@ -311,7 +320,7 @@ uint8_t maxim_max1726x_write_and_verify_reg(AlxMax17263* me, uint8_t reg_addr, u
 		}
 	}
 
-	return 1;	// error
+	return Alx_Err;	// error
 }
 
 /* ************************************************************************* */
@@ -330,7 +339,7 @@ uint8_t maxim_max1726x_check_por(AlxMax17263* me)
 }
 
 /* ************************************************************************* */
-uint8_t maxim_max1726x_clear_por(AlxMax17263* me)
+Alx_Status maxim_max1726x_clear_por(AlxMax17263* me)
 {
 	maxim_max1726x_read_reg(me, MAX1726X_STATUS_REG, &max1726x_regs[MAX1726X_STATUS_REG]);
 
@@ -340,26 +349,30 @@ uint8_t maxim_max1726x_clear_por(AlxMax17263* me)
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_wait_dnr(AlxMax17263* me)
+Alx_Status maxim_max1726x_wait_dnr(AlxMax17263* me)
 {
-	maxim_max1726x_read_reg(me, MAX1726X_FSTAT_REG, &max1726x_regs[MAX1726X_FSTAT_REG]);
+	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_FSTAT_REG, &max1726x_regs[MAX1726X_FSTAT_REG]);
+	if(ret != Alx_Ok) return ret;
 
 	while ((max1726x_regs[MAX1726X_FSTAT_REG] & 0x0001) == 0x0001)
 	{
 		AlxOsDelay_ms(&alxOsDelay, 10); // about 10ms
-		maxim_max1726x_read_reg(me, MAX1726X_FSTAT_REG, &max1726x_regs[MAX1726X_FSTAT_REG]);
+		ret = maxim_max1726x_read_reg(me, MAX1726X_FSTAT_REG, &max1726x_regs[MAX1726X_FSTAT_REG]);
+		if(ret != Alx_Ok) return ret;
 	}
 
+	return ret;
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_initialize_ez_config(AlxMax17263* me)
+Alx_Status maxim_max1726x_initialize_ez_config(AlxMax17263* me)
 {
+	Alx_Status ret = Alx_Ok;
 	uint16_t tempdata;
 
 	/// customer must provide the battery parameters accordingly
 	/// here the values are default for two serials of 18650 bat
-	max1726x_ez_config.designcap  = 0x1388;
+	max1726x_ez_config.designcap  = 0x2710; // 10000mAh
 	max1726x_ez_config.ichgterm   = 0x0780;
 	max1726x_ez_config.modelcfg   = 0x8400;
 	max1726x_ez_config.vempty     = 0xA561;
@@ -367,14 +380,14 @@ void maxim_max1726x_initialize_ez_config(AlxMax17263* me)
 
 
 	/// Store original HibCFG value
-	maxim_max1726x_read_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG])) != Alx_Ok) return ret;
 
 	/// Exit Hibernate Mode step
 	tempdata = 0x0090;
-	maxim_max1726x_write_reg(me, 0x60, &tempdata);
+	if((ret = maxim_max1726x_write_reg(me, 0x60, &tempdata)) != Alx_Ok) return ret;
 	tempdata = 0x0000;
-	maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &tempdata);
-	maxim_max1726x_write_reg(me, 0x60, &tempdata);
+	if((ret = maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &tempdata)) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_write_reg(me, 0x60, &tempdata)) != Alx_Ok) return ret;
 
 	/// OPTION 1 EZ Config (No INI file is needed)
 	max1726x_regs[MAX1726X_DESIGNCAP_REG] = max1726x_ez_config.designcap;
@@ -382,23 +395,23 @@ void maxim_max1726x_initialize_ez_config(AlxMax17263* me)
 	max1726x_regs[MAX1726X_VEMPTY_REG] = max1726x_ez_config.vempty;
 	max1726x_regs[MAX1726X_MODELCFG_REG] = max1726x_ez_config.modelcfg;
 
-	maxim_max1726x_write_reg(me, MAX1726X_DESIGNCAP_REG, &max1726x_regs[MAX1726X_DESIGNCAP_REG]);
-	maxim_max1726x_write_reg(me, MAX1726X_ICHGTERM_REG, &max1726x_regs[MAX1726X_ICHGTERM_REG]);
-	maxim_max1726x_write_reg(me, MAX1726X_VEMPTY_REG, &max1726x_regs[MAX1726X_VEMPTY_REG]);
-	maxim_max1726x_write_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
+	if((ret = maxim_max1726x_write_reg(me, MAX1726X_DESIGNCAP_REG, &max1726x_regs[MAX1726X_DESIGNCAP_REG])) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_write_reg(me, MAX1726X_ICHGTERM_REG, &max1726x_regs[MAX1726X_ICHGTERM_REG])) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_write_reg(me, MAX1726X_VEMPTY_REG, &max1726x_regs[MAX1726X_VEMPTY_REG])) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_write_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG])) != Alx_Ok) return ret;
 
 
 	//Poll ModelCFG.Refresh bit, do not continue until ModelCFG.Refresh==0
-	maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG])) != Alx_Ok) return ret;
 
 	while ((max1726x_regs[MAX1726X_MODELCFG_REG] & 0x8000) == 0x8000)
 	{
 		AlxOsDelay_ms(&alxOsDelay, 10); // about 10ms
-		maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG]);
+		if((ret = maxim_max1726x_read_reg(me, MAX1726X_MODELCFG_REG, &max1726x_regs[MAX1726X_MODELCFG_REG])) != Alx_Ok) return ret;
 	}
 
 	/// Restore Original HibCFG value
-	maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG]);
+	if((ret = maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG])) != Alx_Ok) return ret;
 
 }
 
@@ -408,7 +421,7 @@ void maxim_max1726x_initialize_short_ini(AlxMax17263* me)
 	uint16_t tempdata;
 
 	/// customer must provide the battery parameters, get the parameters from MAXIM INI file
-	max1726x_short_ini.designcap  = 0x06aE;
+	max1726x_short_ini.designcap  = 0x2710; // 10000mAh
 	max1726x_short_ini.ichgterm   = 0x0100;
 	max1726x_short_ini.modelcfg   = 0x8410;
 	max1726x_short_ini.learncfg   = 0x0000; // Optional
@@ -661,33 +674,134 @@ void maxim_max1726x_initialize_full_ini(AlxMax17263* me)
 }
 
 /* ************************************************************************* */
-float maxim_max1726x_get_repcap(AlxMax17263* me, float Rsense)
+Alx_Status maxim_max1726x_get_data(AlxMax17263* me, uint8_t reg, float *value)
 {
-	float repcap;
-	maxim_max1726x_read_reg(me, MAX1726X_REPCAP_REG, &max1726x_regs[MAX1726X_REPCAP_REG]);
+	float temp = 0;
+	Alx_Status ret = maxim_max1726x_read_reg(me, reg, &max1726x_regs[reg]);
+	if(ret != Alx_Ok) return ret;
 
-	repcap = (float)max1726x_regs[MAX1726X_REPCAP_REG] * 5.0f / (float)Rsense;
-	return repcap;
+	temp = (float)max1726x_regs[reg];
+
+	// Some registers require additional "formatting"
+	switch(reg)
+	{
+		case MAX1726X_REPCAP_REG:
+			temp *= (5.0f / RSENSE);
+			break;
+		case MAX1726X_REPSOC_REG:
+			temp /= 256.0f;
+			break;
+		case MAX1726X_TTE_REG:
+			temp *= 5.625f;
+			break;
+		case MAX1726X_TTF_REG:
+			temp *= 5.625f;
+			break;
+
+		default:
+		break;
+	}
+
+	*value = temp;
+
+	return ret;
 }
 
 /* ************************************************************************* */
-float maxim_max1726x_get_repsoc(AlxMax17263* me)
+Alx_Status maxim_max1726x_get_repcap(AlxMax17263* me, float Rsense, float *value)
 {
-	float repsoc;
-	maxim_max1726x_read_reg(me, MAX1726X_REPSOC_REG, &max1726x_regs[MAX1726X_REPSOC_REG]);
+	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_REPCAP_REG, &max1726x_regs[MAX1726X_REPCAP_REG]);
+	if(ret != Alx_Ok) return ret;
 
-	repsoc = (float)max1726x_regs[MAX1726X_REPSOC_REG] / 256.0f;
-	return repsoc;
+	*value = (float)max1726x_regs[MAX1726X_REPCAP_REG] * 5.0f / (float)Rsense;
+	return ret;
 }
 
 /* ************************************************************************* */
-float maxim_max1726x_get_tte(AlxMax17263* me)
+Alx_Status maxim_max1726x_get_repsoc(AlxMax17263* me, float *value)
+{
+	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_REPSOC_REG, &max1726x_regs[MAX1726X_REPSOC_REG]);
+	if(ret != Alx_Ok) return ret;
+
+	*value = (float)max1726x_regs[MAX1726X_REPSOC_REG] / 256.0f;
+	return ret;
+}
+
+/* ************************************************************************* */
+Alx_Status maxim_max1726x_get_fullcaprep(AlxMax17263* me, float *value)
+{
+	float fullcaprep;
+	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]);
+	if(ret != Alx_Ok) return ret;
+
+	*value = (float)max1726x_regs[MAX1726X_FULLCAPREP_REG];
+	return ret;
+}
+
+/* ************************************************************************* */
+Alx_Status maxim_max1726x_get_tte(AlxMax17263* me, float *value)
 {
 	float tte;
-	maxim_max1726x_read_reg(me, MAX1726X_TTE_REG, &max1726x_regs[MAX1726X_TTE_REG]);
+	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_TTE_REG, &max1726x_regs[MAX1726X_TTE_REG]);
+	if(ret != Alx_Ok) return ret;
 
-	tte = (float)max1726x_regs[MAX1726X_TTE_REG] * 5.625f;
-	return tte;
+	*value = (float)max1726x_regs[MAX1726X_TTE_REG] * 5.625f;
+	return ret;
+}
+
+/* ************************************************************************* */
+Alx_Status maxim_max1726x_get_cycles(AlxMax17263* me, float *value)
+{
+	float cycles;
+	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_CYCLES_REG, &max1726x_regs[MAX1726X_CYCLES_REG]);
+	if(ret != Alx_Ok) return ret;
+
+	*value = (float)max1726x_regs[MAX1726X_CYCLES_REG];
+	return ret;
+}
+
+/* ************************************************************************* */
+Alx_Status maxim_max1726x_get_avgta(AlxMax17263* me, float *value)
+{
+	float avgta;
+	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_AVGTA_REG, &max1726x_regs[MAX1726X_AVGTA_REG]);
+	if(ret != Alx_Ok) return ret;
+
+	*value = (float)max1726x_regs[MAX1726X_AVGTA_REG];
+	return ret;
+}
+
+/* ************************************************************************* */
+Alx_Status maxim_max1726x_get_ttf(AlxMax17263* me, float *value)
+{
+	float ttf;
+	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_TTF_REG, &max1726x_regs[MAX1726X_TTF_REG]);
+	if(ret != Alx_Ok) return ret;
+
+	*value = (float)max1726x_regs[MAX1726X_TTF_REG] * 5.625f;
+	return ret;
+}
+
+/* ************************************************************************* */
+Alx_Status maxim_max1726x_get_avgvcell(AlxMax17263* me, float *value)
+{
+	float ttf;
+	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_AVGVCELL_REG, &max1726x_regs[MAX1726X_AVGVCELL_REG]);
+	if(ret != Alx_Ok) return ret;
+
+	*value = (float)max1726x_regs[MAX1726X_AVGVCELL_REG];
+	return ret;
+}
+
+/* ************************************************************************* */
+Alx_Status maxim_max1726x_get_avgcurr(AlxMax17263* me, float *value)
+{
+	float ttf;
+	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_AVGCURRENT_REG, &max1726x_regs[MAX1726X_AVGCURRENT_REG]);
+	if(ret != Alx_Ok) return ret;
+
+	*value = (float)max1726x_regs[MAX1726X_AVGCURRENT_REG];
+	return ret;
 }
 
 /* ************************************************************************* */
@@ -729,24 +843,24 @@ void maxim_max1726x_restore_learned_parameters(AlxMax17263* me, max1726x_learned
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_get_serial_number(AlxMax17263* me, uint16_t *sn)
+Alx_Status maxim_max1726x_get_serial_number(AlxMax17263* me, uint16_t *sn)
 {
-
-	maxim_max1726x_read_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
+	Alx_Status ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG])) != Alx_Ok) return ret;
 
 	// clear AtRateEn bit and DPEn bit in Config2 register
 	max1726x_regs[MAX1726X_CONFIG2_REG] = max1726x_regs[MAX1726X_CONFIG2_REG] & 0xCFFF;
-	maxim_max1726x_write_and_verify_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
-	AlxOsDelay_ms(&alxOsDelay, 40);
+	if((ret = maxim_max1726x_write_and_verify_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG])) != Alx_Ok) return ret;
+	AlxOsDelay_ms(&alxOsDelay, 500);
 
-	maxim_max1726x_read_reg(me, MAX1726X_MAXPEAKPOWER_REG, &max1726x_regs[MAX1726X_MAXPEAKPOWER_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_SUSPEAKPOWER_REG, &max1726x_regs[MAX1726X_SUSPEAKPOWER_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_MPPCURRENT_REG, &max1726x_regs[MAX1726X_MPPCURRENT_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_SPPCURRENT_REG, &max1726x_regs[MAX1726X_SPPCURRENT_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_ATQRESIDUAL_REG, &max1726x_regs[MAX1726X_ATQRESIDUAL_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_ATTTE_REG, &max1726x_regs[MAX1726X_ATTTE_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_ATAVSOC_REG, &max1726x_regs[MAX1726X_ATAVSOC_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_ATAVCAP_REG, &max1726x_regs[MAX1726X_ATAVCAP_REG]);
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_MAXPEAKPOWER_REG, &max1726x_regs[MAX1726X_MAXPEAKPOWER_REG])) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_SUSPEAKPOWER_REG, &max1726x_regs[MAX1726X_SUSPEAKPOWER_REG])) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_MPPCURRENT_REG, &max1726x_regs[MAX1726X_MPPCURRENT_REG])) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_SPPCURRENT_REG, &max1726x_regs[MAX1726X_SPPCURRENT_REG])) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_ATQRESIDUAL_REG, &max1726x_regs[MAX1726X_ATQRESIDUAL_REG])) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_ATTTE_REG, &max1726x_regs[MAX1726X_ATTTE_REG])) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_ATAVSOC_REG, &max1726x_regs[MAX1726X_ATAVSOC_REG])) != Alx_Ok) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_ATAVCAP_REG, &max1726x_regs[MAX1726X_ATAVCAP_REG])) != Alx_Ok) return ret;
 
 
 	sn[0] = max1726x_regs[MAX1726X_MAXPEAKPOWER_REG];
@@ -761,8 +875,10 @@ void maxim_max1726x_get_serial_number(AlxMax17263* me, uint16_t *sn)
 
 	// set AtRateEn bit and DPEn bit in Config2 register
 	max1726x_regs[MAX1726X_CONFIG2_REG] = max1726x_regs[MAX1726X_CONFIG2_REG] | 0x3000;
-	maxim_max1726x_write_and_verify_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG]);
-	AlxOsDelay_ms(&alxOsDelay, 40); // about 40ms
+	if((ret = maxim_max1726x_write_and_verify_reg(me, MAX1726X_CONFIG2_REG, &max1726x_regs[MAX1726X_CONFIG2_REG])) != Alx_Ok) return ret;
+	AlxOsDelay_ms(&alxOsDelay, 500); // about 40ms
+
+	return Alx_Ok;
 }
 
 /* ************************************************************************* */
