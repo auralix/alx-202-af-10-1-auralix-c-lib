@@ -329,7 +329,7 @@ typedef struct
 	float AvgTA;
 
 	char serial[32 + 1];
-}max1726_user_data_t;
+}max1726_data_t;
 
 typedef struct
 {
@@ -341,7 +341,7 @@ typedef struct
 	uint16_t i2cTimeout_ms;
 
 	//user data
-	max1726_user_data_t user_data;
+	max1726_data_t data;
 
 	// Info
 	bool wasCtorCalled;

@@ -172,7 +172,7 @@ Alx_Status AlxMax17263_Init(AlxMax17263* me)
 	status = maxim_max1726x_get_serial_number(me, sn);
 	if (status != Alx_Ok) { ALX_MAX17263_TRACE("Err"); return status; }
 
-	snprintf(me->user_data.serial, sizeof(me->user_data.serial), "%04x%04x%04x%04x%04x%04x%04x%04x", sn[7], sn[6], sn[5], sn[4], sn[3], sn[2], sn[1], sn[0]);
+	snprintf(me->data.serial, sizeof(me->data.serial), "%04x%04x%04x%04x%04x%04x%04x%04x", sn[7], sn[6], sn[5], sn[4], sn[3], sn[2], sn[1], sn[0]);
 
 	// Set isInit
 	me->isInit = true;
@@ -210,31 +210,25 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me)
 {
 	if (1 == maxim_max1726x_check_por(me))
 	{
-		me->user_data.reset_happened = true;
+		me->data.reset_happened = true;
 
-		//ALX_MAX17263_TRACE("Power on reset happened\r\n");
-
-		maxim_max1726x_wait_dnr(me);
-		maxim_max1726x_initialize_ez_config(me);
-		maxim_max1726x_clear_por(me);
-		//ALX_MAX17263_TRACE("MAX serial number: %s\r\n", sn_str);
-
+		if(Alx_Ok != maxim_max1726x_wait_dnr(me)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_initialize_ez_config(me)) return Alx_Err;
+		if (Alx_Ok != maxim_max1726x_clear_por(me)) return Alx_Err;
 	}
 	else
 	{
-		me->user_data.reset_happened = false;
+		me->data.reset_happened = false;
 
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPSOC_REG, &me->user_data.RepSOC)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPCAP_REG, &me->user_data.RepCAP)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TTE_REG, &me->user_data.TTE)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TTF_REG, &me->user_data.TTF)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_FULLCAP_REG, &me->user_data.FulLCAP)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_CYCLES_REG, &me->user_data.Cycles)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGCURRENT_REG, &me->user_data.AvgCurrent)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGTA_REG, &me->user_data.AvgTA)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGVCELL_REG, &me->user_data.AvgVCell)) return Alx_Err;
-
-		//ALX_MAX17263_TRACE("repsoc: %f\r\n", repsoc);
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPSOC_REG, &me->data.RepSOC)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPCAP_REG, &me->data.RepCAP)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TTE_REG, &me->data.TTE)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TTF_REG, &me->data.TTF)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_FULLCAP_REG, &me->data.FulLCAP)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_CYCLES_REG, &me->data.Cycles)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGCURRENT_REG, &me->data.AvgCurrent)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGTA_REG, &me->data.AvgTA)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGVCELL_REG, &me->data.AvgVCell)) return Alx_Err;
 
 		// Goto step 3.2
 	}
@@ -682,7 +676,7 @@ Alx_Status maxim_max1726x_get_data(AlxMax17263* me, uint8_t reg, float *value)
 
 	temp = (float)max1726x_regs[reg];
 
-	// Some registers require additional "formatting"
+	// Some registers require additional work
 	switch(reg)
 	{
 		case MAX1726X_REPCAP_REG:
@@ -693,9 +687,23 @@ Alx_Status maxim_max1726x_get_data(AlxMax17263* me, uint8_t reg, float *value)
 			break;
 		case MAX1726X_TTE_REG:
 			temp *= 5.625f;
+			temp = temp / 60 / 60;
 			break;
 		case MAX1726X_TTF_REG:
 			temp *= 5.625f;
+			temp = temp / 60 / 60;
+			break;
+		case MAX1726X_AVGCURRENT_REG:
+		{
+			int16_t twos = (int16_t)max1726x_regs[reg];
+			temp = (float)((float)twos / RSENSE);
+			break;
+		}
+		case MAX1726X_AVGTA_REG:
+			temp /= 256.0f;
+			break;
+		case MAX1726X_AVGVCELL_REG:
+			temp *= 0.000078125f;
 			break;
 
 		default:
