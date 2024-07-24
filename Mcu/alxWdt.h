@@ -43,7 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 
-#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
 #include "alxWdt_McuStm32.h"
 
 #elif defined(ALX_LPC55S6X)

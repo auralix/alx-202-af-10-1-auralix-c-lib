@@ -52,14 +52,18 @@ static AlxMmc* alxMmc_Sdmmc2_me = NULL;
 //------------------------------------------------------------------------------
 // Specific
 //------------------------------------------------------------------------------
+static uint32_t AlxMmc_GetBusWidth(AlxMmc* me);
+static uint32_t AlxMmc_GetClkDiv(AlxMmc* me);
 static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read);
-static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me);
+static Alx_Status AlxMmc_WaitForTransferState_Private(AlxMmc* me);
 
 
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
-static Alx_Status AlxMmc_Reset(AlxMmc* me);
+static Alx_Status AlxMmc_Init_Private(AlxMmc* me);
+static Alx_Status AlxMmc_DeInit_Private(AlxMmc* me);
+static Alx_Status AlxMmc_ReInit(AlxMmc* me);
 static bool AlxMmc_IsClkOk(AlxMmc* me);
 static void AlxMmc_Periph_EnableClk(AlxMmc* me);
 static void AlxMmc_Periph_DisableClk(AlxMmc* me);
@@ -92,6 +96,10 @@ void AlxMmc_Ctor
 	AlxIoPin* io_DAT5,
 	AlxIoPin* io_DAT6,
 	AlxIoPin* io_DAT7,
+	AlxClk* clk,
+	AlxMmc_Clk mmcClk,
+	uint8_t* dmaReadWriteBuffAlign4,
+	uint32_t dmaReadWriteBuffAlign4Len,
 	uint16_t dmaReadWriteTimeout_ms,
 	uint16_t waitForTransferStateTimeout_ms,
 	Alx_IrqPriority irqPriority
@@ -121,6 +129,10 @@ void AlxMmc_Ctor
 	me->io_DAT5 = io_DAT5;
 	me->io_DAT6 = io_DAT6;
 	me->io_DAT7 = io_DAT7;
+	me->clk = clk;
+	me->mmcClk = mmcClk;
+	me->dmaReadWriteBuffAlign4 = dmaReadWriteBuffAlign4;
+	me->dmaReadWriteBuffAlign4Len = dmaReadWriteBuffAlign4Len;
 	me->dmaReadWriteTimeout_ms = dmaReadWriteTimeout_ms;
 	me->waitForTransferStateTimeout_ms = waitForTransferStateTimeout_ms;
 	me->irqPriority = irqPriority;
@@ -131,12 +143,12 @@ void AlxMmc_Ctor
 	me->hmmc.Instance = mmc;
 	me->hmmc.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
 	me->hmmc.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
-	me->hmmc.Init.BusWide = SDMMC_BUS_WIDE_8B;
+	me->hmmc.Init.BusWide = AlxMmc_GetBusWidth(me);
 	me->hmmc.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
-	me->hmmc.Init.ClockDiv = 0;
+	me->hmmc.Init.ClockDiv = AlxMmc_GetClkDiv(me);
 	me->hmmc.Init.Transceiver = SDMMC_TRANSCEIVER_DISABLE;
-	me->isDmaReadDone = false;
-	me->isDmaWriteDone = false;
+	me->dmaReadDone = false;
+	me->dmaWriteDone = false;
 
 	// Check clock
 	ALX_MMC_ASSERT(AlxMmc_IsClkOk(me));
@@ -156,63 +168,8 @@ Alx_Status AlxMmc_Init(AlxMmc* me)
 	ALX_MMC_ASSERT(me->wasCtorCalled == true);
 	ALX_MMC_ASSERT(me->isInit == false);
 
-	// Init GPIO
-	AlxIoPin_Init(me->do_nRST);
-	AlxIoPin_Init(me->do_CLK);
-	AlxIoPin_Init(me->do_CMD);
-	AlxIoPin_Init(me->io_DAT0);
-	AlxIoPin_Init(me->io_DAT1);
-	AlxIoPin_Init(me->io_DAT2);
-	AlxIoPin_Init(me->io_DAT3);
-	AlxIoPin_Init(me->io_DAT4);
-	AlxIoPin_Init(me->io_DAT5);
-	AlxIoPin_Init(me->io_DAT6);
-	AlxIoPin_Init(me->io_DAT7);
-
-	// Disable MMC
-	AlxIoPin_Reset(me->do_nRST);
-
-	// Wait for GPIO stable
-	AlxDelay_ms(100);
-
-	// Enable MMC
-	AlxIoPin_Set(me->do_nRST);
-
-	// Wait for MMC boot
-	AlxDelay_ms(100);
-
-	// Init clock
-	if (HAL_RCCEx_PeriphCLKConfig(&me->iclk) != HAL_OK) { ALX_MMC_TRACE("Err"); return Alx_Err; }
-
-	// Release SDMMC periphery reset
-	AlxMmc_Periph_ReleaseReset(me);
-
-	// Enable SDMMC periphery clock
-	AlxMmc_Periph_EnableClk(me);
-
-	// Init IRQ
-	AlxMmc_Periph_EnableIrq(me);
-
-	// Init SDMMC
-	if (HAL_MMC_Init(&me->hmmc) != HAL_OK) { ALX_MMC_TRACE("Err"); return Alx_Err; }					// TV: Communication with MMC
-
-	// Wait for Transfer State
-	if (AlxMmc_WaitForTransferState(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }			// TV: Communication with MMC
-
-	// Get CID
-	if (HAL_MMC_GetCardCID(&me->hmmc, &me->cid) != HAL_OK) { ALX_MMC_TRACE("Err"); return Alx_Err; }	// TV: NO Commucination with MMC - Uses data which is aquired from HAL_MMC_Init
-
-	// Get CSD
-	if (HAL_MMC_GetCardCSD(&me->hmmc, &me->csd) != HAL_OK) { ALX_MMC_TRACE("Err"); return Alx_Err; }	// TV: Communication with MMC
-
-	// Get Info
-	if (HAL_MMC_GetCardInfo(&me->hmmc, &me->info) != HAL_OK) { ALX_MMC_TRACE("Err"); return Alx_Err; }	// TV: NO Commucination with MMC - Uses data which is aquired from HAL_MMC_GetCardCSD
-
-	// Set isInit
-	me->isInit = true;
-
 	// Return
-	return Alx_Ok;
+	return AlxMmc_Init_Private(me);
 }
 Alx_Status AlxMmc_DeInit(AlxMmc* me)
 {
@@ -220,36 +177,8 @@ Alx_Status AlxMmc_DeInit(AlxMmc* me)
 	ALX_MMC_ASSERT(me->wasCtorCalled == true);
 	ALX_MMC_ASSERT(me->isInit == true);
 
-	// DeInit IRQ
-	AlxMmc_Periph_DisableIrq(me);
-
-	// DeInit MMC
-	if (HAL_MMC_DeInit(&me->hmmc) != HAL_OK) { ALX_MMC_TRACE("Err"); return Alx_Err; }
-
-	// Force MMC periphery reset
-	AlxMmc_Periph_ForceReset(me);
-
-	// Disable MMC periphery clock
-	AlxMmc_Periph_DisableClk(me);
-
-	// DeInit GPIO
-	AlxIoPin_DeInit(me->do_nRST);
-	AlxIoPin_DeInit(me->do_CLK);
-	AlxIoPin_DeInit(me->do_CMD);
-	AlxIoPin_DeInit(me->io_DAT0);
-	AlxIoPin_DeInit(me->io_DAT1);
-	AlxIoPin_DeInit(me->io_DAT2);
-	AlxIoPin_DeInit(me->io_DAT3);
-	AlxIoPin_DeInit(me->io_DAT4);
-	AlxIoPin_DeInit(me->io_DAT5);
-	AlxIoPin_DeInit(me->io_DAT6);
-	AlxIoPin_DeInit(me->io_DAT7);
-
-	// Clear isInit
-	me->isInit = false;
-
 	// Return
-	return Alx_Ok;
+	return AlxMmc_DeInit_Private(me);
 }
 Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data, uint32_t len, uint8_t numOfTries, uint16_t newTryWaitTime_ms)
 {
@@ -259,6 +188,15 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 	ALX_MMC_ASSERT(me->wasCtorCalled == true);
 	ALX_MMC_ASSERT(me->isInit == true);
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
+	ALX_MMC_ASSERT(((uintptr_t)data & 0x3) == 0);	// Check data address 4-byte alignment, requred for DMA
+	// TV: TODO - Implement dmaReadWriteBuffAlign4Len
+
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	HAL_StatusTypeDef statusHal = HAL_ERROR;
+	Alx_Status statusAlx = Alx_Err;
 
 
 	//------------------------------------------------------------------------------
@@ -269,34 +207,49 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
 		// Clear
-		me->isDmaReadDone = false;
+		me->dmaReadDone = false;
 
 		// Read
-		HAL_StatusTypeDef statusHal = HAL_MMC_ReadBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
+		statusHal = HAL_MMC_ReadBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
-			ALX_MMC_TRACE("Err");
-			if (AlxMmc_Reset(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaReadDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
 
 		// Wait
-		Alx_Status statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, true);
+		statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, true);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err");
-			if (AlxMmc_Reset(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
 
 		// Wait
-		statusAlx = AlxMmc_WaitForTransferState(me);
+		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err");
-			if (AlxMmc_Reset(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
@@ -321,6 +274,22 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	ALX_MMC_ASSERT(me->wasCtorCalled == true);
 	ALX_MMC_ASSERT(me->isInit == true);
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
+	ALX_MMC_ASSERT(len <= me->dmaReadWriteBuffAlign4Len);
+	ALX_MMC_ASSERT(((uintptr_t)me->dmaReadWriteBuffAlign4 & 0x3) == 0);	// Check data address 4-byte alignment, requred for DMA
+
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	HAL_StatusTypeDef statusHal = HAL_ERROR;
+	Alx_Status statusAlx = Alx_Err;
+
+
+	//------------------------------------------------------------------------------
+	// Prepare
+	//------------------------------------------------------------------------------
+	memset(me->dmaReadWriteBuffAlign4, 0, me->dmaReadWriteBuffAlign4Len);
+	memcpy(me->dmaReadWriteBuffAlign4, data, len);
 
 
 	//------------------------------------------------------------------------------
@@ -331,34 +300,49 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
 		// Clear
-		me->isDmaWriteDone = false;
+		me->dmaWriteDone = false;
 
 		// Read
-		HAL_StatusTypeDef statusHal = HAL_MMC_WriteBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
+		statusHal = HAL_MMC_WriteBlocks_DMA(&me->hmmc, me->dmaReadWriteBuffAlign4, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
-			ALX_MMC_TRACE("Err");
-			if (AlxMmc_Reset(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaWriteDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
 
 		// Wait
-		Alx_Status statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, false);
+		statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, false);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err");
-			if (AlxMmc_Reset(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
 
 		// Wait
-		statusAlx = AlxMmc_WaitForTransferState(me);
+		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err");
-			if (AlxMmc_Reset(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
+			statusAlx = AlxMmc_ReInit(me);
+			if (statusAlx != Alx_Ok)
+			{
+				ALX_MMC_TRACE("Err: %d", statusAlx);
+				return Alx_Err;
+			}
 			AlxDelay_ms(newTryWaitTime_ms);
 			continue;
 		}
@@ -375,6 +359,15 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	// Return
 	return Alx_ErrNumOfTries;
 }
+Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me)
+{
+	// Assert
+	ALX_MMC_ASSERT(me->wasCtorCalled == true);
+	ALX_MMC_ASSERT(me->isInit == true);
+
+	// Return
+	return AlxMmc_WaitForTransferState_Private(me);
+}
 void AlxMmc_IrqHandler(AlxMmc* me)
 {
 	HAL_MMC_IRQHandler(&me->hmmc);
@@ -389,6 +382,90 @@ void AlxMmc_IrqHandler(AlxMmc* me)
 //------------------------------------------------------------------------------
 // Specific
 //------------------------------------------------------------------------------
+static uint32_t AlxMmc_GetBusWidth(AlxMmc* me)
+{
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L4)
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz)
+	)
+	{
+		return SDMMC_BUS_WIDE_1B;
+	}
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz)
+	)
+	{
+		return SDMMC_BUS_WIDE_4B;
+	}
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+	)
+	{
+		return SDMMC_BUS_WIDE_8B;
+	}
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_MMC_ASSERT(false);	// We should not get here
+	return ALX_NULL;
+}
+static uint32_t AlxMmc_GetClkDiv(AlxMmc* me)
+{
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L4)
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz)
+	)
+	{
+		return 2;
+	}
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz)
+	)
+	{
+		return 1;
+	}
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+	)
+	{
+		return 0;
+	}
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_MMC_ASSERT(false);	// We should not get here
+	return ALX_NULL;
+}
 static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read)
 {
 	// Local variables
@@ -404,14 +481,14 @@ static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read)
 		// Check state
 		if (read)
 		{
-			if (me->isDmaReadDone)
+			if (me->dmaReadDone)
 			{
 				return Alx_Ok;
 			}
 		}
 		else	// write
 		{
-			if (me->isDmaWriteDone)
+			if (me->dmaWriteDone)
 			{
 				return Alx_Ok;
 			}
@@ -424,7 +501,7 @@ static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read)
 		}
 	}
 }
-static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me)
+static Alx_Status AlxMmc_WaitForTransferState_Private(AlxMmc* me)
 {
 	// Local variables
 	AlxTimSw alxTimSw;
@@ -457,20 +534,24 @@ static Alx_Status AlxMmc_WaitForTransferState(AlxMmc* me)
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
-static Alx_Status AlxMmc_Reset(AlxMmc* me)
+static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 {
-	// DeInit I2C
-	if (HAL_MMC_DeInit(&me->hmmc) != HAL_OK) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+	// Local variables
+	HAL_StatusTypeDef statusHal = HAL_ERROR;
+	Alx_Status statusAlx = Alx_Err;
 
-	// Force MMC periphery reset
-	AlxMmc_Periph_ForceReset(me);
-
-	// Clear variables
-	me->isDmaReadDone = false;
-	me->isDmaWriteDone = false;
-
-	// Clear isInit
-	me->isInit = false;
+	// Init GPIO
+	AlxIoPin_Init(me->do_nRST);
+	AlxIoPin_Init(me->do_CLK);
+	AlxIoPin_Init(me->do_CMD);
+	AlxIoPin_Init(me->io_DAT0);
+	AlxIoPin_Init(me->io_DAT1);
+	AlxIoPin_Init(me->io_DAT2);
+	AlxIoPin_Init(me->io_DAT3);
+	AlxIoPin_Init(me->io_DAT4);
+	AlxIoPin_Init(me->io_DAT5);
+	AlxIoPin_Init(me->io_DAT6);
+	AlxIoPin_Init(me->io_DAT7);
 
 	// Disable MMC
 	AlxIoPin_Reset(me->do_nRST);
@@ -484,14 +565,62 @@ static Alx_Status AlxMmc_Reset(AlxMmc* me)
 	// Wait for MMC boot
 	AlxDelay_ms(100);
 
-	// Release SDMMC periphery reset
+	// Init clock
+	statusHal = HAL_RCCEx_PeriphCLKConfig(&me->iclk);
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
+
+	// Release MMC periphery reset
 	AlxMmc_Periph_ReleaseReset(me);
 
-	// Init SDMMC
-	if (HAL_MMC_Init(&me->hmmc) != HAL_OK) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+	// Enable MMC periphery clock
+	AlxMmc_Periph_EnableClk(me);
 
-	// Wait for Transfer State
-	if (AlxMmc_WaitForTransferState(me) != Alx_Ok) { ALX_MMC_TRACE("Err"); return Alx_Err; }
+	// Init IRQ
+	AlxMmc_Periph_EnableIrq(me);
+
+	// Init MMC - Communication with MMC
+	statusHal = HAL_MMC_Init(&me->hmmc);
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
+
+	// Wait for Transfer State - Communication with MMC
+	statusAlx = AlxMmc_WaitForTransferState_Private(me);
+	if (statusAlx != Alx_Ok)
+	{
+		ALX_MMC_TRACE("Err: %d", statusAlx);
+		return Alx_Err;
+	}
+
+	// Get CID - NO Commucination with MMC - Uses data which is aquired from HAL_MMC_Init
+	statusHal = HAL_MMC_GetCardCID(&me->hmmc, &me->cid);
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
+
+	// Get CSD - Communication with MMC
+	statusHal = HAL_MMC_GetCardCSD(&me->hmmc, &me->csd);
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
+
+	// Get Info - NO Commucination with MMC - Uses data which is aquired from HAL_MMC_GetCardCSD
+	statusHal = HAL_MMC_GetCardInfo(&me->hmmc, &me->info);
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -499,11 +628,95 @@ static Alx_Status AlxMmc_Reset(AlxMmc* me)
 	// Return
 	return Alx_Ok;
 }
+static Alx_Status AlxMmc_DeInit_Private(AlxMmc* me)
+{
+	// Local variables
+	HAL_StatusTypeDef statusHal = HAL_ERROR;
+
+	// DeInit IRQ
+	AlxMmc_Periph_DisableIrq(me);
+
+	// DeInit MMC
+	statusHal = HAL_MMC_DeInit(&me->hmmc);
+	if (statusHal != HAL_OK)
+	{
+		ALX_MMC_TRACE("Err: %d", statusHal);
+		return Alx_Err;
+	}
+
+	// Force MMC periphery reset
+	AlxMmc_Periph_ForceReset(me);
+
+	// Disable MMC periphery clock
+	AlxMmc_Periph_DisableClk(me);
+
+	// DeInit GPIO
+	AlxIoPin_DeInit(me->do_nRST);
+	AlxIoPin_DeInit(me->do_CLK);
+	AlxIoPin_DeInit(me->do_CMD);
+	AlxIoPin_DeInit(me->io_DAT0);
+	AlxIoPin_DeInit(me->io_DAT1);
+	AlxIoPin_DeInit(me->io_DAT2);
+	AlxIoPin_DeInit(me->io_DAT3);
+	AlxIoPin_DeInit(me->io_DAT4);
+	AlxIoPin_DeInit(me->io_DAT5);
+	AlxIoPin_DeInit(me->io_DAT6);
+	AlxIoPin_DeInit(me->io_DAT7);
+
+	// Clear isInit
+	me->isInit = false;
+
+	// Return
+	return Alx_Ok;
+}
+static Alx_Status AlxMmc_ReInit(AlxMmc* me)
+{
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// DeInit
+	status = AlxMmc_DeInit_Private(me);
+	if (status != Alx_Ok) return status;
+
+	// Init
+	status = AlxMmc_Init_Private(me);
+	if (status != Alx_Ok) return status;
+
+	// Return
+	return Alx_Ok;
+}
 static bool AlxMmc_IsClkOk(AlxMmc* me)
 {
-	// TODO
-	(void)me;
-	return true;
+	//------------------------------------------------------------------------------
+	// STM32L4
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L4)
+	if
+	(
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+	)
+	{
+		if(48000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_PllP_Ctor))
+			return true;
+		else
+			return false;
+	}
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_MMC_ASSERT(false);	// We should not get here
+	return ALX_NULL;
 }
 static void AlxMmc_Periph_EnableClk(AlxMmc* me)
 {
@@ -578,8 +791,10 @@ static void AlxMmc_Periph_DisableIrq(AlxMmc* me)
 //******************************************************************************
 void HAL_MMC_RxCpltCallback(MMC_HandleTypeDef *hmmc)
 {
+	(void)hmmc;
+
 	#if defined(SDMMC1)
-	alxMmc_Sdmmc1_me->isDmaReadDone = true;
+	alxMmc_Sdmmc1_me->dmaReadDone = true;
 	#endif
 	#if defined(SDMMC2)
 	alxMmc_Sdmmc2_me->isDmaReadDone = true;
@@ -587,8 +802,10 @@ void HAL_MMC_RxCpltCallback(MMC_HandleTypeDef *hmmc)
 }
 void HAL_MMC_TxCpltCallback(MMC_HandleTypeDef *hmmc)
 {
+	(void)hmmc;
+
 	#if defined(SDMMC1)
-	alxMmc_Sdmmc1_me->isDmaWriteDone = true;
+	alxMmc_Sdmmc1_me->dmaWriteDone = true;
 	#endif
 	#if defined(SDMMC2)
 	alxMmc_Sdmmc2_me->isDmaWriteDone = true;

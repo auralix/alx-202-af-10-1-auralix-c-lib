@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		alxWdt_McuStm32.h
-  * @brief		Auralix C Library - ALX Watchdog Timer MCU STM32 Module
+  * @file		alxMath.h
+  * @brief		Auralix C Library - ALX Mathematics Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_WDT_MCU_STM32_H
-#define ALX_WDT_MCU_STM32_H
+#ifndef ALX_MATH_H
+#define ALX_MATH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,51 +47,71 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
+// Preprocessor
+//******************************************************************************
+#define ALX_MATH_FILE "alxMath.h"
+
+// Assert //
+#if defined(ALX_MATH_ASSERT_BKPT_ENABLE)
+	#define ALX_MATH_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MATH_FILE, expr)
+#elif defined(ALX_MATH_ASSERT_TRACE_ENABLE)
+	#define ALX_MATH_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MATH_FILE, expr)
+#elif defined(ALX_MATH_ASSERT_RST_ENABLE)
+	#define ALX_MATH_ASSERT(expr) ALX_ASSERT_RST(ALX_MATH_FILE, expr)
+#else
+	#define ALX_MATH_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(ALX_MATH_TRACE_ENABLE)
+	#define ALX_MATH_TRACE(...) ALX_TRACE_STD(ALX_MATH_FILE, __VA_ARGS__)
+#else
+	#define ALX_MATH_TRACE(...) do{} while (false)
+#endif
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
+typedef struct
 {
-	AlxWdt_Config_McuStm32_WdtTimeout_512ms_WdtClk_8kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_1024ms_WdtClk_4kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_2048ms_WdtClk_2kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_4096ms_WdtClk_1kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_8192ms_WdtClk_500Hz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_16384ms_WdtClk_250Hz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_32768ms_WdtClk_125Hz_Lsi_32kHz
-} AlxWdt_Config;
+	uint32_t count;
+	uint64_t sum;
+	uint32_t avg;
+	uint32_t min;
+	uint32_t max;
+} AlxMath_Data;
 
 typedef struct
 {
-	// Parameters
-	AlxWdt_Config config;
-
 	// Variables
-	IWDG_HandleTypeDef hiwdg;
+	AlxMath_Data data;
 
 	// Info
 	bool wasCtorCalled;
-	bool isInit;
-} AlxWdt;
+} AlxMath;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxWdt_Ctor
-(
-	AlxWdt* me,
-	AlxWdt_Config config
-);
+void AlxMath_Ctor(AlxMath* me);
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+//******************************************************************************
+// Functions
+//******************************************************************************
+AlxMath_Data AlxMath_Process(AlxMath* me, uint32_t in);
+
+
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_WDT_MCU_STM32_H
+#endif	// #ifndef ALX_MATH_H

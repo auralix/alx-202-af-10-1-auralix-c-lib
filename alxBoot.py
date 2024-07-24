@@ -35,7 +35,7 @@ import subprocess
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
+def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	# Print
 	print("")
 	print("alxBoot.py - START")
@@ -48,14 +48,16 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 	# Parse input file
 	date = inFileLines[5][23:]
 	hashShort = inFileLines[8][30:37]
-	fwVerMajor = inFileLines[10][31:]
-	fwVerMinor = inFileLines[11][31:]
-	fwVerPatch = inFileLines[12][31:]
+	fwVerMajor = inFileLines[11][31:]
+	fwVerMinor = inFileLines[12][31:]
+	fwVerPatch = inFileLines[13][31:]
 
-	# Set lenghts
+	# Set lengths
 	bootLen = int(bootLenHexStr, 16)
-	headerLen = 0x200  # 512 bytes
-	trailerLen = 0x28  # 40 bytes
+	headerLenStr = r'0x0200'	# 512 bytes
+	trailerLenStr =  r'0x0028'	# 40 bytes
+	headerLen = int(headerLenStr, 16)
+	trailerLen = int(trailerLenStr, 16)
 
 	# Read source bin
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix('.bin')
@@ -80,15 +82,16 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 
 	# Run imgtool
 	cmd = (r"python {imgtoolPath} sign"
-		r" --header-size 0x200"
+		r" --header-size {headerLenStr}"
 		r" --pad-header"
-		r" --slot-size {imgSlotSize}"
+		r" --slot-size {imgSlotLenHexStr}"
 		r" --version {fwVerMajor}.{fwVerMinor}.{fwVerPatch}+{date}"
 		r" --pad"
 		r" {binPathIn}"
 		r" {binPathOut}").format(
 		imgtoolPath=imgtoolPath,
-		imgSlotSize=imgSlotSize,
+		headerLenStr=headerLenStr,
+		imgSlotLenHexStr=imgSlotLenHexStr,
 		fwVerMajor=fwVerMajor,
 		fwVerMinor=fwVerMinor,
 		fwVerPatch=fwVerPatch,
@@ -96,6 +99,7 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 		binPathIn=binRawPath,
 		binPathOut=binSignedPath
 	)
+	print("imgtool.py - cmd:" + cmd)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
 	# Print imgtool
@@ -114,25 +118,21 @@ def Script(vsTargetPath, imgSlotSize, bootLenHexStr):
 	# Prepare signed bin header & trailer variables
 	binSignedHeaderArr = ", ".join(f"0x{byte:02X}" for byte in binSignedHeader)
 	binSignedTrailerArr = ", ".join(f"0x{byte:02X}" for byte in binSignedTrailer)
-	binSignedHeaderTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "alx-202-af-10-1-auralix-c-lib" / "alxBoot2_GENERATED.h"
+	binSignedHeaderTrailerPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "alx-202-af-10-1-auralix-c-lib" / "alxBootMetadata_GENERATED.h"
 
 	# Prepare signed bin header & trailer file text
-	binSignedHeaderTrailerText = """#ifndef ALX_BOOT2_GENERATED_H
-#define ALX_BOOT2_GENERATED_H
+	binSignedHeaderTrailerText = """#ifndef ALX_BOOT_METADATA_GENERATED_H
+#define ALX_BOOT_METADATA_GENERATED_H
 
 
 #if defined(ALX_BUILD_CONFIG_DEBUG)
-static const unsigned char header[{headerLen}] __attribute__((section(".header"), used)) = {{{binSignedHeaderArr}}};
-static const unsigned char trailer[{trailerLen}] __attribute__((section(".trailer"), used)) = {{{binSignedTrailerArr}}};
-#endif
-#if defined(ALX_BUILD_CONFIG_FW_UP)
-static const unsigned char header[{headerLen}] __attribute__((section(".header"), used)) = {{0xBB, 0xBB, 0xBB, 0xBB}};
-static const unsigned char trailer[{trailerLen}] __attribute__((section(".trailer"), used)) = {{0xCC, 0xCC, 0xCC, 0xCC}};
+static const unsigned char app_header[{headerLenStr}] __attribute__((section(".app_header"), used)) = {{{binSignedHeaderArr}}};
+static const unsigned char app_trailer[{trailerLenStr}] __attribute__((section(".app_trailer"), used)) = {{{binSignedTrailerArr}}};
 #endif
 
 
-#endif	// ALX_BOOT2_GENERATED_H
-""".format(headerLen=headerLen, binSignedHeaderArr=binSignedHeaderArr, trailerLen=trailerLen, binSignedTrailerArr=binSignedTrailerArr)
+#endif	// ALX_BOOT_METADATA_GENERATED_H
+""".format(headerLenStr=headerLenStr, binSignedHeaderArr=binSignedHeaderArr, trailerLenStr=trailerLenStr, binSignedTrailerArr=binSignedTrailerArr)
 
 	# Write signed bin header & trailer file text
 	binSignedHeaderTrailerPath.write_text(binSignedHeaderTrailerText)
@@ -148,8 +148,8 @@ static const unsigned char trailer[{trailerLen}] __attribute__((section(".traile
 if __name__ == "__main__":
 	# Prepare
 	vsTargetPath = sys.argv[1]
-	imgSlotSize = sys.argv[2]
-	bootSize = sys.argv[3]
+	imgSlotLenHexStr = sys.argv[2]
+	bootLenHexStr = sys.argv[3]
 
 	# Script
-	Script(vsTargetPath, imgSlotSize, bootSize)
+	Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr)

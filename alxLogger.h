@@ -45,6 +45,8 @@ extern "C" {
 #include "alxFs.h"
 #include "alxCrc.h"
 #include "alxTimSw.h"
+#include "alxIoPin.h"
+#include "alxMath.h"
 
 
 //******************************************************************************
@@ -119,7 +121,7 @@ typedef struct
 	// Defines
 	#define ALX_LOGGER_PATH_LEN_MAX 128
 	#define ALX_LOGGER_LOG_LEN_MAX 256
-	#define ALX_LOGGER_METADATA_FILE_PATH "/AlxLoggerMetadata.bin"
+	#define ALX_LOGGER_METADATA_FILE_PATH "/md.bin"
 	#define ALX_LOGGER_METADATA_MAGIC_NUMBER 0x002DCA5D
 	#define ALX_LOGGER_METADATA_VERSION 1
 
@@ -129,6 +131,10 @@ typedef struct
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
 	const char* logDelim;
+	AlxIoPin* do_DBG_Read;
+	AlxIoPin* do_DBG_Write;
+	AlxIoPin* do_DBG_StoreReadMetadata;
+	AlxIoPin* do_DBG_StoreWriteMetadata;
 
 	// Parameters - Private
 	uint32_t numOfFilesTotal;
@@ -139,6 +145,12 @@ typedef struct
 	AlxLogger_Metadata md;
 	AlxLogger_Metadata mdStored;
 	AlxCrc alxCrc;
+	uint32_t numOfDirCreated;
+	uint32_t numOfFilesPerDirCreated;
+	AlxMath alxMath_ReadTime_ms;
+	AlxMath alxMath_WriteTime_ms;
+	AlxMath_Data alxMath_Data_ReadTime_ms;
+	AlxMath_Data alxMath_Data_WriteTime_ms;
 
 	// Info
 	bool wasCtorCalled;
@@ -156,7 +168,11 @@ void AlxLogger_Ctor
 	uint32_t numOfDir,
 	uint32_t numOfFilesPerDir,
 	uint32_t numOfLogsPerFile,
-	const char* logDelim
+	const char* logDelim,
+	AlxIoPin* do_DBG_Read,
+	AlxIoPin* do_DBG_Write,
+	AlxIoPin* do_DBG_StoreReadMetadata,
+	AlxIoPin* do_DBG_StoreWriteMetadata
 );
 
 
@@ -171,6 +187,8 @@ uint32_t AlxLogger_GetNumOfLogsToReadAvailable(AlxLogger* me);
 Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
 AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me);
 AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me);
+AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me);
+AlxMath_Data AlxLogger_GetMath_Data_WriteTime_ms(AlxLogger* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

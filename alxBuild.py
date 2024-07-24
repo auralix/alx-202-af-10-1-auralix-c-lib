@@ -54,13 +54,15 @@ def Script(vsSolDir):
 	cmdHashCompletedObj = subprocess.run(cmdHash, capture_output=True)
 	if cmdHashCompletedObj.returncode == 0:
 		_hash = cmdHashCompletedObj.stdout.decode().rstrip('\n')
-		hashShort = _hash[0:7]
 	else:
 		print("alxBuild.py - Not a GIT repo, hash could not be set")
 		_hash = "abcdefabcdefabcdefabcdefabcdefabcdefabcd"
-		hashShort = "abcdefa"
+	hashShort = _hash[0:7]
+	hashShortUint32 = int(hashShort, 16)
+	hashShortUint32Str = "0x{0:08X}".format(hashShortUint32)
 	print("alxBuild.py - buildHash: " + _hash)
 	print("alxBuild.py - buildHashShort: " + hashShort)
+	print("alxBuild.py - buildHashShortUint32: " + hashShortUint32Str)
 
 	# Try to set FW version from GIT tag
 	try:
@@ -105,6 +107,7 @@ def Script(vsSolDir):
 #define ALX_BUILD_NUM 0
 #define ALX_BUILD_HASH "{_hash}"
 #define ALX_BUILD_HASH_SHORT "{hashShort}"
+#define ALX_BUILD_HASH_SHORT_UINT32 {hashShortUint32Str}
 #define ALX_BUILD_REV 0
 #define ALX_BUILD_FW_VER_MAJOR {fwVerMajorStr}
 #define ALX_BUILD_FW_VER_MINOR {fwVerMinorStr}
@@ -112,7 +115,7 @@ def Script(vsSolDir):
 
 
 #endif	// ALX_BUILD_GENERATED_H
-""".format(date=date, _hash=_hash, hashShort=hashShort, fwVerMajorStr=fwVerMajorStr, fwVerMinorStr=fwVerMinorStr, fwVerPatchStr=fwVerPatchStr)
+""".format(date=date, _hash=_hash, hashShort=hashShort, hashShortUint32Str=hashShortUint32Str, fwVerMajorStr=fwVerMajorStr, fwVerMinorStr=fwVerMinorStr, fwVerPatchStr=fwVerPatchStr)
 
 	# Write output file text
 	outFilePath = pathlib.Path("alxBuild_GENERATED.h")

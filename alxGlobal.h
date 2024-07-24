@@ -117,6 +117,15 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
+// MCUboot
+//------------------------------------------------------------------------------
+#if defined(ALX_MCU_BOOT)
+#include "bootutil/bootutil.h"
+#include "sysflash/sysflash.h"
+#endif
+
+
+//------------------------------------------------------------------------------
 // ARM CMSIS DSP Library
 //------------------------------------------------------------------------------
 #if defined(ALX_CMSIS_DSP)
@@ -144,7 +153,20 @@ extern "C" {
 // FreeRTOS Cellular Interface
 //------------------------------------------------------------------------------
 #if defined(ALX_FREE_RTOS_CELLULAR)
-// TV: TODO, add files
+#include "cellular_config.h"
+#include "cellular_comm_interface.h"
+#include "cellular_api.h"
+#include "cellular_types.h"
+#include "cellular_api_ext.h"
+#endif
+
+
+//------------------------------------------------------------------------------
+// FatFs
+//------------------------------------------------------------------------------
+#if defined(ALX_FATFS)
+#include "ff.h"
+#include "diskio.h"
 #endif
 
 
@@ -164,7 +186,7 @@ extern "C" {
 // Wiznet
 //------------------------------------------------------------------------------
 #if defined(ALX_WIZNET)
-// TV: TODO, add files
+// TV: TODO
 #endif
 
 
@@ -312,7 +334,9 @@ typedef enum
 	AlxRange_ErrLen,
 	AlxFs_ErrNoDelim,
 	AlxFs_EndOfDir,
-	AlxLogger_ErrNoReadLog
+	AlxLogger_ErrNoReadLog,
+	AlxNet_Timeout,
+	AlxNet_NotSupported
 } Alx_Status;
 
 typedef enum
@@ -373,9 +397,12 @@ typedef enum
 	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
 	AlxClk_Clk_McuStm32_Pclk2Apb2Tim_Ctor,
 	#endif
-
 	AlxClk_Clk_McuStm32_MainPllClk,
 	AlxClk_Clk_McuStm32_MainPllInputClk_Ctor,
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	AlxClk_Clk_McuStm32_PllP_Ctor,
+	AlxClk_Clk_McuStm32_PllQ_Ctor,
+	#endif
 	#endif
 
 	#if defined(ALX_LPC80X) || defined(ALX_LPC84X)
@@ -407,6 +434,8 @@ typedef enum
 	AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor,
 	AlxClk_Clk_McuLpc55s6x_WdtOsc_Ctor,
 	#endif
+
+	AlxClk_Clk_Dummy
 } AlxClk_Clk;
 
 typedef enum

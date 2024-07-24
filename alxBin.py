@@ -35,7 +35,7 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr):
+def Script(vsTargetPath, fwName, binRawAndBinSignedCopyEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr):
 	# Print
 	print("")
 	print("alxBin.py - START")
@@ -48,9 +48,9 @@ def Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr):
 	# Parse input file
 	date = inFileLines[5][23:]
 	hashShort = inFileLines[8][30:37]
-	fwVerMajor = inFileLines[10][31:]
-	fwVerMinor = inFileLines[11][31:]
-	fwVerPatch = inFileLines[12][31:]
+	fwVerMajor = inFileLines[11][31:]
+	fwVerMinor = inFileLines[12][31:]
+	fwVerPatch = inFileLines[13][31:]
 
 	# Set source bin variables
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix(".bin")
@@ -74,8 +74,8 @@ def Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr):
 	# Print
 	print("Generated: " + binDstName)
 
-	# If _Raw & _Signed copy enabled
-	if binRawSigned == "True":
+	# If bin _Raw & _Signed copy enabled
+	if binRawAndBinSignedCopyEnable == "True":
 		# Set source bin variables
 		binRawSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Raw' + binSrcPath.suffix)
 		binSignedSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Signed' + binSrcPath.suffix)
@@ -92,15 +92,15 @@ def Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr):
 		print("Generated: " + binRawDstName)
 		print("Generated: " + binSignedDstName)
 
-	# If bootloader header generation enabled
-	if bootHdr == "True":
+	# If bootloader header file generation enabled
+	if bootHdrFileGenEnable == "True":
 		# Read bin
 		binData = binSrcPath.read_bytes()
 		binLen = len(binData)
 
 		# Set bootHdr variables
 		bootHdrDstName = binDstDirName + ".h"
-		bootHdrLen = int(bootHdrLenHexStr, 16)
+		bootHdrLen = int(bootHdrFileLenHexStr, 16)
 
 		bootHdrData = binData + bytes([0xFF] * (bootHdrLen - binLen))
 		bootHdrArr = ", ".join(f"0x{byte:02X}" for byte in bootHdrData)
@@ -115,15 +115,15 @@ def Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr):
 
 // {binDstName}
 #if defined(ALX_BUILD_CONFIG_DEBUG)
-static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boot"), used)) = {{{bootHdrArr}}};
+static const unsigned char boot[{bootHdrFileLenHexStr}] __attribute__((section(".boot"), used)) = {{{bootHdrArr}}};
 #endif
 #if defined(ALX_BUILD_CONFIG_FW_UP)
-static const unsigned char boot[{bootHdrLenHexStr}] __attribute__((section(".boot"), used)) = {{{bootHdrArrFF}}};
+static const unsigned char boot[{bootHdrFileLenHexStr}] __attribute__((section(".boot"), used)) = {{{bootHdrArrFF}}};
 #endif
 
 
 #endif	// ALX_BOOT_GENERATED_H
-""".format(binDstName=binDstName, bootHdrLenHexStr=bootHdrLenHexStr, bootHdrArr=bootHdrArr, bootHdrArrFF=bootHdrArrFF)
+""".format(binDstName=binDstName, bootHdrFileLenHexStr=bootHdrFileLenHexStr, bootHdrArr=bootHdrArr, bootHdrArrFF=bootHdrArrFF)
 
 		# Write bootloader header file text
 		bootHdrSrcPath = binSrcDir / "alxBoot_GENERATED.h"
@@ -147,15 +147,15 @@ if __name__ == "__main__":
 	vsTargetPath = sys.argv[1]
 	fwName = sys.argv[2]
 	if len(sys.argv) > 3:
-		binRawSigned = sys.argv[3]
+		binRawAndBinSignedCopyEnable = sys.argv[3]
 	else:
-		binRawSigned = "False"
+		binRawAndBinSignedCopyEnable = "False"
 	if len(sys.argv) > 4:
-		bootHdr = sys.argv[4]
-		bootHdrLenHexStr = sys.argv[5]
+		bootHdrFileGenEnable = sys.argv[4]
+		bootHdrFileLenHexStr = sys.argv[5]
 	else:
-		bootHdr = "False"
-		bootHdrLenHexStr = "0x00000000"
+		bootHdrFileGenEnable = "False"
+		bootHdrFileLenHexStr = "0x00000000"
 
 	# Script
-	Script(vsTargetPath, fwName, binRawSigned, bootHdr, bootHdrLenHexStr)
+	Script(vsTargetPath, fwName, binRawAndBinSignedCopyEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr)

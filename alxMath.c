@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		alxWdt_McuStm32.h
-  * @brief		Auralix C Library - ALX Watchdog Timer MCU STM32 Module
+  * @file		alxMath.c
+  * @brief		Auralix C Library - ALX Mathematics Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -26,72 +26,66 @@
   **/
 
 //******************************************************************************
-// Include Guard
-//******************************************************************************
-#ifndef ALX_WDT_MCU_STM32_H
-#define ALX_WDT_MCU_STM32_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-//******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
+#include "alxMath.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
-
-
-//******************************************************************************
-// Types
-//******************************************************************************
-typedef enum
-{
-	AlxWdt_Config_McuStm32_WdtTimeout_512ms_WdtClk_8kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_1024ms_WdtClk_4kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_2048ms_WdtClk_2kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_4096ms_WdtClk_1kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_8192ms_WdtClk_500Hz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_16384ms_WdtClk_250Hz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_32768ms_WdtClk_125Hz_Lsi_32kHz
-} AlxWdt_Config;
-
-typedef struct
-{
-	// Parameters
-	AlxWdt_Config config;
-
-	// Variables
-	IWDG_HandleTypeDef hiwdg;
-
-	// Info
-	bool wasCtorCalled;
-	bool isInit;
-} AlxWdt;
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxWdt_Ctor
-(
-	AlxWdt* me,
-	AlxWdt_Config config
-);
+void AlxMath_Ctor(AlxMath* me)
+{
+	// Variables
+	me->data.count = 0;
+	me->data.sum = 0;
+	me->data.avg = 0;
+	me->data.min = 4294967295;
+	me->data.max = 0;
 
-
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
-
-#ifdef __cplusplus
+	// Info
+	me->wasCtorCalled = true;
 }
-#endif
 
-#endif	// #ifndef ALX_WDT_MCU_STM32_H
+
+//******************************************************************************
+// Functions
+//******************************************************************************
+AlxMath_Data AlxMath_Process(AlxMath* me, uint32_t in)
+{
+	// Assert
+	ALX_MATH_ASSERT(me->wasCtorCalled == true);
+
+	// Update count
+	me->data.count++;
+
+	// Update sum
+	me->data.sum = me->data.sum + in;
+
+	// Update average
+	me->data.avg = me->data.sum / me->data.count;
+
+	// Update min
+	if (in < me->data.min)
+	{
+		me->data.min = in;
+	}
+
+	// Update max
+	if (in > me->data.max)
+	{
+		me->data.max = in;
+	}
+
+	// Return
+	return me->data;
+}
+
+
+#endif	// #if defined(ALX_C_LIB)

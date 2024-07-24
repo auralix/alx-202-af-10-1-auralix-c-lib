@@ -148,6 +148,10 @@ typedef struct
 	uint32_t pclk1Apb1Tim_Ctor;
 	uint32_t pclk2Apb2Tim_Ctor;
 	uint32_t mainPllInputClk_Ctor;
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	uint32_t pllP_Ctor;
+	uint32_t pllQ_Ctor;
+	#endif
 
 	// Info
 	bool wasCtorCalled;

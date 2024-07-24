@@ -3,10 +3,11 @@
 
 
 #define ALX_BUILD_NAME "VisualGDB Local"
-#define ALX_BUILD_DATE 2207141259
+#define ALX_BUILD_DATE 2405291222
 #define ALX_BUILD_NUM 0
-#define ALX_BUILD_HASH "712a4b2f235b21a0c3ff37f680123844bf49a598"
-#define ALX_BUILD_HASH_SHORT "712a4b2"
+#define ALX_BUILD_HASH "abcdefabcdefabcdefabcdefabcdefabcdefabcd"
+#define ALX_BUILD_HASH_SHORT "abcdefa"
+#define ALX_BUILD_HASH_SHORT_UINT32 0x0ABCDEFA
 #define ALX_BUILD_REV 0
 #define ALX_BUILD_FW_VER_MAJOR 0
 #define ALX_BUILD_FW_VER_MINOR 0

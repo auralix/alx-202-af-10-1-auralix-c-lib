@@ -42,12 +42,15 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxSpi.h"
+#include "alxIoPin.h"
+#include "alxOsMutex.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
 
 
 //******************************************************************************
@@ -75,6 +78,11 @@ extern "C" {
 	#define ALX_NET_TRACE_FORMAT(...) do{} while (false)
 #endif
 
+//******************************************************************************
+// Defines
+//******************************************************************************
+#define ALX_NET_IP_ADDRESS_SIZE 45
+#define ALX_NET_MAC_SIZE 18
 
 //******************************************************************************
 // Types
@@ -90,20 +98,52 @@ typedef enum
 	#endif
 } AlxNet_Config;
 
+#if defined(ALX_FREE_RTOS_CELLULAR)
+typedef struct
+{
+	// Cellular context
+	CellularHandle_t handle;
+	CellularCommInterface_t * CommIntf; // UART interface
+	CellularSimCardStatus_t simStatus;
+	CellularServiceStatus_t serviceStatus;
+	cellularSignalQuality_t signalQuality;
+	uint8_t cellularContext;	// Cellular context id
+}AlxNet_Cellular;
+#endif
+
 typedef struct
 {
 	// Defines
 
 	// Parameters
 	AlxNet_Config config;
+	AlxSpi* alxSpi;
+	AlxIoPin* do_nRST;
+	AlxIoPin* di_nINT;
+	bool enable_dhcp;
 
+	#if defined(ALX_FREE_RTOS_CELLULAR)
+	AlxNet_Cellular cellular;
+	#endif
 	// Variables
+	AlxOsMutex alxMutex;
+	char mac[ALX_NET_MAC_SIZE]; // MAC in string format -> "00:18:10:3A:B8:39"
+	char ip[ALX_NET_IP_ADDRESS_SIZE]; // IP, Netmask, gateway, dns in string format -> "123.123.123.123"
+	char netmask[ALX_NET_IP_ADDRESS_SIZE];
+	char gateway[ALX_NET_IP_ADDRESS_SIZE];
+	char dns[4][ALX_NET_IP_ADDRESS_SIZE];
 
 	// Info
 	bool wasCtorCalled;
-	bool isInit;
+	bool isNetConnected;
 } AlxNet;
 
+typedef enum
+{
+	DnsTaskRunning,
+	DnsTaskTimeout,
+	DnsTaskSuccess
+} DnsTaskState;
 
 //******************************************************************************
 // Constructor
@@ -111,13 +151,18 @@ typedef struct
 void AlxNet_Ctor
 (
 	AlxNet* me,
-	AlxNet_Config config
+	AlxNet_Config config,
+	AlxSpi* alxSpi,
+	AlxIoPin* do_nRST,
+	AlxIoPin* di_nINT
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+Alx_Status AlxNet_Init(AlxNet* me);
+
 Alx_Status AlxNet_Connect(AlxNet* me);
 Alx_Status AlxNet_Disconnect(AlxNet* me);
 bool AlxNet_IsConnected(AlxNet* me);
@@ -133,9 +178,13 @@ void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip);
 Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip);
 void AlxNet_Dhcp_Enable(AlxNet* me, bool enable);
 bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me);
+AlxNet_Config Alx_GetNetInterface(AlxNet* me);
+#if defined(ALX_FREE_RTOS_CELLULAR)
+void Alx_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber);
+#endif
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
 
 #ifdef __cplusplus
 }

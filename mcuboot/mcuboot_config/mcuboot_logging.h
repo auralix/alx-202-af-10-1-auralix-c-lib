@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		alxWdt_McuStm32.h
-  * @brief		Auralix C Library - ALX Watchdog Timer MCU STM32 Module
+  * @file		mcuboot_logging.h
+  * @brief		Auralix C Library - ALX MCUboot Logging File
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_WDT_MCU_STM32_H
-#define ALX_WDT_MCU_STM32_H
+#ifndef __MCUBOOT_LOGGING_H__
+#define __MCUBOOT_LOGGING_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,51 +47,55 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
-// Types
+// Defines
 //******************************************************************************
-typedef enum
-{
-	AlxWdt_Config_McuStm32_WdtTimeout_512ms_WdtClk_8kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_1024ms_WdtClk_4kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_2048ms_WdtClk_2kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_4096ms_WdtClk_1kHz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_8192ms_WdtClk_500Hz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_16384ms_WdtClk_250Hz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_32768ms_WdtClk_125Hz_Lsi_32kHz
-} AlxWdt_Config;
-
-typedef struct
-{
-	// Parameters
-	AlxWdt_Config config;
-
-	// Variables
-	IWDG_HandleTypeDef hiwdg;
-
-	// Info
-	bool wasCtorCalled;
-	bool isInit;
-} AlxWdt;
+#define MCUBOOT_LOG_MODULE_DECLARE(domain)
+#define MCUBOOT_LOG_MODULE_REGISTER(domain)
+#define MCUBOOT_LOG_LEVEL_OFF		0
+#define MCUBOOT_LOG_LEVEL_ERROR		1
+#define MCUBOOT_LOG_LEVEL_WARNING	2
+#define MCUBOOT_LOG_LEVEL_INFO		3
+#define MCUBOOT_LOG_LEVEL_DEBUG		4
 
 
 //******************************************************************************
-// Constructor
+// Trace Macros
 //******************************************************************************
-void AlxWdt_Ctor
-(
-	AlxWdt* me,
-	AlxWdt_Config config
-);
+#if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_ERROR
+#define MCUBOOT_LOG_ERR(_fmt, ...) do { AlxTrace_WriteFormat(&alxTrace, "[ERR] " _fmt "\r\n", ##__VA_ARGS__); } while (false)
+#else
+#define MCUBOOT_LOG_ERR(...) IGNORE(__VA_ARGS__)
+#endif
+
+#if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_WARNING
+#define MCUBOOT_LOG_WRN(_fmt, ...) do { AlxTrace_WriteFormat(&alxTrace, "[WRN] " _fmt "\r\n", ##__VA_ARGS__); } while (false)
+#else
+#define MCUBOOT_LOG_WRN(...) IGNORE(__VA_ARGS__)
+#endif
+
+#if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_INFO
+#define MCUBOOT_LOG_INF(_fmt, ...) do { AlxTrace_WriteFormat(&alxTrace, "[INF] " _fmt "\r\n", ##__VA_ARGS__); } while (false)
+#else
+#define MCUBOOT_LOG_INF(...) IGNORE(__VA_ARGS__)
+#endif
+
+#if MCUBOOT_LOG_LEVEL >= MCUBOOT_LOG_LEVEL_DEBUG
+#define MCUBOOT_LOG_DBG(_fmt, ...) do { AlxTrace_WriteFormat(&alxTrace, "[DBG] " _fmt "\r\n", ##__VA_ARGS__); } while (false)
+#else
+#define MCUBOOT_LOG_DBG(...) IGNORE(__VA_ARGS__)
+#endif
+
+#define MCUBOOT_LOG_SIM(...) IGNORE(__VA_ARGS__)
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_WDT_MCU_STM32_H
+#endif	// #ifndef __MCUBOOT_LOGGING_H__

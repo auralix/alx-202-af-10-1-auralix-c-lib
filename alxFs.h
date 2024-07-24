@@ -42,6 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxIoPin.h"
 #include "alxMmc.h"
 #if defined(ALX_LFS)
 #include "lfs.h"
@@ -51,7 +52,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -72,7 +73,11 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_FS_TRACE_ENABLE)
+	#ifndef TV_TEST
 	#define ALX_FS_TRACE(...) ALX_TRACE_STD(ALX_FS_FILE, __VA_ARGS__)
+	#else
+	#define ALX_FS_TRACE(...) ALX_TRACE_STD(ALX_FS_FILE, __VA_ARGS__); if(me->config == AlxFs_Config_Lfs_Mmc) AlxAssert_Rst("file", 0, "fun")
+	#endif
 	#define ALX_FS_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_FS_TRACE(...) do{} while (false)
@@ -86,6 +91,9 @@ extern "C" {
 typedef enum
 {
 	AlxFs_Config_Undefined,
+	#if defined(ALX_FATFS)
+	AlxFs_Config_Fatfs_Mmc,
+	#endif
 	#if defined(ALX_LFS)
 	AlxFs_Config_Lfs_FlashInt,
 	AlxFs_Config_Lfs_Mmc
@@ -101,6 +109,9 @@ typedef enum
 
 typedef struct
 {
+	#if defined(ALX_FATFS)
+	FIL fatfsFile;
+	#endif
 	#if defined(ALX_LFS)
 	lfs_file_t lfsFile;
 	#endif
@@ -109,6 +120,9 @@ typedef struct
 
 typedef struct
 {
+	#if defined(ALX_FATFS)
+	DIR fatfsDir;
+	#endif
 	#if defined(ALX_LFS)
 	lfs_dir_t lfsDir;
 	#endif
@@ -117,6 +131,9 @@ typedef struct
 
 typedef struct
 {
+	#if defined(ALX_FATFS)
+	FILINFO fatfsInfo;
+	#endif
 	#if defined(ALX_LFS)
 	struct lfs_info lfsInfo;
 	#endif
@@ -127,17 +144,30 @@ typedef struct
 {
 	// Defines
 	#define ALX_FS_BUFF_LEN 256
+	#if defined(ALX_FATFS)
+	#define ALX_FS_FATFS_PATH "0:/"
+	#define ALX_FS_FATFS_MKFS_BUFF_LEN 512
+	#endif
 
 	// Parameters
 	AlxFs_Config config;
 	AlxMmc* alxMmc;
+	AlxIoPin* do_DBG_ReadBlock;
+	AlxIoPin* do_DBG_WriteBlock;
+	AlxIoPin* do_DBG_EraseBlock;
+	AlxIoPin* do_DBG_SyncBlock;
 
 	// Variables
+	#if defined(ALX_FATFS)
+	FATFS fatfs;
+	MKFS_PARM fatfsMkfsOpt;
+	uint8_t fatfsMkfsBuff[ALX_FS_FATFS_MKFS_BUFF_LEN];
+	#endif
 	#if defined(ALX_LFS)
 	lfs_t lfs;
 	struct lfs_config lfsConfig;
-	#endif
 	uint32_t lfsAddr;
+	#endif
 
 	// Info
 	bool wasCtorCalled;
@@ -152,7 +182,11 @@ void AlxFs_Ctor
 (
 	AlxFs* me,
 	AlxFs_Config config,
-	AlxMmc* alxMmc
+	AlxMmc* alxMmc,
+	AlxIoPin* do_DBG_ReadBlock,
+	AlxIoPin* do_DBG_WriteBlock,
+	AlxIoPin* do_DBG_EraseBlock,
+	AlxIoPin* do_DBG_SyncBlock
 );
 
 
@@ -185,7 +219,7 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info);
 Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace);
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
