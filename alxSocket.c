@@ -657,7 +657,7 @@ Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port)
 			}
 			if (connect(me->socket_data.wiz_socket, me->socket_data.dst_ip, me->socket_data.dst_port) != SOCK_OK)
 			{
-				return SOCK_ERROR;
+				return Alx_Err;
 			}
 			me->socket_data.wiz_sock_opened = true;
 		}
