@@ -53,12 +53,6 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
-{
-	AlxI2c_Clk_McuZephyr_100kHz = 100000,
-	AlxI2c_Clk_McuZephyr_400kHz = 400000
-} AlxI2c_Clk;
-
 typedef struct
 {
 	// Defines
@@ -66,7 +60,6 @@ typedef struct
 
 	// Parameters
 	const char* deviceName;
-	AlxI2c_Clk i2cClk;
 
 	// Variables
 	const struct device* device;
@@ -83,8 +76,7 @@ typedef struct
 void AlxI2c_Ctor
 (
 	AlxI2c* me,
-	const char* deviceName,
-	AlxI2c_Clk i2cClk
+	const char* deviceName
 );
 
 
