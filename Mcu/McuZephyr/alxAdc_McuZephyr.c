@@ -72,7 +72,7 @@ void AlxAdc_Ctor
 	me->gain = gain;
 
 	// Variables
-	me->device = device_get_binding(deviceName);
+	me->device = NULL;
 	for (uint32_t i = 0; i < numOfCh; i++)
 	{
 		me->ch[i].gain = gain;
@@ -105,9 +105,17 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 	ALX_ADC_ASSERT(me->isInit == false);
-	ALX_ADC_ASSERT(me->device != NULL);
+	ALX_ADC_ASSERT(me->device == NULL);
 
 	// Init
+	me->device = device_get_binding(me->deviceName);
+	if (me->device == NULL)
+	{
+		ALX_ADC_TRACE("Err: device_get_binding");
+		return Alx_Err;
+	}
+
+	// Init Channel
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
 		int32_t status = adc_channel_setup(me->device, &me->ch[i]);
@@ -136,6 +144,10 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 	ALX_ADC_ASSERT(me->isInit == true);
+	ALX_ADC_ASSERT(me->device != NULL);
+
+	// DeInit
+	me->device = NULL;
 
 	// Clear isInit
 	me->isInit = false;
@@ -201,7 +213,7 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	// Local variables
 	int32_t status = 0;
 	uint16_t vref_mV = 0;
-	uint16_t voltage_raw = 0;
+	int16_t voltage_raw = 0;	// TV: ADC can occasionaly return 0xFFFF (negative value), https://devzone.nordicsemi.com/f/nordic-q-a/19688/nrf52832-saadc-occasionally-returns-0xffff
 	int32_t voltage_mV = 0;
 	struct adc_sequence sequence = {};
 
@@ -220,13 +232,16 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	sequence.buffer_size = sizeof(voltage_raw);
 	sequence.resolution = ALX_ADC_RESOLUTION;
 	sequence.oversampling = 0;
-	sequence.calibrate = false;
+	sequence.calibrate = true;
 	status = adc_read(me->device, &sequence);
 	if (status != 0)
 	{
 		ALX_ADC_TRACE("Err: %d", status);
 		return 0;
 	}
+
+	// Bound
+	AlxBound_Int16(&voltage_raw, 0x0000, 0x7FFF);
 
 	// Prepare
 	voltage_mV = voltage_raw;
