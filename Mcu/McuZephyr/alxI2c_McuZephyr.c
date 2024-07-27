@@ -444,12 +444,11 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 	ALX_I2C_ASSERT(me->isInit == true);
 	(void)me;
 	(void)slaveAddr;
-	ALX_I2C_ASSERT(0 < numOfTries);
-	ALX_I2C_ASSERT(timeout_ms == 0);	// TV: Unsupported
+	(void)numOfTries;
+	(void)timeout_ms;
 
 	// Return
-	uint8_t data = 0;
-	return AlxI2c_Master_StartReadStop(me, slaveAddr, &data, 1, numOfTries, timeout_ms);
+	return Alx_Ok;	// TV: Unsupported, just return Alx_Ok
 }
 
 
