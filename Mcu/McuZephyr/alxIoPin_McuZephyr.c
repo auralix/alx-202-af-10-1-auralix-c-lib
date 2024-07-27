@@ -63,7 +63,7 @@ void AlxIoPin_Ctor
 	me->flags = flags;
 
 	// Variables
-	me->device = device_get_binding(deviceName);
+	me->device = NULL;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -84,9 +84,13 @@ void AlxIoPin_Init(AlxIoPin* me)
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 	ALX_IO_PIN_ASSERT(me->isInit == false);
-	ALX_IO_PIN_ASSERT(me->device != NULL);
+	ALX_IO_PIN_ASSERT(me->device == NULL);
 
 	// Init
+	me->device = device_get_binding(me->deviceName);
+	ALX_IO_PIN_ASSERT(me->device != NULL);
+
+	// Configure
 	int32_t status = gpio_pin_configure(me->device, me->pin, me->flags);
 	ALX_IO_PIN_ASSERT(status == 0);
 
@@ -103,10 +107,14 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 	ALX_IO_PIN_ASSERT(me->isInit == true);
+	ALX_IO_PIN_ASSERT(me->device != NULL);
 
-	// DeInit
+	// DeConfigure
 	int32_t status = gpio_pin_configure(me->device, me->pin, GPIO_DISCONNECTED);
 	ALX_IO_PIN_ASSERT(status == 0);
+
+	// DeInit
+	me->device = NULL;
 
 	// Clear isInit
 	me->isInit = false;
