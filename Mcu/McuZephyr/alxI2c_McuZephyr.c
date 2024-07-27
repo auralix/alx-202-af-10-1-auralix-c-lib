@@ -46,7 +46,6 @@
   * @brief
   * @param[in,out]	me
   * @param[in]		deviceName
-  * @param[in]		i2cClk
   */
 void AlxI2c_Ctor
 (
@@ -58,7 +57,7 @@ void AlxI2c_Ctor
 	me->deviceName = deviceName;
 
 	// Variables
-	me->device = device_get_binding(deviceName);
+	me->device = NULL;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -81,7 +80,15 @@ Alx_Status AlxI2c_Init(AlxI2c* me)
 	// Assert
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 	ALX_I2C_ASSERT(me->isInit == false);
-	ALX_I2C_ASSERT(me->device != NULL);
+	ALX_I2C_ASSERT(me->device == NULL);
+
+	// Init
+	me->device = device_get_binding(me->deviceName);
+	if (me->device == NULL)
+	{
+		ALX_I2C_TRACE("Err: device_get_binding");
+		return Alx_Err;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -101,6 +108,10 @@ Alx_Status AlxI2c_DeInit(AlxI2c* me)
 	// Assert
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 	ALX_I2C_ASSERT(me->isInit == true);
+	ALX_I2C_ASSERT(me->device != NULL);
+
+	// DeInit
+	me->device = NULL;
 
 	// Clear isInit
 	me->isInit = false;

@@ -52,7 +52,7 @@ void AlxTrace_Ctor
 )
 {
 	// Variables
-	me->device = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+	me->device = NULL;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -72,7 +72,8 @@ void AlxTrace_Ctor
   */
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
-	// Assert
+	// Init
+	me->device = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
 	if (me->device == NULL)
 	{
 		return Alx_Err;
@@ -93,6 +94,9 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
   */
 Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
+	// DeInit
+	me->device = NULL;
+
 	// Clear isInit
 	me->isInit = false;
 
