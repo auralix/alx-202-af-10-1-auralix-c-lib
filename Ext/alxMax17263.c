@@ -163,10 +163,6 @@ Alx_Status AlxMax17263_Init(AlxMax17263* me)
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_MAX17263_TRACE("Err"); return status; }
 
-	// Check for power on reset. If it happened, reconfigure the IC,
-	// otherwise handle (poll) ICs data.
-	AlxMax17263_Handle(me);
-
 	// Get ICs serial number
 	uint16_t sn[8] = { 0 };
 	status = maxim_max1726x_get_serial_number(me, sn);
@@ -214,11 +210,15 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me)
 
 		if(Alx_Ok != maxim_max1726x_wait_dnr(me)) return Alx_Err;
 		if(Alx_Ok != maxim_max1726x_initialize_ez_config(me)) return Alx_Err;
+		//if (Alx_Ok != maxim_max1726x_restore_learned_parameters(me, &me->data.learned_params)) return Alx_Err;
+		if (Alx_Ok != maxim_max1726x_config_led(me)) return Alx_Err;
 		if (Alx_Ok != maxim_max1726x_clear_por(me)) return Alx_Err;
+
 	}
 	else
 	{
 		me->data.reset_happened = false;
+		uint16_t old_cycles_bit2 = ((uint16_t)me->data.Cycles) & 0x4 ;
 
 		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPSOC_REG, &me->data.RepSOC)) return Alx_Err;
 		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPCAP_REG, &me->data.RepCAP)) return Alx_Err;
@@ -230,6 +230,15 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me)
 		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGTA_REG, &me->data.AvgTA)) return Alx_Err;
 		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGVCELL_REG, &me->data.AvgVCell)) return Alx_Err;
 
+		// Handle learned parameters every two calls of this function
+		// Or as per software implementation guide, every time bit 2 of Cycles register changes
+		static uint8_t count = 0;
+		count++;
+		if (count == 2 || ((uint16_t)me->data.Cycles & 0x4) != old_cycles_bit2)
+		{
+			count = 0;
+			if(Alx_Ok != maxim_max1726x_save_learned_parameters(me, &me->data.learned_params)) return Alx_Err;
+		}
 		// Goto step 3.2
 	}
 
@@ -359,6 +368,22 @@ Alx_Status maxim_max1726x_wait_dnr(AlxMax17263* me)
 }
 
 /* ************************************************************************* */
+Alx_Status maxim_max1726x_config_led(AlxMax17263* me)
+{
+	Alx_Status ret = Alx_Ok;
+
+	max1726x_regs[MAX1726X_LEDCFG1_REG] = 0x60B5;
+	max1726x_regs[MAX1726X_LEDCFG2_REG] = 0x7F8F;
+	max1726x_regs[MAX1726X_LEDCFG3_REG] = 0xC000;
+
+	if ((ret = maxim_max1726x_write_reg(me, MAX1726X_LEDCFG1_REG, &max1726x_regs[MAX1726X_LEDCFG1_REG])) != Alx_Ok) return ret;
+	if ((ret = maxim_max1726x_write_reg(me, MAX1726X_LEDCFG2_REG, &max1726x_regs[MAX1726X_LEDCFG2_REG])) != Alx_Ok) return ret;
+	if ((ret = maxim_max1726x_write_reg(me, MAX1726X_LEDCFG3_REG, &max1726x_regs[MAX1726X_LEDCFG3_REG])) != Alx_Ok) return ret;
+
+	return ret;
+}
+
+/* ************************************************************************* */
 Alx_Status maxim_max1726x_initialize_ez_config(AlxMax17263* me)
 {
 	Alx_Status ret = Alx_Ok;
@@ -366,10 +391,17 @@ Alx_Status maxim_max1726x_initialize_ez_config(AlxMax17263* me)
 
 	/// customer must provide the battery parameters accordingly
 	/// here the values are default for two serials of 18650 bat
-	max1726x_ez_config.designcap  = 0x2710; // 10000mAh
-	max1726x_ez_config.ichgterm   = 0x0780;
-	max1726x_ez_config.modelcfg   = 0x8400;
-	max1726x_ez_config.vempty     = 0xA561;
+
+	// Values are copied from config tool Dewesoft is using
+	max1726x_ez_config.designcap  = 0x2EE0; // 12000mAh
+	max1726x_ez_config.ichgterm   = 0x00A0;
+	max1726x_ez_config.modelcfg   = 0x0000;
+	max1726x_ez_config.vempty     = 0x9661;
+
+	//max1726x_ez_config.designcap  = 0x2710; //10Ah, 12Ah: 0x2EE0;
+	//max1726x_ez_config.ichgterm   = 0x00A0;
+	//max1726x_ez_config.modelcfg   = 0x8060;
+	//max1726x_ez_config.vempty     = 0x9661;
 	/// customer must provide the battery parameters accordingly
 
 
@@ -415,9 +447,9 @@ void maxim_max1726x_initialize_short_ini(AlxMax17263* me)
 	uint16_t tempdata;
 
 	/// customer must provide the battery parameters, get the parameters from MAXIM INI file
-	max1726x_short_ini.designcap  = 0x2710; // 10000mAh
-	max1726x_short_ini.ichgterm   = 0x0100;
-	max1726x_short_ini.modelcfg   = 0x8410;
+	max1726x_short_ini.designcap  = 0x2EE0; // 10000mAh
+	max1726x_short_ini.ichgterm   = 0x00A0;
+	max1726x_short_ini.modelcfg   = 0x0000;
 	max1726x_short_ini.learncfg   = 0x0000; // Optional
 	max1726x_short_ini.fullsocthr = 0x0000; // Optional
 	max1726x_short_ini.qrtable00  = 0x1050;
@@ -680,7 +712,10 @@ Alx_Status maxim_max1726x_get_data(AlxMax17263* me, uint8_t reg, float *value)
 	switch(reg)
 	{
 		case MAX1726X_REPCAP_REG:
-			temp *= (5.0f / RSENSE);
+			temp *= (0.000005f / RSENSE);
+			break;
+		case MAX1726X_FULLCAP_REG:
+			temp *= (0.000005f / RSENSE);
 			break;
 		case MAX1726X_REPSOC_REG:
 			temp /= 256.0f;
@@ -696,7 +731,7 @@ Alx_Status maxim_max1726x_get_data(AlxMax17263* me, uint8_t reg, float *value)
 		case MAX1726X_AVGCURRENT_REG:
 		{
 			int16_t twos = (int16_t)max1726x_regs[reg];
-			temp = (float)((float)twos / RSENSE);
+			temp = (float)(((float)twos / RSENSE) * 1.5625) / 1000000;
 			break;
 		}
 		case MAX1726X_AVGTA_REG:
@@ -707,7 +742,7 @@ Alx_Status maxim_max1726x_get_data(AlxMax17263* me, uint8_t reg, float *value)
 			break;
 
 		default:
-		break;
+			break;
 	}
 
 	*value = temp;
@@ -813,13 +848,15 @@ Alx_Status maxim_max1726x_get_avgcurr(AlxMax17263* me, float *value)
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_save_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp)
+Alx_Status maxim_max1726x_save_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp)
 {
-	maxim_max1726x_read_reg(me, MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_CYCLES_REG, &max1726x_regs[MAX1726X_CYCLES_REG]);
-	maxim_max1726x_read_reg(me, MAX1726X_FULLCAPNOM_REG, &max1726x_regs[MAX1726X_FULLCAPNOM_REG]);
+	Alx_Status ret;
+
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]) != Alx_Ok)) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]) != Alx_Ok)) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]) != Alx_Ok)) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_CYCLES_REG, &max1726x_regs[MAX1726X_CYCLES_REG]) != Alx_Ok)) return ret;
+	if((ret = maxim_max1726x_read_reg(me, MAX1726X_FULLCAPNOM_REG, &max1726x_regs[MAX1726X_FULLCAPNOM_REG]) != Alx_Ok)) return ret;
 
 
 	lp->saved_rcomp0 = max1726x_regs[MAX1726X_RCOMP0_REG];
@@ -827,11 +864,16 @@ void maxim_max1726x_save_learned_parameters(AlxMax17263* me, max1726x_learned_pa
 	lp->saved_fullcaprep = max1726x_regs[MAX1726X_FULLCAPREP_REG];
 	lp->saved_cycles = max1726x_regs[MAX1726X_CYCLES_REG];
 	lp->saved_fullcapnom = max1726x_regs[MAX1726X_FULLCAPNOM_REG];
+
+	return Alx_Ok;
 }
 
 /* ************************************************************************* */
-void maxim_max1726x_restore_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp)
+Alx_Status maxim_max1726x_restore_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp)
 {
+
+	Alx_Status ret;
+
 	max1726x_regs[MAX1726X_RCOMP0_REG] = lp->saved_rcomp0;
 	max1726x_regs[MAX1726X_TEMPCO_REG] = lp->saved_tempco;
 	max1726x_regs[MAX1726X_FULLCAPREP_REG] = lp->saved_fullcaprep;
@@ -841,13 +883,14 @@ void maxim_max1726x_restore_learned_parameters(AlxMax17263* me, max1726x_learned
 	max1726x_regs[MAX1726X_DQACC_REG] = (lp->saved_fullcapnom) / 2;
 
 
-	maxim_max1726x_write_and_verify_reg(me, MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]);
-	maxim_max1726x_write_and_verify_reg(me, MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]);
-	maxim_max1726x_write_and_verify_reg(me, MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]);
-	maxim_max1726x_write_and_verify_reg(me, MAX1726X_DPACC_REG, &max1726x_regs[MAX1726X_DPACC_REG]);
-	maxim_max1726x_write_and_verify_reg(me, MAX1726X_DQACC_REG, &max1726x_regs[MAX1726X_DQACC_REG]);
-	maxim_max1726x_write_and_verify_reg(me, MAX1726X_CYCLES_REG, &max1726x_regs[MAX1726X_CYCLES_REG]);
+	if ((ret = maxim_max1726x_write_and_verify_reg(me, MAX1726X_RCOMP0_REG, &max1726x_regs[MAX1726X_RCOMP0_REG]) != Alx_Ok)) return ret;
+	if ((ret = maxim_max1726x_write_and_verify_reg(me, MAX1726X_TEMPCO_REG, &max1726x_regs[MAX1726X_TEMPCO_REG]) != Alx_Ok)) return ret;
+	if ((ret = maxim_max1726x_write_and_verify_reg(me, MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]) != Alx_Ok)) return ret;;
+	if ((ret = maxim_max1726x_write_and_verify_reg(me, MAX1726X_DPACC_REG, &max1726x_regs[MAX1726X_DPACC_REG]) != Alx_Ok)) return ret;
+	if ((ret = maxim_max1726x_write_and_verify_reg(me, MAX1726X_DQACC_REG, &max1726x_regs[MAX1726X_DQACC_REG]) != Alx_Ok)) return ret;
+	if ((ret = maxim_max1726x_write_and_verify_reg(me, MAX1726X_CYCLES_REG, &max1726x_regs[MAX1726X_CYCLES_REG]) != Alx_Ok)) return ret;
 
+	return Alx_Ok;
 }
 
 /* ************************************************************************* */

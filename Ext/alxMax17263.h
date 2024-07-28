@@ -78,7 +78,7 @@ extern "C" {
 #endif
 
 
-#define RSENSE 5
+#define RSENSE 0.005
 
 /**** MAX1726X I2C ADDRESS ****/
 #define	MAX1726X_I2C_ADDR					0x6C
@@ -145,7 +145,7 @@ extern "C" {
 #define MAX1726X_DIETEMP_REG                0x34
 #define MAX1726X_FULLCAP_REG                0x35
 //                             reserved for 0x36
-//                             reserved for 0x37
+#define MAX1726X_LEDCFG3_REG				0x37
 #define MAX1726X_RCOMP0_REG                 0x38
 #define MAX1726X_TEMPCO_REG                 0x39
 #define MAX1726X_VEMPTY_REG                 0x3A
@@ -155,7 +155,7 @@ extern "C" {
 #define MAX1726X_TIMER_REG                  0x3E
 #define MAX1726X_SHDNTIMER_REG              0x3F
 
-//                             reserved for 0x40
+#define MAX1726X_LEDCFG1_REG				0x40
 //                             reserved for 0x41
 #define MAX1726X_QRTABLE30_REG              0x42
 #define MAX1726X_RGAIN_REG                  0x43
@@ -166,7 +166,7 @@ extern "C" {
 //                             reserved for 0x48
 #define MAX1726X_CONVGCFG_REG               0x49
 #define MAX1726X_VFREMCAP_REG               0x4A
-//                             reserved for 0x4B
+#define MAX1726X_LEDCFG2_REG				0x4B
 //                             reserved for 0x4C
 #define MAX1726X_QH_REG                     0x4D
 //                             reserved for 0x4E
@@ -327,8 +327,12 @@ typedef struct
 	float AvgVCell;
 	float AvgCurrent;
 	float AvgTA;
+	uint16_t saved_fullcapnom; //0x23
+	uint16_t saved_fullcaprep;
 
 	char serial[32 + 1];
+
+	max1726x_learned_parameters_t learned_params;
 }max1726_data_t;
 
 typedef struct
@@ -554,7 +558,7 @@ Alx_Status maxim_max1726x_get_avgta(AlxMax17263* me, float *value);
  * @param      max1726x learned parameters.
  * @retval     void.
  */
-	void maxim_max1726x_save_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp);
+	Alx_Status maxim_max1726x_save_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp);
 
 /****************************************************************************/
 /**
@@ -563,7 +567,7 @@ Alx_Status maxim_max1726x_get_avgta(AlxMax17263* me, float *value);
  * @param      max1726x learned parameters.
  * @retval     void.
  */
-	void maxim_max1726x_restore_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp);
+	Alx_Status maxim_max1726x_restore_learned_parameters(AlxMax17263* me, max1726x_learned_parameters_t *lp);
 
 /****************************************************************************/
 /**
@@ -610,6 +614,14 @@ Alx_Status maxim_max1726x_get_avgta(AlxMax17263* me, float *value);
  * @retval     Number of error word.
  */
 	uint8_t maxim_max1726x_verify_model_data_locked(AlxMax17263* me);
+
+/****************************************************************************/
+/**
+	* @brief      Configure LEDs
+	* @param      void.
+	* @retval     Number of error word.
+	*/
+Alx_Status maxim_max1726x_config_led(AlxMax17263* me);
 
 #endif	// #if defined(ALX_C_LIB)
 
