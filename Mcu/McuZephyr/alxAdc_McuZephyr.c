@@ -80,8 +80,10 @@ void AlxAdc_Ctor
 		me->ch[i].acquisition_time = ADC_ACQ_TIME_DEFAULT;
 		me->ch[i].channel_id = chArr[i];
 		me->ch[i].differential = 0;
+		#if defined(CONFIG_ADC_CONFIGURABLE_INPUTS)
 		me->ch[i].input_positive = chArr[i];
 		me->ch[i].input_negative = 0;
+		#endif
 	}
 
 	// Info
