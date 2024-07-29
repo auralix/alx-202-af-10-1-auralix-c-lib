@@ -132,7 +132,7 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t unused_0_7 : 8;  // bits 0..7 are unused
+		uint8_t unused_0_7 : 8;
 		AlxTmp1075_R1_ShutdownModeEnable SD : 1;
 		AlxTmp1075_R1_AlertPinModeSelect TM : 1;
 		AlxTmp1075_R1_AlertPinPolaritySelect POL : 1;
@@ -215,11 +215,6 @@ typedef struct
 
 
 //******************************************************************************
-// Register Group Structures
-//******************************************************************************
-
-
-//******************************************************************************
 // Main Register Structure
 //******************************************************************************
 typedef struct
@@ -237,11 +232,11 @@ typedef struct
 //******************************************************************************
 typedef struct
 {
-	// Objects - External
-	AlxI2c* i2c;
+	// Defines
+	#define ALX_TMP1075_DEG_C_PER_BIT 0.0625
 
 	// Parameters
-	float DEG_C_PER_BIT;
+	AlxI2c* i2c;
 	uint8_t i2cAddr;
 	bool i2cCheckWithRead;
 	uint8_t i2cNumOfTries;

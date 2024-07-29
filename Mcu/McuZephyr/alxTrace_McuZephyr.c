@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxOsDelay.c
-  * @brief		Auralix C Library - ALX OS Delay Module
+  * @file		alxTrace_McuZephyr.c
+  * @brief		Auralix C Library - ALX Trace MCU Zephyr Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,19 +28,14 @@
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxOsDelay.h"
+#include "alxTrace_McuZephyr.h"
+#include "alxTrace.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
-
-
-//******************************************************************************
-// Variables
-//******************************************************************************
-AlxOsDelay alxOsDelay = {0};
+#if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 
 //******************************************************************************
@@ -50,22 +45,18 @@ AlxOsDelay alxOsDelay = {0};
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		osTick
-  * @param[in]		approxDisable
   */
-void AlxOsDelay_Ctor
+void AlxTrace_Ctor
 (
-	AlxOsDelay* me,
-	AlxClk_Tick osTick,
-	bool approxDisable
+	AlxTrace* me
 )
 {
-	// Parameters
-	me->osTick = osTick;
-	me->approxDisable = approxDisable;
+	// Variables
+	me->device = NULL;
 
 	// Info
 	me->wasCtorCalled = true;
+	me->isInit = false;
 }
 
 
@@ -76,71 +67,61 @@ void AlxOsDelay_Ctor
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		osDelay_us
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
-void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us)
+Alx_Status AlxTrace_Init(AlxTrace* me)
 {
-	// Assert
-	ALX_OS_DELAY_ASSERT(me->wasCtorCalled == true);
-
-	// Check if approximation is disabled
-	if (me->approxDisable)
+	// Init
+	me->device = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+	if (me->device == NULL)
 	{
-		ALX_OS_DELAY_ASSERT(osDelay_us >= (2 * (uint64_t)me->osTick));
-		ALX_OS_DELAY_ASSERT((osDelay_us % (uint64_t)me->osTick) == 0);
+		return Alx_Err;
 	}
 
-	// Convert to osTick
-	uint64_t osDelay_osTick = osDelay_us / (uint64_t)me->osTick;
+	// Set isInit
+	me->isInit = true;
 
-	// Delay
-	#if defined(ALX_FREE_RTOS)
-	vTaskDelay(osDelay_osTick);
-	#endif
-	#if defined(ALX_ZEPHYR)
-	k_sleep(K_USEC(osDelay_us));
-	#endif
+	// Return
+	return Alx_Ok;
 }
 
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		osDelay_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
-void AlxOsDelay_ms(AlxOsDelay* me, uint64_t osDelay_ms)
+Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
-	AlxOsDelay_us(me, osDelay_ms * 1000);
+	// DeInit
+	me->device = NULL;
+
+	// Clear isInit
+	me->isInit = false;
+
+	// Return
+	return Alx_Ok;
 }
 
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		osDelay_sec
+  * @param[in]		str
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
-void AlxOsDelay_sec(AlxOsDelay* me, uint64_t osDelay_sec)
+Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
-	AlxOsDelay_us(me, osDelay_sec * 1000000);
-}
+	// Write
+	while (*str)
+	{
+		uart_poll_out(me->device, *str++);
+	}
 
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_min
-  */
-void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min)
-{
-	AlxOsDelay_us(me, osDelay_min * 60000000);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_hr
-  */
-void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr)
-{
-	AlxOsDelay_us(me, osDelay_hr * 3600000000);
+	// Return
+	return Alx_Ok;
 }
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
