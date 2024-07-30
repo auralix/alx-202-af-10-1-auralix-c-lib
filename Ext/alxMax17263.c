@@ -202,7 +202,7 @@ Alx_Status AlxMax17263_DeInit(AlxMax17263* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxMax17263_Handle(AlxMax17263* me)
+Alx_Status AlxMax17263_Handle(AlxMax17263* me, max1726_data_t *data)
 {
 	if (1 == maxim_max1726x_check_por(me))
 	{
@@ -220,15 +220,19 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me)
 		me->data.reset_happened = false;
 		uint16_t old_cycles_bit2 = ((uint16_t)me->data.Cycles) & 0x4 ;
 
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPSOC_REG, &me->data.RepSOC)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPCAP_REG, &me->data.RepCAP)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TTE_REG, &me->data.TTE)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TTF_REG, &me->data.TTF)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_FULLCAP_REG, &me->data.FulLCAP)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_CYCLES_REG, &me->data.Cycles)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGCURRENT_REG, &me->data.AvgCurrent)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGTA_REG, &me->data.AvgTA)) return Alx_Err;
-		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGVCELL_REG, &me->data.AvgVCell)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPSOC_REG, &data->RepSOC)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPCAP_REG, &data->RepCAP)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TTE_REG, &data->TTE)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TTF_REG, &data->TTF)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_FULLCAP_REG, &data->FulLCAP)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_CYCLES_REG, &data->Cycles)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGCURRENT_REG, &data->AvgCurrent)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGTA_REG, &data->AvgTA)) return Alx_Err;
+		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_AVGVCELL_REG, &data->AvgVCell)) return Alx_Err;
+		if (Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_FULLCAPNOM_REG, &data->FullCapNom)) return Alx_Err;
+		if (Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_FULLCAPREP_REG, &data->FullCapRep)) return Alx_Err;
+		if (Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_RCOMP0_REG, &data->RComp0)) return Alx_Err;
+		if (Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TEMPCO_REG, &data->TempC0)) return Alx_Err;
 
 		// Handle learned parameters every two calls of this function
 		// Or as per software implementation guide, every time bit 2 of Cycles register changes
@@ -741,6 +745,18 @@ Alx_Status maxim_max1726x_get_data(AlxMax17263* me, uint8_t reg, float *value)
 			temp *= 0.000078125f;
 			break;
 
+		case MAX1726X_TEMPCO_REG:
+			temp /= 256.0f;
+			break;
+		case MAX1726X_RCOMP0_REG:
+			temp *= (1.0f / 4096.0f);
+			break;
+		case MAX1726X_FULLCAPREP_REG:
+			temp *= (0.000005f / RSENSE);
+			break;
+		case MAX1726X_FULLCAPNOM_REG:
+			temp *= (0.000005f / RSENSE);
+			break;
 		default:
 			break;
 	}

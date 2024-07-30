@@ -318,21 +318,23 @@ typedef struct
 	float RepSOC;
 	float RepCAP;
 	float FulLCAP;
+	float FullCapNom;
+	float FullCapRep;
 	float TTE;
 	float TTF;
 	float Cycles;
+	float RComp0;
+	float TempC0;
 	/****************/
 	//Other register data
 	/****************/
 	float AvgVCell;
 	float AvgCurrent;
 	float AvgTA;
-	uint16_t saved_fullcapnom; //0x23
-	uint16_t saved_fullcaprep;
 
 	char serial[32 + 1];
 
-	max1726x_learned_parameters_t learned_params;
+	max1726x_learned_parameters_t learned_params; // Currently not used (parameters handled above)
 }max1726_data_t;
 
 typedef struct
@@ -365,7 +367,7 @@ void AlxMax17263_Ctor
 
 Alx_Status AlxMax17263_Init(AlxMax17263* me);
 Alx_Status AlxMax17263_DeInit(AlxMax17263* me);
-Alx_Status AlxMax17263_Handle(AlxMax17263* me);
+Alx_Status AlxMax17263_Handle(AlxMax17263* me, max1726_data_t *data);
 
 
 /**** Function Prototypes ****/
