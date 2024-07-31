@@ -84,7 +84,7 @@ void AlxBq25890_Ctor
 	// Parameters
 	me->i2c = i2c;
 	me->i2cAddr = 0xD4; //0x6A;
-	me->i2cCheckWithRead = false;
+	me->i2cCheckWithRead = true;
 	me->i2cNumOfTries = 3;
 	me->i2cTimeout_ms = 500;
 
@@ -227,12 +227,12 @@ Alx_Status AlxBq25890_DeInit(AlxBq25890* me)
 }
 
 /**
-  * @brief Poll function
+  * @brief Poll (read) all registers
   * @param[in,out]	me
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxBq25890_Handle(AlxBq25890* me)
+Alx_Status AlxBq25890_Poll(AlxBq25890* me)
 {
 	// Assert
 	ALX_BQ25890_ASSERT(me->wasCtorCalled == true);
@@ -247,6 +247,68 @@ Alx_Status AlxBq25890_Handle(AlxBq25890* me)
 	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
 	status = AlxBq25890_Reg_Read(me, &me->reg.REG_09);
 	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
+	status = AlxBq25890_Reg_Read(me, &me->reg.REG_0B);
+	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
+	status = AlxBq25890_Reg_Read(me, &me->reg.REG_0C);
+	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
+
+	return Alx_Ok;
+}
+
+/**
+  * @brief Read registers (make sure to poll the driver first)
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxBq25890_Read(AlxBq25890* me, AlxBq25890_Reg *reg)
+{
+	// Assert
+	ALX_BQ25890_ASSERT(me->wasCtorCalled == true);
+	ALX_BQ25890_ASSERT(me->isInitPeriph == true);
+	ALX_BQ25890_ASSERT(me->isInit == true);
+
+	memcpy(reg, &me->reg, sizeof(AlxBq25890_Reg));
+
+	return Alx_Ok;
+}
+
+/**
+  * @brief Parse faults (make sure to poll the driver first)
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxBq25890_GetFaults(AlxBq25890* me, AlxBq2890_faults_t *faults)
+{
+	// Assert
+	ALX_BQ25890_ASSERT(me->wasCtorCalled == true);
+	ALX_BQ25890_ASSERT(me->isInitPeriph == true);
+	ALX_BQ25890_ASSERT(me->isInit == true);
+
+	// Local variables
+
+	faults->BAT_FAULT = me->reg.REG_0C.val.BAT_FAULT;
+	faults->CHRG_FAULT = me->reg.REG_0C.val.CHGR_FAULT;
+	faults->NTC_FAULT = me->reg.REG_0C.val.NTC_FAULT;
+
+	return Alx_Ok;
+}
+
+/**
+  * @brief Parse charging status (make sure to poll the driver first)
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxBq25890_GetChargingStatus(AlxBq25890* me, uint8_t *status)
+{
+	// Assert
+	ALX_BQ25890_ASSERT(me->wasCtorCalled == true);
+	ALX_BQ25890_ASSERT(me->isInitPeriph == true);
+	ALX_BQ25890_ASSERT(me->isInit == true);
+
+	*status = me->reg.REG_0B.val.CHRG_STAT;
 
 	return Alx_Ok;
 }
@@ -270,11 +332,6 @@ Alx_Status AlxBq25890_Reg_Read(AlxBq25890* me, void* reg)
 	uint8_t regAddr = *((uint8_t*)reg);
 	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
-	//uint8_t data[2] = { 0 };
-	//data[0] = regAddr;
-	// Read
-	//status = AlxI2c_Master_StartReadStop(me->i2c, me->i2cAddr, data, 1, me->i2cNumOfTries, me->i2cTimeout_ms);
-	//memcpy(regValPtr, &data[0], 1);
 
 	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
@@ -311,6 +368,88 @@ Alx_Status AlxBq25890_Reg_Write(AlxBq25890* me, void* reg)
 	return Alx_Ok;
 }
 
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		value
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxBq25890_set_IINLIM(AlxBq25890* me, uint8_t value)
+{
+	// Assert
+	ALX_BQ25890_ASSERT(me->wasCtorCalled == true);
+	ALX_BQ25890_ASSERT(me->isInitPeriph == true);
+	// isInit -> Don't care
+
+	Alx_Status ret;
+	ret = AlxBq25890_Reg_Read(me, &me->reg.REG_00);
+	if (ret != Alx_Ok) return ret;
+
+	value = value & 0x3F; // bound the incoming value to 6 bits
+
+	me->reg.REG_00.val.IINLIM = value;
+
+	ret = AlxBq25890_Reg_Write(me, &me->reg.REG_00);
+	if (ret != Alx_Ok) return ret;
+
+	return ret;
+
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		value
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxBq25890_set_JEITA_VSET(AlxBq25890* me, bool value)
+{
+	// Assert
+	ALX_BQ25890_ASSERT(me->wasCtorCalled == true);
+	ALX_BQ25890_ASSERT(me->isInitPeriph == true);
+	// isInit -> Don't care
+
+	Alx_Status ret;
+	ret = AlxBq25890_Reg_Read(me, &me->reg.REG_09);
+	if (ret != Alx_Ok) return ret;
+
+	me->reg.REG_09.val.JEITA_VSET = value;
+
+	ret = AlxBq25890_Reg_Write(me, &me->reg.REG_09);
+	if (ret != Alx_Ok) return ret;
+
+	return ret;
+
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		value
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxBq25890_set_shipping_mode(AlxBq25890* me)
+{
+	// Assert
+	ALX_BQ25890_ASSERT(me->wasCtorCalled == true);
+	ALX_BQ25890_ASSERT(me->isInitPeriph == true);
+	// isInit -> Don't care
+
+	Alx_Status ret;
+	ret = AlxBq25890_Reg_Read(me, &me->reg.REG_09);
+	if (ret != Alx_Ok) return ret;
+
+	me->reg.REG_09.val.BATFET_DIS = 1;
+
+	ret = AlxBq25890_Reg_Write(me, &me->reg.REG_09);
+	if (ret != Alx_Ok) return ret;
+
+	return ret;
+
+}
 
 //******************************************************************************
 // Private Functions
@@ -319,11 +458,16 @@ static void AlxBq25890_RegStruct_SetAddr(AlxBq25890* me)
 {
 	me->reg.REG_00.addr = 0x00;
 	me->reg.REG_09.addr = 0x09;
+	me->reg.REG_0B.addr = 0x0B;
+	me->reg.REG_0C.addr = 0x0C;
+
 }
 static void AlxBq25890_RegStruct_SetLen(AlxBq25890* me)
 {
 	me->reg.REG_00.len = sizeof(me->reg.REG_00.val);
 	me->reg.REG_09.len = sizeof(me->reg.REG_09.val);
+	me->reg.REG_0B.len = sizeof(me->reg.REG_0B.val);
+	me->reg.REG_0C.len = sizeof(me->reg.REG_0C.val);
 }
 
 static Alx_Status AlxBq25890_RegStruct_SetValToDefault(AlxBq25890* me)
@@ -333,7 +477,10 @@ static Alx_Status AlxBq25890_RegStruct_SetValToDefault(AlxBq25890* me)
 	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
 	status = AlxBq25890_Reg_Read(me, &me->reg.REG_09);
 	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
-
+	status = AlxBq25890_Reg_Read(me, &me->reg.REG_0B);
+	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
+	status = AlxBq25890_Reg_Read(me, &me->reg.REG_0C);
+	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
 	return Alx_Ok;
 }
 
@@ -347,6 +494,14 @@ static Alx_Status AlxBq25890_RegStruct_Write(AlxBq25890* me)
 
 	status = AlxBq25890_Reg_Write(me, &me->reg.REG_09);
 	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
+
+	status = AlxBq25890_Reg_Write(me, &me->reg.REG_0B);
+	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
+
+	status = AlxBq25890_Reg_Write(me, &me->reg.REG_0C);
+	if (status != Alx_Ok) { ALX_BQ25890_TRACE("Err"); return status; }
+
+	return Alx_Ok;
 }
 
 

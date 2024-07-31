@@ -76,13 +76,28 @@ extern "C" {
 	#define ALX_BQ25890_TRACE(...) do{} while (false)
 #endif
 
-
 //******************************************************************************
+// Faults
+//******************************************************************************
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t NTC_FAULT	: 3;
+		uint8_t CHRG_FAULT	: 2;
+		bool BAT_FAULT		: 1;
+		uint8_t unused		: 3;
+	};
+	uint8_t raw;
+
+}AlxBq2890_faults_t;
+
+	//******************************************************************************
 // Register Values Unions
 //******************************************************************************
 
 //------------------------------------------------------------------------------
-// Device registers (currently only REG00 and REG09 supported)
+// Device registers
 //------------------------------------------------------------------------------
 typedef union
 {
@@ -111,6 +126,32 @@ typedef union
 	uint8_t raw;
 } AlxBq25890_Reg_09_bits;
 
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		bool VSYS_STAT			: 1;
+		bool RESERVED			: 1;
+		bool PG_STAT			: 1;
+		uint8_t CHRG_STAT		: 2;
+		uint8_t VBUS_STAT		: 3;
+	};
+	uint8_t raw;
+} AlxBq25890_Reg_0B_bits;
+
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t NTC_FAULT		: 3;
+		bool BAT_FAULT			: 1;
+		uint8_t CHGR_FAULT		: 2;
+		bool BOOST_FAULT		: 1;
+		bool WATCHDOG_FAULT		: 1;
+	};
+	uint8_t raw;
+} AlxBq25890_Reg_0C_bits;
+
 //******************************************************************************
 // Register Structures
 //******************************************************************************
@@ -120,6 +161,7 @@ typedef struct
 	uint8_t len;
 	AlxBq25890_Reg_00_bits val;
 } AlxBq25890_Reg_00;
+
 typedef struct
 {
 	uint8_t addr;
@@ -127,6 +169,19 @@ typedef struct
 	AlxBq25890_Reg_09_bits val;
 } AlxBq25890_Reg_09;
 
+typedef struct
+{
+	uint8_t addr;
+	uint8_t len;
+	AlxBq25890_Reg_0B_bits val;
+} AlxBq25890_Reg_0B;
+
+typedef struct
+{
+	uint8_t addr;
+	uint8_t len;
+	AlxBq25890_Reg_0C_bits val;
+} AlxBq25890_Reg_0C;
 //******************************************************************************
 // Main Register Structure
 //******************************************************************************
@@ -134,6 +189,8 @@ typedef struct
 {
 	AlxBq25890_Reg_00 REG_00;
 	AlxBq25890_Reg_09 REG_09;
+	AlxBq25890_Reg_0B REG_0B;
+	AlxBq25890_Reg_0C REG_0C;
 } AlxBq25890_Reg;
 
 
@@ -184,8 +241,15 @@ Alx_Status AlxBq25890_InitPeriph(AlxBq25890* me);
 Alx_Status AlxBq25890_DeInitPeriph(AlxBq25890* me);
 Alx_Status AlxBq25890_Init(AlxBq25890* me);
 Alx_Status AlxBq25890_DeInit(AlxBq25890* me);
-Alx_Status AlxBq25890_Handle(AlxBq25890* me);
+Alx_Status AlxBq25890_Poll(AlxBq25890* me);
+Alx_Status AlxBq25890_Read(AlxBq25890* me, AlxBq25890_Reg *reg);
+Alx_Status AlxBq25890_GetFaults(AlxBq25890* me, AlxBq2890_faults_t *faults);
+Alx_Status AlxBq25890_GetChargingStatus(AlxBq25890* me, uint8_t *status);
 Alx_Status AlxBq25890_irqHandle(AlxBq25890* me);
+Alx_Status AlxBq25890_set_IINLIM(AlxBq25890* me, uint8_t value);
+Alx_Status AlxBq25890_set_JEITA_VSET(AlxBq25890* me, bool value);
+Alx_Status AlxBq25890_set_shipping_mode(AlxBq25890* me);
+
 
 bool AlxBq25890_IoPin_Read(AlxBq25890* me, uint8_t port, uint8_t pin);
 uint8_t AlxBq25890_Read_Port_Raw(AlxBq25890* me, uint8_t port);
