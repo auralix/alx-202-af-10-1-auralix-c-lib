@@ -621,11 +621,11 @@ ALX_WEAK Alx_Status AlxPca9539a_RegStruct_Write(AlxPca9539a* me)
 	//status = AlxPca9539a_Reg_Write(me, &me->reg._01h_InputPort_1);		// MF: Read Only Reg
 	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
 
-	status = AlxPca9539a_Reg_Write(me, &me->reg._02h_OutputPort_0);		// TV: We will handle OutputPort config outside of Init
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	//status = AlxPca9539a_Reg_Write(me, &me->reg._02h_OutputPort_0);		// TV: We will handle OutputPort config outside of Init
+	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
 
-	status = AlxPca9539a_Reg_Write(me, &me->reg._03h_OutputPort_1);		// TV: We will handle OutputPort config outside of Init
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	//status = AlxPca9539a_Reg_Write(me, &me->reg._03h_OutputPort_1);		// TV: We will handle OutputPort config outside of Init
+	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._04h_PolarityInversion_0);
 	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
