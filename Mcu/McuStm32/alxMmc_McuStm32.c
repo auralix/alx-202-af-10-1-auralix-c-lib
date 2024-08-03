@@ -540,6 +540,10 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	HAL_StatusTypeDef statusHal = HAL_ERROR;
 	Alx_Status statusAlx = Alx_Err;
 
+	// Trace
+	ALX_MMC_TRACE_FORMAT("\r\n");
+	ALX_MMC_TRACE_FORMAT("AlxMmc - Init started\r\n");
+
 	// Init GPIO
 	AlxIoPin_Init(me->do_nRST);
 	AlxIoPin_Init(me->do_CLK);
@@ -621,6 +625,11 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 		ALX_MMC_TRACE("Err: %d", statusHal);
 		return Alx_Err;
 	}
+
+	// Trace
+	float size_B = (float)me->info.BlockNbr * (float)me->info.BlockSize;
+	float size_GB = size_B / 1000000000.f;
+	ALX_MMC_TRACE_FORMAT("AlxMmc - size_GB=%.2f\r\n", size_GB);
 
 	// Set isInit
 	me->isInit = true;

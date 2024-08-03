@@ -1257,7 +1257,10 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 		}
 
 		// Trace
-		ALX_LOGGER_TRACE_FORMAT("[%lu] %s", me->md.write.line, log);
+		if (me->md.write.line % 1000 == 0)
+		{
+			ALX_LOGGER_TRACE_FORMAT("[%lu] %s", me->md.write.line, log);
+		}
 
 		// Increment addr
 		me->md.write.id++;
