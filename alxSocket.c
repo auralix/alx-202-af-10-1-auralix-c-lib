@@ -417,6 +417,61 @@ static Alx_Status sslHandshake(AlxSocket *me)
 	ALX_SOCKET_TRACE_FORMAT("TLS handshake successful\r\n");
 	return Alx_Ok;
 }
+static int check_domain(const char *hostname, size_t hostname_len, const char *domain)
+{
+	size_t domain_len = strlen(domain);
+	if (domain_len == 0)
+	{
+		// no check
+		return 0;
+	}
+
+	if (hostname_len <= domain_len)
+	{
+		return -1;
+	}
+
+	// find first dot
+	char *host_domain = strchr(hostname, '.');
+	if (!host_domain)
+	{
+		return -1;
+	}
+
+	if (hostname_len - (host_domain - hostname) != domain_len + 1)
+	{
+		return -1;
+	}
+
+	return strncasecmp(host_domain + 1, domain, domain_len);
+}
+static int sslVerifyDomain(void *p_vrfy, mbedtls_x509_crt *crt, int i, uint32_t *flags)
+{
+	AlxSocket *me = (AlxSocket *)p_vrfy;
+	if (i == 0) // last certificate in chain (server's certificate)
+	{
+		bool match = false;
+		mbedtls_x509_sequence *seq = &crt->subject_alt_names;
+		while (seq != NULL)
+		{
+			if (seq->buf.len)
+			{
+				// seq->buf.p[seq->buf.len] = 0;
+				// if (check_wildcard((const char *)seq->buf.p, (const char *)p_vrfy) == 0)
+				if (check_domain((const char *)seq->buf.p, seq->buf.len, me->tls_data.domain) == 0)
+				{
+					match = true;
+				}
+			}
+			seq = seq->next;
+		}
+		if (!match)
+		{
+			*flags |= MBEDTLS_X509_BADCERT_CN_MISMATCH;
+		}
+	}
+	return 0;
+}
 #endif // if defined(MBED_TLS)
 
 //******************************************************************************
@@ -1040,7 +1095,7 @@ void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms)
 }
 
 #if defined(ALX_MBEDTLS)
-Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_cn, const unsigned char *ca_cert, const unsigned char *cl_cert, const unsigned char *cl_key)
+Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const unsigned char *ca_cert, const unsigned char *cl_cert, const unsigned char *cl_key)
 {
 	mbedtls_x509_crt_init(&me->tls_data.x509_ca_certificate);
 	me->tls_data.init_state = SSL_INITIALIZED_CACERT;
@@ -1111,13 +1166,15 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_cn, const unsigne
 	}
 
 	mbedtls_ssl_set_bio(&me->tls_data.ssl_context, me, sslSend, sslRecv, NULL);
+	strcpy(me->tls_data.domain, server_domain);
+	mbedtls_ssl_set_verify(&me->tls_data.ssl_context, sslVerifyDomain, (void *)me);
 
-	if (mbedtls_ssl_set_hostname(&me->tls_data.ssl_context, server_cn) != 0)
-	{
-		ALX_SOCKET_TRACE_FORMAT("Failed to set hostname\n");
-		sslFree(&me->tls_data);
-		return Alx_Err;
-	}
+//	if (mbedtls_ssl_set_hostname(&me->tls_data.ssl_context, server_cn) != 0)
+//	{
+//		ALX_SOCKET_TRACE_FORMAT("Failed to set hostname\n");
+//		sslFree(&me->tls_data);
+//		return Alx_Err;
+//	}
 
 	return Alx_Ok;
 }
