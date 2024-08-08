@@ -218,7 +218,7 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me, max1726_data_t *data)
 	else
 	{
 		me->data.reset_happened = false;
-		uint16_t old_cycles_bit2 = ((uint16_t)me->data.Cycles) & 0x4 ;
+		//uint16_t old_cycles_bit2 = ((uint16_t)me->data.Cycles) & 0x4 ;
 
 		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPSOC_REG, &data->RepSOC)) return Alx_Err;
 		if(Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_REPCAP_REG, &data->RepCAP)) return Alx_Err;
@@ -234,15 +234,17 @@ Alx_Status AlxMax17263_Handle(AlxMax17263* me, max1726_data_t *data)
 		if (Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_RCOMP0_REG, &data->RComp0)) return Alx_Err;
 		if (Alx_Ok != maxim_max1726x_get_data(me, MAX1726X_TEMPCO_REG, &data->TempC0)) return Alx_Err;
 
+		/* Not used because if battery is taken out, nemo reboots and loses learned parameters */
+
 		// Handle learned parameters every two calls of this function
 		// Or as per software implementation guide, every time bit 2 of Cycles register changes
-		static uint8_t count = 0;
-		count++;
-		if (count == 2 || ((uint16_t)me->data.Cycles & 0x4) != old_cycles_bit2)
-		{
-			count = 0;
-			if(Alx_Ok != maxim_max1726x_save_learned_parameters(me, &me->data.learned_params)) return Alx_Err;
-		}
+		//static uint8_t count = 0;
+		//count++;
+		//if (count == 2 || ((uint16_t)me->data.Cycles & 0x4) != old_cycles_bit2)
+		//{
+		//	count = 0;
+		//	if(Alx_Ok != maxim_max1726x_save_learned_parameters(me, &me->data.learned_params)) return Alx_Err;
+		//}
 		// Goto step 3.2
 	}
 
@@ -399,15 +401,8 @@ Alx_Status maxim_max1726x_initialize_ez_config(AlxMax17263* me)
 	// Values are copied from config tool Dewesoft is using
 	max1726x_ez_config.designcap  = 0x2EE0; // 12000mAh
 	max1726x_ez_config.ichgterm   = 0x00A0;
-	max1726x_ez_config.modelcfg   = 0x0000;
+	max1726x_ez_config.modelcfg   = 0x8000;
 	max1726x_ez_config.vempty     = 0x9661;
-
-	//max1726x_ez_config.designcap  = 0x2710; //10Ah, 12Ah: 0x2EE0;
-	//max1726x_ez_config.ichgterm   = 0x00A0;
-	//max1726x_ez_config.modelcfg   = 0x8060;
-	//max1726x_ez_config.vempty     = 0x9661;
-	/// customer must provide the battery parameters accordingly
-
 
 	/// Store original HibCFG value
 	if((ret = maxim_max1726x_read_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG])) != Alx_Ok) return ret;
