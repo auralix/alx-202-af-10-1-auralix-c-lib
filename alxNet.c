@@ -85,7 +85,7 @@ static wiz_NetInfo wiz_net_info =
 	.dns = { 8, 8, 8, 8 },
 	.dhcp = NETINFO_DHCP // DHCP enable/disable
 };
-static uint8_t wiz_buffer[WIZ_BUFFER_SIZE];
+static uint8_t wiz_buffer[WIZ_BUFFER_SIZE] __ALIGNED(4);
 static uint64_t dhcp_ip_leased_until = 0;
 static AlxOsMutex alxDhcpMutex;
 static bool dhcp_isRunning = false;
