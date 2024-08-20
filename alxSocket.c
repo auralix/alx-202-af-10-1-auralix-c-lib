@@ -91,6 +91,7 @@ void AlxSocket_Ctor
 
 	#if defined(ALX_WIZNET)
 	me->socket_data.wiz_socket = -1;
+	memset(me->socket_data.mcast_ip, 0, sizeof(me->socket_data.mcast_ip));
 	#endif
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	// Cannot perform any return value check here
@@ -800,6 +801,42 @@ Alx_Status AlxSocket_Bind(AlxSocket* me, uint16_t port)
 	// Return
 	return Alx_Err;
 }
+Alx_Status AlxSocket_Bind_Mcast(AlxSocket* me, const char* ip, uint16_t port)
+{
+	// Assert
+	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
+
+#if defined(ALX_WIZNET)
+	if (me->alxNet->config == AlxNet_Config_Wiznet)
+	{
+		if ((me->socket_data.wiz_socket == -1) ||( me->protocol != AlxSocket_Protocol_Udp))
+		{
+			return Alx_Err;
+		}
+		int mcast_ip[4];
+		if (sscanf(ip, "%d.%d.%d.%d", &mcast_ip[0], &mcast_ip[1], &mcast_ip[2], &mcast_ip[3]) != 4)
+		{
+			return Alx_Err;
+		}
+		me->socket_data.mcast_ip[0] = mcast_ip[0];
+		me->socket_data.mcast_ip[1] = mcast_ip[1];
+		me->socket_data.mcast_ip[2] = mcast_ip[2];
+		me->socket_data.mcast_ip[3] = mcast_ip[3];
+		me->socket_data.my_port = port;
+		return Alx_Ok;
+	}
+#endif
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return AlxNet_NotSupported;
+	}
+#endif
+
+	// Return
+	return Alx_Err;
+}
 Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog)
 {
 	// Assert
@@ -1025,19 +1062,18 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 				// recvfrom should be a separate function, additionally returning srv_ip and srv_port
 				if (getSn_SR(me->socket_data.wiz_socket) != SOCK_UDP)
 				{
-#if 1
-					socket(me->socket_data.wiz_socket, Sn_MR_UDP, me->socket_data.my_port, 0x00);
-					me->socket_data.wiz_sock_opened = true;
-#else
-					uint8_t dhar[] = { 0x01, 0x00, 0x5e, 0x00, 0x01, 0x81 };
-					setSn_DHAR(me->socket_data.wiz_socket, dhar);
-					uint8_t dipr[] = { 224, 0, 1, 129 };
-					setSn_DIPR(me->socket_data.wiz_socket, dipr);
-					setSn_DPORT(me->socket_data.wiz_socket, me->socket_data.my_port);
-					setSn_PORT(me->socket_data.wiz_socket, me->socket_data.my_port);
-					socket(me->socket_data.wiz_socket, Sn_MR_UDP, me->socket_data.my_port, Sn_MR_MULTI);
-					me->socket_data.wiz_sock_opened = true;
-#endif
+					uint8_t flags = 0;
+					if (me->socket_data.mcast_ip[0] != 0)
+					{
+						flags = Sn_MR_MULTI;
+						uint8_t *dipr = me->socket_data.mcast_ip;
+						uint8_t dhar[] = { 0x01, 0x00, 0x5e, dipr[1] & 0x7f, dipr[2], dipr[3] };
+						setSn_DHAR(me->socket_data.wiz_socket, dhar);
+						setSn_DIPR(me->socket_data.wiz_socket, dipr);
+						setSn_DPORT(me->socket_data.wiz_socket, me->socket_data.my_port);
+						setSn_PORT(me->socket_data.wiz_socket, me->socket_data.my_port);
+					}
+					socket(me->socket_data.wiz_socket, Sn_MR_UDP, me->socket_data.my_port, flags);
 				}
 
 				uint8_t srv_ip[4];
