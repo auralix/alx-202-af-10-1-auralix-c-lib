@@ -203,8 +203,8 @@ static void wizchip_dhcp_assign(void)
 
 	/* Network initialize */
 	ctlnetwork(CN_SET_NETINFO, &wiz_net_info);
-	print_network_information(wiz_net_info);
-	ALX_TRACE_FORMAT("DHCP leased time : %ld seconds\r\n", getDHCPLeasetime());
+//	print_network_information(wiz_net_info);
+//	ALX_TRACE_FORMAT("DHCP leased time : %ld seconds\r\n", getDHCPLeasetime());
 }
 static void wizchip_dhcp_conflict(void)
 {
@@ -241,7 +241,7 @@ static void dhcp_task(void *argument)
 				{
 					if ((state == NETINFO_STATIC) && me->enable_dhcp)
 					{
-						ALX_TRACE_FORMAT("DHCP client started\r\n");
+//						ALX_TRACE_FORMAT("DHCP client started\r\n");
 						DHCP_init(alxDhcpSocket.socket_data.wiz_socket, wiz_buffer);
 						dhcp_ip_leased_until = 0;
 						state = NETINFO_DHCP;
@@ -249,7 +249,7 @@ static void dhcp_task(void *argument)
 
 					if ((state == NETINFO_DHCP) && !me->enable_dhcp)
 					{
-						ALX_TRACE_FORMAT("DHCP client stopped\r\n");
+//						ALX_TRACE_FORMAT("DHCP client stopped\r\n");
 						DHCP_stop();
 						state = NETINFO_STATIC;
 						break; // break to mutex
@@ -281,7 +281,7 @@ static void dhcp_task(void *argument)
 							if (dhcp_ip_leased_until == 0)
 							{
 								dhcp_retry = 0;
-								ALX_TRACE_FORMAT("DHCP success\r\n");
+//								ALX_TRACE_FORMAT("DHCP success\r\n");
 								dhcp_ip_leased_until = AlxTick_Get_sec(&alxTick) + getDHCPLeasetime();
 								ip2str(wiz_net_info.dns, me->dns[0]);
 							}
@@ -320,9 +320,9 @@ static void dns_task(void *argument)
 			{
 				if (DNS_run(dns_ip, dns_target_domain, dns_response_ip) > 0)
 				{
-					ALX_TRACE_FORMAT("DNS success\r\n");
-					ALX_TRACE_FORMAT("Target domain : %s\r\n", dns_target_domain);
-					ALX_TRACE_FORMAT("IP of target domain : %d.%d.%d.%d\r\n", dns_response_ip[0], dns_response_ip[1], dns_response_ip[2], dns_response_ip[3]);
+//					ALX_TRACE_FORMAT("DNS success\r\n");
+//					ALX_TRACE_FORMAT("Target domain : %s\r\n", dns_target_domain);
+//					ALX_TRACE_FORMAT("IP of target domain : %d.%d.%d.%d\r\n", dns_response_ip[0], dns_response_ip[1], dns_response_ip[2], dns_response_ip[3]);
 					dns_retval = DnsTaskSuccess;
 					break;
 				}
@@ -331,13 +331,13 @@ static void dns_task(void *argument)
 					dns_retry++;
 					if (dns_retry <= DNS_RETRY_COUNT)
 					{
-						ALX_TRACE_FORMAT("DNS timeout occurred and retry %d\r\n", dns_retry);
+						ALX_TRACE_FORMAT("DNS timeout occurred, retry %d\r\n", dns_retry);
 					}
 				}
 
 				if (dns_retry > DNS_RETRY_COUNT)
 				{
-					ALX_TRACE_FORMAT("DNS failed\r\n");
+					ALX_TRACE_FORMAT("DNS failed for %s\r\n", dns_target_domain);
 					dns_retval = DnsTaskTimeout;
 					break;
 				}
