@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxOsDelay.c
-  * @brief		Auralix C Library - ALX OS Delay Module
+  * @file		alxIoPin_McuZephyr.h
+  * @brief		Auralix C Library - ALX IO Pin MCU Zephyr Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -26,121 +26,66 @@
   **/
 
 //******************************************************************************
+// Include Guard
+//******************************************************************************
+#ifndef ALX_IO_PIN_MCU_ZEPHYR_H
+#define ALX_IO_PIN_MCU_ZEPHYR_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+//******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxOsDelay.h"
+#include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+#include "alxDelay.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 
 //******************************************************************************
-// Variables
+// Types
 //******************************************************************************
-AlxOsDelay alxOsDelay = {0};
+typedef struct
+{
+	// Parameters
+	const char* deviceName;
+	gpio_pin_t pin;
+	gpio_flags_t flags;
+
+	// Variables
+	const struct device* device;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxIoPin;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osTick
-  * @param[in]		approxDisable
-  */
-void AlxOsDelay_Ctor
+void AlxIoPin_Ctor
 (
-	AlxOsDelay* me,
-	AlxClk_Tick osTick,
-	bool approxDisable
-)
-{
-	// Parameters
-	me->osTick = osTick;
-	me->approxDisable = approxDisable;
+	AlxIoPin* me,
+	const char* deviceName,
+	gpio_pin_t pin,
+	gpio_flags_t flags
+);
 
-	// Info
-	me->wasCtorCalled = true;
+
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
+
+#ifdef __cplusplus
 }
+#endif
 
-
-//******************************************************************************
-// Functions
-//******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_us
-  */
-void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us)
-{
-	// Assert
-	ALX_OS_DELAY_ASSERT(me->wasCtorCalled == true);
-
-	// Check if approximation is disabled
-	if (me->approxDisable)
-	{
-		ALX_OS_DELAY_ASSERT(osDelay_us >= (2 * (uint64_t)me->osTick));
-		ALX_OS_DELAY_ASSERT((osDelay_us % (uint64_t)me->osTick) == 0);
-	}
-
-	// Convert to osTick
-	uint64_t osDelay_osTick = osDelay_us / (uint64_t)me->osTick;
-
-	// Delay
-	#if defined(ALX_FREE_RTOS)
-	vTaskDelay(osDelay_osTick);
-	#endif
-	#if defined(ALX_ZEPHYR)
-	k_sleep(K_USEC(osDelay_us));
-	#endif
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_ms
-  */
-void AlxOsDelay_ms(AlxOsDelay* me, uint64_t osDelay_ms)
-{
-	AlxOsDelay_us(me, osDelay_ms * 1000);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_sec
-  */
-void AlxOsDelay_sec(AlxOsDelay* me, uint64_t osDelay_sec)
-{
-	AlxOsDelay_us(me, osDelay_sec * 1000000);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_min
-  */
-void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min)
-{
-	AlxOsDelay_us(me, osDelay_min * 60000000);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_hr
-  */
-void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr)
-{
-	AlxOsDelay_us(me, osDelay_hr * 3600000000);
-}
-
-
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #ifndef ALX_IO_PIN_MCU_ZEPHYR_H

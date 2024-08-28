@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxOsDelay.c
-  * @brief		Auralix C Library - ALX OS Delay Module
+  * @file		alxAdc_McuZephyr.h
+  * @brief		Auralix C Library - ALX ADC MCU Zephyr Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -26,121 +26,73 @@
   **/
 
 //******************************************************************************
+// Include Guard
+//******************************************************************************
+#ifndef ALX_ADC_MCU_ZEPHYR_H
+#define ALX_ADC_MCU_ZEPHYR_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+//******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxOsDelay.h"
+#include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+#include "alxBound.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 
 //******************************************************************************
-// Variables
+// Types
 //******************************************************************************
-AlxOsDelay alxOsDelay = {0};
+typedef struct
+{
+	// Defines
+	#define ALX_ADC_BUFF_LEN 8
+	#define ALX_ADC_RESOLUTION 12
+
+	// Parameters
+	const char* deviceName;
+	Alx_Ch* chArr;
+	uint8_t numOfCh;
+	enum adc_gain gain;
+
+	// Variables
+	const struct device* device;
+	struct adc_channel_cfg ch[ALX_ADC_BUFF_LEN];
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxAdc;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osTick
-  * @param[in]		approxDisable
-  */
-void AlxOsDelay_Ctor
+void AlxAdc_Ctor
 (
-	AlxOsDelay* me,
-	AlxClk_Tick osTick,
-	bool approxDisable
-)
-{
-	// Parameters
-	me->osTick = osTick;
-	me->approxDisable = approxDisable;
+	AlxAdc* me,
+	const char* deviceName,
+	Alx_Ch* chArr,
+	uint8_t numOfCh,
+	enum adc_gain gain
+);
 
-	// Info
-	me->wasCtorCalled = true;
+
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
+
+#ifdef __cplusplus
 }
+#endif
 
-
-//******************************************************************************
-// Functions
-//******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_us
-  */
-void AlxOsDelay_us(AlxOsDelay* me, uint64_t osDelay_us)
-{
-	// Assert
-	ALX_OS_DELAY_ASSERT(me->wasCtorCalled == true);
-
-	// Check if approximation is disabled
-	if (me->approxDisable)
-	{
-		ALX_OS_DELAY_ASSERT(osDelay_us >= (2 * (uint64_t)me->osTick));
-		ALX_OS_DELAY_ASSERT((osDelay_us % (uint64_t)me->osTick) == 0);
-	}
-
-	// Convert to osTick
-	uint64_t osDelay_osTick = osDelay_us / (uint64_t)me->osTick;
-
-	// Delay
-	#if defined(ALX_FREE_RTOS)
-	vTaskDelay(osDelay_osTick);
-	#endif
-	#if defined(ALX_ZEPHYR)
-	k_sleep(K_USEC(osDelay_us));
-	#endif
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_ms
-  */
-void AlxOsDelay_ms(AlxOsDelay* me, uint64_t osDelay_ms)
-{
-	AlxOsDelay_us(me, osDelay_ms * 1000);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_sec
-  */
-void AlxOsDelay_sec(AlxOsDelay* me, uint64_t osDelay_sec)
-{
-	AlxOsDelay_us(me, osDelay_sec * 1000000);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_min
-  */
-void AlxOsDelay_min(AlxOsDelay* me, uint64_t osDelay_min)
-{
-	AlxOsDelay_us(me, osDelay_min * 60000000);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		osDelay_hr
-  */
-void AlxOsDelay_hr(AlxOsDelay* me, uint64_t osDelay_hr)
-{
-	AlxOsDelay_us(me, osDelay_hr * 3600000000);
-}
-
-
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #ifndef ALX_ADC_MCU_ZEPHYR_H

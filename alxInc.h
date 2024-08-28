@@ -58,6 +58,9 @@ extern "C" {
 #include "alxTpa3255.h"
 #include "alxVeml6040.h"
 #include "alxVnh7040.h"
+#include "alxBq25890.h"
+#include "alxMax17263.h"
+#include "alxPca9539a.h"
 
 
 //------------------------------------------------------------------------------

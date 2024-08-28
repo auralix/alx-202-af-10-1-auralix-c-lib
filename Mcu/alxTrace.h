@@ -54,6 +54,9 @@ extern "C" {
 #elif defined(ALX_LPC80X) || defined(ALX_LPC84X)
 #include "alxTrace_McuLpc80x.h"
 
+#elif defined(ALX_ZEPHYR)
+#include "alxTrace_McuZephyr.h"
+
 #elif defined(ALX_PC)
 typedef struct { bool dummy; } AlxTrace;
 

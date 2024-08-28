@@ -48,8 +48,8 @@
 //******************************************************************************
 // Private Defines
 //******************************************************************************
-#define SOCKET_YIELD() taskYIELD();
-//#define SOCKET_YIELD() AlxOsDelay_ms(&alxOsDelay, 1)
+//#define SOCKET_YIELD() taskYIELD();
+#define SOCKET_YIELD() AlxOsDelay_ms(&alxOsDelay, 2)
 
 #define SOCKET_DEFAULT_TIMEOUT   5000
 
@@ -91,6 +91,7 @@ void AlxSocket_Ctor
 
 	#if defined(ALX_WIZNET)
 	me->socket_data.wiz_socket = -1;
+	memset(me->socket_data.mcast_ip, 0, sizeof(me->socket_data.mcast_ip));
 	#endif
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	// Cannot perform any return value check here
@@ -416,6 +417,61 @@ static Alx_Status sslHandshake(AlxSocket *me)
 	}
 	ALX_SOCKET_TRACE_FORMAT("TLS handshake successful\r\n");
 	return Alx_Ok;
+}
+static int check_domain(const char *hostname, size_t hostname_len, const char *domain)
+{
+	size_t domain_len = strlen(domain);
+	if (domain_len == 0)
+	{
+		// no check
+		return 0;
+	}
+
+	if (hostname_len <= domain_len)
+	{
+		return -1;
+	}
+
+	// find first dot
+	char *host_domain = strchr(hostname, '.');
+	if (!host_domain)
+	{
+		return -1;
+	}
+
+	if (hostname_len - (host_domain - hostname) != domain_len + 1)
+	{
+		return -1;
+	}
+
+	return strncasecmp(host_domain + 1, domain, domain_len);
+}
+static int sslVerifyDomain(void *p_vrfy, mbedtls_x509_crt *crt, int i, uint32_t *flags)
+{
+	AlxSocket *me = (AlxSocket *)p_vrfy;
+	if (i == 0) // last certificate in chain (server's certificate)
+	{
+		bool match = false;
+		mbedtls_x509_sequence *seq = &crt->subject_alt_names;
+		while (seq != NULL)
+		{
+			if (seq->buf.len)
+			{
+				// seq->buf.p[seq->buf.len] = 0;
+				// if (check_wildcard((const char *)seq->buf.p, (const char *)p_vrfy) == 0)
+				if (check_domain((const char *)seq->buf.p, seq->buf.len, me->tls_data.domain) == 0)
+				{
+					match = true;
+				}
+			}
+			seq = seq->next;
+		}
+		if (!match)
+		{
+			*flags |= MBEDTLS_X509_BADCERT_CN_MISMATCH;
+		}
+	}
+	return 0;
 }
 #endif // if defined(MBED_TLS)
 
@@ -745,6 +801,42 @@ Alx_Status AlxSocket_Bind(AlxSocket* me, uint16_t port)
 	// Return
 	return Alx_Err;
 }
+Alx_Status AlxSocket_Bind_Mcast(AlxSocket* me, const char* ip, uint16_t port)
+{
+	// Assert
+	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
+
+#if defined(ALX_WIZNET)
+	if (me->alxNet->config == AlxNet_Config_Wiznet)
+	{
+		if ((me->socket_data.wiz_socket == -1) ||( me->protocol != AlxSocket_Protocol_Udp))
+		{
+			return Alx_Err;
+		}
+		int mcast_ip[4];
+		if (sscanf(ip, "%d.%d.%d.%d", &mcast_ip[0], &mcast_ip[1], &mcast_ip[2], &mcast_ip[3]) != 4)
+		{
+			return Alx_Err;
+		}
+		me->socket_data.mcast_ip[0] = mcast_ip[0];
+		me->socket_data.mcast_ip[1] = mcast_ip[1];
+		me->socket_data.mcast_ip[2] = mcast_ip[2];
+		me->socket_data.mcast_ip[3] = mcast_ip[3];
+		me->socket_data.my_port = port;
+		return Alx_Ok;
+	}
+#endif
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->alxNet->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		return AlxNet_NotSupported;
+	}
+#endif
+
+	// Return
+	return Alx_Err;
+}
 Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog)
 {
 	// Assert
@@ -970,8 +1062,18 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 				// recvfrom should be a separate function, additionally returning srv_ip and srv_port
 				if (getSn_SR(me->socket_data.wiz_socket) != SOCK_UDP)
 				{
-					socket(me->socket_data.wiz_socket, Sn_MR_UDP, me->socket_data.my_port, 0x00);
-					me->socket_data.wiz_sock_opened = true;
+					uint8_t flags = 0;
+					if (me->socket_data.mcast_ip[0] != 0)
+					{
+						flags = Sn_MR_MULTI;
+						uint8_t *dipr = me->socket_data.mcast_ip;
+						uint8_t dhar[] = { 0x01, 0x00, 0x5e, dipr[1] & 0x7f, dipr[2], dipr[3] };
+						setSn_DHAR(me->socket_data.wiz_socket, dhar);
+						setSn_DIPR(me->socket_data.wiz_socket, dipr);
+						setSn_DPORT(me->socket_data.wiz_socket, me->socket_data.my_port);
+						setSn_PORT(me->socket_data.wiz_socket, me->socket_data.my_port);
+					}
+					socket(me->socket_data.wiz_socket, Sn_MR_UDP, me->socket_data.my_port, flags);
 				}
 
 				uint8_t srv_ip[4];
@@ -1040,7 +1142,7 @@ void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms)
 }
 
 #if defined(ALX_MBEDTLS)
-Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_cn, const unsigned char *ca_cert, const unsigned char *cl_cert, const unsigned char *cl_key)
+Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const unsigned char *ca_cert, const unsigned char *cl_cert, const unsigned char *cl_key)
 {
 	mbedtls_x509_crt_init(&me->tls_data.x509_ca_certificate);
 	me->tls_data.init_state = SSL_INITIALIZED_CACERT;
@@ -1111,13 +1213,15 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_cn, const unsigne
 	}
 
 	mbedtls_ssl_set_bio(&me->tls_data.ssl_context, me, sslSend, sslRecv, NULL);
+	strcpy(me->tls_data.domain, server_domain);
+	mbedtls_ssl_set_verify(&me->tls_data.ssl_context, sslVerifyDomain, (void *)me);
 
-	if (mbedtls_ssl_set_hostname(&me->tls_data.ssl_context, server_cn) != 0)
-	{
-		ALX_SOCKET_TRACE_FORMAT("Failed to set hostname\n");
-		sslFree(&me->tls_data);
-		return Alx_Err;
-	}
+//	if (mbedtls_ssl_set_hostname(&me->tls_data.ssl_context, server_cn) != 0)
+//	{
+//		ALX_SOCKET_TRACE_FORMAT("Failed to set hostname\n");
+//		sslFree(&me->tls_data);
+//		return Alx_Err;
+//	}
 
 	return Alx_Ok;
 }

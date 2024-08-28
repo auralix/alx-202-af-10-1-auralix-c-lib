@@ -98,6 +98,7 @@ typedef struct
 	int wiz_socket;
 	uint8_t wiz_protocol;
 	uint8_t dst_ip[4];
+	uint8_t mcast_ip[4];
 	uint16_t dst_port;
 	uint16_t my_port;
 	bool wiz_sock_opened;
@@ -124,6 +125,7 @@ typedef struct
 	mbedtls_ssl_config ssl_config;
 	mbedtls_ssl_context ssl_context;
 	AlxSslInitStateType init_state;
+	char domain[32];
 } AlxTlsData;
 #endif
 
@@ -189,13 +191,14 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 Alx_Status AlxSocket_Close(AlxSocket* me);
 Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port);
 Alx_Status AlxSocket_Bind(AlxSocket* me, uint16_t port);
+Alx_Status AlxSocket_Bind_Mcast(AlxSocket* me, const char* ip, uint16_t port);
 Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog);
 AlxSocket* AlxSocket_Accept(AlxSocket* me);
 int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len);
 int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len);
 void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms);
 #if defined(ALX_MBEDTLS)
-Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_cn, const unsigned char *ca_cert, const unsigned char *cl_cert, const unsigned char *cl_key);
+Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const unsigned char *ca_cert, const unsigned char *cl_cert, const unsigned char *cl_key);
 #endif
 
 
