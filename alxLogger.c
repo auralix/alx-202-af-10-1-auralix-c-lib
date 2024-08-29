@@ -513,6 +513,26 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 					wereOldestReadLogsDiscarded = true;
 				}
 
+				// oldest.id - Only start handling after inital wrap around
+				if (me->md.write.id >= me->numOfLogsTotal)
+				{
+					// Increment oldest.id by number of logs per directory
+					me->md.oldest.id = me->md.oldest.id + me->numOfLogsPerDirTotal;
+
+					// Reset
+					me->md.oldest.pos = 0;
+					me->md.oldest.line = 0;
+					me->md.oldest.file = 0;
+
+					// oldest.dir
+					me->md.oldest.dir++;
+					if (me->md.oldest.dir >= me->numOfDir)
+					{
+						// Reset
+						me->md.oldest.dir = 0;
+					}
+				}
+
 				// Clear next write dir
 				status = AlxLogger_ClearWriteDir(me);
 				if (status != Alx_Ok)
@@ -527,9 +547,18 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 		//------------------------------------------------------------------------------
 		// Store Metadata
 		//------------------------------------------------------------------------------
-		if (wereOldestReadLogsDiscarded)	// If oldest read logs were discared, store read & write
+		if (wereOldestReadLogsDiscarded)	// If oldest read logs were discared, store read & write & oldest
 		{
-			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWrite);
+			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWriteOldest);
+			if (status != Alx_Ok)
+			{
+				ALX_LOGGER_TRACE("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
+				return status;
+			}
+		}
+		else if (me->md.write.file == 0)	// If new dir, store write & oldest
+		{
+			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreWriteOldest);
 			if (status != Alx_Ok)
 			{
 				ALX_LOGGER_TRACE("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
@@ -639,6 +668,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
+	char buff[32] = "";
 
 
 	//------------------------------------------------------------------------------
@@ -674,17 +704,26 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_FORMAT("- numOfFilesPerDir = %lu\r\n", me->md.numOfFilesPerDir);
 		ALX_LOGGER_TRACE_FORMAT("- numOfLogsPerFile = %lu\r\n", me->md.numOfLogsPerFile);
 
-		ALX_LOGGER_TRACE_FORMAT("- addrRead.id = %lu\r\n", (uint32_t)me->md.read.id);
-		ALX_LOGGER_TRACE_FORMAT("- addrRead.pos = %lu\r\n", me->md.read.pos);
-		ALX_LOGGER_TRACE_FORMAT("- addrRead.line = %lu\r\n", me->md.read.line);
-		ALX_LOGGER_TRACE_FORMAT("- addrRead.file = %lu\r\n", me->md.read.file);
-		ALX_LOGGER_TRACE_FORMAT("- addrRead.dir = %lu\r\n", me->md.read.dir);
+		AlxGlobal_Ulltoa(me->md.read.id, buff);
+		ALX_LOGGER_TRACE_FORMAT("- read.id = %s\r\n", buff);
+		ALX_LOGGER_TRACE_FORMAT("- read.pos = %lu\r\n", me->md.read.pos);
+		ALX_LOGGER_TRACE_FORMAT("- read.line = %lu\r\n", me->md.read.line);
+		ALX_LOGGER_TRACE_FORMAT("- read.file = %lu\r\n", me->md.read.file);
+		ALX_LOGGER_TRACE_FORMAT("- read.dir = %lu\r\n", me->md.read.dir);
 
-		ALX_LOGGER_TRACE_FORMAT("- addrWrite.id = %lu\r\n", (uint32_t)me->md.write.id);
-		ALX_LOGGER_TRACE_FORMAT("- addrWrite.pos = %lu\r\n", me->md.write.pos);
-		ALX_LOGGER_TRACE_FORMAT("- addrWrite.line = %lu\r\n", me->md.write.line);
-		ALX_LOGGER_TRACE_FORMAT("- addrWrite.file = %lu\r\n", me->md.write.file);
-		ALX_LOGGER_TRACE_FORMAT("- addrWrite.dir = %lu\r\n", me->md.write.dir);
+		AlxGlobal_Ulltoa(me->md.write.id, buff);
+		ALX_LOGGER_TRACE_FORMAT("- write.id = %s\r\n", buff);
+		ALX_LOGGER_TRACE_FORMAT("- write.pos = %lu\r\n", me->md.write.pos);
+		ALX_LOGGER_TRACE_FORMAT("- write.line = %lu\r\n", me->md.write.line);
+		ALX_LOGGER_TRACE_FORMAT("- write.file = %lu\r\n", me->md.write.file);
+		ALX_LOGGER_TRACE_FORMAT("- write.dir = %lu\r\n", me->md.write.dir);
+
+		AlxGlobal_Ulltoa(me->md.oldest.id, buff);
+		ALX_LOGGER_TRACE_FORMAT("- oldest.id = %s\r\n", buff);
+		ALX_LOGGER_TRACE_FORMAT("- oldest.pos = %lu\r\n", me->md.oldest.pos);
+		ALX_LOGGER_TRACE_FORMAT("- oldest.line = %lu\r\n", me->md.oldest.line);
+		ALX_LOGGER_TRACE_FORMAT("- oldest.file = %lu\r\n", me->md.oldest.file);
+		ALX_LOGGER_TRACE_FORMAT("- oldest.dir = %lu\r\n", me->md.oldest.dir);
 
 		ALX_LOGGER_TRACE_FORMAT("- crc = 0x%04X\r\n", me->md.crc);
 
@@ -697,7 +736,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		}
 
 		// Store metadata
-		status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWrite);
+		status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWriteOldest);
 		if (status != Alx_Ok)
 		{
 			ALX_LOGGER_TRACE("Err: %d", status);
@@ -713,17 +752,26 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_FORMAT("- numOfFilesPerDir = %lu\r\n", me->md.numOfFilesPerDir);
 		ALX_LOGGER_TRACE_FORMAT("- numOfLogsPerFile = %lu\r\n", me->md.numOfLogsPerFile);
 
-		ALX_LOGGER_TRACE_FORMAT("- addrRead.id = %lu\r\n", (uint32_t)me->md.read.id);
-		ALX_LOGGER_TRACE_FORMAT("- addrRead.pos = %lu\r\n", me->md.read.pos);
-		ALX_LOGGER_TRACE_FORMAT("- addrRead.line = %lu\r\n", me->md.read.line);
-		ALX_LOGGER_TRACE_FORMAT("- addrRead.file = %lu\r\n", me->md.read.file);
-		ALX_LOGGER_TRACE_FORMAT("- addrRead.dir = %lu\r\n", me->md.read.dir);
+		AlxGlobal_Ulltoa(me->md.read.id, buff);
+		ALX_LOGGER_TRACE_FORMAT("- read.id = %s\r\n", buff);
+		ALX_LOGGER_TRACE_FORMAT("- read.pos = %lu\r\n", me->md.read.pos);
+		ALX_LOGGER_TRACE_FORMAT("- read.line = %lu\r\n", me->md.read.line);
+		ALX_LOGGER_TRACE_FORMAT("- read.file = %lu\r\n", me->md.read.file);
+		ALX_LOGGER_TRACE_FORMAT("- read.dir = %lu\r\n", me->md.read.dir);
 
-		ALX_LOGGER_TRACE_FORMAT("- addrWrite.id = %lu\r\n", (uint32_t)me->md.write.id);
-		ALX_LOGGER_TRACE_FORMAT("- addrWrite.pos = %lu\r\n", me->md.write.pos);
-		ALX_LOGGER_TRACE_FORMAT("- addrWrite.line = %lu\r\n", me->md.write.line);
-		ALX_LOGGER_TRACE_FORMAT("- addrWrite.file = %lu\r\n", me->md.write.file);
-		ALX_LOGGER_TRACE_FORMAT("- addrWrite.dir = %lu\r\n", me->md.write.dir);
+		AlxGlobal_Ulltoa(me->md.write.id, buff);
+		ALX_LOGGER_TRACE_FORMAT("- write.id = %s\r\n", buff);
+		ALX_LOGGER_TRACE_FORMAT("- write.pos = %lu\r\n", me->md.write.pos);
+		ALX_LOGGER_TRACE_FORMAT("- write.line = %lu\r\n", me->md.write.line);
+		ALX_LOGGER_TRACE_FORMAT("- write.file = %lu\r\n", me->md.write.file);
+		ALX_LOGGER_TRACE_FORMAT("- write.dir = %lu\r\n", me->md.write.dir);
+
+		AlxGlobal_Ulltoa(me->md.oldest.id, buff);
+		ALX_LOGGER_TRACE_FORMAT("- oldest.id = %s\r\n", buff);
+		ALX_LOGGER_TRACE_FORMAT("- oldest.pos = %lu\r\n", me->md.oldest.pos);
+		ALX_LOGGER_TRACE_FORMAT("- oldest.line = %lu\r\n", me->md.oldest.line);
+		ALX_LOGGER_TRACE_FORMAT("- oldest.file = %lu\r\n", me->md.oldest.file);
+		ALX_LOGGER_TRACE_FORMAT("- oldest.dir = %lu\r\n", me->md.oldest.dir);
 
 		ALX_LOGGER_TRACE_FORMAT("- crc = 0x%04X\r\n", me->md.crc);
 
@@ -933,8 +981,14 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.write.line		= 0;
 		mdTemp.write.file		= 0;
 		mdTemp.write.dir		= 0;
+
+		mdTemp.oldest.id		= 0;
+		mdTemp.oldest.pos		= 0;
+		mdTemp.oldest.line		= 0;
+		mdTemp.oldest.file		= 0;
+		mdTemp.oldest.dir		= 0;
 	}
-	else if (config == AlxLogger_StoreMetadata_Config_StoreReadWrite)
+	else if (config == AlxLogger_StoreMetadata_Config_StoreReadWriteOldest)
 	{
 		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreReadMetadata);
 		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreWriteMetadata);
@@ -950,6 +1004,12 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.write.line		= me->md.write.line;
 		mdTemp.write.file		= me->md.write.file;
 		mdTemp.write.dir		= me->md.write.dir;
+
+		mdTemp.oldest.id		= me->md.oldest.id;
+		mdTemp.oldest.pos		= me->md.oldest.pos;
+		mdTemp.oldest.line		= me->md.oldest.line;
+		mdTemp.oldest.file		= me->md.oldest.file;
+		mdTemp.oldest.dir		= me->md.oldest.dir;
 	}
 	else if (config == AlxLogger_StoreMetadata_Config_StoreRead)
 	{
@@ -967,6 +1027,12 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.write.line		= me->mdStored.write.line;
 		mdTemp.write.file		= me->mdStored.write.file;
 		mdTemp.write.dir		= me->mdStored.write.dir;
+
+		mdTemp.oldest.id		= me->mdStored.oldest.id;
+		mdTemp.oldest.pos		= me->mdStored.oldest.pos;
+		mdTemp.oldest.line		= me->mdStored.oldest.line;
+		mdTemp.oldest.file		= me->mdStored.oldest.file;
+		mdTemp.oldest.dir		= me->mdStored.oldest.dir;
 	}
 	else if (config == AlxLogger_StoreMetadata_Config_StoreWrite)
 	{
@@ -984,6 +1050,35 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.write.line		= me->md.write.line;
 		mdTemp.write.file		= me->md.write.file;
 		mdTemp.write.dir		= me->md.write.dir;
+
+		mdTemp.oldest.id		= me->mdStored.oldest.id;
+		mdTemp.oldest.pos		= me->mdStored.oldest.pos;
+		mdTemp.oldest.line		= me->mdStored.oldest.line;
+		mdTemp.oldest.file		= me->mdStored.oldest.file;
+		mdTemp.oldest.dir		= me->mdStored.oldest.dir;
+	}
+	else if (config == AlxLogger_StoreMetadata_Config_StoreWriteOldest)
+	{
+		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreReadMetadata);
+		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreWriteMetadata);
+
+		mdTemp.read.id			= me->mdStored.read.id;
+		mdTemp.read.pos			= me->mdStored.read.pos;
+		mdTemp.read.line		= me->mdStored.read.line;
+		mdTemp.read.file		= me->mdStored.read.file;
+		mdTemp.read.dir			= me->mdStored.read.dir;
+
+		mdTemp.write.id			= me->md.write.id;
+		mdTemp.write.pos		= me->md.write.pos;
+		mdTemp.write.line		= me->md.write.line;
+		mdTemp.write.file		= me->md.write.file;
+		mdTemp.write.dir		= me->md.write.dir;
+
+		mdTemp.oldest.id		= me->md.oldest.id;
+		mdTemp.oldest.pos		= me->md.oldest.pos;
+		mdTemp.oldest.line		= me->md.oldest.line;
+		mdTemp.oldest.file		= me->md.oldest.file;
+		mdTemp.oldest.dir		= me->md.oldest.dir;
 	}
 	else
 	{

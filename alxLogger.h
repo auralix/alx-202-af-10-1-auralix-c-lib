@@ -87,9 +87,10 @@ extern "C" {
 typedef enum
 {
 	AlxLogger_StoreMetadata_Config_StoreDefault,
-	AlxLogger_StoreMetadata_Config_StoreReadWrite,
+	AlxLogger_StoreMetadata_Config_StoreReadWriteOldest,
 	AlxLogger_StoreMetadata_Config_StoreRead,
-	AlxLogger_StoreMetadata_Config_StoreWrite
+	AlxLogger_StoreMetadata_Config_StoreWrite,
+	AlxLogger_StoreMetadata_Config_StoreWriteOldest
 } AlxLogger_StoreMetadata_Config;
 
 typedef struct __attribute__((packed))
@@ -112,6 +113,7 @@ typedef struct __attribute__((packed))
 
 	AlxLogger_Metadata_ReadWrite read;
 	AlxLogger_Metadata_ReadWrite write;
+	AlxLogger_Metadata_ReadWrite oldest;
 
 	uint16_t crc;
 } AlxLogger_Metadata;
