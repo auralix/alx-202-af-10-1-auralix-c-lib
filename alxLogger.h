@@ -183,7 +183,7 @@ void AlxLogger_Ctor
 //******************************************************************************
 Alx_Status AlxLogger_Init(AlxLogger* me);
 Alx_Status AlxLogger_Format(AlxLogger* me);
-Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual);
+Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual, bool mdUpdate, uint64_t idStart);
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs);
 uint32_t AlxLogger_GetNumOfLogsToReadAvailable(AlxLogger* me);
 Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);

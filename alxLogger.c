@@ -46,8 +46,8 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me);
 static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me);
 static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me);
-static bool AlxLogger_IsLogToReadAvailable(AlxLogger* me);
-static uint32_t AlxLogger_GetNumOfLogsToReadAvailable_Private(AlxLogger* me);
+static bool AlxLogger_IsLogToReadAvailable(AlxLogger* me, uint64_t readId, uint64_t writeId);
+static uint32_t AlxLogger_GetNumOfLogsToReadAvailable_Private(AlxLogger* me, uint64_t readId, uint64_t writeId);
 static uint32_t AlxLogger_GetNumOfLogsEndPosition(AlxLogger* me, const char* logs, uint32_t numOfLogs);
 
 
@@ -137,7 +137,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	}
 
 	// Trace
-	numOfLogsToReadAvailable = AlxLogger_GetNumOfLogsToReadAvailable_Private(me);
+	numOfLogsToReadAvailable = AlxLogger_GetNumOfLogsToReadAvailable_Private(me, me->md.read.id, me->md.write.id);
 	ALX_LOGGER_TRACE_FORMAT("AlxLogger - Totals\r\n");
 	ALX_LOGGER_TRACE_FORMAT("- numOfFilesTotal = %lu\r\n", me->numOfFilesTotal);
 	ALX_LOGGER_TRACE_FORMAT("- numOfLogsTotal = %lu\r\n", me->numOfLogsTotal);
@@ -170,7 +170,7 @@ Alx_Status AlxLogger_Format(AlxLogger* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual)
+Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual, bool mdUpdate, uint64_t idStart)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -192,6 +192,83 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 	AlxTimSw alxTimSw;
 	AlxTimSw_Ctor(&alxTimSw, false);
 	uint32_t readTime_ms = 0;
+	AlxLogger_Metadata md = {};
+	char log[ALX_LOGGER_LOG_LEN_MAX] = "";
+	uint32_t readLine = 0;
+
+
+	//------------------------------------------------------------------------------
+	// Local md
+	//------------------------------------------------------------------------------
+	md = me->md;
+	if (mdUpdate == false)
+	{
+		//------------------------------------------------------------------------------
+		// Set md.read
+		//------------------------------------------------------------------------------
+		md.read.id = idStart;
+		md.read.pos = 0;
+		md.read.line = (idStart % me->numOfLogsPerDirTotal) % me->numOfLogsPerFile;
+		md.read.file = (idStart % me->numOfLogsPerDirTotal) / me->numOfLogsPerFile;
+		md.read.dir = (idStart / me->numOfLogsPerDirTotal) % me->numOfDir;
+
+
+		//------------------------------------------------------------------------------
+		// Set read.pos via File Reading
+		//------------------------------------------------------------------------------
+		if (md.read.pos != md.read.line)
+		{
+			// Open
+			sprintf(path, "/%lu/%lu.csv", md.read.dir, md.read.file);
+			status = AlxFs_File_Open(me->alxFs, &file, path, "r");
+			if (status != Alx_Ok)
+			{
+				ALX_LOGGER_TRACE("Err: %d, path=%s", status, path);
+				return status;
+			}
+
+			// Read
+			while (true)
+			{
+				// Read
+				status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLen);
+				if (status != Alx_Ok)
+				{
+					ALX_LOGGER_TRACE("Err: %d, path=%s, readLen=%u, readLenTotal=%u, readLine=%u", status, path, readLen, readLenTotal, readLine);
+					Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
+					if (statusClose != Alx_Ok)
+					{
+						ALX_LOGGER_TRACE("Err: %d, path=%s", statusClose, path);
+						// TV: TODO - Handle close error
+					}
+					return status;
+				}
+
+				// Increment readLine, readLenTotal
+				readLine++;
+				readLenTotal = readLenTotal + readLen;
+
+				// If read.line reached
+				if (readLine == md.read.line)
+				{
+					// Close
+					status = AlxFs_File_Close(me->alxFs, &file);
+					if (status != Alx_Ok)
+					{
+						ALX_LOGGER_TRACE("Err: %d, path=%s, readLenTotal=%u, readLine=%u", status, path, readLenTotal, readLine);
+						// TV: TODO - Handle close error
+						return status;
+					}
+
+					// Update
+					md.read.pos = readLenTotal;
+
+					// Break
+					break;
+				}
+			}
+		}
+	}
 
 
 	//------------------------------------------------------------------------------
@@ -207,15 +284,21 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 		if (logNum == 0)
 		{
 			// Check if log-to-read available
-			if (AlxLogger_IsLogToReadAvailable(me) == false)
+			if (AlxLogger_IsLogToReadAvailable(me, md.read.id, md.write.id) == false)
 			{
+				// Update
+				if (mdUpdate)
+				{
+					me->md = md;
+				}
+
 				// Break
 				status = AlxLogger_ErrNoReadLog;
 				break;
 			}
 
 			// Open
-			sprintf(path, "/%lu/%lu.csv", me->md.read.dir, me->md.read.file);
+			sprintf(path, "/%lu/%lu.csv", md.read.dir, md.read.file);
 			status = AlxFs_File_Open(me->alxFs, &file, path, "r");
 			if (status != Alx_Ok)
 			{
@@ -224,10 +307,10 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 			}
 
 			// Seek
-			status = AlxFs_File_Seek(me->alxFs, &file, me->md.read.pos, AlxFs_File_Seek_Origin_Set, &positionNew);
+			status = AlxFs_File_Seek(me->alxFs, &file, md.read.pos, AlxFs_File_Seek_Origin_Set, &positionNew);
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE("Err: %d, path=%s, offset=%d, positionNew=%u, logNum=%u, readLenTotal=%u, numOfLogs=%u", status, path, me->md.read.pos, positionNew, logNum, readLenTotal, numOfLogs);
+				ALX_LOGGER_TRACE("Err: %d, path=%s, offset=%d, positionNew=%u, logNum=%u, readLenTotal=%u, numOfLogs=%u", status, path, md.read.pos, positionNew, logNum, readLenTotal, numOfLogs);
 				Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 				if (statusClose != Alx_Ok)
 				{
@@ -237,7 +320,7 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 				return status;
 			}
 		}
-		else if (me->md.read.line == 0)
+		else if (md.read.line == 0)
 		{
 			// Close existing file
 			status = AlxFs_File_Close(me->alxFs, &file);
@@ -249,7 +332,7 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 			}
 
 			// Open new file
-			sprintf(path, "/%lu/%lu.csv", me->md.read.dir, me->md.read.file);
+			sprintf(path, "/%lu/%lu.csv", md.read.dir, md.read.file);
 			status = AlxFs_File_Open(me->alxFs, &file, path, "r");
 			if (status != Alx_Ok)
 			{
@@ -281,32 +364,32 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 		//------------------------------------------------------------------------------
 
 		// read.id
-		me->md.read.id++;
+		md.read.id++;
 
 		// read.pos
-		me->md.read.pos = me->md.read.pos + readLen;
+		md.read.pos = md.read.pos + readLen;
 
 		// read.line
-		me->md.read.line++;
-		if (me->md.read.line >= me->numOfLogsPerFile)
+		md.read.line++;
+		if (md.read.line >= me->numOfLogsPerFile)
 		{
 			// Reset
-			me->md.read.pos = 0;
-			me->md.read.line = 0;
+			md.read.pos = 0;
+			md.read.line = 0;
 
 			// read.file
-			me->md.read.file++;
-			if (me->md.read.file >= me->numOfFilesPerDir)
+			md.read.file++;
+			if (md.read.file >= me->numOfFilesPerDir)
 			{
 				// Reset
-				me->md.read.file = 0;
+				md.read.file = 0;
 
 				// read.dir
-				me->md.read.dir++;
-				if (me->md.read.dir >= me->numOfDir)
+				md.read.dir++;
+				if (md.read.dir >= me->numOfDir)
 				{
 					// Reset
-					me->md.read.dir = 0;
+					md.read.dir = 0;
 				}
 			}
 		}
@@ -333,11 +416,17 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 				return status;
 			}
 
+			// Update
+			if (mdUpdate)
+			{
+				me->md = md;
+			}
+
 			// Break
 			status = Alx_Ok;
 			break;
 		}
-		else if (AlxLogger_IsLogToReadAvailable(me) == false)
+		else if (AlxLogger_IsLogToReadAvailable(me, md.read.id, md.write.id) == false)
 		{
 			// Close
 			status = AlxFs_File_Close(me->alxFs, &file);
@@ -346,6 +435,12 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 				ALX_LOGGER_TRACE("Err: %d, path=%s, logNum=%u, readLenTotal=%u, numOfLogs=%u", status, path, logNum, readLenTotal, numOfLogs);
 				// TV: TODO - Handle close error
 				return status;
+			}
+
+			// Update
+			if (mdUpdate)
+			{
+				me->md = md;
 			}
 
 			// Break
@@ -620,7 +715,7 @@ uint32_t AlxLogger_GetNumOfLogsToReadAvailable(AlxLogger* me)
 	// isInit -> Don't care
 
 	// Return
-	return AlxLogger_GetNumOfLogsToReadAvailable_Private(me);
+	return AlxLogger_GetNumOfLogsToReadAvailable_Private(me, me->md.read.id, me->md.write.id);
 }
 Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config)
 {
@@ -1443,10 +1538,10 @@ static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
-static bool AlxLogger_IsLogToReadAvailable(AlxLogger* me)
+static bool AlxLogger_IsLogToReadAvailable(AlxLogger* me, uint64_t readId, uint64_t writeId)
 {
 	// Get
-	uint32_t numOfLogsToRead = AlxLogger_GetNumOfLogsToReadAvailable_Private(me);
+	uint32_t numOfLogsToRead = AlxLogger_GetNumOfLogsToReadAvailable_Private(me, readId, writeId);
 
 	// Return
 	if (numOfLogsToRead > 0)
@@ -1458,10 +1553,10 @@ static bool AlxLogger_IsLogToReadAvailable(AlxLogger* me)
 		return false;
 	}
 }
-static uint32_t AlxLogger_GetNumOfLogsToReadAvailable_Private(AlxLogger* me)
+static uint32_t AlxLogger_GetNumOfLogsToReadAvailable_Private(AlxLogger* me, uint64_t readId, uint64_t writeId)
 {
 	// Calculate
-	int64_t numOfLogsToRead = (int64_t)me->md.write.id - (int64_t)me->md.read.id;
+	int64_t numOfLogsToRead = (int64_t)writeId - (int64_t)readId;
 	ALX_LOGGER_ASSERT(numOfLogsToRead >= 0);
 
 	// Return
