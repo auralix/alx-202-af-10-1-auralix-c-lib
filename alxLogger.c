@@ -382,7 +382,8 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 	uint32_t logNum = 0;
 	uint32_t writeLen = 0;
 	uint32_t writeLenTotal = 0;
-	int64_t numOfLogsPerFileRemaining = 0;
+	int64_t numOfLogsToWriteRemaining = 0;
+	int64_t numOfLogsSpacePerFileRemaining = 0;
 	uint32_t numOfLogsToWrite = 0;
 	bool wereOldestReadLogsDiscarded = false;
 	AlxTimSw alxTimSw;
@@ -412,18 +413,27 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 		//------------------------------------------------------------------------------
 		// Prepare
 		//------------------------------------------------------------------------------
-		numOfLogsPerFileRemaining = (int64_t)me->numOfLogsPerFile - (int64_t)me->md.write.line;
-		ALX_LOGGER_ASSERT(numOfLogsPerFileRemaining > 0);
-		if (numOfLogsPerFileRemaining > numOfLogs)
+
+		// Set numOfLogsToWriteRemaining
+		numOfLogsToWriteRemaining = (int64_t)numOfLogs - (int64_t)logNum;
+		ALX_LOGGER_ASSERT(numOfLogsToWriteRemaining > 0);
+
+		// Set numOfLogsSpacePerFileRemaining
+		numOfLogsSpacePerFileRemaining = (int64_t)me->numOfLogsPerFile - (int64_t)me->md.write.line;
+		ALX_LOGGER_ASSERT(numOfLogsSpacePerFileRemaining > 0);
+
+		// If enough space in current file, just write all remaining logs to current file, Else write as many as possible logs in current file
+		if (numOfLogsSpacePerFileRemaining >= numOfLogsToWriteRemaining)
 		{
-			numOfLogsToWrite = numOfLogs;
-			writeLen = strlen(logs);
+			numOfLogsToWrite = numOfLogsToWriteRemaining;
 		}
 		else
 		{
-			numOfLogsToWrite = numOfLogsPerFileRemaining;
-			writeLen = AlxLogger_GetNumOfLogsEndPosition(me, (void*)logs + writeLenTotal, numOfLogsToWrite);
+			numOfLogsToWrite = numOfLogsSpacePerFileRemaining;
 		}
+
+		// Set writeLen
+		writeLen = AlxLogger_GetNumOfLogsEndPosition(me, (void*)logs + writeLenTotal, numOfLogsToWrite);
 
 
 		//------------------------------------------------------------------------------
