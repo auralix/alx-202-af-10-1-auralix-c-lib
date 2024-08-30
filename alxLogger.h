@@ -187,11 +187,12 @@ Alx_Status AlxLogger_Format(AlxLogger* me);
 Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual, bool mdUpdate, uint64_t idStart);
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs);
 uint64_t AlxLogger_GetNumOfLogsToReadAvailable(AlxLogger* me);
-Alx_Status AlxLogger_GetIdToReadOldest(AlxLogger* me, uint64_t* idOldest);
-Alx_Status AlxLogger_GetIdToReadNewest(AlxLogger* me, uint64_t* idNewest);
-Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
+uint64_t AlxLogger_GetNumOfLogsToReadStored(AlxLogger* me);
+Alx_Status AlxLogger_GetIdToReadOldest(AlxLogger* me, uint64_t* idToReadOldest);
+Alx_Status AlxLogger_GetIdToReadNewest(AlxLogger* me, uint64_t* idToReadNewest);
 AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me);
 AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me);
+Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
 AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me);
 AlxMath_Data AlxLogger_GetMath_Data_WriteTime_ms(AlxLogger* me);
 
