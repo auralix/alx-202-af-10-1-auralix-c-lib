@@ -276,6 +276,7 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 	//------------------------------------------------------------------------------
 	// Loop
 	//------------------------------------------------------------------------------
+	readLenTotal = 0;
 	AlxTimSw_Start(&alxTimSw);
 	if(me->do_DBG_Read != NULL) AlxIoPin_Set(me->do_DBG_Read);
 	while (true)
