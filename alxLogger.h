@@ -87,9 +87,10 @@ extern "C" {
 typedef enum
 {
 	AlxLogger_StoreMetadata_Config_StoreDefault,
-	AlxLogger_StoreMetadata_Config_StoreReadWrite,
+	AlxLogger_StoreMetadata_Config_StoreReadWriteOldest,
 	AlxLogger_StoreMetadata_Config_StoreRead,
-	AlxLogger_StoreMetadata_Config_StoreWrite
+	AlxLogger_StoreMetadata_Config_StoreWrite,
+	AlxLogger_StoreMetadata_Config_StoreWriteOldest
 } AlxLogger_StoreMetadata_Config;
 
 typedef struct __attribute__((packed))
@@ -99,7 +100,7 @@ typedef struct __attribute__((packed))
 	uint32_t line;
 	uint32_t file;
 	uint32_t dir;
-} AlxLogger_Metadata_ReadWrite;
+} AlxLogger_Metadata_Id;
 
 typedef struct __attribute__((packed))
 {
@@ -110,8 +111,9 @@ typedef struct __attribute__((packed))
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
 
-	AlxLogger_Metadata_ReadWrite read;
-	AlxLogger_Metadata_ReadWrite write;
+	AlxLogger_Metadata_Id read;
+	AlxLogger_Metadata_Id write;
+	AlxLogger_Metadata_Id oldest;
 
 	uint16_t crc;
 } AlxLogger_Metadata;
@@ -119,6 +121,7 @@ typedef struct __attribute__((packed))
 typedef struct
 {
 	// Defines
+	#define ALX_LOGGER_RESULT_STR_LEN_MAX 32
 	#define ALX_LOGGER_PATH_LEN_MAX 128
 	#define ALX_LOGGER_LOG_LEN_MAX 256
 	#define ALX_LOGGER_METADATA_FILE_PATH "/md.bin"
@@ -181,12 +184,15 @@ void AlxLogger_Ctor
 //******************************************************************************
 Alx_Status AlxLogger_Init(AlxLogger* me);
 Alx_Status AlxLogger_Format(AlxLogger* me);
-Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual);
+Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual, bool mdUpdate, uint64_t idStart);
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs);
-uint32_t AlxLogger_GetNumOfLogsToReadAvailable(AlxLogger* me);
-Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
+uint64_t AlxLogger_GetNumOfLogsToReadAvailable(AlxLogger* me);
+uint64_t AlxLogger_GetNumOfLogsToReadStored(AlxLogger* me);
+Alx_Status AlxLogger_GetIdToReadOldest(AlxLogger* me, uint64_t* idToReadOldest);
+Alx_Status AlxLogger_GetIdToReadNewest(AlxLogger* me, uint64_t* idToReadNewest);
 AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me);
 AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me);
+Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
 AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me);
 AlxMath_Data AlxLogger_GetMath_Data_WriteTime_ms(AlxLogger* me);
 
