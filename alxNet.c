@@ -300,13 +300,62 @@ static void dhcp_task(void *argument)
 	}
 }
 
+// debug info
+static struct
+{
+	uint8_t sr[8]; // socket status regs - getSn_SR
+	uint8_t link; // wizphy_getphylink();
+	wiz_PhyConf phyconf; //wizphy_getphyconf(&phyconf)
+} dbg_wiz_staus[2];
+
+static void dbg_get(void)
+{
+	memcpy(&dbg_wiz_staus[0], &dbg_wiz_staus[1], sizeof(dbg_wiz_staus[0]));
+	for (int i = 0; i < 8; i++)
+	{
+		dbg_wiz_staus[1].sr[i] = getSn_SR(i);
+	}
+	dbg_wiz_staus[1].link = wizphy_getphylink();
+	wizphy_getphyconf(&dbg_wiz_staus[1].phyconf);
+}
+
+static void dbg_dump(void)
+{
+	ALX_TRACE_FORMAT("--- WIZNET STATUS ----\r\n");
+	ALX_TRACE_FORMAT("SR[i]: %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x\r\n",
+		dbg_wiz_staus[0].sr[0],
+		dbg_wiz_staus[1].sr[0],
+		dbg_wiz_staus[0].sr[1],
+		dbg_wiz_staus[1].sr[1],
+		dbg_wiz_staus[0].sr[2],
+		dbg_wiz_staus[1].sr[2],
+		dbg_wiz_staus[0].sr[3],
+		dbg_wiz_staus[1].sr[3],
+		dbg_wiz_staus[0].sr[4],
+		dbg_wiz_staus[1].sr[4],
+		dbg_wiz_staus[0].sr[5],
+		dbg_wiz_staus[1].sr[5],
+		dbg_wiz_staus[0].sr[6],
+		dbg_wiz_staus[1].sr[6],
+		dbg_wiz_staus[0].sr[7],
+		dbg_wiz_staus[1].sr[7]);
+	ALX_TRACE_FORMAT("PhyLink: %02x->%02x\r\n", dbg_wiz_staus[0].link, dbg_wiz_staus[1].link);
+	ALX_TRACE_FORMAT("PhyConf: mode:%02x->%02x duplex:%02x->%02x speed:%02x->%02x\r\n",
+		dbg_wiz_staus[0].phyconf.mode,
+		dbg_wiz_staus[1].phyconf.mode,
+		dbg_wiz_staus[0].phyconf.duplex,
+		dbg_wiz_staus[1].phyconf.duplex,
+		dbg_wiz_staus[0].phyconf.speed,
+		dbg_wiz_staus[1].phyconf.speed);
+}
+
 // DNS task
 static void dns_task(void *argument)
 {
 	AlxNet* me = (AlxNet*) argument;
 	uint8_t dns_ip[4];
 
-	while (1)
+while (1)
 	{
 		AlxOsMutex_Lock(&alxDnsMutex);
 		str2ip(me->dns[0], dns_ip);
@@ -324,6 +373,7 @@ static void dns_task(void *argument)
 //					ALX_TRACE_FORMAT("Target domain : %s\r\n", dns_target_domain);
 //					ALX_TRACE_FORMAT("IP of target domain : %d.%d.%d.%d\r\n", dns_response_ip[0], dns_response_ip[1], dns_response_ip[2], dns_response_ip[3]);
 					dns_retval = DnsTaskSuccess;
+					dbg_get();
 					break;
 				}
 				else
@@ -332,6 +382,8 @@ static void dns_task(void *argument)
 					if (dns_retry <= DNS_RETRY_COUNT)
 					{
 						ALX_TRACE_FORMAT("DNS timeout occurred, retry %d\r\n", dns_retry);
+						dbg_get();
+						dbg_dump();
 					}
 				}
 
@@ -339,6 +391,9 @@ static void dns_task(void *argument)
 				{
 					ALX_TRACE_FORMAT("DNS failed for %s\r\n", dns_target_domain);
 					dns_retval = DnsTaskTimeout;
+					dbg_get();
+					dbg_dump();
+					wizphy_reset();
 					break;
 				}
 
