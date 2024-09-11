@@ -51,6 +51,8 @@
 //******************************************************************************
 // Defines
 //******************************************************************************
+#define ALX_DBG_WIZNET
+
 #define CONNECT_TIMEOUT 5000
 
 #define THREAD_STACK_SIZE_WORDS 512
@@ -300,6 +302,7 @@ static void dhcp_task(void *argument)
 	}
 }
 
+#ifdef ALX_DBG_WIZNET
 // debug info
 static struct
 {
@@ -348,6 +351,7 @@ static void dbg_dump(void)
 		dbg_wiz_staus[0].phyconf.speed,
 		dbg_wiz_staus[1].phyconf.speed);
 }
+#endif
 
 // DNS task
 static void dns_task(void *argument)
@@ -373,7 +377,9 @@ while (1)
 //					ALX_TRACE_FORMAT("Target domain : %s\r\n", dns_target_domain);
 //					ALX_TRACE_FORMAT("IP of target domain : %d.%d.%d.%d\r\n", dns_response_ip[0], dns_response_ip[1], dns_response_ip[2], dns_response_ip[3]);
 					dns_retval = DnsTaskSuccess;
+#ifdef ALX_DBG_WIZNET
 					dbg_get();
+#endif
 					break;
 				}
 				else
@@ -382,8 +388,10 @@ while (1)
 					if (dns_retry <= DNS_RETRY_COUNT)
 					{
 						ALX_TRACE_FORMAT("DNS timeout occurred, retry %d\r\n", dns_retry);
+#ifdef ALX_DBG_WIZNET
 						dbg_get();
 						dbg_dump();
+#endif
 					}
 				}
 
@@ -391,9 +399,11 @@ while (1)
 				{
 					ALX_TRACE_FORMAT("DNS failed for %s\r\n", dns_target_domain);
 					dns_retval = DnsTaskTimeout;
+#ifdef ALX_DBG_WIZNET
 					dbg_get();
 					dbg_dump();
 					wizphy_reset();
+#endif
 					break;
 				}
 
