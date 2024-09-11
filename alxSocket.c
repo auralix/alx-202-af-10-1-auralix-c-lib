@@ -95,7 +95,7 @@ void AlxSocket_Ctor
 	#endif
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	// Cannot perform any return value check here
-	me->cellular_socket.event_group = xEventGroupCreate();
+	me->cellular_socket.event_group = xEventGroupCreateStatic(&me->xEventGroupBuffer);
 	#endif
 	#if defined(ALX_MBEDTLS)
 	me->tls_data.init_state = 0;

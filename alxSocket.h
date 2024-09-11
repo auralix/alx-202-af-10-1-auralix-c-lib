@@ -163,6 +163,7 @@ typedef struct
 	#endif
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	AlxCellularSocketData cellular_socket;
+	StaticEventGroup_t xEventGroupBuffer;
 	#endif
 	#if defined(ALX_MBEDTLS)
 	AlxTlsData tls_data;
