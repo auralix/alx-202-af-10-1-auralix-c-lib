@@ -53,7 +53,7 @@ void AlxRst_Ctor
 {
 	// Variables
 	memset(&me->rr, 0, sizeof(me->rr));
-	me->rccCsrReg = 0;
+	me->csr = 0;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -78,17 +78,17 @@ Alx_Status AlxRst_Init(AlxRst* me)
 	ALX_RST_ASSERT(me->isInit == false);
 
 	// Read
-	me->rccCsrReg = HAL_RCC_GetResetSource();
+	me->csr = HAL_RCC_GetResetSource();
 
 	// Parse
-	me->rr.sw = (me->rccCsrReg & RCC_CSR_SFTRSTF) != 0;
-	me->rr.rstPin = (me->rccCsrReg & RCC_CSR_PINRSTF) != 0;
-	me->rr.wwdg = (me->rccCsrReg & RCC_CSR_WWDGRSTF) != 0;
-	me->rr.iwdg = (me->rccCsrReg & RCC_CSR_IWDGRSTF) != 0;
-	me->rr.firewall = (me->rccCsrReg & RCC_CSR_FWRSTF) != 0;
-	me->rr.lowPowerSecurity = (me->rccCsrReg & RCC_CSR_LPWRRSTF) != 0;
-	me->rr.optioByteLoader = (me->rccCsrReg & RCC_CSR_OBLRSTF) != 0;
-	me->rr.porOrBor = (me->rccCsrReg & RCC_CSR_BORRSTF) != 0;
+	me->rr.sw = (me->csr & RCC_CSR_SFTRSTF) != 0;
+	me->rr.rstPin = (me->csr & RCC_CSR_PINRSTF) != 0;
+	me->rr.wwdg = (me->csr & RCC_CSR_WWDGRSTF) != 0;
+	me->rr.iwdg = (me->csr & RCC_CSR_IWDGRSTF) != 0;
+	me->rr.firewall = (me->csr & RCC_CSR_FWRSTF) != 0;
+	me->rr.lowPowerSecurity = (me->csr & RCC_CSR_LPWRRSTF) != 0;
+	me->rr.optioByteLoader = (me->csr & RCC_CSR_OBLRSTF) != 0;
+	me->rr.porOrBor = (me->csr & RCC_CSR_BORRSTF) != 0;
 
 	// Set isInit
 	me->isInit = true;
