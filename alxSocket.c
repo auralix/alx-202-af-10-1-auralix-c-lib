@@ -95,7 +95,7 @@ void AlxSocket_Ctor
 	#endif
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	// Cannot perform any return value check here
-	me->cellular_socket.event_group = xEventGroupCreate();
+	me->cellular_socket.event_group = xEventGroupCreateStatic(&me->xEventGroupBuffer);
 	#endif
 	#if defined(ALX_MBEDTLS)
 	me->tls_data.init_state = 0;
@@ -357,6 +357,7 @@ static void sslFree(AlxTlsData* tls)
 	{
 		mbedtls_ssl_free(&tls->ssl_context);
 	}
+	tls->init_state = 0;
 }
 
 static int sslRecv(void *ctx, unsigned char *buf, size_t len)
@@ -630,7 +631,6 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 				while (mbedtls_ssl_close_notify(&me->tls_data.ssl_context) == MBEDTLS_ERR_SSL_WANT_WRITE)
 				{
 				}
-				sslFree(&me->tls_data);
 			}
 			if ((me->protocol == AlxSocket_Protocol_Tcp) || (me->protocol == AlxSocket_Protocol_Tls))
 			{
@@ -657,6 +657,10 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 				close(me->socket_data.wiz_socket);
 			}
 			me->socket_data.wiz_sock_opened = false;
+		}
+		if (me->protocol == AlxSocket_Protocol_Tls)
+		{
+			sslFree(&me->tls_data);
 		}
 		me->socket_data.wiz_socket = -1;
 		return Alx_Ok;

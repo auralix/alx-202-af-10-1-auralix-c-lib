@@ -55,7 +55,7 @@ static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 {
 	.magicNum = ALX_ID_BOOT_ID_MAGIC_NUM,
 	.ver = ALX_ID_BOOT_ID_VER,
-	.fwBoot =
+	.fw =
 	{
 		.build =
 		{

@@ -76,6 +76,7 @@ extern "C" {
 #include "alxIoPinIrq.h"
 #include "alxMmc.h"
 #include "alxPwm.h"
+#include "alxRst.h"
 #include "alxRtc.h"
 #include "alxSerialPort.h"
 #include "alxSpi.h"
