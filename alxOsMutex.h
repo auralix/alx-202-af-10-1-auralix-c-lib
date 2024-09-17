@@ -81,7 +81,8 @@ typedef struct
 {
 	// Variables
 	#if defined(ALX_FREE_RTOS)
-	SemaphoreHandle_t mutex;
+	StaticSemaphore_t semaphore;
+	SemaphoreHandle_t semaphoreHandle;
 	#endif
 
 	// Info
