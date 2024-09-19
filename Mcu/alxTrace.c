@@ -48,7 +48,7 @@ AlxTrace alxTrace = {0};
 // Weak Functions
 //******************************************************************************
 void AlxTrace_WriteStr_Callback(AlxTrace* me, const char* str);
-AlxRtc_DateTime AlxTrace_GetRtcDateTime_Callback();
+AlxRtc_DateTime AlxTrace_GetRtcDateTime_Callback(AlxTrace* me);
 
 
 //******************************************************************************
@@ -99,7 +99,7 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	//------------------------------------------------------------------------------
 	// Prepare timeStr
 	//------------------------------------------------------------------------------
-	dateTime = AlxTrace_GetRtcDateTime_Callback();
+	dateTime = AlxTrace_GetRtcDateTime_Callback(me);
 	sprintf
 	(
 		dateTimeStr,
@@ -162,7 +162,7 @@ ALX_WEAK void AlxTrace_WriteStr_Callback(AlxTrace* me, const char* str)
 {
 	AlxTrace_WriteStr(me, str);
 }
-ALX_WEAK AlxRtc_DateTime AlxTrace_GetRtcDateTime_Callback()
+ALX_WEAK AlxRtc_DateTime AlxTrace_GetRtcDateTime_Callback(AlxTrace* me)
 {
 	// Get tickTime_ms
 	uint64_t tickTime_ms = AlxTick_Get_ms(&alxTick);
