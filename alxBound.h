@@ -68,7 +68,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_BOUND_TRACE_ENABLE)
-	#define ALX_BOUND_TRACE(...) ALX_TRACE_STD(ALX_BOUND_FILE, __VA_ARGS__)
+	#define ALX_BOUND_TRACE(...) ALX_TRACE_WRN(ALX_BOUND_FILE, __VA_ARGS__)
 #else
 	#define ALX_BOUND_TRACE(...) do{} while (false)
 #endif

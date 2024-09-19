@@ -71,7 +71,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_PCA9539A_TRACE_ENABLE)
-	#define ALX_PCA9539A_TRACE(...) ALX_TRACE_STD(ALX_PCA9539A_FILE, __VA_ARGS__)
+	#define ALX_PCA9539A_TRACE(...) ALX_TRACE_WRN(ALX_PCA9539A_FILE, __VA_ARGS__)
 #else
 	#define ALX_PCA9539A_TRACE(...) do{} while (false)
 #endif

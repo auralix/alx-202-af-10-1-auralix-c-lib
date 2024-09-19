@@ -69,7 +69,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_ADS8678_TRACE_ENABLE)
-	#define ALX_ADS8678_TRACE(...) ALX_TRACE_STD(ALX_ADS8678_FILE, __VA_ARGS__)
+	#define ALX_ADS8678_TRACE(...) ALX_TRACE_WRN(ALX_ADS8678_FILE, __VA_ARGS__)
 	#define ALX_ADS8678_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_ADS8678_TRACE(...) do{} while (false)

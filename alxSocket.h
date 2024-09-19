@@ -74,7 +74,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_SOCKET_TRACE_ENABLE)
-	#define ALX_SOCKET_TRACE(...) ALX_TRACE_STD(ALX_SOCKET_FILE, __VA_ARGS__)
+	#define ALX_SOCKET_TRACE(...) ALX_TRACE_WRN(ALX_SOCKET_FILE, __VA_ARGS__)
 	#define ALX_SOCKET_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_SOCKET_TRACE(...) do{} while (false)

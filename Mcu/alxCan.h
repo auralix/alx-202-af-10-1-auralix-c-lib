@@ -76,7 +76,7 @@ typedef struct { bool dummy; } AlxCan;
 
 // Trace //
 #if defined(ALX_CAN_TRACE_ENABLE)
-	#define ALX_CAN_TRACE(...) ALX_TRACE_STD(ALX_CAN_FILE, __VA_ARGS__)
+	#define ALX_CAN_TRACE(...) ALX_TRACE_WRN(ALX_CAN_FILE, __VA_ARGS__)
 #else
 	#define ALX_CAN_TRACE(...) do{} while (false)
 #endif

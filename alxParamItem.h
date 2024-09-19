@@ -72,7 +72,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_PARAM_ITEM_TRACE_ENABLE)
-	#define ALX_PARAM_ITEM_TRACE(...) ALX_TRACE_STD(ALX_PARAM_ITEM_FILE, __VA_ARGS__)
+	#define ALX_PARAM_ITEM_TRACE(...) ALX_TRACE_WRN(ALX_PARAM_ITEM_FILE, __VA_ARGS__)
 	#define ALX_PARAM_ITEM_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_PARAM_ITEM_TRACE(...) do{} while (false)

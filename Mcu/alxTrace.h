@@ -86,7 +86,6 @@ typedef struct { bool dummy; } AlxTrace;
 
 #define ALX_TRACE_STR(str) do			{ AlxTrace_WriteStr(&alxTrace, str); } while(false)
 #define ALX_TRACE_FORMAT(...) do		{ AlxTrace_WriteFormat(&alxTrace, __VA_ARGS__); } while(false)
-#define ALX_TRACE_STD(file, ...) do		{ AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_WRN, file, __LINE__, __func__, __VA_ARGS__); } while(false)
 
 #if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_FTL
 	#define ALX_TRACE_FTL(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_FTL, file, __LINE__, __func__, __VA_ARGS__); } while(false)

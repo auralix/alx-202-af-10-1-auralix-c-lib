@@ -70,7 +70,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_TPA3255_TRACE_ENABLE)
-	#define ALX_TPA3255_TRACE(...) ALX_TRACE_STD(ALX_TPA3255_FILE, __VA_ARGS__)
+	#define ALX_TPA3255_TRACE(...) ALX_TRACE_WRN(ALX_TPA3255_FILE, __VA_ARGS__)
 #else
 	#define ALX_TPA3255_TRACE(...) do{} while (false)
 #endif

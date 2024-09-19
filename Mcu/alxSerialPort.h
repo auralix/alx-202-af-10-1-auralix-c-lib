@@ -75,7 +75,7 @@ typedef struct { bool dummy; } AlxSerialPort;
 
 // Trace //
 #if defined(ALX_SERIAL_PORT_TRACE_ENABLE)
-	#define ALX_SERIAL_PORT_TRACE(...) ALX_TRACE_STD(ALX_SERIAL_PORT_FILE, __VA_ARGS__)
+	#define ALX_SERIAL_PORT_TRACE(...) ALX_TRACE_WRN(ALX_SERIAL_PORT_FILE, __VA_ARGS__)
 #else
 	#define ALX_SERIAL_PORT_TRACE(...) do{} while (false)
 #endif

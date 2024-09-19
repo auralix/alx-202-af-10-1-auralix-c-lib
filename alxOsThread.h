@@ -68,7 +68,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_OS_THREAD_TRACE_ENABLE)
-	#define ALX_OS_THREAD_TRACE(...) ALX_TRACE_STD(ALX_OS_THREAD_FILE, __VA_ARGS__)
+	#define ALX_OS_THREAD_TRACE(...) ALX_TRACE_WRN(ALX_OS_THREAD_FILE, __VA_ARGS__)
 #else
 	#define ALX_OS_THREAD_TRACE(...) do{} while (false)
 #endif

@@ -69,7 +69,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_MCP73831_TRACE_ENABLE)
-	#define ALX_MCP73831_TRACE(...) ALX_TRACE_STD(ALX_MCP73831_FILE, __VA_ARGS__)
+	#define ALX_MCP73831_TRACE(...) ALX_TRACE_WRN(ALX_MCP73831_FILE, __VA_ARGS__)
 #else
 	#define ALX_MCP73831_TRACE(...) do{} while (false)
 #endif

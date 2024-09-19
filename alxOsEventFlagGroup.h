@@ -69,7 +69,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_OS_EVENT_FLAG_GROUP_TRACE_ENABLE)
-	#define ALX_OS_EVENT_FLAG_GROUP_TRACE(...) ALX_TRACE_STD(ALX_OS_EVENT_FLAG_GROUP_FILE, __VA_ARGS__)
+	#define ALX_OS_EVENT_FLAG_GROUP_TRACE(...) ALX_TRACE_WRN(ALX_OS_EVENT_FLAG_GROUP_FILE, __VA_ARGS__)
 #else
 	#define ALX_OS_EVENT_FLAG_GROUP_TRACE(...) do{} while (false)
 #endif

@@ -69,7 +69,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_DELAY_TRACE_ENABLE)
-	#define ALX_DELAY_TRACE(...) ALX_TRACE_STD(ALX_DELAY_FILE, __VA_ARGS__)
+	#define ALX_DELAY_TRACE(...) ALX_TRACE_WRN(ALX_DELAY_FILE, __VA_ARGS__)
 #else
 	#define ALX_DELAY_TRACE(...) do{} while (false)
 #endif

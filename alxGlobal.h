@@ -276,7 +276,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_GLOBAL_TRACE)
-	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_STD(ALX_GLOBAL_FILE, __VA_ARGS__)
+	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_GLOBAL_FILE, __VA_ARGS__)
 #else
 	#define ALX_GLOBAL_TRACE(...) do{} while (false)
 #endif

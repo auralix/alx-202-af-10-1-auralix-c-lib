@@ -68,10 +68,10 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_LFS_CONFIG_TRACE_ENABLE)
-    //#define LFS_TRACE(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
-    #define LFS_DEBUG(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
-    #define LFS_WARN(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
-    #define LFS_ERROR(...) ALX_TRACE_STD(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+    //#define LFS_TRACE(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+    #define LFS_DEBUG(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+    #define LFS_WARN(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+    #define LFS_ERROR(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
 #else
     #define LFS_TRACE(...) do{} while (false)
     #define LFS_DEBUG(...) do{} while (false)

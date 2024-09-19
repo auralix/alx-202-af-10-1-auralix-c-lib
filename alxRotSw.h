@@ -69,7 +69,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_ROT_SW_TRACE_ENABLE)
-	#define ALX_ROT_SW_TRACE(...) ALX_TRACE_STD(ALX_ROT_SW_FILE, __VA_ARGS__)
+	#define ALX_ROT_SW_TRACE(...) ALX_TRACE_WRN(ALX_ROT_SW_FILE, __VA_ARGS__)
 	#define ALX_ROT_SW_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_ROT_SW_TRACE(...) do{} while (false)

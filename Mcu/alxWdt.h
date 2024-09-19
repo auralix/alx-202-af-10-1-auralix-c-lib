@@ -81,7 +81,7 @@ typedef struct { bool dummy; } AlxWdt;
 
 // Trace //
 #if defined(ALX_WDT_TRACE_ENABLE)
-	#define ALX_WDT_TRACE(...) ALX_TRACE_STD(ALX_WDT_FILE, __VA_ARGS__)
+	#define ALX_WDT_TRACE(...) ALX_TRACE_WRN(ALX_WDT_FILE, __VA_ARGS__)
 #else
 	#define ALX_WDT_TRACE(...) do{} while (false)
 #endif

@@ -71,7 +71,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_LIN_TRACE_ENABLE)
-	#define ALX_LIN_TRACE(...) ALX_TRACE_STD(ALX_LIN_FILE, __VA_ARGS__)
+	#define ALX_LIN_TRACE(...) ALX_TRACE_WRN(ALX_LIN_FILE, __VA_ARGS__)
 	#define ALX_LIN_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_LIN_TRACE(...) do{} while (false)

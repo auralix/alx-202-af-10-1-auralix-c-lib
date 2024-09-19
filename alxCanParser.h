@@ -69,7 +69,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_CAN_PARSER_TRACE_ENABLE)
-	#define ALX_CAN_PARSER_TRACE(...) ALX_TRACE_STD(ALX_CAN_PARSER_FILE, __VA_ARGS__)
+	#define ALX_CAN_PARSER_TRACE(...) ALX_TRACE_WRN(ALX_CAN_PARSER_FILE, __VA_ARGS__)
 #else
 	#define ALX_CAN_PARSER_TRACE(...) do{} while (false)
 #endif

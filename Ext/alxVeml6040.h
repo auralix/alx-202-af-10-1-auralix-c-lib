@@ -69,7 +69,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_VEML6040_TRACE_ENABLE)
-	#define ALX_VEML6040_TRACE(...) ALX_TRACE_STD(ALX_VEML6040_FILE, __VA_ARGS__)
+	#define ALX_VEML6040_TRACE(...) ALX_TRACE_WRN(ALX_VEML6040_FILE, __VA_ARGS__)
 	#define ALX_VEML6040_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define ALX_VEML6040_TRACE(...) do{} while (false)

@@ -69,7 +69,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_AUDIO_PLAYER_TRACE_ENABLE)
-	#define ALX_AUDIO_PLAYER_TRACE(...) ALX_TRACE_STD(ALX_AUDIO_PLAYER_FILE, __VA_ARGS__)
+	#define ALX_AUDIO_PLAYER_TRACE(...) ALX_TRACE_WRN(ALX_AUDIO_PLAYER_FILE, __VA_ARGS__)
 #else
 	#define ALX_AUDIO_PLAYER_TRACE(...) do{} while (false)
 #endif

@@ -84,7 +84,7 @@ typedef struct { bool dummy; } AlxClk;
 
 // Trace //
 #if defined(ALX_CLK_TRACE_ENABLE)
-	#define ALX_CLK_TRACE(...) ALX_TRACE_STD(ALX_CLK_FILE, __VA_ARGS__)
+	#define ALX_CLK_TRACE(...) ALX_TRACE_WRN(ALX_CLK_FILE, __VA_ARGS__)
 #else
 	#define ALX_CLK_TRACE(...) do{} while (false)
 #endif

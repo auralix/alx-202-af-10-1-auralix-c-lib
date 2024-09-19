@@ -71,7 +71,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_BQ24600_TRACE_ENABLE)
-	#define ALX_BQ24600_TRACE(...) ALX_TRACE_STD(ALX_BQ24600_FILE, __VA_ARGS__)
+	#define ALX_BQ24600_TRACE(...) ALX_TRACE_WRN(ALX_BQ24600_FILE, __VA_ARGS__)
 #else
 	#define ALX_BQ24600_TRACE(...) do{} while (false)
 #endif

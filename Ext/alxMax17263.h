@@ -72,7 +72,7 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_MAX17263_TRACE_ENABLE)
-	#define ALX_MAX17263_TRACE(...) ALX_TRACE_STD(ALX_MAX17263_FILE, __VA_ARGS__)
+	#define ALX_MAX17263_TRACE(...) ALX_TRACE_WRN(ALX_MAX17263_FILE, __VA_ARGS__)
 #else
 	#define ALX_MAX17263_TRACE(...) do{} while (false)
 #endif
