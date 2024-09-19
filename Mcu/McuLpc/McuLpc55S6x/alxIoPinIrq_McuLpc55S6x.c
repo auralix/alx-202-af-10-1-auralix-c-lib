@@ -277,7 +277,7 @@ ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin0()
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
-	ALX_TRACE_FORMAT("Define AlxIoPinIrq_Foreground_Callback_Pin1");
+	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin1");
 	ALX_IO_PIN_IRQ_ASSERT(false);
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin2()

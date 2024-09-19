@@ -69,11 +69,11 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_INA228_TRACE_ENABLE)
-	#define ALX_INA228_TRACE(...) ALX_TRACE_WRN(ALX_INA228_FILE, __VA_ARGS__)
-	#define ALX_INA228_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
+	#define ALX_INA228_TRACE_WRN(...) ALX_TRACE_WRN(ALX_INA228_FILE, __VA_ARGS__)
+	#define ALX_INA228_TRACE_INF(...) ALX_TRACE_INF(ALX_INA228_FILE, __VA_ARGS__)
 #else
-	#define ALX_INA228_TRACE(...) do{} while (false)
-	#define ALX_INA228_TRACE_FORMAT(...) do{} while (false)
+	#define ALX_INA228_TRACE_WRN(...) do{} while (false)
+	#define ALX_INA228_TRACE_INF(...) do{} while (false)
 #endif
 
 

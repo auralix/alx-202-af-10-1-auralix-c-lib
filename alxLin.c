@@ -251,7 +251,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
 		if (status != Alx_Ok)
 		{
-			ALX_LIN_TRACE("Err");
+			ALX_LIN_TRACE_WRN("Err");
 			continue;
 		}
 
@@ -269,7 +269,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		{
 			if (rxFrameDataLen > variableLenEnable_maxLen)
 			{
-				ALX_LIN_TRACE("Err");
+				ALX_LIN_TRACE_WRN("Err");
 				status = Alx_Err;
 				continue;
 			}
@@ -278,7 +278,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		{
 			if (rxFrameDataLen != len)
 			{
-				ALX_LIN_TRACE("Err");
+				ALX_LIN_TRACE_WRN("Err");
 				status = Alx_Err;
 				continue;
 			}
@@ -288,7 +288,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen);
 		if (status != Alx_Ok)
 		{
-			ALX_LIN_TRACE("Err");
+			ALX_LIN_TRACE_WRN("Err");
 			continue;
 		}
 
@@ -297,7 +297,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		uint8_t protectedId_Expected = protectedId;
 		if (protectedId_Actual != protectedId_Expected)
 		{
-			ALX_LIN_TRACE("Err");
+			ALX_LIN_TRACE_WRN("Err");
 			status = Alx_Err;
 			continue;
 		}
@@ -307,7 +307,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId, &rxFrame[3], rxFrameDataLen);
 		if (enhancedChecksum_Actual != enhancedChecksum_Expected)
 		{
-			ALX_LIN_TRACE("Err");
+			ALX_LIN_TRACE_WRN("Err");
 			status = Alx_Err;
 			continue;
 		}
@@ -391,7 +391,7 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE("Err");
+		ALX_LIN_TRACE_WRN("Err");
 		return status;
 	}
 
@@ -473,7 +473,7 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 			// Check if timeout
 			if (AlxTimSw_IsTimeout_ms(&alxTimSw, timeout_ms))
 			{
-				ALX_LIN_TRACE("Err");
+				ALX_LIN_TRACE_WRN("Err");
 				status = Alx_Err;
 				break;
 			}
@@ -482,7 +482,7 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 		// If we are here and status is NOT OK, timeout occured
 		if (status != Alx_Ok)
 		{
-			ALX_LIN_TRACE("Err");
+			ALX_LIN_TRACE_WRN("Err");
 			status = Alx_Err;
 			continue;
 		}
@@ -491,7 +491,7 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 		status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen_Actual);
 		if (status != Alx_Ok)
 		{
-			ALX_LIN_TRACE("Err");
+			ALX_LIN_TRACE_WRN("Err");
 			status = Alx_Err;
 			continue;
 		}
@@ -502,7 +502,7 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 		uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
 		if (protectedId_Actual != protectedId_Expected)
 		{
-			ALX_LIN_TRACE("Err");
+			ALX_LIN_TRACE_WRN("Err");
 			status = Alx_Err;
 			continue;
 		}
@@ -514,7 +514,7 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 			uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId_Actual, &rxFrame[3], len);
 			if (enhancedChecksum_Actual != enhancedChecksum_Expected)
 			{
-				ALX_LIN_TRACE("Err");
+				ALX_LIN_TRACE_WRN("Err");
 				status = Alx_Err;
 				continue;
 			}
@@ -560,7 +560,7 @@ static Alx_Status AlxLin_Init(AlxLin* me, bool isMaster)
 
 	// Init serial port
 	status = AlxSerialPort_Init(me->alxSerialPort);
-	if (status != Alx_Ok) { ALX_LIN_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_LIN_TRACE_WRN("Err"); return status; }
 
 	// Info
 	if (isMaster)
@@ -582,7 +582,7 @@ static Alx_Status AlxLin_DeInit(AlxLin* me, bool isMaster)
 
 	// DeInit serial port
 	status = AlxSerialPort_DeInit(me->alxSerialPort);
-	if (status != Alx_Ok) { ALX_LIN_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_LIN_TRACE_WRN("Err"); return status; }
 
 	// Info
 	if (isMaster)

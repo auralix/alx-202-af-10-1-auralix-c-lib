@@ -65,8 +65,8 @@ Alx_Status AlxParamKvStore_Init(AlxParamKvStore* me)
 	ALX_PARAM_KV_STORE_ASSERT(me->isInit == false);
 
 	// Trace
-	ALX_PARAM_KV_STORE_TRACE_FORMAT("\r\n");
-	ALX_PARAM_KV_STORE_TRACE_FORMAT("AlxParamKvStore - Init started\r\n");
+	ALX_PARAM_KV_STORE_TRACE_INF("");
+	ALX_PARAM_KV_STORE_TRACE_INF("AlxParamKvStore - Init started");
 
 	// Try to mount FS, if error, then format & mount
 	Alx_Status status = AlxFs_Mount(me->fs);
@@ -74,11 +74,11 @@ Alx_Status AlxParamKvStore_Init(AlxParamKvStore* me)
 	{
 		// Format FS
 		status = AlxFs_Format(me->fs);
-		if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
+		if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE_WRN("Err"); return status; }
 
 		// Mount FS
 		status = AlxFs_Mount(me->fs);
-		if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
+		if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE_WRN("Err"); return status; }
 	}
 
 	// Set isInit
@@ -95,7 +95,7 @@ Alx_Status AlxParamKvStore_DeInit(AlxParamKvStore* me)
 
 	// UnMount FS
 	Alx_Status status = AlxFs_UnMount(me->fs);
-	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
+	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE_WRN("Err"); return status; }
 
 	// Clear isInit
 	me->isInit = false;
@@ -115,15 +115,15 @@ Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* data,
 
 	// Open File
 	status = AlxFs_File_Open(me->fs, &file, key, "r");
-	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
+	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE_WRN("Err"); return status; }
 
 	// Read File
 	status = AlxFs_File_Read(me->fs, &file, data, lenMax, lenActual);
-	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
+	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE_WRN("Err"); return status; }
 
 	// Close File
 	status = AlxFs_File_Close(me->fs, &file);
-	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
+	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE_WRN("Err"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -140,15 +140,15 @@ Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* data,
 
 	// Open File
 	status = AlxFs_File_Open(me->fs, &file, key, "w");
-	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
+	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE_WRN("Err"); return status; }
 
 	// Write File
 	status = AlxFs_File_Write(me->fs, &file, data, len);
-	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
+	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE_WRN("Err"); return status; }
 
 	// Close File
 	status = AlxFs_File_Close(me->fs, &file);
-	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
+	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE_WRN("Err"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -161,7 +161,7 @@ Alx_Status AlxParamKvStore_Remove(AlxParamKvStore* me, const char* key)
 
 	// Remove FS
 	Alx_Status status = AlxFs_Remove(me->fs, key);
-	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE("Err"); return status; }
+	if(status != Alx_Ok) { ALX_PARAM_KV_STORE_TRACE_WRN("Err"); return status; }
 
 	// Return
 	return Alx_Ok;

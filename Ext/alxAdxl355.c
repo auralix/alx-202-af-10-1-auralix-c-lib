@@ -133,7 +133,7 @@ Alx_Status AlxAdxl355_Init(AlxAdxl355* me)
 
 	// #2 Init SPI
 	status = AlxSpi_Init(me->spi);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_AlxSpi_Init"); return status; }
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_AlxSpi_Init"); return status; }
 
 	// #3 Set register struct values to default
 	AlxAdxl355_RegStruct_SetValToDefault(me);
@@ -141,18 +141,18 @@ Alx_Status AlxAdxl355_Init(AlxAdxl355* me)
 	// #4 Force stanby mode
 	me->reg._0x2D_POWER_CTL.val.Standby = Standby_StandbyMode;
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2D_POWER_CTL	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x2D_POWER_CTL	"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2D_POWER_CTL	"); return status;}
 
 	// #5 Read ID registers & Trace ID
 	status = AlxAdxl355_TraceId(me);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_TraceId"); return status; }
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_TraceId"); return status; }
 
 	// #6 Set registers values - WEAK
 	AlxAdxl355_RegStruct_SetVal(me);
 
 	// #7 Write all registers
 	status = AlxAdxl355_Reg_WriteAll(me);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_Reg_WriteAll"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_Reg_WriteAll"); return status;}
 
 	// #8 Set isInit
 	me->isInit = true;
@@ -177,11 +177,11 @@ Alx_Status AlxAdxl355_DeInit(AlxAdxl355* me)
 	// #1 Force stanby mode
 	me->reg._0x2D_POWER_CTL.val.Standby = Standby_StandbyMode;
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2D_POWER_CTL	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x2D_POWER_CTL	"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2D_POWER_CTL	"); return status;}
 
 	// #2 DeInit SPI
 	status = AlxSpi_DeInit(me->spi);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_AlxSpi_DeInit"); return status; }
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_AlxSpi_DeInit"); return status; }
 
 	// #3 Flush FIFO
 	AlxFifo_Flush(&me->fifo);
@@ -212,7 +212,7 @@ Alx_Status AlxAdxl355_Enable(AlxAdxl355* me)
 	// #2 Force measurement mode
 	me->reg._0x2D_POWER_CTL.val.Standby = Standby_MeasurementMode;
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2D_POWER_CTL	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x2D_POWER_CTL	"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2D_POWER_CTL	"); return status;}
 
 	// #3 Return OK
 	return Alx_Ok;
@@ -237,7 +237,7 @@ Alx_Status AlxAdxl355_Disable(AlxAdxl355* me)
 	// #2 Force stanby mode
 	me->reg._0x2D_POWER_CTL.val.Standby = Standby_StandbyMode;
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2D_POWER_CTL	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x2D_POWER_CTL	"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2D_POWER_CTL	"); return status;}
 
 	// #3 Return OK
 	return Alx_Ok;
@@ -322,15 +322,15 @@ Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me)
 
 	// #1 Read status register, clears interrupt flags
 	status = AlxAdxl355_Reg_Read(me, &me->reg._0x04_Status);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_ReadStatus"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_ReadStatus"); return status;}
 
 	// #2 Read acceleration data
 	status = AlxAdxl355_ReadXyz_g(me);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_ReadXyz_g"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_ReadXyz_g"); return status;}
 
 	// #3 Read temperature data
 	status = AlxAdxl355_ReadTemp_degC(me);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_ReadTemp_degC"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_ReadTemp_degC"); return status;}
 
 	// #4 Write acceleration data to FIFO
 	status = AlxFifo_WriteMulti(&me->fifo, (uint8_t*)&me->xyz_g, sizeof(AlxAdxl355_Xyz_g));
@@ -437,11 +437,11 @@ static Alx_Status AlxAdxl355_Reg_Write(AlxAdxl355* me, void* reg)
 	// #3 Write address -> LSB is set to 0 for write operaton
 	uint8_t regAddr_Write = regAddr << 1;
 	status = AlxSpi_Master_Write(me->spi, &regAddr_Write , 1, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADXL355_TRACE("Err_WriteAddress"); return status;}
+	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADXL355_TRACE_WRN("Err_WriteAddress"); return status;}
 
 	// #4 Write data
 	status = AlxSpi_Master_Write(me->spi, regValPtr, regLen, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADXL355_TRACE("Err_WriteData"); return status;}
+	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADXL355_TRACE_WRN("Err_WriteData"); return status;}
 
 	// #5 DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
@@ -464,11 +464,11 @@ static Alx_Status AlxAdxl355_Reg_Read(AlxAdxl355* me, void* reg)
 	// #3 Write address -> LSB is set to 1 for read operaton
 	uint8_t regAddr_Write = (regAddr << 1) | 0x01;
 	status = AlxSpi_Master_Write(me->spi, &regAddr_Write , 1, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADXL355_TRACE("Err_WriteAddress"); return status;}
+	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADXL355_TRACE_WRN("Err_WriteAddress"); return status;}
 
 	// #4 Read data
 	status = AlxSpi_Master_Read(me->spi, regValPtr, regLen, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADXL355_TRACE("Err_ReadData"); return status;}
+	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADXL355_TRACE_WRN("Err_ReadData"); return status;}
 
 	// #5 DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
@@ -481,19 +481,19 @@ static Alx_Status AlxAdxl355_Reg_WriteAll(AlxAdxl355* me)
 	Alx_Status status = Alx_Err;
 
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x28_Filter		);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x28_Filter		"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x28_Filter		"); return status;}
 
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2A_INT_MAP	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x2A_INT_MAP		"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2A_INT_MAP		"); return status;}
 
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2B_Sync		);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x2B_Sync		"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2B_Sync		"); return status;}
 
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2C_Range		);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x2C_Range		"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2C_Range		"); return status;}
 
 	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2D_POWER_CTL	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x2D_POWER_CTL	"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2D_POWER_CTL	"); return status;}
 
 	return Alx_Ok;
 }
@@ -503,25 +503,25 @@ static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me)
 
 	// #1 Read ID registers
 	status = AlxAdxl355_Reg_Read(me, &me->reg._0x00_DEVID_AD	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x00_DEVID_AD	"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x00_DEVID_AD	"); return status;}
 
 	status = AlxAdxl355_Reg_Read(me, &me->reg._0x01_DEVID_MST	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x01_DEVID_MST	"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x01_DEVID_MST	"); return status;}
 
 	status = AlxAdxl355_Reg_Read(me, &me->reg._0x02_PARTID		);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x02_PARTID		"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x02_PARTID		"); return status;}
 
 	status = AlxAdxl355_Reg_Read(me, &me->reg._0x03_REVID		);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x03_REVID		"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x03_REVID		"); return status;}
 
 	// #2 Trace
-	ALX_ADXL355_TRACE_FORMAT("\r\n");
-	ALX_ADXL355_TRACE_FORMAT("AlxAdxl355 - Trace\r\n");
-	ALX_ADXL355_TRACE_FORMAT("- DEVID_AD: 0x%02X\r\n", me->reg._0x00_DEVID_AD.val.DEVID_AD);
-	ALX_ADXL355_TRACE_FORMAT("- DEVID_MST: 0x%02X\r\n", me->reg._0x01_DEVID_MST.val.DEVID_MST);
-	ALX_ADXL355_TRACE_FORMAT("- PARTID: 0x%02X\r\n", me->reg._0x02_PARTID.val.PARTID);
-	ALX_ADXL355_TRACE_FORMAT("- REVID: 0x%02X\r\n", me->reg._0x03_REVID.val.REVID);
-	ALX_ADXL355_TRACE_FORMAT("\r\n");
+	ALX_ADXL355_TRACE_INF("");
+	ALX_ADXL355_TRACE_INF("AlxAdxl355 - Trace");
+	ALX_ADXL355_TRACE_INF("- DEVID_AD: 0x%02X", me->reg._0x00_DEVID_AD.val.DEVID_AD);
+	ALX_ADXL355_TRACE_INF("- DEVID_MST: 0x%02X", me->reg._0x01_DEVID_MST.val.DEVID_MST);
+	ALX_ADXL355_TRACE_INF("- PARTID: 0x%02X", me->reg._0x02_PARTID.val.PARTID);
+	ALX_ADXL355_TRACE_INF("- REVID: 0x%02X", me->reg._0x03_REVID.val.REVID);
+	ALX_ADXL355_TRACE_INF("");
 
 	// #3 Return OK
 	return Alx_Ok;
@@ -532,7 +532,7 @@ static Alx_Status AlxAdxl355_ReadXyz_g(AlxAdxl355* me)
 
 	// #1 Read acceleration data
 	status = AlxAdxl355_Reg_Read(me, &me->reg._0x08_0x10_DATA);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x08_0x10_DATA"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x08_0x10_DATA"); return status;}
 
 	// #2 Re-organize raw data
 	me->xyz_20bit.raw[0]	= me->reg._0x08_0x10_DATA.val.XDATA1;	// dataX LSB
@@ -606,7 +606,7 @@ static Alx_Status AlxAdxl355_ReadTemp_degC(AlxAdxl355* me)
 
 	// #1 Read temperature data
 	status = AlxAdxl355_Reg_Read(me, &me->reg._0x06_0x07_TEMP);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE("Err_0x06_0x07_TEMP"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x06_0x07_TEMP"); return status;}
 
 	// #2 Merge raw data to 16bit variable
 	me->temp_12bit.raw[0] = me->reg._0x06_0x07_TEMP.val.TEMP1;
@@ -628,7 +628,7 @@ static Alx_Status AlxAdxl355_ReadTemp_degC(AlxAdxl355* me)
 ALX_WEAK void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me)
 {
 	(void)me;
-	ALX_ADXL355_TRACE("Define 'AlxAdxl355_RegStruct_SetVal' function in your application.");
+	ALX_ADXL355_TRACE_WRN("Define 'AlxAdxl355_RegStruct_SetVal' function in your application.");
 	ALX_ADXL355_ASSERT(false);
 }
 

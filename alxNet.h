@@ -71,11 +71,11 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_NET_TRACE_ENABLE)
-	#define ALX_NET_TRACE(...) ALX_TRACE_WRN(ALX_NET_FILE, __VA_ARGS__)
-	#define ALX_NET_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
+	#define ALX_NET_TRACE_WRN(...) ALX_TRACE_WRN(ALX_NET_FILE, __VA_ARGS__)
+	#define ALX_NET_TRACE_INF(...) ALX_TRACE_INF(ALX_NET_FILE, __VA_ARGS__)
 #else
-	#define ALX_NET_TRACE(...) do{} while (false)
-	#define ALX_NET_TRACE_FORMAT(...) do{} while (false)
+	#define ALX_NET_TRACE_WRN(...) do{} while (false)
+	#define ALX_NET_TRACE_INF(...) do{} while (false)
 #endif
 
 //******************************************************************************

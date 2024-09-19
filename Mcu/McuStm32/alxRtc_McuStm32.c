@@ -193,8 +193,8 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 	ALX_RTC_ASSERT(me->isInit == false);
 
 	// Trace
-	ALX_RTC_TRACE_FORMAT("\r\n");
-	ALX_RTC_TRACE_FORMAT("AlxRtc - Init started\r\n");
+	ALX_RTC_TRACE_INF("");
+	ALX_RTC_TRACE_INF("AlxRtc - Init started");
 
 	// Clear isErr
 	me->isErr = false;
@@ -216,14 +216,14 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 			(me->isErr == true)
 		)
 		{
-			ALX_RTC_TRACE("Err");
+			ALX_RTC_TRACE_WRN("Err");
 			me->isErr = true;
 			me->isInit = false;
 			return Alx_Err;
 		}
 
 		// Trace
-		ALX_RTC_TRACE_FORMAT("AlxRtc - Date-Time NOT configured, counting from default\r\n");
+		ALX_RTC_TRACE_INF("AlxRtc - Date-Time NOT configured, counting from default");
 	}
 	else
 	{
@@ -231,7 +231,7 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 		HAL_RTC_MspInit(&me->hrtc);
 
 		// Trace
-		ALX_RTC_TRACE_FORMAT("AlxRtc - Date-Time configured\r\n");
+		ALX_RTC_TRACE_INF("AlxRtc - Date-Time configured");
 	}
 
 	// Return
@@ -251,7 +251,7 @@ Alx_Status AlxRtc_DeInit(AlxRtc* me)
 	ALX_RTC_ASSERT(me->isInit == true);
 
 	// DeInit RTC
-	if (HAL_RTC_DeInit(&me->hrtc) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; }
+	if (HAL_RTC_DeInit(&me->hrtc) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; }
 
 	// Reset register PRER value & clear isDateTimeConfigured
 	HAL_RTCEx_BKUPWrite(&me->hrtc, RTC_BKP_DR0, 0);
@@ -296,7 +296,7 @@ Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 	sTimeZero.SecondFraction = ALX_NULL;
 	sTimeZero.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
 	sTimeZero.StoreOperation = RTC_STOREOPERATION_RESET;
-	if(HAL_RTC_SetTime(&me->hrtc, &sTimeZero, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTC_SetTime(&me->hrtc, &sTimeZero, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 
 	// Set date
 	RTC_DateTypeDef sDate;
@@ -304,7 +304,7 @@ Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 	sDate.Month = dateTime.mo;
 	sDate.Date = dateTime.day;
 	sDate.Year = dateTime.yr;
-	if(HAL_RTC_SetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTC_SetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 
 	me->lastSetDateTime.yr = dateTime.yr;
 	me->lastSetDateTime.mo = dateTime.mo;
@@ -321,7 +321,7 @@ Alx_Status AlxRtc_SetDateTime(AlxRtc* me, AlxRtc_DateTime dateTime)
 	sTime.SecondFraction = ALX_NULL;
 	sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
 	sTime.StoreOperation = RTC_STOREOPERATION_RESET;
-	if(HAL_RTC_SetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTC_SetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 
 	me->lastSetDateTime.hr = dateTime.hr;
 	me->lastSetDateTime.min = dateTime.min;
@@ -353,7 +353,7 @@ Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 
 	// Get time
 	RTC_TimeTypeDef sTime;
-	if(HAL_RTC_GetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTC_GetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 
 	// Set hr, min, sec
 	dateTime->hr = sTime.Hours;
@@ -402,7 +402,7 @@ Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 
 	// Get date
 	RTC_DateTypeDef sDate;
-	if(HAL_RTC_GetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTC_GetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 
 	// Set yr, mo, day, weekDay
 	dateTime->yr = sDate.Year;
@@ -466,7 +466,7 @@ Alx_Status AlxRtc_SetUnixTime_ns(AlxRtc* me, uint64_t unixTime_ns)
 
 	// Set
 	AlxRtc_DateTime dateTime = AlxRtc_UnixTimeNsToDateTime(unixTime_ns);
-	if(AlxRtc_SetDateTime(me, dateTime) != Alx_Ok) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
+	if(AlxRtc_SetDateTime(me, dateTime) != Alx_Ok) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 	me->lastSetUnixTime_ns = unixTime_ns;
 
 	// Return
@@ -524,7 +524,7 @@ Alx_Status AlxRtc_GetUnixTimeWithStatus_ns(AlxRtc* me, uint64_t* unixTime_ns)
 
 	// Get time
 	AlxRtc_DateTime dateTime;
-	if(AlxRtc_GetDateTimeWithStatus(me, &dateTime) != Alx_Ok) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
+	if(AlxRtc_GetDateTimeWithStatus(me, &dateTime) != Alx_Ok) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 	*unixTime_ns = AlxRtc_DateTimeToUnixTimeNs(dateTime);
 
 	// Return
@@ -677,7 +677,7 @@ Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns)
 	if (ssr > 0x00007FFF) return Alx_Err;
 
 	// Tune
-	if(HAL_RTCEx_SetSynchroShift(&me->hrtc, ShiftAdd1S, numOfTickToAdd) != HAL_OK) { ALX_RTC_TRACE("Err"); me->isErr = true; return Alx_Err; };
+	if(HAL_RTCEx_SetSynchroShift(&me->hrtc, ShiftAdd1S, numOfTickToAdd) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 
 	// Return
 	return Alx_Ok;
@@ -727,8 +727,8 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
 	#endif
 
 	// Init clocks
-	if(HAL_RCC_OscConfig(&alxRtc_me->iosc) != HAL_OK)			{ ALX_RTC_TRACE("Err"); alxRtc_me->isErr = true; };
-	if(HAL_RCCEx_PeriphCLKConfig(&alxRtc_me->iclk) != HAL_OK)	{ ALX_RTC_TRACE("Err"); alxRtc_me->isErr = true; };
+	if(HAL_RCC_OscConfig(&alxRtc_me->iosc) != HAL_OK)			{ ALX_RTC_TRACE_WRN("Err"); alxRtc_me->isErr = true; };
+	if(HAL_RCCEx_PeriphCLKConfig(&alxRtc_me->iclk) != HAL_OK)	{ ALX_RTC_TRACE_WRN("Err"); alxRtc_me->isErr = true; };
 
 	// Enable
 	__HAL_RCC_RTC_ENABLE();

@@ -213,11 +213,11 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusHal = HAL_MMC_ReadBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
-			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaReadDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaReadDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE("Err: %d", statusAlx);
+				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -228,11 +228,11 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, true);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE("Err: %d", statusAlx);
+				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -243,11 +243,11 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE("Err: %d", statusAlx);
+				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -306,11 +306,11 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusHal = HAL_MMC_WriteBlocks_DMA(&me->hmmc, me->dmaReadWriteBuffAlign4, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
-			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaWriteDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaWriteDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE("Err: %d", statusAlx);
+				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -321,11 +321,11 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, false);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE("Err: %d", statusAlx);
+				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -336,11 +336,11 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE("Err: %d", statusAlx);
+				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -541,8 +541,8 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	Alx_Status statusAlx = Alx_Err;
 
 	// Trace
-	ALX_MMC_TRACE_FORMAT("\r\n");
-	ALX_MMC_TRACE_FORMAT("AlxMmc - Init started\r\n");
+	ALX_MMC_TRACE_INF("");
+	ALX_MMC_TRACE_INF("AlxMmc - Init started");
 
 	// Init GPIO
 	AlxIoPin_Init(me->do_nRST);
@@ -573,7 +573,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusHal = HAL_RCCEx_PeriphCLKConfig(&me->iclk);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE("Err: %d", statusHal);
+		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -590,7 +590,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusHal = HAL_MMC_Init(&me->hmmc);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE("Err: %d", statusHal);
+		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -598,7 +598,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusAlx = AlxMmc_WaitForTransferState_Private(me);
 	if (statusAlx != Alx_Ok)
 	{
-		ALX_MMC_TRACE("Err: %d", statusAlx);
+		ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
 		return Alx_Err;
 	}
 
@@ -606,7 +606,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusHal = HAL_MMC_GetCardCID(&me->hmmc, &me->cid);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE("Err: %d", statusHal);
+		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -614,7 +614,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusHal = HAL_MMC_GetCardCSD(&me->hmmc, &me->csd);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE("Err: %d", statusHal);
+		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -622,14 +622,14 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusHal = HAL_MMC_GetCardInfo(&me->hmmc, &me->info);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE("Err: %d", statusHal);
+		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
 		return Alx_Err;
 	}
 
 	// Trace
 	float size_B = (float)me->info.BlockNbr * (float)me->info.BlockSize;
 	float size_GB = size_B / 1000000000.f;
-	ALX_MMC_TRACE_FORMAT("AlxMmc - size_GB=%.2f\r\n", size_GB);
+	ALX_MMC_TRACE_INF("AlxMmc - size_GB=%.2f", size_GB);
 
 	// Set isInit
 	me->isInit = true;
@@ -649,7 +649,7 @@ static Alx_Status AlxMmc_DeInit_Private(AlxMmc* me)
 	statusHal = HAL_MMC_DeInit(&me->hmmc);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE("Err: %d", statusHal);
+		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
 		return Alx_Err;
 	}
 

@@ -1736,14 +1736,14 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 
 	// Allocate memory
 	buff = calloc(buffLen, sizeof(uint8_t));
-	if(buff == NULL) { ALX_PARAM_ITEM_TRACE("Err"); free(buff); return Alx_Err; }
+	if(buff == NULL) { ALX_PARAM_ITEM_TRACE_WRN("Err"); free(buff); return Alx_Err; }
 
 	// Get value from Param KV Store
 	status = AlxParamKvStore_Get(me->paramKvStore, me->key, buff, buffLen, &actualValLen);
 	if (status != Alx_Ok)
 	{
 		// Trace
-		ALX_PARAM_ITEM_TRACE_FORMAT("AlxParamItem - KV store get ERROR - Key not found, default will be used - %s\r\n", me->key);
+		ALX_PARAM_ITEM_TRACE_INF("AlxParamItem - KV store get ERROR - Key not found, default will be used - %s", me->key);
 
 		// Free memory
 		free(buff);
@@ -1763,10 +1763,10 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 	{
 		// Remove Param KV Store key
 		status = AlxParamKvStore_Remove(me->paramKvStore, me->key);
-		if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE("Err"); return Alx_Err; }
+		if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE_WRN("Err"); return Alx_Err; }
 
 		// Trace
-		ALX_PARAM_ITEM_TRACE_FORMAT("AlxParamItem - KV store read OK, param item set ERROR - Key was removed, default will be used - %s\r\n", me->key);
+		ALX_PARAM_ITEM_TRACE_INF("AlxParamItem - KV store read OK, param item set ERROR - Key was removed, default will be used - %s", me->key);
 	}
 
 	// Return
@@ -1788,7 +1788,7 @@ Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 
 	// Set Param KV Store
 	Alx_Status status = AlxParamKvStore_Set(me->paramKvStore, me->key, valPtr, me->valLen);
-	if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE("Err"); return Alx_Err; }
+	if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE_WRN("Err"); return Alx_Err; }
 
 	// Return
 	return Alx_Ok;

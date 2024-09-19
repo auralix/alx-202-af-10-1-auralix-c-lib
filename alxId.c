@@ -522,23 +522,23 @@ void AlxId_Trace(AlxId* me)
 	//------------------------------------------------------------------------------
 	// Intro
 	//------------------------------------------------------------------------------
-	ALX_ID_TRACE_FORMAT("\r\n");
-	ALX_ID_TRACE_FORMAT("AlxId.h - Trace\r\n");
+	ALX_ID_TRACE_INF("");
+	ALX_ID_TRACE_INF("AlxId.h - Trace");
 
 
 	//------------------------------------------------------------------------------
 	// FW
 	//------------------------------------------------------------------------------
-	ALX_ID_TRACE_FORMAT("FW:\r\n");
-	ALX_ID_TRACE_FORMAT("- artf: %s\r\n", me->fw.artf);
-	ALX_ID_TRACE_FORMAT("- name: %s\r\n", me->fw.name);
-	ALX_ID_TRACE_FORMAT("- ver: %s\r\n", me->fw.verStr);
-	ALX_ID_TRACE_FORMAT("- bin: %s\r\n", me->fw.binStr);
-	ALX_ID_TRACE_FORMAT("- job_name: %s\r\n", me->fw.build.name);
-	ALX_ID_TRACE_FORMAT("- job_number: %lu\r\n", me->fw.build.num);
-	ALX_ID_TRACE_FORMAT("- job_hash: %s\r\n", me->fw.build.hash);
-	ALX_ID_TRACE_FORMAT("- job_revision: %lu\r\n", me->fw.build.rev);
-	ALX_ID_TRACE_FORMAT("\r\n");
+	ALX_ID_TRACE_INF("FW:");
+	ALX_ID_TRACE_INF("- artf: %s", me->fw.artf);
+	ALX_ID_TRACE_INF("- name: %s", me->fw.name);
+	ALX_ID_TRACE_INF("- ver: %s", me->fw.verStr);
+	ALX_ID_TRACE_INF("- bin: %s", me->fw.binStr);
+	ALX_ID_TRACE_INF("- job_name: %s", me->fw.build.name);
+	ALX_ID_TRACE_INF("- job_number: %lu", me->fw.build.num);
+	ALX_ID_TRACE_INF("- job_hash: %s", me->fw.build.hash);
+	ALX_ID_TRACE_INF("- job_revision: %lu", me->fw.build.rev);
+	ALX_ID_TRACE_INF("");
 
 
 	//------------------------------------------------------------------------------
@@ -546,44 +546,44 @@ void AlxId_Trace(AlxId* me)
 	//------------------------------------------------------------------------------
 	if (me->fwIsBootUsed)
 	{
-		ALX_ID_TRACE_FORMAT("FW - Bootloader:\r\n");
-		ALX_ID_TRACE_FORMAT("- artf: %s\r\n", me->fwBootId.fw.artf);
-		ALX_ID_TRACE_FORMAT("- name: %s\r\n", me->fwBootId.fw.name);
-		ALX_ID_TRACE_FORMAT("- ver: %s\r\n", me->fwBootId.fw.verStr);
-		ALX_ID_TRACE_FORMAT("- bin: %s\r\n", me->fwBootId.fw.binStr);
-		ALX_ID_TRACE_FORMAT("- job_name: %s\r\n", me->fwBootId.fw.build.name);
-		ALX_ID_TRACE_FORMAT("- job_number: %lu\r\n", me->fwBootId.fw.build.num);
-		ALX_ID_TRACE_FORMAT("- job_hash: %s\r\n", me->fwBootId.fw.build.hash);
-		ALX_ID_TRACE_FORMAT("- job_revision: %lu\r\n", me->fwBootId.fw.build.rev);
-		ALX_ID_TRACE_FORMAT("\r\n");
+		ALX_ID_TRACE_INF("FW - Bootloader:");
+		ALX_ID_TRACE_INF("- artf: %s", me->fwBootId.fw.artf);
+		ALX_ID_TRACE_INF("- name: %s", me->fwBootId.fw.name);
+		ALX_ID_TRACE_INF("- ver: %s", me->fwBootId.fw.verStr);
+		ALX_ID_TRACE_INF("- bin: %s", me->fwBootId.fw.binStr);
+		ALX_ID_TRACE_INF("- job_name: %s", me->fwBootId.fw.build.name);
+		ALX_ID_TRACE_INF("- job_number: %lu", me->fwBootId.fw.build.num);
+		ALX_ID_TRACE_INF("- job_hash: %s", me->fwBootId.fw.build.hash);
+		ALX_ID_TRACE_INF("- job_revision: %lu", me->fwBootId.fw.build.rev);
+		ALX_ID_TRACE_INF("");
 	}
 
 
 	//------------------------------------------------------------------------------
 	// FW - Language C & Language C Standard Library
 	//------------------------------------------------------------------------------
-	ALX_ID_TRACE_FORMAT("FW - Language:\r\n");
-	ALX_ID_TRACE_FORMAT("- name: C, ver: %lu\r\n", me->fwLangC.ver);
-	ALX_ID_TRACE_FORMAT("- name: %s, ver: %lu.%lu.%lu\r\n", me->fwLangCLib.name, me->fwLangCLib.verMajor, me->fwLangCLib.verMinor, me->fwLangCLib.verPatch);
-	ALX_ID_TRACE_FORMAT("\r\n");
+	ALX_ID_TRACE_INF("FW - Language:");
+	ALX_ID_TRACE_INF("- name: C, ver: %lu", me->fwLangC.ver);
+	ALX_ID_TRACE_INF("- name: %s, ver: %lu.%lu.%lu", me->fwLangCLib.name, me->fwLangCLib.verMajor, me->fwLangCLib.verMinor, me->fwLangCLib.verPatch);
+	ALX_ID_TRACE_INF("");
 
 
 	//------------------------------------------------------------------------------
 	// FW - Compiler
 	//------------------------------------------------------------------------------
-	ALX_ID_TRACE_FORMAT("FW - Compiler:\r\n");
-	ALX_ID_TRACE_FORMAT("- name: %s\r\n", me->fwComp.name);
-	ALX_ID_TRACE_FORMAT("- ver: %lu.%lu.%lu\r\n", me->fwComp.verMajor, me->fwComp.verMinor, me->fwComp.verPatch);
-	ALX_ID_TRACE_FORMAT("\r\n");
+	ALX_ID_TRACE_INF("FW - Compiler:");
+	ALX_ID_TRACE_INF("- name: %s", me->fwComp.name);
+	ALX_ID_TRACE_INF("- ver: %lu.%lu.%lu", me->fwComp.verMajor, me->fwComp.verMinor, me->fwComp.verPatch);
+	ALX_ID_TRACE_INF("");
 
 
 	//------------------------------------------------------------------------------
 	// FW - CMSIS Core
 	//------------------------------------------------------------------------------
 	#ifdef ALX_CMSIS_CORE
-	ALX_ID_TRACE_FORMAT("FW - CMSIS Core:\r\n");
-	ALX_ID_TRACE_FORMAT("- ver: %lu.%lu\r\n", me->fwCmsisCore.verMajor, me->fwCmsisCore.verMinor);
-	ALX_ID_TRACE_FORMAT("\r\n");
+	ALX_ID_TRACE_INF("FW - CMSIS Core:");
+	ALX_ID_TRACE_INF("- ver: %lu.%lu", me->fwCmsisCore.verMajor, me->fwCmsisCore.verMinor);
+	ALX_ID_TRACE_INF("");
 	#endif
 
 
@@ -591,40 +591,40 @@ void AlxId_Trace(AlxId* me)
 	// FW - STM32 - CMSIS & HAL
 	//------------------------------------------------------------------------------
 	#ifdef ALX_STM32
-	ALX_ID_TRACE_FORMAT("FW - STM32:\r\n");
-	ALX_ID_TRACE_FORMAT("- name: %s HAL CMSIS, ver: %lu.%lu.%lu\r\n", ALX_STM32_STR, me->fwStm32HalCmsis.verMajor, me->fwStm32HalCmsis.verMinor, me->fwStm32HalCmsis.verPatch);
-	ALX_ID_TRACE_FORMAT("- name: %s HAL Driver, ver: %lu.%lu.%lu\r\n", ALX_STM32_STR, me->fwStm32HalDriver.verMajor, me->fwStm32HalDriver.verMinor, me->fwStm32HalDriver.verPatch);
-	ALX_ID_TRACE_FORMAT("\r\n");
+	ALX_ID_TRACE_INF("FW - STM32:");
+	ALX_ID_TRACE_INF("- name: %s HAL CMSIS, ver: %lu.%lu.%lu", ALX_STM32_STR, me->fwStm32HalCmsis.verMajor, me->fwStm32HalCmsis.verMinor, me->fwStm32HalCmsis.verPatch);
+	ALX_ID_TRACE_INF("- name: %s HAL Driver, ver: %lu.%lu.%lu", ALX_STM32_STR, me->fwStm32HalDriver.verMajor, me->fwStm32HalDriver.verMinor, me->fwStm32HalDriver.verPatch);
+	ALX_ID_TRACE_INF("");
 	#endif
 
 
 	//------------------------------------------------------------------------------
 	// HW
 	//------------------------------------------------------------------------------
-	ALX_ID_TRACE_FORMAT("HW:\r\n");
-	ALX_ID_TRACE_FORMAT("- pcb_artf: %s\r\n", me->hw.instance.pcbArtf);
-	ALX_ID_TRACE_FORMAT("- pcb_name: %s\r\n", me->hw.instance.pcbName);
-	ALX_ID_TRACE_FORMAT("- pcb_ver: %lu.%lu.%lu.%lu\r\n", me->hw.instance.pcbVerMajor, me->hw.instance.pcbVerMinor, me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
-	ALX_ID_TRACE_FORMAT("- pcb_id: %lu\r\n", me->hw.instance.id);
-	ALX_ID_TRACE_FORMAT("- bom_artf: %s\r\n", me->hw.instance.bomArtf);
-	ALX_ID_TRACE_FORMAT("- bom_name: %s\r\n", me->hw.instance.bomName);
-	ALX_ID_TRACE_FORMAT("- bom_ver: %lu.%lu.%lu.%lu\r\n", me->hw.instance.bomVerMajor, me->hw.instance.bomVerMinor, me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
-	ALX_ID_TRACE_FORMAT("- mcu_name: %s\r\n", me->hw.mcuName);
-	ALX_ID_TRACE_FORMAT("\r\n");
+	ALX_ID_TRACE_INF("HW:");
+	ALX_ID_TRACE_INF("- pcb_artf: %s", me->hw.instance.pcbArtf);
+	ALX_ID_TRACE_INF("- pcb_name: %s", me->hw.instance.pcbName);
+	ALX_ID_TRACE_INF("- pcb_ver: %lu.%lu.%lu.%lu", me->hw.instance.pcbVerMajor, me->hw.instance.pcbVerMinor, me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
+	ALX_ID_TRACE_INF("- pcb_id: %lu", me->hw.instance.id);
+	ALX_ID_TRACE_INF("- bom_artf: %s", me->hw.instance.bomArtf);
+	ALX_ID_TRACE_INF("- bom_name: %s", me->hw.instance.bomName);
+	ALX_ID_TRACE_INF("- bom_ver: %lu.%lu.%lu.%lu", me->hw.instance.bomVerMajor, me->hw.instance.bomVerMinor, me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
+	ALX_ID_TRACE_INF("- mcu_name: %s", me->hw.mcuName);
+	ALX_ID_TRACE_INF("");
 
 
 	//------------------------------------------------------------------------------
 	// HW - STM32
 	//------------------------------------------------------------------------------
 	#ifdef ALX_STM32
-	ALX_ID_TRACE_FORMAT("HW - STM32:\r\n");
-	ALX_ID_TRACE_FORMAT("- device ID: %#lX\r\n", me->hwStm32.deviceId);
-	ALX_ID_TRACE_FORMAT("- revision ID: %#lX\r\n", me->hwStm32.revisionId);
-	ALX_ID_TRACE_FORMAT("- flash size: %lukB\r\n", me->hwStm32.flashSize_kB);
+	ALX_ID_TRACE_INF("HW - STM32:");
+	ALX_ID_TRACE_INF("- device ID: %#lX", me->hwStm32.deviceId);
+	ALX_ID_TRACE_INF("- revision ID: %#lX", me->hwStm32.revisionId);
+	ALX_ID_TRACE_INF("- flash size: %lukB", me->hwStm32.flashSize_kB);
 	#ifdef ALX_STM32G4
-	ALX_ID_TRACE_FORMAT("- package ID: %#lX\r\n", me->stm32Hw.packageId);
+	ALX_ID_TRACE_INF("- package ID: %#lX", me->stm32Hw.packageId);
 	#endif
-	ALX_ID_TRACE_FORMAT("- MCU unique ID: %s\r\n", me->hwStm32.mcuUniqueIdStr);
+	ALX_ID_TRACE_INF("- MCU unique ID: %s", me->hwStm32.mcuUniqueIdStr);
 	#endif
 }
 
