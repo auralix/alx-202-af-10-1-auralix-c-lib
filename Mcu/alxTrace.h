@@ -74,11 +74,55 @@ typedef struct { bool dummy; } AlxTrace;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TRACE_STR(str) do								{ AlxTrace_WriteStr(&alxTrace, str); } while(false)
-#define ALX_TRACE_FORMAT(...) do							{ AlxTrace_WriteFormat(&alxTrace, __VA_ARGS__); } while(false)
-#define ALX_TRACE_STD(file, ...) do							{ AlxTrace_WriteStd(&alxTrace, file, __LINE__, __func__, __VA_ARGS__); } while(false)
-#define ALX_TRACE_SM(smLevel, smName, stName, acName) do	{ AlxTrace_WriteSm(&alxTrace, smLevel, smName, stName, acName); } while(false)
 #define ALX_TRACE_LEN_MAX 256
+
+#define ALX_TRACE_LEVEL_OFF 0
+#define ALX_TRACE_LEVEL_FTL 1
+#define ALX_TRACE_LEVEL_ERR 2
+#define ALX_TRACE_LEVEL_WRN 3
+#define ALX_TRACE_LEVEL_INF 4
+#define ALX_TRACE_LEVEL_DBG 5
+#define ALX_TRACE_LEVEL_VRB 6
+
+#define ALX_TRACE_STR(str) do			{ AlxTrace_WriteStr(&alxTrace, str); } while(false)
+#define ALX_TRACE_FORMAT(...) do		{ AlxTrace_WriteFormat(&alxTrace, __VA_ARGS__); } while(false)
+#define ALX_TRACE_STD(file, ...) do		{ AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_WRN, file, __LINE__, __func__, __VA_ARGS__); } while(false)
+
+#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_FTL
+	#define ALX_TRACE_FTL(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_FTL, file, __LINE__, __func__, __VA_ARGS__); } while(false)
+#else
+	#define ALX_TRACE_FTL(file, ...) do {} while(false)
+#endif
+
+#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_ERR
+	#define ALX_TRACE_ERR(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_ERR, file, __LINE__, __func__, __VA_ARGS__); } while(false)
+#else
+	#define ALX_TRACE_ERR(file, ...) do {} while(false)
+#endif
+
+#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_WRN
+	#define ALX_TRACE_WRN(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_WRN, file, __LINE__, __func__, __VA_ARGS__); } while(false)
+#else
+	#define ALX_TRACE_WRN(file, ...) do {} while(false)
+#endif
+
+#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_INF
+	#define ALX_TRACE_INF(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_INF, file, __LINE__, __func__, __VA_ARGS__); } while(false)
+#else
+	#define ALX_TRACE_INF(file, ...) do {} while(false)
+#endif
+
+#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_DBG
+	#define ALX_TRACE_DBG(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_DBG, file, __LINE__, __func__, __VA_ARGS__); } while(false)
+#else
+	#define ALX_TRACE_DBG(file, ...) do {} while(false)
+#endif
+
+#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
+	#define ALX_TRACE_VRB(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_VRB, file, __LINE__, __func__, __VA_ARGS__); } while(false)
+#else
+	#define ALX_TRACE_VRB(file, ...) do {} while(false)
+#endif
 
 
 //******************************************************************************
@@ -94,9 +138,7 @@ Alx_Status AlxTrace_Init(AlxTrace* me);
 Alx_Status AlxTrace_DeInit(AlxTrace* me);
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str);
 void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...);
-void AlxTrace_WriteStd(AlxTrace* me, const char* file, uint32_t line, const char* fun, const char* format, ...);
-void AlxTrace_WriteSm(AlxTrace* me, uint8_t smLevel, const char* smName, const char* stName, const char* acName);
-void AlxTrace_GetSmLevelStr(uint32_t smLevel, char* smLevelStr);
+void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t line, const char* fun, const char* format, ...);
 
 
 #endif	// #if defined(ALX_C_LIB)

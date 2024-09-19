@@ -64,7 +64,7 @@ void ALX_WEAK AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun)
   */
 void ALX_WEAK AlxAssert_Trace(const char* file, uint32_t line, const char* fun)
 {
-	AlxTrace_WriteStd(&alxTrace, file, line, fun, true, "ASSERT");
+	AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_FTL, file, line, fun, "ASSERT");
 }
 
 /**
