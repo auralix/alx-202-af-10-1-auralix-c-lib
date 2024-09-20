@@ -62,11 +62,9 @@ AlxRtc_DateTime AlxTrace_GetRtcDateTime_Callback(AlxTrace* me);
   */
 void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
 {
-	// Local variables
+	// Prepare formatStr
 	char formatStr[ALX_TRACE_LEN_MAX] = {};
 	va_list args = {};
-
-	// Prepare formatStr
 	va_start(args, format);
 	vsnprintf(formatStr, sizeof(formatStr), format, args);
 	va_end(args);
@@ -87,19 +85,10 @@ void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
 void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t line, const char* fun, const char* format, ...)
 {
 	//------------------------------------------------------------------------------
-	// Local variables
+	// Prepare dateTimeStr
 	//------------------------------------------------------------------------------
-	char dateTimeStr[32] = {};
-	const char* levelStr = "";
-	char formatStr[ALX_TRACE_LEN_MAX] = {};
-	va_list args = {};
-	AlxRtc_DateTime dateTime = { };
-
-
-	//------------------------------------------------------------------------------
-	// Prepare timeStr
-	//------------------------------------------------------------------------------
-	dateTime = AlxTrace_GetRtcDateTime_Callback(me);
+	char dateTimeStr[32] = "";
+	AlxRtc_DateTime dateTime = AlxTrace_GetRtcDateTime_Callback(me);
 	sprintf
 	(
 		dateTimeStr,
@@ -117,6 +106,7 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	//------------------------------------------------------------------------------
 	// Prepare levelStr
 	//------------------------------------------------------------------------------
+	const char* levelStr = "";
 	switch (level)
 	{
 		case ALX_TRACE_LEVEL_FTL: levelStr = "FTL"; break;
@@ -130,8 +120,32 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 
 
 	//------------------------------------------------------------------------------
+	// Prepare moduleStr
+	//------------------------------------------------------------------------------
+
+	// Prepare
+	char moduleStr[64] = "";
+	uint32_t moduleStrLen = strlen(file);
+
+	// Loop from the end to find last '.' in filename to identify the extension
+	for (uint32_t i = moduleStrLen; i > 0; i--)
+	{
+		if (file[i] == '.')
+		{
+			moduleStrLen = i;	// Truncate file extension by setting new length
+			break;
+		}
+	}
+
+	// Copy
+	strncpy(moduleStr, file, moduleStrLen);
+
+
+	//------------------------------------------------------------------------------
 	// Prepare formatStr
 	//------------------------------------------------------------------------------
+	char formatStr[ALX_TRACE_LEN_MAX] = {};
+	va_list args = {};
 	va_start(args, format);
 	vsnprintf(formatStr, sizeof(formatStr), format, args);
 	va_end(args);
@@ -142,11 +156,11 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	//------------------------------------------------------------------------------
 	if ((ALX_TRACE_LEVEL_FTL <= level) && (level <= ALX_TRACE_LEVEL_WRN))
 	{
-		AlxTrace_WriteFormat(me, "[%s] [%s] [%s:%lu %s] %s\r\n", dateTimeStr, levelStr, file, line, fun, formatStr);
+		AlxTrace_WriteFormat(me, "[%s] [%s] <%s:%lu %s> %s\r\n", dateTimeStr, levelStr, moduleStr, line, fun, formatStr);
 	}
 	else if ((ALX_TRACE_LEVEL_INF <= level) && (level <= ALX_TRACE_LEVEL_VRB))
 	{
-		AlxTrace_WriteFormat(me, "[%s] [%s] %s\r\n", dateTimeStr, levelStr, formatStr);
+		AlxTrace_WriteFormat(me, "[%s] [%s] <%s> %s\r\n", dateTimeStr, levelStr, moduleStr, formatStr);
 	}
 	else
 	{

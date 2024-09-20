@@ -74,7 +74,7 @@ typedef struct { bool dummy; } AlxTrace;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TRACE_LEN_MAX 256
+#define ALX_TRACE_LEN_MAX 512
 
 #define ALX_TRACE_LEVEL_OFF 0
 #define ALX_TRACE_LEVEL_FTL 1
