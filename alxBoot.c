@@ -122,8 +122,8 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_BOOT_TRACE_FORMAT("\r\n");
-	ALX_BOOT_TRACE_FORMAT("AlxBoot - Prepare START\r\n");
+	ALX_BOOT_TRACE_INF("");
+	ALX_BOOT_TRACE_INF("AlxBoot - Prepare START");
 
 
 	//------------------------------------------------------------------------------
@@ -131,37 +131,37 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	//------------------------------------------------------------------------------
 
 	// Trace
-	ALX_BOOT_TRACE_FORMAT("AlxBoot - boot_go START\r\n");
+	ALX_BOOT_TRACE_INF("AlxBoot - boot_go START");
 
 	// Execute
 	fih_ret status = boot_go(&me->rsp);
 	if (status != FIH_SUCCESS)
 	{
-		ALX_BOOT_TRACE("Err");
+		ALX_BOOT_TRACE_WRN("Err");
 		return Alx_Err;
 	}
 
 	// Check FLASH_DEVICE_ID
 	if (me->rsp.br_flash_dev_id != ALX_MCU_BOOT_FLASH_DEVICE_ID)
 	{
-		ALX_BOOT_TRACE("Err");
+		ALX_BOOT_TRACE_WRN("Err");
 		return Alx_Err;
 	}
 
 	// Trace
-	ALX_BOOT_TRACE_FORMAT("AlxBoot - boot_go FINISH\r\n");
-	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_magic = 0x%08lX\r\n", me->rsp.br_hdr->ih_magic);
-	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_load_addr = 0x%08lX\r\n", me->rsp.br_hdr->ih_load_addr);
-	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_hdr_size = 0x%04lX\r\n", me->rsp.br_hdr->ih_hdr_size);
-	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_protect_tlv_size = 0x%04lX\r\n", me->rsp.br_hdr->ih_protect_tlv_size);
-	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_img_size = %lu\r\n", me->rsp.br_hdr->ih_img_size);
-	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_flags = 0x%08lX\r\n", me->rsp.br_hdr->ih_flags);
-	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_ver.iv_major = %lu\r\n", me->rsp.br_hdr->ih_ver.iv_major);
-	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_ver.iv_minor = %lu\r\n", me->rsp.br_hdr->ih_ver.iv_minor);
-	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_ver.iv_revision = %lu\r\n", me->rsp.br_hdr->ih_ver.iv_revision);
-	ALX_BOOT_TRACE_FORMAT("- br_hdr->ih_ver.iv_build_num = %lu\r\n", me->rsp.br_hdr->ih_ver.iv_build_num);
-	ALX_BOOT_TRACE_FORMAT("- br_flash_dev_id = %lu\r\n", me->rsp.br_flash_dev_id);
-	ALX_BOOT_TRACE_FORMAT("- br_image_off = 0x%08lX\r\n", me->rsp.br_image_off);
+	ALX_BOOT_TRACE_INF("AlxBoot - boot_go FINISH");
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_magic = 0x%08lX", me->rsp.br_hdr->ih_magic);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_load_addr = 0x%08lX", me->rsp.br_hdr->ih_load_addr);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_hdr_size = 0x%04lX", me->rsp.br_hdr->ih_hdr_size);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_protect_tlv_size = 0x%04lX", me->rsp.br_hdr->ih_protect_tlv_size);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_img_size = %lu", me->rsp.br_hdr->ih_img_size);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_flags = 0x%08lX", me->rsp.br_hdr->ih_flags);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_major = %lu", me->rsp.br_hdr->ih_ver.iv_major);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_minor = %lu", me->rsp.br_hdr->ih_ver.iv_minor);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_revision = %lu", me->rsp.br_hdr->ih_ver.iv_revision);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_build_num = %lu", me->rsp.br_hdr->ih_ver.iv_build_num);
+	ALX_BOOT_TRACE_INF("- br_flash_dev_id = %lu", me->rsp.br_flash_dev_id);
+	ALX_BOOT_TRACE_INF("- br_image_off = 0x%08lX", me->rsp.br_image_off);
 
 
 	//------------------------------------------------------------------------------
@@ -174,9 +174,9 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	me->addrJmp = *(volatile uint32_t*)(me->addrVt + 4);
 
 	// Trace
-	ALX_BOOT_TRACE_FORMAT("- addrVt = 0x%08lX\r\n", me->addrVt);
-	ALX_BOOT_TRACE_FORMAT("- addrMsp = 0x%08lX\r\n", me->addrMsp);
-	ALX_BOOT_TRACE_FORMAT("- addrJmp = 0x%08lX\r\n", me->addrJmp);
+	ALX_BOOT_TRACE_INF("- addrVt = 0x%08lX", me->addrVt);
+	ALX_BOOT_TRACE_INF("- addrMsp = 0x%08lX", me->addrMsp);
+	ALX_BOOT_TRACE_INF("- addrJmp = 0x%08lX", me->addrJmp);
 
 
 	//------------------------------------------------------------------------------
@@ -184,7 +184,7 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	//------------------------------------------------------------------------------
 
 	// Trace
-	ALX_BOOT_TRACE_FORMAT("AlxBoot - Prepare FINISH, ready to jump to application\r\n");
+	ALX_BOOT_TRACE_INF("AlxBoot - Prepare FINISH, ready to jump to application");
 
 	// Set isInit
 	me->isPrepared = true;

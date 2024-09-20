@@ -54,22 +54,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_AUDIO_VOL_FILE "alxAudioVol.h"
+#define ALX_AUDIO_VOL_MODULE "AlxAudioVol.h"
 
 // Assert //
 #if defined(ALX_AUDIO_VOL_ASSERT_BKPT_ENABLE)
-	#define ALX_AUDIO_VOL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_AUDIO_VOL_FILE, expr)
+	#define ALX_AUDIO_VOL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_AUDIO_VOL_MODULE, expr)
 #elif defined(ALX_AUDIO_VOL_ASSERT_TRACE_ENABLE)
-	#define ALX_AUDIO_VOL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_AUDIO_VOL_FILE, expr)
+	#define ALX_AUDIO_VOL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_AUDIO_VOL_MODULE, expr)
 #elif defined(ALX_AUDIO_VOL_ASSERT_RST_ENABLE)
-	#define ALX_AUDIO_VOL_ASSERT(expr) ALX_ASSERT_RST(ALX_AUDIO_VOL_FILE, expr)
+	#define ALX_AUDIO_VOL_ASSERT(expr) ALX_ASSERT_RST(ALX_AUDIO_VOL_MODULE, expr)
 #else
 	#define ALX_AUDIO_VOL_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_AUDIO_VOL_TRACE_ENABLE)
-	#define ALX_AUDIO_VOL_TRACE(...) ALX_TRACE_STD(ALX_AUDIO_VOL_FILE, __VA_ARGS__)
+	#define ALX_AUDIO_VOL_TRACE(...) ALX_TRACE_WRN(ALX_AUDIO_VOL_MODULE, __VA_ARGS__)
 #else
 	#define ALX_AUDIO_VOL_TRACE(...) do{} while (false)
 #endif

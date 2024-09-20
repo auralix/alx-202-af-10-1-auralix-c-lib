@@ -56,26 +56,26 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_NET_FILE "alxNet.h"
+#define ALX_NET_MODULE "AlxNet.h"
 
 // Assert //
 #if defined(ALX_NET_ASSERT_BKPT_ENABLE)
-	#define ALX_NET_ASSERT(expr) ALX_ASSERT_BKPT(ALX_NET_FILE, expr)
+	#define ALX_NET_ASSERT(expr) ALX_ASSERT_BKPT(ALX_NET_MODULE, expr)
 #elif defined(ALX_NET_ASSERT_TRACE_ENABLE)
-	#define ALX_NET_ASSERT(expr) ALX_ASSERT_TRACE(ALX_NET_FILE, expr)
+	#define ALX_NET_ASSERT(expr) ALX_ASSERT_TRACE(ALX_NET_MODULE, expr)
 #elif defined(ALX_NET_ASSERT_RST_ENABLE)
-	#define ALX_NET_ASSERT(expr) ALX_ASSERT_RST(ALX_NET_FILE, expr)
+	#define ALX_NET_ASSERT(expr) ALX_ASSERT_RST(ALX_NET_MODULE, expr)
 #else
 	#define ALX_NET_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_NET_TRACE_ENABLE)
-	#define ALX_NET_TRACE(...) ALX_TRACE_STD(ALX_NET_FILE, __VA_ARGS__)
-	#define ALX_NET_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
+	#define ALX_NET_TRACE_WRN(...) ALX_TRACE_WRN(ALX_NET_MODULE, __VA_ARGS__)
+	#define ALX_NET_TRACE_INF(...) ALX_TRACE_INF(ALX_NET_MODULE, __VA_ARGS__)
 #else
-	#define ALX_NET_TRACE(...) do{} while (false)
-	#define ALX_NET_TRACE_FORMAT(...) do{} while (false)
+	#define ALX_NET_TRACE_WRN(...) do{} while (false)
+	#define ALX_NET_TRACE_INF(...) do{} while (false)
 #endif
 
 //******************************************************************************

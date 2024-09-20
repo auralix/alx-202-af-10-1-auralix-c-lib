@@ -108,15 +108,15 @@ void AlxRst_Trace(AlxRst* me)
 	ALX_RST_ASSERT(me->isInit == true);
 
 	// Trace
-	ALX_RST_TRACE_FORMAT("alxRst_McuStm32.h - Reset Reason:\r\n");
-	ALX_RST_TRACE_FORMAT("- Software: %u\r\n", me->rr.sw);
-	ALX_RST_TRACE_FORMAT("- nRST Pin: %u\r\n", me->rr.rstPin);
-	ALX_RST_TRACE_FORMAT("- Window Watchdog (WWDG): %u\r\n", me->rr.wwdg);
-	ALX_RST_TRACE_FORMAT("- Independent Watchdog (IWDG): %u\r\n", me->rr.iwdg);
-	ALX_RST_TRACE_FORMAT("- Firewall: %u\r\n", me->rr.firewall);
-	ALX_RST_TRACE_FORMAT("- Low-power Security: %u\r\n", me->rr.lowPowerSecurity);
-	ALX_RST_TRACE_FORMAT("- Option Byte Loader: %u\r\n", me->rr.optioByteLoader);
-	ALX_RST_TRACE_FORMAT("- Power-on (POR) / Brown-out (BOR): %u\r\n", me->rr.porOrBor);
+	ALX_RST_TRACE_INF("alxRst_McuStm32.h - Reset Reason:");
+	ALX_RST_TRACE_INF("- Software: %u", me->rr.sw);
+	ALX_RST_TRACE_INF("- nRST Pin: %u", me->rr.rstPin);
+	ALX_RST_TRACE_INF("- Window Watchdog (WWDG): %u", me->rr.wwdg);
+	ALX_RST_TRACE_INF("- Independent Watchdog (IWDG): %u", me->rr.iwdg);
+	ALX_RST_TRACE_INF("- Firewall: %u", me->rr.firewall);
+	ALX_RST_TRACE_INF("- Low-power Security: %u", me->rr.lowPowerSecurity);
+	ALX_RST_TRACE_INF("- Option Byte Loader: %u", me->rr.optioByteLoader);
+	ALX_RST_TRACE_INF("- Power-on (POR) / Brown-out (BOR): %u", me->rr.porOrBor);
 }
 
 

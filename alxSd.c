@@ -115,7 +115,7 @@ Alx_Status AlxSd_Init(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_ms)
 
 	// Init SPI
 	status = AlxSpi_Init(me->alxSpi);
-	if (status != Alx_Ok) { ALX_SD_TRACE("Err"); return Alx_Err; }
+	if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); return Alx_Err; }
 
 
 	//------------------------------------------------------------------------------
@@ -127,35 +127,35 @@ Alx_Status AlxSd_Init(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_ms)
 	{
 		// Send power-up clock cycles
 		status = AlxSd_SpiMode_SendPwrUpClkCycles(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute CMD0 SPI mode - Sends CMD0 with CS asserted, which resets SD card and puts it in SPI mode
 		status = AlxSd_SpiMode_SendCmd0(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute CMD8 SPI mode - Sends interface operating conditions and checks if SD card is Version 2.00 or later (currently only 3.3V operation and Version 2.00 or later is supported)
 		status = AlxSd_SpiMode_SendCmd8(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute CMD58 SPI mode (SD card idle) - Reads OCR (operating conditions register), check interface operating conditions
 		status = AlxSd_SpiMode_SendCmd58_SdIdle(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute ACMD41 SPI mode - Starts SD card initialization process, polls untils initialization is complete, also sends HSC (high capacits support) bit
 		status = AlxSd_SpiMode_SendAcmd41(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute CMD58 SPI mode (SD card ready) - Reads OCR (operating conditions register), check interface operating conditions, checks CCD (card capacity status), currently only supported CSS = 1
 		status = AlxSd_SpiMode_SendCmd58_SdReady(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute CMD9 SPI mode - Checks CSD (card-specific register) values
 		status = AlxSd_SpiMode_SendCmd9(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute CMD10 SPI mode - Checks CID (card identification register) values
 		status = AlxSd_SpiMode_SendCmd10(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Set isInit
 		me->isInit = true;
@@ -171,7 +171,7 @@ Alx_Status AlxSd_Init(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_ms)
 
 	// DeInit SPI
 	status = AlxSpi_DeInit(me->alxSpi);
-	if (status != Alx_Ok) { ALX_SD_TRACE("Err"); return Alx_Err; }
+	if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); return Alx_Err; }
 
 	// Return
 	return Alx_ErrNumOfTries;
@@ -199,15 +199,15 @@ Alx_Status AlxSd_DeInit(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_m
 	{
 		// Send power-up clock cycles
 		status = AlxSd_SpiMode_SendPwrUpClkCycles(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute CMD0 SPI mode - Sends CMD0 with CS asserted, which resets SD card and puts it in SPI mode
 		status = AlxSd_SpiMode_SendCmd0(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// DeInit SPI
 		status = AlxSpi_DeInit(me->alxSpi);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); return Alx_Err; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); return Alx_Err; }
 
 		// Clear isInit
 		me->isInit = false;
@@ -248,15 +248,15 @@ Alx_Status AlxSd_ReadBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint8
 	{
 		// Execute CMD18 SPI mode - Sends multiple block read command with specified address at which reading will begin
 		status = AlxSd_SpiMode_SendCmd18(me, addr);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Read number of blocks from specified address onward
 		status = AlxSd_SpiMode_ReadNumOfBlocks(me, numOfBlocks, data);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute CMD12 SPI mode - Sends stop transmission command
 		status = AlxSd_SpiMode_SendCmd12(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Return
 		return Alx_Ok;
@@ -294,19 +294,19 @@ Alx_Status AlxSd_WriteBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint
 	{
 		// Execute ACMD23 SPI mode - Sends number of block to pre-erase before writing
 		status = AlxSd_SpiMode_SendAcmd23(me, numOfBlocks);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute CMD25 SPI mode - Sends multiple block write command with specified address at which writing will begin
 		status = AlxSd_SpiMode_SendCmd25(me, addr);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Write number of blocks from specified address onward
 		status = AlxSd_SpiMode_WriteNumOfBlocks(me, numOfBlocks, data);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Execute CMD13 SPI mode - Check if errors occured during multiple block write
 		status = AlxSd_SpiMode_SendCmd13(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); AlxDelay_ms(newTryWaitTime_ms); continue; }
 
 		// Return
 		return Alx_Ok;
@@ -343,7 +343,7 @@ Alx_Status AlxSd_SpiMode_ReadNumOfBlocks(AlxSd* me, uint32_t numOfBlocks, uint8_
 	{
 		// Assert CS + Send sync byte
 		status = AlxSd_SpiMode_AssertCs_SendSyncByte(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Read number of blocks
 		for (uint32_t i = 0; i < numOfBlocks; i++)
@@ -351,12 +351,12 @@ Alx_Status AlxSd_SpiMode_ReadNumOfBlocks(AlxSd* me, uint32_t numOfBlocks, uint8_
 			// Wait for start multiple block read token
 			uint8_t rxByte = 0;
 			status = AlxSd_SpiMode_WaitByte(me, 0xFF, 0xFE, true, me->blockReadStartTokenTimeout_ms, &rxByte);
-			if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+			if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 			// Read block
 			uint8_t rxData[ALX_SD_BLOCK_LEN+2] = {};	// Block length + CRC 2 bytes
 			status = AlxSpi_Master_WriteRead(me->alxSpi, me->DATA_0xFF, rxData, sizeof(rxData), me->spiNumOfTries, me->spiTimeout_ms);
-			if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+			if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 			// Copy
 			memcpy(data + offset, rxData, ALX_SD_BLOCK_LEN);
@@ -370,7 +370,7 @@ Alx_Status AlxSd_SpiMode_ReadNumOfBlocks(AlxSd* me, uint32_t numOfBlocks, uint8_
 
 		// Send sync byte + DeAssert CS
 		status = AlxSd_SpiMode_SendSyncByte_DeAssertCs(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Return
 		return Alx_Ok;
@@ -405,7 +405,7 @@ Alx_Status AlxSd_SpiMode_WriteNumOfBlocks(AlxSd* me, uint32_t numOfBlocks, uint8
 	{
 		// Assert CS + Send sync byte
 		status = AlxSd_SpiMode_AssertCs_SendSyncByte(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Read number of blocks
 		for (uint32_t i = 0; i < numOfBlocks; i++)
@@ -413,20 +413,20 @@ Alx_Status AlxSd_SpiMode_WriteNumOfBlocks(AlxSd* me, uint32_t numOfBlocks, uint8
 			// Write start multiple block write token
 			uint8_t startMultipleBlockWriteToken = 0xFC;
 			status = AlxSpi_Master_Write(me->alxSpi, &startMultipleBlockWriteToken, 1, me->spiNumOfTries, me->spiTimeout_ms);
-			if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+			if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 			// Write block
 			status = AlxSpi_Master_Write(me->alxSpi, data + offset, ALX_SD_BLOCK_LEN, me->spiNumOfTries, me->spiTimeout_ms);
-			if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+			if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 			// Wait for multiple block write data accepted token
 			uint8_t rxByte = 0;
 			status = AlxSd_SpiMode_WaitByte(me, 0x1F, 0x05, true, me->blockWriteStartTokenTimeout_ms, &rxByte);
-			if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+			if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 			// Wait for SD card busy
 			status = AlxSd_SpiMode_WaitByte(me, 0xFF, 0x00, false, me->blockWriteStopTokenTimeout_ms, &rxByte);
-			if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+			if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 			// Increment offset
 			offset = offset + ALX_SD_BLOCK_LEN;
@@ -438,20 +438,20 @@ Alx_Status AlxSd_SpiMode_WriteNumOfBlocks(AlxSd* me, uint32_t numOfBlocks, uint8
 		// Write stop multiple block write token
 		uint8_t stopMultipleBlockWriteToken = 0xFD;
 		status = AlxSpi_Master_Write(me->alxSpi, &stopMultipleBlockWriteToken, 1, me->spiNumOfTries, me->spiTimeout_ms);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Send sync byte
 		status = AlxSpi_Master_Write(me->alxSpi, me->DATA_0xFF, 1, me->spiNumOfTries, me->spiTimeout_ms);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Wait for SD card busy
 		uint8_t rxByte = 0;
 		status = AlxSd_SpiMode_WaitByte(me, 0xFF, 0x00, false, me->blockWriteStopTokenTimeout_ms, &rxByte);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Send sync byte + DeAssert CS
 		status = AlxSd_SpiMode_SendSyncByte_DeAssertCs(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Return
 		return Alx_Ok;
@@ -485,15 +485,15 @@ Alx_Status AlxSd_SpiMode_SendPwrUpClkCycles(AlxSd* me)
 	{
 		// Assert CS + Send sync byte
 		status = AlxSd_SpiMode_AssertCs_SendSyncByte(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Generate power-up clock cycles
 		status = AlxSpi_Master_Write(me->alxSpi, me->DATA_0xFF, me->NUM_OF_PWR_UP_CLK_CYCLES, me->spiNumOfTries, me->spiTimeout_ms);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Send sync byte + DeAssert CS
 		status = AlxSd_SpiMode_SendSyncByte_DeAssertCs(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Return
 		return Alx_Ok;
@@ -527,26 +527,26 @@ Alx_Status AlxSd_SpiMode_SendCmd(AlxSd* me, uint8_t* cmd, uint8_t cmdLen, uint8_
 	{
 		// Assert CS + Send sync byte
 		status = AlxSd_SpiMode_AssertCs_SendSyncByte(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Send CMD
 		status = AlxSpi_Master_Write(me->alxSpi, cmd, cmdLen, me->spiNumOfTries, me->spiTimeout_ms);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Send sync byte
 		status = AlxSpi_Master_Write(me->alxSpi, me->DATA_0xFF, 1, me->spiNumOfTries, me->spiTimeout_ms);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Read response R1
 		uint8_t rxByte = 0;
 		status = AlxSd_SpiMode_WaitByte(me, expectedRespR1Mask, expectedRespR1, true, me->cmdRespR1Timeout_ms, actualRespR1);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// If response R1b enabled, wait until SD card busy
 		if (enableRespR1b)
 		{
 			status = AlxSd_SpiMode_WaitByte(me, 0xFF, 0x00, false, me->cmdRespR1Timeout_ms, &rxByte);
-			if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+			if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 		}
 
 		// If response R2/R3/R7 enabled, read & check response
@@ -555,18 +555,18 @@ Alx_Status AlxSd_SpiMode_SendCmd(AlxSd* me, uint8_t* cmd, uint8_t cmdLen, uint8_
 			// Read
 			uint8_t actualRespR2R3R7[4] = {};
 			status = AlxSpi_Master_WriteRead(me->alxSpi, me->DATA_0xFF, actualRespR2R3R7, expectedRespR2R3R7Len, me->spiNumOfTries, me->spiTimeout_ms);
-			if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+			if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 			// Check
 			if (expectedRespR2R3R7Len == 1)	// TV: TODO, check for R3/R7
 			{
-				if (memcmp(actualRespR2R3R7, expectedRespR2R3R7, expectedRespR2R3R7Len) != 0) { ALX_SD_TRACE("Err"); break; }
+				if (memcmp(actualRespR2R3R7, expectedRespR2R3R7, expectedRespR2R3R7Len) != 0) { ALX_SD_TRACE_WRN("Err"); break; }
 			}
 		}
 
 		// Send sync byte + DeAssert CS
 		status = AlxSd_SpiMode_SendSyncByte_DeAssertCs(me);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Return
 		return Alx_Ok;
@@ -796,7 +796,7 @@ Alx_Status AlxSd_SpiMode_SendAcmd23(AlxSd* me, uint32_t numOfBlocksToPreErase)
 		// Send
 		actualRespR1 = 0;
 		status = AlxSd_SpiMode_SendCmd(me, cmd, sizeof(cmd), 0xFE, 0x00, &actualRespR1, false, false, ALX_NULL_PTR, ALX_NULL);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 
 		//------------------------------------------------------------------------------
@@ -814,7 +814,7 @@ Alx_Status AlxSd_SpiMode_SendAcmd23(AlxSd* me, uint32_t numOfBlocksToPreErase)
 		// Send
 		actualRespR1 = 0;
 		status = AlxSd_SpiMode_SendCmd(me, cmd, sizeof(cmd), 0xFE, 0x00, &actualRespR1, false, false, ALX_NULL_PTR, ALX_NULL);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Return
 		return Alx_Ok;
@@ -865,7 +865,7 @@ Alx_Status AlxSd_SpiMode_SendAcmd41(AlxSd* me)
 		// Send
 		actualRespR1 = 0;
 		status = AlxSd_SpiMode_SendCmd(me, cmd, sizeof(cmd), 0xFE, 0x00, &actualRespR1, false, false, ALX_NULL_PTR, ALX_NULL);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 
 		//------------------------------------------------------------------------------
@@ -883,7 +883,7 @@ Alx_Status AlxSd_SpiMode_SendAcmd41(AlxSd* me)
 		// Send
 		actualRespR1 = 0;
 		status = AlxSd_SpiMode_SendCmd(me, cmd, sizeof(cmd), 0xFE, 0x00, &actualRespR1, false, false, ALX_NULL_PTR, ALX_NULL);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 
 		//------------------------------------------------------------------------------
@@ -898,7 +898,7 @@ Alx_Status AlxSd_SpiMode_SendAcmd41(AlxSd* me)
 		}
 
 		// Check if timeout
-		if (AlxTimSw_IsTimeout_ms(&alxTimSw, me->acmd41Timeout_ms)) { ALX_SD_TRACE("Err"); break; }
+		if (AlxTimSw_IsTimeout_ms(&alxTimSw, me->acmd41Timeout_ms)) { ALX_SD_TRACE_WRN("Err"); break; }
 	}
 
 
@@ -931,7 +931,7 @@ Alx_Status AlxSd_SpiMode_WaitByte(AlxSd* me, uint8_t rxByteMask, uint8_t rxByteT
 	{
 		// Read
 		status = AlxSpi_Master_WriteRead(me->alxSpi, me->DATA_0xFF, rxByte, 1, me->spiNumOfTries, me->spiTimeout_ms);
-		if (status != Alx_Ok) { ALX_SD_TRACE("Err"); break; }
+		if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); break; }
 
 		// Check if byteToWait
 		uint8_t rxByteMasked = *rxByte & rxByteMask;
@@ -953,7 +953,7 @@ Alx_Status AlxSd_SpiMode_WaitByte(AlxSd* me, uint8_t rxByteMask, uint8_t rxByteT
 		}
 
 		// Check if timeout
-		if (AlxTimSw_IsTimeout_ms(&alxTimSw, timeout_ms)) { ALX_SD_TRACE("Err"); break; }
+		if (AlxTimSw_IsTimeout_ms(&alxTimSw, timeout_ms)) { ALX_SD_TRACE_WRN("Err"); break; }
 	}
 
 
@@ -974,7 +974,7 @@ Alx_Status AlxSd_SpiMode_AssertCs_SendSyncByte(AlxSd* me)
 
 	// Send sync byte
 	status = AlxSpi_Master_Write(me->alxSpi, me->DATA_0xFF, 1, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { ALX_SD_TRACE("Err"); return Alx_Err; }
+	if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); return Alx_Err; }
 
 	// Return
 	return Alx_Ok;
@@ -986,7 +986,7 @@ Alx_Status AlxSd_SpiMode_SendSyncByte_DeAssertCs(AlxSd* me)
 
 	// Send sync byte
 	status = AlxSpi_Master_Write(me->alxSpi, me->DATA_0xFF, 1, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { ALX_SD_TRACE("Err"); return Alx_Err; }
+	if (status != Alx_Ok) { ALX_SD_TRACE_WRN("Err"); return Alx_Err; }
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->alxSpi);

@@ -58,25 +58,27 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_LOGGER_FILE "alxLogger.h"
+#define ALX_LOGGER_MODULE "AlxLogger.h"
 
 // Assert //
 #if defined(ALX_LOGGER_ASSERT_BKPT_ENABLE)
-	#define ALX_LOGGER_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LOGGER_FILE, expr)
+	#define ALX_LOGGER_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LOGGER_MODULE, expr)
 #elif defined(ALX_LOGGER_ASSERT_TRACE_ENABLE)
-	#define ALX_LOGGER_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LOGGER_FILE, expr)
+	#define ALX_LOGGER_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LOGGER_MODULE, expr)
 #elif defined(ALX_LOGGER_ASSERT_RST_ENABLE)
-	#define ALX_LOGGER_ASSERT(expr) ALX_ASSERT_RST(ALX_LOGGER_FILE, expr)
+	#define ALX_LOGGER_ASSERT(expr) ALX_ASSERT_RST(ALX_LOGGER_MODULE, expr)
 #else
 	#define ALX_LOGGER_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_LOGGER_TRACE_ENABLE)
-	#define ALX_LOGGER_TRACE(...) ALX_TRACE_STD(ALX_LOGGER_FILE, __VA_ARGS__)
+	#define ALX_LOGGER_TRACE_WRN(...) ALX_TRACE_WRN(ALX_LOGGER_MODULE, __VA_ARGS__)
+	#define ALX_LOGGER_TRACE_INF(...) ALX_TRACE_INF(ALX_LOGGER_MODULE, __VA_ARGS__)
 	#define ALX_LOGGER_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
-	#define ALX_LOGGER_TRACE(...) do{} while (false)
+	#define ALX_LOGGER_TRACE_WRN(...) do{} while (false)
+	#define ALX_LOGGER_TRACE_INF(...) do{} while (false)
 	#define ALX_LOGGER_TRACE_FORMAT(...) do{} while (false)
 #endif
 

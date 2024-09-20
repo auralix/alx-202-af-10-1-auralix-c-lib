@@ -120,11 +120,11 @@ Alx_Status AlxTmp1075_Init(AlxTmp1075* me)
 
 	// Init I2C
 	status = AlxI2c_Init(me->i2c);
-	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_TMP1075_TRACE_WRN("Err"); return status; }
 
 	// Check if slave ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, 3, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_TMP1075_TRACE_WRN("Err"); return status; }
 
 	// Set register struct values to default
 	AlxTmp1075_RegStruct_SetToDefault(me);
@@ -134,11 +134,11 @@ Alx_Status AlxTmp1075_Init(AlxTmp1075* me)
 
 	// Read ID register & Trace ID
 	status = AlxTmp1075_TraceId(me);
-	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_TMP1075_TRACE_WRN("Err"); return status; }
 
 	// Write registers
 	status = AlxTmp1075_Reg_Write_All(me);
-	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err"); return status;}
+	if (status != Alx_Ok) { ALX_TMP1075_TRACE_WRN("Err"); return status;}
 
 	// Set isInit
 	me->isInit = true;
@@ -164,7 +164,7 @@ Alx_Status AlxTmp1075_DeInit(AlxTmp1075* me)
 
 	// DeInit I2C
 	status = AlxI2c_DeInit(me->i2c);
-	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_TMP1075_TRACE_WRN("Err"); return status; }
 
 	// Reset isInit
 	me->isInit = false;
@@ -204,7 +204,7 @@ float AlxTmp1075_GetTemp_degC(AlxTmp1075* me)
 
 	// Read temperature data
 	status = AlxTmp1075_Reg_Read(me, &me->reg.R0_Temp);
-	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err"); }
+	if (status != Alx_Ok) { ALX_TMP1075_TRACE_WRN("Err"); }
 
 	// Shift value to get rid of the 4 unused bits
 	me->temp_raw = me->reg.R0_Temp.val.T >> 4;
@@ -309,13 +309,13 @@ static Alx_Status AlxTmp1075_TraceId(AlxTmp1075* me)
 
 	// Read ID register
 	status = AlxTmp1075_Reg_Read(me, &me->reg.R4_DeviceId);
-	if (status != Alx_Ok) { ALX_TMP1075_TRACE("Err"); return status;}
+	if (status != Alx_Ok) { ALX_TMP1075_TRACE_WRN("Err"); return status;}
 
 	// Trace
-	ALX_TMP1075_TRACE_FORMAT("\r\n");
-	ALX_TMP1075_TRACE_FORMAT("Auralix C Library ALX Temperature Sensor TMP1075 Module Identification:\r\n");
-	ALX_TMP1075_TRACE_FORMAT("- Device ID: %X\r\n", me->reg.R4_DeviceId.val.DID);
-	ALX_TMP1075_TRACE_FORMAT("\r\n");
+	ALX_TMP1075_TRACE_INF("");
+	ALX_TMP1075_TRACE_INF("Auralix C Library ALX Temperature Sensor TMP1075 Module Identification:");
+	ALX_TMP1075_TRACE_INF("- Device ID: %X", me->reg.R4_DeviceId.val.DID);
+	ALX_TMP1075_TRACE_INF("");
 
 	// Return
 	return Alx_Ok;

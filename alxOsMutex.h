@@ -47,22 +47,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_OS_MUTEX_FILE "alxOsMutex.h"
+#define ALX_OS_MUTEX_MODULE "AlxOsMutex.h"
 
 // Assert //
 #if defined(ALX_OS_MUTEX_ASSERT_BKPT_ENABLE)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_MUTEX_FILE, expr)
+	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_MUTEX_MODULE, expr)
 #elif defined(ALX_OS_MUTEX_ASSERT_TRACE_ENABLE)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_MUTEX_FILE, expr)
+	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_MUTEX_MODULE, expr)
 #elif defined(ALX_OS_MUTEX_ASSERT_RST_ENABLE)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_MUTEX_FILE, expr)
+	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_MUTEX_MODULE, expr)
 #else
 	#define ALX_OS_MUTEX_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_OS_MUTEX_TRACE_ENABLE)
-	#define ALX_OS_MUTEX_TRACE(...) ALX_TRACE_STD(ALX_OS_MUTEX_FILE, __VA_ARGS__)
+	#define ALX_OS_MUTEX_TRACE(...) ALX_TRACE_WRN(ALX_OS_MUTEX_MODULE, __VA_ARGS__)
 #else
 	#define ALX_OS_MUTEX_TRACE(...) do{} while (false)
 #endif
@@ -81,7 +81,8 @@ typedef struct
 {
 	// Variables
 	#if defined(ALX_FREE_RTOS)
-	SemaphoreHandle_t mutex;
+	StaticSemaphore_t semaphore;
+	SemaphoreHandle_t semaphoreHandle;
 	#endif
 
 	// Info

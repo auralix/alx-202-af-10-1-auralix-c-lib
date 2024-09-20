@@ -53,22 +53,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_BOUND_FILE "alxBound.h"
+#define ALX_BOUND_MODULE "AlxBound.h"
 
 // Assert //
 #if defined(ALX_BOUND_ASSERT_BKPT_ENABLE)
-	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BOUND_FILE, expr)
+	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BOUND_MODULE, expr)
 #elif defined(ALX_BOUND_ASSERT_TRACE_ENABLE)
-	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BOUND_FILE, expr)
+	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BOUND_MODULE, expr)
 #elif defined(ALX_BOUND_ASSERT_RST_ENABLE)
-	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_RST(ALX_BOUND_FILE, expr)
+	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_RST(ALX_BOUND_MODULE, expr)
 #else
 	#define ALX_BOUND_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_BOUND_TRACE_ENABLE)
-	#define ALX_BOUND_TRACE(...) ALX_TRACE_STD(ALX_BOUND_FILE, __VA_ARGS__)
+	#define ALX_BOUND_TRACE(...) ALX_TRACE_WRN(ALX_BOUND_MODULE, __VA_ARGS__)
 #else
 	#define ALX_BOUND_TRACE(...) do{} while (false)
 #endif

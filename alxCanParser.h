@@ -54,22 +54,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_CAN_PARSER_FILE "alxCanParser.h"
+#define ALX_CAN_PARSER_MODULE "AlxCanParser.h"
 
 // Assert //
 #if defined(ALX_CAN_PARSER_ASSERT_BKPT_ENABLE)
-	#define ALX_CAN_PARSER_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CAN_PARSER_FILE, expr)
+	#define ALX_CAN_PARSER_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CAN_PARSER_MODULE, expr)
 #elif defined(ALX_CAN_PARSER_ASSERT_TRACE_ENABLE)
-	#define ALX_CAN_PARSER_ASSERT(expr) ALX_ASSERT_TRACE(ALX_CAN_PARSER_FILE, expr)
+	#define ALX_CAN_PARSER_ASSERT(expr) ALX_ASSERT_TRACE(ALX_CAN_PARSER_MODULE, expr)
 #elif defined(ALX_CAN_PARSER_ASSERT_RST_ENABLE)
-	#define ALX_CAN_PARSER_ASSERT(expr) ALX_ASSERT_RST(ALX_CAN_PARSER_FILE, expr)
+	#define ALX_CAN_PARSER_ASSERT(expr) ALX_ASSERT_RST(ALX_CAN_PARSER_MODULE, expr)
 #else
 	#define ALX_CAN_PARSER_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_CAN_PARSER_TRACE_ENABLE)
-	#define ALX_CAN_PARSER_TRACE(...) ALX_TRACE_STD(ALX_CAN_PARSER_FILE, __VA_ARGS__)
+	#define ALX_CAN_PARSER_TRACE(...) ALX_TRACE_WRN(ALX_CAN_PARSER_MODULE, __VA_ARGS__)
 #else
 	#define ALX_CAN_PARSER_TRACE(...) do{} while (false)
 #endif

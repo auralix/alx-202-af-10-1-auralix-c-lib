@@ -60,22 +60,22 @@ typedef struct { bool dummy; } AlxSerialPort;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_SERIAL_PORT_FILE "alxSerialPort.h"
+#define ALX_SERIAL_PORT_MODULE "AlxSerialPort.h"
 
 // Assert //
 #if defined(ALX_SERIAL_PORT_ASSERT_BKPT_ENABLE)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SERIAL_PORT_FILE, expr)
+	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SERIAL_PORT_MODULE, expr)
 #elif defined(ALX_SERIAL_PORT_ASSERT_TRACE_ENABLE)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SERIAL_PORT_FILE, expr)
+	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SERIAL_PORT_MODULE, expr)
 #elif defined(ALX_SERIAL_PORT_ASSERT_RST_ENABLE)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_RST(ALX_SERIAL_PORT_FILE, expr)
+	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_RST(ALX_SERIAL_PORT_MODULE, expr)
 #else
 	#define ALX_SERIAL_PORT_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_SERIAL_PORT_TRACE_ENABLE)
-	#define ALX_SERIAL_PORT_TRACE(...) ALX_TRACE_STD(ALX_SERIAL_PORT_FILE, __VA_ARGS__)
+	#define ALX_SERIAL_PORT_TRACE(...) ALX_TRACE_WRN(ALX_SERIAL_PORT_MODULE, __VA_ARGS__)
 #else
 	#define ALX_SERIAL_PORT_TRACE(...) do{} while (false)
 #endif

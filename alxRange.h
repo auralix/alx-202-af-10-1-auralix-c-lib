@@ -53,22 +53,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_RANGE_FILE "alxRange.h"
+#define ALX_RANGE_MODULE "AlxRange.h"
 
 // Assert //
 #if defined(ALX_RANGE_ASSERT_BKPT_ENABLE)
-	#define ALX_RANGE_ASSERT(expr) ALX_ASSERT_BKPT(ALX_RANGE_FILE, expr)
+	#define ALX_RANGE_ASSERT(expr) ALX_ASSERT_BKPT(ALX_RANGE_MODULE, expr)
 #elif defined(ALX_RANGE_ASSERT_TRACE_ENABLE)
-	#define ALX_RANGE_ASSERT(expr) ALX_ASSERT_TRACE(ALX_RANGE_FILE, expr)
+	#define ALX_RANGE_ASSERT(expr) ALX_ASSERT_TRACE(ALX_RANGE_MODULE, expr)
 #elif defined(ALX_RANGE_ASSERT_RST_ENABLE)
-	#define ALX_RANGE_ASSERT(expr) ALX_ASSERT_RST(ALX_RANGE_FILE, expr)
+	#define ALX_RANGE_ASSERT(expr) ALX_ASSERT_RST(ALX_RANGE_MODULE, expr)
 #else
 	#define ALX_RANGE_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_RANGE_TRACE_ENABLE)
-	#define ALX_RANGE_TRACE(...) ALX_TRACE_STD(ALX_RANGE_FILE, __VA_ARGS__)
+	#define ALX_RANGE_TRACE(...) ALX_TRACE_WRN(ALX_RANGE_MODULE, __VA_ARGS__)
 #else
 	#define ALX_RANGE_TRACE(...) do{} while (false)
 #endif

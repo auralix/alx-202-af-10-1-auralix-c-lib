@@ -61,22 +61,22 @@ typedef struct { bool dummy; } AlxCan;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_CAN_FILE "alxCan.h"
+#define ALX_CAN_MODULE "AlxCan.h"
 
 // Assert //
 #if defined(ALX_CAN_ASSERT_BKPT_ENABLE)
-	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CAN_FILE, expr)
+	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CAN_MODULE, expr)
 #elif defined(ALX_CAN_ASSERT_TRACE_ENABLE)
-	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_CAN_FILE, expr)
+	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_CAN_MODULE, expr)
 #elif defined(ALX_CAN_ASSERT_RST_ENABLE)
-	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_RST(ALX_CAN_FILE, expr)
+	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_RST(ALX_CAN_MODULE, expr)
 #else
 	#define ALX_CAN_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_CAN_TRACE_ENABLE)
-	#define ALX_CAN_TRACE(...) ALX_TRACE_STD(ALX_CAN_FILE, __VA_ARGS__)
+	#define ALX_CAN_TRACE(...) ALX_TRACE_WRN(ALX_CAN_MODULE, __VA_ARGS__)
 #else
 	#define ALX_CAN_TRACE(...) do{} while (false)
 #endif

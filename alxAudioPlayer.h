@@ -54,22 +54,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_AUDIO_PLAYER_FILE "alxAudioPlayer.h"
+#define ALX_AUDIO_PLAYER_MODULE "AlxAudioPlayer.h"
 
 // Assert //
 #if defined(ALX_AUDIO_PLAYER_ASSERT_BKPT_ENABLE)
-	#define ALX_AUDIO_PLAYER_ASSERT(expr) ALX_ASSERT_BKPT(ALX_AUDIO_PLAYER_FILE, expr)
+	#define ALX_AUDIO_PLAYER_ASSERT(expr) ALX_ASSERT_BKPT(ALX_AUDIO_PLAYER_MODULE, expr)
 #elif defined(ALX_AUDIO_PLAYER_ASSERT_TRACE_ENABLE)
-	#define ALX_AUDIO_PLAYER_ASSERT(expr) ALX_ASSERT_TRACE(ALX_AUDIO_PLAYER_FILE, expr)
+	#define ALX_AUDIO_PLAYER_ASSERT(expr) ALX_ASSERT_TRACE(ALX_AUDIO_PLAYER_MODULE, expr)
 #elif defined(ALX_AUDIO_PLAYER_ASSERT_RST_ENABLE)
-	#define ALX_AUDIO_PLAYER_ASSERT(expr) ALX_ASSERT_RST(ALX_AUDIO_PLAYER_FILE, expr)
+	#define ALX_AUDIO_PLAYER_ASSERT(expr) ALX_ASSERT_RST(ALX_AUDIO_PLAYER_MODULE, expr)
 #else
 	#define ALX_AUDIO_PLAYER_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_AUDIO_PLAYER_TRACE_ENABLE)
-	#define ALX_AUDIO_PLAYER_TRACE(...) ALX_TRACE_STD(ALX_AUDIO_PLAYER_FILE, __VA_ARGS__)
+	#define ALX_AUDIO_PLAYER_TRACE(...) ALX_TRACE_WRN(ALX_AUDIO_PLAYER_MODULE, __VA_ARGS__)
 #else
 	#define ALX_AUDIO_PLAYER_TRACE(...) do{} while (false)
 #endif

@@ -53,22 +53,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_INTERP_LIN_FILE "alxInterpLin.h"
+#define ALX_INTERP_LIN_MODULE "AlxInterpLin.h"
 
 // Assert //
 #if defined(ALX_INTERP_LIN_ASSERT_BKPT_ENABLE)
-	#define ALX_INTERP_LIN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_INTERP_LIN_FILE, expr)
+	#define ALX_INTERP_LIN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_INTERP_LIN_MODULE, expr)
 #elif defined(ALX_INTERP_LIN_ASSERT_TRACE_ENABLE)
-	#define ALX_INTERP_LIN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_INTERP_LIN_FILE, expr)
+	#define ALX_INTERP_LIN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_INTERP_LIN_MODULE, expr)
 #elif defined(ALX_INTERP_LIN_ASSERT_RST_ENABLE)
-	#define ALX_INTERP_LIN_ASSERT(expr) ALX_ASSERT_RST(ALX_INTERP_LIN_FILE, expr)
+	#define ALX_INTERP_LIN_ASSERT(expr) ALX_ASSERT_RST(ALX_INTERP_LIN_MODULE, expr)
 #else
 	#define ALX_INTERP_LIN_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_INTERP_LIN_TRACE_ENABLE)
-	#define ALX_INTERP_LIN_TRACE(...) ALX_TRACE_STD(ALX_INTERP_LIN_FILE, __VA_ARGS__)
+	#define ALX_INTERP_LIN_TRACE(...) ALX_TRACE_WRN(ALX_INTERP_LIN_MODULE, __VA_ARGS__)
 #else
 	#define ALX_INTERP_LIN_TRACE(...) do{} while (false)
 #endif

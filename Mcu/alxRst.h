@@ -60,26 +60,26 @@ typedef struct { bool dummy; } AlxRst;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_RST_FILE "alxRst.h"
+#define ALX_RST_MODULE "AlxRst.h"
 
 // Assert //
 #if defined(ALX_RST_ASSERT_BKPT_ENABLE)
-	#define ALX_RST_ASSERT(expr) ALX_ASSERT_BKPT(ALX_RST_FILE, expr)
+	#define ALX_RST_ASSERT(expr) ALX_ASSERT_BKPT(ALX_RST_MODULE, expr)
 #elif defined(ALX_RST_ASSERT_TRACE_ENABLE)
-	#define ALX_RST_ASSERT(expr) ALX_ASSERT_TRACE(ALX_RST_FILE, expr)
+	#define ALX_RST_ASSERT(expr) ALX_ASSERT_TRACE(ALX_RST_MODULE, expr)
 #elif defined(ALX_RST_ASSERT_RST_ENABLE)
-	#define ALX_RST_ASSERT(expr) ALX_ASSERT_RST(ALX_RST_FILE, expr)
+	#define ALX_RST_ASSERT(expr) ALX_ASSERT_RST(ALX_RST_MODULE, expr)
 #else
 	#define ALX_RST_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_RST_TRACE_ENABLE)
-	#define ALX_RST_TRACE(...) ALX_TRACE_STD(ALX_RST_FILE, __VA_ARGS__)
-	#define ALX_RST_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
+	#define ALX_RST_TRACE_WRN(...) ALX_TRACE_WRN(ALX_RST_MODULE, __VA_ARGS__)
+	#define ALX_RST_TRACE_INF(...) ALX_TRACE_INF(ALX_RST_MODULE, __VA_ARGS__)
 #else
-	#define ALX_RST_TRACE(...) do{} while (false)
-	#define ALX_RST_TRACE_FORMAT(...) do{} while (false)
+	#define ALX_RST_TRACE_WRN(...) do{} while (false)
+	#define ALX_RST_TRACE_INF(...) do{} while (false)
 #endif
 
 

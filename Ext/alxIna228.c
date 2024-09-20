@@ -111,11 +111,11 @@ Alx_Status AlxIna228_InitPeriph(AlxIna228* me)
 
 	// Init I2C
 	status = AlxI2c_Init(me->i2c);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxI2c_Init"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_AlxI2c_Init"); return status; }
 
 	// Check if slave ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxI2c_Master_IsSlaveReady"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_AlxI2c_Master_IsSlaveReady"); return status; }
 
 	// Set isInitPeriph
 	me->isInitPeriph = true;
@@ -135,7 +135,7 @@ Alx_Status AlxIna228_DeInitPeriph(AlxIna228* me)
 
 	// DeInit I2C
 	status = AlxI2c_DeInit(me->i2c);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxI2c_DeInit"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_AlxI2c_DeInit"); return status; }
 
 	// Reset isInitPeriph
 	me->isInitPeriph = false;
@@ -170,7 +170,7 @@ Alx_Status AlxIna228_Init(AlxIna228* me)
 
 	// Write registers
 	status = AlxIna228_Reg_Write_All(me);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxIna228_Reg_Write_All"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_AlxIna228_Reg_Write_All"); return status; }
 
 	// Set isInit
 	me->isInit = true;
@@ -195,7 +195,7 @@ Alx_Status AlxIna228_DeInit(AlxIna228* me)
 
 	// Write registers
 	status = AlxIna228_Reg_Write_All(me);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxIna228_Reg_Write_All"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_AlxIna228_Reg_Write_All"); return status; }
 
 	// Reset isInit
 	me->isInit = false;
@@ -215,7 +215,7 @@ Alx_Status AlxIna228_GetShuntVoltage_V(AlxIna228* me, float* voltage_V)
 
 	// Read
 	status = AlxIna228_Reg_Read(me, &me->reg._0x04_VSHUNT);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x04_VSHUNT"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x04_VSHUNT"); return status; }
 
 	// Set Conversion shunt factor value 312.5e-9
 	const float CONVERSION_SHUNT_FACTOR_312_5En9 = 312.5e-9;
@@ -244,7 +244,7 @@ Alx_Status AlxIna228_GetBusVoltage_V(AlxIna228* me, float* voltage_V)
 
 	// Read
 	status = AlxIna228_Reg_Read(me, &me->reg._0x05_VBUS);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x05_VBUS"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x05_VBUS"); return status; }
 
 	// Set Conversion vbus factor
 	const float CONVERSION_VBUS_FACTOR = 195.3125e-6;
@@ -267,7 +267,7 @@ Alx_Status AlxIna228_GetTemp_degC(AlxIna228* me, float* temp_degC)
 
 	// Read
 	status = AlxIna228_Reg_Read(me, &me->reg._0x06_DIETEMP);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x06_DIETEMP"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x06_DIETEMP"); return status; }
 
 	// Set Conversion vbus factor
 	const float CONVERSION_TEMP_FACTOR = 7.8125;
@@ -290,7 +290,7 @@ Alx_Status AlxIna228_GetCurrent_A(AlxIna228* me, float* current_A)
 
 	// Read
 	status = AlxIna228_Reg_Read(me, &me->reg._0x07_CURRENT);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x07_CURRENT"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x07_CURRENT"); return status; }
 
 	// Set Conversion Current LSB Factor
 	const float CONVERSION_CURRENT_LSB_FACTOR = me->conversionCurrentLsbFactor;
@@ -313,7 +313,7 @@ Alx_Status AlxIna228_GetPower_W(AlxIna228* me, float* power_W)
 
 	// Read
 	status = AlxIna228_Reg_Read(me, &me->reg._0x08_POWER);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x08_POWER"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x08_POWER"); return status; }
 
 	// Set Conversion Power Factor
 	const float CONVERSION_POWER_FACTOR = 3.2;
@@ -339,7 +339,7 @@ Alx_Status AlxIna228_GetEnergy_J(AlxIna228* me, float* energy_J)
 
 	// Read
 	status = AlxIna228_Reg_Read(me, &me->reg._0x09_ENERGY);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x09_ENERGY"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x09_ENERGY"); return status; }
 
 	// Set Conversion Energy Factor
 	const float CONVERSION_ENERGY_FACTOR = 16 * 3.2;
@@ -365,7 +365,7 @@ Alx_Status AlxIna228_GetCharge_C(AlxIna228* me, float* charge_C)
 
 	// Read
 	status = AlxIna228_Reg_Read(me, &me->reg._0x0A_CHARGE);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0A_CHARGE"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x0A_CHARGE"); return status; }
 
 	// Set Conversion Current LSB Factor
 	const float CONVERSION_CURRENT_LSB_FACTOR = me->conversionCurrentLsbFactor;
@@ -391,14 +391,14 @@ Alx_Status AlxIna228_ResetEnergyAndCharge(AlxIna228* me)
 
 	// Write
 	status = AlxIna228_Reg_Write(me, &me->reg._0x00_CONFIG);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x00_CONFIG"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x00_CONFIG"); return status; }
 
 	// set
 	me->reg._0x00_CONFIG.val.RSTACC = EnergyAndChargeRegisters_NormalOperation;
 
 	// Write
 	status = AlxIna228_Reg_Write(me, &me->reg._0x00_CONFIG);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x00_CONFIG"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x00_CONFIG"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -418,7 +418,7 @@ Alx_Status AlxIna228_ResetSystem(AlxIna228* me)
 
 	// Write
 	status = AlxIna228_Reg_Write(me, &me->reg._0x00_CONFIG);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x00_CONFIG"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x00_CONFIG"); return status; }
 
 	// set
 	me->reg._0x00_CONFIG.val.RST = SystemReset_Disabled;
@@ -538,7 +538,7 @@ static Alx_Status AlxIna228_Reg_Write(AlxIna228* me, void* reg)
 
 	// Write
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, data, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_AlxI2c_Master_StartWriteMemStop_Multi"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_AlxI2c_Master_StartWriteMemStop_Multi"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -550,37 +550,37 @@ static Alx_Status AlxIna228_Reg_Write_All(AlxIna228* me)
 
 	// Write
 	status = AlxIna228_Reg_Write(me, &me->reg._0x00_CONFIG);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x00_CONFIG"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x00_CONFIG"); return status; }
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x01_ADC_CONFIG);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x01_ADC_CONFIG"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x01_ADC_CONFIG"); return status; }
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x02_SHUNT_CAL);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x02_SHUNT_CAL"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x02_SHUNT_CAL"); return status; }
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x03_SHUNT_TEMPCO);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x03_SHUNT_TEMPCO"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x03_SHUNT_TEMPCO"); return status; }
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0B_DIAG_ALRT);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0B_DIAG_ALRT"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x0B_DIAG_ALRT"); return status; }
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0C_SOVL);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0C_SOVL"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x0C_SOVL"); return status; }
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0D_SUVL);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0D_SUVL"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x0D_SUVL"); return status; }
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0E_BOVL);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0E_BOVL"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x0E_BOVL"); return status; }
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0F_BUVL);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x0F_BUVL"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x0F_BUVL"); return status; }
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x10_TEMP_LIMIT);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x10_TEMP_LIMIT"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x10_TEMP_LIMIT"); return status; }
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x11_PWR_LIMIT);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x11_PWR_LIMIT"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x11_PWR_LIMIT"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -596,7 +596,7 @@ static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg)
 
 	// Read
 	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, data, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err"); return status; }
 
 	// flipped the MSB and LSB all lenght
 	for(uint32_t i = 0; i< regLen; i++)
@@ -653,18 +653,18 @@ static Alx_Status AlxIna228_TraceId(AlxIna228* me)
 
 	// #1 Read ID registers
 	status = AlxIna228_Reg_Read(me, &me->reg._0x3E_MANUFACTURER_ID);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x3E_MANUFACTURER_ID	"); return status;}
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x3E_MANUFACTURER_ID	"); return status;}
 
 	status = AlxIna228_Reg_Read(me, &me->reg._0x3F_DEVICE_ID);
-	if (status != Alx_Ok) { ALX_INA228_TRACE("Err_0x3F_DEVICE_ID	"); return status;}
+	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x3F_DEVICE_ID	"); return status;}
 
 	// #2 Trace
-	ALX_INA228_TRACE_FORMAT("\r\n");
-	ALX_INA228_TRACE_FORMAT("Auralix C Library - ALX Current Monitor INA228 Module Identification:\r\n");
-	ALX_INA228_TRACE_FORMAT("- MANUFACTURER_ID: 0x%02X\r\n", me->reg._0x3E_MANUFACTURER_ID.val.MANFID);
-	ALX_INA228_TRACE_FORMAT("- DEVICE_ID.REV_ID: 0x%02X\r\n", me->reg._0x3F_DEVICE_ID.val.REV_ID);
-	ALX_INA228_TRACE_FORMAT("- DEVICE_ID.DIEID: 0x%02X\r\n", me->reg._0x3F_DEVICE_ID.val.DIEID);
-	ALX_INA228_TRACE_FORMAT("\r\n");
+	ALX_INA228_TRACE_INF("");
+	ALX_INA228_TRACE_INF("Auralix C Library - ALX Current Monitor INA228 Module Identification:");
+	ALX_INA228_TRACE_INF("- MANUFACTURER_ID: 0x%02X", me->reg._0x3E_MANUFACTURER_ID.val.MANFID);
+	ALX_INA228_TRACE_INF("- DEVICE_ID.REV_ID: 0x%02X", me->reg._0x3F_DEVICE_ID.val.REV_ID);
+	ALX_INA228_TRACE_INF("- DEVICE_ID.DIEID: 0x%02X", me->reg._0x3F_DEVICE_ID.val.DIEID);
+	ALX_INA228_TRACE_INF("\r\n");
 
 	// #3 Return OK
 	return Alx_Ok;
@@ -680,7 +680,7 @@ ALX_WEAK void AlxIna228_RegStruct_SetVal(AlxIna228* me)
 	(void)me;
 
 	// Assert
-	ALX_INA228_TRACE("Define 'AlxIna228_RegStruct_SetVal' function in your application.");
+	ALX_INA228_TRACE_WRN("Define 'AlxIna228_RegStruct_SetVal' function in your application.");
 	ALX_INA228_ASSERT(false);
 }
 

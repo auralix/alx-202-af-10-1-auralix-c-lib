@@ -52,8 +52,8 @@ void AlxOsMutex_Ctor
 {
 	// Variables
 	#if defined(ALX_FREE_RTOS)
-	me->mutex = xSemaphoreCreateBinary();	// MF: Mutex is created once and won't be deleted during a program
-	xSemaphoreGive(me->mutex);
+	me->semaphoreHandle = xSemaphoreCreateBinaryStatic(&me->semaphore);
+	xSemaphoreGive(me->semaphoreHandle);
 	#endif
 
 	// Info
@@ -73,7 +73,7 @@ void AlxOsMutex_Lock(AlxOsMutex* me)
 {
 	// Lock Mutex
 	#if defined(ALX_FREE_RTOS)
-	xSemaphoreTake(me->mutex, portMAX_DELAY);
+	xSemaphoreTake(me->semaphoreHandle, portMAX_DELAY);
 	#endif
 }
 
@@ -85,7 +85,7 @@ void AlxOsMutex_Unlock(AlxOsMutex* me)
 {
 	// Unlock Mutex
 	#if defined(ALX_FREE_RTOS)
-	xSemaphoreGive(me->mutex);
+	xSemaphoreGive(me->semaphoreHandle);
 	#endif
 }
 
@@ -99,7 +99,7 @@ bool AlxOsMutex_IsUnlocked(AlxOsMutex* me)
 {
 	// Get Status
 	#if defined(ALX_FREE_RTOS)
-	return uxSemaphoreGetCount(me->mutex);
+	return uxSemaphoreGetCount(me->semaphoreHandle);
 	#endif
 }
 

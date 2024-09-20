@@ -55,22 +55,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_MEM_SAFE_FILE "alxMemSafe.h"
+#define ALX_MEM_SAFE_MODULE "AlxMemSafe.h"
 
 // Assert //
 #if defined(ALX_MEM_SAFE_ASSERT_BKPT_ENABLE)
-	#define ALX_MEM_SAFE_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MEM_SAFE_FILE, expr)
+	#define ALX_MEM_SAFE_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MEM_SAFE_MODULE, expr)
 #elif defined(ALX_MEM_SAFE_ASSERT_TRACE_ENABLE)
-	#define ALX_MEM_SAFE_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MEM_SAFE_FILE, expr)
+	#define ALX_MEM_SAFE_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MEM_SAFE_MODULE, expr)
 #elif defined(ALX_MEM_SAFE_ASSERT_RST_ENABLE)
-	#define ALX_MEM_SAFE_ASSERT(expr) ALX_ASSERT_RST(ALX_MEM_SAFE_FILE, expr)
+	#define ALX_MEM_SAFE_ASSERT(expr) ALX_ASSERT_RST(ALX_MEM_SAFE_MODULE, expr)
 #else
 	#define ALX_MEM_SAFE_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_MEM_SAFE_TRACE_ENABLE)
-	#define ALX_MEM_SAFE_TRACE(...) ALX_TRACE_STD(ALX_MEM_SAFE_FILE, __VA_ARGS__)
+	#define ALX_MEM_SAFE_TRACE(...) ALX_TRACE_WRN(ALX_MEM_SAFE_MODULE, __VA_ARGS__)
 #else
 	#define ALX_MEM_SAFE_TRACE(...) do{} while (false)
 #endif

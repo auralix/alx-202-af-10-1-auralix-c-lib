@@ -58,22 +58,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PWR_FILE "alxPwr.h"
+#define ALX_PWR_MODULE "AlxPwr.h"
 
 // Assert //
 #if defined(ALX_PWR_ASSERT_BKPT_ENABLE)
-	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PWR_FILE, expr)
+	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PWR_MODULE, expr)
 #elif defined(ALX_PWR_ASSERT_TRACE_ENABLE)
-	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PWR_FILE, expr)
+	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PWR_MODULE, expr)
 #elif defined(ALX_PWR_ASSERT_RST_ENABLE)
-	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_RST(ALX_PWR_FILE, expr)
+	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_RST(ALX_PWR_MODULE, expr)
 #else
 	#define ALX_PWR_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_PWR_TRACE_ENABLE)
-	#define ALX_PWR_TRACE(...) ALX_TRACE_STD(ALX_PWR_FILE, __VA_ARGS__)
+	#define ALX_PWR_TRACE(...) ALX_TRACE_WRN(ALX_PWR_MODULE, __VA_ARGS__)
 #else
 	#define ALX_PWR_TRACE(...) do{} while (false)
 #endif

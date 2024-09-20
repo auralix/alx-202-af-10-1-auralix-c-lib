@@ -42,26 +42,26 @@
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_FILE "flash_map_backend.c"
+#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_MODULE "flash_map_backend.c"
 
 // Assert //
 #if defined(ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT_BKPT_ENABLE)
-	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MCU_BOOT_FLASH_MAP_BACKEND_FILE, expr)
+	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MCU_BOOT_FLASH_MAP_BACKEND_MODULE, expr)
 #elif defined(ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT_TRACE_ENABLE)
-	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MCU_BOOT_FLASH_MAP_BACKEND_FILE, expr)
+	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MCU_BOOT_FLASH_MAP_BACKEND_MODULE, expr)
 #elif defined(ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT_RST_ENABLE)
-	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(expr) ALX_ASSERT_RST(ALX_MCU_BOOT_FLASH_MAP_BACKEND_FILE, expr)
+	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(expr) ALX_ASSERT_RST(ALX_MCU_BOOT_FLASH_MAP_BACKEND_MODULE, expr)
 #else
 	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_ENABLE)
-	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE(...) ALX_TRACE_STD(ALX_MCU_BOOT_FLASH_MAP_BACKEND_FILE, __VA_ARGS__)
-	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
+	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_WRN(...) ALX_TRACE_WRN(ALX_MCU_BOOT_FLASH_MAP_BACKEND_MODULE, __VA_ARGS__)
+	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF(...) ALX_TRACE_INF(ALX_MCU_BOOT_FLASH_MAP_BACKEND_MODULE, __VA_ARGS__)
 #else
-	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE(...) do{} while (false)
-	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT(...) do{} while (false)
+	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_WRN(...) do{} while (false)
+	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF(...) do{} while (false)
 #endif
 
 
@@ -129,7 +129,7 @@ int flash_area_open(uint8_t id, const struct flash_area** fapp)
 	// TV: Copied from: https://github.com/mcu-tools/mcuboot/blob/v2.1.0/boot/espressif/port/esp_mcuboot.c
 
 	// Trace
-	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: ID=%d\r\n", __func__, (int)id);
+	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: ID=%d", __func__, (int)id);
 
 	// Get
 	const struct flash_area* area = Flash_GetArea(id);
@@ -160,7 +160,7 @@ int flash_area_read(const struct flash_area* fap, uint32_t off, void* dst, uint3
 	const uint32_t end_offset = off + len;
 	if (end_offset > fap->fa_size)
 	{
-		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Out of Bounds (0x%x vs 0x%x)\r\n", __func__, (int)end_offset, (int)fap->fa_size);
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: Out of Bounds (0x%x vs 0x%x)", __func__, (int)end_offset, (int)fap->fa_size);
 		return -1;
 	}
 
@@ -169,11 +169,11 @@ int flash_area_read(const struct flash_area* fap, uint32_t off, void* dst, uint3
 	// Read
 	//------------------------------------------------------------------------------
 	const uint32_t addr = fap->fa_off + off;
-//	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
+//	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: Addr: 0x%08x Length: %d", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
 	bool success = Flash_Read(addr, dst, len);
 	if (!success)
 	{
-		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Flash read failed\r\n", __func__);
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: Flash read failed", __func__);
 		return -1;
 	}
 
@@ -198,7 +198,7 @@ int flash_area_write(const struct flash_area* fap, uint32_t off, const void* src
 	const uint32_t end_offset = off + len;
 	if (end_offset > fap->fa_size)
 	{
-		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Out of Bounds (0x%x vs 0x%x)\r\n", __func__, (int)end_offset, (int)fap->fa_size);
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: Out of Bounds (0x%x vs 0x%x)", __func__, (int)end_offset, (int)fap->fa_size);
 		return -1;
 	}
 
@@ -207,11 +207,11 @@ int flash_area_write(const struct flash_area* fap, uint32_t off, const void* src
 	// Write
 	//------------------------------------------------------------------------------
 	const uint32_t addr = fap->fa_off + off;
-//	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
+//	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: Addr: 0x%08x Length: %d", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
 	bool success = Flash_Write(addr, src, len);
 	if (!success)
 	{
-		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Flash write failed\r\n", __func__);
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: Flash write failed", __func__);
 		return -1;
 	}
 
@@ -235,7 +235,7 @@ int flash_area_erase(const struct flash_area* fap, uint32_t off, uint32_t len)
 	}
 	if ((len % ALX_MCU_BOOT_FLASH_SECTOR_SIZE) != 0 || (off % ALX_MCU_BOOT_FLASH_SECTOR_SIZE) != 0)
 	{
-		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Not aligned on sector Offset: 0x%x Length: 0x%x\r\n", __func__, (int)off, (int)len);
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: Not aligned on sector Offset: 0x%x Length: 0x%x", __func__, (int)off, (int)len);
 		return -1;
 	}
 
@@ -244,11 +244,11 @@ int flash_area_erase(const struct flash_area* fap, uint32_t off, uint32_t len)
 	// Erase
 	//------------------------------------------------------------------------------
 	const uint32_t addr = fap->fa_off + off;
-//	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Addr: 0x%08x Length: %d\r\n", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
+//	ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: Addr: 0x%08x Length: %d", __func__, (int)addr, (int)len);	// TV: Uncomment for debug
 	bool success = Flash_Erase(addr, len);
 	if (!success)
 	{
-		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Flash erase failed\r\n", __func__);
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: Flash erase failed", __func__);
 		return -1;
 	}
 
@@ -261,7 +261,7 @@ int flash_area_erase(const struct flash_area* fap, uint32_t off, uint32_t len)
 		uint8_t* val = (void*)(addr + i);
 		if (*val != 0xff)
 		{
-			ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: Erase at 0x%x Failed\r\n", __func__, (int)val);
+			ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: Erase at 0x%x Failed", __func__, (int)val);
 			ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(false);
 		}
 	}
@@ -528,7 +528,7 @@ static bool Flash_Write(uint32_t addr, const void* src, uint32_t len)
 		if (status != HAL_OK)
 		{
 			// Trace
-			ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: HAL_FLASH_Program failed\r\n", __func__);
+			ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: HAL_FLASH_Program failed", __func__);
 
 			// Lock FLASH
 			HAL_FLASH_Lock();
@@ -631,7 +631,7 @@ static bool Flash_Erase(uint32_t addr, uint32_t len)
 	if (HAL_FLASHEx_Erase(&eraseInitStruct, &sectorError) != HAL_OK)
 	{
 		// Trace
-		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_FORMAT("%s: HAL_FLASHEx_Erase failed error: %d\r\n", __func__, (int)sectorError);
+		ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF("%s: HAL_FLASHEx_Erase failed error: %d", __func__, (int)sectorError);
 
 		// Lock FLASH
 		HAL_FLASH_Lock();

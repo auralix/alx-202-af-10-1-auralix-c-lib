@@ -53,22 +53,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_OS_CRITICAL_SECTION_FILE "alxOsCriticalSection.h"
+#define ALX_OS_CRITICAL_SECTION_MODULE "AlxOsCriticalSection.h"
 
 // Assert //
 #if defined(ALX_OS_CRITICAL_SECTION_ASSERT_BKPT_ENABLE)
-	#define ALX_OS_CRITICAL_SECTION_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_CRITICAL_SECTION_FILE, expr)
+	#define ALX_OS_CRITICAL_SECTION_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_CRITICAL_SECTION_MODULE, expr)
 #elif defined(ALX_OS_CRITICAL_SECTION_ASSERT_TRACE_ENABLE)
-	#define ALX_OS_CRITICAL_SECTION_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_CRITICAL_SECTION_FILE, expr)
+	#define ALX_OS_CRITICAL_SECTION_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_CRITICAL_SECTION_MODULE, expr)
 #elif defined(ALX_OS_CRITICAL_SECTION_ASSERT_RST_ENABLE)
-	#define ALX_OS_CRITICAL_SECTION_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_CRITICAL_SECTION_FILE, expr)
+	#define ALX_OS_CRITICAL_SECTION_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_CRITICAL_SECTION_MODULE, expr)
 #else
 	#define ALX_OS_CRITICAL_SECTION_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_OS_CRITICAL_SECTION_TRACE_ENABLE)
-	#define ALX_OS_CRITICAL_SECTION_TRACE(...) ALX_TRACE_STD(ALX_OS_CRITICAL_SECTION_FILE, __VA_ARGS__)
+	#define ALX_OS_CRITICAL_SECTION_TRACE(...) ALX_TRACE_WRN(ALX_OS_CRITICAL_SECTION_MODULE, __VA_ARGS__)
 #else
 	#define ALX_OS_CRITICAL_SECTION_TRACE(...) do{} while (false)
 #endif

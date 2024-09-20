@@ -51,7 +51,7 @@
 //******************************************************************************
 // Defines
 //******************************************************************************
-#define ALX_DBG_WIZNET
+//#define ALX_DBG_WIZNET
 
 #define CONNECT_TIMEOUT 5000
 
@@ -177,21 +177,21 @@ static void print_network_information(wiz_NetInfo net_info)
 
 	if (net_info.dhcp == NETINFO_DHCP)
 	{
-		ALX_TRACE_FORMAT("==========================================\r\n");
-		ALX_TRACE_FORMAT(" %s network configuration : DHCP\r\n", (char *)tmp_str);
+		ALX_NET_TRACE_INF("==========================================");
+		ALX_NET_TRACE_INF(" %s network configuration : DHCP", (char *)tmp_str);
 	}
 	else
 	{
-		ALX_TRACE_FORMAT("==========================================\r\n");
-		ALX_TRACE_FORMAT(" %s network configuration : static\r\n", (char *)tmp_str);
+		ALX_NET_TRACE_INF("==========================================");
+		ALX_NET_TRACE_INF(" %s network configuration : static", (char *)tmp_str);
 	}
 
-	ALX_TRACE_FORMAT(" MAC         : %02X:%02X:%02X:%02X:%02X:%02X\r\n", net_info.mac[0], net_info.mac[1], net_info.mac[2], net_info.mac[3], net_info.mac[4], net_info.mac[5]);
-	ALX_TRACE_FORMAT(" IP          : %d.%d.%d.%d\r\n", net_info.ip[0], net_info.ip[1], net_info.ip[2], net_info.ip[3]);
-	ALX_TRACE_FORMAT(" Subnet Mask : %d.%d.%d.%d\r\n", net_info.sn[0], net_info.sn[1], net_info.sn[2], net_info.sn[3]);
-	ALX_TRACE_FORMAT(" Gateway     : %d.%d.%d.%d\r\n", net_info.gw[0], net_info.gw[1], net_info.gw[2], net_info.gw[3]);
-	ALX_TRACE_FORMAT(" DNS         : %d.%d.%d.%d\r\n", net_info.dns[0], net_info.dns[1], net_info.dns[2], net_info.dns[3]);
-	ALX_TRACE_FORMAT("==========================================\r\n");
+	ALX_NET_TRACE_INF(" MAC         : %02X:%02X:%02X:%02X:%02X:%02X", net_info.mac[0], net_info.mac[1], net_info.mac[2], net_info.mac[3], net_info.mac[4], net_info.mac[5]);
+	ALX_NET_TRACE_INF(" IP          : %d.%d.%d.%d", net_info.ip[0], net_info.ip[1], net_info.ip[2], net_info.ip[3]);
+	ALX_NET_TRACE_INF(" Subnet Mask : %d.%d.%d.%d", net_info.sn[0], net_info.sn[1], net_info.sn[2], net_info.sn[3]);
+	ALX_NET_TRACE_INF(" Gateway     : %d.%d.%d.%d", net_info.gw[0], net_info.gw[1], net_info.gw[2], net_info.gw[3]);
+	ALX_NET_TRACE_INF(" DNS         : %d.%d.%d.%d", net_info.dns[0], net_info.dns[1], net_info.dns[2], net_info.dns[3]);
+	ALX_NET_TRACE_INF("==========================================");
 }
 
 // DHCP callbacks and task
@@ -206,11 +206,11 @@ static void wizchip_dhcp_assign(void)
 	/* Network initialize */
 	ctlnetwork(CN_SET_NETINFO, &wiz_net_info);
 //	print_network_information(wiz_net_info);
-//	ALX_TRACE_FORMAT("DHCP leased time : %ld seconds\r\n", getDHCPLeasetime());
+//	ALX_NET_TRACE_INF("DHCP leased time : %ld seconds", getDHCPLeasetime());
 }
 static void wizchip_dhcp_conflict(void)
 {
-	ALX_TRACE_FORMAT("Conflict IP from DHCP\r\n");
+	ALX_NET_TRACE_INF("Conflict IP from DHCP");
 
 	// halt or reset or any...
 	while (1)
@@ -243,7 +243,7 @@ static void dhcp_task(void *argument)
 				{
 					if ((state == NETINFO_STATIC) && me->enable_dhcp)
 					{
-//						ALX_TRACE_FORMAT("DHCP client started\r\n");
+//						ALX_NET_TRACE_INF("DHCP client started");
 						DHCP_init(alxDhcpSocket.socket_data.wiz_socket, wiz_buffer);
 						dhcp_ip_leased_until = 0;
 						state = NETINFO_DHCP;
@@ -251,7 +251,7 @@ static void dhcp_task(void *argument)
 
 					if ((state == NETINFO_DHCP) && !me->enable_dhcp)
 					{
-//						ALX_TRACE_FORMAT("DHCP client stopped\r\n");
+//						ALX_NET_TRACE_INF("DHCP client stopped");
 						DHCP_stop();
 						state = NETINFO_STATIC;
 						break; // break to mutex
@@ -262,7 +262,7 @@ static void dhcp_task(void *argument)
 						link = wizphy_getphylink();
 						if (link == PHY_LINK_OFF)
 						{
-							ALX_TRACE_FORMAT("PHY_LINK_OFF\r\n");
+							ALX_NET_TRACE_INF("PHY_LINK_OFF");
 							DHCP_stop();
 							while (1)
 							{
@@ -283,7 +283,7 @@ static void dhcp_task(void *argument)
 							if (dhcp_ip_leased_until == 0)
 							{
 								dhcp_retry = 0;
-//								ALX_TRACE_FORMAT("DHCP success\r\n");
+//								ALX_NET_TRACE_INF("DHCP success");
 								dhcp_ip_leased_until = AlxTick_Get_sec(&alxTick) + getDHCPLeasetime();
 								ip2str(wiz_net_info.dns, me->dns[0]);
 							}
@@ -291,7 +291,7 @@ static void dhcp_task(void *argument)
 						else if (retval == DHCP_FAILED)
 						{
 							dhcp_ip_leased_until = 0;
-							ALX_TRACE_FORMAT("DHCP timeout occurred, retry: %d\r\n", dhcp_retry);
+							ALX_NET_TRACE_INF("DHCP timeout occurred, retry: %d", dhcp_retry);
 						}
 					}
 				}
@@ -324,8 +324,8 @@ static void dbg_get(void)
 
 static void dbg_dump(void)
 {
-	ALX_TRACE_FORMAT("--- WIZNET STATUS ----\r\n");
-	ALX_TRACE_FORMAT("SR[i]: %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x\r\n",
+	ALX_NET_TRACE_INF("--- WIZNET STATUS ----");
+	ALX_NET_TRACE_INF("SR[i]: %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x",
 		dbg_wiz_staus[0].sr[0],
 		dbg_wiz_staus[1].sr[0],
 		dbg_wiz_staus[0].sr[1],
@@ -342,8 +342,8 @@ static void dbg_dump(void)
 		dbg_wiz_staus[1].sr[6],
 		dbg_wiz_staus[0].sr[7],
 		dbg_wiz_staus[1].sr[7]);
-	ALX_TRACE_FORMAT("PhyLink: %02x->%02x\r\n", dbg_wiz_staus[0].link, dbg_wiz_staus[1].link);
-	ALX_TRACE_FORMAT("PhyConf: mode:%02x->%02x duplex:%02x->%02x speed:%02x->%02x\r\n",
+	ALX_NET_TRACE_INF("PhyLink: %02x->%02x", dbg_wiz_staus[0].link, dbg_wiz_staus[1].link);
+	ALX_NET_TRACE_INF("PhyConf: mode:%02x->%02x duplex:%02x->%02x speed:%02x->%02x",
 		dbg_wiz_staus[0].phyconf.mode,
 		dbg_wiz_staus[1].phyconf.mode,
 		dbg_wiz_staus[0].phyconf.duplex,
@@ -373,9 +373,9 @@ while (1)
 			{
 				if (DNS_run(dns_ip, dns_target_domain, dns_response_ip) > 0)
 				{
-//					ALX_TRACE_FORMAT("DNS success\r\n");
-//					ALX_TRACE_FORMAT("Target domain : %s\r\n", dns_target_domain);
-//					ALX_TRACE_FORMAT("IP of target domain : %d.%d.%d.%d\r\n", dns_response_ip[0], dns_response_ip[1], dns_response_ip[2], dns_response_ip[3]);
+//					ALX_NET_TRACE_INF("DNS success");
+//					ALX_NET_TRACE_INF("Target domain : %s", dns_target_domain);
+//					ALX_NET_TRACE_INF("IP of target domain : %d.%d.%d.%d", dns_response_ip[0], dns_response_ip[1], dns_response_ip[2], dns_response_ip[3]);
 					dns_retval = DnsTaskSuccess;
 #ifdef ALX_DBG_WIZNET
 					dbg_get();
@@ -387,7 +387,7 @@ while (1)
 					dns_retry++;
 					if (dns_retry <= DNS_RETRY_COUNT)
 					{
-						ALX_TRACE_FORMAT("DNS timeout occurred, retry %d\r\n", dns_retry);
+						ALX_NET_TRACE_INF("DNS timeout occurred, retry %d", dns_retry);
 #ifdef ALX_DBG_WIZNET
 						dbg_get();
 						dbg_dump();
@@ -397,7 +397,7 @@ while (1)
 
 				if (dns_retry > DNS_RETRY_COUNT)
 				{
-					ALX_TRACE_FORMAT("DNS failed for %s\r\n", dns_target_domain);
+					ALX_NET_TRACE_INF("DNS failed for %s", dns_target_domain);
 					dns_retval = DnsTaskTimeout;
 #ifdef ALX_DBG_WIZNET
 					dbg_get();
@@ -438,7 +438,7 @@ static void cellular_info_task(void *argument)
 	while (1)
 	{
 		Cellular_GetInfo(me->cellular.handle, &me->cellular.signalQuality) ;
-		//ALX_TRACE_FORMAT("CELLULAR RSSI: %d\r\n", signalInfo.rssi);
+		//ALX_NET_TRACE_INF("CELLULAR RSSI: %d", signalInfo.rssi);
 		AlxOsDelay_ms(&alxOsDelay, 1000);
 	}
 
@@ -566,7 +566,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 
 		cellularStatus = Cellular_Init(&me->cellular.handle, me->cellular.CommIntf);
 		if (cellularStatus != CELLULAR_SUCCESS) {
-			ALX_NET_TRACE_FORMAT("Cellular_Init failure %d\r\n", cellularStatus);
+			ALX_NET_TRACE_INF("Cellular_Init failure %d", cellularStatus);
 		}
 		else {
 			/* wait until SIM is ready */
@@ -579,7 +579,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 					break;
 				}
 				else {
-					ALX_NET_TRACE_FORMAT("Cellular SIM card state %d, Lock State %d <<<\r\n",
+					ALX_NET_TRACE_INF("Cellular SIM card state %d, Lock State %d <<<",
 						me->cellular.simStatus.simCardState,
 						me->cellular.simStatus.simCardLockState);
 				}
@@ -588,7 +588,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 			}
 
 			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_FORMAT(("Cellular SIM failure\r\n"));
+				ALX_NET_TRACE_INF(("Cellular SIM failure"));
 			}
 		}
 
@@ -597,7 +597,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 			cellularStatus = Cellular_RfOff(me->cellular.handle);
 
 			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_FORMAT("Cellular_RfOff failure %d\r\n", cellularStatus);
+				ALX_NET_TRACE_INF("Cellular_RfOff failure %d", cellularStatus);
 			}
 		}
 
@@ -605,7 +605,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 			cellularStatus = Cellular_RfOn(me->cellular.handle);
 
 			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_FORMAT("Cellular_RfOn failure %d\r\n", cellularStatus);
+				ALX_NET_TRACE_INF("Cellular_RfOn failure %d", cellularStatus);
 			}
 		}
 
@@ -623,7 +623,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 				timeoutCount++;
 
 				if (timeoutCount >= timeoutCountLimit) {
-					ALX_NET_TRACE_FORMAT("Cellular module can't be registered\r\n");
+					ALX_NET_TRACE_INF("Cellular module can't be registered");
 				}
 
 				vTaskDelay(pdMS_TO_TICKS(CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS));
@@ -664,7 +664,7 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 		{
 			if (ctlwizchip(CW_GET_PHYLINK, (void *)&temp) == -1)
 			{
-				ALX_NET_TRACE_FORMAT("Unknown PHY link status\r\n");
+				ALX_NET_TRACE_INF("Unknown PHY link status");
 				AlxOsMutex_Unlock(&me->alxMutex);
 				return Alx_Err;
 			}
@@ -707,14 +707,14 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 			cellularStatus = Cellular_SetPdnConfig(me->cellular.handle, me->cellular.cellularContext, &pdnConfig);
 
 			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_FORMAT("Cellular_SetPdnConfig failure %d\r\n", cellularStatus);
+				ALX_NET_TRACE_INF("Cellular_SetPdnConfig failure %d", cellularStatus);
 			}
 		}
 		if (cellularStatus == CELLULAR_SUCCESS) {
 			cellularStatus = Cellular_ActivatePdn(me->cellular.handle, me->cellular.cellularContext);
 
 			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_FORMAT("Cellular_ActivatePdn failure %d\r\n", cellularStatus);
+				ALX_NET_TRACE_INF("Cellular_ActivatePdn failure %d", cellularStatus);
 			}
 		}
 
@@ -722,14 +722,14 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 			cellularStatus = Cellular_GetIPAddress(me->cellular.handle, me->cellular.cellularContext, me->ip, sizeof(me->ip));
 			if (cellularStatus != CELLULAR_SUCCESS)
 			{
-				ALX_NET_TRACE_FORMAT("Cellular_GetIPAddress failure %d\r\n", cellularStatus);
+				ALX_NET_TRACE_INF("Cellular_GetIPAddress failure %d", cellularStatus);
 			}
 		}
 
 		if (cellularStatus == CELLULAR_SUCCESS) {
 			cellularStatus = Cellular_GetPdnStatus(me->cellular.handle, PdnStatusBuffers, (CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U), &NumStatus);
 			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_FORMAT("Cellular_GetPdnStatus failure %d\r\n", cellularStatus);
+				ALX_NET_TRACE_INF("Cellular_GetPdnStatus failure %d", cellularStatus);
 			}
 		}
 
@@ -742,7 +742,7 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 			}
 
 			if (pdnStatus == false) {
-				ALX_NET_TRACE_FORMAT("Cellular PDN is not activated <<<");
+				ALX_NET_TRACE_INF("Cellular PDN is not activated <<<");
 			}
 		}
 

@@ -56,22 +56,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TEMP_SENS_RTD_VDIV_FILE "alxTempSensRtdVdiv.h"
+#define ALX_TEMP_SENS_RTD_VDIV_MODULE "AlxTempSensRtdVdiv.h"
 
 // Assert //
 #if defined(ALX_TEMP_SENS_RTD_VDIV_ASSERT_BKPT_ENABLE)
-	#define ALX_TEMP_SENS_RTD_VDIV_ASSERT(expr) ALX_ASSERT_BKPT(ALX_TEMP_SENS_RTD_VDIV_FILE, expr)
+	#define ALX_TEMP_SENS_RTD_VDIV_ASSERT(expr) ALX_ASSERT_BKPT(ALX_TEMP_SENS_RTD_VDIV_MODULE, expr)
 #elif defined(ALX_TEMP_SENS_RTD_VDIV_ASSERT_TRACE_ENABLE)
-	#define ALX_TEMP_SENS_RTD_VDIV_ASSERT(expr) ALX_ASSERT_TRACE(ALX_TEMP_SENS_RTD_VDIV_FILE, expr)
+	#define ALX_TEMP_SENS_RTD_VDIV_ASSERT(expr) ALX_ASSERT_TRACE(ALX_TEMP_SENS_RTD_VDIV_MODULE, expr)
 #elif defined(ALX_TEMP_SENS_RTD_VDIV_ASSERT_RST_ENABLE)
-	#define ALX_TEMP_SENS_RTD_VDIV_ASSERT(expr) ALX_ASSERT_RST(ALX_TEMP_SENS_RTD_VDIV_FILE, expr)
+	#define ALX_TEMP_SENS_RTD_VDIV_ASSERT(expr) ALX_ASSERT_RST(ALX_TEMP_SENS_RTD_VDIV_MODULE, expr)
 #else
 	#define ALX_TEMP_SENS_RTD_VDIV_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_TEMP_SENS_RTD_VDIV_TRACE_ENABLE)
-	#define ALX_TEMP_SENS_RTD_VDIV_TRACE(...) ALX_TRACE_STD(ALX_TEMP_SENS_RTD_VDIV_FILE, __VA_ARGS__)
+	#define ALX_TEMP_SENS_RTD_VDIV_TRACE(...) ALX_TRACE_WRN(ALX_TEMP_SENS_RTD_VDIV_MODULE, __VA_ARGS__)
 #else
 	#define ALX_TEMP_SENS_RTD_VDIV_TRACE(...) do{} while (false)
 #endif
