@@ -54,22 +54,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_MCP73831_FILE "alxMcp73831.h"
+#define ALX_MCP73831_MODULE "AlxMcp73831.h"
 
 // Assert //
 #if defined(ALX_MCP73831_ASSERT_BKPT_ENABLE)
-	#define ALX_MCP73831_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MCP73831_FILE, expr)
+	#define ALX_MCP73831_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MCP73831_MODULE, expr)
 #elif defined(ALX_MCP73831_ASSERT_TRACE_ENABLE)
-	#define ALX_MCP73831_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MCP73831_FILE, expr)
+	#define ALX_MCP73831_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MCP73831_MODULE, expr)
 #elif defined(ALX_MCP73831_ASSERT_RST_ENABLE)
-	#define ALX_MCP73831_ASSERT(expr) ALX_ASSERT_RST(ALX_MCP73831_FILE, expr)
+	#define ALX_MCP73831_ASSERT(expr) ALX_ASSERT_RST(ALX_MCP73831_MODULE, expr)
 #else
 	#define ALX_MCP73831_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_MCP73831_TRACE_ENABLE)
-	#define ALX_MCP73831_TRACE(...) ALX_TRACE_WRN(ALX_MCP73831_FILE, __VA_ARGS__)
+	#define ALX_MCP73831_TRACE(...) ALX_TRACE_WRN(ALX_MCP73831_MODULE, __VA_ARGS__)
 #else
 	#define ALX_MCP73831_TRACE(...) do{} while (false)
 #endif

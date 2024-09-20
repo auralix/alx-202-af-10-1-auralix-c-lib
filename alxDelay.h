@@ -54,22 +54,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_DELAY_FILE "alxDelay.h"
+#define ALX_DELAY_MODULE "AlxDelay.h"
 
 // Assert //
 #if defined(ALX_DELAY_ASSERT_BKPT_ENABLE)
-	#define ALX_DELAY_ASSERT(expr) ALX_ASSERT_BKPT(ALX_DELAY_FILE, expr)
+	#define ALX_DELAY_ASSERT(expr) ALX_ASSERT_BKPT(ALX_DELAY_MODULE, expr)
 #elif defined(ALX_DELAY_ASSERT_TRACE_ENABLE)
-	#define ALX_DELAY_ASSERT(expr) ALX_ASSERT_TRACE(ALX_DELAY_FILE, expr)
+	#define ALX_DELAY_ASSERT(expr) ALX_ASSERT_TRACE(ALX_DELAY_MODULE, expr)
 #elif defined(ALX_DELAY_ASSERT_RST_ENABLE)
-	#define ALX_DELAY_ASSERT(expr) ALX_ASSERT_RST(ALX_DELAY_FILE, expr)
+	#define ALX_DELAY_ASSERT(expr) ALX_ASSERT_RST(ALX_DELAY_MODULE, expr)
 #else
 	#define ALX_DELAY_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_DELAY_TRACE_ENABLE)
-	#define ALX_DELAY_TRACE(...) ALX_TRACE_WRN(ALX_DELAY_FILE, __VA_ARGS__)
+	#define ALX_DELAY_TRACE(...) ALX_TRACE_WRN(ALX_DELAY_MODULE, __VA_ARGS__)
 #else
 	#define ALX_DELAY_TRACE(...) do{} while (false)
 #endif

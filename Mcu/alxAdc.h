@@ -73,22 +73,22 @@ typedef struct { bool dummy; } AlxAdc;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_ADC_FILE "alxAdc.h"
+#define ALX_ADC_MODULE "AlxAdc.h"
 
 // Assert //
 #if defined(ALX_ADC_ASSERT_BKPT_ENABLE)
-	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADC_FILE, expr)
+	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADC_MODULE, expr)
 #elif defined(ALX_ADC_ASSERT_TRACE_ENABLE)
-	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADC_FILE, expr)
+	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADC_MODULE, expr)
 #elif defined(ALX_ADC_ASSERT_RST_ENABLE)
-	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_RST(ALX_ADC_FILE, expr)
+	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_RST(ALX_ADC_MODULE, expr)
 #else
 	#define ALX_ADC_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_ADC_TRACE_ENABLE)
-	#define ALX_ADC_TRACE(...) ALX_TRACE_WRN(ALX_ADC_FILE, __VA_ARGS__)
+	#define ALX_ADC_TRACE(...) ALX_TRACE_WRN(ALX_ADC_MODULE, __VA_ARGS__)
 #else
 	#define ALX_ADC_TRACE(...) do{} while (false)
 #endif

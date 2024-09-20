@@ -59,22 +59,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_VNH7040_FILE "alxVnh7040.h"
+#define ALX_VNH7040_MODULE "AlxVnh7040.h"
 
 // Assert //
 #if defined(ALX_VNH7040_ASSERT_BKPT_ENABLE)
-	#define ALX_VNH7040_ASSERT(expr) ALX_ASSERT_BKPT(ALX_VNH7040_FILE, expr)
+	#define ALX_VNH7040_ASSERT(expr) ALX_ASSERT_BKPT(ALX_VNH7040_MODULE, expr)
 #elif defined(ALX_VNH7040_ASSERT_TRACE_ENABLE)
-	#define ALX_VNH7040_ASSERT(expr) ALX_ASSERT_TRACE(ALX_VNH7040_FILE, expr)
+	#define ALX_VNH7040_ASSERT(expr) ALX_ASSERT_TRACE(ALX_VNH7040_MODULE, expr)
 #elif defined(ALX_VNH7040_ASSERT_RST_ENABLE)
-	#define ALX_VNH7040_ASSERT(expr) ALX_ASSERT_RST(ALX_VNH7040_FILE, expr)
+	#define ALX_VNH7040_ASSERT(expr) ALX_ASSERT_RST(ALX_VNH7040_MODULE, expr)
 #else
 	#define ALX_VNH7040_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_VNH7040_TRACE_ENABLE)
-	#define ALX_VNH7040_TRACE(...) ALX_TRACE_WRN(ALX_VNH7040_FILE, __VA_ARGS__)
+	#define ALX_VNH7040_TRACE(...) ALX_TRACE_WRN(ALX_VNH7040_MODULE, __VA_ARGS__)
 #else
 	#define ALX_VNH7040_TRACE(...) do{} while (false)
 #endif

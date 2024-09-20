@@ -53,22 +53,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_OS_DELAY_UNTIL_FILE "alxOsDelayUntil.h"
+#define ALX_OS_DELAY_UNTIL_MODULE "AlxOsDelayUntil.h"
 
 // Assert //
 #if defined(ALX_OS_DELAY_UNTIL_ASSERT_BKPT_ENABLE)
-	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_DELAY_UNTIL_FILE, expr)
+	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_DELAY_UNTIL_MODULE, expr)
 #elif defined(ALX_OS_DELAY_UNTIL_ASSERT_TRACE_ENABLE)
-	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_DELAY_UNTIL_FILE, expr)
+	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_DELAY_UNTIL_MODULE, expr)
 #elif defined(ALX_OS_DELAY_UNTIL_ASSERT_RST_ENABLE)
-	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_DELAY_UNTIL_FILE, expr)
+	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_DELAY_UNTIL_MODULE, expr)
 #else
 	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_OS_DELAY_UNTIL_TRACE_ENABLE)
-	#define ALX_OS_DELAY_UNTIL_TRACE(...) ALX_TRACE_WRN(ALX_OS_DELAY_UNTIL_FILE, __VA_ARGS__)
+	#define ALX_OS_DELAY_UNTIL_TRACE(...) ALX_TRACE_WRN(ALX_OS_DELAY_UNTIL_MODULE, __VA_ARGS__)
 #else
 	#define ALX_OS_DELAY_UNTIL_TRACE(...) do{} while (false)
 #endif

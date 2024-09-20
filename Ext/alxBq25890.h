@@ -56,22 +56,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_BQ25890_FILE "alxBq25890.h"
+#define ALX_BQ25890_MODULE "AlxBq25890.h"
 
 // Assert //
 #if defined(ALX_BQ25890_ASSERT_BKPT_ENABLE)
-	#define ALX_BQ25890_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BQ25890_FILE, expr)
+	#define ALX_BQ25890_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BQ25890_MODULE, expr)
 #elif defined(ALX_BQ25890_ASSERT_TRACE_ENABLE)
-	#define ALX_BQ25890_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BQ25890_FILE, expr)
+	#define ALX_BQ25890_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BQ25890_MODULE, expr)
 #elif defined(ALX_BQ25890_ASSERT_RST_ENABLE)
-	#define ALX_BQ25890_ASSERT(expr) ALX_ASSERT_RST(ALX_BQ25890_FILE, expr)
+	#define ALX_BQ25890_ASSERT(expr) ALX_ASSERT_RST(ALX_BQ25890_MODULE, expr)
 #else
 	#define ALX_BQ25890_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_BQ25890_TRACE_ENABLE)
-	#define ALX_BQ25890_TRACE(...) ALX_TRACE_WRN(ALX_BQ25890_FILE, __VA_ARGS__)
+	#define ALX_BQ25890_TRACE(...) ALX_TRACE_WRN(ALX_BQ25890_MODULE, __VA_ARGS__)
 #else
 	#define ALX_BQ25890_TRACE(...) do{} while (false)
 #endif

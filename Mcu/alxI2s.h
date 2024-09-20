@@ -61,22 +61,22 @@ typedef struct { bool dummy; } AlxI2s;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_I2S_FILE "alxI2s.h"
+#define ALX_I2S_MODULE "AlxI2s.h"
 
 // Assert //
 #if defined(ALX_I2S_ASSERT_BKPT_ENABLE)
-	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_BKPT(ALX_I2S_FILE, expr)
+	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_BKPT(ALX_I2S_MODULE, expr)
 #elif defined(ALX_I2S_ASSERT_TRACE_ENABLE)
-	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_TRACE(ALX_I2S_FILE, expr)
+	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_TRACE(ALX_I2S_MODULE, expr)
 #elif defined(ALX_I2S_ASSERT_RST_ENABLE)
-	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_RST(ALX_I2S_FILE, expr)
+	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_RST(ALX_I2S_MODULE, expr)
 #else
 	#define ALX_I2S_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_I2S_TRACE_ENABLE)
-	#define ALX_I2S_TRACE(...) ALX_TRACE_WRN(ALX_I2S_FILE, __VA_ARGS__)
+	#define ALX_I2S_TRACE(...) ALX_TRACE_WRN(ALX_I2S_MODULE, __VA_ARGS__)
 #else
 	#define ALX_I2S_TRACE(...) do{} while (false)
 #endif

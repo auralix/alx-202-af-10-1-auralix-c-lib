@@ -70,22 +70,22 @@ typedef struct { bool dummy; } AlxI2c;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_I2C_FILE "alxI2c.h"
+#define ALX_I2C_MODULE "AlxI2c.h"
 
 // Assert //
 #if defined(ALX_I2C_ASSERT_BKPT_ENABLE)
-	#define ALX_I2C_ASSERT(expr) ALX_ASSERT_BKPT(ALX_I2C_FILE, expr)
+	#define ALX_I2C_ASSERT(expr) ALX_ASSERT_BKPT(ALX_I2C_MODULE, expr)
 #elif defined(ALX_I2C_ASSERT_TRACE_ENABLE)
-	#define ALX_I2C_ASSERT(expr) ALX_ASSERT_TRACE(ALX_I2C_FILE, expr)
+	#define ALX_I2C_ASSERT(expr) ALX_ASSERT_TRACE(ALX_I2C_MODULE, expr)
 #elif defined(ALX_I2C_ASSERT_RST_ENABLE)
-	#define ALX_I2C_ASSERT(expr) ALX_ASSERT_RST(ALX_I2C_FILE, expr)
+	#define ALX_I2C_ASSERT(expr) ALX_ASSERT_RST(ALX_I2C_MODULE, expr)
 #else
 	#define ALX_I2C_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_I2C_TRACE_ENABLE)
-	#define ALX_I2C_TRACE(...) ALX_TRACE_WRN(ALX_I2C_FILE, __VA_ARGS__)
+	#define ALX_I2C_TRACE(...) ALX_TRACE_WRN(ALX_I2C_MODULE, __VA_ARGS__)
 #else
 	#define ALX_I2C_TRACE(...) do{} while (false)
 #endif

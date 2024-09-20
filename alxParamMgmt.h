@@ -54,22 +54,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PARAM_MGMT_FILE "alxParamMgmt.h"
+#define ALX_PARAM_MGMT_MODULE "AlxParamMgmt.h"
 
 // Assert //
 #if defined(ALX_PARAM_MGMT_ASSERT_BKPT_ENABLE)
-	#define ALX_PARAM_MGMT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PARAM_MGMT_FILE, expr)
+	#define ALX_PARAM_MGMT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PARAM_MGMT_MODULE, expr)
 #elif defined(ALX_PARAM_MGMT_ASSERT_TRACE_ENABLE)
-	#define ALX_PARAM_MGMT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PARAM_MGMT_FILE, expr)
+	#define ALX_PARAM_MGMT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PARAM_MGMT_MODULE, expr)
 #elif defined(ALX_PARAM_MGMT_ASSERT_RST_ENABLE)
-	#define ALX_PARAM_MGMT_ASSERT(expr) ALX_ASSERT_RST(ALX_PARAM_MGMT_FILE, expr)
+	#define ALX_PARAM_MGMT_ASSERT(expr) ALX_ASSERT_RST(ALX_PARAM_MGMT_MODULE, expr)
 #else
 	#define ALX_PARAM_MGMT_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_PARAM_MGMT_TRACE_ENABLE)
-	#define ALX_PARAM_MGMT_TRACE(...) ALX_TRACE_WRN(ALX_PARAM_MGMT_FILE, __VA_ARGS__)
+	#define ALX_PARAM_MGMT_TRACE(...) ALX_TRACE_WRN(ALX_PARAM_MGMT_MODULE, __VA_ARGS__)
 #else
 	#define ALX_PARAM_MGMT_TRACE(...) do{} while (false)
 #endif

@@ -261,22 +261,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_GLOBAL_FILE "alxGlobal.h"
+#define ALX_GLOBAL_MODULE "AlxGlobal.h"
 
 // Assert //
 #if defined(ALX_GLOBAL_ASSERT_BKPT)
-	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_GLOBAL_FILE, expr)
+	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_GLOBAL_MODULE, expr)
 #elif defined(ALX_GLOBAL_ASSERT_TRACE)
-	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_GLOBAL_FILE, expr)
+	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_GLOBAL_MODULE, expr)
 #elif defined(ALX_GLOBAL_ASSERT_RST)
-	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_RST(ALX_GLOBAL_FILE, expr)
+	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_RST(ALX_GLOBAL_MODULE, expr)
 #else
 	#define ALX_GLOBAL_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_GLOBAL_TRACE)
-	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_GLOBAL_FILE, __VA_ARGS__)
+	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_GLOBAL_MODULE, __VA_ARGS__)
 #else
 	#define ALX_GLOBAL_TRACE(...) do{} while (false)
 #endif

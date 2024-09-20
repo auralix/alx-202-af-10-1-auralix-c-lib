@@ -82,7 +82,7 @@ void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
   * @param[in]		fun
   * @param[in]		format
   */
-void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t line, const char* fun, const char* format, ...)
+void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* module, uint32_t line, const char* fun, const char* format, ...)
 {
 	//------------------------------------------------------------------------------
 	// Prepare dateTimeStr
@@ -120,28 +120,6 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 
 
 	//------------------------------------------------------------------------------
-	// Prepare moduleStr
-	//------------------------------------------------------------------------------
-
-	// Prepare
-	char moduleStr[64] = "";
-	uint32_t moduleStrLen = strlen(file);
-
-	// Loop from the end to find last '.' in filename to identify the extension
-	for (uint32_t i = moduleStrLen; i > 0; i--)
-	{
-		if (file[i] == '.')
-		{
-			moduleStrLen = i;	// Truncate file extension by setting new length
-			break;
-		}
-	}
-
-	// Copy
-	strncpy(moduleStr, file, moduleStrLen);
-
-
-	//------------------------------------------------------------------------------
 	// Prepare formatStr
 	//------------------------------------------------------------------------------
 	char formatStr[ALX_TRACE_LEN_MAX] = {};
@@ -156,11 +134,11 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	//------------------------------------------------------------------------------
 	if ((ALX_TRACE_LEVEL_FTL <= level) && (level <= ALX_TRACE_LEVEL_WRN))
 	{
-		AlxTrace_WriteFormat(me, "[%s] [%s] <%s:%lu %s> %s\r\n", dateTimeStr, levelStr, moduleStr, line, fun, formatStr);
+		AlxTrace_WriteFormat(me, "[%s] [%s] <%s:%lu %s> %s\r\n", dateTimeStr, levelStr, module, line, fun, formatStr);
 	}
 	else if ((ALX_TRACE_LEVEL_INF <= level) && (level <= ALX_TRACE_LEVEL_VRB))
 	{
-		AlxTrace_WriteFormat(me, "[%s] [%s] <%s> %s\r\n", dateTimeStr, levelStr, moduleStr, formatStr);
+		AlxTrace_WriteFormat(me, "[%s] [%s] <%s> %s\r\n", dateTimeStr, levelStr, module, formatStr);
 	}
 	else
 	{

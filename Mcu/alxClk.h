@@ -69,22 +69,22 @@ typedef struct { bool dummy; } AlxClk;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_CLK_FILE "alxClk.h"
+#define ALX_CLK_MODULE "AlxClk.h"
 
 // Assert //
 #if defined(ALX_CLK_ASSERT_BKPT_ENABLE)
-	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CLK_FILE, expr)
+	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_BKPT(ALX_CLK_MODULE, expr)
 #elif defined(ALX_CLK_ASSERT_TRACE_ENABLE)
-	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_TRACE(ALX_CLK_FILE, expr)
+	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_TRACE(ALX_CLK_MODULE, expr)
 #elif defined(ALX_CLK_ASSERT_RST_ENABLE)
-	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_RST(ALX_CLK_FILE, expr)
+	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_RST(ALX_CLK_MODULE, expr)
 #else
 	#define ALX_CLK_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_CLK_TRACE_ENABLE)
-	#define ALX_CLK_TRACE(...) ALX_TRACE_WRN(ALX_CLK_FILE, __VA_ARGS__)
+	#define ALX_CLK_TRACE(...) ALX_TRACE_WRN(ALX_CLK_MODULE, __VA_ARGS__)
 #else
 	#define ALX_CLK_TRACE(...) do{} while (false)
 #endif

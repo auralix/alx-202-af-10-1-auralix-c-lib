@@ -54,23 +54,23 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PARAM_KV_STORE_FILE "alxParamKvStore.h"
+#define ALX_PARAM_KV_STORE_MODULE "AlxParamKvStore.h"
 
 // Assert //
 #if defined(ALX_PARAM_KV_STORE_ASSERT_BKPT_ENABLE)
-	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PARAM_KV_STORE_FILE, expr)
+	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PARAM_KV_STORE_MODULE, expr)
 #elif defined(ALX_PARAM_KV_STORE_ASSERT_TRACE_ENABLE)
-	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PARAM_KV_STORE_FILE, expr)
+	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PARAM_KV_STORE_MODULE, expr)
 #elif defined(ALX_PARAM_KV_STORE_ASSERT_RST_ENABLE)
-	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_RST(ALX_PARAM_KV_STORE_FILE, expr)
+	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_RST(ALX_PARAM_KV_STORE_MODULE, expr)
 #else
 	#define ALX_PARAM_KV_STORE_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_PARAM_KV_STORE_TRACE_ENABLE)
-	#define ALX_PARAM_KV_STORE_TRACE_WRN(...) ALX_TRACE_WRN(ALX_PARAM_KV_STORE_FILE, __VA_ARGS__)
-	#define ALX_PARAM_KV_STORE_TRACE_INF(...) ALX_TRACE_INF(ALX_PARAM_KV_STORE_FILE, __VA_ARGS__)
+	#define ALX_PARAM_KV_STORE_TRACE_WRN(...) ALX_TRACE_WRN(ALX_PARAM_KV_STORE_MODULE, __VA_ARGS__)
+	#define ALX_PARAM_KV_STORE_TRACE_INF(...) ALX_TRACE_INF(ALX_PARAM_KV_STORE_MODULE, __VA_ARGS__)
 #else
 	#define ALX_PARAM_KV_STORE_TRACE_WRN(...) do{} while (false)
 	#define ALX_PARAM_KV_STORE_TRACE_INF(...) do{} while (false)

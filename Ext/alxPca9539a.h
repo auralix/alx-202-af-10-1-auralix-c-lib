@@ -56,22 +56,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PCA9539A_FILE "alxPca9539a.h"
+#define ALX_PCA9539A_MODULE "AlxPca9539a.h"
 
 // Assert //
 #if defined(ALX_PCA9539A_ASSERT_BKPT_ENABLE)
-	#define ALX_PCA9539A_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PCA9539A_FILE, expr)
+	#define ALX_PCA9539A_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PCA9539A_MODULE, expr)
 #elif defined(ALX_PCA9539A_ASSERT_TRACE_ENABLE)
-	#define ALX_PCA9539A_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PCA9539A_FILE, expr)
+	#define ALX_PCA9539A_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PCA9539A_MODULE, expr)
 #elif defined(ALX_PCA9539A_ASSERT_RST_ENABLE)
-	#define ALX_PCA9539A_ASSERT(expr) ALX_ASSERT_RST(ALX_PCA9539A_FILE, expr)
+	#define ALX_PCA9539A_ASSERT(expr) ALX_ASSERT_RST(ALX_PCA9539A_MODULE, expr)
 #else
 	#define ALX_PCA9539A_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_PCA9539A_TRACE_ENABLE)
-	#define ALX_PCA9539A_TRACE(...) ALX_TRACE_WRN(ALX_PCA9539A_FILE, __VA_ARGS__)
+	#define ALX_PCA9539A_TRACE(...) ALX_TRACE_WRN(ALX_PCA9539A_MODULE, __VA_ARGS__)
 #else
 	#define ALX_PCA9539A_TRACE(...) do{} while (false)
 #endif

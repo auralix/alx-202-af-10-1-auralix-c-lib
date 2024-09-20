@@ -55,22 +55,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_BOOL_FILE "alxBool.h"
+#define ALX_BOOL_MODULE "AlxBool.h"
 
 // Assert //
 #if defined(ALX_BOOL_ASSERT_BKPT_ENABLE)
-	#define ALX_BOOL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BOOL_FILE, expr)
+	#define ALX_BOOL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BOOL_MODULE, expr)
 #elif defined(ALX_BOOL_ASSERT_TRACE_ENABLE)
-	#define ALX_BOOL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BOOL_FILE, expr)
+	#define ALX_BOOL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BOOL_MODULE, expr)
 #elif defined(ALX_BOOL_ASSERT_RST_ENABLE)
-	#define ALX_BOOL_ASSERT(expr) ALX_ASSERT_RST(ALX_BOOL_FILE, expr)
+	#define ALX_BOOL_ASSERT(expr) ALX_ASSERT_RST(ALX_BOOL_MODULE, expr)
 #else
 	#define ALX_BOOL_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_BOOL_TRACE_ENABLE)
-	#define ALX_BOOL_TRACE(...) ALX_TRACE_WRN(ALX_BOOL_FILE, __VA_ARGS__)
+	#define ALX_BOOL_TRACE(...) ALX_TRACE_WRN(ALX_BOOL_MODULE, __VA_ARGS__)
 #else
 	#define ALX_BOOL_TRACE(...) do{} while (false)
 #endif

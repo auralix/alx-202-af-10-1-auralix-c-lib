@@ -55,22 +55,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_SD_FILE "alxSd.h"
+#define ALX_SD_MODULE "AlxSd.h"
 
 // Assert //
 #if defined(ALX_SD_ASSERT_BKPT_ENABLE)
-	#define ALX_SD_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SD_FILE, expr)
+	#define ALX_SD_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SD_MODULE, expr)
 #elif defined(ALX_SD_ASSERT_TRACE_ENABLE)
-	#define ALX_SD_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SD_FILE, expr)
+	#define ALX_SD_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SD_MODULE, expr)
 #elif defined(ALX_SD_ASSERT_RST_ENABLE)
-	#define ALX_SD_ASSERT(expr) ALX_ASSERT_RST(ALX_SD_FILE, expr)
+	#define ALX_SD_ASSERT(expr) ALX_ASSERT_RST(ALX_SD_MODULE, expr)
 #else
 	#define ALX_SD_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_SD_TRACE_ENABLE)
-	#define ALX_SD_TRACE_WRN(...) ALX_TRACE_WRN(ALX_SD_FILE, __VA_ARGS__)
+	#define ALX_SD_TRACE_WRN(...) ALX_TRACE_WRN(ALX_SD_MODULE, __VA_ARGS__)
 #else
 	#define ALX_SD_TRACE_WRN(...) do{} while (false)
 #endif

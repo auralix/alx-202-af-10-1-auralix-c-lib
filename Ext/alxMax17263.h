@@ -57,22 +57,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_MAX17263_FILE "alxMax17263.h"
+#define ALX_MAX17263_MODULE "AlxMax17263.h"
 
 // Assert //
 #if defined(ALX_MAX17263_ASSERT_BKPT_ENABLE)
-	#define ALX_MAX17263_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MAX17263_FILE, expr)
+	#define ALX_MAX17263_ASSERT(expr) ALX_ASSERT_BKPT(ALX_MAX17263_MODULE, expr)
 #elif defined(ALX_MAX17263_ASSERT_TRACE_ENABLE)
-	#define ALX_MAX17263_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MAX17263_FILE, expr)
+	#define ALX_MAX17263_ASSERT(expr) ALX_ASSERT_TRACE(ALX_MAX17263_MODULE, expr)
 #elif defined(ALX_MAX17263_ASSERT_RST_ENABLE)
-	#define ALX_MAX17263_ASSERT(expr) ALX_ASSERT_RST(ALX_MAX17263_FILE, expr)
+	#define ALX_MAX17263_ASSERT(expr) ALX_ASSERT_RST(ALX_MAX17263_MODULE, expr)
 #else
 	#define ALX_MAX17263_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_MAX17263_TRACE_ENABLE)
-	#define ALX_MAX17263_TRACE(...) ALX_TRACE_WRN(ALX_MAX17263_FILE, __VA_ARGS__)
+	#define ALX_MAX17263_TRACE(...) ALX_TRACE_WRN(ALX_MAX17263_MODULE, __VA_ARGS__)
 #else
 	#define ALX_MAX17263_TRACE(...) do{} while (false)
 #endif

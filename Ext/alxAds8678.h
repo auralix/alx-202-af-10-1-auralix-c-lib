@@ -54,22 +54,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_ADS8678_FILE "alxAds8678.h"
+#define ALX_ADS8678_MODULE "AlxAds8678.h"
 
 // Assert //
 #if defined(ALX_ADS8678_ASSERT_BKPT_ENABLE)
-	#define ALX_ADS8678_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADS8678_FILE, expr)
+	#define ALX_ADS8678_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADS8678_MODULE, expr)
 #elif defined(ALX_ADS8678_ASSERT_TRACE_ENABLE)
-	#define ALX_ADS8678_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADS8678_FILE, expr)
+	#define ALX_ADS8678_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADS8678_MODULE, expr)
 #elif defined(ALX_ADS8678_ASSERT_RST_ENABLE)
-	#define ALX_ADS8678_ASSERT(expr) ALX_ASSERT_RST(ALX_ADS8678_FILE, expr)
+	#define ALX_ADS8678_ASSERT(expr) ALX_ASSERT_RST(ALX_ADS8678_MODULE, expr)
 #else
 	#define ALX_ADS8678_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_ADS8678_TRACE_ENABLE)
-	#define ALX_ADS8678_TRACE(...) ALX_TRACE_WRN(ALX_ADS8678_FILE, __VA_ARGS__)
+	#define ALX_ADS8678_TRACE(...) ALX_TRACE_WRN(ALX_ADS8678_MODULE, __VA_ARGS__)
 #else
 	#define ALX_ADS8678_TRACE(...) do{} while (false)
 #endif

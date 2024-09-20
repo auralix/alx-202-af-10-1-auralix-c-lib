@@ -54,22 +54,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_TIM_SW_FILE "alxTimSw.h"
+#define ALX_TIM_SW_MODULE "AlxTimSw.h"
 
 // Assert //
 #if defined(ALX_TIM_SW_ASSERT_BKPT_ENABLE)
-	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_BKPT(ALX_TIM_SW_FILE, expr)
+	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_BKPT(ALX_TIM_SW_MODULE, expr)
 #elif defined(ALX_TIM_SW_ASSERT_TRACE_ENABLE)
-	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_TRACE(ALX_TIM_SW_FILE, expr)
+	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_TRACE(ALX_TIM_SW_MODULE, expr)
 #elif defined(ALX_TIM_SW_ASSERT_RST_ENABLE)
-	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_RST(ALX_TIM_SW_FILE, expr)
+	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_RST(ALX_TIM_SW_MODULE, expr)
 #else
 	#define ALX_TIM_SW_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_TIM_SW_TRACE_ENABLE)
-	#define ALX_TIM_SW_TRACE(...) ALX_TRACE_WRN(ALX_TIM_SW_FILE, __VA_ARGS__)
+	#define ALX_TIM_SW_TRACE(...) ALX_TRACE_WRN(ALX_TIM_SW_MODULE, __VA_ARGS__)
 #else
 	#define ALX_TIM_SW_TRACE(...) do{} while (false)
 #endif

@@ -61,22 +61,22 @@ typedef struct { bool dummy; } AlxDac;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_DAC_FILE "alxDac.h"
+#define ALX_DAC_MODULE "AlxDac.h"
 
 // Assert //
 #if defined(ALX_DAC_ASSERT_BKPT_ENABLE)
-	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_DAC_FILE, expr)
+	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_BKPT(ALX_DAC_MODULE, expr)
 #elif defined(ALX_DAC_ASSERT_TRACE_ENABLE)
-	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_DAC_FILE, expr)
+	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_TRACE(ALX_DAC_MODULE, expr)
 #elif defined(ALX_DAC_ASSERT_RST_ENABLE)
-	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_RST(ALX_DAC_FILE, expr)
+	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_RST(ALX_DAC_MODULE, expr)
 #else
 	#define ALX_DAC_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_DAC_TRACE_ENABLE)
-	#define ALX_DAC_TRACE(...) ALX_TRACE_WRN(ALX_DAC_FILE, __VA_ARGS__)
+	#define ALX_DAC_TRACE(...) ALX_TRACE_WRN(ALX_DAC_MODULE, __VA_ARGS__)
 #else
 	#define ALX_DAC_TRACE(...) do{} while (false)
 #endif
