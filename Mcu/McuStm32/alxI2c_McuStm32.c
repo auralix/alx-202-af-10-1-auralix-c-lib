@@ -230,6 +230,10 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 	// Try read for number of tries
 	for(uint32_t _try = 1 ; _try <= numOfTries ; _try++)
 	{
+		// Trace
+		ALX_I2C_TRACE_VRB("I2C Read START: try %lu, slaveAddr 0x%04X, len %u, timeout %ums", _try, slaveAddr, len, timeout_ms);
+
+		// Read
 		status = HAL_I2C_Master_Receive(&me->hi2c, slaveAddr, data, len, timeout_ms);
 		if (status == HAL_OK)
 		{
@@ -246,6 +250,18 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 	// If we are here, read was OK or number of tries error occured
 	if(status == HAL_OK)
 	{
+		// Trace
+		ALX_I2C_TRACE_VRB("I2C Read OK");
+		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
+		ALX_I2C_TRACE_FORMAT("    data: ");
+		for (uint32_t i = 0; i < len; i++)
+		{
+			ALX_I2C_TRACE_FORMAT("%02X ", data[i]);
+		}
+		ALX_I2C_TRACE_FORMAT("\r\n");
+		#endif
+
+		// Return
 		return Alx_Ok;
 	}
 	else
@@ -289,6 +305,10 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 	// Try read for number of tries
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
+		// Trace
+		ALX_I2C_TRACE_VRB("I2C Read Memory START: try %lu, slaveAddr 0x%04X, memAddr 0x%04X, len %u, timeout %ums", _try, slaveAddr, memAddr, len, timeout_ms);
+
+		// Read
 		status = HAL_I2C_Mem_Read(&me->hi2c, slaveAddr, memAddr, _memAddrLen, data, len, timeout_ms);
 		if (status == HAL_OK)
 		{
@@ -305,6 +325,18 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 	// If we are here, read was OK or number of tries error occured
 	if (status == HAL_OK)
 	{
+		// Trace
+		ALX_I2C_TRACE_VRB("I2C Read Memory OK");
+		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
+		ALX_I2C_TRACE_FORMAT("    data: ");
+		for (uint32_t i = 0; i < len; i++)
+		{
+			ALX_I2C_TRACE_FORMAT("%02X ", data[i]);
+		}
+		ALX_I2C_TRACE_FORMAT("\r\n");
+		#endif
+
+		// Return
 		return Alx_Ok;
 	}
 	else
@@ -359,6 +391,18 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 	// Try write for number of tries
 	for(uint32_t _try = 1 ; _try <= numOfTries ; _try++)
 	{
+		// Trace
+		ALX_I2C_TRACE_VRB("I2C Write START: try %lu, slaveAddr 0x%04X, len %u, timeout %ums", _try, slaveAddr, len, timeout_ms);
+		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
+		ALX_I2C_TRACE_FORMAT("    data: ");
+		for (uint32_t i = 0; i < len; i++)
+		{
+			ALX_I2C_TRACE_FORMAT("%02X ", data[i]);
+		}
+		ALX_I2C_TRACE_FORMAT("\r\n");
+		#endif
+
+		// Write
 		status = HAL_I2C_Master_Transmit(&me->hi2c, slaveAddr,(uint8_t*)data, len, timeout_ms);
 		if (status == HAL_OK)
 		{
@@ -375,6 +419,10 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 	// If we are here, write was OK or number of tries error occured
 	if(status == HAL_OK)
 	{
+		// Trace
+		ALX_I2C_TRACE_VRB("I2C Write OK");
+
+		// Return
 		return Alx_Ok;
 	}
 	else
@@ -440,6 +488,18 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 	// Try write for number of tries
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
+		// Trace
+		ALX_I2C_TRACE_VRB("I2C Write Memory START: try %lu, slaveAddr 0x%04X, memAddr 0x%04X, len %u, timeout %ums", _try, slaveAddr, memAddr, len, timeout_ms);
+		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
+		ALX_I2C_TRACE_FORMAT("    data: ");
+		for (uint32_t i = 0; i < len; i++)
+		{
+			ALX_I2C_TRACE_FORMAT("%02X ", data[i]);
+		}
+		ALX_I2C_TRACE_FORMAT("\r\n");
+		#endif
+
+		// Write
 		status = HAL_I2C_Mem_Write(&me->hi2c, slaveAddr, memAddr, _memAddrLen, (uint8_t*)data, len, timeout_ms);
 		if (status == HAL_OK)
 		{
@@ -484,6 +544,10 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 	// If we are here, write was OK or number of tries error occured
 	if (status == HAL_OK)
 	{
+		// Trace
+		ALX_I2C_TRACE_VRB("I2C Write Memory OK");
+
+		// Return
 		return Alx_Ok;
 	}
 	else
