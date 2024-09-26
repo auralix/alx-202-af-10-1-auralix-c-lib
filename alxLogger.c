@@ -765,6 +765,80 @@ Alx_Status AlxLogger_GetIdToReadNewest(AlxLogger* me, uint64_t* idToReadNewest)
 	*idToReadNewest = me->md.write.id - 1;
 	return Alx_Ok;
 }
+Alx_Status AlxLogger_GetFileToReadOldest(AlxLogger* me, uint32_t* fileToReadOldest)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Check
+	bool isLogToReadStored = AlxLogger_IsLogToReadCheck(me->md.oldest.id, me->md.write.id);
+	if (isLogToReadStored == false)
+	{
+		*fileToReadOldest = 0;
+		return Alx_Err;
+	}
+
+	// Return
+	*fileToReadOldest = me->md.oldest.file;
+	return Alx_Ok;
+}
+Alx_Status AlxLogger_GetFileToReadNewest(AlxLogger* me, uint32_t* fileToReadNewest)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Check
+	bool isLogToReadStored = AlxLogger_IsLogToReadCheck(me->md.oldest.id, me->md.write.id);
+	if (isLogToReadStored == false)
+	{
+		*fileToReadNewest = 0;
+		return Alx_Err;
+	}
+
+	// Return
+	uint64_t idToReadNewest = me->md.write.id - 1;
+	*fileToReadNewest = (idToReadNewest % me->numOfLogsPerDirTotal) / me->numOfLogsPerFile;
+	return Alx_Ok;
+}
+Alx_Status AlxLogger_GetDirToReadOldest(AlxLogger* me, uint32_t* dirToReadOldest)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Check
+	bool isLogToReadStored = AlxLogger_IsLogToReadCheck(me->md.oldest.id, me->md.write.id);
+	if (isLogToReadStored == false)
+	{
+		*dirToReadOldest = 0;
+		return Alx_Err;
+	}
+
+	// Return
+	*dirToReadOldest = me->md.oldest.dir;
+	return Alx_Ok;
+}
+Alx_Status AlxLogger_GetDirToReadNewest(AlxLogger* me, uint32_t* dirToReadNewest)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Check
+	bool isLogToReadStored = AlxLogger_IsLogToReadCheck(me->md.oldest.id, me->md.write.id);
+	if (isLogToReadStored == false)
+	{
+		*dirToReadNewest = 0;
+		return Alx_Err;
+	}
+
+	// Return
+	uint64_t idToReadNewest = me->md.write.id - 1;
+	*dirToReadNewest = (idToReadNewest / me->numOfLogsPerDirTotal) % me->numOfDir;
+	return Alx_Ok;
+}
 AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me)
 {
 	// Assert
