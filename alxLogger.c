@@ -462,6 +462,9 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 	*numOfLogsActual = logNum;
 	return status;
 }
+Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint32_t readChunkLen)
+{
+}
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 {
 	//------------------------------------------------------------------------------

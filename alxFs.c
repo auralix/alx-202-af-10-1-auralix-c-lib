@@ -886,6 +886,85 @@ Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
 	// Return
 	return Alx_Ok;
 }
+Alx_Status AlxFs_File_ReadInChunk(AlxFs* me, const char* path, uint32_t chunkLen, uint8_t* buff, Alx_Status(*callback)(const void* data, uint32_t lenActual))
+{
+	// Assert
+	ALX_FS_ASSERT(me->wasCtorCalled == true);
+	ALX_FS_ASSERT(me->isMounted == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+	AlxFs_File file = {};
+	uint32_t fileSize = 0;
+	uint32_t fileSizeRead = 0;
+	uint32_t lenActual = 0;
+
+	// Open
+	status = AlxFs_File_Open(me, &file, path, "r");
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		return status;
+	}
+
+	// Get fileSize
+	status = AlxFs_File_Size(me, &file, &fileSize);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u", status, path, fileSize);
+		Alx_Status statusClose = AlxFs_File_Close(me, &file);
+		if (statusClose != Alx_Ok)
+		{
+			ALX_FS_TRACE("Err: %d, path=%s", statusClose, path);
+		}
+		return status;
+	}
+
+	// Loop
+	while (fileSizeRead < fileSize)
+	{
+		// Read
+		memset(buff, 0, chunkLen);
+		status = AlxFs_File_Read(me, &file, buff, chunkLen, &lenActual);
+		if (status != Alx_Ok)
+		{
+			ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u, lenActual=%u", status, path, fileSize, lenActual);
+			Alx_Status statusClose = AlxFs_File_Close(me, &file);
+			if (statusClose != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err: %d, path=%s", statusClose, path);
+			}
+			return status;
+		}
+
+		// Call the callback function with updated signature
+		status = callback(buff, lenActual);
+		if (status != Alx_Ok)
+		{
+			// Close the file in case of error in the callback
+			Alx_Status statusClose = AlxFs_File_Close(me, &file);
+			if (statusClose != Alx_Ok)
+			{
+				ALX_FS_TRACE("Err: %d, path=%s", statusClose, path);
+			}
+			return status;
+		}
+
+		// Increment fileSizeRead
+		fileSizeRead += lenActual;
+	}
+
+	// Close
+	status = AlxFs_File_Close(me, &file);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		return status;
+	}
+
+	// Return
+	return Alx_Ok;
+}
 Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 {
 	// Assert
