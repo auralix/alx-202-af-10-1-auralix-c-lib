@@ -462,7 +462,7 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 	*numOfLogsActual = logNum;
 	return status;
 }
-Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(const void* chunkData, uint32_t chunkLenActual))
+Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual))
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
