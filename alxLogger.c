@@ -818,7 +818,7 @@ Alx_Status AlxLogger_GetIdToReadNewest(AlxLogger* me, uint64_t* idToReadNewest)
 	*idToReadNewest = me->md.write.id - 1;
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_GetFileToReadOldest(AlxLogger* me, uint32_t* fileToReadOldest)
+Alx_Status AlxLogger_GetFilePathToReadOldest(AlxLogger* me, char* filePathToReadOldest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -828,15 +828,19 @@ Alx_Status AlxLogger_GetFileToReadOldest(AlxLogger* me, uint32_t* fileToReadOlde
 	bool isLogToReadStored = AlxLogger_IsLogToReadCheck(me->md.oldest.id, me->md.write.id);
 	if (isLogToReadStored == false)
 	{
-		*fileToReadOldest = 0;
+		strcpy(filePathToReadOldest, "");
 		return Alx_Err;
 	}
 
+	// Prepare
+	uint32_t fileToReadOldest = me->md.oldest.file;
+	uint32_t dirToReadOldest = me->md.oldest.dir;
+
 	// Return
-	*fileToReadOldest = me->md.oldest.file;
+	sprintf(filePathToReadOldest, "/%lu/%lu.csv", dirToReadOldest, fileToReadOldest);
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_GetFileToReadNewest(AlxLogger* me, uint32_t* fileToReadNewest)
+Alx_Status AlxLogger_GetFilePathToReadNewest(AlxLogger* me, char* filePathToReadNewest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -846,50 +850,17 @@ Alx_Status AlxLogger_GetFileToReadNewest(AlxLogger* me, uint32_t* fileToReadNewe
 	bool isLogToReadStored = AlxLogger_IsLogToReadCheck(me->md.oldest.id, me->md.write.id);
 	if (isLogToReadStored == false)
 	{
-		*fileToReadNewest = 0;
+		strcpy(filePathToReadNewest, "");
 		return Alx_Err;
 	}
 
-	// Return
+	// Prepare
 	uint64_t idToReadNewest = me->md.write.id - 1;
-	*fileToReadNewest = (idToReadNewest % me->numOfLogsPerDirTotal) / me->numOfLogsPerFile;
-	return Alx_Ok;
-}
-Alx_Status AlxLogger_GetDirToReadOldest(AlxLogger* me, uint32_t* dirToReadOldest)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Check
-	bool isLogToReadStored = AlxLogger_IsLogToReadCheck(me->md.oldest.id, me->md.write.id);
-	if (isLogToReadStored == false)
-	{
-		*dirToReadOldest = 0;
-		return Alx_Err;
-	}
+	uint32_t fileToReadNewest = (idToReadNewest % me->numOfLogsPerDirTotal) / me->numOfLogsPerFile;
+	uint32_t dirToReadNewest = (idToReadNewest / me->numOfLogsPerDirTotal) % me->numOfDir;
 
 	// Return
-	*dirToReadOldest = me->md.oldest.dir;
-	return Alx_Ok;
-}
-Alx_Status AlxLogger_GetDirToReadNewest(AlxLogger* me, uint32_t* dirToReadNewest)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Check
-	bool isLogToReadStored = AlxLogger_IsLogToReadCheck(me->md.oldest.id, me->md.write.id);
-	if (isLogToReadStored == false)
-	{
-		*dirToReadNewest = 0;
-		return Alx_Err;
-	}
-
-	// Return
-	uint64_t idToReadNewest = me->md.write.id - 1;
-	*dirToReadNewest = (idToReadNewest / me->numOfLogsPerDirTotal) % me->numOfDir;
+	sprintf(filePathToReadNewest, "/%lu/%lu.csv", dirToReadNewest, fileToReadNewest);
 	return Alx_Ok;
 }
 AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me)
