@@ -462,8 +462,14 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 	*numOfLogsActual = logNum;
 	return status;
 }
-Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint32_t readChunkLen)
+Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(const void* chunkData, uint32_t chunkLenActual))
 {
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	ALX_LOGGER_ASSERT(me->isInit == true);
+
+	// Return
+	return AlxFs_File_ReadInChunks(me->alxFs, path, chunkBuff, chunkLen, chunkRead_Callback);;
 }
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 {
@@ -713,6 +719,50 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 	// Return
 	//------------------------------------------------------------------------------
 	return status;
+}
+Alx_Status AlxLogger_GetFileSize(AlxLogger* me, const char* path, uint32_t* fileSize)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	ALX_LOGGER_ASSERT(me->isInit == true);
+
+	// Local Variables
+	Alx_Status status = Alx_Err;
+	AlxFs_File file = {};
+
+	// Open
+	status = AlxFs_File_Open(me->alxFs, &file, path, "r");
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		return status;
+	}
+
+	// Get fileSize
+	status = AlxFs_File_Size(me->alxFs, &file, fileSize);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u", status, path, fileSize);
+		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
+		if (statusClose != Alx_Ok)
+		{
+			ALX_FS_TRACE("Err: %d, path=%s", statusClose, path);
+			// TV: TODO - Handle close error
+		}
+		return status;
+	}
+
+	// Close
+	status = AlxFs_File_Close(me->alxFs, &file);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		// TV: TODO - Handle close error
+		return status;
+	}
+
+	// Return
+	return Alx_Ok;
 }
 uint64_t AlxLogger_GetNumOfLogsToReadAvailable(AlxLogger* me)
 {

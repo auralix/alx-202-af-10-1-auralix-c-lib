@@ -91,7 +91,7 @@ static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c);
 //------------------------------------------------------------------------------
 // Callback Functions
 //------------------------------------------------------------------------------
-static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(AlxFs* me, const void* chunkData, uint32_t chunkLenActual);
+static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(const void* chunkData, uint32_t chunkLenActual);
 
 
 //******************************************************************************
@@ -892,7 +892,7 @@ Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(AlxFs* me, const void* chunkData, uint32_t chunkLenActual))
+Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(const void* chunkData, uint32_t chunkLenActual))
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -946,7 +946,7 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 		}
 
 		// Callback
-		status = chunkRead_Callback(me, chunkBuff, chunkLenActual);
+		status = chunkRead_Callback(chunkBuff, chunkLenActual);
 		if (status != Alx_Ok)
 		{
 			ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u, chunkLenActual=%u", status, path, fileSize, chunkLenActual);
@@ -1902,10 +1902,9 @@ static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c)
 //------------------------------------------------------------------------------
 // Callback Functions
 //------------------------------------------------------------------------------
-static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(AlxFs* me, const void* chunkData, uint32_t chunkLenActual)
+static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(const void* chunkData, uint32_t chunkLenActual)
 {
 	// Prepare
-	(void)me;
 	(void)chunkLenActual;
 
 	// Trace
