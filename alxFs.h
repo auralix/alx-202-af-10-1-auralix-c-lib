@@ -211,7 +211,7 @@ Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* position);
 Alx_Status AlxFs_File_Rewind(AlxFs* me, AlxFs_File* file);
 Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* size);
 Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size);
-Alx_Status AlxFs_File_ReadInChunk(AlxFs* me, const char* path, uint32_t chunkLen, uint8_t* buff, Alx_Status(*callback)(const void* data, uint32_t lenActual));
+Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(AlxFs* me, const void* chunkData, uint32_t chunkLenActual));
 Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path);
 Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path);
 Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path);
