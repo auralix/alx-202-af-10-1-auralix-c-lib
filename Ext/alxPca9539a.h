@@ -216,7 +216,36 @@ typedef union
 	};
 	uint8_t raw;
 } AlxPca9539a_RegVal_07h_Configuration_1;
-
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		bool P1_0 : 1;
+		bool P1_1 : 1;
+		bool P1_2 : 1;
+		bool P1_3 : 1;
+		bool P1_4 : 1;
+		bool P1_5 : 1;
+		bool P1_6 : 1;
+		bool P1_7 : 1;
+	};
+	uint8_t raw;
+} AlxPca9539a_RegVal_OpenDrain_0;
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		bool P1_0 : 1;
+		bool P1_1 : 1;
+		bool P1_2 : 1;
+		bool P1_3 : 1;
+		bool P1_4 : 1;
+		bool P1_5 : 1;
+		bool P1_6 : 1;
+		bool P1_7 : 1;
+	};
+	uint8_t raw;
+} AlxPca9539a_RegVal_OpenDrain_1;
 //******************************************************************************
 // Register Structures
 //******************************************************************************
@@ -299,6 +328,8 @@ typedef struct
 
 	// Variables
 	AlxPca9539a_Reg reg;
+	AlxPca9539a_RegVal_OpenDrain_0 _OpenDrain_0;
+	AlxPca9539a_RegVal_OpenDrain_1 _OpenDrain_1;
 
 	// Info
 	bool wasCtorCalled;

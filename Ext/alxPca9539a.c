@@ -248,6 +248,7 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 
 	// Local variables
 	Alx_Status status = Alx_Err;
+	uint8_t mask;
 
 	// Handle
 
@@ -256,6 +257,24 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 
 	status = AlxPca9539a_Reg_Read(me, &me->reg._01h_InputPort_1);
 	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+
+	if (me->_OpenDrain_0.raw != 0b00000000)
+	{
+		mask = me->_OpenDrain_0.raw & me->reg._02h_OutputPort_0.val.raw;
+		me->reg._06h_Configuration_0.val.raw = (me->reg._06h_Configuration_0.val.raw & ~me->_OpenDrain_0.raw) | mask;
+
+		status = AlxPca9539a_Reg_Write(me, &me->reg._06h_Configuration_0);
+		if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	}
+
+	if (me->_OpenDrain_1.raw != 0b00000000)
+	{
+		mask = me->_OpenDrain_1.raw & me->reg._03h_OutputPort_1.val.raw;
+		me->reg._07h_Configuration_1.val.raw = (me->reg._07h_Configuration_1.val.raw & ~me->_OpenDrain_1.raw) | mask;
+
+		status = AlxPca9539a_Reg_Write(me, &me->reg._07h_Configuration_1);
+		if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	}
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._02h_OutputPort_0);
 	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
@@ -572,6 +591,8 @@ static void AlxPca9539a_RegStruct_SetLen(AlxPca9539a* me)
 	me->reg._04h_PolarityInversion_0	.len = sizeof(me->reg._04h_PolarityInversion_0		.val);
 	me->reg._05h_PolarityInversion_1	.len = sizeof(me->reg._05h_PolarityInversion_1		.val);
 	me->reg._06h_Configuration_0		.len = sizeof(me->reg._06h_Configuration_0			.val);
+	me->reg._07h_Configuration_1		.len = sizeof(me->reg._07h_Configuration_1			.val);
+
 }
 
 static void AlxPca9539a_RegStruct_SetValToZero(AlxPca9539a* me)
@@ -584,7 +605,8 @@ static void AlxPca9539a_RegStruct_SetValToZero(AlxPca9539a* me)
 	me->reg._05h_PolarityInversion_1.val.raw = 0b00000000;
 	me->reg._06h_Configuration_0.val.raw = 0b00000000;
 	me->reg._07h_Configuration_1.val.raw = 0b00000000;
-
+	me->_OpenDrain_0.raw = 0b00000000;
+	me->_OpenDrain_1.raw = 0b00000000;
 }
 
 static void AlxPca9539a_RegStruct_SetValToDefault(AlxPca9539a* me)
@@ -597,7 +619,8 @@ static void AlxPca9539a_RegStruct_SetValToDefault(AlxPca9539a* me)
 	me->reg._05h_PolarityInversion_1	.val.raw = 0b00000000;
 	me->reg._06h_Configuration_0		.val.raw = 0b11000000;
 	me->reg._07h_Configuration_1		.val.raw = 0b11111111;
-
+	me->_OpenDrain_0.raw = 0b01000000;
+	me->_OpenDrain_1.raw = 0b00000000;
 }
 
 //******************************************************************************
