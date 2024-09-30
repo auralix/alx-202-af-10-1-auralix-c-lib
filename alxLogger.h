@@ -187,11 +187,16 @@ void AlxLogger_Ctor
 Alx_Status AlxLogger_Init(AlxLogger* me);
 Alx_Status AlxLogger_Format(AlxLogger* me);
 Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual, bool mdUpdate, uint64_t idStart);
+Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual));
+Alx_Status AlxLogger_ReadFileFirstLine(AlxLogger* me, const char* path, char* log);
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs);
+Alx_Status AlxLogger_GetFileSize(AlxLogger* me, const char* path, uint32_t* fileSize);
 uint64_t AlxLogger_GetNumOfLogsToReadAvailable(AlxLogger* me);
 uint64_t AlxLogger_GetNumOfLogsToReadStored(AlxLogger* me);
 Alx_Status AlxLogger_GetIdToReadOldest(AlxLogger* me, uint64_t* idToReadOldest);
 Alx_Status AlxLogger_GetIdToReadNewest(AlxLogger* me, uint64_t* idToReadNewest);
+Alx_Status AlxLogger_GetFilePathToReadOldest(AlxLogger* me, char* filePathToReadOldest);
+Alx_Status AlxLogger_GetFilePathToReadNewest(AlxLogger* me, char* filePathToReadNewest);
 AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me);
 AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me);
 Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
