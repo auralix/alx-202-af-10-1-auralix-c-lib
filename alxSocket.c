@@ -901,6 +901,7 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 				return NULL;
 			}
 			tmpSn_SR = getSn_SR(me->socket_data.wiz_socket);
+			SOCKET_YIELD();
 		} while ((tmpSn_SR != SOCK_ESTABLISHED) && (tmpSn_SR != SOCK_CLOSE_WAIT));
 		me->socket_data.wiz_sock_opened = true;
 
