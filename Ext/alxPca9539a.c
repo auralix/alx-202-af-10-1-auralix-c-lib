@@ -617,7 +617,7 @@ static void AlxPca9539a_RegStruct_SetValToDefault(AlxPca9539a* me)
 	//me->reg._03h_OutputPort_1			.val.raw = 0b11111111;	// TV: We will handle OutputPort config outside of Init
 	me->reg._04h_PolarityInversion_0	.val.raw = 0b00000000;
 	me->reg._05h_PolarityInversion_1	.val.raw = 0b00000000;
-	me->reg._06h_Configuration_0		.val.raw = 0b11000000;
+	me->reg._06h_Configuration_0		.val.raw = 0b11111111;
 	me->reg._07h_Configuration_1		.val.raw = 0b11111111;
 	me->_OpenDrain_0.raw = 0b01000000;
 	me->_OpenDrain_1.raw = 0b00000000;
