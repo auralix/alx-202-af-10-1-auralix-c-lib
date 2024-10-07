@@ -82,7 +82,7 @@ void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
   * @param[in]		fun
   * @param[in]		format
   */
-void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* module, uint32_t line, const char* fun, const char* format, ...)
+void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t line, const char* fun, const char* format, ...)
 {
 	//------------------------------------------------------------------------------
 	// Prepare dateTimeStr
@@ -134,11 +134,11 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* module, uint32
 	//------------------------------------------------------------------------------
 	if ((ALX_TRACE_LEVEL_FTL <= level) && (level <= ALX_TRACE_LEVEL_WRN))
 	{
-		AlxTrace_WriteFormat(me, "[%s] [%s] <%s:%lu %s> %s\r\n", dateTimeStr, levelStr, module, line, fun, formatStr);
+		AlxTrace_WriteFormat(me, "[%s] [%s] [%s:%lu %s] %s\r\n", dateTimeStr, levelStr, file, line, fun, formatStr);
 	}
 	else if ((ALX_TRACE_LEVEL_INF <= level) && (level <= ALX_TRACE_LEVEL_VRB))
 	{
-		AlxTrace_WriteFormat(me, "[%s] [%s] <%s> %s\r\n", dateTimeStr, levelStr, module, formatStr);
+		AlxTrace_WriteFormat(me, "[%s] [%s] %s\r\n", dateTimeStr, levelStr, formatStr);
 	}
 	else
 	{
