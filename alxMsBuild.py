@@ -39,9 +39,14 @@ def Script(vsSolPath):
 	print("")
 	print("alxMsBuild.py - START")
 
-	# Run
+	# Build FwUp
 	cmd = (r'call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" &&'
 		r' msbuild "{vsSolPath}" /p:Configuration=FwUp').format(vsSolPath=vsSolPath)
+	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+
+	# Build NoBoot2
+	cmd = (r'call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" &&'
+		r' msbuild "{vsSolPath}" /p:Configuration=NoBoot2').format(vsSolPath=vsSolPath)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
 	# Print
