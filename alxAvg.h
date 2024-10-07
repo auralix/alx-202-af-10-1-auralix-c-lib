@@ -53,22 +53,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_AVG_MODULE "AlxAvg.h"
+#define ALX_AVG_FILE "alxAvg.h"
 
 // Assert //
 #if defined(ALX_AVG_ASSERT_BKPT_ENABLE)
-	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_BKPT(ALX_AVG_MODULE, expr)
+	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_BKPT(ALX_AVG_FILE, expr)
 #elif defined(ALX_AVG_ASSERT_TRACE_ENABLE)
-	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_TRACE(ALX_AVG_MODULE, expr)
+	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_TRACE(ALX_AVG_FILE, expr)
 #elif defined(ALX_AVG_ASSERT_RST_ENABLE)
-	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_RST(ALX_AVG_MODULE, expr)
+	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_RST(ALX_AVG_FILE, expr)
 #else
 	#define ALX_AVG_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_AVG_TRACE_ENABLE)
-	#define ALX_AVG_TRACE(...) ALX_TRACE_WRN(ALX_AVG_MODULE, __VA_ARGS__)
+	#define ALX_AVG_TRACE(...) ALX_TRACE_WRN(ALX_AVG_FILE, __VA_ARGS__)
 #else
 	#define ALX_AVG_TRACE(...) do{} while (false)
 #endif

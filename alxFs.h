@@ -58,15 +58,15 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_FS_MODULE "AlxFs.h"
+#define ALX_FS_FILE "alxFs.h"
 
 // Assert //
 #if defined(ALX_FS_ASSERT_BKPT_ENABLE)
-	#define ALX_FS_ASSERT(expr) ALX_ASSERT_BKPT(ALX_FS_MODULE, expr)
+	#define ALX_FS_ASSERT(expr) ALX_ASSERT_BKPT(ALX_FS_FILE, expr)
 #elif defined(ALX_FS_ASSERT_TRACE_ENABLE)
-	#define ALX_FS_ASSERT(expr) ALX_ASSERT_TRACE(ALX_FS_MODULE, expr)
+	#define ALX_FS_ASSERT(expr) ALX_ASSERT_TRACE(ALX_FS_FILE, expr)
 #elif defined(ALX_FS_ASSERT_RST_ENABLE)
-	#define ALX_FS_ASSERT(expr) ALX_ASSERT_RST(ALX_FS_MODULE, expr)
+	#define ALX_FS_ASSERT(expr) ALX_ASSERT_RST(ALX_FS_FILE, expr)
 #else
 	#define ALX_FS_ASSERT(expr) do{} while (false)
 #endif
@@ -74,9 +74,9 @@ extern "C" {
 // Trace //
 #if defined(ALX_FS_TRACE_ENABLE)
 	#ifndef TV_TEST
-	#define ALX_FS_TRACE(...) ALX_TRACE_WRN(ALX_FS_MODULE, __VA_ARGS__)
+	#define ALX_FS_TRACE(...) ALX_TRACE_WRN(ALX_FS_FILE, __VA_ARGS__)
 	#else
-	#define ALX_FS_TRACE(...) ALX_TRACE_WRN(ALX_FS_MODULE, __VA_ARGS__); if(me->config == AlxFs_Config_Lfs_Mmc) AlxAssert_Rst("file", 0, "fun")
+	#define ALX_FS_TRACE(...) ALX_TRACE_WRN(ALX_FS_FILE, __VA_ARGS__); if(me->config == AlxFs_Config_Lfs_Mmc) AlxAssert_Rst("file", 0, "fun")
 	#endif
 	#define ALX_FS_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else

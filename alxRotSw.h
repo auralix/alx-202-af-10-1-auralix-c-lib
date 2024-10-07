@@ -54,22 +54,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_ROT_SW_MODULE "AlxRotSw.h"
+#define ALX_ROT_SW_FILE "alxRotSw.h"
 
 // Assert //
 #if defined(ALX_ROT_SW_ASSERT_BKPT_ENABLE)
-	#define ALX_ROT_SW_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ROT_SW_MODULE, expr)
+	#define ALX_ROT_SW_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ROT_SW_FILE, expr)
 #elif defined(ALX_ROT_SW_ASSERT_TRACE_ENABLE)
-	#define ALX_ROT_SW_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ROT_SW_MODULE, expr)
+	#define ALX_ROT_SW_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ROT_SW_FILE, expr)
 #elif defined(ALX_ROT_SW_ASSERT_RST_ENABLE)
-	#define ALX_ROT_SW_ASSERT(expr) ALX_ASSERT_RST(ALX_ROT_SW_MODULE, expr)
+	#define ALX_ROT_SW_ASSERT(expr) ALX_ASSERT_RST(ALX_ROT_SW_FILE, expr)
 #else
 	#define ALX_ROT_SW_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_ROT_SW_TRACE_ENABLE)
-	#define ALX_ROT_SW_TRACE_WRN(...) ALX_TRACE_WRN(ALX_ROT_SW_MODULE, __VA_ARGS__)
+	#define ALX_ROT_SW_TRACE_WRN(...) ALX_TRACE_WRN(ALX_ROT_SW_FILE, __VA_ARGS__)
 #else
 	#define ALX_ROT_SW_TRACE_WRN(...) do{} while (false)
 #endif

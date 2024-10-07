@@ -57,23 +57,23 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PARAM_ITEM_MODULE "AlxParamItem.h"
+#define ALX_PARAM_ITEM_FILE "alxParamItem.h"
 
 // Assert //
 #if defined(ALX_PARAM_ITEM_ASSERT_BKPT_ENABLE)
-	#define ALX_PARAM_ITEM_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PARAM_ITEM_MODULE, expr)
+	#define ALX_PARAM_ITEM_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PARAM_ITEM_FILE, expr)
 #elif defined(ALX_PARAM_ITEM_ASSERT_TRACE_ENABLE)
-	#define ALX_PARAM_ITEM_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PARAM_ITEM_MODULE, expr)
+	#define ALX_PARAM_ITEM_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PARAM_ITEM_FILE, expr)
 #elif defined(ALX_PARAM_ITEM_ASSERT_RST_ENABLE)
-	#define ALX_PARAM_ITEM_ASSERT(expr) ALX_ASSERT_RST(ALX_PARAM_ITEM_MODULE, expr)
+	#define ALX_PARAM_ITEM_ASSERT(expr) ALX_ASSERT_RST(ALX_PARAM_ITEM_FILE, expr)
 #else
 	#define ALX_PARAM_ITEM_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_PARAM_ITEM_TRACE_ENABLE)
-	#define ALX_PARAM_ITEM_TRACE_WRN(...) ALX_TRACE_WRN(ALX_PARAM_ITEM_MODULE, __VA_ARGS__)
-	#define ALX_PARAM_ITEM_TRACE_INF(...) ALX_TRACE_INF(ALX_PARAM_ITEM_MODULE, __VA_ARGS__)
+	#define ALX_PARAM_ITEM_TRACE_WRN(...) ALX_TRACE_WRN(ALX_PARAM_ITEM_FILE, __VA_ARGS__)
+	#define ALX_PARAM_ITEM_TRACE_INF(...) ALX_TRACE_INF(ALX_PARAM_ITEM_FILE, __VA_ARGS__)
 #else
 	#define ALX_PARAM_ITEM_TRACE_WRN(...) do{} while (false)
 	#define ALX_PARAM_ITEM_TRACE_INF(...) do{} while (false)

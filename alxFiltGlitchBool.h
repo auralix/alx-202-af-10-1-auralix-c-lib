@@ -54,22 +54,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_FILT_GLITCH_BOOL_MODULE "AlxFiltGlitch.h"
+#define ALX_FILT_GLITCH_BOOL_FILE "alxFiltGlitch.h"
 
 // Assert //
 #if defined(ALX_FILT_GLITCH_BOOL_ASSERT_BKPT_ENABLE)
-	#define ALX_FILT_GLITCH_BOOL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_FILT_GLITCH_BOOL_MODULE, expr)
+	#define ALX_FILT_GLITCH_BOOL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_FILT_GLITCH_BOOL_FILE, expr)
 #elif defined(ALX_FILT_GLITCH_BOOL_ASSERT_TRACE_ENABLE)
-	#define ALX_FILT_GLITCH_BOOL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_FILT_GLITCH_BOOL_MODULE, expr)
+	#define ALX_FILT_GLITCH_BOOL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_FILT_GLITCH_BOOL_FILE, expr)
 #elif defined(ALX_FILT_GLITCH_BOOL_ASSERT_RST_ENABLE)
-	#define ALX_FILT_GLITCH_BOOL_ASSERT(expr) ALX_ASSERT_RST(ALX_FILT_GLITCH_BOOL_MODULE, expr)
+	#define ALX_FILT_GLITCH_BOOL_ASSERT(expr) ALX_ASSERT_RST(ALX_FILT_GLITCH_BOOL_FILE, expr)
 #else
 	#define ALX_FILT_GLITCH_BOOL_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_FILT_GLITCH_BOOL_TRACE_ENABLE)
-	#define ALX_FILT_GLITCH_BOOL_TRACE(...) ALX_TRACE_WRN(ALX_FILT_GLITCH_BOOL_MODULE, __VA_ARGS__)
+	#define ALX_FILT_GLITCH_BOOL_TRACE(...) ALX_TRACE_WRN(ALX_FILT_GLITCH_BOOL_FILE, __VA_ARGS__)
 #else
 	#define ALX_FILT_GLITCH_BOOL_TRACE(...) do{} while (false)
 #endif

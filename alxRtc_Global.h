@@ -53,22 +53,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_RTC_GLOBAL_MODULE "AlxRtc_Global.h"
+#define ALX_RTC_GLOBAL_FILE "alxRtc_Global.h"
 
 // Assert //
 #if defined(ALX_RTC_GLOBAL_ASSERT_BKPT_ENABLE)
-	#define ALX_RTC_GLOBAL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_RTC_GLOBAL_MODULE, expr)
+	#define ALX_RTC_GLOBAL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_RTC_GLOBAL_FILE, expr)
 #elif defined(ALX_RTC_GLOBAL_ASSERT_TRACE_ENABLE)
-	#define ALX_RTC_GLOBAL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_RTC_GLOBAL_MODULE, expr)
+	#define ALX_RTC_GLOBAL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_RTC_GLOBAL_FILE, expr)
 #elif defined(ALX_RTC_GLOBAL_ASSERT_RST_ENABLE)
-	#define ALX_RTC_GLOBAL_ASSERT(expr) ALX_ASSERT_RST(ALX_RTC_GLOBAL_MODULE, expr)
+	#define ALX_RTC_GLOBAL_ASSERT(expr) ALX_ASSERT_RST(ALX_RTC_GLOBAL_FILE, expr)
 #else
 	#define ALX_RTC_GLOBAL_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_RTC_GLOBAL_TRACE_ENABLE)
-	#define ALX_RTC_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_RTC_GLOBAL_MODULE, __VA_ARGS__)
+	#define ALX_RTC_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_RTC_GLOBAL_FILE, __VA_ARGS__)
 #else
 	#define ALX_RTC_GLOBAL_TRACE(...) do{} while (false)
 #endif

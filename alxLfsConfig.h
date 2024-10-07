@@ -53,25 +53,25 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_LFS_CONFIG_MODULE "AlxLfsConfig.h"
+#define ALX_LFS_CONFIG_FILE "alxLfsConfig.h"
 
 // Assert //
 #if defined(ALX_LFS_CONFIG_ASSERT_BKPT_ENABLE)
-    #define LFS_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LFS_CONFIG_MODULE, expr)
+    #define LFS_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LFS_CONFIG_FILE, expr)
 #elif defined(ALX_LFS_CONFIG_ASSERT_TRACE_ENABLE)
-    #define LFS_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LFS_CONFIG_MODULE, expr)
+    #define LFS_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LFS_CONFIG_FILE, expr)
 #elif defined(ALX_LFS_CONFIG_ASSERT_RST_ENABLE)
-    #define LFS_ASSERT(expr) ALX_ASSERT_RST(ALX_LFS_CONFIG_MODULE, expr)
+    #define LFS_ASSERT(expr) ALX_ASSERT_RST(ALX_LFS_CONFIG_FILE, expr)
 #else
     #define LFS_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_LFS_CONFIG_TRACE_ENABLE)
-    //#define LFS_TRACE(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_MODULE, __VA_ARGS__)
-    #define LFS_DEBUG(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_MODULE, __VA_ARGS__)
-    #define LFS_WARN(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_MODULE, __VA_ARGS__)
-    #define LFS_ERROR(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_MODULE, __VA_ARGS__)
+    //#define LFS_TRACE(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+    #define LFS_DEBUG(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+    #define LFS_WARN(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
+    #define LFS_ERROR(...) ALX_TRACE_WRN(ALX_LFS_CONFIG_FILE, __VA_ARGS__)
 #else
     #define LFS_TRACE(...) do{} while (false)
     #define LFS_DEBUG(...) do{} while (false)

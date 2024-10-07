@@ -56,22 +56,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_ADAU1961_MODULE "AlxAdau1961.h"
+#define ALX_ADAU1961_FILE "alxAdau1961.h"
 
 // Assert //
 #if defined(ALX_ADAU1961_ASSERT_BKPT_ENABLE)
-	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADAU1961_MODULE, expr)
+	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADAU1961_FILE, expr)
 #elif defined(ALX_ADAU1961_ASSERT_TRACE_ENABLE)
-	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADAU1961_MODULE, expr)
+	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADAU1961_FILE, expr)
 #elif defined(ALX_ADAU1961_ASSERT_RST_ENABLE)
-	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_RST(ALX_ADAU1961_MODULE, expr)
+	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_RST(ALX_ADAU1961_FILE, expr)
 #else
 	#define ALX_ADAU1961_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_ADAU1961_TRACE_ENABLE)
-	#define ALX_ADAU1961_TRACE(...) ALX_TRACE_WRN(ALX_ADAU1961_MODULE, __VA_ARGS__)
+	#define ALX_ADAU1961_TRACE(...) ALX_TRACE_WRN(ALX_ADAU1961_FILE, __VA_ARGS__)
 #else
 	#define ALX_ADAU1961_TRACE(...) do{} while (false)
 #endif

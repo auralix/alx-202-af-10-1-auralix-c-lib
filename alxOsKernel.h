@@ -53,22 +53,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_OS_KERNEL_MODULE "AlxOsKernel.h"
+#define ALX_OS_KERNEL_FILE "alxOsKernel.h"
 
 // Assert //
 #if defined(ALX_OS_KERNEL_ASSERT_BKPT_ENABLE)
-	#define ALX_OS_KERNEL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_KERNEL_MODULE, expr)
+	#define ALX_OS_KERNEL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_KERNEL_FILE, expr)
 #elif defined(ALX_OS_KERNEL_ASSERT_TRACE_ENABLE)
-	#define ALX_OS_KERNEL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_KERNEL_MODULE, expr)
+	#define ALX_OS_KERNEL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_KERNEL_FILE, expr)
 #elif defined(ALX_OS_KERNEL_ASSERT_RST_ENABLE)
-	#define ALX_OS_KERNEL_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_KERNEL_MODULE, expr)
+	#define ALX_OS_KERNEL_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_KERNEL_FILE, expr)
 #else
 	#define ALX_OS_KERNEL_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_OS_KERNEL_TRACE_ENABLE)
-	#define ALX_OS_KERNEL_TRACE(...) ALX_TRACE_WRN(ALX_OS_KERNEL_MODULE, __VA_ARGS__)
+	#define ALX_OS_KERNEL_TRACE(...) ALX_TRACE_WRN(ALX_OS_KERNEL_FILE, __VA_ARGS__)
 #else
 	#define ALX_OS_KERNEL_TRACE(...) do{} while (false)
 #endif

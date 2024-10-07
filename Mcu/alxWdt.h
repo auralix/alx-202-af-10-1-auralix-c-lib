@@ -66,22 +66,22 @@ typedef struct { bool dummy; } AlxWdt;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_WDT_MODULE "AlxWdt.h"
+#define ALX_WDT_FILE "alxWdt.h"
 
 // Assert //
 #if defined(ALX_WDT_ASSERT_BKPT_ENABLE)
-	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_WDT_MODULE, expr)
+	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_WDT_FILE, expr)
 #elif defined(ALX_WDT_ASSERT_TRACE_ENABLE)
-	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_WDT_MODULE, expr)
+	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_WDT_FILE, expr)
 #elif defined(ALX_WDT_ASSERT_RST_ENABLE)
-	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_RST(ALX_WDT_MODULE, expr)
+	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_RST(ALX_WDT_FILE, expr)
 #else
 	#define ALX_WDT_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_WDT_TRACE_ENABLE)
-	#define ALX_WDT_TRACE(...) ALX_TRACE_WRN(ALX_WDT_MODULE, __VA_ARGS__)
+	#define ALX_WDT_TRACE(...) ALX_TRACE_WRN(ALX_WDT_FILE, __VA_ARGS__)
 #else
 	#define ALX_WDT_TRACE(...) do{} while (false)
 #endif

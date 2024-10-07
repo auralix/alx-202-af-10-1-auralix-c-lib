@@ -64,22 +64,22 @@ typedef struct { bool dummy; } AlxSpi;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_SPI_MODULE "AlxSpi.h"
+#define ALX_SPI_FILE "alxSpi.h"
 
 // Assert //
 #if defined(ALX_SPI_ASSERT_BKPT_ENABLE)
-	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SPI_MODULE, expr)
+	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SPI_FILE, expr)
 #elif defined(ALX_SPI_ASSERT_TRACE_ENABLE)
-	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SPI_MODULE, expr)
+	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SPI_FILE, expr)
 #elif defined(ALX_SPI_ASSERT_RST_ENABLE)
-	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_RST(ALX_SPI_MODULE, expr)
+	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_RST(ALX_SPI_FILE, expr)
 #else
 	#define ALX_SPI_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_SPI_TRACE_ENABLE)
-	#define ALX_SPI_TRACE(...) ALX_TRACE_WRN(ALX_SPI_MODULE, __VA_ARGS__)
+	#define ALX_SPI_TRACE(...) ALX_TRACE_WRN(ALX_SPI_FILE, __VA_ARGS__)
 #else
 	#define ALX_SPI_TRACE(...) do{} while (false)
 #endif

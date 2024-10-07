@@ -66,22 +66,22 @@ typedef struct { bool dummy; } AlxPwm;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_PWM_MODULE "AlxPwm.h"
+#define ALX_PWM_FILE "alxPwm.h"
 
 // Assert //
 #if defined(ALX_PWM_ASSERT_BKPT_ENABLE)
-	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PWM_MODULE, expr)
+	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PWM_FILE, expr)
 #elif defined(ALX_PWM_ASSERT_TRACE_ENABLE)
-	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PWM_MODULE, expr)
+	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PWM_FILE, expr)
 #elif defined(ALX_PWM_ASSERT_RST_ENABLE)
-	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_RST(ALX_PWM_MODULE, expr)
+	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_RST(ALX_PWM_FILE, expr)
 #else
 	#define ALX_PWM_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_PWM_TRACE_ENABLE)
-	#define ALX_PWM_TRACE(...) ALX_TRACE_WRN(ALX_PWM_MODULE, __VA_ARGS__)
+	#define ALX_PWM_TRACE(...) ALX_TRACE_WRN(ALX_PWM_FILE, __VA_ARGS__)
 #else
 	#define ALX_PWM_TRACE(...) do{} while (false)
 #endif

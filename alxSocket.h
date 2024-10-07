@@ -59,23 +59,23 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_SOCKET_MODULE "AlxSocket.h"
+#define ALX_SOCKET_FILE "alxSocket.h"
 
 // Assert //
 #if defined(ALX_SOCKET_ASSERT_BKPT_ENABLE)
-	#define ALX_SOCKET_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SOCKET_MODULE, expr)
+	#define ALX_SOCKET_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SOCKET_FILE, expr)
 #elif defined(ALX_SOCKET_ASSERT_TRACE_ENABLE)
-	#define ALX_SOCKET_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SOCKET_MODULE, expr)
+	#define ALX_SOCKET_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SOCKET_FILE, expr)
 #elif defined(ALX_SOCKET_ASSERT_RST_ENABLE)
-	#define ALX_SOCKET_ASSERT(expr) ALX_ASSERT_RST(ALX_SOCKET_MODULE, expr)
+	#define ALX_SOCKET_ASSERT(expr) ALX_ASSERT_RST(ALX_SOCKET_FILE, expr)
 #else
 	#define ALX_SOCKET_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_SOCKET_TRACE_ENABLE)
-	#define ALX_SOCKET_TRACE_WRN(...) ALX_TRACE_WRN(ALX_SOCKET_MODULE, __VA_ARGS__)
-	#define ALX_SOCKET_TRACE_INF(...) ALX_TRACE_INF(ALX_SOCKET_MODULE, __VA_ARGS__)
+	#define ALX_SOCKET_TRACE_WRN(...) ALX_TRACE_WRN(ALX_SOCKET_FILE, __VA_ARGS__)
+	#define ALX_SOCKET_TRACE_INF(...) ALX_TRACE_INF(ALX_SOCKET_FILE, __VA_ARGS__)
 #else
 	#define ALX_SOCKET_TRACE_WRN(...) do{} while (false)
 	#define ALX_SOCKET_TRACE_INF(...) do{} while (false)

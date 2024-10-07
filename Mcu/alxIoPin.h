@@ -73,22 +73,22 @@ typedef struct { bool dummy; } AlxIoPin;
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_IO_PIN_MODULE "AlxIoPin.h"
+#define ALX_IO_PIN_FILE "alxIoPin.h"
 
 // Assert //
 #if defined(ALX_IO_PIN_ASSERT_BKPT_ENABLE)
-	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_IO_PIN_MODULE, expr)
+	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_BKPT(ALX_IO_PIN_FILE, expr)
 #elif defined(ALX_IO_PIN_ASSERT_TRACE_ENABLE)
-	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_IO_PIN_MODULE, expr)
+	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_TRACE(ALX_IO_PIN_FILE, expr)
 #elif defined(ALX_IO_PIN_ASSERT_RST_ENABLE)
-	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_RST(ALX_IO_PIN_MODULE, expr)
+	#define ALX_IO_PIN_ASSERT(expr) ALX_ASSERT_RST(ALX_IO_PIN_FILE, expr)
 #else
 	#define ALX_IO_PIN_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_IO_PIN_TRACE_ENABLE)
-	#define ALX_IO_PIN_TRACE(...) ALX_TRACE_WRN(ALX_IO_PIN_MODULE, __VA_ARGS__)
+	#define ALX_IO_PIN_TRACE(...) ALX_TRACE_WRN(ALX_IO_PIN_FILE, __VA_ARGS__)
 #else
 	#define ALX_IO_PIN_TRACE(...) do{} while (false)
 #endif

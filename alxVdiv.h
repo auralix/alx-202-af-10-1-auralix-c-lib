@@ -53,22 +53,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_VDIV_MODULE "AlxVdiv.h"
+#define ALX_VDIV_FILE "alxVdiv.h"
 
 // Assert //
 #if defined(ALX_VDIV_ASSERT_BKPT_ENABLE)
-	#define ALX_VDIV_ASSERT(expr) ALX_ASSERT_BKPT(ALX_VDIV_MODULE, expr)
+	#define ALX_VDIV_ASSERT(expr) ALX_ASSERT_BKPT(ALX_VDIV_FILE, expr)
 #elif defined(ALX_VDIV_ASSERT_TRACE_ENABLE)
-	#define ALX_VDIV_ASSERT(expr) ALX_ASSERT_TRACE(ALX_VDIV_MODULE, expr)
+	#define ALX_VDIV_ASSERT(expr) ALX_ASSERT_TRACE(ALX_VDIV_FILE, expr)
 #elif defined(ALX_VDIV_ASSERT_RST_ENABLE)
-	#define ALX_VDIV_ASSERT(expr) ALX_ASSERT_RST(ALX_VDIV_MODULE, expr)
+	#define ALX_VDIV_ASSERT(expr) ALX_ASSERT_RST(ALX_VDIV_FILE, expr)
 #else
 	#define ALX_VDIV_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_VDIV_TRACE_ENABLE)
-	#define ALX_VDIV_TRACE(...) ALX_TRACE_WRN(ALX_VDIV_MODULE, __VA_ARGS__)
+	#define ALX_VDIV_TRACE(...) ALX_TRACE_WRN(ALX_VDIV_FILE, __VA_ARGS__)
 #else
 	#define ALX_VDIV_TRACE(...) do{} while (false)
 #endif

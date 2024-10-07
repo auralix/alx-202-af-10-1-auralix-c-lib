@@ -53,22 +53,22 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_HYS1_MODULE "AlxHys1.h"
+#define ALX_HYS1_FILE "alxHys1.h"
 
 // Assert //
 #if defined(ALX_HYS1_ASSERT_BKPT_ENABLE)
-	#define ALX_HYS1_ASSERT(expr) ALX_ASSERT_BKPT(ALX_HYS1_MODULE, expr)
+	#define ALX_HYS1_ASSERT(expr) ALX_ASSERT_BKPT(ALX_HYS1_FILE, expr)
 #elif defined(ALX_HYS1_ASSERT_TRACE_ENABLE)
-	#define ALX_HYS1_ASSERT(expr) ALX_ASSERT_TRACE(ALX_HYS1_MODULE, expr)
+	#define ALX_HYS1_ASSERT(expr) ALX_ASSERT_TRACE(ALX_HYS1_FILE, expr)
 #elif defined(ALX_HYS1_ASSERT_RST_ENABLE)
-	#define ALX_HYS1_ASSERT(expr) ALX_ASSERT_RST(ALX_HYS1_MODULE, expr)
+	#define ALX_HYS1_ASSERT(expr) ALX_ASSERT_RST(ALX_HYS1_FILE, expr)
 #else
 	#define ALX_HYS1_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
 #if defined(ALX_HYS1_TRACE_ENABLE)
-	#define ALX_HYS1_TRACE(...) ALX_TRACE_WRN(ALX_HYS1_MODULE, __VA_ARGS__)
+	#define ALX_HYS1_TRACE(...) ALX_TRACE_WRN(ALX_HYS1_FILE, __VA_ARGS__)
 #else
 	#define ALX_HYS1_TRACE(...) do{} while (false)
 #endif
