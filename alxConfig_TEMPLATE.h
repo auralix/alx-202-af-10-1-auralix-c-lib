@@ -63,6 +63,7 @@ extern "C" {
 //#define ALX_WIZNET
 //#define ALX_MBED
 //#define ALX_MBED_CLOUD_CLIENT
+//#define ALX_ZEPHYR
 
 
 //------------------------------------------------------------------------------
@@ -121,9 +122,9 @@ extern "C" {
 //#define ALX_STM32F1_CMSIS_VER_REQUIRED 0x01010100 // 1.1.1.0
 //#define ALX_STM32F1_HAL_VER_REQUIRED 0x01010100 // 1.1.1.0
 
-#define ALX_STM32F4
-#define ALX_STM32F4_CMSIS_VER_REQUIRED 0x01010100 // 1.1.1.0
-#define ALX_STM32F4_HAL_VER_REQUIRED 0x01010100 // 1.1.1.0
+//#define ALX_STM32F4
+//#define ALX_STM32F4_CMSIS_VER_REQUIRED 0x01010100 // 1.1.1.0
+//#define ALX_STM32F4_HAL_VER_REQUIRED 0x01010100 // 1.1.1.0
 
 //#define ALX_STM32F7
 //#define ALX_STM32F7_CMSIS_VER_REQUIRED 0x01010100 // 1.1.1.0
