@@ -233,8 +233,8 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	sequence.buffer = &voltage_raw;
 	sequence.buffer_size = sizeof(voltage_raw);
 	sequence.resolution = ALX_ADC_RESOLUTION;
-	sequence.oversampling = 0;
-	sequence.calibrate = true;
+	sequence.oversampling = 8;
+	sequence.calibrate = false;
 	status = adc_read(me->device, &sequence);
 	if (status != 0)
 	{
