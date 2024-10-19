@@ -158,7 +158,7 @@ extern "C" {{
 
 // Trace //
 #if defined(_{prefixUp}_{nameUp}_TRACE) || defined(_{prefixUp}_TRACE_ALL)
-	#define {prefixUp}_{nameUp}_TRACE(...) ALX_TRACE_STD({prefixUp}_{nameUp}_FILE, __VA_ARGS__)
+	#define {prefixUp}_{nameUp}_TRACE(...) ALX_TRACE_WRN({prefixUp}_{nameUp}_FILE, __VA_ARGS__)
 	#define {prefixUp}_{nameUp}_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define {prefixUp}_{nameUp}_TRACE(...) do{{}} while (false)
@@ -362,7 +362,7 @@ extern "C" {{
 
 // Trace //
 #if defined(_{prefixUp}_{nameUp}_TRACE) || defined(_{prefixUp}_TRACE_ALL)
-	#define {prefixUp}_{nameUp}_TRACE(...) ALX_TRACE_STD({prefixUp}_{nameUp}_FILE, __VA_ARGS__)
+	#define {prefixUp}_{nameUp}_TRACE(...) ALX_TRACE_WRN({prefixUp}_{nameUp}_FILE, __VA_ARGS__)
 	#define {prefixUp}_{nameUp}_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define {prefixUp}_{nameUp}_TRACE(...) do{{}} while (false)
@@ -675,7 +675,7 @@ def _CreateFile_hpp(brief, prefixLow, prefixUp, prefixCap, nameUp, nameCap):
 
 // Trace //
 #if defined(_{prefixUp}_{nameUp}_TRACE) || defined(_{prefixUp}_TRACE_ALL)
-	#define {prefixUp}_{nameUp}_TRACE(...) ALX_TRACE_STD({prefixUp}_{nameUp}_FILE, __VA_ARGS__)
+	#define {prefixUp}_{nameUp}_TRACE(...) ALX_TRACE_WRN({prefixUp}_{nameUp}_FILE, __VA_ARGS__)
 	#define {prefixUp}_{nameUp}_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 #else
 	#define {prefixUp}_{nameUp}_TRACE(...) do{{}} while (false)
