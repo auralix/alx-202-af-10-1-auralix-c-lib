@@ -104,6 +104,9 @@ void AlxAdc_Ctor
   */
 Alx_Status AlxAdc_Init(AlxAdc* me)
 {
+	// Trace
+	ALX_ADC_TRACE_DBG("ENTER: device %s", me->deviceName);
+
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 	ALX_ADC_ASSERT(me->isInit == false);
@@ -113,7 +116,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	me->device = device_get_binding(me->deviceName);
 	if (me->device == NULL)
 	{
-		ALX_ADC_TRACE("Err: device_get_binding");
+		ALX_ADC_TRACE_ERR("FAIL: device_get_binding() device %s", me->deviceName);
 		return Alx_Err;
 	}
 
@@ -123,13 +126,16 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 		int32_t status = adc_channel_setup(me->device, &me->ch[i]);
 		if (status != 0)
 		{
-			ALX_ADC_TRACE("Err: %d", status);
+			ALX_ADC_TRACE_ERR("FAIL: adc_channel_setup() device %s status %ld", me->deviceName, status);
 			return Alx_Err;
 		}
 	}
 
 	// Set isInit
 	me->isInit = true;
+
+	// Trace
+	ALX_ADC_TRACE_DBG("EXIT: device %s", me->deviceName);
 
 	// Return
 	return Alx_Ok;
@@ -143,6 +149,9 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
   */
 Alx_Status AlxAdc_DeInit(AlxAdc* me)
 {
+	// Trace
+	ALX_ADC_TRACE_DBG("ENTER: device %s", me->deviceName);
+
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 	ALX_ADC_ASSERT(me->isInit == true);
@@ -153,6 +162,9 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 
 	// Clear isInit
 	me->isInit = false;
+
+	// Trace
+	ALX_ADC_TRACE_DBG("EXIT: device %s", me->deviceName);
 
 	// Return
 	return Alx_Ok;
@@ -166,6 +178,9 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
   */
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 {
+	// Trace
+	ALX_ADC_TRACE_DBG("ENTER: device %s ch %lu", me->deviceName, ch);
+
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 	ALX_ADC_ASSERT(me->isInit == true);
@@ -173,6 +188,9 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	// Get
 	uint32_t voltage_mV = AlxAdc_GetVoltage_mV_Private(me, ch);
 	float voltage_V = (float)voltage_mV / 1000.f;
+
+	// Trace
+	ALX_ADC_TRACE_DBG("EXIT: device %s voltage_V %f", me->deviceName, voltage_V);
 
 	// Return
 	return voltage_V;
@@ -186,12 +204,21 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
   */
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 {
+	// Trace
+	ALX_ADC_TRACE_DBG("ENTER: device %s ch %lu", me->deviceName, ch);
+
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 	ALX_ADC_ASSERT(me->isInit == true);
 
+	// Get
+	uint32_t voltage_mV = AlxAdc_GetVoltage_mV_Private(me, ch);
+
+	// Trace
+	ALX_ADC_TRACE_DBG("EXIT: device %s voltage_mV %lu", me->deviceName, voltage_mV);
+
 	// Return
-	return AlxAdc_GetVoltage_mV_Private(me, ch);
+	return voltage_mV;
 }
 
 /**
@@ -212,6 +239,9 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 //******************************************************************************
 uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 {
+	// Trace
+	ALX_ADC_TRACE_DBG("ENTER: device %s ch %lu", me->deviceName, ch);
+
 	// Local variables
 	int32_t status = 0;
 	uint16_t vref_mV = 0;
@@ -223,9 +253,10 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	vref_mV = adc_ref_internal(me->device);
 	if (vref_mV == 0)
 	{
-		ALX_ADC_TRACE("Err: %u", vref_mV);
+		ALX_ADC_TRACE_ERR("FAIL: adc_ref_internal() device %s vref_mV %u", me->deviceName, vref_mV);
 		return 0;
 	}
+	ALX_ADC_TRACE_VRB("DONE: adc_ref_internal() device %s vref_mV %u", me->deviceName, vref_mV);
 
 	// Get voltage
 	sequence.options = NULL;
@@ -238,21 +269,27 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	status = adc_read(me->device, &sequence);
 	if (status != 0)
 	{
-		ALX_ADC_TRACE("Err: %d", status);
+		ALX_ADC_TRACE_ERR("FAIL: adc_read() device %s status %ld", me->deviceName, status);
 		return 0;
 	}
+	ALX_ADC_TRACE_VRB("DONE: adc_read() device %s status %ld voltage_raw %d", me->deviceName, status, voltage_raw);
 
 	// Bound
 	AlxBound_Int16(&voltage_raw, 0x0000, 0x7FFF);
+	ALX_ADC_TRACE_VRB("DONE: AlxBound_Int16() device %s voltage_raw %d", me->deviceName, voltage_raw);
 
 	// Prepare
 	voltage_mV = voltage_raw;
 	status = adc_raw_to_millivolts(vref_mV, me->gain, ALX_ADC_RESOLUTION, &voltage_mV);
 	if (status != 0)
 	{
-		ALX_ADC_TRACE("Err: %d", status);
+		ALX_ADC_TRACE_ERR("FAIL: adc_raw_to_millivolts() device %s status %ld", me->deviceName, status);
 		return 0;
 	}
+	ALX_ADC_TRACE_VRB("DONE: adc_raw_to_millivolts() device %s status %ld, voltage_mV %ld", me->deviceName, status, voltage_mV);
+
+	// Trace
+	ALX_ADC_TRACE_DBG("EXIT: device %s voltage_mV %lu", me->deviceName, voltage_mV);
 
 	// Return
 	return voltage_mV;
