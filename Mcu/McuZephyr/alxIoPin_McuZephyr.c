@@ -82,7 +82,7 @@ void AlxIoPin_Ctor
 void AlxIoPin_Init(AlxIoPin* me)
 {
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("ENTER: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
 
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
@@ -101,7 +101,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 	me->isInit = true;
 
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("EXIT: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
 }
 
 /**
@@ -111,7 +111,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("ENTER: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
 
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
@@ -129,7 +129,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	me->isInit = false;
 
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("EXIT: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
 }
 
 /**
@@ -141,7 +141,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 bool AlxIoPin_Read(AlxIoPin* me)
 {
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("ENTER: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
 
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
@@ -152,7 +152,7 @@ bool AlxIoPin_Read(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(valStatus >= 0);
 
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("EXIT: device %s pin %u val %ld", me->deviceName, me->pin, valStatus);
+	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u val %ld", me->deviceName, me->pin, valStatus);
 
 	// Return
 	return valStatus;
@@ -166,7 +166,7 @@ bool AlxIoPin_Read(AlxIoPin* me)
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("ENTER: device %s pin %u val %u", me->deviceName, me->pin, val);
+	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u val %u", me->deviceName, me->pin, val);
 
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
@@ -177,7 +177,7 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 	ALX_IO_PIN_ASSERT(status == 0);
 
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("EXIT: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
 }
 
 /**
@@ -187,7 +187,7 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 void AlxIoPin_Set(AlxIoPin* me)
 {
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("ENTER: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
 
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
@@ -198,7 +198,7 @@ void AlxIoPin_Set(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(status == 0);
 
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("EXIT: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
 }
 
 /**
@@ -208,7 +208,7 @@ void AlxIoPin_Set(AlxIoPin* me)
 void AlxIoPin_Reset(AlxIoPin* me)
 {
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("ENTER: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
 
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
@@ -219,7 +219,7 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(status == 0);
 
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("EXIT: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
 }
 
 /**
@@ -229,7 +229,7 @@ void AlxIoPin_Reset(AlxIoPin* me)
 void AlxIoPin_Toggle(AlxIoPin* me)
 {
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("ENTER: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
 
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
@@ -240,7 +240,7 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(status == 0);
 
 	// Trace
-	ALX_IO_PIN_TRACE_DBG("EXIT: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
 }
 
 /**
@@ -256,7 +256,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_IO_PIN_TRACE_DBG("ENTER: device %s pin %u", me->deviceName, me->pin);
+	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
 
 
 	//------------------------------------------------------------------------------
@@ -321,7 +321,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_IO_PIN_TRACE_DBG("EXIT: device %s pin %u triState %lu", me->deviceName, me->pin, triState);
+	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u triState %lu", me->deviceName, me->pin, triState);
 
 
 	//------------------------------------------------------------------------------
