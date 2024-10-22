@@ -239,17 +239,26 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 //******************************************************************************
 uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 {
+	//------------------------------------------------------------------------------
 	// Trace
+	//------------------------------------------------------------------------------
 	ALX_ADC_TRACE_DBG("ENTER: device %s ch %lu", me->deviceName, ch);
 
-	// Local variables
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
 	int32_t status = 0;
 	uint16_t vref_mV = 0;
 	int16_t voltage_raw = 0;	// TV: ADC can occasionaly return 0xFFFF (negative value), https://devzone.nordicsemi.com/f/nordic-q-a/19688/nrf52832-saadc-occasionally-returns-0xffff
 	int32_t voltage_mV = 0;
-	struct adc_sequence sequence = {};
+	struct adc_sequence seq = {};
 
-	// Get vref
+
+	//------------------------------------------------------------------------------
+	// Get Vref
+	//------------------------------------------------------------------------------
+	ALX_ADC_TRACE_VRB("DO: adc_ref_internal() device %s", me->deviceName);
 	vref_mV = adc_ref_internal(me->device);
 	if (vref_mV == 0)
 	{
@@ -258,15 +267,19 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	}
 	ALX_ADC_TRACE_VRB("DONE: adc_ref_internal() device %s vref_mV %u", me->deviceName, vref_mV);
 
-	// Get voltage
-	sequence.options = NULL;
-	sequence.channels = BIT(ch);
-	sequence.buffer = &voltage_raw;
-	sequence.buffer_size = sizeof(voltage_raw);
-	sequence.resolution = ALX_ADC_RESOLUTION;
-	sequence.oversampling = 8;
-	sequence.calibrate = false;
-	status = adc_read(me->device, &sequence);
+
+	//------------------------------------------------------------------------------
+	// Get Voltage
+	//------------------------------------------------------------------------------
+	seq.options = NULL;
+	seq.channels = BIT(ch);
+	seq.buffer = &voltage_raw;
+	seq.buffer_size = sizeof(voltage_raw);
+	seq.resolution = ALX_ADC_RESOLUTION;
+	seq.oversampling = 8;
+	seq.calibrate = false;
+	ALX_ADC_TRACE_VRB("DO: adc_read() device %s channels 0x%08lX resolution %u oversampling %u calibrate %u", me->deviceName, seq.channels, seq.resolution, seq.oversampling, seq.calibrate);
+	status = adc_read(me->device, &seq);
 	if (status != 0)
 	{
 		ALX_ADC_TRACE_ERR("FAIL: adc_read() device %s status %ld", me->deviceName, status);
@@ -274,12 +287,20 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	}
 	ALX_ADC_TRACE_VRB("DONE: adc_read() device %s status %ld voltage_raw %d", me->deviceName, status, voltage_raw);
 
+
+	//------------------------------------------------------------------------------
 	// Bound
+	//------------------------------------------------------------------------------
+	ALX_ADC_TRACE_VRB("DO: AlxBound_Int16() device %s voltage_raw %d", me->deviceName, voltage_raw);
 	AlxBound_Int16(&voltage_raw, 0x0000, 0x7FFF);
 	ALX_ADC_TRACE_VRB("DONE: AlxBound_Int16() device %s voltage_raw %d", me->deviceName, voltage_raw);
 
-	// Prepare
+
+	//------------------------------------------------------------------------------
+	// Convert
+	//------------------------------------------------------------------------------
 	voltage_mV = voltage_raw;
+	ALX_ADC_TRACE_VRB("DO: adc_raw_to_millivolts() device %s vref_mV %ld, gain %lu resolution %u voltage_mV %ld", me->deviceName, vref_mV, me->gain, seq.resolution, voltage_mV);
 	status = adc_raw_to_millivolts(vref_mV, me->gain, ALX_ADC_RESOLUTION, &voltage_mV);
 	if (status != 0)
 	{
@@ -288,10 +309,16 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	}
 	ALX_ADC_TRACE_VRB("DONE: adc_raw_to_millivolts() device %s status %ld, voltage_mV %ld", me->deviceName, status, voltage_mV);
 
+
+	//------------------------------------------------------------------------------
 	// Trace
+	//------------------------------------------------------------------------------
 	ALX_ADC_TRACE_DBG("EXIT: device %s voltage_mV %lu", me->deviceName, voltage_mV);
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return voltage_mV;
 }
 
