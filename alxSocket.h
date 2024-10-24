@@ -81,6 +81,7 @@ extern "C" {
 	#define ALX_SOCKET_TRACE_INF(...) do{} while (false)
 #endif
 
+#define SOCKET_LISTEN_IDLE_TIMEOUT 2000
 
 //******************************************************************************
 // Types
@@ -193,7 +194,7 @@ Alx_Status AlxSocket_Close(AlxSocket* me);
 Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port);
 Alx_Status AlxSocket_Bind(AlxSocket* me, uint16_t port);
 Alx_Status AlxSocket_Bind_Mcast(AlxSocket* me, const char* ip, uint16_t port);
-Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog);
+Alx_Status AlxSocket_Listen(AlxSocket* me, int backlog);
 AlxSocket* AlxSocket_Accept(AlxSocket* me);
 int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len);
 int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len);
