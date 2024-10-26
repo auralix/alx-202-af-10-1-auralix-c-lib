@@ -809,6 +809,23 @@ Alx_Status AlxLogger_GetFileSize(AlxLogger* me, const char* path, uint32_t* file
 	// Return
 	return Alx_Ok;
 }
+Alx_Status AlxLogger_DiscardLogsToProcess(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	ALX_LOGGER_ASSERT(me->isInit == true);
+
+	// Set metadata current read IDs to write IDs (discard logs-to-process)
+	me->md = me->mdStored;
+	me->md.read.id = me->mdStored.write.id;
+	me->md.read.pos = me->mdStored.write.pos;
+	me->md.read.line = me->mdStored.write.line;
+	me->md.read.file = me->mdStored.write.file;
+	me->md.read.dir = me->mdStored.write.dir;
+
+	// Return
+	return AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWriteOldest);
+}
 uint64_t AlxLogger_GetNumOfLogsToProcess(AlxLogger* me)
 {
 	// Assert
