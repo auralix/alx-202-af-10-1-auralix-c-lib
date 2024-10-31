@@ -143,7 +143,7 @@ Alx_Status AlxI2c_Init(AlxI2c* me)
 	AlxI2c_Periph_EnableClk(me);
 
 	// Init I2C
-	if (HAL_I2C_Init(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+	if (HAL_I2C_Init(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE_WRN("Err"); return Alx_Err; }
 
 	// Set isInit
 	me->isInit = true;
@@ -165,7 +165,7 @@ Alx_Status AlxI2c_DeInit(AlxI2c* me)
 	ALX_I2C_ASSERT(me->isInit == true);
 
 	// DeInit I2C
-	if (HAL_I2C_DeInit(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+	if (HAL_I2C_DeInit(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE_WRN("Err"); return Alx_Err; }
 
 	// Force I2C periphery reset
 	AlxI2c_Periph_ForceReset(me);
@@ -241,8 +241,8 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		}
 		else
 		{
-			ALX_I2C_TRACE("Err");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("Err");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("Err"); return Alx_Err; }
 			continue;
 		}
 	}
@@ -266,7 +266,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 	}
 	else
 	{
-		ALX_I2C_TRACE("Err");
+		ALX_I2C_TRACE_WRN("Err");
 		return Alx_ErrNumOfTries;
 	}
 }
@@ -316,8 +316,8 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		}
 		else
 		{
-			ALX_I2C_TRACE("Err");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("Err");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("Err"); return Alx_Err; }
 			continue;
 		}
 	}
@@ -341,7 +341,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 	}
 	else
 	{
-		ALX_I2C_TRACE("Err");
+		ALX_I2C_TRACE_WRN("Err");
 		return Alx_ErrNumOfTries;
 	}
 }
@@ -410,8 +410,8 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		}
 		else
 		{
-			ALX_I2C_TRACE("Err");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("Err");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("Err"); return Alx_Err; }
 			continue;
 		}
 	}
@@ -427,7 +427,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 	}
 	else
 	{
-		ALX_I2C_TRACE("Err");
+		ALX_I2C_TRACE_WRN("Err");
 		return Alx_ErrNumOfTries;
 	}
 }
@@ -510,7 +510,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 				status = AlxI2c_Master_StartReadMemStop(me, slaveAddr, memAddr, memAddrLen, buff, len, numOfTries, timeout_ms);
 				if (status == Alx_ErrNumOfTries)
 				{
-					ALX_I2C_TRACE("Err");
+					ALX_I2C_TRACE_WRN("Err");
 					continue;
 				}
 				else if (status != Alx_Ok)
@@ -520,7 +520,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 				}
 				else if (memcmp(buff, data, len) != 0)	// Check previously written data
 				{
-					ALX_I2C_TRACE("Err");
+					ALX_I2C_TRACE_WRN("Err");
 					continue;
 				}
 				else
@@ -535,8 +535,8 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		}
 		else
 		{
-			ALX_I2C_TRACE("Err");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("Err");
+			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("Err"); return Alx_Err; }
 			continue;
 		}
 	}
@@ -552,7 +552,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 	}
 	else
 	{
-		ALX_I2C_TRACE("Err");
+		ALX_I2C_TRACE_WRN("Err");
 		return Alx_ErrNumOfTries;
 	}
 }
@@ -594,8 +594,8 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 	HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(&me->hi2c, slaveAddr, numOfTries, timeout_ms);
 	if (status != HAL_OK)
 	{
-		ALX_I2C_TRACE("Err");
-		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+		ALX_I2C_TRACE_WRN("Err");
+		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("Err"); return Alx_Err; }
 	}
 
 	// Return
@@ -625,7 +625,7 @@ static uint16_t AlxI2c_ParseMemAddrLen(AlxI2c_Master_MemAddrLen memAddrLen)
 static Alx_Status AlxI2c_Reset(AlxI2c* me)
 {
 	// DeInit I2C
-	if (HAL_I2C_DeInit(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+	if (HAL_I2C_DeInit(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE_WRN("Err"); return Alx_Err; }
 
 	// Force I2C periphery reset
 	AlxI2c_Periph_ForceReset(me);
@@ -637,7 +637,7 @@ static Alx_Status AlxI2c_Reset(AlxI2c* me)
 	AlxI2c_Periph_ReleaseReset(me);
 
 	// Init I2C
-	if (HAL_I2C_Init(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE("Err"); return Alx_Err; }
+	if (HAL_I2C_Init(&me->hi2c) != HAL_OK) { ALX_I2C_TRACE_WRN("Err"); return Alx_Err; }
 
 	// Set isInit
 	me->isInit = true;

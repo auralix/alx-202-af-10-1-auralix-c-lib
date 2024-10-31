@@ -88,9 +88,15 @@ typedef struct { bool dummy; } AlxAdc;
 
 // Trace //
 #if defined(ALX_ADC_TRACE_ENABLE)
-	#define ALX_ADC_TRACE(...) ALX_TRACE_WRN(ALX_ADC_FILE, __VA_ARGS__)
+	#define ALX_ADC_TRACE_ERR(...) ALX_TRACE_ERR(ALX_ADC_FILE, __VA_ARGS__)
+	#define ALX_ADC_TRACE_WRN(...) ALX_TRACE_WRN(ALX_ADC_FILE, __VA_ARGS__)
+	#define ALX_ADC_TRACE_DBG(...) ALX_TRACE_DBG(ALX_ADC_FILE, __VA_ARGS__)
+	#define ALX_ADC_TRACE_VRB(...) ALX_TRACE_VRB(ALX_ADC_FILE, __VA_ARGS__)
 #else
-	#define ALX_ADC_TRACE(...) do{} while (false)
+	#define ALX_ADC_TRACE_ERR(...) do{} while (false)
+	#define ALX_ADC_TRACE_WRN(...) do{} while (false)
+	#define ALX_ADC_TRACE_DBG(...) do{} while (false)
+	#define ALX_ADC_TRACE_VRB(...) do{} while (false)
 #endif
 
 

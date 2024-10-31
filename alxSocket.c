@@ -841,7 +841,7 @@ Alx_Status AlxSocket_Bind_Mcast(AlxSocket* me, const char* ip, uint16_t port)
 	// Return
 	return Alx_Err;
 }
-Alx_Status AlxSocket_Listen(AlxSocket* me, uint8_t backlog)
+Alx_Status AlxSocket_Listen(AlxSocket* me, int backlog)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
@@ -893,8 +893,20 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 		// wait until clent conents to the socket
 		uint8_t tmpSn_SR;
 		uint64_t start = AlxTick_Get_ms(&alxTick);
+		uint64_t next_listen_restart_timeout = AlxTick_Get_ms(&alxTick) + SOCKET_LISTEN_IDLE_TIMEOUT;
 		do
 		{
+			if ((me->protocol == AlxSocket_Protocol_Tcp) || (me->protocol == AlxSocket_Protocol_Tls))
+			{
+				if (AlxTick_Get_ms(&alxTick) > next_listen_restart_timeout)
+				{
+					//ALX_NET_TRACE_WRN("Socket close/listen...");
+					next_listen_restart_timeout = AlxTick_Get_ms(&alxTick) + SOCKET_LISTEN_IDLE_TIMEOUT;
+					close(me->socket_data.wiz_socket);
+					socket(me->socket_data.wiz_socket, Sn_MR_TCP, me->socket_data.my_port, 0);
+					listen(me->socket_data.wiz_socket);
+				}
+			}
 			if (AlxTick_Get_ms(&alxTick) - start > me->timeout)
 			{
 				// timeout
@@ -902,7 +914,7 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 			}
 			tmpSn_SR = getSn_SR(me->socket_data.wiz_socket);
 			SOCKET_YIELD();
-		} while ((tmpSn_SR != SOCK_ESTABLISHED) && (tmpSn_SR != SOCK_CLOSE_WAIT));
+		} while ((tmpSn_SR != SOCK_ESTABLISHED) && (tmpSn_SR != SOCK_CLOSE_WAIT) &&  (tmpSn_SR != SOCK_CLOSED));
 		me->socket_data.wiz_sock_opened = true;
 
 		// find available socket for listening fotr new connects

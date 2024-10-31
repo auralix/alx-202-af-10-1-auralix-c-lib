@@ -132,11 +132,18 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	if ((ALX_TRACE_LEVEL_FTL <= level) && (level <= ALX_TRACE_LEVEL_WRN))
+	if
+	(
+		(level == ALX_TRACE_LEVEL_FTL) ||
+		(level == ALX_TRACE_LEVEL_ERR) ||
+		(level == ALX_TRACE_LEVEL_WRN) ||
+		(level == ALX_TRACE_LEVEL_DBG) ||
+		(level == ALX_TRACE_LEVEL_VRB)
+	)
 	{
-		AlxTrace_WriteFormat(me, "[%s] [%s] [%s:%lu %s] %s\r\n", dateTimeStr, levelStr, file, line, fun, formatStr);
+		AlxTrace_WriteFormat(me, "[%s] [%s] [%s:%04lu %s] %s\r\n", dateTimeStr, levelStr, file, line, fun, formatStr);
 	}
-	else if ((ALX_TRACE_LEVEL_INF <= level) && (level <= ALX_TRACE_LEVEL_VRB))
+	else if (level == ALX_TRACE_LEVEL_INF)
 	{
 		AlxTrace_WriteFormat(me, "[%s] [%s] %s\r\n", dateTimeStr, levelStr, formatStr);
 	}
