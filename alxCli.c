@@ -47,6 +47,13 @@ static void AlxCli_PrepResp_ErrArg(AlxCli* me);
 
 
 //******************************************************************************
+// Weak Functions
+//******************************************************************************
+bool AlxCli_Handle_Callback(AlxCli* me);
+void AlxCli_Help_Callback(AlxCli* me);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxCli_Ctor
@@ -101,6 +108,7 @@ void AlxCli_Handle(AlxCli* me)
 		//------------------------------------------------------------------------------
 		if (strcmp(me->buff, "help\r\n") == 0)
 		{
+			// Trace
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "help         Get all available commands and their descriptions\r\n") == Alx_Ok);
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "reset        Trigger device reset\r\n") == Alx_Ok);
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "id           Get device ID info\r\n") == Alx_Ok);
@@ -111,13 +119,19 @@ void AlxCli_Handle(AlxCli* me)
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-const    Get all device constants\r\n") == Alx_Ok);
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-trig     Get all device triggers\r\n") == Alx_Ok);
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "set-param    Set specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\r\n") == Alx_Ok);
+
+			// Callback
+			AlxCli_Help_Callback(me);
+
+			// Return
+			return;
 		}
 
 
 		//------------------------------------------------------------------------------
 		// Reset Command
 		//------------------------------------------------------------------------------
-		else if (strcmp(me->buff, "reset\r\n") == 0)
+		if (strcmp(me->buff, "reset\r\n") == 0)
 		{
 			// Prepare response
 			AlxCli_PrepResp_Success(me);
@@ -127,13 +141,16 @@ void AlxCli_Handle(AlxCli* me)
 
 			// Reset MCU
 			NVIC_SystemReset();
+
+			// Return
+			return;
 		}
 
 
 		//------------------------------------------------------------------------------
 		// ID Command
 		//------------------------------------------------------------------------------
-		else if (strcmp(me->buff, "id\r\n") == 0)
+		if (strcmp(me->buff, "id\r\n") == 0)
 		{
 			// Get
 			bool fwIsBootUsed = AlxId_GetFwIsBootUsed(me->alxId);
@@ -333,67 +350,76 @@ void AlxCli_Handle(AlxCli* me)
 
 			// Send response
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+
+			// Return
+			return;
 		}
 
 
 		//------------------------------------------------------------------------------
 		// Get Command
 		//------------------------------------------------------------------------------
-		else if (strcmp(me->buff, "get\r\n") == 0)
+		if (strcmp(me->buff, "get\r\n") == 0)
 		{
 			AlxCli_Get(me, false, ALX_NULL);
+			return;
 		}
 
 
 		//------------------------------------------------------------------------------
 		// Get Parameters Command
 		//------------------------------------------------------------------------------
-		else if (strcmp(me->buff, "get-param\r\n") == 0)
+		if (strcmp(me->buff, "get-param\r\n") == 0)
 		{
 			AlxCli_Get(me, true, AlxParamItem_Param);
+			return;
 		}
 
 
 		//------------------------------------------------------------------------------
 		// Get Variables Command
 		//------------------------------------------------------------------------------
-		else if (strcmp(me->buff, "get-var\r\n") == 0)
+		if (strcmp(me->buff, "get-var\r\n") == 0)
 		{
 			AlxCli_Get(me, true, AlxParamItem_Var);
+			return;
 		}
 
 
 		//------------------------------------------------------------------------------
 		// Get Flags Command
 		//------------------------------------------------------------------------------
-		else if (strcmp(me->buff, "get-flag\r\n") == 0)
+		if (strcmp(me->buff, "get-flag\r\n") == 0)
 		{
 			AlxCli_Get(me, true, AlxParamItem_Flag);
+			return;
 		}
 
 
 		//------------------------------------------------------------------------------
 		// Get Constants Command
 		//------------------------------------------------------------------------------
-		else if (strcmp(me->buff, "get-const\r\n") == 0)
+		if (strcmp(me->buff, "get-const\r\n") == 0)
 		{
 			AlxCli_Get(me, true, AlxParamItem_Const);
+			return;
 		}
 
 
 		//------------------------------------------------------------------------------
 		// Get Triggers Command
 		//------------------------------------------------------------------------------
-		else if (strcmp(me->buff, "get-trig\r\n") == 0)
+		if (strcmp(me->buff, "get-trig\r\n") == 0)
 		{
 			AlxCli_Get(me, true, AlxParamItem_Trig);
+			return;
 		}
 
 
 		//------------------------------------------------------------------------------
 		// Set Parameter Command
 		//------------------------------------------------------------------------------
-		else if (strncmp(me->buff, "set-param", strlen("set-param")) == 0)
+		if (strncmp(me->buff, "set-param", strlen("set-param")) == 0)
 		{
 			//------------------------------------------------------------------------------
 			// Local Variables
@@ -455,20 +481,34 @@ void AlxCli_Handle(AlxCli* me)
 			// Send Response
 			//------------------------------------------------------------------------------
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+
+
+			//------------------------------------------------------------------------------
+			// Return
+			//------------------------------------------------------------------------------
+			return;
+		}
+
+
+		//------------------------------------------------------------------------------
+		// Callback
+		//------------------------------------------------------------------------------
+		bool wasCmdHandled = AlxCli_Handle_Callback(me);
+		if (wasCmdHandled)
+		{
+			return;
 		}
 
 
 		//------------------------------------------------------------------------------
 		// Invalid Command
 		//------------------------------------------------------------------------------
-		else
-		{
-			// Prepare response
-			AlxCli_PrepResp_ErrCmd(me);
 
-			// Send response
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
-		}
+		// Prepare response
+		AlxCli_PrepResp_ErrCmd(me);
+
+		// Send response
+		ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
 	}
 }
 
@@ -705,6 +745,20 @@ static void AlxCli_PrepResp_ErrArg(AlxCli* me)
 			"}\r\n"
 		);
 	}
+}
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+ALX_WEAK bool AlxCli_Handle_Callback(AlxCli* me)
+{
+	(void)me;
+	return false;
+}
+ALX_WEAK void AlxCli_Help_Callback(AlxCli* me)
+{
+	(void)me;
 }
 
 
