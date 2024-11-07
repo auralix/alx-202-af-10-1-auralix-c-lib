@@ -244,12 +244,23 @@ static int cell_send(AlxSocket* me, void* data, uint32_t len)
 	uint32_t sent_length = 0;
 	uint32_t sent_total = 0;
 
+	uint64_t timer_start = AlxTick_Get_ms(&alxTick);
 	while (1)
 	{
 		CellularError_t cellularStatus = Cellular_SocketSend(me->alxNet->cellular.handle, me->cellular_socket.socket, data + sent_total, len - sent_total, &sent_length);
-		if (cellularStatus != CELLULAR_SUCCESS) return -1;
+		if (cellularStatus != CELLULAR_SUCCESS)
+		{
+			if (AlxTick_Get_ms(&alxTick) - timer_start > me->timeout)
+			{
+				return -1;
+			}
+			else
+			{
+				AlxOsDelay_ms(&alxOsDelay, 500);
+			}
+		}
 
-		if (sent_length <= 0)
+		if (sent_length < 0)
 		{
 			return sent_length;
 		}
