@@ -1275,8 +1275,7 @@ const char* AlxId_GetHwMcuUniqueIdStr(AlxId* me)
 	#ifdef ALX_STM32
 	return me->hwStm32.mcuUniqueIdStr;
 	#else
-	ALX_ID_ASSERT(false);
-	return NULL;
+	return "";
 	#endif
 }
 
