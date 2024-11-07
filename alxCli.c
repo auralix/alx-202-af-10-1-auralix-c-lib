@@ -55,7 +55,7 @@ void AlxCli_Ctor
 	AlxSerialPort* alxSerialPort,
 	AlxId* alxId,
 	AlxParamMgmt* alxParamMgmt,
-	bool prettyJsonEnable,
+	AlxParamItem* PRETTY_JSON_EN,
 	void* buff,
 	uint32_t buffLen
 )
@@ -64,7 +64,7 @@ void AlxCli_Ctor
 	me->alxSerialPort = alxSerialPort;
 	me->alxId = alxId;
 	me->alxParamMgmt = alxParamMgmt;
-	me->prettyJsonEnable = prettyJsonEnable;
+	me->PRETTY_JSON_EN = PRETTY_JSON_EN;
 	me->buff = buff;
 	me->buffLen = buffLen;
 
@@ -160,7 +160,7 @@ void AlxCli_Handle(AlxCli* me)
 			const char* hwMcuUniqueIdStr = AlxId_GetHwMcuUniqueIdStr(me->alxId);
 
 			// Prepare response
-			if (me->prettyJsonEnable)
+			if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 			{
 				if (fwIsBootUsed)
 				{
@@ -471,14 +471,6 @@ void AlxCli_Handle(AlxCli* me)
 		}
 	}
 }
-void AlxCli_PrettyJsonEnable(AlxCli* me, bool prettyJsonEnable)
-{
-	// Assert
-	ALX_CLI_ASSERT(me->wasCtorCalled == true);
-
-	// Set
-	me->prettyJsonEnable = prettyJsonEnable;
-}
 
 
 //******************************************************************************
@@ -491,7 +483,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 	//------------------------------------------------------------------------------
 
 	// Prepare
-	if (me->prettyJsonEnable)
+	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 	{
 		strcpy
 		(
@@ -560,7 +552,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 		// If string type add double quote (") around value, Else just use value
 		if (dataType == AlxParamItem_Str)
 		{
-			if (me->prettyJsonEnable)
+			if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 			{
 				sprintf(me->buff, "        \"%s\":\"%s\"", key, val);
 			}
@@ -571,7 +563,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 		}
 		else
 		{
-			if (me->prettyJsonEnable)
+			if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 			{
 				sprintf(me->buff, "        \"%s\":%s", key, val);
 			}
@@ -588,7 +580,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 			((paramTypeCheck == false) && (i < (numOfParamItems - 1)))
 		)
 		{
-			if (me->prettyJsonEnable)
+			if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 			{
 				strcat(me->buff, ",\r\n");
 			}
@@ -599,7 +591,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 		}
 		else
 		{
-			if (me->prettyJsonEnable)
+			if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 			{
 				strcat(me->buff, "\r\n");
 			}
@@ -619,7 +611,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 	//------------------------------------------------------------------------------
 
 	// Prepare
-	if (me->prettyJsonEnable)
+	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 	{
 		strcpy
 		(
@@ -643,14 +635,13 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 }
 static void AlxCli_PrepResp_Success(AlxCli* me)
 {
-	if (me->prettyJsonEnable)
+	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 	{
 		strcpy
 		(
 			me->buff,
 			"{\r\n"
-			"    \"status\":\"success\",\r\n"
-			"    \"data\":null\r\n"
+			"    \"status\":\"success\"\r\n"
 			"}\r\n"
 		);
 	}
@@ -660,22 +651,21 @@ static void AlxCli_PrepResp_Success(AlxCli* me)
 		(
 			me->buff,
 			"{"
-				"\"status\":\"success\","
-				"\"data\":null"
+				"\"status\":\"success\""
 			"}\r\n"
 		);
 	}
 }
 static void AlxCli_PrepResp_ErrCmd(AlxCli* me)
 {
-	if (me->prettyJsonEnable)
+	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 	{
 		strcpy
 		(
 			me->buff,
 			"{\r\n"
 			"    \"status\":\"error\",\r\n"
-			"    \"message\":\"Invalid command\"\r\n"
+			"    \"message\":\"Command invalid\"\r\n"
 			"}\r\n"
 		);
 	}
@@ -686,21 +676,21 @@ static void AlxCli_PrepResp_ErrCmd(AlxCli* me)
 			me->buff,
 			"{"
 				"\"status\":\"error\","
-				"\"message\":\"Invalid command\""
+				"\"message\":\"Command invalid\""
 			"}\r\n"
 		);
 	}
 }
 static void AlxCli_PrepResp_ErrArg(AlxCli* me)
 {
-	if (me->prettyJsonEnable)
+	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 	{
 		strcpy
 		(
 			me->buff,
 			"{\r\n"
 			"    \"status\":\"error\",\r\n"
-			"    \"message\":\"Invalid arguments\"\r\n"
+			"    \"message\":\"Arguments invalid\"\r\n"
 			"}\r\n"
 		);
 	}
@@ -711,7 +701,7 @@ static void AlxCli_PrepResp_ErrArg(AlxCli* me)
 			me->buff,
 			"{"
 				"\"status\":\"error\","
-				"\"message\":\"Invalid arguments\""
+				"\"message\":\"Arguments invalid\""
 			"}\r\n"
 		);
 	}
