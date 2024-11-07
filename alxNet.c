@@ -166,7 +166,7 @@ static void WriteByte(uint8_t byte) {
 	WriteBurst(&byte, sizeof(byte));
 }
 
-static void print_network_information(wiz_NetInfo net_info)
+static void __attribute__((unused)) print_network_information(wiz_NetInfo net_info)
 {
 	uint8_t tmp_str[8] = {
 		0,
@@ -477,6 +477,262 @@ void AlxNet_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+
+#define MODEM_REGISTER_TIMEOUT 60000
+#define MODEM_SIM_TIMEOUT 20000
+#define MODEM_ACTIVATE_PDN_TIMEOUT 150000
+#define MODEM_CONNECTION_MONITORING_TIMEOUT 10000
+#define MODEM_LOW_LEVEL_ERR_THRESHOLD 3
+
+typedef enum
+{
+	State_ModemGoOff,
+	State_ModemOff,
+	State_ModemOn,
+	State_SimOk,
+	State_ModemRegistered,
+	State_ModemConnected
+} ConenctionStateType;
+
+typedef enum
+{
+	Cmd_Work,
+	Cmd_PowerCycle,
+	Cmd_Disconnect
+} HandleConnectionCommandType;
+
+static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectionCommandType cmd)
+{
+	static ConenctionStateType connection_state = State_ModemOff;
+	static uint64_t start_time = 0;
+	static int pdn_deact_cnt = 0;
+	static int low_level_err = 0;
+
+	if ((cmd == Cmd_PowerCycle) || (low_level_err > MODEM_LOW_LEVEL_ERR_THRESHOLD))
+	{
+		connection_state = State_ModemGoOff;
+	}
+
+	ALX_NET_TRACE_INF("Cellular handler state: %d", connection_state);
+	switch (connection_state)
+	{
+	case State_ModemGoOff:
+		{
+			if (Cellular_Cleanup(me->cellular.handle) == CELLULAR_SUCCESS)
+			{
+				me->cellular.handle = NULL;
+			}
+			low_level_err = 0;
+			connection_state = State_ModemOff;
+			break;
+		}
+	case State_ModemOff:
+		{
+			me->isNetConnected = false;
+			if (Cellular_Init(&me->cellular.handle, me->cellular.CommIntf) == CELLULAR_SUCCESS) // power on with GPIO key simulation, auto-bauding
+			{
+				start_time = AlxTick_Get_ms(&alxTick);
+				connection_state = State_ModemOn;
+			}
+			else
+			{
+				connection_state = State_ModemGoOff;
+			}
+			break;
+		}
+	case State_ModemOn:
+		{
+			while (true)
+			{
+				if (Cellular_GetSimCardStatus(me->cellular.handle, &me->cellular.simStatus) != CELLULAR_SUCCESS)
+				{
+					ALX_NET_TRACE_INF(("Cellular SIM failure"));
+					connection_state = State_ModemGoOff;
+				}
+
+				if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_SIM_TIMEOUT)
+				{
+					ALX_NET_TRACE_WRN("SIM ready timed out");
+					connection_state = State_ModemGoOff;
+					break;
+				}
+
+				if ((me->cellular.simStatus.simCardState == CELLULAR_SIM_CARD_INSERTED) &&
+					(me->cellular.simStatus.simCardLockState == CELLULAR_SIM_CARD_READY))
+				{
+					connection_state = State_SimOk;
+					start_time = AlxTick_Get_ms(&alxTick);
+					break;
+				}
+
+				vTaskDelay(pdMS_TO_TICKS(CELLULAR_SIM_CARD_WAIT_INTERVAL_MS));
+			}
+			break;
+		}
+	case State_SimOk:
+		{
+			while (true)
+			{
+				CellularError_t cellularStatus = Cellular_GetServiceStatus(me->cellular.handle, &me->cellular.serviceStatus);
+
+				if ((cellularStatus == CELLULAR_SUCCESS) &&
+				    ((me->cellular.serviceStatus.psRegistrationStatus == REGISTRATION_STATUS_REGISTERED_HOME) ||
+				      (me->cellular.serviceStatus.psRegistrationStatus == REGISTRATION_STATUS_ROAMING_REGISTERED)))
+				{
+					connection_state = State_ModemRegistered;
+					start_time = AlxTick_Get_ms(&alxTick);
+					break;
+				}
+
+				if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_REGISTER_TIMEOUT)
+				{
+					ALX_NET_TRACE_WRN("Registering to network timed out");
+					connection_state = State_ModemGoOff;
+					break;
+				}
+
+				vTaskDelay(pdMS_TO_TICKS(CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS));
+			}
+			break;
+		}
+	case State_ModemRegistered:
+		{
+			me->cellular.cellularContext = CELLULAR_PDN_CONTEXT_ID;
+			CellularPdnConfig_t pdnConfig = { CELLULAR_PDN_CONTEXT_IPV4, CELLULAR_PDN_AUTH_NONE, "internet", "", "" }; // ToDo: parameter!
+			Cellular_SetPdnConfig(me->cellular.handle, me->cellular.cellularContext, &pdnConfig);
+
+			while (true)
+			{
+				if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_ACTIVATE_PDN_TIMEOUT)
+				{
+					ALX_NET_TRACE_WRN("Activating PDN timed out");
+					connection_state = State_ModemGoOff;
+					break;
+				}
+
+				if (Cellular_ActivatePdn(me->cellular.handle, me->cellular.cellularContext) == CELLULAR_SUCCESS)
+				{
+					if (Cellular_GetIPAddress(me->cellular.handle, me->cellular.cellularContext, me->ip, sizeof(me->ip)) == CELLULAR_SUCCESS)
+					{
+						me->isNetConnected = true;
+						start_time = AlxTick_Get_ms(&alxTick);
+						connection_state = State_ModemConnected;
+						break;
+					}
+					ALX_NET_TRACE_WRN("Cellular_GetIPAddress failure");
+					// contimnue to PDN deactivation
+				}
+
+				if (Cellular_DeactivatePdn(me->cellular.handle, me->cellular.cellularContext) != CELLULAR_SUCCESS)
+				{
+					if (pdn_deact_cnt++ > 3)
+					{
+						connection_state = State_ModemGoOff;
+						break;
+					}
+					break;
+				}
+				else
+				{
+					// PDN deact successfull
+					pdn_deact_cnt = 0;
+					start_time = AlxTick_Get_ms(&alxTick);
+					connection_state = State_ModemOn;
+					break;
+				}
+
+				vTaskDelay(pdMS_TO_TICKS(CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS));
+			}
+			break;
+		}
+	case State_ModemConnected:
+		{
+			if (cmd == Cmd_Disconnect)
+			{
+				me->isNetConnected = false;
+				start_time = AlxTick_Get_ms(&alxTick);
+				connection_state = State_ModemOn;
+				break;
+			}
+
+			// periodically do connection monitoring
+			if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_CONNECTION_MONITORING_TIMEOUT)
+			{
+				start_time = AlxTick_Get_ms(&alxTick);
+
+				// update RSSI info
+				if (Cellular_GetInfo(me->cellular.handle, &me->cellular.signalQuality) != CELLULAR_SUCCESS)
+				{
+					low_level_err++;
+				}
+
+				// monitor PDN status
+				uint8_t NumStatus = 0;
+				CellularPdnStatus_t PdnStatusBuffers[CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U] = { 0 };
+
+				if (Cellular_GetPdnStatus(me->cellular.handle, PdnStatusBuffers, (CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U), &NumStatus) == CELLULAR_SUCCESS)
+				{
+					bool pdnStatus = false;
+					for (int i = 0U; i < NumStatus; i++) {
+						if ((PdnStatusBuffers[i].contextId == me->cellular.cellularContext) && (PdnStatusBuffers[i].state == 1)) {
+							pdnStatus = true;
+							break;
+						}
+					}
+					if (pdnStatus == false) {
+						ALX_NET_TRACE_WRN("Cellular PDN is not activated");
+						me->isNetConnected = false;
+						start_time = AlxTick_Get_ms(&alxTick);
+						connection_state = State_ModemOn;
+						break;
+					}
+				}
+				else
+				{
+					ALX_NET_TRACE_WRN("Cellular_GetPdnStatus failure");
+					low_level_err++;
+				}
+
+				// monitor service status
+				CellularServiceStatus_t serviceStatus;
+				if (Cellular_GetServiceStatus(me->cellular.handle, &serviceStatus) == CELLULAR_SUCCESS)
+				{
+					if (serviceStatus.psRegistrationStatus != REGISTRATION_STATUS_REGISTERED_HOME &&
+						serviceStatus.psRegistrationStatus != REGISTRATION_STATUS_ROAMING_REGISTERED)
+					{
+						me->isNetConnected = false;
+						start_time = AlxTick_Get_ms(&alxTick);
+						connection_state = State_ModemOn;
+					}
+				}
+				else
+				{
+					low_level_err++;
+				}
+			}
+			break;
+		}
+
+	default:
+		// should never happen
+		connection_state = State_ModemGoOff;
+		break;
+	}
+	return connection_state;
+}
+#endif
+
+#if defined(ALX_WIZNET)
+// saved when wiznet network is disconencted
+static char saved_mac[ALX_NET_MAC_SIZE];
+static char saved_ip[ALX_NET_IP_ADDRESS_SIZE];
+static char saved_netmask[ALX_NET_IP_ADDRESS_SIZE];
+static char saved_gateway[ALX_NET_IP_ADDRESS_SIZE];
+static char saved_dns[4][ALX_NET_IP_ADDRESS_SIZE];
+#endif
+
 Alx_Status AlxNet_Init(AlxNet *me)
 {
 	#if defined(ALX_WIZNET)
@@ -558,96 +814,28 @@ Alx_Status AlxNet_Init(AlxNet *me)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		CellularError_t cellularStatus = CELLULAR_SUCCESS;
-		uint8_t tries = 0;
-
-		uint32_t timeoutCountLimit = (60000 / CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS) + 1U;
-		uint32_t timeoutCount = 0;
-
-		cellularStatus = Cellular_Init(&me->cellular.handle, me->cellular.CommIntf);
-		if (cellularStatus != CELLULAR_SUCCESS) {
-			ALX_NET_TRACE_INF("Cellular_Init failure %d", cellularStatus);
-		}
-		else {
-			/* wait until SIM is ready */
-			for (tries = 0; tries < CELLULAR_MAX_SIM_RETRY; tries++) {
-				cellularStatus = Cellular_GetSimCardStatus(me->cellular.handle, &me->cellular.simStatus);
-
-				if ((cellularStatus == CELLULAR_SUCCESS) &&
-				    ((me->cellular.simStatus.simCardState == CELLULAR_SIM_CARD_INSERTED) &&
-				      (me->cellular.simStatus.simCardLockState == CELLULAR_SIM_CARD_READY))) {
-					break;
-				}
-				else {
-					ALX_NET_TRACE_INF("Cellular SIM card state %d, Lock State %d <<<",
-						me->cellular.simStatus.simCardState,
-						me->cellular.simStatus.simCardLockState);
-				}
-
-				vTaskDelay(pdMS_TO_TICKS(CELLULAR_SIM_CARD_WAIT_INTERVAL_MS));
-			}
-
-			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_INF(("Cellular SIM failure"));
+		AlxOsMutex_Lock(&me->alxMutex);
+		uint64_t start_time = AlxTick_Get_ms(&alxTick);
+		cellular_HandleConnection(me, Cmd_PowerCycle);
+		while (AlxTick_Get_ms(&alxTick) - start_time < 120000)
+		{
+			if (cellular_HandleConnection(me, Cmd_Work) == State_ModemRegistered)
+			{
+				AlxOsMutex_Unlock(&me->alxMutex);
+				return Alx_Ok;
 			}
 		}
 
-		/* Rescan network. */
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_RfOff(me->cellular.handle);
-
-			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_INF("Cellular_RfOff failure %d", cellularStatus);
-			}
-		}
-
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_RfOn(me->cellular.handle);
-
-			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_INF("Cellular_RfOn failure %d", cellularStatus);
-			}
-		}
-
-		/* Get service status. */
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			while (timeoutCount < timeoutCountLimit) {
-				cellularStatus = Cellular_GetServiceStatus(me->cellular.handle, &me->cellular.serviceStatus);
-
-				if ((cellularStatus == CELLULAR_SUCCESS) &&
-				    ((me->cellular.serviceStatus.psRegistrationStatus == REGISTRATION_STATUS_REGISTERED_HOME) ||
-				      (me->cellular.serviceStatus.psRegistrationStatus == REGISTRATION_STATUS_ROAMING_REGISTERED))) {
-					break;
-				}
-
-				timeoutCount++;
-
-				if (timeoutCount >= timeoutCountLimit) {
-					ALX_NET_TRACE_INF("Cellular module can't be registered");
-				}
-
-				vTaskDelay(pdMS_TO_TICKS(CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS));
-			}
-		}
-
-		// Create a task that will monitor cellular diagnostics
-		AlxOsThread cellular_info_thread;
-		AlxOsThread_Ctor(&cellular_info_thread,
-			cellular_info_task,
-			"Cellular_info_task",
-			1024,
-			(void *)me,
-			THREAD_PRIORITY);
-		AlxOsThread_Start(&cellular_info_thread);
-
-		if(cellularStatus != CELLULAR_SUCCESS) {
-			return Alx_Err;
-		}
+		AlxOsMutex_Unlock(&me->alxMutex);
+		return Alx_Err;
 	}
 	#endif
 
 	return Alx_Ok;
 }
+
+#define AlxOsMutex_Lock(m) ALX_NET_TRACE_INF("alxNet Lock"); AlxOsMutex_Lock(m)
+#define AlxOsMutex_Unlock(m) ALX_NET_TRACE_INF("alxNet Unlock"); AlxOsMutex_Unlock(m)
 
 Alx_Status AlxNet_Connect(AlxNet* me)
 {
@@ -693,65 +881,20 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
 		AlxOsMutex_Lock(&me->alxMutex);
-
-		CellularError_t cellularStatus = CELLULAR_SUCCESS;
-		me->cellular.cellularContext = CELLULAR_PDN_CONTEXT_ID;
-		uint8_t NumStatus = 0;
-		bool pdnStatus = false;
-
-		CellularPdnConfig_t pdnConfig = { CELLULAR_PDN_CONTEXT_IPV4, CELLULAR_PDN_AUTH_NONE, CELLULAR_APN_NAME, "", "" };
-		CellularPdnStatus_t PdnStatusBuffers[CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U] = { 0 };
-
-		/* Setup the PDN config. */
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_SetPdnConfig(me->cellular.handle, me->cellular.cellularContext, &pdnConfig);
-
-			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_INF("Cellular_SetPdnConfig failure %d", cellularStatus);
-			}
-		}
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_ActivatePdn(me->cellular.handle, me->cellular.cellularContext);
-
-			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_INF("Cellular_ActivatePdn failure %d", cellularStatus);
-			}
-		}
-
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_GetIPAddress(me->cellular.handle, me->cellular.cellularContext, me->ip, sizeof(me->ip));
-			if (cellularStatus != CELLULAR_SUCCESS)
+		uint64_t start_time = AlxTick_Get_ms(&alxTick);
+		while (AlxTick_Get_ms(&alxTick) - start_time < 120000)
+		{
+			if (cellular_HandleConnection(me, Cmd_Work) == State_ModemConnected)
 			{
-				ALX_NET_TRACE_INF("Cellular_GetIPAddress failure %d", cellularStatus);
+				AlxOsMutex_Unlock(&me->alxMutex);
+				return Alx_Ok;
 			}
+			AlxOsDelay_ms(&alxOsDelay, 100);
 		}
 
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			cellularStatus = Cellular_GetPdnStatus(me->cellular.handle, PdnStatusBuffers, (CELLULAR_PDN_CONTEXT_ID_MAX - CELLULAR_PDN_CONTEXT_ID_MIN + 1U), &NumStatus);
-			if (cellularStatus != CELLULAR_SUCCESS) {
-				ALX_NET_TRACE_INF("Cellular_GetPdnStatus failure %d", cellularStatus);
-			}
-		}
-
-		if (cellularStatus == CELLULAR_SUCCESS) {
-			for (int i = 0U; i < NumStatus; i++) {
-				if ((PdnStatusBuffers[i].contextId == me->cellular.cellularContext) && (PdnStatusBuffers[i].state == 1)) {
-					pdnStatus = true;
-					break;
-				}
-			}
-
-			if (pdnStatus == false) {
-				ALX_NET_TRACE_INF("Cellular PDN is not activated <<<");
-			}
-		}
-
-		if (pdnStatus != true || cellularStatus != CELLULAR_SUCCESS) {
-			AlxOsMutex_Unlock(&me->alxMutex);
-			return Alx_Err;
-		}
-		me->isNetConnected = true;
 		AlxOsMutex_Unlock(&me->alxMutex);
+		vTaskDelay(pdMS_TO_TICKS(CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS));
+		return Alx_Err;
 	}
 #endif
 
@@ -772,6 +915,12 @@ Alx_Status AlxNet_Disconnect(AlxNet* me)
 		AlxIoPin_Set(me->do_nRST);
 		AlxDelay_ms(10);
 
+		strcpy(saved_mac, me->mac);
+		strcpy(saved_ip, me->ip);
+		strcpy(saved_netmask, me->netmask);
+		strcpy(saved_gateway, me->gateway);
+		memcpy(saved_dns, me->dns, sizeof(saved_dns));
+
 		memset(me->mac, 0, sizeof(me->mac));
 		memset(me->ip, 0, sizeof(me->ip));
 		memset(me->netmask, 0, sizeof(me->netmask));
@@ -788,19 +937,38 @@ Alx_Status AlxNet_Disconnect(AlxNet* me)
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
-		CellularError_t cellularStatus = CELLULAR_SUCCESS;
 		AlxOsMutex_Lock(&me->alxMutex);
-
-		cellularStatus = Cellular_DeactivatePdn(me->cellular.handle, me->cellular.cellularContext);
-
-		if (cellularStatus != CELLULAR_SUCCESS) {
-			AlxOsMutex_Unlock(&me->alxMutex);
-			return Alx_Err;
-		}
-
+		cellular_HandleConnection(me, Cmd_Disconnect);
+		me->isNetConnected = false;
 		AlxOsMutex_Unlock(&me->alxMutex);
 	}
 	#endif
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxNet_Restart(AlxNet* me)
+{
+	// Assert
+	ALX_NET_ASSERT(me->wasCtorCalled == true);
+
+#if defined(ALX_WIZNET)
+	if (me->config == AlxNet_Config_Wiznet)
+	{
+		AlxNet_Disconnect(me);
+	}
+#endif
+
+	// Connect CELLULAR to PDN (Packet Data Network)
+#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		AlxOsMutex_Lock(&me->alxMutex);
+		cellular_HandleConnection(me, Cmd_PowerCycle);
+		me->isNetConnected = false;
+		AlxOsMutex_Unlock(&me->alxMutex);
+	}
+#endif
 
 	// Return
 	return Alx_Ok;
@@ -809,6 +977,27 @@ bool AlxNet_IsConnected(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
+
+#if defined(ALX_WIZNET)
+	if (!me->isNetConnected)
+	{
+		AlxNet_Connect(me);
+		AlxNet_SetMac(me, saved_mac);
+		AlxNet_SetIp(me, saved_ip);
+		AlxNet_SetGateway(me, saved_gateway);
+		AlxNet_SetNetmask(me, saved_netmask);
+		memcpy(me->dns, saved_dns, sizeof(me->dns));
+	}
+#endif
+
+#if defined(ALX_FREE_RTOS_CELLULAR)
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		AlxOsMutex_Lock(&me->alxMutex);
+		cellular_HandleConnection(me, Cmd_Work);
+		AlxOsMutex_Unlock(&me->alxMutex);
+	}
+#endif
 
 	// Return
 	return me->isNetConnected;

@@ -165,6 +165,7 @@ Alx_Status AlxNet_Init(AlxNet* me);
 
 Alx_Status AlxNet_Connect(AlxNet* me);
 Alx_Status AlxNet_Disconnect(AlxNet* me);
+Alx_Status AlxNet_Restart(AlxNet* me);
 bool AlxNet_IsConnected(AlxNet* me);
 void AlxNet_SetMac(AlxNet* me, const char* mac);
 void AlxNet_SetIp(AlxNet* me, const char* ip);
