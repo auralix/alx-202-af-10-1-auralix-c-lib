@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxSerialPort.h
-  * @brief		Auralix C Library - ALX Serial Port Module
+  * @file		alxSerialPort_McuLpc55S6x.h
+  * @brief		Auralix C Library - ALX Serial Port MCU LPC55S6X Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_SERIAL_PORT_H
-#define ALX_SERIAL_PORT_H
+#ifndef ALX_SERIAL_PORT_MCU_LPC55S6X_H
+#define ALX_SERIAL_PORT_MCU_LPC55S6X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,66 +42,60 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-
-#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-#include "alxSerialPort_McuStm32.h"
-
-#elif defined(ALX_LPC55S6X)
-#include "alxSerialPort_McuLpc55S6x.h"
-
-#else
-typedef struct { bool dummy; } AlxSerialPort;
-#endif
+#include "alxFifo.h"
+#include "alxIoPin.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 
 //******************************************************************************
-// Preprocessor
+// Types
 //******************************************************************************
-#define ALX_SERIAL_PORT_FILE "alxSerialPort.h"
+typedef struct
+{
+	// Parameters
+	USART_Type* usart;
+	AlxIoPin* do_TX;
+	AlxIoPin* di_RX;
+	AlxGlobal_BaudRate baudRate;
+	uint8_t* rxFifoBuff;
+	uint32_t rxFifoBuffLen;
+	Alx_IrqPriority rxIrqPriority;
 
-// Assert //
-#if defined(ALX_SERIAL_PORT_ASSERT_BKPT_ENABLE)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_BKPT(ALX_SERIAL_PORT_FILE, expr)
-#elif defined(ALX_SERIAL_PORT_ASSERT_TRACE_ENABLE)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_TRACE(ALX_SERIAL_PORT_FILE, expr)
-#elif defined(ALX_SERIAL_PORT_ASSERT_RST_ENABLE)
-	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_RST(ALX_SERIAL_PORT_FILE, expr)
-#else
-	#define ALX_SERIAL_PORT_ASSERT(expr) do{} while (false)
-#endif
+	// Variables
+	usart_config_t usartConfig;
+	AlxFifo rxFifo;
 
-// Trace //
-#if defined(ALX_SERIAL_PORT_TRACE_ENABLE)
-	#define ALX_SERIAL_PORT_TRACE(...) ALX_TRACE_WRN(ALX_SERIAL_PORT_FILE, __VA_ARGS__)
-#else
-	#define ALX_SERIAL_PORT_TRACE(...) do{} while (false)
-#endif
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxSerialPort;
 
 
 //******************************************************************************
-// Functions
+// Constructor
 //******************************************************************************
-Alx_Status AlxSerialPort_Init(AlxSerialPort* me);
-Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me);
-Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len);
-Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
-Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len);
-Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str);
-void AlxSerialPort_FlushRxFifo(AlxSerialPort* me);
-uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me);
-void AlxSerialPort_IrqHandler(AlxSerialPort* me);
+void AlxSerialPort_Ctor
+(
+	AlxSerialPort* me,
+	USART_Type* usart,
+	AlxIoPin* do_TX,
+	AlxIoPin* di_RX,
+	AlxGlobal_BaudRate baudRate,
+	uint8_t* rxFifoBuff,
+	uint32_t rxFifoBuffLen,
+	Alx_IrqPriority rxIrqPriority
+);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_LPC55S6X)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_SERIAL_PORT_H
+#endif	// #ifndef ALX_SERIAL_PORT_MCU_LPC55S6X_H

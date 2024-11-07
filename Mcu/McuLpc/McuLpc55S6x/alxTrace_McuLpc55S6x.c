@@ -42,10 +42,10 @@
 // Private Functions
 //******************************************************************************
 static Alx_Status AlxTrace_Reset(AlxTrace* me);
-static uint8_t AlxTrace_GetIoconFunc(AlxTrace* me);
-static uint32_t AlxTrace_GetFlexCommClkFreq(AlxTrace* me);
-static void AlxTrace_AttachClkToFlexcomm(AlxTrace* me);
-static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me);
+static uint8_t AlxTrace_Periph_GetIoconFunc(AlxTrace* me);
+static uint32_t AlxTrace_Periph_GetClk(AlxTrace* me);
+static void AlxTrace_Periph_AttachClk(AlxTrace* me);
+static void AlxTrace_Periph_DisableClkAndReset(AlxTrace* me);
 
 
 //******************************************************************************
@@ -93,8 +93,8 @@ void AlxTrace_Ctor
 	me->usartConfig.enableContinuousSCLK		= false;
 	me->usartConfig.enableMode32k				= false;
 	me->usartConfig.enableHardwareFlowControl	= false;
-	me->usartConfig.txWatermark					= kUSART_TxFifo0;	// MF: I don't understand this
-	me->usartConfig.rxWatermark					= kUSART_RxFifo1;	// MF: I don't understand this
+	me->usartConfig.txWatermark					= kUSART_TxFifo0;
+	me->usartConfig.rxWatermark					= kUSART_RxFifo1;
 	me->usartConfig.syncMode					= kUSART_SyncModeDisabled;
 	me->usartConfig.clockPolarity				= kUSART_RxSampleOnFallingEdge;
 
@@ -116,14 +116,14 @@ void AlxTrace_Ctor
   */
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
-	// Set IoPin Usart Func
-	IOCON_PinMuxSet(IOCON, me->port, me->pin, AlxTrace_GetIoconFunc(me));
+	// Init GPIO
+	IOCON_PinMuxSet(IOCON, me->port, me->pin, AlxTrace_Periph_GetIoconFunc(me));
 
-	// Attach Clk to FlexComm
-	AlxTrace_AttachClkToFlexcomm(me);
+	// Attach USART periphery clock
+	AlxTrace_Periph_AttachClk(me);
 
 	// Init USART
-	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_GetFlexCommClkFreq(me)) != kStatus_Success) { return Alx_Err; }	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
+	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_Periph_GetClk(me)) != kStatus_Success) { return Alx_Err; }	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
 
 	// Set isInit
 	me->isInit = true;
@@ -141,12 +141,12 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
 	// DeInit USART
-	USART_Deinit(me->usart);	// MF: Always returns Success, so we won't hande return
+	USART_Deinit(me->usart);
 
-	// Disable FlexComm Clk and Reset FlexComm Perihpery
-	AlxTrace_FlexcommDisableClkResetPeriph(me);
+	// Disable USART periphery clock and reset USART periphery
+	AlxTrace_Periph_DisableClkAndReset(me);
 
-	// Set Pin to Default Func
+	// DeInit GPIO
 	IOCON_PinMuxSet(IOCON, me->port, me->pin, IOCON_FUNC0);
 
 	// Reset isInit
@@ -168,11 +168,7 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 	// Write
 	if (USART_WriteBlocking(me->usart, (const uint8_t*)str, strlen(str)) != kStatus_Success)
 	{
-		// Reset
-		AlxTrace_Reset(me);
-
-		// Return
-		return Alx_Err;
+		return AlxTrace_Reset(me);
 	}
 
 	// Return
@@ -186,19 +182,19 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 static Alx_Status AlxTrace_Reset(AlxTrace* me)
 {
 	// DeInit USART
-	USART_Deinit(me->usart);	// MF: Always returns Success, so we won't hande return
+	USART_Deinit(me->usart);
 
-	// Disable FlexComm Clk and Reset FlexComm Perihpery
-	AlxTrace_FlexcommDisableClkResetPeriph(me);
+	// Disable USART periphery clock and reset USART periphery
+	AlxTrace_Periph_DisableClkAndReset(me);
 
 	// Reset isInit
 	me->isInit = false;
 
-	// Attach Clk to FlexComm
-	AlxTrace_AttachClkToFlexcomm(me);
+	// Attach USART periphery clock
+	AlxTrace_Periph_AttachClk(me);
 
 	// Init USART
-	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_GetFlexCommClkFreq(me)) != kStatus_Success) { return Alx_Err; }	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
+	if (USART_Init(me->usart, &me->usartConfig, AlxTrace_Periph_GetClk(me)) != kStatus_Success) { return Alx_Err; }	// MF: FlexComm Init (Periph_Reset and EnableClk) happens in "USART_Init()"
 
 	// Set isInit
 	me->isInit = true;
@@ -206,9 +202,8 @@ static Alx_Status AlxTrace_Reset(AlxTrace* me)
 	// Return
 	return Alx_Ok;
 }
-static uint8_t AlxTrace_GetIoconFunc(AlxTrace* me)
+static uint8_t AlxTrace_Periph_GetIoconFunc(AlxTrace* me)
 {
-	// Prepare Info Variable
 	bool isErr = true;
 
 	// Get IOCON Func (see Table 340-342 in User Manual on page 343)
@@ -260,19 +255,16 @@ static uint8_t AlxTrace_GetIoconFunc(AlxTrace* me)
 	}
 	#endif
 
-	// Assert
 	if (isErr)
 	{
 		// We shouldn't get here
 	}
 	return 0xFF;
 }
-static uint32_t AlxTrace_GetFlexCommClkFreq(AlxTrace* me)
+static uint32_t AlxTrace_Periph_GetClk(AlxTrace* me)
 {
-	// Prepare Info Variable
 	bool isErr = true;
 
-	// Get FlexComm Clk Freq
 	#if defined(USART0)
 	if (me->usart == USART0)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(0U); }
 	#endif
@@ -298,19 +290,16 @@ static uint32_t AlxTrace_GetFlexCommClkFreq(AlxTrace* me)
 	if (me->usart == USART7)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(7U); }
 	#endif
 
-	// Assert
 	if (isErr)
 	{
 		// We shouldn't get here
 	}
 	return 0xFFFFFFFF;
 }
-static void AlxTrace_AttachClkToFlexcomm(AlxTrace* me)
+static void AlxTrace_Periph_AttachClk(AlxTrace* me)
 {
-	// Prepare Info Variable
 	bool isErr = true;
 
-	// FlexComm Disable Clk and Reset Periphery
 	#if defined(USART0)
 	if (me->usart == USART0)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM0); isErr = false; }
 	#endif
@@ -336,18 +325,15 @@ static void AlxTrace_AttachClkToFlexcomm(AlxTrace* me)
 	if (me->usart == USART7)	{ CLOCK_AttachClk(kMAIN_CLK_to_FLEXCOMM7); isErr = false; }
 	#endif
 
-	// Assert
 	if (isErr)
 	{
 		// We shouldn't get here
 	}
 }
-static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me)
+static void AlxTrace_Periph_DisableClkAndReset(AlxTrace* me)
 {
-	// Prepare Info Variable
 	bool isErr = true;
 
-	// FlexComm Disable Clk and Reset Periphery
 	#if defined(USART0)
 	if (me->usart == USART0)	{ CLOCK_DisableClock(kCLOCK_FlexComm0); RESET_PeripheralReset(kFC0_RST_SHIFT_RSTn); isErr = false; }
 	#endif
@@ -373,7 +359,6 @@ static void AlxTrace_FlexcommDisableClkResetPeriph(AlxTrace* me)
 	if (me->usart == USART7)	{ CLOCK_DisableClock(kCLOCK_FlexComm7); RESET_PeripheralReset(kFC7_RST_SHIFT_RSTn); isErr = false; }
 	#endif
 
-	// Assert
 	if (isErr)
 	{
 		// We shouldn't get here
