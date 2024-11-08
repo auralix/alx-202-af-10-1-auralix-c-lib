@@ -41,9 +41,6 @@
 // Private Functions
 //******************************************************************************
 static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType paramType);
-static void AlxCli_PrepResp_Success(AlxCli* me);
-static void AlxCli_PrepResp_ErrCmd(AlxCli* me);
-static void AlxCli_PrepResp_ErrArg(AlxCli* me);
 
 
 //******************************************************************************
@@ -440,7 +437,7 @@ void AlxCli_Handle(AlxCli* me)
 				int sscanfStatus = sscanf
 				(
 					me->buff,
-					"set-param --key %s --val %s",
+					"set-param --key %s --val %s\r\n",
 					key,
 					val
 				);
@@ -509,6 +506,79 @@ void AlxCli_Handle(AlxCli* me)
 
 		// Send response
 		ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+	}
+}
+void AlxCli_PrepResp_Success(AlxCli* me)
+{
+	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
+	{
+		strcpy
+		(
+			me->buff,
+			"{\r\n"
+			"    \"status\":\"success\"\r\n"
+			"}\r\n"
+		);
+	}
+	else
+	{
+		strcpy
+		(
+			me->buff,
+			"{"
+				"\"status\":\"success\""
+			"}\r\n"
+		);
+	}
+}
+void AlxCli_PrepResp_ErrCmd(AlxCli* me)
+{
+	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
+	{
+		strcpy
+		(
+			me->buff,
+			"{\r\n"
+			"    \"status\":\"error\",\r\n"
+			"    \"message\":\"Command invalid\"\r\n"
+			"}\r\n"
+		);
+	}
+	else
+	{
+		strcpy
+		(
+			me->buff,
+			"{"
+				"\"status\":\"error\","
+				"\"message\":\"Command invalid\""
+			"}\r\n"
+		);
+	}
+}
+void AlxCli_PrepResp_ErrArg(AlxCli* me)
+{
+	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
+	{
+		strcpy
+		(
+			me->buff,
+			"{\r\n"
+			"    \"status\":\"error\",\r\n"
+			"    \"message\":\"Arguments invalid\"\r\n"
+			"}\r\n"
+		);
+	}
+	else
+	{
+		strcpy
+		(
+			me->buff,
+			"{"
+				"\"status\":\"error\","
+				"\"message\":\"Arguments invalid\""
+			"}\r\n"
+		);
 	}
 }
 
@@ -672,79 +742,6 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 
 	// Send
 	ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
-}
-static void AlxCli_PrepResp_Success(AlxCli* me)
-{
-	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
-	{
-		strcpy
-		(
-			me->buff,
-			"{\r\n"
-			"    \"status\":\"success\"\r\n"
-			"}\r\n"
-		);
-	}
-	else
-	{
-		strcpy
-		(
-			me->buff,
-			"{"
-				"\"status\":\"success\""
-			"}\r\n"
-		);
-	}
-}
-static void AlxCli_PrepResp_ErrCmd(AlxCli* me)
-{
-	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
-	{
-		strcpy
-		(
-			me->buff,
-			"{\r\n"
-			"    \"status\":\"error\",\r\n"
-			"    \"message\":\"Command invalid\"\r\n"
-			"}\r\n"
-		);
-	}
-	else
-	{
-		strcpy
-		(
-			me->buff,
-			"{"
-				"\"status\":\"error\","
-				"\"message\":\"Command invalid\""
-			"}\r\n"
-		);
-	}
-}
-static void AlxCli_PrepResp_ErrArg(AlxCli* me)
-{
-	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
-	{
-		strcpy
-		(
-			me->buff,
-			"{\r\n"
-			"    \"status\":\"error\",\r\n"
-			"    \"message\":\"Arguments invalid\"\r\n"
-			"}\r\n"
-		);
-	}
-	else
-	{
-		strcpy
-		(
-			me->buff,
-			"{"
-				"\"status\":\"error\","
-				"\"message\":\"Arguments invalid\""
-			"}\r\n"
-		);
-	}
 }
 
 

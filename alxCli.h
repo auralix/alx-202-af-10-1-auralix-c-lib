@@ -117,6 +117,9 @@ void AlxCli_Ctor
 // Functions
 //******************************************************************************
 void AlxCli_Handle(AlxCli* me);
+void AlxCli_PrepResp_Success(AlxCli* me);
+void AlxCli_PrepResp_ErrCmd(AlxCli* me);
+void AlxCli_PrepResp_ErrArg(AlxCli* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
