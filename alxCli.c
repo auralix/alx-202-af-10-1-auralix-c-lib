@@ -72,6 +72,9 @@ void AlxCli_Ctor
 	me->buff = buff;
 	me->buffLen = buffLen;
 
+	// Variables
+	me->buffWriteMsgLen = 0;
+
 	// Info
 	me->wasCtorCalled = true;
 }
@@ -83,375 +86,422 @@ void AlxCli_Ctor
 void AlxCli_Handle(AlxCli* me)
 {
 	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
 	ALX_CLI_ASSERT(me->wasCtorCalled == true);
 
 
+
+
 	//------------------------------------------------------------------------------
-	// Handle Command
+	//------------------------------------------------------------------------------
+	// Handle Write Message
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	if (me->buffWriteMsgLen > 0)
+	{
+		// Write
+		ALX_CLI_ASSERT(AlxSerialPort_Write(me->alxSerialPort, me->buff, me->buffWriteMsgLen) == Alx_Ok);
+
+		// Clear
+		memset(me->buff, 0, me->buffLen);
+		me->buffWriteMsgLen = 0;
+	}
+
+
+
+
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	// Handle Read Command
+	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
 	uint32_t cmdLen = 0;
 	if (AlxSerialPort_ReadStrUntil(me->alxSerialPort, me->buff, "\r\n", me->buffLen, &cmdLen) == Alx_Ok)
 	{
-		//------------------------------------------------------------------------------
-		// Append \r\n
-		//------------------------------------------------------------------------------
-		strcat(me->buff, "\r\n");
-
-
-		//------------------------------------------------------------------------------
-		// Help Command
-		//------------------------------------------------------------------------------
-		if (strcmp(me->buff, "help\r\n") == 0)
+		while (1)
 		{
-			// Trace
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "help         Get all available commands and their descriptions\r\n") == Alx_Ok);
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "reset        Trigger device reset\r\n") == Alx_Ok);
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "id           Get device ID info\r\n") == Alx_Ok);
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get          Get all device properties\r\n") == Alx_Ok);
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-param    Get all device parameters\r\n") == Alx_Ok);
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-var      Get all device variables\r\n") == Alx_Ok);
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-flag     Get all device flags\r\n") == Alx_Ok);
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-const    Get all device constants\r\n") == Alx_Ok);
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-trig     Get all device triggers\r\n") == Alx_Ok);
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "set-param    Set specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\r\n") == Alx_Ok);
-
-			// Callback
-			AlxCli_Help_Callback(me);
-
-			// Return
-			return;
-		}
+			//------------------------------------------------------------------------------
+			// Append \r\n
+			//------------------------------------------------------------------------------
+			strcat(me->buff, "\r\n");
 
 
-		//------------------------------------------------------------------------------
-		// Reset Command
-		//------------------------------------------------------------------------------
-		if (strcmp(me->buff, "reset\r\n") == 0)
-		{
-			// Prepare response
-			AlxCli_PrepResp_Success(me);
-
-			// Send response
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
-
-			// Reset MCU
-			NVIC_SystemReset();
-
-			// Return
-			return;
-		}
-
-
-		//------------------------------------------------------------------------------
-		// ID Command
-		//------------------------------------------------------------------------------
-		if (strcmp(me->buff, "id\r\n") == 0)
-		{
-			// Get
-			bool fwIsBootUsed = AlxId_GetFwIsBootUsed(me->alxId);
-
-			const char* fwArtf = AlxId_GetFwArtf(me->alxId);
-			const char* fwName = AlxId_GetFwName(me->alxId);
-			const char* fwVerStr = AlxId_GetFwVerStr(me->alxId);
-			const char* fwBinStr = AlxId_GetFwBinStr(me->alxId);
-
-			const char* fwBootArtf = AlxId_GetFwBootArtf(me->alxId);
-			const char* fwBootName = AlxId_GetFwBootName(me->alxId);
-			const char* fwBootVerStr = AlxId_GetFwBootVerStr(me->alxId);
-			const char* fwBootBinStr = AlxId_GetFwBootBinStr(me->alxId);
-
-			const char* hwPcbArtf = AlxId_GetHwPcbArtf(me->alxId);
-			const char* hwPcbName = AlxId_GetHwPcbName(me->alxId);
-			const char* hwPcbVerStr = AlxId_GetHwPcbVerStr(me->alxId);
-
-			const char* hwBomArtf = AlxId_GetHwBomArtf(me->alxId);
-			const char* hwBomName = AlxId_GetHwBomName(me->alxId);
-			const char* hwBomVerStr = AlxId_GetHwBomVerStr(me->alxId);
-
-			uint8_t hwId = AlxId_GetHwId(me->alxId);
-			const char* hwMcuUniqueIdStr = AlxId_GetHwMcuUniqueIdStr(me->alxId);
-
-			// Prepare response
-			if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
+			//------------------------------------------------------------------------------
+			// Help Command
+			//------------------------------------------------------------------------------
+			if (strcmp(me->buff, "help\r\n") == 0)
 			{
-				if (fwIsBootUsed)
+				// Trace
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "help         Get all available commands and their descriptions\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "reset        Trigger device reset\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "id           Get device ID info\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get          Get all device properties\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-param    Get all device parameters\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-var      Get all device variables\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-flag     Get all device flags\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-const    Get all device constants\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-trig     Get all device triggers\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "set-param    Set specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\r\n") == Alx_Ok);
+
+				// Callback
+				AlxCli_Help_Callback(me);
+
+				// Break
+				break;
+			}
+
+
+			//------------------------------------------------------------------------------
+			// Reset Command
+			//------------------------------------------------------------------------------
+			if (strcmp(me->buff, "reset\r\n") == 0)
+			{
+				// Prepare response
+				AlxCli_PrepResp_Success(me);
+
+				// Send response
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+
+				// Reset MCU
+				NVIC_SystemReset();
+
+				// Break
+				break;
+			}
+
+
+			//------------------------------------------------------------------------------
+			// ID Command
+			//------------------------------------------------------------------------------
+			if (strcmp(me->buff, "id\r\n") == 0)
+			{
+				// Get
+				bool fwIsBootUsed = AlxId_GetFwIsBootUsed(me->alxId);
+
+				const char* fwArtf = AlxId_GetFwArtf(me->alxId);
+				const char* fwName = AlxId_GetFwName(me->alxId);
+				const char* fwVerStr = AlxId_GetFwVerStr(me->alxId);
+				const char* fwBinStr = AlxId_GetFwBinStr(me->alxId);
+
+				const char* fwBootArtf = AlxId_GetFwBootArtf(me->alxId);
+				const char* fwBootName = AlxId_GetFwBootName(me->alxId);
+				const char* fwBootVerStr = AlxId_GetFwBootVerStr(me->alxId);
+				const char* fwBootBinStr = AlxId_GetFwBootBinStr(me->alxId);
+
+				const char* hwPcbArtf = AlxId_GetHwPcbArtf(me->alxId);
+				const char* hwPcbName = AlxId_GetHwPcbName(me->alxId);
+				const char* hwPcbVerStr = AlxId_GetHwPcbVerStr(me->alxId);
+
+				const char* hwBomArtf = AlxId_GetHwBomArtf(me->alxId);
+				const char* hwBomName = AlxId_GetHwBomName(me->alxId);
+				const char* hwBomVerStr = AlxId_GetHwBomVerStr(me->alxId);
+
+				uint8_t hwId = AlxId_GetHwId(me->alxId);
+				const char* hwMcuUniqueIdStr = AlxId_GetHwMcuUniqueIdStr(me->alxId);
+
+				// Prepare response
+				if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 				{
-					sprintf
-					(
-						me->buff,
-						"{\r\n"
-						"    \"status\":\"success\",\r\n"
-						"    \"data\":\r\n"
-						"    {\r\n"
-						"        \"fwArtf\":\"%s\",\r\n"
-						"        \"fwName\":\"%s\",\r\n"
-						"        \"fwVerStr\":\"%s\",\r\n"
-						"        \"fwBinStr\":\"%s\",\r\n"
-						"        \"fwBootArtf\":\"%s\",\r\n"
-						"        \"fwBootName\":\"%s\",\r\n"
-						"        \"fwBootVerStr\":\"%s\",\r\n"
-						"        \"fwBootBinStr\":\"%s\",\r\n"
-						"        \"hwPcbArtf\":\"%s\",\r\n"
-						"        \"hwPcbName\":\"%s\",\r\n"
-						"        \"hwPcbVerStr\":\"%s\",\r\n"
-						"        \"hwBomArtf\":\"%s\",\r\n"
-						"        \"hwBomName\":\"%s\",\r\n"
-						"        \"hwBomVerStr\":\"%s\",\r\n"
-						"        \"hwId\":%u,\r\n"
-						"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
-						"    }\r\n"
-						"}\r\n",
-						fwArtf,
-						fwName,
-						fwVerStr,
-						fwBinStr,
-						fwBootArtf,
-						fwBootName,
-						fwBootVerStr,
-						fwBootBinStr,
-						hwPcbArtf,
-						hwPcbName,
-						hwPcbVerStr,
-						hwBomArtf,
-						hwBomName,
-						hwBomVerStr,
-						hwId,
-						hwMcuUniqueIdStr
-					);
+					if (fwIsBootUsed)
+					{
+						sprintf
+						(
+							me->buff,
+							"{\r\n"
+							"    \"status\":\"success\",\r\n"
+							"    \"data\":\r\n"
+							"    {\r\n"
+							"        \"fwArtf\":\"%s\",\r\n"
+							"        \"fwName\":\"%s\",\r\n"
+							"        \"fwVerStr\":\"%s\",\r\n"
+							"        \"fwBinStr\":\"%s\",\r\n"
+							"        \"fwBootArtf\":\"%s\",\r\n"
+							"        \"fwBootName\":\"%s\",\r\n"
+							"        \"fwBootVerStr\":\"%s\",\r\n"
+							"        \"fwBootBinStr\":\"%s\",\r\n"
+							"        \"hwPcbArtf\":\"%s\",\r\n"
+							"        \"hwPcbName\":\"%s\",\r\n"
+							"        \"hwPcbVerStr\":\"%s\",\r\n"
+							"        \"hwBomArtf\":\"%s\",\r\n"
+							"        \"hwBomName\":\"%s\",\r\n"
+							"        \"hwBomVerStr\":\"%s\",\r\n"
+							"        \"hwId\":%u,\r\n"
+							"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
+							"    }\r\n"
+							"}\r\n",
+							fwArtf,
+							fwName,
+							fwVerStr,
+							fwBinStr,
+							fwBootArtf,
+							fwBootName,
+							fwBootVerStr,
+							fwBootBinStr,
+							hwPcbArtf,
+							hwPcbName,
+							hwPcbVerStr,
+							hwBomArtf,
+							hwBomName,
+							hwBomVerStr,
+							hwId,
+							hwMcuUniqueIdStr);
+					}
+					else
+					{
+						sprintf
+						(
+							me->buff,
+							"{\r\n"
+							"    \"status\":\"success\",\r\n"
+							"    \"data\":\r\n"
+							"    {\r\n"
+							"        \"fwArtf\":\"%s\",\r\n"
+							"        \"fwName\":\"%s\",\r\n"
+							"        \"fwVerStr\":\"%s\",\r\n"
+							"        \"fwBinStr\":\"%s\",\r\n"
+							"        \"hwPcbArtf\":\"%s\",\r\n"
+							"        \"hwPcbName\":\"%s\",\r\n"
+							"        \"hwPcbVerStr\":\"%s\",\r\n"
+							"        \"hwBomArtf\":\"%s\",\r\n"
+							"        \"hwBomName\":\"%s\",\r\n"
+							"        \"hwBomVerStr\":\"%s\",\r\n"
+							"        \"hwId\":%u,\r\n"
+							"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
+							"    }\r\n"
+							"}\r\n",
+							fwArtf,
+							fwName,
+							fwVerStr,
+							fwBinStr,
+							hwPcbArtf,
+							hwPcbName,
+							hwPcbVerStr,
+							hwBomArtf,
+							hwBomName,
+							hwBomVerStr,
+							hwId,
+							hwMcuUniqueIdStr);
+					}
 				}
 				else
 				{
-					sprintf
-					(
-						me->buff,
-						"{\r\n"
-						"    \"status\":\"success\",\r\n"
-						"    \"data\":\r\n"
-						"    {\r\n"
-						"        \"fwArtf\":\"%s\",\r\n"
-						"        \"fwName\":\"%s\",\r\n"
-						"        \"fwVerStr\":\"%s\",\r\n"
-						"        \"fwBinStr\":\"%s\",\r\n"
-						"        \"hwPcbArtf\":\"%s\",\r\n"
-						"        \"hwPcbName\":\"%s\",\r\n"
-						"        \"hwPcbVerStr\":\"%s\",\r\n"
-						"        \"hwBomArtf\":\"%s\",\r\n"
-						"        \"hwBomName\":\"%s\",\r\n"
-						"        \"hwBomVerStr\":\"%s\",\r\n"
-						"        \"hwId\":%u,\r\n"
-						"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
-						"    }\r\n"
-						"}\r\n",
-						fwArtf,
-						fwName,
-						fwVerStr,
-						fwBinStr,
-						hwPcbArtf,
-						hwPcbName,
-						hwPcbVerStr,
-						hwBomArtf,
-						hwBomName,
-						hwBomVerStr,
-						hwId,
-						hwMcuUniqueIdStr
-					);
-				}
-			}
-			else
-			{
-				if (fwIsBootUsed)
-				{
-					sprintf
-					(
-						me->buff,
-						"{"
-							"\"status\":\"success\","
-							"\"data\":"
+					if (fwIsBootUsed)
+					{
+						sprintf
+						(
+							me->buff,
 							"{"
-								"\"fwArtf\":\"%s\","
-								"\"fwName\":\"%s\","
-								"\"fwVerStr\":\"%s\","
-								"\"fwBinStr\":\"%s\","
-								"\"fwBootArtf\":\"%s\","
-								"\"fwBootName\":\"%s\","
-								"\"fwBootVerStr\":\"%s\","
-								"\"fwBootBinStr\":\"%s\","
-								"\"hwPcbArtf\":\"%s\","
-								"\"hwPcbName\":\"%s\","
-								"\"hwPcbVerStr\":\"%s\","
-								"\"hwBomArtf\":\"%s\","
-								"\"hwBomName\":\"%s\","
-								"\"hwBomVerStr\":\"%s\","
-								"\"hwId\":%u,"
-								"\"hwMcuUniqueIdStr\":\"%s\""
-							"}"
-						"}\r\n",
-						fwArtf,
-						fwName,
-						fwVerStr,
-						fwBinStr,
-						fwBootArtf,
-						fwBootName,
-						fwBootVerStr,
-						fwBootBinStr,
-						hwPcbArtf,
-						hwPcbName,
-						hwPcbVerStr,
-						hwBomArtf,
-						hwBomName,
-						hwBomVerStr,
-						hwId,
-						hwMcuUniqueIdStr
-					);
-				}
-				else
-				{
-					sprintf
-					(
-						me->buff,
-						"{"
-							"\"status\":\"success\","
-							"\"data\":"
+								"\"status\":\"success\","
+								"\"data\":"
+								"{"
+									"\"fwArtf\":\"%s\","
+									"\"fwName\":\"%s\","
+									"\"fwVerStr\":\"%s\","
+									"\"fwBinStr\":\"%s\","
+									"\"fwBootArtf\":\"%s\","
+									"\"fwBootName\":\"%s\","
+									"\"fwBootVerStr\":\"%s\","
+									"\"fwBootBinStr\":\"%s\","
+									"\"hwPcbArtf\":\"%s\","
+									"\"hwPcbName\":\"%s\","
+									"\"hwPcbVerStr\":\"%s\","
+									"\"hwBomArtf\":\"%s\","
+									"\"hwBomName\":\"%s\","
+									"\"hwBomVerStr\":\"%s\","
+									"\"hwId\":%u,"
+									"\"hwMcuUniqueIdStr\":\"%s\""
+								"}"
+							"}\r\n",
+							fwArtf,
+							fwName,
+							fwVerStr,
+							fwBinStr,
+							fwBootArtf,
+							fwBootName,
+							fwBootVerStr,
+							fwBootBinStr,
+							hwPcbArtf,
+							hwPcbName,
+							hwPcbVerStr,
+							hwBomArtf,
+							hwBomName,
+							hwBomVerStr,
+							hwId,
+							hwMcuUniqueIdStr);
+					}
+					else
+					{
+						sprintf
+						(
+							me->buff,
 							"{"
-								"\"fwArtf\":\"%s\","
-								"\"fwName\":\"%s\","
-								"\"fwVerStr\":\"%s\","
-								"\"fwBinStr\":\"%s\","
-								"\"hwPcbArtf\":\"%s\","
-								"\"hwPcbName\":\"%s\","
-								"\"hwPcbVerStr\":\"%s\","
-								"\"hwBomArtf\":\"%s\","
-								"\"hwBomName\":\"%s\","
-								"\"hwBomVerStr\":\"%s\","
-								"\"hwId\":%u,"
-								"\"hwMcuUniqueIdStr\":\"%s\""
-							"}"
-						"}\r\n",
-						fwArtf,
-						fwName,
-						fwVerStr,
-						fwBinStr,
-						hwPcbArtf,
-						hwPcbName,
-						hwPcbVerStr,
-						hwBomArtf,
-						hwBomName,
-						hwBomVerStr,
-						hwId,
-						hwMcuUniqueIdStr
-					);
+								"\"status\":\"success\","
+								"\"data\":"
+								"{"
+									"\"fwArtf\":\"%s\","
+									"\"fwName\":\"%s\","
+									"\"fwVerStr\":\"%s\","
+									"\"fwBinStr\":\"%s\","
+									"\"hwPcbArtf\":\"%s\","
+									"\"hwPcbName\":\"%s\","
+									"\"hwPcbVerStr\":\"%s\","
+									"\"hwBomArtf\":\"%s\","
+									"\"hwBomName\":\"%s\","
+									"\"hwBomVerStr\":\"%s\","
+									"\"hwId\":%u,"
+									"\"hwMcuUniqueIdStr\":\"%s\""
+								"}"
+							"}\r\n",
+							fwArtf,
+							fwName,
+							fwVerStr,
+							fwBinStr,
+							hwPcbArtf,
+							hwPcbName,
+							hwPcbVerStr,
+							hwBomArtf,
+							hwBomName,
+							hwBomVerStr,
+							hwId,
+							hwMcuUniqueIdStr);
+					}
 				}
+
+				// Send response
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+
+				// Break
+				break;
 			}
 
-			// Send response
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
 
-			// Return
-			return;
-		}
-
-
-		//------------------------------------------------------------------------------
-		// Get Command
-		//------------------------------------------------------------------------------
-		if (strcmp(me->buff, "get\r\n") == 0)
-		{
-			AlxCli_Get(me, false, ALX_NULL);
-			return;
-		}
-
-
-		//------------------------------------------------------------------------------
-		// Get Parameters Command
-		//------------------------------------------------------------------------------
-		if (strcmp(me->buff, "get-param\r\n") == 0)
-		{
-			AlxCli_Get(me, true, AlxParamItem_Param);
-			return;
-		}
-
-
-		//------------------------------------------------------------------------------
-		// Get Variables Command
-		//------------------------------------------------------------------------------
-		if (strcmp(me->buff, "get-var\r\n") == 0)
-		{
-			AlxCli_Get(me, true, AlxParamItem_Var);
-			return;
-		}
-
-
-		//------------------------------------------------------------------------------
-		// Get Flags Command
-		//------------------------------------------------------------------------------
-		if (strcmp(me->buff, "get-flag\r\n") == 0)
-		{
-			AlxCli_Get(me, true, AlxParamItem_Flag);
-			return;
-		}
-
-
-		//------------------------------------------------------------------------------
-		// Get Constants Command
-		//------------------------------------------------------------------------------
-		if (strcmp(me->buff, "get-const\r\n") == 0)
-		{
-			AlxCli_Get(me, true, AlxParamItem_Const);
-			return;
-		}
-
-
-		//------------------------------------------------------------------------------
-		// Get Triggers Command
-		//------------------------------------------------------------------------------
-		if (strcmp(me->buff, "get-trig\r\n") == 0)
-		{
-			AlxCli_Get(me, true, AlxParamItem_Trig);
-			return;
-		}
-
-
-		//------------------------------------------------------------------------------
-		// Set Parameter Command
-		//------------------------------------------------------------------------------
-		if (strncmp(me->buff, "set-param", strlen("set-param")) == 0)
-		{
 			//------------------------------------------------------------------------------
-			// Local Variables
+			// Get Command
 			//------------------------------------------------------------------------------
-			Alx_Status status = Alx_Err;
+			if (strcmp(me->buff, "get\r\n") == 0)
+			{
+				AlxCli_Get(me, false, ALX_NULL);
+				break;
+			}
 
 
 			//------------------------------------------------------------------------------
-			// Handle
+			// Get Parameters Command
 			//------------------------------------------------------------------------------
-			while (1)
+			if (strcmp(me->buff, "get-param\r\n") == 0)
+			{
+				AlxCli_Get(me, true, AlxParamItem_Param);
+				break;
+			}
+
+
+			//------------------------------------------------------------------------------
+			// Get Variables Command
+			//------------------------------------------------------------------------------
+			if (strcmp(me->buff, "get-var\r\n") == 0)
+			{
+				AlxCli_Get(me, true, AlxParamItem_Var);
+				break;
+			}
+
+
+			//------------------------------------------------------------------------------
+			// Get Flags Command
+			//------------------------------------------------------------------------------
+			if (strcmp(me->buff, "get-flag\r\n") == 0)
+			{
+				AlxCli_Get(me, true, AlxParamItem_Flag);
+				break;
+			}
+
+
+			//------------------------------------------------------------------------------
+			// Get Constants Command
+			//------------------------------------------------------------------------------
+			if (strcmp(me->buff, "get-const\r\n") == 0)
+			{
+				AlxCli_Get(me, true, AlxParamItem_Const);
+				break;
+			}
+
+
+			//------------------------------------------------------------------------------
+			// Get Triggers Command
+			//------------------------------------------------------------------------------
+			if (strcmp(me->buff, "get-trig\r\n") == 0)
+			{
+				AlxCli_Get(me, true, AlxParamItem_Trig);
+				break;
+			}
+
+
+			//------------------------------------------------------------------------------
+			// Set Parameter Command
+			//------------------------------------------------------------------------------
+			if (strncmp(me->buff, "set-param", strlen("set-param")) == 0)
 			{
 				//------------------------------------------------------------------------------
-				// Parse
+				// Local Variables
 				//------------------------------------------------------------------------------
-				char key[ALX_CLI_BUFF_LEN] = "";
-				char val[ALX_CLI_BUFF_LEN] = "";
-				int sscanfStatus = sscanf
-				(
-					me->buff,
-					"set-param --key %s --val %s\r\n",
-					key,
-					val
-				);
-				if (sscanfStatus != 2)
+				Alx_Status status = Alx_Err;
+
+
+				//------------------------------------------------------------------------------
+				// Handle
+				//------------------------------------------------------------------------------
+				while (1)
 				{
-					status = Alx_Err;
+					//------------------------------------------------------------------------------
+					// Parse
+					//------------------------------------------------------------------------------
+					char key[ALX_CLI_BUFF_LEN] = "";
+					char val[ALX_CLI_BUFF_LEN] = "";
+					int sscanfStatus = sscanf
+					(
+						me->buff,
+						"set-param --key %s --val %s\r\n",
+						key,
+						val);
+					if (sscanfStatus != 2)
+					{
+						status = Alx_Err;
+						break;
+					}
+
+
+					//------------------------------------------------------------------------------
+					// Set
+					//------------------------------------------------------------------------------
+					status = AlxParamMgmt_ByKey_SetVal_StrFormat(me->alxParamMgmt, key, val);
+
+
+					//------------------------------------------------------------------------------
+					// Break
+					//------------------------------------------------------------------------------
 					break;
 				}
 
 
 				//------------------------------------------------------------------------------
-				// Set
+				// Prepare Response
 				//------------------------------------------------------------------------------
-				status = AlxParamMgmt_ByKey_SetVal_StrFormat(me->alxParamMgmt, key, val);
+				if (status == Alx_Ok)
+				{
+					AlxCli_PrepResp_Success(me);
+				}
+				else
+				{
+					AlxCli_PrepResp_ErrArg(me);
+				}
+
+
+				//------------------------------------------------------------------------------
+				// Send Response
+				//------------------------------------------------------------------------------
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
 
 
 				//------------------------------------------------------------------------------
@@ -462,51 +512,43 @@ void AlxCli_Handle(AlxCli* me)
 
 
 			//------------------------------------------------------------------------------
-			// Prepare Response
+			// Callback
 			//------------------------------------------------------------------------------
-			if (status == Alx_Ok)
+			bool wasCmdHandled = AlxCli_Handle_Callback(me);
+			if (wasCmdHandled)
 			{
-				AlxCli_PrepResp_Success(me);
-			}
-			else
-			{
-				AlxCli_PrepResp_ErrArg(me);
+				break;
 			}
 
 
 			//------------------------------------------------------------------------------
-			// Send Response
+			// Invalid Command
 			//------------------------------------------------------------------------------
+
+			// Flush serial port RX FIFO
+			AlxSerialPort_FlushRxFifo(me->alxSerialPort);
+
+			// Prepare response
+			AlxCli_PrepResp_ErrCmd(me);
+
+			// Send response
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
 
-
-			//------------------------------------------------------------------------------
-			// Return
-			//------------------------------------------------------------------------------
-			return;
+			// Break
+			break;
 		}
-
-
-		//------------------------------------------------------------------------------
-		// Callback
-		//------------------------------------------------------------------------------
-		bool wasCmdHandled = AlxCli_Handle_Callback(me);
-		if (wasCmdHandled)
-		{
-			return;
-		}
-
-
-		//------------------------------------------------------------------------------
-		// Invalid Command
-		//------------------------------------------------------------------------------
-
-		// Prepare response
-		AlxCli_PrepResp_ErrCmd(me);
-
-		// Send response
-		ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
 	}
+
+
+	//------------------------------------------------------------------------------
+	// Clear
+	//------------------------------------------------------------------------------
+	memset(me->buff, 0, me->buffLen);
+}
+void AlxCli_PrepMsg(AlxCli* me, const uint8_t* data, uint32_t len)
+{
+	memcpy(me->buff, data, len);
+	me->buffWriteMsgLen = len;
 }
 void AlxCli_PrepResp_Success(AlxCli* me)
 {

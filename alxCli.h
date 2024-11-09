@@ -93,6 +93,9 @@ typedef struct
 	void* buff;
 	uint32_t buffLen;
 
+	// Variables
+	uint32_t buffWriteMsgLen;
+
 	// Info
 	bool wasCtorCalled;
 } AlxCli;
@@ -117,6 +120,7 @@ void AlxCli_Ctor
 // Functions
 //******************************************************************************
 void AlxCli_Handle(AlxCli* me);
+void AlxCli_PrepMsg(AlxCli* me, const uint8_t* data, uint32_t len);
 void AlxCli_PrepResp_Success(AlxCli* me);
 void AlxCli_PrepResp_ErrCmd(AlxCli* me);
 void AlxCli_PrepResp_ErrArg(AlxCli* me);
