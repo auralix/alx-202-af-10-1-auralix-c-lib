@@ -80,6 +80,15 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxCli_ResponseType_Success,
+	AlxCli_ResponseType_ErrCmd,
+	AlxCli_ResponseType_ErrArg,
+	AlxCli_ResponseType_ErrCrc,
+	AlxCli_ResponseType_ErrTimeout
+} AlxCli_ResponseType;
+
 typedef struct
 {
 	// Defines
@@ -94,7 +103,7 @@ typedef struct
 	uint32_t buffLen;
 
 	// Variables
-	uint32_t buffWriteMsgLen;
+	uint32_t buffLenUsed;
 
 	// Info
 	bool wasCtorCalled;
@@ -120,10 +129,8 @@ void AlxCli_Ctor
 // Functions
 //******************************************************************************
 void AlxCli_Handle(AlxCli* me);
-void AlxCli_PrepMsg(AlxCli* me, const uint8_t* data, uint32_t len);
-void AlxCli_PrepResp_Success(AlxCli* me);
-void AlxCli_PrepResp_ErrCmd(AlxCli* me);
-void AlxCli_PrepResp_ErrArg(AlxCli* me);
+void AlxCli_PrepareEvent(AlxCli* me, const uint8_t* data, uint32_t len);
+void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType);
 
 
 #endif	// #if defined(ALX_C_LIB)

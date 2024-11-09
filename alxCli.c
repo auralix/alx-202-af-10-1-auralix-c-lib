@@ -47,7 +47,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 // Weak Functions
 //******************************************************************************
 bool AlxCli_Handle_Callback(AlxCli* me);
-void AlxCli_Help_Callback(AlxCli* me);
+bool AlxCli_Help_Callback(AlxCli* me);
 
 
 //******************************************************************************
@@ -73,7 +73,7 @@ void AlxCli_Ctor
 	me->buffLen = buffLen;
 
 	// Variables
-	me->buffWriteMsgLen = 0;
+	me->buffLenUsed = 0;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -97,17 +97,17 @@ void AlxCli_Handle(AlxCli* me)
 
 	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
-	// Handle Write Message
+	// Handle Write Event
 	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
-	if (me->buffWriteMsgLen > 0)
+	if (me->buffLenUsed > 0)
 	{
 		// Write
-		ALX_CLI_ASSERT(AlxSerialPort_Write(me->alxSerialPort, me->buff, me->buffWriteMsgLen) == Alx_Ok);
+		ALX_CLI_ASSERT(AlxSerialPort_Write(me->alxSerialPort, me->buff, me->buffLenUsed) == Alx_Ok);
 
 		// Clear
 		memset(me->buff, 0, me->buffLen);
-		me->buffWriteMsgLen = 0;
+		me->buffLenUsed = 0;
 	}
 
 
@@ -134,22 +134,59 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			if (strcmp(me->buff, "help\r\n") == 0)
 			{
-				// Trace
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "help         Get all available commands and their descriptions\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "reset        Trigger device reset\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "id           Get device ID info\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get          Get all device properties\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-param    Get all device parameters\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-var      Get all device variables\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-flag     Get all device flags\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-const    Get all device constants\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "get-trig     Get all device triggers\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "set-param    Set specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\r\n") == Alx_Ok);
+				//------------------------------------------------------------------------------
+				// JSON Header
+				//------------------------------------------------------------------------------
+				strcpy
+				(
+					me->buff,
+					"{\r\n"
+					"    \"status\":\"success\",\r\n"
+					"    \"data\":\r\n"
+					"    {\r\n"
+				);
 
-				// Callback
-				AlxCli_Help_Callback(me);
 
+				//------------------------------------------------------------------------------
+				// JSON Body
+				//------------------------------------------------------------------------------
+				strcat(me->buff, "        \"help\":\"Help Command - Gets CLI help info\",\r\n");
+				strcat(me->buff, "        \"reset\":\"Reset Command - Triggers device reset\",\r\n");
+				strcat(me->buff, "        \"id\":\"ID Command - Gets device ID info\",\r\n");
+				strcat(me->buff, "        \"get\":\"Get Command - Gets device properties\",\r\n");
+				strcat(me->buff, "        \"get-param\":\"Get Parameters Command - Gets device parameters\",\r\n");
+				strcat(me->buff, "        \"get-var\":\"Get Variables Command - Gets device variables\",\r\n");
+				strcat(me->buff, "        \"get-flag\":\"Get Flags Command - Gets device flags\",\r\n");
+				strcat(me->buff, "        \"get-const\":\"Get Constants Command - Gets device constants\",\r\n");
+				strcat(me->buff, "        \"get-trig\":\"Get Triggers Command - Gets device triggers\",\r\n");
+				strcat(me->buff, "        \"set-param\":\"Set Parameter Command - Sets specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\"");
+				bool isImplemented = AlxCli_Help_Callback(me);
+				if (isImplemented == false)
+				{
+					strcat(me->buff, "\r\n");
+				}
+
+
+				//------------------------------------------------------------------------------
+				// JSON Footer
+				//------------------------------------------------------------------------------
+				strcat
+				(
+					me->buff,
+					"    }\r\n"
+					"}\r\n"
+				);
+
+
+				//------------------------------------------------------------------------------
+				// Send Response
+				//------------------------------------------------------------------------------
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+
+
+				//------------------------------------------------------------------------------
 				// Break
+				//------------------------------------------------------------------------------
 				break;
 			}
 
@@ -160,7 +197,7 @@ void AlxCli_Handle(AlxCli* me)
 			if (strcmp(me->buff, "reset\r\n") == 0)
 			{
 				// Prepare response
-				AlxCli_PrepResp_Success(me);
+				AlxCli_PrepareResponse(me, AlxCli_ResponseType_Success);
 
 				// Send response
 				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
@@ -247,7 +284,8 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomName,
 							hwBomVerStr,
 							hwId,
-							hwMcuUniqueIdStr);
+							hwMcuUniqueIdStr
+						);
 					}
 					else
 					{
@@ -283,7 +321,8 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomName,
 							hwBomVerStr,
 							hwId,
-							hwMcuUniqueIdStr);
+							hwMcuUniqueIdStr
+						);
 					}
 				}
 				else
@@ -330,7 +369,8 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomName,
 							hwBomVerStr,
 							hwId,
-							hwMcuUniqueIdStr);
+							hwMcuUniqueIdStr
+						);
 					}
 					else
 					{
@@ -366,7 +406,8 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomName,
 							hwBomVerStr,
 							hwId,
-							hwMcuUniqueIdStr);
+							hwMcuUniqueIdStr
+						);
 					}
 				}
 
@@ -444,12 +485,6 @@ void AlxCli_Handle(AlxCli* me)
 			if (strncmp(me->buff, "set-param", strlen("set-param")) == 0)
 			{
 				//------------------------------------------------------------------------------
-				// Local Variables
-				//------------------------------------------------------------------------------
-				Alx_Status status = Alx_Err;
-
-
-				//------------------------------------------------------------------------------
 				// Handle
 				//------------------------------------------------------------------------------
 				while (1)
@@ -467,7 +502,7 @@ void AlxCli_Handle(AlxCli* me)
 						val);
 					if (sscanfStatus != 2)
 					{
-						status = Alx_Err;
+						AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrArg);
 						break;
 					}
 
@@ -475,26 +510,19 @@ void AlxCli_Handle(AlxCli* me)
 					//------------------------------------------------------------------------------
 					// Set
 					//------------------------------------------------------------------------------
-					status = AlxParamMgmt_ByKey_SetVal_StrFormat(me->alxParamMgmt, key, val);
+					Alx_Status status = AlxParamMgmt_ByKey_SetVal_StrFormat(me->alxParamMgmt, key, val);
+					if (status != Alx_Ok)
+					{
+						AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrArg);
+						break;
+					}
 
 
 					//------------------------------------------------------------------------------
 					// Break
 					//------------------------------------------------------------------------------
+					AlxCli_PrepareResponse(me, AlxCli_ResponseType_Success);
 					break;
-				}
-
-
-				//------------------------------------------------------------------------------
-				// Prepare Response
-				//------------------------------------------------------------------------------
-				if (status == Alx_Ok)
-				{
-					AlxCli_PrepResp_Success(me);
-				}
-				else
-				{
-					AlxCli_PrepResp_ErrArg(me);
 				}
 
 
@@ -529,7 +557,7 @@ void AlxCli_Handle(AlxCli* me)
 			AlxSerialPort_FlushRxFifo(me->alxSerialPort);
 
 			// Prepare response
-			AlxCli_PrepResp_ErrCmd(me);
+			AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrCmd);
 
 			// Send response
 			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
@@ -545,82 +573,115 @@ void AlxCli_Handle(AlxCli* me)
 	//------------------------------------------------------------------------------
 	memset(me->buff, 0, me->buffLen);
 }
-void AlxCli_PrepMsg(AlxCli* me, const uint8_t* data, uint32_t len)
+void AlxCli_PrepareEvent(AlxCli* me, const uint8_t* data, uint32_t len)
 {
+	// Assert
+	ALX_CLI_ASSERT(me->wasCtorCalled == true);
+
+	// Set
 	memcpy(me->buff, data, len);
-	me->buffWriteMsgLen = len;
+	me->buffLenUsed = len;
 }
-void AlxCli_PrepResp_Success(AlxCli* me)
+void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 {
-	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_CLI_ASSERT(me->wasCtorCalled == true);
+
+
+	//------------------------------------------------------------------------------
+	// Prepare
+	//------------------------------------------------------------------------------
+	const char* statusStr = "";
+	const char* messageStr = "";
+	if (responseType == AlxCli_ResponseType_Success)
 	{
-		strcpy
-		(
-			me->buff,
-			"{\r\n"
-			"    \"status\":\"success\"\r\n"
-			"}\r\n"
-		);
+		statusStr = "success";
+		messageStr = NULL;
+	}
+	else if (responseType == AlxCli_ResponseType_ErrCmd)
+	{
+		statusStr = "error";
+		messageStr = "Command invalid";
+	}
+	else if (responseType == AlxCli_ResponseType_ErrArg)
+	{
+		statusStr = "error";
+		messageStr = "Arguments invalid";
+	}
+	else if (responseType == AlxCli_ResponseType_ErrCrc)
+	{
+		statusStr = "error";
+		messageStr = "CRC mismatch";
+	}
+	else if (responseType == AlxCli_ResponseType_ErrTimeout)
+	{
+		statusStr = "error";
+		messageStr = "Command timeout";
 	}
 	else
 	{
-		strcpy
-		(
-			me->buff,
-			"{"
-				"\"status\":\"success\""
-			"}\r\n"
-		);
+		ALX_CLI_ASSERT(false);	// We shouldn't get here
 	}
-}
-void AlxCli_PrepResp_ErrCmd(AlxCli* me)
-{
+
+
+	//------------------------------------------------------------------------------
+	// Set
+	//------------------------------------------------------------------------------
 	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 	{
-		strcpy
-		(
-			me->buff,
-			"{\r\n"
-			"    \"status\":\"error\",\r\n"
-			"    \"message\":\"Command invalid\"\r\n"
-			"}\r\n"
-		);
+		if (messageStr == NULL)
+		{
+			sprintf
+			(
+				me->buff,
+				"{\r\n"
+				"    \"status\":\"%s\"\r\n"
+				"}\r\n",
+				statusStr
+			);
+		}
+		else
+		{
+			sprintf
+			(
+				me->buff,
+				"{\r\n"
+				"    \"status\":\"%s\",\r\n"
+				"    \"message\":\"%s\"\r\n"
+				"}\r\n",
+				statusStr,
+				messageStr
+			);
+		}
 	}
 	else
 	{
-		strcpy
-		(
-			me->buff,
-			"{"
-				"\"status\":\"error\","
-				"\"message\":\"Command invalid\""
-			"}\r\n"
-		);
-	}
-}
-void AlxCli_PrepResp_ErrArg(AlxCli* me)
-{
-	if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
-	{
-		strcpy
-		(
-			me->buff,
-			"{\r\n"
-			"    \"status\":\"error\",\r\n"
-			"    \"message\":\"Arguments invalid\"\r\n"
-			"}\r\n"
-		);
-	}
-	else
-	{
-		strcpy
-		(
-			me->buff,
-			"{"
-				"\"status\":\"error\","
-				"\"message\":\"Arguments invalid\""
-			"}\r\n"
-		);
+		if (messageStr == NULL)
+		{
+			sprintf
+			(
+				me->buff,
+				"{"
+					"\"status\":\"%s\""
+				"}\r\n",
+				statusStr
+			);
+		}
+		else
+		{
+			sprintf
+			(
+				me->buff,
+				"{"
+					"\"status\":\"%s\","
+					"\"message\":\"%s\""
+				"}\r\n",
+				statusStr,
+				messageStr
+			);
+		}
 	}
 }
 
@@ -795,9 +856,10 @@ ALX_WEAK bool AlxCli_Handle_Callback(AlxCli* me)
 	(void)me;
 	return false;
 }
-ALX_WEAK void AlxCli_Help_Callback(AlxCli* me)
+ALX_WEAK bool AlxCli_Help_Callback(AlxCli* me)
 {
 	(void)me;
+	return false;
 }
 
 
