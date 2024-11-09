@@ -488,12 +488,12 @@ void AlxNet_Ctor
 
 typedef enum
 {
-	State_ModemGoOff,
-	State_ModemOff,
-	State_ModemOn,
-	State_SimOk,
-	State_ModemRegistered,
-	State_ModemConnected
+	State_ModemGoOff,		// cleanup, power off
+	State_ModemOff,			// power on auto-bauding, setup
+	State_ModemOn,			// check SIM
+	State_SimOk,			// register to network
+	State_ModemRegistered,	// open data connection
+	State_ModemConnected	// querry data connection state, rssi
 } ConenctionStateType;
 
 typedef enum
@@ -550,6 +550,7 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 				{
 					ALX_NET_TRACE_INF(("Cellular SIM failure"));
 					connection_state = State_ModemGoOff;
+					break;
 				}
 
 				if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_SIM_TIMEOUT)
@@ -979,14 +980,17 @@ bool AlxNet_IsConnected(AlxNet* me)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 
 #if defined(ALX_WIZNET)
-	if (!me->isNetConnected)
+	if (me->config == AlxNet_Config_Wiznet)
 	{
-		AlxNet_Connect(me);
-		AlxNet_SetMac(me, saved_mac);
-		AlxNet_SetIp(me, saved_ip);
-		AlxNet_SetGateway(me, saved_gateway);
-		AlxNet_SetNetmask(me, saved_netmask);
-		memcpy(me->dns, saved_dns, sizeof(me->dns));
+		if (!me->isNetConnected)
+		{
+			AlxNet_Connect(me);
+			AlxNet_SetMac(me, saved_mac);
+			AlxNet_SetIp(me, saved_ip);
+			AlxNet_SetGateway(me, saved_gateway);
+			AlxNet_SetNetmask(me, saved_netmask);
+			memcpy(me->dns, saved_dns, sizeof(me->dns));
+		}
 	}
 #endif
 
@@ -1201,6 +1205,7 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 	ALX_NET_ASSERT(strlen(hostname) < sizeof(dns_target_domain));
 
+	#if defined(ALX_WIZNET)
 	if (me->config == AlxNet_Config_Wiznet)
 	{
 		AlxOsMutex_Lock(&me->alxMutex);
@@ -1228,14 +1233,18 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 		}
 		AlxOsMutex_Unlock(&me->alxMutex);
 	}
+	#endif
 
 	#if defined(ALX_FREE_RTOS_CELLULAR)
-	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	if (me->isNetConnected)
 	{
-		CellularError_t ret;
-		ret = Cellular_GetHostByName(me->cellular.handle, me->cellular.cellularContext, hostname, ip);
-		if (ret != CELLULAR_SUCCESS) return Alx_Err;
-		else return Alx_Ok;
+		if (me->config == AlxNet_Config_FreeRtos_Cellular)
+		{
+			CellularError_t ret;
+			ret = Cellular_GetHostByName(me->cellular.handle, me->cellular.cellularContext, hostname, ip);
+			if (ret != CELLULAR_SUCCESS) return Alx_Err;
+			else return Alx_Ok;
+		}
 	}
 	#endif
 
