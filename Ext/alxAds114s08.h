@@ -76,7 +76,7 @@ extern "C" {
 #if defined(ALX_ADS114S08_TRACE_ENABLE)
 	#define ALX_ADS114S08_TRACE(...) ALX_TRACE_WRN(ALX_ADS114S08_FILE, __VA_ARGS__)
 #else
-	#define ALX_ADS114S08_TRACE(...) do{} while (false))
+	#define ALX_ADS114S08_TRACE(...) do{} while (false)
 #endif
 
 
