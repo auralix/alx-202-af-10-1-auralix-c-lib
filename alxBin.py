@@ -35,22 +35,43 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, fwName, binRawAndBinSignedCopyEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr):
+def Script(vsTargetPath, fwName, binRawBinSignedManifestCopyEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr):
+	#-------------------------------------------------------------------------------
 	# Print
+	#-------------------------------------------------------------------------------
 	print("")
-	print("alxBin.py - START")
+	print(f"alxBin.py - START: vsTargetPath {vsTargetPath} fwName {fwName} binRawBinSignedManifestCopyEnable {binRawBinSignedManifestCopyEnable} bootHdrFileGenEnable {bootHdrFileGenEnable} bootHdrFileLenHexStr {bootHdrFileLenHexStr}")
 
-	# Read input file
+
+	#-------------------------------------------------------------------------------
+	# Read alxBuild_GENERATED.h
+	#-------------------------------------------------------------------------------
+
+	# Print
+	print("DO: Read alxBuild_GENERATED.h")
+
+	# Read build file
 	inFilePath = pathlib.Path("alxBuild_GENERATED.h")
 	inFileText = inFilePath.read_text()
 	inFileLines = inFileText.splitlines()
 
-	# Parse input file
+	# Parse build file
 	date = inFileLines[5][23:]
 	hashShort = inFileLines[8][30:37]
 	fwVerMajor = inFileLines[11][31:]
 	fwVerMinor = inFileLines[12][31:]
 	fwVerPatch = inFileLines[13][31:]
+
+	# Print
+	print("DONE: Read alxBuild_GENERATED.h")
+
+
+	#-------------------------------------------------------------------------------
+	# Generate Destination Directory & .bin
+	#-------------------------------------------------------------------------------
+
+	# Print
+	print("DO: Generate Destination Directory & .bin")
 
 	# Set source bin variables
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix(".bin")
@@ -73,27 +94,45 @@ def Script(vsTargetPath, fwName, binRawAndBinSignedCopyEnable, bootHdrFileGenEna
 
 	# Print
 	print("Generated: " + binDstName)
+	print("DONE: Generate Destination Directory & .bin")
 
-	# If bin _Raw & _Signed copy enabled
-	if binRawAndBinSignedCopyEnable == "True":
-		# Set source bin variables
+
+	#-------------------------------------------------------------------------------
+	# Generate _Raw.bin & _Signed.bin & _Manifest.json
+	#-------------------------------------------------------------------------------
+	if binRawBinSignedManifestCopyEnable == "True":
+		# Print
+		print("DO: Generate _Raw.bin & _Signed.bin & _Manifest.json")
+
+		# Set source variables
 		binRawSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Raw' + binSrcPath.suffix)
 		binSignedSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Signed' + binSrcPath.suffix)
+		manifestSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Manifest.json')
 
-		# Set destination bin variables
+		# Set destination variables
 		binRawDstName = binDstDirName + "_Raw.bin"
 		binSignedDstName = binDstDirName + "_Signed.bin"
+		manifestDstName = binDstDirName + "_Manifest.json"
 
-		# Copy source bin to destination bin directory & rename it to destination bin
+		# Copy source files to destination files directory & rename it to destination files
 		shutil.copy2(binRawSrcPath, binDstDir / binRawDstName)
 		shutil.copy2(binSignedSrcPath, binDstDir / binSignedDstName)
+		shutil.copy2(manifestSrcPath, binDstDir / manifestDstName)
 
 		# Print
 		print("Generated: " + binRawDstName)
 		print("Generated: " + binSignedDstName)
+		print("Generated: " + manifestDstName)
+		print("DONE: Generate _Raw.bin & _Signed.bin & _Manifest.json")
 
-	# If bootloader header file generation enabled
+
+	#-------------------------------------------------------------------------------
+	# Generate Bootloader Header File
+	#-------------------------------------------------------------------------------
 	if bootHdrFileGenEnable == "True":
+		# Print
+		print("DO: Generate Bootloader Header File")
+
 		# Read bin
 		binData = binSrcPath.read_bytes()
 		binLen = len(binData)
@@ -133,8 +172,12 @@ static const unsigned char boot[{bootHdrFileLenHexStr}] __attribute__((section("
 
 		# Print
 		print("Generated: " + bootHdrDstName)
+		print("DONE: Generate Bootloader Header File")
 
+
+	#-------------------------------------------------------------------------------
 	# Print
+	#-------------------------------------------------------------------------------
 	print("alxBin.py - FINISH")
 	print("")
 
@@ -147,9 +190,9 @@ if __name__ == "__main__":
 	vsTargetPath = sys.argv[1]
 	fwName = sys.argv[2]
 	if len(sys.argv) > 3:
-		binRawAndBinSignedCopyEnable = sys.argv[3]
+		binRawBinSignedManifestCopyEnable = sys.argv[3]
 	else:
-		binRawAndBinSignedCopyEnable = "False"
+		binRawBinSignedManifestCopyEnable = "False"
 	if len(sys.argv) > 4:
 		bootHdrFileGenEnable = sys.argv[4]
 		bootHdrFileLenHexStr = sys.argv[5]
@@ -158,4 +201,4 @@ if __name__ == "__main__":
 		bootHdrFileLenHexStr = "0x00000000"
 
 	# Script
-	Script(vsTargetPath, fwName, binRawAndBinSignedCopyEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr)
+	Script(vsTargetPath, fwName, binRawBinSignedManifestCopyEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr)

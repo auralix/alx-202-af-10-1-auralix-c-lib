@@ -43,11 +43,11 @@ def Script(vsSolDir):
 
 	# Set gitDir
 	gitDir = pathlib.Path(vsSolDir).parent
-	print("alxBuild.py - gitDir: " + str(gitDir))
+	print("gitDir: " + str(gitDir))
 
 	# Set build date
 	date = datetime.datetime.now().strftime("%y%m%d%H%M")
-	print("alxBuild.py - buildDate: " + date)
+	print("buildDate: " + date)
 
 	# Set build hash from GIT hash
 	cmdHash = "git --git-dir=" + str(gitDir) + "\.git rev-parse HEAD"
@@ -55,14 +55,14 @@ def Script(vsSolDir):
 	if cmdHashCompletedObj.returncode == 0:
 		_hash = cmdHashCompletedObj.stdout.decode().rstrip('\n')
 	else:
-		print("alxBuild.py - Not a GIT repo, hash could not be set")
+		print("Not a GIT repo, hash could not be set")
 		_hash = "abcdefabcdefabcdefabcdefabcdefabcdefabcd"
 	hashShort = _hash[0:7]
 	hashShortUint32 = int(hashShort, 16)
 	hashShortUint32Str = "0x{0:08X}".format(hashShortUint32)
-	print("alxBuild.py - buildHash: " + _hash)
-	print("alxBuild.py - buildHashShort: " + hashShort)
-	print("alxBuild.py - buildHashShortUint32: " + hashShortUint32Str)
+	print("buildHash: " + _hash)
+	print("buildHashShort: " + hashShort)
+	print("buildHashShortUint32: " + hashShortUint32Str)
 
 	# Try to set FW version from GIT tag
 	try:
@@ -85,17 +85,17 @@ def Script(vsSolDir):
 		if (fwVerMajor > 255) or (fwVerMinor > 255) or (fwVerPatch > 255):
 			raise
 	except:
-		print("alxBuild.py - fwVer: No valid GIT tag, FW version could not be set")
+		print("fwVer: No valid GIT tag, FW version could not be set")
 		tag ="v0.0.0"
 		fwVerMajorStr = "0"
 		fwVerMinorStr = "0"
 		fwVerPatchStr = "0"
 
 	# Print
-	print("alxBuild.py - buildTag: " + tag)
-	print("alxBuild.py - fwVerMajor: " + fwVerMajorStr)
-	print("alxBuild.py - fwVerMinor: " + fwVerMinorStr)
-	print("alxBuild.py - fwVerPatch: " + fwVerPatchStr)
+	print("buildTag: " + tag)
+	print("fwVerMajor: " + fwVerMajorStr)
+	print("fwVerMinor: " + fwVerMinorStr)
+	print("fwVerPatch: " + fwVerPatchStr)
 
 	# Prepare output file text
 	outFileText = """#ifndef ALX_BUILD_GENERATED_H
@@ -120,7 +120,7 @@ def Script(vsSolDir):
 	# Write output file text
 	outFilePath = pathlib.Path("alxBuild_GENERATED.h")
 	outFilePath.write_text(outFileText)
-	print("alxBuild.py - Generated: alxBuild_GENERATED.h")
+	print("Generated: alxBuild_GENERATED.h")
 
 	# Print
 	print("alxBuild.py - FINISH")

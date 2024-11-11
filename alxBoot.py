@@ -30,27 +30,50 @@
 import pathlib
 import sys
 import subprocess
+import json
+import hashlib
 
 
 #*******************************************************************************
 # Script
 #*******************************************************************************
 def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
+	#-------------------------------------------------------------------------------
 	# Print
+	#-------------------------------------------------------------------------------
 	print("")
-	print("alxBoot.py - START")
+	print(f"alxBoot.py - START: vsTargetPath {vsTargetPath} imgSlotLenHexStr {imgSlotLenHexStr} bootLenHexStr {bootLenHexStr}")
 
-	# Read input file
+
+	#-------------------------------------------------------------------------------
+	# Read alxBuild_GENERATED.h
+	#-------------------------------------------------------------------------------
+
+	# Print
+	print("DO: Read alxBuild_GENERATED.h")
+
+	# Read build file
 	inFilePath = pathlib.Path("alxBuild_GENERATED.h")
 	inFileText = inFilePath.read_text()
 	inFileLines = inFileText.splitlines()
 
-	# Parse input file
+	# Parse build file
 	date = inFileLines[5][23:]
 	hashShort = inFileLines[8][30:37]
 	fwVerMajor = inFileLines[11][31:]
 	fwVerMinor = inFileLines[12][31:]
 	fwVerPatch = inFileLines[13][31:]
+
+	# Print
+	print("DONE: Read alxBuild_GENERATED.h")
+
+
+	#-------------------------------------------------------------------------------
+	# Read Source .bin
+	#-------------------------------------------------------------------------------
+
+	# Print
+	print("DO: Read Source .bin")
 
 	# Set lengths
 	bootLen = int(bootLenHexStr, 16)
@@ -69,6 +92,17 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	appEndOffset = binLen - trailerLen
 	appData = binData[appStartOffset:appEndOffset]
 	appDataLen = len(appData)
+
+	# Print
+	print("DONE: Read Source .bin")
+
+
+	#-------------------------------------------------------------------------------
+	# Generate _Raw.bin & _Signed.bin
+	#-------------------------------------------------------------------------------
+
+	# Print
+	print("DO: Generate _Raw.bin & _Signed.bin")
 
 	# Write extracted application data to raw bin
 	binRawPath = binSrcPath.with_name(binSrcPath.stem + '_Raw' + binSrcPath.suffix)
@@ -106,8 +140,49 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	print(cmdCompletedObj.stdout)
 	print(cmdCompletedObj.stderr, file=sys.stderr)
 
+	# Print
+	print("DONE: Generate _Raw.bin & _Signed.bin")
+
+
+	#-------------------------------------------------------------------------------
+	# Generate _Manifest.json
+	#-------------------------------------------------------------------------------
+
+	# Print
+	print("DO: Generate _Manifest.json")
+
 	# Read signed bin
 	binSignedData = binSignedPath.read_bytes()
+
+	# Prepare manifest file variables
+	manifestVer = int(date)
+	manifestSize = len(binSignedData)
+	manifestHashObj = hashlib.sha256(binSignedData)
+	manifestHashStr = manifestHashObj.hexdigest().upper()
+	manifestPath = binSrcPath.with_name(binSrcPath.stem + '_Manifest.json')
+
+	# Prepare manifest file text
+	manifestDict = {
+		"ver": manifestVer,
+		"size": manifestSize,
+		"hash": manifestHashStr,
+		"url": "/api/v1/NEMO/fw-update/get-bin"
+	}
+	manifestJsonObj = json.dumps(manifestDict, indent=4)
+
+	# Write manifest file text
+	manifestPath.write_text(manifestJsonObj)
+
+	# Print
+	print("DONE: Generate _Manifest.json")
+
+
+	#-------------------------------------------------------------------------------
+	# Generate alxBootMetadata_GENERATED.h
+	#-------------------------------------------------------------------------------
+
+	# Print
+	print("DO: Generate alxBootMetadata_GENERATED.h")
 
 	# Extract signed bin header & trailer
 	binSignedHeader = binSignedData[:headerLen]
@@ -138,6 +213,12 @@ static const unsigned char app_trailer[{trailerLenStr}] __attribute__((section("
 	binSignedHeaderTrailerPath.write_text(binSignedHeaderTrailerText)
 
 	# Print
+	print("DONE: Generate alxBootMetadata_GENERATED.h")
+
+
+	#-------------------------------------------------------------------------------
+	# Print
+	#-------------------------------------------------------------------------------
 	print("alxBoot.py - FINISH")
 	print("")
 
