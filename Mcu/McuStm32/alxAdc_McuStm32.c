@@ -103,7 +103,6 @@ void AlxAdc_Ctor
 	// Assert
 	//------------------------------------------------------------------------------
 	(void)me;
-	ALX_ADC_ASSERT(adc == ADC1);							// Currently only ADC1 is supported
 	(void)ioPinArr;
 	ALX_ADC_ASSERT(numOfIoPins <= ALX_ADC_BUFF_LEN - 1);	// We have only 16 ranks, one is used for VrefInt
 	(void)chArr;
@@ -274,6 +273,18 @@ void AlxAdc_Ctor
 		me->dma = DMA2;
 		me->hdma.Instance = DMA2_Stream0;
 		me->hdma.Init.Channel = DMA_CHANNEL_0;
+	}
+	if (me->hadc.Instance == ADC2) // JS: not tested
+	{
+		me->dma = DMA2;
+		me->hdma.Instance = DMA2_Stream2;
+		me->hdma.Init.Channel = DMA_CHANNEL_1;
+	}
+	if (me->hadc.Instance == ADC3)
+	{
+		me->dma = DMA2;
+		me->hdma.Instance = DMA2_Stream1;
+		me->hdma.Init.Channel = DMA_CHANNEL_2;
 	}
 	me->hdma.Init.Direction = DMA_PERIPH_TO_MEMORY;
 	me->hdma.Init.PeriphInc = DMA_PINC_DISABLE;
@@ -652,7 +663,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxAdc_DeInit(AlxAdc* me)
+Alx_Status AlxAdc_DeInit(AlxAdc* me)// JS: zasvijaril z ADC2 in ADC3 (če se oboje uporablja)
 {
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
