@@ -663,7 +663,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxAdc_DeInit(AlxAdc* me)// JS: zasvijaril z ADC2 in ADC3 (če se oboje uporablja)
+Alx_Status AlxAdc_DeInit(AlxAdc* me)// JS: if using ADC1 with combination of ADC2 or. ADC3 there is bug with disable Dma for all ADCs if only deinit one of the ADCs.
 {
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
