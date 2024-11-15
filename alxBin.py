@@ -35,12 +35,12 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, fwName, binRawBinSignedManifestCopyEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr):
+def Script(vsTargetPath, fwName, addFwUpNoBoot2Enable, binRawBinSignedManifestGenEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr):
 	#-------------------------------------------------------------------------------
 	# Print
 	#-------------------------------------------------------------------------------
 	print("")
-	print(f"alxBin.py - START: vsTargetPath {vsTargetPath} fwName {fwName} binRawBinSignedManifestCopyEnable {binRawBinSignedManifestCopyEnable} bootHdrFileGenEnable {bootHdrFileGenEnable} bootHdrFileLenHexStr {bootHdrFileLenHexStr}")
+	print(f"alxBin.py - START: vsTargetPath {vsTargetPath} fwName {fwName} addFwUpNoBoot2Enable {addFwUpNoBoot2Enable} binRawBinSignedManifestGenEnable {binRawBinSignedManifestGenEnable} bootHdrFileGenEnable {bootHdrFileGenEnable} bootHdrFileLenHexStr {bootHdrFileLenHexStr}")
 
 
 	#-------------------------------------------------------------------------------
@@ -76,6 +76,7 @@ def Script(vsTargetPath, fwName, binRawBinSignedManifestCopyEnable, bootHdrFileG
 	# Set source bin variables
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix(".bin")
 	binSrcDir = binSrcPath.parent
+	binSrcDirName = binSrcDir.name
 
 	# Set fwArtf
 	fwArtf = binSrcPath.stem
@@ -83,7 +84,10 @@ def Script(vsTargetPath, fwName, binRawBinSignedManifestCopyEnable, bootHdrFileG
 	# Set destination bin variables
 	binDstDirName = date + "_" + fwArtf + "_" + fwName + "_" + "V" + fwVerMajor + "-" + fwVerMinor + "-" + fwVerPatch + "_" + hashShort
 	binDstDir = binSrcDir / binDstDirName
-	binDstName = binDstDirName + ".bin"
+	if binSrcDirName == 'NoBoot' or binSrcDirName == 'NoBoot2':
+		binDstName = binDstDirName + "_NoBoot.bin"
+	else:
+		binDstName = binDstDirName + ".bin"
 
 	# Create clean directory for destination bin
 	shutil.rmtree(binDstDir, ignore_errors=True)
@@ -98,9 +102,40 @@ def Script(vsTargetPath, fwName, binRawBinSignedManifestCopyEnable, bootHdrFileG
 
 
 	#-------------------------------------------------------------------------------
+	# Add FwUp & NoBoot2 Files to Destination
+	#-------------------------------------------------------------------------------
+	if addFwUpNoBoot2Enable == "True":
+		# Print
+		print("DO: Add FwUp & NoBoot2 Files to Destination")
+
+		# Set source variables
+		fwUpSrcDir = binSrcDir.parent / 'FwUp' / binDstDirName
+		noBoot2SrcDir = binSrcDir.parent / 'NoBoot2' / binDstDirName
+
+		fwUpBinSignedSrcName = binDstDirName + '_Signed.bin'
+		fwUpManifestSrcName = binDstDirName + '_Manifest.json'
+		noBoot2BinSrcName = binDstDirName + '_NoBoot.bin'
+
+		fwUpBinSignedSrcPath = fwUpSrcDir / fwUpBinSignedSrcName
+		fwUpManifestSrcPath = fwUpSrcDir / fwUpManifestSrcName
+		noBoot2BinSrcPath = noBoot2SrcDir / noBoot2BinSrcName
+
+		# Copy source files to destination files directory
+		shutil.copy2(fwUpBinSignedSrcPath, binDstDir)
+		shutil.copy2(fwUpManifestSrcPath, binDstDir)
+		shutil.copy2(noBoot2BinSrcPath, binDstDir)
+
+		# Print
+		print("Added: " + fwUpBinSignedSrcName)
+		print("Added: " + fwUpManifestSrcName)
+		print("Added: " + noBoot2BinSrcName)
+		print("DONE: Add FwUp & NoBoot2 Files to Destination")
+
+
+	#-------------------------------------------------------------------------------
 	# Generate _Raw.bin & _Signed.bin & _Manifest.json
 	#-------------------------------------------------------------------------------
-	if binRawBinSignedManifestCopyEnable == "True":
+	if binRawBinSignedManifestGenEnable == "True":
 		# Print
 		print("DO: Generate _Raw.bin & _Signed.bin & _Manifest.json")
 
@@ -190,15 +225,19 @@ if __name__ == "__main__":
 	vsTargetPath = sys.argv[1]
 	fwName = sys.argv[2]
 	if len(sys.argv) > 3:
-		binRawBinSignedManifestCopyEnable = sys.argv[3]
+		addFwUpNoBoot2Enable = sys.argv[3]
 	else:
-		binRawBinSignedManifestCopyEnable = "False"
+		binRawBinSignedManifestGenEnable = "False"
 	if len(sys.argv) > 4:
-		bootHdrFileGenEnable = sys.argv[4]
-		bootHdrFileLenHexStr = sys.argv[5]
+		binRawBinSignedManifestGenEnable = sys.argv[4]
+	else:
+		binRawBinSignedManifestGenEnable = "False"
+	if len(sys.argv) > 5:
+		bootHdrFileGenEnable = sys.argv[5]
+		bootHdrFileLenHexStr = sys.argv[6]
 	else:
 		bootHdrFileGenEnable = "False"
 		bootHdrFileLenHexStr = "0x00000000"
 
 	# Script
-	Script(vsTargetPath, fwName, binRawBinSignedManifestCopyEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr)
+	Script(vsTargetPath, fwName, addFwUpNoBoot2Enable, binRawBinSignedManifestGenEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr)
