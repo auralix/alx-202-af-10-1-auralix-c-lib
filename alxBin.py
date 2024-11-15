@@ -227,7 +227,7 @@ if __name__ == "__main__":
 	if len(sys.argv) > 3:
 		addFwUpNoBoot2Enable = sys.argv[3]
 	else:
-		binRawBinSignedManifestGenEnable = "False"
+		addFwUpNoBoot2Enable = "False"
 	if len(sys.argv) > 4:
 		binRawBinSignedManifestGenEnable = sys.argv[4]
 	else:
