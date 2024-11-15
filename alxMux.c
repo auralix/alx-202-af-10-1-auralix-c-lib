@@ -43,22 +43,22 @@
 void AlxMux_Ctor
 (
 	AlxMux* me,
+	AlxIoPin* do_nEN,
 	AlxIoPin** ioPinArr,
-	uint8_t ioPinArrLen,
-	AlxMux_CodeType codeType
+	uint8_t ioPinArrLen
 )
 {
 	// Assert
 	ALX_MUX_ASSERT(ioPinArrLen <= ALX_MUX_IO_PIN_VAL_ARR_LEN);
 
 	// Parameters
+	me->do_nEN = do_nEN;
 	me->ioPinArr = ioPinArr;
 	me->ioPinArrLen = ioPinArrLen;
-	me->codeType = codeType;
+
 
 	// Variables
 	memset(me->ioPinValArr, 0, sizeof(me->ioPinValArr));
-	me->code = 0;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -69,7 +69,7 @@ void AlxMux_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxMux_Init(AlxMux* me)
+Alx_Status AlxMux_Init(AlxMux* me)
 {
 	// Assert
 	ALX_MUX_ASSERT(me->wasCtorCalled == true);
@@ -80,11 +80,15 @@ void AlxMux_Init(AlxMux* me)
 	{
 		AlxIoPin_Init((*(me->ioPinArr + i)));
 	}
+	AlxIoPin_Init(me->do_nEN);
 
 	// Set isInit
 	me->isInit = true;
+
+	// Return
+	return Alx_Ok;
 }
-void AlxMux_DeInit(AlxMux* me)
+Alx_Status AlxMux_DeInit(AlxMux* me)
 {
 	// Assert
 	ALX_MUX_ASSERT(me->wasCtorCalled == true);
@@ -95,11 +99,15 @@ void AlxMux_DeInit(AlxMux* me)
 	{
 		AlxIoPin_DeInit((*(me->ioPinArr + i)));
 	}
+	AlxIoPin_DeInit(me->do_nEN);
 
 	// Clear isInit
 	me->isInit = false;
+
+	// Return
+	return Alx_Ok;
 }
-uint32_t AlxMux_GetCode(AlxMux* me)
+void AlxMux_Enable(AlxMux* me, bool enable)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -109,45 +117,40 @@ uint32_t AlxMux_GetCode(AlxMux* me)
 
 
 	//------------------------------------------------------------------------------
-	// Get
+	// Set
 	//------------------------------------------------------------------------------
-	for (uint32_t i = 0; i < me->ioPinArrLen; i++)
+	if (enable == true)
 	{
-		me->ioPinValArr[i] = AlxIoPin_Read((*(me->ioPinArr + i)));
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Calculate
-	//------------------------------------------------------------------------------
-	me->code = 0;
-	if (me->codeType == AlxMux_CodeType_Real)
-	{
-		for (uint32_t i = 0; i < me->ioPinArrLen; i++)
-		{
-			me->code = me->code + (uint32_t)me->ioPinValArr[i] * (uint32_t)(1 << i);	// TV: For size optimization we use bitwise shifting to compute 2^i
-		}
-	}
-	else if (me->codeType == AlxMux_CodeType_Complement)
-	{
-		// TV: TODO
-		ALX_MUX_ASSERT(false);
-	}
-	else if (me->codeType == AlxMux_CodeType_Gray)
-	{
-		// TV: TODO
-		ALX_MUX_ASSERT(false);
+		AlxIoPin_Reset(me->do_nEN);
 	}
 	else
 	{
-		ALX_MUX_ASSERT(false);	// We should not get here
+		AlxIoPin_Set(me->do_nEN);
 	}
+}
 
+void AlxMux_Select(AlxMux* me, Alx_Ch ch)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_MUX_ASSERT(me->wasCtorCalled == true);
+	ALX_MUX_ASSERT(me->isInit == true);
 
 	//------------------------------------------------------------------------------
-	// Return
+	// Set
 	//------------------------------------------------------------------------------
-	return me->code;
+	for (uint32_t i = 0; i < me->ioPinArrLen; i++)
+	{
+		if ((uint8_t)ch & (1 << i))
+		{
+			AlxIoPin_Set((me->ioPinArr[i]));
+		}
+		else
+		{
+			AlxIoPin_Reset((me->ioPinArr[i]));
+		}
+	}
 }
 
 
