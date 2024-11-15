@@ -35,12 +35,12 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, fwName, addFwUpNoBoot2Enable, binRawBinSignedManifestGenEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr):
+def Script(vsTargetPath, fwName, copyFwUpNoBoot2Enable, binRawBinSignedManifestGenEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr):
 	#-------------------------------------------------------------------------------
 	# Print
 	#-------------------------------------------------------------------------------
 	print("")
-	print(f"alxBin.py - START: vsTargetPath {vsTargetPath} fwName {fwName} addFwUpNoBoot2Enable {addFwUpNoBoot2Enable} binRawBinSignedManifestGenEnable {binRawBinSignedManifestGenEnable} bootHdrFileGenEnable {bootHdrFileGenEnable} bootHdrFileLenHexStr {bootHdrFileLenHexStr}")
+	print(f"alxBin.py - START: vsTargetPath {vsTargetPath} fwName {fwName} copyFwUpNoBoot2Enable {copyFwUpNoBoot2Enable} binRawBinSignedManifestGenEnable {binRawBinSignedManifestGenEnable} bootHdrFileGenEnable {bootHdrFileGenEnable} bootHdrFileLenHexStr {bootHdrFileLenHexStr}")
 
 
 	#-------------------------------------------------------------------------------
@@ -50,30 +50,30 @@ def Script(vsTargetPath, fwName, addFwUpNoBoot2Enable, binRawBinSignedManifestGe
 	# Print
 	print("DO: Read alxBuild_GENERATED.h")
 
-	# Read build file
-	inFilePath = pathlib.Path("alxBuild_GENERATED.h")
-	inFileText = inFilePath.read_text()
-	inFileLines = inFileText.splitlines()
+	# Read
+	buildFilePath = pathlib.Path("alxBuild_GENERATED.h")
+	buildFileText = buildFilePath.read_text()
+	buildFileLines = buildFileText.splitlines()
 
-	# Parse build file
-	date = inFileLines[5][23:]
-	hashShort = inFileLines[8][30:37]
-	fwVerMajor = inFileLines[11][31:]
-	fwVerMinor = inFileLines[12][31:]
-	fwVerPatch = inFileLines[13][31:]
+	# Parse
+	date = buildFileLines[5][23:]
+	hashShort = buildFileLines[8][30:37]
+	fwVerMajor = buildFileLines[11][31:]
+	fwVerMinor = buildFileLines[12][31:]
+	fwVerPatch = buildFileLines[13][31:]
 
 	# Print
 	print("DONE: Read alxBuild_GENERATED.h")
 
 
 	#-------------------------------------------------------------------------------
-	# Generate Destination Directory & .bin
+	# Generate .bin Destination Directory & .bin
 	#-------------------------------------------------------------------------------
 
 	# Print
-	print("DO: Generate Destination Directory & .bin")
+	print("DO: Generate .bin Destination Directory & .bin")
 
-	# Set source bin variables
+	# Set binSrc variables
 	binSrcPath = pathlib.Path(vsTargetPath).with_suffix(".bin")
 	binSrcDir = binSrcPath.parent
 	binSrcDirName = binSrcDir.name
@@ -81,55 +81,69 @@ def Script(vsTargetPath, fwName, addFwUpNoBoot2Enable, binRawBinSignedManifestGe
 	# Set fwArtf
 	fwArtf = binSrcPath.stem
 
-	# Set destination bin variables
+	# Set binDst variables
 	binDstDirName = date + "_" + fwArtf + "_" + fwName + "_" + "V" + fwVerMajor + "-" + fwVerMinor + "-" + fwVerPatch + "_" + hashShort
 	binDstDir = binSrcDir / binDstDirName
 	if binSrcDirName == 'NoBoot' or binSrcDirName == 'NoBoot2':
 		binDstName = binDstDirName + "_NoBoot.bin"
 	else:
 		binDstName = binDstDirName + ".bin"
+	binDstPath = binDstDir / binDstName
 
-	# Create clean directory for destination bin
+	# Create clean directory for binDst
 	shutil.rmtree(binDstDir, ignore_errors=True)
 	pathlib.Path(binDstDir).mkdir(parents=True, exist_ok=True)
 
-	# Copy source bin to destination bin directory & rename it to destination bin
-	shutil.copy2(binSrcPath, binDstDir / binDstName)
+	# Copy binSrc to binDst directory & rename it
+	shutil.copy2(binSrcPath, binDstPath)
+
+	# Set binDstArtf variables
+	binDstArtfDir = binSrcDir.parent.parent.parent / 'Artf'
+
+	# Create clean directory for binDstArtf
+	shutil.rmtree(binDstArtfDir, ignore_errors=True)
+	pathlib.Path(binDstArtfDir).mkdir(parents=True, exist_ok=True)
+
+	# Copy binDst to binDstArtf directory
+	shutil.copy2(binDstPath, binDstArtfDir)
 
 	# Print
 	print("Generated: " + binDstName)
-	print("DONE: Generate Destination Directory & .bin")
+	print("DONE: Generate .bin Destination Directory & .bin")
 
 
 	#-------------------------------------------------------------------------------
-	# Add FwUp & NoBoot2 Files to Destination
+	# Copy FwUp & NoBoot2 Files to .bin Destination Directory
 	#-------------------------------------------------------------------------------
-	if addFwUpNoBoot2Enable == "True":
+	if copyFwUpNoBoot2Enable == "True":
 		# Print
-		print("DO: Add FwUp & NoBoot2 Files to Destination")
+		print("DO: Copy FwUp & NoBoot2 Files to .bin Destination Directory")
 
-		# Set source variables
+		# Set fwUpSrc & noBoot2Src source variables
 		fwUpSrcDir = binSrcDir.parent / 'FwUp' / binDstDirName
 		noBoot2SrcDir = binSrcDir.parent / 'NoBoot2' / binDstDirName
-
 		fwUpBinSignedSrcName = binDstDirName + '_Signed.bin'
 		fwUpManifestSrcName = binDstDirName + '_Manifest.json'
 		noBoot2BinSrcName = binDstDirName + '_NoBoot.bin'
-
 		fwUpBinSignedSrcPath = fwUpSrcDir / fwUpBinSignedSrcName
 		fwUpManifestSrcPath = fwUpSrcDir / fwUpManifestSrcName
 		noBoot2BinSrcPath = noBoot2SrcDir / noBoot2BinSrcName
 
-		# Copy source files to destination files directory
+		# Copy fwUpSrc & noBoot2Src to binDst directory
 		shutil.copy2(fwUpBinSignedSrcPath, binDstDir)
 		shutil.copy2(fwUpManifestSrcPath, binDstDir)
 		shutil.copy2(noBoot2BinSrcPath, binDstDir)
+
+		# Copy fwUpSrc & noBoot2Src to binDstArtf directory
+		shutil.copy2(fwUpBinSignedSrcPath, binDstArtfDir)
+		shutil.copy2(fwUpManifestSrcPath, binDstArtfDir)
+		shutil.copy2(noBoot2BinSrcPath, binDstArtfDir)
 
 		# Print
 		print("Added: " + fwUpBinSignedSrcName)
 		print("Added: " + fwUpManifestSrcName)
 		print("Added: " + noBoot2BinSrcName)
-		print("DONE: Add FwUp & NoBoot2 Files to Destination")
+		print("DONE: Copy FwUp & NoBoot2 Files to .bin Destination Directory")
 
 
 	#-------------------------------------------------------------------------------
@@ -149,7 +163,7 @@ def Script(vsTargetPath, fwName, addFwUpNoBoot2Enable, binRawBinSignedManifestGe
 		binSignedDstName = binDstDirName + "_Signed.bin"
 		manifestDstName = binDstDirName + "_Manifest.json"
 
-		# Copy source files to destination files directory & rename it to destination files
+		# Copy source files to binDst directory & rename it
 		shutil.copy2(binRawSrcPath, binDstDir / binRawDstName)
 		shutil.copy2(binSignedSrcPath, binDstDir / binSignedDstName)
 		shutil.copy2(manifestSrcPath, binDstDir / manifestDstName)
@@ -225,9 +239,9 @@ if __name__ == "__main__":
 	vsTargetPath = sys.argv[1]
 	fwName = sys.argv[2]
 	if len(sys.argv) > 3:
-		addFwUpNoBoot2Enable = sys.argv[3]
+		copyFwUpNoBoot2Enable = sys.argv[3]
 	else:
-		addFwUpNoBoot2Enable = "False"
+		copyFwUpNoBoot2Enable = "False"
 	if len(sys.argv) > 4:
 		binRawBinSignedManifestGenEnable = sys.argv[4]
 	else:
@@ -240,4 +254,4 @@ if __name__ == "__main__":
 		bootHdrFileLenHexStr = "0x00000000"
 
 	# Script
-	Script(vsTargetPath, fwName, addFwUpNoBoot2Enable, binRawBinSignedManifestGenEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr)
+	Script(vsTargetPath, fwName, copyFwUpNoBoot2Enable, binRawBinSignedManifestGenEnable, bootHdrFileGenEnable, bootHdrFileLenHexStr)
