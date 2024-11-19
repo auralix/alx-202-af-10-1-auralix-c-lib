@@ -368,7 +368,7 @@ while (1)
 			dns_retval = DnsTaskRunning;
 			DNS_init(alxDnsSocket.socket_data.wiz_socket, wiz_buffer);
 			int dns_retry = 0;
-			int counter;
+			int counter = 0;
 			while (1)
 			{
 				if (DNS_run(dns_ip, dns_target_domain, dns_response_ip) > 0)
@@ -549,8 +549,8 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 				if (Cellular_GetSimCardStatus(me->cellular.handle, &me->cellular.simStatus) != CELLULAR_SUCCESS)
 				{
 					ALX_NET_TRACE_INF(("Cellular SIM failure"));
-					connection_state = State_ModemGoOff;
-					break;
+					//connection_state = State_ModemGoOff;
+					//break;
 				}
 
 				if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_SIM_TIMEOUT)
@@ -601,7 +601,7 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 	case State_ModemRegistered:
 		{
 			me->cellular.cellularContext = CELLULAR_PDN_CONTEXT_ID;
-			CellularPdnConfig_t pdnConfig = { CELLULAR_PDN_CONTEXT_IPV4, CELLULAR_PDN_AUTH_NONE, "internet", "", "" }; // ToDo: parameter!
+			CellularPdnConfig_t pdnConfig = { CELLULAR_PDN_CONTEXT_IPV4, CELLULAR_PDN_AUTH_NONE, CELLULAR_APN_NAME, "", "" }; // ToDo: parameter!
 			Cellular_SetPdnConfig(me->cellular.handle, me->cellular.cellularContext, &pdnConfig);
 
 			while (true)
