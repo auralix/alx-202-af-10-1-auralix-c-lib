@@ -100,6 +100,15 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
+// ALX - MCU - DAC
+//------------------------------------------------------------------------------
+#define __HAL_RCC_DAC1_CLK_ENABLE		__HAL_RCC_DAC_CLK_ENABLE
+#define __HAL_RCC_DAC1_CLK_DISABLE		__HAL_RCC_DAC_CLK_DISABLE
+#define __HAL_RCC_DAC1_FORCE_RESET		__HAL_RCC_DAC_FORCE_RESET
+#define __HAL_RCC_DAC1_RELEASE_RESET	__HAL_RCC_DAC_RELEASE_RESET
+
+
+//------------------------------------------------------------------------------
 // ALX - ID
 //------------------------------------------------------------------------------
 #define ALX_STM32_CMSIS_VERSION_MAIN	__STM32F7_CMSIS_VERSION_MAIN

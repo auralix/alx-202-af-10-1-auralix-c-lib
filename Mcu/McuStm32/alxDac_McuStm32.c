@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -137,7 +137,7 @@ void AlxDac_Ctor
 		me->ch[buffPos] = *(me->chArr + buffPos);
 		me->setVoltageDefault_V[buffPos] = *(me->setVoltageDefaultArr_V + buffPos);
 
-		#if defined(ALX_STM32F4) || defined(ALX_STM32L0)
+		#if defined(ALX_STM32F7) || defined(ALX_STM32F4) || defined(ALX_STM32L0)
 		me->chdac[buffPos].DAC_Trigger = DAC_TRIGGER_NONE;
 		me->chdac[buffPos].DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
 		#endif
@@ -373,7 +373,7 @@ static Alx_Status AlxDac_SetVoltage_V_Private(AlxDac* me, Alx_Ch ch, float volta
 static uint32_t AlxDac_GetCh(Alx_Ch ch)
 {
 	if(ch == Alx_Ch_1 ) return DAC_CHANNEL_1;
-	#if defined(ALX_STM32F4) || \
+	#if defined(ALX_STM32F7) || defined(ALX_STM32F4) || \
 	defined(STM32L072xx) || defined(STM32L073xx) || defined(STM32L082xx) || defined(STM32L083xx) || \
 	defined(STM32L431xx) || defined(STM32L432xx) || defined(STM32L433xx) || defined(STM32L442xx) || defined(STM32L443xx) || \
 	defined(STM32L471xx) || defined(STM32L475xx) || defined(STM32L476xx) || defined(STM32L485xx) || defined(STM32L486xx) || defined(STM32L496xx) || defined(STM32L4A6xx) || \
