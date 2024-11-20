@@ -621,7 +621,8 @@ static void AlxIna228_CurrentLsbFactor(AlxIna228* me)
 	const float MAX_EXPECTED_CURRENT = (me->adcRange == AdcRange_163_84_mV) ? (ADC_RANGE_163_84_MV / SHUNT_RES_VAL) : (ADC_RANGE_40_96_MV / SHUNT_RES_VAL);
 
 	// Set Current LSB factor
-	const float CURRENT_LSB_FACTOR =  MAX_EXPECTED_CURRENT / 524288.0; // 2^19 = 524288;
+	//const float CURRENT_LSB_FACTOR =  MAX_EXPECTED_CURRENT / 524288.0; // 2^19 = 524288; // INA228
+	const float CURRENT_LSB_FACTOR =  MAX_EXPECTED_CURRENT / 32768.0; // 2^15 = 32768; // INA238
 
 	// Save
 	me->conversionCurrentLsbFactor = CURRENT_LSB_FACTOR;
@@ -629,7 +630,8 @@ static void AlxIna228_CurrentLsbFactor(AlxIna228* me)
 static void AlxIna228_ShuntFactor(AlxIna228* me)
 {
 	// Set Fixed Scaling Factor
-	const float FIXED_SCALING_FACTOR = 13107.2 * 1e6;
+	//const float FIXED_SCALING_FACTOR = 13107.2 * 1e6; // -> INA228
+	const float FIXED_SCALING_FACTOR = 819.2 * 1e6; // -> INA238
 
 	// Set Current LSB factor
 	const float CONVERSION_CURRENT_LSB_FACTOR = me->conversionCurrentLsbFactor;
