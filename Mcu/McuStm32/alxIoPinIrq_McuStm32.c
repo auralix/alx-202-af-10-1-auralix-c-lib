@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -198,6 +198,7 @@ static void AlxIoPinIrq_Periph_EnableIrq(AlxIoPinIrq* me)
 			HAL_NVIC_SetPriority(EXTI4_IRQn, me->irqPriorityArr[i], 0);
 			HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 		}
+		#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 		else if
 		(
 			(ioPin->igpio.Pin == GPIO_PIN_5) ||
@@ -223,6 +224,64 @@ static void AlxIoPinIrq_Periph_EnableIrq(AlxIoPinIrq* me)
 			HAL_NVIC_SetPriority(EXTI15_10_IRQn, me->irqPriorityArr[i], 0);
 			HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 		}
+		#endif
+		#if defined(ALX_STM32U5)
+		else if (ioPin->igpio.Pin == GPIO_PIN_5)
+		{
+			HAL_NVIC_SetPriority(EXTI5_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI5_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_6)
+		{
+			HAL_NVIC_SetPriority(EXTI6_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI6_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_7)
+		{
+			HAL_NVIC_SetPriority(EXTI7_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI7_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_8)
+		{
+			HAL_NVIC_SetPriority(EXTI8_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI8_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_9)
+		{
+			HAL_NVIC_SetPriority(EXTI9_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI9_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_10)
+		{
+			HAL_NVIC_SetPriority(EXTI10_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI10_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_11)
+		{
+			HAL_NVIC_SetPriority(EXTI11_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI11_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_12)
+		{
+			HAL_NVIC_SetPriority(EXTI12_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI12_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_13)
+		{
+			HAL_NVIC_SetPriority(EXTI13_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI13_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_14)
+		{
+			HAL_NVIC_SetPriority(EXTI14_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI14_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_15)
+		{
+			HAL_NVIC_SetPriority(EXTI15_IRQn, me->irqPriorityArr[i], 0);
+			HAL_NVIC_EnableIRQ(EXTI15_IRQn);
+		}
+		#endif
 		else
 		{
 			ALX_IO_PIN_IRQ_ASSERT(false);	// We should not get here
@@ -260,6 +319,7 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 			HAL_NVIC_DisableIRQ(EXTI4_IRQn);
 			HAL_NVIC_ClearPendingIRQ(EXTI4_IRQn);
 		}
+		#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 		else if
 		(
 			(ioPin->igpio.Pin == GPIO_PIN_5) ||
@@ -285,6 +345,64 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 			HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
 			HAL_NVIC_ClearPendingIRQ(EXTI15_10_IRQn);
 		}
+		#endif
+		#if defined(ALX_STM32U5)
+		else if (ioPin->igpio.Pin == GPIO_PIN_5)
+		{
+			HAL_NVIC_DisableIRQ(EXTI5_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI5_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_6)
+		{
+			HAL_NVIC_DisableIRQ(EXTI6_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI6_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_7)
+		{
+			HAL_NVIC_DisableIRQ(EXTI7_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI7_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_8)
+		{
+			HAL_NVIC_DisableIRQ(EXTI8_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI8_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_9)
+		{
+			HAL_NVIC_DisableIRQ(EXTI9_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI9_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_10)
+		{
+			HAL_NVIC_DisableIRQ(EXTI10_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI10_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_11)
+		{
+			HAL_NVIC_DisableIRQ(EXTI11_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI11_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_12)
+		{
+			HAL_NVIC_DisableIRQ(EXTI12_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI12_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_13)
+		{
+			HAL_NVIC_DisableIRQ(EXTI13_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI13_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_14)
+		{
+			HAL_NVIC_DisableIRQ(EXTI14_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI14_IRQn);
+		}
+		else if (ioPin->igpio.Pin == GPIO_PIN_15)
+		{
+			HAL_NVIC_DisableIRQ(EXTI15_IRQn);
+			HAL_NVIC_ClearPendingIRQ(EXTI15_IRQn);
+		}
+		#endif
 		else
 		{
 			ALX_IO_PIN_IRQ_ASSERT(false);	// We should not get here
@@ -298,6 +416,7 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
+#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if		(GPIO_Pin == GPIO_PIN_0 ) AlxIoPinIrq_IrqCallback_Pin0();
@@ -318,6 +437,49 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	else if	(GPIO_Pin == GPIO_PIN_15) AlxIoPinIrq_IrqCallback_Pin15();
 	else	ALX_IO_PIN_IRQ_ASSERT(false);	// We should not get here
 }
+#endif
+#if defined(ALX_STM32U5)
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+{
+	if		(GPIO_Pin == GPIO_PIN_0 ) AlxIoPinIrq_IrqCallback_Pin0();
+	else if	(GPIO_Pin == GPIO_PIN_1 ) AlxIoPinIrq_IrqCallback_Pin1();
+	else if	(GPIO_Pin == GPIO_PIN_2 ) AlxIoPinIrq_IrqCallback_Pin2();
+	else if	(GPIO_Pin == GPIO_PIN_3 ) AlxIoPinIrq_IrqCallback_Pin3();
+	else if	(GPIO_Pin == GPIO_PIN_4 ) AlxIoPinIrq_IrqCallback_Pin4();
+	else if	(GPIO_Pin == GPIO_PIN_5 ) AlxIoPinIrq_IrqCallback_Pin5();
+	else if	(GPIO_Pin == GPIO_PIN_6 ) AlxIoPinIrq_IrqCallback_Pin6();
+	else if	(GPIO_Pin == GPIO_PIN_7 ) AlxIoPinIrq_IrqCallback_Pin7();
+	else if	(GPIO_Pin == GPIO_PIN_8 ) AlxIoPinIrq_IrqCallback_Pin8();
+	else if	(GPIO_Pin == GPIO_PIN_9 ) AlxIoPinIrq_IrqCallback_Pin9();
+	else if	(GPIO_Pin == GPIO_PIN_10) AlxIoPinIrq_IrqCallback_Pin10();
+	else if	(GPIO_Pin == GPIO_PIN_11) AlxIoPinIrq_IrqCallback_Pin11();
+	else if	(GPIO_Pin == GPIO_PIN_12) AlxIoPinIrq_IrqCallback_Pin12();
+	else if	(GPIO_Pin == GPIO_PIN_13) AlxIoPinIrq_IrqCallback_Pin13();
+	else if	(GPIO_Pin == GPIO_PIN_14) AlxIoPinIrq_IrqCallback_Pin14();
+	else if	(GPIO_Pin == GPIO_PIN_15) AlxIoPinIrq_IrqCallback_Pin15();
+	else	ALX_IO_PIN_IRQ_ASSERT(false);	// We should not get here
+}
+void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
+{
+	if		(GPIO_Pin == GPIO_PIN_0 ) AlxIoPinIrq_IrqCallback_Pin0();
+	else if	(GPIO_Pin == GPIO_PIN_1 ) AlxIoPinIrq_IrqCallback_Pin1();
+	else if	(GPIO_Pin == GPIO_PIN_2 ) AlxIoPinIrq_IrqCallback_Pin2();
+	else if	(GPIO_Pin == GPIO_PIN_3 ) AlxIoPinIrq_IrqCallback_Pin3();
+	else if	(GPIO_Pin == GPIO_PIN_4 ) AlxIoPinIrq_IrqCallback_Pin4();
+	else if	(GPIO_Pin == GPIO_PIN_5 ) AlxIoPinIrq_IrqCallback_Pin5();
+	else if	(GPIO_Pin == GPIO_PIN_6 ) AlxIoPinIrq_IrqCallback_Pin6();
+	else if	(GPIO_Pin == GPIO_PIN_7 ) AlxIoPinIrq_IrqCallback_Pin7();
+	else if	(GPIO_Pin == GPIO_PIN_8 ) AlxIoPinIrq_IrqCallback_Pin8();
+	else if	(GPIO_Pin == GPIO_PIN_9 ) AlxIoPinIrq_IrqCallback_Pin9();
+	else if	(GPIO_Pin == GPIO_PIN_10) AlxIoPinIrq_IrqCallback_Pin10();
+	else if	(GPIO_Pin == GPIO_PIN_11) AlxIoPinIrq_IrqCallback_Pin11();
+	else if	(GPIO_Pin == GPIO_PIN_12) AlxIoPinIrq_IrqCallback_Pin12();
+	else if	(GPIO_Pin == GPIO_PIN_13) AlxIoPinIrq_IrqCallback_Pin13();
+	else if	(GPIO_Pin == GPIO_PIN_14) AlxIoPinIrq_IrqCallback_Pin14();
+	else if	(GPIO_Pin == GPIO_PIN_15) AlxIoPinIrq_IrqCallback_Pin15();
+	else	ALX_IO_PIN_IRQ_ASSERT(false);	// We should not get here
+}
+#endif
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin0(void)
 {
 	ALX_IO_PIN_IRQ_TRACE("Err");
@@ -424,6 +586,7 @@ void EXTI4_IRQHandler(void)
 {
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
 }
+#if defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 void EXTI9_5_IRQHandler(void)
 {
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
@@ -442,6 +605,53 @@ void EXTI15_10_IRQHandler(void)
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
 }
 #endif
+#if defined(ALX_STM32U5)
+void EXTI5_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
+}
+void EXTI6_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
+}
+void EXTI7_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
+}
+void EXTI8_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+}
+void EXTI9_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_9);
+}
+void EXTI10_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+}
+void EXTI11_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
+}
+void EXTI12_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+}
+void EXTI13_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+}
+void EXTI14_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
+}
+void EXTI15_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
+}
+#endif
+#endif
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
