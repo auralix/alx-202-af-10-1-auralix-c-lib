@@ -51,6 +51,7 @@ extern "C" {
 #if defined(ALX_C_LIB)
 
 
+
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
@@ -111,9 +112,17 @@ typedef union
 	{
 		uint8_t unused_0_3 : 4;
 		AlxIna228_RegEnum_0x00_ADCRANGE ADCRANGE : 1;
+		#if defined(ALX_INA228)
 		AlxIna228_RegEnum_0x00_TEMPCOMP TEMPCOMP : 1;
+		#elif defined(ALX_INA238)
+		uint8_t unused_5 : 1;
+		#endif
 		uint8_t CONVDLY : 8;
+		#if defined(ALX_INA228)
 		AlxIna228_RegEnum_0x00_RSTACC RSTACC : 1;
+		#elif defined(ALX_INA238)
+		uint8_t unused_14 : 1;
+		#endif
 		AlxIna228_RegEnum_0x00_RST RST : 1;
 	};
 	uint16_t raw;
@@ -215,6 +224,7 @@ typedef union
 //******************************************************************************
 // Address: 0x03, Reset: 0x00 0x00, Name: SHUNT_TEMPCO
 //******************************************************************************
+#if defined(ALX_INA228)
 typedef union
 {
 	struct __attribute__((packed))
@@ -224,6 +234,7 @@ typedef union
 	};
 	uint16_t raw;
 } AlxIna228_RegVal_0x03_SHUNT_TEMPCO;
+#endif
 
 
 //******************************************************************************
@@ -233,10 +244,19 @@ typedef union
 {
     struct __attribute__((packed))
     {
+		#if defined(ALX_INA228)
 		int8_t unused_0_3 : 4;
 		int32_t VSHUNT_nVoltage : 20;
+		#elif defined(ALX_INA238)
+		int16_t VSHUNT_nVoltage;
+		#endif
     };
+	#if defined(ALX_INA228)
 	int8_t raw[3];
+	#elif defined(ALX_INA238)
+	int8_t raw[2];
+	//int16_t raw;
+	#endif
 } AlxIna228_RegVal_0x04_VSHUNT;
 
 
@@ -247,10 +267,18 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
+		#if defined(ALX_INA228)
 		int8_t unused_0_3 : 4;
 		int32_t VBUS_uVoltage : 20;
+		#elif defined(ALX_INA238)
+		int16_t VBUS_uVoltage;
+		#endif
 	};
+	#if defined(ALX_INA228)
 	int8_t raw[3];
+	#elif defined(ALX_INA238)
+	int16_t raw;
+	#endif
 } AlxIna228_RegVal_0x05_VBUS;
 
 
@@ -261,7 +289,12 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
+		#if defined(ALX_INA228)
 		int16_t DIETEMP_mDegC;
+		#elif defined(ALX_INA238)
+		int8_t unused_0_3 : 4;
+		int16_t DIETEMP_mDegC : 12;
+		#endif
 	};
 	int16_t raw;
 } AlxIna228_RegVal_0x06_DIETEMP;
@@ -274,10 +307,19 @@ typedef union
 {
 	struct __attribute__((packed))
 	{
+		#if defined(ALX_INA228)
 		int8_t unused_0_3 : 4;
 		int32_t CURRENT_Amperes : 20;
+		#elif defined(ALX_INA238)
+		int16_t CURRENT_Amperes;
+		#endif
 	};
+	#if defined(ALX_INA228)
 	int8_t raw[3];
+	#elif defined(ALX_INA238)
+	//int16_t raw;
+	int8_t raw[2];
+	#endif
 } AlxIna228_RegVal_0x07_CURRENT;
 
 
@@ -297,6 +339,7 @@ typedef union
 //******************************************************************************
 // Address: 0x09, Reset: 0x00 0x00, Name: ENERGY
 //******************************************************************************
+#if defined(ALX_INA228)
 typedef union
 {
 	struct __attribute__((packed))
@@ -305,11 +348,13 @@ typedef union
 	};
 	uint8_t raw[5];
 } AlxIna228_RegVal_0x09_ENERGY;
+#endif
 
 
 //******************************************************************************
 // Address: 0x0A, Reset: 0x00 0x00, Name: CHARGE
 //******************************************************************************
+#if defined(ALX_INA228)
 typedef union
 {
 	struct __attribute__((packed))
@@ -318,6 +363,7 @@ typedef union
 	};
 	int8_t raw[5];
 } AlxIna228_RegVal_0x0A_CHARGE;
+#endif
 
 
 //******************************************************************************
@@ -368,6 +414,7 @@ typedef enum
 	ArithmeticOverflowIs_Normal = 0,
 	ArithmeticOverflowIs_Error = 1
 } AlxIna228_RegEnum_0x0B_MATHOF;
+#if defined(ALX_INA228)
 typedef enum
 {
 	HealthChargeOverflow_Normal = 0,
@@ -378,6 +425,7 @@ typedef enum
 	HealthEnergyOverflow_Normal = 0,
 	HealthEnergyOverflow_Error = 1
 } AlxIna228_RegEnum_0x0B_ENERGYOF;
+#endif
 typedef enum
 {
 	PolarityOpenDrain_ActiveLow = 0,
@@ -412,8 +460,12 @@ typedef union
 		AlxIna228_RegEnum_0x0B_TMPOL TMPOL : 1;
 		uint8_t unused_8 : 1;
 		AlxIna228_RegEnum_0x0B_MATHOF MATHOF : 1;
+		#if defined(ALX_INA228)
 		AlxIna228_RegEnum_0x0B_CHARGEOF CHARGEOF : 1;
 		AlxIna228_RegEnum_0x0B_ENERGYOF ENERGYOF : 1;
+		#elif defined(ALX_INA238)
+		uint8_t unused_10_11 : 2;
+		#endif
 		AlxIna228_RegEnum_0x0B_APOL APOL : 1;
 		AlxIna228_RegEnum_0x0B_SLOWALERT SLOWALERT : 1;
 		AlxIna228_RegEnum_0x0B_CNVR CNVR : 1;
@@ -478,13 +530,18 @@ typedef union
 
 
 //******************************************************************************
-// Address: 0x10, Reset: 0x7F 0xFF, Name: TEMP_LIMIT
+// Address: 0x10, Reset: INA226: 0x7F 0xFF, INA236: 0x7F 0xF0 Name: TEMP_LIMIT
 //******************************************************************************
 typedef union
 {
 	struct __attribute__((packed))
 	{
+#if defined(ALX_INA228)
 		int16_t TOL_mDegC;
+#elif defined(ALX_INA238)
+		uint8_t unused_0_3 : 4;
+		int16_t TOL_mDegC : 12;
+#endif
 	};
 	int16_t raw;
 } AlxIna228_RegVal_0x10_TEMP_LIMIT;
@@ -517,7 +574,7 @@ typedef union
 
 
 //******************************************************************************
-// Address: 0x3F, Reset: 0x22 0x81, Name: DEVICE_ID
+// Address: 0x3F, Reset: INA228: 0x22 0x81, INA238: 0x23 0x81, Name: DEVICE_ID
 //******************************************************************************
 typedef union
 {
@@ -551,12 +608,14 @@ typedef struct
 	uint8_t len;
 	AlxIna228_RegVal_0x02_SHUNT_CAL val;
 } AlxIna228_Reg_0x02_SHUNT_CAL;
+#if defined(ALX_INA228)
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
 	AlxIna228_RegVal_0x03_SHUNT_TEMPCO val;
 } AlxIna228_Reg_0x03_SHUNT_TEMPCO;
+#endif
 typedef struct
 {
 	uint8_t addr;
@@ -587,6 +646,7 @@ typedef struct
 	uint8_t len;
 	AlxIna228_RegVal_0x08_POWER val;
 } AlxIna228_Reg_0x08_POWER;
+#if defined(ALX_INA228)
 typedef struct
 {
 	uint8_t addr;
@@ -599,6 +659,7 @@ typedef struct
 	uint8_t len;
 	AlxIna228_RegVal_0x0A_CHARGE val;
 } AlxIna228_Reg_0x0A_CHARGE;
+#endif
 typedef struct
 {
 	uint8_t addr;
@@ -663,14 +724,18 @@ typedef struct
 	AlxIna228_Reg_0x00_CONFIG			_0x00_CONFIG;
 	AlxIna228_Reg_0x01_ADC_CONFIG		_0x01_ADC_CONFIG;
 	AlxIna228_Reg_0x02_SHUNT_CAL		_0x02_SHUNT_CAL;
+	#if defined(ALX_INA228)
 	AlxIna228_Reg_0x03_SHUNT_TEMPCO		_0x03_SHUNT_TEMPCO;
+	#endif
 	AlxIna228_Reg_0x04_VSHUNT			_0x04_VSHUNT;
 	AlxIna228_Reg_0x05_VBUS				_0x05_VBUS;
 	AlxIna228_Reg_0x06_DIETEMP			_0x06_DIETEMP;
 	AlxIna228_Reg_0x07_CURRENT			_0x07_CURRENT;
 	AlxIna228_Reg_0x08_POWER			_0x08_POWER;
+	#if defined(ALX_INA228)
 	AlxIna228_Reg_0x09_ENERGY			_0x09_ENERGY;
 	AlxIna228_Reg_0x0A_CHARGE			_0x0A_CHARGE;
+	#endif
 	AlxIna228_Reg_0x0B_DIAG_ALRT		_0x0B_DIAG_ALRT;
 	AlxIna228_Reg_0x0C_SOVL				_0x0C_SOVL;
 	AlxIna228_Reg_0x0D_SUVL				_0x0D_SUVL;
@@ -739,9 +804,11 @@ Alx_Status AlxIna228_GetBusVoltage_V(AlxIna228* me, float* voltage_V);
 Alx_Status AlxIna228_GetTemp_degC(AlxIna228* me, float* temp_degC);
 Alx_Status AlxIna228_GetCurrent_A(AlxIna228* me, float* current_A);
 Alx_Status AlxIna228_GetPower_W(AlxIna228* me, float* power_W);
+#if defined(ALX_INA228)
 Alx_Status AlxIna228_GetEnergy_J(AlxIna228* me, float* energy_J);
 Alx_Status AlxIna228_GetCharge_C(AlxIna228* me, float* charge_C);
 Alx_Status AlxIna228_ResetEnergyAndCharge(AlxIna228* me);
+#endif
 Alx_Status AlxIna228_ResetSystem(AlxIna228* me);
 
 #endif	// #if defined(ALX_C_LIB)
