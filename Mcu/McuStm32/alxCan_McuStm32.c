@@ -595,7 +595,8 @@ void AlxCan_IrqHandler(AlxCan* me)
 static void AlxCan_TxMsg_TryAddToHwMailbox(AlxCan* me)
 {
 	#if defined(ALX_STM32F7) || defined(ALX_STM32F4) || defined(ALX_STM32L4)
-	while(HAL_CAN_GetTxMailboxesFreeLevel(&me->hcan) != 0)	// Add TX messages to HW mailboxes until all HW mailboxes are full
+	uint32_t txMailboxesFreeLevel = HAL_CAN_GetTxMailboxesFreeLevel(&me->hcan);
+	while(txMailboxesFreeLevel != 0)	// Add TX messages to HW mailboxes until all HW mailboxes are full
 	{
 		// Local variables
 		AlxCan_Msg alxTxMsg;
