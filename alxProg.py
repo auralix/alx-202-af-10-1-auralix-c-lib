@@ -36,51 +36,55 @@ import alxJlink
 # Script
 #*******************************************************************************
 def Script(progPath, targetName, fwDir, addrAppHexStr, addrSignedHexStr):
-	#-------------------------------------------------------------------------------
-	# Print
-	#-------------------------------------------------------------------------------
-	print("")
-	print(f"alxProg.py - START: progPath {progPath} targetName {targetName} fwDir {fwDir} addrAppHexStr {addrAppHexStr} addrSignedHexStr {addrSignedHexStr}")
+	try:
+		#-------------------------------------------------------------------------------
+		# Print
+		#-------------------------------------------------------------------------------
+		print("")
+		print(f"alxProg.py - START: progPath {progPath} targetName {targetName} fwDir {fwDir} addrAppHexStr {addrAppHexStr} addrSignedHexStr {addrSignedHexStr}")
 
 
-	#-------------------------------------------------------------------------------
-	# Program FW APP
-	#-------------------------------------------------------------------------------
+		#-------------------------------------------------------------------------------
+		# Program FW APP
+		#-------------------------------------------------------------------------------
 
-	# Set FW path
-	fwAppPath = next(
-		f for f in pathlib.Path(fwDir).glob("*.bin")
-		if not f.name.endswith("_Signed.bin") and not f.name.endswith("_NoBoot.bin")
-	)
-	fwAppPathStr = str(fwAppPath)
-
-	# Program
-	print(f"DO: Program FW APP: ResetEraseProgramVerifyReset() fwAppPathStr {fwAppPathStr}")
-	alxJlinkObj = alxJlink.Jlink(progPath)
-	alxJlinkObj.ResetEraseProgramVerifyReset(targetName, fwAppPathStr, addrAppHexStr)
-	print("DONE: Program FW APP")
-
-
-	#-------------------------------------------------------------------------------
-	# Program FW Signed
-	#-------------------------------------------------------------------------------
-	if addrSignedHexStr != "":
 		# Set FW path
-		fwSignedPath = next(pathlib.Path(fwDir).glob("*_Signed.bin"))
-		fwSignedPathStr = str(fwSignedPath)
+		fwAppPath = next(
+			f for f in pathlib.Path(fwDir).glob("*.bin")
+			if not f.name.endswith("_Signed.bin") and not f.name.endswith("_NoBoot.bin")
+		)
+		fwAppPathStr = str(fwAppPath)
 
 		# Program
-		print(f"DO: Program FW Signed: ResetProgramVerifyReset() fwSignedPathStr {fwSignedPathStr}")
+		print(f"DO: Program FW APP: ResetEraseProgramVerifyReset() fwAppPathStr {fwAppPathStr}")
 		alxJlinkObj = alxJlink.Jlink(progPath)
-		alxJlinkObj.ResetProgramVerifyReset(targetName, fwSignedPathStr, addrSignedHexStr)
-		print("DONE: Program FW Signed")
+		alxJlinkObj.ResetEraseProgramVerifyReset(targetName, fwAppPathStr, addrAppHexStr)
+		print("DONE: Program FW APP")
 
 
-	#-------------------------------------------------------------------------------
-	# Print
-	#-------------------------------------------------------------------------------
-	print("alxProg.py - FINISH")
-	print("")
+		#-------------------------------------------------------------------------------
+		# Program FW Signed
+		#-------------------------------------------------------------------------------
+		if addrSignedHexStr != "":
+			# Set FW path
+			fwSignedPath = next(pathlib.Path(fwDir).glob("*_Signed.bin"))
+			fwSignedPathStr = str(fwSignedPath)
+
+			# Program
+			print(f"DO: Program FW Signed: ResetProgramVerifyReset() fwSignedPathStr {fwSignedPathStr}")
+			alxJlinkObj = alxJlink.Jlink(progPath)
+			alxJlinkObj.ResetProgramVerifyReset(targetName, fwSignedPathStr, addrSignedHexStr)
+			print("DONE: Program FW Signed")
+
+
+		#-------------------------------------------------------------------------------
+		# Print
+		#-------------------------------------------------------------------------------
+		print("alxProg.py - FINISH")
+		print("")
+	except Exception as e:
+		print(f"alxProg.py - EXCEPTION: {e}")
+		print("")
 
 
 #*******************************************************************************

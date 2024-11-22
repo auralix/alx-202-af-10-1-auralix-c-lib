@@ -152,7 +152,7 @@ q"""
 		# Execute Process
 		print("DO: subprocess.run() ", args)
 		try:
-			completedProcessObj = subprocess.run(args, capture_output=True, check=True)
+			completedProcessObj = subprocess.run(args, capture_output=True, check=True, timeout=60)
 			print(completedProcessObj.stdout.decode())
 		finally:
 			scriptPath.unlink()
