@@ -50,6 +50,7 @@ static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg);
 static void AlxIna228_CurrentLsbFactor(AlxIna228* me);
 static void AlxIna228_ShuntFactor(AlxIna228* me);
 static Alx_Status AlxIna228_TraceId(AlxIna228* me);
+Alx_Status AlxIna228_ReadRegAll(AlxIna228* me);
 
 
 //******************************************************************************
@@ -175,6 +176,10 @@ Alx_Status AlxIna228_Init(AlxIna228* me)
 	// Set isInit
 	me->isInit = true;
 
+	// Delay
+	AlxDelay_ms(500);
+	AlxIna228_ReadRegAll(me);
+
 	// Return
 	return Alx_Ok;
 }
@@ -199,6 +204,45 @@ Alx_Status AlxIna228_DeInit(AlxIna228* me)
 
 	// Reset isInit
 	me->isInit = false;
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxIna228_ReadRegAll(AlxIna228* me)
+{
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInitPeriph == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Read
+	status = AlxIna228_Reg_Read(me, &me->reg._0x00_CONFIG);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x01_ADC_CONFIG);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x02_SHUNT_CAL);
+	#if defined(ALX_INA228)
+	status = AlxIna228_Reg_Read(me, &me->reg._0x03_SHUNT_TEMPCO);
+	#endif
+	status = AlxIna228_Reg_Read(me, &me->reg._0x04_VSHUNT);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x05_VBUS);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x06_DIETEMP);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x07_CURRENT);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x08_POWER);
+	#if defined(ALX_INA228)
+	status = AlxIna228_Reg_Read(me, &me->reg._0x09_ENERGY);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0A_CHARGE);
+	#endif
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0B_DIAG_ALRT);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0C_SOVL);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0D_SUVL);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0E_BOVL);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0F_BUVL);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x10_TEMP_LIMIT);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x11_PWR_LIMIT);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x3E_MANUFACTURER_ID);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x3F_DEVICE_ID);
 
 	// Return
 	return Alx_Ok;
@@ -233,6 +277,13 @@ Alx_Status AlxIna228_GetShuntVoltage_V(AlxIna228* me, float* voltage_V)
 
 	// Set Conversion shunt factor. Depending on (ADCRANGE) adc range: 0 or 1.
 	const float CONVERSION_SHUNT_FACTOR = (me->reg._0x00_CONFIG.val.ADCRANGE == AdcRange_163_84_mV) ? CONVERSION_SHUNT_FACTOR_1 : CONVERSION_SHUNT_FACTOR_2;
+
+	// flipped the MSB and LSB all lenght
+	uint8_t raw1[2] = {0};
+	raw1[0] = me->reg._0x04_VSHUNT.val.raw[0];
+	raw1[1] = me->reg._0x04_VSHUNT.val.raw[1];
+	me->reg._0x04_VSHUNT.val.raw[0] = raw1[1];
+	me->reg._0x04_VSHUNT.val.raw[1] = raw1[0];
 
 	// Set
 	*voltage_V = me->reg._0x04_VSHUNT.val.VSHUNT_nVoltage * CONVERSION_SHUNT_FACTOR;
@@ -311,11 +362,13 @@ Alx_Status AlxIna228_GetCurrent_A(AlxIna228* me, float* current_A)
 	// Set Conversion Current LSB Factor
 	const float CONVERSION_CURRENT_LSB_FACTOR = me->conversionCurrentLsbFactor;
 
-	int8_t raw1[2] = {0};
+	// flipped the MSB and LSB all lenght
+	uint8_t raw1[2] = {0};
 	raw1[0] = me->reg._0x07_CURRENT.val.raw[0];
 	raw1[1] = me->reg._0x07_CURRENT.val.raw[1];
 	me->reg._0x07_CURRENT.val.raw[0] = raw1[1];
 	me->reg._0x07_CURRENT.val.raw[1] = raw1[0];
+
 	// Set
 	*current_A = CONVERSION_CURRENT_LSB_FACTOR * me->reg._0x07_CURRENT.val.CURRENT_Amperes;
 
@@ -515,7 +568,8 @@ static void AlxIna228_RegStruct_SetValToZero(AlxIna228* me)
 {
 	me->reg._0x00_CONFIG			.val.raw =	0x0000;
 	me->reg._0x01_ADC_CONFIG		.val.raw =	0x0000;
-	me->reg._0x02_SHUNT_CAL			.val.raw =	0x0000;
+	//me->reg._0x02_SHUNT_CAL			.val.raw =	0x0000;
+	memset(me->reg._0x02_SHUNT_CAL.val.raw,		0x0000, sizeof(me->reg._0x02_SHUNT_CAL	.val.raw));
 	#if defined(ALX_INA228)
 	me->reg._0x03_SHUNT_TEMPCO		.val.raw =	0x0000;
 	#endif
@@ -542,7 +596,8 @@ static void AlxIna228_RegStruct_SetToDefault(AlxIna228* me)
 {
 	me->reg._0x00_CONFIG.val.raw =			0x0000;
 	me->reg._0x01_ADC_CONFIG.val.raw =		0xFB68;
-	me->reg._0x02_SHUNT_CAL.val.raw	=		0x1000;
+	//me->reg._0x02_SHUNT_CAL.val.raw	=		0x1000;
+	memset(me->reg._0x02_SHUNT_CAL.val.raw,	0x1000, sizeof(me->reg._0x02_SHUNT_CAL	.val.raw));
 	#if defined(ALX_INA228)
 	me->reg._0x03_SHUNT_TEMPCO.val.raw =	0x0000;
 	#endif
@@ -645,7 +700,7 @@ static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg)
 	uint8_t regAddr = *((uint8_t*)reg);
 	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
-	uint8_t data[regLen];
+	uint8_t data[8] =  {};
 
 	// Read
 	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, data, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);

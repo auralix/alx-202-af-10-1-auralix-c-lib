@@ -217,7 +217,8 @@ typedef union
 		uint16_t SHUNT_CAL_Current_Amperes : 15;
 		uint8_t unused_15 : 1;
 	};
-	uint16_t raw;
+	//uint16_t raw;
+	uint8_t raw[2];
 } AlxIna228_RegVal_0x02_SHUNT_CAL;
 
 
@@ -248,14 +249,13 @@ typedef union
 		int8_t unused_0_3 : 4;
 		int32_t VSHUNT_nVoltage : 20;
 		#elif defined(ALX_INA238)
-		int16_t VSHUNT_nVoltage;
+		int16_t VSHUNT_nVoltage : 16;
 		#endif
     };
 	#if defined(ALX_INA228)
-	int8_t raw[3];
+	uint8_t raw[3];
 	#elif defined(ALX_INA238)
-	int8_t raw[2];
-	//int16_t raw;
+	uint8_t raw[2];
 	#endif
 } AlxIna228_RegVal_0x04_VSHUNT;
 
@@ -271,13 +271,13 @@ typedef union
 		int8_t unused_0_3 : 4;
 		int32_t VBUS_uVoltage : 20;
 		#elif defined(ALX_INA238)
-		int16_t VBUS_uVoltage;
+		int16_t VBUS_uVoltage : 16;
 		#endif
 	};
 	#if defined(ALX_INA228)
-	int8_t raw[3];
+	uint8_t raw[3];
 	#elif defined(ALX_INA238)
-	int16_t raw;
+	uint8_t raw[2];
 	#endif
 } AlxIna228_RegVal_0x05_VBUS;
 
@@ -311,14 +311,13 @@ typedef union
 		int8_t unused_0_3 : 4;
 		int32_t CURRENT_Amperes : 20;
 		#elif defined(ALX_INA238)
-		int16_t CURRENT_Amperes;
+		int16_t CURRENT_Amperes : 16;
 		#endif
 	};
 	#if defined(ALX_INA228)
-	int8_t raw[3];
+	uint8_t raw[3];
 	#elif defined(ALX_INA238)
-	//int16_t raw;
-	int8_t raw[2];
+	uint8_t raw[2];
 	#endif
 } AlxIna228_RegVal_0x07_CURRENT;
 
