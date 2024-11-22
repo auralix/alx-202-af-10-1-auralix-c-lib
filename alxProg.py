@@ -85,6 +85,7 @@ def Script(progPath, targetName, fwDir, addrAppHexStr, addrSignedHexStr):
 	except Exception as e:
 		print(f"alxProg.py - EXCEPTION: {e}")
 		print("")
+		sys.exit(1)
 
 
 #*******************************************************************************
