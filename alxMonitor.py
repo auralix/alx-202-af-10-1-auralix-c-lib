@@ -84,7 +84,8 @@ def Script(progPath, targetName, fwDir, termExePath, termPort, termBaudRate, log
 		]
 		DETACHED_PROCESS = 0x00000008
 		print("DO: Start new TeraTerm process: subprocess.Popen()", argsStart)
-		resultStart = subprocess.Popen(argsStart, creationflags=DETACHED_PROCESS)
+		resultStart = subprocess.Popen(argsStart, creationflags=DETACHED_PROCESS, capture_output=True, text=True)
+		print(f"stdout: {resultStart.stdout.strip()} stderr: {resultStart.stderr.strip()}")
 		print("DONE: Start new TeraTerm process")
 
 		# Check if new TeraTerm process is running
@@ -95,6 +96,7 @@ def Script(progPath, targetName, fwDir, termExePath, termPort, termBaudRate, log
 		]
 		print("DO: Check if new TeraTerm process is running: subprocess.run()", argsCheck)
 		resultCheck = subprocess.run(argsCheck, capture_output=True, text=True, check=True)
+		print(f"stdout: {resultCheck.stdout.strip()} stderr: {resultCheck.stderr.strip()}")
 		print("DONE: Check if new TeraTerm process is running")
 		time.sleep(20)
 
