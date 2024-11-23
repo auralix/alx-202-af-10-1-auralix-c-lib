@@ -63,27 +63,38 @@ def Script(progPath, targetName, fwDir, termExePath, termPort, termBaudRate, log
 		pathlib.Path(logFolderDir).mkdir(parents=True, exist_ok=True)
 
 		# Kill existing TeraTerm process
-		args = [
+		argsKill = [
 			"taskkill",
 			"/IM",
 			"ttermpro.exe",
 			"/F"
 		]
-		print("DO: Kill existing TeraTerm process: subprocess.run()", args)
-		result = subprocess.run(args, capture_output=True, text=True)
-		print(f"stdout: {result.stdout.strip()} stderr: {result.stderr.strip()}")
+		print("DO: Kill existing TeraTerm process: subprocess.run()", argsKill)
+		resultKill = subprocess.run(argsKill, capture_output=True, text=True)
+		print(f"stdout: {resultKill.stdout.strip()} stderr: {resultKill.stderr.strip()}")
 		print("DONE: Kill existing TeraTerm process")
 
 		# Start new TeraTerm process
-		args = [
+		argsStart = [
 			termExePath,
 			f"/C={termPort}",
 			f"/BAUD={termBaudRate}",
 			f"/L={logPath}"
 		]
-		print("DO: Start new TeraTerm process: subprocess.Popen()", args)
-		subprocess.Popen(args)
+		DETACHED_PROCESS = 0x00000008
+		print("DO: Start new TeraTerm process: subprocess.Popen()", argsStart)
+		resultStart = subprocess.Popen(argsStart, creationflags=DETACHED_PROCESS)
 		print("DONE: Start new TeraTerm process")
+
+		# Check if new TeraTerm process is running
+		argsCheck = [
+			"tasklist",
+			"/FI",
+			f"PID eq {resultStart.pid}"
+		]
+		print("DO: Check if new TeraTerm process is running: subprocess.run()", argsCheck)
+		resultCheck = subprocess.run(argsCheck, capture_output=True, text=True, check=True)
+		print("DONE: Check if new TeraTerm process is running")
 
 
 		#-------------------------------------------------------------------------------
