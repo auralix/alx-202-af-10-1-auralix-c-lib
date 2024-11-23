@@ -32,7 +32,6 @@ import sys
 import shutil
 import subprocess
 import alxJlink
-import time
 
 
 #*******************************************************************************
@@ -84,8 +83,7 @@ def Script(progPath, targetName, fwDir, termExePath, termPort, termBaudRate, log
 		]
 		DETACHED_PROCESS = 0x00000008
 		print("DO: Start new TeraTerm process: subprocess.Popen()", argsStart)
-		resultStart = subprocess.Popen(argsStart, creationflags=DETACHED_PROCESS, capture_output=True, text=True)
-		print(f"stdout: {resultStart.stdout.strip()} stderr: {resultStart.stderr.strip()}")
+		resultStart = subprocess.Popen(argsStart, creationflags=DETACHED_PROCESS)
 		print("DONE: Start new TeraTerm process")
 
 		# Check if new TeraTerm process is running
@@ -98,7 +96,6 @@ def Script(progPath, targetName, fwDir, termExePath, termPort, termBaudRate, log
 		resultCheck = subprocess.run(argsCheck, capture_output=True, text=True, check=True)
 		print(f"stdout: {resultCheck.stdout.strip()} stderr: {resultCheck.stderr.strip()}")
 		print("DONE: Check if new TeraTerm process is running")
-		time.sleep(20)
 
 
 		#-------------------------------------------------------------------------------
