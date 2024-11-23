@@ -32,6 +32,7 @@ import sys
 import shutil
 import subprocess
 import alxJlink
+import time
 
 
 #*******************************************************************************
@@ -95,6 +96,7 @@ def Script(progPath, targetName, fwDir, termExePath, termPort, termBaudRate, log
 		print("DO: Check if new TeraTerm process is running: subprocess.run()", argsCheck)
 		resultCheck = subprocess.run(argsCheck, capture_output=True, text=True, check=True)
 		print("DONE: Check if new TeraTerm process is running")
+		time.sleep(20)
 
 
 		#-------------------------------------------------------------------------------
