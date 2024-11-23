@@ -79,6 +79,8 @@ def Script(progPath, targetName, fwDir, termExePath, termPort, termBaudRate, log
 			termExePath,
 			f"/C={termPort}",
 			f"/BAUD={termBaudRate}",
+			"/V",
+			"/I",
 			f"/L={logPath}"
 		]
 		DETACHED_PROCESS = 0x00000008
