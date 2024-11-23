@@ -29,8 +29,8 @@
 #*******************************************************************************
 import pathlib
 import sys
-from typing import final
 import serial
+import logging
 
 
 #*******************************************************************************
@@ -47,7 +47,22 @@ def Script(port, baudRate, logDir):
 
 
 		#-------------------------------------------------------------------------------
-		# Init
+		# Init Logging
+		#-------------------------------------------------------------------------------
+		logDirPath = pathlib.Path(logDir)
+		logPath = logDirPath / f"{logDirPath.name}.log"
+		logging.basicConfig(
+			format = '%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s',
+			datefmt = '%Y-%m-%d %H:%M:%S',
+			level=logging.INFO,
+			handlers = [
+				logging.FileHandler(logPath)
+			]
+		)
+
+
+		#-------------------------------------------------------------------------------
+		# Init Serial Port
 		#-------------------------------------------------------------------------------
 		serialPort = serial.Serial(port=port, baudrate=baudRate)
 
@@ -58,6 +73,7 @@ def Script(port, baudRate, logDir):
 		while True:
 			line = serialPort.read_until(b'\r\n')
 			print(line.decode(), end="")
+			logging.info(line.decode(errors='ignore').strip())
 
 	except Exception as e:
 		#-------------------------------------------------------------------------------

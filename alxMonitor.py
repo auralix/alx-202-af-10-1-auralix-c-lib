@@ -37,67 +37,90 @@ import alxJlink
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(progPath, targetName, fwDir, termExePath, termPort, termBaudRate, logDir):
+def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 	try:
 		#-------------------------------------------------------------------------------
 		# Print - START
 		#-------------------------------------------------------------------------------
 		print("")
-		print(f"alxMonitor.py - START: progPath {progPath} targetName {targetName} fwDir {fwDir} termExePath {termExePath} termPort {termPort} termBaudRate {termBaudRate} logDir {logDir}")
+		print(f"alxMonitor.py - START: progPath {progPath} targetName {targetName} fwDir {fwDir} termPort {termPort} termBaudRate {termBaudRate} logDir {logDir}")
 
 
 		#-------------------------------------------------------------------------------
-		# Init TeraTerm
+		# Init Dir & Path
 		#-------------------------------------------------------------------------------
 
-		# Set logPath
+		# Print
+		print("DO: Init Dir & Path")
+
+		# Set logFolderDir & pidPath
 		fwAppPath = next(
 			f for f in pathlib.Path(fwDir).glob("*.bin")
 			if not f.name.endswith("_Signed.bin") and not f.name.endswith("_NoBoot.bin")
 		)
 		logFolderDir =  pathlib.Path(logDir) / fwAppPath.stem
-		logPath = logFolderDir / f"{fwAppPath.stem}.log"
+		pidPath = pathlib.Path(logDir) / "alxSerialPortLogger.pid"
 
 		# Create clean directory for logPath
 		shutil.rmtree(logFolderDir, ignore_errors=True)
 		pathlib.Path(logFolderDir).mkdir(parents=True, exist_ok=True)
 
-		# Kill existing TeraTerm process
-		argsKill = [
-			"taskkill",
-			"/IM",
-			"ttermpro.exe",
-			"/F"
-		]
-		print("DO: Kill existing TeraTerm process: subprocess.run()", argsKill)
-		resultKill = subprocess.run(argsKill, capture_output=True, text=True)
-		print(f"stdout: {resultKill.stdout.strip()} stderr: {resultKill.stderr.strip()}")
-		print("DONE: Kill existing TeraTerm process")
+		# Print
+		print(f"DONE: Init Dir & Path: logFolderDir {logFolderDir} pidPath {pidPath}")
 
-		# Start new TeraTerm process
+
+		#-------------------------------------------------------------------------------
+		# Kill Existing alxSerialPortLogger Process
+		#-------------------------------------------------------------------------------
+		if pidPath.exists():
+			try:
+				# Read PID file
+				pid = int(pidPath.read_text().strip())
+
+				# Kill Process
+				print(f"DO: Kill existing alxSerialPortLogger process: subprocess.run() pid {pid}")
+				resultKill = subprocess.run(
+					["taskkill", "/PID", str(pid), "/F"],
+					capture_output=True,
+					text=True,
+					check=True
+				)
+				print(f"stdout: {resultKill.stdout.strip()} stderr: {resultKill.stderr.strip()}")
+				print(f"DONE: Kill existing alxSerialPortLogger process")
+			except subprocess.CalledProcessError as e:
+				print(f"FAIL: Failed to kill process: PID {pid}: {e}")
+			except ValueError:
+				print(f"FAIL: Invalid PID: pidPath {pidPath}")
+			finally:
+				# Delete PID file
+				pidPath.unlink(missing_ok=True)
+
+
+		#-------------------------------------------------------------------------------
+		# Start New alxSerialPortLogger Process
+		#-------------------------------------------------------------------------------
+
+		# Prepare
+		loggerScriptPath = pathlib.Path(__file__).parent / "alxSerialPortLogger.py"
 		argsStart = [
-			termExePath,
-			f"/C={termPort}",
-			f"/BAUD={termBaudRate}",
-			"/V",
-			"/I",
-			f"/L={logPath}"
+			sys.executable,
+			str(loggerScriptPath),
+			termPort,
+			termBaudRate,
+			str(logFolderDir)
 		]
 		DETACHED_PROCESS = 0x00000008
-		print("DO: Start new TeraTerm process: subprocess.Popen()", argsStart)
-		resultStart = subprocess.Popen(argsStart, creationflags=DETACHED_PROCESS)
-		print("DONE: Start new TeraTerm process")
 
-		# Check if new TeraTerm process is running
-		argsCheck = [
-			"tasklist",
-			"/FI",
-			f"PID eq {resultStart.pid}"
-		]
-		print("DO: Check if new TeraTerm process is running: subprocess.run()", argsCheck)
-		resultCheck = subprocess.run(argsCheck, capture_output=True, text=True, check=True)
-		print(f"stdout: {resultCheck.stdout.strip()} stderr: {resultCheck.stderr.strip()}")
-		print("DONE: Check if new TeraTerm process is running")
+		# Start
+		print("DO: Start new alxSerialPortLogger process: subprocess.Popen()", argsStart)
+		resultStart = subprocess.Popen(
+			argsStart,
+			creationflags=DETACHED_PROCESS
+		)
+		print(f"DONE: Start new alxSerialPortLogger process: PID {resultStart.pid}")
+
+		# Save new PID
+		pidPath.write_text(str(resultStart.pid))
 
 
 		#-------------------------------------------------------------------------------
@@ -132,10 +155,9 @@ if __name__ == "__main__":
 	progPath = sys.argv[1]
 	targetName = sys.argv[2]
 	fwDir = sys.argv[3]
-	termExePath = sys.argv[4]
-	termPort = sys.argv[5]
-	termBaudRate = sys.argv[6]
-	logDir = sys.argv[7]
+	termPort = sys.argv[4]
+	termBaudRate = sys.argv[5]
+	logDir = sys.argv[6]
 
 	# Script
-	Script(progPath, targetName, fwDir, termExePath, termPort, termBaudRate, logDir)
+	Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir)
