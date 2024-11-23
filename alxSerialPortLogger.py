@@ -40,13 +40,6 @@ def Script(port, baudRate, logDir):
 	serialPort = None
 	try:
 		#-------------------------------------------------------------------------------
-		# START
-		#-------------------------------------------------------------------------------
-		print("")
-		print(f"alxSerialPortLogger.py - START: port {port} baudRate {baudRate} logDir {logDir}")
-
-
-		#-------------------------------------------------------------------------------
 		# Init Logging
 		#-------------------------------------------------------------------------------
 		logDirPath = pathlib.Path(logDir)
@@ -54,11 +47,18 @@ def Script(port, baudRate, logDir):
 		logging.basicConfig(
 			format = '%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s',
 			datefmt = '%Y-%m-%d %H:%M:%S',
-			level=logging.INFO,
+			level=logging.DEBUG,
 			handlers = [
 				logging.FileHandler(logPath)
 			]
 		)
+
+
+		#-------------------------------------------------------------------------------
+		# START
+		#-------------------------------------------------------------------------------
+		logging.debug("")
+		logging.debug(f"alxSerialPortLogger.py - START: port {port} baudRate {baudRate} logDir {logDir}")
 
 
 		#-------------------------------------------------------------------------------
@@ -79,16 +79,16 @@ def Script(port, baudRate, logDir):
 		#-------------------------------------------------------------------------------
 		# EXCEPTION
 		#-------------------------------------------------------------------------------
-		print(f"alxSerialPortLogger.py - EXCEPTION: {e}")
-		print("")
+		logging.fatal(f"alxSerialPortLogger.py - EXCEPTION: {e}")
+		logging.fatal("")
 		sys.exit(1)
 
 	finally:
 		#-------------------------------------------------------------------------------
 		# FINISH
 		#-------------------------------------------------------------------------------
-		print("alxSerialPortLogger.py - FINISH")
-		print("")
+		logging.debug("alxSerialPortLogger.py - FINISH")
+		logging.debug("")
 		if serialPort and serialPort.is_open:
 			serialPort.close()
 
