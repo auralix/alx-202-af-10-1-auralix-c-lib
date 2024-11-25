@@ -118,6 +118,7 @@ extern "C" {
 #include "alxMath.h"
 #include "alxMemRaw.h"
 #include "alxMemSafe.h"
+#include "alxMux.h"
 #include "alxNet.h"
 #include "alxOsCriticalSection.h"
 #include "alxOsDelay.h"
