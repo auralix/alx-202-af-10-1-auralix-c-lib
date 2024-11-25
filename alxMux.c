@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxMux.c
-  * @brief		Auralix C Library - ALX Analog Multiplexer Module
+  * @brief		Auralix C Library - ALX MUX Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -56,10 +56,6 @@ void AlxMux_Ctor
 	me->ioPinArr = ioPinArr;
 	me->ioPinArrLen = ioPinArrLen;
 
-
-	// Variables
-	memset(me->ioPinValArr, 0, sizeof(me->ioPinValArr));
-
 	// Info
 	me->wasCtorCalled = true;
 	me->isInit = false;
@@ -76,11 +72,11 @@ Alx_Status AlxMux_Init(AlxMux* me)
 	ALX_MUX_ASSERT(me->isInit == false);
 
 	// Init GPIO
+	AlxIoPin_Init(me->do_nEN);
 	for (uint32_t i = 0; i < me->ioPinArrLen; i++)
 	{
 		AlxIoPin_Init((*(me->ioPinArr + i)));
 	}
-	AlxIoPin_Init(me->do_nEN);
 
 	// Set isInit
 	me->isInit = true;
@@ -95,11 +91,11 @@ Alx_Status AlxMux_DeInit(AlxMux* me)
 	ALX_MUX_ASSERT(me->isInit == true);
 
 	// DeInit GPIO
+	AlxIoPin_DeInit(me->do_nEN);
 	for (uint32_t i = 0; i < me->ioPinArrLen; i++)
 	{
 		AlxIoPin_DeInit((*(me->ioPinArr + i)));
 	}
-	AlxIoPin_DeInit(me->do_nEN);
 
 	// Clear isInit
 	me->isInit = false;
@@ -109,37 +105,20 @@ Alx_Status AlxMux_DeInit(AlxMux* me)
 }
 void AlxMux_Enable(AlxMux* me, bool enable)
 {
-	//------------------------------------------------------------------------------
 	// Assert
-	//------------------------------------------------------------------------------
 	ALX_MUX_ASSERT(me->wasCtorCalled == true);
 	ALX_MUX_ASSERT(me->isInit == true);
 
-
-	//------------------------------------------------------------------------------
-	// Set
-	//------------------------------------------------------------------------------
-	if (enable == true)
-	{
-		AlxIoPin_Reset(me->do_nEN);
-	}
-	else
-	{
-		AlxIoPin_Set(me->do_nEN);
-	}
+	// Write GPIO
+	AlxIoPin_Write(me->do_nEN, enable);
 }
-
 void AlxMux_Select(AlxMux* me, Alx_Ch ch)
 {
-	//------------------------------------------------------------------------------
 	// Assert
-	//------------------------------------------------------------------------------
 	ALX_MUX_ASSERT(me->wasCtorCalled == true);
 	ALX_MUX_ASSERT(me->isInit == true);
 
-	//------------------------------------------------------------------------------
-	// Set
-	//------------------------------------------------------------------------------
+	// Write GPIO
 	for (uint32_t i = 0; i < me->ioPinArrLen; i++)
 	{
 		if ((uint8_t)ch & (1 << i))

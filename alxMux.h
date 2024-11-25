@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxMux.h
-  * @brief		Auralix C Library - ALX Analog Multiplexer Module
+  * @brief		Auralix C Library - ALX MUX Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -88,9 +88,6 @@ typedef struct
 	AlxIoPin** ioPinArr;
 	uint8_t ioPinArrLen;
 
-	// Variables
-	bool ioPinValArr[ALX_MUX_IO_PIN_VAL_ARR_LEN];
-
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
@@ -116,6 +113,7 @@ Alx_Status AlxMux_Init(AlxMux* me);
 Alx_Status AlxMux_DeInit(AlxMux* me);
 void AlxMux_Enable(AlxMux* me, bool enable);
 void AlxMux_Select(AlxMux* me, Alx_Ch ch);
+
 
 #endif	// #if defined(ALX_C_LIB)
 
