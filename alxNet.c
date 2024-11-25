@@ -69,7 +69,7 @@
 #define CELLULAR_SIM_CARD_WAIT_INTERVAL_MS       ( 500UL )
 #define CELLULAR_MAX_SIM_RETRY                   ( 5U )
 #define CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS    ( 1000UL )
-
+#define CELLULAR_CONNECTION_MONITORING_PING		 "8.8.8.8"
 #endif
 //******************************************************************************
 // Private Variables
@@ -483,7 +483,7 @@ void AlxNet_Ctor
 #define MODEM_REGISTER_TIMEOUT 60000
 #define MODEM_SIM_TIMEOUT 20000
 #define MODEM_ACTIVATE_PDN_TIMEOUT 150000
-#define MODEM_CONNECTION_MONITORING_TIMEOUT 10000
+#define MODEM_CONNECTION_MONITORING_TIMEOUT 20000
 #define MODEM_LOW_LEVEL_ERR_THRESHOLD 3
 
 typedef enum
@@ -502,6 +502,19 @@ typedef enum
 	Cmd_PowerCycle,
 	Cmd_Disconnect
 } HandleConnectionCommandType;
+
+static uint64_t cellular_last_ping_time = 0;
+
+static void cellular_GenericCB(const char * pRawData,
+	void * pCallbackContext)
+{
+	// for ping pRawData is NULL
+	if (pRawData == NULL && pCallbackContext == NULL)
+	{
+		//ALX_NET_TRACE_INF("Ping OK!");
+		cellular_last_ping_time = AlxTick_Get_ms(&alxTick);
+	}
+}
 
 static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectionCommandType cmd)
 {
@@ -533,6 +546,7 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 			me->isNetConnected = false;
 			if (Cellular_Init(&me->cellular.handle, me->cellular.CommIntf) == CELLULAR_SUCCESS) // power on with GPIO key simulation, auto-bauding
 			{
+				Cellular_RegisterUrcGenericCallback(me->cellular.handle, cellular_GenericCB, NULL);
 				start_time = AlxTick_Get_ms(&alxTick);
 				connection_state = State_ModemOn;
 			}
@@ -618,7 +632,7 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 					if (Cellular_GetIPAddress(me->cellular.handle, me->cellular.cellularContext, me->ip, sizeof(me->ip)) == CELLULAR_SUCCESS)
 					{
 						me->isNetConnected = true;
-						start_time = AlxTick_Get_ms(&alxTick);
+						start_time = cellular_last_ping_time = AlxTick_Get_ms(&alxTick);
 						connection_state = State_ModemConnected;
 						break;
 					}
@@ -663,6 +677,16 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 			{
 				start_time = AlxTick_Get_ms(&alxTick);
 
+#ifdef CELLULAR_CONNECTION_MONITORING_PING
+				// monitor connection with pinging
+				Cellular_Ping(me->cellular.handle, me->cellular.cellularContext, CELLULAR_CONNECTION_MONITORING_PING);
+				if (AlxTick_Get_ms(&alxTick) - cellular_last_ping_time > 3 * MODEM_CONNECTION_MONITORING_TIMEOUT)
+				{
+					ALX_NET_TRACE_WRN("Ping is failing for more than %d seconds", 3 * MODEM_CONNECTION_MONITORING_TIMEOUT / 1000);
+					me->isNetConnected = false;
+					// no break;
+				}
+#endif
 				// update RSSI info
 				if (Cellular_GetInfo(me->cellular.handle, &me->cellular.signalQuality) != CELLULAR_SUCCESS)
 				{
