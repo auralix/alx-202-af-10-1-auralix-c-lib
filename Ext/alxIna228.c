@@ -777,6 +777,7 @@ static Alx_Status AlxIna228_TraceId(AlxIna228* me)
 	// #2 Trace
 	ALX_INA228_TRACE_INF("");
 	ALX_INA228_TRACE_INF("Auralix C Library - ALX Current Monitor INA228 Module Identification:");
+	ALX_INA228_TRACE_INF("- DEVICE_i2cAddr: 0x%02X", me->i2cAddr);
 	ALX_INA228_TRACE_INF("- MANUFACTURER_ID: 0x%02X", me->reg._0x3E_MANUFACTURER_ID.val.MANFID);
 	ALX_INA228_TRACE_INF("- DEVICE_ID.REV_ID: 0x%02X", me->reg._0x3F_DEVICE_ID.val.REV_ID);
 	ALX_INA228_TRACE_INF("- DEVICE_ID.DIEID: 0x%02X", me->reg._0x3F_DEVICE_ID.val.DIEID);
