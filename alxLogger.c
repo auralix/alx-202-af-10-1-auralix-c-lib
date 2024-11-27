@@ -826,6 +826,23 @@ Alx_Status AlxLogger_DiscardLogsToProcess(AlxLogger* me)
 	// Return
 	return AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWriteOldest);
 }
+Alx_Status AlxLogger_RewindLogsToProcessFiles(AlxLogger* me, uint32_t numOfFiles)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	ALX_LOGGER_ASSERT(me->isInit == true);
+	ALX_LOGGER_ASSERT(numOfFiles == 0);		// Currently only supported rewind of existing file
+
+	// Rewind
+	me->md.read.id = me->md.read.id - me->md.read.line;
+	me->md.read.pos = 0;
+	me->md.read.line = 0;
+	// me->md.read.file	// Don't need to change
+	// me->md.read.dir	// Don't need to change
+
+	// Return
+	return AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreRead);
+}
 uint64_t AlxLogger_GetNumOfLogsToProcess(AlxLogger* me)
 {
 	// Assert

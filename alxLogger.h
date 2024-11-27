@@ -193,6 +193,7 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs);
 Alx_Status AlxLogger_GetFileSize(AlxLogger* me, const char* path, uint32_t* fileSize);
 uint64_t AlxLogger_GetNumOfLogsToProcess(AlxLogger* me);
 Alx_Status AlxLogger_DiscardLogsToProcess(AlxLogger* me);
+Alx_Status AlxLogger_RewindLogsToProcessFiles(AlxLogger* me, uint32_t numOfFiles);
 uint64_t AlxLogger_GetNumOfLogsStored(AlxLogger* me);
 Alx_Status AlxLogger_GetIdOldest(AlxLogger* me, uint64_t* idOldest);
 Alx_Status AlxLogger_GetIdNewest(AlxLogger* me, uint64_t* idNewest);
