@@ -32,6 +32,7 @@ import sys
 import shutil
 import subprocess
 import alxJlink
+import time
 
 
 #*******************************************************************************
@@ -60,6 +61,7 @@ def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 		)
 		logFolderDir =  pathlib.Path(logDir) / fwAppPath.stem
 		pidPath = pathlib.Path(logDir) / "alxSerialPortLogger.pid"
+		logPath = logFolderDir / f"{logFolderDir.name}.log"
 
 		# Create clean directory for logPath
 		shutil.rmtree(logFolderDir, ignore_errors=True)
@@ -124,9 +126,21 @@ def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 
 
 		#-------------------------------------------------------------------------------
+		# Check if alxSerialPortLogger Process is Running
+		#-------------------------------------------------------------------------------
+		time.sleep(2)
+		print("DO: Check if alxSerialPortLogger process is running")
+		logText = logPath.read_text().strip()
+		if logText.endswith("alxSerialPortLogger.py - FINISH"):
+			print("FAIL: alxSerialPortLogger NOT running")
+			raise
+		print("DONE: Check if alxSerialPortLogger process is running")
+
+
+		#-------------------------------------------------------------------------------
 		# Reset FW
 		#-------------------------------------------------------------------------------
-		print(f"DO: Reset FW")
+		print("DO: Reset FW")
 		alxJlinkObj = alxJlink.Jlink(progPath)
 		alxJlinkObj.Reset(targetName)
 		print("DONE: Reset FW")

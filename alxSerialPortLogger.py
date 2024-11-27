@@ -57,7 +57,6 @@ def Script(port, baudRate, logDir):
 		#-------------------------------------------------------------------------------
 		# START
 		#-------------------------------------------------------------------------------
-		logging.debug("")
 		logging.debug(f"alxSerialPortLogger.py - START: port {port} baudRate {baudRate} logDir {logDir}")
 
 
@@ -80,7 +79,6 @@ def Script(port, baudRate, logDir):
 		# EXCEPTION
 		#-------------------------------------------------------------------------------
 		logging.fatal(f"alxSerialPortLogger.py - EXCEPTION: {e}")
-		logging.fatal("")
 		sys.exit(1)
 
 	finally:
@@ -88,7 +86,6 @@ def Script(port, baudRate, logDir):
 		# FINISH
 		#-------------------------------------------------------------------------------
 		logging.debug("alxSerialPortLogger.py - FINISH")
-		logging.debug("")
 		if serialPort and serialPort.is_open:
 			serialPort.close()
 
