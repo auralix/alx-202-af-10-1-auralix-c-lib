@@ -192,9 +192,11 @@ if __name__ == "__main__":
 	progPath = sys.argv[1]
 	targetName = sys.argv[2]
 	fwDir = sys.argv[3]
-	termPort = sys.argv[4]
-	termBaudRate = sys.argv[5]
-	logDir = sys.argv[6]
+	addrAppHexStr = sys.argv[4]
+	addrSignedHexStr = sys.argv[5]
+	termPort = sys.argv[6]
+	termBaudRate = sys.argv[7]
+	logDir = sys.argv[8]
 
 	# Script
-	Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir)
+	Script(progPath, targetName, fwDir, addrAppHexStr, addrSignedHexStr, termPort, termBaudRate, logDir)
