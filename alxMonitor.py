@@ -31,14 +31,14 @@ import pathlib
 import sys
 import shutil
 import subprocess
-import alxJlink
 import time
+import alxJlink
 
 
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
+def Script(progPath, targetName, fwDir, addrAppHexStr, addrSignedHexStr, termPort, termBaudRate, logDir):
 	try:
 		#-------------------------------------------------------------------------------
 		# Print - START
@@ -50,6 +50,7 @@ def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 		#-------------------------------------------------------------------------------
 		# Init Dir & Path
 		#-------------------------------------------------------------------------------
+		alxJlinkObj = alxJlink.Jlink(progPath)
 
 		# Print
 		print("DO: Init Dir & Path")
@@ -59,6 +60,7 @@ def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 			f for f in pathlib.Path(fwDir).glob("*.bin")
 			if not f.name.endswith("_Signed.bin") and not f.name.endswith("_NoBoot.bin")
 		)
+		fwAppPathStr = str(fwAppPath)
 		logFolderDir =  pathlib.Path(logDir) / fwAppPath.stem
 		pidPath = pathlib.Path(logDir) / "alxSerialPortLogger.pid"
 		logPath = logFolderDir / f"{logFolderDir.name}.log"
@@ -96,6 +98,14 @@ def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 			finally:
 				# Delete PID file
 				pidPath.unlink(missing_ok=True)
+
+
+		#-------------------------------------------------------------------------------
+		# Erase FW
+		#-------------------------------------------------------------------------------
+		print(f"DO: Erase FW")
+		alxJlinkObj.ResetErase(targetName)
+		print("DONE: Erase FW")
 
 
 		#-------------------------------------------------------------------------------
@@ -138,12 +148,25 @@ def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 
 
 		#-------------------------------------------------------------------------------
-		# Reset FW
+		# Program FW APP
 		#-------------------------------------------------------------------------------
-		print("DO: Reset FW")
-		alxJlinkObj = alxJlink.Jlink(progPath)
-		alxJlinkObj.Reset(targetName)
-		print("DONE: Reset FW")
+		print(f"DO: Program FW APP: ResetProgramVerifyReset() fwAppPathStr {fwAppPathStr}")
+		alxJlinkObj.ResetProgramVerifyReset(targetName, fwAppPathStr, addrAppHexStr)
+		print("DONE: Program FW APP")
+
+
+		#-------------------------------------------------------------------------------
+		# Program FW Signed
+		#-------------------------------------------------------------------------------
+		if addrSignedHexStr != "":
+			# Set FW path
+			fwSignedPath = next(pathlib.Path(fwDir).glob("*_Signed.bin"))
+			fwSignedPathStr = str(fwSignedPath)
+
+			# Program
+			print(f"DO: Program FW Signed: ResetProgramVerifyReset() fwSignedPathStr {fwSignedPathStr}")
+			alxJlinkObj.ResetProgramVerifyReset(targetName, fwSignedPathStr, addrSignedHexStr)
+			print("DONE: Program FW Signed")
 
 	except Exception as e:
 		#-------------------------------------------------------------------------------
