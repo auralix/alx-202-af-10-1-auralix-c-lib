@@ -278,13 +278,6 @@ Alx_Status AlxIna228_GetShuntVoltage_V(AlxIna228* me, float* voltage_V)
 	// Set Conversion shunt factor. Depending on (ADCRANGE) adc range: 0 or 1.
 	const float CONVERSION_SHUNT_FACTOR = (me->reg._0x00_CONFIG.val.ADCRANGE == AdcRange_163_84_mV) ? CONVERSION_SHUNT_FACTOR_1 : CONVERSION_SHUNT_FACTOR_2;
 
-	// flipped the MSB and LSB all lenght
-	uint8_t raw1[2] = {0};
-	raw1[0] = me->reg._0x04_VSHUNT.val.raw[0];
-	raw1[1] = me->reg._0x04_VSHUNT.val.raw[1];
-	me->reg._0x04_VSHUNT.val.raw[0] = raw1[1];
-	me->reg._0x04_VSHUNT.val.raw[1] = raw1[0];
-
 	// Set
 	*voltage_V = me->reg._0x04_VSHUNT.val.VSHUNT_nVoltage * CONVERSION_SHUNT_FACTOR;
 
@@ -361,13 +354,6 @@ Alx_Status AlxIna228_GetCurrent_A(AlxIna228* me, float* current_A)
 
 	// Set Conversion Current LSB Factor
 	const float CONVERSION_CURRENT_LSB_FACTOR = me->conversionCurrentLsbFactor;
-
-	// flipped the MSB and LSB all lenght
-	uint8_t raw1[2] = {0};
-	raw1[0] = me->reg._0x07_CURRENT.val.raw[0];
-	raw1[1] = me->reg._0x07_CURRENT.val.raw[1];
-	me->reg._0x07_CURRENT.val.raw[0] = raw1[1];
-	me->reg._0x07_CURRENT.val.raw[1] = raw1[0];
 
 	// Set
 	*current_A = CONVERSION_CURRENT_LSB_FACTOR * me->reg._0x07_CURRENT.val.CURRENT_Amperes;
@@ -777,6 +763,7 @@ static Alx_Status AlxIna228_TraceId(AlxIna228* me)
 	// #2 Trace
 	ALX_INA228_TRACE_INF("");
 	ALX_INA228_TRACE_INF("Auralix C Library - ALX Current Monitor INA228 Module Identification:");
+	ALX_INA228_TRACE_INF("- DEVICE_i2cAddr: 0x%02X", me->i2cAddr);
 	ALX_INA228_TRACE_INF("- MANUFACTURER_ID: 0x%02X", me->reg._0x3E_MANUFACTURER_ID.val.MANFID);
 	ALX_INA228_TRACE_INF("- DEVICE_ID.REV_ID: 0x%02X", me->reg._0x3F_DEVICE_ID.val.REV_ID);
 	ALX_INA228_TRACE_INF("- DEVICE_ID.DIEID: 0x%02X", me->reg._0x3F_DEVICE_ID.val.DIEID);
