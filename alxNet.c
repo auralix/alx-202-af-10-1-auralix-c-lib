@@ -578,6 +578,7 @@ int AlxNet_Ping(AlxNet* me, const char *addr, uint16_t count, uint32_t timeout_m
 		{
 			return -1;
 		}
+		alxPingSocket.socket_data.wiz_sock_opened = true;
 
 		uint8_t addr_bin[4];
 		str2ip(addr, addr_bin);
