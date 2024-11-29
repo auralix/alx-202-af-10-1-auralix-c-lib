@@ -67,7 +67,9 @@ typedef enum
 	#endif
 	#if defined(ALX_STM32F7)
 	AlxI2c_Clk_McuStm32F7_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_54MHz = 0x10906999,
+	AlxI2c_Clk_McuStm32F7_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_54MHz = 0x6000030D,
 	AlxI2c_Clk_McuStm32F7_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_54MHz = 0x00A01B56,
+	AlxI2c_Clk_McuStm32F7_I2cClk_1MHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_54MHz = 0x00200922,
 	#endif
 	#if defined(ALX_STM32G4)
 	AlxI2c_Clk_McuStm32G4_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_170MHz = 0x40B285C2,	// TV: TODO, test
