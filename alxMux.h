@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxMux.h
-  * @brief		Auralix C Library - ALX Analog Multiplexer Module
+  * @brief		Auralix C Library - ALX MUX Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -78,26 +78,15 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
-{
-	AlxMux_CodeType_Real,
-	AlxMux_CodeType_Complement,
-	AlxMux_CodeType_Gray
-} AlxMux_CodeType;
-
 typedef struct
 {
 	// Defines
 	#define ALX_MUX_IO_PIN_VAL_ARR_LEN 8
 
 	// Parameters
+	AlxIoPin* do_nEN;
 	AlxIoPin** ioPinArr;
 	uint8_t ioPinArrLen;
-	AlxMux_CodeType codeType;
-
-	// Variables
-	bool ioPinValArr[ALX_MUX_IO_PIN_VAL_ARR_LEN];
-	uint32_t code;
 
 	// Info
 	bool wasCtorCalled;
@@ -111,18 +100,19 @@ typedef struct
 void AlxMux_Ctor
 (
 	AlxMux* me,
+	AlxIoPin* do_nEN,
 	AlxIoPin** ioPinArr,
-	uint8_t ioPinArrLen,
-	AlxMux_CodeType codeType
+	uint8_t ioPinArrLen
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxMux_Init(AlxMux* me);
-void AlxMux_DeInit(AlxMux* me);
-uint32_t AlxMux_GetCode(AlxMux* me);
+Alx_Status AlxMux_Init(AlxMux* me);
+Alx_Status AlxMux_DeInit(AlxMux* me);
+void AlxMux_Enable(AlxMux* me, bool enable);
+void AlxMux_Select(AlxMux* me, Alx_Ch ch);
 
 
 #endif	// #if defined(ALX_C_LIB)

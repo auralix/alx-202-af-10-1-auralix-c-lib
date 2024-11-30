@@ -103,6 +103,7 @@ void AlxAdc_Ctor
 	// Assert
 	//------------------------------------------------------------------------------
 	(void)me;
+	(void)adc;
 	(void)ioPinArr;
 	ALX_ADC_ASSERT(numOfIoPins <= ALX_ADC_BUFF_LEN - 1);	// We have only 16 ranks, one is used for VrefInt
 	(void)chArr;
@@ -274,13 +275,13 @@ void AlxAdc_Ctor
 		me->hdma.Instance = DMA2_Stream0;
 		me->hdma.Init.Channel = DMA_CHANNEL_0;
 	}
-	if (me->hadc.Instance == ADC2) // JS: not tested
+	else if (me->hadc.Instance == ADC2)	// JS: Not tested
 	{
 		me->dma = DMA2;
 		me->hdma.Instance = DMA2_Stream2;
 		me->hdma.Init.Channel = DMA_CHANNEL_1;
 	}
-	if (me->hadc.Instance == ADC3)
+	else if (me->hadc.Instance == ADC3)
 	{
 		me->dma = DMA2;
 		me->hdma.Instance = DMA2_Stream1;
@@ -663,7 +664,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxAdc_DeInit(AlxAdc* me)// JS: zasvijaril z ADC2 in ADC3 (če se oboje uporablja)
+Alx_Status AlxAdc_DeInit(AlxAdc* me)	// JS: On STM32F7 if using ADC1 with combination of ADC2 or ADC3 there is a bug with ADC periphery reset because it is NOT independent for each ADC1, ADC2, ADC3
 {
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);

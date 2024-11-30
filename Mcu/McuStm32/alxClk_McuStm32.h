@@ -78,6 +78,7 @@ typedef enum
 	#if defined(ALX_STM32F7)
 	AlxClk_Config_McuStm32F7_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default,
 	AlxClk_Config_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MHz_Hsi_16MHz,
+	AlxClk_Config_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MHz_Hse_12MHz,
 	AlxClk_Config_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MHz_Hse_25MHz,
 	#endif
 	#if defined(ALX_STM32G4)

@@ -680,7 +680,9 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 	if
 	(
 		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_54MHz) ||
-		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_54MHz)
+		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_54MHz) ||
+		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_54MHz) ||
+		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2cClk_1MHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_54MHz)
 	)
 	{
 		if(54000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))

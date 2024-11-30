@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxBq25890.h
-  * @brief		Auralix C Library - ALX Battery charger
+  * @file		alxPi4ioe5v6534q.h
+  * @brief		Auralix C Library - ALX IO Expander PI4IOE5V6534Q Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_BQ25890_H
-#define ALX_BQ25890_H
+#ifndef ALX_PI4IOE5V6534Q_H
+#define ALX_PI4IOE5V6534Q_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,101 +56,92 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_BQ25890_FILE "alxBq25890.h"
+#define ALX_PI4IOE5V6534Q_FILE "alxPi4ioe5v6534q.h"
 
 // Assert //
-#if defined(ALX_BQ25890_ASSERT_BKPT_ENABLE)
-	#define ALX_BQ25890_ASSERT(expr) ALX_ASSERT_BKPT(ALX_BQ25890_FILE, expr)
-#elif defined(ALX_BQ25890_ASSERT_TRACE_ENABLE)
-	#define ALX_BQ25890_ASSERT(expr) ALX_ASSERT_TRACE(ALX_BQ25890_FILE, expr)
-#elif defined(ALX_BQ25890_ASSERT_RST_ENABLE)
-	#define ALX_BQ25890_ASSERT(expr) ALX_ASSERT_RST(ALX_BQ25890_FILE, expr)
+#if defined(ALX_PI4IOE5V6534Q_ASSERT_BKPT_ENABLE)
+	#define ALX_PI4IOE5V6534Q_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PI4IOE5V6534Q_FILE, expr)
+#elif defined(ALX_PI4IOE5V6534Q_ASSERT_TRACE_ENABLE)
+	#define ALX_PI4IOE5V6534Q_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PI4IOE5V6534Q_FILE, expr)
+#elif defined(ALX_PI4IOE5V6534Q_ASSERT_RST_ENABLE)
+	#define ALX_PI4IOE5V6534Q_ASSERT(expr) ALX_ASSERT_RST(ALX_PI4IOE5V6534Q_FILE, expr)
 #else
-	#define ALX_BQ25890_ASSERT(expr) do{} while (false)
+	#define ALX_PI4IOE5V6534Q_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(ALX_BQ25890_TRACE_ENABLE)
-	#define ALX_BQ25890_TRACE(...) ALX_TRACE_WRN(ALX_BQ25890_FILE, __VA_ARGS__)
+#if defined(ALX_PI4IOE5V6534Q_TRACE_ENABLE)
+	#define ALX_PI4IOE5V6534Q_TRACE_WRN(...) ALX_TRACE_WRN(ALX_PI4IOE5V6534Q_FILE, __VA_ARGS__)
+	#define ALX_PI4IOE5V6534Q_TRACE_ERR(...) ALX_TRACE_ERR(ALX_PI4IOE5V6534Q_FILE, __VA_ARGS__)
 #else
-	#define ALX_BQ25890_TRACE(...) do{} while (false)
+	#define ALX_PI4IOE5V6534Q_TRACE_WRN(...) do{} while (false)
+	#define ALX_PI4IOE5V6534Q_TRACE_ERR(...) do{} while (false)
 #endif
 
-//******************************************************************************
-// Faults
-//******************************************************************************
-typedef union
-{
-	struct __attribute__((packed))
-	{
-		uint8_t NTC_FAULT	: 3;
-		uint8_t CHRG_FAULT	: 2;
-		bool BAT_FAULT		: 1;
-		uint8_t unused		: 2;
-	};
-	uint8_t raw;
 
-}AlxBq2890_faults_t;
-
-	//******************************************************************************
+//******************************************************************************
 // Register Values Unions
 //******************************************************************************
 
+
 //------------------------------------------------------------------------------
-// Device registers
+// Types
 //------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t IINLIM	: 6;
-		bool EN_ILIM	: 1;
-		bool EN_HIZ		: 1;
+		bool _0 : 1;
+		bool _1 : 1;
+		bool _2 : 1;
+		bool _3 : 1;
+		bool _4 : 1;
+		bool _5 : 1;
+		bool _6 : 1;
+		bool _7 : 1;
 	};
 	uint8_t raw;
-} AlxBq25890_Reg_00_bits;
+} AlxPi4ioe5v6534q_RegVal_Port;
 
+
+//------------------------------------------------------------------------------
+// Input Port Register Group
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		bool PUMPX_DN		: 1;
-		bool PUMPX_UP		: 1;
-		bool BATFET_RST_EN	: 1;
-		bool BATFET_DLY		: 1;
-		bool JEITA_VSET		: 1;
-		bool BATFET_DIS		: 1;
-		bool TMR2X_EN		: 1;
-		bool FORCE_ICO		: 1;
+		AlxPi4ioe5v6534q_RegVal_Port P[5];
 	};
-	uint8_t raw;
-} AlxBq25890_Reg_09_bits;
+	uint8_t raw[5];
+} AlxPi4ioe5v6534q_RegGroupVal_0x00_InputPort;
 
+
+//------------------------------------------------------------------------------
+// Output Port Register Group
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		bool VSYS_STAT			: 1;
-		bool RESERVED			: 1;
-		bool PG_STAT			: 1;
-		uint8_t CHRG_STAT		: 2;
-		uint8_t VBUS_STAT		: 3;
+		AlxPi4ioe5v6534q_RegVal_Port P[5];
 	};
-	uint8_t raw;
-} AlxBq25890_Reg_0B_bits;
+	uint8_t raw[5];
+} AlxPi4ioe5v6534q_RegGroupVal_0x05_OutputPort;
 
+
+//------------------------------------------------------------------------------
+// Configuration Port Register Group
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		uint8_t NTC_FAULT		: 3;
-		bool BAT_FAULT			: 1;
-		uint8_t CHGR_FAULT		: 2;
-		bool BOOST_FAULT		: 1;
-		bool WATCHDOG_FAULT		: 1;
+		AlxPi4ioe5v6534q_RegVal_Port P[5];
 	};
-	uint8_t raw;
-} AlxBq25890_Reg_0C_bits;
+	uint8_t raw[5];
+} AlxPi4ioe5v6534q_RegGroupVal_0x0F_ConfigurationPort;
+
 
 //******************************************************************************
 // Register Structures
@@ -159,39 +150,33 @@ typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxBq25890_Reg_00_bits val;
-} AlxBq25890_Reg_00;
+	AlxPi4ioe5v6534q_RegGroupVal_0x00_InputPort val;
+} AlxPi4ioe5v6534q_RegGroup_0x00_InputPort;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxBq25890_Reg_09_bits val;
-} AlxBq25890_Reg_09;
+	AlxPi4ioe5v6534q_RegGroupVal_0x05_OutputPort val;
+} AlxPi4ioe5v6534q_RegGroup_0x05_OutputPort;
 
 typedef struct
 {
 	uint8_t addr;
 	uint8_t len;
-	AlxBq25890_Reg_0B_bits val;
-} AlxBq25890_Reg_0B;
+	AlxPi4ioe5v6534q_RegGroupVal_0x0F_ConfigurationPort val;
+} AlxPi4ioe5v6534q_RegGroup_0x0F_ConfigurationPort;
 
-typedef struct
-{
-	uint8_t addr;
-	uint8_t len;
-	AlxBq25890_Reg_0C_bits val;
-} AlxBq25890_Reg_0C;
+
 //******************************************************************************
 // Main Register Structure
 //******************************************************************************
 typedef struct
 {
-	AlxBq25890_Reg_00 REG_00;
-	AlxBq25890_Reg_09 REG_09;
-	AlxBq25890_Reg_0B REG_0B;
-	AlxBq25890_Reg_0C REG_0C;
-} AlxBq25890_Reg;
+	AlxPi4ioe5v6534q_RegGroup_0x00_InputPort _0x00_InputPort;
+	AlxPi4ioe5v6534q_RegGroup_0x05_OutputPort _0x05_OutputPort;
+	AlxPi4ioe5v6534q_RegGroup_0x0F_ConfigurationPort _0x0F_ConfigurationPort;
+} AlxPi4ioe5v6534q_Reg;
 
 
 //******************************************************************************
@@ -200,65 +185,51 @@ typedef struct
 typedef struct
 {
 	// Parameters
+	AlxIoPin* do_nRESET;
 	AlxI2c* i2c;
 	uint8_t i2cAddr;
 	bool i2cCheckWithRead;
 	uint8_t i2cNumOfTries;
 	uint16_t i2cTimeout_ms;
 
-	// IC Ctor specific configuration
-	uint16_t IINLIM;
-	bool JEITA_VSET;
-	bool BATFET_DIS;
-
 	// Variables
-	AlxBq25890_Reg reg;
+	AlxPi4ioe5v6534q_Reg reg;
 
 	// Info
 	bool wasCtorCalled;
 	bool isInitPeriph;
 	bool isInit;
-} AlxBq25890;
+} AlxPi4ioe5v6534q;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxBq25890_Ctor
+void AlxPi4ioe5v6534q_Ctor
 (
-	AlxBq25890* me,
+	AlxPi4ioe5v6534q* me,
+	AlxIoPin* do_nRESET,
 	AlxI2c* i2c,
-	uint8_t IINLIM,
-	bool JEITA_VSET,
-	bool BATFET_DIS
+	uint8_t i2cAddr,
+	bool i2cCheckWithRead,
+	uint8_t i2cNumOfTries,
+	uint16_t i2cTimeout_ms
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxBq25890_InitPeriph(AlxBq25890* me);
-Alx_Status AlxBq25890_DeInitPeriph(AlxBq25890* me);
-Alx_Status AlxBq25890_Init(AlxBq25890* me);
-Alx_Status AlxBq25890_DeInit(AlxBq25890* me);
-Alx_Status AlxBq25890_Poll(AlxBq25890* me);
-Alx_Status AlxBq25890_Read(AlxBq25890* me, AlxBq25890_Reg *reg);
-Alx_Status AlxBq25890_GetFaults(AlxBq25890* me, AlxBq2890_faults_t *faults);
-Alx_Status AlxBq25890_GetChargingStatus(AlxBq25890* me, uint8_t *status);
-Alx_Status AlxBq25890_irqHandle(AlxBq25890* me);
-Alx_Status AlxBq25890_set_IINLIM(AlxBq25890* me, uint8_t value);
-Alx_Status AlxBq25890_set_JEITA_VSET(AlxBq25890* me, bool value);
-Alx_Status AlxBq25890_set_shipping_mode(AlxBq25890* me);
-
-
-bool AlxBq25890_IoPin_Read(AlxBq25890* me, uint8_t port, uint8_t pin);
-uint8_t AlxBq25890_Read_Port_Raw(AlxBq25890* me, uint8_t port);
-void AlxBq25890_IoPin_Write(AlxBq25890* me, uint8_t port, uint8_t pin, bool val);
-void AlxBq25890_IoPin_Set(AlxBq25890* me, uint8_t port, uint8_t pin);
-void AlxBq25890_IoPin_Reset(AlxBq25890* me, uint8_t port, uint8_t pin);
-void AlxBq25890_IoPin_Toggle(AlxBq25890* me, uint8_t port, uint8_t pin);
-Alx_Status AlxBq25890_Reg_Write(AlxBq25890* me, void* reg);
-Alx_Status AlxBq25890_Reg_Read(AlxBq25890* me, void* reg);
+Alx_Status AlxPi4ioe5v6534q_InitPeriph(AlxPi4ioe5v6534q* me);
+Alx_Status AlxPi4ioe5v6534q_DeInitPeriph(AlxPi4ioe5v6534q* me);
+Alx_Status AlxPi4ioe5v6534q_Init(AlxPi4ioe5v6534q* me);
+Alx_Status AlxPi4ioe5v6534q_DeInit(AlxPi4ioe5v6534q* me);
+Alx_Status AlxPi4ioe5v6534q_Handle(AlxPi4ioe5v6534q* me, uint8_t inPortNum, uint8_t outPortNum);
+bool AlxPi4ioe5v6534q_IoPin_Read(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pin);
+void AlxPi4ioe5v6534q_IoPin_Write(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pin, bool val);
+void AlxPi4ioe5v6534q_IoPin_Set(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pin);
+void AlxPi4ioe5v6534q_IoPin_Reset(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pin);
+void AlxPi4ioe5v6534q_IoPin_Toggle(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pin);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -267,4 +238,4 @@ Alx_Status AlxBq25890_Reg_Read(AlxBq25890* me, void* reg);
 }
 #endif
 
-#endif	// #ifndef ALX_BQ25890_H
+#endif	// #ifndef ALX_PI4IOE5V6534Q_H

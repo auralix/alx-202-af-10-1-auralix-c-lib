@@ -50,6 +50,7 @@ static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg);
 static void AlxIna228_CurrentLsbFactor(AlxIna228* me);
 static void AlxIna228_ShuntFactor(AlxIna228* me);
 static Alx_Status AlxIna228_TraceId(AlxIna228* me);
+Alx_Status AlxIna228_ReadRegAll(AlxIna228* me);
 
 
 //******************************************************************************
@@ -175,6 +176,10 @@ Alx_Status AlxIna228_Init(AlxIna228* me)
 	// Set isInit
 	me->isInit = true;
 
+	// Delay
+	AlxDelay_ms(500);
+	AlxIna228_ReadRegAll(me);
+
 	// Return
 	return Alx_Ok;
 }
@@ -203,6 +208,45 @@ Alx_Status AlxIna228_DeInit(AlxIna228* me)
 	// Return
 	return Alx_Ok;
 }
+Alx_Status AlxIna228_ReadRegAll(AlxIna228* me)
+{
+	// Assert
+	ALX_INA228_ASSERT(me->wasCtorCalled == true);
+	ALX_INA228_ASSERT(me->isInitPeriph == true);
+	ALX_INA228_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+
+	// Read
+	status = AlxIna228_Reg_Read(me, &me->reg._0x00_CONFIG);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x01_ADC_CONFIG);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x02_SHUNT_CAL);
+	#if defined(ALX_INA228)
+	status = AlxIna228_Reg_Read(me, &me->reg._0x03_SHUNT_TEMPCO);
+	#endif
+	status = AlxIna228_Reg_Read(me, &me->reg._0x04_VSHUNT);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x05_VBUS);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x06_DIETEMP);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x07_CURRENT);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x08_POWER);
+	#if defined(ALX_INA228)
+	status = AlxIna228_Reg_Read(me, &me->reg._0x09_ENERGY);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0A_CHARGE);
+	#endif
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0B_DIAG_ALRT);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0C_SOVL);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0D_SUVL);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0E_BOVL);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x0F_BUVL);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x10_TEMP_LIMIT);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x11_PWR_LIMIT);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x3E_MANUFACTURER_ID);
+	status = AlxIna228_Reg_Read(me, &me->reg._0x3F_DEVICE_ID);
+
+	// Return
+	return Alx_Ok;
+}
 Alx_Status AlxIna228_GetShuntVoltage_V(AlxIna228* me, float* voltage_V)
 {
 	// Assert
@@ -217,14 +261,22 @@ Alx_Status AlxIna228_GetShuntVoltage_V(AlxIna228* me, float* voltage_V)
 	status = AlxIna228_Reg_Read(me, &me->reg._0x04_VSHUNT);
 	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x04_VSHUNT"); return status; }
 
-	// Set Conversion shunt factor value 312.5e-9
-	const float CONVERSION_SHUNT_FACTOR_312_5En9 = 312.5e-9;
+	// Set Conversion shunt factor for AdcRange_163_84_mV
+	#if defined(ALX_INA228)
+	const float CONVERSION_SHUNT_FACTOR_1 = 312.5e-9;
+	#elif defined(ALX_INA238)
+	const float CONVERSION_SHUNT_FACTOR_1 = 5.0e-6;
+	#endif
 
-	// Set Conversion shunt factorvalue 78.125e-9
-	const float CONVERSION_SHUNT_FACTOR_78_125En9 = 78.125e-9;
+	// Set Conversion shunt factor for AdcRange_40_96_mV
+	#if defined(ALX_INA228)
+	const float CONVERSION_SHUNT_FACTOR_2 = 78.125e-9;
+	#elif defined(ALX_INA238)
+	const float CONVERSION_SHUNT_FACTOR_2 = 1.25e-6;
+	#endif
 
 	// Set Conversion shunt factor. Depending on (ADCRANGE) adc range: 0 or 1.
-	const float CONVERSION_SHUNT_FACTOR = (me->reg._0x00_CONFIG.val.ADCRANGE == AdcRange_163_84_mV) ? CONVERSION_SHUNT_FACTOR_312_5En9 : CONVERSION_SHUNT_FACTOR_78_125En9;
+	const float CONVERSION_SHUNT_FACTOR = (me->reg._0x00_CONFIG.val.ADCRANGE == AdcRange_163_84_mV) ? CONVERSION_SHUNT_FACTOR_1 : CONVERSION_SHUNT_FACTOR_2;
 
 	// Set
 	*voltage_V = me->reg._0x04_VSHUNT.val.VSHUNT_nVoltage * CONVERSION_SHUNT_FACTOR;
@@ -247,7 +299,11 @@ Alx_Status AlxIna228_GetBusVoltage_V(AlxIna228* me, float* voltage_V)
 	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x05_VBUS"); return status; }
 
 	// Set Conversion vbus factor
+	#if defined(ALX_INA228)
 	const float CONVERSION_VBUS_FACTOR = 195.3125e-6;
+	#elif defined(ALX_INA238)
+	const float CONVERSION_VBUS_FACTOR = 3.125e-3;
+	#endif
 
 	// Set
 	*voltage_V = me->reg._0x05_VBUS.val.VBUS_uVoltage * CONVERSION_VBUS_FACTOR;
@@ -270,7 +326,11 @@ Alx_Status AlxIna228_GetTemp_degC(AlxIna228* me, float* temp_degC)
 	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x06_DIETEMP"); return status; }
 
 	// Set Conversion vbus factor
+	#if defined(ALX_INA228)
 	const float CONVERSION_TEMP_FACTOR = 7.8125;
+	#elif defined(ALX_INA238)
+	const float CONVERSION_TEMP_FACTOR = 125;
+	#endif
 
 	// Set
 	*temp_degC = me->reg._0x06_DIETEMP.val.DIETEMP_mDegC * CONVERSION_TEMP_FACTOR;
@@ -316,7 +376,11 @@ Alx_Status AlxIna228_GetPower_W(AlxIna228* me, float* power_W)
 	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x08_POWER"); return status; }
 
 	// Set Conversion Power Factor
+	#if defined(ALX_INA228)
 	const float CONVERSION_POWER_FACTOR = 3.2;
+	#elif defined(ALX_INA238)
+	const float CONVERSION_POWER_FACTOR = 0.2;
+	#endif
 
 	// Set Conversion Current LSB Factor
 	const float CONVERSION_CURRENT_LSB_FACTOR = me->conversionCurrentLsbFactor;
@@ -327,6 +391,7 @@ Alx_Status AlxIna228_GetPower_W(AlxIna228* me, float* power_W)
 	// Return
 	return Alx_Ok;
 }
+#if defined(ALX_INA228)
 Alx_Status AlxIna228_GetEnergy_J(AlxIna228* me, float* energy_J)
 {
 	// Assert
@@ -403,6 +468,7 @@ Alx_Status AlxIna228_ResetEnergyAndCharge(AlxIna228* me)
 	// Return
 	return Alx_Ok;
 }
+#endif
 Alx_Status AlxIna228_ResetSystem(AlxIna228* me)
 {
 	// Assert
@@ -435,14 +501,18 @@ static void AlxIna228_RegStruct_SetAddr(AlxIna228* me)
 	me->reg._0x00_CONFIG			.addr = 0x00;
 	me->reg._0x01_ADC_CONFIG		.addr = 0x01;
 	me->reg._0x02_SHUNT_CAL			.addr = 0x02;
+	#if defined(ALX_INA228)
 	me->reg._0x03_SHUNT_TEMPCO		.addr = 0x03;
+	#endif
 	me->reg._0x04_VSHUNT			.addr = 0x04;
 	me->reg._0x05_VBUS				.addr = 0x05;
 	me->reg._0x06_DIETEMP			.addr = 0x06;
 	me->reg._0x07_CURRENT			.addr = 0x07;
 	me->reg._0x08_POWER				.addr = 0x08;
+	#if defined(ALX_INA228)
 	me->reg._0x09_ENERGY			.addr = 0x09;
 	me->reg._0x0A_CHARGE			.addr = 0x0A;
+	#endif
 	me->reg._0x0B_DIAG_ALRT			.addr = 0x0B;
 	me->reg._0x0C_SOVL				.addr = 0x0C;
 	me->reg._0x0D_SUVL				.addr = 0x0D;
@@ -458,14 +528,18 @@ static void AlxIna228_RegStruct_SetLen(AlxIna228* me)
 	me->reg._0x00_CONFIG			.len = sizeof(me->reg._0x00_CONFIG			.val);
 	me->reg._0x01_ADC_CONFIG		.len = sizeof(me->reg._0x01_ADC_CONFIG		.val);
 	me->reg._0x02_SHUNT_CAL			.len = sizeof(me->reg._0x02_SHUNT_CAL		.val);
+	#if defined(ALX_INA228)
 	me->reg._0x03_SHUNT_TEMPCO		.len = sizeof(me->reg._0x03_SHUNT_TEMPCO	.val);
+	#endif
 	me->reg._0x04_VSHUNT			.len = sizeof(me->reg._0x04_VSHUNT			.val);
 	me->reg._0x05_VBUS				.len = sizeof(me->reg._0x05_VBUS			.val);
 	me->reg._0x06_DIETEMP			.len = sizeof(me->reg._0x06_DIETEMP			.val);
 	me->reg._0x07_CURRENT			.len = sizeof(me->reg._0x07_CURRENT			.val);
 	me->reg._0x08_POWER				.len = sizeof(me->reg._0x08_POWER			.val);
+	#if defined(ALX_INA228)
 	me->reg._0x09_ENERGY			.len = sizeof(me->reg._0x09_ENERGY			.val);
 	me->reg._0x0A_CHARGE			.len = sizeof(me->reg._0x0A_CHARGE			.val);
+	#endif
 	me->reg._0x0B_DIAG_ALRT			.len = sizeof(me->reg._0x0B_DIAG_ALRT		.val);
 	me->reg._0x0C_SOVL				.len = sizeof(me->reg._0x0C_SOVL			.val);
 	me->reg._0x0D_SUVL				.len = sizeof(me->reg._0x0D_SUVL			.val);
@@ -480,15 +554,20 @@ static void AlxIna228_RegStruct_SetValToZero(AlxIna228* me)
 {
 	me->reg._0x00_CONFIG			.val.raw =	0x0000;
 	me->reg._0x01_ADC_CONFIG		.val.raw =	0x0000;
-	me->reg._0x02_SHUNT_CAL			.val.raw =	0x0000;
+	//me->reg._0x02_SHUNT_CAL			.val.raw =	0x0000;
+	memset(me->reg._0x02_SHUNT_CAL.val.raw,		0x0000, sizeof(me->reg._0x02_SHUNT_CAL	.val.raw));
+	#if defined(ALX_INA228)
 	me->reg._0x03_SHUNT_TEMPCO		.val.raw =	0x0000;
+	#endif
 	memset(me->reg._0x04_VSHUNT.val.raw,		0x00, sizeof(me->reg._0x04_VSHUNT	.val.raw));
 	memset(me->reg._0x05_VBUS.val.raw,			0x00, sizeof(me->reg._0x05_VBUS		.val.raw));
 	me->reg._0x06_DIETEMP			.val.raw =	0x0000;
 	memset(me->reg._0x07_CURRENT.val.raw,		0x00, sizeof(me->reg._0x07_CURRENT	.val.raw));
 	memset(me->reg._0x08_POWER.val.raw,			0x00, sizeof(me->reg._0x08_POWER	.val.raw));
+	#if defined(ALX_INA228)
 	memset(me->reg._0x09_ENERGY.val.raw,		0x00, sizeof(me->reg._0x09_ENERGY	.val.raw));
 	memset(me->reg._0x0A_CHARGE.val.raw,		0x00, sizeof(me->reg._0x0A_CHARGE	.val.raw));
+	#endif
 	me->reg._0x0B_DIAG_ALRT			.val.raw =	0x0000;
 	me->reg._0x0C_SOVL				.val.raw =	0x0000;
 	me->reg._0x0D_SUVL				.val.raw =	0x0000;
@@ -503,24 +582,37 @@ static void AlxIna228_RegStruct_SetToDefault(AlxIna228* me)
 {
 	me->reg._0x00_CONFIG.val.raw =			0x0000;
 	me->reg._0x01_ADC_CONFIG.val.raw =		0xFB68;
-	me->reg._0x02_SHUNT_CAL.val.raw	=		0x1000;
+	//me->reg._0x02_SHUNT_CAL.val.raw	=		0x1000;
+	memset(me->reg._0x02_SHUNT_CAL.val.raw,	0x1000, sizeof(me->reg._0x02_SHUNT_CAL	.val.raw));
+	#if defined(ALX_INA228)
 	me->reg._0x03_SHUNT_TEMPCO.val.raw =	0x0000;
+	#endif
 	memset(me->reg._0x04_VSHUNT.val.raw,	0x00, sizeof(me->reg._0x04_VSHUNT	.val.raw));
 	memset(me->reg._0x05_VBUS.val.raw,		0x00, sizeof(me->reg._0x05_VBUS		.val.raw));
 	me->reg._0x06_DIETEMP.val.raw =			0x0000;
 	memset(me->reg._0x07_CURRENT.val.raw,	0x00, sizeof(me->reg._0x07_CURRENT	.val.raw));
 	memset(me->reg._0x08_POWER.val.raw,		0x00, sizeof(me->reg._0x08_POWER	.val.raw));
+	#if defined(ALX_INA228)
 	memset(me->reg._0x09_ENERGY.val.raw,	0x00, sizeof(me->reg._0x09_ENERGY	.val.raw));
 	memset(me->reg._0x0A_CHARGE.val.raw,	0x00, sizeof(me->reg._0x0A_CHARGE	.val.raw));
+	#endif
 	me->reg._0x0B_DIAG_ALRT.val.raw =		0x0001;
 	me->reg._0x0C_SOVL.val.raw =			0x7FFF;
 	me->reg._0x0D_SUVL.val.raw =			0x8000;
 	me->reg._0x0E_BOVL.val.raw =			0x7FFF;
 	me->reg._0x0F_BUVL.val.raw =			0x0000;
+	#if defined(ALX_INA228)
 	me->reg._0x10_TEMP_LIMIT.val.raw =		0x7FFF;
+	#elif defined(ALX_INA238)
+	me->reg._0x10_TEMP_LIMIT.val.raw =		0x7FF0;
+	#endif
 	me->reg._0x11_PWR_LIMIT.val.raw =		0xFFFF;
 	me->reg._0x3E_MANUFACTURER_ID.val.raw =	0x5449;
+	#if defined(ALX_INA228)
 	me->reg._0x3F_DEVICE_ID.val.raw =		0x2281;
+	#elif defined(ALX_INA238)
+	me->reg._0x3F_DEVICE_ID.val.raw =		0x2381;
+	#endif
 }
 
 static Alx_Status AlxIna228_Reg_Write(AlxIna228* me, void* reg)
@@ -558,8 +650,10 @@ static Alx_Status AlxIna228_Reg_Write_All(AlxIna228* me)
 	status = AlxIna228_Reg_Write(me, &me->reg._0x02_SHUNT_CAL);
 	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x02_SHUNT_CAL"); return status; }
 
+	#if defined(ALX_INA228)
 	status = AlxIna228_Reg_Write(me, &me->reg._0x03_SHUNT_TEMPCO);
 	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x03_SHUNT_TEMPCO"); return status; }
+	#endif
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0B_DIAG_ALRT);
 	if (status != Alx_Ok) { ALX_INA228_TRACE_WRN("Err_0x0B_DIAG_ALRT"); return status; }
@@ -592,7 +686,7 @@ static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg)
 	uint8_t regAddr = *((uint8_t*)reg);
 	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
-	uint8_t data[regLen];
+	uint8_t data[8] =  {};
 
 	// Read
 	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, data, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
@@ -621,7 +715,11 @@ static void AlxIna228_CurrentLsbFactor(AlxIna228* me)
 	const float MAX_EXPECTED_CURRENT = (me->adcRange == AdcRange_163_84_mV) ? (ADC_RANGE_163_84_MV / SHUNT_RES_VAL) : (ADC_RANGE_40_96_MV / SHUNT_RES_VAL);
 
 	// Set Current LSB factor
+	#if defined(ALX_INA228)
 	const float CURRENT_LSB_FACTOR =  MAX_EXPECTED_CURRENT / 524288.0; // 2^19 = 524288;
+	#elif defined(ALX_INA238)
+	const float CURRENT_LSB_FACTOR =  MAX_EXPECTED_CURRENT / 32768.0; // 2^15 = 32768;
+	#endif
 
 	// Save
 	me->conversionCurrentLsbFactor = CURRENT_LSB_FACTOR;
@@ -629,7 +727,11 @@ static void AlxIna228_CurrentLsbFactor(AlxIna228* me)
 static void AlxIna228_ShuntFactor(AlxIna228* me)
 {
 	// Set Fixed Scaling Factor
+	#if defined(ALX_INA228)
 	const float FIXED_SCALING_FACTOR = 13107.2 * 1e6;
+	#elif defined(ALX_INA238)
+	const float FIXED_SCALING_FACTOR = 819.2 * 1e6;
+	#endif
 
 	// Set Current LSB factor
 	const float CONVERSION_CURRENT_LSB_FACTOR = me->conversionCurrentLsbFactor;
@@ -661,6 +763,7 @@ static Alx_Status AlxIna228_TraceId(AlxIna228* me)
 	// #2 Trace
 	ALX_INA228_TRACE_INF("");
 	ALX_INA228_TRACE_INF("Auralix C Library - ALX Current Monitor INA228 Module Identification:");
+	ALX_INA228_TRACE_INF("- DEVICE_i2cAddr: 0x%02X", me->i2cAddr);
 	ALX_INA228_TRACE_INF("- MANUFACTURER_ID: 0x%02X", me->reg._0x3E_MANUFACTURER_ID.val.MANFID);
 	ALX_INA228_TRACE_INF("- DEVICE_ID.REV_ID: 0x%02X", me->reg._0x3F_DEVICE_ID.val.REV_ID);
 	ALX_INA228_TRACE_INF("- DEVICE_ID.DIEID: 0x%02X", me->reg._0x3F_DEVICE_ID.val.DIEID);

@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
   * @file		alxMux.c
-  * @brief		Auralix C Library - ALX Analog Multiplexer Module
+  * @brief		Auralix C Library - ALX MUX Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -43,22 +43,18 @@
 void AlxMux_Ctor
 (
 	AlxMux* me,
+	AlxIoPin* do_nEN,
 	AlxIoPin** ioPinArr,
-	uint8_t ioPinArrLen,
-	AlxMux_CodeType codeType
+	uint8_t ioPinArrLen
 )
 {
 	// Assert
 	ALX_MUX_ASSERT(ioPinArrLen <= ALX_MUX_IO_PIN_VAL_ARR_LEN);
 
 	// Parameters
+	me->do_nEN = do_nEN;
 	me->ioPinArr = ioPinArr;
 	me->ioPinArrLen = ioPinArrLen;
-	me->codeType = codeType;
-
-	// Variables
-	memset(me->ioPinValArr, 0, sizeof(me->ioPinValArr));
-	me->code = 0;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -69,13 +65,14 @@ void AlxMux_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-void AlxMux_Init(AlxMux* me)
+Alx_Status AlxMux_Init(AlxMux* me)
 {
 	// Assert
 	ALX_MUX_ASSERT(me->wasCtorCalled == true);
 	ALX_MUX_ASSERT(me->isInit == false);
 
 	// Init GPIO
+	AlxIoPin_Init(me->do_nEN);
 	for (uint32_t i = 0; i < me->ioPinArrLen; i++)
 	{
 		AlxIoPin_Init((*(me->ioPinArr + i)));
@@ -83,14 +80,18 @@ void AlxMux_Init(AlxMux* me)
 
 	// Set isInit
 	me->isInit = true;
+
+	// Return
+	return Alx_Ok;
 }
-void AlxMux_DeInit(AlxMux* me)
+Alx_Status AlxMux_DeInit(AlxMux* me)
 {
 	// Assert
 	ALX_MUX_ASSERT(me->wasCtorCalled == true);
 	ALX_MUX_ASSERT(me->isInit == true);
 
 	// DeInit GPIO
+	AlxIoPin_DeInit(me->do_nEN);
 	for (uint32_t i = 0; i < me->ioPinArrLen; i++)
 	{
 		AlxIoPin_DeInit((*(me->ioPinArr + i)));
@@ -98,56 +99,37 @@ void AlxMux_DeInit(AlxMux* me)
 
 	// Clear isInit
 	me->isInit = false;
+
+	// Return
+	return Alx_Ok;
 }
-uint32_t AlxMux_GetCode(AlxMux* me)
+void AlxMux_Enable(AlxMux* me, bool enable)
 {
-	//------------------------------------------------------------------------------
 	// Assert
-	//------------------------------------------------------------------------------
 	ALX_MUX_ASSERT(me->wasCtorCalled == true);
 	ALX_MUX_ASSERT(me->isInit == true);
 
+	// Write GPIO
+	AlxIoPin_Write(me->do_nEN, enable);
+}
+void AlxMux_Select(AlxMux* me, Alx_Ch ch)
+{
+	// Assert
+	ALX_MUX_ASSERT(me->wasCtorCalled == true);
+	ALX_MUX_ASSERT(me->isInit == true);
 
-	//------------------------------------------------------------------------------
-	// Get
-	//------------------------------------------------------------------------------
+	// Write GPIO
 	for (uint32_t i = 0; i < me->ioPinArrLen; i++)
 	{
-		me->ioPinValArr[i] = AlxIoPin_Read((*(me->ioPinArr + i)));
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Calculate
-	//------------------------------------------------------------------------------
-	me->code = 0;
-	if (me->codeType == AlxMux_CodeType_Real)
-	{
-		for (uint32_t i = 0; i < me->ioPinArrLen; i++)
+		if ((uint8_t)ch & (1 << i))
 		{
-			me->code = me->code + (uint32_t)me->ioPinValArr[i] * (uint32_t)(1 << i);	// TV: For size optimization we use bitwise shifting to compute 2^i
+			AlxIoPin_Set((me->ioPinArr[i]));
+		}
+		else
+		{
+			AlxIoPin_Reset((me->ioPinArr[i]));
 		}
 	}
-	else if (me->codeType == AlxMux_CodeType_Complement)
-	{
-		// TV: TODO
-		ALX_MUX_ASSERT(false);
-	}
-	else if (me->codeType == AlxMux_CodeType_Gray)
-	{
-		// TV: TODO
-		ALX_MUX_ASSERT(false);
-	}
-	else
-	{
-		ALX_MUX_ASSERT(false);	// We should not get here
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Return
-	//------------------------------------------------------------------------------
-	return me->code;
 }
 
 
