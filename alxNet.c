@@ -69,7 +69,7 @@
 #define CELLULAR_SIM_CARD_WAIT_INTERVAL_MS       ( 500UL )
 #define CELLULAR_MAX_SIM_RETRY                   ( 5U )
 #define CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS    ( 1000UL )
-
+#define CELLULAR_CONNECTION_MONITORING_PING		 "8.8.8.8"
 #endif
 //******************************************************************************
 // Private Variables
@@ -97,7 +97,7 @@ static uint8_t dns_response_ip[4];
 static DnsTaskState dns_retval;
 static AlxOsMutex alxDnsMutex;
 
-AlxSocket alxDhcpSocket, alxDnsSocket;
+AlxSocket alxDhcpSocket, alxDnsSocket, alxPingSocket;
 
 #if defined(ALX_FREE_RTOS_CELLULAR)
 extern CellularCommInterface_t CellularCommInterface;
@@ -431,6 +431,216 @@ static void tick_task(void *argument)
 		AlxOsDelay_ms(&alxOsDelay, 1000);
 	}
 }
+
+#define PING_BUF_LEN 32
+#define PING_REQUEST 8
+#define PING_REPLY 0
+#define Sn_PROTO(N)         (_W5500_IO_BASE_ + (0x0014 << 8) + (WIZCHIP_SREG_BLOCK(N) << 3))
+
+typedef struct pingmsg
+{
+	uint8_t  Type; // 0 - Ping Reply, 8 - Ping Request
+	uint8_t  Code; // Always 0
+	int16_t  CheckSum; // Check sum
+	int16_t  ID; // Identification
+	int16_t  SeqNum; // Sequence Number
+	int8_t	 Data[PING_BUF_LEN]; // Ping Data  : 1452 = IP RAW MTU - sizeof(Type+Code+CheckSum+ID+SeqNum)
+} PINGMSGR;
+
+static uint16_t RandomID = 0x1234;
+static uint16_t RandomSeqNum = 0x4321;
+
+static uint16_t ping_checksum(uint8_t * data_buf, uint16_t len)
+
+{
+	uint16_t sum, tsum, i, j;
+	uint32_t lsum;
+
+	j = len >> 1;
+	lsum = 0;
+	tsum = 0;
+	for (i = 0; i < j; i++)
+	{
+		tsum = data_buf[i * 2];
+		tsum = tsum << 8;
+		tsum += data_buf[i * 2 + 1];
+		lsum += tsum;
+	}
+	if (len % 2)
+	{
+		tsum = data_buf[i * 2];
+		lsum += (tsum << 8);
+	}
+	sum = (uint16_t)lsum;
+	sum = ~(sum + (lsum >> 16));
+	return sum;
+
+}
+
+
+static uint16_t htons(uint16_t hostshort)
+{
+	uint16_t netshort = (hostshort & 0xFF) << 8;
+	netshort |= ((hostshort >> 8) & 0xFF);
+	return netshort;
+}
+
+static int ping_request(uint8_t s, uint8_t *addr) {
+	PINGMSGR PingRequest;
+
+	/* make header of the ping-request  */
+	PingRequest.Type = PING_REQUEST; // Ping-Request
+	PingRequest.Code = 0; // Always '0'
+	PingRequest.ID = htons(RandomID++); // set ping-request's ID to random integer value
+	PingRequest.SeqNum = htons(RandomSeqNum++); // set ping-request's sequence number to ramdom integer value
+
+	/* Fill in Data[]  as size of BUF_LEN (Default = 32)*/
+	for (int i = 0; i < PING_BUF_LEN; i++) {
+		PingRequest.Data[i] = (i) % 8; //'0'~'8' number into ping-request's data
+	}
+	/* Do checksum of Ping Request */
+	PingRequest.CheckSum = 0; // value of checksum before calucating checksum of ping-request packet
+	PingRequest.CheckSum = htons(ping_checksum((uint8_t*)&PingRequest, sizeof(PingRequest))); // Calculate checksum
+
+	/* sendto ping_request to destination */
+	if (sendto(s, (uint8_t *)&PingRequest, sizeof(PingRequest), addr, 3000) == 0)
+	{
+		return -1;
+	}
+
+	return 0;
+}
+
+static uint8_t ping_reply(uint8_t s, uint8_t *addr, uint16_t rlen) {
+
+	uint16_t tmp_checksum;
+	uint16_t len;
+	uint16_t i;
+	uint8_t data_buf[128];
+	uint16_t port = 3000;
+	PINGMSGR PingReply;
+
+	/* receive data from a destination */
+	len = recvfrom(s, (uint8_t *)data_buf, rlen, addr, &port);
+	if (data_buf[0] == PING_REPLY)
+	{
+		PingReply.Type 		 = data_buf[0];
+		PingReply.Code 		 = data_buf[1];
+		PingReply.CheckSum   = (data_buf[3] << 8) + data_buf[2];
+		PingReply.ID 		 = (data_buf[5] << 8) + data_buf[4];
+		PingReply.SeqNum 	 = (data_buf[7] << 8) + data_buf[6];
+
+		for (i = 0; i < len - 8; i++)
+		{
+			PingReply.Data[i] = data_buf[8 + i];
+		}
+		/* check Checksum of Ping Reply */
+		tmp_checksum = ~ping_checksum((uint8_t*)&data_buf, len);
+		if (tmp_checksum == 0xffff)
+		{
+			return 0;
+		}
+	}
+	else if (data_buf[0] == PING_REQUEST)
+	{
+		PingReply.Code 	 = data_buf[1];
+		PingReply.Type 	 = data_buf[2];
+		PingReply.CheckSum  = (data_buf[3] << 8) + data_buf[2];
+		PingReply.ID 		 = (data_buf[5] << 8) + data_buf[4];
+		PingReply.SeqNum 	 = (data_buf[7] << 8) + data_buf[6];
+
+		for (i = 0; i < len - 8; i++)
+		{
+			PingReply.Data[i] = data_buf[8 + i];
+		}
+		/* check Checksum of Ping Reply */
+		tmp_checksum = PingReply.CheckSum;
+		PingReply.CheckSum = 0;
+		PingReply.CheckSum = htons(ping_checksum((uint8_t *)&PingReply, len));
+
+		if (tmp_checksum == PingReply.CheckSum)
+		{
+			return 0; // success
+		}
+	}
+
+	return -1;
+}
+
+int AlxNet_Ping(AlxNet* me, const char *addr, uint16_t count, uint32_t timeout_ms)
+{
+	if (me->config == AlxNet_Config_Wiznet)
+	{
+		uint16_t rlen, i;
+		int replies = 0;
+
+		if (AlxSocket_Open(&alxPingSocket, me, AlxSocket_Protocol_Udp) != Alx_Ok)
+		{
+			return -1;
+		}
+		alxPingSocket.socket_data.wiz_sock_opened = true;
+
+		uint8_t addr_bin[4];
+		str2ip(addr, addr_bin);
+		uint8_t s = alxPingSocket.socket_data.wiz_socket;
+		uint64_t start = AlxTick_Get_ms(&alxTick);
+		for (i = 0; i < count + 1; i++)
+		{
+			switch (getSn_SR(alxPingSocket.socket_data.wiz_socket))
+			{
+			case SOCK_CLOSED:
+				close(s);
+				// close the SOCKET
+				/* Create Socket */
+				WIZCHIP_WRITE(Sn_PROTO(s), IPPROTO_ICMP); // set ICMP Protocol
+				if (socket(s, Sn_MR_IPRAW, 3000, 0) != s) {
+					// open the SOCKET with IPRAW mode, if fail then Error
+					return -1;
+				}
+				/* Check socket register */
+				while (getSn_SR(s) != SOCK_IPRAW)
+				{
+				}
+				break;
+
+			case SOCK_IPRAW:
+				ping_request(s, addr_bin);
+				while (1)
+				{
+					if ((rlen = getSn_RX_RSR(s)) > 0)
+					{
+						if (ping_reply(s, addr_bin, rlen) == 0)
+						{
+							replies++;
+							break;
+						}
+					}
+
+					if (AlxTick_Get_ms(&alxTick) > start + timeout_ms)
+					{
+						AlxSocket_Close(&alxPingSocket);
+						return replies;
+					}
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+		AlxSocket_Close(&alxPingSocket);
+		return replies;
+	}
+
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		Cellular_Ping(me->cellular.handle, me->cellular.cellularContext, (char *)addr);
+		return 0;
+	}
+
+	return -1;
+}
+
 #if defined(ALX_FREE_RTOS_CELLULAR)
 static void cellular_info_task(void *argument)
 {
@@ -483,7 +693,7 @@ void AlxNet_Ctor
 #define MODEM_REGISTER_TIMEOUT 60000
 #define MODEM_SIM_TIMEOUT 20000
 #define MODEM_ACTIVATE_PDN_TIMEOUT 150000
-#define MODEM_CONNECTION_MONITORING_TIMEOUT 10000
+#define MODEM_CONNECTION_MONITORING_TIMEOUT 20000
 #define MODEM_LOW_LEVEL_ERR_THRESHOLD 3
 
 typedef enum
@@ -502,6 +712,19 @@ typedef enum
 	Cmd_PowerCycle,
 	Cmd_Disconnect
 } HandleConnectionCommandType;
+
+static uint64_t cellular_last_ping_time = 0;
+
+static void cellular_GenericCB(const char * pRawData,
+	void * pCallbackContext)
+{
+	// for ping pRawData is NULL
+	if (pRawData == NULL && pCallbackContext == NULL)
+	{
+		//ALX_NET_TRACE_INF("Ping OK!");
+		cellular_last_ping_time = AlxTick_Get_ms(&alxTick);
+	}
+}
 
 static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectionCommandType cmd)
 {
@@ -533,6 +756,7 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 			me->isNetConnected = false;
 			if (Cellular_Init(&me->cellular.handle, me->cellular.CommIntf) == CELLULAR_SUCCESS) // power on with GPIO key simulation, auto-bauding
 			{
+				Cellular_RegisterUrcGenericCallback(me->cellular.handle, cellular_GenericCB, NULL);
 				start_time = AlxTick_Get_ms(&alxTick);
 				connection_state = State_ModemOn;
 			}
@@ -618,7 +842,7 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 					if (Cellular_GetIPAddress(me->cellular.handle, me->cellular.cellularContext, me->ip, sizeof(me->ip)) == CELLULAR_SUCCESS)
 					{
 						me->isNetConnected = true;
-						start_time = AlxTick_Get_ms(&alxTick);
+						start_time = cellular_last_ping_time = AlxTick_Get_ms(&alxTick);
 						connection_state = State_ModemConnected;
 						break;
 					}
@@ -663,6 +887,17 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 			{
 				start_time = AlxTick_Get_ms(&alxTick);
 
+#ifdef CELLULAR_CONNECTION_MONITORING_PING
+				// monitor connection with pinging
+				// Cellular_Ping(me->cellular.handle, me->cellular.cellularContext, CELLULAR_CONNECTION_MONITORING_PING);
+				AlxNet_Ping(me, CELLULAR_CONNECTION_MONITORING_PING, 0, 0);
+				if (AlxTick_Get_ms(&alxTick) - cellular_last_ping_time > 3 * MODEM_CONNECTION_MONITORING_TIMEOUT)
+				{
+					ALX_NET_TRACE_WRN("Ping is failing for more than %d seconds", 3 * MODEM_CONNECTION_MONITORING_TIMEOUT / 1000);
+					me->isNetConnected = false;
+					// no break;
+				}
+#endif
 				// update RSSI info
 				if (Cellular_GetInfo(me->cellular.handle, &me->cellular.signalQuality) != CELLULAR_SUCCESS)
 				{
@@ -755,6 +990,9 @@ Alx_Status AlxNet_Init(AlxNet *me)
 			reg_wizchip_cs_cbfunc(Select, Unselect);
 			reg_wizchip_spi_cbfunc(ReadByte, WriteByte);
 			reg_wizchip_spiburst_cbfunc(ReadBurst, WriteBurst);
+
+			// Init ping socket
+			AlxSocket_Ctor(&alxPingSocket);
 
 			// Init SPI
 			AlxOsMutex_Ctor(&alxSpiMutex);
