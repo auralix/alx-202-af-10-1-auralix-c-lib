@@ -458,30 +458,48 @@ static int check_domain(const char *hostname, size_t hostname_len, const char *d
 
 	return strncasecmp(host_domain + 1, domain, domain_len);
 }
+
 static int sslVerifyDomain(void *p_vrfy, mbedtls_x509_crt *crt, int i, uint32_t *flags)
 {
 	AlxSocket *me = (AlxSocket *)p_vrfy;
 	if (i == 0) // last certificate in chain (server's certificate)
 	{
-		bool match = false;
 		mbedtls_x509_sequence *seq = &crt->subject_alt_names;
-		while (seq != NULL)
+		if (seq != NULL)
 		{
-			if (seq->buf.len)
+			while (seq != NULL)
 			{
-				// seq->buf.p[seq->buf.len] = 0;
-				// if (check_wildcard((const char *)seq->buf.p, (const char *)p_vrfy) == 0)
-				if (check_domain((const char *)seq->buf.p, seq->buf.len, me->tls_data.domain) == 0)
+				if((seq->buf.tag & MBEDTLS_ASN1_TAG_VALUE_MASK) == MBEDTLS_X509_SAN_DNS_NAME && seq->buf.len)
 				{
-					match = true;
+					if (check_domain((const char *)seq->buf.p, seq->buf.len, me->tls_data.domain) == 0)
+					{
+						return 0;
+					}
 				}
+				seq = seq->next;
 			}
-			seq = seq->next;
 		}
-		if (!match)
+		else
 		{
-			*flags |= MBEDTLS_X509_BADCERT_CN_MISMATCH;
+			mbedtls_x509_name *sub = &crt->subject;
+			while (sub != NULL)
+			{
+				if (MBEDTLS_OID_CMP(MBEDTLS_OID_AT_CN, &sub->oid) == 0) // CN
+				{
+					if (sub->val.len)
+					{
+						if (check_domain((const char *)sub->val.p, sub->val.len, me->tls_data.domain) == 0)
+						{
+							return 0;
+						}
+					}
+				}
+				sub = sub->next;
+			}
 		}
+
+		// domain didn't match subject's CN or any SAN domain
+		*flags |= MBEDTLS_X509_BADCERT_CN_MISMATCH;
 	}
 	return 0;
 }
