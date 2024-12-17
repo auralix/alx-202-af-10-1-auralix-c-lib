@@ -695,6 +695,7 @@ void AlxNet_Ctor
 #define MODEM_ACTIVATE_PDN_TIMEOUT 150000
 #define MODEM_CONNECTION_MONITORING_TIMEOUT 20000
 #define MODEM_LOW_LEVEL_ERR_THRESHOLD 3
+#define MODEM_POWER_CYCLE_DELAY 1000
 
 typedef enum
 {
@@ -748,21 +749,25 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 				me->cellular.handle = NULL;
 			}
 			low_level_err = 0;
+			start_time = AlxTick_Get_ms(&alxTick);
 			connection_state = State_ModemOff;
 			break;
 		}
 	case State_ModemOff:
 		{
 			me->isNetConnected = false;
-			if (Cellular_Init(&me->cellular.handle, me->cellular.CommIntf) == CELLULAR_SUCCESS) // power on with GPIO key simulation, auto-bauding
+			if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_POWER_CYCLE_DELAY)
 			{
-				Cellular_RegisterUrcGenericCallback(me->cellular.handle, cellular_GenericCB, NULL);
-				start_time = AlxTick_Get_ms(&alxTick);
-				connection_state = State_ModemOn;
-			}
-			else
-			{
-				connection_state = State_ModemGoOff;
+				if (Cellular_Init(&me->cellular.handle, me->cellular.CommIntf) == CELLULAR_SUCCESS) // power on with GPIO key simulation, auto-bauding
+				{
+					Cellular_RegisterUrcGenericCallback(me->cellular.handle, cellular_GenericCB, NULL);
+					start_time = AlxTick_Get_ms(&alxTick);
+					connection_state = State_ModemOn;
+				}
+				else
+				{
+					connection_state = State_ModemGoOff;
+				}
 			}
 			break;
 		}
