@@ -93,10 +93,18 @@ extern "C" {
 #define __HAL_RCC_ADC1_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
 #define __HAL_RCC_ADC2_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
 #define __HAL_RCC_ADC3_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
-
 #define __HAL_RCC_ADC1_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
 #define __HAL_RCC_ADC2_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
 #define __HAL_RCC_ADC3_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
+
+
+//------------------------------------------------------------------------------
+// ALX - MCU - DAC
+//------------------------------------------------------------------------------
+#define __HAL_RCC_DAC1_CLK_ENABLE		__HAL_RCC_DAC_CLK_ENABLE
+#define __HAL_RCC_DAC1_CLK_DISABLE		__HAL_RCC_DAC_CLK_DISABLE
+#define __HAL_RCC_DAC1_FORCE_RESET		__HAL_RCC_DAC_FORCE_RESET
+#define __HAL_RCC_DAC1_RELEASE_RESET	__HAL_RCC_DAC_RELEASE_RESET
 
 
 //------------------------------------------------------------------------------

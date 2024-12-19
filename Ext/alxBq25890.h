@@ -86,7 +86,7 @@ typedef union
 		uint8_t NTC_FAULT	: 3;
 		uint8_t CHRG_FAULT	: 2;
 		bool BAT_FAULT		: 1;
-		uint8_t unused		: 3;
+		uint8_t unused		: 2;
 	};
 	uint8_t raw;
 
