@@ -54,6 +54,7 @@ extern "C" {
 #include "alxMcp73831.h"
 #include "alxNtcg103jf103ft1s.h"
 #include "alxPcal6416a.h"
+#include "alxPi4ioe5v6534q.h"
 #include "alxTmp1075.h"
 #include "alxTpa3255.h"
 #include "alxVeml6040.h"

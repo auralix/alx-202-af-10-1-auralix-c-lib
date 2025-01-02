@@ -31,6 +31,7 @@ import pathlib
 import sys
 import serial
 import logging
+import logging.handlers
 
 
 #*******************************************************************************
@@ -44,12 +45,17 @@ def Script(port, baudRate, logDir):
 		#-------------------------------------------------------------------------------
 		logDirPath = pathlib.Path(logDir)
 		logPath = logDirPath / f"{logDirPath.name}.log"
+		timedRotatingHandler = logging.handlers.TimedRotatingFileHandler(
+			logPath,
+			when='midnight',
+			backupCount=90
+		)
 		logging.basicConfig(
 			format = '%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s',
 			datefmt = '%Y-%m-%d %H:%M:%S',
 			level=logging.DEBUG,
 			handlers = [
-				logging.FileHandler(logPath)
+				timedRotatingHandler
 			]
 		)
 
@@ -57,7 +63,6 @@ def Script(port, baudRate, logDir):
 		#-------------------------------------------------------------------------------
 		# START
 		#-------------------------------------------------------------------------------
-		logging.debug("")
 		logging.debug(f"alxSerialPortLogger.py - START: port {port} baudRate {baudRate} logDir {logDir}")
 
 
@@ -80,7 +85,6 @@ def Script(port, baudRate, logDir):
 		# EXCEPTION
 		#-------------------------------------------------------------------------------
 		logging.fatal(f"alxSerialPortLogger.py - EXCEPTION: {e}")
-		logging.fatal("")
 		sys.exit(1)
 
 	finally:
@@ -88,7 +92,6 @@ def Script(port, baudRate, logDir):
 		# FINISH
 		#-------------------------------------------------------------------------------
 		logging.debug("alxSerialPortLogger.py - FINISH")
-		logging.debug("")
 		if serialPort and serialPort.is_open:
 			serialPort.close()
 

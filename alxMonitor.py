@@ -31,13 +31,14 @@ import pathlib
 import sys
 import shutil
 import subprocess
+import time
 import alxJlink
 
 
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
+def Script(progPath, targetName, fwDir, addrAppHexStr, addrSignedHexStr, termPort, termBaudRate, logDir):
 	try:
 		#-------------------------------------------------------------------------------
 		# Print - START
@@ -49,6 +50,7 @@ def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 		#-------------------------------------------------------------------------------
 		# Init Dir & Path
 		#-------------------------------------------------------------------------------
+		alxJlinkObj = alxJlink.Jlink(progPath)
 
 		# Print
 		print("DO: Init Dir & Path")
@@ -58,8 +60,10 @@ def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 			f for f in pathlib.Path(fwDir).glob("*.bin")
 			if not f.name.endswith("_Signed.bin") and not f.name.endswith("_NoBoot.bin")
 		)
+		fwAppPathStr = str(fwAppPath)
 		logFolderDir =  pathlib.Path(logDir) / fwAppPath.stem
 		pidPath = pathlib.Path(logDir) / "alxSerialPortLogger.pid"
+		logPath = logFolderDir / f"{logFolderDir.name}.log"
 
 		# Create clean directory for logPath
 		shutil.rmtree(logFolderDir, ignore_errors=True)
@@ -97,6 +101,14 @@ def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 
 
 		#-------------------------------------------------------------------------------
+		# Erase FW
+		#-------------------------------------------------------------------------------
+		# print(f"DO: Erase FW")
+		# alxJlinkObj.ResetErase(targetName)
+		# print("DONE: Erase FW")
+
+
+		#-------------------------------------------------------------------------------
 		# Start New alxSerialPortLogger Process
 		#-------------------------------------------------------------------------------
 
@@ -124,12 +136,37 @@ def Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir):
 
 
 		#-------------------------------------------------------------------------------
-		# Reset FW
+		# Check if alxSerialPortLogger Process is Running
 		#-------------------------------------------------------------------------------
-		print(f"DO: Reset FW")
-		alxJlinkObj = alxJlink.Jlink(progPath)
-		alxJlinkObj.Reset(targetName)
-		print("DONE: Reset FW")
+		time.sleep(2)
+		print("DO: Check if alxSerialPortLogger process is running")
+		logText = logPath.read_text().strip()
+		if logText.endswith("alxSerialPortLogger.py - FINISH"):
+			print("FAIL: alxSerialPortLogger NOT running")
+			raise
+		print("DONE: Check if alxSerialPortLogger process is running")
+
+
+		#-------------------------------------------------------------------------------
+		# Program FW APP
+		#-------------------------------------------------------------------------------
+		print(f"DO: Program FW APP: ResetProgramVerifyReset() fwAppPathStr {fwAppPathStr}")
+		alxJlinkObj.ResetProgramVerifyReset(targetName, fwAppPathStr, addrAppHexStr)
+		print("DONE: Program FW APP")
+
+
+		#-------------------------------------------------------------------------------
+		# Program FW Signed
+		#-------------------------------------------------------------------------------
+		if addrSignedHexStr != "":
+			# Set FW path
+			fwSignedPath = next(pathlib.Path(fwDir).glob("*_Signed.bin"))
+			fwSignedPathStr = str(fwSignedPath)
+
+			# Program
+			print(f"DO: Program FW Signed: ResetProgramVerifyReset() fwSignedPathStr {fwSignedPathStr}")
+			alxJlinkObj.ResetProgramVerifyReset(targetName, fwSignedPathStr, addrSignedHexStr)
+			print("DONE: Program FW Signed")
 
 	except Exception as e:
 		#-------------------------------------------------------------------------------
@@ -155,9 +192,11 @@ if __name__ == "__main__":
 	progPath = sys.argv[1]
 	targetName = sys.argv[2]
 	fwDir = sys.argv[3]
-	termPort = sys.argv[4]
-	termBaudRate = sys.argv[5]
-	logDir = sys.argv[6]
+	addrAppHexStr = sys.argv[4]
+	addrSignedHexStr = sys.argv[5]
+	termPort = sys.argv[6]
+	termBaudRate = sys.argv[7]
+	logDir = sys.argv[8]
 
 	# Script
-	Script(progPath, targetName, fwDir, termPort, termBaudRate, logDir)
+	Script(progPath, targetName, fwDir, addrAppHexStr, addrSignedHexStr, termPort, termBaudRate, logDir)
