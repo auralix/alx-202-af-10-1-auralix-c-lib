@@ -249,6 +249,9 @@ extern "C" {
 #elif defined(ALX_LPC84X)
 #include "alxGlobal_McuLpc84x.h"
 
+#elif defined(ALX_SAM)
+#include "alxGlobal_McuSam.h"
+
 #endif
 
 
