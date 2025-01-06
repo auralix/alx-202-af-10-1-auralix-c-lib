@@ -103,9 +103,9 @@ def Script(progPath, targetName, fwDir, addrAppHexStr, addrSignedHexStr, termPor
 		#-------------------------------------------------------------------------------
 		# Erase FW
 		#-------------------------------------------------------------------------------
-		print(f"DO: Erase FW")
-		alxJlinkObj.ResetErase(targetName)
-		print("DONE: Erase FW")
+		# print(f"DO: Erase FW")
+		# alxJlinkObj.ResetErase(targetName)
+		# print("DONE: Erase FW")
 
 
 		#-------------------------------------------------------------------------------

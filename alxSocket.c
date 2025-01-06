@@ -244,6 +244,7 @@ static int cell_send(AlxSocket* me, void* data, uint32_t len)
 	uint32_t sent_length = 0;
 	uint32_t sent_total = 0;
 
+	AlxOsMutex_Lock(&socketMutex);
 	uint64_t timer_start = AlxTick_Get_ms(&alxTick);
 	while (1)
 	{
@@ -252,12 +253,26 @@ static int cell_send(AlxSocket* me, void* data, uint32_t len)
 		{
 			if (AlxTick_Get_ms(&alxTick) - timer_start > me->timeout)
 			{
+				AlxOsMutex_Unlock(&socketMutex);
+				ALX_SOCKET_TRACE_WRN("Cellular_SocketSend failed with timeout: %d", cellularStatus);
 				return -1;
 			}
 			else
 			{
 				AlxOsDelay_ms(&alxOsDelay, 500);
+				if (cellularStatus != CELLULAR_MODEM_NOT_READY)
+				{
+					AlxOsMutex_Unlock(&socketMutex);
+					ALX_SOCKET_TRACE_WRN("Cellular_SocketSend failed: %d", cellularStatus);
+					return -1;
+				}
 			}
+		}
+
+		if (AlxTick_Get_ms(&alxTick) - timer_start > me->timeout)
+		{
+			ALX_SOCKET_TRACE_WRN("cell_send timed out");
+			break;
 		}
 
 		if (sent_length < 0)
@@ -270,9 +285,17 @@ static int cell_send(AlxSocket* me, void* data, uint32_t len)
 		{
 			break;
 		}
-		SOCKET_YIELD();
+		if (sent_length > 0)
+		{
+			SOCKET_YIELD();
+		}
+		else
+		{
+			AlxOsDelay_ms(&alxOsDelay, 500);
+		}
 	}
 
+	AlxOsMutex_Unlock(&socketMutex);
 	return sent_total;
 }
 
@@ -288,8 +311,10 @@ static int cell_recv(AlxSocket* me, void* data, uint32_t len)
 		CellularError_t ret = Cellular_SocketRecv(me->alxNet->cellular.handle, me->cellular_socket.socket, data + received_total, len - received_total, &received_chunk);
 		if (ret != CELLULAR_SUCCESS)
 		{
-			total = -1;
-			break;
+			AlxOsMutex_Unlock(&socketMutex);
+			ALX_SOCKET_TRACE_WRN("Cellular_SocketRecv failed: %d", ret);
+			AlxOsDelay_ms(&alxOsDelay, 500);
+			return -1;
 		}
 
 		if (received_chunk <= len)
@@ -308,10 +333,18 @@ static int cell_recv(AlxSocket* me, void* data, uint32_t len)
 
 		if ((AlxTick_Get_ms(&alxTick) - timer_start >= me->timeout) || (received_total > 0))
 		{
+			//ALX_SOCKET_TRACE_WRN("cell_recv timeout");
 			break;
 		}
 
-		SOCKET_YIELD();
+		if (received_chunk > 0)
+		{
+			SOCKET_YIELD();
+		}
+		else
+		{
+			AlxOsDelay_ms(&alxOsDelay, 100);
+		}
 	}
 
 	AlxOsMutex_Unlock(&socketMutex);
@@ -420,6 +453,7 @@ static Alx_Status sslHandshake(AlxSocket *me)
 			sslFree(&me->tls_data);
 			return Alx_Err;
 		}
+		SOCKET_YIELD();
 	}
 	if ((status = mbedtls_ssl_get_verify_result(&me->tls_data.ssl_context)) != 0)
 	{
@@ -659,6 +693,7 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 			{
 				while (mbedtls_ssl_close_notify(&me->tls_data.ssl_context) == MBEDTLS_ERR_SSL_WANT_WRITE)
 				{
+					SOCKET_YIELD();
 				}
 			}
 			if ((me->protocol == AlxSocket_Protocol_Tcp) || (me->protocol == AlxSocket_Protocol_Tls))
@@ -703,6 +738,7 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 		{
 			while (mbedtls_ssl_close_notify(&me->tls_data.ssl_context) == MBEDTLS_ERR_SSL_WANT_WRITE)
 			{
+				SOCKET_YIELD();
 			}
 			sslFree(&me->tls_data);
 		}

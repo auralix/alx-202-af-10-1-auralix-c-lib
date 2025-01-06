@@ -693,8 +693,13 @@ void AlxNet_Ctor
 #define MODEM_REGISTER_TIMEOUT 60000
 #define MODEM_SIM_TIMEOUT 20000
 #define MODEM_ACTIVATE_PDN_TIMEOUT 150000
+#ifdef CELLULAR_CONNECTION_MONITORING_PING
 #define MODEM_CONNECTION_MONITORING_TIMEOUT 20000
+#else
+#define MODEM_CONNECTION_MONITORING_TIMEOUT 10000
+#endif
 #define MODEM_LOW_LEVEL_ERR_THRESHOLD 3
+#define MODEM_POWER_CYCLE_DELAY 1000
 
 typedef enum
 {
@@ -715,6 +720,7 @@ typedef enum
 
 static uint64_t cellular_last_ping_time = 0;
 
+#ifdef CELLULAR_CONNECTION_MONITORING_PING
 static void cellular_GenericCB(const char * pRawData,
 	void * pCallbackContext)
 {
@@ -725,6 +731,7 @@ static void cellular_GenericCB(const char * pRawData,
 		cellular_last_ping_time = AlxTick_Get_ms(&alxTick);
 	}
 }
+#endif
 
 static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectionCommandType cmd)
 {
@@ -748,21 +755,27 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 				me->cellular.handle = NULL;
 			}
 			low_level_err = 0;
+			start_time = AlxTick_Get_ms(&alxTick);
 			connection_state = State_ModemOff;
 			break;
 		}
 	case State_ModemOff:
 		{
 			me->isNetConnected = false;
-			if (Cellular_Init(&me->cellular.handle, me->cellular.CommIntf) == CELLULAR_SUCCESS) // power on with GPIO key simulation, auto-bauding
+			if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_POWER_CYCLE_DELAY)
 			{
-				Cellular_RegisterUrcGenericCallback(me->cellular.handle, cellular_GenericCB, NULL);
-				start_time = AlxTick_Get_ms(&alxTick);
-				connection_state = State_ModemOn;
-			}
-			else
-			{
-				connection_state = State_ModemGoOff;
+				if (Cellular_Init(&me->cellular.handle, me->cellular.CommIntf) == CELLULAR_SUCCESS) // power on with GPIO key simulation, auto-bauding
+				{
+#ifdef CELLULAR_CONNECTION_MONITORING_PING
+					Cellular_RegisterUrcGenericCallback(me->cellular.handle, cellular_GenericCB, NULL);
+#endif
+					start_time = AlxTick_Get_ms(&alxTick);
+					connection_state = State_ModemOn;
+				}
+				else
+				{
+					connection_state = State_ModemGoOff;
+				}
 			}
 			break;
 		}
