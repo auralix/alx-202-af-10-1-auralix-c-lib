@@ -29,6 +29,7 @@
 #*******************************************************************************
 import subprocess
 import pathlib
+import logging
 import tempfile
 
 
@@ -41,22 +42,27 @@ class Jlink:
 	#-------------------------------------------------------------------------------
 	def __init__(
 		self,
-		exePath: str
+		exePath
 	):
-		#-------------------------------------------------------------------------------
-		# Private Variables
-		#-------------------------------------------------------------------------------
+		# Log
+		logging.debug(f"ENTER: exePath {exePath}")
 
 		# Parameters
-		self.exePath: str = exePath;
+		self.__exePath = exePath;
+
+		# Log
+		logging.debug("EXIT")
 
 
 	#-------------------------------------------------------------------------------
 	# Public Functions
 	#-------------------------------------------------------------------------------
-	def Reset(self, targetName: str):
+	def Reset(self, targetName):
+		# Log
+		logging.debug(f"ENTER: targetName {targetName}")
+
 		# Prepare Script
-		scriptText: str = """r
+		scriptText = """r
 q"""
 		# Script:
 		# r			- Reset
@@ -68,9 +74,15 @@ q"""
 		# Prepare & Execute Process
 		self.PrepareExecuteProcess(targetName, scriptPath)
 
-	def ResetErase(self, targetName: str):
+		# Log
+		logging.debug("EXIT")
+
+	def ResetErase(self, targetName):
+		# Log
+		logging.debug(f"ENTER: targetName {targetName}")
+
 		# Prepare Script
-		scriptText: str = """r
+		scriptText = """r
 h
 n
 erase
@@ -86,9 +98,20 @@ q"""
 		# Prepare & Execute Process
 		self.PrepareExecuteProcess(targetName, scriptPath)
 
-	def ResetProgramVerifyReset(self, targetName: str, fwPath: str, addrHexStr: str):
+		# Log
+		logging.debug("EXIT")
+
+	def ResetProgramVerifyReset(self, targetName, fwPath, addrHexStr):
+		# Log
+		logging.debug(
+			f"ENTER: "
+			f"targetName {targetName} "
+			f"fwPath {fwPath} "
+			f"addrHexStr {addrHexStr} "
+		)
+
 		# Prepare Script
-		scriptText: str = f"""
+		scriptText = f"""
 r
 h
 loadbin {fwPath} {addrHexStr}
@@ -109,9 +132,20 @@ q"""
 		# Prepare & Execute Process
 		self.PrepareExecuteProcess(targetName, scriptPath)
 
-	def ResetEraseProgramVerifyReset(self, targetName: str, fwPath: str, addrHexStr: str):
+		# Log
+		logging.debug("EXIT")
+
+	def ResetEraseProgramVerifyReset(self, targetName, fwPath, addrHexStr):
+		# Log
+		logging.debug(
+			f"ENTER: "
+			f"targetName {targetName} "
+			f"fwPath {fwPath} "
+			f"addrHexStr {addrHexStr} "
+		)
+
 		# Prepare Script
-		scriptText: str = f"""
+		scriptText = f"""
 r
 h
 erase
@@ -134,15 +168,21 @@ q"""
 		# Prepare & Execute Process
 		self.PrepareExecuteProcess(targetName, scriptPath)
 
+		# Log
+		logging.debug("EXIT")
+
 
 	#-------------------------------------------------------------------------------
 	# Private Functions
 	#-------------------------------------------------------------------------------
-	def PrepareExecuteProcess(self, targetName: str, scriptPath: object):
+	def PrepareExecuteProcess(self, targetName, scriptPath):
+		# Log
+		logging.debug("ENTER")
+
 		# Prepare Process
-		scriptPathStr: str = str(scriptPath)
+		scriptPathStr = str(scriptPath)
 		args = [
-			self.exePath,
+			self.__exePath,
 			"-device", targetName,
 			"-if", "SWD",
 			"-speed", "4000",
@@ -150,10 +190,13 @@ q"""
 		]
 
 		# Execute Process
-		print("DO: subprocess.run() ", args)
+		logging.debug(f"DO: subprocess.run() args {args}")
 		try:
 			completedProcessObj = subprocess.run(args, capture_output=True, check=True, timeout=60)
-			print(completedProcessObj.stdout.decode())
+			logging.debug(completedProcessObj.stdout.decode())
 		finally:
 			scriptPath.unlink()
-		print("DONE: subprocess.run()")
+		logging.debug("DONE: subprocess.run()")
+
+		# Log
+		logging.debug("EXIT")

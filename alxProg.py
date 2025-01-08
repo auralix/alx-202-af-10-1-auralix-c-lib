@@ -28,6 +28,7 @@
 # Imports
 #*******************************************************************************
 import pathlib
+import logging
 import alxJlink
 
 
@@ -46,9 +47,14 @@ class Prog:
 		addrAppHexStr,
 		addrSignedHexStr
 	):
-		#-------------------------------------------------------------------------------
-		# Private Variables
-		#-------------------------------------------------------------------------------
+		# Log
+		logging.debug(
+			f"ENTER: "
+			f"targetName {targetName} "
+			f"fwDir {fwDir} "
+			f"addrAppHexStr {addrAppHexStr} "
+			f"addrSignedHexStr {addrSignedHexStr} "
+		)
 
 		# Parameters
 		self.__alxJlink = alxJlink
@@ -57,17 +63,27 @@ class Prog:
 		self.__addrAppHexStr = addrAppHexStr
 		self.__addrSignedHexStr = addrSignedHexStr
 
+		# Log
+		logging.debug("EXIT")
+
 
 	#-------------------------------------------------------------------------------
 	# Public Functions
 	#-------------------------------------------------------------------------------
 	def Reset(self):
+		logging.debug("ENTER")
 		self.__alxJlink.Reset(self.__targetName)
+		logging.debug("EXIT")
 
 	def Erase(self):
+		logging.debug("ENTER")
 		self.__alxJlink.ResetErase(self.__targetName)
+		logging.debug("EXIT")
 
 	def ProgramApp(self):
+		# Log
+		logging.debug("ENTER")
+
 		# Set FW path
 		fwAppPath = next(
 			f for f in pathlib.Path(self.__fwDir).glob("*.bin")
@@ -76,12 +92,25 @@ class Prog:
 		fwAppPathStr = str(fwAppPath)
 
 		# Program
+		logging.debug(f"DO: alxJlink.ResetProgramVerifyReset() targetName {self.__targetName} fwAppPathStr {fwAppPathStr} addrAppHexStr {self.__addrAppHexStr}")
 		self.__alxJlink.ResetProgramVerifyReset(self.__targetName, fwAppPathStr, self.__addrAppHexStr)
+		logging.debug("DONE: alxJlink.ResetProgramVerifyReset()")
+
+		# Log
+		logging.debug("EXIT")
 
 	def ProgramSigned(self):
+		# Log
+		logging.debug("ENTER")
+
 		# Set FW path
 		fwSignedPath = next(pathlib.Path(self.__fwDir).glob("*_Signed.bin"))
 		fwSignedPathStr = str(fwSignedPath)
 
 		# Program
+		logging.debug(f"DO: alxJlink.ResetProgramVerifyReset() targetName {self.__targetName} fwSignedPathStr {fwSignedPathStr} addrSignedHexStr {self.__addrSignedHexStr}")
 		self.__alxJlink.ResetProgramVerifyReset(self.__targetName, fwSignedPathStr, self.__addrSignedHexStr)
+		logging.debug("DONE: alxJlink.ResetProgramVerifyReset()")
+
+		# Log
+		logging.debug("EXIT")
