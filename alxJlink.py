@@ -1,6 +1,6 @@
 #*******************************************************************************
 # @file			alxJlink.py
-# @brief		Auralix C Library - ALX J-Link Script
+# @brief		Auralix C Library - ALX J-Link Module
 # @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
 #
 # @section License
