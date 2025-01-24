@@ -48,7 +48,7 @@
 void AlxGlobal_DisableIrq(void)
 {
 	#if defined(__GNUC__)
-	__disable_irq();
+	//__disable_irq();
 	#endif
 }
 
@@ -58,7 +58,7 @@ void AlxGlobal_DisableIrq(void)
 void AlxGlobal_EnableIrq(void)
 {
 	#if defined(__GNUC__)
-	__enable_irq();
+	//__enable_irq();
 	#endif
 }
 
