@@ -1,6 +1,6 @@
 #*******************************************************************************
 # @file			alxSerialPortLogger.py
-# @brief		Auralix C Library - ALX Serial Port Logger Script
+# @brief		Auralix C Library - ALX Serial Port Logger Module
 # @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
 #
 # @section License
@@ -27,11 +27,136 @@
 #*******************************************************************************
 # Imports
 #*******************************************************************************
+import threading
 import pathlib
 import sys
 import serial
 import logging
 import logging.handlers
+
+
+#*******************************************************************************
+# Class - SerialPortLogger
+#*******************************************************************************
+class SerialPortLogger:
+	#-------------------------------------------------------------------------------
+	# Ctor
+	#-------------------------------------------------------------------------------
+	def __init__(
+		self,
+		port,
+		baudRate,
+		logPath,
+		logToConsole
+	):
+		#-------------------------------------------------------------------------------
+		# Log
+		#-------------------------------------------------------------------------------
+		logging.debug(
+			f"ENTER: "
+			f"port {port} "
+			f"baudRate {baudRate} "
+			f"logPath {logPath} "
+			f"logToConsole {logToConsole} "
+		)
+
+
+		#-------------------------------------------------------------------------------
+		# Parameters
+		#-------------------------------------------------------------------------------
+		self.__port = port
+		self.__baudRate = baudRate
+		self.__logPath = logPath
+		self.__logToConsole = logToConsole
+
+
+		#-------------------------------------------------------------------------------
+		# Logging
+		#-------------------------------------------------------------------------------
+
+		# Handler
+		timedRotatingHandler = logging.handlers.TimedRotatingFileHandler(
+			logPath,
+			when='midnight',
+			backupCount=90
+		)
+		formatter = logging.Formatter(
+			fmt='%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s',
+			datefmt='%Y-%m-%d %H:%M:%S'
+		)
+		timedRotatingHandler.setFormatter(formatter)
+
+		# Named Logger
+		self.__logger = logging.getLogger("SerialPortLogger")
+		self.__logger.setLevel(logging.DEBUG)
+		self.__logger.addHandler(timedRotatingHandler)
+		if logToConsole:
+			consoleHandler = logging.StreamHandler()
+			consoleHandler.setFormatter(formatter)
+			self.__logger.addHandler(consoleHandler)
+		self.__logger.propagate = False
+
+
+		#-------------------------------------------------------------------------------
+		# Serial Port
+		#-------------------------------------------------------------------------------
+		self.__serialPort = serial.Serial(port=port, baudrate=baudRate, timeout=1)
+
+
+		#-------------------------------------------------------------------------------
+		# Stop Event
+		#-------------------------------------------------------------------------------
+		self.__stopEvent = threading.Event()
+
+
+		#-------------------------------------------------------------------------------
+		# Log
+		#-------------------------------------------------------------------------------
+		logging.debug("EXIT")
+
+
+	#-------------------------------------------------------------------------------
+	# Public Functions
+	#-------------------------------------------------------------------------------
+	def Run(self):
+		# Log
+		logging.debug("ENTER")
+		self.__logger.debug(
+			f"Run(): "
+			f"port {self.__port} "
+			f"baudRate {self.__baudRate} "
+			f"logPath {self.__logPath} "
+			f"logToConsole {self.__logToConsole} "
+		)
+
+		# Do
+		buffer = b""
+		try:
+			while not self.__stopEvent.is_set():
+				chunk = self.__serialPort.read_until(b'\r\n')
+				if chunk:
+					# Accumulate partial data
+					buffer += chunk
+
+					# Check if complete line
+					if buffer.endswith(b'\r\n'):
+						line = buffer.decode(errors='ignore').strip()
+						self.__logger.info(line)
+						buffer = b""
+
+		except Exception as e:
+			self.__logger.fatal(f"FAIL: {e}")
+			logging.fatal(f"FAIL: {e}")
+
+		finally:
+			logging.debug("EXIT")
+			if self.__serialPort and self.__serialPort.is_open:
+				self.__serialPort.close()
+
+	def Stop(self):
+		logging.debug("ENTER")
+		self.__stopEvent.set()
+		logging.debug("EXIT")
 
 
 #*******************************************************************************

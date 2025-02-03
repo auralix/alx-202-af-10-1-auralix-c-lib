@@ -183,7 +183,7 @@ AlxNet_Config Alx_GetNetInterface(AlxNet* me);
 #if defined(ALX_FREE_RTOS_CELLULAR)
 void Alx_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber);
 #endif
-int AlxNet_Ping(AlxNet* me, const char *addr, uint16_t count, uint32_t timeout_ms);
+
 
 #endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
 
