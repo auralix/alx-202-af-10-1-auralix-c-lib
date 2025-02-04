@@ -460,7 +460,19 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	uint8_t raw[252];
+	struct __attribute__((packed))
+	{
+		uint8_t XDATA3;
+		uint8_t XDATA2;
+		uint8_t XDATA1;
+		uint8_t YDATA3;
+		uint8_t YDATA2;
+		uint8_t YDATA1;
+		uint8_t ZDATA3;
+		uint8_t ZDATA2;
+		uint8_t ZDATA1;
+	} xyz_20bit[32];
+	uint8_t raw[288];
 } AlxAdxl355_RegGroupVal_0x11_FIFO_DATA;
 
 
@@ -647,6 +659,7 @@ Alx_Status AlxAdxl355_DeInit(AlxAdxl355* me);
 Alx_Status AlxAdxl355_Enable(AlxAdxl355* me);
 Alx_Status AlxAdxl355_Disable(AlxAdxl355* me);
 Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g);
+Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint8_t len);
 Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC);
 Alx_Status AlxAdxl355_GetStatusReg(AlxAdxl355* me, AlxAdxl355_RegVal_0x04_Status* statusReg);
 
