@@ -601,12 +601,6 @@ typedef union
 	uint8_t raw[12];
 } AlxAdxl355_Xyz_20bit;
 
-typedef union
-{
-	uint16_t val;
-	uint8_t raw[2];
-} AlxAdxl355_Temp_12bit;
-
 typedef struct
 {
 	// Objects - External
@@ -625,9 +619,6 @@ typedef struct
 	float rangeFactor;
 	AlxAdxl355_Xyz_g xyz_g;
 	AlxAdxl355_Xyz_20bit xyz_20bit;
-
-	AlxAdxl355_Temp_12bit temp_12bit;
-	float temp_degC;
 
 	AlxAdxl355_Reg reg;
 
@@ -660,7 +651,7 @@ Alx_Status AlxAdxl355_Enable(AlxAdxl355* me);
 Alx_Status AlxAdxl355_Disable(AlxAdxl355* me);
 Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g);
 Alx_Status AlxAdxl355_GetXyzMulti_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint32_t len);
-float AlxAdxl355_GetTemp_degC(AlxAdxl355* me);
+Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC);
 Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me);
 
 

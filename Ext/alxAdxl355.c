@@ -51,7 +51,6 @@ static Alx_Status AlxAdxl355_Reg_WriteAll(AlxAdxl355* me);
 
 static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me);
 static Alx_Status AlxAdxl355_ReadXyz_g(AlxAdxl355* me);
-static Alx_Status AlxAdxl355_ReadTemp_degC(AlxAdxl355* me);
 
 
 //******************************************************************************
@@ -100,7 +99,6 @@ void AlxAdxl355_Ctor
 	me->xyz_g.x_g = 0.f;
 	me->xyz_g.y_g = 0.f;
 	me->xyz_g.z_g = 0.f;
-	me->temp_degC = 0.f;
 	AlxAdxl355_RegStruct_SetAddr(me);
 	AlxAdxl355_RegStruct_SetLen(me);
 	AlxAdxl355_RegStruct_SetValToZero(me);
@@ -300,14 +298,38 @@ Alx_Status AlxAdxl355_GetXyzMulti_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uin
 /**
   * @brief
   * @param[in,out]	me
-  * @return
+  * @param[out]		temp_degC
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
-float AlxAdxl355_GetTemp_degC(AlxAdxl355* me)
+Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC)
 {
+	// Assert
 	ALX_ADXL355_ASSERT(me->isInit == true);
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
 
-	return me->temp_degC;
+	// Read
+	Alx_Status status = AlxAdxl355_Reg_Read(me, &me->reg._0x06_0x07_TEMP);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
+
+	// Prepare
+	typedef union
+	{
+		uint16_t val;
+		uint8_t raw[2];
+	} AlxAdxl355_Temp_12bit;
+	AlxAdxl355_Temp_12bit temp_12bit = {};
+
+	// Convert
+	temp_12bit.raw[0] = me->reg._0x06_0x07_TEMP.val.TEMP1;
+	temp_12bit.raw[1] = me->reg._0x06_0x07_TEMP.val.TEMP2;
+
+	// Calculate
+	float _temp_degC = temp_12bit.val * (-0.1104972376f) + 233.2872929f;	// -9.05 LSB/degC -> -0.1104972376 degC/LSB, 1885 LSB -> 25 degC, 0 LSB -> 233.2872929 degC
+
+	// Return
+	*temp_degC = _temp_degC;
+	return Alx_Ok;
 }
 
 /**
@@ -320,34 +342,30 @@ Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me)
 {
 	Alx_Status status = Alx_Err;
 
-//	// Read status register, clears interrupt flags
-//	status = AlxAdxl355_Reg_Read(me, &me->reg._0x04_Status);
+	// Read status register, clears interrupt flags
+	status = AlxAdxl355_Reg_Read(me, &me->reg._0x04_Status);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
+
+//	status = AlxAdxl355_Reg_Read(me, &me->reg._0x11_FIFO_DATA);
 //	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	status = AlxAdxl355_Reg_Read(me, &me->reg._0x11_FIFO_DATA);
+	// Read acceleration data
+	status = AlxAdxl355_ReadXyz_g(me);
 	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
-//
-//	// Read acceleration data
-//	status = AlxAdxl355_ReadXyz_g(me);
-//	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
-//
-	// Read temperature data
-	status = AlxAdxl355_ReadTemp_degC(me);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
-//
-//	// Write acceleration data to FIFO
-//	status = AlxFifo_WriteMulti(&me->fifo, (uint8_t*)&me->xyz_g, sizeof(AlxAdxl355_Xyz_g));
-//	if (status == AlxFifo_ErrFull)
-//	{
-//		// TV: TODO, decide if we will handle FIFO overflow as error, or we will discard overflow data..
-//		// For now we will discard additional overflow data..
-//		return status;
-//	}
-//	else if (status != Alx_Ok)
-//	{
-//		ALX_ADXL355_ASSERT(false);	// We should never get here
-//		return status;
-//	}
+
+	// Write acceleration data to FIFO
+	status = AlxFifo_WriteMulti(&me->fifo, (uint8_t*)&me->xyz_g, sizeof(AlxAdxl355_Xyz_g));
+	if (status == AlxFifo_ErrFull)
+	{
+		// TV: TODO, decide if we will handle FIFO overflow as error, or we will discard overflow data..
+		// For now we will discard additional overflow data..
+		return status;
+	}
+	else if (status != Alx_Ok)
+	{
+		ALX_ADXL355_ASSERT(false);	// We should never get here
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -612,26 +630,6 @@ static Alx_Status AlxAdxl355_ReadXyz_g(AlxAdxl355* me)
 	me->xyz_g.z_g = me->xyz_20bit.z_20bit * me->rangeFactor;
 
 	// #7 Return OK
-	return Alx_Ok;
-}
-static Alx_Status AlxAdxl355_ReadTemp_degC(AlxAdxl355* me)
-{
-	Alx_Status status = Alx_Err;
-
-	// #1 Read temperature data
-	status = AlxAdxl355_Reg_Read(me, &me->reg._0x06_0x07_TEMP);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x06_0x07_TEMP"); return status;}
-
-	// #2 Merge raw data to 16bit variable
-	me->temp_12bit.raw[0] = me->reg._0x06_0x07_TEMP.val.TEMP1;
-	me->temp_12bit.raw[1] = me->reg._0x06_0x07_TEMP.val.TEMP2;
-
-	// #3 Calculate
-	me->temp_degC = me->temp_12bit.val * (-0.1104972376f) + 233.2872929f;	// -9.05 LSB/°C -> -0.1104972376 °C/LSB
-																			// 1885 LSB -> 25 °C
-																			// 0 LSB -> 233.2872929 °C
-
-	// #4 Return OK
 	return Alx_Ok;
 }
 
