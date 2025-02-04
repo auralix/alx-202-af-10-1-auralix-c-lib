@@ -294,6 +294,7 @@ typedef union
 		AlxAdxl355_RegEnum_0x2A_FULL_EN1 FULL_EN1 : 1;
 		AlxAdxl355_RegEnum_0x2A_OVR_EN1 OVR_EN1 : 1;
 		AlxAdxl355_RegEnum_0x2A_ACT_EN1 ACT_EN1 : 1;
+
 		AlxAdxl355_RegEnum_0x2A_RDY_EN2 RDY_EN2 : 1;
 		AlxAdxl355_RegEnum_0x2A_FULL_EN2 FULL_EN2 : 1;
 		AlxAdxl355_RegEnum_0x2A_OVR_EN2 OVR_EN2 : 1;
@@ -444,9 +445,11 @@ typedef union
 		uint8_t XDATA3;
 		uint8_t XDATA2;
 		uint8_t XDATA1;
+
 		uint8_t YDATA3;
 		uint8_t YDATA2;
 		uint8_t YDATA1;
+
 		uint8_t ZDATA3;
 		uint8_t ZDATA2;
 		uint8_t ZDATA1;
@@ -464,13 +467,24 @@ typedef union
 	{
 		uint8_t XDATA3;
 		uint8_t XDATA2;
-		uint8_t XDATA1;
+		uint8_t XDATA1_Xmarker : 1;
+		uint8_t XDATA1_EmptyIndicator : 1;
+		uint8_t XDATA1_unused_2_3 : 2;
+		uint8_t XDATA1 : 4;
+
 		uint8_t YDATA3;
 		uint8_t YDATA2;
-		uint8_t YDATA1;
+		uint8_t YDATA1_Xmarker : 1;
+		uint8_t YDATA1_EmptyIndicator : 1;
+		uint8_t YDATA1_unused_2_3 : 2;
+		uint8_t YDATA1 : 4;
+
 		uint8_t ZDATA3;
 		uint8_t ZDATA2;
-		uint8_t ZDATA1;
+		uint8_t ZDATA1_Xmarker : 1;
+		uint8_t ZDATA1_EmptyIndicator : 1;
+		uint8_t ZDATA1_unused_2_3 : 2;
+		uint8_t ZDATA1 : 4;
 	} xyz_20bit[32];
 	uint8_t raw[288];
 } AlxAdxl355_RegGroupVal_0x11_FIFO_DATA;

@@ -299,6 +299,40 @@ Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint
 	AlxAdxl355_Xyz_g _xyz_g[32] = {};
 	for (uint32_t i = 0; i < len; i++)
 	{
+		// Check X marker
+		if (me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].XDATA1_Xmarker != 1)
+		{
+			ALX_ADXL355_TRACE_WRN("Err");
+			return Alx_Err;
+		}
+		if (me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].YDATA1_Xmarker != 0)
+		{
+			ALX_ADXL355_TRACE_WRN("Err");
+			return Alx_Err;
+		}
+		if (me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].ZDATA1_Xmarker != 0)
+		{
+			ALX_ADXL355_TRACE_WRN("Err");
+			return Alx_Err;
+		}
+
+		// Check empty indicator
+		if (me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].XDATA1_EmptyIndicator != 0)
+		{
+			ALX_ADXL355_TRACE_WRN("Err");
+			return Alx_Err;
+		}
+		if (me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].YDATA1_EmptyIndicator != 0)
+		{
+			ALX_ADXL355_TRACE_WRN("Err");
+			return Alx_Err;
+		}
+		if (me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].ZDATA1_EmptyIndicator != 0)
+		{
+			ALX_ADXL355_TRACE_WRN("Err");
+			return Alx_Err;
+		}
+
 		// Prepare
 		AlxAdxl355_Xyz_20bit xyz_20bit = {};
 		xyz_20bit.raw[0]	= me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].XDATA1;	// dataX LSB
