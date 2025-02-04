@@ -320,33 +320,36 @@ Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me)
 {
 	Alx_Status status = Alx_Err;
 
-	// #1 Read status register, clears interrupt flags
-	status = AlxAdxl355_Reg_Read(me, &me->reg._0x04_Status);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_ReadStatus"); return status;}
+//	// Read status register, clears interrupt flags
+//	status = AlxAdxl355_Reg_Read(me, &me->reg._0x04_Status);
+//	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	// #2 Read acceleration data
-	status = AlxAdxl355_ReadXyz_g(me);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_ReadXyz_g"); return status;}
-
-	// #3 Read temperature data
+	status = AlxAdxl355_Reg_Read(me, &me->reg._0x11_FIFO_DATA);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
+//
+//	// Read acceleration data
+//	status = AlxAdxl355_ReadXyz_g(me);
+//	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
+//
+	// Read temperature data
 	status = AlxAdxl355_ReadTemp_degC(me);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_ReadTemp_degC"); return status;}
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
+//
+//	// Write acceleration data to FIFO
+//	status = AlxFifo_WriteMulti(&me->fifo, (uint8_t*)&me->xyz_g, sizeof(AlxAdxl355_Xyz_g));
+//	if (status == AlxFifo_ErrFull)
+//	{
+//		// TV: TODO, decide if we will handle FIFO overflow as error, or we will discard overflow data..
+//		// For now we will discard additional overflow data..
+//		return status;
+//	}
+//	else if (status != Alx_Ok)
+//	{
+//		ALX_ADXL355_ASSERT(false);	// We should never get here
+//		return status;
+//	}
 
-	// #4 Write acceleration data to FIFO
-	status = AlxFifo_WriteMulti(&me->fifo, (uint8_t*)&me->xyz_g, sizeof(AlxAdxl355_Xyz_g));
-	if (status == AlxFifo_ErrFull)
-	{
-		// TV: TODO, decide if we will handle FIFO overflow as error, or we will discard overflow data..
-		// For now we will discard additional overflow data..
-		return status;
-	}
-	else if (status != Alx_Ok)
-	{
-		ALX_ADXL355_ASSERT(false);	// We should never get here
-		return status;
-	}
-
-	// #5 Return OK
+	// Return
 	return Alx_Ok;
 }
 
@@ -356,71 +359,79 @@ Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me)
 //******************************************************************************
 static void AlxAdxl355_RegStruct_SetAddr(AlxAdxl355* me)
 {
-	me->reg._0x00_DEVID_AD	.addr = 0x00;
-	me->reg._0x01_DEVID_MST	.addr = 0x01;
-	me->reg._0x02_PARTID	.addr = 0x02;
-	me->reg._0x03_REVID		.addr = 0x03;
-	me->reg._0x04_Status	.addr = 0x04;
-	me->reg._0x28_Filter	.addr = 0x28;
-	me->reg._0x2A_INT_MAP	.addr = 0x2A;
-	me->reg._0x2B_Sync		.addr = 0x2B;
-	me->reg._0x2C_Range		.addr = 0x2C;
-	me->reg._0x2D_POWER_CTL	.addr = 0x2D;
-	me->reg._0x2F_Reset		.addr = 0x2F;
+	me->reg._0x00_DEVID_AD		.addr = 0x00;
+	me->reg._0x01_DEVID_MST		.addr = 0x01;
+	me->reg._0x02_PARTID		.addr = 0x02;
+	me->reg._0x03_REVID			.addr = 0x03;
+	me->reg._0x04_Status		.addr = 0x04;
+	me->reg._0x28_Filter		.addr = 0x28;
+	me->reg._0x29_FIFO_SAMPLES	.addr = 0x29;
+	me->reg._0x2A_INT_MAP		.addr = 0x2A;
+	me->reg._0x2B_Sync			.addr = 0x2B;
+	me->reg._0x2C_Range			.addr = 0x2C;
+	me->reg._0x2D_POWER_CTL		.addr = 0x2D;
+	me->reg._0x2F_Reset			.addr = 0x2F;
 
-	me->reg._0x06_0x07_TEMP	.addr = 0x06;
-	me->reg._0x08_0x10_DATA	.addr = 0x08;
+	me->reg._0x06_0x07_TEMP		.addr = 0x06;
+	me->reg._0x08_0x10_DATA		.addr = 0x08;
+	me->reg._0x11_FIFO_DATA		.addr = 0x11;
 }
 static void AlxAdxl355_RegStruct_SetLen(AlxAdxl355* me)
 {
-	me->reg._0x00_DEVID_AD	.len = sizeof(me->reg._0x00_DEVID_AD	.val);
-	me->reg._0x01_DEVID_MST	.len = sizeof(me->reg._0x01_DEVID_MST	.val);
-	me->reg._0x02_PARTID	.len = sizeof(me->reg._0x02_PARTID		.val);
-	me->reg._0x03_REVID		.len = sizeof(me->reg._0x03_REVID		.val);
-	me->reg._0x04_Status	.len = sizeof(me->reg._0x04_Status		.val);
-	me->reg._0x28_Filter	.len = sizeof(me->reg._0x28_Filter		.val);
-	me->reg._0x2A_INT_MAP	.len = sizeof(me->reg._0x2A_INT_MAP		.val);
-	me->reg._0x2B_Sync		.len = sizeof(me->reg._0x2B_Sync		.val);
-	me->reg._0x2C_Range		.len = sizeof(me->reg._0x2C_Range		.val);
-	me->reg._0x2D_POWER_CTL	.len = sizeof(me->reg._0x2D_POWER_CTL	.val);
-	me->reg._0x2F_Reset		.len = sizeof(me->reg._0x2F_Reset		.val);
+	me->reg._0x00_DEVID_AD		.len = sizeof(me->reg._0x00_DEVID_AD		.val);
+	me->reg._0x01_DEVID_MST		.len = sizeof(me->reg._0x01_DEVID_MST		.val);
+	me->reg._0x02_PARTID		.len = sizeof(me->reg._0x02_PARTID			.val);
+	me->reg._0x03_REVID			.len = sizeof(me->reg._0x03_REVID			.val);
+	me->reg._0x04_Status		.len = sizeof(me->reg._0x04_Status			.val);
+	me->reg._0x28_Filter		.len = sizeof(me->reg._0x28_Filter			.val);
+	me->reg._0x29_FIFO_SAMPLES	.len = sizeof(me->reg._0x29_FIFO_SAMPLES	.val);
+	me->reg._0x2A_INT_MAP		.len = sizeof(me->reg._0x2A_INT_MAP			.val);
+	me->reg._0x2B_Sync			.len = sizeof(me->reg._0x2B_Sync			.val);
+	me->reg._0x2C_Range			.len = sizeof(me->reg._0x2C_Range			.val);
+	me->reg._0x2D_POWER_CTL		.len = sizeof(me->reg._0x2D_POWER_CTL		.val);
+	me->reg._0x2F_Reset			.len = sizeof(me->reg._0x2F_Reset			.val);
 
-	me->reg._0x06_0x07_TEMP	.len = sizeof(me->reg._0x06_0x07_TEMP	.val);
-	me->reg._0x08_0x10_DATA	.len = sizeof(me->reg._0x08_0x10_DATA	.val);
+	me->reg._0x06_0x07_TEMP		.len = sizeof(me->reg._0x06_0x07_TEMP		.val);
+	me->reg._0x08_0x10_DATA		.len = sizeof(me->reg._0x08_0x10_DATA		.val);
+	me->reg._0x11_FIFO_DATA		.len = sizeof(me->reg._0x11_FIFO_DATA		.val);
 }
 static void AlxAdxl355_RegStruct_SetValToZero(AlxAdxl355* me)
 {
-	me->reg._0x00_DEVID_AD	.val.raw	= 0x00;
-	me->reg._0x01_DEVID_MST	.val.raw	= 0x00;
-	me->reg._0x02_PARTID	.val.raw	= 0x00;
-	me->reg._0x03_REVID		.val.raw	= 0x00;
-	me->reg._0x04_Status	.val.raw	= 0x00;
-	me->reg._0x28_Filter	.val.raw	= 0x00;
-	me->reg._0x2A_INT_MAP	.val.raw	= 0x00;
-	me->reg._0x2B_Sync		.val.raw	= 0x00;
-	me->reg._0x2C_Range		.val.raw	= 0x00;
-	me->reg._0x2D_POWER_CTL	.val.raw	= 0x00;
-	me->reg._0x2F_Reset		.val.raw	= 0x00;
+	me->reg._0x00_DEVID_AD		.val.raw = 0x00;
+	me->reg._0x01_DEVID_MST		.val.raw = 0x00;
+	me->reg._0x02_PARTID		.val.raw = 0x00;
+	me->reg._0x03_REVID			.val.raw = 0x00;
+	me->reg._0x04_Status		.val.raw = 0x00;
+	me->reg._0x28_Filter		.val.raw = 0x00;
+	me->reg._0x29_FIFO_SAMPLES	.val.raw = 0x00;
+	me->reg._0x2A_INT_MAP		.val.raw = 0x00;
+	me->reg._0x2B_Sync			.val.raw = 0x00;
+	me->reg._0x2C_Range			.val.raw = 0x00;
+	me->reg._0x2D_POWER_CTL		.val.raw = 0x00;
+	me->reg._0x2F_Reset			.val.raw = 0x00;
 
-	for (uint32_t i = 0; i < sizeof(me->reg._0x06_0x07_TEMP	.val); i++)	{ me->reg._0x06_0x07_TEMP	.val.raw[i] = 0x00; }
-	for (uint32_t i = 0; i < sizeof(me->reg._0x08_0x10_DATA	.val); i++)	{ me->reg._0x08_0x10_DATA	.val.raw[i] = 0x00; }
+	memset(me->reg._0x06_0x07_TEMP	.val.raw, 0x00, sizeof(me->reg._0x06_0x07_TEMP	.val.raw));
+	memset(me->reg._0x08_0x10_DATA	.val.raw, 0x00, sizeof(me->reg._0x08_0x10_DATA	.val.raw));
+	memset(me->reg._0x11_FIFO_DATA	.val.raw, 0x00, sizeof(me->reg._0x11_FIFO_DATA	.val.raw));
 }
 static void AlxAdxl355_RegStruct_SetValToDefault(AlxAdxl355* me)
 {
-	me->reg._0x00_DEVID_AD	.val.raw	= 0xAD;
-	me->reg._0x01_DEVID_MST	.val.raw	= 0x1D;
-	me->reg._0x02_PARTID	.val.raw	= 0xED;
-	me->reg._0x03_REVID		.val.raw	= 0x01;
-	me->reg._0x04_Status	.val.raw	= 0x00;
-	me->reg._0x28_Filter	.val.raw	= 0x00;
-	me->reg._0x2A_INT_MAP	.val.raw	= 0x00;
-	me->reg._0x2B_Sync		.val.raw	= 0x00;
-	me->reg._0x2C_Range		.val.raw	= 0x81;
-	me->reg._0x2D_POWER_CTL	.val.raw	= 0x01;
-	me->reg._0x2F_Reset		.val.raw	= 0x00;
+	me->reg._0x00_DEVID_AD		.val.raw	= 0xAD;
+	me->reg._0x01_DEVID_MST		.val.raw	= 0x1D;
+	me->reg._0x02_PARTID		.val.raw	= 0xED;
+	me->reg._0x03_REVID			.val.raw	= 0x01;
+	me->reg._0x04_Status		.val.raw	= 0x00;
+	me->reg._0x28_Filter		.val.raw	= 0x00;
+	me->reg._0x29_FIFO_SAMPLES	.val.raw	= 0x60;
+	me->reg._0x2A_INT_MAP		.val.raw	= 0x00;
+	me->reg._0x2B_Sync			.val.raw	= 0x00;
+	me->reg._0x2C_Range			.val.raw	= 0x81;
+	me->reg._0x2D_POWER_CTL		.val.raw	= 0x01;
+	me->reg._0x2F_Reset			.val.raw	= 0x00;
 
-	for (uint32_t i = 0; i < sizeof(me->reg._0x06_0x07_TEMP	.val); i++)	{ me->reg._0x06_0x07_TEMP	.val.raw[i] = 0x00; }
-	for (uint32_t i = 0; i < sizeof(me->reg._0x08_0x10_DATA	.val); i++)	{ me->reg._0x08_0x10_DATA	.val.raw[i] = 0x00; }
+	memset(me->reg._0x06_0x07_TEMP	.val.raw, 0x00, sizeof(me->reg._0x06_0x07_TEMP	.val.raw));
+	memset(me->reg._0x08_0x10_DATA	.val.raw, 0x00, sizeof(me->reg._0x08_0x10_DATA	.val.raw));
+	memset(me->reg._0x11_FIFO_DATA	.val.raw, 0x00, sizeof(me->reg._0x11_FIFO_DATA	.val.raw));
 }
 static Alx_Status AlxAdxl355_Reg_Write(AlxAdxl355* me, void* reg)
 {
@@ -480,20 +491,23 @@ static Alx_Status AlxAdxl355_Reg_WriteAll(AlxAdxl355* me)
 {
 	Alx_Status status = Alx_Err;
 
-	status = AlxAdxl355_Reg_Write(me, &me->reg._0x28_Filter		);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x28_Filter		"); return status;}
+	status = AlxAdxl355_Reg_Write(me, &me->reg._0x28_Filter);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2A_INT_MAP	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2A_INT_MAP		"); return status;}
+	status = AlxAdxl355_Reg_Write(me, &me->reg._0x29_FIFO_SAMPLES);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2B_Sync		);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2B_Sync		"); return status;}
+	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2A_INT_MAP);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2C_Range		);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2C_Range		"); return status;}
+	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2B_Sync);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2D_POWER_CTL	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x2D_POWER_CTL	"); return status;}
+	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2C_Range);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
+
+	status = AlxAdxl355_Reg_Write(me, &me->reg._0x2D_POWER_CTL);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
 	return Alx_Ok;
 }
@@ -501,20 +515,20 @@ static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me)
 {
 	Alx_Status status = Alx_Err;
 
-	// #1 Read ID registers
-	status = AlxAdxl355_Reg_Read(me, &me->reg._0x00_DEVID_AD	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x00_DEVID_AD	"); return status;}
+	// Read ID registers
+	status = AlxAdxl355_Reg_Read(me, &me->reg._0x00_DEVID_AD);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	status = AlxAdxl355_Reg_Read(me, &me->reg._0x01_DEVID_MST	);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x01_DEVID_MST	"); return status;}
+	status = AlxAdxl355_Reg_Read(me, &me->reg._0x01_DEVID_MST);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	status = AlxAdxl355_Reg_Read(me, &me->reg._0x02_PARTID		);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x02_PARTID		"); return status;}
+	status = AlxAdxl355_Reg_Read(me, &me->reg._0x02_PARTID);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	status = AlxAdxl355_Reg_Read(me, &me->reg._0x03_REVID		);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x03_REVID		"); return status;}
+	status = AlxAdxl355_Reg_Read(me, &me->reg._0x03_REVID);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	// #2 Trace
+	// Trace
 	ALX_ADXL355_TRACE_INF("");
 	ALX_ADXL355_TRACE_INF("AlxAdxl355 - Trace");
 	ALX_ADXL355_TRACE_INF("- DEVID_AD: 0x%02X", me->reg._0x00_DEVID_AD.val.DEVID_AD);
@@ -523,7 +537,7 @@ static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me)
 	ALX_ADXL355_TRACE_INF("- REVID: 0x%02X", me->reg._0x03_REVID.val.REVID);
 	ALX_ADXL355_TRACE_INF("");
 
-	// #3 Return OK
+	// Return
 	return Alx_Ok;
 }
 static Alx_Status AlxAdxl355_ReadXyz_g(AlxAdxl355* me)
@@ -628,7 +642,7 @@ static Alx_Status AlxAdxl355_ReadTemp_degC(AlxAdxl355* me)
 ALX_WEAK void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me)
 {
 	(void)me;
-	ALX_ADXL355_TRACE_WRN("Define 'AlxAdxl355_RegStruct_SetVal' function in your application.");
+	ALX_ADXL355_TRACE_WRN("Err");
 	ALX_ADXL355_ASSERT(false);
 }
 

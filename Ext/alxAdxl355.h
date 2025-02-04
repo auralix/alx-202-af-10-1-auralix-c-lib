@@ -220,6 +220,20 @@ typedef union
 
 
 //******************************************************************************
+// Address: 0x29, Reset: 0x60, Name: FIFO_SAMPLES
+//******************************************************************************
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t FIFO_SAMPLES : 7;
+		uint8_t unused_7 : 1;
+	};
+	uint8_t raw;
+} AlxAdxl355_RegVal_0x29_FIFO_SAMPLES;
+
+
+//******************************************************************************
 // Address: 0x2A, Reset: 0x00, Name: INT_MAP
 //******************************************************************************
 typedef enum
@@ -434,6 +448,15 @@ typedef union
 
 
 //******************************************************************************
+// Address: 0x11, Reset: 0x00, Name: FIFO_DATA
+//******************************************************************************
+typedef union
+{
+	uint8_t raw[252];
+} AlxAdxl355_RegGroupVal_0x11_FIFO_DATA;
+
+
+//******************************************************************************
 // Register Structures
 //******************************************************************************
 typedef struct
@@ -472,6 +495,12 @@ typedef struct
 	uint8_t len;
 	AlxAdxl355_RegVal_0x28_Filter val;
 } AlxAdxl355_Reg_0x28_Filter;
+typedef struct
+{
+	uint8_t addr;
+	uint8_t len;
+	AlxAdxl355_RegVal_0x29_FIFO_SAMPLES val;
+} AlxAdxl355_Reg_0x29_FIFO_SAMPLES;
 typedef struct
 {
 	uint8_t addr;
@@ -519,6 +548,12 @@ typedef struct
 	uint8_t len;
 	AlxAdxl355_RegGroupVal_0x08_0x10_DATA val;
 } AlxAdxl355_RegGroup_0x08_0x10_DATA;
+typedef struct
+{
+	uint8_t addr;
+	uint8_t len;
+	AlxAdxl355_RegGroupVal_0x11_FIFO_DATA val;
+} AlxAdxl355_RegGroup_0x11_FIFO_DATA;
 
 
 //******************************************************************************
@@ -526,20 +561,22 @@ typedef struct
 //******************************************************************************
 typedef struct
 {
-	AlxAdxl355_Reg_0x00_DEVID_AD	_0x00_DEVID_AD	;
-	AlxAdxl355_Reg_0x01_DEVID_MST	_0x01_DEVID_MST	;
-	AlxAdxl355_Reg_0x02_PARTID		_0x02_PARTID	;
-	AlxAdxl355_Reg_0x03_REVID		_0x03_REVID		;
-	AlxAdxl355_Reg_0x04_Status		_0x04_Status	;
-	AlxAdxl355_Reg_0x28_Filter		_0x28_Filter	;
-	AlxAdxl355_Reg_0x2A_INT_MAP		_0x2A_INT_MAP	;
-	AlxAdxl355_Reg_0x2B_Sync		_0x2B_Sync		;
-	AlxAdxl355_Reg_0x2C_Range		_0x2C_Range		;
-	AlxAdxl355_Reg_0x2D_POWER_CTL	_0x2D_POWER_CTL	;
-	AlxAdxl355_Reg_0x2F_Reset		_0x2F_Reset		;
+	AlxAdxl355_Reg_0x00_DEVID_AD		_0x00_DEVID_AD;
+	AlxAdxl355_Reg_0x01_DEVID_MST		_0x01_DEVID_MST;
+	AlxAdxl355_Reg_0x02_PARTID			_0x02_PARTID;
+	AlxAdxl355_Reg_0x03_REVID			_0x03_REVID;
+	AlxAdxl355_Reg_0x04_Status			_0x04_Status;
+	AlxAdxl355_Reg_0x28_Filter			_0x28_Filter;
+	AlxAdxl355_Reg_0x29_FIFO_SAMPLES	_0x29_FIFO_SAMPLES;
+	AlxAdxl355_Reg_0x2A_INT_MAP			_0x2A_INT_MAP;
+	AlxAdxl355_Reg_0x2B_Sync			_0x2B_Sync;
+	AlxAdxl355_Reg_0x2C_Range			_0x2C_Range;
+	AlxAdxl355_Reg_0x2D_POWER_CTL		_0x2D_POWER_CTL;
+	AlxAdxl355_Reg_0x2F_Reset			_0x2F_Reset;
 
-	AlxAdxl355_RegGroup_0x06_0x07_TEMP	_0x06_0x07_TEMP	;
-	AlxAdxl355_RegGroup_0x08_0x10_DATA	_0x08_0x10_DATA	;
+	AlxAdxl355_RegGroup_0x06_0x07_TEMP	_0x06_0x07_TEMP;
+	AlxAdxl355_RegGroup_0x08_0x10_DATA	_0x08_0x10_DATA;
+	AlxAdxl355_RegGroup_0x11_FIFO_DATA	_0x11_FIFO_DATA;
 } AlxAdxl355_Reg;
 
 
