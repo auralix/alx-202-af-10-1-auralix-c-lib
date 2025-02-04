@@ -479,87 +479,87 @@ typedef union
 //******************************************************************************
 // Register Structures
 //******************************************************************************
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x00_DEVID_AD val;
 } AlxAdxl355_Reg_0x00_DEVID_AD;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x01_DEVID_MST val;
 } AlxAdxl355_Reg_0x01_DEVID_MST;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x02_PARTID val;
 } AlxAdxl355_Reg_0x02_PARTID;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x03_REVID val;
 } AlxAdxl355_Reg_0x03_REVID;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x04_Status val;
 } AlxAdxl355_Reg_0x04_Status;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x28_Filter val;
 } AlxAdxl355_Reg_0x28_Filter;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x29_FIFO_SAMPLES val;
 } AlxAdxl355_Reg_0x29_FIFO_SAMPLES;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x2A_INT_MAP val;
 } AlxAdxl355_Reg_0x2A_INT_MAP;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x2B_Sync val;
 } AlxAdxl355_Reg_0x2B_Sync;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x2C_Range val;
 } AlxAdxl355_Reg_0x2C_Range;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x2D_POWER_CTL val;
 } AlxAdxl355_Reg_0x2D_POWER_CTL;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x2F_Reset val;
 } AlxAdxl355_Reg_0x2F_Reset;
 
@@ -567,24 +567,24 @@ typedef struct
 //******************************************************************************
 // Register Group Structures
 //******************************************************************************
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegGroupVal_0x06_0x07_TEMP val;
 } AlxAdxl355_RegGroup_0x06_0x07_TEMP;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegGroupVal_0x08_0x10_DATA val;
 } AlxAdxl355_RegGroup_0x08_0x10_DATA;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegGroupVal_0x11_FIFO_DATA val;
 } AlxAdxl355_RegGroup_0x11_FIFO_DATA;
 

@@ -248,23 +248,11 @@ Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g)
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
 	ALX_ADXL355_ASSERT(me->isInit == true);
 
-	// Local Types
-	typedef union
-	{
-		struct __attribute__((packed))
-		{
-			int32_t x_20bit;
-			int32_t y_20bit;
-			int32_t z_20bit;
-		};
-		uint8_t raw[12];
-	} AlxAdxl355_Xyz_20bit;
-
 	// Read
 	Alx_Status status = AlxAdxl355_Reg_Read(me, &me->reg._0x08_0x10_DATA);
 	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	// Convert
+	// Prepare
 	AlxAdxl355_Xyz_20bit xyz_20bit = {};
 	xyz_20bit.raw[0]	= me->reg._0x08_0x10_DATA.val.XDATA1;	// dataX LSB
 	xyz_20bit.raw[1]	= me->reg._0x08_0x10_DATA.val.XDATA2;
@@ -279,56 +267,8 @@ Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g)
 	xyz_20bit.raw[10]	= me->reg._0x08_0x10_DATA.val.ZDATA3;
 	xyz_20bit.raw[11]	= 0x00;
 
-	// Make data right-justified
-	xyz_20bit.x_20bit = xyz_20bit.x_20bit >> 4;
-	xyz_20bit.y_20bit = xyz_20bit.y_20bit >> 4;
-	xyz_20bit.z_20bit = xyz_20bit.z_20bit >> 4;
-
-	// Add padding 1 for negative numbers (negative numbers have their MSB set to 1)
-	if((xyz_20bit.x_20bit & 0x00080000) == 0x00080000)
-	{
-		xyz_20bit.x_20bit = xyz_20bit.x_20bit | 0xFFF00000;
-	}
-	if ((xyz_20bit.y_20bit & 0x00080000) == 0x00080000)
-	{
-		xyz_20bit.y_20bit = xyz_20bit.y_20bit | 0xFFF00000;
-	}
-	if ((xyz_20bit.z_20bit & 0x00080000) == 0x00080000)
-	{
-		xyz_20bit.z_20bit = xyz_20bit.z_20bit | 0xFFF00000;
-	}
-
-	// Determine full scale range factor
-	float rangeFactor = 0;
-	switch (me->reg._0x2C_Range.val.Range)
-	{
-		case Range_2g048:
-		{
-			rangeFactor = 0.0000039f;
-			break;
-		}
-		case Range_4g096:
-		{
-			rangeFactor = 0.0000078f;
-			break;
-		}
-		case Range_8g192:
-		{
-			rangeFactor = 0.0000156f;
-			break;
-		}
-		default:
-		{
-			ALX_ADXL355_ASSERT(false);	// We should never get here
-			return Alx_Err;
-		}
-	}
-
-	// Calculate
-	AlxAdxl355_Xyz_g _xyz_g = {};
-	_xyz_g.x_g = xyz_20bit.x_20bit * rangeFactor;
-	_xyz_g.y_g = xyz_20bit.y_20bit * rangeFactor;
-	_xyz_g.z_g = xyz_20bit.z_20bit * rangeFactor;
+	// Convert
+	AlxAdxl355_Xyz_g _xyz_g = AlxAdxl355_ConvertXyz(me, xyz_20bit);
 
 	// Return
 	*xyz_g = _xyz_g;
@@ -495,8 +435,7 @@ static Alx_Status AlxAdxl355_Reg_Read(AlxAdxl355* me, void* reg)
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t regAddr = *((uint8_t*)reg);
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-//	uint16_t regLen = *((uint16_t*)((uint8_t*)reg + sizeof(regAddr)));
+	uint16_t regLen = *((uint16_t*)((uint8_t*)reg + sizeof(regAddr)));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
 
 	// Assert CS
@@ -522,8 +461,7 @@ static Alx_Status AlxAdxl355_Reg_Write(AlxAdxl355* me, void* reg)
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t regAddr = *((uint8_t*)reg);
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-//	uint16_t regLen = *((uint16_t*)((uint8_t*)reg + sizeof(regAddr)));
+	uint16_t regLen = *((uint16_t*)((uint8_t*)reg + sizeof(regAddr)));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
 
 	// Assert CS
