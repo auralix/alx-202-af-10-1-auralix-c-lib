@@ -590,17 +590,6 @@ typedef struct
 	float z_g;
 } AlxAdxl355_Xyz_g;
 
-typedef union
-{
-	struct __attribute__((packed))
-	{
-		int32_t x_20bit;
-		int32_t y_20bit;
-		int32_t z_20bit;
-	};
-	uint8_t raw[12];
-} AlxAdxl355_Xyz_20bit;
-
 typedef struct
 {
 	// Objects - External
@@ -616,10 +605,6 @@ typedef struct
 	uint32_t fifoBuffLen;
 
 	// Variables
-	float rangeFactor;
-	AlxAdxl355_Xyz_g xyz_g;
-	AlxAdxl355_Xyz_20bit xyz_20bit;
-
 	AlxAdxl355_Reg reg;
 
 	// Info

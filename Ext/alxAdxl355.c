@@ -50,7 +50,6 @@ static Alx_Status AlxAdxl355_Reg_Read(AlxAdxl355* me, void* reg);
 static Alx_Status AlxAdxl355_Reg_WriteAll(AlxAdxl355* me);
 
 static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me);
-static Alx_Status AlxAdxl355_ReadXyz_g(AlxAdxl355* me);
 
 
 //******************************************************************************
@@ -95,10 +94,6 @@ void AlxAdxl355_Ctor
 	me->fifoBuffLen = fifoBuffLen;
 
 	// Variables
-	me->rangeFactor = 0.f;
-	me->xyz_g.x_g = 0.f;
-	me->xyz_g.y_g = 0.f;
-	me->xyz_g.z_g = 0.f;
 	AlxAdxl355_RegStruct_SetAddr(me);
 	AlxAdxl355_RegStruct_SetLen(me);
 	AlxAdxl355_RegStruct_SetValToZero(me);
@@ -250,7 +245,95 @@ Alx_Status AlxAdxl355_Disable(AlxAdxl355* me)
   */
 Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g)
 {
-	return AlxAdxl355_GetXyzMulti_g(me, xyz_g, 1);
+	// Assert
+	ALX_ADXL355_ASSERT(me->isInit == true);
+	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
+
+	// Local Types
+	typedef union
+	{
+		struct __attribute__((packed))
+		{
+			int32_t x_20bit;
+			int32_t y_20bit;
+			int32_t z_20bit;
+		};
+		uint8_t raw[12];
+	} AlxAdxl355_Xyz_20bit;
+
+	// Read
+	Alx_Status status = AlxAdxl355_Reg_Read(me, &me->reg._0x08_0x10_DATA);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
+
+	// Convert
+	AlxAdxl355_Xyz_20bit xyz_20bit = {};
+	xyz_20bit.raw[0]	= me->reg._0x08_0x10_DATA.val.XDATA1;	// dataX LSB
+	xyz_20bit.raw[1]	= me->reg._0x08_0x10_DATA.val.XDATA2;
+	xyz_20bit.raw[2]	= me->reg._0x08_0x10_DATA.val.XDATA3;
+	xyz_20bit.raw[3]	= 0x00;
+	xyz_20bit.raw[4]	= me->reg._0x08_0x10_DATA.val.YDATA1;	// dataY LSB
+	xyz_20bit.raw[5]	= me->reg._0x08_0x10_DATA.val.YDATA2;
+	xyz_20bit.raw[6]	= me->reg._0x08_0x10_DATA.val.YDATA3;
+	xyz_20bit.raw[7]	= 0x00;
+	xyz_20bit.raw[8]	= me->reg._0x08_0x10_DATA.val.ZDATA1;	// dataZ LSB
+	xyz_20bit.raw[9]	= me->reg._0x08_0x10_DATA.val.ZDATA2;
+	xyz_20bit.raw[10]	= me->reg._0x08_0x10_DATA.val.ZDATA3;
+	xyz_20bit.raw[11]	= 0x00;
+
+	// Make data right-justified
+	xyz_20bit.x_20bit = xyz_20bit.x_20bit >> 4;
+	xyz_20bit.y_20bit = xyz_20bit.y_20bit >> 4;
+	xyz_20bit.z_20bit = xyz_20bit.z_20bit >> 4;
+
+	// Add padding 1 for negative numbers (negative numbers have their MSB set to 1)
+	if((xyz_20bit.x_20bit & 0x00080000) == 0x00080000)
+	{
+		xyz_20bit.x_20bit = xyz_20bit.x_20bit | 0xFFF00000;
+	}
+	if ((xyz_20bit.y_20bit & 0x00080000) == 0x00080000)
+	{
+		xyz_20bit.y_20bit = xyz_20bit.y_20bit | 0xFFF00000;
+	}
+	if ((xyz_20bit.z_20bit & 0x00080000) == 0x00080000)
+	{
+		xyz_20bit.z_20bit = xyz_20bit.z_20bit | 0xFFF00000;
+	}
+
+	// Determine full scale range factor
+	float rangeFactor = 0;
+	switch (me->reg._0x2C_Range.val.Range)
+	{
+		case Range_2g048:
+		{
+			rangeFactor = 0.0000039f;
+			break;
+		}
+		case Range_4g096:
+		{
+			rangeFactor = 0.0000078f;
+			break;
+		}
+		case Range_8g192:
+		{
+			rangeFactor = 0.0000156f;
+			break;
+		}
+		default:
+		{
+			ALX_ADXL355_ASSERT(false);	// We should never get here
+			return Alx_Err;
+		}
+	}
+
+	// Calculate
+	AlxAdxl355_Xyz_g _xyz_g = {};
+	_xyz_g.x_g = xyz_20bit.x_20bit * rangeFactor;
+	_xyz_g.y_g = xyz_20bit.y_20bit * rangeFactor;
+	_xyz_g.z_g = xyz_20bit.z_20bit * rangeFactor;
+
+	// Return
+	*xyz_g = _xyz_g;
+	return Alx_Ok;
 }
 
 /**
@@ -263,6 +346,7 @@ Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g)
   */
 Alx_Status AlxAdxl355_GetXyzMulti_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint32_t len)
 {
+	// Assert
 	ALX_ADXL355_ASSERT(me->isInit == true);
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
 	ALX_ADXL355_ASSERT((0 < len) && (len <= me->fifoBuffLen));
@@ -308,19 +392,19 @@ Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC)
 	ALX_ADXL355_ASSERT(me->isInit == true);
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
 
-	// Read
-	Alx_Status status = AlxAdxl355_Reg_Read(me, &me->reg._0x06_0x07_TEMP);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
-
-	// Prepare
+	// Local Types
 	typedef union
 	{
 		uint16_t val;
 		uint8_t raw[2];
 	} AlxAdxl355_Temp_12bit;
-	AlxAdxl355_Temp_12bit temp_12bit = {};
+
+	// Read
+	Alx_Status status = AlxAdxl355_Reg_Read(me, &me->reg._0x06_0x07_TEMP);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
 	// Convert
+	AlxAdxl355_Temp_12bit temp_12bit = {};
 	temp_12bit.raw[0] = me->reg._0x06_0x07_TEMP.val.TEMP1;
 	temp_12bit.raw[1] = me->reg._0x06_0x07_TEMP.val.TEMP2;
 
@@ -349,23 +433,23 @@ Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me)
 //	status = AlxAdxl355_Reg_Read(me, &me->reg._0x11_FIFO_DATA);
 //	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	// Read acceleration data
-	status = AlxAdxl355_ReadXyz_g(me);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
-
-	// Write acceleration data to FIFO
-	status = AlxFifo_WriteMulti(&me->fifo, (uint8_t*)&me->xyz_g, sizeof(AlxAdxl355_Xyz_g));
-	if (status == AlxFifo_ErrFull)
-	{
-		// TV: TODO, decide if we will handle FIFO overflow as error, or we will discard overflow data..
-		// For now we will discard additional overflow data..
-		return status;
-	}
-	else if (status != Alx_Ok)
-	{
-		ALX_ADXL355_ASSERT(false);	// We should never get here
-		return status;
-	}
+//	// Read acceleration data
+//	status = AlxAdxl355_ReadXyz_g(me);
+//	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
+//
+//	// Write acceleration data to FIFO
+//	status = AlxFifo_WriteMulti(&me->fifo, (uint8_t*)&me->xyz_g, sizeof(AlxAdxl355_Xyz_g));
+//	if (status == AlxFifo_ErrFull)
+//	{
+//		// TV: TODO, decide if we will handle FIFO overflow as error, or we will discard overflow data..
+//		// For now we will discard additional overflow data..
+//		return status;
+//	}
+//	else if (status != Alx_Ok)
+//	{
+//		ALX_ADXL355_ASSERT(false);	// We should never get here
+//		return status;
+//	}
 
 	// Return
 	return Alx_Ok;
@@ -556,80 +640,6 @@ static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me)
 	ALX_ADXL355_TRACE_INF("");
 
 	// Return
-	return Alx_Ok;
-}
-static Alx_Status AlxAdxl355_ReadXyz_g(AlxAdxl355* me)
-{
-	Alx_Status status = Alx_Err;
-
-	// #1 Read acceleration data
-	status = AlxAdxl355_Reg_Read(me, &me->reg._0x08_0x10_DATA);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err_0x08_0x10_DATA"); return status;}
-
-	// #2 Re-organize raw data
-	me->xyz_20bit.raw[0]	= me->reg._0x08_0x10_DATA.val.XDATA1;	// dataX LSB
-	me->xyz_20bit.raw[1]	= me->reg._0x08_0x10_DATA.val.XDATA2;
-	me->xyz_20bit.raw[2]	= me->reg._0x08_0x10_DATA.val.XDATA3;
-	me->xyz_20bit.raw[3]	= 0x00;
-	me->xyz_20bit.raw[4]	= me->reg._0x08_0x10_DATA.val.YDATA1;	// dataY LSB
-	me->xyz_20bit.raw[5]	= me->reg._0x08_0x10_DATA.val.YDATA2;
-	me->xyz_20bit.raw[6]	= me->reg._0x08_0x10_DATA.val.YDATA3;
-	me->xyz_20bit.raw[7]	= 0x00;
-	me->xyz_20bit.raw[8]	= me->reg._0x08_0x10_DATA.val.ZDATA1;	// dataZ LSB
-	me->xyz_20bit.raw[9]	= me->reg._0x08_0x10_DATA.val.ZDATA2;
-	me->xyz_20bit.raw[10]	= me->reg._0x08_0x10_DATA.val.ZDATA3;
-	me->xyz_20bit.raw[11]	= 0x00;
-
-	// #3 Make data right-justified
-	me->xyz_20bit.x_20bit = me->xyz_20bit.x_20bit >> 4;
-	me->xyz_20bit.y_20bit = me->xyz_20bit.y_20bit >> 4;
-	me->xyz_20bit.z_20bit = me->xyz_20bit.z_20bit >> 4;
-
-	// #4 Add padding 1 for negative numbers (negative numbers have their MSB set to 1)
-	if((me->xyz_20bit.x_20bit & 0x00080000) == 0x00080000)
-	{
-		me->xyz_20bit.x_20bit = me->xyz_20bit.x_20bit | 0xFFF00000;
-	}
-	if ((me->xyz_20bit.y_20bit & 0x00080000) == 0x00080000)
-	{
-		me->xyz_20bit.y_20bit = me->xyz_20bit.y_20bit | 0xFFF00000;
-	}
-	if ((me->xyz_20bit.z_20bit & 0x00080000) == 0x00080000)
-	{
-		me->xyz_20bit.z_20bit = me->xyz_20bit.z_20bit | 0xFFF00000;
-	}
-
-	// #5 Determine full scale range factor
-	switch (me->reg._0x2C_Range.val.Range)
-	{
-		case Range_2g048:
-		{
-			me->rangeFactor = 0.0000039f;
-			break;
-		}
-		case Range_4g096:
-		{
-			me->rangeFactor = 0.0000078f;
-			break;
-		}
-		case Range_8g192:
-		{
-			me->rangeFactor = 0.0000156f;
-			break;
-		}
-		default:
-		{
-			ALX_ADXL355_ASSERT(false);	// We should never get here
-			return status;
-		}
-	}
-
-	// #6 Calculate & set
-	me->xyz_g.x_g = me->xyz_20bit.x_20bit * me->rangeFactor;
-	me->xyz_g.y_g = me->xyz_20bit.y_20bit * me->rangeFactor;
-	me->xyz_g.z_g = me->xyz_20bit.z_20bit * me->rangeFactor;
-
-	// #7 Return OK
 	return Alx_Ok;
 }
 
