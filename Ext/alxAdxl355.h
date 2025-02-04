@@ -592,7 +592,7 @@ typedef struct __attribute__((packed))
 //******************************************************************************
 // Main Register Structure
 //******************************************************************************
-typedef struct
+typedef struct __attribute__((packed))
 {
 	AlxAdxl355_Reg_0x00_DEVID_AD		_0x00_DEVID_AD;
 	AlxAdxl355_Reg_0x01_DEVID_MST		_0x01_DEVID_MST;
@@ -616,7 +616,7 @@ typedef struct
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef struct
+typedef struct __attribute__((packed))
 {
 	float x_g;
 	float y_g;

@@ -288,13 +288,38 @@ Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint
 	// Assert
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
 	ALX_ADXL355_ASSERT(me->isInit == true);
+	ALX_ADXL355_ASSERT((1 <= len) && (len <= 32));
 
 	// Read
-	me->reg._0x11_FIFO_DATA.len = len * 3;
+	me->reg._0x11_FIFO_DATA.len = len * 3 * 3;
 	Alx_Status status = AlxAdxl355_Reg_Read(me, &me->reg._0x11_FIFO_DATA);
 	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
+	// Loop
+	AlxAdxl355_Xyz_g _xyz_g[32] = {};
+	for (uint32_t i = 0; i < len; i++)
+	{
+		// Prepare
+		AlxAdxl355_Xyz_20bit xyz_20bit = {};
+		xyz_20bit.raw[0]	= me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].XDATA1;	// dataX LSB
+		xyz_20bit.raw[1]	= me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].XDATA2;
+		xyz_20bit.raw[2]	= me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].XDATA3;
+		xyz_20bit.raw[3]	= 0x00;
+		xyz_20bit.raw[4]	= me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].YDATA1;	// dataY LSB
+		xyz_20bit.raw[5]	= me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].YDATA2;
+		xyz_20bit.raw[6]	= me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].YDATA3;
+		xyz_20bit.raw[7]	= 0x00;
+		xyz_20bit.raw[8]	= me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].ZDATA1;	// dataZ LSB
+		xyz_20bit.raw[9]	= me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].ZDATA2;
+		xyz_20bit.raw[10]	= me->reg._0x11_FIFO_DATA.val.xyz_20bit[i].ZDATA3;
+		xyz_20bit.raw[11]	= 0x00;
+
+		// Convert
+		_xyz_g[i] = AlxAdxl355_ConvertXyz(me, xyz_20bit);
+	}
+
 	// Return
+	memcpy(xyz_g, _xyz_g, len * sizeof(AlxAdxl355_Xyz_g));
 	return Alx_Ok;
 }
 
