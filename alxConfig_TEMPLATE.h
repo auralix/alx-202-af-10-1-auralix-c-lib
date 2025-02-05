@@ -63,6 +63,7 @@ extern "C" {
 //#define ALX_WIZNET
 //#define ALX_MBED
 //#define ALX_MBED_CLOUD_CLIENT
+//#define ALX_MBEDTLS
 //#define ALX_ZEPHYR
 
 
