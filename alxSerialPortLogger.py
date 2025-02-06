@@ -27,6 +27,7 @@
 #*******************************************************************************
 # Imports
 #*******************************************************************************
+import queue
 import threading
 import pathlib
 import sys
@@ -47,7 +48,8 @@ class SerialPortLogger:
 		port,
 		baudRate,
 		logPath,
-		logToConsole
+		logToConsole,
+		fifoQueue = None
 	):
 		#-------------------------------------------------------------------------------
 		# Log
@@ -68,6 +70,8 @@ class SerialPortLogger:
 		self.__baudRate = baudRate
 		self.__logPath = logPath
 		self.__logToConsole = logToConsole
+		self.__fifoQueue = fifoQueue
+		self.__queueLoggingEnabled = threading.Event()
 
 
 		#-------------------------------------------------------------------------------
@@ -142,6 +146,13 @@ class SerialPortLogger:
 					if buffer.endswith(b'\r\n'):
 						line = buffer.decode(errors='ignore').strip()
 						self.__logger.info(line)
+
+						# Put to FIFO Queue
+						if self.__queueLoggingEnabled.is_set() and self.__fifoQueue is not None:
+							self.__fifoQueue.put(line)
+							if self.__fifoQueue.qsize() > 100:
+								self.__fifoQueue.get()
+
 						buffer = b""
 
 		except Exception as e:
@@ -158,6 +169,19 @@ class SerialPortLogger:
 		self.__stopEvent.set()
 		logging.debug("EXIT")
 
+	#-------------------------------------------------------------------------------
+	# FIFO Queue Functions
+	#-------------------------------------------------------------------------------
+	def StartQueueLogging(self):
+		self.__queueLoggingEnabled.set()
+
+	def StopQueueLogging(self):
+		self.__queueLoggingEnabled.clear()
+
+	def ReadFromQueue(self):
+		if self.__fifoQueue and not self.__fifoQueue.empty():
+			return self.__fifoQueue.get()
+		return None
 
 #*******************************************************************************
 # Script
