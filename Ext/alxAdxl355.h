@@ -676,6 +676,7 @@ Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g);
 Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint8_t len);
 Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC);
 Alx_Status AlxAdxl355_GetStatusReg(AlxAdxl355* me, AlxAdxl355_RegVal_0x04_Status* statusReg);
+uint8_t AlxAdxl355_GetFifoLen(AlxAdxl355* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

@@ -409,6 +409,24 @@ Alx_Status AlxAdxl355_GetStatusReg(AlxAdxl355* me, AlxAdxl355_RegVal_0x04_Status
 	return Alx_Ok;
 }
 
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
+uint8_t AlxAdxl355_GetFifoLen(AlxAdxl355* me)
+{
+	// Assert
+	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
+	ALX_ADXL355_ASSERT(me->isInit == true);
+
+	// Get
+	uint8_t len = me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES / 3;
+
+	// Return
+	return len;
+}
+
 
 //******************************************************************************
 // Private Functions
