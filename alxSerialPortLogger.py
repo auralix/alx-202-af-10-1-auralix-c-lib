@@ -31,6 +31,7 @@ import queue
 import threading
 import pathlib
 import sys
+import re
 import serial
 import logging
 import logging.handlers
@@ -134,26 +135,37 @@ class SerialPortLogger:
 		)
 
 		# Do
-		buffer = b""
+		buffer = ""
+		self.__serialPort.timeout = 0.1
 		try:
 			while not self.__stopEvent.is_set():
-				chunk = self.__serialPort.read_until(b'\r\n')
+				chunk = self.__serialPort.read(1024).decode(errors='ignore')
 				if chunk:
-					# Accumulate partial data
 					buffer += chunk
 
-					# Check if complete line
-					if buffer.endswith(b'\r\n'):
-						line = buffer.decode(errors='ignore').strip()
-						self.__logger.info(line)
+					# Process complete lines (ending with \n)
+					# Split at the first complete line
+					while '\n' in buffer:
+						line, buffer = buffer.split('\n', 1) 
+						line = line.strip()
 
-						# Put to FIFO Queue
-						if self.__queueLoggingEnabled.is_set() and self.__fifoQueue is not None:
-							self.__fifoQueue.put(line)
-							if self.__fifoQueue.qsize() > 100:
-								self.__fifoQueue.get()
+						# Check for reset markers (-----) and handle them
+						# Clear buffer after a reset marker
+						# Because if the power reset occurs in the middle of the line, buffer starts to act weird
+						if re.match(r'-{4,}', line):
+							logging.debug("Reset marker detected. Flushing buffer.")
+							buffer = ""
+							continue
 
-						buffer = b""
+						# Process valid lines
+						if line:
+							self.__logger.info(line)
+
+							# Add to the queue if logging is enabled
+							if self.__queueLoggingEnabled.is_set() and self.__fifoQueue is not None:
+								self.__fifoQueue.put(line)
+								if self.__fifoQueue.qsize() > 100:
+									self.__fifoQueue.get()
 
 		except Exception as e:
 			self.__logger.fatal(f"FAIL: {e}")
@@ -181,6 +193,11 @@ class SerialPortLogger:
 	def ReadFromQueue(self):
 		if self.__fifoQueue and not self.__fifoQueue.empty():
 			return self.__fifoQueue.get()
+		return None
+
+	def ReadLastInputFromQueue(self):
+		if self.__fifoQueue and not self.__fifoQueue.empty():
+			return self.__fifoQueue.queue[-1]
 		return None
 
 #*******************************************************************************
