@@ -202,10 +202,8 @@ class SerialPortLogger:
 			return None
 
 	def ReadLastInputFromQueue(self):
-		if self.__fifoQueue:
-			with self.__fifoQueue.mutex:
-				if not self.__fifoQueue.empty():
-					return self.__fifoQueue.queue[-1]
+		if self.__fifoQueue and not self.__fifoQueue.empty():
+			return self.__fifoQueue.queue[-1]
 		return None
 
 #*******************************************************************************
