@@ -161,7 +161,7 @@ class SerialPortLogger:
 								if self.__fifoQueue.qsize() > 10:
 									self.__fifoQueue.get()
 
-						buffer = b""
+						buffer = ""
 		except Exception as e:
 			self.__logger.fatal(f"FAIL: {e}")
 			logging.fatal(f"FAIL: {e}")
