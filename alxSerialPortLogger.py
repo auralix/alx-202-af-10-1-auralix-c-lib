@@ -134,24 +134,32 @@ class SerialPortLogger:
 		)
 
 		# Do
-		buffer = b""
 		self.__serialPort.timeout = 0.1
-		buffer = b""
+		buffer = ""
 		try:
 			while not self.__stopEvent.is_set():
-				chunk = self.__serialPort.read_until(b'\n')
+				chunk = self.__serialPort.read(1024).decode(errors='ignore')
 				if chunk:
 					# Accumulate partial data
 					buffer += chunk
 					# Check if complete line
-					if buffer.endswith(b'\n'):
-						line = buffer.decode(errors='ignore').strip()
-						self.__logger.info(line)
+					while '\n' in buffer:
+						line, buffer = buffer.split('\n', 1)
+						line = line.strip()
 
-						if self.__queueLoggingEnabled.is_set() and self.__fifoQueue is not None:
-							self.__fifoQueue.put(line)
-							if self.__fifoQueue.qsize() > 10:
-								self.__fifoQueue.get()
+						if '------' in line:
+							logging.debug("Reset marker detected. Flushing buffer.")
+							buffer = ""
+							continue
+						
+						if line:
+							self.__logger.info(line)
+
+							# Add to the queue if logging is enabled
+							if self.__queueLoggingEnabled.is_set() and self.__fifoQueue is not None:
+								self.__fifoQueue.put(line)
+								if self.__fifoQueue.qsize() > 10:
+									self.__fifoQueue.get()
 
 						buffer = b""
 		except Exception as e:
@@ -170,17 +178,28 @@ class SerialPortLogger:
 	#-------------------------------------------------------------------------------
 	# FIFO Queue Functions
 	#-------------------------------------------------------------------------------
+
+	def clear_queue(self, q):
+		with q.mutex:
+			q.queue.clear()
+			q.all_tasks_done.notify_all()
+			q.unfinished_tasks = 0
+
 	def StartQueueLogging(self):
-		self.__fifoQueue.queue.clear()
+		if self.__fifoQueue is not None:
+			self.clear_queue(self.__fifoQueue)
 		self.__queueLoggingEnabled.set()
 
 	def StopQueueLogging(self):
 		self.__queueLoggingEnabled.clear()
-		self.__fifoQueue.queue.clear()
+		if self.__fifoQueue is not None:
+			self.clear_queue(self.__fifoQueue)
 
 	def ReadFromQueue(self):
-		if self.__fifoQueue and not self.__fifoQueue.empty():
-			return self.__fifoQueue.get()
+		if self.__fifoQueue:
+			with self.__fifoQueue.mutex:
+				if not self.__fifoQueue.empty():
+					return self.__fifoQueue.queue[-1]
 		return None
 
 	def ReadLastInputFromQueue(self):
