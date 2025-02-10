@@ -31,7 +31,6 @@ import queue
 import threading
 import pathlib
 import sys
-import re
 import serial
 import logging
 import logging.handlers
@@ -135,26 +134,26 @@ class SerialPortLogger:
 		)
 
 		# Do
-		buffer = ""
+		buffer = b""
 		self.__serialPort.timeout = 0.1
 		try:
 			while not self.__stopEvent.is_set():
-				chunk = self.__serialPort.read(1024).decode(errors='ignore')
+				chunk = self.__serialPort.readall()
 				if chunk:
 					buffer += chunk
 
 					# Process complete lines (ending with \n)
 					# Split at the first complete line
-					while '\n' in buffer:
-						line, buffer = buffer.split('\n', 1) 
-						line = line.strip()
+					while b'\n' in buffer:
+						line, buffer = buffer.split(b'\n', 1) 
+						line = line.decode(errors='ignore').strip()
 
 						# Check for reset markers (-----) and handle them
 						# Clear buffer after a reset marker
 						# Because if the power reset occurs in the middle of the line, buffer starts to act weird
-						if re.match(r'-{4,}', line):
+						if "-----" in line:
 							logging.debug("Reset marker detected. Flushing buffer.")
-							buffer = ""
+							buffer = b""
 							continue
 
 						# Process valid lines
