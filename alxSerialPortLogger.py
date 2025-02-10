@@ -136,40 +136,27 @@ class SerialPortLogger:
 		# Do
 		buffer = b""
 		self.__serialPort.timeout = 0.1
+		buffer = b""
 		try:
 			while not self.__stopEvent.is_set():
-				chunk = self.__serialPort.readall()
+				chunk = self.__serialPort.read_until(b'\n')
 				if chunk:
+					# Accumulate partial data
 					buffer += chunk
+					# Check if complete line
+					if buffer.endswith(b'\n'):
+						line = buffer.decode(errors='ignore').strip()
+						self.__logger.info(line)
 
-					# Process complete lines (ending with \n)
-					# Split at the first complete line
-					while b'\n' in buffer:
-						line, buffer = buffer.split(b'\n', 1) 
-						line = line.decode(errors='ignore').strip()
+						if self.__queueLoggingEnabled.is_set() and self.__fifoQueue is not None:
+							self.__fifoQueue.put(line)
+							if self.__fifoQueue.qsize() > 10:
+								self.__fifoQueue.get()
 
-						# Check for reset markers (-----) and handle them
-						# Clear buffer after a reset marker
-						# Because if the power reset occurs in the middle of the line, buffer starts to act weird
-						if "-----" in line:
-							logging.debug("Reset marker detected. Flushing buffer.")
-							buffer = b""
-							continue
-
-						# Process valid lines
-						if line:
-							self.__logger.info(line)
-
-							# Add to the queue if logging is enabled
-							if self.__queueLoggingEnabled.is_set() and self.__fifoQueue is not None:
-								self.__fifoQueue.put(line)
-								if self.__fifoQueue.qsize() > 10:
-									self.__fifoQueue.get()
-
+						buffer = b""
 		except Exception as e:
 			self.__logger.fatal(f"FAIL: {e}")
 			logging.fatal(f"FAIL: {e}")
-
 		finally:
 			logging.debug("EXIT")
 			if self.__serialPort and self.__serialPort.is_open:
