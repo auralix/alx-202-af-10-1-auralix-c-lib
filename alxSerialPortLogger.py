@@ -157,9 +157,9 @@ class SerialPortLogger:
 
 							# Add to the queue if logging is enabled
 							if self.__queueLoggingEnabled.is_set() and self.__fifoQueue is not None:
-								self.__fifoQueue.put(line)
-								if self.__fifoQueue.qsize() > 10:
-									self.__fifoQueue.get()
+								if self.__fifoQueue.full():
+									self.__fifoQueue.get_nowait()
+								self.__fifoQueue.put_nowait(line)
 
 		except Exception as e:
 			self.__logger.fatal(f"FAIL: {e}")
@@ -195,13 +195,17 @@ class SerialPortLogger:
 			self.clear_queue(self.__fifoQueue)
 
 	def ReadFromQueue(self):
-		if self.__fifoQueue and not self.__fifoQueue.empty():
-			return self.__fifoQueue.get()
-		return None
+		try:
+			element = self.__fifoQueue.get_nowait()
+			return element
+		except queue.Empty:
+			return None
 
 	def ReadLastInputFromQueue(self):
-		if self.__fifoQueue and not self.__fifoQueue.empty():
-			return self.__fifoQueue.queue[-1]
+		if self.__fifoQueue:
+				with self.__fifoQueue.mutex:
+					if not self.__fifoQueue.empty():
+						return self.__fifoQueue.queue.pop()
 		return None
 
 #*******************************************************************************
