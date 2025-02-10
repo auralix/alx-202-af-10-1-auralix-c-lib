@@ -205,7 +205,7 @@ class SerialPortLogger:
 		if self.__fifoQueue:
 			with self.__fifoQueue.mutex:
 				if not self.__fifoQueue.empty():
-					return self.__fifoQueue.queue.pop()
+					return self.__fifoQueue.queue[-1]
 		return None
 
 #*******************************************************************************
