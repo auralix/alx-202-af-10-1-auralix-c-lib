@@ -61,8 +61,6 @@ extern "C" {
 //#define ALX_FATFS
 //#define ALX_LFS
 //#define ALX_WIZNET
-//#define ALX_MBED
-//#define ALX_MBED_CLOUD_CLIENT
 //#define ALX_MBEDTLS
 //#define ALX_ZEPHYR
 
@@ -152,6 +150,9 @@ extern "C" {
 //#define ALX_LPC55S6X
 //#define ALX_LPC80X
 //#define ALX_LPC84X
+
+// HW - SAM
+//#define ALX_SAM
 
 
 //------------------------------------------------------------------------------
