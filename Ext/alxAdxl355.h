@@ -42,10 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxTimSw.h"
-#include "alxIoPin.h"
 #include "alxSpi.h"
-#include "alxFifo.h"
 
 
 //******************************************************************************
@@ -85,9 +82,9 @@ extern "C" {
 //******************************************************************************
 
 
-//******************************************************************************
-// Address: 0x00, Reset: 0xAD, Name: DEVID_AD
-//******************************************************************************
+//------------------------------------------------------------------------------
+// ANALOG DEVICES ID REGISTER
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -98,9 +95,9 @@ typedef union
 } AlxAdxl355_RegVal_0x00_DEVID_AD;
 
 
-//******************************************************************************
-// Address: 0x01, Reset: 0x1D, Name: DEVID_MST
-//******************************************************************************
+//------------------------------------------------------------------------------
+// ANALOG DEVICES MEMS ID REGISTER
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -111,9 +108,9 @@ typedef union
 } AlxAdxl355_RegVal_0x01_DEVID_MST;
 
 
-//******************************************************************************
-// Address: 0x02, Reset: 0xED, Name: PARTID
-//******************************************************************************
+//------------------------------------------------------------------------------
+// DEVICE ID REGISTER
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -124,9 +121,9 @@ typedef union
 } AlxAdxl355_RegVal_0x02_PARTID;
 
 
-//******************************************************************************
-// Address: 0x03, Reset: 0x01, Name: REVID
-//******************************************************************************
+//------------------------------------------------------------------------------
+// PRODUCT REVISION ID REGISTER
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -137,34 +134,39 @@ typedef union
 } AlxAdxl355_RegVal_0x03_REVID;
 
 
-//******************************************************************************
-// Address: 0x04, Reset: 0x00, Name: Status
-//******************************************************************************
+//------------------------------------------------------------------------------
+// STATUS REGISTER
+//------------------------------------------------------------------------------
 typedef enum
 {
 	DATA_RDY_False	= 0b0,
 	DATA_RDY_True	= 0b1
 } AlxAdxl355_RegEnum_0x04_DATA_RDY;
+
 typedef enum
 {
 	FIFO_FULL_False	= 0b0,
 	FIFO_FULL_True	= 0b1
 } AlxAdxl355_RegEnum_0x04_FIFO_FULL;
+
 typedef enum
 {
 	FIFO_OVR_False	= 0b0,
 	FIFO_OVR_True	= 0b1
 } AlxAdxl355_RegEnum_0x04_FIFO_OVR;
+
 typedef enum
 {
 	Activity_Detected		= 0b0,
 	Activity_NotDetected	= 0b1
 } AlxAdxl355_RegEnum_0x04_Activity;
+
 typedef enum
 {
 	NVM_BUSY_False	= 0b0,
 	NVM_BUSY_True	= 0b1
 } AlxAdxl355_RegEnum_0x04_NVM_BUSY;
+
 typedef union
 {
 	struct __attribute__((packed))
@@ -180,9 +182,9 @@ typedef union
 } AlxAdxl355_RegVal_0x04_Status;
 
 
-//******************************************************************************
-// Address: 0x28, Reset: 0x00, Name: Filter
-//******************************************************************************
+//------------------------------------------------------------------------------
+// FILTER SETTINGS REGISTER
+//------------------------------------------------------------------------------
 typedef enum
 {
 	ODR_LPF_4000Hz_1000Hz		= 0b0000,
@@ -219,49 +221,71 @@ typedef union
 } AlxAdxl355_RegVal_0x28_Filter;
 
 
-//******************************************************************************
-// Address: 0x2A, Reset: 0x00, Name: INT_MAP
-//******************************************************************************
+//------------------------------------------------------------------------------
+// FIFO SAMPLES REGISTER
+//------------------------------------------------------------------------------
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t FIFO_SAMPLES : 7;
+		uint8_t unused_7 : 1;
+	};
+	uint8_t raw;
+} AlxAdxl355_RegVal_0x29_FIFO_SAMPLES;
+
+
+//------------------------------------------------------------------------------
+// INTERRUPT PIN (INTX) FUNCTION MAP REGISTER
+//------------------------------------------------------------------------------
 typedef enum
 {
 	RDY_EN1_Disable		= 0b0,
 	RDY_EN1_Enable		= 0b1
 } AlxAdxl355_RegEnum_0x2A_RDY_EN1;
+
 typedef enum
 {
 	FULL_EN1_Disable	= 0b0,
 	FULL_EN1_Enable		= 0b1
 } AlxAdxl355_RegEnum_0x2A_FULL_EN1;
+
 typedef enum
 {
 	OVR_EN1_Disable		= 0b0,
 	OVR_EN1_Enable		= 0b1
 } AlxAdxl355_RegEnum_0x2A_OVR_EN1;
+
 typedef enum
 {
 	ACT_EN1_Disable		= 0b0,
 	ACT_EN1_Enable		= 0b1
 } AlxAdxl355_RegEnum_0x2A_ACT_EN1;
+
 typedef enum
 {
 	RDY_EN2_Disable		= 0b0,
 	RDY_EN2_Enable		= 0b1
 } AlxAdxl355_RegEnum_0x2A_RDY_EN2;
+
 typedef enum
 {
 	FULL_EN2_Disable	= 0b0,
 	FULL_EN2_Enable		= 0b1
 } AlxAdxl355_RegEnum_0x2A_FULL_EN2;
+
 typedef enum
 {
 	OVR_EN2_Disable		= 0b0,
 	OVR_EN2_Enable		= 0b1
 } AlxAdxl355_RegEnum_0x2A_OVR_EN2;
+
 typedef enum
 {
 	ACT_EN2_Disable		= 0b0,
 	ACT_EN2_Enable		= 0b1
 } AlxAdxl355_RegEnum_0x2A_ACT_EN2;
+
 typedef union
 {
 	struct __attribute__((packed))
@@ -280,9 +304,9 @@ typedef union
 } AlxAdxl355_RegVal_0x2A_INT_MAP;
 
 
-//******************************************************************************
-// Address: 0x2B, Reset: 0x00, Name: Sync
-//******************************************************************************
+//------------------------------------------------------------------------------
+// DATA SYNCHRONIZATION REGISTER
+//------------------------------------------------------------------------------
 typedef enum
 {
 	EXT_SYNC_InternalSync						= 0b00,
@@ -290,11 +314,13 @@ typedef enum
 	EXT_SYNC_ExternalSync_InterpolationFilter	= 0b10,
 	EXT_SYNC_Reserved							= 0b11
 } AlxAdxl355_RegEnum_0x2B_EXT_SYNC;
+
 typedef enum
 {
 	EXT_CLK_Disable	= 0b0,
 	EXT_CLK_Enable	= 0b1
 } AlxAdxl355_RegEnum_0x2B_EXT_CLK;
+
 typedef union
 {
 	struct __attribute__((packed))
@@ -307,9 +333,9 @@ typedef union
 } AlxAdxl355_RegVal_0x2B_Sync;
 
 
-//******************************************************************************
-// Address: 0x2C, Reset: 0x81, Name: Range
-//******************************************************************************
+//------------------------------------------------------------------------------
+// I2C SPEED, INTERRUPT POLARITY, AND RANGE REGISTER
+//------------------------------------------------------------------------------
 typedef enum
 {
 	Range_Reserved	= 0b00,
@@ -317,16 +343,19 @@ typedef enum
 	Range_4g096		= 0b10,
 	Range_8g192		= 0b11,
 } AlxAdxl355_RegEnum_0x2C_Range;
+
 typedef enum
 {
 	INT_POL_INT1_INT2_ActiveLow		= 0b0,
 	INT_POL_INT1_INT2_ActiveHigh	= 0b1
 } AlxAdxl355_RegEnum_0x2C_INT_POL;
+
 typedef enum
 {
 	I2C_HS_FastMode			= 0b0,
 	I2C_HS_HighSpeedMode	= 0b1
 } AlxAdxl355_RegEnum_0x2C_I2C_HS;
+
 typedef union
 {
 	struct __attribute__((packed))
@@ -340,24 +369,27 @@ typedef union
 } AlxAdxl355_RegVal_0x2C_Range;
 
 
-//******************************************************************************
-// Address: 0x2D, Reset: 0x01, Name: POWER_CTL
-//******************************************************************************
+//------------------------------------------------------------------------------
+// POWER CONTROL REGISTER
+//------------------------------------------------------------------------------
 typedef enum
 {
 	Standby_StandbyMode		= 0b1,
 	Standby_MeasurementMode	= 0b0,
 } AlxAdxl355_RegEnum_0x2D_Standby;
+
 typedef enum
 {
 	TEMP_OFF_TempProcessEnabled		= 0b0,
 	TEMP_OFF_TempProcessDisabled	= 0b1
 } AlxAdxl355_RegEnum_0x2D_TEMP_OFF;
+
 typedef enum
 {
 	DRDY_OFF_DRDY_NormalOperation	= 0b0,
 	DRDY_OFF_DRDY_ForceToZero		= 0b1
 } AlxAdxl355_RegEnum_0x2D_DRDY_OFF;
+
 typedef union
 {
 	struct __attribute__((packed))
@@ -371,9 +403,9 @@ typedef union
 } AlxAdxl355_RegVal_0x2D_POWER_CTL;
 
 
-//******************************************************************************
-// Address: 0x2F, Reset: 0x00, Name: Reset
-//******************************************************************************
+//------------------------------------------------------------------------------
+// RESET REGISTER
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -389,10 +421,9 @@ typedef union
 //******************************************************************************
 
 
-//******************************************************************************
-// Address: 0x06, Reset: 0x00, Name: TEMP2
-// Address: 0x07, Reset: 0x00, Name: TEMP1
-//******************************************************************************
+//------------------------------------------------------------------------------
+// TEMPERATURE DATA REGISTER GROUP
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -404,17 +435,9 @@ typedef union
 } AlxAdxl355_RegGroupVal_0x06_0x07_TEMP;
 
 
-//******************************************************************************
-// Address: 0x08, Reset: 0x00, Name: XDATA3
-// Address: 0x09, Reset: 0x00, Name: XDATA2
-// Address: 0x0A, Reset: 0x00, Name: XDATA1
-// Address: 0x0B, Reset: 0x00, Name: YDATA3
-// Address: 0x0C, Reset: 0x00, Name: YDATA2
-// Address: 0x0D, Reset: 0x00, Name: YDATA1
-// Address: 0x0E, Reset: 0x00, Name: ZDATA3
-// Address: 0x0F, Reset: 0x00, Name: ZDATA2
-// Address: 0x10, Reset: 0x00, Name: ZDATA1
-//******************************************************************************
+//------------------------------------------------------------------------------
+// X-AXIS / Y-AXIS / Z-AXIS DATA REGISTER GROUP
+//------------------------------------------------------------------------------
 typedef union
 {
 	struct __attribute__((packed))
@@ -422,9 +445,11 @@ typedef union
 		uint8_t XDATA3;
 		uint8_t XDATA2;
 		uint8_t XDATA1;
+
 		uint8_t YDATA3;
 		uint8_t YDATA2;
 		uint8_t YDATA1;
+
 		uint8_t ZDATA3;
 		uint8_t ZDATA2;
 		uint8_t ZDATA1;
@@ -433,73 +458,122 @@ typedef union
 } AlxAdxl355_RegGroupVal_0x08_0x10_DATA;
 
 
+//------------------------------------------------------------------------------
+// FIFO ACCESS REGISTER GROUP
+//------------------------------------------------------------------------------
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		uint8_t XDATA3;
+		uint8_t XDATA2;
+		uint8_t XDATA1_Xmarker : 1;
+		uint8_t XDATA1_EmptyIndicator : 1;
+		uint8_t XDATA1_unused_2_3 : 2;
+		uint8_t XDATA1 : 4;
+
+		uint8_t YDATA3;
+		uint8_t YDATA2;
+		uint8_t YDATA1_Xmarker : 1;
+		uint8_t YDATA1_EmptyIndicator : 1;
+		uint8_t YDATA1_unused_2_3 : 2;
+		uint8_t YDATA1 : 4;
+
+		uint8_t ZDATA3;
+		uint8_t ZDATA2;
+		uint8_t ZDATA1_Xmarker : 1;
+		uint8_t ZDATA1_EmptyIndicator : 1;
+		uint8_t ZDATA1_unused_2_3 : 2;
+		uint8_t ZDATA1 : 4;
+	} xyz_20bit[32];
+	uint8_t raw[288];
+} AlxAdxl355_RegGroupVal_0x11_FIFO_DATA;
+
+
 //******************************************************************************
 // Register Structures
 //******************************************************************************
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x00_DEVID_AD val;
 } AlxAdxl355_Reg_0x00_DEVID_AD;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x01_DEVID_MST val;
 } AlxAdxl355_Reg_0x01_DEVID_MST;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x02_PARTID val;
 } AlxAdxl355_Reg_0x02_PARTID;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x03_REVID val;
 } AlxAdxl355_Reg_0x03_REVID;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x04_Status val;
 } AlxAdxl355_Reg_0x04_Status;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x28_Filter val;
 } AlxAdxl355_Reg_0x28_Filter;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
+	AlxAdxl355_RegVal_0x29_FIFO_SAMPLES val;
+} AlxAdxl355_Reg_0x29_FIFO_SAMPLES;
+
+typedef struct __attribute__((packed))
+{
+	uint8_t addr;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x2A_INT_MAP val;
 } AlxAdxl355_Reg_0x2A_INT_MAP;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x2B_Sync val;
 } AlxAdxl355_Reg_0x2B_Sync;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x2C_Range val;
 } AlxAdxl355_Reg_0x2C_Range;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x2D_POWER_CTL val;
 } AlxAdxl355_Reg_0x2D_POWER_CTL;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegVal_0x2F_Reset val;
 } AlxAdxl355_Reg_0x2F_Reset;
 
@@ -507,96 +581,75 @@ typedef struct
 //******************************************************************************
 // Register Group Structures
 //******************************************************************************
-typedef struct
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegGroupVal_0x06_0x07_TEMP val;
 } AlxAdxl355_RegGroup_0x06_0x07_TEMP;
-typedef struct
+
+typedef struct __attribute__((packed))
 {
 	uint8_t addr;
-	uint8_t len;
+	uint16_t len;
 	AlxAdxl355_RegGroupVal_0x08_0x10_DATA val;
 } AlxAdxl355_RegGroup_0x08_0x10_DATA;
+
+typedef struct __attribute__((packed))
+{
+	uint8_t addr;
+	uint16_t len;
+	AlxAdxl355_RegGroupVal_0x11_FIFO_DATA val;
+} AlxAdxl355_RegGroup_0x11_FIFO_DATA;
 
 
 //******************************************************************************
 // Main Register Structure
 //******************************************************************************
-typedef struct
+typedef struct __attribute__((packed))
 {
-	AlxAdxl355_Reg_0x00_DEVID_AD	_0x00_DEVID_AD	;
-	AlxAdxl355_Reg_0x01_DEVID_MST	_0x01_DEVID_MST	;
-	AlxAdxl355_Reg_0x02_PARTID		_0x02_PARTID	;
-	AlxAdxl355_Reg_0x03_REVID		_0x03_REVID		;
-	AlxAdxl355_Reg_0x04_Status		_0x04_Status	;
-	AlxAdxl355_Reg_0x28_Filter		_0x28_Filter	;
-	AlxAdxl355_Reg_0x2A_INT_MAP		_0x2A_INT_MAP	;
-	AlxAdxl355_Reg_0x2B_Sync		_0x2B_Sync		;
-	AlxAdxl355_Reg_0x2C_Range		_0x2C_Range		;
-	AlxAdxl355_Reg_0x2D_POWER_CTL	_0x2D_POWER_CTL	;
-	AlxAdxl355_Reg_0x2F_Reset		_0x2F_Reset		;
+	AlxAdxl355_Reg_0x00_DEVID_AD		_0x00_DEVID_AD;
+	AlxAdxl355_Reg_0x01_DEVID_MST		_0x01_DEVID_MST;
+	AlxAdxl355_Reg_0x02_PARTID			_0x02_PARTID;
+	AlxAdxl355_Reg_0x03_REVID			_0x03_REVID;
+	AlxAdxl355_Reg_0x04_Status			_0x04_Status;
+	AlxAdxl355_Reg_0x28_Filter			_0x28_Filter;
+	AlxAdxl355_Reg_0x29_FIFO_SAMPLES	_0x29_FIFO_SAMPLES;
+	AlxAdxl355_Reg_0x2A_INT_MAP			_0x2A_INT_MAP;
+	AlxAdxl355_Reg_0x2B_Sync			_0x2B_Sync;
+	AlxAdxl355_Reg_0x2C_Range			_0x2C_Range;
+	AlxAdxl355_Reg_0x2D_POWER_CTL		_0x2D_POWER_CTL;
+	AlxAdxl355_Reg_0x2F_Reset			_0x2F_Reset;
 
-	AlxAdxl355_RegGroup_0x06_0x07_TEMP	_0x06_0x07_TEMP	;
-	AlxAdxl355_RegGroup_0x08_0x10_DATA	_0x08_0x10_DATA	;
+	AlxAdxl355_RegGroup_0x06_0x07_TEMP	_0x06_0x07_TEMP;
+	AlxAdxl355_RegGroup_0x08_0x10_DATA	_0x08_0x10_DATA;
+	AlxAdxl355_RegGroup_0x11_FIFO_DATA	_0x11_FIFO_DATA;
 } AlxAdxl355_Reg;
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef struct
+typedef struct __attribute__((packed))
 {
 	float x_g;
 	float y_g;
 	float z_g;
 } AlxAdxl355_Xyz_g;
 
-typedef union
-{
-	struct __attribute__((packed))
-	{
-		int32_t x_20bit;
-		int32_t y_20bit;
-		int32_t z_20bit;
-	};
-	uint8_t raw[12];
-} AlxAdxl355_Xyz_20bit;
-
-typedef union
-{
-	uint16_t val;
-	uint8_t raw[2];
-} AlxAdxl355_Temp_12bit;
-
 typedef struct
 {
-	// Objects - External
-	AlxSpi* spi;
-
-	// Objects - Internal
-	AlxFifo fifo;
-
 	// Parameters
+	AlxSpi* spi;
 	uint8_t spiNumOfTries;
 	uint16_t spiTimeout_ms;
-	uint8_t* fifoBuff;
-	uint32_t fifoBuffLen;
 
 	// Variables
-	float rangeFactor;
-	AlxAdxl355_Xyz_g xyz_g;
-	AlxAdxl355_Xyz_20bit xyz_20bit;
-
-	AlxAdxl355_Temp_12bit temp_12bit;
-	float temp_degC;
-
 	AlxAdxl355_Reg reg;
 
 	// Info
-	bool isInit;
 	bool wasCtorCalled;
+	bool isInit;
 } AlxAdxl355;
 
 
@@ -608,9 +661,7 @@ void AlxAdxl355_Ctor
 	AlxAdxl355* me,
 	AlxSpi* spi,
 	uint8_t spiNumOfTries,
-	uint16_t spiTimeout_ms,
-	uint8_t* fifoBuff,
-	uint32_t fifoBuffLen
+	uint16_t spiTimeout_ms
 );
 
 
@@ -622,9 +673,10 @@ Alx_Status AlxAdxl355_DeInit(AlxAdxl355* me);
 Alx_Status AlxAdxl355_Enable(AlxAdxl355* me);
 Alx_Status AlxAdxl355_Disable(AlxAdxl355* me);
 Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g);
-Alx_Status AlxAdxl355_GetXyzMulti_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint32_t len);
-float AlxAdxl355_GetTemp_degC(AlxAdxl355* me);
-Alx_Status AlxAdxl355_Foreground_Handle(AlxAdxl355* me);
+Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint8_t len);
+Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC);
+Alx_Status AlxAdxl355_GetStatusReg(AlxAdxl355* me, AlxAdxl355_RegVal_0x04_Status* statusReg);
+uint8_t AlxAdxl355_GetFifoLen(AlxAdxl355* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

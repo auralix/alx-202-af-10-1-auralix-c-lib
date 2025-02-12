@@ -48,6 +48,7 @@ extern "C" {
 #include "mbedtls/x509.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/ssl.h"
+#include "mbedtls/oid.h"
 #endif
 
 //******************************************************************************
