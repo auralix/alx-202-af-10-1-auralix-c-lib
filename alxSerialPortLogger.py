@@ -196,7 +196,7 @@ class SerialPortLogger:
 
 	def ReadFromQueue(self):
 		try:
-			element = self.__fifoQueue.get()
+			element = self.__fifoQueue.get(timeout=10)
 			return element
 		except queue.Empty:
 			return None
