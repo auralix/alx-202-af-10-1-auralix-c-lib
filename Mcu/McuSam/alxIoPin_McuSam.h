@@ -57,18 +57,11 @@ extern "C" {
 typedef struct
 {
 	// Parameters
-//	GPIO_TypeDef* port;
-//	uint16_t pin;
-//	uint32_t mode;
-//	uint32_t pull;
-//	uint32_t speed;
-//	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-//	uint32_t alternate;
-//	#endif
+	uint8_t portPin;
+	enum gpio_direction dir;
+	enum gpio_pull_mode pull;
+	uint32_t func;
 	bool val;
-
-	// Variables
-//	GPIO_InitTypeDef igpio;
 
 	// Info
 	bool wasCtorCalled;
@@ -82,14 +75,10 @@ typedef struct
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
-//	GPIO_TypeDef* port,
-//	uint16_t pin,
-//	uint32_t mode,
-//	uint32_t pull,
-//	uint32_t speed,
-//	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-//	uint32_t alternate,
-//	#endif
+	uint8_t portPin,
+	enum gpio_direction dir,
+	enum gpio_pull_mode pull,
+	uint32_t func,
 	bool val
 );
 

@@ -45,47 +45,28 @@
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		port
-  * @param[in]		pin
-  * @param[in]		mode
+  * @param[in]		portPin
+  * @param[in]		dir
   * @param[in]		pull
-  * @param[in]		speed
-  * @param[in]		alternate
+  * @param[in]		func
   * @param[in]		val
   */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
-//	GPIO_TypeDef* port,
-//	uint16_t pin,
-//	uint32_t mode,
-//	uint32_t pull,
-//	uint32_t speed,
-//	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-//	uint32_t alternate,
-//	#endif
+	uint8_t portPin,
+	enum gpio_direction dir,
+	enum gpio_pull_mode pull,
+	uint32_t func,
 	bool val
 )
 {
 	// Parameters
-//	me->port = port;
-//	me->pin = pin;
-//	me->mode = mode;
-//	me->pull = pull;
-//	me->speed = speed;
-//	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-//	me->alternate = alternate;
-//	#endif
+	me->portPin = portPin;
+	me->dir = dir;
+	me->pull = pull;
+	me->func = func;
 	me->val = val;
-
-	// Variables
-//	me->igpio.Pin = pin;
-//	me->igpio.Mode = mode;
-//	me->igpio.Pull = pull;
-//	me->igpio.Speed = speed;
-//	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-//	me->igpio.Alternate = alternate;
-//	#endif
 
 	// Info
 	me->wasCtorCalled = true;
@@ -107,13 +88,14 @@ void AlxIoPin_Init(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 	ALX_IO_PIN_ASSERT(me->isInit == false);
 
+	// Init
+	gpio_set_pin_level(me->portPin, me->val);
+	gpio_set_pin_direction(me->portPin, me->dir);
+	gpio_set_pin_pull_mode(me->portPin, me->pull);
+	gpio_set_pin_function(me->portPin, me->func);
+
 	// Set isInit
 	me->isInit = true;
-
-	// Init
-//	AlxIoPin_Write(me, me->val);							// Set initial output value, before config
-//	HAL_GPIO_Init((GPIO_TypeDef*)me->port, &me->igpio);
-//	AlxIoPin_Write(me, me->val);							// Set initial output value, after config
 }
 
 /**
@@ -127,7 +109,9 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// DeInit
-//	HAL_GPIO_DeInit((GPIO_TypeDef*)me->port, me->igpio.Pin);
+	gpio_set_pin_direction(me->portPin, GPIO_DIRECTION_OFF);
+	gpio_set_pin_pull_mode(me->portPin, GPIO_PULL_OFF);
+	gpio_set_pin_function(me->portPin, GPIO_PIN_FUNCTION_OFF);
 
 	// Clear isInit
 	me->isInit = false;
@@ -146,7 +130,7 @@ bool AlxIoPin_Read(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Read
-//	return HAL_GPIO_ReadPin((GPIO_TypeDef*)me->port, me->igpio.Pin);
+	return gpio_get_pin_level(me->portPin);
 }
 
 /**
@@ -161,7 +145,7 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Write
-//	HAL_GPIO_WritePin((GPIO_TypeDef*)me->port, me->igpio.Pin, (GPIO_PinState)val);
+	gpio_set_pin_level(me->portPin, val);
 }
 
 /**
@@ -175,7 +159,7 @@ void AlxIoPin_Set(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Set
-//	HAL_GPIO_WritePin((GPIO_TypeDef*)me->port, me->igpio.Pin, (GPIO_PinState)true);
+	gpio_set_pin_level(me->portPin, true);
 }
 
 /**
@@ -189,7 +173,7 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Reset
-//	HAL_GPIO_WritePin((GPIO_TypeDef*)me->port, me->igpio.Pin, (GPIO_PinState)false);
+	gpio_set_pin_level(me->portPin, false);
 }
 
 /**
@@ -203,7 +187,7 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Toggle
-//	HAL_GPIO_TogglePin((GPIO_TypeDef*)me->port, me->igpio.Pin);
+	gpio_toggle_pin_level(me->portPin);
 }
 
 /**
@@ -228,7 +212,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 
 	// Config PullUp
-//	LL_GPIO_SetPinPull((GPIO_TypeDef*)me->port, me->igpio.Pin, LL_GPIO_PULL_UP);
+	gpio_set_pin_pull_mode(me->portPin, GPIO_PULL_UP);
 
 	// Wait
 	AlxDelay_ms(1);
@@ -242,7 +226,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 
 	// Config PullDown
-//	LL_GPIO_SetPinPull((GPIO_TypeDef*)me->port, me->igpio.Pin, LL_GPIO_PULL_DOWN);
+	gpio_set_pin_pull_mode(me->portPin, GPIO_PULL_DOWN);
 
 	// Wait
 	AlxDelay_ms(1);
