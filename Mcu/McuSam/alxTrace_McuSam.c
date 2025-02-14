@@ -96,11 +96,14 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	gpio_set_pin_function(me->portPin, me->func);
 
 	// Enable USART clock
-	_pm_enable_bus_clock(PM_BUS_APBC, SERCOM1);
-	_gclk_enable_channel(SERCOM1_GCLK_ID_CORE, CONF_GCLK_SERCOM1_CORE_SRC);
+	_pm_enable_bus_clock(PM_BUS_APBC, me->hw);
+	AlxTrace_Periph_EnableClk(me);
 
 	// Init USART
-	usart_sync_init(&me->descr, SERCOM1, ALX_NULL);	// TV: Always returns OK
+	usart_sync_init(&me->descr, me->hw, ALX_NULL);	// TV: Always returns OK
+
+	// Enable USART
+	usart_sync_enable(&me->descr);					// TV: Always returns OK
 
 	// Set isInit
 	me->isInit = true;
@@ -117,6 +120,9 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
   */
 Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
+	// Disable USART
+	usart_sync_disable(&me->descr);	// TV: Always returns OK
+
 	// DeInit USART
 	usart_sync_deinit(&me->descr);	// TV: Always returns OK
 
@@ -139,10 +145,11 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
   */
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
+	// Prepare
 	struct io_descriptor *io = NULL;
 	usart_sync_get_io_descriptor(&me->descr, &io);
-	usart_sync_enable(&me->descr);
 
+	// Write
 	uint16_t strLen = strlen(str);
 	int32_t numOfBytesWritten = io_write(io, (uint8_t*)str, strLen);
 	if (numOfBytesWritten != strLen)
