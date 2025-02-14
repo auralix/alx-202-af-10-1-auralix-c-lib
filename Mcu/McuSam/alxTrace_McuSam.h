@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxGlobal_McuSam.h
-  * @brief		Auralix C Library - ALX Global MCU SAM File
+  * @file		alxTrace_McuSam.h
+  * @brief		Auralix C Library - ALX Trace MCU SAM Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_GLOBAL_MCU_SAM_H
-#define ALX_GLOBAL_MCU_SAM_H
+#ifndef ALX_TRACE_MCU_SAM_H
+#define ALX_TRACE_MCU_SAM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,20 +49,34 @@ extern "C" {
 
 
 //******************************************************************************
-// Includes
+// Types
 //******************************************************************************
-#include <peripheral_clk_config.h>
-#include <hpl_gclk_base.h>
-#include <hpl_pm_base.h>
-#include <hal_init.h>
-#include <hal_adc_sync.h>
-#include <hal_gpio.h>
-#include <hal_usart_sync.h>
+typedef struct
+{
+	// Parameters
+	uint8_t portPin;
+	uint32_t func;
+	void* hw;
+
+	// Variables
+	struct usart_sync_descriptor descr;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxTrace;
 
 
 //******************************************************************************
-// Preprocessor
+// Constructor
 //******************************************************************************
+void AlxTrace_Ctor
+(
+	AlxTrace* me,
+	uint8_t portPin,
+	uint32_t func,
+	void* hw
+);
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_SAM)
@@ -71,4 +85,4 @@ extern "C" {
 }
 #endif
 
-#endif	// #ifndef ALX_GLOBAL_MCU_SAM_H
+#endif	// #ifndef ALX_TRACE_MCU_SAM_H

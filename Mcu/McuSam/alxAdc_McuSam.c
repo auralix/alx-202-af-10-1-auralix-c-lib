@@ -90,12 +90,12 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 		AlxIoPin_Init((*(me->ioPinArr + i)));
 	}
 
-	// Init ADC clock
+	// Enable ADC clock
 	_pm_enable_bus_clock(PM_BUS_APBC, ADC);
 	_gclk_enable_channel(ADC_GCLK_ID, CONF_GCLK_ADC_SRC);
 
 	// Init ADC
-	adc_sync_init(&me->descr, ADC, ALX_NULL);	// TV: Returns always OK
+	adc_sync_init(&me->descr, ADC, ALX_NULL);	// TV: Always returns OK
 
 	// Set isInit
 	me->isInit = true;
@@ -117,9 +117,9 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	ALX_ADC_ASSERT(me->isInit == true);
 
 	// DeInit ADC
-	adc_sync_deinit(&me->descr);	// TV: Returns always OK
+	adc_sync_deinit(&me->descr);	// TV: Always returns OK
 
-	// DeInit ADC clock
+	// Disable ADC clock
 	_pm_disable_bus_clock(PM_BUS_APBC, ADC);
 
 	// DeInit GPIO
@@ -169,8 +169,8 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 	AlxAdc_Voltage_12bit voltage_12bit = {};
 
 	// Get channel voltage
-	adc_sync_set_inputs(&me->descr, ch, 0x18, ALX_NULL);				// TV: Returns always OK, neg_input = Fixed = 0x18 = Internal ground
-	adc_sync_read_channel(&me->descr, ALX_NULL, voltage_12bit.raw, 2);	// TV: We will not handle return
+	adc_sync_set_inputs(&me->descr, ch, 0x18, ALX_NULL);				// TV: Always returns OK, neg_input = Fixed = 0x18 = Internal ground
+	adc_sync_read_channel(&me->descr, ALX_NULL, voltage_12bit.raw, 2);	// TV: We will NOT handle return
 
 	// Calculate
 	uint32_t voltage_mV = (voltage_12bit.val * ALX_ADC_VREF_mV) / ALX_ADC_12BIT_FULL_SCALE_COUNT;
