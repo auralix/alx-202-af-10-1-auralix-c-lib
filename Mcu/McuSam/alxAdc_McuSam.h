@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxGlobal_McuSam.h
-  * @brief		Auralix C Library - ALX Global MCU SAM File
+  * @file		alxAdc_McuSam.h
+  * @brief		Auralix C Library - ALX ADC MCU SAM Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_GLOBAL_MCU_SAM_H
-#define ALX_GLOBAL_MCU_SAM_H
+#ifndef ALX_ADC_MCU_SAM_H
+#define ALX_ADC_MCU_SAM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +40,9 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+#include "alxIoPin.h"
 
 
 //******************************************************************************
@@ -49,17 +52,36 @@ extern "C" {
 
 
 //******************************************************************************
-// Includes
+// Types
 //******************************************************************************
-#include "peripheral_clk_config.h"
-#include "atmel_start.h"
-#include <hpl_gclk_base.h>
-#include <hpl_pm_base.h>
+typedef struct
+{
+	// Defines
+	#define ALX_ADC_VREF_mV 1000
+	#define ALX_ADC_12BIT_FULL_SCALE_COUNT 4095
+
+	// Parameters
+	AlxIoPin** ioPinArr;
+	uint8_t numOfIoPins;
+
+	// Variables
+	struct adc_sync_descriptor descr;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxAdc;
 
 
 //******************************************************************************
-// Preprocessor
+// Constructor
 //******************************************************************************
+void AlxAdc_Ctor
+(
+	AlxAdc* me,
+	AlxIoPin** ioPinArr,
+	uint8_t numOfIoPins
+);
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_SAM)
@@ -68,4 +90,4 @@ extern "C" {
 }
 #endif
 
-#endif	// #ifndef ALX_GLOBAL_MCU_SAM_H
+#endif	// #ifndef ALX_ADC_MCU_SAM_H
