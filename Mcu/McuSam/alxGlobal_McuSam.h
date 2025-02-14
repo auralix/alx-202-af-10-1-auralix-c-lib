@@ -51,10 +51,12 @@ extern "C" {
 //******************************************************************************
 // Includes
 //******************************************************************************
-#include "peripheral_clk_config.h"
-#include "atmel_start.h"
+#include <peripheral_clk_config.h>
 #include <hpl_gclk_base.h>
 #include <hpl_pm_base.h>
+#include <hal_init.h>
+#include <hal_adc_sync.h>
+#include <hal_gpio.h>
 
 
 //******************************************************************************
