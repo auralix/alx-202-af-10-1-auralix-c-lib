@@ -95,7 +95,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 	_gclk_enable_channel(ADC_GCLK_ID, CONF_GCLK_ADC_SRC);
 
 	// Init ADC
-	adc_sync_init(&me->descr, ADC, ALX_NULL);	// TV: Always returns OK
+	adc_sync_init(&me->descr, ADC, ALX_NULL);	// TV: Always returns OK, resets periphery
 
 	// Set isInit
 	me->isInit = true;
@@ -117,7 +117,7 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	ALX_ADC_ASSERT(me->isInit == true);
 
 	// DeInit ADC
-	adc_sync_deinit(&me->descr);	// TV: Always returns OK
+	adc_sync_deinit(&me->descr);	// TV: Always returns OK, disables & resets periphery
 
 	// Disable ADC clock
 	_pm_disable_bus_clock(PM_BUS_APBC, ADC);
