@@ -41,7 +41,9 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static void AlxTrace_Reset(AlxTrace* me);
 static void AlxTrace_Periph_EnableClk(AlxTrace* me);
+static void AlxTrace_Periph_DisableClk(AlxTrace* me);
 
 
 //******************************************************************************
@@ -100,9 +102,7 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	AlxTrace_Periph_EnableClk(me);
 
 	// Init USART
-	usart_sync_init(&me->descr, me->hw, ALX_NULL);	// TV: Always returns OK
-
-	// Enable USART
+	usart_sync_init(&me->descr, me->hw, ALX_NULL);	// TV: Always returns OK, resets periphery
 	usart_sync_enable(&me->descr);					// TV: Always returns OK
 
 	// Set isInit
@@ -120,13 +120,11 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
   */
 Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
-	// Disable USART
-	usart_sync_disable(&me->descr);	// TV: Always returns OK
-
 	// DeInit USART
-	usart_sync_deinit(&me->descr);	// TV: Always returns OK
+	usart_sync_deinit(&me->descr);	// TV: Always returns OK, disables & resets periphery
 
 	// Disable USART clock
+	AlxTrace_Periph_DisableClk(me);
 	_pm_disable_bus_clock(PM_BUS_APBC, me->hw);
 
 	// Clear isInit
@@ -151,9 +149,10 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 
 	// Write
 	uint16_t strLen = strlen(str);
-	int32_t numOfBytesWritten = io_write(io, (uint8_t*)str, strLen);
-	if (numOfBytesWritten != strLen)
+	int32_t strLen_Expected = io_write(io, (uint8_t*)str, strlen(str));
+	if (strLen != strLen_Expected)
 	{
+		AlxTrace_Reset(me);
 		return Alx_Err;
 	}
 
@@ -165,28 +164,47 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static void AlxTrace_Reset(AlxTrace* me)
+{
+	// DeInit USART
+	usart_sync_deinit(&me->descr);	// TV: Always returns OK, disables & resets periphery
+
+	// Clear isInit
+	me->isInit = false;
+
+	// Init USART
+	usart_sync_init(&me->descr, me->hw, ALX_NULL);	// TV: Always returns OK, resets periphery
+	usart_sync_enable(&me->descr);					// TV: Always returns OK
+
+	// Set isInit
+	me->isInit = true;
+}
 static void AlxTrace_Periph_EnableClk(AlxTrace* me)
 {
-	#ifdef CONF_GCLK_SERCOM0_CORE_SRC
+	#ifdef SERCOM0
 	if (me->hw == SERCOM0)	{ _gclk_enable_channel(SERCOM0_GCLK_ID_CORE, CONF_GCLK_SERCOM0_CORE_SRC); return; }
 	#endif
-	#ifdef CONF_GCLK_SERCOM1_CORE_SRC
+	#ifdef SERCOM1
 	if (me->hw == SERCOM1)	{ _gclk_enable_channel(SERCOM1_GCLK_ID_CORE, CONF_GCLK_SERCOM1_CORE_SRC); return; }
 	#endif
-	#ifdef CONF_GCLK_SERCOM2_CORE_SRC
+	#ifdef SERCOM2
 	if (me->hw == SERCOM2)	{ _gclk_enable_channel(SERCOM2_GCLK_ID_CORE, CONF_GCLK_SERCOM2_CORE_SRC); return; }
 	#endif
-	#ifdef CONF_GCLK_SERCOM3_CORE_SRC
+	#ifdef SERCOM3
 	if (me->hw == SERCOM3)	{ _gclk_enable_channel(SERCOM3_GCLK_ID_CORE, CONF_GCLK_SERCOM3_CORE_SRC); return; }
 	#endif
-	#ifdef CONF_GCLK_SERCOM4_CORE_SRC
+	#ifdef SERCOM4
 	if (me->hw == SERCOM4)	{ _gclk_enable_channel(SERCOM4_GCLK_ID_CORE, CONF_GCLK_SERCOM4_CORE_SRC); return; }
 	#endif
-	#ifdef CONF_GCLK_SERCOM5_CORE_SRC
+	#ifdef SERCOM5
 	if (me->hw == SERCOM5)	{ _gclk_enable_channel(SERCOM5_GCLK_ID_CORE, CONF_GCLK_SERCOM5_CORE_SRC); return; }
 	#endif
 
 	// We should not get here
+}
+static void AlxTrace_Periph_DisableClk(AlxTrace* me)
+{
+	// TV: TODO
 }
 
 

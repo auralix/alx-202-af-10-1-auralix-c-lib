@@ -52,6 +52,7 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include <peripheral_clk_config.h>
+#include <hpl_sercom_config.h>
 #include <hpl_gclk_base.h>
 #include <hpl_pm_base.h>
 #include <hal_init.h>
@@ -63,6 +64,28 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
+
+//------------------------------------------------------------------------------
+// ALX - MCU - SerialPort & Trace
+//------------------------------------------------------------------------------
+#ifndef CONF_GCLK_SERCOM0_CORE_SRC
+	#define CONF_GCLK_SERCOM0_CORE_SRC 0
+#endif
+#ifndef CONF_GCLK_SERCOM1_CORE_SRC
+	#define CONF_GCLK_SERCOM1_CORE_SRC 0
+#endif
+#ifndef CONF_GCLK_SERCOM2_CORE_SRC
+	#define CONF_GCLK_SERCOM2_CORE_SRC 0
+#endif
+#ifndef CONF_GCLK_SERCOM3_CORE_SRC
+	#define CONF_GCLK_SERCOM3_CORE_SRC 0
+#endif
+#ifndef CONF_GCLK_SERCOM4_CORE_SRC
+	#define CONF_GCLK_SERCOM4_CORE_SRC 0
+#endif
+#ifndef CONF_GCLK_SERCOM5_CORE_SRC
+	#define CONF_GCLK_SERCOM5_CORE_SRC 0
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_SAM)
