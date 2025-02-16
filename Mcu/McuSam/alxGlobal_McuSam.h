@@ -53,12 +53,15 @@ extern "C" {
 //******************************************************************************
 #include <peripheral_clk_config.h>
 #include <hpl_sercom_config.h>
+#include <hpl_tcc_config.h>
 #include <hpl_gclk_base.h>
 #include <hpl_pm_base.h>
 #include <hal_init.h>
 #include <hal_adc_sync.h>
 #include <hal_gpio.h>
 #include <hal_usart_sync.h>
+#include <hal_pwm.h>
+#include <hpl_tcc.h>
 
 
 //******************************************************************************
@@ -71,6 +74,20 @@ extern "C" {
 //------------------------------------------------------------------------------
 #ifndef CONF_GCLK_ADC_SRC
 	#define CONF_GCLK_ADC_SRC 0
+#endif
+
+
+//------------------------------------------------------------------------------
+// ALX - MCU - ADC
+//------------------------------------------------------------------------------
+#ifndef CONF_GCLK_TCC0_SRC
+	#define CONF_GCLK_TCC0_SRC 0
+#endif
+#ifndef CONF_GCLK_TCC1_SRC
+	#define CONF_GCLK_TCC1_SRC 0
+#endif
+#ifndef CONF_GCLK_TCC2_SRC
+	#define CONF_GCLK_TCC2_SRC 0
 #endif
 
 

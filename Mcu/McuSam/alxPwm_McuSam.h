@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxPwm.h
-  * @brief		Auralix C Library - ALX PWM Module
+  * @file		alxPwm_McuSam.h
+  * @brief		Auralix C Library - ALX PWM MCU SAM Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_PWM_H
-#define ALX_PWM_H
+#ifndef ALX_PWM_MCU_SAM_H
+#define ALX_PWM_MCU_SAM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,67 +42,54 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-
-#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-#include "alxPwm_McuStm32.h"
-
-#elif defined(ALX_LPC55S6X)
-#include "alxPwm_McuLpc55S6x.h"
-
-#elif defined(ALX_LPC80X)
-#include "alxPwm_McuLpc80x.h"
-
-#elif defined(ALX_SAM)
-#include "alxPwm_McuSam.h"
-
-#else
-typedef struct { bool dummy; } AlxPwm;
-#endif
+#include "alxIoPin.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_SAM)
 
 
 //******************************************************************************
-// Preprocessor
+// Types
 //******************************************************************************
-#define ALX_PWM_FILE "alxPwm.h"
+typedef struct
+{
+	// Parameters
+	void* hw;
+	AlxIoPin* do_PWM;
+	Alx_Ch ch;
+	uint16_t dutyDefault_permil;
+	uint16_t period;
 
-// Assert //
-#if defined(ALX_PWM_ASSERT_BKPT_ENABLE)
-	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_BKPT(ALX_PWM_FILE, expr)
-#elif defined(ALX_PWM_ASSERT_TRACE_ENABLE)
-	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_TRACE(ALX_PWM_FILE, expr)
-#elif defined(ALX_PWM_ASSERT_RST_ENABLE)
-	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_RST(ALX_PWM_FILE, expr)
-#else
-	#define ALX_PWM_ASSERT(expr) do{} while (false)
-#endif
+	// Variables
+	struct pwm_descriptor descr;
 
-// Trace //
-#if defined(ALX_PWM_TRACE_ENABLE)
-	#define ALX_PWM_TRACE(...) ALX_TRACE_WRN(ALX_PWM_FILE, __VA_ARGS__)
-#else
-	#define ALX_PWM_TRACE(...) do{} while (false)
-#endif
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxPwm;
 
 
 //******************************************************************************
-// Functions
+// Constructor
 //******************************************************************************
-Alx_Status AlxPwm_Init(AlxPwm* me);
-Alx_Status AlxPwm_DeInit(AlxPwm* me);
-Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct);
-Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil);
+void AlxPwm_Ctor
+(
+	AlxPwm* me,
+	void* hw,
+	AlxIoPin* do_PWM,
+	Alx_Ch ch,
+	uint16_t dutyDefault_permil,
+	uint16_t period
+);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_SAM)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_PWM_H
+#endif	// #ifndef ALX_PWM_MCU_SAM_H
