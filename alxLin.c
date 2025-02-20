@@ -423,25 +423,40 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t id_Actual = 0;
+#ifdef ALX_SAM
+	uint8_t rxFrame[1 + ALX_LIN_BUFF_LEN + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
+#else
 	uint8_t rxFrame[3 + ALX_LIN_BUFF_LEN + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
+#endif // ALX_SAM
+
 	uint32_t rxFrameLen_Actual = 0;
 	uint32_t rxFrameLen_Expected = 0;
 
 	// Set rxFrameLen_Expected
 	if (len == 0)
 	{
+#ifdef ALX_SAM
+		rxFrameLen_Expected = 1;	// Break, SYNC, Protected ID
+#else
 		rxFrameLen_Expected = 3;	// Break, SYNC, Protected ID
+#endif // ALX_SAM
 	}
 	else
 	{
+#ifdef ALX_SAM
+		rxFrameLen_Expected = 1 + len + 1;	// Break + SYNC + Protected ID + Data + Enhanced Checksum
+#else
 		rxFrameLen_Expected = 3 + len + 1;	// Break + SYNC + Protected ID + Data + Enhanced Checksum
+#endif // ALX_SAM
 	}
 
 	// Try for number of tries
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
 	{
+#ifndef ALX_SAM
 		// Flush serial port RX FIFO
 		AlxSerialPort_FlushRxFifo(me->alxSerialPort);
+#endif // ALX_SAM
 
 		// Create timer
 		AlxTimSw alxTimSw;
@@ -456,8 +471,15 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 			// Check if serial port RX FIFO number of entries is OK
 			rxFrameLen_Actual = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);
 
+#ifdef ALX_SAM
+			if (rxFrameLen_Actual > 0)
+			{
+				ALX_LIN_TRACE_WRN("RxFifoNumOfEntries: %u \r\n", rxFrameLen_Actual);
+			}
+#endif // ALX_SAM
+
 			// Check if data length is OK
-			if(rxFrameLen_Actual == rxFrameLen_Expected)
+     			if(rxFrameLen_Actual == rxFrameLen_Expected)
 			{
 				status = Alx_Ok;
 				break;
@@ -489,6 +511,14 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 
 		// Read received frame from serial port RX FIFO
 		status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen_Actual);
+
+#ifdef ALX_SAM
+		for (uint8_t i = 0;i < rxFrameLen_Actual;i++)
+		{
+			ALX_LIN_TRACE_WRN("rxFrame[%u]: %01X \r\n",i, rxFrame[i]);
+		}
+#endif // ALX_SAM
+
 		if (status != Alx_Ok)
 		{
 			ALX_LIN_TRACE_WRN("Err");
@@ -497,8 +527,14 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 		}
 
 		// Check if protected ID is OK
+#ifdef ALX_SAM
+		uint8_t protectedId_Actual = rxFrame[0];
+		id_Actual = rxFrame[0] & 0x3F;
+#else
 		uint8_t protectedId_Actual = rxFrame[2];
 		id_Actual = rxFrame[2] & 0x3F;
+#endif // ALX_SAM
+
 		uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
 		if (protectedId_Actual != protectedId_Expected)
 		{
@@ -508,10 +544,17 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 		}
 
 		// Check if enhanced checksum is OK
+#ifdef ALX_SAM
+		if (3 <= rxFrameLen_Actual)
+		{
+			uint8_t enhancedChecksum_Actual = rxFrame[1 + len];
+			uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId_Actual, &rxFrame[1], len);
+#else
 		if (5 <= rxFrameLen_Actual)
 		{
 			uint8_t enhancedChecksum_Actual = rxFrame[3 + len];
 			uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId_Actual, &rxFrame[3], len);
+#endif // ALX_SAM
 			if (enhancedChecksum_Actual != enhancedChecksum_Expected)
 			{
 				ALX_LIN_TRACE_WRN("Err");
@@ -523,6 +566,10 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 		// Break
 		break;
 	}
+#ifdef ALX_SAM
+	// Flush serial port RX FIFO
+	AlxSerialPort_FlushRxFifo(me->alxSerialPort);
+#endif // ALX_SAM
 
 	// If we are here and status is NOT OK, number of tries error occured
 	if (status != Alx_Ok)
@@ -533,8 +580,13 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 	// Return protected ID
 	*id = id_Actual;
 
+#ifdef ALX_SAM
+	// Return frame response data
+	memcpy(data, &rxFrame[1], len);
+#else
 	// Return frame response data
 	memcpy(data, &rxFrame[3], len);
+#endif // ALX_SAM
 
 	// Return
 	return Alx_Ok;
