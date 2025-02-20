@@ -474,7 +474,7 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 #ifdef ALX_SAM
 			if (rxFrameLen_Actual > 0)
 			{
-				ALX_LIN_TRACE_DBG("RxFifoNumOfEntries: %u \r\n", rxFrameLen_Actual);
+				ALX_LIN_TRACE_DBG("RxFifoNumOfEntries: %u", rxFrameLen_Actual);
 			}
 #endif // ALX_SAM
 
@@ -515,7 +515,7 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 #ifdef ALX_SAM
 		for (uint8_t i = 0;i < rxFrameLen_Actual;i++)
 		{
-			ALX_LIN_TRACE_DBG("rxFrame[%u]: %01X \r\n",i, rxFrame[i]);
+			ALX_LIN_TRACE_DBG("rxFrame[%u]: %01X",i, rxFrame[i]);
 		}
 #endif // ALX_SAM
 
