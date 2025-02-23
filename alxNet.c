@@ -1086,8 +1086,10 @@ Alx_Status AlxNet_Init(AlxNet *me)
 	return Alx_Ok;
 }
 
+#ifdef ALX_DBG_WIZNET
 #define AlxOsMutex_Lock(m) ALX_NET_TRACE_INF("alxNet Lock"); AlxOsMutex_Lock(m)
 #define AlxOsMutex_Unlock(m) ALX_NET_TRACE_INF("alxNet Unlock"); AlxOsMutex_Unlock(m)
+#endif
 
 Alx_Status AlxNet_Connect(AlxNet* me)
 {
