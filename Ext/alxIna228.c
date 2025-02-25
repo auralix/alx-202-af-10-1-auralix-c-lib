@@ -327,9 +327,9 @@ Alx_Status AlxIna228_GetTemp_degC(AlxIna228* me, float* temp_degC)
 
 	// Set Conversion vbus factor
 	#if defined(ALX_INA228)
-	const float CONVERSION_TEMP_FACTOR = 7.8125;
+	const float CONVERSION_TEMP_FACTOR = 0.0078125; // Conversion factor: 7.8125 m°C/LSB
 	#elif defined(ALX_INA238)
-	const float CONVERSION_TEMP_FACTOR = 125;
+	const float CONVERSION_TEMP_FACTOR = 0.125; // Conversion factor: 125 m°C/LSB
 	#endif
 
 	// Set
