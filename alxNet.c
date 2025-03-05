@@ -69,7 +69,7 @@
 #define CELLULAR_SIM_CARD_WAIT_INTERVAL_MS       ( 500UL )
 #define CELLULAR_MAX_SIM_RETRY                   ( 5U )
 #define CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS    ( 1000UL )
-#define CELLULAR_CONNECTION_MONITORING_PING		 "8.8.8.8"
+//#define CELLULAR_CONNECTION_MONITORING_PING		 "8.8.8.8"
 #endif
 //******************************************************************************
 // Private Variables
