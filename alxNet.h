@@ -108,6 +108,9 @@ extern "C" {
 		CellularServiceStatus_t serviceStatus;
 		cellularSignalQuality_t signalQuality;
 		uint8_t cellularContext; // Cellular context id
+
+		CellularPdnConfig_t pdn_config;
+		uint32_t pdn_connect_timeout;
 	}AlxNet_Cellular;
 #endif
 
@@ -180,7 +183,8 @@ extern "C" {
 	bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me);
 	AlxNet_Config Alx_GetNetInterface(AlxNet* me);
 #if defined(ALX_FREE_RTOS_CELLULAR)
-	void Alx_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber);
+	void AlxNet_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber);
+	void AlxNet_SetPdnConfig(AlxNet* me, const char* apn, const char* user, const char* pass, CellularPdnAuthType_t auth_type, uint32_t connect_timeout);
 #endif
 	int AlxNet_Ping(AlxNet* me, const char *addr, uint16_t count, uint32_t timeout_ms);
 
