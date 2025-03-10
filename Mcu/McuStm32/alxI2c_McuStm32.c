@@ -682,10 +682,9 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2cClk_100kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_54MHz) ||
 		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_54MHz) ||
 		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2cClk_400kHz_RiseTime_100ns_FallTime_100ns_Pclk1Apb1_54MHz) ||
-		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2c1_I2c2_I2c4_I2cClk_400kHz_Pclk1Apb1_54MHz_tPRESC_18ns5185_tSCLDEL_111ns_tSDADEL_0ns_tSCLH_1130ns_tSCLL_1130ns) ||
 		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2cClk_1MHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_54MHz) ||
-		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2c1_I2c2_I2c4_I2cClk_800kHz_Pclk1Apb1_54MHz_tPRESC_18ns5185_tSCLDEL_37ns_tSDADEL_0ns_tSCLH_500ns_tSCLL_500ns) ||
-		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2c1_I2c2_I2c4_I2cClk_1MHz_Pclk1Apb1_54MHz_tPRESC_18ns5185_tSCLDEL_37ns_tSDADEL_0ns_tSCLH_370ns_tSCLL_370ns)
+		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2c1_I2c2_I2c4_I2cClk_400kHz_Pclk1Apb1_54MHz_tPRESC_18ns52_tSCLDEL_111ns_tSDADEL_0ns_tSCLH_1130ns_tSCLL_1130ns) ||
+		(me->i2cClk == AlxI2c_Clk_McuStm32F7_I2c1_I2c2_I2c4_I2cClk_1MHz_Pclk1Apb1_54MHz_tPRESC_18ns52_tSCLDEL_37ns_tSDADEL_0ns_tSCLH_370ns_tSCLL_370ns)
 	)
 	{
 		if(54000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
