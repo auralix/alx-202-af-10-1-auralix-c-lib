@@ -1111,8 +1111,8 @@ void AlxNet_SetPdnConfig(AlxNet* me, const char* apn, const char* user, const ch
 #endif
 
 //uncomment for mutex debugging
-#define AlxOsMutex_Lock(m) ALX_NET_TRACE_INF("alxNet Lock"); AlxOsMutex_Lock(m)
-#define AlxOsMutex_Unlock(m) ALX_NET_TRACE_INF("alxNet Unlock"); AlxOsMutex_Unlock(m)
+//#define AlxOsMutex_Lock(m) ALX_NET_TRACE_INF("alxNet Lock"); AlxOsMutex_Lock(m)
+//#define AlxOsMutex_Unlock(m) ALX_NET_TRACE_INF("alxNet Unlock"); AlxOsMutex_Unlock(m)
 
 Alx_Status AlxNet_Connect(AlxNet* me)
 {
