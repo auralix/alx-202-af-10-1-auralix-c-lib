@@ -69,7 +69,7 @@
 #define CELLULAR_SIM_CARD_WAIT_INTERVAL_MS       ( 500UL )
 #define CELLULAR_MAX_SIM_RETRY                   ( 5U )
 #define CELLULAR_PDN_CONNECT_WAIT_INTERVAL_MS    ( 1000UL )
-#define CELLULAR_CONNECTION_MONITORING_PING		 "8.8.8.8"
+//#define CELLULAR_CONNECTION_MONITORING_PING		 "8.8.8.8"
 #endif
 //******************************************************************************
 // Private Variables
@@ -677,6 +677,13 @@ void AlxNet_Ctor
 
 	#if defined(ALX_FREE_RTOS_CELLULAR)
 	me->cellular.CommIntf = &CellularCommInterface;
+
+	me->cellular.pdn_config.pdnContextType = CELLULAR_PDN_CONTEXT_IPV4;
+	strncpy((char *)me->cellular.pdn_config.apnName, CELLULAR_APN_NAME, sizeof(me->cellular.pdn_config.apnName));
+	strcpy((char *)me->cellular.pdn_config.username, "");
+	strcpy((char *)me->cellular.pdn_config.password, "");
+	me->cellular.pdn_config.pdnAuthType = CELLULAR_PDN_AUTH_NONE;
+	me->cellular.pdn_connect_timeout = 10000;
 	#endif
 
 	// Info
@@ -692,7 +699,6 @@ void AlxNet_Ctor
 
 #define MODEM_REGISTER_TIMEOUT 60000
 #define MODEM_SIM_TIMEOUT 20000
-#define MODEM_ACTIVATE_PDN_TIMEOUT 150000
 #ifdef CELLULAR_CONNECTION_MONITORING_PING
 #define MODEM_CONNECTION_MONITORING_TIMEOUT 20000
 #else
@@ -838,12 +844,11 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 	case State_ModemRegistered:
 		{
 			me->cellular.cellularContext = CELLULAR_PDN_CONTEXT_ID;
-			CellularPdnConfig_t pdnConfig = { CELLULAR_PDN_CONTEXT_IPV4, CELLULAR_PDN_AUTH_NONE, CELLULAR_APN_NAME, "", "" }; // ToDo: parameter!
-			Cellular_SetPdnConfig(me->cellular.handle, me->cellular.cellularContext, &pdnConfig);
+			Cellular_SetPdnConfig(me->cellular.handle, me->cellular.cellularContext, &me->cellular.pdn_config);
 
 			while (true)
 			{
-				if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_ACTIVATE_PDN_TIMEOUT)
+				if (AlxTick_Get_ms(&alxTick) - start_time > me->cellular.pdn_connect_timeout)
 				{
 					ALX_NET_TRACE_WRN("Activating PDN timed out");
 					connection_state = State_ModemGoOff;
@@ -1086,11 +1091,28 @@ Alx_Status AlxNet_Init(AlxNet *me)
 	return Alx_Ok;
 }
 
-#define ALX_NET_DEBUG_MUTEX
-#ifdef ALX_NET_DEBUG_MUTEX
-#define AlxOsMutex_Lock(m) ALX_NET_TRACE_INF("alxNet Lock"); AlxOsMutex_Lock(m)
-#define AlxOsMutex_Unlock(m) ALX_NET_TRACE_INF("alxNet Unlock"); AlxOsMutex_Unlock(m)
+#if defined(ALX_FREE_RTOS_CELLULAR)
+
+void AlxNet_SetPdnConfig(AlxNet* me, const char* apn, const char* user, const char* pass, CellularPdnAuthType_t auth_type, uint32_t connect_timeout)
+{
+#if defined(ALX_FREE_RTOS_CELLULAR)
+	// Assert
+	ALX_NET_ASSERT(me->wasCtorCalled == true);
+	if (me->config == AlxNet_Config_FreeRtos_Cellular)
+	{
+		strncpy((char *)me->cellular.pdn_config.apnName, apn, sizeof(me->cellular.pdn_config.apnName));
+		strncpy((char *)me->cellular.pdn_config.username, user, sizeof(me->cellular.pdn_config.username));
+		strncpy((char *)me->cellular.pdn_config.password, pass, sizeof(me->cellular.pdn_config.password));
+		me->cellular.pdn_config.pdnAuthType = auth_type;
+		me->cellular.pdn_connect_timeout = connect_timeout;
+	}
 #endif
+}
+#endif
+
+//uncomment for mutex debugging
+//#define AlxOsMutex_Lock(m) ALX_NET_TRACE_INF("alxNet Lock"); AlxOsMutex_Lock(m)
+//#define AlxOsMutex_Unlock(m) ALX_NET_TRACE_INF("alxNet Unlock"); AlxOsMutex_Unlock(m)
 
 Alx_Status AlxNet_Connect(AlxNet* me)
 {
@@ -1593,7 +1615,7 @@ static int8_t parse_cellular_rssi_to_dbm(uint8_t input)
 }
 
 #if defined(ALX_FREE_RTOS_CELLULAR)
-void Alx_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber)
+void AlxNet_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber)
 {
 	if (rssi != NULL) {
 		*rssi = parse_cellular_rssi_to_dbm(me->cellular.signalQuality.rssi);
