@@ -503,11 +503,22 @@ static int sslVerifyDomain(void *p_vrfy, mbedtls_x509_crt *crt, int i, uint32_t 
 		{
 			while (seq != NULL)
 			{
-				if((seq->buf.tag & MBEDTLS_ASN1_TAG_VALUE_MASK) == MBEDTLS_X509_SAN_DNS_NAME && seq->buf.len)
+				if ((seq->buf.tag & MBEDTLS_ASN1_TAG_VALUE_MASK) == MBEDTLS_X509_SAN_DNS_NAME && seq->buf.len)
 				{
 					if (check_domain((const char *)seq->buf.p, seq->buf.len, me->tls_data.domain) == 0)
 					{
 						return 0;
+					}
+				}
+				else if((seq->buf.tag & MBEDTLS_ASN1_TAG_VALUE_MASK) == MBEDTLS_X509_SAN_IP_ADDRESS && seq->buf.len)
+				{
+					uint32_t ip[4];
+					size_t cn_len = mbedtls_x509_crt_parse_cn_inet_pton(me->tls_data.domain, ip);
+					if (cn_len > 0) {
+						if (seq->buf.len == cn_len && memcmp(seq->buf.p, ip, cn_len) == 0)
+						{
+							return 0;
+						}
 					}
 				}
 				seq = seq->next;
