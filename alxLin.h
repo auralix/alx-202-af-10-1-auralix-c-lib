@@ -71,12 +71,14 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_LIN_TRACE_ENABLE)
+	#define ALX_LIN_TRACE_FTL(...) ALX_TRACE_FTL(ALX_LIN_FILE, __VA_ARGS__)
 	#define ALX_LIN_TRACE_ERR(...) ALX_TRACE_ERR(ALX_LIN_FILE, __VA_ARGS__)
 	#define ALX_LIN_TRACE_WRN(...) ALX_TRACE_WRN(ALX_LIN_FILE, __VA_ARGS__)
 	#define ALX_LIN_TRACE_INF(...) ALX_TRACE_INF(ALX_LIN_FILE, __VA_ARGS__)
 	#define ALX_LIN_TRACE_DBG(...) ALX_TRACE_DBG(ALX_LIN_FILE, __VA_ARGS__)
 	#define ALX_LIN_TRACE_VRB(...) ALX_TRACE_VRB(ALX_LIN_FILE, __VA_ARGS__)
 #else
+	#define ALX_LIN_TRACE_FTL(...) do{} while (false)
 	#define ALX_LIN_TRACE_ERR(...) do{} while (false)
 	#define ALX_LIN_TRACE_WRN(...) do{} while (false)
 	#define ALX_LIN_TRACE_INF(...) do{} while (false)
@@ -124,7 +126,7 @@ bool AlxLin_Master_IsInit(AlxLin* me);
 bool AlxLin_Slave_IsInit(AlxLin* me);
 Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLenEnable, uint32_t variableLenEnable_maxLen, uint32_t* variableLenEnable_actualLen);
 Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLenEnable);
-Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t len, uint16_t timeout_ms, uint8_t numOfTries, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms);
+Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t len, uint16_t timeout_ms, uint8_t numOfTries, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms, bool handleBreakSync);
 void AlxLin_IrqHandler(AlxLin* me);
 
 
