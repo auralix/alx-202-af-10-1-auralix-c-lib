@@ -49,6 +49,9 @@ extern "C" {
 #elif defined(ALX_LPC55S6X)
 #include "alxSerialPort_McuLpc55S6x.h"
 
+#elif defined(ALX_SAM)
+#include "alxSerialPort_McuSam.h"
+
 #else
 typedef struct { bool dummy; } AlxSerialPort;
 #endif
