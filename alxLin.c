@@ -403,7 +403,7 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
   * @brief													As a LIN slave device, receive frame header or receive frame header & frame response from master device
   *																AlxLin_Slave_RxFrameHeader_RxFrameResponse
   * @param[in,out]	me
-  * @param[in]		id										Pointer to variable which will be set with ID which was received in the frame header
+  * @param[out]		id										Pointer to variable which will be set with ID which was received in the frame header
   * @param[out]		data									Pointer to location to which received frame response data will be copied
   * @param[in]		len										Received frame response data length which will be read
   * @param[in]		timeout_ms								Time in ms for which, we as LIN slave device, will wait after RX FIFO Flush for master device to transmit whole frame response with specified data length
