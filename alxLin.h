@@ -97,6 +97,7 @@ typedef struct
 
 	// Parameters
 	AlxSerialPort* alxSerialPort;
+	AlxIoPin* do_BREAK;
 
 	// Info
 	bool wasCtorCalled;
@@ -111,7 +112,8 @@ typedef struct
 void AlxLin_Ctor
 (
 	AlxLin* me,
-	AlxSerialPort* alxSerialPort
+	AlxSerialPort* alxSerialPort,
+	AlxIoPin* do_BREAK
 );
 
 

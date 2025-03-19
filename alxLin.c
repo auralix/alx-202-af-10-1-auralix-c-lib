@@ -55,15 +55,18 @@ static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, u
   * @brief
   * @param[in,out]	me
   * @param[in]		alxSerialPort
+  * @param[in]		do_BREAK
   */
 void AlxLin_Ctor
 (
 	AlxLin* me,
-	AlxSerialPort* alxSerialPort
+	AlxSerialPort* alxSerialPort,
+	AlxIoPin* do_BREAK
 )
 {
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
+	me->do_BREAK = do_BREAK;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -122,6 +125,7 @@ Alx_Status AlxLin_Slave_Init(AlxLin* me)
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInitMaster == false);
 	ALX_LIN_ASSERT(me->isInitSlave == false);
+	ALX_LIN_ASSERT(me->do_BREAK == NULL);
 
 	// Return
 	return AlxLin_Init(me, false);
@@ -139,6 +143,7 @@ Alx_Status AlxLin_Slave_DeInit(AlxLin* me)
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInitMaster == false);
 	ALX_LIN_ASSERT(me->isInitSlave == true);
+	ALX_LIN_ASSERT(me->do_BREAK == NULL);
 
 	// Return
 	return AlxLin_DeInit(me, false);
@@ -359,7 +364,9 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
   */
 Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLenEnable)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInitMaster == true);
 	ALX_LIN_ASSERT(me->isInitSlave == false);
@@ -373,21 +380,61 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 		ALX_LIN_ASSERT(len == AlxLin_GetDataLenFromId(id));
 	}
 
-	// Local variables
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	uint8_t protectedId = AlxLin_CalcProtectedId(id);
 	uint8_t enhancedChecksum = AlxLin_CalcEnhancedChecksum(protectedId, data, len);
 	uint8_t txFrame[2 + ALX_LIN_BUFF_LEN + 1] = {};	// SYNC + Protected ID + Data + Enhanced Checksum
 
-	// Prepare frame header + frame response
-	// Break								// Frame Header Break - Send automatically by STM32 HW
+
+	//------------------------------------------------------------------------------
+	// Generate Break
+	//------------------------------------------------------------------------------
+	if (me->do_BREAK != NULL)
+	{
+		// DeInit serial port
+		status = AlxSerialPort_DeInit(me->alxSerialPort);
+		if (status != Alx_Ok)
+		{
+			ALX_LIN_TRACE_WRN("Err");
+			return status;
+		}
+
+		// Init - Sets GPIO to LOW
+		AlxIoPin_Init(me->do_BREAK);
+
+		// Wait
+		AlxDelay_ms(2);
+
+		// DeInit - Sets GPIO to HIGH
+		AlxIoPin_DeInit(me->do_BREAK);
+
+		// Init serial port
+		status = AlxSerialPort_Init(me->alxSerialPort);
+		if (status != Alx_Ok)
+		{
+			ALX_LIN_TRACE_WRN("Err");
+			return status;
+		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Transmit Frame Header + Frame Response
+	//------------------------------------------------------------------------------
+
+	// Prepare
+	// Break								// Frame Header Break - Send automatically by HW or by SW above
 	txFrame[0] = 0x55;						// Frame Header SYNC
 	txFrame[1] = protectedId;				// Frame Header Protected ID
 	memcpy(&txFrame[2], data, len);			// Frame Response Data
 	txFrame[2 + len] = enhancedChecksum;	// Frame Response Enhanced Checksum
-
-	// Transmit frame header + frame response
 	uint8_t txFrameLen = 2 + len + 1;	// SYNC + Protected ID + Data + Enhanced Checksum
+
+	// Write
 	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
 	if (status != Alx_Ok)
 	{
@@ -395,7 +442,10 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 		return status;
 	}
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
 
@@ -415,20 +465,29 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
   */
 Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t len, uint16_t timeout_ms, uint8_t numOfTries, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms, bool handleBreakSync)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInitMaster == false);
 	ALX_LIN_ASSERT(me->isInitSlave == true);
+	ALX_LIN_ASSERT(me->do_BREAK == NULL);
 	ALX_LIN_ASSERT((0 <= len) && (len <= ALX_LIN_BUFF_LEN));
 
-	// Local variables
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	uint8_t id_Actual = 0;
 	uint8_t rxFrame[3 + ALX_LIN_BUFF_LEN + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
 	uint32_t rxFrameLen_Actual = 0;
 	uint32_t rxFrameLen_Expected = 0;
 
+
+	//------------------------------------------------------------------------------
 	// Set rxFrameLen_Expected
+	//------------------------------------------------------------------------------
 	if (len == 0)
 	{
 		if (handleBreakSync)
@@ -451,6 +510,11 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 			rxFrameLen_Expected = 1 + len + 1;	// Protected ID + Data + Enhanced Checksum
 		}
 	}
+
+
+	//------------------------------------------------------------------------------
+	// Try
+	//------------------------------------------------------------------------------
 
 	// Try for number of tries
 	for (uint32_t _try = 1; _try <= numOfTries; _try++)
@@ -570,6 +634,11 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 	{
 		return Alx_ErrNumOfTries;
 	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
 
 	// Return protected ID
 	*id = id_Actual;
