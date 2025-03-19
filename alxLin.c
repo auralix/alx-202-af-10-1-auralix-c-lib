@@ -249,14 +249,14 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 	uint8_t txFrame[2] = {};						// SYNC + Protected ID
 	uint8_t rxFrame[3 + ALX_LIN_BUFF_LEN + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
 	uint32_t rxFrameDataLen = 0;
-	uint32_t handleBreakOffset = 0;
+	uint32_t breakOffset = 0;
 	if (me->masterReadSwHandleBreak)
 	{
-		handleBreakOffset = 0;
+		breakOffset = 0;
 	}
 	else
 	{
-		handleBreakOffset = 1;
+		breakOffset = 1;
 	}
 
 
@@ -305,7 +305,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 
 		// Check if serial port RX FIFO number of entries is OK
 		uint32_t rxFrameLen = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);
-		rxFrameDataLen = rxFrameLen - (4 - handleBreakOffset);	// We must subtract: [Break], SYNC, Protected ID, Enhanced Checksum
+		rxFrameDataLen = rxFrameLen - (4 - breakOffset);	// We must subtract: *Break, SYNC, Protected ID, Enhanced Checksum
 		if (variableLenEnable)
 		{
 			if (rxFrameDataLen > variableLenEnable_maxLen)
@@ -334,7 +334,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		}
 
 		// Check if protected ID is OK
-		uint8_t protectedId_Actual = rxFrame[2 - handleBreakOffset];
+		uint8_t protectedId_Actual = rxFrame[2 - breakOffset];
 		uint8_t protectedId_Expected = protectedId;
 		if (protectedId_Actual != protectedId_Expected)
 		{
@@ -344,8 +344,8 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		}
 
 		// Check if enhanced checksum is OK
-		uint8_t enhancedChecksum_Actual = rxFrame[(3 - handleBreakOffset) + rxFrameDataLen];
-		uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId, &rxFrame[3 - handleBreakOffset], rxFrameDataLen);
+		uint8_t enhancedChecksum_Actual = rxFrame[(3 - breakOffset) + rxFrameDataLen];
+		uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId, &rxFrame[3 - breakOffset], rxFrameDataLen);
 		if (enhancedChecksum_Actual != enhancedChecksum_Expected)
 		{
 			ALX_LIN_TRACE_WRN("Err");
@@ -369,7 +369,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 	//------------------------------------------------------------------------------
 
 	// Return frame response data
-	memcpy(data, &rxFrame[3 - handleBreakOffset], rxFrameDataLen);
+	memcpy(data, &rxFrame[3 - breakOffset], rxFrameDataLen);
 
 	// Return frame response actual data length
 	if (variableLenEnable)
@@ -455,7 +455,7 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 	txFrame[1] = protectedId;				// Frame Header Protected ID
 	memcpy(&txFrame[2], data, len);			// Frame Response Data
 	txFrame[2 + len] = enhancedChecksum;	// Frame Response Enhanced Checksum
-	uint8_t txFrameLen = 2 + len + 1;	// SYNC + Protected ID + Data + Enhanced Checksum
+	uint8_t txFrameLen = 2 + len + 1;		// SYNC + Protected ID + Data + Enhanced Checksum
 
 	// Transmit frame header
 	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
@@ -482,11 +482,10 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
   * @param[in]		timeout_ms								Time in ms for which, we as LIN slave device, will wait after RX FIFO Flush for master device to transmit whole frame response with specified data length
   * @param[in]		numOfTries								Number of tries
   * @param[in]		rxFifoNumOfEntriesNewCheckWaitTime_ms	Time in ms for which we will wait for new RX FIFO number of entries check
-  * @param[in]		handleBreakSync							Bool for specifying if Break & SYNC will be handled
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t len, uint16_t timeout_ms, uint8_t numOfTries, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms, bool handleBreakSync)
+Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t len, uint16_t timeout_ms, uint8_t numOfTries, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -506,6 +505,15 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 	uint8_t rxFrame[3 + ALX_LIN_BUFF_LEN + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
 	uint32_t rxFrameLen_Actual = 0;
 	uint32_t rxFrameLen_Expected = 0;
+	uint32_t breakSyncOffset = 0;
+	if (me->slaveReadSwHandleBreakSync)
+	{
+		breakSyncOffset = 0;
+	}
+	else
+	{
+		breakSyncOffset = 2;
+	}
 
 
 	//------------------------------------------------------------------------------
@@ -513,25 +521,11 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 	//------------------------------------------------------------------------------
 	if (len == 0)
 	{
-		if (handleBreakSync)
-		{
-			rxFrameLen_Expected = 3;	// Break, SYNC, Protected ID
-		}
-		else
-		{
-			rxFrameLen_Expected = 1;	// Protected ID
-		}
+		rxFrameLen_Expected = 3 - breakSyncOffset;	// *Break + *SYNC + Protected ID
 	}
 	else
 	{
-		if (handleBreakSync)
-		{
-			rxFrameLen_Expected = 3 + len + 1;	// Break + SYNC + Protected ID + Data + Enhanced Checksum
-		}
-		else
-		{
-			rxFrameLen_Expected = 1 + len + 1;	// Protected ID + Data + Enhanced Checksum
-		}
+		rxFrameLen_Expected = (3 - breakSyncOffset) + len + 1;	// *Break + *SYNC + Protected ID + Data + Enhanced Checksum
 	}
 
 
@@ -599,17 +593,8 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 		}
 
 		// Check if protected ID is OK
-		uint8_t protectedId_Actual = 0;
-		if (handleBreakSync)
-		{
-			protectedId_Actual = rxFrame[2];
-			id_Actual = rxFrame[2] & 0x3F;
-		}
-		else
-		{
-			protectedId_Actual = rxFrame[0];
-			id_Actual = rxFrame[0] & 0x3F;
-		}
+		uint8_t protectedId_Actual = rxFrame[2 - breakSyncOffset];
+		id_Actual = rxFrame[2 - breakSyncOffset] & 0x3F;
 		uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
 		if (protectedId_Actual != protectedId_Expected)
 		{
@@ -619,32 +604,15 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 		}
 
 		// Check if enhanced checksum is OK
-		if (handleBreakSync)
+		if ((5 - breakSyncOffset) <= rxFrameLen_Actual)
 		{
-			if (5 <= rxFrameLen_Actual)
+			uint8_t enhancedChecksum_Actual = rxFrame[(3 - breakSyncOffset) + len];
+			uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId_Actual, &rxFrame[3 - breakSyncOffset], len);
+			if (enhancedChecksum_Actual != enhancedChecksum_Expected)
 			{
-				uint8_t enhancedChecksum_Actual = rxFrame[3 + len];
-				uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId_Actual, &rxFrame[3], len);
-				if (enhancedChecksum_Actual != enhancedChecksum_Expected)
-				{
-					ALX_LIN_TRACE_WRN("Err");
-					status = Alx_Err;
-					continue;
-				}
-			}
-		}
-		else
-		{
-			if (3 <= rxFrameLen_Actual)
-			{
-				uint8_t enhancedChecksum_Actual = rxFrame[1 + len];
-				uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId_Actual, &rxFrame[1], len);
-				if (enhancedChecksum_Actual != enhancedChecksum_Expected)
-				{
-					ALX_LIN_TRACE_WRN("Err");
-					status = Alx_Err;
-					continue;
-				}
+				ALX_LIN_TRACE_WRN("Err");
+				status = Alx_Err;
+				continue;
 			}
 		}
 
@@ -667,14 +635,7 @@ Alx_Status AlxLin_Slave_ReadLen(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t
 	*id = id_Actual;
 
 	// Return frame response data
-	if (handleBreakSync)
-	{
-		memcpy(data, &rxFrame[3], len);
-	}
-	else
-	{
-		memcpy(data, &rxFrame[1], len);
-	}
+	memcpy(data, &rxFrame[3 - breakSyncOffset], len);
 
 	// Return
 	return Alx_Ok;
