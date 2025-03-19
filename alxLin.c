@@ -57,6 +57,8 @@ static Alx_Status AlxLin_TxFrameHeaderBreak(AlxLin* me);
   * @param[in,out]	me
   * @param[in]		alxSerialPort
   * @param[in]		do_BREAK
+  * @param[in]		masterReadSwHandleBreak
+  * @param[in]		slaveReadSwHandleBreakSync
   */
 void AlxLin_Ctor
 (
@@ -149,13 +151,13 @@ bool AlxLin_Master_IsInit(AlxLin* me)
   *													Acceptable values: 0x00 .. 0x3F
   * @param[out]		data						Pointer to location to which received frame response data will be copied
   * @param[in]		len							Received frame response data length
-  *													If variableLenEnable = false, then length is LIN compliant and:
+  *													If variableLen = false, then length is LIN compliant and:
   *														Acceptable values are: 2, 4, 8
   *														Length must be set accordingly to specified ID
   *															If ID = 0x00 .. 0x1F, then 2
   *															If ID = 0x20 .. 0x2F, then 4
   *															If ID = 0x30 .. 0x3F, then 8
-  *													Else if variableLenEnable = true, then len should be 0, or ASSERT will happen
+  *													Else if variableLen = true, then len should be 0, or ASSERT will happen
   * @param[in]		slaveResponseWaitTime_ms	Time in ms for which, we as LIN master device, will wait for slave device to transmit whole frame response
   *													Wait will start right after we transmitted frame header
   *													When determining this value you must consider:
@@ -164,16 +166,16 @@ bool AlxLin_Master_IsInit(AlxLin* me)
   *														How fast is slave device, how quickly after received frame header does it start transmitting frame response
   *													This operation is blocking, so it's recommend that the wait time is not too large
   * @param[in]		numOfTries					Number of tries
-  * @param[in]		variableLenEnable			Bool for specifying if variable data length is enabled
-  * @param[in]		variableLenEnable_maxLen	Maximum frame response data length, that the user of this function can receive
-  *													If received frame response data length > variableLenEnable_maxLen, Alx_Err is returned
-  *													ONLY APPLICABLE if variableLenEnable = true
-  * @param[out]		variableLenEnable_actualLen	Pointer to variable which will be set with actual frame response data length received after successful communication
-  *													ONLY APPLICABLE if variableLenEnable = true
+  * @param[in]		variableLen					Bool for specifying if variable data length is enabled
+  * @param[in]		variableLen_maxLen			Maximum frame response data length, that the user of this function can receive
+  *													If received frame response data length > variableLen_maxLen, Alx_Err is returned
+  *													ONLY APPLICABLE if variableLen = true
+  * @param[out]		variableLen_actualLen		Pointer to variable which will be set with actual frame response data length received after successful communication
+  *													ONLY APPLICABLE if variableLen = true
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLenEnable, uint32_t variableLenEnable_maxLen, uint32_t* variableLenEnable_actualLen)
+Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLen, uint32_t variableLen_maxLen, uint32_t* variableLen_actualLen)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -182,16 +184,16 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 	ALX_LIN_ASSERT(me->isInitMaster == true);
 	ALX_LIN_ASSERT(me->isInitSlave == false);
 	ALX_LIN_ASSERT((0 <= id) && (id <= 0x3F));
-	if (variableLenEnable)
+	if (variableLen)
 	{
 		ALX_LIN_ASSERT(len == 0);
-		ALX_LIN_ASSERT((0 < variableLenEnable_maxLen) && (variableLenEnable_maxLen <= ALX_LIN_BUFF_LEN));
+		ALX_LIN_ASSERT((0 < variableLen_maxLen) && (variableLen_maxLen <= ALX_LIN_BUFF_LEN));
 	}
 	else
 	{
 		ALX_LIN_ASSERT(len == AlxLin_GetDataLenFromId(id));
-		ALX_LIN_ASSERT(variableLenEnable_maxLen == 0);
-		ALX_LIN_ASSERT(variableLenEnable_actualLen == ALX_NULL);
+		ALX_LIN_ASSERT(variableLen_maxLen == 0);
+		ALX_LIN_ASSERT(variableLen_actualLen == ALX_NULL);
 	}
 
 
@@ -212,7 +214,6 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 	{
 		breakOffset = 1;
 	}
-
 
 
 	//------------------------------------------------------------------------------
@@ -260,9 +261,9 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		// Check if serial port RX FIFO number of entries is OK
 		uint32_t rxFrameLen = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);
 		rxFrameDataLen = rxFrameLen - (4 - breakOffset);	// We must subtract: *Break, SYNC, Protected ID, Enhanced Checksum
-		if (variableLenEnable)
+		if (variableLen)
 		{
-			if (rxFrameDataLen > variableLenEnable_maxLen)
+			if (rxFrameDataLen > variableLen_maxLen)
 			{
 				ALX_LIN_TRACE_WRN("Err");
 				status = Alx_Err;
@@ -279,7 +280,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 			}
 		}
 
-		// Read received frame from serial port RX FIFO
+		// Read received frame response from serial port RX FIFO
 		status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen);
 		if (status != Alx_Ok)
 		{
@@ -326,9 +327,9 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 	memcpy(data, &rxFrame[3 - breakOffset], rxFrameDataLen);
 
 	// Return frame response actual data length
-	if (variableLenEnable)
+	if (variableLen)
 	{
-		*variableLenEnable_actualLen = rxFrameDataLen;
+		*variableLen_actualLen = rxFrameDataLen;
 	}
 
 	// Return
@@ -336,28 +337,28 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 }
 
 /**
-  * @brief								As a LIN master device, transmit frame header and frame response to specified ID
-  *											This will probably be an ID of LIN slave device
-  *											If it's our own ID, then we will transmit frame to ourselves
-  *											In LIN terminology when you are transmitting frame response, this is considered PUBLISHING
-  *											Alternative name: AlxLin_Master_TxFrameHeader_TxFrameResponse
+  * @brief							As a LIN master device, transmit frame header and frame response to specified ID
+  *										This will probably be an ID of LIN slave device
+  *										If it's our own ID, then we will transmit frame to ourselves
+  *										In LIN terminology when you are transmitting frame response, this is considered PUBLISHING
+  *										Alternative name: AlxLin_Master_TxFrameHeader_TxFrameResponse
   * @param[in,out]	me
-  * @param[in]		id					ID which will be transmitted in the frame header
-  *											Acceptable values: 0x00 .. 0x3F
-  * @param[in]		data				Pointer to data which will be transmitted in frame response
-  * @param[in]		len					Transmitted frame response data length
-  *											If variableLenEnable = false, then length is LIN compliant and:
-  *												Acceptable values are: 2, 4, 8
-  *												Length must be set accordingly to specified ID
-  *													If ID = 0x00 .. 0x1F, then 2
-  *													If ID = 0x20 .. 0x2F, then 4
-  *													If ID = 0x30 .. 0x3F, then 8
-  *											Else if variableLenEnable = true, then 0 < len <= ALX_LIN_BUFF_LEN
-  * @param[in]		variableLenEnable	Bool for specifying if variable data length is enabled
+  * @param[in]		id				ID which will be transmitted in the frame header
+  *										Acceptable values: 0x00 .. 0x3F
+  * @param[in]		data			Pointer to data which will be transmitted in frame response
+  * @param[in]		len				Transmitted frame response data length
+  *										If variableLen = false, then length is LIN compliant and:
+  *											Acceptable values are: 2, 4, 8
+  *											Length must be set accordingly to specified ID
+  *												If ID = 0x00 .. 0x1F, then 2
+  *												If ID = 0x20 .. 0x2F, then 4
+  *												If ID = 0x30 .. 0x3F, then 8
+  *										Else if variableLen = true, then 0 < len <= ALX_LIN_BUFF_LEN
+  * @param[in]		variableLen		Bool for specifying if variable data length is enabled
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLenEnable)
+Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLen)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -366,7 +367,7 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 	ALX_LIN_ASSERT(me->isInitMaster == true);
 	ALX_LIN_ASSERT(me->isInitSlave == false);
 	ALX_LIN_ASSERT((0 <= id) && (id <= 0x3F));
-	if (variableLenEnable)
+	if (variableLen)
 	{
 		ALX_LIN_ASSERT((0 < len) && (len <= ALX_LIN_BUFF_LEN));
 	}
@@ -559,7 +560,7 @@ Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t le
 		// Wait for master to transmit whole frame response with specified data length
 		while (1)
 		{
-			// Check if serial port RX FIFO number of entries is OK
+			// Check if serial port RX FIFO number of entries are OK
 			rxFrameLen_Actual = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);
 
 			// Check if data length is OK
@@ -593,7 +594,7 @@ Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t le
 			continue;
 		}
 
-		// Read received frame from serial port RX FIFO
+		// Read received frame response from serial port RX FIFO
 		status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen_Actual);
 		if (status != Alx_Ok)
 		{
