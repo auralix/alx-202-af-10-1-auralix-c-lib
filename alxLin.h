@@ -98,6 +98,8 @@ typedef struct
 	// Parameters
 	AlxSerialPort* alxSerialPort;
 	AlxIoPin* do_BREAK;
+	bool masterReadSwHandleBreak;
+	bool slaveReadSwHandleBreakSync;
 
 	// Info
 	bool wasCtorCalled;
@@ -113,7 +115,9 @@ void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
-	AlxIoPin* do_BREAK
+	AlxIoPin* do_BREAK,
+	bool masterReadSwHandleBreak,
+	bool slaveReadSwHandleBreakSync
 );
 
 
