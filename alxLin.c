@@ -84,6 +84,11 @@ void AlxLin_Ctor
 // Functions
 //******************************************************************************
 
+
+//------------------------------------------------------------------------------
+// Master
+//------------------------------------------------------------------------------
+
 /**
   * @brief
   * @param[in,out]	me
@@ -121,42 +126,6 @@ Alx_Status AlxLin_Master_DeInit(AlxLin* me)
 /**
   * @brief
   * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxLin_Slave_Init(AlxLin* me)
-{
-	// Assert
-	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == false);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
-	ALX_LIN_ASSERT(me->do_BREAK == NULL);
-
-	// Return
-	return AlxLin_Init(me, false);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxLin_Slave_DeInit(AlxLin* me)
-{
-	// Assert
-	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == false);
-	ALX_LIN_ASSERT(me->isInitSlave == true);
-	ALX_LIN_ASSERT(me->do_BREAK == NULL);
-
-	// Return
-	return AlxLin_DeInit(me, false);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
   * @retval			false
   * @retval			true
   */
@@ -167,21 +136,6 @@ bool AlxLin_Master_IsInit(AlxLin* me)
 
 	// Return
 	return me->isInitMaster;
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @retval			false
-  * @retval			true
-  */
-bool AlxLin_Slave_IsInit(AlxLin* me)
-{
-	// Assert
-	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-
-	// Return
-	return me->isInitSlave;
 }
 
 /**
@@ -472,6 +426,62 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 	return Alx_Ok;
 }
 
+
+//------------------------------------------------------------------------------
+// Slave
+//------------------------------------------------------------------------------
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxLin_Slave_Init(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInitMaster == false);
+	ALX_LIN_ASSERT(me->isInitSlave == false);
+	ALX_LIN_ASSERT(me->do_BREAK == NULL);
+
+	// Return
+	return AlxLin_Init(me, false);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxLin_Slave_DeInit(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInitMaster == false);
+	ALX_LIN_ASSERT(me->isInitSlave == true);
+	ALX_LIN_ASSERT(me->do_BREAK == NULL);
+
+	// Return
+	return AlxLin_DeInit(me, false);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
+  */
+bool AlxLin_Slave_IsInit(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return me->isInitSlave;
+}
+
 /**
   * @brief													As a LIN slave device, receive frame header or receive frame header & frame response from master device
   *																AlxLin_Slave_RxFrameHeader_RxFrameResponse
@@ -640,6 +650,11 @@ Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t le
 	// Return
 	return Alx_Ok;
 }
+
+
+//------------------------------------------------------------------------------
+// IRQ
+//------------------------------------------------------------------------------
 
 /**
   * @brief

@@ -124,15 +124,30 @@ void AlxLin_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Master
+//------------------------------------------------------------------------------
 Alx_Status AlxLin_Master_Init(AlxLin* me);
 Alx_Status AlxLin_Master_DeInit(AlxLin* me);
-Alx_Status AlxLin_Slave_Init(AlxLin* me);
-Alx_Status AlxLin_Slave_DeInit(AlxLin* me);
 bool AlxLin_Master_IsInit(AlxLin* me);
-bool AlxLin_Slave_IsInit(AlxLin* me);
 Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLenEnable, uint32_t variableLenEnable_maxLen, uint32_t* variableLenEnable_actualLen);
 Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLenEnable);
+
+
+//------------------------------------------------------------------------------
+// Slave
+//------------------------------------------------------------------------------
+Alx_Status AlxLin_Slave_Init(AlxLin* me);
+Alx_Status AlxLin_Slave_DeInit(AlxLin* me);
+bool AlxLin_Slave_IsInit(AlxLin* me);
 Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t len, uint16_t timeout_ms, uint8_t numOfTries, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms);
+
+
+//------------------------------------------------------------------------------
+// IRQ
+//------------------------------------------------------------------------------
 void AlxLin_IrqHandler(AlxLin* me);
 
 
