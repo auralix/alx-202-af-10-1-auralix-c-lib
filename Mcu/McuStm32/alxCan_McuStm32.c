@@ -136,40 +136,55 @@ void AlxCan_Ctor
 	//------------------------------------------------------------------------------
 	// Private Variables
 	//------------------------------------------------------------------------------
-	#if defined(ALX_STM32F4) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
 		#if defined(CAN1)
-		if (me->hcan.Instance == CAN1)			{ alxCan_Can1 = me; }
+		if (me->hcan.Instance == CAN1)
+		{
+			alxCan_Can1 = me;
+		}
 		#endif
 		#if defined(CAN2)
-		else if (me->hcan.Instance == CAN2)		{ alxCan_Can2 = me; }
-		#endif
-		else									{ ALX_CAN_ASSERT(false); }	// We should never get here
-	#endif
-	#if defined(ALX_STM32F7)
-		#if defined(CAN1)
-		if (me->hcan.Instance == CAN1)			{ alxCan_Can1 = me; }
-		#endif
-		#if defined(CAN2)
-		else if (me->hcan.Instance == CAN2)		{ alxCan_Can2 = me; }
+		else if (me->hcan.Instance == CAN2)
+		{
+			alxCan_Can2 = me;
+		}
 		#endif
 		#if defined(CAN3)
-		else if (me->hcan.Instance == CAN3)		{ alxCan_Can3 = me; }
+		else if (me->hcan.Instance == CAN3)
+		{
+			alxCan_Can3 = me;
+		}
 		#endif
-		else									{ ALX_CAN_ASSERT(false); }	// We should never get here
+		else
+		{
+			ALX_CAN_ASSERT(false);	// We should never get here
+		}
 	#endif
 	#if defined(ALX_STM32G4)
 		#if defined(FDCAN1)
-		if(me->hcan.Instance == FDCAN1)			{ alxCan_Can1 = me; }
+		if (me->hcan.Instance == FDCAN1)
+		{
+			alxCan_Can1 = me;
+		}
 		#endif
 		#if defined(FDCAN2)
-		else if (me->hcan.Instance == FDCAN2)	{ alxCan_Can2 = me; }
-		ALX_CAN_ASSERT(false);	// Only FDCAN1 is supported
+		else if (me->hcan.Instance == FDCAN2)
+		{
+			alxCan_Can2 = me;
+			ALX_CAN_ASSERT(false);	// Only FDCAN1 is supported
+		}
 		#endif
 		#if defined(FDCAN3)
-		else if(me->hcan.Instance == FDCAN3)	{ alxCan_Can2 = me; }
-		ALX_CAN_ASSERT(false);	// Only FDCAN1 is supported
+		else if (me->hcan.Instance == FDCAN3)
+		{
+			alxCan_Can3 = me;
+			ALX_CAN_ASSERT(false);	// Only FDCAN1 is supported
+		}
 		#endif
-		else									{ ALX_CAN_ASSERT(false); }	// We should never get here
+		else
+		{
+			ALX_CAN_ASSERT(false);	// We should never get here
+		}
 	#endif
 
 
@@ -207,7 +222,6 @@ void AlxCan_Ctor
 		me->hcan.Init.TimeSeg1 = CAN_BS1_15TQ;
 		me->hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
 	}
-	else { ALX_CAN_ASSERT(false); return; } // We shouldn't get here
 	#endif
 	#if defined(ALX_STM32F7)
 	if(me->canClk == AlxCan_Clk_McuStm32F7_CanClk_250kbps_Pclk1Apb1_54MHz)
@@ -218,7 +232,6 @@ void AlxCan_Ctor
 		me->hcan.Init.TimeSeg1 = CAN_BS1_15TQ;
 		me->hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
 	}
-	else { ALX_CAN_ASSERT(false); return; } // We shouldn't get here
 	#endif
 	#if defined(ALX_STM32L4)
 	if(me->canClk == AlxCan_Clk_McuStm32L4_CanClk_250kbps_Pclk1Apb1_80MHz)
@@ -229,19 +242,41 @@ void AlxCan_Ctor
 		me->hcan.Init.TimeSeg1 = CAN_BS1_13TQ;
 		me->hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
 	}
-	else { ALX_CAN_ASSERT(false); return; } // We shouldn't get here
 	#endif
+	else { ALX_CAN_ASSERT(false); return; }	// We should never get here
 
 	me->fcan.FilterIdHigh = 0x00000000;
 	me->fcan.FilterIdLow = 0x00000000;
 	me->fcan.FilterMaskIdHigh = 0x00000000;
 	me->fcan.FilterMaskIdLow = 0x00000000;
 	me->fcan.FilterFIFOAssignment = me->canRxFifo;
-	me->fcan.FilterBank = 0;
 	me->fcan.FilterMode = CAN_FILTERMODE_IDMASK;
 	me->fcan.FilterScale = CAN_FILTERSCALE_32BIT;
 	me->fcan.FilterActivation = ENABLE;
 	me->fcan.SlaveStartFilterBank = 14;
+
+	#if defined(CAN1)
+	if (me->hcan.Instance == CAN1)
+	{
+		me->fcan.FilterBank = 0;
+	}
+	#endif
+	#if defined(CAN2)
+	else if (me->hcan.Instance == CAN2)
+	{
+		me->fcan.FilterBank = 14;
+	}
+	#endif
+	#if defined(CAN3)
+	else if (me->hcan.Instance == CAN3)
+	{
+		me->fcan.FilterBank = 0;
+	}
+	#endif
+	else
+	{
+		ALX_CAN_ASSERT(false);	// We should never get here
+	}
 	#endif
 
 
@@ -274,7 +309,7 @@ void AlxCan_Ctor
 		me->hcan.Init.DataTimeSeg1 = ALX_NULL;
 		me->hcan.Init.DataTimeSeg2 = ALX_NULL;
 	}
-	else { ALX_CAN_ASSERT(false); return; } // We shouldn't get here
+	else { ALX_CAN_ASSERT(false); return; }	// We should never get here
 
 	me->fcan.IdType = FDCAN_STANDARD_ID;
 	me->fcan.FilterIndex = 0;

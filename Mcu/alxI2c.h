@@ -57,7 +57,7 @@ extern "C" {
 #include "alxI2c_McuZephyr.h"
 
 #else
-typedef struct { bool dummy; } AlxI2c;
+typedef struct { bool dummy; bool isInit;} AlxI2c;
 #endif
 
 

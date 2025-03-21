@@ -82,7 +82,7 @@ extern "C" {
 // Newlib Nano
 //------------------------------------------------------------------------------
 #if defined(ALX_NEWLIB_NANO)
-#include <assert.h> // All headers from C11 Standard, commented out what not compatible with C99
+//#include <assert.h> // All headers from C11 Standard, commented out what not compatible with C99
 #include <complex.h>
 #include <ctype.h>
 #include <errno.h>
@@ -248,6 +248,9 @@ extern "C" {
 
 #elif defined(ALX_LPC84X)
 #include "alxGlobal_McuLpc84x.h"
+
+#elif defined(ALX_SAM)
+#include "alxGlobal_McuSam.h"
 
 #endif
 

@@ -133,6 +133,15 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 		binPathIn=binRawPath,
 		binPathOut=binSignedPath
 	)
+
+	# If sig_key exists sign the FW and if enc_key exists also encrypt the FW
+	sigkeyPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "sig_key.pem"
+	if sigkeyPath.is_file():
+		cmd = cmd + (r" -k {sigKey}").format(sigKey=sigkeyPath)
+		enckeyPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "enc_key.pem"
+		if enckeyPath.is_file():
+			cmd = cmd + (r" --encrypt {encKey}").format(encKey=enckeyPath)
+
 	print("imgtool.py - cmd:" + cmd)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 

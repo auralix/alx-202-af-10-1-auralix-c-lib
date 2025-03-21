@@ -73,6 +73,7 @@ static void AlxSerialPort_Periph_DisableIrq(AlxSerialPort* me);
   * @param[in]		rxFifoBuff
   * @param[in]		rxFifoBuffLen
   * @param[in]		rxIrqPriority
+  * @param[in]		lin
   */
 void AlxSerialPort_Ctor
 (
