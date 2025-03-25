@@ -43,6 +43,8 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxNet.h"
+#include "alxSocket.h"
+#include "alxOsDelay.h"
 
 
 //******************************************************************************
@@ -81,7 +83,10 @@ extern "C" {
 typedef struct
 {
 	// Defines
-	#define ALX_FTP_BUFF_LEN 1460
+	#define ALX_FTP_BUFF_LEN 3000
+	#define ALX_FTP_SOCKET_CTRL_TIMEOUT_ms 30000
+	#define ALX_FTP_SOCKET_DATA_TIMEOUT_ms 30000
+	#define ALX_FTP_SOCKET_DATA_CONNECT_TRY_COUNT 20
 
 	// Parameters
 	AlxNet* alxNet;
@@ -92,6 +97,9 @@ typedef struct
 	const char* clientPassword;
 
 	// Variables
+	AlxSocket alxSocket_Ctrl;
+	AlxSocket alxSocket_Data;
+	char buff[ALX_FTP_BUFF_LEN];
 
 	// Info
 	bool wasCtorCalled;
