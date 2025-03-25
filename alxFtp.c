@@ -40,7 +40,7 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxFtp_Reset(AlxFtp* me);
+static void AlxFtp_Client_Reset(AlxFtp* me);
 
 
 //******************************************************************************
@@ -79,7 +79,7 @@ void AlxFtp_Ctor
 //******************************************************************************
 // Fields
 //******************************************************************************
-void AlxFtp_SetServerAddr(AlxFtp* me, const char* serverAddr)
+void AlxFtp_Client_SetServerAddr(AlxFtp* me, const char* serverAddr)
 {
 	// Assert
 	ALX_FTP_ASSERT(me->wasCtorCalled == true);
@@ -87,7 +87,7 @@ void AlxFtp_SetServerAddr(AlxFtp* me, const char* serverAddr)
 	// Set
 	me->serverAddr = serverAddr;
 }
-void AlxFtp_SetServerAddrIsHostname(AlxFtp* me, bool serverAddrIsHostname)
+void AlxFtp_Client_SetServerAddrIsHostname(AlxFtp* me, bool serverAddrIsHostname)
 {
 	// Assert
 	ALX_FTP_ASSERT(me->wasCtorCalled == true);
@@ -95,7 +95,7 @@ void AlxFtp_SetServerAddrIsHostname(AlxFtp* me, bool serverAddrIsHostname)
 	// Set
 	me->serverAddrIsHostname = serverAddrIsHostname;
 }
-void AlxFtp_SetServerPort(AlxFtp* me, uint16_t serverPort)
+void AlxFtp_Client_SetServerPort(AlxFtp* me, uint16_t serverPort)
 {
 	// Assert
 	ALX_FTP_ASSERT(me->wasCtorCalled == true);
@@ -103,7 +103,7 @@ void AlxFtp_SetServerPort(AlxFtp* me, uint16_t serverPort)
 	// Set
 	me->serverPort = serverPort;
 }
-void AlxFtp_SetClientUsername(AlxFtp* me, const char* clientUsername)
+void AlxFtp_Client_SetClientUsername(AlxFtp* me, const char* clientUsername)
 {
 	// Assert
 	ALX_FTP_ASSERT(me->wasCtorCalled == true);
@@ -111,7 +111,7 @@ void AlxFtp_SetClientUsername(AlxFtp* me, const char* clientUsername)
 	// Set
 	me->clientUsername = clientUsername;
 }
-void AlxFtp_SetClientPassword(AlxFtp* me, const char* clientPassword)
+void AlxFtp_Client_SetClientPassword(AlxFtp* me, const char* clientPassword)
 {
 	// Assert
 	ALX_FTP_ASSERT(me->wasCtorCalled == true);
@@ -604,7 +604,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxFtp_Reset(AlxFtp* me)
+static void AlxFtp_Client_Reset(AlxFtp* me)
 {
 	// Local variables
 	Alx_Status status = Alx_Err;

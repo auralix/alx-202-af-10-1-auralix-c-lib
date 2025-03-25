@@ -125,11 +125,11 @@ void AlxFtp_Ctor
 //******************************************************************************
 // Fields
 //******************************************************************************
-void AlxFtp_SetServerAddr(AlxFtp* me, const char* serverAddr);
-void AlxFtp_SetServerAddrIsHostname(AlxFtp* me, bool serverAddrIsHostname);
-void AlxFtp_SetServerPort(AlxFtp* me, uint16_t serverPort);
-void AlxFtp_SetClientUsername(AlxFtp* me, const char* clientUsername);
-void AlxFtp_SetClientPassword(AlxFtp* me, const char* clientPassword);
+void AlxFtp_Client_SetServerAddr(AlxFtp* me, const char* serverAddr);
+void AlxFtp_Client_SetServerAddrIsHostname(AlxFtp* me, bool serverAddrIsHostname);
+void AlxFtp_Client_SetServerPort(AlxFtp* me, uint16_t serverPort);
+void AlxFtp_Client_SetClientUsername(AlxFtp* me, const char* clientUsername);
+void AlxFtp_Client_SetClientPassword(AlxFtp* me, const char* clientPassword);
 
 
 //******************************************************************************
