@@ -72,8 +72,10 @@ extern "C" {
 // Trace //
 #if defined(ALX_FTP_TRACE_ENABLE)
 	#define ALX_FTP_TRACE_WRN(...) ALX_TRACE_WRN(ALX_FTP_FILE, __VA_ARGS__)
+	#define ALX_FTP_TRACE_ERR(...) ALX_TRACE_ERR(ALX_FTP_FILE, __VA_ARGS__)
 #else
 	#define ALX_FTP_TRACE_WRN(...) do{} while (false)
+	#define ALX_FTP_TRACE_ERR(...) do{} while (false)
 #endif
 
 
@@ -83,10 +85,10 @@ extern "C" {
 typedef struct
 {
 	// Defines
-	#define ALX_FTP_BUFF_LEN 3000
+	#define ALX_FTP_BUFF_LEN 2000
 	#define ALX_FTP_SOCKET_CTRL_TIMEOUT_ms 30000
 	#define ALX_FTP_SOCKET_DATA_TIMEOUT_ms 30000
-	#define ALX_FTP_SOCKET_DATA_CONNECT_TRY_COUNT 20
+	#define ALX_FTP_SOCKET_DATA_CONNECT_TRY_COUNT 10
 
 	// Parameters
 	AlxNet* alxNet;
@@ -100,6 +102,7 @@ typedef struct
 
 	// Variables
 	AlxSocket alxSocket_Ctrl;
+	char alxSocket_Ctrl_Ip[16];
 	AlxSocket alxSocket_Data;
 	char buff[ALX_FTP_BUFF_LEN];
 
