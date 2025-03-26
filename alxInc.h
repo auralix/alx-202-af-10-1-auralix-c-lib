@@ -106,6 +106,7 @@ extern "C" {
 #include "alxFiltGlitchUint32.h"
 #include "alxFs.h"
 #include "alxFtoa.h"
+#include "alxFtp.h"
 #include "alxGlobal.h"
 #include "alxHys1.h"
 #include "alxHys2.h"
