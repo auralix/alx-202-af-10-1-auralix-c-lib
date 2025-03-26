@@ -40,7 +40,7 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxFtp_Client_Reset(AlxFtp* me);
+static void AlxFtp_Reset(AlxFtp* me);
 
 
 //******************************************************************************
@@ -49,21 +49,18 @@ static void AlxFtp_Client_Reset(AlxFtp* me);
 void AlxFtp_Ctor
 (
 	AlxFtp* me,
-	AlxNet* alxNet,
-	const char* serverAddr,
-	bool serverAddrIsHostname,
-	uint16_t serverPort,
-	const char* clientUsername,
-	const char* clientPassword
+	AlxNet* alxNet
 )
 {
 	// Parameters
 	me->alxNet = alxNet;
-	me->serverAddr = serverAddr;
-	me->serverAddrIsHostname = serverAddrIsHostname;
-	me->serverPort = serverPort;
-	me->clientUsername = clientUsername;
-	me->clientPassword = clientPassword;
+
+	// Fields
+	me->serverAddr = "";
+	me->serverAddrIsHostname = false;
+	me->serverPort = 0;
+	me->clientUsername = "";
+	me->clientPassword = "";
 
 	// Variables
 	AlxSocket_Ctor(&me->alxSocket_Ctrl);
@@ -83,6 +80,7 @@ void AlxFtp_Client_SetServerAddr(AlxFtp* me, const char* serverAddr)
 {
 	// Assert
 	ALX_FTP_ASSERT(me->wasCtorCalled == true);
+	ALX_FTP_ASSERT(me->isClientLoggedIn == false);
 
 	// Set
 	me->serverAddr = serverAddr;
@@ -91,6 +89,7 @@ void AlxFtp_Client_SetServerAddrIsHostname(AlxFtp* me, bool serverAddrIsHostname
 {
 	// Assert
 	ALX_FTP_ASSERT(me->wasCtorCalled == true);
+	ALX_FTP_ASSERT(me->isClientLoggedIn == false);
 
 	// Set
 	me->serverAddrIsHostname = serverAddrIsHostname;
@@ -99,6 +98,7 @@ void AlxFtp_Client_SetServerPort(AlxFtp* me, uint16_t serverPort)
 {
 	// Assert
 	ALX_FTP_ASSERT(me->wasCtorCalled == true);
+	ALX_FTP_ASSERT(me->isClientLoggedIn == false);
 
 	// Set
 	me->serverPort = serverPort;
@@ -107,6 +107,7 @@ void AlxFtp_Client_SetClientUsername(AlxFtp* me, const char* clientUsername)
 {
 	// Assert
 	ALX_FTP_ASSERT(me->wasCtorCalled == true);
+	ALX_FTP_ASSERT(me->isClientLoggedIn == false);
 
 	// Set
 	me->clientUsername = clientUsername;
@@ -115,6 +116,7 @@ void AlxFtp_Client_SetClientPassword(AlxFtp* me, const char* clientPassword)
 {
 	// Assert
 	ALX_FTP_ASSERT(me->wasCtorCalled == true);
+	ALX_FTP_ASSERT(me->isClientLoggedIn == false);
 
 	// Set
 	me->clientPassword = clientPassword;
@@ -604,7 +606,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxFtp_Client_Reset(AlxFtp* me)
+static void AlxFtp_Reset(AlxFtp* me)
 {
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -614,8 +616,6 @@ static void AlxFtp_Client_Reset(AlxFtp* me)
 	if (status != Alx_Ok)
 	{
 		ALX_FTP_TRACE_WRN("FAIL: alxSocket_Data() status %ld", status);
-		AlxFtp_Reset(me);
-		return Alx_Err;
 	}
 
 	// Close control socket
@@ -623,12 +623,11 @@ static void AlxFtp_Client_Reset(AlxFtp* me)
 	if (status != Alx_Ok)
 	{
 		ALX_FTP_TRACE_WRN("FAIL: alxSocket_Ctrl() status %ld", status);
-		AlxFtp_Reset(me);
-		return Alx_Err;
 	}
 
 	// Clear
 	memset(me->buff, 0, sizeof(me->buff));
+	me->isClientLoggedIn = false;
 }
 
 

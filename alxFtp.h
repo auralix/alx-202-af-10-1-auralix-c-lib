@@ -90,6 +90,8 @@ typedef struct
 
 	// Parameters
 	AlxNet* alxNet;
+
+	// Fields
 	const char* serverAddr;
 	bool serverAddrIsHostname;
 	uint16_t serverPort;
@@ -113,12 +115,7 @@ typedef struct
 void AlxFtp_Ctor
 (
 	AlxFtp* me,
-	AlxNet* alxNet,
-	const char* serverAddr,
-	bool serverAddrIsHostname,
-	uint16_t serverPort,
-	const char* clientUsername,
-	const char* clientPassword
+	AlxNet* alxNet
 );
 
 

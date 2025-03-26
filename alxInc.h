@@ -49,19 +49,19 @@ extern "C" {
 #include "alxAds114s08.h"
 #include "alxAdxl355.h"
 #include "alxBq24600.h"
+#include "alxBq25890.h"
 #include "alxBts724g.h"
 #include "alxIna228.h"
+#include "alxMax17263.h"
 #include "alxMcp73831.h"
 #include "alxNtcg103jf103ft1s.h"
+#include "alxPca9539a.h"
 #include "alxPcal6416a.h"
 #include "alxPi4ioe5v6534q.h"
 #include "alxTmp1075.h"
 #include "alxTpa3255.h"
 #include "alxVeml6040.h"
 #include "alxVnh7040.h"
-#include "alxBq25890.h"
-#include "alxMax17263.h"
-#include "alxPca9539a.h"
 
 
 //------------------------------------------------------------------------------
