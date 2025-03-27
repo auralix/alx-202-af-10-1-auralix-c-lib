@@ -370,21 +370,19 @@ Alx_Status AlxFtp_Client_Logout(AlxFtp* me)
 		return Alx_Err;
 	}
 
-	// Receive response
+	// Receive response - TV: Won't handle as wrong status as error, since it can happen that server sends response & closes socket so fast that we can NOT read socket quickly enough, then this function fails..
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv() statusLen %ld buff %.100s", statusLen, me->buff);
-		AlxFtp_Reset(me);
-		return Alx_Err;
+		ALX_FTP_TRACE_WRN("FAIL: AlxSocket_Recv() statusLen %ld buff %.100s", statusLen, me->buff);
 	}
-
-	// Check response - Expected response: "221" -> Service closing control connection - AS: Often no replay
-	if (strncmp(me->buff, "221", 3) != 0)
+	else
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp() buff %.100s", me->buff);
-		AlxFtp_Reset(me);
-		return Alx_Err;
+		// Check response - Expected response: "221" -> Service closing control connection
+		if (strncmp(me->buff, "221", 3) != 0)
+		{
+			ALX_FTP_TRACE_WRN("FAIL: strncmp() buff %.100s", me->buff);
+		}
 	}
 
 
@@ -590,17 +588,6 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
-
-
-//	const char* testStr = "Hello world!!!\r\n";
-//	len = strlen(testStr);
-//	statusLen = AlxSocket_Send(&me->alxSocket_Data, testStr, len);
-//	if (statusLen != len)
-//	{
-//		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Send() statusLen %ld testStr %.100s len %lu", statusLen, testStr, len);
-//		AlxFtp_Reset(me);
-//		return Alx_Err;
-//	}
 
 
 	//------------------------------------------------------------------------------
