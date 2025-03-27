@@ -374,14 +374,14 @@ Alx_Status AlxFtp_Client_Logout(AlxFtp* me)
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_WRN("FAIL: AlxSocket_Recv() statusLen %ld buff %.100s", statusLen, me->buff);
+		ALX_FTP_TRACE_DBG("FAIL: AlxSocket_Recv() statusLen %ld buff %.100s", statusLen, me->buff);
 	}
 	else
 	{
 		// Check response - Expected response: "221" -> Service closing control connection
 		if (strncmp(me->buff, "221", 3) != 0)
 		{
-			ALX_FTP_TRACE_WRN("FAIL: strncmp() buff %.100s", me->buff);
+			ALX_FTP_TRACE_DBG("FAIL: strncmp() buff %.100s", me->buff);
 		}
 	}
 

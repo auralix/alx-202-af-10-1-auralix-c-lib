@@ -74,9 +74,11 @@ extern "C" {
 #if defined(ALX_FTP_TRACE_ENABLE)
 	#define ALX_FTP_TRACE_WRN(...) ALX_TRACE_WRN(ALX_FTP_FILE, __VA_ARGS__)
 	#define ALX_FTP_TRACE_ERR(...) ALX_TRACE_ERR(ALX_FTP_FILE, __VA_ARGS__)
+	#define ALX_FTP_TRACE_DBG(...) ALX_TRACE_DBG(ALX_FTP_FILE, __VA_ARGS__)
 #else
 	#define ALX_FTP_TRACE_WRN(...) do{} while (false)
 	#define ALX_FTP_TRACE_ERR(...) do{} while (false)
+	#define ALX_FTP_TRACE_DBG(...) do{} while (false)
 #endif
 
 
