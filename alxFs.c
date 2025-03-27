@@ -892,7 +892,7 @@ Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual))
+Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual), uint32_t* readLen)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -979,6 +979,7 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 	}
 
 	// Return
+	*readLen = fileSizeRead;
 	return Alx_Ok;
 }
 Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
@@ -991,7 +992,8 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	uint8_t chunkBuff[ALX_FS_BUFF_LEN] = {};
 
 	// Read
-	Alx_Status status = AlxFs_File_ReadInChunks(me, path, chunkBuff, sizeof(chunkBuff), AlxFs_File_Trace_ChunkRead_Callback);
+	uint32_t readLen = 0;
+	Alx_Status status = AlxFs_File_ReadInChunks(me, path, chunkBuff, sizeof(chunkBuff), AlxFs_File_Trace_ChunkRead_Callback, &readLen);
 
 	// Return
 	return status;
