@@ -43,6 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxNet.h"
+#include "alxFs.h"
 #include "alxSocket.h"
 #include "alxOsDelay.h"
 
@@ -92,6 +93,7 @@ typedef struct
 
 	// Parameters
 	AlxNet* alxNet;
+	AlxFs* alxFs;
 
 	// Fields
 	const char* serverAddr;
@@ -118,7 +120,8 @@ typedef struct
 void AlxFtp_Ctor
 (
 	AlxFtp* me,
-	AlxNet* alxNet
+	AlxNet* alxNet,
+	AlxFs* alxFs
 );
 
 
