@@ -408,7 +408,7 @@ Alx_Status AlxFtp_Client_Logout(AlxFtp* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const char* remoteFilePath, uint32_t* fileSize)
+Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const char* remoteFilePath, uint32_t* fileSize, AlxOsMutex* alxOsMutex_UploadFileInChunks)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -579,10 +579,10 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 
 
 	//------------------------------------------------------------------------------
-	// Upload File
+	// Upload File In Chunks
 	//------------------------------------------------------------------------------
 	uint32_t _fileSize = 0;
-	status = AlxFs_File_ReadInChunks(me->alxFs, localFilePath, me->buff, sizeof(me->buff), AlxFtp_Client_UploadFile_ChunkRead_Callback, &_fileSize);
+	status = AlxFs_File_ReadInChunks(me->alxFs, localFilePath, me->buff, sizeof(me->buff), AlxFtp_Client_UploadFile_ChunkRead_Callback, &_fileSize, alxOsMutex_UploadFileInChunks);
 	if (status != Alx_Ok)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: AlxFs_File_ReadInChunks() status %ld localFilePath %s", status, localFilePath);

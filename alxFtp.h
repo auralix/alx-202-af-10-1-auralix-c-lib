@@ -142,7 +142,7 @@ void AlxFtp_Client_SetClientPassword(AlxFtp* me, const char* clientPassword);
 //******************************************************************************
 Alx_Status AlxFtp_Client_Login(AlxFtp* me);
 Alx_Status AlxFtp_Client_Logout(AlxFtp* me);
-Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const char* remoteFilePath, uint32_t* fileSize);
+Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const char* remoteFilePath, uint32_t* fileSize, AlxOsMutex* alxOsMutex_UploadFileInChunks);
 
 
 #endif	// #if defined(ALX_C_LIB)

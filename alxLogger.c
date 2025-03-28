@@ -470,7 +470,7 @@ Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint8_t* chunkBuf
 
 	// Return
 	uint32_t readLen = 0;
-	return AlxFs_File_ReadInChunks(me->alxFs, path, chunkBuff, chunkLen, chunkRead_Callback, &readLen);
+	return AlxFs_File_ReadInChunks(me->alxFs, path, chunkBuff, chunkLen, chunkRead_Callback, &readLen, NULL);
 }
 Alx_Status AlxLogger_ReadFileFirstLine(AlxLogger* me, const char* path, char* log)
 {
