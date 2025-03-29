@@ -54,16 +54,16 @@ static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me);
 //------------------------------------------------------------------------------
 // Metadata
 //------------------------------------------------------------------------------
-static Alx_Status AlxLogger_LoadMetadata(AlxLogger* me);
-static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Metadata_StoreConfig config);
+static Alx_Status AlxLogger_Metadata_Load(AlxLogger* me);
+static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Metadata_StoreConfig config);
 
 
 //------------------------------------------------------------------------------
 // Status
 //------------------------------------------------------------------------------
-static bool AlxLogger_IsLogAvailable(uint64_t idStart, uint64_t idEnd);
-static uint64_t AlxLogger_GetNumOfLogs_Private(uint64_t idStart, uint64_t idEnd);
-static uint32_t AlxLogger_GetNumOfLogsEndPosition(AlxLogger* me, const char* logs, uint32_t numOfLogs);
+static bool AlxLogger_Log_AreLogsAvailable(uint64_t idStart, uint64_t idEnd);
+static uint64_t AlxLogger_Log_GetNumOfLogs(uint64_t idStart, uint64_t idEnd);
+static uint32_t AlxLogger_Log_GetLogsEndPosition(AlxLogger* me, const char* logs, uint32_t numOfLogs);
 
 
 //******************************************************************************
@@ -165,7 +165,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	}
 
 	// Trace
-	numOfLogsToProcess = AlxLogger_GetNumOfLogs_Private(me->md.read.id, me->md.write.id);
+	numOfLogsToProcess = AlxLogger_Log_GetNumOfLogs(me->md.read.id, me->md.write.id);
 	AlxGlobal_Ulltoa(numOfLogsToProcess, numOfLogsToProcess_str);
 	ALX_LOGGER_TRACE_INF("AlxLogger - Totals");
 	ALX_LOGGER_TRACE_INF("- numOfFilesTotal = %lu", me->numOfFilesTotal);
@@ -229,7 +229,7 @@ Alx_Status AlxLogger_Metadata_Store(AlxLogger* me, AlxLogger_Metadata_StoreConfi
 	ALX_LOGGER_ASSERT(me->isInit == true);
 
 	// Return
-	return AlxLogger_StoreMetadata_Private(me, config);
+	return AlxLogger_Metadata_Store_Private(me, config);
 }
 
 
@@ -383,7 +383,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 		if (logNum == 0)
 		{
 			// Check if log-to-process available
-			if (AlxLogger_IsLogAvailable(md.read.id, md.write.id) == false)
+			if (AlxLogger_Log_AreLogsAvailable(md.read.id, md.write.id) == false)
 			{
 				// Update
 				if (mdUpdate)
@@ -525,7 +525,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 			status = Alx_Ok;
 			break;
 		}
-		else if (AlxLogger_IsLogAvailable(md.read.id, md.write.id) == false)
+		else if (AlxLogger_Log_AreLogsAvailable(md.read.id, md.write.id) == false)
 		{
 			// Close
 			status = AlxFs_File_Close(me->alxFs, &file);
@@ -627,7 +627,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		}
 
 		// Set writeLen
-		writeLen = AlxLogger_GetNumOfLogsEndPosition(me, (void*)logs + writeLenTotal, numOfLogsToWrite);
+		writeLen = AlxLogger_Log_GetLogsEndPosition(me, (void*)logs + writeLenTotal, numOfLogsToWrite);
 
 
 		//------------------------------------------------------------------------------
@@ -753,7 +753,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		//------------------------------------------------------------------------------
 		if (wereOldestReadLogsDiscarded)	// If oldest read logs were discared, store read & write & oldest
 		{
-			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
+			status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
 			if (status != Alx_Ok)
 			{
 				ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
@@ -762,7 +762,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		}
 		else if (me->md.write.file == 0)	// If new dir, store write & oldest
 		{
-			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_WriteOldest);
+			status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_WriteOldest);
 			if (status != Alx_Ok)
 			{
 				ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
@@ -771,7 +771,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		}
 		else if (me->md.write.log == 0)	// If new file, store write only
 		{
-			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_Write);
+			status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_Write);
 			if (status != Alx_Ok)
 			{
 				ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
@@ -819,7 +819,7 @@ uint64_t AlxLogger_Log_GetNumOfLogsStored(AlxLogger* me)
 	// isInit -> Don't care
 
 	// Return
-	return AlxLogger_GetNumOfLogs_Private(me->md.oldest.id, me->md.write.id);
+	return AlxLogger_Log_GetNumOfLogs(me->md.oldest.id, me->md.write.id);
 }
 uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me)
 {
@@ -828,7 +828,7 @@ uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me)
 	// isInit -> Don't care
 
 	// Return
-	return AlxLogger_GetNumOfLogs_Private(me->md.read.id, me->md.write.id);
+	return AlxLogger_Log_GetNumOfLogs(me->md.read.id, me->md.write.id);
 }
 Alx_Status AlxLogger_Log_GetIdStoredOldest(AlxLogger* me, uint64_t* idStoredOldest)
 {
@@ -837,8 +837,8 @@ Alx_Status AlxLogger_Log_GetIdStoredOldest(AlxLogger* me, uint64_t* idStoredOlde
 	// isInit -> Don't care
 
 	// Check
-	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
-	if (isLogAvailableStored == false)
+	bool areLogsAvailable = AlxLogger_Log_AreLogsAvailable(me->md.oldest.id, me->md.write.id);
+	if (areLogsAvailable == false)
 	{
 		*idStoredOldest = 0;
 		return Alx_Err;
@@ -855,8 +855,8 @@ Alx_Status AlxLogger_Log_GetIdStoredNewest(AlxLogger* me, uint64_t* idStoredNewe
 	// isInit -> Don't care
 
 	// Check
-	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
-	if (isLogAvailableStored == false)
+	bool areLogsAvailable = AlxLogger_Log_AreLogsAvailable(me->md.oldest.id, me->md.write.id);
+	if (areLogsAvailable == false)
 	{
 		*idStoredNewest = 0;
 		return Alx_Err;
@@ -886,7 +886,7 @@ Alx_Status AlxLogger_Log_DiscardLogsToProcess(AlxLogger* me)
 	me->md.read.dir = me->mdStored.write.dir;
 
 	// Return
-	return AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
+	return AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
 }
 
 
@@ -1013,8 +1013,8 @@ Alx_Status AlxLogger_File_GetPathStoredOldest(AlxLogger* me, char* pathStoredOld
 	// isInit -> Don't care
 
 	// Check
-	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
-	if (isLogAvailableStored == false)
+	bool areLogsAvailable = AlxLogger_Log_AreLogsAvailable(me->md.oldest.id, me->md.write.id);
+	if (areLogsAvailable == false)
 	{
 		strcpy(pathStoredOldest, "");
 		return Alx_Err;
@@ -1035,8 +1035,8 @@ Alx_Status AlxLogger_File_GetPathStoredNewest(AlxLogger* me, char* pathStoredNew
 	// isInit -> Don't care
 
 	// Check
-	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
-	if (isLogAvailableStored == false)
+	bool areLogsAvailable = AlxLogger_Log_AreLogsAvailable(me->md.oldest.id, me->md.write.id);
+	if (areLogsAvailable == false)
 	{
 		strcpy(pathStoredNewest, "");
 		return Alx_Err;
@@ -1071,7 +1071,7 @@ Alx_Status AlxLogger_File_RewindLogsToProcess(AlxLogger* me, uint32_t numOfFiles
 	// me->md.read.dir	// Don't need to change
 
 	// Return
-	return AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_Read);
+	return AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_Read);
 }
 Alx_Status AlxLogger_File_ForwardLogsToProcess(AlxLogger* me, uint32_t numOfFiles)
 {
@@ -1116,7 +1116,7 @@ Alx_Status AlxLogger_File_ForwardLogsToProcess(AlxLogger* me, uint32_t numOfFile
 	//------------------------------------------------------------------------------
 	// Store Metadata
 	//------------------------------------------------------------------------------
-	Alx_Status status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_Read);
+	Alx_Status status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_Read);
 
 
 	//------------------------------------------------------------------------------
@@ -1159,7 +1159,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		}
 
 		// Load metadata
-		status = AlxLogger_LoadMetadata(me);
+		status = AlxLogger_Metadata_Load(me);
 		if (status != Alx_Ok)
 		{
 			ALX_LOGGER_TRACE_WRN("Err: %d", status);
@@ -1210,7 +1210,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		}
 
 		// Store metadata
-		status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
+		status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
 		if (status != Alx_Ok)
 		{
 			ALX_LOGGER_TRACE_WRN("Err: %d", status);
@@ -1286,7 +1286,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 	}
 
 	// Store default metadata
-	status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_Default);
+	status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_Default);
 	if (status != Alx_Ok)
 	{
 		ALX_LOGGER_TRACE_WRN("Err: %d", status);
@@ -1601,7 +1601,7 @@ static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me)
 //------------------------------------------------------------------------------
 // Metadata
 //------------------------------------------------------------------------------
-static Alx_Status AlxLogger_LoadMetadata(AlxLogger* me)
+static Alx_Status AlxLogger_Metadata_Load(AlxLogger* me)
 {
 	//------------------------------------------------------------------------------
 	// Local Variables
@@ -1716,7 +1716,7 @@ static Alx_Status AlxLogger_LoadMetadata(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
-static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Metadata_StoreConfig config)
+static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Metadata_StoreConfig config)
 {
 	//------------------------------------------------------------------------------
 	// Local Variables
@@ -1917,10 +1917,10 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Metad
 //------------------------------------------------------------------------------
 // Status
 //------------------------------------------------------------------------------
-static bool AlxLogger_IsLogAvailable(uint64_t idStart, uint64_t idEnd)
+static bool AlxLogger_Log_AreLogsAvailable(uint64_t idStart, uint64_t idEnd)
 {
 	// Get
-	uint64_t numOfLogs = AlxLogger_GetNumOfLogs_Private(idStart, idEnd);
+	uint64_t numOfLogs = AlxLogger_Log_GetNumOfLogs(idStart, idEnd);
 
 	// Return
 	if (numOfLogs > 0)
@@ -1932,7 +1932,7 @@ static bool AlxLogger_IsLogAvailable(uint64_t idStart, uint64_t idEnd)
 		return false;
 	}
 }
-static uint64_t AlxLogger_GetNumOfLogs_Private(uint64_t idStart, uint64_t idEnd)
+static uint64_t AlxLogger_Log_GetNumOfLogs(uint64_t idStart, uint64_t idEnd)
 {
 	// Calculate
 	ALX_LOGGER_ASSERT(idEnd >= idStart);
@@ -1941,7 +1941,7 @@ static uint64_t AlxLogger_GetNumOfLogs_Private(uint64_t idStart, uint64_t idEnd)
 	// Return
 	return numOfLogs;
 }
-static uint32_t AlxLogger_GetNumOfLogsEndPosition(AlxLogger* me, const char* logs, uint32_t numOfLogs)
+static uint32_t AlxLogger_Log_GetLogsEndPosition(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 {
 	// Local variables
 	const char* logsPtr = logs;
