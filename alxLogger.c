@@ -189,7 +189,7 @@ Alx_Status AlxLogger_Format(AlxLogger* me)
 //------------------------------------------------------------------------------
 // Metadata
 //------------------------------------------------------------------------------
-AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me)
+AlxLogger_Metadata AlxLogger_Metadata_GetCurrent(AlxLogger* me)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -198,7 +198,7 @@ AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me)
 	// Return
 	return me->md;
 }
-AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me)
+AlxLogger_Metadata AlxLogger_Metadata_GetStored(AlxLogger* me)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -207,7 +207,7 @@ AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me)
 	// Return
 	return me->mdStored;
 }
-Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config)
+Alx_Status AlxLogger_Metadata_Store(AlxLogger* me, AlxLogger_StoreMetadata_Config config)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -221,7 +221,7 @@ Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config
 //------------------------------------------------------------------------------
 // Debug
 //------------------------------------------------------------------------------
-AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me)
+AlxMath_Data AlxLogger_Debug_GetReadTime_ms(AlxLogger* me)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -230,7 +230,7 @@ AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me)
 	// Return
 	return me->alxMath_Data_ReadTime_ms;
 }
-AlxMath_Data AlxLogger_GetMath_Data_WriteTime_ms(AlxLogger* me)
+AlxMath_Data AlxLogger_Debug_GetWriteTime_ms(AlxLogger* me)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);

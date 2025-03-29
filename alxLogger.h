@@ -203,16 +203,16 @@ Alx_Status AlxLogger_Format(AlxLogger* me);
 //------------------------------------------------------------------------------
 // Metadata
 //------------------------------------------------------------------------------
-AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me);
-AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me);
-Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
+AlxLogger_Metadata AlxLogger_Metadata_GetCurrent(AlxLogger* me);
+AlxLogger_Metadata AlxLogger_Metadata_GetStored(AlxLogger* me);
+Alx_Status AlxLogger_Metadata_Store(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
 
 
 //------------------------------------------------------------------------------
 // Debug
 //------------------------------------------------------------------------------
-AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me);
-AlxMath_Data AlxLogger_GetMath_Data_WriteTime_ms(AlxLogger* me);
+AlxMath_Data AlxLogger_Debug_GetReadTime_ms(AlxLogger* me);
+AlxMath_Data AlxLogger_Debug_GetWriteTime_ms(AlxLogger* me);
 
 
 
