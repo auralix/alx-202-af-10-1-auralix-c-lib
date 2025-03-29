@@ -234,8 +234,8 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 //------------------------------------------------------------------------------
 // Status
 //------------------------------------------------------------------------------
-uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me);
 uint64_t AlxLogger_Log_GetNumOfLogsStored(AlxLogger* me);
+uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me);
 Alx_Status AlxLogger_Log_GetIdStoredOldest(AlxLogger* me, uint64_t* idStoredOldest);
 Alx_Status AlxLogger_Log_GetIdStoredNewest(AlxLogger* me, uint64_t* idStoredNewest);
 

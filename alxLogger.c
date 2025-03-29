@@ -797,15 +797,6 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 //------------------------------------------------------------------------------
 // Status
 //------------------------------------------------------------------------------
-uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Return
-	return AlxLogger_GetNumOfLogs_Private(me->md.read.id, me->md.write.id);
-}
 uint64_t AlxLogger_Log_GetNumOfLogsStored(AlxLogger* me)
 {
 	// Assert
@@ -814,6 +805,15 @@ uint64_t AlxLogger_Log_GetNumOfLogsStored(AlxLogger* me)
 
 	// Return
 	return AlxLogger_GetNumOfLogs_Private(me->md.oldest.id, me->md.write.id);
+}
+uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Return
+	return AlxLogger_GetNumOfLogs_Private(me->md.read.id, me->md.write.id);
 }
 Alx_Status AlxLogger_Log_GetIdStoredOldest(AlxLogger* me, uint64_t* idStoredOldest)
 {
