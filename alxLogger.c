@@ -797,7 +797,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 //------------------------------------------------------------------------------
 // Status
 //------------------------------------------------------------------------------
-uint64_t AlxLogger_GetNumOfLogsToProcess(AlxLogger* me)
+uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -806,7 +806,7 @@ uint64_t AlxLogger_GetNumOfLogsToProcess(AlxLogger* me)
 	// Return
 	return AlxLogger_GetNumOfLogs_Private(me->md.read.id, me->md.write.id);
 }
-uint64_t AlxLogger_GetNumOfLogsStored(AlxLogger* me)
+uint64_t AlxLogger_Log_GetNumOfLogsStored(AlxLogger* me)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -815,7 +815,7 @@ uint64_t AlxLogger_GetNumOfLogsStored(AlxLogger* me)
 	// Return
 	return AlxLogger_GetNumOfLogs_Private(me->md.oldest.id, me->md.write.id);
 }
-Alx_Status AlxLogger_GetIdOldest(AlxLogger* me, uint64_t* idOldest)
+Alx_Status AlxLogger_Log_GetIdOldest(AlxLogger* me, uint64_t* idOldest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -833,7 +833,7 @@ Alx_Status AlxLogger_GetIdOldest(AlxLogger* me, uint64_t* idOldest)
 	*idOldest = me->md.oldest.id;
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_GetIdNewest(AlxLogger* me, uint64_t* idNewest)
+Alx_Status AlxLogger_Log_GetIdNewest(AlxLogger* me, uint64_t* idNewest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -856,7 +856,7 @@ Alx_Status AlxLogger_GetIdNewest(AlxLogger* me, uint64_t* idNewest)
 //------------------------------------------------------------------------------
 // Management
 //------------------------------------------------------------------------------
-Alx_Status AlxLogger_DiscardLogsToProcess(AlxLogger* me)
+Alx_Status AlxLogger_Log_DiscardLogsToProcess(AlxLogger* me)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
