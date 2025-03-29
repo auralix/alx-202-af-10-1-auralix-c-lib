@@ -844,6 +844,57 @@ Alx_Status AlxLogger_RewindLogsToProcessFiles(AlxLogger* me, uint32_t numOfFiles
 	// Return
 	return AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreRead);
 }
+Alx_Status AlxLogger_ForwardLogsToProcessFiles(AlxLogger* me, uint32_t numOfFiles)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	ALX_LOGGER_ASSERT(me->isInit == true);
+	ALX_LOGGER_ASSERT(numOfFiles == 1);		// Currently only supported forwarding for 1 file
+
+
+	//------------------------------------------------------------------------------
+	// Forward
+	//------------------------------------------------------------------------------
+
+	// read.id
+	me->md.read.id = me->md.read.id + me->numOfLogsPerFile;
+
+	// read.pos
+	me->md.read.pos = 0;
+
+	// read.line
+	me->md.read.line = 0;
+
+	// read.file
+	me->md.read.file++;
+	if (me->md.read.file >= me->numOfFilesPerDir)
+	{
+		// Reset
+		me->md.read.file = 0;
+
+		// read.dir
+		me->md.read.dir++;
+		if (me->md.read.dir >= me->numOfDir)
+		{
+			// Reset
+			me->md.read.dir = 0;
+		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Store Metadata
+	//------------------------------------------------------------------------------
+	Alx_Status status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreRead);
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return status;
+}
 uint64_t AlxLogger_GetNumOfLogsToProcess(AlxLogger* me)
 {
 	// Assert
