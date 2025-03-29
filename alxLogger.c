@@ -1788,7 +1788,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 
 		mdTemp.read.id			= 0;
 		mdTemp.read.pos			= 0;
-		mdTemp.read.log		= 0;
+		mdTemp.read.log			= 0;
 		mdTemp.read.file		= 0;
 		mdTemp.read.dir			= 0;
 
@@ -1811,7 +1811,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 
 		mdTemp.read.id			= me->md.read.id;
 		mdTemp.read.pos			= me->md.read.pos;
-		mdTemp.read.log		= me->md.read.log;
+		mdTemp.read.log			= me->md.read.log;
 		mdTemp.read.file		= me->md.read.file;
 		mdTemp.read.dir			= me->md.read.dir;
 
@@ -1834,7 +1834,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 
 		mdTemp.read.id			= me->md.read.id;
 		mdTemp.read.pos			= me->md.read.pos;
-		mdTemp.read.log		= me->md.read.log;
+		mdTemp.read.log			= me->md.read.log;
 		mdTemp.read.file		= me->md.read.file;
 		mdTemp.read.dir			= me->md.read.dir;
 
@@ -1857,7 +1857,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 
 		mdTemp.read.id			= me->mdStored.read.id;
 		mdTemp.read.pos			= me->mdStored.read.pos;
-		mdTemp.read.log		= me->mdStored.read.log;
+		mdTemp.read.log			= me->mdStored.read.log;
 		mdTemp.read.file		= me->mdStored.read.file;
 		mdTemp.read.dir			= me->mdStored.read.dir;
 
@@ -1880,7 +1880,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 
 		mdTemp.read.id			= me->mdStored.read.id;
 		mdTemp.read.pos			= me->mdStored.read.pos;
-		mdTemp.read.log		= me->mdStored.read.log;
+		mdTemp.read.log			= me->mdStored.read.log;
 		mdTemp.read.file		= me->mdStored.read.file;
 		mdTemp.read.dir			= me->mdStored.read.dir;
 
