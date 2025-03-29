@@ -253,7 +253,7 @@ AlxMath_Data AlxLogger_Debug_GetWriteTime_ms(AlxLogger* me)
 //------------------------------------------------------------------------------
 // Read/Write
 //------------------------------------------------------------------------------
-Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual, bool mdUpdate, uint64_t idStart)
+Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual, bool mdUpdate, uint64_t idStart)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -543,7 +543,7 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 	*numOfLogsActual = logNum;
 	return status;
 }
-Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
+Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -887,7 +887,7 @@ Alx_Status AlxLogger_DiscardLogsToProcess(AlxLogger* me)
 //------------------------------------------------------------------------------
 // Read/Write
 //------------------------------------------------------------------------------
-Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual))
+Alx_Status AlxLogger_File_Read(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual))
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -897,7 +897,7 @@ Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint8_t* chunkBuf
 	uint32_t readLen = 0;
 	return AlxFs_File_ReadInChunks(me->alxFs, path, chunkBuff, chunkLen, chunkRead_Callback, &readLen, NULL);
 }
-Alx_Status AlxLogger_ReadFileFirstLine(AlxLogger* me, const char* path, char* log)
+Alx_Status AlxLogger_File_ReadFirstLine(AlxLogger* me, const char* path, char* log)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
