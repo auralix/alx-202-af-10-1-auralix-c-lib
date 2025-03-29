@@ -266,8 +266,10 @@ Alx_Status AlxLogger_File_ReadFirstLog(AlxLogger* me, const char* path, char* lo
 // Status
 //------------------------------------------------------------------------------
 Alx_Status AlxLogger_File_GetSize(AlxLogger* me, const char* path, uint32_t* size);
+uint32_t AlxLogger_File_GetNumOfFilesToProcess(AlxLogger* me);
 Alx_Status AlxLogger_File_GetPathStoredOldest(AlxLogger* me, char* pathStoredOldest);
 Alx_Status AlxLogger_File_GetPathStoredNewest(AlxLogger* me, char* pathStoredNewest);
+Alx_Status AlxLogger_File_GetPathToProcessOldest(AlxLogger* me, char* pathToProcessOldest);
 
 
 //------------------------------------------------------------------------------

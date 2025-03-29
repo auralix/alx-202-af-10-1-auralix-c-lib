@@ -818,8 +818,11 @@ uint64_t AlxLogger_Log_GetNumOfLogsStored(AlxLogger* me)
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
 	// isInit -> Don't care
 
+	// Get
+	uint64_t numOfLogsStored = AlxLogger_Log_GetNumOfLogs(me->md.oldest.id, me->md.write.id);
+
 	// Return
-	return AlxLogger_Log_GetNumOfLogs(me->md.oldest.id, me->md.write.id);
+	return numOfLogsStored;
 }
 uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me)
 {
@@ -827,8 +830,11 @@ uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me)
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
 	// isInit -> Don't care
 
+	// Get
+	uint64_t numOfLogsToProcess = AlxLogger_Log_GetNumOfLogs(me->md.read.id, me->md.write.id);
+
 	// Return
-	return AlxLogger_Log_GetNumOfLogs(me->md.read.id, me->md.write.id);
+	return numOfLogsToProcess;
 }
 Alx_Status AlxLogger_Log_GetIdStoredOldest(AlxLogger* me, uint64_t* idStoredOldest)
 {
@@ -1006,6 +1012,21 @@ Alx_Status AlxLogger_File_GetSize(AlxLogger* me, const char* path, uint32_t* siz
 	// Return
 	return Alx_Ok;
 }
+uint32_t AlxLogger_File_GetNumOfFilesToProcess(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Get
+	uint64_t numOfLogsToProcess = AlxLogger_Log_GetNumOfLogs(me->md.read.id, me->md.write.id);
+
+	// Set
+	uint64_t numOfFilesToProcess = numOfLogsToProcess / me->numOfLogsPerFile;
+
+	// Return
+	return numOfFilesToProcess;
+}
 Alx_Status AlxLogger_File_GetPathStoredOldest(AlxLogger* me, char* pathStoredOldest)
 {
 	// Assert
@@ -1049,6 +1070,28 @@ Alx_Status AlxLogger_File_GetPathStoredNewest(AlxLogger* me, char* pathStoredNew
 
 	// Return
 	sprintf(pathStoredNewest, "/%lu/%lu.csv", dirNewest, fileNewest);
+	return Alx_Ok;
+}
+Alx_Status AlxLogger_File_GetPathToProcessOldest(AlxLogger* me, char* pathToProcessOldest)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Check
+	bool areLogsAvailable = AlxLogger_Log_AreLogsAvailable(me->md.read.id, me->md.write.id);
+	if (areLogsAvailable == false)
+	{
+		strcpy(pathToProcessOldest, "");
+		return Alx_Err;
+	}
+
+	// Prepare
+	uint32_t fileOldest = me->md.read.file;
+	uint32_t dirOldest = me->md.read.dir;
+
+	// Return
+	sprintf(pathToProcessOldest, "/%lu/%lu.csv", dirOldest, fileOldest);
 	return Alx_Ok;
 }
 
