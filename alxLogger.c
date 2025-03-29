@@ -277,7 +277,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 	uint32_t readTime_ms = 0;
 	AlxLogger_Metadata md = {};
 	char log[ALX_LOGGER_LOG_LEN_MAX] = "";
-	uint32_t readLine = 0;
+	uint32_t readLog = 0;
 
 
 	//------------------------------------------------------------------------------
@@ -291,7 +291,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 		//------------------------------------------------------------------------------
 		md.read.id = idStart;
 		md.read.pos = 0;
-		md.read.line = (idStart % me->numOfLogsPerDirTotal) % me->numOfLogsPerFile;
+		md.read.log = (idStart % me->numOfLogsPerDirTotal) % me->numOfLogsPerFile;
 		md.read.file = (idStart % me->numOfLogsPerDirTotal) / me->numOfLogsPerFile;
 		md.read.dir = (idStart / me->numOfLogsPerDirTotal) % me->numOfDir;
 
@@ -299,7 +299,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 		//------------------------------------------------------------------------------
 		// Set read.pos via File Reading
 		//------------------------------------------------------------------------------
-		if (md.read.pos != md.read.line)
+		if (md.read.pos != md.read.log)
 		{
 			// Open
 			sprintf(path, "/%lu/%lu.csv", md.read.dir, md.read.file);
@@ -317,7 +317,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 				status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLen);
 				if (status != Alx_Ok)
 				{
-					ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, readLen=%u, readLenTotal=%u, readLine=%u", status, path, readLen, readLenTotal, readLine);
+					ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, readLen=%u, readLenTotal=%u, readLog=%u", status, path, readLen, readLenTotal, readLog);
 					Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 					if (statusClose != Alx_Ok)
 					{
@@ -327,18 +327,18 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 					return status;
 				}
 
-				// Increment readLine, readLenTotal
-				readLine++;
+				// Increment readLog, readLenTotal
+				readLog++;
 				readLenTotal = readLenTotal + readLen;
 
-				// If read.line reached
-				if (readLine == md.read.line)
+				// If read.log reached
+				if (readLog == md.read.log)
 				{
 					// Close
 					status = AlxFs_File_Close(me->alxFs, &file);
 					if (status != Alx_Ok)
 					{
-						ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, readLenTotal=%u, readLine=%u", status, path, readLenTotal, readLine);
+						ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, readLenTotal=%u, readLog=%u", status, path, readLenTotal, readLog);
 						// TV: TODO - Handle close error
 						return status;
 					}
@@ -363,7 +363,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 	while (true)
 	{
 		//------------------------------------------------------------------------------
-		// Handle First Log & First Line
+		// Handle First Log & First Log in File
 		//------------------------------------------------------------------------------
 		if (logNum == 0)
 		{
@@ -404,7 +404,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 				return status;
 			}
 		}
-		else if (md.read.line == 0)
+		else if (md.read.log == 0)
 		{
 			// Close existing file
 			status = AlxFs_File_Close(me->alxFs, &file);
@@ -453,13 +453,13 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 		// read.pos
 		md.read.pos = md.read.pos + readLen;
 
-		// read.line
-		md.read.line++;
-		if (md.read.line >= me->numOfLogsPerFile)
+		// read.log
+		md.read.log++;
+		if (md.read.log >= me->numOfLogsPerFile)
 		{
 			// Reset
 			md.read.pos = 0;
-			md.read.line = 0;
+			md.read.log = 0;
 
 			// read.file
 			md.read.file++;
@@ -598,7 +598,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		ALX_LOGGER_ASSERT(numOfLogsToWriteRemaining > 0);
 
 		// Set numOfLogsSpacePerFileRemaining
-		numOfLogsSpacePerFileRemaining = (int64_t)me->numOfLogsPerFile - (int64_t)me->md.write.line;
+		numOfLogsSpacePerFileRemaining = (int64_t)me->numOfLogsPerFile - (int64_t)me->md.write.log;
 		ALX_LOGGER_ASSERT(numOfLogsSpacePerFileRemaining > 0);
 
 		// If enough space in current file, just write all remaining logs to current file, Else write as many as possible logs in current file
@@ -654,13 +654,13 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		// write.pos
 		me->md.write.pos = me->md.write.pos + writeLen;
 
-		// write.line
-		me->md.write.line = me->md.write.line + numOfLogsToWrite;
-		if (me->md.write.line >= me->numOfLogsPerFile)
+		// write.log
+		me->md.write.log = me->md.write.log + numOfLogsToWrite;
+		if (me->md.write.log >= me->numOfLogsPerFile)
 		{
 			// Reset
 			me->md.write.pos = 0;
-			me->md.write.line = 0;
+			me->md.write.log = 0;
 
 			// write.file
 			me->md.write.file++;
@@ -687,7 +687,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 
 					// Reset
 					me->md.read.pos = 0;
-					me->md.read.line = 0;
+					me->md.read.log = 0;
 					me->md.read.file = 0;
 
 					// read.dir
@@ -710,7 +710,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 
 					// Reset
 					me->md.oldest.pos = 0;
-					me->md.oldest.line = 0;
+					me->md.oldest.log = 0;
 					me->md.oldest.file = 0;
 
 					// oldest.dir
@@ -754,7 +754,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 				return status;
 			}
 		}
-		else if (me->md.write.line == 0)	// If new file, store write only
+		else if (me->md.write.log == 0)	// If new file, store write only
 		{
 			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreWrite);
 			if (status != Alx_Ok)
@@ -866,7 +866,7 @@ Alx_Status AlxLogger_Log_DiscardLogsToProcess(AlxLogger* me)
 	me->md = me->mdStored;
 	me->md.read.id = me->mdStored.write.id;
 	me->md.read.pos = me->mdStored.write.pos;
-	me->md.read.line = me->mdStored.write.line;
+	me->md.read.log = me->mdStored.write.log;
 	me->md.read.file = me->mdStored.write.file;
 	me->md.read.dir = me->mdStored.write.dir;
 
@@ -1049,9 +1049,9 @@ Alx_Status AlxLogger_File_RewindLogsToProcess(AlxLogger* me, uint32_t numOfFiles
 	ALX_LOGGER_ASSERT(numOfFiles == 0);		// Currently only supported rewind of existing file
 
 	// Rewind
-	me->md.read.id = me->md.read.id - me->md.read.line;
+	me->md.read.id = me->md.read.id - me->md.read.log;
 	me->md.read.pos = 0;
-	me->md.read.line = 0;
+	me->md.read.log = 0;
 	// me->md.read.file	// Don't need to change
 	// me->md.read.dir	// Don't need to change
 
@@ -1078,8 +1078,8 @@ Alx_Status AlxLogger_File_ForwardLogsToProcess(AlxLogger* me, uint32_t numOfFile
 	// read.pos
 	me->md.read.pos = 0;
 
-	// read.line
-	me->md.read.line = 0;
+	// read.log
+	me->md.read.log = 0;
 
 	// read.file
 	me->md.read.file++;
@@ -1161,21 +1161,21 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		AlxGlobal_Ulltoa(me->md.read.id, str);
 		ALX_LOGGER_TRACE_INF("- read.id = %s", str);
 		ALX_LOGGER_TRACE_INF("- read.pos = %lu", me->md.read.pos);
-		ALX_LOGGER_TRACE_INF("- read.line = %lu", me->md.read.line);
+		ALX_LOGGER_TRACE_INF("- read.log = %lu", me->md.read.log);
 		ALX_LOGGER_TRACE_INF("- read.file = %lu", me->md.read.file);
 		ALX_LOGGER_TRACE_INF("- read.dir = %lu", me->md.read.dir);
 
 		AlxGlobal_Ulltoa(me->md.write.id, str);
 		ALX_LOGGER_TRACE_INF("- write.id = %s", str);
 		ALX_LOGGER_TRACE_INF("- write.pos = %lu", me->md.write.pos);
-		ALX_LOGGER_TRACE_INF("- write.line = %lu", me->md.write.line);
+		ALX_LOGGER_TRACE_INF("- write.log = %lu", me->md.write.log);
 		ALX_LOGGER_TRACE_INF("- write.file = %lu", me->md.write.file);
 		ALX_LOGGER_TRACE_INF("- write.dir = %lu", me->md.write.dir);
 
 		AlxGlobal_Ulltoa(me->md.oldest.id, str);
 		ALX_LOGGER_TRACE_INF("- oldest.id = %s", str);
 		ALX_LOGGER_TRACE_INF("- oldest.pos = %lu", me->md.oldest.pos);
-		ALX_LOGGER_TRACE_INF("- oldest.line = %lu", me->md.oldest.line);
+		ALX_LOGGER_TRACE_INF("- oldest.log = %lu", me->md.oldest.log);
 		ALX_LOGGER_TRACE_INF("- oldest.file = %lu", me->md.oldest.file);
 		ALX_LOGGER_TRACE_INF("- oldest.dir = %lu", me->md.oldest.dir);
 
@@ -1209,21 +1209,21 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		AlxGlobal_Ulltoa(me->md.read.id, str);
 		ALX_LOGGER_TRACE_INF("- read.id = %s", str);
 		ALX_LOGGER_TRACE_INF("- read.pos = %lu", me->md.read.pos);
-		ALX_LOGGER_TRACE_INF("- read.line = %lu", me->md.read.line);
+		ALX_LOGGER_TRACE_INF("- read.log = %lu", me->md.read.log);
 		ALX_LOGGER_TRACE_INF("- read.file = %lu", me->md.read.file);
 		ALX_LOGGER_TRACE_INF("- read.dir = %lu", me->md.read.dir);
 
 		AlxGlobal_Ulltoa(me->md.write.id, str);
 		ALX_LOGGER_TRACE_INF("- write.id = %s", str);
 		ALX_LOGGER_TRACE_INF("- write.pos = %lu", me->md.write.pos);
-		ALX_LOGGER_TRACE_INF("- write.line = %lu", me->md.write.line);
+		ALX_LOGGER_TRACE_INF("- write.log = %lu", me->md.write.log);
 		ALX_LOGGER_TRACE_INF("- write.file = %lu", me->md.write.file);
 		ALX_LOGGER_TRACE_INF("- write.dir = %lu", me->md.write.dir);
 
 		AlxGlobal_Ulltoa(me->md.oldest.id, str);
 		ALX_LOGGER_TRACE_INF("- oldest.id = %s", str);
 		ALX_LOGGER_TRACE_INF("- oldest.pos = %lu", me->md.oldest.pos);
-		ALX_LOGGER_TRACE_INF("- oldest.line = %lu", me->md.oldest.line);
+		ALX_LOGGER_TRACE_INF("- oldest.log = %lu", me->md.oldest.log);
 		ALX_LOGGER_TRACE_INF("- oldest.file = %lu", me->md.oldest.file);
 		ALX_LOGGER_TRACE_INF("- oldest.dir = %lu", me->md.oldest.dir);
 
@@ -1426,19 +1426,19 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 
 		mdTemp.read.id			= 0;
 		mdTemp.read.pos			= 0;
-		mdTemp.read.line		= 0;
+		mdTemp.read.log		= 0;
 		mdTemp.read.file		= 0;
 		mdTemp.read.dir			= 0;
 
 		mdTemp.write.id			= 0;
 		mdTemp.write.pos		= 0;
-		mdTemp.write.line		= 0;
+		mdTemp.write.log		= 0;
 		mdTemp.write.file		= 0;
 		mdTemp.write.dir		= 0;
 
 		mdTemp.oldest.id		= 0;
 		mdTemp.oldest.pos		= 0;
-		mdTemp.oldest.line		= 0;
+		mdTemp.oldest.log		= 0;
 		mdTemp.oldest.file		= 0;
 		mdTemp.oldest.dir		= 0;
 	}
@@ -1449,19 +1449,19 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 
 		mdTemp.read.id			= me->md.read.id;
 		mdTemp.read.pos			= me->md.read.pos;
-		mdTemp.read.line		= me->md.read.line;
+		mdTemp.read.log		= me->md.read.log;
 		mdTemp.read.file		= me->md.read.file;
 		mdTemp.read.dir			= me->md.read.dir;
 
 		mdTemp.write.id			= me->md.write.id;
 		mdTemp.write.pos		= me->md.write.pos;
-		mdTemp.write.line		= me->md.write.line;
+		mdTemp.write.log		= me->md.write.log;
 		mdTemp.write.file		= me->md.write.file;
 		mdTemp.write.dir		= me->md.write.dir;
 
 		mdTemp.oldest.id		= me->md.oldest.id;
 		mdTemp.oldest.pos		= me->md.oldest.pos;
-		mdTemp.oldest.line		= me->md.oldest.line;
+		mdTemp.oldest.log		= me->md.oldest.log;
 		mdTemp.oldest.file		= me->md.oldest.file;
 		mdTemp.oldest.dir		= me->md.oldest.dir;
 	}
@@ -1472,19 +1472,19 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 
 		mdTemp.read.id			= me->md.read.id;
 		mdTemp.read.pos			= me->md.read.pos;
-		mdTemp.read.line		= me->md.read.line;
+		mdTemp.read.log		= me->md.read.log;
 		mdTemp.read.file		= me->md.read.file;
 		mdTemp.read.dir			= me->md.read.dir;
 
 		mdTemp.write.id			= me->mdStored.write.id;
 		mdTemp.write.pos		= me->mdStored.write.pos;
-		mdTemp.write.line		= me->mdStored.write.line;
+		mdTemp.write.log		= me->mdStored.write.log;
 		mdTemp.write.file		= me->mdStored.write.file;
 		mdTemp.write.dir		= me->mdStored.write.dir;
 
 		mdTemp.oldest.id		= me->mdStored.oldest.id;
 		mdTemp.oldest.pos		= me->mdStored.oldest.pos;
-		mdTemp.oldest.line		= me->mdStored.oldest.line;
+		mdTemp.oldest.log		= me->mdStored.oldest.log;
 		mdTemp.oldest.file		= me->mdStored.oldest.file;
 		mdTemp.oldest.dir		= me->mdStored.oldest.dir;
 	}
@@ -1495,19 +1495,19 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 
 		mdTemp.read.id			= me->mdStored.read.id;
 		mdTemp.read.pos			= me->mdStored.read.pos;
-		mdTemp.read.line		= me->mdStored.read.line;
+		mdTemp.read.log		= me->mdStored.read.log;
 		mdTemp.read.file		= me->mdStored.read.file;
 		mdTemp.read.dir			= me->mdStored.read.dir;
 
 		mdTemp.write.id			= me->md.write.id;
 		mdTemp.write.pos		= me->md.write.pos;
-		mdTemp.write.line		= me->md.write.line;
+		mdTemp.write.log		= me->md.write.log;
 		mdTemp.write.file		= me->md.write.file;
 		mdTemp.write.dir		= me->md.write.dir;
 
 		mdTemp.oldest.id		= me->mdStored.oldest.id;
 		mdTemp.oldest.pos		= me->mdStored.oldest.pos;
-		mdTemp.oldest.line		= me->mdStored.oldest.line;
+		mdTemp.oldest.log		= me->mdStored.oldest.log;
 		mdTemp.oldest.file		= me->mdStored.oldest.file;
 		mdTemp.oldest.dir		= me->mdStored.oldest.dir;
 	}
@@ -1518,19 +1518,19 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 
 		mdTemp.read.id			= me->mdStored.read.id;
 		mdTemp.read.pos			= me->mdStored.read.pos;
-		mdTemp.read.line		= me->mdStored.read.line;
+		mdTemp.read.log		= me->mdStored.read.log;
 		mdTemp.read.file		= me->mdStored.read.file;
 		mdTemp.read.dir			= me->mdStored.read.dir;
 
 		mdTemp.write.id			= me->md.write.id;
 		mdTemp.write.pos		= me->md.write.pos;
-		mdTemp.write.line		= me->md.write.line;
+		mdTemp.write.log		= me->md.write.log;
 		mdTemp.write.file		= me->md.write.file;
 		mdTemp.write.dir		= me->md.write.dir;
 
 		mdTemp.oldest.id		= me->md.oldest.id;
 		mdTemp.oldest.pos		= me->md.oldest.pos;
-		mdTemp.oldest.line		= me->md.oldest.line;
+		mdTemp.oldest.log		= me->md.oldest.log;
 		mdTemp.oldest.file		= me->md.oldest.file;
 		mdTemp.oldest.dir		= me->md.oldest.dir;
 	}
@@ -1722,10 +1722,10 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 	ALX_LOGGER_TRACE_INF("AlxLogger - Check/Repair current write_file started");
 	ALX_LOGGER_TRACE_INF
 	(
-		"Address START - dir = %lu, file = %lu, line = %lu, pos = %lu, id = %lu",
+		"Address START - dir = %lu, file = %lu, log = %lu, pos = %lu, id = %lu",
 		me->md.write.dir,
 		me->md.write.file,
-		me->md.write.line,
+		me->md.write.log,
 		me->md.write.pos,
 		(uint32_t)me->md.write.id
 	);
@@ -1806,15 +1806,15 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 		}
 
 		// Trace
-		if (me->md.write.line % 1000 == 0)
+		if (me->md.write.log % 1000 == 0)
 		{
-			ALX_LOGGER_TRACE_FORMAT("[%lu] %s", me->md.write.line, log);
+			ALX_LOGGER_TRACE_FORMAT("[%lu] %s", me->md.write.log, log);
 		}
 
 		// Increment addr
 		me->md.write.id++;
 		me->md.write.pos = me->md.write.pos + readLenActual;
-		me->md.write.line++;
+		me->md.write.log++;
 	}
 
 
@@ -1833,10 +1833,10 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	ALX_LOGGER_TRACE_INF
 	(
-		"Address END - dir = %lu, file = %lu, line = %lu, pos = %lu, id = %lu",
+		"Address END - dir = %lu, file = %lu, log = %lu, pos = %lu, id = %lu",
 		me->md.write.dir,
 		me->md.write.file,
-		me->md.write.line,
+		me->md.write.log,
 		me->md.write.pos,
 		(uint32_t)me->md.write.id
 	);

@@ -99,7 +99,7 @@ typedef struct __attribute__((packed))
 {
 	uint64_t id;
 	uint32_t pos;
-	uint32_t line;
+	uint32_t log;
 	uint32_t file;
 	uint32_t dir;
 } AlxLogger_Metadata_Id;
