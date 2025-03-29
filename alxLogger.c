@@ -947,7 +947,7 @@ Alx_Status AlxLogger_File_ReadFirstLog(AlxLogger* me, const char* path, char* lo
 //------------------------------------------------------------------------------
 // Status
 //------------------------------------------------------------------------------
-Alx_Status AlxLogger_GetFileSize(AlxLogger* me, const char* path, uint32_t* fileSize)
+Alx_Status AlxLogger_File_GetSize(AlxLogger* me, const char* path, uint32_t* size)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -966,10 +966,10 @@ Alx_Status AlxLogger_GetFileSize(AlxLogger* me, const char* path, uint32_t* file
 	}
 
 	// Get fileSize
-	status = AlxFs_File_Size(me->alxFs, &file, fileSize);
+	status = AlxFs_File_Size(me->alxFs, &file, size);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u", status, path, fileSize);
+		ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u", status, path, size);
 		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 		if (statusClose != Alx_Ok)
 		{
@@ -991,7 +991,7 @@ Alx_Status AlxLogger_GetFileSize(AlxLogger* me, const char* path, uint32_t* file
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_GetFilePathOldest(AlxLogger* me, char* filePathOldest)
+Alx_Status AlxLogger_File_GetPathOldest(AlxLogger* me, char* pathOldest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -1001,7 +1001,7 @@ Alx_Status AlxLogger_GetFilePathOldest(AlxLogger* me, char* filePathOldest)
 	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
 	if (isLogAvailableStored == false)
 	{
-		strcpy(filePathOldest, "");
+		strcpy(pathOldest, "");
 		return Alx_Err;
 	}
 
@@ -1010,10 +1010,10 @@ Alx_Status AlxLogger_GetFilePathOldest(AlxLogger* me, char* filePathOldest)
 	uint32_t dirOldest = me->md.oldest.dir;
 
 	// Return
-	sprintf(filePathOldest, "/%lu/%lu.csv", dirOldest, fileOldest);
+	sprintf(pathOldest, "/%lu/%lu.csv", dirOldest, fileOldest);
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_GetFilePathNewest(AlxLogger* me, char* filePathNewest)
+Alx_Status AlxLogger_File_GetPathNewest(AlxLogger* me, char* pathNewest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -1023,7 +1023,7 @@ Alx_Status AlxLogger_GetFilePathNewest(AlxLogger* me, char* filePathNewest)
 	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
 	if (isLogAvailableStored == false)
 	{
-		strcpy(filePathNewest, "");
+		strcpy(pathNewest, "");
 		return Alx_Err;
 	}
 
@@ -1033,7 +1033,7 @@ Alx_Status AlxLogger_GetFilePathNewest(AlxLogger* me, char* filePathNewest)
 	uint32_t dirNewest = (idNewest / me->numOfLogsPerDirTotal) % me->numOfDir;
 
 	// Return
-	sprintf(filePathNewest, "/%lu/%lu.csv", dirNewest, fileNewest);
+	sprintf(pathNewest, "/%lu/%lu.csv", dirNewest, fileNewest);
 	return Alx_Ok;
 }
 
