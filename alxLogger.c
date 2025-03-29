@@ -104,6 +104,18 @@ void AlxLogger_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Setup
+//------------------------------------------------------------------------------
 Alx_Status AlxLogger_Init(AlxLogger* me)
 {
 	// Assert
@@ -172,6 +184,75 @@ Alx_Status AlxLogger_Format(AlxLogger* me)
 	// Return
 	return Alx_Ok;
 }
+
+
+//------------------------------------------------------------------------------
+// Metadata
+//------------------------------------------------------------------------------
+AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Return
+	return me->md;
+}
+AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Return
+	return me->mdStored;
+}
+Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	ALX_LOGGER_ASSERT(me->isInit == true);
+
+	// Return
+	return AlxLogger_StoreMetadata_Private(me, config);
+}
+
+
+//------------------------------------------------------------------------------
+// Debug
+//------------------------------------------------------------------------------
+AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Return
+	return me->alxMath_Data_ReadTime_ms;
+}
+AlxMath_Data AlxLogger_GetMath_Data_WriteTime_ms(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Return
+	return me->alxMath_Data_WriteTime_ms;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Log Level
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Read/Write
+//------------------------------------------------------------------------------
 Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual, bool mdUpdate, uint64_t idStart)
 {
 	//------------------------------------------------------------------------------
@@ -462,61 +543,6 @@ Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_
 	*numOfLogsActual = logNum;
 	return status;
 }
-Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual))
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	ALX_LOGGER_ASSERT(me->isInit == true);
-
-	// Return
-	uint32_t readLen = 0;
-	return AlxFs_File_ReadInChunks(me->alxFs, path, chunkBuff, chunkLen, chunkRead_Callback, &readLen, NULL);
-}
-Alx_Status AlxLogger_ReadFileFirstLine(AlxLogger* me, const char* path, char* log)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	ALX_LOGGER_ASSERT(me->isInit == true);
-
-	// Local variables
-	Alx_Status status = Alx_Err;
-	AlxFs_File file = {};
-	uint32_t readLen = 0;
-
-	// Open
-	status = AlxFs_File_Open(me->alxFs, &file, path, "r");
-	if (status != Alx_Ok)
-	{
-		ALX_FS_TRACE("Err: %d, path=%s", status, path);
-		return status;
-	}
-
-	// Read
-	status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLen);
-	if (status != Alx_Ok)
-	{
-		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, readLen=%u", status, path, readLen);
-		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
-		if (statusClose != Alx_Ok)
-		{
-			ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", statusClose, path);
-			// TV: TODO - Handle close error
-		}
-		return status;
-	}
-
-	// Close
-	status = AlxFs_File_Close(me->alxFs, &file);
-	if (status != Alx_Ok)
-	{
-		ALX_FS_TRACE("Err: %d, path=%s", status, path);
-		// TV: TODO - Handle close error
-		return status;
-	}
-
-	// Return
-	return Alx_Ok;
-}
 Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 {
 	//------------------------------------------------------------------------------
@@ -766,6 +792,161 @@ Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs)
 	//------------------------------------------------------------------------------
 	return status;
 }
+
+
+//------------------------------------------------------------------------------
+// Status
+//------------------------------------------------------------------------------
+uint64_t AlxLogger_GetNumOfLogsToProcess(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Return
+	return AlxLogger_GetNumOfLogs_Private(me->md.read.id, me->md.write.id);
+}
+uint64_t AlxLogger_GetNumOfLogsStored(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Return
+	return AlxLogger_GetNumOfLogs_Private(me->md.oldest.id, me->md.write.id);
+}
+Alx_Status AlxLogger_GetIdOldest(AlxLogger* me, uint64_t* idOldest)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Check
+	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
+	if (isLogAvailableStored == false)
+	{
+		*idOldest = 0;
+		return Alx_Err;
+	}
+
+	// Return
+	*idOldest = me->md.oldest.id;
+	return Alx_Ok;
+}
+Alx_Status AlxLogger_GetIdNewest(AlxLogger* me, uint64_t* idNewest)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Check
+	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
+	if (isLogAvailableStored == false)
+	{
+		*idNewest = 0;
+		return Alx_Err;
+	}
+
+	// Return
+	*idNewest = me->md.write.id - 1;
+	return Alx_Ok;
+}
+
+
+//------------------------------------------------------------------------------
+// Management
+//------------------------------------------------------------------------------
+Alx_Status AlxLogger_DiscardLogsToProcess(AlxLogger* me)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	ALX_LOGGER_ASSERT(me->isInit == true);
+
+	// Set metadata current read IDs to write IDs (discard logs-to-process)
+	me->md = me->mdStored;
+	me->md.read.id = me->mdStored.write.id;
+	me->md.read.pos = me->mdStored.write.pos;
+	me->md.read.line = me->mdStored.write.line;
+	me->md.read.file = me->mdStored.write.file;
+	me->md.read.dir = me->mdStored.write.dir;
+
+	// Return
+	return AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWriteOldest);
+}
+
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// File Level
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Read/Write
+//------------------------------------------------------------------------------
+Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual))
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	ALX_LOGGER_ASSERT(me->isInit == true);
+
+	// Return
+	uint32_t readLen = 0;
+	return AlxFs_File_ReadInChunks(me->alxFs, path, chunkBuff, chunkLen, chunkRead_Callback, &readLen, NULL);
+}
+Alx_Status AlxLogger_ReadFileFirstLine(AlxLogger* me, const char* path, char* log)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	ALX_LOGGER_ASSERT(me->isInit == true);
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+	AlxFs_File file = {};
+	uint32_t readLen = 0;
+
+	// Open
+	status = AlxFs_File_Open(me->alxFs, &file, path, "r");
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		return status;
+	}
+
+	// Read
+	status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLen);
+	if (status != Alx_Ok)
+	{
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, readLen=%u", status, path, readLen);
+		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
+		if (statusClose != Alx_Ok)
+		{
+			ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", statusClose, path);
+			// TV: TODO - Handle close error
+		}
+		return status;
+	}
+
+	// Close
+	status = AlxFs_File_Close(me->alxFs, &file);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		// TV: TODO - Handle close error
+		return status;
+	}
+
+	// Return
+	return Alx_Ok;
+}
+
+
+//------------------------------------------------------------------------------
+// Status
+//------------------------------------------------------------------------------
 Alx_Status AlxLogger_GetFileSize(AlxLogger* me, const char* path, uint32_t* fileSize)
 {
 	// Assert
@@ -810,23 +991,56 @@ Alx_Status AlxLogger_GetFileSize(AlxLogger* me, const char* path, uint32_t* file
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_DiscardLogsToProcess(AlxLogger* me)
+Alx_Status AlxLogger_GetFilePathOldest(AlxLogger* me, char* filePathOldest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	ALX_LOGGER_ASSERT(me->isInit == true);
+	// isInit -> Don't care
 
-	// Set metadata current read IDs to write IDs (discard logs-to-process)
-	me->md = me->mdStored;
-	me->md.read.id = me->mdStored.write.id;
-	me->md.read.pos = me->mdStored.write.pos;
-	me->md.read.line = me->mdStored.write.line;
-	me->md.read.file = me->mdStored.write.file;
-	me->md.read.dir = me->mdStored.write.dir;
+	// Check
+	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
+	if (isLogAvailableStored == false)
+	{
+		strcpy(filePathOldest, "");
+		return Alx_Err;
+	}
+
+	// Prepare
+	uint32_t fileOldest = me->md.oldest.file;
+	uint32_t dirOldest = me->md.oldest.dir;
 
 	// Return
-	return AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWriteOldest);
+	sprintf(filePathOldest, "/%lu/%lu.csv", dirOldest, fileOldest);
+	return Alx_Ok;
 }
+Alx_Status AlxLogger_GetFilePathNewest(AlxLogger* me, char* filePathNewest)
+{
+	// Assert
+	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
+	// isInit -> Don't care
+
+	// Check
+	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
+	if (isLogAvailableStored == false)
+	{
+		strcpy(filePathNewest, "");
+		return Alx_Err;
+	}
+
+	// Prepare
+	uint64_t idNewest = me->md.write.id - 1;
+	uint32_t fileNewest = (idNewest % me->numOfLogsPerDirTotal) / me->numOfLogsPerFile;
+	uint32_t dirNewest = (idNewest / me->numOfLogsPerDirTotal) % me->numOfDir;
+
+	// Return
+	sprintf(filePathNewest, "/%lu/%lu.csv", dirNewest, fileNewest);
+	return Alx_Ok;
+}
+
+
+//------------------------------------------------------------------------------
+// Management
+//------------------------------------------------------------------------------
 Alx_Status AlxLogger_RewindLogsToProcessFiles(AlxLogger* me, uint32_t numOfFiles)
 {
 	// Assert
@@ -895,150 +1109,8 @@ Alx_Status AlxLogger_ForwardLogsToProcessFiles(AlxLogger* me, uint32_t numOfFile
 	//------------------------------------------------------------------------------
 	return status;
 }
-uint64_t AlxLogger_GetNumOfLogsToProcess(AlxLogger* me)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
 
-	// Return
-	return AlxLogger_GetNumOfLogs_Private(me->md.read.id, me->md.write.id);
-}
-uint64_t AlxLogger_GetNumOfLogsStored(AlxLogger* me)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
 
-	// Return
-	return AlxLogger_GetNumOfLogs_Private(me->md.oldest.id, me->md.write.id);
-}
-Alx_Status AlxLogger_GetIdOldest(AlxLogger* me, uint64_t* idOldest)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Check
-	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
-	if (isLogAvailableStored == false)
-	{
-		*idOldest = 0;
-		return Alx_Err;
-	}
-
-	// Return
-	*idOldest = me->md.oldest.id;
-	return Alx_Ok;
-}
-Alx_Status AlxLogger_GetIdNewest(AlxLogger* me, uint64_t* idNewest)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Check
-	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
-	if (isLogAvailableStored == false)
-	{
-		*idNewest = 0;
-		return Alx_Err;
-	}
-
-	// Return
-	*idNewest = me->md.write.id - 1;
-	return Alx_Ok;
-}
-Alx_Status AlxLogger_GetFilePathOldest(AlxLogger* me, char* filePathOldest)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Check
-	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
-	if (isLogAvailableStored == false)
-	{
-		strcpy(filePathOldest, "");
-		return Alx_Err;
-	}
-
-	// Prepare
-	uint32_t fileOldest = me->md.oldest.file;
-	uint32_t dirOldest = me->md.oldest.dir;
-
-	// Return
-	sprintf(filePathOldest, "/%lu/%lu.csv", dirOldest, fileOldest);
-	return Alx_Ok;
-}
-Alx_Status AlxLogger_GetFilePathNewest(AlxLogger* me, char* filePathNewest)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Check
-	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
-	if (isLogAvailableStored == false)
-	{
-		strcpy(filePathNewest, "");
-		return Alx_Err;
-	}
-
-	// Prepare
-	uint64_t idNewest = me->md.write.id - 1;
-	uint32_t fileNewest = (idNewest % me->numOfLogsPerDirTotal) / me->numOfLogsPerFile;
-	uint32_t dirNewest = (idNewest / me->numOfLogsPerDirTotal) % me->numOfDir;
-
-	// Return
-	sprintf(filePathNewest, "/%lu/%lu.csv", dirNewest, fileNewest);
-	return Alx_Ok;
-}
-AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Return
-	return me->md;
-}
-AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Return
-	return me->mdStored;
-}
-Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	ALX_LOGGER_ASSERT(me->isInit == true);
-
-	// Return
-	return AlxLogger_StoreMetadata_Private(me, config);
-}
-AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Return
-	return me->alxMath_Data_ReadTime_ms;
-}
-AlxMath_Data AlxLogger_GetMath_Data_WriteTime_ms(AlxLogger* me)
-{
-	// Assert
-	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
-	// isInit -> Don't care
-
-	// Return
-	return me->alxMath_Data_WriteTime_ms;
-}
 
 
 //******************************************************************************
