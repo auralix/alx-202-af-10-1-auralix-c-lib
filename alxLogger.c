@@ -897,7 +897,7 @@ Alx_Status AlxLogger_File_Read(AlxLogger* me, const char* path, uint8_t* chunkBu
 	uint32_t readLen = 0;
 	return AlxFs_File_ReadInChunks(me->alxFs, path, chunkBuff, chunkLen, chunkRead_Callback, &readLen, NULL);
 }
-Alx_Status AlxLogger_File_ReadFirstLine(AlxLogger* me, const char* path, char* log)
+Alx_Status AlxLogger_File_ReadFirstLog(AlxLogger* me, const char* path, char* log)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
