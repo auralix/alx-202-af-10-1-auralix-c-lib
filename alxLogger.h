@@ -236,8 +236,8 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 //------------------------------------------------------------------------------
 uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me);
 uint64_t AlxLogger_Log_GetNumOfLogsStored(AlxLogger* me);
-Alx_Status AlxLogger_Log_GetIdOldest(AlxLogger* me, uint64_t* idOldest);
-Alx_Status AlxLogger_Log_GetIdNewest(AlxLogger* me, uint64_t* idNewest);
+Alx_Status AlxLogger_Log_GetIdStoredOldest(AlxLogger* me, uint64_t* idStoredOldest);
+Alx_Status AlxLogger_Log_GetIdStoredNewest(AlxLogger* me, uint64_t* idStoredNewest);
 
 
 //------------------------------------------------------------------------------
@@ -266,8 +266,8 @@ Alx_Status AlxLogger_File_ReadFirstLog(AlxLogger* me, const char* path, char* lo
 // Status
 //------------------------------------------------------------------------------
 Alx_Status AlxLogger_File_GetSize(AlxLogger* me, const char* path, uint32_t* size);
-Alx_Status AlxLogger_File_GetPathOldest(AlxLogger* me, char* pathOldest);
-Alx_Status AlxLogger_File_GetPathNewest(AlxLogger* me, char* pathNewest);
+Alx_Status AlxLogger_File_GetPathStoredOldest(AlxLogger* me, char* pathStoredOldest);
+Alx_Status AlxLogger_File_GetPathStoredNewest(AlxLogger* me, char* pathStoredNewest);
 
 
 //------------------------------------------------------------------------------

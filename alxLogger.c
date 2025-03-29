@@ -815,7 +815,7 @@ uint64_t AlxLogger_Log_GetNumOfLogsStored(AlxLogger* me)
 	// Return
 	return AlxLogger_GetNumOfLogs_Private(me->md.oldest.id, me->md.write.id);
 }
-Alx_Status AlxLogger_Log_GetIdOldest(AlxLogger* me, uint64_t* idOldest)
+Alx_Status AlxLogger_Log_GetIdStoredOldest(AlxLogger* me, uint64_t* idStoredOldest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -825,15 +825,15 @@ Alx_Status AlxLogger_Log_GetIdOldest(AlxLogger* me, uint64_t* idOldest)
 	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
 	if (isLogAvailableStored == false)
 	{
-		*idOldest = 0;
+		*idStoredOldest = 0;
 		return Alx_Err;
 	}
 
 	// Return
-	*idOldest = me->md.oldest.id;
+	*idStoredOldest = me->md.oldest.id;
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_Log_GetIdNewest(AlxLogger* me, uint64_t* idNewest)
+Alx_Status AlxLogger_Log_GetIdStoredNewest(AlxLogger* me, uint64_t* idStoredNewest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -843,12 +843,12 @@ Alx_Status AlxLogger_Log_GetIdNewest(AlxLogger* me, uint64_t* idNewest)
 	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
 	if (isLogAvailableStored == false)
 	{
-		*idNewest = 0;
+		*idStoredNewest = 0;
 		return Alx_Err;
 	}
 
 	// Return
-	*idNewest = me->md.write.id - 1;
+	*idStoredNewest = me->md.write.id - 1;
 	return Alx_Ok;
 }
 
@@ -991,7 +991,7 @@ Alx_Status AlxLogger_File_GetSize(AlxLogger* me, const char* path, uint32_t* siz
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_File_GetPathOldest(AlxLogger* me, char* pathOldest)
+Alx_Status AlxLogger_File_GetPathStoredOldest(AlxLogger* me, char* pathStoredOldest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -1001,7 +1001,7 @@ Alx_Status AlxLogger_File_GetPathOldest(AlxLogger* me, char* pathOldest)
 	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
 	if (isLogAvailableStored == false)
 	{
-		strcpy(pathOldest, "");
+		strcpy(pathStoredOldest, "");
 		return Alx_Err;
 	}
 
@@ -1010,10 +1010,10 @@ Alx_Status AlxLogger_File_GetPathOldest(AlxLogger* me, char* pathOldest)
 	uint32_t dirOldest = me->md.oldest.dir;
 
 	// Return
-	sprintf(pathOldest, "/%lu/%lu.csv", dirOldest, fileOldest);
+	sprintf(pathStoredOldest, "/%lu/%lu.csv", dirOldest, fileOldest);
 	return Alx_Ok;
 }
-Alx_Status AlxLogger_File_GetPathNewest(AlxLogger* me, char* pathNewest)
+Alx_Status AlxLogger_File_GetPathStoredNewest(AlxLogger* me, char* pathStoredNewest)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -1023,7 +1023,7 @@ Alx_Status AlxLogger_File_GetPathNewest(AlxLogger* me, char* pathNewest)
 	bool isLogAvailableStored = AlxLogger_IsLogAvailable(me->md.oldest.id, me->md.write.id);
 	if (isLogAvailableStored == false)
 	{
-		strcpy(pathNewest, "");
+		strcpy(pathStoredNewest, "");
 		return Alx_Err;
 	}
 
@@ -1033,7 +1033,7 @@ Alx_Status AlxLogger_File_GetPathNewest(AlxLogger* me, char* pathNewest)
 	uint32_t dirNewest = (idNewest / me->numOfLogsPerDirTotal) % me->numOfDir;
 
 	// Return
-	sprintf(pathNewest, "/%lu/%lu.csv", dirNewest, fileNewest);
+	sprintf(pathStoredNewest, "/%lu/%lu.csv", dirNewest, fileNewest);
 	return Alx_Ok;
 }
 
