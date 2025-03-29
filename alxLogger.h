@@ -88,12 +88,12 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxLogger_StoreMetadata_Config_StoreDefault,
-	AlxLogger_StoreMetadata_Config_StoreReadWriteOldest,
-	AlxLogger_StoreMetadata_Config_StoreRead,
-	AlxLogger_StoreMetadata_Config_StoreWrite,
-	AlxLogger_StoreMetadata_Config_StoreWriteOldest
-} AlxLogger_StoreMetadata_Config;
+	AlxLogger_Metadata_StoreConfig_Default,
+	AlxLogger_Metadata_StoreConfig_ReadWriteOldest,
+	AlxLogger_Metadata_StoreConfig_Read,
+	AlxLogger_Metadata_StoreConfig_Write,
+	AlxLogger_Metadata_StoreConfig_WriteOldest
+} AlxLogger_Metadata_StoreConfig;
 
 typedef struct __attribute__((packed))
 {
@@ -205,7 +205,7 @@ Alx_Status AlxLogger_Format(AlxLogger* me);
 //------------------------------------------------------------------------------
 AlxLogger_Metadata AlxLogger_Metadata_GetCurrent(AlxLogger* me);
 AlxLogger_Metadata AlxLogger_Metadata_GetStored(AlxLogger* me);
-Alx_Status AlxLogger_Metadata_Store(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
+Alx_Status AlxLogger_Metadata_Store(AlxLogger* me, AlxLogger_Metadata_StoreConfig config);
 
 
 //------------------------------------------------------------------------------

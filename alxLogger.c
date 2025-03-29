@@ -42,7 +42,7 @@
 //******************************************************************************
 static Alx_Status AlxLogger_Prepare(AlxLogger* me);
 static Alx_Status AlxLogger_LoadMetadata(AlxLogger* me);
-static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
+static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Metadata_StoreConfig config);
 static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me);
 static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me);
 static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me);
@@ -207,7 +207,7 @@ AlxLogger_Metadata AlxLogger_Metadata_GetStored(AlxLogger* me)
 	// Return
 	return me->mdStored;
 }
-Alx_Status AlxLogger_Metadata_Store(AlxLogger* me, AlxLogger_StoreMetadata_Config config)
+Alx_Status AlxLogger_Metadata_Store(AlxLogger* me, AlxLogger_Metadata_StoreConfig config)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -738,7 +738,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		//------------------------------------------------------------------------------
 		if (wereOldestReadLogsDiscarded)	// If oldest read logs were discared, store read & write & oldest
 		{
-			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWriteOldest);
+			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
 			if (status != Alx_Ok)
 			{
 				ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
@@ -747,7 +747,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		}
 		else if (me->md.write.file == 0)	// If new dir, store write & oldest
 		{
-			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreWriteOldest);
+			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_WriteOldest);
 			if (status != Alx_Ok)
 			{
 				ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
@@ -756,7 +756,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		}
 		else if (me->md.write.log == 0)	// If new file, store write only
 		{
-			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreWrite);
+			status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_Write);
 			if (status != Alx_Ok)
 			{
 				ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
@@ -871,7 +871,7 @@ Alx_Status AlxLogger_Log_DiscardLogsToProcess(AlxLogger* me)
 	me->md.read.dir = me->mdStored.write.dir;
 
 	// Return
-	return AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWriteOldest);
+	return AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
 }
 
 
@@ -1056,7 +1056,7 @@ Alx_Status AlxLogger_File_RewindLogsToProcess(AlxLogger* me, uint32_t numOfFiles
 	// me->md.read.dir	// Don't need to change
 
 	// Return
-	return AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreRead);
+	return AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_Read);
 }
 Alx_Status AlxLogger_File_ForwardLogsToProcess(AlxLogger* me, uint32_t numOfFiles)
 {
@@ -1101,7 +1101,7 @@ Alx_Status AlxLogger_File_ForwardLogsToProcess(AlxLogger* me, uint32_t numOfFile
 	//------------------------------------------------------------------------------
 	// Store Metadata
 	//------------------------------------------------------------------------------
-	Alx_Status status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreRead);
+	Alx_Status status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_Read);
 
 
 	//------------------------------------------------------------------------------
@@ -1190,7 +1190,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		}
 
 		// Store metadata
-		status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreReadWriteOldest);
+		status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
 		if (status != Alx_Ok)
 		{
 			ALX_LOGGER_TRACE_WRN("Err: %d", status);
@@ -1266,7 +1266,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 	}
 
 	// Store default metadata
-	status = AlxLogger_StoreMetadata_Private(me, AlxLogger_StoreMetadata_Config_StoreDefault);
+	status = AlxLogger_StoreMetadata_Private(me, AlxLogger_Metadata_StoreConfig_Default);
 	if (status != Alx_Ok)
 	{
 		ALX_LOGGER_TRACE_WRN("Err: %d", status);
@@ -1397,7 +1397,7 @@ static Alx_Status AlxLogger_LoadMetadata(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
-static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_StoreMetadata_Config config)
+static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Metadata_StoreConfig config)
 {
 	//------------------------------------------------------------------------------
 	// Local Variables
@@ -1419,7 +1419,7 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 	mdTemp.numOfFilesPerDir = me->numOfFilesPerDir;
 	mdTemp.numOfLogsPerFile = me->numOfLogsPerFile;
 
-	if (config == AlxLogger_StoreMetadata_Config_StoreDefault)
+	if (config == AlxLogger_Metadata_StoreConfig_Default)
 	{
 		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreReadMetadata);
 		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreWriteMetadata);
@@ -1442,7 +1442,7 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.oldest.file		= 0;
 		mdTemp.oldest.dir		= 0;
 	}
-	else if (config == AlxLogger_StoreMetadata_Config_StoreReadWriteOldest)
+	else if (config == AlxLogger_Metadata_StoreConfig_ReadWriteOldest)
 	{
 		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreReadMetadata);
 		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreWriteMetadata);
@@ -1465,7 +1465,7 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.oldest.file		= me->md.oldest.file;
 		mdTemp.oldest.dir		= me->md.oldest.dir;
 	}
-	else if (config == AlxLogger_StoreMetadata_Config_StoreRead)
+	else if (config == AlxLogger_Metadata_StoreConfig_Read)
 	{
 		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreReadMetadata);
 		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Reset(me->do_DBG_StoreWriteMetadata);
@@ -1488,7 +1488,7 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.oldest.file		= me->mdStored.oldest.file;
 		mdTemp.oldest.dir		= me->mdStored.oldest.dir;
 	}
-	else if (config == AlxLogger_StoreMetadata_Config_StoreWrite)
+	else if (config == AlxLogger_Metadata_StoreConfig_Write)
 	{
 		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Reset(me->do_DBG_StoreReadMetadata);
 		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreWriteMetadata);
@@ -1511,7 +1511,7 @@ static Alx_Status AlxLogger_StoreMetadata_Private(AlxLogger* me, AlxLogger_Store
 		mdTemp.oldest.file		= me->mdStored.oldest.file;
 		mdTemp.oldest.dir		= me->mdStored.oldest.dir;
 	}
-	else if (config == AlxLogger_StoreMetadata_Config_StoreWriteOldest)
+	else if (config == AlxLogger_Metadata_StoreConfig_WriteOldest)
 	{
 		if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreReadMetadata);
 		if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Set(me->do_DBG_StoreWriteMetadata);
