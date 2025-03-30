@@ -1099,7 +1099,7 @@ Alx_Status AlxLogger_File_GetPathToProcessOldest(AlxLogger* me, char* pathToProc
 //------------------------------------------------------------------------------
 // Management
 //------------------------------------------------------------------------------
-Alx_Status AlxLogger_File_RewindLogsToProcess(AlxLogger* me, uint32_t numOfFiles)
+Alx_Status AlxLogger_File_RewindFilesToProcess(AlxLogger* me, uint32_t numOfFiles)
 {
 	// Assert
 	ALX_LOGGER_ASSERT(me->wasCtorCalled == true);
@@ -1116,7 +1116,7 @@ Alx_Status AlxLogger_File_RewindLogsToProcess(AlxLogger* me, uint32_t numOfFiles
 	// Return
 	return AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_Read);
 }
-Alx_Status AlxLogger_File_ForwardLogsToProcess(AlxLogger* me, uint32_t numOfFiles)
+Alx_Status AlxLogger_File_ForwardFilesToProcess(AlxLogger* me, uint32_t numOfFiles)
 {
 	//------------------------------------------------------------------------------
 	// Assert

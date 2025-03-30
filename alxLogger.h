@@ -113,9 +113,9 @@ typedef struct __attribute__((packed))
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
 
-	AlxLogger_Metadata_Id read;
-	AlxLogger_Metadata_Id write;
-	AlxLogger_Metadata_Id oldest;
+	AlxLogger_Metadata_Id read;		// ID of oldest log to process
+	AlxLogger_Metadata_Id write;	// ID of next log to store (not yet stored)
+	AlxLogger_Metadata_Id oldest;	// ID of oldest stored log
 
 	uint16_t crc;
 } AlxLogger_Metadata;
@@ -275,8 +275,8 @@ Alx_Status AlxLogger_File_GetPathToProcessOldest(AlxLogger* me, char* pathToProc
 //------------------------------------------------------------------------------
 // Management
 //------------------------------------------------------------------------------
-Alx_Status AlxLogger_File_RewindLogsToProcess(AlxLogger* me, uint32_t numOfFiles);
-Alx_Status AlxLogger_File_ForwardLogsToProcess(AlxLogger* me, uint32_t numOfFiles);
+Alx_Status AlxLogger_File_RewindFilesToProcess(AlxLogger* me, uint32_t numOfFiles);
+Alx_Status AlxLogger_File_ForwardFilesToProcess(AlxLogger* me, uint32_t numOfFiles);
 
 
 #endif	// #if defined(ALX_C_LIB)
