@@ -38,16 +38,10 @@
 
 
 //******************************************************************************
-// Private Variables
-//******************************************************************************
-static AlxFtp* alxFtp_me = NULL;
-
-
-//******************************************************************************
 // Private Functions
 //******************************************************************************
 static void AlxFtp_Reset(AlxFtp* me);
-static Alx_Status AlxFtp_Client_UploadFile_ChunkRead_Callback(void* chunkData, uint32_t chunkLenActual);
+static Alx_Status AlxFtp_Client_UploadFile_ChunkRead_Callback(void* ctx, void* chunkData, uint32_t chunkLenActual);
 
 
 //******************************************************************************
@@ -70,9 +64,6 @@ void AlxFtp_Ctor
 	me->serverPort = 0;
 	me->clientUsername = "";
 	me->clientPassword = "";
-
-	// Private variables
-	alxFtp_me = me;
 
 	// Variables
 	AlxSocket_Ctor(&me->alxSocket_Ctrl);
@@ -582,7 +573,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	// Upload File In Chunks
 	//------------------------------------------------------------------------------
 	uint32_t _fileSize = 0;
-	status = AlxFs_File_ReadInChunks(me->alxFs, localFilePath, me->buff, sizeof(me->buff), AlxFtp_Client_UploadFile_ChunkRead_Callback, &_fileSize, alxOsMutex_UploadFileInChunks);
+	status = AlxFs_File_ReadInChunks(me->alxFs, localFilePath, me->buff, sizeof(me->buff), AlxFtp_Client_UploadFile_ChunkRead_Callback, me, &_fileSize, alxOsMutex_UploadFileInChunks);
 	if (status != Alx_Ok)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: AlxFs_File_ReadInChunks() status %ld localFilePath %s", status, localFilePath);
@@ -656,10 +647,13 @@ static void AlxFtp_Reset(AlxFtp* me)
 	memset(me->buff, 0, sizeof(me->buff));
 	me->isClientLoggedIn = false;
 }
-static Alx_Status AlxFtp_Client_UploadFile_ChunkRead_Callback(void* chunkData, uint32_t chunkLenActual)
+static Alx_Status AlxFtp_Client_UploadFile_ChunkRead_Callback(void* ctx, void* chunkData, uint32_t chunkLenActual)
 {
+	// Prepare
+	AlxFtp* me = (AlxFtp*)ctx;
+
 	// Send
-	int32_t statusLen = AlxSocket_Send(&alxFtp_me->alxSocket_Data, chunkData, chunkLenActual);
+	int32_t statusLen = AlxSocket_Send(&me->alxSocket_Data, chunkData, chunkLenActual);
 	if (statusLen != (int32_t)chunkLenActual)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Send() statusLen %ld chunkLenActual %lu", statusLen, chunkLenActual);

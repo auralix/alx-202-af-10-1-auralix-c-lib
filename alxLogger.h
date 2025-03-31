@@ -258,7 +258,7 @@ Alx_Status AlxLogger_Log_DiscardLogsToProcess(AlxLogger* me);
 //------------------------------------------------------------------------------
 // Read/Write
 //------------------------------------------------------------------------------
-Alx_Status AlxLogger_File_Read(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual));
+Alx_Status AlxLogger_File_Read(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* ctx, void* chunkData, uint32_t chunkLenActual), void* chunkRead_Callback_Ctx, uint32_t* readLen, AlxOsMutex* alxOsMutex);
 Alx_Status AlxLogger_File_ReadFirstLog(AlxLogger* me, const char* path, char* log);
 
 
