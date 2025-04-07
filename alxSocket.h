@@ -54,7 +54,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
+#if defined(ALX_C_LIB)
 
 
 //******************************************************************************
@@ -205,7 +205,7 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 #endif
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
