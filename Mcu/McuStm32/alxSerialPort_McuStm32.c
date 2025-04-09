@@ -410,13 +410,19 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 		if (me->do_DBG_Tx != NULL) AlxIoPin_Reset(me->do_DBG_Tx);
 		if (statusHal != HAL_OK)
 		{
+			// Trace
 			ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_Transmit() statusHal %u", statusHal);
+
+			// Reset
 			status = AlxSerialPort_Reset(me);
 			if (status != Alx_Ok)
 			{
 				ALX_SERIAL_PORT_TRACE("FAIL: AlxSerialPort_Reset() status %u", status);
 				return Alx_Err;
 			}
+
+			// Return
+			return Alx_Err;
 		}
 
 		// Set
@@ -467,7 +473,7 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 			{
 				// TX data from TX FIFO
 				if (me->do_DBG_Tx != NULL) AlxIoPin_Set(me->do_DBG_Tx);
-				LL_USART_TransmitData8(me->huart.Instance, txData);	// Clears TXE = 0
+				LL_USART_TransmitData8(me->huart.Instance, txData);	// Clears TXE
 				if (me->do_DBG_Tx != NULL) AlxIoPin_Reset(me->do_DBG_Tx);
 			}
 			else
@@ -493,7 +499,7 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 
 		// No overrun error handling, overrun error must be disabled @ Uart initialization.
 		if (me->do_DBG_Rx != NULL) AlxIoPin_Set(me->do_DBG_Rx);
-		uint8_t rxData = LL_USART_ReceiveData8(me->huart.Instance);	// Clears RXNE = 0
+		uint8_t rxData = LL_USART_ReceiveData8(me->huart.Instance);	// Clears RXNE
 		if (me->do_DBG_Rx != NULL) AlxIoPin_Reset(me->do_DBG_Rx);
 		AlxFifo_Write(&me->rxFifo, rxData);
 	}
