@@ -68,13 +68,18 @@ typedef struct
 	void* hw;
 	AlxIoPin* do_TX;
 	AlxIoPin* di_RX;
+	uint8_t* txFifoBuff;
+	uint32_t txFifoBuffLen;
 	uint8_t* rxFifoBuff;
 	uint32_t rxFifoBuffLen;
-	Alx_IrqPriority rxIrqPriority;
+	Alx_IrqPriority irqPriority;
 	AlxSerialPort_Lin lin;
+	AlxIoPin* do_DBG_Tx;
+	AlxIoPin* do_DBG_Rx;
 
 	// Variables
 	struct usart_sync_descriptor descr;
+	AlxFifo txFifo;
 	AlxFifo rxFifo;
 
 	// Info
@@ -92,10 +97,14 @@ void AlxSerialPort_Ctor
 	void* hw,
 	AlxIoPin* do_TX,
 	AlxIoPin* di_RX,
+	uint8_t* txFifoBuff,
+	uint32_t txFifoBuffLen,
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
-	Alx_IrqPriority rxIrqPriority,
-	AlxSerialPort_Lin lin
+	Alx_IrqPriority irqPriority,
+	AlxSerialPort_Lin lin,
+	AlxIoPin* do_DBG_Tx,
+	AlxIoPin* do_DBG_Rx
 );
 
 

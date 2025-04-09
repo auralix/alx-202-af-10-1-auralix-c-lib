@@ -58,10 +58,14 @@ static void AlxSerialPort_Periph_DisableIrq(AlxSerialPort* me);
   * @param[in]		hw
   * @param[in]		do_TX
   * @param[in]		di_RX
+  * @param[in]		txFifoBuff
+  * @param[in]		txFifoBuffLen
   * @param[in]		rxFifoBuff
   * @param[in]		rxFifoBuffLen
-  * @param[in]		rxIrqPriority
+  * @param[in]		irqPriority
   * @param[in]		lin
+  * @param[in]		do_DBG_Tx
+  * @param[in]		do_DBG_Rx
   */
 void AlxSerialPort_Ctor
 (
@@ -69,23 +73,32 @@ void AlxSerialPort_Ctor
 	void* hw,
 	AlxIoPin* do_TX,
 	AlxIoPin* di_RX,
+	uint8_t* txFifoBuff,
+	uint32_t txFifoBuffLen,
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
-	Alx_IrqPriority rxIrqPriority,
-	AlxSerialPort_Lin lin
+	Alx_IrqPriority irqPriority,
+	AlxSerialPort_Lin lin,
+	AlxIoPin* do_DBG_Tx,
+	AlxIoPin* do_DBG_Rx
 )
 {
 	// Parameters
 	me->hw = hw;
 	me->do_TX = do_TX;
 	me->di_RX = di_RX;
+	me->txFifoBuff = txFifoBuff;
+	me->txFifoBuffLen = txFifoBuffLen;
 	me->rxFifoBuff = rxFifoBuff;
 	me->rxFifoBuffLen = rxFifoBuffLen;
-	me->rxIrqPriority = rxIrqPriority;
+	me->irqPriority = irqPriority;
 	me->lin = lin;
+	me->do_DBG_Tx = do_DBG_Tx;
+	me->do_DBG_Rx = do_DBG_Rx;
 
 	// Variables
 	memset(&me->descr, 0, sizeof(me->descr));
+	if (txFifoBuff != NULL) AlxFifo_Ctor(&me->txFifo, txFifoBuff, txFifoBuffLen);
 	AlxFifo_Ctor(&me->rxFifo, rxFifoBuff, rxFifoBuffLen);
 
 	// Info
@@ -110,22 +123,23 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == false);
 
-	// Flush RX FIFO
+	// Flush TX & RX FIFO
+	if (me->txFifoBuff != NULL) AlxFifo_Flush(&me->txFifo);
 	AlxFifo_Flush(&me->rxFifo);
 
 	// Init GPIO
 	AlxIoPin_Init(me->do_TX);
 	AlxIoPin_Init(me->di_RX);
 
-	// Enable USART clock
+	// Enable UART periphery clock
 	_pm_enable_bus_clock(PM_BUS_APBC, me->hw);
 	AlxSerialPort_Periph_EnableClk(me);
 
-	// Init USART
+	// Init UART
 	usart_sync_init(&me->descr, me->hw, ALX_NULL);	// TV: Always returns OK, resets periphery
 	usart_sync_enable(&me->descr);					// TV: Always returns OK
 
-	// Enable USART RX IRQ
+	// Enable UART IRQ
 	hri_sercomusart_set_INTEN_RXC_bit(me->hw);
 	AlxSerialPort_Periph_EnableIrq(me);
 
@@ -148,14 +162,15 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
-	// Disable UART RX IRQ
+	// Disable UART IRQ
 	AlxSerialPort_Periph_DisableIrq(me);
+	if (me->txFifoBuff != NULL) hri_sercomusart_clear_INTEN_DRE_bit(me->hw);
 	hri_sercomusart_clear_INTEN_RXC_bit(me->hw);
 
-	// DeInit USART
+	// DeInit UART
 	usart_sync_deinit(&me->descr);	// TV: Always returns OK, disables & resets periphery
 
-	// Disable USART clock
+	// Disable UART periphery clock
 	_pm_disable_bus_clock(PM_BUS_APBC, me->hw);
 	AlxSerialPort_Periph_DisableClk(me);
 
@@ -163,7 +178,8 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	AlxIoPin_DeInit(me->do_TX);
 	AlxIoPin_DeInit(me->di_RX);
 
-	// Flush RX FIFO
+	// Flush TX & RX FIFO
+	if (me->txFifoBuff != NULL) AlxFifo_Flush(&me->txFifo);
 	AlxFifo_Flush(&me->rxFifo);
 
 	// Clear isInit
@@ -187,7 +203,7 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
-	// Read
+	// Read RX FIFO
 	AlxGlobal_DisableIrq();
 	Alx_Status status = AlxFifo_Read(&me->rxFifo, data, len);
 	AlxGlobal_EnableIrq();
@@ -213,7 +229,7 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 	ALX_SERIAL_PORT_ASSERT(me->lin == AlxSerialPort_Lin_Disable);
 
-	// Read
+	// Read RX FIFO
 	AlxGlobal_DisableIrq();
 	Alx_Status status = AlxFifo_ReadStrUntil(&me->rxFifo, str, delim, maxLen, numRead);
 	AlxGlobal_EnableIrq();
@@ -232,25 +248,69 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
   */
 Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
-	// Prepare
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
 	struct io_descriptor *io = NULL;
 	usart_sync_get_io_descriptor(&me->descr, &io);
 
+
+	//------------------------------------------------------------------------------
 	// Write
-	int32_t len_Expected = io_write(io, data, len);
-	if ((uint16_t)len != len_Expected)
+	//------------------------------------------------------------------------------
+	if (me->txFifoBuff != NULL)
 	{
-		ALX_SERIAL_PORT_TRACE("Err");
-		if(AlxSerialPort_Reset(me) != Alx_Ok) { ALX_SERIAL_PORT_TRACE("Err"); };
-		return Alx_Err;
+		// Write TX FIFO
+		AlxGlobal_DisableIrq();
+		status = AlxFifo_WriteMulti(&me->txFifo, data, len);
+		AlxGlobal_EnableIrq();
+
+		// If UART TX IRQ NOT enabled, enable it
+		if (hri_sercomusart_get_INTEN_DRE_bit(me->hw) == false)
+		{
+			hri_sercomusart_set_INTEN_DRE_bit(me->hw);
+		}
+	}
+	else
+	{
+		// TX data blocking
+		if (me->do_DBG_Tx != NULL) AlxIoPin_Set(me->do_DBG_Tx);
+		int32_t len_Expected = io_write(io, data, len);
+		if (me->do_DBG_Tx != NULL) AlxIoPin_Reset(me->do_DBG_Tx);
+		if ((int32_t)len != len_Expected)
+		{
+			// Trace
+			ALX_SERIAL_PORT_TRACE("FAIL: io_write() len %ld len_Expected %ld", len, len_Expected);
+
+			// Reset
+			status = AlxSerialPort_Reset(me);
+			if (status != Alx_Ok)
+			{
+				ALX_SERIAL_PORT_TRACE("FAIL: AlxSerialPort_Reset() status %u", status);
+				return Alx_Err;
+			}
+
+			// Return
+			return Alx_Err;
+		}
+
+		// Set
+		status = Alx_Ok;
 	}
 
+
+	//------------------------------------------------------------------------------
 	// Return
-	return Alx_Ok;
+	//------------------------------------------------------------------------------
+	return status;
 }
 
 /**
@@ -277,8 +337,39 @@ Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
   */
 void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 {
-	uint8_t data = hri_sercomusart_read_DATA_reg(me->hw);
-	AlxFifo_Write(&me->rxFifo, data);
+	//------------------------------------------------------------------------------
+	// TX
+	//------------------------------------------------------------------------------
+	if (me->txFifoBuff != NULL)
+	{
+		if (hri_sercomusart_get_INTFLAG_DRE_bit(me->hw))
+		{
+			uint8_t txData = 0;
+			Alx_Status status = AlxFifo_Read(&me->txFifo, &txData, sizeof(txData));
+			if (status == Alx_Ok)
+			{
+				// TX data from TX FIFO
+				if (me->do_DBG_Tx != NULL) AlxIoPin_Set(me->do_DBG_Tx);
+				hri_sercomusart_write_DATA_reg(me->hw, txData);	// Clears DRE
+				if (me->do_DBG_Tx != NULL) AlxIoPin_Reset(me->do_DBG_Tx);
+			}
+			else
+			{
+				// Disable UART TX IRQ, no more data in TX FIFO
+				hri_sercomusart_clear_INTEN_DRE_bit(me->hw);
+			}
+		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// RX
+	//------------------------------------------------------------------------------
+	if (hri_sercomusart_get_INTFLAG_RXC_bit(me->hw))
+	{
+		uint8_t rxData = hri_sercomusart_read_DATA_reg(me->hw);	// Clears RXC
+		AlxFifo_Write(&me->rxFifo, rxData);
+	}
 }
 
 /**
@@ -306,24 +397,26 @@ uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
 //******************************************************************************
 static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 {
-	// Disable UART RX IRQ
+	// Disable UART IRQ
 	AlxSerialPort_Periph_DisableIrq(me);
+	if (me->txFifoBuff != NULL) hri_sercomusart_clear_INTEN_DRE_bit(me->hw);
 	hri_sercomusart_clear_INTEN_RXC_bit(me->hw);
 
-	// DeInit USART
+	// DeInit UART
 	usart_sync_deinit(&me->descr);	// TV: Always returns OK, disables & resets periphery
 
-	// Flush RX FIFO
+	// Flush TX & RX FIFO
+	if (me->txFifoBuff != NULL) AlxFifo_Flush(&me->txFifo);
 	AlxFifo_Flush(&me->rxFifo);
 
 	// Clear isInit
 	me->isInit = false;
 
-	// Init USART
+	// Init UART
 	usart_sync_init(&me->descr, me->hw, ALX_NULL);	// TV: Always returns OK, resets periphery
 	usart_sync_enable(&me->descr);					// TV: Always returns OK
 
-	// Enable USART RX IRQ
+	// Enable UART IRQ
 	hri_sercomusart_set_INTEN_RXC_bit(me->hw);
 	AlxSerialPort_Periph_EnableIrq(me);
 
@@ -363,22 +456,22 @@ static void AlxSerialPort_Periph_DisableClk(AlxSerialPort* me)
 static void AlxSerialPort_Periph_EnableIrq(AlxSerialPort* me)
 {
 	#if defined(SERCOM0)
-	if (me->hw == SERCOM0)	{ NVIC_SetPriority(SERCOM0_IRQn, me->rxIrqPriority); NVIC_EnableIRQ(SERCOM0_IRQn); return; }
+	if (me->hw == SERCOM0)	{ NVIC_SetPriority(SERCOM0_IRQn, me->irqPriority); NVIC_EnableIRQ(SERCOM0_IRQn); return; }
 	#endif
 	#if defined(SERCOM1)
-	if (me->hw == SERCOM1)	{ NVIC_SetPriority(SERCOM1_IRQn, me->rxIrqPriority); NVIC_EnableIRQ(SERCOM1_IRQn); return; }
+	if (me->hw == SERCOM1)	{ NVIC_SetPriority(SERCOM1_IRQn, me->irqPriority); NVIC_EnableIRQ(SERCOM1_IRQn); return; }
 	#endif
 	#if defined(SERCOM2)
-	if (me->hw == SERCOM2)	{ NVIC_SetPriority(SERCOM2_IRQn, me->rxIrqPriority); NVIC_EnableIRQ(SERCOM2_IRQn); return; }
+	if (me->hw == SERCOM2)	{ NVIC_SetPriority(SERCOM2_IRQn, me->irqPriority); NVIC_EnableIRQ(SERCOM2_IRQn); return; }
 	#endif
 	#if defined(SERCOM3)
-	if (me->hw == SERCOM3)	{ NVIC_SetPriority(SERCOM3_IRQn, me->rxIrqPriority); NVIC_EnableIRQ(SERCOM3_IRQn); return; }
+	if (me->hw == SERCOM3)	{ NVIC_SetPriority(SERCOM3_IRQn, me->irqPriority); NVIC_EnableIRQ(SERCOM3_IRQn); return; }
 	#endif
 	#if defined(SERCOM4)
-	if (me->hw == SERCOM4)	{ NVIC_SetPriority(SERCOM4_IRQn, me->rxIrqPriority); NVIC_EnableIRQ(SERCOM4_IRQn); return; }
+	if (me->hw == SERCOM4)	{ NVIC_SetPriority(SERCOM4_IRQn, me->irqPriority); NVIC_EnableIRQ(SERCOM4_IRQn); return; }
 	#endif
 	#if defined(SERCOM5)
-	if (me->hw == SERCOM5)	{ NVIC_SetPriority(SERCOM5_IRQn, me->rxIrqPriority); NVIC_EnableIRQ(SERCOM5_IRQn); return; }
+	if (me->hw == SERCOM5)	{ NVIC_SetPriority(SERCOM5_IRQn, me->irqPriority); NVIC_EnableIRQ(SERCOM5_IRQn); return; }
 	#endif
 
 	ALX_SERIAL_PORT_ASSERT(false);	// We should not get here
