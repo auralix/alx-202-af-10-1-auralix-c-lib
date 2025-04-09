@@ -46,6 +46,7 @@
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
+static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me);
 static void AlxSerialPort_Periph_EnableClk(AlxSerialPort* me);
 static void AlxSerialPort_Periph_DisableClk(AlxSerialPort* me);
 static void AlxSerialPort_Periph_ForceReset(AlxSerialPort* me);
@@ -74,8 +75,8 @@ static void AlxSerialPort_Periph_DisableIrq(AlxSerialPort* me);
   * @param[in]		rxFifoBuffLen
   * @param[in]		irqPriority
   * @param[in]		lin
-  * @param[in]		do_DBG_IrqTx
-  * @param[in]		do_DBG_IrqRx
+  * @param[in]		do_DBG_Tx
+  * @param[in]		do_DBG_Rx
   */
 void AlxSerialPort_Ctor
 (
@@ -93,8 +94,8 @@ void AlxSerialPort_Ctor
 	uint32_t rxFifoBuffLen,
 	Alx_IrqPriority irqPriority,
 	AlxSerialPort_Lin lin,
-	AlxIoPin* do_DBG_IrqTx,
-	AlxIoPin* do_DBG_IrqRx
+	AlxIoPin* do_DBG_Tx,
+	AlxIoPin* do_DBG_Rx
 )
 {
 	// Parameters
@@ -111,8 +112,8 @@ void AlxSerialPort_Ctor
 	me->rxFifoBuffLen = rxFifoBuffLen;
 	me->irqPriority = irqPriority;
 	me->lin = lin;
-	me->do_DBG_IrqTx = do_DBG_IrqTx;
-	me->do_DBG_IrqRx = do_DBG_IrqRx;
+	me->do_DBG_Tx = do_DBG_Tx;
+	me->do_DBG_Rx = do_DBG_Rx;
 
 	// Variables
 	me->huart.Instance = uart;
@@ -165,7 +166,7 @@ void AlxSerialPort_Ctor
 	me->huart.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
 	#endif
 
-	AlxFifo_Ctor(&me->txFifo, txFifoBuff, txFifoBuffLen);
+	if (txFifoBuff != NULL) AlxFifo_Ctor(&me->txFifo, txFifoBuff, txFifoBuffLen);
 	AlxFifo_Ctor(&me->rxFifo, rxFifoBuff, rxFifoBuffLen);
 
 	// Info
@@ -190,8 +191,11 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == false);
 
+	// Local variables
+	HAL_StatusTypeDef statusHal = HAL_ERROR;
+
 	// Flush TX & RX FIFO
-	AlxFifo_Flush(&me->txFifo);
+	if (me->txFifoBuff != NULL) AlxFifo_Flush(&me->txFifo);
 	AlxFifo_Flush(&me->rxFifo);
 
 	// Init GPIO
@@ -214,19 +218,27 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 
 		// Init
 		#if defined(ALX_STM32F0) && defined(USART_CR2_LINEN)
-		if (HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
+		if (statusHal != HAL_OK)
+		{
+			ALX_SERIAL_PORT_TRACE("FAIL: HAL_LIN_Init() statusHal %u", statusHal);
+			return Alx_Err;
+		}
 		#endif
 	}
 	else
 	{
 		// Init
-		if (HAL_UART_Init(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		statusHal = HAL_UART_Init(&me->huart);
+		if (statusHal != HAL_OK)
+		{
+			ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_Init() statusHal %u", statusHal);
+			return Alx_Err;
+		}
 	}
 
-	// Enable UART RX IRQ
+	// Enable UART IRQ
 	__HAL_UART_ENABLE_IT(&me->huart, UART_IT_RXNE);
-
-	// Enable UART NVIC TX & RX IRQ
 	AlxSerialPort_Periph_EnableIrq(me);
 
 	// Set isInit
@@ -248,13 +260,21 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
+	// Local variables
+	HAL_StatusTypeDef statusHal = HAL_ERROR;
+
 	// Disable UART IRQ
 	AlxSerialPort_Periph_DisableIrq(me);
-	__HAL_UART_DISABLE_IT(&me->huart, UART_IT_TXE);
+	if (me->txFifoBuff != NULL) __HAL_UART_DISABLE_IT(&me->huart, UART_IT_TXE);
 	__HAL_UART_DISABLE_IT(&me->huart, UART_IT_RXNE);
 
 	// DeInit UART
-	if (HAL_UART_DeInit(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+	statusHal = HAL_UART_DeInit(&me->huart);
+	if (statusHal != HAL_OK)
+	{
+		ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_DeInit() statusHal %u", statusHal);
+		return Alx_Err;
+	}
 
 	// Force UART periphery reset
 	AlxSerialPort_Periph_ForceReset(me);
@@ -267,7 +287,7 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	AlxIoPin_DeInit(me->di_RX);
 
 	// Flush TX & RX FIFO
-	AlxFifo_Flush(&me->txFifo);
+	if (me->txFifoBuff != NULL) AlxFifo_Flush(&me->txFifo);
 	AlxFifo_Flush(&me->rxFifo);
 
 	// Clear isInit
@@ -336,30 +356,77 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
   */
 Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
-	// If LIN enabled, TX break condition
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	HAL_StatusTypeDef statusHal = HAL_ERROR;
+	Alx_Status status = Alx_Err;
+
+
+	//------------------------------------------------------------------------------
+	// LIN Break Condition
+	//------------------------------------------------------------------------------
 	if (me->lin != AlxSerialPort_Lin_Disable)
 	{
 		#if defined(ALX_STM32F0) && defined(USART_CR2_LINEN)
-		if (HAL_LIN_SendBreak(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		statusHal = HAL_LIN_SendBreak(&me->huart);
+		if (statusHal != HAL_OK)
+		{
+			ALX_SERIAL_PORT_TRACE("FAIL: HAL_LIN_SendBreak() statusHal %u", statusHal);
+			return Alx_Err;
+		}
 		#endif
 	}
 
-	// Write TX FIFO
-	AlxGlobal_DisableIrq();
-	Alx_Status status = AlxFifo_WriteMulti(&me->txFifo, data, len);
-	AlxGlobal_EnableIrq();
 
-	// If UART TX IRQ NOT enabled, enable it
-	if (__HAL_UART_GET_IT_SOURCE(&me->huart, UART_IT_TXE) == false)
+	//------------------------------------------------------------------------------
+	// Write
+	//------------------------------------------------------------------------------
+	if (me->txFifoBuff != NULL)
 	{
-		__HAL_UART_ENABLE_IT(&me->huart, UART_IT_TXE);
+		// Write TX FIFO
+		AlxGlobal_DisableIrq();
+		status = AlxFifo_WriteMulti(&me->txFifo, data, len);
+		AlxGlobal_EnableIrq();
+
+		// If UART TX IRQ NOT enabled, enable it
+		if (__HAL_UART_GET_IT_SOURCE(&me->huart, UART_IT_TXE) == false)
+		{
+			__HAL_UART_ENABLE_IT(&me->huart, UART_IT_TXE);
+		}
+	}
+	else
+	{
+		// TX data blocking
+		if (me->do_DBG_Tx != NULL) AlxIoPin_Set(me->do_DBG_Tx);
+		statusHal = HAL_UART_Transmit(&me->huart, (uint8_t*)data, len, ALX_SERIAL_PORT_TX_TIMEOUT_ms);
+		if (me->do_DBG_Tx != NULL) AlxIoPin_Reset(me->do_DBG_Tx);
+		if (statusHal != HAL_OK)
+		{
+			ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_Transmit() statusHal %u", statusHal);
+			status = AlxSerialPort_Reset(me);
+			if (status != Alx_Ok)
+			{
+				ALX_SERIAL_PORT_TRACE("FAIL: AlxSerialPort_Reset() status %u", status);
+				return Alx_Err;
+			}
+		}
+
+		// Set
+		status = Alx_Ok;
 	}
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return status;
 }
 
@@ -390,22 +457,24 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 	//------------------------------------------------------------------------------
 	// TX
 	//------------------------------------------------------------------------------
-	if (__HAL_UART_GET_FLAG(&me->huart, UART_FLAG_TXE))
+	if (me->txFifoBuff != NULL)
 	{
-
-		uint8_t txData = 0;
-		Alx_Status status = AlxFifo_Read(&me->txFifo, &txData, sizeof(txData));
-		if (status == Alx_Ok)
+		if (__HAL_UART_GET_FLAG(&me->huart, UART_FLAG_TXE))
 		{
-			// TX data from TX FIFO
-			if(me->do_DBG_IrqTx != NULL) AlxIoPin_Set(me->do_DBG_IrqTx);
-			LL_USART_TransmitData8(me->huart.Instance, txData);	// Clears TXE = 0
-			if(me->do_DBG_IrqTx != NULL) AlxIoPin_Reset(me->do_DBG_IrqTx);
-		}
-		else
-		{
-			// Disable UART TX IRQ, no more data in TX FIFO
-			__HAL_UART_DISABLE_IT(&me->huart, UART_IT_TXE);
+			uint8_t txData = 0;
+			Alx_Status status = AlxFifo_Read(&me->txFifo, &txData, sizeof(txData));
+			if (status == Alx_Ok)
+			{
+				// TX data from TX FIFO
+				if (me->do_DBG_Tx != NULL) AlxIoPin_Set(me->do_DBG_Tx);
+				LL_USART_TransmitData8(me->huart.Instance, txData);	// Clears TXE = 0
+				if (me->do_DBG_Tx != NULL) AlxIoPin_Reset(me->do_DBG_Tx);
+			}
+			else
+			{
+				// Disable UART TX IRQ, no more data in TX FIFO
+				__HAL_UART_DISABLE_IT(&me->huart, UART_IT_TXE);
+			}
 		}
 	}
 
@@ -423,9 +492,9 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 		#endif
 
 		// No overrun error handling, overrun error must be disabled @ Uart initialization.
-		if(me->do_DBG_IrqRx != NULL) AlxIoPin_Set(me->do_DBG_IrqRx);
+		if (me->do_DBG_Rx != NULL) AlxIoPin_Set(me->do_DBG_Rx);
 		uint8_t rxData = LL_USART_ReceiveData8(me->huart.Instance);	// Clears RXNE = 0
-		if(me->do_DBG_IrqRx != NULL) AlxIoPin_Reset(me->do_DBG_IrqRx);
+		if (me->do_DBG_Rx != NULL) AlxIoPin_Reset(me->do_DBG_Rx);
 		AlxFifo_Write(&me->rxFifo, rxData);
 	}
 }
@@ -458,6 +527,76 @@ uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
+static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
+{
+	// Local variables
+	HAL_StatusTypeDef statusHal = HAL_ERROR;
+
+	// Disable UART IRQ
+	AlxSerialPort_Periph_DisableIrq(me);
+	if (me->txFifoBuff != NULL) __HAL_UART_DISABLE_IT(&me->huart, UART_IT_TXE);
+	__HAL_UART_DISABLE_IT(&me->huart, UART_IT_RXNE);
+
+	// DeInit UART
+	statusHal = HAL_UART_DeInit(&me->huart);
+	if (statusHal != HAL_OK)
+	{
+		ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_DeInit() statusHal %u", statusHal);
+		return Alx_Err;
+	}
+
+	// Force UART periphery reset
+	AlxSerialPort_Periph_ForceReset(me);
+
+	// Flush TX & RX FIFO
+	if (me->txFifoBuff != NULL) AlxFifo_Flush(&me->txFifo);
+	AlxFifo_Flush(&me->rxFifo);
+
+	// Clear isInit
+	me->isInit = false;
+
+	// Release UART periphery reset
+	AlxSerialPort_Periph_ReleaseReset(me);
+
+	// Init UART
+	if (me->lin != AlxSerialPort_Lin_Disable)
+	{
+		// Assert
+		ALX_SERIAL_PORT_ASSERT(me->dataWidth == UART_WORDLENGTH_8B);
+		ALX_SERIAL_PORT_ASSERT(me->stopBits == UART_STOPBITS_1);
+		ALX_SERIAL_PORT_ASSERT(me->parity == UART_PARITY_NONE);
+
+		// Init
+		#if defined(ALX_STM32F0) && defined(USART_CR2_LINEN)
+		statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
+		if (statusHal != HAL_OK)
+		{
+			ALX_SERIAL_PORT_TRACE("FAIL: HAL_LIN_Init() statusHal %u", statusHal);
+			return Alx_Err;
+		}
+		#endif
+	}
+	else
+	{
+		// Init
+		statusHal = HAL_UART_Init(&me->huart);
+		if (statusHal != HAL_OK)
+		{
+			ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_Init() statusHal %u", statusHal);
+			return Alx_Err;
+		}
+	}
+
+	// Enable UART RX IRQ
+	__HAL_UART_ENABLE_IT(&me->huart, UART_IT_RXNE);
+	AlxSerialPort_Periph_EnableIrq(me);
+
+	// Set isInit
+	me->isInit = true;
+
+	// Return
+	return Alx_Ok;
+}
 static void AlxSerialPort_Periph_EnableClk(AlxSerialPort* me)
 {
 	#ifdef USART1

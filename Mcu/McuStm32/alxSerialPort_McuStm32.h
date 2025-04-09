@@ -64,6 +64,9 @@ typedef enum
 
 typedef struct
 {
+	// Defines
+	#define ALX_SERIAL_PORT_TX_TIMEOUT_ms 1000
+
 	// Parameters
 	USART_TypeDef* uart;
 	AlxIoPin* do_TX;
@@ -78,8 +81,8 @@ typedef struct
 	uint32_t rxFifoBuffLen;
 	Alx_IrqPriority irqPriority;
 	AlxSerialPort_Lin lin;
-	AlxIoPin* do_DBG_IrqTx;
-	AlxIoPin* do_DBG_IrqRx;
+	AlxIoPin* do_DBG_Tx;
+	AlxIoPin* do_DBG_Rx;
 
 	// Variables
 	UART_HandleTypeDef huart;
@@ -111,8 +114,8 @@ void AlxSerialPort_Ctor
 	uint32_t rxFifoBuffLen,
 	Alx_IrqPriority irqPriority,
 	AlxSerialPort_Lin lin,
-	AlxIoPin* do_DBG_IrqTx,
-	AlxIoPin* do_DBG_IrqRx
+	AlxIoPin* do_DBG_Tx,
+	AlxIoPin* do_DBG_Rx
 );
 
 
