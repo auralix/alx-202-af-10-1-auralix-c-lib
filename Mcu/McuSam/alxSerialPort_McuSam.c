@@ -51,8 +51,8 @@ static void AlxSerialPort_Periph_DisableIrq(AlxSerialPort* me);
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-void AlxSerialPort_Lin_Slave_RxBreak_Callback(AlxSerialPort* me);
-void AlxSerialPort_Lin_Slave_RxByte_Callback(AlxSerialPort* me, uint8_t rxByte);
+void AlxSerialPort_RxData_Callback(AlxSerialPort* me, uint8_t data);
+void AlxSerialPort_LinSlaveRxBreak_Callback(AlxSerialPort* me);
 
 
 //******************************************************************************
@@ -63,6 +63,7 @@ void AlxSerialPort_Lin_Slave_RxByte_Callback(AlxSerialPort* me, uint8_t rxByte);
   * @brief
   * @param[in,out]	me
   * @param[in]		hw
+  * @param[in]		config
   * @param[in]		do_TX
   * @param[in]		di_RX
   * @param[in]		txFifoBuff
@@ -70,13 +71,13 @@ void AlxSerialPort_Lin_Slave_RxByte_Callback(AlxSerialPort* me, uint8_t rxByte);
   * @param[in]		rxFifoBuff
   * @param[in]		rxFifoBuffLen
   * @param[in]		irqPriority
-  * @param[in]		lin
   * @param[in]		do_DBG_Tx
   * @param[in]		do_DBG_Rx
   */
 void AlxSerialPort_Ctor
 (
 	AlxSerialPort* me,
+	AlxSerialPort_Config config,
 	void* hw,
 	AlxIoPin* do_TX,
 	AlxIoPin* di_RX,
@@ -85,12 +86,14 @@ void AlxSerialPort_Ctor
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
 	Alx_IrqPriority irqPriority,
-	AlxSerialPort_Lin lin,
 	AlxIoPin* do_DBG_Tx,
 	AlxIoPin* do_DBG_Rx
 )
 {
+	//------------------------------------------------------------------------------
 	// Parameters
+	//------------------------------------------------------------------------------
+	me->config = config;
 	me->hw = hw;
 	me->do_TX = do_TX;
 	me->di_RX = di_RX;
@@ -99,16 +102,93 @@ void AlxSerialPort_Ctor
 	me->rxFifoBuff = rxFifoBuff;
 	me->rxFifoBuffLen = rxFifoBuffLen;
 	me->irqPriority = irqPriority;
-	me->lin = lin;
 	me->do_DBG_Tx = do_DBG_Tx;
 	me->do_DBG_Rx = do_DBG_Rx;
 
-	// Variables
-	memset(&me->descr, 0, sizeof(me->descr));
-	if (txFifoBuff != NULL) AlxFifo_Ctor(&me->txFifo, txFifoBuff, txFifoBuffLen);
-	AlxFifo_Ctor(&me->rxFifo, rxFifoBuff, rxFifoBuffLen);
 
+	//------------------------------------------------------------------------------
+	// Parameters - Private
+	//------------------------------------------------------------------------------
+
+	// txFifoUsed
+	if
+	(
+		(config == AlxSerialPort_Config_Standard_TxIrqFifo_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_Standard_TxIrqFifo_RxIrqCallback) ||
+		(config == AlxSerialPort_Config_LinMaster_TxIrqFifo_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_LinMaster_TxIrqFifo_RxIrqCallback) ||
+		(config == AlxSerialPort_Config_LinSlave_TxIrqFifo_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_LinSlave_TxIrqFifo_RxIrqCallback))
+	{
+		me->txFifoUsed = true;
+	}
+	else
+	{
+		me->txFifoUsed = false;
+	}
+
+	// rxFifoUsed
+	if
+	(
+		(config == AlxSerialPort_Config_Standard_TxBlocking_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_Standard_TxIrqFifo_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_LinMaster_TxBlocking_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_LinMaster_TxIrqFifo_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_LinSlave_TxBlocking_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_LinSlave_TxIrqFifo_RxIrqFifo)
+	)
+	{
+		me->rxFifoUsed = true;
+	}
+	else
+	{
+		me->rxFifoUsed = false;
+	}
+
+	// linMaster
+	if
+	(
+		(config == AlxSerialPort_Config_LinMaster_TxBlocking_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_LinMaster_TxBlocking_RxIrqCallback) ||
+		(config == AlxSerialPort_Config_LinMaster_TxIrqFifo_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_LinMaster_TxIrqFifo_RxIrqCallback)
+	)
+	{
+		me->linMaster = true;
+	}
+	else
+	{
+		me->linMaster = false;
+	}
+
+	// linSlave
+	if
+	(
+		(config == AlxSerialPort_Config_LinSlave_TxBlocking_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_LinSlave_TxBlocking_RxIrqCallback) ||
+		(config == AlxSerialPort_Config_LinSlave_TxIrqFifo_RxIrqFifo) ||
+		(config == AlxSerialPort_Config_LinSlave_TxIrqFifo_RxIrqCallback)
+	)
+	{
+		me->linSlave = true;
+	}
+	else
+	{
+		me->linSlave = false;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Variables
+	//------------------------------------------------------------------------------
+	memset(&me->descr, 0, sizeof(me->descr));
+	if (me->txFifoUsed) AlxFifo_Ctor(&me->txFifo, txFifoBuff, txFifoBuffLen);
+	if (me->rxFifoUsed) AlxFifo_Ctor(&me->rxFifo, rxFifoBuff, rxFifoBuffLen);
+
+
+	//------------------------------------------------------------------------------
 	// Info
+	//------------------------------------------------------------------------------
 	me->wasCtorCalled = true;
 	me->isInit = false;
 }
@@ -131,8 +211,8 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->isInit == false);
 
 	// Flush TX & RX FIFO
-	if (me->txFifoBuff != NULL) AlxFifo_Flush(&me->txFifo);
-	AlxFifo_Flush(&me->rxFifo);
+	if (me->txFifoUsed) AlxFifo_Flush(&me->txFifo);
+	if (me->rxFifoUsed) AlxFifo_Flush(&me->rxFifo);
 
 	// Init GPIO
 	AlxIoPin_Init(me->do_TX);
@@ -148,7 +228,7 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 
 	// Enable UART IRQ
 	hri_sercomusart_set_INTEN_RXC_bit(me->hw);
-	if (me->lin == AlxSerialPort_Lin_EnableSlave) hri_sercomusart_set_INTEN_RXBRK_bit(me->hw);
+	if (me->linSlave) hri_sercomusart_set_INTEN_RXBRK_bit(me->hw);
 	AlxSerialPort_Periph_EnableIrq(me);
 
 	// Set isInit
@@ -172,9 +252,9 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 
 	// Disable UART IRQ
 	AlxSerialPort_Periph_DisableIrq(me);
-	if (me->txFifoBuff != NULL) hri_sercomusart_clear_INTEN_DRE_bit(me->hw);
+	if (me->txFifoUsed) hri_sercomusart_clear_INTEN_DRE_bit(me->hw);
 	hri_sercomusart_clear_INTEN_RXC_bit(me->hw);
-	if (me->lin == AlxSerialPort_Lin_EnableSlave) hri_sercomusart_clear_INTEN_RXBRK_bit(me->hw);
+	if (me->linSlave) hri_sercomusart_clear_INTEN_RXBRK_bit(me->hw);
 
 	// DeInit UART
 	usart_sync_deinit(&me->descr);	// TV: Always returns OK, disables & resets periphery
@@ -188,8 +268,8 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	AlxIoPin_DeInit(me->di_RX);
 
 	// Flush TX & RX FIFO
-	if (me->txFifoBuff != NULL) AlxFifo_Flush(&me->txFifo);
-	AlxFifo_Flush(&me->rxFifo);
+	if (me->txFifoUsed) AlxFifo_Flush(&me->txFifo);
+	if (me->rxFifoUsed) AlxFifo_Flush(&me->rxFifo);
 
 	// Clear isInit
 	me->isInit = false;
@@ -211,6 +291,7 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
+	ALX_SERIAL_PORT_ASSERT(me->rxFifoUsed == true);
 
 	// Read RX FIFO
 	AlxGlobal_DisableIrq();
@@ -236,7 +317,9 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
-	ALX_SERIAL_PORT_ASSERT(me->lin == AlxSerialPort_Lin_Disable);
+	ALX_SERIAL_PORT_ASSERT(me->rxFifoUsed == true);
+	ALX_SERIAL_PORT_ASSERT(me->linMaster == false);
+	ALX_SERIAL_PORT_ASSERT(me->linSlave == false);
 
 	// Read RX FIFO
 	AlxGlobal_DisableIrq();
@@ -275,7 +358,7 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	//------------------------------------------------------------------------------
 	// Write
 	//------------------------------------------------------------------------------
-	if (me->txFifoBuff != NULL)
+	if (me->txFifoUsed)
 	{
 		// Write TX FIFO
 		AlxGlobal_DisableIrq();
@@ -334,7 +417,8 @@ Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
-	ALX_SERIAL_PORT_ASSERT(me->lin == AlxSerialPort_Lin_Disable);
+	ALX_SERIAL_PORT_ASSERT(me->linMaster == false);
+	ALX_SERIAL_PORT_ASSERT(me->linSlave == false);
 
 	// Return
 	return AlxSerialPort_Write(me, (const uint8_t*)str, strlen(str));
@@ -347,19 +431,19 @@ Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
 void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 {
 	//------------------------------------------------------------------------------
-	// TX
+	// TX Data
 	//------------------------------------------------------------------------------
-	if (me->txFifoBuff != NULL)
+	if (me->txFifoUsed)
 	{
 		if (hri_sercomusart_get_INTFLAG_DRE_bit(me->hw))
 		{
-			uint8_t txData = 0;
-			Alx_Status status = AlxFifo_Read(&me->txFifo, &txData, sizeof(txData));
+			uint8_t data = 0;
+			Alx_Status status = AlxFifo_Read(&me->txFifo, &data, sizeof(data));
 			if (status == Alx_Ok)
 			{
 				// TX data from TX FIFO
 				if (me->do_DBG_Tx != NULL) AlxIoPin_Set(me->do_DBG_Tx);
-				hri_sercomusart_write_DATA_reg(me->hw, txData);	// Clears DRE
+				hri_sercomusart_write_DATA_reg(me->hw, data);	// Clears DRE
 				if (me->do_DBG_Tx != NULL) AlxIoPin_Reset(me->do_DBG_Tx);
 			}
 			else
@@ -372,29 +456,31 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 
 
 	//------------------------------------------------------------------------------
-	// RX
+	// RX Data
 	//------------------------------------------------------------------------------
 	if (hri_sercomusart_get_INTFLAG_RXC_bit(me->hw))
 	{
-		uint8_t rxData = hri_sercomusart_read_DATA_reg(me->hw);	// Clears RXC
-		AlxFifo_Write(&me->rxFifo, rxData);
-
-		if (me->lin == AlxSerialPort_Lin_EnableSlave)
+		uint8_t data = hri_sercomusart_read_DATA_reg(me->hw);	// Clears RXC
+		if (me->rxFifoUsed)
 		{
-			AlxSerialPort_Lin_Slave_RxByte_Callback(me, rxData);
+			AlxFifo_Write(&me->rxFifo, data);
+		}
+		else
+		{
+			AlxSerialPort_RxData_Callback(me, data);
 		}
 	}
 
 
 	//------------------------------------------------------------------------------
-	// LIN RX Break
+	// LIN Slave RX Break
 	//------------------------------------------------------------------------------
-	if (me->lin == AlxSerialPort_Lin_EnableSlave)
+	if (me->linSlave)
 	{
 		if (hri_sercomusart_get_INTFLAG_RXBRK_bit(me->hw))
 		{
 			hri_sercomusart_clear_INTFLAG_RXBRK_bit(me->hw);
-			AlxSerialPort_Lin_Slave_RxBreak_Callback(me);
+			AlxSerialPort_LinSlaveRxBreak_Callback(me);
 		}
 	}
 }
@@ -405,6 +491,11 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
   */
 void AlxSerialPort_FlushRxFifo(AlxSerialPort* me)
 {
+	// Assert
+	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
+	ALX_SERIAL_PORT_ASSERT(me->rxFifoUsed == true);
+
+	// Flush
 	AlxFifo_Flush(&me->rxFifo);
 }
 
@@ -415,6 +506,11 @@ void AlxSerialPort_FlushRxFifo(AlxSerialPort* me)
   */
 uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
 {
+	// Assert
+	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
+	ALX_SERIAL_PORT_ASSERT(me->rxFifoUsed == true);
+
+	// Get
 	return AlxFifo_GetNumOfEntries(&me->rxFifo);
 }
 
@@ -426,16 +522,16 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 {
 	// Disable UART IRQ
 	AlxSerialPort_Periph_DisableIrq(me);
-	if (me->txFifoBuff != NULL) hri_sercomusart_clear_INTEN_DRE_bit(me->hw);
+	if (me->txFifoUsed) hri_sercomusart_clear_INTEN_DRE_bit(me->hw);
 	hri_sercomusart_clear_INTEN_RXC_bit(me->hw);
-	if (me->lin == AlxSerialPort_Lin_EnableSlave) hri_sercomusart_clear_INTEN_RXBRK_bit(me->hw);
+	if (me->linSlave) hri_sercomusart_clear_INTEN_RXBRK_bit(me->hw);
 
 	// DeInit UART
 	usart_sync_deinit(&me->descr);	// TV: Always returns OK, disables & resets periphery
 
 	// Flush TX & RX FIFO
-	if (me->txFifoBuff != NULL) AlxFifo_Flush(&me->txFifo);
-	AlxFifo_Flush(&me->rxFifo);
+	if (me->txFifoUsed) AlxFifo_Flush(&me->txFifo);
+	if (me->rxFifoUsed) AlxFifo_Flush(&me->rxFifo);
 
 	// Clear isInit
 	me->isInit = false;
@@ -446,7 +542,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 
 	// Enable UART IRQ
 	hri_sercomusart_set_INTEN_RXC_bit(me->hw);
-	if (me->lin == AlxSerialPort_Lin_EnableSlave) hri_sercomusart_set_INTEN_RXBRK_bit(me->hw);
+	if (me->linSlave) hri_sercomusart_set_INTEN_RXBRK_bit(me->hw);
 	AlxSerialPort_Periph_EnableIrq(me);
 
 	// Set isInit
@@ -533,14 +629,15 @@ static void AlxSerialPort_Periph_DisableIrq(AlxSerialPort* me)
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-ALX_WEAK void AlxSerialPort_Lin_Slave_RxBreak_Callback(AlxSerialPort* me)
+ALX_WEAK void AlxSerialPort_RxData_Callback(AlxSerialPort* me, uint8_t data)
+{
+	(void)me;
+	(void)data;
+}
+ALX_WEAK void AlxSerialPort_LinSlaveRxBreak_Callback(AlxSerialPort* me)
 {
 	(void)me;
 }
-ALX_WEAK void AlxSerialPort_Lin_Slave_RxByte_Callback(AlxSerialPort* me, uint8_t rxByte)
-{
-	(void)me;
-	(void)rxByte;
-}
+
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_SAM)

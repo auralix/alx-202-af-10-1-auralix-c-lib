@@ -57,13 +57,6 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxSerialPort_Lin_Disable,
-	AlxSerialPort_Lin_EnableMaster,
-	AlxSerialPort_Lin_EnableSlave
-} AlxSerialPort_Lin;
-
-typedef enum
-{
 	AlxSerialPort_Config_Standard_TxBlocking_RxIrqFifo,
 	AlxSerialPort_Config_Standard_TxBlocking_RxIrqCallback,
 	AlxSerialPort_Config_Standard_TxIrqFifo_RxIrqFifo,
@@ -83,6 +76,7 @@ typedef enum
 typedef struct
 {
 	// Parameters
+	AlxSerialPort_Config config;
 	void* hw;
 	AlxIoPin* do_TX;
 	AlxIoPin* di_RX;
@@ -91,9 +85,14 @@ typedef struct
 	uint8_t* rxFifoBuff;
 	uint32_t rxFifoBuffLen;
 	Alx_IrqPriority irqPriority;
-	AlxSerialPort_Lin lin;
 	AlxIoPin* do_DBG_Tx;
 	AlxIoPin* do_DBG_Rx;
+
+	// Parameters - Private
+	bool txFifoUsed;
+	bool rxFifoUsed;
+	bool linMaster;
+	bool linSlave;
 
 	// Variables
 	struct usart_sync_descriptor descr;
@@ -112,6 +111,7 @@ typedef struct
 void AlxSerialPort_Ctor
 (
 	AlxSerialPort* me,
+	AlxSerialPort_Config config,
 	void* hw,
 	AlxIoPin* do_TX,
 	AlxIoPin* di_RX,
@@ -120,7 +120,6 @@ void AlxSerialPort_Ctor
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
 	Alx_IrqPriority irqPriority,
-	AlxSerialPort_Lin lin,
 	AlxIoPin* do_DBG_Tx,
 	AlxIoPin* do_DBG_Rx
 );
