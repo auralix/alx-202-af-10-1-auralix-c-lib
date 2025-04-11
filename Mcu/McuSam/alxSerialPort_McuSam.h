@@ -62,6 +62,24 @@ typedef enum
 	AlxSerialPort_Lin_EnableSlave
 } AlxSerialPort_Lin;
 
+typedef enum
+{
+	AlxSerialPort_Config_Standard_TxBlocking_RxIrqFifo,
+	AlxSerialPort_Config_Standard_TxBlocking_RxIrqCallback,
+	AlxSerialPort_Config_Standard_TxIrqFifo_RxIrqFifo,
+	AlxSerialPort_Config_Standard_TxIrqFifo_RxIrqCallback,
+
+	AlxSerialPort_Config_LinMaster_TxBlocking_RxIrqFifo,
+	AlxSerialPort_Config_LinMaster_TxBlocking_RxIrqCallback,
+	AlxSerialPort_Config_LinMaster_TxIrqFifo_RxIrqFifo,
+	AlxSerialPort_Config_LinMaster_TxIrqFifo_RxIrqCallback,
+
+	AlxSerialPort_Config_LinSlave_TxBlocking_RxIrqFifo,
+	AlxSerialPort_Config_LinSlave_TxBlocking_RxIrqCallback,
+	AlxSerialPort_Config_LinSlave_TxIrqFifo_RxIrqFifo,
+	AlxSerialPort_Config_LinSlave_TxIrqFifo_RxIrqCallback
+} AlxSerialPort_Config;
+
 typedef struct
 {
 	// Parameters

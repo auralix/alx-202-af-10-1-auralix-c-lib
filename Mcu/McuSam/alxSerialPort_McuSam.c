@@ -49,6 +49,13 @@ static void AlxSerialPort_Periph_DisableIrq(AlxSerialPort* me);
 
 
 //******************************************************************************
+// Weak Functions
+//******************************************************************************
+void AlxSerialPort_Lin_Slave_RxBreak_Callback(AlxSerialPort* me);
+void AlxSerialPort_Lin_Slave_RxByte_Callback(AlxSerialPort* me, uint8_t rxByte);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 
@@ -141,6 +148,7 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 
 	// Enable UART IRQ
 	hri_sercomusart_set_INTEN_RXC_bit(me->hw);
+	if (me->lin == AlxSerialPort_Lin_EnableSlave) hri_sercomusart_set_INTEN_RXBRK_bit(me->hw);
 	AlxSerialPort_Periph_EnableIrq(me);
 
 	// Set isInit
@@ -166,6 +174,7 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	AlxSerialPort_Periph_DisableIrq(me);
 	if (me->txFifoBuff != NULL) hri_sercomusart_clear_INTEN_DRE_bit(me->hw);
 	hri_sercomusart_clear_INTEN_RXC_bit(me->hw);
+	if (me->lin == AlxSerialPort_Lin_EnableSlave) hri_sercomusart_clear_INTEN_RXBRK_bit(me->hw);
 
 	// DeInit UART
 	usart_sync_deinit(&me->descr);	// TV: Always returns OK, disables & resets periphery
@@ -369,6 +378,24 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 	{
 		uint8_t rxData = hri_sercomusart_read_DATA_reg(me->hw);	// Clears RXC
 		AlxFifo_Write(&me->rxFifo, rxData);
+
+		if (me->lin == AlxSerialPort_Lin_EnableSlave)
+		{
+			AlxSerialPort_Lin_Slave_RxByte_Callback(me, rxData);
+		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// LIN RX Break
+	//------------------------------------------------------------------------------
+	if (me->lin == AlxSerialPort_Lin_EnableSlave)
+	{
+		if (hri_sercomusart_get_INTFLAG_RXBRK_bit(me->hw))
+		{
+			hri_sercomusart_clear_INTFLAG_RXBRK_bit(me->hw);
+			AlxSerialPort_Lin_Slave_RxBreak_Callback(me);
+		}
 	}
 }
 
@@ -401,6 +428,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 	AlxSerialPort_Periph_DisableIrq(me);
 	if (me->txFifoBuff != NULL) hri_sercomusart_clear_INTEN_DRE_bit(me->hw);
 	hri_sercomusart_clear_INTEN_RXC_bit(me->hw);
+	if (me->lin == AlxSerialPort_Lin_EnableSlave) hri_sercomusart_clear_INTEN_RXBRK_bit(me->hw);
 
 	// DeInit UART
 	usart_sync_deinit(&me->descr);	// TV: Always returns OK, disables & resets periphery
@@ -418,6 +446,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 
 	// Enable UART IRQ
 	hri_sercomusart_set_INTEN_RXC_bit(me->hw);
+	if (me->lin == AlxSerialPort_Lin_EnableSlave) hri_sercomusart_set_INTEN_RXBRK_bit(me->hw);
 	AlxSerialPort_Periph_EnableIrq(me);
 
 	// Set isInit
@@ -500,5 +529,18 @@ static void AlxSerialPort_Periph_DisableIrq(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(false);	// We should not get here
 }
 
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+ALX_WEAK void AlxSerialPort_Lin_Slave_RxBreak_Callback(AlxSerialPort* me)
+{
+	(void)me;
+}
+ALX_WEAK void AlxSerialPort_Lin_Slave_RxByte_Callback(AlxSerialPort* me, uint8_t rxByte)
+{
+	(void)me;
+	(void)rxByte;
+}
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_SAM)
