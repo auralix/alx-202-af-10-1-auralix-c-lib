@@ -85,6 +85,8 @@ typedef struct
 	uint8_t* rxFifoBuff;
 	uint32_t rxFifoBuffLen;
 	Alx_IrqPriority irqPriority;
+	AlxIoPin* do_LIN_MASTER_BREAK;
+	uint32_t linMasterBreakLength_forLoopCycles;
 	AlxIoPin* do_DBG_Tx;
 	AlxIoPin* do_DBG_Rx;
 
@@ -120,6 +122,8 @@ void AlxSerialPort_Ctor
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
 	Alx_IrqPriority irqPriority,
+	AlxIoPin* do_LIN_MASTER_BREAK,
+	uint32_t linMasterBreakLength_forLoopCycles,
 	AlxIoPin* do_DBG_Tx,
 	AlxIoPin* do_DBG_Rx
 );

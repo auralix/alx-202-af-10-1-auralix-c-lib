@@ -71,6 +71,8 @@ void AlxSerialPort_LinSlaveRxBreak_Callback(AlxSerialPort* me);
   * @param[in]		rxFifoBuff
   * @param[in]		rxFifoBuffLen
   * @param[in]		irqPriority
+  * @param[in]		do_LIN_MASTER_BREAK
+  * @param[in]		linMasterBreakLength_forLoopCycles
   * @param[in]		do_DBG_Tx
   * @param[in]		do_DBG_Rx
   */
@@ -86,6 +88,8 @@ void AlxSerialPort_Ctor
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
 	Alx_IrqPriority irqPriority,
+	AlxIoPin* do_LIN_MASTER_BREAK,
+	uint32_t linMasterBreakLength_forLoopCycles,
 	AlxIoPin* do_DBG_Tx,
 	AlxIoPin* do_DBG_Rx
 )
@@ -102,6 +106,8 @@ void AlxSerialPort_Ctor
 	me->rxFifoBuff = rxFifoBuff;
 	me->rxFifoBuffLen = rxFifoBuffLen;
 	me->irqPriority = irqPriority;
+	me->do_LIN_MASTER_BREAK = do_LIN_MASTER_BREAK;
+	me->linMasterBreakLength_forLoopCycles = linMasterBreakLength_forLoopCycles;
 	me->do_DBG_Tx = do_DBG_Tx;
 	me->do_DBG_Rx = do_DBG_Rx;
 
@@ -353,6 +359,27 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	Alx_Status status = Alx_Err;
 	struct io_descriptor *io = NULL;
 	usart_sync_get_io_descriptor(&me->descr, &io);
+
+
+	//------------------------------------------------------------------------------
+	// LIN TX Break
+	//------------------------------------------------------------------------------
+	if (me->linMaster)
+	{
+		if (me->do_LIN_MASTER_BREAK != NULL)
+		{
+			// Set GPIO to LOW
+			AlxIoPin_DeInit(me->do_TX);
+			AlxIoPin_Init(me->do_LIN_MASTER_BREAK);
+
+			// Wait
+			for (volatile uint32_t i = 0; i < me->linMasterBreakLength_forLoopCycles; i++);
+
+			// Set GPIO to HIGH
+			AlxIoPin_DeInit(me->do_LIN_MASTER_BREAK);
+			AlxIoPin_Init(me->do_TX);
+		}
+	}
 
 
 	//------------------------------------------------------------------------------

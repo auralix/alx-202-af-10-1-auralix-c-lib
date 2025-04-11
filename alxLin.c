@@ -45,7 +45,6 @@ static Alx_Status AlxLin_DeInit(AlxLin* me, bool isMaster);
 static uint8_t AlxLin_GetDataLenFromId(uint8_t id);
 static uint8_t AlxLin_CalcProtectedId(uint8_t id);
 static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, uint32_t len);
-static Alx_Status AlxLin_TxFrameHeaderBreak(AlxLin* me);
 
 
 //******************************************************************************
@@ -56,7 +55,6 @@ static Alx_Status AlxLin_TxFrameHeaderBreak(AlxLin* me);
   * @brief
   * @param[in,out]	me
   * @param[in]		alxSerialPort
-  * @param[in]		do_BREAK
   * @param[in]		masterReadSwHandleBreak
   * @param[in]		slaveReadSwHandleBreakSync
   */
@@ -64,14 +62,12 @@ void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
-	AlxIoPin* do_BREAK,
 	bool masterReadSwHandleBreak,
 	bool slaveReadSwHandleBreakSync
 )
 {
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
-	me->do_BREAK = do_BREAK;
 	me->masterReadSwHandleBreak = masterReadSwHandleBreak;
 	me->slaveReadSwHandleBreakSync = slaveReadSwHandleBreakSync;
 
@@ -226,19 +222,8 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 		// Flush serial port RX FIFO
 		AlxSerialPort_FlushRxFifo(me->alxSerialPort);
 
-		// Transmit frame header break
-		if (me->do_BREAK != NULL)
-		{
-			status = AlxLin_TxFrameHeaderBreak(me);
-			if (status != Alx_Ok)
-			{
-				ALX_LIN_TRACE_WRN("Err");
-				return status;
-			}
-		}
-
 		// Prepare frame header
-		// Break					// Frame Header Break - Send automatically by HW or by SW above
+		// Break					// Frame Header Break - Send by AlxSerialPort_Write
 		txFrame[0] = 0x55;			// Frame Header SYNC
 		txFrame[1] = protectedId;	// Frame Header Protected ID
 		uint8_t txFrameLen = 2;		// SYNC + Protected ID
@@ -387,25 +372,11 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 
 
 	//------------------------------------------------------------------------------
-	// Transmit Frame Header Break
-	//------------------------------------------------------------------------------
-	if (me->do_BREAK != NULL)
-	{
-		status = AlxLin_TxFrameHeaderBreak(me);
-		if (status != Alx_Ok)
-		{
-			ALX_LIN_TRACE_WRN("Err");
-			return status;
-		}
-	}
-
-
-	//------------------------------------------------------------------------------
 	// Transmit Frame Header + Frame Response
 	//------------------------------------------------------------------------------
 
 	// Prepare frame header
-	// Break								// Frame Header Break - Send automatically by HW or by SW above
+	// Break								// Frame Header Break - Send by AlxSerialPort_Write
 	txFrame[0] = 0x55;						// Frame Header SYNC
 	txFrame[1] = protectedId;				// Frame Header Protected ID
 	memcpy(&txFrame[2], data, len);			// Frame Response Data
@@ -444,7 +415,6 @@ Alx_Status AlxLin_Slave_Init(AlxLin* me)
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInitMaster == false);
 	ALX_LIN_ASSERT(me->isInitSlave == false);
-	ALX_LIN_ASSERT(me->do_BREAK == NULL);
 
 	// Return
 	return AlxLin_Init(me, false);
@@ -462,7 +432,6 @@ Alx_Status AlxLin_Slave_DeInit(AlxLin* me)
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInitMaster == false);
 	ALX_LIN_ASSERT(me->isInitSlave == true);
-	ALX_LIN_ASSERT(me->do_BREAK == NULL);
 
 	// Return
 	return AlxLin_DeInit(me, false);
@@ -504,7 +473,6 @@ Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t le
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInitMaster == false);
 	ALX_LIN_ASSERT(me->isInitSlave == true);
-	ALX_LIN_ASSERT(me->do_BREAK == NULL);
 	ALX_LIN_ASSERT((0 <= len) && (len <= ALX_LIN_BUFF_LEN));
 
 
@@ -763,40 +731,6 @@ static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, u
 
 	// Return
 	return sum;
-}
-static Alx_Status AlxLin_TxFrameHeaderBreak(AlxLin* me)
-{
-	// Local variables
-	Alx_Status status = Alx_Err;
-
-	// DeInit serial port
-	status = AlxSerialPort_DeInit(me->alxSerialPort);
-	if (status != Alx_Ok)
-	{
-		ALX_LIN_TRACE_WRN("Err");
-		return status;
-	}
-
-	// Init - Sets GPIO to LOW
-	AlxIoPin_Init(me->do_BREAK);
-
-	// Wait
-	AlxDelay_ms(2);
-	//for (uint32_t i = 0; i < 3000; i++);
-
-	// DeInit - Sets GPIO to HIGH
-	AlxIoPin_DeInit(me->do_BREAK);
-
-	// Init serial port
-	status = AlxSerialPort_Init(me->alxSerialPort);
-	if (status != Alx_Ok)
-	{
-		ALX_LIN_TRACE_WRN("Err");
-		return status;
-	}
-
-	// Return
-	return Alx_Ok;
 }
 
 
