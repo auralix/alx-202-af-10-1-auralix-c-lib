@@ -658,17 +658,7 @@ void AlxLin_RxBuff_Flush(AlxLin* me)
   * @param[in,out]	me
   * @param[in]		data
   */
-void AlxLin_RxBuff_Write(AlxLin* me, uint8_t data)
-{
-	me->rxb.buff[me->rxb.i] = data;
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		data
-  */
-void AlxLin_RxBuff_Handle(AlxLin* me)
+void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 {
 	//------------------------------------------------------------------------------
 	// Check if Active
@@ -677,6 +667,12 @@ void AlxLin_RxBuff_Handle(AlxLin* me)
 	{
 		return;
 	}
+
+
+	//------------------------------------------------------------------------------
+	// Handle Write
+	//------------------------------------------------------------------------------
+	me->rxb.buff[me->rxb.i] = data;
 
 
 	//------------------------------------------------------------------------------

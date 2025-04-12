@@ -181,8 +181,7 @@ Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t le
 // RX Buffer
 //------------------------------------------------------------------------------
 void AlxLin_RxBuff_Flush(AlxLin* me);
-void AlxLin_RxBuff_Write(AlxLin* me, uint8_t data);
-void AlxLin_RxBuff_Handle(AlxLin* me);
+void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data);
 
 
 //------------------------------------------------------------------------------
