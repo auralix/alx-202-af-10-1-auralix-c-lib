@@ -125,12 +125,9 @@ typedef struct
 	// Parameters
 	AlxSerialPort* alxSerialPort;
 	bool masterReadSwHandleBreak;
-	bool slaveReadSwHandleBreakSync;
+	uint8_t breakSyncOffset;
 	AlxLin_FrameConfig* frameConfigArr;
 	uint8_t frameConfigArrLen;
-
-	// Parameters - Private
-	uint8_t slaveReadBreakSyncOffset;
 
 	// Variables
 	AlxLin_RxBuffStruct rxb;
@@ -150,7 +147,7 @@ void AlxLin_Ctor
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
 	bool masterReadSwHandleBreak,
-	bool slaveReadSwHandleBreakSync,
+	uint8_t breakSyncOffset,
 	AlxLin_FrameConfig* frameConfigArr,
 	uint8_t frameConfigArrLen
 );
