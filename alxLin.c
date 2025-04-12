@@ -45,15 +45,15 @@ static Alx_Status AlxLin_DeInit(AlxLin* me, bool isMaster);
 static uint8_t AlxLin_GetDataLenFromId(uint8_t id);
 static uint8_t AlxLin_CalcProtectedId(uint8_t id);
 static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, uint32_t len);
-static Alx_Status AlxLin_GetRxFrameInfoFromId(AlxLin* me, uint8_t id, AlxLin_RxFrameInfo* rxFrameInfo);
+static Alx_Status AlxLin_GetFrameConfigFromId(AlxLin* me, uint8_t id, AlxLin_FrameConfig* frameConfig);
 
 
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame* msg);
-void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame msg);
-void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* msg);
+void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame* frame);
+void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
+void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame);
 
 
 //******************************************************************************
@@ -66,8 +66,8 @@ void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* msg);
   * @param[in]		alxSerialPort
   * @param[in]		masterReadSwHandleBreak
   * @param[in]		slaveReadSwHandleBreakSync
-  * @param[in]		rxFrameInfoArr
-  * @param[in]		rxFrameInfoArrLen
+  * @param[in]		frameConfigArr
+  * @param[in]		frameConfigArrLen
   */
 void AlxLin_Ctor
 (
@@ -75,16 +75,16 @@ void AlxLin_Ctor
 	AlxSerialPort* alxSerialPort,
 	bool masterReadSwHandleBreak,
 	bool slaveReadSwHandleBreakSync,
-	AlxLin_RxFrameInfo* rxFrameInfoArr,
-	uint8_t rxFrameInfoArrLen
+	AlxLin_FrameConfig* frameConfigArr,
+	uint8_t frameConfigArrLen
 )
 {
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
 	me->masterReadSwHandleBreak = masterReadSwHandleBreak;
 	me->slaveReadSwHandleBreakSync = slaveReadSwHandleBreakSync;
-	me->rxFrameInfoArr = rxFrameInfoArr;
-	me->rxFrameInfoArrLen = rxFrameInfoArrLen;
+	me->frameConfigArr = frameConfigArr;
+	me->frameConfigArrLen = frameConfigArrLen;
 
 	// Variables
 	memset(&me->rxBuff, 0, sizeof(me->rxBuff));
@@ -696,8 +696,8 @@ void AlxLin_RxBuff_Handle(AlxLin* me)
 		}
 
 		// Get data length from table
-		AlxLin_RxFrameInfo rxFrameInfo = {};
-		Alx_Status status = AlxLin_GetRxFrameInfoFromId(me, id_Actual, &rxFrameInfo);
+		AlxLin_FrameConfig rxFrameInfo = {};
+		Alx_Status status = AlxLin_GetFrameConfigFromId(me, id_Actual, &rxFrameInfo);
 		if (status != Alx_Ok)
 		{
 			ALX_LIN_TRACE_WRN("Err");
@@ -899,13 +899,13 @@ static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, u
 	// Return
 	return sum;
 }
-static Alx_Status AlxLin_GetRxFrameInfoFromId(AlxLin* me, uint8_t id, AlxLin_RxFrameInfo* rxFrameInfo)
+static Alx_Status AlxLin_GetFrameConfigFromId(AlxLin* me, uint8_t id, AlxLin_FrameConfig* frameConfig)
 {
-	for (uint32_t i = 0; i < me->rxFrameInfoArrLen; i++)
+	for (uint32_t i = 0; i < me->frameConfigArrLen; i++)
 	{
-		if (me->rxFrameInfoArr[i].id == id)
+		if (me->frameConfigArr[i].id == id)
 		{
-			*rxFrameInfo = me->rxFrameInfoArr[i];
+			*frameConfig = me->frameConfigArr[i];
 			return Alx_Ok;
 		}
 	}

@@ -106,7 +106,7 @@ typedef struct
 	uint8_t id;
 	uint8_t dataLen;
 	bool publish;
-} AlxLin_RxFrameInfo;
+} AlxLin_FrameConfig;
 
 typedef struct
 {
@@ -117,8 +117,8 @@ typedef struct
 	AlxSerialPort* alxSerialPort;
 	bool masterReadSwHandleBreak;
 	bool slaveReadSwHandleBreakSync;
-	AlxLin_RxFrameInfo* rxFrameInfoArr;
-	uint8_t rxFrameInfoArrLen;
+	AlxLin_FrameConfig* frameConfigArr;
+	uint8_t frameConfigArrLen;
 
 	// Variables
 	uint8_t rxBuff[ALX_LIN_BUFF_LEN];
@@ -143,8 +143,8 @@ void AlxLin_Ctor
 	AlxSerialPort* alxSerialPort,
 	bool masterReadSwHandleBreak,
 	bool slaveReadSwHandleBreakSync,
-	AlxLin_RxFrameInfo* rxFrameInfoArr,
-	uint8_t rxFrameInfoArrLen
+	AlxLin_FrameConfig* frameConfigArr,
+	uint8_t frameConfigArrLen
 );
 
 
