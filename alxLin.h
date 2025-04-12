@@ -92,6 +92,24 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	uint8_t _break;
+	uint8_t sync;
+	uint8_t id;
+	uint8_t protectedId;
+	uint8_t dataLen;
+	uint8_t data[8];
+	uint8_t enhancedChecksum;
+} AlxLin_Msg;
+
+typedef struct
+{
+	uint8_t id;
+	uint8_t dataLen;
+	bool publish;
+} AlxLin_RxFrameInfo;
+
+typedef struct
+{
 	// Defines
 	#define ALX_LIN_BUFF_LEN 250
 
@@ -99,6 +117,15 @@ typedef struct
 	AlxSerialPort* alxSerialPort;
 	bool masterReadSwHandleBreak;
 	bool slaveReadSwHandleBreakSync;
+	AlxLin_RxFrameInfo* rxFrameInfoArr;
+	uint8_t rxFrameInfoArrLen;
+
+	// Variables
+	uint8_t rxBuff[ALX_LIN_BUFF_LEN];
+	uint8_t i;
+	AlxLin_Msg rxMsg;
+	bool rxPublish;
+	bool rxBuffHandleActive;
 
 	// Info
 	bool wasCtorCalled;
@@ -115,7 +142,9 @@ void AlxLin_Ctor
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
 	bool masterReadSwHandleBreak,
-	bool slaveReadSwHandleBreakSync
+	bool slaveReadSwHandleBreakSync,
+	AlxLin_RxFrameInfo* rxFrameInfoArr,
+	uint8_t rxFrameInfoArrLen
 );
 
 
@@ -144,9 +173,17 @@ Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t le
 
 
 //------------------------------------------------------------------------------
+// RX Buffer
+//------------------------------------------------------------------------------
+void AlxLin_RxBuff_Flush(AlxLin* me);
+void AlxLin_RxBuff_Write(AlxLin* me, uint8_t data);
+void AlxLin_RxBuff_Handle(AlxLin* me);
+
+
+//------------------------------------------------------------------------------
 // IRQ
 //------------------------------------------------------------------------------
-void AlxLin_IrqHandler(AlxLin* me);
+void AlxLin_Irq_Handle(AlxLin* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
