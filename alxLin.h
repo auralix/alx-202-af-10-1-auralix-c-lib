@@ -127,6 +127,9 @@ typedef struct
 	AlxLin_FrameConfig* frameConfigArr;
 	uint8_t frameConfigArrLen;
 
+	// Parameters - Private
+	uint8_t slaveReadBreakSyncOffset;
+
 	// Variables
 	AlxLin_RxBuffStruct rxb;
 
