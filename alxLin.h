@@ -95,8 +95,6 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	uint8_t _break;
-	uint8_t sync;
 	uint8_t id;
 	uint8_t protectedId;
 	uint8_t dataLen;

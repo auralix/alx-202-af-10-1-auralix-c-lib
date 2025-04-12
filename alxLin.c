@@ -721,7 +721,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 			// Clear active
 			me->rxb.active = false;
 
-			// Transmit
+			// Transmit frame response
 			Alx_Status status = AlxSerialPort_Write(me->alxSerialPort, me->rxb.frame.data, me->rxb.frame.dataLen + 1);
 			if (status != Alx_Ok)
 			{
