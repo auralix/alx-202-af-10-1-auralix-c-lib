@@ -99,7 +99,7 @@ typedef struct
 	uint8_t dataLen;
 	uint8_t data[8];
 	uint8_t enhancedChecksum;
-} AlxLin_Msg;
+} AlxLin_Frame;
 
 typedef struct
 {
@@ -123,7 +123,7 @@ typedef struct
 	// Variables
 	uint8_t rxBuff[ALX_LIN_BUFF_LEN];
 	uint8_t i;
-	AlxLin_Msg rxMsg;
+	AlxLin_Frame rxMsg;
 	bool rxPublish;
 	bool rxBuffHandleActive;
 

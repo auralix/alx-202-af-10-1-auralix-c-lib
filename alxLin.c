@@ -51,8 +51,9 @@ static Alx_Status AlxLin_GetRxFrameInfoFromId(AlxLin* me, uint8_t id, AlxLin_RxF
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Msg msg);
-void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Msg* msg);
+void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame* msg);
+void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame msg);
+void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* msg);
 
 
 //******************************************************************************
@@ -917,15 +918,15 @@ static Alx_Status AlxLin_GetRxFrameInfoFromId(AlxLin* me, uint8_t id, AlxLin_RxF
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-ALX_WEAK void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Msg msg)
+ALX_WEAK void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
 {
 	(void)me;
-	(void)msg;
+	(void)frame;
 }
-ALX_WEAK void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Msg* msg)
+ALX_WEAK void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame)
 {
 	(void)me;
-	(void)msg;
+	(void)frame;
 }
 
 
