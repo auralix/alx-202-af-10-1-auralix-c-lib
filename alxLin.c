@@ -491,7 +491,7 @@ bool AlxLin_Slave_IsInit(AlxLin* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLin_Slave_Read(AlxLin* me, AlxLin_Frame* frame, uint16_t timeout_ms, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms)
+Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t timeout_ms, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -559,6 +559,14 @@ Alx_Status AlxLin_Slave_Read(AlxLin* me, AlxLin_Frame* frame, uint16_t timeout_m
 		#else
 		AlxDelay_ms(rxFifoNumOfEntriesNewCheckWaitTime_ms);
 		#endif
+
+		// Check if data length to large
+		if (rxFrameLen_Actual > rxFrameLen_Expected)
+		{
+			ALX_LIN_TRACE_WRN("Err");
+			status = Alx_Err;
+			break;
+		}
 
 		// Check if timeout
 		if (AlxTimSw_IsTimeout_ms(&alxTimSw, timeout_ms))
