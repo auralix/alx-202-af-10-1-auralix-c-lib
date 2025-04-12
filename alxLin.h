@@ -86,6 +86,9 @@ extern "C" {
 	#define ALX_LIN_TRACE_VRB(...) do{} while (false)
 #endif
 
+// Defines
+#define ALX_LIN_BUFF_LEN 250
+
 
 //******************************************************************************
 // Types
@@ -110,9 +113,15 @@ typedef struct
 
 typedef struct
 {
-	// Defines
-	#define ALX_LIN_BUFF_LEN 250
+	uint8_t buff[ALX_LIN_BUFF_LEN];
+	uint8_t i;
+	AlxLin_Frame frame;
+	AlxLin_FrameConfig frameConfig;
+	bool active;
+} AlxLin_RxBuffStruct;
 
+typedef struct
+{
 	// Parameters
 	AlxSerialPort* alxSerialPort;
 	bool masterReadSwHandleBreak;
@@ -121,11 +130,7 @@ typedef struct
 	uint8_t frameConfigArrLen;
 
 	// Variables
-	uint8_t rxBuff[ALX_LIN_BUFF_LEN];
-	uint8_t i;
-	AlxLin_Frame rxMsg;
-	bool rxPublish;
-	bool rxBuffHandleActive;
+	AlxLin_RxBuffStruct rxb;
 
 	// Info
 	bool wasCtorCalled;
