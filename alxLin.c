@@ -226,7 +226,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 	}
 	else
 	{
-		breakOffset = 1;
+		breakOffset = 2;
 	}
 
 
@@ -263,7 +263,7 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 
 		// Check if serial port RX FIFO number of entries is OK
 		uint32_t rxFrameLen = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);
-		rxFrameDataLen = rxFrameLen - (4 - breakOffset);	// We must subtract: *Break, SYNC, Protected ID, Enhanced Checksum
+		rxFrameDataLen = rxFrameLen - (4 - breakOffset);	// We must subtract: *Break, *SYNC, Protected ID, Enhanced Checksum
 		if (variableLen)
 		{
 			if (rxFrameDataLen > variableLen_maxLen)
