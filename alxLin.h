@@ -87,8 +87,8 @@ extern "C" {
 #endif
 
 // Defines
-#ifndef ALX_LIN_BUFF_LEN
-	#define ALX_LIN_BUFF_LEN 16
+#ifndef ALX_LIN_FRAME_DATA_LEN_MAX
+	#define ALX_LIN_FRAME_DATA_LEN_MAX 8
 #endif
 
 
@@ -100,7 +100,7 @@ typedef struct
 	uint8_t id;
 	uint8_t protectedId;
 	uint8_t dataLen;
-	uint8_t data[ALX_LIN_BUFF_LEN];
+	uint8_t data[ALX_LIN_FRAME_DATA_LEN_MAX];
 	uint8_t enhancedChecksum;
 } AlxLin_Frame;
 
@@ -113,7 +113,7 @@ typedef struct
 
 typedef struct
 {
-	uint8_t buff[ALX_LIN_BUFF_LEN];
+	uint8_t buff[3 + ALX_LIN_FRAME_DATA_LEN_MAX + 1];
 	uint8_t i;
 	AlxLin_Frame frame;
 	AlxLin_FrameConfig frameConfig;
