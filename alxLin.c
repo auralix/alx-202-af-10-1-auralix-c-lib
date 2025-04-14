@@ -48,7 +48,7 @@ static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLi
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame* frame);
+void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
 void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
 void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame);
 
@@ -306,6 +306,57 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	frame->protectedId = protectedId_Actual;
 	memcpy(frame->data, &rxFrame[me->breakSyncOffset + 1], frame->dataLen);
 	frame->enhancedChecksum = enhancedChecksum_Actual;
+
+	// Return
+	return Alx_Ok;
+}
+
+Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
+	ALX_LIN_ASSERT((0 <= frame.id) && (frame.id <= 0x3F));
+	ALX_LIN_ASSERT((0 < frame.dataLen) && (frame.dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
+
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
+	uint8_t protectedId = AlxLin_CalcProtectedId(frame.id);
+	uint8_t txFrame[2] = {};	// SYNC + Protected ID
+
+
+	//------------------------------------------------------------------------------
+	// Transmit Frame Header
+	//------------------------------------------------------------------------------
+
+	// Prepare
+	// Break					// Frame Header Break - Send by AlxSerialPort_Write
+	txFrame[0] = 0x55;			// Frame Header SYNC
+	txFrame[1] = protectedId;	// Frame Header Protected ID
+	uint8_t txFrameLen = 2;		// SYNC + Protected ID
+
+	// Flush
+	AlxSerialPort_FlushTxFifo(me->alxSerialPort);
+	AlxLin_RxBuff_Flush(me);
+
+	// Set frame
+	me->rxb.frame.id = frame.id;
+	me->rxb.frame.protectedId = protectedId;
+	me->rxb.frame.dataLen = frame.dataLen;
+
+	// Transmit
+	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %ld", status);
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -636,56 +687,76 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 	//------------------------------------------------------------------------------
 	if (me->rxb.i == me->breakSyncOffset)
 	{
-		// Check protected ID
-		uint8_t protectedId_Actual = me->rxb.buff[me->breakSyncOffset];
-		uint8_t id_Actual = protectedId_Actual & 0x3F;
-		uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
-		if (protectedId_Actual != protectedId_Expected)
+		if (me->isMaster)
 		{
-			ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
-			me->rxb.active = false;
-			return;
+			// Set frame - Already set by AlxLin_Master_SubscribeViaCallback
+			// me->rxb.frame.id
+			// me->rxb.frame.protectedId
+			// me->rxb.frame.dataLen
+
+			// Check protected ID
+			uint8_t protectedId_Actual = me->rxb.buff[me->breakSyncOffset];
+			uint8_t protectedId_Expected = me->rxb.frame.protectedId;
+			if (protectedId_Actual != protectedId_Expected)
+			{
+				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
+				me->rxb.active = false;
+				return;
+			}
 		}
-
-		// Get slave frame config from ID
-		AlxLin_SlaveFrameConfig slaveFrameConfig = {};
-		Alx_Status status = AlxLin_GetSlaveFrameConfigFromId(me, id_Actual, &slaveFrameConfig);
-		if (status != Alx_Ok)
+		else
 		{
-			ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %u", status, id_Actual);
-			me->rxb.active = false;
-			return;
-		}
+			// Check protected ID
+			uint8_t protectedId_Actual = me->rxb.buff[me->breakSyncOffset];
+			uint8_t id_Actual = protectedId_Actual & 0x3F;
+			uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
+			if (protectedId_Actual != protectedId_Expected)
+			{
+				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
+				me->rxb.active = false;
+				return;
+			}
 
-		// Set frame
-		me->rxb.frame.id = id_Actual;
-		me->rxb.frame.protectedId = protectedId_Actual;
-		me->rxb.frame.dataLen = slaveFrameConfig.dataLen;
-
-		// Set slave frame config
-		me->rxb.slaveFrameConfig = slaveFrameConfig;
-
-
-		//------------------------------------------------------------------------------
-		// Handle Slave Publish
-		//------------------------------------------------------------------------------
-		if (me->rxb.slaveFrameConfig.publish)
-		{
-			// Callback
-			AlxLin_Slave_Publish_Callback(me, &me->rxb.frame);
-
-			// Set enhanced checksum
-			me->rxb.frame.enhancedChecksum = AlxLin_CalcEnhancedChecksum(me->rxb.frame.protectedId, me->rxb.frame.data, me->rxb.frame.dataLen);
-
-			// Clear active
-			me->rxb.active = false;
-
-			// Transmit frame response
-			Alx_Status status = AlxSerialPort_Write(me->alxSerialPort, me->rxb.frame.data, me->rxb.frame.dataLen + 1);
+			// Get slave frame config from ID
+			AlxLin_SlaveFrameConfig slaveFrameConfig = {};
+			Alx_Status status = AlxLin_GetSlaveFrameConfigFromId(me, id_Actual, &slaveFrameConfig);
 			if (status != Alx_Ok)
 			{
-				ALX_LIN_TRACE_DBG("FAIL: AlxSerialPort_Write() status %ld", status);
+				ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %u", status, id_Actual);
+				me->rxb.active = false;
 				return;
+			}
+
+			// Set frame
+			me->rxb.frame.id = id_Actual;
+			me->rxb.frame.protectedId = protectedId_Actual;
+			me->rxb.frame.dataLen = slaveFrameConfig.dataLen;
+
+			// Set slave frame config
+			me->rxb.slaveFrameConfig = slaveFrameConfig;
+
+
+			//------------------------------------------------------------------------------
+			// Handle Slave Publish
+			//------------------------------------------------------------------------------
+			if (me->rxb.slaveFrameConfig.publish)
+			{
+				// Callback
+				AlxLin_Slave_Publish_Callback(me, &me->rxb.frame);
+
+				// Set enhanced checksum
+				me->rxb.frame.enhancedChecksum = AlxLin_CalcEnhancedChecksum(me->rxb.frame.protectedId, me->rxb.frame.data, me->rxb.frame.dataLen);
+
+				// Clear active
+				me->rxb.active = false;
+
+				// Transmit frame response
+				Alx_Status status = AlxSerialPort_Write(me->alxSerialPort, me->rxb.frame.data, me->rxb.frame.dataLen + 1);
+				if (status != Alx_Ok)
+				{
+					ALX_LIN_TRACE_DBG("FAIL: AlxSerialPort_Write() status %ld", status);
+					return;
+				}
 			}
 		}
 	}
@@ -722,7 +793,14 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 		me->rxb.frame.enhancedChecksum = enhancedChecksum_Actual;
 
 		// Callback
-		AlxLin_Slave_Subscribe_Callback(me, me->rxb.frame);
+		if (me->isMaster)
+		{
+			AlxLin_Master_Subscribe_Callback(me, me->rxb.frame);
+		}
+		else
+		{
+			AlxLin_Slave_Subscribe_Callback(me, me->rxb.frame);
+		}
 	}
 
 
@@ -800,6 +878,11 @@ static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLi
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
+ALX_WEAK void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
+{
+	(void)me;
+	(void)frame;
+}
 ALX_WEAK void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
 {
 	(void)me;

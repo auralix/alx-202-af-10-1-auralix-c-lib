@@ -163,6 +163,7 @@ Alx_Status AlxLin_Master_Init(AlxLin* me);
 Alx_Status AlxLin_Master_DeInit(AlxLin* me);
 bool AlxLin_Master_IsInit(AlxLin* me);
 Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t slaveResponseWaitTime_ms);
+Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame);
 Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame);
 
 
