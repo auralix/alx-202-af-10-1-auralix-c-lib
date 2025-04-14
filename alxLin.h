@@ -116,7 +116,6 @@ typedef struct
 	uint8_t buff[3 + ALX_LIN_FRAME_DATA_LEN_MAX + 1];
 	uint8_t i;
 	AlxLin_Frame frame;
-	AlxLin_SlaveFrameConfig slaveFrameConfig;
 	bool active;
 } AlxLin_RxBuffStruct;
 

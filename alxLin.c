@@ -310,7 +310,6 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	// Return
 	return Alx_Ok;
 }
-
 Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame)
 {
 	//------------------------------------------------------------------------------
@@ -732,14 +731,11 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 			me->rxb.frame.protectedId = protectedId_Actual;
 			me->rxb.frame.dataLen = slaveFrameConfig.dataLen;
 
-			// Set slave frame config
-			me->rxb.slaveFrameConfig = slaveFrameConfig;
-
 
 			//------------------------------------------------------------------------------
 			// Handle Slave Publish
 			//------------------------------------------------------------------------------
-			if (me->rxb.slaveFrameConfig.publish)
+			if (slaveFrameConfig.publish)
 			{
 				// Callback
 				AlxLin_Slave_Publish_Callback(me, &me->rxb.frame);
