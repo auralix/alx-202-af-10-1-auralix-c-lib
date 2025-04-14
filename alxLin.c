@@ -42,7 +42,7 @@
 //******************************************************************************
 static uint8_t AlxLin_CalcProtectedId(uint8_t id);
 static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, uint32_t len);
-static Alx_Status AlxLin_GetFrameConfigFromId(AlxLin* me, uint8_t id, AlxLin_FrameConfig* frameConfig);
+static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLin_SlaveFrameConfig* slaveFrameConfig);
 
 
 //******************************************************************************
@@ -62,23 +62,23 @@ void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame);
   * @param[in,out]	me
   * @param[in]		alxSerialPort
   * @param[in]		breakSyncOffset
-  * @param[in]		frameConfigArr
-  * @param[in]		frameConfigArrLen
+  * @param[in]		slaveFrameConfigArr
+  * @param[in]		slaveFrameConfigArrLen
   */
 void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
 	uint8_t breakSyncOffset,
-	AlxLin_FrameConfig* frameConfigArr,
-	uint8_t frameConfigArrLen
+	AlxLin_SlaveFrameConfig* slaveFrameConfigArr,
+	uint8_t slaveFrameConfigArrLen
 )
 {
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
 	me->breakSyncOffset = breakSyncOffset;
-	me->frameConfigArr = frameConfigArr;
-	me->frameConfigArrLen = frameConfigArrLen;
+	me->slaveFrameConfigArr = slaveFrameConfigArr;
+	me->slaveFrameConfigArrLen = slaveFrameConfigArrLen;
 
 	// Variables
 	memset(&me->rxb, 0, sizeof(me->rxb));
@@ -647,12 +647,12 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 			return;
 		}
 
-		// Get frame config from ID
-		AlxLin_FrameConfig frameConfig = {};
-		Alx_Status status = AlxLin_GetFrameConfigFromId(me, id_Actual, &frameConfig);
+		// Get slave frame config from ID
+		AlxLin_SlaveFrameConfig slaveFrameConfig = {};
+		Alx_Status status = AlxLin_GetSlaveFrameConfigFromId(me, id_Actual, &slaveFrameConfig);
 		if (status != Alx_Ok)
 		{
-			ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetFrameConfigFromId() status %ld id_Actual %u", status, id_Actual);
+			ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %u", status, id_Actual);
 			me->rxb.active = false;
 			return;
 		}
@@ -660,16 +660,16 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 		// Set frame
 		me->rxb.frame.id = id_Actual;
 		me->rxb.frame.protectedId = protectedId_Actual;
-		me->rxb.frame.dataLen = frameConfig.dataLen;
+		me->rxb.frame.dataLen = slaveFrameConfig.dataLen;
 
-		// Set frame config
-		me->rxb.frameConfig = frameConfig;
+		// Set slave frame config
+		me->rxb.slaveFrameConfig = slaveFrameConfig;
 
 
 		//------------------------------------------------------------------------------
 		// Handle Slave Publish
 		//------------------------------------------------------------------------------
-		if (me->rxb.frameConfig.publish)
+		if (me->rxb.slaveFrameConfig.publish)
 		{
 			// Callback
 			AlxLin_Slave_Publish_Callback(me, &me->rxb.frame);
@@ -780,14 +780,14 @@ static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, u
 	// Return
 	return sum;
 }
-static Alx_Status AlxLin_GetFrameConfigFromId(AlxLin* me, uint8_t id, AlxLin_FrameConfig* frameConfig)
+static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLin_SlaveFrameConfig* slaveFrameConfig)
 {
 	// Get
-	for (uint32_t i = 0; i < me->frameConfigArrLen; i++)
+	for (uint32_t i = 0; i < me->slaveFrameConfigArrLen; i++)
 	{
-		if (me->frameConfigArr[i].id == id)
+		if (me->slaveFrameConfigArr[i].id == id)
 		{
-			*frameConfig = me->frameConfigArr[i];
+			*slaveFrameConfig = me->slaveFrameConfigArr[i];
 			return Alx_Ok;
 		}
 	}
