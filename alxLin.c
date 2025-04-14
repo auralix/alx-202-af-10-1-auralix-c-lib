@@ -174,6 +174,85 @@ bool AlxLin_Master_IsInit(AlxLin* me)
 }
 
 /**
+  * @brief					As a LIN master device, transmit frame header and frame response to specified ID
+  *								This will probably be an ID of LIN slave device
+  *								If it's our own ID, then we will transmit frame to ourselves
+  *								In LIN terminology when you are transmitting frame response, this is considered PUBLISHING
+  *								Alternative name: AlxLin_Master_TxFrameHeader_TxFrameResponse
+  * @param[in,out]	me
+  * @param[in]		frame	Frame which will be transmitted and shall include:
+  *								frame.id - Frame Header ID
+  *									ID which will be transmitted in the frame header
+  *									Acceptable values: 0x00 .. 0x3F
+  *								frame.dataLen - Frame Response Data Length
+  *									Transmitted frame response data length
+  *									0 < frame.dataLen <= ALX_LIN_BUFF_LEN
+  *									If we want that data length is LIN compliant then:
+  *										Acceptable values are: 2, 4, 8
+  *										Length must be set accordingly to specified ID
+  *											If ID = 0x00 .. 0x1F, then 2
+  *											If ID = 0x20 .. 0x2F, then 4
+  *											If ID = 0x30 .. 0x3F, then 8
+  *								frame.data - Frame Response Data
+  *									Data which will be transmitted in frame response
+  *								Unused and set internally:
+  *									frame.protectedId - Frame Header Protected ID
+  *									frame.enhancedChecksum - Frame Response Enhanced Checksum
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
+	ALX_LIN_ASSERT((0 <= frame.id) && (frame.id <= 0x3F));
+	ALX_LIN_ASSERT((0 < frame.dataLen) && (frame.dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
+
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
+	uint8_t protectedId = AlxLin_CalcProtectedId(frame.id);
+	uint8_t enhancedChecksum = AlxLin_CalcEnhancedChecksum(protectedId, frame.data, frame.dataLen);
+	uint8_t txFrame[2 + ALX_LIN_FRAME_DATA_LEN_MAX + 1] = {};	// SYNC + Protected ID + Data + Enhanced Checksum
+
+
+	//------------------------------------------------------------------------------
+	// Transmit Frame Header + Frame Response
+	//------------------------------------------------------------------------------
+
+	// Prepare
+	// Break										// Frame Header Break - Send by AlxSerialPort_Write
+	txFrame[0] = 0x55;								// Frame Header SYNC
+	txFrame[1] = protectedId;						// Frame Header Protected ID
+	memcpy(&txFrame[2], frame.data, frame.dataLen);	// Frame Response Data
+	txFrame[2 + frame.dataLen] = enhancedChecksum;	// Frame Response Enhanced Checksum
+	uint8_t txFrameLen = 2 + frame.dataLen + 1;		// SYNC + Protected ID + Data + Enhanced Checksum
+
+	// Flush
+	AlxSerialPort_FlushTxFifo(me->alxSerialPort);
+
+	// Transmit
+	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %ld", status);
+		return status;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
+}
+
+/**
   * @brief										As a LIN master device, transmit frame header to specified ID and receive frame response from slave device
   *													This will probably be an ID of LIN slave device
   *													If it's our own ID, then we will need to respond to ourselves
@@ -358,85 +437,6 @@ Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame)
 	}
 
 	// Return
-	return Alx_Ok;
-}
-
-/**
-  * @brief					As a LIN master device, transmit frame header and frame response to specified ID
-  *								This will probably be an ID of LIN slave device
-  *								If it's our own ID, then we will transmit frame to ourselves
-  *								In LIN terminology when you are transmitting frame response, this is considered PUBLISHING
-  *								Alternative name: AlxLin_Master_TxFrameHeader_TxFrameResponse
-  * @param[in,out]	me
-  * @param[in]		frame	Frame which will be transmitted and shall include:
-  *								frame.id - Frame Header ID
-  *									ID which will be transmitted in the frame header
-  *									Acceptable values: 0x00 .. 0x3F
-  *								frame.dataLen - Frame Response Data Length
-  *									Transmitted frame response data length
-  *									0 < frame.dataLen <= ALX_LIN_BUFF_LEN
-  *									If we want that data length is LIN compliant then:
-  *										Acceptable values are: 2, 4, 8
-  *										Length must be set accordingly to specified ID
-  *											If ID = 0x00 .. 0x1F, then 2
-  *											If ID = 0x20 .. 0x2F, then 4
-  *											If ID = 0x30 .. 0x3F, then 8
-  *								frame.data - Frame Response Data
-  *									Data which will be transmitted in frame response
-  *								Unused and set internally:
-  *									frame.protectedId - Frame Header Protected ID
-  *									frame.enhancedChecksum - Frame Response Enhanced Checksum
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame)
-{
-	//------------------------------------------------------------------------------
-	// Assert
-	//------------------------------------------------------------------------------
-	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInit == true);
-	ALX_LIN_ASSERT(me->isMaster == true);
-	ALX_LIN_ASSERT((0 <= frame.id) && (frame.id <= 0x3F));
-	ALX_LIN_ASSERT((0 < frame.dataLen) && (frame.dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
-
-
-	//------------------------------------------------------------------------------
-	// Local Variables
-	//------------------------------------------------------------------------------
-	Alx_Status status = Alx_Err;
-	uint8_t protectedId = AlxLin_CalcProtectedId(frame.id);
-	uint8_t enhancedChecksum = AlxLin_CalcEnhancedChecksum(protectedId, frame.data, frame.dataLen);
-	uint8_t txFrame[2 + ALX_LIN_FRAME_DATA_LEN_MAX + 1] = {};	// SYNC + Protected ID + Data + Enhanced Checksum
-
-
-	//------------------------------------------------------------------------------
-	// Transmit Frame Header + Frame Response
-	//------------------------------------------------------------------------------
-
-	// Prepare
-	// Break										// Frame Header Break - Send by AlxSerialPort_Write
-	txFrame[0] = 0x55;								// Frame Header SYNC
-	txFrame[1] = protectedId;						// Frame Header Protected ID
-	memcpy(&txFrame[2], frame.data, frame.dataLen);	// Frame Response Data
-	txFrame[2 + frame.dataLen] = enhancedChecksum;	// Frame Response Enhanced Checksum
-	uint8_t txFrameLen = 2 + frame.dataLen + 1;		// SYNC + Protected ID + Data + Enhanced Checksum
-
-	// Flush
-	AlxSerialPort_FlushTxFifo(me->alxSerialPort);
-
-	// Transmit
-	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
-	if (status != Alx_Ok)
-	{
-		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %ld", status);
-		return status;
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Return
-	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
 
