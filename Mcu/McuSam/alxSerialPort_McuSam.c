@@ -516,6 +516,35 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
   * @brief
   * @param[in,out]	me
   */
+void AlxSerialPort_FlushTxFifo(AlxSerialPort* me)
+{
+	// Assert
+	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
+	ALX_SERIAL_PORT_ASSERT(me->txFifoUsed == true);
+
+	// Flush
+	AlxFifo_Flush(&me->txFifo);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
+uint32_t AlxSerialPort_GetTxFifoNumOfEntries(AlxSerialPort* me)
+{
+	// Assert
+	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
+	ALX_SERIAL_PORT_ASSERT(me->txFifoUsed == true);
+
+	// Get
+	return AlxFifo_GetNumOfEntries(&me->txFifo);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
 void AlxSerialPort_FlushRxFifo(AlxSerialPort* me)
 {
 	// Assert

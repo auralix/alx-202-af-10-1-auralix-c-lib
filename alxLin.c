@@ -340,28 +340,34 @@ Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t le
 }
 
 /**
-  * @brief							As a LIN master device, transmit frame header and frame response to specified ID
-  *										This will probably be an ID of LIN slave device
-  *										If it's our own ID, then we will transmit frame to ourselves
-  *										In LIN terminology when you are transmitting frame response, this is considered PUBLISHING
-  *										Alternative name: AlxLin_Master_TxFrameHeader_TxFrameResponse
+  * @brief					As a LIN master device, transmit frame header and frame response to specified ID
+  *								This will probably be an ID of LIN slave device
+  *								If it's our own ID, then we will transmit frame to ourselves
+  *								In LIN terminology when you are transmitting frame response, this is considered PUBLISHING
+  *								Alternative name: AlxLin_Master_TxFrameHeader_TxFrameResponse
   * @param[in,out]	me
-  * @param[in]		id				ID which will be transmitted in the frame header
-  *										Acceptable values: 0x00 .. 0x3F
-  * @param[in]		data			Pointer to data which will be transmitted in frame response
-  * @param[in]		len				Transmitted frame response data length
-  *										If variableLen = false, then length is LIN compliant and:
-  *											Acceptable values are: 2, 4, 8
-  *											Length must be set accordingly to specified ID
-  *												If ID = 0x00 .. 0x1F, then 2
-  *												If ID = 0x20 .. 0x2F, then 4
-  *												If ID = 0x30 .. 0x3F, then 8
-  *										Else if variableLen = true, then 0 < len <= ALX_LIN_BUFF_LEN
-  * @param[in]		variableLen		Bool for specifying if variable data length is enabled
+  * @param[in]		frame	Frame which will be transmitted and shall include:
+  *								frame.id - Frame Header ID
+  *									ID which will be transmitted in the frame header
+  *									Acceptable values: 0x00 .. 0x3F
+  *								frame.dataLen - Frame Response Data Length
+  *									Transmitted frame response data length
+  *									0 <= frame.dataLen <= ALX_LIN_BUFF_LEN
+  *									If we want that length is LIN compliant then:
+  *										Acceptable values are: 2, 4, 8
+  *										Length must be set accordingly to specified ID
+  *											If ID = 0x00 .. 0x1F, then 2
+  *											If ID = 0x20 .. 0x2F, then 4
+  *											If ID = 0x30 .. 0x3F, then 8
+  *								frame.data - Frame Response Data
+  *									Data which will be transmitted in frame response
+  *								Unused and set internally:
+  *									frame.protectedId - Frame Header Protected ID
+  *									frame.enhancedChecksum - Frame Response Enhanced Checksum
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLen)
+Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -369,43 +375,39 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInitMaster == true);
 	ALX_LIN_ASSERT(me->isInitSlave == false);
-	ALX_LIN_ASSERT((0 <= id) && (id <= 0x3F));
-	if (variableLen)
-	{
-		ALX_LIN_ASSERT((0 < len) && (len <= ALX_LIN_BUFF_LEN));
-	}
-	else
-	{
-		ALX_LIN_ASSERT(len == AlxLin_GetDataLenFromId(id));
-	}
+	ALX_LIN_ASSERT((0 <= frame.dataLen) && (frame.dataLen <= ALX_LIN_BUFF_LEN));
+	ALX_LIN_ASSERT((0 <= frame.id) && (frame.id <= 0x3F));
 
 
 	//------------------------------------------------------------------------------
 	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
-	uint8_t protectedId = AlxLin_CalcProtectedId(id);
-	uint8_t enhancedChecksum = AlxLin_CalcEnhancedChecksum(protectedId, data, len);
-	uint8_t txFrame[2 + ALX_LIN_BUFF_LEN + 1] = {};	// SYNC + Protected ID + Data + Enhanced Checksum
+	uint8_t protectedId = AlxLin_CalcProtectedId(frame.id);
+	uint8_t enhancedChecksum = AlxLin_CalcEnhancedChecksum(protectedId, frame.data, frame.dataLen);
+	uint8_t txFrame[ALX_LIN_BUFF_LEN] = {};	// SYNC + Protected ID + Data + Enhanced Checksum
 
 
 	//------------------------------------------------------------------------------
 	// Transmit Frame Header + Frame Response
 	//------------------------------------------------------------------------------
 
-	// Prepare frame header
-	// Break								// Frame Header Break - Send by AlxSerialPort_Write
-	txFrame[0] = 0x55;						// Frame Header SYNC
-	txFrame[1] = protectedId;				// Frame Header Protected ID
-	memcpy(&txFrame[2], data, len);			// Frame Response Data
-	txFrame[2 + len] = enhancedChecksum;	// Frame Response Enhanced Checksum
-	uint8_t txFrameLen = 2 + len + 1;		// SYNC + Protected ID + Data + Enhanced Checksum
+	// Prepare
+	// Break										// Frame Header Break - Send by AlxSerialPort_Write
+	txFrame[0] = 0x55;								// Frame Header SYNC
+	txFrame[1] = protectedId;						// Frame Header Protected ID
+	memcpy(&txFrame[2], frame.data, frame.dataLen);	// Frame Response Data
+	txFrame[2 + frame.dataLen] = enhancedChecksum;	// Frame Response Enhanced Checksum
+	uint8_t txFrameLen = 2 + frame.dataLen + 1;		// SYNC + Protected ID + Data + Enhanced Checksum
 
-	// Transmit frame header
+	// Flush
+	AlxSerialPort_FlushTxFifo(me->alxSerialPort);
+
+	// Transmit
 	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("Err");
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %ld", status);
 		return status;
 	}
 
@@ -474,8 +476,14 @@ bool AlxLin_Slave_IsInit(AlxLin* me)
   * @brief													As a LIN slave device, receive frame header or receive frame header & frame response from master device
   *																AlxLin_Slave_RxFrameHeader_RxFrameResponse
   * @param[in,out]	me
-  * @param[in,out]	frame									Pointer to frame variable which shall already include frame response data length which we will try to receive
-  *																After successful frame variable will be populated with ID, protected ID, received data and enhanced checksum
+  * @param[in,out]	frame									Pointer to frame variable in which data will be received and shall already include:
+  *																frame.dataLen - Frame Response Data Length
+  *																	Data length which we will try to receive
+  *																After successful operation frame variable will be populated with:
+  *																	frame.id - Frame Header ID
+  *																	frame.protectedId - Frame Header Protected ID
+  *																	frame.data - Frame Response Data
+  *																	frame.enhancedChecksum - Frame Response Enhanced Checksum
   * @param[in]		timeout_ms								Time in ms for which, we as LIN slave device, will wait after RX FIFO Flush for master device to transmit whole frame response with specified data length
   * @param[in]		rxFifoNumOfEntriesNewCheckWaitTime_ms	Time in ms for which we will wait for new RX FIFO number of entries check
   * @retval			Alx_Ok

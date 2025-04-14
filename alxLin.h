@@ -165,7 +165,7 @@ Alx_Status AlxLin_Master_Init(AlxLin* me);
 Alx_Status AlxLin_Master_DeInit(AlxLin* me);
 bool AlxLin_Master_IsInit(AlxLin* me);
 Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLen, uint32_t variableLen_maxLen, uint32_t* variableLen_actualLen);
-Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLen);
+Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame);
 
 
 //------------------------------------------------------------------------------
