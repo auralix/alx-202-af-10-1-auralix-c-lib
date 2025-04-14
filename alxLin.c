@@ -40,8 +40,6 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static Alx_Status AlxLin_Init(AlxLin* me, bool isMaster);
-static Alx_Status AlxLin_DeInit(AlxLin* me, bool isMaster);
 static uint8_t AlxLin_CalcProtectedId(uint8_t id);
 static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, uint32_t len);
 static Alx_Status AlxLin_GetFrameConfigFromId(AlxLin* me, uint8_t id, AlxLin_FrameConfig* frameConfig);
@@ -87,8 +85,8 @@ void AlxLin_Ctor
 
 	// Info
 	me->wasCtorCalled = true;
-	me->isInitMaster = false;
-	me->isInitSlave = false;
+	me->isInit = false;
+	me->isMaster = false;
 }
 
 
@@ -111,11 +109,23 @@ Alx_Status AlxLin_Master_Init(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == false);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
+	ALX_LIN_ASSERT(me->isInit == false);
+	ALX_LIN_ASSERT(me->isMaster == false);
+
+	// Init
+	Alx_Status status = AlxSerialPort_Init(me->alxSerialPort);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Init() status %ld", status);
+		return status;
+	}
+
+	// Set info
+	me->isInit = true;
+	me->isMaster = true;
 
 	// Return
-	return AlxLin_Init(me, true);
+	return Alx_Ok;
 }
 
 /**
@@ -128,11 +138,23 @@ Alx_Status AlxLin_Master_DeInit(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == true);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
+
+	// DeInit
+	Alx_Status status = AlxSerialPort_DeInit(me->alxSerialPort);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_DeInit() status %ld", status);
+		return status;
+	}
+
+	// Clear info
+	me->isInit = false;
+	me->isMaster = false;
 
 	// Return
-	return AlxLin_DeInit(me, true);
+	return Alx_Ok;
 }
 
 /**
@@ -145,9 +167,10 @@ bool AlxLin_Master_IsInit(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
 
 	// Return
-	return me->isInitMaster;
+	return me->isInit;
 }
 
 /**
@@ -190,8 +213,8 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == true);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
 	ALX_LIN_ASSERT((0 <= frame->id) && (frame->id <= 0x3F));
 	ALX_LIN_ASSERT((0 < frame->dataLen) && (frame->dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
 
@@ -244,7 +267,7 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	uint32_t rxFrameLen_Expected = me->breakSyncOffset + 1 + frame->dataLen + 1;	// *Break + *SYNC + Protected ID + Data + Enhanced Checksum
 	if (rxFrameLen_Actual != rxFrameLen_Expected)
 	{
-		ALX_LIN_TRACE_WRN("CheckRxFrameLen() rxFrameLen_Actual %lu rxFrameLen_Expected %lu", rxFrameLen_Actual, rxFrameLen_Expected);
+		ALX_LIN_TRACE_WRN("FAIL: CheckRxFrameLen() rxFrameLen_Actual %lu rxFrameLen_Expected %lu", rxFrameLen_Actual, rxFrameLen_Expected);
 		return Alx_Err;
 	}
 
@@ -322,8 +345,8 @@ Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame)
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == true);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
 	ALX_LIN_ASSERT((0 <= frame.id) && (frame.id <= 0x3F));
 	ALX_LIN_ASSERT((0 < frame.dataLen) && (frame.dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
 
@@ -382,11 +405,23 @@ Alx_Status AlxLin_Slave_Init(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == false);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
+	ALX_LIN_ASSERT(me->isInit == false);
+	ALX_LIN_ASSERT(me->isMaster == false);
+
+	// Init
+	Alx_Status status = AlxSerialPort_Init(me->alxSerialPort);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Init() status %ld", status);
+		return status;
+	}
+
+	// Set info
+	me->isInit = true;
+	me->isMaster = false;
 
 	// Return
-	return AlxLin_Init(me, false);
+	return Alx_Ok;
 }
 
 /**
@@ -399,11 +434,23 @@ Alx_Status AlxLin_Slave_DeInit(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == false);
-	ALX_LIN_ASSERT(me->isInitSlave == true);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == false);
+
+	// DeInit
+	Alx_Status status = AlxSerialPort_DeInit(me->alxSerialPort);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_DeInit() status %ld", status);
+		return status;
+	}
+
+	// Clear info
+	me->isInit = false;
+	me->isMaster = false;
 
 	// Return
-	return AlxLin_DeInit(me, false);
+	return Alx_Ok;
 }
 
 /**
@@ -416,9 +463,10 @@ bool AlxLin_Slave_IsInit(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isMaster == false);
 
 	// Return
-	return me->isInitSlave;
+	return me->isInit;
 }
 
 /**
@@ -445,8 +493,8 @@ Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t time
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == false);
-	ALX_LIN_ASSERT(me->isInitSlave == true);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == false);
 	ALX_LIN_ASSERT((0 < frame->dataLen) && (frame->dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
 
 
@@ -508,7 +556,7 @@ Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t time
 	status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen_Actual);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("Err");
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Read() status %ld", status);
 		return Alx_Err;
 	}
 
@@ -702,50 +750,6 @@ void AlxLin_Irq_Handle(AlxLin* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static Alx_Status AlxLin_Init(AlxLin* me, bool isMaster)
-{
-	// Local variables
-	Alx_Status status = Alx_Err;
-
-	// Init serial port
-	status = AlxSerialPort_Init(me->alxSerialPort);
-	if (status != Alx_Ok) { ALX_LIN_TRACE_WRN("Err"); return status; }
-
-	// Info
-	if (isMaster)
-	{
-		me->isInitMaster = true;
-	}
-	else
-	{
-		me->isInitSlave = true;
-	}
-
-	// Return
-	return Alx_Ok;
-}
-static Alx_Status AlxLin_DeInit(AlxLin* me, bool isMaster)
-{
-	// Local variables
-	Alx_Status status = Alx_Err;
-
-	// DeInit serial port
-	status = AlxSerialPort_DeInit(me->alxSerialPort);
-	if (status != Alx_Ok) { ALX_LIN_TRACE_WRN("Err"); return status; }
-
-	// Info
-	if (isMaster)
-	{
-		me->isInitMaster = false;
-	}
-	else
-	{
-		me->isInitSlave = false;
-	}
-
-	// Return
-	return Alx_Ok;
-}
 static uint8_t AlxLin_CalcProtectedId(uint8_t id)
 {
 	// Calculate

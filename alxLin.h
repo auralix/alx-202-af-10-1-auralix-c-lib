@@ -133,8 +133,8 @@ typedef struct
 
 	// Info
 	bool wasCtorCalled;
-	bool isInitMaster;
-	bool isInitSlave;
+	bool isInit;
+	bool isMaster;
 } AlxLin;
 
 
