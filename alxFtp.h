@@ -107,7 +107,6 @@ typedef struct
 
 	// Variables
 	AlxSocket alxSocket_Ctrl;
-	char alxSocket_Ctrl_Ip[16];
 	AlxSocket alxSocket_Data;
 	char buff[ALX_FTP_BUFF_LEN];
 	bool isInitialChunk;

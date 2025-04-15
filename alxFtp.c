@@ -68,7 +68,6 @@ void AlxFtp_Ctor
 
 	// Variables
 	AlxSocket_Ctor(&me->alxSocket_Ctrl);
-	memset(me->alxSocket_Ctrl_Ip, 0, sizeof(me->alxSocket_Ctrl_Ip));
 	AlxSocket_Ctor(&me->alxSocket_Data);
 	memset(me->buff, 0, sizeof(me->buff));
 
@@ -155,6 +154,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	Alx_Status status = Alx_Err;
 	int32_t statusLen = 0;
 	int32_t len = 0;
+	char alxSocket_Ctrl_Ip[16] = "";
 	uint16_t alxSocket_Ctrl_Port = 0;
 
 
@@ -174,7 +174,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	// Set control socket IP, resolve if hostname format
 	if (me->serverAddrIsHostname)
 	{
-		status = AlxNet_Dns_GetHostByName(me->alxNet, me->serverAddr, me->alxSocket_Ctrl_Ip);
+		status = AlxNet_Dns_GetHostByName(me->alxNet, me->serverAddr, alxSocket_Ctrl_Ip);
 		if (status != Alx_Ok)
 		{
 			ALX_FTP_TRACE_ERR("FAIL: AlxNet_Dns_GetHostByName() status %ld", status);
@@ -184,7 +184,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	}
 	else
 	{
-		strcpy(me->alxSocket_Ctrl_Ip, me->serverAddr);
+		strcpy(alxSocket_Ctrl_Ip, me->serverAddr);
 	}
 
 	// Set control socket port
@@ -208,10 +208,10 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	}
 
 	// Connect control socket
-	status = AlxSocket_Connect(&me->alxSocket_Ctrl, me->alxSocket_Ctrl_Ip, alxSocket_Ctrl_Port);
+	status = AlxSocket_Connect(&me->alxSocket_Ctrl, alxSocket_Ctrl_Ip, alxSocket_Ctrl_Port);
 	if (status != Alx_Ok)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Connect(Ctrl) status %ld alxSocket_Ctrl_Ip %s alxSocket_Ctrl_Port %u", status, me->alxSocket_Ctrl_Ip, alxSocket_Ctrl_Port);
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Connect(Ctrl) status %ld alxSocket_Ctrl_Ip %s alxSocket_Ctrl_Port %u", status, alxSocket_Ctrl_Ip, alxSocket_Ctrl_Port);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -522,16 +522,6 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		// Trace
 		ALX_FTP_TRACE_WRN("FAIL: 'Connect with PASV response IP' AlxSocket_Connect(Data) status %ld alxSocket_Data_Ip %s alxSocket_Data_Port %u _try %lu", status, alxSocket_Data_Ip, alxSocket_Data_Port, _try);
 
-		// Connect with control socket IP
-		status = AlxSocket_Connect(&me->alxSocket_Data, me->alxSocket_Ctrl_Ip, alxSocket_Data_Port);
-		if (status == Alx_Ok)
-		{
-			break;
-		}
-
-		// Trace
-		ALX_FTP_TRACE_WRN("FAIL: 'Connect with control socket IP' AlxSocket_Connect(Data) status %ld alxSocket_Ctrl_Ip %s alxSocket_Data_Port %u _try %lu", status, me->alxSocket_Ctrl_Ip, alxSocket_Data_Port, _try);
-
 		// Wait
 		AlxOsDelay_ms(&alxOsDelay, 1);
 	}
@@ -655,7 +645,6 @@ static void AlxFtp_Reset(AlxFtp* me)
 	}
 
 	// Clear
-	memset(me->alxSocket_Ctrl_Ip, 0, sizeof(me->alxSocket_Ctrl_Ip));
 	memset(me->buff, 0, sizeof(me->buff));
 	me->isInitialChunk = false;
 	me->isClientLoggedIn = false;
