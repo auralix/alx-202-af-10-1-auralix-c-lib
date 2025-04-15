@@ -103,12 +103,14 @@ typedef struct
 	uint16_t serverPort;
 	const char* clientUsername;
 	const char* clientPassword;
+	const char* extraFileHeader;
 
 	// Variables
 	AlxSocket alxSocket_Ctrl;
 	char alxSocket_Ctrl_Ip[16];
 	AlxSocket alxSocket_Data;
 	char buff[ALX_FTP_BUFF_LEN];
+	bool isInitialChunk;
 
 	// Info
 	bool wasCtorCalled;
@@ -135,6 +137,7 @@ void AlxFtp_Client_SetServerAddrIsHostname(AlxFtp* me, bool serverAddrIsHostname
 void AlxFtp_Client_SetServerPort(AlxFtp* me, uint16_t serverPort);
 void AlxFtp_Client_SetClientUsername(AlxFtp* me, const char* clientUsername);
 void AlxFtp_Client_SetClientPassword(AlxFtp* me, const char* clientPassword);
+void AlxFtp_Client_SetExtraFileHeader(AlxFtp* me, const char* extraFileHeader);
 
 
 //******************************************************************************

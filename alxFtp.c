@@ -64,6 +64,7 @@ void AlxFtp_Ctor
 	me->serverPort = 0;
 	me->clientUsername = "";
 	me->clientPassword = "";
+	me->extraFileHeader = NULL;
 
 	// Variables
 	AlxSocket_Ctor(&me->alxSocket_Ctrl);
@@ -124,6 +125,15 @@ void AlxFtp_Client_SetClientPassword(AlxFtp* me, const char* clientPassword)
 
 	// Set
 	me->clientPassword = clientPassword;
+}
+void AlxFtp_Client_SetExtraFileHeader(AlxFtp* me, const char* extraFileHeader)
+{
+	// Assert
+	ALX_FTP_ASSERT(me->wasCtorCalled == true);
+	ALX_FTP_ASSERT(me->isClientLoggedIn == false);
+
+	// Set
+	me->extraFileHeader = extraFileHeader;
 }
 
 
@@ -572,6 +582,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	//------------------------------------------------------------------------------
 	// Upload File In Chunks
 	//------------------------------------------------------------------------------
+	me->isInitialChunk = true;
 	uint32_t _fileSize = 0;
 	status = AlxFs_File_ReadInChunks(me->alxFs, localFilePath, me->buff, sizeof(me->buff), AlxFtp_Client_UploadFile_ChunkRead_Callback, me, &_fileSize, alxOsMutex_UploadFileInChunks);
 	if (status != Alx_Ok)
@@ -644,15 +655,36 @@ static void AlxFtp_Reset(AlxFtp* me)
 	}
 
 	// Clear
+	memset(me->alxSocket_Ctrl_Ip, 0, sizeof(me->alxSocket_Ctrl_Ip));
 	memset(me->buff, 0, sizeof(me->buff));
+	me->isInitialChunk = false;
 	me->isClientLoggedIn = false;
 }
 static Alx_Status AlxFtp_Client_UploadFile_ChunkRead_Callback(void* ctx, void* chunkData, uint32_t chunkLenActual)
 {
-	// Prepare
+	// Local variables
 	AlxFtp* me = (AlxFtp*)ctx;
 
-	// Send
+	// Upload extra file header
+	if (me->isInitialChunk)
+	{
+		if (me->extraFileHeader != NULL)
+		{
+			// Upload
+			uint32_t extraFileHeaderLen = strlen(me->extraFileHeader);
+			int32_t statusLen = AlxSocket_Send(&me->alxSocket_Data, me->extraFileHeader, extraFileHeaderLen);
+			if (statusLen != (int32_t)extraFileHeaderLen)
+			{
+				ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Send(extraFileHeader) statusLen %ld extraFileHeaderLen %lu", statusLen, extraFileHeaderLen);
+				return Alx_Err;
+			}
+
+			// Clear
+			me->isInitialChunk = false;
+		}
+	}
+
+	// Upload original file chunk
 	int32_t statusLen = AlxSocket_Send(&me->alxSocket_Data, chunkData, chunkLenActual);
 	if (statusLen != (int32_t)chunkLenActual)
 	{
