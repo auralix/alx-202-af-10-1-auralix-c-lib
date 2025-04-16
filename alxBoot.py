@@ -32,6 +32,7 @@ import sys
 import subprocess
 import json
 import hashlib
+import base64
 
 
 #*******************************************************************************
@@ -114,6 +115,76 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	# Set imgtool path
 	imgtoolPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "mcuboot" / "scripts" / "imgtool.py"
 
+	# Set srec_cat path
+	srecPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Tools" / "srec_cat"
+
+	# If singing server is configured read settings and use it to generate the signature
+	signserverSettingsPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "signserver.json"
+	if signserverSettingsPath.is_file():
+		with open(signserverSettingsPath) as json_file:
+			signserverSettings = json.load(json_file)
+
+			# Set SHA256 bin path
+			binSHA256Path = binSrcPath.with_name(binSrcPath.stem + '_SHA256.bin')
+			if binSHA256Path.exists():
+				binSHA256Path.unlink()
+
+			# Set external signature path
+			extSigPath = binSrcPath.with_name(binSrcPath.stem + '_ExtSig.base64')
+			if extSigPath.exists():
+				extSigPath.unlink()
+
+			# Get digest
+			cmd = (r"python {imgtoolPath} sign"
+				r" --header-size {headerLenStr}"
+				r" --pad-header"
+				r" --slot-size {imgSlotLenHexStr}"
+				r" --version {fwVerMajor}.{fwVerMinor}.{fwVerPatch}+{date}"
+				r" {binPathIn}"
+				r" {sha256PathOut}"
+				r" --vector-to-sign digest").format(
+				imgtoolPath=imgtoolPath,
+				headerLenStr=headerLenStr,
+				imgSlotLenHexStr=imgSlotLenHexStr,
+				fwVerMajor=fwVerMajor,
+				fwVerMinor=fwVerMinor,
+				fwVerPatch=fwVerPatch,
+				date=date,
+				binPathIn=binRawPath,
+				sha256PathOut=binSHA256Path
+			)
+			enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "enc_pub.pem"
+			if enc_pubPath.is_file():
+				cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
+
+			print("imgtool.py - cmd:" + cmd)
+			cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+
+			# Print imgtool
+			print(cmdCompletedObj.stdout)
+			print(cmdCompletedObj.stderr, file=sys.stderr)
+
+			cmd = (r"curl -F workerName={worker}"
+				r" -F file=@{SHA256}"
+				r" {server_url}"
+				r" -o {signature}").format(
+				worker=signserverSettings["worker_name"],
+				server_url=signserverSettings["server_url"],
+				SHA256=binSHA256Path,
+				signature=extSigPath
+			)
+			print("curl - cmd:" + cmd)
+			cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+
+			# Print imgtool
+			print(cmdCompletedObj.stdout)
+			print(cmdCompletedObj.stderr, file=sys.stderr)
+
+			# Convert signature is returned as binary; convert it to base64
+			binSig = extSigPath.read_bytes()
+			encoded = base64.b64encode(binSig)
+			extSigPath.write_bytes(encoded)
+
 	# Run imgtool
 	cmd = (r"python {imgtoolPath} sign"
 		r" --header-size {headerLenStr}"
@@ -135,14 +206,75 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	)
 
 	# If sig_key exists sign the FW and if enc_key exists also encrypt the FW
-	sigkeyPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "sig_key.pem"
-	if sigkeyPath.is_file():
-		cmd = cmd + (r" -k {sigKey}").format(sigKey=sigkeyPath)
-		enckeyPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "enc_key.pem"
-		if enckeyPath.is_file():
-			cmd = cmd + (r" --encrypt {encKey}").format(encKey=enckeyPath)
+	sig_keyPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "sig_key.pem"
+	if sig_keyPath.is_file():
+		cmd = cmd + (r" -k {sigKey}").format(sigKey=sig_keyPath)
+		enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "enc_pub.pem"
+		if enc_pubPath.is_file():
+			cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
+	elif extSigPath.is_file(): # look for external signature
+		sig_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "sig_pub.pem"
+		if sig_pubPath.is_file():
+			cmd = cmd + (r" --fix-sig {extSignature}"
+				r" --fix-sig-pubkey {sigPubKey}").format(
+					extSignature=extSigPath,
+					sigPubKey=sig_pubPath)
+			enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "enc_pub.pem"
+			if enc_pubPath.is_file():
+				cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
 
 	print("imgtool.py - cmd:" + cmd)
+	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+
+	# Print imgtool
+	print(cmdCompletedObj.stdout)
+	print(cmdCompletedObj.stderr, file=sys.stderr)
+
+
+	# Set bootloader path
+	bootloaderPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / signserverSettings["bootloader_binary"]
+
+	# Set combined hex paths
+	combinedPath = binSrcPath.with_name(binSrcPath.stem + '_Unsigned_BL.hex')
+	binUnsignedPath = binSrcPath.with_name(binSrcPath.stem + '_Unsigned' + binSrcPath.suffix)
+
+	cmd = (r"python {imgtoolPath} sign"
+		r" --header-size {headerLenStr}"
+		r" --pad-header"
+		r" --slot-size {imgSlotLenHexStr}"
+		r" --version {fwVerMajor}.{fwVerMinor}.{fwVerPatch}+{date}"
+		r" --pad"
+		r" {binPathIn}"
+		r" {binPathOut}").format(
+		imgtoolPath=imgtoolPath,
+		headerLenStr=headerLenStr,
+		imgSlotLenHexStr=imgSlotLenHexStr,
+		fwVerMajor=fwVerMajor,
+		fwVerMinor=fwVerMinor,
+		fwVerPatch=fwVerPatch,
+		date=date,
+		binPathIn=binRawPath,
+		binPathOut=binUnsignedPath
+	)
+
+	print("unsigned image: " + cmd)
+	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+
+	# Print imgtool
+	print(cmdCompletedObj.stdout)
+	print(cmdCompletedObj.stderr, file=sys.stderr)
+
+	cmd = (r"{srecPath}"
+		r" {bootloaderPath} -binary -offset 0x8000000"
+		r" {imagePath} -binary -offset 0x8020000"
+		r" -o {combinedPath} -Intel").format(
+		srecPath=srecPath,
+		bootloaderPath=bootloaderPath,
+		imagePath=binUnsignedPath,
+		combinedPath=combinedPath
+	)
+
+	print("srec-cmd: " + cmd)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
 	# Print imgtool

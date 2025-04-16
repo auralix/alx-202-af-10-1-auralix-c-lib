@@ -124,6 +124,7 @@ def Script(vsTargetPath, fwName, copyFwUpNoBoot2Enable, binRawBinSignedManifestG
 		noBoot2SrcDir = binSrcDir.parent / 'NoBoot2' / binDstDirName
 		fwUpBinSignedSrcName = binDstDirName + '_Signed.bin'
 		fwUpManifestSrcName = binDstDirName + '_Manifest.json'
+		fwUpHexCombinedSrcName = binDstDirName + '_Unsigned_BL.hex'
 		noBoot2BinSrcName = binDstDirName + '_NoBoot.bin'
 		fwUpBinSignedSrcPath = fwUpSrcDir / fwUpBinSignedSrcName
 		fwUpManifestSrcPath = fwUpSrcDir / fwUpManifestSrcName
@@ -132,11 +133,13 @@ def Script(vsTargetPath, fwName, copyFwUpNoBoot2Enable, binRawBinSignedManifestG
 		# Copy fwUpSrc & noBoot2Src to binDst directory
 		shutil.copy2(fwUpBinSignedSrcPath, binDstDir)
 		shutil.copy2(fwUpManifestSrcPath, binDstDir)
+		shutil.copy2(fwUpHexCombinedSrcName, binDstDir)
 		shutil.copy2(noBoot2BinSrcPath, binDstDir)
 
 		# Copy fwUpSrc & noBoot2Src to binDstArtf directory
 		shutil.copy2(fwUpBinSignedSrcPath, binDstArtfDir)
 		shutil.copy2(fwUpManifestSrcPath, binDstArtfDir)
+		shutil.copy2(fwUpHexCombinedSrcName, binDstArtfDir)
 		shutil.copy2(noBoot2BinSrcPath, binDstArtfDir)
 
 		# Print
@@ -157,16 +160,19 @@ def Script(vsTargetPath, fwName, copyFwUpNoBoot2Enable, binRawBinSignedManifestG
 		binRawSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Raw' + binSrcPath.suffix)
 		binSignedSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Signed' + binSrcPath.suffix)
 		manifestSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Manifest.json')
+		hexCombinedSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Unsigned_BL.hex')
 
 		# Set destination variables
 		binRawDstName = binDstDirName + "_Raw.bin"
 		binSignedDstName = binDstDirName + "_Signed.bin"
 		manifestDstName = binDstDirName + "_Manifest.json"
+		hexCombinedDstName = binDstDirName + "_Unsigned_BL.hex"
 
 		# Copy source files to binDst directory & rename it
 		shutil.copy2(binRawSrcPath, binDstDir / binRawDstName)
 		shutil.copy2(binSignedSrcPath, binDstDir / binSignedDstName)
 		shutil.copy2(manifestSrcPath, binDstDir / manifestDstName)
+		shutil.copy2(hexCombinedSrcPath, binDstDir / hexCombinedDstName)
 
 		# Print
 		print("Generated: " + binRawDstName)
