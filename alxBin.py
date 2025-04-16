@@ -128,18 +128,19 @@ def Script(vsTargetPath, fwName, copyFwUpNoBoot2Enable, binRawBinSignedManifestG
 		noBoot2BinSrcName = binDstDirName + '_NoBoot.bin'
 		fwUpBinSignedSrcPath = fwUpSrcDir / fwUpBinSignedSrcName
 		fwUpManifestSrcPath = fwUpSrcDir / fwUpManifestSrcName
+		fwUpHexCombinedSrcPath = fwUpSrcDir / fwUpHexCombinedSrcName
 		noBoot2BinSrcPath = noBoot2SrcDir / noBoot2BinSrcName
 
 		# Copy fwUpSrc & noBoot2Src to binDst directory
 		shutil.copy2(fwUpBinSignedSrcPath, binDstDir)
 		shutil.copy2(fwUpManifestSrcPath, binDstDir)
-		shutil.copy2(fwUpHexCombinedSrcName, binDstDir)
+		shutil.copy2(fwUpHexCombinedSrcPath, binDstDir)
 		shutil.copy2(noBoot2BinSrcPath, binDstDir)
 
 		# Copy fwUpSrc & noBoot2Src to binDstArtf directory
 		shutil.copy2(fwUpBinSignedSrcPath, binDstArtfDir)
 		shutil.copy2(fwUpManifestSrcPath, binDstArtfDir)
-		shutil.copy2(fwUpHexCombinedSrcName, binDstArtfDir)
+		shutil.copy2(fwUpHexCombinedSrcPath, binDstArtfDir)
 		shutil.copy2(noBoot2BinSrcPath, binDstArtfDir)
 
 		# Print
@@ -178,6 +179,7 @@ def Script(vsTargetPath, fwName, copyFwUpNoBoot2Enable, binRawBinSignedManifestG
 		print("Generated: " + binRawDstName)
 		print("Generated: " + binSignedDstName)
 		print("Generated: " + manifestDstName)
+		print("Generated: " + hexCombinedDstName)
 		print("DONE: Generate _Raw.bin & _Signed.bin & _Manifest.json")
 
 
