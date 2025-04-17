@@ -144,8 +144,8 @@ void AlxFtp_Client_SetExtraFileHeader(AlxFtp* me, const char* extraFileHeader);
 //******************************************************************************
 Alx_Status AlxFtp_Client_Login(AlxFtp* me);
 Alx_Status AlxFtp_Client_Logout(AlxFtp* me);
-Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path, bool* exists);
 Alx_Status AlxFtp_Client_MakeDir(AlxFtp* me, const char* path);
+Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path, bool* exists);
 Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const char* remoteFilePath, uint32_t* fileSize, AlxOsMutex* alxOsMutex_UploadFileInChunks);
 
 
