@@ -225,7 +225,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 		return Alx_Err;
 	}
 
-	// Check response - Expected response: "220" -> Service ready for new user
+	// Check response
 	if(strncmp(me->buff, "220", 3) != 0)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: strncmp(220) buff %.100s", me->buff);
@@ -235,10 +235,10 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 
 
 	//------------------------------------------------------------------------------
-	// Send Username
+	// Send USER Command - Client Username
 	//------------------------------------------------------------------------------
 
-	// Send username
+	// Send command
 	len = sprintf(me->buff, "user %s\r\n", me->clientUsername);
 	statusLen = AlxSocket_Send(&me->alxSocket_Ctrl, me->buff, len);
 	if (statusLen != len)
@@ -257,7 +257,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 		return Alx_Err;
 	}
 
-	// Check response - Expected response: "331" -> User name OK, need password
+	// Check response
 	if (strncmp(&me->buff, "331", 3) != 0)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: strncmp(331) buff %.100s", me->buff);
@@ -267,10 +267,10 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 
 
 	//------------------------------------------------------------------------------
-	// Send Password
+	// Send PASS Command - Client Password
 	//------------------------------------------------------------------------------
 
-	// Send password
+	// Send command
 	len = sprintf(me->buff, "pass %s\r\n", me->clientPassword);
 	statusLen = AlxSocket_Send(&me->alxSocket_Ctrl, me->buff, len);
 	if (statusLen != len)
@@ -289,7 +289,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 		return Alx_Err;
 	}
 
-	// Check response - Expected response: "230" -> User logged in, proceed
+	// Check response
 	if (strncmp(me->buff, "230", 3) != 0)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: strncmp(230) buff %.100s", me->buff);
@@ -299,7 +299,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 
 
 	//------------------------------------------------------------------------------
-	// Send Select Binary Type Transfer Command
+	// Send TYPE Command - Select Binary Transfer Type
 	//------------------------------------------------------------------------------
 
 	// Send command
@@ -358,7 +358,7 @@ Alx_Status AlxFtp_Client_Logout(AlxFtp* me)
 
 
 	//------------------------------------------------------------------------------
-	// Send Quit Command
+	// Send QUIT Command
 	//------------------------------------------------------------------------------
 
 	// Send command
@@ -379,7 +379,7 @@ Alx_Status AlxFtp_Client_Logout(AlxFtp* me)
 	}
 	else
 	{
-		// Check response - Expected response: "221" -> Service closing control connection
+		// Check response
 		if (strncmp(me->buff, "221", 3) != 0)
 		{
 			ALX_FTP_TRACE_DBG("FAIL: strncmp(221) buff %.100s", me->buff);
@@ -409,7 +409,7 @@ Alx_Status AlxFtp_Client_Logout(AlxFtp* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path)
+Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path, bool* exists)
 {
 	//------------------------------------------------------------------------------
 	// Assert
@@ -426,7 +426,7 @@ Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path)
 
 
 	//------------------------------------------------------------------------------
-	// Send Change Working Directory Command
+	// Send CWD Command - Change Working Directory
 	//------------------------------------------------------------------------------
 
 	// Send command
@@ -449,10 +449,18 @@ Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path)
 	}
 
 	// Check response
-	if (strncmp(me->buff, "250", 3) != 0)
+	if (strncmp(me->buff, "250", 3) == 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp(250) buff %.100s", me->buff);
-//		AlxFtp_Reset(me);
+		*exists = true;
+	}
+	else if (strncmp(me->buff, "550", 3) == 0)
+	{
+		*exists = false;
+	}
+	else
+	{
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(250 & 550) buff %.100s", me->buff);
+		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
 
@@ -479,7 +487,7 @@ Alx_Status AlxFtp_Client_MakeDir(AlxFtp* me, const char* path)
 
 
 	//------------------------------------------------------------------------------
-	// Send Make Directory Command
+	// Send MKD Command - Make Directory
 	//------------------------------------------------------------------------------
 
 	// Send command
@@ -535,7 +543,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 
 
 	//------------------------------------------------------------------------------
-	// Send Enter Passive Mode Command
+	// Send PASV Command - Enter Passive Mode
 	//------------------------------------------------------------------------------
 
 	// Send command
@@ -557,7 +565,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		return Alx_Err;
 	}
 
-	// Check response - Expected response: "227" -> Entering passive mode
+	// Check response
 	if (strncmp(me->buff, "227", 3) != 0)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: strncmp(227) buff %.100s", me->buff);
@@ -640,7 +648,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 
 
 	//------------------------------------------------------------------------------
-	// Send Initiate File Upload Command
+	// Send STOR Command - Initiate File Upload Command
 	//------------------------------------------------------------------------------
 
 	// Send command
@@ -662,7 +670,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		return Alx_Err;
 	}
 
-	// Check response - Expected response: "150" -> File status okay, about to open data connection OR "125" -> Data connection already open, transfer starting
+	// Check response
 	if
 	(
 		(strncmp(me->buff, "150", 3) != 0) &&
@@ -711,7 +719,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		return Alx_Err;
 	}
 
-	// Check response - Expected response: "226" -> Closing data connection, requested file action successful
+	// Check response
 	if (strncmp(me->buff, "226", 3) != 0)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: strncmp(226) buff %.100s", me->buff);
