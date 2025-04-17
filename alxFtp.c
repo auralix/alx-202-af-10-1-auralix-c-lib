@@ -409,6 +409,112 @@ Alx_Status AlxFtp_Client_Logout(AlxFtp* me)
 	// Return
 	return Alx_Ok;
 }
+Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_FTP_ASSERT(me->wasCtorCalled == true);
+	ALX_FTP_ASSERT(me->isClientLoggedIn == true);
+
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	int32_t statusLen = 0;
+	int32_t len = 0;
+
+
+	//------------------------------------------------------------------------------
+	// Send Change Working Directory Command
+	//------------------------------------------------------------------------------
+
+	// Send command
+	len = sprintf(me->buff, "CWD %s\r\n", path);
+	statusLen = AlxSocket_Send(&me->alxSocket_Ctrl, me->buff, len);
+	if (statusLen != len)
+	{
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Send(Ctrl) statusLen %ld buff %.100s len %lu", statusLen, me->buff, len);
+		AlxFtp_Reset(me);
+		return Alx_Err;
+	}
+
+	// Receive response
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	if (statusLen <= 0)
+	{
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %ld buff %.100s", statusLen, me->buff);
+		AlxFtp_Reset(me);
+		return Alx_Err;
+	}
+
+	// Check response
+	if (strncmp(me->buff, "250", 3) != 0)
+	{
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(250) buff %.100s", me->buff);
+//		AlxFtp_Reset(me);
+		return Alx_Err;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
+}
+Alx_Status AlxFtp_Client_MakeDir(AlxFtp* me, const char* path)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_FTP_ASSERT(me->wasCtorCalled == true);
+	ALX_FTP_ASSERT(me->isClientLoggedIn == true);
+
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	int32_t statusLen = 0;
+	int32_t len = 0;
+
+
+	//------------------------------------------------------------------------------
+	// Send Make Directory Command
+	//------------------------------------------------------------------------------
+
+	// Send command
+	len = sprintf(me->buff, "MKD %s\r\n", path);
+	statusLen = AlxSocket_Send(&me->alxSocket_Ctrl, me->buff, len);
+	if (statusLen != len)
+	{
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Send(Ctrl) statusLen %ld buff %.100s len %lu", statusLen, me->buff, len);
+		AlxFtp_Reset(me);
+		return Alx_Err;
+	}
+
+	// Receive response
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	if (statusLen <= 0)
+	{
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %ld buff %.100s", statusLen, me->buff);
+		AlxFtp_Reset(me);
+		return Alx_Err;
+	}
+
+	// Check response
+	if (strncmp(me->buff, "257", 3) != 0)
+	{
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(257) buff %.100s", me->buff);
+		AlxFtp_Reset(me);
+		return Alx_Err;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
+}
 Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const char* remoteFilePath, uint32_t* fileSize, AlxOsMutex* alxOsMutex_UploadFileInChunks)
 {
 	//------------------------------------------------------------------------------
