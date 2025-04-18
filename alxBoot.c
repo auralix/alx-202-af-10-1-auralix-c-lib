@@ -40,6 +40,8 @@
 	#endif
 #endif
 
+#include "image.h"
+#include "mbedtls/sha256.h" /* SHA-256 only */
 
 //******************************************************************************
 // Module Guard
@@ -83,6 +85,17 @@ static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 };
 #endif
 
+static int check_primary_slot_sha256(void)
+{
+	uint8_t calc_sha256[32];
+	struct image_header *header = (struct image_header *)ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET;
+	uint32_t len = header->ih_hdr_size + header->ih_img_size;
+	mbedtls_sha256((uint8_t *)ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET, len, calc_sha256, 0);
+	// image is followed by image_tlv_info and image_tlv structures; then SHA256 follows
+	return memcmp(calc_sha256,
+		(uint8_t *)(ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET + len + sizeof(struct image_tlv_info) + sizeof(struct image_tlv)),
+		32);
+}
 
 //******************************************************************************
 // Constructor
@@ -134,6 +147,16 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	ALX_BOOT_TRACE_INF("AlxBoot - boot_go START");
 
 	// Execute
+
+#ifndef MCUBOOT_VALIDATE_PRIMARY_SLOT
+	// since we don't validate primary slot we check image integrity here
+	if (check_primary_slot_sha256() != 0)
+	{
+		ALX_BOOT_TRACE_WRN("Err");
+		return Alx_Err;
+	}
+#endif
+
 	fih_ret status = boot_go(&me->rsp);
 	if (status != FIH_SUCCESS)
 	{
@@ -234,6 +257,10 @@ void AlxBoot_Jump(AlxBoot* me)
 
 	// Jump to app's reset handler
 	((void(*)(void))me->addrJmp)();	// Cast jump address to function pointer & then execute it - Compiler automatically handles, that the real jump address is odd number, so it automatically adds +1 to addrJmp, this is needed for all ARM Cortex-M series processor (for THUMB instruction execution)
+	while (1)
+	{
+		// will never get here
+	}
 }
 #endif
 
