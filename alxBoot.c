@@ -40,7 +40,6 @@
 	#endif
 #endif
 
-#include "image.h"
 #include "mbedtls/sha256.h" /* SHA-256 only */
 
 //******************************************************************************
@@ -53,6 +52,8 @@
 // Private Variables
 //******************************************************************************
 #if defined(ALX_BOOT_B)
+#include "image.h"
+
 static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 {
 	.magicNum = ALX_ID_BOOT_ID_MAGIC_NUM,
@@ -83,7 +84,6 @@ static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 	},
 	.crc = 0			// For future use
 };
-#endif
 
 static int check_primary_slot_sha256(void)
 {
@@ -103,6 +103,7 @@ static int check_primary_slot_sha256(void)
 		(uint8_t *)(ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET + len + sizeof(struct image_tlv_info) + sizeof(struct image_tlv)),
 		32);
 }
+#endif
 
 //******************************************************************************
 // Constructor
