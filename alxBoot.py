@@ -116,10 +116,10 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	imgtoolPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "mcuboot" / "scripts" / "imgtool.py"
 
 	# Set srec_cat path
-	srecPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Tools" / "srec_cat"
+	srecPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "Tools" / "srec_cat"
 
 	# If singing server is configured read settings and use it to generate the signature
-	signserverSettingsPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "signserver.json"
+	signserverSettingsPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "signserver.json"
 	if signserverSettingsPath.is_file():
 		with open(signserverSettingsPath) as json_file:
 			signserverSettings = json.load(json_file)
@@ -133,6 +133,11 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 			extSigPath = binSrcPath.with_name(binSrcPath.stem + '_ExtSig.base64')
 			if extSigPath.exists():
 				extSigPath.unlink()
+
+			# Set fake pubkey path
+			binSHA256Path = binSrcPath.with_name(binSrcPath.stem + '_SHA256.bin')
+			if binSHA256Path.exists():
+				binSHA256Path.unlink()
 
 			# Get digest
 			cmd = (r"python {imgtoolPath} sign"
@@ -153,7 +158,7 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 				binPathIn=binRawPath,
 				sha256PathOut=binSHA256Path
 			)
-			enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "enc_pub.pem"
+			enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "enc_pub.pem"
 			if enc_pubPath.is_file():
 				cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
 
@@ -164,15 +169,25 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 			print(cmdCompletedObj.stdout)
 			print(cmdCompletedObj.stderr, file=sys.stderr)
 
-			cmd = (r"curl -F workerName={worker}"
-				r" -F file=@{SHA256}"
-				r" {server_url}"
-				r" -o {signature}").format(
+			if len(signserverSettings["certificate_thumbprint"]) > 0:
+				cert_cmd = (r"--cert CurrentUser\\MY\\{certificate_thumbprint}").format(
+					certificate_thumbprint=signserverSettings["certificate_thumbprint"]
+				)
+			else:
+				cert_cmd = ""
+
+			cmd = (r"curl {cert_cmd} -F workerName={worker}"
+				" -F \"file=@{SHA256}\""
+				" {server_url}"
+				" -o \"{signature}\"").format(
+				cert_cmd=cert_cmd,
 				worker=signserverSettings["worker_name"],
 				server_url=signserverSettings["server_url"],
 				SHA256=binSHA256Path,
 				signature=extSigPath
 			)
+
+
 			print("curl - cmd:" + cmd)
 			cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
@@ -206,22 +221,29 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	)
 
 	# If sig_key exists sign the FW and if enc_key exists also encrypt the FW
-	sig_keyPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "sig_key.pem"
+	sig_keyPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "sig_key.pem"
 	if sig_keyPath.is_file():
 		cmd = cmd + (r" -k {sigKey}").format(sigKey=sig_keyPath)
-		enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "enc_pub.pem"
+		enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "enc_pub.pem"
 		if enc_pubPath.is_file():
 			cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
 	elif extSigPath.is_file(): # look for external signature
-		sig_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "sig_pub.pem"
-		if sig_pubPath.is_file():
-			cmd = cmd + (r" --fix-sig {extSignature}"
-				r" --fix-sig-pubkey {sigPubKey}").format(
-					extSignature=extSigPath,
-					sigPubKey=sig_pubPath)
-			enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / "enc_pub.pem"
-			if enc_pubPath.is_file():
-				cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
+		# Generate fake pubkey for mcuboot (real pubkey is in secure element)
+		sig_pubPath = binSrcPath.with_name("fake_pubkey.pem")
+		sig_pubPath.write_bytes(b"-----BEGIN PUBLIC KEY-----\r\n"
+			b"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESgQNrEUInMsjK2OQJmBe5AMcQfL+\r\n"
+			b"5eooj27ulcKzf0iASF2Top9ypskjTv3LigXzcBbUlktWpBIA766l0cp/Xw==\r\n"
+			b"-----END PUBLIC KEY-----\r\n"
+		)
+		cmd = cmd + (r" --fix-sig {extSignature}"
+			r" --fix-sig-pubkey {sigPubKey}").format(
+				extSignature=extSigPath,
+				sigPubKey=sig_pubPath)
+		enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "enc_pub.pem"
+		if enc_pubPath.is_file():
+			cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
+	else:
+		sys.exit('Error: no signature!')
 
 	print("imgtool.py - cmd:" + cmd)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
@@ -232,7 +254,7 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 
 
 	# Set bootloader path
-	bootloaderPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Keys" / signserverSettings["bootloader_binary"]
+	bootloaderPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / signserverSettings["bootloader_binary"]
 
 	# Set combined hex paths
 	combinedPath = binSrcPath.with_name(binSrcPath.stem + '_Unsigned_BL.hex')
