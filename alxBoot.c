@@ -88,8 +88,15 @@ static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 static int check_primary_slot_sha256(void)
 {
 	uint8_t calc_sha256[32];
-	struct image_header *header = (struct image_header *)ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET;
-	uint32_t len = header->ih_hdr_size + header->ih_img_size;
+	struct image_header *hdr = (struct image_header *)ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET;
+	if (hdr->ih_magic != IMAGE_MAGIC) {
+		return -1;
+	}
+	uint32_t len = hdr->ih_hdr_size + hdr->ih_img_size;
+	if (len > ALX_MCU_BOOT_IMAGE_SIZE)
+	{
+		return -1;
+	}
 	mbedtls_sha256((uint8_t *)ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET, len, calc_sha256, 0);
 	// image is followed by image_tlv_info and image_tlv structures; then SHA256 follows
 	return memcmp(calc_sha256,
@@ -147,7 +154,12 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	ALX_BOOT_TRACE_INF("AlxBoot - boot_go START");
 
 	// Execute
-
+	fih_ret status = boot_go(&me->rsp);
+	if (status != FIH_SUCCESS)
+	{
+		ALX_BOOT_TRACE_WRN("Err");
+		return Alx_Err;
+	}
 #ifndef MCUBOOT_VALIDATE_PRIMARY_SLOT
 	// since we don't validate primary slot we check image integrity here
 	if (check_primary_slot_sha256() != 0)
@@ -156,14 +168,6 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 		return Alx_Err;
 	}
 #endif
-
-	fih_ret status = boot_go(&me->rsp);
-	if (status != FIH_SUCCESS)
-	{
-		ALX_BOOT_TRACE_WRN("Err");
-		return Alx_Err;
-	}
-
 	// Check FLASH_DEVICE_ID
 	if (me->rsp.br_flash_dev_id != ALX_MCU_BOOT_FLASH_DEVICE_ID)
 	{
