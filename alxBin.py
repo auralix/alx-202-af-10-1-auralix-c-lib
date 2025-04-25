@@ -122,29 +122,35 @@ def Script(vsTargetPath, fwName, copyFwUpNoBoot2Enable, binRawBinSignedManifestG
 		# Set fwUpSrc & noBoot2Src source variables
 		fwUpSrcDir = binSrcDir.parent / 'FwUp' / binDstDirName
 		noBoot2SrcDir = binSrcDir.parent / 'NoBoot2' / binDstDirName
+		fwUpBinUnsignedSrcName = binDstDirName + '_Unsigned.bin'
 		fwUpBinSignedSrcName = binDstDirName + '_Signed.bin'
 		fwUpManifestSrcName = binDstDirName + '_Manifest.json'
 		fwUpHexCombinedSrcName = binDstDirName + '_Unsigned_BL.hex'
 		noBoot2BinSrcName = binDstDirName + '_NoBoot.bin'
+		fwUpBinUnsignedSrcPath = fwUpSrcDir / fwUpBinUnsignedSrcName
 		fwUpBinSignedSrcPath = fwUpSrcDir / fwUpBinSignedSrcName
 		fwUpManifestSrcPath = fwUpSrcDir / fwUpManifestSrcName
 		fwUpHexCombinedSrcPath = fwUpSrcDir / fwUpHexCombinedSrcName
 		noBoot2BinSrcPath = noBoot2SrcDir / noBoot2BinSrcName
 
 		# Copy fwUpSrc & noBoot2Src to binDst directory
+		shutil.copy2(fwUpBinUnsignedSrcPath, binDstDir)
 		shutil.copy2(fwUpBinSignedSrcPath, binDstDir)
 		shutil.copy2(fwUpManifestSrcPath, binDstDir)
 		shutil.copy2(fwUpHexCombinedSrcPath, binDstDir)
 		shutil.copy2(noBoot2BinSrcPath, binDstDir)
 
 		# Copy fwUpSrc & noBoot2Src to binDstArtf directory
+		shutil.copy2(fwUpBinUnsignedSrcPath, binDstArtfDir)
 		shutil.copy2(fwUpBinSignedSrcPath, binDstArtfDir)
 		shutil.copy2(fwUpManifestSrcPath, binDstArtfDir)
 		shutil.copy2(fwUpHexCombinedSrcPath, binDstArtfDir)
 		shutil.copy2(noBoot2BinSrcPath, binDstArtfDir)
 
 		# Print
+		print("Added: " + fwUpBinUnsignedSrcName)
 		print("Added: " + fwUpBinSignedSrcName)
+		print("Added: " + fwUpHexCombinedSrcName)
 		print("Added: " + fwUpManifestSrcName)
 		print("Added: " + noBoot2BinSrcName)
 		print("DONE: Copy FwUp & NoBoot2 Files to .bin Destination Directory")

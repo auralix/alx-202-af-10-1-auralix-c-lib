@@ -120,25 +120,26 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 
 	# If singing server is configured read settings and use it to generate the signature
 	signserverSettingsPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "signserver.json"
-	if signserverSettingsPath.is_file():
-		with open(signserverSettingsPath) as json_file:
-			signserverSettings = json.load(json_file)
 
-			# Set SHA256 bin path
-			binSHA256Path = binSrcPath.with_name(binSrcPath.stem + '_SHA256.bin')
-			if binSHA256Path.exists():
-				binSHA256Path.unlink()
+	# Set SHA256 bin path
+	binSHA256Path = binSrcPath.with_name(binSrcPath.stem + '_SHA256.bin')
+	if binSHA256Path.exists():
+		binSHA256Path.unlink()
 
-			# Set external signature path
-			extSigPath = binSrcPath.with_name(binSrcPath.stem + '_ExtSig.base64')
-			if extSigPath.exists():
-				extSigPath.unlink()
+	# Set external signature path
+	extSigPath = binSrcPath.with_name(binSrcPath.stem + '_ExtSig.base64')
+	if extSigPath.exists():
+		extSigPath.unlink()
 
-			# Set fake pubkey path
-			binSHA256Path = binSrcPath.with_name(binSrcPath.stem + '_SHA256.bin')
-			if binSHA256Path.exists():
-				binSHA256Path.unlink()
+	# Set fake pubkey path
+	binSHA256Path = binSrcPath.with_name(binSrcPath.stem + '_SHA256.bin')
+	if binSHA256Path.exists():
+		binSHA256Path.unlink()
 
+	with open(signserverSettingsPath) as json_file:
+		signserverSettings = json.load(json_file)
+
+		if len(signserverSettings["worker_name"]) > 0:
 			# Get digest
 			cmd = (r"python {imgtoolPath} sign"
 				r" --header-size {headerLenStr}"
@@ -242,8 +243,6 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 		enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "enc_pub.pem"
 		if enc_pubPath.is_file():
 			cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
-	else:
-		sys.exit('Error: no signature!')
 
 	print("imgtool.py - cmd:" + cmd)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
