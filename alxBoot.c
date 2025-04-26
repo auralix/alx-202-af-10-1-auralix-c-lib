@@ -39,8 +39,10 @@
 		static const unsigned char app_trailer[0x0028] __attribute__((section(".app_trailer"), used)) = {0xDE, 0xAD, 0xBE, 0xEF};
 	#endif
 #endif
+#if defined(ALX_MBEDTLS)
+#include "mbedtls/sha256.h"
+#endif
 
-#include "mbedtls/sha256.h" /* SHA-256 only */
 
 //******************************************************************************
 // Module Guard
