@@ -803,6 +803,9 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 		{
 			AlxLin_Slave_Subscribe_Callback(me, me->rxb.frame);
 		}
+
+		// Clear active
+		me->rxb.active = false;
 	}
 
 
