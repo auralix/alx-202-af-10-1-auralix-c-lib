@@ -86,25 +86,54 @@ extern "C" {
 	#define ALX_LIN_TRACE_VRB(...) do{} while (false)
 #endif
 
+// Defines
+#ifndef ALX_LIN_FRAME_DATA_LEN_MAX
+	#define ALX_LIN_FRAME_DATA_LEN_MAX 8
+#endif
+
 
 //******************************************************************************
 // Types
 //******************************************************************************
 typedef struct
 {
-	// Defines
-	#define ALX_LIN_BUFF_LEN 250
+	uint8_t id;
+	uint8_t protectedId;
+	uint8_t dataLen;
+	uint8_t data[ALX_LIN_FRAME_DATA_LEN_MAX];
+	uint8_t enhancedChecksum;
+} AlxLin_Frame;
 
+typedef struct
+{
+	uint8_t id;
+	uint8_t dataLen;
+	bool publish;
+} AlxLin_SlaveFrameConfig;
+
+typedef struct
+{
+	uint8_t buff[3 + ALX_LIN_FRAME_DATA_LEN_MAX + 1];
+	uint8_t i;
+	AlxLin_Frame frame;
+	bool active;
+} AlxLin_RxBuffStruct;
+
+typedef struct
+{
 	// Parameters
 	AlxSerialPort* alxSerialPort;
-	AlxIoPin* do_BREAK;
-	bool masterReadSwHandleBreak;
-	bool slaveReadSwHandleBreakSync;
+	uint8_t breakSyncOffset;
+	AlxLin_SlaveFrameConfig* slaveFrameConfigArr;
+	uint8_t slaveFrameConfigArrLen;
+
+	// Variables
+	AlxLin_RxBuffStruct rxb;
 
 	// Info
 	bool wasCtorCalled;
-	bool isInitMaster;
-	bool isInitSlave;
+	bool isInit;
+	bool isMaster;
 } AlxLin;
 
 
@@ -115,9 +144,9 @@ void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
-	AlxIoPin* do_BREAK,
-	bool masterReadSwHandleBreak,
-	bool slaveReadSwHandleBreakSync
+	uint8_t breakSyncOffset,
+	AlxLin_SlaveFrameConfig* slaveFrameConfigArr,
+	uint8_t slaveFrameConfigArrLen
 );
 
 
@@ -132,8 +161,9 @@ void AlxLin_Ctor
 Alx_Status AlxLin_Master_Init(AlxLin* me);
 Alx_Status AlxLin_Master_DeInit(AlxLin* me);
 bool AlxLin_Master_IsInit(AlxLin* me);
-Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLen, uint32_t variableLen_maxLen, uint32_t* variableLen_actualLen);
-Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLen);
+Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame);
+Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t slaveResponseWaitTime_ms);
+Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame);
 
 
 //------------------------------------------------------------------------------
@@ -142,13 +172,20 @@ Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t l
 Alx_Status AlxLin_Slave_Init(AlxLin* me);
 Alx_Status AlxLin_Slave_DeInit(AlxLin* me);
 bool AlxLin_Slave_IsInit(AlxLin* me);
-Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t len, uint16_t timeout_ms, uint8_t numOfTries, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms);
+Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t timeout_ms, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms);
+
+
+//------------------------------------------------------------------------------
+// RX Buffer
+//------------------------------------------------------------------------------
+void AlxLin_RxBuff_Flush(AlxLin* me);
+void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data);
 
 
 //------------------------------------------------------------------------------
 // IRQ
 //------------------------------------------------------------------------------
-void AlxLin_IrqHandler(AlxLin* me);
+void AlxLin_Irq_Handle(AlxLin* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

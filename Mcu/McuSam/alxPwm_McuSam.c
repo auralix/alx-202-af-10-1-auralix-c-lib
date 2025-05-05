@@ -109,12 +109,16 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	// Init TCC_PWM
 	pwm_init(&me->descr, me->hw, _tcc_get_pwm());	// TV: Always returns OK, resets periphery
 
-	// Set TCC_PWM default duty
-	uint32_t pulse = (me->dutyDefault_permil * (me->period + 1)) / 1000;
-	pwm_set_parameters(&me->descr, me->period, pulse);	// TV: Always returns OK
+	// If default duty NOT zero
+	if (me->dutyDefault_permil > 0)
+	{
+		// Set TCC_PWM default duty
+		uint32_t pulse = (me->dutyDefault_permil * (me->period + 1)) / 1000;
+		pwm_set_parameters(&me->descr, me->period, pulse);	// TV: Always returns OK
 
-	// Enable TCC_PWM
-	pwm_enable(&me->descr);	// TV: We will NOT handle return
+		// Enable TCC_PWM
+		pwm_enable(&me->descr);	// TV: We will NOT handle return
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -177,9 +181,21 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 	ALX_PWM_ASSERT(ch == me->ch);
 	ALX_PWM_ASSERT((0 <= duty_permil) && (duty_permil <= 1000));
 
-	// Set duty
-	uint32_t pulse = (duty_permil * (me->period + 1)) / 1000;
-	pwm_set_parameters(&me->descr, me->period, pulse);
+	// If duty NOT zero
+	if (duty_permil > 0)
+	{
+		// Set duty
+		uint32_t pulse = (duty_permil * (me->period + 1)) / 1000;
+		pwm_set_parameters(&me->descr, me->period, pulse);
+
+		// Enable TCC_PWM
+		pwm_enable(&me->descr);	// TV: We will NOT handle return
+	}
+	else
+	{
+		// Disable TCC_PWM
+		pwm_disable(&me->descr);	// TV: We will NOT handle return
+	}
 
 	// Return
 	return Alx_Ok;

@@ -96,6 +96,8 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len);
 Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
 Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len);
 Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str);
+void AlxSerialPort_FlushTxFifo(AlxSerialPort* me);
+uint32_t AlxSerialPort_GetTxFifoNumOfEntries(AlxSerialPort* me);
 void AlxSerialPort_FlushRxFifo(AlxSerialPort* me);
 uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me);
 void AlxSerialPort_IrqHandler(AlxSerialPort* me);

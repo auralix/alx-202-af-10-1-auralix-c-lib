@@ -88,18 +88,18 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxLogger_StoreMetadata_Config_StoreDefault,
-	AlxLogger_StoreMetadata_Config_StoreReadWriteOldest,
-	AlxLogger_StoreMetadata_Config_StoreRead,
-	AlxLogger_StoreMetadata_Config_StoreWrite,
-	AlxLogger_StoreMetadata_Config_StoreWriteOldest
-} AlxLogger_StoreMetadata_Config;
+	AlxLogger_Metadata_StoreConfig_Default,
+	AlxLogger_Metadata_StoreConfig_ReadWriteOldest,
+	AlxLogger_Metadata_StoreConfig_Read,
+	AlxLogger_Metadata_StoreConfig_Write,
+	AlxLogger_Metadata_StoreConfig_WriteOldest
+} AlxLogger_Metadata_StoreConfig;
 
 typedef struct __attribute__((packed))
 {
 	uint64_t id;
 	uint32_t pos;
-	uint32_t line;
+	uint32_t log;
 	uint32_t file;
 	uint32_t dir;
 } AlxLogger_Metadata_Id;
@@ -113,9 +113,9 @@ typedef struct __attribute__((packed))
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
 
-	AlxLogger_Metadata_Id read;
-	AlxLogger_Metadata_Id write;
-	AlxLogger_Metadata_Id oldest;
+	AlxLogger_Metadata_Id read;		// ID of oldest log to process
+	AlxLogger_Metadata_Id write;	// ID of next log to store (not yet stored)
+	AlxLogger_Metadata_Id oldest;	// ID of oldest stored log
 
 	uint16_t crc;
 } AlxLogger_Metadata;
@@ -184,26 +184,99 @@ void AlxLogger_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Setup
+//------------------------------------------------------------------------------
 Alx_Status AlxLogger_Init(AlxLogger* me);
 Alx_Status AlxLogger_Format(AlxLogger* me);
-Alx_Status AlxLogger_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual, bool mdUpdate, uint64_t idStart);
-Alx_Status AlxLogger_ReadFile(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual));
-Alx_Status AlxLogger_ReadFileFirstLine(AlxLogger* me, const char* path, char* log);
-Alx_Status AlxLogger_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs);
-Alx_Status AlxLogger_GetFileSize(AlxLogger* me, const char* path, uint32_t* fileSize);
-uint64_t AlxLogger_GetNumOfLogsToProcess(AlxLogger* me);
-Alx_Status AlxLogger_DiscardLogsToProcess(AlxLogger* me);
-Alx_Status AlxLogger_RewindLogsToProcessFiles(AlxLogger* me, uint32_t numOfFiles);
-uint64_t AlxLogger_GetNumOfLogsStored(AlxLogger* me);
-Alx_Status AlxLogger_GetIdOldest(AlxLogger* me, uint64_t* idOldest);
-Alx_Status AlxLogger_GetIdNewest(AlxLogger* me, uint64_t* idNewest);
-Alx_Status AlxLogger_GetFilePathOldest(AlxLogger* me, char* filePathOldest);
-Alx_Status AlxLogger_GetFilePathNewest(AlxLogger* me, char* filePathNewest);
-AlxLogger_Metadata AlxLogger_GetMetadataCurrent(AlxLogger* me);
-AlxLogger_Metadata AlxLogger_GetMetadataStored(AlxLogger* me);
-Alx_Status AlxLogger_StoreMetadata(AlxLogger* me, AlxLogger_StoreMetadata_Config config);
-AlxMath_Data AlxLogger_GetMath_Data_ReadTime_ms(AlxLogger* me);
-AlxMath_Data AlxLogger_GetMath_Data_WriteTime_ms(AlxLogger* me);
+
+
+//------------------------------------------------------------------------------
+// Metadata
+//------------------------------------------------------------------------------
+AlxLogger_Metadata AlxLogger_Metadata_GetCurrent(AlxLogger* me);
+AlxLogger_Metadata AlxLogger_Metadata_GetStored(AlxLogger* me);
+Alx_Status AlxLogger_Metadata_Store(AlxLogger* me, AlxLogger_Metadata_StoreConfig config);
+
+
+//------------------------------------------------------------------------------
+// Debug
+//------------------------------------------------------------------------------
+AlxMath_Data AlxLogger_Debug_GetReadTime_ms(AlxLogger* me);
+AlxMath_Data AlxLogger_Debug_GetWriteTime_ms(AlxLogger* me);
+
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Log Layer
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Read/Write
+//------------------------------------------------------------------------------
+Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uint32_t* numOfLogsActual, bool mdUpdate, uint64_t idStart);
+Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLogs);
+
+
+//------------------------------------------------------------------------------
+// Status
+//------------------------------------------------------------------------------
+uint64_t AlxLogger_Log_GetNumOfLogsStored(AlxLogger* me);
+uint64_t AlxLogger_Log_GetNumOfLogsToProcess(AlxLogger* me);
+Alx_Status AlxLogger_Log_GetIdStoredOldest(AlxLogger* me, uint64_t* idStoredOldest);
+Alx_Status AlxLogger_Log_GetIdStoredNewest(AlxLogger* me, uint64_t* idStoredNewest);
+
+
+//------------------------------------------------------------------------------
+// Management
+//------------------------------------------------------------------------------
+Alx_Status AlxLogger_Log_DiscardLogsToProcess(AlxLogger* me);
+
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// File Layer
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Read/Write
+//------------------------------------------------------------------------------
+Alx_Status AlxLogger_File_Read(AlxLogger* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* ctx, void* chunkData, uint32_t chunkLenActual), void* chunkRead_Callback_Ctx, uint32_t* readLen, AlxOsMutex* alxOsMutex);
+Alx_Status AlxLogger_File_ReadFirstLog(AlxLogger* me, const char* path, char* log);
+
+
+//------------------------------------------------------------------------------
+// Status
+//------------------------------------------------------------------------------
+Alx_Status AlxLogger_File_GetSize(AlxLogger* me, const char* path, uint32_t* size);
+uint32_t AlxLogger_File_GetNumOfFilesToProcess(AlxLogger* me);
+Alx_Status AlxLogger_File_GetPathStoredOldest(AlxLogger* me, char* pathStoredOldest);
+Alx_Status AlxLogger_File_GetPathStoredNewest(AlxLogger* me, char* pathStoredNewest);
+Alx_Status AlxLogger_File_GetPathToProcessOldest(AlxLogger* me, char* pathToProcessOldest);
+
+
+//------------------------------------------------------------------------------
+// Management
+//------------------------------------------------------------------------------
+Alx_Status AlxLogger_File_RewindFilesToProcess(AlxLogger* me, uint32_t numOfFiles);
+Alx_Status AlxLogger_File_ForwardFilesToProcess(AlxLogger* me, uint32_t numOfFiles);
 
 
 #endif	// #if defined(ALX_C_LIB)

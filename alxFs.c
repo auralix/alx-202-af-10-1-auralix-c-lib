@@ -91,7 +91,7 @@ static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c);
 //------------------------------------------------------------------------------
 // Callback Functions
 //------------------------------------------------------------------------------
-static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(void* chunkData, uint32_t chunkLenActual);
+static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(void* ctx, void* chunkData, uint32_t chunkLenActual);
 
 
 //******************************************************************************
@@ -892,7 +892,7 @@ Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* chunkData, uint32_t chunkLenActual))
+Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* ctx, void* chunkData, uint32_t chunkLenActual), void* chunkRead_Callback_Ctx, uint32_t* readLen, AlxOsMutex* alxOsMutex)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -906,7 +906,9 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 	uint32_t chunkLenActual = 0;
 
 	// Open
+	if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 	status = AlxFs_File_Open(me, &file, path, "r");
+	if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err: %d, path=%s", status, path);
@@ -914,11 +916,15 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 	}
 
 	// Get fileSize
+	if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 	status = AlxFs_File_Size(me, &file, &fileSize);
+	if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u", status, path, fileSize);
+		if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 		Alx_Status statusClose = AlxFs_File_Close(me, &file);
+		if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 		if (statusClose != Alx_Ok)
 		{
 			ALX_FS_TRACE("Err: %d, path=%s", statusClose, path);
@@ -932,11 +938,15 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 	{
 		// Read
 		memset(chunkBuff, 0, chunkLen);
+		if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 		status = AlxFs_File_Read(me, &file, chunkBuff, chunkLen, &chunkLenActual);
+		if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 		if (status != Alx_Ok)
 		{
 			ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u, chunkLen=%u, chunkLenActual=%u", status, path, fileSize, chunkLen, chunkLenActual);
+			if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 			Alx_Status statusClose = AlxFs_File_Close(me, &file);
+			if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 			if (statusClose != Alx_Ok)
 			{
 				ALX_FS_TRACE("Err: %d, path=%s", statusClose, path);
@@ -946,11 +956,13 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 		}
 
 		// Callback
-		status = chunkRead_Callback(chunkBuff, chunkLenActual);
+		status = chunkRead_Callback(chunkRead_Callback_Ctx, chunkBuff, chunkLenActual);
 		if (status != Alx_Ok)
 		{
 			ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u, chunkLenActual=%u", status, path, fileSize, chunkLenActual);
+			if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 			Alx_Status statusClose = AlxFs_File_Close(me, &file);
+			if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 			if (statusClose != Alx_Ok)
 			{
 				ALX_FS_TRACE("Err: %d, path=%s", statusClose, path);
@@ -970,7 +982,9 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 	}
 
 	// Close
+	if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 	status = AlxFs_File_Close(me, &file);
+	if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE("Err: %d, path=%s", status, path);
@@ -979,6 +993,7 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 	}
 
 	// Return
+	*readLen = fileSizeRead;
 	return Alx_Ok;
 }
 Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
@@ -991,7 +1006,8 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	uint8_t chunkBuff[ALX_FS_BUFF_LEN] = {};
 
 	// Read
-	Alx_Status status = AlxFs_File_ReadInChunks(me, path, chunkBuff, sizeof(chunkBuff), AlxFs_File_Trace_ChunkRead_Callback);
+	uint32_t readLen = 0;
+	Alx_Status status = AlxFs_File_ReadInChunks(me, path, chunkBuff, sizeof(chunkBuff), AlxFs_File_Trace_ChunkRead_Callback, NULL, &readLen, NULL);
 
 	// Return
 	return status;
@@ -1537,8 +1553,8 @@ static int AlxFs_Lfs_FlashInt_ReadBlock(const struct lfs_config* c, lfs_block_t 
 	#endif
 
 	// Set addrSrc
-	AlxFs* alxFs_me = (AlxFs*)c->context;
-	uint32_t src_address = alxFs_me->lfsAddr + block * c->block_size + off;
+	AlxFs* me = (AlxFs*)c->context;
+	uint32_t src_address = me->lfsAddr + block * c->block_size + off;
 
 	// Read
 	memcpy(buffer, (void*)src_address, size);
@@ -1610,8 +1626,8 @@ static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t 
 	{
 		#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 		// Local variables
-		AlxFs* alxFs_me = (AlxFs*)c->context;
-		uint32_t block_base_addr = alxFs_me->lfsAddr + block * c->block_size;
+		AlxFs* me = (AlxFs*)c->context;
+		uint32_t block_base_addr = me->lfsAddr + block * c->block_size;
 		uint32_t dest_address = block_base_addr + off + i_row * 4;		// Multiply by 4 because we write 4 bytes at the time
 		uint32_t* src_address_ptr = (uint32_t*)(buffer + i_row * 4);	// Multiply by 4 because we write 4 bytes at the time
 
@@ -1628,8 +1644,8 @@ static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t 
 		#endif
 		#if defined(ALX_STM32L4)
 		// Local variables
-		AlxFs* alxFs_me = (AlxFs*)c->context;
-		uint32_t block_base_addr = alxFs_me->lfsAddr + block * c->block_size;
+		AlxFs* me = (AlxFs*)c->context;
+		uint32_t block_base_addr = me->lfsAddr + block * c->block_size;
 		uint32_t dest_address = block_base_addr + off + i_row * 8;		// Multiply by 8 because we write 8 bytes at the time
 		uint64_t* src_address_ptr = (uint64_t*)(buffer + i_row * 8);	// Multiply by 8 because we write 8 bytes at the time
 
@@ -1902,9 +1918,10 @@ static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c)
 //------------------------------------------------------------------------------
 // Callback Functions
 //------------------------------------------------------------------------------
-static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(void* chunkData, uint32_t chunkLenActual)
+static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(void* ctx, void* chunkData, uint32_t chunkLenActual)
 {
 	// Prepare
+	(void)ctx;
 	(void)chunkLenActual;
 
 	// Trace

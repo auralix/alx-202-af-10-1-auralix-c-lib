@@ -40,12 +40,17 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static Alx_Status AlxLin_Init(AlxLin* me, bool isMaster);
-static Alx_Status AlxLin_DeInit(AlxLin* me, bool isMaster);
-static uint8_t AlxLin_GetDataLenFromId(uint8_t id);
 static uint8_t AlxLin_CalcProtectedId(uint8_t id);
 static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, uint32_t len);
-static Alx_Status AlxLin_TxFrameHeaderBreak(AlxLin* me);
+static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLin_SlaveFrameConfig* slaveFrameConfig);
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
+void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
+void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame);
 
 
 //******************************************************************************
@@ -56,29 +61,32 @@ static Alx_Status AlxLin_TxFrameHeaderBreak(AlxLin* me);
   * @brief
   * @param[in,out]	me
   * @param[in]		alxSerialPort
-  * @param[in]		do_BREAK
-  * @param[in]		masterReadSwHandleBreak
-  * @param[in]		slaveReadSwHandleBreakSync
+  * @param[in]		breakSyncOffset
+  * @param[in]		slaveFrameConfigArr
+  * @param[in]		slaveFrameConfigArrLen
   */
 void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
-	AlxIoPin* do_BREAK,
-	bool masterReadSwHandleBreak,
-	bool slaveReadSwHandleBreakSync
+	uint8_t breakSyncOffset,
+	AlxLin_SlaveFrameConfig* slaveFrameConfigArr,
+	uint8_t slaveFrameConfigArrLen
 )
 {
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
-	me->do_BREAK = do_BREAK;
-	me->masterReadSwHandleBreak = masterReadSwHandleBreak;
-	me->slaveReadSwHandleBreakSync = slaveReadSwHandleBreakSync;
+	me->breakSyncOffset = breakSyncOffset;
+	me->slaveFrameConfigArr = slaveFrameConfigArr;
+	me->slaveFrameConfigArrLen = slaveFrameConfigArrLen;
+
+	// Variables
+	memset(&me->rxb, 0, sizeof(me->rxb));
 
 	// Info
 	me->wasCtorCalled = true;
-	me->isInitMaster = false;
-	me->isInitSlave = false;
+	me->isInit = false;
+	me->isMaster = false;
 }
 
 
@@ -101,11 +109,23 @@ Alx_Status AlxLin_Master_Init(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == false);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
+	ALX_LIN_ASSERT(me->isInit == false);
+	ALX_LIN_ASSERT(me->isMaster == false);
+
+	// Init
+	Alx_Status status = AlxSerialPort_Init(me->alxSerialPort);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Init() status %ld", status);
+		return status;
+	}
+
+	// Set info
+	me->isInit = true;
+	me->isMaster = true;
 
 	// Return
-	return AlxLin_Init(me, true);
+	return Alx_Ok;
 }
 
 /**
@@ -118,11 +138,23 @@ Alx_Status AlxLin_Master_DeInit(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == true);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
+
+	// DeInit
+	Alx_Status status = AlxSerialPort_DeInit(me->alxSerialPort);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_DeInit() status %ld", status);
+		return status;
+	}
+
+	// Clear info
+	me->isInit = false;
+	me->isMaster = false;
 
 	// Return
-	return AlxLin_DeInit(me, true);
+	return Alx_Ok;
 }
 
 /**
@@ -135,9 +167,89 @@ bool AlxLin_Master_IsInit(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
 
 	// Return
-	return me->isInitMaster;
+	return me->isInit;
+}
+
+/**
+  * @brief					As a LIN master device, transmit frame header and frame response to specified ID
+  *								This will probably be an ID of LIN slave device
+  *								If it's our own ID, then we will transmit frame to ourselves
+  *								In LIN terminology when you are transmitting frame response, this is considered PUBLISHING
+  *								Alternative name: AlxLin_Master_TxFrameHeader_TxFrameResponse
+  * @param[in,out]	me
+  * @param[in]		frame	Frame which will be transmitted and shall include:
+  *								frame.id - Frame Header ID
+  *									ID which will be transmitted in the frame header
+  *									Acceptable values: 0x00 .. 0x3F
+  *								frame.dataLen - Frame Response Data Length
+  *									Transmitted frame response data length
+  *									0 < frame.dataLen <= ALX_LIN_BUFF_LEN
+  *									If we want that data length is LIN compliant then:
+  *										Acceptable values are: 2, 4, 8
+  *										Length must be set accordingly to specified ID
+  *											If ID = 0x00 .. 0x1F, then 2
+  *											If ID = 0x20 .. 0x2F, then 4
+  *											If ID = 0x30 .. 0x3F, then 8
+  *								frame.data - Frame Response Data
+  *									Data which will be transmitted in frame response
+  *								Unused and set internally:
+  *									frame.protectedId - Frame Header Protected ID
+  *									frame.enhancedChecksum - Frame Response Enhanced Checksum
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
+	ALX_LIN_ASSERT((0 <= frame.id) && (frame.id <= 0x3F));
+	ALX_LIN_ASSERT((0 < frame.dataLen) && (frame.dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
+
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
+	uint8_t protectedId = AlxLin_CalcProtectedId(frame.id);
+	uint8_t enhancedChecksum = AlxLin_CalcEnhancedChecksum(protectedId, frame.data, frame.dataLen);
+	uint8_t txFrame[2 + ALX_LIN_FRAME_DATA_LEN_MAX + 1] = {};	// SYNC + Protected ID + Data + Enhanced Checksum
+
+
+	//------------------------------------------------------------------------------
+	// Transmit Frame Header + Frame Response
+	//------------------------------------------------------------------------------
+
+	// Prepare
+	// Break										// Frame Header Break - Send by AlxSerialPort_Write
+	txFrame[0] = 0x55;								// Frame Header SYNC
+	txFrame[1] = protectedId;						// Frame Header Protected ID
+	memcpy(&txFrame[2], frame.data, frame.dataLen);	// Frame Response Data
+	txFrame[2 + frame.dataLen] = enhancedChecksum;	// Frame Response Enhanced Checksum
+	uint8_t txFrameLen = 2 + frame.dataLen + 1;		// SYNC + Protected ID + Data + Enhanced Checksum
+
+	// Flush
+	AlxSerialPort_FlushTxFifo(me->alxSerialPort);
+
+	// Transmit
+	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %ld", status);
+		return status;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
 }
 
 /**
@@ -147,17 +259,23 @@ bool AlxLin_Master_IsInit(AlxLin* me)
   *													In LIN terminology when you are responding to received frame header, this is considered SUBSCRIBING
   *													AlxLin_Master_TxFrameHeader_RxFrameResponse
   * @param[in,out]	me
-  * @param[in]		id							ID which will be transmitted in the frame header
-  *													Acceptable values: 0x00 .. 0x3F
-  * @param[out]		data						Pointer to location to which received frame response data will be copied
-  * @param[in]		len							Received frame response data length
-  *													If variableLen = false, then length is LIN compliant and:
-  *														Acceptable values are: 2, 4, 8
-  *														Length must be set accordingly to specified ID
-  *															If ID = 0x00 .. 0x1F, then 2
-  *															If ID = 0x20 .. 0x2F, then 4
-  *															If ID = 0x30 .. 0x3F, then 8
-  *													Else if variableLen = true, then len should be 0, or ASSERT will happen
+  * @param[in,out]	frame						Pointer to frame variable in which data will be received and shall already include:
+  *													frame.id - Frame Header ID
+  *														ID which will be transmitted in the frame header
+  *														Acceptable values: 0x00 .. 0x3F
+  *													frame.dataLen - Frame Response Data Length
+  *														Received frame response data length
+  *														0 < frame.dataLen <= ALX_LIN_BUFF_LEN
+  *														If we want that data length is LIN compliant then:
+  *															Acceptable values are: 2, 4, 8
+  *															Length must be set accordingly to specified ID
+  *																If ID = 0x00 .. 0x1F, then 2
+  *																If ID = 0x20 .. 0x2F, then 4
+  *																If ID = 0x30 .. 0x3F, then 8
+  *													After successful operation frame variable will be populated with:
+  *														frame.protectedId - Frame Header Protected ID
+  *														frame.data - Frame Response Data
+  *														frame.enhancedChecksum - Frame Response Enhanced Checksum
   * @param[in]		slaveResponseWaitTime_ms	Time in ms for which, we as LIN master device, will wait for slave device to transmit whole frame response
   *													Wait will start right after we transmitted frame header
   *													When determining this value you must consider:
@@ -165,265 +283,160 @@ bool AlxLin_Master_IsInit(AlxLin* me)
   *														Frame response data length
   *														How fast is slave device, how quickly after received frame header does it start transmitting frame response
   *													This operation is blocking, so it's recommend that the wait time is not too large
-  * @param[in]		numOfTries					Number of tries
-  * @param[in]		variableLen					Bool for specifying if variable data length is enabled
-  * @param[in]		variableLen_maxLen			Maximum frame response data length, that the user of this function can receive
-  *													If received frame response data length > variableLen_maxLen, Alx_Err is returned
-  *													ONLY APPLICABLE if variableLen = true
-  * @param[out]		variableLen_actualLen		Pointer to variable which will be set with actual frame response data length received after successful communication
-  *													ONLY APPLICABLE if variableLen = true
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLin_Master_Read(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, uint16_t slaveResponseWaitTime_ms, uint8_t numOfTries, bool variableLen, uint32_t variableLen_maxLen, uint32_t* variableLen_actualLen)
+Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t slaveResponseWaitTime_ms)
 {
 	//------------------------------------------------------------------------------
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == true);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
-	ALX_LIN_ASSERT((0 <= id) && (id <= 0x3F));
-	if (variableLen)
-	{
-		ALX_LIN_ASSERT(len == 0);
-		ALX_LIN_ASSERT((0 < variableLen_maxLen) && (variableLen_maxLen <= ALX_LIN_BUFF_LEN));
-	}
-	else
-	{
-		ALX_LIN_ASSERT(len == AlxLin_GetDataLenFromId(id));
-		ALX_LIN_ASSERT(variableLen_maxLen == 0);
-		ALX_LIN_ASSERT(variableLen_actualLen == ALX_NULL);
-	}
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
+	ALX_LIN_ASSERT((0 <= frame->id) && (frame->id <= 0x3F));
+	ALX_LIN_ASSERT((0 < frame->dataLen) && (frame->dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
 
 
 	//------------------------------------------------------------------------------
 	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
-	uint8_t protectedId = AlxLin_CalcProtectedId(id);
-	uint8_t txFrame[2] = {};						// SYNC + Protected ID
-	uint8_t rxFrame[3 + ALX_LIN_BUFF_LEN + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
-	uint32_t rxFrameDataLen = 0;
-	uint32_t breakOffset = 0;
-	if (me->masterReadSwHandleBreak)
-	{
-		breakOffset = 0;
-	}
-	else
-	{
-		breakOffset = 1;
-	}
+	uint8_t protectedId = AlxLin_CalcProtectedId(frame->id);
+	uint8_t txFrame[2] = {};									// SYNC + Protected ID
+	uint8_t rxFrame[3 + ALX_LIN_FRAME_DATA_LEN_MAX + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
 
 
 	//------------------------------------------------------------------------------
-	// Try
+	// Transmit Frame Header
 	//------------------------------------------------------------------------------
 
-	// Try for number of tries
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
-	{
-		// Flush serial port RX FIFO
-		AlxSerialPort_FlushRxFifo(me->alxSerialPort);
+	// Prepare
+	// Break					// Frame Header Break - Send by AlxSerialPort_Write
+	txFrame[0] = 0x55;			// Frame Header SYNC
+	txFrame[1] = protectedId;	// Frame Header Protected ID
+	uint8_t txFrameLen = 2;		// SYNC + Protected ID
 
-		// Transmit frame header break
-		if (me->do_BREAK != NULL)
-		{
-			status = AlxLin_TxFrameHeaderBreak(me);
-			if (status != Alx_Ok)
-			{
-				ALX_LIN_TRACE_WRN("Err");
-				return status;
-			}
-		}
+	// Flush
+	AlxSerialPort_FlushTxFifo(me->alxSerialPort);
+	AlxSerialPort_FlushRxFifo(me->alxSerialPort);
 
-		// Prepare frame header
-		// Break					// Frame Header Break - Send automatically by HW or by SW above
-		txFrame[0] = 0x55;			// Frame Header SYNC
-		txFrame[1] = protectedId;	// Frame Header Protected ID
-		uint8_t txFrameLen = 2;		// SYNC + Protected ID
-
-		// Transmit frame header
-		status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
-		if (status != Alx_Ok)
-		{
-			ALX_LIN_TRACE_WRN("Err");
-			continue;
-		}
-
-		// Wait for slave to transmit whole frame response
-		#if defined(ALX_FREE_RTOS)
-		AlxOsDelay_ms(&alxOsDelay, slaveResponseWaitTime_ms);
-		#else
-		AlxDelay_ms(slaveResponseWaitTime_ms);
-		#endif
-
-		// Check if serial port RX FIFO number of entries is OK
-		uint32_t rxFrameLen = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);
-		rxFrameDataLen = rxFrameLen - (4 - breakOffset);	// We must subtract: *Break, SYNC, Protected ID, Enhanced Checksum
-		if (variableLen)
-		{
-			if (rxFrameDataLen > variableLen_maxLen)
-			{
-				ALX_LIN_TRACE_WRN("Err");
-				status = Alx_Err;
-				continue;
-			}
-		}
-		else
-		{
-			if (rxFrameDataLen != len)
-			{
-				ALX_LIN_TRACE_WRN("Err");
-				status = Alx_Err;
-				continue;
-			}
-		}
-
-		// Read received frame response from serial port RX FIFO
-		status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen);
-		if (status != Alx_Ok)
-		{
-			ALX_LIN_TRACE_WRN("Err");
-			continue;
-		}
-
-		// Check if protected ID is OK
-		uint8_t protectedId_Actual = rxFrame[2 - breakOffset];
-		uint8_t protectedId_Expected = protectedId;
-		if (protectedId_Actual != protectedId_Expected)
-		{
-			ALX_LIN_TRACE_WRN("Err");
-			status = Alx_Err;
-			continue;
-		}
-
-		// Check if enhanced checksum is OK
-		uint8_t enhancedChecksum_Actual = rxFrame[(3 - breakOffset) + rxFrameDataLen];
-		uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId, &rxFrame[3 - breakOffset], rxFrameDataLen);
-		if (enhancedChecksum_Actual != enhancedChecksum_Expected)
-		{
-			ALX_LIN_TRACE_WRN("Err");
-			status = Alx_Err;
-			continue;
-		}
-
-		// Break
-		break;
-	}
-
-	// If we are here and status is NOT OK, number of tries error occured
-	if (status != Alx_Ok)
-	{
-		return Alx_ErrNumOfTries;
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Return
-	//------------------------------------------------------------------------------
-
-	// Return frame response data
-	memcpy(data, &rxFrame[3 - breakOffset], rxFrameDataLen);
-
-	// Return frame response actual data length
-	if (variableLen)
-	{
-		*variableLen_actualLen = rxFrameDataLen;
-	}
-
-	// Return
-	return Alx_Ok;
-}
-
-/**
-  * @brief							As a LIN master device, transmit frame header and frame response to specified ID
-  *										This will probably be an ID of LIN slave device
-  *										If it's our own ID, then we will transmit frame to ourselves
-  *										In LIN terminology when you are transmitting frame response, this is considered PUBLISHING
-  *										Alternative name: AlxLin_Master_TxFrameHeader_TxFrameResponse
-  * @param[in,out]	me
-  * @param[in]		id				ID which will be transmitted in the frame header
-  *										Acceptable values: 0x00 .. 0x3F
-  * @param[in]		data			Pointer to data which will be transmitted in frame response
-  * @param[in]		len				Transmitted frame response data length
-  *										If variableLen = false, then length is LIN compliant and:
-  *											Acceptable values are: 2, 4, 8
-  *											Length must be set accordingly to specified ID
-  *												If ID = 0x00 .. 0x1F, then 2
-  *												If ID = 0x20 .. 0x2F, then 4
-  *												If ID = 0x30 .. 0x3F, then 8
-  *										Else if variableLen = true, then 0 < len <= ALX_LIN_BUFF_LEN
-  * @param[in]		variableLen		Bool for specifying if variable data length is enabled
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxLin_Master_Write(AlxLin* me, uint8_t id, uint8_t* data, uint32_t len, bool variableLen)
-{
-	//------------------------------------------------------------------------------
-	// Assert
-	//------------------------------------------------------------------------------
-	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == true);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
-	ALX_LIN_ASSERT((0 <= id) && (id <= 0x3F));
-	if (variableLen)
-	{
-		ALX_LIN_ASSERT((0 < len) && (len <= ALX_LIN_BUFF_LEN));
-	}
-	else
-	{
-		ALX_LIN_ASSERT(len == AlxLin_GetDataLenFromId(id));
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Local Variables
-	//------------------------------------------------------------------------------
-	Alx_Status status = Alx_Err;
-	uint8_t protectedId = AlxLin_CalcProtectedId(id);
-	uint8_t enhancedChecksum = AlxLin_CalcEnhancedChecksum(protectedId, data, len);
-	uint8_t txFrame[2 + ALX_LIN_BUFF_LEN + 1] = {};	// SYNC + Protected ID + Data + Enhanced Checksum
-
-
-	//------------------------------------------------------------------------------
-	// Transmit Frame Header Break
-	//------------------------------------------------------------------------------
-	if (me->do_BREAK != NULL)
-	{
-		status = AlxLin_TxFrameHeaderBreak(me);
-		if (status != Alx_Ok)
-		{
-			ALX_LIN_TRACE_WRN("Err");
-			return status;
-		}
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Transmit Frame Header + Frame Response
-	//------------------------------------------------------------------------------
-
-	// Prepare frame header
-	// Break								// Frame Header Break - Send automatically by HW or by SW above
-	txFrame[0] = 0x55;						// Frame Header SYNC
-	txFrame[1] = protectedId;				// Frame Header Protected ID
-	memcpy(&txFrame[2], data, len);			// Frame Response Data
-	txFrame[2 + len] = enhancedChecksum;	// Frame Response Enhanced Checksum
-	uint8_t txFrameLen = 2 + len + 1;		// SYNC + Protected ID + Data + Enhanced Checksum
-
-	// Transmit frame header
+	// Transmit
 	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("Err");
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %ld", status);
 		return status;
 	}
 
 
 	//------------------------------------------------------------------------------
+	// Receive Frame Response
+	//------------------------------------------------------------------------------
+
+	// Wait for slave to transmit whole frame response
+	#if defined(ALX_FREE_RTOS)
+	AlxOsDelay_ms(&alxOsDelay, slaveResponseWaitTime_ms);
+	#else
+	AlxDelay_ms(slaveResponseWaitTime_ms);
+	#endif
+
+	// Check RX frame length
+	uint32_t rxFrameLen_Actual = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);
+	uint32_t rxFrameLen_Expected = me->breakSyncOffset + 1 + frame->dataLen + 1;	// *Break + *SYNC + Protected ID + Data + Enhanced Checksum
+	if (rxFrameLen_Actual != rxFrameLen_Expected)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: CheckRxFrameLen() rxFrameLen_Actual %lu rxFrameLen_Expected %lu", rxFrameLen_Actual, rxFrameLen_Expected);
+		return Alx_Err;
+	}
+
+	// Read RX frame
+	status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen_Actual);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Read() status %ld", status);
+		return status;
+	}
+
+	// Check protected ID
+	uint8_t protectedId_Actual = rxFrame[me->breakSyncOffset];
+	uint8_t protectedId_Expected = protectedId;
+	if (protectedId_Actual != protectedId_Expected)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
+		return Alx_Err;
+	}
+
+	// Check enhanced checksum
+	uint8_t enhancedChecksum_Actual = rxFrame[me->breakSyncOffset + 1 + frame->dataLen];
+	uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId, &rxFrame[me->breakSyncOffset + 1], frame->dataLen);
+	if (enhancedChecksum_Actual != enhancedChecksum_Expected)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: CheckEnhancedChecksum() enhancedChecksum_Actual %u enhancedChecksum_Expected %u", enhancedChecksum_Actual, enhancedChecksum_Expected);
+		return Alx_Err;
+	}
+
+
+	//------------------------------------------------------------------------------
 	// Return
 	//------------------------------------------------------------------------------
+
+	// Return frame
+	frame->protectedId = protectedId_Actual;
+	memcpy(frame->data, &rxFrame[me->breakSyncOffset + 1], frame->dataLen);
+	frame->enhancedChecksum = enhancedChecksum_Actual;
+
+	// Return
+	return Alx_Ok;
+}
+Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
+	ALX_LIN_ASSERT((0 <= frame.id) && (frame.id <= 0x3F));
+	ALX_LIN_ASSERT((0 < frame.dataLen) && (frame.dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
+
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
+	uint8_t protectedId = AlxLin_CalcProtectedId(frame.id);
+	uint8_t txFrame[2] = {};	// SYNC + Protected ID
+
+
+	//------------------------------------------------------------------------------
+	// Transmit Frame Header
+	//------------------------------------------------------------------------------
+
+	// Prepare
+	// Break					// Frame Header Break - Send by AlxSerialPort_Write
+	txFrame[0] = 0x55;			// Frame Header SYNC
+	txFrame[1] = protectedId;	// Frame Header Protected ID
+	uint8_t txFrameLen = 2;		// SYNC + Protected ID
+
+	// Flush
+	AlxSerialPort_FlushTxFifo(me->alxSerialPort);
+	AlxLin_RxBuff_Flush(me);
+
+	// Set frame
+	me->rxb.frame.id = frame.id;
+	me->rxb.frame.protectedId = protectedId;
+	me->rxb.frame.dataLen = frame.dataLen;
+
+	// Transmit
+	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %ld", status);
+		return status;
+	}
+
+	// Return
 	return Alx_Ok;
 }
 
@@ -442,12 +455,23 @@ Alx_Status AlxLin_Slave_Init(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == false);
-	ALX_LIN_ASSERT(me->isInitSlave == false);
-	ALX_LIN_ASSERT(me->do_BREAK == NULL);
+	ALX_LIN_ASSERT(me->isInit == false);
+	ALX_LIN_ASSERT(me->isMaster == false);
+
+	// Init
+	Alx_Status status = AlxSerialPort_Init(me->alxSerialPort);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Init() status %ld", status);
+		return status;
+	}
+
+	// Set info
+	me->isInit = true;
+	me->isMaster = false;
 
 	// Return
-	return AlxLin_Init(me, false);
+	return Alx_Ok;
 }
 
 /**
@@ -460,12 +484,23 @@ Alx_Status AlxLin_Slave_DeInit(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == false);
-	ALX_LIN_ASSERT(me->isInitSlave == true);
-	ALX_LIN_ASSERT(me->do_BREAK == NULL);
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == false);
+
+	// DeInit
+	Alx_Status status = AlxSerialPort_DeInit(me->alxSerialPort);
+	if (status != Alx_Ok)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_DeInit() status %ld", status);
+		return status;
+	}
+
+	// Clear info
+	me->isInit = false;
+	me->isMaster = false;
 
 	// Return
-	return AlxLin_DeInit(me, false);
+	return Alx_Ok;
 }
 
 /**
@@ -478,163 +513,120 @@ bool AlxLin_Slave_IsInit(AlxLin* me)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isMaster == false);
 
 	// Return
-	return me->isInitSlave;
+	return me->isInit;
 }
 
 /**
   * @brief													As a LIN slave device, receive frame header or receive frame header & frame response from master device
   *																AlxLin_Slave_RxFrameHeader_RxFrameResponse
   * @param[in,out]	me
-  * @param[out]		id										Pointer to variable which will be set with ID which was received in the frame header
-  * @param[out]		data									Pointer to location to which received frame response data will be copied
-  * @param[in]		len										Received frame response data length which will be read
+  * @param[in,out]	frame									Pointer to frame variable in which data will be received and shall already include:
+  *																frame.dataLen - Frame Response Data Length
+  *																	Data length which we will try to receive
+  *																	0 < frame.dataLen <= ALX_LIN_BUFF_LEN
+  *																After successful operation frame variable will be populated with:
+  *																	frame.id - Frame Header ID
+  *																	frame.protectedId - Frame Header Protected ID
+  *																	frame.data - Frame Response Data
+  *																	frame.enhancedChecksum - Frame Response Enhanced Checksum
   * @param[in]		timeout_ms								Time in ms for which, we as LIN slave device, will wait after RX FIFO Flush for master device to transmit whole frame response with specified data length
-  * @param[in]		numOfTries								Number of tries
   * @param[in]		rxFifoNumOfEntriesNewCheckWaitTime_ms	Time in ms for which we will wait for new RX FIFO number of entries check
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t len, uint16_t timeout_ms, uint8_t numOfTries, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms)
+Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t timeout_ms, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms)
 {
 	//------------------------------------------------------------------------------
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInitMaster == false);
-	ALX_LIN_ASSERT(me->isInitSlave == true);
-	ALX_LIN_ASSERT(me->do_BREAK == NULL);
-	ALX_LIN_ASSERT((0 <= len) && (len <= ALX_LIN_BUFF_LEN));
+	ALX_LIN_ASSERT(me->isInit == true);
+	ALX_LIN_ASSERT(me->isMaster == false);
+	ALX_LIN_ASSERT((0 < frame->dataLen) && (frame->dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
 
 
 	//------------------------------------------------------------------------------
 	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
-	uint8_t id_Actual = 0;
-	uint8_t rxFrame[3 + ALX_LIN_BUFF_LEN + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
+	uint8_t rxFrame[3 + ALX_LIN_FRAME_DATA_LEN_MAX + 1] = {};	// Break + SYNC + Protected ID + Data + Enhanced Checksum
+
+
+	//------------------------------------------------------------------------------
+	// Receive Frame Header + Frame Response
+	//------------------------------------------------------------------------------
+
+	// Flush
+	AlxSerialPort_FlushRxFifo(me->alxSerialPort);
+
+	// Start timer
+	AlxTimSw alxTimSw;
+	AlxTimSw_Ctor(&alxTimSw, false);
+	AlxTimSw_Start(&alxTimSw);
+
+	// Wait for master to transmit whole frame response with specified data length
 	uint32_t rxFrameLen_Actual = 0;
-	uint32_t rxFrameLen_Expected = 0;
-	uint32_t breakSyncOffset = 0;
-	if (me->slaveReadSwHandleBreakSync)
+	while (1)
 	{
-		breakSyncOffset = 0;
-	}
-	else
-	{
-		breakSyncOffset = 2;
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Set rxFrameLen_Expected
-	//------------------------------------------------------------------------------
-	if (len == 0)
-	{
-		rxFrameLen_Expected = 3 - breakSyncOffset;	// *Break + *SYNC + Protected ID
-	}
-	else
-	{
-		rxFrameLen_Expected = (3 - breakSyncOffset) + len + 1;	// *Break + *SYNC + Protected ID + Data + Enhanced Checksum
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Try
-	//------------------------------------------------------------------------------
-
-	// Try for number of tries
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
-	{
-		// Flush serial port RX FIFO
-		AlxSerialPort_FlushRxFifo(me->alxSerialPort);
-
-		// Create timer
-		AlxTimSw alxTimSw;
-		AlxTimSw_Ctor(&alxTimSw, false);
-
-		// Start timer
-		AlxTimSw_Start(&alxTimSw);
-
-		// Wait for master to transmit whole frame response with specified data length
-		while (1)
+		// Check RX frame length
+		rxFrameLen_Actual = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);
+		uint32_t rxFrameLen_Expected = me->breakSyncOffset + 1 + frame->dataLen + 1;	// *Break + *SYNC + Protected ID + Data + Enhanced Checksum
+		if (rxFrameLen_Actual == rxFrameLen_Expected)
 		{
-			// Check if serial port RX FIFO number of entries are OK
-			rxFrameLen_Actual = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);
-
-			// Check if data length is OK
-			if(rxFrameLen_Actual == rxFrameLen_Expected)
-			{
-				status = Alx_Ok;
-				break;
-			}
-
-			// Delay
-			#if defined(ALX_FREE_RTOS)
-			AlxOsDelay_ms(&alxOsDelay, rxFifoNumOfEntriesNewCheckWaitTime_ms);
-			#else
-			AlxDelay_ms(rxFifoNumOfEntriesNewCheckWaitTime_ms);
-			#endif
-
-			// Check if timeout
-			if (AlxTimSw_IsTimeout_ms(&alxTimSw, timeout_ms))
-			{
-				ALX_LIN_TRACE_WRN("Err");
-				status = Alx_Err;
-				break;
-			}
+			status = Alx_Ok;
+			break;
 		}
 
-		// If we are here and status is NOT OK, timeout occured
-		if (status != Alx_Ok)
+		// Wait
+		#if defined(ALX_FREE_RTOS)
+		AlxOsDelay_ms(&alxOsDelay, rxFifoNumOfEntriesNewCheckWaitTime_ms);
+		#else
+		AlxDelay_ms(rxFifoNumOfEntriesNewCheckWaitTime_ms);
+		#endif
+
+		// Check RX frame length too large
+		if (rxFrameLen_Actual > rxFrameLen_Expected)
 		{
-			ALX_LIN_TRACE_WRN("Err");
-			status = Alx_Err;
-			continue;
+			ALX_LIN_TRACE_WRN("FAIL: CheckRxFrameLenTooLarge() rxFrameLen_Actual %lu rxFrameLen_Expected %lu", rxFrameLen_Actual, rxFrameLen_Expected);
+			return Alx_Err;
 		}
 
-		// Read received frame response from serial port RX FIFO
-		status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen_Actual);
-		if (status != Alx_Ok)
+		// Check timeout
+		if (AlxTimSw_IsTimeout_ms(&alxTimSw, timeout_ms))
 		{
-			ALX_LIN_TRACE_WRN("Err");
-			status = Alx_Err;
-			continue;
+			ALX_LIN_TRACE_WRN("FAIL: AlxTimSw_IsTimeout_ms()");
+			return Alx_Err;
 		}
-
-		// Check if protected ID is OK
-		uint8_t protectedId_Actual = rxFrame[2 - breakSyncOffset];
-		id_Actual = rxFrame[2 - breakSyncOffset] & 0x3F;
-		uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
-		if (protectedId_Actual != protectedId_Expected)
-		{
-			ALX_LIN_TRACE_WRN("Err");
-			status = Alx_Err;
-			continue;
-		}
-
-		// Check if enhanced checksum is OK
-		if ((5 - breakSyncOffset) <= rxFrameLen_Actual)
-		{
-			uint8_t enhancedChecksum_Actual = rxFrame[(3 - breakSyncOffset) + len];
-			uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId_Actual, &rxFrame[3 - breakSyncOffset], len);
-			if (enhancedChecksum_Actual != enhancedChecksum_Expected)
-			{
-				ALX_LIN_TRACE_WRN("Err");
-				status = Alx_Err;
-				continue;
-			}
-		}
-
-		// Break
-		break;
 	}
 
-	// If we are here and status is NOT OK, number of tries error occured
+	// Read RX frame
+	status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen_Actual);
 	if (status != Alx_Ok)
 	{
-		return Alx_ErrNumOfTries;
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Read() status %ld", status);
+		return Alx_Err;
+	}
+
+	// Check protected ID
+	uint8_t protectedId_Actual = rxFrame[me->breakSyncOffset];
+	uint8_t id_Actual = protectedId_Actual & 0x3F;
+	uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
+	if (protectedId_Actual != protectedId_Expected)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
+		return Alx_Err;
+	}
+
+	// Check enhanced checksum
+	uint8_t enhancedChecksum_Actual = rxFrame[me->breakSyncOffset + 1 + frame->dataLen];
+	uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(protectedId_Actual, &rxFrame[me->breakSyncOffset + 1], frame->dataLen);
+	if (enhancedChecksum_Actual != enhancedChecksum_Expected)
+	{
+		ALX_LIN_TRACE_WRN("FAIL: CheckEnhancedChecksum() enhancedChecksum_Actual %u enhancedChecksum_Expected %u", enhancedChecksum_Actual, enhancedChecksum_Expected);
+		return Alx_Err;
 	}
 
 
@@ -642,14 +634,185 @@ Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t le
 	// Return
 	//------------------------------------------------------------------------------
 
-	// Return protected ID
-	*id = id_Actual;
-
-	// Return frame response data
-	memcpy(data, &rxFrame[3 - breakSyncOffset], len);
+	// Return frame
+	frame->id = id_Actual;
+	frame->protectedId = protectedId_Actual;
+	memcpy(frame->data, &rxFrame[me->breakSyncOffset + 1], frame->dataLen);
+	frame->enhancedChecksum = enhancedChecksum_Actual;
 
 	// Return
 	return Alx_Ok;
+}
+
+
+//------------------------------------------------------------------------------
+// RX Buffer
+//------------------------------------------------------------------------------
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+void AlxLin_RxBuff_Flush(AlxLin* me)
+{
+	memset(&me->rxb, 0, sizeof(me->rxb));
+	me->rxb.active = true;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		data
+  */
+void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
+{
+	//------------------------------------------------------------------------------
+	// Check if Active
+	//------------------------------------------------------------------------------
+	if (me->rxb.active == false)
+	{
+		return;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Handle Write
+	//------------------------------------------------------------------------------
+	me->rxb.buff[me->rxb.i] = data;
+
+
+	//------------------------------------------------------------------------------
+	// Handle Frame ID, Protected ID, Data Length
+	//------------------------------------------------------------------------------
+	if (me->rxb.i == me->breakSyncOffset)
+	{
+		if (me->isMaster)
+		{
+			// Set frame - Already set by AlxLin_Master_SubscribeViaCallback
+			// me->rxb.frame.id
+			// me->rxb.frame.protectedId
+			// me->rxb.frame.dataLen
+
+			// Check protected ID
+			uint8_t protectedId_Actual = me->rxb.buff[me->breakSyncOffset];
+			uint8_t protectedId_Expected = me->rxb.frame.protectedId;
+			if (protectedId_Actual != protectedId_Expected)
+			{
+				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
+				me->rxb.active = false;
+				return;
+			}
+		}
+		else
+		{
+			// Check protected ID
+			uint8_t protectedId_Actual = me->rxb.buff[me->breakSyncOffset];
+			uint8_t id_Actual = protectedId_Actual & 0x3F;
+			uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
+			if (protectedId_Actual != protectedId_Expected)
+			{
+				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
+				me->rxb.active = false;
+				return;
+			}
+
+			// Get slave frame config from ID
+			AlxLin_SlaveFrameConfig slaveFrameConfig = {};
+			Alx_Status status = AlxLin_GetSlaveFrameConfigFromId(me, id_Actual, &slaveFrameConfig);
+			if (status != Alx_Ok)
+			{
+				ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %u", status, id_Actual);
+				me->rxb.active = false;
+				return;
+			}
+
+			// Set frame
+			me->rxb.frame.id = id_Actual;
+			me->rxb.frame.protectedId = protectedId_Actual;
+			me->rxb.frame.dataLen = slaveFrameConfig.dataLen;
+
+
+			//------------------------------------------------------------------------------
+			// Handle Slave Publish
+			//------------------------------------------------------------------------------
+			if (slaveFrameConfig.publish)
+			{
+				// Callback
+				AlxLin_Slave_Publish_Callback(me, &me->rxb.frame);
+
+				// Set enhanced checksum
+				me->rxb.frame.enhancedChecksum = AlxLin_CalcEnhancedChecksum(me->rxb.frame.protectedId, me->rxb.frame.data, me->rxb.frame.dataLen);
+
+				// Clear active
+				me->rxb.active = false;
+
+				// Prepare frame response
+				uint8_t txFrameResponse[ALX_LIN_FRAME_DATA_LEN_MAX + 1] = {};				// Data + Enhanced Checksum
+				memcpy(txFrameResponse, me->rxb.frame.data, me->rxb.frame.dataLen);			// Frame Response Data
+				txFrameResponse[me->rxb.frame.dataLen] = me->rxb.frame.enhancedChecksum;	// Frame Response Enhanced Checksum
+				uint8_t txFrameResponseLen = me->rxb.frame.dataLen + 1;						// Data + Enhanced Checksum
+
+				// Transmit frame response
+				Alx_Status status = AlxSerialPort_Write(me->alxSerialPort, txFrameResponse, txFrameResponseLen);
+				if (status != Alx_Ok)
+				{
+					ALX_LIN_TRACE_DBG("FAIL: AlxSerialPort_Write() status %ld", status);
+					return;
+				}
+			}
+		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Handle Data
+	//------------------------------------------------------------------------------
+	else if (me->rxb.i == me->breakSyncOffset + me->rxb.frame.dataLen)
+	{
+		for (uint8_t i = 0; i < me->rxb.frame.dataLen; i++)
+		{
+			me->rxb.frame.data[i] = me->rxb.buff[me->breakSyncOffset + 1 + i];
+		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Handle Enhanced Checksum
+	//------------------------------------------------------------------------------
+	else if (me->rxb.i == me->breakSyncOffset + 1 + me->rxb.frame.dataLen)
+	{
+		// Check enhanced checksum
+		uint8_t enhancedChecksum_Actual = me->rxb.buff[me->rxb.i];
+		uint8_t enhancedChecksum_Expected = AlxLin_CalcEnhancedChecksum(me->rxb.frame.protectedId, me->rxb.frame.data, me->rxb.frame.dataLen);
+		if (enhancedChecksum_Actual != enhancedChecksum_Expected)
+		{
+			ALX_LIN_TRACE_DBG("FAIL: CheckEnhancedChecksum() enhancedChecksum_Actual %u enhancedChecksum_Expected %u", enhancedChecksum_Actual, enhancedChecksum_Expected);
+			me->rxb.active = false;
+			return;
+		}
+
+		// Set frame
+		me->rxb.frame.enhancedChecksum = enhancedChecksum_Actual;
+
+		// Callback
+		if (me->isMaster)
+		{
+			AlxLin_Master_Subscribe_Callback(me, me->rxb.frame);
+		}
+		else
+		{
+			AlxLin_Slave_Subscribe_Callback(me, me->rxb.frame);
+		}
+
+		// Clear active
+		me->rxb.active = false;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Increment
+	//------------------------------------------------------------------------------
+	me->rxb.i++;
 }
 
 
@@ -661,7 +824,7 @@ Alx_Status AlxLin_Slave_Read(AlxLin* me, uint8_t* id, uint8_t* data, uint32_t le
   * @brief
   * @param[in,out]	me
   */
-void AlxLin_IrqHandler(AlxLin* me)
+void AlxLin_Irq_Handle(AlxLin* me)
 {
 	AlxSerialPort_IrqHandler(me->alxSerialPort);
 }
@@ -670,70 +833,6 @@ void AlxLin_IrqHandler(AlxLin* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static Alx_Status AlxLin_Init(AlxLin* me, bool isMaster)
-{
-	// Local variables
-	Alx_Status status = Alx_Err;
-
-	// Init serial port
-	status = AlxSerialPort_Init(me->alxSerialPort);
-	if (status != Alx_Ok) { ALX_LIN_TRACE_WRN("Err"); return status; }
-
-	// Info
-	if (isMaster)
-	{
-		me->isInitMaster = true;
-	}
-	else
-	{
-		me->isInitSlave = true;
-	}
-
-	// Return
-	return Alx_Ok;
-}
-static Alx_Status AlxLin_DeInit(AlxLin* me, bool isMaster)
-{
-	// Local variables
-	Alx_Status status = Alx_Err;
-
-	// DeInit serial port
-	status = AlxSerialPort_DeInit(me->alxSerialPort);
-	if (status != Alx_Ok) { ALX_LIN_TRACE_WRN("Err"); return status; }
-
-	// Info
-	if (isMaster)
-	{
-		me->isInitMaster = false;
-	}
-	else
-	{
-		me->isInitSlave = false;
-	}
-
-	// Return
-	return Alx_Ok;
-}
-static uint8_t AlxLin_GetDataLenFromId(uint8_t id)
-{
-	// Get
-	if ((0 <= id) && (id <= 0x1F))
-	{
-		return 2;
-	}
-	else if ((0x20 <= id) && (id <= 0x2F))
-	{
-		return 4;
-	}
-	else if ((0x30 <= id) && (id <= 0x3F))
-	{
-		return 8;
-	}
-
-	// Assert
-	ALX_LIN_ASSERT(false);	// We should not get here
-	return 0;
-}
 static uint8_t AlxLin_CalcProtectedId(uint8_t id)
 {
 	// Calculate
@@ -764,39 +863,40 @@ static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, u
 	// Return
 	return sum;
 }
-static Alx_Status AlxLin_TxFrameHeaderBreak(AlxLin* me)
+static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLin_SlaveFrameConfig* slaveFrameConfig)
 {
-	// Local variables
-	Alx_Status status = Alx_Err;
-
-	// DeInit serial port
-	status = AlxSerialPort_DeInit(me->alxSerialPort);
-	if (status != Alx_Ok)
+	// Get
+	for (uint32_t i = 0; i < me->slaveFrameConfigArrLen; i++)
 	{
-		ALX_LIN_TRACE_WRN("Err");
-		return status;
-	}
-
-	// Init - Sets GPIO to LOW
-	AlxIoPin_Init(me->do_BREAK);
-
-	// Wait
-	AlxDelay_ms(2);
-	//for (uint32_t i = 0; i < 3000; i++);
-
-	// DeInit - Sets GPIO to HIGH
-	AlxIoPin_DeInit(me->do_BREAK);
-
-	// Init serial port
-	status = AlxSerialPort_Init(me->alxSerialPort);
-	if (status != Alx_Ok)
-	{
-		ALX_LIN_TRACE_WRN("Err");
-		return status;
+		if (me->slaveFrameConfigArr[i].id == id)
+		{
+			*slaveFrameConfig = me->slaveFrameConfigArr[i];
+			return Alx_Ok;
+		}
 	}
 
 	// Return
-	return Alx_Ok;
+	return Alx_Err;
+}
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+ALX_WEAK void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
+{
+	(void)me;
+	(void)frame;
+}
+ALX_WEAK void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
+{
+	(void)me;
+	(void)frame;
+}
+ALX_WEAK void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame)
+{
+	(void)me;
+	(void)frame;
 }
 
 

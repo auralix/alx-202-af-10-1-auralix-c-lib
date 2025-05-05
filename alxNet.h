@@ -50,7 +50,7 @@ extern "C" {
 	//******************************************************************************
 	// Module Guard
 	//******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
+#if defined(ALX_C_LIB)
 
 
 	//******************************************************************************
@@ -188,7 +188,7 @@ extern "C" {
 #endif
 	int AlxNet_Ping(AlxNet* me, const char *addr, uint16_t count, uint32_t timeout_ms);
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }

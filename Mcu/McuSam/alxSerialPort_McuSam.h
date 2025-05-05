@@ -57,24 +57,48 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxSerialPort_Lin_Disable,
-	AlxSerialPort_Lin_EnableMaster,
-	AlxSerialPort_Lin_EnableSlave
-} AlxSerialPort_Lin;
+	AlxSerialPort_Config_Standard_TxBlocking_RxIrqFifo,
+	AlxSerialPort_Config_Standard_TxBlocking_RxIrqCallback,
+	AlxSerialPort_Config_Standard_TxIrqFifo_RxIrqFifo,
+	AlxSerialPort_Config_Standard_TxIrqFifo_RxIrqCallback,
+
+	AlxSerialPort_Config_LinMaster_TxBlocking_RxIrqFifo,
+	AlxSerialPort_Config_LinMaster_TxBlocking_RxIrqCallback,
+	AlxSerialPort_Config_LinMaster_TxIrqFifo_RxIrqFifo,
+	AlxSerialPort_Config_LinMaster_TxIrqFifo_RxIrqCallback,
+
+	AlxSerialPort_Config_LinSlave_TxBlocking_RxIrqFifo,
+	AlxSerialPort_Config_LinSlave_TxBlocking_RxIrqCallback,
+	AlxSerialPort_Config_LinSlave_TxIrqFifo_RxIrqFifo,
+	AlxSerialPort_Config_LinSlave_TxIrqFifo_RxIrqCallback
+} AlxSerialPort_Config;
 
 typedef struct
 {
 	// Parameters
+	AlxSerialPort_Config config;
 	void* hw;
 	AlxIoPin* do_TX;
 	AlxIoPin* di_RX;
+	uint8_t* txFifoBuff;
+	uint32_t txFifoBuffLen;
 	uint8_t* rxFifoBuff;
 	uint32_t rxFifoBuffLen;
-	Alx_IrqPriority rxIrqPriority;
-	AlxSerialPort_Lin lin;
+	Alx_IrqPriority irqPriority;
+	AlxIoPin* do_LIN_MASTER_BREAK;
+	uint32_t linMasterBreakLength_forLoopCycles;
+	AlxIoPin* do_DBG_Tx;
+	AlxIoPin* do_DBG_Rx;
+
+	// Parameters - Private
+	bool txFifoUsed;
+	bool rxFifoUsed;
+	bool linMaster;
+	bool linSlave;
 
 	// Variables
 	struct usart_sync_descriptor descr;
+	AlxFifo txFifo;
 	AlxFifo rxFifo;
 
 	// Info
@@ -89,13 +113,19 @@ typedef struct
 void AlxSerialPort_Ctor
 (
 	AlxSerialPort* me,
+	AlxSerialPort_Config config,
 	void* hw,
 	AlxIoPin* do_TX,
 	AlxIoPin* di_RX,
+	uint8_t* txFifoBuff,
+	uint32_t txFifoBuffLen,
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
-	Alx_IrqPriority rxIrqPriority,
-	AlxSerialPort_Lin lin
+	Alx_IrqPriority irqPriority,
+	AlxIoPin* do_LIN_MASTER_BREAK,
+	uint32_t linMasterBreakLength_forLoopCycles,
+	AlxIoPin* do_DBG_Tx,
+	AlxIoPin* do_DBG_Rx
 );
 
 
