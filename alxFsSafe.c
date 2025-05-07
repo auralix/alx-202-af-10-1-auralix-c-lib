@@ -42,7 +42,7 @@
 //******************************************************************************
 Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, void* data, uint32_t len, uint32_t* validatedCrc);
 Alx_Status AlxFsSafe_File_WriteCopy(AlxFsSafe* me, bool isA, const char* path, void* data, uint32_t len, uint8_t* buff);
-void AlxFsSafe_PathToPathWithPrefix(bool isA, const char* path, const char* pathWithPrefix);
+void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, const char* pathWithSuffix);
 
 
 //******************************************************************************
@@ -254,9 +254,9 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	// Prepare
 	//------------------------------------------------------------------------------
 
-	// Path with Prefix
-	char pathWithPrefix[ALX_FS_SAFE_PATH_LEN_MAX + 1 + 1] = "";	// path + prefix + termination
-	AlxFsSafe_PathToPathWithPrefix(isA, path, pathWithPrefix);
+	// Path with Suffix
+	char pathWithSuffix[ALX_FS_SAFE_PATH_LEN_MAX + 1 + 1] = "";	// path + suffix + termination
+	AlxFsSafe_PathToPathWithSuffix(isA, path, pathWithSuffix);
 
 	// Length
 	uint32_t lenWithCrc = len + me->alxCrcLen;
@@ -271,10 +271,10 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	AlxFs_File file = {};
 
 	// Open
-	status = AlxFs_File_Open(me->alxFs, &file, pathWithPrefix, "r");
+	status = AlxFs_File_Open(me->alxFs, &file, pathWithSuffix, "r");
 	if (status != Alx_Ok)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Open(%s) status %d", pathWithPrefix, status);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Open(%s) status %d", pathWithSuffix, status);
 		return status;
 	}
 
@@ -283,11 +283,11 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	status = AlxFs_File_Read(me->alxFs, &file, data, lenWithCrc, &lenWithCrcActual);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Read(%s) status %d lenWithCrc %u lenWithCrcActual %u", pathWithPrefix, status, lenWithCrc, lenWithCrcActual);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Read(%s) status %d lenWithCrc %u lenWithCrcActual %u", pathWithSuffix, status, lenWithCrc, lenWithCrcActual);
 		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 		if (statusClose != Alx_Ok)
 		{
-			ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", pathWithPrefix, statusClose);
+			ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", pathWithSuffix, statusClose);
 			// TV: TODO - Handle close error
 		}
 		return status;
@@ -297,7 +297,7 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	status = AlxFs_File_Close(me->alxFs, &file);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", pathWithPrefix, status);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", pathWithSuffix, status);
 		// TV: TODO - Handle close error
 		return status;
 	}
@@ -310,7 +310,7 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	// Check length
 	if (lenWithCrcActual != lenWithCrc)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckLen(%s) lenWithCrcActual %lu lenWithCrc %lu", pathWithPrefix, lenWithCrcActual, lenWithCrc);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckLen(%s) lenWithCrcActual %lu lenWithCrc %lu", pathWithSuffix, lenWithCrcActual, lenWithCrc);
 		return Alx_Err;
 	}
 
@@ -318,7 +318,7 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	bool isCrcOk = AlxCrc_IsOk(&me->alxCrc, data, lenWithCrc, *validatedCrc);
 	if (isCrcOk == false)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckCrc(%s) isCrcOk %u lenWithCrc %lu, validatedCrc 0x%lX", pathWithPrefix, isCrcOk, lenWithCrc, *validatedCrc);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckCrc(%s) isCrcOk %u lenWithCrc %lu, validatedCrc 0x%lX", pathWithSuffix, isCrcOk, lenWithCrc, *validatedCrc);
 		return Alx_Err;
 	}
 
@@ -334,9 +334,9 @@ Alx_Status AlxFsSafe_File_WriteCopy(AlxFsSafe* me, bool isA, const char* path, v
 	// Prepare
 	//------------------------------------------------------------------------------
 
-	// Path with Prefix
-	char pathWithPrefix[ALX_FS_SAFE_PATH_LEN_MAX + 2 + 1] = "";	// path + prefix + termination
-	AlxFsSafe_PathToPathWithPrefix(isA, path, pathWithPrefix);
+	// Path with Suffix
+	char pathWithSuffix[ALX_FS_SAFE_PATH_LEN_MAX + 2 + 1] = "";	// path + suffix + termination
+	AlxFsSafe_PathToPathWithSuffix(isA, path, pathWithSuffix);
 
 	// CRC
 	uint16_t crc = AlxCrc_Calc(&me->alxCrc, data, len);
@@ -358,10 +358,10 @@ Alx_Status AlxFsSafe_File_WriteCopy(AlxFsSafe* me, bool isA, const char* path, v
 	AlxFs_File file = {};
 
 	// Open
-	status = AlxFs_File_Open(me->alxFs, &file, pathWithPrefix, "w");
+	status = AlxFs_File_Open(me->alxFs, &file, pathWithSuffix, "w");
 	if (status != Alx_Ok)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Open(%s) status %d", pathWithPrefix, status);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Open(%s) status %d", pathWithSuffix, status);
 		return status;
 	}
 
@@ -369,11 +369,11 @@ Alx_Status AlxFsSafe_File_WriteCopy(AlxFsSafe* me, bool isA, const char* path, v
 	status = AlxFs_File_Write(me->alxFs, &file, buff, lenWithCrc);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Write(%s) status %d lenWithCrc %u", pathWithPrefix, status, lenWithCrc);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Write(%s) status %d lenWithCrc %u", pathWithSuffix, status, lenWithCrc);
 		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 		if (statusClose != Alx_Ok)
 		{
-			ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", pathWithPrefix, statusClose);
+			ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", pathWithSuffix, statusClose);
 			// TV: TODO - Handle close error
 		}
 		return status;
@@ -383,7 +383,7 @@ Alx_Status AlxFsSafe_File_WriteCopy(AlxFsSafe* me, bool isA, const char* path, v
 	status = AlxFs_File_Close(me->alxFs, &file);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", pathWithPrefix, status);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", pathWithSuffix, status);
 		// TV: TODO - Handle close error
 		return status;
 	}
@@ -394,21 +394,28 @@ Alx_Status AlxFsSafe_File_WriteCopy(AlxFsSafe* me, bool isA, const char* path, v
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
-void AlxFsSafe_PathToPathWithPrefix(bool isA, const char* path, const char* pathWithPrefix)
+void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, const char* pathWithSuffix)
 {
-	// Prepare
-	const char* prefix = "";
+	// Find dot
+	const char* dot = strrchr(path, '.');
+	ALX_FS_SAFE_ASSERT(dot != NULL);
+
+	// Set suffix
+	const char* suffix = "";
 	if (isA)
 	{
-		prefix = "A";
+		suffix = "A";
 	}
 	else
 	{
-		prefix = "B";
+		suffix = "B";
 	}
 
+	// Set prefix length
+	uint32_t prefixLen = (uint32_t)(dot - path);
+
 	// Transform
-	sprintf(pathWithPrefix, "%s_%s", prefix, path);
+	sprintf(pathWithSuffix, "%.*s%s%s", prefixLen, path, suffix, dot);
 }
 
 
