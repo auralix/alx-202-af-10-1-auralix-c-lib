@@ -43,6 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxFs.h"
+#include "alxCrc.h"
 
 
 //******************************************************************************
@@ -70,12 +71,10 @@ extern "C" {
 // Trace //
 #if defined(ALX_FS_SAFE_TRACE_ENABLE)
 	#define ALX_FS_SAFE_TRACE_ERR(...) ALX_TRACE_ERR(ALX_FS_SAFE_FILE, __VA_ARGS__)
-	#define ALX_FS_SAFE_TRACE_WRN(...) ALX_TRACE_WRN(ALX_FS_SAFE_FILE, __VA_ARGS__)
-	#define ALX_FS_SAFE_TRACE_DBG(...) ALX_TRACE_DBG(ALX_FS_SAFE_FILE, __VA_ARGS__)
+	#define ALX_FS_SAFE_TRACE_INF(...) ALX_TRACE_INF(ALX_FS_SAFE_FILE, __VA_ARGS__)
 #else
 	#define ALX_FS_SAFE_TRACE_ERR(...) do{} while (false)
-	#define ALX_FS_SAFE_TRACE_WRN(...) do{} while (false)
-	#define ALX_FS_SAFE_TRACE_DBG(...) do{} while (false)
+	#define ALX_FS_SAFE_TRACE_INF(...) do{} while (false)
 #endif
 
 
@@ -85,11 +84,17 @@ extern "C" {
 typedef struct
 {
 	// Defines
+	#define ALX_FS_SAFE_PATH_LEN_MAX 128
 
 	// Parameters
 	AlxFs* alxFs;
+	uint8_t* buffA;
+	uint8_t* buffB;
+	uint32_t buffLen;
 
-	// Variables
+	// Variables,
+	AlxCrc alxCrc;
+	uint32_t alxCrcLen;
 
 	// Info
 	bool wasCtorCalled;
@@ -102,14 +107,17 @@ typedef struct
 void AlxFsSafe_Ctor
 (
 	AlxFsSafe* me,
-	AlxFs* alxFs
+	AlxFs* alxFs,
+	uint8_t* buffA,
+	uint8_t* buffB,
+	uint32_t buffLen
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint32_t len, uint32_t* lenActual);
+Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint32_t len);
 Alx_Status AlxFsSafe_File_Write(AlxFsSafe* me, const char* path, void* data, uint32_t len);
 
 
