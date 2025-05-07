@@ -130,7 +130,7 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	if (validA == false && validB == false)	// Both Copy ERR
 	{
 		// Trace
-		ALX_FS_SAFE_TRACE_INF("DONE: CheckValidity() 'Both Copy ERR'");
+		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'Both Copy ERR'");
 
 		// Status
 		status = AlxSafe_BothCopyErr;
@@ -138,7 +138,7 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	else if (validA && validB && crcA == crcB)	// Both Copy OK & CRC Same -> Use CopyA
 	{
 		// Trace
-		ALX_FS_SAFE_TRACE_INF("DONE: CheckValidity() 'Both Copy OK & CRC Same -> Use CopyA'");
+		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'Both Copy OK & CRC Same -> Use CopyA'");
 
 		// Use CopyA
 		memcpy(data, me->buffA, len);
@@ -149,7 +149,7 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	else if (validA && validB && crcA != crcB)	// Both Copy OK & CRC Different -> Use CopyA, CopyA is used because we always write CopyA first
 	{
 		// Trace
-		ALX_FS_SAFE_TRACE_INF("DONE: CheckValidity() 'Both Copy OK & CRC Different -> Use CopyA, CopyA is used because we always write CopyA first'");
+		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'Both Copy OK & CRC Different -> Use CopyA'");
 
 		// Update CopyB with CopyA
 		status = AlxFsSafe_File_WriteCopy(me, false, path, me->buffA, len, me->buffB);
@@ -168,7 +168,7 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	else if (validA && validB == false)	// CopyA OK, CopyB ERR -> Use CopyA and update CopyB with CopyA
 	{
 		// Trace
-		ALX_FS_SAFE_TRACE_INF("DONE: CheckValidity() 'CopyA OK, CopyB ERR -> Use CopyA and update CopyB with CopyA'");
+		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'CopyA OK, CopyB ERR -> Use CopyA and update CopyB with CopyA'");
 
 		// Update CopyB with CopyA
 		status = AlxFsSafe_File_WriteCopy(me, false, path, me->buffA, len, me->buffB);
@@ -187,7 +187,7 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	else if (validA == false && validB)	// CopyA ERR, CopyB OK -> Use CopyB and update CopyA with CopyB
 	{
 		// Trace
-		ALX_FS_SAFE_TRACE_INF("DONE: CheckValidity() 'CopyA ERR, CopyB OK -> Use CopyB and update CopyA with CopyB'");
+		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'CopyA ERR, CopyB OK -> Use CopyB and update CopyA with CopyB'");
 
 		// Update CopyA with CopyB
 		status = AlxFsSafe_File_WriteCopy(me, true, path, me->buffB, len, me->buffA);
@@ -331,10 +331,10 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	}
 
 	// Check CRC
-	bool isCrcOk = AlxCrc_IsOk(&me->alxCrc, data, lenWithCrc, *validatedCrc);
+	bool isCrcOk = AlxCrc_IsOk(&me->alxCrc, data, lenWithCrc, validatedCrc);
 	if (isCrcOk == false)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckCrc(%s) isCrcOk %u lenWithCrc %lu, validatedCrc 0x%lX", pathWithSuffix, isCrcOk, lenWithCrc, *validatedCrc);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckCrc(%s) isCrcOk %u lenWithCrc %lu", pathWithSuffix, isCrcOk, lenWithCrc);
 		return Alx_Err;
 	}
 
