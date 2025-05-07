@@ -746,8 +746,14 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				// Clear active
 				me->rxb.active = false;
 
+				// Prepare frame response
+				uint8_t txFrameResponse[ALX_LIN_FRAME_DATA_LEN_MAX + 1] = {};				// Data + Enhanced Checksum
+				memcpy(txFrameResponse, me->rxb.frame.data, me->rxb.frame.dataLen);			// Frame Response Data
+				txFrameResponse[me->rxb.frame.dataLen] = me->rxb.frame.enhancedChecksum;	// Frame Response Enhanced Checksum
+				uint8_t txFrameResponseLen = me->rxb.frame.dataLen + 1;						// Data + Enhanced Checksum
+
 				// Transmit frame response
-				Alx_Status status = AlxSerialPort_Write(me->alxSerialPort, me->rxb.frame.data, me->rxb.frame.dataLen + 1);
+				Alx_Status status = AlxSerialPort_Write(me->alxSerialPort, txFrameResponse, txFrameResponseLen);
 				if (status != Alx_Ok)
 				{
 					ALX_LIN_TRACE_DBG("FAIL: AlxSerialPort_Write() status %ld", status);
@@ -797,6 +803,9 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 		{
 			AlxLin_Slave_Subscribe_Callback(me, me->rxb.frame);
 		}
+
+		// Clear active
+		me->rxb.active = false;
 	}
 
 
