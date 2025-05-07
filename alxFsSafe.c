@@ -93,6 +93,8 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	bool validB = false;
 	uint32_t crcA = 0;
 	uint32_t crcB = 0;
+	memset(me->buffA, 0, me->buffLen);
+	memset(me->buffB, 0, me->buffLen);
 
 
 	//------------------------------------------------------------------------------
@@ -125,15 +127,26 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	//------------------------------------------------------------------------------
 	// Check Validity
 	//------------------------------------------------------------------------------
-	if (validA && validB && crcA == crcB) // Both Copy OK & CRC Same -> Use CopyA
+	if (validA == false && validB == false)	// Both Copy ERR
+	{
+		// Trace
+		ALX_FS_SAFE_TRACE_INF("DONE: CheckValidity() 'Both Copy ERR'");
+
+		// Status
+		status = AlxSafe_BothCopyErr;
+	}
+	else if (validA && validB && crcA == crcB)	// Both Copy OK & CRC Same -> Use CopyA
 	{
 		// Trace
 		ALX_FS_SAFE_TRACE_INF("DONE: CheckValidity() 'Both Copy OK & CRC Same -> Use CopyA'");
 
 		// Use CopyA
 		memcpy(data, me->buffA, len);
+
+		// Status
+		status = AlxSafe_BothCopyOkCrcSame_UsedCopyA;
 	}
-	else if (validA && validB && crcA != crcB) // Both Copy OK & CRC Different -> Use CopyA, CopyA is used because we always write CopyA first
+	else if (validA && validB && crcA != crcB)	// Both Copy OK & CRC Different -> Use CopyA, CopyA is used because we always write CopyA first
 	{
 		// Trace
 		ALX_FS_SAFE_TRACE_INF("DONE: CheckValidity() 'Both Copy OK & CRC Different -> Use CopyA, CopyA is used because we always write CopyA first'");
@@ -148,6 +161,9 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 
 		// Use CopyA
 		memcpy(data, me->buffA, len);
+
+		// Status
+		status = AlxSafe_BothCopyOkCrcDiff_UsedCopyA;
 	}
 	else if (validA && validB == false)	// CopyA OK, CopyB ERR -> Use CopyA and update CopyB with CopyA
 	{
@@ -164,6 +180,9 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 
 		// Use CopyA
 		memcpy(data, me->buffA, len);
+
+		// Status
+		status = AlxSafe_CopyAOkCopyBErr_UsedCopyA;
 	}
 	else if (validA == false && validB)	// CopyA ERR, CopyB OK -> Use CopyB and update CopyA with CopyB
 	{
@@ -180,14 +199,9 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 
 		// Use CopyB
 		memcpy(data, me->buffB, len);
-	}
-	else if (validA == false && validB == false)	// Both Copy ERR
-	{
-		// Trace
-		ALX_FS_SAFE_TRACE_INF("DONE: CheckValidity() 'Both Copy ERR'");
 
-		// Return
-		return Alx_Err;
+		// Status
+		status = AlxSafe_CopyAErrCopyBOk_UsedCopyB;
 	}
 	else
 	{
@@ -199,7 +213,7 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	//------------------------------------------------------------------------------
 	// Return
 	//------------------------------------------------------------------------------
-	return Alx_Ok;
+	return status;
 }
 Alx_Status AlxFsSafe_File_Write(AlxFsSafe* me, const char* path, void* data, uint32_t len)
 {
@@ -215,6 +229,8 @@ Alx_Status AlxFsSafe_File_Write(AlxFsSafe* me, const char* path, void* data, uin
 	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
+	memset(me->buffA, 0, me->buffLen);
+	memset(me->buffB, 0, me->buffLen);
 
 
 	//------------------------------------------------------------------------------
