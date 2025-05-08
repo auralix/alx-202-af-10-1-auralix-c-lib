@@ -146,7 +146,7 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 		// Status
 		status = AlxSafe_BothCopyOkCrcSame_UsedCopyA;
 	}
-	else if (validA && validB && crcA != crcB)	// Both Copy OK & CRC Different -> Use CopyA, CopyA is used because we always write CopyA first
+	else if (validA && validB && crcA != crcB)	// Both Copy OK & CRC Different -> Use CopyA and update CopyB with CopyA, CopyA is used because we always write CopyA first and update
 	{
 		// Trace
 		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'Both Copy OK & CRC Different -> Use CopyA'");
