@@ -56,16 +56,15 @@ void AlxFiltGlitchBool_Ctor
 	float stableFalseTime_ms
 )
 {
-	// Ctor
-	AlxTimSw_Ctor(&me->tim, true);
-
 	// Parameters
+	me->valInitial = valInitial;
 	me->stableTrueTime_us = (uint64_t)(stableTrueTime_ms * 1000.f);
 	me->stableFalseTime_us = (uint64_t)(stableFalseTime_ms * 1000.f);
 
 	// Variables
 	me->valRaw = valInitial;
 	me->valFiltered = valInitial;
+	AlxTimSw_Ctor(&me->tim, true);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -86,16 +85,15 @@ void AlxFiltGlitchBool_Ctor_us
 	uint64_t stableFalseTime_us
 )
 {
-	// Ctor
-	AlxTimSw_Ctor(&me->tim, true);
-
 	// Parameters
+	me->valInitial = valInitial;
 	me->stableTrueTime_us = stableTrueTime_us;
 	me->stableFalseTime_us = stableFalseTime_us;
 
 	// Variables
 	me->valRaw = valInitial;
 	me->valFiltered = valInitial;
+	AlxTimSw_Ctor(&me->tim, true);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -143,6 +141,18 @@ bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in)
 	}
 
 	return me->valFiltered;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+void AlxFiltGlitchBool_Reset(AlxFiltGlitchBool* me)
+{
+	// Variables
+	me->valRaw = me->valInitial;
+	me->valFiltered = me->valInitial;
+	AlxTimSw_Start(&me->tim);
 }
 
 
