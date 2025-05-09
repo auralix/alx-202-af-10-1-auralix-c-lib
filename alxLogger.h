@@ -43,6 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxFs.h"
+#include "alxFsSafe.h"
 #include "alxCrc.h"
 #include "alxTimSw.h"
 #include "alxIoPin.h"
@@ -132,6 +133,7 @@ typedef struct
 
 	// Parameters
 	AlxFs* alxFs;
+	AlxFs* alxFsSafe;
 	uint32_t numOfDir;
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
@@ -170,6 +172,7 @@ void AlxLogger_Ctor
 (
 	AlxLogger* me,
 	AlxFs* alxFs,
+	AlxFsSafe* alxFsSafe,
 	uint32_t numOfDir,
 	uint32_t numOfFilesPerDir,
 	uint32_t numOfLogsPerFile,
