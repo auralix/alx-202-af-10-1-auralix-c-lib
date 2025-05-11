@@ -1202,6 +1202,14 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 			break;
 		}
 
+		// Trace
+		ALX_LOGGER_TRACE_VRB("AlxLogger - Trace before AlxLogger_Metadata_Load()");
+		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
+		AlxFs_Dir_Trace(me->alxFs, "/", false, false);
+		AlxFs_File_Trace(me->alxFs, "/mdA.bin", true);
+		AlxFs_File_Trace(me->alxFs, "/mdB.bin", true);
+		#endif
+
 		// Load metadata
 		status = AlxLogger_Metadata_Load(me);
 		if (status != Alx_Ok)
@@ -1260,6 +1268,14 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 			ALX_LOGGER_TRACE_WRN("Err: %d", status);
 			return status;
 		}
+
+		// Trace
+		ALX_LOGGER_TRACE_VRB("AlxLogger - Trace after AlxLogger_Metadata_StoreConfig_ReadWriteOldest()");
+		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
+		AlxFs_Dir_Trace(me->alxFs, "/", false, false);
+		AlxFs_File_Trace(me->alxFs, "/mdA.bin", true);
+		AlxFs_File_Trace(me->alxFs, "/mdB.bin", true);
+		#endif
 
 		// Trace
 		ALX_LOGGER_TRACE_INF("AlxLogger - Store metadata after Check/Repair current write_file OK");
@@ -1336,6 +1352,14 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_WRN("Err: %d", status);
 		return status;
 	}
+
+	// Trace
+	ALX_LOGGER_TRACE_VRB("AlxLogger - Trace after AlxLogger_Metadata_StoreConfig_Default()");
+	#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
+	AlxFs_Dir_Trace(me->alxFs, "/", false, false);
+	AlxFs_File_Trace(me->alxFs, "/mdA.bin", true);
+	AlxFs_File_Trace(me->alxFs, "/mdB.bin", true);
+	#endif
 
 	// Set metadata current
 	me->md = me->mdStored;
