@@ -122,7 +122,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 		// #2.2 Handle result
 		switch(statusAlxMemSafeRead)
 		{
-			case AlxSafe_BothCopyOkCrcSame_UsedCopyA:
+			case AlxSafe_BothCopyOkCrcSame_OrigDontCare_UseCopyA:
 			{
 				// Update
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
@@ -133,7 +133,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				// Break
 				break;
 			}
-			case AlxSafe_BothCopyOkCrcDiff_UsedCopyA:
+			case AlxSafe_BothCopyOkCrcDiff_OrigDontCare_UseCopyA:
 			{
 				// Update
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
@@ -144,7 +144,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				// Break
 				break;
 			}
-			case AlxSafe_CopyAErrCopyBOk_UsedCopyB:
+			case AlxSafe_CopyAErrCopyBOk_OrigDontCare_UseCopyB:
 			{
 				// Update
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
@@ -155,7 +155,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				// Break
 				break;
 			}
-			case AlxSafe_CopyAOkCopyBErr_UsedCopyA:
+			case AlxSafe_CopyAOkCopyBErr_OrigDontCare_UseCopyA:
 			{
 				// Update
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
@@ -166,7 +166,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				// Break
 				break;
 			}
-			case AlxSafe_BothCopyErr:
+			case AlxSafe_BothCopyErr_OrigErr:
 			{
 				// Prepare
 				AlxParamGroup_ParamItemsValDefToValToStoreBuff(me);

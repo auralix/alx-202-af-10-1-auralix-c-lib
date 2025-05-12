@@ -1687,10 +1687,11 @@ static Alx_Status AlxLogger_Metadata_Load(AlxLogger* me)
 	status = AlxFsSafe_File_Read(me->alxFsSafe, ALX_LOGGER_METADATA_FILE_PATH, &mdTemp, sizeof(mdTemp));
 	if
 	(
-		status != AlxSafe_BothCopyOkCrcSame_UsedCopyA &&
-		status != AlxSafe_BothCopyOkCrcDiff_UsedCopyA &&
-		status != AlxSafe_CopyAOkCopyBErr_UsedCopyA &&
-		status != AlxSafe_CopyAErrCopyBOk_UsedCopyB
+		status != AlxSafe_BothCopyErr_OrigOk_UseOrig &&
+		status != AlxSafe_BothCopyOkCrcSame_OrigDontCare_UseCopyA &&
+		status != AlxSafe_BothCopyOkCrcDiff_OrigDontCare_UseCopyA &&
+		status != AlxSafe_CopyAOkCopyBErr_OrigDontCare_UseCopyA &&
+		status != AlxSafe_CopyAErrCopyBOk_OrigDontCare_UseCopyB
 	)
 	{
 		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, len=%u", status, ALX_LOGGER_METADATA_FILE_PATH, sizeof(mdTemp));

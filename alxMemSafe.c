@@ -189,7 +189,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 				if((me->isCopyAValid == false) && (me->isCopyBValid == false))
 				{
 					// Break
-					status = AlxSafe_BothCopyErr;
+					status = AlxSafe_BothCopyErr_OrigErr;
 					break;
 				}
 				// #3.2.5.2 Both CRC OK & Same -> Use CopyA
@@ -199,7 +199,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					memcpy(data, me->buff1, len);
 
 					// Break
-					status = AlxSafe_BothCopyOkCrcSame_UsedCopyA;
+					status = AlxSafe_BothCopyOkCrcSame_OrigDontCare_UseCopyA;
 					break;
 				}
 				// #3.2.5.3 Both CRC OK & Different -> Use CopyA (CopyA is used because we always write CopyA first)
@@ -223,7 +223,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					memcpy(data, me->buff1, len);
 
 					// Break
-					status = AlxSafe_BothCopyOkCrcDiff_UsedCopyA;
+					status = AlxSafe_BothCopyOkCrcDiff_OrigDontCare_UseCopyA;
 					break;
 				}
 				// #3.2.5.4 CopyA OK, CopyB NOK
@@ -247,7 +247,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					memcpy(data, me->buff1, len);
 
 					// Break
-					status = AlxSafe_CopyAOkCopyBErr_UsedCopyA;
+					status = AlxSafe_CopyAOkCopyBErr_OrigDontCare_UseCopyA;
 					break;
 				}
 				// #3.2.5.5 CopyA NOK & CopyB OK
@@ -271,7 +271,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					memcpy(data, me->buff2, len);
 
 					// Break
-					status = AlxSafe_CopyAErrCopyBOk_UsedCopyB;
+					status = AlxSafe_CopyAErrCopyBOk_OrigDontCare_UseCopyB;
 					break;
 				}
 				// #3.2.5.6 Assert
