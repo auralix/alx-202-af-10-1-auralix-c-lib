@@ -40,6 +40,7 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+Alx_Status AlxFsSafe_File_ReadRaw(AlxFsSafe* me, const char* path, void* data, uint32_t len, uint32_t* lenActual);
 Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, void* data, uint32_t len, uint32_t* validatedCrc);
 Alx_Status AlxFsSafe_File_WriteCopy(AlxFsSafe* me, bool isA, const char* path, void* data, uint32_t len, uint8_t* buff);
 void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, const char* pathWithSuffix);
@@ -52,6 +53,8 @@ void AlxFsSafe_Ctor
 (
 	AlxFsSafe* me,
 	AlxFs* alxFs,
+	bool useOrig,
+	uint8_t* buffOrig,
 	uint8_t* buffA,
 	uint8_t* buffB,
 	uint32_t buffLen
@@ -59,6 +62,8 @@ void AlxFsSafe_Ctor
 {
 	// Parameters
 	me->alxFs = alxFs;
+	me->useOrig = useOrig;
+	me->buffOrig = buffOrig;
 	me->buffA = buffA;
 	me->buffB = buffB;
 	me->buffLen = buffLen;
@@ -89,10 +94,12 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
+	bool validOrig = false;
 	bool validA = false;
 	bool validB = false;
 	uint32_t crcA = 0;
 	uint32_t crcB = 0;
+	memset(me->buffOrig, 0, me->buffLen);
 	memset(me->buffA, 0, me->buffLen);
 	memset(me->buffB, 0, me->buffLen);
 
@@ -264,6 +271,43 @@ Alx_Status AlxFsSafe_File_Write(AlxFsSafe* me, const char* path, void* data, uin
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+Alx_Status AlxFsSafe_File_ReadRaw(AlxFsSafe* me, const char* path, void* data, uint32_t len, uint32_t* lenActual)
+{
+	// Local variables
+	Alx_Status status = Alx_Err;
+	AlxFs_File file = {};
+
+	// Open
+	status = AlxFs_File_Open(me->alxFs, &file, path, "r");
+	if (status != Alx_Ok)
+	{
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Open(%s) status %d", path, status);
+		return status;
+	}
+
+	// Read
+	status = AlxFs_File_Read(me->alxFs, &file, data, len, lenActual);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Read(%s) status %d len %u lenActual %u", path, status, len, *lenActual);
+		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
+		if (statusClose != Alx_Ok)
+		{
+			ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", path, statusClose);
+			// TV: TODO - Handle close error
+		}
+		return status;
+	}
+
+	// Close
+	status = AlxFs_File_Close(me->alxFs, &file);
+	if (status != Alx_Ok)
+	{
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", path, status);
+		// TV: TODO - Handle close error
+		return status;
+	}
+}
 Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, void* data, uint32_t len, uint32_t* validatedCrc)
 {
 	//------------------------------------------------------------------------------
@@ -281,40 +325,11 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	//------------------------------------------------------------------------------
 	// Read
 	//------------------------------------------------------------------------------
-
-	// Local variables
-	Alx_Status status = Alx_Err;
-	AlxFs_File file = {};
-
-	// Open
-	status = AlxFs_File_Open(me->alxFs, &file, pathWithSuffix, "r");
-	if (status != Alx_Ok)
-	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Open(%s) status %d", pathWithSuffix, status);
-		return status;
-	}
-
-	// Read
 	uint32_t lenWithCrcActual = 0;
-	status = AlxFs_File_Read(me->alxFs, &file, data, lenWithCrc, &lenWithCrcActual);
+	Alx_Status status = AlxFsSafe_File_ReadRaw(me, pathWithSuffix, data, lenWithCrc, &lenWithCrcActual);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Read(%s) status %d lenWithCrc %u lenWithCrcActual %u", pathWithSuffix, status, lenWithCrc, lenWithCrcActual);
-		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
-		if (statusClose != Alx_Ok)
-		{
-			ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", pathWithSuffix, statusClose);
-			// TV: TODO - Handle close error
-		}
-		return status;
-	}
-
-	// Close
-	status = AlxFs_File_Close(me->alxFs, &file);
-	if (status != Alx_Ok)
-	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Close(%s) status %d", pathWithSuffix, status);
-		// TV: TODO - Handle close error
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFsSafe_File_Read(%s) status %d", pathWithSuffix, status);
 		return status;
 	}
 

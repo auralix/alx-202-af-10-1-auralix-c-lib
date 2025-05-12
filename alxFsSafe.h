@@ -88,6 +88,8 @@ typedef struct
 
 	// Parameters
 	AlxFs* alxFs;
+	bool useOrig;
+	uint8_t* buffOrig;
 	uint8_t* buffA;
 	uint8_t* buffB;
 	uint32_t buffLen;
@@ -108,6 +110,8 @@ void AlxFsSafe_Ctor
 (
 	AlxFsSafe* me,
 	AlxFs* alxFs,
+	bool useOrig,
+	uint8_t* buffOrig,
 	uint8_t* buffA,
 	uint8_t* buffB,
 	uint32_t buffLen
