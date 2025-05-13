@@ -485,7 +485,7 @@ void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, const char* path
 	const char* suffix = "";
 	if (isA)
 	{
-		suffix = "";
+		suffix = "";	// We will use empty suffix for copy A, so then we have copy.bin & copyB.bin
 	}
 	else
 	{
