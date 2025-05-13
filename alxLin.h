@@ -101,7 +101,8 @@ typedef struct
 	uint8_t protectedId;
 	uint8_t dataLen;
 	uint8_t data[ALX_LIN_FRAME_DATA_LEN_MAX];
-	uint8_t enhancedChecksum;
+	uint8_t checksum;
+	bool enhancedChecksumEnable;
 } AlxLin_Frame;
 
 typedef struct
@@ -109,6 +110,7 @@ typedef struct
 	uint8_t id;
 	uint8_t dataLen;
 	bool publish;
+	bool enhancedChecksumEnable;
 } AlxLin_SlaveFrameConfig;
 
 typedef struct
