@@ -62,23 +62,21 @@ void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame);
   * @param[in,out]	me
   * @param[in]		alxSerialPort
   * @param[in]		breakSyncOffset
-  * @param[in]		slaveFrameConfigArr
-  * @param[in]		slaveFrameConfigArrLen
   */
 void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
-	uint8_t breakSyncOffset,
-	AlxLin_SlaveFrameConfig* slaveFrameConfigArr,
-	uint8_t slaveFrameConfigArrLen
+	uint8_t breakSyncOffset
 )
 {
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
 	me->breakSyncOffset = breakSyncOffset;
-	me->slaveFrameConfigArr = slaveFrameConfigArr;
-	me->slaveFrameConfigArrLen = slaveFrameConfigArrLen;
+
+	// Fields
+	me->slaveFrameConfigArr = NULL;
+	me->slaveFrameConfigArrLen = 0;
 
 	// Variables
 	memset(&me->rxb, 0, sizeof(me->rxb));
@@ -87,6 +85,21 @@ void AlxLin_Ctor
 	me->wasCtorCalled = true;
 	me->isInit = false;
 	me->isMaster = false;
+}
+
+
+//******************************************************************************
+// Fields
+//******************************************************************************
+void AlxLin_SetSlaveFrameConfigArr(AlxLin* me, AlxLin_SlaveFrameConfig* slaveFrameConfigArr, uint8_t slaveFrameConfigArrLen)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isInit == false);
+
+	// Set
+	me->slaveFrameConfigArr = slaveFrameConfigArr;
+	me->slaveFrameConfigArrLen = slaveFrameConfigArrLen;
 }
 
 

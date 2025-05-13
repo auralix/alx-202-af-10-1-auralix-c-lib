@@ -124,6 +124,8 @@ typedef struct
 	// Parameters
 	AlxSerialPort* alxSerialPort;
 	uint8_t breakSyncOffset;
+
+	// Fields
 	AlxLin_SlaveFrameConfig* slaveFrameConfigArr;
 	uint8_t slaveFrameConfigArrLen;
 
@@ -144,10 +146,14 @@ void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
-	uint8_t breakSyncOffset,
-	AlxLin_SlaveFrameConfig* slaveFrameConfigArr,
-	uint8_t slaveFrameConfigArrLen
+	uint8_t breakSyncOffset
 );
+
+
+//******************************************************************************
+// Fields
+//******************************************************************************
+void AlxLin_SetSlaveFrameConfigArr(AlxLin* me, AlxLin_SlaveFrameConfig* slaveFrameConfigArr, uint8_t slaveFrameConfigArrLen);
 
 
 //******************************************************************************
