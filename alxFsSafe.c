@@ -152,10 +152,10 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	//------------------------------------------------------------------------------
 	// Check Validity
 	//------------------------------------------------------------------------------
-	if (validOrig == false && validA == false && validB == false)	// Both Copy ERR and Original ERR
+	if (validOrig == false && validA == false && validB == false)	// Both Copy ERR and Original ERR -> Return ERR
 	{
 		// Trace
-		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'Both Copy ERR and Original ERR'");
+		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'Both Copy ERR and Original ERR -> Return ERR'");
 
 		// Status
 		status = AlxSafe_BothCopyErr_OrigErr;
