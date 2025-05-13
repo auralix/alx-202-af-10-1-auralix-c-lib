@@ -81,15 +81,14 @@ extern "C" {
 typedef struct
 {
 	// Parameters
+	bool valInitial;
 	uint64_t stableTrueTime_us;
 	uint64_t stableFalseTime_us;
-
-	// Objects - Internal
-	AlxTimSw tim; // Timer to measure how long state is stable
 
 	// Variables
 	bool valRaw;
 	bool valFiltered;
+	AlxTimSw tim;
 
 	// Info
 	bool wasCtorCalled;
@@ -119,6 +118,7 @@ void AlxFiltGlitchBool_Ctor_us
 // Functions
 //******************************************************************************
 bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in);
+void AlxFiltGlitchBool_Reset(AlxFiltGlitchBool* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
