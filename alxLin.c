@@ -52,7 +52,7 @@ static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLi
 void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
 void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
 void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame);
-void AlxLin_Slave_Subscribe_MasterReq_Callback(AlxLin* me, uint8_t nad, AlxLin_Frame frame, bool* slaveReqPending);
+void AlxLin_Slave_Subscribe_MasterReq_Callback(AlxLin* me, AlxLin_Frame frame, bool* slaveReqPending);
 void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* frame);
 
 
@@ -960,7 +960,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				}
 
 				// Callback
-				AlxLin_Slave_Subscribe_MasterReq_Callback(me, nad_Actual, me->rxb.frame, &me->slaveReqPending);
+				AlxLin_Slave_Subscribe_MasterReq_Callback(me, me->rxb.frame, &me->slaveReqPending);
 			}
 			else
 			{
@@ -1070,10 +1070,9 @@ ALX_WEAK void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame)
 	(void)me;
 	(void)frame;
 }
-ALX_WEAK void AlxLin_Slave_Subscribe_MasterReq_Callback(AlxLin* me, uint8_t nad, AlxLin_Frame frame, bool* slaveReqPending)
+ALX_WEAK void AlxLin_Slave_Subscribe_MasterReq_Callback(AlxLin* me, AlxLin_Frame frame, bool* slaveReqPending)
 {
 	(void)me;
-	(void)nad;
 	(void)frame;
 	(void)slaveReqPending;
 }
