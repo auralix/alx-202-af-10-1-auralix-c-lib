@@ -52,6 +52,8 @@ static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLi
 void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
 void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
 void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame);
+void AlxLin_Slave_Subscribe_MasterReq_Callback(AlxLin* me, uint8_t nad, AlxLin_Frame frame, bool* slaveReqPending);
+void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* frame);
 
 
 //******************************************************************************
@@ -76,11 +78,13 @@ void AlxLin_Ctor
 	me->breakSyncOffset = breakSyncOffset;
 
 	// Fields
+	me->nad = ALX_LIN_NAD_BROADCAST;
 	me->slaveFrameConfigArr = NULL;
 	me->slaveFrameConfigArrLen = 0;
 
 	// Variables
 	memset(&me->rxb, 0, sizeof(me->rxb));
+	me->slaveReqPending = false;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -92,15 +96,30 @@ void AlxLin_Ctor
 //******************************************************************************
 // Fields
 //******************************************************************************
+void AlxLin_SetNad(AlxLin* me, uint8_t nad)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+
+	// Set
+	me->nad = nad;
+}
 void AlxLin_SetSlaveFrameConfigArr(AlxLin* me, AlxLin_SlaveFrameConfig* slaveFrameConfigArr, uint8_t slaveFrameConfigArrLen)
 {
 	// Assert
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
-	ALX_LIN_ASSERT(me->isInit == false);
 
 	// Set
 	me->slaveFrameConfigArr = slaveFrameConfigArr;
 	me->slaveFrameConfigArrLen = slaveFrameConfigArrLen;
+}
+uint8_t AlxLin_GetNad(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return me->nad;
 }
 
 
@@ -254,7 +273,7 @@ Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame)
 	txFrame[0] = 0x55;								// Frame Header SYNC
 	txFrame[1] = protectedId;						// Frame Header Protected ID
 	memcpy(&txFrame[2], frame.data, frame.dataLen);	// Frame Response Data
-	txFrame[2 + frame.dataLen] = checksum;	// Frame Response Checksum
+	txFrame[2 + frame.dataLen] = checksum;			// Frame Response Checksum
 	uint8_t txFrameLen = 2 + frame.dataLen + 1;		// SYNC + Protected ID + Data + Checksum
 
 	// Flush
@@ -387,7 +406,7 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	uint8_t protectedId_Expected = protectedId;
 	if (protectedId_Actual != protectedId_Expected)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
+		ALX_LIN_TRACE_WRN("FAIL: CheckProtectedId() protectedId_Actual %02X protectedId_Expected %02X", protectedId_Actual, protectedId_Expected);
 		return Alx_Err;
 	}
 
@@ -404,7 +423,7 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	}
 	if (checksum_Actual != checksum_Expected)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: CheckChecksum() checksum_Actual %u checksum_Expected %u enhancedChecksumEnable %u", checksum_Actual, checksum_Expected, frame->enhancedChecksumEnable);
+		ALX_LIN_TRACE_WRN("FAIL: CheckChecksum() checksum_Actual %02X checksum_Expected %02X enhancedChecksumEnable %u", checksum_Actual, checksum_Expected, frame->enhancedChecksumEnable);
 		return Alx_Err;
 	}
 
@@ -650,7 +669,7 @@ Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t time
 	uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
 	if (protectedId_Actual != protectedId_Expected)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
+		ALX_LIN_TRACE_WRN("FAIL: CheckProtectedId() protectedId_Actual %02X protectedId_Expected %02X", protectedId_Actual, protectedId_Expected);
 		return Alx_Err;
 	}
 
@@ -667,7 +686,7 @@ Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t time
 	}
 	if (checksum_Actual != checksum_Expected)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: CheckChecksum() checksum_Actual %u checksum_Expected %u enhancedChecksumEnable %u", checksum_Actual, checksum_Expected, frame->enhancedChecksumEnable);
+		ALX_LIN_TRACE_WRN("FAIL: CheckChecksum() checksum_Actual %02X checksum_Expected %02X enhancedChecksumEnable %u", checksum_Actual, checksum_Expected, frame->enhancedChecksumEnable);
 		return Alx_Err;
 	}
 
@@ -730,59 +749,118 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 	{
 		if (me->isMaster)
 		{
-			// Set frame - Already set by AlxLin_Master_SubscribeViaCallback
+			//------------------------------------------------------------------------------
+			// Set Frame - Already set by AlxLin_Master_SubscribeViaCallback
+			//------------------------------------------------------------------------------
 			// me->rxb.frame.id
 			// me->rxb.frame.protectedId
 			// me->rxb.frame.dataLen
 			// me->rxb.frame.enhancedChecksumEnable
 
-			// Check protected ID
+
+			//------------------------------------------------------------------------------
+			// Check Protected ID
+			//------------------------------------------------------------------------------
 			uint8_t protectedId_Actual = me->rxb.buff[me->breakSyncOffset];
 			uint8_t protectedId_Expected = me->rxb.frame.protectedId;
 			if (protectedId_Actual != protectedId_Expected)
 			{
-				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
+				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %02X protectedId_Expected %02X", protectedId_Actual, protectedId_Expected);
 				me->rxb.active = false;
 				return;
 			}
 		}
 		else
 		{
-			// Check protected ID
+			//------------------------------------------------------------------------------
+			// Check Protected ID
+			//------------------------------------------------------------------------------
 			uint8_t protectedId_Actual = me->rxb.buff[me->breakSyncOffset];
 			uint8_t id_Actual = protectedId_Actual & 0x3F;
 			uint8_t protectedId_Expected = AlxLin_CalcProtectedId(id_Actual);
 			if (protectedId_Actual != protectedId_Expected)
 			{
-				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %u protectedId_Expected %u", protectedId_Actual, protectedId_Expected);
+				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %02X protectedId_Expected %02X", protectedId_Actual, protectedId_Expected);
 				me->rxb.active = false;
 				return;
 			}
 
-			// Get slave frame config from ID
-			AlxLin_SlaveFrameConfig slaveFrameConfig = {};
-			Alx_Status status = AlxLin_GetSlaveFrameConfigFromId(me, id_Actual, &slaveFrameConfig);
-			if (status != Alx_Ok)
+
+			//------------------------------------------------------------------------------
+			// Set Frame
+			//------------------------------------------------------------------------------
+			bool slavePublish = false;
+			if (id_Actual == ALX_LIN_FRAME_MASTER_REQ_ID)
 			{
-				ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %u", status, id_Actual);
-				me->rxb.active = false;
-				return;
-			}
+				// Set slave publish
+				slavePublish = false;
 
-			// Set frame
-			me->rxb.frame.id = id_Actual;
-			me->rxb.frame.protectedId = protectedId_Actual;
-			me->rxb.frame.dataLen = slaveFrameConfig.dataLen;
-			me->rxb.frame.enhancedChecksumEnable = slaveFrameConfig.enhancedChecksumEnable;
+				// Set frame
+				me->rxb.frame.id = id_Actual;
+				me->rxb.frame.protectedId = protectedId_Actual;
+				me->rxb.frame.dataLen = ALX_LIN_FRAME_MASTER_REQ_DATA_LEN;
+				me->rxb.frame.enhancedChecksumEnable = false;
+			}
+			else if (id_Actual == ALX_LIN_FRAME_SLAVE_REQ_ID)
+			{
+				// Set slave publish
+				slavePublish = true;
+
+				// Set frame
+				me->rxb.frame.id = id_Actual;
+				me->rxb.frame.protectedId = protectedId_Actual;
+				me->rxb.frame.dataLen = ALX_LIN_FRAME_SLAVE_REQ_DATA_LEN;
+				me->rxb.frame.enhancedChecksumEnable = false;
+			}
+			else
+			{
+				// Get slave frame config from ID
+				AlxLin_SlaveFrameConfig slaveFrameConfig = {};
+				Alx_Status status = AlxLin_GetSlaveFrameConfigFromId(me, id_Actual, &slaveFrameConfig);
+				if (status != Alx_Ok)
+				{
+					ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %02X", status, id_Actual);
+					me->rxb.active = false;
+					return;
+				}
+
+				// Set slave publish
+				slavePublish = slaveFrameConfig.publish;
+
+				// Set frame
+				me->rxb.frame.id = id_Actual;
+				me->rxb.frame.protectedId = protectedId_Actual;
+				me->rxb.frame.dataLen = slaveFrameConfig.dataLen;
+				me->rxb.frame.enhancedChecksumEnable = slaveFrameConfig.enhancedChecksumEnable;
+			}
 
 
 			//------------------------------------------------------------------------------
 			// Handle Slave Publish
 			//------------------------------------------------------------------------------
-			if (slaveFrameConfig.publish)
+			if (slavePublish)
 			{
-				// Callback
-				AlxLin_Slave_Publish_Callback(me, &me->rxb.frame);
+				if (me->rxb.frame.id == ALX_LIN_FRAME_SLAVE_REQ_ID)
+				{
+					// Check SlaveReq pending
+					if (me->slaveReqPending != true)
+					{
+						ALX_LIN_TRACE_DBG("FAIL: CheckSlaveReqPending()");
+						me->rxb.active = false;
+						return;
+					}
+
+					// Clear SlaveReq pending
+					me->slaveReqPending = false;
+
+					// Callback
+					AlxLin_Slave_Publish_SlaveReq_Callback(me, &me->rxb.frame);
+				}
+				else
+				{
+					// Callback
+					AlxLin_Slave_Publish_Callback(me, &me->rxb.frame);
+				}
 
 				// Set checksum
 				if (me->rxb.frame.enhancedChecksumEnable)
@@ -798,10 +876,10 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				me->rxb.active = false;
 
 				// Prepare frame response
-				uint8_t txFrameResponse[ALX_LIN_FRAME_DATA_LEN_MAX + 1] = {};				// Data + Checksum
-				memcpy(txFrameResponse, me->rxb.frame.data, me->rxb.frame.dataLen);			// Frame Response Data
-				txFrameResponse[me->rxb.frame.dataLen] = me->rxb.frame.checksum;			// Frame Response Checksum
-				uint8_t txFrameResponseLen = me->rxb.frame.dataLen + 1;						// Data + Checksum
+				uint8_t txFrameResponse[ALX_LIN_FRAME_DATA_LEN_MAX + 1] = {};		// Data + Checksum
+				memcpy(txFrameResponse, me->rxb.frame.data, me->rxb.frame.dataLen);	// Frame Response Data
+				txFrameResponse[me->rxb.frame.dataLen] = me->rxb.frame.checksum;	// Frame Response Checksum
+				uint8_t txFrameResponseLen = me->rxb.frame.dataLen + 1;				// Data + Checksum
 
 				// Transmit frame response
 				Alx_Status status = AlxSerialPort_Write(me->alxSerialPort, txFrameResponse, txFrameResponseLen);
@@ -832,7 +910,9 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 	//------------------------------------------------------------------------------
 	else if (me->rxb.i == me->breakSyncOffset + 1 + me->rxb.frame.dataLen)
 	{
-		// Check checksum
+		//------------------------------------------------------------------------------
+		// Check Checksum
+		//------------------------------------------------------------------------------
 		uint8_t checksum_Actual = me->rxb.buff[me->rxb.i];
 		uint8_t checksum_Expected = 0;
 		if (me->rxb.frame.enhancedChecksumEnable)
@@ -845,25 +925,54 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 		}
 		if (checksum_Actual != checksum_Expected)
 		{
-			ALX_LIN_TRACE_DBG("FAIL: CheckChecksum() checksum_Actual %u checksum_Expected %u enhancedChecksumEnable %u", checksum_Actual, checksum_Expected, me->rxb.frame.enhancedChecksumEnable);
+			ALX_LIN_TRACE_DBG("FAIL: CheckChecksum() checksum_Actual %02X checksum_Expected %02X enhancedChecksumEnable %u", checksum_Actual, checksum_Expected, me->rxb.frame.enhancedChecksumEnable);
 			me->rxb.active = false;
 			return;
 		}
 
-		// Set frame
+
+		//------------------------------------------------------------------------------
+		// Set Frame
+		//------------------------------------------------------------------------------
 		me->rxb.frame.checksum = checksum_Actual;
 
+
+		//------------------------------------------------------------------------------
 		// Callback
+		//------------------------------------------------------------------------------
 		if (me->isMaster)
 		{
 			AlxLin_Master_Subscribe_Callback(me, me->rxb.frame);
 		}
 		else
 		{
-			AlxLin_Slave_Subscribe_Callback(me, me->rxb.frame);
+			if (me->rxb.frame.id == ALX_LIN_FRAME_MASTER_REQ_ID)
+			{
+				// Check NAD
+				uint8_t nad_Actual = me->rxb.frame.data[0];
+				uint8_t nad_Expected = me->nad;
+				uint8_t nad_Broadcast = ALX_LIN_NAD_BROADCAST;
+				if (nad_Actual != nad_Expected && nad_Actual != nad_Broadcast)
+				{
+					ALX_LIN_TRACE_DBG("FAIL: CheckMasterReqNad() nad_Actual %02X nad_Expected %02X nad_Broadcast %02X", nad_Actual, nad_Expected, nad_Broadcast);
+					me->rxb.active = false;
+					return;
+				}
+
+				// Callback
+				AlxLin_Slave_Subscribe_MasterReq_Callback(me, nad_Actual, me->rxb.frame, &me->slaveReqPending);
+			}
+			else
+			{
+				// Callback
+				AlxLin_Slave_Subscribe_Callback(me, me->rxb.frame);
+			}
 		}
 
+
+		//------------------------------------------------------------------------------
 		// Clear active
+		//------------------------------------------------------------------------------
 		me->rxb.active = false;
 	}
 
@@ -957,6 +1066,18 @@ ALX_WEAK void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
 	(void)frame;
 }
 ALX_WEAK void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame)
+{
+	(void)me;
+	(void)frame;
+}
+ALX_WEAK void AlxLin_Slave_Subscribe_MasterReq_Callback(AlxLin* me, uint8_t nad, AlxLin_Frame frame, bool* slaveReqPending)
+{
+	(void)me;
+	(void)nad;
+	(void)frame;
+	(void)slaveReqPending;
+}
+ALX_WEAK void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* frame)
 {
 	(void)me;
 	(void)frame;

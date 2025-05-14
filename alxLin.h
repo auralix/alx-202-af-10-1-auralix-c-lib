@@ -90,6 +90,11 @@ extern "C" {
 #ifndef ALX_LIN_FRAME_DATA_LEN_MAX
 	#define ALX_LIN_FRAME_DATA_LEN_MAX 8
 #endif
+#define ALX_LIN_NAD_BROADCAST 0x7F
+#define ALX_LIN_FRAME_MASTER_REQ_ID 0x3C
+#define ALX_LIN_FRAME_MASTER_REQ_DATA_LEN 8
+#define ALX_LIN_FRAME_SLAVE_REQ_ID 0x3D
+#define ALX_LIN_FRAME_SLAVE_REQ_DATA_LEN 8
 
 
 //******************************************************************************
@@ -128,11 +133,13 @@ typedef struct
 	uint8_t breakSyncOffset;
 
 	// Fields
+	uint8_t nad;
 	AlxLin_SlaveFrameConfig* slaveFrameConfigArr;
 	uint8_t slaveFrameConfigArrLen;
 
 	// Variables
 	AlxLin_RxBuffStruct rxb;
+	bool slaveReqPending;
 
 	// Info
 	bool wasCtorCalled;
@@ -155,7 +162,9 @@ void AlxLin_Ctor
 //******************************************************************************
 // Fields
 //******************************************************************************
+void AlxLin_SetNad(AlxLin* me, uint8_t nad);
 void AlxLin_SetSlaveFrameConfigArr(AlxLin* me, AlxLin_SlaveFrameConfig* slaveFrameConfigArr, uint8_t slaveFrameConfigArrLen);
+uint8_t AlxLin_GetNad(AlxLin* me);
 
 
 //******************************************************************************
