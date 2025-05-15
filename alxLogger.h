@@ -43,6 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxFs.h"
+#include "alxFsSafe.h"
 #include "alxCrc.h"
 #include "alxTimSw.h"
 #include "alxIoPin.h"
@@ -76,10 +77,12 @@ extern "C" {
 	#define ALX_LOGGER_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 	#define ALX_LOGGER_TRACE_WRN(...) ALX_TRACE_WRN(ALX_LOGGER_FILE, __VA_ARGS__)
 	#define ALX_LOGGER_TRACE_INF(...) ALX_TRACE_INF(ALX_LOGGER_FILE, __VA_ARGS__)
+	#define ALX_LOGGER_TRACE_VRB(...) ALX_TRACE_VRB(ALX_LOGGER_FILE, __VA_ARGS__)
 #else
 	#define ALX_LOGGER_TRACE_FORMAT(...) do{} while (false)
 	#define ALX_LOGGER_TRACE_WRN(...) do{} while (false)
 	#define ALX_LOGGER_TRACE_INF(...) do{} while (false)
+	#define ALX_LOGGER_TRACE_VRB(...) do{} while (false)
 #endif
 
 
@@ -132,6 +135,7 @@ typedef struct
 
 	// Parameters
 	AlxFs* alxFs;
+	AlxFs* alxFsSafe;
 	uint32_t numOfDir;
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
@@ -170,6 +174,7 @@ void AlxLogger_Ctor
 (
 	AlxLogger* me,
 	AlxFs* alxFs,
+	AlxFsSafe* alxFsSafe,
 	uint32_t numOfDir,
 	uint32_t numOfFilesPerDir,
 	uint32_t numOfLogsPerFile,

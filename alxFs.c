@@ -996,7 +996,7 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 	*readLen = fileSizeRead;
 	return Alx_Ok;
 }
-Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
+Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path, bool bin)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -1005,9 +1005,15 @@ Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path)
 	// Local variables
 	uint8_t chunkBuff[ALX_FS_BUFF_LEN] = {};
 
+	// Trace
+	ALX_FS_TRACE_FORMAT("AlxFs - File '%s' Trace\r\n", path);
+
 	// Read
 	uint32_t readLen = 0;
-	Alx_Status status = AlxFs_File_ReadInChunks(me, path, chunkBuff, sizeof(chunkBuff), AlxFs_File_Trace_ChunkRead_Callback, NULL, &readLen, NULL);
+	Alx_Status status = AlxFs_File_ReadInChunks(me, path, chunkBuff, sizeof(chunkBuff), AlxFs_File_Trace_ChunkRead_Callback, &bin, &readLen, NULL);
+
+	// Trace
+	ALX_FS_TRACE_FORMAT("\r\n");
 
 	// Return
 	return status;
@@ -1155,7 +1161,7 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
+Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fileBin)
 {
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
@@ -1270,7 +1276,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace)
 				#endif
 
 				// Trace
-				status = AlxFs_File_Trace(me, buff);
+				status = AlxFs_File_Trace(me, buff, fileBin);
 				if (status != Alx_Ok)
 				{
 					ALX_FS_TRACE("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
@@ -1921,11 +1927,38 @@ static int AlxFs_Lfs_Mmc_Unlock(const struct lfs_config* c)
 static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(void* ctx, void* chunkData, uint32_t chunkLenActual)
 {
 	// Prepare
-	(void)ctx;
-	(void)chunkLenActual;
+	bool bin = *(bool*)ctx;
 
 	// Trace
-	ALX_FS_TRACE_FORMAT("%s", chunkData);
+	if (bin)
+	{
+		for (uint32_t i = 0; i < chunkLenActual; i = i + 64)
+		{
+			// Prepare line length
+			uint32_t lineLen = 0;
+			if (chunkLenActual - i > 64)
+			{
+				lineLen = 64;
+			}
+			else
+			{
+				lineLen = chunkLenActual - i;
+			}
+
+			// Trace data
+			for (uint32_t j = 0; j < lineLen; j++)
+			{
+				ALX_FS_TRACE_FORMAT("%02X ", ((uint8_t*)chunkData)[i + j]);
+			}
+
+			// Trace new line
+			ALX_FS_TRACE_FORMAT("\r\n");
+		}
+	}
+	else
+	{
+		ALX_FS_TRACE_FORMAT("%s", chunkData);
+	}
 
 	// Return
 	return Alx_Ok;

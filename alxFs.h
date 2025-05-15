@@ -213,12 +213,12 @@ Alx_Status AlxFs_File_Rewind(AlxFs* me, AlxFs_File* file);
 Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* size);
 Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size);
 Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBuff, uint32_t chunkLen, Alx_Status(*chunkRead_Callback)(void* ctx, void* chunkData, uint32_t chunkLenActual), void* chunkRead_Callback_Ctx, uint32_t* readLen, AlxOsMutex* alxOsMutex);
-Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path);
+Alx_Status AlxFs_File_Trace(AlxFs* me, const char* path, bool bin);
 Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path);
 Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path);
 Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir);
 Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info);
-Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace);
+Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fileBin);
 
 
 #endif	// #if defined(ALX_C_LIB)
