@@ -1206,7 +1206,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_VRB("AlxLogger - Trace before AlxLogger_Metadata_Load()");
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		AlxFs_Dir_Trace(me->alxFs, "/", false, false);
-		AlxFs_File_Trace(me->alxFs, "/mdA.bin", true);
+		AlxFs_File_Trace(me->alxFs, "/md.bin", true);
 		AlxFs_File_Trace(me->alxFs, "/mdB.bin", true);
 		#endif
 
@@ -1273,7 +1273,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_VRB("AlxLogger - Trace after AlxLogger_Metadata_StoreConfig_ReadWriteOldest()");
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		AlxFs_Dir_Trace(me->alxFs, "/", false, false);
-		AlxFs_File_Trace(me->alxFs, "/mdA.bin", true);
+		AlxFs_File_Trace(me->alxFs, "/md.bin", true);
 		AlxFs_File_Trace(me->alxFs, "/mdB.bin", true);
 		#endif
 
@@ -1357,7 +1357,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 	ALX_LOGGER_TRACE_VRB("AlxLogger - Trace after AlxLogger_Metadata_StoreConfig_Default()");
 	#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 	AlxFs_Dir_Trace(me->alxFs, "/", false, false);
-	AlxFs_File_Trace(me->alxFs, "/mdA.bin", true);
+	AlxFs_File_Trace(me->alxFs, "/md.bin", true);
 	AlxFs_File_Trace(me->alxFs, "/mdB.bin", true);
 	#endif
 
