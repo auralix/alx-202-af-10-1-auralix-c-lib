@@ -94,10 +94,10 @@ typedef struct
 	#define ALX_FTP_SOCKET_DATA_CONNECT_TRY_COUNT 10
 
 	// Parameters
-	AlxNet* alxNet;
 	AlxFs* alxFs;
 
 	// Fields
+	AlxNet* alxNet;
 	const char* serverAddr;
 	bool serverAddrIsHostname;
 	uint16_t serverPort;
@@ -123,7 +123,6 @@ typedef struct
 void AlxFtp_Ctor
 (
 	AlxFtp* me,
-	AlxNet* alxNet,
 	AlxFs* alxFs
 );
 
@@ -131,6 +130,7 @@ void AlxFtp_Ctor
 //******************************************************************************
 // Fields
 //******************************************************************************
+void AlxFtp_Client_SetNet(AlxFtp* me, AlxNet* alxNet);
 void AlxFtp_Client_SetServerAddr(AlxFtp* me, const char* serverAddr);
 void AlxFtp_Client_SetServerAddrIsHostname(AlxFtp* me, bool serverAddrIsHostname);
 void AlxFtp_Client_SetServerPort(AlxFtp* me, uint16_t serverPort);

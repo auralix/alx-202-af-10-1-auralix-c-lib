@@ -1237,29 +1237,35 @@ void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms)
 #if defined(ALX_MBEDTLS)
 Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const unsigned char *ca_cert, const unsigned char *cl_cert, const unsigned char *cl_key)
 {
-	mbedtls_x509_crt_init(&me->tls_data.x509_ca_certificate);
-	me->tls_data.init_state = SSL_INITIALIZED_CACERT;
-	if (mbedtls_x509_crt_parse(&me->tls_data.x509_ca_certificate, ca_cert, strlen((const char *)ca_cert) + 1) != 0)
+	if (ca_cert)
 	{
-		ALX_SOCKET_TRACE_INF("Failed to parse CA certificate");
-		sslFree(&me->tls_data);
-		return Alx_Err;
+		mbedtls_x509_crt_init(&me->tls_data.x509_ca_certificate);
+		me->tls_data.init_state = SSL_INITIALIZED_CACERT;
+		if (mbedtls_x509_crt_parse(&me->tls_data.x509_ca_certificate, ca_cert, strlen((const char *)ca_cert) + 1) != 0)
+		{
+			ALX_SOCKET_TRACE_INF("Failed to parse CA certificate\r\n");
+			sslFree(&me->tls_data);
+			return Alx_Err;
+		}
 	}
-	mbedtls_x509_crt_init(&me->tls_data.x509_cl_certificate);
-	me->tls_data.init_state = SSL_INITIALIZED_CLCERT;
-	if (mbedtls_x509_crt_parse(&me->tls_data.x509_cl_certificate, cl_cert, strlen((const char *)cl_cert) + 1) != 0)
+	if (cl_cert && cl_key)
 	{
-		ALX_SOCKET_TRACE_INF("Failed to parse CL certificate");
-		sslFree(&me->tls_data);
-		return Alx_Err;
-	}
-	mbedtls_pk_init(&me->tls_data.pkey);
-	me->tls_data.init_state = SSL_INITIALIZED_CLKEY;
-	if (mbedtls_pk_parse_key(&me->tls_data.pkey, cl_key, strlen((const char *)cl_key) + 1, NULL, 0, NULL, NULL) != 0)
-	{
-		ALX_SOCKET_TRACE_INF("Failed to parse CL private key");
-		sslFree(&me->tls_data);
-		return Alx_Err;
+		mbedtls_x509_crt_init(&me->tls_data.x509_cl_certificate);
+		me->tls_data.init_state = SSL_INITIALIZED_CLCERT;
+		if (mbedtls_x509_crt_parse(&me->tls_data.x509_cl_certificate, cl_cert, strlen((const char *)cl_cert) + 1) != 0)
+		{
+			ALX_SOCKET_TRACE_INF("Failed to parse CL certificate\r\n");
+			sslFree(&me->tls_data);
+			return Alx_Err;
+		}
+		mbedtls_pk_init(&me->tls_data.pkey);
+		me->tls_data.init_state = SSL_INITIALIZED_CLKEY;
+		if (mbedtls_pk_parse_key(&me->tls_data.pkey, cl_key, strlen((const char *)cl_key) + 1, NULL, 0, NULL, NULL) != 0)
+		{
+			ALX_SOCKET_TRACE_INF("Failed to parse CL private key\r\n");
+			sslFree(&me->tls_data);
+			return Alx_Err;
+		}
 	}
 
 	mbedtls_ctr_drbg_init(&me->tls_data.drbg_context);
@@ -1272,7 +1278,7 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 		MBEDTLS_SSL_TRANSPORT_STREAM,
 		MBEDTLS_SSL_PRESET_DEFAULT) != 0)
 	{
-		ALX_SOCKET_TRACE_INF("Failed to load default SSL config");
+		ALX_SOCKET_TRACE_INF("Failed to load default SSL config\r\n");
 		sslFree(&me->tls_data);
 		return Alx_Err;
 	}
@@ -1282,25 +1288,38 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 	mbedtls_ssl_conf_min_version(&me->tls_data.ssl_config, MBEDTLS_SSL_MAJOR_VERSION_3, MBEDTLS_SSL_MINOR_VERSION_3);
 
 	// Load CA certificate
-	mbedtls_ssl_conf_ca_chain(&me->tls_data.ssl_config, &me->tls_data.x509_ca_certificate, NULL);
+	if (ca_cert)
+	{
+		mbedtls_ssl_conf_ca_chain(&me->tls_data.ssl_config, &me->tls_data.x509_ca_certificate, NULL);
+	}
 
 	// Set Client certificate and private key
-	if (mbedtls_ssl_conf_own_cert(&me->tls_data.ssl_config, &me->tls_data.x509_cl_certificate, &me->tls_data.pkey) != 0)
+	if (cl_cert && cl_key)
 	{
-		ALX_SOCKET_TRACE_INF("Failed to config own certificate");
-		sslFree(&me->tls_data);
-		return Alx_Err;
+		if (mbedtls_ssl_conf_own_cert(&me->tls_data.ssl_config, &me->tls_data.x509_cl_certificate, &me->tls_data.pkey) != 0)
+		{
+			ALX_SOCKET_TRACE_INF("Failed to config own certificate\r\n");
+			sslFree(&me->tls_data);
+			return Alx_Err;
+		}
 	}
 
 	// Strictly ensure that certificates are signed by the CA
-	mbedtls_ssl_conf_authmode(&me->tls_data.ssl_config, MBEDTLS_SSL_VERIFY_REQUIRED);
+	if (ca_cert)
+	{
+		mbedtls_ssl_conf_authmode(&me->tls_data.ssl_config, MBEDTLS_SSL_VERIFY_REQUIRED);
+	}
+	else
+	{
+		mbedtls_ssl_conf_authmode(&me->tls_data.ssl_config, MBEDTLS_SSL_VERIFY_NONE);
+	}
 	mbedtls_ssl_conf_rng(&me->tls_data.ssl_config, sslRandomCallback, &me->tls_data.drbg_context);
 
 	mbedtls_ssl_init(&me->tls_data.ssl_context);
 	me->tls_data.init_state = SSL_INITIALIZED_SSL_CONTEXT;
 	if (mbedtls_ssl_setup(&me->tls_data.ssl_context, &me->tls_data.ssl_config) != 0)
 	{
-		ALX_SOCKET_TRACE_INF("Failed to setup SSL context");
+		ALX_SOCKET_TRACE_INF("Failed to setup SSL context\r\n");
 		sslFree(&me->tls_data);
 		return Alx_Err;
 	}
@@ -1308,13 +1327,14 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 	mbedtls_ssl_set_bio(&me->tls_data.ssl_context, me, sslSend, sslRecv, NULL);
 	strcpy(me->tls_data.domain, server_domain);
 	mbedtls_ssl_set_verify(&me->tls_data.ssl_context, sslVerifyDomain, (void *)me);
+	me->protocol = AlxSocket_Protocol_Tls;
 
-//	if (mbedtls_ssl_set_hostname(&me->tls_data.ssl_context, server_cn) != 0)
-//	{
-//		ALX_SOCKET_TRACE_INF("Failed to set hostname");
-//		sslFree(&me->tls_data);
-//		return Alx_Err;
-//	}
+	//	if (mbedtls_ssl_set_hostname(&me->tls_data.ssl_context, server_cn) != 0)
+	//	{
+	//		ALX_SOCKET_TRACE_INF("Failed to set hostname\n");
+	//		sslFree(&me->tls_data);
+	//		return Alx_Err;
+	//	}
 
 	return Alx_Ok;
 }
