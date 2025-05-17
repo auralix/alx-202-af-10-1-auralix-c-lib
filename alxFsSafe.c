@@ -367,6 +367,12 @@ Alx_Status AlxFsSafe_File_ReadRaw(AlxFsSafe* me, const char* path, void* data, u
 		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckLen(%s) lenActual %lu len %lu", path, lenActual, len);
 		return Alx_Err;
 	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
 }
 Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, void* data, uint32_t len, uint32_t* validatedCrc)
 {
