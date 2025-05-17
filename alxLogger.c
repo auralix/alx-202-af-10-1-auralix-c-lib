@@ -1588,12 +1588,92 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 			ALX_LOGGER_TRACE_FORMAT("[%lu] %s", me->md.write.log, log);
 		}
 
-		// Increment addr
-		me->md.write.id++;
-		me->md.write.pos = me->md.write.pos + readLenActual;
-		me->md.write.log++;
-	}
 
+		//------------------------------------------------------------------------------
+		// Handle IDs & Addresses
+		//------------------------------------------------------------------------------
+
+		// write.id
+		me->md.write.id++;
+
+		// write.pos
+		me->md.write.pos = me->md.write.pos + readLenActual;
+
+		// write.log
+		me->md.write.log++;
+		if (me->md.write.log >= me->numOfLogsPerFile)
+		{
+			// Reset
+			me->md.write.pos = 0;
+			me->md.write.log = 0;
+
+			// write.file
+			me->md.write.file++;
+			if (me->md.write.file >= me->numOfFilesPerDir)
+			{
+				// Reset
+				me->md.write.file = 0;
+
+				// write.dir
+				me->md.write.dir++;
+				if (me->md.write.dir >= me->numOfDir)
+				{
+					// Reset
+					me->md.write.dir = 0;
+				}
+
+				// If needed, discard oldest logs by incrementing read.dir
+				if (me->md.write.dir == me->md.read.dir)
+				{
+					// Increment read.id to next nearest multiple
+					uint64_t remainder = me->md.read.id % me->numOfLogsPerDirTotal;
+					uint64_t delta = me->numOfLogsPerDirTotal - remainder;
+					me->md.read.id = me->md.read.id + delta;
+
+					// Reset
+					me->md.read.pos = 0;
+					me->md.read.log = 0;
+					me->md.read.file = 0;
+
+					// read.dir
+					me->md.read.dir++;
+					if (me->md.read.dir >= me->numOfDir)
+					{
+						// Reset
+						me->md.read.dir = 0;
+					}
+				}
+
+				// oldest.id - Only start handling after inital wrap around
+				if (me->md.write.id >= me->numOfLogsTotal)
+				{
+					// Increment oldest.id by number of logs per directory
+					me->md.oldest.id = me->md.oldest.id + me->numOfLogsPerDirTotal;
+
+					// Reset
+					me->md.oldest.pos = 0;
+					me->md.oldest.log = 0;
+					me->md.oldest.file = 0;
+
+					// oldest.dir
+					me->md.oldest.dir++;
+					if (me->md.oldest.dir >= me->numOfDir)
+					{
+						// Reset
+						me->md.oldest.dir = 0;
+					}
+				}
+
+				// Clear next write dir
+				status = AlxLogger_ClearWriteDir(me);
+				if (status != Alx_Ok)
+				{
+					ALX_LOGGER_TRACE_WRN("FAIL: AlxLogger_ClearWriteDir() status %ld", status);
+					return status;
+				}
+			}
+		}
+	}
 
 	// Close
 	status = AlxFs_File_Close(me->alxFs, &file);
