@@ -50,15 +50,14 @@ static Alx_Status AlxFtp_Client_UploadFile_ChunkRead_Callback(void* ctx, void* c
 void AlxFtp_Ctor
 (
 	AlxFtp* me,
-	AlxNet* alxNet,
 	AlxFs* alxFs
 )
 {
 	// Parameters
-	me->alxNet = alxNet;
 	me->alxFs = alxFs;
 
 	// Fields
+	me->alxNet = NULL;
 	me->serverAddr = "";
 	me->serverAddrIsHostname = false;
 	me->serverPort = 0;
@@ -80,6 +79,15 @@ void AlxFtp_Ctor
 //******************************************************************************
 // Fields
 //******************************************************************************
+void AlxFtp_Client_SetNet(AlxFtp* me, AlxNet* alxNet)
+{
+	// Assert
+	ALX_FTP_ASSERT(me->wasCtorCalled == true);
+	ALX_FTP_ASSERT(me->isClientLoggedIn == false);
+
+	// Set
+	me->alxNet = alxNet;
+}
 void AlxFtp_Client_SetServerAddr(AlxFtp* me, const char* serverAddr)
 {
 	// Assert
@@ -154,7 +162,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	Alx_Status status = Alx_Err;
 	int32_t statusLen = 0;
 	int32_t len = 0;
-	char alxSocket_Ctrl_Ip[16] = "";
+	char alxSocket_Ctrl_Ip[64] = "CAFEBABECAFEBABECAFEBABECAFEBABECAFEBABECAFEBABECAFEBABECAFEBAB";
 	uint16_t alxSocket_Ctrl_Port = 0;
 
 
@@ -538,7 +546,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	Alx_Status status = Alx_Err;
 	int32_t statusLen = 0;
 	int32_t len = 0;
-	char alxSocket_Data_Ip[16] = "";
+	char alxSocket_Data_Ip[64] = "CAFEBABECAFEBABECAFEBABECAFEBABECAFEBABECAFEBABECAFEBABECAFEBAB";
 	uint16_t alxSocket_Data_Port = 0;
 
 
