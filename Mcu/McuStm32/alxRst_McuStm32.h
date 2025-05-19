@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_STM32L4)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -59,10 +59,15 @@ typedef struct
 	bool rstPin;
 	bool wwdg;
 	bool iwdg;
-	bool firewall;
-	bool lowPowerSecurity;
-	bool optioByteLoader;
+	bool lowPowerMgmt;
 	bool porOrBor;
+	#if defined(ALX_STM32F7)
+	bool por;
+	#endif
+	#if defined(ALX_STM32L4)
+	bool firewall;
+	bool optionByteLoader;
+	#endif
 } AlxRst_RstReason;
 
 typedef struct
@@ -86,7 +91,7 @@ void AlxRst_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32L4)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }
