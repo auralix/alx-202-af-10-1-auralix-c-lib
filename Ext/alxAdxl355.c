@@ -366,18 +366,29 @@ Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint
   */
 Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC)
 {
+	static uint16_t last_temp_12bit;
+
 	// Assert
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
 	ALX_ADXL355_ASSERT(me->isInit == true);
 
 	// Read
-	Alx_Status status = AlxAdxl355_Reg_Read(me, &me->reg._0x06_0x07_TEMP);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
-
-	// Convert
 	AlxAdxl355_Temp_12bit temp_12bit = {};
-	temp_12bit.raw[0] = me->reg._0x06_0x07_TEMP.val.TEMP1;
-	temp_12bit.raw[1] = me->reg._0x06_0x07_TEMP.val.TEMP2;
+	for (int retry = 0; retry < 3; retry++)
+	{
+		Alx_Status status = AlxAdxl355_Reg_Read(me, &me->reg._0x06_0x07_TEMP);
+		if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
+
+		// Convert
+		temp_12bit.raw[0] = me->reg._0x06_0x07_TEMP.val.TEMP1;
+		temp_12bit.raw[1] = me->reg._0x06_0x07_TEMP.val.TEMP2;
+		if (((int)last_temp_12bit - (int)temp_12bit.val < 20) && ((int)last_temp_12bit - (int)temp_12bit.val > -20))
+		{
+			break;
+		}
+	}
+	last_temp_12bit = temp_12bit.val;
+
 
 	// Calculate
 	float _temp_degC = temp_12bit.val * (-0.1104972376f) + 233.2872929f;	// -9.05 LSB/degC -> -0.1104972376 degC/LSB, 1885 LSB -> 25 degC, 0 LSB -> 233.2872929 degC
