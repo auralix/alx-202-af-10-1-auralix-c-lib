@@ -106,7 +106,7 @@ void AlxSpi_Ctor
 	me->isWriteReadLowLevel = isWriteReadLowLevel;
 
 	// Variables
-AlxSpi_ParseMode(me);
+	AlxSpi_ParseMode(me);
 	me->hspi.Instance = spi;
 	me->hspi.Init.Mode = SPI_MODE_MASTER;
 	me->hspi.Init.Direction = SPI_DIRECTION_2LINES;
@@ -214,6 +214,48 @@ Alx_Status AlxSpi_DeInit(AlxSpi* me)
 	return Alx_Ok;
 }
 
+Alx_Status AlxSpi_Reconfigure
+(
+	AlxSpi* me,
+	AlxSpi_Mode mode,
+	AlxSpi_DataSize dataSize,
+	AlxSpi_Clk spiClk,
+	bool isWriteReadLowLevel
+)
+{
+	ALX_SPI_ASSERT(me->wasCtorCalled == true);
+	bool wasInit = false;
+	
+	if (me->isInit)
+	{
+		AlxSpi_DeInit(me);
+		wasInit = true;
+	}
+	
+	me->mode = mode;
+	me->dataSize = dataSize;
+	me->spiClk = spiClk;
+	me->isWriteReadLowLevel = isWriteReadLowLevel;
+	
+	me->hspi.Init.DataSize = AlxSpi_GetDataSize(me);
+	
+	AlxSpi_ParseMode(me);
+	me->hspi.Init.CLKPolarity = me->clkPolarity;
+	me->hspi.Init.CLKPhase = me->clkPhase;
+	
+	me->hspi.Init.BaudRatePrescaler = AlxSpi_GetClkPrescaler(me);
+
+	// Check clock
+	ALX_SPI_ASSERT(AlxSpi_IsClkOk(me));
+	
+	if (wasInit)
+	{
+		AlxSpi_Init(me);
+	}
+	
+	return Alx_Ok;
+}
+
 /**
   * @brief
   * @param[in,out]	me
@@ -287,6 +329,8 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 		uint16_t lenToWrite = len;
 		uint16_t lenToRead = len;
 		uint16_t writeIndex = 0;
+		uint32_t tickstart = HAL_GetTick();
+		uint32_t timeout = (uint32_t)timeout_ms;
 
 		// Execute write/read
 		while(lenToRead > 0)
@@ -328,6 +372,15 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 
 				// Decrement
 				lenToRead--;
+			}
+			
+			// Timeout management
+			if ((lenToRead > 0) || (lenToWrite > 0))
+			{
+				if ((((HAL_GetTick() - tickstart) >= timeout) && (timeout != HAL_MAX_DELAY)) || (timeout == 0U))
+				{
+					return Alx_Err;
+				}
 			}
 		}
 
@@ -409,6 +462,8 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 		uint16_t lenToWrite = len;
 		uint16_t lenToRead = len;
 		uint16_t readIndex = 0;
+		uint32_t tickstart = HAL_GetTick();
+		uint32_t timeout = (uint32_t)timeout_ms;
 
 		// Execute write/read
 		while(lenToRead > 0)
@@ -450,6 +505,15 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 
 				// Decrement
 				lenToRead--;
+			}
+			
+			// Timeout management
+			if ((lenToRead > 0) || (lenToWrite > 0))
+			{
+				if ((((HAL_GetTick() - tickstart) >= timeout) && (timeout != HAL_MAX_DELAY)) || (timeout == 0U))
+				{
+					return Alx_Err;
+				}
 			}
 		}
 
@@ -534,6 +598,8 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 		uint16_t lenToRead = len;
 		uint16_t writeIndex = 0;
 		uint16_t readIndex = 0;
+		uint32_t tickstart = HAL_GetTick();
+		uint32_t timeout = (uint32_t)timeout_ms;
 
 		// Execute write/read
 		while(lenToRead > 0)
@@ -576,6 +642,15 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 
 				// Decrement
 				lenToRead--;
+			}
+			
+			// Timeout management
+			if ((lenToRead > 0) || (lenToWrite > 0))
+			{
+				if ((((HAL_GetTick() - tickstart) >= timeout) && (timeout != HAL_MAX_DELAY)) || (timeout == 0U))
+				{
+					return Alx_Err;
+				}
 			}
 		}
 

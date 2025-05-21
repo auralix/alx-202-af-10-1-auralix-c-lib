@@ -30,6 +30,7 @@
 //******************************************************************************
 #include "alxA352.h"
 
+#include "alxOsDelay.h"
 
 //******************************************************************************
 // Module Guard
@@ -40,20 +41,23 @@
 //******************************************************************************
 // Private Types
 //******************************************************************************
-#define ALX_A352_BUSY_WAIT(cycles)									\
-	do																\
-	{																\
-		for (uint32_t __cycle = 0; __cycle < cycles; ++__cycle) { }	\
-	} while(0)
-
+static TIM_HandleTypeDef htim = {};
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
 static void AlxA352_RegStruct_Init(AlxA352* me);
-static Alx_Status AlxA352_SetWindow(AlxA352* me, uint16_t window);
 static Alx_Status AlxA352_Reg_Read(AlxA352* me, void* reg);
 static Alx_Status AlxA352_Reg_Write(AlxA352* me, void* reg);
+static Alx_Status AlxA352_SetWindow(AlxA352* me, uint16_t window);
+static Alx_Status AlxA352_GetProdId(AlxA352* me);
+static Alx_Status AlxA352_GetFwVersion(AlxA352* me);
+static Alx_Status AlxA352_GetSerialNum(AlxA352* me);
+static Alx_Status AlxA352_ReadBurst(AlxA352* me, uint16_t *burstData);
+static Alx_Status AlxA352_Configure(AlxA352* me);
+static Alx_Status AlxA352_FlashBackup(AlxA352* me);
+static Alx_Status AlxA352_SwReset(AlxA352* me);
+static void AlxA352_Wait_us(uint32_t waitTime);
 
 
 //******************************************************************************
@@ -87,10 +91,24 @@ void AlxA352_Ctor
 
 	// Variables
 	AlxA352_RegStruct_Init(me);
+	me->burstSize = 0;
 
 	// Info
 	me->wasCtorCalled = true;
 	me->isInit = false;
+	me->isConfig = false;
+	
+	// Timer
+	htim.Instance = TIM6;
+	htim.Init.Prescaler = 120 - 1;
+	htim.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim.Init.Period = 0xFFFF;
+	htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;	// We will wait for update event to change period value
+	htim.Init.RepetitionCounter = 0;
+	__HAL_RCC_TIM6_RELEASE_RESET();
+	__HAL_RCC_TIM6_CLK_ENABLE();
+	HAL_TIM_Base_Init(&htim);
 }
 
 
@@ -114,8 +132,19 @@ Alx_Status AlxA352_Init(AlxA352* me)
 	Alx_Status status = Alx_Err;
 
 	// Init SPI
-	status = AlxSpi_Init(me->spi);
-	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err SpiInit"); return status; }
+	status = AlxSpi_Reconfigure(me->spi,
+		AlxSpi_Mode_3,
+		AlxSpi_DataSize_16bit,
+		AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_1MHz875_Pclk1Apb1_120MHz,
+		true);
+	if (!me->spi->isInit)
+	{
+		status = AlxSpi_Init(me->spi);
+		if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err SpiInit"); return status; }
+	}
+	
+	status = AlxA352_Disable(me);
+	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err Disable"); return status; }
 
 	// Read ID registers & Trace ID
 	status = AlxA352_GetProdId(me);
@@ -126,6 +155,9 @@ Alx_Status AlxA352_Init(AlxA352* me)
 	
 	status = AlxA352_GetSerialNum(me);
 	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err GetSerialNum"); return status; }
+	
+	status = AlxA352_Configure(me);
+	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err Configure"); return status; }
 
 	// Set isInit
 	me->isInit = true;
@@ -160,160 +192,91 @@ Alx_Status AlxA352_DeInit(AlxA352* me)
 
 	// Clear isInit
 	me->isInit = false;
+	me->isConfig = false;
 
 	// Return
 	return Alx_Ok;
 }
 
-Alx_Status AlxA352_Configure(AlxA352* me)
+Alx_Status AlxA352_Enable(AlxA352* me)
 {
-	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.GLOB_CMD);
-	ALX_A352_TRACE_INF("Get GLOB_CMD: 0x%04X (%s)", me->reg.GLOB_CMD.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.MODE_CTRL);
-	ALX_A352_TRACE_INF("Get MODE_CTRL: 0x%04X (%s)", me->reg.MODE_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.DIAG_STAT);
-	ALX_A352_TRACE_INF("Get DIAG_STAT: 0x%04X (%s)", me->reg.DIAG_STAT.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.FLAG);
-	ALX_A352_TRACE_INF("Get FLAG: 0x%04X (%s)", me->reg.FLAG.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.COUNT);
-	ALX_A352_TRACE_INF("Get COUNT: 0x%04X (%s)", me->reg.COUNT.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.SIG_CTRL);
-	ALX_A352_TRACE_INF("Get SIG_CTRL: 0x%04X (%s)", me->reg.SIG_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.MSC_CTRL);
-	ALX_A352_TRACE_INF("Get MSC_CTRL: 0x%04X (%s)", me->reg.MSC_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.SMPL_CTRL);
-	ALX_A352_TRACE_INF("Get SMPL_CTRL: 0x%04X (%s)", me->reg.SMPL_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.FILTER_CTRL);
-	ALX_A352_TRACE_INF("Get FILTER_CTRL: 0x%04X (%s)", me->reg.FILTER_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.BURST_CTRL);
-	ALX_A352_TRACE_INF("Get BURST_CTRL: 0x%04X (%s)", me->reg.BURST_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.LONGFILT_CTRL);
-	ALX_A352_TRACE_INF("Get LONGFILT_CTRL: 0x%04X (%s)", me->reg.LONGFILT_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	status = AlxA352_Reg_Read(me, &me->reg.LONGFILT_TAP);
-	ALX_A352_TRACE_INF("Get LONGFILT_TAP: 0x%04X (%s)", me->reg.LONGFILT_TAP.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	me->reg.FILTER_CTRL.val.FILTER_SEL = 8;
-	status = AlxA352_Reg_Write(me, &me->reg.FILTER_CTRL);
+	me->reg.MODE_CTRL.val.MODE_CMD = 1;
+	Alx_Status status = AlxA352_Reg_Write(me, &me->reg.MODE_CTRL);
 	
 	uint32_t i = 0;
-	while (1)
-	{
-		i++;
-		status = AlxA352_Reg_Read(me, &me->reg.FILTER_CTRL);
-		if (me->reg.FILTER_CTRL.val.FILTER_STAT == 0)
-		{
-			break;
-		}
-	}
-	
-	ALX_A352_TRACE_INF("Get FILTER_CTRL: 0x%04X (%u) (%s)", me->reg.FILTER_CTRL.val.raw, i, status == Alx_Ok ? "OK" : "ERR");
-	
-	me->reg.SMPL_CTRL.val.DOUT_RATE = 4;
-	status = AlxA352_Reg_Write(me, &me->reg.SMPL_CTRL);
-	
-	status = AlxA352_Reg_Read(me, &me->reg.SMPL_CTRL);
-	ALX_A352_TRACE_INF("Get SMPL_CTRL: 0x%04X (%s)", me->reg.SMPL_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
-	
-	me->reg.MODE_CTRL.val.MODE_CMD = 1;
-	status = AlxA352_Reg_Write(me, &me->reg.MODE_CTRL);
-	
-	i = 0;
 	while (1)
 	{
 		i++;
 		status = AlxA352_Reg_Read(me, &me->reg.MODE_CTRL);
 		if (me->reg.MODE_CTRL.val.MODE_CMD == 0)
 		{
+			status = Alx_Ok;
 			break;
 		}
 	}
 	
-	ALX_A352_TRACE_INF("Get MODE_CTRL: 0x%04X (%u) (%s)", me->reg.MODE_CTRL.val.raw, i, status == Alx_Ok ? "OK" : "ERR");
+	ALX_A352_TRACE_INF("Sampling mode entered 0x%04X (%u) (%s)", me->reg.MODE_CTRL.val.raw, i, status == Alx_Ok ? "OK" : "ERR");
 	
 	return status;
 }
 
-Alx_Status AlxA352_GetProdId(AlxA352* me)
+Alx_Status AlxA352_Disable(AlxA352* me)
 {
-	char prod_id[9] = {0};
-	const char *prod_id_expected = "A352AD10";
-	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.PROD_ID);
+	// Go to command mode
+	me->reg.MODE_CTRL.val.MODE_CMD = 2;
+	Alx_Status status = AlxA352_Reg_Write(me, &me->reg.MODE_CTRL);
 	
-	memcpy(prod_id, (uint8_t *)me->reg.PROD_ID.val.raw, sizeof(me->reg.PROD_ID.val.raw));
-	if (!strcmp(prod_id, prod_id_expected))
+	uint32_t i = 0;
+	while (1)
 	{
-		status = Alx_Ok;
+		i++;
+		status = AlxA352_Reg_Read(me, &me->reg.MODE_CTRL);
+		if (me->reg.MODE_CTRL.val.MODE_CMD == 0)
+		{
+			status = Alx_Ok;
+			break;
+		}
 	}
-	else
-	{
-		status = Alx_Err;
-	}
-
-	ALX_A352_TRACE_INF("Get PROD_ID: %s (%s)", prod_id, status == Alx_Ok ? "OK" : "ERR");
-
-	return status;
-}
-
-
-Alx_Status AlxA352_GetFwVersion(AlxA352* me)
-{
-	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.VERSION);
-
-	ALX_A352_TRACE_INF("Get VERSION: %u (%s)", me->reg.VERSION.val.VERSION, status == Alx_Ok ? "OK" : "ERR");
-
-	return status;
-}
-
-Alx_Status AlxA352_GetSerialNum(AlxA352* me)
-{
-	char serial[9] = {0};
-	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.SERIAL_NUM);
+	ALX_A352_TRACE_INF("Command mode entered 0x%04X (%u) (%s)", me->reg.MODE_CTRL.val.raw, i, status == Alx_Ok ? "OK" : "ERR");
 	
-	memcpy(serial, (uint8_t *)me->reg.SERIAL_NUM.val.raw, sizeof(me->reg.SERIAL_NUM.val.raw));
-
-	ALX_A352_TRACE_INF("Get SERIAL_NUM: %s (%s)", serial, status == Alx_Ok ? "OK" : "ERR");
-
 	return status;
 }
 
-Alx_Status AlxA352_GetAccData(AlxA352* me)
-{
-	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.ACCL);
-
-	int32_t x_raw = ((uint32_t)(me->reg.ACCL.val.XACCL_HIGH) << 16) | (uint32_t)me->reg.ACCL.val.XACCL_LOW;
-	int32_t y_raw = ((uint32_t)(me->reg.ACCL.val.YACCL_HIGH) << 16) | (uint32_t)me->reg.ACCL.val.YACCL_LOW;
-	int32_t z_raw = ((uint32_t)(me->reg.ACCL.val.ZACCL_HIGH) << 16) | (uint32_t)me->reg.ACCL.val.ZACCL_LOW;
+Alx_Status AlxA352_GetData(AlxA352* me, AccDataPoint* data, uint8_t len)
+{	
+	uint16_t burst[8] = {0};
+	Alx_Status status = AlxA352_ReadBurst(me, burst);
+	
+	int32_t x_raw = ((uint32_t)(burst[2]) << 16) | (uint32_t)burst[3];
+	int32_t y_raw = ((uint32_t)(burst[4]) << 16) | (uint32_t)burst[5];
+	int32_t z_raw = ((uint32_t)(burst[6]) << 16) | (uint32_t)burst[7];
 
 	float x = ((float)x_raw / (float)(1 << 24));
 	float y = ((float)y_raw / (float)(1 << 24));
 	float z = ((float)z_raw / (float)(1 << 24));
+		
+	float temp = -0.0037918 * (((uint32_t)(burst[0]) << 16) | (uint32_t)burst[1]) + 34.987;
 
-	ALX_A352_TRACE_INF("Get ACCL: %.2f %.2f %.2f", x, y, z);
+	if (status == Alx_Ok)
+	{
+		//ALX_A352_TRACE_INF("Get ACCL: %.2f %.2f %.2f %.2f", x, y, z, temp);
+		
+		data[0].x = x;
+		data[0].y = y;
+		data[0].z = z;
+		data[0].temp = temp;
+	}
+	else
+	{
+		//ALX_A352_TRACE_WRN("AlxA352_ReadBurst returned %u", status);
+	}
 
 	return status;
 }
 
-Alx_Status AlxA352_GetTempData(AlxA352* me)
+uint8_t AlxA352_GetFifoLen(AlxA352* me)
 {
-	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.TEMP);
-	
-	ALX_A352_TRACE_INF("Get TEMP: 0x%04X 0x%04X (%s)",
-		               me->reg.TEMP.val.TEMP_HIGH,
-		               me->reg.TEMP.val.TEMP_LOW,
-		               status == Alx_Ok ? "OK" : "ERR");
-	
-	return status;
+	return 1;
 }
 
 //******************************************************************************
@@ -518,8 +481,8 @@ static Alx_Status AlxA352_Reg_Read(AlxA352* me, void* reg)
 	status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regAddr_Read, 1, me->spiNumOfTries, me->spiTimeout_ms);
 	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiReadSetAddr"); return status; }
 
-	// Stall time (A352 requires 20 us)
-	ALX_A352_BUSY_WAIT(300);
+	// Stall time (A352 requires 20 us with 40 us readrate)
+	AlxA352_Wait_us(30);
 
 	for (uint8_t i = 1; i < regMeta.len; i++)
 	{
@@ -527,7 +490,7 @@ static Alx_Status AlxA352_Reg_Read(AlxA352* me, void* reg)
 		status = AlxSpi_Master_WriteRead(me->spi, (uint8_t*)&regAddr_Read, (uint8_t*)&regValPtr[i - 1], 1, me->spiNumOfTries, me->spiTimeout_ms);
 		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiReadGetData1"); return status; }
 		
-		ALX_A352_BUSY_WAIT(300);
+		AlxA352_Wait_us(30);
 	}
 
 	// Read final data
@@ -563,7 +526,7 @@ static Alx_Status AlxA352_Reg_Write(AlxA352* me, void* reg)
 		uint16_t regCmd_Write = 0x8000 | ((regMeta.addr & 0x7F) << 8) | (regVal & 0x00FF);
 		status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regCmd_Write, 1, me->spiNumOfTries, me->spiTimeout_ms);
 		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiWrite"); return status; }
-		ALX_A352_BUSY_WAIT(300);
+		AlxA352_Wait_us(30);
 	}
 	
 	if (regMeta.w.high)
@@ -571,7 +534,7 @@ static Alx_Status AlxA352_Reg_Write(AlxA352* me, void* reg)
 		uint16_t regCmd_Write = 0x8000 | (((regMeta.addr + 1) & 0x7F) << 8) | ((regVal & 0xFF00) >> 8);
 		status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regCmd_Write, 1, me->spiNumOfTries, me->spiTimeout_ms);
 		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiWrite"); return status; }
-		ALX_A352_BUSY_WAIT(300);
+		AlxA352_Wait_us(30);
 	}
 
 	// DeAssert CS
@@ -598,5 +561,221 @@ static Alx_Status AlxA352_SetWindow(AlxA352* me, uint16_t window)
 	return status;
 }
 
+static Alx_Status AlxA352_GetProdId(AlxA352* me)
+{
+	char prod_id[9] = {0};
+	const char *prod_id_expected = "A352AD10";
+	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.PROD_ID);
+	
+	memcpy(prod_id, (uint8_t *)me->reg.PROD_ID.val.raw, sizeof(me->reg.PROD_ID.val.raw));
+	if (!strcmp(prod_id, prod_id_expected))
+	{
+		status = Alx_Ok;
+	}
+	else
+	{
+		status = Alx_Err;
+	}
 
+	ALX_A352_TRACE_INF("Get PROD_ID: %s (%s)", prod_id, status == Alx_Ok ? "OK" : "ERR");
+
+	return status;
+}
+
+
+static Alx_Status AlxA352_GetFwVersion(AlxA352* me)
+{
+	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.VERSION);
+
+	ALX_A352_TRACE_INF("Get VERSION: %u (%s)", me->reg.VERSION.val.VERSION, status == Alx_Ok ? "OK" : "ERR");
+
+	return status;
+}
+
+static Alx_Status AlxA352_GetSerialNum(AlxA352* me)
+{
+	char serial[9] = {0};
+	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.SERIAL_NUM);
+	
+	memcpy(serial, (uint8_t *)me->reg.SERIAL_NUM.val.raw, sizeof(me->reg.SERIAL_NUM.val.raw));
+
+	ALX_A352_TRACE_INF("Get SERIAL_NUM: %s (%s)", serial, status == Alx_Ok ? "OK" : "ERR");
+
+	return status;
+}
+
+static Alx_Status AlxA352_Configure(AlxA352* me)
+{
+	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.GLOB_CMD);
+	ALX_A352_TRACE_INF("Get GLOB_CMD: 0x%04X (%s)", me->reg.GLOB_CMD.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	if (me->reg.GLOB_CMD.val.MESMOD_STAT != 1)
+	{
+		me->reg.SIG_CTRL.val.raw = 0x8E14;
+		status = AlxA352_Reg_Write(me, &me->reg.SIG_CTRL);
+		status = AlxA352_FlashBackup(me);
+		status = AlxA352_SwReset(me);
+	}
+	
+	status = AlxA352_Reg_Read(me, &me->reg.MODE_CTRL);
+	ALX_A352_TRACE_INF("Get MODE_CTRL: 0x%04X (%s)", me->reg.MODE_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	
+	status = AlxA352_Reg_Read(me, &me->reg.DIAG_STAT);
+	ALX_A352_TRACE_INF("Get DIAG_STAT: 0x%04X (%s)", me->reg.DIAG_STAT.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	
+	status = AlxA352_Reg_Read(me, &me->reg.FLAG);
+	ALX_A352_TRACE_INF("Get FLAG: 0x%04X (%s)", me->reg.FLAG.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	
+	status = AlxA352_Reg_Read(me, &me->reg.COUNT);
+	ALX_A352_TRACE_INF("Get COUNT: 0x%04X (%s)", me->reg.COUNT.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	
+	me->reg.SIG_CTRL.val.raw = 0x0E14;  // ND_EN_TEMP disabled
+	status = AlxA352_Reg_Write(me, &me->reg.SIG_CTRL);
+	status = AlxA352_Reg_Read(me, &me->reg.SIG_CTRL);
+	ALX_A352_TRACE_INF("Get SIG_CTRL: 0x%04X (%s)", me->reg.SIG_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	
+	//me->reg.MSC_CTRL.val.raw = 0x0004;  // Set for internal trigger, DRDY active low
+	me->reg.MSC_CTRL.val.raw = 0x0044;  // Set for external trigger, rising edge, DRDY active low
+	status = AlxA352_Reg_Write(me, &me->reg.MSC_CTRL);
+	status = AlxA352_Reg_Read(me, &me->reg.MSC_CTRL);
+	ALX_A352_TRACE_INF("Get MSC_CTRL: 0x%04X (%s)", me->reg.MSC_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	
+	me->reg.SMPL_CTRL.val.DOUT_RATE = 2;  // 1000 sps
+	status = AlxA352_Reg_Write(me, &me->reg.SMPL_CTRL);
+	status = AlxA352_Reg_Read(me, &me->reg.SMPL_CTRL);
+	ALX_A352_TRACE_INF("Get SMPL_CTRL: 0x%04X (%s)", me->reg.SMPL_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	
+	me->reg.FILTER_CTRL.val.FILTER_SEL = 10;  // TAP=512, Fc=460
+	status = AlxA352_Reg_Write(me, &me->reg.FILTER_CTRL);
+	
+	uint32_t i = 0;
+	while (1)
+	{
+		i++;
+		status = AlxA352_Reg_Read(me, &me->reg.FILTER_CTRL);
+		if (me->reg.FILTER_CTRL.val.FILTER_STAT == 0)
+		{
+			break;
+		}
+	}
+	ALX_A352_TRACE_INF("Get FILTER_CTRL: 0x%04X (%u) (%s)", me->reg.FILTER_CTRL.val.raw, i, status == Alx_Ok ? "OK" : "ERR");
+	
+	//me->reg.BURST_CTRL.val.raw = 0xC703;  // Everything enabled, burst size 11
+	me->reg.BURST_CTRL.val.raw = 0x4700;  // Temp and ACC enabled, burst size 8
+	status = AlxA352_Reg_Write(me, &me->reg.BURST_CTRL);
+	status = AlxA352_Reg_Read(me, &me->reg.BURST_CTRL);
+	me->burstSize = 8;
+	ALX_A352_TRACE_INF("Get BURST_CTRL: 0x%04X (%s)", me->reg.BURST_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	
+	me->reg.LONGFILT_CTRL.val.raw = 0x0000;  // Disabled
+	status = AlxA352_Reg_Write(me, &me->reg.LONGFILT_CTRL);
+	status = AlxA352_Reg_Read(me, &me->reg.LONGFILT_CTRL);
+	ALX_A352_TRACE_INF("Get LONGFILT_CTRL: 0x%04X (%s)", me->reg.LONGFILT_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	
+	status = AlxA352_Reg_Read(me, &me->reg.LONGFILT_TAP);
+	ALX_A352_TRACE_INF("Get LONGFILT_TAP: 0x%04X (%s)", me->reg.LONGFILT_TAP.val.raw, status == Alx_Ok ? "OK" : "ERR");
+	
+	me->isConfig = true;
+	
+	return status;
+}
+
+static Alx_Status AlxA352_ReadBurst(AlxA352* me, uint16_t *burstData)
+{
+	// Local variables
+	Alx_Status status = Alx_Err;
+	AlxA352_RegMeta regMeta = me->reg.BURST.meta;
+	uint16_t regVal = me->reg.BURST.val.raw;
+
+	status = AlxA352_SetWindow(me, regMeta.win);
+	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err SpiReadSetWindow"); return status; }
+
+	// Assert CS
+	AlxSpi_Master_AssertCs(me->spi);
+
+	// Write low address -> MSB is set to 1 for write operaton
+	if (regMeta.w.low)
+	{
+		uint16_t regCmd_Write = 0x8000 | ((regMeta.addr & 0x7F) << 8) | (regVal & 0x00FF);
+		status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regCmd_Write, 1, me->spiNumOfTries, me->spiTimeout_ms);
+		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiWrite"); return status; }
+	}
+
+	AlxA352_Wait_us(45);
+
+	status = AlxSpi_Master_Read(me->spi, (uint8_t*)burstData, me->burstSize, me->spiNumOfTries, me->spiTimeout_ms);
+	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiReadGetData1"); return status; }
+
+	// DeAssert CS
+	AlxSpi_Master_DeAssertCs(me->spi);
+
+	// Return
+	return Alx_Ok;
+}
+
+static Alx_Status AlxA352_FlashBackup(AlxA352* me)
+{
+	Alx_Status status = Alx_Ok;
+	
+	me->reg.GLOB_CMD.val.raw = 0;
+	me->reg.GLOB_CMD.val.FLASH_BACKUP = 1;
+	status = AlxA352_Reg_Write(me, &me->reg.GLOB_CMD);
+	
+	uint32_t i = 0;
+	while (1)
+	{
+		i++;
+		status = AlxA352_Reg_Read(me, &me->reg.GLOB_CMD);
+		if (me->reg.GLOB_CMD.val.FLASH_BACKUP == 0)
+		{
+			break;
+		}
+	}
+	status = AlxA352_Reg_Read(me, &me->reg.DIAG_STAT);
+	
+	if ((status == Alx_Ok) && (me->reg.DIAG_STAT.val.FLASH_BU_ERR == 0))
+	{
+		ALX_A352_TRACE_INF("Flash backup complete (%u)", i);
+	}
+	else
+	{
+		ALX_A352_TRACE_INF("Flash backup failed (%u)", i);
+		status = Alx_Err;
+	}
+	
+	return status;
+}
+
+static Alx_Status AlxA352_SwReset(AlxA352* me)
+{
+	Alx_Status status = Alx_Ok;
+	
+	me->reg.GLOB_CMD.val.raw = 0;
+	me->reg.GLOB_CMD.val.SOFT_RST = 1;
+	status = AlxA352_Reg_Write(me, &me->reg.GLOB_CMD);
+	
+	AlxOsDelay_ms(&alxOsDelay, 1000);
+	
+	me->reg.WIN_CTRL.val.WINDOW_ID = 0xFFFF;
+	uint32_t i = 0;
+	while (1)
+	{
+		i++;
+		status = AlxA352_Reg_Read(me, &me->reg.GLOB_CMD);
+		if (me->reg.GLOB_CMD.val.SOFT_RST == 0)
+		{
+			break;
+		}
+	}
+	
+	ALX_A352_TRACE_INF("Software reset complete (%u) (%s)", i, (status == Alx_Ok) ? "OK" : "ERR");
+	return status;
+}
+
+static void AlxA352_Wait_us(uint32_t waitTime)
+{
+	__HAL_TIM_SET_COUNTER(&htim, 0);
+	HAL_TIM_Base_Start(&htim);
+	while (__HAL_TIM_GET_COUNTER(&htim) < waitTime) {}
+	HAL_TIM_Base_Stop(&htim);
+}
 #endif	// #if defined(ALX_C_LIB)
