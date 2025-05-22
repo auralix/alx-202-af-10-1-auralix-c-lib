@@ -54,7 +54,8 @@ static Alx_Status AlxA352_GetProdId(AlxA352* me);
 static Alx_Status AlxA352_GetFwVersion(AlxA352* me);
 static Alx_Status AlxA352_GetSerialNum(AlxA352* me);
 static Alx_Status AlxA352_ReadBurst(AlxA352* me, uint16_t *burstData);
-static Alx_Status AlxA352_Configure(AlxA352* me);
+static Alx_Status AlxA352_ConfigureSampleRate(AlxA352* me, float sampleRate);
+static Alx_Status AlxA352_Configure(AlxA352* me, float sampleRate);
 static Alx_Status AlxA352_FlashBackup(AlxA352* me);
 static Alx_Status AlxA352_SwReset(AlxA352* me);
 static void AlxA352_Wait_us(uint32_t waitTime);
@@ -122,7 +123,7 @@ void AlxA352_Ctor
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxA352_Init(AlxA352* me)
+Alx_Status AlxA352_Init(AlxA352* me, float sampleRate)
 {
 	// Assert
 	ALX_A352_ASSERT(me->wasCtorCalled == true);
@@ -156,7 +157,7 @@ Alx_Status AlxA352_Init(AlxA352* me)
 	status = AlxA352_GetSerialNum(me);
 	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err GetSerialNum"); return status; }
 	
-	status = AlxA352_Configure(me);
+	status = AlxA352_Configure(me, sampleRate);
 	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err Configure"); return status; }
 
 	// Set isInit
@@ -244,31 +245,46 @@ Alx_Status AlxA352_Disable(AlxA352* me)
 
 Alx_Status AlxA352_GetData(AlxA352* me, AccDataPoint* data, uint8_t len)
 {	
+	Alx_Status status = Alx_Err;
 	uint16_t burst[8] = {0};
-	Alx_Status status = AlxA352_ReadBurst(me, burst);
 	
-	int32_t x_raw = ((uint32_t)(burst[2]) << 16) | (uint32_t)burst[3];
-	int32_t y_raw = ((uint32_t)(burst[4]) << 16) | (uint32_t)burst[5];
-	int32_t z_raw = ((uint32_t)(burst[6]) << 16) | (uint32_t)burst[7];
-
-	float x = ((float)x_raw / (float)(1 << 24));
-	float y = ((float)y_raw / (float)(1 << 24));
-	float z = ((float)z_raw / (float)(1 << 24));
-		
-	float temp = -0.0037918 * (((uint32_t)(burst[0]) << 16) | (uint32_t)burst[1]) + 34.987;
-
-	if (status == Alx_Ok)
+	while (true)
 	{
-		//ALX_A352_TRACE_INF("Get ACCL: %.2f %.2f %.2f %.2f", x, y, z, temp);
+		status = AlxA352_ReadBurst(me, burst);
+
+		if (status == Alx_Ok)
+		{
+			int32_t x_raw = ((uint32_t)(burst[2]) << 16) | (uint32_t)burst[3];
+			int32_t y_raw = ((uint32_t)(burst[4]) << 16) | (uint32_t)burst[5];
+			int32_t z_raw = ((uint32_t)(burst[6]) << 16) | (uint32_t)burst[7];
+
+			float x = ((float)x_raw / (float)(1 << 24));
+			float y = ((float)y_raw / (float)(1 << 24));
+			float z = ((float)z_raw / (float)(1 << 24));
 		
-		data[0].x = x;
-		data[0].y = y;
-		data[0].z = z;
-		data[0].temp = temp;
-	}
-	else
-	{
-		//ALX_A352_TRACE_WRN("AlxA352_ReadBurst returned %u", status);
+			float temp = -0.0037918 * (((uint32_t)(burst[0]) << 16) | (uint32_t)burst[1]) + 34.987;
+			
+			//ALX_A352_TRACE_INF("Get ACCL: %.2f %.2f %.2f %.2f", x, y, z, temp);
+		
+			data[0].x = x;
+			data[0].y = y;
+			data[0].z = z;
+			data[0].temp = temp;
+		}
+		else
+		{
+			//ALX_A352_TRACE_WRN("AlxA352_ReadBurst returned %u", status);
+		}
+		
+		AlxA352_Wait_us(10);
+		status = AlxA352_Reg_Read(me, &me->reg.FLAG);
+		if ((status == Alx_Ok) &&
+			(me->reg.FLAG.val.ND_XACCL == 0) &&
+			(me->reg.FLAG.val.ND_YACCL == 0) &&
+			(me->reg.FLAG.val.ND_ZACCL == 0))
+		{
+			break;
+		}
 	}
 
 	return status;
@@ -604,9 +620,51 @@ static Alx_Status AlxA352_GetSerialNum(AlxA352* me)
 	return status;
 }
 
-static Alx_Status AlxA352_Configure(AlxA352* me)
+static Alx_Status AlxA352_ConfigureSampleRate(AlxA352* me, float sampleRate)
 {
-	Alx_Status status = AlxA352_Reg_Read(me, &me->reg.GLOB_CMD);
+	struct acquisitionParams
+	{
+		float rate;
+		uint16_t doutRateSetting;
+		uint16_t filterSetting;
+	} acquisitionParams[] =
+	{
+		{ 31.25f, 6, 6},
+		{ 62.5f, 5, 7},
+		{ 125.f, 4, 8},
+		{ 250.f, 3, 8},
+		{ 500.f, 3, 9},
+		{ 1000.f, 2, 10},
+	};
+	
+	bool sampleRateOk = false;
+	for (uint32_t i = 0; i < ALX_ARR_LEN(acquisitionParams); i++)
+	{
+		struct acquisitionParams* p = &acquisitionParams[i];
+		if (p->rate == sampleRate)
+		{
+			me->reg.SMPL_CTRL.val.DOUT_RATE = p->doutRateSetting;
+			me->reg.FILTER_CTRL.val.FILTER_SEL = p->filterSetting;
+			sampleRateOk = true;
+			break;
+		}
+	}
+	
+	if (!sampleRateOk)
+	{
+		ALX_A352_TRACE_WRN("Invalid sample rate requested");
+		return Alx_Err;
+	}
+	
+	return Alx_Ok;
+}
+
+static Alx_Status AlxA352_Configure(AlxA352* me, float sampleRate)
+{
+	Alx_Status status = AlxA352_ConfigureSampleRate(me, sampleRate);
+	if (status != Alx_Ok) { return status; }
+	
+	status = AlxA352_Reg_Read(me, &me->reg.GLOB_CMD);
 	ALX_A352_TRACE_INF("Get GLOB_CMD: 0x%04X (%s)", me->reg.GLOB_CMD.val.raw, status == Alx_Ok ? "OK" : "ERR");
 	if (me->reg.GLOB_CMD.val.MESMOD_STAT != 1)
 	{
@@ -639,12 +697,11 @@ static Alx_Status AlxA352_Configure(AlxA352* me)
 	status = AlxA352_Reg_Read(me, &me->reg.MSC_CTRL);
 	ALX_A352_TRACE_INF("Get MSC_CTRL: 0x%04X (%s)", me->reg.MSC_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
 	
-	me->reg.SMPL_CTRL.val.DOUT_RATE = 2;  // 1000 sps
+	// SMPL_CTRL and FILTER_CTRL are already configured, write them
 	status = AlxA352_Reg_Write(me, &me->reg.SMPL_CTRL);
 	status = AlxA352_Reg_Read(me, &me->reg.SMPL_CTRL);
 	ALX_A352_TRACE_INF("Get SMPL_CTRL: 0x%04X (%s)", me->reg.SMPL_CTRL.val.raw, status == Alx_Ok ? "OK" : "ERR");
 	
-	me->reg.FILTER_CTRL.val.FILTER_SEL = 10;  // TAP=512, Fc=460
 	status = AlxA352_Reg_Write(me, &me->reg.FILTER_CTRL);
 	
 	uint32_t i = 0;

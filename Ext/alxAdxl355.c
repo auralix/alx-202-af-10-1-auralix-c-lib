@@ -65,17 +65,12 @@ static void AlxAdxl355_RegStruct_SetAddr(AlxAdxl355* me);
 static void AlxAdxl355_RegStruct_SetLen(AlxAdxl355* me);
 static void AlxAdxl355_RegStruct_SetValToZero(AlxAdxl355* me);
 static void AlxAdxl355_RegStruct_SetValToDefault(AlxAdxl355* me);
+static void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me, float sampleRate);
 static Alx_Status AlxAdxl355_Reg_Read(AlxAdxl355* me, void* reg);
 static Alx_Status AlxAdxl355_Reg_Write(AlxAdxl355* me, void* reg);
 static Alx_Status AlxAdxl355_Reg_WriteAll(AlxAdxl355* me);
 static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me);
 static AccDataPoint AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20bit xyz_20bit);
-
-
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
-void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me);
 
 
 //******************************************************************************
@@ -123,7 +118,7 @@ void AlxAdxl355_Ctor
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxAdxl355_Init(AlxAdxl355* me)
+Alx_Status AlxAdxl355_Init(AlxAdxl355* me, float sampleRate)
 {
 	// Assert
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
@@ -156,8 +151,8 @@ Alx_Status AlxAdxl355_Init(AlxAdxl355* me)
 	status = AlxAdxl355_TraceId(me);
 	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	// Set registers values - WEAK
-	AlxAdxl355_RegStruct_SetVal(me);
+	// Set registers values
+	AlxAdxl355_RegStruct_SetVal(me, sampleRate);
 
 	// Write all registers
 	status = AlxAdxl355_Reg_WriteAll(me);
@@ -530,6 +525,61 @@ static void AlxAdxl355_RegStruct_SetValToDefault(AlxAdxl355* me)
 	memset(me->reg._0x08_0x10_DATA	.val.raw, 0x00, sizeof(me->reg._0x08_0x10_DATA	.val.raw));
 	memset(me->reg._0x11_FIFO_DATA	.val.raw, 0x00, sizeof(me->reg._0x11_FIFO_DATA	.val.raw));
 }
+static void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me, float sampleRate)
+{
+	// 0x28 - FILTER SETTINGS REGISTER & 0x29 - FIFO SAMPLES REGISTER
+	if (sampleRate == 31.25f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_31Hz25_7Hz813Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 1 * 3;
+	}
+	else if (sampleRate == 62.5f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_62Hz5_15Hz625Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 2 * 3;
+	}
+	else if (sampleRate == 125.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_125Hz_31Hz25Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 4 * 3;
+	}
+	else if (sampleRate == 250.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_250Hz_62Hz5Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 8 * 3;
+	}
+	else if (sampleRate == 500.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_500Hz_125Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 16 * 3;
+	}
+	else if (sampleRate == 1000.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_1000Hz_250Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 32 * 3;
+	}
+	else if (sampleRate == 2000.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_2000Hz_500Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 32 * 3;
+	}
+	else if (sampleRate == 4000.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_4000Hz_1000Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 32 * 3;
+	}
+	else
+	{
+		ALX_ADXL355_ASSERT(false);	// We should never get here
+	}
+
+	// 0x2A - INTERRUPT PIN (INTX) FUNCTION MAP REGISTER
+	me->reg._0x2A_INT_MAP.val.FULL_EN1 = FULL_EN1_Enable;
+
+	// 0x2B - DATA SYNCHRONIZATION REGISTER
+	me->reg._0x2B_Sync.val.EXT_CLK = EXT_CLK_Disable;
+	me->reg._0x2B_Sync.val.EXT_SYNC = EXT_SYNC_ExternalSync_InterpolationFilter;
+}
 static Alx_Status AlxAdxl355_Reg_Read(AlxAdxl355* me, void* reg)
 {
 	// Local variables
@@ -700,17 +750,5 @@ static AccDataPoint AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20bit x
 	// Return
 	return xyz_g;
 }
-
-
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
-ALX_WEAK void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me)
-{
-	(void)me;
-	ALX_ADXL355_TRACE_WRN("Err");
-	ALX_ADXL355_ASSERT(false);
-}
-
 
 #endif	// #if defined(ALX_C_LIB)
