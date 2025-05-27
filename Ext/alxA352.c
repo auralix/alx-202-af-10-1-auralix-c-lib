@@ -255,7 +255,6 @@ Alx_Status AlxA352_GetData(AlxA352* me, AccDataPoint* data, uint8_t len)
 			//ALX_A352_TRACE_WRN("AlxA352_ReadBurst returned %u", status);
 		}
 		
-		AlxA352_Wait_us(10);
 		status = AlxA352_Reg_Read(me, &me->reg.FLAG);
 		if ((status == Alx_Ok) &&
 			(me->reg.FLAG.val.ND_XACCL == 0) &&
@@ -482,8 +481,8 @@ static Alx_Status AlxA352_Reg_Read(AlxA352* me, void* reg)
 	status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regAddr_Read, 1, me->spiNumOfTries, me->spiTimeout_ms);
 	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiReadSetAddr"); return status; }
 
-	// Stall time (A352 requires 20 us with 40 us readrate)
-	AlxA352_Wait_us(30);
+	// Stall time (A352 requires 20 us with 40 us readrate, one word is 8 us)
+	AlxA352_Wait_us(32);
 
 	for (uint8_t i = 1; i < regMeta.len; i++)
 	{
@@ -491,7 +490,7 @@ static Alx_Status AlxA352_Reg_Read(AlxA352* me, void* reg)
 		status = AlxSpi_Master_WriteRead(me->spi, (uint8_t*)&regAddr_Read, (uint8_t*)&regValPtr[i - 1], 1, me->spiNumOfTries, me->spiTimeout_ms);
 		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiReadGetData1"); return status; }
 		
-		AlxA352_Wait_us(30);
+		AlxA352_Wait_us(32);
 	}
 
 	// Read final data
@@ -500,6 +499,8 @@ static Alx_Status AlxA352_Reg_Read(AlxA352* me, void* reg)
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
+	
+	AlxA352_Wait_us(32);
 
 	// Return
 	return Alx_Ok;
@@ -509,6 +510,7 @@ static Alx_Status AlxA352_Reg_Write(AlxA352* me, void* reg)
 {
 	// Local variables
 	Alx_Status status = Alx_Err;
+	bool needToWait = false;
 	AlxA352_RegMeta regMeta = *(AlxA352_RegMeta*)reg;
 	uint16_t regVal = *(uint16_t *)((uint8_t *)reg + sizeof(regMeta));
 
@@ -527,19 +529,22 @@ static Alx_Status AlxA352_Reg_Write(AlxA352* me, void* reg)
 		uint16_t regCmd_Write = 0x8000 | ((regMeta.addr & 0x7F) << 8) | (regVal & 0x00FF);
 		status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regCmd_Write, 1, me->spiNumOfTries, me->spiTimeout_ms);
 		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiWrite"); return status; }
-		AlxA352_Wait_us(30);
+		needToWait = true;
 	}
 	
 	if (regMeta.w.high)
 	{
+		if (needToWait) { AlxA352_Wait_us(32); }
 		uint16_t regCmd_Write = 0x8000 | (((regMeta.addr + 1) & 0x7F) << 8) | ((regVal & 0xFF00) >> 8);
 		status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regCmd_Write, 1, me->spiNumOfTries, me->spiTimeout_ms);
 		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiWrite"); return status; }
-		AlxA352_Wait_us(30);
+		needToWait = true;
 	}
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
+	
+	if (needToWait) { AlxA352_Wait_us(32); }
 
 	// Return
 	return Alx_Ok;
@@ -549,6 +554,7 @@ static Alx_Status AlxA352_VerifyMode(AlxA352* me, AlxA352_RegEnum_MODE_CTRL_MODE
 {
 	Alx_Status status = Alx_Err;
 	uint32_t i = 0;
+
 	while (1)
 	{
 		i++;
@@ -817,6 +823,8 @@ static Alx_Status AlxA352_ReadBurst(AlxA352* me, uint16_t *burstData)
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
+	
+	AlxA352_Wait_us(32);
 
 	// Return
 	return Alx_Ok;
