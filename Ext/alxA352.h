@@ -77,6 +77,78 @@ extern "C" {
 #define ALX_A352_TRACE_INF(...) do{} while (false)
 #endif
 
+//******************************************************************************
+// Register Enums
+//******************************************************************************
+typedef enum
+{
+	MODE_STAT_Sampling = 0,
+	MODE_STAT_Configuration = 1,
+	MODE_STAT_Sleep = 2
+} AlxA352_RegEnum_MODE_CTRL_MODE_STAT;
+
+typedef enum
+{
+	MODE_CMD_Complete = 0,
+	MODE_CMD_GoToSampling = 1,
+	MODE_CMD_GoToConfiguration = 2,
+	MODE_CMD_GoToSleep = 3,
+} AlxA352_RegEnum_MODE_CTRL_MODE_CMD;
+
+typedef enum
+{
+	DOUT_RATE_1000_Sps = 2,
+	DOUT_RATE_500_Sps = 3,
+	DOUT_RATE_200_Sps = 4,
+	DOUT_RATE_100_Sps = 5,
+	DOUT_RATE_50_Sps = 6
+} AlxA352_RegEnum_SMPL_CTRL_DOUT_RATE;
+
+typedef enum
+{
+	FILTER_STAT_Complete = 0,
+	FILTER_STAT_Busy = 1
+} AlxA352_RegEnum_FILTER_CTRL_FILTER_STAT;
+
+typedef enum
+{
+	FILTER_SEL_Kaiser_T64_Fc83 = 1,
+	FILTER_SEL_Kaiser_T64_Fc220 = 2,
+	FILTER_SEL_Kaiser_T128_Fc36 = 3,
+	FILTER_SEL_Kaiser_T128_Fc110 = 4,
+	FILTER_SEL_Kaiser_T128_Fc350 = 5,
+	FILTER_SEL_Kaiser_T512_Fc9 = 6,
+	FILTER_SEL_Kaiser_T512_Fc16 = 7,
+	FILTER_SEL_Kaiser_T512_Fc60 = 8,
+	FILTER_SEL_Kaiser_T512_Fc210 = 9,
+	FILTER_SEL_Kaiser_T512_Fc460 = 10,
+	FILTER_SEL_User_T4 = 11,
+	FILTER_SEL_User_T64 = 12,
+	FILTER_SEL_User_T128 = 13,
+	FILTER_SEL_User_T512 = 14
+} AlxA352_RegEnum_FILTER_CTRL_FILTER_SEL;
+
+typedef enum
+{
+	MESMOD_STAT_NoiseFloorStandard = 0,
+	MESMOD_STAT_NoiseFloorReduced = 1
+} AlxA352_RegEnum_GLOB_CMD_MESMOD_STAT;
+
+typedef enum
+{
+	TAP_SIZE_2 = 1,
+	TAP_SIZE_4 = 2,
+	TAP_SIZE_8 = 3,
+	TAP_SIZE_16 = 4,
+	TAP_SIZE_32 = 5,
+	TAP_SIZE_64 = 6,
+	TAP_SIZE_128 = 7,
+	TAP_SIZE_256 = 8,
+	TAP_SIZE_512 = 9,
+	TAP_SIZE_1024 = 10,
+	TAP_SIZE_2048 = 11,
+	TAP_SIZE_4096 = 12
+} AlxA352_RegEnum_LONGFILT_TAP_TAP_SIZE;
 
 //******************************************************************************
 // Register Values Unions
