@@ -669,7 +669,7 @@ void AlxAdxl355_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxAdxl355_Init(AlxAdxl355* me);
+Alx_Status AlxAdxl355_Init(AlxAdxl355* me, float sampleRate);
 Alx_Status AlxAdxl355_DeInit(AlxAdxl355* me);
 Alx_Status AlxAdxl355_Enable(AlxAdxl355* me);
 Alx_Status AlxAdxl355_Disable(AlxAdxl355* me);

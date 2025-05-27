@@ -636,7 +636,7 @@ void AlxA352_Ctor(
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxA352_Init(AlxA352* me);
+Alx_Status AlxA352_Init(AlxA352* me, float sampleRate);
 Alx_Status AlxA352_DeInit(AlxA352* me);
 Alx_Status AlxA352_Enable(AlxA352* me);
 Alx_Status AlxA352_Disable(AlxA352* me);
