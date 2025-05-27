@@ -263,12 +263,12 @@ Alx_Status AlxA352_GetData(AlxA352* me, AccDataPoint* data, uint8_t len)
 		{
 			break;
 		}
-		else
-		{
-			char log[11];
-			sprintf(log, "A352 %04X\n", me->reg.FLAG.val.raw);
-			HAL_UART_Transmit(&alxTrace.huart, (uint8_t*)log, strlen(log), ALX_TRACE_TIMEOUT_ms);
-		}
+		//else
+		//{
+		//	char log[11];
+		//	sprintf(log, "A352 %04X\n", me->reg.FLAG.val.raw);
+		//	HAL_UART_Transmit(&alxTrace.huart, (uint8_t*)log, strlen(log), ALX_TRACE_TIMEOUT_ms);
+		//}
 	}
 
 	return status;
