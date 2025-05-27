@@ -42,6 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxAccelerometer.h"
 #include "alxSpi.h"
 
 
@@ -613,10 +614,12 @@ typedef struct
 
 	// Variables
 	AlxA352_Reg reg;
+	uint32_t burstSize;
 
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
+	bool isConfig;
 } AlxA352;
 
 
@@ -635,18 +638,14 @@ void AlxA352_Ctor(
 //******************************************************************************
 Alx_Status AlxA352_Init(AlxA352* me);
 Alx_Status AlxA352_DeInit(AlxA352* me);
-Alx_Status AlxA352_Configure(AlxA352* me);
-Alx_Status AlxA352_GetProdId(AlxA352* me);
-Alx_Status AlxA352_GetFwVersion(AlxA352 *me);
-Alx_Status AlxA352_GetSerialNum(AlxA352 *me);
-Alx_Status AlxA352_GetAccData(AlxA352* me);
-Alx_Status AlxA352_GetTempData(AlxA352* me);
-
+Alx_Status AlxA352_Enable(AlxA352* me);
+Alx_Status AlxA352_Disable(AlxA352* me);
+Alx_Status AlxA352_GetData(AlxA352* me, AccDataPoint* data, uint8_t len);
+uint8_t AlxA352_GetFifoLen(AlxA352* me);
 #endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_ADXL355_H
-
+#endif	// #ifndef ALX_A352_H
