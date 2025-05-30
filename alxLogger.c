@@ -1717,6 +1717,7 @@ static Alx_Status AlxLogger_Metadata_Load(AlxLogger* me)
 }
 static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Metadata_StoreConfig config)
 {
+	ALX_LOGGER_TRACE_INF("MD STORE START %u", config);
 	//------------------------------------------------------------------------------
 	// Local Variables
 	//------------------------------------------------------------------------------
@@ -1869,6 +1870,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 	if (status != Alx_Ok)
 	{
 		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, len=%u", status, ALX_LOGGER_METADATA_FILE_PATH, sizeof(mdTemp));
+		ALX_LOGGER_TRACE_INF("MD STORE STOP ERR 1");
 		return status;
 	}
 
@@ -1877,6 +1879,29 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 	// Set
 	//------------------------------------------------------------------------------
 	me->mdStored = mdTemp;
+	
+	char path[ALX_LOGGER_PATH_LEN_MAX] = "";
+	sprintf(path, "/%lu/%lu.csv", me->md.write.dir, me->md.write.file);
+	status = AlxFs_File_Open(me->alxFs, &file, path, "r+");
+	if (status != Alx_Ok)
+	{
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
+		return status;
+	}
+	uint32_t fileSize = 0;
+	AlxFs_File_Size(me->alxFs, &file, &fileSize);
+	if (fileSize != me->md.write.pos)
+	{
+		ALX_LOGGER_TRACE_INF("File size does not equal metadata position (%u, %u)", fileSize, me->md.write.pos);
+	}
+	// Close
+	status = AlxFs_File_Close(me->alxFs, &file);
+	if (status != Alx_Ok)
+	{
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
+		// TV: TODO - Handle close error
+		return status;
+	}
 
 
 	//------------------------------------------------------------------------------
@@ -1884,6 +1909,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 	//------------------------------------------------------------------------------
 	if(me->do_DBG_StoreReadMetadata != NULL) AlxIoPin_Reset(me->do_DBG_StoreReadMetadata);
 	if(me->do_DBG_StoreWriteMetadata != NULL) AlxIoPin_Reset(me->do_DBG_StoreWriteMetadata);
+	ALX_LOGGER_TRACE_INF("MD STORE STOP OK");
 	return Alx_Ok;
 }
 
