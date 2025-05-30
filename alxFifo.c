@@ -91,7 +91,6 @@ void AlxFifo_Flush(AlxFifo* me)
 {
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
 
-	for (uint32_t i = 0; i < me->buffLen; i++) me->buff[i] = 0;
 	me->head = 0;
 	me->tail = 0;
 	me->numOfEntries = 0;
