@@ -65,17 +65,12 @@ static void AlxAdxl355_RegStruct_SetAddr(AlxAdxl355* me);
 static void AlxAdxl355_RegStruct_SetLen(AlxAdxl355* me);
 static void AlxAdxl355_RegStruct_SetValToZero(AlxAdxl355* me);
 static void AlxAdxl355_RegStruct_SetValToDefault(AlxAdxl355* me);
+static void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me, float sampleRate);
 static Alx_Status AlxAdxl355_Reg_Read(AlxAdxl355* me, void* reg);
 static Alx_Status AlxAdxl355_Reg_Write(AlxAdxl355* me, void* reg);
 static Alx_Status AlxAdxl355_Reg_WriteAll(AlxAdxl355* me);
 static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me);
-static AlxAdxl355_Xyz_g AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20bit xyz_20bit);
-
-
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
-void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me);
+static AccDataPoint AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20bit xyz_20bit);
 
 
 //******************************************************************************
@@ -123,7 +118,7 @@ void AlxAdxl355_Ctor
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxAdxl355_Init(AlxAdxl355* me)
+Alx_Status AlxAdxl355_Init(AlxAdxl355* me, float sampleRate)
 {
 	// Assert
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
@@ -133,8 +128,16 @@ Alx_Status AlxAdxl355_Init(AlxAdxl355* me)
 	Alx_Status status = Alx_Err;
 
 	// Init SPI
-	status = AlxSpi_Init(me->spi);
-	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
+	status = AlxSpi_Reconfigure(me->spi,
+		AlxSpi_Mode_0,
+		AlxSpi_DataSize_8bit,
+		AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_7MHz5_Pclk1Apb1_120MHz,
+		true);
+	if (!me->spi->isInit)
+	{
+		status = AlxSpi_Init(me->spi);
+		if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err SpiInit"); return status; }
+	}
 
 	// Set register struct values to default
 	AlxAdxl355_RegStruct_SetValToDefault(me);
@@ -148,8 +151,8 @@ Alx_Status AlxAdxl355_Init(AlxAdxl355* me)
 	status = AlxAdxl355_TraceId(me);
 	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
-	// Set registers values - WEAK
-	AlxAdxl355_RegStruct_SetVal(me);
+	// Set registers values
+	AlxAdxl355_RegStruct_SetVal(me, sampleRate);
 
 	// Write all registers
 	status = AlxAdxl355_Reg_WriteAll(me);
@@ -242,7 +245,7 @@ Alx_Status AlxAdxl355_Disable(AlxAdxl355* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g)
+static Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AccDataPoint* data)
 {
 	// Assert
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
@@ -267,11 +270,8 @@ Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g)
 	xyz_20bit.raw[10]	= me->reg._0x08_0x10_DATA.val.ZDATA3;
 	xyz_20bit.raw[11]	= 0x00;
 
-	// Convert
-	AlxAdxl355_Xyz_g _xyz_g = AlxAdxl355_ConvertXyz(me, xyz_20bit);
-
-	// Return
-	*xyz_g = _xyz_g;
+	// Convert and return
+	*data = AlxAdxl355_ConvertXyz(me, xyz_20bit);
 	return Alx_Ok;
 }
 
@@ -283,7 +283,7 @@ Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint8_t len)
+static Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AccDataPoint* data, uint8_t len)
 {
 	// Assert
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
@@ -296,7 +296,7 @@ Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint
 	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err"); return status; }
 
 	// Loop
-	AlxAdxl355_Xyz_g _xyz_g[32] = {};
+	AccDataPoint _xyz_g[32] = {};
 	for (uint32_t i = 0; i < len; i++)
 	{
 		// Check X marker
@@ -353,7 +353,7 @@ Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint
 	}
 
 	// Return
-	memcpy(xyz_g, _xyz_g, len * sizeof(AlxAdxl355_Xyz_g));
+	memcpy(data, _xyz_g, len * sizeof(AccDataPoint));
 	return Alx_Ok;
 }
 
@@ -364,7 +364,7 @@ Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC)
+static Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC)
 {
 	// Assert
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
@@ -400,6 +400,24 @@ Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC)
 	return Alx_Ok;
 }
 
+Alx_Status AlxAdxl355_GetData(AlxAdxl355* me, AccDataPoint* data, uint8_t len)
+{
+	Alx_Status status = AlxAdxl355_GetFifoXyz_g(me, data, len);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err GetFifo"); return status; }
+	
+	float temp = 0;
+	status = AlxAdxl355_GetTemp_degC(me, &temp);
+	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err GetTemp"); return status; }
+
+	for (uint8_t i = 0; i < len; i++)
+	{
+		data[i].temp = temp;
+		//ALX_ADXL355_TRACE_INF("Get ACCL: %.2f %.2f %.2f %.2f", data[i].x, data[i].y, data[i].z, data[i].temp);
+	}
+
+	return Alx_Ok;
+}
+
 /**
   * @brief
   * @param[in,out]	me
@@ -407,7 +425,7 @@ Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxAdxl355_GetStatusReg(AlxAdxl355* me, AlxAdxl355_RegVal_0x04_Status* statusReg)
+static Alx_Status AlxAdxl355_GetStatusReg(AlxAdxl355* me, AlxAdxl355_RegVal_0x04_Status* statusReg)
 {
 	// Assert
 	ALX_ADXL355_ASSERT(me->wasCtorCalled == true);
@@ -520,6 +538,61 @@ static void AlxAdxl355_RegStruct_SetValToDefault(AlxAdxl355* me)
 	memset(me->reg._0x08_0x10_DATA	.val.raw, 0x00, sizeof(me->reg._0x08_0x10_DATA	.val.raw));
 	memset(me->reg._0x11_FIFO_DATA	.val.raw, 0x00, sizeof(me->reg._0x11_FIFO_DATA	.val.raw));
 }
+static void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me, float sampleRate)
+{
+	// 0x28 - FILTER SETTINGS REGISTER & 0x29 - FIFO SAMPLES REGISTER
+	if (sampleRate == 31.25f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_31Hz25_7Hz813Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 1 * 3;
+	}
+	else if (sampleRate == 62.5f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_62Hz5_15Hz625Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 2 * 3;
+	}
+	else if (sampleRate == 125.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_125Hz_31Hz25Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 4 * 3;
+	}
+	else if (sampleRate == 250.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_250Hz_62Hz5Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 8 * 3;
+	}
+	else if (sampleRate == 500.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_500Hz_125Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 16 * 3;
+	}
+	else if (sampleRate == 1000.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_1000Hz_250Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 32 * 3;
+	}
+	else if (sampleRate == 2000.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_2000Hz_500Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 32 * 3;
+	}
+	else if (sampleRate == 4000.f)
+	{
+		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_4000Hz_1000Hz;
+		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 32 * 3;
+	}
+	else
+	{
+		ALX_ADXL355_ASSERT(false);	// We should never get here
+	}
+
+	// 0x2A - INTERRUPT PIN (INTX) FUNCTION MAP REGISTER
+	me->reg._0x2A_INT_MAP.val.FULL_EN1 = FULL_EN1_Enable;
+
+	// 0x2B - DATA SYNCHRONIZATION REGISTER
+	me->reg._0x2B_Sync.val.EXT_CLK = EXT_CLK_Disable;
+	me->reg._0x2B_Sync.val.EXT_SYNC = EXT_SYNC_ExternalSync_InterpolationFilter;
+}
 static Alx_Status AlxAdxl355_Reg_Read(AlxAdxl355* me, void* reg)
 {
 	// Local variables
@@ -625,11 +698,17 @@ static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me)
 	ALX_ADXL355_TRACE_INF("- PARTID: 0x%02X", me->reg._0x02_PARTID.val.PARTID);
 	ALX_ADXL355_TRACE_INF("- REVID: 0x%02X", me->reg._0x03_REVID.val.REVID);
 	ALX_ADXL355_TRACE_INF("");
-
-	// Return
-	return Alx_Ok;
+	
+	if ((me->reg._0x00_DEVID_AD.val.DEVID_AD == 0xAD) &&
+		(me->reg._0x01_DEVID_MST.val.DEVID_MST == 0x1D) &&
+		(me->reg._0x02_PARTID.val.PARTID == 0xED))
+	{
+		return Alx_Ok;
+	}
+	
+	return Alx_Err;
 }
-static AlxAdxl355_Xyz_g AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20bit xyz_20bit)
+static AccDataPoint AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20bit xyz_20bit)
 {
 	// Make data right-justified
 	xyz_20bit.x_20bit = xyz_20bit.x_20bit >> 4;
@@ -676,25 +755,13 @@ static AlxAdxl355_Xyz_g AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20b
 	}
 
 	// Calculate
-	AlxAdxl355_Xyz_g xyz_g = {};
-	xyz_g.x_g = xyz_20bit.x_20bit * rangeFactor;
-	xyz_g.y_g = xyz_20bit.y_20bit * rangeFactor;
-	xyz_g.z_g = xyz_20bit.z_20bit * rangeFactor;
+	AccDataPoint xyz_g = {};
+	xyz_g.x = xyz_20bit.x_20bit * rangeFactor;
+	xyz_g.y = xyz_20bit.y_20bit * rangeFactor;
+	xyz_g.z = xyz_20bit.z_20bit * rangeFactor;
 
 	// Return
 	return xyz_g;
 }
-
-
-//******************************************************************************
-// Weak Functions
-//******************************************************************************
-ALX_WEAK void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me)
-{
-	(void)me;
-	ALX_ADXL355_TRACE_WRN("Err");
-	ALX_ADXL355_ASSERT(false);
-}
-
 
 #endif	// #if defined(ALX_C_LIB)
