@@ -716,6 +716,7 @@ void AlxParamItem_CtorStr
 	// Variables
 	me->val.str = (char*)buff;
 	strcpy((char*)buff, valDef);	// Copy default value to buffer
+	me->pendingStore = false;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -1306,63 +1307,69 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
-	// Set value to default
+	// Local variables
+	void* valDefPtr = NULL;
+
+	// Prepare
 	if (me->dataType == AlxParamItem_Uint8)
 	{
-		me->val.uint8 = me->valDef.uint8;
+		valDefPtr = &me->valDef.uint8;
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
-		me->val.uint16 = me->valDef.uint16;
+		valDefPtr = &me->valDef.uint16;
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
 	{
-		me->val.uint32 = me->valDef.uint32;
+		valDefPtr = &me->valDef.uint32;
 	}
 	else if (me->dataType == AlxParamItem_Uint64)
 	{
-		me->val.uint64 = me->valDef.uint64;
+		valDefPtr = &me->valDef.uint64;
 	}
 	else if (me->dataType == AlxParamItem_Int8)
 	{
-		me->val.int8 = me->valDef.int8;
+		valDefPtr = &me->valDef.int8;
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
-		me->val.int16 = me->valDef.int16;
+		valDefPtr = &me->valDef.int16;
 	}
 	else if (me->dataType == AlxParamItem_Int32)
 	{
-		me->val.int32 = me->valDef.int32;
+		valDefPtr = &me->valDef.int32;
 	}
 	else if (me->dataType == AlxParamItem_Int64)
 	{
-		me->val.int64 = me->valDef.int64;
+		valDefPtr = &me->valDef.int64;
 	}
 	else if (me->dataType == AlxParamItem_Float)
 	{
-		me->val._float = me->valDef._float;
+		valDefPtr = &me->valDef._float;
 	}
 	else if (me->dataType == AlxParamItem_Double)
 	{
-		me->val._double = me->valDef._double;
+		valDefPtr = &me->valDef._double;
 	}
 	else if (me->dataType == AlxParamItem_Bool)
 	{
-		me->val._bool = me->valDef._bool;
+		valDefPtr = &me->valDef._bool;
 	}
 	else if (me->dataType == AlxParamItem_Arr)
 	{
-		me->val.arr = me->valDef.arr;
+		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
 	else if (me->dataType == AlxParamItem_Str)
 	{
-		strcpy(me->val.str, me->valDef.str);
+		valDefPtr =  me->valDef.str;
 	}
 	else
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
+
+	// Set
+	ALX_PARAM_ITEM_ASSERT(AlxParamItem_SetVal(me, valDefPtr) == Alx_Ok);
 }
 
 
@@ -1785,12 +1792,21 @@ Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->paramKvStore != NULL);
 
+	// Check
+	if (me->pendingStore == false)
+	{
+		return Alx_Ok;
+	}
+
 	// Get value pointer
 	void* valPtr = AlxParamItem_GetValPtr_Private(me);
 
 	// Set Param KV Store
 	Alx_Status status = AlxParamKvStore_Set(me->paramKvStore, me->key, valPtr, me->valLen);
 	if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE_WRN("Err"); return Alx_Err; }
+
+	// Clear
+	me->pendingStore = false;
 
 	// Return
 	return Alx_Ok;
@@ -2169,30 +2185,16 @@ static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me)
 static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 {
 	//------------------------------------------------------------------------------
+	// Local Variables
 	//------------------------------------------------------------------------------
-	// Handle Bool
-	//------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------
-	if (me->dataType == AlxParamItem_Bool)
-	{
-		bool _val = *(bool*)val;
-		me->val._bool = _val;
-		return Alx_Ok;
-	}
-
-
-
-
-	//------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------
-	// Handle Uint8/16/32/64, Int8/16/32/64, Float, Double, String
-	//------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------
-
-	// Local variables
 	Alx_Status status = Alx_Err;
+	void* oldVal = NULL;
+	uint32_t oldValLen = 0;
 
-	// Check if enum
+
+	//------------------------------------------------------------------------------
+	// Handle Enum
+	//------------------------------------------------------------------------------
 	if (me->enumArr != NULL)
 	{
 		// Check if enum is on the list
@@ -2203,7 +2205,7 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 			if (me->valOutOfRangeHandle == AlxParamItem_Assert)
 			{
 				ALX_PARAM_ITEM_ASSERT(false);
-				status = Alx_Err;
+				return AlxParamItem_ErrEnum;
 			}
 
 			// Return
@@ -2211,8 +2213,39 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 		}
 	}
 
-	// Handle value out of range
-	if((me->valOutOfRangeHandle == AlxParamItem_Assert) || (me->valOutOfRangeHandle == AlxParamItem_Ignore))
+
+	//------------------------------------------------------------------------------
+	// Handle Set Old
+	//------------------------------------------------------------------------------
+
+	// Set oldValLen
+	if (me->dataType == AlxParamItem_Str)
+	{
+		oldValLen = me->buffLen;
+	}
+	else
+	{
+		oldValLen = me->valLen;
+	}
+
+	// Allocate memory
+	oldVal = calloc(oldValLen, sizeof(uint8_t));
+	if(oldVal == NULL) { ALX_PARAM_ITEM_TRACE_WRN("Err"); free(oldVal); return Alx_Err; }
+
+	// Set oldVal
+	memcpy(oldVal, AlxParamItem_GetValPtr_Private(me), me->valLen);
+
+
+	//------------------------------------------------------------------------------
+	// Handle Set New
+	//------------------------------------------------------------------------------
+	if (me->dataType == AlxParamItem_Bool)
+	{
+		bool _val = *(bool*)val;
+		me->val._bool = _val;
+		status = Alx_Ok;
+	}
+	else if((me->valOutOfRangeHandle == AlxParamItem_Assert) || (me->valOutOfRangeHandle == AlxParamItem_Ignore))
 	{
 		// Set
 		if (me->dataType == AlxParamItem_Uint8)
@@ -2422,6 +2455,26 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 		status = Alx_Err;
 	}
+
+
+	//------------------------------------------------------------------------------
+	// Handle Pending Store
+	//------------------------------------------------------------------------------
+	if (status == Alx_Ok)
+	{
+		if (memcmp(oldVal, AlxParamItem_GetValPtr_Private(me), me->valLen) != 0)
+		{
+			me->pendingStore = true;
+		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+
+	// Free memory
+	free(oldVal);
 
 	// Return
 	return status;
