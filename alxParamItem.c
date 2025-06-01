@@ -1717,6 +1717,7 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 {
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->paramKvStore != NULL);
 
 	// Local variables
 	void* buff = NULL;
@@ -1782,6 +1783,7 @@ Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 {
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->paramKvStore != NULL);
 
 	// Get value pointer
 	void* valPtr = AlxParamItem_GetValPtr_Private(me);
