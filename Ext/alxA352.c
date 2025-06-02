@@ -206,6 +206,7 @@ Alx_Status AlxA352_Enable(AlxA352* me)
 	me->reg.MODE_CTRL.val.MODE_CMD = MODE_CMD_GoToSampling;
 	Alx_Status status = AlxA352_Reg_Write(me, &me->reg.MODE_CTRL);
 	
+	AlxA352_Wait_us(100);
 	status = AlxA352_VerifyMode(me, MODE_STAT_Sampling);
 	
 	return status;
@@ -217,6 +218,7 @@ Alx_Status AlxA352_Disable(AlxA352* me)
 	me->reg.MODE_CTRL.val.MODE_CMD = MODE_CMD_GoToConfiguration;
 	Alx_Status status = AlxA352_Reg_Write(me, &me->reg.MODE_CTRL);
 	
+	AlxA352_Wait_us(100);
 	status = AlxA352_VerifyMode(me, MODE_STAT_Configuration);
 	
 	return status;
