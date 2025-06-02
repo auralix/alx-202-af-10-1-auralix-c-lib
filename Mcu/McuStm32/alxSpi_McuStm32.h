@@ -105,6 +105,7 @@ typedef enum
 	AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_5MHz_Pclk1Apb1_80MHz,
 	AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_10MHz_Pclk1Apb1_80MHz,
 	AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_20MHz_Pclk1Apb1_80MHz,
+	AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_1MHz875_Pclk1Apb1_120MHz,
 	AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_7MHz5_Pclk1Apb1_120MHz,
 	AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_15MHz_Pclk1Apb1_120MHz,
 	AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_30MHz_Pclk1Apb1_120MHz,
@@ -119,6 +120,23 @@ typedef enum
 	AlxSpi_Mode_3 = 3	// CPOL = 1, CPHA = 1 --> Clock is idle at 1, data is sampled at trailing clock edge, shifted at leading clock edge
 } AlxSpi_Mode;
 
+typedef enum
+{
+	AlxSpi_DataSize_4bit,
+	AlxSpi_DataSize_5bit,
+	AlxSpi_DataSize_6bit,
+	AlxSpi_DataSize_7bit,
+	AlxSpi_DataSize_8bit,
+	AlxSpi_DataSize_9bit,
+	AlxSpi_DataSize_10bit,
+	AlxSpi_DataSize_11bit,
+	AlxSpi_DataSize_12bit,
+	AlxSpi_DataSize_13bit,
+	AlxSpi_DataSize_14bit,
+	AlxSpi_DataSize_15bit,
+	AlxSpi_DataSize_16bit,
+} AlxSpi_DataSize;
+
 typedef struct
 {
 	// Parameters
@@ -128,6 +146,7 @@ typedef struct
 	AlxIoPin* di_MISO;
 	AlxIoPin* do_nCS;
 	AlxSpi_Mode mode;
+	AlxSpi_DataSize dataSize;
 	AlxClk* clk;
 	AlxSpi_Clk spiClk;
 	bool isWriteReadLowLevel;
@@ -155,7 +174,17 @@ void AlxSpi_Ctor
 	AlxIoPin* di_MISO,
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
+	AlxSpi_DataSize dataSize,
 	AlxClk* clk,
+	AlxSpi_Clk spiClk,
+	bool isWriteReadLowLevel
+);
+	
+Alx_Status AlxSpi_Reconfigure
+(
+	AlxSpi* me,
+	AlxSpi_Mode mode,
+	AlxSpi_DataSize dataSize,
 	AlxSpi_Clk spiClk,
 	bool isWriteReadLowLevel
 );
