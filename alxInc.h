@@ -90,6 +90,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 // ALX
 //------------------------------------------------------------------------------
+#include "alxAccelerometer.h"
 #include "alxAssert.h"
 #include "alxAudio.h"
 #include "alxAudioPlayer.h"
