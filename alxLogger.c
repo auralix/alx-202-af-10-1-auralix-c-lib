@@ -766,7 +766,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		else if (me->md.write.log == 0)	// If new file, store write only, if new dir store write & oldest
 		{
 			ALX_LOGGER_TRACE_INF("Storing metadata because of new write %s", me->md.write.file == 0 ? "dir" : "file");
-			AlxLogger_Metadata_StoreConfig config = me->md.write.file == 0 
+			AlxLogger_Metadata_StoreConfig config = me->md.write.file == 0
 				? AlxLogger_Metadata_StoreConfig_WriteOldest : AlxLogger_Metadata_StoreConfig_Write;
 			status = AlxLogger_Metadata_Store_Private(me, config);
 			if (status != Alx_Ok)
@@ -1484,7 +1484,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 	Alx_Status status = Alx_Err;
 	AlxFs_File file = {};
 	char path[ALX_LOGGER_PATH_LEN_MAX] = "";
-	char log[ALX_LOGGER_LOG_LEN_MAX] = { 0 };
+	char log[ALX_LOGGER_LOG_LEN_MAX] = "";
 	uint32_t positionNew = 0;
 	uint32_t readLenActual = 0;
 
@@ -1526,7 +1526,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 			ALX_LOGGER_TRACE_WRN("Seek before truncate failed (err: %d, path=%s, offset=%d, positionNew=%u)", status, path, me->md.write.pos, positionNew);
 			break;
 		}
-		
+
 		// Truncate
 		uint32_t fileSize = 0;
 		status = AlxFs_File_Size(me->alxFs, &file, &fileSize);
@@ -1543,15 +1543,17 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 		if (fileSize < me->md.write.pos)
 		{
 			ALX_LOGGER_TRACE_WRN("File size is smaller than indicated in metadata, this will likely lead to FS format");
+			status = Alx_Err;
+			break;
 		}
-		
+
 		status = AlxFs_File_Truncate(me->alxFs, &file, me->md.write.pos);
 		if (status != Alx_Ok)
 		{
 			ALX_LOGGER_TRACE_INF("Failed to truncate file (%u)", status);
 			break;
 		}
-		
+
 		// Verify we didn't cut a single entry
 		uint32_t delimSize = strlen(me->logDelim);
 		if (me->md.write.pos >= delimSize)
@@ -1562,7 +1564,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 				ALX_LOGGER_TRACE_WRN("Seek after truncate failed (err: %d, path=%s, offset=%d, positionNew=%u)", status, path, me->md.write.pos, positionNew);
 				break;
 			}
-			
+
 			status = AlxFs_File_Read(me->alxFs, &file, log, delimSize, &readLenActual);
 			if ((status != Alx_Ok) || (readLenActual != delimSize))
 			{
@@ -1574,7 +1576,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 				ALX_LOGGER_TRACE_INF("Delimiter not found where expected, some data will be lost");
 			}
 		}
-		
+
 		break;
 	}
 
@@ -1902,7 +1904,8 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 	// Set
 	//------------------------------------------------------------------------------
 	me->mdStored = mdTemp;
-	
+
+	#if defined(ALX_LOGGER_DEBUG)
 	char path[ALX_LOGGER_PATH_LEN_MAX] = "";
 	sprintf(path, "/%lu/%lu.csv", me->md.write.dir, me->md.write.file);
 	status = AlxFs_File_Open(me->alxFs, &file, path, "r+");
@@ -1925,7 +1928,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 		// TV: TODO - Handle close error
 		return status;
 	}
-
+	#endif
 
 	//------------------------------------------------------------------------------
 	// Return
@@ -1957,7 +1960,8 @@ static bool AlxLogger_Log_AreLogsAvailable(uint64_t idStart, uint64_t idEnd)
 static uint64_t AlxLogger_Log_GetNumOfLogs(uint64_t idStart, uint64_t idEnd)
 {
 	// Calculate
-	uint64_t numOfLogs = (idEnd >= idStart) ? (idEnd - idStart) : 0;
+	ALX_LOGGER_ASSERT(idEnd >= idStart);
+	uint64_t numOfLogs = idEnd - idStart;
 
 	// Return
 	return numOfLogs;
