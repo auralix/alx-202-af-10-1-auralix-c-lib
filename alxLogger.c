@@ -1577,6 +1577,18 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 			}
 		}
 
+		// Read pointer could be newer than write (if read metadata was stored after write).
+		// In this case they must be synchronized otherwise read.pos could point into a middle of log
+		if ((me->md.read.dir == me->md.write.dir) &&
+			(me->md.read.file == me->md.write.file) &&
+			(me->md.read.pos > me->md.write.pos))
+		{
+			me->md.read.pos = me->md.write.pos;
+			me->md.read.log = me->md.write.log;
+			me->md.read.id = me->md.write.id;
+			ALX_LOGGER_TRACE_INF("Read metadata was newer than write");
+		}
+
 		break;
 	}
 
