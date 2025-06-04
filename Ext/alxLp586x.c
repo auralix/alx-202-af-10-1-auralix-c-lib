@@ -273,6 +273,7 @@ static void AlxLp586x_RegStruct_SetValToZero(AlxLp586x* me)
 }
 static void AlxLp586x_RegStruct_SetValToDefault(AlxLp586x* me)
 {
+	
 }
 Alx_Status AlxLp586x_RegStruct_Write(AlxLp586x* me)
 {
