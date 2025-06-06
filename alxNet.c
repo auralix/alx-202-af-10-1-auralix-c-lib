@@ -705,7 +705,7 @@ void AlxNet_Ctor
 #define MODEM_CONNECTION_MONITORING_TIMEOUT 10000
 #endif
 #define MODEM_LOW_LEVEL_ERR_THRESHOLD 3
-#define MODEM_POWER_CYCLE_DELAY 1000
+#define MODEM_POWER_CYCLE_DELAY 2000
 
 typedef enum
 {
@@ -762,6 +762,7 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 			}
 			low_level_err = 0;
 			start_time = AlxTick_Get_ms(&alxTick);
+			me->isNetConnected = false;
 			connection_state = State_ModemOff;
 			break;
 		}
@@ -782,6 +783,10 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 				{
 					connection_state = State_ModemGoOff;
 				}
+			}
+			else
+			{
+				AlxOsDelay_ms(&alxOsDelay, MODEM_POWER_CYCLE_DELAY / 2); // ensure yielding
 			}
 			break;
 		}
@@ -1250,7 +1255,7 @@ Alx_Status AlxNet_Restart(AlxNet* me)
 	// Return
 	return Alx_Ok;
 }
-bool AlxNet_IsConnected(AlxNet* me)
+void AlxNet_Handle(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
@@ -1278,6 +1283,12 @@ bool AlxNet_IsConnected(AlxNet* me)
 		AlxOsMutex_Unlock(&me->alxMutex);
 	}
 #endif
+}
+
+bool AlxNet_IsConnected(AlxNet* me)
+{
+	// Assert
+	ALX_NET_ASSERT(me->wasCtorCalled == true);
 
 	// Return
 	return me->isNetConnected;
