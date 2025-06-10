@@ -41,6 +41,8 @@
 #include "dns.h"
 #endif
 
+extern void CellularDevice_PowerOff(void);
+
 
 //******************************************************************************
 // Module Guard
@@ -756,6 +758,12 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 	{
 	case State_ModemGoOff:
 		{
+			if (me->cellular.handle)
+			{
+				Cellular_Pdown(me->cellular.handle);
+				AlxOsDelay_ms(&alxOsDelay, 3000);
+			}
+
 			if (Cellular_Cleanup(me->cellular.handle) == CELLULAR_SUCCESS)
 			{
 				me->cellular.handle = NULL;
@@ -797,8 +805,9 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 				if (Cellular_GetSimCardStatus(me->cellular.handle, &me->cellular.simStatus) != CELLULAR_SUCCESS)
 				{
 					ALX_NET_TRACE_INF(("Cellular SIM failure"));
-					//connection_state = State_ModemGoOff;
-					//break;
+					CellularDevice_PowerOff();
+					connection_state = State_ModemGoOff;
+					break;
 				}
 
 				if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_SIM_TIMEOUT)
