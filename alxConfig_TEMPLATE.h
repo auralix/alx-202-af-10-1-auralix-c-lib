@@ -154,6 +154,9 @@ extern "C" {
 // HW - SAM
 //#define ALX_SAM
 
+// HW - RA
+//#define ALX_RA
+
 
 //------------------------------------------------------------------------------
 // ALX - MCU - IO Pin IRQ
