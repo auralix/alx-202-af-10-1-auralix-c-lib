@@ -44,12 +44,13 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxAccelerometer.h"
 #include "alxSpi.h"
+#include "alxOsDelay.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_STM32L4)
 
 
 //******************************************************************************
@@ -76,6 +77,7 @@ extern "C" {
 #define ALX_A352_TRACE_WRN(...) do{} while (false)
 #define ALX_A352_TRACE_INF(...) do{} while (false)
 #endif
+
 
 //******************************************************************************
 // Register Enums
@@ -714,7 +716,9 @@ Alx_Status AlxA352_Enable(AlxA352* me);
 Alx_Status AlxA352_Disable(AlxA352* me);
 Alx_Status AlxA352_GetData(AlxA352* me, AccDataPoint* data, uint8_t len);
 uint8_t AlxA352_GetFifoLen(AlxA352* me);
-#endif	// #if defined(ALX_C_LIB)
+
+
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32L4)
 
 #ifdef __cplusplus
 }

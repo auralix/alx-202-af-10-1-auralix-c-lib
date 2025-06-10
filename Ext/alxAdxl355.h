@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_STM32L4)
 
 
 //******************************************************************************
@@ -677,7 +677,7 @@ Alx_Status AlxAdxl355_GetData(AlxAdxl355* me, AccDataPoint* data, uint8_t len);
 uint8_t AlxAdxl355_GetFifoLen(AlxAdxl355* me);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32L4)
 
 #ifdef __cplusplus
 }

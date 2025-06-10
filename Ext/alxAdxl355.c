@@ -34,7 +34,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_STM32L4)
 
 
 //******************************************************************************
@@ -404,7 +404,7 @@ Alx_Status AlxAdxl355_GetData(AlxAdxl355* me, AccDataPoint* data, uint8_t len)
 {
 	Alx_Status status = AlxAdxl355_GetFifoXyz_g(me, data, len);
 	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err GetFifo"); return status; }
-	
+
 	float temp = 0;
 	status = AlxAdxl355_GetTemp_degC(me, &temp);
 	if (status != Alx_Ok) { ALX_ADXL355_TRACE_WRN("Err GetTemp"); return status; }
@@ -698,14 +698,14 @@ static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me)
 	ALX_ADXL355_TRACE_INF("- PARTID: 0x%02X", me->reg._0x02_PARTID.val.PARTID);
 	ALX_ADXL355_TRACE_INF("- REVID: 0x%02X", me->reg._0x03_REVID.val.REVID);
 	ALX_ADXL355_TRACE_INF("");
-	
+
 	if ((me->reg._0x00_DEVID_AD.val.DEVID_AD == 0xAD) &&
 		(me->reg._0x01_DEVID_MST.val.DEVID_MST == 0x1D) &&
 		(me->reg._0x02_PARTID.val.PARTID == 0xED))
 	{
 		return Alx_Ok;
 	}
-	
+
 	return Alx_Err;
 }
 static AccDataPoint AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20bit xyz_20bit)
@@ -764,4 +764,4 @@ static AccDataPoint AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20bit x
 	return xyz_g;
 }
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32L4)
