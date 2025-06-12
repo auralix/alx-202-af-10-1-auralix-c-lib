@@ -46,6 +46,7 @@
   * @param[in,out]	me
   * @param[in]		func
   * @param[in]		name
+  * @param[in]		stackBuff
   * @param[in]		stackLen_byte
   * @param[in]		param
   * @param[in]		priority
@@ -55,27 +56,36 @@ void AlxOsThread_Ctor
 	AlxOsThread* me,
 	void (*func)(void*),
 	const char* name,
+	#if defined(ALX_ZEPHYR)
+	k_thread_stack_t* stackBuff,
+	#endif
 	uint32_t stackLen_byte,
 	void* param,
-	uint32_t priority
+	int32_t priority
 )
 {
 	// Parameters
 	me->func = func;
 	me->name = name;
+	#if defined(ALX_ZEPHYR)
+	me->stackBuff = stackBuff;
+	#endif
 	me->stackLen_byte = stackLen_byte;
 	me->param = param;
 	me->priority = priority;
 
 	// Variables
 	#if defined(ALX_FREE_RTOS)
-	me->stackLen_word = stackLen_byte / 4;	// TV: FreeRTOS stack is mesured in words, 1 word = 4 bytes
 	me->taskHandle = NULL;
+	me->stackLen_word = stackLen_byte / sizeof(StackType_t);	// TV: FreeRTOS stack is mesured in words, 1 word = sizeof(StackType_t) bytes
+	#endif
+	#if defined(ALX_ZEPHYR)
+	memset(&me->threadHandle, 0, sizeof(me->threadHandle));
 	#endif
 
 	// Info
-	me->wasThreadStarted = false;
 	me->wasCtorCalled = true;
+	me->wasStarted = false;
 }
 
 
@@ -92,11 +102,12 @@ void AlxOsThread_Ctor
 Alx_Status AlxOsThread_Start(AlxOsThread* me)
 {
 	// Assert
-	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == false);
 	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+	ALX_OS_THREAD_ASSERT(me->wasStarted == false);
 
 	// Start
 	#if defined(ALX_FREE_RTOS)
+	ALX_OS_THREAD_ASSERT(0 <= me->priority && me->priority < configMAX_PRIORITIES);
 	BaseType_t status = xTaskCreate
 	(
 		(TaskFunction_t)me->func,
@@ -106,11 +117,38 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 		(UBaseType_t)me->priority,
 		&me->taskHandle
 	);
-	if (status != pdPASS) { ALX_OS_THREAD_TRACE("Err"); return Alx_Err; }
+	if (status != pdPASS)
+	{
+		ALX_OS_THREAD_TRACE_ERR("FAIL: xTaskCreate() status %ld name %s stackLen_word %lu priority %ld", status, me->name, me->stackLen_word, me->priority);
+		return Alx_Err;
+	}
+	#endif
+	#if defined(ALX_ZEPHYR)
+	k_tid_t threadId = k_thread_create
+	(
+		&me->threadHandle,			// new_thread
+		me->stackBuff,				// stack
+		me->stackLen_byte,			// stack_size
+		(k_thread_entry_t)me->func,	// entry
+		me->param,					// p1
+		NULL,						// p2
+		NULL,						// p3
+		me->priority,				// prio
+		0,							// options
+		K_NO_WAIT					// delay
+	);
+	#if defined(CONFIG_THREAD_NAME)
+	int32_t status = k_thread_name_set(threadId, me->name);
+	if (status != 0)
+	{
+		ALX_OS_THREAD_TRACE_ERR("FAIL: k_thread_name_set() status %ld name %s stackLen_byte %lu priority %ld", status, me->name, me->stackLen_byte, me->priority);
+		return Alx_Err;
+	}
+	#endif
 	#endif
 
-	// Set wasThreadStarted
-	me->wasThreadStarted = true;
+	// Set
+	me->wasStarted = true;
 
 	// Return
 	return Alx_Ok;
@@ -123,12 +161,15 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 void AlxOsThread_Yield(AlxOsThread* me)
 {
 	// Assert
-	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == true);
 	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+	ALX_OS_THREAD_ASSERT(me->wasStarted == true);
 
 	// Yield
 	#if defined(ALX_FREE_RTOS)
 	taskYIELD();
+	#endif
+	#if defined(ALX_ZEPHYR)
+	k_yield();
 	#endif
 }
 
@@ -139,12 +180,16 @@ void AlxOsThread_Yield(AlxOsThread* me)
 void AlxOsThread_Terminate(AlxOsThread* me)
 {
 	// Assert
-	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == true);
 	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+	ALX_OS_THREAD_ASSERT(me->wasStarted == true);
 
 	// Terminate
 	#if defined(ALX_FREE_RTOS)
 	vTaskDelete(me->taskHandle);
+	#endif
+	#if defined(ALX_ZEPHYR)
+	// TODO
+	ALX_OS_THREAD_ASSERT(false);
 	#endif
 }
 
