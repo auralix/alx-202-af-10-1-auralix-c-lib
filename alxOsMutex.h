@@ -84,6 +84,9 @@ typedef struct
 	StaticSemaphore_t semaphore;
 	SemaphoreHandle_t semaphoreHandle;
 	#endif
+	#if defined(ALX_ZEPHYR)
+	struct k_mutex mutex;
+	#endif
 
 	// Info
 	bool wasCtorCalled;

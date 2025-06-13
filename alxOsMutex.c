@@ -55,6 +55,9 @@ void AlxOsMutex_Ctor
 	me->semaphoreHandle = xSemaphoreCreateBinaryStatic(&me->semaphore);
 	xSemaphoreGive(me->semaphoreHandle);
 	#endif
+	#if defined(ALX_ZEPHYR)
+	k_mutex_init(&me->mutex);
+	#endif
 
 	// Info
 	me->wasCtorCalled = true;
@@ -71,9 +74,11 @@ void AlxOsMutex_Ctor
   */
 void AlxOsMutex_Lock(AlxOsMutex* me)
 {
-	// Lock Mutex
 	#if defined(ALX_FREE_RTOS)
 	xSemaphoreTake(me->semaphoreHandle, portMAX_DELAY);
+	#endif
+	#if defined(ALX_ZEPHYR)
+	k_mutex_lock(&me->mutex, K_FOREVER);
 	#endif
 }
 
@@ -83,9 +88,11 @@ void AlxOsMutex_Lock(AlxOsMutex* me)
   */
 void AlxOsMutex_Unlock(AlxOsMutex* me)
 {
-	// Unlock Mutex
 	#if defined(ALX_FREE_RTOS)
 	xSemaphoreGive(me->semaphoreHandle);
+	#endif
+	#if defined(ALX_ZEPHYR)
+	k_mutex_unlock(&me->mutex);
 	#endif
 }
 
@@ -97,9 +104,16 @@ void AlxOsMutex_Unlock(AlxOsMutex* me)
   */
 bool AlxOsMutex_IsUnlocked(AlxOsMutex* me)
 {
-	// Get Status
 	#if defined(ALX_FREE_RTOS)
 	return uxSemaphoreGetCount(me->semaphoreHandle);
+	#endif
+	#if defined(ALX_ZEPHYR)
+	if (k_mutex_lock(&me->mutex, K_NO_WAIT) == 0)
+	{
+		k_mutex_unlock(&me->mutex);
+		return true;
+	}
+	return false;
 	#endif
 }
 
