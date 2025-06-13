@@ -253,6 +253,7 @@ extern "C" {
 #include "alxGlobal_McuSam.h"
 
 #elif defined(ALX_RA)
+#include "hal_data.h"
 #include "cmsis_gcc.h"
 
 #endif
