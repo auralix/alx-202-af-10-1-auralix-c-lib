@@ -419,16 +419,16 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 		struct spi_buf writeBuff = {};
 		writeBuff.buf = writeData;
 		writeBuff.len = len;
-		struct spi_buf readBuff = {};
-		writeBuff.buf = readData;
-		writeBuff.len = len;
-
 		struct spi_buf_set writeBuffSet = {};
 		writeBuffSet.buffers = &writeBuff;
 		writeBuffSet.count = 1;
+
+		struct spi_buf readBuff = {};
+		readBuff.buf = readData;
+		readBuff.len = len;
 		struct spi_buf_set readBuffSet = {};
-		writeBuffSet.buffers = &readBuff;
-		writeBuffSet.count = 1;
+		readBuffSet.buffers = &readBuff;
+		readBuffSet.count = 1;
 
 		// Write/Read
 		int32_t status = spi_transceive(me->device, &me->config, &writeBuffSet, &readBuffSet);
