@@ -199,6 +199,7 @@ extern "C" {
 #include "zephyr/drivers/i2c.h"
 #include "zephyr/drivers/adc.h"
 #include "zephyr/drivers/uart.h"
+#include "zephyr/drivers/spi.h"
 #endif
 
 
