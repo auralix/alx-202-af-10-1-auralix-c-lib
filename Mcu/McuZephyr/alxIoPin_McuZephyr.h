@@ -59,10 +59,13 @@ typedef struct
 	// Parameters
 	const char* deviceName;
 	gpio_pin_t pin;
-	gpio_flags_t flags;
+	gpio_flags_t gpioFlags;
+	gpio_flags_t irqFlags;
+	gpio_callback_handler_t irqCb;
 
 	// Variables
 	const struct device* device;
+	struct gpio_callback irqStruct;
 
 	// Info
 	bool wasCtorCalled;
@@ -78,7 +81,9 @@ void AlxIoPin_Ctor
 	AlxIoPin* me,
 	const char* deviceName,
 	gpio_pin_t pin,
-	gpio_flags_t flags
+	gpio_flags_t gpioFlags,
+	gpio_flags_t irqFlags,
+	gpio_callback_handler_t irqCb
 );
 
 

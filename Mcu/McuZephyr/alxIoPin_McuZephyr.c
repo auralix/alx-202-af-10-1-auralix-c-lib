@@ -47,23 +47,30 @@
   * @param[in,out]	me
   * @param[in]		deviceName
   * @param[in]		pin
-  * @param[in]		flags
+  * @param[in]		gpioFlags
+  * @param[in]		irqFlags
+  * @param[in]		irqCb
   */
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
 	const char* deviceName,
 	gpio_pin_t pin,
-	gpio_flags_t flags
+	gpio_flags_t gpioFlags,
+	gpio_flags_t irqFlags,
+	gpio_callback_handler_t irqCb
 )
 {
 	// Parameters
 	me->deviceName = deviceName;
 	me->pin = pin;
-	me->flags = flags;
+	me->gpioFlags = gpioFlags;
+	me->irqFlags = irqFlags;
+	me->irqCb = irqCb;
 
 	// Variables
 	me->device = NULL;
+	memset(&me->irqStruct, 0, sizeof(me->irqStruct));
 
 	// Info
 	me->wasCtorCalled = true;
@@ -89,12 +96,25 @@ void AlxIoPin_Init(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == false);
 	ALX_IO_PIN_ASSERT(me->device == NULL);
 
-	// Init
+	// Init GPIO
 	me->device = device_get_binding(me->deviceName);
 	ALX_IO_PIN_ASSERT(me->device != NULL);
 
-	// Configure
-	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, me->flags) == 0);
+	// Configure GPIO
+	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, me->gpioFlags) == 0);
+
+	// Init IRQ
+	if (me->irqFlags != 0 && me->irqCb != NULL)
+	{
+		// Configure IRQ
+		ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, me->irqFlags) == 0);
+
+		// Init IRQ Callback
+		gpio_init_callback(&me->irqStruct, me->irqCb, BIT(me->pin));
+
+		// Add IRQ Callback - Enables IRQ
+		ALX_IO_PIN_ASSERT(gpio_add_callback(me->device, &me->irqStruct) == 0);
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -117,10 +137,23 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->device != NULL);
 
-	// DeConfigure
+	// DeInit IRQ
+	if (me->irqFlags != 0 && me->irqCb != NULL)
+	{
+		// DeConfigure IRQ
+		ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, GPIO_INT_DISABLE) == 0);
+
+		// Remove IRQ Callback
+		ALX_IO_PIN_ASSERT(gpio_remove_callback(me->device, &me->irqStruct) == 0);
+
+		// Clear irqStruct
+		memset(&me->irqStruct, 0, sizeof(me->irqStruct));
+	}
+
+	// DeConfigure GPIO
 	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, GPIO_DISCONNECTED) == 0);
 
-	// DeInit
+	// DeInit GPIO
 	me->device = NULL;
 
 	// Clear isInit
