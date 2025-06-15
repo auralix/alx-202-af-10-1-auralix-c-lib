@@ -94,8 +94,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->device != NULL);
 
 	// Configure
-	int32_t status = gpio_pin_configure(me->device, me->pin, me->flags);
-	ALX_IO_PIN_ASSERT(status == 0);
+	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, me->flags) == 0);
 
 	// Set isInit
 	me->isInit = true;
@@ -119,8 +118,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->device != NULL);
 
 	// DeConfigure
-	int32_t status = gpio_pin_configure(me->device, me->pin, GPIO_DISCONNECTED);
-	ALX_IO_PIN_ASSERT(status == 0);
+	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, GPIO_DISCONNECTED) == 0);
 
 	// DeInit
 	me->device = NULL;
@@ -173,8 +171,7 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Write
-	int32_t status = gpio_pin_set(me->device, me->pin, val);
-	ALX_IO_PIN_ASSERT(status == 0);
+	ALX_IO_PIN_ASSERT(gpio_pin_set(me->device, me->pin, val) == 0);
 
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
@@ -194,8 +191,7 @@ void AlxIoPin_Set(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Set
-	int32_t status = gpio_pin_set(me->device, me->pin, 1);
-	ALX_IO_PIN_ASSERT(status == 0);
+	ALX_IO_PIN_ASSERT(gpio_pin_set(me->device, me->pin, 1) == 0);
 
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
@@ -215,8 +211,7 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Reset
-	int32_t status = gpio_pin_set(me->device, me->pin, 0);
-	ALX_IO_PIN_ASSERT(status == 0);
+	ALX_IO_PIN_ASSERT(gpio_pin_set(me->device, me->pin, 0) == 0);
 
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
@@ -236,8 +231,7 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 
 	// Toggle
-	int32_t status = gpio_pin_toggle(me->device, me->pin);
-	ALX_IO_PIN_ASSERT(status == 0);
+	ALX_IO_PIN_ASSERT(gpio_pin_toggle(me->device, me->pin) == 0);
 
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
@@ -271,8 +265,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 
 	// Config PullUp
-	int32_t status = gpio_pin_configure(me->device, me->pin, GPIO_PULL_UP);
-	ALX_IO_PIN_ASSERT(status == 0);
+	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, GPIO_PULL_UP) == 0);
 
 	// Wait
 	AlxDelay_ms(1);
@@ -286,8 +279,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 
 	// Config PullDown
-	status = gpio_pin_configure(me->device, me->pin, GPIO_PULL_DOWN);
-	ALX_IO_PIN_ASSERT(status == 0);
+	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, GPIO_PULL_DOWN) == 0);
 
 	// Wait
 	AlxDelay_ms(1);
