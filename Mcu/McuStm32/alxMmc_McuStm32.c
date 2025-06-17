@@ -274,6 +274,10 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	ALX_MMC_ASSERT(me->wasCtorCalled == true);
 	ALX_MMC_ASSERT(me->isInit == true);
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
+	if (len > me->dmaReadWriteBuffAlign4Len)
+	{
+		ALX_MMC_TRACE_FTL("FAIL: CheckLen() len %lu dmaReadWriteBuffAlign4Len %lu", len, me->dmaReadWriteBuffAlign4Len);
+	}
 	ALX_MMC_ASSERT(len <= me->dmaReadWriteBuffAlign4Len);
 	ALX_MMC_ASSERT(((uintptr_t)me->dmaReadWriteBuffAlign4 & 0x3) == 0);	// Check data address 4-byte alignment, requred for DMA
 

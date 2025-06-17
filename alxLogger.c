@@ -755,6 +755,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		//------------------------------------------------------------------------------
 		if (wereOldestReadLogsDiscarded)	// If oldest read logs were discared, store read & write & oldest
 		{
+			ALX_LOGGER_TRACE_INF("Storing metadata because oldest logs were discarded");
 			status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
 			if (status != Alx_Ok)
 			{
@@ -762,18 +763,12 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 				return status;
 			}
 		}
-		else if (me->md.write.file == 0)	// If new dir, store write & oldest
+		else if (me->md.write.log == 0)	// If new file, store write only, if new dir store write & oldest
 		{
-			status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_WriteOldest);
-			if (status != Alx_Ok)
-			{
-				ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
-				return status;
-			}
-		}
-		else if (me->md.write.log == 0)	// If new file, store write only
-		{
-			status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_Write);
+			ALX_LOGGER_TRACE_INF("Storing metadata because of new write %s", me->md.write.file == 0 ? "dir" : "file");
+			AlxLogger_Metadata_StoreConfig config = me->md.write.file == 0
+				? AlxLogger_Metadata_StoreConfig_WriteOldest : AlxLogger_Metadata_StoreConfig_Write;
+			status = AlxLogger_Metadata_Store_Private(me, config);
 			if (status != Alx_Ok)
 			{
 				ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
@@ -886,12 +881,13 @@ Alx_Status AlxLogger_Log_DiscardLogsToProcess(AlxLogger* me)
 	ALX_LOGGER_ASSERT(me->isInit == true);
 
 	// Set metadata current read IDs to write IDs (discard logs-to-process)
-	me->md = me->mdStored;
 	me->md.read.id = me->mdStored.write.id;
 	me->md.read.pos = me->mdStored.write.pos;
 	me->md.read.log = me->mdStored.write.log;
 	me->md.read.file = me->mdStored.write.file;
 	me->md.read.dir = me->mdStored.write.dir;
+
+	ALX_LOGGER_TRACE_INF("Discarding logs by moving read pointer to write pointer location");
 
 	// Return
 	return AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
@@ -1521,158 +1517,81 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 		return status;
 	}
 
-	// Seek
-	status = AlxFs_File_Seek(me->alxFs, &file, me->md.write.pos, AlxFs_File_Seek_Origin_Set, &positionNew);
-	if (status != Alx_Ok)
-	{
-		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, offset=%d, positionNew=%u", status, path, me->md.write.pos, positionNew);
-		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
-		if (statusClose != Alx_Ok)
-		{
-			ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", statusClose, path);
-			// TV: TODO - Handle close error
-		}
-		return status;
-	}
-
-	// Read logs until end-of-file or last corrupted log
 	while (true)
 	{
-		// Read
-		status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLenActual);
-		if ((status == AlxFs_ErrNoDelim) && (readLenActual == 0))
+		// Seek
+		status = AlxFs_File_Seek(me->alxFs, &file, me->md.write.pos, AlxFs_File_Seek_Origin_Set, &positionNew);
+		if (status != Alx_Ok)
 		{
-			// Trace
-			ALX_LOGGER_TRACE_INF("Reached end of file, all logs are OK");
-
-			// Break
+			ALX_LOGGER_TRACE_WRN("Seek before truncate failed (err: %d, path=%s, offset=%d, positionNew=%u)", status, path, me->md.write.pos, positionNew);
 			break;
 		}
-		else if (status == AlxFs_ErrNoDelim)
+
+		// Truncate
+		uint32_t fileSize = 0;
+		status = AlxFs_File_Size(me->alxFs, &file, &fileSize);
+		if (status != Alx_Ok)
 		{
-			// Truncate, with this we eliminate last corrupted log
-			status = AlxFs_File_Truncate(me->alxFs, &file, me->md.write.pos);
+			ALX_LOGGER_TRACE_INF("Failed to get file size (%u)", status);
+			break;
+		}
+		ALX_LOGGER_TRACE_INF("File size: %u, write.pos: %u", fileSize, me->md.write.pos);
+		if (fileSize > me->md.write.pos)
+		{
+			ALX_LOGGER_TRACE_INF("File size is larger than indicated in metadata, some data will be lost");
+		}
+		if (fileSize < me->md.write.pos)
+		{
+			ALX_LOGGER_TRACE_WRN("File size is smaller than indicated in metadata, this will likely lead to FS format");
+			status = Alx_Err;
+			break;
+		}
+
+		status = AlxFs_File_Truncate(me->alxFs, &file, me->md.write.pos);
+		if (status != Alx_Ok)
+		{
+			ALX_LOGGER_TRACE_INF("Failed to truncate file (%u)", status);
+			break;
+		}
+
+		// Verify we didn't cut a single entry
+		uint32_t delimSize = strlen(me->logDelim);
+		if (me->md.write.pos >= delimSize)
+		{
+			status = AlxFs_File_Seek(me->alxFs, &file, (-1) * delimSize, AlxFs_File_Seek_Origin_Cur, &positionNew);
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, size=%u", status, path, me->md.write.pos);
-				Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
-				if (statusClose != Alx_Ok)
-				{
-					ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", statusClose, path);
-					// TV: TODO - Handle close error
-				}
-				return status;
+				ALX_LOGGER_TRACE_WRN("Seek after truncate failed (err: %d, path=%s, offset=%d, positionNew=%u)", status, path, me->md.write.pos, positionNew);
+				break;
 			}
 
-			// Trace
-			ALX_LOGGER_TRACE_INF("Found and eliminated last corrupted log - %s", log);
-
-			// Break
-			break;
-		}
-		else if (status != Alx_Ok)
-		{
-			ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
-			Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
-			if (statusClose != Alx_Ok)
+			status = AlxFs_File_Read(me->alxFs, &file, log, delimSize, &readLenActual);
+			if ((status != Alx_Ok) || (readLenActual != delimSize))
 			{
-				ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", statusClose, path);
-				// TV: TODO - Handle close error
+				ALX_LOGGER_TRACE_WRN("Failed to read delimiter (err: %u, len: %u)", status, readLenActual);
+				break;
 			}
-			return status;
-		}
-
-		// Trace
-		if (me->md.write.log % 1000 == 0)
-		{
-			ALX_LOGGER_TRACE_FORMAT("[%lu] %s", me->md.write.log, log);
-		}
-
-
-		//------------------------------------------------------------------------------
-		// Handle IDs & Addresses
-		//------------------------------------------------------------------------------
-
-		// write.id
-		me->md.write.id++;
-
-		// write.pos
-		me->md.write.pos = me->md.write.pos + readLenActual;
-
-		// write.log
-		me->md.write.log++;
-		if (me->md.write.log >= me->numOfLogsPerFile)
-		{
-			// Reset
-			me->md.write.pos = 0;
-			me->md.write.log = 0;
-
-			// write.file
-			me->md.write.file++;
-			if (me->md.write.file >= me->numOfFilesPerDir)
+			if (strcmp(me->logDelim, log))
 			{
-				// Reset
-				me->md.write.file = 0;
-
-				// write.dir
-				me->md.write.dir++;
-				if (me->md.write.dir >= me->numOfDir)
-				{
-					// Reset
-					me->md.write.dir = 0;
-				}
-
-				// If needed, discard oldest logs by incrementing read.dir
-				if (me->md.write.dir == me->md.read.dir)
-				{
-					// Increment read.id to next nearest multiple
-					uint64_t remainder = me->md.read.id % me->numOfLogsPerDirTotal;
-					uint64_t delta = me->numOfLogsPerDirTotal - remainder;
-					me->md.read.id = me->md.read.id + delta;
-
-					// Reset
-					me->md.read.pos = 0;
-					me->md.read.log = 0;
-					me->md.read.file = 0;
-
-					// read.dir
-					me->md.read.dir++;
-					if (me->md.read.dir >= me->numOfDir)
-					{
-						// Reset
-						me->md.read.dir = 0;
-					}
-				}
-
-				// oldest.id - Only start handling after inital wrap around
-				if (me->md.write.id >= me->numOfLogsTotal)
-				{
-					// Increment oldest.id by number of logs per directory
-					me->md.oldest.id = me->md.oldest.id + me->numOfLogsPerDirTotal;
-
-					// Reset
-					me->md.oldest.pos = 0;
-					me->md.oldest.log = 0;
-					me->md.oldest.file = 0;
-
-					// oldest.dir
-					me->md.oldest.dir++;
-					if (me->md.oldest.dir >= me->numOfDir)
-					{
-						// Reset
-						me->md.oldest.dir = 0;
-					}
-				}
-
-				// Clear next write dir
-				status = AlxLogger_ClearWriteDir(me);
-				if (status != Alx_Ok)
-				{
-					ALX_LOGGER_TRACE_WRN("FAIL: AlxLogger_ClearWriteDir() status %ld", status);
-					return status;
-				}
+				ALX_LOGGER_TRACE_INF("Delimiter not found where expected, some data will be lost");
 			}
 		}
+
+		// Read pointer could be newer than write (if read metadata was stored after write).
+		// In this case they must be synchronized otherwise read.pos could point into a middle of log
+		if ((me->md.read.dir == me->md.write.dir) &&
+			(me->md.read.file == me->md.write.file) &&
+			((me->md.read.pos > me->md.write.pos) ||
+			 (me->md.read.log > me->md.write.log) ||
+			 (me->md.read.id > me->md.write.id)))
+		{
+			me->md.read.pos = me->md.write.pos;
+			me->md.read.log = me->md.write.log;
+			me->md.read.id = me->md.write.id;
+			ALX_LOGGER_TRACE_INF("Read metadata was newer than write");
+		}
+
+		break;
 	}
 
 	// Close
@@ -1683,7 +1602,6 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 		// TV: TODO - Handle close error
 		return status;
 	}
-
 
 	//------------------------------------------------------------------------------
 	// Trace
@@ -2001,6 +1919,30 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 	//------------------------------------------------------------------------------
 	me->mdStored = mdTemp;
 
+	#if defined(ALX_LOGGER_DEBUG)
+	char path[ALX_LOGGER_PATH_LEN_MAX] = "";
+	sprintf(path, "/%lu/%lu.csv", me->md.write.dir, me->md.write.file);
+	status = AlxFs_File_Open(me->alxFs, &file, path, "r+");
+	if (status != Alx_Ok)
+	{
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
+		return status;
+	}
+	uint32_t fileSize = 0;
+	AlxFs_File_Size(me->alxFs, &file, &fileSize);
+	if (fileSize != me->md.write.pos)
+	{
+		ALX_LOGGER_TRACE_INF("File size does not equal metadata position (%u, %u)", fileSize, me->md.write.pos);
+	}
+	// Close
+	status = AlxFs_File_Close(me->alxFs, &file);
+	if (status != Alx_Ok)
+	{
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
+		// TV: TODO - Handle close error
+		return status;
+	}
+	#endif
 
 	//------------------------------------------------------------------------------
 	// Return

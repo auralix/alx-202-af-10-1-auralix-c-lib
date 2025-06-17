@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_STM32L4)
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -85,10 +85,15 @@ Alx_Status AlxRst_Init(AlxRst* me)
 	me->rr.rstPin = (me->csr & RCC_CSR_PINRSTF) != 0;
 	me->rr.wwdg = (me->csr & RCC_CSR_WWDGRSTF) != 0;
 	me->rr.iwdg = (me->csr & RCC_CSR_IWDGRSTF) != 0;
-	me->rr.firewall = (me->csr & RCC_CSR_FWRSTF) != 0;
-	me->rr.lowPowerSecurity = (me->csr & RCC_CSR_LPWRRSTF) != 0;
-	me->rr.optioByteLoader = (me->csr & RCC_CSR_OBLRSTF) != 0;
+	me->rr.lowPowerMgmt = (me->csr & RCC_CSR_LPWRRSTF) != 0;
 	me->rr.porOrBor = (me->csr & RCC_CSR_BORRSTF) != 0;
+	#if defined(ALX_STM32F7)
+	me->rr.por = (me->csr & RCC_CSR_PORRSTF) != 0;
+	#endif
+	#if defined(ALX_STM32L4)
+	me->rr.firewall = (me->csr & RCC_CSR_FWRSTF) != 0;
+	me->rr.optionByteLoader = (me->csr & RCC_CSR_OBLRSTF) != 0;
+	#endif
 
 	// Set isInit
 	me->isInit = true;
@@ -113,11 +118,16 @@ void AlxRst_Trace(AlxRst* me)
 	ALX_RST_TRACE_INF("- nRST Pin: %u", me->rr.rstPin);
 	ALX_RST_TRACE_INF("- Window Watchdog (WWDG): %u", me->rr.wwdg);
 	ALX_RST_TRACE_INF("- Independent Watchdog (IWDG): %u", me->rr.iwdg);
-	ALX_RST_TRACE_INF("- Firewall: %u", me->rr.firewall);
-	ALX_RST_TRACE_INF("- Low-power Security: %u", me->rr.lowPowerSecurity);
-	ALX_RST_TRACE_INF("- Option Byte Loader: %u", me->rr.optioByteLoader);
+	ALX_RST_TRACE_INF("- Low-power Management: %u", me->rr.lowPowerMgmt);
 	ALX_RST_TRACE_INF("- Power-on (POR) / Brown-out (BOR): %u", me->rr.porOrBor);
+	#if defined(ALX_STM32F7)
+	ALX_RST_TRACE_INF("- Power-on (POR): %u", me->rr.por);
+	#endif
+	#if defined(ALX_STM32L4)
+	ALX_RST_TRACE_INF("- Firewall: %u", me->rr.firewall);
+	ALX_RST_TRACE_INF("- Option Byte Loader: %u", me->rr.optionByteLoader);
+	#endif
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32L4)
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
