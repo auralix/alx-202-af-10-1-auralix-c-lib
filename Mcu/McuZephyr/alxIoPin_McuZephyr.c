@@ -355,5 +355,49 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	return triState;
 }
 
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+void AlxIoPin_DisableIrq(AlxIoPin* me)
+{
+	// Trace
+	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
+
+	// Assert
+	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	ALX_IO_PIN_ASSERT(me->isInit == true);
+	ALX_IO_PIN_ASSERT(me->irqFlags != 0);
+	ALX_IO_PIN_ASSERT(me->irqCb != NULL);
+
+	// DeConfigure IRQ
+	ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, GPIO_INT_DISABLE) == 0);
+
+	// Trace
+	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+void AlxIoPin_EnableIrq(AlxIoPin* me)
+{
+	// Trace
+	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
+
+	// Assert
+	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
+	ALX_IO_PIN_ASSERT(me->isInit == true);
+	ALX_IO_PIN_ASSERT(me->irqFlags != 0);
+	ALX_IO_PIN_ASSERT(me->irqCb != NULL);
+
+	// Configure IRQ
+	ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, me->irqFlags) == 0);
+
+	// Trace
+	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
+}
+
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)

@@ -120,6 +120,8 @@ void AlxIoPin_Set(AlxIoPin* me);
 void AlxIoPin_Reset(AlxIoPin* me);
 void AlxIoPin_Toggle(AlxIoPin* me);
 AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me);
+void AlxIoPin_DisableIrq(AlxIoPin* me);
+void AlxIoPin_EnableIrq(AlxIoPin* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
