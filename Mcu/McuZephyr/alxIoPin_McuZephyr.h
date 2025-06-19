@@ -61,7 +61,6 @@ typedef struct
 	gpio_pin_t pin;
 	gpio_flags_t gpioFlags;
 	gpio_flags_t irqFlags;
-	gpio_callback_handler_t irqCb;
 
 	// Variables
 	const struct device* device;
@@ -82,8 +81,7 @@ void AlxIoPin_Ctor
 	const char* deviceName,
 	gpio_pin_t pin,
 	gpio_flags_t gpioFlags,
-	gpio_flags_t irqFlags,
-	gpio_callback_handler_t irqCb
+	gpio_flags_t irqFlags
 );
 
 

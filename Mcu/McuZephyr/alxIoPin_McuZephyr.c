@@ -39,6 +39,18 @@
 
 
 //******************************************************************************
+// Private Functions
+//******************************************************************************
+static void AlxIoPin_Irq_Callback_Zephry(const struct device* port, struct gpio_callback* cb, gpio_port_pins_t pins);
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+void AlxIoPin_Irq_Callback(AlxIoPin* me);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 
@@ -49,7 +61,6 @@
   * @param[in]		pin
   * @param[in]		gpioFlags
   * @param[in]		irqFlags
-  * @param[in]		irqCb
   */
 void AlxIoPin_Ctor
 (
@@ -57,8 +68,7 @@ void AlxIoPin_Ctor
 	const char* deviceName,
 	gpio_pin_t pin,
 	gpio_flags_t gpioFlags,
-	gpio_flags_t irqFlags,
-	gpio_callback_handler_t irqCb
+	gpio_flags_t irqFlags
 )
 {
 	// Parameters
@@ -66,7 +76,6 @@ void AlxIoPin_Ctor
 	me->pin = pin;
 	me->gpioFlags = gpioFlags;
 	me->irqFlags = irqFlags;
-	me->irqCb = irqCb;
 
 	// Variables
 	me->device = NULL;
@@ -104,13 +113,13 @@ void AlxIoPin_Init(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, me->gpioFlags) == 0);
 
 	// Init IRQ
-	if (me->irqFlags != 0 && me->irqCb != NULL)
+	if (me->irqFlags != 0)
 	{
 		// Configure IRQ
 		ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, me->irqFlags) == 0);
 
 		// Init IRQ Callback
-		gpio_init_callback(&me->irqStruct, me->irqCb, BIT(me->pin));
+		gpio_init_callback(&me->irqStruct, AlxIoPin_Irq_Callback_Zephry, BIT(me->pin));
 
 		// Add IRQ Callback - Enables IRQ
 		ALX_IO_PIN_ASSERT(gpio_add_callback(me->device, &me->irqStruct) == 0);
@@ -138,7 +147,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->device != NULL);
 
 	// DeInit IRQ
-	if (me->irqFlags != 0 && me->irqCb != NULL)
+	if (me->irqFlags != 0)
 	{
 		// DeConfigure IRQ
 		ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, GPIO_INT_DISABLE) == 0);
@@ -359,7 +368,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
   * @brief
   * @param[in,out]	me
   */
-void AlxIoPin_DisableIrq(AlxIoPin* me)
+void AlxIoPin_Irq_Disable(AlxIoPin* me)
 {
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
@@ -368,7 +377,6 @@ void AlxIoPin_DisableIrq(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->irqFlags != 0);
-	ALX_IO_PIN_ASSERT(me->irqCb != NULL);
 
 	// DeConfigure IRQ
 	ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, GPIO_INT_DISABLE) == 0);
@@ -381,7 +389,7 @@ void AlxIoPin_DisableIrq(AlxIoPin* me)
   * @brief
   * @param[in,out]	me
   */
-void AlxIoPin_EnableIrq(AlxIoPin* me)
+void AlxIoPin_Irq_Enable(AlxIoPin* me)
 {
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %u", me->deviceName, me->pin);
@@ -390,13 +398,34 @@ void AlxIoPin_EnableIrq(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 	ALX_IO_PIN_ASSERT(me->isInit == true);
 	ALX_IO_PIN_ASSERT(me->irqFlags != 0);
-	ALX_IO_PIN_ASSERT(me->irqCb != NULL);
 
 	// Configure IRQ
 	ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, me->irqFlags) == 0);
 
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %u", me->deviceName, me->pin);
+}
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static void AlxIoPin_Irq_Callback_Zephry(const struct device* port, struct gpio_callback* cb, gpio_port_pins_t pins)
+{
+	// Get
+	AlxIoPin* me = CONTAINER_OF(cb, AlxIoPin, irqStruct);
+
+	// Callback
+	AlxIoPin_Irq_Callback(me);
+}
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+ALX_WEAK void AlxIoPin_Irq_Callback(AlxIoPin* me)
+{
+	(void)me;
 }
 
 
