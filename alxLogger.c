@@ -1531,9 +1531,11 @@ static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
 	}
 
 	// Ensure read.id is consistent with read.dir, .file and .log
+	uint64_t loggerRotations = (me->md.oldest.id + (me->numOfLogsTotal - 1)) / me->numOfLogsTotal;
 	uint64_t expectedId = me->md.read.dir * me->md.numOfFilesPerDir * me->md.numOfLogsPerFile
 		+ me->md.read.file * me->md.numOfLogsPerFile
 		+ me->md.read.log;
+	expectedId += (loggerRotations * me->numOfLogsTotal);
 
 	if (expectedId != me->md.read.id)
 	{
