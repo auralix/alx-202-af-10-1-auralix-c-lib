@@ -47,6 +47,7 @@
 //------------------------------------------------------------------------------
 static Alx_Status AlxLogger_Prepare(AlxLogger* me);
 static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me);
+static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me);
 static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me);
 static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me);
 
@@ -1128,7 +1129,7 @@ Alx_Status AlxLogger_File_ForwardFilesToProcess(AlxLogger* me, uint32_t numOfFil
 	//------------------------------------------------------------------------------
 
 	// read.id
-	me->md.read.id = me->md.read.id + me->numOfLogsPerFile;
+	me->md.read.id += (me->md.numOfLogsPerFile - me->md.read.log);
 
 	// read.pos
 	me->md.read.pos = 0;
@@ -1257,6 +1258,14 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 			return status;
 		}
 
+		// Repair read file
+		status = AlxLogger_CheckRepairReadFile(me);
+		if (status != Alx_Ok)
+		{
+			ALX_LOGGER_TRACE_WRN("Err: %d", status);
+			return status;
+		}
+
 		// Store metadata
 		status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
 		if (status != Alx_Ok)
@@ -1274,7 +1283,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		#endif
 
 		// Trace
-		ALX_LOGGER_TRACE_INF("AlxLogger - Store metadata after Check/Repair current write_file OK");
+		ALX_LOGGER_TRACE_INF("AlxLogger - Store metadata after Check/Repair current write_file and read_file OK");
 		ALX_LOGGER_TRACE_INF("- magicNumber = 0x%08lX", me->md.magicNumber);
 		ALX_LOGGER_TRACE_INF("- version = %lu", me->md.version);
 
@@ -1476,6 +1485,84 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
+static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
+{
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
+	AlxFs_File file = {};
+	char path[ALX_LOGGER_PATH_LEN_MAX] = "";
+	char log[ALX_LOGGER_LOG_LEN_MAX] = "";
+	uint32_t positionNew = 0;
+	uint32_t readLenActual = 0;
+
+
+	//------------------------------------------------------------------------------
+	// Trace
+	//------------------------------------------------------------------------------
+	ALX_LOGGER_TRACE_INF("AlxLogger - Check/Repair current read_file started");
+	ALX_LOGGER_TRACE_INF
+	(
+		"Address START - dir = %lu, file = %lu, log = %lu, pos = %lu, id = %lu",
+		me->md.read.dir,
+		me->md.read.file,
+		me->md.read.log,
+		me->md.read.pos,
+		(uint32_t)me->md.read.id
+	);
+
+
+	//------------------------------------------------------------------------------
+	// Check/Repair
+	//------------------------------------------------------------------------------
+	// Read pointer could be newer than write (if read metadata was stored after write).
+	// In this case they must be synchronized otherwise read.pos could point into a middle of log
+	if ((me->md.read.dir == me->md.write.dir) &&
+		(me->md.read.file == me->md.write.file) &&
+		((me->md.read.pos > me->md.write.pos) ||
+		 (me->md.read.log > me->md.write.log) ||
+		 (me->md.read.id > me->md.write.id)))
+	{
+		me->md.read.pos = me->md.write.pos;
+		me->md.read.log = me->md.write.log;
+		me->md.read.id = me->md.write.id;
+		ALX_LOGGER_TRACE_INF("Read metadata was newer than write");
+	}
+
+	// Ensure read.id is consistent with read.dir, .file and .log
+	uint64_t expectedId = me->md.read.dir * me->md.numOfFilesPerDir * me->md.numOfLogsPerFile
+		+ me->md.read.file * me->md.numOfLogsPerFile
+		+ me->md.read.log;
+
+	if (expectedId != me->md.read.id)
+	{
+		ALX_LOGGER_TRACE_WRN("Read metadata missmatch, rewinding read file");
+		expectedId -= me->md.read.log;
+		me->md.read.log = 0;
+		me->md.read.pos = 0;
+		me->md.read.id = expectedId;
+	}
+
+	//------------------------------------------------------------------------------
+	// Trace
+	//------------------------------------------------------------------------------
+	ALX_LOGGER_TRACE_INF
+	(
+		"Address END - dir = %lu, file = %lu, log = %lu, pos = %lu, id = %lu",
+		me->md.read.dir,
+		me->md.read.file,
+		me->md.read.log,
+		me->md.read.pos,
+		(uint32_t)me->md.read.id
+	);
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
+}
 static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 {
 	//------------------------------------------------------------------------------
@@ -1575,20 +1662,6 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 			{
 				ALX_LOGGER_TRACE_INF("Delimiter not found where expected, some data will be lost");
 			}
-		}
-
-		// Read pointer could be newer than write (if read metadata was stored after write).
-		// In this case they must be synchronized otherwise read.pos could point into a middle of log
-		if ((me->md.read.dir == me->md.write.dir) &&
-			(me->md.read.file == me->md.write.file) &&
-			((me->md.read.pos > me->md.write.pos) ||
-			 (me->md.read.log > me->md.write.log) ||
-			 (me->md.read.id > me->md.write.id)))
-		{
-			me->md.read.pos = me->md.write.pos;
-			me->md.read.log = me->md.write.log;
-			me->md.read.id = me->md.write.id;
-			ALX_LOGGER_TRACE_INF("Read metadata was newer than write");
 		}
 
 		break;
