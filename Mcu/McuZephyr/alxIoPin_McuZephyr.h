@@ -69,6 +69,7 @@ typedef struct
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
+	bool isIrqEnabled;
 } AlxIoPin;
 
 
