@@ -109,6 +109,13 @@ Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns);
 Alx_Status AlxRtc_TuneTime_us(AlxRtc* me, int64_t tuneTime_us);
 Alx_Status AlxRtc_TuneTime_ms(AlxRtc* me, int64_t tuneTime_ms);
 
+/**
+ * @brief Tune RTC clock source
+ * @param[in]	me		Pointer to RTC instance
+ * @param[in]	offset	Offset from ideal frequency (negative values slow down
+ *						the clock, positive values speed it up)
+ */
+Alx_Status AlxRtc_TuneClockSource(AlxRtc* me, int32_t offset);
 
 #endif	// #if defined(ALX_C_LIB)
 
