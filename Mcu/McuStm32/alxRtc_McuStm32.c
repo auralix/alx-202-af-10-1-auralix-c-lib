@@ -353,21 +353,21 @@ Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 
 	// Get time
 	RTC_TimeTypeDef sTime;
-	if(HAL_RTC_GetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
+	if (HAL_RTC_GetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 
 	// Set hr, min, sec
 	dateTime->hr = sTime.Hours;
 	dateTime->min = sTime.Minutes;
 	dateTime->sec = sTime.Seconds;
 
-	// Calculate secFract
-	float secFract = ((float)sTime.SecondFraction - (float)sTime.SubSeconds) / ((float)sTime.SecondFraction + 1.f);
+	// Invert SubSeconds
+	int32_t ss = (int32_t)sTime.SecondFraction - (int32_t)sTime.SubSeconds;  // Casts are safe because values come from 16 bit registers
 
-	// Handle if SS Larger than PREDIV_S, then secFract will be negative
-	if(secFract < 0.f)
+	// Handle if SS Larger than PREDIV_S, then ss will be negative
+	if (ss < 0)
 	{
-		// Make secFract positive
-		secFract = secFract * (-1.f);	// Make positive
+		// Adjust ss
+		ss += (int32_t)sTime.SecondFraction;
 
 		// Handle if hr, min, sec are 0
 		if (dateTime->sec == 0)								// If sec are 0, we must substract min
@@ -397,12 +397,15 @@ Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 		}
 	}
 
+	// Convert ss from counter value to time
+	float secFract = (float)ss / ((float)sTime.SecondFraction + 1.f);
+
 	// Set ms, us, ns
 	AlxRtc_SecFractToMsUsNs(secFract, &dateTime->ms, &dateTime->us, &dateTime->ns);
 
 	// Get date
 	RTC_DateTypeDef sDate;
-	if(HAL_RTC_GetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
+	if (HAL_RTC_GetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 
 	// Set yr, mo, day, weekDay
 	dateTime->yr = sDate.Year;
