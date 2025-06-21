@@ -157,7 +157,7 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	if (me->irqFlags != 0)
 	{
 		// Assert
-		ALX_IO_PIN_ASSERT(me->isIrqEnabled == true);
+		// isIrqEnabled -> Don't care
 
 		// DeConfigure IRQ
 		ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, GPIO_INT_DISABLE) == 0);
@@ -395,7 +395,7 @@ void AlxIoPin_Irq_Disable(AlxIoPin* me)
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 	ALX_IO_PIN_ASSERT(me->isInit == true);
-//	ALX_IO_PIN_ASSERT(me->isIrqEnabled == true);	// TV: TODO
+	// isIrqEnabled -> Don't care
 	ALX_IO_PIN_ASSERT(me->irqFlags != 0);
 
 	// DeConfigure IRQ
@@ -420,7 +420,7 @@ void AlxIoPin_Irq_Enable(AlxIoPin* me)
 	// Assert
 	ALX_IO_PIN_ASSERT(me->wasCtorCalled == true);
 	ALX_IO_PIN_ASSERT(me->isInit == true);
-//	ALX_IO_PIN_ASSERT(me->isIrqEnabled == false);	// TV: TODO
+	// isIrqEnabled -> Don't care
 	ALX_IO_PIN_ASSERT(me->irqFlags != 0);
 
 	// Configure IRQ
