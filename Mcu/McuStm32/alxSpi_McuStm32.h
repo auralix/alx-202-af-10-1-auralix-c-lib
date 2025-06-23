@@ -179,7 +179,7 @@ void AlxSpi_Ctor
 	AlxSpi_Clk spiClk,
 	bool isWriteReadLowLevel
 );
-	
+
 Alx_Status AlxSpi_Reconfigure
 (
 	AlxSpi* me,
