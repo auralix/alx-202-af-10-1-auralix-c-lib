@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxOsMutex.h
-  * @brief		Auralix C Library - ALX OS Mutex Module
+  * @file		alxSpi_McuZephyr.h
+  * @brief		Auralix C Library - ALX SPI MCU Zephyr Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_OS_MUTEX_H
-#define ALX_OS_MUTEX_H
+#ifndef ALX_SPI_MCU_ZEPHYR_H
+#define ALX_SPI_MCU_ZEPHYR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,36 +42,13 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-
-
-//******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_OS_MUTEX_FILE "alxOsMutex.h"
-
-// Assert //
-#if defined(ALX_OS_MUTEX_ASSERT_BKPT_ENABLE)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_MUTEX_FILE, expr)
-#elif defined(ALX_OS_MUTEX_ASSERT_TRACE_ENABLE)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_MUTEX_FILE, expr)
-#elif defined(ALX_OS_MUTEX_ASSERT_RST_ENABLE)
-	#define ALX_OS_MUTEX_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_MUTEX_FILE, expr)
-#else
-	#define ALX_OS_MUTEX_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(ALX_OS_MUTEX_TRACE_ENABLE)
-	#define ALX_OS_MUTEX_TRACE(...) ALX_TRACE_WRN(ALX_OS_MUTEX_FILE, __VA_ARGS__)
-#else
-	#define ALX_OS_MUTEX_TRACE(...) do{} while (false)
-#endif
+#include "alxIoPin.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 
 //******************************************************************************
@@ -79,41 +56,37 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
+	// Parameters
+	const char* deviceName;
+	AlxIoPin* do_nCS;
+	struct spi_config config;
+
 	// Variables
-	#if defined(ALX_FREE_RTOS)
-	StaticSemaphore_t semaphore;
-	SemaphoreHandle_t semaphoreHandle;
-	#endif
-	#if defined(ALX_ZEPHYR)
-	struct k_mutex mutex;
-	#endif
+	const struct device* device;
 
 	// Info
 	bool wasCtorCalled;
-} AlxOsMutex;
+	bool isInit;
+} AlxSpi;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxOsMutex_Ctor
+void AlxSpi_Ctor
 (
-	AlxOsMutex* me
+	AlxSpi* me,
+	const char* deviceName,
+	AlxIoPin* do_nCS,
+	uint32_t frequency,
+	spi_operation_t operation
 );
 
 
-//******************************************************************************
-// Functions
-//******************************************************************************
-void AlxOsMutex_Lock(AlxOsMutex* me);
-void AlxOsMutex_Unlock(AlxOsMutex* me);
-bool AlxOsMutex_IsUnlocked(AlxOsMutex* me);
-
-
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_OS_MUTEX_H
+#endif	// #ifndef ALX_SPI_MCU_ZEPHYR_H

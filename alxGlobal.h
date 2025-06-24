@@ -199,6 +199,7 @@ extern "C" {
 #include "zephyr/drivers/i2c.h"
 #include "zephyr/drivers/adc.h"
 #include "zephyr/drivers/uart.h"
+#include "zephyr/drivers/spi.h"
 #endif
 
 
@@ -253,6 +254,7 @@ extern "C" {
 #include "alxGlobal_McuSam.h"
 
 #elif defined(ALX_RA)
+#include "hal_data.h"
 #include "cmsis_gcc.h"
 
 #endif
