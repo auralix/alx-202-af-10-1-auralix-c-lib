@@ -190,7 +190,7 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 	float voltage_V = (float)voltage_mV / 1000.f;
 
 	// Trace
-	ALX_ADC_TRACE_DBG("EXIT: deviceName %s voltage_V %f", me->deviceName, voltage_V);
+	ALX_ADC_TRACE_DBG("EXIT: deviceName %s voltage_V %f", me->deviceName, (double)voltage_V);
 
 	// Return
 	return voltage_V;
@@ -251,7 +251,7 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	//------------------------------------------------------------------------------
 	int32_t status = 0;
 	uint16_t vref_mV = 0;
-	int16_t voltage_raw = 0;	// TV: ADC can occasionaly return 0xFFFF (negative value), https://devzone.nordicsemi.com/f/nordic-q-a/19688/nrf52832-saadc-occasionally-returns-0xffff
+	int16_t voltage_raw = 0;	// TV: ADC can occasionally return 0xFFFF (negative value), https://devzone.nordicsemi.com/f/nordic-q-a/19688/nrf52832-saadc-occasionally-returns-0xffff
 	int32_t voltage_mV = 0;
 	struct adc_sequence seq = {};
 
