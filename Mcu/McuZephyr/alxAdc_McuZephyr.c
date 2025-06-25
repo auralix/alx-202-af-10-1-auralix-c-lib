@@ -228,9 +228,10 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
   */
 float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
-	// Unsupported
+	// TV: Unsupported
+	(void)me;
 	ALX_ADC_ASSERT(false);
-	return ALX_NULL;
+	return -1;
 }
 
 
