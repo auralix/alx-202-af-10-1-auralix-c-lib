@@ -1532,6 +1532,18 @@ static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
 
 	// Ensure read.id is consistent with read.dir, .file and .log
 	uint64_t loggerRotations = (me->md.oldest.id + (me->numOfLogsTotal - 1)) / me->numOfLogsTotal;
+	if (loggerRotations != 0)
+	{
+		if ((me->md.oldest.id % me->numOfLogsTotal) == 0)
+		{
+			loggerRotations++;
+		}
+		if (me->md.read.dir >= me->md.oldest.dir)
+		{
+			// This will happen if write is already wrapped but read is not - read has one fewer logger rotation
+			loggerRotations--;
+		}
+	}
 	uint64_t expectedId = me->md.read.dir * me->md.numOfFilesPerDir * me->md.numOfLogsPerFile
 		+ me->md.read.file * me->md.numOfLogsPerFile
 		+ me->md.read.log;
