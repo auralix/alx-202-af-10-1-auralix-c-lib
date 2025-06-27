@@ -1762,6 +1762,7 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 
 	// Set Param Item
 	status = AlxParamItem_SetVal(me, buff);
+	me->pendingStore = false;	// TV: TODO - Hack, we had problem, that if loaded val diff than default, pendingStore was set.. we don't want that..
 
 	// Free memory
 	free(buff);
@@ -2188,7 +2189,8 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
-	void* oldVal = NULL;
+	void* valPtr = AlxParamItem_GetValPtr_Private(me);
+	void* oldValPtr = NULL;
 	uint32_t oldValLen = 0;
 
 
@@ -2229,11 +2231,11 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 	}
 
 	// Allocate memory
-	oldVal = calloc(oldValLen, sizeof(uint8_t));
-	if(oldVal == NULL) { ALX_PARAM_ITEM_TRACE_WRN("Err"); free(oldVal); return Alx_Err; }
+	oldValPtr = calloc(oldValLen, sizeof(uint8_t));
+	if(oldValPtr == NULL) { ALX_PARAM_ITEM_TRACE_WRN("Err"); free(oldValPtr); return Alx_Err; }
 
 	// Set oldVal
-	memcpy(oldVal, AlxParamItem_GetValPtr_Private(me), me->valLen);
+	memcpy(oldValPtr, valPtr, me->valLen);
 
 
 	//------------------------------------------------------------------------------
@@ -2462,7 +2464,7 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 	//------------------------------------------------------------------------------
 	if (status == Alx_Ok)
 	{
-		if (memcmp(oldVal, AlxParamItem_GetValPtr_Private(me), me->valLen) != 0)
+		if (memcmp(oldValPtr, valPtr, me->valLen) != 0)
 		{
 			me->pendingStore = true;
 		}
@@ -2474,7 +2476,7 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 	//------------------------------------------------------------------------------
 
 	// Free memory
-	free(oldVal);
+	free(oldValPtr);
 
 	// Return
 	return status;
