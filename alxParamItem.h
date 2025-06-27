@@ -159,6 +159,7 @@ typedef struct
 
 	// Variables
 	AlxParamItem_Val val;
+	bool pendingStore;
 
 	// Info
 	bool wasCtorCalled;
