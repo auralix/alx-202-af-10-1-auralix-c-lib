@@ -1536,8 +1536,9 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 	{
 		if (me->config == AlxNet_Config_FreeRtos_Cellular)
 		{
-			CellularError_t ret;
-			ret = Cellular_GetHostByName(me->cellular.handle, me->cellular.cellularContext, hostname, ip);
+			AlxOsMutex_Lock(&me->alxMutex);
+			CellularError_t ret = Cellular_GetHostByName(me->cellular.handle, me->cellular.cellularContext, hostname, ip);
+			AlxOsMutex_Unlock(&me->alxMutex);
 			if (ret != CELLULAR_SUCCESS) return Alx_Err;
 			else return Alx_Ok;
 		}
