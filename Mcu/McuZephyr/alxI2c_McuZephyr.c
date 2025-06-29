@@ -643,10 +643,10 @@ Alx_Status AlxI2c_Master_StartWriteReadStop(AlxI2c* me, uint16_t slaveAddr, cons
 	(void)me;
 	(void)slaveAddr;
 	(void)writeData;
-	(void)writeLen;
+	ALX_I2C_ASSERT(0 < writeLen);
 	(void)readData;
-	(void)readLen;
-	(void)numOfTries;
+	ALX_I2C_ASSERT(0 < readLen);
+	ALX_I2C_ASSERT(0 < numOfTries);
 	ALX_I2C_ASSERT(timeout_ms == 0);	// TV: Unsupported
 
 
@@ -658,7 +658,7 @@ Alx_Status AlxI2c_Master_StartWriteReadStop(AlxI2c* me, uint16_t slaveAddr, cons
 		//------------------------------------------------------------------------------
 		// Trace
 		//------------------------------------------------------------------------------
-		ALX_I2C_TRACE_VRB("DO: i2c_write_read() deviceName %s try %u slaveAddr 0x%04X writeLen %u", me->deviceName, _try, slaveAddr, writeLen);
+		ALX_I2C_TRACE_VRB("DO: i2c_write_read() deviceName %s try %u slaveAddr 0x%04X writeLen %u readLen %u", me->deviceName, _try, slaveAddr, writeLen, readLen);
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		ALX_I2C_TRACE_FORMAT("    writeData: ");
 		for (uint32_t i = 0; i < writeLen; i++)
