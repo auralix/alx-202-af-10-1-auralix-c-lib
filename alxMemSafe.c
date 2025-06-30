@@ -212,7 +212,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					if(statusMemRaw != Alx_Ok) { ALX_MEM_SAFE_TRACE("ErrInit"); continue; }
 
 					// Write
-					statusMemRaw = AlxMemRaw_Write(me->memRaw, me->copyAddrB, me->buff1, me->copyLenWithCrc, false, me->memRawReadWriteNumOfTries, me->memRawReadWriteTimeout_ms);
+					statusMemRaw = AlxMemRaw_Write(me->memRaw, me->copyAddrB, me->buff1, me->copyLenWithCrc, true, me->memRawReadWriteNumOfTries, me->memRawReadWriteTimeout_ms);
 					if(statusMemRaw != Alx_Ok) { ALX_MEM_SAFE_TRACE("CrcOkDiff_UsedCopyA_WriteErr"); continue; }
 
 					// DeInit

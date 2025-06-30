@@ -729,6 +729,50 @@ typedef union
 
 
 //******************************************************************************
+// Address: 0x0C, Reset: 0x00 , Name: Dot_grp_sel0
+//******************************************************************************
+typedef enum
+{
+	L0_CS3_No_Group_member = 0,
+	L0_CS3_Comp_Group1 = 1,
+	L0_CS3_Comp_Group2 = 2,
+	L0_CS3_Comp_Group3 = 3
+} AlxLp586x_RegEnum_0x0C_Dot_L0_CS3_Group;
+typedef enum
+{
+	L0_CS2_No_Group_member = 0,
+	L0_CS2_Comp_Group1 = 1,
+	L0_CS2_Comp_Group2 = 2,
+	L0_CS2_Comp_Group3 = 3
+} AlxLp586x_RegEnum_0x0C_Dot_L0_CS2_Group;
+	typedef enum
+{
+	L0_CS1_No_Group_member = 0,
+	L0_CS1_Comp_Group1 = 1,
+	L0_CS1_Comp_Group2 = 2,
+	L0_CS1_Comp_Group3 = 3
+} AlxLp586x_RegEnum_0x0C_Dot_L0_CS1_Group;
+typedef enum
+{
+	L0_CS0_No_Group_member = 0,
+	L0_CS0_Comp_Group1 = 1,
+	L0_CS0_Comp_Group2 = 2,
+	L0_CS0_Comp_Group3 = 3
+} AlxLp586x_RegEnum_0x0C_Dot_L0_CS0_Group;
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		AlxLp586x_RegEnum_0x0C_Dot_L0_CS3_Group Dot_L0_CS3_Group : 2;
+		AlxLp586x_RegEnum_0x0C_Dot_L0_CS2_Group Dot_L0_CS2_Group : 2;
+		AlxLp586x_RegEnum_0x0C_Dot_L0_CS1_Group Dot_L0_CS1_Group : 2;
+		AlxLp586x_RegEnum_0x0C_Dot_L0_CS0_Group Dot_L0_CS0_Group : 2;
+	};
+	uint8_t raw;
+	} AlxLp586x_RegVal_0x0C_Dot_grp_sel0;
+
+
+//******************************************************************************
 // Register Structures
 //******************************************************************************
 typedef struct
