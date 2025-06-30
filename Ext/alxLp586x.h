@@ -2854,6 +2854,1784 @@ typedef union
 
 
 //******************************************************************************
+// Address: 0x65, Reset: 0x00 , Name: Dot_lod0
+//******************************************************************************
+typedef enum
+{
+    L0_CS7_No_LOD = 0,
+    L0_CS7_LOD    = 1
+} AlxLp586x_RegEnum_0x65_Dot_L0_CS7_LOD;
+typedef enum
+{
+    L0_CS6_No_LOD = 0,
+    L0_CS6_LOD    = 1
+} AlxLp586x_RegEnum_0x65_Dot_L0_CS6_LOD;
+typedef enum
+{
+    L0_CS5_No_LOD = 0,
+    L0_CS5_LOD    = 1
+} AlxLp586x_RegEnum_0x65_Dot_L0_CS5_LOD;
+typedef enum
+{
+    L0_CS4_No_LOD = 0,
+    L0_CS4_LOD    = 1
+} AlxLp586x_RegEnum_0x65_Dot_L0_CS4_LOD;
+typedef enum
+{
+    L0_CS3_No_LOD = 0,
+    L0_CS3_LOD    = 1
+} AlxLp586x_RegEnum_0x65_Dot_L0_CS3_LOD;
+typedef enum
+{
+    L0_CS2_No_LOD = 0,
+    L0_CS2_LOD    = 1
+} AlxLp586x_RegEnum_0x65_Dot_L0_CS2_LOD;
+typedef enum
+{
+    L0_CS1_No_LOD = 0,
+    L0_CS1_LOD    = 1
+} AlxLp586x_RegEnum_0x65_Dot_L0_CS1_LOD;
+typedef enum
+{
+    L0_CS0_No_LOD = 0,
+    L0_CS0_LOD    = 1
+} AlxLp586x_RegEnum_0x65_Dot_L0_CS0_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x65_Dot_L0_CS7_LOD Dot_L0_CS7_LOD : 1;
+        AlxLp586x_RegEnum_0x65_Dot_L0_CS6_LOD Dot_L0_CS6_LOD : 1;
+        AlxLp586x_RegEnum_0x65_Dot_L0_CS5_LOD Dot_L0_CS5_LOD : 1;
+        AlxLp586x_RegEnum_0x65_Dot_L0_CS4_LOD Dot_L0_CS4_LOD : 1;
+        AlxLp586x_RegEnum_0x65_Dot_L0_CS3_LOD Dot_L0_CS3_LOD : 1;
+        AlxLp586x_RegEnum_0x65_Dot_L0_CS2_LOD Dot_L0_CS2_LOD : 1;
+        AlxLp586x_RegEnum_0x65_Dot_L0_CS1_LOD Dot_L0_CS1_LOD : 1;
+        AlxLp586x_RegEnum_0x65_Dot_L0_CS0_LOD Dot_L0_CS0_LOD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x65_Dot_lod0;
+
+
+//******************************************************************************
+// Address: 0x66, Reset: 0x00 , Name: Dot_lod1
+//******************************************************************************
+typedef enum
+{
+    L0_CS15_No_LOD = 0,
+    L0_CS15_LOD    = 1
+} AlxLp586x_RegEnum_0x66_Dot_L0_CS15_LOD;
+typedef enum
+{
+    L0_CS14_No_LOD = 0,
+    L0_CS14_LOD    = 1
+} AlxLp586x_RegEnum_0x66_Dot_L0_CS14_LOD;
+typedef enum
+{
+    L0_CS13_No_LOD = 0,
+    L0_CS13_LOD    = 1
+} AlxLp586x_RegEnum_0x66_Dot_L0_CS13_LOD;
+typedef enum
+{
+    L0_CS12_No_LOD = 0,
+    L0_CS12_LOD    = 1
+} AlxLp586x_RegEnum_0x66_Dot_L0_CS12_LOD;
+typedef enum
+{
+    L0_CS11_No_LOD = 0,
+    L0_CS11_LOD    = 1
+} AlxLp586x_RegEnum_0x66_Dot_L0_CS11_LOD;
+typedef enum
+{
+    L0_CS10_No_LOD = 0,
+    L0_CS10_LOD    = 1
+} AlxLp586x_RegEnum_0x66_Dot_L0_CS10_LOD;
+typedef enum
+{
+    L0_CS9_No_LOD = 0,
+    L0_CS9_LOD    = 1
+} AlxLp586x_RegEnum_0x66_Dot_L0_CS9_LOD;
+typedef enum
+{
+    L0_CS8_No_LOD = 0,
+    L0_CS8_LOD    = 1
+} AlxLp586x_RegEnum_0x66_Dot_L0_CS8_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x66_Dot_L0_CS15_LOD Dot_L0_CS15_LOD : 1;
+        AlxLp586x_RegEnum_0x66_Dot_L0_CS14_LOD Dot_L0_CS14_LOD : 1;
+        AlxLp586x_RegEnum_0x66_Dot_L0_CS13_LOD Dot_L0_CS13_LOD : 1;
+        AlxLp586x_RegEnum_0x66_Dot_L0_CS12_LOD Dot_L0_CS12_LOD : 1;
+        AlxLp586x_RegEnum_0x66_Dot_L0_CS11_LOD Dot_L0_CS11_LOD : 1;
+        AlxLp586x_RegEnum_0x66_Dot_L0_CS10_LOD Dot_L0_CS10_LOD : 1;
+        AlxLp586x_RegEnum_0x66_Dot_L0_CS9_LOD  Dot_L0_CS9_LOD  : 1;
+        AlxLp586x_RegEnum_0x66_Dot_L0_CS8_LOD  Dot_L0_CS8_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x66_Dot_lod1;
+
+
+//******************************************************************************
+// Address: 0x67, Reset: 0x00 , Name: Dot_lod2
+//******************************************************************************
+typedef enum
+{
+    L0_CS17_No_LOD = 0,
+    L0_CS17_LOD    = 1
+} AlxLp586x_RegEnum_0x67_Dot_L0_CS17_LOD;
+typedef enum
+{
+    L0_CS16_No_LOD = 0,
+    L0_CS16_LOD    = 1
+} AlxLp586x_RegEnum_0x67_Dot_L0_CS16_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x67_Dot_L0_CS17_LOD Dot_L0_CS17_LOD  : 1;
+        AlxLp586x_RegEnum_0x67_Dot_L0_CS16_LOD Dot_L0_CS16_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x67_Dot_lod2;
+
+
+//******************************************************************************
+// Address: 0x68, Reset: 0x00 , Name: Dot_lod3
+//******************************************************************************
+typedef enum
+{
+    L1_CS7_No_LOD = 0,
+    L1_CS7_LOD    = 1
+} AlxLp586x_RegEnum_0x68_Dot_L1_CS7_LOD;
+typedef enum
+{
+    L1_CS6_No_LOD = 0,
+    L1_CS6_LOD    = 1
+} AlxLp586x_RegEnum_0x68_Dot_L1_CS6_LOD;
+typedef enum
+{
+    L1_CS5_No_LOD = 0,
+    L1_CS5_LOD    = 1
+} AlxLp586x_RegEnum_0x68_Dot_L1_CS5_LOD;
+typedef enum
+{
+    L1_CS4_No_LOD = 0,
+    L1_CS4_LOD    = 1
+} AlxLp586x_RegEnum_0x68_Dot_L1_CS4_LOD;
+typedef enum
+{
+    L1_CS3_No_LOD = 0,
+    L1_CS3_LOD    = 1
+} AlxLp586x_RegEnum_0x68_Dot_L1_CS3_LOD;
+typedef enum
+{
+    L1_CS2_No_LOD = 0,
+    L1_CS2_LOD    = 1
+} AlxLp586x_RegEnum_0x68_Dot_L1_CS2_LOD;
+typedef enum
+{
+    L1_CS1_No_LOD = 0,
+    L1_CS1_LOD    = 1
+} AlxLp586x_RegEnum_0x68_Dot_L1_CS1_LOD;
+typedef enum
+{
+    L1_CS0_No_LOD = 0,
+    L1_CS0_LOD    = 1
+} AlxLp586x_RegEnum_0x68_Dot_L1_CS0_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x68_Dot_L1_CS7_LOD Dot_L1_CS7_LOD : 1;
+        AlxLp586x_RegEnum_0x68_Dot_L1_CS6_LOD Dot_L1_CS6_LOD : 1;
+        AlxLp586x_RegEnum_0x68_Dot_L1_CS5_LOD Dot_L1_CS5_LOD : 1;
+        AlxLp586x_RegEnum_0x68_Dot_L1_CS4_LOD Dot_L1_CS4_LOD : 1;
+        AlxLp586x_RegEnum_0x68_Dot_L1_CS3_LOD Dot_L1_CS3_LOD : 1;
+        AlxLp586x_RegEnum_0x68_Dot_L1_CS2_LOD Dot_L1_CS2_LOD : 1;
+        AlxLp586x_RegEnum_0x68_Dot_L1_CS1_LOD Dot_L1_CS1_LOD : 1;
+        AlxLp586x_RegEnum_0x68_Dot_L1_CS0_LOD Dot_L1_CS0_LOD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x68_Dot_lod3;
+
+
+//******************************************************************************
+// Address: 0x69, Reset: 0x00 , Name: Dot_lod4
+//******************************************************************************
+typedef enum
+{
+    L1_CS15_No_LOD = 0,
+    L1_CS15_LOD    = 1
+} AlxLp586x_RegEnum_0x69_Dot_L1_CS15_LOD;
+typedef enum
+{
+    L1_CS14_No_LOD = 0,
+    L1_CS14_LOD    = 1
+} AlxLp586x_RegEnum_0x69_Dot_L1_CS14_LOD;
+typedef enum
+{
+    L1_CS13_No_LOD = 0,
+    L1_CS13_LOD    = 1
+} AlxLp586x_RegEnum_0x69_Dot_L1_CS13_LOD;
+typedef enum
+{
+    L1_CS12_No_LOD = 0,
+    L1_CS12_LOD    = 1
+} AlxLp586x_RegEnum_0x69_Dot_L1_CS12_LOD;
+typedef enum
+{
+    L1_CS11_No_LOD = 0,
+    L1_CS11_LOD    = 1
+} AlxLp586x_RegEnum_0x69_Dot_L1_CS11_LOD;
+typedef enum
+{
+    L1_CS10_No_LOD = 0,
+    L1_CS10_LOD    = 1
+} AlxLp586x_RegEnum_0x69_Dot_L1_CS10_LOD;
+typedef enum
+{
+    L1_CS9_No_LOD = 0,
+    L1_CS9_LOD    = 1
+} AlxLp586x_RegEnum_0x69_Dot_L1_CS9_LOD;
+typedef enum
+{
+    L1_CS8_No_LOD = 0,
+    L1_CS8_LOD    = 1
+} AlxLp586x_RegEnum_0x69_Dot_L1_CS8_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x69_Dot_L1_CS15_LOD Dot_L1_CS15_LOD : 1;
+        AlxLp586x_RegEnum_0x69_Dot_L1_CS14_LOD Dot_L1_CS14_LOD : 1;
+        AlxLp586x_RegEnum_0x69_Dot_L1_CS13_LOD Dot_L1_CS13_LOD : 1;
+        AlxLp586x_RegEnum_0x69_Dot_L1_CS12_LOD Dot_L1_CS12_LOD : 1;
+        AlxLp586x_RegEnum_0x69_Dot_L1_CS11_LOD Dot_L1_CS11_LOD : 1;
+        AlxLp586x_RegEnum_0x69_Dot_L1_CS10_LOD Dot_L1_CS10_LOD : 1;
+        AlxLp586x_RegEnum_0x69_Dot_L1_CS9_LOD  Dot_L1_CS9_LOD  : 1;
+        AlxLp586x_RegEnum_0x69_Dot_L1_CS8_LOD  Dot_L1_CS8_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x69_Dot_lod4;
+
+
+//******************************************************************************
+// Address: 0x6A, Reset: 0x00 , Name: Dot_lod5
+//******************************************************************************
+typedef enum
+{
+    L1_CS17_No_LOD = 0,
+    L1_CS17_LOD    = 1
+} AlxLp586x_RegEnum_0x6A_Dot_L1_CS17_LOD;
+typedef enum
+{
+    L1_CS16_No_LOD = 0,
+    L1_CS16_LOD    = 1
+} AlxLp586x_RegEnum_0x6A_Dot_L1_CS16_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x6A_Dot_L1_CS17_LOD Dot_L1_CS17_LOD  : 1;
+        AlxLp586x_RegEnum_0x6A_Dot_L1_CS16_LOD Dot_L1_CS16_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x6A_Dot_lod5;
+
+
+//******************************************************************************
+// Address: 0x6B, Reset: 0x00 , Name: Dot_lod6
+//******************************************************************************
+typedef enum
+{
+    L2_CS7_No_LOD = 0,
+    L2_CS7_LOD    = 1
+} AlxLp586x_RegEnum_0x6B_Dot_L2_CS7_LOD;
+typedef enum
+{
+    L2_CS6_No_LOD = 0,
+    L2_CS6_LOD    = 1
+} AlxLp586x_RegEnum_0x6B_Dot_L2_CS6_LOD;
+typedef enum
+{
+    L2_CS5_No_LOD = 0,
+    L2_CS5_LOD    = 1
+} AlxLp586x_RegEnum_0x6B_Dot_L2_CS5_LOD;
+typedef enum
+{
+    L2_CS4_No_LOD = 0,
+    L2_CS4_LOD    = 1
+} AlxLp586x_RegEnum_0x6B_Dot_L2_CS4_LOD;
+typedef enum
+{
+    L2_CS3_No_LOD = 0,
+    L2_CS3_LOD    = 1
+} AlxLp586x_RegEnum_0x6B_Dot_L2_CS3_LOD;
+typedef enum
+{
+    L2_CS2_No_LOD = 0,
+    L2_CS2_LOD    = 1
+} AlxLp586x_RegEnum_0x6B_Dot_L2_CS2_LOD;
+typedef enum
+{
+    L2_CS1_No_LOD = 0,
+    L2_CS1_LOD    = 1
+} AlxLp586x_RegEnum_0x6B_Dot_L2_CS1_LOD;
+typedef enum
+{
+    L2_CS0_No_LOD = 0,
+    L2_CS0_LOD    = 1
+} AlxLp586x_RegEnum_0x6B_Dot_L2_CS0_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x6B_Dot_L2_CS7_LOD Dot_L2_CS7_LOD : 1;
+        AlxLp586x_RegEnum_0x6B_Dot_L2_CS6_LOD Dot_L2_CS6_LOD : 1;
+        AlxLp586x_RegEnum_0x6B_Dot_L2_CS5_LOD Dot_L2_CS5_LOD : 1;
+        AlxLp586x_RegEnum_0x6B_Dot_L2_CS4_LOD Dot_L2_CS4_LOD : 1;
+        AlxLp586x_RegEnum_0x6B_Dot_L2_CS3_LOD Dot_L2_CS3_LOD : 1;
+        AlxLp586x_RegEnum_0x6B_Dot_L2_CS2_LOD Dot_L2_CS2_LOD : 1;
+        AlxLp586x_RegEnum_0x6B_Dot_L2_CS1_LOD Dot_L2_CS1_LOD : 1;
+        AlxLp586x_RegEnum_0x6B_Dot_L2_CS0_LOD Dot_L2_CS0_LOD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x6B_Dot_lod6;
+
+
+//******************************************************************************
+// Address: 0x6C, Reset: 0x00 , Name: Dot_lod7
+//******************************************************************************
+typedef enum
+{
+    L2_CS15_No_LOD = 0,
+    L2_CS15_LOD    = 1
+} AlxLp586x_RegEnum_0x6C_Dot_L2_CS15_LOD;
+typedef enum
+{
+    L2_CS14_No_LOD = 0,
+    L2_CS14_LOD    = 1
+} AlxLp586x_RegEnum_0x6C_Dot_L2_CS14_LOD;
+typedef enum
+{
+    L2_CS13_No_LOD = 0,
+    L2_CS13_LOD    = 1
+} AlxLp586x_RegEnum_0x6C_Dot_L2_CS13_LOD;
+typedef enum
+{
+    L2_CS12_No_LOD = 0,
+    L2_CS12_LOD    = 1
+} AlxLp586x_RegEnum_0x6C_Dot_L2_CS12_LOD;
+typedef enum
+{
+    L2_CS11_No_LOD = 0,
+    L2_CS11_LOD    = 1
+} AlxLp586x_RegEnum_0x6C_Dot_L2_CS11_LOD;
+typedef enum
+{
+    L2_CS10_No_LOD = 0,
+    L2_CS10_LOD    = 1
+} AlxLp586x_RegEnum_0x6C_Dot_L2_CS10_LOD;
+typedef enum
+{
+    L2_CS9_No_LOD = 0,
+    L2_CS9_LOD    = 1
+} AlxLp586x_RegEnum_0x6C_Dot_L2_CS9_LOD;
+typedef enum
+{
+    L2_CS8_No_LOD = 0,
+    L2_CS8_LOD    = 1
+} AlxLp586x_RegEnum_0x6C_Dot_L2_CS8_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x6C_Dot_L2_CS15_LOD Dot_L2_CS15_LOD : 1;
+        AlxLp586x_RegEnum_0x6C_Dot_L2_CS14_LOD Dot_L2_CS14_LOD : 1;
+        AlxLp586x_RegEnum_0x6C_Dot_L2_CS13_LOD Dot_L2_CS13_LOD : 1;
+        AlxLp586x_RegEnum_0x6C_Dot_L2_CS12_LOD Dot_L2_CS12_LOD : 1;
+        AlxLp586x_RegEnum_0x6C_Dot_L2_CS11_LOD Dot_L2_CS11_LOD : 1;
+        AlxLp586x_RegEnum_0x6C_Dot_L2_CS10_LOD Dot_L2_CS10_LOD : 1;
+        AlxLp586x_RegEnum_0x6C_Dot_L2_CS9_LOD  Dot_L2_CS9_LOD  : 1;
+        AlxLp586x_RegEnum_0x6C_Dot_L2_CS8_LOD  Dot_L2_CS8_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x6C_Dot_lod7;
+
+
+//******************************************************************************
+// Address: 0x6D, Reset: 0x00 , Name: Dot_lod8
+//******************************************************************************
+typedef enum
+{
+    L2_CS17_No_LOD = 0,
+    L2_CS17_LOD    = 1
+} AlxLp586x_RegEnum_0x6D_Dot_L2_CS17_LOD;
+typedef enum
+{
+    L2_CS16_No_LOD = 0,
+    L2_CS16_LOD    = 1
+} AlxLp586x_RegEnum_0x6D_Dot_L2_CS16_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x6D_Dot_L2_CS17_LOD Dot_L2_CS17_LOD  : 1;
+        AlxLp586x_RegEnum_0x6D_Dot_L2_CS16_LOD Dot_L2_CS16_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x6D_Dot_lod8;
+
+
+//******************************************************************************
+// Address: 0x6E, Reset: 0x00 , Name: Dot_lod9
+//******************************************************************************
+typedef enum
+{
+    L3_CS7_No_LOD = 0,
+    L3_CS7_LOD    = 1
+} AlxLp586x_RegEnum_0x6E_Dot_L3_CS7_LOD;
+typedef enum
+{
+    L3_CS6_No_LOD = 0,
+    L3_CS6_LOD    = 1
+} AlxLp586x_RegEnum_0x6E_Dot_L3_CS6_LOD;
+typedef enum
+{
+    L3_CS5_No_LOD = 0,
+    L3_CS5_LOD    = 1
+} AlxLp586x_RegEnum_0x6E_Dot_L3_CS5_LOD;
+typedef enum
+{
+    L3_CS4_No_LOD = 0,
+    L3_CS4_LOD    = 1
+} AlxLp586x_RegEnum_0x6E_Dot_L3_CS4_LOD;
+typedef enum
+{
+    L3_CS3_No_LOD = 0,
+    L3_CS3_LOD    = 1
+} AlxLp586x_RegEnum_0x6E_Dot_L3_CS3_LOD;
+typedef enum
+{
+    L3_CS2_No_LOD = 0,
+    L3_CS2_LOD    = 1
+} AlxLp586x_RegEnum_0x6E_Dot_L3_CS2_LOD;
+typedef enum
+{
+    L3_CS1_No_LOD = 0,
+    L3_CS1_LOD    = 1
+} AlxLp586x_RegEnum_0x6E_Dot_L3_CS1_LOD;
+typedef enum
+{
+    L3_CS0_No_LOD = 0,
+    L3_CS0_LOD    = 1
+} AlxLp586x_RegEnum_0x6E_Dot_L3_CS0_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x6E_Dot_L3_CS7_LOD Dot_L3_CS7_LOD : 1;
+        AlxLp586x_RegEnum_0x6E_Dot_L3_CS6_LOD Dot_L3_CS6_LOD : 1;
+        AlxLp586x_RegEnum_0x6E_Dot_L3_CS5_LOD Dot_L3_CS5_LOD : 1;
+        AlxLp586x_RegEnum_0x6E_Dot_L3_CS4_LOD Dot_L3_CS4_LOD : 1;
+        AlxLp586x_RegEnum_0x6E_Dot_L3_CS3_LOD Dot_L3_CS3_LOD : 1;
+        AlxLp586x_RegEnum_0x6E_Dot_L3_CS2_LOD Dot_L3_CS2_LOD : 1;
+        AlxLp586x_RegEnum_0x6E_Dot_L3_CS1_LOD Dot_L3_CS1_LOD : 1;
+        AlxLp586x_RegEnum_0x6E_Dot_L3_CS0_LOD Dot_L3_CS0_LOD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x6E_Dot_lod9;
+
+
+//******************************************************************************
+// Address: 0x6F, Reset: 0x00 , Name: Dot_lod10
+//******************************************************************************
+typedef enum
+{
+    L3_CS15_No_LOD = 0,
+    L3_CS15_LOD    = 1
+} AlxLp586x_RegEnum_0x6F_Dot_L3_CS15_LOD;
+typedef enum
+{
+    L3_CS14_No_LOD = 0,
+    L3_CS14_LOD    = 1
+} AlxLp586x_RegEnum_0x6F_Dot_L3_CS14_LOD;
+typedef enum
+{
+    L3_CS13_No_LOD = 0,
+    L3_CS13_LOD    = 1
+} AlxLp586x_RegEnum_0x6F_Dot_L3_CS13_LOD;
+typedef enum
+{
+    L3_CS12_No_LOD = 0,
+    L3_CS12_LOD    = 1
+} AlxLp586x_RegEnum_0x6F_Dot_L3_CS12_LOD;
+typedef enum
+{
+    L3_CS11_No_LOD = 0,
+    L3_CS11_LOD    = 1
+} AlxLp586x_RegEnum_0x6F_Dot_L3_CS11_LOD;
+typedef enum
+{
+    L3_CS10_No_LOD = 0,
+    L3_CS10_LOD    = 1
+} AlxLp586x_RegEnum_0x6F_Dot_L3_CS10_LOD;
+typedef enum
+{
+    L3_CS9_No_LOD = 0,
+    L3_CS9_LOD    = 1
+} AlxLp586x_RegEnum_0x6F_Dot_L3_CS9_LOD;
+typedef enum
+{
+    L3_CS8_No_LOD = 0,
+    L3_CS8_LOD    = 1
+} AlxLp586x_RegEnum_0x6F_Dot_L3_CS8_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x6F_Dot_L3_CS15_LOD Dot_L3_CS15_LOD : 1;
+        AlxLp586x_RegEnum_0x6F_Dot_L3_CS14_LOD Dot_L3_CS14_LOD : 1;
+        AlxLp586x_RegEnum_0x6F_Dot_L3_CS13_LOD Dot_L3_CS13_LOD : 1;
+        AlxLp586x_RegEnum_0x6F_Dot_L3_CS12_LOD Dot_L3_CS12_LOD : 1;
+        AlxLp586x_RegEnum_0x6F_Dot_L3_CS11_LOD Dot_L3_CS11_LOD : 1;
+        AlxLp586x_RegEnum_0x6F_Dot_L3_CS10_LOD Dot_L3_CS10_LOD : 1;
+        AlxLp586x_RegEnum_0x6F_Dot_L3_CS9_LOD  Dot_L3_CS9_LOD  : 1;
+        AlxLp586x_RegEnum_0x6F_Dot_L3_CS8_LOD  Dot_L3_CS8_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x6F_Dot_lod10;
+
+
+//******************************************************************************
+// Address: 0x70, Reset: 0x00 , Name: Dot_lod11
+//******************************************************************************
+typedef enum
+{
+    L3_CS17_No_LOD = 0,
+    L3_CS17_LOD    = 1
+} AlxLp586x_RegEnum_0x70_Dot_L3_CS17_LOD;
+typedef enum
+{
+    L3_CS16_No_LOD = 0,
+    L3_CS16_LOD    = 1
+} AlxLp586x_RegEnum_0x70_Dot_L3_CS16_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x70_Dot_L3_CS17_LOD Dot_L3_CS17_LOD  : 1;
+        AlxLp586x_RegEnum_0x70_Dot_L3_CS16_LOD Dot_L3_CS16_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x70_Dot_lod11;
+
+
+//******************************************************************************
+// Address: 0x71, Reset: 0x00 , Name: Dot_lod12
+//******************************************************************************
+typedef enum
+{
+    L4_CS7_No_LOD = 0,
+    L4_CS7_LOD    = 1
+} AlxLp586x_RegEnum_0x71_Dot_L4_CS7_LOD;
+typedef enum
+{
+    L4_CS6_No_LOD = 0,
+    L4_CS6_LOD    = 1
+} AlxLp586x_RegEnum_0x71_Dot_L4_CS6_LOD;
+typedef enum
+{
+    L4_CS5_No_LOD = 0,
+    L4_CS5_LOD    = 1
+} AlxLp586x_RegEnum_0x71_Dot_L4_CS5_LOD;
+typedef enum
+{
+    L4_CS4_No_LOD = 0,
+    L4_CS4_LOD    = 1
+} AlxLp586x_RegEnum_0x71_Dot_L4_CS4_LOD;
+typedef enum
+{
+    L4_CS3_No_LOD = 0,
+    L4_CS3_LOD    = 1
+} AlxLp586x_RegEnum_0x71_Dot_L4_CS3_LOD;
+typedef enum
+{
+    L4_CS2_No_LOD = 0,
+    L4_CS2_LOD    = 1
+} AlxLp586x_RegEnum_0x71_Dot_L4_CS2_LOD;
+typedef enum
+{
+    L4_CS1_No_LOD = 0,
+    L4_CS1_LOD    = 1
+} AlxLp586x_RegEnum_0x71_Dot_L4_CS1_LOD;
+typedef enum
+{
+    L4_CS0_No_LOD = 0,
+    L4_CS0_LOD    = 1
+} AlxLp586x_RegEnum_0x71_Dot_L4_CS0_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x71_Dot_L4_CS7_LOD Dot_L4_CS7_LOD : 1;
+        AlxLp586x_RegEnum_0x71_Dot_L4_CS6_LOD Dot_L4_CS6_LOD : 1;
+        AlxLp586x_RegEnum_0x71_Dot_L4_CS5_LOD Dot_L4_CS5_LOD : 1;
+        AlxLp586x_RegEnum_0x71_Dot_L4_CS4_LOD Dot_L4_CS4_LOD : 1;
+        AlxLp586x_RegEnum_0x71_Dot_L4_CS3_LOD Dot_L4_CS3_LOD : 1;
+        AlxLp586x_RegEnum_0x71_Dot_L4_CS2_LOD Dot_L4_CS2_LOD : 1;
+        AlxLp586x_RegEnum_0x71_Dot_L4_CS1_LOD Dot_L4_CS1_LOD : 1;
+        AlxLp586x_RegEnum_0x71_Dot_L4_CS0_LOD Dot_L4_CS0_LOD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x71_Dot_lod12;
+
+
+//******************************************************************************
+// Address: 0x72, Reset: 0x00 , Name: Dot_lod13
+//******************************************************************************
+typedef enum
+{
+    L4_CS15_No_LOD = 0,
+    L4_CS15_LOD    = 1
+} AlxLp586x_RegEnum_0x72_Dot_L4_CS15_LOD;
+typedef enum
+{
+    L4_CS14_No_LOD = 0,
+    L4_CS14_LOD    = 1
+} AlxLp586x_RegEnum_0x72_Dot_L4_CS14_LOD;
+typedef enum
+{
+    L4_CS13_No_LOD = 0,
+    L4_CS13_LOD    = 1
+} AlxLp586x_RegEnum_0x72_Dot_L4_CS13_LOD;
+typedef enum
+{
+    L4_CS12_No_LOD = 0,
+    L4_CS12_LOD    = 1
+} AlxLp586x_RegEnum_0x72_Dot_L4_CS12_LOD;
+typedef enum
+{
+    L4_CS11_No_LOD = 0,
+    L4_CS11_LOD    = 1
+} AlxLp586x_RegEnum_0x72_Dot_L4_CS11_LOD;
+typedef enum
+{
+    L4_CS10_No_LOD = 0,
+    L4_CS10_LOD    = 1
+} AlxLp586x_RegEnum_0x72_Dot_L4_CS10_LOD;
+typedef enum
+{
+    L4_CS9_No_LOD = 0,
+    L4_CS9_LOD    = 1
+} AlxLp586x_RegEnum_0x72_Dot_L4_CS9_LOD;
+typedef enum
+{
+    L4_CS8_No_LOD = 0,
+    L4_CS8_LOD    = 1
+} AlxLp586x_RegEnum_0x72_Dot_L4_CS8_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x72_Dot_L4_CS15_LOD Dot_L4_CS15_LOD : 1;
+        AlxLp586x_RegEnum_0x72_Dot_L4_CS14_LOD Dot_L4_CS14_LOD : 1;
+        AlxLp586x_RegEnum_0x72_Dot_L4_CS13_LOD Dot_L4_CS13_LOD : 1;
+        AlxLp586x_RegEnum_0x72_Dot_L4_CS12_LOD Dot_L4_CS12_LOD : 1;
+        AlxLp586x_RegEnum_0x72_Dot_L4_CS11_LOD Dot_L4_CS11_LOD : 1;
+        AlxLp586x_RegEnum_0x72_Dot_L4_CS10_LOD Dot_L4_CS10_LOD : 1;
+        AlxLp586x_RegEnum_0x72_Dot_L4_CS9_LOD  Dot_L4_CS9_LOD  : 1;
+        AlxLp586x_RegEnum_0x72_Dot_L4_CS8_LOD  Dot_L4_CS8_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x72_Dot_lod13;
+
+
+//******************************************************************************
+// Address: 0x73, Reset: 0x00 , Name: Dot_lod14
+//******************************************************************************
+typedef enum
+{
+    L4_CS17_No_LOD = 0,
+    L4_CS17_LOD    = 1
+} AlxLp586x_RegEnum_0x73_Dot_L4_CS17_LOD;
+typedef enum
+{
+    L4_CS16_No_LOD = 0,
+    L4_CS16_LOD    = 1
+} AlxLp586x_RegEnum_0x73_Dot_L4_CS16_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x73_Dot_L4_CS17_LOD Dot_L4_CS17_LOD  : 1;
+        AlxLp586x_RegEnum_0x73_Dot_L4_CS16_LOD Dot_L4_CS16_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x73_Dot_lod14;
+
+
+//******************************************************************************
+// Address: 0x74, Reset: 0x00 , Name: Dot_lod15
+//******************************************************************************
+typedef enum
+{
+    L5_CS7_No_LOD = 0,
+    L5_CS7_LOD    = 1
+} AlxLp586x_RegEnum_0x74_Dot_L5_CS7_LOD;
+typedef enum
+{
+    L5_CS6_No_LOD = 0,
+    L5_CS6_LOD    = 1
+} AlxLp586x_RegEnum_0x74_Dot_L5_CS6_LOD;
+typedef enum
+{
+    L5_CS5_No_LOD = 0,
+    L5_CS5_LOD    = 1
+} AlxLp586x_RegEnum_0x74_Dot_L5_CS5_LOD;
+typedef enum
+{
+    L5_CS4_No_LOD = 0,
+    L5_CS4_LOD    = 1
+} AlxLp586x_RegEnum_0x74_Dot_L5_CS4_LOD;
+typedef enum
+{
+    L5_CS3_No_LOD = 0,
+    L5_CS3_LOD    = 1
+} AlxLp586x_RegEnum_0x74_Dot_L5_CS3_LOD;
+typedef enum
+{
+    L5_CS2_No_LOD = 0,
+    L5_CS2_LOD    = 1
+} AlxLp586x_RegEnum_0x74_Dot_L5_CS2_LOD;
+typedef enum
+{
+    L5_CS1_No_LOD = 0,
+    L5_CS1_LOD    = 1
+} AlxLp586x_RegEnum_0x74_Dot_L5_CS1_LOD;
+typedef enum
+{
+    L5_CS0_No_LOD = 0,
+    L5_CS0_LOD    = 1
+} AlxLp586x_RegEnum_0x74_Dot_L5_CS0_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x74_Dot_L5_CS7_LOD Dot_L5_CS7_LOD : 1;
+        AlxLp586x_RegEnum_0x74_Dot_L5_CS6_LOD Dot_L5_CS6_LOD : 1;
+        AlxLp586x_RegEnum_0x74_Dot_L5_CS5_LOD Dot_L5_CS5_LOD : 1;
+        AlxLp586x_RegEnum_0x74_Dot_L5_CS4_LOD Dot_L5_CS4_LOD : 1;
+        AlxLp586x_RegEnum_0x74_Dot_L5_CS3_LOD Dot_L5_CS3_LOD : 1;
+        AlxLp586x_RegEnum_0x74_Dot_L5_CS2_LOD Dot_L5_CS2_LOD : 1;
+        AlxLp586x_RegEnum_0x74_Dot_L5_CS1_LOD Dot_L5_CS1_LOD : 1;
+        AlxLp586x_RegEnum_0x74_Dot_L5_CS0_LOD Dot_L5_CS0_LOD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x74_Dot_lod15;
+
+
+//******************************************************************************
+// Address: 0x75, Reset: 0x00 , Name: Dot_lod16
+//******************************************************************************
+typedef enum
+{
+    L5_CS15_No_LOD = 0,
+    L5_CS15_LOD    = 1
+} AlxLp586x_RegEnum_0x75_Dot_L5_CS15_LOD;
+typedef enum
+{
+    L5_CS14_No_LOD = 0,
+    L5_CS14_LOD    = 1
+} AlxLp586x_RegEnum_0x75_Dot_L5_CS14_LOD;
+typedef enum
+{
+    L5_CS13_No_LOD = 0,
+    L5_CS13_LOD    = 1
+} AlxLp586x_RegEnum_0x75_Dot_L5_CS13_LOD;
+typedef enum
+{
+    L5_CS12_No_LOD = 0,
+    L5_CS12_LOD    = 1
+} AlxLp586x_RegEnum_0x75_Dot_L5_CS12_LOD;
+typedef enum
+{
+    L5_CS11_No_LOD = 0,
+    L5_CS11_LOD    = 1
+} AlxLp586x_RegEnum_0x75_Dot_L5_CS11_LOD;
+typedef enum
+{
+    L5_CS10_No_LOD = 0,
+    L5_CS10_LOD    = 1
+} AlxLp586x_RegEnum_0x75_Dot_L5_CS10_LOD;
+typedef enum
+{
+    L5_CS9_No_LOD = 0,
+    L5_CS9_LOD    = 1
+} AlxLp586x_RegEnum_0x75_Dot_L5_CS9_LOD;
+typedef enum
+{
+    L5_CS8_No_LOD = 0,
+    L5_CS8_LOD    = 1
+} AlxLp586x_RegEnum_0x75_Dot_L5_CS8_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x75_Dot_L5_CS15_LOD Dot_L5_CS15_LOD : 1;
+        AlxLp586x_RegEnum_0x75_Dot_L5_CS14_LOD Dot_L5_CS14_LOD : 1;
+        AlxLp586x_RegEnum_0x75_Dot_L5_CS13_LOD Dot_L5_CS13_LOD : 1;
+        AlxLp586x_RegEnum_0x75_Dot_L5_CS12_LOD Dot_L5_CS12_LOD : 1;
+        AlxLp586x_RegEnum_0x75_Dot_L5_CS11_LOD Dot_L5_CS11_LOD : 1;
+        AlxLp586x_RegEnum_0x75_Dot_L5_CS10_LOD Dot_L5_CS10_LOD : 1;
+        AlxLp586x_RegEnum_0x75_Dot_L5_CS9_LOD  Dot_L5_CS9_LOD  : 1;
+        AlxLp586x_RegEnum_0x75_Dot_L5_CS8_LOD  Dot_L5_CS8_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x75_Dot_lod16;
+
+
+//******************************************************************************
+// Address: 0x76, Reset: 0x00 , Name: Dot_lod17
+//******************************************************************************
+typedef enum
+{
+    L5_CS17_No_LOD = 0,
+    L5_CS17_LOD    = 1
+} AlxLp586x_RegEnum_0x76_Dot_L5_CS17_LOD;
+typedef enum
+{
+    L5_CS16_No_LOD = 0,
+    L5_CS16_LOD    = 1
+} AlxLp586x_RegEnum_0x76_Dot_L5_CS16_LOD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x76_Dot_L5_CS17_LOD Dot_L5_CS17_LOD  : 1;
+        AlxLp586x_RegEnum_0x76_Dot_L5_CS16_LOD Dot_L5_CS16_LOD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x76_Dot_lod17;
+
+
+//******************************************************************************
+// Address: 0x86, Reset: 0x00 , Name: Dot_lsd0
+//******************************************************************************
+typedef enum
+{
+    L0_CS7_No_LSD = 0,
+    L0_CS7_LSD    = 1
+} AlxLp586x_RegEnum_0x86_Dot_L0_CS7_LSD;
+typedef enum
+{
+    L0_CS6_No_LSD = 0,
+    L0_CS6_LSD    = 1
+} AlxLp586x_RegEnum_0x86_Dot_L0_CS6_LSD;
+typedef enum
+{
+    L0_CS5_No_LSD = 0,
+    L0_CS5_LSD    = 1
+} AlxLp586x_RegEnum_0x86_Dot_L0_CS5_LSD;
+typedef enum
+{
+    L0_CS4_No_LSD = 0,
+    L0_CS4_LSD    = 1
+} AlxLp586x_RegEnum_0x86_Dot_L0_CS4_LSD;
+typedef enum
+{
+    L0_CS3_No_LSD = 0,
+    L0_CS3_LSD    = 1
+} AlxLp586x_RegEnum_0x86_Dot_L0_CS3_LSD;
+typedef enum
+{
+    L0_CS2_No_LSD = 0,
+    L0_CS2_LSD    = 1
+} AlxLp586x_RegEnum_0x86_Dot_L0_CS2_LSD;
+typedef enum
+{
+    L0_CS1_No_LSD = 0,
+    L0_CS1_LSD    = 1
+} AlxLp586x_RegEnum_0x86_Dot_L0_CS1_LSD;
+typedef enum
+{
+    L0_CS0_No_LSD = 0,
+    L0_CS0_LSD    = 1
+} AlxLp586x_RegEnum_0x86_Dot_L0_CS0_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x86_Dot_L0_CS7_LSD Dot_L0_CS7_LSD : 1;
+        AlxLp586x_RegEnum_0x86_Dot_L0_CS6_LSD Dot_L0_CS6_LSD : 1;
+        AlxLp586x_RegEnum_0x86_Dot_L0_CS5_LSD Dot_L0_CS5_LSD : 1;
+        AlxLp586x_RegEnum_0x86_Dot_L0_CS4_LSD Dot_L0_CS4_LSD : 1;
+        AlxLp586x_RegEnum_0x86_Dot_L0_CS3_LSD Dot_L0_CS3_LSD : 1;
+        AlxLp586x_RegEnum_0x86_Dot_L0_CS2_LSD Dot_L0_CS2_LSD : 1;
+        AlxLp586x_RegEnum_0x86_Dot_L0_CS1_LSD Dot_L0_CS1_LSD : 1;
+        AlxLp586x_RegEnum_0x86_Dot_L0_CS0_LSD Dot_L0_CS0_LSD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x86_Dot_lsd0;
+
+
+//******************************************************************************
+// Address: 0x87, Reset: 0x00 , Name: Dot_lsd1
+//******************************************************************************
+typedef enum
+{
+    L0_CS15_No_LSD = 0,
+    L0_CS15_LSD    = 1
+} AlxLp586x_RegEnum_0x87_Dot_L0_CS15_LSD;
+typedef enum
+{
+    L0_CS14_No_LSD = 0,
+    L0_CS14_LSD    = 1
+} AlxLp586x_RegEnum_0x87_Dot_L0_CS14_LSD;
+typedef enum
+{
+    L0_CS13_No_LSD = 0,
+    L0_CS13_LSD    = 1
+} AlxLp586x_RegEnum_0x87_Dot_L0_CS13_LSD;
+typedef enum
+{
+    L0_CS12_No_LSD = 0,
+    L0_CS12_LSD    = 1
+} AlxLp586x_RegEnum_0x87_Dot_L0_CS12_LSD;
+typedef enum
+{
+    L0_CS11_No_LSD = 0,
+    L0_CS11_LSD    = 1
+} AlxLp586x_RegEnum_0x87_Dot_L0_CS11_LSD;
+typedef enum
+{
+    L0_CS10_No_LSD = 0,
+    L0_CS10_LSD    = 1
+} AlxLp586x_RegEnum_0x87_Dot_L0_CS10_LSD;
+typedef enum
+{
+    L0_CS9_No_LSD = 0,
+    L0_CS9_LSD    = 1
+} AlxLp586x_RegEnum_0x87_Dot_L0_CS9_LSD;
+typedef enum
+{
+    L0_CS8_No_LSD = 0,
+    L0_CS8_LSD    = 1
+} AlxLp586x_RegEnum_0x87_Dot_L0_CS8_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x87_Dot_L0_CS15_LSD Dot_L0_CS15_LSD : 1;
+        AlxLp586x_RegEnum_0x87_Dot_L0_CS14_LSD Dot_L0_CS14_LSD : 1;
+        AlxLp586x_RegEnum_0x87_Dot_L0_CS13_LSD Dot_L0_CS13_LSD : 1;
+        AlxLp586x_RegEnum_0x87_Dot_L0_CS12_LSD Dot_L0_CS12_LSD : 1;
+        AlxLp586x_RegEnum_0x87_Dot_L0_CS11_LSD Dot_L0_CS11_LSD : 1;
+        AlxLp586x_RegEnum_0x87_Dot_L0_CS10_LSD Dot_L0_CS10_LSD : 1;
+        AlxLp586x_RegEnum_0x87_Dot_L0_CS9_LSD  Dot_L0_CS9_LSD  : 1;
+        AlxLp586x_RegEnum_0x87_Dot_L0_CS8_LSD  Dot_L0_CS8_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x87_Dot_lsd1;
+
+
+//******************************************************************************
+// Address: 0x88, Reset: 0x00 , Name: Dot_lsd2
+//******************************************************************************
+typedef enum
+{
+    L0_CS17_No_LSD = 0,
+    L0_CS17_LSD    = 1
+} AlxLp586x_RegEnum_0x88_Dot_L0_CS17_LSD;
+typedef enum
+{
+    L0_CS16_No_LSD = 0,
+    L0_CS16_LSD    = 1
+} AlxLp586x_RegEnum_0x88_Dot_L0_CS16_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x88_Dot_L0_CS17_LSD Dot_L0_CS17_LSD  : 1;
+        AlxLp586x_RegEnum_0x88_Dot_L0_CS16_LSD Dot_L0_CS16_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x88_Dot_lsd2;
+
+
+//******************************************************************************
+// Address: 0x89, Reset: 0x00 , Name: Dot_lsd3
+//******************************************************************************
+typedef enum
+{
+    L1_CS7_No_LSD = 0,
+    L1_CS7_LSD    = 1
+} AlxLp586x_RegEnum_0x89_Dot_L1_CS7_LSD;
+typedef enum
+{
+    L1_CS6_No_LSD = 0,
+    L1_CS6_LSD    = 1
+} AlxLp586x_RegEnum_0x89_Dot_L1_CS6_LSD;
+typedef enum
+{
+    L1_CS5_No_LSD = 0,
+    L1_CS5_LSD    = 1
+} AlxLp586x_RegEnum_0x89_Dot_L1_CS5_LSD;
+typedef enum
+{
+    L1_CS4_No_LSD = 0,
+    L1_CS4_LSD    = 1
+} AlxLp586x_RegEnum_0x89_Dot_L1_CS4_LSD;
+typedef enum
+{
+    L1_CS3_No_LSD = 0,
+    L1_CS3_LSD    = 1
+} AlxLp586x_RegEnum_0x89_Dot_L1_CS3_LSD;
+typedef enum
+{
+    L1_CS2_No_LSD = 0,
+    L1_CS2_LSD    = 1
+} AlxLp586x_RegEnum_0x89_Dot_L1_CS2_LSD;
+typedef enum
+{
+    L1_CS1_No_LSD = 0,
+    L1_CS1_LSD    = 1
+} AlxLp586x_RegEnum_0x89_Dot_L1_CS1_LSD;
+typedef enum
+{
+    L1_CS0_No_LSD = 0,
+    L1_CS0_LSD    = 1
+} AlxLp586x_RegEnum_0x89_Dot_L1_CS0_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x89_Dot_L1_CS7_LSD Dot_L1_CS7_LSD : 1;
+        AlxLp586x_RegEnum_0x89_Dot_L1_CS6_LSD Dot_L1_CS6_LSD : 1;
+        AlxLp586x_RegEnum_0x89_Dot_L1_CS5_LSD Dot_L1_CS5_LSD : 1;
+        AlxLp586x_RegEnum_0x89_Dot_L1_CS4_LSD Dot_L1_CS4_LSD : 1;
+        AlxLp586x_RegEnum_0x89_Dot_L1_CS3_LSD Dot_L1_CS3_LSD : 1;
+        AlxLp586x_RegEnum_0x89_Dot_L1_CS2_LSD Dot_L1_CS2_LSD : 1;
+        AlxLp586x_RegEnum_0x89_Dot_L1_CS1_LSD Dot_L1_CS1_LSD : 1;
+        AlxLp586x_RegEnum_0x89_Dot_L1_CS0_LSD Dot_L1_CS0_LSD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x89_Dot_lsd3;
+
+
+//******************************************************************************
+// Address: 0x8A, Reset: 0x00 , Name: Dot_lsd4
+//******************************************************************************
+typedef enum
+{
+    L1_CS15_No_LSD = 0,
+    L1_CS15_LSD    = 1
+} AlxLp586x_RegEnum_0x8A_Dot_L1_CS15_LSD;
+typedef enum
+{
+    L1_CS14_No_LSD = 0,
+    L1_CS14_LSD    = 1
+} AlxLp586x_RegEnum_0x8A_Dot_L1_CS14_LSD;
+typedef enum
+{
+    L1_CS13_No_LSD = 0,
+    L1_CS13_LSD    = 1
+} AlxLp586x_RegEnum_0x8A_Dot_L1_CS13_LSD;
+typedef enum
+{
+    L1_CS12_No_LSD = 0,
+    L1_CS12_LSD    = 1
+} AlxLp586x_RegEnum_0x8A_Dot_L1_CS12_LSD;
+typedef enum
+{
+    L1_CS11_No_LSD = 0,
+    L1_CS11_LSD    = 1
+} AlxLp586x_RegEnum_0x8A_Dot_L1_CS11_LSD;
+typedef enum
+{
+    L1_CS10_No_LSD = 0,
+    L1_CS10_LSD    = 1
+} AlxLp586x_RegEnum_0x8A_Dot_L1_CS10_LSD;
+typedef enum
+{
+    L1_CS9_No_LSD = 0,
+    L1_CS9_LSD    = 1
+} AlxLp586x_RegEnum_0x8A_Dot_L1_CS9_LSD;
+typedef enum
+{
+    L1_CS8_No_LSD = 0,
+    L1_CS8_LSD    = 1
+} AlxLp586x_RegEnum_0x8A_Dot_L1_CS8_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x8A_Dot_L1_CS15_LSD Dot_L1_CS15_LSD : 1;
+        AlxLp586x_RegEnum_0x8A_Dot_L1_CS14_LSD Dot_L1_CS14_LSD : 1;
+        AlxLp586x_RegEnum_0x8A_Dot_L1_CS13_LSD Dot_L1_CS13_LSD : 1;
+        AlxLp586x_RegEnum_0x8A_Dot_L1_CS12_LSD Dot_L1_CS12_LSD : 1;
+        AlxLp586x_RegEnum_0x8A_Dot_L1_CS11_LSD Dot_L1_CS11_LSD : 1;
+        AlxLp586x_RegEnum_0x8A_Dot_L1_CS10_LSD Dot_L1_CS10_LSD : 1;
+        AlxLp586x_RegEnum_0x8A_Dot_L1_CS9_LSD  Dot_L1_CS9_LSD  : 1;
+        AlxLp586x_RegEnum_0x8A_Dot_L1_CS8_LSD  Dot_L1_CS8_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x8A_Dot_lsd4;
+
+
+//******************************************************************************
+// Address: 0x8B, Reset: 0x00 , Name: Dot_lsd5
+//******************************************************************************
+typedef enum
+{
+    L1_CS17_No_LSD = 0,
+    L1_CS17_LSD    = 1
+} AlxLp586x_RegEnum_0x8B_Dot_L1_CS17_LSD;
+typedef enum
+{
+    L1_CS16_No_LSD = 0,
+    L1_CS16_LSD    = 1
+} AlxLp586x_RegEnum_0x8B_Dot_L1_CS16_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x8B_Dot_L1_CS17_LSD Dot_L1_CS17_LSD  : 1;
+        AlxLp586x_RegEnum_0x8B_Dot_L1_CS16_LSD Dot_L1_CS16_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x8B_Dot_lsd5;
+
+
+//******************************************************************************
+// Address: 0x8C, Reset: 0x00 , Name: Dot_lsd6
+//******************************************************************************
+typedef enum
+{
+    L2_CS7_No_LSD = 0,
+    L2_CS7_LSD    = 1
+} AlxLp586x_RegEnum_0x8C_Dot_L2_CS7_LSD;
+typedef enum
+{
+    L2_CS6_No_LSD = 0,
+    L2_CS6_LSD    = 1
+} AlxLp586x_RegEnum_0x8C_Dot_L2_CS6_LSD;
+typedef enum
+{
+    L2_CS5_No_LSD = 0,
+    L2_CS5_LSD    = 1
+} AlxLp586x_RegEnum_0x8C_Dot_L2_CS5_LSD;
+typedef enum
+{
+    L2_CS4_No_LSD = 0,
+    L2_CS4_LSD    = 1
+} AlxLp586x_RegEnum_0x8C_Dot_L2_CS4_LSD;
+typedef enum
+{
+    L2_CS3_No_LSD = 0,
+    L2_CS3_LSD    = 1
+} AlxLp586x_RegEnum_0x8C_Dot_L2_CS3_LSD;
+typedef enum
+{
+    L2_CS2_No_LSD = 0,
+    L2_CS2_LSD    = 1
+} AlxLp586x_RegEnum_0x8C_Dot_L2_CS2_LSD;
+typedef enum
+{
+    L2_CS1_No_LSD = 0,
+    L2_CS1_LSD    = 1
+} AlxLp586x_RegEnum_0x8C_Dot_L2_CS1_LSD;
+typedef enum
+{
+    L2_CS0_No_LSD = 0,
+    L2_CS0_LSD    = 1
+} AlxLp586x_RegEnum_0x8C_Dot_L2_CS0_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x8C_Dot_L2_CS7_LSD Dot_L2_CS7_LSD : 1;
+        AlxLp586x_RegEnum_0x8C_Dot_L2_CS6_LSD Dot_L2_CS6_LSD : 1;
+        AlxLp586x_RegEnum_0x8C_Dot_L2_CS5_LSD Dot_L2_CS5_LSD : 1;
+        AlxLp586x_RegEnum_0x8C_Dot_L2_CS4_LSD Dot_L2_CS4_LSD : 1;
+        AlxLp586x_RegEnum_0x8C_Dot_L2_CS3_LSD Dot_L2_CS3_LSD : 1;
+        AlxLp586x_RegEnum_0x8C_Dot_L2_CS2_LSD Dot_L2_CS2_LSD : 1;
+        AlxLp586x_RegEnum_0x8C_Dot_L2_CS1_LSD Dot_L2_CS1_LSD : 1;
+        AlxLp586x_RegEnum_0x8C_Dot_L2_CS0_LSD Dot_L2_CS0_LSD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x8C_Dot_lsd6;
+
+
+//******************************************************************************
+// Address: 0x8D, Reset: 0x00 , Name: Dot_lsd7
+//******************************************************************************
+typedef enum
+{
+    L2_CS15_No_LSD = 0,
+    L2_CS15_LSD    = 1
+} AlxLp586x_RegEnum_0x8D_Dot_L2_CS15_LSD;
+typedef enum
+{
+    L2_CS14_No_LSD = 0,
+    L2_CS14_LSD    = 1
+} AlxLp586x_RegEnum_0x8D_Dot_L2_CS14_LSD;
+typedef enum
+{
+    L2_CS13_No_LSD = 0,
+    L2_CS13_LSD    = 1
+} AlxLp586x_RegEnum_0x8D_Dot_L2_CS13_LSD;
+typedef enum
+{
+    L2_CS12_No_LSD = 0,
+    L2_CS12_LSD    = 1
+} AlxLp586x_RegEnum_0x8D_Dot_L2_CS12_LSD;
+typedef enum
+{
+    L2_CS11_No_LSD = 0,
+    L2_CS11_LSD    = 1
+} AlxLp586x_RegEnum_0x8D_Dot_L2_CS11_LSD;
+typedef enum
+{
+    L2_CS10_No_LSD = 0,
+    L2_CS10_LSD    = 1
+} AlxLp586x_RegEnum_0x8D_Dot_L2_CS10_LSD;
+typedef enum
+{
+    L2_CS9_No_LSD = 0,
+    L2_CS9_LSD    = 1
+} AlxLp586x_RegEnum_0x8D_Dot_L2_CS9_LSD;
+typedef enum
+{
+    L2_CS8_No_LSD = 0,
+    L2_CS8_LSD    = 1
+} AlxLp586x_RegEnum_0x8D_Dot_L2_CS8_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x8D_Dot_L2_CS15_LSD Dot_L2_CS15_LSD : 1;
+        AlxLp586x_RegEnum_0x8D_Dot_L2_CS14_LSD Dot_L2_CS14_LSD : 1;
+        AlxLp586x_RegEnum_0x8D_Dot_L2_CS13_LSD Dot_L2_CS13_LSD : 1;
+        AlxLp586x_RegEnum_0x8D_Dot_L2_CS12_LSD Dot_L2_CS12_LSD : 1;
+        AlxLp586x_RegEnum_0x8D_Dot_L2_CS11_LSD Dot_L2_CS11_LSD : 1;
+        AlxLp586x_RegEnum_0x8D_Dot_L2_CS10_LSD Dot_L2_CS10_LSD : 1;
+        AlxLp586x_RegEnum_0x8D_Dot_L2_CS9_LSD  Dot_L2_CS9_LSD  : 1;
+        AlxLp586x_RegEnum_0x8D_Dot_L2_CS8_LSD  Dot_L2_CS8_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x8D_Dot_lsd7;
+
+
+//******************************************************************************
+// Address: 0x8E, Reset: 0x00 , Name: Dot_lsd8
+//******************************************************************************
+typedef enum
+{
+    L2_CS17_No_LSD = 0,
+    L2_CS17_LSD    = 1
+} AlxLp586x_RegEnum_0x8E_Dot_L2_CS17_LSD;
+typedef enum
+{
+    L2_CS16_No_LSD = 0,
+    L2_CS16_LSD    = 1
+} AlxLp586x_RegEnum_0x8E_Dot_L2_CS16_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x8E_Dot_L2_CS17_LSD Dot_L2_CS17_LSD  : 1;
+        AlxLp586x_RegEnum_0x8E_Dot_L2_CS16_LSD Dot_L2_CS16_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x8E_Dot_lsd8;
+
+
+//******************************************************************************
+// Address: 0x8F, Reset: 0x00 , Name: Dot_lsd9
+//******************************************************************************
+typedef enum
+{
+    L3_CS7_No_LSD = 0,
+    L3_CS7_LSD    = 1
+} AlxLp586x_RegEnum_0x8F_Dot_L3_CS7_LSD;
+typedef enum
+{
+    L3_CS6_No_LSD = 0,
+    L3_CS6_LSD    = 1
+} AlxLp586x_RegEnum_0x8F_Dot_L3_CS6_LSD;
+typedef enum
+{
+    L3_CS5_No_LSD = 0,
+    L3_CS5_LSD    = 1
+} AlxLp586x_RegEnum_0x8F_Dot_L3_CS5_LSD;
+typedef enum
+{
+    L3_CS4_No_LSD = 0,
+    L3_CS4_LSD    = 1
+} AlxLp586x_RegEnum_0x8F_Dot_L3_CS4_LSD;
+typedef enum
+{
+    L3_CS3_No_LSD = 0,
+    L3_CS3_LSD    = 1
+} AlxLp586x_RegEnum_0x8F_Dot_L3_CS3_LSD;
+typedef enum
+{
+    L3_CS2_No_LSD = 0,
+    L3_CS2_LSD    = 1
+} AlxLp586x_RegEnum_0x8F_Dot_L3_CS2_LSD;
+typedef enum
+{
+    L3_CS1_No_LSD = 0,
+    L3_CS1_LSD    = 1
+} AlxLp586x_RegEnum_0x8F_Dot_L3_CS1_LSD;
+typedef enum
+{
+    L3_CS0_No_LSD = 0,
+    L3_CS0_LSD    = 1
+} AlxLp586x_RegEnum_0x8F_Dot_L3_CS0_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x8F_Dot_L3_CS7_LSD Dot_L3_CS7_LSD : 1;
+        AlxLp586x_RegEnum_0x8F_Dot_L3_CS6_LSD Dot_L3_CS6_LSD : 1;
+        AlxLp586x_RegEnum_0x8F_Dot_L3_CS5_LSD Dot_L3_CS5_LSD : 1;
+        AlxLp586x_RegEnum_0x8F_Dot_L3_CS4_LSD Dot_L3_CS4_LSD : 1;
+        AlxLp586x_RegEnum_0x8F_Dot_L3_CS3_LSD Dot_L3_CS3_LSD : 1;
+        AlxLp586x_RegEnum_0x8F_Dot_L3_CS2_LSD Dot_L3_CS2_LSD : 1;
+        AlxLp586x_RegEnum_0x8F_Dot_L3_CS1_LSD Dot_L3_CS1_LSD : 1;
+        AlxLp586x_RegEnum_0x8F_Dot_L3_CS0_LSD Dot_L3_CS0_LSD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x8F_Dot_lsd9;
+
+
+//******************************************************************************
+// Address: 0x90, Reset: 0x00 , Name: Dot_lsd10
+//******************************************************************************
+typedef enum
+{
+    L3_CS15_No_LSD = 0,
+    L3_CS15_LSD    = 1
+} AlxLp586x_RegEnum_0x90_Dot_L3_CS15_LSD;
+typedef enum
+{
+    L3_CS14_No_LSD = 0,
+    L3_CS14_LSD    = 1
+} AlxLp586x_RegEnum_0x90_Dot_L3_CS14_LSD;
+typedef enum
+{
+    L3_CS13_No_LSD = 0,
+    L3_CS13_LSD    = 1
+} AlxLp586x_RegEnum_0x90_Dot_L3_CS13_LSD;
+typedef enum
+{
+    L3_CS12_No_LSD = 0,
+    L3_CS12_LSD    = 1
+} AlxLp586x_RegEnum_0x90_Dot_L3_CS12_LSD;
+typedef enum
+{
+    L3_CS11_No_LSD = 0,
+    L3_CS11_LSD    = 1
+} AlxLp586x_RegEnum_0x90_Dot_L3_CS11_LSD;
+typedef enum
+{
+    L3_CS10_No_LSD = 0,
+    L3_CS10_LSD    = 1
+} AlxLp586x_RegEnum_0x90_Dot_L3_CS10_LSD;
+typedef enum
+{
+    L3_CS9_No_LSD = 0,
+    L3_CS9_LSD    = 1
+} AlxLp586x_RegEnum_0x90_Dot_L3_CS9_LSD;
+typedef enum
+{
+    L3_CS8_No_LSD = 0,
+    L3_CS8_LSD    = 1
+} AlxLp586x_RegEnum_0x90_Dot_L3_CS8_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x90_Dot_L3_CS15_LSD Dot_L3_CS15_LSD : 1;
+        AlxLp586x_RegEnum_0x90_Dot_L3_CS14_LSD Dot_L3_CS14_LSD : 1;
+        AlxLp586x_RegEnum_0x90_Dot_L3_CS13_LSD Dot_L3_CS13_LSD : 1;
+        AlxLp586x_RegEnum_0x90_Dot_L3_CS12_LSD Dot_L3_CS12_LSD : 1;
+        AlxLp586x_RegEnum_0x90_Dot_L3_CS11_LSD Dot_L3_CS11_LSD : 1;
+        AlxLp586x_RegEnum_0x90_Dot_L3_CS10_LSD Dot_L3_CS10_LSD : 1;
+        AlxLp586x_RegEnum_0x90_Dot_L3_CS9_LSD  Dot_L3_CS9_LSD  : 1;
+        AlxLp586x_RegEnum_0x90_Dot_L3_CS8_LSD  Dot_L3_CS8_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x90_Dot_lsd10;
+
+
+//******************************************************************************
+// Address: 0x91, Reset: 0x00 , Name: Dot_lsd11
+//******************************************************************************
+typedef enum
+{
+    L3_CS17_No_LSD = 0,
+    L3_CS17_LSD    = 1
+} AlxLp586x_RegEnum_0x91_Dot_L3_CS17_LSD;
+typedef enum
+{
+    L3_CS16_No_LSD = 0,
+    L3_CS16_LSD    = 1
+} AlxLp586x_RegEnum_0x91_Dot_L3_CS16_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x91_Dot_L3_CS17_LSD Dot_L3_CS17_LSD  : 1;
+        AlxLp586x_RegEnum_0x91_Dot_L3_CS16_LSD Dot_L3_CS16_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x91_Dot_lsd11;
+
+
+//******************************************************************************
+// Address: 0x92, Reset: 0x00 , Name: Dot_lsd12
+//******************************************************************************
+typedef enum
+{
+    L4_CS7_No_LSD = 0,
+    L4_CS7_LSD    = 1
+} AlxLp586x_RegEnum_0x92_Dot_L4_CS7_LSD;
+typedef enum
+{
+    L4_CS6_No_LSD = 0,
+    L4_CS6_LSD    = 1
+} AlxLp586x_RegEnum_0x92_Dot_L4_CS6_LSD;
+typedef enum
+{
+    L4_CS5_No_LSD = 0,
+    L4_CS5_LSD    = 1
+} AlxLp586x_RegEnum_0x92_Dot_L4_CS5_LSD;
+typedef enum
+{
+    L4_CS4_No_LSD = 0,
+    L4_CS4_LSD    = 1
+} AlxLp586x_RegEnum_0x92_Dot_L4_CS4_LSD;
+typedef enum
+{
+    L4_CS3_No_LSD = 0,
+    L4_CS3_LSD    = 1
+} AlxLp586x_RegEnum_0x92_Dot_L4_CS3_LSD;
+typedef enum
+{
+    L4_CS2_No_LSD = 0,
+    L4_CS2_LSD    = 1
+} AlxLp586x_RegEnum_0x92_Dot_L4_CS2_LSD;
+typedef enum
+{
+    L4_CS1_No_LSD = 0,
+    L4_CS1_LSD    = 1
+} AlxLp586x_RegEnum_0x92_Dot_L4_CS1_LSD;
+typedef enum
+{
+    L4_CS0_No_LSD = 0,
+    L4_CS0_LSD    = 1
+} AlxLp586x_RegEnum_0x92_Dot_L4_CS0_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x92_Dot_L4_CS7_LSD Dot_L4_CS7_LSD : 1;
+        AlxLp586x_RegEnum_0x92_Dot_L4_CS6_LSD Dot_L4_CS6_LSD : 1;
+        AlxLp586x_RegEnum_0x92_Dot_L4_CS5_LSD Dot_L4_CS5_LSD : 1;
+        AlxLp586x_RegEnum_0x92_Dot_L4_CS4_LSD Dot_L4_CS4_LSD : 1;
+        AlxLp586x_RegEnum_0x92_Dot_L4_CS3_LSD Dot_L4_CS3_LSD : 1;
+        AlxLp586x_RegEnum_0x92_Dot_L4_CS2_LSD Dot_L4_CS2_LSD : 1;
+        AlxLp586x_RegEnum_0x92_Dot_L4_CS1_LSD Dot_L4_CS1_LSD : 1;
+        AlxLp586x_RegEnum_0x92_Dot_L4_CS0_LSD Dot_L4_CS0_LSD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x92_Dot_lsd12;
+
+
+//******************************************************************************
+// Address: 0x93, Reset: 0x00 , Name: Dot_lsd13
+//******************************************************************************
+typedef enum
+{
+    L4_CS15_No_LSD = 0,
+    L4_CS15_LSD    = 1
+} AlxLp586x_RegEnum_0x93_Dot_L4_CS15_LSD;
+typedef enum
+{
+    L4_CS14_No_LSD = 0,
+    L4_CS14_LSD    = 1
+} AlxLp586x_RegEnum_0x93_Dot_L4_CS14_LSD;
+typedef enum
+{
+    L4_CS13_No_LSD = 0,
+    L4_CS13_LSD    = 1
+} AlxLp586x_RegEnum_0x93_Dot_L4_CS13_LSD;
+typedef enum
+{
+    L4_CS12_No_LSD = 0,
+    L4_CS12_LSD    = 1
+} AlxLp586x_RegEnum_0x93_Dot_L4_CS12_LSD;
+typedef enum
+{
+    L4_CS11_No_LSD = 0,
+    L4_CS11_LSD    = 1
+} AlxLp586x_RegEnum_0x93_Dot_L4_CS11_LSD;
+typedef enum
+{
+    L4_CS10_No_LSD = 0,
+    L4_CS10_LSD    = 1
+} AlxLp586x_RegEnum_0x93_Dot_L4_CS10_LSD;
+typedef enum
+{
+    L4_CS9_No_LSD = 0,
+    L4_CS9_LSD    = 1
+} AlxLp586x_RegEnum_0x93_Dot_L4_CS9_LSD;
+typedef enum
+{
+    L4_CS8_No_LSD = 0,
+    L4_CS8_LSD    = 1
+} AlxLp586x_RegEnum_0x93_Dot_L4_CS8_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x93_Dot_L4_CS15_LSD Dot_L4_CS15_LSD : 1;
+        AlxLp586x_RegEnum_0x93_Dot_L4_CS14_LSD Dot_L4_CS14_LSD : 1;
+        AlxLp586x_RegEnum_0x93_Dot_L4_CS13_LSD Dot_L4_CS13_LSD : 1;
+        AlxLp586x_RegEnum_0x93_Dot_L4_CS12_LSD Dot_L4_CS12_LSD : 1;
+        AlxLp586x_RegEnum_0x93_Dot_L4_CS11_LSD Dot_L4_CS11_LSD : 1;
+        AlxLp586x_RegEnum_0x93_Dot_L4_CS10_LSD Dot_L4_CS10_LSD : 1;
+        AlxLp586x_RegEnum_0x93_Dot_L4_CS9_LSD  Dot_L4_CS9_LSD  : 1;
+        AlxLp586x_RegEnum_0x93_Dot_L4_CS8_LSD  Dot_L4_CS8_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x93_Dot_lsd13;
+
+
+//******************************************************************************
+// Address: 0x94, Reset: 0x00 , Name: Dot_lsd14
+//******************************************************************************
+typedef enum
+{
+    L4_CS17_No_LSD = 0,
+    L4_CS17_LSD    = 1
+} AlxLp586x_RegEnum_0x94_Dot_L4_CS17_LSD;
+typedef enum
+{
+    L4_CS16_No_LSD = 0,
+    L4_CS16_LSD    = 1
+} AlxLp586x_RegEnum_0x94_Dot_L4_CS16_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x94_Dot_L4_CS17_LSD Dot_L4_CS17_LSD  : 1;
+        AlxLp586x_RegEnum_0x94_Dot_L4_CS16_LSD Dot_L4_CS16_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x94_Dot_lsd14;
+
+
+//******************************************************************************
+// Address: 0x95, Reset: 0x00 , Name: Dot_lsd15
+//******************************************************************************
+typedef enum
+{
+    L5_CS7_No_LSD = 0,
+    L5_CS7_LSD    = 1
+} AlxLp586x_RegEnum_0x95_Dot_L5_CS7_LSD;
+typedef enum
+{
+    L5_CS6_No_LSD = 0,
+    L5_CS6_LSD    = 1
+} AlxLp586x_RegEnum_0x95_Dot_L5_CS6_LSD;
+typedef enum
+{
+    L5_CS5_No_LSD = 0,
+    L5_CS5_LSD    = 1
+} AlxLp586x_RegEnum_0x95_Dot_L5_CS5_LSD;
+typedef enum
+{
+    L5_CS4_No_LSD = 0,
+    L5_CS4_LSD    = 1
+} AlxLp586x_RegEnum_0x95_Dot_L5_CS4_LSD;
+typedef enum
+{
+    L5_CS3_No_LSD = 0,
+    L5_CS3_LSD    = 1
+} AlxLp586x_RegEnum_0x95_Dot_L5_CS3_LSD;
+typedef enum
+{
+    L5_CS2_No_LSD = 0,
+    L5_CS2_LSD    = 1
+} AlxLp586x_RegEnum_0x95_Dot_L5_CS2_LSD;
+typedef enum
+{
+    L5_CS1_No_LSD = 0,
+    L5_CS1_LSD    = 1
+} AlxLp586x_RegEnum_0x95_Dot_L5_CS1_LSD;
+typedef enum
+{
+    L5_CS0_No_LSD = 0,
+    L5_CS0_LSD    = 1
+} AlxLp586x_RegEnum_0x95_Dot_L5_CS0_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x95_Dot_L5_CS7_LSD Dot_L5_CS7_LSD : 1;
+        AlxLp586x_RegEnum_0x95_Dot_L5_CS6_LSD Dot_L5_CS6_LSD : 1;
+        AlxLp586x_RegEnum_0x95_Dot_L5_CS5_LSD Dot_L5_CS5_LSD : 1;
+        AlxLp586x_RegEnum_0x95_Dot_L5_CS4_LSD Dot_L5_CS4_LSD : 1;
+        AlxLp586x_RegEnum_0x95_Dot_L5_CS3_LSD Dot_L5_CS3_LSD : 1;
+        AlxLp586x_RegEnum_0x95_Dot_L5_CS2_LSD Dot_L5_CS2_LSD : 1;
+        AlxLp586x_RegEnum_0x95_Dot_L5_CS1_LSD Dot_L5_CS1_LSD : 1;
+        AlxLp586x_RegEnum_0x95_Dot_L5_CS0_LSD Dot_L5_CS0_LSD : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x95_Dot_lsd15;
+
+
+//******************************************************************************
+// Address: 0x96, Reset: 0x00 , Name: Dot_lsd16
+//******************************************************************************
+typedef enum
+{
+    L5_CS15_No_LSD = 0,
+    L5_CS15_LSD    = 1
+} AlxLp586x_RegEnum_0x96_Dot_L5_CS15_LSD;
+typedef enum
+{
+    L5_CS14_No_LSD = 0,
+    L5_CS14_LSD    = 1
+} AlxLp586x_RegEnum_0x96_Dot_L5_CS14_LSD;
+typedef enum
+{
+    L5_CS13_No_LSD = 0,
+    L5_CS13_LSD    = 1
+} AlxLp586x_RegEnum_0x96_Dot_L5_CS13_LSD;
+typedef enum
+{
+    L5_CS12_No_LSD = 0,
+    L5_CS12_LSD    = 1
+} AlxLp586x_RegEnum_0x96_Dot_L5_CS12_LSD;
+typedef enum
+{
+    L5_CS11_No_LSD = 0,
+    L5_CS11_LSD    = 1
+} AlxLp586x_RegEnum_0x96_Dot_L5_CS11_LSD;
+typedef enum
+{
+    L5_CS10_No_LSD = 0,
+    L5_CS10_LSD    = 1
+} AlxLp586x_RegEnum_0x96_Dot_L5_CS10_LSD;
+typedef enum
+{
+    L5_CS9_No_LSD = 0,
+    L5_CS9_LSD    = 1
+} AlxLp586x_RegEnum_0x96_Dot_L5_CS9_LSD;
+typedef enum
+{
+    L5_CS8_No_LSD = 0,
+    L5_CS8_LSD    = 1
+} AlxLp586x_RegEnum_0x96_Dot_L5_CS8_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0x96_Dot_L5_CS15_LSD Dot_L5_CS15_LSD : 1;
+        AlxLp586x_RegEnum_0x96_Dot_L5_CS14_LSD Dot_L5_CS14_LSD : 1;
+        AlxLp586x_RegEnum_0x96_Dot_L5_CS13_LSD Dot_L5_CS13_LSD : 1;
+        AlxLp586x_RegEnum_0x96_Dot_L5_CS12_LSD Dot_L5_CS12_LSD : 1;
+        AlxLp586x_RegEnum_0x96_Dot_L5_CS11_LSD Dot_L5_CS11_LSD : 1;
+        AlxLp586x_RegEnum_0x96_Dot_L5_CS10_LSD Dot_L5_CS10_LSD : 1;
+        AlxLp586x_RegEnum_0x96_Dot_L5_CS9_LSD  Dot_L5_CS9_LSD  : 1;
+        AlxLp586x_RegEnum_0x96_Dot_L5_CS8_LSD  Dot_L5_CS8_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x96_Dot_lsd16;
+
+
+//******************************************************************************
+// Address: 0x97, Reset: 0x00 , Name: Dot_lsd17
+//******************************************************************************
+typedef enum
+{
+    L5_CS17_No_LSD = 0,
+    L5_CS17_LSD    = 1
+} AlxLp586x_RegEnum_0x97_Dot_L5_CS17_LSD;
+typedef enum
+{
+    L5_CS16_No_LSD = 0,
+    L5_CS16_LSD    = 1
+} AlxLp586x_RegEnum_0x97_Dot_L5_CS16_LSD;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+	    uint8_t unused_0_5                                      : 6;
+        AlxLp586x_RegEnum_0x97_Dot_L5_CS17_LSD Dot_L5_CS17_LSD  : 1;
+        AlxLp586x_RegEnum_0x97_Dot_L5_CS16_LSD Dot_L5_CS16_LSD  : 1;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0x97_Dot_lsd17;
+
+
+//******************************************************************************
+// Address: 0xA7, Reset: 0x00 , Name: LOD_clear
+//******************************************************************************
+typedef enum
+{
+	LOD_Clear_None = 0x0, // Leave all LOD flags unchanged
+	LOD_Clear_All = 0xF   // Clear all 4 open-fault bits at once
+} AlxLp586x_RegEnum_0xA7_LOD_Clear;
+typedef union
+{
+	struct __attribute__((packed))
+	{
+		AlxLp586x_RegEnum_0xA7_LOD_Clear LOD_clear  : 4;
+		uint8_t unused_4_7                          : 4;
+	};
+	uint8_t raw;
+} AlxLp586x_RegVal_0xA7_LOD_clear;
+
+
+//******************************************************************************
+// Address: 0xA8, Reset: 0x00 , Name: LSD_clear
+//******************************************************************************
+typedef enum
+{
+    LSD_Clear_None = 0x0, // Leave all LSD flags unchanged
+    LSD_Clear_All  = 0xF  // Clear all 4 short-fault bits at once
+} AlxLp586x_RegEnum_0xA8_LSD_Clear;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0xA8_LSD_Clear LSD_clear : 4;
+        uint8_t                         unused_4_7 : 4;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0xA8_LSD_clear;
+
+
+//******************************************************************************
 // Register Structures
 //******************************************************************************
 typedef struct
