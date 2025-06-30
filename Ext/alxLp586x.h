@@ -4632,6 +4632,24 @@ typedef union
 
 
 //******************************************************************************
+// Address: 0xA9, Reset: 0x00 , Name: Reset
+//******************************************************************************
+typedef enum
+{
+    Reset_None = 0x00,
+    Reset_Exec = 0xFF     // Write 0xFF to trigger a software reset
+} AlxLp586x_RegEnum_0xA9_Reset;
+typedef union
+{
+    struct __attribute__((packed))
+    {
+        AlxLp586x_RegEnum_0xA9_Reset Reset : 8;
+    };
+    uint8_t raw;
+} AlxLp586x_RegVal_0xA9_Reset;
+
+
+//******************************************************************************
 // Register Structures
 //******************************************************************************
 typedef struct
@@ -4886,7 +4904,6 @@ typedef struct
     uint8_t len;
     AlxLp586x_RegVal_0x29_Dot_grp_sel29   val;
 } AlxLp586x_Reg_0x29_Dot_grp_sel29;
-
 typedef struct
 {
     uint8_t addr;
@@ -4995,80 +5012,353 @@ typedef struct
     uint8_t len;
     AlxLp586x_RegVal_0x54_Dot_onoff17    val;
 } AlxLp586x_Reg_0x54_Dot_onoff17;
-
 typedef struct
 {
     uint8_t addr;
     uint8_t len;
     AlxLp586x_RegVal_0x64_Fault_state    val;
 } AlxLp586x_Reg_0x64_Fault_state;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x65_Dot_lod0       val;
+} AlxLp586x_Reg_0x65_Dot_lod0;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x66_Dot_lod1       val;
+} AlxLp586x_Reg_0x66_Dot_lod1;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x67_Dot_lod2       val;
+} AlxLp586x_Reg_0x67_Dot_lod2;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x68_Dot_lod3       val;
+} AlxLp586x_Reg_0x68_Dot_lod3;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x69_Dot_lod4       val;
+} AlxLp586x_Reg_0x69_Dot_lod4;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x6A_Dot_lod5       val;
+} AlxLp586x_Reg_0x6A_Dot_lod5;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x6B_Dot_lod6       val;
+} AlxLp586x_Reg_0x6B_Dot_lod6;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x6C_Dot_lod7       val;
+} AlxLp586x_Reg_0x6C_Dot_lod7;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x6D_Dot_lod8       val;
+} AlxLp586x_Reg_0x6D_Dot_lod8;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x6E_Dot_lod9       val;
+} AlxLp586x_Reg_0x6E_Dot_lod9;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x6F_Dot_lod10      val;
+} AlxLp586x_Reg_0x6F_Dot_lod10;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x70_Dot_lod11      val;
+} AlxLp586x_Reg_0x70_Dot_lod11;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x71_Dot_lod12      val;
+} AlxLp586x_Reg_0x71_Dot_lod12;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x72_Dot_lod13      val;
+} AlxLp586x_Reg_0x72_Dot_lod13;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x73_Dot_lod14      val;
+} AlxLp586x_Reg_0x73_Dot_lod14;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x74_Dot_lod15      val;
+} AlxLp586x_Reg_0x74_Dot_lod15;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x75_Dot_lod16      val;
+} AlxLp586x_Reg_0x75_Dot_lod16;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x76_Dot_lod17      val;
+} AlxLp586x_Reg_0x76_Dot_lod17;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x86_Dot_lsd0       val;
+} AlxLp586x_Reg_0x86_Dot_lsd0;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x87_Dot_lsd1       val;
+} AlxLp586x_Reg_0x87_Dot_lsd1;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x88_Dot_lsd2       val;
+} AlxLp586x_Reg_0x88_Dot_lsd2;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x89_Dot_lsd3       val;
+} AlxLp586x_Reg_0x89_Dot_lsd3;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x8A_Dot_lsd4       val;
+} AlxLp586x_Reg_0x8A_Dot_lsd4;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x8B_Dot_lsd5       val;
+} AlxLp586x_Reg_0x8B_Dot_lsd5;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x8C_Dot_lsd6       val;
+} AlxLp586x_Reg_0x8C_Dot_lsd6;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x8D_Dot_lsd7       val;
+} AlxLp586x_Reg_0x8D_Dot_lsd7;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x8E_Dot_lsd8       val;
+} AlxLp586x_Reg_0x8E_Dot_lsd8;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x8F_Dot_lsd9       val;
+} AlxLp586x_Reg_0x8F_Dot_lsd9;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x90_Dot_lsd10      val;
+} AlxLp586x_Reg_0x90_Dot_lsd10;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x91_Dot_lsd11      val;
+} AlxLp586x_Reg_0x91_Dot_lsd11;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x92_Dot_lsd12      val;
+} AlxLp586x_Reg_0x92_Dot_lsd12;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x93_Dot_lsd13      val;
+} AlxLp586x_Reg_0x93_Dot_lsd13;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x94_Dot_lsd14      val;
+} AlxLp586x_Reg_0x94_Dot_lsd14;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x95_Dot_lsd15      val;
+} AlxLp586x_Reg_0x95_Dot_lsd15;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x96_Dot_lsd16      val;
+} AlxLp586x_Reg_0x96_Dot_lsd16;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0x97_Dot_lsd17      val;
+} AlxLp586x_Reg_0x97_Dot_lsd17;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0xA7_LOD_clear      val;
+} AlxLp586x_Reg_0xA7_LOD_clear;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0xA8_LSD_clear      val;
+} AlxLp586x_Reg_0xA8_LSD_clear;
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    AlxLp586x_RegVal_0xA9_Reset          val;
+} AlxLp586x_Reg_0xA9_Reset;
+
 
 //******************************************************************************
 // Main Register Structure
 //******************************************************************************
 typedef struct
 {
-	AlxLp586x_Reg_0x00_Chip_En _0x00_Chip_En;
-	AlxLp586x_Reg_0x01_Dev_initial _Dev_initial;
-	AlxLp586x_Reg_0x02_Dev_config1 _Dev_config1;
-	AlxLp586x_Reg_0x03_Dev_config2 _Dev_config2;
-	AlxLp586x_Reg_0x04_Dev_config3 _Dev_config3;
-	AlxLp586x_Reg_0x05_Global_bri _Global_bri;
-	AlxLp586x_Reg_0x06_Group0_bri _Group0_bri;
-	AlxLp586x_Reg_0x07_Group1_bri _0x07_Group1_bri;
-	AlxLp586x_Reg_0x08_Group2_bri _0x08_Group2_bri;
-	AlxLp586x_Reg_0x09_R_current_set_CC_Group1 _0x09_R_current_set_CC_Group1;
-	AlxLp586x_Reg_0x0A_G_current_set_CC_Group2 _0x0A_G_current_set_CC_Group2;
-	AlxLp586x_Reg_0x0B_B_current_set_CC_Group3 _0x0B_B_current_set_CC_Group3;
-	AlxLp586x_Reg_0x0C_Dot_grp_sel0            _0x0C_Dot_grp_sel0;
-    AlxLp586x_Reg_0x0D_Dot_grp_sel1            _0x0D_Dot_grp_sel1;
-    AlxLp586x_Reg_0x0E_Dot_grp_sel2            _0x0E_Dot_grp_sel2;
-    AlxLp586x_Reg_0x0F_Dot_grp_sel3            _0x0F_Dot_grp_sel3;
-    AlxLp586x_Reg_0x10_Dot_grp_sel4            _0x10_Dot_grp_sel4;
-    AlxLp586x_Reg_0x11_Dot_grp_sel5            _0x11_Dot_grp_sel5;
-    AlxLp586x_Reg_0x12_Dot_grp_sel6            _0x12_Dot_grp_sel6;
-    AlxLp586x_Reg_0x13_Dot_grp_sel7            _0x13_Dot_grp_sel7;
-    AlxLp586x_Reg_0x14_Dot_grp_sel8            _0x14_Dot_grp_sel8;
-    AlxLp586x_Reg_0x15_Dot_grp_sel9            _0x15_Dot_grp_sel9;
-    AlxLp586x_Reg_0x16_Dot_grp_sel10           _0x16_Dot_grp_sel10;
-    AlxLp586x_Reg_0x17_Dot_grp_sel11           _0x17_Dot_grp_sel11;
-    AlxLp586x_Reg_0x18_Dot_grp_sel12           _0x18_Dot_grp_sel12;
-    AlxLp586x_Reg_0x19_Dot_grp_sel13           _0x19_Dot_grp_sel13;
-    AlxLp586x_Reg_0x1A_Dot_grp_sel14           _0x1A_Dot_grp_sel14;
-    AlxLp586x_Reg_0x1B_Dot_grp_sel15           _0x1B_Dot_grp_sel15;
-    AlxLp586x_Reg_0x1C_Dot_grp_sel16           _0x1C_Dot_grp_sel16;
-    AlxLp586x_Reg_0x1D_Dot_grp_sel17           _0x1D_Dot_grp_sel17;
-    AlxLp586x_Reg_0x1E_Dot_grp_sel18           _0x1E_Dot_grp_sel18;
-    AlxLp586x_Reg_0x1F_Dot_grp_sel19           _0x1F_Dot_grp_sel19;
-    AlxLp586x_Reg_0x20_Dot_grp_sel20           _0x20_Dot_grp_sel20;
-    AlxLp586x_Reg_0x21_Dot_grp_sel21           _0x21_Dot_grp_sel21;
-    AlxLp586x_Reg_0x22_Dot_grp_sel22           _0x22_Dot_grp_sel22;
-    AlxLp586x_Reg_0x23_Dot_grp_sel23           _0x23_Dot_grp_sel23;
-    AlxLp586x_Reg_0x24_Dot_grp_sel24           _0x24_Dot_grp_sel24;
-    AlxLp586x_Reg_0x25_Dot_grp_sel25           _0x25_Dot_grp_sel25;
-    AlxLp586x_Reg_0x26_Dot_grp_sel26           _0x26_Dot_grp_sel26;
-    AlxLp586x_Reg_0x27_Dot_grp_sel27           _0x27_Dot_grp_sel27;
-    AlxLp586x_Reg_0x28_Dot_grp_sel28           _0x28_Dot_grp_sel28;
-    AlxLp586x_Reg_0x29_Dot_grp_sel29           _0x29_Dot_grp_sel29;
-    AlxLp586x_Reg_0x43_Dot_onoff0              _0x43_Dot_onoff0;
-    AlxLp586x_Reg_0x44_Dot_onoff1              _0x44_Dot_onoff1;
-    AlxLp586x_Reg_0x45_Dot_onoff2              _0x45_Dot_onoff2;
-    AlxLp586x_Reg_0x46_Dot_onoff3              _0x46_Dot_onoff3;
-    AlxLp586x_Reg_0x47_Dot_onoff4              _0x47_Dot_onoff4;
-    AlxLp586x_Reg_0x48_Dot_onoff5              _0x48_Dot_onoff5;
-    AlxLp586x_Reg_0x49_Dot_onoff6              _0x49_Dot_onoff6;
-    AlxLp586x_Reg_0x4A_Dot_onoff7              _0x4A_Dot_onoff7;
-    AlxLp586x_Reg_0x4B_Dot_onoff8              _0x4B_Dot_onoff8;
-    AlxLp586x_Reg_0x4C_Dot_onoff9              _0x4C_Dot_onoff9;
-    AlxLp586x_Reg_0x4D_Dot_onoff10             _0x4D_Dot_onoff10;
-    AlxLp586x_Reg_0x4E_Dot_onoff11             _0x4E_Dot_onoff11;
-    AlxLp586x_Reg_0x4F_Dot_onoff12             _0x4F_Dot_onoff12;
-    AlxLp586x_Reg_0x50_Dot_onoff13             _0x50_Dot_onoff13;
-    AlxLp586x_Reg_0x51_Dot_onoff14             _0x51_Dot_onoff14;
-    AlxLp586x_Reg_0x52_Dot_onoff15             _0x52_Dot_onoff15;
-    AlxLp586x_Reg_0x53_Dot_onoff16             _0x53_Dot_onoff16;
-    AlxLp586x_Reg_0x54_Dot_onoff17             _0x54_Dot_onoff17;
-    AlxLp586x_Reg_0x64_Fault_state             _0x64_Fault_state;
+	AlxLp586x_Reg_0x00_Chip_En                  _0x00_Chip_En;
+	AlxLp586x_Reg_0x01_Dev_initial              _Dev_initial;
+	AlxLp586x_Reg_0x02_Dev_config1              _Dev_config1;
+	AlxLp586x_Reg_0x03_Dev_config2              _Dev_config2;
+	AlxLp586x_Reg_0x04_Dev_config3              _Dev_config3;
+	AlxLp586x_Reg_0x05_Global_bri               _Global_bri;
+	AlxLp586x_Reg_0x06_Group0_bri               _Group0_bri;
+	AlxLp586x_Reg_0x07_Group1_bri               _0x07_Group1_bri;
+	AlxLp586x_Reg_0x08_Group2_bri               _0x08_Group2_bri;
+	AlxLp586x_Reg_0x09_R_current_set_CC_Group1  _0x09_R_current_set_CC_Group1;
+	AlxLp586x_Reg_0x0A_G_current_set_CC_Group2  _0x0A_G_current_set_CC_Group2;
+	AlxLp586x_Reg_0x0B_B_current_set_CC_Group3  _0x0B_B_current_set_CC_Group3;
+	AlxLp586x_Reg_0x0C_Dot_grp_sel0             _0x0C_Dot_grp_sel0;
+    AlxLp586x_Reg_0x0D_Dot_grp_sel1             _0x0D_Dot_grp_sel1;
+    AlxLp586x_Reg_0x0E_Dot_grp_sel2             _0x0E_Dot_grp_sel2;
+    AlxLp586x_Reg_0x0F_Dot_grp_sel3             _0x0F_Dot_grp_sel3;
+    AlxLp586x_Reg_0x10_Dot_grp_sel4             _0x10_Dot_grp_sel4;
+    AlxLp586x_Reg_0x11_Dot_grp_sel5             _0x11_Dot_grp_sel5;
+    AlxLp586x_Reg_0x12_Dot_grp_sel6             _0x12_Dot_grp_sel6;
+    AlxLp586x_Reg_0x13_Dot_grp_sel7             _0x13_Dot_grp_sel7;
+    AlxLp586x_Reg_0x14_Dot_grp_sel8             _0x14_Dot_grp_sel8;
+    AlxLp586x_Reg_0x15_Dot_grp_sel9             _0x15_Dot_grp_sel9;
+    AlxLp586x_Reg_0x16_Dot_grp_sel10            _0x16_Dot_grp_sel10;
+    AlxLp586x_Reg_0x17_Dot_grp_sel11            _0x17_Dot_grp_sel11;
+    AlxLp586x_Reg_0x18_Dot_grp_sel12            _0x18_Dot_grp_sel12;
+    AlxLp586x_Reg_0x19_Dot_grp_sel13            _0x19_Dot_grp_sel13;
+    AlxLp586x_Reg_0x1A_Dot_grp_sel14            _0x1A_Dot_grp_sel14;
+    AlxLp586x_Reg_0x1B_Dot_grp_sel15            _0x1B_Dot_grp_sel15;
+    AlxLp586x_Reg_0x1C_Dot_grp_sel16            _0x1C_Dot_grp_sel16;
+    AlxLp586x_Reg_0x1D_Dot_grp_sel17            _0x1D_Dot_grp_sel17;
+    AlxLp586x_Reg_0x1E_Dot_grp_sel18            _0x1E_Dot_grp_sel18;
+    AlxLp586x_Reg_0x1F_Dot_grp_sel19            _0x1F_Dot_grp_sel19;
+    AlxLp586x_Reg_0x20_Dot_grp_sel20            _0x20_Dot_grp_sel20;
+    AlxLp586x_Reg_0x21_Dot_grp_sel21            _0x21_Dot_grp_sel21;
+    AlxLp586x_Reg_0x22_Dot_grp_sel22            _0x22_Dot_grp_sel22;
+    AlxLp586x_Reg_0x23_Dot_grp_sel23            _0x23_Dot_grp_sel23;
+    AlxLp586x_Reg_0x24_Dot_grp_sel24            _0x24_Dot_grp_sel24;
+    AlxLp586x_Reg_0x25_Dot_grp_sel25            _0x25_Dot_grp_sel25;
+    AlxLp586x_Reg_0x26_Dot_grp_sel26            _0x26_Dot_grp_sel26;
+    AlxLp586x_Reg_0x27_Dot_grp_sel27            _0x27_Dot_grp_sel27;
+    AlxLp586x_Reg_0x28_Dot_grp_sel28            _0x28_Dot_grp_sel28;
+    AlxLp586x_Reg_0x29_Dot_grp_sel29            _0x29_Dot_grp_sel29;
+    AlxLp586x_Reg_0x43_Dot_onoff0               _0x43_Dot_onoff0;
+    AlxLp586x_Reg_0x44_Dot_onoff1               _0x44_Dot_onoff1;
+    AlxLp586x_Reg_0x45_Dot_onoff2               _0x45_Dot_onoff2;
+    AlxLp586x_Reg_0x46_Dot_onoff3               _0x46_Dot_onoff3;
+    AlxLp586x_Reg_0x47_Dot_onoff4               _0x47_Dot_onoff4;
+    AlxLp586x_Reg_0x48_Dot_onoff5               _0x48_Dot_onoff5;
+    AlxLp586x_Reg_0x49_Dot_onoff6               _0x49_Dot_onoff6;
+    AlxLp586x_Reg_0x4A_Dot_onoff7               _0x4A_Dot_onoff7;
+    AlxLp586x_Reg_0x4B_Dot_onoff8               _0x4B_Dot_onoff8;
+    AlxLp586x_Reg_0x4C_Dot_onoff9               _0x4C_Dot_onoff9;
+    AlxLp586x_Reg_0x4D_Dot_onoff10              _0x4D_Dot_onoff10;
+    AlxLp586x_Reg_0x4E_Dot_onoff11              _0x4E_Dot_onoff11;
+    AlxLp586x_Reg_0x4F_Dot_onoff12              _0x4F_Dot_onoff12;
+    AlxLp586x_Reg_0x50_Dot_onoff13              _0x50_Dot_onoff13;
+    AlxLp586x_Reg_0x51_Dot_onoff14              _0x51_Dot_onoff14;
+    AlxLp586x_Reg_0x52_Dot_onoff15              _0x52_Dot_onoff15;
+    AlxLp586x_Reg_0x53_Dot_onoff16              _0x53_Dot_onoff16;
+    AlxLp586x_Reg_0x54_Dot_onoff17              _0x54_Dot_onoff17;
+    AlxLp586x_Reg_0x64_Fault_state              _0x64_Fault_state;
+	AlxLp586x_Reg_0x65_Dot_lod0                 _0x65_Dot_lod0;
+    AlxLp586x_Reg_0x66_Dot_lod1                 _0x66_Dot_lod1;
+    AlxLp586x_Reg_0x67_Dot_lod2                 _0x67_Dot_lod2;
+    AlxLp586x_Reg_0x68_Dot_lod3                 _0x68_Dot_lod3;
+    AlxLp586x_Reg_0x69_Dot_lod4                 _0x69_Dot_lod4;
+    AlxLp586x_Reg_0x6A_Dot_lod5                 _0x6A_Dot_lod5;
+    AlxLp586x_Reg_0x6B_Dot_lod6                 _0x6B_Dot_lod6;
+    AlxLp586x_Reg_0x6C_Dot_lod7                 _0x6C_Dot_lod7;
+    AlxLp586x_Reg_0x6D_Dot_lod8                 _0x6D_Dot_lod8;
+    AlxLp586x_Reg_0x6E_Dot_lod9                 _0x6E_Dot_lod9;
+    AlxLp586x_Reg_0x6F_Dot_lod10                _0x6F_Dot_lod10;
+    AlxLp586x_Reg_0x70_Dot_lod11                _0x70_Dot_lod11;
+    AlxLp586x_Reg_0x71_Dot_lod12                _0x71_Dot_lod12;
+    AlxLp586x_Reg_0x72_Dot_lod13                _0x72_Dot_lod13;
+    AlxLp586x_Reg_0x73_Dot_lod14                _0x73_Dot_lod14;
+    AlxLp586x_Reg_0x74_Dot_lod15                _0x74_Dot_lod15;
+    AlxLp586x_Reg_0x75_Dot_lod16                _0x75_Dot_lod16;
+    AlxLp586x_Reg_0x76_Dot_lod17                _0x76_Dot_lod17;
+    AlxLp586x_Reg_0x86_Dot_lsd0                 _0x86_Dot_lsd0;
+    AlxLp586x_Reg_0x87_Dot_lsd1                 _0x87_Dot_lsd1;
+    AlxLp586x_Reg_0x88_Dot_lsd2                 _0x88_Dot_lsd2;
+    AlxLp586x_Reg_0x89_Dot_lsd3                 _0x89_Dot_lsd3;
+    AlxLp586x_Reg_0x8A_Dot_lsd4                 _0x8A_Dot_lsd4;
+    AlxLp586x_Reg_0x8B_Dot_lsd5                 _0x8B_Dot_lsd5;
+    AlxLp586x_Reg_0x8C_Dot_lsd6                 _0x8C_Dot_lsd6;
+    AlxLp586x_Reg_0x8D_Dot_lsd7                 _0x8D_Dot_lsd7;
+    AlxLp586x_Reg_0x8E_Dot_lsd8                 _0x8E_Dot_lsd8;
+    AlxLp586x_Reg_0x8F_Dot_lsd9                 _0x8F_Dot_lsd9;
+    AlxLp586x_Reg_0x90_Dot_lsd10                _0x90_Dot_lsd10;
+    AlxLp586x_Reg_0x91_Dot_lsd11                _0x91_Dot_lsd11;
+    AlxLp586x_Reg_0x92_Dot_lsd12                _0x92_Dot_lsd12;
+    AlxLp586x_Reg_0x93_Dot_lsd13                _0x93_Dot_lsd13;
+    AlxLp586x_Reg_0x94_Dot_lsd14                _0x94_Dot_lsd14;
+    AlxLp586x_Reg_0x95_Dot_lsd15                _0x95_Dot_lsd15;
+    AlxLp586x_Reg_0x96_Dot_lsd16                _0x96_Dot_lsd16;
+    AlxLp586x_Reg_0x97_Dot_lsd17                _0x97_Dot_lsd17;
+    AlxLp586x_Reg_0xA7_LOD_clear                _0xA7_LOD_clear;
+    AlxLp586x_Reg_0xA8_LSD_clear                _0xA8_LSD_clear;
+    AlxLp586x_Reg_0xA9_Reset                    _0xA9_Reset;
 } AlxLp586x_Reg;
 
 
