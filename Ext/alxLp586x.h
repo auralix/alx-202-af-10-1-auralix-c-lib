@@ -5260,12 +5260,12 @@ typedef struct
 typedef struct
 {
 	AlxLp586x_Reg_0x00_Chip_En                  _0x00_Chip_En;
-	AlxLp586x_Reg_0x01_Dev_initial              _Dev_initial;
-	AlxLp586x_Reg_0x02_Dev_config1              _Dev_config1;
-	AlxLp586x_Reg_0x03_Dev_config2              _Dev_config2;
-	AlxLp586x_Reg_0x04_Dev_config3              _Dev_config3;
-	AlxLp586x_Reg_0x05_Global_bri               _Global_bri;
-	AlxLp586x_Reg_0x06_Group0_bri               _Group0_bri;
+	AlxLp586x_Reg_0x01_Dev_initial              _0x01_Dev_initial;
+	AlxLp586x_Reg_0x02_Dev_config1              _0x02_Dev_config1;
+	AlxLp586x_Reg_0x03_Dev_config2              _0x03_Dev_config2;
+	AlxLp586x_Reg_0x04_Dev_config3              _0x04_Dev_config3;
+	AlxLp586x_Reg_0x05_Global_bri               _0x05_Global_bri;
+	AlxLp586x_Reg_0x06_Group0_bri               _0x06_Group0_bri;
 	AlxLp586x_Reg_0x07_Group1_bri               _0x07_Group1_bri;
 	AlxLp586x_Reg_0x08_Group2_bri               _0x08_Group2_bri;
 	AlxLp586x_Reg_0x09_R_current_set_CC_Group1  _0x09_R_current_set_CC_Group1;
@@ -5368,6 +5368,8 @@ typedef struct
 typedef struct
 {
 	// Parameters
+	AlxIoPin* do_LED_DRV_EN;
+    AlxIoPin* do_LED_DRV_SYNC;
 	AlxI2c* i2c;
 	uint8_t i2cAddr;
 	bool i2cCheckWithRead;
@@ -5390,6 +5392,8 @@ typedef struct
 void AlxLp586x_Ctor
 (
 	AlxLp586x* me,
+	AlxIoPin* do_LED_DRV_EN,
+	AlxIoPin* do_LED_DRV_SYNC,
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	bool i2cCheckWithRead,
