@@ -357,7 +357,8 @@ typedef enum
 	AlxFs_EndOfDir,
 	AlxLogger_ErrNoReadLog,
 	AlxNet_Timeout,
-	AlxNet_NotSupported
+	AlxNet_NotSupported,
+	AlxNtp_NotEnoughSamples
 } Alx_Status;
 
 typedef enum

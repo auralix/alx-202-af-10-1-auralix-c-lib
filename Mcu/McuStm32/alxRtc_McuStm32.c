@@ -243,8 +243,6 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 		ALX_RTC_TRACE_INF("AlxRtc - Date-Time configured");
 	}
 
-	//AlxRtc_TuneClockSource(me, 0);  // TODO Here we could have a calibrated value
-
 	// Return
 	return Alx_Ok;
 }
