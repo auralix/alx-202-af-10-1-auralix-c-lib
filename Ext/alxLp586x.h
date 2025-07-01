@@ -4728,512 +4728,8 @@ typedef struct
 {
     uint8_t addr;
     uint8_t len;
-    AlxLp586x_RegVal_0x0C_Dot_grp_sel0    val;
-} AlxLp586x_Reg_0x0C_Dot_grp_sel0;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x0D_Dot_grp_sel1    val;
-} AlxLp586x_Reg_0x0D_Dot_grp_sel1;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x0E_Dot_grp_sel2    val;
-} AlxLp586x_Reg_0x0E_Dot_grp_sel2;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x0F_Dot_grp_sel3    val;
-} AlxLp586x_Reg_0x0F_Dot_grp_sel3;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x10_Dot_grp_sel4    val;
-} AlxLp586x_Reg_0x10_Dot_grp_sel4;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x11_Dot_grp_sel5    val;
-} AlxLp586x_Reg_0x11_Dot_grp_sel5;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x12_Dot_grp_sel6    val;
-} AlxLp586x_Reg_0x12_Dot_grp_sel6;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x13_Dot_grp_sel7    val;
-} AlxLp586x_Reg_0x13_Dot_grp_sel7;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x14_Dot_grp_sel8    val;
-} AlxLp586x_Reg_0x14_Dot_grp_sel8;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x15_Dot_grp_sel9    val;
-} AlxLp586x_Reg_0x15_Dot_grp_sel9;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x16_Dot_grp_sel10   val;
-} AlxLp586x_Reg_0x16_Dot_grp_sel10;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x17_Dot_grp_sel11   val;
-} AlxLp586x_Reg_0x17_Dot_grp_sel11;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x18_Dot_grp_sel12   val;
-} AlxLp586x_Reg_0x18_Dot_grp_sel12;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x19_Dot_grp_sel13   val;
-} AlxLp586x_Reg_0x19_Dot_grp_sel13;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x1A_Dot_grp_sel14   val;
-} AlxLp586x_Reg_0x1A_Dot_grp_sel14;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x1B_Dot_grp_sel15   val;
-} AlxLp586x_Reg_0x1B_Dot_grp_sel15;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x1C_Dot_grp_sel16   val;
-} AlxLp586x_Reg_0x1C_Dot_grp_sel16;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x1D_Dot_grp_sel17   val;
-} AlxLp586x_Reg_0x1D_Dot_grp_sel17;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x1E_Dot_grp_sel18   val;
-} AlxLp586x_Reg_0x1E_Dot_grp_sel18;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x1F_Dot_grp_sel19   val;
-} AlxLp586x_Reg_0x1F_Dot_grp_sel19;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x20_Dot_grp_sel20   val;
-} AlxLp586x_Reg_0x20_Dot_grp_sel20;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x21_Dot_grp_sel21   val;
-} AlxLp586x_Reg_0x21_Dot_grp_sel21;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x22_Dot_grp_sel22   val;
-} AlxLp586x_Reg_0x22_Dot_grp_sel22;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x23_Dot_grp_sel23   val;
-} AlxLp586x_Reg_0x23_Dot_grp_sel23;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x24_Dot_grp_sel24   val;
-} AlxLp586x_Reg_0x24_Dot_grp_sel24;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x25_Dot_grp_sel25   val;
-} AlxLp586x_Reg_0x25_Dot_grp_sel25;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x26_Dot_grp_sel26   val;
-} AlxLp586x_Reg_0x26_Dot_grp_sel26;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x27_Dot_grp_sel27   val;
-} AlxLp586x_Reg_0x27_Dot_grp_sel27;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x28_Dot_grp_sel28   val;
-} AlxLp586x_Reg_0x28_Dot_grp_sel28;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x29_Dot_grp_sel29   val;
-} AlxLp586x_Reg_0x29_Dot_grp_sel29;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x43_Dot_onoff0     val;
-} AlxLp586x_Reg_0x43_Dot_onoff0;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x44_Dot_onoff1     val;
-} AlxLp586x_Reg_0x44_Dot_onoff1;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x45_Dot_onoff2     val;
-} AlxLp586x_Reg_0x45_Dot_onoff2;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x46_Dot_onoff3     val;
-} AlxLp586x_Reg_0x46_Dot_onoff3;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x47_Dot_onoff4     val;
-} AlxLp586x_Reg_0x47_Dot_onoff4;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x48_Dot_onoff5     val;
-} AlxLp586x_Reg_0x48_Dot_onoff5;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x49_Dot_onoff6     val;
-} AlxLp586x_Reg_0x49_Dot_onoff6;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x4A_Dot_onoff7     val;
-} AlxLp586x_Reg_0x4A_Dot_onoff7;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x4B_Dot_onoff8     val;
-} AlxLp586x_Reg_0x4B_Dot_onoff8;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x4C_Dot_onoff9     val;
-} AlxLp586x_Reg_0x4C_Dot_onoff9;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x4D_Dot_onoff10    val;
-} AlxLp586x_Reg_0x4D_Dot_onoff10;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x4E_Dot_onoff11    val;
-} AlxLp586x_Reg_0x4E_Dot_onoff11;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x4F_Dot_onoff12    val;
-} AlxLp586x_Reg_0x4F_Dot_onoff12;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x50_Dot_onoff13    val;
-} AlxLp586x_Reg_0x50_Dot_onoff13;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x51_Dot_onoff14    val;
-} AlxLp586x_Reg_0x51_Dot_onoff14;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x52_Dot_onoff15    val;
-} AlxLp586x_Reg_0x52_Dot_onoff15;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x53_Dot_onoff16    val;
-} AlxLp586x_Reg_0x53_Dot_onoff16;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x54_Dot_onoff17    val;
-} AlxLp586x_Reg_0x54_Dot_onoff17;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
     AlxLp586x_RegVal_0x64_Fault_state    val;
 } AlxLp586x_Reg_0x64_Fault_state;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x65_Dot_lod0       val;
-} AlxLp586x_Reg_0x65_Dot_lod0;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x66_Dot_lod1       val;
-} AlxLp586x_Reg_0x66_Dot_lod1;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x67_Dot_lod2       val;
-} AlxLp586x_Reg_0x67_Dot_lod2;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x68_Dot_lod3       val;
-} AlxLp586x_Reg_0x68_Dot_lod3;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x69_Dot_lod4       val;
-} AlxLp586x_Reg_0x69_Dot_lod4;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x6A_Dot_lod5       val;
-} AlxLp586x_Reg_0x6A_Dot_lod5;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x6B_Dot_lod6       val;
-} AlxLp586x_Reg_0x6B_Dot_lod6;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x6C_Dot_lod7       val;
-} AlxLp586x_Reg_0x6C_Dot_lod7;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x6D_Dot_lod8       val;
-} AlxLp586x_Reg_0x6D_Dot_lod8;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x6E_Dot_lod9       val;
-} AlxLp586x_Reg_0x6E_Dot_lod9;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x6F_Dot_lod10      val;
-} AlxLp586x_Reg_0x6F_Dot_lod10;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x70_Dot_lod11      val;
-} AlxLp586x_Reg_0x70_Dot_lod11;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x71_Dot_lod12      val;
-} AlxLp586x_Reg_0x71_Dot_lod12;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x72_Dot_lod13      val;
-} AlxLp586x_Reg_0x72_Dot_lod13;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x73_Dot_lod14      val;
-} AlxLp586x_Reg_0x73_Dot_lod14;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x74_Dot_lod15      val;
-} AlxLp586x_Reg_0x74_Dot_lod15;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x75_Dot_lod16      val;
-} AlxLp586x_Reg_0x75_Dot_lod16;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x76_Dot_lod17      val;
-} AlxLp586x_Reg_0x76_Dot_lod17;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x86_Dot_lsd0       val;
-} AlxLp586x_Reg_0x86_Dot_lsd0;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x87_Dot_lsd1       val;
-} AlxLp586x_Reg_0x87_Dot_lsd1;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x88_Dot_lsd2       val;
-} AlxLp586x_Reg_0x88_Dot_lsd2;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x89_Dot_lsd3       val;
-} AlxLp586x_Reg_0x89_Dot_lsd3;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x8A_Dot_lsd4       val;
-} AlxLp586x_Reg_0x8A_Dot_lsd4;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x8B_Dot_lsd5       val;
-} AlxLp586x_Reg_0x8B_Dot_lsd5;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x8C_Dot_lsd6       val;
-} AlxLp586x_Reg_0x8C_Dot_lsd6;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x8D_Dot_lsd7       val;
-} AlxLp586x_Reg_0x8D_Dot_lsd7;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x8E_Dot_lsd8       val;
-} AlxLp586x_Reg_0x8E_Dot_lsd8;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x8F_Dot_lsd9       val;
-} AlxLp586x_Reg_0x8F_Dot_lsd9;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x90_Dot_lsd10      val;
-} AlxLp586x_Reg_0x90_Dot_lsd10;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x91_Dot_lsd11      val;
-} AlxLp586x_Reg_0x91_Dot_lsd11;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x92_Dot_lsd12      val;
-} AlxLp586x_Reg_0x92_Dot_lsd12;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x93_Dot_lsd13      val;
-} AlxLp586x_Reg_0x93_Dot_lsd13;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x94_Dot_lsd14      val;
-} AlxLp586x_Reg_0x94_Dot_lsd14;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x95_Dot_lsd15      val;
-} AlxLp586x_Reg_0x95_Dot_lsd15;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x96_Dot_lsd16      val;
-} AlxLp586x_Reg_0x96_Dot_lsd16;
-typedef struct
-{
-    uint8_t addr;
-    uint8_t len;
-    AlxLp586x_RegVal_0x97_Dot_lsd17      val;
-} AlxLp586x_Reg_0x97_Dot_lsd17;
 typedef struct
 {
     uint8_t addr;
@@ -5255,6 +4751,152 @@ typedef struct
 
 
 //******************************************************************************
+// Dot group-select registers (0x0C…0x29)
+//******************************************************************************
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    union
+    {
+    AlxLp586x_RegVal_0x0C_Dot_grp_sel0   rg0;   // 0Ch:  L0-CS3…CS0
+    AlxLp586x_RegVal_0x0D_Dot_grp_sel1   rg1;   // 0Dh:  L0-CS7…CS4
+    AlxLp586x_RegVal_0x0E_Dot_grp_sel2   rg2;   // 0Eh:  L0-CS11…CS8
+    AlxLp586x_RegVal_0x0F_Dot_grp_sel3   rg3;   // 0Fh:  L0-CS15…CS12
+    AlxLp586x_RegVal_0x10_Dot_grp_sel4   rg4;   // 10h:  L0-CS17/16
+    AlxLp586x_RegVal_0x11_Dot_grp_sel5   rg5;   // 11h:  L1-CS3…CS0
+    AlxLp586x_RegVal_0x12_Dot_grp_sel6   rg6;   // 12h:  L1-CS7…CS4
+    AlxLp586x_RegVal_0x13_Dot_grp_sel7   rg7;   // 13h:  L1-CS11…CS8
+    AlxLp586x_RegVal_0x14_Dot_grp_sel8   rg8;   // 14h:  L1-CS15…CS12
+    AlxLp586x_RegVal_0x15_Dot_grp_sel9   rg9;   // 15h:  L1-CS17/16
+    AlxLp586x_RegVal_0x16_Dot_grp_sel10  rg10;  // 16h:  L2-CS3…CS0
+    AlxLp586x_RegVal_0x17_Dot_grp_sel11  rg11;  // 17h:  L2-CS7…CS4
+    AlxLp586x_RegVal_0x18_Dot_grp_sel12  rg12;  // 18h:  L2-CS11…CS8
+    AlxLp586x_RegVal_0x19_Dot_grp_sel13  rg13;  // 19h:  L2-CS15…CS12
+    AlxLp586x_RegVal_0x1A_Dot_grp_sel14  rg14;  // 1Ah:  L2-CS17/16
+    AlxLp586x_RegVal_0x1B_Dot_grp_sel15  rg15;  // 1Bh:  L3-CS3…CS0
+    AlxLp586x_RegVal_0x1C_Dot_grp_sel16  rg16;  // 1Ch:  L3-CS7…CS4
+    AlxLp586x_RegVal_0x1D_Dot_grp_sel17  rg17;  // 1Dh:  L3-CS11…CS8
+    AlxLp586x_RegVal_0x1E_Dot_grp_sel18  rg18;  // 1Eh:  L3-CS15…CS12
+    AlxLp586x_RegVal_0x1F_Dot_grp_sel19  rg19;  // 1Fh:  L3-CS17/16
+    AlxLp586x_RegVal_0x20_Dot_grp_sel20  rg20;  // 20h:  L4-CS3…CS0
+    AlxLp586x_RegVal_0x21_Dot_grp_sel21  rg21;  // 21h:  L4-CS7…CS4
+    AlxLp586x_RegVal_0x22_Dot_grp_sel22  rg22;  // 22h:  L4-CS11…CS8
+    AlxLp586x_RegVal_0x23_Dot_grp_sel23  rg23;  // 23h:  L4-CS15…CS12
+    AlxLp586x_RegVal_0x24_Dot_grp_sel24  rg24;  // 24h:  L4-CS17/16
+    AlxLp586x_RegVal_0x25_Dot_grp_sel25  rg25;  // 25h:  L5-CS3…CS0
+    AlxLp586x_RegVal_0x26_Dot_grp_sel26  rg26;  // 26h:  L5-CS7…CS4
+    AlxLp586x_RegVal_0x27_Dot_grp_sel27  rg27;  // 27h:  L5-CS11…CS8
+    AlxLp586x_RegVal_0x28_Dot_grp_sel28  rg28;  // 28h:  L5-CS15…CS12
+    AlxLp586x_RegVal_0x29_Dot_grp_sel29  rg29;  // 29h:  L5-CS17/16
+	uint8_t raw; // Fallback so we can memset the whole byte
+    } val;
+} AlxLp586x_Reg_DotGrpSel;
+
+
+//******************************************************************************
+// Dot on/off registers (0x43…0x54)
+//******************************************************************************
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+
+    // each entry is one of the union types you already generated:
+    //   0  → AlxLp586x_RegVal_0x43_Dot_onoff0
+    //   1  → AlxLp586x_RegVal_0x44_Dot_onoff1
+    //   …
+    //  17  → AlxLp586x_RegVal_0x54_Dot_onoff17
+    union
+    {
+        AlxLp586x_RegVal_0x43_Dot_onoff0   onoff0;
+        AlxLp586x_RegVal_0x44_Dot_onoff1   onoff1;
+        AlxLp586x_RegVal_0x45_Dot_onoff2   onoff2;
+        AlxLp586x_RegVal_0x46_Dot_onoff3   onoff3;
+        AlxLp586x_RegVal_0x47_Dot_onoff4   onoff4;
+        AlxLp586x_RegVal_0x48_Dot_onoff5   onoff5;
+        AlxLp586x_RegVal_0x49_Dot_onoff6   onoff6;
+        AlxLp586x_RegVal_0x4A_Dot_onoff7   onoff7;
+        AlxLp586x_RegVal_0x4B_Dot_onoff8   onoff8;
+        AlxLp586x_RegVal_0x4C_Dot_onoff9   onoff9;
+        AlxLp586x_RegVal_0x4D_Dot_onoff10  onoff10;
+        AlxLp586x_RegVal_0x4E_Dot_onoff11  onoff11;
+        AlxLp586x_RegVal_0x4F_Dot_onoff12  onoff12;
+        AlxLp586x_RegVal_0x50_Dot_onoff13  onoff13;
+        AlxLp586x_RegVal_0x51_Dot_onoff14  onoff14;
+        AlxLp586x_RegVal_0x52_Dot_onoff15  onoff15;
+        AlxLp586x_RegVal_0x53_Dot_onoff16  onoff16;
+        AlxLp586x_RegVal_0x54_Dot_onoff17  onoff17;
+        uint8_t raw;   // fallback so we can memset the whole byte
+    } val;
+} AlxLp586x_Reg_DotOnOff;
+
+
+//------------------------------------------------------------------------------
+// 0x65–0x76: Dot LOD status registers (L0…L5, CS0…CS7)
+//------------------------------------------------------------------------------
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    union
+    {
+        AlxLp586x_RegVal_0x65_Dot_lod0   lod0;
+        AlxLp586x_RegVal_0x66_Dot_lod1   lod1;
+        AlxLp586x_RegVal_0x67_Dot_lod2   lod2;
+        AlxLp586x_RegVal_0x68_Dot_lod3   lod3;
+        AlxLp586x_RegVal_0x69_Dot_lod4   lod4;
+        AlxLp586x_RegVal_0x6A_Dot_lod5   lod5;
+        AlxLp586x_RegVal_0x6B_Dot_lod6   lod6;
+        AlxLp586x_RegVal_0x6C_Dot_lod7   lod7;
+        AlxLp586x_RegVal_0x6D_Dot_lod8   lod8;
+        AlxLp586x_RegVal_0x6E_Dot_lod9   lod9;
+        AlxLp586x_RegVal_0x6F_Dot_lod10  lod10;
+        AlxLp586x_RegVal_0x70_Dot_lod11  lod11;
+        AlxLp586x_RegVal_0x71_Dot_lod12  lod12;
+        AlxLp586x_RegVal_0x72_Dot_lod13  lod13;
+        AlxLp586x_RegVal_0x73_Dot_lod14  lod14;
+        AlxLp586x_RegVal_0x74_Dot_lod15  lod15;
+        AlxLp586x_RegVal_0x75_Dot_lod16  lod16;
+        AlxLp586x_RegVal_0x76_Dot_lod17  lod17;
+        uint8_t raw;
+    } val;
+} AlxLp586x_Reg_DotLod;
+
+
+//------------------------------------------------------------------------------
+// 0x86–0x97: Dot LSD status registers (L0…L5, CS0…CS7)
+//------------------------------------------------------------------------------
+typedef struct
+{
+    uint8_t addr;
+    uint8_t len;
+    union
+    {
+        AlxLp586x_RegVal_0x86_Dot_lsd0   lsd0;
+        AlxLp586x_RegVal_0x87_Dot_lsd1   lsd1;
+        AlxLp586x_RegVal_0x88_Dot_lsd2   lsd2;
+        AlxLp586x_RegVal_0x89_Dot_lsd3   lsd3;
+        AlxLp586x_RegVal_0x8A_Dot_lsd4   lsd4;
+        AlxLp586x_RegVal_0x8B_Dot_lsd5   lsd5;
+        AlxLp586x_RegVal_0x8C_Dot_lsd6   lsd6;
+        AlxLp586x_RegVal_0x8D_Dot_lsd7   lsd7;
+        AlxLp586x_RegVal_0x8E_Dot_lsd8   lsd8;
+        AlxLp586x_RegVal_0x8F_Dot_lsd9   lsd9;
+        AlxLp586x_RegVal_0x90_Dot_lsd10  lsd10;
+        AlxLp586x_RegVal_0x91_Dot_lsd11  lsd11;
+        AlxLp586x_RegVal_0x92_Dot_lsd12  lsd12;
+        AlxLp586x_RegVal_0x93_Dot_lsd13  lsd13;
+        AlxLp586x_RegVal_0x94_Dot_lsd14  lsd14;
+        AlxLp586x_RegVal_0x95_Dot_lsd15  lsd15;
+        AlxLp586x_RegVal_0x96_Dot_lsd16  lsd16;
+        AlxLp586x_RegVal_0x97_Dot_lsd17  lsd17;
+        uint8_t raw;
+    } val;
+} AlxLp586x_Reg_DotLsd;
+
+
+//******************************************************************************
 // Main Register Structure
 //******************************************************************************
 typedef struct
@@ -5271,91 +4913,22 @@ typedef struct
 	AlxLp586x_Reg_0x09_R_current_set_CC_Group1  _0x09_R_current_set_CC_Group1;
 	AlxLp586x_Reg_0x0A_G_current_set_CC_Group2  _0x0A_G_current_set_CC_Group2;
 	AlxLp586x_Reg_0x0B_B_current_set_CC_Group3  _0x0B_B_current_set_CC_Group3;
-	AlxLp586x_Reg_0x0C_Dot_grp_sel0             _0x0C_Dot_grp_sel0;
-    AlxLp586x_Reg_0x0D_Dot_grp_sel1             _0x0D_Dot_grp_sel1;
-    AlxLp586x_Reg_0x0E_Dot_grp_sel2             _0x0E_Dot_grp_sel2;
-    AlxLp586x_Reg_0x0F_Dot_grp_sel3             _0x0F_Dot_grp_sel3;
-    AlxLp586x_Reg_0x10_Dot_grp_sel4             _0x10_Dot_grp_sel4;
-    AlxLp586x_Reg_0x11_Dot_grp_sel5             _0x11_Dot_grp_sel5;
-    AlxLp586x_Reg_0x12_Dot_grp_sel6             _0x12_Dot_grp_sel6;
-    AlxLp586x_Reg_0x13_Dot_grp_sel7             _0x13_Dot_grp_sel7;
-    AlxLp586x_Reg_0x14_Dot_grp_sel8             _0x14_Dot_grp_sel8;
-    AlxLp586x_Reg_0x15_Dot_grp_sel9             _0x15_Dot_grp_sel9;
-    AlxLp586x_Reg_0x16_Dot_grp_sel10            _0x16_Dot_grp_sel10;
-    AlxLp586x_Reg_0x17_Dot_grp_sel11            _0x17_Dot_grp_sel11;
-    AlxLp586x_Reg_0x18_Dot_grp_sel12            _0x18_Dot_grp_sel12;
-    AlxLp586x_Reg_0x19_Dot_grp_sel13            _0x19_Dot_grp_sel13;
-    AlxLp586x_Reg_0x1A_Dot_grp_sel14            _0x1A_Dot_grp_sel14;
-    AlxLp586x_Reg_0x1B_Dot_grp_sel15            _0x1B_Dot_grp_sel15;
-    AlxLp586x_Reg_0x1C_Dot_grp_sel16            _0x1C_Dot_grp_sel16;
-    AlxLp586x_Reg_0x1D_Dot_grp_sel17            _0x1D_Dot_grp_sel17;
-    AlxLp586x_Reg_0x1E_Dot_grp_sel18            _0x1E_Dot_grp_sel18;
-    AlxLp586x_Reg_0x1F_Dot_grp_sel19            _0x1F_Dot_grp_sel19;
-    AlxLp586x_Reg_0x20_Dot_grp_sel20            _0x20_Dot_grp_sel20;
-    AlxLp586x_Reg_0x21_Dot_grp_sel21            _0x21_Dot_grp_sel21;
-    AlxLp586x_Reg_0x22_Dot_grp_sel22            _0x22_Dot_grp_sel22;
-    AlxLp586x_Reg_0x23_Dot_grp_sel23            _0x23_Dot_grp_sel23;
-    AlxLp586x_Reg_0x24_Dot_grp_sel24            _0x24_Dot_grp_sel24;
-    AlxLp586x_Reg_0x25_Dot_grp_sel25            _0x25_Dot_grp_sel25;
-    AlxLp586x_Reg_0x26_Dot_grp_sel26            _0x26_Dot_grp_sel26;
-    AlxLp586x_Reg_0x27_Dot_grp_sel27            _0x27_Dot_grp_sel27;
-    AlxLp586x_Reg_0x28_Dot_grp_sel28            _0x28_Dot_grp_sel28;
-    AlxLp586x_Reg_0x29_Dot_grp_sel29            _0x29_Dot_grp_sel29;
-    AlxLp586x_Reg_0x43_Dot_onoff0               _0x43_Dot_onoff0;
-    AlxLp586x_Reg_0x44_Dot_onoff1               _0x44_Dot_onoff1;
-    AlxLp586x_Reg_0x45_Dot_onoff2               _0x45_Dot_onoff2;
-    AlxLp586x_Reg_0x46_Dot_onoff3               _0x46_Dot_onoff3;
-    AlxLp586x_Reg_0x47_Dot_onoff4               _0x47_Dot_onoff4;
-    AlxLp586x_Reg_0x48_Dot_onoff5               _0x48_Dot_onoff5;
-    AlxLp586x_Reg_0x49_Dot_onoff6               _0x49_Dot_onoff6;
-    AlxLp586x_Reg_0x4A_Dot_onoff7               _0x4A_Dot_onoff7;
-    AlxLp586x_Reg_0x4B_Dot_onoff8               _0x4B_Dot_onoff8;
-    AlxLp586x_Reg_0x4C_Dot_onoff9               _0x4C_Dot_onoff9;
-    AlxLp586x_Reg_0x4D_Dot_onoff10              _0x4D_Dot_onoff10;
-    AlxLp586x_Reg_0x4E_Dot_onoff11              _0x4E_Dot_onoff11;
-    AlxLp586x_Reg_0x4F_Dot_onoff12              _0x4F_Dot_onoff12;
-    AlxLp586x_Reg_0x50_Dot_onoff13              _0x50_Dot_onoff13;
-    AlxLp586x_Reg_0x51_Dot_onoff14              _0x51_Dot_onoff14;
-    AlxLp586x_Reg_0x52_Dot_onoff15              _0x52_Dot_onoff15;
-    AlxLp586x_Reg_0x53_Dot_onoff16              _0x53_Dot_onoff16;
-    AlxLp586x_Reg_0x54_Dot_onoff17              _0x54_Dot_onoff17;
+
+	// 0x0C–0x29: Dot group-select for L0…L5, CS0…CS17
+	AlxLp586x_Reg_DotGrpSel dot_grp_sel[30];
+
+	// 0x43–0x54: Dot on/off registers (L0…L5, CS0…CS7)
+    AlxLp586x_Reg_DotOnOff dot_onoff[18];
+
+	// 0x65–0x76: Dot Lod open load errors registers (L0…L5, CS0…CS7)
+	AlxLp586x_Reg_DotLod    dot_lod[18];
+
+	// 0x86–0x97: Dot Lsd short-cut load errors registers (L0…L5, CS0…CS7)
+	AlxLp586x_Reg_DotLsd    dot_lsd[18];
+
+	// Fault_state (0x64):
     AlxLp586x_Reg_0x64_Fault_state              _0x64_Fault_state;
-	AlxLp586x_Reg_0x65_Dot_lod0                 _0x65_Dot_lod0;
-    AlxLp586x_Reg_0x66_Dot_lod1                 _0x66_Dot_lod1;
-    AlxLp586x_Reg_0x67_Dot_lod2                 _0x67_Dot_lod2;
-    AlxLp586x_Reg_0x68_Dot_lod3                 _0x68_Dot_lod3;
-    AlxLp586x_Reg_0x69_Dot_lod4                 _0x69_Dot_lod4;
-    AlxLp586x_Reg_0x6A_Dot_lod5                 _0x6A_Dot_lod5;
-    AlxLp586x_Reg_0x6B_Dot_lod6                 _0x6B_Dot_lod6;
-    AlxLp586x_Reg_0x6C_Dot_lod7                 _0x6C_Dot_lod7;
-    AlxLp586x_Reg_0x6D_Dot_lod8                 _0x6D_Dot_lod8;
-    AlxLp586x_Reg_0x6E_Dot_lod9                 _0x6E_Dot_lod9;
-    AlxLp586x_Reg_0x6F_Dot_lod10                _0x6F_Dot_lod10;
-    AlxLp586x_Reg_0x70_Dot_lod11                _0x70_Dot_lod11;
-    AlxLp586x_Reg_0x71_Dot_lod12                _0x71_Dot_lod12;
-    AlxLp586x_Reg_0x72_Dot_lod13                _0x72_Dot_lod13;
-    AlxLp586x_Reg_0x73_Dot_lod14                _0x73_Dot_lod14;
-    AlxLp586x_Reg_0x74_Dot_lod15                _0x74_Dot_lod15;
-    AlxLp586x_Reg_0x75_Dot_lod16                _0x75_Dot_lod16;
-    AlxLp586x_Reg_0x76_Dot_lod17                _0x76_Dot_lod17;
-    AlxLp586x_Reg_0x86_Dot_lsd0                 _0x86_Dot_lsd0;
-    AlxLp586x_Reg_0x87_Dot_lsd1                 _0x87_Dot_lsd1;
-    AlxLp586x_Reg_0x88_Dot_lsd2                 _0x88_Dot_lsd2;
-    AlxLp586x_Reg_0x89_Dot_lsd3                 _0x89_Dot_lsd3;
-    AlxLp586x_Reg_0x8A_Dot_lsd4                 _0x8A_Dot_lsd4;
-    AlxLp586x_Reg_0x8B_Dot_lsd5                 _0x8B_Dot_lsd5;
-    AlxLp586x_Reg_0x8C_Dot_lsd6                 _0x8C_Dot_lsd6;
-    AlxLp586x_Reg_0x8D_Dot_lsd7                 _0x8D_Dot_lsd7;
-    AlxLp586x_Reg_0x8E_Dot_lsd8                 _0x8E_Dot_lsd8;
-    AlxLp586x_Reg_0x8F_Dot_lsd9                 _0x8F_Dot_lsd9;
-    AlxLp586x_Reg_0x90_Dot_lsd10                _0x90_Dot_lsd10;
-    AlxLp586x_Reg_0x91_Dot_lsd11                _0x91_Dot_lsd11;
-    AlxLp586x_Reg_0x92_Dot_lsd12                _0x92_Dot_lsd12;
-    AlxLp586x_Reg_0x93_Dot_lsd13                _0x93_Dot_lsd13;
-    AlxLp586x_Reg_0x94_Dot_lsd14                _0x94_Dot_lsd14;
-    AlxLp586x_Reg_0x95_Dot_lsd15                _0x95_Dot_lsd15;
-    AlxLp586x_Reg_0x96_Dot_lsd16                _0x96_Dot_lsd16;
-    AlxLp586x_Reg_0x97_Dot_lsd17                _0x97_Dot_lsd17;
+
     AlxLp586x_Reg_0xA7_LOD_clear                _0xA7_LOD_clear;
     AlxLp586x_Reg_0xA8_LSD_clear                _0xA8_LSD_clear;
     AlxLp586x_Reg_0xA9_Reset                    _0xA9_Reset;
