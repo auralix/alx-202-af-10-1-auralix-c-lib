@@ -4983,6 +4983,7 @@ Alx_Status AlxLp586x_DeInitPeriph(AlxLp586x* me);
 Alx_Status AlxLp586x_Init(AlxLp586x* me);
 Alx_Status AlxLp586x_DeInit(AlxLp586x* me);
 Alx_Status AlxLp586x_Handle(AlxLp586x* me);
+Alx_Status AlxLp586x_Reg_Write(AlxLp586x* me, void* reg);
 void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val);
 
 

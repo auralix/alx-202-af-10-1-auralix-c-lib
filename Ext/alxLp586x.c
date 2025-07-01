@@ -264,6 +264,28 @@ Alx_Status AlxLp586x_Handle(AlxLp586x* me)
   * @retval			false
   * @retval			true
   */
+
+Alx_Status AlxLp586x_Reg_Write(AlxLp586x* me, void* reg)
+{
+	// Assert
+	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
+	ALX_LP586x_ASSERT(me->isInitPeriph == true);
+	// isInit -> Don't care
+
+	// Local variables
+	Alx_Status status = Alx_Err;
+	uint8_t regAddr = *((uint8_t*)reg);
+	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+
+	// Write
+	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
+	if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+
+	// Return
+	return Alx_Ok;
+}
+
 void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val)
 {
 	// Assert
