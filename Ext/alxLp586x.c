@@ -308,12 +308,18 @@ static void AlxLp586x_RegStruct_SetAddr(AlxLp586x* me)
 	me->reg._0x03_Dev_config2.addr				= 0x03;
 	me->reg._0x04_Dev_config3.addr				= 0x04;
 	me->reg._0x05_Global_bri.addr				= 0x05;
-	me->reg._0x06_Group0_bri.addr				= 0x06;
-	me->reg._0x07_Group1_bri.addr				= 0x07;
-	me->reg._0x08_Group2_bri.addr				= 0x08;
-	me->reg._0x09_R_current_set_CC_Group1.addr	= 0x09;
-	me->reg._0x0A_G_current_set_CC_Group2.addr	= 0x0A;
-	me->reg._0x0B_B_current_set_CC_Group3.addr	= 0x0B;
+
+	// 0x06–0x08: Group brightness
+	for (uint8_t i = 0; i < 3; ++i)
+	{
+		me->reg.group_bri[i].addr				= (uint8_t)(0x06 + i);
+	}
+
+	// 0x09…0x0B: CC-current-set
+	for (uint8_t i = 0; i < 3; ++i)
+	{
+		me->reg.current_set_cc[i].addr			= (uint8_t)(0x09 + i);
+	}
 
 	// 0x0C–0x29: Dot group-select for L0…L5, CS0…CS17
 	for (int i = 0; i < 30; ++i)
@@ -357,12 +363,18 @@ static void AlxLp586x_RegStruct_SetLen(AlxLp586x* me)
 	me->reg._0x03_Dev_config2.len				= sizeof(me->reg._0x03_Dev_config2.val);
 	me->reg._0x04_Dev_config3.len				= sizeof(me->reg._0x04_Dev_config3.val);
 	me->reg._0x05_Global_bri.len				= sizeof(me->reg._0x05_Global_bri.val);
-	me->reg._0x06_Group0_bri.len				= sizeof(me->reg._0x06_Group0_bri.val);
-	me->reg._0x07_Group1_bri.len				= sizeof(me->reg._0x07_Group1_bri.val);
-	me->reg._0x08_Group2_bri.len				= sizeof(me->reg._0x08_Group2_bri.val);
-	me->reg._0x09_R_current_set_CC_Group1.len	= sizeof(me->reg._0x09_R_current_set_CC_Group1.val);
-	me->reg._0x0A_G_current_set_CC_Group2.len	= sizeof(me->reg._0x0A_G_current_set_CC_Group2.val);
-	me->reg._0x0B_B_current_set_CC_Group3.len	= sizeof(me->reg._0x0B_B_current_set_CC_Group3.val);
+
+	// 0x06–0x08: Group brightness
+	for (uint8_t i = 0; i < 3; ++i)
+	{
+		me->reg.group_bri[i].len				= sizeof(me->reg.group_bri[i].val);
+	}
+
+	// 0x09…0x0B: CC-current-set
+	for (uint8_t i = 0; i < 3; ++i)
+	{
+		me->reg.current_set_cc[i].len			= sizeof(me->reg.current_set_cc[i].val);
+	}
 
 	// 0x0C–0x29: Dot group-select for L0…L5, CS0…CS17
 	for (int i = 0; i < 30; ++i)
@@ -400,113 +412,126 @@ static void AlxLp586x_RegStruct_SetLen(AlxLp586x* me)
 static void AlxLp586x_RegStruct_SetValToZero(AlxLp586x* me)
 {
 	// Core registers:
-	memset(&me->reg._0x00_Chip_En.val.raw,					0x00, sizeof(me->reg._0x00_Chip_En.val.raw));
-	memset(&me->reg._0x01_Dev_initial.val.raw,				0x00, sizeof(me->reg._0x01_Dev_initial.val.raw));
-	memset(&me->reg._0x02_Dev_config1.val.raw,				0x00, sizeof(me->reg._0x02_Dev_config1.val.raw));
-	memset(&me->reg._0x03_Dev_config2.val.raw,				0x00, sizeof(me->reg._0x03_Dev_config2.val.raw));
-	memset(&me->reg._0x04_Dev_config3.val.raw,				0x00, sizeof(me->reg._0x04_Dev_config3.val.raw));
-	memset(&me->reg._0x05_Global_bri.val.raw,				0x00, sizeof(me->reg._0x05_Global_bri.val.raw));
-	memset(&me->reg._0x06_Group0_bri.val.raw,				0x00, sizeof(me->reg._0x06_Group0_bri.val.raw));
-	memset(&me->reg._0x07_Group1_bri.val.raw,				0x00, sizeof(me->reg._0x07_Group1_bri.val.raw));
-	memset(&me->reg._0x08_Group2_bri.val.raw,				0x00, sizeof(me->reg._0x08_Group2_bri.val.raw));
-	memset(&me->reg._0x09_R_current_set_CC_Group1.val.raw,	0x00, sizeof(me->reg._0x09_R_current_set_CC_Group1.val.raw));
-	memset(&me->reg._0x0A_G_current_set_CC_Group2.val.raw,	0x00, sizeof(me->reg._0x0A_G_current_set_CC_Group2.val.raw));
-	memset(&me->reg._0x0B_B_current_set_CC_Group3.val.raw,	0x00, sizeof(me->reg._0x0B_B_current_set_CC_Group3.val.raw));
+	memset(&me->reg._0x00_Chip_En.val.raw,			0x00, sizeof(me->reg._0x00_Chip_En.val.raw));
+	memset(&me->reg._0x01_Dev_initial.val.raw,		0x00, sizeof(me->reg._0x01_Dev_initial.val.raw));
+	memset(&me->reg._0x02_Dev_config1.val.raw,		0x00, sizeof(me->reg._0x02_Dev_config1.val.raw));
+	memset(&me->reg._0x03_Dev_config2.val.raw,		0x00, sizeof(me->reg._0x03_Dev_config2.val.raw));
+	memset(&me->reg._0x04_Dev_config3.val.raw,		0x00, sizeof(me->reg._0x04_Dev_config3.val.raw));
+	memset(&me->reg._0x05_Global_bri.val.raw,		0x00, sizeof(me->reg._0x05_Global_bri.val.raw));
+
+	// 0x06–0x08: Group brightness
+	for (uint8_t i = 0; i < 3; ++i)
+	{
+		memset(&me->reg.group_bri[i].val.raw,		0x00,sizeof(me->reg.group_bri[i].val.raw));
+	}
+
+	// 0x09…0x0B: CC-current-set
+	for (uint8_t i = 0; i < 3; ++i)
+	{
+		memset(&me->reg.current_set_cc[i].val.raw,	0x00,sizeof(me->reg.current_set_cc[i].val.raw));
+	}
 
 	// 0x0C–0x29: Dot group-select for L0…L5, CS0…CS17
 	for (int i = 0; i < 30; ++i)
 	{
-		memset(&me->reg.dot_grp_sel[i].val.raw,				0x00, sizeof(me->reg.dot_grp_sel[i].val.raw));
+		memset(&me->reg.dot_grp_sel[i].val.raw,		0x00, sizeof(me->reg.dot_grp_sel[i].val.raw));
 	}
 
 
 	// 0x43–0x54: Dot on/off registers (L0…L5, CS0…CS7)
 	for (uint8_t i = 0; i < 18; ++i)
 	{
-		memset(&me->reg.dot_onoff[i].val.raw,				0x00,sizeof(me->reg.dot_onoff[i].val.raw));
+		memset(&me->reg.dot_onoff[i].val.raw,		0x00,sizeof(me->reg.dot_onoff[i].val.raw));
 	}
 
 	// Fault_state (0x64):
-	memset(&me->reg._0x64_Fault_state.val.raw,				0x00, sizeof(me->reg._0x64_Fault_state.val.raw));
+	memset(&me->reg._0x64_Fault_state.val.raw,		0x00, sizeof(me->reg._0x64_Fault_state.val.raw));
 
 	// LOD (0x65–0x76):
 	for (uint8_t i = 0; i < 18; ++i)
 	{
-		memset(&me->reg.dot_lod[i].val.raw, 0x00, sizeof(me->reg.dot_lod[i].val.raw));
+		memset(&me->reg.dot_lod[i].val.raw,			0x00, sizeof(me->reg.dot_lod[i].val.raw));
 	}
 
 	// LSD (0x86–0x97):
 	for (uint8_t i = 0; i < 18; ++i)
 	{
-		memset(&me->reg.dot_lsd[i].val.raw, 0x00, sizeof(me->reg.dot_lsd[i].val.raw));
+		memset(&me->reg.dot_lsd[i].val.raw,			0x00, sizeof(me->reg.dot_lsd[i].val.raw));
 	}
 
 	// Clears and reset registers (0xA7–0xA9):
-	memset(&me->reg._0xA7_LOD_clear.val.raw,				0x00, sizeof(me->reg._0xA7_LOD_clear.val.raw));
-	memset(&me->reg._0xA8_LSD_clear.val.raw,				0x00, sizeof(me->reg._0xA8_LSD_clear.val.raw));
-	memset(&me->reg._0xA9_Reset.val.raw,					0x00, sizeof(me->reg._0xA9_Reset.val.raw));
+	memset(&me->reg._0xA7_LOD_clear.val.raw,		0x00, sizeof(me->reg._0xA7_LOD_clear.val.raw));
+	memset(&me->reg._0xA8_LSD_clear.val.raw,		0x00, sizeof(me->reg._0xA8_LSD_clear.val.raw));
+	memset(&me->reg._0xA9_Reset.val.raw,			0x00, sizeof(me->reg._0xA9_Reset.val.raw));
 }
 static void AlxLp586x_RegStruct_SetValToDefault(AlxLp586x* me)
 {
 	// Core registers:
-	memset(&me->reg._0x00_Chip_En.val.raw,						0x00, sizeof(me->reg._0x00_Chip_En.val.raw));     // Reset = 0x00
-	memset(&me->reg._0x01_Dev_initial.val.raw,					0x5E, sizeof(me->reg._0x01_Dev_initial.val.raw)); // Reset = 0x5E
-	memset(&me->reg._0x02_Dev_config1.val.raw,					0x00, sizeof(me->reg._0x02_Dev_config1.val.raw)); // Reset = 0x00
-	memset(&me->reg._0x03_Dev_config2.val.raw,					0x00, sizeof(me->reg._0x03_Dev_config2.val.raw)); // Reset = 0x00
-	memset(&me->reg._0x04_Dev_config3.val.raw,					0x47, sizeof(me->reg._0x04_Dev_config3.val.raw)); // Reset = 0x47
-	memset(&me->reg._0x05_Global_bri.val.raw,					0xFF, sizeof(me->reg._0x05_Global_bri.val.raw));  // Reset = 0xFF
-	memset(&me->reg._0x06_Group0_bri.val.raw,					0xFF, sizeof(me->reg._0x06_Group0_bri.val.raw));  // Reset = 0xFF
-	memset(&me->reg._0x07_Group1_bri.val.raw,					0xFF, sizeof(me->reg._0x07_Group1_bri.val.raw));  // Reset = 0xFF
-	memset(&me->reg._0x08_Group2_bri.val.raw,					0xFF, sizeof(me->reg._0x08_Group2_bri.val.raw));  // Reset = 0xFF
-	memset(&me->reg._0x09_R_current_set_CC_Group1.val.raw,		0x40, sizeof(me->reg._0x09_R_current_set_CC_Group1.val.raw)); // Reset = 0x40
-	memset(&me->reg._0x0A_G_current_set_CC_Group2.val.raw,		0x40, sizeof(me->reg._0x0A_G_current_set_CC_Group2.val.raw)); // Reset = 0x40
-	memset(&me->reg._0x0B_B_current_set_CC_Group3.val.raw,		0x40, sizeof(me->reg._0x0B_B_current_set_CC_Group3.val.raw)); // Reset = 0x40
+	memset(&me->reg._0x00_Chip_En.val.raw,			0x00, sizeof(me->reg._0x00_Chip_En.val.raw));     // Reset = 0x00
+	memset(&me->reg._0x01_Dev_initial.val.raw,		0x5E, sizeof(me->reg._0x01_Dev_initial.val.raw)); // Reset = 0x5E
+	memset(&me->reg._0x02_Dev_config1.val.raw,		0x00, sizeof(me->reg._0x02_Dev_config1.val.raw)); // Reset = 0x00
+	memset(&me->reg._0x03_Dev_config2.val.raw,		0x00, sizeof(me->reg._0x03_Dev_config2.val.raw)); // Reset = 0x00
+	memset(&me->reg._0x04_Dev_config3.val.raw,		0x47, sizeof(me->reg._0x04_Dev_config3.val.raw)); // Reset = 0x47
+	memset(&me->reg._0x05_Global_bri.val.raw,		0xFF, sizeof(me->reg._0x05_Global_bri.val.raw));  // Reset = 0xFF
+
+	// 0x06–0x08: Group brightness all 0xFF
+	for (uint8_t i = 0;  i < 3;  ++i)
+	{
+	memset(&me->reg.group_bri[i].val.raw,			0xFF,sizeof(me->reg.group_bri[i].val.raw));
+	}
+
+
+	// 0x09…0x0B: CC-current-set all 0x40
+	for (uint8_t i = 0; i < 3; ++i)
+	{
+		memset(&me->reg.current_set_cc[i].val.raw,	0x40,sizeof(me->reg.current_set_cc[i].val.raw));
+	}
 
 	// Dot group selects (0x0C–0x29): all 0x00
 	for (int i = 0; i < 30; ++i)
 	{
-		memset(&me->reg.dot_grp_sel[i].val.raw,					0x00,sizeof(me->reg.dot_grp_sel[i].val.raw));
+		memset(&me->reg.dot_grp_sel[i].val.raw,		0x00,sizeof(me->reg.dot_grp_sel[i].val.raw));
 	}
 
 	// Dot on/off (0x43–0x54):
-	memset(&me->reg.dot_onoff[0].val.raw,						0xFF, sizeof(me->reg.dot_onoff[0].val.raw));
-	memset(&me->reg.dot_onoff[1].val.raw,						0xFF, sizeof(me->reg.dot_onoff[1].val.raw));
-	memset(&me->reg.dot_onoff[2].val.raw,						0x03, sizeof(me->reg.dot_onoff[2].val.raw));
-    memset(&me->reg.dot_onoff[3].val.raw,						0xFF, sizeof(me->reg.dot_onoff[3].val.raw));
-    memset(&me->reg.dot_onoff[4].val.raw,						0xFF, sizeof(me->reg.dot_onoff[4].val.raw));
-    memset(&me->reg.dot_onoff[5].val.raw,						0x03, sizeof(me->reg.dot_onoff[5].val.raw));
-    memset(&me->reg.dot_onoff[6].val.raw,						0xFF, sizeof(me->reg.dot_onoff[6].val.raw));
-    memset(&me->reg.dot_onoff[7].val.raw,						0xFF, sizeof(me->reg.dot_onoff[7].val.raw));
-    memset(&me->reg.dot_onoff[8].val.raw,						0x03, sizeof(me->reg.dot_onoff[8].val.raw));
-    memset(&me->reg.dot_onoff[9].val.raw,						0xFF, sizeof(me->reg.dot_onoff[9].val.raw));
-    memset(&me->reg.dot_onoff[10].val.raw,						0xFF, sizeof(me->reg.dot_onoff[10].val.raw));
-    memset(&me->reg.dot_onoff[11].val.raw,						0x03, sizeof(me->reg.dot_onoff[11].val.raw));
-    memset(&me->reg.dot_onoff[12].val.raw,						0xFF, sizeof(me->reg.dot_onoff[12].val.raw));
-    memset(&me->reg.dot_onoff[13].val.raw,						0xFF, sizeof(me->reg.dot_onoff[13].val.raw));
-    memset(&me->reg.dot_onoff[14].val.raw,						0x03, sizeof(me->reg.dot_onoff[14].val.raw));
-    memset(&me->reg.dot_onoff[15].val.raw,						0xFF, sizeof(me->reg.dot_onoff[15].val.raw));
-    memset(&me->reg.dot_onoff[16].val.raw,						0xFF, sizeof(me->reg.dot_onoff[16].val.raw));
-    memset(&me->reg.dot_onoff[17].val.raw,						0x03, sizeof(me->reg.dot_onoff[17].val.raw));
+	memset(&me->reg.dot_onoff[0].val.raw,			0xFF, sizeof(me->reg.dot_onoff[0].val.raw));
+	memset(&me->reg.dot_onoff[1].val.raw,			0xFF, sizeof(me->reg.dot_onoff[1].val.raw));
+	memset(&me->reg.dot_onoff[2].val.raw,			0x03, sizeof(me->reg.dot_onoff[2].val.raw));
+	memset(&me->reg.dot_onoff[3].val.raw,			0xFF, sizeof(me->reg.dot_onoff[3].val.raw));
+	memset(&me->reg.dot_onoff[4].val.raw,			0xFF, sizeof(me->reg.dot_onoff[4].val.raw));
+	memset(&me->reg.dot_onoff[5].val.raw,			0x03, sizeof(me->reg.dot_onoff[5].val.raw));
+	memset(&me->reg.dot_onoff[6].val.raw,			0xFF, sizeof(me->reg.dot_onoff[6].val.raw));
+	memset(&me->reg.dot_onoff[7].val.raw,			0xFF, sizeof(me->reg.dot_onoff[7].val.raw));
+	memset(&me->reg.dot_onoff[8].val.raw,			0x03, sizeof(me->reg.dot_onoff[8].val.raw));
+	memset(&me->reg.dot_onoff[9].val.raw,			0xFF, sizeof(me->reg.dot_onoff[9].val.raw));
+	memset(&me->reg.dot_onoff[10].val.raw,			0xFF, sizeof(me->reg.dot_onoff[10].val.raw));
+	memset(&me->reg.dot_onoff[11].val.raw,			0x03, sizeof(me->reg.dot_onoff[11].val.raw));
+	memset(&me->reg.dot_onoff[12].val.raw,			0xFF, sizeof(me->reg.dot_onoff[12].val.raw));
+	memset(&me->reg.dot_onoff[13].val.raw,			0xFF, sizeof(me->reg.dot_onoff[13].val.raw));
+	memset(&me->reg.dot_onoff[14].val.raw,			0x03, sizeof(me->reg.dot_onoff[14].val.raw));
+	memset(&me->reg.dot_onoff[15].val.raw,			0xFF, sizeof(me->reg.dot_onoff[15].val.raw));
+	memset(&me->reg.dot_onoff[16].val.raw,			0xFF, sizeof(me->reg.dot_onoff[16].val.raw));
+	memset(&me->reg.dot_onoff[17].val.raw,			0x03, sizeof(me->reg.dot_onoff[17].val.raw));
 
 	// Fault_state (0x64): default 0x00
-	memset(&me->reg._0x64_Fault_state.val.raw,					0x00, sizeof(me->reg._0x64_Fault_state.val.raw));
+	memset(&me->reg._0x64_Fault_state.val.raw,		0x00, sizeof(me->reg._0x64_Fault_state.val.raw));
 
 	// LOD defaults (0x65–0x76): all 0x00
 	for (uint8_t i = 0; i < 18; ++i)
 	{
-		memset(&me->reg.dot_lod[i].val.raw,						0x00, sizeof(me->reg.dot_lod[i].val.raw));
+		memset(&me->reg.dot_lod[i].val.raw,			0x00, sizeof(me->reg.dot_lod[i].val.raw));
 	}
 
 	// LSD defaults (0x86–0x97): all 0x00
 	for (uint8_t i = 0; i < 18; ++i)
 	{
-		memset(&me->reg.dot_lsd[i].val.raw,						0x00, sizeof(me->reg.dot_lsd[i].val.raw));
+		memset(&me->reg.dot_lsd[i].val.raw,			0x00, sizeof(me->reg.dot_lsd[i].val.raw));
 	}
 
 	// Clears and reset registers (0xA7–0xA9): default 0x00
-	memset(&me->reg._0xA7_LOD_clear.val.raw,					0x00, sizeof(me->reg._0xA7_LOD_clear.val.raw));
-	memset(&me->reg._0xA8_LSD_clear.val.raw,					0x00, sizeof(me->reg._0xA8_LSD_clear.val.raw));
-	memset(&me->reg._0xA9_Reset.val.raw,						0x00, sizeof(me->reg._0xA9_Reset.val.raw));
+	memset(&me->reg._0xA7_LOD_clear.val.raw,		0x00, sizeof(me->reg._0xA7_LOD_clear.val.raw));
+	memset(&me->reg._0xA8_LSD_clear.val.raw,		0x00, sizeof(me->reg._0xA8_LSD_clear.val.raw));
+	memset(&me->reg._0xA9_Reset.val.raw,			0x00, sizeof(me->reg._0xA9_Reset.val.raw));
 }
 Alx_Status AlxLp586x_RegStruct_Write(AlxLp586x* me)
 {

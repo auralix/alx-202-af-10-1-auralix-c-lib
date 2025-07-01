@@ -4690,42 +4690,6 @@ typedef struct
 } AlxLp586x_Reg_0x05_Global_bri;
 typedef struct
 {
-	uint8_t addr;
-	uint8_t len;
-	AlxLp586x_RegVal_0x06_Group0_bri val;
-} AlxLp586x_Reg_0x06_Group0_bri;
-typedef struct
-{
-	uint8_t addr;
-	uint8_t len;
-	AlxLp586x_RegVal_0x07_Group1_bri val;
-} AlxLp586x_Reg_0x07_Group1_bri;
-typedef struct
-{
-	uint8_t addr;
-	uint8_t len;
-	AlxLp586x_RegVal_0x08_Group2_bri val;
-} AlxLp586x_Reg_0x08_Group2_bri;
-typedef struct
-{
-	uint8_t addr;
-	uint8_t len;
-	AlxLp586x_RegVal_0x09_R_current_set_CC_Group1 val;
-} AlxLp586x_Reg_0x09_R_current_set_CC_Group1;
-typedef struct
-{
-	uint8_t addr;
-	uint8_t len;
-	AlxLp586x_RegVal_0x0A_G_current_set_CC_Group2 val;
-} AlxLp586x_Reg_0x0A_G_current_set_CC_Group2;
-typedef struct
-{
-	uint8_t addr;
-	uint8_t len;
-	AlxLp586x_RegVal_0x0B_B_current_set_CC_Group3 val;
-} AlxLp586x_Reg_0x0B_B_current_set_CC_Group3;
-typedef struct
-{
     uint8_t addr;
     uint8_t len;
     AlxLp586x_RegVal_0x64_Fault_state    val;
@@ -4748,6 +4712,38 @@ typedef struct
     uint8_t len;
     AlxLp586x_RegVal_0xA9_Reset          val;
 } AlxLp586x_Reg_0xA9_Reset;
+
+
+//------------------------------------------------------------------------------
+// 0x06–0x08: Group brightness registers (Group0_bri…Group2_bri)
+//------------------------------------------------------------------------------
+typedef struct {
+	uint8_t addr;
+	uint8_t len;
+	union {
+		AlxLp586x_RegVal_0x06_Group0_bri  g0;
+		AlxLp586x_RegVal_0x07_Group1_bri  g1;
+		AlxLp586x_RegVal_0x08_Group2_bri  g2;
+		uint8_t raw; // clear/reset fallback
+	} val;
+} AlxLp586x_Reg_GroupBri;
+
+
+//------------------------------------------------------------------------------
+// 0x09–0x0B: 3-groups CC current-set registers
+//------------------------------------------------------------------------------
+typedef struct
+{
+	uint8_t addr;
+	uint8_t len;
+	union
+	{
+		AlxLp586x_RegVal_0x09_R_current_set_CC_Group1  g1;
+		AlxLp586x_RegVal_0x0A_G_current_set_CC_Group2  g2;
+		AlxLp586x_RegVal_0x0B_B_current_set_CC_Group3  g3;
+		uint8_t raw; // fallback so we can memset the byte
+	} val;
+} AlxLp586x_Reg_CurrentSetCC;
 
 
 //******************************************************************************
@@ -4907,12 +4903,12 @@ typedef struct
 	AlxLp586x_Reg_0x03_Dev_config2              _0x03_Dev_config2;
 	AlxLp586x_Reg_0x04_Dev_config3              _0x04_Dev_config3;
 	AlxLp586x_Reg_0x05_Global_bri               _0x05_Global_bri;
-	AlxLp586x_Reg_0x06_Group0_bri               _0x06_Group0_bri;
-	AlxLp586x_Reg_0x07_Group1_bri               _0x07_Group1_bri;
-	AlxLp586x_Reg_0x08_Group2_bri               _0x08_Group2_bri;
-	AlxLp586x_Reg_0x09_R_current_set_CC_Group1  _0x09_R_current_set_CC_Group1;
-	AlxLp586x_Reg_0x0A_G_current_set_CC_Group2  _0x0A_G_current_set_CC_Group2;
-	AlxLp586x_Reg_0x0B_B_current_set_CC_Group3  _0x0B_B_current_set_CC_Group3;
+
+	// 0x06–0x08: Group brightness registers (Group0_bri…Group2_bri)
+	AlxLp586x_Reg_GroupBri  group_bri[3];
+
+	// 0x09…0x0B: CC-current-set
+	AlxLp586x_Reg_CurrentSetCC  current_set_cc[3];
 
 	// 0x0C–0x29: Dot group-select for L0…L5, CS0…CS17
 	AlxLp586x_Reg_DotGrpSel dot_grp_sel[30];
