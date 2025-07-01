@@ -617,6 +617,113 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 /**
   * @brief
   * @param[in,out]	me
+  * @param[in]		slaveAddr
+  * @param[in]		writeData
+  * @param[in]		writeLen
+  * @param[in]		readData
+  * @param[in]		readLen
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxI2c_Master_StartWriteReadStop(AlxI2c* me, uint16_t slaveAddr, const uint8_t* writeData, uint16_t writeLen, uint8_t* readData, uint16_t readLen, uint8_t numOfTries, uint16_t timeout_ms)
+{
+	//------------------------------------------------------------------------------
+	// Trace
+	//------------------------------------------------------------------------------
+	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04X writeLen %u readLen %u numOfTries %u timeout_ms %u", me->deviceName, slaveAddr, writeLen, readLen, numOfTries, timeout_ms);
+
+
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_I2C_ASSERT(me->wasCtorCalled == true);
+	ALX_I2C_ASSERT(me->isInit == true);
+	(void)me;
+	(void)slaveAddr;
+	(void)writeData;
+	ALX_I2C_ASSERT(0 < writeLen);
+	(void)readData;
+	ALX_I2C_ASSERT(0 < readLen);
+	ALX_I2C_ASSERT(0 < numOfTries);
+	ALX_I2C_ASSERT(timeout_ms == 0);	// TV: Unsupported
+
+
+	//------------------------------------------------------------------------------
+	// Try
+	//------------------------------------------------------------------------------
+	for (uint8_t _try = 1; _try <= numOfTries; _try++)
+	{
+		//------------------------------------------------------------------------------
+		// Trace
+		//------------------------------------------------------------------------------
+		ALX_I2C_TRACE_VRB("DO: i2c_write_read() deviceName %s try %u slaveAddr 0x%04X writeLen %u readLen %u", me->deviceName, _try, slaveAddr, writeLen, readLen);
+		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
+		ALX_I2C_TRACE_FORMAT("    writeData: ");
+		for (uint32_t i = 0; i < writeLen; i++)
+		{
+			ALX_I2C_TRACE_FORMAT("%02X ", writeData[i]);
+		}
+		ALX_I2C_TRACE_FORMAT("\r\n");
+		#endif
+
+
+		//------------------------------------------------------------------------------
+		// Write/Read
+		//------------------------------------------------------------------------------
+		int32_t status = i2c_write_read(me->device, slaveAddr >> 1, writeData, writeLen, readData, readLen);
+		if (status != 0)
+		{
+			#if ALX_TRACE_LEVEL < ALX_TRACE_LEVEL_VRB
+			ALX_I2C_TRACE_WRN("FAIL: i2c_write_read() deviceName %s status %ld try %u", me->deviceName, status, _try);
+			#else
+			ALX_I2C_TRACE_VRB("FAIL: i2c_write_read() deviceName %s status %ld try %u slaveAddr 0x%04X writeLen %u readLen %u numOfTries %u timeout_ms %u", me->deviceName, status, _try, slaveAddr, writeLen, readLen, numOfTries, timeout_ms);
+			#endif
+			continue;
+		}
+
+
+		//-----------------------------------------------------------------------------
+		// Trace
+		//-----------------------------------------------------------------------------
+
+		// DONE
+		ALX_I2C_TRACE_VRB("DONE: i2c_write_read() deviceName %s status %ld", me->deviceName, status);
+		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
+		ALX_I2C_TRACE_FORMAT("    readData: ");
+		for (uint32_t i = 0; i < readLen; i++)
+		{
+			ALX_I2C_TRACE_FORMAT("%02X ", readData[i]);
+		}
+		ALX_I2C_TRACE_FORMAT("\r\n");
+		#endif
+
+		// EXIT
+		ALX_I2C_TRACE_DBG("EXIT: deviceName %s", me->deviceName);
+
+
+		//------------------------------------------------------------------------------
+		// Return
+		//------------------------------------------------------------------------------
+		return Alx_Ok;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Catch
+	//------------------------------------------------------------------------------
+
+	// Trace
+	ALX_I2C_TRACE_ERR("FAIL: Alx_ErrNumOfTries deviceName %s", me->deviceName);
+
+	// Return
+	return Alx_ErrNumOfTries;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
   * @param[in]		timeout_ms
   * @retval			Alx_Ok
   * @retval			Alx_Err
