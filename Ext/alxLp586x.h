@@ -5257,22 +5257,22 @@ typedef struct
 	AlxLp586x_Reg_0x05_Global_bri               _0x05_Global_bri;
 
 	// 0x06–0x08: Group brightness registers (Group0_bri…Group2_bri)
-	AlxLp586x_Reg_GroupBri  group_bri[3];
+	AlxLp586x_Reg_GroupBri  _group_bri[3];
 
 	// 0x09…0x0B: CC-current-set
-	AlxLp586x_Reg_CurrentSetCC  current_set_cc[3];
+	AlxLp586x_Reg_CurrentSetCC  _current_set_cc[3];
 
 	// 0x0C–0x29: Dot group-select for L0…L5, CS0…CS17
-	AlxLp586x_Reg_DotGrpSel dot_grp_sel[30];
+	AlxLp586x_Reg_DotGrpSel _dot_grp_sel[30];
 
 	// 0x43–0x54: Dot on/off registers (L0…L5, CS0…CS7)
-    AlxLp586x_Reg_DotOnOff dot_onoff[18];
+    AlxLp586x_Reg_DotOnOff _dot_onoff[18];
 
 	// 0x65–0x76: Dot Lod open load errors registers (L0…L5, CS0…CS7)
-	AlxLp586x_Reg_DotLod    dot_lod[18];
+	AlxLp586x_Reg_DotLod    _dot_lod[18];
 
 	// 0x86–0x97: Dot Lsd short-cut load errors registers (L0…L5, CS0…CS7)
-	AlxLp586x_Reg_DotLsd    dot_lsd[18];
+	AlxLp586x_Reg_DotLsd    _dot_lsd[18];
 
 	// 0x64: Fault_state
     AlxLp586x_Reg_0x64_Fault_state              _0x64_Fault_state;
@@ -5283,10 +5283,10 @@ typedef struct
     AlxLp586x_Reg_0xA9_Reset                    _0xA9_Reset;
 
 	// 0x100–0x16B: Dot-current (DC0…DC107)
-	AlxLp586x_Reg_DotCurr dot_curr[108];
+	AlxLp586x_Reg_DotCurr _dot_curr[108];
 
 	// 0x200–0x2D7: Dot current registers (pwm_bri0…pwm_bri215 )
-	AlxLp586x_Reg_PwmBri pwm_bri[216];
+	AlxLp586x_Reg_PwmBri _pwm_bri[216];
 
 } AlxLp586x_Reg;
 
