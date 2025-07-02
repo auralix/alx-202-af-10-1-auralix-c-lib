@@ -40,6 +40,7 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static void AlxLp586x_RegStruct_SetI2cAddrOffset(AlxLp586x* me);
 static void AlxLp586x_RegStruct_SetAddr(AlxLp586x* me);
 static void AlxLp586x_RegStruct_SetLen(AlxLp586x* me);
 static void AlxLp586x_RegStruct_SetValToZero(AlxLp586x* me);
@@ -87,6 +88,7 @@ void AlxLp586x_Ctor
 	me->i2cTimeout_ms = i2cTimeout_ms;
 
 	// Variables
+	AlxLp586x_RegStruct_SetI2cAddrOffset(me);
 	AlxLp586x_RegStruct_SetAddr(me);
 	AlxLp586x_RegStruct_SetLen(me);
 	AlxLp586x_RegStruct_SetValToZero(me);
@@ -288,32 +290,13 @@ Alx_Status AlxLp586x_Reg_Write(AlxLp586x* me, void* reg)
 
 	// Local variables
 	Alx_Status status = Alx_Err;
-	uint8_t regAddr = 0;
-	uint16_t _regAddr = *((uint16_t*)reg);
-	if ((0 <= _regAddr) && (_regAddr <= 0xFF))
-	{
-		regAddr = *((uint8_t*)reg);
-	}
-	else if ((0x100 <= _regAddr) && (_regAddr <= 0x1FF))
-	{
-		regAddr = *((uint8_t*)reg);
-		me->i2cAddr = me->i2cAddr + 2;
-	}
-	else if ((0x200 <= _regAddr) && (_regAddr <= 0x2FF))
-	{
-		regAddr = *((uint8_t*)reg);
-		me->i2cAddr = me->i2cAddr + 4;
-	}
-	else
-	{
-		ALX_LP586x_ASSERT(false); // We should never get here
-	}
-
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+	uint8_t i2cAddr_Offset = *((uint8_t*)reg);
+	uint8_t regAddr = *((uint8_t*)reg) + sizeof(i2cAddr_Offset);
+	uint8_t regLen = *((uint8_t*)reg + sizeof(i2cAddr_Offset) + sizeof(regAddr));
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(i2cAddr_Offset) + sizeof(regAddr) + sizeof(regLen);
 
 	// Write
-	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
+	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr + i2cAddr_Offset, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
 
 	// Return
@@ -345,6 +328,72 @@ void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+static void AlxLp586x_RegStruct_SetI2cAddrOffset(AlxLp586x* me)
+{
+	// Core registers:
+	me->reg._0x00_Chip_En.i2cAddr_Offset			= 0x00;
+	me->reg._0x01_Dev_initial.i2cAddr_Offset		= 0x00;
+	me->reg._0x02_Dev_config1.i2cAddr_Offset		= 0x00;
+	me->reg._0x03_Dev_config2.i2cAddr_Offset		= 0x00;
+	me->reg._0x04_Dev_config3.i2cAddr_Offset		= 0x00;
+	me->reg._0x05_Global_bri.i2cAddr_Offset			= 0x00;
+
+	// 0x06–0x08: Group brightness
+	for (uint8_t i = 0; i < 3; ++i)
+	{
+		me->reg._group_bri[i].i2cAddr_Offset		= 0x00;
+	}
+
+	// 0x09…0x0B: CC-current-set
+	for (uint8_t i = 0; i < 3; ++i)
+	{
+		me->reg._current_set_cc[i].i2cAddr_Offset	= 0x00;
+	}
+
+	// 0x0C–0x29: Dot group-select for L0…L5, CS0…CS17
+	for (int i = 0; i < 30; ++i)
+	{
+		me->reg._dot_grp_sel[i].i2cAddr_Offset		= 0x00;
+	}
+
+	// 0x43–0x54: Dot on/off registers (L0…L5, CS0…CS7)
+	for (uint8_t i = 0; i < 18; ++i)
+	{
+		me->reg._dot_onoff[i].i2cAddr_Offset		= 0x00;
+	}
+
+	// Fault_state (0x64):
+	me->reg._0x64_Fault_state.i2cAddr_Offset		= 0x00;
+
+	// LOD (0x65–0x76):
+	for (uint8_t i = 0; i < 18; ++i)
+	{
+		me->reg._dot_lod[i].i2cAddr_Offset			= 0x00;
+	}
+
+	// LSD (0x86–0x97):
+	for (uint8_t i = 0; i < 18; ++i)
+	{
+		me->reg._dot_lsd[i].i2cAddr_Offset			= 0x00;
+	}
+
+	// Clears and reset registers (0xA7–0xA9):
+	me->reg._0xA7_LOD_clear.i2cAddr_Offset			= 0x00;
+	me->reg._0xA8_LSD_clear.i2cAddr_Offset			= 0x00;
+	me->reg._0xA9_Reset.i2cAddr_Offset				= 0x00;
+
+	// Dot-current (DC0…DC107) (0x100–0x16B):
+	for (uint16_t i = 0; i < 108; ++i)
+	{
+		me->reg._dot_curr[i].i2cAddr_Offset			= 0x02;
+	}
+
+	//  Dot current registers (pwm_bri0…pwm_bri215 ) (0x200–0x2D7):
+	for (uint16_t i = 0; i < 216; ++i)
+	{
+		me->reg._pwm_bri[i].i2cAddr_Offset			= 0x04;
+	}
+}
 static void AlxLp586x_RegStruct_SetAddr(AlxLp586x* me)
 {
 	// Core registers:

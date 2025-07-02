@@ -4654,60 +4654,70 @@ typedef union
 //******************************************************************************
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x00_Chip_En val;
 } AlxLp586x_Reg_0x00_Chip_En;
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x01_Dev_initial val;
 } AlxLp586x_Reg_0x01_Dev_initial;
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x02_Dev_config1 val;
 } AlxLp586x_Reg_0x02_Dev_config1;
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x03_Dev_config2 val;
 } AlxLp586x_Reg_0x03_Dev_config2;
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x04_Dev_config3 val;
 } AlxLp586x_Reg_0x04_Dev_config3;
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x05_Global_bri val;
 } AlxLp586x_Reg_0x05_Global_bri;
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
     uint8_t addr;
     uint8_t len;
     AlxLp586x_RegVal_0x64_Fault_state    val;
 } AlxLp586x_Reg_0x64_Fault_state;
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
     uint8_t addr;
     uint8_t len;
     AlxLp586x_RegVal_0xA7_LOD_clear      val;
 } AlxLp586x_Reg_0xA7_LOD_clear;
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
     uint8_t addr;
     uint8_t len;
     AlxLp586x_RegVal_0xA8_LSD_clear      val;
 } AlxLp586x_Reg_0xA8_LSD_clear;
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
     uint8_t addr;
     uint8_t len;
     AlxLp586x_RegVal_0xA9_Reset          val;
@@ -4717,7 +4727,9 @@ typedef struct
 //------------------------------------------------------------------------------
 // 0x06–0x08: Group brightness registers (Group0_bri…Group2_bri)
 //------------------------------------------------------------------------------
-typedef struct {
+typedef struct
+{
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
 	uint8_t addr;
 	uint8_t len;
 	union {
@@ -4734,6 +4746,7 @@ typedef struct {
 //------------------------------------------------------------------------------
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
 	uint8_t addr;
 	uint8_t len;
 	union
@@ -4751,6 +4764,7 @@ typedef struct
 //------------------------------------------------------------------------------
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
     uint8_t addr;
     uint8_t len;
     union
@@ -4795,6 +4809,7 @@ typedef struct
 //------------------------------------------------------------------------------
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
     uint8_t addr;
     uint8_t len;
 
@@ -4833,6 +4848,7 @@ typedef struct
 //------------------------------------------------------------------------------
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
     uint8_t addr;
     uint8_t len;
     union
@@ -4865,6 +4881,7 @@ typedef struct
 //------------------------------------------------------------------------------
 typedef struct
 {
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
     uint8_t addr;
     uint8_t len;
     union
@@ -4897,8 +4914,9 @@ typedef struct
 //------------------------------------------------------------------------------
 typedef struct
 {
-    uint16_t addr;    // 16-bit because addresses ≥ 0x100
-    uint8_t  len;     // always 1 byte
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+    uint8_t addr;     // Always 1 byte
+    uint8_t  len;     // Always 1 byte
     union
     {
         uint8_t  dc0;    // L0–CS0
@@ -5019,8 +5037,9 @@ typedef struct
 //------------------------------------------------------------------------------
 typedef struct
 {
-	uint16_t addr; // 16-bit because addresses ≥ 0x100
-	uint8_t  len; // always 1 byte
+	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t addr; // Always 1 byte
+	uint8_t  len; // Always 1 byte
 	union
 	{
 		uint8_t pwm_bri0;
@@ -5239,7 +5258,7 @@ typedef struct
         uint8_t pwm_bri213;
         uint8_t pwm_bri214;
 		uint8_t pwm_bri215;
-		uint8_t raw; // fallback so we can memset the whole byte
+		uint8_t raw; // Fallback so we can memset the whole byte
 	} val;
 } AlxLp586x_Reg_PwmBri;
 
@@ -5249,44 +5268,44 @@ typedef struct
 //******************************************************************************
 typedef struct
 {
-	AlxLp586x_Reg_0x00_Chip_En                  _0x00_Chip_En;
-	AlxLp586x_Reg_0x01_Dev_initial              _0x01_Dev_initial;
-	AlxLp586x_Reg_0x02_Dev_config1              _0x02_Dev_config1;
-	AlxLp586x_Reg_0x03_Dev_config2              _0x03_Dev_config2;
-	AlxLp586x_Reg_0x04_Dev_config3              _0x04_Dev_config3;
-	AlxLp586x_Reg_0x05_Global_bri               _0x05_Global_bri;
+	AlxLp586x_Reg_0x00_Chip_En      _0x00_Chip_En;
+	AlxLp586x_Reg_0x01_Dev_initial  _0x01_Dev_initial;
+	AlxLp586x_Reg_0x02_Dev_config1  _0x02_Dev_config1;
+	AlxLp586x_Reg_0x03_Dev_config2  _0x03_Dev_config2;
+	AlxLp586x_Reg_0x04_Dev_config3  _0x04_Dev_config3;
+	AlxLp586x_Reg_0x05_Global_bri   _0x05_Global_bri;
 
 	// 0x06–0x08: Group brightness registers (Group0_bri…Group2_bri)
-	AlxLp586x_Reg_GroupBri  _group_bri[3];
+	AlxLp586x_Reg_GroupBri          _group_bri[3];
 
 	// 0x09…0x0B: CC-current-set
-	AlxLp586x_Reg_CurrentSetCC  _current_set_cc[3];
+	AlxLp586x_Reg_CurrentSetCC      _current_set_cc[3];
 
 	// 0x0C–0x29: Dot group-select for L0…L5, CS0…CS17
-	AlxLp586x_Reg_DotGrpSel _dot_grp_sel[30];
+	AlxLp586x_Reg_DotGrpSel         _dot_grp_sel[30];
 
 	// 0x43–0x54: Dot on/off registers (L0…L5, CS0…CS7)
-    AlxLp586x_Reg_DotOnOff _dot_onoff[18];
+    AlxLp586x_Reg_DotOnOff          _dot_onoff[18];
 
 	// 0x65–0x76: Dot Lod open load errors registers (L0…L5, CS0…CS7)
-	AlxLp586x_Reg_DotLod    _dot_lod[18];
+	AlxLp586x_Reg_DotLod            _dot_lod[18];
 
 	// 0x86–0x97: Dot Lsd short-cut load errors registers (L0…L5, CS0…CS7)
-	AlxLp586x_Reg_DotLsd    _dot_lsd[18];
+	AlxLp586x_Reg_DotLsd            _dot_lsd[18];
 
 	// 0x64: Fault_state
-    AlxLp586x_Reg_0x64_Fault_state              _0x64_Fault_state;
+    AlxLp586x_Reg_0x64_Fault_state  _0x64_Fault_state;
 
 	// 0xA7–0xA9: Clears and reset registers
-    AlxLp586x_Reg_0xA7_LOD_clear                _0xA7_LOD_clear;
-    AlxLp586x_Reg_0xA8_LSD_clear                _0xA8_LSD_clear;
-    AlxLp586x_Reg_0xA9_Reset                    _0xA9_Reset;
+    AlxLp586x_Reg_0xA7_LOD_clear    _0xA7_LOD_clear;
+    AlxLp586x_Reg_0xA8_LSD_clear    _0xA8_LSD_clear;
+    AlxLp586x_Reg_0xA9_Reset        _0xA9_Reset;
 
 	// 0x100–0x16B: Dot-current (DC0…DC107)
-	AlxLp586x_Reg_DotCurr _dot_curr[108];
+	AlxLp586x_Reg_DotCurr           _dot_curr[108];
 
 	// 0x200–0x2D7: Dot current registers (pwm_bri0…pwm_bri215 )
-	AlxLp586x_Reg_PwmBri _pwm_bri[216];
+	AlxLp586x_Reg_PwmBri            _pwm_bri[216];
 
 } AlxLp586x_Reg;
 
