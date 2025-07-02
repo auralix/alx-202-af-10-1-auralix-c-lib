@@ -463,6 +463,10 @@ bool AlxIoPin_Irq_IsEnabled(AlxIoPin* me)
 //******************************************************************************
 static void AlxIoPin_Irq_Callback_Zephry(const struct device* port, struct gpio_callback* cb, gpio_port_pins_t pins)
 {
+	// Void
+	(void)port;
+	(void)pins;
+
 	// Get
 	AlxIoPin* me = CONTAINER_OF(cb, AlxIoPin, irqStruct);
 

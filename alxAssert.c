@@ -53,7 +53,7 @@ void ALX_WEAK AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun)
 	(void)line;
 	(void)fun;
 
-	ALX_BKPT;
+	ALX_BKPT();
 }
 
 /**

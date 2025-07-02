@@ -38,6 +38,14 @@
 
 
 //******************************************************************************
+// Private Functions
+//******************************************************************************
+#if defined(ALX_ZEPHYR)
+static void AlxOsThread_Thread(void* p1, void* p2, void* p3);
+#endif
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 
@@ -126,16 +134,16 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 	#if defined(ALX_ZEPHYR)
 	k_tid_t threadId = k_thread_create
 	(
-		&me->threadHandle,			// new_thread
-		me->stackBuff,				// stack
-		me->stackLen_byte,			// stack_size
-		(k_thread_entry_t)me->func,	// entry
-		me->param,					// p1
-		NULL,						// p2
-		NULL,						// p3
-		me->priority,				// prio
-		0,							// options
-		K_NO_WAIT					// delay
+		&me->threadHandle,						// new_thread
+		me->stackBuff,							// stack
+		me->stackLen_byte,						// stack_size
+		(k_thread_entry_t)AlxOsThread_Thread,	// entry
+		me,										// p1
+		NULL,									// p2
+		NULL,									// p3
+		me->priority,							// prio
+		0,										// options
+		K_NO_WAIT								// delay
 	);
 	#if defined(CONFIG_THREAD_NAME)
 	int32_t status = k_thread_name_set(threadId, me->name);
@@ -192,6 +200,25 @@ void AlxOsThread_Terminate(AlxOsThread* me)
 	ALX_OS_THREAD_ASSERT(false);
 	#endif
 }
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+#if defined(ALX_ZEPHYR)
+static void AlxOsThread_Thread(void* p1, void* p2, void* p3)
+{
+	// Void
+	(void)p2;
+	(void)p3;
+
+	// Prepare me from p1
+	AlxOsThread* me = (AlxOsThread*)p1;
+
+	// Call actual user function
+	me->func(me->param);
+}
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB)
