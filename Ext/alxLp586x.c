@@ -184,6 +184,12 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 	AlxIoPin_Init(me->do_LED_DRV_EN);
 	AlxIoPin_Init(me->do_LED_DRV_SYNC);
 
+	// Reset GPIO
+	AlxIoPin_Reset(me->do_LED_DRV_EN);
+	AlxDelay_us(10);
+	// Set GPIO do_LED_DRV_EN
+	AlxIoPin_Set(me->do_LED_DRV_EN);
+
 	// Check if slave is ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok)
@@ -198,8 +204,7 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 	// Set register struct values - WEAK
 	AlxLp586x_RegStruct_SetVal(me);
 
-	// Set GPIO do_LED_DRV_EN
-	AlxIoPin_Set(me->do_LED_DRV_EN);
+
 
 	// Write register struct - WEAK
 	status = AlxLp586x_RegStruct_Write(me);
@@ -211,6 +216,8 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 
 	// Set GPIO do_LED_DRV_SYNC - turn on all leds
 	AlxIoPin_Set(me->do_LED_DRV_SYNC);
+	AlxDelay_us(10);
+	AlxIoPin_Reset(me->do_LED_DRV_SYNC);
 
 	// Set isInit
 	me->isInit = true;
@@ -278,9 +285,30 @@ Alx_Status AlxLp586x_Reg_Write(AlxLp586x* me, void* reg)
 	ALX_LP586x_ASSERT(me->isInitPeriph == true);
 	// isInit -> Don't care
 
+
 	// Local variables
 	Alx_Status status = Alx_Err;
-	uint8_t regAddr = *((uint8_t*)reg);
+	uint8_t regAddr = 0;
+	uint16_t _regAddr = *((uint16_t*)reg);
+	if ((0 <= _regAddr) && (_regAddr <= 0xFF))
+	{
+		regAddr = *((uint8_t*)reg);
+	}
+	else if ((0x100 <= _regAddr) && (_regAddr <= 0x1FF))
+	{
+		regAddr = *((uint8_t*)reg);
+		me->i2cAddr = me->i2cAddr + 2;
+	}
+	else if ((0x200 <= _regAddr) && (_regAddr <= 0x2FF))
+	{
+		regAddr = *((uint8_t*)reg);
+		me->i2cAddr = me->i2cAddr + 4;
+	}
+	else
+	{
+		ALX_LP586x_ASSERT(false); // We should never get here
+	}
+
 	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
 
@@ -299,6 +327,18 @@ void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_LP586x_ASSERT(ledNum <= 107);
+
+	if (val == true)
+	{
+		memset(&me->reg._pwm_bri[ledNum].val.raw, 0xFF, sizeof(me->reg._pwm_bri[ledNum].val.raw));
+	}
+	else
+	{
+		memset(&me->reg._pwm_bri[ledNum].val.raw, 0x00, sizeof(me->reg._pwm_bri[ledNum].val.raw));
+	}
+
+	// Set Core registers:
+	AlxLp586x_Reg_Write(me, &me->reg._pwm_bri[ledNum]);
 }
 
 
@@ -626,6 +666,13 @@ Alx_Status AlxLp586x_RegStruct_Write(AlxLp586x* me)
 	for (int i = 0; i < 30; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._dot_grp_sel[i]);
+		if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+	}
+
+	//  Dot current registers (pwm_bri0…pwm_bri107 ) (0x200–0x26B):  all to 100%
+	for (uint16_t i = 0; i < 107; ++i)
+	{
+		status = AlxLp586x_Reg_Write(me, &me->reg._pwm_bri[i]);
 		if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
 	}
 
