@@ -353,6 +353,17 @@ static void AlxLp586x_RegStruct_SetAddr(AlxLp586x* me)
 	me->reg._0xA8_LSD_clear.addr				= 0xA8;
 	me->reg._0xA9_Reset.addr					= 0xA9;
 
+	// Dot-current (DC0…DC107) (0x100–0x16B):
+	for (uint16_t i = 0; i < 108; ++i)
+	{
+		me->reg.dot_curr[i].addr = (uint16_t)(0x100 + i);
+	}
+
+	//  Dot current registers (pwm_bri0…pwm_bri215 ) (0x200–0x2D7):
+	for (uint16_t i = 0; i < 216; ++i)
+	{
+		me->reg.pwm_bri[i].addr = (uint16_t)(0x200 + i);
+	}
 }
 static void AlxLp586x_RegStruct_SetLen(AlxLp586x* me)
 {
@@ -408,6 +419,18 @@ static void AlxLp586x_RegStruct_SetLen(AlxLp586x* me)
 	me->reg._0xA7_LOD_clear.len					= sizeof(me->reg._0xA7_LOD_clear.val);
 	me->reg._0xA8_LSD_clear.len					= sizeof(me->reg._0xA8_LSD_clear.val);
 	me->reg._0xA9_Reset.len						= sizeof(me->reg._0xA9_Reset.val);
+
+	// Dot-current (DC0…DC107) (0x100–0x16B):
+	for (uint16_t i = 0; i < 108; ++i)
+	{
+		me->reg.dot_curr[i].len					= sizeof(me->reg.dot_curr[i].val);
+	}
+
+	//  Dot current registers (pwm_bri0…pwm_bri215 ) (0x200–0x2D7):
+	for (uint16_t i = 0; i < 216; ++i)
+	{
+		me->reg.pwm_bri[i].len					= sizeof(me->reg.pwm_bri[i].val);
+	}
 }
 static void AlxLp586x_RegStruct_SetValToZero(AlxLp586x* me)
 {
@@ -463,6 +486,18 @@ static void AlxLp586x_RegStruct_SetValToZero(AlxLp586x* me)
 	memset(&me->reg._0xA7_LOD_clear.val.raw,		0x00, sizeof(me->reg._0xA7_LOD_clear.val.raw));
 	memset(&me->reg._0xA8_LSD_clear.val.raw,		0x00, sizeof(me->reg._0xA8_LSD_clear.val.raw));
 	memset(&me->reg._0xA9_Reset.val.raw,			0x00, sizeof(me->reg._0xA9_Reset.val.raw));
+
+	// Dot-current (DC0…DC107) (0x100–0x16B):
+	for (uint16_t i = 0; i < 108; ++i)
+	{
+		memset(&me->reg.dot_curr[i].val.raw,		0x00, sizeof(me->reg.dot_curr[i].val.raw));
+	}
+
+	//  Dot current registers (pwm_bri0…pwm_bri215 ) (0x200–0x2D7):
+	for (uint16_t i = 0; i < 216; ++i)
+	{
+		memset(&me->reg.pwm_bri[i].val.raw,			0x00, sizeof(me->reg.pwm_bri[i].val.raw));
+	}
 }
 static void AlxLp586x_RegStruct_SetValToDefault(AlxLp586x* me)
 {
@@ -532,6 +567,19 @@ static void AlxLp586x_RegStruct_SetValToDefault(AlxLp586x* me)
 	memset(&me->reg._0xA7_LOD_clear.val.raw,		0x00, sizeof(me->reg._0xA7_LOD_clear.val.raw));
 	memset(&me->reg._0xA8_LSD_clear.val.raw,		0x00, sizeof(me->reg._0xA8_LSD_clear.val.raw));
 	memset(&me->reg._0xA9_Reset.val.raw,			0x00, sizeof(me->reg._0xA9_Reset.val.raw));
+
+	// Dot-current (DC0…DC107) (0x100–0x16B): default all 0x80
+	for (uint16_t i = 0; i < 108; ++i)
+	{
+		memset(&me->reg.dot_curr[i].val.raw,		0x80, sizeof(me->reg.dot_curr[i].val.raw));
+	}
+
+	//  Dot current registers (pwm_bri0…pwm_bri215 ) (0x200–0x2D7): default all 0x00
+	for (uint16_t i = 0; i < 216; ++i)
+	{
+		memset(&me->reg.pwm_bri[i].val.raw,			0x00, sizeof(me->reg.pwm_bri[i].val.raw));
+	}
+
 }
 Alx_Status AlxLp586x_RegStruct_Write(AlxLp586x* me)
 {

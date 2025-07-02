@@ -4724,7 +4724,7 @@ typedef struct {
 		AlxLp586x_RegVal_0x06_Group0_bri  g0;
 		AlxLp586x_RegVal_0x07_Group1_bri  g1;
 		AlxLp586x_RegVal_0x08_Group2_bri  g2;
-		uint8_t raw; // clear/reset fallback
+		uint8_t raw; // fallback so we can memset the whole byte
 	} val;
 } AlxLp586x_Reg_GroupBri;
 
@@ -4741,7 +4741,7 @@ typedef struct
 		AlxLp586x_RegVal_0x09_R_current_set_CC_Group1  g1;
 		AlxLp586x_RegVal_0x0A_G_current_set_CC_Group2  g2;
 		AlxLp586x_RegVal_0x0B_B_current_set_CC_Group3  g3;
-		uint8_t raw; // fallback so we can memset the byte
+		uint8_t raw; // fallback so we can memset the whole byte
 	} val;
 } AlxLp586x_Reg_CurrentSetCC;
 
@@ -4785,7 +4785,7 @@ typedef struct
     AlxLp586x_RegVal_0x27_Dot_grp_sel27  rg27;  // 27h:  L5-CS11…CS8
     AlxLp586x_RegVal_0x28_Dot_grp_sel28  rg28;  // 28h:  L5-CS15…CS12
     AlxLp586x_RegVal_0x29_Dot_grp_sel29  rg29;  // 29h:  L5-CS17/16
-	uint8_t raw; // Fallback so we can memset the whole byte
+	uint8_t raw; // fallback so we can memset the whole byte
     } val;
 } AlxLp586x_Reg_DotGrpSel;
 
@@ -4823,7 +4823,7 @@ typedef struct
         AlxLp586x_RegVal_0x52_Dot_onoff15  onoff15;
         AlxLp586x_RegVal_0x53_Dot_onoff16  onoff16;
         AlxLp586x_RegVal_0x54_Dot_onoff17  onoff17;
-        uint8_t raw;   // fallback so we can memset the whole byte
+	    uint8_t raw; // fallback so we can memset the whole byte
     } val;
 } AlxLp586x_Reg_DotOnOff;
 
@@ -4855,7 +4855,7 @@ typedef struct
         AlxLp586x_RegVal_0x74_Dot_lod15  lod15;
         AlxLp586x_RegVal_0x75_Dot_lod16  lod16;
         AlxLp586x_RegVal_0x76_Dot_lod17  lod17;
-        uint8_t raw;
+	    uint8_t raw; // fallback so we can memset the whole byte
     } val;
 } AlxLp586x_Reg_DotLod;
 
@@ -4887,7 +4887,7 @@ typedef struct
         AlxLp586x_RegVal_0x95_Dot_lsd15  lsd15;
         AlxLp586x_RegVal_0x96_Dot_lsd16  lsd16;
         AlxLp586x_RegVal_0x97_Dot_lsd17  lsd17;
-        uint8_t raw;
+	    uint8_t raw; // fallback so we can memset the whole byte
     } val;
 } AlxLp586x_Reg_DotLsd;
 
@@ -5009,9 +5009,239 @@ typedef struct
         uint8_t  dc105;  // L5–CS15
         uint8_t  dc106;  // L5–CS16
         uint8_t  dc107;  // L5–CS17
-        uint8_t raw;     // fallback so we can memset the whole byte
+	    uint8_t raw; // fallback so we can memset the whole byte
     } val;
 } AlxLp586x_Reg_DotCurr;
+
+
+//------------------------------------------------------------------------------
+// 0x200–0x2D7: Dot current registers (pwm_bri0…pwm_bri215 )
+//------------------------------------------------------------------------------
+typedef struct
+{
+	uint16_t addr; // 16-bit because addresses ≥ 0x100
+	uint8_t  len; // always 1 byte
+	union
+	{
+		uint8_t pwm_bri0;
+		uint8_t pwm_bri1;
+        uint8_t pwm_bri2;
+        uint8_t pwm_bri3;
+        uint8_t pwm_bri4;
+        uint8_t pwm_bri5;
+        uint8_t pwm_bri6;
+        uint8_t pwm_bri7;
+        uint8_t pwm_bri8;
+        uint8_t pwm_bri9;
+        uint8_t pwm_bri10;
+        uint8_t pwm_bri11;
+        uint8_t pwm_bri12;
+        uint8_t pwm_bri13;
+        uint8_t pwm_bri14;
+        uint8_t pwm_bri15;
+        uint8_t pwm_bri16;
+        uint8_t pwm_bri17;
+        uint8_t pwm_bri18;
+        uint8_t pwm_bri19;
+        uint8_t pwm_bri20;
+        uint8_t pwm_bri21;
+        uint8_t pwm_bri22;
+        uint8_t pwm_bri23;
+        uint8_t pwm_bri24;
+        uint8_t pwm_bri25;
+        uint8_t pwm_bri26;
+        uint8_t pwm_bri27;
+        uint8_t pwm_bri28;
+        uint8_t pwm_bri29;
+        uint8_t pwm_bri30;
+        uint8_t pwm_bri31;
+        uint8_t pwm_bri32;
+        uint8_t pwm_bri33;
+        uint8_t pwm_bri34;
+        uint8_t pwm_bri35;
+        uint8_t pwm_bri36;
+        uint8_t pwm_bri37;
+        uint8_t pwm_bri38;
+        uint8_t pwm_bri39;
+        uint8_t pwm_bri40;
+        uint8_t pwm_bri41;
+        uint8_t pwm_bri42;
+        uint8_t pwm_bri43;
+        uint8_t pwm_bri44;
+        uint8_t pwm_bri45;
+        uint8_t pwm_bri46;
+        uint8_t pwm_bri47;
+        uint8_t pwm_bri48;
+        uint8_t pwm_bri49;
+        uint8_t pwm_bri50;
+        uint8_t pwm_bri51;
+        uint8_t pwm_bri52;
+        uint8_t pwm_bri53;
+        uint8_t pwm_bri54;
+        uint8_t pwm_bri55;
+        uint8_t pwm_bri56;
+        uint8_t pwm_bri57;
+        uint8_t pwm_bri58;
+        uint8_t pwm_bri59;
+        uint8_t pwm_bri60;
+        uint8_t pwm_bri61;
+        uint8_t pwm_bri62;
+        uint8_t pwm_bri63;
+        uint8_t pwm_bri64;
+        uint8_t pwm_bri65;
+        uint8_t pwm_bri66;
+        uint8_t pwm_bri67;
+        uint8_t pwm_bri68;
+        uint8_t pwm_bri69;
+        uint8_t pwm_bri70;
+        uint8_t pwm_bri71;
+        uint8_t pwm_bri72;
+        uint8_t pwm_bri73;
+        uint8_t pwm_bri74;
+        uint8_t pwm_bri75;
+        uint8_t pwm_bri76;
+        uint8_t pwm_bri77;
+        uint8_t pwm_bri78;
+        uint8_t pwm_bri79;
+        uint8_t pwm_bri80;
+        uint8_t pwm_bri81;
+        uint8_t pwm_bri82;
+        uint8_t pwm_bri83;
+        uint8_t pwm_bri84;
+        uint8_t pwm_bri85;
+        uint8_t pwm_bri86;
+        uint8_t pwm_bri87;
+        uint8_t pwm_bri88;
+        uint8_t pwm_bri89;
+        uint8_t pwm_bri90;
+        uint8_t pwm_bri91;
+        uint8_t pwm_bri92;
+        uint8_t pwm_bri93;
+        uint8_t pwm_bri94;
+        uint8_t pwm_bri95;
+        uint8_t pwm_bri96;
+        uint8_t pwm_bri97;
+        uint8_t pwm_bri98;
+        uint8_t pwm_bri99;
+        uint8_t pwm_bri100;
+        uint8_t pwm_bri101;
+        uint8_t pwm_bri102;
+        uint8_t pwm_bri103;
+        uint8_t pwm_bri104;
+        uint8_t pwm_bri105;
+        uint8_t pwm_bri106;
+        uint8_t pwm_bri107;
+        uint8_t pwm_bri108;
+        uint8_t pwm_bri109;
+        uint8_t pwm_bri110;
+        uint8_t pwm_bri111;
+        uint8_t pwm_bri112;
+        uint8_t pwm_bri113;
+        uint8_t pwm_bri114;
+        uint8_t pwm_bri115;
+        uint8_t pwm_bri116;
+        uint8_t pwm_bri117;
+        uint8_t pwm_bri118;
+        uint8_t pwm_bri119;
+        uint8_t pwm_bri120;
+        uint8_t pwm_bri121;
+        uint8_t pwm_bri122;
+        uint8_t pwm_bri123;
+        uint8_t pwm_bri124;
+        uint8_t pwm_bri125;
+        uint8_t pwm_bri126;
+        uint8_t pwm_bri127;
+        uint8_t pwm_bri128;
+        uint8_t pwm_bri129;
+        uint8_t pwm_bri130;
+        uint8_t pwm_bri131;
+        uint8_t pwm_bri132;
+        uint8_t pwm_bri133;
+        uint8_t pwm_bri134;
+        uint8_t pwm_bri135;
+        uint8_t pwm_bri136;
+        uint8_t pwm_bri137;
+        uint8_t pwm_bri138;
+        uint8_t pwm_bri139;
+        uint8_t pwm_bri140;
+        uint8_t pwm_bri141;
+        uint8_t pwm_bri142;
+        uint8_t pwm_bri143;
+        uint8_t pwm_bri144;
+        uint8_t pwm_bri145;
+        uint8_t pwm_bri146;
+        uint8_t pwm_bri147;
+        uint8_t pwm_bri148;
+        uint8_t pwm_bri149;
+        uint8_t pwm_bri150;
+        uint8_t pwm_bri151;
+        uint8_t pwm_bri152;
+        uint8_t pwm_bri153;
+        uint8_t pwm_bri154;
+        uint8_t pwm_bri155;
+        uint8_t pwm_bri156;
+        uint8_t pwm_bri157;
+        uint8_t pwm_bri158;
+        uint8_t pwm_bri159;
+        uint8_t pwm_bri160;
+        uint8_t pwm_bri161;
+        uint8_t pwm_bri162;
+        uint8_t pwm_bri163;
+        uint8_t pwm_bri164;
+        uint8_t pwm_bri165;
+        uint8_t pwm_bri166;
+        uint8_t pwm_bri167;
+        uint8_t pwm_bri168;
+        uint8_t pwm_bri169;
+        uint8_t pwm_bri170;
+        uint8_t pwm_bri171;
+        uint8_t pwm_bri172;
+        uint8_t pwm_bri173;
+        uint8_t pwm_bri174;
+        uint8_t pwm_bri175;
+        uint8_t pwm_bri176;
+        uint8_t pwm_bri177;
+        uint8_t pwm_bri178;
+        uint8_t pwm_bri179;
+        uint8_t pwm_bri180;
+        uint8_t pwm_bri181;
+        uint8_t pwm_bri182;
+        uint8_t pwm_bri183;
+        uint8_t pwm_bri184;
+        uint8_t pwm_bri185;
+        uint8_t pwm_bri186;
+        uint8_t pwm_bri187;
+        uint8_t pwm_bri188;
+        uint8_t pwm_bri189;
+        uint8_t pwm_bri190;
+        uint8_t pwm_bri191;
+        uint8_t pwm_bri192;
+        uint8_t pwm_bri193;
+        uint8_t pwm_bri194;
+        uint8_t pwm_bri195;
+        uint8_t pwm_bri196;
+        uint8_t pwm_bri197;
+        uint8_t pwm_bri198;
+        uint8_t pwm_bri199;
+        uint8_t pwm_bri200;
+        uint8_t pwm_bri201;
+        uint8_t pwm_bri202;
+        uint8_t pwm_bri203;
+        uint8_t pwm_bri204;
+        uint8_t pwm_bri205;
+        uint8_t pwm_bri206;
+        uint8_t pwm_bri207;
+        uint8_t pwm_bri208;
+        uint8_t pwm_bri209;
+        uint8_t pwm_bri210;
+        uint8_t pwm_bri211;
+        uint8_t pwm_bri212;
+        uint8_t pwm_bri213;
+        uint8_t pwm_bri214;
+		uint8_t pwm_bri215;
+		uint8_t raw; // fallback so we can memset the whole byte
+	} val;
+} AlxLp586x_Reg_PwmBri;
 
 
 //******************************************************************************
@@ -5054,6 +5284,9 @@ typedef struct
 
 	// 0x100–0x16B: Dot-current (DC0…DC107)
 	AlxLp586x_Reg_DotCurr dot_curr[108];
+
+	// 0x200–0x2D7: Dot current registers (pwm_bri0…pwm_bri215 )
+	AlxLp586x_Reg_PwmBri pwm_bri[216];
 
 } AlxLp586x_Reg;
 
