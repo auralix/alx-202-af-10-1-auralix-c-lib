@@ -47,6 +47,7 @@
 // Specific
 //------------------------------------------------------------------------------
 static void AlxSpi_ParseMode(AlxSpi* me);
+static uint32_t AlxSpi_GetDataSize(AlxSpi* me);
 static uint32_t AlxSpi_GetClkPrescaler(AlxSpi* me);
 
 
@@ -86,6 +87,7 @@ void AlxSpi_Ctor
 	AlxIoPin* di_MISO,
 	AlxIoPin* do_nCS,
 	AlxSpi_Mode mode,
+	AlxSpi_DataSize dataSize,
 	AlxClk* clk,
 	AlxSpi_Clk spiClk,
 	bool isWriteReadLowLevel
@@ -98,6 +100,7 @@ void AlxSpi_Ctor
 	me->di_MISO = di_MISO;
 	me->do_nCS = do_nCS;
 	me->mode = mode;
+	me->dataSize = dataSize;
 	me->clk = clk;
 	me->spiClk = spiClk;
 	me->isWriteReadLowLevel = isWriteReadLowLevel;
@@ -107,7 +110,7 @@ void AlxSpi_Ctor
 	me->hspi.Instance = spi;
 	me->hspi.Init.Mode = SPI_MODE_MASTER;
 	me->hspi.Init.Direction = SPI_DIRECTION_2LINES;
-	me->hspi.Init.DataSize = SPI_DATASIZE_8BIT;
+	me->hspi.Init.DataSize = AlxSpi_GetDataSize(me);
 	me->hspi.Init.CLKPolarity = me->clkPolarity;
 	me->hspi.Init.CLKPhase = me->clkPhase;
 	me->hspi.Init.NSS = SPI_NSS_SOFT;
@@ -159,7 +162,7 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 	AlxSpi_Periph_EnableClk(me);
 
 	// Init SPI
-	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE_WRN("Err"); return Alx_Err; };
 
 	// If write/read low level, set FIFO threshold & enable SPI
 	if (me->isWriteReadLowLevel)
@@ -190,7 +193,7 @@ Alx_Status AlxSpi_DeInit(AlxSpi* me)
 	ALX_SPI_ASSERT(me->isInit == true);
 
 	// DeInit SPI
-	if (HAL_SPI_DeInit(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+	if (HAL_SPI_DeInit(&me->hspi) != HAL_OK) { ALX_SPI_TRACE_WRN("Err"); return Alx_Err; };
 
 	// Force SPI periphery reset
 	AlxSpi_Periph_ForceReset(me);
@@ -211,11 +214,53 @@ Alx_Status AlxSpi_DeInit(AlxSpi* me)
 	return Alx_Ok;
 }
 
+Alx_Status AlxSpi_Reconfigure
+(
+	AlxSpi* me,
+	AlxSpi_Mode mode,
+	AlxSpi_DataSize dataSize,
+	AlxSpi_Clk spiClk,
+	bool isWriteReadLowLevel
+)
+{
+	ALX_SPI_ASSERT(me->wasCtorCalled == true);
+	bool wasInit = false;
+
+	if (me->isInit)
+	{
+		AlxSpi_DeInit(me);
+		wasInit = true;
+	}
+
+	me->mode = mode;
+	me->dataSize = dataSize;
+	me->spiClk = spiClk;
+	me->isWriteReadLowLevel = isWriteReadLowLevel;
+
+	me->hspi.Init.DataSize = AlxSpi_GetDataSize(me);
+
+	AlxSpi_ParseMode(me);
+	me->hspi.Init.CLKPolarity = me->clkPolarity;
+	me->hspi.Init.CLKPhase = me->clkPhase;
+
+	me->hspi.Init.BaudRatePrescaler = AlxSpi_GetClkPrescaler(me);
+
+	// Check clock
+	ALX_SPI_ASSERT(AlxSpi_IsClkOk(me));
+
+	if (wasInit)
+	{
+		AlxSpi_Init(me);
+	}
+
+	return Alx_Ok;
+}
+
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		writeData
-  * @param[in]		len
+  * @param[in]		len Number of data words (can be different than sizeof(writeData))
   * @param[in]		numOfTries
   * @param[in]		timeout_ms
   * @retval			Alx_Ok
@@ -257,8 +302,8 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 			}
 			else
 			{
-				ALX_SPI_TRACE("Err");
-				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+				ALX_SPI_TRACE_WRN("Err");
+				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE_WRN("Err"); return Alx_Err; };
 				continue;
 			}
 		}
@@ -270,7 +315,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 		}
 		else
 		{
-			ALX_SPI_TRACE("Err");
+			ALX_SPI_TRACE_WRN("Err");
 			return Alx_ErrNumOfTries;
 		}
 	}
@@ -284,6 +329,8 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 		uint16_t lenToWrite = len;
 		uint16_t lenToRead = len;
 		uint16_t writeIndex = 0;
+		uint32_t tickstart = HAL_GetTick();
+		uint32_t timeout = (uint32_t)timeout_ms;
 
 		// Execute write/read
 		while(lenToRead > 0)
@@ -296,7 +343,15 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 			)
 			{
 				// Write
-				LL_SPI_TransmitData8(me->hspi.Instance, writeData[writeIndex++]);
+				if (me->dataSize <= AlxSpi_DataSize_8bit)
+				{
+					LL_SPI_TransmitData8(me->hspi.Instance, writeData[writeIndex++]);
+				}
+				else
+				{
+					LL_SPI_TransmitData16(me->hspi.Instance, *(uint16_t*)&writeData[writeIndex]);
+					writeIndex += 2;  // Advance by 2 because it points into byte buffer
+				}
 
 				// Decrement
 				lenToWrite--;
@@ -306,10 +361,26 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 			if(LL_SPI_IsActiveFlag_RXNE(me->hspi.Instance))
 			{
 				// Read
-				LL_SPI_ReceiveData8(me->hspi.Instance);
+				if (me->dataSize <= AlxSpi_DataSize_8bit)
+				{
+					LL_SPI_ReceiveData8(me->hspi.Instance);
+				}
+				else
+				{
+					LL_SPI_ReceiveData16(me->hspi.Instance);
+				}
 
 				// Decrement
 				lenToRead--;
+			}
+
+			// Timeout management
+			if ((lenToRead > 0) || (lenToWrite > 0))
+			{
+				if ((((HAL_GetTick() - tickstart) >= timeout) && (timeout != HAL_MAX_DELAY)) || (timeout == 0U))
+				{
+					return Alx_Err;
+				}
 			}
 		}
 
@@ -364,8 +435,8 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 			}
 			else
 			{
-				ALX_SPI_TRACE("Err");
-				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+				ALX_SPI_TRACE_WRN("Err");
+				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE_WRN("Err"); return Alx_Err; };
 				continue;
 			}
 		}
@@ -377,7 +448,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 		}
 		else
 		{
-			ALX_SPI_TRACE("Err");
+			ALX_SPI_TRACE_WRN("Err");
 			return Alx_ErrNumOfTries;
 		}
 	}
@@ -391,6 +462,8 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 		uint16_t lenToWrite = len;
 		uint16_t lenToRead = len;
 		uint16_t readIndex = 0;
+		uint32_t tickstart = HAL_GetTick();
+		uint32_t timeout = (uint32_t)timeout_ms;
 
 		// Execute write/read
 		while(lenToRead > 0)
@@ -403,7 +476,14 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 			)
 			{
 				// Write
-				LL_SPI_TransmitData8(me->hspi.Instance, 0x00);
+				if (me->dataSize <= AlxSpi_DataSize_8bit)
+				{
+					LL_SPI_TransmitData8(me->hspi.Instance, 0x00);
+				}
+				else
+				{
+					LL_SPI_TransmitData16(me->hspi.Instance, 0x0000);
+				}
 
 				// Decrement
 				lenToWrite--;
@@ -413,10 +493,27 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 			if(LL_SPI_IsActiveFlag_RXNE(me->hspi.Instance))
 			{
 				// Read
-				readData[readIndex++] = LL_SPI_ReceiveData8(me->hspi.Instance);
+				if (me->dataSize <= AlxSpi_DataSize_8bit)
+				{
+					readData[readIndex++] = LL_SPI_ReceiveData8(me->hspi.Instance);
+				}
+				else
+				{
+					*(uint16_t*)&readData[readIndex] = LL_SPI_ReceiveData16(me->hspi.Instance);
+					readIndex += 2;  // Advance by 2 because it points into byte buffer
+				}
 
 				// Decrement
 				lenToRead--;
+			}
+
+			// Timeout management
+			if ((lenToRead > 0) || (lenToWrite > 0))
+			{
+				if ((((HAL_GetTick() - tickstart) >= timeout) && (timeout != HAL_MAX_DELAY)) || (timeout == 0U))
+				{
+					return Alx_Err;
+				}
 			}
 		}
 
@@ -473,8 +570,8 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 			}
 			else
 			{
-				ALX_SPI_TRACE("Err");
-				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+				ALX_SPI_TRACE_WRN("Err");
+				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE_WRN("Err"); return Alx_Err; };
 				continue;
 			}
 		}
@@ -486,7 +583,7 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 		}
 		else
 		{
-			ALX_SPI_TRACE("Err");
+			ALX_SPI_TRACE_WRN("Err");
 			return Alx_ErrNumOfTries;
 		}
 	}
@@ -501,6 +598,8 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 		uint16_t lenToRead = len;
 		uint16_t writeIndex = 0;
 		uint16_t readIndex = 0;
+		uint32_t tickstart = HAL_GetTick();
+		uint32_t timeout = (uint32_t)timeout_ms;
 
 		// Execute write/read
 		while(lenToRead > 0)
@@ -513,7 +612,15 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 			)
 			{
 				// Write
-				LL_SPI_TransmitData8(me->hspi.Instance, writeData[writeIndex++]);
+				if (me->dataSize <= AlxSpi_DataSize_8bit)
+				{
+					LL_SPI_TransmitData8(me->hspi.Instance, writeData[writeIndex++]);
+				}
+				else
+				{
+					LL_SPI_TransmitData16(me->hspi.Instance, *(uint16_t*)&writeData[writeIndex]);
+					writeIndex += 2;  // Advance by 2 because it points into byte buffer
+				}
 
 				// Decrement
 				lenToWrite--;
@@ -523,10 +630,27 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 			if(LL_SPI_IsActiveFlag_RXNE(me->hspi.Instance))
 			{
 				// Read
-				readData[readIndex++] = LL_SPI_ReceiveData8(me->hspi.Instance);
+				if (me->dataSize <= AlxSpi_DataSize_8bit)
+				{
+					readData[readIndex++] = LL_SPI_ReceiveData8(me->hspi.Instance);
+				}
+				else
+				{
+					*(uint16_t*)&readData[readIndex] = LL_SPI_ReceiveData16(me->hspi.Instance);
+					readIndex += 2;  // Advance by 2 because it points into byte buffer
+				}
 
 				// Decrement
 				lenToRead--;
+			}
+
+			// Timeout management
+			if ((lenToRead > 0) || (lenToWrite > 0))
+			{
+				if ((((HAL_GetTick() - tickstart) >= timeout) && (timeout != HAL_MAX_DELAY)) || (timeout == 0U))
+				{
+					return Alx_Err;
+				}
 			}
 		}
 
@@ -571,6 +695,31 @@ static void AlxSpi_ParseMode(AlxSpi* me)
 
 	ALX_SPI_ASSERT(false);	// We should not get here
 }
+
+static uint32_t AlxSpi_GetDataSize(AlxSpi* me)
+{
+	switch (me->dataSize)
+	{
+		case AlxSpi_DataSize_4bit: return SPI_DATASIZE_4BIT;
+		case AlxSpi_DataSize_5bit: return SPI_DATASIZE_5BIT;
+		case AlxSpi_DataSize_6bit: return SPI_DATASIZE_6BIT;
+		case AlxSpi_DataSize_7bit: return SPI_DATASIZE_7BIT;
+		case AlxSpi_DataSize_8bit: return SPI_DATASIZE_8BIT;
+		case AlxSpi_DataSize_9bit: return SPI_DATASIZE_9BIT;
+		case AlxSpi_DataSize_10bit: return SPI_DATASIZE_10BIT;
+		case AlxSpi_DataSize_11bit: return SPI_DATASIZE_11BIT;
+		case AlxSpi_DataSize_12bit: return SPI_DATASIZE_12BIT;
+		case AlxSpi_DataSize_13bit: return SPI_DATASIZE_13BIT;
+		case AlxSpi_DataSize_14bit: return SPI_DATASIZE_14BIT;
+		case AlxSpi_DataSize_15bit: return SPI_DATASIZE_15BIT;
+		case AlxSpi_DataSize_16bit: return SPI_DATASIZE_16BIT;
+		default: ALX_SPI_ASSERT(false);
+	}
+
+	ALX_SPI_ASSERT(false);
+	return 0;
+}
+
 static uint32_t AlxSpi_GetClkPrescaler(AlxSpi* me)
 {
 	//------------------------------------------------------------------------------
@@ -644,6 +793,7 @@ static uint32_t AlxSpi_GetClkPrescaler(AlxSpi* me)
 	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_5MHz_Pclk1Apb1_80MHz)		return SPI_BAUDRATEPRESCALER_16;
 	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_10MHz_Pclk1Apb1_80MHz)		return SPI_BAUDRATEPRESCALER_8;
 	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_20MHz_Pclk1Apb1_80MHz)		return SPI_BAUDRATEPRESCALER_4;
+	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_1MHz875_Pclk1Apb1_120MHz)	return SPI_BAUDRATEPRESCALER_64;
 	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_7MHz5_Pclk1Apb1_120MHz)		return SPI_BAUDRATEPRESCALER_16;
 	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_15MHz_Pclk1Apb1_120MHz)		return SPI_BAUDRATEPRESCALER_8;
 	if(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_30MHz_Pclk1Apb1_120MHz)		return SPI_BAUDRATEPRESCALER_4;
@@ -664,7 +814,7 @@ static uint32_t AlxSpi_GetClkPrescaler(AlxSpi* me)
 static Alx_Status AlxSpi_Reset(AlxSpi* me)
 {
 	// DeInit SPI
-	if (HAL_SPI_DeInit(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; }
+	if (HAL_SPI_DeInit(&me->hspi) != HAL_OK) { ALX_SPI_TRACE_WRN("Err"); return Alx_Err; }
 
 	// Force SPI periphery reset
 	AlxSpi_Periph_ForceReset(me);
@@ -676,7 +826,7 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me)
 	AlxSpi_Periph_ReleaseReset(me);
 
 	// Init SPI
-	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; }
+	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE_WRN("Err"); return Alx_Err; }
 
 	// If write/read low level, set FIFO threshold & enable SPI
 	if (me->isWriteReadLowLevel)
@@ -896,6 +1046,7 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 		}
 		else if
 		(
+			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_1MHz875_Pclk1Apb1_120MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_7MHz5_Pclk1Apb1_120MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_15MHz_Pclk1Apb1_120MHz) ||
 			(me->spiClk == AlxSpi_Clk_McuStm32L4_Spi2_Spi3_SpiClk_30MHz_Pclk1Apb1_120MHz)

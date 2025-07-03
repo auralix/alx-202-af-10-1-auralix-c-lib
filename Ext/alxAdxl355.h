@@ -42,13 +42,14 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxAccelerometer.h"
 #include "alxSpi.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_STM32L4)
 
 
 //******************************************************************************
@@ -668,18 +669,15 @@ void AlxAdxl355_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxAdxl355_Init(AlxAdxl355* me);
+Alx_Status AlxAdxl355_Init(AlxAdxl355* me, float sampleRate);
 Alx_Status AlxAdxl355_DeInit(AlxAdxl355* me);
 Alx_Status AlxAdxl355_Enable(AlxAdxl355* me);
 Alx_Status AlxAdxl355_Disable(AlxAdxl355* me);
-Alx_Status AlxAdxl355_GetXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g);
-Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint8_t len);
-Alx_Status AlxAdxl355_GetTemp_degC(AlxAdxl355* me, float* temp_degC);
-Alx_Status AlxAdxl355_GetStatusReg(AlxAdxl355* me, AlxAdxl355_RegVal_0x04_Status* statusReg);
+Alx_Status AlxAdxl355_GetData(AlxAdxl355* me, AccDataPoint* data, uint8_t len);
 uint8_t AlxAdxl355_GetFifoLen(AlxAdxl355* me);
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32L4)
 
 #ifdef __cplusplus
 }

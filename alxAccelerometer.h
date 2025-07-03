@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		alxAssert.c
-  * @brief		Auralix C Library - ALX Assert Module
+  * @file		alxAccelerometer.h
+  * @brief		Auralix C Library - ALX Accelerometer Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -26,8 +26,21 @@
   **/
 
 //******************************************************************************
+// Include Guard
+//******************************************************************************
+#ifndef ALX_ACCELEROMETER_H
+#define ALX_ACCELEROMETER_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+//******************************************************************************
 // Includes
 //******************************************************************************
+#include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
 
 
@@ -38,47 +51,45 @@
 
 
 //******************************************************************************
-// Functions
+// Preprocessor
 //******************************************************************************
+#define ALX_ACCELEROMETER_FILE "alxAccelerometer.h"
 
-/**
-  * @brief
-  * @param[in]	file
-  * @param[in]	line
-  * @param[in]	fun
-  */
-void ALX_WEAK AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun)
+// Assert //
+#if defined(ALX_ACCELEROMETER_ASSERT_BKPT_ENABLE)
+	#define ALX_ACCELEROMETER_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ACCELEROMETER_FILE, expr)
+#elif defined(ALX_ACCELEROMETER_ASSERT_TRACE_ENABLE)
+	#define ALX_ACCELEROMETER_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ACCELEROMETER_FILE, expr)
+#elif defined(ALX_ACCELEROMETER_ASSERT_RST_ENABLE)
+	#define ALX_ACCELEROMETER_ASSERT(expr) ALX_ASSERT_RST(ALX_ACCELEROMETER_FILE, expr)
+#else
+	#define ALX_ACCELEROMETER_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(ALX_ACCELEROMETER_TRACE_ENABLE)
+	#define ALX_ACCELEROMETER_TRACE(...) ALX_TRACE_WRN(ALX_ACCELEROMETER_FILE, __VA_ARGS__)
+#else
+	#define ALX_ACCELEROMETER_TRACE(...) do{} while (false)
+#endif
+
+
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct __attribute__((packed))
 {
-	(void)file;
-	(void)line;
-	(void)fun;
-
-	ALX_BKPT();
-}
-
-/**
-  * @brief
-  * @param[in]	file
-  * @param[in]	line
-  * @param[in]	fun
-  */
-void ALX_WEAK AlxAssert_Trace(const char* file, uint32_t line, const char* fun)
-{
-	AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_FTL, file, line, fun, "ASSERT");
-}
-
-/**
-  * @brief
-  * @param[in]	file
-  * @param[in]	line
-  * @param[in]	fun
-  */
-void ALX_WEAK AlxAssert_Rst(const char* file, uint32_t line, const char* fun)
-{
-	(void)file;
-	(void)line;
-	(void)fun;
-}
+	float x;
+	float y;
+	float z;
+	float temp;
+} AccDataPoint;
 
 
 #endif	// #if defined(ALX_C_LIB)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif	// #ifndef ALX_ACCELEROMETER_H

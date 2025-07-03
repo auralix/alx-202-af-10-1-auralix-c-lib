@@ -81,7 +81,7 @@ extern "C" {
 void AlxDelay_ns(uint64_t delay_ns);
 void AlxDelay_us(uint64_t delay_us);
 void AlxDelay_ms(uint64_t delay_ms);
-void AlxDelay_sec( uint64_t delay_sec);
+void AlxDelay_sec(uint64_t delay_sec);
 void AlxDelay_min(uint64_t delay_min);
 void AlxDelay_hr(uint64_t delay_hr);
 

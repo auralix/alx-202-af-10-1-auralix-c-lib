@@ -77,14 +77,22 @@ void AlxGlobal_Ulltoa(uint64_t uint64, char* str)
 	uint64_t foo3 = foo2 - ((uint64_t)num3 * 100000UL);
 	uint32_t num4 = foo3 / 1UL;
 
-	if((num1 == 0) && (num2 == 0) && (num3 == 0))
-		snprintf (str, 50, "%lu", num4);
-	else if((num1 == 0) && (num2 == 0))
-		snprintf (str, 50, "%lu%05lu", num3, num4);
-	else if(num1 == 0)
-		snprintf (str, 50, "%lu%05lu%05lu", num2, num3, num4);
+	if ((num1 == 0) && (num2 == 0) && (num3 == 0))
+	{
+		snprintf(str, 50, "%" PRIu32, num4);
+	}
+	else if ((num1 == 0) && (num2 == 0))
+	{
+		snprintf(str, 50, "%" PRIu32 "%05" PRIu32, num3, num4);
+	}
+	else if (num1 == 0)
+	{
+		snprintf(str, 50, "%" PRIu32 "%05" PRIu32 "%05" PRIu32, num2, num3, num4);
+	}
 	else
-		snprintf (str, 50, "%lu%05lu%05lu%05lu", num1, num2, num3, num4);
+	{
+		snprintf(str, 50, "%" PRIu32 "%05" PRIu32 "%05" PRIu32 "%05" PRIu32, num1, num2, num3, num4);
+	}
 }
 
 /**
