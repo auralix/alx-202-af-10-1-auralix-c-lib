@@ -71,6 +71,8 @@ void AlxLp586x_Ctor
 	AlxLp586x* me,
 	AlxIoPin* do_LED_DRV_EN,
 	AlxIoPin* do_LED_DRV_SYNC,
+	uint8_t ledNumUsed,
+	AlxLp586x_Led_State ledState[108],
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	bool i2cCheckWithRead,
@@ -81,6 +83,11 @@ void AlxLp586x_Ctor
 	// Parameters
 	me->do_LED_DRV_EN = do_LED_DRV_EN;
 	me->do_LED_DRV_SYNC = do_LED_DRV_SYNC;
+	me->ledNumUsed = ledNumUsed;
+	for (uint32_t i = 0; i < 108; i++)
+	{
+		me->ledState[i] = ledState[i];
+	}
 	me->i2c = i2c;
 	me->i2cAddr = i2cAddr;
 	me->i2cCheckWithRead = i2cCheckWithRead;
@@ -188,7 +195,7 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 
 	// Reset do_LED_DRV_SYNC
 	AlxIoPin_Reset(me->do_LED_DRV_SYNC);
-	
+
 	// Set GPIO do_LED_DRV_EN
 	AlxIoPin_Set(me->do_LED_DRV_EN);
 
@@ -243,6 +250,7 @@ Alx_Status AlxLp586x_DeInit(AlxLp586x* me)
 
 	// Disable device
 	AlxIoPin_Reset(me->do_LED_DRV_EN);
+	AlxIoPin_Reset(me->do_LED_DRV_SYNC);
 
 	// DeInit GPIO
 	AlxIoPin_DeInit(me->do_LED_DRV_EN);
@@ -261,12 +269,27 @@ Alx_Status AlxLp586x_DeInit(AlxLp586x* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLp586x_Handle(AlxLp586x* me)
+Alx_Status AlxLp586x_Handle(AlxLp586x* me, AlxLp586x_Led_State* ledState)
 {
 	// Assert
 	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
 	ALX_LP586x_ASSERT(me->isInitPeriph == true);
 	ALX_LP586x_ASSERT(me->isInit == true);
+
+	//
+	for (uint32_t ledNum = 0; ledNum < me->ledNumUsed; ledNum++)
+	{
+		if (ledState[ledNum] != me->ledState[ledNum])
+		{
+			me->ledState[ledNum] = ledState[ledNum];
+			AlxLp586x_Reg_Write(me, &me->reg._pwm_bri[ledNum]);
+		}
+	}
+
+	// Set GPIO do_LED_DRV_SYNC - turn on all leds
+	AlxIoPin_Set(me->do_LED_DRV_SYNC);
+	AlxDelay_us(10);
+	AlxIoPin_Reset(me->do_LED_DRV_SYNC);
 
 	// Return
 	return Alx_Ok;
@@ -309,7 +332,7 @@ void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val)
 	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_LP586x_ASSERT(ledNum <= 107);
+	ALX_LP586x_ASSERT(ledNum <= me->ledNumUsed);
 
 	if (val == true)
 	{
@@ -319,9 +342,6 @@ void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val)
 	{
 		memset(&me->reg._pwm_bri[ledNum].val.raw, 0x00, sizeof(me->reg._pwm_bri[ledNum].val.raw));
 	}
-
-	// Set Core registers:
-	AlxLp586x_Reg_Write(me, &me->reg._pwm_bri[ledNum]);
 }
 
 
