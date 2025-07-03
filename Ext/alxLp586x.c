@@ -186,9 +186,9 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 	AlxIoPin_Init(me->do_LED_DRV_EN);
 	AlxIoPin_Init(me->do_LED_DRV_SYNC);
 
-	// Reset GPIO
-	AlxIoPin_Reset(me->do_LED_DRV_EN);
-	AlxDelay_us(10);
+	// Reset do_LED_DRV_SYNC
+	AlxIoPin_Reset(me->do_LED_DRV_SYNC);
+	
 	// Set GPIO do_LED_DRV_EN
 	AlxIoPin_Set(me->do_LED_DRV_EN);
 
@@ -291,7 +291,7 @@ Alx_Status AlxLp586x_Reg_Write(AlxLp586x* me, void* reg)
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t i2cAddr_Offset = *((uint8_t*)reg);
-	uint8_t regAddr = *((uint8_t*)reg) + sizeof(i2cAddr_Offset);
+	uint8_t regAddr = *((uint8_t*)reg + sizeof(i2cAddr_Offset));
 	uint8_t regLen = *((uint8_t*)reg + sizeof(i2cAddr_Offset) + sizeof(regAddr));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(i2cAddr_Offset) + sizeof(regAddr) + sizeof(regLen);
 
