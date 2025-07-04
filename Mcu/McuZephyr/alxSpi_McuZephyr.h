@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxAssert.c
-  * @brief		Auralix C Library - ALX Assert Module
+  * @file		alxSpi_McuZephyr.h
+  * @brief		Auralix C Library - ALX SPI MCU Zephyr Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -26,59 +26,67 @@
   **/
 
 //******************************************************************************
+// Include Guard
+//******************************************************************************
+#ifndef ALX_SPI_MCU_ZEPHYR_H
+#define ALX_SPI_MCU_ZEPHYR_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+//******************************************************************************
 // Includes
 //******************************************************************************
+#include "alxGlobal.h"
+#include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxIoPin.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 
 //******************************************************************************
-// Functions
+// Types
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in]	file
-  * @param[in]	line
-  * @param[in]	fun
-  */
-void ALX_WEAK AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun)
+typedef struct
 {
-	(void)file;
-	(void)line;
-	(void)fun;
+	// Parameters
+	const char* deviceName;
+	AlxIoPin* do_nCS;
+	struct spi_config config;
 
-	ALX_BKPT();
+	// Variables
+	const struct device* device;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxSpi;
+
+
+//******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxSpi_Ctor
+(
+	AlxSpi* me,
+	const char* deviceName,
+	AlxIoPin* do_nCS,
+	uint32_t frequency,
+	spi_operation_t operation
+);
+
+
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
+
+#ifdef __cplusplus
 }
+#endif
 
-/**
-  * @brief
-  * @param[in]	file
-  * @param[in]	line
-  * @param[in]	fun
-  */
-void ALX_WEAK AlxAssert_Trace(const char* file, uint32_t line, const char* fun)
-{
-	AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_FTL, file, line, fun, "ASSERT");
-}
-
-/**
-  * @brief
-  * @param[in]	file
-  * @param[in]	line
-  * @param[in]	fun
-  */
-void ALX_WEAK AlxAssert_Rst(const char* file, uint32_t line, const char* fun)
-{
-	(void)file;
-	(void)line;
-	(void)fun;
-}
-
-
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #ifndef ALX_SPI_MCU_ZEPHYR_H

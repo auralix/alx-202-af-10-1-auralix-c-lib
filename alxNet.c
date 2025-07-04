@@ -41,6 +41,8 @@
 #include "dns.h"
 #endif
 
+extern void CellularDevice_PowerOff(void);
+
 
 //******************************************************************************
 // Module Guard
@@ -705,7 +707,7 @@ void AlxNet_Ctor
 #define MODEM_CONNECTION_MONITORING_TIMEOUT 10000
 #endif
 #define MODEM_LOW_LEVEL_ERR_THRESHOLD 3
-#define MODEM_POWER_CYCLE_DELAY 1000
+#define MODEM_POWER_CYCLE_DELAY 2000
 
 typedef enum
 {
@@ -756,12 +758,19 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 	{
 	case State_ModemGoOff:
 		{
+			if (me->cellular.handle)
+			{
+				Cellular_Pdown(me->cellular.handle);
+				AlxOsDelay_ms(&alxOsDelay, 3000);
+			}
+
 			if (Cellular_Cleanup(me->cellular.handle) == CELLULAR_SUCCESS)
 			{
 				me->cellular.handle = NULL;
 			}
 			low_level_err = 0;
 			start_time = AlxTick_Get_ms(&alxTick);
+			me->isNetConnected = false;
 			connection_state = State_ModemOff;
 			break;
 		}
@@ -783,6 +792,10 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 					connection_state = State_ModemGoOff;
 				}
 			}
+			else
+			{
+				AlxOsDelay_ms(&alxOsDelay, MODEM_POWER_CYCLE_DELAY / 2); // ensure yielding
+			}
 			break;
 		}
 	case State_ModemOn:
@@ -792,8 +805,9 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 				if (Cellular_GetSimCardStatus(me->cellular.handle, &me->cellular.simStatus) != CELLULAR_SUCCESS)
 				{
 					ALX_NET_TRACE_INF(("Cellular SIM failure"));
-					//connection_state = State_ModemGoOff;
-					//break;
+					CellularDevice_PowerOff();
+					connection_state = State_ModemGoOff;
+					break;
 				}
 
 				if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_SIM_TIMEOUT)
@@ -1250,7 +1264,7 @@ Alx_Status AlxNet_Restart(AlxNet* me)
 	// Return
 	return Alx_Ok;
 }
-bool AlxNet_IsConnected(AlxNet* me)
+void AlxNet_Handle(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
@@ -1278,6 +1292,12 @@ bool AlxNet_IsConnected(AlxNet* me)
 		AlxOsMutex_Unlock(&me->alxMutex);
 	}
 #endif
+}
+
+bool AlxNet_IsConnected(AlxNet* me)
+{
+	// Assert
+	ALX_NET_ASSERT(me->wasCtorCalled == true);
 
 	// Return
 	return me->isNetConnected;

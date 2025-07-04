@@ -163,6 +163,9 @@ ALX_WEAK void AlxTrace_WriteStr_Callback(AlxTrace* me, const char* str)
 }
 ALX_WEAK AlxRtc_DateTime AlxTrace_GetRtcDateTime_Callback(AlxTrace* me)
 {
+	// Void
+	(void)me;
+
 	// Get tickTime_ms
 	uint64_t tickTime_ms = AlxTick_Get_ms(&alxTick);
 
