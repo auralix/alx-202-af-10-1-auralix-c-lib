@@ -82,12 +82,6 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
-{
-	Led_Off,
-	Led_On,
-	Led_Toggle
-} AlxLp586x_Led_State;
 
 
 //******************************************************************************
@@ -2743,7 +2737,6 @@ typedef struct
 	AlxIoPin* do_LED_DRV_EN;
     AlxIoPin* do_LED_DRV_SYNC;
 	uint8_t ledNumUsed;
-	AlxLp586x_Led_State ledState[108];
 	AlxI2c* i2c;
 	uint8_t i2cAddr;
 	bool i2cCheckWithRead;
@@ -2751,6 +2744,8 @@ typedef struct
 	uint16_t i2cTimeout_ms;
 
 	// Variables
+	bool valNew[108];
+	bool valOld[108];
 	AlxLp586x_Reg reg;
 
 	// Info
@@ -2769,13 +2764,11 @@ void AlxLp586x_Ctor
 	AlxIoPin* do_LED_DRV_EN,
 	AlxIoPin* do_LED_DRV_SYNC,
 	uint8_t ledNumUsed,
-	AlxLp586x_Led_State ledState[108],
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	bool i2cCheckWithRead,
 	uint8_t i2cNumOfTries,
 	uint16_t i2cTimeout_ms
-
 );
 
 
@@ -2786,7 +2779,7 @@ Alx_Status AlxLp586x_InitPeriph(AlxLp586x* me);
 Alx_Status AlxLp586x_DeInitPeriph(AlxLp586x* me);
 Alx_Status AlxLp586x_Init(AlxLp586x* me);
 Alx_Status AlxLp586x_DeInit(AlxLp586x* me);
-Alx_Status AlxLp586x_Handle(AlxLp586x* me, AlxLp586x_Led_State* ledState);
+Alx_Status AlxLp586x_Handle(AlxLp586x* me);
 Alx_Status AlxLp586x_Reg_Write(AlxLp586x* me, void* reg);
 void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val);
 

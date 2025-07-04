@@ -72,7 +72,6 @@ void AlxLp586x_Ctor
 	AlxIoPin* do_LED_DRV_EN,
 	AlxIoPin* do_LED_DRV_SYNC,
 	uint8_t ledNumUsed,
-	AlxLp586x_Led_State ledState[108],
 	AlxI2c* i2c,
 	uint8_t i2cAddr,
 	bool i2cCheckWithRead,
@@ -84,10 +83,6 @@ void AlxLp586x_Ctor
 	me->do_LED_DRV_EN = do_LED_DRV_EN;
 	me->do_LED_DRV_SYNC = do_LED_DRV_SYNC;
 	me->ledNumUsed = ledNumUsed;
-	for (uint32_t i = 0; i < 108; i++)
-	{
-		me->ledState[i] = ledState[i];
-	}
 	me->i2c = i2c;
 	me->i2cAddr = i2cAddr;
 	me->i2cCheckWithRead = i2cCheckWithRead;
@@ -95,6 +90,13 @@ void AlxLp586x_Ctor
 	me->i2cTimeout_ms = i2cTimeout_ms;
 
 	// Variables
+	bool valNew[108];
+	bool valOld[108];
+	for (uint32_t i = 0; i < 108; i++)
+	{
+		me->valNew[i] = false;
+		me->valOld[i] = false;
+	}
 	AlxLp586x_RegStruct_SetI2cAddrOffset(me);
 	AlxLp586x_RegStruct_SetAddr(me);
 	AlxLp586x_RegStruct_SetLen(me);
@@ -269,7 +271,7 @@ Alx_Status AlxLp586x_DeInit(AlxLp586x* me)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxLp586x_Handle(AlxLp586x* me, AlxLp586x_Led_State* ledState)
+Alx_Status AlxLp586x_Handle(AlxLp586x* me)
 {
 	// Assert
 	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
@@ -279,10 +281,18 @@ Alx_Status AlxLp586x_Handle(AlxLp586x* me, AlxLp586x_Led_State* ledState)
 	//
 	for (uint32_t ledNum = 0; ledNum < me->ledNumUsed; ledNum++)
 	{
-		if (ledState[ledNum] != me->ledState[ledNum])
+		if (me->valNew[ledNum] != me->valOld[ledNum])
 		{
-			me->ledState[ledNum] = ledState[ledNum];
+			if (me->valNew[ledNum] == true)
+			{
+				memset(&me->reg._pwm_bri[ledNum].val.raw, 0xFF, sizeof(me->reg._pwm_bri[ledNum].val.raw));
+			}
+			else
+			{
+				memset(&me->reg._pwm_bri[ledNum].val.raw, 0x00, sizeof(me->reg._pwm_bri[ledNum].val.raw));
+			}
 			AlxLp586x_Reg_Write(me, &me->reg._pwm_bri[ledNum]);
+			me->valOld[ledNum] = me->valNew[ledNum];
 		}
 	}
 
@@ -334,14 +344,7 @@ void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val)
 	// isInit -> Don't care
 	ALX_LP586x_ASSERT(ledNum <= me->ledNumUsed);
 
-	if (val == true)
-	{
-		memset(&me->reg._pwm_bri[ledNum].val.raw, 0xFF, sizeof(me->reg._pwm_bri[ledNum].val.raw));
-	}
-	else
-	{
-		memset(&me->reg._pwm_bri[ledNum].val.raw, 0x00, sizeof(me->reg._pwm_bri[ledNum].val.raw));
-	}
+	me->valNew[ledNum] = val;
 }
 
 
