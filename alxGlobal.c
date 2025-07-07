@@ -95,6 +95,27 @@ void AlxGlobal_Ulltoa(uint64_t uint64, char* str)
 	}
 }
 
+void AlxGlobal_Slltoa(int64_t int64, char* str)
+{
+	int32_t sign = int64 < 0 ? -1 : 1;
+	int64 *= sign;
+	int32_t num1 = int64 / 1000000000000000UL;
+	int64_t foo1 = int64 - ((int64_t)num1 * 1000000000000000UL);
+	int32_t num2 = foo1 / 10000000000UL;
+	int64_t foo2 = foo1 - ((int64_t)num2 * 10000000000UL);
+	int32_t num3 = foo2 / 100000UL;
+	int64_t foo3 = foo2 - ((int64_t)num3 * 100000UL);
+	uint32_t num4 = foo3 / 1UL;
+
+	if((num1 == 0) && (num2 == 0) && (num3 == 0))
+		snprintf (str, 50, "%s%ld", sign == -1 ? "-" : "", num4);
+	else if((num1 == 0) && (num2 == 0))
+		snprintf (str, 50, "%s%ld%05ld", sign == -1 ? "-" : "", num3, num4);
+	else if(num1 == 0)
+		snprintf (str, 50, "%s%ld%05ld%05ld", sign == -1 ? "-" : "", num2, num3, num4);
+	else
+		snprintf (str, 50, "%s%ld%05ld%05ld%05ld", sign == -1 ? "-" : "", num1, num2, num3, num4);
+}
 /**
   * @brief
   * @param[in] val

@@ -506,6 +506,7 @@ typedef enum
 void AlxGlobal_DisableIrq(void);
 void AlxGlobal_EnableIrq(void);
 void AlxGlobal_Ulltoa(uint64_t uint64, char* str);
+void AlxGlobal_Slltoa(int64_t int64, char* str);
 uint32_t AlxGlobal_Ntohl(uint32_t val);
 
 

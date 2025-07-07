@@ -140,9 +140,9 @@ void AlxRtc_Ctor
 	)
 	{
 		me->hrtc.Init.AsynchPrediv = 1 - 1;
-		me->hrtc.Init.SynchPrediv = 32768 - 1;
+		me->hrtc.Init.SynchPrediv = 32768 - 1 - 8; // -8 is needed for smooth calibration and is compensated by setting CALM to 0x100 in case of an ideal clock source
 		me->rtcTick_ns = 30518;	// 1000000000 / 32768 = 30517.57813 = ~30518ns
-		me->PRER_Expected = 0x00007FFF;
+		me->PRER_Expected = 0x00007FF7;
 	}
 	else
 	{
@@ -209,15 +209,24 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 	 	(me->hrtc.Instance->PRER != me->PRER_Expected)	// Check if register PRER value is NOK
 	)
 	{
-		// Init
-		if
-		(
-			(HAL_RTC_Init(&me->hrtc) != HAL_OK) ||
-			(me->isErr == true)
-		)
+		HAL_RTC_MspInit(&me->hrtc);
+
+		HAL_StatusTypeDef status = HAL_RTC_DeInit(&me->hrtc);
+		if (status != HAL_OK)
 		{
-			ALX_RTC_TRACE_WRN("Err");
+			ALX_RTC_TRACE_WRN("Err: RTC DeInit (%u)", status);
 			me->isErr = true;
+		}
+
+		status = HAL_RTC_Init(&me->hrtc);
+		if (status != HAL_OK)
+		{
+			ALX_RTC_TRACE_WRN("Err RTC Init (%u)", status);
+			me->isErr = true;
+		}
+
+		if (me->isErr == true)
+		{
 			me->isInit = false;
 			return Alx_Err;
 		}
@@ -233,6 +242,8 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 		// Trace
 		ALX_RTC_TRACE_INF("AlxRtc - Date-Time configured");
 	}
+
+	//AlxRtc_TuneClockSource(me, 0);  // TODO Here we could have a calibrated value
 
 	// Return
 	return Alx_Ok;
@@ -709,6 +720,31 @@ Alx_Status AlxRtc_TuneTime_us(AlxRtc* me, int64_t tuneTime_us)
 Alx_Status AlxRtc_TuneTime_ms(AlxRtc* me, int64_t tuneTime_ms)
 {
 	return AlxRtc_TuneTime_ns(me, tuneTime_ms * 1000000ull);
+}
+
+Alx_Status AlxRtc_TuneClockSource(AlxRtc* me, int32_t offset)
+{
+	// Assert
+	ALX_RTC_ASSERT(me->wasCtorCalled == true);
+	ALX_RTC_ASSERT(me->isInit == true);
+
+	if ((offset < -255) || (offset > 256))
+	{
+		ALX_RTC_TRACE_INF("Invalid offset %d, should be -255 >= offset <= 256", offset);
+		return Alx_Err;
+	}
+
+	HAL_StatusTypeDef status = HAL_RTCEx_SetSmoothCalib(
+		&me->hrtc,
+		RTC_SMOOTHCALIB_PERIOD_32SEC,
+		RTC_SMOOTHCALIB_PLUSPULSES_RESET,
+		(uint32_t)(256 - offset));
+
+	ALX_RTC_TRACE_INF(
+		"HAL_RTCEx_SetSmoothCalib(%d): status %u",
+		256 - offset, status);
+
+	return (status == HAL_OK) ? Alx_Ok : Alx_Err;
 }
 
 
