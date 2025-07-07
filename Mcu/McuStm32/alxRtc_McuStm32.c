@@ -673,8 +673,9 @@ Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns)
 	// Check if no tuning is needed
 	if(numOfTickToAdd == 0) return Alx_Ok;	// No tuning needed
 
-	// Read sub seconds register and calculate ssrAfterAdd
+	// Read sub seconds register and calculate ssrAfterAdd (note: after reading SSR DR must be read as well to unlock TR and DR)
 	uint32_t ssr = me->hrtc.Instance->SSR;
+	uint32_t dummy = me->hrtc.Instance->DR;
 
 	// Check if overflow occurs
 	if (ssr > 0x00007FFF) return Alx_Err;
