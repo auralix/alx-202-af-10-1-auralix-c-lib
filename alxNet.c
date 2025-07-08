@@ -237,15 +237,17 @@ static void dhcp_task(void *argument)
 		// open a ssocket to get socket number only
 		// DHCP is handled by ioLibrary
 		dhcp_isRunning = true;
+		int thread_interval;
 		if (AlxSocket_Open(&alxDhcpSocket, me, AlxSocket_Protocol_Udp) == Alx_Ok)
 		{
 			while (1)
 			{
 				if (me->isNetConnected)
 				{
+					thread_interval = 100;
 					if ((state == NETINFO_STATIC) && me->enable_dhcp)
 					{
-//						ALX_NET_TRACE_INF("DHCP client started");
+						ALX_NET_TRACE_INF("DHCP client started");
 						DHCP_init(alxDhcpSocket.socket_data.wiz_socket, wiz_buffer);
 						dhcp_ip_leased_until = 0;
 						state = NETINFO_DHCP;
@@ -275,7 +277,7 @@ static void dhcp_task(void *argument)
 									dhcp_retry = 0;
 									break;
 								}
-								AlxOsDelay_ms(&alxOsDelay, 1000);
+								AlxOsDelay_ms(&alxOsDelay, 100);
 							}
 						}
 
@@ -289,6 +291,7 @@ static void dhcp_task(void *argument)
 								dhcp_ip_leased_until = AlxTick_Get_sec(&alxTick) + getDHCPLeasetime();
 								ip2str(wiz_net_info.dns, me->dns[0]);
 							}
+							thread_interval = 1000;
 						}
 						else if (retval == DHCP_FAILED)
 						{
@@ -297,7 +300,7 @@ static void dhcp_task(void *argument)
 						}
 					}
 				}
-				AlxOsDelay_ms(&alxOsDelay, 1000);
+				AlxOsDelay_ms(&alxOsDelay, thread_interval);
 			}
 			AlxSocket_Close(&alxDhcpSocket); // close the socket
 		}
