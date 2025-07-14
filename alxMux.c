@@ -103,6 +103,21 @@ Alx_Status AlxMux_DeInit(AlxMux* me)
 	// Return
 	return Alx_Ok;
 }
+Alx_Status AlxMux_DeInit_Select(AlxMux* me)
+{
+	// Assert
+	ALX_MUX_ASSERT(me->wasCtorCalled == true);
+	ALX_MUX_ASSERT(me->isInit == true);
+
+	// DeInit GPIO
+	for (uint32_t i = 0; i < me->ioPinArrLen; i++)
+	{
+		AlxIoPin_DeInit((*(me->ioPinArr + i)));
+	}
+
+	// Return
+	return Alx_Ok;
+}
 void AlxMux_Enable(AlxMux* me, bool enable)
 {
 	// Assert
