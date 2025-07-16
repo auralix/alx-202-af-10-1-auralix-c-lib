@@ -191,6 +191,8 @@ void AlxOsThread_Terminate(AlxOsThread* me)
 	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
 	ALX_OS_THREAD_ASSERT(me->wasStarted == true);
 
+	me->wasStarted = false;
+
 	// Terminate
 	#if defined(ALX_FREE_RTOS)
 	vTaskDelete(me->taskHandle);

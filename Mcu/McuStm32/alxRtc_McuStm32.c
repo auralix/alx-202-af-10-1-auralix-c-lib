@@ -30,6 +30,7 @@
 //******************************************************************************
 #include "alxRtc_McuStm32.h"
 #include "alxRtc.h"
+#include <math.h>
 
 
 //******************************************************************************
@@ -720,15 +721,17 @@ Alx_Status AlxRtc_TuneTime_ms(AlxRtc* me, int64_t tuneTime_ms)
 	return AlxRtc_TuneTime_ns(me, tuneTime_ms * 1000000ull);
 }
 
-Alx_Status AlxRtc_TuneClockSource(AlxRtc* me, int32_t offset)
+Alx_Status AlxRtc_TuneClockSource(AlxRtc* me, float offset_ppm)
 {
 	// Assert
 	ALX_RTC_ASSERT(me->wasCtorCalled == true);
 	ALX_RTC_ASSERT(me->isInit == true);
 
-	if ((offset < -255) || (offset > 256))
+	int32_t tune = (int32_t)round(offset_ppm * 1.0482f);	// tuning resolution is 0.954 PPM
+
+	if ((tune < -255) || (tune > 256))
 	{
-		ALX_RTC_TRACE_INF("Invalid offset %d, should be -255 >= offset <= 256", offset);
+		ALX_RTC_TRACE_INF("Invalid tune value %d, should be -255 >= tune <= 256", tune);
 		return Alx_Err;
 	}
 
@@ -736,11 +739,11 @@ Alx_Status AlxRtc_TuneClockSource(AlxRtc* me, int32_t offset)
 		&me->hrtc,
 		RTC_SMOOTHCALIB_PERIOD_32SEC,
 		RTC_SMOOTHCALIB_PLUSPULSES_RESET,
-		(uint32_t)(256 - offset));
+		(uint32_t)(256 - tune));
 
 	ALX_RTC_TRACE_INF(
 		"HAL_RTCEx_SetSmoothCalib(%d): status %u",
-		256 - offset, status);
+		256 - tune, status);
 
 	return (status == HAL_OK) ? Alx_Ok : Alx_Err;
 }
