@@ -176,27 +176,27 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// Check if slave is ready
-	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok)
-	{
-		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_Master_IsSlaveReady() status %ld", status);
-		return status;
-	}
-
-	// Set register struct values to default
-	AlxLp586x_RegStruct_SetValToDefault(me);
-
-	// Set register struct values - WEAK
-	AlxLp586x_RegStruct_SetVal(me);
-
-	// Write register struct - WEAK
-	status = AlxLp586x_RegStruct_Write(me);
-	if (status != Alx_Ok)
-	{
-		ALX_LP586x_TRACE_ERR("FAIL: AlxLp586x_RegStruct_Write() status %ld", status);
-		return status;
-	}
+//	// Check if slave is ready
+//	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
+//	if (status != Alx_Ok)
+//	{
+//		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_Master_IsSlaveReady() status %ld", status);
+//		return status;
+//	}
+//
+//	// Set register struct values to default
+//	AlxLp586x_RegStruct_SetValToDefault(me);
+//
+//	// Set register struct values - WEAK
+//	AlxLp586x_RegStruct_SetVal(me);
+//
+//	// Write register struct - WEAK
+//	status = AlxLp586x_RegStruct_Write(me);
+//	if (status != Alx_Ok)
+//	{
+//		ALX_LP586x_TRACE_ERR("FAIL: AlxLp586x_RegStruct_Write() status %ld", status);
+//		return status;
+//	}
 
 	// Set isInit
 	me->isInit = true;
