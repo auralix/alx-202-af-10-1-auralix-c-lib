@@ -226,6 +226,13 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 			me->isErr = true;
 		}
 
+		Alx_Status alxStatus = AlxRtc_TuneClockSource(me, 0.0f);
+		if (alxStatus != HAL_OK)
+		{
+			ALX_RTC_TRACE_WRN("Err AlxRtc_TuneClockSource (%u)", alxStatus);
+			me->isErr = true;
+		}
+
 		if (me->isErr == true)
 		{
 			me->isInit = false;
