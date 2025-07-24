@@ -30,6 +30,7 @@
 //******************************************************************************
 #include "alxRtc_McuStm32.h"
 #include "alxRtc.h"
+#include <math.h>
 
 
 //******************************************************************************
@@ -140,9 +141,9 @@ void AlxRtc_Ctor
 	)
 	{
 		me->hrtc.Init.AsynchPrediv = 1 - 1;
-		me->hrtc.Init.SynchPrediv = 32768 - 1;
+		me->hrtc.Init.SynchPrediv = 32768 - 1 - 8; // -8 is needed for smooth calibration and is compensated by setting CALM to 0x100 in case of an ideal clock source
 		me->rtcTick_ns = 30518;	// 1000000000 / 32768 = 30517.57813 = ~30518ns
-		me->PRER_Expected = 0x00007FFF;
+		me->PRER_Expected = 0x00007FF7;
 	}
 	else
 	{
@@ -209,15 +210,31 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 	 	(me->hrtc.Instance->PRER != me->PRER_Expected)	// Check if register PRER value is NOK
 	)
 	{
-		// Init
-		if
-		(
-			(HAL_RTC_Init(&me->hrtc) != HAL_OK) ||
-			(me->isErr == true)
-		)
+		HAL_RTC_MspInit(&me->hrtc);
+
+		HAL_StatusTypeDef status = HAL_RTC_DeInit(&me->hrtc);
+		if (status != HAL_OK)
 		{
-			ALX_RTC_TRACE_WRN("Err");
+			ALX_RTC_TRACE_WRN("Err: RTC DeInit (%u)", status);
 			me->isErr = true;
+		}
+
+		status = HAL_RTC_Init(&me->hrtc);
+		if (status != HAL_OK)
+		{
+			ALX_RTC_TRACE_WRN("Err RTC Init (%u)", status);
+			me->isErr = true;
+		}
+
+		Alx_Status alxStatus = AlxRtc_TuneClockSource(me, 0.0f);
+		if (alxStatus != HAL_OK)
+		{
+			ALX_RTC_TRACE_WRN("Err AlxRtc_TuneClockSource (%u)", alxStatus);
+			me->isErr = true;
+		}
+
+		if (me->isErr == true)
+		{
 			me->isInit = false;
 			return Alx_Err;
 		}
@@ -353,21 +370,21 @@ Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 
 	// Get time
 	RTC_TimeTypeDef sTime;
-	if(HAL_RTC_GetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
+	if (HAL_RTC_GetTime(&me->hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 
 	// Set hr, min, sec
 	dateTime->hr = sTime.Hours;
 	dateTime->min = sTime.Minutes;
 	dateTime->sec = sTime.Seconds;
 
-	// Calculate secFract
-	float secFract = ((float)sTime.SecondFraction - (float)sTime.SubSeconds) / ((float)sTime.SecondFraction + 1.f);
+	// Invert SubSeconds
+	int32_t ss = (int32_t)sTime.SecondFraction - (int32_t)sTime.SubSeconds;  // Casts are safe because values come from 16 bit registers
 
-	// Handle if SS Larger than PREDIV_S, then secFract will be negative
-	if(secFract < 0.f)
+	// Handle if SS Larger than PREDIV_S, then ss will be negative
+	if (ss < 0)
 	{
-		// Make secFract positive
-		secFract = secFract * (-1.f);	// Make positive
+		// Adjust ss
+		ss += (int32_t)sTime.SecondFraction;
 
 		// Handle if hr, min, sec are 0
 		if (dateTime->sec == 0)								// If sec are 0, we must substract min
@@ -397,12 +414,15 @@ Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 		}
 	}
 
+	// Convert ss from counter value to time
+	float secFract = (float)ss / ((float)sTime.SecondFraction + 1.f);
+
 	// Set ms, us, ns
 	AlxRtc_SecFractToMsUsNs(secFract, &dateTime->ms, &dateTime->us, &dateTime->ns);
 
 	// Get date
 	RTC_DateTypeDef sDate;
-	if(HAL_RTC_GetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
+	if (HAL_RTC_GetDate(&me->hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK) { ALX_RTC_TRACE_WRN("Err"); me->isErr = true; return Alx_Err; };
 
 	// Set yr, mo, day, weekDay
 	dateTime->yr = sDate.Year;
@@ -670,8 +690,9 @@ Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns)
 	// Check if no tuning is needed
 	if(numOfTickToAdd == 0) return Alx_Ok;	// No tuning needed
 
-	// Read sub seconds register and calculate ssrAfterAdd
+	// Read sub seconds register and calculate ssrAfterAdd (note: after reading SSR DR must be read as well to unlock TR and DR)
 	uint32_t ssr = me->hrtc.Instance->SSR;
+	uint32_t dummy = me->hrtc.Instance->DR;
 
 	// Check if overflow occurs
 	if (ssr > 0x00007FFF) return Alx_Err;
@@ -705,6 +726,33 @@ Alx_Status AlxRtc_TuneTime_us(AlxRtc* me, int64_t tuneTime_us)
 Alx_Status AlxRtc_TuneTime_ms(AlxRtc* me, int64_t tuneTime_ms)
 {
 	return AlxRtc_TuneTime_ns(me, tuneTime_ms * 1000000ull);
+}
+
+Alx_Status AlxRtc_TuneClockSource(AlxRtc* me, float offset_ppm)
+{
+	// Assert
+	ALX_RTC_ASSERT(me->wasCtorCalled == true);
+	ALX_RTC_ASSERT(me->isInit == true);
+
+	int32_t tune = (int32_t)round(offset_ppm * 1.0482f);	// tuning resolution is 0.954 PPM
+
+	if ((tune < -255) || (tune > 256))
+	{
+		ALX_RTC_TRACE_INF("Invalid tune value %d, should be -255 >= tune <= 256", tune);
+		return Alx_Err;
+	}
+
+	HAL_StatusTypeDef status = HAL_RTCEx_SetSmoothCalib(
+		&me->hrtc,
+		RTC_SMOOTHCALIB_PERIOD_32SEC,
+		RTC_SMOOTHCALIB_PLUSPULSES_RESET,
+		(uint32_t)(256 - tune));
+
+	ALX_RTC_TRACE_INF(
+		"HAL_RTCEx_SetSmoothCalib(%d): status %u",
+		256 - tune, status);
+
+	return (status == HAL_OK) ? Alx_Ok : Alx_Err;
 }
 
 
