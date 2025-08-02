@@ -56,6 +56,7 @@
   * @param[in]		valMax
   * @param[in]		valLen
   * @param[in]		valOutOfRangeHandle
+  * @param[in]		isEnum
   * @param[in]		enumArr
   * @param[in]		enumArrLen
   * @param[in]		valUnit
@@ -78,6 +79,7 @@ static void AlxParamItem_Ctor
 	void* valMax,
 	uint32_t valLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	void* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -107,6 +109,7 @@ void AlxParamItem_CtorUint8
 	uint8_t valMin,
 	uint8_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint8_t* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -128,6 +131,7 @@ void AlxParamItem_CtorUint8
 		&valMax,
 		sizeof(uint8_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
 		enumArrLen,
 		valUnit,
@@ -149,6 +153,7 @@ void AlxParamItem_CtorUint16
 	uint16_t valMin,
 	uint16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint16_t* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -170,6 +175,7 @@ void AlxParamItem_CtorUint16
 		&valMax,
 		sizeof(uint16_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
 		enumArrLen,
 		valUnit,
@@ -191,6 +197,7 @@ void AlxParamItem_CtorUint32
 	uint32_t valMin,
 	uint32_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint32_t* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -212,6 +219,7 @@ void AlxParamItem_CtorUint32
 		&valMax,
 		sizeof(uint32_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
 		enumArrLen,
 		valUnit,
@@ -233,6 +241,7 @@ void AlxParamItem_CtorUint64
 	uint64_t valMin,
 	uint64_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint64_t* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -254,6 +263,7 @@ void AlxParamItem_CtorUint64
 		&valMax,
 		sizeof(uint64_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
 		enumArrLen,
 		valUnit,
@@ -275,6 +285,7 @@ void AlxParamItem_CtorInt8
 	int8_t valMin,
 	int8_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int8_t* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -296,6 +307,7 @@ void AlxParamItem_CtorInt8
 		&valMax,
 		sizeof(int8_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
 		enumArrLen,
 		valUnit,
@@ -317,6 +329,7 @@ void AlxParamItem_CtorInt16
 	int16_t valMin,
 	int16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int16_t* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -338,6 +351,7 @@ void AlxParamItem_CtorInt16
 		&valMax,
 		sizeof(int16_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
 		enumArrLen,
 		valUnit,
@@ -359,6 +373,7 @@ void AlxParamItem_CtorInt32
 	int32_t valMin,
 	int32_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int32_t* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -380,6 +395,7 @@ void AlxParamItem_CtorInt32
 		&valMax,
 		sizeof(int32_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
 		enumArrLen,
 		valUnit,
@@ -401,6 +417,7 @@ void AlxParamItem_CtorInt64
 	int64_t valMin,
 	int64_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int64_t* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -422,6 +439,7 @@ void AlxParamItem_CtorInt64
 		&valMax,
 		sizeof(int64_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
 		enumArrLen,
 		valUnit,
@@ -443,6 +461,7 @@ void AlxParamItem_CtorFloat
 	float valMin,
 	float valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	float* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -464,6 +483,7 @@ void AlxParamItem_CtorFloat
 		&valMax,
 		sizeof(float),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
 		enumArrLen,
 		valUnit,
@@ -485,6 +505,7 @@ void AlxParamItem_CtorDouble
 	double valMin,
 	double valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	double* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -506,6 +527,7 @@ void AlxParamItem_CtorDouble
 		&valMax,
 		sizeof(double),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
 		enumArrLen,
 		valUnit,
@@ -1645,11 +1667,22 @@ double AlxParamItem_GetValMaxDouble(AlxParamItem* me)
 //------------------------------------------------------------------------------
 // Enum
 //------------------------------------------------------------------------------
+bool AlxParamItem_GetIsEnum(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return me->isEnum;
+}
 void AlxParamItem_GetEnumArrUint8(AlxParamItem* me, uint8_t** enumArr, uint8_t* enumArrLen)
 {
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint8);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
 
 	// Return
 	*enumArr = (uint8_t*)me->enumArr;
@@ -1660,6 +1693,9 @@ void AlxParamItem_GetEnumArrUint16(AlxParamItem* me, uint16_t** enumArr, uint8_t
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint16);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
 
 	// Return
 	*enumArr = (uint16_t*)me->enumArr;
@@ -1670,6 +1706,9 @@ void AlxParamItem_GetEnumArrUint32(AlxParamItem* me, uint32_t** enumArr, uint8_t
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint32);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
 
 	// Return
 	*enumArr = (uint32_t*)me->enumArr;
@@ -1680,6 +1719,9 @@ void AlxParamItem_GetEnumArrUint64(AlxParamItem* me, uint64_t** enumArr, uint8_t
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint64);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
 
 	// Return
 	*enumArr = (uint64_t*)me->enumArr;
@@ -1690,6 +1732,9 @@ void AlxParamItem_GetEnumArrInt8(AlxParamItem* me, int8_t** enumArr, uint8_t* en
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int8);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
 
 	// Return
 	*enumArr = (int8_t*)me->enumArr;
@@ -1700,6 +1745,9 @@ void AlxParamItem_GetEnumArrInt16(AlxParamItem* me, int16_t** enumArr, uint8_t* 
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int16);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
 
 	// Return
 	*enumArr = (int16_t*)me->enumArr;
@@ -1710,6 +1758,9 @@ void AlxParamItem_GetEnumArrInt32(AlxParamItem* me, int32_t** enumArr, uint8_t* 
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int32);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
 
 	// Return
 	*enumArr = (int32_t*)me->enumArr;
@@ -1720,6 +1771,9 @@ void AlxParamItem_GetEnumArrInt64(AlxParamItem* me, int64_t** enumArr, uint8_t* 
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int64);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
 
 	// Return
 	*enumArr = (int64_t*)me->enumArr;
@@ -1730,6 +1784,9 @@ void AlxParamItem_GetEnumArrFloat(AlxParamItem* me, float** enumArr, uint8_t* en
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Float);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
 
 	// Return
 	*enumArr = (float*)me->enumArr;
@@ -1740,6 +1797,9 @@ void AlxParamItem_GetEnumArrDouble(AlxParamItem* me, double** enumArr, uint8_t* 
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Double);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
 
 	// Return
 	*enumArr = (double*)me->enumArr;
@@ -2206,6 +2266,7 @@ static void AlxParamItem_Ctor
 	void* valMax,
 	uint32_t valLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	void* enumArr,
 	uint8_t enumArrLen,
 	const char* valUnit,
@@ -2227,6 +2288,7 @@ static void AlxParamItem_Ctor
 	memcpy(&me->valMax, valMax, valLen);
 	me->valLen = valLen;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
+	me->isEnum = isEnum;
 	me->enumArr = enumArr;
 	me->enumArrLen = enumArrLen;
 	me->valUnit = valUnit;
