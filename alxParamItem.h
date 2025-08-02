@@ -153,7 +153,7 @@ typedef struct
 	uint32_t valLen;											// General
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle;		// General
 	void* enumArr;												// Enum
-	uint8_t numOfEnums;											// Enum
+	uint8_t enumArrLen;											// Enum
 	const char* valUnit;										// General
 	bool valChangeTakesEffectAfterReset;						// General
 	uint8_t* buff;												// N/A
@@ -185,7 +185,7 @@ void AlxParamItem_CtorUint8
 	uint8_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
 	uint8_t* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
 	const char* valUnit,
 	bool valChangeTakesEffectAfterReset
 );
@@ -203,7 +203,7 @@ void AlxParamItem_CtorUint16
 	uint16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
 	uint16_t* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
 	const char* valUnit,
 	bool valChangeTakesEffectAfterReset
 );
@@ -221,7 +221,7 @@ void AlxParamItem_CtorUint32
 	uint32_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
 	uint32_t* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
 	const char* valUnit,
 	bool valChangeTakesEffectAfterReset
 );
@@ -239,7 +239,7 @@ void AlxParamItem_CtorUint64
 	uint64_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
 	uint64_t* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
 	const char* valUnit,
 	bool valChangeTakesEffectAfterReset
 );
@@ -257,7 +257,7 @@ void AlxParamItem_CtorInt8
 	int8_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
 	int8_t* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
 	const char* valUnit,
 	bool valChangeTakesEffectAfterReset
 );
@@ -275,7 +275,7 @@ void AlxParamItem_CtorInt16
 	int16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
 	int16_t* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
 	const char* valUnit,
 	bool valChangeTakesEffectAfterReset
 );
@@ -293,7 +293,7 @@ void AlxParamItem_CtorInt32
 	int32_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
 	int32_t* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
 	const char* valUnit,
 	bool valChangeTakesEffectAfterReset
 );
@@ -311,7 +311,7 @@ void AlxParamItem_CtorInt64
 	int64_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
 	int64_t* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
 	const char* valUnit,
 	bool valChangeTakesEffectAfterReset
 );
@@ -329,7 +329,7 @@ void AlxParamItem_CtorFloat
 	float valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
 	float* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
 	const char* valUnit,
 	bool valChangeTakesEffectAfterReset
 );
@@ -347,7 +347,7 @@ void AlxParamItem_CtorDouble
 	double valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
 	double* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
 	const char* valUnit,
 	bool valChangeTakesEffectAfterReset
 );
@@ -499,16 +499,16 @@ double AlxParamItem_GetValMaxDouble(AlxParamItem* me);
 //------------------------------------------------------------------------------
 // Enum
 //------------------------------------------------------------------------------
-void AlxParamItem_GetEnumArrUint8(AlxParamItem* me, uint8_t** enumArr, uint8_t* numOfEnums);
-void AlxParamItem_GetEnumArrUint16(AlxParamItem* me, uint16_t** enumArr, uint8_t* numOfEnums);
-void AlxParamItem_GetEnumArrUint32(AlxParamItem* me, uint32_t** enumArr, uint8_t* numOfEnums);
-void AlxParamItem_GetEnumArrUint64(AlxParamItem* me, uint64_t** enumArr, uint8_t* numOfEnums);
-void AlxParamItem_GetEnumArrInt8(AlxParamItem* me, int8_t** enumArr, uint8_t* numOfEnums);
-void AlxParamItem_GetEnumArrInt16(AlxParamItem* me, int16_t** enumArr, uint8_t* numOfEnums);
-void AlxParamItem_GetEnumArrInt32(AlxParamItem* me, int32_t** enumArr, uint8_t* numOfEnums);
-void AlxParamItem_GetEnumArrInt64(AlxParamItem* me, int64_t** enumArr, uint8_t* numOfEnums);
-void AlxParamItem_GetEnumArrFloat(AlxParamItem* me, float** enumArr, uint8_t* numOfEnums);
-void AlxParamItem_GetEnumArrDouble(AlxParamItem* me, double** enumArr, uint8_t* numOfEnums);
+void AlxParamItem_GetEnumArrUint8(AlxParamItem* me, uint8_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrUint16(AlxParamItem* me, uint16_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrUint32(AlxParamItem* me, uint32_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrUint64(AlxParamItem* me, uint64_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrInt8(AlxParamItem* me, int8_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrInt16(AlxParamItem* me, int16_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrInt32(AlxParamItem* me, int32_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrInt64(AlxParamItem* me, int64_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrFloat(AlxParamItem* me, float** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrDouble(AlxParamItem* me, double** enumArr, uint8_t* enumArrLen);
 
 
 //------------------------------------------------------------------------------
