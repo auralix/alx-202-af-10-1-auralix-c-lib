@@ -88,6 +88,9 @@ typedef struct
 	#if defined(ALX_FREE_RTOS)
 	EventGroupHandle_t eventGroupHandle_t;
 	#endif
+	#if defined(ALX_ZEPHYR)
+	struct k_event event;
+	#endif
 	AlxOsMutex alxMutex;
 
 	// Info

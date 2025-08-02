@@ -40,7 +40,9 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+#if defined(ALX_FREE_RTOS)
 static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, uint32_t timeout_ms);
+#endif
 
 
 //******************************************************************************
@@ -66,6 +68,9 @@ void AlxOsEventFlagGroup_Ctor
 	#if defined(ALX_FREE_RTOS)
 	me->eventGroupHandle_t = xEventGroupCreate();	// TV: EventGroup is created once and won't be deleted during a program
 	#endif
+	#if defined(ALX_ZEPHYR)
+	k_event_init(&me->event);
+	#endif
 	AlxOsMutex_Ctor(&me->alxMutex);
 
 	// Info
@@ -85,21 +90,22 @@ void AlxOsEventFlagGroup_Ctor
   */
 uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet)
 {
-	#if defined(ALX_FREE_RTOS)
-
-
 	// Lock mutex
 	AlxOsMutex_Lock(&me->alxMutex);
 
 	// Assert
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
+	// Unlock mutex
+	AlxOsMutex_Unlock(&me->alxMutex);
+
+	// Local variables
+	uint32_t eventBits = 0;
+
+	#if defined(ALX_FREE_RTOS)
 	// Local variables
 	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
 	EventBits_t eventBits_t = 0;
-
-	// Unlock mutex
-	AlxOsMutex_Unlock(&me->alxMutex);
 
 	// Set
 	eventBits_t = xEventGroupSetBits(eventGroupHandle_t, eventFlagsToSet);
@@ -110,10 +116,19 @@ uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToS
 	AlxOsMutex_Unlock(&me->alxMutex);
 
 	// Return
-	return eventBits_t;
-
-
+	eventBits = eventBits_t;
 	#endif
+
+	#if defined(ALX_ZEPHYR)
+	// Set event flags
+	k_event_post(&me->event, eventFlagsToSet);
+	
+	// Get current event state
+	eventBits = k_event_test(&me->event, UINT32_MAX);
+	#endif
+
+	// Return
+	return eventBits;
 }
 
 /**
@@ -124,21 +139,22 @@ uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToS
   */
 uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsToClear)
 {
-	#if defined(ALX_FREE_RTOS)
-
-
 	// Lock mutex
 	AlxOsMutex_Lock(&me->alxMutex);
 
 	// Assert
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
+	// Unlock mutex
+	AlxOsMutex_Unlock(&me->alxMutex);
+
+	// Local variables
+	uint32_t eventBits = 0;
+
+	#if defined(ALX_FREE_RTOS)
 	// Local variables
 	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
 	EventBits_t eventBits_t = 0;
-
-	// Unlock mutex
-	AlxOsMutex_Unlock(&me->alxMutex);
 
 	// Clear
 	eventBits_t = xEventGroupClearBits(eventGroupHandle_t, eventFlagsToClear);
@@ -149,10 +165,19 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
 	AlxOsMutex_Unlock(&me->alxMutex);
 
 	// Return
-	return eventBits_t;
-
-
+	eventBits = eventBits_t;
 	#endif
+
+	#if defined(ALX_ZEPHYR)
+	// Get current state before clearing
+	eventBits = k_event_test(&me->event, UINT32_MAX);
+	
+	// Clear event flags
+	k_event_clear(&me->event, eventFlagsToClear);
+	#endif
+
+	// Return
+	return eventBits;
 }
 
 /**
@@ -166,15 +191,19 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
   */
 uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsToWait, bool clearEventFlagsOnExit, bool waitForAllEventFlags, uint32_t timeout_ms)
 {
-	#if defined(ALX_FREE_RTOS)
-
-
 	// Lock mutex
 	AlxOsMutex_Lock(&me->alxMutex);
 
 	// Assert
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
+	// Unlock mutex
+	AlxOsMutex_Unlock(&me->alxMutex);
+
+	// Local variables
+	uint32_t eventBits = 0;
+
+	#if defined(ALX_FREE_RTOS)
 	// Local variables
 	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
 	EventBits_t eventBits_t = 0;
@@ -182,9 +211,6 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 
 	// Convert to timeout_osTick
 	timeout_osTick = AlxOsEventFlagGroup_GetTimeout_osTick(me, timeout_ms);
-
-	// Unlock mutex
-	AlxOsMutex_Unlock(&me->alxMutex);
 
 	// Wait
 	eventBits_t = xEventGroupWaitBits(eventGroupHandle_t, eventFlagsToWait, clearEventFlagsOnExit, waitForAllEventFlags, timeout_osTick);
@@ -195,10 +221,26 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	AlxOsMutex_Unlock(&me->alxMutex);
 
 	// Return
-	return eventBits_t;
-
-
+	eventBits = eventBits_t;
 	#endif
+
+	#if defined(ALX_ZEPHYR)
+	// Convert timeout
+	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
+	
+	// Wait for events
+	// Note: Zephyr k_event_wait uses "reset" parameter which is opposite of waitForAllEventFlags
+	// reset = true means wait for ANY flag (OR), reset = false means wait for ALL flags (AND)
+	eventBits = k_event_wait(&me->event, eventFlagsToWait, !waitForAllEventFlags, timeout);
+	
+	// Clear flags if requested and we got any matching events
+	if (clearEventFlagsOnExit && (eventBits & eventFlagsToWait)) {
+		k_event_clear(&me->event, eventBits & eventFlagsToWait);
+	}
+	#endif
+
+	// Return
+	return eventBits;
 }
 
 /**
@@ -211,15 +253,19 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
   */
 uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, uint32_t eventFlagsToWait, uint32_t timeout_ms)
 {
-	#if defined(ALX_FREE_RTOS)
-
-
 	// Lock mutex
 	AlxOsMutex_Lock(&me->alxMutex);
 
 	// Assert
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
+	// Unlock mutex
+	AlxOsMutex_Unlock(&me->alxMutex);
+
+	// Local variables
+	uint32_t eventBits = 0;
+
+	#if defined(ALX_FREE_RTOS)
 	// Local variables
 	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
 	EventBits_t eventBits_t = 0;
@@ -227,9 +273,6 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 
 	// Convert to timeout_osTick
 	timeout_osTick = AlxOsEventFlagGroup_GetTimeout_osTick(me, timeout_ms);
-
-	// Unlock mutex
-	AlxOsMutex_Unlock(&me->alxMutex);
 
 	// Sync
 	eventBits_t = xEventGroupSync(eventGroupHandle_t, eventFlagsToSet, eventFlagsToWait, timeout_osTick);
@@ -240,21 +283,39 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	AlxOsMutex_Unlock(&me->alxMutex);
 
 	// Return
-	return eventBits_t;
-
-
+	eventBits = eventBits_t;
 	#endif
+
+	#if defined(ALX_ZEPHYR)
+	// Convert timeout
+	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
+	
+	// Set our flags
+	k_event_post(&me->event, eventFlagsToSet);
+	
+	// Wait for all flags to be set (sync means wait for ALL)
+	eventBits = k_event_wait(&me->event, eventFlagsToWait, false, timeout);
+	
+	// Clear the flags we were waiting for if they all arrived
+	if ((eventBits & eventFlagsToWait) == eventFlagsToWait) {
+		k_event_clear(&me->event, eventFlagsToWait);
+	}
+	#endif
+
+	// Return
+	return eventBits;
 }
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+#if defined(ALX_FREE_RTOS)
 static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, uint32_t timeout_ms)
 {
+	uint32_t timeout_osTick = 0;
+
 	#if defined(ALX_FREE_RTOS)
-
-
 	// Check if approximation is disabled
 	if (me->approxDisable)
 	{
@@ -263,14 +324,18 @@ static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, u
 	}
 
 	// Convert to timeout_osTick
-	uint32_t timeout_osTick = (timeout_ms * 1000) / (uint32_t)me->osTick;
+	timeout_osTick = (timeout_ms * 1000) / (uint32_t)me->osTick;
+	#endif
+
+	#if defined(ALX_ZEPHYR)
+	// For Zephyr, we use K_MSEC() directly in the functions, so just return the ms value
+	timeout_osTick = timeout_ms;
+	#endif
 
 	// Return
 	return timeout_osTick;
-
-
-	#endif
 }
+#endif	// #if defined(ALX_FREE_RTOS)
 
 
 #endif	// #if defined(ALX_C_LIB)

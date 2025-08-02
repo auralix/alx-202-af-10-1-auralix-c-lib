@@ -37,6 +37,10 @@
 //******************************************************************************
 #if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
+#if defined(ALX_ZEPHYR_TRACE_WITH_LOG)
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(alx, LOG_LEVEL_INF);
+#endif
 
 //******************************************************************************
 // Constructor
@@ -73,11 +77,17 @@ void AlxTrace_Ctor
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
 	// Init
+	#if !defined(ALX_ZEPHYR_TRACE_WITH_LOG)
+
+	#if DT_NODE_HAS_STATUS(DT_CHOSEN(zephyr_console), okay)
 	me->device = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
 	if (me->device == NULL)
 	{
 		return Alx_Err;
 	}
+	#endif
+
+	#endif
 
 	// Set isInit
 	me->isInit = true;
@@ -114,10 +124,26 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
 	// Write
-	while (*str)
+	#if !defined(ALX_ZEPHYR_TRACE_WITH_LOG)
+	if (me->device)
 	{
-		uart_poll_out(me->device, *str++);
+		while (*str)
+		{
+			uart_poll_out(me->device, *str++);
+		}
 	}
+	#else
+	// Remove trailing newline character if present
+	static char buffer[ALX_TRACE_LEN_MAX];
+	int len = (int)strlen(str);
+	while (len > 0 && (str[len - 1] == '\n' || str[len - 1] == '\r')) {
+		--len; // Exclude the newline character
+	}
+	strncpy(buffer, str, len);
+	buffer[len] = '\0'; // Null-terminate the string
+
+	LOG_INF("%s", buffer);
+	#endif
 
 	// Return
 	return Alx_Ok;
