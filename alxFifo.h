@@ -87,6 +87,7 @@ typedef struct
 	uint32_t head;
 	uint32_t tail;
 	uint32_t numOfEntries;
+	uint32_t numOfEntriesSinceFlush;
 	bool isFull;
 	bool isEmpty;
 
@@ -112,10 +113,11 @@ void AlxFifo_Ctor
 void AlxFifo_Flush(AlxFifo* me);
 Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len);
 Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
-Alx_Status AlxFifo_Write(AlxFifo* me, uint8_t data);
-Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len);
+Alx_Status AlxFifo_Write(AlxFifo* me, const uint8_t* data, uint32_t len);
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str);
 uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me);
+uint32_t AlxFifo_GetNumOfEntriesSinceFlush(AlxFifo* me);
+void AlxFifo_Rewind(AlxFifo* me, uint32_t numOfEntries);
 
 
 #endif	// #if defined(ALX_C_LIB)

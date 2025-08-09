@@ -389,7 +389,7 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	{
 		// Write TX FIFO
 		AlxGlobal_DisableIrq();
-		status = AlxFifo_WriteMulti(&me->txFifo, data, len);
+		status = AlxFifo_Write(&me->txFifo, data, len);
 		AlxGlobal_EnableIrq();
 
 		// If UART TX IRQ NOT enabled, enable it
@@ -490,7 +490,7 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 		uint8_t data = hri_sercomusart_read_DATA_reg(me->hw);	// Clears RXC
 		if (me->rxFifoUsed)
 		{
-			AlxFifo_Write(&me->rxFifo, data);
+			AlxFifo_Write(&me->rxFifo, &data, 1);
 		}
 		else
 		{
