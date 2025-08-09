@@ -53,7 +53,7 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Internal
+	// Variables
 	volatile uint64_t tick_ns;
 
 	// Info

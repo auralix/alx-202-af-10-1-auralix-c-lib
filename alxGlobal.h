@@ -199,6 +199,7 @@ extern "C" {
 #include "zephyr/drivers/i2c.h"
 #include "zephyr/drivers/adc.h"
 #include "zephyr/drivers/uart.h"
+#include "zephyr/drivers/spi.h"
 #endif
 
 
@@ -252,6 +253,10 @@ extern "C" {
 #elif defined(ALX_SAM)
 #include "alxGlobal_McuSam.h"
 
+#elif defined(ALX_RA)
+#include "hal_data.h"
+#include "cmsis_gcc.h"
+
 #endif
 
 
@@ -297,12 +302,12 @@ extern "C" {
 	#define ALX_INLINE __attribute__((always_inline))
 	#define ALX_STATIC_INLINE static __attribute__((always_inline))
 	#define ALX_WEAK __attribute__ ((weak))
-	#define ALX_BKPT asm("bkpt 255")
+	#define ALX_BKPT() __BKPT(255)
 #endif
 
 #if defined(_MSC_VER)
 	#define ALX_WEAK
-	#define ALX_BKPT __debugbreak()
+	#define ALX_BKPT() __debugbreak()
 #endif
 
 #define ALX_NULL 0
@@ -352,7 +357,8 @@ typedef enum
 	AlxFs_EndOfDir,
 	AlxLogger_ErrNoReadLog,
 	AlxNet_Timeout,
-	AlxNet_NotSupported
+	AlxNet_NotSupported,
+	AlxNtp_NotEnoughSamples
 } Alx_Status;
 
 typedef enum
@@ -501,6 +507,7 @@ typedef enum
 void AlxGlobal_DisableIrq(void);
 void AlxGlobal_EnableIrq(void);
 void AlxGlobal_Ulltoa(uint64_t uint64, char* str);
+void AlxGlobal_Slltoa(int64_t int64, char* str);
 uint32_t AlxGlobal_Ntohl(uint32_t val);
 
 

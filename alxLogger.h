@@ -135,7 +135,7 @@ typedef struct
 
 	// Parameters
 	AlxFs* alxFs;
-	AlxFs* alxFsSafe;
+	AlxFsSafe* alxFsSafe;
 	uint32_t numOfDir;
 	uint32_t numOfFilesPerDir;
 	uint32_t numOfLogsPerFile;
