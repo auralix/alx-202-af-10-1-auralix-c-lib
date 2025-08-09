@@ -120,11 +120,59 @@ uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToS
 	#endif
 
 	#if defined(ALX_ZEPHYR)
+	// Local variables
+	struct k_event* event_p;
+	
+	// Get event handle
+	AlxOsMutex_Lock(&me->alxMutex);
+	event_p = &me->event;
+	AlxOsMutex_Unlock(&me->alxMutex);
+	
 	// Set event flags
-	k_event_post(&me->event, eventFlagsToSet);
+	k_event_post(event_p, eventFlagsToSet);
 	
 	// Get current event state
-	eventBits = k_event_test(&me->event, UINT32_MAX);
+	eventBits = k_event_test(event_p, UINT32_MAX);
+	#endif
+
+	// Return
+	return eventBits;
+}
+
+/**
+  * @brief ISR-safe version of AlxOsEventFlagGroup_Set (no mutex protection)
+  * @param[in,out]	me
+  * @param[in]		eventFlagsToSet
+  * @return
+  */
+uint32_t AlxOsEventFlagGroup_Set_Unsafe(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet)
+{
+	// Assert
+	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
+
+	// Local variables
+	uint32_t eventBits = 0;
+
+	#if defined(ALX_FREE_RTOS)
+	// Always use ISR-safe version since this is the "unsafe" function meant for ISR context
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	BaseType_t result = xEventGroupSetBitsFromISR(me->eventGroupHandle_t, eventFlagsToSet, &xHigherPriorityTaskWoken);
+	if (result != pdFAIL)
+	{
+		// Yield if a higher priority task was woken
+		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+	}
+	// Note: xEventGroupSetBitsFromISR doesn't return current bits, so return what we set
+	eventBits = eventFlagsToSet;
+	#endif
+
+	#if defined(ALX_ZEPHYR)
+	struct k_event* event_p = &me->event; 
+	// Zephyr's k_event_post is inherently ISR-safe
+	k_event_post(event_p, eventFlagsToSet);
+	
+	// Get current event state
+	eventBits = k_event_test(event_p, UINT32_MAX);
 	#endif
 
 	// Return
@@ -169,11 +217,19 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
 	#endif
 
 	#if defined(ALX_ZEPHYR)
+	// Local variables
+	struct k_event* event_p;
+	
+	// Get event handle
+	AlxOsMutex_Lock(&me->alxMutex);
+	event_p = &me->event;
+	AlxOsMutex_Unlock(&me->alxMutex);
+	
 	// Get current state before clearing
-	eventBits = k_event_test(&me->event, UINT32_MAX);
+	eventBits = k_event_test(event_p, UINT32_MAX);
 	
 	// Clear event flags
-	k_event_clear(&me->event, eventFlagsToClear);
+	k_event_clear(event_p, eventFlagsToClear);
 	#endif
 
 	// Return
@@ -225,17 +281,25 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	#endif
 
 	#if defined(ALX_ZEPHYR)
+	// Local variables
+	struct k_event* event_p;
+	
 	// Convert timeout
 	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
+	
+	// Get event handle
+	AlxOsMutex_Lock(&me->alxMutex);
+	event_p = &me->event;
+	AlxOsMutex_Unlock(&me->alxMutex);
 	
 	// Wait for events
 	// Note: Zephyr k_event_wait uses "reset" parameter which is opposite of waitForAllEventFlags
 	// reset = true means wait for ANY flag (OR), reset = false means wait for ALL flags (AND)
-	eventBits = k_event_wait(&me->event, eventFlagsToWait, !waitForAllEventFlags, timeout);
+	eventBits = k_event_wait(event_p, eventFlagsToWait, !waitForAllEventFlags, timeout);
 	
 	// Clear flags if requested and we got any matching events
 	if (clearEventFlagsOnExit && (eventBits & eventFlagsToWait)) {
-		k_event_clear(&me->event, eventBits & eventFlagsToWait);
+		k_event_clear(event_p, eventBits & eventFlagsToWait);
 	}
 	#endif
 
@@ -287,18 +351,26 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	#endif
 
 	#if defined(ALX_ZEPHYR)
+	// Local variables
+	struct k_event* event_p;
+	
 	// Convert timeout
 	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
 	
+	// Get event handle
+	AlxOsMutex_Lock(&me->alxMutex);
+	event_p = &me->event;
+	AlxOsMutex_Unlock(&me->alxMutex);
+	
 	// Set our flags
-	k_event_post(&me->event, eventFlagsToSet);
+	k_event_post(event_p, eventFlagsToSet);
 	
 	// Wait for all flags to be set (sync means wait for ALL)
-	eventBits = k_event_wait(&me->event, eventFlagsToWait, false, timeout);
+	eventBits = k_event_wait(event_p, eventFlagsToWait, false, timeout);
 	
 	// Clear the flags we were waiting for if they all arrived
 	if ((eventBits & eventFlagsToWait) == eventFlagsToWait) {
-		k_event_clear(&me->event, eventFlagsToWait);
+		k_event_clear(event_p, eventFlagsToWait);
 	}
 	#endif
 
@@ -315,7 +387,6 @@ static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, u
 {
 	uint32_t timeout_osTick = 0;
 
-	#if defined(ALX_FREE_RTOS)
 	// Check if approximation is disabled
 	if (me->approxDisable)
 	{
@@ -325,12 +396,6 @@ static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, u
 
 	// Convert to timeout_osTick
 	timeout_osTick = (timeout_ms * 1000) / (uint32_t)me->osTick;
-	#endif
-
-	#if defined(ALX_ZEPHYR)
-	// For Zephyr, we use K_MSEC() directly in the functions, so just return the ms value
-	timeout_osTick = timeout_ms;
-	#endif
 
 	// Return
 	return timeout_osTick;

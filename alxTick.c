@@ -30,6 +30,10 @@
 //******************************************************************************
 #include "alxTick.h"
 
+#if defined(ALX_ZEPHYR)
+#include <zephyr/kernel.h>
+#endif
+
 
 //******************************************************************************
 // Module Guard
@@ -75,6 +79,12 @@ void AlxTick_Ctor
   */
 uint64_t AlxTick_Get_ns(volatile AlxTick* me)
 {
+	#if defined(ALX_ZEPHYR)
+	// Use direct Zephyr cycle counter for high precision timing
+	(void)me;  // Suppress unused parameter warning
+	uint64_t cycles = k_cycle_get_64();
+	return k_cyc_to_ns_floor64(cycles);
+	#else
 	volatile uint64_t tick_ns = 0;
 
 	AlxGlobal_DisableIrq();		// Start of critical section
@@ -84,6 +94,7 @@ uint64_t AlxTick_Get_ns(volatile AlxTick* me)
 	AlxGlobal_EnableIrq();		// End of critical section
 
 	return tick_ns;
+	#endif
 }
 
 /**
@@ -256,11 +267,15 @@ void AlxTick_IncRange_hr(volatile AlxTick* me, uint64_t ticks_hr)
   */
 void AlxTick_Reset(volatile AlxTick* me)
 {
+  #if !defined(ALX_ZEPHYR)
 	AlxGlobal_DisableIrq();	// Start of critical section
 	me->tick_ns = 0;		// Shared resource tick variable is used by:
 							// Background - GetTick (gets current tick value)
 							// Foreground - IrqHandler (incremnets tick value)
 	AlxGlobal_EnableIrq();	// End of critical section
+  #else
+  (void)me;
+  #endif // !defined(ALX_ZEPHYR)
 }
 
 

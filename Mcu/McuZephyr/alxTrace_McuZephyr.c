@@ -39,7 +39,11 @@
 
 #if defined(ALX_ZEPHYR_TRACE_WITH_LOG)
 #include <zephyr/logging/log.h>
+#include <zephyr/kernel.h>
 LOG_MODULE_REGISTER(alx, LOG_LEVEL_INF);
+
+// Mutex for thread-safe access to accumulation buffer
+K_MUTEX_DEFINE(alx_trace_mutex);
 #endif
 
 //******************************************************************************
@@ -133,16 +137,87 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 		}
 	}
 	#else
-	// Remove trailing newline character if present
-	static char buffer[ALX_TRACE_LEN_MAX];
-	int len = (int)strlen(str);
-	while (len > 0 && (str[len - 1] == '\n' || str[len - 1] == '\r')) {
-		--len; // Exclude the newline character
+	// Static accumulation buffer
+	static char accumBuffer[ALX_TRACE_LEN_MAX];
+	static size_t accumLen = 0;
+	
+	// Lock mutex for thread-safe access
+	k_mutex_lock(&alx_trace_mutex, K_FOREVER);
+	
+	// Check if string contains newline
+	const char* newlinePos = strpbrk(str, "\r\n");
+	
+	if (newlinePos != NULL)
+	{
+		// Copy up to (but not including) the newline
+		size_t copyLen = newlinePos - str;
+		
+		// Check if we have space in the accumulation buffer
+		if (accumLen + copyLen < ALX_TRACE_LEN_MAX - 1)
+		{
+			// Append to accumulation buffer
+			memcpy(accumBuffer + accumLen, str, copyLen);
+			accumLen += copyLen;
+			accumBuffer[accumLen] = '\0';
+			
+			// Flush the accumulated buffer
+			if (accumLen > 0)
+			{
+				LOG_INF("%s", accumBuffer);
+			}
+			
+			// Reset accumulation
+			accumLen = 0;
+		}
+		else
+		{
+			// Buffer overflow - flush what we have and log the new part
+			if (accumLen > 0)
+			{
+				LOG_INF("%s", accumBuffer);
+			}
+			
+			// Log the current part (up to newline)
+			static char tempBuffer[ALX_TRACE_LEN_MAX];
+			size_t tempLen = (copyLen < ALX_TRACE_LEN_MAX - 1) ? copyLen : ALX_TRACE_LEN_MAX - 1;
+			memcpy(tempBuffer, str, tempLen);
+			tempBuffer[tempLen] = '\0';
+			LOG_INF("%s", tempBuffer);
+			
+			// Reset accumulation
+			accumLen = 0;
+		}
 	}
-	strncpy(buffer, str, len);
-	buffer[len] = '\0'; // Null-terminate the string
-
-	LOG_INF("%s", buffer);
+	else
+	{
+		// No newline - accumulate the string
+		size_t strLen = strlen(str);
+		
+		if (accumLen + strLen < ALX_TRACE_LEN_MAX - 1)
+		{
+			// Append to accumulation buffer
+			memcpy(accumBuffer + accumLen, str, strLen);
+			accumLen += strLen;
+			accumBuffer[accumLen] = '\0';
+		}
+		else
+		{
+			// Buffer overflow - flush what we have and start new accumulation
+			if (accumLen > 0)
+			{
+				LOG_INF("%s", accumBuffer);
+			}
+			
+			// Start new accumulation with current string
+			size_t copyLen = (strLen < ALX_TRACE_LEN_MAX - 1) ? strLen : ALX_TRACE_LEN_MAX - 1;
+			memcpy(accumBuffer, str, copyLen);
+			accumLen = copyLen;
+			accumBuffer[accumLen] = '\0';
+		}
+	}
+	
+	// Unlock mutex
+	k_mutex_unlock(&alx_trace_mutex);
 	#endif
 
 	// Return
