@@ -315,13 +315,18 @@ uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me)
   * @brief
   * @param[in,out]	me
   * @param[in]		len
-  * @return
+  * @return			numOfEntriesRewinded
   */
-void AlxFifo_Rewind(AlxFifo* me, uint32_t len)
+uint32_t AlxFifo_Rewind(AlxFifo* me, uint32_t len)
 {
 	// Assert
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-	ALX_FIFO_ASSERT(0 < len);
+
+	// Check length
+	if (len == 0)
+	{
+		return 0;
+	}
 
 	// Bound numOfEntriesUnused
 	if (me->buffLen > me->numOfEntries)
@@ -331,7 +336,7 @@ void AlxFifo_Rewind(AlxFifo* me, uint32_t len)
 	}
 	else
 	{
-		return;
+		return 0;
 	}
 
 	// Bound numOfEntriesRewindable
@@ -344,7 +349,7 @@ void AlxFifo_Rewind(AlxFifo* me, uint32_t len)
 	}
 	else
 	{
-		return;
+		return 0;
 	}
 
 	// Handle rewind
@@ -357,6 +362,9 @@ void AlxFifo_Rewind(AlxFifo* me, uint32_t len)
 	{
 		me->isFull = true;
 	}
+
+	// Return
+	return len;
 }
 
 
