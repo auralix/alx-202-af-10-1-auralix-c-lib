@@ -117,7 +117,7 @@ Alx_Status AlxFifo_Write(AlxFifo* me, const uint8_t* data, uint32_t len);
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str);
 uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me);
 uint32_t AlxFifo_GetNumOfEntriesSinceFlush(AlxFifo* me);
-void AlxFifo_Rewind(AlxFifo* me, uint32_t numOfEntries);
+void AlxFifo_Rewind(AlxFifo* me, uint32_t len);
 
 
 #endif	// #if defined(ALX_C_LIB)
