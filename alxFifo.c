@@ -314,20 +314,6 @@ uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me)
 /**
   * @brief
   * @param[in,out]	me
-  * @return
-  */
-uint32_t AlxFifo_GetNumOfEntriesSinceFlush(AlxFifo* me)
-{
-	// Assert
-	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-
-	// Return
-	return me->numOfEntriesSinceFlush;
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
   * @param[in]		len
   * @return
   */
@@ -335,8 +321,31 @@ void AlxFifo_Rewind(AlxFifo* me, uint32_t len)
 {
 	// Assert
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-	ALX_FIFO_ASSERT(0 < len && len <= (me->buffLen - me->numOfEntries));
-	ALX_FIFO_ASSERT(0 < len && len <= me->numOfEntriesSinceFlush);
+	ALX_FIFO_ASSERT(0 < len);
+
+	// Bound numOfEntriesUnused
+	if (me->buffLen > me->numOfEntries)
+	{
+		uint32_t numOfEntriesUnused = me->buffLen - me->numOfEntries;
+		AlxBound_Uint32(&len, 1, numOfEntriesUnused);
+	}
+	else
+	{
+		return;
+	}
+
+	// Bound numOfEntriesRewindable
+	if (me->numOfEntriesSinceFlush > me->numOfEntries)
+	{
+		uint64_t numOfEntriesRewindable = me->numOfEntriesSinceFlush - me->numOfEntries;
+		uint64_t _len = len;
+		AlxBound_Uint64(&_len, 1, numOfEntriesRewindable);
+		len = (uint32_t)_len;
+	}
+	else
+	{
+		return;
+	}
 
 	// Handle rewind
 	me->tail = (me->tail + me->buffLen - len) % me->buffLen;	// Decrement tail, rewind if necessary

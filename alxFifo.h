@@ -42,6 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxBound.h"
 
 
 //******************************************************************************
@@ -87,7 +88,7 @@ typedef struct
 	uint32_t head;
 	uint32_t tail;
 	uint32_t numOfEntries;
-	uint32_t numOfEntriesSinceFlush;
+	uint64_t numOfEntriesSinceFlush;
 	bool isFull;
 	bool isEmpty;
 
@@ -116,7 +117,6 @@ Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint3
 Alx_Status AlxFifo_Write(AlxFifo* me, const uint8_t* data, uint32_t len);
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str);
 uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me);
-uint32_t AlxFifo_GetNumOfEntriesSinceFlush(AlxFifo* me);
 void AlxFifo_Rewind(AlxFifo* me, uint32_t len);
 
 
