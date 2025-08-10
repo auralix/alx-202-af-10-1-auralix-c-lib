@@ -389,7 +389,6 @@ static Alx_Status AlxFifo_ReadByte(AlxFifo* me, uint8_t* data)
 	{
 		// Handle fifo read
 		*data = me->buff[me->tail];
-		me->buff[me->tail] = 0;						// Set read byte to 0
 		me->tail = (me->tail + 1) % me->buffLen;	// Increment tail, rewind if necessary
 		me->numOfEntries--;
 		me->isFull = false;							// Fifo not full anymore
