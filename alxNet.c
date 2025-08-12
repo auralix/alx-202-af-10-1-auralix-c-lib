@@ -1165,8 +1165,8 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 			return Alx_Err;
 		}
 
-		setRTR(2000); // set wiznet sockets timeout
-		setRCR(1);
+		//setRTR(2000); // set wiznet sockets timeout
+		//setRCR(1);
 
 		me->isNetConnected = true;
 		AlxOsMutex_Unlock(&me->alxMutex);
