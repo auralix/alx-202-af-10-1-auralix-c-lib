@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxAdxl355.h
-  * @brief		Auralix C Library - ALX Accelerometer ADXL355 Module
+  * @file		alxAdxl35x.h
+  * @brief		Auralix C Library - ALX Accelerometer ADXL355/357 Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_ADXL355_H
-#define ALX_ADXL355_H
+#ifndef ALX_ADXL35X_H
+#define ALX_ADXL35X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,26 +55,26 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_ADXL355_FILE "alxAdxl355.h"
+#define ALX_ADXL35X_FILE "AlxAdxl35x.h"
 
 // Assert //
-#if defined(ALX_ADXL355_ASSERT_BKPT_ENABLE)
-	#define ALX_ADXL355_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADXL355_FILE, expr)
-#elif defined(ALX_ADXL355_ASSERT_TRACE_ENABLE)
-	#define ALX_ADXL355_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADXL355_FILE, expr)
-#elif defined(ALX_ADXL355_ASSERT_RST_ENABLE)
-	#define ALX_ADXL355_ASSERT(expr) ALX_ASSERT_RST(ALX_ADXL355_FILE, expr)
+#if defined(ALX_ADXL35X_ASSERT_BKPT_ENABLE)
+	#define ALX_ADXL35X_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ADXL35X_FILE, expr)
+#elif defined(ALX_ADXL35X_ASSERT_TRACE_ENABLE)
+	#define ALX_ADXL35X_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ADXL35X_FILE, expr)
+#elif defined(ALX_ADXL35X_ASSERT_RST_ENABLE)
+	#define ALX_ADXL35X_ASSERT(expr) ALX_ASSERT_RST(ALX_ADXL35X_FILE, expr)
 #else
-	#define ALX_ADXL355_ASSERT(expr) do{} while (false)
+	#define ALX_ADXL35X_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(ALX_ADXL355_TRACE_ENABLE)
-	#define ALX_ADXL355_TRACE_WRN(...) ALX_TRACE_WRN(ALX_ADXL355_FILE, __VA_ARGS__)
-	#define ALX_ADXL355_TRACE_INF(...) ALX_TRACE_INF(ALX_ADXL355_FILE, __VA_ARGS__)
+#if defined(ALX_ADXL35X_TRACE_ENABLE)
+	#define ALX_ADXL35X_TRACE_WRN(...) ALX_TRACE_WRN(ALX_ADXL35X_FILE, __VA_ARGS__)
+	#define ALX_ADXL35X_TRACE_INF(...) ALX_TRACE_INF(ALX_ADXL35X_FILE, __VA_ARGS__)
 #else
-	#define ALX_ADXL355_TRACE_WRN(...) do{} while (false)
-	#define ALX_ADXL355_TRACE_INF(...) do{} while (false)
+	#define ALX_ADXL35X_TRACE_WRN(...) do{} while (false)
+	#define ALX_ADXL35X_TRACE_INF(...) do{} while (false)
 #endif
 
 
@@ -93,7 +93,7 @@ typedef union
 		uint8_t DEVID_AD;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x00_DEVID_AD;
+} AlxAdxl35x_RegVal_0x00_DEVID_AD;
 
 
 //------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ typedef union
 		uint8_t DEVID_MST;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x01_DEVID_MST;
+} AlxAdxl35x_RegVal_0x01_DEVID_MST;
 
 
 //------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ typedef union
 		uint8_t PARTID;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x02_PARTID;
+} AlxAdxl35x_RegVal_0x02_PARTID;
 
 
 //------------------------------------------------------------------------------
@@ -132,7 +132,7 @@ typedef union
 		uint8_t REVID;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x03_REVID;
+} AlxAdxl35x_RegVal_0x03_REVID;
 
 
 //------------------------------------------------------------------------------
@@ -142,45 +142,45 @@ typedef enum
 {
 	DATA_RDY_False	= 0b0,
 	DATA_RDY_True	= 0b1
-} AlxAdxl355_RegEnum_0x04_DATA_RDY;
+} AlxAdxl35x_RegEnum_0x04_DATA_RDY;
 
 typedef enum
 {
 	FIFO_FULL_False	= 0b0,
 	FIFO_FULL_True	= 0b1
-} AlxAdxl355_RegEnum_0x04_FIFO_FULL;
+} AlxAdxl35x_RegEnum_0x04_FIFO_FULL;
 
 typedef enum
 {
 	FIFO_OVR_False	= 0b0,
 	FIFO_OVR_True	= 0b1
-} AlxAdxl355_RegEnum_0x04_FIFO_OVR;
+} AlxAdxl35x_RegEnum_0x04_FIFO_OVR;
 
 typedef enum
 {
 	Activity_Detected		= 0b0,
 	Activity_NotDetected	= 0b1
-} AlxAdxl355_RegEnum_0x04_Activity;
+} AlxAdxl35x_RegEnum_0x04_Activity;
 
 typedef enum
 {
 	NVM_BUSY_False	= 0b0,
 	NVM_BUSY_True	= 0b1
-} AlxAdxl355_RegEnum_0x04_NVM_BUSY;
+} AlxAdxl35x_RegEnum_0x04_NVM_BUSY;
 
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		AlxAdxl355_RegEnum_0x04_DATA_RDY DATA_RDY : 1;
-		AlxAdxl355_RegEnum_0x04_FIFO_FULL FIFO_FULL : 1;
-		AlxAdxl355_RegEnum_0x04_FIFO_OVR FIFO_OVR : 1;
-		AlxAdxl355_RegEnum_0x04_Activity Activity : 1;
-		AlxAdxl355_RegEnum_0x04_NVM_BUSY NVM_BUSY : 1;
+		AlxAdxl35x_RegEnum_0x04_DATA_RDY DATA_RDY : 1;
+		AlxAdxl35x_RegEnum_0x04_FIFO_FULL FIFO_FULL : 1;
+		AlxAdxl35x_RegEnum_0x04_FIFO_OVR FIFO_OVR : 1;
+		AlxAdxl35x_RegEnum_0x04_Activity Activity : 1;
+		AlxAdxl35x_RegEnum_0x04_NVM_BUSY NVM_BUSY : 1;
 		uint8_t unused_5_7 : 3;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x04_Status;
+} AlxAdxl35x_RegVal_0x04_Status;
 
 
 //------------------------------------------------------------------------------
@@ -199,7 +199,7 @@ typedef enum
 	ODR_LPF_15Hz625_3Hz906Hz	= 0b1000,
 	ODR_LPF_7Hz813_1Hz953Hz		= 0b1001,
 	ODR_LPF_3Hz906_0Hz977Hz		= 0b1010
-} Adxl355_RegEnum_0x28_ODR_LPF;
+} Adxl35x_RegEnum_0x28_ODR_LPF;
 typedef enum
 {
 	HPF_CORNER_NoFilter	= 0b000,
@@ -209,17 +209,17 @@ typedef enum
 	HPF_CORNER_0p3862	= 0b100,
 	HPF_CORNER_0p0954	= 0b101,
 	HPF_CORNER_0p0238	= 0b110
-} Adxl355_RegEnum_0x28_HPF_CORNER;
+} Adxl35x_RegEnum_0x28_HPF_CORNER;
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		Adxl355_RegEnum_0x28_ODR_LPF ODR_LPF : 4;
-		Adxl355_RegEnum_0x28_HPF_CORNER HPF_CORNER : 3;
+		Adxl35x_RegEnum_0x28_ODR_LPF ODR_LPF : 4;
+		Adxl35x_RegEnum_0x28_HPF_CORNER HPF_CORNER : 3;
 		uint8_t unused_7 : 1;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x28_Filter;
+} AlxAdxl35x_RegVal_0x28_Filter;
 
 
 //------------------------------------------------------------------------------
@@ -233,7 +233,7 @@ typedef union
 		uint8_t unused_7 : 1;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x29_FIFO_SAMPLES;
+} AlxAdxl35x_RegVal_0x29_FIFO_SAMPLES;
 
 
 //------------------------------------------------------------------------------
@@ -243,66 +243,66 @@ typedef enum
 {
 	RDY_EN1_Disable		= 0b0,
 	RDY_EN1_Enable		= 0b1
-} AlxAdxl355_RegEnum_0x2A_RDY_EN1;
+} AlxAdxl35x_RegEnum_0x2A_RDY_EN1;
 
 typedef enum
 {
 	FULL_EN1_Disable	= 0b0,
 	FULL_EN1_Enable		= 0b1
-} AlxAdxl355_RegEnum_0x2A_FULL_EN1;
+} AlxAdxl35x_RegEnum_0x2A_FULL_EN1;
 
 typedef enum
 {
 	OVR_EN1_Disable		= 0b0,
 	OVR_EN1_Enable		= 0b1
-} AlxAdxl355_RegEnum_0x2A_OVR_EN1;
+} AlxAdxl35x_RegEnum_0x2A_OVR_EN1;
 
 typedef enum
 {
 	ACT_EN1_Disable		= 0b0,
 	ACT_EN1_Enable		= 0b1
-} AlxAdxl355_RegEnum_0x2A_ACT_EN1;
+} AlxAdxl35x_RegEnum_0x2A_ACT_EN1;
 
 typedef enum
 {
 	RDY_EN2_Disable		= 0b0,
 	RDY_EN2_Enable		= 0b1
-} AlxAdxl355_RegEnum_0x2A_RDY_EN2;
+} AlxAdxl35x_RegEnum_0x2A_RDY_EN2;
 
 typedef enum
 {
 	FULL_EN2_Disable	= 0b0,
 	FULL_EN2_Enable		= 0b1
-} AlxAdxl355_RegEnum_0x2A_FULL_EN2;
+} AlxAdxl35x_RegEnum_0x2A_FULL_EN2;
 
 typedef enum
 {
 	OVR_EN2_Disable		= 0b0,
 	OVR_EN2_Enable		= 0b1
-} AlxAdxl355_RegEnum_0x2A_OVR_EN2;
+} AlxAdxl35x_RegEnum_0x2A_OVR_EN2;
 
 typedef enum
 {
 	ACT_EN2_Disable		= 0b0,
 	ACT_EN2_Enable		= 0b1
-} AlxAdxl355_RegEnum_0x2A_ACT_EN2;
+} AlxAdxl35x_RegEnum_0x2A_ACT_EN2;
 
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		AlxAdxl355_RegEnum_0x2A_RDY_EN1 RDY_EN1 : 1;
-		AlxAdxl355_RegEnum_0x2A_FULL_EN1 FULL_EN1 : 1;
-		AlxAdxl355_RegEnum_0x2A_OVR_EN1 OVR_EN1 : 1;
-		AlxAdxl355_RegEnum_0x2A_ACT_EN1 ACT_EN1 : 1;
+		AlxAdxl35x_RegEnum_0x2A_RDY_EN1 RDY_EN1 : 1;
+		AlxAdxl35x_RegEnum_0x2A_FULL_EN1 FULL_EN1 : 1;
+		AlxAdxl35x_RegEnum_0x2A_OVR_EN1 OVR_EN1 : 1;
+		AlxAdxl35x_RegEnum_0x2A_ACT_EN1 ACT_EN1 : 1;
 
-		AlxAdxl355_RegEnum_0x2A_RDY_EN2 RDY_EN2 : 1;
-		AlxAdxl355_RegEnum_0x2A_FULL_EN2 FULL_EN2 : 1;
-		AlxAdxl355_RegEnum_0x2A_OVR_EN2 OVR_EN2 : 1;
-		AlxAdxl355_RegEnum_0x2A_ACT_EN2 ACT_EN2 : 1;
+		AlxAdxl35x_RegEnum_0x2A_RDY_EN2 RDY_EN2 : 1;
+		AlxAdxl35x_RegEnum_0x2A_FULL_EN2 FULL_EN2 : 1;
+		AlxAdxl35x_RegEnum_0x2A_OVR_EN2 OVR_EN2 : 1;
+		AlxAdxl35x_RegEnum_0x2A_ACT_EN2 ACT_EN2 : 1;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x2A_INT_MAP;
+} AlxAdxl35x_RegVal_0x2A_INT_MAP;
 
 
 //------------------------------------------------------------------------------
@@ -314,24 +314,24 @@ typedef enum
 	EXT_SYNC_ExternalSync_NoInterpolationFilter	= 0b01,
 	EXT_SYNC_ExternalSync_InterpolationFilter	= 0b10,
 	EXT_SYNC_Reserved							= 0b11
-} AlxAdxl355_RegEnum_0x2B_EXT_SYNC;
+} AlxAdxl35x_RegEnum_0x2B_EXT_SYNC;
 
 typedef enum
 {
 	EXT_CLK_Disable	= 0b0,
 	EXT_CLK_Enable	= 0b1
-} AlxAdxl355_RegEnum_0x2B_EXT_CLK;
+} AlxAdxl35x_RegEnum_0x2B_EXT_CLK;
 
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		AlxAdxl355_RegEnum_0x2B_EXT_SYNC EXT_SYNC : 2;
-		AlxAdxl355_RegEnum_0x2B_EXT_CLK EXT_CLK : 1;
+		AlxAdxl35x_RegEnum_0x2B_EXT_SYNC EXT_SYNC : 2;
+		AlxAdxl35x_RegEnum_0x2B_EXT_CLK EXT_CLK : 1;
 		uint8_t unused_3_7 : 5;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x2B_Sync;
+} AlxAdxl35x_RegVal_0x2B_Sync;
 
 
 //------------------------------------------------------------------------------
@@ -339,35 +339,39 @@ typedef union
 //------------------------------------------------------------------------------
 typedef enum
 {
-	Range_Reserved	= 0b00,
+	Range_Reserved	= 0,
 	Range_2g048		= 0b01,
 	Range_4g096		= 0b10,
 	Range_8g192		= 0b11,
-} AlxAdxl355_RegEnum_0x2C_Range;
+	Range_10g240	= 0b01,
+	Range_20g480	= 0b10,
+	Range_40g960	= 0b11,
+	Range_Guard     = 4
+} AlxAdxl35x_RegEnum_0x2C_Range;
 
 typedef enum
 {
 	INT_POL_INT1_INT2_ActiveLow		= 0b0,
 	INT_POL_INT1_INT2_ActiveHigh	= 0b1
-} AlxAdxl355_RegEnum_0x2C_INT_POL;
+} AlxAdxl35x_RegEnum_0x2C_INT_POL;
 
 typedef enum
 {
 	I2C_HS_FastMode			= 0b0,
 	I2C_HS_HighSpeedMode	= 0b1
-} AlxAdxl355_RegEnum_0x2C_I2C_HS;
+} AlxAdxl35x_RegEnum_0x2C_I2C_HS;
 
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		AlxAdxl355_RegEnum_0x2C_Range Range : 2;
+		AlxAdxl35x_RegEnum_0x2C_Range Range : 2;
 		uint8_t unused_3_7 : 4;
-		AlxAdxl355_RegEnum_0x2C_INT_POL INT_POL : 1;
-		AlxAdxl355_RegEnum_0x2C_I2C_HS I2C_HS : 1;
+		AlxAdxl35x_RegEnum_0x2C_INT_POL INT_POL : 1;
+		AlxAdxl35x_RegEnum_0x2C_I2C_HS I2C_HS : 1;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x2C_Range;
+} AlxAdxl35x_RegVal_0x2C_Range;
 
 
 //------------------------------------------------------------------------------
@@ -377,31 +381,31 @@ typedef enum
 {
 	Standby_StandbyMode		= 0b1,
 	Standby_MeasurementMode	= 0b0,
-} AlxAdxl355_RegEnum_0x2D_Standby;
+} AlxAdxl35x_RegEnum_0x2D_Standby;
 
 typedef enum
 {
 	TEMP_OFF_TempProcessEnabled		= 0b0,
 	TEMP_OFF_TempProcessDisabled	= 0b1
-} AlxAdxl355_RegEnum_0x2D_TEMP_OFF;
+} AlxAdxl35x_RegEnum_0x2D_TEMP_OFF;
 
 typedef enum
 {
 	DRDY_OFF_DRDY_NormalOperation	= 0b0,
 	DRDY_OFF_DRDY_ForceToZero		= 0b1
-} AlxAdxl355_RegEnum_0x2D_DRDY_OFF;
+} AlxAdxl35x_RegEnum_0x2D_DRDY_OFF;
 
 typedef union
 {
 	struct __attribute__((packed))
 	{
-		AlxAdxl355_RegEnum_0x2D_Standby Standby : 1;
-		AlxAdxl355_RegEnum_0x2D_TEMP_OFF TEMP_OFF : 1;
-		AlxAdxl355_RegEnum_0x2D_DRDY_OFF DRDY_OFF : 1;
+		AlxAdxl35x_RegEnum_0x2D_Standby Standby : 1;
+		AlxAdxl35x_RegEnum_0x2D_TEMP_OFF TEMP_OFF : 1;
+		AlxAdxl35x_RegEnum_0x2D_DRDY_OFF DRDY_OFF : 1;
 		uint8_t unused_3_7 : 5;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x2D_POWER_CTL;
+} AlxAdxl35x_RegVal_0x2D_POWER_CTL;
 
 
 //------------------------------------------------------------------------------
@@ -414,7 +418,7 @@ typedef union
 		uint8_t Reset;
 	};
 	uint8_t raw;
-} AlxAdxl355_RegVal_0x2F_Reset;
+} AlxAdxl35x_RegVal_0x2F_Reset;
 
 
 //******************************************************************************
@@ -433,7 +437,7 @@ typedef union
 		uint8_t TEMP1;
 	};
 	uint8_t raw[2];
-} AlxAdxl355_RegGroupVal_0x06_0x07_TEMP;
+} AlxAdxl35x_RegGroupVal_0x06_0x07_TEMP;
 
 
 //------------------------------------------------------------------------------
@@ -456,7 +460,7 @@ typedef union
 		uint8_t ZDATA1;
 	};
 	uint8_t raw[9];
-} AlxAdxl355_RegGroupVal_0x08_0x10_DATA;
+} AlxAdxl35x_RegGroupVal_0x08_0x10_DATA;
 
 
 //------------------------------------------------------------------------------
@@ -488,7 +492,7 @@ typedef union
 		uint8_t ZDATA1 : 4;
 	} xyz_20bit[32];
 	uint8_t raw[288];
-} AlxAdxl355_RegGroupVal_0x11_FIFO_DATA;
+} AlxAdxl35x_RegGroupVal_0x11_FIFO_DATA;
 
 
 //******************************************************************************
@@ -498,85 +502,85 @@ typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x00_DEVID_AD val;
-} AlxAdxl355_Reg_0x00_DEVID_AD;
+	AlxAdxl35x_RegVal_0x00_DEVID_AD val;
+} AlxAdxl35x_Reg_0x00_DEVID_AD;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x01_DEVID_MST val;
-} AlxAdxl355_Reg_0x01_DEVID_MST;
+	AlxAdxl35x_RegVal_0x01_DEVID_MST val;
+} AlxAdxl35x_Reg_0x01_DEVID_MST;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x02_PARTID val;
-} AlxAdxl355_Reg_0x02_PARTID;
+	AlxAdxl35x_RegVal_0x02_PARTID val;
+} AlxAdxl35x_Reg_0x02_PARTID;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x03_REVID val;
-} AlxAdxl355_Reg_0x03_REVID;
+	AlxAdxl35x_RegVal_0x03_REVID val;
+} AlxAdxl35x_Reg_0x03_REVID;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x04_Status val;
-} AlxAdxl355_Reg_0x04_Status;
+	AlxAdxl35x_RegVal_0x04_Status val;
+} AlxAdxl35x_Reg_0x04_Status;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x28_Filter val;
-} AlxAdxl355_Reg_0x28_Filter;
+	AlxAdxl35x_RegVal_0x28_Filter val;
+} AlxAdxl35x_Reg_0x28_Filter;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x29_FIFO_SAMPLES val;
-} AlxAdxl355_Reg_0x29_FIFO_SAMPLES;
+	AlxAdxl35x_RegVal_0x29_FIFO_SAMPLES val;
+} AlxAdxl35x_Reg_0x29_FIFO_SAMPLES;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x2A_INT_MAP val;
-} AlxAdxl355_Reg_0x2A_INT_MAP;
+	AlxAdxl35x_RegVal_0x2A_INT_MAP val;
+} AlxAdxl35x_Reg_0x2A_INT_MAP;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x2B_Sync val;
-} AlxAdxl355_Reg_0x2B_Sync;
+	AlxAdxl35x_RegVal_0x2B_Sync val;
+} AlxAdxl35x_Reg_0x2B_Sync;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x2C_Range val;
-} AlxAdxl355_Reg_0x2C_Range;
+	AlxAdxl35x_RegVal_0x2C_Range val;
+} AlxAdxl35x_Reg_0x2C_Range;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x2D_POWER_CTL val;
-} AlxAdxl355_Reg_0x2D_POWER_CTL;
+	AlxAdxl35x_RegVal_0x2D_POWER_CTL val;
+} AlxAdxl35x_Reg_0x2D_POWER_CTL;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegVal_0x2F_Reset val;
-} AlxAdxl355_Reg_0x2F_Reset;
+	AlxAdxl35x_RegVal_0x2F_Reset val;
+} AlxAdxl35x_Reg_0x2F_Reset;
 
 
 //******************************************************************************
@@ -586,22 +590,22 @@ typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegGroupVal_0x06_0x07_TEMP val;
-} AlxAdxl355_RegGroup_0x06_0x07_TEMP;
+	AlxAdxl35x_RegGroupVal_0x06_0x07_TEMP val;
+} AlxAdxl35x_RegGroup_0x06_0x07_TEMP;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegGroupVal_0x08_0x10_DATA val;
-} AlxAdxl355_RegGroup_0x08_0x10_DATA;
+	AlxAdxl35x_RegGroupVal_0x08_0x10_DATA val;
+} AlxAdxl35x_RegGroup_0x08_0x10_DATA;
 
 typedef struct __attribute__((packed))
 {
 	uint8_t addr;
 	uint16_t len;
-	AlxAdxl355_RegGroupVal_0x11_FIFO_DATA val;
-} AlxAdxl355_RegGroup_0x11_FIFO_DATA;
+	AlxAdxl35x_RegGroupVal_0x11_FIFO_DATA val;
+} AlxAdxl35x_RegGroup_0x11_FIFO_DATA;
 
 
 //******************************************************************************
@@ -609,34 +613,40 @@ typedef struct __attribute__((packed))
 //******************************************************************************
 typedef struct __attribute__((packed))
 {
-	AlxAdxl355_Reg_0x00_DEVID_AD		_0x00_DEVID_AD;
-	AlxAdxl355_Reg_0x01_DEVID_MST		_0x01_DEVID_MST;
-	AlxAdxl355_Reg_0x02_PARTID			_0x02_PARTID;
-	AlxAdxl355_Reg_0x03_REVID			_0x03_REVID;
-	AlxAdxl355_Reg_0x04_Status			_0x04_Status;
-	AlxAdxl355_Reg_0x28_Filter			_0x28_Filter;
-	AlxAdxl355_Reg_0x29_FIFO_SAMPLES	_0x29_FIFO_SAMPLES;
-	AlxAdxl355_Reg_0x2A_INT_MAP			_0x2A_INT_MAP;
-	AlxAdxl355_Reg_0x2B_Sync			_0x2B_Sync;
-	AlxAdxl355_Reg_0x2C_Range			_0x2C_Range;
-	AlxAdxl355_Reg_0x2D_POWER_CTL		_0x2D_POWER_CTL;
-	AlxAdxl355_Reg_0x2F_Reset			_0x2F_Reset;
+	AlxAdxl35x_Reg_0x00_DEVID_AD		_0x00_DEVID_AD;
+	AlxAdxl35x_Reg_0x01_DEVID_MST		_0x01_DEVID_MST;
+	AlxAdxl35x_Reg_0x02_PARTID			_0x02_PARTID;
+	AlxAdxl35x_Reg_0x03_REVID			_0x03_REVID;
+	AlxAdxl35x_Reg_0x04_Status			_0x04_Status;
+	AlxAdxl35x_Reg_0x28_Filter			_0x28_Filter;
+	AlxAdxl35x_Reg_0x29_FIFO_SAMPLES	_0x29_FIFO_SAMPLES;
+	AlxAdxl35x_Reg_0x2A_INT_MAP			_0x2A_INT_MAP;
+	AlxAdxl35x_Reg_0x2B_Sync			_0x2B_Sync;
+	AlxAdxl35x_Reg_0x2C_Range			_0x2C_Range;
+	AlxAdxl35x_Reg_0x2D_POWER_CTL		_0x2D_POWER_CTL;
+	AlxAdxl35x_Reg_0x2F_Reset			_0x2F_Reset;
 
-	AlxAdxl355_RegGroup_0x06_0x07_TEMP	_0x06_0x07_TEMP;
-	AlxAdxl355_RegGroup_0x08_0x10_DATA	_0x08_0x10_DATA;
-	AlxAdxl355_RegGroup_0x11_FIFO_DATA	_0x11_FIFO_DATA;
-} AlxAdxl355_Reg;
+	AlxAdxl35x_RegGroup_0x06_0x07_TEMP	_0x06_0x07_TEMP;
+	AlxAdxl35x_RegGroup_0x08_0x10_DATA	_0x08_0x10_DATA;
+	AlxAdxl35x_RegGroup_0x11_FIFO_DATA	_0x11_FIFO_DATA;
+} AlxAdxl35x_Reg;
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	ALX_ADXL355,
+	ALX_ADXL357
+} AlxAdxlDeviceId;
+
 typedef struct __attribute__((packed))
 {
 	float x_g;
 	float y_g;
 	float z_g;
-} AlxAdxl355_Xyz_g;
+} AlxAdxl35x_Xyz_g;
 
 typedef struct
 {
@@ -646,20 +656,24 @@ typedef struct
 	uint16_t spiTimeout_ms;
 
 	// Variables
-	AlxAdxl355_Reg reg;
+	AlxAdxl35x_Reg reg;
+	AlxAdxlDeviceId device;
+	AlxAdxl35x_RegEnum_0x2C_Range range;
 
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
-} AlxAdxl355;
+} AlxAdxl35x;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxAdxl355_Ctor
+void AlxAdxl35x_Ctor
 (
-	AlxAdxl355* me,
+	AlxAdxl35x* me,
+	AlxAdxlDeviceId device,
+	AlxAdxl35x_RegEnum_0x2C_Range range,
 	AlxSpi* spi,
 	uint8_t spiNumOfTries,
 	uint16_t spiTimeout_ms
@@ -669,12 +683,12 @@ void AlxAdxl355_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxAdxl355_Init(AlxAdxl355* me, float sampleRate);
-Alx_Status AlxAdxl355_DeInit(AlxAdxl355* me);
-Alx_Status AlxAdxl355_Enable(AlxAdxl355* me);
-Alx_Status AlxAdxl355_Disable(AlxAdxl355* me);
-Alx_Status AlxAdxl355_GetData(AlxAdxl355* me, AccDataPoint* data, uint8_t len);
-uint8_t AlxAdxl355_GetFifoLen(AlxAdxl355* me);
+Alx_Status AlxAdxl35x_Init(AlxAdxl35x* me, float sampleRate);
+Alx_Status AlxAdxl35x_DeInit(AlxAdxl35x* me);
+Alx_Status AlxAdxl35x_Enable(AlxAdxl35x* me);
+Alx_Status AlxAdxl35x_Disable(AlxAdxl35x* me);
+Alx_Status AlxAdxl35x_GetData(AlxAdxl35x* me, AccDataPoint* data, uint8_t len);
+uint8_t AlxAdxl35x_GetFifoLen(AlxAdxl35x* me);
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32L4)
@@ -683,4 +697,4 @@ uint8_t AlxAdxl355_GetFifoLen(AlxAdxl355* me);
 }
 #endif
 
-#endif	// #ifndef ALX_ADXL355_H
+#endif	// #ifndef ALX_ADXL35X_H

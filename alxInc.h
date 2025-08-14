@@ -48,7 +48,7 @@ extern "C" {
 #include "alxAdau1961.h"
 #include "alxAds8678.h"
 #include "alxAds114s08.h"
-#include "alxAdxl355.h"
+#include "alxAdxl35x.h"
 #include "alxBq24600.h"
 #include "alxBq25890.h"
 #include "alxBts724g.h"
