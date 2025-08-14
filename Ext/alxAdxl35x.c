@@ -87,16 +87,12 @@ static AccDataPoint AlxAdxl35x_ConvertXyz(AlxAdxl35x* me, AlxAdxl35x_Xyz_20bit x
 void AlxAdxl35x_Ctor
 (
 	AlxAdxl35x* me,
-	AlxAdxlDeviceId device,
-	AlxAdxl35x_RegEnum_0x2C_Range range,
 	AlxSpi* spi,
 	uint8_t spiNumOfTries,
 	uint16_t spiTimeout_ms
 )
 {
 	// Parameters
-	me->device = device;
-	me->range = range;
 	me->spi = spi;
 	me->spiNumOfTries = spiNumOfTries;
 	me->spiTimeout_ms = spiTimeout_ms;
@@ -122,7 +118,13 @@ void AlxAdxl35x_Ctor
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxAdxl35x_Init(AlxAdxl35x* me, float sampleRate)
+Alx_Status AlxAdxl35x_Init
+(
+	AlxAdxl35x* me,
+	AlxAccDevice device,
+	AlxAccRange range,
+	float sampleRate
+)
 {
 	// Assert
 	ALX_ADXL35X_ASSERT(me->wasCtorCalled == true);
@@ -130,6 +132,30 @@ Alx_Status AlxAdxl35x_Init(AlxAdxl35x* me, float sampleRate)
 
 	// Local variables
 	Alx_Status status = Alx_Err;
+
+	me->device = device;
+	ALX_ADXL35X_ASSERT(
+		(me->device == ALX_ACC_DEVICE_ADXL355) ||
+		(me->device == ALX_ACC_DEVICE_ADXL357));
+
+	switch (range)
+	{
+		case ALX_ACC_RANGE_0:
+			me->range = (me->device == ALX_ACC_DEVICE_ADXL355)
+				? Range_2g048 : Range_10g240;
+			break;
+		case ALX_ACC_RANGE_1:
+			me->range = (me->device == ALX_ACC_DEVICE_ADXL355)
+				? Range_4g096 : Range_20g480;
+			break;
+		case ALX_ACC_RANGE_2:
+			me->range = (me->device == ALX_ACC_DEVICE_ADXL355)
+				? Range_8g192 : Range_40g960;
+			break;
+		default:
+			ALX_ADXL35X_ASSERT(false);
+			break;
+	}
 
 	// Init SPI
 	status = AlxSpi_Reconfigure(me->spi,
@@ -748,11 +774,11 @@ static AccDataPoint AlxAdxl35x_ConvertXyz(AlxAdxl35x* me, AlxAdxl35x_Xyz_20bit x
 	const float rangeFactors_357[Range_Guard] = {0.0f, 0.0000195f, 0.0000390f, 0.0000780f};
 
 	float rangeFactor = 0;
-	if (me->device == ALX_ADXL355)
+	if (me->device == ALX_ACC_DEVICE_ADXL355)
 	{
 		rangeFactor = rangeFactors_355[me->range];
 	}
-	else if (me->device == ALX_ADXL357)
+	else if (me->device == ALX_ACC_DEVICE_ADXL357)
 	{
 		rangeFactor = rangeFactors_357[me->range];
 	}

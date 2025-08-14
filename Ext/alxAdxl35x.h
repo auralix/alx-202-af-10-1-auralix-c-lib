@@ -635,12 +635,6 @@ typedef struct __attribute__((packed))
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef enum
-{
-	ALX_ADXL355,
-	ALX_ADXL357
-} AlxAdxlDeviceId;
-
 typedef struct __attribute__((packed))
 {
 	float x_g;
@@ -657,7 +651,7 @@ typedef struct
 
 	// Variables
 	AlxAdxl35x_Reg reg;
-	AlxAdxlDeviceId device;
+	AlxAccDevice device;
 	AlxAdxl35x_RegEnum_0x2C_Range range;
 
 	// Info
@@ -672,8 +666,6 @@ typedef struct
 void AlxAdxl35x_Ctor
 (
 	AlxAdxl35x* me,
-	AlxAdxlDeviceId device,
-	AlxAdxl35x_RegEnum_0x2C_Range range,
 	AlxSpi* spi,
 	uint8_t spiNumOfTries,
 	uint16_t spiTimeout_ms
@@ -683,7 +675,13 @@ void AlxAdxl35x_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxAdxl35x_Init(AlxAdxl35x* me, float sampleRate);
+Alx_Status AlxAdxl35x_Init
+(
+	AlxAdxl35x* me,
+	AlxAccDevice device,
+	AlxAccRange range,
+	float sampleRate
+);
 Alx_Status AlxAdxl35x_DeInit(AlxAdxl35x* me);
 Alx_Status AlxAdxl35x_Enable(AlxAdxl35x* me);
 Alx_Status AlxAdxl35x_Disable(AlxAdxl35x* me);

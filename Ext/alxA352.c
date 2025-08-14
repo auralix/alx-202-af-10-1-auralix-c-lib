@@ -125,7 +125,13 @@ void AlxA352_Ctor
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxA352_Init(AlxA352* me, float sampleRate)
+Alx_Status AlxA352_Init
+(
+	AlxA352* me,
+	AlxAccDevice device,
+	AlxAccRange range,
+	float sampleRate
+)
 {
 	// Assert
 	ALX_A352_ASSERT(me->wasCtorCalled == true);
@@ -133,6 +139,9 @@ Alx_Status AlxA352_Init(AlxA352* me, float sampleRate)
 
 	// Local variables
 	Alx_Status status = Alx_Err;
+
+	ALX_A352_ASSERT(device == ALX_ACC_DEVICE_A352);
+	ALX_A352_ASSERT(range < ALX_ACC_RANGE_Max);
 
 	// Init SPI
 	status = AlxSpi_Reconfigure(me->spi,
