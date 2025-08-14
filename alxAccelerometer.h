@@ -80,7 +80,7 @@ extern "C" {
 typedef enum
 {
 	ALX_ACC_DEVICE_ADXL355,
-  ALX_ACC_DEVICE_ADXL357,
+	ALX_ACC_DEVICE_ADXL357,
 	ALX_ACC_DEVICE_A352,
 	ALX_ACC_DEVICE_Max
 } AlxAccDevice;
@@ -92,6 +92,12 @@ typedef enum
 	ALX_ACC_RANGE_2,
 	ALX_ACC_RANGE_Max
 } AlxAccRange;
+
+typedef enum
+{
+	ALX_ACC_SYNC_MODE_MEAS_CLK,
+	ALX_ACC_SYNC_MODE_PLL
+} AlxAccSyncMode;
 
 typedef struct __attribute__((packed))
 {

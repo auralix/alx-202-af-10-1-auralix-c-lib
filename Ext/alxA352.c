@@ -130,12 +130,15 @@ Alx_Status AlxA352_Init
 	AlxA352* me,
 	AlxAccDevice device,
 	AlxAccRange range,
-	float sampleRate
+	float sampleRate,
+	AlxAccSyncMode syncMode
 )
 {
 	// Assert
 	ALX_A352_ASSERT(me->wasCtorCalled == true);
 	ALX_A352_ASSERT(me->isInit == false);
+
+	(void)syncMode;
 
 	// Local variables
 	Alx_Status status = Alx_Err;

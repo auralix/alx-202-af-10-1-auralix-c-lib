@@ -52,6 +52,7 @@ extern "C" {
 #include "alxBq24600.h"
 #include "alxBq25890.h"
 #include "alxBts724g.h"
+#include "alxCdce913.h"
 #include "alxIna228.h"
 #include "alxLp586x.h"
 #include "alxMax17263.h"

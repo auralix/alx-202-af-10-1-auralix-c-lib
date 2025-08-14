@@ -680,7 +680,8 @@ Alx_Status AlxAdxl35x_Init
 	AlxAdxl35x* me,
 	AlxAccDevice device,
 	AlxAccRange range,
-	float sampleRate
+	float sampleRate,
+	AlxAccSyncMode syncMode
 );
 Alx_Status AlxAdxl35x_DeInit(AlxAdxl35x* me);
 Alx_Status AlxAdxl35x_Enable(AlxAdxl35x* me);

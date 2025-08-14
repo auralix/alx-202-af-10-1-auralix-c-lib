@@ -65,7 +65,7 @@ static void AlxAdxl35x_RegStruct_SetAddr(AlxAdxl35x* me);
 static void AlxAdxl35x_RegStruct_SetLen(AlxAdxl35x* me);
 static void AlxAdxl35x_RegStruct_SetValToZero(AlxAdxl35x* me);
 static void AlxAdxl35x_RegStruct_SetValToDefault(AlxAdxl35x* me);
-static void AlxAdxl35x_RegStruct_SetVal(AlxAdxl35x* me, float sampleRate);
+static void AlxAdxl35x_RegStruct_SetVal(AlxAdxl35x* me, float sampleRate, AlxAccSyncMode syncMode);
 static Alx_Status AlxAdxl35x_Reg_Read(AlxAdxl35x* me, void* reg);
 static Alx_Status AlxAdxl35x_Reg_Write(AlxAdxl35x* me, void* reg);
 static Alx_Status AlxAdxl35x_Reg_WriteAll(AlxAdxl35x* me);
@@ -123,7 +123,8 @@ Alx_Status AlxAdxl35x_Init
 	AlxAdxl35x* me,
 	AlxAccDevice device,
 	AlxAccRange range,
-	float sampleRate
+	float sampleRate,
+	AlxAccSyncMode syncMode
 )
 {
 	// Assert
@@ -182,7 +183,7 @@ Alx_Status AlxAdxl35x_Init
 	if (status != Alx_Ok) { ALX_ADXL35X_TRACE_WRN("Err"); return status; }
 
 	// Set registers values
-	AlxAdxl35x_RegStruct_SetVal(me, sampleRate);
+	AlxAdxl35x_RegStruct_SetVal(me, sampleRate, syncMode);
 
 	// Write all registers
 	status = AlxAdxl35x_Reg_WriteAll(me);
@@ -568,45 +569,45 @@ static void AlxAdxl35x_RegStruct_SetValToDefault(AlxAdxl35x* me)
 	memset(me->reg._0x08_0x10_DATA	.val.raw, 0x00, sizeof(me->reg._0x08_0x10_DATA	.val.raw));
 	memset(me->reg._0x11_FIFO_DATA	.val.raw, 0x00, sizeof(me->reg._0x11_FIFO_DATA	.val.raw));
 }
-static void AlxAdxl35x_RegStruct_SetVal(AlxAdxl35x* me, float sampleRate)
+static void AlxAdxl35x_RegStruct_SetVal(AlxAdxl35x* me, float sampleRate, AlxAccSyncMode syncMode)
 {
 	// 0x28 - FILTER SETTINGS REGISTER & 0x29 - FIFO SAMPLES REGISTER
-	if (sampleRate == 31.25f)
+	if ((sampleRate == 25.0f) || (sampleRate == 31.25f))
 	{
 		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_31Hz25_7Hz813Hz;
 		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 1 * 3;
 	}
-	else if (sampleRate == 62.5f)
+	else if ((sampleRate == 50.0f) || (sampleRate == 62.5f))
 	{
 		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_62Hz5_15Hz625Hz;
 		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 2 * 3;
 	}
-	else if (sampleRate == 125.f)
+	else if ((sampleRate == 100.0f) || (sampleRate == 125.f))
 	{
 		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_125Hz_31Hz25Hz;
 		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 4 * 3;
 	}
-	else if (sampleRate == 250.f)
+	else if ((sampleRate == 200.0f) || (sampleRate == 250.f))
 	{
 		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_250Hz_62Hz5Hz;
 		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 8 * 3;
 	}
-	else if (sampleRate == 500.f)
+	else if ((sampleRate == 400.0f) || (sampleRate == 500.f))
 	{
 		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_500Hz_125Hz;
 		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 16 * 3;
 	}
-	else if (sampleRate == 1000.f)
+	else if ((sampleRate == 800.0f) || (sampleRate == 1000.f))
 	{
 		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_1000Hz_250Hz;
 		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 32 * 3;
 	}
-	else if (sampleRate == 2000.f)
+	else if ((sampleRate == 1600.0f) || (sampleRate == 2000.f))
 	{
 		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_2000Hz_500Hz;
 		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 32 * 3;
 	}
-	else if (sampleRate == 4000.f)
+	else if ((sampleRate == 3200.0f) || (sampleRate == 4000.f))
 	{
 		me->reg._0x28_Filter.val.ODR_LPF = ODR_LPF_4000Hz_1000Hz;
 		me->reg._0x29_FIFO_SAMPLES.val.FIFO_SAMPLES = 32 * 3;
@@ -620,8 +621,16 @@ static void AlxAdxl35x_RegStruct_SetVal(AlxAdxl35x* me, float sampleRate)
 	me->reg._0x2A_INT_MAP.val.FULL_EN1 = FULL_EN1_Enable;
 
 	// 0x2B - DATA SYNCHRONIZATION REGISTER
-	me->reg._0x2B_Sync.val.EXT_CLK = EXT_CLK_Disable;
-	me->reg._0x2B_Sync.val.EXT_SYNC = EXT_SYNC_ExternalSync_InterpolationFilter;
+	if (syncMode == ALX_ACC_SYNC_MODE_MEAS_CLK)
+	{
+		me->reg._0x2B_Sync.val.EXT_CLK = EXT_CLK_Disable;
+		me->reg._0x2B_Sync.val.EXT_SYNC = EXT_SYNC_ExternalSync_InterpolationFilter;
+	}
+	else
+	{
+		me->reg._0x2B_Sync.val.EXT_CLK = EXT_CLK_Enable;
+		me->reg._0x2B_Sync.val.EXT_SYNC = EXT_SYNC_ExternalSync_NoInterpolationFilter;
+	}
 
 	// 0x2C - RANGE REGISTER
 	if ((me->range > Range_Reserved) && (me->range < Range_Guard))
