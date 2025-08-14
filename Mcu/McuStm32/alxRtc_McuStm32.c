@@ -212,6 +212,12 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 	{
 		HAL_RTC_MspInit(&me->hrtc);
 
+		AlxRtc_DateTime dtBackup = {};
+		if (AlxRtc_IsDateTimeConfigured(me))
+		{
+			dtBackup = AlxRtc_GetDateTime(me);
+		}
+
 		HAL_StatusTypeDef status = HAL_RTC_DeInit(&me->hrtc);
 		if (status != HAL_OK)
 		{
@@ -227,10 +233,30 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 		}
 
 		Alx_Status alxStatus = AlxRtc_TuneClockSource(me, 0.0f);
-		if (alxStatus != HAL_OK)
+		if (alxStatus != Alx_Ok)
 		{
 			ALX_RTC_TRACE_WRN("Err AlxRtc_TuneClockSource (%u)", alxStatus);
 			me->isErr = true;
+		}
+
+		if (AlxRtc_IsDateTimeConfigured(me))
+		{
+			int64_t secFract = dtBackup.ms * 1000000 + dtBackup.us * 1000 + dtBackup.ns;
+			dtBackup.ms = 0;
+			dtBackup.us = 0;
+			dtBackup.ns = 0;
+			alxStatus = AlxRtc_SetDateTime(me, dtBackup);
+			if (alxStatus != Alx_Ok)
+			{
+				ALX_RTC_TRACE_WRN("Err restore backed-up time 1 (%u)", alxStatus);
+				me->isErr = true;
+			}
+			alxStatus = AlxRtc_TuneTime_ns(me, secFract);
+			if (alxStatus != Alx_Ok)
+			{
+				ALX_RTC_TRACE_WRN("Err restore backed-up time 2 (%u)", alxStatus);
+				me->isErr = true;
+			}
 		}
 
 		if (me->isErr == true)
@@ -240,7 +266,14 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 		}
 
 		// Trace
-		ALX_RTC_TRACE_INF("AlxRtc - Date-Time NOT configured, counting from default");
+		if (AlxRtc_IsDateTimeConfigured(me))
+		{
+			ALX_RTC_TRACE_INF("AlxRtc - RTC reconfigured, Date-Time configured");
+		}
+		else
+		{
+			ALX_RTC_TRACE_INF("AlxRtc - Date-Time NOT configured, counting from default");
+		}
 	}
 	else
 	{
