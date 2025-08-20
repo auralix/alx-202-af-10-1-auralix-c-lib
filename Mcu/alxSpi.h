@@ -83,12 +83,14 @@ typedef struct { bool dummy; } AlxSpi;
 // Trace //
 #if defined(ALX_SPI_TRACE_ENABLE)
 	#define ALX_SPI_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
+	#define ALX_SPI_TRACE_INF(...) ALX_TRACE_INF(ALX_SPI_FILE, __VA_ARGS__)
 	#define ALX_SPI_TRACE_ERR(...) ALX_TRACE_ERR(ALX_SPI_FILE, __VA_ARGS__)
 	#define ALX_SPI_TRACE_WRN(...) ALX_TRACE_WRN(ALX_SPI_FILE, __VA_ARGS__)
 	#define ALX_SPI_TRACE_DBG(...) ALX_TRACE_DBG(ALX_SPI_FILE, __VA_ARGS__)
 	#define ALX_SPI_TRACE_VRB(...) ALX_TRACE_VRB(ALX_SPI_FILE, __VA_ARGS__)
 #else
 	#define ALX_SPI_TRACE_FORMAT(...) do{} while (false)
+	#define ALX_SPI_TRACE_INF(...) do{} while (false)
 	#define ALX_SPI_TRACE_ERR(...) do{} while (false)
 	#define ALX_SPI_TRACE_WRN(...) do{} while (false)
 	#define ALX_SPI_TRACE_DBG(...) do{} while (false)

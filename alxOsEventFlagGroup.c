@@ -132,7 +132,7 @@ uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToS
 	k_event_post(event_p, eventFlagsToSet);
 	
 	// Get current event state
-	eventBits = k_event_test(event_p, UINT32_MAX);
+	eventBits = k_event_test(event_p, UINT32_MAX) & eventFlagsToSet;
 	#endif
 
 	// Return
@@ -172,7 +172,7 @@ uint32_t AlxOsEventFlagGroup_Set_Unsafe(AlxOsEventFlagGroup* me, uint32_t eventF
 	k_event_post(event_p, eventFlagsToSet);
 	
 	// Get current event state
-	eventBits = k_event_test(event_p, UINT32_MAX);
+	eventBits = k_event_test(event_p, UINT32_MAX) & eventFlagsToSet;
 	#endif
 
 	// Return
@@ -226,7 +226,7 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
 	AlxOsMutex_Unlock(&me->alxMutex);
 	
 	// Get current state before clearing
-	eventBits = k_event_test(event_p, UINT32_MAX);
+	eventBits = k_event_test(event_p, UINT32_MAX) & eventFlagsToClear;
 	
 	// Clear event flags
 	k_event_clear(event_p, eventFlagsToClear);
@@ -292,15 +292,25 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	event_p = &me->event;
 	AlxOsMutex_Unlock(&me->alxMutex);
 	
-	// Wait for events
-	// Note: Zephyr k_event_wait uses "reset" parameter which is opposite of waitForAllEventFlags
-	// reset = true means wait for ANY flag (OR), reset = false means wait for ALL flags (AND)
-	eventBits = k_event_wait(event_p, eventFlagsToWait, !waitForAllEventFlags, timeout);
+	// Wait for ANY vs ALL. 
+	// Zephyr's wait functions do not do atomic clear-on-exit, so we handle that manually.
+	// Multi-consumer note: this post-return clear is not atomic with the wake. 
+	// If multiple threads wait on the same bits, one can clear while another is waking,
+	// causing missed events.
+	uint32_t got = waitForAllEventFlags
+		? k_event_wait_all(event_p, eventFlagsToWait, false, timeout)
+		: k_event_wait    (event_p, eventFlagsToWait, false, timeout);
 	
-	// Clear flags if requested and we got any matching events
-	if (clearEventFlagsOnExit && (eventBits & eventFlagsToWait)) {
-		k_event_clear(event_p, eventBits & eventFlagsToWait);
+	uint32_t matched = got & eventFlagsToWait;
+	if (clearEventFlagsOnExit && matched) {
+		// Clear the event flags if requested and if matched
+		if (!waitForAllEventFlags || matched == eventFlagsToWait) {
+			k_event_clear(event_p, matched);
+		}
 	}
+
+	// Mask to requested bits (Zephyr may return superset)
+	eventBits = got & eventFlagsToWait;	
 	#endif
 
 	// Return
@@ -366,10 +376,11 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	k_event_post(event_p, eventFlagsToSet);
 	
 	// Wait for all flags to be set (sync means wait for ALL)
-	eventBits = k_event_wait(event_p, eventFlagsToWait, false, timeout);
-	
-	// Clear the flags we were waiting for if they all arrived
-	if ((eventBits & eventFlagsToWait) == eventFlagsToWait) {
+	eventBits = k_event_wait_all(event_p, eventFlagsToWait, false, timeout) & eventFlagsToWait;
+	if (eventBits == eventFlagsToWait) {
+		/* Auto-clear barrier mask so next round starts clean
+		NOTE: This is NOT atomic with the wake; multiple threads may race to clear.
+		      In practice it's OK for a simple barrier if all bits belong to the same round. */
 		k_event_clear(event_p, eventFlagsToWait);
 	}
 	#endif

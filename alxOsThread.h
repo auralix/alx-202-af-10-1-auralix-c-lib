@@ -127,6 +127,7 @@ void AlxOsThread_Ctor
 Alx_Status AlxOsThread_Start(AlxOsThread* me);
 void AlxOsThread_Yield(AlxOsThread* me);
 void AlxOsThread_Terminate(AlxOsThread* me);
+Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms);
 
 
 #endif	// #if defined(ALX_C_LIB)
