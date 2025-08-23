@@ -324,8 +324,14 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	manifestPath = binSrcPath.with_name(binSrcPath.stem + '_Manifest.json')
 
 	# Prepare manifest file text
+	ver_name = (r"{fwVerMajor}.{fwVerMinor}.{fwVerPatch}").format(
+		fwVerMajor=fwVerMajor,
+		fwVerMinor=fwVerMinor,
+		fwVerPatch=fwVerPatch
+	)
 	manifestDict = {
 		"ver": manifestVer,
+		"ver_name": ver_name,
 		"size": manifestSize,
 		"hash": manifestHashStr,
 		"url": "/api/v1/NEMO/fw-update/get-bin"

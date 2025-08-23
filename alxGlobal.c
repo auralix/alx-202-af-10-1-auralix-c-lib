@@ -95,6 +95,18 @@ void AlxGlobal_Ulltoa(uint64_t uint64, char* str)
 	}
 }
 
+void AlxGlobal_Slltoa(int64_t int64, char* str)
+{
+	uint32_t offset = 0;
+	int32_t sign = int64 < 0 ? -1 : 1;
+	int64 *= sign;
+	if (sign == -1)
+	{
+		str[0] = '-';
+		offset = 1;
+	}
+	AlxGlobal_Ulltoa((uint64_t)int64, &str[offset]);
+}
 /**
   * @brief
   * @param[in] val

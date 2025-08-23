@@ -282,7 +282,7 @@ Alx_Status AlxSerialPort_WriteStr(AlxSerialPort* me, const char* str)
 void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 {
 	uint8_t data = USART_ReadByte(me->usart);
-	AlxFifo_Write(&me->rxFifo, data);
+	AlxFifo_Write(&me->rxFifo, &data, 1);
 }
 
 /**
