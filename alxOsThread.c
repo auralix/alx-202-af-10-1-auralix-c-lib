@@ -196,9 +196,10 @@ void AlxOsThread_Terminate(AlxOsThread* me)
 	vTaskDelete(me->taskHandle);
 	#endif
 	#if defined(ALX_ZEPHYR)
-	// Zephyr thread termination
 	k_thread_abort(&me->threadHandle);
 	#endif
+
+	// Clear
 	me->wasStarted = false;
 }
 Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
@@ -207,14 +208,12 @@ Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
 	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
 	ALX_OS_THREAD_ASSERT(me->wasStarted == true);
 
-	// Join - wait for thread to finish
+	// Join
 	#if defined(ALX_FREE_RTOS)
-	// FreeRTOS doesn't have a native join mechanism
-	// We need to poll task state and wait for deletion
 	TickType_t timeout_ticks = (timeout_ms == UINT32_MAX) ? portMAX_DELAY : pdMS_TO_TICKS(timeout_ms);
 	TickType_t start_time = xTaskGetTickCount();
-	
-	while (true)
+
+	while (true)	// AB: FreeRTOS doesn't have a native join mechanism, we need to poll task state and wait for deletion
 	{
 		// Check if task still exists by trying to get its state
 		eTaskState task_state = eTaskGetState(me->taskHandle);
@@ -223,7 +222,7 @@ Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
 			// Task has finished/been deleted
 			return Alx_Ok;
 		}
-		
+
 		// Check timeout
 		if (timeout_ms != UINT32_MAX)
 		{
@@ -233,17 +232,15 @@ Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
 				return Alx_ErrNumOfTries;
 			}
 		}
-		
+
 		// Small delay to avoid busy waiting
 		vTaskDelay(pdMS_TO_TICKS(10));
 	}
 	#endif
-	
 	#if defined(ALX_ZEPHYR)
-	// Zephyr has k_thread_join function
 	k_timeout_t timeout = (timeout_ms == UINT32_MAX) ? K_FOREVER : K_MSEC(timeout_ms);
-	
-	int ret = k_thread_join(&me->threadHandle, timeout);
+
+	int ret = k_thread_join(&me->threadHandle, timeout);	// AB: Zephyr has k_thread_join function
 	if (ret == 0)
 	{
 		return Alx_Ok;
@@ -257,6 +254,8 @@ Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
 		return Alx_Err;
 	}
 	#endif
+
+	// Clear
 	me->wasStarted = false;
 }
 
