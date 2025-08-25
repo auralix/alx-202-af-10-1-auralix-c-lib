@@ -122,15 +122,15 @@ uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToS
 	#if defined(ALX_ZEPHYR)
 	// Local variables
 	struct k_event* event_p;
-	
+
 	// Get event handle
 	AlxOsMutex_Lock(&me->alxMutex);
 	event_p = &me->event;
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// Set event flags
 	k_event_post(event_p, eventFlagsToSet);
-	
+
 	// Get current event state
 	eventBits = k_event_test(event_p, UINT32_MAX) & eventFlagsToSet;
 	#endif
@@ -167,10 +167,10 @@ uint32_t AlxOsEventFlagGroup_Set_Unsafe(AlxOsEventFlagGroup* me, uint32_t eventF
 	#endif
 
 	#if defined(ALX_ZEPHYR)
-	struct k_event* event_p = &me->event; 
+	struct k_event* event_p = &me->event;
 	// Zephyr's k_event_post is inherently ISR-safe
 	k_event_post(event_p, eventFlagsToSet);
-	
+
 	// Get current event state
 	eventBits = k_event_test(event_p, UINT32_MAX) & eventFlagsToSet;
 	#endif
@@ -219,15 +219,15 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
 	#if defined(ALX_ZEPHYR)
 	// Local variables
 	struct k_event* event_p;
-	
+
 	// Get event handle
 	AlxOsMutex_Lock(&me->alxMutex);
 	event_p = &me->event;
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// Get current state before clearing
 	eventBits = k_event_test(event_p, UINT32_MAX) & eventFlagsToClear;
-	
+
 	// Clear event flags
 	k_event_clear(event_p, eventFlagsToClear);
 	#endif
@@ -283,24 +283,24 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	#if defined(ALX_ZEPHYR)
 	// Local variables
 	struct k_event* event_p;
-	
+
 	// Convert timeout
 	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
-	
+
 	// Get event handle
 	AlxOsMutex_Lock(&me->alxMutex);
 	event_p = &me->event;
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
-	// Wait for ANY vs ALL. 
+
+	// Wait for ANY vs ALL.
 	// Zephyr's wait functions do not do atomic clear-on-exit, so we handle that manually.
-	// Multi-consumer note: this post-return clear is not atomic with the wake. 
+	// Multi-consumer note: this post-return clear is not atomic with the wake.
 	// If multiple threads wait on the same bits, one can clear while another is waking,
 	// causing missed events.
 	uint32_t got = waitForAllEventFlags
 		? k_event_wait_all(event_p, eventFlagsToWait, false, timeout)
 		: k_event_wait    (event_p, eventFlagsToWait, false, timeout);
-	
+
 	uint32_t matched = got & eventFlagsToWait;
 	if (clearEventFlagsOnExit && matched) {
 		// Clear the event flags if requested and if matched
@@ -310,7 +310,7 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	}
 
 	// Mask to requested bits (Zephyr may return superset)
-	eventBits = got & eventFlagsToWait;	
+	eventBits = got & eventFlagsToWait;
 	#endif
 
 	// Return
@@ -363,18 +363,18 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	#if defined(ALX_ZEPHYR)
 	// Local variables
 	struct k_event* event_p;
-	
+
 	// Convert timeout
 	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
-	
+
 	// Get event handle
 	AlxOsMutex_Lock(&me->alxMutex);
 	event_p = &me->event;
 	AlxOsMutex_Unlock(&me->alxMutex);
-	
+
 	// Set our flags
 	k_event_post(event_p, eventFlagsToSet);
-	
+
 	// Wait for all flags to be set (sync means wait for ALL)
 	eventBits = k_event_wait_all(event_p, eventFlagsToWait, false, timeout) & eventFlagsToWait;
 	if (eventBits == eventFlagsToWait) {
