@@ -67,11 +67,11 @@ void AlxOsEventFlagGroup_Ctor
 	// Variables
 	#if defined(ALX_FREE_RTOS)
 	me->eventGroupHandle_t = xEventGroupCreate();	// TV: EventGroup is created once and won't be deleted during a program
+	AlxOsMutex_Ctor(&me->alxOsMutex);
 	#endif
 	#if defined(ALX_ZEPHYR)
 	k_event_init(&me->event);
 	#endif
-	AlxOsMutex_Ctor(&me->alxMutex);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -86,87 +86,52 @@ void AlxOsEventFlagGroup_Ctor
   * @brief
   * @param[in,out]	me
   * @param[in]		eventFlagsToSet
+  * @param[in]		irqSafe
   * @return
   */
-uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet)
-{
-	// Lock mutex
-	AlxOsMutex_Lock(&me->alxMutex);
-
-	// Assert
-	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
-
-	// Unlock mutex
-	AlxOsMutex_Unlock(&me->alxMutex);
-
-	// Local variables
-	uint32_t eventBits = 0;
-
-	#if defined(ALX_FREE_RTOS)
-	// Local variables
-	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
-	EventBits_t eventBits_t = 0;
-
-	// Set
-	eventBits_t = xEventGroupSetBits(eventGroupHandle_t, eventFlagsToSet);
-
-	// Set me->eventGroupHandle_t
-	AlxOsMutex_Lock(&me->alxMutex);
-	me->eventGroupHandle_t = eventGroupHandle_t;
-	AlxOsMutex_Unlock(&me->alxMutex);
-
-	// Return
-	eventBits = eventBits_t;
-	#endif
-
-	#if defined(ALX_ZEPHYR)
-	// Local variables
-	struct k_event* event_p;
-
-	// Get event handle
-	AlxOsMutex_Lock(&me->alxMutex);
-	event_p = &me->event;
-	AlxOsMutex_Unlock(&me->alxMutex);
-
-	// Set event flags
-	k_event_post(event_p, eventFlagsToSet);
-
-	// Get current event state
-	eventBits = k_event_test(event_p, UINT32_MAX) & eventFlagsToSet;
-	#endif
-
-	// Return
-	return eventBits;
-}
-
-/**
-  * @brief ISR-safe version of AlxOsEventFlagGroup_Set (no mutex protection)
-  * @param[in,out]	me
-  * @param[in]		eventFlagsToSet
-  */
-void AlxOsEventFlagGroup_Set_Unsafe(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet)
+void AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, bool irqSafe)
 {
 	//------------------------------------------------------------------------------
 	// ALX_FREE_RTOS
 	//------------------------------------------------------------------------------
-	#if defined(ALX_FREE_RTOS)	// TV: Implemented by AB, not tested
-
-	// Assert
-	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
-
-	// Local variables
-	uint32_t eventBits = 0;
-
-	// Always use ISR-safe version since this is the "unsafe" function meant for ISR context
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	BaseType_t result = xEventGroupSetBitsFromISR(me->eventGroupHandle_t, eventFlagsToSet, &xHigherPriorityTaskWoken);
-	if (result != pdFAIL)
+	#if defined(ALX_FREE_RTOS)
+	if (irqSafe)	// TV: Original TV implementation
 	{
-		// Yield if a higher priority task was woken
-		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+		// Lock
+		AlxOsMutex_Lock(&me->alxOsMutex);
+
+		// Assert
+		ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
+
+		// Local variables
+		EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
+		EventBits_t eventBits_t = 0;
+
+		// Unlock
+		AlxOsMutex_Unlock(&me->alxOsMutex);
+
+		// Set
+		eventBits_t = xEventGroupSetBits(eventGroupHandle_t, eventFlagsToSet);
+
+		// Set me->eventGroupHandle_t
+		AlxOsMutex_Lock(&me->alxOsMutex);
+		me->eventGroupHandle_t = eventGroupHandle_t;
+		AlxOsMutex_Unlock(&me->alxOsMutex);
 	}
-	// Note: xEventGroupSetBitsFromISR doesn't return current bits, so return what we set
-	eventBits = eventFlagsToSet;
+	else		// TV: AB implementation, updated by TV - Not tested
+	{
+		// Assert
+		ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
+
+		// Set
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+		BaseType_t result = xEventGroupSetBitsFromISR(me->eventGroupHandle_t, eventFlagsToSet, &xHigherPriorityTaskWoken);
+		if (result != pdFAIL)
+		{
+			// Yield if a higher priority task was woken
+			portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+		}
+	}
 	#endif
 
 
@@ -175,9 +140,13 @@ void AlxOsEventFlagGroup_Set_Unsafe(AlxOsEventFlagGroup* me, uint32_t eventFlags
 	//------------------------------------------------------------------------------
 	#if defined(ALX_ZEPHYR)
 
+	// Void
+	(void)irqSafe;
+
 	// Assert
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
+	// Set
 	k_event_post(&me->event, eventFlagsToSet);	// AB: Zephyr's k_event_post is inherently ISR-safe
 	#endif
 }
@@ -190,53 +159,57 @@ void AlxOsEventFlagGroup_Set_Unsafe(AlxOsEventFlagGroup* me, uint32_t eventFlags
   */
 uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsToClear)
 {
-	// Lock mutex
-	AlxOsMutex_Lock(&me->alxMutex);
+	//------------------------------------------------------------------------------
+	// ALX_FREE_RTOS
+	//------------------------------------------------------------------------------
+	#if defined(ALX_FREE_RTOS)	// TV: Original TV implementation
+
+	// Lock
+	AlxOsMutex_Lock(&me->alxOsMutex);
 
 	// Assert
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
-	// Unlock mutex
-	AlxOsMutex_Unlock(&me->alxMutex);
-
-	// Local variables
-	uint32_t eventBits = 0;
-
-	#if defined(ALX_FREE_RTOS)
 	// Local variables
 	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
 	EventBits_t eventBits_t = 0;
+
+	// Unlock
+	AlxOsMutex_Unlock(&me->alxOsMutex);
 
 	// Clear
 	eventBits_t = xEventGroupClearBits(eventGroupHandle_t, eventFlagsToClear);
 
 	// Set me->eventGroupHandle_t
-	AlxOsMutex_Lock(&me->alxMutex);
+	AlxOsMutex_Lock(&me->alxOsMutex);
 	me->eventGroupHandle_t = eventGroupHandle_t;
-	AlxOsMutex_Unlock(&me->alxMutex);
+	AlxOsMutex_Unlock(&me->alxOsMutex);
 
 	// Return
-	eventBits = eventBits_t;
+	return eventBits_t;
 	#endif
 
-	#if defined(ALX_ZEPHYR)
-	// Local variables
-	struct k_event* event_p;
 
-	// Get event handle
-	AlxOsMutex_Lock(&me->alxMutex);
-	event_p = &me->event;
-	AlxOsMutex_Unlock(&me->alxMutex);
+	//------------------------------------------------------------------------------
+	// ALX_ZEPHYR
+	//------------------------------------------------------------------------------
+	#if defined(ALX_ZEPHYR)	// TV: AB implementation, updated by TV - Not tested
+
+	// Assert
+	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
+
+	// Local variables
+	uint32_t eventBits = 0;
 
 	// Get current state before clearing
-	eventBits = k_event_test(event_p, UINT32_MAX) & eventFlagsToClear;
+	eventBits = k_event_test(&me->event, UINT32_MAX) & eventFlagsToClear;
 
 	// Clear event flags
-	k_event_clear(event_p, eventFlagsToClear);
-	#endif
+	k_event_clear(&me->event, eventFlagsToClear);
 
 	// Return
 	return eventBits;
+	#endif
 }
 
 /**
@@ -253,10 +226,10 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	//------------------------------------------------------------------------------
 	// ALX_FREE_RTOS
 	//------------------------------------------------------------------------------
-	#if defined(ALX_FREE_RTOS)	// TV: Original implementation
+	#if defined(ALX_FREE_RTOS)	// TV: Original TV implementation
 
-	// Lock mutex
-	AlxOsMutex_Lock(&me->alxMutex);
+	// Lock
+	AlxOsMutex_Lock(&me->alxOsMutex);
 
 	// Assert
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
@@ -269,16 +242,16 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	// Convert to timeout_osTick
 	timeout_osTick = AlxOsEventFlagGroup_GetTimeout_osTick(me, timeout_ms);
 
-	// Unlock mutex
-	AlxOsMutex_Unlock(&me->alxMutex);
+	// Unlock
+	AlxOsMutex_Unlock(&me->alxOsMutex);
 
 	// Wait
 	eventBits_t = xEventGroupWaitBits(eventGroupHandle_t, eventFlagsToWait, clearEventFlagsOnExit, waitForAllEventFlags, timeout_osTick);
 
 	// Set me->eventGroupHandle_t
-	AlxOsMutex_Lock(&me->alxMutex);
+	AlxOsMutex_Lock(&me->alxOsMutex);
 	me->eventGroupHandle_t = eventGroupHandle_t;
-	AlxOsMutex_Unlock(&me->alxMutex);
+	AlxOsMutex_Unlock(&me->alxOsMutex);
 
 	// Return
 	return eventBits_t;
@@ -288,7 +261,10 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	//------------------------------------------------------------------------------
 	// ALX_ZEPHYR
 	//------------------------------------------------------------------------------
-	#if defined(ALX_ZEPHYR)
+	#if defined(ALX_ZEPHYR)	// TV: AB implementation, updated by TV
+
+	// Assert
+	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
 	// Convert timeout
 	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
@@ -330,19 +306,17 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
   */
 uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, uint32_t eventFlagsToWait, uint32_t timeout_ms)
 {
-	// Lock mutex
-	AlxOsMutex_Lock(&me->alxMutex);
+	//------------------------------------------------------------------------------
+	// ALX_FREE_RTOS
+	//------------------------------------------------------------------------------
+	#if defined(ALX_FREE_RTOS)	// TV: Original TV implementation
+
+	// Lock
+	AlxOsMutex_Lock(&me->alxOsMutex);
 
 	// Assert
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
-	// Unlock mutex
-	AlxOsMutex_Unlock(&me->alxMutex);
-
-	// Local variables
-	uint32_t eventBits = 0;
-
-	#if defined(ALX_FREE_RTOS)
 	// Local variables
 	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
 	EventBits_t eventBits_t = 0;
@@ -351,45 +325,52 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	// Convert to timeout_osTick
 	timeout_osTick = AlxOsEventFlagGroup_GetTimeout_osTick(me, timeout_ms);
 
+	// Unlock
+	AlxOsMutex_Unlock(&me->alxOsMutex);
+
 	// Sync
 	eventBits_t = xEventGroupSync(eventGroupHandle_t, eventFlagsToSet, eventFlagsToWait, timeout_osTick);
 
 	// Set me->eventGroupHandle_t
-	AlxOsMutex_Lock(&me->alxMutex);
+	AlxOsMutex_Lock(&me->alxOsMutex);
 	me->eventGroupHandle_t = eventGroupHandle_t;
-	AlxOsMutex_Unlock(&me->alxMutex);
+	AlxOsMutex_Unlock(&me->alxOsMutex);
 
 	// Return
-	eventBits = eventBits_t;
+	return eventBits_t;
 	#endif
 
-	#if defined(ALX_ZEPHYR)
+
+	//------------------------------------------------------------------------------
+	// ALX_ZEPHYR
+	//------------------------------------------------------------------------------
+	#if defined(ALX_ZEPHYR)	// TV: AB implementation, updated by TV - Not tested
+
+	// Assert
+	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
+
 	// Local variables
-	struct k_event* event_p;
+	uint32_t eventBits = 0;
 
 	// Convert timeout
 	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
 
-	// Get event handle
-	AlxOsMutex_Lock(&me->alxMutex);
-	event_p = &me->event;
-	AlxOsMutex_Unlock(&me->alxMutex);
-
 	// Set our flags
-	k_event_post(event_p, eventFlagsToSet);
+	k_event_post(&me->event, eventFlagsToSet);
 
 	// Wait for all flags to be set (sync means wait for ALL)
-	eventBits = k_event_wait_all(event_p, eventFlagsToWait, false, timeout) & eventFlagsToWait;
-	if (eventBits == eventFlagsToWait) {
+	eventBits = k_event_wait_all(&me->event, eventFlagsToWait, false, timeout) & eventFlagsToWait;
+	if (eventBits == eventFlagsToWait)
+	{
 		/* Auto-clear barrier mask so next round starts clean
 		NOTE: This is NOT atomic with the wake; multiple threads may race to clear.
 			  In practice it's OK for a simple barrier if all bits belong to the same round. */
-		k_event_clear(event_p, eventFlagsToWait);
+		k_event_clear(&me->event, eventFlagsToWait);
 	}
-	#endif
 
 	// Return
 	return eventBits;
+	#endif
 }
 
 
