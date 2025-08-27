@@ -41,7 +41,7 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxIoPin_Irq_Callback_Zephry(const struct device* port, struct gpio_callback* cb, gpio_port_pins_t pins);
+static void AlxIoPin_Irq_Callback_Zephyr(const struct device* port, struct gpio_callback* cb, gpio_port_pins_t pins);
 
 
 //******************************************************************************
@@ -123,7 +123,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 		ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, me->irqFlags) == 0);
 
 		// Init IRQ Callback
-		gpio_init_callback(&me->irqStruct, AlxIoPin_Irq_Callback_Zephry, BIT(me->pin));
+		gpio_init_callback(&me->irqStruct, AlxIoPin_Irq_Callback_Zephyr, BIT(me->pin));
 
 		// Add IRQ Callback - Enables IRQ
 		ALX_IO_PIN_ASSERT(gpio_add_callback(me->device, &me->irqStruct) == 0);
@@ -461,7 +461,7 @@ bool AlxIoPin_Irq_IsEnabled(AlxIoPin* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static void AlxIoPin_Irq_Callback_Zephry(const struct device* port, struct gpio_callback* cb, gpio_port_pins_t pins)
+static void AlxIoPin_Irq_Callback_Zephyr(const struct device* port, struct gpio_callback* cb, gpio_port_pins_t pins)
 {
 	// Void
 	(void)port;

@@ -195,6 +195,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 #if defined(ALX_ZEPHYR)
 #include "zephyr/kernel.h"
+#include <zephyr/logging/log.h>
 #include "zephyr/drivers/gpio.h"
 #include "zephyr/drivers/i2c.h"
 #include "zephyr/drivers/adc.h"
@@ -357,7 +358,8 @@ typedef enum
 	AlxFs_EndOfDir,
 	AlxLogger_ErrNoReadLog,
 	AlxNet_Timeout,
-	AlxNet_NotSupported
+	AlxNet_NotSupported,
+	AlxNtp_NotEnoughSamples
 } Alx_Status;
 
 typedef enum
@@ -506,6 +508,7 @@ typedef enum
 void AlxGlobal_DisableIrq(void);
 void AlxGlobal_EnableIrq(void);
 void AlxGlobal_Ulltoa(uint64_t uint64, char* str);
+void AlxGlobal_Slltoa(int64_t int64, char* str);
 uint32_t AlxGlobal_Ntohl(uint32_t val);
 
 

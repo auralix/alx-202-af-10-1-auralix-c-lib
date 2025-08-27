@@ -67,10 +67,10 @@ void AlxFifo_Ctor
 	me->buffLen = buffLen;
 
 	// Variables
-	for (uint32_t i = 0; i < me->buffLen; i++) me->buff[i] = 0;
 	me->head = 0;
 	me->tail = 0;
 	me->numOfEntries = 0;
+	me->numOfEntriesSinceFlush = 0;
 	me->isFull = false;
 	me->isEmpty = true;
 
@@ -89,12 +89,14 @@ void AlxFifo_Ctor
   */
 void AlxFifo_Flush(AlxFifo* me)
 {
+	// Assert
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
 
-	for (uint32_t i = 0; i < me->buffLen; i++) me->buff[i] = 0;
+	// Clear
 	me->head = 0;
 	me->tail = 0;
 	me->numOfEntries = 0;
+	me->numOfEntriesSinceFlush = 0;
 	me->isFull = false;
 	me->isEmpty = true;
 }
@@ -110,16 +112,22 @@ void AlxFifo_Flush(AlxFifo* me)
   */
 Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len)
 {
+	// Assert
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-	ALX_FIFO_ASSERT((0 < len) && (len <= me->buffLen));
+	ALX_FIFO_ASSERT(0 < len && len <= me->buffLen);
 
+	// Read
 	Alx_Status status = Alx_Err;
 	for (uint32_t i = 0; i < len; i++)
 	{
 		status = AlxFifo_ReadByte(me, &data[i]);
-		if (status != Alx_Ok) return status;
+		if (status != Alx_Ok)
+		{
+			return status;
+		}
 	}
 
+	// Return
 	return status;
 }
 
@@ -137,26 +145,34 @@ Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len)
   */
 Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead)
 {
-	// #0 Assert
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-	//ALX_FIFO_ASSERT((delim != "") && (strlen(delim) <= me->buffLen)); // TV: Warning  comparison with string literal results in unspecified behavior
-	ALX_FIFO_ASSERT((0 < maxLen) && (maxLen <= me->buffLen));
-	(void)numRead;
+	ALX_FIFO_ASSERT(0 < maxLen && maxLen <= me->buffLen);
 
+
+	//------------------------------------------------------------------------------
+	// Read
+	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
-
-	// #1 Return if fifo empty
 	if (me->isEmpty == true)
 	{
 		status = AlxFifo_ErrEmpty;
-		if (numRead != NULL) { *numRead = 0; }
+		if (numRead != NULL)
+		{
+			*numRead = 0;
+		}
 	}
 	else
 	{
 		status = AlxFifo_ErrNoDelim;
-		if (numRead != NULL) { *numRead = 0; }
+		if (numRead != NULL)
+		{
+			*numRead = 0;
+		}
 
-		// #2 search for "delim" in _buff
+		// Search for "delim" in _buff
 		uint8_t* ptrDelim = NULL;
 		uint32_t countDelimChar = 0;
 		uint32_t numBytesRead = 0;
@@ -174,13 +190,13 @@ Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint3
 				}
 				countDelimChar++;
 
-				// #3 Checks if there is "delim" in FIFO and
+				// Checks if there is "delim" in FIFO
 				if ((strlen(delim) == countDelimChar) && (strlen(delim) <= me->numOfEntries))
 				{
 					numBytesRead = ptrDelim - AlxFifo_GetTailPtr(me);
 					uint8_t dummy = 0;
 
-					// #3.1 Handle ReadUntil
+					// Handle ReadUntil
 					if (numBytesRead < maxLen)
 					{
 						for (uint32_t k = 0; k < numBytesRead; k++)
@@ -189,7 +205,10 @@ Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint3
 						}
 						str[numBytesRead] = '\0';
 
-						if (numRead != NULL) { *numRead = numBytesRead; }
+						if (numRead != NULL)
+						{
+							*numRead = numBytesRead;
+						}
 					}
 					else
 					{
@@ -204,10 +223,13 @@ Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint3
 							AlxFifo_ReadByte(me, (uint8_t*)&str[m]);
 						}
 
-						if (numRead != NULL) { *numRead = maxLen; }
+						if (numRead != NULL)
+						{
+							*numRead = maxLen;
+						}
 					}
 
-					// #3.2 Delete "delim" from FIFO
+					// Delete "delim" from FIFO
 					for (uint32_t n = 0; n < strlen(delim); n++)
 					{
 						AlxFifo_ReadByte(me, &dummy);
@@ -221,23 +243,11 @@ Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint3
 		}
 	}
 
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
 	return status;
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		data
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  * @retval			AlxFifo_ErrFull
-  */
-Alx_Status AlxFifo_Write(AlxFifo* me, uint8_t data)
-{
-	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-	(void)data;
-
-	return AlxFifo_WriteMulti(me, &data, 1);
 }
 
 /**
@@ -249,18 +259,24 @@ Alx_Status AlxFifo_Write(AlxFifo* me, uint8_t data)
   * @retval			Alx_Err
   * @retval			AlxFifo_ErrFull
   */
-Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len)
+Alx_Status AlxFifo_Write(AlxFifo* me, const uint8_t* data, uint32_t len)
 {
+	// Assert
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-	ALX_FIFO_ASSERT((0 < len) && (len <= me->buffLen));
+	ALX_FIFO_ASSERT(0 < len && len <= me->buffLen);
 
+	// Write
 	Alx_Status status = Alx_Err;
 	for (uint32_t i = 0; i < len; i++)
 	{
 		status = AlxFifo_WriteByte(me, data[i]);
-		if (status != Alx_Ok) return status;
+		if (status != Alx_Ok)
+		{
+			return status;
+		}
 	}
 
+	// Return
 	return status;
 }
 
@@ -274,9 +290,11 @@ Alx_Status AlxFifo_WriteMulti(AlxFifo* me, const uint8_t* data, uint32_t len)
   */
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str)
 {
+	// Assert
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
 
-	return AlxFifo_WriteMulti(me, (uint8_t*)str, strlen(str));
+	// Return
+	return AlxFifo_Write(me, (uint8_t*)str, strlen(str));
 }
 
 /**
@@ -286,9 +304,67 @@ Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str)
   */
 uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me)
 {
+	// Assert
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
 
+	// Return
 	return me->numOfEntries;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		len
+  * @return			numOfEntriesRewinded
+  */
+uint32_t AlxFifo_Rewind(AlxFifo* me, uint32_t len)
+{
+	// Assert
+	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
+
+	// Check length
+	if (len == 0)
+	{
+		return 0;
+	}
+
+	// Bound numOfEntriesUnused
+	if (me->buffLen > me->numOfEntries)
+	{
+		uint32_t numOfEntriesUnused = me->buffLen - me->numOfEntries;
+		AlxBound_Uint32(&len, 1, numOfEntriesUnused);
+	}
+	else
+	{
+		return 0;
+	}
+
+	// Bound numOfEntriesRewindable
+	if (me->numOfEntriesSinceFlush > me->numOfEntries)
+	{
+		uint64_t numOfEntriesRewindable = me->numOfEntriesSinceFlush - me->numOfEntries;
+		uint64_t _len = len;
+		AlxBound_Uint64(&_len, 1, numOfEntriesRewindable);
+		len = (uint32_t)_len;
+	}
+	else
+	{
+		return 0;
+	}
+
+	// Handle rewind
+	me->tail = (me->tail + me->buffLen - len) % me->buffLen;	// Decrement tail, rewind if necessary
+	me->numOfEntries = me->numOfEntries + len;
+	me->isEmpty = false;										// Fifo not empty anymore
+
+	// Update isFull flag if needed
+	if (me->numOfEntries == me->buffLen)
+	{
+		me->isFull = true;
+	}
+
+	// Return
+	return len;
 }
 
 
@@ -297,72 +373,79 @@ uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me)
 //******************************************************************************
 static Alx_Status AlxFifo_ReadByte(AlxFifo* me, uint8_t* data)
 {
-	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
+	//------------------------------------------------------------------------------
+	// Read
+	//------------------------------------------------------------------------------
 
+	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// #1 Check if fifo empty
+	// Check if fifo empty
 	if(me->isEmpty)
 	{
 		status = AlxFifo_ErrEmpty;
 	}
 	else
 	{
-		// #2 Handle fifo read
+		// Handle fifo read
 		*data = me->buff[me->tail];
-		me->buff[me->tail] = 0;						// Set read byte to 0
 		me->tail = (me->tail + 1) % me->buffLen;	// Increment tail, rewind if necessary
 		me->numOfEntries--;
 		me->isFull = false;							// Fifo not full anymore
 
-		// #3 Update isEmpty flag if needed
-		if (me->numOfEntries <= 0)
+		// Update isEmpty flag if needed
+		if (me->numOfEntries == 0)
 		{
 			me->isEmpty = true;
 		}
 
+		// Set
 		status = Alx_Ok;
 	}
 
-	ALX_FIFO_ASSERT((0 <= me->head) && (me->head <= me->buffLen));
-	ALX_FIFO_ASSERT((0 <= me->tail) && (me->tail <= me->buffLen));
-	ALX_FIFO_ASSERT((0 <= me->numOfEntries) && (me->numOfEntries <= me->buffLen));
 
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
 	return status;
 }
 static Alx_Status AlxFifo_WriteByte(AlxFifo* me, uint8_t data)
 {
-	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-	(void)data;
+	//------------------------------------------------------------------------------
+	// Write
+	//------------------------------------------------------------------------------
 
+	// Local variables
 	Alx_Status status = Alx_Err;
 
-	// #1 Check if fifo full
+	// Check if fifo full
 	if(me->isFull)
 	{
 		status = AlxFifo_ErrFull;
 	}
 	else
 	{
-		// #2 Handle fifo write
+		// Handle fifo write
 		me->buff[me->head] = data;
 		me->head = (me->head + 1) % me->buffLen;	// Increment head, rewind if necessary
 		me->numOfEntries++;
+		me->numOfEntriesSinceFlush++;
 		me->isEmpty = false;						// Fifo not empty anymore
 
-		// #3 Update isFull flag if needed
-		if (me->numOfEntries >= me->buffLen)
+		// Update isFull flag if needed
+		if (me->numOfEntries == me->buffLen)
 		{
 			me->isFull = true;
 		}
 
+		// Set
 		status = Alx_Ok;
 	}
 
-	ALX_FIFO_ASSERT((0 <= me->head) && (me->head <= me->buffLen));
-	ALX_FIFO_ASSERT((0 <= me->tail) && (me->tail <= me->buffLen));
-	ALX_FIFO_ASSERT((0 <= me->numOfEntries) && (me->numOfEntries <= me->buffLen));
 
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
 	return status;
 }
 static uint8_t* AlxFifo_GetTailPtr(AlxFifo* me)

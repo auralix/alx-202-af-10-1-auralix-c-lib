@@ -54,7 +54,7 @@ extern "C" {
 typedef struct
 {
 	// Variables
-	volatile uint64_t tick_ns;
+	uint64_t tick_ns;
 
 	// Info
 	bool wasCtorCalled;
@@ -64,7 +64,7 @@ typedef struct
 //******************************************************************************
 // Variables
 //******************************************************************************
-extern volatile AlxTick alxTick;
+extern AlxTick alxTick;
 
 
 //******************************************************************************
@@ -72,32 +72,31 @@ extern volatile AlxTick alxTick;
 //******************************************************************************
 void AlxTick_Ctor
 (
-	volatile AlxTick* me
+	AlxTick* me
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-uint64_t AlxTick_Get_ns(volatile AlxTick* me);
-uint64_t AlxTick_Get_us(volatile AlxTick* me);
-uint64_t AlxTick_Get_ms(volatile AlxTick* me);
-uint64_t AlxTick_Get_sec(volatile AlxTick* me);
-uint64_t AlxTick_Get_min(volatile AlxTick* me);
-uint64_t AlxTick_Get_hr(volatile AlxTick* me);
-void AlxTick_Inc_ns(volatile AlxTick* me);
-void AlxTick_Inc_us(volatile AlxTick* me);
-void AlxTick_Inc_ms(volatile AlxTick* me);
-void AlxTick_Inc_sec(volatile AlxTick* me);
-void AlxTick_Inc_min(volatile AlxTick* me);
-void AlxTick_Inc_hr(volatile AlxTick* me);
-void AlxTick_IncRange_ns(volatile AlxTick* me, uint64_t ticks_ns);
-void AlxTick_IncRange_us(volatile AlxTick* me, uint64_t ticks_us);
-void AlxTick_IncRange_ms(volatile AlxTick* me, uint64_t ticks_ms);
-void AlxTick_IncRange_sec(volatile AlxTick* me, uint64_t ticks_sec);
-void AlxTick_IncRange_min(volatile AlxTick* me, uint64_t ticks_min);
-void AlxTick_IncRange_hr(volatile AlxTick* me, uint64_t ticks_hr);
-void AlxTick_Reset(volatile AlxTick* me);
+uint64_t AlxTick_Get_ns(AlxTick* me);
+uint64_t AlxTick_Get_us(AlxTick* me);
+uint64_t AlxTick_Get_ms(AlxTick* me);
+uint64_t AlxTick_Get_sec(AlxTick* me);
+uint64_t AlxTick_Get_min(AlxTick* me);
+uint64_t AlxTick_Get_hr(AlxTick* me);
+void AlxTick_Inc_ns(AlxTick* me);
+void AlxTick_Inc_us(AlxTick* me);
+void AlxTick_Inc_ms(AlxTick* me);
+void AlxTick_Inc_sec(AlxTick* me);
+void AlxTick_Inc_min(AlxTick* me);
+void AlxTick_Inc_hr(AlxTick* me);
+void AlxTick_IncRange_ns(AlxTick* me, uint64_t ticks_ns);
+void AlxTick_IncRange_us(AlxTick* me, uint64_t ticks_us);
+void AlxTick_IncRange_ms(AlxTick* me, uint64_t ticks_ms);
+void AlxTick_IncRange_sec(AlxTick* me, uint64_t ticks_sec);
+void AlxTick_IncRange_min(AlxTick* me, uint64_t ticks_min);
+void AlxTick_IncRange_hr(AlxTick* me, uint64_t ticks_hr);
 
 
 #endif	// #if defined(ALX_C_LIB)

@@ -500,7 +500,7 @@ Alx_Status AlxCan_TxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg)
 		uint8_t* ptr = (uint8_t*)&msg[i * msgLen];
 
 		AlxGlobal_DisableIrq();
-		status = AlxFifo_WriteMulti(&me->txFifo, ptr, msgLen);
+		status = AlxFifo_Write(&me->txFifo, ptr, msgLen);
 		AlxGlobal_EnableIrq();
 
 		if(status == AlxFifo_ErrFull)
@@ -790,7 +790,7 @@ static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me)
 
 		// Add RX message to ALX RX FIFO
 		Alx_Status alxStatus = Alx_Err;
-		alxStatus = AlxFifo_WriteMulti(&me->rxFifo, (uint8_t*)&alxRxMsg, sizeof(AlxCan_Msg));
+		alxStatus = AlxFifo_Write(&me->rxFifo, (uint8_t*)&alxRxMsg, sizeof(AlxCan_Msg));
 		if (alxStatus == AlxFifo_ErrFull)
 		{
 			// TV: TODO, decide if we will handle ALX RX FIFO overflow as error, or we will discard overflow data..
@@ -846,7 +846,7 @@ static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me)
 
 		// Add RX message to ALX RX FIFO
 		Alx_Status alxStatus = Alx_Err;
-		alxStatus = AlxFifo_WriteMulti(&me->rxFifo, (uint8_t*)&alxRxMsg, sizeof(AlxCan_Msg));
+		alxStatus = AlxFifo_Write(&me->rxFifo, (uint8_t*)&alxRxMsg, sizeof(AlxCan_Msg));
 		if (alxStatus == AlxFifo_ErrFull)
 		{
 			// TV: TODO, decide if we will handle ALX RX FIFO overflow as error, or we will discard overflow data..
