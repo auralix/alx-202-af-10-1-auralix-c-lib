@@ -52,7 +52,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles
 	char* dirPathBuffer,
 	uint32_t dirPathBufferSize,
 	char* filePathBuffer,
-	uint32_t filePathBuffseSize
+	uint32_t filePathBufferSize
 );
 static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me);
 static Alx_Status AlxLogger_SyncLogWriteFile
@@ -1418,7 +1418,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles
 	char* dirPathBuffer,
 	uint32_t dirPathBufferSize,
 	char* filePathBuffer,
-	uint32_t filePathBuffseSize
+	uint32_t filePathBufferSize
 )
 {
 	//------------------------------------------------------------------------------
@@ -1651,7 +1651,7 @@ static Alx_Status AlxLogger_SyncLogWriteFile
 		status = AlxFs_File_Read(me->alxFs, file, buffer, bufferSize, &readLenActual);
 		if ((status == Alx_Ok) && (readLenActual != 0))
 		{
-			for (uint32_t i = 0; i < readLenActual; i += logDelimSize)
+			for (uint32_t i = 0; i < readLenActual; i++)
 			{
 				if (!strncmp(&buffer[i], me->logDelim, logDelimSize))
 				{
@@ -1695,7 +1695,7 @@ static Alx_Status AlxLogger_SyncLogWriteFile
 		me->md.write.id += (logCount - me->md.write.log);
 	}
 
-	me->md.write.pos = lastDelimPos + 1;
+	me->md.write.pos = (logCount > 0) ? (lastDelimPos + 1) : (0);
 	me->md.write.log = logCount;
 
 	status = AlxFs_File_Truncate(me->alxFs, file, me->md.write.pos);
