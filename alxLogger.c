@@ -1636,6 +1636,12 @@ static Alx_Status AlxLogger_SyncLogWriteFile
 	uint32_t lastDelimPosTemp = 0;
 	uint32_t logDelimSize = strlen(me->logDelim);
 
+	if (logDelimSize >= bufferSize)
+	{
+		ALX_LOGGER_TRACE_WRN("Delimiter too large");
+		return Alx_Err;
+	}
+
 	// File is open when we get here, seek to beginning
 	Alx_Status status = AlxFs_File_Seek(me->alxFs, file, 0, AlxFs_File_Seek_Origin_Set, &positionNew);
 	if (status != Alx_Ok)
@@ -1651,7 +1657,7 @@ static Alx_Status AlxLogger_SyncLogWriteFile
 		status = AlxFs_File_Read(me->alxFs, file, buffer, bufferSize, &readLenActual);
 		if ((status == Alx_Ok) && (readLenActual != 0))
 		{
-			for (uint32_t i = 0; i < readLenActual; i++)
+			for (uint32_t i = 0; i < readLenActual - logDelimSize + 1; i++)
 			{
 				if (!strncmp(&buffer[i], me->logDelim, logDelimSize))
 				{
@@ -1669,9 +1675,20 @@ static Alx_Status AlxLogger_SyncLogWriteFile
 				}
 			}
 			offset += readLenActual;
-			if (offset > maxReadLen)
+			if (offset >= maxReadLen)
 			{
 				break;
+			}
+			if ((logDelimSize > 1) && (lastDelimPos != offset - 1))
+			{
+				// Incomplete log at the end of buffer, ensure a delimiter is not missed
+				offset -= logDelimSize - 1;
+				status = AlxFs_File_Seek(me->alxFs, file, -(logDelimSize - 1), AlxFs_File_Seek_Origin_Cur, &positionNew);
+				if (status != Alx_Ok)
+				{
+					ALX_LOGGER_TRACE_WRN("Sync: seek failed (err: %d, offset=%d, positionNew=%u)", status, 0, positionNew);
+					return Alx_Err;
+				}
 			}
 		}
 		else if ((status == Alx_Ok) && (readLenActual == 0))
@@ -1755,6 +1772,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 
 	while (true)
 	{
+		bool syncNeeded = false;
 		uint32_t fileSize = 0;
 		status = AlxFs_File_Size(me->alxFs, &file, &fileSize);
 		if (status != Alx_Ok)
@@ -1762,19 +1780,21 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 			ALX_LOGGER_TRACE_INF("Failed to get file size (%u)", status);
 			break;
 		}
+
 		ALX_LOGGER_TRACE_INF("File size: %u, write.pos: %u", fileSize, me->md.write.pos);
 		if (fileSize > me->md.write.pos)
 		{
 			ALX_LOGGER_TRACE_INF("File size is larger than indicated in metadata, synchronizing...");
-			status = AlxLogger_SyncLogWriteFile(me, &file, MIN(fileSize, me->md.write.pos), logBuffer, logBufferSize);
-			if (status != Alx_Ok)
-			{
-				break;
-			}
+			syncNeeded = true;
 		}
 		else if (fileSize < me->md.write.pos)
 		{
 			ALX_LOGGER_TRACE_WRN("File size is smaller than indicated in metadata, synchronizing...");
+			syncNeeded = true;
+		}
+
+		if (syncNeeded)
+		{
 			status = AlxLogger_SyncLogWriteFile(me, &file, MIN(fileSize, me->md.write.pos), logBuffer, logBufferSize);
 			if (status != Alx_Ok)
 			{
