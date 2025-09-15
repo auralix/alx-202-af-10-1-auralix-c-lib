@@ -39,9 +39,6 @@
 		static const unsigned char app_trailer[0x0028] __attribute__((section(".app_trailer"), used)) = {0xDE, 0xAD, 0xBE, 0xEF};
 	#endif
 #endif
-#if defined(ALX_MBEDTLS)
-#include "mbedtls/sha256.h"
-#endif
 
 
 //******************************************************************************
@@ -54,8 +51,6 @@
 // Private Variables
 //******************************************************************************
 #if defined(ALX_BOOT_B)
-#include "image.h"
-
 static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 {
 	.magicNum = ALX_ID_BOOT_ID_MAGIC_NUM,
@@ -86,26 +81,8 @@ static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 	},
 	.crc = 0			// For future use
 };
-
-static int check_primary_slot_sha256(void)
-{
-	uint8_t calc_sha256[32];
-	struct image_header *hdr = (struct image_header *)ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET;
-	if (hdr->ih_magic != IMAGE_MAGIC) {
-		return -1;
-	}
-	uint32_t len = hdr->ih_hdr_size + hdr->ih_img_size;
-	if (len > ALX_MCU_BOOT_IMAGE_SIZE)
-	{
-		return -1;
-	}
-	mbedtls_sha256((uint8_t *)ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET, len, calc_sha256, 0);
-	// image is followed by image_tlv_info and image_tlv structures; then SHA256 follows
-	return memcmp(calc_sha256,
-		(uint8_t *)(ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET + len + sizeof(struct image_tlv_info) + sizeof(struct image_tlv)),
-		32);
-}
 #endif
+
 
 //******************************************************************************
 // Constructor
@@ -163,14 +140,7 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 		ALX_BOOT_TRACE_WRN("Err");
 		return Alx_Err;
 	}
-#ifndef MCUBOOT_VALIDATE_PRIMARY_SLOT
-	// since we don't validate primary slot we check image integrity here
-	if (check_primary_slot_sha256() != 0)
-	{
-		ALX_BOOT_TRACE_WRN("Err");
-		return Alx_Err;
-	}
-#endif
+
 	// Check FLASH_DEVICE_ID
 	if (me->rsp.br_flash_dev_id != ALX_MCU_BOOT_FLASH_DEVICE_ID)
 	{
@@ -264,10 +234,6 @@ void AlxBoot_Jump(AlxBoot* me)
 
 	// Jump to app's reset handler
 	((void(*)(void))me->addrJmp)();	// Cast jump address to function pointer & then execute it - Compiler automatically handles, that the real jump address is odd number, so it automatically adds +1 to addrJmp, this is needed for all ARM Cortex-M series processor (for THUMB instruction execution)
-	while (1)
-	{
-		// will never get here
-	}
 }
 #endif
 

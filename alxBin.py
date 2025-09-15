@@ -122,35 +122,25 @@ def Script(vsTargetPath, fwName, copyFwUpNoBoot2Enable, binRawBinSignedManifestG
 		# Set fwUpSrc & noBoot2Src source variables
 		fwUpSrcDir = binSrcDir.parent / 'FwUp' / binDstDirName
 		noBoot2SrcDir = binSrcDir.parent / 'NoBoot2' / binDstDirName
-		fwUpBinUnsignedSrcName = binDstDirName + '_Unsigned.bin'
 		fwUpBinSignedSrcName = binDstDirName + '_Signed.bin'
 		fwUpManifestSrcName = binDstDirName + '_Manifest.json'
-		fwUpHexCombinedSrcName = binDstDirName + '_Unsigned_BL.hex'
 		noBoot2BinSrcName = binDstDirName + '_NoBoot.bin'
-		fwUpBinUnsignedSrcPath = fwUpSrcDir / fwUpBinUnsignedSrcName
 		fwUpBinSignedSrcPath = fwUpSrcDir / fwUpBinSignedSrcName
 		fwUpManifestSrcPath = fwUpSrcDir / fwUpManifestSrcName
-		fwUpHexCombinedSrcPath = fwUpSrcDir / fwUpHexCombinedSrcName
 		noBoot2BinSrcPath = noBoot2SrcDir / noBoot2BinSrcName
 
 		# Copy fwUpSrc & noBoot2Src to binDst directory
-		shutil.copy2(fwUpBinUnsignedSrcPath, binDstDir)
 		shutil.copy2(fwUpBinSignedSrcPath, binDstDir)
 		shutil.copy2(fwUpManifestSrcPath, binDstDir)
-		shutil.copy2(fwUpHexCombinedSrcPath, binDstDir)
 		shutil.copy2(noBoot2BinSrcPath, binDstDir)
 
 		# Copy fwUpSrc & noBoot2Src to binDstArtf directory
-		shutil.copy2(fwUpBinUnsignedSrcPath, binDstArtfDir)
 		shutil.copy2(fwUpBinSignedSrcPath, binDstArtfDir)
 		shutil.copy2(fwUpManifestSrcPath, binDstArtfDir)
-		shutil.copy2(fwUpHexCombinedSrcPath, binDstArtfDir)
 		shutil.copy2(noBoot2BinSrcPath, binDstArtfDir)
 
 		# Print
-		print("Added: " + fwUpBinUnsignedSrcName)
 		print("Added: " + fwUpBinSignedSrcName)
-		print("Added: " + fwUpHexCombinedSrcName)
 		print("Added: " + fwUpManifestSrcName)
 		print("Added: " + noBoot2BinSrcName)
 		print("DONE: Copy FwUp & NoBoot2 Files to .bin Destination Directory")
@@ -165,31 +155,23 @@ def Script(vsTargetPath, fwName, copyFwUpNoBoot2Enable, binRawBinSignedManifestG
 
 		# Set source variables
 		binRawSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Raw' + binSrcPath.suffix)
-		binUnsignedSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Unsigned' + binSrcPath.suffix)
 		binSignedSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Signed' + binSrcPath.suffix)
 		manifestSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Manifest.json')
-		hexCombinedSrcPath = binSrcPath.with_name(binSrcPath.stem + '_Unsigned_BL.hex')
 
 		# Set destination variables
 		binRawDstName = binDstDirName + "_Raw.bin"
-		binUnsignedDstName = binDstDirName + "_Unsigned.bin"
 		binSignedDstName = binDstDirName + "_Signed.bin"
 		manifestDstName = binDstDirName + "_Manifest.json"
-		hexCombinedDstName = binDstDirName + "_Unsigned_BL.hex"
 
 		# Copy source files to binDst directory & rename it
 		shutil.copy2(binRawSrcPath, binDstDir / binRawDstName)
-		shutil.copy2(binUnsignedSrcPath, binDstDir / binUnsignedDstName)
 		shutil.copy2(binSignedSrcPath, binDstDir / binSignedDstName)
 		shutil.copy2(manifestSrcPath, binDstDir / manifestDstName)
-		shutil.copy2(hexCombinedSrcPath, binDstDir / hexCombinedDstName)
 
 		# Print
 		print("Generated: " + binRawDstName)
-		print("Generated: " + binUnsignedDstName)
 		print("Generated: " + binSignedDstName)
 		print("Generated: " + manifestDstName)
-		print("Generated: " + hexCombinedDstName)
 		print("DONE: Generate _Raw.bin & _Signed.bin & _Manifest.json")
 
 
