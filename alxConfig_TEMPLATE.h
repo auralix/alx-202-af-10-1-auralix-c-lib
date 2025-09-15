@@ -74,7 +74,7 @@ extern "C" {
 //#define ALX_MCU_BOOT_IMAGE_SIZE (896*1024) // 896kB - 917504, 0x000E0000
 //#define ALX_MCU_BOOT_BOOTLOADER_OFFSET (0x08000000)
 //#define ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET (0x08020000)
-//#define ALX_MCU_BOOT_IMAGE_SECONDARY_OFFSET (0x08120000))
+//#define ALX_MCU_BOOT_IMAGE_SECONDARY_OFFSET (0x08120000)
 
 
 //------------------------------------------------------------------------------
