@@ -68,11 +68,7 @@
 //******************************************************************************
 // Private Defines
 //******************************************************************************
-#if defined(ALX_STM32F4)
-#define HAL_FLASH_PROGRAM_TYPE FLASH_TYPEPROGRAM_WORD
-#define HAL_FLASH_PROGRAM_LEN 4
-#endif
-#if defined(ALX_STM32F7)
+#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 #define HAL_FLASH_PROGRAM_TYPE FLASH_TYPEPROGRAM_WORD
 #define HAL_FLASH_PROGRAM_LEN 4
 #endif
@@ -379,7 +375,7 @@ static uint32_t Flash_GetBankNum(uint32_t addr)
 	uint32_t bankNum = 0;
 
 	// Prepare
-	#if defined(ALX_STM32F4) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
 	if ((0x08000000 <= addr) && (addr < 0x08100000))
 	{
 		bankNum = 1;
@@ -403,7 +399,7 @@ static uint32_t Flash_GetSectorNum(uint32_t addr)
 	uint32_t sectorNum = 0;
 
 	// Prepare
-	#if defined(ALX_STM32F4)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 	if ((0x08000000 <= addr) && (addr < 0x08010000))
 	{
 		//sectorNum = 0 + (addr - 0x08000000) / 0x4000;		// Sector 0..3 - 16kB
@@ -493,6 +489,18 @@ static bool Flash_Write(uint32_t addr, const void* src, uint32_t len)
 		FLASH_FLAG_BSY
 	);
 	#endif
+	#if defined(ALX_STM32F7)
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_PGPERR |
+		FLASH_FLAG_ERSERR |
+		FLASH_FLAG_BSY
+	);
+	#endif
 	#if defined(ALX_STM32L4)
 	__HAL_FLASH_CLEAR_FLAG
 	(
@@ -578,6 +586,18 @@ static bool Flash_Erase(uint32_t addr, uint32_t len)
 		FLASH_FLAG_BSY
 	);
 	#endif
+	#if defined(ALX_STM32F7)
+	__HAL_FLASH_CLEAR_FLAG
+	(
+		FLASH_FLAG_EOP |
+		FLASH_FLAG_OPERR |
+		FLASH_FLAG_WRPERR |
+		FLASH_FLAG_PGAERR |
+		FLASH_FLAG_PGPERR |
+		FLASH_FLAG_ERSERR |
+		FLASH_FLAG_BSY
+	);
+	#endif
 	#if defined(ALX_STM32L4)
 	__HAL_FLASH_CLEAR_FLAG
 	(
@@ -614,7 +634,7 @@ static bool Flash_Erase(uint32_t addr, uint32_t len)
 	uint32_t numOfSectorsToErase = sectorNumLast - sectorNumFirst + 1;
 	FLASH_EraseInitTypeDef eraseInitStruct = {};
 	uint32_t sectorError = 0;
-	#if defined(ALX_STM32F4)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 	eraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
 	eraseInitStruct.Banks = bankNum;
 	eraseInitStruct.Sector = sectorNumFirst;
