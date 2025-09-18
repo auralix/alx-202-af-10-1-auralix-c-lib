@@ -65,6 +65,13 @@ void AlxMux_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me		Context
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxMux_Init(AlxMux* me)
 {
 	// Assert
@@ -84,6 +91,13 @@ Alx_Status AlxMux_Init(AlxMux* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief
+  * @param[in,out]	me		Context
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxMux_DeInit(AlxMux* me)
 {
 	// Assert
@@ -103,6 +117,15 @@ Alx_Status AlxMux_DeInit(AlxMux* me)
 	// Return
 	return Alx_Ok;
 }
+
+/**
+  * @brief					DeInit only select pins, keep enable (me->do_nEN ) pin initialized,
+  *							used when there is multiple Muxes,
+  *							which uses different enable pin, but the same select pins.
+  * @param[in,out]	me		Context
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxMux_DeInit_Select(AlxMux* me)
 {
 	// Assert
@@ -118,6 +141,11 @@ Alx_Status AlxMux_DeInit_Select(AlxMux* me)
 	// Return
 	return Alx_Ok;
 }
+/**
+  * @brief
+  * @param[in,out]	me		Context
+  * @param[in]		enable	Enable Mux
+  */
 void AlxMux_Enable(AlxMux* me, bool enable)
 {
 	// Assert
@@ -127,6 +155,11 @@ void AlxMux_Enable(AlxMux* me, bool enable)
 	// Write GPIO
 	AlxIoPin_Write(me->do_nEN, enable);
 }
+/**
+  * @brief
+  * @param[in,out]	me		Context
+  * @param[in]		ch		Select Mux Channel
+  */
 void AlxMux_Select(AlxMux* me, Alx_Ch ch)
 {
 	// Assert
