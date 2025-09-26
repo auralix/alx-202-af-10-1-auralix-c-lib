@@ -50,7 +50,9 @@ static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLi
 // Weak Functions
 //******************************************************************************
 void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
+void AlxLin_Master_SubscribeErr_Callback(AlxLin* me, AlxLin_Status_Err lin_Status);
 void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
+void AlxLin_Slave_SubscribeErr_Callback(AlxLin* me, AlxLin_Status_Err lin_Status);
 void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame);
 void AlxLin_Slave_Subscribe_MasterReq_Callback(AlxLin* me, AlxLin_Frame frame, bool* slaveReqPending);
 void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* frame);
@@ -767,6 +769,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 			{
 				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %02X protectedId_Expected %02X", protectedId_Actual, protectedId_Expected);
 				me->rxb.active = false;
+				AlxLin_Master_SubscribeErr_Callback(me, AlxLinProtectedId_Err);
 				return;
 			}
 		}
@@ -782,6 +785,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 			{
 				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %02X protectedId_Expected %02X", protectedId_Actual, protectedId_Expected);
 				me->rxb.active = false;
+				AlxLin_Slave_SubscribeErr_Callback(me, AlxLinProtectedId_Err);
 				return;
 			}
 
@@ -821,6 +825,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				{
 					ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %02X", status, id_Actual);
 					me->rxb.active = false;
+					AlxLin_Slave_SubscribeErr_Callback(me, AlxLinFrameConfigFromId_Err);
 					return;
 				}
 
@@ -927,6 +932,14 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 		{
 			ALX_LIN_TRACE_DBG("FAIL: CheckChecksum() checksum_Actual %02X checksum_Expected %02X enhancedChecksumEnable %u", checksum_Actual, checksum_Expected, me->rxb.frame.enhancedChecksumEnable);
 			me->rxb.active = false;
+			if (me->isMaster)
+			{
+				AlxLin_Master_SubscribeErr_Callback(me, AlxLinChecksum_Err);
+			}
+			else
+			{
+				AlxLin_Slave_SubscribeErr_Callback(me, AlxLinChecksum_Err);
+			}
 			return;
 		}
 
@@ -1060,10 +1073,20 @@ ALX_WEAK void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
 	(void)me;
 	(void)frame;
 }
+ALX_WEAK void AlxLin_Master_SubscribeErr_Callback(AlxLin* me, AlxLin_Status_Err lin_Status)
+{
+	(void)me;
+	(void)lin_Status;
+}
 ALX_WEAK void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
 {
 	(void)me;
 	(void)frame;
+}
+ALX_WEAK void AlxLin_Slave_SubscribeErr_Callback(AlxLin* me, AlxLin_Status_Err lin_Status)
+{
+	(void)me;
+	(void)lin_Status;
 }
 ALX_WEAK void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame)
 {

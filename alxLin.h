@@ -147,6 +147,14 @@ typedef struct
 	bool isMaster;
 } AlxLin;
 
+typedef enum
+{
+	AlxLin_Status_Ok = 0,
+	AlxLinProtectedId_Err = 1,
+	AlxLinFrameConfigFromId_Err = 2,
+	AlxLinChecksum_Err  = 3
+} AlxLin_Status_Err;
+
 
 //******************************************************************************
 // Constructor
