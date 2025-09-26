@@ -825,7 +825,6 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				{
 					ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %02X", status, id_Actual);
 					me->rxb.active = false;
-					AlxLin_Slave_SubscribeErr_Callback(me, AlxLinFrameConfigFromId_Err);
 					return;
 				}
 

@@ -151,8 +151,7 @@ typedef enum
 {
 	AlxLin_Status_Ok = 0,
 	AlxLinProtectedId_Err = 1,
-	AlxLinFrameConfigFromId_Err = 2,
-	AlxLinChecksum_Err  = 3
+	AlxLinChecksum_Err  = 2
 } AlxLin_Status_Err;
 
 
