@@ -409,6 +409,7 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	if (protectedId_Actual != protectedId_Expected)
 	{
 		ALX_LIN_TRACE_WRN("FAIL: CheckProtectedId() protectedId_Actual %02X protectedId_Expected %02X", protectedId_Actual, protectedId_Expected);
+		AlxLin_Master_SubscribeErr_Callback(me, AlxLinProtectedId_Err);
 		return Alx_Err;
 	}
 
@@ -426,6 +427,7 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	if (checksum_Actual != checksum_Expected)
 	{
 		ALX_LIN_TRACE_WRN("FAIL: CheckChecksum() checksum_Actual %02X checksum_Expected %02X enhancedChecksumEnable %u", checksum_Actual, checksum_Expected, frame->enhancedChecksumEnable);
+		AlxLin_Master_SubscribeErr_Callback(me, AlxLinChecksum_Err);
 		return Alx_Err;
 	}
 
