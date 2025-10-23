@@ -176,8 +176,6 @@ Alx_Status AlxIna228_Init(AlxIna228* me)
 	// Set isInit
 	me->isInit = true;
 
-	// Delay
-	AlxDelay_ms(500);
 	AlxIna228_ReadRegAll(me);
 
 	// Return
