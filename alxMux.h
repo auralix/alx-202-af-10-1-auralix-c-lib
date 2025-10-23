@@ -111,6 +111,7 @@ void AlxMux_Ctor
 //******************************************************************************
 Alx_Status AlxMux_Init(AlxMux* me);
 Alx_Status AlxMux_DeInit(AlxMux* me);
+Alx_Status AlxMux_DeInit_Select(AlxMux* me);
 void AlxMux_Enable(AlxMux* me, bool enable);
 void AlxMux_Select(AlxMux* me, Alx_Ch ch);
 
