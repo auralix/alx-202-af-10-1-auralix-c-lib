@@ -1073,7 +1073,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 				"TICK_Task",
 				THREAD_STACK_SIZE_WORDS * 4,
 				(void *)me,
-				THREAD_PRIORITY);
+				THREAD_PRIORITY + 1);
 			AlxOsThread_Start(&tick_thread);
 
 			AlxOsMutex_Unlock(&me->alxMutex);

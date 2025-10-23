@@ -46,9 +46,31 @@
 // Setup
 //------------------------------------------------------------------------------
 static Alx_Status AlxLogger_Prepare(AlxLogger* me);
-static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me);
+static Alx_Status AlxLogger_CreateDirAndFiles
+(
+	AlxLogger* me,
+	char* dirPathBuffer,
+	uint32_t dirPathBufferSize,
+	char* filePathBuffer,
+	uint32_t filePathBufferSize
+);
 static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me);
-static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me);
+static Alx_Status AlxLogger_SyncLogWriteFile
+(
+	AlxLogger* me,
+	AlxFs_File *file,
+	uint32_t maxReadLen,
+	char* buffer,
+	uint32_t bufferSize
+);
+static Alx_Status AlxLogger_CheckRepairWriteFile
+(
+	AlxLogger* me,
+	char* logBuffer,
+	uint32_t logBufferSize,
+	char* pathBuffer,
+	uint32_t pathBufferSize
+);
 static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me);
 
 
@@ -530,6 +552,9 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 		}
 		else if (AlxLogger_Log_AreLogsAvailable(md.read.id, md.write.id) == false)
 		{
+			ALX_LOGGER_TRACE_WRN("No more logs available (read.id %u, write.id %u, logNum %u, numOfLogs %u)",
+				md.read.id, md.write.id, logNum, numOfLogs);
+
 			// Close
 			status = AlxFs_File_Close(me->alxFs, &file);
 			if (status != Alx_Ok)
@@ -1182,9 +1207,10 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	// Local Variables
 	//------------------------------------------------------------------------------
+	// Optimization to avoid called functions creating large buffers on stack
+	static char buffer[ALX_LOGGER_LOG_LEN_MAX] = "";
+	static char pathBuffer[ALX_LOGGER_PATH_LEN_MAX] = "";
 	Alx_Status status = Alx_Err;
-	char str[ALX_LOGGER_RESULT_STR_LEN_MAX] = "";
-
 
 	//------------------------------------------------------------------------------
 	// Try
@@ -1227,22 +1253,22 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_INF("- numOfFilesPerDir = %lu", me->md.numOfFilesPerDir);
 		ALX_LOGGER_TRACE_INF("- numOfLogsPerFile = %lu", me->md.numOfLogsPerFile);
 
-		AlxGlobal_Ulltoa(me->md.read.id, str);
-		ALX_LOGGER_TRACE_INF("- read.id = %s", str);
+		AlxGlobal_Ulltoa(me->md.read.id, buffer);
+		ALX_LOGGER_TRACE_INF("- read.id = %s", buffer);
 		ALX_LOGGER_TRACE_INF("- read.pos = %lu", me->md.read.pos);
 		ALX_LOGGER_TRACE_INF("- read.log = %lu", me->md.read.log);
 		ALX_LOGGER_TRACE_INF("- read.file = %lu", me->md.read.file);
 		ALX_LOGGER_TRACE_INF("- read.dir = %lu", me->md.read.dir);
 
-		AlxGlobal_Ulltoa(me->md.write.id, str);
-		ALX_LOGGER_TRACE_INF("- write.id = %s", str);
+		AlxGlobal_Ulltoa(me->md.write.id, buffer);
+		ALX_LOGGER_TRACE_INF("- write.id = %s", buffer);
 		ALX_LOGGER_TRACE_INF("- write.pos = %lu", me->md.write.pos);
 		ALX_LOGGER_TRACE_INF("- write.log = %lu", me->md.write.log);
 		ALX_LOGGER_TRACE_INF("- write.file = %lu", me->md.write.file);
 		ALX_LOGGER_TRACE_INF("- write.dir = %lu", me->md.write.dir);
 
-		AlxGlobal_Ulltoa(me->md.oldest.id, str);
-		ALX_LOGGER_TRACE_INF("- oldest.id = %s", str);
+		AlxGlobal_Ulltoa(me->md.oldest.id, buffer);
+		ALX_LOGGER_TRACE_INF("- oldest.id = %s", buffer);
 		ALX_LOGGER_TRACE_INF("- oldest.pos = %lu", me->md.oldest.pos);
 		ALX_LOGGER_TRACE_INF("- oldest.log = %lu", me->md.oldest.log);
 		ALX_LOGGER_TRACE_INF("- oldest.file = %lu", me->md.oldest.file);
@@ -1251,7 +1277,12 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_INF("- crc = 0x%04X", me->md.crc);
 
 		// Repair write file
-		status = AlxLogger_CheckRepairWriteFile(me);
+		status = AlxLogger_CheckRepairWriteFile(
+			me,
+			buffer,
+			ALX_ARR_LEN(buffer),
+			pathBuffer,
+			ALX_ARR_LEN(pathBuffer));
 		if (status != Alx_Ok)
 		{
 			ALX_LOGGER_TRACE_WRN("Err: %d", status);
@@ -1291,22 +1322,22 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_INF("- numOfFilesPerDir = %lu", me->md.numOfFilesPerDir);
 		ALX_LOGGER_TRACE_INF("- numOfLogsPerFile = %lu", me->md.numOfLogsPerFile);
 
-		AlxGlobal_Ulltoa(me->md.read.id, str);
-		ALX_LOGGER_TRACE_INF("- read.id = %s", str);
+		AlxGlobal_Ulltoa(me->md.read.id, buffer);
+		ALX_LOGGER_TRACE_INF("- read.id = %s", buffer);
 		ALX_LOGGER_TRACE_INF("- read.pos = %lu", me->md.read.pos);
 		ALX_LOGGER_TRACE_INF("- read.log = %lu", me->md.read.log);
 		ALX_LOGGER_TRACE_INF("- read.file = %lu", me->md.read.file);
 		ALX_LOGGER_TRACE_INF("- read.dir = %lu", me->md.read.dir);
 
-		AlxGlobal_Ulltoa(me->md.write.id, str);
-		ALX_LOGGER_TRACE_INF("- write.id = %s", str);
+		AlxGlobal_Ulltoa(me->md.write.id, buffer);
+		ALX_LOGGER_TRACE_INF("- write.id = %s", buffer);
 		ALX_LOGGER_TRACE_INF("- write.pos = %lu", me->md.write.pos);
 		ALX_LOGGER_TRACE_INF("- write.log = %lu", me->md.write.log);
 		ALX_LOGGER_TRACE_INF("- write.file = %lu", me->md.write.file);
 		ALX_LOGGER_TRACE_INF("- write.dir = %lu", me->md.write.dir);
 
-		AlxGlobal_Ulltoa(me->md.oldest.id, str);
-		ALX_LOGGER_TRACE_INF("- oldest.id = %s", str);
+		AlxGlobal_Ulltoa(me->md.oldest.id, buffer);
+		ALX_LOGGER_TRACE_INF("- oldest.id = %s", buffer);
 		ALX_LOGGER_TRACE_INF("- oldest.pos = %lu", me->md.oldest.pos);
 		ALX_LOGGER_TRACE_INF("- oldest.log = %lu", me->md.oldest.log);
 		ALX_LOGGER_TRACE_INF("- oldest.file = %lu", me->md.oldest.file);
@@ -1343,7 +1374,12 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 	}
 
 	// Create directories & files
-	status = AlxLogger_CreateDirAndFiles(me);
+	status = AlxLogger_CreateDirAndFiles(
+		me,
+		buffer,
+		ALX_ARR_LEN(buffer),
+		pathBuffer,
+		ALX_ARR_LEN(pathBuffer));
 	if (status != Alx_Ok)
 	{
 		ALX_LOGGER_TRACE_WRN("Err: %d", status);
@@ -1375,7 +1411,15 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 	// Return
 	return Alx_Ok;
 }
-static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
+
+static Alx_Status AlxLogger_CreateDirAndFiles
+(
+	AlxLogger* me,
+	char* dirPathBuffer,
+	uint32_t dirPathBufferSize,
+	char* filePathBuffer,
+	uint32_t filePathBufferSize
+)
 {
 	//------------------------------------------------------------------------------
 	// Local Variables
@@ -1383,8 +1427,6 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 	Alx_Status status = Alx_Err;
 	AlxFs_Dir dir = {};
 	AlxFs_File file = {};
-	char dirPath[ALX_LOGGER_PATH_LEN_MAX] = "";
-	char filePath[ALX_LOGGER_PATH_LEN_MAX] = "";
 	AlxTimSw alxTimSw_DirFilePrepSingle;
 	AlxTimSw alxTimSw_DirFilePrepAll;
 	AlxTimSw_Ctor(&alxTimSw_DirFilePrepSingle, false);
@@ -1411,19 +1453,19 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 		AlxTimSw_Start(&alxTimSw_DirFilePrepSingle);
 
 		// Make dir
-		sprintf(dirPath, "/%lu", me->numOfDirCreated);
-		status = AlxFs_Dir_Make(me->alxFs, dirPath);
+		sprintf(dirPathBuffer, "/%lu", me->numOfDirCreated);
+		status = AlxFs_Dir_Make(me->alxFs, dirPathBuffer);
 		if (status != Alx_Ok)
 		{
-			ALX_LOGGER_TRACE_WRN("Err: %d, dirPath=%s", status, dirPath);
+			ALX_LOGGER_TRACE_WRN("Err: %d, dirPath=%s", status, dirPathBuffer);
 			return status;
 		}
 
 		// Open dir
-		status = AlxFs_Dir_Open(me->alxFs, &dir, dirPath);
+		status = AlxFs_Dir_Open(me->alxFs, &dir, dirPathBuffer);
 		if (status != Alx_Ok)
 		{
-			ALX_LOGGER_TRACE_WRN("Err: %d, dirPath=%s", status, dirPath);
+			ALX_LOGGER_TRACE_WRN("Err: %d, dirPath=%s", status, dirPathBuffer);
 			return status;
 		}
 
@@ -1431,15 +1473,15 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 		for (me->numOfFilesPerDirCreated = 0; me->numOfFilesPerDirCreated < me->numOfFilesPerDir; me->numOfFilesPerDirCreated++)
 		{
 			// Open file
-			sprintf(filePath, "%s/%lu.csv", dirPath, me->numOfFilesPerDirCreated);
-			status = AlxFs_File_Open(me->alxFs, &file, filePath, "w");
+			sprintf(filePathBuffer, "%s/%lu.csv", dirPathBuffer, me->numOfFilesPerDirCreated);
+			status = AlxFs_File_Open(me->alxFs, &file, filePathBuffer, "w");
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_WRN("Err: %d, filePath=%s", status, filePath);
+				ALX_LOGGER_TRACE_WRN("Err: %d, filePath=%s", status, filePathBuffer);
 				Alx_Status statusClose = AlxFs_Dir_Close(me->alxFs, &dir);
 				if (statusClose != Alx_Ok)
 				{
-					ALX_LOGGER_TRACE_WRN("Err: %d, dirPath=%s", statusClose, dirPath);
+					ALX_LOGGER_TRACE_WRN("Err: %d, dirPath=%s", statusClose, dirPathBuffer);
 					// TV: TODO - Handle close error
 				}
 				return status;
@@ -1449,11 +1491,11 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 			status = AlxFs_File_Close(me->alxFs, &file);
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_WRN("Err: %d, filePath=%s", status, filePath);
+				ALX_LOGGER_TRACE_WRN("Err: %d, filePath=%s", status, filePathBuffer);
 				Alx_Status statusClose = AlxFs_Dir_Close(me->alxFs, &dir);
 				if (statusClose != Alx_Ok)
 				{
-					ALX_LOGGER_TRACE_WRN("Err: %d, dirPath=%s", statusClose, dirPath);
+					ALX_LOGGER_TRACE_WRN("Err: %d, dirPath=%s", statusClose, dirPathBuffer);
 					// TV: TODO - Handle close error
 				}
 				return status;
@@ -1464,14 +1506,14 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 		status = AlxFs_Dir_Close(me->alxFs, &dir);
 		if (status != Alx_Ok)
 		{
-			ALX_LOGGER_TRACE_WRN("Err: %d, dirPath=%s", status, dirPath);
+			ALX_LOGGER_TRACE_WRN("Err: %d, dirPath=%s", status, dirPathBuffer);
 			// TV: TODO - Handle close error
 			return status;
 		}
 
 		// Trace
 		dirFilePrepSingle_sec = AlxTimSw_Get_sec(&alxTimSw_DirFilePrepSingle);
-		ALX_LOGGER_TRACE_INF("Created dir '%s' with %lu files in %lu sec", dirPath, me->numOfFilesPerDir, dirFilePrepSingle_sec);
+		ALX_LOGGER_TRACE_INF("Created dir '%s' with %lu files in %lu sec", dirPathBuffer, me->numOfFilesPerDir, dirFilePrepSingle_sec);
 	}
 
 	// Trace
@@ -1485,6 +1527,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
+
 static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
 {
 	//------------------------------------------------------------------------------
@@ -1492,8 +1535,6 @@ static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	AlxFs_File file = {};
-	char path[ALX_LOGGER_PATH_LEN_MAX] = "";
-	char log[ALX_LOGGER_LOG_LEN_MAX] = "";
 	uint32_t positionNew = 0;
 	uint32_t readLenActual = 0;
 
@@ -1577,15 +1618,126 @@ static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
-static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
+
+static Alx_Status AlxLogger_SyncLogWriteFile
+(
+	AlxLogger* me,
+	AlxFs_File *file,
+	uint32_t maxReadLen,
+	char* buffer,
+	uint32_t bufferSize
+)
+{
+	uint32_t positionNew = 0;
+	uint32_t readLenActual = 0;
+	uint32_t offset = 0;
+	uint32_t logCount = 0;
+	uint32_t lastDelimPos = 0;
+	uint32_t lastDelimPosTemp = 0;
+	uint32_t logDelimSize = strlen(me->logDelim);
+
+	if (logDelimSize >= bufferSize)
+	{
+		ALX_LOGGER_TRACE_WRN("Delimiter too large");
+		return Alx_Err;
+	}
+
+	// File is open when we get here, seek to beginning
+	Alx_Status status = AlxFs_File_Seek(me->alxFs, file, 0, AlxFs_File_Seek_Origin_Set, &positionNew);
+	if (status != Alx_Ok)
+	{
+		ALX_LOGGER_TRACE_WRN("Sync: initial seek failed (err: %d, offset=%d, positionNew=%u)", status, 0, positionNew);
+		return Alx_Err;
+	}
+
+	status = Alx_Ok;
+	while (true)
+	{
+		// This would be more elegant with AlxFs_File_ReadStrUntil but much slower
+		status = AlxFs_File_Read(me->alxFs, file, buffer, bufferSize, &readLenActual);
+		if ((status == Alx_Ok) && (readLenActual != 0))
+		{
+			for (uint32_t i = 0; i < readLenActual - logDelimSize + 1; i++)
+			{
+				if (!strncmp(&buffer[i], me->logDelim, logDelimSize))
+				{
+					logCount++;
+					lastDelimPosTemp = offset + i + logDelimSize - 1;
+					if (lastDelimPosTemp >= maxReadLen)
+					{
+						logCount--;
+						break;
+					}
+					else
+					{
+						lastDelimPos = lastDelimPosTemp;
+					}
+				}
+			}
+			offset += readLenActual;
+			if (offset >= maxReadLen)
+			{
+				break;
+			}
+			if ((logDelimSize > 1) && (lastDelimPos != offset - 1))
+			{
+				// Incomplete log at the end of buffer, ensure a delimiter is not missed
+				offset -= logDelimSize - 1;
+				status = AlxFs_File_Seek(me->alxFs, file, -(logDelimSize - 1), AlxFs_File_Seek_Origin_Cur, &positionNew);
+				if (status != Alx_Ok)
+				{
+					ALX_LOGGER_TRACE_WRN("Sync: seek failed (err: %d, offset=%d, positionNew=%u)", status, 0, positionNew);
+					return Alx_Err;
+				}
+			}
+		}
+		else if ((status == Alx_Ok) && (readLenActual == 0))
+		{
+			break;
+		}
+		else
+		{
+			ALX_LOGGER_TRACE_WRN("Sync: read failed (err: %d, readLenActual: %u)", status, readLenActual);
+			break;
+		}
+	}
+
+	ALX_LOGGER_TRACE_INF("Sync: file read done (numLogs: %u, last delimiter position: %u)", logCount, lastDelimPos);
+	if (logCount < me->md.write.log)
+	{
+		me->md.write.id -= (me->md.write.log - logCount);
+	}
+	else
+	{
+		me->md.write.id += (logCount - me->md.write.log);
+	}
+
+	me->md.write.pos = (logCount > 0) ? (lastDelimPos + 1) : (0);
+	me->md.write.log = logCount;
+
+	status = AlxFs_File_Truncate(me->alxFs, file, me->md.write.pos);
+	if (status != Alx_Ok)
+	{
+		ALX_LOGGER_TRACE_INF("Sync: failed to truncate file (%u)", status);
+	}
+
+	return status;
+}
+
+static Alx_Status AlxLogger_CheckRepairWriteFile
+(
+	AlxLogger* me,
+	char* logBuffer,
+	uint32_t logBufferSize,
+	char* pathBuffer,
+	uint32_t pathBufferSize
+)
 {
 	//------------------------------------------------------------------------------
 	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	AlxFs_File file = {};
-	char path[ALX_LOGGER_PATH_LEN_MAX] = "";
-	char log[ALX_LOGGER_LOG_LEN_MAX] = "";
 	uint32_t positionNew = 0;
 	uint32_t readLenActual = 0;
 
@@ -1610,25 +1762,17 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 	//------------------------------------------------------------------------------
 
 	// Open
-	sprintf(path, "/%lu/%lu.csv", me->md.write.dir, me->md.write.file);
-	status = AlxFs_File_Open(me->alxFs, &file, path, "r+");
+	sprintf(pathBuffer, "/%lu/%lu.csv", me->md.write.dir, me->md.write.file);
+	status = AlxFs_File_Open(me->alxFs, &file, pathBuffer, "r+");
 	if (status != Alx_Ok)
 	{
-		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, pathBuffer);
 		return status;
 	}
 
 	while (true)
 	{
-		// Seek
-		status = AlxFs_File_Seek(me->alxFs, &file, me->md.write.pos, AlxFs_File_Seek_Origin_Set, &positionNew);
-		if (status != Alx_Ok)
-		{
-			ALX_LOGGER_TRACE_WRN("Seek before truncate failed (err: %d, path=%s, offset=%d, positionNew=%u)", status, path, me->md.write.pos, positionNew);
-			break;
-		}
-
-		// Truncate
+		bool syncNeeded = false;
 		uint32_t fileSize = 0;
 		status = AlxFs_File_Size(me->alxFs, &file, &fileSize);
 		if (status != Alx_Ok)
@@ -1636,45 +1780,25 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 			ALX_LOGGER_TRACE_INF("Failed to get file size (%u)", status);
 			break;
 		}
+
 		ALX_LOGGER_TRACE_INF("File size: %u, write.pos: %u", fileSize, me->md.write.pos);
 		if (fileSize > me->md.write.pos)
 		{
-			ALX_LOGGER_TRACE_INF("File size is larger than indicated in metadata, some data will be lost");
+			ALX_LOGGER_TRACE_INF("File size is larger than indicated in metadata, synchronizing...");
+			syncNeeded = true;
 		}
-		if (fileSize < me->md.write.pos)
+		else if (fileSize < me->md.write.pos)
 		{
-			ALX_LOGGER_TRACE_WRN("File size is smaller than indicated in metadata, this will likely lead to FS format");
-			status = Alx_Err;
-			break;
-		}
-
-		status = AlxFs_File_Truncate(me->alxFs, &file, me->md.write.pos);
-		if (status != Alx_Ok)
-		{
-			ALX_LOGGER_TRACE_INF("Failed to truncate file (%u)", status);
-			break;
+			ALX_LOGGER_TRACE_WRN("File size is smaller than indicated in metadata, synchronizing...");
+			syncNeeded = true;
 		}
 
-		// Verify we didn't cut a single entry
-		uint32_t delimSize = strlen(me->logDelim);
-		if (me->md.write.pos >= delimSize)
+		if (syncNeeded)
 		{
-			status = AlxFs_File_Seek(me->alxFs, &file, (-1) * delimSize, AlxFs_File_Seek_Origin_Cur, &positionNew);
+			status = AlxLogger_SyncLogWriteFile(me, &file, MIN(fileSize, me->md.write.pos), logBuffer, logBufferSize);
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_WRN("Seek after truncate failed (err: %d, path=%s, offset=%d, positionNew=%u)", status, path, me->md.write.pos, positionNew);
 				break;
-			}
-
-			status = AlxFs_File_Read(me->alxFs, &file, log, delimSize, &readLenActual);
-			if ((status != Alx_Ok) || (readLenActual != delimSize))
-			{
-				ALX_LOGGER_TRACE_WRN("Failed to read delimiter (err: %u, len: %u)", status, readLenActual);
-				break;
-			}
-			if (strcmp(me->logDelim, log))
-			{
-				ALX_LOGGER_TRACE_INF("Delimiter not found where expected, some data will be lost");
 			}
 		}
 
@@ -1685,7 +1809,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 	status = AlxFs_File_Close(me->alxFs, &file);
 	if (status != Alx_Ok)
 	{
-		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, pathBuffer);
 		// TV: TODO - Handle close error
 		return status;
 	}
