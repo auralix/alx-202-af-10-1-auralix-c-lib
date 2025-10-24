@@ -24,6 +24,18 @@
 #*****************************************************************************
 
 
+"""
+Auralix C Library - ALX Bootloader Script
+
+Signs and packages firmware binaries and emits boot metadata. Uses
+``alxBuild_GENERATED.h`` for versioning, extracts the application payload,
+signs with MCUboot ``imgtool.py``, writes a manifest, and generates
+``alxBootMetadata_GENERATED.h``.
+Intended for VisualGDB post-build steps
+or manual CLI use.
+"""
+
+
 #*******************************************************************************
 # Imports
 #*******************************************************************************
@@ -37,7 +49,37 @@ import hashlib
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
+def Script(vsTargetPath: str, imgSlotLenHexStr: str, bootLenHexStr: str) -> None:
+	"""Sign and package a VisualGDB firmware binary and emit boot metadata.
+
+	Reads ``alxBuild_GENERATED.h`` in the CWD, slices the application region
+	from ``<vsTargetPath>.bin`` (after the bootloader + ``0x0200`` header and
+	before the ``0x0028`` trailer), writes ``_Raw.bin``, signs to ``_Signed.bin``
+	with MCUboot, writes a manifest, and generates
+	``alxBootMetadata_GENERATED.h``.
+
+	Args:
+		vsTargetPath: Absolute path to the VisualGDB target; the source binary
+			is resolved as ``Path(vsTargetPath).with_suffix(".bin")``.
+		imgSlotLenHexStr: Image slot length as a hex string
+			(e.g., ``"0x00120000"``).
+		bootLenHexStr: Bootloader length as a hex string
+			(e.g., ``"0x00020000"``).
+
+	Returns:
+		None
+
+	Raises:
+		FileNotFoundError: If ``alxBuild_GENERATED.h`` or required binaries are missing.
+		ValueError: If ``imgSlotLenHexStr`` or ``bootLenHexStr`` are not valid hex.
+		OSError: On file I/O or subprocess errors.
+
+	Side Effects:
+		Creates ``_Raw.bin``, ``_Signed.bin``, ``_Manifest.json``, and
+		``alxBootMetadata_GENERATED.h``; invokes ``imgtool.py``; prints progress.
+	"""
+
+
 	#-------------------------------------------------------------------------------
 	# Print
 	#-------------------------------------------------------------------------------
