@@ -261,6 +261,9 @@ static const unsigned char boot[{bootHdrFileLenHexStr}] __attribute__((section("
 		bootHdrDstPath = binDstDir / bootHdrDstName
 		bootHdrDstPath.write_text(bootHdrText)
 
+		# Copy bootHdrDst to binDstArtf directory
+		shutil.copy2(bootHdrDstPath, binDstArtfDir)
+
 		# Print
 		print("Generated: " + bootHdrDstName)
 		print("DONE: Generate Bootloader Header File")
