@@ -31,8 +31,7 @@ Signs and packages firmware binaries and emits boot metadata. Uses
 ``alxBuild_GENERATED.h`` for versioning, extracts the application payload,
 signs with MCUboot ``imgtool.py``, writes a manifest, and generates
 ``alxBootMetadata_GENERATED.h``.
-Intended for VisualGDB post-build steps
-or manual CLI use.
+Intended for VisualGDB post-build steps or manual CLI use.
 """
 
 
