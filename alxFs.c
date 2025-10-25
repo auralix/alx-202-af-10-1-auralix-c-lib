@@ -1470,23 +1470,12 @@ static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me)
 	//------------------------------------------------------------------------------
 	// Parameters
 	//------------------------------------------------------------------------------
-	#if defined(ALX_STM32F4)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 	me->lfsAddr = 0x08100000;
 	me->lfsConfig.read_size = 1;
 	me->lfsConfig.prog_size = 4;
 	me->lfsConfig.block_size = 16 * 1024;
 	me->lfsConfig.block_count = 4;
-	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
-	me->lfsConfig.cache_size = 16;
-	me->lfsConfig.lookahead_size = 8;
-	#endif
-
-	#if defined(ALX_STM32F7)
-	me->lfsAddr = 0x08180000;
-	me->lfsConfig.read_size = 1;
-	me->lfsConfig.prog_size = 4;
-	me->lfsConfig.block_size = 256 * 1024;
-	me->lfsConfig.block_count = 2;
 	me->lfsConfig.block_cycles = -1;	// -1 means wear-leveling disabled
 	me->lfsConfig.cache_size = 16;
 	me->lfsConfig.lookahead_size = 8;
