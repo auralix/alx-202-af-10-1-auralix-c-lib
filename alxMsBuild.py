@@ -60,10 +60,9 @@ def Script(vsSolPath: str) -> None:
 
 	Side Effects:
 		Invokes external tools (``VsDevCmd.bat``, ``msbuild``) and prints build
-		output to stdout/stderr. Build artifacts are created in the solution’s
+		output to stdout/stderr. Build artifacts are created in the solution's
 		output directories per configuration.
 	"""
-
 
 	# Print
 	print("")
