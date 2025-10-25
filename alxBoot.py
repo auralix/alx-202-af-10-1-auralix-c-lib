@@ -100,6 +100,7 @@ def Script(vsTargetPath: str, imgSlotLenHexStr: str, bootLenHexStr: str) -> None
 
 	# Parse build file
 	date = inFileLines[5][23:]
+	_hash = inFileLines[7][24:64]
 	hashShort = inFileLines[8][30:37]
 	fwVerMajor = inFileLines[11][31:]
 	fwVerMinor = inFileLines[12][31:]
@@ -196,7 +197,7 @@ def Script(vsTargetPath: str, imgSlotLenHexStr: str, bootLenHexStr: str) -> None
 	binSignedData = binSignedPath.read_bytes()
 
 	# Prepare manifest file variables
-	manifestVer = int(date)
+	manifestVer = f"{fwVerMajor}.{fwVerMinor}.{fwVerPatch}.{date}.{_hash}"
 	manifestSize = len(binSignedData)
 	manifestHashObj = hashlib.sha256(binSignedData)
 	manifestHashStr = manifestHashObj.hexdigest().upper()
@@ -206,8 +207,7 @@ def Script(vsTargetPath: str, imgSlotLenHexStr: str, bootLenHexStr: str) -> None
 	manifestDict = {
 		"ver": manifestVer,
 		"size": manifestSize,
-		"hash": manifestHashStr,
-		"url": "/api/v1/NEMO/fw-update/get-bin"
+		"hash": manifestHashStr
 	}
 	manifestJsonObj = json.dumps(manifestDict, indent=4)
 
