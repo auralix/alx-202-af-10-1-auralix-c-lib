@@ -46,9 +46,24 @@ static AlxUsb* alxUsb_me = NULL;
 //*******************************************************************************
 // Private Functions
 //*******************************************************************************
-Alx_Status AlxUsb_Init_Private(AlxUsb* me);
-Alx_Status AlxUsb_DeInit_Private(AlxUsb* me);
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
 static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id);
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
+static Alx_Status AlxUsb_Reset(AlxUsb* me);
+static void AlxUsb_Periph_EnableClk(AlxUsb* me);
+static void AlxUsb_Periph_DisableClk(AlxUsb* me);
+static void AlxUsb_Periph_ForceReset(AlxUsb* me);
+static void AlxUsb_Periph_ReleaseReset(AlxUsb* me);
+static void AlxUsb_Periph_EnableIrq(AlxUsb* me);
+static void AlxUsb_Periph_DisableIrq(AlxUsb* me);
 
 
 //*******************************************************************************
@@ -56,17 +71,46 @@ static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id);
 //*******************************************************************************
 void AlxUsb_Ctor
 (
-	AlxUsb*	me
+	AlxUsb*	me,
+	HCD_TypeDef* usb,
+	AlxIoPin* io_USB_D_P,
+	AlxIoPin* io_USB_D_N,
+	Alx_IrqPriority irqPriority
 )
 {
 	// Private Variables
 	alxUsb_me = me;
 
+	// Parameters
+	me->usb = usb;
+	me->io_USB_D_P = io_USB_D_P;
+	me->io_USB_D_N = io_USB_D_N;
+	me->irqPriority = irqPriority;
+
 	// Variables
+	memset(&me->hhcd, 0, sizeof(me->hhcd));
+	me->hhcd.Instance = usb;
+	me->hhcd.Init.dev_endpoints = 0;	// TODO
+	me->hhcd.Init.Host_channels = 11;
+	me->hhcd.Init.dma_enable = 0;
+	me->hhcd.Init.speed = HCD_SPEED_FULL;
+	me->hhcd.Init.ep0_mps = 0;	// TODO
+	me->hhcd.Init.phy_itface = HCD_PHY_EMBEDDED;
+	me->hhcd.Init.Sof_enable = 0;
+	me->hhcd.Init.low_power_enable = 0;
+	me->hhcd.Init.lpm_enable = 0;
+	me->hhcd.Init.battery_charging_enable = 0;	// TODO
+	me->hhcd.Init.vbus_sensing_enable = 0;
+	me->hhcd.Init.use_dedicated_ep1 = 0;	// TODO
+	me->hhcd.Init.use_external_vbus = 0;	// TODO
 	memset(&me->usbh, 0, sizeof(me->usbh));
 	me->usbh_event = 0;
 	me->usbhMsc_isReady = false;
 	me->isReady = false;
+
+	// Link
+	me->hhcd.pData = &me->usbh;
+	me->usbh.pData = &me->hhcd;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -90,8 +134,51 @@ Alx_Status AlxUsb_Init(AlxUsb* me)
 	ALX_USB_ASSERT(me->wasCtorCalled == true);
 	ALX_USB_ASSERT(me->isInit == false);
 
+	// Local variables
+	USBH_StatusTypeDef status = USBH_FAIL;
+
+	// Init GPIO
+	AlxIoPin_Init(me->io_USB_D_P);
+	AlxIoPin_Init(me->io_USB_D_N);
+
+	// Release USB periphery reset
+	AlxUsb_Periph_ReleaseReset(me);
+
+	// Enable USB periphery clock
+	AlxUsb_Periph_EnableClk(me);
+
+	// Enable USB periphery IRQ
+	AlxUsb_Periph_EnableIrq(me);
+
+	// Init USB
+	status = USBH_Init(&me->usbh, AlxUsb_Event_Callback, 0);
+	if (status != USBH_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: USBH_Init() status %ld", status);
+		return Alx_Err;
+	}
+
+	// Register USB class
+	status = USBH_RegisterClass(&me->usbh, USBH_MSC_CLASS);
+	if (status != USBH_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: USBH_RegisterClass() status %ld", status);
+		return Alx_Err;
+	}
+
+	// Start USB
+	status = USBH_Start(&me->usbh);
+	if (status != USBH_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: USBH_Start() status %ld", status);
+		return Alx_Err;
+	}
+
+	// Set isInit
+	me->isInit = true;
+
 	// Return
-	return AlxUsb_Init_Private(me);
+	return Alx_Ok;
 }
 
 /**
@@ -106,8 +193,48 @@ Alx_Status AlxUsb_DeInit(AlxUsb* me)
 	ALX_USB_ASSERT(me->wasCtorCalled == true);
 	ALX_USB_ASSERT(me->isInit == true);
 
+	// Local variables
+	USBH_StatusTypeDef status = USBH_FAIL;
+
+	// Stop USB
+	status = USBH_Stop(&me->usbh);
+	if (status != USBH_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: USBH_Stop() status %ld", status);
+		return Alx_Err;
+	}
+
+	// DeInit USB
+	status = USBH_DeInit(&me->usbh);
+	if (status != USBH_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: USBH_DeInit() status %ld", status);
+		return Alx_Err;
+	}
+
+	// Disable USB periphery IRQ
+	AlxUsb_Periph_DisableIrq(me);
+
+	// Force USB periphery reset
+	AlxUsb_Periph_ForceReset(me);
+
+	// Disable USB periphery clock
+	AlxUsb_Periph_DisableClk(me);
+
+	// DeInit GPIO
+	AlxIoPin_DeInit(me->io_USB_D_P);
+	AlxIoPin_DeInit(me->io_USB_D_N);
+
+	// Clear
+	me->usbh_event = 0;
+	me->usbhMsc_isReady = false;
+	me->isReady = false;
+
+	// Clear isInit
+	me->isInit = false;
+
 	// Return
-	return AlxUsb_DeInit_Private(me);
+	return Alx_Ok;
 }
 
 /**
@@ -137,22 +264,11 @@ Alx_Status AlxUsb_Handle(AlxUsb* me)
 		// Trace
 		ALX_USB_TRACE_ERR("FAIL: AlxUsb_Handle() HOST_USER_UNRECOVERED_ERROR");
 
-		// Local variables
-		Alx_Status status = Alx_Err;
-
-		// DeInit
-		status = AlxUsb_DeInit_Private(me);
+		// Reset
+		Alx_Status status = AlxUsb_Reset(me);
 		if (status != Alx_Ok)
 		{
-			ALX_USB_TRACE_ERR("FAIL: AlxUsb_DeInit_Private() status %ld", status);
-			return Alx_Err;
-		}
-
-		// Init
-		status = AlxUsb_Init_Private(me);
-		if (status != Alx_Ok)
-		{
-			ALX_USB_TRACE_ERR("FAIL: AlxUsb_Init_Private() status %ld", status);
+			ALX_USB_TRACE_ERR("FAIL: AlxUsb_Reset() status %ld", status);
 			return Alx_Err;
 		}
 	}
@@ -258,16 +374,82 @@ Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len)
 	return Alx_Ok;
 }
 
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+void AlxUsb_Irq_Handle(AlxUsb* me)
+{
+	HAL_HCD_IRQHandler(&me->hhcd);
+}
+
 
 //*******************************************************************************
 // Private Functions
 //*******************************************************************************
-Alx_Status AlxUsb_Init_Private(AlxUsb* me)
+
+
+//------------------------------------------------------------------------------
+// Specific
+//------------------------------------------------------------------------------
+static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
+{
+	// Void
+	(void)phost;
+
+	// Set
+	alxUsb_me->usbh_event = id;
+
+	// Trace
+	ALX_USB_TRACE_INF("AlxUsb_Event_Callback(%lu)", id);
+}
+
+
+//------------------------------------------------------------------------------
+// General
+//------------------------------------------------------------------------------
+static Alx_Status AlxUsb_Reset(AlxUsb* me)
 {
 	// Local variables
 	USBH_StatusTypeDef status = USBH_FAIL;
 
-	// Init
+	// Stop USB
+	status = USBH_Stop(&me->usbh);
+	if (status != USBH_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: USBH_Stop() status %ld", status);
+		return Alx_Err;
+	}
+
+	// DeInit USB
+	status = USBH_DeInit(&me->usbh);
+	if (status != USBH_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: USBH_DeInit() status %ld", status);
+		return Alx_Err;
+	}
+
+	// Disable USB periphery IRQ
+	AlxUsb_Periph_DisableIrq(me);
+
+	// Force USB periphery reset
+	AlxUsb_Periph_ForceReset(me);
+
+	// Clear
+	me->usbh_event = 0;
+	me->usbhMsc_isReady = false;
+	me->isReady = false;
+
+	// Clear isInit
+	me->isInit = false;
+
+	// Release USB periphery reset
+	AlxUsb_Periph_ReleaseReset(me);
+
+	// Enable USB periphery IRQ
+	AlxUsb_Periph_EnableIrq(me);
+
+	// Init USB
 	status = USBH_Init(&me->usbh, AlxUsb_Event_Callback, 0);
 	if (status != USBH_OK)
 	{
@@ -275,7 +457,7 @@ Alx_Status AlxUsb_Init_Private(AlxUsb* me)
 		return Alx_Err;
 	}
 
-	// Register class
+	// Register USB class
 	status = USBH_RegisterClass(&me->usbh, USBH_MSC_CLASS);
 	if (status != USBH_OK)
 	{
@@ -283,7 +465,7 @@ Alx_Status AlxUsb_Init_Private(AlxUsb* me)
 		return Alx_Err;
 	}
 
-	// Start
+	// Start USB
 	status = USBH_Start(&me->usbh);
 	if (status != USBH_OK)
 	{
@@ -297,49 +479,305 @@ Alx_Status AlxUsb_Init_Private(AlxUsb* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxUsb_DeInit_Private(AlxUsb* me)
+static void AlxUsb_Periph_EnableClk(AlxUsb* me)
 {
-	// Local variables
-	USBH_StatusTypeDef status = USBH_FAIL;
+	#if defined(USB_OTG_FS)
+	if (me->hhcd.Instance == USB_OTG_FS)	{ __HAL_RCC_USB_OTG_FS_CLK_ENABLE(); return; }
+	#endif
+	#if defined(USB_OTG_HS)
+	if (me->hhcd.Instance == USB_OTG_HS)	{ __HAL_RCC_USB_OTG_HS_CLK_ENABLE(); return; }
+	#endif
 
-	// Stop
-	status = USBH_Stop(&me->usbh);
-	if (status != USBH_OK)
-	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_Stop() status %ld", status);
-		return Alx_Err;
-	}
-
-	// DeInit
-	status = USBH_DeInit(&me->usbh);
-	if (status != USBH_OK)
-	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_DeInit() status %ld", status);
-		return Alx_Err;
-	}
-
-	// Clear
-	memset(&me->usbh, 0, sizeof(me->usbh));
-	me->usbh_event = 0;
-	me->usbhMsc_isReady = false;
-	me->isReady = false;
-
-	// Clear isInit
-	me->isInit = false;
-
-	// Return
-	return Alx_Ok;
+	ALX_USB_ASSERT(false);	// We should never get here
 }
-static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
+static void AlxUsb_Periph_DisableClk(AlxUsb* me)
 {
-	// Void
-	(void)phost;
+	#if defined(USB_OTG_FS)
+	if (me->hhcd.Instance == USB_OTG_FS)	{ __HAL_RCC_USB_OTG_FS_CLK_DISABLE(); return; }
+	#endif
+	#if defined(USB_OTG_HS)
+	if (me->hhcd.Instance == USB_OTG_HS)	{ __HAL_RCC_USB_OTG_HS_CLK_DISABLE(); return; }
+	#endif
+
+	ALX_USB_ASSERT(false);	// We should never get here
+}
+static void AlxUsb_Periph_ForceReset(AlxUsb* me)
+{
+	#if defined(USB_OTG_FS)
+	if (me->hhcd.Instance == USB_OTG_FS)	{ __HAL_RCC_USB_OTG_FS_FORCE_RESET(); return; }
+	#endif
+	#if defined(USB_OTG_HS)
+	if (me->hhcd.Instance == USB_OTG_HS)	{ __HAL_RCC_USB_OTG_HS_FORCE_RESET(); return; }
+	#endif
+
+	ALX_USB_ASSERT(false);	// We should never get here
+}
+static void AlxUsb_Periph_ReleaseReset(AlxUsb* me)
+{
+	#if defined(USB_OTG_FS)
+	if (me->hhcd.Instance == USB_OTG_FS)	{ __HAL_RCC_USB_OTG_FS_RELEASE_RESET(); return; }
+	#endif
+	#if defined(USB_OTG_HS)
+	if (me->hhcd.Instance == USB_OTG_HS)	{ __HAL_RCC_USB_OTG_HS_RELEASE_RESET(); return; }
+	#endif
+
+	ALX_USB_ASSERT(false);	// We should never get here
+}
+static void AlxUsb_Periph_EnableIrq(AlxUsb* me)
+{
+	#ifdef USB_OTG_FS
+	if (me->hhcd.Instance == USB_OTG_FS)	{ HAL_NVIC_SetPriority(OTG_FS_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(OTG_FS_IRQn); return; }
+	#endif
+	#ifdef USB_OTG_HS
+	if (me->hhcd.Instance == USB_OTG_HS)	{ HAL_NVIC_SetPriority(OTG_HS_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(OTG_HS_IRQn); return; }
+	#endif
+
+	ALX_USB_ASSERT(false);	// We should never get here
+}
+static void AlxUsb_Periph_DisableIrq(AlxUsb* me)
+{
+	#ifdef USB_OTG_FS
+	if (me->hhcd.Instance == USB_OTG_FS)	{ HAL_NVIC_DisableIRQ(OTG_FS_IRQn); HAL_NVIC_ClearPendingIRQ(OTG_FS_IRQn); return; }
+	#endif
+	#ifdef USB_OTG_HS
+	if (me->hhcd.Instance == USB_OTG_HS)	{ HAL_NVIC_DisableIRQ(OTG_HS_IRQn); HAL_NVIC_ClearPendingIRQ(OTG_HS_IRQn); return; }
+	#endif
+
+	ALX_USB_ASSERT(false);	// We should never get here
+}
+
+
+//*******************************************************************************
+// USBH Functions Implementation - usbh_conf_template.c
+//*******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// HAL_HCD
+//------------------------------------------------------------------------------
+void HAL_HCD_SOF_Callback(HCD_HandleTypeDef* hhcd)
+{
+	USBH_LL_IncTimer(hhcd->pData);
+}
+void HAL_HCD_Connect_Callback(HCD_HandleTypeDef* hhcd)
+{
+	USBH_LL_Connect(hhcd->pData);	// Always return OK
+}
+void HAL_HCD_Disconnect_Callback(HCD_HandleTypeDef* hhcd)
+{
+	USBH_LL_Disconnect(hhcd->pData);	// Always return OK
+}
+void HAL_HCD_PortEnabled_Callback(HCD_HandleTypeDef* hhcd)
+{
+	USBH_LL_PortEnabled(hhcd->pData);
+}
+void HAL_HCD_PortDisabled_Callback(HCD_HandleTypeDef* hhcd)
+{
+	USBH_LL_PortDisabled(hhcd->pData);
+}
+
+
+//------------------------------------------------------------------------------
+// USBH_LL
+//------------------------------------------------------------------------------
+USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef* phost)
+{
+	// Context
+	HCD_HandleTypeDef* hhcd = (HCD_HandleTypeDef*)phost->pData;
+
+	// Init
+	HAL_StatusTypeDef status = HAL_HCD_Init(hhcd);
+	if (status != HAL_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_Init() status %ld", status);
+		return USBH_UNRECOVERED_ERROR;
+	}
 
 	// Set
-	alxUsb_me->usbh_event = id;
+	USBH_LL_SetTimer(phost, HAL_HCD_GetCurrentFrame(hhcd));
 
-	// Trace
-	ALX_USB_TRACE_INF("AlxUsb_Event_Callback(%lu)", id);
+	// Return
+	return USBH_OK;
+}
+USBH_StatusTypeDef USBH_LL_DeInit(USBH_HandleTypeDef* phost)
+{
+	// DeInit
+	HAL_StatusTypeDef status = HAL_HCD_DeInit(phost->pData);
+	if (status != HAL_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_DeInit() status %ld", status);
+		return USBH_UNRECOVERED_ERROR;
+	}
+
+	// Return
+	return USBH_OK;
+}
+USBH_StatusTypeDef USBH_LL_Start(USBH_HandleTypeDef* phost)
+{
+	// Start
+	HAL_StatusTypeDef status = HAL_HCD_Start(phost->pData);
+	if (status != HAL_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_Start() status %ld", status);
+		return USBH_UNRECOVERED_ERROR;
+	}
+
+	// Return
+	return USBH_OK;
+}
+USBH_StatusTypeDef USBH_LL_Stop(USBH_HandleTypeDef* phost)
+{
+	// Stop
+	HAL_StatusTypeDef status = HAL_HCD_Stop(phost->pData);
+	if (status != HAL_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_Stop() status %ld", status);
+		return USBH_UNRECOVERED_ERROR;
+	}
+
+	// Return
+	return USBH_OK;
+}
+// USBH_LL_Connect
+// USBH_LL_Disconnect
+USBH_SpeedTypeDef USBH_LL_GetSpeed(USBH_HandleTypeDef* phost)
+{
+	// Get speed
+	uint32_t speed = HAL_HCD_GetCurrentSpeed(phost->pData);
+
+	// Return
+	if (speed == HCD_SPEED_HIGH)
+	{
+		return USBH_SPEED_HIGH;
+	}
+	else if (speed == HCD_SPEED_FULL)
+	{
+		return USBH_SPEED_FULL;
+	}
+	else if (speed == HCD_SPEED_LOW)
+	{
+		return USBH_SPEED_LOW;
+	}
+	else
+	{
+		ALX_USB_ASSERT(false);	// We should never get here
+		return 0;
+	}
+}
+USBH_StatusTypeDef USBH_LL_ResetPort(USBH_HandleTypeDef* phost)
+{
+	// Reset port
+	HAL_StatusTypeDef status = HAL_HCD_ResetPort(phost->pData);
+	if (status != HAL_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_ResetPort() status %ld", status);
+		return USBH_UNRECOVERED_ERROR;
+	}
+
+	// Return
+	return USBH_OK;
+}
+uint32_t USBH_LL_GetLastXferSize(USBH_HandleTypeDef* phost, uint8_t pipe)
+{
+	// Return
+	return HAL_HCD_HC_GetXferCount(phost->pData, pipe);
+}
+USBH_StatusTypeDef USBH_LL_DriverVBUS(USBH_HandleTypeDef* phost, uint8_t state)
+{
+	// Void
+	(void)(phost);
+	(void)(state);
+
+	// Return
+	return USBH_OK;
+}
+USBH_StatusTypeDef USBH_LL_OpenPipe(USBH_HandleTypeDef* phost, uint8_t pipe, uint8_t epnum, uint8_t dev_address, uint8_t speed, uint8_t ep_type, uint16_t mps)
+{
+	// Open pipe
+	HAL_StatusTypeDef status = HAL_HCD_HC_Init(phost->pData, pipe, epnum, dev_address, speed, ep_type, mps);
+	if (status != HAL_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_HC_Init() status %ld", status);
+		return USBH_UNRECOVERED_ERROR;
+	}
+
+	// Return
+	return USBH_OK;
+}
+USBH_StatusTypeDef USBH_LL_ClosePipe(USBH_HandleTypeDef* phost, uint8_t pipe)
+{
+	// Halt pipe
+	HAL_StatusTypeDef status = HAL_HCD_HC_Halt(phost->pData, pipe);
+	if (status != HAL_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_HC_Halt() status %ld", status);
+		return USBH_UNRECOVERED_ERROR;
+	}
+
+	// Return
+	return USBH_OK;
+}
+USBH_StatusTypeDef USBH_LL_SubmitURB(USBH_HandleTypeDef* phost, uint8_t pipe, uint8_t direction, uint8_t ep_type, uint8_t token, uint8_t* pbuff, uint16_t length, uint8_t do_ping)
+{
+	// Submit URB
+	HAL_StatusTypeDef status = HAL_HCD_HC_SubmitRequest(phost->pData, pipe,direction, ep_type, token, pbuff, length, do_ping);
+	if (status != HAL_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_HC_SubmitRequest() status %ld", status);
+		return USBH_UNRECOVERED_ERROR;
+	}
+
+	// Return
+	return USBH_OK;
+}
+USBH_URBStateTypeDef USBH_LL_GetURBState(USBH_HandleTypeDef* phost, uint8_t pipe)
+{
+	// Return
+	return (USBH_URBStateTypeDef)HAL_HCD_HC_GetURBState(phost->pData, pipe);
+}
+// USBH_LL_NotifyURBChange
+USBH_StatusTypeDef USBH_LL_SetToggle(USBH_HandleTypeDef* phost, uint8_t pipe, uint8_t toggle)
+{
+	// Context
+	HCD_HandleTypeDef* hhcd = (HCD_HandleTypeDef*)phost->pData;
+
+	// Set toggle
+	if (hhcd->hc[pipe].ep_is_in)
+	{
+		hhcd->hc[pipe].toggle_in = toggle;
+	}
+	else
+	{
+		hhcd->hc[pipe].toggle_out = toggle;
+	}
+
+	// Return
+	return USBH_OK;
+}
+uint8_t USBH_LL_GetToggle(USBH_HandleTypeDef* phost, uint8_t pipe)
+{
+	// Context
+	HCD_HandleTypeDef* hhcd = (HCD_HandleTypeDef*)phost->pData;
+
+	// Get toggle
+	uint8_t toggle = 0;
+	if (hhcd->hc[pipe].ep_is_in)
+	{
+		toggle = hhcd->hc[pipe].toggle_in;
+	}
+	else
+	{
+		toggle = hhcd->hc[pipe].toggle_out;
+	}
+
+	// Return
+	return toggle;
+}
+// USBH_LL_SetTimer
+// USBH_LL_IncTimer
+void USBH_Delay(uint32_t Delay)
+{
+	HAL_Delay(Delay);
 }
 
 

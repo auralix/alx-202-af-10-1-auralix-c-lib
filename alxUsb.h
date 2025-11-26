@@ -42,6 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxIoPin.h"
 
 
 //*******************************************************************************
@@ -83,7 +84,14 @@ extern "C" {
 //*******************************************************************************
 typedef struct
 {
+	// Parameters
+	HCD_TypeDef* usb;
+	AlxIoPin* io_USB_D_P;
+	AlxIoPin* io_USB_D_N;
+	Alx_IrqPriority irqPriority;
+
 	// Variables
+	HCD_HandleTypeDef hhcd;
 	USBH_HandleTypeDef usbh;
 	uint8_t	usbh_event;
 	bool usbhMsc_isReady;
@@ -100,7 +108,11 @@ typedef struct
 //*******************************************************************************
 void AlxUsb_Ctor
 (
-	AlxUsb*	me
+	AlxUsb*	me,
+	HCD_TypeDef* usb,
+	AlxIoPin* io_USB_D_P,
+	AlxIoPin* io_USB_D_N,
+	Alx_IrqPriority irqPriority
 );
 
 
@@ -113,6 +125,7 @@ Alx_Status AlxUsb_Handle(AlxUsb* me);
 bool AlxUsb_IsReady(AlxUsb* me);
 Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len);
 Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len);
+void AlxUsb_Irq_Handle(AlxUsb* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
