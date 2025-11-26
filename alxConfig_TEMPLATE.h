@@ -62,6 +62,7 @@ extern "C" {
 //#define ALX_LFS
 //#define ALX_WIZNET
 //#define ALX_MBEDTLS
+//#define ALX_USBH
 //#define ALX_ZEPHYR
 
 
@@ -295,6 +296,7 @@ extern "C" {
 //#define ALX_TEMP_SENS_RTD_VDIV_ASSERT_BKPT_ENABLE
 //// AlxTick
 //#define ALX_TIM_SW_ASSERT_BKPT_ENABLE
+//#define ALX_USB_ASSERT_BKPT_ENABLE
 //#define ALX_VDIV_ASSERT_BKPT_ENABLE
 //
 //// ALX - C++
@@ -401,6 +403,7 @@ extern "C" {
 //#define ALX_TEMP_SENS_RTD_VDIV_ASSERT_TRACE_ENABLE
 //// AlxTick
 //#define ALX_TIM_SW_ASSERT_TRACE_ENABLE
+//#define ALX_USB_ASSERT_TRACE_ENABLE
 //#define ALX_VDIV_ASSERT_TRACE_ENABLE
 //
 //// ALX - C++
@@ -507,6 +510,7 @@ extern "C" {
 #define ALX_TEMP_SENS_RTD_VDIV_ASSERT_RST_ENABLE
 // AlxTick
 #define ALX_TIM_SW_ASSERT_RST_ENABLE
+#define ALX_USB_ASSERT_RST_ENABLE
 #define ALX_VDIV_ASSERT_RST_ENABLE
 
 // ALX - C++
@@ -614,6 +618,7 @@ extern "C" {
 #define ALX_TEMP_SENS_RTD_VDIV_TRACE_ENABLE
 // AlxTick
 #define ALX_TIM_SW_TRACE_ENABLE
+#define ALX_USB_TRACE_ENABLE
 #define ALX_VDIV_TRACE_ENABLE
 
 // ALX - C++

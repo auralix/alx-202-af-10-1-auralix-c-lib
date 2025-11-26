@@ -1,8 +1,8 @@
 ﻿/**
   ******************************************************************************
-  * @file        alxUsb.h
-  * @brief       Auralix C Library - ALX USB Host MSC Module
-  * @copyright   Copyright (C) Auralix d.o.o. All rights reserved.
+  * @file		alxUsb.h
+  * @brief		Auralix C Library - ALX USB Module
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -35,6 +35,7 @@
 extern "C" {
 #endif
 
+
 //*******************************************************************************
 // Includes
 //*******************************************************************************
@@ -42,13 +43,12 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 
-#include "usbh_core.h"
-#include "usbh_msc.h"
 
 //*******************************************************************************
 // Module Guard
 //*******************************************************************************
 #if defined(ALX_C_LIB)
+
 
 //*******************************************************************************
 // Preprocessor
@@ -57,147 +57,62 @@ extern "C" {
 
 // Assert //
 #if defined(ALX_USB_ASSERT_BKPT_ENABLE)
-	#define ALX_USB_ASSERT(expr)	ALX_ASSERT_BKPT(ALX_USB_FILE, expr)
+	#define ALX_USB_ASSERT(expr) ALX_ASSERT_BKPT(ALX_USB_FILE, expr)
 #elif defined(ALX_USB_ASSERT_TRACE_ENABLE)
-	#define ALX_USB_ASSERT(expr)	ALX_ASSERT_TRACE(ALX_USB_FILE, expr)
+	#define ALX_USB_ASSERT(expr) ALX_ASSERT_TRACE(ALX_USB_FILE, expr)
 #elif defined(ALX_USB_ASSERT_RST_ENABLE)
-	#define ALX_USB_ASSERT(expr)	ALX_ASSERT_RST(ALX_USB_FILE, expr)
+	#define ALX_USB_ASSERT(expr) ALX_ASSERT_RST(ALX_USB_FILE, expr)
 #else
-	#define ALX_USB_ASSERT(expr)	do {} while (false)
+	#define ALX_USB_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(ALX_USB_TRACE_WRN_ENABLE)
-	#define ALX_USB_TRACE_WRN(...)	ALX_TRACE_WRN(ALX_USB_FILE, __VA_ARGS__)
+#if defined(ALX_USB_TRACE_ENABLE)
+	#define ALX_USB_TRACE_ERR(...) ALX_TRACE_ERR(ALX_USB_FILE, __VA_ARGS__)
+	#define ALX_USB_TRACE_WRN(...) ALX_TRACE_WRN(ALX_USB_FILE, __VA_ARGS__)
+	#define ALX_USB_TRACE_INF(...) ALX_TRACE_INF(ALX_USB_FILE, __VA_ARGS__)
 #else
-	#define ALX_USB_TRACE_WRN(...)	do {} while (false)
+	#define ALX_USB_TRACE_ERR(...) do {} while (false)
+	#define ALX_USB_TRACE_WRN(...) do {} while (false)
+	#define ALX_USB_TRACE_INF(...) do {} while (false)
 #endif
+
 
 //*******************************************************************************
 // Types
 //*******************************************************************************
-
-/**
- * @brief High-level USB MSC host state
- *
- * This is internal to the module; external users normally only call
- * AlxUsb_IsReady().
- */
-typedef enum
-{
-	AlxUsb_State_NoDevice = 0,
-	AlxUsb_State_Connected,
-	AlxUsb_State_Enumerating,
-	AlxUsb_State_Ready,
-	AlxUsb_State_Disconnected,
-	AlxUsb_State_Error,
-} AlxUsb_State;
-
-/**
- * @brief ALX USB MSC context
- */
 typedef struct
 {
-	// Parameters
-	uint8_t				hostId;			///< USB host ID passed to USBH_Init (e.g. HOST_FS)
-
-	// Low-level USB Host handle (owned by this module)
-	USBH_HandleTypeDef	host;
-
-	// Internal state
-	volatile uint8_t	pendingEvent;	///< Last HOST_USER_* event (0 = none)
-	AlxUsb_State		state;			///< Current high-level state
+	// Variables
+	USBH_HandleTypeDef usbh;
+	uint8_t	usbh_event;
+	bool usbhMsc_isReady;
+	bool isReady;
 
 	// Info
-	bool				wasCtorCalled;
-	bool				isInit;
+	bool wasCtorCalled;
+	bool isInit;
 } AlxUsb;
 
 
 //*******************************************************************************
 // Constructor
 //*******************************************************************************
-
-/**
-  * @brief		Constructor
-  * @param[in]	me		Context
-  * @param[in]	hostId	Host ID passed to USBH_Init (e.g. HOST_FS)
-  */
 void AlxUsb_Ctor
 (
-	AlxUsb*	me,
-	uint8_t	hostId
+	AlxUsb*	me
 );
 
 
 //*******************************************************************************
 // Functions
 //*******************************************************************************
-
-/**
-  * @brief	Initialize USB Host + MSC class and start host.
-  * @param	me		Context
-  * @retval	Alx_Ok
-  * @retval	Alx_Err
-  */
 Alx_Status AlxUsb_Init(AlxUsb* me);
-
-/**
-  * @brief	DeInitialize USB Host.
-  * @param	me		Context
-  * @retval	Alx_Ok
-  * @retval	Alx_Err
-  */
 Alx_Status AlxUsb_DeInit(AlxUsb* me);
-
-/**
-  * @brief	Drive USB Host state machine (polling).
-  *			Must be called regularly (e.g. in main loop).
-  * @param	me		Context
-  */
-void AlxUsb_Handle(AlxUsb* me);
-
-/**
-  * @brief	Check if MSC device is ready for block I/O.
-  * @param	me		Context
-  * @retval	true	Device is ready (enumerated + MSC ready)
-  * @retval	false	Not ready / no device / error
-  */
+Alx_Status AlxUsb_Handle(AlxUsb* me);
 bool AlxUsb_IsReady(AlxUsb* me);
-
-/**
-  * @brief	Read sectors from USB MSC device.
-  * @param	me		Context
-  * @param	sector	Start sector (LBA)
-  * @param	count	Number of sectors to read
-  * @param	buff	Destination buffer
-  * @retval	Alx_Ok
-  * @retval	Alx_Err
-  */
-Alx_Status AlxUsb_Read
-(
-	AlxUsb*		me,
-	uint32_t	sector,
-	uint32_t	count,
-	uint8_t*	buff
-);
-
-/**
-  * @brief	Write sectors to USB MSC device.
-  * @param	me		Context
-  * @param	sector	Start sector (LBA)
-  * @param	count	Number of sectors to write
-  * @param	buff	Source buffer
-  * @retval	Alx_Ok
-  * @retval	Alx_Err
-  */
-Alx_Status AlxUsb_Write
-(
-	AlxUsb*			me,
-	uint32_t		sector,
-	uint32_t		count,
-	const uint8_t*	buff
-);
+Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len);
+Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len);
 
 
 #endif	// #if defined(ALX_C_LIB)

@@ -1,8 +1,8 @@
 ﻿/**
   ******************************************************************************
-  * @file        alxUsb.c
-  * @brief       Auralix C Library - ALX USB Host MSC Module
-  * @copyright   Copyright (C) Auralix d.o.o. All rights reserved.
+  * @file		alxUsb.c
+  * @brief		Auralix C Library - ALX USB Module
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
   *
@@ -30,25 +30,25 @@
 //*******************************************************************************
 #include "alxUsb.h"
 
+
 //*******************************************************************************
 // Module Guard
 //*******************************************************************************
 #if defined(ALX_C_LIB)
 
-//*******************************************************************************
-// Local function prototypes
-//*******************************************************************************
-
-static void AlxUsb_UserProcess(USBH_HandleTypeDef* phost, uint8_t id);
-static void AlxUsb_StatusChange_Callback(AlxUsb* me, AlxUsb_State newState);
 
 //*******************************************************************************
-// Local variables
+// Private Variables
 //*******************************************************************************
+static AlxUsb* alxUsb_me = NULL;
 
-// NOTE: current implementation assumes a single USB host instance.
-// If multiple hosts are needed, this can be extended.
-static AlxUsb* s_alxUsbInstance = NULL;
+
+//*******************************************************************************
+// Private Functions
+//*******************************************************************************
+Alx_Status AlxUsb_Init_Private(AlxUsb* me);
+Alx_Status AlxUsb_DeInit_Private(AlxUsb* me);
+static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id);
 
 
 //*******************************************************************************
@@ -56,21 +56,21 @@ static AlxUsb* s_alxUsbInstance = NULL;
 //*******************************************************************************
 void AlxUsb_Ctor
 (
-	AlxUsb*	me,
-	uint8_t	hostId
+	AlxUsb*	me
 )
 {
-	// Assert
-	ALX_USB_ASSERT(me != NULL);
+	// Private Variables
+	alxUsb_me = me;
 
-	// Parameters
-	me->hostId = hostId;
+	// Variables
+	memset(&me->usbh, 0, sizeof(me->usbh));
+	me->usbh_event = 0;
+	me->usbhMsc_isReady = false;
+	me->isReady = false;
 
 	// Info
-	me->pendingEvent  = 0U;
-	me->state         = AlxUsb_State_NoDevice;
 	me->wasCtorCalled = true;
-	me->isInit        = false;
+	me->isInit = false;
 }
 
 
@@ -80,47 +80,144 @@ void AlxUsb_Ctor
 
 /**
   * @brief
-  * @param[in,out]	me	Context
+  * @param[in,out]	me
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
 Alx_Status AlxUsb_Init(AlxUsb* me)
 {
 	// Assert
-	ALX_USB_ASSERT(me != NULL);
 	ALX_USB_ASSERT(me->wasCtorCalled == true);
 	ALX_USB_ASSERT(me->isInit == false);
 
-	// Store global instance pointer
-	s_alxUsbInstance = me;
+	// Return
+	return AlxUsb_Init_Private(me);
+}
 
-	// Clear internal state
-	me->pendingEvent = 0U;
-	me->state        = AlxUsb_State_NoDevice;
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxUsb_DeInit(AlxUsb* me)
+{
+	// Assert
+	ALX_USB_ASSERT(me->wasCtorCalled == true);
+	ALX_USB_ASSERT(me->isInit == true);
 
-	// Init USB Host Core
-	if (USBH_Init(&me->host, AlxUsb_UserProcess, me->hostId) != USBH_OK)
+	// Return
+	return AlxUsb_DeInit_Private(me);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+Alx_Status AlxUsb_Handle(AlxUsb* me)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_USB_ASSERT(me->wasCtorCalled == true);
+	ALX_USB_ASSERT(me->isInit == true);
+
+
+	//------------------------------------------------------------------------------
+	// Handle
+	//------------------------------------------------------------------------------
+
+	// Process
+	USBH_Process(&me->usbh);	// Always returns OK
+	me->usbhMsc_isReady = USBH_MSC_IsReady(&me->usbh);
+
+	// Handle
+	if (me->usbh_event == HOST_USER_UNRECOVERED_ERROR)
 	{
-		ALX_USB_TRACE_WRN("USBH_Init failed");
+		// Trace
+		ALX_USB_TRACE_ERR("FAIL: AlxUsb_Handle() HOST_USER_UNRECOVERED_ERROR");
+
+		// Local variables
+		Alx_Status status = Alx_Err;
+
+		// DeInit
+		status = AlxUsb_DeInit_Private(me);
+		if (status != Alx_Ok)
+		{
+			ALX_USB_TRACE_ERR("FAIL: AlxUsb_DeInit_Private() status %ld", status);
+			return Alx_Err;
+		}
+
+		// Init
+		status = AlxUsb_Init_Private(me);
+		if (status != Alx_Ok)
+		{
+			ALX_USB_TRACE_ERR("FAIL: AlxUsb_Init_Private() status %ld", status);
+			return Alx_Err;
+		}
+	}
+	else if (me->usbh_event == HOST_USER_CLASS_ACTIVE && me->usbhMsc_isReady)
+	{
+		me->isReady = true;
+	}
+	else
+	{
+		me->isReady = false;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			true
+  * @retval			false
+  */
+bool AlxUsb_IsReady(AlxUsb* me)
+{
+	// Assert
+	ALX_USB_ASSERT(me->wasCtorCalled == true);
+	ALX_USB_ASSERT(me->isInit == true);
+
+	// Return
+	return me->isReady;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		addr
+  * @param[in]		data
+  * @param[out]		len
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len)
+{
+	// Assert
+	ALX_USB_ASSERT(me->wasCtorCalled == true);
+	ALX_USB_ASSERT(me->isInit == true);
+	ALX_USB_ASSERT(0 < len);
+
+	// Check
+	if (!me->isReady)
+	{
+		ALX_USB_TRACE_ERR("FAIL: isReady() addr %lu len %lu", addr, len);
 		return Alx_Err;
 	}
 
-	// Register MSC Class
-	if (USBH_RegisterClass(&me->host, USBH_MSC_CLASS) != USBH_OK)
+	// Read
+	USBH_StatusTypeDef status = USBH_MSC_Read(&me->usbh, 0, addr, data, len);
+	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_WRN("USBH_RegisterClass MSC failed");
+		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Read() status %ld addr %lu len %lu", status, addr, len);
 		return Alx_Err;
 	}
-
-	// Start Host
-	if (USBH_Start(&me->host) != USBH_OK)
-	{
-		ALX_USB_TRACE_WRN("USBH_Start failed");
-		return Alx_Err;
-	}
-
-	// Info
-	me->isInit = true;
 
 	// Return
 	return Alx_Ok;
@@ -128,239 +225,121 @@ Alx_Status AlxUsb_Init(AlxUsb* me)
 
 /**
   * @brief
-  * @param[in,out]	me	Context
+  * @param[in,out]	me
+  * @param[in]		addr
+  * @param[in]		data
+  * @param[in]		len
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxUsb_DeInit(AlxUsb* me)
+Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len)
 {
 	// Assert
-	ALX_USB_ASSERT(me != NULL);
 	ALX_USB_ASSERT(me->wasCtorCalled == true);
 	ALX_USB_ASSERT(me->isInit == true);
+	ALX_USB_ASSERT(0 < len);
 
-	// Stop + DeInit USB Host
-	(void)USBH_Stop(&me->host);
-	(void)USBH_DeInit(&me->host);
-
-	// Clear instance
-	if (s_alxUsbInstance == me)
+	// Check
+	if (!me->isReady)
 	{
-		s_alxUsbInstance = NULL;
+		ALX_USB_TRACE_ERR("FAIL: isReady() addr %lu len %lu", addr, len);
+		return Alx_Err;
 	}
 
-	me->isInit        = false;
-	me->pendingEvent  = 0U;
-	me->state         = AlxUsb_State_NoDevice;
+	// Read
+	USBH_StatusTypeDef status = USBH_MSC_Write(&me->usbh, 0, addr, data, len);
+	if (status != USBH_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Write() status %ld addr %lu len %lu", status, addr, len);
+		return Alx_Err;
+	}
 
+	// Return
 	return Alx_Ok;
 }
 
-/**
-  * @brief			Drive USB host state machine (polling).
-  * @param[in,out]	me	Context
-  */
-void AlxUsb_Handle(AlxUsb* me)
+
+//*******************************************************************************
+// Private Functions
+//*******************************************************************************
+Alx_Status AlxUsb_Init_Private(AlxUsb* me)
 {
-	// Assert
-	ALX_USB_ASSERT(me != NULL);
-	ALX_USB_ASSERT(me->wasCtorCalled == true);
-	ALX_USB_ASSERT(me->isInit == true);
+	// Local variables
+	USBH_StatusTypeDef status = USBH_FAIL;
 
-	// Drive USB Host core
-	USBH_Process(&me->host);
-
-	// Consume event from callback
-	uint8_t ev = me->pendingEvent;
-	me->pendingEvent = 0U;
-
-	if (ev != 0U)
+	// Init
+	status = USBH_Init(&me->usbh, AlxUsb_Event_Callback, 0);
+	if (status != USBH_OK)
 	{
-		AlxUsb_State oldState = me->state;
-
-		switch (ev)
-		{
-			case HOST_USER_CONNECTION:
-				me->state = AlxUsb_State_Connected;
-				break;
-
-			case HOST_USER_CLASS_SELECTED:
-				me->state = AlxUsb_State_Enumerating;
-				break;
-
-			case HOST_USER_CLASS_ACTIVE:
-				me->state = AlxUsb_State_Ready;
-				break;
-
-			case HOST_USER_DISCONNECTION:
-				me->state = AlxUsb_State_Disconnected;
-				break;
-
-			case HOST_USER_UNRECOVERED_ERROR:
-				me->state = AlxUsb_State_Error;
-				// Optional: you could try auto-restart here
-				// USBH_Stop(&me->host);
-				// USBH_Start(&me->host);
-				break;
-
-			case HOST_USER_SELECT_CONFIGURATION:
-			default:
-				// Not used in this abstraction
-				break;
-		}
-
-		if (me->state != oldState)
-		{
-			AlxUsb_StatusChange_Callback(me, me->state);
-		}
-	}
-
-	// Extra safety: if we think we are ready but MSC is not, downgrade state
-	if (me->state == AlxUsb_State_Ready)
-	{
-		if (USBH_MSC_IsReady(&me->host) != USBH_OK)
-		{
-			me->state = AlxUsb_State_Enumerating;
-		}
-	}
-}
-
-/**
-  * @brief
-  * @param[in,out]	me	Context
-  * @retval			true	MSC device ready for block I/O
-  * @retval			false	Not ready / no device / error
-  */
-bool AlxUsb_IsReady(AlxUsb* me)
-{
-	// Assert
-	ALX_USB_ASSERT(me != NULL);
-	ALX_USB_ASSERT(me->wasCtorCalled == true);
-	ALX_USB_ASSERT(me->isInit == true);
-
-	if (me->state != AlxUsb_State_Ready)
-	{
-		return false;
-	}
-
-	// Double-check with MSC class driver
-	return (USBH_MSC_IsReady(&me->host) == USBH_OK);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me		Context
-  * @param[in]		sector	Start sector (LBA)
-  * @param[in]		count	Number of sectors to read
-  * @param[out]		buff	Destination buffer
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxUsb_Read
-(
-	AlxUsb*		me,
-	uint32_t	sector,
-	uint32_t	count,
-	uint8_t*	buff
-)
-{
-	// Assert
-	ALX_USB_ASSERT(me != NULL);
-	ALX_USB_ASSERT(me->wasCtorCalled == true);
-	ALX_USB_ASSERT(me->isInit == true);
-	ALX_USB_ASSERT(buff != NULL);
-	ALX_USB_ASSERT(count > 0U);
-
-	if (!AlxUsb_IsReady(me))
-	{
-		ALX_USB_TRACE_WRN("Read requested while not ready");
+		ALX_USB_TRACE_ERR("FAIL: USBH_Init() status %ld", status);
 		return Alx_Err;
 	}
 
-	USBH_StatusTypeDef st = USBH_MSC_Read(&me->host, 0U, sector, buff, count);
-
-	if (st == USBH_OK)
+	// Register class
+	status = USBH_RegisterClass(&me->usbh, USBH_MSC_CLASS);
+	if (status != USBH_OK)
 	{
-		return Alx_Ok;
-	}
-
-	ALX_USB_TRACE_WRN("USBH_MSC_Read failed (%d)", (int)st);
-	return Alx_Err;
-}
-
-/**
-  * @brief
-  * @param[in,out]	me		Context
-  * @param[in]		sector	Start sector (LBA)
-  * @param[in]		count	Number of sectors to write
-  * @param[in]		buff	Source buffer
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  */
-Alx_Status AlxUsb_Write
-(
-	AlxUsb*			me,
-	uint32_t		sector,
-	uint32_t		count,
-	const uint8_t*	buff
-)
-{
-	// Assert
-	ALX_USB_ASSERT(me != NULL);
-	ALX_USB_ASSERT(me->wasCtorCalled == true);
-	ALX_USB_ASSERT(me->isInit == true);
-	ALX_USB_ASSERT(buff != NULL);
-	ALX_USB_ASSERT(count > 0U);
-
-	if (!AlxUsb_IsReady(me))
-	{
-		ALX_USB_TRACE_WRN("Write requested while not ready");
+		ALX_USB_TRACE_ERR("FAIL: USBH_RegisterClass() status %ld", status);
 		return Alx_Err;
 	}
 
-	USBH_StatusTypeDef st =
-		USBH_MSC_Write(&me->host, 0U, sector, (uint8_t*)buff, count);
-
-	if (st == USBH_OK)
+	// Start
+	status = USBH_Start(&me->usbh);
+	if (status != USBH_OK)
 	{
-		return Alx_Ok;
+		ALX_USB_TRACE_ERR("FAIL: USBH_Start() status %ld", status);
+		return Alx_Err;
 	}
 
-	ALX_USB_TRACE_WRN("USBH_MSC_Write failed (%d)", (int)st);
-	return Alx_Err;
+	// Set isInit
+	me->isInit = true;
+
+	// Return
+	return Alx_Ok;
 }
-
-
-//*******************************************************************************
-// Local functions
-//*******************************************************************************
-
-/**
-  * @brief	USB Host core user callback (bridge to AlxUsb)
-  */
-static void AlxUsb_UserProcess(USBH_HandleTypeDef* phost, uint8_t id)
+Alx_Status AlxUsb_DeInit_Private(AlxUsb* me)
 {
+	// Local variables
+	USBH_StatusTypeDef status = USBH_FAIL;
+
+	// Stop
+	status = USBH_Stop(&me->usbh);
+	if (status != USBH_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: USBH_Stop() status %ld", status);
+		return Alx_Err;
+	}
+
+	// DeInit
+	status = USBH_DeInit(&me->usbh);
+	if (status != USBH_OK)
+	{
+		ALX_USB_TRACE_ERR("FAIL: USBH_DeInit() status %ld", status);
+		return Alx_Err;
+	}
+
+	// Clear
+	memset(&me->usbh, 0, sizeof(me->usbh));
+	me->usbh_event = 0;
+	me->usbhMsc_isReady = false;
+	me->isReady = false;
+
+	// Clear isInit
+	me->isInit = false;
+
+	// Return
+	return Alx_Ok;
+}
+static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
+{
+	// Void
 	(void)phost;
 
-	if (s_alxUsbInstance != NULL)
-	{
-		// Just record, actual handling is done in AlxUsb_Handle()
-		s_alxUsbInstance->pendingEvent = id;
-	}
-}
+	// Set
+	alxUsb_me->usbh_event = id;
 
-/**
-  * @brief	Status change hook, can be used for debug/LED/etc.
-  * @note	Default implementation: do nothing.
-  *			If you want board-specific behaviour, you can modify this
-  *			function in this file as needed.
-  */
-static void AlxUsb_StatusChange_Callback(AlxUsb* me, AlxUsb_State newState)
-{
-	(void)me;
-	(void)newState;
-	// Example:
-	// ALX_USB_TRACE_WRN("USB state = %d", (int)newState);
+	// Trace
+	ALX_USB_TRACE_INF("AlxUsb_Event_Callback(%lu)", id);
 }
 
 

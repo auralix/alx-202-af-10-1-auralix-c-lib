@@ -148,6 +148,7 @@ extern "C" {
 #include "alxTempSensRtdVdiv.h"
 #include "alxTick.h"
 #include "alxTimSw.h"
+#include "alxUsb.h"
 #include "alxVdiv.h"
 
 
