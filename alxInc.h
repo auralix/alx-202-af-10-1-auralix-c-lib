@@ -85,6 +85,7 @@ extern "C" {
 #include "alxSerialPort.h"
 #include "alxSpi.h"
 #include "alxTrace.h"
+#include "alxUsb.h"
 #include "alxWdt.h"
 
 
@@ -148,7 +149,6 @@ extern "C" {
 #include "alxTempSensRtdVdiv.h"
 #include "alxTick.h"
 #include "alxTimSw.h"
-#include "alxUsb.h"
 #include "alxVdiv.h"
 
 

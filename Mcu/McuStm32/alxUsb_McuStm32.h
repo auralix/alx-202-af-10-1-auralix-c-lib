@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxUsb.h
-  * @brief		Auralix C Library - ALX USB Module
+  * @file		alxUsb_McuStm32.h
+  * @brief		Auralix C Library - ALX USB MCU STM32 Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //*******************************************************************************
 // Include Guard
 //*******************************************************************************
-#ifndef ALX_USB_H
-#define ALX_USB_H
+#ifndef ALX_USB_MCU_STM32_H
+#define ALX_USB_MCU_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,35 +48,7 @@ extern "C" {
 //*******************************************************************************
 // Module Guard
 //*******************************************************************************
-#if defined(ALX_C_LIB)
-
-
-//*******************************************************************************
-// Preprocessor
-//*******************************************************************************
-#define ALX_USB_FILE "alxUsb.h"
-
-// Assert //
-#if defined(ALX_USB_ASSERT_BKPT_ENABLE)
-	#define ALX_USB_ASSERT(expr) ALX_ASSERT_BKPT(ALX_USB_FILE, expr)
-#elif defined(ALX_USB_ASSERT_TRACE_ENABLE)
-	#define ALX_USB_ASSERT(expr) ALX_ASSERT_TRACE(ALX_USB_FILE, expr)
-#elif defined(ALX_USB_ASSERT_RST_ENABLE)
-	#define ALX_USB_ASSERT(expr) ALX_ASSERT_RST(ALX_USB_FILE, expr)
-#else
-	#define ALX_USB_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(ALX_USB_TRACE_ENABLE)
-	#define ALX_USB_TRACE_ERR(...) ALX_TRACE_ERR(ALX_USB_FILE, __VA_ARGS__)
-	#define ALX_USB_TRACE_WRN(...) ALX_TRACE_WRN(ALX_USB_FILE, __VA_ARGS__)
-	#define ALX_USB_TRACE_INF(...) ALX_TRACE_INF(ALX_USB_FILE, __VA_ARGS__)
-#else
-	#define ALX_USB_TRACE_ERR(...) do {} while (false)
-	#define ALX_USB_TRACE_WRN(...) do {} while (false)
-	#define ALX_USB_TRACE_INF(...) do {} while (false)
-#endif
+#if defined(ALX_C_LIB) && defined(ALX_STM32F7)
 
 
 //*******************************************************************************
@@ -116,22 +88,10 @@ void AlxUsb_Ctor
 );
 
 
-//*******************************************************************************
-// Functions
-//*******************************************************************************
-Alx_Status AlxUsb_Init(AlxUsb* me);
-Alx_Status AlxUsb_DeInit(AlxUsb* me);
-Alx_Status AlxUsb_Handle(AlxUsb* me);
-bool AlxUsb_IsReady(AlxUsb* me);
-Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len);
-Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len);
-void AlxUsb_Irq_Handle(AlxUsb* me);
-
-
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F7)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_USB_H
+#endif	// #ifndef ALX_USB_MCU_STM32_H

@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxUsb.c
-  * @brief		Auralix C Library - ALX USB Module
+  * @file		alxUsb_McuStm32.c
+  * @brief		Auralix C Library - ALX USB MCU STM32 Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,13 +28,14 @@
 //*******************************************************************************
 // Includes
 //*******************************************************************************
+#include "alxUsb_McuStm32.h"
 #include "alxUsb.h"
 
 
 //*******************************************************************************
 // Module Guard
 //*******************************************************************************
-#if defined(ALX_C_LIB)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F7)
 
 
 //*******************************************************************************
@@ -781,4 +782,4 @@ void USBH_Delay(uint32_t Delay)
 }
 
 
-#endif	// #if defined(ALX_C_LIB)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F7)
