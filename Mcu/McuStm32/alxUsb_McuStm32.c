@@ -92,19 +92,19 @@ void AlxUsb_Ctor
 
 	// Variables
 	me->hhcd.Instance = usb;
-	me->hhcd.Init.dev_endpoints = 0;	// TODO
-	me->hhcd.Init.Host_channels = 11;
+	me->hhcd.Init.dev_endpoints = 0;				// Unused, only relevant for PCD
+	me->hhcd.Init.Host_channels = 8;				// 8 is max for USB_OTG_FS
 	me->hhcd.Init.dma_enable = 0;
 	me->hhcd.Init.speed = HCD_SPEED_FULL;
-	me->hhcd.Init.ep0_mps = 0;	// TODO
+	me->hhcd.Init.ep0_mps = 0;						// Unused, only relevant for PCD
 	me->hhcd.Init.phy_itface = HCD_PHY_EMBEDDED;
-	me->hhcd.Init.Sof_enable = 0;
+	me->hhcd.Init.Sof_enable = 1;
 	me->hhcd.Init.low_power_enable = 0;
 	me->hhcd.Init.lpm_enable = 0;
-	me->hhcd.Init.battery_charging_enable = 0;	// TODO
+	me->hhcd.Init.battery_charging_enable = 0;
 	me->hhcd.Init.vbus_sensing_enable = 0;
-	me->hhcd.Init.use_dedicated_ep1 = 0;	// TODO
-	me->hhcd.Init.use_external_vbus = 0;	// TODO
+	me->hhcd.Init.use_dedicated_ep1 = 0;
+	me->hhcd.Init.use_external_vbus = 0;
 	me->usbh_event = 0;
 	me->usbhMsc_isReady = false;
 	me->isReady = false;
@@ -544,10 +544,10 @@ static void AlxUsb_Periph_ReleaseReset(AlxUsb* me)
 }
 static void AlxUsb_Periph_EnableIrq(AlxUsb* me)
 {
-	#ifdef USB_OTG_FS
+	#if defined(USB_OTG_FS)
 	if (me->hhcd.Instance == USB_OTG_FS)	{ HAL_NVIC_SetPriority(OTG_FS_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(OTG_FS_IRQn); return; }
 	#endif
-	#ifdef USB_OTG_HS
+	#if defined(USB_OTG_HS)
 	if (me->hhcd.Instance == USB_OTG_HS)	{ HAL_NVIC_SetPriority(OTG_HS_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(OTG_HS_IRQn); return; }
 	#endif
 
@@ -555,10 +555,10 @@ static void AlxUsb_Periph_EnableIrq(AlxUsb* me)
 }
 static void AlxUsb_Periph_DisableIrq(AlxUsb* me)
 {
-	#ifdef USB_OTG_FS
+	#if defined(USB_OTG_FS)
 	if (me->hhcd.Instance == USB_OTG_FS)	{ HAL_NVIC_DisableIRQ(OTG_FS_IRQn); HAL_NVIC_ClearPendingIRQ(OTG_FS_IRQn); return; }
 	#endif
-	#ifdef USB_OTG_HS
+	#if defined(USB_OTG_HS)
 	if (me->hhcd.Instance == USB_OTG_HS)	{ HAL_NVIC_DisableIRQ(OTG_HS_IRQn); HAL_NVIC_ClearPendingIRQ(OTG_HS_IRQn); return; }
 	#endif
 
