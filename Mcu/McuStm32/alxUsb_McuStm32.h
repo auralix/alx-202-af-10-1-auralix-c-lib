@@ -56,6 +56,12 @@ extern "C" {
 //*******************************************************************************
 typedef struct
 {
+	// Defines
+	#define ALX_USB_EVENT_NAME_ARR_LEN 7
+
+	// Const
+	const char* eventNameArr[ALX_USB_EVENT_NAME_ARR_LEN];
+
 	// Parameters
 	HCD_TypeDef* usb;
 	AlxIoPin* io_USB_D_P;

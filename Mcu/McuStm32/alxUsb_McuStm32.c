@@ -84,6 +84,15 @@ void AlxUsb_Ctor
 	// Private Variables
 	alxUsb_me = me;
 
+	// Const
+	me->eventNameArr[0] = "UNDEFINED";
+	me->eventNameArr[1] = "HOST_USER_SELECT_CONFIGURATION";
+	me->eventNameArr[2] = "HOST_USER_CLASS_ACTIVE";
+	me->eventNameArr[3] = "HOST_USER_CLASS_SELECTED";
+	me->eventNameArr[4] = "HOST_USER_CONNECTION";
+	me->eventNameArr[5] = "HOST_USER_DISCONNECTION";
+	me->eventNameArr[6] = "HOST_USER_UNRECOVERED_ERROR";
+
 	// Parameters
 	me->usb = usb;
 	me->io_USB_D_P = io_USB_D_P;
@@ -415,7 +424,7 @@ static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
 	alxUsb_me->usbh_event = id;
 
 	// Trace
-	ALX_USB_TRACE_INF("AlxUsb_Event_Callback(%lu)", id);
+	ALX_USB_TRACE_INF("AlxUsb_Event_Callback() id %lu name %s", id, alxUsb_me->eventNameArr[id]);
 }
 #endif
 
