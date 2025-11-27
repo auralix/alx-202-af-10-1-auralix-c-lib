@@ -52,7 +52,9 @@ static AlxUsb* alxUsb_me = NULL;
 //------------------------------------------------------------------------------
 // Specific
 //------------------------------------------------------------------------------
+#if defined(ALX_USBH)
 static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id);
+#endif
 
 
 //------------------------------------------------------------------------------
@@ -89,7 +91,6 @@ void AlxUsb_Ctor
 	me->irqPriority = irqPriority;
 
 	// Variables
-	memset(&me->hhcd, 0, sizeof(me->hhcd));
 	me->hhcd.Instance = usb;
 	me->hhcd.Init.dev_endpoints = 0;	// TODO
 	me->hhcd.Init.Host_channels = 11;
@@ -104,14 +105,15 @@ void AlxUsb_Ctor
 	me->hhcd.Init.vbus_sensing_enable = 0;
 	me->hhcd.Init.use_dedicated_ep1 = 0;	// TODO
 	me->hhcd.Init.use_external_vbus = 0;	// TODO
-	memset(&me->usbh, 0, sizeof(me->usbh));
 	me->usbh_event = 0;
 	me->usbhMsc_isReady = false;
 	me->isReady = false;
 
 	// Link
+	#if defined(ALX_USBH)
 	me->hhcd.pData = &me->usbh;
 	me->usbh.pData = &me->hhcd;
+	#endif
 
 	// Info
 	me->wasCtorCalled = true;
@@ -135,9 +137,6 @@ Alx_Status AlxUsb_Init(AlxUsb* me)
 	ALX_USB_ASSERT(me->wasCtorCalled == true);
 	ALX_USB_ASSERT(me->isInit == false);
 
-	// Local variables
-	USBH_StatusTypeDef status = USBH_FAIL;
-
 	// Init GPIO
 	AlxIoPin_Init(me->io_USB_D_P);
 	AlxIoPin_Init(me->io_USB_D_N);
@@ -150,6 +149,10 @@ Alx_Status AlxUsb_Init(AlxUsb* me)
 
 	// Enable USB periphery IRQ
 	AlxUsb_Periph_EnableIrq(me);
+
+	// Local variables
+	#if defined(ALX_USBH)
+	USBH_StatusTypeDef status = USBH_FAIL;
 
 	// Init USB
 	status = USBH_Init(&me->usbh, AlxUsb_Event_Callback, 0);
@@ -174,6 +177,7 @@ Alx_Status AlxUsb_Init(AlxUsb* me)
 		ALX_USB_TRACE_ERR("FAIL: USBH_Start() status %ld", status);
 		return Alx_Err;
 	}
+	#endif
 
 	// Set isInit
 	me->isInit = true;
@@ -195,6 +199,7 @@ Alx_Status AlxUsb_DeInit(AlxUsb* me)
 	ALX_USB_ASSERT(me->isInit == true);
 
 	// Local variables
+	#if defined(ALX_USBH)
 	USBH_StatusTypeDef status = USBH_FAIL;
 
 	// Stop USB
@@ -212,6 +217,7 @@ Alx_Status AlxUsb_DeInit(AlxUsb* me)
 		ALX_USB_TRACE_ERR("FAIL: USBH_DeInit() status %ld", status);
 		return Alx_Err;
 	}
+	#endif
 
 	// Disable USB periphery IRQ
 	AlxUsb_Periph_DisableIrq(me);
@@ -254,6 +260,7 @@ Alx_Status AlxUsb_Handle(AlxUsb* me)
 	//------------------------------------------------------------------------------
 	// Handle
 	//------------------------------------------------------------------------------
+	#if defined(ALX_USBH)
 
 	// Process
 	USBH_Process(&me->usbh);	// Always returns OK
@@ -281,6 +288,7 @@ Alx_Status AlxUsb_Handle(AlxUsb* me)
 	{
 		me->isReady = false;
 	}
+	#endif
 
 
 	//------------------------------------------------------------------------------
@@ -329,12 +337,14 @@ Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len)
 	}
 
 	// Read
+	#if defined(ALX_USBH)
 	USBH_StatusTypeDef status = USBH_MSC_Read(&me->usbh, 0, addr, data, len);
 	if (status != USBH_OK)
 	{
 		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Read() status %ld addr %lu len %lu", status, addr, len);
 		return Alx_Err;
 	}
+	#endif
 
 	// Return
 	return Alx_Ok;
@@ -363,13 +373,15 @@ Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len)
 		return Alx_Err;
 	}
 
-	// Read
+	// Write
+	#if defined(ALX_USBH)
 	USBH_StatusTypeDef status = USBH_MSC_Write(&me->usbh, 0, addr, data, len);
 	if (status != USBH_OK)
 	{
 		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Write() status %ld addr %lu len %lu", status, addr, len);
 		return Alx_Err;
 	}
+	#endif
 
 	// Return
 	return Alx_Ok;
@@ -393,6 +405,7 @@ void AlxUsb_Irq_Handle(AlxUsb* me)
 //------------------------------------------------------------------------------
 // Specific
 //------------------------------------------------------------------------------
+#if defined(ALX_USBH)
 static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
 {
 	// Void
@@ -404,6 +417,7 @@ static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
 	// Trace
 	ALX_USB_TRACE_INF("AlxUsb_Event_Callback(%lu)", id);
 }
+#endif
 
 
 //------------------------------------------------------------------------------
@@ -412,6 +426,7 @@ static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
 static Alx_Status AlxUsb_Reset(AlxUsb* me)
 {
 	// Local variables
+	#if defined(ALX_USBH)
 	USBH_StatusTypeDef status = USBH_FAIL;
 
 	// Stop USB
@@ -429,6 +444,7 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 		ALX_USB_TRACE_ERR("FAIL: USBH_DeInit() status %ld", status);
 		return Alx_Err;
 	}
+	#endif
 
 	// Disable USB periphery IRQ
 	AlxUsb_Periph_DisableIrq(me);
@@ -451,6 +467,7 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 	AlxUsb_Periph_EnableIrq(me);
 
 	// Init USB
+	#if defined(ALX_USBH)
 	status = USBH_Init(&me->usbh, AlxUsb_Event_Callback, 0);
 	if (status != USBH_OK)
 	{
@@ -473,6 +490,7 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 		ALX_USB_TRACE_ERR("FAIL: USBH_Start() status %ld", status);
 		return Alx_Err;
 	}
+	#endif
 
 	// Set isInit
 	me->isInit = true;
@@ -548,39 +566,45 @@ static void AlxUsb_Periph_DisableIrq(AlxUsb* me)
 }
 
 
-//*******************************************************************************
-// USBH Functions Implementation - usbh_conf_template.c
-//*******************************************************************************
-
-
-//------------------------------------------------------------------------------
-// HAL_HCD
-//------------------------------------------------------------------------------
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
 void HAL_HCD_SOF_Callback(HCD_HandleTypeDef* hhcd)
 {
+	#if defined(ALX_USBH)
 	USBH_LL_IncTimer(hhcd->pData);
+	#endif
 }
 void HAL_HCD_Connect_Callback(HCD_HandleTypeDef* hhcd)
 {
+	#if defined(ALX_USBH)
 	USBH_LL_Connect(hhcd->pData);	// Always return OK
+	#endif
 }
 void HAL_HCD_Disconnect_Callback(HCD_HandleTypeDef* hhcd)
 {
+	#if defined(ALX_USBH)
 	USBH_LL_Disconnect(hhcd->pData);	// Always return OK
+	#endif
 }
 void HAL_HCD_PortEnabled_Callback(HCD_HandleTypeDef* hhcd)
 {
+	#if defined(ALX_USBH)
 	USBH_LL_PortEnabled(hhcd->pData);
+	#endif
 }
 void HAL_HCD_PortDisabled_Callback(HCD_HandleTypeDef* hhcd)
 {
+	#if defined(ALX_USBH)
 	USBH_LL_PortDisabled(hhcd->pData);
+	#endif
 }
 
 
-//------------------------------------------------------------------------------
-// USBH_LL
-//------------------------------------------------------------------------------
+//*******************************************************************************
+// USBH Library - Functions implementation based on usbh_conf_template.c
+//*******************************************************************************
+#if defined(ALX_USBH)
 USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef* phost)
 {
 	// Context
@@ -780,6 +804,7 @@ void USBH_Delay(uint32_t Delay)
 {
 	HAL_Delay(Delay);
 }
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F7)

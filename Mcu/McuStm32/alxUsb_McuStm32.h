@@ -64,7 +64,9 @@ typedef struct
 
 	// Variables
 	HCD_HandleTypeDef hhcd;
+	#if defined(ALX_USBH)
 	USBH_HandleTypeDef usbh;
+	#endif
 	uint8_t	usbh_event;
 	bool usbhMsc_isReady;
 	bool isReady;
