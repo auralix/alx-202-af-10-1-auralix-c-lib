@@ -99,7 +99,7 @@ void AlxUsb_Ctor
 	me->io_USB_D_N = io_USB_D_N;
 	me->irqPriority = irqPriority;
 
-	// Variables
+	// Variables - HAL
 	me->hhcd.Instance = usb;
 	me->hhcd.Init.dev_endpoints = 0;				// Unused, only relevant for PCD
 	me->hhcd.Init.Host_channels = 8;				// 8 is max for USB_OTG_FS
@@ -114,8 +114,19 @@ void AlxUsb_Ctor
 	me->hhcd.Init.vbus_sensing_enable = 0;
 	me->hhcd.Init.use_dedicated_ep1 = 0;
 	me->hhcd.Init.use_external_vbus = 0;
+
+	// Variables - USBH
 	me->usbh_event = 0;
+
+	// Variables - USBH_MSC
+	#if defined(ALX_USBH)
+	memset(&me->usbhMsc_info, 0, sizeof(me->usbhMsc_info));
+	#endif
 	me->usbhMsc_isReady = false;
+
+	// Variables
+	me->blockCount = 0;
+	me->blockLen_byte = 0;
 	me->isReady = false;
 
 	// Link
@@ -243,7 +254,10 @@ Alx_Status AlxUsb_DeInit(AlxUsb* me)
 
 	// Clear
 	me->usbh_event = 0;
+	memset(&me->usbhMsc_info, 0, sizeof(me->usbhMsc_info));
 	me->usbhMsc_isReady = false;
+	me->blockCount = 0;
+	me->blockLen_byte = 0;
 	me->isReady = false;
 
 	// Clear isInit
@@ -291,10 +305,22 @@ Alx_Status AlxUsb_Handle(AlxUsb* me)
 	}
 	else if (me->usbh_event == HOST_USER_CLASS_ACTIVE && me->usbhMsc_isReady)
 	{
+		// Get info
+		USBH_StatusTypeDef status = USBH_MSC_GetLUNInfo(&me->usbh, 0, &me->usbhMsc_info);
+		if (status != USBH_OK)
+		{
+			ALX_USB_TRACE_ERR("FAIL: USBH_MSC_GetLUNInfo() status %ld", status);
+			return Alx_Err;
+		}
+
+		// Set
+		me->blockCount = me->usbhMsc_info.capacity.block_nbr;
+		me->blockLen_byte = me->usbhMsc_info.capacity.block_size;
 		me->isReady = true;
 	}
 	else
 	{
+		// Clear
 		me->isReady = false;
 	}
 	#endif
@@ -303,6 +329,33 @@ Alx_Status AlxUsb_Handle(AlxUsb* me)
 	//------------------------------------------------------------------------------
 	// Return
 	//------------------------------------------------------------------------------
+	return Alx_Ok;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[out]		blockCount
+  * @param[out]		blockLen_byte
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxUsb_GetCapacity(AlxUsb* me, uint32_t* blockCount, uint32_t* blockLen_byte)
+{
+	// Assert
+	ALX_USB_ASSERT(me->wasCtorCalled == true);
+	ALX_USB_ASSERT(me->isInit == true);
+
+	// Check
+	if (!me->isReady)
+	{
+		ALX_USB_TRACE_ERR("FAIL: isReady()");
+		return Alx_Err;
+	}
+
+	// Return
+	*blockCount = me->blockCount;
+	*blockLen_byte = me->blockLen_byte;
 	return Alx_Ok;
 }
 
@@ -325,32 +378,32 @@ bool AlxUsb_IsReady(AlxUsb* me)
 /**
   * @brief
   * @param[in,out]	me
+  * @param[in]		numOfBlocks
   * @param[in]		addr
-  * @param[in]		data
-  * @param[out]		len
+  * @param[out]		data
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len)
+Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data)
 {
 	// Assert
 	ALX_USB_ASSERT(me->wasCtorCalled == true);
 	ALX_USB_ASSERT(me->isInit == true);
-	ALX_USB_ASSERT(0 < len);
+	ALX_USB_ASSERT(0 < numOfBlocks);
 
 	// Check
 	if (!me->isReady)
 	{
-		ALX_USB_TRACE_ERR("FAIL: isReady() addr %lu len %lu", addr, len);
+		ALX_USB_TRACE_ERR("FAIL: isReady() addr %lu numOfBlocks %lu", addr, numOfBlocks);
 		return Alx_Err;
 	}
 
 	// Read
 	#if defined(ALX_USBH)
-	USBH_StatusTypeDef status = USBH_MSC_Read(&me->usbh, 0, addr, data, len);
+	USBH_StatusTypeDef status = USBH_MSC_Read(&me->usbh, 0, addr, data, numOfBlocks);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Read() status %ld addr %lu len %lu", status, addr, len);
+		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Read() status %ld addr %lu numOfBlocks %lu", status, addr, numOfBlocks);
 		return Alx_Err;
 	}
 	#endif
@@ -362,32 +415,32 @@ Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len)
 /**
   * @brief
   * @param[in,out]	me
+  * @param[in]		numOfBlocks
   * @param[in]		addr
   * @param[in]		data
-  * @param[in]		len
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len)
+Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data)
 {
 	// Assert
 	ALX_USB_ASSERT(me->wasCtorCalled == true);
 	ALX_USB_ASSERT(me->isInit == true);
-	ALX_USB_ASSERT(0 < len);
+	ALX_USB_ASSERT(0 < numOfBlocks);
 
 	// Check
 	if (!me->isReady)
 	{
-		ALX_USB_TRACE_ERR("FAIL: isReady() addr %lu len %lu", addr, len);
+		ALX_USB_TRACE_ERR("FAIL: isReady() addr %lu numOfBlocks %lu", addr, numOfBlocks);
 		return Alx_Err;
 	}
 
 	// Write
 	#if defined(ALX_USBH)
-	USBH_StatusTypeDef status = USBH_MSC_Write(&me->usbh, 0, addr, data, len);
+	USBH_StatusTypeDef status = USBH_MSC_Write(&me->usbh, 0, addr, data, numOfBlocks);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Write() status %ld addr %lu len %lu", status, addr, len);
+		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Write() status %ld addr %lu numOfBlocks %lu", status, addr, numOfBlocks);
 		return Alx_Err;
 	}
 	#endif
@@ -463,7 +516,10 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 
 	// Clear
 	me->usbh_event = 0;
+	memset(&me->usbhMsc_info, 0, sizeof(me->usbhMsc_info));
 	me->usbhMsc_isReady = false;
+	me->blockCount = 0;
+	me->blockLen_byte = 0;
 	me->isReady = false;
 
 	// Clear isInit

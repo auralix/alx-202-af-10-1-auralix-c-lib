@@ -1358,29 +1358,95 @@ static void AlxFs_Fatfs_Mmc_Usb_Ctor(AlxFs* me)
 	me->fatfsMkfsOpt.au_size = 0;
 	memset(&me->fatfsMkfsBuff, 0, sizeof(me->fatfsMkfsBuff));
 }
-DSTATUS disk_initialize (BYTE pdrv)
+DSTATUS disk_initialize(BYTE pdrv)
 {
-	(void)pdrv;
-
-	return RES_OK;
-}
-DSTATUS disk_status (BYTE pdrv)
-{
-	(void)pdrv;
-
-	return RES_OK;
-}
-DRESULT disk_read (BYTE pdrv, BYTE* buff, LBA_t sector, UINT count)
-{
+	//------------------------------------------------------------------------------
 	// Prepare
+	//------------------------------------------------------------------------------
+	(void)pdrv;
+
+
+	//------------------------------------------------------------------------------
+	// Handle
+	//------------------------------------------------------------------------------
+	if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		// Do nothing
+	}
+	else if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Usb)
+	{
+		// Check
+		#if defined(ALX_STM32F7)
+		if (!AlxUsb_IsReady(alxFs_Fatfs_Mmc_Usb_me->alxUsb))
+		{
+			return STA_NOINIT;
+		}
+		#endif
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return 0;
+}
+DSTATUS disk_status(BYTE pdrv)
+{
+	//------------------------------------------------------------------------------
+	// Prepare
+	//------------------------------------------------------------------------------
+	(void)pdrv;
+
+
+	//------------------------------------------------------------------------------
+	// Handle
+	//------------------------------------------------------------------------------
+	if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		// Do nothing
+	}
+	else if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Usb)
+	{
+		// Check
+		#if defined(ALX_STM32F7)
+		if (!AlxUsb_IsReady(alxFs_Fatfs_Mmc_Usb_me->alxUsb))
+		{
+			return STA_NOINIT;
+		}
+		#endif
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return 0;
+}
+DRESULT disk_read(BYTE pdrv, BYTE* buff, LBA_t sector, UINT count)
+{
+	//------------------------------------------------------------------------------
+	// Prepare
+	//------------------------------------------------------------------------------
 	(void)pdrv;
 	Alx_Status status = Alx_Err;
 
+
+	//------------------------------------------------------------------------------
 	// Read
+	//------------------------------------------------------------------------------
 	if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_ReadBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_Usb_me->do_DBG_ReadBlock);
-	#if defined(ALX_STM32L4)
-	status = AlxMmc_ReadBlock(alxFs_Fatfs_Mmc_Usb_me->alxMmc, count, sector, buff, count * 512, 3, 100);
-	#endif
+	if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		#if defined(ALX_STM32L4)
+		status = AlxMmc_ReadBlock(alxFs_Fatfs_Mmc_Usb_me->alxMmc, count, sector, buff, count * 512, 3, 100);
+		#endif
+	}
+	else if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Usb)
+	{
+		#if defined(ALX_STM32F7)
+		status = AlxUsb_Read(alxFs_Fatfs_Mmc_Usb_me->alxUsb, count, sector, (uint8_t*)buff);
+		#endif
+	}
 	if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_ReadBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_Usb_me->do_DBG_ReadBlock);
 	if (status != Alx_Ok)
 	{
@@ -1388,20 +1454,37 @@ DRESULT disk_read (BYTE pdrv, BYTE* buff, LBA_t sector, UINT count)
 		return RES_ERROR;
 	}
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return RES_OK;
 }
-DRESULT disk_write (BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count)
+DRESULT disk_write(BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count)
 {
+	//------------------------------------------------------------------------------
 	// Prepare
+	//------------------------------------------------------------------------------
 	(void)pdrv;
 	Alx_Status status = Alx_Err;
 
+
+	//------------------------------------------------------------------------------
 	// Write
+	//------------------------------------------------------------------------------
 	if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_WriteBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_Usb_me->do_DBG_WriteBlock);
-	#if defined(ALX_STM32L4)
-	status = AlxMmc_WriteBlock(alxFs_Fatfs_Mmc_Usb_me->alxMmc, count, sector, (uint8_t*)buff, count * 512, 3, 100);
-	#endif
+	if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Mmc)
+	{
+		#if defined(ALX_STM32L4)
+		status = AlxMmc_WriteBlock(alxFs_Fatfs_Mmc_Usb_me->alxMmc, count, sector, (uint8_t*)buff, count * 512, 3, 100);
+		#endif
+	}
+	else if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Usb)
+	{
+		#if defined(ALX_STM32F7)
+		status = AlxUsb_Write(alxFs_Fatfs_Mmc_Usb_me->alxUsb, count, sector, (uint8_t*)buff);
+		#endif
+	}
 	if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_WriteBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_Usb_me->do_DBG_WriteBlock);
 	if (status != Alx_Ok)
 	{
@@ -1409,23 +1492,42 @@ DRESULT disk_write (BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count)
 		return RES_ERROR;
 	}
 
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
 	return RES_OK;
 }
 DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff)
 {
+	//------------------------------------------------------------------------------
 	// Prepare
+	//------------------------------------------------------------------------------
 	(void)pdrv;
 	Alx_Status status = Alx_Err;
 
-	// Get
+
+	//------------------------------------------------------------------------------
+	// Handle
+	//------------------------------------------------------------------------------
 	switch (cmd)
 	{
 		case CTRL_SYNC:
 		{
+			//------------------------------------------------------------------------------
+			// Handle
+			//------------------------------------------------------------------------------
 			if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_SyncBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_Usb_me->do_DBG_SyncBlock);
-			#if defined(ALX_STM32L4)
-			status = AlxMmc_WaitForTransferState(alxFs_Fatfs_Mmc_Usb_me->alxMmc);
-			#endif
+			if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Mmc)
+			{
+				#if defined(ALX_STM32L4)
+				status = AlxMmc_WaitForTransferState(alxFs_Fatfs_Mmc_Usb_me->alxMmc);
+				#endif
+			}
+			else if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Usb)
+			{
+				status = Alx_Ok;	// AlxUsb_Read/Write are synchronous, so always return OK
+			}
 			if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_SyncBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_Usb_me->do_DBG_SyncBlock);
 			if (status != Alx_Ok)
 			{
@@ -1433,25 +1535,91 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff)
 				return RES_NOTRDY;
 			}
 
+
+			//------------------------------------------------------------------------------
+			// Return
+			//------------------------------------------------------------------------------
 			return RES_OK;
 		}
 		case GET_SECTOR_COUNT:
 		{
-			*(LBA_t*)buff = 62160896;
+			//------------------------------------------------------------------------------
+			// Handle
+			//------------------------------------------------------------------------------
+			if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Mmc)
+			{
+				// Set
+				*(LBA_t*)buff = 62160896;
+			}
+			else if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Usb)
+			{
+				// Get
+				uint32_t blockCount = 0;
+				uint32_t blockLen_byte = 0;
+				#if defined(ALX_STM32F7)
+				status = AlxUsb_GetCapacity(alxFs_Fatfs_Mmc_Usb_me->alxUsb, &blockCount, &blockLen_byte);
+				#endif
+				if (status != Alx_Ok)
+				{
+					ALX_FS_TRACE_WRN("Err: %d", status);
+					return RES_ERROR;
+				}
+
+				// Set
+				*(LBA_t*)buff = (LBA_t)blockCount;
+			}
+
+
+			//------------------------------------------------------------------------------
+			// Return
+			//------------------------------------------------------------------------------
 			return RES_OK;
 		}
 		case GET_SECTOR_SIZE:
 		{
-			*(WORD*)buff = 512;
+			//------------------------------------------------------------------------------
+			// Handle
+			//------------------------------------------------------------------------------
+			if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Mmc)
+			{
+				// Set
+				*(WORD*)buff = 512;
+			}
+			else if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Usb)
+			{
+				// Get
+				uint32_t blockCount = 0;
+				uint32_t blockLen_byte = 0;
+				#if defined(ALX_STM32F7)
+				status = AlxUsb_GetCapacity(alxFs_Fatfs_Mmc_Usb_me->alxUsb, &blockCount, &blockLen_byte);
+				#endif
+				if (status != Alx_Ok)
+				{
+					ALX_FS_TRACE_WRN("Err: %d", status);
+					return RES_ERROR;
+				}
+
+				// Set
+				*(WORD*)buff = (WORD)blockLen_byte;
+			}
+
+
+			//------------------------------------------------------------------------------
+			// Return
+			//------------------------------------------------------------------------------
 			return RES_OK;
 		}
 		case GET_BLOCK_SIZE:
 		{
+			// Set
 			*(DWORD*)buff = 1;	// TV: Seems like this shall be the same as erasable block size, but we can use simplification approach and set it to 1
+
+			// Return
 			return RES_OK;
 		}
 		default:
 		{
+			// Return
 			return RES_PARERR;
 		}
 	}

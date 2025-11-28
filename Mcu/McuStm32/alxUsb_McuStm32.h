@@ -68,13 +68,24 @@ typedef struct
 	AlxIoPin* io_USB_D_N;
 	Alx_IrqPriority irqPriority;
 
-	// Variables
+	// Variables - HAL
 	HCD_HandleTypeDef hhcd;
+
+	// Variables - USBH
 	#if defined(ALX_USBH)
 	USBH_HandleTypeDef usbh;
 	#endif
 	uint8_t	usbh_event;
+
+	// Variables - USBH_MSC
+	#if defined(ALX_USBH)
+	MSC_LUNTypeDef usbhMsc_info;
+	#endif
 	bool usbhMsc_isReady;
+
+	// Variables
+	uint32_t blockCount;
+	uint32_t blockLen_byte;
 	bool isReady;
 
 	// Info

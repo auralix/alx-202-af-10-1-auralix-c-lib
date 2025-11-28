@@ -91,9 +91,10 @@ typedef struct { bool dummy; } AlxUsb;
 Alx_Status AlxUsb_Init(AlxUsb* me);
 Alx_Status AlxUsb_DeInit(AlxUsb* me);
 Alx_Status AlxUsb_Handle(AlxUsb* me);
+Alx_Status AlxUsb_GetCapacity(AlxUsb* me, uint32_t* blockCount, uint32_t* blockLen_byte);
 bool AlxUsb_IsReady(AlxUsb* me);
-Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len);
-Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t addr, uint8_t* data, uint32_t len);
+Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data);
+Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data);
 void AlxUsb_Irq_Handle(AlxUsb* me);
 
 
