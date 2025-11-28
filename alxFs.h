@@ -74,15 +74,11 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_FS_TRACE_ENABLE)
+	#define ALX_FS_TRACE_WRN(...) ALX_TRACE_WRN(ALX_FS_FILE, __VA_ARGS__)
 	#define ALX_FS_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
-	#ifndef TV_TEST
-	#define ALX_FS_TRACE(...) ALX_TRACE_WRN(ALX_FS_FILE, __VA_ARGS__)
-	#else
-	#define ALX_FS_TRACE(...) ALX_TRACE_WRN(ALX_FS_FILE, __VA_ARGS__); if(me->config == AlxFs_Config_Lfs_Mmc) AlxAssert_Rst("file", 0, "fun")
-	#endif
 #else
+	#define ALX_FS_TRACE_WRN(...) do{} while (false)
 	#define ALX_FS_TRACE_FORMAT(...) do{} while (false)
-	#define ALX_FS_TRACE(...) do{} while (false)
 #endif
 
 
