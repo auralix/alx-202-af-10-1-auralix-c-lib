@@ -41,7 +41,7 @@
 // Private Variables
 //******************************************************************************
 #if defined(ALX_FATFS)
-static AlxFs* alxFs_Fatfs_Mmc_me = NULL;
+static AlxFs* alxFs_Fatfs_Mmc_Usb_me = NULL;
 #endif
 
 
@@ -51,10 +51,10 @@ static AlxFs* alxFs_Fatfs_Mmc_me = NULL;
 
 
 //------------------------------------------------------------------------------
-// Fatfs_Mmc
+// Fatfs_Mmc & Fatfs_Usb
 //------------------------------------------------------------------------------
 #if defined(ALX_FATFS)
-static void AlxFs_Fatfs_Mmc_Ctor(AlxFs* me);
+static void AlxFs_Fatfs_Mmc_Usb_Ctor(AlxFs* me);
 #endif
 
 
@@ -104,6 +104,7 @@ void AlxFs_Ctor
 	AlxFs* me,
 	AlxFs_Config config,
 	AlxMmc* alxMmc,
+	AlxUsb* alxUsb,
 	AlxIoPin* do_DBG_ReadBlock,
 	AlxIoPin* do_DBG_WriteBlock,
 	AlxIoPin* do_DBG_EraseBlock,
@@ -113,6 +114,7 @@ void AlxFs_Ctor
 	// Parameters
 	me->config = config;
 	me->alxMmc = alxMmc;
+	me->alxUsb = alxUsb;
 	me->do_DBG_ReadBlock = do_DBG_ReadBlock;
 	me->do_DBG_WriteBlock = do_DBG_WriteBlock;
 	me->do_DBG_EraseBlock = do_DBG_EraseBlock;
@@ -123,9 +125,9 @@ void AlxFs_Ctor
 	{
 	}
 	#if defined(ALX_FATFS)
-	else if (me->config == AlxFs_Config_Fatfs_Mmc)
+	else if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
-		AlxFs_Fatfs_Mmc_Ctor(me);
+		AlxFs_Fatfs_Mmc_Usb_Ctor(me);
 	}
 	#endif
 	#if defined(ALX_LFS)
@@ -133,8 +135,6 @@ void AlxFs_Ctor
 	{
 		AlxFs_Lfs_FlashInt_Ctor(me);
 	}
-	#endif
-	#if defined(ALX_LFS)
 	else if	(me->config == AlxFs_Config_Lfs_Mmc)
 	{
 		AlxFs_Lfs_Mmc_Ctor(me);
@@ -165,7 +165,7 @@ Alx_Status AlxFs_Mount(AlxFs* me)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_mount(&me->fatfs, ALX_FS_FATFS_PATH, 1);
 	}
@@ -208,7 +208,7 @@ Alx_Status AlxFs_UnMount(AlxFs* me)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_unmount(ALX_FS_FATFS_PATH);
 	}
@@ -277,7 +277,7 @@ Alx_Status AlxFs_Format(AlxFs* me)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_mkfs(ALX_FS_FATFS_PATH, &me->fatfsMkfsOpt, me->fatfsMkfsBuff, sizeof(me->fatfsMkfsBuff));
 	}
@@ -310,7 +310,7 @@ Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_unlink(path);
 	}
@@ -343,7 +343,7 @@ Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_rename(pathOld, pathNew);
 	}
@@ -379,7 +379,7 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const 
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		// Local variables
 		uint8_t fatfsMode = 0;
@@ -480,7 +480,7 @@ Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_close(&file->fatfsFile);
 	}
@@ -510,7 +510,7 @@ Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		unsigned int _lenActual = 0;
 		int32_t status = f_read(&file->fatfsFile, data, len, &_lenActual);
@@ -602,7 +602,7 @@ Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t le
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		unsigned int lenActual = 0;
 		int32_t status = f_write(&file->fatfsFile, data, len, &lenActual);
@@ -648,7 +648,7 @@ Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_sync(&file->fatfsFile);
 	}
@@ -678,7 +678,7 @@ Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_Fi
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		// Local variables
 		int32_t fatfsPositionNew = 0;
@@ -764,7 +764,7 @@ Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* position)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		_position = f_tell(&file->fatfsFile);
 	}
@@ -798,7 +798,7 @@ Alx_Status AlxFs_File_Rewind(AlxFs* me, AlxFs_File* file)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_rewind(&file->fatfsFile);
 	}
@@ -831,7 +831,7 @@ Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* size)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		_size = f_size(&file->fatfsFile);
 	}
@@ -865,7 +865,7 @@ Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		// Move file pointer to the new end of the file, with this we can expand or shrink file
 		status = f_lseek(&file->fatfsFile, size);
@@ -1031,7 +1031,7 @@ Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_mkdir(path);
 	}
@@ -1064,7 +1064,7 @@ Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_opendir(&dir->fatfsDir, path);
 	}
@@ -1097,7 +1097,7 @@ Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_closedir(&dir->fatfsDir);
 	}
@@ -1130,7 +1130,7 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 
 	// Do
 	#if defined(ALX_FATFS)
-	if (me->config == AlxFs_Config_Fatfs_Mmc)
+	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
 		status = f_readdir(&dir->fatfsDir, &info->fatfsInfo);
 		if (status != 0)
@@ -1210,7 +1210,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 		// Prepare
 		bool isFile = false;
 		#if defined(ALX_FATFS)
-		if (me->config == AlxFs_Config_Fatfs_Mmc)
+		if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 		{
 			if (info.fatfsInfo.fattrib & AM_DIR)
 			{
@@ -1245,7 +1245,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 		{
 			// Prepare
 			#if defined(ALX_FATFS)
-			if (me->config == AlxFs_Config_Fatfs_Mmc)
+			if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 			{
 				sprintf(buff, "FILE - %s - %lu B\r\n", info.fatfsInfo.fname, info.fatfsInfo.fsize);
 			}
@@ -1265,7 +1265,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 			{
 				// Prepare
 				#if defined(ALX_FATFS)
-				if (me->config == AlxFs_Config_Fatfs_Mmc)
+				if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 				{
 					sprintf(buff, "%s/%s", path, info.fatfsInfo.fname);
 				}
@@ -1296,7 +1296,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 		{
 			// Prepare
 			#if defined(ALX_FATFS)
-			if (me->config == AlxFs_Config_Fatfs_Mmc)
+			if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 			{
 				sprintf(buff, "DIR - %s\r\n", info.fatfsInfo.fname);
 			}
@@ -1336,15 +1336,15 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 
 
 //------------------------------------------------------------------------------
-// Fatfs_Mmc
+// Fatfs_Mmc & Fatfs_Usb
 //------------------------------------------------------------------------------
 #if defined(ALX_FATFS)
-static void AlxFs_Fatfs_Mmc_Ctor(AlxFs* me)
+static void AlxFs_Fatfs_Mmc_Usb_Ctor(AlxFs* me)
 {
 	//------------------------------------------------------------------------------
 	// Private Variables
 	//------------------------------------------------------------------------------
-	alxFs_Fatfs_Mmc_me = me;
+	alxFs_Fatfs_Mmc_Usb_me = me;
 
 
 	//------------------------------------------------------------------------------
@@ -1372,26 +1372,37 @@ DSTATUS disk_status (BYTE pdrv)
 }
 DRESULT disk_read (BYTE pdrv, BYTE* buff, LBA_t sector, UINT count)
 {
+	// Prepare
 	(void)pdrv;
+	Alx_Status status = Alx_Err;
 
-	if(alxFs_Fatfs_Mmc_me->do_DBG_ReadBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_me->do_DBG_ReadBlock);
-	Alx_Status status = AlxMmc_ReadBlock(alxFs_Fatfs_Mmc_me->alxMmc, count, sector, buff, count * 512, 3, 100);
-	if(alxFs_Fatfs_Mmc_me->do_DBG_ReadBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_me->do_DBG_ReadBlock);
+	// Read
+	if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_ReadBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_Usb_me->do_DBG_ReadBlock);
+	#if defined(ALX_STM32L4)
+	status = AlxMmc_ReadBlock(alxFs_Fatfs_Mmc_Usb_me->alxMmc, count, sector, buff, count * 512, 3, 100);
+	#endif
+	if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_ReadBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_Usb_me->do_DBG_ReadBlock);
 	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE_WRN("Err: %d", status);
 		return RES_ERROR;
 	}
 
+	// Return
 	return RES_OK;
 }
 DRESULT disk_write (BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count)
 {
+	// Prepare
 	(void)pdrv;
+	Alx_Status status = Alx_Err;
 
-	if(alxFs_Fatfs_Mmc_me->do_DBG_WriteBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_me->do_DBG_WriteBlock);
-	Alx_Status status = AlxMmc_WriteBlock(alxFs_Fatfs_Mmc_me->alxMmc, count, sector, (uint8_t*)buff, count * 512, 3, 100);
-	if(alxFs_Fatfs_Mmc_me->do_DBG_WriteBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_me->do_DBG_WriteBlock);
+	// Write
+	if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_WriteBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_Usb_me->do_DBG_WriteBlock);
+	#if defined(ALX_STM32L4)
+	status = AlxMmc_WriteBlock(alxFs_Fatfs_Mmc_Usb_me->alxMmc, count, sector, (uint8_t*)buff, count * 512, 3, 100);
+	#endif
+	if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_WriteBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_Usb_me->do_DBG_WriteBlock);
 	if (status != Alx_Ok)
 	{
 		ALX_FS_TRACE_WRN("Err: %d", status);
@@ -1402,15 +1413,20 @@ DRESULT disk_write (BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count)
 }
 DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff)
 {
+	// Prepare
 	(void)pdrv;
+	Alx_Status status = Alx_Err;
 
+	// Get
 	switch (cmd)
 	{
 		case CTRL_SYNC:
 		{
-			if(alxFs_Fatfs_Mmc_me->do_DBG_SyncBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_me->do_DBG_SyncBlock);
-			Alx_Status status = AlxMmc_WaitForTransferState(alxFs_Fatfs_Mmc_me->alxMmc);
-			if(alxFs_Fatfs_Mmc_me->do_DBG_SyncBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_me->do_DBG_SyncBlock);
+			if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_SyncBlock != NULL) AlxIoPin_Set(alxFs_Fatfs_Mmc_Usb_me->do_DBG_SyncBlock);
+			#if defined(ALX_STM32L4)
+			status = AlxMmc_WaitForTransferState(alxFs_Fatfs_Mmc_Usb_me->alxMmc);
+			#endif
+			if(alxFs_Fatfs_Mmc_Usb_me->do_DBG_SyncBlock != NULL) AlxIoPin_Reset(alxFs_Fatfs_Mmc_Usb_me->do_DBG_SyncBlock);
 			if (status != Alx_Ok)
 			{
 				ALX_FS_TRACE_WRN("Err: %d", status);

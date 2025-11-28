@@ -44,6 +44,7 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxIoPin.h"
 #include "alxMmc.h"
+#include "alxUsb.h"
 #include "alxOsMutex.h"
 #if defined(ALX_LFS)
 #include "lfs.h"
@@ -90,6 +91,7 @@ typedef enum
 	AlxFs_Config_Undefined,
 	#if defined(ALX_FATFS)
 	AlxFs_Config_Fatfs_Mmc,
+	AlxFs_Config_Fatfs_Usb,
 	#endif
 	#if defined(ALX_LFS)
 	AlxFs_Config_Lfs_FlashInt,
@@ -149,6 +151,7 @@ typedef struct
 	// Parameters
 	AlxFs_Config config;
 	AlxMmc* alxMmc;
+	AlxUsb* alxUsb;
 	AlxIoPin* do_DBG_ReadBlock;
 	AlxIoPin* do_DBG_WriteBlock;
 	AlxIoPin* do_DBG_EraseBlock;
@@ -180,6 +183,7 @@ void AlxFs_Ctor
 	AlxFs* me,
 	AlxFs_Config config,
 	AlxMmc* alxMmc,
+	AlxUsb* alxUsb,
 	AlxIoPin* do_DBG_ReadBlock,
 	AlxIoPin* do_DBG_WriteBlock,
 	AlxIoPin* do_DBG_EraseBlock,
