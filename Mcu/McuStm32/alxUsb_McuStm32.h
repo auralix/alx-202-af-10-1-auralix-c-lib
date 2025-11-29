@@ -43,6 +43,10 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxIoPin.h"
+#if defined(ALX_USBH)
+#include "usbh_core.h"
+#include "usbh_msc.h"
+#endif
 
 
 //*******************************************************************************
