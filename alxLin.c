@@ -44,16 +44,31 @@ static uint8_t AlxLin_CalcProtectedId(uint8_t id);
 static uint8_t AlxLin_CalcClassicChecksum(uint8_t* data, uint32_t len);
 static uint8_t AlxLin_CalcEnhancedChecksum(uint8_t protectedId, uint8_t* data, uint32_t len);
 static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLin_SlaveFrameConfig* slaveFrameConfig);
+static void AlxLin_Handle(AlxLin* me);
 
 
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Master
+//------------------------------------------------------------------------------
 void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
+void AlxLin_Master_Subscribe_ErrChecksum_Callback(AlxLin* me);
+void AlxLin_Master_Subscribe_ErrTimeout_Callback(AlxLin* me);
+
+
+//------------------------------------------------------------------------------
+// Slave
+//------------------------------------------------------------------------------
 void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
 void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame);
 void AlxLin_Slave_Subscribe_MasterReq_Callback(AlxLin* me, AlxLin_Frame frame, bool* slaveReqPending);
 void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* frame);
+void AlxLin_Slave_Subscribe_ErrChecksum_Callback(AlxLin* me);
+void AlxLin_Slave_Subscribe_ErrTimeout_Callback(AlxLin* me);
 
 
 //******************************************************************************
@@ -65,17 +80,20 @@ void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* frame);
   * @param[in,out]	me
   * @param[in]		alxSerialPort
   * @param[in]		breakSyncOffset
+  * @param[in]		rxb_ResponseTimeout_ms
   */
 void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
-	uint8_t breakSyncOffset
+	uint8_t breakSyncOffset,
+	uint16_t rxb_ResponseTimeout_ms
 )
 {
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
 	me->breakSyncOffset = breakSyncOffset;
+	me->rxb_ResponseTimeout_ms = rxb_ResponseTimeout_ms;
 
 	// Fields
 	me->nad = ALX_LIN_NAD_BROADCAST;
@@ -84,6 +102,7 @@ void AlxLin_Ctor
 
 	// Variables
 	memset(&me->rxb, 0, sizeof(me->rxb));
+	AlxTimSw_Ctor(&me->rxb_ResponseTim, false);
 	me->slaveReqPending = false;
 
 	// Info
@@ -204,6 +223,20 @@ bool AlxLin_Master_IsInit(AlxLin* me)
 
 	// Return
 	return me->isInit;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+void AlxLin_Master_Handle(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isMaster == true);
+
+	// Handle
+	AlxLin_Handle(me);
 }
 
 /**
@@ -480,6 +513,9 @@ Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame)
 	me->rxb.frame.dataLen = frame.dataLen;
 	me->rxb.frame.enhancedChecksumEnable = frame.enhancedChecksumEnable;
 
+	// Start timer
+	AlxTimSw_Start(&me->rxb_ResponseTim);
+
 	// Transmit
 	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
 	if (status != Alx_Ok)
@@ -569,6 +605,20 @@ bool AlxLin_Slave_IsInit(AlxLin* me)
 
 	// Return
 	return me->isInit;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+void AlxLin_Slave_Handle(AlxLin* me)
+{
+	// Assert
+	ALX_LIN_ASSERT(me->wasCtorCalled == true);
+	ALX_LIN_ASSERT(me->isMaster == false);
+
+	// Handle
+	AlxLin_Handle(me);
 }
 
 /**
@@ -718,6 +768,7 @@ void AlxLin_RxBuff_Flush(AlxLin* me)
 {
 	memset(&me->rxb, 0, sizeof(me->rxb));
 	me->rxb.active = true;
+	AlxTimSw_Stop(&me->rxb_ResponseTim);
 }
 
 /**
@@ -767,7 +818,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 			{
 				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %02X protectedId_Expected %02X", protectedId_Actual, protectedId_Expected);
 				me->rxb.active = false;
-				return;
+				return;	// Protected ID FAIL: Ignore frame, no Master_Subscribe_Err_Callback
 			}
 		}
 		else
@@ -782,7 +833,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 			{
 				ALX_LIN_TRACE_DBG("FAIL: CheckProtectedId() protectedId_Actual %02X protectedId_Expected %02X", protectedId_Actual, protectedId_Expected);
 				me->rxb.active = false;
-				return;
+				return;	// Protected ID FAIL: Ignore frame, no Slave_Subscribe_Err_Callback
 			}
 
 
@@ -821,7 +872,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				{
 					ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %02X", status, id_Actual);
 					me->rxb.active = false;
-					return;
+					return;	// Unsupported Frame FAIL: Ignore frame, no Slave_Subscribe_Err_Callback
 				}
 
 				// Set slave publish
@@ -886,8 +937,12 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				if (status != Alx_Ok)
 				{
 					ALX_LIN_TRACE_DBG("FAIL: AlxSerialPort_Write() status %ld", status);
-					return;
+					return;	// Serial Port FAIL: Fatal error, no Err_Callback
 				}
+			}
+			else
+			{
+				AlxTimSw_Start(&me->rxb_ResponseTim);
 			}
 		}
 	}
@@ -927,7 +982,15 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 		{
 			ALX_LIN_TRACE_DBG("FAIL: CheckChecksum() checksum_Actual %02X checksum_Expected %02X enhancedChecksumEnable %u", checksum_Actual, checksum_Expected, me->rxb.frame.enhancedChecksumEnable);
 			me->rxb.active = false;
-			return;
+			if (me->isMaster)
+			{
+				AlxLin_Master_Subscribe_ErrChecksum_Callback(me);
+			}
+			else
+			{
+				AlxLin_Slave_Subscribe_ErrChecksum_Callback(me);
+			}
+			return;	// Checksum FAIL: Call Master/Slave_Subscribe_Err_Callback
 		}
 
 
@@ -1050,16 +1113,54 @@ static Alx_Status AlxLin_GetSlaveFrameConfigFromId(AlxLin* me, uint8_t id, AlxLi
 	// Return
 	return Alx_Err;
 }
+static void AlxLin_Handle(AlxLin* me)
+{
+	// Handle
+	bool isTimeout = AlxTimSw_IsTimeout_ms(&me->rxb_ResponseTim, me->rxb_ResponseTimeout_ms);
+	if (me->rxb.active && isTimeout)
+	{
+		// Clear
+		me->rxb.active = false;
+
+		// Callback
+		if (me->isMaster)
+		{
+			AlxLin_Master_Subscribe_ErrTimeout_Callback(me);
+		}
+		else
+		{
+			AlxLin_Slave_Subscribe_ErrTimeout_Callback(me);
+		}
+	}
+}
 
 
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// Master
+//------------------------------------------------------------------------------
 ALX_WEAK void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
 {
 	(void)me;
 	(void)frame;
 }
+ALX_WEAK void AlxLin_Master_Subscribe_ErrChecksum_Callback(AlxLin* me)
+{
+	(void)me;
+}
+ALX_WEAK void AlxLin_Master_Subscribe_ErrTimeout_Callback(AlxLin* me)
+{
+	(void)me;
+}
+
+
+//------------------------------------------------------------------------------
+// Slave
+//------------------------------------------------------------------------------
 ALX_WEAK void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
 {
 	(void)me;
@@ -1080,6 +1181,14 @@ ALX_WEAK void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* f
 {
 	(void)me;
 	(void)frame;
+}
+ALX_WEAK void AlxLin_Slave_Subscribe_ErrChecksum_Callback(AlxLin* me)
+{
+	(void)me;
+}
+ALX_WEAK void AlxLin_Slave_Subscribe_ErrTimeout_Callback(AlxLin* me)
+{
+	(void)me;
 }
 
 
