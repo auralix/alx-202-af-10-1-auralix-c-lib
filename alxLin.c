@@ -56,19 +56,17 @@ static void AlxLin_Handle(AlxLin* me);
 // Master
 //------------------------------------------------------------------------------
 void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
-void AlxLin_Master_Subscribe_ErrChecksum_Callback(AlxLin* me);
-void AlxLin_Master_Subscribe_ErrTimeout_Callback(AlxLin* me);
+void AlxLin_Master_Subscribe_Err_Callback(AlxLin* me, AlxLin_Err err);
 
 
 //------------------------------------------------------------------------------
 // Slave
 //------------------------------------------------------------------------------
 void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame);
+void AlxLin_Slave_Subscribe_Err_Callback(AlxLin* me, AlxLin_Err err);
 void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame);
 void AlxLin_Slave_Subscribe_MasterReq_Callback(AlxLin* me, AlxLin_Frame frame, bool* slaveReqPending);
 void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* frame);
-void AlxLin_Slave_Subscribe_ErrChecksum_Callback(AlxLin* me);
-void AlxLin_Slave_Subscribe_ErrTimeout_Callback(AlxLin* me);
 
 
 //******************************************************************************
@@ -984,11 +982,11 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 			me->rxb.active = false;
 			if (me->isMaster)
 			{
-				AlxLin_Master_Subscribe_ErrChecksum_Callback(me);
+				AlxLin_Master_Subscribe_Err_Callback(me, AlxLin_Err_Checksum);
 			}
 			else
 			{
-				AlxLin_Slave_Subscribe_ErrChecksum_Callback(me);
+				AlxLin_Slave_Subscribe_Err_Callback(me, AlxLin_Err_Checksum);
 			}
 			return;	// Checksum FAIL: Call Master/Slave_Subscribe_Err_Callback
 		}
@@ -1125,11 +1123,11 @@ static void AlxLin_Handle(AlxLin* me)
 		// Callback
 		if (me->isMaster)
 		{
-			AlxLin_Master_Subscribe_ErrTimeout_Callback(me);
+			AlxLin_Master_Subscribe_Err_Callback(me, AlxLin_Err_Timeout);
 		}
 		else
 		{
-			AlxLin_Slave_Subscribe_ErrTimeout_Callback(me);
+			AlxLin_Slave_Subscribe_Err_Callback(me, AlxLin_Err_Timeout);
 		}
 	}
 }
@@ -1148,13 +1146,10 @@ ALX_WEAK void AlxLin_Master_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
 	(void)me;
 	(void)frame;
 }
-ALX_WEAK void AlxLin_Master_Subscribe_ErrChecksum_Callback(AlxLin* me)
+ALX_WEAK void AlxLin_Master_Subscribe_Err_Callback(AlxLin* me, AlxLin_Err err)
 {
 	(void)me;
-}
-ALX_WEAK void AlxLin_Master_Subscribe_ErrTimeout_Callback(AlxLin* me)
-{
-	(void)me;
+	(void)err;
 }
 
 
@@ -1165,6 +1160,11 @@ ALX_WEAK void AlxLin_Slave_Subscribe_Callback(AlxLin* me, AlxLin_Frame frame)
 {
 	(void)me;
 	(void)frame;
+}
+ALX_WEAK void AlxLin_Slave_Subscribe_Err_Callback(AlxLin* me, AlxLin_Err err)
+{
+	(void)me;
+	(void)err;
 }
 ALX_WEAK void AlxLin_Slave_Publish_Callback(AlxLin* me, AlxLin_Frame* frame)
 {
@@ -1181,14 +1181,6 @@ ALX_WEAK void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* f
 {
 	(void)me;
 	(void)frame;
-}
-ALX_WEAK void AlxLin_Slave_Subscribe_ErrChecksum_Callback(AlxLin* me)
-{
-	(void)me;
-}
-ALX_WEAK void AlxLin_Slave_Subscribe_ErrTimeout_Callback(AlxLin* me)
-{
-	(void)me;
 }
 
 
