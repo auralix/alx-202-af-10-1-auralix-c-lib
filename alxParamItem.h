@@ -140,28 +140,32 @@ typedef struct
 	#define ALX_PARAM_ITEM_FTOA_PRECISION 6
 
 	// Parameters
-	AlxParamItem_DataType dataType;
-	AlxParamKvStore* paramKvStore;
-	AlxParamItem_ParamType paramType;
-	const char* key;
-	uint32_t id;
-	const char* groupKey;
-	uint32_t groupId;
-	AlxParamItem_Val valDef;
-	AlxParamItem_Val valMin;
-	AlxParamItem_Val valMax;
-	uint32_t valLen;
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle;
-	void* enumArr;
-	uint8_t numOfEnums;
-	uint8_t* buff;
-	uint32_t buffLen;
+	AlxParamItem_DataType dataType;								// General
+	AlxParamKvStore* paramKvStore;								// N/A
+	AlxParamItem_ParamType paramType;							// General
+	const char* key;											// General
+	uint32_t id;												// General
+	const char* groupKey;										// General
+	uint32_t groupId;											// General
+	AlxParamItem_Val valDef;									// Default / Min / Max
+	AlxParamItem_Val valMin;									// Default / Min / Max
+	AlxParamItem_Val valMax;									// Default / Min / Max
+	uint32_t valLen;											// General
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle;		// General
+	bool isEnum;												// Enum
+	void* enumArr;												// Enum
+	uint8_t enumArrLen;											// Enum
+	const char* valUnit;										// General
+	bool valChangeTakesEffectAfterReset;						// General
+	uint8_t* buff;												// N/A
+	uint32_t buffLen;											// General
 
 	// Variables
-	AlxParamItem_Val val;
+	AlxParamItem_Val val;										// General
+	bool pendingStore;											// N/A
 
 	// Info
-	bool wasCtorCalled;
+	bool wasCtorCalled;											// N/A
 } AlxParamItem;
 
 
@@ -181,8 +185,11 @@ void AlxParamItem_CtorUint8
 	uint8_t valMin,
 	uint8_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint8_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorUint16
 (
@@ -197,8 +204,11 @@ void AlxParamItem_CtorUint16
 	uint16_t valMin,
 	uint16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint16_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorUint32
 (
@@ -213,8 +223,11 @@ void AlxParamItem_CtorUint32
 	uint32_t valMin,
 	uint32_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint32_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorUint64
 (
@@ -229,8 +242,11 @@ void AlxParamItem_CtorUint64
 	uint64_t valMin,
 	uint64_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint64_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorInt8
 (
@@ -245,8 +261,11 @@ void AlxParamItem_CtorInt8
 	int8_t valMin,
 	int8_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int8_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorInt16
 (
@@ -261,8 +280,11 @@ void AlxParamItem_CtorInt16
 	int16_t valMin,
 	int16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int16_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorInt32
 (
@@ -277,8 +299,11 @@ void AlxParamItem_CtorInt32
 	int32_t valMin,
 	int32_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int32_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorInt64
 (
@@ -293,8 +318,11 @@ void AlxParamItem_CtorInt64
 	int64_t valMin,
 	int64_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int64_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorFloat
 (
@@ -309,8 +337,11 @@ void AlxParamItem_CtorFloat
 	float valMin,
 	float valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	float* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorDouble
 (
@@ -325,8 +356,11 @@ void AlxParamItem_CtorDouble
 	double valMin,
 	double valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	double* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorBool
 (
@@ -337,7 +371,9 @@ void AlxParamItem_CtorBool
 	uint32_t id,
 	const char* groupKey,
 	uint32_t groupId,
-	bool valDef
+	bool valDef,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorArr
 (
@@ -352,7 +388,9 @@ void AlxParamItem_CtorArr
 	void* valBuff,
 	void* valDefBuff,
 	uint32_t valBuffLen,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 );
 void AlxParamItem_CtorStr
 (
@@ -365,6 +403,8 @@ void AlxParamItem_CtorStr
 	uint32_t groupId,
 	const char* valDef,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset,
 	uint8_t* buff,
 	uint32_t buffLen
 );
@@ -384,8 +424,12 @@ const char* AlxParamItem_GetKey(AlxParamItem* me);
 uint32_t AlxParamItem_GetId(AlxParamItem* me);
 const char* AlxParamItem_GetGroupKey(AlxParamItem* me);
 uint32_t AlxParamItem_GetGroupId(AlxParamItem* me);
-void* AlxParamItem_GetValPtr(AlxParamItem* me);
 uint32_t AlxParamItem_GetValLen(AlxParamItem* me);
+AlxParamItem_ValOutOfRangeHandle AlxParamItem_GetValOutOfRangeHandle(AlxParamItem* me);
+const char* AlxParamItem_GetValUnit(AlxParamItem* me);
+bool AlxParamItem_GetValChangeTakesEffectAfterReset(AlxParamItem* me);
+uint32_t AlxParamItem_GetBuffLen(AlxParamItem* me);
+void* AlxParamItem_GetValPtr(AlxParamItem* me);
 
 
 //------------------------------------------------------------------------------
@@ -425,9 +469,58 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val);
 
 
 //------------------------------------------------------------------------------
-// Set Default
+// Default / Min / Max
 //------------------------------------------------------------------------------
 void AlxParamItem_SetValToDef(AlxParamItem* me);
+uint8_t AlxParamItem_GetValDefUint8(AlxParamItem* me);
+uint16_t AlxParamItem_GetValDefUint16(AlxParamItem* me);
+uint32_t AlxParamItem_GetValDefUint32(AlxParamItem* me);
+uint64_t AlxParamItem_GetValDefUint64(AlxParamItem* me);
+int8_t AlxParamItem_GetValDefInt8(AlxParamItem* me);
+int16_t AlxParamItem_GetValDefInt16(AlxParamItem* me);
+int32_t AlxParamItem_GetValDefInt32(AlxParamItem* me);
+int64_t AlxParamItem_GetValDefInt64(AlxParamItem* me);
+float AlxParamItem_GetValDefFloat(AlxParamItem* me);
+double AlxParamItem_GetValDefDouble(AlxParamItem* me);
+bool AlxParamItem_GetValDefBool(AlxParamItem* me);
+void* AlxParamItem_GetValDefArr(AlxParamItem* me);
+const char* AlxParamItem_GetValDefStr(AlxParamItem* me);
+uint8_t AlxParamItem_GetValMinUint8(AlxParamItem* me);
+uint16_t AlxParamItem_GetValMinUint16(AlxParamItem* me);
+uint32_t AlxParamItem_GetValMinUint32(AlxParamItem* me);
+uint64_t AlxParamItem_GetValMinUint64(AlxParamItem* me);
+int8_t AlxParamItem_GetValMinInt8(AlxParamItem* me);
+int16_t AlxParamItem_GetValMinInt16(AlxParamItem* me);
+int32_t AlxParamItem_GetValMinInt32(AlxParamItem* me);
+int64_t AlxParamItem_GetValMinInt64(AlxParamItem* me);
+float AlxParamItem_GetValMinFloat(AlxParamItem* me);
+double AlxParamItem_GetValMinDouble(AlxParamItem* me);
+uint8_t AlxParamItem_GetValMaxUint8(AlxParamItem* me);
+uint16_t AlxParamItem_GetValMaxUint16(AlxParamItem* me);
+uint32_t AlxParamItem_GetValMaxUint32(AlxParamItem* me);
+uint64_t AlxParamItem_GetValMaxUint64(AlxParamItem* me);
+int8_t AlxParamItem_GetValMaxInt8(AlxParamItem* me);
+int16_t AlxParamItem_GetValMaxInt16(AlxParamItem* me);
+int32_t AlxParamItem_GetValMaxInt32(AlxParamItem* me);
+int64_t AlxParamItem_GetValMaxInt64(AlxParamItem* me);
+float AlxParamItem_GetValMaxFloat(AlxParamItem* me);
+double AlxParamItem_GetValMaxDouble(AlxParamItem* me);
+
+
+//------------------------------------------------------------------------------
+// Enum
+//------------------------------------------------------------------------------
+bool AlxParamItem_GetIsEnum(AlxParamItem* me);
+void AlxParamItem_GetEnumArrUint8(AlxParamItem* me, uint8_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrUint16(AlxParamItem* me, uint16_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrUint32(AlxParamItem* me, uint32_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrUint64(AlxParamItem* me, uint64_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrInt8(AlxParamItem* me, int8_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrInt16(AlxParamItem* me, int16_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrInt32(AlxParamItem* me, int32_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrInt64(AlxParamItem* me, int64_t** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrFloat(AlxParamItem* me, float** enumArr, uint8_t* enumArrLen);
+void AlxParamItem_GetEnumArrDouble(AlxParamItem* me, double** enumArr, uint8_t* enumArrLen);
 
 
 //------------------------------------------------------------------------------

@@ -41,6 +41,8 @@
 #include "dns.h"
 #endif
 
+extern void CellularDevice_PowerOff(void);
+
 
 //******************************************************************************
 // Module Guard
@@ -235,15 +237,17 @@ static void dhcp_task(void *argument)
 		// open a ssocket to get socket number only
 		// DHCP is handled by ioLibrary
 		dhcp_isRunning = true;
+		int thread_interval;
 		if (AlxSocket_Open(&alxDhcpSocket, me, AlxSocket_Protocol_Udp) == Alx_Ok)
 		{
 			while (1)
 			{
 				if (me->isNetConnected)
 				{
+					thread_interval = 100;
 					if ((state == NETINFO_STATIC) && me->enable_dhcp)
 					{
-//						ALX_NET_TRACE_INF("DHCP client started");
+						ALX_NET_TRACE_INF("DHCP client started");
 						DHCP_init(alxDhcpSocket.socket_data.wiz_socket, wiz_buffer);
 						dhcp_ip_leased_until = 0;
 						state = NETINFO_DHCP;
@@ -273,7 +277,7 @@ static void dhcp_task(void *argument)
 									dhcp_retry = 0;
 									break;
 								}
-								AlxOsDelay_ms(&alxOsDelay, 1000);
+								AlxOsDelay_ms(&alxOsDelay, 100);
 							}
 						}
 
@@ -287,6 +291,7 @@ static void dhcp_task(void *argument)
 								dhcp_ip_leased_until = AlxTick_Get_sec(&alxTick) + getDHCPLeasetime();
 								ip2str(wiz_net_info.dns, me->dns[0]);
 							}
+							thread_interval = 1000;
 						}
 						else if (retval == DHCP_FAILED)
 						{
@@ -295,7 +300,7 @@ static void dhcp_task(void *argument)
 						}
 					}
 				}
-				AlxOsDelay_ms(&alxOsDelay, 1000);
+				AlxOsDelay_ms(&alxOsDelay, thread_interval);
 			}
 			AlxSocket_Close(&alxDhcpSocket); // close the socket
 		}
@@ -705,7 +710,7 @@ void AlxNet_Ctor
 #define MODEM_CONNECTION_MONITORING_TIMEOUT 10000
 #endif
 #define MODEM_LOW_LEVEL_ERR_THRESHOLD 3
-#define MODEM_POWER_CYCLE_DELAY 1000
+#define MODEM_POWER_CYCLE_DELAY 2000
 
 typedef enum
 {
@@ -756,12 +761,19 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 	{
 	case State_ModemGoOff:
 		{
+			if (me->cellular.handle)
+			{
+				Cellular_Pdown(me->cellular.handle);
+				AlxOsDelay_ms(&alxOsDelay, 3000);
+			}
+
 			if (Cellular_Cleanup(me->cellular.handle) == CELLULAR_SUCCESS)
 			{
 				me->cellular.handle = NULL;
 			}
 			low_level_err = 0;
 			start_time = AlxTick_Get_ms(&alxTick);
+			me->isNetConnected = false;
 			connection_state = State_ModemOff;
 			break;
 		}
@@ -783,6 +795,10 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 					connection_state = State_ModemGoOff;
 				}
 			}
+			else
+			{
+				AlxOsDelay_ms(&alxOsDelay, MODEM_POWER_CYCLE_DELAY / 2); // ensure yielding
+			}
 			break;
 		}
 	case State_ModemOn:
@@ -792,8 +808,9 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 				if (Cellular_GetSimCardStatus(me->cellular.handle, &me->cellular.simStatus) != CELLULAR_SUCCESS)
 				{
 					ALX_NET_TRACE_INF(("Cellular SIM failure"));
-					//connection_state = State_ModemGoOff;
-					//break;
+					CellularDevice_PowerOff();
+					connection_state = State_ModemGoOff;
+					break;
 				}
 
 				if (AlxTick_Get_ms(&alxTick) - start_time > MODEM_SIM_TIMEOUT)
@@ -1056,7 +1073,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 				"TICK_Task",
 				THREAD_STACK_SIZE_WORDS * 4,
 				(void *)me,
-				THREAD_PRIORITY);
+				THREAD_PRIORITY + 1);
 			AlxOsThread_Start(&tick_thread);
 
 			AlxOsMutex_Unlock(&me->alxMutex);
@@ -1147,6 +1164,9 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 			AlxOsMutex_Unlock(&me->alxMutex);
 			return Alx_Err;
 		}
+
+		//setRTR(2000); // set wiznet sockets timeout
+		//setRCR(1);
 
 		me->isNetConnected = true;
 		AlxOsMutex_Unlock(&me->alxMutex);
@@ -1250,7 +1270,7 @@ Alx_Status AlxNet_Restart(AlxNet* me)
 	// Return
 	return Alx_Ok;
 }
-bool AlxNet_IsConnected(AlxNet* me)
+void AlxNet_Handle(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
@@ -1278,6 +1298,12 @@ bool AlxNet_IsConnected(AlxNet* me)
 		AlxOsMutex_Unlock(&me->alxMutex);
 	}
 #endif
+}
+
+bool AlxNet_IsConnected(AlxNet* me)
+{
+	// Assert
+	ALX_NET_ASSERT(me->wasCtorCalled == true);
 
 	// Return
 	return me->isNetConnected;
@@ -1516,8 +1542,9 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 	{
 		if (me->config == AlxNet_Config_FreeRtos_Cellular)
 		{
-			CellularError_t ret;
-			ret = Cellular_GetHostByName(me->cellular.handle, me->cellular.cellularContext, hostname, ip);
+			AlxOsMutex_Lock(&me->alxMutex);
+			CellularError_t ret = Cellular_GetHostByName(me->cellular.handle, me->cellular.cellularContext, hostname, ip);
+			AlxOsMutex_Unlock(&me->alxMutex);
 			if (ret != CELLULAR_SUCCESS) return Alx_Err;
 			else return Alx_Ok;
 		}

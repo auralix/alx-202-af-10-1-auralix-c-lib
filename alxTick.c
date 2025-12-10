@@ -40,7 +40,7 @@
 //******************************************************************************
 // Variables
 //******************************************************************************
-volatile AlxTick alxTick = {0};
+AlxTick alxTick = {};
 
 
 //******************************************************************************
@@ -53,10 +53,10 @@ volatile AlxTick alxTick = {0};
   */
 void AlxTick_Ctor
 (
-	volatile AlxTick* me
+	AlxTick* me
 )
 {
-	// Internal
+	// Variables
 	me->tick_ns = 0;
 
 	// Info
@@ -73,17 +73,36 @@ void AlxTick_Ctor
   * @param[in,out]	me
   * @return
   */
-uint64_t AlxTick_Get_ns(volatile AlxTick* me)
+uint64_t AlxTick_Get_ns(AlxTick* me)
 {
-	volatile uint64_t tick_ns = 0;
+	#if defined(ALX_ZEPHYR)
+	// Void
+	(void)me;
 
-	AlxGlobal_DisableIrq();		// Start of critical section
-	tick_ns = me->tick_ns;		// Shared resource tick variable is used by:
-								// Background - GetTick (gets current tick value)
-								// Foreground - IrqHandler (incremnets tick value)
-	AlxGlobal_EnableIrq();		// End of critical section
+	// Get
+	#if IS_ENABLED(CONFIG_TIMER_HAS_64BIT_CYCLE_COUNTER)
+	uint64_t cycles = k_cycle_get_64();	// AB: Use direct Zephyr cycle counter for high precision timing
+	me->tick_ns = k_cyc_to_ns_floor64(cycles);
+	#else
+	uint64_t ticks = k_uptime_ticks();
+	me->tick_ns = k_ticks_to_ns_floor64(ticks);
+	#endif
 
+	// Return
+	return me->tick_ns;
+
+	#else
+	// Prepare
+	uint64_t tick_ns = 0;
+
+	// Get
+	AlxGlobal_DisableIrq();
+	tick_ns = me->tick_ns;
+	AlxGlobal_EnableIrq();
+
+	// Return
 	return tick_ns;
+	#endif
 }
 
 /**
@@ -91,125 +110,217 @@ uint64_t AlxTick_Get_ns(volatile AlxTick* me)
   * @param[in,out]	me
   * @return
   */
-uint64_t AlxTick_Get_us(volatile AlxTick* me)	{ return AlxTick_Get_ns(me) / 1000; }
+uint64_t AlxTick_Get_us(AlxTick* me)
+{
+	return AlxTick_Get_ns(me) / 1000;
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @return
   */
-uint64_t AlxTick_Get_ms(volatile AlxTick* me)	{ return AlxTick_Get_ns(me) / 1000000; }
+uint64_t AlxTick_Get_ms(AlxTick* me)
+{
+	return AlxTick_Get_ns(me) / 1000000;
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @return
   */
-uint64_t AlxTick_Get_sec(volatile AlxTick* me)	{ return AlxTick_Get_ns(me) / 1000000000; }
+uint64_t AlxTick_Get_sec(AlxTick* me)
+{
+	return AlxTick_Get_ns(me) / 1000000000;
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @return
   */
-uint64_t AlxTick_Get_min(volatile AlxTick* me)	{ return AlxTick_Get_ns(me) / 60000000000; }
+uint64_t AlxTick_Get_min(AlxTick* me)
+{
+	return AlxTick_Get_ns(me) / 60000000000;
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @return
   */
-uint64_t AlxTick_Get_hr(volatile AlxTick* me)	{ return AlxTick_Get_ns(me) / 3600000000000; }
+uint64_t AlxTick_Get_hr(AlxTick* me)
+{
+	return AlxTick_Get_ns(me) / 3600000000000;
+}
 
 /**
   * @brief
   * @param[in,out] me
   */
-void AlxTick_Inc_ns(volatile AlxTick* me)		{ me->tick_ns = me->tick_ns + 1; }
+void AlxTick_Inc_ns(AlxTick* me)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	#else
+	me->tick_ns = me->tick_ns + 1;
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out] me
   */
-void AlxTick_Inc_us(volatile AlxTick* me)		{ me->tick_ns = me->tick_ns + 1000; }
+void AlxTick_Inc_us(AlxTick* me)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	#else
+	me->tick_ns = me->tick_ns + 1000;
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out] me
   */
-void AlxTick_Inc_ms(volatile AlxTick* me)		{ me->tick_ns = me->tick_ns + 1000000; }
+void AlxTick_Inc_ms(AlxTick* me)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	#else
+	me->tick_ns = me->tick_ns + 1000000;
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out] me
   */
-void AlxTick_Inc_sec(volatile AlxTick* me)		{ me->tick_ns = me->tick_ns + 1000000000; }
+void AlxTick_Inc_sec(AlxTick* me)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	#else
+	me->tick_ns = me->tick_ns + 1000000000;
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out] me
   */
-void AlxTick_Inc_min(volatile AlxTick* me)		{ me->tick_ns = me->tick_ns + 60000000000; }
+void AlxTick_Inc_min(AlxTick* me)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	#else
+	me->tick_ns = me->tick_ns + 60000000000;
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out] me
   */
-void AlxTick_Inc_hr(volatile AlxTick* me)		{ me->tick_ns = me->tick_ns + 3600000000000; }
+void AlxTick_Inc_hr(AlxTick* me)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	#else
+	me->tick_ns = me->tick_ns + 3600000000000;
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		ticks_ns
   */
-void AlxTick_IncRange_ns(volatile AlxTick* me, uint64_t ticks_ns)	{ me->tick_ns = me->tick_ns + ticks_ns; }
+void AlxTick_IncRange_ns(AlxTick* me, uint64_t ticks_ns)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	(void)ticks_ns;
+	#else
+	me->tick_ns = me->tick_ns + ticks_ns;
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		ticks_us
   */
-void AlxTick_IncRange_us(volatile AlxTick* me, uint64_t ticks_us)	{ me->tick_ns = me->tick_ns + (ticks_us * 1000); }
+void AlxTick_IncRange_us(AlxTick* me, uint64_t ticks_us)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	(void)ticks_us;
+	#else
+	me->tick_ns = me->tick_ns + (ticks_us * 1000);
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		ticks_ms
   */
-void AlxTick_IncRange_ms(volatile AlxTick* me, uint64_t ticks_ms)	{ me->tick_ns = me->tick_ns + (ticks_ms * 1000000); }
+void AlxTick_IncRange_ms(AlxTick* me, uint64_t ticks_ms)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	(void)ticks_ms;
+	#else
+	me->tick_ns = me->tick_ns + (ticks_ms * 1000000);
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		ticks_sec
   */
-void AlxTick_IncRange_sec(volatile AlxTick* me, uint64_t ticks_sec)	{ me->tick_ns = me->tick_ns + (ticks_sec * 1000000000); }
+void AlxTick_IncRange_sec(AlxTick* me, uint64_t ticks_sec)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	(void)ticks_sec;
+	#else
+	me->tick_ns = me->tick_ns + (ticks_sec * 1000000000);
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		ticks_min
   */
-void AlxTick_IncRange_min(volatile AlxTick* me, uint64_t ticks_min)	{ me->tick_ns = me->tick_ns + (ticks_min * 60000000000); }
+void AlxTick_IncRange_min(AlxTick* me, uint64_t ticks_min)
+{
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	(void)ticks_min;
+	#else
+	me->tick_ns = me->tick_ns + (ticks_min * 60000000000);
+	#endif
+}
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		ticks_hr
   */
-void AlxTick_IncRange_hr(volatile AlxTick* me, uint64_t ticks_hr)	{ me->tick_ns = me->tick_ns + (ticks_hr * 3600000000000); }
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
-void AlxTick_Reset(volatile AlxTick* me)
+void AlxTick_IncRange_hr(AlxTick* me, uint64_t ticks_hr)
 {
-	AlxGlobal_DisableIrq();	// Start of critical section
-	me->tick_ns = 0;		// Shared resource tick variable is used by:
-							// Background - GetTick (gets current tick value)
-							// Foreground - IrqHandler (incremnets tick value)
-	AlxGlobal_EnableIrq();	// End of critical section
+	#if defined(ALX_ZEPHYR)
+	(void)me;
+	(void)ticks_hr;
+	#else
+	me->tick_ns = me->tick_ns + (ticks_hr * 3600000000000);
+	#endif
 }
 
 

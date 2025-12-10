@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		alxRst_McuStm32.h
-  * @brief		Auralix C Library - ALX Reset MCU STM32 Module
+  * @file		alxAccelerometer.h
+  * @brief		Auralix C Library - ALX Accelerometer Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_RST_MCU_STM32_H
-#define ALX_RST_MCU_STM32_H
+#ifndef ALX_ACCELEROMETER_H
+#define ALX_ACCELEROMETER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,54 +47,71 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB)
+
+
+//******************************************************************************
+// Preprocessor
+//******************************************************************************
+#define ALX_ACCELEROMETER_FILE "alxAccelerometer.h"
+
+// Assert //
+#if defined(ALX_ACCELEROMETER_ASSERT_BKPT_ENABLE)
+	#define ALX_ACCELEROMETER_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ACCELEROMETER_FILE, expr)
+#elif defined(ALX_ACCELEROMETER_ASSERT_TRACE_ENABLE)
+	#define ALX_ACCELEROMETER_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ACCELEROMETER_FILE, expr)
+#elif defined(ALX_ACCELEROMETER_ASSERT_RST_ENABLE)
+	#define ALX_ACCELEROMETER_ASSERT(expr) ALX_ASSERT_RST(ALX_ACCELEROMETER_FILE, expr)
+#else
+	#define ALX_ACCELEROMETER_ASSERT(expr) do{} while (false)
+#endif
+
+// Trace //
+#if defined(ALX_ACCELEROMETER_TRACE_ENABLE)
+	#define ALX_ACCELEROMETER_TRACE(...) ALX_TRACE_WRN(ALX_ACCELEROMETER_FILE, __VA_ARGS__)
+#else
+	#define ALX_ACCELEROMETER_TRACE(...) do{} while (false)
+#endif
 
 
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef struct
+typedef enum
 {
-	bool sw;
-	bool rstPin;
-	bool wwdg;
-	bool iwdg;
-	bool lowPowerMgmt;
-	bool porOrBor;
-	#if defined(ALX_STM32F7)
-	bool por;
-	#endif
-	#if defined(ALX_STM32L4)
-	bool firewall;
-	bool optionByteLoader;
-	#endif
-} AlxRst_RstReason;
+	ALX_ACC_DEVICE_ADXL355,
+	ALX_ACC_DEVICE_ADXL357,
+	ALX_ACC_DEVICE_A352,
+	ALX_ACC_DEVICE_Max
+} AlxAccDevice;
 
-typedef struct
+typedef enum
 {
-	// Variables
-	AlxRst_RstReason rr;
-	uint32_t csr;
+	ALX_ACC_RANGE_0,
+	ALX_ACC_RANGE_1,
+	ALX_ACC_RANGE_2,
+	ALX_ACC_RANGE_Max
+} AlxAccRange;
 
-	// Info
-	bool wasCtorCalled;
-	bool isInit;
-} AlxRst;
+typedef enum
+{
+	ALX_ACC_SYNC_MODE_MEAS_CLK,
+	ALX_ACC_SYNC_MODE_PLL
+} AlxAccSyncMode;
+
+typedef struct __attribute__((packed))
+{
+	float x;
+	float y;
+	float z;
+	float temp;
+} AccDataPoint;
 
 
-//******************************************************************************
-// Constructor
-//******************************************************************************
-void AlxRst_Ctor
-(
-	AlxRst* me
-);
-
-
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_RST_MCU_STM32_H
+#endif	// #ifndef ALX_ACCELEROMETER_H

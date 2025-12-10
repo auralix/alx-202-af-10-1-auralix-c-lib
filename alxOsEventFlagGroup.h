@@ -87,8 +87,11 @@ typedef struct
 	// Variables
 	#if defined(ALX_FREE_RTOS)
 	EventGroupHandle_t eventGroupHandle_t;
+	AlxOsMutex alxOsMutex;
 	#endif
-	AlxOsMutex alxMutex;
+	#if defined(ALX_ZEPHYR)
+	struct k_event event;
+	#endif
 
 	// Info
 	bool wasCtorCalled;
@@ -109,7 +112,7 @@ void AlxOsEventFlagGroup_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-uint32_t AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet);
+void AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, bool irqSafe);
 uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsToClear);
 uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsToWait, bool clearEventFlagsOnExit, bool waitForAllEventFlags, uint32_t timeout_ms);
 uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, uint32_t eventFlagsToWait, uint32_t timeout_ms);

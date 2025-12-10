@@ -44,14 +44,17 @@ extern "C" {
 //------------------------------------------------------------------------------
 // ALX - EXT
 //------------------------------------------------------------------------------
+#include "alxA352.h"
 #include "alxAdau1961.h"
 #include "alxAds8678.h"
 #include "alxAds114s08.h"
-#include "alxAdxl355.h"
+#include "alxAdxl35x.h"
 #include "alxBq24600.h"
 #include "alxBq25890.h"
 #include "alxBts724g.h"
+#include "alxCdce913.h"
 #include "alxIna228.h"
+#include "alxLp586x.h"
 #include "alxMax17263.h"
 #include "alxMcp73831.h"
 #include "alxNtcg103jf103ft1s.h"
@@ -88,6 +91,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 // ALX
 //------------------------------------------------------------------------------
+#include "alxAccelerometer.h"
 #include "alxAssert.h"
 #include "alxAudio.h"
 #include "alxAudioPlayer.h"

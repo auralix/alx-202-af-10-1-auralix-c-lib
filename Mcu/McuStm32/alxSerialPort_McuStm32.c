@@ -376,7 +376,7 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 
 	// No overrun error handling, overrun error must be disabled @ Uart initialization.
 	uint8_t data = LL_USART_ReceiveData8(me->huart.Instance);	// Clears RXNE = 0
-	AlxFifo_Write(&me->rxFifo, data);
+	AlxFifo_Write(&me->rxFifo, &data, 1);
 }
 
 /**

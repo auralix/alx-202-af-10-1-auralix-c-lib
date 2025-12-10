@@ -146,7 +146,7 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 	AlxSpi_Periph_AttachClk(me);
 
 	// Init SPI
-	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
+	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE_WRN("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
 
 	// Set isInit
 	me->isInit = true;
@@ -220,7 +220,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 
 	// If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
-	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
+	else					{ ALX_SPI_TRACE_WRN("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 
 /**
@@ -256,7 +256,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 
 	// If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
-	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
+	else					{ ALX_SPI_TRACE_WRN("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 
 /**
@@ -293,7 +293,7 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 
 	// If we are here, SPI write/read was OK or number of tries error occured
 	if (status == Alx_Ok)	{ return Alx_Ok; }
-	else					{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
+	else					{ ALX_SPI_TRACE_WRN("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 
 /**
@@ -357,7 +357,7 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me)
 	AlxSpi_Periph_AttachClk(me);
 
 	// Init SPI
-	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
+	if (SPI_MasterInit(me->spi, &me->spiMasterConfig, AlxSpi_GetFlexCommClkFreq(me)) != kStatus_Success)	{ ALX_SPI_TRACE_WRN("ErrInit"); return Alx_Err; }	// MF: FlexComm "EnableClk" and "Periph reset" happens here
 
 	// Set isInit
 	me->isInit = true;
@@ -384,15 +384,15 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 		}
 		else
 		{
-			ALX_SPI_TRACE("ErrFls");
-			if (AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("ErrReset"); return Alx_Err;}
+			ALX_SPI_TRACE_WRN("ErrFls");
+			if (AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE_WRN("ErrReset"); return Alx_Err;}
 			continue;
 		}
 	}
 
 	// If we are here, SPI write/read was OK or number of tries error occured
 	if (status == kStatus_Success)	{ return Alx_Ok; }
-	else							{ ALX_SPI_TRACE("ErrNumOfTries"); return Alx_ErrNumOfTries; }
+	else							{ ALX_SPI_TRACE_WRN("ErrNumOfTries"); return Alx_ErrNumOfTries; }
 }
 static void AlxSpi_Ctor_ParseMode(AlxSpi* me)
 {

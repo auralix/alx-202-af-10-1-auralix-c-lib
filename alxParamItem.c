@@ -40,6 +40,30 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		dataType
+  * @param[in]		paramKvStore
+  * @param[in]		paramType
+  * @param[in]		key
+  * @param[in]		id
+  * @param[in]		groupKey
+  * @param[in]		groupId
+  * @param[in]		valDef
+  * @param[in]		valMin
+  * @param[in]		valMax
+  * @param[in]		valLen
+  * @param[in]		valOutOfRangeHandle
+  * @param[in]		isEnum
+  * @param[in]		enumArr
+  * @param[in]		enumArrLen
+  * @param[in]		valUnit
+  * @param[in]		valChangeTakesEffectAfterReset
+  * @param[in]		buff
+  * @param[in]		buffLen
+  */
 static void AlxParamItem_Ctor
 (
 	AlxParamItem* me,
@@ -55,8 +79,11 @@ static void AlxParamItem_Ctor
 	void* valMax,
 	uint32_t valLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	void* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset,
 	uint8_t* buff,
 	uint32_t buffLen
 );
@@ -69,18 +96,6 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val);
 //******************************************************************************
 // Constructor
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorUint8
 (
 	AlxParamItem* me,
@@ -94,8 +109,11 @@ void AlxParamItem_CtorUint8
 	uint8_t valMin,
 	uint8_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint8_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	AlxParamItem_Ctor
@@ -113,25 +131,15 @@ void AlxParamItem_CtorUint8
 		&valMax,
 		sizeof(uint8_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
-		numOfEnums,
+		enumArrLen,
+		valUnit,
+		valChangeTakesEffectAfterReset,
 		ALX_NULL_PTR,
 		ALX_NULL
 	);
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		paramKvStore
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorUint16
 (
 	AlxParamItem* me,
@@ -145,8 +153,11 @@ void AlxParamItem_CtorUint16
 	uint16_t valMin,
 	uint16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint16_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	AlxParamItem_Ctor
@@ -164,24 +175,15 @@ void AlxParamItem_CtorUint16
 		&valMax,
 		sizeof(uint16_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
-		numOfEnums,
+		enumArrLen,
+		valUnit,
+		valChangeTakesEffectAfterReset,
 		ALX_NULL_PTR,
 		ALX_NULL
 	);
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorUint32
 (
 	AlxParamItem* me,
@@ -195,8 +197,11 @@ void AlxParamItem_CtorUint32
 	uint32_t valMin,
 	uint32_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint32_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	AlxParamItem_Ctor
@@ -214,24 +219,15 @@ void AlxParamItem_CtorUint32
 		&valMax,
 		sizeof(uint32_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
-		numOfEnums,
+		enumArrLen,
+		valUnit,
+		valChangeTakesEffectAfterReset,
 		ALX_NULL_PTR,
 		ALX_NULL
 	);
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorUint64
 (
 	AlxParamItem* me,
@@ -245,8 +241,11 @@ void AlxParamItem_CtorUint64
 	uint64_t valMin,
 	uint64_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	uint64_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	AlxParamItem_Ctor
@@ -264,24 +263,15 @@ void AlxParamItem_CtorUint64
 		&valMax,
 		sizeof(uint64_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
-		numOfEnums,
+		enumArrLen,
+		valUnit,
+		valChangeTakesEffectAfterReset,
 		ALX_NULL_PTR,
 		ALX_NULL
 	);
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorInt8
 (
 	AlxParamItem* me,
@@ -295,8 +285,11 @@ void AlxParamItem_CtorInt8
 	int8_t valMin,
 	int8_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int8_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	AlxParamItem_Ctor
@@ -314,24 +307,15 @@ void AlxParamItem_CtorInt8
 		&valMax,
 		sizeof(int8_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
-		numOfEnums,
+		enumArrLen,
+		valUnit,
+		valChangeTakesEffectAfterReset,
 		ALX_NULL_PTR,
 		ALX_NULL
 	);
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorInt16
 (
 	AlxParamItem* me,
@@ -345,8 +329,11 @@ void AlxParamItem_CtorInt16
 	int16_t valMin,
 	int16_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int16_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	AlxParamItem_Ctor
@@ -364,24 +351,15 @@ void AlxParamItem_CtorInt16
 		&valMax,
 		sizeof(int16_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
-		numOfEnums,
+		enumArrLen,
+		valUnit,
+		valChangeTakesEffectAfterReset,
 		ALX_NULL_PTR,
 		ALX_NULL
 	);
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorInt32
 (
 	AlxParamItem* me,
@@ -395,8 +373,11 @@ void AlxParamItem_CtorInt32
 	int32_t valMin,
 	int32_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int32_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	AlxParamItem_Ctor
@@ -414,24 +395,15 @@ void AlxParamItem_CtorInt32
 		&valMax,
 		sizeof(int32_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
-		numOfEnums,
+		enumArrLen,
+		valUnit,
+		valChangeTakesEffectAfterReset,
 		ALX_NULL_PTR,
 		ALX_NULL
 	);
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorInt64
 (
 	AlxParamItem* me,
@@ -445,8 +417,11 @@ void AlxParamItem_CtorInt64
 	int64_t valMin,
 	int64_t valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	int64_t* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	AlxParamItem_Ctor
@@ -464,25 +439,15 @@ void AlxParamItem_CtorInt64
 		&valMax,
 		sizeof(int64_t),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
-		numOfEnums,
+		enumArrLen,
+		valUnit,
+		valChangeTakesEffectAfterReset,
 		ALX_NULL_PTR,
 		ALX_NULL
 	);
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		paramKvStore
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorFloat
 (
 	AlxParamItem* me,
@@ -496,8 +461,11 @@ void AlxParamItem_CtorFloat
 	float valMin,
 	float valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	float* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	AlxParamItem_Ctor
@@ -515,24 +483,15 @@ void AlxParamItem_CtorFloat
 		&valMax,
 		sizeof(float),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
-		numOfEnums,
+		enumArrLen,
+		valUnit,
+		valChangeTakesEffectAfterReset,
 		ALX_NULL_PTR,
 		ALX_NULL
 	);
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valMin
-  * @param[in]		valMax
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorDouble
 (
 	AlxParamItem* me,
@@ -546,8 +505,11 @@ void AlxParamItem_CtorDouble
 	double valMin,
 	double valMax,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	double* enumArr,
-	uint8_t numOfEnums
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	AlxParamItem_Ctor
@@ -565,22 +527,15 @@ void AlxParamItem_CtorDouble
 		&valMax,
 		sizeof(double),
 		valOutOfRangeHandle,
+		isEnum,
 		enumArr,
-		numOfEnums,
+		enumArrLen,
+		valUnit,
+		valChangeTakesEffectAfterReset,
 		ALX_NULL_PTR,
 		ALX_NULL
 	);
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		paramKvStore
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  */
 void AlxParamItem_CtorBool
 (
 	AlxParamItem* me,
@@ -590,7 +545,9 @@ void AlxParamItem_CtorBool
 	uint32_t id,
 	const char* groupKey,
 	uint32_t groupId,
-	bool valDef
+	bool valDef,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	// Parameters
@@ -606,6 +563,8 @@ void AlxParamItem_CtorBool
 	me->valMax._bool = ALX_NULL;
 	me->valLen = sizeof(bool);
 	me->valOutOfRangeHandle = ALX_NULL;
+	me->valUnit = valUnit;
+	me->valChangeTakesEffectAfterReset = valChangeTakesEffectAfterReset;
 	me->buff = ALX_NULL_PTR;
 	me->buffLen = ALX_NULL;
 
@@ -615,19 +574,6 @@ void AlxParamItem_CtorBool
 	// Info
 	me->wasCtorCalled = true;
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valBuff
-  * @param[in]		valDefBuff
-  * @param[in]		valBuffLen
-  * @param[in]		valOutOfRangeHandle
-  */
 void AlxParamItem_CtorArr
 (
 	AlxParamItem* me,
@@ -641,7 +587,9 @@ void AlxParamItem_CtorArr
 	void* valBuff,
 	void* valDefBuff,
 	uint32_t valBuffLen,
-	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle
+	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset
 )
 {
 	// Parameters
@@ -658,6 +606,8 @@ void AlxParamItem_CtorArr
 	me->valMax.arr = ALX_NULL_PTR;
 	me->valLen = valBuffLen;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
+	me->valUnit = valUnit;
+	me->valChangeTakesEffectAfterReset = valChangeTakesEffectAfterReset;
 
 	// Variables
 	memcpy(me->valDef.arr, valDef, me->valLen);			// Copy default value to default value buffer
@@ -666,19 +616,6 @@ void AlxParamItem_CtorArr
 	// Info
 	me->wasCtorCalled = true;
 }
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		paramKvStore
-  * @param[in]		key
-  * @param[in]		id
-  * @param[in]		groupId
-  * @param[in]		valDef
-  * @param[in]		valOutOfRangeHandle
-  * @param[in,out]	buff
-  * @param[in]		buffLen
-  */
 void AlxParamItem_CtorStr
 (
 	AlxParamItem* me,
@@ -690,6 +627,8 @@ void AlxParamItem_CtorStr
 	uint32_t groupId,
 	const char* valDef,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset,
 	uint8_t* buff,
 	uint32_t buffLen
 )
@@ -710,12 +649,15 @@ void AlxParamItem_CtorStr
 	me->valMax.str = ALX_NULL_PTR;
 	me->valLen = strlen(valDef) + 1;	// Add +1 for null terminator
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
+	me->valUnit = valUnit;
+	me->valChangeTakesEffectAfterReset = valChangeTakesEffectAfterReset;
 	me->buff = buff;
 	me->buffLen = buffLen;
 
 	// Variables
 	me->val.str = (char*)buff;
 	strcpy((char*)buff, valDef);	// Copy default value to buffer
+	me->pendingStore = false;
 
 	// Info
 	me->wasCtorCalled = true;
@@ -833,19 +775,6 @@ uint32_t AlxParamItem_GetGroupId(AlxParamItem* me)
 /**
   * @brief
   * @param[in,out]	me
-  */
-void* AlxParamItem_GetValPtr(AlxParamItem* me)
-{
-	// Assert
-	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-
-	// Return
-	return AlxParamItem_GetValPtr_Private(me);
-}
-
-/**
-  * @brief
-  * @param[in,out]	me
   * @return
   */
 uint32_t AlxParamItem_GetValLen(AlxParamItem* me)
@@ -855,6 +784,77 @@ uint32_t AlxParamItem_GetValLen(AlxParamItem* me)
 
 	// Return
 	return me->valLen;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retva			AlxParamItem_Assert
+  * @retva			AlxParamItem_Ignore
+  * @retva			AlxParamItem_Bound
+  */
+AlxParamItem_ValOutOfRangeHandle AlxParamItem_GetValOutOfRangeHandle(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return me->valOutOfRangeHandle;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
+const char* AlxParamItem_GetValUnit(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return me->valUnit;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
+bool AlxParamItem_GetValChangeTakesEffectAfterReset(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return me->valChangeTakesEffectAfterReset;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
+uint32_t AlxParamItem_GetBuffLen(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return me->buffLen;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  */
+void* AlxParamItem_GetValPtr(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return AlxParamItem_GetValPtr_Private(me);
 }
 
 
@@ -1294,75 +1294,516 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 
 
 //------------------------------------------------------------------------------
-// Set Default
+// Default / Min / Max
 //------------------------------------------------------------------------------
-
-/**
-  * @brief
-  * @param[in,out] me
-  */
 void AlxParamItem_SetValToDef(AlxParamItem* me)
 {
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 
-	// Set value to default
+	// Local variables
+	void* valDefPtr = NULL;
+
+	// Prepare
 	if (me->dataType == AlxParamItem_Uint8)
 	{
-		me->val.uint8 = me->valDef.uint8;
+		valDefPtr = &me->valDef.uint8;
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
-		me->val.uint16 = me->valDef.uint16;
+		valDefPtr = &me->valDef.uint16;
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
 	{
-		me->val.uint32 = me->valDef.uint32;
+		valDefPtr = &me->valDef.uint32;
 	}
 	else if (me->dataType == AlxParamItem_Uint64)
 	{
-		me->val.uint64 = me->valDef.uint64;
+		valDefPtr = &me->valDef.uint64;
 	}
 	else if (me->dataType == AlxParamItem_Int8)
 	{
-		me->val.int8 = me->valDef.int8;
+		valDefPtr = &me->valDef.int8;
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
-		me->val.int16 = me->valDef.int16;
+		valDefPtr = &me->valDef.int16;
 	}
 	else if (me->dataType == AlxParamItem_Int32)
 	{
-		me->val.int32 = me->valDef.int32;
+		valDefPtr = &me->valDef.int32;
 	}
 	else if (me->dataType == AlxParamItem_Int64)
 	{
-		me->val.int64 = me->valDef.int64;
+		valDefPtr = &me->valDef.int64;
 	}
 	else if (me->dataType == AlxParamItem_Float)
 	{
-		me->val._float = me->valDef._float;
+		valDefPtr = &me->valDef._float;
 	}
 	else if (me->dataType == AlxParamItem_Double)
 	{
-		me->val._double = me->valDef._double;
+		valDefPtr = &me->valDef._double;
 	}
 	else if (me->dataType == AlxParamItem_Bool)
 	{
-		me->val._bool = me->valDef._bool;
+		valDefPtr = &me->valDef._bool;
 	}
 	else if (me->dataType == AlxParamItem_Arr)
 	{
-		me->val.arr = me->valDef.arr;
+		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
 	else if (me->dataType == AlxParamItem_Str)
 	{
-		strcpy(me->val.str, me->valDef.str);
+		valDefPtr =  me->valDef.str;
 	}
 	else
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
+
+	// Set
+	ALX_PARAM_ITEM_ASSERT(AlxParamItem_SetVal(me, valDefPtr) == Alx_Ok);
+}
+uint8_t AlxParamItem_GetValDefUint8(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint8);
+
+	// Return
+	return me->valDef.uint8;
+}
+uint16_t AlxParamItem_GetValDefUint16(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint16);
+
+	// Return
+	return me->valDef.uint16;
+}
+uint32_t AlxParamItem_GetValDefUint32(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint32);
+
+	// Return
+	return me->valDef.uint32;
+}
+uint64_t AlxParamItem_GetValDefUint64(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint64);
+
+	// Return
+	return me->valDef.uint64;
+}
+int8_t AlxParamItem_GetValDefInt8(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int8);
+
+	// Return
+	return me->valDef.int8;
+}
+int16_t AlxParamItem_GetValDefInt16(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int16);
+
+	// Return
+	return me->valDef.int16;
+}
+int32_t AlxParamItem_GetValDefInt32(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int32);
+
+	// Return
+	return me->valDef.int32;
+}
+int64_t AlxParamItem_GetValDefInt64(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int64);
+
+	// Return
+	return me->valDef.int64;
+}
+float AlxParamItem_GetValDefFloat(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Float);
+
+	// Return
+	return me->valDef._float;
+}
+double AlxParamItem_GetValDefDouble(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Double);
+
+	// Return
+	return me->valDef._double;
+}
+bool AlxParamItem_GetValDefBool(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Bool);
+
+	// Return
+	return me->valDef._bool;
+}
+void* AlxParamItem_GetValDefArr(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Arr);
+
+	// Return
+	return me->valDef.arr;
+}
+const char* AlxParamItem_GetValDefStr(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Str);
+
+	// Return
+	return me->valDef.str;
+}
+uint8_t AlxParamItem_GetValMinUint8(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint8);
+
+	// Return
+	return me->valMin.uint8;
+}
+uint16_t AlxParamItem_GetValMinUint16(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint16);
+
+	// Return
+	return me->valMin.uint16;
+}
+uint32_t AlxParamItem_GetValMinUint32(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint32);
+
+	// Return
+	return me->valMin.uint32;
+}
+uint64_t AlxParamItem_GetValMinUint64(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint64);
+
+	// Return
+	return me->valMin.uint64;
+}
+int8_t AlxParamItem_GetValMinInt8(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int8);
+
+	// Return
+	return me->valMin.int8;
+}
+int16_t AlxParamItem_GetValMinInt16(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int16);
+
+	// Return
+	return me->valMin.int16;
+}
+int32_t AlxParamItem_GetValMinInt32(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int32);
+
+	// Return
+	return me->valMin.int32;
+}
+int64_t AlxParamItem_GetValMinInt64(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int64);
+
+	// Return
+	return me->valMin.int64;
+}
+float AlxParamItem_GetValMinFloat(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Float);
+
+	// Return
+	return me->valMin._float;
+}
+double AlxParamItem_GetValMinDouble(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Double);
+
+	// Return
+	return me->valMin._double;
+}
+uint8_t AlxParamItem_GetValMaxUint8(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint8);
+
+	// Return
+	return me->valMax.uint8;
+}
+uint16_t AlxParamItem_GetValMaxUint16(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint16);
+
+	// Return
+	return me->valMax.uint16;
+}
+uint32_t AlxParamItem_GetValMaxUint32(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint32);
+
+	// Return
+	return me->valMax.uint32;
+}
+uint64_t AlxParamItem_GetValMaxUint64(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint64);
+
+	// Return
+	return me->valMax.uint64;
+}
+int8_t AlxParamItem_GetValMaxInt8(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int8);
+
+	// Return
+	return me->valMax.int8;
+}
+int16_t AlxParamItem_GetValMaxInt16(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int16);
+
+	// Return
+	return me->valMax.int16;
+}
+int32_t AlxParamItem_GetValMaxInt32(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int32);
+
+	// Return
+	return me->valMax.int32;
+}
+int64_t AlxParamItem_GetValMaxInt64(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int64);
+
+	// Return
+	return me->valMax.int64;
+}
+float AlxParamItem_GetValMaxFloat(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Float);
+
+	// Return
+	return me->valMax._float;
+}
+double AlxParamItem_GetValMaxDouble(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Double);
+
+	// Return
+	return me->valMax._double;
+}
+
+
+//------------------------------------------------------------------------------
+// Enum
+//------------------------------------------------------------------------------
+bool AlxParamItem_GetIsEnum(AlxParamItem* me)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+
+	// Return
+	return me->isEnum;
+}
+void AlxParamItem_GetEnumArrUint8(AlxParamItem* me, uint8_t** enumArr, uint8_t* enumArrLen)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint8);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
+
+	// Return
+	*enumArr = (uint8_t*)me->enumArr;
+	*enumArrLen = me->enumArrLen;
+}
+void AlxParamItem_GetEnumArrUint16(AlxParamItem* me, uint16_t** enumArr, uint8_t* enumArrLen)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint16);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
+
+	// Return
+	*enumArr = (uint16_t*)me->enumArr;
+	*enumArrLen = me->enumArrLen;
+}
+void AlxParamItem_GetEnumArrUint32(AlxParamItem* me, uint32_t** enumArr, uint8_t* enumArrLen)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint32);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
+
+	// Return
+	*enumArr = (uint32_t*)me->enumArr;
+	*enumArrLen = me->enumArrLen;
+}
+void AlxParamItem_GetEnumArrUint64(AlxParamItem* me, uint64_t** enumArr, uint8_t* enumArrLen)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint64);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
+
+	// Return
+	*enumArr = (uint64_t*)me->enumArr;
+	*enumArrLen = me->enumArrLen;
+}
+void AlxParamItem_GetEnumArrInt8(AlxParamItem* me, int8_t** enumArr, uint8_t* enumArrLen)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int8);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
+
+	// Return
+	*enumArr = (int8_t*)me->enumArr;
+	*enumArrLen = me->enumArrLen;
+}
+void AlxParamItem_GetEnumArrInt16(AlxParamItem* me, int16_t** enumArr, uint8_t* enumArrLen)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int16);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
+
+	// Return
+	*enumArr = (int16_t*)me->enumArr;
+	*enumArrLen = me->enumArrLen;
+}
+void AlxParamItem_GetEnumArrInt32(AlxParamItem* me, int32_t** enumArr, uint8_t* enumArrLen)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int32);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
+
+	// Return
+	*enumArr = (int32_t*)me->enumArr;
+	*enumArrLen = me->enumArrLen;
+}
+void AlxParamItem_GetEnumArrInt64(AlxParamItem* me, int64_t** enumArr, uint8_t* enumArrLen)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int64);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
+
+	// Return
+	*enumArr = (int64_t*)me->enumArr;
+	*enumArrLen = me->enumArrLen;
+}
+void AlxParamItem_GetEnumArrFloat(AlxParamItem* me, float** enumArr, uint8_t* enumArrLen)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Float);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
+
+	// Return
+	*enumArr = (float*)me->enumArr;
+	*enumArrLen = me->enumArrLen;
+}
+void AlxParamItem_GetEnumArrDouble(AlxParamItem* me, double** enumArr, uint8_t* enumArrLen)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Double);
+	ALX_PARAM_ITEM_ASSERT(me->isEnum == true);
+	ALX_PARAM_ITEM_ASSERT(me->enumArr != NULL);
+	ALX_PARAM_ITEM_ASSERT(me->enumArrLen != 0);
+
+	// Return
+	*enumArr = (double*)me->enumArr;
+	*enumArrLen = me->enumArrLen;
 }
 
 
@@ -1717,6 +2158,7 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 {
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->paramKvStore != NULL);
 
 	// Local variables
 	void* buff = NULL;
@@ -1754,6 +2196,7 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 
 	// Set Param Item
 	status = AlxParamItem_SetVal(me, buff);
+	me->pendingStore = false;	// TV: TODO - Hack, we had problem, that if loaded val diff than default, pendingStore was set.. we don't want that..
 
 	// Free memory
 	free(buff);
@@ -1782,6 +2225,13 @@ Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 {
 	// Assert
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+	ALX_PARAM_ITEM_ASSERT(me->paramKvStore != NULL);
+
+	// Check
+	if (me->pendingStore == false)
+	{
+		return Alx_Ok;
+	}
 
 	// Get value pointer
 	void* valPtr = AlxParamItem_GetValPtr_Private(me);
@@ -1789,6 +2239,9 @@ Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 	// Set Param KV Store
 	Alx_Status status = AlxParamKvStore_Set(me->paramKvStore, me->key, valPtr, me->valLen);
 	if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE_WRN("Err"); return Alx_Err; }
+
+	// Clear
+	me->pendingStore = false;
 
 	// Return
 	return Alx_Ok;
@@ -1813,8 +2266,11 @@ static void AlxParamItem_Ctor
 	void* valMax,
 	uint32_t valLen,
 	AlxParamItem_ValOutOfRangeHandle valOutOfRangeHandle,
+	bool isEnum,
 	void* enumArr,
-	uint8_t numOfEnums,
+	uint8_t enumArrLen,
+	const char* valUnit,
+	bool valChangeTakesEffectAfterReset,
 	uint8_t* buff,
 	uint32_t buffLen
 )
@@ -1832,8 +2288,11 @@ static void AlxParamItem_Ctor
 	memcpy(&me->valMax, valMax, valLen);
 	me->valLen = valLen;
 	me->valOutOfRangeHandle = valOutOfRangeHandle;
+	me->isEnum = isEnum;
 	me->enumArr = enumArr;
-	me->numOfEnums = numOfEnums;
+	me->enumArrLen = enumArrLen;
+	me->valUnit = valUnit;
+	me->valChangeTakesEffectAfterReset = valChangeTakesEffectAfterReset;
 	me->buff = buff;
 	me->buffLen = buffLen;
 
@@ -1858,7 +2317,7 @@ static void AlxParamItem_Ctor
 static bool AlxParamItem_AreEnumArrValFromLowToHigh(AlxParamItem* me)
 {
 	// Check if enum array values are from low to high
-	for (uint8_t i = 0; i < me->numOfEnums - 1; i++)
+	for (uint8_t i = 0; i < me->enumArrLen - 1; i++)
 	{
 		if (me->dataType == AlxParamItem_Uint8)
 		{
@@ -2004,7 +2463,7 @@ static bool AlxParamItem_AreEnumArrValFromLowToHigh(AlxParamItem* me)
 static bool AlxParamItem_IsEnumOnList(AlxParamItem* me, void* enumVal)
 {
 	// Check if enum value is on the list
-	for (uint8_t i = 0; i < me->numOfEnums; i++)
+	for (uint8_t i = 0; i < me->enumArrLen; i++)
 	{
 		if (me->dataType == AlxParamItem_Uint8)
 		{
@@ -2167,30 +2626,17 @@ static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me)
 static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 {
 	//------------------------------------------------------------------------------
+	// Local Variables
 	//------------------------------------------------------------------------------
-	// Handle Bool
-	//------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------
-	if (me->dataType == AlxParamItem_Bool)
-	{
-		bool _val = *(bool*)val;
-		me->val._bool = _val;
-		return Alx_Ok;
-	}
-
-
-
-
-	//------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------
-	// Handle Uint8/16/32/64, Int8/16/32/64, Float, Double, String
-	//------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------
-
-	// Local variables
 	Alx_Status status = Alx_Err;
+	void* valPtr = AlxParamItem_GetValPtr_Private(me);
+	void* oldValPtr = NULL;
+	uint32_t oldValLen = 0;
 
-	// Check if enum
+
+	//------------------------------------------------------------------------------
+	// Handle Enum
+	//------------------------------------------------------------------------------
 	if (me->enumArr != NULL)
 	{
 		// Check if enum is on the list
@@ -2201,7 +2647,7 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 			if (me->valOutOfRangeHandle == AlxParamItem_Assert)
 			{
 				ALX_PARAM_ITEM_ASSERT(false);
-				status = Alx_Err;
+				return AlxParamItem_ErrEnum;
 			}
 
 			// Return
@@ -2209,8 +2655,39 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 		}
 	}
 
-	// Handle value out of range
-	if((me->valOutOfRangeHandle == AlxParamItem_Assert) || (me->valOutOfRangeHandle == AlxParamItem_Ignore))
+
+	//------------------------------------------------------------------------------
+	// Handle Set Old
+	//------------------------------------------------------------------------------
+
+	// Set oldValLen
+	if (me->dataType == AlxParamItem_Str)
+	{
+		oldValLen = me->buffLen;
+	}
+	else
+	{
+		oldValLen = me->valLen;
+	}
+
+	// Allocate memory
+	oldValPtr = calloc(oldValLen, sizeof(uint8_t));
+	if(oldValPtr == NULL) { ALX_PARAM_ITEM_TRACE_WRN("Err"); free(oldValPtr); return Alx_Err; }
+
+	// Set oldVal
+	memcpy(oldValPtr, valPtr, me->valLen);
+
+
+	//------------------------------------------------------------------------------
+	// Handle Set New
+	//------------------------------------------------------------------------------
+	if (me->dataType == AlxParamItem_Bool)
+	{
+		bool _val = *(bool*)val;
+		me->val._bool = _val;
+		status = Alx_Ok;
+	}
+	else if((me->valOutOfRangeHandle == AlxParamItem_Assert) || (me->valOutOfRangeHandle == AlxParamItem_Ignore))
 	{
 		// Set
 		if (me->dataType == AlxParamItem_Uint8)
@@ -2420,6 +2897,26 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 		status = Alx_Err;
 	}
+
+
+	//------------------------------------------------------------------------------
+	// Handle Pending Store
+	//------------------------------------------------------------------------------
+	if (status == Alx_Ok)
+	{
+		if (memcmp(oldValPtr, valPtr, me->valLen) != 0)
+		{
+			me->pendingStore = true;
+		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+
+	// Free memory
+	free(oldValPtr);
 
 	// Return
 	return status;

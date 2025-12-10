@@ -38,6 +38,14 @@
 
 
 //******************************************************************************
+// Private Functions
+//******************************************************************************
+#if defined(ALX_ZEPHYR)
+static void AlxOsThread_Thread(void* p1, void* p2, void* p3);
+#endif
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 
@@ -46,6 +54,7 @@
   * @param[in,out]	me
   * @param[in]		func
   * @param[in]		name
+  * @param[in]		stackBuff
   * @param[in]		stackLen_byte
   * @param[in]		param
   * @param[in]		priority
@@ -55,27 +64,36 @@ void AlxOsThread_Ctor
 	AlxOsThread* me,
 	void (*func)(void*),
 	const char* name,
+	#if defined(ALX_ZEPHYR)
+	k_thread_stack_t* stackBuff,
+	#endif
 	uint32_t stackLen_byte,
 	void* param,
-	uint32_t priority
+	int32_t priority
 )
 {
 	// Parameters
 	me->func = func;
 	me->name = name;
+	#if defined(ALX_ZEPHYR)
+	me->stackBuff = stackBuff;
+	#endif
 	me->stackLen_byte = stackLen_byte;
 	me->param = param;
 	me->priority = priority;
 
 	// Variables
 	#if defined(ALX_FREE_RTOS)
-	me->stackLen_word = stackLen_byte / 4;	// TV: FreeRTOS stack is mesured in words, 1 word = 4 bytes
 	me->taskHandle = NULL;
+	me->stackLen_word = stackLen_byte / sizeof(StackType_t);	// TV: FreeRTOS stack is mesured in words, 1 word = sizeof(StackType_t) bytes
+	#endif
+	#if defined(ALX_ZEPHYR)
+	memset(&me->threadHandle, 0, sizeof(me->threadHandle));
 	#endif
 
 	// Info
-	me->wasThreadStarted = false;
 	me->wasCtorCalled = true;
+	me->wasStarted = false;
 }
 
 
@@ -92,11 +110,12 @@ void AlxOsThread_Ctor
 Alx_Status AlxOsThread_Start(AlxOsThread* me)
 {
 	// Assert
-	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == false);
 	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+	ALX_OS_THREAD_ASSERT(me->wasStarted == false);
 
 	// Start
 	#if defined(ALX_FREE_RTOS)
+	ALX_OS_THREAD_ASSERT(0 <= me->priority && me->priority < configMAX_PRIORITIES);
 	BaseType_t status = xTaskCreate
 	(
 		(TaskFunction_t)me->func,
@@ -106,11 +125,38 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 		(UBaseType_t)me->priority,
 		&me->taskHandle
 	);
-	if (status != pdPASS) { ALX_OS_THREAD_TRACE("Err"); return Alx_Err; }
+	if (status != pdPASS)
+	{
+		ALX_OS_THREAD_TRACE_ERR("FAIL: xTaskCreate() status %ld name %s stackLen_word %lu priority %ld", status, me->name, me->stackLen_word, me->priority);
+		return Alx_Err;
+	}
+	#endif
+	#if defined(ALX_ZEPHYR)
+	k_tid_t threadId = k_thread_create
+	(
+		&me->threadHandle,						// new_thread
+		me->stackBuff,							// stack
+		me->stackLen_byte,						// stack_size
+		(k_thread_entry_t)AlxOsThread_Thread,	// entry
+		me,										// p1
+		NULL,									// p2
+		NULL,									// p3
+		me->priority,							// prio
+		0,										// options
+		K_NO_WAIT								// delay
+	);
+	#if defined(CONFIG_THREAD_NAME)
+	int32_t status = k_thread_name_set(threadId, me->name);
+	if (status != 0)
+	{
+		ALX_OS_THREAD_TRACE_ERR("FAIL: k_thread_name_set() status %ld name %s stackLen_byte %lu priority %ld", status, me->name, me->stackLen_byte, me->priority);
+		return Alx_Err;
+	}
+	#endif
 	#endif
 
-	// Set wasThreadStarted
-	me->wasThreadStarted = true;
+	// Set
+	me->wasStarted = true;
 
 	// Return
 	return Alx_Ok;
@@ -123,12 +169,15 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 void AlxOsThread_Yield(AlxOsThread* me)
 {
 	// Assert
-	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == true);
 	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+	ALX_OS_THREAD_ASSERT(me->wasStarted == true);
 
 	// Yield
 	#if defined(ALX_FREE_RTOS)
 	taskYIELD();
+	#endif
+	#if defined(ALX_ZEPHYR)
+	k_yield();
 	#endif
 }
 
@@ -139,14 +188,95 @@ void AlxOsThread_Yield(AlxOsThread* me)
 void AlxOsThread_Terminate(AlxOsThread* me)
 {
 	// Assert
-	ALX_OS_THREAD_ASSERT(me->wasThreadStarted == true);
 	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+	ALX_OS_THREAD_ASSERT(me->wasStarted == true);
 
 	// Terminate
 	#if defined(ALX_FREE_RTOS)
 	vTaskDelete(me->taskHandle);
 	#endif
+	#if defined(ALX_ZEPHYR)
+	k_thread_abort(&me->threadHandle);
+	#endif
+
+	// Clear
+	me->wasStarted = false;
 }
+Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
+{
+	// Assert
+	ALX_OS_THREAD_ASSERT(me->wasCtorCalled == true);
+	ALX_OS_THREAD_ASSERT(me->wasStarted == true);
+
+	// Join
+	#if defined(ALX_FREE_RTOS)
+	TickType_t timeout_ticks = (timeout_ms == UINT32_MAX) ? portMAX_DELAY : pdMS_TO_TICKS(timeout_ms);
+	TickType_t start_time = xTaskGetTickCount();
+
+	while (true)	// AB: FreeRTOS doesn't have a native join mechanism, we need to poll task state and wait for deletion
+	{
+		// Check if task still exists by trying to get its state
+		eTaskState task_state = eTaskGetState(me->taskHandle);
+		if (task_state == eDeleted || task_state == eInvalid)
+		{
+			// Task has finished/been deleted
+			return Alx_Ok;
+		}
+
+		// Check timeout
+		if (timeout_ms != UINT32_MAX)
+		{
+			TickType_t current_time = xTaskGetTickCount();
+			if ((current_time - start_time) >= timeout_ticks)
+			{
+				return Alx_ErrNumOfTries;
+			}
+		}
+
+		// Small delay to avoid busy waiting
+		vTaskDelay(pdMS_TO_TICKS(10));
+	}
+	#endif
+	#if defined(ALX_ZEPHYR)
+	k_timeout_t timeout = (timeout_ms == UINT32_MAX) ? K_FOREVER : K_MSEC(timeout_ms);
+
+	int ret = k_thread_join(&me->threadHandle, timeout);	// AB: Zephyr has k_thread_join function
+	if (ret == 0)
+	{
+		return Alx_Ok;
+	}
+	else if (ret == -EAGAIN)
+	{
+		return Alx_ErrNumOfTries;
+	}
+	else
+	{
+		return Alx_Err;
+	}
+	#endif
+
+	// Clear
+	me->wasStarted = false;
+}
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+#if defined(ALX_ZEPHYR)
+static void AlxOsThread_Thread(void* p1, void* p2, void* p3)
+{
+	// Void
+	(void)p2;
+	(void)p3;
+
+	// Prepare me from p1
+	AlxOsThread* me = (AlxOsThread*)p1;
+
+	// Call actual user function
+	me->func(me->param);
+}
+#endif
 
 
 #endif	// #if defined(ALX_C_LIB)

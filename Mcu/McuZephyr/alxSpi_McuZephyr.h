@@ -1,7 +1,7 @@
 ﻿/**
   ******************************************************************************
-  * @file		alxRst_McuStm32.h
-  * @brief		Auralix C Library - ALX Reset MCU STM32 Module
+  * @file		alxSpi_McuZephyr.h
+  * @brief		Auralix C Library - ALX SPI MCU Zephyr Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_RST_MCU_STM32_H
-#define ALX_RST_MCU_STM32_H
+#ifndef ALX_SPI_MCU_ZEPHYR_H
+#define ALX_SPI_MCU_ZEPHYR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,12 +42,13 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxIoPin.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 
 //******************************************************************************
@@ -55,46 +56,37 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	bool sw;
-	bool rstPin;
-	bool wwdg;
-	bool iwdg;
-	bool lowPowerMgmt;
-	bool porOrBor;
-	#if defined(ALX_STM32F7)
-	bool por;
-	#endif
-	#if defined(ALX_STM32L4)
-	bool firewall;
-	bool optionByteLoader;
-	#endif
-} AlxRst_RstReason;
+	// Parameters
+	const char* deviceName;
+	AlxIoPin* do_nCS;
+	struct spi_config config;
 
-typedef struct
-{
 	// Variables
-	AlxRst_RstReason rr;
-	uint32_t csr;
+	const struct device* device;
 
 	// Info
 	bool wasCtorCalled;
 	bool isInit;
-} AlxRst;
+} AlxSpi;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxRst_Ctor
+void AlxSpi_Ctor
 (
-	AlxRst* me
+	AlxSpi* me,
+	const char* deviceName,
+	AlxIoPin* do_nCS,
+	uint32_t frequency,
+	spi_operation_t operation
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_ZEPHYR)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_RST_MCU_STM32_H
+#endif	// #ifndef ALX_SPI_MCU_ZEPHYR_H

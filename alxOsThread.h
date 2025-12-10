@@ -68,9 +68,9 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_OS_THREAD_TRACE_ENABLE)
-	#define ALX_OS_THREAD_TRACE(...) ALX_TRACE_WRN(ALX_OS_THREAD_FILE, __VA_ARGS__)
+	#define ALX_OS_THREAD_TRACE_ERR(...) ALX_TRACE_ERR(ALX_OS_THREAD_FILE, __VA_ARGS__)
 #else
-	#define ALX_OS_THREAD_TRACE(...) do{} while (false)
+	#define ALX_OS_THREAD_TRACE_ERR(...) do{} while (false)
 #endif
 
 
@@ -82,19 +82,25 @@ typedef struct
 	// Parameters
 	void (*func)(void*);
 	const char* name;
+	#if defined(ALX_ZEPHYR)
+	k_thread_stack_t* stackBuff;
+	#endif
 	uint32_t stackLen_byte;
 	void* param;
-	uint32_t priority;
+	int32_t priority;
 
 	// Variables
 	#if defined(ALX_FREE_RTOS)
-	configSTACK_DEPTH_TYPE stackLen_word;
 	TaskHandle_t taskHandle;
+	configSTACK_DEPTH_TYPE stackLen_word;
+	#endif
+	#if defined(ALX_ZEPHYR)
+	struct k_thread threadHandle;
 	#endif
 
 	// Info
-	bool wasThreadStarted;
 	bool wasCtorCalled;
+	bool wasStarted;
 } AlxOsThread;
 
 
@@ -106,9 +112,12 @@ void AlxOsThread_Ctor
 	AlxOsThread* me,
 	void (*func)(void*),
 	const char* name,
+	#if defined(ALX_ZEPHYR)
+	k_thread_stack_t* stackBuff,
+	#endif
 	uint32_t stackLen_byte,
 	void* param,
-	uint32_t priority
+	int32_t priority
 );
 
 
@@ -118,6 +127,7 @@ void AlxOsThread_Ctor
 Alx_Status AlxOsThread_Start(AlxOsThread* me);
 void AlxOsThread_Yield(AlxOsThread* me);
 void AlxOsThread_Terminate(AlxOsThread* me);
+Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms);
 
 
 #endif	// #if defined(ALX_C_LIB)
