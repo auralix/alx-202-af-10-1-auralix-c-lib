@@ -1274,6 +1274,9 @@ const char* AlxId_GetHwMcuUniqueIdStr(AlxId* me)
   */
 void AlxId_CalcHwId(AlxIoPin** hwIdIoPinArr, uint8_t hwIdIoPinArrLen, AlxIoPin_TriState* hwIdIoPinState, uint8_t* hwId)
 {
+	// Assert
+	ALX_ID_ASSERT(hwIdIoPinArrLen <= ALX_ID_HW_ID_IO_PIN_ARR_LEN);
+
 	// Get HW ID pin states
 	for (uint32_t i = 0; i < hwIdIoPinArrLen; i++)
 	{
@@ -1283,10 +1286,16 @@ void AlxId_CalcHwId(AlxIoPin** hwIdIoPinArr, uint8_t hwIdIoPinArrLen, AlxIoPin_T
 	}
 
 	// Calculate HW ID
+	uint8_t _hwId = 0;
+	uint8_t pow3 = 1;
 	for (uint32_t i = 0; i < hwIdIoPinArrLen; i++)
 	{
-		*hwId = *hwId + (uint32_t)hwIdIoPinState[i] * (uint32_t)powf(3UL, i);
+		_hwId = _hwId + (uint8_t)hwIdIoPinState[i] * pow3;
+		pow3 = pow3 * 3;
 	}
+
+	// Return
+	*hwId = _hwId;
 }
 
 
