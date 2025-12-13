@@ -896,7 +896,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 					{
 						ALX_LIN_TRACE_DBG("FAIL: CheckSlaveReqPending()");
 						me->rxb.active = false;
-						return;
+						return;	// SlaveReq Pending FAIL: Ignore frame, no Err_Callback
 					}
 
 					// Clear SlaveReq pending
@@ -1017,7 +1017,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				{
 					ALX_LIN_TRACE_DBG("FAIL: CheckMasterReqNad() nad_Actual %02X nad_Expected %02X nad_Broadcast %02X", nad_Actual, nad_Expected, nad_Broadcast);
 					me->rxb.active = false;
-					return;
+					return;	// MasterReq NAD FAIL: Ignore frame, no Err_Callback
 				}
 
 				// Callback
