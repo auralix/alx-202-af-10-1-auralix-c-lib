@@ -418,22 +418,8 @@ void AlxId_Init(AlxId* me)
 	//------------------------------------------------------------------------------
 	if (me->isHwIdUsed)
 	{
-		// Set // TV: TODO - Even needed?
-		me->hw.instance.id = 0;
-
-		// Get HW ID pin states
-		for (uint32_t i = 0; i < me->hw.idIoPinArrLen; i++)
-		{
-			AlxIoPin_Init(*(me->hw.idIoPinArr + i));
-			me->hw.idIoPinState[i] = AlxIoPin_Read_TriState(*(me->hw.idIoPinArr + i));
-			AlxIoPin_DeInit(*(me->hw.idIoPinArr + i));
-		}
-
 		// Calculate HW ID
-		for (uint32_t i = 0; i < me->hw.idIoPinArrLen; i++)
-		{
-			me->hw.instance.id = me->hw.instance.id + (uint32_t)me->hw.idIoPinState[i] * (uint32_t)powf(3UL, i);
-		}
+		AlxId_CalcHwId(me->hw.idIoPinArr, me->hw.idIoPinArrLen, me->hw.idIoPinState, &me->hw.instance.id);
 
 		// Set HW instance
 		for (uint8_t i = 0; i < me->hw.instanceKnownArrLen; i++)
@@ -1277,6 +1263,39 @@ const char* AlxId_GetHwMcuUniqueIdStr(AlxId* me)
 	#else
 	return "";
 	#endif
+}
+
+/**
+  * @brief
+  * @param[in]		hwIdIoPinArr
+  * @param[in]		hwIdIoPinArrLen
+  * @param[in,out]	hwIdIoPinState
+  * @param[out]		hwId
+  */
+void AlxId_CalcHwId(AlxIoPin** hwIdIoPinArr, uint8_t hwIdIoPinArrLen, AlxIoPin_TriState* hwIdIoPinState, uint8_t* hwId)
+{
+	// Assert
+	ALX_ID_ASSERT(hwIdIoPinArrLen <= ALX_ID_HW_ID_IO_PIN_ARR_LEN);
+
+	// Get HW ID pin states
+	for (uint32_t i = 0; i < hwIdIoPinArrLen; i++)
+	{
+		AlxIoPin_Init(*(hwIdIoPinArr + i));
+		hwIdIoPinState[i] = AlxIoPin_Read_TriState(*(hwIdIoPinArr + i));
+		AlxIoPin_DeInit(*(hwIdIoPinArr + i));
+	}
+
+	// Calculate HW ID
+	uint8_t _hwId = 0;
+	uint8_t pow3 = 1;
+	for (uint32_t i = 0; i < hwIdIoPinArrLen; i++)
+	{
+		_hwId = _hwId + (uint8_t)hwIdIoPinState[i] * pow3;
+		pow3 = pow3 * 3;
+	}
+
+	// Return
+	*hwId = _hwId;
 }
 
 
