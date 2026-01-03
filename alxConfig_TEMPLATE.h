@@ -81,11 +81,9 @@ extern "C" {
 //------------------------------------------------------------------------------
 // ALX - Bootloader
 //------------------------------------------------------------------------------
-//#if !defined(ALX_BUILD_CONFIG_NO_BOOT)
-//	#define ALX_BOOT_A
-//	#define ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE "alxBoot_GENERATED.h"
-//	#define ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE "2406071858_ALX-202-AF-27-1_NucleoF429Zi_Boot_CFw_V0-0-0_9f672fc.h"
-//#endif
+//#define ALX_BOOT_A
+//#define ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE "alxBoot_GENERATED.h"
+//#define ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE "2406071858_ALX-202-AF-27-1_NucleoF429Zi_Boot_CFw_V0-0-0_9f672fc.h"
 //#define ALX_BOOT_B
 //#define ALX_BOOT_B_ID_FW_ARTF "ALX-202-AF-27-1"
 //#define ALX_BOOT_B_ID_FW_NAME "NucleoF429Zi_Boot_CFw"
