@@ -87,7 +87,8 @@ static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-void AlxBoot_App_Usb_IsReadyTimeout_Callback(AlxBoot* me);
+void AlxBoot_App_Usb_UsbNotFound_Callback(AlxBoot* me);
+void AlxBoot_App_Usb_BinNotFound_Callback(AlxBoot* me);
 
 
 //******************************************************************************
@@ -96,11 +97,15 @@ void AlxBoot_App_Usb_IsReadyTimeout_Callback(AlxBoot* me);
 void AlxBoot_Ctor
 (
 	AlxBoot* me,
-	AlxUsb* alxUsb
+	AlxUsb* alxUsb,
+	AlxFs* alxFs,
+	AlxId* alxId
 )
 {
 	// Parameters
 	me->alxUsb = alxUsb;
+	me->alxFs = alxFs;
+	me->alxId = alxId;
 
 	// Variables - App
 	me->alxUsb_IsReady = false;
@@ -152,7 +157,6 @@ Alx_Status AlxBoot_App_Usb_Update(AlxBoot* me)
 	}
 
 	// Wait USB ready
-	ALX_BOOT_TRACE_INF("Wait USB ready..");
 	AlxTimSw_Start(&me->alxUsb_alxTimSw);
 	while (1)
 	{
@@ -177,16 +181,139 @@ Alx_Status AlxBoot_App_Usb_Update(AlxBoot* me)
 		bool isTimeout = AlxTimSw_IsTimeout_ms(&me->alxUsb_alxTimSw, timeout_ms);
 		if (isTimeout)
 		{
-			AlxBoot_App_Usb_IsReadyTimeout_Callback(me);
+			AlxBoot_App_Usb_UsbNotFound_Callback(me);
 			return Alx_Ok;
 		}
 
 		// Delay
 		AlxDelay_ms(10);
 	}
-
-	// Trace
 	ALX_BOOT_TRACE_INF("USB ready!");
+
+
+	//------------------------------------------------------------------------------
+	// Check if new FW Candidate Present
+	//------------------------------------------------------------------------------
+
+	// Mount
+	status = AlxFs_Mount(me->alxFs);
+	if (status != Alx_Ok)
+	{
+		AlxBoot_App_Usb_BinNotFound_Callback(me);
+		return Alx_Ok;
+	}
+
+	// Delay
+	AlxDelay_ms(100);
+
+	// Open dir
+	AlxFs_Dir dir;
+	status = AlxFs_Dir_Open(me->alxFs, &dir, "/MmxEc2Fw");
+	if (status != Alx_Ok)
+	{
+		AlxBoot_App_Usb_BinNotFound_Callback(me);
+		return Alx_Ok;
+	}
+
+	// Read dir
+	AlxFs_Info info;
+	status = AlxFs_Dir_Read(me->alxFs, &dir, &info);
+	if (status != Alx_Ok)
+	{
+		AlxBoot_App_Usb_BinNotFound_Callback(me);
+		return Alx_Ok;
+	}
+
+	// Check if only one file in dir
+	AlxFs_Info infoSecond;
+	status = AlxFs_Dir_Read(me->alxFs, &dir, &infoSecond);
+	if (status != AlxFs_EndOfDir)
+	{
+		AlxBoot_App_Usb_BinNotFound_Callback(me);
+		return Alx_Ok;
+	}
+
+	// Check if file
+	if (info.fatfsInfo.fattrib & AM_DIR)
+	{
+		AlxBoot_App_Usb_BinNotFound_Callback(me);
+		return Alx_Ok;
+	}
+
+	// Check file size
+	if (info.fatfsInfo.fsize != ALX_MCU_BOOT_IMAGE_SIZE)
+	{
+		AlxBoot_App_Usb_BinNotFound_Callback(me);
+		return Alx_Ok;
+	}
+
+	// Parse file name
+	uint32_t fwCandVerDate = 0;
+	char fwCandArtf[ALX_ID_NAME_LEN] = "";
+	char fwCandName[ALX_ID_NAME_LEN] = "";
+	uint8_t fwCandVerMajor = 0;
+	uint8_t fwCandVerMinor = 0;
+	uint8_t fwCandVerPatch = 0;
+	char fwCandHashShort[ALX_ID_FW_BUILD_HASH_SHORT_LEN] = "";
+	int charConsumed = -1;
+	int fwCandFileNameLen = strlen(info.fatfsInfo.fname);
+	int sscanfStatus = sscanf
+	(
+		info.fatfsInfo.fname,
+		"%lu_%39[^_]_%39[^_]_V%u-%u-%u_%7[^_]_Signed.bin%n",
+		&fwCandVerDate,
+		fwCandArtf,
+		fwCandName,
+		&fwCandVerMajor,
+		&fwCandVerMinor,
+		&fwCandVerPatch,
+		fwCandHashShort,
+		&charConsumed
+	);
+	if (sscanfStatus != 7 || charConsumed != fwCandFileNameLen)
+	{
+		AlxBoot_App_Usb_BinNotFound_Callback(me);
+		return Alx_Ok;
+	}
+
+	// Check FW artifact
+	const char* fwArtf = AlxId_GetFwArtf(me->alxId);
+	if (strcmp(fwCandArtf, fwArtf) != 0)
+	{
+		AlxBoot_App_Usb_BinNotFound_Callback(me);
+		return Alx_Ok;
+	}
+
+	// Check FW name
+	const char* fwName = AlxId_GetFwName(me->alxId);
+	if (strcmp(fwCandName, fwName) != 0)
+	{
+		AlxBoot_App_Usb_BinNotFound_Callback(me);
+		return Alx_Ok;
+	}
+
+
+
+
+
+
+
+
+
+
+
+//	status = AlxFs_Dir_Trace(me->alxFs, "/MmxEc2Fw", false, false);
+//	if (status != Alx_Ok)
+//	{
+//		AlxBoot_App_Usb_BinNotFound_Callback(me);
+//		return Alx_Ok;
+//	}
+
+
+
+
+
+
 
 
 	//------------------------------------------------------------------------------
@@ -335,11 +462,17 @@ void AlxBoot_Jump(AlxBoot* me)
 //******************************************************************************
 // Weak Functions
 //******************************************************************************
-ALX_WEAK void AlxBoot_App_Usb_IsReadyTimeout_Callback(AlxBoot* me)
+ALX_WEAK void AlxBoot_App_Usb_UsbNotFound_Callback(AlxBoot* me)
 {
 	(void)me;
-	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb_IsReadyTimeout_Callback()");
+	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb_UsbNotFound_Callback()");
 }
+ALX_WEAK void AlxBoot_App_Usb_BinNotFound_Callback(AlxBoot* me)
+{
+	(void)me;
+	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb_BinNotFound_Callback()");
+}
+
 
 
 #endif	// #if defined(ALX_C_LIB)

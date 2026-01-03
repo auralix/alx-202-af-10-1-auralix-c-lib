@@ -45,6 +45,8 @@ extern "C" {
 #include "alxId.h"
 #include "alxUsb.h"
 #include "alxTimSw.h"
+#include "alxFs.h"
+#include "alxId.h"
 
 
 //******************************************************************************
@@ -88,6 +90,8 @@ typedef struct
 {
 	// Parameters
 	AlxUsb* alxUsb;
+	AlxFs* alxFs;
+	AlxId* alxId;
 
 	// Variables - App
 	bool alxUsb_IsReady;
@@ -116,7 +120,9 @@ typedef struct
 void AlxBoot_Ctor
 (
 	AlxBoot* me,
-	AlxUsb* alxUsb
+	AlxUsb* alxUsb,
+	AlxFs* alxFs,
+	AlxId* alxId
 );
 
 
