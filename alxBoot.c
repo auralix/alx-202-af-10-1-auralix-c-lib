@@ -85,14 +85,29 @@ static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 
 
 //******************************************************************************
+// Weak Functions
+//******************************************************************************
+void AlxBoot_App_Usb_IsReadyTimeout_Callback(AlxBoot* me);
+
+
+//******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxBoot_Ctor
 (
-	AlxBoot* me
+	AlxBoot* me,
+	AlxUsb* alxUsb
 )
 {
-	// Variables
+	// Parameters
+	me->alxUsb = alxUsb;
+
+	// Variables - App
+	me->alxUsb_IsReady = false;
+	me->alxUsb_IsReadyOld = false;
+	AlxTimSw_Ctor(&me->alxUsb_alxTimSw, false);
+
+	// Variables - Boot
 	#if defined(ALX_BOOT_B)
 	memset(&me->rsp, 0, sizeof(me->rsp));
 	#endif
@@ -102,6 +117,8 @@ void AlxBoot_Ctor
 
 	// Info
 	me->wasCtorCalled = true;
+
+	// Info - Boot
 	me->isPrepared = false;
 }
 
@@ -109,7 +126,79 @@ void AlxBoot_Ctor
 //******************************************************************************
 // Functions
 //******************************************************************************
-#if defined(ALX_BOOT_B)
+
+
+//------------------------------------------------------------------------------
+// App
+//------------------------------------------------------------------------------
+Alx_Status AlxBoot_App_Usb_Update(AlxBoot* me)
+{
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	Alx_Status status = Alx_Err;
+
+
+	//------------------------------------------------------------------------------
+	// Wait USB Ready
+	//------------------------------------------------------------------------------
+
+	// Init USB
+	status = AlxUsb_Init(me->alxUsb);
+	if (status != Alx_Ok)
+	{
+		ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Init() status %ld", status);
+		return Alx_Err;
+	}
+
+	// Wait USB ready
+	ALX_BOOT_TRACE_INF("Wait USB ready..");
+	AlxTimSw_Start(&me->alxUsb_alxTimSw);
+	while (1)
+	{
+		// Handle
+		status = AlxUsb_Handle(me->alxUsb);
+		if (status != Alx_Ok)
+		{
+			ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Handle() status %ld", status);
+			return Alx_Err;
+		}
+
+		// Check if USB ready
+		me->alxUsb_IsReady = AlxUsb_IsReady(me->alxUsb);
+		if (me->alxUsb_IsReady)
+		{
+			me->alxUsb_IsReadyOld = me->alxUsb_IsReady;
+			break;
+		}
+
+		// Check if USB ready timeout
+		uint32_t timeout_ms = 2000;
+		bool isTimeout = AlxTimSw_IsTimeout_ms(&me->alxUsb_alxTimSw, timeout_ms);
+		if (isTimeout)
+		{
+			AlxBoot_App_Usb_IsReadyTimeout_Callback(me);
+			return Alx_Ok;
+		}
+
+		// Delay
+		AlxDelay_ms(10);
+	}
+
+	// Trace
+	ALX_BOOT_TRACE_INF("USB ready!");
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return Alx_Ok;
+}
+
+
+//------------------------------------------------------------------------------
+// Boot
+//------------------------------------------------------------------------------
 Alx_Status AlxBoot_Prepare(AlxBoot* me)
 {
 	//------------------------------------------------------------------------------
@@ -134,6 +223,7 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	ALX_BOOT_TRACE_INF("AlxBoot - boot_go START");
 
 	// Execute
+	#if defined(ALX_BOOT_B)
 	fih_ret status = boot_go(&me->rsp);
 	if (status != FIH_SUCCESS)
 	{
@@ -147,9 +237,11 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 		ALX_BOOT_TRACE_WRN("Err");
 		return Alx_Err;
 	}
+	#endif
 
 	// Trace
 	ALX_BOOT_TRACE_INF("AlxBoot - boot_go FINISH");
+	#if defined(ALX_BOOT_B)
 	ALX_BOOT_TRACE_INF("- br_hdr->ih_magic = 0x%08lX", me->rsp.br_hdr->ih_magic);
 	ALX_BOOT_TRACE_INF("- br_hdr->ih_load_addr = 0x%08lX", me->rsp.br_hdr->ih_load_addr);
 	ALX_BOOT_TRACE_INF("- br_hdr->ih_hdr_size = 0x%04lX", me->rsp.br_hdr->ih_hdr_size);
@@ -162,6 +254,7 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_build_num = %lu", me->rsp.br_hdr->ih_ver.iv_build_num);
 	ALX_BOOT_TRACE_INF("- br_flash_dev_id = %lu", me->rsp.br_flash_dev_id);
 	ALX_BOOT_TRACE_INF("- br_image_off = 0x%08lX", me->rsp.br_image_off);
+	#endif
 
 
 	//------------------------------------------------------------------------------
@@ -169,7 +262,9 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	//------------------------------------------------------------------------------
 
 	// Set
+	#if defined(ALX_BOOT_B)
 	me->addrVt = me->rsp.br_image_off + me->rsp.br_hdr->ih_hdr_size;
+	#endif
 	me->addrMsp = *(volatile uint32_t*)(me->addrVt);
 	me->addrJmp = *(volatile uint32_t*)(me->addrVt + 4);
 
@@ -235,7 +330,16 @@ void AlxBoot_Jump(AlxBoot* me)
 	// Jump to app's reset handler
 	((void(*)(void))me->addrJmp)();	// Cast jump address to function pointer & then execute it - Compiler automatically handles, that the real jump address is odd number, so it automatically adds +1 to addrJmp, this is needed for all ARM Cortex-M series processor (for THUMB instruction execution)
 }
-#endif
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+ALX_WEAK void AlxBoot_App_Usb_IsReadyTimeout_Callback(AlxBoot* me)
+{
+	(void)me;
+	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb_IsReadyTimeout_Callback()");
+}
 
 
 #endif	// #if defined(ALX_C_LIB)

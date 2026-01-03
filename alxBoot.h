@@ -43,6 +43,8 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxId.h"
+#include "alxUsb.h"
+#include "alxTimSw.h"
 
 
 //******************************************************************************
@@ -69,9 +71,11 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_BOOT_TRACE_ENABLE)
+	#define ALX_BOOT_TRACE_ERR(...) ALX_TRACE_ERR(ALX_BOOT_FILE, __VA_ARGS__)
 	#define ALX_BOOT_TRACE_WRN(...) ALX_TRACE_WRN(ALX_BOOT_FILE, __VA_ARGS__)
 	#define ALX_BOOT_TRACE_INF(...) ALX_TRACE_INF(ALX_BOOT_FILE, __VA_ARGS__)
 #else
+	#define ALX_BOOT_TRACE_ERR(...) do{} while (false)
 	#define ALX_BOOT_TRACE_WRN(...) do{} while (false)
 	#define ALX_BOOT_TRACE_INF(...) do{} while (false)
 #endif
@@ -82,7 +86,15 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Variables
+	// Parameters
+	AlxUsb* alxUsb;
+
+	// Variables - App
+	bool alxUsb_IsReady;
+	bool alxUsb_IsReadyOld;
+	AlxTimSw alxUsb_alxTimSw;
+
+	// Variables - Boot
 	#if defined(ALX_BOOT_B)
 	struct boot_rsp rsp;
 	#endif
@@ -92,6 +104,8 @@ typedef struct
 
 	// Info
 	bool wasCtorCalled;
+
+	// Info - Boot
 	bool isPrepared;
 } AlxBoot;
 
@@ -101,13 +115,25 @@ typedef struct
 //******************************************************************************
 void AlxBoot_Ctor
 (
-	AlxBoot* me
+	AlxBoot* me,
+	AlxUsb* alxUsb
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
+
+
+//------------------------------------------------------------------------------
+// App
+//------------------------------------------------------------------------------
+Alx_Status AlxBoot_App_Usb_Update(AlxBoot* me);
+
+
+//------------------------------------------------------------------------------
+// Boot
+//------------------------------------------------------------------------------
 Alx_Status AlxBoot_Prepare(AlxBoot* me);
 void AlxBoot_Jump(AlxBoot* me);
 
