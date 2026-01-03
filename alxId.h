@@ -408,6 +408,7 @@ uint8_t AlxId_GetHwId(AlxId* me);
 void AlxId_GetHwMcuUniqueIdUint32(AlxId* me, uint32_t* uniqueIdUint32, uint8_t len);
 void AlxId_GetHwMcuUniqueIdUint8(AlxId* me, uint8_t* uniqueIdUint8, uint8_t len);
 const char* AlxId_GetHwMcuUniqueIdStr(AlxId* me);
+void AlxId_CalcHwId(AlxIoPin** hwIdIoPinArr, uint8_t hwIdIoPinArrLen, AlxIoPin_TriState* hwIdIoPinState, uint8_t* hwId);
 
 
 #endif	// #if defined(ALX_C_LIB)

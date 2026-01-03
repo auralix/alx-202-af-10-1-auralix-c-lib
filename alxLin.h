@@ -100,6 +100,12 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxLin_Err_Checksum,
+	AlxLin_Err_Timeout
+} AlxLin_Err;
+
 typedef struct
 {
 	uint8_t id;
@@ -131,6 +137,7 @@ typedef struct
 	// Parameters
 	AlxSerialPort* alxSerialPort;
 	uint8_t breakSyncOffset;
+	uint16_t rxb_ResponseTimeout_ms;
 
 	// Fields
 	uint8_t nad;
@@ -139,6 +146,7 @@ typedef struct
 
 	// Variables
 	AlxLin_RxBuffStruct rxb;
+	AlxTimSw rxb_ResponseTim;
 	bool slaveReqPending;
 
 	// Info
@@ -155,7 +163,8 @@ void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
-	uint8_t breakSyncOffset
+	uint8_t breakSyncOffset,
+	uint16_t rxb_ResponseTimeout_ms
 );
 
 
@@ -178,6 +187,7 @@ uint8_t AlxLin_GetNad(AlxLin* me);
 Alx_Status AlxLin_Master_Init(AlxLin* me);
 Alx_Status AlxLin_Master_DeInit(AlxLin* me);
 bool AlxLin_Master_IsInit(AlxLin* me);
+void AlxLin_Master_Handle(AlxLin* me);
 Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame);
 Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t slaveResponseWaitTime_ms);
 Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame);
@@ -189,6 +199,7 @@ Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame);
 Alx_Status AlxLin_Slave_Init(AlxLin* me);
 Alx_Status AlxLin_Slave_DeInit(AlxLin* me);
 bool AlxLin_Slave_IsInit(AlxLin* me);
+void AlxLin_Slave_Handle(AlxLin* me);
 Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t timeout_ms, uint16_t rxFifoNumOfEntriesNewCheckWaitTime_ms);
 
 
