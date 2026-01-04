@@ -86,6 +86,17 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxBoot_App_Status_UsbNotFound,
+	AlxBoot_App_Status_FwCandNotFound,
+	AlxBoot_App_Status_FwCandSameVer,
+	AlxBoot_App_Status_FwCandValid_FwUpStageStart,
+	AlxBoot_App_Status_FwUpStageProgress,
+	AlxBoot_App_Status_FwUpStageDone_ResetTriggered,
+	AlxBoot_App_Status_FwUpStageErr
+} AlxBoot_App_Status;
+
 typedef struct
 {
 	// Parameters
@@ -94,9 +105,6 @@ typedef struct
 	AlxId* alxId;
 
 	// Variables - App
-	bool alxUsb_IsReady;
-	bool alxUsb_IsReadyOld;
-	AlxTimSw alxUsb_alxTimSw;
 
 	// Variables - Boot
 	#if defined(ALX_BOOT_B)
