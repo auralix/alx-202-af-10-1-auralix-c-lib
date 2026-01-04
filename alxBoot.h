@@ -91,22 +91,23 @@ typedef enum
 	AlxBoot_App_Status_UsbNotFound,
 	AlxBoot_App_Status_FwCandNotFound,
 	AlxBoot_App_Status_FwCandSameVer,
-	AlxBoot_App_Status_FwCandValid_FwUpStageStart,
-	AlxBoot_App_Status_FwUpStageProgress,
-	AlxBoot_App_Status_FwUpStageDone_ResetTriggered,
-	AlxBoot_App_Status_FwUpStageErr
+	AlxBoot_App_Status_FwUpStagingStart,
+	AlxBoot_App_Status_FwUpStagingDone,
+	AlxBoot_App_Status_Err
 } AlxBoot_App_Status;
 
 typedef struct
 {
+	// Defines
+	#define ALX_BOOT_BUFF_LEN 512
+
 	// Parameters
 	AlxUsb* alxUsb;
 	AlxFs* alxFs;
 	AlxId* alxId;
 
-	// Variables - App
-
-	// Variables - Boot
+	// Variables
+	uint8_t buff[ALX_BOOT_BUFF_LEN];
 	#if defined(ALX_BOOT_B)
 	struct boot_rsp rsp;
 	#endif
@@ -116,8 +117,6 @@ typedef struct
 
 	// Info
 	bool wasCtorCalled;
-
-	// Info - Boot
 	bool isPrepared;
 } AlxBoot;
 
@@ -142,7 +141,7 @@ void AlxBoot_Ctor
 //------------------------------------------------------------------------------
 // App
 //------------------------------------------------------------------------------
-Alx_Status AlxBoot_App_Usb_Update(AlxBoot* me);
+void AlxBoot_App_Usb_Update(AlxBoot* me);
 
 
 //------------------------------------------------------------------------------
