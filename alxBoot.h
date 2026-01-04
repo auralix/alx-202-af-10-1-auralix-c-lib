@@ -108,6 +108,10 @@ typedef struct
 
 	// Variables
 	uint8_t buff[ALX_BOOT_BUFF_LEN];
+	#if defined(ALX_BOOT_A)
+	const struct flash_area* fa;
+	#endif
+	uint32_t flashWriteAddrOffset;
 	#if defined(ALX_BOOT_B)
 	struct boot_rsp rsp;
 	#endif

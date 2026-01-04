@@ -114,6 +114,10 @@ void AlxBoot_Ctor
 
 	// Variables
 	memset(me->buff, 0, sizeof(me->buff));
+	#if defined(ALX_BOOT_A)
+	me->fa = NULL;
+	me->flashWriteAddrOffset = 0;
+	#endif
 	#if defined(ALX_BOOT_B)
 	memset(&me->rsp, 0, sizeof(me->rsp));
 	#endif
@@ -401,6 +405,41 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	ALX_BOOT_TRACE_INF("AlxBoot_App - USB FW Update Staging START");
 	AlxBoot_App_StatusChange_Callback(me, AlxBoot_App_Status_FwUpStagingStart);
 
+
+
+
+	// Open
+	int statusBoot = -1;
+	int id = flash_area_id_from_image_slot(1);
+	statusBoot = flash_area_open(id, &me->fa);
+	if (statusBoot != 0)
+	{
+		ALX_BOOT_TRACE_WRN("FAIL: flash_area_erase() statusBoot %ld", statusBoot);
+		AlxFs_UnMount(me->alxFs);
+		AlxBoot_App_StatusChange_Callback(me, AlxBoot_App_Status_Err);
+		return;
+	}
+
+	// Erase
+	statusBoot = flash_area_erase(me->fa, 0, ALX_MCU_BOOT_IMAGE_SIZE);
+	if (statusBoot != 0)
+	{
+		ALX_BOOT_TRACE_WRN("FAIL: flash_area_erase() statusBoot %ld", statusBoot);
+		AlxFs_UnMount(me->alxFs);
+		AlxBoot_App_StatusChange_Callback(me, AlxBoot_App_Status_Err);
+		return;
+	}
+
+
+
+
+
+
+
+
+
+
+
 	// Handle staging
 	uint32_t readLen = 0;
 	status = AlxFs_File_ReadInChunks(me->alxFs, fwCandFilePath, me->buff, sizeof(me->buff), AlxBoot_App_FwCandFile_ChunkRead_Callback, me, &readLen, NULL);
@@ -411,6 +450,9 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		AlxBoot_App_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
 	}
+
+	// Close
+	flash_area_close(me->fa);
 
 	// UnMount
 	AlxFs_UnMount(me->alxFs);
@@ -571,15 +613,24 @@ void AlxBoot_Jump(AlxBoot* me)
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static uint32_t len = 0;
 static Alx_Status AlxBoot_App_FwCandFile_ChunkRead_Callback(void* ctx, void* chunkData, uint32_t chunkLenActual)
 {
 	// Local variables
 	AlxBoot* me = (AlxBoot*)ctx;
 
 	// Trace
-	len = len + chunkLenActual;
-	ALX_BOOT_TRACE_INF("len %lu", len);
+	ALX_BOOT_TRACE_INF("flashWriteAddrOffset %lu", me->flashWriteAddrOffset);
+
+	// Write
+	int statusBoot = flash_area_write(me->fa, me->flashWriteAddrOffset, chunkData, chunkLenActual);
+	if (statusBoot != 0)
+	{
+		ALX_BOOT_TRACE_WRN("FAIL: flash_area_write() statusBoot %ld", statusBoot);
+		return Alx_Err;
+	}
+
+	// Update addr
+	me->flashWriteAddrOffset = me->flashWriteAddrOffset + chunkLenActual;
 
 	// Return
 	return Alx_Ok;
