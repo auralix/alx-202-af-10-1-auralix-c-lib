@@ -498,7 +498,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
 	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - Reset will occur now..");
-//	NVIC_SystemReset();
+	NVIC_SystemReset();
 }
 
 
