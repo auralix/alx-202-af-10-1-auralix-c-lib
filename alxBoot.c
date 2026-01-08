@@ -214,7 +214,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		bool isTimeout = AlxTimSw_IsTimeout_ms(&alxUsb_alxTimSw, me->usbReadyTimeout_ms);
 		if (isTimeout)
 		{
-			ALX_BOOT_TRACE_WRN("FAIL: CheckUsbReadyTimeout() usbReadyTimeout_ms %lu", me->usbReadyTimeout_ms);
+			ALX_BOOT_TRACE_WRN("FAIL: 'USB NOT found' CheckUsbReadyTimeout() usbReadyTimeout_ms %lu", me->usbReadyTimeout_ms);
 			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_UsbNotFound);
 			return;
 		}
@@ -240,7 +240,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	status = AlxFs_Mount(me->alxFs);
 	if (status != Alx_Ok)
 	{
-		ALX_BOOT_TRACE_WRN("FAIL: AlxFs_Mount() status %ld", status);
+		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Mount() status %ld", status);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound);
 		return;
 	}
@@ -257,7 +257,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	status = AlxFs_Dir_Open(me->alxFs, &dir, dirPath);
 	if (status != Alx_Ok)
 	{
-		ALX_BOOT_TRACE_WRN("FAIL: AlxFs_Dir_Open() status %ld dirPath %s", status, dirPath);
+		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Dir_Open() status %ld dirPath %s", status, dirPath);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound);
 		return;
@@ -279,7 +279,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		}
 		else if (status != Alx_Ok)
 		{
-			ALX_BOOT_TRACE_WRN("FAIL: AlxFs_Dir_Read() status %ld", status);
+			ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Dir_Read() status %ld", status);
 			AlxFs_Dir_Close(me->alxFs, &dir);
 			AlxFs_UnMount(me->alxFs);
 			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound);
@@ -432,7 +432,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	statusBoot = flash_area_open(id, &me->fa);
 	if (statusBoot != 0)
 	{
-		ALX_BOOT_TRACE_WRN("FAIL: flash_area_open() statusBoot %ld", statusBoot);
+		ALX_BOOT_TRACE_ERR("FAIL: flash_area_open() statusBoot %ld", statusBoot);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
@@ -442,7 +442,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	statusBoot = flash_area_erase(me->fa, 0, ALX_MCU_BOOT_IMAGE_SIZE);
 	if (statusBoot != 0)
 	{
-		ALX_BOOT_TRACE_WRN("FAIL: flash_area_erase() statusBoot %ld", statusBoot);
+		ALX_BOOT_TRACE_ERR("FAIL: flash_area_erase() statusBoot %ld", statusBoot);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
@@ -466,7 +466,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	status = AlxFs_File_ReadInChunks(me->alxFs, fwCandFilePath, me->buff, sizeof(me->buff), AlxBoot_App_Usb_FwCand_ChunkRead_Callback, me, &readLen, NULL);
 	if (status != Alx_Ok)
 	{
-		ALX_BOOT_TRACE_WRN("FAIL: AlxFs_File_ReadInChunks() status %ld fwCandFilePath %s", status, fwCandFilePath);
+		ALX_BOOT_TRACE_ERR("FAIL: AlxFs_File_ReadInChunks() status %ld fwCandFilePath %s", status, fwCandFilePath);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
