@@ -525,6 +525,8 @@ Alx_Status AlxBoot_Boot_Run(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	ALX_BOOT_TRACE_INF("");
 	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - START");
+	AlxTimSw bootRun_AlxTimSw;
+	AlxTimSw_Ctor(&bootRun_AlxTimSw, true);
 
 
 	//------------------------------------------------------------------------------
@@ -587,11 +589,15 @@ Alx_Status AlxBoot_Boot_Run(AlxBoot* me)
 
 
 	//------------------------------------------------------------------------------
+	// Trace
+	//------------------------------------------------------------------------------
+	uint32_t bootRun_ExecutionTime_sec = AlxTimSw_Get_sec(&bootRun_AlxTimSw);
+	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - DONE - Ready to jump to application - Execution Time: %lu sec", bootRun_ExecutionTime_sec);
+
+
+	//------------------------------------------------------------------------------
 	// Return
 	//------------------------------------------------------------------------------
-
-	// Trace
-	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - DONE - Ready to jump to application");
 
 	// Set
 	me->isReadyToJumpToApp = true;
