@@ -131,7 +131,7 @@ void AlxBoot_Ctor
 
 	// Info
 	me->wasCtorCalled = true;
-	me->isPrepared = false;
+	me->isReadyToJumpToApp = false;
 }
 
 
@@ -287,6 +287,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		}
 
 		// Check if file
+		#if defined(ALX_FATFS)
 		if (info.fatfsInfo.fattrib & (AM_DIR | AM_HID | AM_SYS))
 		{
 			ALX_BOOT_TRACE_WRN("SKIP: CheckIfFile() fattrib %lu fname %s", info.fatfsInfo.fattrib, info.fatfsInfo.fname);
@@ -354,6 +355,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 			// Trace
 			ALX_BOOT_TRACE_INF("UPDATE: FwCandFilePathUpdated() fwCandFilePath %s", fwCandFilePath);
 		}
+		#endif
 	}
 
 	// Check if FW candidate NOT found
@@ -427,6 +429,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandStaging_EraseFlashStart);
 
 	// Open FLASH
+	#if defined(ALX_BOOT_A)
 	int statusBoot = -1;
 	int id = flash_area_id_from_image_slot(1);
 	statusBoot = flash_area_open(id, &me->fa);
@@ -447,6 +450,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
 	}
+	#endif
 
 	// Trace
 	ALX_BOOT_TRACE_INF("DONE: EraseFlash() -> OK");
@@ -473,7 +477,9 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	}
 
 	// Close FLASH
+	#if defined(ALX_BOOT_A)
 	flash_area_close(me->fa);
+	#endif
 
 	// UnMount
 	AlxFs_UnMount(me->alxFs);
@@ -505,48 +511,48 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 //------------------------------------------------------------------------------
 // Boot
 //------------------------------------------------------------------------------
-Alx_Status AlxBoot_Prepare(AlxBoot* me)
+Alx_Status AlxBoot_Boot_Run(AlxBoot* me)
 {
 	//------------------------------------------------------------------------------
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_BOOT_ASSERT(me->wasCtorCalled == true);
-	ALX_BOOT_ASSERT(me->isPrepared == false);
+	ALX_BOOT_ASSERT(me->isReadyToJumpToApp == false);
 
 
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
 	ALX_BOOT_TRACE_INF("");
-	ALX_BOOT_TRACE_INF("AlxBoot - Prepare START");
+	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - START");
 
 
 	//------------------------------------------------------------------------------
-	// Execute boot_go
+	// Run boot_go
 	//------------------------------------------------------------------------------
 
 	// Trace
-	ALX_BOOT_TRACE_INF("AlxBoot - boot_go START");
+	ALX_BOOT_TRACE_INF("DO: boot_go()");
 
-	// Execute
+	// Run
 	#if defined(ALX_BOOT_B)
 	fih_ret status = boot_go(&me->rsp);
 	if (status != FIH_SUCCESS)
 	{
-		ALX_BOOT_TRACE_WRN("Err");
+		ALX_BOOT_TRACE_ERR("FAIL: boot_go() status %ld", status);
 		return Alx_Err;
 	}
 
 	// Check FLASH_DEVICE_ID
 	if (me->rsp.br_flash_dev_id != ALX_MCU_BOOT_FLASH_DEVICE_ID)
 	{
-		ALX_BOOT_TRACE_WRN("Err");
+		ALX_BOOT_TRACE_ERR("FAIL: CheckFlashDeviceId() rsp.br_flash_dev_id %u", me->rsp.br_flash_dev_id);
 		return Alx_Err;
 	}
 	#endif
 
 	// Trace
-	ALX_BOOT_TRACE_INF("AlxBoot - boot_go FINISH");
+	ALX_BOOT_TRACE_INF("DONE: boot_go()");
 	#if defined(ALX_BOOT_B)
 	ALX_BOOT_TRACE_INF("- br_hdr->ih_magic = 0x%08lX", me->rsp.br_hdr->ih_magic);
 	ALX_BOOT_TRACE_INF("- br_hdr->ih_load_addr = 0x%08lX", me->rsp.br_hdr->ih_load_addr);
@@ -585,21 +591,21 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	//------------------------------------------------------------------------------
 
 	// Trace
-	ALX_BOOT_TRACE_INF("AlxBoot - Prepare FINISH, ready to jump to application");
+	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - DONE - Ready to jump to application");
 
-	// Set isInit
-	me->isPrepared = true;
+	// Set
+	me->isReadyToJumpToApp = true;
 
 	// Return
 	return Alx_Ok;
 }
-void AlxBoot_Jump(AlxBoot* me)
+void AlxBoot_Boot_JumpToApp(AlxBoot* me)
 {
 	//------------------------------------------------------------------------------
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_BOOT_ASSERT(me->wasCtorCalled == true);
-	ALX_BOOT_ASSERT(me->isPrepared == true);
+	ALX_BOOT_ASSERT(me->isReadyToJumpToApp == true);
 
 
 	//------------------------------------------------------------------------------
@@ -647,12 +653,14 @@ static Alx_Status AlxBoot_App_Usb_FwCand_ChunkRead_Callback(void* ctx, void* chu
 	AlxBoot* me = (AlxBoot*)ctx;
 
 	// Write FLASH area
+	#if defined(ALX_BOOT_A)
 	int statusBoot = flash_area_write(me->fa, me->fwCandStaging_LenWritten_bytes, chunkData, chunkLenActual);
 	if (statusBoot != 0)
 	{
 		ALX_BOOT_TRACE_WRN("FAIL: flash_area_write() statusBoot %ld", statusBoot);
 		return Alx_Err;
 	}
+	#endif
 
 	// Calculate progress
 	uint8_t fwCandStaging_Progress_pct = ((uint64_t)me->fwCandStaging_LenWritten_bytes * 100) / ALX_MCU_BOOT_IMAGE_SIZE;

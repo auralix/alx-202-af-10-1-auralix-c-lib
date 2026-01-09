@@ -42,11 +42,10 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxFs.h"
 #include "alxId.h"
 #include "alxUsb.h"
 #include "alxTimSw.h"
-#include "alxFs.h"
-#include "alxId.h"
 
 
 //******************************************************************************
@@ -136,7 +135,7 @@ typedef struct
 
 	// Info
 	bool wasCtorCalled;
-	bool isPrepared;
+	bool isReadyToJumpToApp;
 } AlxBoot;
 
 
@@ -167,8 +166,8 @@ void AlxBoot_App_Usb_Update(AlxBoot* me);
 //------------------------------------------------------------------------------
 // Boot
 //------------------------------------------------------------------------------
-Alx_Status AlxBoot_Prepare(AlxBoot* me);
-void AlxBoot_Jump(AlxBoot* me);
+Alx_Status AlxBoot_Boot_Run(AlxBoot* me);
+void AlxBoot_Boot_JumpToApp(AlxBoot* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
