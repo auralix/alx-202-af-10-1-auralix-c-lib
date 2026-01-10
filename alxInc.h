@@ -85,6 +85,7 @@ extern "C" {
 #include "alxSerialPort.h"
 #include "alxSpi.h"
 #include "alxTrace.h"
+#include "alxUsb.h"
 #include "alxWdt.h"
 
 

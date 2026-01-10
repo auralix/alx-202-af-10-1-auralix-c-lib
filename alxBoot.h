@@ -42,7 +42,10 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxFs.h"
 #include "alxId.h"
+#include "alxUsb.h"
+#include "alxTimSw.h"
 
 
 //******************************************************************************
@@ -69,9 +72,11 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_BOOT_TRACE_ENABLE)
+	#define ALX_BOOT_TRACE_ERR(...) ALX_TRACE_ERR(ALX_BOOT_FILE, __VA_ARGS__)
 	#define ALX_BOOT_TRACE_WRN(...) ALX_TRACE_WRN(ALX_BOOT_FILE, __VA_ARGS__)
 	#define ALX_BOOT_TRACE_INF(...) ALX_TRACE_INF(ALX_BOOT_FILE, __VA_ARGS__)
 #else
+	#define ALX_BOOT_TRACE_ERR(...) do{} while (false)
 	#define ALX_BOOT_TRACE_WRN(...) do{} while (false)
 	#define ALX_BOOT_TRACE_INF(...) do{} while (false)
 #endif
@@ -80,9 +85,47 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
+typedef enum
+{
+	AlxBoot_App_Status_FwCandDiscovery_FindUsbStart,
+	AlxBoot_App_Status_FwCandDiscovery_UsbNotFound,
+	AlxBoot_App_Status_FwCandDiscovery_FindUsbDone,
+
+	AlxBoot_App_Status_FwCandDiscovery_FindFwCandStart,
+	AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound,
+	AlxBoot_App_Status_FwCandDiscovery_FindFwCandDone,
+
+	AlxBoot_App_Status_FwCandDiscovery_CheckFwCandVerStart,
+	AlxBoot_App_Status_FwCandDiscovery_FwCandSameVer,
+	AlxBoot_App_Status_FwCandDiscovery_CheckFwCandVerDone,
+
+	AlxBoot_App_Status_FwCandStaging_EraseFlashStart,
+	AlxBoot_App_Status_FwCandStaging_EraseFlashDone,
+
+	AlxBoot_App_Status_FwCandStaging_WriteFlashStart,
+	AlxBoot_App_Status_FwCandStaging_WriteFlashDone,
+
+	AlxBoot_App_Status_Err
+} AlxBoot_App_Status;
+
 typedef struct
 {
+	// Defines
+	#define ALX_BOOT_BUFF_LEN 512
+
+	// Parameters
+	AlxFs* alxFs;
+	AlxId* alxId;
+	AlxUsb* alxUsb;
+	uint16_t usbReadyTimeout_ms;
+
 	// Variables
+	uint8_t buff[ALX_BOOT_BUFF_LEN];
+	#if defined(ALX_BOOT_A)
+	const struct flash_area* fa;
+	#endif
+	uint32_t fwCandStaging_LenWritten_bytes;
+	uint8_t fwCandStaging_ProgressStep10_pct;
 	#if defined(ALX_BOOT_B)
 	struct boot_rsp rsp;
 	#endif
@@ -92,7 +135,7 @@ typedef struct
 
 	// Info
 	bool wasCtorCalled;
-	bool isPrepared;
+	bool isReadyToJumpToApp;
 } AlxBoot;
 
 
@@ -101,15 +144,30 @@ typedef struct
 //******************************************************************************
 void AlxBoot_Ctor
 (
-	AlxBoot* me
+	AlxBoot* me,
+	AlxFs* alxFs,
+	AlxId* alxId,
+	AlxUsb* alxUsb,
+	uint16_t usbReadyTimeout_ms
 );
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-Alx_Status AlxBoot_Prepare(AlxBoot* me);
-void AlxBoot_Jump(AlxBoot* me);
+
+
+//------------------------------------------------------------------------------
+// App
+//------------------------------------------------------------------------------
+void AlxBoot_App_Usb_Update(AlxBoot* me);
+
+
+//------------------------------------------------------------------------------
+// Boot
+//------------------------------------------------------------------------------
+Alx_Status AlxBoot_Boot_Run(AlxBoot* me);
+void AlxBoot_Boot_JumpToApp(AlxBoot* me);
 
 
 #endif	// #if defined(ALX_C_LIB)
