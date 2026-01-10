@@ -113,7 +113,7 @@ void AlxRst_Trace(AlxRst* me)
 	ALX_RST_ASSERT(me->isInit == true);
 
 	// Trace
-	ALX_RST_TRACE_INF("alxRst_McuStm32.h - Reset Reason:");
+	ALX_RST_TRACE_INF("AlxRst_Trace - START - STM32 Reset Reason:");
 	ALX_RST_TRACE_INF("- Software: %u", me->rr.sw);
 	ALX_RST_TRACE_INF("- nRST Pin: %u", me->rr.rstPin);
 	ALX_RST_TRACE_INF("- Window Watchdog (WWDG): %u", me->rr.wwdg);

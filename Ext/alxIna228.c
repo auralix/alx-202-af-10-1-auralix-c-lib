@@ -765,7 +765,7 @@ static Alx_Status AlxIna228_TraceId(AlxIna228* me)
 	ALX_INA228_TRACE_INF("- MANUFACTURER_ID: 0x%02X", me->reg._0x3E_MANUFACTURER_ID.val.MANFID);
 	ALX_INA228_TRACE_INF("- DEVICE_ID.REV_ID: 0x%02X", me->reg._0x3F_DEVICE_ID.val.REV_ID);
 	ALX_INA228_TRACE_INF("- DEVICE_ID.DIEID: 0x%02X", me->reg._0x3F_DEVICE_ID.val.DIEID);
-	ALX_INA228_TRACE_INF("\r\n");
+	ALX_INA228_TRACE_INF("");
 
 	// #3 Return OK
 	return Alx_Ok;
