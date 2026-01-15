@@ -141,6 +141,7 @@ Alx_Status AlxMux_DeInit_Select(AlxMux* me)
 	// Return
 	return Alx_Ok;
 }
+
 /**
   * @brief
   * @param[in,out]	me		Context
@@ -155,6 +156,7 @@ void AlxMux_Enable(AlxMux* me, bool enable)
 	// Write GPIO
 	AlxIoPin_Write(me->do_nEN, enable);
 }
+
 /**
   * @brief
   * @param[in,out]	me		Context

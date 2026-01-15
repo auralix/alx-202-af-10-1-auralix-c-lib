@@ -24,6 +24,15 @@
 #*****************************************************************************
 
 
+"""
+Auralix C Library - ALX Bootloader Script
+
+Builds Visual Studio solution configurations ``FwUp`` and ``NoBoot2`` by
+invoking ``VsDevCmd.bat`` and ``msbuild``.
+Intended for VisualGDB post-build steps or manual CLI use.
+"""
+
+
 #*******************************************************************************
 # Imports
 #*******************************************************************************
@@ -34,7 +43,27 @@ import subprocess
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsSolPath):
+def Script(vsSolPath: str) -> None:
+	"""Build Visual Studio solution configurations ``FwUp`` and ``NoBoot2``.
+
+	Calls the Visual Studio developer environment batch script and invokes
+	``msbuild`` for the provided solution.
+
+	Args:
+		vsSolPath: Absolute path to the Visual Studio ``.sln`` file to build.
+
+	Returns:
+		None
+
+	Raises:
+		OSError: If the developer environment or ``msbuild`` cannot be invoked.
+
+	Side Effects:
+		Invokes external tools (``VsDevCmd.bat``, ``msbuild``) and prints build
+		output to stdout/stderr. Build artifacts are created in the solution's
+		output directories per configuration.
+	"""
+
 	# Print
 	print("")
 	print("alxMsBuild.py - START")

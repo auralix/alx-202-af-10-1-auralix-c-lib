@@ -24,6 +24,15 @@
 #*****************************************************************************
 
 
+"""
+Auralix C Library - ALX Build Script
+
+Generates ``alxBuild_GENERATED.h`` with build metadata (build date, Git commit
+hash/short hash, and firmware version from a tag pointing at ``HEAD``).
+Intended for VisualGDB post-build steps or manual CLI use.
+"""
+
+
 #*******************************************************************************
 # Imports
 #*******************************************************************************
@@ -36,7 +45,28 @@ import sys
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsSolDir):
+def Script(vsSolDir: str) -> None:
+	"""Generate ``alxBuild_GENERATED.h`` with build metadata.
+
+	Infers the repository root from the parent of ``vsSolDir``, resolves the
+	current Git commit (and 32-bit short form), and, if a tag points at
+	``HEAD``, parses a firmware version (``vMAJOR.MINOR.PATCH``) to emit
+	``#define`` macros.
+
+	Args:
+		vsSolDir: Absolute path to the VisualGDB solution directory; the Git
+			directory is assumed at ``Path(vsSolDir).parent / ".git"``.
+
+	Returns:
+		None
+
+	Raises:
+		OSError: If writing the output header file fails.
+
+	Side Effects:
+		Writes ``alxBuild_GENERATED.h`` in the CWD and invokes ``git``.
+	"""
+
 	# Print
 	print("")
 	print("alxBuild.py - START")

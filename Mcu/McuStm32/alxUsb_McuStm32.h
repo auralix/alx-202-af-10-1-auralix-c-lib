@@ -1,0 +1,120 @@
+﻿/**
+  ******************************************************************************
+  * @file		alxUsb_McuStm32.h
+  * @brief		Auralix C Library - ALX USB MCU STM32 Module
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
+  *
+  * @section License
+  *
+  * SPDX-License-Identifier: GPL-3.0-or-later
+  *
+  * This file is part of Auralix C Library.
+  *
+  * Auralix C Library is free software: you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation, either version 3
+  * of the License, or (at your option) any later version.
+  *
+  * Auralix C Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with Auralix C Library. If not, see <https://www.gnu.org/licenses/>.
+  ******************************************************************************
+  **/
+
+//*******************************************************************************
+// Include Guard
+//*******************************************************************************
+#ifndef ALX_USB_MCU_STM32_H
+#define ALX_USB_MCU_STM32_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+//*******************************************************************************
+// Includes
+//*******************************************************************************
+#include "alxGlobal.h"
+#include "alxTrace.h"
+#include "alxAssert.h"
+#include "alxIoPin.h"
+#if defined(ALX_USBH)
+#include "usbh_core.h"
+#include "usbh_msc.h"
+#endif
+
+
+//*******************************************************************************
+// Module Guard
+//*******************************************************************************
+#if defined(ALX_C_LIB) && defined(ALX_STM32F7)
+
+
+//*******************************************************************************
+// Types
+//*******************************************************************************
+typedef struct
+{
+	// Defines
+	#define ALX_USB_EVENT_NAME_ARR_LEN 7
+
+	// Const
+	const char* eventNameArr[ALX_USB_EVENT_NAME_ARR_LEN];
+
+	// Parameters
+	HCD_TypeDef* usb;
+	AlxIoPin* io_USB_D_P;
+	AlxIoPin* io_USB_D_N;
+	Alx_IrqPriority irqPriority;
+
+	// Variables - HAL
+	HCD_HandleTypeDef hhcd;
+
+	// Variables - USBH
+	#if defined(ALX_USBH)
+	USBH_HandleTypeDef usbh;
+	#endif
+	uint8_t	usbh_event;
+
+	// Variables - USBH_MSC
+	#if defined(ALX_USBH)
+	MSC_LUNTypeDef usbhMsc_info;
+	#endif
+	bool usbhMsc_isReady;
+
+	// Variables
+	uint32_t blockCount;
+	uint32_t blockLen_byte;
+	bool isReady;
+
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxUsb;
+
+
+//*******************************************************************************
+// Constructor
+//*******************************************************************************
+void AlxUsb_Ctor
+(
+	AlxUsb*	me,
+	HCD_TypeDef* usb,
+	AlxIoPin* io_USB_D_P,
+	AlxIoPin* io_USB_D_N,
+	Alx_IrqPriority irqPriority
+);
+
+
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F7)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif	// #ifndef ALX_USB_MCU_STM32_H

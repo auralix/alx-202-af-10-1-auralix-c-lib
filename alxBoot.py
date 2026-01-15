@@ -24,6 +24,17 @@
 #*****************************************************************************
 
 
+"""
+Auralix C Library - ALX Bootloader Script
+
+Signs and packages firmware binaries and emits boot metadata. Uses
+``alxBuild_GENERATED.h`` for versioning, extracts the application payload,
+signs with MCUboot ``imgtool.py``, writes a manifest, and generates
+``alxBootMetadata_GENERATED.h``.
+Intended for VisualGDB post-build steps or manual CLI use.
+"""
+
+
 #*******************************************************************************
 # Imports
 #*******************************************************************************
@@ -32,13 +43,42 @@ import sys
 import subprocess
 import json
 import hashlib
-import base64
 
 
 #*******************************************************************************
 # Script
 #*******************************************************************************
-def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
+def Script(vsTargetPath: str, imgSlotLenHexStr: str, bootLenHexStr: str) -> None:
+	"""Sign and package a VisualGDB firmware binary and emit boot metadata.
+
+	Reads ``alxBuild_GENERATED.h`` in the CWD, slices the application region
+	from ``<vsTargetPath>.bin`` (after the bootloader + ``0x0200`` header and
+	before the ``0x0028`` trailer), writes ``_Raw.bin``, signs to ``_Signed.bin``
+	with MCUboot, writes a manifest, and generates
+	``alxBootMetadata_GENERATED.h``.
+
+	Args:
+		vsTargetPath: Absolute path to the VisualGDB target; the source binary
+			is resolved as ``Path(vsTargetPath).with_suffix(".bin")``.
+		imgSlotLenHexStr: Image slot length as a hex string
+			(e.g., ``"0x00120000"``).
+		bootLenHexStr: Bootloader length as a hex string
+			(e.g., ``"0x00020000"``).
+
+	Returns:
+		None
+
+	Raises:
+		FileNotFoundError: If ``alxBuild_GENERATED.h`` or required binaries are missing.
+		ValueError: If ``imgSlotLenHexStr`` or ``bootLenHexStr`` are not valid hex.
+		OSError: On file I/O or subprocess errors.
+
+	Side Effects:
+		Creates ``_Raw.bin``, ``_Signed.bin``, ``_Manifest.json``, and
+		``alxBootMetadata_GENERATED.h``; invokes ``imgtool.py``; prints progress.
+	"""
+
+
 	#-------------------------------------------------------------------------------
 	# Print
 	#-------------------------------------------------------------------------------
@@ -60,6 +100,7 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 
 	# Parse build file
 	date = inFileLines[5][23:]
+	_hash = inFileLines[7][24:64]
 	hashShort = inFileLines[8][30:37]
 	fwVerMajor = inFileLines[11][31:]
 	fwVerMinor = inFileLines[12][31:]
@@ -115,92 +156,6 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	# Set imgtool path
 	imgtoolPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "mcuboot" / "scripts" / "imgtool.py"
 
-	# Set srec_cat path
-	srecPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "Tools" / "srec_cat"
-
-	# If singing server is configured read settings and use it to generate the signature
-	signserverSettingsPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "signserver.json"
-
-	# Set SHA256 bin path
-	binSHA256Path = binSrcPath.with_name(binSrcPath.stem + '_SHA256.bin')
-	if binSHA256Path.exists():
-		binSHA256Path.unlink()
-
-	# Set external signature path
-	extSigPath = binSrcPath.with_name(binSrcPath.stem + '_ExtSig.base64')
-	if extSigPath.exists():
-		extSigPath.unlink()
-
-	# Set fake pubkey path
-	binSHA256Path = binSrcPath.with_name(binSrcPath.stem + '_SHA256.bin')
-	if binSHA256Path.exists():
-		binSHA256Path.unlink()
-
-	with open(signserverSettingsPath) as json_file:
-		signserverSettings = json.load(json_file)
-
-		if len(signserverSettings["worker_name"]) > 0:
-			# Get digest
-			cmd = (r"python {imgtoolPath} sign"
-				r" --header-size {headerLenStr}"
-				r" --pad-header"
-				r" --slot-size {imgSlotLenHexStr}"
-				r" --version {fwVerMajor}.{fwVerMinor}.{fwVerPatch}+{date}"
-				r" {binPathIn}"
-				r" {sha256PathOut}"
-				r" --vector-to-sign digest").format(
-				imgtoolPath=imgtoolPath,
-				headerLenStr=headerLenStr,
-				imgSlotLenHexStr=imgSlotLenHexStr,
-				fwVerMajor=fwVerMajor,
-				fwVerMinor=fwVerMinor,
-				fwVerPatch=fwVerPatch,
-				date=date,
-				binPathIn=binRawPath,
-				sha256PathOut=binSHA256Path
-			)
-			enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "enc_pub.pem"
-			if enc_pubPath.is_file():
-				cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
-
-			print("imgtool.py - cmd:" + cmd)
-			cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
-
-			# Print imgtool
-			print(cmdCompletedObj.stdout)
-			print(cmdCompletedObj.stderr, file=sys.stderr)
-
-			if len(signserverSettings["certificate_thumbprint"]) > 0:
-				cert_cmd = (r"--cert CurrentUser\\MY\\{certificate_thumbprint}").format(
-					certificate_thumbprint=signserverSettings["certificate_thumbprint"]
-				)
-			else:
-				cert_cmd = ""
-
-			cmd = (r"curl {cert_cmd} -F workerName={worker}"
-				" -F \"file=@{SHA256}\""
-				" {server_url}"
-				" -o \"{signature}\"").format(
-				cert_cmd=cert_cmd,
-				worker=signserverSettings["worker_name"],
-				server_url=signserverSettings["server_url"],
-				SHA256=binSHA256Path,
-				signature=extSigPath
-			)
-
-
-			print("curl - cmd:" + cmd)
-			cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
-
-			# Print imgtool
-			print(cmdCompletedObj.stdout)
-			print(cmdCompletedObj.stderr, file=sys.stderr)
-
-			# Convert signature is returned as binary; convert it to base64
-			binSig = extSigPath.read_bytes()
-			encoded = base64.b64encode(binSig)
-			extSigPath.write_bytes(encoded)
-
 	# Run imgtool
 	cmd = (r"python {imgtoolPath} sign"
 		r" --header-size {headerLenStr}"
@@ -220,82 +175,7 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 		binPathIn=binRawPath,
 		binPathOut=binSignedPath
 	)
-
-	# If sig_key exists sign the FW and if enc_key exists also encrypt the FW
-	sig_keyPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "sig_key.pem"
-	if sig_keyPath.is_file():
-		cmd = cmd + (r" -k {sigKey}").format(sigKey=sig_keyPath)
-		enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "enc_pub.pem"
-		if enc_pubPath.is_file():
-			cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
-	elif extSigPath.is_file(): # look for external signature
-		# Generate fake pubkey for mcuboot (real pubkey is in secure element)
-		sig_pubPath = binSrcPath.with_name("fake_pubkey.pem")
-		sig_pubPath.write_bytes(b"-----BEGIN PUBLIC KEY-----\r\n"
-			b"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESgQNrEUInMsjK2OQJmBe5AMcQfL+\r\n"
-			b"5eooj27ulcKzf0iASF2Top9ypskjTv3LigXzcBbUlktWpBIA766l0cp/Xw==\r\n"
-			b"-----END PUBLIC KEY-----\r\n"
-		)
-		cmd = cmd + (r" --fix-sig {extSignature}"
-			r" --fix-sig-pubkey {sigPubKey}").format(
-				extSignature=extSigPath,
-				sigPubKey=sig_pubPath)
-		enc_pubPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / "enc_pub.pem"
-		if enc_pubPath.is_file():
-			cmd = cmd + (r" --encrypt {encKey}").format(encKey=enc_pubPath)
-
 	print("imgtool.py - cmd:" + cmd)
-	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
-
-	# Print imgtool
-	print(cmdCompletedObj.stdout)
-	print(cmdCompletedObj.stderr, file=sys.stderr)
-
-
-	# Set bootloader path
-	bootloaderPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "SignServer" / signserverSettings["bootloader_binary"]
-
-	# Set combined hex paths
-	combinedPath = binSrcPath.with_name(binSrcPath.stem + '_Unsigned_BL.hex')
-	binUnsignedPath = binSrcPath.with_name(binSrcPath.stem + '_Unsigned' + binSrcPath.suffix)
-
-	cmd = (r"python {imgtoolPath} sign"
-		r" --header-size {headerLenStr}"
-		r" --pad-header"
-		r" --slot-size {imgSlotLenHexStr}"
-		r" --version {fwVerMajor}.{fwVerMinor}.{fwVerPatch}+{date}"
-		r" --pad"
-		r" {binPathIn}"
-		r" {binPathOut}").format(
-		imgtoolPath=imgtoolPath,
-		headerLenStr=headerLenStr,
-		imgSlotLenHexStr=imgSlotLenHexStr,
-		fwVerMajor=fwVerMajor,
-		fwVerMinor=fwVerMinor,
-		fwVerPatch=fwVerPatch,
-		date=date,
-		binPathIn=binRawPath,
-		binPathOut=binUnsignedPath
-	)
-
-	print("unsigned image: " + cmd)
-	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
-
-	# Print imgtool
-	print(cmdCompletedObj.stdout)
-	print(cmdCompletedObj.stderr, file=sys.stderr)
-
-	cmd = (r"{srecPath}"
-		r" {bootloaderPath} -binary -offset 0x8000000"
-		r" {imagePath} -binary -offset 0x8020000"
-		r" -o {combinedPath} -Intel").format(
-		srecPath=srecPath,
-		bootloaderPath=bootloaderPath,
-		imagePath=binUnsignedPath,
-		combinedPath=combinedPath
-	)
-
-	print("srec-cmd: " + cmd)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
 	# Print imgtool
@@ -317,24 +197,17 @@ def Script(vsTargetPath, imgSlotLenHexStr, bootLenHexStr):
 	binSignedData = binSignedPath.read_bytes()
 
 	# Prepare manifest file variables
-	manifestVer = int(date)
+	manifestVer = f"{fwVerMajor}.{fwVerMinor}.{fwVerPatch}.{date}.{_hash}"
 	manifestSize = len(binSignedData)
 	manifestHashObj = hashlib.sha256(binSignedData)
 	manifestHashStr = manifestHashObj.hexdigest().upper()
 	manifestPath = binSrcPath.with_name(binSrcPath.stem + '_Manifest.json')
 
 	# Prepare manifest file text
-	ver_name = (r"{fwVerMajor}.{fwVerMinor}.{fwVerPatch}").format(
-		fwVerMajor=fwVerMajor,
-		fwVerMinor=fwVerMinor,
-		fwVerPatch=fwVerPatch
-	)
 	manifestDict = {
 		"ver": manifestVer,
-		"ver_name": ver_name,
 		"size": manifestSize,
-		"hash": manifestHashStr,
-		"url": "/api/v1/NEMO/fw-update/get-bin"
+		"hash": manifestHashStr
 	}
 	manifestJsonObj = json.dumps(manifestDict, indent=4)
 

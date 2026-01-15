@@ -29,7 +29,7 @@
 // Includes
 //******************************************************************************
 #include "alxBoot.h"
-#if defined(ALX_BOOT_A)
+#if defined(ALX_BOOT_A) && !defined(ALX_BUILD_CONFIG_NO_BOOT)
 	#include ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE
 	#if defined(ALX_BUILD_CONFIG_DEBUG)
 		#include "alxBootMetadata_GENERATED.h"
@@ -38,9 +38,6 @@
 		static const unsigned char app_header[0x0200] __attribute__((section(".app_header"), used)) = {0xDE, 0xAD, 0xBE, 0xEF};
 		static const unsigned char app_trailer[0x0028] __attribute__((section(".app_trailer"), used)) = {0xDE, 0xAD, 0xBE, 0xEF};
 	#endif
-#endif
-#if defined(ALX_MBEDTLS)
-#include "mbedtls/sha256.h"
 #endif
 
 
@@ -54,8 +51,6 @@
 // Private Variables
 //******************************************************************************
 #if defined(ALX_BOOT_B)
-#include "image.h"
-
 static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 {
 	.magicNum = ALX_ID_BOOT_ID_MAGIC_NUM,
@@ -86,36 +81,47 @@ static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
 	},
 	.crc = 0			// For future use
 };
-
-static int check_primary_slot_sha256(void)
-{
-	uint8_t calc_sha256[32];
-	struct image_header *hdr = (struct image_header *)ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET;
-	if (hdr->ih_magic != IMAGE_MAGIC) {
-		return -1;
-	}
-	uint32_t len = hdr->ih_hdr_size + hdr->ih_img_size;
-	if (len > ALX_MCU_BOOT_IMAGE_SIZE)
-	{
-		return -1;
-	}
-	mbedtls_sha256((uint8_t *)ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET, len, calc_sha256, 0);
-	// image is followed by image_tlv_info and image_tlv structures; then SHA256 follows
-	return memcmp(calc_sha256,
-		(uint8_t *)(ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET + len + sizeof(struct image_tlv_info) + sizeof(struct image_tlv)),
-		32);
-}
 #endif
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static Alx_Status AlxBoot_App_Usb_FwCand_ChunkRead_Callback(void* ctx, void* chunkData, uint32_t chunkLenActual);
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+void AlxBoot_App_Usb_StatusChange_Callback(AlxBoot* me, AlxBoot_App_Status status);
+void AlxBoot_App_Usb_FwCandStagingProgress_Callback(AlxBoot* me, uint8_t progress_pct);
+
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
 void AlxBoot_Ctor
 (
-	AlxBoot* me
+	AlxBoot* me,
+	AlxFs* alxFs,
+	AlxId* alxId,
+	AlxUsb* alxUsb,
+	uint16_t usbReadyTimeout_ms
 )
 {
+	// Parameters
+	me->alxFs = alxFs;
+	me->alxId = alxId;
+	me->alxUsb = alxUsb;
+	me->usbReadyTimeout_ms = usbReadyTimeout_ms;
+
 	// Variables
+	memset(me->buff, 0, sizeof(me->buff));
+	#if defined(ALX_BOOT_A)
+	me->fa = NULL;
+	me->fwCandStaging_LenWritten_bytes = 0;
+	me->fwCandStaging_ProgressStep10_pct = 255;
+	#endif
 	#if defined(ALX_BOOT_B)
 	memset(&me->rsp, 0, sizeof(me->rsp));
 	#endif
@@ -125,61 +131,431 @@ void AlxBoot_Ctor
 
 	// Info
 	me->wasCtorCalled = true;
-	me->isPrepared = false;
+	me->isReadyToJumpToApp = false;
 }
 
 
 //******************************************************************************
 // Functions
 //******************************************************************************
-#if defined(ALX_BOOT_B)
-Alx_Status AlxBoot_Prepare(AlxBoot* me)
+
+
+//------------------------------------------------------------------------------
+// App
+//------------------------------------------------------------------------------
+void AlxBoot_App_Usb_Update(AlxBoot* me)
 {
+	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
 	// Assert
 	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 	ALX_BOOT_ASSERT(me->wasCtorCalled == true);
-	ALX_BOOT_ASSERT(me->isPrepared == false);
+
+
+
+
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	// FW Candidate Discovery
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 
 
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
 	ALX_BOOT_TRACE_INF("");
-	ALX_BOOT_TRACE_INF("AlxBoot - Prepare START");
+	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Discovery START");
+	AlxTimSw fwCandDiscovery_AlxTimSw;
+	AlxTimSw_Ctor(&fwCandDiscovery_AlxTimSw, true);
 
 
 	//------------------------------------------------------------------------------
-	// Execute boot_go
+	// Find USB
 	//------------------------------------------------------------------------------
 
 	// Trace
-	ALX_BOOT_TRACE_INF("AlxBoot - boot_go START");
+	ALX_BOOT_TRACE_INF("DO: FindUsb()");
+	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FindUsbStart);
 
-	// Execute
+	// Init USB
+	Alx_Status status = Alx_Err;
+	status = AlxUsb_Init(me->alxUsb);
+	if (status != Alx_Ok)
+	{
+		ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Init() status %ld", status);
+		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
+		return;
+	}
+
+	// Wait USB ready
+	AlxTimSw alxUsb_alxTimSw;
+	AlxTimSw_Ctor(&alxUsb_alxTimSw, true);
+	while (1)
+	{
+		// Handle USB
+		status = AlxUsb_Handle(me->alxUsb);
+		if (status != Alx_Ok)
+		{
+			ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Handle() status %ld", status);
+			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
+			return;
+		}
+
+		// Check if USB ready
+		bool isReady = AlxUsb_IsReady(me->alxUsb);
+		if (isReady)
+		{
+			break;
+		}
+
+		// Check if USB ready timeout
+		bool isTimeout = AlxTimSw_IsTimeout_ms(&alxUsb_alxTimSw, me->usbReadyTimeout_ms);
+		if (isTimeout)
+		{
+			ALX_BOOT_TRACE_WRN("FAIL: 'USB NOT found' CheckUsbReadyTimeout() usbReadyTimeout_ms %lu", me->usbReadyTimeout_ms);
+			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_UsbNotFound);
+			return;
+		}
+
+		// Delay
+		AlxDelay_ms(10);
+	}
+
+	// Trace
+	ALX_BOOT_TRACE_INF("DONE: FindUsb() -> OK");
+	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FindUsbDone);
+
+
+	//------------------------------------------------------------------------------
+	// Find FW Candidate
+	//------------------------------------------------------------------------------
+
+	// Trace
+	ALX_BOOT_TRACE_INF("DO: FindFwCand()");
+	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FindFwCandStart);
+
+	// Mount
+	status = AlxFs_Mount(me->alxFs);
+	if (status != Alx_Ok)
+	{
+		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Mount() status %ld", status);
+		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound);
+		return;
+	}
+
+	// Delay
+	AlxDelay_ms(100);
+
+	// Open dir
+	const char* fwArtf = AlxId_GetFwArtf(me->alxId);
+	const char* fwName = AlxId_GetFwName(me->alxId);
+	AlxFs_Dir dir = {};
+	char dirPath[128] = "";
+	sprintf(dirPath, "/%s", fwName);
+	status = AlxFs_Dir_Open(me->alxFs, &dir, dirPath);
+	if (status != Alx_Ok)
+	{
+		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Dir_Open() status %ld dirPath %s", status, dirPath);
+		AlxFs_UnMount(me->alxFs);
+		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound);
+		return;
+	}
+
+	// Loop
+	bool fwCandFound = false;
+	uint32_t fwCandVerDate = 0;
+	char fwCandFilePath[128] = "";
+	while (true)
+	{
+		// Read dir
+		AlxFs_Info info = {};
+		status = AlxFs_Dir_Read(me->alxFs, &dir, &info);
+		if (status == AlxFs_EndOfDir)
+		{
+			AlxFs_Dir_Close(me->alxFs, &dir);
+			break;
+		}
+		else if (status != Alx_Ok)
+		{
+			ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Dir_Read() status %ld", status);
+			AlxFs_Dir_Close(me->alxFs, &dir);
+			AlxFs_UnMount(me->alxFs);
+			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound);
+			return;
+		}
+
+		// Check if file
+		#if defined(ALX_FATFS)
+		if (info.fatfsInfo.fattrib & (AM_DIR | AM_HID | AM_SYS))
+		{
+			ALX_BOOT_TRACE_WRN("SKIP: CheckIfFile() fattrib %lu fname %s", info.fatfsInfo.fattrib, info.fatfsInfo.fname);
+			continue;
+		}
+
+		// Check file size
+		if (info.fatfsInfo.fsize != ALX_MCU_BOOT_IMAGE_SIZE)
+		{
+			ALX_BOOT_TRACE_WRN("SKIP: CheckFileSize() fsize %lu fname %s", info.fatfsInfo.fsize, info.fatfsInfo.fname);
+			continue;
+		}
+
+		// Parse file name
+		uint32_t _fwCandVerDate = 0;
+		char fwCandArtf[ALX_ID_NAME_LEN] = "";
+		char fwCandName[ALX_ID_NAME_LEN] = "";
+		uint32_t fwCandVerMajor = 0;
+		uint32_t fwCandVerMinor = 0;
+		uint32_t fwCandVerPatch = 0;
+		char fwCandHashShort[ALX_ID_FW_BUILD_HASH_SHORT_LEN] = "";
+		int charConsumed = -1;
+		uint32_t fwCandFileNameLen = strlen(info.fatfsInfo.fname);
+		int sscanfStatus = sscanf
+		(
+			info.fatfsInfo.fname,
+			"%lu_%39[^_]_%39[^_]_V%lu-%lu-%lu_%7[^_]_Signed.bin%n",
+			&_fwCandVerDate,
+			fwCandArtf,
+			fwCandName,
+			&fwCandVerMajor,
+			&fwCandVerMinor,
+			&fwCandVerPatch,
+			fwCandHashShort,
+			&charConsumed
+		);
+		if (sscanfStatus != 7 || charConsumed != (int)fwCandFileNameLen)
+		{
+			ALX_BOOT_TRACE_WRN("SKIP: ParseFileName() fname %s", info.fatfsInfo.fname);
+			continue;
+		}
+
+		// Check file name FW artifact
+		if (strcmp(fwCandArtf, fwArtf) != 0)
+		{
+			ALX_BOOT_TRACE_WRN("SKIP: CheckFileNameFwArtf() fwCandArtf %s fwArtf %s fname %s", fwCandArtf, fwArtf, info.fatfsInfo.fname);
+			continue;
+		}
+
+		// Check file name FW name
+		if (strcmp(fwCandName, fwName) != 0)
+		{
+			ALX_BOOT_TRACE_WRN("SKIP: CheckFileNameFwName() fwCandName %s fwName %s fname %s", fwCandName, fwName, info.fatfsInfo.fname);
+			continue;
+		}
+
+		// Update FW candidate file path
+		if (_fwCandVerDate > fwCandVerDate)
+		{
+			// Update
+			fwCandFound = true;
+			fwCandVerDate = _fwCandVerDate;
+			sprintf(fwCandFilePath, "/%s/%s", fwName, info.fatfsInfo.fname);
+
+			// Trace
+			ALX_BOOT_TRACE_INF("UPDATE: FwCandFilePathUpdated() fwCandFilePath %s", fwCandFilePath);
+		}
+		#endif
+	}
+
+	// Check if FW candidate NOT found
+	if (fwCandFound == false)
+	{
+		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' CheckFwCandNotFound()");
+		AlxFs_UnMount(me->alxFs);
+		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound);
+		return;
+	}
+
+	// Trace
+	ALX_BOOT_TRACE_INF("DONE: FindFwCand() fwCandFilePath %s", fwCandFilePath);
+	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FindFwCandDone);
+
+
+	//------------------------------------------------------------------------------
+	// Check FW Candidate Version
+	//------------------------------------------------------------------------------
+
+	// Trace
+	ALX_BOOT_TRACE_INF("DO: CheckFwCandVer()");
+	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_CheckFwCandVerStart);
+
+	// Check if FW candidate version is the same as active FW version
+	uint32_t fwVerDate = AlxId_GetFwVerDate(me->alxId);
+	if (fwCandVerDate == fwVerDate)
+	{
+		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate REJECTED - FW candidate version SAME as active FW version' CheckFwCandVer() fwCandVerDate %lu fwVerDate %lu", fwCandVerDate, fwVerDate);
+		AlxFs_UnMount(me->alxFs);
+		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandSameVer);
+		return;
+	}
+
+	// Trace
+	ALX_BOOT_TRACE_INF("DONE: 'FW candidate ACCEPTED - FW candidate version DIFFERENT from active FW version' CheckFwCandVer() fwCandVerDate %lu fwVerDate %lu", fwCandVerDate, fwVerDate);
+	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_CheckFwCandVerDone);
+
+
+	//------------------------------------------------------------------------------
+	// Trace
+	//------------------------------------------------------------------------------
+	uint32_t fwCandDiscovery_ExecutionTime_sec = AlxTimSw_Get_sec(&fwCandDiscovery_AlxTimSw);
+	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Discovery DONE - Execution Time: %lu sec", fwCandDiscovery_ExecutionTime_sec);
+
+
+
+
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	// FW Candidate Staging
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+
+
+	//------------------------------------------------------------------------------
+	// Trace
+	//------------------------------------------------------------------------------
+	ALX_BOOT_TRACE_INF("");
+	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Staging START");
+	AlxTimSw fwCandStaging_AlxTimSw;
+	AlxTimSw_Ctor(&fwCandStaging_AlxTimSw, true);
+
+
+	//------------------------------------------------------------------------------
+	// Erase FLASH
+	//------------------------------------------------------------------------------
+
+	// Trace
+	ALX_BOOT_TRACE_INF("DO: EraseFlash()");
+	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandStaging_EraseFlashStart);
+
+	// Open FLASH
+	#if defined(ALX_BOOT_A)
+	int statusBoot = -1;
+	int id = flash_area_id_from_image_slot(1);
+	statusBoot = flash_area_open(id, &me->fa);
+	if (statusBoot != 0)
+	{
+		ALX_BOOT_TRACE_ERR("FAIL: flash_area_open() statusBoot %ld", statusBoot);
+		AlxFs_UnMount(me->alxFs);
+		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
+		return;
+	}
+
+	// Erase FLASH
+	statusBoot = flash_area_erase(me->fa, 0, ALX_MCU_BOOT_IMAGE_SIZE);
+	if (statusBoot != 0)
+	{
+		ALX_BOOT_TRACE_ERR("FAIL: flash_area_erase() statusBoot %ld", statusBoot);
+		AlxFs_UnMount(me->alxFs);
+		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
+		return;
+	}
+	#endif
+
+	// Trace
+	ALX_BOOT_TRACE_INF("DONE: EraseFlash() -> OK");
+	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandStaging_EraseFlashDone);
+
+
+	//------------------------------------------------------------------------------
+	// Write FLASH
+	//------------------------------------------------------------------------------
+
+	// Trace
+	ALX_BOOT_TRACE_INF("DO: WriteFlash()");
+	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandStaging_WriteFlashStart);
+
+	// Perform staging
+	uint32_t readLen = 0;
+	status = AlxFs_File_ReadInChunks(me->alxFs, fwCandFilePath, me->buff, sizeof(me->buff), AlxBoot_App_Usb_FwCand_ChunkRead_Callback, me, &readLen, NULL);
+	if (status != Alx_Ok)
+	{
+		ALX_BOOT_TRACE_ERR("FAIL: AlxFs_File_ReadInChunks() status %ld fwCandFilePath %s", status, fwCandFilePath);
+		AlxFs_UnMount(me->alxFs);
+		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
+		return;
+	}
+
+	// Close FLASH
+	#if defined(ALX_BOOT_A)
+	flash_area_close(me->fa);
+	#endif
+
+	// UnMount
+	AlxFs_UnMount(me->alxFs);
+
+	// Trace
+	ALX_BOOT_TRACE_INF("DONE: WriteFlash() -> OK");
+	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandStaging_WriteFlashDone);
+
+
+	//------------------------------------------------------------------------------
+	// Trace
+	//------------------------------------------------------------------------------
+	uint32_t fwCandStaging_ExecutionTime_sec = AlxTimSw_Get_sec(&fwCandStaging_AlxTimSw);
+	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Staging DONE - Execution Time: %lu sec", fwCandStaging_ExecutionTime_sec);
+
+
+
+
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	// Reset
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - Reset will occur now..");
+	NVIC_SystemReset();
+}
+
+
+//------------------------------------------------------------------------------
+// Boot
+//------------------------------------------------------------------------------
+Alx_Status AlxBoot_Boot_Run(AlxBoot* me)
+{
+	//------------------------------------------------------------------------------
+	// Assert
+	//------------------------------------------------------------------------------
+	ALX_BOOT_ASSERT(me->wasCtorCalled == true);
+	ALX_BOOT_ASSERT(me->isReadyToJumpToApp == false);
+
+
+	//------------------------------------------------------------------------------
+	// Trace
+	//------------------------------------------------------------------------------
+	ALX_BOOT_TRACE_INF("");
+	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - START");
+	AlxTimSw bootRun_AlxTimSw;
+	AlxTimSw_Ctor(&bootRun_AlxTimSw, true);
+
+
+	//------------------------------------------------------------------------------
+	// Run boot_go
+	//------------------------------------------------------------------------------
+
+	// Trace
+	ALX_BOOT_TRACE_INF("DO: boot_go()");
+
+	// Run
+	#if defined(ALX_BOOT_B)
 	fih_ret status = boot_go(&me->rsp);
 	if (status != FIH_SUCCESS)
 	{
-		ALX_BOOT_TRACE_WRN("Err");
-		return Alx_Err;
-	}
-#ifndef MCUBOOT_VALIDATE_PRIMARY_SLOT
-	// since we don't validate primary slot we check image integrity here
-	if (check_primary_slot_sha256() != 0)
-	{
-		ALX_BOOT_TRACE_WRN("Err");
-		return Alx_Err;
-	}
-#endif
-	// Check FLASH_DEVICE_ID
-	if (me->rsp.br_flash_dev_id != ALX_MCU_BOOT_FLASH_DEVICE_ID)
-	{
-		ALX_BOOT_TRACE_WRN("Err");
+		ALX_BOOT_TRACE_ERR("FAIL: boot_go() status %ld", status);
 		return Alx_Err;
 	}
 
+	// Check FLASH_DEVICE_ID
+	if (me->rsp.br_flash_dev_id != ALX_MCU_BOOT_FLASH_DEVICE_ID)
+	{
+		ALX_BOOT_TRACE_ERR("FAIL: CheckFlashDeviceId() rsp.br_flash_dev_id %u", me->rsp.br_flash_dev_id);
+		return Alx_Err;
+	}
+	#endif
+
 	// Trace
-	ALX_BOOT_TRACE_INF("AlxBoot - boot_go FINISH");
+	ALX_BOOT_TRACE_INF("DONE: boot_go()");
+	#if defined(ALX_BOOT_B)
 	ALX_BOOT_TRACE_INF("- br_hdr->ih_magic = 0x%08lX", me->rsp.br_hdr->ih_magic);
 	ALX_BOOT_TRACE_INF("- br_hdr->ih_load_addr = 0x%08lX", me->rsp.br_hdr->ih_load_addr);
 	ALX_BOOT_TRACE_INF("- br_hdr->ih_hdr_size = 0x%04lX", me->rsp.br_hdr->ih_hdr_size);
@@ -192,6 +568,7 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_build_num = %lu", me->rsp.br_hdr->ih_ver.iv_build_num);
 	ALX_BOOT_TRACE_INF("- br_flash_dev_id = %lu", me->rsp.br_flash_dev_id);
 	ALX_BOOT_TRACE_INF("- br_image_off = 0x%08lX", me->rsp.br_image_off);
+	#endif
 
 
 	//------------------------------------------------------------------------------
@@ -199,7 +576,9 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 	//------------------------------------------------------------------------------
 
 	// Set
+	#if defined(ALX_BOOT_B)
 	me->addrVt = me->rsp.br_image_off + me->rsp.br_hdr->ih_hdr_size;
+	#endif
 	me->addrMsp = *(volatile uint32_t*)(me->addrVt);
 	me->addrJmp = *(volatile uint32_t*)(me->addrVt + 4);
 
@@ -210,25 +589,29 @@ Alx_Status AlxBoot_Prepare(AlxBoot* me)
 
 
 	//------------------------------------------------------------------------------
+	// Trace
+	//------------------------------------------------------------------------------
+	uint32_t bootRun_ExecutionTime_sec = AlxTimSw_Get_sec(&bootRun_AlxTimSw);
+	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - DONE - Ready to jump to application - Execution Time: %lu sec", bootRun_ExecutionTime_sec);
+
+
+	//------------------------------------------------------------------------------
 	// Return
 	//------------------------------------------------------------------------------
 
-	// Trace
-	ALX_BOOT_TRACE_INF("AlxBoot - Prepare FINISH, ready to jump to application");
-
-	// Set isInit
-	me->isPrepared = true;
+	// Set
+	me->isReadyToJumpToApp = true;
 
 	// Return
 	return Alx_Ok;
 }
-void AlxBoot_Jump(AlxBoot* me)
+void AlxBoot_Boot_JumpToApp(AlxBoot* me)
 {
 	//------------------------------------------------------------------------------
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_BOOT_ASSERT(me->wasCtorCalled == true);
-	ALX_BOOT_ASSERT(me->isPrepared == true);
+	ALX_BOOT_ASSERT(me->isReadyToJumpToApp == true);
 
 
 	//------------------------------------------------------------------------------
@@ -264,12 +647,65 @@ void AlxBoot_Jump(AlxBoot* me)
 
 	// Jump to app's reset handler
 	((void(*)(void))me->addrJmp)();	// Cast jump address to function pointer & then execute it - Compiler automatically handles, that the real jump address is odd number, so it automatically adds +1 to addrJmp, this is needed for all ARM Cortex-M series processor (for THUMB instruction execution)
-	while (1)
-	{
-		// will never get here
-	}
 }
-#endif
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static Alx_Status AlxBoot_App_Usb_FwCand_ChunkRead_Callback(void* ctx, void* chunkData, uint32_t chunkLenActual)
+{
+	// Local variables
+	AlxBoot* me = (AlxBoot*)ctx;
+
+	// Write FLASH area
+	#if defined(ALX_BOOT_A)
+	int statusBoot = flash_area_write(me->fa, me->fwCandStaging_LenWritten_bytes, chunkData, chunkLenActual);
+	if (statusBoot != 0)
+	{
+		ALX_BOOT_TRACE_WRN("FAIL: flash_area_write() statusBoot %ld", statusBoot);
+		return Alx_Err;
+	}
+	#endif
+
+	// Calculate progress
+	uint8_t fwCandStaging_Progress_pct = ((uint64_t)me->fwCandStaging_LenWritten_bytes * 100) / ALX_MCU_BOOT_IMAGE_SIZE;
+	uint8_t fwCandStaging_ProgressStep10_pct = fwCandStaging_Progress_pct / 10 * 10;
+
+	// Trace progress
+	if (fwCandStaging_ProgressStep10_pct != me->fwCandStaging_ProgressStep10_pct)
+	{
+		// Update
+		me->fwCandStaging_ProgressStep10_pct = fwCandStaging_ProgressStep10_pct;
+
+		// Trace
+		ALX_BOOT_TRACE_INF("%02u%% - %lu/%lu bytes", fwCandStaging_ProgressStep10_pct, me->fwCandStaging_LenWritten_bytes, ALX_MCU_BOOT_IMAGE_SIZE);
+
+		// Callback
+		AlxBoot_App_Usb_FwCandStagingProgress_Callback(me, fwCandStaging_ProgressStep10_pct);
+	}
+
+	// Update length written
+	me->fwCandStaging_LenWritten_bytes = me->fwCandStaging_LenWritten_bytes + chunkLenActual;
+
+	// Return
+	return Alx_Ok;
+}
+
+
+//******************************************************************************
+// Weak Functions
+//******************************************************************************
+ALX_WEAK void AlxBoot_App_Usb_StatusChange_Callback(AlxBoot* me, AlxBoot_App_Status status)
+{
+	(void)me;
+	(void)status;
+}
+ALX_WEAK void AlxBoot_App_Usb_FwCandStagingProgress_Callback(AlxBoot* me, uint8_t progress_pct)
+{
+	(void)me;
+	(void)progress_pct;
+}
 
 
 #endif	// #if defined(ALX_C_LIB)

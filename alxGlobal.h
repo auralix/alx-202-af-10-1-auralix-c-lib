@@ -120,8 +120,11 @@ extern "C" {
 // MCUboot
 //------------------------------------------------------------------------------
 #if defined(ALX_MCU_BOOT)
-#include "bootutil/bootutil.h"
+#include "flash_map_backend/flash_map_backend.h"
 #include "sysflash/sysflash.h"
+#endif
+#if defined(ALX_MCU_BOOT) && defined(ALX_BOOT_B)
+#include "bootutil/bootutil.h"
 #endif
 
 

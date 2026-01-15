@@ -2178,14 +2178,19 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 
 	// Allocate memory
 	buff = calloc(buffLen, sizeof(uint8_t));
-	if(buff == NULL) { ALX_PARAM_ITEM_TRACE_WRN("Err"); free(buff); return Alx_Err; }
+	if (buff == NULL)
+	{
+		ALX_PARAM_ITEM_TRACE_ERR("FAIL: calloc()");
+		free(buff);
+		return Alx_Err;
+	}
 
 	// Get value from Param KV Store
 	status = AlxParamKvStore_Get(me->paramKvStore, me->key, buff, buffLen, &actualValLen);
 	if (status != Alx_Ok)
 	{
 		// Trace
-		ALX_PARAM_ITEM_TRACE_INF("AlxParamItem - KV store get ERROR - Key not found, default will be used - %s", me->key);
+		ALX_PARAM_ITEM_TRACE_DBG("AlxParamItem_LoadVal - KV store get ERROR - Key not found, default will be used - %s", me->key);
 
 		// Free memory
 		free(buff);
@@ -2206,10 +2211,14 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 	{
 		// Remove Param KV Store key
 		status = AlxParamKvStore_Remove(me->paramKvStore, me->key);
-		if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE_WRN("Err"); return Alx_Err; }
+		if (status != Alx_Ok)
+		{
+			ALX_PARAM_ITEM_TRACE_ERR("FAIL: AlxParamKvStore_Remove()");
+			return Alx_Err;
+		}
 
 		// Trace
-		ALX_PARAM_ITEM_TRACE_INF("AlxParamItem - KV store read OK, param item set ERROR - Key was removed, default will be used - %s", me->key);
+		ALX_PARAM_ITEM_TRACE_DBG("AlxParamItem_LoadVal - KV store get OK, param item set ERROR - Key was removed, default will be used - %s", me->key);
 	}
 
 	// Return
@@ -2238,7 +2247,11 @@ Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 
 	// Set Param KV Store
 	Alx_Status status = AlxParamKvStore_Set(me->paramKvStore, me->key, valPtr, me->valLen);
-	if(status != Alx_Ok) { ALX_PARAM_ITEM_TRACE_WRN("Err"); return Alx_Err; }
+	if (status != Alx_Ok)
+	{
+		ALX_PARAM_ITEM_TRACE_ERR("FAIL: AlxParamKvStore_Set()");
+		return Alx_Err;
+	}
 
 	// Clear
 	me->pendingStore = false;
@@ -2672,7 +2685,12 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 
 	// Allocate memory
 	oldValPtr = calloc(oldValLen, sizeof(uint8_t));
-	if(oldValPtr == NULL) { ALX_PARAM_ITEM_TRACE_WRN("Err"); free(oldValPtr); return Alx_Err; }
+	if (oldValPtr == NULL)
+	{
+		ALX_PARAM_ITEM_TRACE_ERR("FAIL: calloc()");
+		free(oldValPtr);
+		return Alx_Err;
+	}
 
 	// Set oldVal
 	memcpy(oldValPtr, valPtr, me->valLen);
@@ -2687,7 +2705,7 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 		me->val._bool = _val;
 		status = Alx_Ok;
 	}
-	else if((me->valOutOfRangeHandle == AlxParamItem_Assert) || (me->valOutOfRangeHandle == AlxParamItem_Ignore))
+	else if ((me->valOutOfRangeHandle == AlxParamItem_Assert) || (me->valOutOfRangeHandle == AlxParamItem_Ignore))
 	{
 		// Set
 		if (me->dataType == AlxParamItem_Uint8)
