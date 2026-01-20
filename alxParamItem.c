@@ -1880,7 +1880,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%hu", me->val.uint16) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%u", me->val.uint16) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
 	{
@@ -1896,7 +1896,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%hd", me->val.int16) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%d", me->val.int16) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Int32)
 	{
@@ -1988,14 +1988,15 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	if (me->dataType == AlxParamItem_Uint8)
 	{
 		// Convert
-		uint8_t valNum = 0;
-		if (sscanf(val, "%hu", &valNum) != 1)
+		uint16_t valNum_Uint16 = 0;
+		if (sscanf(val, "%hu", &valNum_Uint16) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+		uint8_t valNum = valNum_Uint16;
 
 		// Set
-		status = AlxParamItem_SetValUint8(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
@@ -2005,7 +2006,9 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		{
 			return AlxParamItem_ErrConv;
 		}
-		status = AlxParamItem_SetValUint16(me, valNum);
+
+		// Set
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
 	{
@@ -2017,7 +2020,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValUint32(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Uint64)
 	{
@@ -2026,14 +2029,15 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	else if (me->dataType == AlxParamItem_Int8)
 	{
 		// Convert
-		int8_t valNum = 0;
-		if (sscanf(val, "%hd", &valNum) != 1)
+		int16_t valNum_Int16 = 0;
+		if (sscanf(val, "%hd", &valNum_Int16) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+		int8_t valNum = valNum_Int16;
 
 		// Set
-		status = AlxParamItem_SetValInt8(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
@@ -2045,7 +2049,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValInt16(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Int32)
 	{
@@ -2057,7 +2061,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValInt32(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Int64)
 	{
@@ -2073,7 +2077,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValFloat(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Double)
 	{
@@ -2085,7 +2089,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValDouble(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Bool)
 	{
@@ -2121,7 +2125,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValBool(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Arr)
 	{
@@ -2130,7 +2134,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	else if (me->dataType == AlxParamItem_Str)
 	{
 		// Set
-		status = AlxParamItem_SetValStr(me, val);
+		status = AlxParamItem_SetVal(me, val);
 	}
 	else
 	{
