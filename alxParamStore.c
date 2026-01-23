@@ -193,7 +193,7 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_CheckingGroup1;
 
 				// #1.2 Trace
-				ALX_PARAM_STORE_TRACE("InitOk");
+				ALX_PARAM_STORE_TRACE_WRN("InitOk");
 			}
 
 			// #2 Do Nothing
@@ -223,7 +223,7 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_WritingGroup1;
 
 				// #1.4 Trace
-				ALX_PARAM_STORE_TRACE("Group1_WriteStart");
+				ALX_PARAM_STORE_TRACE_WRN("Group1_WriteStart");
 			}
 
 			// #2.1 Refresh values
@@ -246,7 +246,7 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_CheckingGroup1;
 
 				// #1.3 Trace
-				ALX_PARAM_STORE_TRACE("Group1_WriteDone");
+				ALX_PARAM_STORE_TRACE_WRN("Group1_WriteDone");
 			}
 
 			// #2 Transition
@@ -256,7 +256,7 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_Err;
 
 				// #2.2 Trace
-				ALX_PARAM_STORE_TRACE("Group1_Err");
+				ALX_PARAM_STORE_TRACE_WRN("Group1_Err");
 			}
 
 			// #3 Do Nothing
@@ -287,7 +287,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_CheckingGroup1;
 
 				// #1.2 Trace
-				ALX_PARAM_STORE_TRACE("InitOk");
+				ALX_PARAM_STORE_TRACE_WRN("InitOk");
 			}
 
 			// #2 Do Nothing
@@ -317,7 +317,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_WritingGroup1;
 
 				// #1.4 Trace
-				ALX_PARAM_STORE_TRACE("Group1_WriteStart");
+				ALX_PARAM_STORE_TRACE_WRN("Group1_WriteStart");
 			}
 			// #2 Transition
 			else
@@ -346,7 +346,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_CheckingGroup2;
 
 				// #1.3 Trace
-				ALX_PARAM_STORE_TRACE("Group1_WriteDone");
+				ALX_PARAM_STORE_TRACE_WRN("Group1_WriteDone");
 			}
 
 			// #2 Transition
@@ -356,7 +356,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_Err;
 
 				// #2.2 Trace
-				ALX_PARAM_STORE_TRACE("Group1_Err");
+				ALX_PARAM_STORE_TRACE_WRN("Group1_Err");
 			}
 
 			// #3 Do Nothing
@@ -379,7 +379,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_WritingGroup2;
 
 				// #1.4 Trace
-				ALX_PARAM_STORE_TRACE("Group2_WriteStart");
+				ALX_PARAM_STORE_TRACE_WRN("Group2_WriteStart");
 			}
 			// #2 Transition
 			else
@@ -408,7 +408,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_CheckingGroup1;
 
 				// #1.3 Trace
-				ALX_PARAM_STORE_TRACE("Group2_WriteDone");
+				ALX_PARAM_STORE_TRACE_WRN("Group2_WriteDone");
 			}
 
 			// #2 Transition
@@ -418,7 +418,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 				me->st = AlxParamStore_St_Err;
 
 				// #2.2 Trace
-				ALX_PARAM_STORE_TRACE("Group2_Err");
+				ALX_PARAM_STORE_TRACE_WRN("Group2_Err");
 			}
 
 			// #3 Do Nothing

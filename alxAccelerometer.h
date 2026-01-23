@@ -51,30 +51,6 @@ extern "C" {
 
 
 //******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_ACCELEROMETER_FILE "alxAccelerometer.h"
-
-// Assert //
-#if defined(ALX_ACCELEROMETER_ASSERT_BKPT_ENABLE)
-	#define ALX_ACCELEROMETER_ASSERT(expr) ALX_ASSERT_BKPT(ALX_ACCELEROMETER_FILE, expr)
-#elif defined(ALX_ACCELEROMETER_ASSERT_TRACE_ENABLE)
-	#define ALX_ACCELEROMETER_ASSERT(expr) ALX_ASSERT_TRACE(ALX_ACCELEROMETER_FILE, expr)
-#elif defined(ALX_ACCELEROMETER_ASSERT_RST_ENABLE)
-	#define ALX_ACCELEROMETER_ASSERT(expr) ALX_ASSERT_RST(ALX_ACCELEROMETER_FILE, expr)
-#else
-	#define ALX_ACCELEROMETER_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(ALX_ACCELEROMETER_TRACE_ENABLE)
-	#define ALX_ACCELEROMETER_TRACE(...) ALX_TRACE_WRN(ALX_ACCELEROMETER_FILE, __VA_ARGS__)
-#else
-	#define ALX_ACCELEROMETER_TRACE(...) do{} while (false)
-#endif
-
-
-//******************************************************************************
 // Types
 //******************************************************************************
 typedef enum

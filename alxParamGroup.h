@@ -70,9 +70,9 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_PARAM_GROUP_TRACE_ENABLE)
-	#define ALX_PARAM_GROUP_TRACE(...) ALX_TRACE_WRN(ALX_PARAM_GROUP_FILE, __VA_ARGS__)
+	#define ALX_PARAM_GROUP_TRACE_WRN(...) ALX_TRACE_WRN(ALX_PARAM_GROUP_FILE, __VA_ARGS__)
 #else
-	#define ALX_PARAM_GROUP_TRACE(...) do{} while (false)
+	#define ALX_PARAM_GROUP_TRACE_WRN(...) do{} while (false)
 #endif
 
 

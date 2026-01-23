@@ -128,7 +128,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
 
 				// Trace
-				ALX_PARAM_GROUP_TRACE("%s_CrcOkSame_UsedCopyA", me->name);
+				ALX_PARAM_GROUP_TRACE_WRN("%s_CrcOkSame_UsedCopyA", me->name);
 
 				// Break
 				break;
@@ -139,7 +139,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
 
 				// Trace
-				ALX_PARAM_GROUP_TRACE("%s_CrcOkDiff_UsedCopyA", me->name);
+				ALX_PARAM_GROUP_TRACE_WRN("%s_CrcOkDiff_UsedCopyA", me->name);
 
 				// Break
 				break;
@@ -150,7 +150,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
 
 				// Trace
-				ALX_PARAM_GROUP_TRACE("%s_CopyANokCopyBOk_UsedCopyB", me->name);
+				ALX_PARAM_GROUP_TRACE_WRN("%s_CopyANokCopyBOk_UsedCopyB", me->name);
 
 				// Break
 				break;
@@ -161,7 +161,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				AlxParamGroup_ValStoredBuffToParamItemsVal(me);
 
 				// Trace
-				ALX_PARAM_GROUP_TRACE("%s_CopyAOkCopyBNok_UsedCopyA", me->name);
+				ALX_PARAM_GROUP_TRACE_WRN("%s_CopyAOkCopyBNok_UsedCopyA", me->name);
 
 				// Break
 				break;
@@ -176,7 +176,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				if (statusAlxMemSafeWrite != Alx_Ok)
 				{
 					// Trace
-					ALX_PARAM_GROUP_TRACE("%s_BothNok_ResetToDef_WriteErr", me->name);
+					ALX_PARAM_GROUP_TRACE_WRN("%s_BothNok_ResetToDef_WriteErr", me->name);
 
 					// Continue
 					continue;
@@ -188,7 +188,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 					AlxParamGroup_ValToStoreBuffToValStoredBuff(me);
 
 					// Trace
-					ALX_PARAM_GROUP_TRACE("%s_BothNok_ResToDef", me->name);
+					ALX_PARAM_GROUP_TRACE_WRN("%s_BothNok_ResToDef", me->name);
 
 					// Break
 					break;
@@ -196,7 +196,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 			}
 			case Alx_Err:
 			{
-				ALX_PARAM_GROUP_TRACE("%s_Err", me->name);
+				ALX_PARAM_GROUP_TRACE_WRN("%s_Err", me->name);
 				continue;
 			}
 			default:
