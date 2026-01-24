@@ -266,7 +266,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	}
 
 	// Check response
-	if (strncmp(&me->buff, "331", 3) != 0)
+	if (strncmp(me->buff, "331", 3) != 0)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: strncmp(331) buff %.*s", statusLen, me->buff);
 		AlxFtp_Reset(me);
