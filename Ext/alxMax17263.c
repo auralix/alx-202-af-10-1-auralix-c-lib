@@ -98,7 +98,11 @@ Alx_Status AlxMax17263_InitPeriph(AlxMax17263* me)
 
 	// Init I2C
 	status = AlxI2c_Init(me->i2c);
-	if (status != Alx_Ok) { ALX_MAX17263_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_MAX17263_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Set isInitPeriph
 	me->isInitPeriph = true;
@@ -125,7 +129,11 @@ Alx_Status AlxMax17263_DeInitPeriph(AlxMax17263* me)
 
 	// DeInit I2C
 	status = AlxI2c_DeInit(me->i2c);
-	if (status != Alx_Ok) { ALX_MAX17263_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_MAX17263_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Reset isInitPeriph
 	me->isInitPeriph = false;
@@ -161,12 +169,20 @@ Alx_Status AlxMax17263_Init(AlxMax17263* me)
 
 	// Check if slave is ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_MAX17263_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_MAX17263_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Get ICs serial number
 	uint16_t sn[8] = { 0 };
 	status = maxim_max1726x_get_serial_number(me, sn);
-	if (status != Alx_Ok) { ALX_MAX17263_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_MAX17263_TRACE_ERR("Err");
+		return status;
+	}
 
 	snprintf(me->data.serial, sizeof(me->data.serial), "%04x%04x%04x%04x%04x%04x%04x%04x", sn[7], sn[6], sn[5], sn[4], sn[3], sn[2], sn[1], sn[0]);
 

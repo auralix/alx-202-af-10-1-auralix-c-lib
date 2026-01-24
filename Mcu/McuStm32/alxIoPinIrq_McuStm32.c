@@ -482,83 +482,67 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 #endif
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin0(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin1(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin2(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin3(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin4(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin5(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin6(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin7(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin8(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin9(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin10(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin11(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin12(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin13(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin14(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_IrqCallback_Pin15(void)
 {
-	ALX_IO_PIN_IRQ_TRACE("Err");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 
 

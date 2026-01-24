@@ -206,12 +206,20 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 	if (me->lin != AlxSerialPort_Lin_Disable)
 	{
 		#if defined(ALX_STM32F0) && defined(USART_CR2_LINEN)
-		if(HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		if(HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B) != HAL_OK)
+		{
+			ALX_SERIAL_PORT_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 		#endif
 	}
 	else
 	{
-		if(HAL_UART_Init(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		if(HAL_UART_Init(&me->huart) != HAL_OK)
+		{
+			ALX_SERIAL_PORT_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 	}
 
 	// Enable UART RX IRQ
@@ -242,7 +250,11 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	__HAL_UART_DISABLE_IT(&me->huart, UART_IT_RXNE);	// We will not clear flag, because of the differences between STM32 HALs, flag will be cleared when UART periphery is reset
 
 	// DeInit UART
-	if(HAL_UART_DeInit(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+	if(HAL_UART_DeInit(&me->huart) != HAL_OK)
+	{
+		ALX_SERIAL_PORT_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Force UART periphery reset
 	AlxSerialPort_Periph_ForceReset(me);
@@ -331,13 +343,21 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	if (me->lin != AlxSerialPort_Lin_Disable)
 	{
 		#if defined(ALX_STM32F0) && defined(USART_CR2_LINEN)
-		if(HAL_LIN_SendBreak(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		if(HAL_LIN_SendBreak(&me->huart) != HAL_OK)
+		{
+			ALX_SERIAL_PORT_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 		#endif
 	}
 	if(HAL_UART_Transmit(&me->huart, (uint8_t*)data, len, me->txTimeout_ms) != HAL_OK)
 	{
-		ALX_SERIAL_PORT_TRACE("Err");
-		if(AlxSerialPort_Reset(me) != Alx_Ok) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		ALX_SERIAL_PORT_TRACE_ERR("Err");
+		if(AlxSerialPort_Reset(me) != Alx_Ok)
+		{
+			ALX_SERIAL_PORT_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 	}
 
 	// Return
@@ -414,7 +434,11 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 	__HAL_UART_DISABLE_IT(&me->huart, UART_IT_RXNE);	// We will not clear flag, because of the differences between STM32 HALs, flag will be cleared when UART periphery is reset
 
 	// DeInit UART
-	if(HAL_UART_DeInit(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+	if(HAL_UART_DeInit(&me->huart) != HAL_OK)
+	{
+		ALX_SERIAL_PORT_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Force UART periphery reset
 	AlxSerialPort_Periph_ForceReset(me);
@@ -429,7 +453,11 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 	AlxSerialPort_Periph_ReleaseReset(me);
 
 	// Init UART
-	if(HAL_UART_Init(&me->huart) != HAL_OK) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+	if(HAL_UART_Init(&me->huart) != HAL_OK)
+	{
+		ALX_SERIAL_PORT_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Enable UART RX IRQ
 	__HAL_UART_ENABLE_IT(&me->huart, UART_IT_RXNE);

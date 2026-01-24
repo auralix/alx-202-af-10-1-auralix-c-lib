@@ -130,7 +130,11 @@ Alx_Status AlxPca9539a_InitPeriph(AlxPca9539a* me)
 
 	// Init I2C
 	status = AlxI2c_Init(me->i2c);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Set isInitPeriph
 	me->isInitPeriph = true;
@@ -157,7 +161,11 @@ Alx_Status AlxPca9539a_DeInitPeriph(AlxPca9539a* me)
 
 	// DeInit I2C
 	status = AlxI2c_DeInit(me->i2c);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Reset isInitPeriph
 	me->isInitPeriph = false;
@@ -193,7 +201,11 @@ Alx_Status AlxPca9539a_Init(AlxPca9539a* me)
 
 	// Check if slave is ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Set register struct values to default
 	AlxPca9539a_RegStruct_SetValToDefault(me);
@@ -203,7 +215,11 @@ Alx_Status AlxPca9539a_Init(AlxPca9539a* me)
 
 	// Write register struct - WEAK
 	status = AlxPca9539a_RegStruct_Write(me);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -253,10 +269,18 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 	// Handle
 
 	status = AlxPca9539a_Reg_Read(me, &me->reg._00h_InputPort_0);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPca9539a_Reg_Read(me, &me->reg._01h_InputPort_1);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	if (me->_OpenDrain_0.raw != 0b00000000)
 	{
@@ -264,7 +288,11 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 		me->reg._06h_Configuration_0.val.raw = (me->reg._06h_Configuration_0.val.raw & ~me->_OpenDrain_0.raw) | mask;
 
 		status = AlxPca9539a_Reg_Write(me, &me->reg._06h_Configuration_0);
-		if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_PCA9539A_TRACE_ERR("Err");
+			return status;
+		}
 	}
 
 	if (me->_OpenDrain_1.raw != 0b00000000)
@@ -273,14 +301,26 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 		me->reg._07h_Configuration_1.val.raw = (me->reg._07h_Configuration_1.val.raw & ~me->_OpenDrain_1.raw) | mask;
 
 		status = AlxPca9539a_Reg_Write(me, &me->reg._07h_Configuration_1);
-		if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_PCA9539A_TRACE_ERR("Err");
+			return status;
+		}
 	}
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._02h_OutputPort_0);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._03h_OutputPort_1);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -303,10 +343,18 @@ Alx_Status AlxPca9539a_irqHandle(AlxPca9539a* me)
 	Alx_Status status = Alx_Ok;
 
 	status = AlxPca9539a_Reg_Read(me, &me->reg._00h_InputPort_0);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPca9539a_Reg_Read(me, &me->reg._01h_InputPort_1);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	return Alx_Ok;
 }
@@ -533,7 +581,11 @@ Alx_Status AlxPca9539a_Reg_Write(AlxPca9539a* me, void* reg)
 
 	// Write
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -561,7 +613,11 @@ Alx_Status AlxPca9539a_Reg_Read(AlxPca9539a* me, void* reg)
 
 	// Read
 	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -629,8 +685,7 @@ static void AlxPca9539a_RegStruct_SetValToDefault(AlxPca9539a* me)
 ALX_WEAK void AlxPca9539a_RegStruct_SetVal(AlxPca9539a* me)
 {
 	(void)me;
-	ALX_PCA9539A_TRACE("Define function!");
-	ALX_PCA9539A_ASSERT(false);
+	ALX_PCA9539A_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK Alx_Status AlxPca9539a_RegStruct_Write(AlxPca9539a* me)
 {
@@ -639,28 +694,28 @@ ALX_WEAK Alx_Status AlxPca9539a_RegStruct_Write(AlxPca9539a* me)
 
 	// Write
 	//status = AlxPca9539a_Reg_Write(me, &me->reg._00h_InputPort_0);		// MF: Read Only Reg
-	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
 
 	//status = AlxPca9539a_Reg_Write(me, &me->reg._01h_InputPort_1);		// MF: Read Only Reg
-	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
 
 	//status = AlxPca9539a_Reg_Write(me, &me->reg._02h_OutputPort_0);		// TV: We will handle OutputPort config outside of Init
-	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
 
 	//status = AlxPca9539a_Reg_Write(me, &me->reg._03h_OutputPort_1);		// TV: We will handle OutputPort config outside of Init
-	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._04h_PolarityInversion_0);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._05h_PolarityInversion_1);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._06h_Configuration_0);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._07h_Configuration_1);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
 
 	// Return
 	return Alx_Ok;

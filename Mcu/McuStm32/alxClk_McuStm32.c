@@ -255,12 +255,16 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 			me->wasCtorCalled = true;
 
 			// Init
-			if(HAL_RCC_OscConfig(&me->iosc) != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; }
+			if(HAL_RCC_OscConfig(&me->iosc) != HAL_OK)
+			{
+				ALX_CLK_TRACE_ERR("Err");
+				return Alx_Err;
+			}
 		}
 		// Else trace & return
 		else
 		{
-			ALX_CLK_TRACE("Err");
+			ALX_CLK_TRACE_ERR("Err");
 			return Alx_Err;
 		}
 	}
@@ -278,12 +282,20 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 
 	// Init power regulator
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-	if(HAL_PWREx_ControlVoltageScaling(me->pwrRegVoltageScale) != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; };
+	if(HAL_PWREx_ControlVoltageScaling(me->pwrRegVoltageScale) != HAL_OK)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 	#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) || defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx) || defined(ALX_STM32F7)
 	if (me->isPwrRegOverDrive)
 	{
-		if(HAL_PWREx_EnableOverDrive() != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; };
+		if(HAL_PWREx_EnableOverDrive() != HAL_OK)
+		{
+			ALX_CLK_TRACE_ERR("Err");
+			return Alx_Err;
+		};
 	}
 	#endif
 	#if defined(ALX_STM32L0)
@@ -296,10 +308,18 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	__HAL_RCC_SYSCFG_CLK_ENABLE();
 
 	// Init clocks
-	if(HAL_RCC_ClockConfig(&me->iclk, me->flashLatency) != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; }
+	if(HAL_RCC_ClockConfig(&me->iclk, me->flashLatency) != HAL_OK)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Check clocks
-	if(AlxClk_IsClkOk(me) == false) { ALX_CLK_TRACE("Err"); return Alx_Err; }
+	if(AlxClk_IsClkOk(me) == false)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -1810,15 +1830,39 @@ static bool AlxClk_IsClkOk(AlxClk* me)
 	#endif
 
 	// Check
-	if (SystemCoreClock != me->systemCoreClock_Ctor)	{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->sysclk != me->sysclk_Ctor)					{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->hclk != me->hclk_Ctor)						{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->pclk1Apb1 != me->pclk1Apb1_Ctor)			{ ALX_CLK_TRACE("Err");	return false; }
+	if (SystemCoreClock != me->systemCoreClock_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->sysclk != me->sysclk_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->hclk != me->hclk_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->pclk1Apb1 != me->pclk1Apb1_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
 	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-	if (me->pclk2Apb2 != me->pclk2Apb2_Ctor)			{ ALX_CLK_TRACE("Err");	return false; }
+	if (me->pclk2Apb2 != me->pclk2Apb2_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
 	#endif
 	#if defined(ALX_STM32U5)
-	if (me->pclk3Apb3 != me->pclk3Apb3_Ctor)			{ ALX_CLK_TRACE("Err");	return false; }
+	if (me->pclk3Apb3 != me->pclk3Apb3_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
 	#endif
 
 	// Return

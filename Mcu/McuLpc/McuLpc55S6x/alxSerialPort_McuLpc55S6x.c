@@ -250,8 +250,12 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	// Write
 	if (USART_WriteBlocking(me->usart, data, len) != kStatus_Success)
 	{
-		ALX_SERIAL_PORT_TRACE("Err");
-		if(AlxSerialPort_Reset(me) != Alx_Ok) { ALX_SERIAL_PORT_TRACE("Err"); return Alx_Err; };
+		ALX_SERIAL_PORT_TRACE_ERR("Err");
+		if(AlxSerialPort_Reset(me) != Alx_Ok)
+		{
+			ALX_SERIAL_PORT_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 	}
 
 	// Return

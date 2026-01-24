@@ -359,28 +359,68 @@ Alx_Status AlxCan_Init(AlxCan* me)
 	// Enable CAN Periphery Clock
 	AlxCan_Periph_EnableClk(me);
 	#if defined(ALX_STM32G4)
-	if(HAL_RCCEx_PeriphCLKConfig(&me->periphClkInit) != HAL_OK)	{ ALX_CAN_TRACE("Err"); };
+	if(HAL_RCCEx_PeriphCLKConfig(&me->periphClkInit) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 
 	// Init CAN
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
-	if(HAL_CAN_Init(&me->hcan) != HAL_OK)						{ ALX_CAN_TRACE("Err"); return Alx_Err; };
-	if(HAL_CAN_ConfigFilter(&me->hcan, &me->fcan) != HAL_OK)	{ ALX_CAN_TRACE("Err"); return Alx_Err; };
-	if(HAL_CAN_Start(&me->hcan) != HAL_OK)						{ ALX_CAN_TRACE("Err"); return Alx_Err; };
+	if(HAL_CAN_Init(&me->hcan) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
+	if(HAL_CAN_ConfigFilter(&me->hcan, &me->fcan) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
+	if(HAL_CAN_Start(&me->hcan) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 	#if defined(ALX_STM32G4)
-	if(HAL_FDCAN_Init(&me->hcan) != HAL_OK)																												{ ALX_CAN_TRACE("Err"); return Alx_Err; };
-	if(HAL_FDCAN_ConfigFilter(&me->hcan, &me->fcan) != HAL_OK)																							{ ALX_CAN_TRACE("Err"); return Alx_Err; };
-	if(HAL_FDCAN_ConfigGlobalFilter(&me->hcan, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE) != HAL_OK)	{ ALX_CAN_TRACE("Err"); return Alx_Err; };
-	if(HAL_FDCAN_Start(&me->hcan) != HAL_OK)																											{ ALX_CAN_TRACE("Err"); return Alx_Err; };
+	if(HAL_FDCAN_Init(&me->hcan) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
+	if(HAL_FDCAN_ConfigFilter(&me->hcan, &me->fcan) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
+	if(HAL_FDCAN_ConfigGlobalFilter(&me->hcan, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_ACCEPT_IN_RX_FIFO0, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
+	if(HAL_FDCAN_Start(&me->hcan) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 
 	// Enable CAN TX & RX IRQ
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
-	if(HAL_CAN_ActivateNotification(&me->hcan, CAN_IT_TX_MAILBOX_EMPTY | CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) { ALX_CAN_TRACE("Err"); return Alx_Err; };
+	if(HAL_CAN_ActivateNotification(&me->hcan, CAN_IT_TX_MAILBOX_EMPTY | CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 	#if defined(ALX_STM32G4)
-	if(HAL_FDCAN_ActivateNotification(&me->hcan, FDCAN_IT_TX_FIFO_EMPTY | FDCAN_IT_RX_FIFO0_NEW_MESSAGE, ALX_NULL) != HAL_OK) { ALX_CAN_TRACE("Err"); return Alx_Err; };
+	if(HAL_FDCAN_ActivateNotification(&me->hcan, FDCAN_IT_TX_FIFO_EMPTY | FDCAN_IT_RX_FIFO0_NEW_MESSAGE, ALX_NULL) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 
 	// Enable CAN TX & RX IRQ
@@ -408,19 +448,35 @@ Alx_Status AlxCan_DeInit(AlxCan* me)
 	// Disable CAN TX & RX IRQ
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
 	AlxCan_Periph_DisableIrq(me);
-	if(HAL_CAN_DeactivateNotification(&me->hcan, CAN_IT_TX_MAILBOX_EMPTY | CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) { ALX_CAN_TRACE("Err"); return Alx_Err; };
+	if(HAL_CAN_DeactivateNotification(&me->hcan, CAN_IT_TX_MAILBOX_EMPTY | CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 	#if defined(ALX_STM32G4)
 	AlxCan_Periph_DisableIrq(me);
-	if (HAL_FDCAN_DeactivateNotification(&me->hcan, FDCAN_IT_TX_FIFO_EMPTY | FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != HAL_OK) { ALX_CAN_TRACE("Err"); return Alx_Err; };
+	if (HAL_FDCAN_DeactivateNotification(&me->hcan, FDCAN_IT_TX_FIFO_EMPTY | FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 
 	// DeInit CAN
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
-	if(HAL_CAN_DeInit(&me->hcan) != HAL_OK) { ALX_CAN_TRACE("Err"); return Alx_Err; };
+	if(HAL_CAN_DeInit(&me->hcan) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 	#if defined(ALX_STM32G4)
-	if(HAL_FDCAN_DeInit(&me->hcan) != HAL_OK) { ALX_CAN_TRACE("Err"); return Alx_Err; };
+	if(HAL_FDCAN_DeInit(&me->hcan) != HAL_OK)
+	{
+		ALX_CAN_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 
 	// Force CAN Periphery Reset

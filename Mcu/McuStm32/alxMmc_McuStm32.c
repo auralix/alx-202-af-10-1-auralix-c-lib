@@ -217,7 +217,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
+				ALX_MMC_TRACE_ERR("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -232,7 +232,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
+				ALX_MMC_TRACE_ERR("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -247,7 +247,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
+				ALX_MMC_TRACE_ERR("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -314,7 +314,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
+				ALX_MMC_TRACE_ERR("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -329,7 +329,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
+				ALX_MMC_TRACE_ERR("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -344,7 +344,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
-				ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
+				ALX_MMC_TRACE_ERR("Err: %d", statusAlx);
 				return Alx_Err;
 			}
 			AlxDelay_ms(newTryWaitTime_ms);
@@ -577,7 +577,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusHal = HAL_RCCEx_PeriphCLKConfig(&me->iclk);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
+		ALX_MMC_TRACE_ERR("Err: %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -594,7 +594,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusHal = HAL_MMC_Init(&me->hmmc);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
+		ALX_MMC_TRACE_ERR("Err: %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -602,7 +602,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusAlx = AlxMmc_WaitForTransferState_Private(me);
 	if (statusAlx != Alx_Ok)
 	{
-		ALX_MMC_TRACE_WRN("Err: %d", statusAlx);
+		ALX_MMC_TRACE_ERR("Err: %d", statusAlx);
 		return Alx_Err;
 	}
 
@@ -610,7 +610,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusHal = HAL_MMC_GetCardCID(&me->hmmc, &me->cid);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
+		ALX_MMC_TRACE_ERR("Err: %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -618,7 +618,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusHal = HAL_MMC_GetCardCSD(&me->hmmc, &me->csd);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
+		ALX_MMC_TRACE_ERR("Err: %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -626,7 +626,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	statusHal = HAL_MMC_GetCardInfo(&me->hmmc, &me->info);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
+		ALX_MMC_TRACE_ERR("Err: %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -653,7 +653,7 @@ static Alx_Status AlxMmc_DeInit_Private(AlxMmc* me)
 	statusHal = HAL_MMC_DeInit(&me->hmmc);
 	if (statusHal != HAL_OK)
 	{
-		ALX_MMC_TRACE_WRN("Err: %d", statusHal);
+		ALX_MMC_TRACE_ERR("Err: %d", statusHal);
 		return Alx_Err;
 	}
 

@@ -69,9 +69,9 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_TIM_SW_TRACE_ENABLE)
-	#define ALX_TIM_SW_TRACE(...) ALX_TRACE_WRN(ALX_TIM_SW_FILE, __VA_ARGS__)
+	#define ALX_TIM_SW_TRACE_WRN(...) ALX_TRACE_WRN(ALX_TIM_SW_FILE, __VA_ARGS__)
 #else
-	#define ALX_TIM_SW_TRACE(...) do{} while (false)
+	#define ALX_TIM_SW_TRACE_WRN(...) do{} while (false)
 #endif
 
 

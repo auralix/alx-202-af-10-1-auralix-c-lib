@@ -38,16 +38,12 @@
 
 
 //******************************************************************************
-// Private Types
-//******************************************************************************
-
-
-//******************************************************************************
 // Private Variables
 //******************************************************************************
 float transferFun_thermocoupleS_PointArr_mV[] = { -0.236, 0.000, 0.173, 0.646, 1.441, 2.323, 3.259, 4.233, 5.239, 6.275, 7.345, 8.449, 9.587, 10.757, 11.951, 13.159, 15.582, 17.947 };
 float transferFun_thermocoupleS_PointArr_degC[] = { -50, 0, 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1500, 1700 };
 #define NUM_OF_PONTS_TRANSFER_FUN_THERMCOUPLE_S (sizeof(transferFun_thermocoupleS_PointArr_mV) / sizeof(transferFun_thermocoupleS_PointArr_mV[0]))
+
 
 //******************************************************************************
 // Private Functions
@@ -57,13 +53,13 @@ static void AlxAds114s08_RegStruct_SetLen(AlxAds114s08* me);
 static void AlxAds114s08_RegStruct_SetValToZero(AlxAds114s08* me);
 static void AlxAds114s08_RegStruct_SetToDefault(AlxAds114s08* me);
 static Alx_Status AlxAds114s08_Cmd_RREG(AlxAds114s08* me, uint8_t regAddr, uint8_t len, uint8_t* data);
-
 static Alx_Status AlxAds114s08_Reg_Read(AlxAds114s08* me, void* reg);
 static Alx_Status AlxAds114s08_Reg_Write(AlxAds114s08* me, void* reg);
 static Alx_Status AlxAds114s08_Reg_WriteAndRead(AlxAds114s08* me, void* reg);
 static Alx_Status AlxAds114s08_Reg_WriteAll(AlxAds114s08* me);
 Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltage_raw, uint32_t timeout_ms);
 Alx_Status AlxAds114s08_Convert_raw_mV(AlxAds114s08* me, int16_t chVoltage_raw, float* chVoltage_mV, bool* isOutOfRange);
+
 
 //******************************************************************************
 // Weak Functions
@@ -76,13 +72,14 @@ void AlxAds114s08_RegStruct_SetVal(AlxAds114s08* me);
 //******************************************************************************
 void AlxAds114s08_Ctor
 (
-AlxAds114s08* me,
+	AlxAds114s08* me,
 	AlxSpi* spi,
 	uint8_t spiNumOfTries,
 	uint16_t spiTimeout_ms,
 	AlxIoPin* di_nDRDY,
 	AlxIoPin* do_START,
-	AlxIoPin* do_nRST)
+	AlxIoPin* do_nRST
+)
 {
 	// Parameters
 	me->spi = spi;
@@ -144,7 +141,11 @@ Alx_Status AlxAds114s08_InitPeriph(AlxAds114s08* me)
 
 	// Init SPI
 	status = AlxSpi_Init(me->spi);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Set isInitPeriph
 	me->isInitPeriph = true;
@@ -164,7 +165,11 @@ Alx_Status AlxAds114s08_DeInitPeriph(AlxAds114s08* me)
 
 	// DeInit SPI
 	status = AlxSpi_DeInit(me->spi);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	// DeInit GPIO
 	AlxIoPin_DeInit(me->di_nDRDY);
@@ -202,7 +207,11 @@ Alx_Status AlxAds114s08_Init(AlxAds114s08* me)
 
 	// Write registers
 	status = AlxAds114s08_Reg_WriteAll(me);
-	if(status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
+	if(status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -225,7 +234,11 @@ Alx_Status AlxAds114s08_DeInit(AlxAds114s08* me)
 
 	// Write registers
 	status = AlxAds114s08_Reg_WriteAll(me);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Place device in power down mode (all registers are reset to default values)
 	AlxIoPin_Reset(me->di_nDRDY);
@@ -250,7 +263,11 @@ Alx_Status AlxAds114s08_GetDevId(AlxAds114s08* me, Ads114s08_RegEnum_0x00_DEV_ID
 
 	// Read all rgisters
 	status = AlxAds114s08_Reg_Read(me, (void*)&me->reg.reg_0x00_ID);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Return ID register
 	*DEV_ID = me->reg.reg_0x00_ID.val.DEV_ID;
@@ -312,16 +329,23 @@ Alx_Status AlxAds114s08_GetChVoltage_mV(AlxAds114s08* me, uint8_t chNum, float* 
 	me->reg.reg_0x05_REF.val.REFSEL = REFSEL_Internal2_5Vref;
 	me->reg.reg_0x05_REF.val.REFCON = REFCON_InternalRefAlwaysOn;
 	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_BurnOutCurrentSrcEn_0_2uA;	// GK: Should be dissabled if G_CHOP is enabled, but we need it and it doesn't seem to pose issues at low currents
-		;
 	status = AlxAds114s08_Reg_WriteAll(me);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Perform ADC Conversion, Create Sample in blocking mode
 	//------------------------------------------------------------------------------
 	int16_t chVoltage_raw = 0;
 	status = AlxAds114s08_PerformAdcConversion(me, &chVoltage_raw, me->CONVERSION_TIMEOUT_ms);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Convert to mV
@@ -331,7 +355,6 @@ Alx_Status AlxAds114s08_GetChVoltage_mV(AlxAds114s08* me, uint8_t chNum, float* 
 	// Return
 	return Alx_Ok;
 }
-
 Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTemp_degC)
 {
 	// Assert
@@ -357,14 +380,22 @@ Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTe
 	me->reg.reg_0x05_REF.val.REFCON = REFCON_InternalRefAlwaysOn;
 	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_InternalTempSense;
 	status = AlxAds114s08_Reg_WriteAll(me);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Perform ADC Conversion, Create Sample in blocking mode
 	//------------------------------------------------------------------------------
 	int16_t adcVoltage_raw = 0;
 	status = AlxAds114s08_PerformAdcConversion(me, &adcVoltage_raw, me->CONVERSION_TIMEOUT_ms);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Convert to mV
@@ -372,7 +403,11 @@ Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTe
 	bool isOutOfRange = true;
 	float adcVoltage_mV = -99999999;	// set out of range value
 	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Convert to degC
@@ -411,7 +446,7 @@ Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltag
 			AlxIoPin_Reset(me->do_START);
 
 			// Return
-			ALX_ADS114S08_TRACE("Err");
+			ALX_ADS114S08_TRACE_ERR("Err");
 			return Alx_Err;
 		}
 
@@ -438,7 +473,11 @@ Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltag
 
 	// Read
 	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, sizeof(dataWriteArr), 1, 100);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
@@ -454,7 +493,6 @@ Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltag
 	// Return
 	return Alx_Ok;
 }
-
 Alx_Status AlxAds114s08_Convert_raw_mV(AlxAds114s08* me, int16_t chVoltage_raw, float* chVoltage_mV, bool* isOutOfRange)
 {
 	// Assert
@@ -598,7 +636,6 @@ static void AlxAds114s08_RegStruct_SetToDefault(AlxAds114s08* me)
 	me->reg.reg_0x10_GPIODAT.val.raw =		0x00;
 	me->reg.reg_0x11_GPIOCON.val.raw =		0x00;
 }
-
 static Alx_Status AlxAds114s08_Cmd_RREG(AlxAds114s08* me, uint8_t regAddr, uint8_t len, uint8_t* data)
 {
 	// Assert
@@ -625,7 +662,12 @@ static Alx_Status AlxAds114s08_Cmd_RREG(AlxAds114s08* me, uint8_t regAddr, uint8
 
 	// Read
 	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, len + 2, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		AlxSpi_Master_DeAssertCs(me->spi);
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	*data = dataReadArr[2];
 
@@ -633,7 +675,6 @@ static Alx_Status AlxAds114s08_Cmd_RREG(AlxAds114s08* me, uint8_t regAddr, uint8
 	AlxSpi_Master_DeAssertCs(me->spi);
 	return Alx_Ok;
 }
-
 static Alx_Status AlxAds114s08_Reg_Read(AlxAds114s08* me, void* reg)
 {
 	// Assert
@@ -648,14 +689,15 @@ static Alx_Status AlxAds114s08_Reg_Read(AlxAds114s08* me, void* reg)
 
 	// Read register with RREG command
 	status = AlxAds114s08_Cmd_RREG(me, regAddr, regLen, regValPtr);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
 }
-
-
-
 static Alx_Status AlxAds114s08_Reg_Write(AlxAds114s08* me, void* reg)
 {
 	// Assert
@@ -680,7 +722,7 @@ static Alx_Status AlxAds114s08_Reg_Write(AlxAds114s08* me, void* reg)
 
 	// Write
 	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, sizeof(dataWriteArr), me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS114S08_TRACE_ERR("Err"); return status; }
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
@@ -703,7 +745,11 @@ static Alx_Status AlxAds114s08_Reg_WriteAndRead(AlxAds114s08* me, void* reg)
 
 	// Write
 	status = AlxAds114s08_Reg_Write(me, reg);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Read
 	uint8_t regData[3] = { };
@@ -711,40 +757,43 @@ static Alx_Status AlxAds114s08_Reg_WriteAndRead(AlxAds114s08* me, void* reg)
 	regData[1] = regLen;
 	regData[2] = *regValPtr;
 	status = AlxAds114s08_Reg_Read(me, regData);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Compare
 	if (regData[2] != *regValPtr)
 	{
-		ALX_ADS114S08_TRACE("Err");
+		ALX_ADS114S08_TRACE_ERR("Err");
 		return Alx_Err;
 	}
 
 	// Return
 	return Alx_Ok;
 }
-
 static Alx_Status AlxAds114s08_Reg_WriteAll(AlxAds114s08* me)
 {
 	// Write
 	// me->reg.reg_0x00_ID // is read only
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x01_STATUS	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x02_INPMUX	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x03_PGA		) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x04_DATARATE) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x05_REF		) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x06_IDACMAG	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x07_IDACMUX	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x08_VBIAS	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x09_SYS		) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0A_RESERVED) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0B_OFCAL0	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0C_OFCAL1	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0D_RESERVED) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0E_FSCAL0	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0F_FSCAL1	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x10_GPIODAT	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
-	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x11_GPIOCON	) != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x01_STATUS	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x02_INPMUX	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x03_PGA		) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x04_DATARATE) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x05_REF		) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x06_IDACMAG	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x07_IDACMUX	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x08_VBIAS	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x09_SYS		) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0A_RESERVED) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0B_OFCAL0	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0C_OFCAL1	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0D_RESERVED) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0E_FSCAL0	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x0F_FSCAL1	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x10_GPIODAT	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
+	if( AlxAds114s08_Reg_WriteAndRead(me, &me->reg.reg_0x11_GPIOCON	) != Alx_Ok) { ALX_ADS114S08_TRACE_ERR("Err"); return Alx_Err; }
 
 	// Return
 	return Alx_Ok;
@@ -774,14 +823,22 @@ Alx_Status AlxAds114s08_GetPgaShorted_uV(AlxAds114s08* me, float* pgaShortedVolt
 	me->reg.reg_0x05_REF.val.REFCON = REFCON_InternalRefAlwaysOn;
 	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_Pga_AvddAvss_Div2;
 	status = AlxAds114s08_Reg_WriteAll(me);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Perform ADC Conversion, Create Sample in blocking mode
 	//------------------------------------------------------------------------------
 	int16_t adcVoltage_raw = 0;
 	status = AlxAds114s08_PerformAdcConversion(me, &adcVoltage_raw, me->CONVERSION_TIMEOUT_ms);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Convert to mV
@@ -789,7 +846,11 @@ Alx_Status AlxAds114s08_GetPgaShorted_uV(AlxAds114s08* me, float* pgaShortedVolt
 	bool isOutOfRange = true;
 	float adcVoltage_mV = -99999999; // set out of range value
 	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Convert to degC
@@ -824,14 +885,22 @@ Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV)
 	me->reg.reg_0x05_REF.val.REFCON = REFCON_InternalRefAlwaysOn;
 	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_AvddAvss_Div4;
 	status = AlxAds114s08_Reg_WriteAll(me);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Perform ADC Conversion, Create Sample in blocking mode
 	//------------------------------------------------------------------------------
 	int16_t adcVoltage_raw = 0;
 	status = AlxAds114s08_PerformAdcConversion(me, &adcVoltage_raw, me->CONVERSION_TIMEOUT_ms);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Convert to mV
@@ -839,7 +908,11 @@ Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV)
 	bool isOutOfRange = true;
 	float adcVoltage_mV = -99999999; // set out of range value
 	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Convert to degC
@@ -874,14 +947,22 @@ Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV)
 	me->reg.reg_0x05_REF.val.REFCON = REFCON_InternalRefAlwaysOn;
 	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_Dvdd_Div4;
 	status = AlxAds114s08_Reg_WriteAll(me);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Perform ADC Conversion, Create Sample in blocking mode
 	//------------------------------------------------------------------------------
 	int16_t adcVoltage_raw = 0;
 	status = AlxAds114s08_PerformAdcConversion(me, &adcVoltage_raw, me->CONVERSION_TIMEOUT_ms);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Convert to mV
@@ -889,7 +970,11 @@ Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV)
 	bool isOutOfRange = true;
 	float adcVoltage_mV = -99999999; // set out of range value
 	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
-	if (status != Alx_Ok) { ALX_ADS114S08_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	//------------------------------------------------------------------------------
 	// Convert to degC
@@ -899,11 +984,14 @@ Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC(AlxAds114s08* me,
+Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC
+(
+	AlxAds114s08* me,
 	Ads114s08_ThermocoupleType thermocoupleType,
 	float thermocoupleVoltage_mV,
 	float coldJunctionTemp_degC,
-	float* thermocoupleTemperatureCompensated_degC)
+	float* thermocoupleTemperatureCompensated_degC
+)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -916,5 +1004,6 @@ Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC(AlxAds114s08* me,
 
 	return Alx_Ok;
 }
+
 
 #endif	// #if defined(ALX_C_LIB)

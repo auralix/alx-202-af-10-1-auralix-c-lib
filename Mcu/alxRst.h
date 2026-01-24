@@ -75,10 +75,8 @@ typedef struct { bool dummy; } AlxRst;
 
 // Trace //
 #if defined(ALX_RST_TRACE_ENABLE)
-	#define ALX_RST_TRACE_WRN(...) ALX_TRACE_WRN(ALX_RST_FILE, __VA_ARGS__)
 	#define ALX_RST_TRACE_INF(...) ALX_TRACE_INF(ALX_RST_FILE, __VA_ARGS__)
 #else
-	#define ALX_RST_TRACE_WRN(...) do{} while (false)
 	#define ALX_RST_TRACE_INF(...) do{} while (false)
 #endif
 
