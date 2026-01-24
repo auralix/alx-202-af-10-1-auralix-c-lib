@@ -155,7 +155,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_Init(me->memRaw);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrInit");
+				ALX_MEM_SAFE_TRACE_WRN("WrnInit");
 				continue;
 			}
 
@@ -163,7 +163,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_Read(me->memRaw, me->copyAddrA, me->buff1, me->copyLenWithCrc, me->memRawReadWriteNumOfTries, me->memRawReadWriteTimeout_ms);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrReadCopyA");
+				ALX_MEM_SAFE_TRACE_WRN("WrnReadCopyA");
 				continue;
 			}
 
@@ -171,7 +171,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrDeInit");
+				ALX_MEM_SAFE_TRACE_WRN("WrnDeInit");
 				continue;
 			}
 
@@ -184,7 +184,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_Init(me->memRaw);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrInit");
+				ALX_MEM_SAFE_TRACE_WRN("WrnInit");
 				continue;
 			}
 
@@ -192,7 +192,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_Read(me->memRaw, me->copyAddrB, me->buff2, me->copyLenWithCrc, me->memRawReadWriteNumOfTries, me->memRawReadWriteTimeout_ms);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrReadCopyB");
+				ALX_MEM_SAFE_TRACE_WRN("WrnReadCopyB");
 				continue;
 			}
 
@@ -200,7 +200,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrDeInit");
+				ALX_MEM_SAFE_TRACE_WRN("WrnDeInit");
 				continue;
 			}
 
@@ -235,7 +235,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					statusMemRaw = AlxMemRaw_Init(me->memRaw);
 					if(statusMemRaw != Alx_Ok)
 					{
-						ALX_MEM_SAFE_TRACE_WRN("ErrInit");
+						ALX_MEM_SAFE_TRACE_WRN("WrnInit");
 						continue;
 					}
 
@@ -251,7 +251,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 					if(statusMemRaw != Alx_Ok)
 					{
-						ALX_MEM_SAFE_TRACE_WRN("ErrDeInit");
+						ALX_MEM_SAFE_TRACE_WRN("WrnDeInit");
 						continue;
 					}
 
@@ -271,7 +271,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					statusMemRaw = AlxMemRaw_Init(me->memRaw);
 					if(statusMemRaw != Alx_Ok)
 					{
-						ALX_MEM_SAFE_TRACE_WRN("ErrInit");
+						ALX_MEM_SAFE_TRACE_WRN("WrnInit");
 						continue;
 					}
 
@@ -287,7 +287,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 					if(statusMemRaw != Alx_Ok)
 					{
-						ALX_MEM_SAFE_TRACE_WRN("ErrDeInit");
+						ALX_MEM_SAFE_TRACE_WRN("WrnDeInit");
 						continue;
 					}
 
@@ -307,7 +307,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					statusMemRaw = AlxMemRaw_Init(me->memRaw);
 					if(statusMemRaw != Alx_Ok)
 					{
-						ALX_MEM_SAFE_TRACE_WRN("ErrInit");
+						ALX_MEM_SAFE_TRACE_WRN("WrnInit");
 						continue;
 					}
 
@@ -323,7 +323,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 					if(statusMemRaw != Alx_Ok)
 					{
-						ALX_MEM_SAFE_TRACE_WRN("ErrDeInit");
+						ALX_MEM_SAFE_TRACE_WRN("WrnDeInit");
 						continue;
 					}
 
@@ -399,7 +399,7 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_Init(me->memRaw);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrInit");
+				ALX_MEM_SAFE_TRACE_WRN("WrnInit");
 				continue;
 			}
 
@@ -407,7 +407,7 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_Write(me->memRaw, me->copyAddrA, me->buff1, me->copyLenWithCrc, true, me->memRawReadWriteNumOfTries, me->memRawReadWriteTimeout_ms);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrWriteCopyA");
+				ALX_MEM_SAFE_TRACE_WRN("WrnWriteCopyA");
 				continue;
 			}
 
@@ -415,7 +415,7 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrDeInit");
+				ALX_MEM_SAFE_TRACE_WRN("WrnDeInit");
 				continue;
 			}
 
@@ -425,7 +425,7 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_Init(me->memRaw);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrInit");
+				ALX_MEM_SAFE_TRACE_WRN("WrnInit");
 				continue;
 			}
 
@@ -433,7 +433,7 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_Write(me->memRaw, me->copyAddrB, me->buff1, me->copyLenWithCrc, true, me->memRawReadWriteNumOfTries, me->memRawReadWriteTimeout_ms);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrWriteCopyB");
+				ALX_MEM_SAFE_TRACE_WRN("WrnWriteCopyB");
 				continue;
 			}
 
@@ -441,7 +441,7 @@ Alx_Status AlxMemSafe_Write(AlxMemSafe* me, uint8_t* data, uint32_t len)
 			statusMemRaw = AlxMemRaw_DeInit(me->memRaw);
 			if(statusMemRaw != Alx_Ok)
 			{
-				ALX_MEM_SAFE_TRACE_WRN("ErrDeInit");
+				ALX_MEM_SAFE_TRACE_WRN("WrnDeInit");
 				continue;
 			}
 
