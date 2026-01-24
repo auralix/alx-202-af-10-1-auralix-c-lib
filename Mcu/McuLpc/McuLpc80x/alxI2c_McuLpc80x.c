@@ -192,8 +192,12 @@ Alx_Status AlxI2c_Master_StartRead(AlxI2c* me, uint16_t slaveAddr, uint8_t* data
 	status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Read, timeout_ms);
 	if (status != kStatus_Success)
 	{
-		ALX_I2C_TRACE_WRN("ErrStartCondition");
-		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+		ALX_I2C_TRACE_ERR("ErrStartCondition");
+		if (AlxI2c_Reset(me) != Alx_Ok)
+		{
+			ALX_I2C_TRACE_ERR("ErrReset");
+			return Alx_Err;
+		}
 	}
 
 	// #5 Return OK
@@ -236,8 +240,12 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Read, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrStartCondition");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnStartCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -245,8 +253,12 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		status = AlxI2c_MasterReadBlocking(me, me->i2c, data, len, kI2C_TransferDefaultFlag, timeout_ms); // MF: Read data, then Stop
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrFlsRead");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnFlsRead");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -254,8 +266,12 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrStopCondition");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnStopCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -266,7 +282,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 	// #5 If we are here, the number of tries error occured
 	if (status != kStatus_Success)
 	{
-		ALX_I2C_TRACE_WRN("ErrNumOfTries");
+		ALX_I2C_TRACE_ERR("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
 	}
 
@@ -317,8 +333,12 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrStartCondition");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnStartCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -326,8 +346,12 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		status = AlxI2c_MasterWriteBlocking(me, me->i2c, _memAddr, _memAddrLen, kI2C_TransferDefaultFlag, timeout_ms); // MF: Write memAddr, then Stop
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrWriteSlaveAddr");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnWriteSlaveAddr");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -335,8 +359,12 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Read, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrStartCondition");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnStartCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -344,8 +372,12 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		status = AlxI2c_MasterReadBlocking(me, me->i2c, data, len, kI2C_TransferDefaultFlag, timeout_ms); // MF: Read data, then Stop
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrFlsRead");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnFlsRead");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -353,8 +385,12 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrStopCondition");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnStopCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -365,7 +401,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 	// #5 If we are here, the number of tries error occured
 	if (status != kStatus_Success)
 	{
-		ALX_I2C_TRACE_WRN("ErrNumOfTries");
+		ALX_I2C_TRACE_ERR("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
 	}
 
@@ -405,8 +441,12 @@ Alx_Status AlxI2c_Master_StartWrite(AlxI2c* me, uint16_t slaveAddr, const uint8_
 	status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
 	if (status != kStatus_Success)
 	{
-		ALX_I2C_TRACE_WRN("ErrStartCondition");
-		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+		ALX_I2C_TRACE_WRN("WrnStartCondition");
+		if (AlxI2c_Reset(me) != Alx_Ok)
+		{
+			ALX_I2C_TRACE_ERR("ErrReset");
+			return Alx_Err;
+		}
 	}
 
 	// #5 Return OK
@@ -449,8 +489,12 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrStartCondition");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnStartCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -458,8 +502,12 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		status = AlxI2c_MasterWriteBlocking(me, me->i2c, data, len, kI2C_TransferDefaultFlag, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrWriteSlaveAddr");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnWriteSlaveAddr");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -467,8 +515,12 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrStopCondition");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnStopCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -479,7 +531,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 	// #5 If we are here, the number of tries error occured
 	if (status != kStatus_Success)
 	{
-		ALX_I2C_TRACE_WRN("ErrNumOfTries");
+		ALX_I2C_TRACE_ERR("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
 	}
 
@@ -552,8 +604,12 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrStartCondition");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnStartCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -561,8 +617,12 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		status = AlxI2c_MasterWriteBlocking(me, me->i2c, _memAddr, _memAddrLen, kI2C_TransferNoStopFlag, timeout_ms); // MF: Write memAddr, no Stop
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrWriteSlaveAddr");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnWriteSlaveAddr");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -596,8 +656,12 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 			status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
 			if (status != kStatus_Success)
 			{
-				ALX_I2C_TRACE_WRN("ErrStopCondition");
-				if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+				ALX_I2C_TRACE_WRN("WrnStopCondition");
+				if (AlxI2c_Reset(me) != Alx_Ok)
+				{
+					ALX_I2C_TRACE_ERR("ErrReset");
+					return Alx_Err;
+				}
 				continue;
 			}
 
@@ -606,8 +670,12 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		}
 		else
 		{
-			ALX_I2C_TRACE_WRN("ErrFlsWrite");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnFlsWrite");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 	}
@@ -615,7 +683,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 	// #5 If we are here, write was OK or number of tries error occured
 	if (status != kStatus_Success)
 	{
-		ALX_I2C_TRACE_WRN("ErrNumOfTries");
+		ALX_I2C_TRACE_ERR("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
 	}
 
@@ -649,8 +717,12 @@ Alx_Status AlxI2c_Master_Stop(AlxI2c* me, uint16_t timeout_ms)
 	status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
 	if (status != kStatus_Success)
 	{
-		ALX_I2C_TRACE_WRN("ErrStopCondition");
-		if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+		ALX_I2C_TRACE_ERR("ErrStopCondition");
+		if (AlxI2c_Reset(me) != Alx_Ok)
+		{
+			ALX_I2C_TRACE_ERR("ErrReset");
+			return Alx_Err;
+		}
 	}
 
 	// #5 Return OK
@@ -691,21 +763,29 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrStartCondition");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnStartCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
 		// #4.2 Get status flag and check if NACK was return
 		do
 		{
-			if (AlxTimSw_IsTimeout_ms(&me->tim, timeout_ms)) { ALX_I2C_TRACE_WRN("ErrTimeout"); return (uint32_t)kStatus_I2C_Timeout; }
+			if (AlxTimSw_IsTimeout_ms(&me->tim, timeout_ms))
+			{
+				ALX_I2C_TRACE_ERR("ErrTimeout");
+				return (uint32_t)kStatus_I2C_Timeout;
+			}
 
 			flag = I2C_GetStatusFlags(me->i2c);
 		} while ((flag & I2C_STAT_MSTPENDING_MASK) == 0U);
 		if ((flag & (1 << 1)) && (flag & (1 << 2)))	// MF: Check 2nd and 3rd bit of I2C Status register. If this is true, NACK was returned
 		{
-			ALX_I2C_TRACE_WRN("ErrNack");
+			ALX_I2C_TRACE_WRN("WrnNack");
 			status = kStatus_Fail;
 			alxStat = Alx_Err;
 			continue;
@@ -715,8 +795,12 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		status = AlxI2c_MasterStop(me, me->i2c, timeout_ms);
 		if (status != kStatus_Success)
 		{
-			ALX_I2C_TRACE_WRN("ErrStopCondition");
-			if (AlxI2c_Reset(me) != Alx_Ok) { ALX_I2C_TRACE_WRN("ErrReset"); return Alx_Err; }
+			ALX_I2C_TRACE_WRN("WrnStopCondition");
+			if (AlxI2c_Reset(me) != Alx_Ok)
+			{
+				ALX_I2C_TRACE_ERR("ErrReset");
+				return Alx_Err;
+			}
 			continue;
 		}
 
@@ -727,7 +811,7 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 	// #5 If we are here, the number of tries error occured
 	if (status != kStatus_Success)
 	{
-		ALX_I2C_TRACE_WRN("ErrNumOfTries");
+		ALX_I2C_TRACE_ERR("ErrNumOfTries");
 		return Alx_ErrNumOfTries;
 	}
 
@@ -824,7 +908,7 @@ static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const voi
 
 		if (status == kStatus_I2C_Timeout)
 		{
-			ALX_I2C_TRACE_WRN("ErrTimeout");
+			ALX_I2C_TRACE_ERR("ErrTimeout");
 			return kStatus_I2C_Timeout;
 		}
 
@@ -867,7 +951,7 @@ static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const voi
 
 	if (status == kStatus_I2C_Timeout)
 	{
-		ALX_I2C_TRACE_WRN("ErrTimeout");
+		ALX_I2C_TRACE_ERR("ErrTimeout");
 		return kStatus_I2C_Timeout;
 	}
 
@@ -881,7 +965,7 @@ static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const voi
 
 			if (status == kStatus_I2C_Timeout)
 			{
-				ALX_I2C_TRACE_WRN("ErrTimeout");
+				ALX_I2C_TRACE_ERR("ErrTimeout");
 				return kStatus_I2C_Timeout;
 			}
 		}
@@ -910,7 +994,7 @@ static status_t AlxI2c_MasterReadBlocking(AlxI2c* me, I2C_Type* base, void* rxBu
 
 		if (status == kStatus_I2C_Timeout)
 		{
-			ALX_I2C_TRACE_WRN("ErrTimeout");
+			ALX_I2C_TRACE_ERR("ErrTimeout");
 			return kStatus_I2C_Timeout;
 		}
 
@@ -938,7 +1022,7 @@ static status_t AlxI2c_MasterReadBlocking(AlxI2c* me, I2C_Type* base, void* rxBu
 
 						if (status == kStatus_I2C_Timeout)
 						{
-							ALX_I2C_TRACE_WRN("ErrTimeout");
+							ALX_I2C_TRACE_ERR("ErrTimeout");
 							return kStatus_I2C_Timeout;
 						}
 					}
@@ -987,7 +1071,7 @@ static uint32_t AlxI2c_PendingStatusWait(AlxI2c* me, I2C_Type* base, uint16_t ti
 		// MF: Check Timeout
 		if (AlxTimSw_IsTimeout_ms(&me->tim, timeout))
 		{
-			ALX_I2C_TRACE_WRN("ErrTimeout");
+			ALX_I2C_TRACE_ERR("ErrTimeout");
 			return (uint32_t)kStatus_I2C_Timeout;
 		}
 

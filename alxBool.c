@@ -251,7 +251,7 @@ void AlxBool_Update(AlxBool* me, bool val)
 		ALX_BOOL_ASSERT(false);	// We should never get here
 	}
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -267,7 +267,7 @@ bool AlxBool_IsTrue(AlxBool* me)
 	// Return
 	return me->isTrue;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -282,7 +282,7 @@ bool AlxBool_IsTrueUpToShortTime(AlxBool* me)
 	// Return
 	return me->isTrueUpToShortTime;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -297,7 +297,7 @@ bool AlxBool_IsTrueUpToLongTime(AlxBool* me)
 	// Return
 	return me->isTrueUpToLongTime;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -312,7 +312,7 @@ bool AlxBool_IsTrueForLongTime(AlxBool* me)
 	// Return
 	return me->isTrueForLongTime;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -327,7 +327,7 @@ bool AlxBool_WasTrue(AlxBool* me)
 	// Return
 	return me->wasTrue;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -342,7 +342,7 @@ bool AlxBool_WasTrueForShortTime(AlxBool* me)
 	// Return
 	return me->wasTrueForShortTime;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -357,7 +357,7 @@ bool AlxBool_WasTrueForLongTime(AlxBool* me)
 	// Return
 	return me->wasTrueForLongTime;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -370,7 +370,7 @@ void AlxBool_ClearWasTrueFlag(AlxBool* me)
 	// Clear
 	me->wasTrue = false;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -383,7 +383,7 @@ void AlxBool_ClearWasTrueForShortTimeFlag(AlxBool* me)
 	// Clear
 	me->wasTrueForShortTime = false;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -396,7 +396,7 @@ void AlxBool_ClearWasTrueForLongTimeFlag(AlxBool* me)
 	// Clear
 	me->wasTrueForLongTime = false;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -411,7 +411,7 @@ bool AlxBool_IsFalse(AlxBool* me)
 	// Return
 	return me->isFalse;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -426,7 +426,7 @@ bool AlxBool_IsFalseUpToShortTime(AlxBool* me)
 	// Return
 	return me->isFalseUpToShortTime;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -441,7 +441,7 @@ bool AlxBool_IsFalseUpToLongTime(AlxBool* me)
 	// Return
 	return me->isFalseUpToLongTime;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -456,7 +456,7 @@ bool AlxBool_IsFalseForLongTime(AlxBool* me)
 	// Return
 	return me->isFalseForLongTime;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -471,7 +471,7 @@ bool AlxBool_WasFalse(AlxBool* me)
 	// Return
 	return me->wasFalse;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -486,7 +486,7 @@ bool AlxBool_WasFalseForShortTime(AlxBool* me)
 	// Return
 	return me->wasFalseForShortTime;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -501,7 +501,7 @@ bool AlxBool_WasFalseForLongTime(AlxBool* me)
 	// Return
 	return me->wasFalseForLongTime;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -514,7 +514,7 @@ void AlxBool_ClearWasFalseFlag(AlxBool* me)
 	// Clear
 	me->wasFalse = false;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me
@@ -527,7 +527,7 @@ void AlxBool_ClearWasFalseForShortTimeFlag(AlxBool* me)
 	// Clear
 	me->wasFalseForShortTime = false;
 }
-	
+
 /**
   * @brief
   * @param[in,out]	me

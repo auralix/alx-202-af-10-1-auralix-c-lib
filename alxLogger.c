@@ -956,7 +956,7 @@ Alx_Status AlxLogger_File_ReadFirstLog(AlxLogger* me, const char* path, char* lo
 	status = AlxFs_File_Open(me->alxFs, &file, path, "r");
 	if (status != Alx_Ok)
 	{
-		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
 		return status;
 	}
 
@@ -978,7 +978,7 @@ Alx_Status AlxLogger_File_ReadFirstLog(AlxLogger* me, const char* path, char* lo
 	status = AlxFs_File_Close(me->alxFs, &file);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
 		// TV: TODO - Handle close error
 		return status;
 	}
@@ -1005,7 +1005,7 @@ Alx_Status AlxLogger_File_GetSize(AlxLogger* me, const char* path, uint32_t* siz
 	status = AlxFs_File_Open(me->alxFs, &file, path, "r");
 	if (status != Alx_Ok)
 	{
-		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
 		return status;
 	}
 
@@ -1013,11 +1013,11 @@ Alx_Status AlxLogger_File_GetSize(AlxLogger* me, const char* path, uint32_t* siz
 	status = AlxFs_File_Size(me->alxFs, &file, size);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_TRACE("Err: %d, path=%s, fileSize=%u", status, path, size);
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s, fileSize=%u", status, path, size);
 		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 		if (statusClose != Alx_Ok)
 		{
-			ALX_FS_TRACE("Err: %d, path=%s", statusClose, path);
+			ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", statusClose, path);
 			// TV: TODO - Handle close error
 		}
 		return status;
@@ -1027,7 +1027,7 @@ Alx_Status AlxLogger_File_GetSize(AlxLogger* me, const char* path, uint32_t* siz
 	status = AlxFs_File_Close(me->alxFs, &file);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_TRACE("Err: %d, path=%s", status, path);
+		ALX_LOGGER_TRACE_WRN("Err: %d, path=%s", status, path);
 		// TV: TODO - Handle close error
 		return status;
 	}

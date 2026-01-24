@@ -330,7 +330,11 @@ Alx_Status AlxLp586x_Reg_Write(AlxLp586x* me, void* reg)
 
 	// Write
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr + i2cAddr_Offset, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_LP586x_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;

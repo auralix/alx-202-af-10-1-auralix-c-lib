@@ -148,11 +148,21 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
 		#if defined(ALX_PWM_OPTIMIZE_SIZE)
-		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), me->dutyDefaultArr_permil[i] / 10, me->pwmFreq_Hz, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; }	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period). Divide duty by 10 to get pct from permil
+		// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period). Divide duty by 10 to get pct from permil
+		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), me->dutyDefaultArr_permil[i] / 10, me->pwmFreq_Hz, me->srcClk_Hz, false) != kStatus_Success)
+		{
+			ALX_PWM_TRACE_ERR("ErrChInit");
+			return Alx_Err;
+		}
 		AlxPwm_UpdatePwmDutyPermil(me, me->chArr[i], me->dutyDefaultArr_permil[i]);	// MF: To setup duty in permil because FLS can not handle it
 		#else
-		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), (uint8_t)me->dutyDefaultArr_pct[i], me->pwmFreq_Hz, me->srcClk_Hz, false) != kStatus_Success) { ALX_PWM_TRACE("ErrChInit"); return Alx_Err; }	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
-		AlxPwm_UpdatePwmDutyPct(me, me->chArr[i], me->dutyDefaultArr_pct[i]);		// MF: To setup duty in float because FLS can not handle it
+		// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
+		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), (uint8_t)me->dutyDefaultArr_pct[i], me->pwmFreq_Hz, me->srcClk_Hz, false) != kStatus_Success)
+		{
+			ALX_PWM_TRACE_ERR("ErrChInit");
+			return Alx_Err;
+		}
+		AlxPwm_UpdatePwmDutyPct(me, me->chArr[i], me->dutyDefaultArr_pct[i]);	// MF: To setup duty in float because FLS can not handle it
 		#endif
 	}
 

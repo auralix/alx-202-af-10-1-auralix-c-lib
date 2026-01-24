@@ -120,7 +120,11 @@ Alx_Status AlxAds8678_InitPeriph(AlxAds8678* me)
 
 	// Init SPI
 	status = AlxSpi_Init(me->spi);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Set isInitPeriph
 	me->isInitPeriph = true;
@@ -140,7 +144,11 @@ Alx_Status AlxAds8678_DeInitPeriph(AlxAds8678* me)
 
 	// DeInit SPI
 	status = AlxSpi_DeInit(me->spi);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// DeInit GPIO
 	AlxIoPin_DeInit(me->do_nRST);
@@ -175,7 +183,11 @@ Alx_Status AlxAds8678_Init(AlxAds8678* me)
 
 	// Write registers
 	status = AlxAds8678_Reg_WriteAll(me);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -198,7 +210,11 @@ Alx_Status AlxAds8678_DeInit(AlxAds8678* me)
 
 	// Write registers
 	status = AlxAds8678_Reg_WriteAll(me);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Place device in power down mode (all registers are reset to default values)
 	AlxIoPin_Reset(me->do_nRST);
@@ -221,7 +237,11 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 
 	// Write AUTO_RST command
 	status = AlxAds8678_Cmd_Write_AutoRst(me);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Loop through all channels
 	for (uint32_t chNum = 0; chNum < ALX_ADS8678_NUM_OF_CH; chNum++)
@@ -235,7 +255,11 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 			// Write NO_OP command
 			uint8_t dataReadArr[6] = {};
 			status = AlxAds8678_Cmd_Write_NoOp(me, dataReadArr);
-			if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+			if (status != Alx_Ok)
+			{
+				ALX_ADS8678_TRACE_ERR("Err");
+				return status;
+			}
 
 			// Check channel number
 			if
@@ -249,7 +273,11 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 				chDataFrame.chNum = (dataReadArr[4] & 0xF0) >> 4;
 
 				// Check
-				if(chDataFrame.chNum != chNum) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+				if(chDataFrame.chNum != chNum)
+				{
+					ALX_ADS8678_TRACE_ERR("Err");
+					return Alx_Err;
+				}
 			}
 
 			// Check device address
@@ -263,7 +291,11 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 				chDataFrame.devAddr = (dataReadArr[4] & 0x0C) >> 2;
 
 				// Check
-				if(chDataFrame.devAddr != me->reg._0x03_FeatureSelect.val.DEV) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+				if(chDataFrame.devAddr != me->reg._0x03_FeatureSelect.val.DEV)
+				{
+					ALX_ADS8678_TRACE_ERR("Err");
+					return Alx_Err;
+				}
 			}
 
 			// Check channel voltage range
@@ -278,7 +310,11 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 				// Check
 				regEnumChVoltageRange = AlxAds8678_GetChRegEnumChVoltageRange(me, chNum);
 				uint8_t chVoltageRangeLsb3 = regEnumChVoltageRange & 0x07;
-				if(chDataFrame.chVoltageRangeLsb3 != chVoltageRangeLsb3) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+				if(chDataFrame.chVoltageRangeLsb3 != chVoltageRangeLsb3)
+				{
+					ALX_ADS8678_TRACE_ERR("Err");
+					return Alx_Err;
+				}
 			}
 
 			// Prepare
@@ -385,7 +421,12 @@ static Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)
 
 	// Read
 	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, sizeof(dataWriteArr), me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		AlxSpi_Master_DeAssertCs(me->spi);
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
@@ -416,13 +457,22 @@ static Alx_Status AlxAds8678_Reg_Write(AlxAds8678* me, void* reg)
 
 	// Write
 	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, sizeof(dataWriteArr), me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		AlxSpi_Master_DeAssertCs(me->spi);
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
 
 	// Check if data was written ok
-	if (dataWriteArr[1] != dataReadArr[2]) { ALX_ADS8678_TRACE("Err"); return Alx_Err; }
+	if (dataWriteArr[1] != dataReadArr[2])
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -434,37 +484,37 @@ static Alx_Status AlxAds8678_Reg_WriteAll(AlxAds8678* me)
 
 	// Write
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x01_AutoScanSequenceEnable);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x02_ChannelPowerDown);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x03_FeatureSelect);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x05_Channel0InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x06_Channel1InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x07_Channel2InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x08_Channel3InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x09_Channel4InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x0A_Channel5InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x0B_Channel6InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x0C_Channel7InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
 
 	// Return
 	return Alx_Ok;
@@ -502,7 +552,12 @@ static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, uint8_t* dataReadArr
 
 	// Write NO_OP command
 	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, len, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		AlxSpi_Master_DeAssertCs(me->spi);
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
@@ -528,7 +583,12 @@ static Alx_Status AlxAds8678_Cmd_Write_AutoRst(AlxAds8678* me)
 
 	// Write AUTO_RST command
 	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, sizeof(dataWriteArr), me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS8678_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		AlxSpi_Master_DeAssertCs(me->spi);
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
@@ -620,8 +680,7 @@ ALX_WEAK void AlxAds8678_RegStruct_SetVal(AlxAds8678* me)
 	(void)me;
 
 	// Assert
-	ALX_ADS8678_TRACE("Err");
-	ALX_ADS8678_ASSERT(false);
+	ALX_ADS8678_ASSERT(false);	// Implement in APP!
 }
 
 

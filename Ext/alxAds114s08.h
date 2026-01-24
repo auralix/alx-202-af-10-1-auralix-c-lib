@@ -44,7 +44,6 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxSpi.h"
 #include "alxInterpLin.h"
-
 #include "alxTimSw.h"
 #include "alxOsMutex.h"
 #include "alxOsDelay.h"
@@ -74,9 +73,9 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_ADS114S08_TRACE_ENABLE)
-	#define ALX_ADS114S08_TRACE(...) ALX_TRACE_WRN(ALX_ADS114S08_FILE, __VA_ARGS__)
+	#define ALX_ADS114S08_TRACE_ERR(...) ALX_TRACE_ERR(ALX_ADS114S08_FILE, __VA_ARGS__)
 #else
-	#define ALX_ADS114S08_TRACE(...) do{} while (false)
+	#define ALX_ADS114S08_TRACE_ERR(...) do{} while (false)
 #endif
 
 
@@ -88,6 +87,7 @@ typedef enum
 	thermocoupleType_K,
 	thermocoupleType_S
 } Ads114s08_ThermocoupleType;
+
 
 //******************************************************************************
 // Register Values Unions
@@ -117,7 +117,7 @@ typedef union
 		uint8_t RESERVED : 5;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x00_ID;
+} Ads114s08_RegVal_0x00_ID;
 
 
 //------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ typedef union
 		bool FL_POR		: 1;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x01_STATUS;
+} Ads114s08_RegVal_0x01_STATUS;
 
 
 //------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ typedef union
 		Ads114s08_RegEnum_0x02_MUXP MUXP : 4;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x02_INPMUX;
+} Ads114s08_RegVal_0x02_INPMUX;
 
 
 //------------------------------------------------------------------------------
@@ -296,7 +296,7 @@ typedef union
 		Ads114s08_RegEnum_0x04_G_CHOP	G_CHOP	: 1;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x04_DATARATE;
+} Ads114s08_RegVal_0x04_DATARATE;
 
 
 //------------------------------------------------------------------------------
@@ -308,7 +308,7 @@ typedef enum
 	FL_REF_EN_FL_REF_L0_MonEn				= 0b01,
 	FL_REF_EN_FL_REF_L0_FL_REF_L1_MonEn		= 0b10,
 	FL_REF_EN_FL_REF_L0_MonEn_PullUpEn		= 0b11
-	} Ads114s08_RegEnum_0x05_FL_REF_EN;
+} Ads114s08_RegEnum_0x05_FL_REF_EN;
 typedef enum
 {
 	REFP_BUF_Enabled	= 0b0,
@@ -333,7 +333,6 @@ typedef enum
 	REFCON_InternalRefAlwaysOn	= 0b10,
 	REFCON_InternalRefReserved3	= 0b11,
 } Ads114s08_RegEnum_0x05_REFCON;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -345,7 +344,7 @@ typedef union
 		Ads114s08_RegEnum_0x05_FL_REF_EN	FL_REF_EN	: 2;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x05_REF;
+} Ads114s08_RegVal_0x05_REF;
 
 
 //------------------------------------------------------------------------------
@@ -387,7 +386,6 @@ typedef enum
 	IMAG_Off14  = 0b1110,
 	IMAG_Off15  = 0b1111
 } Ads114s08_RegEnum_0x06_IMAG;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -398,7 +396,7 @@ typedef union
 		Ads114s08_RegEnum_0x06_FL_RAIL_EN	FL_RAIL_EN	: 1;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x06_IDACMAG;
+} Ads114s08_RegVal_0x06_IDACMAG;
 
 
 //------------------------------------------------------------------------------
@@ -442,7 +440,6 @@ typedef enum
 	I1MUX_Disconnected14 = 0b1110,
 	I1MUX_Disconnected15 = 0b1111
 } Ads114s08_RegEnum_0x07_I1MUX;
-
 typedef union
 {
 	struct __attribute__((packed))
@@ -451,7 +448,7 @@ typedef union
 		Ads114s08_RegEnum_0x07_I2MUX	I2MUX	: 4;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x07_IDACMUX;
+} Ads114s08_RegVal_0x07_IDACMUX;
 
 
 //------------------------------------------------------------------------------
@@ -511,7 +508,7 @@ typedef union
 		Ads114s08_RegEnum_0x08_VB_LEVEL	VB_LEVEL : 1;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x08_VBIAS;
+} Ads114s08_RegVal_0x08_VBIAS;
 
 
 //------------------------------------------------------------------------------
@@ -546,7 +543,7 @@ typedef union
 		Ads114s08_RegEnum_0x09_SYS_MON	SYS_MON		: 3;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x09_SYS;
+} Ads114s08_RegVal_0x09_SYS;
 
 
 //------------------------------------------------------------------------------
@@ -559,7 +556,7 @@ typedef union
 		uint8_t	reserved0 : 8;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x0A_Reserved;
+} Ads114s08_RegVal_0x0A_Reserved;
 
 
 //------------------------------------------------------------------------------
@@ -572,7 +569,7 @@ typedef union
 		uint8_t	OFC_7_0 : 8;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x0B_OFCAL0;
+} Ads114s08_RegVal_0x0B_OFCAL0;
 
 
 //------------------------------------------------------------------------------
@@ -585,7 +582,7 @@ typedef union
 		uint8_t	OFC_15_8 : 8;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x0C_OFCAL1;
+} Ads114s08_RegVal_0x0C_OFCAL1;
 
 
 //------------------------------------------------------------------------------
@@ -598,7 +595,7 @@ typedef union
 		uint8_t	reserved0 : 8;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x0D_Reserved;
+} Ads114s08_RegVal_0x0D_Reserved;
 
 
 //------------------------------------------------------------------------------
@@ -611,7 +608,7 @@ typedef union
 		uint8_t	FSC_7_0 : 8;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x0E_FSCAL0;
+} Ads114s08_RegVal_0x0E_FSCAL0;
 
 
 //------------------------------------------------------------------------------
@@ -624,7 +621,7 @@ typedef union
 		uint8_t	FSC_15_8 : 8;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x0F_FSCAL1;
+} Ads114s08_RegVal_0x0F_FSCAL1;
 
 
 //------------------------------------------------------------------------------
@@ -644,7 +641,7 @@ typedef union
 		bool DIR_pin3_asInput : 1;
 	};
 	uint8_t raw;
-	} Ads114s08_RegVal_0x10_GPIODAT;
+} Ads114s08_RegVal_0x10_GPIODAT;
 
 
 //------------------------------------------------------------------------------
@@ -841,13 +838,14 @@ typedef struct
 //******************************************************************************
 void AlxAds114s08_Ctor
 (
-AlxAds114s08* me,
-AlxSpi* spi,
-uint8_t spiNumOfTries,
-uint16_t spiTimeout_ms,
-AlxIoPin* di_nDRDY,
-AlxIoPin* do_START,
-AlxIoPin* do_nRST);
+	AlxAds114s08* me,
+	AlxSpi* spi,
+	uint8_t spiNumOfTries,
+	uint16_t spiTimeout_ms,
+	AlxIoPin* di_nDRDY,
+	AlxIoPin* do_START,
+	AlxIoPin* do_nRST
+);
 
 
 //******************************************************************************
@@ -863,11 +861,15 @@ Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTe
 Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV);
 Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV);
 Alx_Status AlxAds114s08_GetDevId(AlxAds114s08* me, Ads114s08_RegEnum_0x00_DEV_ID* DEV_ID);
-Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC(AlxAds114s08* me,
-Ads114s08_ThermocoupleType thermocoupleType,
-float thermocoupleVoltage_mV,
-float coldJunctionTemp_degC,
-float* thermocoupleTemperatureCompnsated_degC);
+Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC
+(
+	AlxAds114s08* me,
+	Ads114s08_ThermocoupleType thermocoupleType,
+	float thermocoupleVoltage_mV,
+	float coldJunctionTemp_degC,
+	float* thermocoupleTemperatureCompnsated_degC
+);
+
 
 #endif	// #if defined(ALX_C_LIB)
 
