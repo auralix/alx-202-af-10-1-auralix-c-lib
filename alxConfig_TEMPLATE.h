@@ -199,6 +199,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 
 //// ALX - EXT
+//#define ALX_A352_ASSERT_BKPT_ENABLE
 //#define ALX_ADAU1961_ASSERT_BKPT_ENABLE
 //#define ALX_ADS8678_ASSERT_BKPT_ENABLE
 //#define ALX_ADS114S08_ASSERT_BKPT_ENABLE
@@ -310,6 +311,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 
 //// ALX - EXT
+//#define ALX_A352_ASSERT_TRACE_ENABLE
 //#define ALX_ADAU1961_ASSERT_TRACE_ENABLE
 //#define ALX_ADS8678_ASSERT_TRACE_ENABLE
 //#define ALX_ADS114S08_ASSERT_TRACE_ENABLE
@@ -421,6 +423,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 
 // ALX - EXT
+#define ALX_A352_ASSERT_RST_ENABLE
 #define ALX_ADAU1961_ASSERT_RST_ENABLE
 #define ALX_ADS8678_ASSERT_RST_ENABLE
 #define ALX_ADS114S08_ASSERT_RST_ENABLE
@@ -533,6 +536,7 @@ extern "C" {
 #define ALX_TRACE_LEVEL ALX_TRACE_LEVEL_INF
 
 // ALX - EXT
+#define ALX_A352_TRACE_ENABLE
 #define ALX_ADAU1961_TRACE_ENABLE
 #define ALX_ADS8678_TRACE_ENABLE
 #define ALX_ADS114S08_TRACE_ENABLE
