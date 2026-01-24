@@ -116,28 +116,28 @@ void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osTimeIncrement_us)
   * @param[in,out]	me
   * @param[in]		osTimeIncrement_ms
   */
-void AlxOsDelayUntil_ms(AlxOsDelayUntil* me, uint64_t osTimeIncrement_ms)	{ AlxOsDelay_ms(me, osTimeIncrement_ms * 1000); }
+void AlxOsDelayUntil_ms(AlxOsDelayUntil* me, uint64_t osTimeIncrement_ms)	{ AlxOsDelayUntil_us(me, osTimeIncrement_ms * 1000); }
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		osTimeIncrement_sec
   */
-void AlxOsDelayUntil_sec(AlxOsDelayUntil* me, uint64_t osTimeIncrement_sec)	{ AlxOsDelay_sec(me, osTimeIncrement_sec * 1000000); }
+void AlxOsDelayUntil_sec(AlxOsDelayUntil* me, uint64_t osTimeIncrement_sec)	{ AlxOsDelayUntil_us(me, osTimeIncrement_sec * 1000000); }
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		osTimeIncrement_min
   */
-void AlxOsDelayUntil_min(AlxOsDelayUntil* me, uint64_t osTimeIncrement_min)	{ AlxOsDelay_min(me, osTimeIncrement_min * 60000000); }
+void AlxOsDelayUntil_min(AlxOsDelayUntil* me, uint64_t osTimeIncrement_min)	{ AlxOsDelayUntil_us(me, osTimeIncrement_min * 60000000); }
 
 /**
   * @brief
   * @param[in,out]	me
   * @param[in]		osTimeIncrement_hr
   */
-void AlxOsDelayUntil_hr(AlxOsDelayUntil* me, uint64_t osTimeIncrement_hr)	{ AlxOsDelay_hr(me, osTimeIncrement_hr * 3600000000); }
+void AlxOsDelayUntil_hr(AlxOsDelayUntil* me, uint64_t osTimeIncrement_hr)	{ AlxOsDelayUntil_us(me, osTimeIncrement_hr * 3600000000); }
 
 
 #endif	// #if defined(ALX_C_LIB)
