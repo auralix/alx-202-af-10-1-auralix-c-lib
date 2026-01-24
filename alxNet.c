@@ -58,9 +58,22 @@ extern void CellularDevice_PowerOff(void);
 #define CONNECT_TIMEOUT 5000
 
 #define THREAD_STACK_SIZE_WORDS 512
-#define THREAD_PRIORITY 1
 
-#define DNS_RETRY_COUNT 1 // 3 sec.
+#if defined(ALX_FREERTOS_TASK_PRIORITY_NET_TICK)
+#define THREAD_PRIORITY_TICK (ALX_FREERTOS_TASK_PRIORITY_NET_TICK)
+#else
+#define THREAD_PRIORITY_TICK (1)
+#endif
+
+#if defined(ALX_FREERTOS_TASK_PRIORITY_NET_DHCP)
+#define THREAD_PRIORITY_DHCP (ALX_FREERTOS_TASK_PRIORITY_NET_DHCP)
+#else
+#define THREAD_PRIORITY_DHCP (1)
+#endif
+
+#define DNS_RETRY_COUNT 1 // 2 sec. per retry
+#define DNS_PORT		53
+#define DNS_TIMEOUT_MS	2000
 
 #define WIZ_BUFFER_SIZE 2048
 
@@ -93,11 +106,6 @@ static uint8_t wiz_buffer[WIZ_BUFFER_SIZE] __ALIGNED(4);
 static uint64_t dhcp_ip_leased_until = 0;
 static AlxOsMutex alxDhcpMutex;
 static bool dhcp_isRunning = false;
-
-static uint8_t dns_target_domain[256];
-static uint8_t dns_response_ip[4];
-static DnsTaskState dns_retval;
-static AlxOsMutex alxDnsMutex;
 
 AlxSocket alxDhcpSocket, alxDnsSocket, alxPingSocket;
 
@@ -212,7 +220,7 @@ static void wizchip_dhcp_assign(void)
 }
 static void wizchip_dhcp_conflict(void)
 {
-	ALX_NET_TRACE_INF("Conflict IP from DHCP");
+	ALX_NET_TRACE_ERR("Conflict IP from DHCP");
 
 	// halt or reset or any...
 	while (1)
@@ -266,7 +274,7 @@ static void dhcp_task(void *argument)
 						link = wizphy_getphylink();
 						if (link == PHY_LINK_OFF)
 						{
-							ALX_NET_TRACE_INF("PHY_LINK_OFF");
+							ALX_NET_TRACE_WRN("PHY_LINK_OFF");
 							DHCP_stop();
 							while (1)
 							{
@@ -296,7 +304,7 @@ static void dhcp_task(void *argument)
 						else if (retval == DHCP_FAILED)
 						{
 							dhcp_ip_leased_until = 0;
-							ALX_NET_TRACE_INF("DHCP timeout occurred, retry: %d", dhcp_retry);
+							ALX_NET_TRACE_WRN("DHCP timeout occurred, retry: %d", dhcp_retry);
 						}
 					}
 				}
@@ -358,84 +366,17 @@ static void dbg_dump(void)
 }
 #endif
 
-// DNS task
-static void dns_task(void *argument)
-{
-	AlxNet* me = (AlxNet*) argument;
-	uint8_t dns_ip[4];
-
-while (1)
-	{
-		AlxOsMutex_Lock(&alxDnsMutex);
-		str2ip(me->dns[0], dns_ip);
-		if (AlxSocket_Open(&alxDnsSocket, me, AlxSocket_Protocol_Udp) == Alx_Ok)
-		{
-			dns_retval = DnsTaskRunning;
-			DNS_init(alxDnsSocket.socket_data.wiz_socket, wiz_buffer);
-			int dns_retry = 0;
-			int counter = 0;
-			while (1)
-			{
-				if (DNS_run(dns_ip, dns_target_domain, dns_response_ip) > 0)
-				{
-//					ALX_NET_TRACE_INF("DNS success");
-//					ALX_NET_TRACE_INF("Target domain : %s", dns_target_domain);
-//					ALX_NET_TRACE_INF("IP of target domain : %d.%d.%d.%d", dns_response_ip[0], dns_response_ip[1], dns_response_ip[2], dns_response_ip[3]);
-					dns_retval = DnsTaskSuccess;
-#ifdef ALX_DBG_WIZNET
-					dbg_get();
-#endif
-					break;
-				}
-				else
-				{
-					dns_retry++;
-					if (dns_retry <= DNS_RETRY_COUNT)
-					{
-						ALX_NET_TRACE_INF("DNS timeout occurred, retry %d", dns_retry);
-#ifdef ALX_DBG_WIZNET
-						dbg_get();
-						dbg_dump();
-#endif
-					}
-				}
-
-				if (dns_retry > DNS_RETRY_COUNT)
-				{
-					ALX_NET_TRACE_INF("DNS failed for %s", dns_target_domain);
-					dns_retval = DnsTaskTimeout;
-#ifdef ALX_DBG_WIZNET
-					dbg_get();
-					dbg_dump();
-					wizphy_reset();
-#endif
-					break;
-				}
-
-				AlxOsDelay_ms(&alxOsDelay, 10);
-				counter++;
-				if (counter == 100)
-				{
-					counter = 0;
-					DNS_time_handler();
-				}
-			}
-			AlxSocket_Close(&alxDnsSocket);
-		}
-	}
-}
-
 // 1 sec tick task
 static void tick_task(void *argument)
 {
 	UNUSED(argument);
 	while (1)
 	{
-		DNS_time_handler();
 		DHCP_time_handler();
 		AlxOsDelay_ms(&alxOsDelay, 1000);
 	}
 }
+
 
 #define PING_BUF_LEN 32
 #define PING_REQUEST 8
@@ -571,6 +512,174 @@ static uint8_t ping_reply(uint8_t s, uint8_t *addr, uint16_t rlen) {
 
 	return -1;
 }
+
+typedef struct {
+	uint16_t id;
+	uint16_t flags;
+	uint16_t qdcount;
+	uint16_t ancount;
+	uint16_t nscount;
+	uint16_t arcount;
+} dns_header_t;
+
+/* Build a DNS query in 'buf' for 'hostname'. out_len gets total length. */
+static uint16_t dns_build_query(uint8_t *buf, const char *hostname, size_t *out_len)
+{
+	dns_header_t *hdr = (dns_header_t *)buf;
+	uint16_t txid = (uint16_t)AlxTick_Get_ms(&alxTick); // simple txid
+
+	hdr->id = htons(txid);
+	hdr->flags = htons(0x0100); // standard query, recursion desired
+	hdr->qdcount = htons(1);
+	hdr->ancount = 0;
+	hdr->nscount = 0;
+	hdr->arcount = 0;
+
+	uint8_t *p = buf + sizeof(dns_header_t);
+
+	// QNAME: label length + label bytes ... terminated by 0
+	const char *label = hostname;
+	while (*label) {
+		const char *dot = strchr(label, '.');
+		size_t len = dot ? (size_t)(dot - label) : strlen(label);
+		*p++ = (uint8_t)len;
+		memcpy(p, label, len);
+		p += len;
+		if (!dot) break;
+		label = dot + 1;
+	}
+	*p++ = 0; // null terminator for QNAME
+
+	// QTYPE = A (1), QCLASS = IN (1)
+	*(uint16_t*)p = htons(1); p += 2;
+	*(uint16_t*)p = htons(1); p += 2;
+
+	*out_len = (size_t)(p - buf);
+
+	return txid;
+}
+
+/* Parse DNS response, return IPv4 address or 0 on failure */
+static uint32_t dns_parse_response(uint8_t *buf, size_t len, uint16_t txid)
+{
+	if (len < sizeof(dns_header_t)) return 0;
+	dns_header_t *hdr = (dns_header_t *)buf;
+
+	if (htons(hdr->id) != txid)
+		return 0;
+
+	uint8_t *p = buf + sizeof(dns_header_t);
+	uint8_t *end = buf + len;
+
+	uint16_t qdcount = htons(hdr->qdcount);
+	uint16_t ancount = htons(hdr->ancount);
+
+	// Skip question section
+	for (int q = 0; q < qdcount; q++) {
+		// skip QNAME
+		while (p < end && *p) p += (*p) + 1;
+		if (p >= end) return 0;
+		p++; // skip null
+		if ((p + 4) > end) return 0; // QTYPE + QCLASS
+		p += 4;
+	}
+
+	// Parse answer RRs
+	for (int a = 0; a < ancount; a++) {
+		// name (pointer or label)
+		if (p >= end) return 0;
+		if ((*p & 0xC0) == 0xC0) {
+			// pointer: skip 2 bytes
+			p += 2;
+		}
+		else {
+			// label sequence
+			while (p < end && *p) p += (*p) + 1;
+			if (p >= end) return 0;
+			p++; // skip null
+		}
+
+		if ((p + 10) > end) return 0; // type(2) class(2) ttl(4) rdlen(2)
+		uint16_t type  = htons(*(uint16_t*)p); p += 2;
+		uint16_t clas  = htons(*(uint16_t*)p); p += 2;
+		uint32_t ttl   = htons(*(uint32_t*)p); p += 4;
+		uint16_t rdlen = htons(*(uint16_t*)p); p += 2;
+
+		if ((p + rdlen) > end) return 0;
+
+		if (type == 1 && clas == 1 && rdlen == 4) {
+			// A record, IN class
+			uint32_t ip_net;
+			memcpy(&ip_net, p, 4);
+			return ip_net;
+		}
+
+		p += rdlen; // skip rdata
+	}
+
+	return 0;
+}
+
+uint32_t dns_resolve_wiznet(AlxNet* me, const char *hostname)
+{
+	static size_t selected_dns_server = 0;
+
+	uint8_t tx_buf[256];
+	size_t tx_len;
+	uint16_t txid = dns_build_query(tx_buf, hostname, &tx_len);
+
+	if (me->dns[selected_dns_server][0] != '\0')
+	{
+		for (size_t retry = 0; retry < DNS_RETRY_COUNT; retry++)
+		{
+			// Create UDP socket on WIZnet
+			if (AlxSocket_Open(&alxDnsSocket, me, AlxSocket_Protocol_Udp) != Alx_Ok)
+			{
+				return 0;
+			}
+
+			AlxSocket_Connect(&alxDnsSocket, me->dns[selected_dns_server], DNS_PORT);
+			if (AlxSocket_Send(&alxDnsSocket, tx_buf, tx_len) == (int)tx_len)
+			{
+				// wait for response (non-blocking recv with polling)
+				uint64_t start = AlxTick_Get_ms(&alxTick);
+				uint8_t rx_buf[512];
+				int32_t rlen = 0;
+
+				while (AlxTick_Get_ms(&alxTick) - start < DNS_TIMEOUT_MS) {
+					rlen = AlxSocket_Recv(&alxDnsSocket, rx_buf, sizeof(rx_buf));
+					if (rlen > 0) {
+						uint32_t ip_net = dns_parse_response(rx_buf, (size_t)rlen, txid);
+						AlxSocket_Close(&alxDnsSocket);
+						return ip_net; // 0 = failure, otherwise network-byte-order IPv4
+					}
+					AlxOsDelay_ms(&alxOsDelay, 10);
+				}
+			}
+
+			AlxSocket_Close(&alxDnsSocket);
+		}
+	}
+
+	// Failed - cycle to next DNS server
+	selected_dns_server = (selected_dns_server + 1) % ALX_NET_NUM_DNS_SERVERS;
+
+	// Skip empty DNS entries
+	for (int i = 0; i < ALX_NET_NUM_DNS_SERVERS; i++)
+	{
+		if (me->dns[selected_dns_server][0] != '\0')
+			break; // found a valid server
+
+		// try next one
+		selected_dns_server = (selected_dns_server + 1) % ALX_NET_NUM_DNS_SERVERS;
+	}
+
+	return 0;
+}
+
+
+
+
 
 int AlxNet_Ping(AlxNet* me, const char *addr, uint16_t count, uint32_t timeout_ms)
 {
@@ -807,7 +916,7 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 			{
 				if (Cellular_GetSimCardStatus(me->cellular.handle, &me->cellular.simStatus) != CELLULAR_SUCCESS)
 				{
-					ALX_NET_TRACE_INF(("Cellular SIM failure"));
+					ALX_NET_TRACE_WRN(("Cellular SIM failure"));
 					CellularDevice_PowerOff();
 					connection_state = State_ModemGoOff;
 					break;
@@ -1040,6 +1149,9 @@ Alx_Status AlxNet_Init(AlxNet *me)
 				return Alx_Err;
 			}
 
+			// Init DNS socket
+			AlxSocket_Ctor(&alxDnsSocket);
+
 			// start DHCP
 			AlxOsMutex_Ctor(&alxDhcpMutex);
 			AlxOsMutex_Lock(&alxDhcpMutex);
@@ -1050,21 +1162,8 @@ Alx_Status AlxNet_Init(AlxNet *me)
 				"DHCP_Task",
 				THREAD_STACK_SIZE_WORDS * 4,
 				(void *)me,
-				THREAD_PRIORITY);
+				THREAD_PRIORITY_DHCP);
 			AlxOsThread_Start(&dhcp_thread);
-
-			// start DNS
-			AlxOsMutex_Ctor(&alxDnsMutex);
-			AlxOsMutex_Lock(&alxDnsMutex);
-			AlxSocket_Ctor(&alxDnsSocket);
-			AlxOsThread dns_thread;
-			AlxOsThread_Ctor(&dns_thread,
-				dns_task,
-				"DNS_Task",
-				THREAD_STACK_SIZE_WORDS * 4,
-				(void *)me,
-				THREAD_PRIORITY);
-			AlxOsThread_Start(&dns_thread);
 
 			// start 1 sec tick
 			AlxOsThread tick_thread;
@@ -1073,7 +1172,7 @@ Alx_Status AlxNet_Init(AlxNet *me)
 				"TICK_Task",
 				THREAD_STACK_SIZE_WORDS * 4,
 				(void *)me,
-				THREAD_PRIORITY + 1);
+				THREAD_PRIORITY_TICK);
 			AlxOsThread_Start(&tick_thread);
 
 			AlxOsMutex_Unlock(&me->alxMutex);
@@ -1141,12 +1240,12 @@ Alx_Status AlxNet_Connect(AlxNet* me)
 	{
 		AlxOsMutex_Lock(&me->alxMutex);
 		uint8_t temp;
-		uint32_t start = AlxTick_Get_ms(&alxTick);
+		uint64_t start = AlxTick_Get_ms(&alxTick);
 		do
 		{
 			if (ctlwizchip(CW_GET_PHYLINK, (void *)&temp) == -1)
 			{
-				ALX_NET_TRACE_INF("Unknown PHY link status");
+				ALX_NET_TRACE_WRN("Unknown PHY link status");
 				AlxOsMutex_Unlock(&me->alxMutex);
 				return Alx_Err;
 			}
@@ -1281,11 +1380,31 @@ void AlxNet_Handle(AlxNet* me)
 		if (!me->isNetConnected)
 		{
 			AlxNet_Connect(me);
-			AlxNet_SetMac(me, saved_mac);
-			AlxNet_SetIp(me, saved_ip);
-			AlxNet_SetGateway(me, saved_gateway);
-			AlxNet_SetNetmask(me, saved_netmask);
-			memcpy(me->dns, saved_dns, sizeof(me->dns));
+
+			if (!me->enable_dhcp)
+			{
+				AlxNet_SetMac(me, saved_mac);
+				AlxNet_SetIp(me, saved_ip);
+				AlxNet_SetGateway(me, saved_gateway);
+				AlxNet_SetNetmask(me, saved_netmask);
+				memcpy(me->dns, saved_dns, sizeof(me->dns));
+			}
+			else
+			{
+				if (dhcp_ip_leased_until > AlxTick_Get_sec(&alxTick))
+				{
+					// if lease has not expired temporarily use stored settings
+					AlxNet_SetMac(me, saved_mac);
+					AlxNet_SetIp(me, saved_ip);
+					AlxNet_SetGateway(me, saved_gateway);
+					AlxNet_SetNetmask(me, saved_netmask);
+					memcpy(me->dns, saved_dns, sizeof(me->dns));
+				}
+
+				// restart DHCP to get new IP
+				AlxNet_Dhcp_Enable(me, false);
+				AlxNet_Dhcp_Enable(me, true);
+			}
 		}
 	}
 #endif
@@ -1505,35 +1624,20 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
-	ALX_NET_ASSERT(strlen(hostname) < sizeof(dns_target_domain));
 
 	#if defined(ALX_WIZNET)
 	if (me->config == AlxNet_Config_Wiznet)
 	{
 		AlxOsMutex_Lock(&me->alxMutex);
-		strcpy((char *)dns_target_domain, hostname);
-		dns_retval = DnsTaskRunning;
-		AlxOsMutex_Unlock(&alxDnsMutex);
-
-		while (dns_retval == DnsTaskRunning)
+		uint32_t ip_uint = dns_resolve_wiznet(me, hostname);
+		if (ip_uint != 0)
 		{
-			// timeout in DNS task
-			AlxOsDelay_ms(&alxOsDelay, 20);
-		}
-
-		switch (dns_retval)
-		{
-		case DnsTaskSuccess:
-			ip2str(dns_response_ip, ip);
+			sprintf(ip, "%lu.%lu.%lu.%lu", ip_uint & 0xff, (ip_uint >> 8) & 0xff, (ip_uint >> 16) & 0xff, ip_uint >> 24);
 			AlxOsMutex_Unlock(&me->alxMutex);
 			return Alx_Ok;
-		case DnsTaskTimeout:
-			AlxOsMutex_Unlock(&me->alxMutex);
-			return Alx_ErrNumOfTries;
-		default:
-			break;
 		}
 		AlxOsMutex_Unlock(&me->alxMutex);
+		return Alx_ErrNumOfTries;
 	}
 	#endif
 

@@ -254,7 +254,7 @@ static int cell_send(AlxSocket* me, void* data, uint32_t len)
 			if (AlxTick_Get_ms(&alxTick) - timer_start > me->timeout)
 			{
 				AlxOsMutex_Unlock(&socketMutex);
-				ALX_SOCKET_TRACE_WRN("Cellular_SocketSend failed with timeout: %d", cellularStatus);
+				ALX_SOCKET_TRACE_ERR("Cellular_SocketSend failed with timeout: %d", cellularStatus);
 				return -1;
 			}
 			else
@@ -263,7 +263,7 @@ static int cell_send(AlxSocket* me, void* data, uint32_t len)
 				if (cellularStatus != CELLULAR_MODEM_NOT_READY)
 				{
 					AlxOsMutex_Unlock(&socketMutex);
-					ALX_SOCKET_TRACE_WRN("Cellular_SocketSend failed: %d", cellularStatus);
+					ALX_SOCKET_TRACE_ERR("Cellular_SocketSend failed: %d", cellularStatus);
 					return -1;
 				}
 			}
@@ -271,7 +271,7 @@ static int cell_send(AlxSocket* me, void* data, uint32_t len)
 
 		if (AlxTick_Get_ms(&alxTick) - timer_start > me->timeout)
 		{
-			ALX_SOCKET_TRACE_WRN("cell_send timed out");
+			//ALX_SOCKET_TRACE_ERR("cell_send timed out");
 			break;
 		}
 
@@ -312,7 +312,7 @@ static int cell_recv(AlxSocket* me, void* data, uint32_t len)
 		if (ret != CELLULAR_SUCCESS)
 		{
 			AlxOsMutex_Unlock(&socketMutex);
-			ALX_SOCKET_TRACE_WRN("Cellular_SocketRecv failed: %d", ret);
+			ALX_SOCKET_TRACE_ERR("Cellular_SocketRecv failed: %d", ret);
 			AlxOsDelay_ms(&alxOsDelay, 500);
 			return -1;
 		}
@@ -333,7 +333,7 @@ static int cell_recv(AlxSocket* me, void* data, uint32_t len)
 
 		if ((AlxTick_Get_ms(&alxTick) - timer_start >= me->timeout) || (received_total > 0))
 		{
-			//ALX_SOCKET_TRACE_WRN("cell_recv timeout");
+			//ALX_SOCKET_TRACE_ERR("cell_recv timeout");
 			break;
 		}
 
@@ -407,7 +407,7 @@ static void sslFree(AlxTlsData* tls)
 static int sslRecv(void *ctx, unsigned char *buf, size_t len)
 {
 	AlxSocket* me = (AlxSocket*)ctx;
-	int ret = Alx_Err;
+	int ret = -1;
 
 #if defined (ALX_WIZNET)
 	if (me->alxNet->config == AlxNet_Config_Wiznet)
@@ -426,7 +426,7 @@ static int sslRecv(void *ctx, unsigned char *buf, size_t len)
 static int sslSend(void *ctx, const unsigned char *buf, size_t len)
 {
 	AlxSocket* me = (AlxSocket*)ctx;
-	int ret = Alx_Err;
+	int ret = -1;
 
 #if defined (ALX_WIZNET)
 	if (me->alxNet->config == AlxNet_Config_Wiznet)
@@ -449,7 +449,7 @@ static Alx_Status sslHandshake(AlxSocket *me)
 	{
 		if (status != MBEDTLS_ERR_SSL_WANT_READ && status != MBEDTLS_ERR_SSL_WANT_WRITE)
 		{
-			ALX_SOCKET_TRACE_INF("TLS handshake error: 0x%X", status);
+			ALX_SOCKET_TRACE_ERR("TLS handshake error: 0x%X", status);
 			sslFree(&me->tls_data);
 			return Alx_Err;
 		}
@@ -457,7 +457,7 @@ static Alx_Status sslHandshake(AlxSocket *me)
 	}
 	if ((status = mbedtls_ssl_get_verify_result(&me->tls_data.ssl_context)) != 0)
 	{
-		ALX_SOCKET_TRACE_INF("TLS verify_result error 0x%X", status);
+		ALX_SOCKET_TRACE_ERR("TLS verify_result error 0x%X", status);
 		sslFree(&me->tls_data);
 		return Alx_Err;
 	}
@@ -738,6 +738,7 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 			sslFree(&me->tls_data);
 		}
 		me->socket_data.wiz_socket = -1;
+		me->isOpened = false;
 		return Alx_Ok;
 	}
 	#endif
@@ -756,7 +757,11 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 		if (NULL == me->cellular_socket.socket) return Alx_Err;
 		CellularError_t cellularStatus = CELLULAR_SUCCESS;
 		cellularStatus = Cellular_SocketClose(me->alxNet->cellular.handle, me->cellular_socket.socket);
-		if (cellularStatus == CELLULAR_SUCCESS) return Alx_Ok;
+		if (cellularStatus == CELLULAR_SUCCESS)
+		{
+			me->isOpened = false;
+			return Alx_Ok;
+		}
 	}
 	#endif
 
@@ -1123,7 +1128,7 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 	#endif
 
 	// Return
-	return Alx_Err;
+	return SOCKERR_SOCKINIT;
 }
 int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 {
@@ -1224,7 +1229,7 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 	#endif
 
 	// Return
-	return Alx_Err;
+	return SOCKERR_SOCKINIT;
 }
 void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms)
 {
@@ -1243,7 +1248,7 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 		me->tls_data.init_state = SSL_INITIALIZED_CACERT;
 		if (mbedtls_x509_crt_parse(&me->tls_data.x509_ca_certificate, ca_cert, strlen((const char *)ca_cert) + 1) != 0)
 		{
-			ALX_SOCKET_TRACE_INF("Failed to parse CA certificate\r\n");
+			ALX_SOCKET_TRACE_ERR("Failed to parse CA certificate\r\n");
 			sslFree(&me->tls_data);
 			return Alx_Err;
 		}
@@ -1254,7 +1259,7 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 		me->tls_data.init_state = SSL_INITIALIZED_CLCERT;
 		if (mbedtls_x509_crt_parse(&me->tls_data.x509_cl_certificate, cl_cert, strlen((const char *)cl_cert) + 1) != 0)
 		{
-			ALX_SOCKET_TRACE_INF("Failed to parse CL certificate\r\n");
+			ALX_SOCKET_TRACE_ERR("Failed to parse CL certificate\r\n");
 			sslFree(&me->tls_data);
 			return Alx_Err;
 		}
@@ -1262,7 +1267,7 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 		me->tls_data.init_state = SSL_INITIALIZED_CLKEY;
 		if (mbedtls_pk_parse_key(&me->tls_data.pkey, cl_key, strlen((const char *)cl_key) + 1, NULL, 0, NULL, NULL) != 0)
 		{
-			ALX_SOCKET_TRACE_INF("Failed to parse CL private key\r\n");
+			ALX_SOCKET_TRACE_ERR("Failed to parse CL private key\r\n");
 			sslFree(&me->tls_data);
 			return Alx_Err;
 		}
@@ -1278,7 +1283,7 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 		MBEDTLS_SSL_TRANSPORT_STREAM,
 		MBEDTLS_SSL_PRESET_DEFAULT) != 0)
 	{
-		ALX_SOCKET_TRACE_INF("Failed to load default SSL config\r\n");
+		ALX_SOCKET_TRACE_ERR("Failed to load default SSL config\r\n");
 		sslFree(&me->tls_data);
 		return Alx_Err;
 	}
@@ -1298,7 +1303,7 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 	{
 		if (mbedtls_ssl_conf_own_cert(&me->tls_data.ssl_config, &me->tls_data.x509_cl_certificate, &me->tls_data.pkey) != 0)
 		{
-			ALX_SOCKET_TRACE_INF("Failed to config own certificate\r\n");
+			ALX_SOCKET_TRACE_ERR("Failed to config own certificate\r\n");
 			sslFree(&me->tls_data);
 			return Alx_Err;
 		}
@@ -1319,7 +1324,7 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 	me->tls_data.init_state = SSL_INITIALIZED_SSL_CONTEXT;
 	if (mbedtls_ssl_setup(&me->tls_data.ssl_context, &me->tls_data.ssl_config) != 0)
 	{
-		ALX_SOCKET_TRACE_INF("Failed to setup SSL context\r\n");
+		ALX_SOCKET_TRACE_ERR("Failed to setup SSL context\r\n");
 		sslFree(&me->tls_data);
 		return Alx_Err;
 	}
@@ -1331,7 +1336,7 @@ Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const uns
 
 	//	if (mbedtls_ssl_set_hostname(&me->tls_data.ssl_context, server_cn) != 0)
 	//	{
-	//		ALX_SOCKET_TRACE_INF("Failed to set hostname\n");
+	//		ALX_SOCKET_TRACE_ERR("Failed to set hostname\n");
 	//		sslFree(&me->tls_data);
 	//		return Alx_Err;
 	//	}

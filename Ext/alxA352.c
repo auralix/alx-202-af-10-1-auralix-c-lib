@@ -155,24 +155,48 @@ Alx_Status AlxA352_Init
 	if (!me->spi->isInit)
 	{
 		status = AlxSpi_Init(me->spi);
-		if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err SpiInit"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_A352_TRACE_ERR("Err SpiInit");
+			return status;
+		}
 	}
 
 	status = AlxA352_Disable(me);
-	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err Disable"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_A352_TRACE_ERR("Err Disable");
+		return status;
+	}
 
 	// Read ID registers & Trace ID
 	status = AlxA352_GetProdId(me);
-	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err GetId"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_A352_TRACE_ERR("Err GetId");
+		return status;
+	}
 
 	status = AlxA352_GetFwVersion(me);
-	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err GetFwVersion"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_A352_TRACE_ERR("Err GetFwVersion");
+		return status;
+	}
 
 	status = AlxA352_GetSerialNum(me);
-	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err GetSerialNum"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_A352_TRACE_ERR("Err GetSerialNum");
+		return status;
+	}
 
 	status = AlxA352_Configure(me, sampleRate);
-	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err Configure"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_A352_TRACE_ERR("Err Configure");
+		return status;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -200,7 +224,11 @@ Alx_Status AlxA352_DeInit(AlxA352* me)
 
 	// DeInit SPI
 	status = AlxSpi_DeInit(me->spi);
-	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err SpiDeinit"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_A352_TRACE_ERR("Err SpiDeinit");
+		return status;
+	}
 
 	// Force window refresh in next init
 	me->reg.WIN_CTRL.val.WINDOW_ID = 0xFFFF;
@@ -266,7 +294,7 @@ Alx_Status AlxA352_GetData(AlxA352* me, AccDataPoint* data, uint8_t len)
 		}
 		else
 		{
-			//ALX_A352_TRACE_WRN("AlxA352_ReadBurst returned %u", status);
+			//ALX_A352_TRACE_ERR("AlxA352_ReadBurst returned %u", status);
 		}
 
 		status = AlxA352_Reg_Read(me, &me->reg.FLAG);
@@ -484,7 +512,11 @@ static Alx_Status AlxA352_Reg_Read(AlxA352* me, void* reg)
 	if (regMeta.addr != me->reg.WIN_CTRL.meta.addr)
 	{
 		status = AlxA352_SetWindow(me, regMeta.win);
-		if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err SpiReadSetWindow"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_A352_TRACE_ERR("Err SpiReadSetWindow");
+			return status;
+		}
 	}
 
 	// Assert CS
@@ -493,7 +525,12 @@ static Alx_Status AlxA352_Reg_Read(AlxA352* me, void* reg)
 	// Write address -> MSB is set to 0 for read operaton
 	uint16_t regAddr_Read = 0x0000 | ((regMeta.addr & 0x7F) << 8);
 	status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regAddr_Read, 1, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiReadSetAddr"); return status; }
+	if (status != Alx_Ok)
+	{
+		AlxSpi_Master_DeAssertCs(me->spi);
+		ALX_A352_TRACE_ERR("Err SpiReadSetAddr");
+		return status;
+	}
 
 	// Stall time (A352 requires 20 us with 40 us readrate, one word is 8 us)
 	AlxA352_Wait_us(32);
@@ -502,14 +539,24 @@ static Alx_Status AlxA352_Reg_Read(AlxA352* me, void* reg)
 	{
 		regAddr_Read = 0x0000 | (((regMeta.addr + (2 * i)) & 0x7F) << 8);
 		status = AlxSpi_Master_WriteRead(me->spi, (uint8_t*)&regAddr_Read, (uint8_t*)&regValPtr[i - 1], 1, me->spiNumOfTries, me->spiTimeout_ms);
-		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiReadGetData1"); return status; }
+		if (status != Alx_Ok)
+		{
+			AlxSpi_Master_DeAssertCs(me->spi);
+			ALX_A352_TRACE_ERR("Err SpiReadGetData1");
+			return status;
+		}
 
 		AlxA352_Wait_us(32);
 	}
 
 	// Read final data
 	status = AlxSpi_Master_Read(me->spi, (uint8_t*)&regValPtr[regMeta.len - 1], 1, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiReadGetData2"); return status; }
+	if (status != Alx_Ok)
+	{
+		AlxSpi_Master_DeAssertCs(me->spi);
+		ALX_A352_TRACE_ERR("Err SpiReadGetData2");
+		return status;
+	}
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
@@ -531,7 +578,11 @@ static Alx_Status AlxA352_Reg_Write(AlxA352* me, void* reg)
 	if (regMeta.addr != me->reg.WIN_CTRL.meta.addr)
 	{
 		status = AlxA352_SetWindow(me, regMeta.win);
-		if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err SpiWriteSetWindow"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_A352_TRACE_ERR("Err SpiWriteSetWindow");
+			return status;
+		}
 	}
 
 	// Assert CS
@@ -542,7 +593,12 @@ static Alx_Status AlxA352_Reg_Write(AlxA352* me, void* reg)
 	{
 		uint16_t regCmd_Write = 0x8000 | ((regMeta.addr & 0x7F) << 8) | (regVal & 0x00FF);
 		status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regCmd_Write, 1, me->spiNumOfTries, me->spiTimeout_ms);
-		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiWrite"); return status; }
+		if (status != Alx_Ok)
+		{
+			AlxSpi_Master_DeAssertCs(me->spi);
+			ALX_A352_TRACE_ERR("Err SpiWrite");
+			return status;
+		}
 		needToWait = true;
 	}
 
@@ -551,7 +607,12 @@ static Alx_Status AlxA352_Reg_Write(AlxA352* me, void* reg)
 		if (needToWait) { AlxA352_Wait_us(32); }
 		uint16_t regCmd_Write = 0x8000 | (((regMeta.addr + 1) & 0x7F) << 8) | ((regVal & 0xFF00) >> 8);
 		status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regCmd_Write, 1, me->spiNumOfTries, me->spiTimeout_ms);
-		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiWrite"); return status; }
+		if (status != Alx_Ok)
+		{
+			AlxSpi_Master_DeAssertCs(me->spi);
+			ALX_A352_TRACE_ERR("Err SpiWrite");
+			return status;
+		}
 		needToWait = true;
 	}
 
@@ -698,9 +759,13 @@ static Alx_Status AlxA352_ConfigureSampleRate(AlxA352* me, float sampleRate)
 		AlxA352_RegEnum_FILTER_CTRL_FILTER_SEL filterSetting;
 	} acquisitionParams[] =
 	{
+		{ 25.f, DOUT_RATE_50_Sps, FILTER_SEL_Kaiser_T512_Fc9},
 		{ 31.25f, DOUT_RATE_50_Sps, FILTER_SEL_Kaiser_T512_Fc16},
+		{ 50.f, DOUT_RATE_50_Sps, FILTER_SEL_Kaiser_T512_Fc16},
 		{ 62.5f, DOUT_RATE_100_Sps, FILTER_SEL_Kaiser_T128_Fc36},
+		{ 100.f, DOUT_RATE_100_Sps, FILTER_SEL_Kaiser_T128_Fc36},
 		{ 125.f, DOUT_RATE_200_Sps, FILTER_SEL_Kaiser_T512_Fc60},
+		{ 200.f, DOUT_RATE_200_Sps, FILTER_SEL_Kaiser_T64_Fc83},
 		{ 250.f, DOUT_RATE_500_Sps, FILTER_SEL_Kaiser_T128_Fc110},
 		{ 500.f, DOUT_RATE_500_Sps, FILTER_SEL_Kaiser_T512_Fc210},
 		{ 1000.f, DOUT_RATE_1000_Sps, FILTER_SEL_Kaiser_T512_Fc460},
@@ -721,7 +786,7 @@ static Alx_Status AlxA352_ConfigureSampleRate(AlxA352* me, float sampleRate)
 
 	if (!sampleRateOk)
 	{
-		ALX_A352_TRACE_WRN("Invalid sample rate requested");
+		ALX_A352_TRACE_ERR("Invalid sample rate requested");
 		return Alx_Err;
 	}
 
@@ -817,7 +882,11 @@ static Alx_Status AlxA352_ReadBurst(AlxA352* me, uint16_t *burstData)
 	uint16_t regVal = me->reg.BURST.val.raw;
 
 	status = AlxA352_SetWindow(me, regMeta.win);
-	if (status != Alx_Ok) { ALX_A352_TRACE_WRN("Err SpiReadSetWindow"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_A352_TRACE_ERR("Err SpiReadSetWindow");
+		return status;
+	}
 
 	// Assert CS
 	AlxSpi_Master_AssertCs(me->spi);
@@ -827,13 +896,23 @@ static Alx_Status AlxA352_ReadBurst(AlxA352* me, uint16_t *burstData)
 	{
 		uint16_t regCmd_Write = 0x8000 | ((regMeta.addr & 0x7F) << 8) | (regVal & 0x00FF);
 		status = AlxSpi_Master_Write(me->spi, (uint8_t*)&regCmd_Write, 1, me->spiNumOfTries, me->spiTimeout_ms);
-		if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiWrite"); return status; }
+		if (status != Alx_Ok)
+		{
+			AlxSpi_Master_DeAssertCs(me->spi);
+			ALX_A352_TRACE_ERR("Err SpiWrite");
+			return status;
+		}
 	}
 
 	AlxA352_Wait_us(45);
 
 	status = AlxSpi_Master_Read(me->spi, (uint8_t*)burstData, me->burstSize, me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_A352_TRACE_WRN("Err SpiReadGetData1"); return status; }
+	if (status != Alx_Ok)
+	{
+		AlxSpi_Master_DeAssertCs(me->spi);
+		ALX_A352_TRACE_ERR("Err SpiReadGetData1");
+		return status;
+	}
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
@@ -880,7 +959,7 @@ static Alx_Status AlxA352_FlashBackup(AlxA352* me)
 	}
 	else
 	{
-		ALX_A352_TRACE_INF("Flash backup failed (%u)", i);
+		ALX_A352_TRACE_ERR("Flash backup failed (%u)", i);
 		status = Alx_Err;
 	}
 

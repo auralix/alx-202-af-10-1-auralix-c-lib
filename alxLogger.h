@@ -74,10 +74,12 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_LOGGER_TRACE_ENABLE)
+	#define ALX_LOGGER_TRACE_ERR(...) ALX_TRACE_ERR(ALX_LOGGER_FILE, __VA_ARGS__)
 	#define ALX_LOGGER_TRACE_WRN(...) ALX_TRACE_WRN(ALX_LOGGER_FILE, __VA_ARGS__)
 	#define ALX_LOGGER_TRACE_INF(...) ALX_TRACE_INF(ALX_LOGGER_FILE, __VA_ARGS__)
 	#define ALX_LOGGER_TRACE_VRB(...) ALX_TRACE_VRB(ALX_LOGGER_FILE, __VA_ARGS__)
 #else
+	#define ALX_LOGGER_TRACE_ERR(...) do{} while (false)
 	#define ALX_LOGGER_TRACE_WRN(...) do{} while (false)
 	#define ALX_LOGGER_TRACE_INF(...) do{} while (false)
 	#define ALX_LOGGER_TRACE_VRB(...) do{} while (false)

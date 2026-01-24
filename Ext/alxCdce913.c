@@ -503,7 +503,7 @@ Alx_Status AlxCdce913_Init
 	status = Cdce913_RegWriteAll(me);
 	if (status != Alx_Ok)
 	{
-		ALX_CDCE913_TRACE_WRN("Failed to write CDCE913 registers");
+		ALX_CDCE913_TRACE_ERR("Failed to write CDCE913 registers");
 		return Alx_Err;
 	}
 
@@ -511,7 +511,7 @@ Alx_Status AlxCdce913_Init
 	status = Cdce913_RegReadAll(me);
 	if (status != Alx_Ok)
 	{
-		ALX_CDCE913_TRACE_WRN("Failed to read CDCE913 registers");
+		ALX_CDCE913_TRACE_ERR("Failed to read CDCE913 registers");
 		return Alx_Err;
 	}
 	ALX_CDCE913_TRACE_INF("REG 0x%02X: 0x%02X", me->reg.ID.addr, me->reg.ID.val.raw);
