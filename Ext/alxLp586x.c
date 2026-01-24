@@ -763,7 +763,7 @@ Alx_Status AlxLp586x_RegStruct_Write(AlxLp586x* me)
 ALX_WEAK void AlxLp586x_RegStruct_SetVal(AlxLp586x* me)
 {
 	(void)me;
-	ALX_LP586x_ASSERT(false);	// Implement function in APP
+	ALX_LP586x_ASSERT(false);	// Implement in APP!
 }
 
 

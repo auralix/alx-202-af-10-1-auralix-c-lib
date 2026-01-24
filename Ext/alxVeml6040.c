@@ -415,10 +415,7 @@ static Alx_Status AlxVeml6040_Reg_Read(AlxVeml6040* me, void* reg)
 //******************************************************************************
 ALX_WEAK void AlxVeml6040_RegStruct_SetVal(AlxVeml6040* me)
 {
-	// Local variables
 	(void)me;
-
-	// Assert
 	ALX_VEML6040_ASSERT(false);	// Implement in APP!
 }
 

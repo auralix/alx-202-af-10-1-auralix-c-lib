@@ -435,7 +435,7 @@ static void AlxPi4ioe5v6534q_RegStruct_SetValToDefault(AlxPi4ioe5v6534q* me)
 ALX_WEAK void AlxPi4ioe5v6534q_RegStruct_SetVal(AlxPi4ioe5v6534q* me)
 {
 	(void)me;
-	ALX_PI4IOE5V6534Q_ASSERT(false);	// Implement function in APP
+	ALX_PI4IOE5V6534Q_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK Alx_Status AlxPi4ioe5v6534q_RegStruct_Write(AlxPi4ioe5v6534q* me)
 {

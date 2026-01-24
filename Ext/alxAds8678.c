@@ -676,10 +676,7 @@ static void AlxAds8678_RegEnumChVoltageRangeToChVoltageRangeParam(AlxAds8678_Reg
 //******************************************************************************
 ALX_WEAK void AlxAds8678_RegStruct_SetVal(AlxAds8678* me)
 {
-	// Local variables
 	(void)me;
-
-	// Assert
 	ALX_ADS8678_ASSERT(false);	// Implement in APP!
 }
 

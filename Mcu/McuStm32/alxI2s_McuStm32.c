@@ -513,30 +513,22 @@ static void AlxI2s_Periph_DisableIrq(AlxI2s* me)
 ALX_WEAK void AlxI2s_Foreground_Callback_TxL(AlxI2s* me)
 {
 	(void)me;
-
-	ALX_I2S_TRACE_FTL("Implement!");
-	ALX_I2S_ASSERT(false);
+	ALX_I2S_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxI2s_Foreground_Callback_TxR(AlxI2s* me)
 {
 	(void)me;
-
-	ALX_I2S_TRACE_FTL("Implement!");
-	ALX_I2S_ASSERT(false);
+	ALX_I2S_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxI2s_Foreground_Callback_RxL(AlxI2s* me)
 {
 	(void)me;
-
-	ALX_I2S_TRACE_FTL("Implement!");
-	ALX_I2S_ASSERT(false);
+	ALX_I2S_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxI2s_Foreground_Callback_RxR(AlxI2s* me)
 {
 	(void)me;
-
-	ALX_I2S_TRACE_FTL("Implement!");
-	ALX_I2S_ASSERT(false);
+	ALX_I2S_ASSERT(false);	// Implement in APP!
 }
 
 

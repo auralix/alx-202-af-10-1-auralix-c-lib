@@ -853,10 +853,7 @@ static Alx_Status AlxIna228_TraceId(AlxIna228* me)
 //******************************************************************************
 ALX_WEAK void AlxIna228_RegStruct_SetVal(AlxIna228* me)
 {
-	// Local variables
 	(void)me;
-
-	// Assert
 	ALX_INA228_ASSERT(false);	// Implement in APP!
 }
 
