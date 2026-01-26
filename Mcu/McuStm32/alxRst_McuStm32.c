@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 
 //******************************************************************************
@@ -78,7 +78,7 @@ Alx_Status AlxRst_Init(AlxRst* me)
 	ALX_RST_ASSERT(me->isInit == false);
 
 	// Read
-	me->csr = HAL_RCC_GetResetSource();
+//	me->csr = HAL_RCC_GetResetSource();
 
 	// Parse
 	me->rr.sw = (me->csr & RCC_CSR_SFTRSTF) != 0;

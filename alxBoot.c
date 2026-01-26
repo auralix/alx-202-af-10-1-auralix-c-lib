@@ -666,7 +666,6 @@ static Alx_Status AlxBoot_App_Usb_FwCand_ChunkRead_Callback(void* ctx, void* chu
 		ALX_BOOT_TRACE_WRN("FAIL: flash_area_write() statusBoot %ld", statusBoot);
 		return Alx_Err;
 	}
-	#endif
 
 	// Calculate progress
 	uint8_t fwCandStaging_Progress_pct = ((uint64_t)me->fwCandStaging_LenWritten_bytes * 100) / ALX_MCU_BOOT_IMAGE_SIZE;
@@ -684,6 +683,7 @@ static Alx_Status AlxBoot_App_Usb_FwCand_ChunkRead_Callback(void* ctx, void* chu
 		// Callback
 		AlxBoot_App_Usb_FwCandStagingProgress_Callback(me, fwCandStaging_ProgressStep10_pct);
 	}
+	#endif
 
 	// Update length written
 	me->fwCandStaging_LenWritten_bytes = me->fwCandStaging_LenWritten_bytes + chunkLenActual;

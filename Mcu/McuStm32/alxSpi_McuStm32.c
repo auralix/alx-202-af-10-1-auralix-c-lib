@@ -720,18 +720,18 @@ static uint32_t AlxSpi_GetDataSize(AlxSpi* me)
 {
 	switch (me->dataSize)
 	{
-		case AlxSpi_DataSize_4bit: return SPI_DATASIZE_4BIT;
-		case AlxSpi_DataSize_5bit: return SPI_DATASIZE_5BIT;
-		case AlxSpi_DataSize_6bit: return SPI_DATASIZE_6BIT;
-		case AlxSpi_DataSize_7bit: return SPI_DATASIZE_7BIT;
+//		case AlxSpi_DataSize_4bit: return SPI_DATASIZE_4BIT;
+//		case AlxSpi_DataSize_5bit: return SPI_DATASIZE_5BIT;
+//		case AlxSpi_DataSize_6bit: return SPI_DATASIZE_6BIT;
+//		case AlxSpi_DataSize_7bit: return SPI_DATASIZE_7BIT;
 		case AlxSpi_DataSize_8bit: return SPI_DATASIZE_8BIT;
-		case AlxSpi_DataSize_9bit: return SPI_DATASIZE_9BIT;
-		case AlxSpi_DataSize_10bit: return SPI_DATASIZE_10BIT;
-		case AlxSpi_DataSize_11bit: return SPI_DATASIZE_11BIT;
-		case AlxSpi_DataSize_12bit: return SPI_DATASIZE_12BIT;
-		case AlxSpi_DataSize_13bit: return SPI_DATASIZE_13BIT;
-		case AlxSpi_DataSize_14bit: return SPI_DATASIZE_14BIT;
-		case AlxSpi_DataSize_15bit: return SPI_DATASIZE_15BIT;
+//		case AlxSpi_DataSize_9bit: return SPI_DATASIZE_9BIT;
+//		case AlxSpi_DataSize_10bit: return SPI_DATASIZE_10BIT;
+//		case AlxSpi_DataSize_11bit: return SPI_DATASIZE_11BIT;
+//		case AlxSpi_DataSize_12bit: return SPI_DATASIZE_12BIT;
+//		case AlxSpi_DataSize_13bit: return SPI_DATASIZE_13BIT;
+//		case AlxSpi_DataSize_14bit: return SPI_DATASIZE_14BIT;
+//		case AlxSpi_DataSize_15bit: return SPI_DATASIZE_15BIT;
 		case AlxSpi_DataSize_16bit: return SPI_DATASIZE_16BIT;
 		default: ALX_SPI_ASSERT(false);
 	}
@@ -877,7 +877,8 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 	// STM32F4
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F4)
-	if((me->hspi.Instance == SPI1) || (me->hspi.Instance == SPI4))
+//	if((me->hspi.Instance == SPI1) || (me->hspi.Instance == SPI4))
+	if(me->hspi.Instance == SPI1)
 	{
 		if
 		(
