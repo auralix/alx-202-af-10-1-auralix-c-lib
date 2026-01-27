@@ -62,7 +62,9 @@ extern "C" {
 #define USBH_memset		memset
 #define USBH_memcpy		memcpy
 
+#if defined(ALX_USBH)
 #include "usbh_conf_usr.h"
+#endif
 
 
 //******************************************************************************

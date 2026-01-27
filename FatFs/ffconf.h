@@ -295,4 +295,6 @@
 
 /*--- End of configuration options ---*/
 
-//#include "ffconf_usr.h"	// TV: Added
+#if defined(ALX_FATFS)	// TV: Added
+#include "ffconf_usr.h"
+#endif
