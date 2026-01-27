@@ -159,7 +159,11 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 	AlxSpi_Periph_EnableClk(me);
 
 	// Init SPI
-	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+	if (HAL_SPI_Init(&me->hspi) != HAL_OK)
+	{
+		ALX_SPI_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 
 	// If write/read low level, set FIFO threshold & enable SPI
 	if (me->isWriteReadLowLevel)
@@ -190,7 +194,11 @@ Alx_Status AlxSpi_DeInit(AlxSpi* me)
 	ALX_SPI_ASSERT(me->isInit == true);
 
 	// DeInit SPI
-	if (HAL_SPI_DeInit(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+	if (HAL_SPI_DeInit(&me->hspi) != HAL_OK)
+	{
+		ALX_SPI_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 
 	// Force SPI periphery reset
 	AlxSpi_Periph_ForceReset(me);
@@ -257,8 +265,12 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 			}
 			else
 			{
-				ALX_SPI_TRACE("Err");
-				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+				ALX_SPI_TRACE_ERR("Err");
+				if(AlxSpi_Reset(me) != Alx_Ok)
+				{
+					ALX_SPI_TRACE_ERR("Err");
+					return Alx_Err;
+				};
 				continue;
 			}
 		}
@@ -270,7 +282,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 		}
 		else
 		{
-			ALX_SPI_TRACE("Err");
+			ALX_SPI_TRACE_ERR("Err");
 			return Alx_ErrNumOfTries;
 		}
 	}
@@ -364,8 +376,12 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 			}
 			else
 			{
-				ALX_SPI_TRACE("Err");
-				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+				ALX_SPI_TRACE_ERR("Err");
+				if(AlxSpi_Reset(me) != Alx_Ok)
+				{
+					ALX_SPI_TRACE_ERR("Err");
+					return Alx_Err;
+				};
 				continue;
 			}
 		}
@@ -377,7 +393,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 		}
 		else
 		{
-			ALX_SPI_TRACE("Err");
+			ALX_SPI_TRACE_ERR("Err");
 			return Alx_ErrNumOfTries;
 		}
 	}
@@ -473,8 +489,12 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 			}
 			else
 			{
-				ALX_SPI_TRACE("Err");
-				if(AlxSpi_Reset(me) != Alx_Ok) { ALX_SPI_TRACE("Err"); return Alx_Err; };
+				ALX_SPI_TRACE_ERR("Err");
+				if(AlxSpi_Reset(me) != Alx_Ok)
+				{
+					ALX_SPI_TRACE_ERR("Err");
+					return Alx_Err;
+				};
 				continue;
 			}
 		}
@@ -486,7 +506,7 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 		}
 		else
 		{
-			ALX_SPI_TRACE("Err");
+			ALX_SPI_TRACE_ERR("Err");
 			return Alx_ErrNumOfTries;
 		}
 	}
@@ -664,7 +684,11 @@ static uint32_t AlxSpi_GetClkPrescaler(AlxSpi* me)
 static Alx_Status AlxSpi_Reset(AlxSpi* me)
 {
 	// DeInit SPI
-	if (HAL_SPI_DeInit(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; }
+	if (HAL_SPI_DeInit(&me->hspi) != HAL_OK)
+	{
+		ALX_SPI_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Force SPI periphery reset
 	AlxSpi_Periph_ForceReset(me);
@@ -676,7 +700,11 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me)
 	AlxSpi_Periph_ReleaseReset(me);
 
 	// Init SPI
-	if (HAL_SPI_Init(&me->hspi) != HAL_OK) { ALX_SPI_TRACE("Err"); return Alx_Err; }
+	if (HAL_SPI_Init(&me->hspi) != HAL_OK)
+	{
+		ALX_SPI_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// If write/read low level, set FIFO threshold & enable SPI
 	if (me->isWriteReadLowLevel)
@@ -699,7 +727,7 @@ static bool AlxSpi_IsClkOk(AlxSpi* me)
 	// STM32F4
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F4)
-	if((me->hspi.Instance == SPI1) || (me->hspi.Instance == SPI4))
+	if(me->hspi.Instance == SPI1)
 	{
 		if
 		(
