@@ -61,7 +61,7 @@ typedef struct
 	bool iwdg;
 	bool lowPowerMgmt;
 	bool porOrBor;
-	#if defined(ALX_STM32F7)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 	bool por;
 	#endif
 	#if defined(ALX_STM32L4)
@@ -91,7 +91,7 @@ void AlxRst_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 
 #ifdef __cplusplus
 }

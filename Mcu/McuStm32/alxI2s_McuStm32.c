@@ -35,10 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && \
-(defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) || \
-defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx) || defined(STM32F413xx) || \
-defined(STM32F423xx))
+#if defined(ALX_C_LIB) && defined(ALX_STM32F4) && defined(SAI1)
 
 
 //******************************************************************************
@@ -535,4 +532,4 @@ ALX_WEAK void AlxI2s_Foreground_Callback_RxR(AlxI2s* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4) && defined(SAI1)

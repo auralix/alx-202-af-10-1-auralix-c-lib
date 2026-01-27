@@ -78,7 +78,7 @@ Alx_Status AlxRst_Init(AlxRst* me)
 	ALX_RST_ASSERT(me->isInit == false);
 
 	// Read
-//	me->csr = HAL_RCC_GetResetSource();
+	me->csr = HAL_RCC_GetResetSource();
 
 	// Parse
 	me->rr.sw = (me->csr & RCC_CSR_SFTRSTF) != 0;
@@ -87,7 +87,7 @@ Alx_Status AlxRst_Init(AlxRst* me)
 	me->rr.iwdg = (me->csr & RCC_CSR_IWDGRSTF) != 0;
 	me->rr.lowPowerMgmt = (me->csr & RCC_CSR_LPWRRSTF) != 0;
 	me->rr.porOrBor = (me->csr & RCC_CSR_BORRSTF) != 0;
-	#if defined(ALX_STM32F7)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 	me->rr.por = (me->csr & RCC_CSR_PORRSTF) != 0;
 	#endif
 	#if defined(ALX_STM32L4)
@@ -120,7 +120,7 @@ void AlxRst_Trace(AlxRst* me)
 	ALX_RST_TRACE_INF("- Independent Watchdog (IWDG): %u", me->rr.iwdg);
 	ALX_RST_TRACE_INF("- Low-power Management: %u", me->rr.lowPowerMgmt);
 	ALX_RST_TRACE_INF("- Power-on (POR) / Brown-out (BOR): %u", me->rr.porOrBor);
-	#if defined(ALX_STM32F7)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
 	ALX_RST_TRACE_INF("- Power-on (POR): %u", me->rr.por);
 	#endif
 	#if defined(ALX_STM32L4)
@@ -130,4 +130,4 @@ void AlxRst_Trace(AlxRst* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))

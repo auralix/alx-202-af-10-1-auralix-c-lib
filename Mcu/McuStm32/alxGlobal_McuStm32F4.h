@@ -91,12 +91,9 @@ extern "C" {
 #define __HAL_RCC_ADC1_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
 #define __HAL_RCC_ADC2_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
 #define __HAL_RCC_ADC3_FORCE_RESET		__HAL_RCC_ADC_FORCE_RESET
-
 #define __HAL_RCC_ADC1_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
 #define __HAL_RCC_ADC2_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
 #define __HAL_RCC_ADC3_RELEASE_RESET	__HAL_RCC_ADC_RELEASE_RESET
-
-#define __LL_ADC_CALC_VREFANALOG_VOLTAGE(__VREFINT_ADC_DATA__,__ADC_RESOLUTION__) (((uint32_t)(*VREFINT_CAL_ADDR) * VREFINT_CAL_VREF) / __LL_ADC_CONVERT_DATA_RESOLUTION((__VREFINT_ADC_DATA__),(__ADC_RESOLUTION__),LL_ADC_RESOLUTION_12B))
 
 
 //------------------------------------------------------------------------------
@@ -109,13 +106,29 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
+// ALX - MCU - Reset
+//------------------------------------------------------------------------------
+static inline uint32_t HAL_RCC_GetResetSource(void)
+{
+	// Get
+	uint32_t csr = RCC->CSR;
+
+	// Clear
+	__HAL_RCC_CLEAR_RESET_FLAGS();
+
+	// Return
+	return csr;
+}
+
+
+//------------------------------------------------------------------------------
 // ALX - ID
 //------------------------------------------------------------------------------
 #define ALX_STM32_CMSIS_VERSION_MAIN	__STM32F4xx_CMSIS_VERSION_MAIN
 #define ALX_STM32_CMSIS_VERSION_SUB1	__STM32F4xx_CMSIS_VERSION_SUB1
 #define ALX_STM32_CMSIS_VERSION_SUB2	__STM32F4xx_CMSIS_VERSION_SUB2
 #define ALX_STM32_CMSIS_VERSION_RC		__STM32F4xx_CMSIS_VERSION_RC
-#define ALX_STM32_CMSIS_VERSION			((__STM32F4xx_CMSIS_VERSION_MAIN << 24) | (__STM32F4xx_CMSIS_VERSION_SUB1 << 16) | (__STM32F4xx_CMSIS_VERSION_SUB2 << 8 ) | (__STM32F4xx_CMSIS_VERSION_RC))
+#define ALX_STM32_CMSIS_VERSION			__STM32F4xx_CMSIS_VERSION
 #define ALX_STM32_CMSIS_VER_REQUIRED	ALX_STM32F4_CMSIS_VER_REQUIRED
 #define ALX_STM32_HAL_VER_REQUIRED		ALX_STM32F4_HAL_VER_REQUIRED
 #define ALX_STM32_STR "STM32F4"
