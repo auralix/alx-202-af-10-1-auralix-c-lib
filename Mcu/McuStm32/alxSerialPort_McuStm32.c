@@ -221,7 +221,7 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 		statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE("FAIL: HAL_LIN_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %u", statusHal);
 			return Alx_Err;
 		}
 		#endif
@@ -232,7 +232,7 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 		statusHal = HAL_UART_Init(&me->huart);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %u", statusHal);
 			return Alx_Err;
 		}
 	}
@@ -272,7 +272,7 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	statusHal = HAL_UART_DeInit(&me->huart);
 	if (statusHal != HAL_OK)
 	{
-		ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_DeInit() statusHal %u", statusHal);
+		ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_DeInit() statusHal %u", statusHal);
 		return Alx_Err;
 	}
 
@@ -379,7 +379,7 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 		statusHal = HAL_LIN_SendBreak(&me->huart);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE("FAIL: HAL_LIN_SendBreak() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_SendBreak() statusHal %u", statusHal);
 			return Alx_Err;
 		}
 		#endif
@@ -393,7 +393,7 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	{
 		// Write TX FIFO
 		AlxGlobal_DisableIrq();
-		status = AlxFifo_WriteMulti(&me->txFifo, data, len);
+		status = AlxFifo_Write(&me->txFifo, data, len);
 		AlxGlobal_EnableIrq();
 
 		// If UART TX IRQ NOT enabled, enable it
@@ -411,13 +411,13 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 		if (statusHal != HAL_OK)
 		{
 			// Trace
-			ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_Transmit() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Transmit() statusHal %u", statusHal);
 
 			// Reset
 			status = AlxSerialPort_Reset(me);
 			if (status != Alx_Ok)
 			{
-				ALX_SERIAL_PORT_TRACE("FAIL: AlxSerialPort_Reset() status %u", status);
+				ALX_SERIAL_PORT_TRACE_ERR("FAIL: AlxSerialPort_Reset() status %u", status);
 				return Alx_Err;
 			}
 
@@ -501,7 +501,7 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 		if (me->do_DBG_Rx != NULL) AlxIoPin_Set(me->do_DBG_Rx);
 		uint8_t rxData = LL_USART_ReceiveData8(me->huart.Instance);	// Clears RXNE
 		if (me->do_DBG_Rx != NULL) AlxIoPin_Reset(me->do_DBG_Rx);
-		AlxFifo_Write(&me->rxFifo, rxData);
+		AlxFifo_Write(&me->rxFifo, &rxData, 1);
 	}
 }
 
@@ -547,7 +547,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 	statusHal = HAL_UART_DeInit(&me->huart);
 	if (statusHal != HAL_OK)
 	{
-		ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_DeInit() statusHal %u", statusHal);
+		ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_DeInit() statusHal %u", statusHal);
 		return Alx_Err;
 	}
 
@@ -577,7 +577,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 		statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE("FAIL: HAL_LIN_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %u", statusHal);
 			return Alx_Err;
 		}
 		#endif
@@ -588,7 +588,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 		statusHal = HAL_UART_Init(&me->huart);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE("FAIL: HAL_UART_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %u", statusHal);
 			return Alx_Err;
 		}
 	}
@@ -908,52 +908,52 @@ static void AlxSerialPort_Periph_EnableIrq(AlxSerialPort* me)
 	if (me->huart.Instance == USART6)	{ HAL_NVIC_SetPriority(USART6_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(USART6_IRQn); return; }
 	#endif
 	#ifdef USART7
-	if (me->huart.Instance == USART7)	{ HAL_NVIC_SetPriority(USART7_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART7_IRQn); return; }
+	if (me->huart.Instance == USART7)	{ HAL_NVIC_SetPriority(USART7_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(USART7_IRQn); return; }
 	#endif
 	#ifdef USART8
-	if (me->huart.Instance == USART8)	{ HAL_NVIC_SetPriority(USART8_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART8_IRQn); return; }
+	if (me->huart.Instance == USART8)	{ HAL_NVIC_SetPriority(USART8_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(USART8_IRQn); return; }
 	#endif
 	#ifdef USART9
-	if (me->huart.Instance == USART9)	{ HAL_NVIC_SetPriority(USART9_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART9_IRQn); return; }
+	if (me->huart.Instance == USART9)	{ HAL_NVIC_SetPriority(USART9_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(USART9_IRQn); return; }
 	#endif
 	#ifdef USART10
-	if (me->huart.Instance == USART10)	{ HAL_NVIC_SetPriority(USART10_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(USART10_IRQn); return; }
+	if (me->huart.Instance == USART10)	{ HAL_NVIC_SetPriority(USART10_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(USART10_IRQn); return; }
 	#endif
 	#ifdef UART1
-	if (me->huart.Instance == UART1)	{ HAL_NVIC_SetPriority(UART1_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART1_IRQn); return; }
+	if (me->huart.Instance == UART1)	{ HAL_NVIC_SetPriority(UART1_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(UART1_IRQn); return; }
 	#endif
 	#ifdef UART2
-	if (me->huart.Instance == UART2)	{ HAL_NVIC_SetPriority(UART2_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART2_IRQn); return; }
+	if (me->huart.Instance == UART2)	{ HAL_NVIC_SetPriority(UART2_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(UART2_IRQn); return; }
 	#endif
 	#ifdef UART3
-	if (me->huart.Instance == UART3)	{ HAL_NVIC_SetPriority(UART3_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART3_IRQn); return; }
+	if (me->huart.Instance == UART3)	{ HAL_NVIC_SetPriority(UART3_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(UART3_IRQn); return; }
 	#endif
 	#ifdef UART4
-	if (me->huart.Instance == UART4)	{ HAL_NVIC_SetPriority(UART4_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART4_IRQn); return; }
+	if (me->huart.Instance == UART4)	{ HAL_NVIC_SetPriority(UART4_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(UART4_IRQn); return; }
 	#endif
 	#ifdef UART5
-	if (me->huart.Instance == UART5)	{ HAL_NVIC_SetPriority(UART5_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART5_IRQn); return; }
+	if (me->huart.Instance == UART5)	{ HAL_NVIC_SetPriority(UART5_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(UART5_IRQn); return; }
 	#endif
 	#ifdef UART6
-	if (me->huart.Instance == UART6)	{ HAL_NVIC_SetPriority(UART6_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART6_IRQn); return; }
+	if (me->huart.Instance == UART6)	{ HAL_NVIC_SetPriority(UART6_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(UART6_IRQn); return; }
 	#endif
 	#ifdef UART7
-	if (me->huart.Instance == UART7)	{ HAL_NVIC_SetPriority(UART7_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART7_IRQn); return; }
+	if (me->huart.Instance == UART7)	{ HAL_NVIC_SetPriority(UART7_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(UART7_IRQn); return; }
 	#endif
 	#ifdef UART8
-	if (me->huart.Instance == UART8)	{ HAL_NVIC_SetPriority(UART8_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART8_IRQn); return; }
+	if (me->huart.Instance == UART8)	{ HAL_NVIC_SetPriority(UART8_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(UART8_IRQn); return; }
 	#endif
 	#ifdef UART9
-	if (me->huart.Instance == UART9)	{ HAL_NVIC_SetPriority(UART9_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART9_IRQn); return; }
+	if (me->huart.Instance == UART9)	{ HAL_NVIC_SetPriority(UART9_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(UART9_IRQn); return; }
 	#endif
 	#ifdef UART10
-	if (me->huart.Instance == UART10)	{ HAL_NVIC_SetPriority(UART10_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(UART10_IRQn); return; }
+	if (me->huart.Instance == UART10)	{ HAL_NVIC_SetPriority(UART10_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(UART10_IRQn); return; }
 	#endif
 	#ifdef LPUART1
-	if (me->huart.Instance == LPUART1)	{ HAL_NVIC_SetPriority(LPUART1_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(LPUART1_IRQn); return; }
+	if (me->huart.Instance == LPUART1)	{ HAL_NVIC_SetPriority(LPUART1_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(LPUART1_IRQn); return; }
 	#endif
 	#ifdef LPUART2
-	if (me->huart.Instance == LPUART2)	{ HAL_NVIC_SetPriority(LPUART2_IRQn, me->rxIrqPriority, 0); HAL_NVIC_EnableIRQ(LPUART2_IRQn); return; }
+	if (me->huart.Instance == LPUART2)	{ HAL_NVIC_SetPriority(LPUART2_IRQn, me->irqPriority, 0); HAL_NVIC_EnableIRQ(LPUART2_IRQn); return; }
 	#endif
 
 	ALX_SERIAL_PORT_ASSERT(false);	// We should not get here
