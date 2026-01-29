@@ -630,7 +630,7 @@ uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
 	// Get
 	if (me->rxFifoUsed)
 	{
-		return AlxFifo_GetNumOfEntries(&me->txFifo);
+		return AlxFifo_GetNumOfEntries(&me->rxFifo);
 	}
 	else
 	{
