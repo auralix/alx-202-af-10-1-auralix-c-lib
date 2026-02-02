@@ -57,7 +57,7 @@ extern "C" {
 typedef struct
 {
 	// Defines
-	#define ALX_ADC_VREF_mV 1000
+	#define ALX_ADC_VREF_mV 2230
 	#define ALX_ADC_12BIT_FULL_SCALE_COUNT 4095
 
 	// Parameters
