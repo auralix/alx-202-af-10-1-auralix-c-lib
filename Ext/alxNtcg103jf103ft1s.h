@@ -42,6 +42,7 @@ extern "C" {
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
+#include "alxBound.h"
 
 
 //******************************************************************************
@@ -73,24 +74,11 @@ extern "C" {
 	#define ALX_NTCG103JF103FT1S_TRACE_WRN(...) do{} while (false)
 #endif
 
-#define ALX_NTCG103JF103FT1S_NUM_OF_POINTS 191
-
 
 //******************************************************************************
-// Types
+// Functions
 //******************************************************************************
-typedef struct
-{
-	float xPointRes_kOhm[ALX_NTCG103JF103FT1S_NUM_OF_POINTS];
-	float yPointTemp_degC[ALX_NTCG103JF103FT1S_NUM_OF_POINTS];
-	uint32_t numOfPoints;
-} AlxNtcg103jf103ft1s;
-
-
-//******************************************************************************
-// Variables
-//******************************************************************************
-extern const AlxNtcg103jf103ft1s alxNtcg103jf103ft1s;
+int16_t AlxNtcg103jf103ft1s_ResToTemp_degC(uint32_t res_Ohm);
 
 
 #endif	// #if defined(ALX_C_LIB)
