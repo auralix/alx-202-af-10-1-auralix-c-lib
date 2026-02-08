@@ -79,19 +79,22 @@ void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* frame);
   * @param[in]		alxSerialPort
   * @param[in]		breakSyncOffset
   * @param[in]		rxb_ResponseTimeout_ms
+  * @param[in]		do_DBG
   */
 void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
 	uint8_t breakSyncOffset,
-	uint16_t rxb_ResponseTimeout_ms
+	uint16_t rxb_ResponseTimeout_ms,
+	AlxIoPin* do_DBG
 )
 {
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
 	me->breakSyncOffset = breakSyncOffset;
 	me->rxb_ResponseTimeout_ms = rxb_ResponseTimeout_ms;
+	me->do_DBG = do_DBG;
 
 	// Fields
 	me->nad = ALX_LIN_NAD_BROADCAST;
@@ -767,6 +770,7 @@ void AlxLin_RxBuff_Flush(AlxLin* me)
 	memset(&me->rxb, 0, sizeof(me->rxb));
 	me->rxb.active = true;
 	AlxTimSw_Stop(&me->rxb_ResponseTim);
+	if (me->do_DBG != NULL) AlxIoPin_Reset(me->do_DBG);
 }
 
 /**
@@ -940,6 +944,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 			}
 			else
 			{
+				if (me->do_DBG != NULL) AlxIoPin_Set(me->do_DBG);
 				AlxTimSw_Start(&me->rxb_ResponseTim);
 			}
 		}

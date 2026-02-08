@@ -45,6 +45,7 @@ extern "C" {
 #include "alxSerialPort.h"
 #include "alxTimSw.h"
 #include "alxOsDelay.h"
+#include "alxIoPin.h"
 
 
 //******************************************************************************
@@ -132,6 +133,7 @@ typedef struct
 	AlxSerialPort* alxSerialPort;
 	uint8_t breakSyncOffset;
 	uint16_t rxb_ResponseTimeout_ms;
+	AlxIoPin* do_DBG;
 
 	// Fields
 	uint8_t nad;
@@ -158,7 +160,8 @@ void AlxLin_Ctor
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
 	uint8_t breakSyncOffset,
-	uint16_t rxb_ResponseTimeout_ms
+	uint16_t rxb_ResponseTimeout_ms,
+	AlxIoPin* do_DBG
 );
 
 
