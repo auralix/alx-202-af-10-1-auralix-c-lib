@@ -868,7 +868,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				Alx_Status status = AlxLin_GetSlaveFrameConfigFromId(me, id_Actual, &slaveFrameConfig);
 				if (status != Alx_Ok)
 				{
-					ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %02X", status, id_Actual);
+					ALX_LIN_TRACE_VRB("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %02X", status, id_Actual);
 					me->rxb.active = false;
 					return;	// Unsupported Frame FAIL: Ignore frame, no Slave_Subscribe_Err_Callback
 				}
