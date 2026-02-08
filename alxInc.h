@@ -117,8 +117,9 @@ extern "C" {
 #include "alxHys1.h"
 #include "alxHys2.h"
 #include "alxId.h"
-#include "alxInc.h"
+// AlxInc
 #include "alxInterpLin.h"
+#include "alxIrq.h"
 #include "alxLfsConfig.h"
 #include "alxLin.h"
 #include "alxLinFun.h"
