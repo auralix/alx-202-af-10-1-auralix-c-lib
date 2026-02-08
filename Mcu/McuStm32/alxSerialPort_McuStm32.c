@@ -375,9 +375,9 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 	ALX_SERIAL_PORT_ASSERT(me->rxFifoUsed == true);
 
 	// Read RX FIFO
-	AlxGlobal_DisableIrq();
+	uint32_t key = AlxIrq_Lock();
 	Alx_Status status = AlxFifo_Read(&me->rxFifo, data, len);
-	AlxGlobal_EnableIrq();
+	AlxIrq_Unlock(key);
 
 	// Return
 	return status;
@@ -403,9 +403,9 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
 	ALX_SERIAL_PORT_ASSERT(me->linSlave == false);
 
 	// Read RX FIFO
-	AlxGlobal_DisableIrq();
+	uint32_t key = AlxIrq_Lock();
 	Alx_Status status = AlxFifo_ReadStrUntil(&me->rxFifo, str, delim, maxLen, numRead);
-	AlxGlobal_EnableIrq();
+	AlxIrq_Unlock(key);
 
 	// Return
 	return status;
@@ -457,9 +457,9 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	if (me->txFifoUsed)
 	{
 		// Write TX FIFO
-		AlxGlobal_DisableIrq();
+		uint32_t key = AlxIrq_Lock();
 		status = AlxFifo_Write(&me->txFifo, data, len);
-		AlxGlobal_EnableIrq();
+		AlxIrq_Unlock(key);
 
 		// If UART TX IRQ NOT enabled, enable it
 		if (__HAL_UART_GET_IT_SOURCE(&me->huart, UART_IT_TXE) == false)

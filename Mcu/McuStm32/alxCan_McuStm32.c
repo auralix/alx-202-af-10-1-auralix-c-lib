@@ -555,9 +555,9 @@ Alx_Status AlxCan_TxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg)
 		uint32_t msgLen = sizeof(AlxCan_Msg);
 		uint8_t* ptr = (uint8_t*)&msg[i * msgLen];
 
-		AlxGlobal_DisableIrq();
+		uint32_t key = AlxIrq_Lock();
 		status = AlxFifo_Write(&me->txFifo, ptr, msgLen);
-		AlxGlobal_EnableIrq();
+		AlxIrq_Unlock(key);
 
 		if(status == AlxFifo_ErrFull)
 		{
@@ -571,9 +571,9 @@ Alx_Status AlxCan_TxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg)
 	}
 
 	// Try to add TX messages to HW mailbox
-	AlxGlobal_DisableIrq();
+	uint32_t key = AlxIrq_Lock();
 	AlxCan_TxMsg_TryAddToHwMailbox(me);
-	AlxGlobal_EnableIrq();
+	AlxIrq_Unlock(key);
 
 	// Return
 	return status;
@@ -615,9 +615,9 @@ Alx_Status AlxCan_RxMsgMulti(AlxCan* me, AlxCan_Msg* msg, uint32_t numOfMsg)
 		uint32_t msgLen = sizeof(AlxCan_Msg);
 		uint8_t* ptr = (uint8_t*)&msg[i * msgLen];
 
-		AlxGlobal_DisableIrq();
+		uint32_t key = AlxIrq_Lock();
 		status = AlxFifo_Read(&me->rxFifo, ptr, msgLen);
-		AlxGlobal_EnableIrq();
+		AlxIrq_Unlock(key);
 
 		if(status == AlxFifo_ErrEmpty)
 		{

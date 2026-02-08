@@ -40,38 +40,12 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
 
 
 //******************************************************************************
 // Module Guard
 //******************************************************************************
 #if defined(ALX_C_LIB)
-
-
-//******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_IRQ_FILE "alxIrq.h"
-
-// Assert //
-#if defined(ALX_IRQ_ASSERT_BKPT_ENABLE)
-	#define ALX_IRQ_ASSERT(expr) ALX_ASSERT_BKPT(ALX_IRQ_FILE, expr)
-#elif defined(ALX_IRQ_ASSERT_TRACE_ENABLE)
-	#define ALX_IRQ_ASSERT(expr) ALX_ASSERT_TRACE(ALX_IRQ_FILE, expr)
-#elif defined(ALX_IRQ_ASSERT_RST_ENABLE)
-	#define ALX_IRQ_ASSERT(expr) ALX_ASSERT_RST(ALX_IRQ_FILE, expr)
-#else
-	#define ALX_IRQ_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(ALX_IRQ_TRACE_ENABLE)
-	#define ALX_IRQ_TRACE_WRN(...) ALX_TRACE_WRN(ALX_IRQ_FILE, __VA_ARGS__)
-#else
-	#define ALX_IRQ_TRACE_WRN(...) do{} while (false)
-#endif
 
 
 //******************************************************************************

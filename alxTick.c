@@ -82,23 +82,23 @@ uint64_t AlxTick_Get_ns(AlxTick* me)
 	// Get
 	#if IS_ENABLED(CONFIG_TIMER_HAS_64BIT_CYCLE_COUNTER)
 	uint64_t cycles = k_cycle_get_64();	// AB: Use direct Zephyr cycle counter for high precision timing
-	me->tick_ns = k_cyc_to_ns_floor64(cycles);
+	uint64_t tick_ns = k_cyc_to_ns_floor64(cycles);
 	#else
 	uint64_t ticks = k_uptime_ticks();
-	me->tick_ns = k_ticks_to_ns_floor64(ticks);
+	uint64_t tick_ns = k_ticks_to_ns_floor64(ticks);
 	#endif
 
 	// Return
-	return me->tick_ns;
+	return tick_ns;
 
 	#else
 	// Prepare
 	uint64_t tick_ns = 0;
 
 	// Get
-	AlxGlobal_DisableIrq();
+	uint32_t key = AlxIrq_Lock();
 	tick_ns = me->tick_ns;
-	AlxGlobal_EnableIrq();
+	AlxIrq_Unlock(key);
 
 	// Return
 	return tick_ns;
@@ -164,7 +164,7 @@ void AlxTick_Inc_ns(AlxTick* me)
 	#if defined(ALX_ZEPHYR)
 	(void)me;
 	#else
-	me->tick_ns = me->tick_ns + 1;
+	AlxTick_IncRange_ns(me, 1);
 	#endif
 }
 
@@ -177,7 +177,7 @@ void AlxTick_Inc_us(AlxTick* me)
 	#if defined(ALX_ZEPHYR)
 	(void)me;
 	#else
-	me->tick_ns = me->tick_ns + 1000;
+	AlxTick_IncRange_ns(me, 1000);
 	#endif
 }
 
@@ -190,7 +190,7 @@ void AlxTick_Inc_ms(AlxTick* me)
 	#if defined(ALX_ZEPHYR)
 	(void)me;
 	#else
-	me->tick_ns = me->tick_ns + 1000000;
+	AlxTick_IncRange_ns(me, 1000000);
 	#endif
 }
 
@@ -203,7 +203,7 @@ void AlxTick_Inc_sec(AlxTick* me)
 	#if defined(ALX_ZEPHYR)
 	(void)me;
 	#else
-	me->tick_ns = me->tick_ns + 1000000000;
+	AlxTick_IncRange_ns(me, 1000000000);
 	#endif
 }
 
@@ -216,7 +216,7 @@ void AlxTick_Inc_min(AlxTick* me)
 	#if defined(ALX_ZEPHYR)
 	(void)me;
 	#else
-	me->tick_ns = me->tick_ns + 60000000000;
+	AlxTick_IncRange_ns(me, 60000000000);
 	#endif
 }
 
@@ -229,7 +229,7 @@ void AlxTick_Inc_hr(AlxTick* me)
 	#if defined(ALX_ZEPHYR)
 	(void)me;
 	#else
-	me->tick_ns = me->tick_ns + 3600000000000;
+	AlxTick_IncRange_ns(me, 3600000000000);
 	#endif
 }
 
@@ -244,7 +244,9 @@ void AlxTick_IncRange_ns(AlxTick* me, uint64_t ticks_ns)
 	(void)me;
 	(void)ticks_ns;
 	#else
+	uint32_t key = AlxIrq_Lock();
 	me->tick_ns = me->tick_ns + ticks_ns;
+	AlxIrq_Unlock(key);
 	#endif
 }
 
@@ -259,7 +261,7 @@ void AlxTick_IncRange_us(AlxTick* me, uint64_t ticks_us)
 	(void)me;
 	(void)ticks_us;
 	#else
-	me->tick_ns = me->tick_ns + (ticks_us * 1000);
+	AlxTick_IncRange_ns(me, ticks_us * 1000);
 	#endif
 }
 
@@ -274,7 +276,7 @@ void AlxTick_IncRange_ms(AlxTick* me, uint64_t ticks_ms)
 	(void)me;
 	(void)ticks_ms;
 	#else
-	me->tick_ns = me->tick_ns + (ticks_ms * 1000000);
+	AlxTick_IncRange_ns(me, ticks_ms * 1000000);
 	#endif
 }
 
@@ -289,7 +291,7 @@ void AlxTick_IncRange_sec(AlxTick* me, uint64_t ticks_sec)
 	(void)me;
 	(void)ticks_sec;
 	#else
-	me->tick_ns = me->tick_ns + (ticks_sec * 1000000000);
+	AlxTick_IncRange_ns(me, ticks_sec * 1000000000);
 	#endif
 }
 
@@ -304,7 +306,7 @@ void AlxTick_IncRange_min(AlxTick* me, uint64_t ticks_min)
 	(void)me;
 	(void)ticks_min;
 	#else
-	me->tick_ns = me->tick_ns + (ticks_min * 60000000000);
+	AlxTick_IncRange_ns(me, ticks_min * 60000000000);
 	#endif
 }
 
@@ -319,7 +321,7 @@ void AlxTick_IncRange_hr(AlxTick* me, uint64_t ticks_hr)
 	(void)me;
 	(void)ticks_hr;
 	#else
-	me->tick_ns = me->tick_ns + (ticks_hr * 3600000000000);
+	AlxTick_IncRange_ns(me, ticks_hr * 3600000000000);
 	#endif
 }
 
