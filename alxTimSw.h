@@ -43,6 +43,7 @@ extern "C" {
 #include "alxTrace.h"
 #include "alxAssert.h"
 #include "alxTick.h"
+#include "alxIrq.h"
 
 
 //******************************************************************************
@@ -81,11 +82,11 @@ extern "C" {
 typedef struct
 {
 	// Variables
-	uint64_t ticksStart_ns;
-	bool isRunning;
+	uint64_t tickStart_ns;	// IRQ Safe
 
-	//Info
+	// Info
 	bool wasCtorCalled;
+	bool isRunning;			// IRQ Safe
 } AlxTimSw;
 
 
@@ -94,8 +95,7 @@ typedef struct
 //******************************************************************************
 void AlxTimSw_Ctor
 (
-	AlxTimSw* me,
-	bool start
+	AlxTimSw* me
 );
 
 

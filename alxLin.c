@@ -103,7 +103,7 @@ void AlxLin_Ctor
 
 	// Variables
 	memset(&me->rxb, 0, sizeof(me->rxb));
-	AlxTimSw_Ctor(&me->rxb_ResponseTim, false);
+	AlxTimSw_Ctor(&me->rxb_ResponseTim);
 	me->slaveReqPending = false;
 
 	// Info
@@ -668,7 +668,7 @@ Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t time
 
 	// Start timer
 	AlxTimSw alxTimSw;
-	AlxTimSw_Ctor(&alxTimSw, false);
+	AlxTimSw_Ctor(&alxTimSw);
 	AlxTimSw_Start(&alxTimSw);
 
 	// Wait for master to transmit whole frame response with specified data length

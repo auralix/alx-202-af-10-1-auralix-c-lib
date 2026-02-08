@@ -57,7 +57,7 @@ void AlxTick_Ctor
 )
 {
 	// Variables
-	me->tick_ns = 0;
+	me->tick_ns = 0;	// IRQ Safe
 
 	// Info
 	me->wasCtorCalled = true;

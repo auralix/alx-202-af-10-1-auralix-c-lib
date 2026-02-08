@@ -94,7 +94,7 @@ void AlxI2c_Ctor
 	me->i2cConfig.baudRate_Bps = me->clk;	// MF: baudRate = bit rate
 	me->i2cConfig.enableTimeout = false;
 
-	AlxTimSw_Ctor(&me->tim, false);
+	AlxTimSw_Ctor(&me->tim);
 
 	// Info
 	me->isInit = false;

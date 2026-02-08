@@ -94,7 +94,7 @@ void AlxAds114s08_Ctor
 	AlxAds114s08_RegStruct_SetAddr(me);
 	AlxAds114s08_RegStruct_SetLen(me);
 	AlxAds114s08_RegStruct_SetValToZero(me);
-	AlxTimSw_Ctor(&me->timeoutTimer, false);
+	AlxTimSw_Ctor(&me->timeoutTimer);
 
 	// Prepare transfer function for thermocouple S conversion from mV to degC
 	AlxInterpLin_Ctor

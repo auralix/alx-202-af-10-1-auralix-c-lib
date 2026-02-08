@@ -86,7 +86,7 @@ void AlxI2c_Ctor
 	me->i2cConfig.baudRate_Bps = me->clk;	// MF: baudRate = bit rate
 	me->i2cConfig.enableTimeout = false;
 	me->i2cConfig.timeout_Ms = 1;			// MF: We will use our own timeout. Must be at least "1" otherwise FSL triggers Assert
-	AlxTimSw_Ctor(&me->tim, false);
+	AlxTimSw_Ctor(&me->tim);
 
 	// Info
 	me->isInit = false;

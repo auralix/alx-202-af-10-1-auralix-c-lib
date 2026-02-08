@@ -78,7 +78,7 @@ void AlxBool_Ctor
 	me->valFiltered = valInitial;
 	AlxFiltGlitchBool_Ctor(&me->alxFiltGlitchBool, valInitial, filtGlitchBool_StableTrueTime_ms, filtGlitchBool_StableFalseTime_ms);
 
-	AlxTimSw_Ctor(&me->alxTimSw_True, false);
+	AlxTimSw_Ctor(&me->alxTimSw_True);
 	me->trueTime_ms = 0.f;
 	me->isTrue = valInitial;
 	me->isTrueUpToShortTime = valInitial;
@@ -88,7 +88,7 @@ void AlxBool_Ctor
 	me->wasTrueForShortTime = false;
 	me->wasTrueForLongTime = false;
 
-	AlxTimSw_Ctor(&me->alxTimSw_False, false);
+	AlxTimSw_Ctor(&me->alxTimSw_False);
 	me->falseTime_ms = 0.f;
 	me->isFalse = !valInitial;
 	me->isFalseUpToShortTime = !valInitial;

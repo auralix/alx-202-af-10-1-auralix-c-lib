@@ -474,7 +474,7 @@ static Alx_Status AlxMmc_WaitForDmaReadWriteDone(AlxMmc* me, bool read)
 {
 	// Local variables
 	AlxTimSw alxTimSw;
-	AlxTimSw_Ctor(&alxTimSw, false);
+	AlxTimSw_Ctor(&alxTimSw);
 
 	// Start timer
 	AlxTimSw_Start(&alxTimSw);
@@ -509,7 +509,7 @@ static Alx_Status AlxMmc_WaitForTransferState_Private(AlxMmc* me)
 {
 	// Local variables
 	AlxTimSw alxTimSw;
-	AlxTimSw_Ctor(&alxTimSw, false);
+	AlxTimSw_Ctor(&alxTimSw);
 
 	// Start timer
 	AlxTimSw_Start(&alxTimSw);

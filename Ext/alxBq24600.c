@@ -63,9 +63,9 @@ void AlxBq24600_Ctor
 	me->STATUS_BLINK_HALFPERIOD_TIME_MAX_ms = 1100;
 
 	// Ctor
-	AlxTimSw_Ctor(&me->timWindow, false);
-	AlxTimSw_Ctor(&me->timStatHalfperiod, false);
-	AlxTimSw_Ctor(&me->timStableStatus, false);
+	AlxTimSw_Ctor(&me->timWindow);
+	AlxTimSw_Ctor(&me->timStatHalfperiod);
+	AlxTimSw_Ctor(&me->timStableStatus);
 
 	// Objects - External
 	me->do_EN = do_EN;

@@ -1040,7 +1040,7 @@ Alx_Status AlxSd_SpiMode_SendAcmd41(AlxSd* me)
 	uint8_t cmd[6] = {};
 	uint8_t actualRespR1 = 0;
 	AlxTimSw alxTimSw;
-	AlxTimSw_Ctor(&alxTimSw, false);
+	AlxTimSw_Ctor(&alxTimSw);
 
 	// Start timer
 	AlxTimSw_Start(&alxTimSw);
@@ -1131,7 +1131,7 @@ Alx_Status AlxSd_SpiMode_WaitByte(AlxSd* me, uint8_t rxByteMask, uint8_t rxByteT
 	// Local variables
 	Alx_Status status = Alx_Err;
 	AlxTimSw alxTimSw;
-	AlxTimSw_Ctor(&alxTimSw, false);
+	AlxTimSw_Ctor(&alxTimSw);
 
 	// Start timer
 	AlxTimSw_Start(&alxTimSw);
