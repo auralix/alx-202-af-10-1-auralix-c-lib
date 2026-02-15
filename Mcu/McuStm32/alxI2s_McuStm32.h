@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_STM32F4)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F4) && defined(SAI1)
 
 
 //******************************************************************************
@@ -118,7 +118,7 @@ void AlxI2s_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4) && defined(SAI1)
 
 #ifdef __cplusplus
 }

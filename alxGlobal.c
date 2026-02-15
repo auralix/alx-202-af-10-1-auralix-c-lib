@@ -44,26 +44,6 @@
 
 /**
   * @brief
-  */
-void AlxGlobal_DisableIrq(void)
-{
-	#if defined(__GNUC__)
-	__disable_irq();
-	#endif
-}
-
-/**
-  * @brief
-  */
-void AlxGlobal_EnableIrq(void)
-{
-	#if defined(__GNUC__)
-	__enable_irq();
-	#endif
-}
-
-/**
-  * @brief
   * @param[in]	uint64
   * @param[out]	str
   */

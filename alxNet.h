@@ -71,9 +71,11 @@ extern "C" {
 
 					// Trace //
 #if defined(ALX_NET_TRACE_ENABLE)
+#define ALX_NET_TRACE_ERR(...) ALX_TRACE_ERR(ALX_NET_FILE, __VA_ARGS__)
 #define ALX_NET_TRACE_WRN(...) ALX_TRACE_WRN(ALX_NET_FILE, __VA_ARGS__)
 #define ALX_NET_TRACE_INF(...) ALX_TRACE_INF(ALX_NET_FILE, __VA_ARGS__)
 #else
+#define ALX_NET_TRACE_ERR(...) do{} while (false)
 #define ALX_NET_TRACE_WRN(...) do{} while (false)
 #define ALX_NET_TRACE_INF(...) do{} while (false)
 #endif
@@ -83,6 +85,7 @@ extern "C" {
 							//******************************************************************************
 #define ALX_NET_IP_ADDRESS_SIZE 45
 #define ALX_NET_MAC_SIZE 18
+#define ALX_NET_NUM_DNS_SERVERS 4
 
 							//******************************************************************************
 							// Types
@@ -134,7 +137,7 @@ extern "C" {
 		char ip[ALX_NET_IP_ADDRESS_SIZE]; // IP, Netmask, gateway, dns in string format -> "123.123.123.123"
 		char netmask[ALX_NET_IP_ADDRESS_SIZE];
 		char gateway[ALX_NET_IP_ADDRESS_SIZE];
-		char dns[4][ALX_NET_IP_ADDRESS_SIZE];
+		char dns[ALX_NET_NUM_DNS_SERVERS][ALX_NET_IP_ADDRESS_SIZE];
 
 		// Info
 		bool wasCtorCalled;

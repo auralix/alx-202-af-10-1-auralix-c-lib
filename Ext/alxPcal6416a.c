@@ -129,7 +129,11 @@ Alx_Status AlxPcal6416a_InitPeriph(AlxPcal6416a* me)
 
 	// Init I2C
 	status = AlxI2c_Init(me->i2c);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Set isInitPeriph
 	me->isInitPeriph = true;
@@ -156,7 +160,11 @@ Alx_Status AlxPcal6416a_DeInitPeriph(AlxPcal6416a* me)
 
 	// DeInit I2C
 	status = AlxI2c_DeInit(me->i2c);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Reset isInitPeriph
 	me->isInitPeriph = false;
@@ -183,7 +191,11 @@ Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me)
 
 	// Check if slave is ready
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Set register struct values to default
 	AlxPcal6416a_RegStruct_SetValToDefault(me);
@@ -193,7 +205,11 @@ Alx_Status AlxPcal6416a_Init(AlxPcal6416a* me)
 
 	// Write register struct - WEAK
 	status = AlxPcal6416a_RegStruct_Write(me);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -246,22 +262,38 @@ Alx_Status AlxPcal6416a_Handle(AlxPcal6416a* me, bool inPort0, bool inPort1, boo
 	if (inPort0)
 	{
 		status = AlxPcal6416a_Reg_Read(me, &me->reg._00h_InputPort_0);
-		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_PCAL6416A_TRACE_ERR("Err");
+			return status;
+		}
 	}
 	if (inPort1)
 	{
 		status = AlxPcal6416a_Reg_Read(me, &me->reg._01h_InputPort_1);
-		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_PCAL6416A_TRACE_ERR("Err");
+			return status;
+		}
 	}
 	if (outPort0)
 	{
 		status = AlxPcal6416a_Reg_Write(me, &me->reg._02h_OutputPort_0);
-		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_PCAL6416A_TRACE_ERR("Err");
+			return status;
+		}
 	}
 	if (outPort1)
 	{
 		status = AlxPcal6416a_Reg_Write(me, &me->reg._03h_OutputPort_1);
-		if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_PCAL6416A_TRACE_ERR("Err");
+			return status;
+		}
 	}
 
 	// Return
@@ -476,22 +508,46 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, uint8_t port, uint
 
 	// Write pull registers
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Wait
 	AlxDelay_ms(1);
 
 	// Read input port registers
 	status = AlxPcal6416a_Reg_Read(me, &me->reg._00h_InputPort_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Read(me, &me->reg._01h_InputPort_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Read
 	valPullUp = AlxPcal6416a_IoPin_Read(me, port, pin);
@@ -501,13 +557,29 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, uint8_t port, uint
 
 	// Write pull registers
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 
 	//------------------------------------------------------------------------------
@@ -519,22 +591,46 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, uint8_t port, uint
 
 	// Write pull registers
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Wait
 	AlxDelay_ms(1);
 
 	// Read input port registers
 	status = AlxPcal6416a_Reg_Read(me, &me->reg._00h_InputPort_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Read(me, &me->reg._01h_InputPort_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Read
 	valPullDown = AlxPcal6416a_IoPin_Read(me, port, pin);
@@ -544,13 +640,29 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, uint8_t port, uint
 
 	// Write pull registers
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 
 	//------------------------------------------------------------------------------
@@ -602,7 +714,11 @@ Alx_Status AlxPcal6416a_Reg_Write(AlxPcal6416a* me, void* reg)
 
 	// Write
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -630,7 +746,11 @@ Alx_Status AlxPcal6416a_Reg_Read(AlxPcal6416a* me, void* reg)
 
 	// Read
 	status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -818,8 +938,7 @@ void AlxPcal6416a_IoPin_ConfigPull(AlxPcal6416a* me, uint8_t port, uint8_t pin, 
 ALX_WEAK void AlxPcal6416a_RegStruct_SetVal(AlxPcal6416a* me)
 {
 	(void)me;
-	ALX_PCAL6416A_TRACE("Define function!");
-	ALX_PCAL6416A_ASSERT(false);
+	ALX_PCAL6416A_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK Alx_Status AlxPcal6416a_RegStruct_Write(AlxPcal6416a* me)
 {
@@ -828,73 +947,73 @@ ALX_WEAK Alx_Status AlxPcal6416a_RegStruct_Write(AlxPcal6416a* me)
 
 	// Write
 	//status = AlxPcal6416a_Reg_Write(me, &me->reg._00h_InputPort_0);		// MF: Read Only Reg
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	//status = AlxPcal6416a_Reg_Write(me, &me->reg._01h_InputPort_1);		// MF: Read Only Reg
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	//status = AlxPcal6416a_Reg_Write(me, &me->reg._02h_OutputPort_0);		// TV: We will handle OutputPort config outside of Init
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	//status = AlxPcal6416a_Reg_Write(me, &me->reg._03h_OutputPort_1);		// TV: We will handle OutputPort config outside of Init
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._04h_PolarityInversion_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._05h_PolarityInversion_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._06h_Configuration_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._07h_Configuration_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._40h_OutputDriveStrength_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._41h_OutputDriveStrength_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._42h_OutputDriveStrength_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._43h_OutputDriveStrength_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._44h_InputLatch_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._45h_InputLatch_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Ah_IrqMask_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Bh_IrqMask_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	//status = AlxPcal6416a_Reg_Write(me, &me->reg._4Ch_IrqStatus_0);		// MF: Read Only Reg
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	//status = AlxPcal6416a_Reg_Write(me, &me->reg._4Dh_IrqStatus_1);		// MF: Read Only Reg
-	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Fh_OutputPortConfig);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE("Err"); return status; }
+	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	// Return
 	return Alx_Ok;

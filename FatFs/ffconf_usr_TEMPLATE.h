@@ -1,7 +1,7 @@
-/**
+﻿/**
   ******************************************************************************
-  * @file		alxAccelerometer.h
-  * @brief		Auralix C Library - ALX Accelerometer Module
+  * @file		ffconf_usr.h
+  * @brief		Auralix C Library - ALX FatFs Configuration File - User
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_ACCELEROMETER_H
-#define ALX_ACCELEROMETER_H
+#ifndef FFCONF_CONF_USR_H
+#define FFCONF_CONF_USR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,57 +37,14 @@ extern "C" {
 
 
 //******************************************************************************
-// Includes
+// Configuration
 //******************************************************************************
-#include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
+#undef FF_USE_LFN
+#define FF_USE_LFN 1
 
-
-//******************************************************************************
-// Module Guard
-//******************************************************************************
-#if defined(ALX_C_LIB)
-
-
-//******************************************************************************
-// Types
-//******************************************************************************
-typedef enum
-{
-	ALX_ACC_DEVICE_ADXL355,
-	ALX_ACC_DEVICE_ADXL357,
-	ALX_ACC_DEVICE_A352,
-	ALX_ACC_DEVICE_Max
-} AlxAccDevice;
-
-typedef enum
-{
-	ALX_ACC_RANGE_0,
-	ALX_ACC_RANGE_1,
-	ALX_ACC_RANGE_2,
-	ALX_ACC_RANGE_Max
-} AlxAccRange;
-
-typedef enum
-{
-	ALX_ACC_SYNC_MODE_MEAS_CLK,
-	ALX_ACC_SYNC_MODE_PLL
-} AlxAccSyncMode;
-
-typedef struct __attribute__((packed))
-{
-	float x;
-	float y;
-	float z;
-	float temp;
-} AccDataPoint;
-
-
-#endif	// #if defined(ALX_C_LIB)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	// #ifndef ALX_ACCELEROMETER_H
+#endif	// #ifndef FFCONF_CONF_USR_H

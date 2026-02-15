@@ -609,47 +609,103 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 
 	// Init ADC clock
 	#if defined(ALX_STM32F1)
-	if(HAL_RCCEx_PeriphCLKConfig(&me->iclk) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; };
+	if(HAL_RCCEx_PeriphCLKConfig(&me->iclk) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 
 	// Init ADC
-	if(HAL_ADC_Init(&me->hadc) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
+	if(HAL_ADC_Init(&me->hadc) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Init ADC channels
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (HAL_ADC_ConfigChannel(&me->hadc, &me->chadc[i]) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
+		if (HAL_ADC_ConfigChannel(&me->hadc, &me->chadc[i]) != HAL_OK)
+		{
+			ALX_ADC_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 	}
 
 	// Calibrate ADC
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F1)
-	if(HAL_ADCEx_Calibration_Start(&me->hadc) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
+	if(HAL_ADCEx_Calibration_Start(&me->hadc) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 	#endif
 	#if defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-	if(HAL_ADCEx_Calibration_Start(&me->hadc, ADC_SINGLE_ENDED) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
+	if(HAL_ADCEx_Calibration_Start(&me->hadc, ADC_SINGLE_ENDED) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 	#endif
 	#if defined(ALX_STM32U5)
-	if(HAL_ADCEx_Calibration_Start(&me->hadc, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
+	if(HAL_ADCEx_Calibration_Start(&me->hadc, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 	#endif
 
 	// Init DMA
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
-	if(HAL_DMA_Init(&me->hdma) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
+	if(HAL_DMA_Init(&me->hdma) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 	#endif
 	#if defined(ALX_STM32U5)
-	if(HAL_DMAEx_List_BuildNode(&me->ncdma, &me->ndma) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
-	if(HAL_DMAEx_List_InsertNode(&me->qdma, NULL, &me->ndma) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
-	if(HAL_DMAEx_List_SetCircularMode(&me->qdma) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
-	if(HAL_DMAEx_List_Init(&me->hdma) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
-	if(HAL_DMAEx_List_LinkQ(&me->hdma, &me->qdma) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
-	if(HAL_DMA_ConfigChannelAttributes(&me->hdma, DMA_CHANNEL_PRIV) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
+	if(HAL_DMAEx_List_BuildNode(&me->ncdma, &me->ndma) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
+	if(HAL_DMAEx_List_InsertNode(&me->qdma, NULL, &me->ndma) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
+	if(HAL_DMAEx_List_SetCircularMode(&me->qdma) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
+	if(HAL_DMAEx_List_Init(&me->hdma) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
+	if(HAL_DMAEx_List_LinkQ(&me->hdma, &me->qdma) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
+	if(HAL_DMA_ConfigChannelAttributes(&me->hdma, DMA_CHANNEL_PRIV) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 	#endif
 
 	// Link ADC & DMA
 	__HAL_LINKDMA(&me->hadc, DMA_Handle, me->hdma);
 
 	// Start ADC with DMA
-	if(HAL_ADC_Start_DMA(&me->hadc, me->buff, me->numOfCh) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
+	if(HAL_ADC_Start_DMA(&me->hadc, me->buff, me->numOfCh) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -671,10 +727,18 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)	// JS: On STM32F7 if using ADC1 with combin
 	ALX_ADC_ASSERT(me->isInit == true);
 
 	// DeInit DMA
-	if(HAL_DMA_DeInit(&me->hdma) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
+	if(HAL_DMA_DeInit(&me->hdma) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// DeInit ADC
-	if(HAL_ADC_DeInit(&me->hadc) != HAL_OK) { ALX_ADC_TRACE_WRN("Err"); return Alx_Err; }
+	if(HAL_ADC_DeInit(&me->hadc) != HAL_OK)
+	{
+		ALX_ADC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Force ADC & DMA periphery reset
 	AlxAdc_Periph_Adc_ForceReset(me);

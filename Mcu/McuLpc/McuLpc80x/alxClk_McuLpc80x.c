@@ -153,11 +153,19 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	// Update SystemCoreClock
 	SystemCoreClockUpdate();
 
-	// Configure SysTick
-	if (SysTick_Config(SystemCoreClock / (1000000U / me->tick)) == 1) { ALX_CLK_TRACE("Err"); return Alx_Err; }	// MF: In the example it was 1000000 when setting up SysTick
+	// Configure SysTick - MF: In the example it was 1000000 when setting up SysTick
+	if (SysTick_Config(SystemCoreClock / (1000000U / me->tick)) == 1)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Check clocks
-	if (AlxClk_IsClkOk(me) == false) { ALX_CLK_TRACE("Err"); return Alx_Err; }
+	if (AlxClk_IsClkOk(me) == false)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -310,12 +318,36 @@ static bool AlxClk_IsClkOk(AlxClk* me)
 	#endif
 
 	// Check
-	if (SystemCoreClock != me->systemCoreClock_Ctor)	{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->mainClk != me->mainClk_Ctor)				{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->ahbClk != me->ahbClk_Ctor)					{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->froOsc != me->froOsc_Ctor)					{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->extClk != me->extClk_Ctor)					{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->wdtOsc != me->wdtOsc_Ctor)					{ ALX_CLK_TRACE("Err");	return false; }
+	if (SystemCoreClock != me->systemCoreClock_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->mainClk != me->mainClk_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->ahbClk != me->ahbClk_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->froOsc != me->froOsc_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->extClk != me->extClk_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->wdtOsc != me->wdtOsc_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
 
 	// Return
 	return true;

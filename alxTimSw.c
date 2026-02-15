@@ -44,20 +44,18 @@
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		start
   */
 void AlxTimSw_Ctor
 (
-	AlxTimSw* me,
-	bool start
+	AlxTimSw* me
 )
 {
 	// Variables
-	me->ticksStart_ns = 0;
-	me->isRunning = start;
+	me->tickStart_ns = 0;
 
 	// Info
 	me->wasCtorCalled = true;
+	me->isRunning = false;
 }
 
 
@@ -71,8 +69,14 @@ void AlxTimSw_Ctor
   */
 void AlxTimSw_Start(AlxTimSw* me)
 {
-	me->ticksStart_ns = AlxTick_Get_ns(&alxTick);
+	// Prepare
+	uint64_t tickNow_ns = AlxTick_Get_ns(&alxTick);
+
+	// Start
+	uint32_t key = AlxIrq_Lock();
+	me->tickStart_ns = tickNow_ns;
 	me->isRunning = true;
+	AlxIrq_Unlock(key);
 }
 
 /**
@@ -81,7 +85,10 @@ void AlxTimSw_Start(AlxTimSw* me)
   */
 void AlxTimSw_Stop(AlxTimSw* me)
 {
+	// Stop
+	uint32_t key = AlxIrq_Lock();
 	me->isRunning = false;
+	AlxIrq_Unlock(key);
 }
 
 /**
@@ -92,7 +99,16 @@ void AlxTimSw_Stop(AlxTimSw* me)
   */
 bool AlxTimSw_IsRunning(AlxTimSw* me)
 {
-	return me->isRunning;
+	// Prepare
+	bool isRunning = false;
+
+	// Get
+	uint32_t key = AlxIrq_Lock();
+	isRunning = me->isRunning;
+	AlxIrq_Unlock(key);
+
+	// Return
+	return isRunning;
 }
 
 /**
@@ -102,9 +118,21 @@ bool AlxTimSw_IsRunning(AlxTimSw* me)
   */
 uint64_t AlxTimSw_Get_ns(AlxTimSw* me)
 {
-	if (me->isRunning)
+	// Prepare
+	bool isRunning = false;
+	uint64_t tickStart_ns = 0;
+
+	// Get
+	uint32_t key = AlxIrq_Lock();
+	isRunning  = me->isRunning;
+	tickStart_ns = me->tickStart_ns;
+	AlxIrq_Unlock(key);
+
+	// Return
+	if (isRunning)
 	{
-		return AlxTick_Get_ns(&alxTick) - me->ticksStart_ns;
+		uint64_t tickNow_ns = AlxTick_Get_ns(&alxTick);
+		return tickNow_ns - tickStart_ns;
 	}
 	else
 	{
@@ -117,7 +145,7 @@ uint64_t AlxTimSw_Get_ns(AlxTimSw* me)
   * @param[in,out]	me
   * @return
   */
-uint64_t AlxTimSw_Get_us(AlxTimSw*  me)
+uint64_t AlxTimSw_Get_us(AlxTimSw* me)
 {
 	return AlxTimSw_Get_ns(me) / 1000;
 }
@@ -171,7 +199,10 @@ uint64_t AlxTimSw_Get_hr(AlxTimSw* me)
   */
 bool AlxTimSw_IsTimeout_ns(AlxTimSw* me, uint64_t timeout_ns)
 {
+	// Get
 	uint64_t ticks_ns = AlxTimSw_Get_ns(me);
+
+	// Return
 	if (ticks_ns >= timeout_ns)
 	{
 		return true;
@@ -185,7 +216,7 @@ bool AlxTimSw_IsTimeout_ns(AlxTimSw* me, uint64_t timeout_ns)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in] timeout_us
+  * @param[in]		timeout_us
   * @retval			false
   * @retval			true
   */
@@ -197,7 +228,7 @@ bool AlxTimSw_IsTimeout_us(AlxTimSw* me, uint64_t timeout_us)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in] timeout_ms
+  * @param[in]		timeout_ms
   * @retval			false
   * @retval			true
   */
@@ -209,7 +240,7 @@ bool AlxTimSw_IsTimeout_ms(AlxTimSw* me, uint64_t timeout_ms)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in] timeout_sec
+  * @param[in]		timeout_sec
   * @retval			false
   * @retval			true
   */
@@ -221,7 +252,7 @@ bool AlxTimSw_IsTimeout_sec(AlxTimSw* me, uint64_t timeout_sec)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in] timeout_min
+  * @param[in]		timeout_min
   * @retval			false
   * @retval			true
   */
@@ -233,7 +264,7 @@ bool AlxTimSw_IsTimeout_min(AlxTimSw* me, uint64_t timeout_min)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in] timeout_hr
+  * @param[in]		timeout_hr
   * @retval			false
   * @retval			true
   */

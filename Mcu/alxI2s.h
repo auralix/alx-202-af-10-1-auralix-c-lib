@@ -44,7 +44,7 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxIoPin.h"
 
-#if defined(ALX_STM32F4)
+#if defined(ALX_STM32F4) && defined(SAI1)
 #include "alxI2s_McuStm32.h"
 
 #else
@@ -76,9 +76,9 @@ typedef struct { bool dummy; } AlxI2s;
 
 // Trace //
 #if defined(ALX_I2S_TRACE_ENABLE)
-	#define ALX_I2S_TRACE(...) ALX_TRACE_WRN(ALX_I2S_FILE, __VA_ARGS__)
+	#define ALX_I2S_TRACE_ERR(...) ALX_TRACE_ERR(ALX_I2S_FILE, __VA_ARGS__)
 #else
-	#define ALX_I2S_TRACE(...) do{} while (false)
+	#define ALX_I2S_TRACE_ERR(...) do{} while (false)
 #endif
 
 

@@ -126,7 +126,11 @@ Alx_Status AlxWdt_Init(AlxWdt* me)
 	ALX_WDT_ASSERT(me->isInit == false);
 
 	// Init
-	if (HAL_IWDG_Init(&me->hiwdg) != HAL_OK) { ALX_WDT_TRACE("Err"); return Alx_Err; };
+	if (HAL_IWDG_Init(&me->hiwdg) != HAL_OK)
+	{
+		ALX_WDT_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 
 	// Set isInit
 	me->isInit = true;
@@ -148,7 +152,11 @@ Alx_Status AlxWdt_Refresh(AlxWdt* me)
 	ALX_WDT_ASSERT(me->isInit == true);
 
 	// Refresh
-	if (HAL_IWDG_Refresh(&me->hiwdg) != HAL_OK) { ALX_WDT_TRACE("Err"); return Alx_Err; };
+	if (HAL_IWDG_Refresh(&me->hiwdg) != HAL_OK)
+	{
+		ALX_WDT_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 
 	// Return
 	return Alx_Ok;

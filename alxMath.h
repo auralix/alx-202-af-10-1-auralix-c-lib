@@ -68,9 +68,9 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_MATH_TRACE_ENABLE)
-	#define ALX_MATH_TRACE(...) ALX_TRACE_WRN(ALX_MATH_FILE, __VA_ARGS__)
+	#define ALX_MATH_TRACE_WRN(...) ALX_TRACE_WRN(ALX_MATH_FILE, __VA_ARGS__)
 #else
-	#define ALX_MATH_TRACE(...) do{} while (false)
+	#define ALX_MATH_TRACE_WRN(...) do{} while (false)
 #endif
 
 

@@ -80,7 +80,7 @@ def Script(vsSolDir: str) -> None:
 	print("buildDate: " + date)
 
 	# Set build hash from GIT hash
-	cmdHash = "git --git-dir=" + str(gitDir) + "\.git rev-parse HEAD"
+	cmdHash = "git --git-dir=" + str(gitDir) + "\\.git rev-parse HEAD"
 	cmdHashCompletedObj = subprocess.run(cmdHash, capture_output=True)
 	if cmdHashCompletedObj.returncode == 0:
 		_hash = cmdHashCompletedObj.stdout.decode().rstrip('\n')
@@ -97,7 +97,7 @@ def Script(vsSolDir: str) -> None:
 	# Try to set FW version from GIT tag
 	try:
 		# Get
-		cmdTag = "git --git-dir=" + str(gitDir) + "\.git tag --points-at HEAD"
+		cmdTag = "git --git-dir=" + str(gitDir) + "\\.git tag --points-at HEAD"
 		cmdTagCompletedObj = subprocess.run(cmdTag, capture_output=True)
 		tag = cmdTagCompletedObj.stdout.decode().rstrip('\n')
 		tagOnlyNum = tag.lstrip('v')

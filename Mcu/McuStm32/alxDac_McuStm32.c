@@ -221,7 +221,11 @@ Alx_Status AlxDac_DeInit(AlxDac* me)
 	ALX_DAC_ASSERT(me->isInit == true);
 
 	// DeInit DAC
-	if(HAL_DAC_DeInit(&me->hdac) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
+	if(HAL_DAC_DeInit(&me->hdac) != HAL_OK)
+	{
+		ALX_DAC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Force DAC periphery reset
 	AlxDac_Periph_ForceReset(me);
@@ -305,12 +309,20 @@ static Alx_Status AlxDac_Init_Private(AlxDac* me, bool calibrateVref, float vref
 	AlxDac_Periph_EnableClk(me);
 
 	// Init DAC
-	if(HAL_DAC_Init(&me->hdac) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
+	if(HAL_DAC_Init(&me->hdac) != HAL_OK)
+	{
+		ALX_DAC_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Init DAC channels
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (HAL_DAC_ConfigChannel(&me->hdac, &me->chdac[i], AlxDac_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
+		if (HAL_DAC_ConfigChannel(&me->hdac, &me->chdac[i], AlxDac_GetCh(me->ch[i])) != HAL_OK)
+		{
+			ALX_DAC_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 	}
 
 	// Set isInit
@@ -321,18 +333,30 @@ static Alx_Status AlxDac_Init_Private(AlxDac* me, bool calibrateVref, float vref
 	{
 		if (calibrateVref)
 		{
-			if(AlxDac_SetVoltage_V_CalibrateVref(me, me->ch[i], me->setVoltageDefault_V[i], vref_V) != Alx_Ok) { ALX_DAC_TRACE("Err"); return Alx_Err; }
+			if(AlxDac_SetVoltage_V_CalibrateVref(me, me->ch[i], me->setVoltageDefault_V[i], vref_V) != Alx_Ok)
+			{
+				ALX_DAC_TRACE_ERR("Err");
+				return Alx_Err;
+			}
 		}
 		else
 		{
-			if (AlxDac_SetVoltage_V(me, me->ch[i], me->setVoltageDefault_V[i]) != Alx_Ok) { ALX_DAC_TRACE("Err"); return Alx_Err; }
+			if (AlxDac_SetVoltage_V(me, me->ch[i], me->setVoltageDefault_V[i]) != Alx_Ok)
+			{
+				ALX_DAC_TRACE_ERR("Err");
+				return Alx_Err;
+			}
 		}
 	}
 
 	// Start DAC channels
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (HAL_DAC_Start(&me->hdac, AlxDac_GetCh(me->ch[i])) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
+		if (HAL_DAC_Start(&me->hdac, AlxDac_GetCh(me->ch[i])) != HAL_OK)
+		{
+			ALX_DAC_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 	}
 
 	// Return
@@ -350,7 +374,11 @@ static Alx_Status AlxDac_SetVoltage_V_Private(AlxDac* me, Alx_Ch ch, float volta
 			uint32_t vref_mV = (uint32_t)(vref_V * 1000.f);
 
 			// Bound
-			if(AlxBound_Float(&dacVoltage_V, 0, vref_V) != Alx_Ok) { ALX_DAC_TRACE("Err"); return Alx_Err; }
+			if(AlxBound_Float(&dacVoltage_V, 0, vref_V) != Alx_Ok)
+			{
+				ALX_DAC_TRACE_ERR("Err");
+				return Alx_Err;
+			}
 
 			// Get channel
 			uint32_t dacCh = AlxDac_GetCh(ch);
@@ -359,7 +387,11 @@ static Alx_Status AlxDac_SetVoltage_V_Private(AlxDac* me, Alx_Ch ch, float volta
 			uint32_t dacData = __LL_DAC_CALC_VOLTAGE_TO_DATA(vref_mV, dacVoltage_mV, me->RESOLUTION);
 
 			// Set voltage
-			if(HAL_DAC_SetValue(&me->hdac, dacCh, me->RESOLUTION, dacData) != HAL_OK) { ALX_DAC_TRACE("Err"); return Alx_Err; }
+			if(HAL_DAC_SetValue(&me->hdac, dacCh, me->RESOLUTION, dacData) != HAL_OK)
+			{
+				ALX_DAC_TRACE_ERR("Err");
+				return Alx_Err;
+			}
 
 			// Return
 			return Alx_Ok;

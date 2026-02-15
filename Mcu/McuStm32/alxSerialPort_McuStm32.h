@@ -57,14 +57,23 @@ extern "C" {
 //******************************************************************************
 typedef enum
 {
-	AlxSerialPort_Lin_Disable,
-	AlxSerialPort_Lin_EnableMaster,
-	AlxSerialPort_Lin_EnableSlave
-} AlxSerialPort_Lin;
+	AlxSerialPort_Config_Standard_TxBlocking_RxIrqFifo,
+	AlxSerialPort_Config_Standard_TxIrqFifo_RxIrqFifo,
+
+	AlxSerialPort_Config_LinMaster_TxBlocking_RxIrqFifo,
+	AlxSerialPort_Config_LinMaster_TxIrqFifo_RxIrqFifo,
+
+	AlxSerialPort_Config_LinSlave_TxBlocking_RxIrqFifo,
+	AlxSerialPort_Config_LinSlave_TxIrqFifo_RxIrqFifo,
+} AlxSerialPort_Config;
 
 typedef struct
 {
+	// Defines
+	#define ALX_SERIAL_PORT_TX_TIMEOUT_ms 1000
+
 	// Parameters
+	AlxSerialPort_Config config;
 	USART_TypeDef* uart;
 	AlxIoPin* do_TX;
 	AlxIoPin* di_RX;
@@ -72,14 +81,23 @@ typedef struct
 	uint32_t dataWidth;
 	uint32_t stopBits;
 	uint32_t parity;
-	uint16_t txTimeout_ms;
+	uint8_t* txFifoBuff;
+	uint32_t txFifoBuffLen;
 	uint8_t* rxFifoBuff;
 	uint32_t rxFifoBuffLen;
-	Alx_IrqPriority rxIrqPriority;
-	AlxSerialPort_Lin lin;
+	Alx_IrqPriority irqPriority;
+	AlxIoPin* do_DBG_Tx;
+	AlxIoPin* do_DBG_Rx;
+
+	// Parameters - Private
+	bool txFifoUsed;
+	bool rxFifoUsed;
+	bool linMaster;
+	bool linSlave;
 
 	// Variables
 	UART_HandleTypeDef huart;
+	AlxFifo txFifo;
 	AlxFifo rxFifo;
 
 	// Info
@@ -94,6 +112,7 @@ typedef struct
 void AlxSerialPort_Ctor
 (
 	AlxSerialPort* me,
+	AlxSerialPort_Config config,
 	USART_TypeDef* uart,
 	AlxIoPin* do_TX,
 	AlxIoPin* di_RX,
@@ -101,11 +120,13 @@ void AlxSerialPort_Ctor
 	uint32_t dataWidth,
 	uint32_t stopBits,
 	uint32_t parity,
-	uint16_t txTimeout_ms,
+	uint8_t* txFifoBuff,
+	uint32_t txFifoBuffLen,
 	uint8_t* rxFifoBuff,
 	uint32_t rxFifoBuffLen,
-	Alx_IrqPriority rxIrqPriority,
-	AlxSerialPort_Lin lin
+	Alx_IrqPriority irqPriority,
+	AlxIoPin* do_DBG_Tx,
+	AlxIoPin* do_DBG_Rx
 );
 
 

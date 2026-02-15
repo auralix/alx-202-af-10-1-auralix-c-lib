@@ -68,9 +68,9 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_AVG_TRACE_ENABLE)
-	#define ALX_AVG_TRACE(...) ALX_TRACE_WRN(ALX_AVG_FILE, __VA_ARGS__)
+	#define ALX_AVG_TRACE_WRN(...) ALX_TRACE_WRN(ALX_AVG_FILE, __VA_ARGS__)
 #else
-	#define ALX_AVG_TRACE(...) do{} while (false)
+	#define ALX_AVG_TRACE_WRN(...) do{} while (false)
 #endif
 
 

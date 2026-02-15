@@ -272,43 +272,35 @@ static IRQn_Type AlxIoPin_GetIrqType(AlxIoPinIrq* me)
 #if !defined(ALX_IO_PIN_IRQ_HANDLERS_OFF)
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin0");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin1");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin2()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin2");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin3()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin3");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin4()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin4");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin5()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin5");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin6()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin6");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin7()
 {
-	ALX_IO_PIN_IRQ_TRACE("Define AlxIoPinIrq_Foreground_Callback_Pin7");
-	ALX_IO_PIN_IRQ_ASSERT(false);
+	ALX_IO_PIN_IRQ_ASSERT(false);	// Implement in APP!
 }
 #endif
 

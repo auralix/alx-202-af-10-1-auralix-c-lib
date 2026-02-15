@@ -45,6 +45,7 @@ extern "C" {
 #include "alxSerialPort.h"
 #include "alxTimSw.h"
 #include "alxOsDelay.h"
+#include "alxIoPin.h"
 
 
 //******************************************************************************
@@ -71,17 +72,11 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_LIN_TRACE_ENABLE)
-	#define ALX_LIN_TRACE_FTL(...) ALX_TRACE_FTL(ALX_LIN_FILE, __VA_ARGS__)
-	#define ALX_LIN_TRACE_ERR(...) ALX_TRACE_ERR(ALX_LIN_FILE, __VA_ARGS__)
 	#define ALX_LIN_TRACE_WRN(...) ALX_TRACE_WRN(ALX_LIN_FILE, __VA_ARGS__)
-	#define ALX_LIN_TRACE_INF(...) ALX_TRACE_INF(ALX_LIN_FILE, __VA_ARGS__)
 	#define ALX_LIN_TRACE_DBG(...) ALX_TRACE_DBG(ALX_LIN_FILE, __VA_ARGS__)
 	#define ALX_LIN_TRACE_VRB(...) ALX_TRACE_VRB(ALX_LIN_FILE, __VA_ARGS__)
 #else
-	#define ALX_LIN_TRACE_FTL(...) do{} while (false)
-	#define ALX_LIN_TRACE_ERR(...) do{} while (false)
 	#define ALX_LIN_TRACE_WRN(...) do{} while (false)
-	#define ALX_LIN_TRACE_INF(...) do{} while (false)
 	#define ALX_LIN_TRACE_DBG(...) do{} while (false)
 	#define ALX_LIN_TRACE_VRB(...) do{} while (false)
 #endif
@@ -138,6 +133,7 @@ typedef struct
 	AlxSerialPort* alxSerialPort;
 	uint8_t breakSyncOffset;
 	uint16_t rxb_ResponseTimeout_ms;
+	AlxIoPin* do_DBG;
 
 	// Fields
 	uint8_t nad;
@@ -164,7 +160,8 @@ void AlxLin_Ctor
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
 	uint8_t breakSyncOffset,
-	uint16_t rxb_ResponseTimeout_ms
+	uint16_t rxb_ResponseTimeout_ms,
+	AlxIoPin* do_DBG
 );
 
 

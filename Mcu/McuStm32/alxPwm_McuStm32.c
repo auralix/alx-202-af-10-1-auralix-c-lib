@@ -209,15 +209,27 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	AlxPwm_Periph_EnableClk(me);
 
 	// Remap TIM IoPins
-	if(AlxPwm_RemapIoPin(me) != Alx_Ok) { ALX_PWM_TRACE("Err"); return Alx_Err; };
+	if(AlxPwm_RemapIoPin(me) != Alx_Ok)
+	{
+		ALX_PWM_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 
 	// Init TIM_PWM
-	if(HAL_TIM_PWM_Init(&me->htim) != HAL_OK) { ALX_PWM_TRACE("Err"); return Alx_Err; }
+	if(HAL_TIM_PWM_Init(&me->htim) != HAL_OK)
+	{
+		ALX_PWM_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Init TIM_PWM channels
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (HAL_TIM_PWM_ConfigChannel(&me->htim, &me->chtim[i], AlxPwm_GetCh(me->ch[i])) != HAL_OK) { ALX_PWM_TRACE("Err"); return Alx_Err; }
+		if (HAL_TIM_PWM_ConfigChannel(&me->htim, &me->chtim[i], AlxPwm_GetCh(me->ch[i])) != HAL_OK)
+		{
+			ALX_PWM_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 	}
 
 	// Set isInit
@@ -227,19 +239,31 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (AlxPwm_SetDuty_permil(me, me->ch[i], me->dutyDefault_permil[i]) != Alx_Ok) { ALX_PWM_TRACE("Err"); return Alx_Err; }
+		if (AlxPwm_SetDuty_permil(me, me->ch[i], me->dutyDefault_permil[i]) != Alx_Ok)
+		{
+			ALX_PWM_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 	}
 	#else
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (AlxPwm_SetDuty_pct(me, me->ch[i], me->dutyDefault_pct[i]) != Alx_Ok) { ALX_PWM_TRACE("Err"); return Alx_Err; }
+		if (AlxPwm_SetDuty_pct(me, me->ch[i], me->dutyDefault_pct[i]) != Alx_Ok)
+		{
+			ALX_PWM_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 	}
 	#endif
 
 	// Start TIM_PWM channels
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (HAL_TIM_PWM_Start(&me->htim, AlxPwm_GetCh(me->ch[i])) != HAL_OK) { ALX_PWM_TRACE("Err"); return Alx_Err; }
+		if (HAL_TIM_PWM_Start(&me->htim, AlxPwm_GetCh(me->ch[i])) != HAL_OK)
+		{
+			ALX_PWM_TRACE_ERR("Err");
+			return Alx_Err;
+		}
 	}
 
 	// Return
@@ -257,7 +281,11 @@ Alx_Status AlxPwm_DeInit(AlxPwm* me)
 	ALX_PWM_ASSERT(me->isInit == true);
 
 	// DeInit TIM_PWM
-	if(HAL_TIM_PWM_DeInit(&me->htim) != HAL_OK) { ALX_PWM_TRACE("Err"); return Alx_Err; }
+	if(HAL_TIM_PWM_DeInit(&me->htim) != HAL_OK)
+	{
+		ALX_PWM_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Force TIM periphery reset
 	AlxPwm_Periph_ForceReset(me);
@@ -480,7 +508,11 @@ static Alx_Status AlxPwm_RemapIoPin(AlxPwm* me)
 			(ioPin->igpio.Alternate == GPIO_AF4_TIM3)
 		)
 		{
-			if(HAL_TIMEx_RemapConfig(&me->htim, TIM3_TI2_GPIOB5_AF4) != HAL_OK) { ALX_PWM_TRACE("Err"); return Alx_Err; };
+			if(HAL_TIMEx_RemapConfig(&me->htim, TIM3_TI2_GPIOB5_AF4) != HAL_OK)
+			{
+				ALX_PWM_TRACE_ERR("Err");
+				return Alx_Err;
+			};
 		}
 		#endif
 	}

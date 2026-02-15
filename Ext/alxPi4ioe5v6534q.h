@@ -71,10 +71,8 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_PI4IOE5V6534Q_TRACE_ENABLE)
-	#define ALX_PI4IOE5V6534Q_TRACE_WRN(...) ALX_TRACE_WRN(ALX_PI4IOE5V6534Q_FILE, __VA_ARGS__)
 	#define ALX_PI4IOE5V6534Q_TRACE_ERR(...) ALX_TRACE_ERR(ALX_PI4IOE5V6534Q_FILE, __VA_ARGS__)
 #else
-	#define ALX_PI4IOE5V6534Q_TRACE_WRN(...) do{} while (false)
 	#define ALX_PI4IOE5V6534Q_TRACE_ERR(...) do{} while (false)
 #endif
 

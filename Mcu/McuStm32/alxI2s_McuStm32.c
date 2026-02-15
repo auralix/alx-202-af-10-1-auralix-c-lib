@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_STM32F4)
+#if defined(ALX_C_LIB) && defined(ALX_STM32F4) && defined(SAI1)
 
 
 //******************************************************************************
@@ -243,11 +243,23 @@ Alx_Status AlxI2s_Init(AlxI2s* me)
 	AlxI2s_Periph_EnableClk(me);
 
 	// #4 Init SAI PLL Clock
-	if(HAL_RCCEx_PeriphCLKConfig(&me->iclk) != HAL_OK) { ALX_I2S_TRACE("ErrClk"); return Alx_Err; };
+	if(HAL_RCCEx_PeriphCLKConfig(&me->iclk) != HAL_OK)
+	{
+		ALX_I2S_TRACE_ERR("ErrClk");
+		return Alx_Err;
+	};
 
 	// #5 Init SAI
-	if(HAL_SAI_InitProtocol(&me->hsaiRx, SAI_I2S_STANDARD, me->protocolDataSize, 2) != HAL_OK)	{ ALX_I2S_TRACE("ErrInit"); return Alx_Err; };
-	if(HAL_SAI_InitProtocol(&me->hsaiTx, SAI_I2S_STANDARD, me->protocolDataSize, 2) != HAL_OK)	{ ALX_I2S_TRACE("ErrInit"); return Alx_Err; };
+	if(HAL_SAI_InitProtocol(&me->hsaiRx, SAI_I2S_STANDARD, me->protocolDataSize, 2) != HAL_OK)
+	{
+		ALX_I2S_TRACE_ERR("ErrInit");
+		return Alx_Err;
+	};
+	if(HAL_SAI_InitProtocol(&me->hsaiTx, SAI_I2S_STANDARD, me->protocolDataSize, 2) != HAL_OK)
+	{
+		ALX_I2S_TRACE_ERR("ErrInit");
+		return Alx_Err;
+	};
 
 	// #6 Enable SAI IRQ
 	__HAL_SAI_ENABLE_IT(&me->hsaiTx, SAI_xIMR_FREQIE);
@@ -501,31 +513,23 @@ static void AlxI2s_Periph_DisableIrq(AlxI2s* me)
 ALX_WEAK void AlxI2s_Foreground_Callback_TxL(AlxI2s* me)
 {
 	(void)me;
-
-	ALX_I2S_TRACE("Define AlxI2s_Foreground_Callback_TxL");
-	ALX_I2S_ASSERT(false);
+	ALX_I2S_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxI2s_Foreground_Callback_TxR(AlxI2s* me)
 {
 	(void)me;
-
-	ALX_I2S_TRACE("Define AlxI2s_Foreground_Callback_TxR");
-	ALX_I2S_ASSERT(false);
+	ALX_I2S_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxI2s_Foreground_Callback_RxL(AlxI2s* me)
 {
 	(void)me;
-
-	ALX_I2S_TRACE("Define AlxI2s_Foreground_Callback_RxL");
-	ALX_I2S_ASSERT(false);
+	ALX_I2S_ASSERT(false);	// Implement in APP!
 }
 ALX_WEAK void AlxI2s_Foreground_Callback_RxR(AlxI2s* me)
 {
 	(void)me;
-
-	ALX_I2S_TRACE("Define AlxI2s_Foreground_Callback_RxR");
-	ALX_I2S_ASSERT(false);
+	ALX_I2S_ASSERT(false);	// Implement in APP!
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4)
+#endif	// #if defined(ALX_C_LIB) && defined(ALX_STM32F4) && defined(SAI1)

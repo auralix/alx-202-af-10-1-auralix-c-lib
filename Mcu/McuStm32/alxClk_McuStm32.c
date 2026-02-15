@@ -59,6 +59,7 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_
 #endif
 #if defined(ALX_STM32F4)
 static void AlxClk_Ctor_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default(AlxClk* me);
+static void AlxClk_Ctor_McuStm32F4_Sysclk_168MHz_Pclk1Apb1_42MHz_Pclk2Apb2_84MHz_Hse_12MHz(AlxClk* me);
 static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz(AlxClk* me);
 static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz(AlxClk* me);
 static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_25MHz(AlxClk* me);
@@ -136,6 +137,7 @@ ALX_WEAK void AlxClk_Ctor
 	#endif
 	#if defined(ALX_STM32F4)
 	if		(me->config == AlxClk_Config_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default)				{ AlxClk_Ctor_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default(me);	me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32F4_Sysclk_168MHz_Pclk1Apb1_42MHz_Pclk2Apb2_84MHz_Hse_12MHz)					{ AlxClk_Ctor_McuStm32F4_Sysclk_168MHz_Pclk1Apb1_42MHz_Pclk2Apb2_84MHz_Hse_12MHz(me);			me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz)					{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz)					{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz(me);			me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz_BackupHsi_16MHz)	{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz(me);			me->backupHsiEnable = true;		}
@@ -255,12 +257,16 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 			me->wasCtorCalled = true;
 
 			// Init
-			if(HAL_RCC_OscConfig(&me->iosc) != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; }
+			if(HAL_RCC_OscConfig(&me->iosc) != HAL_OK)
+			{
+				ALX_CLK_TRACE_ERR("Err");
+				return Alx_Err;
+			}
 		}
 		// Else trace & return
 		else
 		{
-			ALX_CLK_TRACE("Err");
+			ALX_CLK_TRACE_ERR("Err");
 			return Alx_Err;
 		}
 	}
@@ -278,12 +284,20 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 
 	// Init power regulator
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-	if(HAL_PWREx_ControlVoltageScaling(me->pwrRegVoltageScale) != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; };
+	if(HAL_PWREx_ControlVoltageScaling(me->pwrRegVoltageScale) != HAL_OK)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	};
 	#endif
 	#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) || defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx) || defined(ALX_STM32F7)
 	if (me->isPwrRegOverDrive)
 	{
-		if(HAL_PWREx_EnableOverDrive() != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; };
+		if(HAL_PWREx_EnableOverDrive() != HAL_OK)
+		{
+			ALX_CLK_TRACE_ERR("Err");
+			return Alx_Err;
+		};
 	}
 	#endif
 	#if defined(ALX_STM32L0)
@@ -296,10 +310,18 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 	__HAL_RCC_SYSCFG_CLK_ENABLE();
 
 	// Init clocks
-	if(HAL_RCC_ClockConfig(&me->iclk, me->flashLatency) != HAL_OK) { ALX_CLK_TRACE("Err"); return Alx_Err; }
+	if(HAL_RCC_ClockConfig(&me->iclk, me->flashLatency) != HAL_OK)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Check clocks
-	if(AlxClk_IsClkOk(me) == false) { ALX_CLK_TRACE("Err"); return Alx_Err; }
+	if(AlxClk_IsClkOk(me) == false)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	}
 
 	// Set isInit
 	me->isInit = true;
@@ -704,6 +726,51 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 	me->pclk1Apb1Tim_Ctor = 16000000;
 	me->pclk2Apb2Tim_Ctor = 16000000;
 	me->mainPllInputClk_Ctor = 0;
+}
+static void AlxClk_Ctor_McuStm32F4_Sysclk_168MHz_Pclk1Apb1_42MHz_Pclk2Apb2_84MHz_Hse_12MHz(AlxClk* me)
+{
+	// Set power regulator
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+	me->isPwrRegOverDrive = false;
+
+	// Set oscillators
+	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+	me->iosc.HSEState = RCC_HSE_ON;
+	me->iosc.LSEState = RCC_LSE_OFF;
+	me->iosc.HSIState = RCC_HSI_ON;
+	me->iosc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	me->iosc.LSIState = RCC_LSI_OFF;
+	me->iosc.PLL.PLLState = RCC_PLL_ON;
+	me->iosc.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+	me->iosc.PLL.PLLM = 6;	// VCO frequency = 2MHz, it must be between 1MHz and 2MHz, recommended is 2MHz to limit PLL jitter
+	me->iosc.PLL.PLLN = 168;
+	me->iosc.PLL.PLLP = RCC_PLLP_DIV2;
+	me->iosc.PLL.PLLQ = 15;	// TV: TODO
+	#if defined(STM32F410Tx) || defined(STM32F410Cx) || defined(STM32F410Rx) || defined(STM32F446xx) || defined(STM32F469xx) ||\
+		defined(STM32F479xx) || defined(STM32F412Zx) || defined(STM32F412Vx) || defined(STM32F412Rx) || defined(STM32F412Cx) ||\
+		defined(STM32F413xx) || defined(STM32F423xx)
+	me->iosc.PLL.PLLR = 0;	// TV: TODO
+	#endif
+
+	// Set clocks
+	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	me->iclk.APB1CLKDivider = RCC_HCLK_DIV4;
+	me->iclk.APB2CLKDivider = RCC_HCLK_DIV2;
+
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_5;
+
+	// Set expected clocks
+	me->systemCoreClock_Ctor = 168000000;
+	me->sysclk_Ctor = 168000000;
+	me->hclk_Ctor = 168000000;
+	me->pclk1Apb1_Ctor = 42000000;
+	me->pclk2Apb2_Ctor = 84000000;
+	me->pclk1Apb1Tim_Ctor = 42000000 * 2;
+	me->pclk2Apb2Tim_Ctor = 84000000 * 2;
+	me->mainPllInputClk_Ctor = HSE_VALUE / me->iosc.PLL.PLLM;
 }
 static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz(AlxClk* me)
 {
@@ -1810,15 +1877,39 @@ static bool AlxClk_IsClkOk(AlxClk* me)
 	#endif
 
 	// Check
-	if (SystemCoreClock != me->systemCoreClock_Ctor)	{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->sysclk != me->sysclk_Ctor)					{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->hclk != me->hclk_Ctor)						{ ALX_CLK_TRACE("Err");	return false; }
-	if (me->pclk1Apb1 != me->pclk1Apb1_Ctor)			{ ALX_CLK_TRACE("Err");	return false; }
+	if (SystemCoreClock != me->systemCoreClock_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->sysclk != me->sysclk_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->hclk != me->hclk_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
+	if (me->pclk1Apb1 != me->pclk1Apb1_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
 	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-	if (me->pclk2Apb2 != me->pclk2Apb2_Ctor)			{ ALX_CLK_TRACE("Err");	return false; }
+	if (me->pclk2Apb2 != me->pclk2Apb2_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
 	#endif
 	#if defined(ALX_STM32U5)
-	if (me->pclk3Apb3 != me->pclk3Apb3_Ctor)			{ ALX_CLK_TRACE("Err");	return false; }
+	if (me->pclk3Apb3 != me->pclk3Apb3_Ctor)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return false;
+	}
 	#endif
 
 	// Return

@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * @file		alxAudio.h
-  * @brief		Auralix C Library - ALX Audio Module
+  * @file		alxIrq.h
+  * @brief		Auralix C Library - ALX IRQ Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_AUDIO_H
-#define ALX_AUDIO_H
+#ifndef ALX_IRQ_H
+#define ALX_IRQ_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,8 +40,6 @@ extern "C" {
 // Includes
 //******************************************************************************
 #include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
 
 
 //******************************************************************************
@@ -51,52 +49,10 @@ extern "C" {
 
 
 //******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_AUDIO_FILE "alxAudio.h"
-
-// Assert //
-#if defined(ALX_AUDIO_ASSERT_BKPT_ENABLE)
-	#define ALX_AUDIO_ASSERT(expr) ALX_ASSERT_BKPT(ALX_AUDIO_FILE, expr)
-#elif defined(ALX_AUDIO_ASSERT_TRACE_ENABLE)
-	#define ALX_AUDIO_ASSERT(expr) ALX_ASSERT_TRACE(ALX_AUDIO_FILE, expr)
-#elif defined(ALX_AUDIO_ASSERT_RST_ENABLE)
-	#define ALX_AUDIO_ASSERT(expr) ALX_ASSERT_RST(ALX_AUDIO_FILE, expr)
-#else
-	#define ALX_AUDIO_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(ALX_AUDIO_TRACE_ENABLE)
-	#define ALX_AUDIO_TRACE_WRN(...) ALX_TRACE_WRN(ALX_AUDIO_FILE, __VA_ARGS__)
-#else
-	#define ALX_AUDIO_TRACE_WRN(...) do{} while (false)
-#endif
-
-
-//******************************************************************************
-// Types
-//******************************************************************************
-typedef enum
-{
-	AlxAudio_Encoding_LinerPcm_Int8   = 0,
-	AlxAudio_Encoding_LinerPcm_Uint8  = 1,
-	AlxAudio_Encoding_LinerPcm_Int16  = 2,
-	AlxAudio_Encoding_LinerPcm_Uint16 = 3,
-	AlxAudio_Encoding_LinerPcm_Int16_InternalFlash  = 4
-} AlxAudio_Encoding;
-
-
-//******************************************************************************
 // Functions
 //******************************************************************************
-float AlxAudio_LinerPcmInt8ToFloat(int8_t inSample);
-float AlxAudio_LinerPcmUint8ToFloat(uint8_t inSample);
-float AlxAudio_LinerPcmInt16ToFloat(int16_t inSample);
-float AlxAudio_LinerPcmUint16ToFloat(uint16_t inSample);
-int8_t AlxAudio_FloatToLinerPcmInt8(float inSample);
-int16_t AlxAudio_FloatToLinerPcmInt16(float inSample);
-float AlxAudio_StereoToMono(float sampleL, float sampleR);
+uint32_t AlxIrq_Lock(void);
+void AlxIrq_Unlock(uint32_t key);
 
 
 #endif	// #if defined(ALX_C_LIB)
@@ -105,4 +61,4 @@ float AlxAudio_StereoToMono(float sampleL, float sampleR);
 }
 #endif
 
-#endif	// #ifndef ALX_AUDIO_H
+#endif	// #ifndef ALX_IRQ_H

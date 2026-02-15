@@ -55,7 +55,8 @@ void AlxFiltGlitchUint32_Ctor
 )
 {
 	// Ctor
-	AlxTimSw_Ctor(&me->tim, true);
+	AlxTimSw_Ctor(&me->tim);
+	AlxTimSw_Start(&me->tim);
 
 	// Parameters
 	me->valInitial = valInitial;

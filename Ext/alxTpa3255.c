@@ -59,7 +59,7 @@ void AlxTpa3255_Ctor
 )
 {
 	// Ctor
-	AlxTimSw_Ctor(&me->tim, false);
+	AlxTimSw_Ctor(&me->tim);
 
 	// Parameters Const
 	me->lowLevelTime_ms = 2;

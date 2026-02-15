@@ -1880,7 +1880,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%hu", me->val.uint16) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%u", me->val.uint16) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
 	{
@@ -1896,7 +1896,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%hd", me->val.int16) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%d", me->val.int16) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Int32)
 	{
@@ -1988,14 +1988,15 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	if (me->dataType == AlxParamItem_Uint8)
 	{
 		// Convert
-		uint8_t valNum = 0;
-		if (sscanf(val, "%hu", &valNum) != 1)
+		uint16_t valNum_Uint16 = 0;
+		if (sscanf(val, "%hu", &valNum_Uint16) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+		uint8_t valNum = valNum_Uint16;
 
 		// Set
-		status = AlxParamItem_SetValUint8(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
@@ -2005,7 +2006,9 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		{
 			return AlxParamItem_ErrConv;
 		}
-		status = AlxParamItem_SetValUint16(me, valNum);
+
+		// Set
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
 	{
@@ -2017,7 +2020,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValUint32(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Uint64)
 	{
@@ -2026,14 +2029,15 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	else if (me->dataType == AlxParamItem_Int8)
 	{
 		// Convert
-		int8_t valNum = 0;
-		if (sscanf(val, "%hd", &valNum) != 1)
+		int16_t valNum_Int16 = 0;
+		if (sscanf(val, "%hd", &valNum_Int16) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+		int8_t valNum = valNum_Int16;
 
 		// Set
-		status = AlxParamItem_SetValInt8(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
@@ -2045,7 +2049,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValInt16(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Int32)
 	{
@@ -2057,7 +2061,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValInt32(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Int64)
 	{
@@ -2073,7 +2077,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValFloat(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Double)
 	{
@@ -2085,7 +2089,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValDouble(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Bool)
 	{
@@ -2121,7 +2125,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetValBool(me, valNum);
+		status = AlxParamItem_SetVal(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Arr)
 	{
@@ -2130,7 +2134,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	else if (me->dataType == AlxParamItem_Str)
 	{
 		// Set
-		status = AlxParamItem_SetValStr(me, val);
+		status = AlxParamItem_SetVal(me, val);
 	}
 	else
 	{
@@ -2156,15 +2160,25 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
   */
 Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->paramKvStore != NULL);
 
-	// Local variables
+
+	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
 	void* buff = NULL;
 	uint32_t buffLen = 0;
 	uint32_t actualValLen = 0;
 	Alx_Status status = Alx_Err;
+
+
+	//------------------------------------------------------------------------------
+	// Prepare
+	//------------------------------------------------------------------------------
 
 	// Set buffLen
 	if (me->dataType == AlxParamItem_Str)
@@ -2180,48 +2194,77 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 	buff = calloc(buffLen, sizeof(uint8_t));
 	if (buff == NULL)
 	{
-		ALX_PARAM_ITEM_TRACE_ERR("FAIL: calloc()");
 		free(buff);
+		ALX_PARAM_ITEM_TRACE_ERR("FAIL: calloc()");
 		return Alx_Err;
 	}
 
-	// Get value from Param KV Store
+
+	//------------------------------------------------------------------------------
+	// Load
+	//------------------------------------------------------------------------------
+
+	// Get value from KV store
 	status = AlxParamKvStore_Get(me->paramKvStore, me->key, buff, buffLen, &actualValLen);
 	if (status != Alx_Ok)
 	{
-		// Trace
-		ALX_PARAM_ITEM_TRACE_DBG("AlxParamItem_LoadVal - KV store get ERROR - Key not found, default will be used - %s", me->key);
-
 		// Free memory
 		free(buff);
+
+		// Trace
+		ALX_PARAM_ITEM_TRACE_INF("AlxParamItem_LoadVal - KV store get ERR - Key not found, default key will be created - %s", me->key);
+
+		// Get default value pointer
+		void* valPtr = AlxParamItem_GetValPtr_Private(me);
+
+		// Set default value to KV store
+		status = AlxParamKvStore_Set(me->paramKvStore, me->key, valPtr, me->valLen);
+		if (status != Alx_Ok)
+		{
+			ALX_PARAM_ITEM_TRACE_ERR("FAIL: AlxParamKvStore_Set(default)");
+			return Alx_Err;
+		}
 
 		// Return
 		return Alx_Ok;
 	}
 
-	// Set Param Item
+
+	//------------------------------------------------------------------------------
+	// Set
+	//------------------------------------------------------------------------------
+
+	// Set value
 	status = AlxParamItem_SetVal(me, buff);
-	me->pendingStore = false;	// TV: TODO - Hack, we had problem, that if loaded val diff than default, pendingStore was set.. we don't want that..
+
+	// Force pending store to FALSE - We had problem, that if loaded val diff than default, pendingStore was set.. we don't want that..
+	me->pendingStore = false;
 
 	// Free memory
 	free(buff);
 
-	// If Param Item set error
+	// If set error
 	if (status != Alx_Ok)
 	{
-		// Remove Param KV Store key
-		status = AlxParamKvStore_Remove(me->paramKvStore, me->key);
+		// Trace
+		ALX_PARAM_ITEM_TRACE_INF("AlxParamItem_LoadVal - KV store get OK, value set ERR - Key will be set to default - %s", me->key);
+
+		// Get default value pointer
+		void* valPtr = AlxParamItem_GetValPtr_Private(me);
+
+		// Set default value to KV store
+		status = AlxParamKvStore_Set(me->paramKvStore, me->key, valPtr, me->valLen);
 		if (status != Alx_Ok)
 		{
-			ALX_PARAM_ITEM_TRACE_ERR("FAIL: AlxParamKvStore_Remove()");
+			ALX_PARAM_ITEM_TRACE_ERR("FAIL: AlxParamKvStore_Set(default)");
 			return Alx_Err;
 		}
-
-		// Trace
-		ALX_PARAM_ITEM_TRACE_DBG("AlxParamItem_LoadVal - KV store get OK, param item set ERROR - Key was removed, default will be used - %s", me->key);
 	}
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
 
@@ -2232,11 +2275,18 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
   */
 Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_ITEM_ASSERT(me->paramKvStore != NULL);
 
-	// Check
+
+	//------------------------------------------------------------------------------
+	// Store
+	//------------------------------------------------------------------------------
+
+	// Check pending
 	if (me->pendingStore == false)
 	{
 		return Alx_Ok;
@@ -2245,7 +2295,7 @@ Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 	// Get value pointer
 	void* valPtr = AlxParamItem_GetValPtr_Private(me);
 
-	// Set Param KV Store
+	// Set value to KV store
 	Alx_Status status = AlxParamKvStore_Set(me->paramKvStore, me->key, valPtr, me->valLen);
 	if (status != Alx_Ok)
 	{
@@ -2253,10 +2303,13 @@ Alx_Status AlxParamItem_StoreVal(AlxParamItem* me)
 		return Alx_Err;
 	}
 
-	// Clear
+	// Clear pending
 	me->pendingStore = false;
 
+
+	//------------------------------------------------------------------------------
 	// Return
+	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
 
@@ -2687,8 +2740,8 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 	oldValPtr = calloc(oldValLen, sizeof(uint8_t));
 	if (oldValPtr == NULL)
 	{
-		ALX_PARAM_ITEM_TRACE_ERR("FAIL: calloc()");
 		free(oldValPtr);
+		ALX_PARAM_ITEM_TRACE_ERR("FAIL: calloc()");
 		return Alx_Err;
 	}
 
@@ -2705,7 +2758,7 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 		me->val._bool = _val;
 		status = Alx_Ok;
 	}
-	else if ((me->valOutOfRangeHandle == AlxParamItem_Assert) || (me->valOutOfRangeHandle == AlxParamItem_Ignore))
+	else if (me->valOutOfRangeHandle == AlxParamItem_Assert || me->valOutOfRangeHandle == AlxParamItem_Ignore)
 	{
 		// Set
 		if (me->dataType == AlxParamItem_Uint8)
@@ -2822,10 +2875,9 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 		}
 
 		// If ValOutOfRangeHandle_Assert and status is NOT OK, assert
-		if ((me->valOutOfRangeHandle == AlxParamItem_Assert) && (status != Alx_Ok))
+		if (me->valOutOfRangeHandle == AlxParamItem_Assert && status != Alx_Ok)
 		{
 			ALX_PARAM_ITEM_ASSERT(false);
-			status = Alx_Err;
 		}
 	}
 	else if (me->valOutOfRangeHandle == AlxParamItem_Bound)
@@ -2913,14 +2965,13 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 	else
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-		status = Alx_Err;
 	}
 
 
 	//------------------------------------------------------------------------------
 	// Handle Pending Store
 	//------------------------------------------------------------------------------
-	if (status == Alx_Ok)
+	if (status == Alx_Ok || status == AlxBound_ErrMin || status == AlxBound_ErrMax || status == AlxBound_ErrLen)
 	{
 		if (memcmp(oldValPtr, valPtr, me->valLen) != 0)
 		{

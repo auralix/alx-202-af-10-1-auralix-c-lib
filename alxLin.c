@@ -79,19 +79,22 @@ void AlxLin_Slave_Publish_SlaveReq_Callback(AlxLin* me, AlxLin_Frame* frame);
   * @param[in]		alxSerialPort
   * @param[in]		breakSyncOffset
   * @param[in]		rxb_ResponseTimeout_ms
+  * @param[in]		do_DBG
   */
 void AlxLin_Ctor
 (
 	AlxLin* me,
 	AlxSerialPort* alxSerialPort,
 	uint8_t breakSyncOffset,
-	uint16_t rxb_ResponseTimeout_ms
+	uint16_t rxb_ResponseTimeout_ms,
+	AlxIoPin* do_DBG
 )
 {
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
 	me->breakSyncOffset = breakSyncOffset;
 	me->rxb_ResponseTimeout_ms = rxb_ResponseTimeout_ms;
+	me->do_DBG = do_DBG;
 
 	// Fields
 	me->nad = ALX_LIN_NAD_BROADCAST;
@@ -100,7 +103,7 @@ void AlxLin_Ctor
 
 	// Variables
 	memset(&me->rxb, 0, sizeof(me->rxb));
-	AlxTimSw_Ctor(&me->rxb_ResponseTim, false);
+	AlxTimSw_Ctor(&me->rxb_ResponseTim);
 	me->slaveReqPending = false;
 
 	// Info
@@ -665,7 +668,7 @@ Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t time
 
 	// Start timer
 	AlxTimSw alxTimSw;
-	AlxTimSw_Ctor(&alxTimSw, false);
+	AlxTimSw_Ctor(&alxTimSw);
 	AlxTimSw_Start(&alxTimSw);
 
 	// Wait for master to transmit whole frame response with specified data length
@@ -767,6 +770,7 @@ void AlxLin_RxBuff_Flush(AlxLin* me)
 	memset(&me->rxb, 0, sizeof(me->rxb));
 	me->rxb.active = true;
 	AlxTimSw_Stop(&me->rxb_ResponseTim);
+	if (me->do_DBG != NULL) AlxIoPin_Reset(me->do_DBG);
 }
 
 /**
@@ -868,7 +872,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				Alx_Status status = AlxLin_GetSlaveFrameConfigFromId(me, id_Actual, &slaveFrameConfig);
 				if (status != Alx_Ok)
 				{
-					ALX_LIN_TRACE_DBG("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %02X", status, id_Actual);
+					ALX_LIN_TRACE_VRB("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %02X", status, id_Actual);
 					me->rxb.active = false;
 					return;	// Unsupported Frame FAIL: Ignore frame, no Slave_Subscribe_Err_Callback
 				}
@@ -940,6 +944,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 			}
 			else
 			{
+				if (me->do_DBG != NULL) AlxIoPin_Set(me->do_DBG);
 				AlxTimSw_Start(&me->rxb_ResponseTim);
 			}
 		}

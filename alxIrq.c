@@ -1,7 +1,7 @@
-﻿/**
+/**
   ******************************************************************************
-  * @file		alxOsKernel.h
-  * @brief		Auralix C Library - ALX OS Kernel Module
+  * @file		alxIrq.c
+  * @brief		Auralix C Library - ALX IRQ Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -26,22 +26,9 @@
   **/
 
 //******************************************************************************
-// Include Guard
-//******************************************************************************
-#ifndef ALX_OS_KERNEL_H
-#define ALX_OS_KERNEL_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-//******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxGlobal.h"
-#include "alxTrace.h"
-#include "alxAssert.h"
+#include "alxIrq.h"
 
 
 //******************************************************************************
@@ -51,39 +38,33 @@ extern "C" {
 
 
 //******************************************************************************
-// Preprocessor
-//******************************************************************************
-#define ALX_OS_KERNEL_FILE "alxOsKernel.h"
-
-// Assert //
-#if defined(ALX_OS_KERNEL_ASSERT_BKPT_ENABLE)
-	#define ALX_OS_KERNEL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_OS_KERNEL_FILE, expr)
-#elif defined(ALX_OS_KERNEL_ASSERT_TRACE_ENABLE)
-	#define ALX_OS_KERNEL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_OS_KERNEL_FILE, expr)
-#elif defined(ALX_OS_KERNEL_ASSERT_RST_ENABLE)
-	#define ALX_OS_KERNEL_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_KERNEL_FILE, expr)
-#else
-	#define ALX_OS_KERNEL_ASSERT(expr) do{} while (false)
-#endif
-
-// Trace //
-#if defined(ALX_OS_KERNEL_TRACE_ENABLE)
-	#define ALX_OS_KERNEL_TRACE_WRN(...) ALX_TRACE_WRN(ALX_OS_KERNEL_FILE, __VA_ARGS__)
-#else
-	#define ALX_OS_KERNEL_TRACE_WRN(...) do{} while (false)
-#endif
-
-
-//******************************************************************************
 // Functions
 //******************************************************************************
-void AlxOsKernel_Start(void);
+
+/**
+  * @brief
+  * @return key
+  */
+uint32_t AlxIrq_Lock(void)
+{
+	uint32_t key = 0;
+
+	key = __get_PRIMASK();
+	__disable_irq();
+	__DMB();	// TV: Ensure that all memory ops prior to this point are observed BEFORE memory ops AFTER this point
+
+	return key;
+}
+
+/**
+  * @brief
+  * @param[in] key
+  */
+void AlxIrq_Unlock(uint32_t key)
+{
+	__DMB();	// TV: Ensure that all memory ops prior to this point are observed BEFORE memory ops AFTER this point
+	__set_PRIMASK(key);
+}
 
 
 #endif	// #if defined(ALX_C_LIB)
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif	// #ifndef ALX_OS_KERNEL_H
