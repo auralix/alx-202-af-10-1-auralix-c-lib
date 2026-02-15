@@ -64,7 +64,8 @@ void AlxFiltGlitchBool_Ctor
 	// Variables
 	me->valRaw = valInitial;
 	me->valFiltered = valInitial;
-	AlxTimSw_Ctor(&me->tim, true);
+	AlxTimSw_Ctor(&me->tim);
+	AlxTimSw_Start(&me->tim);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -93,7 +94,8 @@ void AlxFiltGlitchBool_Ctor_us
 	// Variables
 	me->valRaw = valInitial;
 	me->valFiltered = valInitial;
-	AlxTimSw_Ctor(&me->tim, true);
+	AlxTimSw_Ctor(&me->tim);
+	AlxTimSw_Start(&me->tim);
 
 	// Info
 	me->wasCtorCalled = true;

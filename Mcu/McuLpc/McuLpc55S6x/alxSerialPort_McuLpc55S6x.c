@@ -200,9 +200,9 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
 	// Read
-	AlxGlobal_DisableIrq();
+	uint32_t key = AlxIrq_Lock();
 	Alx_Status status = AlxFifo_Read(&me->rxFifo, data, len);
-	AlxGlobal_EnableIrq();
+	AlxIrq_Unlock(key);
 
 	// Return
 	return status;
@@ -225,9 +225,9 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
 	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
 
 	// Read
-	AlxGlobal_DisableIrq();
+	uint32_t key = AlxIrq_Lock();
 	Alx_Status status = AlxFifo_ReadStrUntil(&me->rxFifo, str, delim, maxLen, numRead);
-	AlxGlobal_EnableIrq();
+	AlxIrq_Unlock(key);
 
 	// Return
 	return status;

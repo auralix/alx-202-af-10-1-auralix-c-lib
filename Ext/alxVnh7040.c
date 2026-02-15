@@ -96,8 +96,9 @@ void AlxVnh7040_Ctor
 	me->isInit = false;
 
 	// Ctor
-	AlxTimSw_Ctor(&me->timMonitoringPeriod, true);
-	AlxTimSw_Ctor(&me->tim, false);
+	AlxTimSw_Ctor(&me->timMonitoringPeriod);
+	AlxTimSw_Start(&me->timMonitoringPeriod);
+	AlxTimSw_Ctor(&me->tim);
 
 	// Parameters Const
 	me->MONITORING_PERIOD_MIN_us = 1000;							// minimum monitoring period

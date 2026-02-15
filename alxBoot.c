@@ -168,7 +168,8 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	ALX_BOOT_TRACE_INF("");
 	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Discovery START");
 	AlxTimSw fwCandDiscovery_AlxTimSw;
-	AlxTimSw_Ctor(&fwCandDiscovery_AlxTimSw, true);
+	AlxTimSw_Ctor(&fwCandDiscovery_AlxTimSw);
+	AlxTimSw_Start(&fwCandDiscovery_AlxTimSw);
 
 
 	//------------------------------------------------------------------------------
@@ -191,7 +192,8 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 
 	// Wait USB ready
 	AlxTimSw alxUsb_alxTimSw;
-	AlxTimSw_Ctor(&alxUsb_alxTimSw, true);
+	AlxTimSw_Ctor(&alxUsb_alxTimSw);
+	AlxTimSw_Start(&alxUsb_alxTimSw);
 	while (1)
 	{
 		// Handle USB
@@ -417,7 +419,8 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	ALX_BOOT_TRACE_INF("");
 	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Staging START");
 	AlxTimSw fwCandStaging_AlxTimSw;
-	AlxTimSw_Ctor(&fwCandStaging_AlxTimSw, true);
+	AlxTimSw_Ctor(&fwCandStaging_AlxTimSw);
+	AlxTimSw_Start(&fwCandStaging_AlxTimSw);
 
 
 	//------------------------------------------------------------------------------
@@ -526,7 +529,8 @@ Alx_Status AlxBoot_Boot_Run(AlxBoot* me)
 	ALX_BOOT_TRACE_INF("");
 	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - START");
 	AlxTimSw bootRun_AlxTimSw;
-	AlxTimSw_Ctor(&bootRun_AlxTimSw, true);
+	AlxTimSw_Ctor(&bootRun_AlxTimSw);
+	AlxTimSw_Start(&bootRun_AlxTimSw);
 
 
 	//------------------------------------------------------------------------------
@@ -666,7 +670,6 @@ static Alx_Status AlxBoot_App_Usb_FwCand_ChunkRead_Callback(void* ctx, void* chu
 		ALX_BOOT_TRACE_WRN("FAIL: flash_area_write() statusBoot %ld", statusBoot);
 		return Alx_Err;
 	}
-	#endif
 
 	// Calculate progress
 	uint8_t fwCandStaging_Progress_pct = ((uint64_t)me->fwCandStaging_LenWritten_bytes * 100) / ALX_MCU_BOOT_IMAGE_SIZE;
@@ -684,6 +687,7 @@ static Alx_Status AlxBoot_App_Usb_FwCand_ChunkRead_Callback(void* ctx, void* chu
 		// Callback
 		AlxBoot_App_Usb_FwCandStagingProgress_Callback(me, fwCandStaging_ProgressStep10_pct);
 	}
+	#endif
 
 	// Update length written
 	me->fwCandStaging_LenWritten_bytes = me->fwCandStaging_LenWritten_bytes + chunkLenActual;

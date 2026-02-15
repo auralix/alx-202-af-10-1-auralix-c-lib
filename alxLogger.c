@@ -313,7 +313,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 	uint32_t readLenTotal = 0;
 	uint32_t positionNew = 0;
 	AlxTimSw alxTimSw;
-	AlxTimSw_Ctor(&alxTimSw, false);
+	AlxTimSw_Ctor(&alxTimSw);
 	uint32_t readTime_ms = 0;
 	AlxLogger_Metadata md = {};
 	char log[ALX_LOGGER_LOG_LEN_MAX] = "";
@@ -609,7 +609,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 	uint32_t numOfLogsToWrite = 0;
 	bool wereOldestReadLogsDiscarded = false;
 	AlxTimSw alxTimSw;
-	AlxTimSw_Ctor(&alxTimSw, false);
+	AlxTimSw_Ctor(&alxTimSw);
 	uint32_t writeTime_ms = 0;
 
 
@@ -1429,8 +1429,8 @@ static Alx_Status AlxLogger_CreateDirAndFiles
 	AlxFs_File file = {};
 	AlxTimSw alxTimSw_DirFilePrepSingle;
 	AlxTimSw alxTimSw_DirFilePrepAll;
-	AlxTimSw_Ctor(&alxTimSw_DirFilePrepSingle, false);
-	AlxTimSw_Ctor(&alxTimSw_DirFilePrepAll, false);
+	AlxTimSw_Ctor(&alxTimSw_DirFilePrepSingle);
+	AlxTimSw_Ctor(&alxTimSw_DirFilePrepAll);
 	uint32_t dirFilePrepSingle_sec = 0;
 	uint32_t dirFilePrepAllTime_sec = 0;
 

@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * @file		alxFiltGlitchUint32.c
-  * @brief		Auralix C Library - ALX Fliter Glitch Uint32 Module
+  * @file		alxIrq.h
+  * @brief		Auralix C Library - ALX IRQ Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -26,9 +26,20 @@
   **/
 
 //******************************************************************************
+// Include Guard
+//******************************************************************************
+#ifndef ALX_IRQ_H
+#define ALX_IRQ_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+//******************************************************************************
 // Includes
 //******************************************************************************
-#include "alxFiltGlitchUint32.h"
+#include "alxGlobal.h"
 
 
 //******************************************************************************
@@ -38,63 +49,16 @@
 
 
 //******************************************************************************
-// Constructor
-//******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		valInitial
-  * @param[in]		stableTime_ms
-  */
-void AlxFiltGlitchUint32_Ctor
-(
-	AlxFiltGlitchUint32* me,
-	uint32_t valInitial,	// Initial output filtered value
-	float stableTime_ms		// Time that val must be stable to change output state to new val
-)
-{
-	// Ctor
-	AlxTimSw_Ctor(&me->tim);
-	AlxTimSw_Start(&me->tim);
-
-	// Parameters
-	me->valInitial = valInitial;
-	me->stableTime_ms = stableTime_ms;
-
-	// Variables
-	me->valOld = valInitial;
-	me->valFiltered = valInitial;
-
-	// Info
-	me->wasCtorCalled = true;
-}
-
-
-//******************************************************************************
 // Functions
 //******************************************************************************
-
-/**
-  * @brief
-  * @param[in,out]	me
-  * @param[in]		valNew
-  * @return
-  */
-uint32_t AlxFiltGlitchUint32_Process(AlxFiltGlitchUint32* me, uint32_t valNew)
-{
-	if (me->valOld != valNew) // Change detected
-	{
-		me->valOld = valNew;
-		AlxTimSw_Start(&me->tim);
-	}
-	float stableTime_ms = AlxTimSw_Get_us(&me->tim) / 1000.f;
-	if (stableTime_ms >= me->stableTime_ms)
-	{
-		me->valFiltered = valNew; // Change output filtered value
-	}
-	return me->valFiltered;
-}
+uint32_t AlxIrq_Lock(void);
+void AlxIrq_Unlock(uint32_t key);
 
 
 #endif	// #if defined(ALX_C_LIB)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif	// #ifndef ALX_IRQ_H
