@@ -17,7 +17,8 @@ alxConfig.h
 #define ALX_<module_name>_TRACE_ENABLE
 ```
 
-- Because trace level is defined globally, **different trace levels per module are NOT supported** (you can only enable/disable tracing per module)
+- Because trace level is defined globally, **different trace levels per module are NOT supported**
+	- You can only enable/disable tracing per module)
 
 ## Trace Level
 - Higher trace level number means more messages are traced
