@@ -22,31 +22,46 @@ alxConfig.h
 
 ## Trace Level
 - Higher trace level number means more messages are traced
-- Understand that **tracing always affects system behavior**, so use it reasonably and with understanding
+- Understand that **tracing always affects system behavior**, so use it reasonably
 
 #### ALX_TRACE_LEVEL_OFF - 0
 - Tracing is globally OFF, no messages are traced in any module
 
 #### ALX_TRACE_LEVEL_FTL - 1
-- Use `_FTL` level for fatal system errors tracing
+- Use `_FTL` level for tracing of fatal system errors
 - **NOTE:** After fatal system error, **system shall always reset**
 
 #### ALX_TRACE_LEVEL_ERR - 2
-- Use `_ERR` level for function errors 
-	- After that **function shall shall always reset**
+- Use `_ERR` level for tracing of errors after which function returns error status
+- **NOTE:** On APP layer, use it when operation finally fails (for example after all retries fail)
 
 #### ALX_TRACE_LEVEL_WRN - 3
-- TODO
+- Use `_WRN` level for tracing of warnings/obstacles after which function can still retry/continue
+- **NOTE:** On APP layer, use it for temporary problems during operation (for example retry 1, retry 2, ...), when operation may still end with success
 
 #### ALX_TRACE_LEVEL_INF - 4
-- Use `_INF` level for system states/events/statuses/variables tracing
+- Use `_INF` level for tracing of meaningful system/app information, such as:
+	- system state changes
+	- system events
+	- system statuses/variables
 - **NOTE:**
-	- The more APP specific (high level) the module is the more you can use in a ways that is most usable for this APP
-	- The more lower level module is (library, NOT APP specific) the less is recommended to use it, becae here tu neveš kaj bo smiselno tracing delat katare variables
+	- The higher-level the module is (more APP specific), the more `_INF` tracing can be used in a way that is useful for the APP
+	- The lower-level the module is (less APP specific), the less `_INF` tracing is recommended, because it's less clear what is useful to trace for the APP
 
 #### ALX_TRACE_LEVEL_DBG - 5
-- TODO
+- Use `_DBG` level for tracing of selected useful debug information, such as:
+	- function flow (enter/exit, where the function is)
+	- important function inputs & outputs (input argument values, return values)
+	- relevant variables at key debug points
 
 #### ALX_TRACE_LEVEL_VRB - 6
-- Use `_VRB` level for tracing 
-	- After that **function shall shall always reset**
+- Use `_VRB` level for tracing of full detailed internal/raw data, such as:
+	- registers
+	- raw packet bytes
+	- buffers
+	- flags
+	- counters
+	- intermediate variables
+- **ATTENTION:**
+	- When using `_VRB` level, it's recommended to disable tracing for most modules, so that only a few specific modules that we want to debug/analyze are traced
+		- This also drastically reduces the total number of trace messages, so impact on system behavior is minimized when using `_VRB` level

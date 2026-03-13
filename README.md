@@ -6,3 +6,4 @@
 
 ## Links
 - [Auralix C/C++ Library CLI Design Specifications](Doc/AuralixCCppLibCliDesSpec/AuralixCCppLibCliDesSpec.md)
+- [Auralix C/C++ Library Trace How-To Guide](Doc/AuralixCCppLibTraceHowToGuide/AuralixCCppLibTraceHowToGuide.md)
