@@ -1795,7 +1795,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 
 		if (syncNeeded)
 		{
-			status = AlxLogger_SyncLogWriteFile(me, &file, MIN(fileSize, me->md.write.pos), logBuffer, logBufferSize);
+//			status = AlxLogger_SyncLogWriteFile(me, &file, MIN(fileSize, me->md.write.pos), logBuffer, logBufferSize);	// TV: TODO
 			if (status != Alx_Ok)
 			{
 				break;
