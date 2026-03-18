@@ -83,7 +83,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 #if defined(ALX_NEWLIB_NANO)
 //#include <assert.h> // All headers from C11 Standard, commented out what not compatible with C99
-#include <complex.h>
+//#include <complex.h>
 #include <ctype.h>
 #include <errno.h>
 //#include <fenv.h>
@@ -105,7 +105,7 @@ extern "C" {
 #include <stdlib.h>
 #include <stdnoreturn.h>
 #include <string.h>
-#include <tgmath.h>
+//#include <tgmath.h>
 //#include <threads.h>
 #include <time.h>
 //#include <uchar.h>
