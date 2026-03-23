@@ -638,7 +638,9 @@ void AlxBoot_Boot_JumpToApp(AlxBoot* me)
 	}
 
 	// Set VTOR to the app's vector table address
+	#if defined(ALX_BOOT_B)
 	SCB->VTOR = (uint32_t)me->addrVt;
+	#endif
 
 	// Set app's stack pointer
 	__set_MSP(me->addrMsp);
