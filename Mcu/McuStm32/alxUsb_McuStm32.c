@@ -127,6 +127,7 @@ void AlxUsb_Ctor
 	// Variables
 	me->blockCount = 0;
 	me->blockLen_byte = 0;
+	me->isConnected = false;
 	me->isReady = false;
 
 	// Link
@@ -258,6 +259,7 @@ Alx_Status AlxUsb_DeInit(AlxUsb* me)
 	me->usbhMsc_isReady = false;
 	me->blockCount = 0;
 	me->blockLen_byte = 0;
+	me->isConnected = false;
 	me->isReady = false;
 
 	// Clear isInit
@@ -357,6 +359,22 @@ Alx_Status AlxUsb_GetCapacity(AlxUsb* me, uint32_t* blockCount, uint32_t* blockL
 	*blockCount = me->blockCount;
 	*blockLen_byte = me->blockLen_byte;
 	return Alx_Ok;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @retval			true
+  * @retval			false
+  */
+bool AlxUsb_IsConnected(AlxUsb* me)
+{
+	// Assert
+	ALX_USB_ASSERT(me->wasCtorCalled == true);
+	ALX_USB_ASSERT(me->isInit == true);
+
+	// Return
+	return me->isConnected;
 }
 
 /**
@@ -520,6 +538,7 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 	me->usbhMsc_isReady = false;
 	me->blockCount = 0;
 	me->blockLen_byte = 0;
+	me->isConnected = false;
 	me->isReady = false;
 
 	// Clear isInit
@@ -644,12 +663,14 @@ void HAL_HCD_Connect_Callback(HCD_HandleTypeDef* hhcd)
 {
 	#if defined(ALX_USBH)
 	USBH_LL_Connect(hhcd->pData);	// Always return OK
+	alxUsb_me->isConnected = true;
 	#endif
 }
 void HAL_HCD_Disconnect_Callback(HCD_HandleTypeDef* hhcd)
 {
 	#if defined(ALX_USBH)
 	USBH_LL_Disconnect(hhcd->pData);	// Always return OK
+	alxUsb_me->isConnected = false;
 	#endif
 }
 void HAL_HCD_PortEnabled_Callback(HCD_HandleTypeDef* hhcd)

@@ -90,6 +90,7 @@ Alx_Status AlxUsb_Init(AlxUsb* me);
 Alx_Status AlxUsb_DeInit(AlxUsb* me);
 Alx_Status AlxUsb_Handle(AlxUsb* me);
 Alx_Status AlxUsb_GetCapacity(AlxUsb* me, uint32_t* blockCount, uint32_t* blockLen_byte);
+bool AlxUsb_IsConnected(AlxUsb* me);
 bool AlxUsb_IsReady(AlxUsb* me);
 Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data);
 Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t numOfBlocks, uint32_t addr, uint8_t* data);

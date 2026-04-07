@@ -117,6 +117,7 @@ typedef struct
 	AlxFs* alxFs;
 	AlxId* alxId;
 	AlxUsb* alxUsb;
+	uint16_t usbConnectedTimeout_ms;
 	uint16_t usbReadyTimeout_ms;
 
 	// Variables
@@ -148,6 +149,7 @@ void AlxBoot_Ctor
 	AlxFs* alxFs,
 	AlxId* alxId,
 	AlxUsb* alxUsb,
+	uint16_t usbConnectedTimeout_ms,
 	uint16_t usbReadyTimeout_ms
 );
 

@@ -106,6 +106,7 @@ void AlxBoot_Ctor
 	AlxFs* alxFs,
 	AlxId* alxId,
 	AlxUsb* alxUsb,
+	uint16_t usbConnectedTimeout_ms,
 	uint16_t usbReadyTimeout_ms
 )
 {
@@ -113,6 +114,7 @@ void AlxBoot_Ctor
 	me->alxFs = alxFs;
 	me->alxId = alxId;
 	me->alxUsb = alxUsb;
+	me->usbConnectedTimeout_ms = usbConnectedTimeout_ms;
 	me->usbReadyTimeout_ms = usbReadyTimeout_ms;
 
 	// Variables
@@ -190,9 +192,42 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		return;
 	}
 
-	// Wait USB ready
+	// Wait USB connected
 	AlxTimSw alxUsb_alxTimSw;
 	AlxTimSw_Ctor(&alxUsb_alxTimSw);
+	AlxTimSw_Start(&alxUsb_alxTimSw);
+	while (1)
+	{
+		// Handle USB
+		status = AlxUsb_Handle(me->alxUsb);
+		if (status != Alx_Ok)
+		{
+			ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Handle() status %ld", status);
+			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
+			return;
+		}
+
+		// Check if USB connected
+		bool isConnected = AlxUsb_IsConnected(me->alxUsb);
+		if (isConnected)
+		{
+			break;
+		}
+
+		// Check if USB connected timeout
+		bool isTimeout = AlxTimSw_IsTimeout_ms(&alxUsb_alxTimSw, me->usbConnectedTimeout_ms);
+		if (isTimeout)
+		{
+			ALX_BOOT_TRACE_WRN("FAIL: 'USB NOT found' CheckUsbConnectedTimeout() usbConnectedTimeout_ms %lu", me->usbConnectedTimeout_ms);
+			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_UsbNotFound);
+			return;
+		}
+
+		// Delay
+		AlxDelay_ms(10);
+	}
+
+	// Wait USB ready
 	AlxTimSw_Start(&alxUsb_alxTimSw);
 	while (1)
 	{

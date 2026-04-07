@@ -90,6 +90,7 @@ typedef struct
 	// Variables
 	uint32_t blockCount;
 	uint32_t blockLen_byte;
+	bool isConnected;
 	bool isReady;
 
 	// Info
