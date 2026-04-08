@@ -295,6 +295,7 @@
 
 /*--- End of configuration options ---*/
 
+#include "alxConfig.h"
 #if defined(ALX_FATFS)	// TV: Added
 #include "ffconf_usr.h"
 #endif
