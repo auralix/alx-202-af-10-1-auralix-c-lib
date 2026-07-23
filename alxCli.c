@@ -213,7 +213,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// ID Command
 			//------------------------------------------------------------------------------
-			if (strcmp(me->buff, "id\r\n") == 0)
+			if (strcmp(me->buff, "id\r\n") == 0 && me->alxId != NULL)
 			{
 				// Get
 				bool fwIsBootUsed = AlxId_GetFwIsBootUsed(me->alxId);
