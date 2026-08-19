@@ -64,25 +64,55 @@ def Script(vsSolPath: str) -> None:
 		output directories per configuration.
 	"""
 
+
+	#-------------------------------------------------------------------------------
 	# Print
+	#-------------------------------------------------------------------------------
 	print("")
 	print("alxMsBuild.py - START")
+
+
+	#-------------------------------------------------------------------------------
+	# FwUp
+	#-------------------------------------------------------------------------------
 
 	# Build FwUp
 	cmd = (r'call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" &&'
 		r' msbuild "{vsSolPath}" /p:Configuration=FwUp /verbosity:quiet').format(vsSolPath=vsSolPath)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
+	# Print FwUp
+	print(cmdCompletedObj.stdout)
+	print(cmdCompletedObj.stderr, file=sys.stderr)
+
+	# Check FwUp
+	if cmdCompletedObj.returncode != 0:
+		print("alxMsBuild.py - ERROR: msbuild Configuration=FwUp FAILED with returncode " + str(cmdCompletedObj.returncode), file=sys.stderr)
+		sys.exit(1)
+
+
+	#-------------------------------------------------------------------------------
+	# NoBoot2
+	#-------------------------------------------------------------------------------
+
 	# Build NoBoot2
 	cmd = (r'call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" &&'
 		r' msbuild "{vsSolPath}" /p:Configuration=NoBoot2 /verbosity:quiet').format(vsSolPath=vsSolPath)
 	cmdCompletedObj = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
-	# Print
+	# Print NoBoot2
 	print(cmdCompletedObj.stdout)
 	print(cmdCompletedObj.stderr, file=sys.stderr)
 
+	# Check NoBoot2
+	if cmdCompletedObj.returncode != 0:
+		print("alxMsBuild.py - ERROR: msbuild Configuration=NoBoot2 FAILED with returncode " + str(cmdCompletedObj.returncode), file=sys.stderr)
+		sys.exit(1)
+
+
+	#-------------------------------------------------------------------------------
 	# Print
+	#-------------------------------------------------------------------------------
 	print("alxMsBuild.py - FINISH")
 	print("")
 
