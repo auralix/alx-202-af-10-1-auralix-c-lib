@@ -128,6 +128,8 @@ def Script(vsTargetPath: str, fwName: str, copyFwUpNoBoot2Enable: str, binRawBin
 	binDstDir = binSrcDir / binDstDirName
 	if binSrcDirName == 'NoBoot' or binSrcDirName == 'NoBoot2':
 		binDstName = binDstDirName + "_NoBoot.bin"
+	elif binSrcDirName == 'FwUp':
+		binDstName = binDstDirName + "_FwUp.bin"
 	else:
 		binDstName = binDstDirName + ".bin"
 	binDstPath = binDstDir / binDstName
