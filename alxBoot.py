@@ -153,6 +153,9 @@ def Script(vsTargetPath: str, imgSlotLenHexStr: str, bootLenHexStr: str) -> None
 	# Set signed bin path
 	binSignedPath = binSrcPath.with_name(binSrcPath.stem + '_Signed' + binSrcPath.suffix)
 
+	# Delete stale signed bin, so that failed signing can NOT silently reuse it
+	binSignedPath.unlink(missing_ok=True)
+
 	# Set imgtool path
 	imgtoolPath = pathlib.Path(vsTargetPath).parent.parent.parent / pathlib.Path(vsTargetPath).stem / "Sub" / "mcuboot" / "scripts" / "imgtool.py"
 
@@ -181,6 +184,14 @@ def Script(vsTargetPath: str, imgSlotLenHexStr: str, bootLenHexStr: str) -> None
 	# Print imgtool
 	print(cmdCompletedObj.stdout)
 	print(cmdCompletedObj.stderr, file=sys.stderr)
+
+	# Check imgtool
+	if cmdCompletedObj.returncode != 0:
+		print("alxBoot.py - ERROR: imgtool.py FAILED with returncode " + str(cmdCompletedObj.returncode), file=sys.stderr)
+		sys.exit(1)
+	if not binSignedPath.exists():
+		print("alxBoot.py - ERROR: imgtool.py did NOT generate " + str(binSignedPath), file=sys.stderr)
+		sys.exit(1)
 
 	# Print
 	print("DONE: Generate _Raw.bin & _Signed.bin")
