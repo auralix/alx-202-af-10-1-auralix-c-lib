@@ -50,6 +50,7 @@
   * @param[in]		fwVerMinor
   * @param[in]		fwVerPatch
   * @param[in]		fwIsBuildJobUsed
+  * @param[in]		fwBuildDateComp
   * @param[in]		fwIsBootUsed
   * @param[in]		fwBootIdAddr
   * @param[in]		hwInstanceKnownArr
@@ -69,6 +70,7 @@ void AlxId_Ctor
 	uint8_t fwVerMinor,
 	uint8_t fwVerPatch,
 	bool fwIsBuildJobUsed,
+	uint32_t fwBuildDateComp,
 	bool fwIsBootUsed,
 	uint32_t fwBootIdAddr,
 	AlxId_HwInstance* hwInstanceKnownArr,
@@ -87,7 +89,6 @@ void AlxId_Ctor
 	// Const
 	strcpy(me->fw.build.name, ALX_BUILD_NAME);
 	me->fw.build.date = ALX_BUILD_DATE;
-	me->fw.build.dateComp = ALX_BUILD_DATE_COMP;
 	me->fw.build.num = ALX_BUILD_NUM;
 	strcpy(me->fw.build.hash, ALX_BUILD_HASH);
 	strcpy(me->fw.build.hashShort, ALX_BUILD_HASH_SHORT);
@@ -101,6 +102,7 @@ void AlxId_Ctor
 	me->fw.verMinor = fwVerMinor;
 	me->fw.verPatch = fwVerPatch;
 	me->fw.isBuildJobUsed = fwIsBuildJobUsed;
+	me->fw.build.dateComp = fwBuildDateComp;
 
 	// Variables
 	if (me->fw.isBuildJobUsed)
@@ -334,6 +336,7 @@ void AlxId_Ctor
   * @param[in]		fwVerMinor
   * @param[in]		fwVerPatch
   * @param[in]		fwIsBuildJobUsed
+  * @param[in]		fwBuildDateComp
   * @param[in]		fwIsBootUsed
   * @param[in]		fwBootIdAddr
   * @param[in]		hwInstance
@@ -348,6 +351,7 @@ void AlxId_Ctor_NoHwId
 	uint8_t fwVerMinor,
 	uint8_t fwVerPatch,
 	bool fwIsBuildJobUsed,
+	uint32_t fwBuildDateComp,
 	bool fwIsBootUsed,
 	uint32_t fwBootIdAddr,
 	AlxId_HwInstance hwInstance,
@@ -366,6 +370,7 @@ void AlxId_Ctor_NoHwId
 		fwVerMinor,
 		fwVerPatch,
 		fwIsBuildJobUsed,
+		fwBuildDateComp,
 		fwIsBootUsed,
 		fwBootIdAddr,
 		NULL,
