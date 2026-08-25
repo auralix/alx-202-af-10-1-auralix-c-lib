@@ -366,7 +366,7 @@ void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));
 
 	// Local variables
-	AlxCanParser_FloatUnion myFloat;
+	AlxCanParser_FloatUnion myFloat = {};
 	myFloat.number = value;
 
 	// Set
@@ -409,7 +409,7 @@ void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
 
 	// Local variables
-	AlxCanParser_DoubleUnion myDouble;
+	AlxCanParser_DoubleUnion myDouble = {};
 	myDouble.number = value;
 
 	// Set
@@ -498,8 +498,14 @@ uint8_t AlxCanParser_GetUint8(AlxCan_Msg* msg, uint8_t byteOffset)
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
 
+	// Local variables
+	uint8_t value = 0;
+
+	// Get
+	value = msg->data[byteOffset];
+
 	// Return
-	return msg->data[byteOffset];
+	return value;
 }
 
 /**
@@ -513,8 +519,14 @@ int8_t AlxCanParser_GetInt8(AlxCan_Msg* msg, uint8_t byteOffset)
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
 
+	// Local variables
+	int8_t value = 0;
+
+	// Get
+	value = msg->data[byteOffset];
+
 	// Return
-	return msg->data[byteOffset];
+	return value;
 }
 
 /**
@@ -530,7 +542,7 @@ uint16_t AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2));
 
 	// Local variables
-	uint16_t value;
+	uint16_t value = 0;
 
 	// Get
 	switch (endian)
@@ -571,7 +583,7 @@ int16_t AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2));
 
 	// Local variables
-	uint16_t value;
+	uint16_t value = 0;
 
 	// Get
 	switch (endian)
@@ -612,7 +624,7 @@ uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));
 
 	// Local variables
-	uint32_t value;
+	uint32_t value = 0;
 
 	// Get
 	switch (endian)
@@ -657,7 +669,7 @@ int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));
 
 	// Local variables
-	int32_t value;
+	int32_t value = 0;
 
 	// Get
 	switch (endian)
@@ -702,7 +714,7 @@ uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
 
 	// Local variables
-	uint64_t value;
+	uint64_t value = 0;
 
 	// Get
 	switch (endian)
@@ -755,7 +767,7 @@ int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
 
 	// Local variables
-	int64_t value;
+	int64_t value = 0;
 
 	// Get
 	switch (endian)
@@ -808,7 +820,7 @@ float AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));
 
 	// Local variables
-	AlxCanParser_FloatUnion myFloat;
+	AlxCanParser_FloatUnion myFloat = {};
 
 	// Get
 	switch (endian)
@@ -853,7 +865,7 @@ double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
 
 	// Local variables
-	AlxCanParser_DoubleUnion myDouble;
+	AlxCanParser_DoubleUnion myDouble = {};
 
 	// Get
 	switch (endian)
@@ -933,17 +945,18 @@ static bool AlxCanParser_BitGet(uint8_t var, uint8_t bit)
 	// Local variables
 	uint8_t mask = 0x01;
 
-	// Prepare mask
+	// Prepare
 	mask = mask << bit;
 
-	// Check bit state
+	// Return
 	if ((var & mask) > 0)
 	{
 		return true;
 	}
-
-	// Return
-	return false;
+	else
+	{
+		return false;
+	}
 }
 static void AlxCanParser_BitSet(uint8_t* var, uint8_t bit, bool state)
 {
@@ -955,7 +968,6 @@ static void AlxCanParser_BitSet(uint8_t* var, uint8_t bit, bool state)
 	{
 		*var |= (0x01 << bit);
 	}
-	// Reset
 	else
 	{
 		*var &= ~(0x01 << bit);
