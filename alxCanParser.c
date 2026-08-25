@@ -698,14 +698,18 @@ double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	// #1 Prepare variables
 	AlxCanParser_DoubleUnion myDouble;
 
-	// #2 Copy data to float union according to endian selection
+	// #2 Copy data to double union according to endian selection
 	switch (endian)
 	{
 	case Big:
-		myDouble.bytes[3] = msg->data[byteOffset + 0];
-		myDouble.bytes[2] = msg->data[byteOffset + 1];
-		myDouble.bytes[1] = msg->data[byteOffset + 2];
-		myDouble.bytes[0] = msg->data[byteOffset + 3];
+		myDouble.bytes[7] = msg->data[byteOffset + 0];
+		myDouble.bytes[6] = msg->data[byteOffset + 1];
+		myDouble.bytes[5] = msg->data[byteOffset + 2];
+		myDouble.bytes[4] = msg->data[byteOffset + 3];
+		myDouble.bytes[3] = msg->data[byteOffset + 4];
+		myDouble.bytes[2] = msg->data[byteOffset + 5];
+		myDouble.bytes[1] = msg->data[byteOffset + 6];
+		myDouble.bytes[0] = msg->data[byteOffset + 7];
 		break;
 
 	case Little:
@@ -713,6 +717,10 @@ double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 		myDouble.bytes[1] = msg->data[byteOffset + 1];
 		myDouble.bytes[2] = msg->data[byteOffset + 2];
 		myDouble.bytes[3] = msg->data[byteOffset + 3];
+		myDouble.bytes[4] = msg->data[byteOffset + 4];
+		myDouble.bytes[5] = msg->data[byteOffset + 5];
+		myDouble.bytes[6] = msg->data[byteOffset + 6];
+		myDouble.bytes[7] = msg->data[byteOffset + 7];
 		break;
 	default: break;
 	}
