@@ -88,6 +88,7 @@ typedef enum
 //******************************************************************************
 // Functions
 //******************************************************************************
+// Bit numbering is LSB first, bitOffset 0 addresses the least significant bit of the byte
 void AlxCanParser_SetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, bool value);
 void AlxCanParser_SetUint8(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t value);
 void AlxCanParser_SetInt8(AlxCan_Msg* msg, uint8_t byteOffset, int8_t value);
