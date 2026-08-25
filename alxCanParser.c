@@ -247,10 +247,10 @@ void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 		msg->data[byteOffset + 1] = (uint8_t)(value >> 8);
 		msg->data[byteOffset + 2] = (uint8_t)(value >> 16);
 		msg->data[byteOffset + 3] = (uint8_t)(value >> 24);
-		msg->data[byteOffset + 3] = (uint8_t)(value >> 32);
-		msg->data[byteOffset + 3] = (uint8_t)(value >> 40);
-		msg->data[byteOffset + 3] = (uint8_t)(value >> 48);
-		msg->data[byteOffset + 3] = (uint8_t)(value >> 56);
+		msg->data[byteOffset + 4] = (uint8_t)(value >> 32);
+		msg->data[byteOffset + 5] = (uint8_t)(value >> 40);
+		msg->data[byteOffset + 6] = (uint8_t)(value >> 48);
+		msg->data[byteOffset + 7] = (uint8_t)(value >> 56);
 		break;
 	default: break;
 	}
@@ -285,10 +285,10 @@ void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 		msg->data[byteOffset + 1] = (uint8_t)(value >> 8);
 		msg->data[byteOffset + 2] = (uint8_t)(value >> 16);
 		msg->data[byteOffset + 3] = (uint8_t)(value >> 24);
-		msg->data[byteOffset + 3] = (uint8_t)(value >> 32);
-		msg->data[byteOffset + 3] = (uint8_t)(value >> 40);
-		msg->data[byteOffset + 3] = (uint8_t)(value >> 48);
-		msg->data[byteOffset + 3] = (uint8_t)(value >> 56);
+		msg->data[byteOffset + 4] = (uint8_t)(value >> 32);
+		msg->data[byteOffset + 5] = (uint8_t)(value >> 40);
+		msg->data[byteOffset + 6] = (uint8_t)(value >> 48);
+		msg->data[byteOffset + 7] = (uint8_t)(value >> 56);
 		break;
 	default: break;
 	}
