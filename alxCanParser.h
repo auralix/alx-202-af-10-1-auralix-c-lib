@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxCanParser.h
   * @brief		Auralix C Library - ALX CAN Parser Module
