@@ -56,8 +56,8 @@ typedef union
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static bool AlxCanParser_BitGet(uint8_t var, uint8_t bit);
-static void AlxCanParser_BitSet(uint8_t* var, uint8_t bit, bool state);
+static bool AlxCanParser_GetBit_Private(uint8_t byte, uint8_t bitOffset);
+static void AlxCanParser_SetBit_Private(uint8_t* byte, uint8_t bitOffset, bool value);
 
 
 //******************************************************************************
@@ -78,7 +78,7 @@ void AlxCanParser_SetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset,
 	ALX_CAN_PARSER_ASSERT(bitOffset < 8);
 
 	// Set
-	AlxCanParser_BitSet(&msg->data[byteOffset], bitOffset, value);
+	AlxCanParser_SetBit_Private(&msg->data[byteOffset], bitOffset, value);
 }
 
 /**
@@ -465,7 +465,7 @@ void AlxCanParser_SetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset
 	// Set
 	for (uint8_t i = 0; i < nOfBits; i++)
 	{
-		AlxCanParser_BitSet(&msg->data[byteOffset], bitOffset + i, AlxCanParser_BitGet(value, i));
+		AlxCanParser_SetBit_Private(&msg->data[byteOffset], bitOffset + i, AlxCanParser_GetBit_Private(value, i));
 	}
 }
 
@@ -484,7 +484,7 @@ bool AlxCanParser_GetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset)
 	ALX_CAN_PARSER_ASSERT(bitOffset < 8);
 
 	// Return
-	return AlxCanParser_BitGet(msg->data[byteOffset], bitOffset);
+	return AlxCanParser_GetBit_Private(msg->data[byteOffset], bitOffset);
 }
 
 /**
@@ -926,7 +926,7 @@ uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOff
 	// Get
 	for (uint8_t i = 0; i < nOfBits; i++)
 	{
-		AlxCanParser_BitSet(&value, i, AlxCanParser_BitGet(msg->data[byteOffset], bitOffset + i));
+		AlxCanParser_SetBit_Private(&value, i, AlxCanParser_GetBit_Private(msg->data[byteOffset], bitOffset + i));
 	}
 
 	// Return
@@ -937,19 +937,19 @@ uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOff
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static bool AlxCanParser_BitGet(uint8_t var, uint8_t bit)
+static bool AlxCanParser_GetBit_Private(uint8_t byte, uint8_t bitOffset)
 {
 	// Assert
-	ALX_CAN_PARSER_ASSERT(bit < 8);
+	ALX_CAN_PARSER_ASSERT(bitOffset < 8);
 
 	// Local variables
 	uint8_t mask = 0x01;
 
 	// Prepare
-	mask = mask << bit;
+	mask = mask << bitOffset;
 
 	// Return
-	if ((var & mask) > 0)
+	if ((byte & mask) > 0)
 	{
 		return true;
 	}
@@ -958,19 +958,19 @@ static bool AlxCanParser_BitGet(uint8_t var, uint8_t bit)
 		return false;
 	}
 }
-static void AlxCanParser_BitSet(uint8_t* var, uint8_t bit, bool state)
+static void AlxCanParser_SetBit_Private(uint8_t* byte, uint8_t bitOffset, bool value)
 {
 	// Assert
-	ALX_CAN_PARSER_ASSERT(bit < 8);
+	ALX_CAN_PARSER_ASSERT(bitOffset < 8);
 
 	// Set
-	if (state)
+	if (value)
 	{
-		*var |= (0x01 << bit);
+		*byte |= (0x01 << bitOffset);
 	}
 	else
 	{
-		*var &= ~(0x01 << bit);
+		*byte &= ~(0x01 << bitOffset);
 	}
 }
 
