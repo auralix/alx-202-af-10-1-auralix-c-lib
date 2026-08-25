@@ -74,8 +74,8 @@ static void AlxCanParser_SetBit_Private(uint8_t* byte, uint8_t bitOffset, bool v
 void AlxCanParser_SetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, bool value)
 {
 	// Assert
-	ALX_CAN_PARSER_ASSERT(byteOffset < 8);
-	ALX_CAN_PARSER_ASSERT(bitOffset < 8);
+	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
+	ALX_CAN_PARSER_ASSERT(bitOffset <= (8 - 1));
 
 	// Set
 	AlxCanParser_SetBit_Private(&msg->data[byteOffset], bitOffset, value);
@@ -459,8 +459,7 @@ void AlxCanParser_SetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
-	ALX_CAN_PARSER_ASSERT(bitOffset < 8);
-	ALX_CAN_PARSER_ASSERT(nOfBits < 8);
+	ALX_CAN_PARSER_ASSERT((bitOffset + nOfBits) <= 8);
 
 	// Set
 	for (uint8_t i = 0; i < nOfBits; i++)
@@ -481,7 +480,7 @@ bool AlxCanParser_GetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
-	ALX_CAN_PARSER_ASSERT(bitOffset < 8);
+	ALX_CAN_PARSER_ASSERT(bitOffset <= (8 - 1));
 
 	// Return
 	return AlxCanParser_GetBit_Private(msg->data[byteOffset], bitOffset);
@@ -917,8 +916,7 @@ uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOff
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
-	ALX_CAN_PARSER_ASSERT(bitOffset < 8);
-	ALX_CAN_PARSER_ASSERT(nOfBits < 8);
+	ALX_CAN_PARSER_ASSERT((bitOffset + nOfBits) <= 8);
 
 	// Local variables
 	uint8_t value = 0;
@@ -939,9 +937,6 @@ uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOff
 //******************************************************************************
 static bool AlxCanParser_GetBit_Private(uint8_t byte, uint8_t bitOffset)
 {
-	// Assert
-	ALX_CAN_PARSER_ASSERT(bitOffset < 8);
-
 	// Local variables
 	uint8_t mask = 0x01;
 
@@ -960,9 +955,6 @@ static bool AlxCanParser_GetBit_Private(uint8_t byte, uint8_t bitOffset)
 }
 static void AlxCanParser_SetBit_Private(uint8_t* byte, uint8_t bitOffset, bool value)
 {
-	// Assert
-	ALX_CAN_PARSER_ASSERT(bitOffset < 8);
-
 	// Set
 	if (value)
 	{
