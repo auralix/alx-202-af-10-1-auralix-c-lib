@@ -140,6 +140,7 @@ void AlxCanParser_SetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -174,6 +175,7 @@ void AlxCanParser_SetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -212,6 +214,7 @@ void AlxCanParser_SetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -250,6 +253,7 @@ void AlxCanParser_SetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -296,6 +300,7 @@ void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -342,6 +347,7 @@ void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -384,6 +390,7 @@ void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -434,6 +441,7 @@ void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -506,7 +514,7 @@ int8_t AlxCanParser_GetInt8(AlxCan_Msg* msg, uint8_t byteOffset)
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
 
 	// Return
-	return (int8_t)msg->data[byteOffset];
+	return msg->data[byteOffset];
 }
 
 /**
@@ -529,16 +537,19 @@ uint16_t AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	{
 		case Big:
 		{
-			value = (uint16_t)(msg->data[byteOffset + 1] << 0) | (uint16_t)(msg->data[byteOffset + 0] << 8);
+			value = (uint16_t)(msg->data[byteOffset + 1] << 0) |
+					(uint16_t)(msg->data[byteOffset + 0] << 8);
 			break;
 		}
 		case Little:
 		{
-			value = (uint16_t)(msg->data[byteOffset + 1] << 8) | (uint16_t)(msg->data[byteOffset + 0] << 0);
+			value = (uint16_t)(msg->data[byteOffset + 1] << 8) |
+					(uint16_t)(msg->data[byteOffset + 0] << 0);
 			break;
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -567,22 +578,25 @@ int16_t AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	{
 		case Big:
 		{
-			value = (uint16_t)(msg->data[byteOffset + 1] << 0) | (uint16_t)(msg->data[byteOffset + 0] << 8);
+			value = (uint16_t)(msg->data[byteOffset + 1] << 0) |
+					(uint16_t)(msg->data[byteOffset + 0] << 8);
 			break;
 		}
 		case Little:
 		{
-			value = (uint16_t)(msg->data[byteOffset + 1] << 8) | (uint16_t)(msg->data[byteOffset + 0] << 0);
+			value = (uint16_t)(msg->data[byteOffset + 1] << 8) |
+					(uint16_t)(msg->data[byteOffset + 0] << 0);
 			break;
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
 
 	// Return
-	return (int16_t)value;
+	return value;
 }
 
 /**
@@ -605,16 +619,23 @@ uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	{
 		case Big:
 		{
-			value = (uint32_t)(msg->data[byteOffset + 3] << 0) | (uint32_t)(msg->data[byteOffset + 2] << 8) | (uint32_t)(msg->data[byteOffset + 1] << 16) | (uint32_t)(msg->data[byteOffset + 0] << 24);
+			value = (uint32_t)(msg->data[byteOffset + 3] << 0) |
+					(uint32_t)(msg->data[byteOffset + 2] << 8) |
+					(uint32_t)(msg->data[byteOffset + 1] << 16) |
+					(uint32_t)(msg->data[byteOffset + 0] << 24);
 			break;
 		}
 		case Little:
 		{
-			value = (uint32_t)(msg->data[byteOffset + 3] << 24) | (uint32_t)(msg->data[byteOffset + 2] << 16) | (uint32_t)(msg->data[byteOffset + 1] << 8) | (uint32_t)(msg->data[byteOffset + 0] << 0);
+			value = (uint32_t)(msg->data[byteOffset + 3] << 24) |
+					(uint32_t)(msg->data[byteOffset + 2] << 16) |
+					(uint32_t)(msg->data[byteOffset + 1] << 8) |
+					(uint32_t)(msg->data[byteOffset + 0] << 0);
 			break;
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -643,16 +664,23 @@ int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	{
 		case Big:
 		{
-			value = (int32_t)(msg->data[byteOffset + 3] << 0) | (int32_t)(msg->data[byteOffset + 2] << 8) | (int32_t)(msg->data[byteOffset + 1] << 16) | (int32_t)(msg->data[byteOffset + 0] << 24);
+			value = (int32_t)(msg->data[byteOffset + 3] << 0) |
+					(int32_t)(msg->data[byteOffset + 2] << 8) |
+					(int32_t)(msg->data[byteOffset + 1] << 16) |
+					(int32_t)(msg->data[byteOffset + 0] << 24);
 			break;
 		}
 		case Little:
 		{
-			value = (int32_t)(msg->data[byteOffset + 3] << 24) | (int32_t)(msg->data[byteOffset + 2] << 16) | (int32_t)(msg->data[byteOffset + 1] << 8) | (int32_t)(msg->data[byteOffset + 0] << 0);
+			value = (int32_t)(msg->data[byteOffset + 3] << 24) |
+					(int32_t)(msg->data[byteOffset + 2] << 16) |
+					(int32_t)(msg->data[byteOffset + 1] << 8) |
+					(int32_t)(msg->data[byteOffset + 0] << 0);
 			break;
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -681,16 +709,31 @@ uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	{
 		case Big:
 		{
-			value = ((uint64_t)(msg->data[byteOffset + 7]) << 0) | ((uint64_t)(msg->data[byteOffset + 6]) << 8) | ((uint64_t)(msg->data[byteOffset + 5]) << 16) | ((uint64_t)(msg->data[byteOffset + 4]) << 24) | ((uint64_t)(msg->data[byteOffset + 3]) << 32) | ((uint64_t)(msg->data[byteOffset + 2]) << 40) | ((uint64_t)(msg->data[byteOffset + 1]) << 48) | ((uint64_t)(msg->data[byteOffset + 0]) << 56);
+			value = (uint64_t)(msg->data[byteOffset + 7]) << 0 |
+					(uint64_t)(msg->data[byteOffset + 6]) << 8 |
+					(uint64_t)(msg->data[byteOffset + 5]) << 16 |
+					(uint64_t)(msg->data[byteOffset + 4]) << 24 |
+					(uint64_t)(msg->data[byteOffset + 3]) << 32 |
+					(uint64_t)(msg->data[byteOffset + 2]) << 40 |
+					(uint64_t)(msg->data[byteOffset + 1]) << 48 |
+					(uint64_t)(msg->data[byteOffset + 0]) << 56;
 			break;
 		}
 		case Little:
 		{
-			value = ((uint64_t)(msg->data[byteOffset + 7]) << 56) | ((uint64_t)(msg->data[byteOffset + 6]) << 48) | ((uint64_t)(msg->data[byteOffset + 5]) << 40) | ((uint64_t)(msg->data[byteOffset + 4]) << 32) | ((uint64_t)(msg->data[byteOffset + 3]) << 24) | ((uint64_t)(msg->data[byteOffset + 2]) << 16) | ((uint64_t)(msg->data[byteOffset + 1]) << 8) | ((uint64_t)(msg->data[byteOffset + 0]) << 0);
+			value = (uint64_t)(msg->data[byteOffset + 7]) << 56 |
+					(uint64_t)(msg->data[byteOffset + 6]) << 48 |
+					(uint64_t)(msg->data[byteOffset + 5]) << 40 |
+					(uint64_t)(msg->data[byteOffset + 4]) << 32 |
+					(uint64_t)(msg->data[byteOffset + 3]) << 24 |
+					(uint64_t)(msg->data[byteOffset + 2]) << 16 |
+					(uint64_t)(msg->data[byteOffset + 1]) << 8 |
+					(uint64_t)(msg->data[byteOffset + 0]) << 0;
 			break;
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -719,16 +762,31 @@ int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	{
 		case Big:
 		{
-			value = ((int64_t)(msg->data[byteOffset + 7]) << 0) | ((int64_t)(msg->data[byteOffset + 6]) << 8) | ((int64_t)(msg->data[byteOffset + 5]) << 16) | ((int64_t)(msg->data[byteOffset + 4]) << 24) | ((int64_t)(msg->data[byteOffset + 3]) << 32) | ((int64_t)(msg->data[byteOffset + 2]) << 40) | ((int64_t)(msg->data[byteOffset + 1]) << 48) | ((int64_t)(msg->data[byteOffset + 0]) << 56);
+			value = (int64_t)(msg->data[byteOffset + 7]) << 0 |
+					(int64_t)(msg->data[byteOffset + 6]) << 8 |
+					(int64_t)(msg->data[byteOffset + 5]) << 16 |
+					(int64_t)(msg->data[byteOffset + 4]) << 24 |
+					(int64_t)(msg->data[byteOffset + 3]) << 32 |
+					(int64_t)(msg->data[byteOffset + 2]) << 40 |
+					(int64_t)(msg->data[byteOffset + 1]) << 48 |
+					(int64_t)(msg->data[byteOffset + 0]) << 56;
 			break;
 		}
 		case Little:
 		{
-			value = ((int64_t)(msg->data[byteOffset + 7]) << 56) | ((int64_t)(msg->data[byteOffset + 6]) << 48) | ((int64_t)(msg->data[byteOffset + 5]) << 40) | ((int64_t)(msg->data[byteOffset + 4]) << 32) | ((int64_t)(msg->data[byteOffset + 3]) << 24) | ((int64_t)(msg->data[byteOffset + 2]) << 16) | ((int64_t)(msg->data[byteOffset + 1]) << 8) | ((int64_t)(msg->data[byteOffset + 0]) << 0);
+			value = (int64_t)(msg->data[byteOffset + 7]) << 56 |
+					(int64_t)(msg->data[byteOffset + 6]) << 48 |
+					(int64_t)(msg->data[byteOffset + 5]) << 40 |
+					(int64_t)(msg->data[byteOffset + 4]) << 32 |
+					(int64_t)(msg->data[byteOffset + 3]) << 24 |
+					(int64_t)(msg->data[byteOffset + 2]) << 16 |
+					(int64_t)(msg->data[byteOffset + 1]) << 8 |
+					(int64_t)(msg->data[byteOffset + 0]) << 0;
 			break;
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -773,6 +831,7 @@ float AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -825,6 +884,7 @@ double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 		}
 		default:
 		{
+			ALX_CAN_PARSER_ASSERT(false);	// We should never get here
 			break;
 		}
 	}
@@ -852,7 +912,7 @@ uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOff
 	uint8_t value = 0;
 
 	// Get
-	for (uint8_t i = 0; i < nOfBits; i++)				// copy bits to selected positions
+	for (uint8_t i = 0; i < nOfBits; i++)
 	{
 		AlxCanParser_BitSet(&value, i, AlxCanParser_BitGet(msg->data[byteOffset], bitOffset + i));
 	}
