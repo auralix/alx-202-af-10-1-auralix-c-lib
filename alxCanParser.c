@@ -42,22 +42,22 @@
 //******************************************************************************
 typedef union
 {
-	float number;
-	uint8_t bytes[4];
-} AlxCanParser_FloatUnion;
+	float _float;
+	uint8_t raw[4];
+} AlxCanParser_Float;
 
 typedef union
 {
-	double number;
-	uint8_t bytes[8];
-} AlxCanParser_DoubleUnion;
+	double _double;
+	uint8_t raw[8];
+} AlxCanParser_Double;
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
 static bool AlxCanParser_GetBit_Private(uint8_t byte, uint8_t bitOffset);
-static void AlxCanParser_SetBit_Private(uint8_t* byte, uint8_t bitOffset, bool value);
+static void AlxCanParser_SetBit_Private(uint8_t* byte, uint8_t bitOffset, bool val);
 
 
 //******************************************************************************
@@ -69,46 +69,46 @@ static void AlxCanParser_SetBit_Private(uint8_t* byte, uint8_t bitOffset, bool v
   * @param[in,out]	msg
   * @param[in]		byteOffset
   * @param[in]		bitOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, bool value)
+void AlxCanParser_SetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, bool val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
 	ALX_CAN_PARSER_ASSERT(bitOffset <= (8 - 1));
 
 	// Set
-	AlxCanParser_SetBit_Private(&msg->data[byteOffset], bitOffset, value);
+	AlxCanParser_SetBit_Private(&msg->data[byteOffset], bitOffset, val);
 }
 
 /**
   * @brief
   * @param[in,out]	msg
   * @param[in]		byteOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetUint8(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t value)
+void AlxCanParser_SetUint8(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
 
 	// Set
-	msg->data[byteOffset] = value;
+	msg->data[byteOffset] = val;
 }
 
 /**
   * @brief
   * @param[in,out]	msg
   * @param[in]		byteOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetInt8(AlxCan_Msg* msg, uint8_t byteOffset, int8_t value)
+void AlxCanParser_SetInt8(AlxCan_Msg* msg, uint8_t byteOffset, int8_t val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
 
 	// Set
-	msg->data[byteOffset] = (uint8_t)value;
+	msg->data[byteOffset] = (uint8_t)val;
 }
 
 /**
@@ -116,9 +116,9 @@ void AlxCanParser_SetInt8(AlxCan_Msg* msg, uint8_t byteOffset, int8_t value)
   * @param[in,out]	msg
   * @param[in]		endian
   * @param[in]		byteOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint16_t value)
+void AlxCanParser_SetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint16_t val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2));
@@ -128,14 +128,14 @@ void AlxCanParser_SetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	{
 		case Big:
 		{
-			msg->data[byteOffset + 0] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 1] = (uint8_t)value;
+			msg->data[byteOffset + 0] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 1] = (uint8_t)val;
 			break;
 		}
 		case Little:
 		{
-			msg->data[byteOffset + 1] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 0] = (uint8_t)value;
+			msg->data[byteOffset + 1] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 0] = (uint8_t)val;
 			break;
 		}
 		default:
@@ -151,9 +151,9 @@ void AlxCanParser_SetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
   * @param[in,out]	msg
   * @param[in]		endian
   * @param[in]		byteOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int16_t value)
+void AlxCanParser_SetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int16_t val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2));
@@ -163,14 +163,14 @@ void AlxCanParser_SetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 	{
 		case Big:
 		{
-			msg->data[byteOffset + 0] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 1] = (uint8_t)value;
+			msg->data[byteOffset + 0] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 1] = (uint8_t)val;
 			break;
 		}
 		case Little:
 		{
-			msg->data[byteOffset + 1] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 0] = (uint8_t)value;
+			msg->data[byteOffset + 1] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 0] = (uint8_t)val;
 			break;
 		}
 		default:
@@ -186,9 +186,9 @@ void AlxCanParser_SetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
   * @param[in,out]	msg
   * @param[in]		endian
   * @param[in]		byteOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint32_t value)
+void AlxCanParser_SetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint32_t val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));
@@ -198,18 +198,18 @@ void AlxCanParser_SetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	{
 		case Big:
 		{
-			msg->data[byteOffset + 0] = (uint8_t)(value >> 24);
-			msg->data[byteOffset + 1] = (uint8_t)(value >> 16);
-			msg->data[byteOffset + 2] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 3] = (uint8_t)value;
+			msg->data[byteOffset + 0] = (uint8_t)(val >> 24);
+			msg->data[byteOffset + 1] = (uint8_t)(val >> 16);
+			msg->data[byteOffset + 2] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 3] = (uint8_t)val;
 			break;
 		}
 		case Little:
 		{
-			msg->data[byteOffset + 0] = (uint8_t)value;
-			msg->data[byteOffset + 1] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 2] = (uint8_t)(value >> 16);
-			msg->data[byteOffset + 3] = (uint8_t)(value >> 24);
+			msg->data[byteOffset + 0] = (uint8_t)val;
+			msg->data[byteOffset + 1] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 2] = (uint8_t)(val >> 16);
+			msg->data[byteOffset + 3] = (uint8_t)(val >> 24);
 			break;
 		}
 		default:
@@ -225,9 +225,9 @@ void AlxCanParser_SetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
   * @param[in,out]	msg
   * @param[in]		endian
   * @param[in]		byteOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int32_t value)
+void AlxCanParser_SetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int32_t val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));
@@ -237,18 +237,18 @@ void AlxCanParser_SetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 	{
 		case Big:
 		{
-			msg->data[byteOffset + 0] = (uint8_t)(value >> 24);
-			msg->data[byteOffset + 1] = (uint8_t)(value >> 16);
-			msg->data[byteOffset + 2] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 3] = (uint8_t)value;
+			msg->data[byteOffset + 0] = (uint8_t)(val >> 24);
+			msg->data[byteOffset + 1] = (uint8_t)(val >> 16);
+			msg->data[byteOffset + 2] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 3] = (uint8_t)val;
 			break;
 		}
 		case Little:
 		{
-			msg->data[byteOffset + 0] = (uint8_t)value;
-			msg->data[byteOffset + 1] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 2] = (uint8_t)(value >> 16);
-			msg->data[byteOffset + 3] = (uint8_t)(value >> 24);
+			msg->data[byteOffset + 0] = (uint8_t)val;
+			msg->data[byteOffset + 1] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 2] = (uint8_t)(val >> 16);
+			msg->data[byteOffset + 3] = (uint8_t)(val >> 24);
 			break;
 		}
 		default:
@@ -264,9 +264,9 @@ void AlxCanParser_SetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
   * @param[in,out]	msg
   * @param[in]		endian
   * @param[in]		byteOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint64_t value)
+void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint64_t val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
@@ -276,26 +276,26 @@ void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	{
 		case Big:
 		{
-			msg->data[byteOffset + 0] = (uint8_t)(value >> 56);
-			msg->data[byteOffset + 1] = (uint8_t)(value >> 48);
-			msg->data[byteOffset + 2] = (uint8_t)(value >> 40);
-			msg->data[byteOffset + 3] = (uint8_t)(value >> 32);
-			msg->data[byteOffset + 4] = (uint8_t)(value >> 24);
-			msg->data[byteOffset + 5] = (uint8_t)(value >> 16);
-			msg->data[byteOffset + 6] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 7] = (uint8_t)value;
+			msg->data[byteOffset + 0] = (uint8_t)(val >> 56);
+			msg->data[byteOffset + 1] = (uint8_t)(val >> 48);
+			msg->data[byteOffset + 2] = (uint8_t)(val >> 40);
+			msg->data[byteOffset + 3] = (uint8_t)(val >> 32);
+			msg->data[byteOffset + 4] = (uint8_t)(val >> 24);
+			msg->data[byteOffset + 5] = (uint8_t)(val >> 16);
+			msg->data[byteOffset + 6] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 7] = (uint8_t)val;
 			break;
 		}
 		case Little:
 		{
-			msg->data[byteOffset + 0] = (uint8_t)value;
-			msg->data[byteOffset + 1] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 2] = (uint8_t)(value >> 16);
-			msg->data[byteOffset + 3] = (uint8_t)(value >> 24);
-			msg->data[byteOffset + 4] = (uint8_t)(value >> 32);
-			msg->data[byteOffset + 5] = (uint8_t)(value >> 40);
-			msg->data[byteOffset + 6] = (uint8_t)(value >> 48);
-			msg->data[byteOffset + 7] = (uint8_t)(value >> 56);
+			msg->data[byteOffset + 0] = (uint8_t)val;
+			msg->data[byteOffset + 1] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 2] = (uint8_t)(val >> 16);
+			msg->data[byteOffset + 3] = (uint8_t)(val >> 24);
+			msg->data[byteOffset + 4] = (uint8_t)(val >> 32);
+			msg->data[byteOffset + 5] = (uint8_t)(val >> 40);
+			msg->data[byteOffset + 6] = (uint8_t)(val >> 48);
+			msg->data[byteOffset + 7] = (uint8_t)(val >> 56);
 			break;
 		}
 		default:
@@ -311,9 +311,9 @@ void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
   * @param[in,out]	msg
   * @param[in]		endian
   * @param[in]		byteOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int64_t value)
+void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int64_t val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
@@ -323,26 +323,26 @@ void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 	{
 		case Big:
 		{
-			msg->data[byteOffset + 0] = (uint8_t)(value >> 56);
-			msg->data[byteOffset + 1] = (uint8_t)(value >> 48);
-			msg->data[byteOffset + 2] = (uint8_t)(value >> 40);
-			msg->data[byteOffset + 3] = (uint8_t)(value >> 32);
-			msg->data[byteOffset + 4] = (uint8_t)(value >> 24);
-			msg->data[byteOffset + 5] = (uint8_t)(value >> 16);
-			msg->data[byteOffset + 6] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 7] = (uint8_t)value;
+			msg->data[byteOffset + 0] = (uint8_t)(val >> 56);
+			msg->data[byteOffset + 1] = (uint8_t)(val >> 48);
+			msg->data[byteOffset + 2] = (uint8_t)(val >> 40);
+			msg->data[byteOffset + 3] = (uint8_t)(val >> 32);
+			msg->data[byteOffset + 4] = (uint8_t)(val >> 24);
+			msg->data[byteOffset + 5] = (uint8_t)(val >> 16);
+			msg->data[byteOffset + 6] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 7] = (uint8_t)val;
 			break;
 		}
 		case Little:
 		{
-			msg->data[byteOffset + 0] = (uint8_t)value;
-			msg->data[byteOffset + 1] = (uint8_t)(value >> 8);
-			msg->data[byteOffset + 2] = (uint8_t)(value >> 16);
-			msg->data[byteOffset + 3] = (uint8_t)(value >> 24);
-			msg->data[byteOffset + 4] = (uint8_t)(value >> 32);
-			msg->data[byteOffset + 5] = (uint8_t)(value >> 40);
-			msg->data[byteOffset + 6] = (uint8_t)(value >> 48);
-			msg->data[byteOffset + 7] = (uint8_t)(value >> 56);
+			msg->data[byteOffset + 0] = (uint8_t)val;
+			msg->data[byteOffset + 1] = (uint8_t)(val >> 8);
+			msg->data[byteOffset + 2] = (uint8_t)(val >> 16);
+			msg->data[byteOffset + 3] = (uint8_t)(val >> 24);
+			msg->data[byteOffset + 4] = (uint8_t)(val >> 32);
+			msg->data[byteOffset + 5] = (uint8_t)(val >> 40);
+			msg->data[byteOffset + 6] = (uint8_t)(val >> 48);
+			msg->data[byteOffset + 7] = (uint8_t)(val >> 56);
 			break;
 		}
 		default:
@@ -358,34 +358,34 @@ void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
   * @param[in,out]	msg
   * @param[in]		endian
   * @param[in]		byteOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, float value)
+void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, float val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));
 
 	// Local variables
-	AlxCanParser_FloatUnion myFloat = {};
-	myFloat.number = value;
+	AlxCanParser_Float _val = {};
+	_val._float = val;
 
 	// Set
 	switch (endian)
 	{
 		case Big:
 		{
-			msg->data[byteOffset + 0] = myFloat.bytes[3];
-			msg->data[byteOffset + 1] = myFloat.bytes[2];
-			msg->data[byteOffset + 2] = myFloat.bytes[1];
-			msg->data[byteOffset + 3] = myFloat.bytes[0];
+			msg->data[byteOffset + 0] = _val.raw[3];
+			msg->data[byteOffset + 1] = _val.raw[2];
+			msg->data[byteOffset + 2] = _val.raw[1];
+			msg->data[byteOffset + 3] = _val.raw[0];
 			break;
 		}
 		case Little:
 		{
-			msg->data[byteOffset + 0] = myFloat.bytes[0];
-			msg->data[byteOffset + 1] = myFloat.bytes[1];
-			msg->data[byteOffset + 2] = myFloat.bytes[2];
-			msg->data[byteOffset + 3] = myFloat.bytes[3];
+			msg->data[byteOffset + 0] = _val.raw[0];
+			msg->data[byteOffset + 1] = _val.raw[1];
+			msg->data[byteOffset + 2] = _val.raw[2];
+			msg->data[byteOffset + 3] = _val.raw[3];
 			break;
 		}
 		default:
@@ -401,42 +401,42 @@ void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
   * @param[in,out]	msg
   * @param[in]		endian
   * @param[in]		byteOffset
-  * @param[in]		value
+  * @param[in]		val
   */
-void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, double value)
+void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, double val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
 
 	// Local variables
-	AlxCanParser_DoubleUnion myDouble = {};
-	myDouble.number = value;
+	AlxCanParser_Double _val = {};
+	_val._double = val;
 
 	// Set
 	switch (endian)
 	{
 		case Big:
 		{
-			msg->data[byteOffset + 0] = myDouble.bytes[7];
-			msg->data[byteOffset + 1] = myDouble.bytes[6];
-			msg->data[byteOffset + 2] = myDouble.bytes[5];
-			msg->data[byteOffset + 3] = myDouble.bytes[4];
-			msg->data[byteOffset + 4] = myDouble.bytes[3];
-			msg->data[byteOffset + 5] = myDouble.bytes[2];
-			msg->data[byteOffset + 6] = myDouble.bytes[1];
-			msg->data[byteOffset + 7] = myDouble.bytes[0];
+			msg->data[byteOffset + 0] = _val.raw[7];
+			msg->data[byteOffset + 1] = _val.raw[6];
+			msg->data[byteOffset + 2] = _val.raw[5];
+			msg->data[byteOffset + 3] = _val.raw[4];
+			msg->data[byteOffset + 4] = _val.raw[3];
+			msg->data[byteOffset + 5] = _val.raw[2];
+			msg->data[byteOffset + 6] = _val.raw[1];
+			msg->data[byteOffset + 7] = _val.raw[0];
 			break;
 		}
 		case Little:
 		{
-			msg->data[byteOffset + 0] = myDouble.bytes[0];
-			msg->data[byteOffset + 1] = myDouble.bytes[1];
-			msg->data[byteOffset + 2] = myDouble.bytes[2];
-			msg->data[byteOffset + 3] = myDouble.bytes[3];
-			msg->data[byteOffset + 4] = myDouble.bytes[4];
-			msg->data[byteOffset + 5] = myDouble.bytes[5];
-			msg->data[byteOffset + 6] = myDouble.bytes[6];
-			msg->data[byteOffset + 7] = myDouble.bytes[7];
+			msg->data[byteOffset + 0] = _val.raw[0];
+			msg->data[byteOffset + 1] = _val.raw[1];
+			msg->data[byteOffset + 2] = _val.raw[2];
+			msg->data[byteOffset + 3] = _val.raw[3];
+			msg->data[byteOffset + 4] = _val.raw[4];
+			msg->data[byteOffset + 5] = _val.raw[5];
+			msg->data[byteOffset + 6] = _val.raw[6];
+			msg->data[byteOffset + 7] = _val.raw[7];
 			break;
 		}
 		default:
@@ -452,19 +452,19 @@ void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
   * @param[in,out]	msg
   * @param[in]		byteOffset
   * @param[in]		bitOffset
-  * @param[in]		nOfBits
-  * @param[in]		value
+  * @param[in]		numOfBits
+  * @param[in]		val
   */
-void AlxCanParser_SetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, uint8_t nOfBits, uint8_t value)
+void AlxCanParser_SetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, uint8_t numOfBits, uint8_t val)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
-	ALX_CAN_PARSER_ASSERT((bitOffset + nOfBits) <= 8);
+	ALX_CAN_PARSER_ASSERT((bitOffset + numOfBits) <= 8);
 
 	// Set
-	for (uint8_t i = 0; i < nOfBits; i++)
+	for (uint8_t i = 0; i < numOfBits; i++)
 	{
-		AlxCanParser_SetBit_Private(&msg->data[byteOffset], bitOffset + i, AlxCanParser_GetBit_Private(value, i));
+		AlxCanParser_SetBit_Private(&msg->data[byteOffset], bitOffset + i, AlxCanParser_GetBit_Private(val, i));
 	}
 }
 
@@ -498,13 +498,13 @@ uint8_t AlxCanParser_GetUint8(AlxCan_Msg* msg, uint8_t byteOffset)
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
 
 	// Local variables
-	uint8_t value = 0;
+	uint8_t val = 0;
 
 	// Get
-	value = msg->data[byteOffset];
+	val = msg->data[byteOffset];
 
 	// Return
-	return value;
+	return val;
 }
 
 /**
@@ -519,13 +519,13 @@ int8_t AlxCanParser_GetInt8(AlxCan_Msg* msg, uint8_t byteOffset)
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
 
 	// Local variables
-	int8_t value = 0;
+	int8_t val = 0;
 
 	// Get
-	value = msg->data[byteOffset];
+	val = msg->data[byteOffset];
 
 	// Return
-	return value;
+	return val;
 }
 
 /**
@@ -541,20 +541,20 @@ uint16_t AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2));
 
 	// Local variables
-	uint16_t value = 0;
+	uint16_t val = 0;
 
 	// Get
 	switch (endian)
 	{
 		case Big:
 		{
-			value = ((uint16_t)msg->data[byteOffset + 1] << 0) |
+			val = ((uint16_t)msg->data[byteOffset + 1] << 0) |
 					((uint16_t)msg->data[byteOffset + 0] << 8);
 			break;
 		}
 		case Little:
 		{
-			value = ((uint16_t)msg->data[byteOffset + 1] << 8) |
+			val = ((uint16_t)msg->data[byteOffset + 1] << 8) |
 					((uint16_t)msg->data[byteOffset + 0] << 0);
 			break;
 		}
@@ -566,7 +566,7 @@ uint16_t AlxCanParser_GetUint16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	}
 
 	// Return
-	return value;
+	return val;
 }
 
 /**
@@ -582,20 +582,20 @@ int16_t AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 2));
 
 	// Local variables
-	int16_t value = 0;
+	int16_t val = 0;
 
 	// Get
 	switch (endian)
 	{
 		case Big:
 		{
-			value = ((uint16_t)msg->data[byteOffset + 1] << 0) |
+			val = ((uint16_t)msg->data[byteOffset + 1] << 0) |
 					((uint16_t)msg->data[byteOffset + 0] << 8);
 			break;
 		}
 		case Little:
 		{
-			value = ((uint16_t)msg->data[byteOffset + 1] << 8) |
+			val = ((uint16_t)msg->data[byteOffset + 1] << 8) |
 					((uint16_t)msg->data[byteOffset + 0] << 0);
 			break;
 		}
@@ -607,7 +607,7 @@ int16_t AlxCanParser_GetInt16(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	}
 
 	// Return
-	return value;
+	return val;
 }
 
 /**
@@ -623,14 +623,14 @@ uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));
 
 	// Local variables
-	uint32_t value = 0;
+	uint32_t val = 0;
 
 	// Get
 	switch (endian)
 	{
 		case Big:
 		{
-			value = ((uint32_t)msg->data[byteOffset + 3] << 0) |
+			val = ((uint32_t)msg->data[byteOffset + 3] << 0) |
 					((uint32_t)msg->data[byteOffset + 2] << 8) |
 					((uint32_t)msg->data[byteOffset + 1] << 16) |
 					((uint32_t)msg->data[byteOffset + 0] << 24);
@@ -638,7 +638,7 @@ uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 		}
 		case Little:
 		{
-			value = ((uint32_t)msg->data[byteOffset + 3] << 24) |
+			val = ((uint32_t)msg->data[byteOffset + 3] << 24) |
 					((uint32_t)msg->data[byteOffset + 2] << 16) |
 					((uint32_t)msg->data[byteOffset + 1] << 8) |
 					((uint32_t)msg->data[byteOffset + 0] << 0);
@@ -652,7 +652,7 @@ uint32_t AlxCanParser_GetUint32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	}
 
 	// Return
-	return value;
+	return val;
 }
 
 /**
@@ -668,14 +668,14 @@ int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));
 
 	// Local variables
-	int32_t value = 0;
+	int32_t val = 0;
 
 	// Get
 	switch (endian)
 	{
 		case Big:
 		{
-			value = ((uint32_t)msg->data[byteOffset + 3] << 0) |
+			val = ((uint32_t)msg->data[byteOffset + 3] << 0) |
 					((uint32_t)msg->data[byteOffset + 2] << 8) |
 					((uint32_t)msg->data[byteOffset + 1] << 16) |
 					((uint32_t)msg->data[byteOffset + 0] << 24);
@@ -683,7 +683,7 @@ int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 		}
 		case Little:
 		{
-			value = ((uint32_t)msg->data[byteOffset + 3] << 24) |
+			val = ((uint32_t)msg->data[byteOffset + 3] << 24) |
 					((uint32_t)msg->data[byteOffset + 2] << 16) |
 					((uint32_t)msg->data[byteOffset + 1] << 8) |
 					((uint32_t)msg->data[byteOffset + 0] << 0);
@@ -697,7 +697,7 @@ int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	}
 
 	// Return
-	return value;
+	return val;
 }
 
 /**
@@ -713,14 +713,14 @@ uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
 
 	// Local variables
-	uint64_t value = 0;
+	uint64_t val = 0;
 
 	// Get
 	switch (endian)
 	{
 		case Big:
 		{
-			value = ((uint64_t)msg->data[byteOffset + 7] << 0) |
+			val = ((uint64_t)msg->data[byteOffset + 7] << 0) |
 					((uint64_t)msg->data[byteOffset + 6] << 8) |
 					((uint64_t)msg->data[byteOffset + 5] << 16) |
 					((uint64_t)msg->data[byteOffset + 4] << 24) |
@@ -732,7 +732,7 @@ uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 		}
 		case Little:
 		{
-			value = ((uint64_t)msg->data[byteOffset + 7] << 56) |
+			val = ((uint64_t)msg->data[byteOffset + 7] << 56) |
 					((uint64_t)msg->data[byteOffset + 6] << 48) |
 					((uint64_t)msg->data[byteOffset + 5] << 40) |
 					((uint64_t)msg->data[byteOffset + 4] << 32) |
@@ -750,7 +750,7 @@ uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 	}
 
 	// Return
-	return value;
+	return val;
 }
 
 /**
@@ -766,14 +766,14 @@ int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
 
 	// Local variables
-	int64_t value = 0;
+	int64_t val = 0;
 
 	// Get
 	switch (endian)
 	{
 		case Big:
 		{
-			value = ((uint64_t)msg->data[byteOffset + 7] << 0) |
+			val = ((uint64_t)msg->data[byteOffset + 7] << 0) |
 					((uint64_t)msg->data[byteOffset + 6] << 8) |
 					((uint64_t)msg->data[byteOffset + 5] << 16) |
 					((uint64_t)msg->data[byteOffset + 4] << 24) |
@@ -785,7 +785,7 @@ int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 		}
 		case Little:
 		{
-			value = ((uint64_t)msg->data[byteOffset + 7] << 56) |
+			val = ((uint64_t)msg->data[byteOffset + 7] << 56) |
 					((uint64_t)msg->data[byteOffset + 6] << 48) |
 					((uint64_t)msg->data[byteOffset + 5] << 40) |
 					((uint64_t)msg->data[byteOffset + 4] << 32) |
@@ -803,7 +803,7 @@ int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	}
 
 	// Return
-	return value;
+	return val;
 }
 
 /**
@@ -819,25 +819,25 @@ float AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 4));
 
 	// Local variables
-	AlxCanParser_FloatUnion myFloat = {};
+	AlxCanParser_Float val = {};
 
 	// Get
 	switch (endian)
 	{
 		case Big:
 		{
-			myFloat.bytes[3] = msg->data[byteOffset + 0];
-			myFloat.bytes[2] = msg->data[byteOffset + 1];
-			myFloat.bytes[1] = msg->data[byteOffset + 2];
-			myFloat.bytes[0] = msg->data[byteOffset + 3];
+			val.raw[3] = msg->data[byteOffset + 0];
+			val.raw[2] = msg->data[byteOffset + 1];
+			val.raw[1] = msg->data[byteOffset + 2];
+			val.raw[0] = msg->data[byteOffset + 3];
 			break;
 		}
 		case Little:
 		{
-			myFloat.bytes[0] = msg->data[byteOffset + 0];
-			myFloat.bytes[1] = msg->data[byteOffset + 1];
-			myFloat.bytes[2] = msg->data[byteOffset + 2];
-			myFloat.bytes[3] = msg->data[byteOffset + 3];
+			val.raw[0] = msg->data[byteOffset + 0];
+			val.raw[1] = msg->data[byteOffset + 1];
+			val.raw[2] = msg->data[byteOffset + 2];
+			val.raw[3] = msg->data[byteOffset + 3];
 			break;
 		}
 		default:
@@ -848,7 +848,7 @@ float AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 	}
 
 	// Return
-	return myFloat.number;
+	return val._float;
 }
 
 /**
@@ -864,33 +864,33 @@ double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
 
 	// Local variables
-	AlxCanParser_DoubleUnion myDouble = {};
+	AlxCanParser_Double val = {};
 
 	// Get
 	switch (endian)
 	{
 		case Big:
 		{
-			myDouble.bytes[7] = msg->data[byteOffset + 0];
-			myDouble.bytes[6] = msg->data[byteOffset + 1];
-			myDouble.bytes[5] = msg->data[byteOffset + 2];
-			myDouble.bytes[4] = msg->data[byteOffset + 3];
-			myDouble.bytes[3] = msg->data[byteOffset + 4];
-			myDouble.bytes[2] = msg->data[byteOffset + 5];
-			myDouble.bytes[1] = msg->data[byteOffset + 6];
-			myDouble.bytes[0] = msg->data[byteOffset + 7];
+			val.raw[7] = msg->data[byteOffset + 0];
+			val.raw[6] = msg->data[byteOffset + 1];
+			val.raw[5] = msg->data[byteOffset + 2];
+			val.raw[4] = msg->data[byteOffset + 3];
+			val.raw[3] = msg->data[byteOffset + 4];
+			val.raw[2] = msg->data[byteOffset + 5];
+			val.raw[1] = msg->data[byteOffset + 6];
+			val.raw[0] = msg->data[byteOffset + 7];
 			break;
 		}
 		case Little:
 		{
-			myDouble.bytes[0] = msg->data[byteOffset + 0];
-			myDouble.bytes[1] = msg->data[byteOffset + 1];
-			myDouble.bytes[2] = msg->data[byteOffset + 2];
-			myDouble.bytes[3] = msg->data[byteOffset + 3];
-			myDouble.bytes[4] = msg->data[byteOffset + 4];
-			myDouble.bytes[5] = msg->data[byteOffset + 5];
-			myDouble.bytes[6] = msg->data[byteOffset + 6];
-			myDouble.bytes[7] = msg->data[byteOffset + 7];
+			val.raw[0] = msg->data[byteOffset + 0];
+			val.raw[1] = msg->data[byteOffset + 1];
+			val.raw[2] = msg->data[byteOffset + 2];
+			val.raw[3] = msg->data[byteOffset + 3];
+			val.raw[4] = msg->data[byteOffset + 4];
+			val.raw[5] = msg->data[byteOffset + 5];
+			val.raw[6] = msg->data[byteOffset + 6];
+			val.raw[7] = msg->data[byteOffset + 7];
 			break;
 		}
 		default:
@@ -901,7 +901,7 @@ double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 	}
 
 	// Return
-	return myDouble.number;
+	return val._double;
 }
 
 /**
@@ -909,26 +909,26 @@ double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
   * @param[in]		msg
   * @param[in]		byteOffset
   * @param[in]		bitOffset
-  * @param[in]		nOfBits
+  * @param[in]		numOfBits
   * @return
   */
-uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, uint8_t nOfBits)
+uint8_t AlxCanParser_GetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset, uint8_t numOfBits)
 {
 	// Assert
 	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 1));
-	ALX_CAN_PARSER_ASSERT((bitOffset + nOfBits) <= 8);
+	ALX_CAN_PARSER_ASSERT((bitOffset + numOfBits) <= 8);
 
 	// Local variables
-	uint8_t value = 0;
+	uint8_t val = 0;
 
 	// Get
-	for (uint8_t i = 0; i < nOfBits; i++)
+	for (uint8_t i = 0; i < numOfBits; i++)
 	{
-		AlxCanParser_SetBit_Private(&value, i, AlxCanParser_GetBit_Private(msg->data[byteOffset], bitOffset + i));
+		AlxCanParser_SetBit_Private(&val, i, AlxCanParser_GetBit_Private(msg->data[byteOffset], bitOffset + i));
 	}
 
 	// Return
-	return value;
+	return val;
 }
 
 
@@ -953,10 +953,10 @@ static bool AlxCanParser_GetBit_Private(uint8_t byte, uint8_t bitOffset)
 		return false;
 	}
 }
-static void AlxCanParser_SetBit_Private(uint8_t* byte, uint8_t bitOffset, bool value)
+static void AlxCanParser_SetBit_Private(uint8_t* byte, uint8_t bitOffset, bool val)
 {
 	// Set
-	if (value)
+	if (val)
 	{
 		*byte |= (0x01 << bitOffset);
 	}
