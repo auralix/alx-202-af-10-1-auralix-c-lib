@@ -473,8 +473,8 @@ void AlxCanParser_SetEnum(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset
   * @param[in]		msg
   * @param[in]		byteOffset
   * @param[in]		bitOffset
-  * @retval		false
-  * @retval		true
+  * @retval			false
+  * @retval			true
   */
 bool AlxCanParser_GetBit(AlxCan_Msg* msg, uint8_t byteOffset, uint8_t bitOffset)
 {
