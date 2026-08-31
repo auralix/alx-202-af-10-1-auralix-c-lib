@@ -153,6 +153,11 @@ class Lib:
 # --------------------------------------------------------------- fixtures ----
 @pytest.fixture(scope="session")
 def lib() -> Lib:
+    # ALX_FIFO_TEST_DLL selects an externally built DLL variant (coverage/ASan build)
+    # instead of the default MSVC build - same suite, instrumented binary.
+    override = os.environ.get("ALX_FIFO_TEST_DLL")
+    if override:
+        return Lib(Path(override))
     if _needs_build(FIFO_DLL, FIFO_DEPS):
         _build_fifo_dll()
     return Lib(FIFO_DLL)

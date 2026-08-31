@@ -416,6 +416,24 @@ def test_ALX1514_P8_rewind_audit_trace(lib, make_fifo):
     assert status == lib.OK and data == b"CDEF"
 
 
+def test_ALX1514_P8_rewind_edge_cases_return_zero(lib, make_fifo):
+    f = make_fifo(4)
+    assert lib.c.AlxFifo_Rewind(f, 0) == 0     # len == 0
+    lib.write(f, b"abcd")
+    assert lib.c.AlxFifo_Rewind(f, 1) == 0     # FIFO full - no unused space
+    lib.c.AlxFifo_Flush(f)
+    assert lib.c.AlxFifo_Rewind(f, 1) == 0     # nothing consumed since flush
+
+
+def test_ALX1514_P8_rewind_partial_leaves_fifo_not_full(lib, make_fifo):
+    f = make_fifo(4)
+    lib.write(f, b"abcd")
+    lib.read(f, 3)                             # consume a, b, c
+    assert lib.c.AlxFifo_Rewind(f, 1) == 1     # un-consume 'c'; 2 of 4 entries
+    status, data = lib.read(f, 2)
+    assert status == lib.OK and data == b"cd"
+
+
 # =====================================================================
 # P9 - property/model test: random ops vs Python reference model
 # =====================================================================
