@@ -42,5 +42,15 @@ python -m pytest -m unit         # only no-hardware tests
 - Property tests compare against a Python reference model with fixed seeds.
 - Sealed proof: test commit precedes implementation commit; new-contract tests must
   be demonstrated RED first (see ALX-1514 commits 7c98879 -> 1efb914).
-- ASan smoke: `alxFifoAsanSmoke.c` builds with `/fsanitize=address` into
-  `build/alxFifoAsanSmoke.exe` (see conftest build command in git history / notes).
+
+## Build variants (one suite, several binaries)
+
+| Command | Compiler | Proves |
+|---|---|---|
+| `python -m pytest` | MSVC | the contract (dev loop, 0.3 s) |
+| `powershell -File RunCoverage.ps1` | clang | 100% line+branch coverage (txt/HTML/cobertura) |
+| `powershell -File RunSanitizers.ps1` | clang | memory safety (ASan) + no undefined behavior (UBSan) |
+
+Sanitizer design is measurement-driven (details in RunSanitizers.ps1 header): the native
+ASan+UBSan smoke exe is the diagnostics vehicle; the UBSan DLL under the full pytest suite is
+the coverage vehicle; MSVC-ASan-DLL-under-python was MEASURED as non-detecting and is not used.
