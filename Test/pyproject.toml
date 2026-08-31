@@ -10,11 +10,16 @@ requires-python = ">=3.10"
 dependencies = [
     "pytest>=8",
     "pytest-html>=4",
+    "pytest-timeout>=2",
+    "pytest-randomly>=4",
 ]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["."]
+# no test may hang the run (C infinite loop / stuck serial read) - generous global guard,
+# per-test overrides via @pytest.mark.timeout(n)
+timeout = 120
 # every run writes both evidence artifacts (gitignored build/):
 #   pytest_report.xml  - junit XML, machine-readable (CI)
 #   pytest_report.html - self-contained HTML, human-readable (open in browser)
