@@ -9,9 +9,12 @@ description = "PC unit tests for Auralix C Library modules (pytest + ctypes over
 requires-python = ">=3.10"
 dependencies = [
     "pytest>=8",
+    "pytest-html>=4",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["."]
-# every run writes the machine-readable evidence artifact (gitignored build/)
-addopts = "-ra --junitxml=build/pytest_report.xml"
+# every run writes both evidence artifacts (gitignored build/):
+#   pytest_report.xml  - junit XML, machine-readable (CI)
+#   pytest_report.html - self-contained HTML, human-readable (open in browser)
+addopts = "-ra --junitxml=build/pytest_report.xml --html=build/pytest_report.html --self-contained-html"
