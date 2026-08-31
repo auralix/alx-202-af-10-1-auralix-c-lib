@@ -3,6 +3,7 @@
 # Builds a clang-instrumented DLL variant, runs the SAME pytest suite against it,
 # and produces:
 #   build/cov/coverage_report.txt   - human summary (also printed)
+#   build/cov/html/index.html       - human per-line view (open in browser)
 #   build/cov/coverage_c.xml        - cobertura XML (CI: Codecov/GitLab/Sonar/PR rendering)
 #   build/cov/lcov.info             - lcov intermediate
 #
@@ -39,4 +40,6 @@ finally {
 & "$llvm\llvm-cov.exe" report "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" | Tee-Object "$cov\coverage_report.txt"
 & "$llvm\llvm-cov.exe" export "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" -format=lcov | Out-File -Encoding ascii "$cov\lcov.info"
 python -m lcov_cobertura "$cov\lcov.info" --output "$cov\coverage_c.xml" --base-dir "$clib"
+& "$llvm\llvm-cov.exe" show "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" -format=html -output-dir="$cov\html" -show-branches=count -show-line-counts
 Write-Host "`ncobertura: $cov\coverage_c.xml"
+Write-Host "html:      $cov\html\index.html"
