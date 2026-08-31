@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxFifo.c
   * @brief		Auralix C Library - ALX FIFO Module
@@ -42,7 +42,7 @@
 //******************************************************************************
 static Alx_Status AlxFifo_ReadByte(AlxFifo* me, uint8_t* data);
 static Alx_Status AlxFifo_WriteByte(AlxFifo* me, uint8_t data);
-static uint8_t* AlxFifo_GetTailPtr(AlxFifo* me);
+static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const char* delim, uint32_t len, uint32_t* lenActual, bool delimIsCharSet);
 
 
 //******************************************************************************
@@ -132,145 +132,47 @@ Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len)
 }
 
 /**
-  * @brief
+  * @brief		Reads one line from FIFO, terminated by the FIRST occurrence of the FULL delim SEQUENCE (e.g. "\r\n" = the two bytes CR,LF adjacent)
   * @param[in,out]	me
-  * @param[out]		str
-  * @param[in]		delim
-  * @param[in]		maxLen
-  * @param[out]		numRead
-  * @retval			Alx_Ok
-  * @retval			Alx_Err
-  * @retval			AlxFifo_ErrEmpty
-  * @retval			AlxFifo_ErrNoDelim
+  * @param[out]		str			Line INCLUDING terminator, ALWAYS null-terminated; empty string on every non-Ok return
+  * @param[in]		delim		Delimiter sequence - all chars must occur adjacent, in order
+  * @param[in]		len			Size of str buffer INCLUDING null terminator - max line = len-1 chars
+  * @param[out]		lenActual	Line length EXCLUDING null terminator, 0 on every non-Ok return, NULL allowed
+  * @retval			Alx_Ok				Line delivered & consumed (empty line = terminator only)
+  * @retval			AlxFifo_ErrEmpty	FIFO empty
+  * @retval			AlxFifo_ErrNoDelim	No terminator yet & FIFO not full - FIFO left untouched
+  * @retval			AlxFifo_ErrTooLong	Undeliverable line DISCARDED: line found but > len-1 chars (only that line discarded), or FIFO full without terminator (whole content discarded - line can never complete)
   */
-Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead)
+Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t len, uint32_t* lenActual)
 {
-	//------------------------------------------------------------------------------
 	// Assert
-	//------------------------------------------------------------------------------
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
-	ALX_FIFO_ASSERT(0 < maxLen && maxLen <= me->buffLen);
+	ALX_FIFO_ASSERT(0 < len);
 
-
-	//------------------------------------------------------------------------------
 	// Read
-	//------------------------------------------------------------------------------
-	Alx_Status status = Alx_Err;
-	if (me->isEmpty == true)
-	{
-		status = AlxFifo_ErrEmpty;
-		if (numRead != NULL)
-		{
-			*numRead = 0;
-		}
-	}
-	else
-	{
-		status = AlxFifo_ErrNoDelim;
-		if (numRead != NULL)
-		{
-			*numRead = 0;
-		}
-
-		// Search for "delim" in _buff
-		uint8_t* ptrDelim = NULL;
-		uint32_t countDelimChar = 0;
-		uint32_t numBytesRead = 0;
-		for (uint32_t i = 0; i < me->numOfEntries; i++)
-		{
-			if ((me->buff[(i + me->tail) % me->buffLen]) == (delim[0]))
-			{
-				ptrDelim = AlxFifo_GetTailPtr(me) + i;
-				for (uint32_t j = 1; j < strlen(delim); j++)
-				{
-					if ((me->buff[(i + me->tail + j) % me->buffLen] == delim[0 + j]) && ((i + j) < me->numOfEntries))
-					{
-						countDelimChar++;
-					}
-				}
-				countDelimChar++;
-
-				// Checks if there is "delim" in FIFO
-				if ((strlen(delim) == countDelimChar) && (strlen(delim) <= me->numOfEntries))
-				{
-					numBytesRead = ptrDelim - AlxFifo_GetTailPtr(me);
-					uint8_t dummy = 0;
-
-					// Handle ReadUntil
-					if (numBytesRead < maxLen)
-					{
-						for (uint32_t k = 0; k < numBytesRead; k++)
-						{
-							AlxFifo_ReadByte(me, (uint8_t*)&str[k]);
-						}
-						str[numBytesRead] = '\0';
-
-						if (numRead != NULL)
-						{
-							*numRead = numBytesRead;
-						}
-					}
-					else
-					{
-						// Delete bytes that are before maxLen
-						for (uint32_t l = 0; l < numBytesRead - maxLen; l++)
-						{
-							AlxFifo_ReadByte(me, &dummy);
-						}
-
-						for (uint32_t m = 0; m < maxLen; m++)
-						{
-							AlxFifo_ReadByte(me, (uint8_t*)&str[m]);
-						}
-
-						if (numRead != NULL)
-						{
-							*numRead = maxLen;
-						}
-					}
-
-					// Delete "delim" from FIFO
-					for (uint32_t n = 0; n < strlen(delim); n++)
-					{
-						AlxFifo_ReadByte(me, &dummy);
-					}
-
-					status = Alx_Ok;
-					break;
-				}
-				countDelimChar = 0;
-			}
-		}
-	}
-
-
-	//------------------------------------------------------------------------------
-	// Return
-	//------------------------------------------------------------------------------
-	return status;
+	return AlxFifo_ReadStrUntil_Private(me, str, delim, len, lenActual, false);
 }
 
 /**
-  * @brief
+  * @brief		Reads one line from FIFO, terminated by the FIRST occurrence of ANY SINGLE char from delimSet (e.g. "\r\n" = CR or LF, whichever comes first)
   * @param[in,out]	me
-  * @param[out]		str
-  * @param[in]		delimSet
-  * @param[in]		len
-  * @param[out]		lenActual
-  * @retval			Alx_Ok
-  * @retval			AlxFifo_ErrEmpty
-  * @retval			AlxFifo_ErrNoDelim
-  * @retval			AlxFifo_ErrTooLong
+  * @param[out]		str			Line INCLUDING terminator, ALWAYS null-terminated; empty string on every non-Ok return
+  * @param[in]		delimSet	Set of single-char delimiters - byte 0x00 is never a set member
+  * @param[in]		len			Size of str buffer INCLUDING null terminator - max line = len-1 chars
+  * @param[out]		lenActual	Line length EXCLUDING null terminator, 0 on every non-Ok return, NULL allowed
+  * @retval			Alx_Ok				Line delivered & consumed (empty line = terminator only, lenActual == 1)
+  * @retval			AlxFifo_ErrEmpty	FIFO empty
+  * @retval			AlxFifo_ErrNoDelim	No terminator yet & FIFO not full - FIFO left untouched
+  * @retval			AlxFifo_ErrTooLong	Undeliverable line DISCARDED: line found but > len-1 chars (only that line discarded), or FIFO full without terminator (whole content discarded - line can never complete)
   */
 Alx_Status AlxFifo_ReadStrUntilAny(AlxFifo* me, char* str, const char* delimSet, uint32_t len, uint32_t* lenActual)
 {
-	// ALX-1514 sealed-proof stub - real implementation follows in the next commit
-	(void)me;
-	(void)str;
-	(void)delimSet;
-	(void)len;
-	(void)lenActual;
-	return Alx_Err;
+	// Assert
+	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
+	ALX_FIFO_ASSERT(0 < len);
+
+	// Read
+	return AlxFifo_ReadStrUntil_Private(me, str, delimSet, len, lenActual, true);
 }
 
 /**
@@ -471,9 +373,116 @@ static Alx_Status AlxFifo_WriteByte(AlxFifo* me, uint8_t data)
 	//------------------------------------------------------------------------------
 	return status;
 }
-static uint8_t* AlxFifo_GetTailPtr(AlxFifo* me)
+static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const char* delim, uint32_t len, uint32_t* lenActual, bool delimIsCharSet)
 {
-	return (uint8_t*)me->buff + me->tail;
+	//------------------------------------------------------------------------------
+	// Prepare Out Params - str always null-terminated, empty until a line is delivered
+	//------------------------------------------------------------------------------
+	str[0] = '\0';
+	if (lenActual != NULL)
+	{
+		*lenActual = 0;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Handle Empty
+	//------------------------------------------------------------------------------
+	if (me->isEmpty == true)
+	{
+		return AlxFifo_ErrEmpty;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Search Line End - lineLen = line length INCLUDING terminator, 0 = not found
+	//------------------------------------------------------------------------------
+	uint32_t delimLen = delimIsCharSet ? 1u : (uint32_t)strlen(delim);
+	uint32_t lineLen = 0;
+	for (uint32_t i = 0; (i + delimLen) <= me->numOfEntries; i++)
+	{
+		char ch = (char)me->buff[(me->tail + i) % me->buffLen];
+		if (delimIsCharSet)
+		{
+			// Set semantics - terminate at first char that is a member of delim set (0x00 is never a member)
+			if ((ch != '\0') && (strchr(delim, ch) != NULL))
+			{
+				lineLen = i + 1;
+				break;
+			}
+		}
+		else
+		{
+			// Sequence semantics - terminate at first occurrence of the full delim sequence
+			if (ch == delim[0])
+			{
+				bool match = true;
+				for (uint32_t j = 1; j < delimLen; j++)
+				{
+					if ((char)me->buff[(me->tail + i + j) % me->buffLen] != delim[j])
+					{
+						match = false;
+						break;
+					}
+				}
+				if (match)
+				{
+					lineLen = i + delimLen;
+					break;
+				}
+			}
+		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Handle No Line
+	//------------------------------------------------------------------------------
+	if (lineLen == 0)
+	{
+		if (me->isFull)
+		{
+			// Line can never complete (nothing more can enter) - discard everything to restore liveness
+			uint8_t dummy = 0;
+			uint32_t numOfEntries = me->numOfEntries;
+			for (uint32_t k = 0; k < numOfEntries; k++)
+			{
+				AlxFifo_ReadByte(me, &dummy);
+			}
+			return AlxFifo_ErrTooLong;
+		}
+		return AlxFifo_ErrNoDelim;	// Line may still complete - FIFO left untouched
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Handle Line Too Long - line + null terminator must fit into len
+	//------------------------------------------------------------------------------
+	if ((lineLen + 1) > len)	// line + null terminator must fit (no uint32 underflow for len == 0)
+	{
+		// Discard ONLY this line incl. terminator - data behind it survives
+		uint8_t dummy = 0;
+		for (uint32_t k = 0; k < lineLen; k++)
+		{
+			AlxFifo_ReadByte(me, &dummy);
+		}
+		return AlxFifo_ErrTooLong;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Read Line - incl. terminator
+	//------------------------------------------------------------------------------
+	for (uint32_t k = 0; k < lineLen; k++)
+	{
+		AlxFifo_ReadByte(me, (uint8_t*)&str[k]);
+	}
+	str[lineLen] = '\0';
+	if (lenActual != NULL)
+	{
+		*lenActual = lineLen;
+	}
+	return Alx_Ok;
 }
 
 

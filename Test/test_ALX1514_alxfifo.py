@@ -96,6 +96,19 @@ def test_ALX1514_P1_any_generic_set_semicolon_comma(lib, make_fifo):
     check(lib, lib.ru_any(f, b";,", 16), lib.OK, b"e;", 16)
 
 
+def test_ALX1514_P1_any_single_member_set(lib, make_fifo):
+    f = make_fifo(32)
+    lib.write(f, b"a\rb\n")
+    check(lib, lib.ru_any(f, b"\n", 16), lib.OK, b"a\rb\n", 16)  # \r NOT in set
+
+
+def test_ALX1514_P1_any_three_member_set(lib, make_fifo):
+    f = make_fifo(32)
+    lib.write(f, b"ab;c\r")
+    check(lib, lib.ru_any(f, b"\r\n;", 16), lib.OK, b"ab;", 16)
+    check(lib, lib.ru_any(f, b"\r\n;", 16), lib.OK, b"c\r", 16)
+
+
 def test_ALX1514_P1_any_nul_byte_is_not_a_delimiter(lib, make_fifo):
     # strchr(delimSet, 0x00) matches the set's NUL terminator - the
     # implementation MUST NOT treat a 0x00 data byte as a set member.
@@ -105,6 +118,7 @@ def test_ALX1514_P1_any_nul_byte_is_not_a_delimiter(lib, make_fifo):
     assert status == lib.OK
     assert la == 4
     assert raw[:4] == b"a\x00b\r"
+    assert raw[4] == 0 and all(b == lib.POISON for b in raw[5:])
 
 
 # =====================================================================
@@ -230,6 +244,29 @@ def test_ALX1514_P5_seq_repeated_char_delim(lib, make_fifo):
     assert lib.entries(f) == 1                   # lone "a" stays
 
 
+def test_ALX1514_P5_seq_single_char_delim(lib, make_fifo):
+    # delimLen == 1: inner match loop runs zero iterations
+    f = make_fifo(32)
+    lib.write(f, b"get\nx\n")
+    check(lib, lib.ru(f, b"\n", 16), lib.OK, b"get\n", 16)
+    check(lib, lib.ru(f, b"\n", 16), lib.OK, b"x\n", 16)
+
+
+def test_ALX1514_P5_seq_three_char_delim_mismatch_beyond_j1(lib, make_fifo):
+    # "ENx" false start fails at j=2; real "END" follows
+    f = make_fifo(32)
+    lib.write(f, b"aENxbEND")
+    check(lib, lib.ru(f, b"END", 16), lib.OK, b"aENxbEND", 16)
+
+
+def test_ALX1514_P5_seq_fewer_entries_than_delim_is_nodelim(lib, make_fifo):
+    # scan loop runs zero iterations when entries < strlen(delim)
+    f = make_fifo(8)
+    lib.write(f, b"x")
+    check(lib, lib.ru(f, b"\r\n", 8), lib.ERR_NO_DELIM, b"", 8)
+    assert lib.entries(f) == 1
+
+
 def test_ALX1514_P5_seq_empty_line_is_terminator_only(lib, make_fifo):
     f = make_fifo(32)
     lib.write(f, b"\r\n")
@@ -314,6 +351,23 @@ def test_ALX1514_P7_wrap_seq_partial_delim_waits(lib, make_fifo, rot):
 # P8 - regression: untouched functions keep their current contract
 # =====================================================================
 
+def test_ALX1514_P8_writestr_smoke(lib, make_fifo):
+    f = make_fifo(8)
+    assert lib.c.AlxFifo_WriteStr(f, b"abc") == lib.OK
+    assert lib.entries(f) == 3
+    status, data = lib.read(f, 3)
+    assert data == b"abc"
+
+
+def test_ALX1514_P2_lenactual_null_on_seq_and_error_paths(lib, make_fifo):
+    f = make_fifo(8)
+    s, _, _, raw = lib.ru(f, b"\r\n", 8, len_actual_null=True)   # ErrEmpty path
+    assert s == lib.ERR_EMPTY and raw[0] == 0
+    lib.write(f, b"a\r\n")
+    s, _, _, raw = lib.ru(f, b"\r\n", 8, len_actual_null=True)   # Ok path
+    assert s == lib.OK and raw[:3] == b"a\r\n" and raw[3] == 0
+
+
 def test_ALX1514_P8_write_read_roundtrip(lib, make_fifo):
     f = make_fifo(8)
     assert lib.write(f, b"abc") == lib.OK
@@ -396,6 +450,23 @@ class ModelFifo:
         del self.buf[:line_len]
         return "OK", line
 
+    def read_until_seq(self, delim: bytes, ln: int):
+        if not self.buf:
+            return "ERR_EMPTY", b""
+        idx = bytes(self.buf).find(delim)          # leftmost full occurrence
+        if idx < 0:
+            if len(self.buf) == self.cap:
+                self.buf.clear()
+                return "ERR_TOO_LONG", b""
+            return "ERR_NO_DELIM", b""
+        line_len = idx + len(delim)
+        if line_len > ln - 1:
+            del self.buf[:line_len]
+            return "ERR_TOO_LONG", b""
+        line = bytes(self.buf[:line_len])
+        del self.buf[:line_len]
+        return "OK", line
+
 
 @pytest.mark.parametrize("seed", [1, 2, 3])
 def test_ALX1514_P9_property_model_random_ops(lib, make_fifo, seed):
@@ -424,6 +495,34 @@ def test_ALX1514_P9_property_model_random_ops(lib, make_fifo, seed):
             exp_la = len(exp_line)
             assert la == exp_la, f"seed {seed} step {step}: lenActual {la} != {exp_la}"
             assert raw[:la] == exp_line and raw[la] == 0
+        assert lib.entries(f) == len(model.buf), \
+            f"seed {seed} step {step}: entries {lib.entries(f)} != model {len(model.buf)}"
+
+
+@pytest.mark.parametrize("seed", [4, 5])
+def test_ALX1514_P9_property_model_seq_random_ops(lib, make_fifo, seed):
+    rng = random.Random(seed)
+    cap = 16
+    f = make_fifo(cap)
+    model = ModelFifo(cap)
+    status_name = {lib.OK: "OK", lib.ERR_FULL: "ERR_FULL",
+                   lib.ERR_EMPTY: "ERR_EMPTY", lib.ERR_NO_DELIM: "ERR_NO_DELIM",
+                   lib.ERR_TOO_LONG: "ERR_TOO_LONG"}
+    alphabet = b"ab\r\n\x00;"
+    for step in range(2000):
+        if rng.random() < 0.5:
+            chunk = bytes(rng.choice(alphabet) for _ in range(rng.randint(1, 6)))
+            got = status_name[lib.write(f, chunk)]
+            exp = model.write(chunk)
+            assert got == exp, f"seed {seed} step {step} write({chunk!r}): {got} != {exp}"
+        else:
+            ln = rng.choice([4, 8, 32])
+            status, content, la, raw = lib.ru(f, b"\r\n", ln)
+            exp_status, exp_line = model.read_until_seq(b"\r\n", ln)
+            got_status = status_name[status]
+            assert got_status == exp_status, \
+                f"seed {seed} step {step} ru(len={ln}): {got_status} != {exp_status}"
+            assert la == len(exp_line) and raw[:la] == exp_line and raw[la] == 0
         assert lib.entries(f) == len(model.buf), \
             f"seed {seed} step {step}: entries {lib.entries(f)} != model {len(model.buf)}"
 

@@ -15,6 +15,7 @@
 //******************************************************************************
 #include "alxFifo.h"
 #include <stdlib.h>
+#include <string.h>
 
 
 //******************************************************************************
@@ -24,6 +25,8 @@ AlxFifo* AlxFifoTest_New(uint32_t buffLen)
 {
 	AlxFifo* me = (AlxFifo*)malloc(sizeof(AlxFifo));
 	uint8_t* buff = (uint8_t*)malloc(buffLen);
+	memset(buff, '\n', buffLen);	// poison with a DELIMITER byte - any scan past the
+									// valid entries finds a phantom terminator deterministically
 	AlxFifo_Ctor(me, buff, buffLen);
 	return me;
 }

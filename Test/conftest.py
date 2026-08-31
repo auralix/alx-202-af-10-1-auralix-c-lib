@@ -24,6 +24,9 @@ FIFO_SOURCES = [
 FIFO_DEPS = FIFO_SOURCES + [
     CLIB_DIR / "alxFifo.h",
     CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxBound.h",
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "Mcu" / "alxTrace.h",
     TEST_DIR / "alxConfig.h",
     TEST_DIR / "alxFifoTest.def",
 ]
