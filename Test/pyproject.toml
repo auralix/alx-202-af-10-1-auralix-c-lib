@@ -20,6 +20,8 @@ testpaths = ["."]
 # no test may hang the run (C infinite loop / stuck serial read) - generous global guard,
 # per-test overrides via @pytest.mark.timeout(n)
 timeout = 120
+# an xfail test that unexpectedly PASSES is a failure - stale expected-to-fail markers must die
+xfail_strict = true
 # every run writes both evidence artifacts (gitignored build/):
 #   pytest_report.xml  - junit XML, machine-readable (CI)
 #   pytest_report.html - self-contained HTML, human-readable (open in browser)
