@@ -1,0 +1,42 @@
+# Auralix C Library - PC unit test C-code coverage run (ALX-1514)
+#
+# Builds a clang-instrumented DLL variant, runs the SAME pytest suite against it,
+# and produces:
+#   build/cov/coverage_report.txt   - human summary (also printed)
+#   build/cov/coverage_c.xml        - cobertura XML (CI: Codecov/GitLab/Sonar/PR rendering)
+#   build/cov/lcov.info             - lcov intermediate
+#
+# Requirements: LLVM (clang-cl, llvm-profdata, llvm-cov), VS2022 (vcvars), lcov-cobertura (pip).
+# Usage:  powershell -File RunCoverage.ps1
+
+$ErrorActionPreference = "Stop"
+$test  = $PSScriptRoot
+$clib  = Split-Path $test
+$cov   = Join-Path $test "build\cov"
+$llvm  = "C:\Program Files\LLVM\bin"
+$vcvars = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+
+New-Item -ItemType Directory -Force $cov | Out-Null
+Remove-Item "$cov\*.profraw" -Force -ErrorAction SilentlyContinue
+
+# 1) instrumented DLL (per-module sources; extend list per module)
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /std:c11 -fprofile-instr-generate -fcoverage-mapping /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoTestHelpers.c"" /Fe:""$cov\alxFifoTest.dll"" /Fo""$cov""\ /link /DEF:""$test\alxFifoTest.def"""
+if ($LASTEXITCODE -ne 0) { throw "coverage DLL build failed" }
+
+# 2) same suite, instrumented binary
+$env:ALX_FIFO_TEST_DLL  = "$cov\alxFifoTest.dll"
+$env:LLVM_PROFILE_FILE  = "$cov\%m-%p.profraw"
+try {
+    python -m pytest -q
+    if ($LASTEXITCODE -ne 0) { throw "pytest failed (rc=$LASTEXITCODE) - coverage of a red suite is meaningless" }
+}
+finally {
+    Remove-Item Env:ALX_FIFO_TEST_DLL, Env:LLVM_PROFILE_FILE -ErrorAction SilentlyContinue
+}
+
+# 3) merge + reports
+& "$llvm\llvm-profdata.exe" merge -sparse (Get-ChildItem "$cov\*.profraw").FullName -o "$cov\merged.profdata"
+& "$llvm\llvm-cov.exe" report "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" | Tee-Object "$cov\coverage_report.txt"
+& "$llvm\llvm-cov.exe" export "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" -format=lcov | Out-File -Encoding ascii "$cov\lcov.info"
+python -m lcov_cobertura "$cov\lcov.info" --output "$cov\coverage_c.xml" --base-dir "$clib"
+Write-Host "`ncobertura: $cov\coverage_c.xml"
