@@ -13,8 +13,18 @@ dependencies = [
 ]
 
 [tool.pytest.ini_options]
+minversion = "8.0"
 testpaths = ["."]
 # every run writes both evidence artifacts (gitignored build/):
 #   pytest_report.xml  - junit XML, machine-readable (CI)
 #   pytest_report.html - self-contained HTML, human-readable (open in browser)
-addopts = "-ra --junitxml=build/pytest_report.xml --html=build/pytest_report.html --self-contained-html"
+# --strict-markers/--strict-config: typos in markers/config are errors, not silence
+addopts = "-ra --strict-markers --strict-config --junitxml=build/pytest_report.xml --html=build/pytest_report.html --self-contained-html"
+markers = [
+    "unit: PC unit test of a c-lib module (no hardware required)",
+    "hil: hardware-in-loop test (requires device on serial port)",
+]
+# unexpected warnings are failures - silence nothing silently
+filterwarnings = [
+    "error",
+]

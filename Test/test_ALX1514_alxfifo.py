@@ -30,6 +30,8 @@ import pytest
 
 from conftest import check
 
+pytestmark = pytest.mark.unit
+
 
 # =====================================================================
 # P1 - ReadStrUntilAny: basic contract (delimiter set semantics)
