@@ -1,0 +1,16 @@
+# Auralix C Library - PC Unit Tests
+# Target standard: uv-managed (uv sync --locked && uv run pytest).
+# uv is not yet installed on all workstations - until then, any Python >= 3.10
+# with pytest >= 8 runs the suite directly:  python -m pytest
+[project]
+name = "alx-c-lib-tests"
+version = "0.1.0"
+description = "PC unit tests for Auralix C Library modules (pytest + ctypes over per-module DLLs)"
+requires-python = ">=3.10"
+dependencies = [
+    "pytest>=8",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+addopts = "-q -ra"

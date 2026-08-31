@@ -1,0 +1,19 @@
+LIBRARY alxFifoTest
+EXPORTS
+	AlxFifo_Ctor
+	AlxFifo_Flush
+	AlxFifo_Read
+	AlxFifo_ReadStrUntil
+	AlxFifo_ReadStrUntilAny
+	AlxFifo_Write
+	AlxFifo_WriteStr
+	AlxFifo_GetNumOfEntries
+	AlxFifo_Rewind
+	AlxFifoTest_New
+	AlxFifoTest_Delete
+	AlxFifoTest_Status_Ok
+	AlxFifoTest_Status_Err
+	AlxFifoTest_Status_ErrFull
+	AlxFifoTest_Status_ErrEmpty
+	AlxFifoTest_Status_ErrNoDelim
+	AlxFifoTest_Status_ErrTooLong

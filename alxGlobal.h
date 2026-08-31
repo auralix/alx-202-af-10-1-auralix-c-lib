@@ -346,6 +346,7 @@ typedef enum
 	AlxFifo_ErrFull,
 	AlxFifo_ErrEmpty,
 	AlxFifo_ErrNoDelim,
+	AlxFifo_ErrTooLong,
 	AlxSafe_BothCopyErr_OrigErr,
 	AlxSafe_BothCopyErr_OrigOk_UseOrig,
 	AlxSafe_BothCopyOkCrcSame_OrigDontCare_UseCopyA,

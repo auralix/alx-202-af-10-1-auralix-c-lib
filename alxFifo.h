@@ -113,7 +113,8 @@ void AlxFifo_Ctor
 //******************************************************************************
 void AlxFifo_Flush(AlxFifo* me);
 Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len);
-Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead);
+Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint32_t len, uint32_t* lenActual);
+Alx_Status AlxFifo_ReadStrUntilAny(AlxFifo* me, char* str, const char* delimSet, uint32_t len, uint32_t* lenActual);
 Alx_Status AlxFifo_Write(AlxFifo* me, const uint8_t* data, uint32_t len);
 Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str);
 uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me);

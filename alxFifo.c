@@ -253,6 +253,29 @@ Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint3
 /**
   * @brief
   * @param[in,out]	me
+  * @param[out]		str
+  * @param[in]		delimSet
+  * @param[in]		len
+  * @param[out]		lenActual
+  * @retval			Alx_Ok
+  * @retval			AlxFifo_ErrEmpty
+  * @retval			AlxFifo_ErrNoDelim
+  * @retval			AlxFifo_ErrTooLong
+  */
+Alx_Status AlxFifo_ReadStrUntilAny(AlxFifo* me, char* str, const char* delimSet, uint32_t len, uint32_t* lenActual)
+{
+	// ALX-1514 sealed-proof stub - real implementation follows in the next commit
+	(void)me;
+	(void)str;
+	(void)delimSet;
+	(void)len;
+	(void)lenActual;
+	return Alx_Err;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
   * @param[in]		data
   * @param[in]		len
   * @retval			Alx_Ok
