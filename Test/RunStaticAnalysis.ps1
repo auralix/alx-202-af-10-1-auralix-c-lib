@@ -2,7 +2,7 @@
 #
 #   Stage 1  clang-tidy    (.clang-tidy config, compile_commands.json from conftest)
 #   Stage 2  cppcheck      (the only tool exploring #ifdef combinations)
-#   Stage 3  gcc -fanalyzer (arm-gcc 14.2.Rel1, interprocedural path analysis)
+#   Stage 3  gcc -fanalyzer (arm-gcc 15.2.Rel1, interprocedural path analysis)
 #
 # Exit != 0 on any finding. Usage:  powershell -File RunStaticAnalysis.ps1
 
