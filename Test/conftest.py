@@ -7,6 +7,7 @@ handles from alxFifoTestHelpers.c and the public alxFifo.h API only.
 
 import ctypes
 import os
+import re
 import subprocess
 from pathlib import Path
 
@@ -182,6 +183,26 @@ class Lib:
 
     def ru_any(self, f, delim_set: bytes, ln: int, **kw):
         return self._read_str("AlxFifo_ReadStrUntilAny", f, delim_set, ln, **kw)
+
+
+# ------------------------------------------------------- traceability ----
+# The proof token in a test's NAME (test_ALX1514_P4_...) is the primary
+# traceability link (spec PROOF row <-> test <-> commit, greppable).
+# This hook mirrors it into junit XML as <property name="proof" .../> so the
+# evidence artifact carries it in structured form too. Additional proofs from
+# LATER tasks attach via @pytest.mark.req("ALX-1620-P2") - the test name keeps
+# its ORIGINATING token forever (never rename on later modification).
+_PROOF_RE = re.compile(r"ALX(\d+)_P(\d+)")
+
+
+def pytest_collection_modifyitems(items):
+    for item in items:
+        m = _PROOF_RE.search(item.name)
+        if m:
+            item.user_properties.append(("proof", f"ALX-{m.group(1)}-P{m.group(2)}"))
+        for mark in item.iter_markers(name="req"):
+            for rid in mark.args:
+                item.user_properties.append(("req", rid))
 
 
 # --------------------------------------------------------------- fixtures ----

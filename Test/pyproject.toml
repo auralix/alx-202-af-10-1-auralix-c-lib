@@ -32,7 +32,10 @@ addopts = "-ra --strict-markers --strict-config --junitxml=build/pytest_report.x
 markers = [
     "unit: PC unit test of a c-lib module (no hardware required)",
     "hil: hardware-in-loop test (requires device on serial port)",
+    "req(id): additional proof/requirement id attached by a LATER task (name keeps the originating token)",
 ]
+# xunit1: allows per-testcase <property> elements (proof tokens) without schema friction
+junit_family = "xunit1"
 # unexpected warnings are failures - silence nothing silently
 filterwarnings = [
     "error",
