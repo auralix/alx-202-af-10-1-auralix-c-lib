@@ -67,15 +67,15 @@ void AlxInterpLin_Ctor
 	// Info
 	me->wasCtorCalled = true;
 
-	// Check lenght and dataX numbers sequence
+	// Check length and dataX numbers sequence
 	ALX_INTERP_LIN_ASSERT( me->numOfArrPoints > 1);
 
 	if(me->isXpointArrRising) {
-		for (uint32_t i = 0; i < numOfArrPoints - 1; i++) ALX_INTERP_LIN_ASSERT(*(me->xPointArr + i + 1) > *(me->xPointArr + i)); // Xn+1 > Xn - Every number in the array should be greater than the previus!
+		for (uint32_t i = 0; i < numOfArrPoints - 1; i++) ALX_INTERP_LIN_ASSERT(*(me->xPointArr + i + 1) > *(me->xPointArr + i)); // Xn+1 > Xn - Every number in the array should be greater than the previous!
 	}
 	else
 	{
-		for (uint32_t i = 0; i < numOfArrPoints - 1; i++) ALX_INTERP_LIN_ASSERT(*(me->xPointArr + i + 1) < *(me->xPointArr + i));  // Xn+1 < Xn - Every number in the array should be lesser than the previus!
+		for (uint32_t i = 0; i < numOfArrPoints - 1; i++) ALX_INTERP_LIN_ASSERT(*(me->xPointArr + i + 1) < *(me->xPointArr + i));  // Xn+1 < Xn - Every number in the array should be lesser than the previous!
 	}
 }
 

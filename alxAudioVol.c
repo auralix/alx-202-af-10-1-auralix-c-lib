@@ -81,7 +81,7 @@ float AlxAudioVol_Process(AlxAudioVol* me, float inSample)
 {
 	ALX_AUDIO_VOL_ASSERT((-1.f <= inSample) && (inSample <= 1.f));
 
-	// #1 Calclulate
+	// #1 Calculate
 	float outSample = inSample * me->volFactor;
 
 	// #2 Handle Clipping

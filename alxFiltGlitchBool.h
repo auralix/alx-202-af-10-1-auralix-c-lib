@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file		alxFiltGlitchBool.h
-  * @brief		Auralix C Library - ALX Fliter Glitch Bool Module
+  * @brief		Auralix C Library - ALX Filter Glitch Bool Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License

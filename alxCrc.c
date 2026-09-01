@@ -223,7 +223,7 @@ bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t
 		uint8_t raw[4];
 	} crc = {0};
 
-	// #3 Get CRC lenght based on configuration
+	// #3 Get CRC length based on configuration
 	uint32_t crcLen = AlxCrc_GetLen(me);
 
 	// #4 Copy CRC from dataWithCrc to local union
@@ -254,7 +254,7 @@ uint32_t AlxCrc_GetLen(AlxCrc* me)
 	// #1 Assert
 	ALX_CRC_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Get & return lenght
+	// #2 Get & return length
 	switch (me->config)
 	{
 		case AlxCrc_Config_Ccitt:

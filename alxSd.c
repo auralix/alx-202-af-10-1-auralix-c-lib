@@ -396,7 +396,7 @@ Alx_Status AlxSd_WriteBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint
 			continue;
 		}
 
-		// Execute CMD13 SPI mode - Check if errors occured during multiple block write
+		// Execute CMD13 SPI mode - Check if errors occurred during multiple block write
 		status = AlxSd_SpiMode_SendCmd13(me);
 		if (status != Alx_Ok)
 		{

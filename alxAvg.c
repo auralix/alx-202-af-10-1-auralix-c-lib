@@ -83,7 +83,7 @@ float AlxAvg_Process(AlxAvg* me, float in)
 	// Increment shift counter
 	me->shiftCount++;
 
-	// If shift threashold reached (enough new samples were shifted inside buffer), calculate new average
+	// If shift threshold reached (enough new samples were shifted inside buffer), calculate new average
 	if(me->shiftCount == me->shiftThreshold)
 	{
 		// Calculate new average

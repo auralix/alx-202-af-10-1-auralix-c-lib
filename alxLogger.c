@@ -745,7 +745,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 					wereOldestReadLogsDiscarded = true;
 				}
 
-				// oldest.id - Only start handling after inital wrap around
+				// oldest.id - Only start handling after initial wrap around
 				if (me->md.write.id >= me->numOfLogsTotal)
 				{
 					// Increment oldest.id by number of logs per directory
@@ -1592,7 +1592,7 @@ static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
 
 	if (expectedId != me->md.read.id)
 	{
-		ALX_LOGGER_TRACE_WRN("Read metadata missmatch, rewinding read file");
+		ALX_LOGGER_TRACE_WRN("Read metadata mismatch, rewinding read file");
 		expectedId -= me->md.read.log;
 		me->md.read.log = 0;
 		me->md.read.pos = 0;

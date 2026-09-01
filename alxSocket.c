@@ -842,7 +842,7 @@ Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port)
 		}
 		else
 		{
-			// TIMEOUT occured
+			// TIMEOUT occurred
 			return AlxNet_Timeout;
 		}
 
@@ -971,7 +971,7 @@ AlxSocket* AlxSocket_Accept(AlxSocket* me)
 	#if defined(ALX_WIZNET)
 	if (me->alxNet->config == AlxNet_Config_Wiznet)
 	{
-		// wait until clent conents to the socket
+		// wait until clent contents to the socket
 		uint8_t tmpSn_SR;
 		uint64_t start = AlxTick_Get_ms(&alxTick);
 		uint64_t next_listen_restart_timeout = AlxTick_Get_ms(&alxTick) + SOCKET_LISTEN_IDLE_TIMEOUT;

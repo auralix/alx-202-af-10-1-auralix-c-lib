@@ -85,7 +85,7 @@ void AlxOsThread_Ctor
 	// Variables
 	#if defined(ALX_FREE_RTOS)
 	me->taskHandle = NULL;
-	me->stackLen_word = stackLen_byte / sizeof(StackType_t);	// TV: FreeRTOS stack is mesured in words, 1 word = sizeof(StackType_t) bytes
+	me->stackLen_word = stackLen_byte / sizeof(StackType_t);	// TV: FreeRTOS stack is measured in words, 1 word = sizeof(StackType_t) bytes
 	#endif
 	#if defined(ALX_ZEPHYR)
 	memset(&me->threadHandle, 0, sizeof(me->threadHandle));

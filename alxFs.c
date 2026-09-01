@@ -564,7 +564,7 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 		}
 		else if (statusRead != Alx_Ok)
 		{
-			// Break, error occured, trace, change status to Alx_Err
+			// Break, error occurred, trace, change status to Alx_Err
 			ALX_FS_TRACE_ERR("Err: %d, ch=%d, readLenActual=%u, lenActual=%u, len=%u, delim=%s", statusRead, ch, readLenActual, _lenActual, len, delim);
 			status = Alx_Err;
 			break;

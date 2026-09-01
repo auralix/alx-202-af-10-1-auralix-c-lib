@@ -409,7 +409,7 @@ uint64_t AlxRtc_DateTimeToUnixTimeNs(AlxRtc_DateTime dateTime)
 	{
 		daysSinceEpoch = daysSinceEpoch + (uint64_t)AlxRtc_MonthDaysTable[ALX_RTC_LEAP_YEAR(currentYr)][mo - 1ull];
 	}
-	daysSinceEpoch = daysSinceEpoch + (uint64_t)dateTime.day - 1ull;	// Day start with 1, so we substract 1
+	daysSinceEpoch = daysSinceEpoch + (uint64_t)dateTime.day - 1ull;	// Day start with 1, so we subtract 1
 
 	// #3 Set us
 	nsSinceEpoch = daysSinceEpoch								* 86400000000000ull;

@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file		alxFiltGlitchBool.c
-  * @brief		Auralix C Library - ALX Fliter Glitch Bool Module
+  * @brief		Auralix C Library - ALX Filter Glitch Bool Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License
@@ -128,7 +128,7 @@ bool AlxFiltGlitchBool_Process(AlxFiltGlitchBool* me, bool in)
 				AlxTimSw_Start(&me->tim);
 			}
 		}
-		else // We are in true state and it becomes unstable, bacause "in = false"
+		else // We are in true state and it becomes unstable, because "in = false"
 		{
 			if (unstableTime_us > me->stableFalseTime_us)
 			{

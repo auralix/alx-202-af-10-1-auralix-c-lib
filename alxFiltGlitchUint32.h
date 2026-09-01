@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file		alxFiltGlitchUint32.h
-  * @brief		Auralix C Library - ALX Fliter Glitch Uint32 Module
+  * @brief		Auralix C Library - ALX Filter Glitch Uint32 Module
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * @section License

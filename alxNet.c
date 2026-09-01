@@ -438,14 +438,14 @@ static int ping_request(uint8_t s, uint8_t *addr) {
 	PingRequest.Type = PING_REQUEST; // Ping-Request
 	PingRequest.Code = 0; // Always '0'
 	PingRequest.ID = htons(RandomID++); // set ping-request's ID to random integer value
-	PingRequest.SeqNum = htons(RandomSeqNum++); // set ping-request's sequence number to ramdom integer value
+	PingRequest.SeqNum = htons(RandomSeqNum++); // set ping-request's sequence number to random integer value
 
 	/* Fill in Data[]  as size of BUF_LEN (Default = 32)*/
 	for (int i = 0; i < PING_BUF_LEN; i++) {
 		PingRequest.Data[i] = (i) % 8; //'0'~'8' number into ping-request's data
 	}
 	/* Do checksum of Ping Request */
-	PingRequest.CheckSum = 0; // value of checksum before calucating checksum of ping-request packet
+	PingRequest.CheckSum = 0; // value of checksum before calculating checksum of ping-request packet
 	PingRequest.CheckSum = htons(ping_checksum((uint8_t*)&PingRequest, sizeof(PingRequest))); // Calculate checksum
 
 	/* sendto ping_request to destination */
@@ -1005,7 +1005,7 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 				}
 				else
 				{
-					// PDN deact successfull
+					// PDN deact successful
 					pdn_deact_cnt = 0;
 					start_time = AlxTick_Get_ms(&alxTick);
 					connection_state = State_ModemOn;
@@ -1105,7 +1105,7 @@ static ConenctionStateType cellular_HandleConnection(AlxNet *me, HandleConnectio
 #endif
 
 #if defined(ALX_WIZNET)
-// saved when wiznet network is disconencted
+// saved when wiznet network is disconnected
 static char saved_mac[ALX_NET_MAC_SIZE];
 static char saved_ip[ALX_NET_IP_ADDRESS_SIZE];
 static char saved_netmask[ALX_NET_IP_ADDRESS_SIZE];
