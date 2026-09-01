@@ -1,4 +1,49 @@
-# Auralix C Library - PC Unit Tests
+# Auralix C Library - Test
+
+---
+
+# Human Notes
+
+## WRITE
+- **Tools**
+	- Visual Studio Community
+	- clangd
+	- VisualGDB IntelliSense
+- **Files - Config**
+	- `.clangd`
+	- `.editorconfig`
+- **Files - Generated**
+	- `Test/build/compile_commands.json`
+
+## COMPILE
+- **Tools**
+	- clang `-std=gnu99 -O0 -g -Werror` + warning_flags
+- **Files - Config**
+	- `Test/alxConfig.h`
+- **Files - Code**
+	- `Test/conftest.py`
+
+## TEST
+- **Tools**
+	- pytest
+	- ctypes
+	- uv
+- **Files - Config**
+	- `Test/pyproject.toml`
+	- `Test/uv.lock`
+- **Files - Code**
+	- `Test/conftest.py`
+	- `Test/test_alx<Module>.py` -> `Test/test_alxFifo.py`
+	- `Test/alx<Module>TestHelpers.c` -> `Test/alxFifoTestHelpers.c`
+	- `Test/alx<FakedModule>Fake.c` -> `Test/alxSerialPortFake.c`
+	- `Test/alx<Module>Test.def` -> `Test/alxFifoTest.def`
+- **Files - Generated**
+	- `Test/build/pytest_report.xml`
+	- `Test/build/pytest_report.html`
+
+---
+
+# AI Notes
 
 Tier 1 = pure C modules, tested directly.
 Tier 2 = modules with hardware-shaped extern dependencies, tested via link-time fakes.
