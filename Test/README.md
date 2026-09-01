@@ -110,7 +110,7 @@
 	- `Test/build/mutation/survivors/*.diff`
 	- `Test/build/mutation/report.txt`
 
-## COMPILE TARGET
+## COMPILE - TARGET
 - **Tools**
 	- VisualGDB/MSBuild (today) -> CMake + Ninja (future)
 	- arm-none-eabi 10.3.1 + newlib-nano
@@ -121,7 +121,7 @@
 - **Files - Generated** (device repo)
 	- `.bin` / `.elf` / `.map`
 
-## TEST TARGET
+## TEST - TARGET
 - **Tools**
 	- pytest = bench orchestrator (planned)
 	- instrument drivers per bus (Python libs: serial, CAN, Ethernet, Modbus/PLC, SCPI/VISA, GPIO/relay, debug probe, ...)
