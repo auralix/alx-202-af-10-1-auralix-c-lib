@@ -110,6 +110,27 @@
 	- `Test/build/mutation/survivors/*.diff`
 	- `Test/build/mutation/report.txt`
 
+## TARGET
+- **Tools**
+	- VisualGDB/MSBuild (today) -> CMake + Ninja (future)
+	- arm-none-eabi 10.3.1 + newlib-nano
+	- Backlog: `-Wl,--print-memory-usage` + `-Wstack-usage=<bytes>` gates
+- **Files - Config** (device repo)
+	- `*.vcxproj` / `mcu.props`
+	- `*.vgdbsettings`
+- **Files - Generated** (device repo)
+	- `.bin` / `.elf` / `.map`
+
+## DEVICE
+- **Tools**
+	- pytest = bench orchestrator (planned)
+	- instrument drivers per bus (Python libs: serial, CAN, Ethernet, Modbus/PLC, SCPI/VISA, GPIO/relay, debug probe, ...)
+- **Files** (device repo `Test/`, planned)
+	- `pyproject.toml` (own markers)
+	- `conftest.py` = the bench (one fixture per instrument; DUT provision / identity guard / isolation / teardown)
+	- `test_<subsystem>.py`
+	- bench config (instrument addresses per bench)
+
 
 
 
