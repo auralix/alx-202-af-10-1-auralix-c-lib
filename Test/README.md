@@ -56,7 +56,7 @@
 
 ## ANALYZE
 - **Tools**
-	- codespell + ascii_gate.py -> Stage 0
+	- codespell + ascii_gate.py + style_gate.py -> Stage 0
 	- clang-tidy -> Stage 1
 	- cppcheck -> Stage 2
 		- `--platform=unix32 --funsigned-char` -> Cortex-M
@@ -68,6 +68,7 @@
 	- `Test/RunStaticAnalysis.ps1`
 	- `Test/ToolPaths.ps1`
 	- `Test/ascii_gate.py`
+	- `Test/style_gate.py`
 - **Files - Generated**
 	- `Test/build/analysis/fanalyzer.txt`
 
