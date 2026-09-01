@@ -41,6 +41,35 @@
 	- `Test/build/pytest_report.xml`
 	- `Test/build/pytest_report.html`
 
+## ANALYZE
+- **Tools**
+	- codespell + ascii_gate.py -> Stage 0
+	- clang-tidy -> Stage 1
+	- cppcheck -> Stage 2
+		- `--platform=unix32 --funsigned-char` -> Cortex-M
+		- `--platform=win64` -> Windows
+	- arm-gcc 15.2.1 `-fanalyzer` -> Stage 3
+- **Files - Config**
+	- `.clang-tidy`
+- **Files - Code**
+	- `Test/RunStaticAnalysis.ps1`
+	- `Test/ToolPaths.ps1`
+	- `Test/ascii_gate.py`
+- **Files - Generated**
+	- `Test/build/analysis/fanalyzer.txt`
+
+## SANITIZE
+- **Tools**
+	- clang ASan + UBSan `-fsanitize=address,undefined` -> Stage 1 = `alxFifoSanSmoke.exe`
+	- clang UBSan `-fsanitize=undefined` -> Stage 2 = `alxFifoTest.dll` & pytest
+- **Files - Code**
+	- `Test/RunSanitizers.ps1`
+	- `Test/alxFifoAsanSmoke.c`
+- **Files - Generated**
+	- `Test/build/asan/alxFifoSanSmoke.exe`
+	- `Test/build/asan/clang_rt.asan_dynamic-x86_64.dll`
+	- `Test/build/ubsan/alxFifoTest.dll`
+
 ---
 
 # AI Notes
