@@ -42,7 +42,7 @@ Reproducible environment: `uv sync --locked && uv run pytest`.
 ```
 alxFooTestHelpers.c     opaque-handle New/Delete + status-enum getters (+ fakes for Tier 2)
 alxFooTest.def          DLL exports
-test_<KEY>_alxfoo.py    tests, names test_<KEY>_P<n>_<what>
+test_alxFoo.py          tests; file = module-scoped, functions = task-scoped: test_<KEY>_P<n>_<what>
 ```
 
 ## Conventions
