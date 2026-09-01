@@ -38,6 +38,10 @@ AlxFifo* AlxFifoTest_New(uint32_t buffLen)
 {
 	AlxFifo* me = (AlxFifo*)malloc(sizeof(AlxFifo));
 	uint8_t* buff = (uint8_t*)malloc(buffLen);
+	if ((me == NULL) || (buff == NULL))
+	{
+		exit(1);	// test infrastructure - fail fast on OOM
+	}
 	memset(buff, '\n', buffLen);	// poison with a DELIMITER byte - any scan past the
 									// valid entries finds a phantom terminator deterministically
 	AlxFifo_Ctor(me, buff, buffLen);

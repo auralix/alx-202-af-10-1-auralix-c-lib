@@ -69,8 +69,21 @@ HOST_WARN_FLAGS = [
 ]
 
 
+def _write_compile_db() -> None:
+    """compile_commands.json for clang-tidy/clangd - same flags as the real build."""
+    import json
+    args_common = ["clang", "-std=gnu99", "-O1", *HOST_WARN_FLAGS,
+                   "-D_CRT_SECURE_NO_WARNINGS",
+                   f"-I{TEST_DIR}", f"-I{CLIB_DIR}", f"-I{CLIB_DIR / 'Mcu'}"]
+    db = [{"directory": str(BUILD_DIR),
+           "arguments": [*args_common, "-c", str(src)],
+           "file": str(src)} for src in FIFO_SOURCES]
+    (BUILD_DIR / "compile_commands.json").write_text(json.dumps(db, indent=1))
+
+
 def _build_fifo_dll() -> None:
     BUILD_DIR.mkdir(exist_ok=True)
+    _write_compile_db()
     vcvars = _find_vcvars()
     sources = " ".join(f'"{s}"' for s in FIFO_SOURCES)
     flags = " ".join(HOST_WARN_FLAGS)

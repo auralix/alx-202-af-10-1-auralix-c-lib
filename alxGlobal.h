@@ -72,7 +72,7 @@ extern "C" {
 //#include <tgmath.h>	// ALX-1514: depends on complex.h - same clang-cl clash
 //#include <threads.h>
 #include <time.h>
-#include <uchar.h>
+//#include <uchar.h>	// ALX-1514: not provided by arm-none-eabi newlib (-fanalyzer leg compiles ALX_PC config with arm-gcc); char16_t/char32_t unused in the lib
 #include <wchar.h>
 #include <wctype.h>
 #endif

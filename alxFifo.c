@@ -227,7 +227,7 @@ Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str)
   * @param[in,out]	me
   * @return
   */
-uint32_t AlxFifo_GetNumOfEntries(AlxFifo* me)
+uint32_t AlxFifo_GetNumOfEntries(const AlxFifo* me)
 {
 	// Assert
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);

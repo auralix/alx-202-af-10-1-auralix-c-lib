@@ -320,7 +320,7 @@ Alx_Status AlxBound_Double(double* val, double valMin, double valMax)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxBound_Str(char* valBounded, char* val, uint32_t valMaxLenWithNullTerm)
+Alx_Status AlxBound_Str(char* valBounded, const char* val, uint32_t valMaxLenWithNullTerm)
 {
 	ALX_BOUND_ASSERT(1 < valMaxLenWithNullTerm);	// We want more than 1, because of null terminator
 
@@ -333,7 +333,7 @@ Alx_Status AlxBound_Str(char* valBounded, char* val, uint32_t valMaxLenWithNullT
 	}
 	else
 	{
-		strcpy(valBounded, val);
+		memcpy(valBounded, val, valLenWithNullTerm);	// Length incl. null terminator known & checked above
 		return Alx_Ok;
 	}
 }

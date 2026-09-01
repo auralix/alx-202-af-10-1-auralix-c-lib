@@ -1,0 +1,18 @@
+# Auralix C Library - clang-tidy configuration
+# Disabled checks (measured as noise on this codebase):
+#   bugprone-easily-swappable-parameters - fires on every (me, data) style C API
+#   cert-int09-c                         - non-consecutive enumerators are intentional here
+#   clang-analyzer-optin.performance.Padding / insecureAPI.DeprecatedOrUnsafeBufferHandling
+#                                        - host-CRT artifacts, meaningless for the target
+Checks: >
+  -*, clang-analyzer-*, bugprone-*, cert-*, concurrency-mt-unsafe,
+  misc-redundant-expression, misc-static-assert,
+  readability-misleading-indentation, readability-non-const-parameter,
+  -bugprone-easily-swappable-parameters, -cert-int09-c,
+  -clang-analyzer-optin.performance.Padding,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+WarningsAsErrors: >
+  clang-analyzer-*, bugprone-branch-clone, bugprone-macro-parentheses,
+  bugprone-suspicious-semicolon, bugprone-terminating-continue,
+  cert-err33-c, cert-flp30-c, misc-redundant-expression
+HeaderFilterRegex: '.*[\/]alx[A-Za-z0-9]+\.h$'

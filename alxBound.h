@@ -88,7 +88,7 @@ Alx_Status AlxBound_Int64(int64_t* val, int64_t valMin, int64_t valMax);
 Alx_Status AlxBound_Float(float* val, float valMin, float valMax);
 Alx_Status AlxBound_Double(double* val, double valMin, double valMax);
 //Alx_Status AlxBound_Arr(char* val, uint32_t valLenMax);	// TV: TODO
-Alx_Status AlxBound_Str(char* valBounded, char* val, uint32_t valMaxLenWithNullTerm);
+Alx_Status AlxBound_Str(char* valBounded, const char* val, uint32_t valMaxLenWithNullTerm);
 
 
 #endif	// #if defined(ALX_C_LIB)
