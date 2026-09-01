@@ -97,6 +97,18 @@
 	- `Test/build/cov/coverage_report.txt` + `html/index.html`
 	- `Test/build/cov/lcov.info` -> `coverage_c.xml` (cobertura)
 	- `Test/build/cov/summary.json` (gate input)
+ 
+## QUALIFY
+- **Tools**
+	- universalmutator (mutant generation)
+	- clang `-fsyntax-only` + TCE object-compare (pool filters)
+- **Files - Code**
+	- `Test/RunMutation.ps1`
+	- `Test/mutation_run.py`
+- **Files - Generated**
+	- `Test/build/mutation/mutants/`
+	- `Test/build/mutation/survivors/*.diff`
+	- `Test/build/mutation/report.txt`
 
 
 
