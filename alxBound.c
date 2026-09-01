@@ -333,7 +333,7 @@ Alx_Status AlxBound_Str(char* valBounded, const char* val, uint32_t valMaxLenWit
 	}
 	else
 	{
-		memcpy(valBounded, val, valLenWithNullTerm);	// Length incl. null terminator known & checked above
+		memcpy(valBounded, val, valLenWithNullTerm);
 		return Alx_Ok;
 	}
 }
