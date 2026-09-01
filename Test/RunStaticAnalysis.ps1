@@ -1,5 +1,6 @@
 # Auralix C Library - static analysis of the PC-tested module sources
 #
+#   Stage 0  codespell + ascii_gate.py (text hygiene: spelling, pure-ASCII sources)
 #   Stage 1  clang-tidy    (.clang-tidy config, compile_commands.json from conftest)
 #   Stage 2  cppcheck      (the only tool exploring #ifdef combinations)
 #   Stage 3  gcc -fanalyzer (arm-gcc 15.2.Rel1, interprocedural path analysis)
