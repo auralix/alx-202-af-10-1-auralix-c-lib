@@ -3,6 +3,8 @@
 **Spec V1 (draft, ALX-1514 pilot). Normative for testing Tier 1/2 c-lib modules on PC.**
 Rationale, measurements and rejected alternatives: internal engineering wiki
 (AuralixCCppLibWiki) and the ALX-1514 task record. This file says WHAT; the wiki says WHY.
+Rule: this spec states only what IS implemented and enforceable - normative changes land
+in the same commit as their implementation. Status/backlog live in Jira and the wiki, never here.
 
 ## 1. Scope - module tiers
 
@@ -81,7 +83,7 @@ Conventions (all mandatory):
   (precedent: ALX-1514, commits 7c98879 -> 1efb914).
 - One DLL per module/test-group: link-time fakes must never collide.
 
-## 7. Static analysis on the module - NORMATIVE order
+## 7. Static analysis on the module - normative order (legs land per module as adopted)
 
 1. **clang-tidy** (config `.clang-tidy`, target-mode flags) - gate: zero findings in
    `WarningsAsErrors` set. Never bare `NOLINT`; always `NOLINT(check)` + reason.
@@ -109,26 +111,3 @@ evidence). **Default instruction for Tier 1/2 modules: "Test at L5".**
 
 Zero-test guards: pytest exit code 5 is never swallowed; junit `tests=` count is the
 minimum-count assert once CI exists.
-
-## 10. Status of this spec (V1)
-
-| Item | Status |
-|---|---|
-| pytest harness, evidence artifacts, uv lock, strict config | implemented (alxFifo pilot) |
-| coverage + sanitizer variants with negative controls | implemented |
-| **dialect switch of all 4 variants to `-std=gnu99` + warning set + -Werror** | **PENDING - next change** |
-| compile_commands.json generated from conftest | PENDING |
-| .clang-tidy config + module gate | PENDING |
-| cppcheck + -fanalyzer legs scripted | PENDING |
-| second module (alxCli, Tier 2 with fake serial port) | PENDING (ALX-1514 step 2) |
-
-## 11. Improvement backlog (trigger -> action)
-
-- DLL-copy-before-load (Windows file-lock hygiene) - when parallel/watch runs appear.
-- `build_info()` export (git hash + compiler in DLL, asserted by a test) - with CI.
-- `faulthandler` enabled in conftest - cheap, with next conftest touch.
-- hypothesis `RuleBasedStateMachine` migration of property tests - when a model test needs
-  shrinking to debug.
-- MSan leg - on the future Linux CI runner (not possible on Windows, from any compiler).
-- libFuzzer target - only if hypothesis tests stop finding issues on parser-shaped modules.
-- Committed mutant list + `mutation_smoke.py` - promotes manual spot-checks to a durable artifact.
