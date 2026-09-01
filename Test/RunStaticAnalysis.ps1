@@ -36,7 +36,9 @@ Write-Host "Stage 1 (clang-tidy): CLEAN"
 # --- Stage 2: cppcheck ---------------------------------------------------------
 # missing tool = FAIL, never skip: a gate that silently passes without its tool is a hole
 if (-not (Test-Path $cppcheck)) { throw "Stage 2 FAILED: cppcheck not found at '$cppcheck' (install it or set ALX_CPPCHECK)" }
-& $cppcheck --std=c99 --platform=unix32 --enable=warning,style,performance,portability `
+# unix32 = ILP32 widths of the Cortex-M target; --funsigned-char because plain char is
+# UNSIGNED per ARM AAPCS (verified: _Static_assert(CHAR_MIN==0) compiles under arm-gcc)
+& $cppcheck --std=c99 --platform=unix32 --funsigned-char --enable=warning,style,performance,portability `
     --inline-suppr --error-exitcode=1 --quiet `
     --suppress=missingIncludeSystem --suppress=unusedFunction `
     -I $test -I $clib -I "$clib\Mcu" @sources
