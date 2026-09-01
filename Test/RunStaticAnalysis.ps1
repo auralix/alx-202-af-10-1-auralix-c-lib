@@ -14,7 +14,7 @@ $build = Join-Path $test "build"
 . "$PSScriptRoot\ToolPaths.ps1"
 
 # module sources under analysis (extend per module)
-$sources = @("$clib\alxFifo.c", "$clib\alxBound.c", "$test\alxFifoTestHelpers.c", "$test\alxFifoAsanSmoke.c")
+$sources = @("$clib\alxFifo.c", "$clib\alxBound.c", "$test\alxFifoTestHelpers.c", "$test\alxFifoSanSmoke.c")
 
 New-Item -ItemType Directory -Force "$build\analysis" | Out-Null
 if (-not (Test-Path "$build\compile_commands.json")) {

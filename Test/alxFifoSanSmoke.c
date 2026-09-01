@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * @file		alxFifoAsanSmoke.c
-  * @brief		Auralix C Library - ALX FIFO Module - AddressSanitizer smoke runner
+  * @file		alxFifoSanSmoke.c
+  * @brief		Auralix C Library - ALX FIFO Module - ASan+UBSan smoke runner
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * Native exe built with /fsanitize=address. Exercises the memory-risky paths

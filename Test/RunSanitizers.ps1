@@ -29,7 +29,7 @@ if ($LASTEXITCODE -ne 0) { throw "dev-lane build/collect failed" }
 New-Item -ItemType Directory -Force $build, "$build\asan", "$build\ubsan" | Out-Null
 
 # --- Stage 1: native combined ASan+UBSan exe (clang) --------------------------
-cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /clang:-std=gnu99 -fsanitize=address,undefined -fno-sanitize-recover=undefined /Z7 /MT /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoAsanSmoke.c"" /Fe:""$build\asan\alxFifoSanSmoke.exe"" /Fo""$build\asan""\"
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /clang:-std=gnu99 -fsanitize=address,undefined -fno-sanitize-recover=undefined /Z7 /MT /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoSanSmoke.c"" /Fe:""$build\asan\alxFifoSanSmoke.exe"" /Fo""$build\asan""\"
 if ($LASTEXITCODE -ne 0) { throw "sanitizer smoke exe build failed" }
 $resDir = (& "$llvm\clang.exe" -print-resource-dir | Out-String).Trim()
 Copy-Item (Join-Path $resDir "lib\windows\clang_rt.asan_dynamic-x86_64.dll") "$build\asan" -Force   # the compiler's OWN runtime must shadow MSVC's older copy
