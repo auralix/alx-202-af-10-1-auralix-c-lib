@@ -23,7 +23,7 @@
 - **Files - Generated**
 	- `Test/build/compile_commands.json`
 
-## COMPILE
+## COMPILE - HOST
 - **Tools**
 	- clang `-std=gnu99 -O0 -g -Werror` + warning_flags
 	- vswhere -> vcvars64 (VS2022 C++ workload) = build env for all lanes
@@ -34,7 +34,7 @@
 - **Files - Generated**
 	- `Test/build/alxFifoTest.dll`
 
-## TEST
+## TEST - HOST
 - **Tools**
 	- python >= 3.10
 	- pytest + plugins: pytest-html, pytest-timeout, pytest-randomly
@@ -83,7 +83,7 @@
 	- `Test/build/asan/clang_rt.asan_dynamic-x86_64.dll`
 	- `Test/build/ubsan/alxFifoTest.dll`
 
-## MEASURE
+## COVERAGE
 - **Tools**
 	- clang-cl `-fprofile-instr-generate -fcoverage-mapping`
 	- llvm-profdata + llvm-cov
@@ -97,8 +97,8 @@
 	- `Test/build/cov/coverage_report.txt` + `html/index.html`
 	- `Test/build/cov/lcov.info` -> `coverage_c.xml` (cobertura)
 	- `Test/build/cov/summary.json` (gate input)
- 
-## QUALIFY
+
+## MUTATE
 - **Tools**
 	- universalmutator (mutant generation)
 	- clang `-fsyntax-only` + TCE object-compare (pool filters)
@@ -110,7 +110,7 @@
 	- `Test/build/mutation/survivors/*.diff`
 	- `Test/build/mutation/report.txt`
 
-## TARGET
+## COMPILE TARGET
 - **Tools**
 	- VisualGDB/MSBuild (today) -> CMake + Ninja (future)
 	- arm-none-eabi 10.3.1 + newlib-nano
@@ -121,7 +121,7 @@
 - **Files - Generated** (device repo)
 	- `.bin` / `.elf` / `.map`
 
-## DEVICE
+## TEST TARGET
 - **Tools**
 	- pytest = bench orchestrator (planned)
 	- instrument drivers per bus (Python libs: serial, CAN, Ethernet, Modbus/PLC, SCPI/VISA, GPIO/relay, debug probe, ...)
