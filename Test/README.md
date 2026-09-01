@@ -207,6 +207,9 @@ alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar),
 - Test commit precedes implementation commit and is demonstrated failing first.
 - One DLL per module/test-group.
 - Library sources are pure ASCII (gated: `ascii_gate.py`, Stage 0 of RunStaticAnalysis).
+- No ternary operator in gated sources - write if/else (gated: `style_gate.py`, Stage 0).
+- Doxygen tag lines: tabs-only field separators; name and description columns each
+  aligned within a block, tab stop 4 (gated: `style_gate.py`, Stage 0).
 - Test names keep their ORIGINATING proof token forever; later tasks attach
   `@pytest.mark.req("ALX-<key>-P<n>")` instead of renaming. Proof tokens are mirrored
   into junit XML as `<property>` elements (conftest hook).

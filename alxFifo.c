@@ -397,7 +397,15 @@ static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const cha
 	//------------------------------------------------------------------------------
 	// Search Line End - lineLen = line length INCLUDING terminator, 0 = not found
 	//------------------------------------------------------------------------------
-	uint32_t delimLen = delimIsSet ? 1u : (uint32_t)strlen(delim);
+	uint32_t delimLen;
+	if (delimIsSet)
+	{
+		delimLen = 1;
+	}
+	else
+	{
+		delimLen = (uint32_t)strlen(delim);
+	}
 	uint32_t lineLen = 0;
 	for (uint32_t i = 0; (i + delimLen) <= me->numOfEntries; i++)
 	{

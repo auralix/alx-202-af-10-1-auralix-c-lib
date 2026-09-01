@@ -1,6 +1,6 @@
 # Auralix C Library - static analysis of the PC-tested module sources
 #
-#   Stage 0  codespell + ascii_gate.py (text hygiene: spelling, pure-ASCII sources)
+#   Stage 0  codespell + ascii_gate.py + style_gate.py (spelling, pure-ASCII, no ternary, doxygen tab alignment)
 #   Stage 1  clang-tidy    (.clang-tidy config, compile_commands.json from conftest)
 #   Stage 2  cppcheck      (the only tool exploring #ifdef combinations)
 #   Stage 3  gcc -fanalyzer (arm-gcc 15.2.Rel1, interprocedural path analysis)
@@ -15,6 +15,8 @@ $build = Join-Path $test "build"
 
 # module sources under analysis (extend per module)
 $sources = @("$clib\alxFifo.c", "$clib\alxBound.c", "$test\alxFifoTestHelpers.c", "$test\alxFifoSanSmoke.c")
+# style gate scope = sources + their public headers (extend per module)
+$styleFiles = $sources + @("$clib\alxFifo.h", "$clib\alxBound.h")
 
 New-Item -ItemType Directory -Force "$build\analysis" | Out-Null
 if (-not (Test-Path "$build\compile_commands.json")) {
@@ -27,6 +29,8 @@ if ($LASTEXITCODE -ne 0) { throw "Stage 0 FAILED: codespell findings above" }
 Write-Host "Stage 0 (codespell): CLEAN"
 python "$test\ascii_gate.py" "$clib"
 if ($LASTEXITCODE -ne 0) { throw "Stage 0 FAILED: non-ASCII bytes in library sources" }
+python "$test\style_gate.py" @styleFiles
+if ($LASTEXITCODE -ne 0) { throw "Stage 0 FAILED: style gate findings above (no ternary; doxygen tab alignment)" }
 
 # --- Stage 1: clang-tidy -------------------------------------------------------
 $srcArgs = ($sources | ForEach-Object { '"' + $_ + '"' }) -join ' '
