@@ -58,8 +58,8 @@ def _needs_build(dll: Path, deps) -> bool:
 
 
 # Host module builds use clang in the TARGET dialect (-std=gnu99) - never test a
-# dialect you do not ship. Warning lane at -O1 (several checks are inert at -O0),
-# blanket -Werror on the host lane per Test/README.md section 5.
+# dialect you do not ship. -O0 -g for faithful debugging (clang diagnostics are
+# front-end based, near-identical at any -O). Blanket -Werror on the host lane.
 CLANG = r"C:/Program Files/LLVM/bin/clang.exe"
 HOST_WARN_FLAGS = [
     "-Wall", "-Wextra",
@@ -76,7 +76,7 @@ HOST_WARN_FLAGS = [
 def _write_compile_db() -> None:
     """compile_commands.json for clang-tidy/clangd - same flags as the real build."""
     import json
-    args_common = ["clang", "-std=gnu99", "-O1", *HOST_WARN_FLAGS,
+    args_common = ["clang", "-std=gnu99", "-O0", *HOST_WARN_FLAGS,
                    "-D_CRT_SECURE_NO_WARNINGS",
                    f"-I{TEST_DIR}", f"-I{CLIB_DIR}", f"-I{CLIB_DIR / 'Mcu'}"]
     db = [{"directory": str(BUILD_DIR),
@@ -92,7 +92,7 @@ def _build_fifo_dll() -> None:
     sources = " ".join(f'"{s}"' for s in FIFO_SOURCES)
     flags = " ".join(HOST_WARN_FLAGS)
     cmd = (
-        f'"{vcvars}" && "{CLANG}" -std=gnu99 -O1 -g {flags} -Werror '
+        f'"{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g {flags} -Werror '
         f'-D_CRT_SECURE_NO_WARNINGS '
         f'-I"{TEST_DIR}" -I"{CLIB_DIR}" -I"{CLIB_DIR / "Mcu"}" {sources} '
         f'-shared -o "{FIFO_DLL}" -Wl,/DEF:"{TEST_DIR / "alxFifoTest.def"}"'

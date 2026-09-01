@@ -19,7 +19,7 @@ Reproducible environment: `uv sync --locked && uv run pytest`.
 ## Stack
 
 - pytest + ctypes over a per-module DLL built from the real sources.
-- Module builds: clang `-std=gnu99 -O1 -Werror` + warning set below (= target dialect).
+- Module builds: clang `-std=gnu99 -O0 -g -Werror` + warning set below (= target dialect).
 - Coverage: clang `-fprofile-instr-generate` + llvm-cov (line + branch).
 - Sanitizers: native ASan+UBSan smoke exe + UBSan DLL under the full suite.
 - Evidence per run: `build/pytest_report.xml` (junit), `build/pytest_report.html`.
