@@ -42,7 +42,7 @@
 //******************************************************************************
 static Alx_Status AlxFifo_ReadByte(AlxFifo* me, uint8_t* data);
 static Alx_Status AlxFifo_WriteByte(AlxFifo* me, uint8_t data);
-static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const char* delim, uint32_t len, uint32_t* lenActual, bool delimIsCharSet);
+static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const char* delim, uint32_t len, uint32_t* lenActual, bool delimIsSet);
 
 
 //******************************************************************************
@@ -132,12 +132,12 @@ Alx_Status AlxFifo_Read(AlxFifo* me, uint8_t* data, uint32_t len)
 }
 
 /**
-  * @brief		Reads one line from FIFO, terminated by the FIRST occurrence of the FULL delim SEQUENCE (e.g. "\r\n" = the two bytes CR,LF adjacent)
+  * @brief								Reads one line from FIFO, terminated by the FIRST occurrence of the FULL delim SEQUENCE (e.g. "\r\n" = the two bytes CR,LF adjacent)
   * @param[in,out]	me
-  * @param[out]		str			Line INCLUDING terminator, ALWAYS null-terminated; empty string on every non-Ok return
-  * @param[in]		delim		Delimiter sequence - all chars must occur adjacent, in order
-  * @param[in]		len			Size of str buffer INCLUDING null terminator - max line = len-1 chars
-  * @param[out]		lenActual	Line length EXCLUDING null terminator, 0 on every non-Ok return, NULL allowed
+  * @param[out]		str					Line INCLUDING terminator, ALWAYS null-terminated; empty string on every non-Ok return
+  * @param[in]		delim				Delimiter sequence - all chars must occur adjacent, in order
+  * @param[in]		len					Size of str buffer INCLUDING null terminator - max line = len-1 chars
+  * @param[out]		lenActual			Line length EXCLUDING null terminator, 0 on every non-Ok return, NULL allowed
   * @retval			Alx_Ok				Line delivered & consumed (empty line = terminator only)
   * @retval			AlxFifo_ErrEmpty	FIFO empty
   * @retval			AlxFifo_ErrNoDelim	No terminator yet & FIFO not full - FIFO left untouched
@@ -154,12 +154,12 @@ Alx_Status AlxFifo_ReadStrUntil(AlxFifo* me, char* str, const char* delim, uint3
 }
 
 /**
-  * @brief		Reads one line from FIFO, terminated by the FIRST occurrence of ANY SINGLE char from delimSet (e.g. "\r\n" = CR or LF, whichever comes first)
+  * @brief								Reads one line from FIFO, terminated by the FIRST occurrence of ANY SINGLE char from delimSet (e.g. "\r\n" = CR or LF, whichever comes first)
   * @param[in,out]	me
-  * @param[out]		str			Line INCLUDING terminator, ALWAYS null-terminated; empty string on every non-Ok return
-  * @param[in]		delimSet	Set of single-char delimiters - byte 0x00 is never a set member
-  * @param[in]		len			Size of str buffer INCLUDING null terminator - max line = len-1 chars
-  * @param[out]		lenActual	Line length EXCLUDING null terminator, 0 on every non-Ok return, NULL allowed
+  * @param[out]		str					Line INCLUDING terminator, ALWAYS null-terminated; empty string on every non-Ok return
+  * @param[in]		delimSet			Set of single-char delimiters - byte 0x00 is never a set member
+  * @param[in]		len					Size of str buffer INCLUDING null terminator - max line = len-1 chars
+  * @param[out]		lenActual			Line length EXCLUDING null terminator, 0 on every non-Ok return, NULL allowed
   * @retval			Alx_Ok				Line delivered & consumed (empty line = terminator only, lenActual == 1)
   * @retval			AlxFifo_ErrEmpty	FIFO empty
   * @retval			AlxFifo_ErrNoDelim	No terminator yet & FIFO not full - FIFO left untouched
@@ -373,7 +373,7 @@ static Alx_Status AlxFifo_WriteByte(AlxFifo* me, uint8_t data)
 	//------------------------------------------------------------------------------
 	return status;
 }
-static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const char* delim, uint32_t len, uint32_t* lenActual, bool delimIsCharSet)
+static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const char* delim, uint32_t len, uint32_t* lenActual, bool delimIsSet)
 {
 	//------------------------------------------------------------------------------
 	// Prepare Out Params - str always null-terminated, empty until a line is delivered
@@ -397,12 +397,12 @@ static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const cha
 	//------------------------------------------------------------------------------
 	// Search Line End - lineLen = line length INCLUDING terminator, 0 = not found
 	//------------------------------------------------------------------------------
-	uint32_t delimLen = delimIsCharSet ? 1u : (uint32_t)strlen(delim);
+	uint32_t delimLen = delimIsSet ? 1u : (uint32_t)strlen(delim);
 	uint32_t lineLen = 0;
 	for (uint32_t i = 0; (i + delimLen) <= me->numOfEntries; i++)
 	{
 		char ch = (char)me->buff[(me->tail + i) % me->buffLen];
-		if (delimIsCharSet)
+		if (delimIsSet)
 		{
 			// Set semantics - terminate at first char that is a member of delim set (0x00 is never a member)
 			if ((ch != '\0') && (strchr(delim, ch) != NULL))
