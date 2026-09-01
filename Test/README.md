@@ -117,6 +117,7 @@ python -m pytest                                                          # dev 
 powershell -NoProfile -ExecutionPolicy Bypass -File RunCoverage.ps1       # coverage + gate
 powershell -NoProfile -ExecutionPolicy Bypass -File RunSanitizers.ps1     # ASan + UBSan
 powershell -NoProfile -ExecutionPolicy Bypass -File RunStaticAnalysis.ps1 # Stages 0-3
+powershell -NoProfile -ExecutionPolicy Bypass -File RunMutation.ps1       # mutation (report-only)
 ```
 
 Reproducible environment: `uv sync --locked && uv run pytest`.
@@ -133,7 +134,11 @@ Tool paths resolve in `ToolPaths.ps1`; override via `ALX_LLVM_DIR` / `ALX_ARMGCC
 - Coverage: clang `-fprofile-instr-generate -fcoverage-mapping` + llvm-cov;
   gate = 100 % lines/branches/regions/functions on gated files (`coverage_gate.py`).
 - Sanitizers: native ASan+UBSan smoke exe + UBSan DLL under the full suite.
-- `build/` layout: root = dev lane; one subfolder per variant (`asan/`, `ubsan/`, `cov/`, `analysis/`).
+- Mutation (report-only): universalmutator mutants of the gated sources, each planted,
+  rebuilt, suite re-run (`RunMutation.ps1`/`mutation_run.py`). Survivors ->
+  `build/mutation/survivors/*.diff`; a real hole gets a killing test (P-group
+  "mutation-driven hardening"), an equivalent mutant gets a note. 100 % is not the target.
+- `build/` layout: root = dev lane; one subfolder per variant (`asan/`, `ubsan/`, `cov/`, `analysis/`, `mutation/`).
 - Evidence per run: `build/pytest_report.xml` (junit), `build/pytest_report.html`.
 
 ## Warning set
