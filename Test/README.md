@@ -99,7 +99,7 @@ test_alxFoo.py          tests; file = module-scoped, functions = task-scoped: te
 - Property tests compare against a Python reference model, fixed seeds.
 - Test commit precedes implementation commit and is demonstrated failing first.
 - One DLL per module/test-group.
-- Library sources are pure ASCII (gated: `ascii_gate.py`, Leg 0 of RunStaticAnalysis).
+- Library sources are pure ASCII (gated: `ascii_gate.py`, Stage 0 of RunStaticAnalysis).
 - Test names keep their ORIGINATING proof token forever; later tasks attach
   `@pytest.mark.req("ALX-<key>-P<n>")` instead of renaming. Proof tokens are mirrored
   into junit XML as `<property>` elements (conftest hook).

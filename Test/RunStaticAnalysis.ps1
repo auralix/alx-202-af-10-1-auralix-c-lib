@@ -1,8 +1,8 @@
 # Auralix C Library - static analysis of the PC-tested module sources
 #
-#   Leg 1  clang-tidy    (.clang-tidy config, compile_commands.json from conftest)
-#   Leg 2  cppcheck      (the only tool exploring #ifdef combinations)
-#   Leg 3  gcc -fanalyzer (arm-gcc 14.2.Rel1, interprocedural path analysis)
+#   Stage 1  clang-tidy    (.clang-tidy config, compile_commands.json from conftest)
+#   Stage 2  cppcheck      (the only tool exploring #ifdef combinations)
+#   Stage 3  gcc -fanalyzer (arm-gcc 14.2.Rel1, interprocedural path analysis)
 #
 # Exit != 0 on any finding. Usage:  powershell -File RunStaticAnalysis.ps1
 
@@ -20,46 +20,46 @@ if (-not (Test-Path "$build\compile_commands.json")) {
     python -m pytest -q --collect-only | Out-Null   # triggers conftest build + compile DB
 }
 
-# --- Leg 0: codespell (spelling gate on the module set) ----------------------
+# --- Stage 0: codespell (spelling gate on the module set) ----------------------
 python -m codespell_lib @sources
-if ($LASTEXITCODE -ne 0) { throw "Leg 0 FAILED: codespell findings above" }
-Write-Host "Leg 0 (codespell): CLEAN"
+if ($LASTEXITCODE -ne 0) { throw "Stage 0 FAILED: codespell findings above" }
+Write-Host "Stage 0 (codespell): CLEAN"
 python "$test\ascii_gate.py" "$clib"
-if ($LASTEXITCODE -ne 0) { throw "Leg 0 FAILED: non-ASCII bytes in library sources" }
+if ($LASTEXITCODE -ne 0) { throw "Stage 0 FAILED: non-ASCII bytes in library sources" }
 
-# --- Leg 1: clang-tidy -------------------------------------------------------
+# --- Stage 1: clang-tidy -------------------------------------------------------
 $srcArgs = ($sources | ForEach-Object { '"' + $_ + '"' }) -join ' '
 cmd /s /c """$llvm\clang-tidy.exe"" --quiet -p ""$build"" $srcArgs 2>nul"
-if ($LASTEXITCODE -ne 0) { throw "Leg 1 FAILED: clang-tidy findings above" }
-Write-Host "Leg 1 (clang-tidy): CLEAN"
+if ($LASTEXITCODE -ne 0) { throw "Stage 1 FAILED: clang-tidy findings above" }
+Write-Host "Stage 1 (clang-tidy): CLEAN"
 
-# --- Leg 2: cppcheck ---------------------------------------------------------
+# --- Stage 2: cppcheck ---------------------------------------------------------
 # missing tool = FAIL, never skip: a gate that silently passes without its tool is a hole
-if (-not (Test-Path $cppcheck)) { throw "Leg 2 FAILED: cppcheck not found at '$cppcheck' (install it or set ALX_CPPCHECK)" }
+if (-not (Test-Path $cppcheck)) { throw "Stage 2 FAILED: cppcheck not found at '$cppcheck' (install it or set ALX_CPPCHECK)" }
 & $cppcheck --std=c99 --platform=unix32 --enable=warning,style,performance,portability `
     --inline-suppr --error-exitcode=1 --quiet `
     --suppress=missingIncludeSystem --suppress=unusedFunction `
     -I $test -I $clib -I "$clib\Mcu" @sources
-if ($LASTEXITCODE -ne 0) { throw "Leg 2 FAILED: cppcheck findings above" }
+if ($LASTEXITCODE -ne 0) { throw "Stage 2 FAILED: cppcheck findings above" }
 # second pass: host pointer model (x64); the unix32 pass above models the 32-bit target
 & $cppcheck --std=c99 --platform=win64 --enable=warning,portability `
     --inline-suppr --error-exitcode=1 --quiet `
     --suppress=missingIncludeSystem --suppress=unusedFunction `
     -I $test -I $clib -I "$clib\Mcu" @sources
-if ($LASTEXITCODE -ne 0) { throw "Leg 2 FAILED: cppcheck (win64 pass) findings above" }
-Write-Host "Leg 2 (cppcheck unix32+win64): CLEAN"
+if ($LASTEXITCODE -ne 0) { throw "Stage 2 FAILED: cppcheck (win64 pass) findings above" }
+Write-Host "Stage 2 (cppcheck unix32+win64): CLEAN"
 
-# --- Leg 3: gcc -fanalyzer (arm-gcc, target flags) ---------------------------
+# --- Stage 3: gcc -fanalyzer (arm-gcc, target flags) ---------------------------
 $log = "$build\analysis\fanalyzer.txt"
 Set-Content $log -Value ""
 foreach ($src in $sources) {
     $name = [IO.Path]::GetFileNameWithoutExtension($src)
     cmd /s /c """$armgcc"" -c -std=gnu99 -mcpu=cortex-m0plus -mthumb -fanalyzer -I ""$test"" -I ""$clib"" -I ""$clib\Mcu"" ""$src"" -o ""$build\analysis\$name.o"" 2>>""$log"""
-    if ($LASTEXITCODE -ne 0) { Get-Content $log; throw "Leg 3 FAILED: $name did not compile" }
+    if ($LASTEXITCODE -ne 0) { Get-Content $log; throw "Stage 3 FAILED: $name did not compile" }
 }
 if (Select-String -Path $log -Pattern "-Wanalyzer" -Quiet) {
-    Get-Content $log; throw "Leg 3 FAILED: -fanalyzer findings above"
+    Get-Content $log; throw "Stage 3 FAILED: -fanalyzer findings above"
 }
-Write-Host "Leg 3 (gcc -fanalyzer): CLEAN"
+Write-Host "Stage 3 (gcc -fanalyzer): CLEAN"
 Write-Host ""
 Write-Host "STATIC ANALYSIS CLEAN"
