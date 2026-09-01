@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxTrace_McuLpc55S6x.h
   * @brief		Auralix C Library - ALX Trace MCU LPC55S6X Module

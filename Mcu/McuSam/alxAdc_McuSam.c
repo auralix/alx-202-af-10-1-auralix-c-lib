@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAdc_McuSam.c
   * @brief		Auralix C Library - ALX ADC MCU SAM Module

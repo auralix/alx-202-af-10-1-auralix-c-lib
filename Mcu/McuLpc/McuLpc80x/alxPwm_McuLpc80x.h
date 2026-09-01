@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPwm_McuLpc80x.h
   * @brief		Auralix C Library - ALX PWM MCU LPC80X Module

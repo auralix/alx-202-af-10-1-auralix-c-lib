@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAdc_McuLpc17xx.h
   * @brief		Auralix C Library - ALX ADC MCU LPC17XX Module

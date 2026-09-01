@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxIoPin_McuLpc80x.c
   * @brief		Auralix C Library - ALX IO Pin MCU LPC80X Module

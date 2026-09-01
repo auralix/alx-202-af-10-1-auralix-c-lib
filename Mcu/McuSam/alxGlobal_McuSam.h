@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxGlobal_McuSam.h
   * @brief		Auralix C Library - ALX Global MCU SAM File

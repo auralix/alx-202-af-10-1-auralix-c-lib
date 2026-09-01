@@ -24,6 +24,8 @@ if (-not (Test-Path "$build\compile_commands.json")) {
 python -m codespell_lib @sources
 if ($LASTEXITCODE -ne 0) { throw "Leg 0 FAILED: codespell findings above" }
 Write-Host "Leg 0 (codespell): CLEAN"
+python "$test\ascii_gate.py" "$clib"
+if ($LASTEXITCODE -ne 0) { throw "Leg 0 FAILED: non-ASCII bytes in library sources" }
 
 # --- Leg 1: clang-tidy -------------------------------------------------------
 $srcArgs = ($sources | ForEach-Object { '"' + $_ + '"' }) -join ' '

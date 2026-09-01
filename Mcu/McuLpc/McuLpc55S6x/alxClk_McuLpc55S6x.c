@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxClk_McuLpc55S6x.c
   * @brief		Auralix C Library - ALX Clock MCU LPC55S6X Module

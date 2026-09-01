@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxRst_McuStm32.c
   * @brief		Auralix C Library - ALX Reset MCU STM32 Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxSerialPort_McuStm32.h
   * @brief		Auralix C Library - ALX Serial Port MCU STM32 Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxSpi_McuZephyr.c
   * @brief		Auralix C Library - ALX SPI MCU Zephyr Module

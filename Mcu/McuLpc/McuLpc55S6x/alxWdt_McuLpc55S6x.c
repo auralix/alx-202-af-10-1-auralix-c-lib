@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxWdt_McuLpc55S6x.c
   * @brief		Auralix C Library - ALX Watchdog Timer MCU LPC80X Module

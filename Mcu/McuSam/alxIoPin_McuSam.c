@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxIoPin_McuSam.c
   * @brief		Auralix C Library - ALX IO Pin MCU SAM Module

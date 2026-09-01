@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxGlobal_McuLpc55S6x.h
   * @brief		Auralix C Library - ALX Global MCU LPC55S6X File

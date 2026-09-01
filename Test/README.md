@@ -54,3 +54,4 @@ test_<KEY>_alxfoo.py    tests, names test_<KEY>_P<n>_<what>
 - Property tests compare against a Python reference model, fixed seeds.
 - Test commit precedes implementation commit and is demonstrated failing first.
 - One DLL per module/test-group.
+- Library sources are pure ASCII (gated: `ascii_gate.py`, Leg 0 of RunStaticAnalysis).

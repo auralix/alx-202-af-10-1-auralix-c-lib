@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxRtc_McuStm32.h
   * @brief		Auralix C Library - ALX RTC MCU STM32 Module

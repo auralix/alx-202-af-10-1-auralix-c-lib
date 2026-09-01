@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxIoPin_McuZephyr.c
   * @brief		Auralix C Library - ALX IO Pin MCU Zephyr Module

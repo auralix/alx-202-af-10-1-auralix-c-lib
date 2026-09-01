@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxClk_McuStm32.c
   * @brief		Auralix C Library - ALX Clock MCU STM32 Module

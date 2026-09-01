@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxSpi_McuStm32.c
   * @brief		Auralix C Library - ALX SPI MCU STM32 Module

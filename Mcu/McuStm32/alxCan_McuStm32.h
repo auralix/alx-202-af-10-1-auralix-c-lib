@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxCan_McuStm32.h
   * @brief		Auralix C Library - ALX CAN MCU STM32 Module

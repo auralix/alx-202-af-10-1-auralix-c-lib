@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPwm_McuSam.h
   * @brief		Auralix C Library - ALX PWM MCU SAM Module

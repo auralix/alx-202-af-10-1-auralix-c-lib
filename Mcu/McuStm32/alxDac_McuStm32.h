@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxDac_McuStm32.h
   * @brief		Auralix C Library - ALX DAC MCU STM32 Module

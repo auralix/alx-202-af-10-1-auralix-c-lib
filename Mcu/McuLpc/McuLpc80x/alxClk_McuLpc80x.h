@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxClk_McuLpc80x.h
   * @brief		Auralix C Library - ALX Clock MCU LPC80X Module

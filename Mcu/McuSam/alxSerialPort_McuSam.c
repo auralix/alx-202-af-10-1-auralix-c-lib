@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxSerialPort_McuSam.c
   * @brief		Auralix C Library - ALX Serial Port MCU SAM Module

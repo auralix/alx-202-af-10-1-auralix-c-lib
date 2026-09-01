@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxTrace_McuSam.c
   * @brief		Auralix C Library - ALX Trace MCU SAM Module

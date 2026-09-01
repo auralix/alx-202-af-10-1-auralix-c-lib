@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxI2c_McuLpc80x.h
   * @brief		Auralix C Library - ALX I2C MCU LPC80X Module

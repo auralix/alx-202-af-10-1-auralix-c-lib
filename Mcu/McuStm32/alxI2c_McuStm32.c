@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxI2c_McuStm32.c
   * @brief		Auralix C Library - ALX I2C MCU STM32 Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxIoPin_McuStm32.c
   * @brief		Auralix C Library - ALX IO Pin MCU STM32 Module

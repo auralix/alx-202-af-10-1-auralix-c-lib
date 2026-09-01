@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxSpi_McuLpc55S6x.c
   * @brief		Auralix C Library - ALX SPI MCU LPC55S6X Module

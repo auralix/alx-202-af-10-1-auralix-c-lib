@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPwm_McuStm32.h
   * @brief		Auralix C Library - ALX PWM MCU STM32 Module

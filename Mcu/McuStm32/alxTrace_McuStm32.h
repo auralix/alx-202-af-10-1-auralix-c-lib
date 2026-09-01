@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxTrace_McuStm32.h
   * @brief		Auralix C Library - ALX Trace MCU STM32 Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAdc_McuLpc80x.c
   * @brief		Auralix C Library - ALX ADC MCU LPC80X Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxTrace_McuZephyr.c
   * @brief		Auralix C Library - ALX Trace MCU Zephyr Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxClk_McuLpc17xx.c
   * @brief		Auralix C Library - ALX Clock MCU LPC17XX Module

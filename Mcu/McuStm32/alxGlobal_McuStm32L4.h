@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxGlobal_McuStm32L4.h
   * @brief		Auralix C Library - ALX Global MCU STM32L4 File

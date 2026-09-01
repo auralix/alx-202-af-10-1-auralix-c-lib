@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAdc_McuZephyr.c
   * @brief		Auralix C Library - ALX ADC MCU Zephyr Module

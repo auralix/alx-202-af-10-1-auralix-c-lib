@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPwm_McuLpc55S6x.c
   * @brief		Auralix C Library - ALX PWM MCU LPC55S6X Module

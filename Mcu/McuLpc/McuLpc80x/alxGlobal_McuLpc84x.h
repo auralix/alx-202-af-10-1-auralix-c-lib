@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxGlobalMcuLpc84x.h
   * @brief		Auralix C Library - ALX Global MCU LPC84X File

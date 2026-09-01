@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxTrace_McuLpc17xx.h
   * @brief		Auralix C Library - ALX Trace MCU LPC17XX Module

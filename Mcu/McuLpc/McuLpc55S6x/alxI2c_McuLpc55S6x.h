@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxI2c_McuLpc55S6x.h
   * @brief		Auralix C Library - ALX I2C MCU LPC55S6X Module

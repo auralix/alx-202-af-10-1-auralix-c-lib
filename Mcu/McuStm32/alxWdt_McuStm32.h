@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxWdt_McuStm32.h
   * @brief		Auralix C Library - ALX Watchdog Timer MCU STM32 Module

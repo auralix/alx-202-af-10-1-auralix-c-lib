@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxSerialPort_McuLpc55S6x.h
   * @brief		Auralix C Library - ALX Serial Port MCU LPC55S6X Module

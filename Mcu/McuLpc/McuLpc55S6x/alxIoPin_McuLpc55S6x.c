@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxIoPin_McuLpc55S6x.c
   * @brief		Auralix C Library - ALX IO Pin MCU LPC55S6X Module

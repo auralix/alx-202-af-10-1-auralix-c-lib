@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxI2s_McuStm32.h
   * @brief		Auralix C Library - ALX I2S MCU STM32 Module

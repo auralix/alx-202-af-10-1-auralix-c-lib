@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxGlobal_McuLpc17xx.h
   * @brief		Auralix C Library - ALX Global MCU LPC17XX File
