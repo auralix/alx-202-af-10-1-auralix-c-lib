@@ -70,6 +70,21 @@
 	- `Test/build/asan/clang_rt.asan_dynamic-x86_64.dll`
 	- `Test/build/ubsan/alxFifoTest.dll`
 
+## MEASURE
+- **Tools**
+	- clang `-fprofile-instr-generate -fcoverage-mapping`
+	- llvm-profdata + llvm-cov
+	- lcov-cobertura
+- **Files - Code**
+	- `Test/RunCoverage.ps1`
+	- `Test/coverage_gate.py` (gate)
+- **Files - Generated**
+	- `Test/build/cov/alxFifoTest.dll
+	- `Test/build/cov/*.profraw` -> `merged.profdata`
+	- `Test/build/cov/coverage_report.txt` + `html/index.html`
+	- `Test/build/cov/lcov.info` -> `coverage_c.xml` (cobertura)
+	- `Test/build/cov/summary.json` (gate input)
+
 ---
 
 # AI Notes
