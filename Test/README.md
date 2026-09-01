@@ -2,7 +2,14 @@
 
 ---
 
+
+
+
 # Human Notes
+
+---
+
+# Verification Pipeline
 
 ## WRITE
 - **Tools**
@@ -12,31 +19,37 @@
 - **Files - Config**
 	- `.clangd`
 	- `.editorconfig`
+	- `.gitattributes`
 - **Files - Generated**
 	- `Test/build/compile_commands.json`
 
 ## COMPILE
 - **Tools**
 	- clang `-std=gnu99 -O0 -g -Werror` + warning_flags
+	- vswhere -> vcvars64 (VS2022 C++ workload) = build env for all lanes
 - **Files - Config**
 	- `Test/alxConfig.h`
 - **Files - Code**
 	- `Test/conftest.py`
+- **Files - Generated**
+	- `Test/build/alxFifoTest.dll`
 
 ## TEST
 - **Tools**
-	- pytest
+	- python >= 3.10
+	- pytest + plugins: pytest-html, pytest-timeout, pytest-randomly
 	- ctypes
 	- uv
 - **Files - Config**
 	- `Test/pyproject.toml`
 	- `Test/uv.lock`
+	- `Test/.python-version`
 - **Files - Code**
 	- `Test/conftest.py`
-	- `Test/test_alx<Module>.py` -> `Test/test_alxFifo.py`
-	- `Test/alx<Module>TestHelpers.c` -> `Test/alxFifoTestHelpers.c`
-	- `Test/alx<FakedModule>Fake.c` -> `Test/alxSerialPortFake.c`
-	- `Test/alx<Module>Test.def` -> `Test/alxFifoTest.def`
+	- `Test/test_alxFifo.py`
+	- `Test/alxFifoTestHelpers.c`
+	- `Test/alxFifoTest.def`
+	- `Test/alxSerialPortFake.c`
 - **Files - Generated**
 	- `Test/build/pytest_report.xml`
 	- `Test/build/pytest_report.html`
@@ -47,8 +60,8 @@
 	- clang-tidy -> Stage 1
 	- cppcheck -> Stage 2
 		- `--platform=unix32 --funsigned-char` -> Cortex-M
-		- `--platform=win64` -> Windows
-	- arm-gcc 15.2.1 `-fanalyzer` -> Stage 3
+		- `--platform=win64` -> PC Host
+	- arm-gcc 15.2.Rel1 `-fanalyzer` -> Stage 3
 - **Files - Config**
 	- `.clang-tidy`
 - **Files - Code**
@@ -60,8 +73,8 @@
 
 ## SANITIZE
 - **Tools**
-	- clang ASan + UBSan `-fsanitize=address,undefined` -> Stage 1 = `alxFifoSanSmoke.exe`
-	- clang UBSan `-fsanitize=undefined` -> Stage 2 = `alxFifoTest.dll` & pytest
+	- clang-cl ASan + UBSan `-fsanitize=address,undefined` -> Stage 1 = `alxFifoSanSmoke.exe`
+	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alxFifoTest.dll` & pytest
 - **Files - Code**
 	- `Test/RunSanitizers.ps1`
 	- `Test/alxFifoAsanSmoke.c`
@@ -72,22 +85,25 @@
 
 ## MEASURE
 - **Tools**
-	- clang `-fprofile-instr-generate -fcoverage-mapping`
+	- clang-cl `-fprofile-instr-generate -fcoverage-mapping`
 	- llvm-profdata + llvm-cov
 	- lcov-cobertura
 - **Files - Code**
 	- `Test/RunCoverage.ps1`
 	- `Test/coverage_gate.py` (gate)
 - **Files - Generated**
-	- `Test/build/cov/alxFifoTest.dll
+	- `Test/build/cov/alxFifoTest.dll`
 	- `Test/build/cov/*.profraw` -> `merged.profdata`
 	- `Test/build/cov/coverage_report.txt` + `html/index.html`
 	- `Test/build/cov/lcov.info` -> `coverage_c.xml` (cobertura)
 	- `Test/build/cov/summary.json` (gate input)
 
----
+
+
 
 # AI Notes
+
+---
 
 Tier 1 = pure C modules, tested directly.
 Tier 2 = modules with hardware-shaped extern dependencies, tested via link-time fakes.
@@ -97,20 +113,27 @@ Tier 2 = modules with hardware-shaped extern dependencies, tested via link-time 
 
 ```
 cd Test
-python -m pytest                              # dev loop
-powershell -File RunCoverage.ps1              # coverage -> txt + HTML + cobertura
-powershell -File RunSanitizers.ps1            # ASan + UBSan
-powershell -File RunStaticAnalysis.ps1        # clang-tidy, cppcheck, gcc -fanalyzer
+python -m pytest                                                          # dev loop
+powershell -NoProfile -ExecutionPolicy Bypass -File RunCoverage.ps1       # coverage + gate
+powershell -NoProfile -ExecutionPolicy Bypass -File RunSanitizers.ps1     # ASan + UBSan
+powershell -NoProfile -ExecutionPolicy Bypass -File RunStaticAnalysis.ps1 # Stages 0-3
 ```
 
 Reproducible environment: `uv sync --locked && uv run pytest`.
+Tool paths resolve in `ToolPaths.ps1`; override via `ALX_LLVM_DIR` / `ALX_ARMGCC` /
+`ALX_CPPCHECK`. A missing tool fails its gate, never skips it.
 
 ## Stack
 
 - pytest + ctypes over a per-module DLL built from the real sources.
-- Module builds: clang `-std=gnu99 -O0 -g -Werror` + warning set below (= target dialect).
-- Coverage: clang `-fprofile-instr-generate` + llvm-cov (line + branch).
+- Dev DLL: clang `-std=gnu99 -O0 -g -Werror` + warning set below (= target dialect).
+  Instrumented variants (sanitizer/coverage): clang-cl inside vcvars, same dialect.
+- One suite serves every variant: the `ALX_FIFO_TEST_DLL` env override (conftest fixture)
+  points pytest at an instrumented DLL.
+- Coverage: clang `-fprofile-instr-generate -fcoverage-mapping` + llvm-cov;
+  gate = 100 % lines/branches/regions/functions on gated files (`coverage_gate.py`).
 - Sanitizers: native ASan+UBSan smoke exe + UBSan DLL under the full suite.
+- `build/` layout: root = dev lane; one subfolder per variant (`asan/`, `ubsan/`, `cov/`, `analysis/`).
 - Evidence per run: `build/pytest_report.xml` (junit), `build/pytest_report.html`.
 
 ## Warning set
@@ -129,9 +152,11 @@ Reproducible environment: `uv sync --locked && uv run pytest`.
 ## Per-module files
 
 ```
-alxFooTestHelpers.c     opaque-handle New/Delete + status-enum getters (+ fakes for Tier 2)
+alxFooTestHelpers.c     opaque-handle New/Delete + status-enum getters
 alxFooTest.def          DLL exports
 test_alxFoo.py          tests; file = module-scoped, functions = task-scoped: test_<KEY>_P<n>_<what>
+alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar), never by the
+                        module under test (none exists yet; first planned: alxSerialPortFake.c)
 ```
 
 ## Conventions
