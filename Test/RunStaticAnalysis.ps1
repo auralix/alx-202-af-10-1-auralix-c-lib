@@ -34,22 +34,20 @@ if ($LASTEXITCODE -ne 0) { throw "Leg 1 FAILED: clang-tidy findings above" }
 Write-Host "Leg 1 (clang-tidy): CLEAN"
 
 # --- Leg 2: cppcheck ---------------------------------------------------------
-if (Test-Path $cppcheck) {
-    & $cppcheck --std=c99 --platform=unix32 --enable=warning,style,performance,portability `
-        --inline-suppr --error-exitcode=1 --quiet `
-        --suppress=missingIncludeSystem --suppress=unusedFunction `
-        -I $test -I $clib -I "$clib\Mcu" @sources
-    if ($LASTEXITCODE -ne 0) { throw "Leg 2 FAILED: cppcheck findings above" }
-    # second pass: host pointer model (x64); the unix32 pass above models the 32-bit target
-    & $cppcheck --std=c99 --platform=win64 --enable=warning,portability `
-        --inline-suppr --error-exitcode=1 --quiet `
-        --suppress=missingIncludeSystem --suppress=unusedFunction `
-        -I $test -I $clib -I "$clib\Mcu" @sources
-    if ($LASTEXITCODE -ne 0) { throw "Leg 2 FAILED: cppcheck (win64 pass) findings above" }
-    Write-Host "Leg 2 (cppcheck unix32+win64): CLEAN"
-} else {
-    Write-Host "Leg 2 (cppcheck): SKIPPED - not installed"
-}
+# missing tool = FAIL, never skip: a gate that silently passes without its tool is a hole
+if (-not (Test-Path $cppcheck)) { throw "Leg 2 FAILED: cppcheck not found at '$cppcheck' (install it or set ALX_CPPCHECK)" }
+& $cppcheck --std=c99 --platform=unix32 --enable=warning,style,performance,portability `
+    --inline-suppr --error-exitcode=1 --quiet `
+    --suppress=missingIncludeSystem --suppress=unusedFunction `
+    -I $test -I $clib -I "$clib\Mcu" @sources
+if ($LASTEXITCODE -ne 0) { throw "Leg 2 FAILED: cppcheck findings above" }
+# second pass: host pointer model (x64); the unix32 pass above models the 32-bit target
+& $cppcheck --std=c99 --platform=win64 --enable=warning,portability `
+    --inline-suppr --error-exitcode=1 --quiet `
+    --suppress=missingIncludeSystem --suppress=unusedFunction `
+    -I $test -I $clib -I "$clib\Mcu" @sources
+if ($LASTEXITCODE -ne 0) { throw "Leg 2 FAILED: cppcheck (win64 pass) findings above" }
+Write-Host "Leg 2 (cppcheck unix32+win64): CLEAN"
 
 # --- Leg 3: gcc -fanalyzer (arm-gcc, target flags) ---------------------------
 $log = "$build\analysis\fanalyzer.txt"
