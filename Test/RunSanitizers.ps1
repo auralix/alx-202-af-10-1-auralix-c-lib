@@ -26,7 +26,7 @@ $vcvars = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\
 New-Item -ItemType Directory -Force $build, "$build\ubsan" | Out-Null
 
 # --- Leg 1: native combined ASan+UBSan exe (clang) --------------------------
-cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /std:c11 -fsanitize=address,undefined -fno-sanitize-recover=undefined /Zi /MT /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoAsanSmoke.c"" /Fe:""$build\alxFifoSanSmoke.exe"" /Fo""$build""\"
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /clang:-std=gnu99 -fsanitize=address,undefined -fno-sanitize-recover=undefined /Zi /MT /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoAsanSmoke.c"" /Fe:""$build\alxFifoSanSmoke.exe"" /Fo""$build""\"
 if ($LASTEXITCODE -ne 0) { throw "sanitizer smoke exe build failed" }
 $rt = Get-ChildItem "C:\Program Files\LLVM\lib\clang" -Recurse -Filter "clang_rt.asan_dynamic-x86_64.dll" | Select-Object -First 1
 Copy-Item $rt.FullName $build -Force   # LLVM's own runtime MUST shadow MSVC's older copy
@@ -35,7 +35,7 @@ if ($LASTEXITCODE -ne 0) { throw "Leg 1 FAILED: sanitizer finding in native smok
 Write-Host "Leg 1 (native ASan+UBSan smoke): CLEAN"
 
 # --- Leg 2: UBSan DLL + full pytest suite ------------------------------------
-cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /std:c11 -fsanitize=undefined -fno-sanitize-recover=undefined /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoTestHelpers.c"" /Fe:""$build\ubsan\alxFifoTest.dll"" /Fo""$build\ubsan""\ /link /DEF:""$test\alxFifoTest.def"""
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99 -fsanitize=undefined -fno-sanitize-recover=undefined /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoTestHelpers.c"" /Fe:""$build\ubsan\alxFifoTest.dll"" /Fo""$build\ubsan""\ /link /DEF:""$test\alxFifoTest.def"""
 if ($LASTEXITCODE -ne 0) { throw "UBSan DLL build failed" }
 $env:ALX_FIFO_TEST_DLL = "$build\ubsan\alxFifoTest.dll"
 try {

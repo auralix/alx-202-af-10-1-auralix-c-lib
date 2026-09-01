@@ -1,6 +1,6 @@
 """Auralix C Library - PC unit test harness (ALX-1514 pilot).
 
-Builds a per-module DLL from the REAL c-lib sources (MSVC, located via vswhere)
+Builds a per-module DLL from the REAL c-lib sources (clang, -std=gnu99 = target dialect)
 and exposes it to pytest via ctypes. No struct mirroring: tests use opaque
 handles from alxFifoTestHelpers.c and the public alxFifo.h API only.
 """
@@ -53,15 +53,32 @@ def _needs_build(dll: Path, deps) -> bool:
     return any(d.stat().st_mtime > dll_mtime for d in deps)
 
 
+# Host module builds use clang in the TARGET dialect (-std=gnu99) - never test a
+# dialect you do not ship. Warning lane at -O1 (several checks are inert at -O0),
+# blanket -Werror on the host lane per Test/README.md section 5.
+CLANG = r"C:/Program Files/LLVM/bin/clang.exe"
+HOST_WARN_FLAGS = [
+    "-Wall", "-Wextra",
+    "-Wshadow", "-Wstrict-prototypes", "-Wold-style-definition",
+    "-Wmissing-prototypes", "-Wmissing-declarations", "-Wmissing-variable-declarations",
+    "-Wredundant-decls", "-Wnested-externs", "-Wbad-function-cast",
+    "-Wcast-qual", "-Wwrite-strings", "-Wundef", "-Wvla", "-Walloca",
+    "-Wswitch-enum", "-Wswitch-default", "-Wenum-conversion",
+    "-Wformat=2", "-Wfloat-equal", "-Wdouble-promotion", "-Wimplicit-fallthrough",
+    "-Wnull-dereference", "-Wunused", "-Wunused-macros", "-Wno-unused-parameter",
+]
+
+
 def _build_fifo_dll() -> None:
     BUILD_DIR.mkdir(exist_ok=True)
     vcvars = _find_vcvars()
     sources = " ".join(f'"{s}"' for s in FIFO_SOURCES)
+    flags = " ".join(HOST_WARN_FLAGS)
     cmd = (
-        f'"{vcvars}" && cl /nologo /W4 /std:c11 /D_CRT_SILENCE_NONCONFORMING_TGMATH_H /LD '
-        f'/I"{TEST_DIR}" /I"{CLIB_DIR}" /I"{CLIB_DIR / "Mcu"}" {sources} '
-        f'/Fe:"{FIFO_DLL}" /Fo"{BUILD_DIR}\\\\" '
-        f'/link /DEF:"{TEST_DIR / "alxFifoTest.def"}"'
+        f'"{vcvars}" && "{CLANG}" -std=gnu99 -O1 -g {flags} -Werror '
+        f'-D_CRT_SECURE_NO_WARNINGS '
+        f'-I"{TEST_DIR}" -I"{CLIB_DIR}" -I"{CLIB_DIR / "Mcu"}" {sources} '
+        f'-shared -o "{FIFO_DLL}" -Wl,/DEF:"{TEST_DIR / "alxFifoTest.def"}"'
     )
     result = subprocess.run(f'cmd /s /c "{cmd}"', capture_output=True, text=True)
     if result.returncode != 0:
@@ -153,8 +170,8 @@ class Lib:
 # --------------------------------------------------------------- fixtures ----
 @pytest.fixture(scope="session")
 def lib() -> Lib:
-    # ALX_FIFO_TEST_DLL selects an externally built DLL variant (coverage/ASan build)
-    # instead of the default MSVC build - same suite, instrumented binary.
+    # ALX_FIFO_TEST_DLL selects an externally built DLL variant (coverage/sanitizer
+    # build) instead of the default clang build - same suite, instrumented binary.
     override = os.environ.get("ALX_FIFO_TEST_DLL")
     if override:
         return Lib(Path(override))

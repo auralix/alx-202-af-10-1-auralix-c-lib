@@ -19,6 +19,19 @@
 
 
 //******************************************************************************
+// Prototypes - the DLL export surface (no separate header for test helpers)
+//******************************************************************************
+AlxFifo* AlxFifoTest_New(uint32_t buffLen);
+void AlxFifoTest_Delete(AlxFifo* me);
+int32_t AlxFifoTest_Status_Ok(void);
+int32_t AlxFifoTest_Status_Err(void);
+int32_t AlxFifoTest_Status_ErrFull(void);
+int32_t AlxFifoTest_Status_ErrEmpty(void);
+int32_t AlxFifoTest_Status_ErrNoDelim(void);
+int32_t AlxFifoTest_Status_ErrTooLong(void);
+
+
+//******************************************************************************
 // Functions
 //******************************************************************************
 AlxFifo* AlxFifoTest_New(uint32_t buffLen)

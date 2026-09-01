@@ -21,7 +21,7 @@ New-Item -ItemType Directory -Force $cov | Out-Null
 Remove-Item "$cov\*.profraw" -Force -ErrorAction SilentlyContinue
 
 # 1) instrumented DLL (per-module sources; extend list per module)
-cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /std:c11 -fprofile-instr-generate -fcoverage-mapping /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoTestHelpers.c"" /Fe:""$cov\alxFifoTest.dll"" /Fo""$cov""\ /link /DEF:""$test\alxFifoTest.def"""
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99 -fprofile-instr-generate -fcoverage-mapping /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoTestHelpers.c"" /Fe:""$cov\alxFifoTest.dll"" /Fo""$cov""\ /link /DEF:""$test\alxFifoTest.def"""
 if ($LASTEXITCODE -ne 0) { throw "coverage DLL build failed" }
 
 # 2) same suite, instrumented binary

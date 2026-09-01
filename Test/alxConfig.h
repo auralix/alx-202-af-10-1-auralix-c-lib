@@ -24,4 +24,9 @@
 //******************************************************************************
 #define ALX_C_LIB
 
+//******************************************************************************
+// Trace - OFF for PC unit tests (module contracts, not logging, are under test)
+//******************************************************************************
+#define ALX_TRACE_LEVEL ALX_TRACE_LEVEL_OFF
+
 #endif	// #ifndef ALX_CONFIG_H

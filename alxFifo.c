@@ -219,7 +219,7 @@ Alx_Status AlxFifo_WriteStr(AlxFifo* me, const char* str)
 	ALX_FIFO_ASSERT(me->wasCtorCalled == true);
 
 	// Return
-	return AlxFifo_Write(me, (uint8_t*)str, strlen(str));
+	return AlxFifo_Write(me, (const uint8_t*)str, strlen(str));
 }
 
 /**
