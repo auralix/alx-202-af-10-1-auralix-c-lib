@@ -77,7 +77,7 @@
 	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alxFifoTest.dll` & pytest
 - **Files - Code**
 	- `Test/RunSanitizers.ps1`
-	- `Test/alxFifoAsanSmoke.c`
+	- `Test/alxFifoSanSmoke.c`
 - **Files - Generated**
 	- `Test/build/asan/alxFifoSanSmoke.exe`
 	- `Test/build/asan/clang_rt.asan_dynamic-x86_64.dll`
