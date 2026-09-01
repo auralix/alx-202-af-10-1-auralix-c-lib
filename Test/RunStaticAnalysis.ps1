@@ -10,17 +10,20 @@ $ErrorActionPreference = "Stop"
 $test  = $PSScriptRoot
 $clib  = Split-Path $test
 $build = Join-Path $test "build"
-$llvm  = "C:\Program Files\LLVM\bin"
-$armgcc = "C:\SysGCC\arm-eabi-14-2-1\bin\arm-none-eabi-gcc.exe"
-$cppcheck = "C:\Program Files\Cppcheck\cppcheck.exe"
+. "$PSScriptRoot\ToolPaths.ps1"
 
 # module sources under analysis (extend per module)
-$sources = @("$clib\alxFifo.c", "$clib\alxBound.c", "$test\alxFifoTestHelpers.c")
+$sources = @("$clib\alxFifo.c", "$clib\alxBound.c", "$test\alxFifoTestHelpers.c", "$test\alxFifoAsanSmoke.c")
 
 New-Item -ItemType Directory -Force "$build\analysis" | Out-Null
 if (-not (Test-Path "$build\compile_commands.json")) {
     python -m pytest -q --collect-only | Out-Null   # triggers conftest build + compile DB
 }
+
+# --- Leg 0: codespell (spelling gate on the module set) ----------------------
+python -m codespell_lib @sources
+if ($LASTEXITCODE -ne 0) { throw "Leg 0 FAILED: codespell findings above" }
+Write-Host "Leg 0 (codespell): CLEAN"
 
 # --- Leg 1: clang-tidy -------------------------------------------------------
 $srcArgs = ($sources | ForEach-Object { '"' + $_ + '"' }) -join ' '
@@ -35,7 +38,13 @@ if (Test-Path $cppcheck) {
         --suppress=missingIncludeSystem --suppress=unusedFunction `
         -I $test -I $clib -I "$clib\Mcu" @sources
     if ($LASTEXITCODE -ne 0) { throw "Leg 2 FAILED: cppcheck findings above" }
-    Write-Host "Leg 2 (cppcheck): CLEAN"
+    # second pass: host pointer model (x64); the unix32 pass above models the 32-bit target
+    & $cppcheck --std=c99 --platform=win64 --enable=warning,portability `
+        --inline-suppr --error-exitcode=1 --quiet `
+        --suppress=missingIncludeSystem --suppress=unusedFunction `
+        -I $test -I $clib -I "$clib\Mcu" @sources
+    if ($LASTEXITCODE -ne 0) { throw "Leg 2 FAILED: cppcheck (win64 pass) findings above" }
+    Write-Host "Leg 2 (cppcheck unix32+win64): CLEAN"
 } else {
     Write-Host "Leg 2 (cppcheck): SKIPPED - not installed"
 }

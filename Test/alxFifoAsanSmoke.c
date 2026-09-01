@@ -23,6 +23,10 @@ static AlxFifo* NewRotated(uint8_t** fifoBuffOut, uint32_t rot)
 {
 	AlxFifo* me = (AlxFifo*)malloc(sizeof(AlxFifo));
 	uint8_t* fifoBuff = (uint8_t*)malloc(FIFO_LEN);
+	if ((me == NULL) || (fifoBuff == NULL))
+	{
+		exit(1);	// test infrastructure - fail fast on OOM
+	}
 	AlxFifo_Ctor(me, fifoBuff, FIFO_LEN);
 	for (uint32_t r = 0; r < rot; r++)
 	{
@@ -40,6 +44,7 @@ static void RunAny(uint32_t rot, uint32_t len, const char* input, uint32_t input
 	AlxFifo* me = NewRotated(&fifoBuff, rot);
 	AlxFifo_Write(me, (const uint8_t*)input, inputLen);
 	char* str = (char*)malloc(len);	// exactly len bytes - overflow = ASan redzone hit
+	if (str == NULL) { exit(1); }	// test infrastructure - fail fast on OOM
 	uint32_t lenActual = 0;
 	while (AlxFifo_ReadStrUntilAny(me, str, "\r\n", len, &lenActual) == Alx_Ok) {}
 	free(str);
@@ -53,6 +58,7 @@ static void RunSeq(uint32_t rot, uint32_t len, const char* input, uint32_t input
 	AlxFifo* me = NewRotated(&fifoBuff, rot);
 	AlxFifo_Write(me, (const uint8_t*)input, inputLen);
 	char* str = (char*)malloc(len);
+	if (str == NULL) { exit(1); }	// test infrastructure - fail fast on OOM
 	uint32_t lenActual = 0;
 	while (AlxFifo_ReadStrUntil(me, str, "\r\n", len, &lenActual) == Alx_Ok) {}
 	free(str);
@@ -77,6 +83,22 @@ int main(void)
 			RunSeq(rot, len, "AAAAAAA\r", 8);			// full, partial delim at end
 			RunSeq(rot, len, "ab\r\n", 4);				// delim split across wrap (rot 7)
 		}
+	}
+	// Exercise the remaining exported functions (WriteStr, Flush, Rewind, partial R/W)
+	for (uint32_t rot = 0; rot < FIFO_LEN; rot++)
+	{
+		uint8_t* fifoBuff = NULL;
+		AlxFifo* me = NewRotated(&fifoBuff, rot);
+		AlxFifo_WriteStr(me, "abc");
+		uint8_t rd[FIFO_LEN];
+		AlxFifo_Read(me, rd, 2);
+		AlxFifo_Rewind(me, 2);
+		AlxFifo_Read(me, rd, 3);
+		AlxFifo_WriteStr(me, "toolongstring");	// partial write into remaining space
+		AlxFifo_Flush(me);
+		AlxFifo_Read(me, rd, 1);				// read from empty
+		free(fifoBuff);
+		free(me);
 	}
 	printf("ASAN SMOKE CLEAN\n");
 	return 0;

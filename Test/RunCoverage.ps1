@@ -14,9 +14,10 @@ $ErrorActionPreference = "Stop"
 $test  = $PSScriptRoot
 $clib  = Split-Path $test
 $cov   = Join-Path $test "build\cov"
-$llvm  = "C:\Program Files\LLVM\bin"
-$vcvars = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+. "$PSScriptRoot\ToolPaths.ps1"
 
+python -m pytest -q --collect-only | Out-Null   # dev gate: -Werror build must be fresh
+if ($LASTEXITCODE -ne 0) { throw "dev-lane build/collect failed" }
 New-Item -ItemType Directory -Force $cov | Out-Null
 Remove-Item "$cov\*.profraw" -Force -ErrorAction SilentlyContinue
 
@@ -42,4 +43,9 @@ finally {
 python -m lcov_cobertura "$cov\lcov.info" --output "$cov\coverage_c.xml" --base-dir "$clib"
 & "$llvm\llvm-cov.exe" show "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" -format=html -output-dir="$cov\html" -show-branches=count -show-line-counts
 Write-Host "`ncobertura: $cov\coverage_c.xml"
+
+# GATE: module under test must be 100% covered (a report alone is not a gate)
+& "$llvm\llvm-cov.exe" export "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" -summary-only | Out-File -Encoding ascii "$cov\summary.json"
+python "$test\coverage_gate.py" "$cov\summary.json" alxFifo.c
+if ($LASTEXITCODE -ne 0) { throw "COVERAGE GATE FAILED - see above" }
 Write-Host "html:      $cov\html\index.html"

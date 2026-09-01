@@ -29,6 +29,7 @@ FIFO_DEPS = FIFO_SOURCES + [
     CLIB_DIR / "Mcu" / "alxTrace.h",
     TEST_DIR / "alxConfig.h",
     TEST_DIR / "alxFifoTest.def",
+    Path(__file__),  # flags live here - flag edits must trigger a rebuild
 ]
 FIFO_DLL = BUILD_DIR / "alxFifoTest.dll"
 
@@ -50,7 +51,10 @@ def _needs_build(dll: Path, deps) -> bool:
     if not dll.exists():
         return True
     dll_mtime = dll.stat().st_mtime
-    return any(d.stat().st_mtime > dll_mtime for d in deps)
+    try:
+        return any(d.stat().st_mtime > dll_mtime for d in deps)
+    except FileNotFoundError:
+        return True  # missing dependency -> rebuild (and let the compiler complain)
 
 
 # Host module builds use clang in the TARGET dialect (-std=gnu99) - never test a

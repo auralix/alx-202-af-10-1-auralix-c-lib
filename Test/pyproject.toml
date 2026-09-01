@@ -12,6 +12,8 @@ dependencies = [
     "pytest-html>=4",
     "pytest-timeout>=2",
     "pytest-randomly>=4",
+    "lcov-cobertura>=2",
+    "codespell>=2",
 ]
 
 [tool.pytest.ini_options]

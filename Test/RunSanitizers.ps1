@@ -20,16 +20,17 @@ $ErrorActionPreference = "Stop"
 $test   = $PSScriptRoot
 $clib   = Split-Path $test
 $build  = Join-Path $test "build"
-$llvm   = "C:\Program Files\LLVM\bin"
-$vcvars = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+. "$PSScriptRoot\ToolPaths.ps1"
 
+python -m pytest -q --collect-only | Out-Null   # dev gate: -Werror build must be fresh
+if ($LASTEXITCODE -ne 0) { throw "dev-lane build/collect failed" }
 New-Item -ItemType Directory -Force $build, "$build\ubsan" | Out-Null
 
 # --- Leg 1: native combined ASan+UBSan exe (clang) --------------------------
-cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /clang:-std=gnu99 -fsanitize=address,undefined -fno-sanitize-recover=undefined /Zi /MT /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoAsanSmoke.c"" /Fe:""$build\alxFifoSanSmoke.exe"" /Fo""$build""\"
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /clang:-std=gnu99 -fsanitize=address,undefined -fno-sanitize-recover=undefined /Z7 /MT /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoAsanSmoke.c"" /Fe:""$build\alxFifoSanSmoke.exe"" /Fo""$build""\"
 if ($LASTEXITCODE -ne 0) { throw "sanitizer smoke exe build failed" }
-$rt = Get-ChildItem "C:\Program Files\LLVM\lib\clang" -Recurse -Filter "clang_rt.asan_dynamic-x86_64.dll" | Select-Object -First 1
-Copy-Item $rt.FullName $build -Force   # LLVM's own runtime MUST shadow MSVC's older copy
+$resDir = (& "$llvm\clang.exe" -print-resource-dir | Out-String).Trim()
+Copy-Item (Join-Path $resDir "lib\windows\clang_rt.asan_dynamic-x86_64.dll") $build -Force   # the compiler's OWN runtime must shadow MSVC's older copy
 & "$build\alxFifoSanSmoke.exe"
 if ($LASTEXITCODE -ne 0) { throw "Leg 1 FAILED: sanitizer finding in native smoke run (see report above)" }
 Write-Host "Leg 1 (native ASan+UBSan smoke): CLEAN"
