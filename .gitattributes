@@ -1,0 +1,15 @@
+* text=auto
+*.c text
+*.h text
+*.md text
+*.py text
+*.ps1 text
+*.def text
+*.toml text
+*.yml text
+*.bat text eol=crlf
+*.sln text eol=crlf
+*.vcxproj text eol=crlf
+*.pdf binary
+*.png binary
+*.xlsx binary
