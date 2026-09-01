@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxRotSw.h
   * @brief		Auralix C Library - ALX Rotary Switch Module

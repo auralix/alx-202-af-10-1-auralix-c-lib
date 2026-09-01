@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxGlobal.h
   * @brief		Auralix C Library - ALX Global Module

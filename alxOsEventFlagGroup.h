@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxOsEventFlagGroup.h
   * @brief		Auralix C Library - ALX OS Event Flag Group Module

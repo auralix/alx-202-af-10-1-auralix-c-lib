@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxIoPinIrq.h
   * @brief		Auralix C Library - ALX IO Pin IRQ Module

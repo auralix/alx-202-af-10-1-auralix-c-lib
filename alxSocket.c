@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxSocket.c
   * @brief		Auralix C Library - ALX Socket Module

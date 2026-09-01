@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxOsThread.h
   * @brief		Auralix C Library - ALX OS Thread Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxConfigUsr.h
   * @brief		Auralix C Library - ALX Configuration File - User

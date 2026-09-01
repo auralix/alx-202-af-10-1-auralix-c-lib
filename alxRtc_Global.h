@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxRtc_Global.h
   * @brief		Auralix C Library - ALX RTC Global Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxTempSens_RtdVdiv.c
   * @brief		Auralix C Library - ALX Temperature Sensor - Resistor Temperature Detector Voltage Divider Module

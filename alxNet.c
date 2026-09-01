@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxNet.c
   * @brief		Auralix C Library - ALX Network Module

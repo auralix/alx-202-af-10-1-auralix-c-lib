@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxOsKernel.c
   * @brief		Auralix C Library - ALX OS Kernel Module

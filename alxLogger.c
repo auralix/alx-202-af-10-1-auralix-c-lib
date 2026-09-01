@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxLogger.c
   * @brief		Auralix C Library - ALX Logger Module

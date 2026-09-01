@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxParamGroup.c
   * @brief		Auralix C Library - ALX Parameter Group Module

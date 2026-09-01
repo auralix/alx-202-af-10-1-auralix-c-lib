@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxWdt.h
   * @brief		Auralix C Library - ALX Watchdog Timer Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxOsCriticalSection.h
   * @brief		Auralix C Library - ALX OS Critical Section Module

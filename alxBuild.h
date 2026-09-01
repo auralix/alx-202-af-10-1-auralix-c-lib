@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxBuild.h
   * @brief		Auralix C Library - ALX Build Module

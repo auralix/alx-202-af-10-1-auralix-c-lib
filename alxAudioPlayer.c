@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAudioPlayer.c
   * @brief		Auralix C Library - ALX Audio Player Module

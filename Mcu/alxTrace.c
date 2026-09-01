@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxTrace.c
   * @brief		Auralix C Library - ALX Trace Module

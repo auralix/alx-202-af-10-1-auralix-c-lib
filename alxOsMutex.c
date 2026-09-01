@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxOsMutex.c
   * @brief		Auralix C Library - ALX OS Mutex Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxFsSafe.h
   * @brief		Auralix C Library - ALX File System Safe Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxOsDelayUntil.c
   * @brief		Auralix C Library - ALX OS Delay Until Module

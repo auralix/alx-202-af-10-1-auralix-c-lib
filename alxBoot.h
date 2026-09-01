@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxBoot.h
   * @brief		Auralix C Library - ALX Bootloader Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxIoPin.h
   * @brief		Auralix C Library - ALX IO Pin Module

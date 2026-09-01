@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxSerialPort.h
   * @brief		Auralix C Library - ALX Serial Port Module

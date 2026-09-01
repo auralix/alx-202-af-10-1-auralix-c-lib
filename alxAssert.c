@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAssert.c
   * @brief		Auralix C Library - ALX Assert Module
