@@ -22,6 +22,7 @@ Contract under test (locked 2026-08-31, implementation follows sealed-proof):
          -> entire FIFO content consumed & discarded.
 
 Test groups P1..P10 map to the PROOF rows of the ALX-1514 TaskSpec.
+P11 = mutation-driven hardening: killing tests for QUALIFY survivors.
 """
 
 import random
@@ -572,3 +573,66 @@ def test_ALX1514_P10_min_len_one_only_nul_fits(lib, make_fifo):
     lib.write(f, b"\r")                          # even the empty line (1 char) can't fit
     check(lib, lib.ru_any(f, b"\r\n", 1), lib.ERR_TOO_LONG, b"", 1)
     assert lib.entries(f) == 0
+
+
+# =====================================================================
+# P11 - mutation-driven hardening (QUALIFY survivors get a killing test)
+# =====================================================================
+
+def test_ALX1514_P11_rewind_partial_leaves_fifo_writable(lib, make_fifo):
+    """Kills QUALIFY survivor alxFifo.mutant.872: Rewind forced isFull=true
+    unconditionally and 65 tests stayed green - nothing wrote AFTER a partial
+    rewind. A partial rewind must leave the FIFO writable; isFull only when
+    the rewound entries exactly fill the buffer."""
+    f = make_fifo(8)
+    assert lib.write(f, b"abcd") == lib.OK
+    status, data = lib.read(f, 2)
+    assert status == lib.OK and data == b"ab"
+    assert lib.c.AlxFifo_Rewind(f, 2) == 2       # un-read "ab": 4 entries, half full
+    assert lib.entries(f) == 4
+    assert lib.write(f, b"wxyz") == lib.OK       # MUST NOT be ErrFull
+    status, data = lib.read(f, 8)
+    assert status == lib.OK and data == b"abcdwxyz"
+
+
+def test_ALX1514_P11_rewind_bounded_by_reads_since_flush(lib, make_fifo):
+    """Kills QUALIFY survivors alxFifo.mutant.69 (Ctor plants
+    numOfEntriesSinceFlush=1) and .766 (rewindability guard forced true):
+    Rewind may restore at most what was actually read since the last flush -
+    a fresh or freshly-flushed FIFO has nothing to rewind."""
+    f = make_fifo(8)
+    assert lib.c.AlxFifo_Rewind(f, 1) == 0       # fresh FIFO: nothing ever read
+    assert lib.entries(f) == 0
+    status, _ = lib.read(f, 1)
+    assert status == lib.ERR_EMPTY               # and still truly empty
+    assert lib.write(f, b"ab") == lib.OK
+    status, data = lib.read(f, 2)
+    assert status == lib.OK and data == b"ab"
+    lib.c.AlxFifo_Flush(f)
+    assert lib.c.AlxFifo_Rewind(f, 1) == 0       # flush forgets read history
+    assert lib.entries(f) == 0
+
+
+def test_ALX1514_P11_flush_resets_positions_for_next_write(lib, make_fifo):
+    """Kills QUALIFY survivor alxFifo.mutant.113 (Flush plants head=1):
+    content written AFTER a flush must read back exactly - desynced
+    head/tail would serve stale pre-flush bytes."""
+    f = make_fifo(8)
+    assert lib.write(f, b"ab") == lib.OK
+    lib.c.AlxFifo_Flush(f)
+    assert lib.entries(f) == 0
+    assert lib.write(f, b"xy") == lib.OK
+    status, data = lib.read(f, 2)
+    assert status == lib.OK and data == b"xy"
+
+
+def test_ALX1514_P11_rewind_to_exactly_full_sets_full(lib, make_fifo):
+    """The legitimate branch of the same condition: rewinding back to
+    buffLen entries makes the FIFO genuinely full - next write must fail."""
+    f = make_fifo(4)
+    assert lib.write(f, b"abcd") == lib.OK       # full
+    status, data = lib.read(f, 4)
+    assert status == lib.OK and data == b"abcd"  # empty again
+    assert lib.c.AlxFifo_Rewind(f, 4) == 4       # rewind to exactly full
+    assert lib.entries(f) == 4
+    assert lib.write(f, b"!") == lib.ERR_FULL
