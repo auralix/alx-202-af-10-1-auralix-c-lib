@@ -314,7 +314,11 @@ static Alx_Status AlxFifo_ReadByte(AlxFifo* me, uint8_t* data)
 	{
 		// Handle fifo read
 		*data = me->buff[me->tail];
-		me->tail = (me->tail + 1) % me->buffLen;	// Increment tail, rewind if necessary
+		me->tail++;									// Increment tail, rewind if necessary - compare instead of %, Cortex-M0+ has no divider
+		if (me->tail == me->buffLen)
+		{
+			me->tail = 0;
+		}
 		me->numOfEntries--;
 		me->isFull = false;							// Fifo not full anymore
 
@@ -352,7 +356,11 @@ static Alx_Status AlxFifo_WriteByte(AlxFifo* me, uint8_t data)
 	{
 		// Handle fifo write
 		me->buff[me->head] = data;
-		me->head = (me->head + 1) % me->buffLen;	// Increment head, rewind if necessary
+		me->head++;									// Increment head, rewind if necessary - compare instead of %, Cortex-M0+ has no divider
+		if (me->head == me->buffLen)
+		{
+			me->head = 0;
+		}
 		me->numOfEntries++;
 		me->numOfEntriesSinceFlush++;
 		me->isEmpty = false;						// Fifo not empty anymore
@@ -407,9 +415,10 @@ static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const cha
 		delimLen = (uint32_t)strlen(delim);
 	}
 	uint32_t lineLen = 0;
+	uint32_t idx = me->tail;	// Buffer index of byte i - advanced with a wrap compare instead of (tail + i) % buffLen, Cortex-M0+ has no divider
 	for (uint32_t i = 0; (i + delimLen) <= me->numOfEntries; i++)
 	{
-		char ch = (char)me->buff[(me->tail + i) % me->buffLen];
+		char ch = (char)me->buff[idx];
 		if (delimIsSet)
 		{
 			// Set semantics - terminate at first char that is a member of delim set (0x00 is never a member)
@@ -425,9 +434,15 @@ static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const cha
 			if (ch == delim[0])
 			{
 				bool match = true;
+				uint32_t idxJ = idx;	// Buffer index of byte i + j, same wrap-by-compare
 				for (uint32_t j = 1; j < delimLen; j++)
 				{
-					if ((char)me->buff[(me->tail + i + j) % me->buffLen] != delim[j])
+					idxJ++;
+					if (idxJ == me->buffLen)
+					{
+						idxJ = 0;
+					}
+					if ((char)me->buff[idxJ] != delim[j])
 					{
 						match = false;
 						break;
@@ -439,6 +454,13 @@ static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const cha
 					break;
 				}
 			}
+		}
+
+		// Next byte
+		idx++;
+		if (idx == me->buffLen)
+		{
+			idx = 0;
 		}
 	}
 
