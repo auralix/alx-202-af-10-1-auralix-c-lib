@@ -278,7 +278,11 @@ uint32_t AlxFifo_Rewind(AlxFifo* me, uint32_t len)
 	}
 
 	// Handle rewind
-	me->tail = (me->tail + me->buffLen - len) % me->buffLen;	// Decrement tail, rewind if necessary
+	me->tail = me->tail + me->buffLen - len;	// Decrement tail, rewind if necessary (len <= buffLen, so one compare wraps it)
+	if (me->tail >= me->buffLen)
+	{
+		me->tail = me->tail - me->buffLen;
+	}
 	me->numOfEntries = me->numOfEntries + len;
 	me->isEmpty = false;										// Fifo not empty anymore
 
@@ -314,7 +318,7 @@ static Alx_Status AlxFifo_ReadByte(AlxFifo* me, uint8_t* data)
 	{
 		// Handle fifo read
 		*data = me->buff[me->tail];
-		me->tail++;									// Increment tail, rewind if necessary - compare instead of %, Cortex-M0+ has no divider
+		me->tail++;									// Increment tail, rewind if necessary
 		if (me->tail == me->buffLen)
 		{
 			me->tail = 0;
@@ -356,7 +360,7 @@ static Alx_Status AlxFifo_WriteByte(AlxFifo* me, uint8_t data)
 	{
 		// Handle fifo write
 		me->buff[me->head] = data;
-		me->head++;									// Increment head, rewind if necessary - compare instead of %, Cortex-M0+ has no divider
+		me->head++;									// Increment head, rewind if necessary
 		if (me->head == me->buffLen)
 		{
 			me->head = 0;
@@ -415,7 +419,7 @@ static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const cha
 		delimLen = (uint32_t)strlen(delim);
 	}
 	uint32_t lineLen = 0;
-	uint32_t idx = me->tail;	// Buffer index of byte i - advanced with a wrap compare instead of (tail + i) % buffLen, Cortex-M0+ has no divider
+	uint32_t idx = me->tail;	// Buffer index of byte i, wraps by compare
 	for (uint32_t i = 0; (i + delimLen) <= me->numOfEntries; i++)
 	{
 		char ch = (char)me->buff[idx];
@@ -434,7 +438,7 @@ static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const cha
 			if (ch == delim[0])
 			{
 				bool match = true;
-				uint32_t idxJ = idx;	// Buffer index of byte i + j, same wrap-by-compare
+				uint32_t idxJ = idx;	// Buffer index of byte i + j, wraps by compare
 				for (uint32_t j = 1; j < delimLen; j++)
 				{
 					idxJ++;
