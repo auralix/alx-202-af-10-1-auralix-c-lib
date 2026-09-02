@@ -118,16 +118,18 @@ void AlxCli_Handle(AlxCli* me)
 	// Handle Read Command
 	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
+	// Read one line terminated by CR or LF - 1 byte of buffLen reserved, the 1-char terminator grows to canonical CRLF below
 	char* cmdBuff = (char*)me->buff;
 	uint32_t cmdLen = 0;
-	Alx_Status cmdStatus = AlxSerialPort_ReadStrUntilAny(me->alxSerialPort, cmdBuff, "\r\n", me->buffLen - 1, &cmdLen);	// 1 byte reserved: the 1-char terminator grows to canonical CRLF below
+	Alx_Status cmdStatus = AlxSerialPort_ReadStrUntilAny(me->alxSerialPort, cmdBuff, "\r\n", me->buffLen - 1, &cmdLen);
 	if (cmdStatus == AlxFifo_ErrTooLong)
 	{
 		// Undeliverable line (longer than buffer, or FIFO full without terminator) - the FIFO already discarded it, report + stay alive
 		AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrCmd);
 		ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
 	}
-	else if ((cmdStatus == Alx_Ok) && (cmdLen > 1))	// cmdLen == 1 = empty line (terminator only): SILENT - also swallows the LF of a CRLF pair
+	// cmdLen == 1 = empty line (terminator only): SILENT - also swallows the LF of a CRLF pair
+	else if ((cmdStatus == Alx_Ok) && (cmdLen > 1))
 	{
 		while (1)
 		{

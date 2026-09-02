@@ -17,7 +17,8 @@
 
 static const char* AlxIdFake_Unreachable(void)
 {
-	exit(1);	// test harness bug: id command ran with alxId supposedly NULL
+	// Test harness bug: the id command ran although alxId is supposed to be NULL
+	exit(1);
 }
 
 bool AlxId_GetFwIsBootUsed(AlxId* me)                { (void)me; AlxIdFake_Unreachable(); return false; }
