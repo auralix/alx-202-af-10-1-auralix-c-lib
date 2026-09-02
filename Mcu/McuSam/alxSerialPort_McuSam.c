@@ -339,6 +339,34 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
 /**
   * @brief
   * @param[in,out]	me
+  * @param[out]		str
+  * @param[in]		delimSet
+  * @param[in]		maxLen
+  * @param[out]		numRead
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
+Alx_Status AlxSerialPort_ReadStrUntilAny(AlxSerialPort* me, char* str, const char* delimSet, uint32_t maxLen, uint32_t* numRead)
+{
+	// Assert
+	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
+	ALX_SERIAL_PORT_ASSERT(me->isInit == true);
+	ALX_SERIAL_PORT_ASSERT(me->rxFifoUsed == true);
+	ALX_SERIAL_PORT_ASSERT(me->linMaster == false);
+	ALX_SERIAL_PORT_ASSERT(me->linSlave == false);
+
+	// Read RX FIFO
+	uint32_t key = AlxIrq_Lock();
+	Alx_Status status = AlxFifo_ReadStrUntilAny(&me->rxFifo, str, delimSet, maxLen, numRead);
+	AlxIrq_Unlock(key);
+
+	// Return
+	return status;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
   * @param[in]		data
   * @param[in]		len
   * @retval			Alx_Ok
@@ -523,7 +551,9 @@ void AlxSerialPort_FlushTxFifo(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->txFifoUsed == true);
 
 	// Flush
+	uint32_t key = AlxIrq_Lock();	// D5a: guard the shared FIFO vs the TX ISR
 	AlxFifo_Flush(&me->txFifo);
+	AlxIrq_Unlock(key);
 }
 
 /**
@@ -538,7 +568,10 @@ uint32_t AlxSerialPort_GetTxFifoNumOfEntries(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->txFifoUsed == true);
 
 	// Get
-	return AlxFifo_GetNumOfEntries(&me->txFifo);
+	uint32_t key = AlxIrq_Lock();	// D5a: guard the shared FIFO vs the TX ISR
+	uint32_t numOfEntries = AlxFifo_GetNumOfEntries(&me->txFifo);
+	AlxIrq_Unlock(key);
+	return numOfEntries;
 }
 
 /**
@@ -552,7 +585,9 @@ void AlxSerialPort_FlushRxFifo(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->rxFifoUsed == true);
 
 	// Flush
+	uint32_t key = AlxIrq_Lock();	// D5a: guard the shared FIFO vs the RX ISR
 	AlxFifo_Flush(&me->rxFifo);
+	AlxIrq_Unlock(key);
 }
 
 /**
@@ -567,7 +602,10 @@ uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->rxFifoUsed == true);
 
 	// Get
-	return AlxFifo_GetNumOfEntries(&me->rxFifo);
+	uint32_t key = AlxIrq_Lock();	// D5a: guard the shared FIFO vs the RX ISR
+	uint32_t numOfEntries = AlxFifo_GetNumOfEntries(&me->rxFifo);
+	AlxIrq_Unlock(key);
+	return numOfEntries;
 }
 
 
