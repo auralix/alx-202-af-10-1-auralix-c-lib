@@ -5,8 +5,6 @@ EXPORTS
 	AlxCliTest_Handle
 	AlxCliTest_Port
 	AlxCliTest_GetBuffLen
-	AlxCliTest_GetCmdLenMax
-	AlxCliTest_GetLongKey
 	AlxCliTest_Status_Ok
 	AlxCliTest_WasResetRequested
 	AlxCliTest_ClearResetRequested

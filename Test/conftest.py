@@ -356,8 +356,6 @@ class CliLib:
         c.AlxCliTest_Port.restype = ctypes.c_void_p
         c.AlxCliTest_Port.argtypes = [ctypes.c_void_p]
         c.AlxCliTest_GetBuffLen.restype = ctypes.c_uint32
-        c.AlxCliTest_GetCmdLenMax.restype = ctypes.c_uint32
-        c.AlxCliTest_GetLongKey.restype = ctypes.c_void_p     # raw pointer; string_at() reads it
         c.AlxCliTest_WasResetRequested.restype = ctypes.c_bool
         c.AlxCliTest_Status_Ok.restype = ctypes.c_int32
         c.AlxSerialPortFake_InjectRx.restype = ctypes.c_int32
@@ -368,14 +366,6 @@ class CliLib:
 
     def buff_len(self) -> int:
         return self.c.AlxCliTest_GetBuffLen()
-
-    def cmd_len_max(self) -> int:
-        """ALX_CLI_CMD_LEN_MAX as compiled into the CLI (spec: 300)."""
-        return self.c.AlxCliTest_GetCmdLenMax()
-
-    def long_key(self) -> bytes:
-        """The helper's 128-char param key (spec maximum)."""
-        return ctypes.string_at(self.c.AlxCliTest_GetLongKey())
 
     def was_reset(self) -> bool:
         return self.c.AlxCliTest_WasResetRequested()

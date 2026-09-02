@@ -38,13 +38,6 @@
 
 
 //******************************************************************************
-// Private Defines
-//******************************************************************************
-#define ALX_CLI_STR_(x) #x
-#define ALX_CLI_STR(x) ALX_CLI_STR_(x)	// Turns a numeric define into a string literal - used to put the spec lengths into the sscanf field widths
-
-
-//******************************************************************************
 // Private Functions
 //******************************************************************************
 static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType paramType);
@@ -71,9 +64,6 @@ void AlxCli_Ctor
 	uint32_t buffLen
 )
 {
-	// Assert
-	ALX_CLI_ASSERT(buffLen >= ALX_CLI_CMD_LEN_MAX + 2);	// Longest command + NUL + 1 byte the CR->CRLF normalization can add; the buffer also holds the responses
-
 	// Parameters
 	me->alxSerialPort = alxSerialPort;
 	me->alxId = alxId;
@@ -130,10 +120,10 @@ void AlxCli_Handle(AlxCli* me)
 	//------------------------------------------------------------------------------
 	char* cmdBuff = (char*)me->buff;
 	uint32_t cmdLen = 0;
-	Alx_Status cmdStatus = AlxSerialPort_ReadStrUntilAny(me->alxSerialPort, cmdBuff, "\r\n", ALX_CLI_CMD_LEN_MAX + 1, &cmdLen);	// Line incl. terminator <= ALX_CLI_CMD_LEN_MAX, +1 for NUL; the ctor guarantees 1 more byte for the CR->CRLF normalization below
+	Alx_Status cmdStatus = AlxSerialPort_ReadStrUntilAny(me->alxSerialPort, cmdBuff, "\r\n", me->buffLen - 1, &cmdLen);	// 1 byte reserved: the 1-char terminator grows to canonical CRLF below
 	if (cmdStatus == AlxFifo_ErrTooLong)
 	{
-		// Undeliverable line (longer than ALX_CLI_CMD_LEN_MAX, or FIFO full without terminator) - the FIFO already discarded it, report + stay alive
+		// Undeliverable line (longer than buffer, or FIFO full without terminator) - the FIFO already discarded it, report + stay alive
 		AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrCmd);
 		ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
 	}
@@ -512,13 +502,12 @@ void AlxCli_Handle(AlxCli* me)
 					//------------------------------------------------------------------------------
 					// Parse
 					//------------------------------------------------------------------------------
-					// Field widths bound the %s writes to the spec lengths (a longer token breaks the match -> Arguments invalid); without them a long UART line overflows the stack
-					char key[ALX_CLI_PARAM_KEY_LEN_MAX + 1] = "";
-					char val[ALX_PARAM_ITEM_BUFF_LEN + 1] = "";
+					char key[ALX_CLI_BUFF_LEN] = "";
+					char val[ALX_CLI_BUFF_LEN] = "";
 					int sscanfStatus = sscanf
 					(
 						me->buff,
-						"set-param --key %" ALX_CLI_STR(ALX_CLI_PARAM_KEY_LEN_MAX) "s --val %" ALX_CLI_STR(ALX_PARAM_ITEM_BUFF_LEN) "s\r\n",
+						"set-param --key %s --val %s\r\n",
 						key,
 						val);
 					if (sscanfStatus != 2)

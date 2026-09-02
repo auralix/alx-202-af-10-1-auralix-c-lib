@@ -93,8 +93,6 @@ typedef struct
 {
 	// Defines
 	#define ALX_CLI_BUFF_LEN 128
-	#define ALX_CLI_CMD_LEN_MAX 300	// Max command length incl. CRLF - set-param --key <128> --val <127> = 280; also bounds the interrupts-off read time per Handle (ALX-1514)
-	#define ALX_CLI_PARAM_KEY_LEN_MAX 128	// Max param key length the set-param parser accepts (value length comes from ALX_PARAM_ITEM_BUFF_LEN)
 
 	// Parameters
 	AlxSerialPort* alxSerialPort;

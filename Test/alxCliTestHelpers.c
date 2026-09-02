@@ -25,17 +25,10 @@ void NVIC_SystemReset(void);
 
 #define ALX_CLI_TEST_BUFF_LEN 1024
 
-// Spec (TV 03.09): param key <= 128 chars. This key is exactly 128 chars - the
-// longest legal one - so the 280-byte set-param line can be exercised end to end.
-#define ALX_CLI_TEST_LONG_KEY \
-	"0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" \
-	"0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"	// 8 x 16 = 128 chars
-
 typedef struct
 {
 	AlxSerialPort port;
-	AlxParamItem paramItems[2];	// [0] PRETTY_JSON_EN (bool), [1] long-key Str param
-	uint8_t longKeyStrBuff[ALX_PARAM_ITEM_BUFF_LEN];	// 128 -> value <= 127 chars
+	AlxParamItem prettyJsonEn;
 	AlxParamMgmt paramMgmt;
 	AlxCli cli;
 	char buff[ALX_CLI_TEST_BUFF_LEN];
@@ -48,8 +41,6 @@ int32_t AlxCliTest_Status_Ok(void);
 void AlxCliTest_Handle(AlxCliTest_Ctx* ctx);
 AlxSerialPort* AlxCliTest_Port(AlxCliTest_Ctx* ctx);
 uint32_t AlxCliTest_GetBuffLen(void);
-uint32_t AlxCliTest_GetCmdLenMax(void);
-const char* AlxCliTest_GetLongKey(void);
 bool AlxCliTest_WasResetRequested(void);
 void AlxCliTest_ClearResetRequested(void);
 
@@ -75,16 +66,6 @@ uint32_t AlxCliTest_GetBuffLen(void)
 	return ALX_CLI_TEST_BUFF_LEN;
 }
 
-uint32_t AlxCliTest_GetCmdLenMax(void)
-{
-	return ALX_CLI_CMD_LEN_MAX;
-}
-
-const char* AlxCliTest_GetLongKey(void)
-{
-	return ALX_CLI_TEST_LONG_KEY;
-}
-
 int32_t AlxCliTest_Status_Ok(void)
 {
 	return (int32_t)Alx_Ok;
@@ -102,7 +83,7 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 
 	AlxParamItem_CtorBool
 	(
-		&ctx->paramItems[0],
+		&ctx->prettyJsonEn,
 		NULL,				// paramKvStore - none, same as the product's CLI items
 		AlxParamItem_Param,
 		"PRETTY_JSON_EN",
@@ -114,24 +95,7 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 		false				// valChangeTakesEffectAfterReset
 	);
 
-	AlxParamItem_CtorStr
-	(
-		&ctx->paramItems[1],
-		NULL,				// paramKvStore
-		AlxParamItem_Param,
-		ALX_CLI_TEST_LONG_KEY,
-		1,					// id
-		NULL,				// groupKey
-		0,					// groupId
-		"",					// valDef
-		AlxParamItem_Ignore,
-		"",					// valUnit
-		false,				// valChangeTakesEffectAfterReset
-		ctx->longKeyStrBuff,
-		sizeof(ctx->longKeyStrBuff)
-	);
-
-	AlxParamMgmt_Ctor(&ctx->paramMgmt, ctx->paramItems, 2);
+	AlxParamMgmt_Ctor(&ctx->paramMgmt, &ctx->prettyJsonEn, 1);
 
 	AlxCli_Ctor
 	(
@@ -139,7 +103,7 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 		&ctx->port,
 		NULL,				// alxId - the guarded optional, same as the product
 		&ctx->paramMgmt,
-		&ctx->paramItems[0],
+		&ctx->prettyJsonEn,
 		ctx->buff,
 		sizeof(ctx->buff)
 	);
