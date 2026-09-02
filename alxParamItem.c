@@ -550,6 +550,9 @@ void AlxParamItem_CtorBool
 	bool valChangeTakesEffectAfterReset
 )
 {
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+
 	// Parameters
 	me->dataType = AlxParamItem_Bool;
 	me->paramKvStore = paramKvStore;
@@ -592,6 +595,9 @@ void AlxParamItem_CtorArr
 	bool valChangeTakesEffectAfterReset
 )
 {
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+
 	// Parameters
 	me->dataType = AlxParamItem_Arr;
 	me->paramKvStore = paramKvStore;
@@ -634,6 +640,7 @@ void AlxParamItem_CtorStr
 )
 {
 	// Assert
+	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
 	ALX_PARAM_ITEM_ASSERT(strlen(valDef) < buffLen);
 
 	// Parameters
@@ -1825,17 +1832,13 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
-	if (me->dataType != AlxParamItem_Str)
-	{
-		ALX_PARAM_ITEM_ASSERT(maxLenWithNullTerm <= ALX_PARAM_ITEM_BUFF_LEN);
-	}
 
 
 	//------------------------------------------------------------------------------
 	// Local variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
-	char valStr[ALX_PARAM_ITEM_BUFF_LEN] = "";
+	char valStr[32] = "";
 
 
 
@@ -2341,6 +2344,9 @@ static void AlxParamItem_Ctor
 	uint32_t buffLen
 )
 {
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+
 	// Parameters
 	me->dataType = dataType;
 	me->paramKvStore = paramKvStore;

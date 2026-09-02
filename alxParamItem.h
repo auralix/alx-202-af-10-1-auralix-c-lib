@@ -136,7 +136,7 @@ typedef union
 typedef struct
 {
 	// Defines
-	#define ALX_PARAM_ITEM_BUFF_LEN 128
+	#define ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX 128
 	#define ALX_PARAM_ITEM_FTOA_PRECISION 6
 
 	// Parameters
