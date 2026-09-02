@@ -46,7 +46,17 @@ CLI_SOURCES_STRICT = [
     TEST_DIR / "alxSerialPortFake.c",
     TEST_DIR / "alxParamKvStoreFake.c",
     TEST_DIR / "alxIdFake.c",
+    TEST_DIR / "alxAssertPc.c",
     TEST_DIR / "alxCliTestHelpers.c",
+]
+# asserts ON = test the code AS SHIPPED (product enables RST mode). Scoped to
+# the CLI DLL for now; the fifo/bound DLL parity is its own follow-up.
+CLI_ASSERT_DEFINES = [
+    "-DALX_CLI_ASSERT_RST_ENABLE", "-DALX_SERIAL_PORT_ASSERT_RST_ENABLE",
+    "-DALX_FIFO_ASSERT_RST_ENABLE", "-DALX_BOUND_ASSERT_RST_ENABLE",
+    "-DALX_PARAM_ITEM_ASSERT_RST_ENABLE", "-DALX_PARAM_MGMT_ASSERT_RST_ENABLE",
+    "-DALX_FTOA_ASSERT_RST_ENABLE", "-DALX_RANGE_ASSERT_RST_ENABLE",
+    "-DALX_ID_ASSERT_RST_ENABLE",
 ]
 CLI_SOURCES_CLOSURE = [
     CLIB_DIR / "alxParamItem.c",
@@ -166,9 +176,10 @@ def _build_cli_dll() -> None:
     strict = " ".join(f'"{s}"' for s in CLI_SOURCES_STRICT)
     objs = " ".join(f'"{o}"' for o in sorted(obj_dir.glob("*.o")))
     flags = " ".join(HOST_WARN_FLAGS)
+    asserts = " ".join(CLI_ASSERT_DEFINES)
     cmd2 = (
         f'"{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g {flags} -Werror '
-        f'-D_CRT_SECURE_NO_WARNINGS {inc} {strict} {objs} '
+        f'-D_CRT_SECURE_NO_WARNINGS {asserts} {inc} {strict} {objs} '
         f'-shared -o "{CLI_DLL}" -Wl,/DEF:"{TEST_DIR / "alxCliTest.def"}"'
     )
     result = subprocess.run(f'cmd /s /c "{cmd2}"', capture_output=True, text=True)

@@ -118,15 +118,25 @@ void AlxCli_Handle(AlxCli* me)
 	// Handle Read Command
 	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
+	char* cmdBuff = (char*)me->buff;
 	uint32_t cmdLen = 0;
-	if (AlxSerialPort_ReadStrUntil(me->alxSerialPort, me->buff, "\r\n", me->buffLen, &cmdLen) == Alx_Ok)
+	Alx_Status cmdStatus = AlxSerialPort_ReadStrUntilAny(me->alxSerialPort, cmdBuff, "\r\n", me->buffLen - 1, &cmdLen);	// 1 byte reserved: the 1-char terminator grows to canonical CRLF below
+	if (cmdStatus == AlxFifo_ErrTooLong)
+	{
+		// Undeliverable line (longer than buffer, or FIFO full without terminator) - the FIFO already discarded it, report + stay alive
+		AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrCmd);
+		ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+	}
+	else if ((cmdStatus == Alx_Ok) && (cmdLen > 1))	// cmdLen == 1 = empty line (terminator only): SILENT - also swallows the LF of a CRLF pair
 	{
 		while (1)
 		{
 			//------------------------------------------------------------------------------
-			// Append \r\n
+			// Normalize Terminator - line arrives with CR or LF INCLUDED; commands match the canonical CRLF form
 			//------------------------------------------------------------------------------
-			strcat(me->buff, "\r\n");
+			cmdBuff[cmdLen - 1] = '\r';
+			cmdBuff[cmdLen] = '\n';
+			cmdBuff[cmdLen + 1] = '\0';
 
 
 			//------------------------------------------------------------------------------
@@ -552,9 +562,8 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Invalid Command
 			//------------------------------------------------------------------------------
-
-			// Flush serial port RX FIFO
-			AlxSerialPort_FlushRxFifo(me->alxSerialPort);
+			// NOTE: no RX flush here anymore - the FIFO primitive consumes exactly one
+			// line per call, so pipelined commands behind an invalid one survive
 
 			// Prepare response
 			AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrCmd);
