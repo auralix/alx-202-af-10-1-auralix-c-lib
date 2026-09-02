@@ -504,15 +504,21 @@ void AlxCli_Handle(AlxCli* me)
 					//------------------------------------------------------------------------------
 					// Parse
 					//------------------------------------------------------------------------------
-					char key[ALX_CLI_BUFF_LEN] = "";
-					char val[ALX_CLI_BUFF_LEN] = "";
-					int sscanfStatus = sscanf
-					(
-						me->buff,
-						"set-param --key %s --val %s",
-						key,
-						val);
-					if (sscanfStatus != 2)
+
+					// Find
+					char* key = strstr(me->buff, " --key ");
+					char* val = strstr(me->buff, " --val ");
+					if (key == NULL || val == NULL || val <= key)
+					{
+						AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrArg);
+						break;
+					}
+
+					// Split
+					*val = '\0';
+					key = key + strlen(" --key ");
+					val = val + strlen(" --val ");
+					if (*key == '\0' || *val == '\0')
 					{
 						AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrArg);
 						break;
