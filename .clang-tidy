@@ -8,11 +8,13 @@ Checks: >
   -*, clang-analyzer-*, bugprone-*, cert-*, concurrency-mt-unsafe,
   misc-redundant-expression, misc-static-assert,
   readability-misleading-indentation, readability-non-const-parameter,
+  readability-inconsistent-declaration-parameter-name,
   -bugprone-easily-swappable-parameters, -cert-int09-c,
   -clang-analyzer-optin.performance.Padding,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
 WarningsAsErrors: >
   clang-analyzer-*, bugprone-branch-clone, bugprone-macro-parentheses,
   bugprone-suspicious-semicolon, bugprone-terminating-continue,
-  cert-err33-c, cert-flp30-c, misc-redundant-expression
+  cert-err33-c, cert-flp30-c, misc-redundant-expression,
+  readability-inconsistent-declaration-parameter-name
 HeaderFilterRegex: '.*[\/]alx[A-Za-z0-9]+\.h$'
