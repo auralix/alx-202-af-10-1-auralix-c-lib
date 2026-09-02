@@ -713,3 +713,88 @@ def test_ALX1514_P11_rewind_to_exactly_full_sets_full(lib, make_fifo):
     assert lib.c.AlxFifo_Rewind(f, 4) == 4       # rewind to exactly full
     assert lib.entries(f) == 4
     assert lib.write(f, b"!") == lib.ERR_FULL
+
+
+# ---------------------------------------------------------------------
+# P11 - full-pool run 03.09 evening (alxFifo 221 mutants: 179 killed, 16 -Werror, 26 survived;
+# alxBound 289: 247 / 38 / 4). Survivor triage below; the tests kill the real holes, the
+# EQUIVALENTS block documents the rest so nobody re-triages them.
+# ---------------------------------------------------------------------
+
+def test_ALX1514_P11_rewind_on_full_fifo_with_read_history_returns_zero(lib, make_fifo):
+    """Kills alxFifo.mutant.697/.699/.705 (capacity guard `buffLen > numOfEntries`
+    weakened to >=, != or true) and .750 (its `return 0` removed): on a FULL fifo
+    that HAS read history (read 2, wrote 2 again), the weakened guard lets the
+    second bound clamp len to 1 and rewinds INTO a full buffer (numOfEntries 5 of 4).
+    The earlier full-fifo test had no read history, so the rewindability check
+    stopped the mutants for free."""
+    f = make_fifo(4)
+    assert lib.write(f, b"abcd") == lib.OK       # full
+    status, data = lib.read(f, 2)
+    assert status == lib.OK and data == b"ab"    # history: 2 read since flush
+    assert lib.write(f, b"ef") == lib.OK         # full again
+    assert lib.c.AlxFifo_Rewind(f, 1) == 0       # nothing can be rewound into a full fifo
+    assert lib.entries(f) == 4
+    status, data = lib.read(f, 4)
+    assert status == lib.OK and data == b"cdef"
+
+
+def test_ALX1514_P11_rewind_clamped_to_reads_when_capacity_allows_more(lib, make_fifo):
+    """Kills alxFifo.mutant.769 (rewindable = sinceFlush + numOfEntries instead of -)
+    and .812 (the clamped length discarded): free capacity (11) is larger than what
+    was read (3), so ONLY the rewindability bound limits the request. Every earlier
+    rewind test had capacity <= reads, so the capacity bound hid the mutants."""
+    f = make_fifo(16)
+    assert lib.write(f, b"ABCDEFGH") == lib.OK
+    status, data = lib.read(f, 3)
+    assert status == lib.OK and data == b"ABC"
+    assert lib.c.AlxFifo_Rewind(f, 5) == 3       # asked 5, only 3 were ever read
+    assert lib.entries(f) == 8
+    status, data = lib.read(f, 8)
+    assert status == lib.OK and data == b"ABCDEFGH"
+
+
+def test_ALX1514_P11_flush_of_non_empty_fifo_makes_it_empty_for_read(lib, make_fifo):
+    """Kills alxFifo.mutant.146 (Flush's `isEmpty = true` removed): ReadByte gates on
+    the flag, so a flushed fifo with a stale isEmpty=false would serve garbage.
+    The earlier flush tests wrote again before reading."""
+    f = make_fifo(8)
+    assert lib.write(f, b"ab") == lib.OK
+    lib.c.AlxFifo_Flush(f)
+    status, _ = lib.read(f, 1)
+    assert status == lib.ERR_EMPTY
+    assert lib.entries(f) == 0
+
+
+def test_ALX1514_P11_fresh_fifo_accepts_first_write(lib, make_fifo):
+    """Kills alxFifo.mutant.78 (Ctor's `isFull = false` removed) TOGETHER with the
+    helper's struct poison changed 0xAA -> 0xFF: clang tests a `bool` by its low
+    bit, so 0xAA read as false and hid a forgotten flag; 0xFF reads as true and a
+    fresh fifo would refuse its first write."""
+    f = make_fifo(4)
+    assert lib.write(f, b"a") == lib.OK
+    assert lib.entries(f) == 1
+
+
+# EQUIVALENT SURVIVORS (full pool 03.09) - no test can distinguish them, by construction:
+# - alxBound.mutant.1092/.1093/.1096/.1099: AlxBound_Str too-long branch copies
+#   maxLen instead of maxLen-1 bytes; the extra byte is valBounded[maxLen-1], which the
+#   next statement overwrites with the NUL terminator.
+# - alxFifo.mutant.250/.257/.263/.266/.269 (Read loop) and .524/.530/.531/.537/.540/.543
+#   (Write loop): the per-byte `if (status != Alx_Ok) return status;` is a shortcut only:
+#   once ReadByte/WriteByte fails (empty/full) every further call fails identically
+#   without side effects, and the loop returns the same final status with the same
+#   partial data. (`< Alx_Ok` / `> Alx_Ok` variants: Alx_Ok is 0 and errors are positive.)
+# - alxFifo.mutant.722/.729 and .791/.798: lower bound 1 -> 0 on a length that is >= 1
+#   at that point (len == 0 returned earlier).
+# - alxFifo.mutant.699: `buffLen > numOfEntries` -> `!=`; numOfEntries never exceeds
+#   buffLen, so `!=` and `>` agree (the >= / true variants .697/.705 ARE killed above).
+# - alxFifo.mutant.760: `numOfEntriesSinceFlush > numOfEntries` -> `!=`; the counter is
+#   never smaller than numOfEntries (invariant kept by every mutator).
+# Replay 03.09 (all 30 survivors re-run against this file): 7 killed (.78 .146 .697 .705
+# .750 .769 .812), 23 equivalent as listed. alxFifo suite kill rate 87.3% -> 90.7% of 205
+# suite-scored; the remaining 19 are these equivalents.
+# - alxFifo.mutant.865: `tail - buffLen` -> `tail % buffLen` after one wrap; identical
+#   for tail in [buffLen, 2*buffLen), which the len <= buffLen clamp guarantees.
+# - alxFifo.mutant.887: `numOfEntries == buffLen` -> `>=`; numOfEntries never exceeds
+#   buffLen (capacity bound above).
