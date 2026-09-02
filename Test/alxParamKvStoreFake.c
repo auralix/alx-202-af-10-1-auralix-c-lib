@@ -17,15 +17,11 @@
 Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* data, uint32_t lenMax, uint32_t* lenActual)
 {
 	(void)me; (void)key; (void)data; (void)lenMax; (void)lenActual;
-
-	// Persistence is out of scope for the PC CLI tests
-	return Alx_Err;
+	return Alx_Err;	// persistence is out of scope for the PC CLI tests
 }
 
 Alx_Status AlxParamKvStore_Set(AlxParamKvStore* me, const char* key, void* data, uint32_t len)
 {
 	(void)me; (void)key; (void)data; (void)len;
-
-	// Persistence is out of scope for the PC CLI tests
-	return Alx_Err;
+	return Alx_Err;	// persistence is out of scope for the PC CLI tests
 }

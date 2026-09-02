@@ -54,9 +54,7 @@ static AlxSerialPortFake_Slot* AlxSerialPortFake_Find(AlxSerialPort* me)
 			return &slots[i];
 		}
 	}
-
-	// Test infrastructure - an unregistered port is a harness bug, fail fast
-	exit(1);
+	exit(1);	// test infrastructure - unregistered port is a harness bug, fail fast
 }
 
 void AlxSerialPortFake_Register(AlxSerialPort* me)
@@ -72,9 +70,7 @@ void AlxSerialPortFake_Register(AlxSerialPort* me)
 			return;
 		}
 	}
-
-	// Test infrastructure - slot pool exhausted, fail fast
-	exit(1);
+	exit(1);	// test infrastructure - slot pool exhausted, fail fast
 }
 
 void AlxSerialPortFake_Unregister(AlxSerialPort* me)
@@ -171,6 +167,5 @@ uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
 
 void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 {
-	// No IRQs on the host
-	(void)me;
+	(void)me;	// no IRQs on the host
 }

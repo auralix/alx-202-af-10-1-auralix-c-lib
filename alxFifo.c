@@ -459,16 +459,14 @@ static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const cha
 			}
 			return AlxFifo_ErrTooLong;
 		}
-		// Line may still complete - FIFO left untouched
-		return AlxFifo_ErrNoDelim;
+		return AlxFifo_ErrNoDelim;	// Line may still complete - FIFO left untouched
 	}
 
 
 	//------------------------------------------------------------------------------
 	// Handle Line Too Long - line + null terminator must fit into len
 	//------------------------------------------------------------------------------
-	// Line + null terminator must fit (no uint32 underflow for len == 0)
-	if ((lineLen + 1) > len)
+	if ((lineLen + 1) > len)	// line + null terminator must fit (no uint32 underflow for len == 0)
 	{
 		// Discard ONLY this line incl. terminator - data behind it survives
 		uint8_t dummy = 0;

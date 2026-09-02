@@ -48,8 +48,7 @@ static bool nvicResetRequested = false;
 
 void NVIC_SystemReset(void)
 {
-	// On the device this never returns - tests just observe the flag
-	nvicResetRequested = true;
+	nvicResetRequested = true;	// on the device this never returns; tests just observe it
 }
 
 bool AlxCliTest_WasResetRequested(void)
@@ -82,15 +81,32 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 
 	AlxSerialPortFake_Register(&ctx->port);
 
-	// PRETTY_JSON_EN item as the product wires it: no KV store, no group, valDef true (pretty JSON)
-	//						me,						paramKvStore,	paramType,				key,				id,	groupKey,	groupId,	valDef,	valUnit,	valChangeTakesEffectAfterReset
-	AlxParamItem_CtorBool(	&ctx->prettyJsonEn,		NULL,			AlxParamItem_Param,		"PRETTY_JSON_EN",	0,	NULL,		0,			true,	"",			false);
+	AlxParamItem_CtorBool
+	(
+		&ctx->prettyJsonEn,
+		NULL,				// paramKvStore - none, same as the product's CLI items
+		AlxParamItem_Param,
+		"PRETTY_JSON_EN",
+		0,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		true,				// valDef - pretty JSON, same as the product
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
 
 	AlxParamMgmt_Ctor(&ctx->paramMgmt, &ctx->prettyJsonEn, 1);
 
-	// CLI as the product wires it: alxId = NULL (the guarded optional)
-	//				me,			alxSerialPort,	alxId,	alxParamMgmt,		PRETTY_JSON_EN,			buff,		buffLen
-	AlxCli_Ctor(	&ctx->cli,	&ctx->port,		NULL,	&ctx->paramMgmt,	&ctx->prettyJsonEn,		ctx->buff,	sizeof(ctx->buff));
+	AlxCli_Ctor
+	(
+		&ctx->cli,
+		&ctx->port,
+		NULL,				// alxId - the guarded optional, same as the product
+		&ctx->paramMgmt,
+		&ctx->prettyJsonEn,
+		ctx->buff,
+		sizeof(ctx->buff)
+	);
 
 	return ctx;
 }

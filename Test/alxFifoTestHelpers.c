@@ -40,17 +40,13 @@ AlxFifo* AlxFifoTest_New(uint32_t buffLen)
 	uint8_t* buff = (uint8_t*)malloc(buffLen);
 	if ((me == NULL) || (buff == NULL))
 	{
-		// Test infrastructure - fail fast on OOM
-		exit(1);
+		exit(1);	// test infrastructure - fail fast on OOM
 	}
-
-	// Poison the buffer with a DELIMITER byte - any scan past the valid entries finds a phantom terminator deterministically
-	memset(buff, '\n', buffLen);
-
-	// Poison the STRUCT - a Ctor that forgets a field leaves garbage, not accidental zeros
-	// (mutation finding: fresh-heap zeros let removed-initialization mutants survive)
-	memset(me, 0xAA, sizeof(*me));
-
+	memset(buff, '\n', buffLen);	// poison with a DELIMITER byte - any scan past the
+									// valid entries finds a phantom terminator deterministically
+	memset(me, 0xAA, sizeof(*me));	// poison the STRUCT - a Ctor that forgets a field leaves
+									// garbage, not accidental zeros (mutation finding: fresh-heap
+									// zeros let removed-initialization mutants survive)
 	AlxFifo_Ctor(me, buff, buffLen);
 	return me;
 }
