@@ -91,9 +91,6 @@ typedef enum
 
 typedef struct
 {
-	// Defines
-	#define ALX_CLI_BUFF_LEN 128
-
 	// Parameters
 	AlxSerialPort* alxSerialPort;
 	AlxId* alxId;

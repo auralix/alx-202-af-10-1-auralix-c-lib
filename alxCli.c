@@ -752,6 +752,10 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 	// Loop through all parameters
 	for (uint32_t i = 0; i < numOfParamItems; i++)
 	{
+		//------------------------------------------------------------------------------
+		// Check
+		//------------------------------------------------------------------------------
+
 		// If param type check enabled
 		if (paramTypeCheck)
 		{
@@ -769,38 +773,47 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 			}
 		}
 
+
+		//------------------------------------------------------------------------------
+		// Get
+		//------------------------------------------------------------------------------
+
 		// Get key
 		const char* key = AlxParamMgmt_ByIndex_GetKey(me->alxParamMgmt, i);
 
 		// Get data type
 		AlxParamItem_DataType dataType = AlxParamMgmt_ByIndex_GetDataType(me->alxParamMgmt, i);
 
-		// Get value in string format
-		char val[ALX_CLI_BUFF_LEN] = "";
-		AlxParamMgmt_ByIndex_GetVal_StrFormat(me->alxParamMgmt, i, val, sizeof(val));
 
-		// If string type add double quote (") around value, Else just use value
-		if (dataType == AlxParamItem_Str)
+		//------------------------------------------------------------------------------
+		// Set
+		//------------------------------------------------------------------------------
+
+		// Set key
+		uint32_t len = 0;
+		if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 		{
-			if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
-			{
-				sprintf(me->buff, "        \"%s\":\"%s\"", key, val);
-			}
-			else
-			{
-				sprintf(me->buff, "\"%s\":\"%s\"", key, val);
-			}
+			len = sprintf(me->buff, "        \"%s\":", key);
 		}
 		else
 		{
-			if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
-			{
-				sprintf(me->buff, "        \"%s\":%s", key, val);
-			}
-			else
-			{
-				sprintf(me->buff, "\"%s\":%s", key, val);
-			}
+			len = sprintf(me->buff, "\"%s\":", key);
+		}
+
+		// If string type add opening double quote (")
+		if (dataType == AlxParamItem_Str)
+		{
+			me->buff[len] = '"';
+			len++;
+		}
+
+		// Set value straight into buff after the key
+		ALX_CLI_ASSERT(AlxParamMgmt_ByIndex_GetVal_StrFormat(me->alxParamMgmt, i, &me->buff[len], me->buffLen - len - 4) == Alx_Ok);
+
+		// If string type add closing double quote (")
+		if (dataType == AlxParamItem_Str)
+		{
+			strcat(me->buff, "\"");
 		}
 
 		// If NOT last line in loop, add comma
