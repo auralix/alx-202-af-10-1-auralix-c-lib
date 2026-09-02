@@ -99,7 +99,7 @@ typedef struct
 	AlxId* alxId;
 	AlxParamMgmt* alxParamMgmt;
 	AlxParamItem* PRETTY_JSON_EN;
-	void* buff;
+	char* buff;
 	uint32_t buffLen;
 
 	// Variables
@@ -120,7 +120,7 @@ void AlxCli_Ctor
 	AlxId* alxId,
 	AlxParamMgmt* alxParamMgmt,
 	AlxParamItem* PRETTY_JSON_EN,
-	void* buff,
+	char* buff,
 	uint32_t buffLen
 );
 

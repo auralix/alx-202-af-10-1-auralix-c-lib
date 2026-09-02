@@ -60,7 +60,7 @@ void AlxCli_Ctor
 	AlxId* alxId,
 	AlxParamMgmt* alxParamMgmt,
 	AlxParamItem* PRETTY_JSON_EN,
-	void* buff,
+	char* buff,
 	uint32_t buffLen
 )
 {
@@ -118,27 +118,29 @@ void AlxCli_Handle(AlxCli* me)
 	// Handle Read Command
 	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
-	char* cmdBuff = (char*)me->buff;
 	uint32_t cmdLen = 0;
-	Alx_Status cmdStatus = AlxSerialPort_ReadStrUntilAny(me->alxSerialPort, cmdBuff, "\r\n", me->buffLen - 1, &cmdLen);	// 1 byte reserved: the 1-char terminator grows to canonical CRLF below
+	Alx_Status cmdStatus = AlxSerialPort_ReadStrUntilAny(me->alxSerialPort, me->buff, "\r\n", me->buffLen, &cmdLen);
 	if (cmdStatus == AlxFifo_ErrTooLong)
 	{
-		// Undeliverable line (longer than buffer, or FIFO full without terminator) - the FIFO already discarded it, report + stay alive
+		// Prepare response
 		AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrCmd);
+
+		// Send response
 		ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
 	}
-	else if ((cmdStatus == Alx_Ok) && (cmdLen > 1))	// cmdLen == 1 = empty line (terminator only): SILENT - also swallows the LF of a CRLF pair
+	else if (cmdStatus == Alx_Ok && cmdLen > 1)
 	{
+		//------------------------------------------------------------------------------
+		// Remove EOL -> \r or \n
+		//------------------------------------------------------------------------------
+		me->buff[cmdLen - 1] = '\0';
+
+
+		//------------------------------------------------------------------------------
+		// Handle
+		//------------------------------------------------------------------------------
 		while (1)
 		{
-			//------------------------------------------------------------------------------
-			// Normalize Terminator - line arrives with CR or LF INCLUDED; commands match the canonical CRLF form
-			//------------------------------------------------------------------------------
-			cmdBuff[cmdLen - 1] = '\r';
-			cmdBuff[cmdLen] = '\n';
-			cmdBuff[cmdLen + 1] = '\0';
-
-
 			//------------------------------------------------------------------------------
 			// Help Command
 			//------------------------------------------------------------------------------
