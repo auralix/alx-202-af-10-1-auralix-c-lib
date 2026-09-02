@@ -47,7 +47,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 #if defined(ALX_PC)
 #include <assert.h>		// TV: All headers from C11 Standard, commented out everything, so that project compiles
-//#include <complex.h>	// ALX-1514: UCRT _Fcomplex clashes with clang-cl in C mode (coverage/UBSan builds)
+//#include <complex.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fenv.h>
@@ -69,10 +69,10 @@ extern "C" {
 #include <stdlib.h>
 //#include <stdnoreturn.h>
 #include <string.h>
-//#include <tgmath.h>	// ALX-1514: depends on complex.h - same clang-cl clash
+//#include <tgmath.h>
 //#include <threads.h>
 #include <time.h>
-//#include <uchar.h>	// ALX-1514: not provided by arm-none-eabi newlib (-fanalyzer leg compiles ALX_PC config with arm-gcc); char16_t/char32_t unused in the lib
+//#include <uchar.h>
 #include <wchar.h>
 #include <wctype.h>
 #endif
