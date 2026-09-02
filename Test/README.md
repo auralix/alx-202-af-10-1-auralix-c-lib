@@ -76,6 +76,7 @@
 - **Tools**
 	- clang-cl ASan + UBSan `-fsanitize=address,undefined` -> Stage 1 = `alxFifoSanSmoke.exe`
 	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alxFifoTest.dll` & pytest
+	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2b = `alxCliTest.dll` & pytest `test_alxCli.py` (asserts ON, as shipped)
 - **Files - Code**
 	- `Test/RunSanitizers.ps1`
 	- `Test/alxFifoSanSmoke.c`
@@ -83,6 +84,7 @@
 	- `Test/build/asan/alxFifoSanSmoke.exe`
 	- `Test/build/asan/clang_rt.asan_dynamic-x86_64.dll`
 	- `Test/build/ubsan/alxFifoTest.dll`
+	- `Test/build/ubsan/alxCliTest.dll`
 
 ## COVERAGE
 - **Tools**
