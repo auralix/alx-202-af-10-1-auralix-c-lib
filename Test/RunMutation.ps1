@@ -15,6 +15,7 @@ param(
 )
 $ErrorActionPreference = "Stop"
 $test = $PSScriptRoot
+$Sources = $Sources | ForEach-Object { $_ -split "," }   # -File passes comma-lists as ONE literal string
 
 python -m pytest -q --collect-only | Out-Null   # dev gate: -Werror build must be fresh
 if ($LASTEXITCODE -ne 0) { throw "dev-lane build/collect failed" }
