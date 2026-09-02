@@ -415,16 +415,20 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 	//------------------------------------------------------------------------------
 	if (me->txFifoUsed)
 	{
-		// Write TX FIFO
+		// Lock
 		uint32_t key = AlxIrq_Lock();
+
+		// Write TX FIFO
 		status = AlxFifo_Write(&me->txFifo, data, len);
-		AlxIrq_Unlock(key);
 
 		// If UART TX IRQ NOT enabled, enable it
 		if (hri_sercomusart_get_INTEN_DRE_bit(me->hw) == false)
 		{
 			hri_sercomusart_set_INTEN_DRE_bit(me->hw);
 		}
+
+		// Unlock
+		AlxIrq_Unlock(key);
 	}
 	else
 	{
