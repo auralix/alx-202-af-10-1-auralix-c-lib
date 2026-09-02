@@ -224,11 +224,21 @@ def test_ALX1514_P15_set_param_str_value_too_long_for_param_rejected(make_cli, c
     b"set-param --key NO_SUCH_KEY --val 5",      # unknown key
     b"set-param --key PRETTY_JSON_EN --val maybe",  # not a bool
     b"set-param --key UINT8_TEST --val 200",     # out of range (valMax 100, Ignore)
-    b"set-param",                                # bare command
 ])
 def test_ALX1514_P15_set_param_bad_lines_answer_arguments_invalid(make_cli, line):
     cli = make_cli()
     assert ARGS_INVALID_MARK in cmd(cli, line + b"\r", handles=4)
+    assert HELP_MARK in cmd(cli, b"help\r")
+
+
+@pytest.mark.parametrize("line", [b"set-param", b"set-paramX --key UINT8_TEST --val 1", b"set-parameter --key UINT8_TEST --val 1"],
+                         ids=["bare", "suffix", "longer-word"])
+def test_ALX1514_P15_set_param_is_matched_as_a_whole_word(make_cli, line):
+    """Dispatch is 'set-param ' (word + space, TV 03.09): a bare or misspelled word is
+    not a command. Before: prefix match -> 'set-paramX --key K --val V' EXECUTED the set."""
+    cli = make_cli()
+    assert INVALID_MARK in cmd(cli, line + b"\r", handles=4)
+    assert as_json(cmd(cli, b"get-param\r", handles=4))["data"]["UINT8_TEST"] == 7   # untouched
     assert HELP_MARK in cmd(cli, b"help\r")
 
 
