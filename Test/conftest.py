@@ -166,8 +166,12 @@ def _build_cli_dll() -> None:
     inc = f'-I"{TEST_DIR}" -I"{CLIB_DIR}" -I"{CLIB_DIR / "Mcu"}"'
 
     closure = " ".join(f'"{s}"' for s in CLI_SOURCES_CLOSURE)
+    asserts = " ".join(CLI_ASSERT_DEFINES)
+    # asserts ON for the closure too - the product ships them on, and alxParamItem.c has
+    # side effects inside ALX_PARAM_ITEM_ASSERT (sprintf of numeric values): with asserts
+    # off, get-param printed numbers as EMPTY (found 03.09 by the P15 uint8 test)
     cmd1 = (f'cd /d "{obj_dir}" && "{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g -w '
-            f'-D_CRT_SECURE_NO_WARNINGS {inc} -c {closure}')
+            f'-D_CRT_SECURE_NO_WARNINGS {asserts} {inc} -c {closure}')
     result = subprocess.run(f'cmd /s /c "{cmd1}"', capture_output=True, text=True)
     if result.returncode != 0:
         raise RuntimeError(
@@ -356,6 +360,7 @@ class CliLib:
         c.AlxCliTest_Port.restype = ctypes.c_void_p
         c.AlxCliTest_Port.argtypes = [ctypes.c_void_p]
         c.AlxCliTest_GetBuffLen.restype = ctypes.c_uint32
+        c.AlxCliTest_GetStrValBuffLen.restype = ctypes.c_uint32
         c.AlxCliTest_WasResetRequested.restype = ctypes.c_bool
         c.AlxCliTest_Status_Ok.restype = ctypes.c_int32
         c.AlxSerialPortFake_InjectRx.restype = ctypes.c_int32
@@ -366,6 +371,10 @@ class CliLib:
 
     def buff_len(self) -> int:
         return self.c.AlxCliTest_GetBuffLen()
+
+    def str_val_buff_len(self) -> int:
+        """Value buffer of the helper's STR_TEST param (value <= len-1 chars)."""
+        return self.c.AlxCliTest_GetStrValBuffLen()
 
     def was_reset(self) -> bool:
         return self.c.AlxCliTest_WasResetRequested()

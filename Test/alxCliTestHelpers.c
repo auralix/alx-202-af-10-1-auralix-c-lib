@@ -24,11 +24,14 @@ void AlxSerialPortFake_Unregister(AlxSerialPort* me);
 void NVIC_SystemReset(void);
 
 #define ALX_CLI_TEST_BUFF_LEN 1024
+#define ALX_CLI_TEST_STR_VAL_BUFF_LEN 600	// Str param value buffer -> value <= 599 chars (longer than any stack array the old parser had)
 
+// Param table under test: the product's bool + one Str + one Uint8, so every value kind the CLI formats is present
 typedef struct
 {
 	AlxSerialPort port;
-	AlxParamItem prettyJsonEn;
+	AlxParamItem paramItems[3];		// [0] PRETTY_JSON_EN (bool), [1] STR_TEST (str), [2] UINT8_TEST (uint8, 0..100)
+	uint8_t strValBuff[ALX_CLI_TEST_STR_VAL_BUFF_LEN];
 	AlxParamMgmt paramMgmt;
 	AlxCli cli;
 	char buff[ALX_CLI_TEST_BUFF_LEN];
@@ -41,6 +44,7 @@ int32_t AlxCliTest_Status_Ok(void);
 void AlxCliTest_Handle(AlxCliTest_Ctx* ctx);
 AlxSerialPort* AlxCliTest_Port(AlxCliTest_Ctx* ctx);
 uint32_t AlxCliTest_GetBuffLen(void);
+uint32_t AlxCliTest_GetStrValBuffLen(void);
 bool AlxCliTest_WasResetRequested(void);
 void AlxCliTest_ClearResetRequested(void);
 
@@ -66,6 +70,11 @@ uint32_t AlxCliTest_GetBuffLen(void)
 	return ALX_CLI_TEST_BUFF_LEN;
 }
 
+uint32_t AlxCliTest_GetStrValBuffLen(void)
+{
+	return ALX_CLI_TEST_STR_VAL_BUFF_LEN;
+}
+
 int32_t AlxCliTest_Status_Ok(void)
 {
 	return (int32_t)Alx_Ok;
@@ -83,7 +92,7 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 
 	AlxParamItem_CtorBool
 	(
-		&ctx->prettyJsonEn,
+		&ctx->paramItems[0],
 		NULL,				// paramKvStore - none, same as the product's CLI items
 		AlxParamItem_Param,
 		"PRETTY_JSON_EN",
@@ -95,7 +104,44 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 		false				// valChangeTakesEffectAfterReset
 	);
 
-	AlxParamMgmt_Ctor(&ctx->paramMgmt, &ctx->prettyJsonEn, 1);
+	AlxParamItem_CtorStr
+	(
+		&ctx->paramItems[1],
+		NULL,				// paramKvStore
+		AlxParamItem_Param,
+		"STR_TEST",
+		1,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		"",					// valDef
+		AlxParamItem_Ignore,
+		"",					// valUnit
+		false,				// valChangeTakesEffectAfterReset
+		ctx->strValBuff,
+		sizeof(ctx->strValBuff)
+	);
+
+	AlxParamItem_CtorUint8
+	(
+		&ctx->paramItems[2],
+		NULL,				// paramKvStore
+		AlxParamItem_Param,
+		"UINT8_TEST",
+		2,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		7,					// valDef
+		0,					// valMin
+		100,				// valMax
+		AlxParamItem_Ignore,
+		false,				// isEnum
+		NULL,				// enumArr
+		0,					// enumArrLen
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamMgmt_Ctor(&ctx->paramMgmt, ctx->paramItems, 3);
 
 	AlxCli_Ctor
 	(
@@ -103,7 +149,7 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 		&ctx->port,
 		NULL,				// alxId - the guarded optional, same as the product
 		&ctx->paramMgmt,
-		&ctx->prettyJsonEn,
+		&ctx->paramItems[0],
 		ctx->buff,
 		sizeof(ctx->buff)
 	);

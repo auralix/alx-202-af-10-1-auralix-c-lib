@@ -49,4 +49,27 @@ finally {
     $env:ALX_FIFO_TEST_DLL = $null
 }
 Write-Host "Stage 2 (UBSan DLL, full suite): CLEAN"
+
+# --- Stage 2b: UBSan CLI DLL (Tier 2: real alxCli + param stack over the fakes) + CLI suite ---
+# Same two-step shape as conftest._build_cli_dll: closure objects with warnings off, then the
+# strict sources + objects linked into the DLL. Asserts ON everywhere = the code as shipped
+# (alxParamItem.c has side effects inside its asserts - with asserts off the numeric values
+# format as EMPTY). KEEP THE SOURCE LISTS IN SYNC WITH conftest.CLI_SOURCES_STRICT/_CLOSURE.
+$cliAsserts = "-DALX_CLI_ASSERT_RST_ENABLE -DALX_SERIAL_PORT_ASSERT_RST_ENABLE -DALX_FIFO_ASSERT_RST_ENABLE -DALX_BOUND_ASSERT_RST_ENABLE -DALX_PARAM_ITEM_ASSERT_RST_ENABLE -DALX_PARAM_MGMT_ASSERT_RST_ENABLE -DALX_FTOA_ASSERT_RST_ENABLE -DALX_RANGE_ASSERT_RST_ENABLE -DALX_ID_ASSERT_RST_ENABLE"
+$cliClosure = "$build\ubsan\cliClosure"
+New-Item -ItemType Directory -Force $cliClosure | Out-Null
+cmd /s /c "cd /d ""$cliClosure"" && ""$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /clang:-std=gnu99 -fsanitize=undefined -fno-sanitize-recover=undefined /w -D_CRT_SECURE_NO_WARNINGS $cliAsserts /I""$test"" /I""$clib"" /I""$clib\Mcu"" /c ""$clib\alxParamItem.c"" ""$clib\alxParamMgmt.c"" ""$clib\alxFtoa.c"" ""$clib\alxRange.c"""
+if ($LASTEXITCODE -ne 0) { throw "UBSan CLI closure build failed" }
+$cliObjs = (Get-ChildItem "$cliClosure\*.obj" | ForEach-Object { """$($_.FullName)""" }) -join " "
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99 -fsanitize=undefined -fno-sanitize-recover=undefined -D_CRT_SECURE_NO_WARNINGS $cliAsserts /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxCli.c"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxSerialPortFake.c"" ""$test\alxParamKvStoreFake.c"" ""$test\alxIdFake.c"" ""$test\alxAssertPc.c"" ""$test\alxCliTestHelpers.c"" $cliObjs /Fe:""$build\ubsan\alxCliTest.dll"" /Fo""$build\ubsan""\ /link /DEF:""$test\alxCliTest.def"""
+if ($LASTEXITCODE -ne 0) { throw "UBSan CLI DLL build failed" }
+$env:ALX_CLI_TEST_DLL = "$build\ubsan\alxCliTest.dll"
+try {
+    python -m pytest -q test_alxCli.py
+    if ($LASTEXITCODE -ne 0) { throw "Stage 2b FAILED: CLI suite red or process killed by UBSan (rc=$LASTEXITCODE)" }
+}
+finally {
+    $env:ALX_CLI_TEST_DLL = $null
+}
+Write-Host "Stage 2b (UBSan CLI DLL, CLI suite): CLEAN"
 Write-Host "`nSANITIZERS CLEAN"

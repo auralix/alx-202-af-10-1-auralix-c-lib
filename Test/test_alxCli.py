@@ -118,12 +118,12 @@ def test_ALX1514_P14_invalid_command_does_not_flush_pipeline(make_cli):
 # =====================================================================
 
 def test_ALX1514_P14_max_length_line_no_overflow_then_too_long_invalid(make_cli, cli_lib):
-    """D1 proof: a command of exactly the maximum deliverable length must be
+    """Boundary proof: a command of exactly the maximum deliverable length must be
     handled (as unknown -> invalid) WITHOUT corruption, and one char more is
     undeliverable (ErrTooLong) -> also 'Command invalid'; the CLI keeps
     working after both. ASan/UBSan variants watch the memory side."""
     buff_len = cli_lib.buff_len()
-    max_content = buff_len - 3          # read len = buffLen-1, content incl. terminator = buffLen-2
+    max_content = buff_len - 2          # read len = buffLen: content + terminator <= buffLen-1
 
     cli = make_cli()
     resp = cmd(cli, b"A" * max_content + b"\r", handles=4)
@@ -157,3 +157,118 @@ def test_ALX1514_P14_responses_use_crlf_line_endings(make_cli):
     resp = cmd(cli, b"help\r")
     assert b"\r\n" in resp
     assert b"\n" not in resp.replace(b"\r\n", b"")   # no bare LF anywhere
+
+
+# =====================================================================
+# P15 - post-review CLI contract (TV review 03.09):
+#   - the terminator is stripped once before dispatch (commands match "help", not "help\r\n")
+#   - set-param parses IN PLACE: key/val point into the line buffer, no stack copies,
+#     so a value is bounded only by the CLI buffer and may contain spaces
+#   - get-param formats the value straight into the CLI buffer (no fixed val[] array)
+#   - the helper's param table has all three value kinds: bool, str (600 B buffer), uint8 (0..100)
+# =====================================================================
+
+import json
+
+ARGS_INVALID_MARK = b"Arguments invalid"
+SUCCESS_MARK = b'"status":"success"'
+
+
+def as_json(resp: bytes):
+    """Every CLI response (pretty or compact) must be one JSON document once CRLFs are removed."""
+    return json.loads(resp.replace(b"\r\n", b"").decode("ascii"))
+
+
+def set_param(cli, key: bytes, val: bytes, term: bytes = b"\r") -> bytes:
+    return cmd(cli, b"set-param --key " + key + b" --val " + val + term, handles=4)
+
+
+def test_ALX1514_P15_set_param_str_value_with_spaces_round_trips(make_cli):
+    """The in-place parser takes the REST OF THE LINE as the value, so string
+    values may contain spaces (sscanf %s stopped at the first one)."""
+    cli = make_cli()
+    val = b"hello wide world 123"
+    assert SUCCESS_MARK in set_param(cli, b"STR_TEST", val)
+    resp = cmd(cli, b"get-param\r", handles=4)
+    assert b'"STR_TEST":"' + val + b'"' in resp
+    assert as_json(resp)["data"]["STR_TEST"] == val.decode()
+
+
+def test_ALX1514_P15_set_param_long_str_value_round_trips(make_cli, cli_lib):
+    """A value far longer than any stack array the old parser had (500 chars)
+    goes through unchanged - proves no fixed-size copy is left in the path."""
+    cli = make_cli()
+    val = bytes((b"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[i % 36] for i in range(500)))
+    assert len(val) < cli_lib.str_val_buff_len()
+    assert SUCCESS_MARK in set_param(cli, b"STR_TEST", val)
+    resp = cmd(cli, b"get-param\r", handles=4)
+    assert as_json(resp)["data"]["STR_TEST"] == val.decode()
+
+
+def test_ALX1514_P15_set_param_str_value_too_long_for_param_rejected(make_cli, cli_lib):
+    """The value limit is the PARAM's buffer (ParamItem), not the CLI: one char
+    over -> 'Arguments invalid', old value kept, CLI alive."""
+    cli = make_cli()
+    assert SUCCESS_MARK in set_param(cli, b"STR_TEST", b"keep")
+    too_long = b"X" * cli_lib.str_val_buff_len()          # buffer len = value + NUL -> one too many
+    resp = set_param(cli, b"STR_TEST", too_long)
+    assert ARGS_INVALID_MARK in resp
+    assert as_json(cmd(cli, b"get-param\r", handles=4))["data"]["STR_TEST"] == "keep"
+
+
+@pytest.mark.parametrize("line", [
+    b"set-param --key STR_TEST",                 # no --val
+    b"set-param --val 5 --key UINT8_TEST",       # swapped order
+    b"set-param --key --val 5",                  # empty key
+    b"set-param --key UINT8_TEST --val ",        # empty value
+    b"set-param --key NO_SUCH_KEY --val 5",      # unknown key
+    b"set-param --key PRETTY_JSON_EN --val maybe",  # not a bool
+    b"set-param --key UINT8_TEST --val 200",     # out of range (valMax 100, Ignore)
+    b"set-param",                                # bare command
+])
+def test_ALX1514_P15_set_param_bad_lines_answer_arguments_invalid(make_cli, line):
+    cli = make_cli()
+    assert ARGS_INVALID_MARK in cmd(cli, line + b"\r", handles=4)
+    assert HELP_MARK in cmd(cli, b"help\r")
+
+
+def test_ALX1514_P15_set_param_uint8_round_trip(make_cli):
+    cli = make_cli()
+    assert as_json(cmd(cli, b"get-param\r", handles=4))["data"]["UINT8_TEST"] == 7   # valDef
+    assert SUCCESS_MARK in set_param(cli, b"UINT8_TEST", b"42")
+    assert as_json(cmd(cli, b"get-param\r", handles=4))["data"]["UINT8_TEST"] == 42
+
+
+def test_ALX1514_P15_pretty_json_toggle_changes_response_format(make_cli):
+    """PRETTY_JSON_EN is read at response time: the success response to the
+    set itself is already compact, and so is the next get-param; back to pretty
+    after. (help is NOT covered: its JSON is hard-coded pretty regardless of the
+    flag - pre-existing behavior, reported to TV 03.09.)"""
+    cli = make_cli()
+    resp = set_param(cli, b"PRETTY_JSON_EN", b"false")
+    assert resp == b'{"status":"success"}\r\n'
+    compact = cmd(cli, b"get-param\r", handles=4)
+    assert compact.startswith(b'{"status":"success","data":{')
+    assert b"    " not in compact
+    assert as_json(compact)["data"]["PRETTY_JSON_EN"] is False
+    assert SUCCESS_MARK in set_param(cli, b"PRETTY_JSON_EN", b"true")
+    assert cmd(cli, b"get-param\r", handles=4).startswith(b"{\r\n    ")
+
+
+@pytest.mark.parametrize("line", [b"help", b"get", b"get-param", b"bogus",
+                                  b"set-param --key UINT8_TEST --val 1"])
+def test_ALX1514_P15_every_response_is_valid_json(make_cli, line):
+    """The get-param body is now assembled piecewise into the CLI buffer
+    (key, quotes, value, comma) - json.loads catches any slip in that assembly."""
+    cli = make_cli()
+    doc = as_json(cmd(cli, line + b"\r", handles=4))
+    assert doc["status"] in ("success", "error")
+
+
+def test_ALX1514_P15_get_param_lists_every_param_with_its_kind(make_cli):
+    cli = make_cli()
+    data = as_json(cmd(cli, b"get-param\r", handles=4))["data"]
+    assert set(data) == {"PRETTY_JSON_EN", "STR_TEST", "UINT8_TEST"}
+    assert data["PRETTY_JSON_EN"] is True          # bool unquoted
+    assert data["STR_TEST"] == ""                  # str quoted (empty default)
+    assert data["UINT8_TEST"] == 7                 # number unquoted
