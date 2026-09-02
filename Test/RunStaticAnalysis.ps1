@@ -14,7 +14,7 @@ $build = Join-Path $test "build"
 . "$PSScriptRoot\ToolPaths.ps1"
 
 # module sources under analysis (extend per module)
-$sources = @("$clib\alxFifo.c", "$clib\alxBound.c", "$test\alxFifoTestHelpers.c", "$test\alxFifoSanSmoke.c")
+$sources = @("$clib\alxFifo.c", "$clib\alxBound.c", "$test\alxFifoTestHelpers.c", "$test\alxBoundTestHelpers.c", "$test\alxFifoSanSmoke.c")
 # style gate scope = sources + their public headers (extend per module)
 $styleFiles = $sources + @("$clib\alxFifo.h", "$clib\alxBound.h")
 

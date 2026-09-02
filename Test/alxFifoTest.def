@@ -17,3 +17,18 @@ EXPORTS
 	AlxFifoTest_Status_ErrEmpty
 	AlxFifoTest_Status_ErrNoDelim
 	AlxFifoTest_Status_ErrTooLong
+	AlxBound_Uint8
+	AlxBound_Uint16
+	AlxBound_Uint32
+	AlxBound_Uint64
+	AlxBound_Int8
+	AlxBound_Int16
+	AlxBound_Int32
+	AlxBound_Int64
+	AlxBound_Float
+	AlxBound_Double
+	AlxBound_Str
+	AlxBoundTest_Status_Ok
+	AlxBoundTest_Status_ErrMin
+	AlxBoundTest_Status_ErrMax
+	AlxBoundTest_Status_ErrLen

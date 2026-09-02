@@ -21,6 +21,7 @@ FIFO_SOURCES = [
     CLIB_DIR / "alxFifo.c",
     CLIB_DIR / "alxBound.c",
     TEST_DIR / "alxFifoTestHelpers.c",
+    TEST_DIR / "alxBoundTestHelpers.c",
 ]
 FIFO_DEPS = FIFO_SOURCES + [
     CLIB_DIR / "alxFifo.h",
@@ -205,6 +206,61 @@ def pytest_collection_modifyitems(items):
                 item.user_properties.append(("req", rid))
 
 
+class BoundLib:
+    """ctypes wrapper for the AlxBound functions (same test-group DLL as alxFifo).
+
+    Bound functions act on caller scalars/buffers - no opaque handle. Each
+    numeric entry maps to (ctypes scalar type, AlxBound function).
+    """
+
+    NUMERIC = {
+        "Uint8": ctypes.c_uint8, "Uint16": ctypes.c_uint16,
+        "Uint32": ctypes.c_uint32, "Uint64": ctypes.c_uint64,
+        "Int8": ctypes.c_int8, "Int16": ctypes.c_int16,
+        "Int32": ctypes.c_int32, "Int64": ctypes.c_int64,
+        "Float": ctypes.c_float, "Double": ctypes.c_double,
+    }
+
+    def __init__(self, cdll):
+        self.c = cdll
+        for name, ct in self.NUMERIC.items():
+            f = getattr(cdll, f"AlxBound_{name}")
+            f.restype = ctypes.c_int32
+            f.argtypes = [ctypes.POINTER(ct), ct, ct]
+        cdll.AlxBound_Str.restype = ctypes.c_int32
+        cdll.AlxBound_Str.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_uint32]
+
+        def status(name: str) -> int:
+            f = getattr(cdll, f"AlxBoundTest_Status_{name}")
+            f.restype = ctypes.c_int32
+            return f()
+
+        self.OK = status("Ok")
+        self.ERR_MIN = status("ErrMin")
+        self.ERR_MAX = status("ErrMax")
+        self.ERR_LEN = status("ErrLen")
+
+    def bound(self, name: str, val, val_min, val_max):
+        """Call AlxBound_<name>; returns (status, bounded_value)."""
+        ct = self.NUMERIC[name]
+        v = ct(val)
+        status = getattr(self.c, f"AlxBound_{name}")(ctypes.byref(v), val_min, val_max)
+        return status, v.value
+
+    POISON = 0xAA
+
+    def bound_str(self, val: bytes, max_len_with_nul: int, buf_len: int = None):
+        """Call AlxBound_Str with a poison-filled destination.
+
+        Returns (status, content_up_to_nul, raw_buffer_bytes)."""
+        n = buf_len if buf_len is not None else max_len_with_nul
+        buf = (ctypes.c_ubyte * n)(*([self.POISON] * n))
+        status = self.c.AlxBound_Str(ctypes.cast(buf, ctypes.c_char_p), val, max_len_with_nul)
+        raw = bytes(buf)
+        content = raw.split(b"\x00", 1)[0]
+        return status, content, raw
+
+
 # --------------------------------------------------------------- fixtures ----
 @pytest.fixture(scope="session")
 def lib() -> Lib:
@@ -216,6 +272,12 @@ def lib() -> Lib:
     if _needs_build(FIFO_DLL, FIFO_DEPS):
         _build_fifo_dll()
     return Lib(FIFO_DLL)
+
+
+@pytest.fixture(scope="session")
+def bound(lib) -> BoundLib:
+    # same test-group DLL as alxFifo (alxBound.c is linked into it anyway)
+    return BoundLib(lib.c)
 
 
 @pytest.fixture

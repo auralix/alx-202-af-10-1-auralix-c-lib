@@ -38,7 +38,7 @@ if ($LASTEXITCODE -ne 0) { throw "Stage 1 FAILED: sanitizer finding in native sm
 Write-Host "Stage 1 (native ASan+UBSan smoke): CLEAN"
 
 # --- Stage 2: UBSan DLL + full pytest suite ------------------------------------
-cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99 -fsanitize=undefined -fno-sanitize-recover=undefined /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoTestHelpers.c"" /Fe:""$build\ubsan\alxFifoTest.dll"" /Fo""$build\ubsan""\ /link /DEF:""$test\alxFifoTest.def"""
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99 -fsanitize=undefined -fno-sanitize-recover=undefined /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoTestHelpers.c"" ""$test\alxBoundTestHelpers.c"" /Fe:""$build\ubsan\alxFifoTest.dll"" /Fo""$build\ubsan""\ /link /DEF:""$test\alxFifoTest.def"""
 if ($LASTEXITCODE -ne 0) { throw "UBSan DLL build failed" }
 $env:ALX_FIFO_TEST_DLL = "$build\ubsan\alxFifoTest.dll"
 try {

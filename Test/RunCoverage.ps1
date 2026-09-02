@@ -22,7 +22,7 @@ New-Item -ItemType Directory -Force $cov | Out-Null
 Remove-Item "$cov\*.profraw" -Force -ErrorAction SilentlyContinue
 
 # 1) instrumented DLL (per-module sources; extend list per module)
-cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99 -fprofile-instr-generate -fcoverage-mapping /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoTestHelpers.c"" /Fe:""$cov\alxFifoTest.dll"" /Fo""$cov""\ /link /DEF:""$test\alxFifoTest.def"""
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99 -fprofile-instr-generate -fcoverage-mapping /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxFifo.c"" ""$clib\alxBound.c"" ""$test\alxFifoTestHelpers.c"" ""$test\alxBoundTestHelpers.c"" /Fe:""$cov\alxFifoTest.dll"" /Fo""$cov""\ /link /DEF:""$test\alxFifoTest.def"""
 if ($LASTEXITCODE -ne 0) { throw "coverage DLL build failed" }
 
 # 2) same suite, instrumented binary
@@ -46,6 +46,6 @@ Write-Host "`ncobertura: $cov\coverage_c.xml"
 
 # GATE: module under test must be 100% covered (a report alone is not a gate)
 & "$llvm\llvm-cov.exe" export "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" -summary-only | Out-File -Encoding ascii "$cov\summary.json"
-python "$test\coverage_gate.py" "$cov\summary.json" alxFifo.c
+python "$test\coverage_gate.py" "$cov\summary.json" alxFifo.c alxBound.c
 if ($LASTEXITCODE -ne 0) { throw "COVERAGE GATE FAILED - see above" }
 Write-Host "html:      $cov\html\index.html"
