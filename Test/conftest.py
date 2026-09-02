@@ -35,6 +35,45 @@ FIFO_DEPS = FIFO_SOURCES + [
 ]
 FIFO_DLL = BUILD_DIR / "alxFifoTest.dll"
 
+# ----------------------------------------------------------- CLI module ------
+# Tier-2 target: REAL alxCli + real param stack over the faked serial port and
+# KV store. GATED sources compile with the full strict set; CLOSURE sources
+# (linked real, own suites pending per the ALX-1495 rollout) compile with -w.
+CLI_SOURCES_STRICT = [
+    CLIB_DIR / "alxCli.c",
+    CLIB_DIR / "alxFifo.c",
+    CLIB_DIR / "alxBound.c",
+    TEST_DIR / "alxSerialPortFake.c",
+    TEST_DIR / "alxParamKvStoreFake.c",
+    TEST_DIR / "alxIdFake.c",
+    TEST_DIR / "alxCliTestHelpers.c",
+]
+CLI_SOURCES_CLOSURE = [
+    CLIB_DIR / "alxParamItem.c",
+    CLIB_DIR / "alxParamMgmt.c",
+    CLIB_DIR / "alxFtoa.c",
+    CLIB_DIR / "alxRange.c",
+]
+CLI_DEPS = CLI_SOURCES_STRICT + CLI_SOURCES_CLOSURE + [
+    CLIB_DIR / "alxCli.h",
+    CLIB_DIR / "Mcu" / "alxSerialPort.h",
+    CLIB_DIR / "Mcu" / "alxTrace.h",
+    CLIB_DIR / "alxParamItem.h",
+    CLIB_DIR / "alxParamMgmt.h",
+    CLIB_DIR / "alxParamKvStore.h",
+    CLIB_DIR / "alxFtoa.h",
+    CLIB_DIR / "alxRange.h",
+    CLIB_DIR / "alxId.h",
+    CLIB_DIR / "alxFifo.h",
+    CLIB_DIR / "alxBound.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxCliTest.def",
+    Path(__file__),
+]
+CLI_DLL = BUILD_DIR / "alxCliTest.dll"
+
 
 # ------------------------------------------------------------------ build ----
 def _find_vcvars() -> Path:
@@ -81,9 +120,10 @@ def _write_compile_db() -> None:
     args_common = ["clang", "-std=gnu99", "-O0", *HOST_WARN_FLAGS,
                    "-D_CRT_SECURE_NO_WARNINGS",
                    f"-I{TEST_DIR}", f"-I{CLIB_DIR}", f"-I{CLIB_DIR / 'Mcu'}"]
+    db_sources = list(dict.fromkeys(FIFO_SOURCES + CLI_SOURCES_STRICT))
     db = [{"directory": str(BUILD_DIR),
            "arguments": [*args_common, "-c", str(src)],
-           "file": str(src)} for src in FIFO_SOURCES]
+           "file": str(src)} for src in db_sources]
     (BUILD_DIR / "compile_commands.json").write_text(json.dumps(db, indent=1))
 
 
@@ -103,6 +143,38 @@ def _build_fifo_dll() -> None:
     if result.returncode != 0:
         raise RuntimeError(
             f"DLL build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
+
+
+def _build_cli_dll() -> None:
+    """Two-step build: closure objects with -w, then strict sources + objects
+    linked into the CLI test DLL under the full -Werror warning set."""
+    BUILD_DIR.mkdir(exist_ok=True)
+    obj_dir = BUILD_DIR / "cliClosure"
+    obj_dir.mkdir(exist_ok=True)
+    _write_compile_db()
+    vcvars = _find_vcvars()
+    inc = f'-I"{TEST_DIR}" -I"{CLIB_DIR}" -I"{CLIB_DIR / "Mcu"}"'
+
+    closure = " ".join(f'"{s}"' for s in CLI_SOURCES_CLOSURE)
+    cmd1 = (f'cd /d "{obj_dir}" && "{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g -w '
+            f'-D_CRT_SECURE_NO_WARNINGS {inc} -c {closure}')
+    result = subprocess.run(f'cmd /s /c "{cmd1}"', capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"CLI closure build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
+
+    strict = " ".join(f'"{s}"' for s in CLI_SOURCES_STRICT)
+    objs = " ".join(f'"{o}"' for o in sorted(obj_dir.glob("*.o")))
+    flags = " ".join(HOST_WARN_FLAGS)
+    cmd2 = (
+        f'"{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g {flags} -Werror '
+        f'-D_CRT_SECURE_NO_WARNINGS {inc} {strict} {objs} '
+        f'-shared -o "{CLI_DLL}" -Wl,/DEF:"{TEST_DIR / "alxCliTest.def"}"'
+    )
+    result = subprocess.run(f'cmd /s /c "{cmd2}"', capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"CLI DLL build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
 
 
 # ---------------------------------------------------------------- ctypes -----
@@ -261,6 +333,60 @@ class BoundLib:
         return status, content, raw
 
 
+class CliLib:
+    """ctypes wrapper around alxCliTest.dll (Tier-2: real CLI, faked serial)."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        c.AlxCliTest_New.restype = ctypes.c_void_p
+        c.AlxCliTest_Delete.argtypes = [ctypes.c_void_p]
+        c.AlxCliTest_Handle.argtypes = [ctypes.c_void_p]
+        c.AlxCliTest_Port.restype = ctypes.c_void_p
+        c.AlxCliTest_Port.argtypes = [ctypes.c_void_p]
+        c.AlxCliTest_GetBuffLen.restype = ctypes.c_uint32
+        c.AlxCliTest_WasResetRequested.restype = ctypes.c_bool
+        c.AlxCliTest_Status_Ok.restype = ctypes.c_int32
+        c.AlxSerialPortFake_InjectRx.restype = ctypes.c_int32
+        c.AlxSerialPortFake_InjectRx.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32]
+        c.AlxSerialPortFake_TxRead.restype = ctypes.c_uint32
+        c.AlxSerialPortFake_TxRead.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32]
+        self.OK = c.AlxCliTest_Status_Ok()
+
+    def buff_len(self) -> int:
+        return self.c.AlxCliTest_GetBuffLen()
+
+    def was_reset(self) -> bool:
+        return self.c.AlxCliTest_WasResetRequested()
+
+    def clear_reset(self):
+        self.c.AlxCliTest_ClearResetRequested()
+
+
+class CliUnderTest:
+    """One CLI instance: inject RX bytes, poll Handle, drain TX responses."""
+
+    def __init__(self, cli_lib: CliLib, ctx):
+        self._l = cli_lib
+        self.ctx = ctx
+        self.port = cli_lib.c.AlxCliTest_Port(ctx)
+
+    def inject(self, data: bytes):
+        assert self._l.c.AlxSerialPortFake_InjectRx(self.port, data, len(data)) == self._l.OK
+
+    def handle(self):
+        self._l.c.AlxCliTest_Handle(self.ctx)
+
+    def tx(self) -> bytes:
+        out = b""
+        while True:
+            buf = ctypes.create_string_buffer(4096)
+            n = self._l.c.AlxSerialPortFake_TxRead(self.port, buf, 4096)
+            if n == 0:
+                return out
+            out += buf.raw[:n]
+
+
 # --------------------------------------------------------------- fixtures ----
 @pytest.fixture(scope="session")
 def lib() -> Lib:
@@ -278,6 +404,32 @@ def lib() -> Lib:
 def bound(lib) -> BoundLib:
     # same test-group DLL as alxFifo (alxBound.c is linked into it anyway)
     return BoundLib(lib.c)
+
+
+@pytest.fixture(scope="session")
+def cli_lib() -> CliLib:
+    # ALX_CLI_TEST_DLL selects an externally built variant (coverage/sanitizer)
+    override = os.environ.get("ALX_CLI_TEST_DLL")
+    if override:
+        return CliLib(Path(override))
+    if _needs_build(CLI_DLL, CLI_DEPS):
+        _build_cli_dll()
+    return CliLib(CLI_DLL)
+
+
+@pytest.fixture
+def make_cli(cli_lib):
+    """Factory: make_cli() -> CliUnderTest with a fresh CLI + fake port. Auto-deleted."""
+    ctxs = []
+
+    def _make() -> CliUnderTest:
+        ctx = cli_lib.c.AlxCliTest_New()
+        ctxs.append(ctx)
+        return CliUnderTest(cli_lib, ctx)
+
+    yield _make
+    for ctx in ctxs:
+        cli_lib.c.AlxCliTest_Delete(ctx)
 
 
 @pytest.fixture

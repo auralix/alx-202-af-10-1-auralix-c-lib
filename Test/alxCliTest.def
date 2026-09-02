@@ -1,0 +1,13 @@
+LIBRARY alxCliTest
+EXPORTS
+	AlxCliTest_New
+	AlxCliTest_Delete
+	AlxCliTest_Handle
+	AlxCliTest_Port
+	AlxCliTest_GetBuffLen
+	AlxCliTest_Status_Ok
+	AlxCliTest_WasResetRequested
+	AlxCliTest_ClearResetRequested
+	AlxSerialPortFake_InjectRx
+	AlxSerialPortFake_TxRead
+	AlxSerialPortFake_TxNumOfEntries

@@ -29,4 +29,10 @@
 //******************************************************************************
 #define ALX_TRACE_LEVEL ALX_TRACE_LEVEL_OFF
 
+//******************************************************************************
+// CMSIS shims - on the MCU these come from core headers; on PC the test
+// helpers provide recording implementations (alxCliTestHelpers.c)
+//******************************************************************************
+void NVIC_SystemReset(void);
+
 #endif	// #ifndef ALX_CONFIG_H
