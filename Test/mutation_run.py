@@ -136,7 +136,8 @@ def _suite() -> str:
 
 def qualify(src_name: str, sample: int, seed: int, report_lines: list) -> int:
     src = CLIB_DIR / src_name
-    mdir = MUT_ROOT / "mutants"
+    mdir = MUT_ROOT / "mutants" / src.stem   # PER-SOURCE pool: a shared dir made the 2nd
+                                             # source hit the 1st source's cache stamp (0 run)
     surv_dir = MUT_ROOT / "survivors"
     surv_dir.mkdir(parents=True, exist_ok=True)
     for f in surv_dir.glob(src.stem + ".mutant.*.diff"):   # stale diffs mislead

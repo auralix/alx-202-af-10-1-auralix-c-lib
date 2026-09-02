@@ -626,6 +626,83 @@ def test_ALX1514_P11_flush_resets_positions_for_next_write(lib, make_fifo):
     assert status == lib.OK and data == b"xy"
 
 
+def test_ALX1514_P11_flush_full_fifo_becomes_writable(lib, make_fifo):
+    """Kills the Flush isFull=false-removal survivors (full-pool run): flushing
+    a FULL fifo must clear isFull - P11's original flush test never filled it."""
+    f = make_fifo(4)
+    assert lib.write(f, b"abcd") == lib.OK           # full: isFull = true
+    assert lib.write(f, b"!") == lib.ERR_FULL
+    lib.c.AlxFifo_Flush(f)
+    assert lib.entries(f) == 0
+    assert lib.write(f, b"wxyz") == lib.OK           # MUST NOT be ErrFull
+    status, data = lib.read(f, 4)
+    assert status == lib.OK and data == b"wxyz"
+
+
+def test_ALX1514_P11_rewind_zero_is_noop(lib, make_fifo):
+    """Kills the Rewind len==0 early-return removal (clamping would turn 0 into 1)."""
+    f = make_fifo(8)
+    assert lib.write(f, b"ab") == lib.OK
+    status, data = lib.read(f, 2)
+    assert status == lib.OK and data == b"ab"
+    assert lib.c.AlxFifo_Rewind(f, 0) == 0
+    assert lib.entries(f) == 0                       # truly nothing rewound
+    status, _ = lib.read(f, 1)
+    assert status == lib.ERR_EMPTY
+
+
+def test_ALX1514_P11_rewind_on_full_fifo_returns_zero(lib, make_fifo):
+    """Kills the unused-space guard mutants (> vs >=/!=): a FULL fifo has no
+    room to rewind into - Rewind must return 0 and leave content intact."""
+    f = make_fifo(4)
+    assert lib.write(f, b"abcd") == lib.OK
+    assert lib.c.AlxFifo_Rewind(f, 1) == 0
+    assert lib.entries(f) == 4
+    status, data = lib.read(f, 4)
+    assert status == lib.OK and data == b"abcd"
+
+
+def test_ALX1514_P11_rewind_from_empty_clears_isEmpty(lib, make_fifo):
+    """Kills the Rewind isEmpty=false-removal survivor: rewinding into a fifo
+    that was read EMPTY must make its content readable again."""
+    f = make_fifo(8)
+    assert lib.write(f, b"ab") == lib.OK
+    status, data = lib.read(f, 2)
+    assert status == lib.OK and data == b"ab"        # fifo now empty
+    assert lib.c.AlxFifo_Rewind(f, 2) == 2
+    status, data = lib.read(f, 2)
+    assert status == lib.OK and data == b"ab"        # readable again
+
+
+def test_ALX1514_P11_flush_after_partial_read_resets_positions(lib, make_fifo):
+    """Kills the Flush tail=0-removal survivor (mutant 126): the original flush
+    tests never had tail != 0 at flush time, so a stale tail was unobservable."""
+    f = make_fifo(4)
+    assert lib.write(f, b"abcd") == lib.OK
+    status, data = lib.read(f, 2)                    # tail = 2, head = 0 (wrapped)
+    assert status == lib.OK and data == b"ab"
+    lib.c.AlxFifo_Flush(f)
+    assert lib.write(f, b"wxyz") == lib.OK
+    status, data = lib.read(f, 4)
+    assert status == lib.OK and data == b"wxyz"      # stale tail would serve garbage
+
+
+def test_ALX1514_P11_rewind_wrap_non_power_of_two_buffer(lib, make_fifo):
+    """Kills the Rewind tail-arithmetic mutants (e.g. tail - buffLen - len):
+    congruent mod buffLen ONLY when buffLen divides 2^32 - every earlier test
+    used power-of-2 sizes, hiding the difference. buffLen = 5 exposes it."""
+    f = make_fifo(5)
+    assert lib.write(f, b"abc") == lib.OK
+    status, data = lib.read(f, 3)                    # tail = 3
+    assert status == lib.OK and data == b"abc"
+    assert lib.write(f, b"de") == lib.OK             # head wraps: positions 3,4
+    status, data = lib.read(f, 2)                    # tail wraps to 0
+    assert status == lib.OK and data == b"de"
+    assert lib.c.AlxFifo_Rewind(f, 2) == 2           # rewind across the wrap: tail -> 3
+    status, data = lib.read(f, 2)
+    assert status == lib.OK and data == b"de"
+
+
 def test_ALX1514_P11_rewind_to_exactly_full_sets_full(lib, make_fifo):
     """The legitimate branch of the same condition: rewinding back to
     buffLen entries makes the FIFO genuinely full - next write must fail."""

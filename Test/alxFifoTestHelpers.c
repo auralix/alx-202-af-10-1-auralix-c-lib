@@ -44,6 +44,9 @@ AlxFifo* AlxFifoTest_New(uint32_t buffLen)
 	}
 	memset(buff, '\n', buffLen);	// poison with a DELIMITER byte - any scan past the
 									// valid entries finds a phantom terminator deterministically
+	memset(me, 0xAA, sizeof(*me));	// poison the STRUCT - a Ctor that forgets a field leaves
+									// garbage, not accidental zeros (mutation finding: fresh-heap
+									// zeros let removed-initialization mutants survive)
 	AlxFifo_Ctor(me, buff, buffLen);
 	return me;
 }
