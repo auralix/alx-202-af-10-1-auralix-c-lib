@@ -494,7 +494,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Set Parameter Command
 			//------------------------------------------------------------------------------
-			if ((strncmp(me->buff, "set-param ", strlen("set-param ")) == 0) || (strcmp(me->buff, "set-param") == 0))	// Whole word: "set-paramX ..." is an unknown command, bare "set-param" still reports its missing arguments
+			if (strncmp(me->buff, "set-param ", strlen("set-param ")) == 0)
 			{
 				//------------------------------------------------------------------------------
 				// Handle
