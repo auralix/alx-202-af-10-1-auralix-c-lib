@@ -103,7 +103,7 @@ void AlxCli_Handle(AlxCli* me)
 	if (me->buffLenUsed > 0)
 	{
 		// Write
-		ALX_CLI_ASSERT(AlxSerialPort_Write(me->alxSerialPort, me->buff, me->buffLenUsed) == Alx_Ok);
+		ALX_CLI_ASSERT(AlxSerialPort_Write(me->alxSerialPort, (const uint8_t*)me->buff, me->buffLenUsed) == Alx_Ok);
 
 		// Clear
 		memset(me->buff, 0, me->buffLen);
@@ -144,7 +144,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Help Command
 			//------------------------------------------------------------------------------
-			if (strcmp(me->buff, "help\r\n") == 0)
+			if (strcmp(me->buff, "help") == 0)
 			{
 				//------------------------------------------------------------------------------
 				// JSON Header
@@ -206,7 +206,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Reset Command
 			//------------------------------------------------------------------------------
-			if (strcmp(me->buff, "reset\r\n") == 0)
+			if (strcmp(me->buff, "reset") == 0)
 			{
 				// Prepare response
 				AlxCli_PrepareResponse(me, AlxCli_ResponseType_Success);
@@ -225,7 +225,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// ID Command
 			//------------------------------------------------------------------------------
-			if (strcmp(me->buff, "id\r\n") == 0 && me->alxId != NULL)
+			if (strcmp(me->buff, "id") == 0 && me->alxId != NULL)
 			{
 				// Get
 				bool fwIsBootUsed = AlxId_GetFwIsBootUsed(me->alxId);
@@ -434,7 +434,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Get Command
 			//------------------------------------------------------------------------------
-			if (strcmp(me->buff, "get\r\n") == 0)
+			if (strcmp(me->buff, "get") == 0)
 			{
 				AlxCli_Get(me, false, ALX_NULL);
 				break;
@@ -444,7 +444,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Get Parameters Command
 			//------------------------------------------------------------------------------
-			if (strcmp(me->buff, "get-param\r\n") == 0)
+			if (strcmp(me->buff, "get-param") == 0)
 			{
 				AlxCli_Get(me, true, AlxParamItem_Param);
 				break;
@@ -454,7 +454,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Get Variables Command
 			//------------------------------------------------------------------------------
-			if (strcmp(me->buff, "get-var\r\n") == 0)
+			if (strcmp(me->buff, "get-var") == 0)
 			{
 				AlxCli_Get(me, true, AlxParamItem_Var);
 				break;
@@ -464,7 +464,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Get Flags Command
 			//------------------------------------------------------------------------------
-			if (strcmp(me->buff, "get-flag\r\n") == 0)
+			if (strcmp(me->buff, "get-flag") == 0)
 			{
 				AlxCli_Get(me, true, AlxParamItem_Flag);
 				break;
@@ -474,7 +474,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Get Constants Command
 			//------------------------------------------------------------------------------
-			if (strcmp(me->buff, "get-const\r\n") == 0)
+			if (strcmp(me->buff, "get-const") == 0)
 			{
 				AlxCli_Get(me, true, AlxParamItem_Const);
 				break;
@@ -484,7 +484,7 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Get Triggers Command
 			//------------------------------------------------------------------------------
-			if (strcmp(me->buff, "get-trig\r\n") == 0)
+			if (strcmp(me->buff, "get-trig") == 0)
 			{
 				AlxCli_Get(me, true, AlxParamItem_Trig);
 				break;
@@ -509,7 +509,7 @@ void AlxCli_Handle(AlxCli* me)
 					int sscanfStatus = sscanf
 					(
 						me->buff,
-						"set-param --key %s --val %s\r\n",
+						"set-param --key %s --val %s",
 						key,
 						val);
 					if (sscanfStatus != 2)
