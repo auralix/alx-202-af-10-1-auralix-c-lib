@@ -548,12 +548,14 @@ void AlxSerialPort_FlushTxFifo(AlxSerialPort* me)
 {
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
-	ALX_SERIAL_PORT_ASSERT(me->txFifoUsed == true);
 
 	// Flush
-	uint32_t key = AlxIrq_Lock();	// D5a: guard the shared FIFO vs the TX ISR
-	AlxFifo_Flush(&me->txFifo);
-	AlxIrq_Unlock(key);
+	if (me->txFifoUsed)
+	{
+		uint32_t key = AlxIrq_Lock();
+		AlxFifo_Flush(&me->txFifo);
+		AlxIrq_Unlock(key);
+	}
 }
 
 /**
@@ -565,12 +567,17 @@ uint32_t AlxSerialPort_GetTxFifoNumOfEntries(AlxSerialPort* me)
 {
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
-	ALX_SERIAL_PORT_ASSERT(me->txFifoUsed == true);
 
 	// Get
-	uint32_t key = AlxIrq_Lock();	// D5a: guard the shared FIFO vs the TX ISR
-	uint32_t numOfEntries = AlxFifo_GetNumOfEntries(&me->txFifo);
-	AlxIrq_Unlock(key);
+	uint32_t numOfEntries = 0;
+	if (me->txFifoUsed)
+	{
+		uint32_t key = AlxIrq_Lock();
+		numOfEntries = AlxFifo_GetNumOfEntries(&me->txFifo);
+		AlxIrq_Unlock(key);
+	}
+
+	// Return
 	return numOfEntries;
 }
 
@@ -582,12 +589,14 @@ void AlxSerialPort_FlushRxFifo(AlxSerialPort* me)
 {
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
-	ALX_SERIAL_PORT_ASSERT(me->rxFifoUsed == true);
 
 	// Flush
-	uint32_t key = AlxIrq_Lock();	// D5a: guard the shared FIFO vs the RX ISR
-	AlxFifo_Flush(&me->rxFifo);
-	AlxIrq_Unlock(key);
+	if (me->rxFifoUsed)
+	{
+		uint32_t key = AlxIrq_Lock();
+		AlxFifo_Flush(&me->rxFifo);
+		AlxIrq_Unlock(key);
+	}
 }
 
 /**
@@ -599,12 +608,17 @@ uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
 {
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
-	ALX_SERIAL_PORT_ASSERT(me->rxFifoUsed == true);
 
 	// Get
-	uint32_t key = AlxIrq_Lock();	// D5a: guard the shared FIFO vs the RX ISR
-	uint32_t numOfEntries = AlxFifo_GetNumOfEntries(&me->rxFifo);
-	AlxIrq_Unlock(key);
+	uint32_t numOfEntries = 0;
+	if (me->rxFifoUsed)
+	{
+		uint32_t key = AlxIrq_Lock();
+		numOfEntries = AlxFifo_GetNumOfEntries(&me->rxFifo);
+		AlxIrq_Unlock(key);
+	}
+
+	// Return
 	return numOfEntries;
 }
 

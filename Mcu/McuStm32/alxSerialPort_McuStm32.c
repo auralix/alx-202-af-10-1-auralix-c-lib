@@ -608,7 +608,12 @@ void AlxSerialPort_FlushTxFifo(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 
 	// Flush
-	if (me->txFifoUsed) AlxFifo_Flush(&me->txFifo);
+	if (me->txFifoUsed)
+	{
+		uint32_t key = AlxIrq_Lock();
+		AlxFifo_Flush(&me->txFifo);
+		AlxIrq_Unlock(key);
+	}
 }
 
 /**
@@ -622,14 +627,16 @@ uint32_t AlxSerialPort_GetTxFifoNumOfEntries(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 
 	// Get
+	uint32_t numOfEntries = 0;
 	if (me->txFifoUsed)
 	{
-		return AlxFifo_GetNumOfEntries(&me->txFifo);
+		uint32_t key = AlxIrq_Lock();
+		numOfEntries = AlxFifo_GetNumOfEntries(&me->txFifo);
+		AlxIrq_Unlock(key);
 	}
-	else
-	{
-		return 0;
-	}
+
+	// Return
+	return numOfEntries;
 }
 
 /**
@@ -642,7 +649,12 @@ void AlxSerialPort_FlushRxFifo(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 
 	// Flush
-	if (me->rxFifoUsed) AlxFifo_Flush(&me->rxFifo);
+	if (me->rxFifoUsed)
+	{
+		uint32_t key = AlxIrq_Lock();
+		AlxFifo_Flush(&me->rxFifo);
+		AlxIrq_Unlock(key);
+	}
 }
 
 /**
@@ -656,14 +668,16 @@ uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
 
 	// Get
+	uint32_t numOfEntries = 0;
 	if (me->rxFifoUsed)
 	{
-		return AlxFifo_GetNumOfEntries(&me->rxFifo);
+		uint32_t key = AlxIrq_Lock();
+		numOfEntries = AlxFifo_GetNumOfEntries(&me->rxFifo);
+		AlxIrq_Unlock(key);
 	}
-	else
-	{
-		return 0;
-	}
+
+	// Return
+	return numOfEntries;
 }
 
 
