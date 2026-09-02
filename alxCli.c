@@ -570,8 +570,6 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			// Invalid Command
 			//------------------------------------------------------------------------------
-			// NOTE: no RX flush here anymore - the FIFO primitive consumes exactly one
-			// line per call, so pipelined commands behind an invalid one survive
 
 			// Prepare response
 			AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrCmd);
