@@ -157,3 +157,73 @@ def test_ALX1514_P14_responses_use_crlf_line_endings(make_cli):
     resp = cmd(cli, b"help\r")
     assert b"\r\n" in resp
     assert b"\n" not in resp.replace(b"\r\n", b"")   # no bare LF anywhere
+
+
+# =====================================================================
+# P15 - command length spec (TV 03.09): max CLI command incl. CRLF = 300,
+#       param key <= 128 chars, param string value <= 127 chars
+#       (ALX_PARAM_ITEM_BUFF_LEN 128 stays). The only variable-length command
+#       is set-param: 16 + 128 + 7 + 127 + 2 = 280 <= 300.
+#       The helper registers a Str param whose key is exactly 128 chars.
+# =====================================================================
+
+ARGS_INVALID_MARK = b"Arguments invalid"
+SUCCESS_MARK = b'"status":"success"'
+
+
+def test_ALX1514_P15_cmd_len_max_is_300(cli_lib):
+    """Pins the spec number the CLI compiles with (ALX_CLI_CMD_LEN_MAX)."""
+    assert cli_lib.cmd_len_max() == 300
+
+
+def test_ALX1514_P15_line_at_max_len_handled_one_more_undeliverable(make_cli, cli_lib):
+    """Boundary of the read: content + 1-char terminator == 300 is delivered
+    (unknown -> 'Command invalid'); 301 is ErrTooLong (also 'Command invalid',
+    discarded by the FIFO). CLI alive after both; ASan variant watches memory."""
+    n = cli_lib.cmd_len_max()
+
+    cli = make_cli()
+    assert INVALID_MARK in cmd(cli, b"A" * (n - 1) + b"\r", handles=4)
+    assert HELP_MARK in cmd(cli, b"help\r")
+
+    cli2 = make_cli()
+    assert INVALID_MARK in cmd(cli2, b"A" * n + b"\r", handles=4)
+    assert HELP_MARK in cmd(cli2, b"help\r")
+
+
+def test_ALX1514_P15_set_param_full_spec_line_key128_val127_succeeds(make_cli, cli_lib):
+    """The longest legal command: 128-char key + 127-char value = 280 bytes
+    incl. CRLF. Must parse, set, and read back via get-param."""
+    key = cli_lib.long_key()
+    assert len(key) == 128
+    val = b"V" * 127
+    line = b"set-param --key " + key + b" --val " + val + b"\r\n"
+    assert len(line) == 280
+
+    cli = make_cli()
+    assert SUCCESS_MARK in cmd(cli, line, handles=4)
+    resp = cmd(cli, b"get-param\r", handles=4)
+    assert b'"' + val + b'"' in resp
+
+
+def test_ALX1514_P15_set_param_val_127_ok_128_rejected(make_cli, cli_lib):
+    """Value limit inherited from ALX_PARAM_ITEM_BUFF_LEN 128 (NUL takes one)."""
+    key = cli_lib.long_key()
+
+    cli = make_cli()
+    assert SUCCESS_MARK in cmd(cli, b"set-param --key " + key + b" --val " + b"V" * 127 + b"\r", handles=4)
+
+    cli2 = make_cli()
+    assert ARGS_INVALID_MARK in cmd(cli2, b"set-param --key " + key + b" --val " + b"V" * 128 + b"\r", handles=4)
+    assert HELP_MARK in cmd(cli2, b"help\r")
+
+
+def test_ALX1514_P15_set_param_overlong_key_answers_arguments_invalid(make_cli):
+    """A key longer than the spec (200 chars) must be a clean 'Arguments
+    invalid' - never a parser buffer overflow. Sealed RED on the old
+    sscanf("%s") into char key[128]: stack smash (ASan variant) instead of
+    a response."""
+    cli = make_cli()
+    resp = cmd(cli, b"set-param --key " + b"K" * 200 + b" --val 1\r", handles=4)
+    assert ARGS_INVALID_MARK in resp
+    assert HELP_MARK in cmd(cli, b"help\r")
