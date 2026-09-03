@@ -149,51 +149,52 @@ void AlxCli_Handle(AlxCli* me)
 				//------------------------------------------------------------------------------
 				// JSON Header
 				//------------------------------------------------------------------------------
-				strcpy
+				ALX_CLI_ASSERT
 				(
-					me->buff,
-					"{\r\n"
-					"    \"status\":\"success\",\r\n"
-					"    \"data\":\r\n"
-					"    {\r\n"
+					AlxSerialPort_WriteStr
+					(
+						me->alxSerialPort,
+						"{\r\n"
+						"    \"status\":\"success\",\r\n"
+						"    \"data\":\r\n"
+						"    {\r\n"
+					) == Alx_Ok
 				);
 
 
 				//------------------------------------------------------------------------------
 				// JSON Body
 				//------------------------------------------------------------------------------
-				strcat(me->buff, "        \"help\":\"Help Command - Gets CLI help info\",\r\n");
-				strcat(me->buff, "        \"reset\":\"Reset Command - Triggers device reset\",\r\n");
-				strcat(me->buff, "        \"id\":\"ID Command - Gets device ID info\",\r\n");
-				strcat(me->buff, "        \"get\":\"Get Command - Gets device properties\",\r\n");
-				strcat(me->buff, "        \"get-param\":\"Get Parameters Command - Gets device parameters\",\r\n");
-				strcat(me->buff, "        \"get-var\":\"Get Variables Command - Gets device variables\",\r\n");
-				strcat(me->buff, "        \"get-flag\":\"Get Flags Command - Gets device flags\",\r\n");
-				strcat(me->buff, "        \"get-const\":\"Get Constants Command - Gets device constants\",\r\n");
-				strcat(me->buff, "        \"get-trig\":\"Get Triggers Command - Gets device triggers\",\r\n");
-				strcat(me->buff, "        \"set-param\":\"Set Parameter Command - Sets specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\"");
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"help\":\"Help Command - Gets CLI help info\",\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"help\":\"Help Command - Gets CLI help info\",\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"reset\":\"Reset Command - Triggers device reset\",\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"id\":\"ID Command - Gets device ID info\",\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get\":\"Get Command - Gets device properties\",\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-param\":\"Get Parameters Command - Gets device parameters\",\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-var\":\"Get Variables Command - Gets device variables\",\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-flag\":\"Get Flags Command - Gets device flags\",\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-const\":\"Get Constants Command - Gets device constants\",\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-trig\":\"Get Triggers Command - Gets device triggers\",\r\n") == Alx_Ok);
+				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"set-param\":\"Set Parameter Command - Sets specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\"") == Alx_Ok);
 				bool isImplemented = AlxCli_Help_Callback(me);
 				if (isImplemented == false)
 				{
-					strcat(me->buff, "\r\n");
+					ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "\r\n") == Alx_Ok);
 				}
 
 
 				//------------------------------------------------------------------------------
 				// JSON Footer
 				//------------------------------------------------------------------------------
-				strcat
+				ALX_CLI_ASSERT
 				(
-					me->buff,
-					"    }\r\n"
-					"}\r\n"
+					AlxSerialPort_WriteStr
+					(
+						me->alxSerialPort,
+						"    }\r\n"
+						"}\r\n"
+					) == Alx_Ok
 				);
-
-
-				//------------------------------------------------------------------------------
-				// Send Response
-				//------------------------------------------------------------------------------
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
 
 
 				//------------------------------------------------------------------------------
