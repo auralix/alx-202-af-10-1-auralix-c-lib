@@ -166,7 +166,6 @@ void AlxCli_Handle(AlxCli* me)
 				// JSON Body
 				//------------------------------------------------------------------------------
 				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"help\":\"Help Command - Gets CLI help info\",\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"help\":\"Help Command - Gets CLI help info\",\r\n") == Alx_Ok);
 				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"reset\":\"Reset Command - Triggers device reset\",\r\n") == Alx_Ok);
 				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"id\":\"ID Command - Gets device ID info\",\r\n") == Alx_Ok);
 				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get\":\"Get Command - Gets device properties\",\r\n") == Alx_Ok);
