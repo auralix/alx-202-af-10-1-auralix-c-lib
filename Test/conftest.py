@@ -84,6 +84,42 @@ CLI_DEPS = CLI_SOURCES_STRICT + CLI_SOURCES_CLOSURE + [
 ]
 CLI_DLL = BUILD_DIR / "alxCliTest.dll"
 
+# ------------------------------------------------------- MemSafe group -------
+# Tier-2 target (ALX-1513): REAL alxMemSafe + alxCrc under the strict set, the REAL
+# param group/store chain as closure (-w: alxParamGroup.c/alxParamStore.c carry
+# -Wswitch-enum warnings, ALX-1495 backlog), all over alxMemRawFake = a 2 kB RAM
+# flash with fault injection and a power-loss model.
+MEMSAFE_SOURCES_STRICT = [
+    CLIB_DIR / "alxMemSafe.c",
+    CLIB_DIR / "alxCrc.c",
+    CLIB_DIR / "alxBound.c",
+    TEST_DIR / "alxMemRawFake.c",
+    TEST_DIR / "alxParamKvStoreFake.c",
+    TEST_DIR / "alxAssertPc.c",
+    TEST_DIR / "alxMemSafeTestHelpers.c",
+]
+MEMSAFE_SOURCES_CLOSURE = [
+    CLIB_DIR / "alxParamGroup.c",
+    CLIB_DIR / "alxParamStore.c",
+    CLIB_DIR / "alxParamItem.c",
+    CLIB_DIR / "alxFtoa.c",
+    CLIB_DIR / "alxRange.c",
+]
+MEMSAFE_ASSERT_DEFINES = [
+    "-DALX_MEM_SAFE_ASSERT_RST_ENABLE", "-DALX_MEM_RAW_ASSERT_RST_ENABLE", "-DALX_CRC_ASSERT_RST_ENABLE",
+    "-DALX_PARAM_GROUP_ASSERT_RST_ENABLE", "-DALX_PARAM_STORE_ASSERT_RST_ENABLE",
+    "-DALX_PARAM_ITEM_ASSERT_RST_ENABLE", "-DALX_BOUND_ASSERT_RST_ENABLE",
+    "-DALX_FTOA_ASSERT_RST_ENABLE", "-DALX_RANGE_ASSERT_RST_ENABLE",
+]
+MEMSAFE_DEPS = MEMSAFE_SOURCES_STRICT + MEMSAFE_SOURCES_CLOSURE + [
+    CLIB_DIR / "alxMemSafe.h", CLIB_DIR / "alxMemRaw.h", CLIB_DIR / "alxCrc.h",
+    CLIB_DIR / "alxParamGroup.h", CLIB_DIR / "alxParamStore.h", CLIB_DIR / "alxParamItem.h",
+    CLIB_DIR / "alxGlobal.h", CLIB_DIR / "alxAssert.h", TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxMemSafeTest.def", Path(__file__),
+]
+MEMSAFE_DLL = BUILD_DIR / "alxMemSafeTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 def _find_vcvars() -> Path:
@@ -190,6 +226,38 @@ def _build_cli_dll() -> None:
     if result.returncode != 0:
         raise RuntimeError(
             f"CLI DLL build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
+
+
+def _build_two_step_dll(strict, closure, assert_defines, dll: Path, def_file: Path, obj_dir_name: str) -> None:
+    """Generic two-step build (same recipe as the CLI DLL): closure objects with -w,
+    then strict sources + objects linked under the full -Werror warning set."""
+    BUILD_DIR.mkdir(exist_ok=True)
+    obj_dir = BUILD_DIR / obj_dir_name
+    obj_dir.mkdir(exist_ok=True)
+    _write_compile_db()
+    vcvars = _find_vcvars()
+    inc = f'-I"{TEST_DIR}" -I"{CLIB_DIR}" -I"{CLIB_DIR / "Mcu"}"'
+    asserts = " ".join(assert_defines)
+    closure_src = " ".join(f'"{s}"' for s in closure)
+    cmd1 = (f'cd /d "{obj_dir}" && "{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g -w '
+            f'-D_CRT_SECURE_NO_WARNINGS {asserts} {inc} -c {closure_src}')
+    result = subprocess.run(f'cmd /s /c "{cmd1}"', capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(f"{dll.name} closure build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
+    strict_src = " ".join(f'"{s}"' for s in strict)
+    objs = " ".join(f'"{o}"' for o in sorted(obj_dir.glob("*.o")))
+    flags = " ".join(HOST_WARN_FLAGS)
+    cmd2 = (f'"{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g {flags} -Werror '
+            f'-D_CRT_SECURE_NO_WARNINGS {asserts} {inc} {strict_src} {objs} '
+            f'-shared -o "{dll}" -Wl,/DEF:"{def_file}"')
+    result = subprocess.run(f'cmd /s /c "{cmd2}"', capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(f"{dll.name} build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
+
+
+def _build_memsafe_dll() -> None:
+    _build_two_step_dll(MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE, MEMSAFE_ASSERT_DEFINES,
+                        MEMSAFE_DLL, TEST_DIR / "alxMemSafeTest.def", "memSafeClosure")
 
 
 # ---------------------------------------------------------------- ctypes -----
@@ -407,6 +475,169 @@ class CliUnderTest:
             out += buf.raw[:n]
 
 
+class MemSafeLib:
+    """ctypes wrapper around alxMemSafeTest.dll: the safe-store chain (AlxCrc -> AlxMemRaw fake
+    -> AlxMemSafe -> AlxParamGroup -> AlxParamStore) plus the fake's test controls.
+    Fake operation kinds for fail_at()/count(): INIT=0, DEINIT=1, READ=2, WRITE=3.
+    CRC configs: CCITT=0, CRC16=1, CRC32=2 (AlxCrc_Config enum order)."""
+
+    INIT, DEINIT, READ, WRITE = 0, 1, 2, 3
+    CCITT, CRC16, CRC32 = 0, 1, 2
+    ALWAYS = 0xFFFFFFFF
+    POISON = 0xAA
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, u32, i32, u8p, b = ctypes.c_void_p, ctypes.c_uint32, ctypes.c_int32, ctypes.POINTER(ctypes.c_uint8), ctypes.c_bool
+        c.AlxMemSafeTest_New.restype = vp
+        c.AlxMemSafeTest_New.argtypes = [u32, u32, ctypes.c_uint8, ctypes.c_uint8]
+        c.AlxMemSafeTest_Delete.argtypes = [vp]
+        for name in ("CopyLen", "NumOfItems"):
+            getattr(c, f"AlxMemSafeTest_{name}").restype = u32
+        for name in ("MemSafeRead", "MemSafeWrite"):
+            f = getattr(c, f"AlxMemSafeTest_{name}"); f.restype = i32; f.argtypes = [vp, u8p, u32]
+        for name in ("MemSafeIsReadDone", "MemSafeIsReadErr", "MemSafeIsWriteDone", "MemSafeIsWriteErr",
+                     "GroupIsValStoredBuffDiff", "StoreIsErr"):
+            f = getattr(c, f"AlxMemSafeTest_{name}"); f.restype = b; f.argtypes = [vp]
+        for name in ("GroupInit", "StoreInit"):
+            f = getattr(c, f"AlxMemSafeTest_{name}"); f.restype = i32; f.argtypes = [vp]
+        c.AlxMemSafeTest_StoreHandle.argtypes = [vp]
+        c.AlxMemSafeTest_ItemGet.restype = u32; c.AlxMemSafeTest_ItemGet.argtypes = [vp, u32]
+        c.AlxMemSafeTest_ItemGetDef.restype = u32; c.AlxMemSafeTest_ItemGetDef.argtypes = [vp, u32]
+        c.AlxMemSafeTest_ItemSet.restype = i32; c.AlxMemSafeTest_ItemSet.argtypes = [vp, u32, u32]
+        c.AlxMemSafeTest_CrcCalc.restype = u32; c.AlxMemSafeTest_CrcCalc.argtypes = [u32, u8p, u32]
+        c.AlxMemSafeTest_CrcIsOk.restype = b; c.AlxMemSafeTest_CrcIsOk.argtypes = [u32, u8p, u32, ctypes.POINTER(u32)]
+        c.AlxMemSafeTest_CrcLen.restype = u32; c.AlxMemSafeTest_CrcLen.argtypes = [u32]
+        c.AlxMemRawFake_Fill.argtypes = [ctypes.c_uint8]
+        c.AlxMemRawFake_Peek.argtypes = [u32, u8p, u32]
+        c.AlxMemRawFake_Poke.argtypes = [u32, u8p, u32]
+        c.AlxMemRawFake_FailAt.argtypes = [u32, u32]
+        c.AlxMemRawFake_Count.restype = u32; c.AlxMemRawFake_Count.argtypes = [u32]
+        c.AlxMemRawFake_PowerLossAt.argtypes = [u32, u32]
+        c.AlxMemRawFake_IsPowerLost.restype = b
+        c.AlxMemRawFake_SetRowEraseModel.argtypes = [b, u32]
+        for name in ("Size", "LastNumOfTries", "LastTimeout_ms", "LastWriteAddr", "LastWriteLen"):
+            getattr(c, f"AlxMemRawFake_{name}").restype = u32
+
+        def status(name: str) -> int:
+            f = getattr(c, f"AlxMemSafeTest_Status_{name}"); f.restype = i32
+            return f()
+
+        self.OK = status("Ok")
+        self.ERR = status("Err")
+        self.ERR_NUM_OF_TRIES = status("ErrNumOfTries")
+        self.BOTH_ERR = status("BothCopyErr")
+        self.BOTH_OK_SAME_USE_A = status("BothOkSame_UseA")
+        self.BOTH_OK_DIFF_USE_A = status("BothOkDiff_UseA")
+        self.A_OK_B_ERR_USE_A = status("AOkBErr_UseA")
+        self.A_ERR_B_OK_USE_B = status("AErrBOk_UseB")
+        self.COPY_LEN = c.AlxMemSafeTest_CopyLen()
+        self.NUM_ITEMS = c.AlxMemSafeTest_NumOfItems()
+
+    # -- chain under test -----------------------------------------------------
+    def new(self, addr_a: int = 0x000, addr_b: int = 0x100, tries: int = 3, raw_tries: int = 3):
+        return self.c.AlxMemSafeTest_New(addr_a, addr_b, tries, raw_tries)
+
+    def delete(self, ctx):
+        self.c.AlxMemSafeTest_Delete(ctx)
+
+    @staticmethod
+    def _buf(data: bytes):
+        return (ctypes.c_uint8 * len(data))(*data)
+
+    def read(self, ctx, n: int = None):
+        """MemSafe read into a poison-filled buffer -> (status, bytes)."""
+        n = self.COPY_LEN if n is None else n
+        buf = (ctypes.c_uint8 * n)(*([self.POISON] * n))
+        st = self.c.AlxMemSafeTest_MemSafeRead(ctx, buf, n)
+        return st, bytes(buf)
+
+    def write(self, ctx, data: bytes) -> int:
+        return self.c.AlxMemSafeTest_MemSafeWrite(ctx, self._buf(data), len(data))
+
+    def flags(self, ctx) -> dict:
+        c = self.c
+        return {"read_done": c.AlxMemSafeTest_MemSafeIsReadDone(ctx), "read_err": c.AlxMemSafeTest_MemSafeIsReadErr(ctx),
+                "write_done": c.AlxMemSafeTest_MemSafeIsWriteDone(ctx), "write_err": c.AlxMemSafeTest_MemSafeIsWriteErr(ctx)}
+
+    def group_init(self, ctx) -> int:
+        return self.c.AlxMemSafeTest_GroupInit(ctx)
+
+    def group_diff(self, ctx) -> bool:
+        return self.c.AlxMemSafeTest_GroupIsValStoredBuffDiff(ctx)
+
+    def store_init(self, ctx) -> int:
+        return self.c.AlxMemSafeTest_StoreInit(ctx)
+
+    def store_handle(self, ctx, passes: int = 1):
+        for _ in range(passes):
+            self.c.AlxMemSafeTest_StoreHandle(ctx)
+
+    def store_err(self, ctx) -> bool:
+        return self.c.AlxMemSafeTest_StoreIsErr(ctx)
+
+    def items(self, ctx) -> list:
+        return [self.c.AlxMemSafeTest_ItemGet(ctx, i) for i in range(self.NUM_ITEMS)]
+
+    def defaults(self, ctx) -> list:
+        return [self.c.AlxMemSafeTest_ItemGetDef(ctx, i) for i in range(self.NUM_ITEMS)]
+
+    def item_set(self, ctx, index: int, val: int) -> int:
+        return self.c.AlxMemSafeTest_ItemSet(ctx, index, val)
+
+    # -- CRC ------------------------------------------------------------------
+    def crc_calc(self, cfg: int, data: bytes) -> int:
+        return self.c.AlxMemSafeTest_CrcCalc(cfg, self._buf(data), len(data))
+
+    def crc_is_ok(self, cfg: int, blob: bytes):
+        v = ctypes.c_uint32(0xDEADBEEF)
+        ok = self.c.AlxMemSafeTest_CrcIsOk(cfg, self._buf(blob), len(blob), ctypes.byref(v))
+        return ok, v.value
+
+    def crc_len(self, cfg: int) -> int:
+        return self.c.AlxMemSafeTest_CrcLen(cfg)
+
+    # -- fake flash -------------------------------------------------------------
+    def fake_reset(self):
+        self.c.AlxMemRawFake_Reset()
+
+    def fake_fill(self, val: int):
+        self.c.AlxMemRawFake_Fill(val)
+
+    def peek(self, addr: int, n: int) -> bytes:
+        buf = (ctypes.c_uint8 * n)()
+        self.c.AlxMemRawFake_Peek(addr, buf, n)
+        return bytes(buf)
+
+    def poke(self, addr: int, data: bytes):
+        self.c.AlxMemRawFake_Poke(addr, self._buf(data), len(data))
+
+    def fail_at(self, kind: int, nth: int):
+        self.c.AlxMemRawFake_FailAt(kind, nth)
+
+    def count(self, kind: int) -> int:
+        return self.c.AlxMemRawFake_Count(kind)
+
+    def power_loss_at(self, nth_write: int, bytes_that_land: int):
+        self.c.AlxMemRawFake_PowerLossAt(nth_write, bytes_that_land)
+
+    def power_on(self):
+        self.c.AlxMemRawFake_PowerOn()
+
+    def power_lost(self) -> bool:
+        return self.c.AlxMemRawFake_IsPowerLost()
+
+    def row_erase_model(self, enable: bool, row_size: int = 256):
+        self.c.AlxMemRawFake_SetRowEraseModel(enable, row_size)
+
+    def last_write(self):
+        return self.c.AlxMemRawFake_LastWriteAddr(), self.c.AlxMemRawFake_LastWriteLen()
+
+    def last_raw_args(self):
+        return self.c.AlxMemRawFake_LastNumOfTries(), self.c.AlxMemRawFake_LastTimeout_ms()
+
+
 # --------------------------------------------------------------- fixtures ----
 @pytest.fixture(scope="session")
 def lib() -> Lib:
@@ -484,3 +715,37 @@ def check(lib, result, exp_status, exp_content: bytes, ln: int):
     assert raw[nul_pos] == 0, f"str not null-terminated at {nul_pos} (raw={raw!r})"
     poison = raw[nul_pos + 1:]
     assert all(b == lib.POISON for b in poison), f"bytes beyond NUL modified: {raw!r}"
+
+
+@pytest.fixture(scope="session")
+def memsafe_lib() -> MemSafeLib:
+    # ALX_MEMSAFE_TEST_DLL selects an externally built variant (coverage/sanitizer)
+    override = os.environ.get("ALX_MEMSAFE_TEST_DLL")
+    if override:
+        return MemSafeLib(Path(override))
+    if _needs_build(MEMSAFE_DLL, MEMSAFE_DEPS):
+        _build_memsafe_dll()
+    return MemSafeLib(MEMSAFE_DLL)
+
+
+@pytest.fixture
+def flash(memsafe_lib) -> MemSafeLib:
+    """The fake flash, blank (0xFF) and fault-free at the start of every test."""
+    memsafe_lib.fake_reset()
+    return memsafe_lib
+
+
+@pytest.fixture
+def make_store(flash):
+    """Factory: make_store(addr_a, addr_b, tries, raw_tries) -> ctx over the shared fake flash.
+    A second ctx over the same flash = a reboot. Auto-deleted."""
+    ctxs = []
+
+    def _make(addr_a: int = 0x000, addr_b: int = 0x100, tries: int = 3, raw_tries: int = 3):
+        ctx = flash.new(addr_a, addr_b, tries, raw_tries)
+        ctxs.append(ctx)
+        return ctx
+
+    yield _make
+    for ctx in ctxs:
+        flash.delete(ctx)
