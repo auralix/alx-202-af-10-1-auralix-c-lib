@@ -126,14 +126,17 @@
 
 ## TEST - TARGET
 - **Tools**
-	- pytest = bench orchestrator (planned)
+	- pytest = bench orchestrator
 	- instrument drivers per bus (Python libs: serial, CAN, Ethernet, Modbus/PLC, SCPI/VISA, GPIO/relay, debug probe, ...)
-- **Files** (device repo `Test/`, planned)
-	- `pyproject.toml` (own markers)
-	- `conftest.py` = the bench (one fixture per instrument; DUT provision / identity guard / isolation / teardown)
-	- `test_<subsystem>.py`
-	- bench config (instrument addresses per bench)
-
+- **Files - Config** (device repo)
+	- `Test/pyproject.toml`
+- **Files - Code** (device repo)
+	- `Test/conftest.py`
+	- `Test/test_<subsystem>.py`
+	- `Test/RunHil.ps1`
+	- `Test/flash.jlink`
+- **Files - Generated** (device repo)
+	- `Test/build/runs/<timestamp>/`
 
 
 
@@ -197,7 +200,7 @@ alxFooTestHelpers.c     opaque-handle New/Delete + status-enum getters
 alxFooTest.def          DLL exports
 test_alxFoo.py          tests; file = module-scoped, functions = task-scoped: test_<KEY>_P<n>_<what>
 alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar), never by the
-                        module under test (none exists yet; first planned: alxSerialPortFake.c)
+                        module under test (alxSerialPortFake.c, alxParamKvStoreFake.c, alxIdFake.c)
 ```
 
 ## Conventions
@@ -205,7 +208,9 @@ alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar),
 - Tests use only the public module API via opaque handles; no struct mirroring in Python.
 - Enum values via exported getters, never hardcoded.
 - Out-buffers poison-filled (0xAA), checked beyond the NUL terminator.
-- Helper backing buffers poisoned with a delimiter byte.
+- Helper backing buffers poisoned with a delimiter byte; helper STRUCTS poisoned 0xFF before the
+  Ctor (not 0xAA: clang tests a bool by its low bit, so 0xAA reads as false and hides a
+  forgotten flag init - mutation finding ALX-1514).
 - Property tests compare against a Python reference model, fixed seeds.
 - Test commit precedes implementation commit and is demonstrated failing first.
 - One DLL per module/test-group.
@@ -216,3 +221,8 @@ alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar),
 - Test names keep their ORIGINATING proof token forever; later tasks attach
   `@pytest.mark.req("ALX-<key>-P<n>")` instead of renaming. Proof tokens are mirrored
   into junit XML as `<property>` elements (conftest hook).
+
+## Jira
+
+- https://auralix.atlassian.net/browse/ALX-1514
+- https://auralix.atlassian.net/browse/ALX-1495
