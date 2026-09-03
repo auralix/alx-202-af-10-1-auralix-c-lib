@@ -307,3 +307,78 @@ def test_ALX1513_P8_row_erase_model_copies_in_the_same_row_destroy_each_other(fl
     flash.write(ctx, V2)
     flash.power_on()
     assert flash.read(make_store(0, 16))[0] == flash.BOTH_ERR, "record lost - the failure the row layout prevents"
+
+
+# =====================================================================
+# P8 - coverage-driven hardening: every raw call site of Read/Write is retried, including the
+#      repair writes (llvm-cov of the first suite showed these branches unexecuted)
+# =====================================================================
+
+@pytest.mark.parametrize("kind,nth", [("INIT", 2), ("READ", 2), ("DEINIT", 1), ("DEINIT", 2)],
+                         ids=["init-before-B", "read-B", "deinit-after-A", "deinit-after-B"])
+def test_ALX1513_P8_read_retries_a_failure_at_every_raw_call_site(flash, make_store, kind, nth):
+    ctx = make_store(tries=3)
+    assert flash.write(ctx, V1) == flash.OK
+    k = getattr(flash, kind)
+    flash.fail_at(k, flash.count(k) + nth)
+    status, data = flash.read(ctx)
+    assert status == flash.BOTH_OK_SAME_USE_A and data == V1
+
+
+@pytest.mark.parametrize("kind,nth", [("INIT", 2), ("WRITE", 2), ("DEINIT", 1), ("DEINIT", 2)],
+                         ids=["init-before-B", "write-B", "deinit-after-A", "deinit-after-B"])
+def test_ALX1513_P8_write_retries_a_failure_at_every_raw_call_site(flash, make_store, kind, nth):
+    ctx = make_store(tries=3)
+    k = getattr(flash, kind)
+    flash.fail_at(k, nth)
+    assert flash.write(ctx, V2) == flash.OK
+    assert flash.peek(A, REC) == blob(V2) and flash.peek(B, REC) == blob(V2)
+
+
+def _repair_case(flash, ctx, case: str):
+    """Prepare the three repair situations of Read: both valid but different / A ok B bad / A bad B ok."""
+    assert flash.write(ctx, V1) == flash.OK
+    if case == "diff":
+        flash.poke(B, blob(V2))
+    elif case == "b-bad":
+        flip(flash, B, 2)
+    else:
+        flip(flash, A, 2)
+
+
+REPAIR_EXPECT = {
+    "diff": ("BOTH_OK_DIFF_USE_A", V1, B),
+    "b-bad": ("A_OK_B_ERR_USE_A", V1, B),
+    "a-bad": ("A_ERR_B_OK_USE_B", V1, A),
+}
+
+
+@pytest.mark.parametrize("case", ["diff", "b-bad", "a-bad"])
+@pytest.mark.parametrize("kind,nth", [("INIT", 3), ("WRITE", 1), ("DEINIT", 3)],
+                         ids=["init-before-repair", "repair-write", "deinit-after-repair"])
+def test_ALX1513_P8_repair_write_path_retries_a_failure_and_still_repairs(flash, make_store, case, kind, nth):
+    """The repair (rewriting the bad copy from the good one) is the third Init/DeInit and the first
+    Write inside one Read; a failure there restarts the whole read and the repair lands on the retry."""
+    ctx = make_store(tries=3)
+    _repair_case(flash, ctx, case)
+    k = getattr(flash, kind)
+    flash.fail_at(k, flash.count(k) + nth)
+    status, data = flash.read(ctx)
+    exp_status, exp_data, repaired = REPAIR_EXPECT[case]
+    if kind == "DEINIT":
+        exp_status = "BOTH_OK_SAME_USE_A"     # the repair had already landed: the retry finds two equal copies
+    assert status == getattr(flash, exp_status)
+    assert data == exp_data
+    assert flash.peek(repaired, REC) == blob(V1), f"{case}: repaired copy must hold the good record"
+
+
+@pytest.mark.parametrize("case", ["diff", "b-bad", "a-bad"])
+def test_ALX1513_P8_repair_write_failing_always_gives_error_and_leaves_flash_as_it_was(flash, make_store, case):
+    ctx = make_store(tries=2)
+    _repair_case(flash, ctx, case)
+    before = (flash.peek(A, REC), flash.peek(B, REC))
+    flash.fail_at(flash.WRITE, flash.ALWAYS)
+    status, data = flash.read(ctx)
+    assert status == flash.ERR
+    assert data == bytes([flash.POISON] * 5), "no record delivered when the repair cannot be completed"
+    assert (flash.peek(A, REC), flash.peek(B, REC)) == before

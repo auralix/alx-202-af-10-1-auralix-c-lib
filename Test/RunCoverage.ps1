@@ -49,3 +49,35 @@ Write-Host "`ncobertura: $cov\coverage_c.xml"
 python "$test\coverage_gate.py" "$cov\summary.json" alxFifo.c alxBound.c
 if ($LASTEXITCODE -ne 0) { throw "COVERAGE GATE FAILED - see above" }
 Write-Host "html:      $cov\html\index.html"
+
+# GATE for this group = functions 100 %; lines/branches are REPORTED: alxMemSafe.c keeps three blocks that are
+# unreachable with asserts ON (nonBlocking TODO in Read and Write, the impossible else of the decision table)
+# and alxCrc.c has `break` after `return` plus assert-guarded default branches - see the ALX-1513 notes.
+# ---- Part B: MemSafe test group (ALX-1513) - real alxMemSafe/alxCrc/alxParamGroup/alxParamStore over
+# alxMemRawFake, same two-step shape as conftest._build_memsafe_dll (closure objects, then strict sources).
+# KEEP THE SOURCE LISTS IN SYNC WITH conftest.MEMSAFE_SOURCES_STRICT/_CLOSURE/_ASSERT_DEFINES.
+$ms = Join-Path $cov "memsafe"
+New-Item -ItemType Directory -Force $ms, "$ms\closure" | Out-Null
+Remove-Item "$ms\*.profraw" -Force -ErrorAction SilentlyContinue
+$msAsserts = "-DALX_MEM_SAFE_ASSERT_RST_ENABLE -DALX_MEM_RAW_ASSERT_RST_ENABLE -DALX_CRC_ASSERT_RST_ENABLE -DALX_PARAM_GROUP_ASSERT_RST_ENABLE -DALX_PARAM_STORE_ASSERT_RST_ENABLE -DALX_PARAM_ITEM_ASSERT_RST_ENABLE -DALX_BOUND_ASSERT_RST_ENABLE -DALX_FTOA_ASSERT_RST_ENABLE -DALX_RANGE_ASSERT_RST_ENABLE"
+cmd /s /c "cd /d ""$ms\closure"" && ""$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /clang:-std=gnu99 -fprofile-instr-generate -fcoverage-mapping /w -D_CRT_SECURE_NO_WARNINGS $msAsserts /I""$test"" /I""$clib"" /I""$clib\Mcu"" /c ""$clib\alxParamGroup.c"" ""$clib\alxParamStore.c"" ""$clib\alxParamItem.c"" ""$clib\alxFtoa.c"" ""$clib\alxRange.c"""
+if ($LASTEXITCODE -ne 0) { throw "coverage MemSafe closure build failed" }
+$msObjs = (Get-ChildItem "$ms\closure\*.obj" | ForEach-Object { """$($_.FullName)""" }) -join " "
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99 -fprofile-instr-generate -fcoverage-mapping -D_CRT_SECURE_NO_WARNINGS $msAsserts /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxMemSafe.c"" ""$clib\alxCrc.c"" ""$clib\alxBound.c"" ""$test\alxMemRawFake.c"" ""$test\alxParamKvStoreFake.c"" ""$test\alxAssertPc.c"" ""$test\alxMemSafeTestHelpers.c"" $msObjs /Fe:""$ms\alxMemSafeTest.dll"" /Fo""$ms""\ /link /DEF:""$test\alxMemSafeTest.def"""
+if ($LASTEXITCODE -ne 0) { throw "coverage MemSafe DLL build failed" }
+$env:ALX_MEMSAFE_TEST_DLL = "$ms\alxMemSafeTest.dll"
+$env:LLVM_PROFILE_FILE    = "$ms\%m-%p.profraw"
+try {
+    python -m pytest -q test_alxCrc.py test_alxMemSafe.py test_alxParamGroup.py test_alxParamStore.py
+    if ($LASTEXITCODE -ne 0) { throw "MemSafe group pytest failed (rc=$LASTEXITCODE)" }
+}
+finally {
+    Remove-Item Env:ALX_MEMSAFE_TEST_DLL, Env:LLVM_PROFILE_FILE -ErrorAction SilentlyContinue
+}
+& "$llvm\llvm-profdata.exe" merge -sparse (Get-ChildItem "$ms\*.profraw").FullName -o "$ms\merged.profdata"
+& "$llvm\llvm-cov.exe" report "$ms\alxMemSafeTest.dll" -instr-profile="$ms\merged.profdata" | Tee-Object "$ms\coverage_report.txt"
+& "$llvm\llvm-cov.exe" show "$ms\alxMemSafeTest.dll" -instr-profile="$ms\merged.profdata" -format=html -output-dir="$ms\html" -show-branches=count -show-line-counts
+& "$llvm\llvm-cov.exe" export "$ms\alxMemSafeTest.dll" -instr-profile="$ms\merged.profdata" -summary-only | Out-File -Encoding ascii "$ms\summary.json"
+python "$test\coverage_gate.py" "$ms\summary.json" alxCrc.c alxMemSafe.c --metrics functions
+if ($LASTEXITCODE -ne 0) { throw "COVERAGE GATE (MemSafe group) FAILED - see above" }
+Write-Host "html:      $ms\html\index.html"

@@ -72,4 +72,25 @@ finally {
     $env:ALX_CLI_TEST_DLL = $null
 }
 Write-Host "Stage 2b (UBSan CLI DLL, CLI suite): CLEAN"
+# --- Stage 2c: UBSan MemSafe DLL (Tier 2: real alxMemSafe/alxCrc/alxParamGroup/alxParamStore over alxMemRawFake)
+# + the MemSafe group suite (ALX-1513). Same two-step shape as conftest._build_memsafe_dll; asserts ON = as shipped.
+# KEEP THE SOURCE LISTS IN SYNC WITH conftest.MEMSAFE_SOURCES_STRICT/_CLOSURE/_ASSERT_DEFINES.
+$msAsserts = "-DALX_MEM_SAFE_ASSERT_RST_ENABLE -DALX_MEM_RAW_ASSERT_RST_ENABLE -DALX_CRC_ASSERT_RST_ENABLE -DALX_PARAM_GROUP_ASSERT_RST_ENABLE -DALX_PARAM_STORE_ASSERT_RST_ENABLE -DALX_PARAM_ITEM_ASSERT_RST_ENABLE -DALX_BOUND_ASSERT_RST_ENABLE -DALX_FTOA_ASSERT_RST_ENABLE -DALX_RANGE_ASSERT_RST_ENABLE"
+$msClosure = "$build\ubsan\memsafeClosure"
+New-Item -ItemType Directory -Force $msClosure | Out-Null
+cmd /s /c "cd /d ""$msClosure"" && ""$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /clang:-std=gnu99 -fsanitize=undefined -fno-sanitize-recover=undefined /w -D_CRT_SECURE_NO_WARNINGS $msAsserts /I""$test"" /I""$clib"" /I""$clib\Mcu"" /c ""$clib\alxParamGroup.c"" ""$clib\alxParamStore.c"" ""$clib\alxParamItem.c"" ""$clib\alxFtoa.c"" ""$clib\alxRange.c"""
+if ($LASTEXITCODE -ne 0) { throw "UBSan MemSafe closure build failed" }
+$msObjs = (Get-ChildItem "$msClosure\*.obj" | ForEach-Object { """$($_.FullName)""" }) -join " "
+cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99 -fsanitize=undefined -fno-sanitize-recover=undefined -D_CRT_SECURE_NO_WARNINGS $msAsserts /I""$test"" /I""$clib"" /I""$clib\Mcu"" ""$clib\alxMemSafe.c"" ""$clib\alxCrc.c"" ""$clib\alxBound.c"" ""$test\alxMemRawFake.c"" ""$test\alxParamKvStoreFake.c"" ""$test\alxAssertPc.c"" ""$test\alxMemSafeTestHelpers.c"" $msObjs /Fe:""$build\ubsan\alxMemSafeTest.dll"" /Fo""$build\ubsan""\ /link /DEF:""$test\alxMemSafeTest.def"""
+if ($LASTEXITCODE -ne 0) { throw "UBSan MemSafe DLL build failed" }
+$env:ALX_MEMSAFE_TEST_DLL = "$build\ubsan\alxMemSafeTest.dll"
+try {
+    python -m pytest -q test_alxCrc.py test_alxMemSafe.py test_alxParamGroup.py test_alxParamStore.py
+    if ($LASTEXITCODE -ne 0) { throw "Stage 2c FAILED: MemSafe group suite red or process killed by UBSan (rc=$LASTEXITCODE)" }
+}
+finally {
+    $env:ALX_MEMSAFE_TEST_DLL = $null
+}
+Write-Host "Stage 2c (UBSan MemSafe DLL, MemSafe group suite): CLEAN"
+
 Write-Host "`nSANITIZERS CLEAN"
