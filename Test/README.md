@@ -143,6 +143,9 @@
 
 ---
 
+This file holds rules and facts only, in the form abstract name -> one FIFO example; task details, module
+inventories and per-group lists belong to the Jira task and its Task folder notes.
+
 Tier 1 = pure C modules, tested directly.
 Tier 2 = modules with hardware-shaped extern dependencies, tested via link-time fakes.
 `Mcu/**` ports are not tested here (target/HIL only).
@@ -171,10 +174,9 @@ Tool paths resolve in `ToolPaths.ps1`; override via `ALX_LLVM_DIR` / `ALX_ARMGCC
   points pytest at an instrumented DLL.
 - Coverage: clang `-fprofile-instr-generate -fcoverage-mapping` + llvm-cov;
   gate = 100 % lines/branches/regions/functions on gated files (`coverage_gate.py`).
-  MemSafe group (Part B): functions gated, lines/branches reported (`--metrics functions`) - alxMemSafe.c
-  and alxCrc.c keep assert-guarded unreachable blocks (nonBlocking TODOs, impossible else, default
-  branches, `break` after `return`) that no test can execute with asserts ON.
-- Sanitizers: native ASan+UBSan smoke exe + UBSan DLLs under the suites (Stage 2 FIFO, 2b CLI, 2c MemSafe).
+  A gated file with assert-guarded unreachable code is gated on functions only
+  (`coverage_gate.py --metrics functions`); lines/branches are reported.
+- Sanitizers: native ASan+UBSan smoke exe + one UBSan DLL per test group under its suite.
   UBSAN_OPTIONS: keep `log_path` relative - a drive-letter colon splits the option list.
 - Mutation (report-only): universalmutator mutants of the gated sources, each planted,
   rebuilt, suite re-run (`RunMutation.ps1`/`mutation_run.py`). Survivors ->
@@ -203,16 +205,11 @@ alxFooTestHelpers.c     opaque-handle New/Delete + status-enum getters
 alxFooTest.def          DLL exports
 test_alxFoo.py          tests; file = module-scoped, functions = task-scoped: test_<KEY>_P<n>_<what>
 alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar), never by the
-                        module under test (alxSerialPortFake.c, alxParamKvStoreFake.c, alxIdFake.c,
-                        alxMemRawFake.c)
+                        module under test -> alxSerialPortFake.c
 ```
 
-Test groups (one DLL each): `alxFifoTest.dll` = alxFifo + alxBound; `alxCliTest.dll` = alxCli over
-alxSerialPortFake; `alxMemSafeTest.dll` = alxMemSafe + alxCrc (strict) + alxParamGroup + alxParamStore
-(closure) over alxMemRawFake - a RAM flash with call counters, fail-nth injection, a power-loss model
-(the n-th write is cut after k bytes) and an optional row-erase model, so copy-A/copy-B recovery and
-"reboot reads the last or the previous record" are proven on the host. Env overrides for instrumented
-variants: `ALX_FIFO_TEST_DLL`, `ALX_CLI_TEST_DLL`, `ALX_MEMSAFE_TEST_DLL`.
+Test groups (one DLL each) are declared in `conftest.py`: strict sources (warning set, -Werror) + closure
+sources (-w) + fakes, and one `ALX_<GROUP>_TEST_DLL` override each -> `ALX_FIFO_TEST_DLL`.
 
 ## Conventions
 
