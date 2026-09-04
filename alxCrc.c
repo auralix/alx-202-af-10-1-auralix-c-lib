@@ -100,14 +100,13 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			for (byte = 0; byte < len; ++byte)
 			{
 				// Bring the next byte into the remainder.
-				remainder ^= (data[byte] << (width - 8));
+				remainder ^= ((uint16_t)data[byte] << (width - 8));
 
 				// Perform modulo-2 division, a bit at a time.
 				for (bit = 8; bit > 0; --bit)
 				{
-
 					// Try to divide the current data bit.
-					if (remainder & (1 << (width - 1)))
+					if (remainder & ((uint16_t)1 << (width - 1)))
 					{
 						remainder = (remainder << 1) ^ polynomial;
 					}
@@ -137,13 +136,13 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			for (byte = 0; byte < len; ++byte)
 			{
 				// Bring the next byte into the remainder.
-				remainder ^= (((uint8_t)AlxCrc_Reflect((data[byte]), 8)) << (width - 8));
+				remainder ^= (((uint16_t)AlxCrc_Reflect((data[byte]), 8)) << (width - 8));
 
 				// Perform modulo-2 division, a bit at a time.
 				for (bit = 8; bit > 0; --bit)
 				{
 					// Try to divide the current data bit.
-					if (remainder & (1 << (width - 1)))
+					if (remainder & ((uint16_t)1 << (width - 1)))
 					{
 						remainder = (remainder << 1) ^ polynomial;
 					}
@@ -173,13 +172,13 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			for (byte = 0; byte < len; ++byte)
 			{
 				// Bring the next byte into the remainder.
-				remainder ^= (((uint8_t)AlxCrc_Reflect((data[byte]), 8)) << (width - 8));
+				remainder ^= (((uint32_t)AlxCrc_Reflect((data[byte]), 8)) << (width - 8));
 
 				// Perform modulo-2 division, a bit at a time.
 				for (bit = 8; bit > 0; --bit)
 				{
 					// Try to divide the current data bit.
-					if (remainder & (1 << (width - 1)))
+					if (remainder & ((uint32_t)1 << (width - 1)))
 					{
 						remainder = (remainder << 1) ^ polynomial;
 					}
@@ -295,7 +294,7 @@ static uint32_t AlxCrc_Reflect(uint32_t data, uint8_t nBits)
 		// If the LSB bit is set, set the reflection of it
 		if (data & 0x01)
 		{
-			reflection |= (1 << ((nBits - 1) - bit));
+			reflection |= ((uint32_t)1 << ((nBits - 1) - bit));
 		}
 		data = (data >> 1);
 	}
