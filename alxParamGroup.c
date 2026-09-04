@@ -108,18 +108,18 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == false);
 
-	// #1 Prepare variables
+	// Prepare variables
 	Alx_Status status = Alx_Err;
 
-	// #2 Read memory for initNumOfTries
+	// Read memory for initNumOfTries
 	for(uint32_t i = 0; i < me->initNumOfTries; i++)
 	{
-		// #2.1 Read memory
+		// Read memory
 		Alx_Status statusAlxMemSafeRead = Alx_Err;
 		statusAlxMemSafeRead = AlxMemSafe_Read(me->memSafe, me->valStoredBuff, me->len);
 		memcpy(me->valBuff, me->valStoredBuff, me->len);
 
-		// #2.2 Handle result
+		// Handle result
 		switch(statusAlxMemSafeRead)
 		{
 			case AlxSafe_BothCopyOkCrcSame_OrigDontCare_UseCopyA:
@@ -206,15 +206,15 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 			}
 		}
 
-		// #2.3 Break
+		// Break
 		status = Alx_Ok;
 		break;
 	}
 
-	// #3 Set isInit
+	// Set isInit
 	me->isInit = true;
 
-	// #4 Return
+	// Return
 	return status;
 }
 
@@ -228,7 +228,7 @@ void AlxParamGroup_Write(AlxParamGroup* me)
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #1 Start writing
+	// Start writing
 	AlxMemSafe_Write(me->memSafe, me->valToStoreBuff, me->len);
 }
 
@@ -244,7 +244,7 @@ bool AlxParamGroup_IsWriteDone(AlxParamGroup* me)
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #1 Return
+	// Return
 	return AlxMemSafe_IsWriteDone(me->memSafe);
 }
 
@@ -260,7 +260,7 @@ bool AlxParamGroup_IsWriteErr(AlxParamGroup* me)
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #1 Return
+	// Return
 	return AlxMemSafe_IsWriteErr(me->memSafe);
 }
 
@@ -276,7 +276,7 @@ bool AlxParamGroup_IsValStoredBuffDiff(AlxParamGroup* me)
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #1 Compare valBuff to valStoredBuff
+	// Compare valBuff to valStoredBuff
 	if (memcmp(me->valBuff, me->valStoredBuff, me->len) != 0)	// Difference detected
 		return true;
 	else
@@ -293,7 +293,7 @@ void AlxParamGroup_ValBuffToValToStoreBuff(AlxParamGroup* me)
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #1 Copy
+	// Copy
 	memcpy(me->valToStoreBuff, me->valBuff, me->len);
 }
 
@@ -307,7 +307,7 @@ void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me)
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// #1 Copy
+	// Copy
 	memcpy(me->valStoredBuff, me->valToStoreBuff, me->len);
 }
 
@@ -317,22 +317,22 @@ void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me)
   */
 void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me)
 {
-	// #1 Prepare variables
+	// Prepare variables
 	uint32_t valBuffIndex = 0;
 
-	// #2 Copy
+	// Copy
 	for (uint32_t i = 0; i < me->numOfParamItems; i++)
 	{
-		// #2.1 Get value pointer
+		// Get value pointer
 		void* valPtr = AlxParamItem_GetValPtr(*(me->paramItemArr + i));
 
-		// #2.2 Get value length
+		// Get value length
 		uint32_t len = AlxParamItem_GetValLen(*(me->paramItemArr + i));
 
-		// #2.3 Copy
+		// Copy
 		memcpy(&me->valBuff[valBuffIndex], valPtr, len);
 
-		// #2.4 Increment
+		// Increment
 		valBuffIndex = valBuffIndex + len;
 	}
 }
@@ -343,43 +343,43 @@ void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me)
 //******************************************************************************
 static void AlxParamGroup_ParamItemsValDefToValToStoreBuff(AlxParamGroup* me)
 {
-	// #1 Prepare variables
+	// Prepare variables
 	uint32_t valToStoreBuffIndex = 0;
 
-	// #2 Copy
+	// Copy
 	for (uint32_t i = 0; i < me->numOfParamItems; i++)
 	{
-		// #2.1 Get value pointer
+		// Get value pointer
 		void* valPtr = AlxParamItem_GetValPtr(*(me->paramItemArr + i));
 
-		// #2.2 Get value length
+		// Get value length
 		uint32_t len = AlxParamItem_GetValLen(*(me->paramItemArr + i));
 
-		// #2.3 Copy
+		// Copy
 		memcpy(&me->valToStoreBuff[valToStoreBuffIndex], valPtr, len);
 
-		// #2.4 Increment
+		// Increment
 		valToStoreBuffIndex = valToStoreBuffIndex + len;
 	}
 }
 static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me)
 {
-	// #1 Prepare variables
+	// Prepare variables
 	uint32_t valStoredBuffIndex = 0;
 
-	// #2 Copy
+	// Copy
 	for (uint32_t i = 0; i < me->numOfParamItems; i++)
 	{
-		// #2.1 Get value pointer
+		// Get value pointer
 		void* valPtr = AlxParamItem_GetValPtr(*(me->paramItemArr + i));
 
-		// #2.2 Get value length
+		// Get value length
 		uint32_t len = AlxParamItem_GetValLen(*(me->paramItemArr + i));
 
-		// #2.3 Copy
+		// Copy
 		memcpy(valPtr, &me->valStoredBuff[valStoredBuffIndex], len);
 
-		// #2.4 Increment
+		// Increment
 		valStoredBuffIndex = valStoredBuffIndex + len;
 	}
 }
