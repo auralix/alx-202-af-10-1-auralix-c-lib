@@ -96,16 +96,16 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			uint32_t byte = 0;
 			uint8_t  bit = 0;
 
-			// Perform modulo-2 division, a byte at a time.
+			// Perform modulo-2 division, a byte at a time
 			for (byte = 0; byte < len; ++byte)
 			{
-				// Bring the next byte into the remainder.
+				// Bring the next byte into the remainder
 				remainder ^= ((uint16_t)data[byte] << (width - 8));
 
-				// Perform modulo-2 division, a bit at a time.
+				// Perform modulo-2 division, a bit at a time
 				for (bit = 8; bit > 0; --bit)
 				{
-					// Try to divide the current data bit.
+					// Try to divide the current data bit
 					if (remainder & ((uint16_t)1 << (width - 1)))
 					{
 						remainder = (remainder << 1) ^ polynomial;
@@ -117,7 +117,7 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 				}
 			}
 
-			// The final remainder is the CRC result.
+			// The final remainder is the CRC result
 			return (remainder ^ finalXorValue);
 			break;
 		}
@@ -132,16 +132,16 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			uint32_t byte = 0;
 			uint8_t  bit = 0;
 
-			// Perform modulo-2 division, a byte at a time.
+			// Perform modulo-2 division, a byte at a time
 			for (byte = 0; byte < len; ++byte)
 			{
-				// Bring the next byte into the remainder.
+				// Bring the next byte into the remainder
 				remainder ^= (((uint16_t)AlxCrc_Reflect((data[byte]), 8)) << (width - 8));
 
-				// Perform modulo-2 division, a bit at a time.
+				// Perform modulo-2 division, a bit at a time
 				for (bit = 8; bit > 0; --bit)
 				{
-					// Try to divide the current data bit.
+					// Try to divide the current data bit
 					if (remainder & ((uint16_t)1 << (width - 1)))
 					{
 						remainder = (remainder << 1) ^ polynomial;
@@ -153,7 +153,7 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 				}
 			}
 
-			// The final remainder is the CRC result.
+			// The final remainder is the CRC result
 			return (((uint16_t)AlxCrc_Reflect((remainder), width)) ^ finalXorValue);
 			break;
 		}
@@ -168,16 +168,16 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			uint32_t byte = 0;
 			uint8_t  bit = 0;
 
-			// Perform modulo-2 division, a byte at a time.
+			// Perform modulo-2 division, a byte at a time
 			for (byte = 0; byte < len; ++byte)
 			{
-				// Bring the next byte into the remainder.
+				// Bring the next byte into the remainder
 				remainder ^= (((uint32_t)AlxCrc_Reflect((data[byte]), 8)) << (width - 8));
 
-				// Perform modulo-2 division, a bit at a time.
+				// Perform modulo-2 division, a bit at a time
 				for (bit = 8; bit > 0; --bit)
 				{
-					// Try to divide the current data bit.
+					// Try to divide the current data bit
 					if (remainder & ((uint32_t)1 << (width - 1)))
 					{
 						remainder = (remainder << 1) ^ polynomial;
@@ -189,7 +189,7 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 				}
 			}
 
-			// The final remainder is the CRC result.
+			// The final remainder is the CRC result
 			return (((uint32_t)AlxCrc_Reflect((remainder), width)) ^ finalXorValue);
 			break;
 		}
