@@ -42,6 +42,7 @@
 //******************************************************************************
 static void AlxParamGroup_ParamItemsValDefToValToStoreBuff(AlxParamGroup* me);
 static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me);
+static void AlxParamGroup_ValToStoreBuffToValStoredBuff_Private(AlxParamGroup* me);
 
 
 //******************************************************************************
@@ -184,8 +185,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				else
 				{
 					// Update
-					me->isInit = true;	// JK: isInit has to be set to true here, otherwise assert is triggered when copying default values
-					AlxParamGroup_ValToStoreBuffToValStoredBuff(me);
+					AlxParamGroup_ValToStoreBuffToValStoredBuff_Private(me);
 
 					// Trace
 					ALX_PARAM_GROUP_TRACE_INF("%s_BothNok_ResToDef", me->name);
@@ -312,7 +312,7 @@ void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me)
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
 	// Copy
-	memcpy(me->valStoredBuff, me->valToStoreBuff, me->len);
+	AlxParamGroup_ValToStoreBuffToValStoredBuff_Private(me);
 }
 
 /**
@@ -386,6 +386,11 @@ static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me)
 		// Increment
 		valStoredBuffIndex = valStoredBuffIndex + len;
 	}
+}
+static void AlxParamGroup_ValToStoreBuffToValStoredBuff_Private(AlxParamGroup* me)
+{
+	// Copy
+	memcpy(me->valStoredBuff, me->valToStoreBuff, me->len);
 }
 
 
