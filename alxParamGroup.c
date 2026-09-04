@@ -220,7 +220,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxParamGroup_Write(AlxParamGroup* me)
 {
@@ -289,7 +289,7 @@ bool AlxParamGroup_IsValStoredBuffDiff(AlxParamGroup* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxParamGroup_ValBuffToValToStoreBuff(AlxParamGroup* me)
 {
@@ -303,7 +303,7 @@ void AlxParamGroup_ValBuffToValToStoreBuff(AlxParamGroup* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me)
 {
@@ -317,7 +317,7 @@ void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me)
 {
