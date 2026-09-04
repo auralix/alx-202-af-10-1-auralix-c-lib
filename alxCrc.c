@@ -79,15 +79,15 @@ void AlxCrc_Ctor
   */
 uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 {
-	// #1 Assert
+	// Assert
 	ALX_CRC_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Handle CRC calculation
+	// Handle CRC calculation
 	switch (me->config)
 	{
 		case AlxCrc_Config_Ccitt:
 		{
-			// #1 Prepare variables
+			// Prepare variables
 			const uint8_t width = (8 * sizeof(uint16_t));
 			const uint16_t polynomial = 0x1021;
 			const uint16_t initialRemainder = 0xFFFF;
@@ -96,17 +96,17 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			uint32_t byte = 0;
 			uint8_t  bit = 0;
 
-			// #2 Perform modulo-2 division, a byte at a time.
+			// Perform modulo-2 division, a byte at a time.
 			for (byte = 0; byte < len; ++byte)
 			{
-				// #2.1 Bring the next byte into the remainder.
+				// Bring the next byte into the remainder.
 				remainder ^= (data[byte] << (width - 8));
 
-				// #2.2 Perform modulo-2 division, a bit at a time.
+				// Perform modulo-2 division, a bit at a time.
 				for (bit = 8; bit > 0; --bit)
 				{
 
-					// #2.3 Try to divide the current data bit.
+					// Try to divide the current data bit.
 					if (remainder & (1 << (width - 1)))
 					{
 						remainder = (remainder << 1) ^ polynomial;
@@ -118,13 +118,13 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 				}
 			}
 
-			// #3 The final remainder is the CRC result.
+			// The final remainder is the CRC result.
 			return (remainder ^ finalXorValue);
 			break;
 		}
 		case AlxCrc_Config_Crc16:
 		{
-			// #1 Prepare variables
+			// Prepare variables
 			const uint8_t width = (8 * sizeof(uint16_t));
 			const uint16_t polynomial = 0x8005;
 			const uint16_t initialRemainder = 0x0000;
@@ -133,16 +133,16 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			uint32_t byte = 0;
 			uint8_t  bit = 0;
 
-			// #2 Perform modulo-2 division, a byte at a time.
+			// Perform modulo-2 division, a byte at a time.
 			for (byte = 0; byte < len; ++byte)
 			{
-				// #2.1 Bring the next byte into the remainder.
+				// Bring the next byte into the remainder.
 				remainder ^= (((uint8_t)AlxCrc_Reflect((data[byte]), 8)) << (width - 8));
 
-				// #2.2 Perform modulo-2 division, a bit at a time.
+				// Perform modulo-2 division, a bit at a time.
 				for (bit = 8; bit > 0; --bit)
 				{
-					// #2.3 Try to divide the current data bit.
+					// Try to divide the current data bit.
 					if (remainder & (1 << (width - 1)))
 					{
 						remainder = (remainder << 1) ^ polynomial;
@@ -154,13 +154,13 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 				}
 			}
 
-			// #3 The final remainder is the CRC result.
+			// The final remainder is the CRC result.
 			return (((uint16_t)AlxCrc_Reflect((remainder), width)) ^ finalXorValue);
 			break;
 		}
 		case AlxCrc_Config_Crc32:
 		{
-			// #1 Prepare variables
+			// Prepare variables
 			const uint8_t width = (8 * sizeof(uint32_t));
 			const uint32_t polynomial = 0x04C11DB7;
 			const uint32_t initialRemainder = 0xFFFFFFFF;
@@ -169,16 +169,16 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 			uint32_t byte = 0;
 			uint8_t  bit = 0;
 
-			// #2 Perform modulo-2 division, a byte at a time.
+			// Perform modulo-2 division, a byte at a time.
 			for (byte = 0; byte < len; ++byte)
 			{
-				// #2.1 Bring the next byte into the remainder.
+				// Bring the next byte into the remainder.
 				remainder ^= (((uint8_t)AlxCrc_Reflect((data[byte]), 8)) << (width - 8));
 
-				// #2.2 Perform modulo-2 division, a bit at a time.
+				// Perform modulo-2 division, a bit at a time.
 				for (bit = 8; bit > 0; --bit)
 				{
-					// #2.3 Try to divide the current data bit.
+					// Try to divide the current data bit.
 					if (remainder & (1 << (width - 1)))
 					{
 						remainder = (remainder << 1) ^ polynomial;
@@ -190,7 +190,7 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 				}
 			}
 
-			// #3 The final remainder is the CRC result.
+			// The final remainder is the CRC result.
 			return (((uint32_t)AlxCrc_Reflect((remainder), width)) ^ finalXorValue);
 			break;
 		}
@@ -213,26 +213,26 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
   */
 bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t* validatedCrc)
 {
-	// #1 Assert
+	// Assert
 	ALX_CRC_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Prepare variables
+	// Prepare variables
 	union
 	{
 		uint32_t crcToCheck;
 		uint8_t raw[4];
 	} crc = {0};
 
-	// #3 Get CRC length based on configuration
+	// Get CRC length based on configuration
 	uint32_t crcLen = AlxCrc_GetLen(me);
 
-	// #4 Copy CRC from dataWithCrc to local union
+	// Copy CRC from dataWithCrc to local union
 	memcpy(crc.raw, &dataWithCrc[lenWithCrc - crcLen], crcLen);
 
-	// #5 Calculate new CRC with data from dataWithCrc
+	// Calculate new CRC with data from dataWithCrc
 	uint32_t crcCalc = AlxCrc_Calc(me, dataWithCrc, lenWithCrc - crcLen);
 
-	// #6 Check if CRCs match
+	// Check if CRCs match
 	if (crc.crcToCheck == crcCalc)
 	{
 		*validatedCrc = crcCalc;
@@ -251,10 +251,10 @@ bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t
   */
 uint32_t AlxCrc_GetLen(AlxCrc* me)
 {
-	// #1 Assert
+	// Assert
 	ALX_CRC_ASSERT(me->wasCtorCalled == true);
 
-	// #2 Get & return length
+	// Get & return length
 	switch (me->config)
 	{
 		case AlxCrc_Config_Ccitt:
@@ -286,13 +286,13 @@ uint32_t AlxCrc_GetLen(AlxCrc* me)
 //******************************************************************************
 static uint32_t AlxCrc_Reflect(uint32_t data, uint8_t nBits)
 {
-	// #1 Prepare variables
+	// Prepare variables
 	uint32_t reflection = 0x00000000;
 
-	// #2 Reflect the data about the center bit
+	// Reflect the data about the center bit
 	for (uint8_t bit = 0; bit < nBits; ++bit)
 	{
-		// #2.1 If the LSB bit is set, set the reflection of it
+		// If the LSB bit is set, set the reflection of it
 		if (data & 0x01)
 		{
 			reflection |= (1 << ((nBits - 1) - bit));
@@ -300,7 +300,7 @@ static uint32_t AlxCrc_Reflect(uint32_t data, uint8_t nBits)
 		data = (data >> 1);
 	}
 
-	// #3 Return
+	// Return
 	return reflection;
 }
 
