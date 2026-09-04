@@ -32,7 +32,7 @@
 - **Files - Code**
 	- `Test/conftest.py`
 - **Files - Generated**
-	- `Test/build/alxFifoTest.dll`
+	- `Test/build/alx<Module>Test.dll` -> `Test/build/alxFifoTest.dll`
 
 ## TEST - HOST
 - **Tools**
@@ -46,10 +46,10 @@
 	- `Test/.python-version`
 - **Files - Code**
 	- `Test/conftest.py`
-	- `Test/test_alxFifo.py`
-	- `Test/alxFifoTestHelpers.c`
-	- `Test/alxFifoTest.def`
-	- `Test/alxSerialPortFake.c`
+	- `Test/test_alx<Module>.py` -> `Test/test_alxFifo.py`
+	- `Test/alx<Module>TestHelpers.c` -> `Test/alxFifoTestHelpers.c`
+	- `Test/alx<Module>Test.def` -> `Test/alxFifoTest.def`
+	- `Test/alx<FakedModule>Fake.c` -> `Test/alxSerialPortFake.c`
 - **Files - Generated**
 	- `Test/build/pytest_report.xml`
 	- `Test/build/pytest_report.html`
@@ -74,19 +74,15 @@
 
 ## SANITIZE
 - **Tools**
-	- clang-cl ASan + UBSan `-fsanitize=address,undefined` -> Stage 1 = `alxFifoSanSmoke.exe`
-	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alxFifoTest.dll` & pytest
-	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2b = `alxCliTest.dll` & pytest `test_alxCli.py` (asserts ON, as shipped)
-	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2c = `alxMemSafeTest.dll` & pytest MemSafe group (alxCrc/alxMemSafe/alxParamGroup/alxParamStore; asserts ON)
+	- clang-cl ASan + UBSan `-fsanitize=address,undefined` -> Stage 1 = `alx<Module>SanSmoke.exe` -> `alxFifoSanSmoke.exe`
+	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alx<Module>Test.dll` & pytest `test_alx<Module>.py`, one stage per test group (asserts ON, as shipped) -> `alxFifoTest.dll` & `test_alxFifo.py`
 - **Files - Code**
 	- `Test/RunSanitizers.ps1`
-	- `Test/alxFifoSanSmoke.c`
+	- `Test/alx<Module>SanSmoke.c` -> `Test/alxFifoSanSmoke.c`
 - **Files - Generated**
-	- `Test/build/asan/alxFifoSanSmoke.exe`
+	- `Test/build/asan/alx<Module>SanSmoke.exe` -> `Test/build/asan/alxFifoSanSmoke.exe`
 	- `Test/build/asan/clang_rt.asan_dynamic-x86_64.dll`
-	- `Test/build/ubsan/alxFifoTest.dll`
-	- `Test/build/ubsan/alxCliTest.dll`
-	- `Test/build/ubsan/alxMemSafeTest.dll`
+	- `Test/build/ubsan/alx<Module>Test.dll` -> `Test/build/ubsan/alxFifoTest.dll`
 
 ## COVERAGE
 - **Tools**
@@ -97,12 +93,12 @@
 	- `Test/RunCoverage.ps1`
 	- `Test/coverage_gate.py` (gate)
 - **Files - Generated**
-	- `Test/build/cov/alxFifoTest.dll`
+	- `Test/build/cov/alx<Module>Test.dll` -> `Test/build/cov/alxFifoTest.dll`
 	- `Test/build/cov/*.profraw` -> `merged.profdata`
 	- `Test/build/cov/coverage_report.txt` + `html/index.html`
 	- `Test/build/cov/lcov.info` -> `coverage_c.xml` (cobertura)
 	- `Test/build/cov/summary.json` (gate input)
-	- `Test/build/cov/memsafe/` (Part B: MemSafe group, same set of files)
+	- `Test/build/cov/<group>/` (further test groups, same files) -> `Test/build/cov/memsafe/`
 
 ## MUTATE
 - **Tools**
