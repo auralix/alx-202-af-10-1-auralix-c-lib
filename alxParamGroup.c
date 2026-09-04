@@ -109,16 +109,15 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == false);
 
-	// Prepare variables
+	// Local variables
 	Alx_Status status = Alx_Err;
 
 	// Read memory for initNumOfTries
 	for (uint32_t i = 0; i < me->initNumOfTries; i++)
 	{
-		// Read memory
+		// Read
 		Alx_Status statusAlxMemSafeRead = Alx_Err;
 		statusAlxMemSafeRead = AlxMemSafe_Read(me->memSafe, me->valStoredBuff, me->len);
-		memcpy(me->valBuff, me->valStoredBuff, me->len);
 
 		// Handle result
 		switch (statusAlxMemSafeRead)
@@ -206,8 +205,13 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 			}
 		}
 
-		// Break
+		// Update valBuff from final valStoredBuff
+		memcpy(me->valBuff, me->valStoredBuff, me->len);
+
+		// Set status
 		status = Alx_Ok;
+
+		// Break
 		break;
 	}
 
@@ -228,7 +232,7 @@ void AlxParamGroup_Write(AlxParamGroup* me)
 	ALX_PARAM_GROUP_ASSERT(me->wasCtorCalled == true);
 	ALX_PARAM_GROUP_ASSERT(me->isInit == true);
 
-	// Start writing
+	// Write
 	AlxMemSafe_Write(me->memSafe, me->valToStoreBuff, me->len);
 }
 
@@ -321,7 +325,7 @@ void AlxParamGroup_ValToStoreBuffToValStoredBuff(AlxParamGroup* me)
   */
 void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me)
 {
-	// Prepare variables
+	// Local variables
 	uint32_t valBuffIndex = 0;
 
 	// Copy
@@ -347,7 +351,7 @@ void AlxParamGroup_ParamItemsValToValBuff(AlxParamGroup* me)
 //******************************************************************************
 static void AlxParamGroup_ParamItemsValDefToValToStoreBuff(AlxParamGroup* me)
 {
-	// Prepare variables
+	// Local variables
 	uint32_t valToStoreBuffIndex = 0;
 
 	// Copy
@@ -368,7 +372,7 @@ static void AlxParamGroup_ParamItemsValDefToValToStoreBuff(AlxParamGroup* me)
 }
 static void AlxParamGroup_ValStoredBuffToParamItemsVal(AlxParamGroup* me)
 {
-	// Prepare variables
+	// Local variables
 	uint32_t valStoredBuffIndex = 0;
 
 	// Copy
