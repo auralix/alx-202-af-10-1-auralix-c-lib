@@ -112,7 +112,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 	Alx_Status status = Alx_Err;
 
 	// Read memory for initNumOfTries
-	for(uint32_t i = 0; i < me->initNumOfTries; i++)
+	for (uint32_t i = 0; i < me->initNumOfTries; i++)
 	{
 		// Read memory
 		Alx_Status statusAlxMemSafeRead = Alx_Err;
@@ -120,7 +120,7 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 		memcpy(me->valBuff, me->valStoredBuff, me->len);
 
 		// Handle result
-		switch(statusAlxMemSafeRead)
+		switch (statusAlxMemSafeRead)
 		{
 			case AlxSafe_BothCopyOkCrcSame_OrigDontCare_UseCopyA:
 			{
@@ -278,9 +278,13 @@ bool AlxParamGroup_IsValStoredBuffDiff(AlxParamGroup* me)
 
 	// Compare valBuff to valStoredBuff
 	if (memcmp(me->valBuff, me->valStoredBuff, me->len) != 0)	// Difference detected
+	{
 		return true;
+	}
 	else
+	{
 		return false;
+	}
 }
 
 /**
