@@ -11,7 +11,7 @@ defaults 0, 0, 50, 100, 70) into one record and moves it through AlxMemSafe. Con
   - a raw layer that keeps failing -> Init returns an error (initNumOfTries exhausted)
   After Init the group's working buffer must equal what it just stored: otherwise the store
   state machine believes a change is pending and writes a stale buffer to flash (finding of
-  03.09, sealed below as xfail(strict)).
+  03.09, fixed the same day: Init refreshes valBuff from the final stored record).
 
 Test group P10 = ALX-1513 param-group proofs.
 """
@@ -25,12 +25,6 @@ pytestmark = pytest.mark.unit
 A, B = 0x000, 0x100
 REC = 9
 DEFAULTS = [0, 0, 50, 100, 70]
-STALE_VALBUFF = ("alxParamGroup.c Init, BothCopyErr branch: the defaults are written and valStoredBuff is "
-                 "refreshed, but valBuff keeps the bytes of the failed read - the first AlxParamStore_Handle "
-                 "pass then writes that stale buffer (zeros) to flash and only the next pass restores the "
-                 "defaults; a power loss in between leaves a CRC-valid all-zero record. 1-line fix, TV decides.")
-
-
 def blob(vals) -> bytes:
     data = bytes(vals)
     return data + (zlib.crc32(data) & 0xFFFFFFFF).to_bytes(4, "little")
@@ -57,7 +51,6 @@ def test_ALX1513_P10_second_boot_after_blank_init_finds_a_valid_record(flash, ma
     assert flash.count(flash.WRITE) == writes, "a clean second boot writes nothing"
 
 
-@pytest.mark.xfail(strict=True, reason=STALE_VALBUFF)
 def test_ALX1513_P10_after_blank_init_no_change_is_pending(flash, make_store):
     """After Init the working buffer equals the stored buffer: the store must not see a diff."""
     ctx = make_store()

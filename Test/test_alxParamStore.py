@@ -8,8 +8,9 @@ Writing (wait for the MemSafe write) -> Checking. Contract:
   - a changed item is written within three Handle passes - the pass that sees the change only
     refreshes the working buffer, the next one writes A and B (blocking), the third completes -
     i.e. one loop period after the set-param on the device; a reboot then reads it back
-  - unchanged items cause no flash writes (endurance) - today violated once per blank boot
-    by the group's stale working buffer, sealed below as xfail(strict)
+  - unchanged items cause no flash writes (endurance) - including right after a blank boot
+    (the stale working-buffer finding of 03.09 was fixed in alxParamGroup.c Init: valBuff is
+    refreshed from the final stored record after the read/reset-to-default switch)
   - a failing write puts the store into its error state (IsErr) and leaves flash as it was
 
 Test group P11 = ALX-1513 store state-machine proofs.
@@ -25,9 +26,6 @@ pytestmark = pytest.mark.unit
 A, B = 0x000, 0x100
 REC = 9
 DEFAULTS = [0, 0, 50, 100, 70]
-STALE_VALBUFF = ("alxParamGroup.c Init, BothCopyErr branch leaves valBuff stale (zeros): the first Handle pass "
-                 "after a blank boot writes zeros to flash, the next one writes the defaults back - two erase/"
-                 "write cycles and a power-loss window with a CRC-valid all-zero record. 1-line fix, TV decides.")
 
 
 def blob(vals) -> bytes:
@@ -38,7 +36,7 @@ def blob(vals) -> bytes:
 def booted(flash, make_store):
     ctx = make_store()
     assert flash.store_init(ctx) == flash.OK
-    flash.store_handle(ctx, 6)               # settle: Init->Checking, then the stale-buffer double write (finding), then steady
+    flash.store_handle(ctx, 6)               # settle: Init -> Checking, a few steady passes
     return ctx
 
 
@@ -64,7 +62,6 @@ def test_ALX1513_P11_init_with_raw_layer_failing_always_is_error(flash, make_sto
 # P11 - the endurance rule: no change, no write
 # =====================================================================
 
-@pytest.mark.xfail(strict=True, reason=STALE_VALBUFF)
 def test_ALX1513_P11_no_change_means_no_flash_write_after_blank_boot(flash, make_store):
     ctx = make_store()
     assert flash.store_init(ctx) == flash.OK
@@ -74,7 +71,6 @@ def test_ALX1513_P11_no_change_means_no_flash_write_after_blank_boot(flash, make
     assert flash.peek(A, REC) == blob(DEFAULTS)
 
 
-@pytest.mark.xfail(strict=True, reason=STALE_VALBUFF)
 def test_ALX1513_P11_flash_never_holds_an_all_zero_record_after_blank_boot(flash, make_store):
     """The power-loss window of the finding: after Init and the first Checking pass the record in
     flash must still be the defaults, not zeros."""
