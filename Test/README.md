@@ -77,6 +77,7 @@
 	- clang-cl ASan + UBSan `-fsanitize=address,undefined` -> Stage 1 = `alxFifoSanSmoke.exe`
 	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alxFifoTest.dll` & pytest
 	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2b = `alxCliTest.dll` & pytest `test_alxCli.py` (asserts ON, as shipped)
+	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2c = `alxMemSafeTest.dll` & pytest MemSafe group (alxCrc/alxMemSafe/alxParamGroup/alxParamStore; asserts ON)
 - **Files - Code**
 	- `Test/RunSanitizers.ps1`
 	- `Test/alxFifoSanSmoke.c`
@@ -85,6 +86,7 @@
 	- `Test/build/asan/clang_rt.asan_dynamic-x86_64.dll`
 	- `Test/build/ubsan/alxFifoTest.dll`
 	- `Test/build/ubsan/alxCliTest.dll`
+	- `Test/build/ubsan/alxMemSafeTest.dll`
 
 ## COVERAGE
 - **Tools**
@@ -100,6 +102,7 @@
 	- `Test/build/cov/coverage_report.txt` + `html/index.html`
 	- `Test/build/cov/lcov.info` -> `coverage_c.xml` (cobertura)
 	- `Test/build/cov/summary.json` (gate input)
+	- `Test/build/cov/memsafe/` (Part B: MemSafe group, same set of files)
 
 ## MUTATE
 - **Tools**
@@ -172,7 +175,11 @@ Tool paths resolve in `ToolPaths.ps1`; override via `ALX_LLVM_DIR` / `ALX_ARMGCC
   points pytest at an instrumented DLL.
 - Coverage: clang `-fprofile-instr-generate -fcoverage-mapping` + llvm-cov;
   gate = 100 % lines/branches/regions/functions on gated files (`coverage_gate.py`).
-- Sanitizers: native ASan+UBSan smoke exe + UBSan DLL under the full suite.
+  MemSafe group (Part B): functions gated, lines/branches reported (`--metrics functions`) - alxMemSafe.c
+  and alxCrc.c keep assert-guarded unreachable blocks (nonBlocking TODOs, impossible else, default
+  branches, `break` after `return`) that no test can execute with asserts ON.
+- Sanitizers: native ASan+UBSan smoke exe + UBSan DLLs under the suites (Stage 2 FIFO, 2b CLI, 2c MemSafe).
+  UBSAN_OPTIONS: keep `log_path` relative - a drive-letter colon splits the option list.
 - Mutation (report-only): universalmutator mutants of the gated sources, each planted,
   rebuilt, suite re-run (`RunMutation.ps1`/`mutation_run.py`). Survivors ->
   `build/mutation/survivors/*.diff`; a real hole gets a killing test (P-group
@@ -200,8 +207,16 @@ alxFooTestHelpers.c     opaque-handle New/Delete + status-enum getters
 alxFooTest.def          DLL exports
 test_alxFoo.py          tests; file = module-scoped, functions = task-scoped: test_<KEY>_P<n>_<what>
 alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar), never by the
-                        module under test (alxSerialPortFake.c, alxParamKvStoreFake.c, alxIdFake.c)
+                        module under test (alxSerialPortFake.c, alxParamKvStoreFake.c, alxIdFake.c,
+                        alxMemRawFake.c)
 ```
+
+Test groups (one DLL each): `alxFifoTest.dll` = alxFifo + alxBound; `alxCliTest.dll` = alxCli over
+alxSerialPortFake; `alxMemSafeTest.dll` = alxMemSafe + alxCrc (strict) + alxParamGroup + alxParamStore
+(closure) over alxMemRawFake - a RAM flash with call counters, fail-nth injection, a power-loss model
+(the n-th write is cut after k bytes) and an optional row-erase model, so copy-A/copy-B recovery and
+"reboot reads the last or the previous record" are proven on the host. Env overrides for instrumented
+variants: `ALX_FIFO_TEST_DLL`, `ALX_CLI_TEST_DLL`, `ALX_MEMSAFE_TEST_DLL`.
 
 ## Conventions
 
@@ -224,5 +239,6 @@ alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar),
 
 ## Jira
 
+- https://auralix.atlassian.net/browse/ALX-1513
 - https://auralix.atlassian.net/browse/ALX-1514
 - https://auralix.atlassian.net/browse/ALX-1495
