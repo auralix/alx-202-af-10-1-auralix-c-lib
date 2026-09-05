@@ -119,8 +119,17 @@ def _generate(src: Path, mdir: Path):
     return viable, counts
 
 
-def _build() -> bool:
-    r = _run([sys.executable, "-c", "import conftest; conftest._build_fifo_dll()"], timeout=300)
+BUILDERS = {                       # source under mutation -> the conftest builder of its test group DLL
+    "alxFifo.c": "_build_fifo_dll", "alxBound.c": "_build_fifo_dll",
+    "alxCli.c": "_build_cli_dll",
+    "alxMemSafe.c": "_build_memsafe_dll", "alxCrc.c": "_build_memsafe_dll",
+    "alxParamGroup.c": "_build_memsafe_dll", "alxParamStore.c": "_build_memsafe_dll",
+}
+
+
+def _build(src_name: str = "alxFifo.c") -> bool:
+    builder = BUILDERS.get(src_name, "_build_fifo_dll")
+    r = _run([sys.executable, "-c", f"import conftest; conftest.{builder}()"], timeout=300)
     return r.returncode == 0
 
 
@@ -160,7 +169,7 @@ def qualify(src_name: str, sample: int, seed: int, report_lines: list) -> int:
     try:
         for i, m in enumerate(selected, 1):
             src.write_bytes(m.read_bytes())
-            if not _build():
+            if not _build(src_name):
                 killed_compile += 1          # syntax-valid, but the -Werror gate got it
                 verdict = "KILLED_COMPILE (-Werror gate)"
             else:
@@ -204,7 +213,7 @@ def main() -> int:
         qualify(name, args.sample, args.seed, report)
 
     print("\nrestoration proof: rebuild + full suite on the original source ...")
-    if not _build():
+    if not all(_build(n) for n in (args.sources or ["alxFifo.c"])):
         print("FATAL: rebuild after restore failed"); return 2
     r = _run([sys.executable, "-m", "pytest", "-q"], timeout=300)
     if r.returncode != 0:
