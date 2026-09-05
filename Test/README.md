@@ -133,7 +133,7 @@
 	- `Test/conftest.py`
 	- `Test/test_<subsystem>.py`
 	- `Test/RunHil.ps1`
-	- `Test/flash.jlink`
+	- `Test/<step>.jlink` -> `Test/flash.jlink`
 - **Files - Generated** (device repo)
 	- `Test/build/runs/<timestamp>/`
 
@@ -178,7 +178,8 @@ Tool paths resolve in `ToolPaths.ps1`; override via `ALX_LLVM_DIR` / `ALX_ARMGCC
   (`coverage_gate.py --metrics functions`); lines/branches are reported.
 - Sanitizers: native ASan+UBSan smoke exe + one UBSan DLL per test group under its suite.
   UBSAN_OPTIONS: keep `log_path` relative - a drive-letter colon splits the option list.
-- Mutation (report-only): universalmutator mutants of the gated sources, each planted,
+- Mutation (report-only): universalmutator mutants of a source (`-Sources alx<Module>.c`, the DLL of its
+  test group is rebuilt per mutant), each planted,
   rebuilt, suite re-run (`RunMutation.ps1`/`mutation_run.py`). Survivors ->
   `build/mutation/survivors/*.diff`; a real hole gets a killing test (P-group
   "mutation-driven hardening"), an equivalent mutant gets a note. 100 % is not the target.
