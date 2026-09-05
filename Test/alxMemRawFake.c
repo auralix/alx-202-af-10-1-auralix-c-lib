@@ -48,6 +48,12 @@ static bool fakeRowEraseModel;
 static uint32_t fakeRowSize;
 static uint32_t fakeLastNumOfTries;
 static uint32_t fakeLastTimeout_ms;
+static bool fakeIsInit;								// Init/DeInit state: Read/Write while not initialised fail (and are counted)
+static uint32_t fakeNotInitCalls;
+static bool fakeArgsSeen;							// first Read/Write fixes the expected (numOfTries, timeout_ms) ...
+static uint32_t fakeArgsTries;
+static uint32_t fakeArgsTimeout_ms;
+static uint32_t fakeArgsMismatch;						// ... every later call with other args counts here
 static uint32_t fakeLastWriteAddr;
 static uint32_t fakeLastWriteLen;
 
@@ -67,6 +73,8 @@ uint32_t AlxMemRawFake_LastNumOfTries(void);
 uint32_t AlxMemRawFake_LastTimeout_ms(void);
 uint32_t AlxMemRawFake_LastWriteAddr(void);
 uint32_t AlxMemRawFake_LastWriteLen(void);
+uint32_t AlxMemRawFake_ArgsMismatchCount(void);
+uint32_t AlxMemRawFake_NotInitCallCount(void);
 
 static bool AlxMemRawFake_Hit(uint32_t kind)
 {
@@ -76,6 +84,20 @@ static bool AlxMemRawFake_Hit(uint32_t kind)
 		return true;
 	}
 	return (fakeFailAt[kind] != 0) && (fakeCount[kind] == fakeFailAt[kind]);
+}
+
+static void AlxMemRawFake_NoteArgs(uint32_t numOfTries, uint32_t timeout_ms)
+{
+	if (fakeArgsSeen == false)
+	{
+		fakeArgsSeen = true;
+		fakeArgsTries = numOfTries;
+		fakeArgsTimeout_ms = timeout_ms;
+	}
+	else if ((numOfTries != fakeArgsTries) || (timeout_ms != fakeArgsTimeout_ms))
+	{
+		fakeArgsMismatch++;
+	}
 }
 
 static bool AlxMemRawFake_InRange(uint32_t addr, uint32_t len)
@@ -96,6 +118,12 @@ void AlxMemRawFake_Reset(void)
 	fakeRowSize = 256;
 	fakeLastNumOfTries = 0;
 	fakeLastTimeout_ms = 0;
+	fakeIsInit = false;
+	fakeNotInitCalls = 0;
+	fakeArgsSeen = false;
+	fakeArgsTries = 0;
+	fakeArgsTimeout_ms = 0;
+	fakeArgsMismatch = 0;
 	fakeLastWriteAddr = 0;
 	fakeLastWriteLen = 0;
 }
@@ -191,6 +219,16 @@ uint32_t AlxMemRawFake_LastWriteLen(void)
 	return fakeLastWriteLen;
 }
 
+uint32_t AlxMemRawFake_ArgsMismatchCount(void)
+{
+	return fakeArgsMismatch;
+}
+
+uint32_t AlxMemRawFake_NotInitCallCount(void)
+{
+	return fakeNotInitCalls;
+}
+
 
 //******************************************************************************
 // AlxMemRaw API - the faked module
@@ -208,6 +246,7 @@ Alx_Status AlxMemRaw_Init(AlxMemRaw* me)
 		return Alx_Err;
 	}
 	me->isInit = true;
+	fakeIsInit = true;
 	return Alx_Ok;
 }
 
@@ -218,6 +257,7 @@ Alx_Status AlxMemRaw_DeInit(AlxMemRaw* me)
 		return Alx_Err;
 	}
 	me->isInit = false;
+	fakeIsInit = false;
 	return Alx_Ok;
 }
 
@@ -226,6 +266,12 @@ Alx_Status AlxMemRaw_Read(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t 
 	(void)me;
 	fakeLastNumOfTries = numOfTries;
 	fakeLastTimeout_ms = timeout_ms;
+	AlxMemRawFake_NoteArgs(numOfTries, timeout_ms);
+	if (fakeIsInit == false)
+	{
+		fakeNotInitCalls++;
+		return Alx_Err;
+	}
 	if (AlxMemRawFake_InRange(addr, len) == false)
 	{
 		return Alx_Err;
@@ -245,6 +291,12 @@ Alx_Status AlxMemRaw_Write(AlxMemRaw* me, uint32_t addr, uint8_t* data, uint32_t
 	fakeLastTimeout_ms = timeout_ms;
 	fakeLastWriteAddr = addr;
 	fakeLastWriteLen = len;
+	AlxMemRawFake_NoteArgs(numOfTries, timeout_ms);
+	if (fakeIsInit == false)
+	{
+		fakeNotInitCalls++;
+		return Alx_Err;
+	}
 	if (AlxMemRawFake_InRange(addr, len) == false)
 	{
 		return Alx_Err;

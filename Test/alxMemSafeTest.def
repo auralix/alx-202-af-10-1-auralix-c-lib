@@ -44,3 +44,5 @@ EXPORTS
 	AlxMemRawFake_LastTimeout_ms
 	AlxMemRawFake_LastWriteAddr
 	AlxMemRawFake_LastWriteLen
+	AlxMemRawFake_ArgsMismatchCount
+	AlxMemRawFake_NotInitCallCount

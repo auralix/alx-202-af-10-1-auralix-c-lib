@@ -634,6 +634,12 @@ class MemSafeLib:
     def last_write(self):
         return self.c.AlxMemRawFake_LastWriteAddr(), self.c.AlxMemRawFake_LastWriteLen()
 
+    def args_mismatch(self) -> int:
+        return self.c.AlxMemRawFake_ArgsMismatchCount()
+
+    def not_init_calls(self) -> int:
+        return self.c.AlxMemRawFake_NotInitCallCount()
+
     def last_raw_args(self):
         return self.c.AlxMemRawFake_LastNumOfTries(), self.c.AlxMemRawFake_LastTimeout_ms()
 

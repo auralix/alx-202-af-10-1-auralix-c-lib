@@ -108,3 +108,44 @@ def test_ALX1513_P10_init_survives_one_failing_raw_call(flash, make_store):
     ctx = make_store()
     assert flash.group_init(ctx) == flash.OK
     assert flash.items(ctx) == [9, 8, 7, 6, 5]
+
+
+# =====================================================================
+# P10 - Init through EVERY recovery path of MemSafe (mutation finding 05.09: only the damaged-A path was covered,
+#       the CrcOkDiff and CopyAOkCopyBErr case labels of Init could be deleted without a test noticing)
+# =====================================================================
+
+def test_ALX1513_P10_stored_record_with_damaged_copy_b_loads_from_a_and_repairs(flash, make_store):
+    flash.poke(A, blob([1, 2, 3, 4, 5]))
+    flash.poke(B, blob([1, 2, 3, 4, 5]))
+    damaged = bytearray(flash.peek(B, REC))
+    damaged[6] ^= 0x01
+    flash.poke(B, bytes(damaged))
+    ctx = make_store()
+    assert flash.group_init(ctx) == flash.OK
+    assert flash.items(ctx) == [1, 2, 3, 4, 5]
+    assert flash.peek(B, REC) == blob([1, 2, 3, 4, 5]), "B repaired from A"
+    assert flash.count(flash.WRITE) == 1, "exactly the repair write"
+    assert flash.group_diff(ctx) is False
+
+
+def test_ALX1513_P10_two_valid_but_different_copies_load_a_and_rewrite_b(flash, make_store):
+    """A is written first, so after a cut between the two writes A is the newer record: the items take A."""
+    flash.poke(A, blob([1, 2, 3, 4, 5]))
+    flash.poke(B, blob([6, 7, 8, 9, 10]))
+    ctx = make_store()
+    assert flash.group_init(ctx) == flash.OK
+    assert flash.items(ctx) == [1, 2, 3, 4, 5]
+    assert flash.peek(B, REC) == blob([1, 2, 3, 4, 5]), "B rewritten from A"
+    assert flash.count(flash.WRITE) == 1
+    assert flash.group_diff(ctx) is False
+
+
+def test_ALX1513_P10_init_retry_budget_is_exactly_initNumOfTries_times_the_memsafe_tries(flash, make_store):
+    """A raw layer that never initialises: the group tries initNumOfTries (3) times, each try is one MemSafe
+    read of memSafeReadWriteNumOfTries (3) attempts, each attempt one raw Init -> exactly 9 raw Inits, then Err."""
+    flash.fail_at(flash.INIT, flash.ALWAYS)
+    ctx = make_store()
+    assert flash.group_init(ctx) == flash.ERR
+    assert flash.count(flash.INIT) == 9
+    assert flash.count(flash.READ) == 0 and flash.count(flash.WRITE) == 0

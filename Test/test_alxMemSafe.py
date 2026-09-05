@@ -82,9 +82,25 @@ def test_ALX1513_P8_write_order_is_copy_a_then_copy_b(flash, make_store):
 
 
 def test_ALX1513_P8_raw_layer_gets_the_configured_tries_and_timeout(flash, make_store):
+    """Both copy writes and every read carry the SAME (numOfTries, timeout_ms) and nothing else - the fake
+    compares every call with the first one (an argument swap in one of the three Write calls survived the
+    05.09 mutation run because only the last call was inspected)."""
     ctx = make_store(raw_tries=7)
     assert flash.write(ctx, V1) == flash.OK
     assert flash.last_raw_args() == (7, 100)
+    assert flash.read(ctx)[0] == flash.BOTH_OK_SAME_USE_A
+    assert flash.args_mismatch() == 0, "a raw call got other tries/timeout than the configured ones"
+    assert flash.not_init_calls() == 0, "a raw Read/Write was issued without a successful Init"
+
+
+@pytest.mark.parametrize("case", ["diff", "b-bad", "a-bad"])
+def test_ALX1513_P8_repair_write_carries_the_configured_tries_and_timeout(flash, make_store, case):
+    ctx = make_store(raw_tries=7)
+    _repair_case(flash, ctx, case)
+    status, data = flash.read(ctx)
+    assert status == getattr(flash, REPAIR_EXPECT[case][0]) and data == V1
+    assert flash.args_mismatch() == 0, "the repair write got other tries/timeout than the configured ones"
+    assert flash.not_init_calls() == 0
 
 
 def test_ALX1513_P8_reboot_reads_what_was_written(flash, make_store):
@@ -93,6 +109,13 @@ def test_ALX1513_P8_reboot_reads_what_was_written(flash, make_store):
     boot2 = make_store()                      # new object over the same flash = reboot
     status, data = flash.read(boot2)
     assert status == flash.BOTH_OK_SAME_USE_A and data == V3
+
+
+def test_ALX1513_P8_all_flags_are_false_right_after_ctor(flash, make_store):
+    """The helper poisons the struct with 0xFF before the Ctor: every flag must be cleared by the Ctor itself
+    (a removed initialisation survived the 05.09 mutation run because the flags were only read after an op)."""
+    ctx = make_store()
+    assert flash.flags(ctx) == {"read_done": False, "read_err": False, "write_done": False, "write_err": False}
 
 
 # =====================================================================
@@ -320,9 +343,12 @@ def test_ALX1513_P8_read_retries_a_failure_at_every_raw_call_site(flash, make_st
     ctx = make_store(tries=3)
     assert flash.write(ctx, V1) == flash.OK
     k = getattr(flash, kind)
+    inits = flash.count(flash.INIT)
     flash.fail_at(k, flash.count(k) + nth)
     status, data = flash.read(ctx)
     assert status == flash.BOTH_OK_SAME_USE_A and data == V1
+    assert flash.count(flash.INIT) >= inits + 3, "a failed raw call must restart the read (2 Inits per attempt)"
+    assert flash.not_init_calls() == 0, "no Read/Write may be issued after a failed Init"
 
 
 @pytest.mark.parametrize("kind,nth", [("INIT", 2), ("WRITE", 2), ("DEINIT", 1), ("DEINIT", 2)],
@@ -333,6 +359,8 @@ def test_ALX1513_P8_write_retries_a_failure_at_every_raw_call_site(flash, make_s
     flash.fail_at(k, nth)
     assert flash.write(ctx, V2) == flash.OK
     assert flash.peek(A, REC) == blob(V2) and flash.peek(B, REC) == blob(V2)
+    assert flash.count(flash.INIT) >= 3, "a failed raw call must restart the pair (2 Inits per attempt)"
+    assert flash.not_init_calls() == 0, "no Read/Write may be issued after a failed Init"
 
 
 def _repair_case(flash, ctx, case: str):
