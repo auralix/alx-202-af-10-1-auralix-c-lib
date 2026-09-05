@@ -165,3 +165,26 @@ def test_ALX1513_P11_property_random_sets_survive_reboots(flash, make_store):
             flash.store_handle(ctx, 3)
         assert flash.items(ctx) == expected, f"step {step}"
     assert flash.peek(A, REC) == blob(expected) and flash.peek(B, REC) == blob(expected)
+
+
+# =====================================================================
+# P11 - a store whose Init failed is inert (finding 6: the product now continues instead of asserting)
+# =====================================================================
+
+def test_ALX1513_P11_store_after_failed_init_is_inert_under_handle(flash, make_store):
+    """The raw layer never initialises: Init returns Err, the items keep their factory defaults, and the store
+    never leaves its Init state - twenty Handle passes and a set-param later nothing was written and nothing
+    asserted. This is what the device does since fw 11d19ba instead of resetting in a loop.
+    CHARACTERIZATION: IsErr() stays FALSE in this case (the store reports Err only for a failed write; a failed
+    group init just blocks the Init -> Checking transition) - callers must use the Init return value."""
+    flash.fail_at(flash.INIT, flash.ALWAYS)
+    ctx = make_store()
+    assert flash.store_init(ctx) == flash.ERR
+    assert flash.items(ctx) == DEFAULTS
+    flash.store_handle(ctx, 20)
+    assert flash.store_err(ctx) is False, "characterization: a failed init is not reported through IsErr"
+    assert flash.item_set(ctx, 2, 77) == flash.OK, "the RAM value still changes (volatile operation)"
+    flash.store_handle(ctx, 20)
+    assert flash.items(ctx)[2] == 77
+    assert flash.count(flash.WRITE) == 0 and flash.count(flash.READ) == 0
+    assert flash.peek(A, REC) == bytes([0xFF] * REC) and flash.peek(B, REC) == bytes([0xFF] * REC)
