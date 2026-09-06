@@ -98,7 +98,7 @@
 	- `Test/build/cov/coverage_report.txt` + `html/index.html`
 	- `Test/build/cov/lcov.info` -> `coverage_c.xml` (cobertura)
 	- `Test/build/cov/summary.json` (gate input)
-	- `Test/build/cov/<group>/` (further test groups, same files) -> `Test/build/cov/memsafe/`
+	- `Test/build/cov/<group>/` (further test groups, same set of files)
 
 ## MUTATE
 - **Tools**
@@ -134,6 +134,8 @@
 	- `Test/test_<subsystem>.py`
 	- `Test/RunHil.ps1`
 	- `Test/<step>.jlink` -> `Test/flash.jlink`
+	- `Test/<instrument>.py` (bench instrument driver) -> `Test/owon_p4603.py`
+	- `Test/<observer>.py` (firmware RAM view over the debug probe) -> `Test/dut_ram.py`
 - **Files - Generated** (device repo)
 	- `Test/build/runs/<timestamp>/`
 
@@ -170,18 +172,17 @@ Tool paths resolve in `ToolPaths.ps1`; override via `ALX_LLVM_DIR` / `ALX_ARMGCC
 - pytest + ctypes over a per-module DLL built from the real sources.
 - Dev DLL: clang `-std=gnu99 -O0 -g -Werror` + warning set below (= target dialect).
   Instrumented variants (sanitizer/coverage): clang-cl inside vcvars, same dialect.
-- One suite serves every variant: the `ALX_FIFO_TEST_DLL` env override (conftest fixture)
-  points pytest at an instrumented DLL.
+- One suite serves every variant: the `ALX_<GROUP>_TEST_DLL` env override (conftest fixture) points pytest
+  at an instrumented DLL -> `ALX_FIFO_TEST_DLL`.
 - Coverage: clang `-fprofile-instr-generate -fcoverage-mapping` + llvm-cov;
   gate = 100 % lines/branches/regions/functions on gated files (`coverage_gate.py`).
   A gated file with assert-guarded unreachable code is gated on functions only
   (`coverage_gate.py --metrics functions`); lines/branches are reported.
 - Sanitizers: native ASan+UBSan smoke exe + one UBSan DLL per test group under its suite.
   UBSAN_OPTIONS: keep `log_path` relative - a drive-letter colon splits the option list.
-- Mutation (report-only): universalmutator mutants of a source (`-Sources alx<Module>.c`, the DLL of its
-  test group is rebuilt per mutant), each planted,
-  rebuilt, suite re-run (`RunMutation.ps1`/`mutation_run.py`). Survivors ->
-  `build/mutation/survivors/*.diff`; a real hole gets a killing test (P-group
+- Mutation (report-only): universalmutator mutants of a source (`-Sources alx<Module>.c`); each mutant is
+  planted, the DLL of its test group rebuilt, the suite re-run (`RunMutation.ps1` / `mutation_run.py`).
+  Survivors -> `build/mutation/survivors/*.diff`; a real hole gets a killing test (P-group
   "mutation-driven hardening"), an equivalent mutant gets a note. 100 % is not the target.
 - `build/` layout: root = dev lane; one subfolder per variant (`asan/`, `ubsan/`, `cov/`, `analysis/`, `mutation/`).
 - Evidence per run: `build/pytest_report.xml` (junit), `build/pytest_report.html`.
@@ -210,7 +211,7 @@ alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar),
 ```
 
 Test groups (one DLL each) are declared in `conftest.py`: strict sources (warning set, -Werror) + closure
-sources (-w) + fakes, and one `ALX_<GROUP>_TEST_DLL` override each -> `ALX_FIFO_TEST_DLL`.
+sources (-w) + fakes.
 
 ## Conventions
 
@@ -222,7 +223,11 @@ sources (-w) + fakes, and one `ALX_<GROUP>_TEST_DLL` override each -> `ALX_FIFO_
   forgotten flag init - mutation finding ALX-1514).
 - Property tests compare against a Python reference model, fixed seeds.
 - Test commit precedes implementation commit and is demonstrated failing first.
-- One DLL per module/test-group.
+- A known defect is sealed as `xfail(strict=True)` with the finding as the reason; it XPASSes when fixed
+  and the marker is removed in the green commit. `xfail(strict=False)` only for a documented flaky
+  product behaviour, never to hide a red test.
+- CHARACTERIZATION tests (docstring prefix) pin behaviour that is not a requirement, so a change is noticed.
+- Metric tests record numbers (junit properties, run log) and assert only a sanity bound.
 - Library sources are pure ASCII (gated: `ascii_gate.py`, Stage 0 of RunStaticAnalysis).
 - No ternary operator in gated sources - write if/else (gated: `style_gate.py`, Stage 0).
 - Doxygen tag lines: tabs-only field separators; name and description columns each
