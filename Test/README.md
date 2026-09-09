@@ -68,7 +68,7 @@ A missing tool fails its lane, never skips it.
 
 #### TEST - HOST
 - **Tools**
-	- python >= 3.10
+	- python >= 3.11
 	- pytest + plugins: pytest-html, pytest-timeout, pytest-randomly
 	- ctypes
 	- uv (`Test/.venv` = the locked environment of the dev loop and of every lane)
