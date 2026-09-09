@@ -24,14 +24,14 @@ A missing tool fails its lane, never skips it.
 ## Layout
 
 - `Test/` = the suite: tests, `conftest.py`, C helpers and fakes, the DLL export files.
-- `Test/Verify/` = the lane side, and only what is THIS repository's: `toolchain.py` (where the tools are, the
-  vcvars environment) and `mutation_hooks.py`. A gate every C repository would need identically is not here; it is
-  in the Python lib and called as a command.
+- `Test/Verify/` = the lane side, and only what is THIS repository's: `mutation_hooks.py`. What every C repository
+  would need identically is not here; it is in the Python lib - the gates as commands
+  (`python -m alx.verify.<gate>`) and the host toolchain and DLL build mechanics (`alx.c_lib.host_build`).
 - `Test/noxfile.py` = the lane runner: one nox session per pipeline stage, named after it, running in `Test/.venv`
   (`uv run nox`). The generic gates (`python -m alx.verify.<gate>`) and the lane vocabulary (`alx.verify.lanes`:
   stage names, evidence folders, tool locations) come from the Auralix Python lib, pinned by tag in `pyproject.toml`.
 - Tool locations are machine configuration: `ALX_LLVM_DIR` / `ALX_ARMGCC` / `ALX_CPPCHECK` override the
-  reference-bench defaults in `Verify/toolchain.py`.
+  reference-bench defaults that `alx.c_lib.host_build.Toolchain` carries.
 - `build/` = evidence: root = dev lane (`pytest_report.xml`, `pytest_report.html`, the dev DLLs); one subfolder per
   lane, named after the stage (`analyze/`, `sanitize/asan/`, `sanitize/ubsan/`, `coverage/`, `mutate/`).
 - Naming across the Auralix repositories: folders follow the repository's convention (`Test/`, `Test/Verify/` here;
@@ -102,7 +102,7 @@ A missing tool fails its lane, never skips it.
 	- `.clang-tidy`
 - **Files - Code**
 	- `Test/noxfile.py` -> `analyze`
-	- `Test/Verify/toolchain.py` (tool locations, vcvars environment)
+	- `alx.c_lib.host_build.Toolchain` (Python lib: tool locations from the `ALX_*` variables, vcvars environment)
 - **Files - Generated**
 	- `Test/build/analyze/ascii_gate.txt`
 	- `Test/build/analyze/readme_gate.txt`

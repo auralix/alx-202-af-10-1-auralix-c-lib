@@ -10,10 +10,11 @@ Run from Test/ inside its uv environment (`uv sync --locked` once):
 
 One nox session per stage, named after it, running in Test/.venv (no second environment per lane), the
 same shape as the Auralix Python lib's noxfile and the device repos'. Evidence under build/<stage>/; the
-dev lane (pytest) writes to build/ itself. What is C lives here and in Verify/ (toolchain.py = where the
-tools are, mutation_hooks.py); everything a second C repository would need identically comes from the
-Python lib: the generic gates (alx.verify.ascii_gate / readme_gate / c_style / coverage_gate / mutation)
-and the lane vocabulary (alx.verify.lanes).
+dev lane (pytest) writes to build/ itself. What lives here is what is THIS repository's: the source lists,
+the defines, the .def files, the mutation hooks. Everything a second C repository would need identically
+comes from the Python lib: the generic gates (alx.verify.ascii_gate / readme_gate / c_style /
+coverage_gate / mutation), the lane vocabulary (alx.verify.lanes) and the host toolchain and DLL build
+mechanics (alx.c_lib.host_build).
 """
 
 import argparse
@@ -24,14 +25,14 @@ from pathlib import Path
 
 import nox
 
+from alx.c_lib import host_build as hb
 from alx.verify import lanes
 
 TEST = Path(__file__).resolve().parent
 CLIB = TEST.parent
 BUILD = TEST / "build"
 PYTHON = sys.executable
-sys.path.insert(0, str(TEST / "Verify"))
-import toolchain as tc  # noqa: E402
+tc = hb.Toolchain()   # where the tools are on THIS machine (ALX_* variables), and the vcvars environment
 
 nox.options.default_venv_backend = "none"
 nox.options.sessions = list(lanes.DEFAULT_SESSIONS)
@@ -72,9 +73,9 @@ MS_STRICT = [CLIB / "alxMemSafe.c", CLIB / "alxCrc.c", CLIB / "alxBound.c", TEST
 MS_DEF = TEST / "alxMemSafeTest.def"
 MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "test_alxParamStore.py"]
 
-UBSAN = ["-fsanitize=undefined", "-fno-sanitize-recover=undefined"]
-ASAN_UBSAN = ["-fsanitize=address,undefined", "-fno-sanitize-recover=undefined"]
-PROFILE = ["-fprofile-instr-generate", "-fcoverage-mapping"]
+UBSAN = list(hb.UBSAN)                 # the instrumented variants are the library's flag sets: one
+ASAN_UBSAN = list(hb.ASAN_UBSAN)       # definition for every C repository, not a copy per noxfile
+PROFILE = list(hb.PROFILE)
 
 
 # ---- helpers (the lane vocabulary itself is alx.verify.lanes) ----------------------------------------------
@@ -90,10 +91,10 @@ def _fresh_dev_build(session: nox.Session) -> None:
 def _clang_cl(session: nox.Session, *args, cwd: Path = None) -> None:
     """clang-cl inside the vcvars environment; cwd = where the objects of a /c compile land."""
     if cwd is None:
-        session.run(str(tc.clang_cl()), *args, env=tc.vcvars_env(), external=True)
+        session.run(str(tc.compiler(hb.MSVC)), *args, env=tc.environment(), external=True)
     else:
         with session.chdir(cwd):
-            session.run(str(tc.clang_cl()), *args, env=tc.vcvars_env(), external=True)
+            session.run(str(tc.compiler(hb.MSVC)), *args, env=tc.environment(), external=True)
 
 
 def _closure_objects(session: nox.Session, out_dir: Path, sources, defines, flags) -> list:
@@ -144,7 +145,7 @@ def analyze(session: nox.Session) -> None:
     session.run(PYTHON, "-m", "alx.verify.readme_gate", str(CLIB), *VENDOR, "--out", str(out / "readme_gate.txt"))
     session.run(PYTHON, "-m", "alx.verify.c_style", *_strs(STYLE_FILES), "--out", str(out / "c_style.txt"))
     session.log("Stage 1: clang-tidy")
-    session.run(str(tc.clang_tidy()), "--quiet", "-p", str(BUILD), *_strs(ANALYSIS_SOURCES), external=True,
+    session.run(str(tc.llvm("clang-tidy")), "--quiet", "-p", str(BUILD), *_strs(ANALYSIS_SOURCES), external=True,
                 stderr=subprocess.DEVNULL)
     session.log("Stage 2: cppcheck (unix32 = the Cortex-M widths, plain char UNSIGNED per AAPCS; win64 = the host)")
     common = ["--std=c99", "--inline-suppr", "--error-exitcode=1", "--quiet", "--suppress=missingIncludeSystem",
@@ -201,9 +202,9 @@ def _llvm_cov_group(session: nox.Session, out: Path, dll: Path, env_var: str, te
         old.unlink()
     _pytest(session, {env_var: str(dll), "LLVM_PROFILE_FILE": str(out / "%m-%p.profraw")}, *tests)
     profdata = out / "merged.profdata"
-    session.run(str(tc.llvm_profdata()), "merge", "-sparse", *_strs(out.glob("*.profraw")), "-o", str(profdata),
+    session.run(str(tc.llvm("llvm-profdata")), "merge", "-sparse", *_strs(out.glob("*.profraw")), "-o", str(profdata),
                 external=True)
-    cov = str(tc.llvm_cov())
+    cov = str(tc.llvm("llvm-cov"))
     report = session.run(cov, "report", str(dll), f"-instr-profile={profdata}", external=True, silent=True)
     _write(out / "coverage_report.txt", report)
     session.log(report)
