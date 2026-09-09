@@ -7,9 +7,10 @@
     python Verify/mutation_hooks.py rebuild                rebuilds every stale test DLL with conftest's -Werror
                                                             recipe; exit != 0 = KILLED_COMPILE
 
-RunMutation.ps1 hands these to the driver (alx.verify.mutation) as --check-cmd / --fingerprint-cmd /
---rebuild-cmd. The driver generates the mutants with universalmutator, plants them, runs the mirror test
-module, classifies, restores (with a crash-safe backup) and reports; only what is C lives here.
+The MUTATE lane (Test/noxfile.py, `uv run nox -s mutate`) hands these to the driver (alx.verify.mutation) as
+--check-cmd / --fingerprint-cmd / --rebuild-cmd. The driver generates the mutants with universalmutator, plants
+them, runs the mirror test module, classifies, restores (with a crash-safe backup) and reports; only what is C
+lives here.
 """
 
 import hashlib
@@ -24,7 +25,7 @@ import conftest  # noqa: E402  single source of truth for the compiler path and 
 
 FRONT = ["-w", "-std=gnu99", "-D_CRT_SECURE_NO_WARNINGS",
          f"-I{TEST_DIR}", f"-I{CLIB_DIR}", f"-I{CLIB_DIR / 'Mcu'}"]
-WORK = TEST_DIR / "build" / "mutation" / "_tce"   # fixed file names: the embedded source name must
+WORK = TEST_DIR / "build" / "mutate" / "_tce"     # fixed file names: the embedded source name must
                                                   # not fake a difference between two compiles
 
 

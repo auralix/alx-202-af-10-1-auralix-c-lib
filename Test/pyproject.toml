@@ -1,8 +1,9 @@
 # Auralix C Library - PC Unit Tests
-# Standard: uv-managed (uv sync --locked; the lane scripts and the dev loop use Test/.venv).
+# Standard: uv-managed (uv sync --locked -> Test/.venv, the environment of the dev loop and of every lane);
+# lanes = nox sessions named after the pipeline stages (Test/noxfile.py):  uv run nox -l
 # Without uv: any Python >= 3.10 with these dependencies installed runs the suite directly
 # (pip install "alx-202-2-af-1-auralix-py-lib @ git+https://github.com/auralix/alx-202-2-af-1-auralix-py-lib@v0.1.0"
-# pytest pytest-html pytest-timeout pytest-randomly lcov-cobertura codespell universalmutator):  python -m pytest
+# pytest pytest-html pytest-timeout pytest-randomly lcov-cobertura codespell universalmutator nox):  python -m pytest
 [project]
 name = "alx-c-lib-tests"
 version = "0.1.0"
@@ -17,6 +18,7 @@ dependencies = [
     "lcov-cobertura>=2",
     "codespell>=2",
     "universalmutator>=1.14",
+    "nox>=2024",                             # the lane runner (Test/noxfile.py, one session per stage)
 ]
 
 [tool.pytest.ini_options]
