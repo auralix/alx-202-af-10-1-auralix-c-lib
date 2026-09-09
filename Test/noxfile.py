@@ -22,6 +22,8 @@ from pathlib import Path
 
 import nox
 
+from alx.verify import lanes
+
 TEST = Path(__file__).resolve().parent
 CLIB = TEST.parent
 BUILD = TEST / "build"
@@ -30,7 +32,8 @@ sys.path.insert(0, str(TEST / "Verify"))
 import toolchain as tc  # noqa: E402
 
 nox.options.default_venv_backend = "none"
-nox.options.sessions = ["build", "test", "analyze", "sanitize", "coverage"]
+nox.options.sessions = list(lanes.DEFAULT_SESSIONS)
+VENDOR = ["--exclude", "Ext", "--exclude", "FatFs", "--exclude", "mcuboot", "--exclude", "Usbh"]   # third-party folders, not gated
 
 # ---- the module sets (extend per module; keep in sync with conftest's group declarations) -------------------
 ANALYSIS_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c",
@@ -72,14 +75,7 @@ ASAN_UBSAN = ["-fsanitize=address,undefined", "-fno-sanitize-recover=undefined"]
 PROFILE = ["-fprofile-instr-generate", "-fcoverage-mapping"]
 
 
-# ---- helpers (= alx.verify.lanes once the pin moves past v0.1.0) -------------------------------------------
-def evidence(lane: str, *parts: str) -> Path:
-    """build/<lane>/<parts...>, created."""
-    out = BUILD.joinpath(lane, *parts)
-    out.mkdir(parents=True, exist_ok=True)
-    return out
-
-
+# ---- helpers (the lane vocabulary itself is alx.verify.lanes) ----------------------------------------------
 def _strs(paths) -> list:
     return [str(p) for p in paths]
 
@@ -136,14 +132,14 @@ def test(session: nox.Session) -> None:
 
 @nox.session
 def analyze(session: nox.Session) -> None:
-    """ANALYZE: 0 codespell + ASCII + style gate, 1 clang-tidy, 2 cppcheck (unix32 + win64), 3 gcc -fanalyzer."""
-    out = evidence("analyze")
+    """ANALYZE: 0 codespell + ASCII + README + style gates, 1 clang-tidy, 2 cppcheck (unix32 + win64), 3 gcc -fanalyzer."""
+    out = lanes.evidence_dir(TEST, "analyze")
     if not (BUILD / "compile_commands.json").exists():
         _fresh_dev_build(session)
-    session.log("Stage 0: codespell, ASCII gate, style gate")
+    session.log("Stage 0: codespell, ASCII gate, README gate, style gate")
     session.run(PYTHON, "-m", "codespell_lib", *_strs(ANALYSIS_SOURCES))
-    session.run(PYTHON, "-m", "alx.verify.ascii_gate", str(CLIB), "--exclude", "Ext", "--exclude", "FatFs",
-                "--exclude", "mcuboot", "--exclude", "Usbh", "--out", str(out / "ascii_gate.txt"))
+    session.run(PYTHON, "-m", "alx.verify.ascii_gate", str(CLIB), *VENDOR, "--out", str(out / "ascii_gate.txt"))
+    session.run(PYTHON, "-m", "alx.verify.readme_gate", str(CLIB), *VENDOR, "--out", str(out / "readme_gate.txt"))
     session.run(PYTHON, str(TEST / "Verify" / "style_gate.py"), *_strs(STYLE_FILES))
     session.log("Stage 1: clang-tidy")
     session.run(str(tc.clang_tidy()), "--quiet", "-p", str(BUILD), *_strs(ANALYSIS_SOURCES), external=True,
@@ -176,7 +172,7 @@ def analyze(session: nox.Session) -> None:
 def sanitize(session: nox.Session) -> None:
     """SANITIZE: 1 native ASan+UBSan smoke exe (diagnostics), 2 UBSan DLL per test group under its suite."""
     _fresh_dev_build(session)
-    asan, ubsan = evidence("sanitize", "asan"), evidence("sanitize", "ubsan")
+    asan, ubsan = lanes.evidence_dir(TEST, "sanitize", "asan"), lanes.evidence_dir(TEST, "sanitize", "ubsan")
     session.log("Stage 1: native ASan+UBSan smoke exe")
     _clang_cl(session, *GNU99, *ASAN_UBSAN, "/Z7", "/MT", *CL_INCLUDES,
               str(CLIB / "alxFifo.c"), str(CLIB / "alxBound.c"), str(TEST / "alxFifoSanSmoke.c"),
@@ -226,13 +222,13 @@ def _llvm_cov_group(session: nox.Session, out: Path, dll: Path, env_var: str, te
 def coverage(session: nox.Session) -> None:
     """COVERAGE: clang-instrumented DLL per test group, the same suite, llvm-cov + cobertura, gate per file."""
     _fresh_dev_build(session)
-    out = evidence("coverage")
+    out = lanes.evidence_dir(TEST, "coverage")
     _dll(session, out / "alxFifoTest.dll", FIFO_SOURCES, FIFO_DEF, PROFILE)
     _llvm_cov_group(session, out, out / "alxFifoTest.dll", "ALX_FIFO_TEST_DLL", [],
                     "lines,branches,regions,functions", ["alxFifo.c", "alxBound.c"])
     # MemSafe group: gate = functions 100 %; lines/branches are REPORTED - alxMemSafe.c keeps three blocks unreachable
     # with asserts ON and alxCrc.c has `break` after `return` plus assert-guarded default branches (task notes).
-    ms = evidence("coverage", "memsafe")
+    ms = lanes.evidence_dir(TEST, "coverage", "memsafe")
     objs = _closure_objects(session, ms / "closure", MS_CLOSURE, MS_ASSERTS, PROFILE)
     _dll(session, ms / "alxMemSafeTest.dll", MS_STRICT, MS_DEF, PROFILE, ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
     _llvm_cov_group(session, ms, ms / "alxMemSafeTest.dll", "ALX_MEMSAFE_TEST_DLL", MS_TESTS,

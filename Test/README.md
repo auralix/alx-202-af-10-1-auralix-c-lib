@@ -27,8 +27,8 @@ A missing tool fails its lane, never skips it.
 - `Test/Verify/` = the lane side: `toolchain.py` (where the tools are, the vcvars environment), the C-specific
   `style_gate.py` and `mutation_hooks.py`.
 - `Test/noxfile.py` = the lane runner: one nox session per pipeline stage, named after it, running in `Test/.venv`
-  (`uv run nox`). The generic gates come from the Auralix Python lib (`python -m alx.verify.<gate>`), pinned by tag
-  in `pyproject.toml`.
+  (`uv run nox`). The generic gates (`python -m alx.verify.<gate>`) and the lane vocabulary (`alx.verify.lanes`:
+  stage names, evidence folders, tool locations) come from the Auralix Python lib, pinned by tag in `pyproject.toml`.
 - Tool locations are machine configuration: `ALX_LLVM_DIR` / `ALX_ARMGCC` / `ALX_CPPCHECK` override the
   reference-bench defaults in `Verify/toolchain.py`.
 - `build/` = evidence: root = dev lane (`pytest_report.xml`, `pytest_report.html`, the dev DLLs); one subfolder per
@@ -75,7 +75,7 @@ A missing tool fails its lane, never skips it.
 	- nox (the lane runner: one session per pipeline stage, `uv run nox -s <stage>`)
 	- Auralix Python lib `alx.verify.evidence` (pytest plugin: proof token and `req` marker -> junit properties)
 - **Files - Config**
-	- `Test/pyproject.toml` (dependency `alx-202-2-af-1-auralix-py-lib @ git+...@v0.1.0`)
+	- `Test/pyproject.toml` (dependency `alx-202-2-af-1-auralix-py-lib @ git+...@v0.2.0`)
 	- `Test/uv.lock`
 	- `Test/.python-version`
 - **Files - Code**
@@ -91,7 +91,7 @@ A missing tool fails its lane, never skips it.
 
 #### ANALYZE
 - **Tools**
-	- codespell + `alx.verify.ascii_gate` (Python lib, `--exclude` for the vendor folders) + style_gate.py -> Stage 0
+	- codespell + `alx.verify.ascii_gate` + `alx.verify.readme_gate` (Python lib, `--exclude` for the vendor folders) + style_gate.py -> Stage 0
 	- clang-tidy -> Stage 1
 	- cppcheck -> Stage 2
 		- `--platform=unix32 --funsigned-char` -> Cortex-M
@@ -105,6 +105,7 @@ A missing tool fails its lane, never skips it.
 	- `Test/Verify/style_gate.py`
 - **Files - Generated**
 	- `Test/build/analyze/ascii_gate.txt`
+	- `Test/build/analyze/readme_gate.txt`
 	- `Test/build/analyze/fanalyzer.txt`
 
 #### SANITIZE
@@ -240,6 +241,8 @@ sources (-w) + fakes.
 - Metric tests record numbers (junit properties, run log) and assert only a sanity bound.
 - The repository is pure ASCII outside the vendor folders (gated: `alx.verify.ascii_gate --exclude Ext
   --exclude FatFs --exclude mcuboot --exclude Usbh`, ANALYZE stage 0).
+- Markdown uses the heading levels `#` (title), `##` (chapter) and `####` (sub-chapter) only, ATX style, and no
+  horizontal rules - chapters separate the text (gated: `alx.verify.readme_gate`, same excludes, ANALYZE stage 0).
 - No ternary operator in gated sources - write if/else (gated: `style_gate.py`, ANALYZE stage 0).
 - Doxygen tag lines: tabs-only field separators; name and description columns each
   aligned within a block, tab stop 4 (gated: `style_gate.py`, ANALYZE stage 0).

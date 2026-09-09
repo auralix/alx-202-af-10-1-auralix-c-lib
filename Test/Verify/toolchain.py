@@ -3,8 +3,7 @@
 Tool locations are machine configuration, never repository content: an environment variable names the
 instance on this machine (ALX_LLVM_DIR, ALX_ARMGCC, ALX_CPPCHECK), this module carries the defaults of the
 reference bench. A lane that needs a tool fails when it is missing (FileNotFoundError naming the variable),
-it never skips. `tool()` mirrors alx.verify.lanes.tool of the Auralix Python lib and gives way to it when
-the pin moves past v0.1.0.
+it never skips. The lookup itself is `alx.verify.lanes.tool` of the Auralix Python lib.
 
 Windows today: clang-cl, llvm-cov, clang-tidy from ALX_LLVM_DIR; the MSVC headers and libraries reach
 clang-cl through the environment vcvars64.bat produces (`vcvars_env()`, captured once per run). Linux is
@@ -17,15 +16,9 @@ import sys
 from functools import lru_cache
 from pathlib import Path
 
+from alx.verify.lanes import tool   # the tool at the environment variable, else the default; missing = FileNotFoundError
+
 WINDOWS = sys.platform == "win32"
-
-
-def tool(env_var: str, default) -> Path:
-    """The tool at the environment variable `env_var`, else at `default`; missing = FileNotFoundError."""
-    path = Path(os.environ.get(env_var) or default)
-    if not path.exists():
-        raise FileNotFoundError(f"tool not found: {path} (install it or set {env_var})")
-    return path
 
 
 def llvm_dir() -> Path:
