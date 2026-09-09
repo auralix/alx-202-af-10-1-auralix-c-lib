@@ -7,10 +7,11 @@ handles from alxFifoTestHelpers.c and the public alxFifo.h API only.
 
 import ctypes
 import os
-import subprocess
 from pathlib import Path
 
 import pytest
+
+from alx.c_lib import host_build
 
 # proof token / req marker -> junit <property>, run_dir, git_head: the Auralix Python lib's evidence plugin
 pytest_plugins = ("alx.verify.evidence",)
@@ -124,142 +125,83 @@ MEMSAFE_DLL = BUILD_DIR / "alxMemSafeTest.dll"
 
 
 # ------------------------------------------------------------------ build ----
-def _find_vcvars() -> Path:
-    vswhere = Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")) / \
-        "Microsoft Visual Studio/Installer/vswhere.exe"
-    vs_path = subprocess.run(
-        [str(vswhere), "-latest", "-property", "installationPath"],
-        capture_output=True, text=True, check=True).stdout.strip()
-    vcvars = Path(vs_path) / "VC/Auxiliary/Build/vcvars64.bat"
-    if not vcvars.exists():
-        raise RuntimeError(f"vcvars64.bat not found under {vs_path}")
-    return vcvars
+# The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
+# environment, the rebuild-if-stale check, the compile database and the two DLL recipes. What stays
+# here is what is this repository's - the source lists, the defines and the .def files above.
+#
+# Driver GNU = clang with GNU-style flags, which is what the dev build has always used; the sanitizer
+# and coverage lanes use clang-cl on the same recipe (Test/noxfile.py). Dialect gnu99 = what the
+# target ships: never test a dialect you do not ship. -O0 -g for faithful debugging; clang's
+# diagnostics are front-end based, so the warning set is the same at any -O.
+TOOLCHAIN = host_build.Toolchain()
+INCLUDES = [TEST_DIR, CLIB_DIR, CLIB_DIR / "Mcu"]
+DEBUG_FLAGS = ["-O0", "-g"]
+STRICT_WARNINGS = [*host_build.WARNINGS, "-Werror"]   # blanket -Werror on the host lane
+DB_ARGUMENTS = ["clang", "-std=gnu99", "-O0", *host_build.WARNINGS, host_build.CRT_DEFINE,
+                *[f"-I{d}" for d in INCLUDES]]
+
+
+def clang() -> str:
+    """The dev build's compiler, for anything outside the fixtures that must compile the same way.
+
+    Verify/mutation_hooks.py syntax-checks and fingerprints mutants with it: the mutation lane must
+    ask the SAME compiler as the build, or a mutant that the build would reject is misfiled.
+    """
+    return str(TOOLCHAIN.compiler(host_build.GNU))
 
 
 def _needs_build(dll: Path, deps) -> bool:
-    if not dll.exists():
-        return True
-    dll_mtime = dll.stat().st_mtime
-    try:
-        return any(d.stat().st_mtime > dll_mtime for d in deps)
-    except FileNotFoundError:
-        return True  # missing dependency -> rebuild (and let the compiler complain)
-
-
-# Host module builds use clang in the TARGET dialect (-std=gnu99) - never test a
-# dialect you do not ship. -O0 -g for faithful debugging (clang diagnostics are
-# front-end based, near-identical at any -O). Blanket -Werror on the host lane.
-CLANG = r"C:/Program Files/LLVM/bin/clang.exe"
-HOST_WARN_FLAGS = [
-    "-Wall", "-Wextra",
-    "-Wshadow", "-Wstrict-prototypes", "-Wold-style-definition",
-    "-Wmissing-prototypes", "-Wmissing-declarations", "-Wmissing-variable-declarations",
-    "-Wredundant-decls", "-Wnested-externs", "-Wbad-function-cast",
-    "-Wcast-qual", "-Wwrite-strings", "-Wundef", "-Wvla", "-Walloca",
-    "-Wswitch-enum", "-Wswitch-default", "-Wenum-conversion",
-    "-Wformat=2", "-Wfloat-equal", "-Wdouble-promotion", "-Wimplicit-fallthrough",
-    "-Wnull-dereference", "-Wunused", "-Wunused-macros", "-Wno-unused-parameter",
-]
+    return host_build.needs_build(dll, deps)
 
 
 def _write_compile_db() -> None:
     """compile_commands.json for clang-tidy/clangd - same flags as the real build."""
-    import json
-    args_common = ["clang", "-std=gnu99", "-O0", *HOST_WARN_FLAGS,
-                   "-D_CRT_SECURE_NO_WARNINGS",
-                   f"-I{TEST_DIR}", f"-I{CLIB_DIR}", f"-I{CLIB_DIR / 'Mcu'}"]
-    db_sources = list(dict.fromkeys(FIFO_SOURCES + CLI_SOURCES_STRICT))
-    db = [{"directory": str(BUILD_DIR),
-           "arguments": [*args_common, "-c", str(src)],
-           "file": str(src)} for src in db_sources]
-    (BUILD_DIR / "compile_commands.json").write_text(json.dumps(db, indent=1))
+    host_build.write_compile_db(
+        BUILD_DIR / "compile_commands.json",
+        list(dict.fromkeys(FIFO_SOURCES + CLI_SOURCES_STRICT)),
+        DB_ARGUMENTS,
+        directory=BUILD_DIR,
+    )
+
+
+def _build_dll(strict, closure, defines, dll: Path, def_file: Path, obj_dir_name: str | None) -> None:
+    """One group's DLL: the library's recipe, this repository's lists.
+
+    With a closure it is the two-step build - the closure compiled with warnings off, then the
+    gated sources and those objects linked under the full set with -Werror. The defines reach both
+    steps: asserts are ON as the product ships them, and alxParamItem.c has side effects inside
+    ALX_PARAM_ITEM_ASSERT (sprintf of numeric values), so a closure built without them printed
+    numbers as EMPTY (found 03.09 by the P15 uint8 test).
+    """
+    BUILD_DIR.mkdir(exist_ok=True)
+    _write_compile_db()
+    host_build.build_dll(
+        TOOLCHAIN,
+        out=dll,
+        strict=strict,
+        closure=closure,
+        includes=INCLUDES,
+        defines=defines,
+        def_file=def_file,
+        flags=DEBUG_FLAGS,
+        warnings=STRICT_WARNINGS,
+        obj_dir=None if obj_dir_name is None else BUILD_DIR / obj_dir_name,
+        driver=host_build.GNU,
+    )
 
 
 def _build_fifo_dll() -> None:
-    BUILD_DIR.mkdir(exist_ok=True)
-    _write_compile_db()
-    vcvars = _find_vcvars()
-    sources = " ".join(f'"{s}"' for s in FIFO_SOURCES)
-    flags = " ".join(HOST_WARN_FLAGS)
-    cmd = (
-        f'"{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g {flags} -Werror '
-        f'-D_CRT_SECURE_NO_WARNINGS '
-        f'-I"{TEST_DIR}" -I"{CLIB_DIR}" -I"{CLIB_DIR / "Mcu"}" {sources} '
-        f'-shared -o "{FIFO_DLL}" -Wl,/DEF:"{TEST_DIR / "alxFifoTest.def"}"'
-    )
-    result = subprocess.run(f'cmd /s /c "{cmd}"', capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"DLL build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
+    _build_dll(FIFO_SOURCES, (), (), FIFO_DLL, TEST_DIR / "alxFifoTest.def", None)
 
 
 def _build_cli_dll() -> None:
-    """Two-step build: closure objects with -w, then strict sources + objects
-    linked into the CLI test DLL under the full -Werror warning set."""
-    BUILD_DIR.mkdir(exist_ok=True)
-    obj_dir = BUILD_DIR / "cliClosure"
-    obj_dir.mkdir(exist_ok=True)
-    _write_compile_db()
-    vcvars = _find_vcvars()
-    inc = f'-I"{TEST_DIR}" -I"{CLIB_DIR}" -I"{CLIB_DIR / "Mcu"}"'
-
-    closure = " ".join(f'"{s}"' for s in CLI_SOURCES_CLOSURE)
-    asserts = " ".join(CLI_ASSERT_DEFINES)
-    # asserts ON for the closure too - the product ships them on, and alxParamItem.c has
-    # side effects inside ALX_PARAM_ITEM_ASSERT (sprintf of numeric values): with asserts
-    # off, get-param printed numbers as EMPTY (found 03.09 by the P15 uint8 test)
-    cmd1 = (f'cd /d "{obj_dir}" && "{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g -w '
-            f'-D_CRT_SECURE_NO_WARNINGS {asserts} {inc} -c {closure}')
-    result = subprocess.run(f'cmd /s /c "{cmd1}"', capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"CLI closure build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
-
-    strict = " ".join(f'"{s}"' for s in CLI_SOURCES_STRICT)
-    objs = " ".join(f'"{o}"' for o in sorted(obj_dir.glob("*.o")))
-    flags = " ".join(HOST_WARN_FLAGS)
-    asserts = " ".join(CLI_ASSERT_DEFINES)
-    cmd2 = (
-        f'"{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g {flags} -Werror '
-        f'-D_CRT_SECURE_NO_WARNINGS {asserts} {inc} {strict} {objs} '
-        f'-shared -o "{CLI_DLL}" -Wl,/DEF:"{TEST_DIR / "alxCliTest.def"}"'
-    )
-    result = subprocess.run(f'cmd /s /c "{cmd2}"', capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"CLI DLL build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
-
-
-def _build_two_step_dll(strict, closure, assert_defines, dll: Path, def_file: Path, obj_dir_name: str) -> None:
-    """Generic two-step build (same recipe as the CLI DLL): closure objects with -w,
-    then strict sources + objects linked under the full -Werror warning set."""
-    BUILD_DIR.mkdir(exist_ok=True)
-    obj_dir = BUILD_DIR / obj_dir_name
-    obj_dir.mkdir(exist_ok=True)
-    _write_compile_db()
-    vcvars = _find_vcvars()
-    inc = f'-I"{TEST_DIR}" -I"{CLIB_DIR}" -I"{CLIB_DIR / "Mcu"}"'
-    asserts = " ".join(assert_defines)
-    closure_src = " ".join(f'"{s}"' for s in closure)
-    cmd1 = (f'cd /d "{obj_dir}" && "{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g -w '
-            f'-D_CRT_SECURE_NO_WARNINGS {asserts} {inc} -c {closure_src}')
-    result = subprocess.run(f'cmd /s /c "{cmd1}"', capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(f"{dll.name} closure build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
-    strict_src = " ".join(f'"{s}"' for s in strict)
-    objs = " ".join(f'"{o}"' for o in sorted(obj_dir.glob("*.o")))
-    flags = " ".join(HOST_WARN_FLAGS)
-    cmd2 = (f'"{vcvars}" && "{CLANG}" -std=gnu99 -O0 -g {flags} -Werror '
-            f'-D_CRT_SECURE_NO_WARNINGS {asserts} {inc} {strict_src} {objs} '
-            f'-shared -o "{dll}" -Wl,/DEF:"{def_file}"')
-    result = subprocess.run(f'cmd /s /c "{cmd2}"', capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(f"{dll.name} build failed (rc={result.returncode}):\n{result.stdout}\n{result.stderr}")
+    _build_dll(CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE, CLI_ASSERT_DEFINES,
+               CLI_DLL, TEST_DIR / "alxCliTest.def", "cliClosure")
 
 
 def _build_memsafe_dll() -> None:
-    _build_two_step_dll(MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE, MEMSAFE_ASSERT_DEFINES,
-                        MEMSAFE_DLL, TEST_DIR / "alxMemSafeTest.def", "memSafeClosure")
+    _build_dll(MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE, MEMSAFE_ASSERT_DEFINES,
+               MEMSAFE_DLL, TEST_DIR / "alxMemSafeTest.def", "memSafeClosure")
 
 
 # ---------------------------------------------------------------- ctypes -----

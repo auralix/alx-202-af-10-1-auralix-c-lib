@@ -30,7 +30,7 @@ WORK = TEST_DIR / "build" / "mutate" / "_tce"     # fixed file names: the embedd
 
 
 def _clang(*args, timeout=120):
-    return subprocess.run([conftest.CLANG, *FRONT, *args], capture_output=True, text=True, timeout=timeout)
+    return subprocess.run([conftest.clang(), *FRONT, *args], capture_output=True, text=True, timeout=timeout)
 
 
 def check(path: str) -> int:
