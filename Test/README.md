@@ -31,6 +31,7 @@
 	- `Test/alxConfig.h`
 - **Files - Code**
 	- `Test/conftest.py`
+	- `Test/noxfile.py` -> `build`
 - **Files - Generated**
 	- `Test/build/alx<Module>Test.dll` -> `Test/build/alxFifoTest.dll`
 
@@ -39,7 +40,8 @@
 	- python >= 3.10
 	- pytest + plugins: pytest-html, pytest-timeout, pytest-randomly
 	- ctypes
-	- uv (`Test/.venv` = the locked environment every lane script uses)
+	- uv (`Test/.venv` = the locked environment of the dev loop and of every lane)
+	- nox (the lane runner: one session per pipeline stage, `uv run nox -s <stage>`)
 	- Auralix Python lib `alx.verify.evidence` (pytest plugin: proof token and `req` marker -> junit properties)
 - **Files - Config**
 	- `Test/pyproject.toml` (dependency `alx-202-2-af-1-auralix-py-lib @ git+...@v0.1.0`)
@@ -47,6 +49,7 @@
 	- `Test/.python-version`
 - **Files - Code**
 	- `Test/conftest.py`
+	- `Test/noxfile.py` -> `test`
 	- `Test/test_alx<Module>.py` -> `Test/test_alxFifo.py`
 	- `Test/alx<Module>TestHelpers.c` -> `Test/alxFifoTestHelpers.c`
 	- `Test/alx<Module>Test.def` -> `Test/alxFifoTest.def`
@@ -66,24 +69,24 @@
 - **Files - Config**
 	- `.clang-tidy`
 - **Files - Code**
-	- `Test/Verify/RunStaticAnalysis.ps1`
-	- `Test/Verify/ToolPaths.ps1`
+	- `Test/noxfile.py` -> `analyze`
+	- `Test/Verify/toolchain.py` (tool locations, vcvars environment)
 	- `Test/Verify/style_gate.py`
 - **Files - Generated**
-	- `Test/build/analysis/ascii_gate.txt`
-	- `Test/build/analysis/fanalyzer.txt`
+	- `Test/build/analyze/ascii_gate.txt`
+	- `Test/build/analyze/fanalyzer.txt`
 
 ## SANITIZE
 - **Tools**
 	- clang-cl ASan + UBSan `-fsanitize=address,undefined` -> Stage 1 = `alx<Module>SanSmoke.exe` -> `alxFifoSanSmoke.exe`
 	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alx<Module>Test.dll` & pytest `test_alx<Module>.py`, one stage per test group (asserts ON, as shipped) -> `alxFifoTest.dll` & `test_alxFifo.py`
 - **Files - Code**
-	- `Test/Verify/RunSanitizers.ps1`
+	- `Test/noxfile.py` -> `sanitize`
 	- `Test/alx<Module>SanSmoke.c` -> `Test/alxFifoSanSmoke.c`
 - **Files - Generated**
-	- `Test/build/asan/alx<Module>SanSmoke.exe` -> `Test/build/asan/alxFifoSanSmoke.exe`
-	- `Test/build/asan/clang_rt.asan_dynamic-x86_64.dll`
-	- `Test/build/ubsan/alx<Module>Test.dll` -> `Test/build/ubsan/alxFifoTest.dll`
+	- `Test/build/sanitize/asan/alx<Module>SanSmoke.exe` -> `Test/build/sanitize/asan/alxFifoSanSmoke.exe`
+	- `Test/build/sanitize/asan/clang_rt.asan_dynamic-x86_64.dll`
+	- `Test/build/sanitize/ubsan/alx<Module>Test.dll` -> `Test/build/sanitize/ubsan/alxFifoTest.dll`
 
 ## COVERAGE
 - **Tools**
@@ -92,14 +95,14 @@
 	- lcov-cobertura
 	- `alx.verify.coverage_gate` (Python lib; gate over llvm-cov's summary.json, `--metrics`)
 - **Files - Code**
-	- `Test/Verify/RunCoverage.ps1`
+	- `Test/noxfile.py` -> `coverage`
 - **Files - Generated**
-	- `Test/build/cov/alx<Module>Test.dll` -> `Test/build/cov/alxFifoTest.dll`
-	- `Test/build/cov/*.profraw` -> `merged.profdata`
-	- `Test/build/cov/coverage_report.txt` + `html/index.html`
-	- `Test/build/cov/lcov.info` -> `coverage_c.xml` (cobertura)
-	- `Test/build/cov/summary.json` (gate input), `coverage_gate.txt` (gate report)
-	- `Test/build/cov/<group>/` (further test groups, same set of files)
+	- `Test/build/coverage/alx<Module>Test.dll` -> `Test/build/coverage/alxFifoTest.dll`
+	- `Test/build/coverage/*.profraw` -> `merged.profdata`
+	- `Test/build/coverage/coverage_report.txt` + `html/index.html`
+	- `Test/build/coverage/lcov.info` -> `coverage_c.xml` (cobertura)
+	- `Test/build/coverage/summary.json` (gate input), `coverage_gate.txt` (gate report)
+	- `Test/build/coverage/<group>/` (further test groups, same set of files)
 
 ## MUTATE
 - **Tools**
@@ -107,13 +110,13 @@
 	- universalmutator (mutant generation)
 	- clang `-fsyntax-only` + TCE object-compare (the C hooks: check, fingerprint) + conftest's `-Werror` DLL rebuild (hook: rebuild)
 - **Files - Code**
-	- `Test/Verify/RunMutation.ps1`
+	- `Test/noxfile.py` -> `mutate`
 	- `Test/Verify/mutation_hooks.py`
 - **Files - Generated**
-	- `Test/build/mutation/mutants/<module>/`
-	- `Test/build/mutation/survivors/*.diff`
-	- `Test/build/mutation/report.txt`, `results.json`
-	- `Test/build/mutation/backup/` (the planted source, until restored)
+	- `Test/build/mutate/mutants/<module>/`
+	- `Test/build/mutate/survivors/*.diff`
+	- `Test/build/mutate/report.txt`, `results.json`
+	- `Test/build/mutate/backup/` (the planted source, until restored)
 
 ## BUILD - TARGET
 - **Tools**
@@ -131,14 +134,14 @@
 	- pytest = bench orchestrator
 	- instrument drivers per bus (Python libs: serial, CAN, Ethernet, Modbus/PLC, SCPI/VISA, GPIO/relay, debug probe, ...)
 - **Files - Config** (device repo)
-	- `Test/pyproject.toml`
+	- `Test/pyproject.toml` + `Test/uv.lock` (uv project; the Python lib from the `Sub/` gitlink as an editable path source)
 - **Files - Code** (device repo)
-	- `Test/conftest.py`
+	- `Test/conftest.py` (bench roles; product values: MCU, memory map, supply policy)
 	- `Test/test_<subsystem>.py`
-	- `Test/RunHil.ps1`
-	- `Test/<step>.jlink` -> `Test/flash.jlink`
-	- `Test/<instrument>.py` (bench instrument driver) -> `Test/owon_p4603.py`
-	- `Test/<observer>.py` (firmware RAM view over the debug probe) -> `Test/dut_ram.py`
+	- `Test/noxfile.py` -> `hil` (BUILD - TARGET, FLASH, TEST - TARGET in one session)
+	- `Test/flash.py` (FLASH through the Python lib's debug probe)
+	- `Test/<product table>.py` (firmware variables watched over the debug probe, mechanism `alx.fw.live_watch`) -> `Test/dut_watch.py`
+	- instrument drivers and probe adapters come from the Python lib (`alx.psu`, `alx.debug_probe`), never from the device repo
 - **Files - Generated** (device repo)
 	- `Test/build/runs/<timestamp>/`
 
@@ -159,20 +162,28 @@ Tier 2 = modules with hardware-shaped extern dependencies, tested via link-time 
 
 ```
 cd Test
-uv sync --locked                                                                 # once: Test/.venv with every tool
-python -m pytest                                                                 # dev loop (Test/.venv active, or uv run pytest)
-powershell -NoProfile -ExecutionPolicy Bypass -File Verify\RunCoverage.ps1       # coverage + gate
-powershell -NoProfile -ExecutionPolicy Bypass -File Verify\RunSanitizers.ps1     # ASan + UBSan
-powershell -NoProfile -ExecutionPolicy Bypass -File Verify\RunStaticAnalysis.ps1 # Stages 0-3
-powershell -NoProfile -ExecutionPolicy Bypass -File Verify\RunMutation.ps1       # mutation (report-only)
+uv sync --locked                               # once: Test/.venv with every tool; the lanes run in it
+python -m pytest                               # dev loop (Test/.venv active, or uv run pytest)
+uv run nox -l                                  # the lanes = the pipeline stages
+uv run nox                                     # build, test, analyze, sanitize, coverage
+uv run nox -s coverage                         # one lane
+uv run nox -s mutate -- --sample 5 alxFifo.c   # mutation (report-only); --sample 0 = every mutant
 ```
 
-`Test/` = the suite (tests, conftest, C helpers and fakes); `Test/Verify/` = the lane side (the `Run*.ps1`
-runners, `ToolPaths.ps1`, the C-specific `style_gate.py` and `mutation_hooks.py`). The generic gates come
-from the Auralix Python lib (`python -m alx.verify.<gate>`), pinned by tag in `pyproject.toml`; the lane
-scripts run the python of `Test/.venv` when it exists, else the PATH python (`ToolPaths.ps1`).
-Tool paths resolve in `Verify/ToolPaths.ps1`; override via `ALX_LLVM_DIR` / `ALX_ARMGCC` /
-`ALX_CPPCHECK`. A missing tool fails its gate, never skips it.
+`Test/` = the suite (tests, conftest, C helpers and fakes); `Test/Verify/` = the lane side (`toolchain.py` =
+where the tools are and the vcvars environment; the C-specific `style_gate.py` and `mutation_hooks.py`);
+`Test/noxfile.py` = the lane runner: one nox session per pipeline stage, named after it, running in
+`Test/.venv` (`uv run nox`). The generic gates come from the Auralix Python lib (`python -m alx.verify.<gate>`),
+pinned by tag in `pyproject.toml`. Tool locations are machine configuration: `ALX_LLVM_DIR` / `ALX_ARMGCC` /
+`ALX_CPPCHECK` override the reference-bench defaults in `Verify/toolchain.py`. A missing tool fails its
+lane, never skips it.
+
+Naming across the Auralix repositories: folders follow the repository's convention (`Test/`, `Test/Verify/`
+here; `tests/`, `alx/verify/` in the Python lib; `Tests/`, `Tests/Verify/` in the C# lib); files follow the
+convention of their language wherever they live (Python snake_case, C `alx` + CamelCase, pytest
+`test_<module as spelled>.py`); the same WORD names the same role everywhere, only the casing changes. Lane
+names are the stage words (`build test analyze sanitize coverage mutate`) in every repository, and so are
+the evidence folders `build/<stage>/`.
 
 ## Stack
 
@@ -188,13 +199,14 @@ Tool paths resolve in `Verify/ToolPaths.ps1`; override via `ALX_LLVM_DIR` / `ALX
   A metric with nothing to cover counts as 100 % (llvm prints 0 %).
 - Sanitizers: native ASan+UBSan smoke exe + one UBSan DLL per test group under its suite.
   UBSAN_OPTIONS: keep `log_path` relative - a drive-letter colon splits the option list.
-- Mutation (report-only): `alx.verify.mutation` drives it (`Verify/RunMutation.ps1 -Sources alx<Module>.c`):
+- Mutation (report-only): `alx.verify.mutation` drives it (`uv run nox -s mutate -- alx<Module>.c`):
   universalmutator mutants of the source, `-fsyntax-only` check and object-code fingerprint (TCE) as the
   C hooks, each mutant planted, the stale test DLL rebuilt under `-Werror` (failure = KILLED_COMPILE), the
   source's MIRROR test module `test_alx<Module>.py` run (`-x`, fixed order), source restored (crash-safe
-  backup). Survivors -> `build/mutation/survivors/*.diff`; a real hole gets a killing test (P-group
+  backup). Survivors -> `build/mutate/survivors/*.diff`; a real hole gets a killing test (P-group
   "mutation-driven hardening"), an equivalent mutant gets a note. 100 % is not the target.
-- `build/` layout: root = dev lane; one subfolder per variant (`asan/`, `ubsan/`, `cov/`, `analysis/`, `mutation/`).
+- `build/` layout: root = dev lane; one subfolder per lane, named after the stage (`analyze/`, `sanitize/asan/`,
+  `sanitize/ubsan/`, `coverage/`, `mutate/`).
 - Evidence per run: `build/pytest_report.xml` (junit), `build/pytest_report.html`.
 
 ## Warning set
@@ -239,7 +251,7 @@ sources (-w) + fakes.
 - CHARACTERIZATION tests (docstring prefix) pin behaviour that is not a requirement, so a change is noticed.
 - Metric tests record numbers (junit properties, run log) and assert only a sanity bound.
 - The repository is pure ASCII outside the vendor folders (gated: `alx.verify.ascii_gate --exclude Ext
-  --exclude FatFs --exclude mcuboot --exclude Usbh`, Stage 0 of RunStaticAnalysis).
+  --exclude FatFs --exclude mcuboot --exclude Usbh`, ANALYZE stage 0).
 - No ternary operator in gated sources - write if/else (gated: `style_gate.py`, Stage 0).
 - Doxygen tag lines: tabs-only field separators; name and description columns each
   aligned within a block, tab stop 4 (gated: `style_gate.py`, Stage 0).
