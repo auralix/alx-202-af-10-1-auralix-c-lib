@@ -1,16 +1,17 @@
 # Auralix C Library - static analysis of the PC-tested module sources
 #
-#   Stage 0  codespell + ascii_gate.py + style_gate.py (spelling, pure-ASCII, no ternary, doxygen tab alignment)
+#   Stage 0  codespell + alx.verify.ascii_gate + style_gate.py (spelling, pure-ASCII, no ternary, doxygen tab alignment)
 #   Stage 1  clang-tidy    (.clang-tidy config, compile_commands.json from conftest)
 #   Stage 2  cppcheck      (the only tool exploring #ifdef combinations)
 #   Stage 3  gcc -fanalyzer (arm-gcc 15.2.Rel1, interprocedural path analysis)
 #
-# Exit != 0 on any finding. Usage:  powershell -File RunStaticAnalysis.ps1
+# Exit != 0 on any finding. Usage (from Test/):  powershell -File Verify\RunStaticAnalysis.ps1
 
 $ErrorActionPreference = "Stop"
-$test  = $PSScriptRoot
+$test  = Split-Path $PSScriptRoot -Parent   # Test/ (this script lives in Test/Verify/)
 $clib  = Split-Path $test
 $build = Join-Path $test "build"
+Set-Location $test
 . "$PSScriptRoot\ToolPaths.ps1"
 
 # module sources under analysis (extend per module)
@@ -20,16 +21,17 @@ $styleFiles = $sources + @("$clib\alxFifo.h", "$clib\alxBound.h")
 
 New-Item -ItemType Directory -Force "$build\analysis" | Out-Null
 if (-not (Test-Path "$build\compile_commands.json")) {
-    python -m pytest -q --collect-only | Out-Null   # triggers conftest build + compile DB
+    & $python -m pytest -q --collect-only | Out-Null   # triggers conftest build + compile DB
 }
 
 # --- Stage 0: codespell (spelling gate on the module set) ----------------------
-python -m codespell_lib @sources
+& $python -m codespell_lib @sources
 if ($LASTEXITCODE -ne 0) { throw "Stage 0 FAILED: codespell findings above" }
 Write-Host "Stage 0 (codespell): CLEAN"
-python "$test\ascii_gate.py" "$clib"
+# pure ASCII over the whole repository except the vendor folders (the gate lives in the Auralix Python lib)
+& $python -m alx.verify.ascii_gate "$clib" --exclude Ext --exclude FatFs --exclude mcuboot --exclude Usbh --out "$build\analysis\ascii_gate.txt"
 if ($LASTEXITCODE -ne 0) { throw "Stage 0 FAILED: non-ASCII bytes in library sources" }
-python "$test\style_gate.py" @styleFiles
+& $python "$PSScriptRoot\style_gate.py" @styleFiles
 if ($LASTEXITCODE -ne 0) { throw "Stage 0 FAILED: style gate findings above (no ternary; doxygen tab alignment)" }
 
 # --- Stage 1: clang-tidy -------------------------------------------------------

@@ -7,16 +7,18 @@
 #   build/cov/coverage_c.xml        - cobertura XML (CI: Codecov/GitLab/Sonar/PR rendering)
 #   build/cov/lcov.info             - lcov intermediate
 #
-# Requirements: LLVM (clang-cl, llvm-profdata, llvm-cov), VS2022 (vcvars), lcov-cobertura (pip).
-# Usage:  powershell -File RunCoverage.ps1
+# Requirements: LLVM (clang-cl, llvm-profdata, llvm-cov), VS2022 (vcvars), the Test/ environment (uv sync --locked:
+# lcov-cobertura + the Auralix Python lib for the gate).
+# Usage (from Test/):  powershell -File Verify\RunCoverage.ps1
 
 $ErrorActionPreference = "Stop"
-$test  = $PSScriptRoot
+$test  = Split-Path $PSScriptRoot -Parent   # Test/ (this script lives in Test/Verify/)
 $clib  = Split-Path $test
 $cov   = Join-Path $test "build\cov"
+Set-Location $test
 . "$PSScriptRoot\ToolPaths.ps1"
 
-python -m pytest -q --collect-only | Out-Null   # dev gate: -Werror build must be fresh
+& $python -m pytest -q --collect-only | Out-Null   # dev gate: -Werror build must be fresh
 if ($LASTEXITCODE -ne 0) { throw "dev-lane build/collect failed" }
 New-Item -ItemType Directory -Force $cov | Out-Null
 Remove-Item "$cov\*.profraw" -Force -ErrorAction SilentlyContinue
@@ -29,7 +31,7 @@ if ($LASTEXITCODE -ne 0) { throw "coverage DLL build failed" }
 $env:ALX_FIFO_TEST_DLL  = "$cov\alxFifoTest.dll"
 $env:LLVM_PROFILE_FILE  = "$cov\%m-%p.profraw"
 try {
-    python -m pytest -q
+    & $python -m pytest -q
     if ($LASTEXITCODE -ne 0) { throw "pytest failed (rc=$LASTEXITCODE) - coverage of a red suite is meaningless" }
 }
 finally {
@@ -40,13 +42,13 @@ finally {
 & "$llvm\llvm-profdata.exe" merge -sparse (Get-ChildItem "$cov\*.profraw").FullName -o "$cov\merged.profdata"
 & "$llvm\llvm-cov.exe" report "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" | Tee-Object "$cov\coverage_report.txt"
 & "$llvm\llvm-cov.exe" export "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" -format=lcov | Out-File -Encoding ascii "$cov\lcov.info"
-python -m lcov_cobertura "$cov\lcov.info" --output "$cov\coverage_c.xml" --base-dir "$clib"
+& $python -m lcov_cobertura "$cov\lcov.info" --output "$cov\coverage_c.xml" --base-dir "$clib"
 & "$llvm\llvm-cov.exe" show "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" -format=html -output-dir="$cov\html" -show-branches=count -show-line-counts
 Write-Host "`ncobertura: $cov\coverage_c.xml"
 
 # GATE: module under test must be 100% covered (a report alone is not a gate)
 & "$llvm\llvm-cov.exe" export "$cov\alxFifoTest.dll" -instr-profile="$cov\merged.profdata" -summary-only | Out-File -Encoding ascii "$cov\summary.json"
-python "$test\coverage_gate.py" "$cov\summary.json" alxFifo.c alxBound.c
+& $python -m alx.verify.coverage_gate "$cov\summary.json" --metrics lines,branches,regions,functions --out "$cov\coverage_gate.txt" alxFifo.c alxBound.c
 if ($LASTEXITCODE -ne 0) { throw "COVERAGE GATE FAILED - see above" }
 Write-Host "html:      $cov\html\index.html"
 
@@ -68,7 +70,7 @@ if ($LASTEXITCODE -ne 0) { throw "coverage MemSafe DLL build failed" }
 $env:ALX_MEMSAFE_TEST_DLL = "$ms\alxMemSafeTest.dll"
 $env:LLVM_PROFILE_FILE    = "$ms\%m-%p.profraw"
 try {
-    python -m pytest -q test_alxCrc.py test_alxMemSafe.py test_alxParamGroup.py test_alxParamStore.py
+    & $python -m pytest -q test_alxCrc.py test_alxMemSafe.py test_alxParamGroup.py test_alxParamStore.py
     if ($LASTEXITCODE -ne 0) { throw "MemSafe group pytest failed (rc=$LASTEXITCODE)" }
 }
 finally {
@@ -78,6 +80,6 @@ finally {
 & "$llvm\llvm-cov.exe" report "$ms\alxMemSafeTest.dll" -instr-profile="$ms\merged.profdata" | Tee-Object "$ms\coverage_report.txt"
 & "$llvm\llvm-cov.exe" show "$ms\alxMemSafeTest.dll" -instr-profile="$ms\merged.profdata" -format=html -output-dir="$ms\html" -show-branches=count -show-line-counts
 & "$llvm\llvm-cov.exe" export "$ms\alxMemSafeTest.dll" -instr-profile="$ms\merged.profdata" -summary-only | Out-File -Encoding ascii "$ms\summary.json"
-python "$test\coverage_gate.py" "$ms\summary.json" alxCrc.c alxMemSafe.c --metrics functions
+& $python -m alx.verify.coverage_gate "$ms\summary.json" --metrics functions --out "$ms\coverage_gate.txt" alxCrc.c alxMemSafe.c
 if ($LASTEXITCODE -ne 0) { throw "COVERAGE GATE (MemSafe group) FAILED - see above" }
 Write-Host "html:      $ms\html\index.html"

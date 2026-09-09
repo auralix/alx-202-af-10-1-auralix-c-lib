@@ -10,7 +10,7 @@ Two mechanical rules on the gated sources:
      column is identical across the block, and the description column is
      identical across the block (@brief's text counts as a description).
 
-Usage:  python style_gate.py <file> [<file> ...]     Exit 1 on any finding.
+Usage:  python Verify/style_gate.py <file> [<file> ...]     Exit 1 on any finding.
 """
 
 import re

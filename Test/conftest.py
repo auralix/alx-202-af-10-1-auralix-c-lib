@@ -7,11 +7,13 @@ handles from alxFifoTestHelpers.c and the public alxFifo.h API only.
 
 import ctypes
 import os
-import re
 import subprocess
 from pathlib import Path
 
 import pytest
+
+# proof token / req marker -> junit <property>, run_dir, git_head: the Auralix Python lib's evidence plugin
+pytest_plugins = ("alx.verify.evidence",)
 
 TEST_DIR = Path(__file__).parent
 CLIB_DIR = TEST_DIR.parent
@@ -342,23 +344,10 @@ class Lib:
 
 
 # ------------------------------------------------------- traceability ----
-# The proof token in a test's NAME (test_ALX1514_P4_...) is the primary
-# traceability link (spec PROOF row <-> test <-> commit, greppable).
-# This hook mirrors it into junit XML as <property name="proof" .../> so the
-# evidence artifact carries it in structured form too. Additional proofs from
-# LATER tasks attach via @pytest.mark.req("ALX-1620-P2") - the test name keeps
-# its ORIGINATING token forever (never rename on later modification).
-_PROOF_RE = re.compile(r"ALX(\d+)_P(\d+)")
-
-
-def pytest_collection_modifyitems(items):
-    for item in items:
-        m = _PROOF_RE.search(item.name)
-        if m:
-            item.user_properties.append(("proof", f"ALX-{m.group(1)}-P{m.group(2)}"))
-        for mark in item.iter_markers(name="req"):
-            for rid in mark.args:
-                item.user_properties.append(("req", rid))
+# The proof token in a test's NAME (test_ALX1514_P4_...) is the primary traceability link (spec PROOF
+# row <-> test <-> commit, greppable). alx.verify.evidence (pytest_plugins above) mirrors it into the
+# junit XML as <property name="proof"/> and every @pytest.mark.req("ALX-<key>-P<n>") as <property
+# name="req"/>; the test name keeps its ORIGINATING token forever (never rename on later modification).
 
 
 class BoundLib:

@@ -14,15 +14,16 @@
 #   NOT used: MSVC-ASan DLL under python - MEASURED as non-detecting for DLL-heap OOB on
 #   this toolset (VS 17.14), despite loading and running fine. Do not trust it blindly.
 #
-# Usage:  powershell -File RunSanitizers.ps1
+# Usage (from Test/):  powershell -File Verify\RunSanitizers.ps1
 
 $ErrorActionPreference = "Stop"
-$test   = $PSScriptRoot
+$test   = Split-Path $PSScriptRoot -Parent   # Test/ (this script lives in Test/Verify/)
 $clib   = Split-Path $test
 $build  = Join-Path $test "build"
+Set-Location $test
 . "$PSScriptRoot\ToolPaths.ps1"
 
-python -m pytest -q --collect-only | Out-Null   # dev gate: -Werror build must be fresh
+& $python -m pytest -q --collect-only | Out-Null   # dev gate: -Werror build must be fresh
 if ($LASTEXITCODE -ne 0) { throw "dev-lane build/collect failed" }
 # build/ layout rule: root = dev lane + shared artifacts; one subfolder per variant
 # (asan/ = Stage 1 exe, ubsan/ = Stage 2 DLL; cov/ and analysis/ follow the same rule)
@@ -42,7 +43,7 @@ cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99
 if ($LASTEXITCODE -ne 0) { throw "UBSan DLL build failed" }
 $env:ALX_FIFO_TEST_DLL = "$build\ubsan\alxFifoTest.dll"
 try {
-    python -m pytest -q
+    & $python -m pytest -q
     if ($LASTEXITCODE -ne 0) { throw "Stage 2 FAILED: suite red or process killed by UBSan (rc=$LASTEXITCODE) - rerun Stage 1 for the location" }
 }
 finally {
@@ -65,7 +66,7 @@ cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99
 if ($LASTEXITCODE -ne 0) { throw "UBSan CLI DLL build failed" }
 $env:ALX_CLI_TEST_DLL = "$build\ubsan\alxCliTest.dll"
 try {
-    python -m pytest -q test_alxCli.py
+    & $python -m pytest -q test_alxCli.py
     if ($LASTEXITCODE -ne 0) { throw "Stage 2b FAILED: CLI suite red or process killed by UBSan (rc=$LASTEXITCODE)" }
 }
 finally {
@@ -85,7 +86,7 @@ cmd /s /c """$vcvars"" >nul 2>&1 && ""$llvm\clang-cl.exe"" /LD /clang:-std=gnu99
 if ($LASTEXITCODE -ne 0) { throw "UBSan MemSafe DLL build failed" }
 $env:ALX_MEMSAFE_TEST_DLL = "$build\ubsan\alxMemSafeTest.dll"
 try {
-    python -m pytest -q test_alxCrc.py test_alxMemSafe.py test_alxParamGroup.py test_alxParamStore.py
+    & $python -m pytest -q test_alxCrc.py test_alxMemSafe.py test_alxParamGroup.py test_alxParamStore.py
     if ($LASTEXITCODE -ne 0) { throw "Stage 2c FAILED: MemSafe group suite red or process killed by UBSan (rc=$LASTEXITCODE)" }
 }
 finally {

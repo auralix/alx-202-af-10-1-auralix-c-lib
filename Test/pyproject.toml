@@ -1,13 +1,15 @@
 # Auralix C Library - PC Unit Tests
-# Target standard: uv-managed (uv sync --locked && uv run pytest).
-# uv is not yet installed on all workstations - until then, any Python >= 3.10
-# with pytest >= 8 runs the suite directly:  python -m pytest
+# Standard: uv-managed (uv sync --locked; the lane scripts and the dev loop use Test/.venv).
+# Without uv: any Python >= 3.10 with these dependencies installed runs the suite directly
+# (pip install "alx-202-2-af-1-auralix-py-lib @ git+https://github.com/auralix/alx-202-2-af-1-auralix-py-lib@v0.1.0"
+# pytest pytest-html pytest-timeout pytest-randomly lcov-cobertura codespell universalmutator):  python -m pytest
 [project]
 name = "alx-c-lib-tests"
 version = "0.1.0"
 description = "PC unit tests for Auralix C Library modules (pytest + ctypes over per-module DLLs)"
 requires-python = ">=3.10"
 dependencies = [
+    "alx-202-2-af-1-auralix-py-lib @ git+https://github.com/auralix/alx-202-2-af-1-auralix-py-lib@v0.1.0",
     "pytest>=8",
     "pytest-html>=4",
     "pytest-timeout>=2",
