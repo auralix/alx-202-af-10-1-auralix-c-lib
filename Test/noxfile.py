@@ -11,7 +11,9 @@ Run from Test/ inside its uv environment (`uv sync --locked` once):
 One nox session per stage, named after it, running in Test/.venv (no second environment per lane), the
 same shape as the Auralix Python lib's noxfile and the device repos'. Evidence under build/<stage>/; the
 dev lane (pytest) writes to build/ itself. What is C lives here and in Verify/ (toolchain.py = where the
-tools are, mutation_hooks.py, style_gate.py); the generic gates come from the Python lib (alx.verify.*).
+tools are, mutation_hooks.py); everything a second C repository would need identically comes from the
+Python lib: the generic gates (alx.verify.ascii_gate / readme_gate / c_style / coverage_gate / mutation)
+and the lane vocabulary (alx.verify.lanes).
 """
 
 import argparse
@@ -140,7 +142,7 @@ def analyze(session: nox.Session) -> None:
     session.run(PYTHON, "-m", "codespell_lib", *_strs(ANALYSIS_SOURCES))
     session.run(PYTHON, "-m", "alx.verify.ascii_gate", str(CLIB), *VENDOR, "--out", str(out / "ascii_gate.txt"))
     session.run(PYTHON, "-m", "alx.verify.readme_gate", str(CLIB), *VENDOR, "--out", str(out / "readme_gate.txt"))
-    session.run(PYTHON, str(TEST / "Verify" / "style_gate.py"), *_strs(STYLE_FILES))
+    session.run(PYTHON, "-m", "alx.verify.c_style", *_strs(STYLE_FILES), "--out", str(out / "c_style.txt"))
     session.log("Stage 1: clang-tidy")
     session.run(str(tc.clang_tidy()), "--quiet", "-p", str(BUILD), *_strs(ANALYSIS_SOURCES), external=True,
                 stderr=subprocess.DEVNULL)

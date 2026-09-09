@@ -24,8 +24,9 @@ A missing tool fails its lane, never skips it.
 ## Layout
 
 - `Test/` = the suite: tests, `conftest.py`, C helpers and fakes, the DLL export files.
-- `Test/Verify/` = the lane side: `toolchain.py` (where the tools are, the vcvars environment), the C-specific
-  `style_gate.py` and `mutation_hooks.py`.
+- `Test/Verify/` = the lane side, and only what is THIS repository's: `toolchain.py` (where the tools are, the
+  vcvars environment) and `mutation_hooks.py`. A gate every C repository would need identically is not here; it is
+  in the Python lib and called as a command.
 - `Test/noxfile.py` = the lane runner: one nox session per pipeline stage, named after it, running in `Test/.venv`
   (`uv run nox`). The generic gates (`python -m alx.verify.<gate>`) and the lane vocabulary (`alx.verify.lanes`:
   stage names, evidence folders, tool locations) come from the Auralix Python lib, pinned by tag in `pyproject.toml`.
@@ -91,7 +92,7 @@ A missing tool fails its lane, never skips it.
 
 #### ANALYZE
 - **Tools**
-	- codespell + `alx.verify.ascii_gate` + `alx.verify.readme_gate` (Python lib, `--exclude` for the vendor folders) + style_gate.py -> Stage 0
+	- codespell + `alx.verify.ascii_gate` + `alx.verify.readme_gate` + `alx.verify.c_style` (Python lib; `--exclude` for the vendor folders) -> Stage 0
 	- clang-tidy -> Stage 1
 	- cppcheck -> Stage 2
 		- `--platform=unix32 --funsigned-char` -> Cortex-M
@@ -102,10 +103,10 @@ A missing tool fails its lane, never skips it.
 - **Files - Code**
 	- `Test/noxfile.py` -> `analyze`
 	- `Test/Verify/toolchain.py` (tool locations, vcvars environment)
-	- `Test/Verify/style_gate.py`
 - **Files - Generated**
 	- `Test/build/analyze/ascii_gate.txt`
 	- `Test/build/analyze/readme_gate.txt`
+	- `Test/build/analyze/c_style.txt`
 	- `Test/build/analyze/fanalyzer.txt`
 
 #### SANITIZE
@@ -243,9 +244,9 @@ sources (-w) + fakes.
   --exclude FatFs --exclude mcuboot --exclude Usbh`, ANALYZE stage 0).
 - Markdown uses the heading levels `#` (title), `##` (chapter) and `####` (sub-chapter) only, ATX style, and no
   horizontal rules - chapters separate the text (gated: `alx.verify.readme_gate`, same excludes, ANALYZE stage 0).
-- No ternary operator in gated sources - write if/else (gated: `style_gate.py`, ANALYZE stage 0).
+- No ternary operator in gated sources - write if/else (gated: `alx.verify.c_style`, ANALYZE stage 0).
 - Doxygen tag lines: tabs-only field separators; name and description columns each
-  aligned within a block, tab stop 4 (gated: `style_gate.py`, ANALYZE stage 0).
+  aligned within a block, tab stop 4 (gated: `alx.verify.c_style`, ANALYZE stage 0).
 - Test names keep their ORIGINATING proof token forever; later tasks attach
   `@pytest.mark.req("ALX-<key>-P<n>")` instead of renaming. Proof tokens are mirrored
   into junit XML as `<property>` elements by the Python lib's plugin (`pytest_plugins =
