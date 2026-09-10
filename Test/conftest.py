@@ -250,6 +250,30 @@ MATH_DEPS = [
 MATH_DLL = BUILD_DIR / "alxMathTest.dll"
 
 
+# -------------------------------------------------- Mapping modules -------
+# Tier-1 target: the two ways the library turns an x into a y - a straight line
+# through two points, and a lookup table interpolated between its points. Both
+# are pure, both are how a raw reading becomes an engineering unit, and neither
+# had a test.
+LINFUN_SOURCES = [
+    CLIB_DIR / "alxLinFun.c",
+    CLIB_DIR / "alxInterpLin.c",
+    TEST_DIR / "alxLinFunTestHelpers.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+LINFUN_DEPS = [
+    *LINFUN_SOURCES,
+    CLIB_DIR / "alxLinFun.h",
+    CLIB_DIR / "alxInterpLin.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxLinFunTest.def",
+    Path(__file__),
+]
+LINFUN_DLL = BUILD_DIR / "alxLinFunTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -338,6 +362,10 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_linfun_dll() -> None:
+    _build_dll(LINFUN_SOURCES, (), (), LINFUN_DLL, TEST_DIR / "alxLinFunTest.def", None)
+
+
 def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
@@ -354,6 +382,7 @@ DLL_GROUPS = [
     (CANPARSER_DLL, CANPARSER_DEPS, _build_canparser_dll),
     (FILTGLITCH_DLL, FILTGLITCH_DEPS, _build_filtglitch_dll),
     (MATH_DLL, MATH_DEPS, _build_math_dll),
+    (LINFUN_DLL, LINFUN_DEPS, _build_linfun_dll),
 ]
 
 
@@ -1289,6 +1318,125 @@ class MathLib:
         for handle, deleter in self._handles:
             getattr(self.c, deleter)(handle)
         self._handles.clear()
+
+
+class LinFunLib:
+    """ctypes wrapper around alxLinFunTest.dll: the library's two x-to-y mappings.
+
+    A straight line through two points, in float and in integer, and a lookup table interpolated
+    between its points. Both clip, and both report which end they clipped at through Alx_Status.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, f, i32, u32, b = (ctypes.c_void_p, ctypes.c_float, ctypes.c_int32,
+                              ctypes.c_uint32, ctypes.c_bool)
+        c.AlxLinFunTest_New.restype = vp
+        c.AlxLinFunTest_New.argtypes = [f, f, f, f, f, f, b]
+        c.AlxLinFunIntTest_New.restype = vp
+        c.AlxLinFunIntTest_New.argtypes = [i32, i32, i32, i32, i32, i32, b]
+        c.AlxInterpLinTest_New.restype = vp
+        c.AlxInterpLinTest_New.argtypes = [ctypes.POINTER(f), ctypes.POINTER(f), u32, b]
+        for name in ("AlxLinFunTest_Delete", "AlxLinFunIntTest_Delete", "AlxInterpLinTest_Delete"):
+            getattr(c, name).argtypes = [vp]
+        for name in ("AlxLinFun_GetY", "AlxLinFun_GetX", "AlxInterpLin_GetY"):
+            fn = getattr(c, name)
+            fn.restype = f
+            fn.argtypes = [vp, f]
+        c.AlxLinFunInt_GetY.restype = i32
+        c.AlxLinFunInt_GetY.argtypes = [vp, i32]
+        for name in ("AlxLinFun_GetY_WithStatus", "AlxLinFun_GetX_WithStatus",
+                     "AlxInterpLin_GetY_WithStatus"):
+            fn = getattr(c, name)
+            fn.restype = i32
+            fn.argtypes = [vp, f, ctypes.POINTER(f)]
+        c.AlxLinFunInt_GetY_WithStatus.restype = i32
+        c.AlxLinFunInt_GetY_WithStatus.argtypes = [vp, i32, ctypes.POINTER(i32)]
+        for name in ("Ok", "ErrMin", "ErrMax"):
+            fn = getattr(c, f"AlxLinFunTest_Status_{name}")
+            fn.restype = i32
+        self.OK = c.AlxLinFunTest_Status_Ok()
+        self.ERR_MIN = c.AlxLinFunTest_Status_ErrMin()
+        self.ERR_MAX = c.AlxLinFunTest_Status_ErrMax()
+        self._handles: list = []
+
+    # -- the three mappings ---------------------------------------------------
+    def line(self, x1, y1, x2, y2, minimum, maximum, limit_on_x=False):
+        """A float line through (x1, y1) and (x2, y2), clipped on x or on y."""
+        return self._keep(self.c.AlxLinFunTest_New(x1, y1, x2, y2, minimum, maximum, limit_on_x),
+                          "AlxLinFunTest_Delete")
+
+    def line_int(self, x1, y1, x2, y2, minimum, maximum, limit_on_x=False):
+        """The same line in integers, which is a separate implementation, not a wrapper."""
+        return self._keep(self.c.AlxLinFunIntTest_New(x1, y1, x2, y2, minimum, maximum, limit_on_x),
+                          "AlxLinFunIntTest_Delete")
+
+    def table(self, x_points, y_points, rising=True):
+        """A lookup table; the helper copies the points, so the caller keeps nothing alive."""
+        count = len(x_points)
+        assert count == len(y_points), "a table needs one y for every x"
+        arr = ctypes.c_float * count
+        return self._keep(
+            self.c.AlxInterpLinTest_New(arr(*x_points), arr(*y_points), count, rising),
+            "AlxInterpLinTest_Delete")
+
+    # -- evaluation -----------------------------------------------------------
+    def y(self, obj, x: float) -> float:
+        return self.c.AlxLinFun_GetY(obj, x)
+
+    def x(self, obj, y: float) -> float:
+        return self.c.AlxLinFun_GetX(obj, y)
+
+    def y_int(self, obj, x: int) -> int:
+        return self.c.AlxLinFunInt_GetY(obj, x)
+
+    def table_y(self, obj, x: float) -> float:
+        return self.c.AlxInterpLin_GetY(obj, x)
+
+    def y_status(self, obj, x: float) -> tuple[int, float]:
+        out = ctypes.c_float()
+        return self.c.AlxLinFun_GetY_WithStatus(obj, x, ctypes.byref(out)), out.value
+
+    def x_status(self, obj, y: float) -> tuple[int, float]:
+        out = ctypes.c_float()
+        return self.c.AlxLinFun_GetX_WithStatus(obj, y, ctypes.byref(out)), out.value
+
+    def y_int_status(self, obj, x: int) -> tuple[int, int]:
+        out = ctypes.c_int32()
+        return self.c.AlxLinFunInt_GetY_WithStatus(obj, x, ctypes.byref(out)), out.value
+
+    def table_y_status(self, obj, x: float) -> tuple[int, float]:
+        out = ctypes.c_float()
+        return self.c.AlxInterpLin_GetY_WithStatus(obj, x, ctypes.byref(out)), out.value
+
+    def _keep(self, handle, deleter: str):
+        assert handle, "the test helper could not allocate"
+        self._handles.append((handle, deleter))
+        return handle
+
+    def free_all(self) -> None:
+        """Release everything this test was handed, through the destructor of its own type."""
+        for handle, deleter in self._handles:
+            getattr(self.c, deleter)(handle)
+        self._handles.clear()
+
+
+@pytest.fixture(scope="session")
+def lin_fun_lib_session() -> LinFunLib:
+    override = os.environ.get("ALX_LINFUN_TEST_DLL")
+    if override:
+        return LinFunLib(Path(override))
+    if _needs_build(LINFUN_DLL, LINFUN_DEPS):
+        _build_linfun_dll()
+    return LinFunLib(LINFUN_DLL)
+
+
+@pytest.fixture
+def lin_fun_lib(lin_fun_lib_session) -> LinFunLib:
+    """The mapping library, with everything the previous test allocated already released."""
+    yield lin_fun_lib_session
+    lin_fun_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")

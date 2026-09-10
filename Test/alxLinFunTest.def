@@ -1,0 +1,19 @@
+LIBRARY alxLinFunTest
+EXPORTS
+	AlxLinFunTest_New
+	AlxLinFunTest_Delete
+	AlxLinFun_GetY
+	AlxLinFun_GetX
+	AlxLinFun_GetY_WithStatus
+	AlxLinFun_GetX_WithStatus
+	AlxLinFunIntTest_New
+	AlxLinFunIntTest_Delete
+	AlxLinFunInt_GetY
+	AlxLinFunInt_GetY_WithStatus
+	AlxInterpLinTest_New
+	AlxInterpLinTest_Delete
+	AlxInterpLin_GetY
+	AlxInterpLin_GetY_WithStatus
+	AlxLinFunTest_Status_Ok
+	AlxLinFunTest_Status_ErrMin
+	AlxLinFunTest_Status_ErrMax
