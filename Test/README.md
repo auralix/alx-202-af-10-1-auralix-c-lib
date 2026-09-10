@@ -39,7 +39,7 @@ A missing tool fails its lane, never skips it.
 	  one test file per module: a group serves the linker, a file mirrors a source
 	- `alxMathTest` - the pure signal conditioning: two hysteresis state machines, the moving
 	  average over a caller-owned buffer, the running count/sum/mean/min/max, and alxGlobal's
-	  number formatting, which has no group of its own
+	  number formatting, which has no group of its own. Five modules, five test files
 	- `alxLinFunTest` - the two x-to-y mappings: a line through two points, in float and in
 	  integer, and a lookup table interpolated between its points
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real
