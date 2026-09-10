@@ -35,7 +35,8 @@ A missing tool fails its lane, never skips it.
 	- `alxCanParserTest` - the CAN payload codec: twenty-four typed accessors over eight bytes,
 	  built with the module's asserts off, which is the default a product ships
 	- `alxFiltGlitchTest` - both glitch filters over the real software timer and tick, with only
-	  the interrupt lock faked, so every debounce boundary is exact to the microsecond
+	  the interrupt lock faked, so every debounce boundary is exact to the microsecond. One DLL,
+	  one test file per module: a group serves the linker, a file mirrors a source
 	- `alxMathTest` - the pure signal conditioning: two hysteresis state machines, the moving
 	  average over a caller-owned buffer, the running count/sum/mean/min/max, and alxGlobal's
 	  number formatting, which has no group of its own

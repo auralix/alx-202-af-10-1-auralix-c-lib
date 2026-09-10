@@ -1,34 +1,33 @@
-"""ALX-1553 - alxFiltGlitchBool and alxFiltGlitchUint32 PC unit tests (Tier 2: over a clock we own).
+"""ALX-1553 - alxFiltGlitchBool PC unit tests (Tier 2: a debounce filter over a clock we own).
 
-Two debounce filters, and nothing tested either. They matter because they sit in front of decisions:
-a digital input that chatters, a mode that flickers, a state a product acts on. A filter that is one
-sample too eager passes the glitch it exists to remove, and a filter that is one sample too slow
-delays every real change - and neither shows up in a build, in a review or on a bus.
+A boolean glitch filter with separate rise and fall times, and nothing tested it. It sits in front of
+decisions - a digital input that chatters, a mode that flickers - and one sample too eager passes the
+glitch it exists to remove, while one too slow delays every real change. Neither shows up in a build,
+in a review or on a bus.
 
-They are worth testing HERE rather than on a bench for the same reason: on hardware the boundary can
-only be approached to within a sampling interval, so an off-by-one in a comparison is invisible.
-Here the tick counter is the test's - time moves only when the test moves it - so each boundary can
-be measured to the microsecond from both sides. The timer and the tick are the real modules; only
-the interrupt lock is faked, because it is CMSIS intrinsics that do not exist on a PC.
+It is worth testing HERE rather than on a bench because on hardware a boundary can only be approached
+to within a sampling interval, so an off-by-one in a comparison is invisible there. The tick counter
+is the test's: time moves only when the test moves it, so each boundary is measured to the
+microsecond from both sides. The timer and the tick are the real modules; only the interrupt lock is
+faked.
 
-The two filters do not agree with each other about their own boundary. That is P163, and it is the
-finding this file exists for.
+Two behaviours are recorded rather than asserted as design:
+  P163 the boundary is STRICTLY after the configured time - its uint32 sibling changes AT it, and
+       neither header says which convention it follows;
+  P168 the window is elapsed TIME since the last agreeing sample, not the samples observed, so a
+       caller whose loop stalls accepts the first disagreeing sample it is handed afterwards.
 
-Test group P159-P168 = ALX-1553 glitch filter proofs.
+Test group P159-P168 = ALX-1553 glitch filter proofs, split by module with alxFiltGlitchUint32.
 """
 
 import pytest
 
 pytestmark = pytest.mark.unit
 
+SHORT_MS, LONG_MS = 100.0, 1000.0
 RISE_MS = 10.0
 FALL_MS = 50.0
 US = 0.001          # one microsecond, expressed in the milliseconds the helpers take
-
-
-# =====================================================================
-# P159-P162 - the boolean filter
-# =====================================================================
 
 
 def test_ALX1553_P159_the_boolean_filter_holds_until_the_input_has_been_stable(filt):
@@ -109,76 +108,6 @@ def test_ALX1553_P162_reset_returns_the_initial_value_and_restarts_the_window(fi
     filt.advance_ms(US)
     assert filt.process(flt, True) is True
 
-
-# =====================================================================
-# P163 - the finding
-# =====================================================================
-
-
-def test_ALX1553_P163_the_two_filters_disagree_about_their_own_boundary(filt):
-    """CHARACTERIZATION: at EXACTLY the configured time, one filter has changed and the other has not.
-
-    Measured to the microsecond, on a clock the test owns:
-
-        AlxFiltGlitchBool     at 10.000 ms: unchanged     at 10.001 ms: changed
-        AlxFiltGlitchUint32   at  5.000 ms: CHANGED
-
-    The boolean filter compares ``unstableTime_us > stableTime_us``; the uint32 filter compares
-    ``stableTime_ms >= me->stableTime_ms``. Same library, same purpose, opposite convention at the
-    boundary, and neither header says which it is.
-
-    A microsecond either way is not a defect and this test does not call it one. It is recorded
-    because it is exactly the kind of difference that is decided once, silently, by whoever wrote
-    each file, and then relied on by someone reading the other one - and because a test that pins
-    both makes the next person's choice deliberate.
-    """
-    boolean = filt.boolean(False, RISE_MS, RISE_MS)
-    filt.process(boolean, True)
-    filt.advance_ms(RISE_MS)
-    assert filt.process(boolean, True) is False, "the boolean filter changed AT its time"
-
-    filt.tick_reset()
-    integer = filt.uint32(0, 5.0)
-    filt.process(integer, 7)
-    filt.advance_ms(5.0)
-    assert filt.process(integer, 7) == 7, "the uint32 filter did NOT change at its time"
-
-
-# =====================================================================
-# P164-P165 - the uint32 filter
-# =====================================================================
-
-
-def test_ALX1553_P164_the_uint32_filter_passes_a_value_only_once_it_has_been_stable(filt):
-    """The old value stays on the output until the new one has been held for the whole time."""
-    flt = filt.uint32(0, RISE_MS)
-    assert filt.process(flt, 0) == 0
-    assert filt.process(flt, 7) == 0, "the new value appeared immediately"
-    filt.advance_ms(RISE_MS - US)
-    assert filt.process(flt, 7) == 0, "the new value appeared before its time"
-    filt.advance_ms(US)
-    assert filt.process(flt, 7) == 7
-
-
-def test_ALX1553_P165_a_value_that_keeps_changing_never_reaches_the_output(filt):
-    """Every change restarts the window, so a value that alternates is held off indefinitely.
-
-    Twenty alternations spread over twenty times the stable time: without the restart the output
-    would have followed long before the end.
-    """
-    flt = filt.uint32(0, RISE_MS)
-    for i in range(20):
-        filt.advance_ms(RISE_MS)
-        assert filt.process(flt, 1 + (i % 2)) == 0, f"the output followed after {i} alternations"
-    filt.advance_ms(RISE_MS + US)
-    assert filt.process(flt, 1 + (19 % 2)) == 2, "a value held steady never got through either"
-
-
-# =====================================================================
-# P166-P167 - what the two constructors and the float conversion can express
-# =====================================================================
-
-
 @pytest.mark.parametrize("ms", [1.0, 10.0, 250.0, 1000.0])
 def test_ALX1553_P166_the_millisecond_and_microsecond_constructors_agree(filt, ms):
     """The same duration, configured both ways, changes state on the same microsecond."""
@@ -191,41 +120,6 @@ def test_ALX1553_P166_the_millisecond_and_microsecond_constructors_agree(filt, m
         filt.advance_ms(elapsed)
         assert filt.process(from_ms, True) is expected
         assert filt.process(from_us, True) is expected
-
-
-@pytest.mark.parametrize(("nominal_ms", "measured_us", "error_us"), [
-    (10.0, 10_000, 0),
-    (1000.0, 1_000_000, 0),
-    (100_000.0, 99_999_996, -4),
-    (10_000_000.0, 9_999_999_489, -511),
-])
-def test_ALX1553_P167_the_uint32_filter_loses_resolution_as_its_window_grows(
-    filt, nominal_ms, measured_us, error_us, record_property
-):
-    """METRIC: the uint32 filter converts elapsed microseconds to a 32-bit float, and it costs.
-
-    ``AlxTimSw_Get_us(&me->tim) / 1000.f`` puts a uint64 count of microseconds through a float, whose
-    24-bit mantissa runs out at about 16.8 million. Past that the comparison is made on a rounded
-    number, so the filter changes state slightly EARLY. Binary-searched to the microsecond:
-
-        10 ms         exact
-        1 s           exact
-        100 s         4 us early
-        10 000 s      511 us early
-
-    Half a millisecond after nearly three hours is nothing, and the boolean filter does not have the
-    problem at all because it keeps microseconds as uint64 throughout. This is here because it is a
-    number rather than an impression: if a product ever configures a window of hours and cares about
-    its edge, this says what it will get.
-    """
-    filt.tick_reset()
-    flt = filt.uint32(0, nominal_ms)
-    filt.process(flt, 7)
-    filt.advance_ms((measured_us - 1) / 1000)
-    assert filt.process(flt, 7) == 0, "changed one microsecond before the measured boundary"
-    filt.advance_ms(US)
-    assert filt.process(flt, 7) == 7, "did not change at the measured boundary"
-    record_property(f"uint32_window_{nominal_ms:.0f}ms_error_us", error_us)
 
 
 def test_ALX1553_P168_the_window_is_elapsed_time_not_observed_samples(filt):
@@ -253,3 +147,23 @@ def test_ALX1553_P168_the_window_is_elapsed_time_not_observed_samples(filt):
 
     filt.advance_ms(100.0)                  # the stall: ten windows, and Process is never called
     assert filt.process(flt, False) is False, "one sample after the stall did not flip the output"
+
+
+def test_ALX1553_P163_the_boolean_filter_changes_strictly_after_its_time(filt):
+    """CHARACTERIZATION: at EXACTLY the configured time this filter has NOT changed yet.
+
+    It compares ``unstableTime_us > stableTime_us`` with a strict greater-than. Its uint32 sibling
+    compares ``stableTime_ms >= me->stableTime_ms`` and therefore changes AT its time - same library,
+    same purpose, opposite convention at the boundary, and neither header says which.
+
+    A microsecond either way is not a defect and this does not call it one. It is recorded because it
+    is exactly the kind of difference that is decided once, silently, by whoever wrote each file, and
+    then relied on by someone reading the other one. The matching half is
+    test_alxFiltGlitchUint32.py P163.
+    """
+    flt = filt.boolean(False, RISE_MS, RISE_MS)
+    filt.process(flt, True)
+    filt.advance_ms(RISE_MS)
+    assert filt.process(flt, True) is False, "changed AT its configured time"
+    filt.advance_ms(US)
+    assert filt.process(flt, True) is True, "did not change one microsecond after it"
