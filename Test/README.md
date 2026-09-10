@@ -116,6 +116,7 @@ A missing tool fails its lane, never skips it.
 	- `Test/alx<Module>TestHelpers.c` -> `Test/alxFifoTestHelpers.c`
 	- `Test/alx<Module>Test.def` -> `Test/alxFifoTest.def`
 	- `Test/alx<FakedModule>Fake.c` -> `Test/alxSerialPortFake.c`
+	- `Test/alx<Module>RegSizeCheck.c` -> `Test/alxIna228RegSizeCheck.c` (target-only)
 - **Files - Generated**
 	- `Test/build/pytest_report.xml`
 	- `Test/build/pytest_report.html`
@@ -128,6 +129,8 @@ A missing tool fails its lane, never skips it.
 		- `--platform=unix32 --funsigned-char` -> Cortex-M
 		- `--platform=win64` -> PC Host
 	- arm-gcc 15.2.Rel1 `-fanalyzer` -> Stage 3
+	- arm-gcc 15.2.Rel1, target layout checks (`noxfile.LAYOUT_CHECKS`: static assertions over
+	  register overlay sizes, one compile per part variant, never linked) -> Stage 4
 - **Files - Config**
 	- `.clang-tidy`
 - **Files - Code**
@@ -138,6 +141,7 @@ A missing tool fails its lane, never skips it.
 	- `Test/build/analyze/readme_gate.txt`
 	- `Test/build/analyze/c_style.txt`
 	- `Test/build/analyze/fanalyzer.txt`
+	- `Test/build/analyze/layout_checks.txt`
 
 #### SANITIZE
 - **Tools**
