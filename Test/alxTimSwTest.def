@@ -1,0 +1,28 @@
+LIBRARY alxTimSwTest
+EXPORTS
+	AlxTimSw_Ctor
+	AlxTimSw_Start
+	AlxTimSw_Stop
+	AlxTimSw_IsRunning
+	AlxTimSw_Get_ns
+	AlxTimSw_Get_us
+	AlxTimSw_Get_ms
+	AlxTimSw_Get_sec
+	AlxTimSw_Get_min
+	AlxTimSw_Get_hr
+	AlxTimSw_IsTimeout_ns
+	AlxTimSw_IsTimeout_us
+	AlxTimSw_IsTimeout_ms
+	AlxTimSw_IsTimeout_sec
+	AlxTimSw_IsTimeout_min
+	AlxTimSw_IsTimeout_hr
+	alxTick DATA
+	AlxTick_Ctor
+	AlxTick_Get_ns
+	AlxTick_Get_ms
+	AlxTick_IncRange_ns
+	AlxIrqFake_Reset
+	AlxIrqFake_LockCount
+	AlxIrqFake_UnlockCount
+	AlxIrqFake_Depth
+	AlxIrqFake_DepthMax

@@ -144,6 +144,31 @@ VDIV_DEPS = [
 VDIV_DLL = BUILD_DIR / "alxVdivTest.dll"
 
 
+# ------------------------------------------------------ TimSw module -------
+# Tier-2 target: the REAL software timer over the REAL tick counter, with the
+# interrupt lock faked because it is CMSIS intrinsics that do not exist on a PC.
+# The tick is not faked - it is a plain counter the test advances itself, so the
+# timer sees real code and the test owns the clock.
+TIMSW_SOURCES = [
+    CLIB_DIR / "alxTimSw.c",
+    CLIB_DIR / "alxTick.c",
+    TEST_DIR / "alxIrqFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+TIMSW_DEPS = [
+    *TIMSW_SOURCES,
+    CLIB_DIR / "alxTimSw.h",
+    CLIB_DIR / "alxTick.h",
+    CLIB_DIR / "alxIrq.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxTimSwTest.def",
+    Path(__file__),
+]
+TIMSW_DLL = BUILD_DIR / "alxTimSwTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -220,6 +245,10 @@ def _build_vdiv_dll() -> None:
     _build_dll(VDIV_SOURCES, (), (), VDIV_DLL, TEST_DIR / "alxVdivTest.def", None)
 
 
+def _build_timsw_dll() -> None:
+    _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
+
+
 # The groups as DATA, for anything that must rebuild them without running the suite: the MUTATE
 # lane names this list on the command line (alx.c_lib.mutation_hooks rebuild --groups
 # conftest:DLL_GROUPS), so the lane needs no script of its own in this repository.
@@ -228,6 +257,7 @@ DLL_GROUPS = [
     (CLI_DLL, CLI_DEPS, _build_cli_dll),
     (MEMSAFE_DLL, MEMSAFE_DEPS, _build_memsafe_dll),
     (VDIV_DLL, VDIV_DEPS, _build_vdiv_dll),
+    (TIMSW_DLL, TIMSW_DEPS, _build_timsw_dll),
 ]
 
 
@@ -805,6 +835,104 @@ class VdivLib:
 
     def current_ua(self, vout_uv, res_low_ohm) -> int:
         return self.c.AlxVdiv_GetCurrent_uA(vout_uv, res_low_ohm)
+
+
+class TimSwLib:
+    """ctypes wrapper around alxTimSwTest.dll: the software timer over a clock the test owns.
+
+    Time only moves when advance_ns is called, so every timeout is exact and nothing is flaky.
+    """
+
+    TIMSW_SIZE = 32          # sizeof(AlxTimSw): uint64 + two bools, generously padded
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, u64, b, u32, i32 = (ctypes.c_void_p, ctypes.c_uint64, ctypes.c_bool,
+                                ctypes.c_uint32, ctypes.c_int32)
+        for name in ("Ctor", "Start", "Stop"):
+            getattr(c, f"AlxTimSw_{name}").argtypes = [vp]
+        c.AlxTimSw_IsRunning.restype = b
+        c.AlxTimSw_IsRunning.argtypes = [vp]
+        for unit in ("ns", "us", "ms", "sec", "min", "hr"):
+            get = getattr(c, f"AlxTimSw_Get_{unit}")
+            get.restype = u64
+            get.argtypes = [vp]
+            timeout = getattr(c, f"AlxTimSw_IsTimeout_{unit}")
+            timeout.restype = b
+            timeout.argtypes = [vp, u64]
+        c.AlxTick_Ctor.argtypes = [vp]
+        c.AlxTick_Get_ns.restype = u64
+        c.AlxTick_Get_ns.argtypes = [vp]
+        c.AlxTick_IncRange_ns.argtypes = [vp, u64]
+        # the library's own global tick instance, reached as data rather than rebuilt here
+        self.tick = ctypes.addressof(ctypes.c_uint8.in_dll(c, "alxTick"))
+        for name in ("LockCount", "UnlockCount"):
+            getattr(c, f"AlxIrqFake_{name}").restype = u32
+        for name in ("Depth", "DepthMax"):
+            getattr(c, f"AlxIrqFake_{name}").restype = i32
+
+    # -- the clock the test owns ----------------------------------------------
+    def tick_reset(self) -> None:
+        self.c.AlxTick_Ctor(self.tick)
+        self.c.AlxIrqFake_Reset()
+
+    def advance_ns(self, ns: int) -> None:
+        self.c.AlxTick_IncRange_ns(self.tick, ns)
+
+    def advance_ms(self, ms: float) -> None:
+        self.advance_ns(int(ms * 1_000_000))
+
+    def now_ns(self) -> int:
+        return self.c.AlxTick_Get_ns(self.tick)
+
+    # -- one timer ------------------------------------------------------------
+    def timer(self):
+        buf = ctypes.create_string_buffer(self.TIMSW_SIZE)
+        self.c.AlxTimSw_Ctor(buf)
+        return buf
+
+    def start(self, tim) -> None:
+        self.c.AlxTimSw_Start(tim)
+
+    def stop(self, tim) -> None:
+        self.c.AlxTimSw_Stop(tim)
+
+    def is_running(self, tim) -> bool:
+        return self.c.AlxTimSw_IsRunning(tim)
+
+    def get(self, tim, unit: str) -> int:
+        return getattr(self.c, f"AlxTimSw_Get_{unit}")(tim)
+
+    def is_timeout(self, tim, unit: str, value: int) -> bool:
+        return getattr(self.c, f"AlxTimSw_IsTimeout_{unit}")(tim, value)
+
+    # -- what the fake saw ----------------------------------------------------
+    def lock_count(self) -> int:
+        return self.c.AlxIrqFake_LockCount()
+
+    def unlock_count(self) -> int:
+        return self.c.AlxIrqFake_UnlockCount()
+
+    def lock_depth_max(self) -> int:
+        return self.c.AlxIrqFake_DepthMax()
+
+
+@pytest.fixture(scope="session")
+def timsw_lib() -> TimSwLib:
+    override = os.environ.get("ALX_TIMSW_TEST_DLL")
+    if override:
+        return TimSwLib(Path(override))
+    if _needs_build(TIMSW_DLL, TIMSW_DEPS):
+        _build_timsw_dll()
+    return TimSwLib(TIMSW_DLL)
+
+
+@pytest.fixture
+def clock(timsw_lib) -> TimSwLib:
+    """The timer library with the clock back at zero and the fake's counters cleared."""
+    timsw_lib.tick_reset()
+    return timsw_lib
 
 
 @pytest.fixture(scope="session")
