@@ -284,7 +284,7 @@ def test_ALX1513_P8_property_reboot_reads_last_or_previous_record_never_a_third(
     """Random writes, each optionally cut at a random point of copy A or copy B, each followed
     by a reboot: the record read is always the last committed one or the one before it, and a
     reboot never finds both copies invalid once a first record exists."""
-    rnd = random.Random(20260903)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
+    rnd = random.Random(20260903)
     committed = None
     ctx = make_store()
     for step in range(120):

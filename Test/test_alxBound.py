@@ -89,7 +89,7 @@ def test_ALX1514_P12_int_degenerate_range(bound, t):
 def test_ALX1514_P12_int_property_vs_model(bound, t):
     """Back-to-back comparison against the Python reference model."""
     lo, hi = TYPE_RANGES[t]
-    rnd = random.Random(1514)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
+    rnd = random.Random(1514)
     pool = [lo, lo + 1, hi - 1, hi, 0, 1] + [rnd.randint(lo, hi) for _ in range(200)]
     for _ in range(300):
         val = rnd.choice(pool)
@@ -170,7 +170,7 @@ def test_ALX1514_P12_str_min_capacity_two(bound):
 
 
 def test_ALX1514_P12_str_property_vs_model(bound):
-    rnd = random.Random(1514)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
+    rnd = random.Random(1514)
     for _ in range(200):
         n = rnd.randint(0, 12)
         val = bytes(rnd.choice(b"abcdefgh") for _ in range(n))

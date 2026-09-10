@@ -499,7 +499,7 @@ class ModelFifo:
 
 @pytest.mark.parametrize("seed", [1, 2, 3])
 def test_ALX1514_P9_property_model_random_ops(lib, make_fifo, seed):
-    rng = random.Random(seed)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
+    rng = random.Random(seed)
     cap = 16
     f = make_fifo(cap)
     model = ModelFifo(cap)
@@ -531,7 +531,7 @@ def test_ALX1514_P9_property_model_random_ops(lib, make_fifo, seed):
 
 @pytest.mark.parametrize("seed", [4, 5])
 def test_ALX1514_P9_property_model_seq_random_ops(lib, make_fifo, seed):
-    rng = random.Random(seed)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
+    rng = random.Random(seed)
     cap = 16
     f = make_fifo(cap)
     model = ModelFifo(cap)

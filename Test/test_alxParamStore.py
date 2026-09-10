@@ -152,7 +152,7 @@ def test_ALX1513_P11_write_failure_puts_the_store_in_error_and_keeps_old_flash(f
 
 
 def test_ALX1513_P11_property_random_sets_survive_reboots(flash, make_store):
-    rnd = random.Random(1513)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
+    rnd = random.Random(1513)
     ctx = booted(flash, make_store)
     expected = list(DEFAULTS)
     for step in range(40):

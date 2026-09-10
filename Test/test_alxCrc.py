@@ -107,7 +107,7 @@ def test_ALX1513_P9_calc_equals_reference_model(memsafe_lib, cfg, data):
 def test_ALX1513_P9_calc_equals_reference_model_random_lengths(memsafe_lib, cfg):
     lib = memsafe_lib
     c = getattr(lib, cfg)
-    rnd = random.Random(1513)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
+    rnd = random.Random(1513)
     for n in range(70):
         data = bytes(rnd.getrandbits(8) for _ in range(n))
         assert lib.crc_calc(c, data) == ref(lib, c, data), f"len {n}"
