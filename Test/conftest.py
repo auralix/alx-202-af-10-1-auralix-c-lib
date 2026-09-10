@@ -169,6 +169,28 @@ TIMSW_DEPS = [
 TIMSW_DLL = BUILD_DIR / "alxTimSwTest.dll"
 
 
+# ------------------------------------------------- CanParser module -------
+# Tier-1 target: the CAN payload codec, 24 context-free functions over an
+# 8-byte buffer and nothing else. It is the module every product's CAN frame
+# passes through, and it needs no CAN peripheral to test: AlxCan_Msg is a plain
+# structure, so the whole codec is host code the moment it is compiled here.
+CANPARSER_SOURCES = [
+    CLIB_DIR / "alxCanParser.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+CANPARSER_DEPS = [
+    *CANPARSER_SOURCES,
+    CLIB_DIR / "alxCanParser.h",
+    CLIB_DIR / "Mcu" / "alxCan.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxCanParserTest.def",
+    Path(__file__),
+]
+CANPARSER_DLL = BUILD_DIR / "alxCanParserTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -245,6 +267,10 @@ def _build_vdiv_dll() -> None:
     _build_dll(VDIV_SOURCES, (), (), VDIV_DLL, TEST_DIR / "alxVdivTest.def", None)
 
 
+def _build_canparser_dll() -> None:
+    _build_dll(CANPARSER_SOURCES, (), (), CANPARSER_DLL, TEST_DIR / "alxCanParserTest.def", None)
+
+
 def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
@@ -258,6 +284,7 @@ DLL_GROUPS = [
     (MEMSAFE_DLL, MEMSAFE_DEPS, _build_memsafe_dll),
     (VDIV_DLL, VDIV_DEPS, _build_vdiv_dll),
     (TIMSW_DLL, TIMSW_DEPS, _build_timsw_dll),
+    (CANPARSER_DLL, CANPARSER_DEPS, _build_canparser_dll),
 ]
 
 
@@ -933,6 +960,102 @@ def clock(timsw_lib) -> TimSwLib:
     """The timer library with the clock back at zero and the fake's counters cleared."""
     timsw_lib.tick_reset()
     return timsw_lib
+
+
+class CanMsg(ctypes.Structure):
+    """AlxCan_Msg: identifier, two flags, a length and the eight data bytes the codec works on."""
+
+    _fields_ = (
+        ("id", ctypes.c_uint32),
+        ("isExtendedId", ctypes.c_bool),
+        ("isDataFrame", ctypes.c_bool),
+        ("dataLen", ctypes.c_uint8),
+        ("data", ctypes.c_uint8 * 8),
+    )
+
+
+class CanParserLib:
+    """ctypes wrapper around alxCanParserTest.dll: the CAN payload codec.
+
+    Twelve setters and twelve getters over one 8-byte buffer, no state and no peripheral. The
+    endian argument is the module's own enum, Big = 0 and Little = 1, and it names where the MOST
+    significant byte goes, not the host's byte order.
+
+    Built with the module's asserts DISABLED, which is the default configuration and the one every
+    product ships unless it opts in. The asserts guard byteOffset only, and on the PC a failed
+    assert calls abort(), which would take the whole suite down with no report; the same guarantee
+    is proved here instead by writing at every LEGAL offset and checking that nothing outside the
+    payload moved (see test_alxCanParser.py P156).
+    """
+
+    BIG = 0
+    LITTLE = 1
+
+    # name -> (ctypes type, does the function take an endian argument)
+    SCALARS: ClassVar[dict[str, tuple[type, bool]]] = {
+        "Uint8": (ctypes.c_uint8, False),
+        "Int8": (ctypes.c_int8, False),
+        "Uint16": (ctypes.c_uint16, True),
+        "Int16": (ctypes.c_int16, True),
+        "Uint32": (ctypes.c_uint32, True),
+        "Int32": (ctypes.c_int32, True),
+        "Uint64": (ctypes.c_uint64, True),
+        "Int64": (ctypes.c_int64, True),
+        "Float": (ctypes.c_float, True),
+        "Double": (ctypes.c_double, True),
+    }
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        msg_p, u8, endian_t = ctypes.POINTER(CanMsg), ctypes.c_uint8, ctypes.c_int
+        for name, (ctype, has_endian) in self.SCALARS.items():
+            head = [msg_p, endian_t, u8] if has_endian else [msg_p, u8]
+            setter = getattr(c, f"AlxCanParser_Set{name}")
+            setter.restype = None
+            setter.argtypes = [*head, ctype]
+            getter = getattr(c, f"AlxCanParser_Get{name}")
+            getter.restype = ctype
+            getter.argtypes = head
+        c.AlxCanParser_SetBit.restype = None
+        c.AlxCanParser_SetBit.argtypes = [msg_p, u8, u8, ctypes.c_bool]
+        c.AlxCanParser_GetBit.restype = ctypes.c_bool
+        c.AlxCanParser_GetBit.argtypes = [msg_p, u8, u8]
+        c.AlxCanParser_SetEnum.restype = None
+        c.AlxCanParser_SetEnum.argtypes = [msg_p, u8, u8, u8, u8]
+        c.AlxCanParser_GetEnum.restype = u8
+        c.AlxCanParser_GetEnum.argtypes = [msg_p, u8, u8, u8]
+
+    @staticmethod
+    def msg(payload: bytes = b"") -> CanMsg:
+        """A frame whose data bytes start as ``payload``, zero filled to eight."""
+        frame = CanMsg()
+        for i, byte in enumerate(payload):
+            frame.data[i] = byte
+        return frame
+
+    @staticmethod
+    def payload(frame: CanMsg) -> bytes:
+        """The eight data bytes - what would go on the wire."""
+        return bytes(frame.data)
+
+    def set(self, name: str, frame: CanMsg, *args) -> None:
+        """Call ``AlxCanParser_Set<name>`` on ``frame``."""
+        getattr(self.c, f"AlxCanParser_Set{name}")(ctypes.byref(frame), *args)
+
+    def get(self, name: str, frame: CanMsg, *args):
+        """Call ``AlxCanParser_Get<name>`` on ``frame`` and return what it read."""
+        return getattr(self.c, f"AlxCanParser_Get{name}")(ctypes.byref(frame), *args)
+
+
+@pytest.fixture(scope="session")
+def canparser_lib() -> CanParserLib:
+    override = os.environ.get("ALX_CANPARSER_TEST_DLL")
+    if override:
+        return CanParserLib(Path(override))
+    if _needs_build(CANPARSER_DLL, CANPARSER_DEPS):
+        _build_canparser_dll()
+    return CanParserLib(CANPARSER_DLL)
 
 
 @pytest.fixture(scope="session")

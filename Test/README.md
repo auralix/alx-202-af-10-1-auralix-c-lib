@@ -32,6 +32,8 @@ A missing tool fails its lane, never skips it.
 	- `alxVdivTest` - a resistive divider's arithmetic; the smallest group here and the shape a pure
 	  module should copy
 	- `alxTimSwTest` - the software timer over the real tick counter, with the interrupt lock faked
+	- `alxCanParserTest` - the CAN payload codec: twenty-four typed accessors over eight bytes,
+	  built with the module's asserts off, which is the default a product ships
 - There is no lane-side folder of its own any more. Everything a second C repository would need identically comes
   from the Python lib and is called as a command or imported: the gates (`python -m alx.verify.<gate>`), the host
   toolchain and DLL build mechanics (`alx.c_lib.host_build`) and the C mutation hooks

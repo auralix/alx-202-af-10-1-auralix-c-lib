@@ -1,0 +1,26 @@
+LIBRARY alxCanParserTest
+EXPORTS
+	AlxCanParser_SetBit
+	AlxCanParser_SetUint8
+	AlxCanParser_SetInt8
+	AlxCanParser_SetUint16
+	AlxCanParser_SetInt16
+	AlxCanParser_SetUint32
+	AlxCanParser_SetInt32
+	AlxCanParser_SetUint64
+	AlxCanParser_SetInt64
+	AlxCanParser_SetFloat
+	AlxCanParser_SetDouble
+	AlxCanParser_SetEnum
+	AlxCanParser_GetBit
+	AlxCanParser_GetUint8
+	AlxCanParser_GetInt8
+	AlxCanParser_GetUint16
+	AlxCanParser_GetInt16
+	AlxCanParser_GetUint32
+	AlxCanParser_GetInt32
+	AlxCanParser_GetUint64
+	AlxCanParser_GetInt64
+	AlxCanParser_GetFloat
+	AlxCanParser_GetDouble
+	AlxCanParser_GetEnum
