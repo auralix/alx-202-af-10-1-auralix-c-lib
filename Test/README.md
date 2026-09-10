@@ -47,6 +47,8 @@ A missing tool fails its lane, never skips it.
 	  resolutions, checked against an independent implementation rather than examples
 	- `alxParamMgmtTest` - the view a CLI reaches its parameters through, over a fixed table
 	  of six real items: by index, by key, by id, and the per-group factory reset
+	- `alxIna228Test` - the current sensor driver over a faked I2C bus, built as the product
+	  builds it (ALX_INA238), for the conversion factors a board's accuracy rests on
 - There is no lane-side folder of its own any more. Everything a second C repository would need identically comes
   from the Python lib and is called as a command or imported: the gates (`python -m alx.verify.<gate>`), the host
   toolchain and DLL build mechanics (`alx.c_lib.host_build`) and the C mutation hooks

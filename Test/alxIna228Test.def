@@ -1,0 +1,22 @@
+LIBRARY alxIna228Test
+EXPORTS
+	AlxIna228Test_New
+	AlxIna228Test_Delete
+	AlxIna228Test_CurrentLsb_A
+	AlxIna228Test_ShuntCal
+	AlxIna228Test_AdcRange_163_84_mV
+	AlxIna228Test_AdcRange_40_96_mV
+	AlxIna228Test_Status_Ok
+	AlxIna228Test_Status_Err
+	AlxIna228_GetShuntVoltage_V
+	AlxIna228_GetBusVoltage_V
+	AlxIna228_GetTemp_degC
+	AlxIna228_GetCurrent_A
+	AlxIna228_GetPower_W
+	AlxI2cFake_Reset
+	AlxI2cFake_SetReg
+	AlxI2cFake_GetLastWrite
+	AlxI2cFake_WriteCount
+	AlxI2cFake_ReadCount
+	AlxI2cFake_SetSlaveReady
+	AlxI2cFake_SetForcedStatus

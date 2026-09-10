@@ -370,6 +370,51 @@ PARAMMGMT_DEPS = [
 PARAMMGMT_DLL = BUILD_DIR / "alxParamMgmtTest.dll"
 
 
+# ---------------------------------------------------- Ina228 module -------
+# Tier-2 target over a faked I2C bus: the current-sense driver this product's
+# main power measurement runs through, configured exactly as the board
+# configures it. The point is the CONVERSION CHAIN - what a register value
+# becomes in amps - which is the arithmetic ALX-1480 is about and which no
+# bench measurement can separate from the analog front end.
+#
+# ALX_INA238 is what the product defines (Usr/alxConfig.h): the part on the
+# board is an INA238, and the same driver serves both. The 238 divides its
+# maximum expected current by 2^15 where the 228 divides by 2^19, so building
+# with the wrong one would silently change every number here by a factor of 16.
+#
+# The driver and the helper are in the CLOSURE, built with warnings off: the
+# library's register bit-fields are declared with ENUM types, whose signedness
+# is implementation defined, so clang reports every assignment of a full-width
+# enum value as a truncation. The bits that reach the wire are correct - it is
+# the header's style, not this suite's, and not something a test should waive
+# globally.
+INA228_SOURCES_STRICT = [
+    TEST_DIR / "alxI2cFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+INA228_SOURCES_CLOSURE = [
+    CLIB_DIR / "Ext" / "alxIna228.c",
+    TEST_DIR / "alxIna228TestHelpers.c",
+]
+# Asserts OFF here, unlike the other groups that mirror the product: the
+# library's weak AlxIna228_RegStruct_SetVal default is an assert, this suite
+# cannot override a weak symbol on a COFF host (see alxIna228TestHelpers.c), and
+# with asserts on that default would abort the suite inside Init.
+INA228_DEFINES = ["-DALX_INA238"]        # the part the product selects
+INA228_DEPS = [
+    *INA228_SOURCES_STRICT,
+    *INA228_SOURCES_CLOSURE,
+    CLIB_DIR / "Ext" / "alxIna228.h",
+    CLIB_DIR / "Mcu" / "alxI2c.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxIna228Test.def",
+    Path(__file__),
+]
+INA228_DLL = BUILD_DIR / "alxIna228Test.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -381,7 +426,7 @@ PARAMMGMT_DLL = BUILD_DIR / "alxParamMgmtTest.dll"
 # target ships: never test a dialect you do not ship. -O0 -g for faithful debugging; clang's
 # diagnostics are front-end based, so the warning set is the same at any -O.
 TOOLCHAIN = host_build.Toolchain()
-INCLUDES = [TEST_DIR, CLIB_DIR, CLIB_DIR / "Mcu"]
+INCLUDES = [TEST_DIR, CLIB_DIR, CLIB_DIR / "Mcu", CLIB_DIR / "Ext"]
 DEBUG_FLAGS = ["-O0", "-g"]
 STRICT_WARNINGS = [*host_build.WARNINGS, "-Werror"]   # blanket -Werror on the host lane
 DB_ARGUMENTS = ["clang", "-std=gnu99", "-O0", *host_build.WARNINGS, host_build.CRT_DEFINE,
@@ -475,6 +520,11 @@ def _build_parammgmt_dll() -> None:
                PARAMMGMT_DLL, TEST_DIR / "alxParamMgmtTest.def", "paramMgmtClosure")
 
 
+def _build_ina228_dll() -> None:
+    _build_dll(INA228_SOURCES_STRICT, INA228_SOURCES_CLOSURE, INA228_DEFINES,
+               INA228_DLL, TEST_DIR / "alxIna228Test.def", "ina228Closure")
+
+
 def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
@@ -495,6 +545,7 @@ DLL_GROUPS = [
     (BOOL_DLL, BOOL_DEPS, _build_bool_dll),
     (RTC_DLL, RTC_DEPS, _build_rtc_dll),
     (PARAMMGMT_DLL, PARAMMGMT_DEPS, _build_parammgmt_dll),
+    (INA228_DLL, INA228_DEPS, _build_ina228_dll),
 ]
 
 
@@ -1846,6 +1897,117 @@ class ParamMgmtLib:
         for handle in self._handles:
             self.c.AlxParamMgmtTest_Delete(handle)
         self._handles.clear()
+
+
+class Ina228Lib:
+    """ctypes wrapper around alxIna228Test.dll: the current sensor driver over a faked I2C bus.
+
+    The test writes a register value into the fake the way the part would present it - most
+    significant byte first, as it travels on the wire - and asks the driver what that means in volts,
+    amps or degrees. The two conversion factors the driver derives from its constructor arguments are
+    readable directly, because they are what a board's accuracy is decided by.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, f, i32, u8, u32 = (ctypes.c_void_p, ctypes.c_float, ctypes.c_int32,
+                               ctypes.c_uint8, ctypes.c_uint32)
+        c.AlxIna228Test_New.restype = vp
+        c.AlxIna228Test_New.argtypes = [i32, f, f]
+        c.AlxIna228Test_Delete.argtypes = [vp]
+        c.AlxIna228Test_CurrentLsb_A.restype = f
+        c.AlxIna228Test_CurrentLsb_A.argtypes = [vp]
+        c.AlxIna228Test_ShuntCal.restype = ctypes.c_uint16
+        c.AlxIna228Test_ShuntCal.argtypes = [vp]
+        for name in ("AdcRange_163_84_mV", "AdcRange_40_96_mV", "Status_Ok", "Status_Err"):
+            getattr(c, f"AlxIna228Test_{name}").restype = i32
+        for name in ("GetShuntVoltage_V", "GetBusVoltage_V", "GetTemp_degC", "GetCurrent_A",
+                     "GetPower_W"):
+            fn = getattr(c, f"AlxIna228_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp, ctypes.POINTER(f)]
+        c.AlxI2cFake_SetReg.argtypes = [u8, ctypes.POINTER(u8), u8]
+        c.AlxI2cFake_GetLastWrite.argtypes = [u8, ctypes.POINTER(u8), u8]
+        for name in ("WriteCount", "ReadCount"):
+            fn = getattr(c, f"AlxI2cFake_{name}")
+            fn.restype = u32
+            fn.argtypes = [u8]
+        c.AlxI2cFake_SetSlaveReady.argtypes = [ctypes.c_bool]
+        c.AlxI2cFake_SetForcedStatus.argtypes = [i32]
+
+        self.OK = c.AlxIna228Test_Status_Ok()
+        self.ERR = c.AlxIna228Test_Status_Err()
+        self.RANGE_163_84_MV = c.AlxIna228Test_AdcRange_163_84_mV()
+        self.RANGE_40_96_MV = c.AlxIna228Test_AdcRange_40_96_mV()
+        self._handles: list = []
+
+    # -- the part -------------------------------------------------------------
+    def sensor(self, adc_range: int, shunt_ohm: float, shunt_ppm: float = 200.0):
+        """A configured sensor. The one this suite is written around is (40.96 mV, 100 uOhm, 200 ppm)."""
+        self.c.AlxI2cFake_Reset()
+        handle = self.c.AlxIna228Test_New(adc_range, shunt_ohm, shunt_ppm)
+        assert handle, "the driver refused to initialise over the fake bus"
+        self._handles.append(handle)
+        return handle
+
+    def current_lsb(self, sensor) -> float:
+        """Amps per count of the CURRENT register - what the reading's resolution is."""
+        return self.c.AlxIna228Test_CurrentLsb_A(sensor)
+
+    def shunt_cal(self, sensor) -> int:
+        """The value the driver computes for the part's SHUNT_CAL register."""
+        return self.c.AlxIna228Test_ShuntCal(sensor)
+
+    # -- the fake bus ---------------------------------------------------------
+    def set_register(self, addr: int, value: int, length: int) -> None:
+        """Put a register value on the fake bus, most significant byte first, as the part sends it."""
+        raw = value.to_bytes(length, "big", signed=value < 0)
+        buff = (ctypes.c_uint8 * length)(*raw)
+        self.c.AlxI2cFake_SetReg(addr, buff, length)
+
+    def last_write(self, addr: int, length: int) -> bytes:
+        buff = (ctypes.c_uint8 * length)()
+        self.c.AlxI2cFake_GetLastWrite(addr, buff, length)
+        return bytes(buff)
+
+    def write_count(self, addr: int) -> int:
+        return self.c.AlxI2cFake_WriteCount(addr)
+
+    def read_count(self, addr: int) -> int:
+        return self.c.AlxI2cFake_ReadCount(addr)
+
+    # -- the readings ---------------------------------------------------------
+    def read(self, sensor, quantity: str) -> tuple[int, float]:
+        """One reading: ``current_A``, ``bus_voltage_V``, ``shunt_voltage_V``, ``temp_degC``, ``power_W``."""
+        names = {"current_A": "GetCurrent_A", "bus_voltage_V": "GetBusVoltage_V",
+                 "shunt_voltage_V": "GetShuntVoltage_V", "temp_degC": "GetTemp_degC",
+                 "power_W": "GetPower_W"}
+        out = ctypes.c_float()
+        status = getattr(self.c, f"AlxIna228_{names[quantity]}")(sensor, ctypes.byref(out))
+        return status, out.value
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxIna228Test_Delete(handle)
+        self._handles.clear()
+
+
+@pytest.fixture(scope="session")
+def ina228_lib_session() -> Ina228Lib:
+    override = os.environ.get("ALX_INA228_TEST_DLL")
+    if override:
+        return Ina228Lib(Path(override))
+    if _needs_build(INA228_DLL, INA228_DEPS):
+        _build_ina228_dll()
+    return Ina228Lib(INA228_DLL)
+
+
+@pytest.fixture
+def ina228_lib(ina228_lib_session) -> Ina228Lib:
+    """The sensor library, with the fake bus cleared and the previous test's sensors released."""
+    yield ina228_lib_session
+    ina228_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")
