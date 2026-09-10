@@ -1,0 +1,26 @@
+LIBRARY alxPi4ioe5v6534qTest
+EXPORTS
+	AlxPi4ioeTest_New
+	AlxPi4ioeTest_Delete
+	AlxPi4ioeTest_ResetPin
+	AlxPi4ioeTest_InputPortAddr
+	AlxPi4ioeTest_OutputPortAddr
+	AlxPi4ioeTest_Status_Ok
+	AlxPi4ioeTest_Status_Err
+	AlxPi4ioe5v6534q_Handle
+	AlxPi4ioe5v6534q_IoPin_Read
+	AlxPi4ioe5v6534q_IoPin_Write
+	AlxPi4ioe5v6534q_IoPin_Set
+	AlxPi4ioe5v6534q_IoPin_Reset
+	AlxPi4ioe5v6534q_IoPin_Toggle
+	AlxI2cFake_Reset
+	AlxI2cFake_SetReg
+	AlxI2cFake_GetLastWrite
+	AlxI2cFake_WriteCount
+	AlxI2cFake_ReadCount
+	AlxI2cFake_SetForcedStatus
+	AlxIoPinFake_Reset
+	AlxIoPinFake_Level
+	AlxIoPinFake_InitCount
+	AlxIoPinFake_DeInitCount
+	AlxIoPinFake_WriteCount

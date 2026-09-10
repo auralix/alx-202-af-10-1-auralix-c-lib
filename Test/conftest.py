@@ -415,6 +415,37 @@ INA228_DEPS = [
 INA228_DLL = BUILD_DIR / "alxIna228Test.dll"
 
 
+# ---------------------------------------------------- Pi4ioe module -------
+# Tier-2 target over the same faked I2C bus plus a faked pin: the 40-channel IO
+# expander this product drives more of its board through than any other single
+# device driver. What it owns is a pin-to-bit mapping and the shape of two bulk
+# transfers, which is exactly the kind of thing that is right or wrong and never
+# nearly right.
+PI4IOE_SOURCES_STRICT = [
+    TEST_DIR / "alxI2cFake.c",
+    TEST_DIR / "alxIoPinFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+PI4IOE_SOURCES_CLOSURE = [
+    CLIB_DIR / "Ext" / "alxPi4ioe5v6534q.c",
+    TEST_DIR / "alxPi4ioeTestHelpers.c",
+]
+PI4IOE_DEFINES: list[str] = []            # asserts off: the weak RegStruct_SetVal default is one
+PI4IOE_DEPS = [
+    *PI4IOE_SOURCES_STRICT,
+    *PI4IOE_SOURCES_CLOSURE,
+    CLIB_DIR / "Ext" / "alxPi4ioe5v6534q.h",
+    CLIB_DIR / "Mcu" / "alxI2c.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxPi4ioe5v6534qTest.def",
+    Path(__file__),
+]
+PI4IOE_DLL = BUILD_DIR / "alxPi4ioe5v6534qTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -525,6 +556,11 @@ def _build_ina228_dll() -> None:
                INA228_DLL, TEST_DIR / "alxIna228Test.def", "ina228Closure")
 
 
+def _build_pi4ioe_dll() -> None:
+    _build_dll(PI4IOE_SOURCES_STRICT, PI4IOE_SOURCES_CLOSURE, PI4IOE_DEFINES,
+               PI4IOE_DLL, TEST_DIR / "alxPi4ioe5v6534qTest.def", "pi4ioeClosure")
+
+
 def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
@@ -546,6 +582,7 @@ DLL_GROUPS = [
     (RTC_DLL, RTC_DEPS, _build_rtc_dll),
     (PARAMMGMT_DLL, PARAMMGMT_DEPS, _build_parammgmt_dll),
     (INA228_DLL, INA228_DEPS, _build_ina228_dll),
+    (PI4IOE_DLL, PI4IOE_DEPS, _build_pi4ioe_dll),
 ]
 
 
@@ -1991,6 +2028,136 @@ class Ina228Lib:
         for handle in self._handles:
             self.c.AlxIna228Test_Delete(handle)
         self._handles.clear()
+
+
+class Pi4ioeLib:
+    """ctypes wrapper around alxPi4ioe5v6534qTest.dll: the 40-channel IO expander, over two fakes.
+
+    The driver keeps a shadow of the output register and pushes it to the part in one transfer, so a
+    test writes pins, calls ``handle``, and reads what actually went on the bus. Inputs go the other
+    way: the test puts bytes in the fake, calls ``handle``, and asks the driver about a pin.
+    """
+
+    PORTS, PINS = 5, 8
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, u8, i32, b, u32 = (ctypes.c_void_p, ctypes.c_uint8, ctypes.c_int32,
+                               ctypes.c_bool, ctypes.c_uint32)
+        c.AlxPi4ioeTest_New.restype = vp
+        c.AlxPi4ioeTest_New.argtypes = [u8]
+        c.AlxPi4ioeTest_Delete.argtypes = [vp]
+        c.AlxPi4ioeTest_ResetPin.restype = vp
+        c.AlxPi4ioeTest_ResetPin.argtypes = [vp]
+        for name in ("InputPortAddr", "OutputPortAddr"):
+            fn = getattr(c, f"AlxPi4ioeTest_{name}")
+            fn.restype = u8
+            fn.argtypes = [vp]
+        for name in ("Status_Ok", "Status_Err"):
+            getattr(c, f"AlxPi4ioeTest_{name}").restype = i32
+        c.AlxPi4ioe5v6534q_Handle.restype = i32
+        c.AlxPi4ioe5v6534q_Handle.argtypes = [vp, u8, u8]
+        c.AlxPi4ioe5v6534q_IoPin_Read.restype = b
+        c.AlxPi4ioe5v6534q_IoPin_Read.argtypes = [vp, u8, u8]
+        c.AlxPi4ioe5v6534q_IoPin_Write.argtypes = [vp, u8, u8, b]
+        for name in ("Set", "Reset", "Toggle"):
+            getattr(c, f"AlxPi4ioe5v6534q_IoPin_{name}").argtypes = [vp, u8, u8]
+        c.AlxI2cFake_SetReg.argtypes = [u8, ctypes.POINTER(u8), u8]
+        c.AlxI2cFake_GetLastWrite.argtypes = [u8, ctypes.POINTER(u8), u8]
+        for name in ("WriteCount", "ReadCount"):
+            fn = getattr(c, f"AlxI2cFake_{name}")
+            fn.restype = u32
+            fn.argtypes = [u8]
+        c.AlxI2cFake_SetForcedStatus.argtypes = [i32]
+        c.AlxIoPinFake_Level.restype = b
+        c.AlxIoPinFake_Level.argtypes = [vp]
+        for name in ("InitCount", "DeInitCount", "WriteCount"):
+            fn = getattr(c, f"AlxIoPinFake_{name}")
+            fn.restype = u32
+            fn.argtypes = [vp]
+
+        self.OK = c.AlxPi4ioeTest_Status_Ok()
+        self.ERR = c.AlxPi4ioeTest_Status_Err()
+        self._handles: list = []
+
+    def expander(self, i2c_addr: int = 0x40):
+        """A constructed and initialised expander, with both fakes cleared first."""
+        self.c.AlxI2cFake_Reset()
+        self.c.AlxIoPinFake_Reset()
+        handle = self.c.AlxPi4ioeTest_New(i2c_addr)
+        assert handle, "the driver refused to initialise over the fakes"
+        self._handles.append(handle)
+        return handle
+
+    # -- the driver -----------------------------------------------------------
+    def addresses(self, dev) -> tuple[int, int]:
+        """The input and output register addresses the driver was built with."""
+        return (self.c.AlxPi4ioeTest_InputPortAddr(dev),
+                self.c.AlxPi4ioeTest_OutputPortAddr(dev))
+
+    def write(self, dev, port: int, pin: int, value: bool) -> None:
+        self.c.AlxPi4ioe5v6534q_IoPin_Write(dev, port, pin, value)
+
+    def act(self, dev, action: str, port: int, pin: int) -> None:
+        """``Set``, ``Reset`` or ``Toggle`` one pin."""
+        getattr(self.c, f"AlxPi4ioe5v6534q_IoPin_{action}")(dev, port, pin)
+
+    def read(self, dev, port: int, pin: int) -> bool:
+        return self.c.AlxPi4ioe5v6534q_IoPin_Read(dev, port, pin)
+
+    def handle(self, dev, in_ports: int = PORTS, out_ports: int = PORTS) -> int:
+        """One service pass: read ``in_ports`` input bytes, write ``out_ports`` output bytes."""
+        return self.c.AlxPi4ioe5v6534q_Handle(dev, in_ports, out_ports)
+
+    def clear_all(self, dev) -> None:
+        """Drive every one of the forty channels low - the output register starts at all ones."""
+        for port in range(self.PORTS):
+            for pin in range(self.PINS):
+                self.write(dev, port, pin, False)
+
+    # -- the fakes ------------------------------------------------------------
+    def set_inputs(self, addr: int, values: bytes) -> None:
+        buff = (ctypes.c_uint8 * len(values))(*values)
+        self.c.AlxI2cFake_SetReg(addr, buff, len(values))
+
+    def outputs_on_the_bus(self, addr: int, length: int = PORTS) -> bytes:
+        buff = (ctypes.c_uint8 * length)()
+        self.c.AlxI2cFake_GetLastWrite(addr, buff, length)
+        return bytes(buff)
+
+    def bus_writes(self, addr: int) -> int:
+        return self.c.AlxI2cFake_WriteCount(addr)
+
+    def bus_reads(self, addr: int) -> int:
+        return self.c.AlxI2cFake_ReadCount(addr)
+
+    def reset_pin(self, dev) -> tuple[bool, int]:
+        """The reset pin's level and how many times it was driven."""
+        pin = self.c.AlxPi4ioeTest_ResetPin(dev)
+        return self.c.AlxIoPinFake_Level(pin), self.c.AlxIoPinFake_WriteCount(pin)
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxPi4ioeTest_Delete(handle)
+        self._handles.clear()
+
+
+@pytest.fixture(scope="session")
+def pi4ioe_lib_session() -> Pi4ioeLib:
+    override = os.environ.get("ALX_PI4IOE_TEST_DLL")
+    if override:
+        return Pi4ioeLib(Path(override))
+    if _needs_build(PI4IOE_DLL, PI4IOE_DEPS):
+        _build_pi4ioe_dll()
+    return Pi4ioeLib(PI4IOE_DLL)
+
+
+@pytest.fixture
+def pi4ioe_lib(pi4ioe_lib_session) -> Pi4ioeLib:
+    """The expander library, with the previous test's devices released."""
+    yield pi4ioe_lib_session
+    pi4ioe_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")
