@@ -24,7 +24,6 @@ import sys
 from pathlib import Path
 
 import nox
-
 from alx.c_lib import host_build as hb
 from alx.verify import lanes
 
@@ -38,12 +37,13 @@ import conftest as cf  # noqa: E402  the source lists, the build recipes and DLL
 
 nox.options.default_venv_backend = "none"
 nox.options.sessions = list(lanes.DEFAULT_SESSIONS)
-VENDOR = ["--exclude", "Ext", "--exclude", "FatFs", "--exclude", "mcuboot", "--exclude", "Usbh"]   # third-party folders, not gated
+# third-party folders, not gated
+VENDOR = ["--exclude", "Ext", "--exclude", "FatFs", "--exclude", "mcuboot", "--exclude", "Usbh"]
 
 # ---- the module sets (extend per module; keep in sync with conftest's group declarations) -------------------
 ANALYSIS_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c",
                     TEST / "alxFifoTestHelpers.c", TEST / "alxBoundTestHelpers.c", TEST / "alxFifoSanSmoke.c"]
-STYLE_FILES = ANALYSIS_SOURCES + [CLIB / "alxFifo.h", CLIB / "alxBound.h"]
+STYLE_FILES = [*ANALYSIS_SOURCES, CLIB / "alxFifo.h", CLIB / "alxBound.h"]
 INCLUDE_DIRS = [TEST, CLIB, CLIB / "Mcu"]
 CL_INCLUDES = [f"/I{d}" for d in INCLUDE_DIRS]
 GNU99 = ["/clang:-std=gnu99"]
@@ -54,11 +54,13 @@ FIFO_DEF = TEST / "alxFifoTest.def"
 # CLI group (Tier 2: real alxCli + param stack over the fakes), asserts ON = the code as shipped
 # (alxParamItem.c has side effects inside its asserts). KEEP IN SYNC WITH conftest.CLI_SOURCES_STRICT/_CLOSURE.
 CLI_ASSERTS = ["-DALX_CLI_ASSERT_RST_ENABLE", "-DALX_SERIAL_PORT_ASSERT_RST_ENABLE", "-DALX_FIFO_ASSERT_RST_ENABLE",
-               "-DALX_BOUND_ASSERT_RST_ENABLE", "-DALX_PARAM_ITEM_ASSERT_RST_ENABLE", "-DALX_PARAM_MGMT_ASSERT_RST_ENABLE",
+               "-DALX_BOUND_ASSERT_RST_ENABLE", "-DALX_PARAM_ITEM_ASSERT_RST_ENABLE",
+               "-DALX_PARAM_MGMT_ASSERT_RST_ENABLE",
                "-DALX_FTOA_ASSERT_RST_ENABLE", "-DALX_RANGE_ASSERT_RST_ENABLE", "-DALX_ID_ASSERT_RST_ENABLE"]
 CLI_CLOSURE = [CLIB / "alxParamItem.c", CLIB / "alxParamMgmt.c", CLIB / "alxFtoa.c", CLIB / "alxRange.c"]
 CLI_STRICT = [CLIB / "alxCli.c", CLIB / "alxFifo.c", CLIB / "alxBound.c", TEST / "alxSerialPortFake.c",
-              TEST / "alxParamKvStoreFake.c", TEST / "alxIdFake.c", TEST / "alxAssertPc.c", TEST / "alxCliTestHelpers.c"]
+              TEST / "alxParamKvStoreFake.c", TEST / "alxIdFake.c", TEST / "alxAssertPc.c",
+              TEST / "alxCliTestHelpers.c"]
 CLI_DEF = TEST / "alxCliTest.def"
 CLI_TESTS = ["test_alxCli.py"]
 
@@ -108,7 +110,7 @@ def _fresh_dev_build(session: nox.Session) -> None:
     session.run(PYTHON, "-m", "pytest", "-q", "--collect-only", silent=True)
 
 
-def _clang_cl(session: nox.Session, *args, cwd: Path = None) -> None:
+def _clang_cl(session: nox.Session, *args, cwd: Path | None = None) -> None:
     """clang-cl inside the vcvars environment; cwd = where the objects of a /c compile land."""
     if cwd is None:
         session.run(str(tc.compiler(hb.MSVC)), *args, env=tc.environment(), external=True)
@@ -158,15 +160,19 @@ def test(session: nox.Session) -> None:
 
 @nox.session
 def analyze(session: nox.Session) -> None:
-    """ANALYZE: 0 codespell + ASCII + README + style gates, 1 clang-tidy, 2 cppcheck (unix32 + win64), 3 gcc -fanalyzer."""
+    """ANALYZE: 0 codespell + ASCII + README + C-style + Python gates, 1 clang-tidy, 2 cppcheck, 3 gcc -fanalyzer."""
     out = lanes.evidence_dir(TEST, "analyze")
     if not (BUILD / "compile_commands.json").exists():
         _fresh_dev_build(session)
-    session.log("Stage 0: codespell, ASCII gate, README gate, style gate")
+    session.log("Stage 0: codespell, ASCII gate, README gate, C style gate, ruff (the shared test profile)")
     session.run(PYTHON, "-m", "codespell_lib", *_strs(ANALYSIS_SOURCES))
     session.run(PYTHON, "-m", "alx.verify.ascii_gate", str(CLIB), *VENDOR, "--out", str(out / "ascii_gate.txt"))
     session.run(PYTHON, "-m", "alx.verify.readme_gate", str(CLIB), *VENDOR, "--out", str(out / "readme_gate.txt"))
     session.run(PYTHON, "-m", "alx.verify.c_style", *_strs(STYLE_FILES), "--out", str(out / "c_style.txt"))
+    # this folder's Python is gated by the SAME profile the library gates its own tests with, so the two
+    # repositories cannot drift into two dialects - see alx/verify/ruff_tests.toml for what a test may waive
+    session.run(PYTHON, "-m", "ruff", "check", "--config", str(lanes.ruff_tests_config()), str(TEST),
+                "--output-file", str(out / "ruff.txt"))
     session.log("Stage 1: clang-tidy")
     session.run(str(tc.llvm("clang-tidy")), "--quiet", "-p", str(BUILD), *_strs(ANALYSIS_SOURCES), external=True,
                 stderr=subprocess.DEVNULL)
@@ -181,9 +187,10 @@ def analyze(session: nox.Session) -> None:
     log = out / "fanalyzer.txt"
     lines = []
     for src in ANALYSIS_SOURCES:
-        result = subprocess.run([str(tc.armgcc()), "-c", "-std=gnu99", "-mcpu=cortex-m0plus", "-mthumb", "-fanalyzer",
-                                 *[f"-I{d}" for d in INCLUDE_DIRS], str(src), "-o", str(out / f"{src.stem}.o")],
-                                capture_output=True, text=True)
+        result = subprocess.run(  # noqa: S603 - argv is the toolchain path and this repo's own sources
+            [str(tc.armgcc()), "-c", "-std=gnu99", "-mcpu=cortex-m0plus", "-mthumb", "-fanalyzer",
+             *[f"-I{d}" for d in INCLUDE_DIRS], str(src), "-o", str(out / f"{src.stem}.o")],
+            capture_output=True, text=True, check=False)   # the return code is read below
         lines.append(result.stderr)
         if result.returncode != 0:
             _write(log, "".join(lines))
@@ -210,11 +217,13 @@ def sanitize(session: nox.Session) -> None:
     _pytest(session, {"ALX_FIFO_TEST_DLL": str(ubsan / "alxFifoTest.dll")})
     session.log("Stage 2b: UBSan CLI DLL, CLI suite")
     objs = _closure_objects(session, ubsan / "cliClosure", CLI_CLOSURE, CLI_ASSERTS, UBSAN)
-    _dll(session, ubsan / "alxCliTest.dll", CLI_STRICT, CLI_DEF, UBSAN, ["-D_CRT_SECURE_NO_WARNINGS", *CLI_ASSERTS], objs)
+    _dll(session, ubsan / "alxCliTest.dll", CLI_STRICT, CLI_DEF, UBSAN,
+         ["-D_CRT_SECURE_NO_WARNINGS", *CLI_ASSERTS], objs)
     _pytest(session, {"ALX_CLI_TEST_DLL": str(ubsan / "alxCliTest.dll")}, *CLI_TESTS)
     session.log("Stage 2c: UBSan MemSafe DLL, MemSafe group suite")
     objs = _closure_objects(session, ubsan / "memsafeClosure", MS_CLOSURE, MS_ASSERTS, UBSAN)
-    _dll(session, ubsan / "alxMemSafeTest.dll", MS_STRICT, MS_DEF, UBSAN, ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
+    _dll(session, ubsan / "alxMemSafeTest.dll", MS_STRICT, MS_DEF, UBSAN,
+         ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
     _pytest(session, {"ALX_MEMSAFE_TEST_DLL": str(ubsan / "alxMemSafeTest.dll")}, *MS_TESTS)
     session.log("SANITIZE CLEAN")
 
@@ -256,7 +265,8 @@ def coverage(session: nox.Session) -> None:
     # with asserts ON and alxCrc.c has `break` after `return` plus assert-guarded default branches (task notes).
     ms = lanes.evidence_dir(TEST, "coverage", "memsafe")
     objs = _closure_objects(session, ms / "closure", MS_CLOSURE, MS_ASSERTS, PROFILE)
-    _dll(session, ms / "alxMemSafeTest.dll", MS_STRICT, MS_DEF, PROFILE, ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
+    _dll(session, ms / "alxMemSafeTest.dll", MS_STRICT, MS_DEF, PROFILE,
+         ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
     _llvm_cov_group(session, ms, ms / "alxMemSafeTest.dll", "ALX_MEMSAFE_TEST_DLL", MS_TESTS,
                     "functions", ["alxCrc.c", "alxMemSafe.c"])
     session.log("COVERAGE GATES PASS")

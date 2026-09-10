@@ -30,7 +30,7 @@ def crc_msb_first(data: bytes, width: int, poly: int, init: int, xorout: int) ->
     for byte in data:
         rem ^= byte << (width - 8)
         for _ in range(8):
-            if rem & top:
+            if rem & top:  # noqa: SIM108 - the reference keeps the published algorithm's shape
                 rem = ((rem << 1) ^ poly) & mask
             else:
                 rem = (rem << 1) & mask
@@ -107,8 +107,8 @@ def test_ALX1513_P9_calc_equals_reference_model(memsafe_lib, cfg, data):
 def test_ALX1513_P9_calc_equals_reference_model_random_lengths(memsafe_lib, cfg):
     lib = memsafe_lib
     c = getattr(lib, cfg)
-    rnd = random.Random(1513)
-    for n in range(0, 70):
+    rnd = random.Random(1513)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
+    for n in range(70):
         data = bytes(rnd.getrandbits(8) for _ in range(n))
         assert lib.crc_calc(c, data) == ref(lib, c, data), f"len {n}"
 
@@ -159,4 +159,5 @@ def test_ALX1513_P9_is_ok_on_all_zero_is_false(memsafe_lib):
 def test_ALX1513_P9_is_ok_with_empty_payload(memsafe_lib):
     lib = memsafe_lib
     ok, validated = lib.crc_is_ok(lib.CRC32, le(zlib.crc32(b""), 4))
-    assert ok is True and validated == zlib.crc32(b"")
+    assert ok is True
+    assert validated == zlib.crc32(b"")

@@ -102,7 +102,8 @@ def test_ALX1513_P11_changed_item_is_stored_within_three_passes(flash, make_stor
     assert flash.count(flash.WRITE) == writes
     flash.store_handle(ctx, 1)               # pass 2: diff -> write A and B (blocking MemSafe)
     assert flash.count(flash.WRITE) == writes + 2
-    assert flash.peek(A, REC) == blob(expected) and flash.peek(B, REC) == blob(expected)
+    assert flash.peek(A, REC) == blob(expected)
+    assert flash.peek(B, REC) == blob(expected)
     flash.store_handle(ctx, 1)               # pass 3: Writing -> done -> Checking
     assert flash.store_err(ctx) is False
     boot2 = make_store()
@@ -143,14 +144,15 @@ def test_ALX1513_P11_write_failure_puts_the_store_in_error_and_keeps_old_flash(f
     assert flash.item_set(ctx, 3, 18) == flash.OK
     flash.store_handle(ctx, 3)
     assert flash.store_err(ctx) is True
-    assert flash.peek(A, REC) == blob(DEFAULTS) and flash.peek(B, REC) == blob(DEFAULTS)
+    assert flash.peek(A, REC) == blob(DEFAULTS)
+    assert flash.peek(B, REC) == blob(DEFAULTS)
     assert flash.items(ctx)[3] == 18, "the RAM value stays what the user set"
     flash.store_handle(ctx, 5)
     assert flash.store_err(ctx) is True, "error state is sticky"
 
 
 def test_ALX1513_P11_property_random_sets_survive_reboots(flash, make_store):
-    rnd = random.Random(1513)
+    rnd = random.Random(1513)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
     ctx = booted(flash, make_store)
     expected = list(DEFAULTS)
     for step in range(40):
@@ -164,7 +166,8 @@ def test_ALX1513_P11_property_random_sets_survive_reboots(flash, make_store):
             assert flash.store_init(ctx) == flash.OK
             flash.store_handle(ctx, 3)
         assert flash.items(ctx) == expected, f"step {step}"
-    assert flash.peek(A, REC) == blob(expected) and flash.peek(B, REC) == blob(expected)
+    assert flash.peek(A, REC) == blob(expected)
+    assert flash.peek(B, REC) == blob(expected)
 
 
 # =====================================================================
@@ -186,5 +189,7 @@ def test_ALX1513_P11_store_after_failed_init_is_inert_under_handle(flash, make_s
     assert flash.item_set(ctx, 2, 77) == flash.OK, "the RAM value still changes (volatile operation)"
     flash.store_handle(ctx, 20)
     assert flash.items(ctx)[2] == 77
-    assert flash.count(flash.WRITE) == 0 and flash.count(flash.READ) == 0
-    assert flash.peek(A, REC) == bytes([0xFF] * REC) and flash.peek(B, REC) == bytes([0xFF] * REC)
+    assert flash.count(flash.WRITE) == 0
+    assert flash.count(flash.READ) == 0
+    assert flash.peek(A, REC) == bytes([0xFF] * REC)
+    assert flash.peek(B, REC) == bytes([0xFF] * REC)

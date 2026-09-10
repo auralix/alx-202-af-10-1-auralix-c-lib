@@ -60,7 +60,8 @@ def test_ALX1513_P8_write_puts_payload_plus_crc32_in_both_copies(flash, make_sto
     assert flash.peek(A, REC) == blob(V1)
     assert flash.peek(B, REC) == blob(V1)
     assert flash.peek(REC, 0x100 - REC) == b"\xff" * (0x100 - REC), "nothing else touched between the copies"
-    assert flash.flags(ctx)["write_done"] is True and flash.flags(ctx)["write_err"] is False
+    assert flash.flags(ctx)["write_done"] is True
+    assert flash.flags(ctx)["write_err"] is False
 
 
 def test_ALX1513_P8_read_after_write_uses_copy_a_and_writes_nothing(flash, make_store):
@@ -71,7 +72,8 @@ def test_ALX1513_P8_read_after_write_uses_copy_a_and_writes_nothing(flash, make_
     assert status == flash.BOTH_OK_SAME_USE_A
     assert data == V2
     assert flash.count(flash.WRITE) == writes, "a clean read must not write"
-    assert flash.flags(ctx)["read_done"] is True and flash.flags(ctx)["read_err"] is False
+    assert flash.flags(ctx)["read_done"] is True
+    assert flash.flags(ctx)["read_err"] is False
 
 
 def test_ALX1513_P8_write_order_is_copy_a_then_copy_b(flash, make_store):
@@ -98,7 +100,8 @@ def test_ALX1513_P8_repair_write_carries_the_configured_tries_and_timeout(flash,
     ctx = make_store(raw_tries=7)
     _repair_case(flash, ctx, case)
     status, data = flash.read(ctx)
-    assert status == getattr(flash, REPAIR_EXPECT[case][0]) and data == V1
+    assert status == getattr(flash, REPAIR_EXPECT[case][0])
+    assert data == V1
     assert flash.args_mismatch() == 0, "the repair write got other tries/timeout than the configured ones"
     assert flash.not_init_calls() == 0
 
@@ -108,7 +111,8 @@ def test_ALX1513_P8_reboot_reads_what_was_written(flash, make_store):
     assert flash.write(boot1, V3) == flash.OK
     boot2 = make_store()                      # new object over the same flash = reboot
     status, data = flash.read(boot2)
-    assert status == flash.BOTH_OK_SAME_USE_A and data == V3
+    assert status == flash.BOTH_OK_SAME_USE_A
+    assert data == V3
 
 
 def test_ALX1513_P8_all_flags_are_false_right_after_ctor(flash, make_store):
@@ -128,7 +132,8 @@ def test_ALX1513_P8_blank_flash_reads_both_copies_invalid_and_touches_nothing(fl
     assert status == flash.BOTH_ERR
     assert data == bytes([flash.POISON] * 5), "out buffer must stay untouched"
     assert flash.count(flash.WRITE) == 0
-    assert flash.peek(A, REC) == b"\xff" * REC and flash.peek(B, REC) == b"\xff" * REC
+    assert flash.peek(A, REC) == b"\xff" * REC
+    assert flash.peek(B, REC) == b"\xff" * REC
 
 
 def test_ALX1513_P8_characterization_read_flags_after_both_invalid(flash, make_store):
@@ -204,7 +209,8 @@ def test_ALX1513_P8_one_failing_raw_call_during_read_is_retried(flash, make_stor
     k = getattr(flash, kind)
     flash.fail_at(k, flash.count(k) + 1)      # the very next call of that kind fails once
     status, data = flash.read(ctx)
-    assert status == flash.BOTH_OK_SAME_USE_A and data == V1
+    assert status == flash.BOTH_OK_SAME_USE_A
+    assert data == V1
 
 
 @pytest.mark.parametrize("kind", ["INIT", "WRITE", "DEINIT"])
@@ -213,14 +219,16 @@ def test_ALX1513_P8_one_failing_raw_call_during_write_is_retried(flash, make_sto
     k = getattr(flash, kind)
     flash.fail_at(k, 1)
     assert flash.write(ctx, V2) == flash.OK
-    assert flash.peek(A, REC) == blob(V2) and flash.peek(B, REC) == blob(V2)
+    assert flash.peek(A, REC) == blob(V2)
+    assert flash.peek(B, REC) == blob(V2)
 
 
 def test_ALX1513_P8_raw_init_failing_always_gives_error_after_the_configured_tries(flash, make_store):
     ctx = make_store(tries=3)
     flash.fail_at(flash.INIT, flash.ALWAYS)
     assert flash.write(ctx, V1) == flash.ERR
-    assert flash.flags(ctx)["write_err"] is True and flash.flags(ctx)["write_done"] is False
+    assert flash.flags(ctx)["write_err"] is True
+    assert flash.flags(ctx)["write_done"] is False
     assert flash.count(flash.INIT) == 3, "one Init attempt per memSafeReadWriteNumOfTries"
     assert flash.count(flash.WRITE) == 0
     flash.fake_reset()
@@ -235,14 +243,15 @@ def test_ALX1513_P8_raw_write_failing_always_leaves_old_record_intact(flash, mak
     flash.fail_at(flash.WRITE, flash.ALWAYS)
     assert flash.write(ctx, V2) == flash.ERR
     assert flash.flags(ctx)["write_err"] is True
-    assert flash.peek(A, REC) == blob(V1) and flash.peek(B, REC) == blob(V1)
+    assert flash.peek(A, REC) == blob(V1)
+    assert flash.peek(B, REC) == blob(V1)
 
 
 # =====================================================================
 # P8 - power loss: the property the two copies exist for
 # =====================================================================
 
-@pytest.mark.parametrize("landed", list(range(0, REC)))
+@pytest.mark.parametrize("landed", list(range(REC)))
 def test_ALX1513_P8_power_loss_during_copy_a_keeps_the_old_record(flash, make_store, landed):
     boot1 = make_store()
     assert flash.write(boot1, V1) == flash.OK
@@ -257,7 +266,7 @@ def test_ALX1513_P8_power_loss_during_copy_a_keeps_the_old_record(flash, make_st
     assert flash.peek(A, REC) == blob(V1), "A repaired (or never damaged)"
 
 
-@pytest.mark.parametrize("landed", list(range(0, REC)))
+@pytest.mark.parametrize("landed", list(range(REC)))
 def test_ALX1513_P8_power_loss_during_copy_b_keeps_the_new_record(flash, make_store, landed):
     boot1 = make_store()
     assert flash.write(boot1, V1) == flash.OK
@@ -275,7 +284,7 @@ def test_ALX1513_P8_property_reboot_reads_last_or_previous_record_never_a_third(
     """Random writes, each optionally cut at a random point of copy A or copy B, each followed
     by a reboot: the record read is always the last committed one or the one before it, and a
     reboot never finds both copies invalid once a first record exists."""
-    rnd = random.Random(20260903)
+    rnd = random.Random(20260903)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
     committed = None
     ctx = make_store()
     for step in range(120):
@@ -312,7 +321,8 @@ def test_ALX1513_P8_row_erase_model_product_layout_a_and_b_in_own_rows_is_safe(f
     assert flash.write(ctx, V2) == flash.ERR
     flash.power_on()
     status, data = flash.read(make_store(0x000, 0x100))
-    assert data == V2 and status in (flash.BOTH_OK_DIFF_USE_A, flash.A_OK_B_ERR_USE_A)
+    assert data == V2
+    assert status in (flash.BOTH_OK_DIFF_USE_A, flash.A_OK_B_ERR_USE_A)
 
 
 def test_ALX1513_P8_row_erase_model_copies_in_the_same_row_destroy_each_other(flash, make_store):
@@ -337,7 +347,7 @@ def test_ALX1513_P8_row_erase_model_copies_in_the_same_row_destroy_each_other(fl
 #      repair writes (llvm-cov of the first suite showed these branches unexecuted)
 # =====================================================================
 
-@pytest.mark.parametrize("kind,nth", [("INIT", 2), ("READ", 2), ("DEINIT", 1), ("DEINIT", 2)],
+@pytest.mark.parametrize(("kind", "nth"), [("INIT", 2), ("READ", 2), ("DEINIT", 1), ("DEINIT", 2)],
                          ids=["init-before-B", "read-B", "deinit-after-A", "deinit-after-B"])
 def test_ALX1513_P8_read_retries_a_failure_at_every_raw_call_site(flash, make_store, kind, nth):
     ctx = make_store(tries=3)
@@ -346,19 +356,21 @@ def test_ALX1513_P8_read_retries_a_failure_at_every_raw_call_site(flash, make_st
     inits = flash.count(flash.INIT)
     flash.fail_at(k, flash.count(k) + nth)
     status, data = flash.read(ctx)
-    assert status == flash.BOTH_OK_SAME_USE_A and data == V1
+    assert status == flash.BOTH_OK_SAME_USE_A
+    assert data == V1
     assert flash.count(flash.INIT) >= inits + 3, "a failed raw call must restart the read (2 Inits per attempt)"
     assert flash.not_init_calls() == 0, "no Read/Write may be issued after a failed Init"
 
 
-@pytest.mark.parametrize("kind,nth", [("INIT", 2), ("WRITE", 2), ("DEINIT", 1), ("DEINIT", 2)],
+@pytest.mark.parametrize(("kind", "nth"), [("INIT", 2), ("WRITE", 2), ("DEINIT", 1), ("DEINIT", 2)],
                          ids=["init-before-B", "write-B", "deinit-after-A", "deinit-after-B"])
 def test_ALX1513_P8_write_retries_a_failure_at_every_raw_call_site(flash, make_store, kind, nth):
     ctx = make_store(tries=3)
     k = getattr(flash, kind)
     flash.fail_at(k, nth)
     assert flash.write(ctx, V2) == flash.OK
-    assert flash.peek(A, REC) == blob(V2) and flash.peek(B, REC) == blob(V2)
+    assert flash.peek(A, REC) == blob(V2)
+    assert flash.peek(B, REC) == blob(V2)
     assert flash.count(flash.INIT) >= 3, "a failed raw call must restart the pair (2 Inits per attempt)"
     assert flash.not_init_calls() == 0, "no Read/Write may be issued after a failed Init"
 
@@ -382,7 +394,7 @@ REPAIR_EXPECT = {
 
 
 @pytest.mark.parametrize("case", ["diff", "b-bad", "a-bad"])
-@pytest.mark.parametrize("kind,nth", [("INIT", 3), ("WRITE", 1), ("DEINIT", 3)],
+@pytest.mark.parametrize(("kind", "nth"), [("INIT", 3), ("WRITE", 1), ("DEINIT", 3)],
                          ids=["init-before-repair", "repair-write", "deinit-after-repair"])
 def test_ALX1513_P8_repair_write_path_retries_a_failure_and_still_repairs(flash, make_store, case, kind, nth):
     """The repair (rewriting the bad copy from the good one) is the third Init/DeInit and the first

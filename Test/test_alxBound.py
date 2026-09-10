@@ -47,7 +47,8 @@ def test_ALX1514_P12_int_in_range_unchanged(bound, t):
     lo, hi = TYPE_RANGES[t]
     for val, mn, mx in [(5, 1, 9), (lo + 1, lo, hi), (hi - 1, lo, hi), (0, lo, hi)]:
         status, out = bound.bound(t, val, mn, mx)
-        assert status == bound.OK and out == val
+        assert status == bound.OK
+        assert out == val
 
 
 @pytest.mark.parametrize("t", INT_TYPES)
@@ -55,21 +56,24 @@ def test_ALX1514_P12_int_boundaries_inclusive(bound, t):
     lo, hi = TYPE_RANGES[t]
     for val, mn, mx in [(1, 1, 9), (9, 1, 9), (lo, lo, hi), (hi, lo, hi)]:
         status, out = bound.bound(t, val, mn, mx)
-        assert status == bound.OK and out == val
+        assert status == bound.OK
+        assert out == val
 
 
 @pytest.mark.parametrize("t", INT_TYPES)
 def test_ALX1514_P12_int_below_min_clamps(bound, t):
     lo, hi = TYPE_RANGES[t]
     status, out = bound.bound(t, lo, lo + 5, hi)
-    assert status == bound.ERR_MIN and out == lo + 5
+    assert status == bound.ERR_MIN
+    assert out == lo + 5
 
 
 @pytest.mark.parametrize("t", INT_TYPES)
 def test_ALX1514_P12_int_above_max_clamps(bound, t):
     lo, hi = TYPE_RANGES[t]
     status, out = bound.bound(t, hi, lo, hi - 5)
-    assert status == bound.ERR_MAX and out == hi - 5
+    assert status == bound.ERR_MAX
+    assert out == hi - 5
 
 
 @pytest.mark.parametrize("t", INT_TYPES)
@@ -85,7 +89,7 @@ def test_ALX1514_P12_int_degenerate_range(bound, t):
 def test_ALX1514_P12_int_property_vs_model(bound, t):
     """Back-to-back comparison against the Python reference model."""
     lo, hi = TYPE_RANGES[t]
-    rnd = random.Random(1514)
+    rnd = random.Random(1514)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
     pool = [lo, lo + 1, hi - 1, hi, 0, 1] + [rnd.randint(lo, hi) for _ in range(200)]
     for _ in range(300):
         val = rnd.choice(pool)
@@ -128,14 +132,17 @@ def test_ALX1514_P12_real_nan_passes_through_as_ok(bound, t):
 
 def test_ALX1514_P12_str_fits_exact_copy(bound):
     status, content, raw = bound.bound_str(b"abc", 8)
-    assert status == bound.OK and content == b"abc"
+    assert status == bound.OK
+    assert content == b"abc"
     assert raw[3] == 0                                   # NUL written
     assert all(b == bound.POISON for b in raw[4:])       # beyond NUL untouched
 
 
 def test_ALX1514_P12_str_exact_fit_boundary(bound):
     status, content, raw = bound.bound_str(b"abcdefg", 8)   # strlen+1 == max
-    assert status == bound.OK and content == b"abcdefg" and raw[7] == 0
+    assert status == bound.OK
+    assert content == b"abcdefg"
+    assert raw[7] == 0
 
 
 def test_ALX1514_P12_str_too_long_truncates_terminated(bound):
@@ -148,25 +155,33 @@ def test_ALX1514_P12_str_too_long_truncates_terminated(bound):
 
 def test_ALX1514_P12_str_empty_source(bound):
     status, content, raw = bound.bound_str(b"", 4)
-    assert status == bound.OK and content == b"" and raw[0] == 0
+    assert status == bound.OK
+    assert content == b""
+    assert raw[0] == 0
     assert all(b == bound.POISON for b in raw[1:])
 
 
 def test_ALX1514_P12_str_min_capacity_two(bound):
     status, content, raw = bound.bound_str(b"xyz", 2, buf_len=6)
-    assert status == bound.ERR_LEN and content == b"x" and raw[1] == 0
+    assert status == bound.ERR_LEN
+    assert content == b"x"
+    assert raw[1] == 0
     assert all(b == bound.POISON for b in raw[2:])
 
 
 def test_ALX1514_P12_str_property_vs_model(bound):
-    rnd = random.Random(1514)
+    rnd = random.Random(1514)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
     for _ in range(200):
         n = rnd.randint(0, 12)
         val = bytes(rnd.choice(b"abcdefgh") for _ in range(n))
         cap = rnd.randint(2, 10)
         status, content, raw = bound.bound_str(val, cap, buf_len=16)
         if len(val) + 1 <= cap:
-            assert status == bound.OK and content == val and raw[len(val)] == 0
+            assert status == bound.OK
+            assert content == val
+            assert raw[len(val)] == 0
         else:
-            assert status == bound.ERR_LEN and content == val[:cap - 1] and raw[cap - 1] == 0
+            assert status == bound.ERR_LEN
+            assert content == val[:cap - 1]
+            assert raw[cap - 1] == 0
         assert all(b == bound.POISON for b in raw[cap:])

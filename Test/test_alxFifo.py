@@ -117,11 +117,12 @@ def test_ALX1514_P1_any_nul_byte_is_not_a_delimiter(lib, make_fifo):
     # implementation MUST NOT treat a 0x00 data byte as a set member.
     f = make_fifo(32)
     lib.write(f, b"a\x00b\r")
-    status, content, la, raw = lib.ru_any(f, b"\r\n", 16)
+    status, _content, la, raw = lib.ru_any(f, b"\r\n", 16)
     assert status == lib.OK
     assert la == 4
     assert raw[:4] == b"a\x00b\r"
-    assert raw[4] == 0 and all(b == lib.POISON for b in raw[5:])
+    assert raw[4] == 0
+    assert all(b == lib.POISON for b in raw[5:])
 
 
 # =====================================================================
@@ -147,14 +148,15 @@ def test_ALX1514_P2_any_lenactual_null_accepted(lib, make_fifo):
     lib.write(f, b"get\r")
     status, _, _, raw = lib.ru_any(f, b"\r\n", 16, len_actual_null=True)
     assert status == lib.OK
-    assert raw[:4] == b"get\r" and raw[4] == 0
+    assert raw[:4] == b"get\r"
+    assert raw[4] == 0
 
 
 # =====================================================================
 # P3 - ReadStrUntilAny: ErrTooLong trigger A (line does not fit len)
 # =====================================================================
 
-@pytest.mark.parametrize("payload,fits", [
+@pytest.mark.parametrize(("payload", "fits"), [
     (b"abcde", True),    # line = 6 incl. CR, len-1 = 7 -> fits
     (b"abcdef", True),   # line = 7 incl. CR = len-1    -> exactly fits
     (b"abcdefg", False), # line = 8 incl. CR > len-1    -> too long
@@ -280,7 +282,7 @@ def test_ALX1514_P5_seq_empty_line_is_terminator_only(lib, make_fifo):
 # P6 - ReadStrUntil (sequence): ErrTooLong A + flood B
 # =====================================================================
 
-@pytest.mark.parametrize("payload,fits", [
+@pytest.mark.parametrize(("payload", "fits"), [
     (b"abc", True),      # line = 5 incl. CRLF = len-1 -> exactly fits
     (b"abcd", False),    # line = 6 incl. CRLF > len-1 -> too long
 ])
@@ -358,17 +360,20 @@ def test_ALX1514_P8_writestr_smoke(lib, make_fifo):
     f = make_fifo(8)
     assert lib.c.AlxFifo_WriteStr(f, b"abc") == lib.OK
     assert lib.entries(f) == 3
-    status, data = lib.read(f, 3)
+    _status, data = lib.read(f, 3)
     assert data == b"abc"
 
 
 def test_ALX1514_P2_lenactual_null_on_seq_and_error_paths(lib, make_fifo):
     f = make_fifo(8)
     s, _, _, raw = lib.ru(f, b"\r\n", 8, len_actual_null=True)   # ErrEmpty path
-    assert s == lib.ERR_EMPTY and raw[0] == 0
+    assert s == lib.ERR_EMPTY
+    assert raw[0] == 0
     lib.write(f, b"a\r\n")
     s, _, _, raw = lib.ru(f, b"\r\n", 8, len_actual_null=True)   # Ok path
-    assert s == lib.OK and raw[:3] == b"a\r\n" and raw[3] == 0
+    assert s == lib.OK
+    assert raw[:3] == b"a\r\n"
+    assert raw[3] == 0
 
 
 def test_ALX1514_P8_write_read_roundtrip(lib, make_fifo):
@@ -376,7 +381,8 @@ def test_ALX1514_P8_write_read_roundtrip(lib, make_fifo):
     assert lib.write(f, b"abc") == lib.OK
     assert lib.entries(f) == 3
     status, data = lib.read(f, 3)
-    assert status == lib.OK and data == b"abc"
+    assert status == lib.OK
+    assert data == b"abc"
     assert lib.entries(f) == 0
 
 
@@ -401,7 +407,7 @@ def test_ALX1514_P8_partial_write_current_contract_pinned(lib, make_fifo):
     f = make_fifo(4)
     assert lib.write(f, b"abcdef") == lib.ERR_FULL
     assert lib.entries(f) == 4
-    status, data = lib.read(f, 4)
+    _status, data = lib.read(f, 4)
     assert data == b"abcd"
 
 
@@ -414,7 +420,8 @@ def test_ALX1514_P8_rewind_audit_trace(lib, make_fifo):
     lib.read(f, 2)                               # consume C, D
     assert lib.c.AlxFifo_Rewind(f, 4) == 2       # clamped to unused space
     status, data = lib.read(f, 4)
-    assert status == lib.OK and data == b"CDEF"
+    assert status == lib.OK
+    assert data == b"CDEF"
 
 
 def test_ALX1514_P8_rewind_edge_cases_return_zero(lib, make_fifo):
@@ -432,7 +439,8 @@ def test_ALX1514_P8_rewind_partial_leaves_fifo_not_full(lib, make_fifo):
     lib.read(f, 3)                             # consume a, b, c
     assert lib.c.AlxFifo_Rewind(f, 1) == 1     # un-consume 'c'; 2 of 4 entries
     status, data = lib.read(f, 2)
-    assert status == lib.OK and data == b"cd"
+    assert status == lib.OK
+    assert data == b"cd"
 
 
 # =====================================================================
@@ -447,7 +455,7 @@ class ModelFifo:
         self.buf = bytearray()
 
     def write(self, data: bytes) -> str:
-        for i, b in enumerate(data):
+        for _i, b in enumerate(data):
             if len(self.buf) >= self.cap:
                 return "ERR_FULL"                # partial commit, rest dropped
             self.buf.append(b)
@@ -491,7 +499,7 @@ class ModelFifo:
 
 @pytest.mark.parametrize("seed", [1, 2, 3])
 def test_ALX1514_P9_property_model_random_ops(lib, make_fifo, seed):
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
     cap = 16
     f = make_fifo(cap)
     model = ModelFifo(cap)
@@ -508,21 +516,22 @@ def test_ALX1514_P9_property_model_random_ops(lib, make_fifo, seed):
             assert got == exp, f"seed {seed} step {step} write({chunk!r}): {got} != {exp}"
         else:
             ln = rng.choice([4, 8, 32])
-            status, content, la, raw = lib.ru_any(f, b"\r\n", ln)
+            status, _content, la, raw = lib.ru_any(f, b"\r\n", ln)
             exp_status, exp_line = model.read_until_any(b"\r\n", ln)
             got_status = status_name[status]
             assert got_status == exp_status, \
                 f"seed {seed} step {step} ru_any(len={ln}): {got_status} != {exp_status}"
             exp_la = len(exp_line)
             assert la == exp_la, f"seed {seed} step {step}: lenActual {la} != {exp_la}"
-            assert raw[:la] == exp_line and raw[la] == 0
+            assert raw[:la] == exp_line
+            assert raw[la] == 0
         assert lib.entries(f) == len(model.buf), \
             f"seed {seed} step {step}: entries {lib.entries(f)} != model {len(model.buf)}"
 
 
 @pytest.mark.parametrize("seed", [4, 5])
 def test_ALX1514_P9_property_model_seq_random_ops(lib, make_fifo, seed):
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # noqa: S311 - a seeded generator is reproducible fuzz input, not crypto
     cap = 16
     f = make_fifo(cap)
     model = ModelFifo(cap)
@@ -538,12 +547,14 @@ def test_ALX1514_P9_property_model_seq_random_ops(lib, make_fifo, seed):
             assert got == exp, f"seed {seed} step {step} write({chunk!r}): {got} != {exp}"
         else:
             ln = rng.choice([4, 8, 32])
-            status, content, la, raw = lib.ru(f, b"\r\n", ln)
+            status, _content, la, raw = lib.ru(f, b"\r\n", ln)
             exp_status, exp_line = model.read_until_seq(b"\r\n", ln)
             got_status = status_name[status]
             assert got_status == exp_status, \
                 f"seed {seed} step {step} ru(len={ln}): {got_status} != {exp_status}"
-            assert la == len(exp_line) and raw[:la] == exp_line and raw[la] == 0
+            assert la == len(exp_line)
+            assert raw[:la] == exp_line
+            assert raw[la] == 0
         assert lib.entries(f) == len(model.buf), \
             f"seed {seed} step {step}: entries {lib.entries(f)} != model {len(model.buf)}"
 
@@ -587,12 +598,14 @@ def test_ALX1514_P11_rewind_partial_leaves_fifo_writable(lib, make_fifo):
     f = make_fifo(8)
     assert lib.write(f, b"abcd") == lib.OK
     status, data = lib.read(f, 2)
-    assert status == lib.OK and data == b"ab"
+    assert status == lib.OK
+    assert data == b"ab"
     assert lib.c.AlxFifo_Rewind(f, 2) == 2       # un-read "ab": 4 entries, half full
     assert lib.entries(f) == 4
     assert lib.write(f, b"wxyz") == lib.OK       # MUST NOT be ErrFull
     status, data = lib.read(f, 8)
-    assert status == lib.OK and data == b"abcdwxyz"
+    assert status == lib.OK
+    assert data == b"abcdwxyz"
 
 
 def test_ALX1514_P11_rewind_bounded_by_reads_since_flush(lib, make_fifo):
@@ -607,7 +620,8 @@ def test_ALX1514_P11_rewind_bounded_by_reads_since_flush(lib, make_fifo):
     assert status == lib.ERR_EMPTY               # and still truly empty
     assert lib.write(f, b"ab") == lib.OK
     status, data = lib.read(f, 2)
-    assert status == lib.OK and data == b"ab"
+    assert status == lib.OK
+    assert data == b"ab"
     lib.c.AlxFifo_Flush(f)
     assert lib.c.AlxFifo_Rewind(f, 1) == 0       # flush forgets read history
     assert lib.entries(f) == 0
@@ -623,7 +637,8 @@ def test_ALX1514_P11_flush_resets_positions_for_next_write(lib, make_fifo):
     assert lib.entries(f) == 0
     assert lib.write(f, b"xy") == lib.OK
     status, data = lib.read(f, 2)
-    assert status == lib.OK and data == b"xy"
+    assert status == lib.OK
+    assert data == b"xy"
 
 
 def test_ALX1514_P11_flush_full_fifo_becomes_writable(lib, make_fifo):
@@ -636,7 +651,8 @@ def test_ALX1514_P11_flush_full_fifo_becomes_writable(lib, make_fifo):
     assert lib.entries(f) == 0
     assert lib.write(f, b"wxyz") == lib.OK           # MUST NOT be ErrFull
     status, data = lib.read(f, 4)
-    assert status == lib.OK and data == b"wxyz"
+    assert status == lib.OK
+    assert data == b"wxyz"
 
 
 def test_ALX1514_P11_rewind_zero_is_noop(lib, make_fifo):
@@ -644,7 +660,8 @@ def test_ALX1514_P11_rewind_zero_is_noop(lib, make_fifo):
     f = make_fifo(8)
     assert lib.write(f, b"ab") == lib.OK
     status, data = lib.read(f, 2)
-    assert status == lib.OK and data == b"ab"
+    assert status == lib.OK
+    assert data == b"ab"
     assert lib.c.AlxFifo_Rewind(f, 0) == 0
     assert lib.entries(f) == 0                       # truly nothing rewound
     status, _ = lib.read(f, 1)
@@ -659,7 +676,8 @@ def test_ALX1514_P11_rewind_on_full_fifo_returns_zero(lib, make_fifo):
     assert lib.c.AlxFifo_Rewind(f, 1) == 0
     assert lib.entries(f) == 4
     status, data = lib.read(f, 4)
-    assert status == lib.OK and data == b"abcd"
+    assert status == lib.OK
+    assert data == b"abcd"
 
 
 def test_ALX1514_P11_rewind_from_empty_clears_isEmpty(lib, make_fifo):
@@ -668,10 +686,12 @@ def test_ALX1514_P11_rewind_from_empty_clears_isEmpty(lib, make_fifo):
     f = make_fifo(8)
     assert lib.write(f, b"ab") == lib.OK
     status, data = lib.read(f, 2)
-    assert status == lib.OK and data == b"ab"        # fifo now empty
+    assert status == lib.OK
+    assert data == b"ab"
     assert lib.c.AlxFifo_Rewind(f, 2) == 2
     status, data = lib.read(f, 2)
-    assert status == lib.OK and data == b"ab"        # readable again
+    assert status == lib.OK
+    assert data == b"ab"
 
 
 def test_ALX1514_P11_flush_after_partial_read_resets_positions(lib, make_fifo):
@@ -680,11 +700,13 @@ def test_ALX1514_P11_flush_after_partial_read_resets_positions(lib, make_fifo):
     f = make_fifo(4)
     assert lib.write(f, b"abcd") == lib.OK
     status, data = lib.read(f, 2)                    # tail = 2, head = 0 (wrapped)
-    assert status == lib.OK and data == b"ab"
+    assert status == lib.OK
+    assert data == b"ab"
     lib.c.AlxFifo_Flush(f)
     assert lib.write(f, b"wxyz") == lib.OK
     status, data = lib.read(f, 4)
-    assert status == lib.OK and data == b"wxyz"      # stale tail would serve garbage
+    assert status == lib.OK
+    assert data == b"wxyz"
 
 
 def test_ALX1514_P11_rewind_wrap_non_power_of_two_buffer(lib, make_fifo):
@@ -694,13 +716,16 @@ def test_ALX1514_P11_rewind_wrap_non_power_of_two_buffer(lib, make_fifo):
     f = make_fifo(5)
     assert lib.write(f, b"abc") == lib.OK
     status, data = lib.read(f, 3)                    # tail = 3
-    assert status == lib.OK and data == b"abc"
+    assert status == lib.OK
+    assert data == b"abc"
     assert lib.write(f, b"de") == lib.OK             # head wraps: positions 3,4
     status, data = lib.read(f, 2)                    # tail wraps to 0
-    assert status == lib.OK and data == b"de"
+    assert status == lib.OK
+    assert data == b"de"
     assert lib.c.AlxFifo_Rewind(f, 2) == 2           # rewind across the wrap: tail -> 3
     status, data = lib.read(f, 2)
-    assert status == lib.OK and data == b"de"
+    assert status == lib.OK
+    assert data == b"de"
 
 
 def test_ALX1514_P11_rewind_to_exactly_full_sets_full(lib, make_fifo):
@@ -709,7 +734,8 @@ def test_ALX1514_P11_rewind_to_exactly_full_sets_full(lib, make_fifo):
     f = make_fifo(4)
     assert lib.write(f, b"abcd") == lib.OK       # full
     status, data = lib.read(f, 4)
-    assert status == lib.OK and data == b"abcd"  # empty again
+    assert status == lib.OK
+    assert data == b"abcd"
     assert lib.c.AlxFifo_Rewind(f, 4) == 4       # rewind to exactly full
     assert lib.entries(f) == 4
     assert lib.write(f, b"!") == lib.ERR_FULL
@@ -731,12 +757,14 @@ def test_ALX1514_P11_rewind_on_full_fifo_with_read_history_returns_zero(lib, mak
     f = make_fifo(4)
     assert lib.write(f, b"abcd") == lib.OK       # full
     status, data = lib.read(f, 2)
-    assert status == lib.OK and data == b"ab"    # history: 2 read since flush
+    assert status == lib.OK
+    assert data == b"ab"
     assert lib.write(f, b"ef") == lib.OK         # full again
     assert lib.c.AlxFifo_Rewind(f, 1) == 0       # nothing can be rewound into a full fifo
     assert lib.entries(f) == 4
     status, data = lib.read(f, 4)
-    assert status == lib.OK and data == b"cdef"
+    assert status == lib.OK
+    assert data == b"cdef"
 
 
 def test_ALX1514_P11_rewind_clamped_to_reads_when_capacity_allows_more(lib, make_fifo):
@@ -747,11 +775,13 @@ def test_ALX1514_P11_rewind_clamped_to_reads_when_capacity_allows_more(lib, make
     f = make_fifo(16)
     assert lib.write(f, b"ABCDEFGH") == lib.OK
     status, data = lib.read(f, 3)
-    assert status == lib.OK and data == b"ABC"
+    assert status == lib.OK
+    assert data == b"ABC"
     assert lib.c.AlxFifo_Rewind(f, 5) == 3       # asked 5, only 3 were ever read
     assert lib.entries(f) == 8
     status, data = lib.read(f, 8)
-    assert status == lib.OK and data == b"ABCDEFGH"
+    assert status == lib.OK
+    assert data == b"ABCDEFGH"
 
 
 def test_ALX1514_P11_flush_of_non_empty_fifo_makes_it_empty_for_read(lib, make_fifo):

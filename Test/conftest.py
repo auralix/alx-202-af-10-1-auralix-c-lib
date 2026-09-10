@@ -8,9 +8,9 @@ handles from alxFifoTestHelpers.c and the public alxFifo.h API only.
 import ctypes
 import os
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
-
 from alx.c_lib import host_build
 
 # proof token / req marker -> junit <property>, run_dir, git_head: the Auralix Python lib's evidence plugin
@@ -26,7 +26,8 @@ FIFO_SOURCES = [
     TEST_DIR / "alxFifoTestHelpers.c",
     TEST_DIR / "alxBoundTestHelpers.c",
 ]
-FIFO_DEPS = FIFO_SOURCES + [
+FIFO_DEPS = [
+    *FIFO_SOURCES,
     CLIB_DIR / "alxFifo.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxBound.h",
@@ -300,7 +301,7 @@ class BoundLib:
     numeric entry maps to (ctypes scalar type, AlxBound function).
     """
 
-    NUMERIC = {
+    NUMERIC: ClassVar[dict[str, type]] = {
         "Uint8": ctypes.c_uint8, "Uint16": ctypes.c_uint16,
         "Uint32": ctypes.c_uint32, "Uint64": ctypes.c_uint64,
         "Int8": ctypes.c_int8, "Int16": ctypes.c_int16,
@@ -336,7 +337,7 @@ class BoundLib:
 
     POISON = 0xAA
 
-    def bound_str(self, val: bytes, max_len_with_nul: int, buf_len: int = None):
+    def bound_str(self, val: bytes, max_len_with_nul: int, buf_len: int | None = None):
         """Call AlxBound_Str with a poison-filled destination.
 
         Returns (status, content_up_to_nul, raw_buffer_bytes)."""
@@ -421,31 +422,45 @@ class MemSafeLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
-        vp, u32, i32, u8p, b = ctypes.c_void_p, ctypes.c_uint32, ctypes.c_int32, ctypes.POINTER(ctypes.c_uint8), ctypes.c_bool
+        vp, u32, i32 = ctypes.c_void_p, ctypes.c_uint32, ctypes.c_int32
+        u8p, b = ctypes.POINTER(ctypes.c_uint8), ctypes.c_bool
         c.AlxMemSafeTest_New.restype = vp
         c.AlxMemSafeTest_New.argtypes = [u32, u32, ctypes.c_uint8, ctypes.c_uint8]
         c.AlxMemSafeTest_Delete.argtypes = [vp]
         for name in ("CopyLen", "NumOfItems"):
             getattr(c, f"AlxMemSafeTest_{name}").restype = u32
         for name in ("MemSafeRead", "MemSafeWrite"):
-            f = getattr(c, f"AlxMemSafeTest_{name}"); f.restype = i32; f.argtypes = [vp, u8p, u32]
+            f = getattr(c, f"AlxMemSafeTest_{name}")
+            f.restype = i32
+            f.argtypes = [vp, u8p, u32]
         for name in ("MemSafeIsReadDone", "MemSafeIsReadErr", "MemSafeIsWriteDone", "MemSafeIsWriteErr",
                      "GroupIsValStoredBuffDiff", "StoreIsErr"):
-            f = getattr(c, f"AlxMemSafeTest_{name}"); f.restype = b; f.argtypes = [vp]
+            f = getattr(c, f"AlxMemSafeTest_{name}")
+            f.restype = b
+            f.argtypes = [vp]
         for name in ("GroupInit", "StoreInit"):
-            f = getattr(c, f"AlxMemSafeTest_{name}"); f.restype = i32; f.argtypes = [vp]
+            f = getattr(c, f"AlxMemSafeTest_{name}")
+            f.restype = i32
+            f.argtypes = [vp]
         c.AlxMemSafeTest_StoreHandle.argtypes = [vp]
-        c.AlxMemSafeTest_ItemGet.restype = u32; c.AlxMemSafeTest_ItemGet.argtypes = [vp, u32]
-        c.AlxMemSafeTest_ItemGetDef.restype = u32; c.AlxMemSafeTest_ItemGetDef.argtypes = [vp, u32]
-        c.AlxMemSafeTest_ItemSet.restype = i32; c.AlxMemSafeTest_ItemSet.argtypes = [vp, u32, u32]
-        c.AlxMemSafeTest_CrcCalc.restype = u32; c.AlxMemSafeTest_CrcCalc.argtypes = [u32, u8p, u32]
-        c.AlxMemSafeTest_CrcIsOk.restype = b; c.AlxMemSafeTest_CrcIsOk.argtypes = [u32, u8p, u32, ctypes.POINTER(u32)]
-        c.AlxMemSafeTest_CrcLen.restype = u32; c.AlxMemSafeTest_CrcLen.argtypes = [u32]
+        c.AlxMemSafeTest_ItemGet.restype = u32
+        c.AlxMemSafeTest_ItemGet.argtypes = [vp, u32]
+        c.AlxMemSafeTest_ItemGetDef.restype = u32
+        c.AlxMemSafeTest_ItemGetDef.argtypes = [vp, u32]
+        c.AlxMemSafeTest_ItemSet.restype = i32
+        c.AlxMemSafeTest_ItemSet.argtypes = [vp, u32, u32]
+        c.AlxMemSafeTest_CrcCalc.restype = u32
+        c.AlxMemSafeTest_CrcCalc.argtypes = [u32, u8p, u32]
+        c.AlxMemSafeTest_CrcIsOk.restype = b
+        c.AlxMemSafeTest_CrcIsOk.argtypes = [u32, u8p, u32, ctypes.POINTER(u32)]
+        c.AlxMemSafeTest_CrcLen.restype = u32
+        c.AlxMemSafeTest_CrcLen.argtypes = [u32]
         c.AlxMemRawFake_Fill.argtypes = [ctypes.c_uint8]
         c.AlxMemRawFake_Peek.argtypes = [u32, u8p, u32]
         c.AlxMemRawFake_Poke.argtypes = [u32, u8p, u32]
         c.AlxMemRawFake_FailAt.argtypes = [u32, u32]
-        c.AlxMemRawFake_Count.restype = u32; c.AlxMemRawFake_Count.argtypes = [u32]
+        c.AlxMemRawFake_Count.restype = u32
+        c.AlxMemRawFake_Count.argtypes = [u32]
         c.AlxMemRawFake_PowerLossAt.argtypes = [u32, u32]
         c.AlxMemRawFake_IsPowerLost.restype = b
         c.AlxMemRawFake_SetRowEraseModel.argtypes = [b, u32]
@@ -453,7 +468,8 @@ class MemSafeLib:
             getattr(c, f"AlxMemRawFake_{name}").restype = u32
 
         def status(name: str) -> int:
-            f = getattr(c, f"AlxMemSafeTest_Status_{name}"); f.restype = i32
+            f = getattr(c, f"AlxMemSafeTest_Status_{name}")
+            f.restype = i32
             return f()
 
         self.OK = status("Ok")
@@ -478,7 +494,7 @@ class MemSafeLib:
     def _buf(data: bytes):
         return (ctypes.c_uint8 * len(data))(*data)
 
-    def read(self, ctx, n: int = None):
+    def read(self, ctx, n: int | None = None):
         """MemSafe read into a poison-filled buffer -> (status, bytes)."""
         n = self.COPY_LEN if n is None else n
         buf = (ctypes.c_uint8 * n)(*([self.POISON] * n))
@@ -490,8 +506,12 @@ class MemSafeLib:
 
     def flags(self, ctx) -> dict:
         c = self.c
-        return {"read_done": c.AlxMemSafeTest_MemSafeIsReadDone(ctx), "read_err": c.AlxMemSafeTest_MemSafeIsReadErr(ctx),
-                "write_done": c.AlxMemSafeTest_MemSafeIsWriteDone(ctx), "write_err": c.AlxMemSafeTest_MemSafeIsWriteErr(ctx)}
+        return {
+            "read_done": c.AlxMemSafeTest_MemSafeIsReadDone(ctx),
+            "read_err": c.AlxMemSafeTest_MemSafeIsReadErr(ctx),
+            "write_done": c.AlxMemSafeTest_MemSafeIsWriteDone(ctx),
+            "write_err": c.AlxMemSafeTest_MemSafeIsWriteErr(ctx),
+        }
 
     def group_init(self, ctx) -> int:
         return self.c.AlxMemSafeTest_GroupInit(ctx)

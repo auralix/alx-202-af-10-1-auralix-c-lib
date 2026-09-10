@@ -17,6 +17,8 @@ Test group P14 = alxCli terminator/robustness proofs. The same terminator
 matrix runs on the real device as P13 (HIL, device repo Test/).
 """
 
+import json
+
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -67,8 +69,10 @@ def test_ALX1514_P14_crlf_pair_yields_exactly_one_response(make_cli):
 def test_ALX1514_P14_split_delivery_one_command(make_cli):
     """Bytes trickle in across poll cycles (real UART reality)."""
     cli = make_cli()
-    cli.inject(b"he"); cli.handle()
-    cli.inject(b"lp"); cli.handle()
+    cli.inject(b"he")
+    cli.handle()
+    cli.inject(b"lp")
+    cli.handle()
     resp = cmd(cli, b"\r")
     assert resp.count(HELP_MARK) == 1
 
@@ -168,8 +172,6 @@ def test_ALX1514_P14_responses_use_crlf_line_endings(make_cli):
 #   - the helper's param table has all three value kinds: bool, str (600 B buffer), uint8 (0..100)
 # =====================================================================
 
-import json
-
 ARGS_INVALID_MARK = b"Arguments invalid"
 SUCCESS_MARK = b'"status":"success"'
 
@@ -198,7 +200,7 @@ def test_ALX1514_P15_set_param_long_str_value_round_trips(make_cli, cli_lib):
     """A value far longer than any stack array the old parser had (500 chars)
     goes through unchanged - proves no fixed-size copy is left in the path."""
     cli = make_cli()
-    val = bytes((b"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[i % 36] for i in range(500)))
+    val = bytes(b"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[i % 36] for i in range(500))
     assert len(val) < cli_lib.str_val_buff_len()
     assert SUCCESS_MARK in set_param(cli, b"STR_TEST", val)
     resp = cmd(cli, b"get-param\r", handles=4)
@@ -231,7 +233,8 @@ def test_ALX1514_P15_set_param_bad_lines_answer_arguments_invalid(make_cli, line
     assert HELP_MARK in cmd(cli, b"help\r")
 
 
-@pytest.mark.parametrize("line", [b"set-param", b"set-paramX --key UINT8_TEST --val 1", b"set-parameter --key UINT8_TEST --val 1"],
+@pytest.mark.parametrize("line", [b"set-param", b"set-paramX --key UINT8_TEST --val 1",
+                                  b"set-parameter --key UINT8_TEST --val 1"],
                          ids=["bare", "suffix", "longer-word"])
 def test_ALX1514_P15_set_param_is_matched_as_a_whole_word(make_cli, line):
     """Dispatch is 'set-param ' (word + space, TV 03.09): a bare or misspelled word is

@@ -39,7 +39,8 @@ def test_ALX1513_P10_blank_flash_init_keeps_factory_defaults_and_writes_them(fla
     assert flash.defaults(ctx) == DEFAULTS
     assert flash.group_init(ctx) == flash.OK
     assert flash.items(ctx) == DEFAULTS
-    assert flash.peek(A, REC) == blob(DEFAULTS) and flash.peek(B, REC) == blob(DEFAULTS)
+    assert flash.peek(A, REC) == blob(DEFAULTS)
+    assert flash.peek(B, REC) == blob(DEFAULTS)
 
 
 def test_ALX1513_P10_second_boot_after_blank_init_finds_a_valid_record(flash, make_store):
@@ -148,4 +149,5 @@ def test_ALX1513_P10_init_retry_budget_is_exactly_initNumOfTries_times_the_memsa
     ctx = make_store()
     assert flash.group_init(ctx) == flash.ERR
     assert flash.count(flash.INIT) == 9
-    assert flash.count(flash.READ) == 0 and flash.count(flash.WRITE) == 0
+    assert flash.count(flash.READ) == 0
+    assert flash.count(flash.WRITE) == 0
