@@ -24,9 +24,11 @@ A missing tool fails its lane, never skips it.
 ## Layout
 
 - `Test/` = the suite: tests, `conftest.py`, C helpers and fakes, the DLL export files.
-- `Test/Verify/` = the lane side, and only what is THIS repository's: `mutation_hooks.py`. What every C repository
-  would need identically is not here; it is in the Python lib - the gates as commands
-  (`python -m alx.verify.<gate>`) and the host toolchain and DLL build mechanics (`alx.c_lib.host_build`).
+- There is no lane-side folder of its own any more. Everything a second C repository would need identically comes
+  from the Python lib and is called as a command or imported: the gates (`python -m alx.verify.<gate>`), the host
+  toolchain and DLL build mechanics (`alx.c_lib.host_build`) and the C mutation hooks
+  (`python -m alx.c_lib.mutation_hooks`). What stays here is what is THIS repository's: the source lists, the
+  defines, the `.def` files and the `DLL_GROUPS` declaration, all in `conftest.py` next to the fixtures.
 - `Test/noxfile.py` = the lane runner: one nox session per pipeline stage, named after it, running in `Test/.venv`
   (`uv run nox`). The generic gates (`python -m alx.verify.<gate>`) and the lane vocabulary (`alx.verify.lanes`:
   stage names, evidence folders, tool locations) come from the Auralix Python lib, pinned by tag in `pyproject.toml`.
@@ -34,8 +36,8 @@ A missing tool fails its lane, never skips it.
   reference-bench defaults that `alx.c_lib.host_build.Toolchain` carries.
 - `build/` = evidence: root = dev lane (`pytest_report.xml`, `pytest_report.html`, the dev DLLs); one subfolder per
   lane, named after the stage (`analyze/`, `sanitize/asan/`, `sanitize/ubsan/`, `coverage/`, `mutate/`).
-- Naming across the Auralix repositories: folders follow the repository's convention (`Test/`, `Test/Verify/` here;
-  `tests/`, `alx/verify/` in the Python lib; `Tests/`, `Tests/Verify/` in the C# lib); files follow the convention
+- Naming across the Auralix repositories: folders follow the repository's convention (`Test/` here; `tests/` and
+  `alx/verify/` in the Python lib; `Tests/` in the C# lib); files follow the convention
   of their language wherever they live (Python snake_case, C `alx` + CamelCase, pytest `test_<module as spelled>.py`);
   the same WORD names the same role everywhere, only the casing changes. Lane names are the stage words
   (`build test analyze sanitize coverage mutate`) in every repository, and so are the evidence folders
@@ -141,10 +143,10 @@ A missing tool fails its lane, never skips it.
 - **Tools**
 	- `alx.verify.mutation` (Python lib: the driver - generate, plant, run the mirror test module, classify, restore, report)
 	- universalmutator (mutant generation)
-	- clang `-fsyntax-only` + TCE object-compare (the C hooks: check, fingerprint) + conftest's `-Werror` DLL rebuild (hook: rebuild)
+	- clang `-fsyntax-only` + TCE object-compare (the C hooks: check, fingerprint) + the `-Werror` DLL rebuild (hook: rebuild), all three from the Python lib
 - **Files - Code**
 	- `Test/noxfile.py` -> `mutate`
-	- `Test/Verify/mutation_hooks.py`
+	- `alx.c_lib.mutation_hooks` (Python lib) -> `check`, `fingerprint`, `rebuild`; the groups come from `conftest.DLL_GROUPS`
 - **Files - Generated**
 	- `Test/build/mutate/mutants/<module>/`
 	- `Test/build/mutate/survivors/*.diff`

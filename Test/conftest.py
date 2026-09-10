@@ -141,15 +141,6 @@ DB_ARGUMENTS = ["clang", "-std=gnu99", "-O0", *host_build.WARNINGS, host_build.C
                 *[f"-I{d}" for d in INCLUDES]]
 
 
-def clang() -> str:
-    """The dev build's compiler, for anything outside the fixtures that must compile the same way.
-
-    Verify/mutation_hooks.py syntax-checks and fingerprints mutants with it: the mutation lane must
-    ask the SAME compiler as the build, or a mutant that the build would reject is misfiled.
-    """
-    return str(TOOLCHAIN.compiler(host_build.GNU))
-
-
 def _needs_build(dll: Path, deps) -> bool:
     return host_build.needs_build(dll, deps)
 

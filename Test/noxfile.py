@@ -270,8 +270,18 @@ def mutate(session: nox.Session) -> None:
     ap.add_argument("sources", nargs="*", default=["alxFifo.c"], help="library sources (default alxFifo.c)")
     args = ap.parse_args(session.posargs)
     _fresh_dev_build(session)
-    hooks = f"{Path(PYTHON).as_posix()} Test/Verify/mutation_hooks.py"   # templates take POSIX paths, relative to --root
+    # The hooks are the Python lib's; only the flags and the group declaration are this repository's.
+    # Templates take POSIX paths and run with --root as the working directory.
+    hooks = f"{Path(PYTHON).as_posix()} -m alx.c_lib.mutation_hooks"
+    # Includes only, no assert defines: the fingerprint is a RELATIVE comparison (does the mutant
+    # produce the original's object code?), so both sides only have to agree. Measured 10.09: adding
+    # the assert defines drops EQUIVALENT from 156 to 42 on alxFifo.c and triples the run, because
+    # more code compiles distinctly. Changing that is a decision of its own, not part of a move.
+    flags = " ".join(f"-I{d.as_posix()}" for d in INCLUDE_DIRS)
+    work = (BUILD / "mutate" / "_tce").as_posix()
     session.run(PYTHON, "-m", "alx.verify.mutation", "--root", str(CLIB), "--tests-dir", "Test",
                 "--out", str(BUILD / "mutate"), "--sample", str(args.sample), "--seed", "1514",
-                "--check-cmd", f"{hooks} check {{mutant}}", "--fingerprint-cmd", f"{hooks} fingerprint {{mutant}}",
-                "--rebuild-cmd", f"{hooks} rebuild", *args.sources)
+                "--check-cmd", f"{hooks} check {{mutant}} {flags}",
+                "--fingerprint-cmd", f"{hooks} fingerprint {{mutant}} --work {work} {flags}",
+                "--rebuild-cmd", f"{hooks} rebuild --groups conftest:DLL_GROUPS --sys-path Test",
+                *args.sources)
