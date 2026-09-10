@@ -1,0 +1,11 @@
+LIBRARY alxVdivTest
+EXPORTS
+	AlxVdiv_GetVout_V
+	AlxVdiv_GetVin_V
+	AlxVdiv_GetResHigh_kOhm
+	AlxVdiv_GetResLow_kOhm
+	AlxVdiv_GetVout_mV
+	AlxVdiv_GetVin_mV
+	AlxVdiv_GetResHigh_ohm
+	AlxVdiv_GetResLow_ohm
+	AlxVdiv_GetCurrent_uA

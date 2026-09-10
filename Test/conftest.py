@@ -124,6 +124,26 @@ MEMSAFE_DEPS = MEMSAFE_SOURCES_STRICT + MEMSAFE_SOURCES_CLOSURE + [
 MEMSAFE_DLL = BUILD_DIR / "alxMemSafeTest.dll"
 
 
+# -------------------------------------------------------- Vdiv module -------
+# Tier-1 target: a resistive divider's arithmetic, nine context-free functions and
+# no state. Its own group because it shares nothing with the store chain: the
+# smallest DLL here, and the shape any other pure module should follow.
+VDIV_SOURCES = [
+    CLIB_DIR / "alxVdiv.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+VDIV_DEPS = [
+    *VDIV_SOURCES,
+    CLIB_DIR / "alxVdiv.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxVdivTest.def",
+    Path(__file__),
+]
+VDIV_DLL = BUILD_DIR / "alxVdivTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -196,6 +216,10 @@ def _build_memsafe_dll() -> None:
                MEMSAFE_DLL, TEST_DIR / "alxMemSafeTest.def", "memSafeClosure")
 
 
+def _build_vdiv_dll() -> None:
+    _build_dll(VDIV_SOURCES, (), (), VDIV_DLL, TEST_DIR / "alxVdivTest.def", None)
+
+
 # The groups as DATA, for anything that must rebuild them without running the suite: the MUTATE
 # lane names this list on the command line (alx.c_lib.mutation_hooks rebuild --groups
 # conftest:DLL_GROUPS), so the lane needs no script of its own in this repository.
@@ -203,6 +227,7 @@ DLL_GROUPS = [
     (FIFO_DLL, FIFO_DEPS, _build_fifo_dll),
     (CLI_DLL, CLI_DEPS, _build_cli_dll),
     (MEMSAFE_DLL, MEMSAFE_DEPS, _build_memsafe_dll),
+    (VDIV_DLL, VDIV_DEPS, _build_vdiv_dll),
 ]
 
 
@@ -730,6 +755,66 @@ def check(lib, result, exp_status, exp_content: bytes, ln: int):
     assert raw[nul_pos] == 0, f"str not null-terminated at {nul_pos} (raw={raw!r})"
     poison = raw[nul_pos + 1:]
     assert all(b == lib.POISON for b in poison), f"bytes beyond NUL modified: {raw!r}"
+
+
+class VdivLib:
+    """ctypes wrapper around alxVdivTest.dll: a resistive divider's arithmetic.
+
+    Two families with the same algebra in different units - float volts and kOhm, and integer
+    millivolts and ohm - plus the current a shunt drops. Every function is context free.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        f, u32 = ctypes.c_float, ctypes.c_uint32
+        for name in ("GetVout_V", "GetVin_V", "GetResHigh_kOhm", "GetResLow_kOhm"):
+            fn = getattr(c, f"AlxVdiv_{name}")
+            fn.restype = f
+            fn.argtypes = [f, f, f]
+        for name in ("GetVout_mV", "GetVin_mV", "GetResHigh_ohm", "GetResLow_ohm"):
+            fn = getattr(c, f"AlxVdiv_{name}")
+            fn.restype = u32
+            fn.argtypes = [u32, u32, u32]
+        c.AlxVdiv_GetCurrent_uA.restype = u32
+        c.AlxVdiv_GetCurrent_uA.argtypes = [u32, u32]
+
+    def vout_v(self, vin_v, res_high_kohm, res_low_kohm) -> float:
+        return self.c.AlxVdiv_GetVout_V(vin_v, res_high_kohm, res_low_kohm)
+
+    def vin_v(self, vout_v, res_high_kohm, res_low_kohm) -> float:
+        return self.c.AlxVdiv_GetVin_V(vout_v, res_high_kohm, res_low_kohm)
+
+    def res_high_kohm(self, vin_v, vout_v, res_low_kohm) -> float:
+        return self.c.AlxVdiv_GetResHigh_kOhm(vin_v, vout_v, res_low_kohm)
+
+    def res_low_kohm(self, vin_v, vout_v, res_high_kohm) -> float:
+        return self.c.AlxVdiv_GetResLow_kOhm(vin_v, vout_v, res_high_kohm)
+
+    def vout_mv(self, vin_mv, res_high_ohm, res_low_ohm) -> int:
+        return self.c.AlxVdiv_GetVout_mV(vin_mv, res_high_ohm, res_low_ohm)
+
+    def vin_mv(self, vout_mv, res_high_ohm, res_low_ohm) -> int:
+        return self.c.AlxVdiv_GetVin_mV(vout_mv, res_high_ohm, res_low_ohm)
+
+    def res_high_ohm(self, vin_mv, vout_mv, res_low_ohm) -> int:
+        return self.c.AlxVdiv_GetResHigh_ohm(vin_mv, vout_mv, res_low_ohm)
+
+    def res_low_ohm(self, vin_mv, vout_mv, res_high_ohm) -> int:
+        return self.c.AlxVdiv_GetResLow_ohm(vin_mv, vout_mv, res_high_ohm)
+
+    def current_ua(self, vout_uv, res_low_ohm) -> int:
+        return self.c.AlxVdiv_GetCurrent_uA(vout_uv, res_low_ohm)
+
+
+@pytest.fixture(scope="session")
+def vdiv_lib() -> VdivLib:
+    override = os.environ.get("ALX_VDIV_TEST_DLL")
+    if override:
+        return VdivLib(Path(override))
+    if _needs_build(VDIV_DLL, VDIV_DEPS):
+        _build_vdiv_dll()
+    return VdivLib(VDIV_DLL)
 
 
 @pytest.fixture(scope="session")
