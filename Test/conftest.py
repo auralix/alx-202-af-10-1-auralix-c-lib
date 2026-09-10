@@ -466,6 +466,15 @@ class MemSafeLib:
         c.AlxMemRawFake_SetRowEraseModel.argtypes = [b, u32]
         for name in ("Size", "LastNumOfTries", "LastTimeout_ms", "LastWriteAddr", "LastWriteLen"):
             getattr(c, f"AlxMemRawFake_{name}").restype = u32
+        c.AlxParamItemStrTest_New.restype = vp
+        c.AlxParamItemStrTest_New.argtypes = [u32, ctypes.c_double, ctypes.c_double, ctypes.c_double]
+        c.AlxParamItemStrTest_Delete.argtypes = [vp]
+        c.AlxParamItemStrTest_SetStr.restype = i32
+        c.AlxParamItemStrTest_SetStr.argtypes = [vp, ctypes.c_char_p]
+        c.AlxParamItemStrTest_GetStr.restype = i32
+        c.AlxParamItemStrTest_GetStr.argtypes = [vp, ctypes.c_char_p, u32]
+        c.AlxParamItemStrTest_GetNum.restype = ctypes.c_double
+        c.AlxParamItemStrTest_GetNum.argtypes = [vp]
 
         def status(name: str) -> int:
             f = getattr(c, f"AlxMemSafeTest_Status_{name}")
@@ -482,6 +491,27 @@ class MemSafeLib:
         self.A_ERR_B_OK_USE_B = status("AErrBOk_UseB")
         self.COPY_LEN = c.AlxMemSafeTest_CopyLen()
         self.NUM_ITEMS = c.AlxMemSafeTest_NumOfItems()
+
+    # -- a standalone parameter item, for the string format conversion --------
+    UINT8, UINT16, UINT32, INT8, INT16, INT32, FLOAT, BOOL = range(8)
+
+    def item_new(self, item_type: int, val_def: float = 0.0, val_min: float = 0.0,
+                 val_max: float = 0.0):
+        return self.c.AlxParamItemStrTest_New(item_type, val_def, val_min, val_max)
+
+    def item_delete(self, ctx) -> None:
+        self.c.AlxParamItemStrTest_Delete(ctx)
+
+    def item_set_str(self, ctx, val: str) -> int:
+        return self.c.AlxParamItemStrTest_SetStr(ctx, val.encode("ascii"))
+
+    def item_get_str(self, ctx, size: int = 64) -> tuple[int, str]:
+        buf = ctypes.create_string_buffer(size)
+        status = self.c.AlxParamItemStrTest_GetStr(ctx, buf, size)
+        return status, buf.value.decode("ascii", "replace")
+
+    def item_get_num(self, ctx) -> float:
+        return self.c.AlxParamItemStrTest_GetNum(ctx)
 
     # -- chain under test -----------------------------------------------------
     def new(self, addr_a: int = 0x000, addr_b: int = 0x100, tries: int = 3, raw_tries: int = 3):
@@ -691,6 +721,26 @@ def flash(memsafe_lib) -> MemSafeLib:
     """The fake flash, blank (0xFF) and fault-free at the start of every test."""
     memsafe_lib.fake_reset()
     return memsafe_lib
+
+
+@pytest.fixture
+def make_item(memsafe_lib):
+    """Factory: make_item(type, val_def, val_min, val_max) -> a standalone AlxParamItem.
+
+    Outside the store chain on purpose: what these tests drive is the string format conversion
+    that a CLI set-param reaches, not persistence. Auto-deleted.
+    """
+    ctxs = []
+
+    def _make(item_type: int, val_def: float = 0.0, val_min: float = 0.0, val_max: float = 0.0):
+        ctx = memsafe_lib.item_new(item_type, val_def, val_min, val_max)
+        assert ctx, "the item could not be constructed"
+        ctxs.append(ctx)
+        return ctx
+
+    yield _make
+    for ctx in ctxs:
+        memsafe_lib.item_delete(ctx)
 
 
 @pytest.fixture

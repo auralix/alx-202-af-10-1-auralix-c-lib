@@ -46,3 +46,8 @@ EXPORTS
 	AlxMemRawFake_LastWriteLen
 	AlxMemRawFake_ArgsMismatchCount
 	AlxMemRawFake_NotInitCallCount
+	AlxParamItemStrTest_New
+	AlxParamItemStrTest_Delete
+	AlxParamItemStrTest_SetStr
+	AlxParamItemStrTest_GetStr
+	AlxParamItemStrTest_GetNum
