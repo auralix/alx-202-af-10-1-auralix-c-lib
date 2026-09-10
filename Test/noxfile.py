@@ -47,7 +47,10 @@ ANALYSIS_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c",
 # gated here are still only the ones ANALYSIS_SOURCES covers (see the Jira task, item A13)
 STYLE_FILES = [*ANALYSIS_SOURCES, CLIB / "alxFifo.h", CLIB / "alxBound.h",
                *sorted(TEST.glob("*.c"))]
-INCLUDE_DIRS = [TEST, CLIB, CLIB / "Mcu"]
+# Target-only translation units: compiled by ANALYZE stage 4 with arm-gcc, never linked, one compile
+# per part variant. (source, variants to compile it under).
+LAYOUT_CHECKS = [(TEST / "alxIna228RegSizeCheck.c", ["ALX_INA238", "ALX_INA228"])]
+INCLUDE_DIRS = [TEST, CLIB, CLIB / "Mcu", CLIB / "Ext"]
 CL_INCLUDES = [f"/I{d}" for d in INCLUDE_DIRS]
 GNU99 = ["/clang:-std=gnu99"]
 
@@ -201,6 +204,28 @@ def analyze(session: nox.Session) -> None:
     _write(log, "".join(lines))
     if "-Wanalyzer" in "".join(lines):
         session.error(f"Stage 3 FAILED: -fanalyzer findings - see {log}")
+
+    session.log("Stage 4: target layout checks (arm-gcc, one compile per part variant)")
+    # Compile-time size checks of register overlays, for the compiler that MATTERS. A driver that
+    # takes its I2C transfer length from sizeof of an overlay is one ABI away from reading the wrong
+    # number of bytes, and the host cannot answer the question: measured on a PC, eleven of the
+    # seventeen INA238 overlays are the wrong size and on the target none are. These files are never
+    # linked - each check is an array whose length is negative when a size is wrong.
+    layout_log = out / "layout_checks.txt"
+    reports = []
+    for source, variants in LAYOUT_CHECKS:
+        for variant in variants:
+            result = subprocess.run(  # noqa: S603 - argv is the toolchain path and this repo's own sources
+                [str(tc.armgcc()), "-c", "-std=gnu99", "-mcpu=cortex-m7", "-mthumb",
+                 f"-D{variant}", *[f"-I{d}" for d in INCLUDE_DIRS], str(source),
+                 "-o", str(out / f"{source.stem}_{variant}.o")],
+                capture_output=True, text=True, check=False)   # the return code is read below
+            reports.append(f"{source.name} -D{variant}: rc={result.returncode}\n{result.stderr}")
+            if result.returncode != 0:
+                _write(layout_log, "".join(reports))
+                session.error(f"Stage 4 FAILED: {source.name} with {variant} - see {layout_log}")
+    _write(layout_log, "".join(reports))
+
     session.log(f"ANALYZE CLEAN - evidence in {out}")
 
 

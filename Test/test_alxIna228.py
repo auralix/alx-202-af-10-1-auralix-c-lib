@@ -179,11 +179,19 @@ def test_ALX1553_P225_the_die_temperature_cannot_be_tested_on_this_host(ina228_l
     target would read 200 - which is 25.0 degC at 125 m degC per count.
 
     So the numbers this host produces for the temperature path describe the host's ABI, not the
-    firmware, and no assertion is made about them. Two things are worth taking away. Any other
-    register overlay that mixes bit-field types has the same problem, and the driver derives each
-    register's I2C LENGTH from ``sizeof`` of that overlay - so on a toolchain that packs differently
-    it would read the wrong number of bytes, silently. For ALX_INA238 the temperature register is the
-    only one affected; the INA228 variant has three more.
+    firmware, and no assertion is made about them.
+
+    How far it reaches was MEASURED rather than guessed, because the driver derives each register's
+    I2C length from ``sizeof`` of its overlay and a wrong size would be a wrong transfer. Counting
+    every overlay against the width of the register it describes:
+
+        on this host    ALX_INA238: 11 of 17 wrong      ALX_INA228: 14 of 20 wrong
+        on the target   ALX_INA238: none                ALX_INA228: none
+
+    The target column is not an assumption either - `alxIna228RegSizeCheck.c` asserts every one of
+    those sizes at compile time and the ANALYZE lane compiles it with arm-gcc, once per part
+    variant. So the layouts are right where they run, and this host simply cannot be used to check
+    the ones that mix bit-field types.
 
     This also matters for the bench: `test_power.py` P93 records that this board's die temperature
     reads 0.0 almost always, and this test says the host cannot be used to investigate that.

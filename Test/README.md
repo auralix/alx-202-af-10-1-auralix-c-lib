@@ -268,7 +268,13 @@ are recorded in the test that met them rather than worked around silently.
   GNU rules pack `int8_t x : 4;` and `int16_t y : 12;` into one 16-bit unit; the Microsoft rules
   clang follows on Windows start a new allocation unit per declared type, so the union is 4 bytes
   instead of 2. Any driver that derives an I2C or SPI length from `sizeof` of such an overlay cannot
-  be tested here at that register. `test_alxIna228.py` P225 records the measured sizes.
+  be tested here at that register. Counted on the INA driver: 11 of its 17 INA238 overlays are the
+  wrong size on this host, and none are on the target. `test_alxIna228.py` P225 records it.
+
+  What CAN be done here is check the target's answer without a target. A file of static assertions
+  over `sizeof` of each overlay, compiled by ANALYZE stage 4 with arm-gcc and never linked, turns a
+  wrong layout into a compiler error naming the register - from the compiler whose answer counts.
+  `alxIna228RegSizeCheck.c` is the pattern; `noxfile.LAYOUT_CHECKS` is the list.
 
 ## Conventions
 
