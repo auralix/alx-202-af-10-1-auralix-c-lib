@@ -1,0 +1,18 @@
+LIBRARY alxRtcTest
+EXPORTS
+	AlxRtc_MsUsNsToNs
+	AlxRtc_MsUsToNs
+	AlxRtc_MsToNs
+	AlxRtc_MsUsNsToSecFract
+	AlxRtc_NsToMsUsNs
+	AlxRtc_NsToMsUs
+	AlxRtc_NsToMs
+	AlxRtc_SecFractToMsUsNs
+	AlxRtc_UnixTimeNsToDateTime
+	AlxRtc_UnixTimeUsToDateTime
+	AlxRtc_UnixTimeMsToDateTime
+	AlxRtc_UnixTimeSecToDateTime
+	AlxRtc_DateTimeToUnixTimeNs
+	AlxRtc_DateTimeToUnixTimeUs
+	AlxRtc_DateTimeToUnixTimeMs
+	AlxRtc_DateTimeToUnixTimeSec

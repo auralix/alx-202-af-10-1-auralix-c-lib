@@ -307,6 +307,28 @@ BOOL_DEPS = [
 BOOL_DLL = BUILD_DIR / "alxBoolTest.dll"
 
 
+# ------------------------------------------------------- RTC module -------
+# Tier-1 target: the calendar. Sixteen free functions converting between Unix
+# time and a broken-down date in four resolutions, and splitting a second into
+# its fractions. No object, no clock, no peripheral - and the one module in the
+# library whose correct answers can be computed independently, which is what
+# these tests do.
+RTC_SOURCES = [
+    CLIB_DIR / "alxRtc_Global.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+RTC_DEPS = [
+    *RTC_SOURCES,
+    CLIB_DIR / "alxRtc_Global.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxRtcTest.def",
+    Path(__file__),
+]
+RTC_DLL = BUILD_DIR / "alxRtcTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -403,6 +425,10 @@ def _build_bool_dll() -> None:
     _build_dll(BOOL_SOURCES, (), (), BOOL_DLL, TEST_DIR / "alxBoolTest.def", None)
 
 
+def _build_rtc_dll() -> None:
+    _build_dll(RTC_SOURCES, (), (), RTC_DLL, TEST_DIR / "alxRtcTest.def", None)
+
+
 def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
@@ -421,6 +447,7 @@ DLL_GROUPS = [
     (MATH_DLL, MATH_DEPS, _build_math_dll),
     (LINFUN_DLL, LINFUN_DEPS, _build_linfun_dll),
     (BOOL_DLL, BOOL_DEPS, _build_bool_dll),
+    (RTC_DLL, RTC_DEPS, _build_rtc_dll),
 ]
 
 
@@ -1560,6 +1587,106 @@ class BoolLib:
         for handle in self._handles:
             self.c.AlxBoolTest_Delete(handle)
         self._handles.clear()
+
+
+class AlxDateTime(ctypes.Structure):
+    """AlxRtc_DateTime: a broken-down date, with the year counted from 2000 and the day of week 1-7."""
+
+    _fields_ = (
+        ("yr", ctypes.c_uint8),
+        ("mo", ctypes.c_uint8),
+        ("day", ctypes.c_uint8),
+        ("weekDay", ctypes.c_uint8),
+        ("hr", ctypes.c_uint8),
+        ("min", ctypes.c_uint8),
+        ("sec", ctypes.c_uint8),
+        ("ms", ctypes.c_uint16),
+        ("us", ctypes.c_uint16),
+        ("ns", ctypes.c_uint16),
+    )
+
+    def as_tuple(self) -> tuple:
+        """Year (full), month, day, hour, minute, second - what a calendar library would give."""
+        return (2000 + self.yr, self.mo, self.day, self.hr, self.min, self.sec)
+
+
+class RtcLib:
+    """ctypes wrapper around alxRtcTest.dll: Unix time to a calendar date and back.
+
+    Every function is free - no object, no clock - so the wrapper is a thin naming layer. The
+    conversions are the one thing in the library whose right answer can be computed independently,
+    which is what test_alxRtc.py does with Python's own datetime.
+    """
+
+    RESOLUTIONS: ClassVar[dict[str, int]] = {
+        "Sec": 1, "Ms": 1_000, "Us": 1_000_000, "Ns": 1_000_000_000,
+    }
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        u16, u64, f = ctypes.c_uint16, ctypes.c_uint64, ctypes.c_float
+        p16 = ctypes.POINTER(u16)
+        for unit in self.RESOLUTIONS:
+            to_date = getattr(c, f"AlxRtc_UnixTime{unit}ToDateTime")
+            to_date.restype = AlxDateTime
+            to_date.argtypes = [u64]
+            from_date = getattr(c, f"AlxRtc_DateTimeToUnixTime{unit}")
+            from_date.restype = u64
+            from_date.argtypes = [AlxDateTime]
+        c.AlxRtc_MsUsNsToNs.restype = u64
+        c.AlxRtc_MsUsNsToNs.argtypes = [u64, u16, u16, u16]
+        c.AlxRtc_MsUsToNs.restype = u64
+        c.AlxRtc_MsUsToNs.argtypes = [u64, u16, u16]
+        c.AlxRtc_MsToNs.restype = u64
+        c.AlxRtc_MsToNs.argtypes = [u64, u16]
+        c.AlxRtc_MsUsNsToSecFract.restype = f
+        c.AlxRtc_MsUsNsToSecFract.argtypes = [u16, u16, u16]
+        c.AlxRtc_NsToMsUsNs.argtypes = [u64, u64, p16, p16, p16]
+        c.AlxRtc_NsToMsUs.argtypes = [u64, u64, p16, p16]
+        c.AlxRtc_NsToMs.argtypes = [u64, u64, p16]
+        c.AlxRtc_SecFractToMsUsNs.argtypes = [f, p16, p16, p16]
+
+    # -- the calendar ---------------------------------------------------------
+    def to_date(self, unix_time: int, unit: str = "Sec") -> AlxDateTime:
+        """Unix time in the given unit to a broken-down date."""
+        return getattr(self.c, f"AlxRtc_UnixTime{unit}ToDateTime")(unix_time)
+
+    def from_date(self, date: AlxDateTime, unit: str = "Sec") -> int:
+        """A broken-down date back to Unix time in the given unit."""
+        return getattr(self.c, f"AlxRtc_DateTimeToUnixTime{unit}")(date)
+
+    @staticmethod
+    def date(year, month, day, hour=0, minute=0, second=0, ms=0, us=0, ns=0) -> AlxDateTime:
+        """Build the structure the module takes; ``year`` is the full year, not the offset."""
+        return AlxDateTime(year - 2000, month, day, 0, hour, minute, second, ms, us, ns)
+
+    # -- the sub-second helpers -----------------------------------------------
+    def ms_us_ns_to_ns(self, tick_ns: int, ms: int, us: int, ns: int) -> int:
+        return self.c.AlxRtc_MsUsNsToNs(tick_ns, ms, us, ns)
+
+    def ns_to_ms_us_ns(self, tick_ns: int, value_ns: int) -> tuple[int, int, int]:
+        out = [ctypes.c_uint16() for _ in range(3)]
+        self.c.AlxRtc_NsToMsUsNs(tick_ns, value_ns, *[ctypes.byref(o) for o in out])
+        return tuple(o.value for o in out)
+
+    def sec_fract(self, ms: int, us: int, ns: int) -> float:
+        return self.c.AlxRtc_MsUsNsToSecFract(ms, us, ns)
+
+    def sec_fract_to_ms_us_ns(self, fraction: float) -> tuple[int, int, int]:
+        out = [ctypes.c_uint16() for _ in range(3)]
+        self.c.AlxRtc_SecFractToMsUsNs(fraction, *[ctypes.byref(o) for o in out])
+        return tuple(o.value for o in out)
+
+
+@pytest.fixture(scope="session")
+def rtc_lib() -> RtcLib:
+    override = os.environ.get("ALX_RTC_TEST_DLL")
+    if override:
+        return RtcLib(Path(override))
+    if _needs_build(RTC_DLL, RTC_DEPS):
+        _build_rtc_dll()
+    return RtcLib(RTC_DLL)
 
 
 @pytest.fixture(scope="session")
