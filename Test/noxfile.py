@@ -33,6 +33,8 @@ CLIB = TEST.parent
 BUILD = TEST / "build"
 PYTHON = sys.executable
 tc = hb.Toolchain()   # where the tools are on THIS machine (ALX_* variables), and the vcvars environment
+sys.path.insert(0, str(TEST))
+import conftest as cf  # noqa: E402  the source lists, the build recipes and DLL_GROUPS live with the fixtures
 
 nox.options.default_venv_backend = "none"
 nox.options.sessions = list(lanes.DEFAULT_SESSIONS)
@@ -83,8 +85,26 @@ def _strs(paths) -> list:
     return [str(p) for p in paths]
 
 
+def _dev_build(session: nox.Session) -> list:
+    """Build every stale group with conftest's -Werror recipe; return the targets that are missing.
+
+    Collection alone does NOT do this: the DLLs are built by the fixtures, which --collect-only
+    never runs. Measured 10.09 - with alxFifoTest.dll deleted, the BUILD lane reported
+    "BUILD CLEAN" listing the other two and exited 0.
+    """
+    for target, deps, make in cf.DLL_GROUPS:
+        if hb.needs_build(target, deps):
+            session.log(f"building {target.name}")
+            make()
+    cf.write_compile_db()
+    return [t.name for t, _, _ in cf.DLL_GROUPS if not t.exists()]
+
+
 def _fresh_dev_build(session: nox.Session) -> None:
-    """The dev gate every lane starts with: conftest's -Werror DLL build must be fresh (compile DB too)."""
+    """The dev gate every lane starts with: the -Werror DLLs and the compile database are current."""
+    missing = _dev_build(session)
+    if missing:
+        session.error(f"BUILD FAILED - the recipe did not produce {missing}")
     session.run(PYTHON, "-m", "pytest", "-q", "--collect-only", silent=True)
 
 
@@ -123,8 +143,11 @@ def _write(path: Path, text: str) -> None:
 @nox.session
 def build(session: nox.Session) -> None:
     """BUILD - HOST: every test group's DLL with conftest's -Werror recipe (clang, gnu99) + compile_commands.json."""
+    missing = _dev_build(session)
+    if missing:
+        session.error(f"BUILD FAILED - the recipe did not produce {missing}")
     session.run(PYTHON, "-m", "pytest", "-q", "--collect-only")
-    session.log(f"BUILD CLEAN - {sorted(p.name for p in BUILD.glob('*.dll'))} in {BUILD}")
+    session.log(f"BUILD CLEAN - {sorted(t.name for t, _, _ in cf.DLL_GROUPS)} in {BUILD}")
 
 
 @nox.session

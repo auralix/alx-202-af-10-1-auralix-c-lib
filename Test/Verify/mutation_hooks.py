@@ -50,12 +50,7 @@ def fingerprint(path: str) -> int:
 
 
 def rebuild() -> int:
-    groups = [
-        (conftest.FIFO_DLL, conftest.FIFO_DEPS, conftest._build_fifo_dll),
-        (conftest.CLI_DLL, conftest.CLI_DEPS, conftest._build_cli_dll),
-        (conftest.MEMSAFE_DLL, conftest.MEMSAFE_DEPS, conftest._build_memsafe_dll),
-    ]
-    for dll, deps, build in groups:
+    for dll, deps, build in conftest.DLL_GROUPS:
         if conftest._needs_build(dll, deps):
             try:
                 build()

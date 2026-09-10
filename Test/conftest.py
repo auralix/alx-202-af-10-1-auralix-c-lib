@@ -154,7 +154,7 @@ def _needs_build(dll: Path, deps) -> bool:
     return host_build.needs_build(dll, deps)
 
 
-def _write_compile_db() -> None:
+def write_compile_db() -> None:
     """compile_commands.json for clang-tidy/clangd - same flags as the real build."""
     host_build.write_compile_db(
         BUILD_DIR / "compile_commands.json",
@@ -174,7 +174,7 @@ def _build_dll(strict, closure, defines, dll: Path, def_file: Path, obj_dir_name
     numbers as EMPTY (found 03.09 by the P15 uint8 test).
     """
     BUILD_DIR.mkdir(exist_ok=True)
-    _write_compile_db()
+    write_compile_db()
     host_build.build_dll(
         TOOLCHAIN,
         out=dll,
@@ -202,6 +202,16 @@ def _build_cli_dll() -> None:
 def _build_memsafe_dll() -> None:
     _build_dll(MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE, MEMSAFE_ASSERT_DEFINES,
                MEMSAFE_DLL, TEST_DIR / "alxMemSafeTest.def", "memSafeClosure")
+
+
+# The groups as DATA, for anything that must rebuild them without running the suite: the MUTATE
+# lane names this list on the command line (alx.c_lib.mutation_hooks rebuild --groups
+# conftest:DLL_GROUPS), so the lane needs no script of its own in this repository.
+DLL_GROUPS = [
+    (FIFO_DLL, FIFO_DEPS, _build_fifo_dll),
+    (CLI_DLL, CLI_DEPS, _build_cli_dll),
+    (MEMSAFE_DLL, MEMSAFE_DEPS, _build_memsafe_dll),
+]
 
 
 # ---------------------------------------------------------------- ctypes -----
