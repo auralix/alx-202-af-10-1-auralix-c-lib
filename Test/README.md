@@ -37,7 +37,8 @@ A missing tool fails its lane, never skips it.
 	- `alxFiltGlitchTest` - both glitch filters over the real software timer and tick, with only
 	  the interrupt lock faked, so every debounce boundary is exact to the microsecond
 	- `alxMathTest` - the pure signal conditioning: two hysteresis state machines, the moving
-	  average over a caller-owned buffer, and the running count/sum/mean/min/max
+	  average over a caller-owned buffer, the running count/sum/mean/min/max, and alxGlobal's
+	  number formatting, which has no group of its own
 	- `alxLinFunTest` - the two x-to-y mappings: a line through two points, in float and in
 	  integer, and a lookup table interpolated between its points
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real

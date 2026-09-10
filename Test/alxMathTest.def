@@ -12,3 +12,6 @@ EXPORTS
 	AlxMathTest_New
 	AlxMathTest_Delete
 	AlxMath_Process
+	AlxGlobal_Ulltoa
+	AlxGlobal_Slltoa
+	AlxGlobal_Ntohl

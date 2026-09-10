@@ -223,15 +223,16 @@ FILTGLITCH_DLL = BUILD_DIR / "alxFiltGlitchTest.dll"
 
 # ---------------------------------------------------- Math modules -------
 # Tier-1 target: the library's pure signal conditioning - two hysteresis state
-# machines, a moving average and a running min/max/mean. Four modules in one
-# group because they share everything that matters: no state outside their own
-# structure, no clock, no peripheral, and a product reads every analog decision
-# through one of them.
+# machines, a moving average and a running min/max/mean - plus the number
+# formatting in alxGlobal, which has no home of its own. In one group because
+# they share everything that matters: no state outside their own arguments, no
+# clock, no peripheral, and a product reads every analog decision through one.
 MATH_SOURCES = [
     CLIB_DIR / "alxHys1.c",
     CLIB_DIR / "alxHys2.c",
     CLIB_DIR / "alxAvg.c",
     CLIB_DIR / "alxMath.c",
+    CLIB_DIR / "alxGlobal.c",
     TEST_DIR / "alxMathTestHelpers.c",
     TEST_DIR / "alxAssertPc.c",
 ]
@@ -242,6 +243,7 @@ MATH_DEPS = [
     CLIB_DIR / "alxAvg.h",
     CLIB_DIR / "alxMath.h",
     CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxGlobal.c",
     CLIB_DIR / "alxAssert.h",
     TEST_DIR / "alxConfig.h",
     TEST_DIR / "alxMathTest.def",
@@ -1307,6 +1309,10 @@ class MathLib:
         c.AlxAvg_Process.argtypes = [vp, f]
         c.AlxMath_Process.restype = AlxMathData
         c.AlxMath_Process.argtypes = [vp, u32]
+        c.AlxGlobal_Ulltoa.argtypes = [ctypes.c_uint64, ctypes.c_char_p]
+        c.AlxGlobal_Slltoa.argtypes = [ctypes.c_int64, ctypes.c_char_p]
+        c.AlxGlobal_Ntohl.restype = u32
+        c.AlxGlobal_Ntohl.argtypes = [u32]
         self._handles: list = []
 
     # -- the four modules -----------------------------------------------------
@@ -1343,6 +1349,23 @@ class MathLib:
 
     def math_process(self, obj, value: int) -> AlxMathData:
         return self.c.AlxMath_Process(obj, value)
+
+    # -- the number formatting in alxGlobal -----------------------------------
+    def ulltoa(self, value: int) -> str:
+        """A uint64 as decimal text. The buffer is 64 bytes; the module writes at most 20 digits."""
+        buff = ctypes.create_string_buffer(64)
+        self.c.AlxGlobal_Ulltoa(value, buff)
+        return buff.value.decode("ascii")
+
+    def slltoa(self, value: int) -> str:
+        """An int64 as decimal text, sign included."""
+        buff = ctypes.create_string_buffer(64)
+        self.c.AlxGlobal_Slltoa(value, buff)
+        return buff.value.decode("ascii")
+
+    def ntohl(self, value: int) -> int:
+        """A uint32 with its four bytes reversed."""
+        return self.c.AlxGlobal_Ntohl(value)
 
     def _keep(self, handle, deleter: str):
         assert handle, "the test helper could not allocate"
