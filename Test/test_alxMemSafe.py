@@ -326,7 +326,7 @@ def test_ALX1513_P8_row_erase_model_product_layout_a_and_b_in_own_rows_is_safe(f
 
 
 def test_ALX1513_P8_row_erase_model_copies_in_the_same_row_destroy_each_other(flash, make_store):
-    """The mmx-ec2 layout (A=0, B=16) is fine on an I2C EEPROM but NOT on RWWEE: writing B
+    """Copies 16 bytes apart (A=0, B=16) are fine on an I2C EEPROM but NOT on RWWEE: writing B
     erases the row that holds A. A read then never finds both copies valid, every read
     triggers a repair write, and a cut during B loses the record completely. This is why the
     product uses 0x000 and 0x100."""
