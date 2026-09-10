@@ -252,6 +252,22 @@ alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar),
 Test groups (one DLL each) are declared in `conftest.py`: strict sources (warning set, -Werror) + closure
 sources (-w) + fakes.
 
+## What the host lane cannot do
+
+Two limits found by running into them. Both are properties of the HOST, not of the library, and both
+are recorded in the test that met them rather than worked around silently.
+
+- **A product's override of an `ALX_WEAK` function cannot be linked here.** The target links ELF,
+  where a strong definition displaces a weak one; the host links COFF through `lld-link`, which
+  reports a duplicate symbol instead. So a group that wants to exercise a library module together
+  with the product hook it calls has to do without the hook - the library's own weak default runs.
+  `alxIna228Test` is built that way, and says so.
+- **A register overlay that mixes bit-field types is not the same size here as on the target.** The
+  GNU rules pack `int8_t x : 4;` and `int16_t y : 12;` into one 16-bit unit; the Microsoft rules
+  clang follows on Windows start a new allocation unit per declared type, so the union is 4 bytes
+  instead of 2. Any driver that derives an I2C or SPI length from `sizeof` of such an overlay cannot
+  be tested here at that register. `test_alxIna228.py` P225 records the measured sizes.
+
 ## Conventions
 
 - Tests use only the public module API via opaque handles; no struct mirroring in Python.
