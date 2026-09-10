@@ -43,7 +43,10 @@ VENDOR = ["--exclude", "Ext", "--exclude", "FatFs", "--exclude", "mcuboot", "--e
 # ---- the module sets (extend per module; keep in sync with conftest's group declarations) -------------------
 ANALYSIS_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c",
                     TEST / "alxFifoTestHelpers.c", TEST / "alxBoundTestHelpers.c", TEST / "alxFifoSanSmoke.c"]
-STYLE_FILES = [*ANALYSIS_SOURCES, CLIB / "alxFifo.h", CLIB / "alxBound.h"]
+# every C file this suite OWNS is style-gated, whatever module it serves; the LIBRARY sources
+# gated here are still only the ones ANALYSIS_SOURCES covers (see the Jira task, item A13)
+STYLE_FILES = [*ANALYSIS_SOURCES, CLIB / "alxFifo.h", CLIB / "alxBound.h",
+               *sorted(TEST.glob("*.c"))]
 INCLUDE_DIRS = [TEST, CLIB, CLIB / "Mcu"]
 CL_INCLUDES = [f"/I{d}" for d in INCLUDE_DIRS]
 GNU99 = ["/clang:-std=gnu99"]

@@ -191,6 +191,36 @@ CANPARSER_DEPS = [
 CANPARSER_DLL = BUILD_DIR / "alxCanParserTest.dll"
 
 
+# ------------------------------------------------ FiltGlitch modules -------
+# Tier-2 target: both glitch filters over the REAL software timer and the REAL
+# tick counter, with only the interrupt lock faked. The clock is the test's, so
+# every debounce boundary is exact instead of approximate - which is the whole
+# reason these are worth testing at all.
+FILTGLITCH_SOURCES = [
+    CLIB_DIR / "alxFiltGlitchBool.c",
+    CLIB_DIR / "alxFiltGlitchUint32.c",
+    CLIB_DIR / "alxTimSw.c",
+    CLIB_DIR / "alxTick.c",
+    TEST_DIR / "alxFiltGlitchTestHelpers.c",
+    TEST_DIR / "alxIrqFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+FILTGLITCH_DEPS = [
+    *FILTGLITCH_SOURCES,
+    CLIB_DIR / "alxFiltGlitchBool.h",
+    CLIB_DIR / "alxFiltGlitchUint32.h",
+    CLIB_DIR / "alxTimSw.h",
+    CLIB_DIR / "alxTick.h",
+    CLIB_DIR / "alxIrq.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxFiltGlitchTest.def",
+    Path(__file__),
+]
+FILTGLITCH_DLL = BUILD_DIR / "alxFiltGlitchTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -271,6 +301,10 @@ def _build_canparser_dll() -> None:
     _build_dll(CANPARSER_SOURCES, (), (), CANPARSER_DLL, TEST_DIR / "alxCanParserTest.def", None)
 
 
+def _build_filtglitch_dll() -> None:
+    _build_dll(FILTGLITCH_SOURCES, (), (), FILTGLITCH_DLL, TEST_DIR / "alxFiltGlitchTest.def", None)
+
+
 def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
@@ -285,6 +319,7 @@ DLL_GROUPS = [
     (VDIV_DLL, VDIV_DEPS, _build_vdiv_dll),
     (TIMSW_DLL, TIMSW_DEPS, _build_timsw_dll),
     (CANPARSER_DLL, CANPARSER_DEPS, _build_canparser_dll),
+    (FILTGLITCH_DLL, FILTGLITCH_DEPS, _build_filtglitch_dll),
 ]
 
 
@@ -908,7 +943,9 @@ class TimSwLib:
         self.c.AlxTick_IncRange_ns(self.tick, ns)
 
     def advance_ms(self, ms: float) -> None:
-        self.advance_ns(int(ms * 1_000_000))
+        # round, not truncate: 1.001 ms is 1000999.9999 ns in binary floating point, and a filter
+        # boundary approached one nanosecond short of the intended time is a test that lies
+        self.advance_ns(round(ms * 1_000_000))
 
     def now_ns(self) -> int:
         return self.c.AlxTick_Get_ns(self.tick)
@@ -1046,6 +1083,102 @@ class CanParserLib:
     def get(self, name: str, frame: CanMsg, *args):
         """Call ``AlxCanParser_Get<name>`` on ``frame`` and return what it read."""
         return getattr(self.c, f"AlxCanParser_Get{name}")(ctypes.byref(frame), *args)
+
+
+class FiltGlitchLib:
+    """ctypes wrapper around alxFiltGlitchTest.dll: both glitch filters over a clock the test owns.
+
+    The filters ask the software timer how long the input has been unstable, and the timer asks the
+    tick counter. The tick moves only when ``advance_ms`` is called, so a debounce boundary can be
+    approached from both sides exactly - which is the only way to tell ``>`` from ``>=``, and the two
+    filters do not agree on that (see test_alxFiltGlitch.py P163).
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, u32, u64, b, f = (ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint64,
+                              ctypes.c_bool, ctypes.c_float)
+        c.AlxFiltGlitchBoolTest_New.restype = vp
+        c.AlxFiltGlitchBoolTest_New.argtypes = [b, f, f]
+        c.AlxFiltGlitchBoolTest_New_us.restype = vp
+        c.AlxFiltGlitchBoolTest_New_us.argtypes = [b, u64, u64]
+        c.AlxFiltGlitchBoolTest_Delete.argtypes = [vp]
+        c.AlxFiltGlitchBool_Process.restype = b
+        c.AlxFiltGlitchBool_Process.argtypes = [vp, b]
+        c.AlxFiltGlitchBool_Reset.argtypes = [vp]
+        c.AlxFiltGlitchUint32Test_New.restype = vp
+        c.AlxFiltGlitchUint32Test_New.argtypes = [u32, f]
+        c.AlxFiltGlitchUint32Test_Delete.argtypes = [vp]
+        c.AlxFiltGlitchUint32_Process.restype = u32
+        c.AlxFiltGlitchUint32_Process.argtypes = [vp, u32]
+        c.AlxTick_Ctor.argtypes = [vp]
+        c.AlxTick_Get_ns.restype = u64
+        c.AlxTick_Get_ns.argtypes = [vp]
+        c.AlxTick_IncRange_ns.argtypes = [vp, u64]
+        self.tick = ctypes.addressof(ctypes.c_uint8.in_dll(c, "alxTick"))
+        self._handles: list = []
+
+    # -- the clock the test owns ----------------------------------------------
+    def tick_reset(self) -> None:
+        self.c.AlxTick_Ctor(self.tick)
+
+    def advance_ms(self, ms: float) -> None:
+        self.c.AlxTick_IncRange_ns(self.tick, round(ms * 1_000_000))
+
+    def now_ns(self) -> int:
+        return self.c.AlxTick_Get_ns(self.tick)
+
+    # -- the filters ----------------------------------------------------------
+    def boolean(self, initial: bool, true_ms: float, false_ms: float):
+        """A boolean filter with separate rise and fall times, in milliseconds."""
+        return self._keep(self.c.AlxFiltGlitchBoolTest_New(initial, true_ms, false_ms), "Bool")
+
+    def boolean_us(self, initial: bool, true_us: int, false_us: int):
+        """The same filter through its microsecond constructor."""
+        return self._keep(self.c.AlxFiltGlitchBoolTest_New_us(initial, true_us, false_us), "Bool")
+
+    def uint32(self, initial: int, stable_ms: float):
+        """A uint32 filter: one stable time for any change of value."""
+        return self._keep(self.c.AlxFiltGlitchUint32Test_New(initial, stable_ms), "Uint32")
+
+    def process(self, filt, value):
+        """Feed one sample. Booleans go to the boolean filter, integers to the uint32 one."""
+        if isinstance(value, bool):
+            return self.c.AlxFiltGlitchBool_Process(filt, value)
+        return self.c.AlxFiltGlitchUint32_Process(filt, value)
+
+    def reset(self, filt) -> None:
+        self.c.AlxFiltGlitchBool_Reset(filt)
+
+    def _keep(self, handle, kind: str):
+        assert handle, "the test helper could not allocate a filter"
+        self._handles.append((handle, kind))
+        return handle
+
+    def free_all(self) -> None:
+        """Release every filter this test was handed, through the destructor of its own type."""
+        for handle, kind in self._handles:
+            getattr(self.c, f"AlxFiltGlitch{kind}Test_Delete")(handle)
+        self._handles.clear()
+
+
+@pytest.fixture(scope="session")
+def filt_glitch_lib() -> FiltGlitchLib:
+    override = os.environ.get("ALX_FILTGLITCH_TEST_DLL")
+    if override:
+        return FiltGlitchLib(Path(override))
+    if _needs_build(FILTGLITCH_DLL, FILTGLITCH_DEPS):
+        _build_filtglitch_dll()
+    return FiltGlitchLib(FILTGLITCH_DLL)
+
+
+@pytest.fixture
+def filt(filt_glitch_lib) -> FiltGlitchLib:
+    """The filter library with the clock back at zero and nothing left over from the last test."""
+    filt_glitch_lib.tick_reset()
+    yield filt_glitch_lib
+    filt_glitch_lib.free_all()
 
 
 @pytest.fixture(scope="session")

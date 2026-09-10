@@ -1,0 +1,14 @@
+LIBRARY alxFiltGlitchTest
+EXPORTS
+	AlxFiltGlitchBoolTest_New
+	AlxFiltGlitchBoolTest_New_us
+	AlxFiltGlitchBoolTest_Delete
+	AlxFiltGlitchBool_Process
+	AlxFiltGlitchBool_Reset
+	AlxFiltGlitchUint32Test_New
+	AlxFiltGlitchUint32Test_Delete
+	AlxFiltGlitchUint32_Process
+	alxTick DATA
+	AlxTick_Ctor
+	AlxTick_Get_ns
+	AlxTick_IncRange_ns

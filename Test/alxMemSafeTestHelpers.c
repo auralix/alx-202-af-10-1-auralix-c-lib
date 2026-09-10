@@ -407,7 +407,7 @@ double AlxParamItemStrTest_GetNum(AlxParamItemStrTest_Ctx* ctx)
 		case 4:  { int16_t v = AlxParamItem_GetValInt16(&ctx->item);   return (double)v; }
 		case 5:  { int32_t v = AlxParamItem_GetValInt32(&ctx->item);   return (double)v; }
 		case 6:  { float v = AlxParamItem_GetValFloat(&ctx->item);     return (double)v; }
-		case 7:  { bool v = AlxParamItem_GetValBool(&ctx->item);       return v ? 1.0 : 0.0; }
+		case 7:  { bool v = AlxParamItem_GetValBool(&ctx->item);       if (v) { return 1.0; } return 0.0; }
 		default: return 0.0;
 	}
 }
