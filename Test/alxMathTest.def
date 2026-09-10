@@ -1,0 +1,14 @@
+LIBRARY alxMathTest
+EXPORTS
+	AlxHys1Test_New
+	AlxHys1Test_Delete
+	AlxHys1_Process
+	AlxHys2Test_New
+	AlxHys2Test_Delete
+	AlxHys2_Process
+	AlxAvgTest_New
+	AlxAvgTest_Delete
+	AlxAvg_Process
+	AlxMathTest_New
+	AlxMathTest_Delete
+	AlxMath_Process

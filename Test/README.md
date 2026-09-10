@@ -36,6 +36,8 @@ A missing tool fails its lane, never skips it.
 	  built with the module's asserts off, which is the default a product ships
 	- `alxFiltGlitchTest` - both glitch filters over the real software timer and tick, with only
 	  the interrupt lock faked, so every debounce boundary is exact to the microsecond
+	- `alxMathTest` - the pure signal conditioning: two hysteresis state machines, the moving
+	  average over a caller-owned buffer, and the running count/sum/mean/min/max
 - There is no lane-side folder of its own any more. Everything a second C repository would need identically comes
   from the Python lib and is called as a command or imported: the gates (`python -m alx.verify.<gate>`), the host
   toolchain and DLL build mechanics (`alx.c_lib.host_build`) and the C mutation hooks

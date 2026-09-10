@@ -221,6 +221,35 @@ FILTGLITCH_DEPS = [
 FILTGLITCH_DLL = BUILD_DIR / "alxFiltGlitchTest.dll"
 
 
+# ---------------------------------------------------- Math modules -------
+# Tier-1 target: the library's pure signal conditioning - two hysteresis state
+# machines, a moving average and a running min/max/mean. Four modules in one
+# group because they share everything that matters: no state outside their own
+# structure, no clock, no peripheral, and a product reads every analog decision
+# through one of them.
+MATH_SOURCES = [
+    CLIB_DIR / "alxHys1.c",
+    CLIB_DIR / "alxHys2.c",
+    CLIB_DIR / "alxAvg.c",
+    CLIB_DIR / "alxMath.c",
+    TEST_DIR / "alxMathTestHelpers.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+MATH_DEPS = [
+    *MATH_SOURCES,
+    CLIB_DIR / "alxHys1.h",
+    CLIB_DIR / "alxHys2.h",
+    CLIB_DIR / "alxAvg.h",
+    CLIB_DIR / "alxMath.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxMathTest.def",
+    Path(__file__),
+]
+MATH_DLL = BUILD_DIR / "alxMathTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -305,6 +334,10 @@ def _build_filtglitch_dll() -> None:
     _build_dll(FILTGLITCH_SOURCES, (), (), FILTGLITCH_DLL, TEST_DIR / "alxFiltGlitchTest.def", None)
 
 
+def _build_math_dll() -> None:
+    _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
+
+
 def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
@@ -320,6 +353,7 @@ DLL_GROUPS = [
     (TIMSW_DLL, TIMSW_DEPS, _build_timsw_dll),
     (CANPARSER_DLL, CANPARSER_DEPS, _build_canparser_dll),
     (FILTGLITCH_DLL, FILTGLITCH_DEPS, _build_filtglitch_dll),
+    (MATH_DLL, MATH_DEPS, _build_math_dll),
 ]
 
 
@@ -1161,6 +1195,117 @@ class FiltGlitchLib:
         for handle, kind in self._handles:
             getattr(self.c, f"AlxFiltGlitch{kind}Test_Delete")(handle)
         self._handles.clear()
+
+
+class AlxMathData(ctypes.Structure):
+    """AlxMath_Data: what the running statistics module reports, returned by value."""
+
+    _fields_ = (
+        ("count", ctypes.c_uint32),
+        ("sum", ctypes.c_uint64),
+        ("avg", ctypes.c_uint32),
+        ("min", ctypes.c_uint32),
+        ("max", ctypes.c_uint32),
+    )
+
+
+class MathLib:
+    """ctypes wrapper around alxMathTest.dll: the library's pure signal conditioning.
+
+    Two hysteresis state machines, a moving average over a caller-owned buffer, and a running
+    min/max/mean. Nothing here has a clock or a peripheral, so every test is a sequence of samples
+    and an expected answer.
+    """
+
+    HYS1_HIGH, HYS1_LOW = 0, 1              # AlxHys1_St
+    HYS2_TOP, HYS2_MID, HYS2_BOT = 0, 1, 2  # AlxHys2_St
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, u32, f, i32 = ctypes.c_void_p, ctypes.c_uint32, ctypes.c_float, ctypes.c_int32
+        c.AlxHys1Test_New.restype = vp
+        c.AlxHys1Test_New.argtypes = [f, f]
+        c.AlxHys2Test_New.restype = vp
+        c.AlxHys2Test_New.argtypes = [f, f, f, f]
+        c.AlxAvgTest_New.restype = vp
+        c.AlxAvgTest_New.argtypes = [u32, u32, f]
+        c.AlxMathTest_New.restype = vp
+        for name in ("AlxHys1Test_Delete", "AlxHys2Test_Delete", "AlxAvgTest_Delete",
+                     "AlxMathTest_Delete"):
+            getattr(c, name).argtypes = [vp]
+        c.AlxHys1_Process.restype = i32
+        c.AlxHys1_Process.argtypes = [vp, f]
+        c.AlxHys2_Process.restype = i32
+        c.AlxHys2_Process.argtypes = [vp, f]
+        c.AlxAvg_Process.restype = f
+        c.AlxAvg_Process.argtypes = [vp, f]
+        c.AlxMath_Process.restype = AlxMathData
+        c.AlxMath_Process.argtypes = [vp, u32]
+        self._handles: list = []
+
+    # -- the four modules -----------------------------------------------------
+    def hys1(self, high: float, low: float):
+        """One threshold pair: high to enter the high state, low to leave it."""
+        return self._keep(self.c.AlxHys1Test_New(high, low), "AlxHys1Test_Delete")
+
+    def hys2(self, top_high: float, top_low: float, bot_high: float, bot_low: float):
+        """Two threshold pairs and three states, top / middle / bottom."""
+        return self._keep(self.c.AlxHys2Test_New(top_high, top_low, bot_high, bot_low),
+                          "AlxHys2Test_Delete")
+
+    def avg(self, buff_len: int, shift_threshold: int, fill: float = 0.0):
+        """A moving average over ``buff_len`` samples, recomputed every ``shift_threshold`` of them.
+
+        ``fill`` is what the caller's buffer holds before the first sample. The library's own
+        constructor never touches that buffer, which is the point of being able to choose it here.
+        """
+        return self._keep(self.c.AlxAvgTest_New(buff_len, shift_threshold, fill),
+                          "AlxAvgTest_Delete")
+
+    def math(self):
+        """A running count, sum, mean, minimum and maximum over uint32 samples."""
+        return self._keep(self.c.AlxMathTest_New(), "AlxMathTest_Delete")
+
+    def hys1_process(self, obj, value: float) -> int:
+        return self.c.AlxHys1_Process(obj, value)
+
+    def hys2_process(self, obj, value: float) -> int:
+        return self.c.AlxHys2_Process(obj, value)
+
+    def avg_process(self, obj, value: float) -> float:
+        return self.c.AlxAvg_Process(obj, value)
+
+    def math_process(self, obj, value: int) -> AlxMathData:
+        return self.c.AlxMath_Process(obj, value)
+
+    def _keep(self, handle, deleter: str):
+        assert handle, "the test helper could not allocate"
+        self._handles.append((handle, deleter))
+        return handle
+
+    def free_all(self) -> None:
+        """Release everything this test was handed, through the destructor of its own type."""
+        for handle, deleter in self._handles:
+            getattr(self.c, deleter)(handle)
+        self._handles.clear()
+
+
+@pytest.fixture(scope="session")
+def math_lib_session() -> MathLib:
+    override = os.environ.get("ALX_MATH_TEST_DLL")
+    if override:
+        return MathLib(Path(override))
+    if _needs_build(MATH_DLL, MATH_DEPS):
+        _build_math_dll()
+    return MathLib(MATH_DLL)
+
+
+@pytest.fixture
+def math_lib(math_lib_session) -> MathLib:
+    """The arithmetic library, with everything the previous test allocated already released."""
+    yield math_lib_session
+    math_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")
