@@ -1,0 +1,29 @@
+LIBRARY alxBoolTest
+EXPORTS
+	AlxBoolTest_New
+	AlxBoolTest_Delete
+	AlxBool_Update
+	AlxBool_IsTrue
+	AlxBool_IsTrueUpToShortTime
+	AlxBool_IsTrueUpToLongTime
+	AlxBool_IsTrueForLongTime
+	AlxBool_WasTrue
+	AlxBool_WasTrueForShortTime
+	AlxBool_WasTrueForLongTime
+	AlxBool_IsFalse
+	AlxBool_IsFalseUpToShortTime
+	AlxBool_IsFalseUpToLongTime
+	AlxBool_IsFalseForLongTime
+	AlxBool_WasFalse
+	AlxBool_WasFalseForShortTime
+	AlxBool_WasFalseForLongTime
+	AlxBool_ClearWasTrueFlag
+	AlxBool_ClearWasTrueForShortTimeFlag
+	AlxBool_ClearWasTrueForLongTimeFlag
+	AlxBool_ClearWasFalseFlag
+	AlxBool_ClearWasFalseForShortTimeFlag
+	AlxBool_ClearWasFalseForLongTimeFlag
+	alxTick DATA
+	AlxTick_Ctor
+	AlxTick_Get_ns
+	AlxTick_IncRange_ns

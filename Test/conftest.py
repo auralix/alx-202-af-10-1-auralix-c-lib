@@ -274,6 +274,37 @@ LINFUN_DEPS = [
 LINFUN_DLL = BUILD_DIR / "alxLinFunTest.dll"
 
 
+# ------------------------------------------------------ Bool module -------
+# Tier-2 target: the library's boolean-with-memory, over the REAL glitch filter,
+# software timer and tick, with only the interrupt lock faked. Twenty-one query
+# and clear functions on one input - the module a product uses to tell a short
+# press from a long one - and the clock is the test's, so every one of its
+# thresholds is exact.
+BOOL_SOURCES = [
+    CLIB_DIR / "alxBool.c",
+    CLIB_DIR / "alxFiltGlitchBool.c",
+    CLIB_DIR / "alxTimSw.c",
+    CLIB_DIR / "alxTick.c",
+    TEST_DIR / "alxBoolTestHelpers.c",
+    TEST_DIR / "alxIrqFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+BOOL_DEPS = [
+    *BOOL_SOURCES,
+    CLIB_DIR / "alxBool.h",
+    CLIB_DIR / "alxFiltGlitchBool.h",
+    CLIB_DIR / "alxTimSw.h",
+    CLIB_DIR / "alxTick.h",
+    CLIB_DIR / "alxIrq.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxBoolTest.def",
+    Path(__file__),
+]
+BOOL_DLL = BUILD_DIR / "alxBoolTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -366,6 +397,10 @@ def _build_linfun_dll() -> None:
     _build_dll(LINFUN_SOURCES, (), (), LINFUN_DLL, TEST_DIR / "alxLinFunTest.def", None)
 
 
+def _build_bool_dll() -> None:
+    _build_dll(BOOL_SOURCES, (), (), BOOL_DLL, TEST_DIR / "alxBoolTest.def", None)
+
+
 def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
@@ -383,6 +418,7 @@ DLL_GROUPS = [
     (FILTGLITCH_DLL, FILTGLITCH_DEPS, _build_filtglitch_dll),
     (MATH_DLL, MATH_DEPS, _build_math_dll),
     (LINFUN_DLL, LINFUN_DEPS, _build_linfun_dll),
+    (BOOL_DLL, BOOL_DEPS, _build_bool_dll),
 ]
 
 
@@ -1420,6 +1456,105 @@ class LinFunLib:
         for handle, deleter in self._handles:
             getattr(self.c, deleter)(handle)
         self._handles.clear()
+
+
+class BoolLib:
+    """ctypes wrapper around alxBoolTest.dll: one boolean input and everything the library says about it.
+
+    ``update(value)`` feeds a sample; ``state()`` returns every query the module answers, as a dict,
+    so a test can assert the whole picture at once rather than call fourteen functions by hand. The
+    clock is the test's: ``advance_ms`` is the only thing that moves time.
+    """
+
+    QUERIES = ("IsTrue", "IsTrueUpToShortTime", "IsTrueUpToLongTime", "IsTrueForLongTime",
+               "WasTrue", "WasTrueForShortTime", "WasTrueForLongTime",
+               "IsFalse", "IsFalseUpToShortTime", "IsFalseUpToLongTime", "IsFalseForLongTime",
+               "WasFalse", "WasFalseForShortTime", "WasFalseForLongTime")
+    CLEARS = ("ClearWasTrueFlag", "ClearWasTrueForShortTimeFlag", "ClearWasTrueForLongTimeFlag",
+              "ClearWasFalseFlag", "ClearWasFalseForShortTimeFlag", "ClearWasFalseForLongTimeFlag")
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, f, b, u64 = ctypes.c_void_p, ctypes.c_float, ctypes.c_bool, ctypes.c_uint64
+        c.AlxBoolTest_New.restype = vp
+        c.AlxBoolTest_New.argtypes = [b, f, f, f, f, f, f]
+        c.AlxBoolTest_Delete.argtypes = [vp]
+        c.AlxBool_Update.argtypes = [vp, b]
+        for name in self.QUERIES:
+            fn = getattr(c, f"AlxBool_{name}")
+            fn.restype = b
+            fn.argtypes = [vp]
+        for name in self.CLEARS:
+            getattr(c, f"AlxBool_{name}").argtypes = [vp]
+        c.AlxTick_Ctor.argtypes = [vp]
+        c.AlxTick_Get_ns.restype = u64
+        c.AlxTick_Get_ns.argtypes = [vp]
+        c.AlxTick_IncRange_ns.argtypes = [vp, u64]
+        self.tick = ctypes.addressof(ctypes.c_uint8.in_dll(c, "alxTick"))
+        self._handles: list = []
+
+    # -- the clock the test owns ----------------------------------------------
+    def tick_reset(self) -> None:
+        self.c.AlxTick_Ctor(self.tick)
+
+    def advance_ms(self, ms: float) -> None:
+        self.c.AlxTick_IncRange_ns(self.tick, round(ms * 1_000_000))
+
+    # -- one boolean ----------------------------------------------------------
+    def make(self, initial: bool, true_short_ms: float, true_long_ms: float,
+             false_short_ms: float, false_long_ms: float,
+             stable_true_ms: float = 0.0, stable_false_ms: float = 0.0):
+        """A boolean with a short and a long threshold on each side, over a glitch filter."""
+        handle = self.c.AlxBoolTest_New(initial, true_short_ms, true_long_ms,
+                                        false_short_ms, false_long_ms,
+                                        stable_true_ms, stable_false_ms)
+        assert handle, "the test helper could not allocate"
+        self._handles.append(handle)
+        return handle
+
+    def update(self, obj, value: bool) -> None:
+        self.c.AlxBool_Update(obj, value)
+
+    def query(self, obj, name: str) -> bool:
+        return getattr(self.c, f"AlxBool_{name}")(obj)
+
+    def clear(self, obj, name: str) -> None:
+        getattr(self.c, f"AlxBool_{name}")(obj)
+
+    def state(self, obj) -> dict:
+        """Every query the module answers, in one dict - what a test compares against."""
+        return {name: self.query(obj, name) for name in self.QUERIES}
+
+    def true_flags(self, obj) -> set:
+        """The names of the true-side queries that answer yes; the readable half of state()."""
+        return {name for name, value in self.state(obj).items() if value and "True" in name}
+
+    def false_flags(self, obj) -> set:
+        return {name for name, value in self.state(obj).items() if value and "False" in name}
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxBoolTest_Delete(handle)
+        self._handles.clear()
+
+
+@pytest.fixture(scope="session")
+def bool_lib_session() -> BoolLib:
+    override = os.environ.get("ALX_BOOL_TEST_DLL")
+    if override:
+        return BoolLib(Path(override))
+    if _needs_build(BOOL_DLL, BOOL_DEPS):
+        _build_bool_dll()
+    return BoolLib(BOOL_DLL)
+
+
+@pytest.fixture
+def bool_lib(bool_lib_session) -> BoolLib:
+    """The boolean library with the clock back at zero and nothing left from the last test."""
+    bool_lib_session.tick_reset()
+    yield bool_lib_session
+    bool_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")
