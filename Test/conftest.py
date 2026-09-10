@@ -1713,7 +1713,7 @@ class RtcLib:
 
     Every function is free - no object, no clock - so the wrapper is a thin naming layer. The
     conversions are the one thing in the library whose right answer can be computed independently,
-    which is what test_alxRtc.py does with Python's own datetime.
+    which is what test_alxRtc_Global.py does with Python's own datetime.
     """
 
     RESOLUTIONS: ClassVar[dict[str, int]] = {
