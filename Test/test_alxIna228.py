@@ -206,7 +206,9 @@ def test_ALX1553_P226_what_the_benchs_own_numbers_are_in_counts(ina228_lib, boar
     The last line is not this driver: the product multiplies the raw reading by 7.5 below 1.5 A
     (its own application code, marked `ToDo fix` there), which is where the seven and a half
     comes from.
-    The raw reading itself is one count below the truth, which is as close as a 12.5 mA LSB allows.
+    The driver's own reading is one count below where a part with no error at all would land -
+    3.28 counts rounds to 3, and it gave 2 - and one count across a 100 uOhm shunt is 1.25 uV,
+    far inside the part's specification. That reading is quantisation, not error.
 
     So the raw path is quantisation-limited at the bench's idle draw, and the compensated path is a
     curve. Neither is a mistake in the arithmetic tested above - which is the point of recording it
