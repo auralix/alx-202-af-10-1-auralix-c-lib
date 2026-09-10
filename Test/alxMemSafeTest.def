@@ -51,3 +51,15 @@ EXPORTS
 	AlxParamItemStrTest_SetStr
 	AlxParamItemStrTest_GetStr
 	AlxParamItemStrTest_GetNum
+	AlxRange_CheckUint8
+	AlxRange_CheckUint16
+	AlxRange_CheckUint32
+	AlxRange_CheckUint64
+	AlxRange_CheckInt8
+	AlxRange_CheckInt16
+	AlxRange_CheckInt32
+	AlxRange_CheckInt64
+	AlxRange_CheckFloat
+	AlxRange_CheckDouble
+	AlxRange_CheckStr
+	AlxFtoa

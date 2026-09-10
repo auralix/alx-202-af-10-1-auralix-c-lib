@@ -475,6 +475,19 @@ class MemSafeLib:
         c.AlxParamItemStrTest_GetStr.argtypes = [vp, ctypes.c_char_p, u32]
         c.AlxParamItemStrTest_GetNum.restype = ctypes.c_double
         c.AlxParamItemStrTest_GetNum.argtypes = [vp]
+        # alxRange and alxFtoa: pure functions, no context, called directly
+        for name, ct in (("Uint8", ctypes.c_uint8), ("Uint16", ctypes.c_uint16),
+                         ("Uint32", u32), ("Uint64", ctypes.c_uint64),
+                         ("Int8", ctypes.c_int8), ("Int16", ctypes.c_int16),
+                         ("Int32", i32), ("Int64", ctypes.c_int64),
+                         ("Float", ctypes.c_float), ("Double", ctypes.c_double)):
+            f = getattr(c, f"AlxRange_Check{name}")
+            f.restype = i32
+            f.argtypes = [ct, ct, ct]
+        c.AlxRange_CheckStr.restype = i32
+        c.AlxRange_CheckStr.argtypes = [ctypes.c_char_p, u32]
+        c.AlxFtoa.restype = ctypes.c_char_p
+        c.AlxFtoa.argtypes = [ctypes.c_double, ctypes.c_char_p, ctypes.c_int]
 
         def status(name: str) -> int:
             f = getattr(c, f"AlxMemSafeTest_Status_{name}")
@@ -491,6 +504,20 @@ class MemSafeLib:
         self.A_ERR_B_OK_USE_B = status("AErrBOk_UseB")
         self.COPY_LEN = c.AlxMemSafeTest_CopyLen()
         self.NUM_ITEMS = c.AlxMemSafeTest_NumOfItems()
+
+    # -- pure helpers the parameter path leans on ----------------------------
+    def range_check(self, kind: str, val, low, high) -> int:
+        """AlxRange_Check<kind>(val, valMin, valMax) - the bound check itself."""
+        return getattr(self.c, f"AlxRange_Check{kind}")(val, low, high)
+
+    def range_check_str(self, text: str, max_len_with_null: int) -> int:
+        return self.c.AlxRange_CheckStr(text.encode("ascii"), max_len_with_null)
+
+    def ftoa(self, value: float, precision: int, size: int = 64) -> str:
+        """AlxFtoa(f, buf, precision) - how a float reaches the CLI's JSON."""
+        buf = ctypes.create_string_buffer(size)
+        self.c.AlxFtoa(value, buf, precision)
+        return buf.value.decode("ascii", "replace")
 
     # -- a standalone parameter item, for the string format conversion --------
     UINT8, UINT16, UINT32, INT8, INT16, INT32, FLOAT, BOOL = range(8)
