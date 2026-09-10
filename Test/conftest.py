@@ -329,6 +329,47 @@ RTC_DEPS = [
 RTC_DLL = BUILD_DIR / "alxRtcTest.dll"
 
 
+# ------------------------------------------------ ParamMgmt module -------
+# Tier-1 target over a real item table: the view a product's CLI reaches its
+# parameters through - by index, by key, by id - and the per-group reset to
+# factory defaults. The items are real AlxParamItem built by the helper, so the
+# whole lookup and conversion chain is under test, not a stand-in for it.
+# Asserts ON, as the product ships them: alxParamItem.c has side effects inside
+# ALX_PARAM_ITEM_ASSERT (an sprintf of numeric values), so a closure built
+# without them formats numbers as EMPTY - and alxRange.c has one function whose
+# whole body is an assert, which falls off the end of a non-void function when
+# they are off. Same reasoning, same defines as the MemSafe group.
+PARAMMGMT_SOURCES_STRICT = [
+    CLIB_DIR / "alxParamMgmt.c",
+    TEST_DIR / "alxParamKvStoreFake.c",   # the items are constructed WITHOUT a store; this is here
+    TEST_DIR / "alxParamMgmtTestHelpers.c",   # only because alxParamItem.c references the symbols
+    TEST_DIR / "alxAssertPc.c",
+]
+PARAMMGMT_SOURCES_CLOSURE = [
+    CLIB_DIR / "alxParamItem.c",
+    CLIB_DIR / "alxFtoa.c",
+    CLIB_DIR / "alxRange.c",
+    CLIB_DIR / "alxBound.c",
+]
+PARAMMGMT_ASSERT_DEFINES = [
+    "-DALX_PARAM_MGMT_ASSERT_RST_ENABLE", "-DALX_PARAM_ITEM_ASSERT_RST_ENABLE",
+    "-DALX_BOUND_ASSERT_RST_ENABLE", "-DALX_FTOA_ASSERT_RST_ENABLE",
+    "-DALX_RANGE_ASSERT_RST_ENABLE",
+]
+PARAMMGMT_DEPS = [
+    *PARAMMGMT_SOURCES_STRICT,
+    *PARAMMGMT_SOURCES_CLOSURE,
+    CLIB_DIR / "alxParamMgmt.h",
+    CLIB_DIR / "alxParamItem.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxParamMgmtTest.def",
+    Path(__file__),
+]
+PARAMMGMT_DLL = BUILD_DIR / "alxParamMgmtTest.dll"
+
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -429,6 +470,11 @@ def _build_rtc_dll() -> None:
     _build_dll(RTC_SOURCES, (), (), RTC_DLL, TEST_DIR / "alxRtcTest.def", None)
 
 
+def _build_parammgmt_dll() -> None:
+    _build_dll(PARAMMGMT_SOURCES_STRICT, PARAMMGMT_SOURCES_CLOSURE, PARAMMGMT_ASSERT_DEFINES,
+               PARAMMGMT_DLL, TEST_DIR / "alxParamMgmtTest.def", "paramMgmtClosure")
+
+
 def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
@@ -448,6 +494,7 @@ DLL_GROUPS = [
     (LINFUN_DLL, LINFUN_DEPS, _build_linfun_dll),
     (BOOL_DLL, BOOL_DEPS, _build_bool_dll),
     (RTC_DLL, RTC_DEPS, _build_rtc_dll),
+    (PARAMMGMT_DLL, PARAMMGMT_DEPS, _build_parammgmt_dll),
 ]
 
 
@@ -1677,6 +1724,145 @@ class RtcLib:
         out = [ctypes.c_uint16() for _ in range(3)]
         self.c.AlxRtc_SecFractToMsUsNs(fraction, *[ctypes.byref(o) for o in out])
         return tuple(o.value for o in out)
+
+
+class ParamMgmtLib:
+    """ctypes wrapper around alxParamMgmtTest.dll: the view a CLI reaches its parameters through.
+
+    The manager is built over a fixed table of six REAL AlxParamItem - two groups, five data types,
+    a Var among the Params - declared in alxParamMgmtTestHelpers.c and documented at the top of it.
+    Everything here goes through the module's public API; nothing reads the items directly.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, u32, i32, cp = ctypes.c_void_p, ctypes.c_uint32, ctypes.c_int32, ctypes.c_char_p
+        c.AlxParamMgmtTest_New.restype = vp
+        c.AlxParamMgmtTest_Delete.argtypes = [vp]
+        for name in ("NumOfItems",):
+            getattr(c, f"AlxParamMgmtTest_{name}").restype = u32
+        for name in ("ParamType_Param", "ParamType_Var", "DataType_Uint8", "DataType_Uint16",
+                     "DataType_Uint32", "DataType_Int32", "DataType_Float", "DataType_Bool",
+                     "Status_Ok", "Status_Err"):
+            getattr(c, f"AlxParamMgmtTest_{name}").restype = i32
+        c.AlxParamMgmt_GetNumOfParamItems.restype = u32
+        c.AlxParamMgmt_GetNumOfParamItems.argtypes = [vp]
+        c.AlxParamMgmt_GetNumOfParamTypeItems.restype = u32
+        c.AlxParamMgmt_GetNumOfParamTypeItems.argtypes = [vp, i32]
+        for name in ("GetDataType", "GetParamType"):
+            fn = getattr(c, f"AlxParamMgmt_ByIndex_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp, u32]
+        for name in ("GetKey", "GetGroupKey"):
+            fn = getattr(c, f"AlxParamMgmt_ByIndex_{name}")
+            fn.restype = cp
+            fn.argtypes = [vp, u32]
+        for name in ("GetId", "GetGroupId", "GetValLen"):
+            fn = getattr(c, f"AlxParamMgmt_ByIndex_{name}")
+            fn.restype = u32
+            fn.argtypes = [vp, u32]
+        c.AlxParamMgmt_ByIndex_GetVal_StrFormat.restype = i32
+        c.AlxParamMgmt_ByIndex_GetVal_StrFormat.argtypes = [vp, u32, cp, u32]
+        c.AlxParamMgmt_ByKey_SetVal_StrFormat.restype = i32
+        c.AlxParamMgmt_ByKey_SetVal_StrFormat.argtypes = [vp, cp, cp]
+        c.AlxParamMgmt_ById_GetValLen.restype = i32
+        c.AlxParamMgmt_ById_GetValLen.argtypes = [vp, u32, ctypes.POINTER(u32)]
+        for name in ("Get", "Set"):
+            fn = getattr(c, f"AlxParamMgmt_ById_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp, u32, ctypes.c_void_p, u32]
+        c.AlxParamMgmt_SetValToDef_Group.argtypes = [vp, u32]
+        c.AlxParamMgmt_SetValToDef_All.argtypes = [vp]
+
+        self.OK = c.AlxParamMgmtTest_Status_Ok()
+        self.ERR = c.AlxParamMgmtTest_Status_Err()
+        self.PARAM = c.AlxParamMgmtTest_ParamType_Param()
+        self.VAR = c.AlxParamMgmtTest_ParamType_Var()
+        self.TYPES = {name: getattr(c, f"AlxParamMgmtTest_DataType_{name}")()
+                      for name in ("Uint8", "Uint16", "Uint32", "Int32", "Float", "Bool")}
+        self._handles: list = []
+
+    def table(self):
+        """The manager over the helper's fixed six-item table."""
+        handle = self.c.AlxParamMgmtTest_New()
+        assert handle, "the test helper could not allocate"
+        self._handles.append(handle)
+        return handle
+
+    # -- the module's own questions -------------------------------------------
+    def count(self, mgmt) -> int:
+        return self.c.AlxParamMgmt_GetNumOfParamItems(mgmt)
+
+    def count_of_type(self, mgmt, param_type: int) -> int:
+        return self.c.AlxParamMgmt_GetNumOfParamTypeItems(mgmt, param_type)
+
+    def by_index(self, mgmt, index: int) -> dict:
+        """Everything the module will say about one item, in one dict."""
+        c = self.c
+        return {
+            "key": c.AlxParamMgmt_ByIndex_GetKey(mgmt, index).decode("ascii"),
+            "id": c.AlxParamMgmt_ByIndex_GetId(mgmt, index),
+            "group_key": c.AlxParamMgmt_ByIndex_GetGroupKey(mgmt, index).decode("ascii"),
+            "group_id": c.AlxParamMgmt_ByIndex_GetGroupId(mgmt, index),
+            "data_type": c.AlxParamMgmt_ByIndex_GetDataType(mgmt, index),
+            "param_type": c.AlxParamMgmt_ByIndex_GetParamType(mgmt, index),
+            "val_len": c.AlxParamMgmt_ByIndex_GetValLen(mgmt, index),
+        }
+
+    def value(self, mgmt, index: int, size: int = 64) -> str:
+        buff = ctypes.create_string_buffer(size)
+        status = self.c.AlxParamMgmt_ByIndex_GetVal_StrFormat(mgmt, index, buff, size)
+        assert status == self.OK, f"reading index {index} returned {status}"
+        return buff.value.decode("ascii")
+
+    def values(self, mgmt) -> list:
+        """Every item's value as text, in index order - what a get-param dump is made of."""
+        return [self.value(mgmt, i) for i in range(self.count(mgmt))]
+
+    def set_by_key(self, mgmt, key: str, value: str) -> int:
+        return self.c.AlxParamMgmt_ByKey_SetVal_StrFormat(mgmt, key.encode(), value.encode())
+
+    def len_by_id(self, mgmt, identifier: int) -> tuple[int, int]:
+        out = ctypes.c_uint32()
+        return self.c.AlxParamMgmt_ById_GetValLen(mgmt, identifier, ctypes.byref(out)), out.value
+
+    def get_by_id(self, mgmt, identifier: int, length: int) -> tuple[int, bytes]:
+        buff = ctypes.create_string_buffer(length)
+        status = self.c.AlxParamMgmt_ById_Get(mgmt, identifier, buff, length)
+        return status, buff.raw
+
+    def set_by_id(self, mgmt, identifier: int, raw: bytes) -> int:
+        buff = ctypes.create_string_buffer(raw, len(raw))
+        return self.c.AlxParamMgmt_ById_Set(mgmt, identifier, buff, len(raw))
+
+    def defaults_group(self, mgmt, group_id: int) -> None:
+        self.c.AlxParamMgmt_SetValToDef_Group(mgmt, group_id)
+
+    def defaults_all(self, mgmt) -> None:
+        self.c.AlxParamMgmt_SetValToDef_All(mgmt)
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxParamMgmtTest_Delete(handle)
+        self._handles.clear()
+
+
+@pytest.fixture(scope="session")
+def param_mgmt_lib_session() -> ParamMgmtLib:
+    override = os.environ.get("ALX_PARAMMGMT_TEST_DLL")
+    if override:
+        return ParamMgmtLib(Path(override))
+    if _needs_build(PARAMMGMT_DLL, PARAMMGMT_DEPS):
+        _build_parammgmt_dll()
+    return ParamMgmtLib(PARAMMGMT_DLL)
+
+
+@pytest.fixture
+def param_mgmt_lib(param_mgmt_lib_session) -> ParamMgmtLib:
+    """The manager library, with every table the previous test built already released."""
+    yield param_mgmt_lib_session
+    param_mgmt_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")
