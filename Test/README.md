@@ -24,6 +24,14 @@ A missing tool fails its lane, never skips it.
 ## Layout
 
 - `Test/` = the suite: tests, `conftest.py`, C helpers and fakes, the DLL export files.
+- The groups, one DLL each, declared in `conftest.py`:
+	- `alxFifoTest` - the FIFO and the bounds helper it uses
+	- `alxCliTest` - the CLI over a faked serial port and KV store
+	- `alxMemSafeTest` - the safe-store chain (CRC, MemSafe, ParamGroup, ParamStore) over a faked raw
+	  memory, and the parameter item's string format conversion
+	- `alxVdivTest` - a resistive divider's arithmetic; the smallest group here and the shape a pure
+	  module should copy
+	- `alxTimSwTest` - the software timer over the real tick counter, with the interrupt lock faked
 - There is no lane-side folder of its own any more. Everything a second C repository would need identically comes
   from the Python lib and is called as a command or imported: the gates (`python -m alx.verify.<gate>`), the host
   toolchain and DLL build mechanics (`alx.c_lib.host_build`) and the C mutation hooks
