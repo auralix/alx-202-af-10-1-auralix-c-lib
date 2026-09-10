@@ -164,7 +164,7 @@ def test_ALX1514_P14_responses_use_crlf_line_endings(make_cli):
 
 
 # =====================================================================
-# P15 - post-review CLI contract (TV review 03.09):
+# P15 - post-review CLI contract (design review 03.09):
 #   - the terminator is stripped once before dispatch (commands match "help", not "help\r\n")
 #   - set-param parses IN PLACE: key/val point into the line buffer, no stack copies,
 #     so a value is bounded only by the CLI buffer and may contain spaces
@@ -237,7 +237,7 @@ def test_ALX1514_P15_set_param_bad_lines_answer_arguments_invalid(make_cli, line
                                   b"set-parameter --key UINT8_TEST --val 1"],
                          ids=["bare", "suffix", "longer-word"])
 def test_ALX1514_P15_set_param_is_matched_as_a_whole_word(make_cli, line):
-    """Dispatch is 'set-param ' (word + space, TV 03.09): a bare or misspelled word is
+    """Dispatch is 'set-param ' (word + space, design review 03.09): a bare or misspelled word is
     not a command. Before: prefix match -> 'set-paramX --key K --val V' EXECUTED the set."""
     cli = make_cli()
     assert INVALID_MARK in cmd(cli, line + b"\r", handles=4)
@@ -256,7 +256,7 @@ def test_ALX1514_P15_pretty_json_toggle_changes_response_format(make_cli):
     """PRETTY_JSON_EN is read at response time: the success response to the
     set itself is already compact, and so is the next get-param; back to pretty
     after. (help is NOT covered: its JSON is hard-coded pretty regardless of the
-    flag - pre-existing behavior, reported to TV 03.09.)"""
+    flag - pre-existing behavior, reported upstream 03.09.)"""
     cli = make_cli()
     resp = set_param(cli, b"PRETTY_JSON_EN", b"false")
     assert resp == b'{"status":"success"}\r\n'

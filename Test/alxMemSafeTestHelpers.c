@@ -5,7 +5,7 @@
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * Opaque-handle constructor for the complete safe-store chain under test,
-  * wired the SAME way the product wires it (tlTest_BringUp.c, ALX-1513):
+  * wired the SAME way the product wires it (ALX-1513):
   * AlxCrc (CRC32) -> AlxMemRaw (faked by alxMemRawFake.c) -> AlxMemSafe
   * (copy A / copy B, copyLen 5) -> AlxParamGroup (five uint8 items with the
   * product's keys and factory defaults) -> AlxParamStore (one group).
@@ -89,7 +89,7 @@ AlxMemSafeTest_Ctx* AlxMemSafeTest_New(uint32_t copyAddrA, uint32_t copyAddrB, u
 		return NULL;
 	}
 
-	// Same chain and the same numbers as the product (tlTest_BringUp.c, ALX-1513)
+	// Same chain and the same numbers as the product (ALX-1513)
 	AlxCrc_Ctor(&ctx->crc, AlxCrc_Config_Crc32);
 	AlxMemRaw_Ctor(&ctx->memRaw);
 	AlxMemSafe_Ctor
@@ -110,8 +110,11 @@ AlxMemSafeTest_Ctx* AlxMemSafeTest_New(uint32_t copyAddrA, uint32_t copyAddrB, u
 		sizeof(ctx->buff2)
 	);
 
-	// The product's five stored params: key, factory default, 0..100, out-of-range ignored
-	static const char* const keys[ALX_MEM_SAFE_TEST_NUM_OF_ITEMS] = { "DRL_pct", "AFS_pct", "INPUT_DRL_1_pct", "INPUT_DRL_2_pct", "INPUT_AFS_pct" };
+	// The product's five stored params: key, factory default, 0..100, out-of-range ignored.
+	// The KEYS are generic on purpose - this is a public library and the client's parameter
+	// vocabulary is not ours to publish. Nothing reads them by name: what the tests measure is
+	// the count, the widths and the defaults.
+	static const char* const keys[ALX_MEM_SAFE_TEST_NUM_OF_ITEMS] = { "PARAM_1_pct", "PARAM_2_pct", "PARAM_3_pct", "PARAM_4_pct", "PARAM_5_pct" };
 	static const uint8_t defs[ALX_MEM_SAFE_TEST_NUM_OF_ITEMS] = { 0, 0, 50, 100, 70 };
 	for (uint32_t i = 0; i < ALX_MEM_SAFE_TEST_NUM_OF_ITEMS; i++)
 	{

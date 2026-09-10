@@ -5,9 +5,9 @@
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
   * Opaque-handle constructor for a complete Tier-2 CLI under test, wired the
-  * SAME way the product wires it (tlTest_BringUp.c): fake serial port +
-  * real AlxParamItem PRETTY_JSON_EN (valDef true, no KV store) + real
-  * AlxParamMgmt over that one item + alxId = NULL (the guarded optional).
+  * SAME way the product wires it: fake serial port + real AlxParamItem
+  * PRETTY_JSON_EN (valDef true, no KV store) + real AlxParamMgmt over that one
+  * item + alxId = NULL (the guarded optional).
   * NVIC_SystemReset is shimmed here: it records a flag the tests can read.
   ******************************************************************************
   **/
