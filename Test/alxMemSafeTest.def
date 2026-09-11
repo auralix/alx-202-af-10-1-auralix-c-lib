@@ -63,3 +63,6 @@ EXPORTS
 	AlxRange_CheckDouble
 	AlxRange_CheckStr
 	AlxFtoa
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

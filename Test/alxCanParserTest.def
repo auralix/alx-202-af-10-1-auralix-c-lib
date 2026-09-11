@@ -24,3 +24,6 @@ EXPORTS
 	AlxCanParser_GetFloat
 	AlxCanParser_GetDouble
 	AlxCanParser_GetEnum
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

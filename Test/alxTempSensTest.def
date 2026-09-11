@@ -15,3 +15,6 @@ EXPORTS
 	AlxTempSensTest_Status_Ok
 	AlxTempSensTest_Status_ErrMin
 	AlxTempSensTest_Status_ErrMax
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

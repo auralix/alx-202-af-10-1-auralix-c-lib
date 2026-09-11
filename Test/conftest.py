@@ -6,7 +6,9 @@ handles from alxFifoTestHelpers.c and the public alxFifo.h API only.
 """
 
 import ctypes
+import functools
 import os
+import re
 from pathlib import Path
 from typing import ClassVar
 
@@ -25,6 +27,7 @@ FIFO_SOURCES = [
     CLIB_DIR / "alxBound.c",
     TEST_DIR / "alxFifoTestHelpers.c",
     TEST_DIR / "alxBoundTestHelpers.c",
+    TEST_DIR / "alxAssertPc.c",
 ]
 FIFO_DEPS = [
     *FIFO_SOURCES,
@@ -785,108 +788,123 @@ def _build_dll(strict, closure, defines, dll: Path, def_file: Path, obj_dir_name
 
 
 def _build_fifo_dll() -> None:
-    _build_dll(FIFO_SOURCES, (), (), FIFO_DLL, TEST_DIR / "alxFifoTest.def", None)
+    _build_dll(FIFO_SOURCES, (), _assert_defines(FIFO_SOURCES), FIFO_DLL, TEST_DIR / "alxFifoTest.def", None)
 
 
 def _build_cli_dll() -> None:
-    _build_dll(CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE, CLI_ASSERT_DEFINES,
+    _build_dll(CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE,
+               [*CLI_ASSERT_DEFINES, *_assert_defines(CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE)],
                CLI_DLL, TEST_DIR / "alxCliTest.def", "cliClosure")
 
 
 def _build_memsafe_dll() -> None:
-    _build_dll(MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE, MEMSAFE_ASSERT_DEFINES,
+    _build_dll(MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE,
+               [*MEMSAFE_ASSERT_DEFINES, *_assert_defines(MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE)],
                MEMSAFE_DLL, TEST_DIR / "alxMemSafeTest.def", "memSafeClosure")
 
 
 def _build_vdiv_dll() -> None:
-    _build_dll(VDIV_SOURCES, (), (), VDIV_DLL, TEST_DIR / "alxVdivTest.def", None)
+    _build_dll(VDIV_SOURCES, (), _assert_defines(VDIV_SOURCES), VDIV_DLL, TEST_DIR / "alxVdivTest.def", None)
 
 
 def _build_canparser_dll() -> None:
-    _build_dll(CANPARSER_SOURCES, (), (), CANPARSER_DLL, TEST_DIR / "alxCanParserTest.def", None)
+    _build_dll(CANPARSER_SOURCES, (),
+               _assert_defines(CANPARSER_SOURCES),
+               CANPARSER_DLL, TEST_DIR / "alxCanParserTest.def", None)
 
 
 def _build_filtglitch_dll() -> None:
-    _build_dll(FILTGLITCH_SOURCES, (), (), FILTGLITCH_DLL, TEST_DIR / "alxFiltGlitchTest.def", None)
+    _build_dll(FILTGLITCH_SOURCES, (),
+               _assert_defines(FILTGLITCH_SOURCES),
+               FILTGLITCH_DLL, TEST_DIR / "alxFiltGlitchTest.def", None)
 
 
 def _build_math_dll() -> None:
-    _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
+    _build_dll(MATH_SOURCES, (), _assert_defines(MATH_SOURCES), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
 def _build_fssafe_dll() -> None:
-    _build_dll(FSSAFE_SOURCES_STRICT, FSSAFE_SOURCES_CLOSURE, FSSAFE_DEFINES, FSSAFE_DLL,
+    _build_dll(FSSAFE_SOURCES_STRICT, FSSAFE_SOURCES_CLOSURE,
+               [*FSSAFE_DEFINES, *_assert_defines(FSSAFE_SOURCES_STRICT, FSSAFE_SOURCES_CLOSURE)],
+               FSSAFE_DLL,
                TEST_DIR / "alxFsSafeTest.def", "fsSafeClosure")
 
 
 def _build_paramkv_dll() -> None:
-    _build_dll(PARAMKV_SOURCES, (), (), PARAMKV_DLL,
+    _build_dll(PARAMKV_SOURCES, (), _assert_defines(PARAMKV_SOURCES), PARAMKV_DLL,
                TEST_DIR / "alxParamKvStoreTest.def", None)
 
 
 def _build_mux_dll() -> None:
-    _build_dll(MUX_SOURCES, (), (), MUX_DLL, TEST_DIR / "alxMuxTest.def", None)
+    _build_dll(MUX_SOURCES, (), _assert_defines(MUX_SOURCES), MUX_DLL, TEST_DIR / "alxMuxTest.def", None)
 
 
 def _build_bts_dll() -> None:
-    _build_dll(BTS_SOURCES, (), (), BTS_DLL, TEST_DIR / "alxBts724gTest.def", None)
+    _build_dll(BTS_SOURCES, (), _assert_defines(BTS_SOURCES), BTS_DLL, TEST_DIR / "alxBts724gTest.def", None)
 
 
 def _build_ntc_dll() -> None:
-    _build_dll(NTC_SOURCES_STRICT, NTC_SOURCES_CLOSURE, (), NTC_DLL,
+    _build_dll(NTC_SOURCES_STRICT, NTC_SOURCES_CLOSURE,
+               _assert_defines(NTC_SOURCES), NTC_DLL,
                TEST_DIR / "alxNtcTest.def", "ntcClosure")
 
 
 def _build_audioplayer_dll() -> None:
-    _build_dll(AUDIOPLAYER_SOURCES_STRICT, AUDIOPLAYER_SOURCES_CLOSURE, (), AUDIOPLAYER_DLL,
+    _build_dll(AUDIOPLAYER_SOURCES_STRICT, AUDIOPLAYER_SOURCES_CLOSURE,
+               _assert_defines(AUDIOPLAYER_SOURCES), AUDIOPLAYER_DLL,
                TEST_DIR / "alxAudioPlayerTest.def", "audioPlayerClosure")
 
 
 def _build_audio_dll() -> None:
-    _build_dll(AUDIO_SOURCES, (), (), AUDIO_DLL, TEST_DIR / "alxAudioTest.def", None)
+    _build_dll(AUDIO_SOURCES, (), _assert_defines(AUDIO_SOURCES), AUDIO_DLL, TEST_DIR / "alxAudioTest.def", None)
 
 
 def _build_pwr_dll() -> None:
-    _build_dll(PWR_SOURCES, (), (), PWR_DLL, TEST_DIR / "alxPwrTest.def", None)
+    _build_dll(PWR_SOURCES, (), _assert_defines(PWR_SOURCES), PWR_DLL, TEST_DIR / "alxPwrTest.def", None)
 
 
 def _build_tempsens_dll() -> None:
-    _build_dll(TEMPSENS_SOURCES, (), (), TEMPSENS_DLL, TEST_DIR / "alxTempSensTest.def", None)
+    _build_dll(TEMPSENS_SOURCES, (),
+               _assert_defines(TEMPSENS_SOURCES),
+               TEMPSENS_DLL, TEST_DIR / "alxTempSensTest.def", None)
 
 
 def _build_rotsw_dll() -> None:
-    _build_dll(ROTSW_SOURCES, (), (), ROTSW_DLL, TEST_DIR / "alxRotSwTest.def", None)
+    _build_dll(ROTSW_SOURCES, (), _assert_defines(ROTSW_SOURCES), ROTSW_DLL, TEST_DIR / "alxRotSwTest.def", None)
 
 
 def _build_linfun_dll() -> None:
-    _build_dll(LINFUN_SOURCES, (), (), LINFUN_DLL, TEST_DIR / "alxLinFunTest.def", None)
+    _build_dll(LINFUN_SOURCES, (), _assert_defines(LINFUN_SOURCES), LINFUN_DLL, TEST_DIR / "alxLinFunTest.def", None)
 
 
 def _build_bool_dll() -> None:
-    _build_dll(BOOL_SOURCES, (), (), BOOL_DLL, TEST_DIR / "alxBoolTest.def", None)
+    _build_dll(BOOL_SOURCES, (), _assert_defines(BOOL_SOURCES), BOOL_DLL, TEST_DIR / "alxBoolTest.def", None)
 
 
 def _build_rtc_dll() -> None:
-    _build_dll(RTC_SOURCES, (), (), RTC_DLL, TEST_DIR / "alxRtcTest.def", None)
+    _build_dll(RTC_SOURCES, (), _assert_defines(RTC_SOURCES), RTC_DLL, TEST_DIR / "alxRtcTest.def", None)
 
 
 def _build_parammgmt_dll() -> None:
-    _build_dll(PARAMMGMT_SOURCES_STRICT, PARAMMGMT_SOURCES_CLOSURE, PARAMMGMT_ASSERT_DEFINES,
+    _build_dll(PARAMMGMT_SOURCES_STRICT, PARAMMGMT_SOURCES_CLOSURE,
+               [*PARAMMGMT_ASSERT_DEFINES, *_assert_defines(PARAMMGMT_SOURCES_STRICT, PARAMMGMT_SOURCES_CLOSURE)],
                PARAMMGMT_DLL, TEST_DIR / "alxParamMgmtTest.def", "paramMgmtClosure")
 
 
 def _build_ina228_dll() -> None:
-    _build_dll(INA228_SOURCES_STRICT, INA228_SOURCES_CLOSURE, INA228_DEFINES,
+    _build_dll(INA228_SOURCES_STRICT, INA228_SOURCES_CLOSURE,
+               [*INA228_DEFINES, *_assert_defines(INA228_SOURCES_STRICT, INA228_SOURCES_CLOSURE)],
                INA228_DLL, TEST_DIR / "alxIna228Test.def", "ina228Closure")
 
 
 def _build_pi4ioe_dll() -> None:
-    _build_dll(PI4IOE_SOURCES_STRICT, PI4IOE_SOURCES_CLOSURE, PI4IOE_DEFINES,
+    _build_dll(PI4IOE_SOURCES_STRICT, PI4IOE_SOURCES_CLOSURE,
+               [*PI4IOE_DEFINES, *_assert_defines(PI4IOE_SOURCES_STRICT, PI4IOE_SOURCES_CLOSURE)],
                PI4IOE_DLL, TEST_DIR / "alxPi4ioe5v6534qTest.def", "pi4ioeClosure")
 
 
 def _build_timsw_dll() -> None:
-    _build_dll(TIMSW_SOURCES, (), (), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
+    _build_dll(TIMSW_SOURCES, (), _assert_defines(TIMSW_SOURCES), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
 
 # The groups as DATA, for anything that must rebuild them without running the suite: the MUTATE
@@ -918,6 +936,93 @@ DLL_GROUPS = [
     (PARAMKV_DLL, PARAMKV_DEPS, _build_paramkv_dll),
     (FSSAFE_DLL, FSSAFE_DEPS, _build_fssafe_dll),
 ]
+
+
+# ------------------------------------- the library's own assertions, per group -----
+# A module built with no ALX_<MODULE>_ASSERT_*_ENABLE macro compiles its assertions down to
+# do{} while(false) and DISCARDS the expression - the invariant is not weakened, it is absent.
+# Seventeen groups here were doing that until 11.09, when the device repository's mutation lane
+# found the same thing: mutants that inverted an assertion survived, because there was nothing
+# left of it to change.
+#
+# The macro name is not derivable from the file name (ALX_FILT_GLITCH_BOOL against
+# alxFiltGlitchBool), so it is read out of each module's own header, which is the one place it is
+# declared. That also means a group that gains a source gains its assertions with it, and a module
+# renamed in the library does not leave a stale define behind.
+_ASSERT_MACRO_RE = re.compile(r"#if defined\((ALX_[A-Z0-9_]+)_ASSERT_BKPT_ENABLE\)")
+
+
+@functools.cache
+def _assert_macro(header: Path) -> str | None:
+    """The module's own ASSERT enable macro, or None for a module that declares none."""
+    try:
+        found = _ASSERT_MACRO_RE.search(header.read_text(encoding="utf-8", errors="replace"))
+    except OSError:
+        return None
+    return f"{found.group(1)}_ASSERT_RST_ENABLE" if found else None
+
+
+def _assert_defines(*source_lists) -> list[str]:
+    """-D flags turning on the assertions of every LIBRARY module a group compiles.
+
+    Test helpers and fakes are skipped - they have no assertions of their own, and alxAssertPc.c is
+    what the enabled ones land in.
+    """
+    macros = set()
+    for sources in source_lists:
+        for source in sources:
+            if TEST_DIR in source.parents:
+                continue
+            macro = _assert_macro(source.with_suffix(".h"))
+            if macro:
+                macros.add(macro)
+    return [f"-D{m}" for m in sorted(macros)]
+
+
+# ---------------------------------------------- the library's own assertions -----
+# A module built with no ALX_<MODULE>_ASSERT_*_ENABLE macro compiles its assertions down to
+# do{} while(false) and DISCARDS the expression - the invariant is not weakened, it is absent.
+# Seventeen groups here were doing that until 11.09, when the device repository's mutation lane
+# found the same thing: mutants that inverted an assertion survived, because there was nothing
+# left of it to change. Every group now builds its module with assertions ON, the way a product
+# that enables them ships it, and alxAssertPc.c records rather than aborts - so a test that breaks
+# an invariant is a failure with a file and a line instead of a dead test runner.
+_LOADED_DLLS: list = []
+
+
+def _register_lib(c) -> None:
+    """Every wrapper's ctypes handle, so one fixture can watch all of them."""
+    if c not in _LOADED_DLLS:
+        c.AlxAssertPc_Count.restype = ctypes.c_uint32
+        c.AlxAssertPc_First.restype = ctypes.c_char_p
+        _LOADED_DLLS.append(c)
+
+
+@pytest.fixture(autouse=True)
+def _no_library_assertions(request):
+    """No test may leave one of the library's own assertions tripped.
+
+    Reset before, checked after, across every DLL loaded so far - which is what makes it work for
+    the session-scoped wrappers too.
+
+    A test that MEANS to trip one marks itself `@pytest.mark.expect_assert("why")`, and the reason
+    is required: an exemption that did not have to say what it was for would be added silently the
+    first time one got in the way, which is how 257 assertions came to be compiled out of the
+    device repository's host build in the first place.
+    """
+    for c in _LOADED_DLLS:
+        c.AlxAssertPc_Reset()
+    yield
+    marker = request.node.get_closest_marker("expect_assert")
+    for c in _LOADED_DLLS:
+        count = c.AlxAssertPc_Count()
+        if count and marker is None:
+            where = (c.AlxAssertPc_First() or b"").decode("ascii", "replace")
+            msg = f"a library assertion failed {count} time(s): {where}"
+            raise AssertionError(msg)
+    if marker is not None:
+        assert marker.args, "expect_assert has to say what the assertion is for"
+        assert marker.args[0], "expect_assert's reason cannot be empty"
 
 
 # ---------------------------------------------------------------- ctypes -----
@@ -1069,6 +1174,7 @@ class CliLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         c.AlxCliTest_New.restype = ctypes.c_void_p
         c.AlxCliTest_Delete.argtypes = [ctypes.c_void_p]
         c.AlxCliTest_Handle.argtypes = [ctypes.c_void_p]
@@ -1136,6 +1242,7 @@ class MemSafeLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, u32, i32 = ctypes.c_void_p, ctypes.c_uint32, ctypes.c_int32
         u8p, b = ctypes.POINTER(ctypes.c_uint8), ctypes.c_bool
         c.AlxMemSafeTest_New.restype = vp
@@ -1456,6 +1563,7 @@ class VdivLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         f, u32 = ctypes.c_float, ctypes.c_uint32
         for name in ("GetVout_V", "GetVin_V", "GetResHigh_kOhm", "GetResLow_kOhm"):
             fn = getattr(c, f"AlxVdiv_{name}")
@@ -1509,6 +1617,7 @@ class TimSwLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, u64, b, u32, i32 = (ctypes.c_void_p, ctypes.c_uint64, ctypes.c_bool,
                                 ctypes.c_uint32, ctypes.c_int32)
         for name in ("Ctor", "Start", "Stop"):
@@ -1659,6 +1768,7 @@ class CanParserLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         msg_p, u8, endian_t = ctypes.POINTER(CanMsg), ctypes.c_uint8, ctypes.c_int
         for name, (ctype, has_endian) in self.SCALARS.items():
             head = [msg_p, endian_t, u8] if has_endian else [msg_p, u8]
@@ -1711,6 +1821,7 @@ class FiltGlitchLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, u32, u64, b, f = (ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint64,
                               ctypes.c_bool, ctypes.c_float)
         c.AlxFiltGlitchBoolTest_New.restype = vp
@@ -1803,6 +1914,7 @@ class MathLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, u32, f, i32 = ctypes.c_void_p, ctypes.c_uint32, ctypes.c_float, ctypes.c_int32
         c.AlxHys1Test_New.restype = vp
         c.AlxHys1Test_New.argtypes = [f, f]
@@ -1902,6 +2014,7 @@ class LinFunLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, f, i32, u32, b = (ctypes.c_void_p, ctypes.c_float, ctypes.c_int32,
                               ctypes.c_uint32, ctypes.c_bool)
         c.AlxLinFunTest_New.restype = vp
@@ -2012,6 +2125,7 @@ class BoolLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, f, b, u64 = ctypes.c_void_p, ctypes.c_float, ctypes.c_bool, ctypes.c_uint64
         c.AlxBoolTest_New.restype = vp
         c.AlxBoolTest_New.argtypes = [b, f, f, f, f, f, f]
@@ -2111,6 +2225,7 @@ class RtcLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         u16, u64, f = ctypes.c_uint16, ctypes.c_uint64, ctypes.c_float
         p16 = ctypes.POINTER(u16)
         for unit in self.RESOLUTIONS:
@@ -2176,6 +2291,7 @@ class ParamMgmtLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, u32, i32, cp = ctypes.c_void_p, ctypes.c_uint32, ctypes.c_int32, ctypes.c_char_p
         c.AlxParamMgmtTest_New.restype = vp
         c.AlxParamMgmtTest_Delete.argtypes = [vp]
@@ -2299,6 +2415,7 @@ class Ina228Lib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, f, i32, u8, u32 = (ctypes.c_void_p, ctypes.c_float, ctypes.c_int32,
                                ctypes.c_uint8, ctypes.c_uint32)
         c.AlxIna228Test_New.restype = vp
@@ -2394,6 +2511,7 @@ class Pi4ioeLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, u8, i32, b, u32 = (ctypes.c_void_p, ctypes.c_uint8, ctypes.c_int32,
                                ctypes.c_bool, ctypes.c_uint32)
         c.AlxPi4ioeTest_New.restype = vp
@@ -2586,6 +2704,7 @@ class FsSafeLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, b, u16, u32, i32 = (ctypes.c_void_p, ctypes.c_bool, ctypes.c_uint16,
                                 ctypes.c_uint32, ctypes.c_int32)
         u8p = ctypes.POINTER(ctypes.c_uint8)
@@ -2707,6 +2826,7 @@ class ParamKvStoreLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, b, u32, i32 = ctypes.c_void_p, ctypes.c_bool, ctypes.c_uint32, ctypes.c_int32
         u8p = ctypes.POINTER(ctypes.c_uint8)
         cp = ctypes.c_char_p
@@ -2833,6 +2953,7 @@ class MuxLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, b, u8, i32 = ctypes.c_void_p, ctypes.c_bool, ctypes.c_uint8, ctypes.c_int32
         c.AlxMuxTest_New.restype = vp
         c.AlxMuxTest_New.argtypes = [u8]
@@ -2924,6 +3045,7 @@ class BtsLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, f, u64, b = ctypes.c_void_p, ctypes.c_float, ctypes.c_uint64, ctypes.c_bool
         c.AlxBts724gTest_New.restype = vp
         c.AlxBts724gTest_Delete.argtypes = [vp]
@@ -3029,6 +3151,7 @@ class NtcLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         c.AlxNtcg103jf103ft1s_ResToTemp_degC.restype = ctypes.c_int16
         c.AlxNtcg103jf103ft1s_ResToTemp_degC.argtypes = [ctypes.c_uint32]
 
@@ -3053,6 +3176,7 @@ class AudioPlayerLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, f, u32, i32, u8, b = (ctypes.c_void_p, ctypes.c_float, ctypes.c_uint32,
                                   ctypes.c_int32, ctypes.c_uint8, ctypes.c_bool)
         c.AlxAudioPlayerTest_New.restype = vp
@@ -3143,6 +3267,7 @@ class AudioLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         f, i8, u8, i16, u16 = (ctypes.c_float, ctypes.c_int8, ctypes.c_uint8,
                                ctypes.c_int16, ctypes.c_uint16)
         for name, arg in (("Int8", i8), ("Uint8", u8), ("Int16", i16), ("Uint16", u16)):
@@ -3188,6 +3313,7 @@ class PwrLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, f, i32, u64, b = (ctypes.c_void_p, ctypes.c_float, ctypes.c_int32,
                               ctypes.c_uint64, ctypes.c_bool)
         c.AlxPwrTest_New.restype = vp
@@ -3260,6 +3386,7 @@ class TempSensLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, f, u32, i32, b = (ctypes.c_void_p, ctypes.c_float, ctypes.c_uint32,
                               ctypes.c_int32, ctypes.c_bool)
         c.AlxTempSensTest_New.restype = vp
@@ -3332,6 +3459,7 @@ class RotSwLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, u8, u32, i32, b = (ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint32,
                                ctypes.c_int32, ctypes.c_bool)
         c.AlxRotSwTest_New.restype = vp
@@ -3402,6 +3530,7 @@ class AudioVolLib:
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
+        _register_lib(c)
         vp, f = ctypes.c_void_p, ctypes.c_float
         c.AlxAudioVolTest_New.restype = vp
         c.AlxAudioVolTest_New.argtypes = [f, f]

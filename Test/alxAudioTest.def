@@ -7,3 +7,6 @@ EXPORTS
 	AlxAudio_FloatToLinerPcmInt8
 	AlxAudio_FloatToLinerPcmInt16
 	AlxAudio_StereoToMono
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

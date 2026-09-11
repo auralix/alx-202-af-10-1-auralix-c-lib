@@ -1,3 +1,6 @@
 LIBRARY alxNtcTest
 EXPORTS
 	AlxNtcg103jf103ft1s_ResToTemp_degC
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

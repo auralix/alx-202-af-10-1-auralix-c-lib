@@ -167,6 +167,10 @@ def test_ALX1553_P418_deinit_select_releases_the_select_pins_and_keeps_the_objec
     assert lib.deinit_count(en) == 1
 
 
+@pytest.mark.expect_assert(
+    "the test deliberately selects a channel beyond the pins to fill the IO pin fake, and AlxMux_Select asserts the "
+    "channel fits - P416 characterises that path on purpose"
+)
 def test_ALX1553_P419_the_pin_fake_says_so_when_it_runs_out_of_slots(mux_lib):
     """The suite's own guard: more pins than the fake has slots must be LOUD, not folded silently.
 

@@ -15,3 +15,6 @@ EXPORTS
 	AlxGlobal_Ulltoa
 	AlxGlobal_Slltoa
 	AlxGlobal_Ntohl
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

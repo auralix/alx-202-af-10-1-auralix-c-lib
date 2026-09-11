@@ -265,6 +265,10 @@ def test_ALX1553_P156_a_write_at_the_last_legal_offset_stays_inside_the_payload(
 # =====================================================================
 
 
+@pytest.mark.expect_assert(
+    "the test deliberately asks for a field wider than a byte, which the module asserts against - characterising "
+    "what it does anyway is the whole point of P157"
+)
 def test_ALX1553_P157_a_bit_field_wider_than_its_byte_is_truncated_not_carried(canparser_lib):
     """CHARACTERIZATION: an enum that would cross a byte boundary loses its top bits, silently.
 

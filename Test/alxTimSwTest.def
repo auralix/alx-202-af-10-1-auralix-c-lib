@@ -41,3 +41,6 @@ EXPORTS
 	AlxIrqFake_UnlockCount
 	AlxIrqFake_Depth
 	AlxIrqFake_DepthMax
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

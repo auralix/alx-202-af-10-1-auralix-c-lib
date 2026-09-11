@@ -25,3 +25,6 @@ EXPORTS
 	AlxIoPinFake_InitCount
 	AlxIoPinFake_DeInitCount
 	AlxIoPinFake_WriteCount
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

@@ -12,3 +12,6 @@ EXPORTS
 	AlxSerialPortFake_InjectRx
 	AlxSerialPortFake_TxRead
 	AlxSerialPortFake_TxNumOfEntries
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

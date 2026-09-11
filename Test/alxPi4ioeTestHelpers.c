@@ -7,13 +7,18 @@
   * Opaque-handle constructor and destructor over a faked I2C bus and a faked
   * reset pin, plus the pin the test wants to inspect afterwards.
   *
-  * As with the current sensor group, the driver's register configuration is
-  * left to a product through a WEAK AlxPi4ioe5v6534q_RegStruct_SetVal, and this
-  * suite does not override it: a weak symbol is displaced by a strong one when
-  * the target links ELF, and the host linker reports a duplicate instead. The
-  * library's own default runs, so the registers written here are the driver's
-  * defaults. Nothing under test depends on a product's choice of them - the pin
-  * mapping and the transfer shape are the driver's own.
+  * The driver's register configuration is left to a product through a WEAK
+  * AlxPi4ioe5v6534q_RegStruct_SetVal, and this file provides it - see the bottom
+  * of the file. It did not until 11.09, on the grounds that the host linker
+  * reported a duplicate rather than displacing the weak symbol; that was true
+  * of the build at the time and is not true now (alxGlobal.h emits
+  * __attribute__((weak)) for clang on Windows since this branch).
+  *
+  * The override keeps every default the driver set, which is what these tests
+  * were measuring all along - nothing under test depends on a product's choice
+  * of register values, the pin mapping and the transfer shape are the driver's
+  * own. What changes is that the library's default body, ALX_ASSERT(false) with
+  * "Implement in APP!" beside it, no longer runs.
   ******************************************************************************
   **/
 
@@ -85,4 +90,13 @@ int32_t AlxPi4ioeTest_Status_Ok(void)
 int32_t AlxPi4ioeTest_Status_Err(void)
 {
 	return (int32_t)Alx_Err;
+}
+
+
+//******************************************************************************
+// The application hook the driver requires
+//******************************************************************************
+void AlxPi4ioe5v6534q_RegStruct_SetVal(AlxPi4ioe5v6534q* me)
+{
+	(void)me;	// this application keeps every default the driver set
 }

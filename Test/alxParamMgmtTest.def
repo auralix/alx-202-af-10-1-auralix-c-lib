@@ -29,3 +29,6 @@ EXPORTS
 	AlxParamMgmt_ById_Set
 	AlxParamMgmt_SetValToDef_Group
 	AlxParamMgmt_SetValToDef_All
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

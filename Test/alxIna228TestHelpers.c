@@ -9,14 +9,18 @@
   * arguments - which is what these tests exist to pin.
   *
   * The driver leaves its register configuration to a product, through the WEAK
-  * function AlxIna228_RegStruct_SetVal. This suite does NOT override it: a weak
-  * definition is overridden by a strong one when the target links ELF, and the
-  * host linker here (lld-link, COFF) reports a duplicate symbol instead. So the
-  * library's own weak default runs, which does nothing, and the registers this
-  * group writes to the fake are the driver's defaults rather than a product's
-  * choices. The factors under test are computed BEFORE that hook is called, so
-  * nothing here depends on it - but it is the reason this group tests the
-  * driver's arithmetic and not a product's configuration of it.
+  * function AlxIna228_RegStruct_SetVal, and this file provides it - see the
+  * bottom of the file. It did not until 11.09, on the grounds that lld-link
+  * reported a duplicate symbol rather than letting a strong definition displace
+  * the weak one. That was true of the build at the time and is not true now:
+  * alxGlobal.h has emitted __attribute__((weak)) for clang on Windows since
+  * this branch, so the override works the way it does on the target.
+  *
+  * The override keeps every default the driver set, which is what this group
+  * has been measuring all along - the two conversion factors are computed
+  * BEFORE the hook is called, so nothing here depends on it. What changes is
+  * that the library's default body, ALX_ASSERT(false) with "Implement in APP!"
+  * beside it, no longer runs.
   ******************************************************************************
   **/
 
@@ -92,4 +96,20 @@ int32_t AlxIna228Test_Status_Ok(void)
 int32_t AlxIna228Test_Status_Err(void)
 {
 	return (int32_t)Alx_Err;
+}
+
+
+//******************************************************************************
+// The application hook the driver requires
+//******************************************************************************
+// AlxIna228_RegStruct_SetVal is ALX_WEAK in the library and its default body is ALX_ASSERT(false)
+// with "Implement in APP!" beside it: Init calls SetToDefault and then calls this, so a product is
+// expected to write its own register configuration here. This group had no override, and because
+// it also compiled its assertions out, every test in it ran a driver whose application hook had
+// asserted - invisibly, until 11.09. Keeping the driver's defaults is a legitimate application
+// choice and is what these tests have in fact been checking, so the override says so in one line
+// rather than changing what any of them measure.
+void AlxIna228_RegStruct_SetVal(AlxIna228* me)
+{
+	(void)me;	// this application keeps every default the driver set
 }

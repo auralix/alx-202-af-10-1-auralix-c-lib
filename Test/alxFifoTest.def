@@ -32,3 +32,6 @@ EXPORTS
 	AlxBoundTest_Status_ErrMin
 	AlxBoundTest_Status_ErrMax
 	AlxBoundTest_Status_ErrLen
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

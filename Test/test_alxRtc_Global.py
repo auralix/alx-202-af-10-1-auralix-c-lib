@@ -44,6 +44,10 @@ def unix(moment: dt.datetime) -> int:
 # =====================================================================
 
 
+@pytest.mark.expect_assert(
+    "P449: the module's two directions disagree about the supported range - UnixTimeNsToDateTime produces years "
+    "past 2099 and DateTimeToUnixTimeNs asserts on them"
+)
 def test_ALX1553_P201_every_day_from_2000_to_2135_converts_the_way_a_calendar_says(rtc_lib):
     """Both directions and the weekday, for 49673 consecutive days, against Python's datetime.
 
@@ -66,6 +70,10 @@ def test_ALX1553_P201_every_day_from_2000_to_2135_converts_the_way_a_calendar_sa
     assert checked == 49673, "the sweep did not cover what it claims to"
 
 
+@pytest.mark.expect_assert(
+    "P449: the module's two directions disagree about the supported range - UnixTimeNsToDateTime produces years "
+    "past 2099 and DateTimeToUnixTimeNs asserts on them"
+)
 def test_ALX1553_P202_twenty_thousand_random_instants_convert_both_ways(rtc_lib):
     """Times of day as well as dates, from a seeded generator so a failure is reproducible.
 
@@ -96,6 +104,10 @@ def test_ALX1553_P202_twenty_thousand_random_instants_convert_both_ways(rtc_lib)
     "2100-03-01T00:00:00",
     "2135-12-31T23:59:59",      # the last date a uint8 year counted from 2000 can express
 ])
+@pytest.mark.expect_assert(
+    "P449: the module's two directions disagree about the supported range - UnixTimeNsToDateTime produces years "
+    "past 2099 and DateTimeToUnixTimeNs asserts on them"
+)
 def test_ALX1553_P203_the_dates_that_break_calendars(rtc_lib, iso):
     """The specific instants worth naming, kept as their own test so a failure says which one."""
     moment = dt.datetime.fromisoformat(iso).replace(tzinfo=dt.UTC)
@@ -235,3 +247,35 @@ def test_ALX1553_P210_the_shorter_conversions_drop_the_fields_they_do_not_take(r
     assert rtc_lib.c.AlxRtc_MsUsToNs(1, 123, 456) == rtc_lib.ms_us_ns_to_ns(1, 123, 456, 0)
     assert rtc_lib.c.AlxRtc_MsToNs(1, 123) == rtc_lib.ms_us_ns_to_ns(1, 123, 0, 0)
     assert rtc_lib.c.AlxRtc_MsToNs(1, 123) == 123_000_000
+
+
+# =====================================================================
+# P449 - the two directions disagree about the range
+# =====================================================================
+
+
+@pytest.mark.xfail(strict=True, reason=(
+    "DEFECT: the module's two conversions disagree about the years they support. "
+    "AlxRtc_UnixTimeNsToDateTime happily produces years past 2099 - P201 walks every day to 2135 "
+    "and P203 checks 2100 and 2135 by name - but AlxRtc_DateTimeToUnixTimeNs opens with "
+    "ALX_RTC_GLOBAL_ASSERT(dateTime.yr <= 99), because the year field is two digits. So a date the "
+    "module itself just produced cannot be given back to it: a round trip through any instant "
+    "after 2099 trips an assertion, and on a product that enables them - which is how they ship - "
+    "that RESETS THE MCU. It is not a far-future problem in the usual sense: the assertion is "
+    "reachable from a corrupted RTC, an unset clock reading a wild value, or a device left running "
+    "past 2099, and the failure mode is a reboot loop rather than a wrong date. The fix is to "
+    "decide the range in one place: either the assertion admits the years the reverse direction "
+    "produces, or the reverse direction stops producing them"))
+def test_ALX1553_P449_a_date_the_module_produced_can_be_given_back_to_it(rtc_lib):
+    """Round trip through a date after 2099 - the years the other direction hands out.
+
+    Measured through the library's own assertion counter rather than by comparing numbers: the
+    conversion still returns something, and what is wrong is that it asserted on the way.
+    """
+    rtc_lib.c.AlxAssertPc_Reset()
+
+    rtc_lib.from_date(rtc_lib.date(2100, 3, 1))
+
+    assert rtc_lib.c.AlxAssertPc_Count() == 0, (
+        f"a date after 2099 asserted: {(rtc_lib.c.AlxAssertPc_First() or b'').decode()}"
+    )

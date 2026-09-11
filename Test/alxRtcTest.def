@@ -16,3 +16,6 @@ EXPORTS
 	AlxRtc_DateTimeToUnixTimeUs
 	AlxRtc_DateTimeToUnixTimeMs
 	AlxRtc_DateTimeToUnixTimeSec
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

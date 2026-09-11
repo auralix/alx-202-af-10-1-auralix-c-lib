@@ -23,3 +23,6 @@ EXPORTS
 	AlxAudioVol_Process
 	AlxAudioVol_Set_pct
 	AlxAudioVol_Set_dB
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

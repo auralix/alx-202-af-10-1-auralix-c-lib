@@ -26,3 +26,6 @@ EXPORTS
 	AlxTick_Ctor
 	AlxTick_IncRange_ns
 	AlxIrqFake_Reset
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

@@ -20,3 +20,6 @@ EXPORTS
 	AlxI2cFake_ReadCount
 	AlxI2cFake_SetSlaveReady
 	AlxI2cFake_SetForcedStatus
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First
