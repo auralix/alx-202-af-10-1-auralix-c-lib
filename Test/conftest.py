@@ -413,6 +413,34 @@ AUDIOPLAYER_DEPS = [
 ]
 AUDIOPLAYER_DLL = BUILD_DIR / "alxAudioPlayerTest.dll"
 
+
+# --------------------------------------------------------- NTC module -----
+# Tier-1 target: one free function and a 191-entry lookup table. A thermistor
+# is the cheapest temperature sensor on a board and the table is the whole
+# part - so the test is mostly the table, read back through the function.
+# The module is CLOSURE, for one line: it defines LUT_TEMP_MAX_degC and never
+# uses it, which -Wunused-macros makes an error. Deleting a dead macro is a
+# library change and belongs to whoever owns the module (TODO A18).
+NTC_SOURCES_STRICT = [
+    CLIB_DIR / "alxBound.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+NTC_SOURCES_CLOSURE = [
+    CLIB_DIR / "Ext" / "alxNtcg103jf103ft1s.c",
+]
+NTC_SOURCES = [*NTC_SOURCES_STRICT, *NTC_SOURCES_CLOSURE]
+NTC_DEPS = [
+    *NTC_SOURCES,
+    CLIB_DIR / "Ext" / "alxNtcg103jf103ft1s.h",
+    CLIB_DIR / "alxBound.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxNtcTest.def",
+    Path(__file__),
+]
+NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
+
 # ------------------------------------------------------ Bool module -------
 # Tier-2 target: the library's boolean-with-memory, over the REAL glitch filter,
 # software timer and tick, with only the interrupt lock faked. Twenty-one query
@@ -671,6 +699,11 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_ntc_dll() -> None:
+    _build_dll(NTC_SOURCES_STRICT, NTC_SOURCES_CLOSURE, (), NTC_DLL,
+               TEST_DIR / "alxNtcTest.def", "ntcClosure")
+
+
 def _build_audioplayer_dll() -> None:
     _build_dll(AUDIOPLAYER_SOURCES_STRICT, AUDIOPLAYER_SOURCES_CLOSURE, (), AUDIOPLAYER_DLL,
                TEST_DIR / "alxAudioPlayerTest.def", "audioPlayerClosure")
@@ -746,6 +779,7 @@ DLL_GROUPS = [
     (PWR_DLL, PWR_DEPS, _build_pwr_dll),
     (AUDIO_DLL, AUDIO_DEPS, _build_audio_dll),
     (AUDIOPLAYER_DLL, AUDIOPLAYER_DEPS, _build_audioplayer_dll),
+    (NTC_DLL, NTC_DEPS, _build_ntc_dll),
 ]
 
 
@@ -2385,6 +2419,19 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class NtcLib:
+    """ctypes wrapper around alxNtcTest.dll: a thermistor resistance to a temperature."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        c.AlxNtcg103jf103ft1s_ResToTemp_degC.restype = ctypes.c_int16
+        c.AlxNtcg103jf103ft1s_ResToTemp_degC.argtypes = [ctypes.c_uint32]
+
+    def temp(self, res_ohm: int) -> int:
+        return self.c.AlxNtcg103jf103ft1s_ResToTemp_degC(res_ohm)
+
+
 class AudioPlayerLib:
     """ctypes wrapper around alxAudioPlayerTest.dll: a track in memory and a cursor into it.
 
@@ -2797,6 +2844,17 @@ def lin_fun_lib_session() -> LinFunLib:
     if _needs_build(LINFUN_DLL, LINFUN_DEPS):
         _build_linfun_dll()
     return LinFunLib(LINFUN_DLL)
+
+
+@pytest.fixture(scope="session")
+def ntc_lib() -> NtcLib:
+    """The thermistor lookup; one free function, so one instance serves every test."""
+    override = os.environ.get("ALX_NTC_TEST_DLL")
+    if override:
+        return NtcLib(Path(override))
+    if _needs_build(NTC_DLL, NTC_DEPS):
+        _build_ntc_dll()
+    return NtcLib(NTC_DLL)
 
 
 @pytest.fixture(scope="session")

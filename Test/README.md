@@ -54,6 +54,8 @@ A missing tool fails its lane, never skips it.
 	- `alxAudioPlayerTest` - the player: a track in memory, a cursor into it, and the
 	  transport controls. The module is CLOSURE here, not gated - it does not survive
 	  -Wcast-qual (it reads a const track through a volatile non-const pointer)
+	- `alxNtcTest` - the 10 kOhm thermistor: one free function over a 191-entry table, one
+	  entry per degree from -40 to +150. CLOSURE too, for a macro it defines and never uses
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real
 	  software timers: twenty-one queries and latches about one input
 	- `alxRtcTest` - the calendar: Unix time to a broken-down date and back, in four
