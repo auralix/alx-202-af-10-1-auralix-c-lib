@@ -208,3 +208,19 @@ def test_ALX1553_P408_a_healthy_switch_reports_nothing_from_the_first_reading(bt
 
     assert bts_lib.open_load(obj) is False
     assert bts_lib.over_temp(obj) is False
+
+
+def test_ALX1553_P467_init_claims_both_pins_and_deinit_releases_them(bts_lib):
+    """The switch owns two pins - the output and the status - and gives both back.
+
+    A driver that released only the one it writes would leave the status pin configured after the
+    part had been shut down, which on a shared port is the next driver's problem rather than this
+    one's. Counted rather than read as levels, because a de-initialised pin still answers a read.
+    """
+    obj = bts_lib.new()
+
+    assert bts_lib.pin_counts(obj) == {"out": (1, 0), "status": (1, 0)}
+
+    bts_lib.deinit(obj)
+
+    assert bts_lib.pin_counts(obj) == {"out": (1, 1), "status": (1, 1)}

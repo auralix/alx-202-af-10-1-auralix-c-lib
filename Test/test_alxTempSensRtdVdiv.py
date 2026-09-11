@@ -206,3 +206,34 @@ def test_ALX1553_P258_a_middle_voltage_equal_to_the_top_is_not_a_temperature(sen
 
     assert status == lib.ERR_MAX
     assert temp == PT1000_DEGC[-1]
+
+
+# =====================================================================
+# P466 - the lifecycle nobody can call
+# =====================================================================
+
+
+@pytest.mark.xfail(strict=True, reason=(
+    "DEFECT: AlxTempSensRtdVdiv_Init and _DeInit are STUBS. Each one is (void)me, "
+    "ALX_TEMP_SENS_RTD_VDIV_ASSERT(false), return 0 - so a product doing the ordinary thing, "
+    "constructing a sensor and initialising it, trips an assertion and, on a build that enables "
+    "them as products ship them, RESETS THE MCU. And the return value is 0, which is Alx_Ok, so a "
+    "caller that checks the status is told the sensor initialised. Nothing in the header says the "
+    "two calls are unimplemented; they are declared beside GetTemp_degC like any other lifecycle "
+    "pair. The reading itself works - everything else in this file passes - so the fix is either "
+    "to implement the two (there is an ADC underneath that has its own Init), or to delete them "
+    "and say in the header that this sensor needs none"))
+@pytest.mark.expect_assert(
+    "P466: Init and DeInit are ALX_ASSERT(false) stubs - tripping them is the point of the test"
+)
+@pytest.mark.parametrize("call", ["Init", "DeInit"])
+def test_ALX1553_P466_the_sensor_can_be_initialised_and_de_initialised(temp_sens_lib, call):
+    """A lifecycle call should do something, or say it cannot - not assert and report success."""
+    lib = temp_sens_lib
+    obj = lib.new(PT1000_KOHM, PT1000_DEGC, ch_vin=CH_VIN, ch_vout=CH_VOUT)
+    lib.c.AlxAssertPc_Reset()
+
+    status = lib.lifecycle(obj, call)
+
+    assert lib.asserts() == 0, f"AlxTempSensRtdVdiv_{call} asserted"
+    assert status == 0

@@ -3247,6 +3247,10 @@ class BtsLib:
             fn = getattr(c, f"AlxBts724g_{name}")
             fn.restype = b
             fn.argtypes = [vp]
+        c.AlxIoPinFake_InitCount.restype = ctypes.c_uint32
+        c.AlxIoPinFake_InitCount.argtypes = [vp]
+        c.AlxIoPinFake_DeInitCount.restype = ctypes.c_uint32
+        c.AlxIoPinFake_DeInitCount.argtypes = [vp]
         c.AlxIoPinFake_SetLevel.argtypes = [vp, b]
         c.AlxIoPinFake_Level.restype = b
         c.AlxIoPinFake_Level.argtypes = [vp]
@@ -3320,6 +3324,17 @@ class BtsLib:
 
     def clear_time_ms(self, obj) -> float:
         return self.c.AlxBts724gTest_ClearTime_ms(obj)
+
+    def deinit(self, obj) -> None:
+        self.c.AlxBts724g_DeInit(self.c.AlxBts724gTest_Bts(obj))
+
+    def pin_counts(self, obj) -> dict:
+        """How often each of the switch's two pins was initialised and de-initialised."""
+        return {
+            name: (self.c.AlxIoPinFake_InitCount(pin), self.c.AlxIoPinFake_DeInitCount(pin))
+            for name, pin in (("out", self.c.AlxBts724gTest_OutPin(obj)),
+                              ("status", self.c.AlxBts724gTest_StatusPin(obj)))
+        }
 
     def free_all(self) -> None:
         for handle in self._handles:
@@ -3581,6 +3596,10 @@ class TempSensLib:
         c.AlxTempSensTest_Adc.argtypes = [vp]
         c.AlxTempSensRtdVdiv_GetTemp_degC.restype = i32
         c.AlxTempSensRtdVdiv_GetTemp_degC.argtypes = [vp, ctypes.POINTER(f)]
+        for name in ("Init", "DeInit"):
+            fn = getattr(c, f"AlxTempSensRtdVdiv_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
         c.AlxAdcFake_SetVoltage_V.argtypes = [vp, u32, f]
         c.AlxAdcFake_ReadCount.restype = u32
         c.AlxAdcFake_ReadCount.argtypes = [vp, u32]
@@ -3617,6 +3636,14 @@ class TempSensLib:
 
     def read_count(self, obj, ch: int) -> int:
         return self.c.AlxAdcFake_ReadCount(self.c.AlxTempSensTest_Adc(obj), ch)
+
+    def lifecycle(self, obj, what: str) -> int:
+        """Init or DeInit the sensor - the two calls a product makes around everything else."""
+        return getattr(self.c, f"AlxTempSensRtdVdiv_{what}")(self.c.AlxTempSensTest_Sens(obj))
+
+    def asserts(self) -> int:
+        """How many of the library's own assertions have failed since this test began."""
+        return self.c.AlxAssertPc_Count()
 
     def temp(self, obj) -> tuple[int, float]:
         """(status, temperature) - the status is the table's, passed straight through."""

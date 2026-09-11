@@ -22,6 +22,8 @@ EXPORTS
 	AlxIoPinFake_DidOverflow
 	AlxIoPinFake_Level
 	AlxIoPinFake_SetLevel
+	AlxIoPinFake_InitCount
+	AlxIoPinFake_DeInitCount
 	alxTick DATA
 	AlxTick_Ctor
 	AlxTick_IncRange_ns
