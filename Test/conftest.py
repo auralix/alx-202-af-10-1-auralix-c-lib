@@ -481,6 +481,30 @@ FSSAFE_DEPS = [
 FSSAFE_DLL = BUILD_DIR / "alxFsSafeTest.dll"
 
 
+# ------------------------------------------------------- Busy-wait delay -----
+# Tier-1 target: six one-line busy waits on the global tick. They cannot be
+# tested over the real clock the way the timer is, because a busy wait never
+# returns to the test that would have to advance it - so alxTick is FAKED here,
+# with a clock that advances by itself one step per read. That is what an
+# interrupt does on a target while the loop spins, and it is the only group in
+# this suite where the clock is not real.
+DELAY_SOURCES = [
+    CLIB_DIR / "alxDelay.c",
+    TEST_DIR / "alxTickFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+DELAY_DEPS = [
+    *DELAY_SOURCES,
+    CLIB_DIR / "alxDelay.h",
+    CLIB_DIR / "alxTick.h",
+    CLIB_DIR / "alxGlobal.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxDelayTest.def",
+    Path(__file__),
+]
+DELAY_DLL = BUILD_DIR / "alxDelayTest.dll"
+
+
 # ------------------------------------------- Parameter key-value store -----
 # Tier-2 target: the store every stored parameter on a device passes through,
 # over a NEW link-time fake of the file system. The module is a thin shell over
@@ -830,6 +854,11 @@ def _build_fssafe_dll() -> None:
                TEST_DIR / "alxFsSafeTest.def", "fsSafeClosure")
 
 
+def _build_delay_dll() -> None:
+    _build_dll(DELAY_SOURCES, (), _assert_defines(DELAY_SOURCES), DELAY_DLL,
+               TEST_DIR / "alxDelayTest.def", None)
+
+
 def _build_paramkv_dll() -> None:
     _build_dll(PARAMKV_SOURCES, (), _assert_defines(PARAMKV_SOURCES), PARAMKV_DLL,
                TEST_DIR / "alxParamKvStoreTest.def", None)
@@ -934,6 +963,7 @@ DLL_GROUPS = [
     (BTS_DLL, BTS_DEPS, _build_bts_dll),
     (MUX_DLL, MUX_DEPS, _build_mux_dll),
     (PARAMKV_DLL, PARAMKV_DEPS, _build_paramkv_dll),
+    (DELAY_DLL, DELAY_DEPS, _build_delay_dll),
     (FSSAFE_DLL, FSSAFE_DEPS, _build_fssafe_dll),
 ]
 
@@ -2814,6 +2844,39 @@ class FsSafeLib:
         self._handles.clear()
 
 
+class DelayLib:
+    """ctypes wrapper around alxDelayTest.dll: six busy waits over a clock that moves by itself."""
+
+    UNITS = ("ns", "us", "ms", "sec", "min", "hr")
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        u64, u32 = ctypes.c_uint64, ctypes.c_uint32
+        for unit in self.UNITS:
+            getattr(c, f"AlxDelay_{unit}").argtypes = [u64]
+        c.AlxTickFake_Reset.argtypes = [u64]
+        c.AlxTickFake_SetNow_ns.argtypes = [u64]
+        c.AlxTickFake_Now_ns.restype = u64
+        c.AlxTickFake_Reads.restype = u32
+
+    def clock(self, *, step_ns: int = 1, start_ns: int = 0) -> None:
+        """Start the clock: how far it moves per read, and where it starts."""
+        self.c.AlxTickFake_Reset(step_ns)
+        if start_ns:
+            self.c.AlxTickFake_SetNow_ns(start_ns)
+
+    def delay(self, unit: str, count: int) -> None:
+        getattr(self.c, f"AlxDelay_{unit}")(count)
+
+    def now_ns(self) -> int:
+        return self.c.AlxTickFake_Now_ns()
+
+    def reads(self) -> int:
+        return self.c.AlxTickFake_Reads()
+
+
 class ParamKvStoreLib:
     """ctypes wrapper around alxParamKvStoreTest.dll: the store, over a file system that can fail.
 
@@ -3610,6 +3673,23 @@ def fs_safe_lib(fs_safe_lib_session) -> FsSafeLib:
     fs_safe_lib_session.c.AlxFsFake_Reset()
     yield fs_safe_lib_session
     fs_safe_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def delay_lib_session() -> DelayLib:
+    override = os.environ.get("ALX_DELAY_TEST_DLL")
+    if override:
+        return DelayLib(Path(override))
+    if _needs_build(DELAY_DLL, DELAY_DEPS):
+        _build_delay_dll()
+    return DelayLib(DELAY_DLL)
+
+
+@pytest.fixture
+def delay_lib(delay_lib_session) -> DelayLib:
+    """The busy waits, with the clock back at zero and moving one nanosecond per read."""
+    delay_lib_session.clock(step_ns=1)
+    return delay_lib_session
 
 
 @pytest.fixture(scope="session")

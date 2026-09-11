@@ -1,0 +1,15 @@
+LIBRARY alxDelayTest
+EXPORTS
+	AlxDelay_ns
+	AlxDelay_us
+	AlxDelay_ms
+	AlxDelay_sec
+	AlxDelay_min
+	AlxDelay_hr
+	AlxTickFake_Reset
+	AlxTickFake_SetNow_ns
+	AlxTickFake_Now_ns
+	AlxTickFake_Reads
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

@@ -68,6 +68,9 @@ A missing tool fails its lane, never skips it.
 	  NEW file system fake that can be told to fail any one operation. The module is thirty
 	  lines of forwarding, so what the group is actually about is what it does when the file
 	  system says no
+	- `alxDelayTest` - the six busy waits. The only group here whose CLOCK is faked: a busy
+	  wait never returns to the test that would have to advance a real one, so the fake
+	  advances by itself one step per read, which is what an interrupt does on a target
 	- `alxFsSafeTest` - two copies of every file, each with a CRC, and the logic that decides
 	  which to believe and which to repair. Over the same file system fake, so a copy can be
 	  corrupted on the "flash" before the module runs. CLOSURE, for a `const char*` output
