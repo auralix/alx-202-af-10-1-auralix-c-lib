@@ -45,8 +45,53 @@ ANALYSIS_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c",
                     TEST / "alxFifoTestHelpers.c", TEST / "alxBoundTestHelpers.c", TEST / "alxFifoSanSmoke.c"]
 # every C file this suite OWNS is style-gated, whatever module it serves; the LIBRARY sources
 # gated here are still only the ones ANALYSIS_SOURCES covers (see the Jira task, item A13)
-STYLE_FILES = [*ANALYSIS_SOURCES, CLIB / "alxFifo.h", CLIB / "alxBound.h",
-               *sorted(TEST.glob("*.c"))]
+# The C style gate reads only what is listed here. Until 12.09 that list was ANALYSIS_SOURCES -
+# which exists to name what clang-tidy and cppcheck analyse, 2 of ~30 library modules - plus the
+# Test/ sources, so 138 of the library's 140 .c/.h were never checked at all. Nothing chose that;
+# the style gate simply borrowed another lane's list and nobody widened it.
+#
+# It is now every library source EXCEPT the ones that cannot pass yet, named so the debt is visible
+# and shrinks by deletion rather than being rediscovered. Measured 12.09: 163 findings in 26 files.
+#
+# COMMENTS - 84 findings in 16 files, all "spaces in field separator (tabs only)". Mechanical, and
+# safe because it touches no code. Whoever does it deletes the name from this set.
+STYLE_PENDING_COMMENTS = [
+    "Mcu/alxRtc.h", "alxAudio.c", "alxAudioPlayer.c", "alxBool.c", "alxCrc.c", "alxDelay.c",
+    "alxFtoa.c", "alxId.c", "alxInterpLin.c", "alxIrq.c", "alxLinFun.c", "alxMemRaw.c",
+    "alxOsDelayUntil.c", "alxOsMutex.c", "alxTick.c", "alxTimSw.c",
+]
+
+# TERNARIES - 29 findings in 10 files, and this half is NOT a cleanup job. Fifteen of them cannot
+# be written as if/else in C at all: they are macro bodies that must expand to an EXPRESSION.
+# alxBuild.h builds a compile-time character out of __DATE__ and is used where a constant is
+# required; ALX_RTC_DAYS_IN_YEAR(yr) is the same shape; alxLfsConfig.h's are littlefs's own
+# vendor shims. Rule 1 as written asks those files for something the language does not offer.
+#
+# So the last ten need a WAIVER MECHANISM in alx.verify.c_style - a per-line marker, or a rule that
+# exempts a #define body - before they can be gated. That is a change to the Python library rather
+# than to this repository, and it is on the TODO.
+STYLE_PENDING_TERNARY = [
+    "alxBuild.h", "alxFs.c", "alxGlobal.c", "alxLfsConfig.h", "alxLogger.c", "alxNet.c",
+    "alxOsEventFlagGroup.c", "alxOsThread.c", "alxRtc_Global.c", "alxSocket.c",
+]
+
+_STYLE_PENDING = {*STYLE_PENDING_COMMENTS, *STYLE_PENDING_TERNARY}
+_STYLE_SKIP_DIRS = {"Ext", "FatFs", "mcuboot", "Usbh", "Test", "build", "Doc"}
+
+
+def _library_style_files() -> list:
+    """Every library .c/.h the gate can check today, vendor trees and the pending list excluded."""
+    found = []
+    for path in sorted(CLIB.glob("*.[ch]")) + sorted(CLIB.glob("*/*.[ch]")):
+        if set(path.relative_to(CLIB).parts[:-1]) & _STYLE_SKIP_DIRS:
+            continue
+        if path.relative_to(CLIB).as_posix() in _STYLE_PENDING:
+            continue
+        found.append(path)
+    return found
+
+
+STYLE_FILES = [*_library_style_files(), *sorted(TEST.glob("*.c"))]
 # Target-only translation units: compiled by ANALYZE stage 4 with arm-gcc, never linked, one compile
 # per part variant. (source, variants to compile it under).
 LAYOUT_CHECKS = [(TEST / "alxIna228RegSizeCheck.c", ["ALX_INA238", "ALX_INA228"])]
