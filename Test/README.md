@@ -51,6 +51,9 @@ A missing tool fails its lane, never skips it.
 	  and a glitch filter, all real, with only the interrupt lock faked
 	- `alxAudioTest` - the sample conversions: linear PCM in four widths to a float and back,
 	  and the stereo-to-mono average. Seven free functions, no object
+	- `alxAudioPlayerTest` - the player: a track in memory, a cursor into it, and the
+	  transport controls. The module is CLOSURE here, not gated - it does not survive
+	  -Wcast-qual (it reads a const track through a volatile non-const pointer)
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real
 	  software timers: twenty-one queries and latches about one input
 	- `alxRtcTest` - the calendar: Unix time to a broken-down date and back, in four

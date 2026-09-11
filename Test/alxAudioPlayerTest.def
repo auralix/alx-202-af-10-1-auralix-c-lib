@@ -1,0 +1,20 @@
+LIBRARY alxAudioPlayerTest
+EXPORTS
+	AlxAudioPlayerTest_New
+	AlxAudioPlayerTest_Delete
+	AlxAudioPlayerTest_Player
+	AlxAudioPlayerTest_LoadOther
+	AlxAudioPlayerTest_Offset_Byte
+	AlxAudioPlayerTest_Step_Byte
+	AlxAudioPlayer_GetSampleL
+	AlxAudioPlayer_GetSampleR
+	AlxAudioPlayer_GetSampleMono
+	AlxAudioPlayer_IncSampleOffset
+	AlxAudioPlayer_Play
+	AlxAudioPlayer_Stop
+	AlxAudioPlayer_Pause
+	AlxAudioPlayer_Replay
+	AlxAudioPlayer_LoopOn
+	AlxAudioPlayer_LoopOff
+	AlxAudioPlayer_LoopConfig
+	AlxAudioPlayer_IsPlaying

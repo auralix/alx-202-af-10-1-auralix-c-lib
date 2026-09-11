@@ -381,6 +381,38 @@ AUDIO_DEPS = [
 ]
 AUDIO_DLL = BUILD_DIR / "alxAudioTest.dll"
 
+
+# ------------------------------------------------ Audio player module -----
+# Tier-2 target: the REAL player over the REAL sample conversions. A track is
+# an array of bytes the test owns, so "what does it play" is a question with
+# an exact answer.
+AUDIOPLAYER_SOURCES_STRICT = [
+    CLIB_DIR / "alxAudio.c",
+    TEST_DIR / "alxAudioPlayerTestHelpers.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+# alxAudioPlayer.c is CLOSURE, not because its tests are pending - they are in
+# test_alxAudioPlayer.py - but because it does not survive -Wcast-qual: it reads
+# the track through `*((volatile int16_t*)(me->trackPtr + offset))`, and trackPtr
+# is a const pointer, so every 16-bit read casts the const away. Nothing is
+# written through it, so nothing is undefined; cleaning it up is a LIBRARY change
+# and belongs to whoever owns the module (TODO A18).
+AUDIOPLAYER_SOURCES_CLOSURE = [
+    CLIB_DIR / "alxAudioPlayer.c",
+]
+AUDIOPLAYER_SOURCES = [*AUDIOPLAYER_SOURCES_STRICT, *AUDIOPLAYER_SOURCES_CLOSURE]
+AUDIOPLAYER_DEPS = [
+    *AUDIOPLAYER_SOURCES,
+    CLIB_DIR / "alxAudioPlayer.h",
+    CLIB_DIR / "alxAudio.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxAudioPlayerTest.def",
+    Path(__file__),
+]
+AUDIOPLAYER_DLL = BUILD_DIR / "alxAudioPlayerTest.dll"
+
 # ------------------------------------------------------ Bool module -------
 # Tier-2 target: the library's boolean-with-memory, over the REAL glitch filter,
 # software timer and tick, with only the interrupt lock faked. Twenty-one query
@@ -639,6 +671,11 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_audioplayer_dll() -> None:
+    _build_dll(AUDIOPLAYER_SOURCES_STRICT, AUDIOPLAYER_SOURCES_CLOSURE, (), AUDIOPLAYER_DLL,
+               TEST_DIR / "alxAudioPlayerTest.def", "audioPlayerClosure")
+
+
 def _build_audio_dll() -> None:
     _build_dll(AUDIO_SOURCES, (), (), AUDIO_DLL, TEST_DIR / "alxAudioTest.def", None)
 
@@ -708,6 +745,7 @@ DLL_GROUPS = [
     (TEMPSENS_DLL, TEMPSENS_DEPS, _build_tempsens_dll),
     (PWR_DLL, PWR_DEPS, _build_pwr_dll),
     (AUDIO_DLL, AUDIO_DEPS, _build_audio_dll),
+    (AUDIOPLAYER_DLL, AUDIOPLAYER_DEPS, _build_audioplayer_dll),
 ]
 
 
@@ -2347,6 +2385,104 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class AudioPlayerLib:
+    """ctypes wrapper around alxAudioPlayerTest.dll: a track in memory and a cursor into it.
+
+    The helper owns the track bytes, so a test passes a list of ints and gets a player back. The
+    byte offset and the step are readable because "where in the track am I" has no public getter
+    and is the thing every transport test is about.
+    """
+
+    INT8 = 0
+    UINT8 = 1
+    INT16 = 2
+    UINT16 = 3
+    INT16_FLASH = 4
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, f, u32, i32, u8, b = (ctypes.c_void_p, ctypes.c_float, ctypes.c_uint32,
+                                  ctypes.c_int32, ctypes.c_uint8, ctypes.c_bool)
+        c.AlxAudioPlayerTest_New.restype = vp
+        c.AlxAudioPlayerTest_New.argtypes = [ctypes.POINTER(u8), u32, u32, i32, b]
+        c.AlxAudioPlayerTest_Delete.argtypes = [vp]
+        c.AlxAudioPlayerTest_Player.restype = vp
+        c.AlxAudioPlayerTest_Player.argtypes = [vp]
+        c.AlxAudioPlayerTest_LoadOther.argtypes = [vp, ctypes.POINTER(u8), u32, u32, i32, b]
+        for name in ("Offset_Byte", "Step_Byte"):
+            fn = getattr(c, f"AlxAudioPlayerTest_{name}")
+            fn.restype = u32
+            fn.argtypes = [vp]
+        for name in ("GetSampleL", "GetSampleR", "GetSampleMono"):
+            fn = getattr(c, f"AlxAudioPlayer_{name}")
+            fn.restype = f
+            fn.argtypes = [vp]
+        for name in ("IncSampleOffset", "Play", "Stop", "Pause", "Replay", "LoopOn", "LoopOff"):
+            getattr(c, f"AlxAudioPlayer_{name}").argtypes = [vp]
+        c.AlxAudioPlayer_LoopConfig.argtypes = [vp, b]
+        c.AlxAudioPlayer_IsPlaying.restype = b
+        c.AlxAudioPlayer_IsPlaying.argtypes = [vp]
+        self._handles: list = []
+
+    def new(self, track, *, encoding=INT8, mono=True, start_sample=0):
+        """A player over a copy of `track`; released when the test ends."""
+        arr = (ctypes.c_uint8 * len(track))(*track)
+        handle = self.c.AlxAudioPlayerTest_New(arr, len(track), start_sample, encoding, mono)
+        assert handle, "AlxAudioPlayerTest_New returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def load(self, obj, track, *, encoding=INT8, mono=True, start_sample=0):
+        arr = (ctypes.c_uint8 * len(track))(*track)
+        self.c.AlxAudioPlayerTest_LoadOther(obj, arr, len(track), start_sample, encoding, mono)
+
+    def _p(self, obj):
+        return self.c.AlxAudioPlayerTest_Player(obj)
+
+    def offset(self, obj) -> int:
+        return self.c.AlxAudioPlayerTest_Offset_Byte(obj)
+
+    def step(self, obj) -> int:
+        return self.c.AlxAudioPlayerTest_Step_Byte(obj)
+
+    def left(self, obj) -> float:
+        return self.c.AlxAudioPlayer_GetSampleL(self._p(obj))
+
+    def right(self, obj) -> float:
+        return self.c.AlxAudioPlayer_GetSampleR(self._p(obj))
+
+    def mono(self, obj) -> float:
+        return self.c.AlxAudioPlayer_GetSampleMono(self._p(obj))
+
+    def advance(self, obj, times: int = 1) -> None:
+        for _ in range(times):
+            self.c.AlxAudioPlayer_IncSampleOffset(self._p(obj))
+
+    def play(self, obj) -> None:
+        self.c.AlxAudioPlayer_Play(self._p(obj))
+
+    def stop(self, obj) -> None:
+        self.c.AlxAudioPlayer_Stop(self._p(obj))
+
+    def pause(self, obj) -> None:
+        self.c.AlxAudioPlayer_Pause(self._p(obj))
+
+    def replay(self, obj) -> None:
+        self.c.AlxAudioPlayer_Replay(self._p(obj))
+
+    def loop(self, obj, *, on: bool) -> None:
+        self.c.AlxAudioPlayer_LoopConfig(self._p(obj), on)
+
+    def is_playing(self, obj) -> bool:
+        return self.c.AlxAudioPlayer_IsPlaying(self._p(obj))
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxAudioPlayerTest_Delete(handle)
+        self._handles.clear()
+
+
 class AudioLib:
     """ctypes wrapper around alxAudioTest.dll: PCM samples to floats and back.
 
@@ -2661,6 +2797,23 @@ def lin_fun_lib_session() -> LinFunLib:
     if _needs_build(LINFUN_DLL, LINFUN_DEPS):
         _build_linfun_dll()
     return LinFunLib(LINFUN_DLL)
+
+
+@pytest.fixture(scope="session")
+def audio_player_lib_session() -> AudioPlayerLib:
+    override = os.environ.get("ALX_AUDIOPLAYER_TEST_DLL")
+    if override:
+        return AudioPlayerLib(Path(override))
+    if _needs_build(AUDIOPLAYER_DLL, AUDIOPLAYER_DEPS):
+        _build_audioplayer_dll()
+    return AudioPlayerLib(AUDIOPLAYER_DLL)
+
+
+@pytest.fixture
+def audio_player_lib(audio_player_lib_session) -> AudioPlayerLib:
+    """The player library, with everything the previous test allocated already released."""
+    yield audio_player_lib_session
+    audio_player_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")
