@@ -102,6 +102,59 @@ ID_STRICT = [TEST / "alxIdTestHelpers.c", TEST / "alxIoPinFake.c", TEST / "alxAs
 ID_DEF = TEST / "alxIdTest.def"
 ID_TESTS = ["test_alxId.py"]
 
+# Assert group (ALX-1553): the funnel every ALX_*_ASSERT in the library goes through, built TWICE
+# from almost the same list. All three handlers are ALX_WEAK and a strong definition displaces a
+# weak one for the whole image, so the two sides cannot both be reachable in one DLL: the WEAK DLL
+# omits alxAssertPc.c and runs alxAssert.c's own bodies, the other links it and is displaced.
+# alxAssertBkptCaller.c is in the second list only - the weak AlxAssert_Bkpt is __debugbreak() on
+# this host and does not return, so a caller for it must not exist where that default would run.
+# No assert defines for either: alxAssert.h declares no enable macro of its own, which is right for
+# the mechanism rather than one of its clients. KEEP IN SYNC WITH conftest.ASSERT_WEAK_SOURCES and
+# conftest.ASSERT_SOURCES.
+#
+# In SANITIZE from the group's first test. NOT in COVERAGE, and that is a decision rather than an
+# omission: two of alxAssert.c's three functions are reachable from a DLL and the third terminates
+# the process, so a functions gate could only be 2 of 3 - a number picked to fit, which is exactly
+# what the Id group's note below refuses to do. Gating this module needs the out-of-process exe
+# that AlxAssert_Bkpt requires anyway (the ASan smoke exe in stage 1 is the shape), and that is a
+# lane change of its own.
+ASSERT_WEAK_SOURCES = [CLIB / "alxAssert.c", TEST / "alxAssertTestHelpers.c"]
+ASSERT_WEAK_DEF = TEST / "alxAssertWeakTest.def"
+ASSERT_SOURCES = [CLIB / "alxAssert.c", TEST / "alxAssertTestHelpers.c", TEST / "alxAssertBkptCaller.c",
+                  TEST / "alxAssertPc.c"]
+ASSERT_DEF = TEST / "alxAssertTest.def"
+ASSERT_TESTS = ["test_alxAssert.py"]
+
+# MemRaw group (ALX-1553): the raw-memory contract, five ALX_WEAK symbols that no file in the
+# library implements strongly. Two DLLs for the same reason the Assert group has two - once with
+# the weak defaults intact, once with alxMemRawTestOverride.c displacing four of the five (DeInit
+# is left weak on purpose, so displacement is visibly per symbol). Note that alxMemRawFake.c, which
+# the MemSafe group links INSTEAD of this module, is in neither list: it would displace all five
+# and leave nothing to test. KEEP IN SYNC WITH conftest.MEMRAW_SOURCES / MEMRAW_OVR_SOURCES and
+# with what conftest._assert_defines derives from them.
+MEMRAW_ASSERTS = ["-DALX_MEM_RAW_ASSERT_RST_ENABLE"]
+MEMRAW_SOURCES = [CLIB / "alxMemRaw.c", TEST / "alxMemRawTestHelpers.c", TEST / "alxAssertPc.c"]
+MEMRAW_DEF = TEST / "alxMemRawTest.def"
+MEMRAW_OVR_SOURCES = [*MEMRAW_SOURCES, TEST / "alxMemRawTestOverride.c"]
+MEMRAW_OVR_DEF = TEST / "alxMemRawOvrTest.def"
+MEMRAW_TESTS = ["test_alxMemRaw.py"]
+
+# Neither module is in ANALYSIS_SOURCES, and both were tried. alxMemRaw.c cannot enter it: that
+# list feeds STYLE_FILES too, and the C style gate reports alxMemRaw.c:46 (spaces rather than tabs
+# after @param[in,out]) - a finding in a library file this suite may not edit. Adding alxAssert.c
+# alone would put one of a pair in and leave the other out for a reason that has nothing to do with
+# either module. Widening the analyze lane over library sources is a decision of its own; it is
+# recorded here so the next reader does not think it was overlooked.
+#
+# Test/alxAssert.cfg is a cppcheck library definition this lane does NOT pass, also on purpose. It
+# marks AlxAssert_Rst and AlxAssert_Bkpt noreturn, which is what stops cppcheck reasoning about the
+# code after an assertion as reachable with the asserted condition false - measured worth 21 of 35
+# findings in a firmware this library serves, and measured NOT to be achievable by declaring the
+# handlers noreturn in alxAssert.h, which changes nothing at c99 or c11. It would do nothing here:
+# ANALYSIS_SOURCES is compiled with no assert defines, so the modules this lane scans have their
+# assertions compiled out and the findings never arise. Its effect is proved instead by
+# test_alxAssert.py P515, which is where a consumer should look before adopting it.
+
 UBSAN = list(hb.UBSAN)                 # the instrumented variants are the library's flag sets: one
 ASAN_UBSAN = list(hb.ASAN_UBSAN)       # definition for every C repository, not a copy per noxfile
 PROFILE = list(hb.PROFILE)
@@ -277,6 +330,22 @@ def sanitize(session: nox.Session) -> None:
     _dll(session, ubsan / "alxIdTest.dll", ID_STRICT, ID_DEF, UBSAN,
          ["-D_CRT_SECURE_NO_WARNINGS", *ID_ASSERTS], objs)
     _pytest(session, {"ALX_ID_TEST_DLL": str(ubsan / "alxIdTest.dll")}, *ID_TESTS)
+    session.log("Stage 2e: UBSan Assert DLLs (weak defaults and displaced), Assert suite")
+    # Both DLLs in one pytest run: the suite's whole point is the comparison between them, so a run
+    # that had only one of them instrumented would leave half of every comparison uninstrumented.
+    _dll(session, ubsan / "alxAssertWeakTest.dll", ASSERT_WEAK_SOURCES, ASSERT_WEAK_DEF, UBSAN,
+         ["-D_CRT_SECURE_NO_WARNINGS"])
+    _dll(session, ubsan / "alxAssertTest.dll", ASSERT_SOURCES, ASSERT_DEF, UBSAN,
+         ["-D_CRT_SECURE_NO_WARNINGS"])
+    _pytest(session, {"ALX_ASSERT_WEAK_TEST_DLL": str(ubsan / "alxAssertWeakTest.dll"),
+                      "ALX_ASSERT_TEST_DLL": str(ubsan / "alxAssertTest.dll")}, *ASSERT_TESTS)
+    session.log("Stage 2f: UBSan MemRaw DLLs (weak defaults and a product override), MemRaw suite")
+    _dll(session, ubsan / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_DEF, UBSAN,
+         ["-D_CRT_SECURE_NO_WARNINGS", *MEMRAW_ASSERTS])
+    _dll(session, ubsan / "alxMemRawOvrTest.dll", MEMRAW_OVR_SOURCES, MEMRAW_OVR_DEF, UBSAN,
+         ["-D_CRT_SECURE_NO_WARNINGS", *MEMRAW_ASSERTS])
+    _pytest(session, {"ALX_MEMRAW_TEST_DLL": str(ubsan / "alxMemRawTest.dll"),
+                      "ALX_MEMRAW_OVR_TEST_DLL": str(ubsan / "alxMemRawOvrTest.dll")}, *MEMRAW_TESTS)
     session.log("SANITIZE CLEAN")
 
 
@@ -333,6 +402,17 @@ def coverage(session: nox.Session) -> None:
          ["-D_CRT_SECURE_NO_WARNINGS", *ID_ASSERTS], id_objs)
     _llvm_cov_group(session, idg, idg / "alxIdTest.dll", "ALX_ID_TEST_DLL", ID_TESTS,
                     "functions", ["alxId.c"])
+    # MemRaw group: gate = functions 100 % over alxMemRaw.c, measured from the WEAK DLL and ONLY
+    # from there. In the override DLL four of the five bodies are displaced by a strong definition
+    # and would report zero executions however many tests ran, so instrumenting that one instead is
+    # the way a well-meant addition breaks this lane. All five weak bodies run in the weak DLL,
+    # which is what makes 100 % an honest number rather than a chosen one. The Assert group is
+    # absent on purpose - the reason is written at its declaration above.
+    mr = lanes.evidence_dir(TEST, "coverage", "memraw")
+    _dll(session, mr / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_DEF, PROFILE,
+         ["-D_CRT_SECURE_NO_WARNINGS", *MEMRAW_ASSERTS])
+    _llvm_cov_group(session, mr, mr / "alxMemRawTest.dll", "ALX_MEMRAW_TEST_DLL", MEMRAW_TESTS,
+                    "functions", ["alxMemRaw.c"])
     session.log("COVERAGE GATES PASS")
 
 

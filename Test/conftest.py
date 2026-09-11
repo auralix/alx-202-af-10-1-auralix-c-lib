@@ -839,6 +839,125 @@ ID_DEPS = [
 ID_DLL = BUILD_DIR / "alxIdTest.dll"
 
 
+# ------------------------------------------------------- Assert module -------
+# Tier-1 target (ALX-1553), and the one module every other group already depends on without ever
+# compiling it: alxAssert.c is the funnel all 2293 ALX_*_ASSERT call sites in the library reach.
+# Until now it appeared in NO source list here - only alxAssert.h did, in 26 dependency lists -
+# because Test/alxAssertPc.c is in every group and supplies strong definitions for all three
+# handlers. So the library's own three bodies have run nowhere in this suite.
+#
+# TWO DLLs, one group, and the second one is not a convenience: all three handlers are ALX_WEAK, a
+# strong definition displaces a weak one for the whole image, and both sides of that cannot be
+# reachable at once. So the group is built twice from almost the same list.
+#
+#   ASSERT_WEAK  alxAssert.c WITHOUT alxAssertPc.c - the library's own bodies run. AlxAssert_Rst's
+#                default is EMPTY and returns (a shipped board resets only because a product
+#                supplies the override), and AlxAssert_Trace's calls AlxTrace_WriteLevel directly
+#                rather than through ALX_TRACE_FTL, so ALX_TRACE_LEVEL_OFF does not silence it.
+#                Both are observable only here. It exports no AlxAssertPc_* and its wrapper must
+#                NOT be registered with _register_lib - safe, because alxAssert.c contains no
+#                ALX_*_ASSERT call site of its own for the autouse fixture to watch.
+#   ASSERT       alxAssert.c WITH alxAssertPc.c - the same three weak symbols, displaced. It is
+#                what proves displacement works at all (nothing else in the suite links a weak
+#                default and its override together), and it is the only image where the BKPT form
+#                is safe to drive, which is why alxAssertBkptCaller.c is linked here alone.
+#
+# No assert defines for either: alxAssert.h declares no ALX_<MODULE>_ASSERT_*_ENABLE of its own, so
+# _assert_defines returns nothing for it, which is correct - this module is the mechanism, not one
+# of its clients. alxAssert.c compiles clean under the full strict set, so neither DLL needs a
+# closure.
+ASSERT_WEAK_SOURCES = [
+    CLIB_DIR / "alxAssert.c",
+    TEST_DIR / "alxAssertTestHelpers.c",
+]
+ASSERT_SOURCES = [
+    CLIB_DIR / "alxAssert.c",
+    TEST_DIR / "alxAssertTestHelpers.c",
+    TEST_DIR / "alxAssertBkptCaller.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+ASSERT_WEAK_DEPS = [
+    *ASSERT_WEAK_SOURCES,
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "Mcu" / "alxTrace.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxAssertWeakTest.def",
+    Path(__file__),
+]
+ASSERT_DEPS = [
+    *ASSERT_SOURCES,
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "Mcu" / "alxTrace.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxAssertTest.def",
+    Path(__file__),
+]
+ASSERT_WEAK_DLL = BUILD_DIR / "alxAssertWeakTest.dll"
+ASSERT_DLL = BUILD_DIR / "alxAssertTest.dll"
+
+
+# ------------------------------------------------------- MemRaw module -------
+# Tier-1 target (ALX-1553): the library's raw-memory contract, and the module a product's persistent
+# parameters pass through on their way off the MCU. Its whole public API - constructor, Init, DeInit,
+# Read and Write - is ALX_WEAK and implemented nowhere in the repository, which makes it the only
+# module here whose complete API is weak rather than a working module with a callback hook bolted on.
+#
+# It has never been compiled by any lane. The only Test/ file bearing the name is alxMemRawFake.c, a
+# complete strong replacement the MemSafe group links INSTEAD of the module, so MEMSAFE_ASSERT_
+# DEFINES has carried -DALX_MEM_RAW_ASSERT_RST_ENABLE for a file that group does not compile.
+#
+# TWO DLLs for the same reason the Assert group has two - a symbol cannot be weak and displaced at
+# once:
+#
+#   MEMRAW      the five weak defaults intact, with alxAssertPc.c so that the four asserting stubs
+#               are observable. Each of Init/DeInit/Read/Write is (void)me, ALX_MEM_RAW_ASSERT
+#               (false), return 0 - and 0 is Alx_Ok, so a call that cannot work reports success.
+#               The constructor is the odd one out: it does not assert, and it sets neither of the
+#               two fields the header declares.
+#   MEMRAW_OVR  the same, plus alxMemRawTestOverride.c, which is what a product supplies. It
+#               overrides FOUR of the five and leaves AlxMemRaw_DeInit weak on purpose, so one
+#               image shows displacement is per symbol.
+#
+# Assertions come from _assert_defines, which reads ALX_MEM_RAW_ASSERT_BKPT_ENABLE out of
+# alxMemRaw.h and derives the RST form - do NOT hand-write it. Note what that define is doing here:
+# without it the module's own macro is do{} while (false) and DISCARDS the expression, so a product
+# that forgets its override gets Alx_Ok, an untouched buffer and no diagnostic at all. alxMemRaw.c
+# compiles clean under the full strict set, so neither DLL needs a closure.
+MEMRAW_SOURCES = [
+    CLIB_DIR / "alxMemRaw.c",
+    TEST_DIR / "alxMemRawTestHelpers.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+MEMRAW_OVR_SOURCES = [
+    *MEMRAW_SOURCES,
+    TEST_DIR / "alxMemRawTestOverride.c",
+]
+MEMRAW_DEPS = [
+    *MEMRAW_SOURCES,
+    CLIB_DIR / "alxMemRaw.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "Mcu" / "alxTrace.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxMemRawTest.def",
+    Path(__file__),
+]
+MEMRAW_OVR_DEPS = [
+    *MEMRAW_OVR_SOURCES,
+    CLIB_DIR / "alxMemRaw.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "Mcu" / "alxTrace.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxMemRawOvrTest.def",
+    Path(__file__),
+]
+MEMRAW_DLL = BUILD_DIR / "alxMemRawTest.dll"
+MEMRAW_OVR_DLL = BUILD_DIR / "alxMemRawOvrTest.dll"
+
+
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
 # environment, the rebuild-if-stale check, the compile database and the two DLL recipes. What stays
@@ -1032,6 +1151,26 @@ def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), _assert_defines(TIMSW_SOURCES), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
 
+def _build_assert_weak_dll() -> None:
+    _build_dll(ASSERT_WEAK_SOURCES, (), _assert_defines(ASSERT_WEAK_SOURCES), ASSERT_WEAK_DLL,
+               TEST_DIR / "alxAssertWeakTest.def", None)
+
+
+def _build_assert_dll() -> None:
+    _build_dll(ASSERT_SOURCES, (), _assert_defines(ASSERT_SOURCES), ASSERT_DLL,
+               TEST_DIR / "alxAssertTest.def", None)
+
+
+def _build_memraw_dll() -> None:
+    _build_dll(MEMRAW_SOURCES, (), _assert_defines(MEMRAW_SOURCES), MEMRAW_DLL,
+               TEST_DIR / "alxMemRawTest.def", None)
+
+
+def _build_memraw_ovr_dll() -> None:
+    _build_dll(MEMRAW_OVR_SOURCES, (), _assert_defines(MEMRAW_OVR_SOURCES), MEMRAW_OVR_DLL,
+               TEST_DIR / "alxMemRawOvrTest.def", None)
+
+
 # The groups as DATA, for anything that must rebuild them without running the suite: the MUTATE
 # lane names this list on the command line (alx.c_lib.mutation_hooks rebuild --groups
 # conftest:DLL_GROUPS), so the lane needs no script of its own in this repository.
@@ -1063,6 +1202,10 @@ DLL_GROUPS = [
     (LIN_DLL, LIN_DEPS, _build_lin_dll),
     (FSSAFE_DLL, FSSAFE_DEPS, _build_fssafe_dll),
     (ID_DLL, ID_DEPS, _build_id_dll),
+    (ASSERT_WEAK_DLL, ASSERT_WEAK_DEPS, _build_assert_weak_dll),
+    (ASSERT_DLL, ASSERT_DEPS, _build_assert_dll),
+    (MEMRAW_DLL, MEMRAW_DEPS, _build_memraw_dll),
+    (MEMRAW_OVR_DLL, MEMRAW_OVR_DEPS, _build_memraw_ovr_dll),
 ]
 
 
@@ -4494,3 +4637,371 @@ def id_lib(id_lib_session) -> IdLib:
     yield id_lib_session
     _assert_pins_fitted(id_lib_session)
     id_lib_session.free_all()
+
+
+class AssertWeakLib:
+    """ctypes wrapper around alxAssertWeakTest.dll: alxAssert.c's own weak defaults, undisplaced.
+
+    The only image in the suite where the library's three handler bodies run. Two of the three are
+    reachable from here - AlxAssert_Rst, whose body is empty and returns, and AlxAssert_Trace, whose
+    body writes through AlxTrace_WriteLevel. The third, AlxAssert_Bkpt, runs ALX_BKPT() and does not
+    return on this host, so nothing in this DLL can call it and no caller for it is exported.
+
+    Deliberately NOT registered with _register_lib: it links no alxAssertPc.c, so it exports none of
+    the AlxAssertPc_* symbols that fixture binds. Nothing is lost by that - alxAssert.c has no
+    assertion of its own for the autouse check to find.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        u8, u32, b = ctypes.c_uint8, ctypes.c_uint32, ctypes.c_bool
+        c.AlxAssertTest_TraceCount.restype = u32
+        c.AlxAssertTest_TraceLevel.restype = u8
+        c.AlxAssertTest_TraceText.restype = ctypes.c_char_p
+        c.AlxAssertTest_TraceFile.restype = ctypes.c_char_p
+        c.AlxAssertTest_TraceFun.restype = ctypes.c_char_p
+        c.AlxAssertTest_TraceLine.restype = u32
+        c.AlxAssertTest_TraceLevelFtl.restype = u8
+        c.AlxAssertTest_TraceLevelConfigured.restype = u8
+        c.AlxAssertTest_TraceLevelOff.restype = u8
+        c.AlxAssertTest_File.restype = ctypes.c_char_p
+        c.AlxAssertTest_SideEffects.restype = u32
+        c.AlxAssertTest_SideEffectsOff.restype = u32
+        c.AlxAssertTest_LineRst.restype = u32
+        c.AlxAssertTest_LineTrace.restype = u32
+        c.AlxAssertTest_ReachedAfterRst.restype = b
+        c.AlxAssertTest_ReachedAfterTrace.restype = b
+        c.AlxAssertTest_CallRstDirect.restype = b
+        c.AlxAssertTest_CallTraceDirect.restype = b
+        for name in ("DriveRst", "DriveTrace"):
+            getattr(c, f"AlxAssertTest_{name}").argtypes = [b]
+        self.FTL = c.AlxAssertTest_TraceLevelFtl()
+        self.OFF = c.AlxAssertTest_TraceLevelOff()
+
+    # -- the recorder the library's weak AlxAssert_Trace writes to ---------
+    def reset(self) -> None:
+        self.c.AlxAssertTest_Reset()
+
+    def traces(self) -> int:
+        return self.c.AlxAssertTest_TraceCount()
+
+    def trace_level(self) -> int:
+        return self.c.AlxAssertTest_TraceLevel()
+
+    def trace_text(self) -> str:
+        return (self.c.AlxAssertTest_TraceText() or b"").decode("ascii", "replace")
+
+    def trace_file(self) -> str:
+        """The `file` the handler was passed - the CALLER's constant, not alxAssert.c's name."""
+        return (self.c.AlxAssertTest_TraceFile() or b"").decode("ascii", "replace")
+
+    def trace_fun(self) -> str:
+        """The `fun` the handler was passed - __func__ expanded at the CALL SITE."""
+        return (self.c.AlxAssertTest_TraceFun() or b"").decode("ascii", "replace")
+
+    def trace_line(self) -> int:
+        """The `line` the handler was passed - __LINE__ expanded at the CALL SITE."""
+        return self.c.AlxAssertTest_TraceLine()
+
+    def level_ftl(self) -> int:
+        """ALX_TRACE_LEVEL_FTL as the DLL was compiled with it."""
+        return self.c.AlxAssertTest_TraceLevelFtl()
+
+    def level_configured(self) -> int:
+        """ALX_TRACE_LEVEL this DLL was built at - Test/alxConfig.h sets it OFF."""
+        return self.c.AlxAssertTest_TraceLevelConfigured()
+
+    # -- the call sites ----------------------------------------------------
+    def file(self) -> str:
+        return self.c.AlxAssertTest_File().decode("ascii")
+
+    def drive(self, kind: str, expr: bool) -> None:
+        """Drive one ALX_ASSERT_<kind> macro with ``expr`` as its expression."""
+        getattr(self.c, f"AlxAssertTest_Drive{kind}")(expr)
+
+    def line(self, kind: str) -> int:
+        """The line the ``kind`` macro sits on, as the DLL recorded it - never a copy in the test."""
+        return getattr(self.c, f"AlxAssertTest_Line{kind}")()
+
+    def reached_after(self, kind: str) -> bool:
+        """Did the statement AFTER the ``kind`` macro run - the whole question of a failed assertion."""
+        return bool(getattr(self.c, f"AlxAssertTest_ReachedAfter{kind}")())
+
+    def side_effects(self) -> int:
+        """How often the probe inside an ENABLED assert expression ran."""
+        return self.c.AlxAssertTest_SideEffects()
+
+    def side_effects_off(self) -> int:
+        """How often the probe inside the DISABLED expansion ran - the expression is discarded, so never."""
+        return self.c.AlxAssertTest_SideEffectsOff()
+
+    def drive_side_effect(self) -> None:
+        self.c.AlxAssertTest_DriveRstSideEffect()
+
+    def drive_side_effect_off(self) -> None:
+        self.c.AlxAssertTest_DriveOffSideEffect()
+
+    def bump_off_direct(self) -> None:
+        """Run the disabled form's probe by hand, to show the counter it does not move is a live one."""
+        self.c.AlxAssertTest_BumpOffDirect()
+
+    def call_direct(self, kind: str) -> bool:
+        """Call AlxAssert_<kind> directly; True = execution continued past the call."""
+        return bool(getattr(self.c, f"AlxAssertTest_Call{kind}Direct")())
+
+
+class AssertLib(AssertWeakLib):
+    """ctypes wrapper around alxAssertTest.dll: the same weak defaults, displaced by alxAssertPc.c.
+
+    Same surface as AssertWeakLib plus the BKPT call sites, which are safe only here, and the
+    AlxAssertPc_* recorder - so a test can say WHICH definition ran, which is the whole comparison.
+    """
+
+    def __init__(self, dll_path: Path):
+        super().__init__(dll_path)
+        c = self.c
+        _register_lib(c)
+        c.AlxAssertTest_LineBkpt.restype = ctypes.c_uint32
+        c.AlxAssertTest_FileBkpt.restype = ctypes.c_char_p
+        c.AlxAssertTest_ReachedAfterBkpt.restype = ctypes.c_bool
+        c.AlxAssertTest_CallBkptDirect.restype = ctypes.c_bool
+        c.AlxAssertTest_DriveBkpt.argtypes = [ctypes.c_bool]
+
+    def file_bkpt(self) -> str:
+        return self.c.AlxAssertTest_FileBkpt().decode("ascii")
+
+    def asserts(self) -> int:
+        return self.c.AlxAssertPc_Count()
+
+    def first(self) -> str:
+        return (self.c.AlxAssertPc_First() or b"").decode("ascii", "replace")
+
+    def assert_reset(self) -> None:
+        self.c.AlxAssertPc_Reset()
+
+
+class MemRawLib:
+    """ctypes wrapper around alxMemRawTest.dll: alxMemRaw.c's five weak defaults, undisplaced.
+
+    Construction is poisoned with 0xFF first, so the two fields the header declares read back as
+    garbage rather than zeros when the constructor does not write them. The data buffer belongs to
+    the helper and is read byte by byte, because what a raw read has to answer is whether it wrote
+    anything at all.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        self._handles: list = []
+        u8, u16, u32, i32, b = (ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32,
+                                ctypes.c_int32, ctypes.c_bool)
+        vp = ctypes.c_void_p
+        c.AlxMemRawTest_New.restype = vp
+        c.AlxMemRawTest_NewNoCtor.restype = vp
+        c.AlxMemRawTest_Delete.argtypes = [vp]
+        for name in ("WasCtorCalled", "IsInit"):
+            fn = getattr(c, f"AlxMemRawTest_{name}")
+            fn.restype = u8      # the BYTE in the field, never loaded as bool - see the helper
+            fn.argtypes = [vp]
+        c.AlxMemRawTest_SizeOf.restype = u32
+        c.AlxMemRawTest_PoisonByte.restype = u8
+        for name in ("Init", "DeInit"):
+            fn = getattr(c, f"AlxMemRawTest_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxMemRawTest_Read.restype = i32
+        c.AlxMemRawTest_Read.argtypes = [vp, u32, u32, u8, u16]
+        c.AlxMemRawTest_Write.restype = i32
+        c.AlxMemRawTest_Write.argtypes = [vp, u32, u32, b, u8, u16]
+        c.AlxMemRawTest_BuffFill.argtypes = [u8]
+        c.AlxMemRawTest_BuffPeek.restype = u8
+        c.AlxMemRawTest_BuffPeek.argtypes = [u32]
+        c.AlxMemRawTest_BuffPoke.argtypes = [u32, u8]
+        c.AlxMemRawTest_BuffLen.restype = u32
+
+        def status(name: str) -> int:
+            fn = getattr(c, f"AlxMemRawTest_Status_{name}")
+            fn.restype = i32
+            return fn()
+
+        self.OK = status("Ok")
+        self.ERR = status("Err")
+        self.ERR_NUM_OF_TRIES = status("ErrNumOfTries")
+        self.POISON = c.AlxMemRawTest_PoisonByte()
+        self.SIZEOF = c.AlxMemRawTest_SizeOf()
+
+    # -- construction ------------------------------------------------------
+    def new(self):
+        """A poisoned AlxMemRaw with the constructor run over it. Auto-deleted by the fixture."""
+        handle = self.c.AlxMemRawTest_New()
+        self._handles.append(handle)
+        return handle
+
+    def new_no_ctor(self):
+        """The same poisoned block with NO constructor - what the poison alone looks like."""
+        handle = self.c.AlxMemRawTest_NewNoCtor()
+        self._handles.append(handle)
+        return handle
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxMemRawTest_Delete(handle)
+        self._handles.clear()
+
+    def field(self, me, name: str) -> int:
+        """The BYTE in wasCtorCalled or isInit, not a bool.
+
+        On a poisoned object the field holds 0xFF, which is not a value a C bool may hold - loading
+        it as one is undefined behaviour the SANITIZE lane aborts on. The byte is also the more
+        useful answer: it tells a test apart a field the constructor set false from a field the
+        constructor never touched, which is the whole of P516.
+        """
+        return getattr(self.c, f"AlxMemRawTest_{name}")(me)
+
+    # -- the five public calls --------------------------------------------
+    def init(self, me) -> int:
+        return self.c.AlxMemRawTest_Init(me)
+
+    def deinit(self, me) -> int:
+        return self.c.AlxMemRawTest_DeInit(me)
+
+    def read(self, me, addr: int = 0, length: int = 8, tries: int = 3, timeout_ms: int = 1000) -> int:
+        return self.c.AlxMemRawTest_Read(me, addr, length, tries, timeout_ms)
+
+    def write(self, me, addr: int = 0, length: int = 8, check: bool = True,
+              tries: int = 3, timeout_ms: int = 1000) -> int:
+        return self.c.AlxMemRawTest_Write(me, addr, length, check, tries, timeout_ms)
+
+    def lifecycle(self, me, call: str) -> int:
+        """Call Init or DeInit by name, for a test parametrized over the asserting stubs."""
+        return getattr(self.c, f"AlxMemRawTest_{call}")(me)
+
+    # -- the caller's data buffer -----------------------------------------
+    def fill(self, value: int) -> None:
+        self.c.AlxMemRawTest_BuffFill(value)
+
+    def buff(self, length: int) -> bytes:
+        return bytes(self.c.AlxMemRawTest_BuffPeek(i) for i in range(length))
+
+    def asserts(self) -> int:
+        return self.c.AlxAssertPc_Count()
+
+    def first(self) -> str:
+        return (self.c.AlxAssertPc_First() or b"").decode("ascii", "replace")
+
+    def assert_reset(self) -> None:
+        self.c.AlxAssertPc_Reset()
+
+
+class MemRawOverrideLib(MemRawLib):
+    """ctypes wrapper around alxMemRawOvrTest.dll: four of the five weak symbols displaced.
+
+    Same surface as MemRawLib plus the override's recorders. AlxMemRaw_DeInit is left weak on
+    purpose, so ``deinit`` still reaches the library's asserting stub in this very DLL - which is
+    how one image shows that displacement is per symbol rather than per translation unit.
+    """
+
+    def __init__(self, dll_path: Path):
+        super().__init__(dll_path)
+        c = self.c
+        u8, u32, b = ctypes.c_uint8, ctypes.c_uint32, ctypes.c_bool
+        for name in ("CtorCount", "InitCount", "ReadCount", "WriteCount", "LastAddr", "LastLen",
+                     "LastNumOfTries", "LastTimeout_ms", "Size"):
+            getattr(c, f"AlxMemRawOverride_{name}").restype = u32
+        c.AlxMemRawOverride_LastCheckWithReadEnable.restype = b
+        c.AlxMemRawOverride_Peek.restype = u8
+        c.AlxMemRawOverride_Peek.argtypes = [u32]
+        c.AlxMemRawOverride_Poke.argtypes = [u32, u8]
+        self.SIZE = c.AlxMemRawOverride_Size()
+
+    def ovr_reset(self) -> None:
+        self.c.AlxMemRawOverride_Reset()
+
+    def count(self, kind: str) -> int:
+        """How many times the override's ``kind`` ran - Ctor, Init, Read or Write."""
+        return getattr(self.c, f"AlxMemRawOverride_{kind}Count")()
+
+    def last(self, field: str):
+        """One recorded argument of the last call: Addr, Len, NumOfTries, Timeout_ms, ..."""
+        return getattr(self.c, f"AlxMemRawOverride_Last{field}")()
+
+    def mem(self, addr: int, length: int) -> bytes:
+        return bytes(self.c.AlxMemRawOverride_Peek(addr + i) for i in range(length))
+
+    def poke(self, addr: int, data: bytes) -> None:
+        for i, byte in enumerate(data):
+            self.c.AlxMemRawOverride_Poke(addr + i, byte)
+
+
+@pytest.fixture(scope="session")
+def assert_weak_lib_session() -> AssertWeakLib:
+    override = os.environ.get("ALX_ASSERT_WEAK_TEST_DLL")
+    if override:
+        return AssertWeakLib(Path(override))
+    if _needs_build(ASSERT_WEAK_DLL, ASSERT_WEAK_DEPS):
+        _build_assert_weak_dll()
+    return AssertWeakLib(ASSERT_WEAK_DLL)
+
+
+@pytest.fixture
+def assert_weak_lib(assert_weak_lib_session) -> AssertWeakLib:
+    """The library's own handlers, with the trace recorder cleared."""
+    assert_weak_lib_session.reset()
+    return assert_weak_lib_session
+
+
+@pytest.fixture(scope="session")
+def assert_lib_session() -> AssertLib:
+    override = os.environ.get("ALX_ASSERT_TEST_DLL")
+    if override:
+        return AssertLib(Path(override))
+    if _needs_build(ASSERT_DLL, ASSERT_DEPS):
+        _build_assert_dll()
+    return AssertLib(ASSERT_DLL)
+
+
+@pytest.fixture
+def assert_lib(assert_lib_session) -> AssertLib:
+    """The displaced handlers, with both recorders cleared."""
+    assert_lib_session.reset()
+    assert_lib_session.assert_reset()
+    return assert_lib_session
+
+
+@pytest.fixture(scope="session")
+def mem_raw_lib_session() -> MemRawLib:
+    override = os.environ.get("ALX_MEMRAW_TEST_DLL")
+    if override:
+        return MemRawLib(Path(override))
+    if _needs_build(MEMRAW_DLL, MEMRAW_DEPS):
+        _build_memraw_dll()
+    return MemRawLib(MEMRAW_DLL)
+
+
+@pytest.fixture
+def mem_raw_lib(mem_raw_lib_session) -> MemRawLib:
+    """The weak defaults, with the data buffer poisoned and every handle released after."""
+    mem_raw_lib_session.fill(mem_raw_lib_session.POISON)
+    yield mem_raw_lib_session
+    mem_raw_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def mem_raw_ovr_lib_session() -> MemRawOverrideLib:
+    override = os.environ.get("ALX_MEMRAW_OVR_TEST_DLL")
+    if override:
+        return MemRawOverrideLib(Path(override))
+    if _needs_build(MEMRAW_OVR_DLL, MEMRAW_OVR_DEPS):
+        _build_memraw_ovr_dll()
+    return MemRawOverrideLib(MEMRAW_OVR_DLL)
+
+
+@pytest.fixture
+def mem_raw_ovr_lib(mem_raw_ovr_lib_session) -> MemRawOverrideLib:
+    """A product's override over a blank device, with the data buffer poisoned."""
+    mem_raw_ovr_lib_session.ovr_reset()
+    mem_raw_ovr_lib_session.fill(mem_raw_ovr_lib_session.POISON)
+    yield mem_raw_ovr_lib_session
+    mem_raw_ovr_lib_session.free_all()
