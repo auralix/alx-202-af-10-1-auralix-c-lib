@@ -13,6 +13,13 @@
   * structure is opaque and empty on the host. One pin is enough for the drivers
   * this suite exercises, but counting them separately costs nothing and makes a
   * two-pin driver testable without changing the fake.
+  *
+  * There are a fixed number of slots, and a test that asks for more than that
+  * used to have its extra pins silently FOLDED onto the last slot - two pins
+  * reading as one, which is not a failure, just a wrong answer. It cost an hour
+  * of reading a correct module looking for a defect that was in the fake. The
+  * fold is still there, because aborting inside a DLL takes the test runner
+  * with it, but it now RAISES A FLAG that a fixture can assert on.
   ******************************************************************************
   **/
 
@@ -26,13 +33,14 @@
 //******************************************************************************
 // Private variables
 //******************************************************************************
-#define ALX_IO_PIN_FAKE_NUM_OF_PINS 8
+#define ALX_IO_PIN_FAKE_NUM_OF_PINS 32
 
 static const AlxIoPin* alxIoPinFake_pin[ALX_IO_PIN_FAKE_NUM_OF_PINS];
 static bool alxIoPinFake_level[ALX_IO_PIN_FAKE_NUM_OF_PINS];
 static uint32_t alxIoPinFake_initCount[ALX_IO_PIN_FAKE_NUM_OF_PINS];
 static uint32_t alxIoPinFake_deInitCount[ALX_IO_PIN_FAKE_NUM_OF_PINS];
 static uint32_t alxIoPinFake_writeCount[ALX_IO_PIN_FAKE_NUM_OF_PINS];
+static bool alxIoPinFake_didOverflow;
 
 
 //******************************************************************************
@@ -43,6 +51,7 @@ bool AlxIoPinFake_Level(const AlxIoPin* me);
 void AlxIoPinFake_SetLevel(const AlxIoPin* me, bool val);
 uint32_t AlxIoPinFake_InitCount(const AlxIoPin* me);
 uint32_t AlxIoPinFake_DeInitCount(const AlxIoPin* me);
+bool AlxIoPinFake_DidOverflow(void);
 uint32_t AlxIoPinFake_WriteCount(const AlxIoPin* me);
 
 
@@ -66,7 +75,11 @@ static uint32_t AlxIoPinFake_Slot(const AlxIoPin* me)
 			return i;
 		}
 	}
-	return ALX_IO_PIN_FAKE_NUM_OF_PINS - 1;	// out of slots: fold onto the last one
+	// Out of slots: fold onto the last one and say so. Two pins sharing a slot answer each
+	// other's level, so a test that reads this flag as false is the only one whose pin answers
+	// mean anything.
+	alxIoPinFake_didOverflow = true;
+	return ALX_IO_PIN_FAKE_NUM_OF_PINS - 1;
 }
 
 
@@ -80,6 +93,14 @@ void AlxIoPinFake_Reset(void)
 	memset(alxIoPinFake_initCount, 0, sizeof(alxIoPinFake_initCount));
 	memset(alxIoPinFake_deInitCount, 0, sizeof(alxIoPinFake_deInitCount));
 	memset(alxIoPinFake_writeCount, 0, sizeof(alxIoPinFake_writeCount));
+	alxIoPinFake_didOverflow = false;
+}
+
+bool AlxIoPinFake_DidOverflow(void)
+{
+	// True once more pins have been seen than there are slots. Whatever a test measured
+	// after that is two pins' worth of answers coming from one.
+	return alxIoPinFake_didOverflow;
 }
 bool AlxIoPinFake_Level(const AlxIoPin* me)
 {

@@ -19,6 +19,7 @@ EXPORTS
 	AlxBts724g_WasOpenLoadDetected
 	AlxBts724g_WasOverTempDetected
 	AlxIoPinFake_Reset
+	AlxIoPinFake_DidOverflow
 	AlxIoPinFake_Level
 	AlxIoPinFake_SetLevel
 	alxTick DATA

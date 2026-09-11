@@ -59,6 +59,8 @@ A missing tool fails its lane, never skips it.
 	  entry per degree from -40 to +150. CLOSURE too, for a macro it defines and never uses
 	- `alxBts724gTest` - the protected high side switch: two faults down one status pin, told
 	  apart by what the output was asked to do, both behind glitch filters
+	- `alxMuxTest` - the analog multiplexer: an enable pin, up to eight select pins, and the
+	  channel code they spell. Also the one test of the IO pin fake's own capacity guard
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real
 	  software timers: twenty-one queries and latches about one input
 	- `alxRtcTest` - the calendar: Unix time to a broken-down date and back, in four

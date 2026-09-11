@@ -11,6 +11,7 @@ EXPORTS
 	AlxRotSw_DeInit
 	AlxRotSw_GetCode
 	AlxIoPinFake_Reset
+	AlxIoPinFake_DidOverflow
 	AlxIoPinFake_Level
 	AlxIoPinFake_SetLevel
 	AlxIoPinFake_InitCount

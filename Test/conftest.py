@@ -442,6 +442,30 @@ NTC_DEPS = [
 NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
 
 
+# ------------------------------------------------- Analog multiplexer -----
+# Tier-1 target: an enable pin and up to eight select pins, over the library's
+# own IO pin fake. Small, and load-bearing - a board that measures more signals
+# than it has converter channels reads all of them through one of these, so a
+# select code written wrong reports the wrong signal under the right name.
+MUX_SOURCES = [
+    CLIB_DIR / "alxMux.c",
+    TEST_DIR / "alxMuxTestHelpers.c",
+    TEST_DIR / "alxIoPinFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+MUX_DEPS = [
+    *MUX_SOURCES,
+    CLIB_DIR / "alxMux.h",
+    CLIB_DIR / "alxIoPin.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxMuxTest.def",
+    Path(__file__),
+]
+MUX_DLL = BUILD_DIR / "alxMuxTest.dll"
+
+
 # ------------------------------------------- BTS724G high side switch -----
 # Tier-2 target: the REAL driver over faked pins, with the REAL glitch filters
 # and software timer under it. The part reports two different faults down ONE
@@ -729,6 +753,10 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_mux_dll() -> None:
+    _build_dll(MUX_SOURCES, (), (), MUX_DLL, TEST_DIR / "alxMuxTest.def", None)
+
+
 def _build_bts_dll() -> None:
     _build_dll(BTS_SOURCES, (), (), BTS_DLL, TEST_DIR / "alxBts724gTest.def", None)
 
@@ -815,6 +843,7 @@ DLL_GROUPS = [
     (AUDIOPLAYER_DLL, AUDIOPLAYER_DEPS, _build_audioplayer_dll),
     (NTC_DLL, NTC_DEPS, _build_ntc_dll),
     (BTS_DLL, BTS_DEPS, _build_bts_dll),
+    (MUX_DLL, MUX_DEPS, _build_mux_dll),
 ]
 
 
@@ -2454,6 +2483,97 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class MuxLib:
+    """ctypes wrapper around alxMuxTest.dll: an enable pin, some select pins, and a channel code.
+
+    Everything a test asks about is a pin level or a pin's init count, through the library's own IO
+    pin fake, so the multiplexer is checked by what it DRIVES rather than by what it stores.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, b, u8, i32 = ctypes.c_void_p, ctypes.c_bool, ctypes.c_uint8, ctypes.c_int32
+        c.AlxMuxTest_New.restype = vp
+        c.AlxMuxTest_New.argtypes = [u8]
+        c.AlxMuxTest_Delete.argtypes = [vp]
+        c.AlxMuxTest_Mux.restype = vp
+        c.AlxMuxTest_Mux.argtypes = [vp]
+        c.AlxMuxTest_EnPin.restype = vp
+        c.AlxMuxTest_EnPin.argtypes = [vp]
+        c.AlxMuxTest_SelPin.restype = vp
+        c.AlxMuxTest_SelPin.argtypes = [vp, u8]
+        for name in ("Init", "DeInit", "DeInit_Select"):
+            fn = getattr(c, f"AlxMux_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxMux_Enable.argtypes = [vp, b]
+        c.AlxMux_Select.argtypes = [vp, i32]
+        c.AlxIoPinFake_Level.restype = b
+        c.AlxIoPinFake_Level.argtypes = [vp]
+        c.AlxIoPinFake_InitCount.restype = ctypes.c_uint32
+        c.AlxIoPinFake_InitCount.argtypes = [vp]
+        c.AlxIoPinFake_DeInitCount.restype = ctypes.c_uint32
+        c.AlxIoPinFake_DeInitCount.argtypes = [vp]
+        self._handles: list = []
+
+    def new(self, num_of_sel_pins: int = 4, *, init: bool = True) -> int:
+        """A multiplexer with that many select pins, initialised unless a test wants it raw."""
+        handle = self.c.AlxMuxTest_New(num_of_sel_pins)
+        assert handle, "the multiplexer helper could not allocate"
+        self._handles.append(handle)
+        if init:
+            self.init(handle)
+        return handle
+
+    # -- the module ------------------------------------------------------------
+    def _mux(self, handle: int) -> int:
+        return self.c.AlxMuxTest_Mux(handle)
+
+    def init(self, handle: int) -> int:
+        return self.c.AlxMux_Init(self._mux(handle))
+
+    def deinit(self, handle: int) -> int:
+        return self.c.AlxMux_DeInit(self._mux(handle))
+
+    def deinit_select(self, handle: int) -> int:
+        return self.c.AlxMux_DeInit_Select(self._mux(handle))
+
+    def enable(self, handle: int, val: bool) -> None:
+        self.c.AlxMux_Enable(self._mux(handle), val)
+
+    def select(self, handle: int, ch: int) -> None:
+        self.c.AlxMux_Select(self._mux(handle), ch)
+
+    # -- the pins --------------------------------------------------------------
+    def en_pin(self, handle: int) -> int:
+        return self.c.AlxMuxTest_EnPin(handle)
+
+    def sel_pin(self, handle: int, index: int) -> int:
+        return self.c.AlxMuxTest_SelPin(handle, index)
+
+    def en_level(self, handle: int) -> bool:
+        return bool(self.c.AlxIoPinFake_Level(self.en_pin(handle)))
+
+    def code(self, handle: int, num_of_sel_pins: int) -> int:
+        """The select pins read back as the binary number they spell, pin 0 the least significant."""
+        return sum(
+            bool(self.c.AlxIoPinFake_Level(self.sel_pin(handle, i))) << i
+            for i in range(num_of_sel_pins)
+        )
+
+    def init_count(self, pin: int) -> int:
+        return self.c.AlxIoPinFake_InitCount(pin)
+
+    def deinit_count(self, pin: int) -> int:
+        return self.c.AlxIoPinFake_DeInitCount(pin)
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxMuxTest_Delete(handle)
+        self._handles.clear()
+
+
 class BtsLib:
     """ctypes wrapper around alxBts724gTest.dll: a high side switch and its one status pin.
 
@@ -2990,6 +3110,40 @@ def lin_fun_lib_session() -> LinFunLib:
     return LinFunLib(LINFUN_DLL)
 
 
+
+def _assert_pins_fitted(lib) -> None:
+    """Every pin a test used had a slot of its own in the IO pin fake.
+
+    The fake tells pins apart by address and has a fixed number of slots; past that it folds the
+    extras onto the last one, so two pins answer each other's level and a perfectly correct module
+    measures wrong. Checked after each test rather than before, because it is the test's own pins
+    that overflow it.
+    """
+    lib.c.AlxIoPinFake_DidOverflow.restype = ctypes.c_bool
+    assert not lib.c.AlxIoPinFake_DidOverflow(), (
+        "more pins than the IO pin fake has slots - raise ALX_IO_PIN_FAKE_NUM_OF_PINS in "
+        "Test/alxIoPinFake.c; everything this test measured about a pin is unreliable"
+    )
+
+@pytest.fixture(scope="session")
+def mux_lib_session() -> MuxLib:
+    override = os.environ.get("ALX_MUX_TEST_DLL")
+    if override:
+        return MuxLib(Path(override))
+    if _needs_build(MUX_DLL, MUX_DEPS):
+        _build_mux_dll()
+    return MuxLib(MUX_DLL)
+
+
+@pytest.fixture
+def mux_lib(mux_lib_session) -> MuxLib:
+    """The multiplexer library with every pin back at its start-up level and count."""
+    mux_lib_session.c.AlxIoPinFake_Reset()
+    yield mux_lib_session
+    _assert_pins_fitted(mux_lib_session)
+    mux_lib_session.free_all()
+
+
 @pytest.fixture(scope="session")
 def bts_lib_session() -> BtsLib:
     override = os.environ.get("ALX_BTS_TEST_DLL")
@@ -3006,6 +3160,7 @@ def bts_lib(bts_lib_session) -> BtsLib:
     bts_lib_session.tick_reset()
     bts_lib_session.c.AlxIoPinFake_Reset()
     yield bts_lib_session
+    _assert_pins_fitted(bts_lib_session)
     bts_lib_session.free_all()
 
 
@@ -3099,6 +3254,7 @@ def rot_sw_lib(rot_sw_lib_session) -> RotSwLib:
     """The rotary switch, with every pin back at zero and nothing left from the last test."""
     rot_sw_lib_session.c.AlxIoPinFake_Reset()
     yield rot_sw_lib_session
+    _assert_pins_fitted(rot_sw_lib_session)
     rot_sw_lib_session.free_all()
 
 

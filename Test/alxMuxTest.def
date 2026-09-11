@@ -1,0 +1,18 @@
+LIBRARY alxMuxTest
+EXPORTS
+	AlxMuxTest_New
+	AlxMuxTest_Delete
+	AlxMuxTest_Mux
+	AlxMuxTest_EnPin
+	AlxMuxTest_SelPin
+	AlxMux_Init
+	AlxMux_DeInit
+	AlxMux_DeInit_Select
+	AlxMux_Enable
+	AlxMux_Select
+	AlxIoPinFake_Reset
+	AlxIoPinFake_DidOverflow
+	AlxIoPinFake_Level
+	AlxIoPinFake_SetLevel
+	AlxIoPinFake_InitCount
+	AlxIoPinFake_DeInitCount

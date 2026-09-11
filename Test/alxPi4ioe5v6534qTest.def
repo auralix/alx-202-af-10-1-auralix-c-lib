@@ -20,6 +20,7 @@ EXPORTS
 	AlxI2cFake_ReadCount
 	AlxI2cFake_SetForcedStatus
 	AlxIoPinFake_Reset
+	AlxIoPinFake_DidOverflow
 	AlxIoPinFake_Level
 	AlxIoPinFake_InitCount
 	AlxIoPinFake_DeInitCount
