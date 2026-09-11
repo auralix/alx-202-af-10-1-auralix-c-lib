@@ -129,6 +129,12 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	alxIoPinFake_level[slot] = false;
 	alxIoPinFake_writeCount[slot]++;
 }
+void AlxIoPin_Write(AlxIoPin* me, bool val)
+{
+	uint32_t slot = AlxIoPinFake_Slot(me);
+	alxIoPinFake_level[slot] = val;
+	alxIoPinFake_writeCount[slot]++;
+}
 bool AlxIoPin_Read(AlxIoPin* me)
 {
 	// An input reads whatever is on it: what a test drove with AlxIoPinFake_SetLevel, or what the

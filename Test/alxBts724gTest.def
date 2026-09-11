@@ -1,0 +1,27 @@
+LIBRARY alxBts724gTest
+EXPORTS
+	AlxBts724gTest_New
+	AlxBts724gTest_Delete
+	AlxBts724gTest_Bts
+	AlxBts724gTest_OutPin
+	AlxBts724gTest_StatusPin
+	AlxBts724gTest_OpenLoadTrue_ms
+	AlxBts724gTest_OverTempTrue_ms
+	AlxBts724gTest_ClearTime_ms
+	AlxBts724g_Init
+	AlxBts724g_DeInit
+	AlxBts724g_Handle
+	AlxBts724g_SetOut
+	AlxBts724g_ResetOut
+	AlxBts724g_WriteOut
+	AlxBts724g_IsOpenLoadDetected
+	AlxBts724g_IsOverTempDetected
+	AlxBts724g_WasOpenLoadDetected
+	AlxBts724g_WasOverTempDetected
+	AlxIoPinFake_Reset
+	AlxIoPinFake_Level
+	AlxIoPinFake_SetLevel
+	alxTick DATA
+	AlxTick_Ctor
+	AlxTick_IncRange_ns
+	AlxIrqFake_Reset

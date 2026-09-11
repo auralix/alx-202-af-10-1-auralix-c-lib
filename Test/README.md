@@ -56,6 +56,8 @@ A missing tool fails its lane, never skips it.
 	  -Wcast-qual (it reads a const track through a volatile non-const pointer)
 	- `alxNtcTest` - the 10 kOhm thermistor: one free function over a 191-entry table, one
 	  entry per degree from -40 to +150. CLOSURE too, for a macro it defines and never uses
+	- `alxBts724gTest` - the protected high side switch: two faults down one status pin, told
+	  apart by what the output was asked to do, both behind glitch filters
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real
 	  software timers: twenty-one queries and latches about one input
 	- `alxRtcTest` - the calendar: Unix time to a broken-down date and back, in four

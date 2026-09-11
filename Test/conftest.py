@@ -441,6 +441,36 @@ NTC_DEPS = [
 ]
 NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
 
+
+# ------------------------------------------- BTS724G high side switch -----
+# Tier-2 target: the REAL driver over faked pins, with the REAL glitch filters
+# and software timer under it. The part reports two different faults down ONE
+# status pin, told apart by whether the output was asked to be on.
+BTS_SOURCES = [
+    CLIB_DIR / "Ext" / "alxBts724g.c",
+    CLIB_DIR / "alxFiltGlitchBool.c",
+    CLIB_DIR / "alxTimSw.c",
+    CLIB_DIR / "alxTick.c",
+    TEST_DIR / "alxIoPinFake.c",
+    TEST_DIR / "alxIrqFake.c",
+    TEST_DIR / "alxBts724gTestHelpers.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+BTS_DEPS = [
+    *BTS_SOURCES,
+    CLIB_DIR / "Ext" / "alxBts724g.h",
+    CLIB_DIR / "alxFiltGlitchBool.h",
+    CLIB_DIR / "alxTimSw.h",
+    CLIB_DIR / "alxTick.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxBts724gTest.def",
+    Path(__file__),
+]
+BTS_DLL = BUILD_DIR / "alxBts724gTest.dll"
+
 # ------------------------------------------------------ Bool module -------
 # Tier-2 target: the library's boolean-with-memory, over the REAL glitch filter,
 # software timer and tick, with only the interrupt lock faked. Twenty-one query
@@ -699,6 +729,10 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_bts_dll() -> None:
+    _build_dll(BTS_SOURCES, (), (), BTS_DLL, TEST_DIR / "alxBts724gTest.def", None)
+
+
 def _build_ntc_dll() -> None:
     _build_dll(NTC_SOURCES_STRICT, NTC_SOURCES_CLOSURE, (), NTC_DLL,
                TEST_DIR / "alxNtcTest.def", "ntcClosure")
@@ -780,6 +814,7 @@ DLL_GROUPS = [
     (AUDIO_DLL, AUDIO_DEPS, _build_audio_dll),
     (AUDIOPLAYER_DLL, AUDIOPLAYER_DEPS, _build_audioplayer_dll),
     (NTC_DLL, NTC_DEPS, _build_ntc_dll),
+    (BTS_DLL, BTS_DEPS, _build_bts_dll),
 ]
 
 
@@ -2419,6 +2454,115 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class BtsLib:
+    """ctypes wrapper around alxBts724gTest.dll: a high side switch and its one status pin.
+
+    The clock belongs to the test; the part's own filter times are read back from the driver rather
+    than restated here.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, f, u64, b = ctypes.c_void_p, ctypes.c_float, ctypes.c_uint64, ctypes.c_bool
+        c.AlxBts724gTest_New.restype = vp
+        c.AlxBts724gTest_Delete.argtypes = [vp]
+        for name in ("Bts", "OutPin", "StatusPin"):
+            fn = getattr(c, f"AlxBts724gTest_{name}")
+            fn.restype = vp
+            fn.argtypes = [vp]
+        for name in ("OpenLoadTrue_ms", "OverTempTrue_ms", "ClearTime_ms"):
+            fn = getattr(c, f"AlxBts724gTest_{name}")
+            fn.restype = f
+            fn.argtypes = [vp]
+        for name in ("Init", "DeInit", "Handle", "SetOut", "ResetOut"):
+            getattr(c, f"AlxBts724g_{name}").argtypes = [vp]
+        c.AlxBts724g_WriteOut.argtypes = [vp, b]
+        for name in ("IsOpenLoadDetected", "IsOverTempDetected",
+                     "WasOpenLoadDetected", "WasOverTempDetected"):
+            fn = getattr(c, f"AlxBts724g_{name}")
+            fn.restype = b
+            fn.argtypes = [vp]
+        c.AlxIoPinFake_SetLevel.argtypes = [vp, b]
+        c.AlxIoPinFake_Level.restype = b
+        c.AlxIoPinFake_Level.argtypes = [vp]
+        c.AlxTick_Ctor.argtypes = [vp]
+        c.AlxTick_IncRange_ns.argtypes = [vp, u64]
+        self.tick = ctypes.addressof(ctypes.c_uint8.in_dll(c, "alxTick"))
+        self._handles: list = []
+
+    # -- the clock the test owns ----------------------------------------------
+    def tick_reset(self) -> None:
+        self.c.AlxTick_Ctor(self.tick)
+        self.c.AlxIrqFake_Reset()
+
+    def advance_ms(self, ms: float) -> None:
+        self.c.AlxTick_IncRange_ns(self.tick, round(ms * 1_000_000))
+
+    # -- one switch -----------------------------------------------------------
+    def new(self):
+        """A switch, initialised, with its status pin low - which is what a fault looks like."""
+        handle = self.c.AlxBts724gTest_New()
+        assert handle, "AlxBts724gTest_New returned NULL"
+        self._handles.append(handle)
+        self.c.AlxBts724g_Init(self.c.AlxBts724gTest_Bts(handle))
+        return handle
+
+    def _b(self, obj):
+        return self.c.AlxBts724gTest_Bts(obj)
+
+    def set_status(self, obj, healthy: bool) -> None:
+        """The part pulls its status pin LOW to report a fault; high is healthy."""
+        self.c.AlxIoPinFake_SetLevel(self.c.AlxBts724gTest_StatusPin(obj), healthy)
+
+    def out_level(self, obj) -> bool:
+        return self.c.AlxIoPinFake_Level(self.c.AlxBts724gTest_OutPin(obj))
+
+    def set_out(self, obj) -> None:
+        self.c.AlxBts724g_SetOut(self._b(obj))
+
+    def reset_out(self, obj) -> None:
+        self.c.AlxBts724g_ResetOut(self._b(obj))
+
+    def write_out(self, obj, state: bool) -> None:
+        self.c.AlxBts724g_WriteOut(self._b(obj), state)
+
+    def handle(self, obj, *, for_ms: float = 0.0, step_ms: float = 1.0) -> None:
+        """Run the driver, advancing the clock in steps, the way a super-loop would."""
+        self.c.AlxBts724g_Handle(self._b(obj))
+        elapsed = 0.0
+        while elapsed < for_ms:
+            self.advance_ms(step_ms)
+            self.c.AlxBts724g_Handle(self._b(obj))
+            elapsed += step_ms
+
+    def open_load(self, obj) -> bool:
+        return self.c.AlxBts724g_IsOpenLoadDetected(self._b(obj))
+
+    def over_temp(self, obj) -> bool:
+        return self.c.AlxBts724g_IsOverTempDetected(self._b(obj))
+
+    def was_open_load(self, obj) -> bool:
+        return self.c.AlxBts724g_WasOpenLoadDetected(self._b(obj))
+
+    def was_over_temp(self, obj) -> bool:
+        return self.c.AlxBts724g_WasOverTempDetected(self._b(obj))
+
+    def open_load_time_ms(self, obj) -> float:
+        return self.c.AlxBts724gTest_OpenLoadTrue_ms(obj)
+
+    def over_temp_time_ms(self, obj) -> float:
+        return self.c.AlxBts724gTest_OverTempTrue_ms(obj)
+
+    def clear_time_ms(self, obj) -> float:
+        return self.c.AlxBts724gTest_ClearTime_ms(obj)
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxBts724gTest_Delete(handle)
+        self._handles.clear()
+
+
 class NtcLib:
     """ctypes wrapper around alxNtcTest.dll: a thermistor resistance to a temperature."""
 
@@ -2844,6 +2988,25 @@ def lin_fun_lib_session() -> LinFunLib:
     if _needs_build(LINFUN_DLL, LINFUN_DEPS):
         _build_linfun_dll()
     return LinFunLib(LINFUN_DLL)
+
+
+@pytest.fixture(scope="session")
+def bts_lib_session() -> BtsLib:
+    override = os.environ.get("ALX_BTS_TEST_DLL")
+    if override:
+        return BtsLib(Path(override))
+    if _needs_build(BTS_DLL, BTS_DEPS):
+        _build_bts_dll()
+    return BtsLib(BTS_DLL)
+
+
+@pytest.fixture
+def bts_lib(bts_lib_session) -> BtsLib:
+    """The switch library with the clock back at zero and every pin low."""
+    bts_lib_session.tick_reset()
+    bts_lib_session.c.AlxIoPinFake_Reset()
+    yield bts_lib_session
+    bts_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")
