@@ -88,8 +88,9 @@ float AlxVdiv_GetResLow_kOhm(float vin_V, float vout_V, float resHigh_kOhm)
 {
 	return ((resHigh_kOhm * vout_V) / (vin_V - vout_V));
 }
+
 /**
-  * @brief		Current through the low leg, from the voltage across it
+  * @brief						Current through the low leg, from the voltage across it
   * @param[in]	vout_V			Voltage across the low leg
   * @param[in]	resLow_kOhm		Low leg resistance
   * @return						Current in mA - V / kOhm IS mA, so nothing is scaled here or by

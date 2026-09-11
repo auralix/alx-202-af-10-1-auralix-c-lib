@@ -77,24 +77,6 @@ extern "C" {
 //******************************************************************************
 // Functions
 //******************************************************************************
-// Five quantities, two flavours, and the difference between them is not taste.
-//
-// FLOAT is the primary API. Its units follow the schematic - volts and kilohms - so a reader types
-// the numbers the drawing already shows. Single precision carries about seven significant digits,
-// far more than any ADC placed in front of it, so here the unit is a READABILITY choice and not a
-// capability one: to work in another unit, scale the RESULT. On a float that is exact and loses
-// nothing. Current needs no scale factor at all, because V / kOhm is mA.
-//
-// FIXED POINT is for parts with no FPU - this library supports Cortex-M0, M0+ and M3 families
-// where every float operation is a software call. Here the unit IS the design, because an integer
-// cannot carry a fraction: the scale is the resolution. Do NOT rescale one of these at the call
-// site. That truncates, and truncating a current reading to whole milliamps is a defect this
-// module has already caused in a product.
-//
-// Which is why the two current functions take a finer voltage than their neighbours do: mV / ohm
-// would yield whole milliamps and throw the fraction away, while uV / ohm yields microamps and
-// keeps it. The asymmetry is forced by arithmetic rather than left over from an edit.
-//******************************************************************************
 float AlxVdiv_GetVout_V(float vin_V, float resHigh_kOhm, float resLow_kOhm);
 float AlxVdiv_GetVin_V(float vout_V, float resHigh_kOhm, float resLow_kOhm);
 float AlxVdiv_GetResHigh_kOhm(float vin_V, float vout_V, float resLow_kOhm);
