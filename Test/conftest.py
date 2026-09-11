@@ -302,6 +302,33 @@ ROTSW_DEPS = [
 ]
 ROTSW_DLL = BUILD_DIR / "alxRotSwTest.dll"
 
+
+# ------------------------------------------ RTD temperature sensor module ---
+# Tier-2 target: the REAL sensor over a faked converter. Two channels in, a
+# divider, a lookup table out - the chain that turns a voltage into a
+# temperature, and every step of it is arithmetic a bench cannot vary.
+TEMPSENS_SOURCES = [
+    CLIB_DIR / "alxTempSensRtdVdiv.c",
+    CLIB_DIR / "alxVdiv.c",
+    CLIB_DIR / "alxInterpLin.c",
+    TEST_DIR / "alxAdcFake.c",
+    TEST_DIR / "alxTempSensTestHelpers.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+TEMPSENS_DEPS = [
+    *TEMPSENS_SOURCES,
+    CLIB_DIR / "alxTempSensRtdVdiv.h",
+    CLIB_DIR / "alxVdiv.h",
+    CLIB_DIR / "alxInterpLin.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "Mcu" / "alxAdc.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxTempSensTest.def",
+    Path(__file__),
+]
+TEMPSENS_DLL = BUILD_DIR / "alxTempSensTest.dll"
+
 # ------------------------------------------------------ Bool module -------
 # Tier-2 target: the library's boolean-with-memory, over the REAL glitch filter,
 # software timer and tick, with only the interrupt lock faked. Twenty-one query
@@ -560,6 +587,10 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_tempsens_dll() -> None:
+    _build_dll(TEMPSENS_SOURCES, (), (), TEMPSENS_DLL, TEST_DIR / "alxTempSensTest.def", None)
+
+
 def _build_rotsw_dll() -> None:
     _build_dll(ROTSW_SOURCES, (), (), ROTSW_DLL, TEST_DIR / "alxRotSwTest.def", None)
 
@@ -614,6 +645,7 @@ DLL_GROUPS = [
     (INA228_DLL, INA228_DEPS, _build_ina228_dll),
     (PI4IOE_DLL, PI4IOE_DEPS, _build_pi4ioe_dll),
     (ROTSW_DLL, ROTSW_DEPS, _build_rotsw_dll),
+    (TEMPSENS_DLL, TEMPSENS_DEPS, _build_tempsens_dll),
 ]
 
 
@@ -2253,6 +2285,78 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class TempSensLib:
+    """ctypes wrapper around alxTempSensTest.dll: a voltage divider with an RTD in it.
+
+    The helper owns the converter, the interpolation table and the points it interpolates, so a
+    test builds a sensor out of a table and two channel numbers and then drives the converter.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, f, u32, i32, b = (ctypes.c_void_p, ctypes.c_float, ctypes.c_uint32,
+                              ctypes.c_int32, ctypes.c_bool)
+        c.AlxTempSensTest_New.restype = vp
+        c.AlxTempSensTest_New.argtypes = [ctypes.POINTER(f), ctypes.POINTER(f), u32, b,
+                                          u32, u32, b, f]
+        c.AlxTempSensTest_Delete.argtypes = [vp]
+        c.AlxTempSensTest_Sens.restype = vp
+        c.AlxTempSensTest_Sens.argtypes = [vp]
+        c.AlxTempSensTest_Adc.restype = vp
+        c.AlxTempSensTest_Adc.argtypes = [vp]
+        c.AlxTempSensRtdVdiv_GetTemp_degC.restype = i32
+        c.AlxTempSensRtdVdiv_GetTemp_degC.argtypes = [vp, ctypes.POINTER(f)]
+        c.AlxAdcFake_SetVoltage_V.argtypes = [vp, u32, f]
+        c.AlxAdcFake_ReadCount.restype = u32
+        c.AlxAdcFake_ReadCount.argtypes = [vp, u32]
+        for name in ("Ok", "ErrMin", "ErrMax"):
+            getattr(c, f"AlxTempSensTest_Status_{name}").restype = i32
+        self.OK = c.AlxTempSensTest_Status_Ok()
+        self.ERR_MIN = c.AlxTempSensTest_Status_ErrMin()
+        self.ERR_MAX = c.AlxTempSensTest_Status_ErrMax()
+        self._handles: list = []
+
+    def new(
+        self,
+        res_points_kOhm,  # noqa: N803 - the unit belongs in the name
+        temp_points_degC,  # noqa: N803
+        *,
+        rising=True,
+        ch_vin=0,
+        ch_vout=1,
+        rtd_low=True,
+        res_other_kOhm=1.0,  # noqa: N803
+    ):
+        """A sensor over a table of (resistance, temperature) points; released when the test ends."""
+        count = len(res_points_kOhm)
+        assert count == len(temp_points_degC), "a table needs one temperature per resistance"
+        arr = ctypes.c_float * count
+        handle = self.c.AlxTempSensTest_New(arr(*res_points_kOhm), arr(*temp_points_degC), count,
+                                            rising, ch_vin, ch_vout, rtd_low, res_other_kOhm)
+        assert handle, "AlxTempSensTest_New returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def set_voltage_V(self, obj, ch: int, voltage_V: float) -> None:  # noqa: N803
+        self.c.AlxAdcFake_SetVoltage_V(self.c.AlxTempSensTest_Adc(obj), ch, voltage_V)
+
+    def read_count(self, obj, ch: int) -> int:
+        return self.c.AlxAdcFake_ReadCount(self.c.AlxTempSensTest_Adc(obj), ch)
+
+    def temp(self, obj) -> tuple[int, float]:
+        """(status, temperature) - the status is the table's, passed straight through."""
+        out = ctypes.c_float()
+        status = self.c.AlxTempSensRtdVdiv_GetTemp_degC(self.c.AlxTempSensTest_Sens(obj),
+                                                        ctypes.byref(out))
+        return status, out.value
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxTempSensTest_Delete(handle)
+        self._handles.clear()
+
+
 class RotSwLib:
     """ctypes wrapper around alxRotSwTest.dll: a rotary switch read through faked IO pins.
 
@@ -2379,6 +2483,24 @@ def lin_fun_lib_session() -> LinFunLib:
     if _needs_build(LINFUN_DLL, LINFUN_DEPS):
         _build_linfun_dll()
     return LinFunLib(LINFUN_DLL)
+
+
+@pytest.fixture(scope="session")
+def temp_sens_lib_session() -> TempSensLib:
+    override = os.environ.get("ALX_TEMPSENS_TEST_DLL")
+    if override:
+        return TempSensLib(Path(override))
+    if _needs_build(TEMPSENS_DLL, TEMPSENS_DEPS):
+        _build_tempsens_dll()
+    return TempSensLib(TEMPSENS_DLL)
+
+
+@pytest.fixture
+def temp_sens_lib(temp_sens_lib_session) -> TempSensLib:
+    """The sensor library, with every converter channel back at zero."""
+    temp_sens_lib_session.c.AlxAdcFake_Reset()
+    yield temp_sens_lib_session
+    temp_sens_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")

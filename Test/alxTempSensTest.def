@@ -1,0 +1,17 @@
+LIBRARY alxTempSensTest
+EXPORTS
+	AlxTempSensTest_New
+	AlxTempSensTest_Delete
+	AlxTempSensTest_Sens
+	AlxTempSensTest_Adc
+	AlxTempSensRtdVdiv_Init
+	AlxTempSensRtdVdiv_DeInit
+	AlxTempSensRtdVdiv_GetTemp_degC
+	AlxAdcFake_Reset
+	AlxAdcFake_SetVoltage_V
+	AlxAdcFake_ReadCount
+	AlxAdcFake_InitCount
+	AlxAdcFake_DeInitCount
+	AlxTempSensTest_Status_Ok
+	AlxTempSensTest_Status_ErrMin
+	AlxTempSensTest_Status_ErrMax
