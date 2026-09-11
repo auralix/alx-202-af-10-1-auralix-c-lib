@@ -64,6 +64,10 @@ A missing tool fails its lane, never skips it.
 	  apart by what the output was asked to do, both behind glitch filters
 	- `alxMuxTest` - the analog multiplexer: an enable pin, up to eight select pins, and the
 	  channel code they spell. Also the one test of the IO pin fake's own capacity guard
+	- `alxParamKvStoreTest` - the key-value store every stored parameter passes through, over a
+	  NEW file system fake that can be told to fail any one operation. The module is thirty
+	  lines of forwarding, so what the group is actually about is what it does when the file
+	  system says no
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real
 	  software timers: twenty-one queries and latches about one input
 	- `alxRtcTest` - the calendar: Unix time to a broken-down date and back, in four

@@ -1,0 +1,23 @@
+LIBRARY alxParamKvStoreTest
+EXPORTS
+	AlxParamKvStoreTest_New
+	AlxParamKvStoreTest_Delete
+	AlxParamKvStoreTest_Store
+	AlxParamKvStoreTest_IsInit
+	AlxParamKvStore_Init
+	AlxParamKvStore_DeInit
+	AlxParamKvStore_Get
+	AlxParamKvStore_Set
+	AlxParamKvStore_Remove
+	AlxFsFake_Reset
+	AlxFsFake_FailNext
+	AlxFsFake_CallCount
+	AlxFsFake_OpenCount
+	AlxFsFake_CloseCount
+	AlxFsFake_FormatCount
+	AlxFsFake_FilesHeld
+	AlxFsFake_IsMounted
+	AlxFsFake_Put
+	AlxFsFake_Get
+	AlxFsFake_Has
+	AlxFsFake_LastOpenMode

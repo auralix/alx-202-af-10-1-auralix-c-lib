@@ -442,6 +442,31 @@ NTC_DEPS = [
 NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
 
 
+# ------------------------------------------- Parameter key-value store -----
+# Tier-2 target: the store every stored parameter on a device passes through,
+# over a NEW link-time fake of the file system. The module is a thin shell over
+# AlxFs, which makes it look uninteresting until you ask what it does when the
+# file system says no - so the fake can be told to fail any operation, once or
+# always, and it counts opens against closes.
+PARAMKV_SOURCES = [
+    CLIB_DIR / "alxParamKvStore.c",
+    TEST_DIR / "alxParamKvStoreTestHelpers.c",
+    TEST_DIR / "alxFsFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+PARAMKV_DEPS = [
+    *PARAMKV_SOURCES,
+    CLIB_DIR / "alxParamKvStore.h",
+    CLIB_DIR / "alxFs.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxParamKvStoreTest.def",
+    Path(__file__),
+]
+PARAMKV_DLL = BUILD_DIR / "alxParamKvStoreTest.dll"
+
+
 # ------------------------------------------------- Analog multiplexer -----
 # Tier-1 target: an enable pin and up to eight select pins, over the library's
 # own IO pin fake. Small, and load-bearing - a board that measures more signals
@@ -753,6 +778,11 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_paramkv_dll() -> None:
+    _build_dll(PARAMKV_SOURCES, (), (), PARAMKV_DLL,
+               TEST_DIR / "alxParamKvStoreTest.def", None)
+
+
 def _build_mux_dll() -> None:
     _build_dll(MUX_SOURCES, (), (), MUX_DLL, TEST_DIR / "alxMuxTest.def", None)
 
@@ -844,6 +874,7 @@ DLL_GROUPS = [
     (NTC_DLL, NTC_DEPS, _build_ntc_dll),
     (BTS_DLL, BTS_DEPS, _build_bts_dll),
     (MUX_DLL, MUX_DEPS, _build_mux_dll),
+    (PARAMKV_DLL, PARAMKV_DEPS, _build_paramkv_dll),
 ]
 
 
@@ -2500,6 +2531,133 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class ParamKvStoreLib:
+    """ctypes wrapper around alxParamKvStoreTest.dll: the store, over a file system that can fail.
+
+    The fake's operations are named rather than numbered on this side, because a test that said
+    `fail("open")` reads and a test that said `fail(3)` does not.
+    """
+
+    OPS = ("mount", "unmount", "format", "open", "close", "read", "write", "remove")
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, b, u32, i32 = ctypes.c_void_p, ctypes.c_bool, ctypes.c_uint32, ctypes.c_int32
+        u8p = ctypes.POINTER(ctypes.c_uint8)
+        cp = ctypes.c_char_p
+        c.AlxParamKvStoreTest_New.restype = vp
+        c.AlxParamKvStoreTest_Delete.argtypes = [vp]
+        c.AlxParamKvStoreTest_Store.restype = vp
+        c.AlxParamKvStoreTest_Store.argtypes = [vp]
+        c.AlxParamKvStoreTest_IsInit.restype = b
+        c.AlxParamKvStoreTest_IsInit.argtypes = [vp]
+        for name in ("Init", "DeInit"):
+            fn = getattr(c, f"AlxParamKvStore_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxParamKvStore_Get.restype = i32
+        c.AlxParamKvStore_Get.argtypes = [vp, cp, vp, u32, ctypes.POINTER(u32)]
+        c.AlxParamKvStore_Set.restype = i32
+        c.AlxParamKvStore_Set.argtypes = [vp, cp, vp, u32]
+        c.AlxParamKvStore_Remove.restype = i32
+        c.AlxParamKvStore_Remove.argtypes = [vp, cp]
+        c.AlxFsFake_FailNext.argtypes = [u32, i32]
+        c.AlxFsFake_CallCount.restype = u32
+        c.AlxFsFake_CallCount.argtypes = [u32]
+        for name in ("OpenCount", "CloseCount", "FormatCount", "FilesHeld"):
+            getattr(c, f"AlxFsFake_{name}").restype = u32
+        c.AlxFsFake_IsMounted.restype = b
+        c.AlxFsFake_Put.argtypes = [cp, u8p, u32]
+        c.AlxFsFake_Get.restype = u32
+        c.AlxFsFake_Get.argtypes = [cp, u8p, u32]
+        c.AlxFsFake_Has.restype = b
+        c.AlxFsFake_Has.argtypes = [cp]
+        c.AlxFsFake_LastOpenMode.restype = cp
+        self._handles: list = []
+
+    def new(self, *, init: bool = True) -> int:
+        handle = self.c.AlxParamKvStoreTest_New()
+        assert handle, "the key-value store helper could not allocate"
+        self._handles.append(handle)
+        if init:
+            assert self.init(handle) == 0, "the store would not initialise over a healthy fake"
+        return handle
+
+    # -- the module ------------------------------------------------------------
+    def _store(self, handle: int) -> int:
+        return self.c.AlxParamKvStoreTest_Store(handle)
+
+    def init(self, handle: int) -> int:
+        return self.c.AlxParamKvStore_Init(self._store(handle))
+
+    def deinit(self, handle: int) -> int:
+        return self.c.AlxParamKvStore_DeInit(self._store(handle))
+
+    def is_init(self, handle: int) -> bool:
+        return bool(self.c.AlxParamKvStoreTest_IsInit(handle))
+
+    def get(self, handle: int, key: str, len_max: int = 64) -> tuple:
+        buff = ctypes.create_string_buffer(len_max)
+        actual = ctypes.c_uint32(0)
+        status = self.c.AlxParamKvStore_Get(self._store(handle), key.encode("ascii"),
+                                            buff, len_max, ctypes.byref(actual))
+        return status, buff.raw[:actual.value]
+
+    def set(self, handle: int, key: str, data: bytes) -> int:
+        buff = ctypes.create_string_buffer(data, len(data))
+        return self.c.AlxParamKvStore_Set(self._store(handle), key.encode("ascii"),
+                                          buff, len(data))
+
+    def remove(self, handle: int, key: str) -> int:
+        return self.c.AlxParamKvStore_Remove(self._store(handle), key.encode("ascii"))
+
+    # -- the file system under it ----------------------------------------------
+    def fail(self, op: str, times: int = 1) -> None:
+        """Make one file system operation fail: `times` more calls, or every call if negative."""
+        self.c.AlxFsFake_FailNext(self.OPS.index(op), times)
+
+    def calls(self, op: str) -> int:
+        return self.c.AlxFsFake_CallCount(self.OPS.index(op))
+
+    def opens(self) -> int:
+        return self.c.AlxFsFake_OpenCount()
+
+    def closes(self) -> int:
+        return self.c.AlxFsFake_CloseCount()
+
+    def formats(self) -> int:
+        return self.c.AlxFsFake_FormatCount()
+
+    def files_held(self) -> int:
+        return self.c.AlxFsFake_FilesHeld()
+
+    def mounted(self) -> bool:
+        return bool(self.c.AlxFsFake_IsMounted())
+
+    def put_on_flash(self, key: str, data: bytes) -> None:
+        """What is already stored before the module ever runs."""
+        arr = (ctypes.c_uint8 * len(data))(*data)
+        self.c.AlxFsFake_Put(key.encode("ascii"), arr, len(data))
+
+    def on_flash(self, key: str, len_max: int = 64) -> bytes:
+        arr = (ctypes.c_uint8 * len_max)()
+        n = self.c.AlxFsFake_Get(key.encode("ascii"), arr, len_max)
+        return bytes(arr[:n])
+
+    def has_on_flash(self, key: str) -> bool:
+        return bool(self.c.AlxFsFake_Has(key.encode("ascii")))
+
+    def last_open_mode(self) -> str:
+        """The mode string the module last asked a file to be opened with."""
+        return (self.c.AlxFsFake_LastOpenMode() or b"").decode("ascii")
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxParamKvStoreTest_Delete(handle)
+        self._handles.clear()
+
+
 class MuxLib:
     """ctypes wrapper around alxMuxTest.dll: an enable pin, some select pins, and a channel code.
 
@@ -3141,6 +3299,24 @@ def _assert_pins_fitted(lib) -> None:
         "more pins than the IO pin fake has slots - raise ALX_IO_PIN_FAKE_NUM_OF_PINS in "
         "Test/alxIoPinFake.c; everything this test measured about a pin is unreliable"
     )
+
+@pytest.fixture(scope="session")
+def param_kv_store_lib_session() -> ParamKvStoreLib:
+    override = os.environ.get("ALX_PARAMKV_TEST_DLL")
+    if override:
+        return ParamKvStoreLib(Path(override))
+    if _needs_build(PARAMKV_DLL, PARAMKV_DEPS):
+        _build_paramkv_dll()
+    return ParamKvStoreLib(PARAMKV_DLL)
+
+
+@pytest.fixture
+def param_kv_store_lib(param_kv_store_lib_session) -> ParamKvStoreLib:
+    """The store with an empty, unmounted file system and no injected failures."""
+    param_kv_store_lib_session.c.AlxFsFake_Reset()
+    yield param_kv_store_lib_session
+    param_kv_store_lib_session.free_all()
+
 
 @pytest.fixture(scope="session")
 def mux_lib_session() -> MuxLib:
