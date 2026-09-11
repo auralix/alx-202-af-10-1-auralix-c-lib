@@ -40,8 +40,9 @@ A missing tool fails its lane, never skips it.
 	- `alxMathTest` - the pure signal conditioning: two hysteresis state machines, the moving
 	  average over a caller-owned buffer, the running count/sum/mean/min/max, and alxGlobal's
 	  number formatting, which has no group of its own. Five modules, five test files
-	- `alxLinFunTest` - the two x-to-y mappings: a line through two points, in float and in
-	  integer, and a lookup table interpolated between its points
+	- `alxLinFunTest` - the x-to-y mappings: a line through two points, in float and in
+	  integer, a lookup table interpolated between its points, and the audio volume that is
+	  built on the line - percent to decibels to an amplitude factor. Three test files
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real
 	  software timers: twenty-one queries and latches about one input
 	- `alxRtcTest` - the calendar: Unix time to a broken-down date and back, in four

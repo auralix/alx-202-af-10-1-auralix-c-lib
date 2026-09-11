@@ -260,13 +260,16 @@ MATH_DLL = BUILD_DIR / "alxMathTest.dll"
 LINFUN_SOURCES = [
     CLIB_DIR / "alxLinFun.c",
     CLIB_DIR / "alxInterpLin.c",
+    CLIB_DIR / "alxAudioVol.c",
     TEST_DIR / "alxLinFunTestHelpers.c",
+    TEST_DIR / "alxAudioVolTestHelpers.c",
     TEST_DIR / "alxAssertPc.c",
 ]
 LINFUN_DEPS = [
     *LINFUN_SOURCES,
     CLIB_DIR / "alxLinFun.h",
     CLIB_DIR / "alxInterpLin.h",
+    CLIB_DIR / "alxAudioVol.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     TEST_DIR / "alxConfig.h",
@@ -2222,6 +2225,54 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class AudioVolLib:
+    """ctypes wrapper around the mapping DLL's audio volume: percent to decibels to a factor.
+
+    It shares alxLinFunTest.dll with AlxLinFun because that is what the module is built on - the
+    percentage-to-decibel line IS an AlxLinFun, constructed inside AlxAudioVol_Ctor.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, f = ctypes.c_void_p, ctypes.c_float
+        c.AlxAudioVolTest_New.restype = vp
+        c.AlxAudioVolTest_New.argtypes = [f, f]
+        c.AlxAudioVolTest_Delete.argtypes = [vp]
+        c.AlxAudioVolTest_PctMax.restype = f
+        c.AlxAudioVolTest_PctMax.argtypes = [vp]
+        c.AlxAudioVol_Process.restype = f
+        c.AlxAudioVol_Process.argtypes = [vp, f]
+        c.AlxAudioVol_Set_pct.argtypes = [vp, f]
+        c.AlxAudioVol_Set_dB.argtypes = [vp, f]
+        self._handles: list = []
+
+    def new(self, vol_min_dB: float, vol_max_dB: float):  # noqa: N803 - the unit belongs in the name
+        """A volume control over a decibel range; released when the test ends."""
+        handle = self.c.AlxAudioVolTest_New(vol_min_dB, vol_max_dB)
+        assert handle, "AlxAudioVolTest_New returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def process(self, obj, sample: float) -> float:
+        return self.c.AlxAudioVol_Process(obj, sample)
+
+    def set_pct(self, obj, vol_pct: float) -> None:
+        self.c.AlxAudioVol_Set_pct(obj, vol_pct)
+
+    def set_dB(self, obj, vol_dB: float) -> None:  # noqa: N802, N803 - the unit belongs in the name
+        self.c.AlxAudioVol_Set_dB(obj, vol_dB)
+
+    def pct_max(self, obj) -> float:
+        """The highest percentage the object will accept, as its constructor computed it."""
+        return self.c.AlxAudioVolTest_PctMax(obj)
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxAudioVolTest_Delete(handle)
+        self._handles.clear()
+
+
 @pytest.fixture(scope="session")
 def lin_fun_lib_session() -> LinFunLib:
     override = os.environ.get("ALX_LINFUN_TEST_DLL")
@@ -2230,6 +2281,23 @@ def lin_fun_lib_session() -> LinFunLib:
     if _needs_build(LINFUN_DLL, LINFUN_DEPS):
         _build_linfun_dll()
     return LinFunLib(LINFUN_DLL)
+
+
+@pytest.fixture(scope="session")
+def audiovol_lib_session() -> AudioVolLib:
+    override = os.environ.get("ALX_LINFUN_TEST_DLL")
+    if override:
+        return AudioVolLib(Path(override))
+    if _needs_build(LINFUN_DLL, LINFUN_DEPS):
+        _build_linfun_dll()
+    return AudioVolLib(LINFUN_DLL)
+
+
+@pytest.fixture
+def audiovol_lib(audiovol_lib_session) -> AudioVolLib:
+    """The audio volume, with everything the previous test allocated already released."""
+    yield audiovol_lib_session
+    audiovol_lib_session.free_all()
 
 
 @pytest.fixture
