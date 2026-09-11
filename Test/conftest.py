@@ -785,6 +785,59 @@ PI4IOE_DEPS = [
 PI4IOE_DLL = BUILD_DIR / "alxPi4ioe5v6534qTest.dll"
 
 
+# ----------------------------------------------------------- Id module -------
+# Tier-2 target (ALX-1553): the identity block every Auralix product prints at boot - firmware
+# name, version, build date and hash, the bootloader's own copy of all of that read out of flash,
+# and the board identification straps. It had no test of its own until now; the only mention of
+# AlxId under Test/ was alxIdFake.c, which is what the CLI group links INSTEAD of this module.
+#
+# It matters more than its size suggests. The Python library parses this block out of a boot trace
+# and the device suite uses it to say WHICH IMAGE a bench run actually ran against, so an identity
+# block that is wrong does not break a board - it makes every result describe the wrong binary.
+#
+# alxId.c is CLOSURE, and it is not close: under the strict set it produces seven errors. Six are
+# -Wformat, every "%lu" in the file given a uint32_t (alxId.c:123, 124, 171, 172, 478, 491), and one
+# is -Wint-to-void-pointer-cast at alxId.c:141, where the boot block's uint32_t address is cast
+# straight to void*. Worth knowing while reading those six: on Windows and on the ARM target
+# unsigned long is 32 bits, so the strings come out RIGHT in both places - the format is only
+# genuinely wrong on an LP64 host, which is why it has survived. The .c is read-only to this suite
+# (TODO A18, the module's owner), so it is compiled with -w and nothing in it is warning-checked.
+#
+# alxIdTestDateComp.c is closure too, for a different and smaller reason - see its file header: a
+# translation unit that mentions ALX_BUILD_DATE_COMP cannot compile under -Werror at all, so the
+# three accessors that need the macro are split out and the rest of the helpers stay gated.
+ID_SOURCES_STRICT = [
+    TEST_DIR / "alxIdTestHelpers.c",
+    TEST_DIR / "alxIoPinFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+ID_SOURCES_CLOSURE = [
+    CLIB_DIR / "alxId.c",
+    TEST_DIR / "alxIdTestDateComp.c",
+]
+ID_SOURCES = [*ID_SOURCES_STRICT, *ID_SOURCES_CLOSURE]
+# No alxDelay.c and no alxTrace.c: alxId.h includes alxDelay.h but alxId.c calls nothing from it,
+# and Test/alxConfig.h sets ALX_TRACE_LEVEL_OFF, which compiles ALX_TRACE_INF itself away - so the
+# module's whole trace paragraph reduces to its two assertions. Assertions come from
+# _assert_defines, which reads ALX_ID_ASSERT_BKPT_ENABLE out of alxId.h and reaches closure sources
+# too: every getter here asserts isInit, so a test that reads one before Init needs
+# @pytest.mark.expect_assert.
+ID_DEPS = [
+    *ID_SOURCES,
+    CLIB_DIR / "alxId.h",
+    CLIB_DIR / "alxBuild.h",
+    CLIB_DIR / "alxBuild_GENERATED.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    CLIB_DIR / "Mcu" / "alxTrace.h",
+    CLIB_DIR / "alxDelay.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxIdTest.def",
+    Path(__file__),
+]
+ID_DLL = BUILD_DIR / "alxIdTest.dll"
+
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
@@ -969,6 +1022,12 @@ def _build_pi4ioe_dll() -> None:
                PI4IOE_DLL, TEST_DIR / "alxPi4ioe5v6534qTest.def", "pi4ioeClosure")
 
 
+def _build_id_dll() -> None:
+    _build_dll(ID_SOURCES_STRICT, ID_SOURCES_CLOSURE,
+               _assert_defines(ID_SOURCES_STRICT, ID_SOURCES_CLOSURE),
+               ID_DLL, TEST_DIR / "alxIdTest.def", "idClosure")
+
+
 def _build_timsw_dll() -> None:
     _build_dll(TIMSW_SOURCES, (), _assert_defines(TIMSW_SOURCES), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
 
@@ -1003,6 +1062,7 @@ DLL_GROUPS = [
     (DELAY_DLL, DELAY_DEPS, _build_delay_dll),
     (LIN_DLL, LIN_DEPS, _build_lin_dll),
     (FSSAFE_DLL, FSSAFE_DEPS, _build_fssafe_dll),
+    (ID_DLL, ID_DEPS, _build_id_dll),
 ]
 
 
@@ -3158,6 +3218,12 @@ class MuxLib:
         c.AlxIoPinFake_InitCount.argtypes = [vp]
         c.AlxIoPinFake_DeInitCount.restype = ctypes.c_uint32
         c.AlxIoPinFake_DeInitCount.argtypes = [vp]
+        # P419 reads the overflow flag from the test itself rather than only at teardown, so this
+        # group declares it here as well as in _assert_pins_fitted. It has to be declared BEFORE
+        # the first call: a C bool comes back in AL and ctypes' default int restype reads the whole
+        # register, so an undeclared call answers with whatever the upper bits happened to hold -
+        # found 11.09 as a test that passed or failed depending on where the random order put it.
+        c.AlxIoPinFake_DidOverflow.restype = b
         self._handles: list = []
 
     def new(self, num_of_sel_pins: int = 4, *, init: bool = True) -> int:
@@ -4137,3 +4203,294 @@ def make_store(flash):
     yield _make
     for ctx in ctxs:
         flash.delete(ctx)
+
+
+class IdLib:
+    """ctypes wrapper around alxIdTest.dll: the identity block a product prints at boot.
+
+    The object is 1464 bytes of nested structs and one constructor takes a hardware instance BY
+    VALUE, so nothing here is built from Python - ``alloc`` hands back an opaque handle and the
+    helpers in alxIdTestHelpers.c do the filling. Construction is deliberately two phase: alloc,
+    then fill the arrays the constructor will be given, then a ctor. The arrays are INPUTS and the
+    module reads them at Init, so a test that wants a board the firmware does not know has to be
+    able to say so first.
+
+    The poison byte is passed rather than assumed. 0xFF is the house default and it is what makes a
+    field the constructor forgot readable as garbage instead of as a plausible zero; a test that
+    wants the counterpart passes 0.
+
+    What the DLL was compiled with is read back through ``build``, never restated here -
+    alxBuild_GENERATED.h is rewritten on every firmware build, so a hardcoded hash is a test that
+    goes red on somebody else's commit.
+    """
+
+    POISON = 0xFF
+
+    STR_GETTERS: ClassVar[tuple[str, ...]] = (
+        "FwArtf", "FwName", "FwVerStr", "FwBinStr",
+        "FwBootArtf", "FwBootName", "FwBootVerStr", "FwBootBinStr",
+        "HwPcbArtf", "HwPcbName", "HwPcbVerStr",
+        "HwBomArtf", "HwBomName", "HwBomVerStr", "HwMcuUniqueIdStr",
+    )
+    U8_GETTERS: ClassVar[tuple[str, ...]] = (
+        "FwVerMajor", "FwVerMinor", "FwVerPatch",
+        "FwBootVerMajor", "FwBootVerMinor", "FwBootVerPatch",
+        "HwPcbVerMajor", "HwPcbVerMinor", "HwPcbVerPatch",
+        "HwBomVerMajor", "HwBomVerMinor", "HwBomVerPatch",
+        "HwId",
+    )
+    U32_GETTERS: ClassVar[tuple[str, ...]] = (
+        "FwVerDate", "FwHashShort", "FwBootVerDate", "FwBootHashShort",
+        "HwPcbVerDate", "HwBomVerDate",
+    )
+    U64_GETTERS: ClassVar[tuple[str, ...]] = ("FwVer", "FwBootVer", "HwPcbVer", "HwBomVer")
+    BOOL_GETTERS: ClassVar[tuple[str, ...]] = ("FwIsBootUsed",)
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        vp, u8, u16, u32, u64, b, cp = (ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16,
+                                        ctypes.c_uint32, ctypes.c_uint64, ctypes.c_bool,
+                                        ctypes.c_char_p)
+        c.AlxIdTest_Alloc.restype = vp
+        c.AlxIdTest_Alloc.argtypes = [u8]
+        c.AlxIdTest_Delete.argtypes = [vp]
+        c.AlxIdTest_Pin.restype = vp
+        c.AlxIdTest_Pin.argtypes = [vp, u8]
+        c.AlxIdTest_Instance.restype = vp
+        c.AlxIdTest_Instance.argtypes = [vp]
+        c.AlxIdTest_Known.restype = vp
+        c.AlxIdTest_Known.argtypes = [vp, u8]
+        c.AlxIdTest_SetSupported.argtypes = [vp, u8, u8]
+        c.AlxIdTest_InstanceSetPcb.argtypes = [vp, u8, cp, cp, u8, u8, u8, u32]
+        c.AlxIdTest_InstanceSetBom.argtypes = [vp, cp, cp, u8, u8, u8, u32]
+        c.AlxIdTest_Ctor.argtypes = [vp, cp, cp, u8, u8, u8, b, u32, b, u32, u8, u8, u8, cp]
+        c.AlxIdTest_CtorNoHwId.argtypes = [vp, cp, cp, u8, u8, u8, b, u32, b, u32, cp]
+        for name in ("IsInit", "IsHwIdUsed"):
+            fn = getattr(c, f"AlxIdTest_{name}")
+            fn.restype = b
+            fn.argtypes = [vp]
+        for name in ("IdIoPinState", "CalcHwId"):
+            fn = getattr(c, f"AlxIdTest_{name}")
+            fn.restype = u8
+            fn.argtypes = [vp, u8]
+        for name in ("HiZ", "Hi", "Lo", "Undefined"):
+            getattr(c, f"AlxIdTest_TriState_{name}").restype = u8
+        c.AlxIdTest_FlashAlloc.restype = u32
+        c.AlxIdTest_FlashFree.argtypes = [u32]
+        c.AlxIdTest_FlashFill.argtypes = [u32, u8, u32]
+        c.AlxIdTest_BootBlobWrite.argtypes = [u32, u32, u32, cp, cp, u8, u8, u8, b, u32, u32,
+                                              cp, cp, cp, u32, u16]
+        c.AlxIdTest_BootBlobFillField.restype = b
+        c.AlxIdTest_BootBlobFillField.argtypes = [u32, cp, u8, u32]
+        for name in ("BootBlobLen", "BootBlobMagicNum", "BootBlobVer",
+                     "BuildDate", "BuildNum", "BuildRev", "BuildHashShortUint32", "BuildDateComp"):
+            getattr(c, f"AlxIdTest_{name}").restype = u32
+        for name in ("BuildName", "BuildHash", "BuildHashShort", "CompDate", "CompTime"):
+            getattr(c, f"AlxIdTest_{name}").restype = cp
+        c.AlxId_Init.argtypes = [vp]
+        c.AlxId_Trace.argtypes = [vp]
+        for names, restype in ((self.STR_GETTERS, cp), (self.U8_GETTERS, u8),
+                               (self.U32_GETTERS, u32), (self.U64_GETTERS, u64),
+                               (self.BOOL_GETTERS, b)):
+            for name in names:
+                fn = getattr(c, f"AlxId_Get{name}")
+                fn.restype = restype
+                fn.argtypes = [vp]
+        # The two array variants of the MCU unique id are [out] parameters rather than returns, so
+        # they are declared by hand instead of through the getter tables above.
+        c.AlxId_GetHwMcuUniqueIdUint32.argtypes = [vp, ctypes.POINTER(u32), u8]
+        c.AlxId_GetHwMcuUniqueIdUint8.argtypes = [vp, ctypes.POINTER(u8), u8]
+        c.AlxIoPinFake_SetTriState.argtypes = [vp, ctypes.c_int]
+        for name in ("InitCount", "DeInitCount"):
+            fn = getattr(c, f"AlxIoPinFake_{name}")
+            fn.restype = u32
+            fn.argtypes = [vp]
+
+        self.HI_Z = c.AlxIdTest_TriState_HiZ()
+        self.HI = c.AlxIdTest_TriState_Hi()
+        self.LO = c.AlxIdTest_TriState_Lo()
+        self.UNDEFINED = c.AlxIdTest_TriState_Undefined()
+        self.MAGIC_NUM = c.AlxIdTest_BootBlobMagicNum()
+        self.BOOT_ID_VER = c.AlxIdTest_BootBlobVer()
+        self.BOOT_BLOB_LEN = c.AlxIdTest_BootBlobLen()
+        self._handles: list = []
+        self._pages: list = []
+
+    # -- the object ------------------------------------------------------------
+    def alloc(self, poison: int = POISON) -> int:
+        """An AlxId filled with ``poison`` and nothing else done to it."""
+        handle = self.c.AlxIdTest_Alloc(poison)
+        assert handle, "the identity helper could not allocate"
+        self._handles.append(handle)
+        return handle
+
+    def instance(self, obj: int) -> int:
+        """The hardware instance AlxIdTest_CtorNoHwId will copy - fill it BEFORE the ctor."""
+        return self.c.AlxIdTest_Instance(obj)
+
+    def known(self, obj: int, i: int) -> int:
+        """One entry of the known instance array - fill it any time before Init."""
+        return self.c.AlxIdTest_Known(obj, i)
+
+    def set_supported(self, obj: int, i: int, hw_id: int) -> None:
+        self.c.AlxIdTest_SetSupported(obj, i, hw_id)
+
+    def set_pcb(self, inst: int, *, hw_id: int = 0, artf: str = "PcbArtf", name: str = "PcbName",
+                ver: tuple = (0, 0, 0), date: int = 0) -> None:
+        self.c.AlxIdTest_InstanceSetPcb(inst, hw_id, artf.encode("ascii"), name.encode("ascii"),
+                                        ver[0], ver[1], ver[2], date)
+
+    def set_bom(self, inst: int, *, artf: str = "BomArtf", name: str = "BomName",
+                ver: tuple = (0, 0, 0), date: int = 0) -> None:
+        self.c.AlxIdTest_InstanceSetBom(inst, artf.encode("ascii"), name.encode("ascii"),
+                                        ver[0], ver[1], ver[2], date)
+
+    def ctor(self, obj: int, *, artf: str = "FwArtf", name: str = "FwName",
+             ver: tuple = (0, 0, 0), is_build_job_used: bool = False, date_comp: int = 0,
+             is_boot_used: bool = False, boot_addr: int = 0, known_len: int = 1,
+             supported_len: int = 1, pin_len: int = 2, mcu: str = "McuName") -> None:
+        """The full constructor: the hardware id is read off the pins this object owns."""
+        self.c.AlxIdTest_Ctor(obj, artf.encode("ascii"), name.encode("ascii"),
+                              ver[0], ver[1], ver[2], is_build_job_used, date_comp,
+                              is_boot_used, boot_addr, known_len, supported_len, pin_len,
+                              mcu.encode("ascii"))
+
+    def ctor_no_hw_id(self, obj: int, *, artf: str = "FwArtf", name: str = "FwName",
+                      ver: tuple = (0, 0, 0), is_build_job_used: bool = False, date_comp: int = 0,
+                      is_boot_used: bool = False, boot_addr: int = 0,
+                      mcu: str = "McuName") -> None:
+        """The constructor a board with one hardware variant uses: no pins are read at all."""
+        self.c.AlxIdTest_CtorNoHwId(obj, artf.encode("ascii"), name.encode("ascii"),
+                                    ver[0], ver[1], ver[2], is_build_job_used, date_comp,
+                                    is_boot_used, boot_addr, mcu.encode("ascii"))
+
+    def init(self, obj: int) -> None:
+        self.c.AlxId_Init(obj)
+
+    def trace(self, obj: int) -> None:
+        self.c.AlxId_Trace(obj)
+
+    def is_init(self, obj: int) -> bool:
+        return self.c.AlxIdTest_IsInit(obj)
+
+    def is_hw_id_used(self, obj: int) -> bool:
+        return self.c.AlxIdTest_IsHwIdUsed(obj)
+
+    # -- the getters, under the name they carry in the library ------------------
+    def text(self, obj: int, name: str) -> str:
+        """One of the string getters, e.g. ``text(obj, "FwVerStr")``."""
+        assert name in self.STR_GETTERS, f"not a string getter: {name}"
+        return (getattr(self.c, f"AlxId_Get{name}")(obj) or b"").decode("ascii", "replace")
+
+    def num(self, obj: int, name: str) -> int:
+        """One of the numeric or boolean getters, e.g. ``num(obj, "FwVerMajor")``."""
+        known = self.U8_GETTERS + self.U32_GETTERS + self.U64_GETTERS + self.BOOL_GETTERS
+        assert name in known, f"not a numeric getter: {name}"
+        return getattr(self.c, f"AlxId_Get{name}")(obj)
+
+    def mcu_unique_id(self, obj: int, width: int, length: int) -> list:
+        """One of the two array getters, over a buffer pre-filled with 0xA5 so a no-op is visible.
+
+        They take the caller's buffer as an [out] parameter and a `len` they hand straight to
+        memcpy as a BYTE count, whichever unit their name promises - so the pre-fill is what says
+        whether anything was written at all.
+        """
+        if width == 32:
+            buf32 = (ctypes.c_uint32 * length)(*([0xA5A5A5A5] * length))
+            self.c.AlxId_GetHwMcuUniqueIdUint32(obj, buf32, length)
+            return list(buf32)
+        buf8 = (ctypes.c_uint8 * length)(*([0xA5] * length))
+        self.c.AlxId_GetHwMcuUniqueIdUint8(obj, buf8, length)
+        return list(buf8)
+
+    # -- the identification straps ---------------------------------------------
+    def pin(self, obj: int, i: int) -> int:
+        return self.c.AlxIdTest_Pin(obj, i)
+
+    def strap(self, obj: int, i: int, state: int) -> None:
+        """Tie one identification pin high or low, or leave it floating."""
+        self.c.AlxIoPinFake_SetTriState(self.pin(obj, i), state)
+
+    def pin_state(self, obj: int, i: int) -> int:
+        """What the module recorded for strap ``i`` while it worked out the hardware id."""
+        return self.c.AlxIdTest_IdIoPinState(obj, i)
+
+    def calc_hw_id(self, obj: int, pin_len: int) -> int:
+        """AlxId_CalcHwId on its own, without an Init around it."""
+        return self.c.AlxIdTest_CalcHwId(obj, pin_len)
+
+    def pin_counts(self, obj: int, i: int) -> tuple:
+        """How many times strap ``i`` was initialised and deinitialised."""
+        return (self.c.AlxIoPinFake_InitCount(self.pin(obj, i)),
+                self.c.AlxIoPinFake_DeInitCount(self.pin(obj, i)))
+
+    # -- the bootloader's block, at an address a uint32_t can hold --------------
+    def flash(self) -> int:
+        """A page below 4 GB, because the module casts its uint32_t address straight to void*."""
+        addr = self.c.AlxIdTest_FlashAlloc()
+        assert addr, "the low page the boot id needs is already taken"
+        self._pages.append(addr)
+        return addr
+
+    def flash_fill(self, addr: int, byte: int, length: int | None = None) -> None:
+        """Whole block filled with one byte - 0xFF is a device that was never programmed."""
+        self.c.AlxIdTest_FlashFill(addr, byte, self.BOOT_BLOB_LEN if length is None else length)
+
+    def boot_blob(self, addr: int, *, magic_num: int | None = None, ver: int | None = None,
+                  artf: str = "BootArtf", name: str = "BootName", fw_ver: tuple = (0, 0, 0),
+                  is_build_job_used: bool = False, build_date: int = 0, build_date_comp: int = 0,
+                  build_name: str = "BuildName", hash_: str = "0" * 40, hash_short: str = "0" * 7,
+                  hash_short_uint32: int = 0, crc: int = 0) -> None:
+        """Write a bootloader identity block where the constructor will go looking for one."""
+        self.c.AlxIdTest_BootBlobWrite(
+            addr,
+            self.MAGIC_NUM if magic_num is None else magic_num,
+            self.BOOT_ID_VER if ver is None else ver,
+            artf.encode("ascii"), name.encode("ascii"),
+            fw_ver[0], fw_ver[1], fw_ver[2], is_build_job_used, build_date, build_date_comp,
+            build_name.encode("ascii"), hash_.encode("ascii"), hash_short.encode("ascii"),
+            hash_short_uint32, crc)
+
+    def boot_blob_fill(self, addr: int, field: str, byte: int, length: int) -> None:
+        """Overwrite one named field of the block with a repeated byte and no terminator."""
+        written = self.c.AlxIdTest_BootBlobFillField(addr, field.encode("ascii"), byte, length)
+        assert written, f"the boot id block has no field called {field}"
+
+    # -- what this DLL was compiled with ---------------------------------------
+    def build(self, name: str):
+        """One ALX_BUILD_* macro as the compiler saw it, e.g. ``build("HashShort")``."""
+        value = getattr(self.c, f"AlxIdTest_Build{name}")()
+        return value.decode("ascii") if isinstance(value, bytes) else value
+
+    def comp(self, name: str) -> str:
+        """``__DATE__`` or ``__TIME__`` of this DLL - what ALX_BUILD_DATE_COMP is derived from."""
+        return getattr(self.c, f"AlxIdTest_Comp{name}")().decode("ascii")
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxIdTest_Delete(handle)
+        self._handles.clear()
+        for page in self._pages:
+            self.c.AlxIdTest_FlashFree(page)
+        self._pages.clear()
+
+
+@pytest.fixture(scope="session")
+def id_lib_session() -> IdLib:
+    override = os.environ.get("ALX_ID_TEST_DLL")
+    if override:
+        return IdLib(Path(override))
+    if _needs_build(ID_DLL, ID_DEPS):
+        _build_id_dll()
+    return IdLib(ID_DLL)
+
+
+@pytest.fixture
+def id_lib(id_lib_session) -> IdLib:
+    """The identity library, with every strap back to floating and the last test's page released."""
+    id_lib_session.c.AlxIoPinFake_Reset()
+    yield id_lib_session
+    _assert_pins_fitted(id_lib_session)
+    id_lib_session.free_all()

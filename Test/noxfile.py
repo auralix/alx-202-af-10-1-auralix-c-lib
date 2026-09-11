@@ -86,6 +86,22 @@ MS_STRICT = [CLIB / "alxMemSafe.c", CLIB / "alxCrc.c", CLIB / "alxBound.c", TEST
 MS_DEF = TEST / "alxMemSafeTest.def"
 MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "test_alxParamStore.py"]
 
+# Id group: the real alxId over the IO pin fake, asserts ON = the code as shipped. Both closure
+# sources are closure for reasons written out at conftest's ID group - alxId.c fails -Wformat and
+# -Wint-to-void-pointer-cast, and alxIdTestDateComp.c cannot survive -Werror at all because the
+# library's ALX_BUILD_DATE_COMP overflows an int. KEEP IN SYNC WITH conftest.ID_SOURCES_STRICT/
+# _CLOSURE and with what conftest._assert_defines derives from them.
+#
+# In SANITIZE from the group's first test: the identity block is read out of flash at a fixed
+# 32-bit address through a packed struct, which is exactly the shape UBSan has something to say
+# about. In COVERAGE since the suite arrived (ALX-1553 P468-P505) and gated on FUNCTIONS the way
+# the MemSafe group is, which is what the note here previously said it would take.
+ID_ASSERTS = ["-DALX_ID_ASSERT_RST_ENABLE"]
+ID_CLOSURE = [CLIB / "alxId.c", TEST / "alxIdTestDateComp.c"]
+ID_STRICT = [TEST / "alxIdTestHelpers.c", TEST / "alxIoPinFake.c", TEST / "alxAssertPc.c"]
+ID_DEF = TEST / "alxIdTest.def"
+ID_TESTS = ["test_alxId.py"]
+
 UBSAN = list(hb.UBSAN)                 # the instrumented variants are the library's flag sets: one
 ASAN_UBSAN = list(hb.ASAN_UBSAN)       # definition for every C repository, not a copy per noxfile
 PROFILE = list(hb.PROFILE)
@@ -256,6 +272,11 @@ def sanitize(session: nox.Session) -> None:
     _dll(session, ubsan / "alxMemSafeTest.dll", MS_STRICT, MS_DEF, UBSAN,
          ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
     _pytest(session, {"ALX_MEMSAFE_TEST_DLL": str(ubsan / "alxMemSafeTest.dll")}, *MS_TESTS)
+    session.log("Stage 2d: UBSan Id DLL, Id suite")
+    objs = _closure_objects(session, ubsan / "idClosure", ID_CLOSURE, ID_ASSERTS, UBSAN)
+    _dll(session, ubsan / "alxIdTest.dll", ID_STRICT, ID_DEF, UBSAN,
+         ["-D_CRT_SECURE_NO_WARNINGS", *ID_ASSERTS], objs)
+    _pytest(session, {"ALX_ID_TEST_DLL": str(ubsan / "alxIdTest.dll")}, *ID_TESTS)
     session.log("SANITIZE CLEAN")
 
 
@@ -300,6 +321,18 @@ def coverage(session: nox.Session) -> None:
          ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
     _llvm_cov_group(session, ms, ms / "alxMemSafeTest.dll", "ALX_MEMSAFE_TEST_DLL", MS_TESTS,
                     "functions", ["alxCrc.c", "alxMemSafe.c"])
+    # Id group: gate = functions 100 %; lines and branches are REPORTED and not gated, on purpose.
+    # alxId.c carries whole paragraphs behind #ifdef ALX_STM32 / ALX_GCC / ALX_CMSIS_CORE that a PC
+    # build cannot reach at all, so a line gate here would be a number picked to fit rather than a
+    # claim about the tests. Every function the module defines IS reached (measured 46 of 46,
+    # 94.6 % of lines), which is the claim worth gating: a getter added and never called, or one
+    # dropped from alxIdTest.def and so from every test, fails this lane.
+    idg = lanes.evidence_dir(TEST, "coverage", "id")
+    id_objs = _closure_objects(session, idg / "closure", ID_CLOSURE, ID_ASSERTS, PROFILE)
+    _dll(session, idg / "alxIdTest.dll", ID_STRICT, ID_DEF, PROFILE,
+         ["-D_CRT_SECURE_NO_WARNINGS", *ID_ASSERTS], id_objs)
+    _llvm_cov_group(session, idg, idg / "alxIdTest.dll", "ALX_ID_TEST_DLL", ID_TESTS,
+                    "functions", ["alxId.c"])
     session.log("COVERAGE GATES PASS")
 
 

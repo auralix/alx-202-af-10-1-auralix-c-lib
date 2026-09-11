@@ -88,6 +88,11 @@ A missing tool fails its lane, never skips it.
 	  builds it (ALX_INA238), for the conversion factors a board's accuracy rests on
 	- `alxPi4ioe5v6534qTest` - the 40-channel IO expander over the same faked bus and a faked
 	  pin: the (port, pin) to bit mapping, exhaustively, and the shape of its two transfers
+	- `alxIdTest` - the identity block a product prints at boot: firmware name, version, build
+	  date and hash, the bootloader's own copy read out of flash, and the board identification
+	  straps, over the IO pin fake. CLOSURE, for six `%lu` given a `uint32_t` and a `uint32_t`
+	  cast to `void*` (TODO A18); the compile-stamp accessors are a second closure file because
+	  the library's `ALX_BUILD_DATE_COMP` overflows an `int`
 - There is no lane-side folder of its own any more. Everything a second C repository would need identically comes
   from the Python lib and is called as a command or imported: the gates (`python -m alx.verify.<gate>`), the host
   toolchain and DLL build mechanics (`alx.c_lib.host_build`) and the C mutation hooks
@@ -257,8 +262,10 @@ A missing tool fails its lane, never skips it.
   at an instrumented DLL -> `ALX_FIFO_TEST_DLL`.
 - Coverage: clang `-fprofile-instr-generate -fcoverage-mapping` + llvm-cov;
   gate = 100 % lines/branches/regions/functions on gated files (`alx.verify.coverage_gate` over
-  `summary.json`, `--metrics lines,branches,regions,functions`). A gated file with assert-guarded
-  unreachable code is gated on functions only (`--metrics functions`); lines/branches are reported.
+  `summary.json`, `--metrics lines,branches,regions,functions`). A gated file with unreachable code -
+  assert-guarded blocks (`alxMemSafe.c`, `alxCrc.c`) or whole paragraphs behind a platform `#ifdef`
+  a PC build does not define (`alxId.c`: `ALX_STM32`, `ALX_GCC`, `ALX_CMSIS_CORE`) - is gated on
+  functions only (`--metrics functions`); lines/branches are reported.
   A metric with nothing to cover counts as 100 % (llvm prints 0 %).
 - Sanitizers: native ASan+UBSan smoke exe + one UBSan DLL per test group under its suite.
   UBSAN_OPTIONS: keep `log_path` relative - a drive-letter colon splits the option list.
