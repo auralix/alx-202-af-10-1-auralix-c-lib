@@ -1,16 +1,17 @@
-"""ALX-1553 - alxRange and alxFtoa PC unit tests (Tier 1: pure functions, no context, no device).
+"""ALX-1553 - alxRange PC unit tests (Tier 1: pure functions, no context, no device).
 
-Two small modules that the parameter path leans on and that nothing tested.
+A small module that the parameter path leans on and that nothing tested.
 
 AlxRange_Check<Type>(val, valMin, valMax) is THE bound check. test_alxParamItem P71 showed from
 above that it works, and that the defects there sit in the conversion in front of it; these tests
 say the same thing from below, per type and at the edges, so a future change to the check cannot
 hide behind the conversion's behaviour.
 
-AlxFtoa(f, buf, precision) is how a float becomes text - the number a `get-param` shows for every
-float parameter on every device built on this library.
+`alxFtoa` was tested here too, the two being the small pure things that path leans on. Those tests
+now live in `test_alxFtoa.py`, so each module has the mirror file the README asks for; P78 moved
+unchanged, and a second pass over the module added five more proofs and two sealed defects.
 
-Test group P75-P78 = ALX-1553 range and float-format proofs.
+Test group P75-P77 = ALX-1553 range proofs.
 """
 
 import pytest
@@ -107,40 +108,3 @@ def test_ALX1553_P77_a_string_is_checked_against_its_buffer(memsafe_lib):
     assert memsafe_lib.range_check_str("abcdefg", 8) == memsafe_lib.OK, "7 characters plus the null"
     assert memsafe_lib.range_check_str("abcdefgh", 8) != memsafe_lib.OK, "8 characters need 9 bytes"
     assert memsafe_lib.range_check_str("abcdefghijk", 8) != memsafe_lib.OK
-
-
-# =====================================================================
-# P78 - a float becomes text
-# =====================================================================
-
-
-@pytest.mark.parametrize(
-    ("value", "precision", "expected"),
-    [
-        (0.0, 2, "0.00"),
-        (1.5, 2, "1.50"),
-        (-1.5, 2, "-1.50"),
-        (12.25, 2, "12.25"),
-        (-12.25, 2, "-12.25"),
-        (100.0, 0, "100"),
-        (3.14159, 4, "3.1416"),
-        (-3.14159, 4, "-3.1416"),
-    ],
-)
-def test_ALX1553_P78_a_float_is_formatted_at_the_requested_precision(
-    memsafe_lib, value, precision, expected
-):
-    """What a get-param shows for a float parameter, negatives included."""
-    assert memsafe_lib.ftoa(value, precision) == expected
-
-
-def test_ALX1553_P78_the_sign_survives_a_value_that_rounds_to_zero(memsafe_lib):
-    """CHARACTERIZATION: a small negative at low precision.
-
-    -0.001 at two decimals is zero to the precision asked for. Whether that prints as "0.00" or
-    "-0.00" is not specified anywhere, and both are defensible; what matters is that it is stable,
-    because it appears in a client-visible JSON response. Recorded here as whatever it is.
-    """
-    text = memsafe_lib.ftoa(-0.001, 2)
-    assert text in ("0.00", "-0.00"), f"unexpected formatting {text!r}"
-    assert memsafe_lib.ftoa(-0.001, 2) == text, "and it is at least stable"

@@ -28,10 +28,13 @@ A missing tool fails its lane, never skips it.
 	- `alxFifoTest` - the FIFO and the bounds helper it uses
 	- `alxCliTest` - the CLI over a faked serial port and KV store
 	- `alxMemSafeTest` - the safe-store chain (CRC, MemSafe, ParamGroup, ParamStore) over a faked raw
-	  memory, and the parameter item's string format conversion
+	  memory, the parameter item's string format conversion, the bound check every parameter
+	  passes, and the float-to-text the command line answers with. Seven modules, seven test
+	  files - `test_alxRange.py` and `test_alxFtoa.py` among them
 	- `alxVdivTest` - a resistive divider's arithmetic; the smallest group here and the shape a pure
 	  module should copy
-	- `alxTimSwTest` - the software timer over the real tick counter, with the interrupt lock faked
+	- `alxTimSwTest` - the software timer over the real tick counter, with the interrupt lock
+	  faked. Two modules, two test files: the timer and the clock it is measured against
 	- `alxCanParserTest` - the CAN payload codec: twenty-four typed accessors over eight bytes,
 	  built with the module's asserts off, which is the default a product ships
 	- `alxFiltGlitchTest` - both glitch filters over the real software timer and tick, with only

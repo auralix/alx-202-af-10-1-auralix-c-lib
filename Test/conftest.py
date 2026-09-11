@@ -1431,6 +1431,8 @@ class TimSwLib:
 
     TIMSW_SIZE = 32          # sizeof(AlxTimSw): uint64 + two bools, generously padded
 
+    TICK_UNITS = ("ns", "us", "ms", "sec", "min", "hr")
+
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
         self.c = c
@@ -1448,9 +1450,12 @@ class TimSwLib:
             timeout.restype = b
             timeout.argtypes = [vp, u64]
         c.AlxTick_Ctor.argtypes = [vp]
-        c.AlxTick_Get_ns.restype = u64
-        c.AlxTick_Get_ns.argtypes = [vp]
-        c.AlxTick_IncRange_ns.argtypes = [vp, u64]
+        for unit in self.TICK_UNITS:
+            getter = getattr(c, f"AlxTick_Get_{unit}")
+            getter.restype = u64
+            getter.argtypes = [vp]
+            getattr(c, f"AlxTick_Inc_{unit}").argtypes = [vp]
+            getattr(c, f"AlxTick_IncRange_{unit}").argtypes = [vp, u64]
         # the library's own global tick instance, reached as data rather than rebuilt here
         self.tick = ctypes.addressof(ctypes.c_uint8.in_dll(c, "alxTick"))
         for name in ("LockCount", "UnlockCount"):
@@ -1473,6 +1478,18 @@ class TimSwLib:
 
     def now_ns(self) -> int:
         return self.c.AlxTick_Get_ns(self.tick)
+
+    def now(self, unit: str) -> int:
+        """The clock in whichever of the six units the module offers."""
+        return getattr(self.c, f"AlxTick_Get_{unit}")(self.tick)
+
+    def tick_inc(self, unit: str) -> None:
+        """One step of one unit - what an interrupt does on the target."""
+        getattr(self.c, f"AlxTick_Inc_{unit}")(self.tick)
+
+    def tick_inc_range(self, unit: str, count: int) -> None:
+        """Many steps at once, for a loop that was away longer than one."""
+        getattr(self.c, f"AlxTick_IncRange_{unit}")(self.tick, count)
 
     # -- one timer ------------------------------------------------------------
     def timer(self):

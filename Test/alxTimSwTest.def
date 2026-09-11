@@ -19,8 +19,23 @@ EXPORTS
 	alxTick DATA
 	AlxTick_Ctor
 	AlxTick_Get_ns
+	AlxTick_Get_us
 	AlxTick_Get_ms
+	AlxTick_Get_sec
+	AlxTick_Get_min
+	AlxTick_Get_hr
+	AlxTick_Inc_ns
+	AlxTick_Inc_us
+	AlxTick_Inc_ms
+	AlxTick_Inc_sec
+	AlxTick_Inc_min
+	AlxTick_Inc_hr
 	AlxTick_IncRange_ns
+	AlxTick_IncRange_us
+	AlxTick_IncRange_ms
+	AlxTick_IncRange_sec
+	AlxTick_IncRange_min
+	AlxTick_IncRange_hr
 	AlxIrqFake_Reset
 	AlxIrqFake_LockCount
 	AlxIrqFake_UnlockCount

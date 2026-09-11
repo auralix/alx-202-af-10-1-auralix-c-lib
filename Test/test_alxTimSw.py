@@ -10,10 +10,11 @@ the bench can measure that a 500 ms cadence is 500.0 ms, but only this can say t
 itself is at 500 and not at 499 or 501.
 
 The interrupt lock IS faked, because the real one is CMSIS intrinsics that do not exist on a PC.
-The fake counts, so P88 can assert that the timer takes the lock around the shared 64 bit tick
-rather than assuming it.
+The fake counts, so a test can assert that the timer takes the lock around the shared 64 bit tick
+rather than assuming it - that proof is P88, and it moved to `test_alxTick.py` with the rest of the
+clock's own tests, so each module has the mirror file the README asks for.
 
-Test group P84-P88 = ALX-1553 software timer proofs.
+Test group P84-P87 = ALX-1553 software timer proofs.
 """
 
 import pytest
@@ -172,26 +173,3 @@ def test_ALX1553_P87_a_late_loop_does_not_lose_the_period(clock):
     assert clock.is_timeout(tim, "ms", 500) is True
     clock.start(tim)
     assert clock.is_timeout(tim, "ms", 500) is False, "the restart clears it"
-
-
-# =====================================================================
-# P88 - the shared 64 bit tick is read under the lock
-# =====================================================================
-
-
-def test_ALX1553_P88_reading_the_tick_takes_the_interrupt_lock(clock):
-    """A 64 bit counter cannot be read atomically on a 32 bit core, so the read must be guarded.
-
-    Asserted rather than assumed: the fake counts, and every lock is matched by an unlock, so a
-    path that returned early while holding it would show up as a depth that never comes back to
-    zero.
-    """
-    tim = clock.timer()
-    before = clock.lock_count()
-    clock.start(tim)
-    clock.advance_ms(10)
-    clock.get(tim, "ms")
-    clock.is_timeout(tim, "ms", 5)
-    assert clock.lock_count() > before, "the tick was read without taking the lock"
-    assert clock.lock_count() == clock.unlock_count(), "a lock was taken and not released"
-    assert clock.lock_depth_max() == 1, "the lock is not taken recursively"
