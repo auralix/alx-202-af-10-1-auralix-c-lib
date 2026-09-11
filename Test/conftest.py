@@ -1015,8 +1015,24 @@ def _build_dll(strict, closure, defines, dll: Path, def_file: Path, obj_dir_name
     )
 
 
+def _fifo_variant_dll(variant: str) -> Path:
+    """One FIFO DLL per named configuration.
+
+    `default` keeps the unsuffixed name, so the sanitizer and coverage lanes - which select a DLL
+    through ALX_FIFO_TEST_DLL - carry on without having to learn about variants.
+    """
+    return FIFO_DLL if variant == DEFAULT_VARIANT else BUILD_DIR / f"alxFifoTest_{variant}.dll"
+
+
+def _build_fifo_variant_dll(variant: str) -> None:
+    _build_dll(FIFO_SOURCES, (), _variant_defines(variant, FIFO_SOURCES),
+               _fifo_variant_dll(variant), TEST_DIR / "alxFifoTest.def", None)
+
+
 def _build_fifo_dll() -> None:
-    _build_dll(FIFO_SOURCES, (), _assert_defines(FIFO_SOURCES), FIFO_DLL, TEST_DIR / "alxFifoTest.def", None)
+    # The default group IS the `default` variant now. It used to be _assert_defines() alone, which
+    # is assert-RST with no traces and ALX_TRACE_LEVEL_OFF - a combination no product ships.
+    _build_fifo_variant_dll(DEFAULT_VARIANT)
 
 
 def _build_cli_dll() -> None:
@@ -1249,6 +1265,69 @@ def _assert_defines(*source_lists) -> list[str]:
                 macros.add(macro)
     return [f"-D{m}" for m in sorted(macros)]
 
+# ------------------------------------------------------ build variants ---------------------------
+# A module's behaviour is not one thing. alxFifo alone has three assert forms plus none, times its
+# own trace on or off, times the global ALX_TRACE_LEVEL - eight compiled behaviours from one source
+# file, across 12 assert sites. Until 11.09 this suite built exactly ONE of them, did not say which,
+# and it was not a combination any product ships: assert-RST like the shipped configuration, but
+# ALX_TRACE_LEVEL_OFF, which compiles all 558 of the library's trace call sites away AND DISCARDS
+# their arguments.
+#
+# These four are the standard set. Each earns its place by reaching something none of the others do:
+#
+#   default       what customers get - alxConfig_TEMPLATE.h's own combination. Must always be green.
+#   off           the elision configuration. No assert macro and no traces, so both collapse to
+#                 do{} while(false) and discard their expressions - the shape of the biggest defect
+#                 ALX-1553 found (NotesClaude 3g), pinned here so it cannot come back unnoticed.
+#   debug         the only variant that COMPILES the DBG and VRB call sites, so a wrong format
+#                 string or argument count in one of them is visible at all.
+#   assert_trace  the only form where a failed assertion CONTINUES into the code after the check.
+#                 RST resets and BKPT halts; this one carries on with the precondition violated.
+#
+# BKPT is safe in a DLL because alxAssertPc.c defines all three handlers strongly - it records where
+# the target would break. Without that, `debug` would take the test runner down with it.
+VARIANTS: dict[str, tuple[str | None, bool, str]] = {
+    #                assert form   module trace   ALX_TRACE_LEVEL
+    "default":      ("RST",        True,          "ALX_TRACE_LEVEL_INF"),
+    "off":          (None,         False,         "ALX_TRACE_LEVEL_OFF"),
+    "debug":        ("BKPT",       True,          "ALX_TRACE_LEVEL_VRB"),
+    "assert_trace": ("TRACE",      True,          "ALX_TRACE_LEVEL_INF"),
+}
+DEFAULT_VARIANT = "default"
+
+
+def _module_macro_prefix(header: Path) -> str | None:
+    """A module's own ALX_<MODULE> macro prefix, read out of its header, or None if it declares no
+    assertions. The header is the only place that knows it - deriving it from the file name would
+    be a second spelling to keep in step."""
+    try:
+        found = _ASSERT_MACRO_RE.search(header.read_text(encoding="utf-8", errors="replace"))
+    except OSError:
+        return None
+    return found.group(1) if found else None
+
+
+def _variant_defines(variant: str, *source_lists) -> list[str]:
+    """-D flags putting every LIBRARY module a group compiles into one named configuration.
+
+    Test helpers and fakes are skipped, as in _assert_defines: they have no assertions or traces of
+    their own, and alxAssertPc.c is where the enabled ones land.
+    """
+    form, module_trace, level = VARIANTS[variant]
+    macros = {f"ALX_TRACE_LEVEL={level}"}
+    for sources in source_lists:
+        for source in sources:
+            if TEST_DIR in source.parents:
+                continue
+            prefix = _module_macro_prefix(source.with_suffix(".h"))
+            if prefix is None:
+                continue
+            if form is not None:
+                macros.add(f"{prefix}_ASSERT_{form}_ENABLE")
+            if module_trace:
+                macros.add(f"{prefix}_TRACE_ENABLE")
+    return [f"-D{m}" for m in sorted(macros)]
+
 
 # ---------------------------------------------- the library's own assertions -----
 # A module built with no ALX_<MODULE>_ASSERT_*_ENABLE macro compiles its assertions down to
@@ -1303,6 +1382,7 @@ class Lib:
     def __init__(self, dll_path: Path):
         self.c = ctypes.CDLL(str(dll_path))
         c = self.c
+        _register_lib(c)
         c.AlxFifoTest_New.restype = ctypes.c_void_p
         c.AlxFifoTest_New.argtypes = [ctypes.c_uint32]
         c.AlxFifoTest_Delete.argtypes = [ctypes.c_void_p]
@@ -1756,6 +1836,22 @@ def lib() -> Lib:
     if _needs_build(FIFO_DLL, FIFO_DEPS):
         _build_fifo_dll()
     return Lib(FIFO_DLL)
+
+
+@pytest.fixture(scope="session", params=sorted(VARIANTS))
+def variant_lib(request) -> tuple[str, Lib]:
+    """The FIFO group built in ONE named configuration - what a variant test asks for.
+
+    Session-scoped and parametrized, so every DLL is built once and a plain `pytest` run covers all
+    four configurations for the behaviour that differs between them. The rest of the suite stays on
+    `default`: a FIFO write and read behave identically in all four, and running 1400 tests four
+    times would cost four times the wall clock to learn nothing.
+    """
+    variant = request.param
+    dll = _fifo_variant_dll(variant)
+    if _needs_build(dll, FIFO_DEPS):
+        _build_fifo_variant_dll(variant)
+    return variant, Lib(dll)
 
 
 @pytest.fixture(scope="session")

@@ -25,9 +25,17 @@
 #define ALX_C_LIB
 
 //******************************************************************************
-// Trace - OFF for PC unit tests (module contracts, not logging, are under test)
+// Trace - OFF unless a build variant says otherwise
+//
+// A DLL built for a named variant passes -DALX_TRACE_LEVEL=... on the command line, so the guard
+// is what lets one header serve every variant. OFF stays the default because most groups test
+// module contracts rather than logging - but OFF is not what a product ships, and it compiles
+// every ALX_TRACE_* call away while DISCARDING its arguments, so the `debug` variant exists to
+// compile them for real.
 //******************************************************************************
-#define ALX_TRACE_LEVEL ALX_TRACE_LEVEL_OFF
+#ifndef ALX_TRACE_LEVEL
+	#define ALX_TRACE_LEVEL ALX_TRACE_LEVEL_OFF
+#endif
 
 //******************************************************************************
 // CMSIS shims - on the MCU these come from core headers; on PC the test

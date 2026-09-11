@@ -402,8 +402,18 @@ def test_ALX1514_P8_partial_read_current_contract_pinned(lib, make_fifo):
     assert lib.entries(f) == 0
 
 
+@pytest.mark.expect_assert(
+    "a write LONGER than the buffer breaks AlxFifo_Write's own len <= buffLen precondition - "
+    "so this contract is only reachable on a board built with assertions off (P531)")
 def test_ALX1514_P8_partial_write_current_contract_pinned(lib, make_fifo):
     # D4/D5 accepted as-is: write commits until full, returns ErrFull.
+    #
+    # 11.09: the FIFO DLL was brought under conftest._no_library_assertions and this was the one
+    # test in the group that had been tripping a library assertion unseen. 6 > buffLen, so
+    # ALX_FIFO_ASSERT(0 < len && len <= me->buffLen) fails before any of this runs. It is still
+    # worth pinning - it is what an assertions-off build does - but it is not the partial-write
+    # contract a shipped board reaches. That one is a write that FITS and finds the FIFO full, and
+    # it is pinned without violating anything by P525.
     f = make_fifo(4)
     assert lib.write(f, b"abcdef") == lib.ERR_FULL
     assert lib.entries(f) == 4
