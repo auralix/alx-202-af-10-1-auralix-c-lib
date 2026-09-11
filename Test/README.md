@@ -43,6 +43,8 @@ A missing tool fails its lane, never skips it.
 	- `alxLinFunTest` - the x-to-y mappings: a line through two points, in float and in
 	  integer, a lookup table interpolated between its points, and the audio volume that is
 	  built on the line - percent to decibels to an amplitude factor. Three test files
+	- `alxRotSwTest` - the rotary switch: a few IO pins read together and composed into a
+	  number, over the library's own IO pin fake
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real
 	  software timers: twenty-one queries and latches about one input
 	- `alxRtcTest` - the calendar: Unix time to a broken-down date and back, in four

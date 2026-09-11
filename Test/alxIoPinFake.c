@@ -40,6 +40,7 @@ static uint32_t alxIoPinFake_writeCount[ALX_IO_PIN_FAKE_NUM_OF_PINS];
 //******************************************************************************
 void AlxIoPinFake_Reset(void);
 bool AlxIoPinFake_Level(const AlxIoPin* me);
+void AlxIoPinFake_SetLevel(const AlxIoPin* me, bool val);
 uint32_t AlxIoPinFake_InitCount(const AlxIoPin* me);
 uint32_t AlxIoPinFake_DeInitCount(const AlxIoPin* me);
 uint32_t AlxIoPinFake_WriteCount(const AlxIoPin* me);
@@ -84,6 +85,13 @@ bool AlxIoPinFake_Level(const AlxIoPin* me)
 {
 	return alxIoPinFake_level[AlxIoPinFake_Slot(me)];
 }
+void AlxIoPinFake_SetLevel(const AlxIoPin* me, bool val)
+{
+	// What a test uses to drive an INPUT. The module under test reads it with AlxIoPin_Read and
+	// cannot tell this from the pin being pulled by something outside the board - which is the
+	// whole point of reading an input.
+	alxIoPinFake_level[AlxIoPinFake_Slot(me)] = val;
+}
 uint32_t AlxIoPinFake_InitCount(const AlxIoPin* me)
 {
 	return alxIoPinFake_initCount[AlxIoPinFake_Slot(me)];
@@ -120,4 +128,10 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	uint32_t slot = AlxIoPinFake_Slot(me);
 	alxIoPinFake_level[slot] = false;
 	alxIoPinFake_writeCount[slot]++;
+}
+bool AlxIoPin_Read(AlxIoPin* me)
+{
+	// An input reads whatever is on it: what a test drove with AlxIoPinFake_SetLevel, or what the
+	// module itself last wrote. The fake keeps one level per pin and does not care which it was.
+	return alxIoPinFake_level[AlxIoPinFake_Slot(me)];
 }

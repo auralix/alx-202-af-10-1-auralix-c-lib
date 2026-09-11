@@ -1,0 +1,17 @@
+LIBRARY alxRotSwTest
+EXPORTS
+	AlxRotSwTest_New
+	AlxRotSwTest_Delete
+	AlxRotSwTest_RotSw
+	AlxRotSwTest_Pin
+	AlxRotSwTest_CodeType_Real
+	AlxRotSwTest_CodeType_Complement
+	AlxRotSwTest_CodeType_Gray
+	AlxRotSw_Init
+	AlxRotSw_DeInit
+	AlxRotSw_GetCode
+	AlxIoPinFake_Reset
+	AlxIoPinFake_Level
+	AlxIoPinFake_SetLevel
+	AlxIoPinFake_InitCount
+	AlxIoPinFake_DeInitCount

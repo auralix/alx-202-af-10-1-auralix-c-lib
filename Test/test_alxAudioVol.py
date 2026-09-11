@@ -64,7 +64,7 @@ def test_ALX1553_P236_zero_decibels_passes_a_sample_through_unchanged(vol):
     (-40.0, 0.01),
     (-60.0, 0.001),
 ])
-def test_ALX1553_P237_the_factor_is_the_amplitude_ratio(vol, vol_dB, factor):
+def test_ALX1553_P237_the_factor_is_the_amplitude_ratio(vol, vol_dB, factor):  # noqa: N803 - the unit belongs in the name
     """The gain is 10^(dB/20) - the AMPLITUDE ratio, not the power ratio.
 
     The difference is not academic: at -20 dB the amplitude formula gives 0.1 and the power formula

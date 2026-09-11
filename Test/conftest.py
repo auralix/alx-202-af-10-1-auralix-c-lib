@@ -279,6 +279,29 @@ LINFUN_DEPS = [
 LINFUN_DLL = BUILD_DIR / "alxLinFunTest.dll"
 
 
+
+# ------------------------------------------------- Rotary switch module ---
+# Tier-2 target: the REAL rotary switch over faked IO pins. The module is a
+# handful of pins read together and composed into a number, which is the kind
+# of thing that is either right or off by a power of two.
+ROTSW_SOURCES = [
+    CLIB_DIR / "alxRotSw.c",
+    TEST_DIR / "alxIoPinFake.c",
+    TEST_DIR / "alxRotSwTestHelpers.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+ROTSW_DEPS = [
+    *ROTSW_SOURCES,
+    CLIB_DIR / "alxRotSw.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxRotSwTest.def",
+    Path(__file__),
+]
+ROTSW_DLL = BUILD_DIR / "alxRotSwTest.dll"
+
 # ------------------------------------------------------ Bool module -------
 # Tier-2 target: the library's boolean-with-memory, over the REAL glitch filter,
 # software timer and tick, with only the interrupt lock faked. Twenty-one query
@@ -537,6 +560,10 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_rotsw_dll() -> None:
+    _build_dll(ROTSW_SOURCES, (), (), ROTSW_DLL, TEST_DIR / "alxRotSwTest.def", None)
+
+
 def _build_linfun_dll() -> None:
     _build_dll(LINFUN_SOURCES, (), (), LINFUN_DLL, TEST_DIR / "alxLinFunTest.def", None)
 
@@ -586,6 +613,7 @@ DLL_GROUPS = [
     (PARAMMGMT_DLL, PARAMMGMT_DEPS, _build_parammgmt_dll),
     (INA228_DLL, INA228_DEPS, _build_ina228_dll),
     (PI4IOE_DLL, PI4IOE_DEPS, _build_pi4ioe_dll),
+    (ROTSW_DLL, ROTSW_DEPS, _build_rotsw_dll),
 ]
 
 
@@ -2225,6 +2253,76 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class RotSwLib:
+    """ctypes wrapper around alxRotSwTest.dll: a rotary switch read through faked IO pins.
+
+    The helper owns the pins and the array the module keeps a pointer to, so a test asks for pin
+    `i` and drives it; nothing here mirrors a struct.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, u8, u32, i32, b = (ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint32,
+                               ctypes.c_int32, ctypes.c_bool)
+        c.AlxRotSwTest_New.restype = vp
+        c.AlxRotSwTest_New.argtypes = [u8, i32]
+        c.AlxRotSwTest_Delete.argtypes = [vp]
+        c.AlxRotSwTest_RotSw.restype = vp
+        c.AlxRotSwTest_RotSw.argtypes = [vp]
+        c.AlxRotSwTest_Pin.restype = vp
+        c.AlxRotSwTest_Pin.argtypes = [vp, u8]
+        for name in ("Real", "Complement", "Gray"):
+            getattr(c, f"AlxRotSwTest_CodeType_{name}").restype = i32
+        c.AlxRotSw_Init.argtypes = [vp]
+        c.AlxRotSw_DeInit.argtypes = [vp]
+        c.AlxRotSw_GetCode.restype = u32
+        c.AlxRotSw_GetCode.argtypes = [vp]
+        c.AlxIoPinFake_SetLevel.argtypes = [vp, b]
+        c.AlxIoPinFake_InitCount.restype = u32
+        c.AlxIoPinFake_InitCount.argtypes = [vp]
+        self.REAL = c.AlxRotSwTest_CodeType_Real()
+        self.COMPLEMENT = c.AlxRotSwTest_CodeType_Complement()
+        self.GRAY = c.AlxRotSwTest_CodeType_Gray()
+        self._handles: list = []
+
+    def new(self, num_of_pins: int, code_type: int | None = None):
+        """A switch with `num_of_pins` pins; released when the test ends."""
+        handle = self.c.AlxRotSwTest_New(num_of_pins,
+                                         self.REAL if code_type is None else code_type)
+        assert handle, "AlxRotSwTest_New returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def rotsw(self, obj):
+        return self.c.AlxRotSwTest_RotSw(obj)
+
+    def pin(self, obj, index: int):
+        return self.c.AlxRotSwTest_Pin(obj, index)
+
+    def set_pins(self, obj, code: int, num_of_pins: int) -> None:
+        """Drive the pins so that they spell `code` in binary, pin i being bit i."""
+        for i in range(num_of_pins):
+            self.c.AlxIoPinFake_SetLevel(self.pin(obj, i), bool(code >> i & 1))
+
+    def init(self, obj) -> None:
+        self.c.AlxRotSw_Init(self.rotsw(obj))
+
+    def deinit(self, obj) -> None:
+        self.c.AlxRotSw_DeInit(self.rotsw(obj))
+
+    def code(self, obj) -> int:
+        return self.c.AlxRotSw_GetCode(self.rotsw(obj))
+
+    def init_count(self, obj, index: int) -> int:
+        return self.c.AlxIoPinFake_InitCount(self.pin(obj, index))
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxRotSwTest_Delete(handle)
+        self._handles.clear()
+
+
 class AudioVolLib:
     """ctypes wrapper around the mapping DLL's audio volume: percent to decibels to a factor.
 
@@ -2260,7 +2358,7 @@ class AudioVolLib:
     def set_pct(self, obj, vol_pct: float) -> None:
         self.c.AlxAudioVol_Set_pct(obj, vol_pct)
 
-    def set_dB(self, obj, vol_dB: float) -> None:  # noqa: N802, N803 - the unit belongs in the name
+    def set_dB(self, obj, vol_dB: float) -> None:  # noqa: N803 - the unit belongs in the name
         self.c.AlxAudioVol_Set_dB(obj, vol_dB)
 
     def pct_max(self, obj) -> float:
@@ -2281,6 +2379,24 @@ def lin_fun_lib_session() -> LinFunLib:
     if _needs_build(LINFUN_DLL, LINFUN_DEPS):
         _build_linfun_dll()
     return LinFunLib(LINFUN_DLL)
+
+
+@pytest.fixture(scope="session")
+def rot_sw_lib_session() -> RotSwLib:
+    override = os.environ.get("ALX_ROTSW_TEST_DLL")
+    if override:
+        return RotSwLib(Path(override))
+    if _needs_build(ROTSW_DLL, ROTSW_DEPS):
+        _build_rotsw_dll()
+    return RotSwLib(ROTSW_DLL)
+
+
+@pytest.fixture
+def rot_sw_lib(rot_sw_lib_session) -> RotSwLib:
+    """The rotary switch, with every pin back at zero and nothing left from the last test."""
+    rot_sw_lib_session.c.AlxIoPinFake_Reset()
+    yield rot_sw_lib_session
+    rot_sw_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")
