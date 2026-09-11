@@ -310,7 +310,11 @@ extern "C" {
 #endif
 
 #if defined(_MSC_VER)
-	#define ALX_WEAK
+	#if defined(__clang__)
+		#define ALX_WEAK __attribute__ ((weak))	// clang emits a real weak symbol on COFF, MSVC itself has none
+	#else
+		#define ALX_WEAK
+	#endif
 	#define ALX_BKPT() __debugbreak()
 #endif
 

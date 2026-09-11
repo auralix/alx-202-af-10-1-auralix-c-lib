@@ -264,11 +264,15 @@ sources (-w) + fakes.
 Two limits found by running into them. Both are properties of the HOST, not of the library, and both
 are recorded in the test that met them rather than worked around silently.
 
-- **A product's override of an `ALX_WEAK` function cannot be linked here.** The target links ELF,
-  where a strong definition displaces a weak one; the host links COFF through `lld-link`, which
-  reports a duplicate symbol instead. So a group that wants to exercise a library module together
-  with the product hook it calls has to do without the hook - the library's own weak default runs.
-  `alxIna228Test` is built that way, and says so.
+- **A product's override of an `ALX_WEAK` function links here as it does on the target** - since
+  11.09. It did not before, and the reason was not the object format: `lld-link` honours a weak
+  COFF symbol and lets a strong definition displace it, measured with a three-object program.
+  `alxGlobal.h` defined `ALX_WEAK` as NOTHING under `_MSC_VER`, so the library's default was a
+  strong definition and the second one was a duplicate. clang targeting MSVC does support the
+  attribute, so the header now emits it when both `_MSC_VER` and `__clang__` are defined and leaves
+  real MSVC alone. A group may now link a library module together with the product hook it calls.
+  `alxIna228Test` still runs the library's own default, because nothing in this repository
+  overrides it.
 - **A register overlay that mixes bit-field types is not the same size here as on the target.** The
   GNU rules pack `int8_t x : 4;` and `int16_t y : 12;` into one 16-bit unit; the Microsoft rules
   clang follows on Windows start a new allocation unit per declared type, so the union is 4 bytes
