@@ -54,7 +54,10 @@ INCLUDE_DIRS = [TEST, CLIB, CLIB / "Mcu", CLIB / "Ext"]
 CL_INCLUDES = [f"/I{d}" for d in INCLUDE_DIRS]
 GNU99 = ["/clang:-std=gnu99"]
 
-FIFO_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c", TEST / "alxFifoTestHelpers.c", TEST / "alxBoundTestHelpers.c"]
+# alxAssertPc.c is in every group now: it holds the assertion counter the .def files export
+# and the suite's per-test check reads. KEEP IN SYNC WITH conftest.FIFO_SOURCES.
+FIFO_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c", TEST / "alxFifoTestHelpers.c",
+                TEST / "alxBoundTestHelpers.c", TEST / "alxAssertPc.c"]
 FIFO_DEF = TEST / "alxFifoTest.def"
 
 # CLI group (Tier 2: real alxCli + param stack over the fakes), asserts ON = the code as shipped
