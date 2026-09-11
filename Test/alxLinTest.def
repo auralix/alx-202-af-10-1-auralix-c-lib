@@ -1,0 +1,17 @@
+LIBRARY alxLinTest
+EXPORTS
+	AlxLinTest_New
+	AlxLinTest_Delete
+	AlxLinTest_Lin
+	AlxLinTest_Port
+	AlxLinTest_Publish
+	AlxLin_Master_Init
+	AlxLin_Master_DeInit
+	AlxLin_Master_IsInit
+	AlxLin_SetNad
+	AlxLin_GetNad
+	AlxSerialPortFake_TxRead
+	AlxSerialPortFake_TxNumOfEntries
+	AlxAssertPc_Reset
+	AlxAssertPc_Count
+	AlxAssertPc_First

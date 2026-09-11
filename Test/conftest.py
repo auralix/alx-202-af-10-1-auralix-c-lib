@@ -481,6 +481,38 @@ FSSAFE_DEPS = [
 FSSAFE_DLL = BUILD_DIR / "alxFsSafeTest.dll"
 
 
+# --------------------------------------------------------- LIN bus master -----
+# Tier-2 target: the master half of a LIN transaction, over the serial port
+# fake. Only the PUBLISH path is covered - it is the one that puts a whole frame
+# on the wire in one call, so the protected identifier's parity bits and both
+# checksums are readable as BYTES, which is the only place they exist. The
+# subscribe half waits on the clock and belongs with a self-advancing tick.
+LIN_SOURCES = [
+    CLIB_DIR / "alxLin.c",
+    CLIB_DIR / "alxTimSw.c",
+    CLIB_DIR / "alxTick.c",
+    CLIB_DIR / "alxFifo.c",
+    CLIB_DIR / "alxBound.c",
+    CLIB_DIR / "alxDelay.c",
+    TEST_DIR / "alxLinTestHelpers.c",
+    TEST_DIR / "alxSerialPortFake.c",
+    TEST_DIR / "alxIoPinFake.c",
+    TEST_DIR / "alxIrqFake.c",
+    TEST_DIR / "alxOsDelayFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+LIN_DEPS = [
+    *LIN_SOURCES,
+    CLIB_DIR / "alxLin.h",
+    CLIB_DIR / "alxSerialPort.h",
+    CLIB_DIR / "alxGlobal.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxLinTest.def",
+    Path(__file__),
+]
+LIN_DLL = BUILD_DIR / "alxLinTest.dll"
+
+
 # ------------------------------------------------------- Busy-wait delay -----
 # Tier-1 target: six one-line busy waits on the global tick. They cannot be
 # tested over the real clock the way the timer is, because a busy wait never
@@ -854,6 +886,11 @@ def _build_fssafe_dll() -> None:
                TEST_DIR / "alxFsSafeTest.def", "fsSafeClosure")
 
 
+def _build_lin_dll() -> None:
+    _build_dll(LIN_SOURCES, (), _assert_defines(LIN_SOURCES), LIN_DLL,
+               TEST_DIR / "alxLinTest.def", None)
+
+
 def _build_delay_dll() -> None:
     _build_dll(DELAY_SOURCES, (), _assert_defines(DELAY_SOURCES), DELAY_DLL,
                TEST_DIR / "alxDelayTest.def", None)
@@ -964,6 +1001,7 @@ DLL_GROUPS = [
     (MUX_DLL, MUX_DEPS, _build_mux_dll),
     (PARAMKV_DLL, PARAMKV_DEPS, _build_paramkv_dll),
     (DELAY_DLL, DELAY_DEPS, _build_delay_dll),
+    (LIN_DLL, LIN_DEPS, _build_lin_dll),
     (FSSAFE_DLL, FSSAFE_DEPS, _build_fssafe_dll),
 ]
 
@@ -2844,6 +2882,87 @@ class FsSafeLib:
         self._handles.clear()
 
 
+class LinLib:
+    """ctypes wrapper around alxLinTest.dll: a LIN master and the bytes it puts on the wire."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        vp, b, u8, u32, i32 = (ctypes.c_void_p, ctypes.c_bool, ctypes.c_uint8,
+                               ctypes.c_uint32, ctypes.c_int32)
+        u8p = ctypes.POINTER(ctypes.c_uint8)
+        c.AlxLinTest_New.restype = vp
+        c.AlxLinTest_Delete.argtypes = [vp]
+        c.AlxLinTest_Lin.restype = vp
+        c.AlxLinTest_Lin.argtypes = [vp]
+        c.AlxLinTest_Port.restype = vp
+        c.AlxLinTest_Port.argtypes = [vp]
+        c.AlxLinTest_Publish.restype = i32
+        c.AlxLinTest_Publish.argtypes = [vp, u8, u8p, u8, b]
+        for name in ("Init", "DeInit"):
+            fn = getattr(c, f"AlxLin_Master_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxLin_Master_IsInit.restype = b
+        c.AlxLin_Master_IsInit.argtypes = [vp]
+        c.AlxLin_SetNad.argtypes = [vp, u8]
+        c.AlxLin_GetNad.restype = u8
+        c.AlxLin_GetNad.argtypes = [vp]
+        c.AlxSerialPortFake_TxRead.restype = u32
+        c.AlxSerialPortFake_TxRead.argtypes = [vp, u8p, u32]
+        c.AlxSerialPortFake_TxNumOfEntries.restype = u32
+        c.AlxSerialPortFake_TxNumOfEntries.argtypes = [vp]
+        self._handles: list = []
+
+    def new(self, *, init: bool = True) -> int:
+        handle = self.c.AlxLinTest_New()
+        assert handle, "the LIN helper could not allocate"
+        self._handles.append(handle)
+        if init:
+            assert self.init(handle) == 0, "the master would not initialise"
+        return handle
+
+    # -- the module ------------------------------------------------------------
+    def _lin(self, handle: int) -> int:
+        return self.c.AlxLinTest_Lin(handle)
+
+    def init(self, handle: int) -> int:
+        return self.c.AlxLin_Master_Init(self._lin(handle))
+
+    def deinit(self, handle: int) -> int:
+        return self.c.AlxLin_Master_DeInit(self._lin(handle))
+
+    def is_init(self, handle: int) -> bool:
+        return bool(self.c.AlxLin_Master_IsInit(self._lin(handle)))
+
+    def set_nad(self, handle: int, nad: int) -> None:
+        self.c.AlxLin_SetNad(self._lin(handle), nad)
+
+    def nad(self, handle: int) -> int:
+        return self.c.AlxLin_GetNad(self._lin(handle))
+
+    def publish(self, handle: int, frame_id: int, data: bytes, *, enhanced: bool = False) -> int:
+        arr = (ctypes.c_uint8 * max(len(data), 1))(*data)
+        return self.c.AlxLinTest_Publish(handle, frame_id, arr, len(data), enhanced)
+
+    # -- the wire --------------------------------------------------------------
+    def wire(self, handle: int) -> bytes:
+        """Every byte the master has put on the bus since it was last read."""
+        port = self.c.AlxLinTest_Port(handle)
+        n = self.c.AlxSerialPortFake_TxNumOfEntries(port)
+        if n == 0:
+            return b""
+        buff = (ctypes.c_uint8 * n)()
+        got = self.c.AlxSerialPortFake_TxRead(port, buff, n)
+        return bytes(buff[:got])
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxLinTest_Delete(handle)
+        self._handles.clear()
+
+
 class DelayLib:
     """ctypes wrapper around alxDelayTest.dll: six busy waits over a clock that moves by itself."""
 
@@ -3673,6 +3792,23 @@ def fs_safe_lib(fs_safe_lib_session) -> FsSafeLib:
     fs_safe_lib_session.c.AlxFsFake_Reset()
     yield fs_safe_lib_session
     fs_safe_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def lin_lib_session() -> LinLib:
+    override = os.environ.get("ALX_LIN_TEST_DLL")
+    if override:
+        return LinLib(Path(override))
+    if _needs_build(LIN_DLL, LIN_DEPS):
+        _build_lin_dll()
+    return LinLib(LIN_DLL)
+
+
+@pytest.fixture
+def lin_lib(lin_lib_session) -> LinLib:
+    """The LIN master, with the previous test's ports released."""
+    yield lin_lib_session
+    lin_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")

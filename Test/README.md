@@ -68,6 +68,9 @@ A missing tool fails its lane, never skips it.
 	  NEW file system fake that can be told to fail any one operation. The module is thirty
 	  lines of forwarding, so what the group is actually about is what it does when the file
 	  system says no
+	- `alxLinTest` - the bus master's publish path over the serial port fake, so the protected
+	  identifier's parity and both checksums are checked as BYTES against the LIN
+	  specification's own formulas rather than against the implementation
 	- `alxDelayTest` - the six busy waits. The only group here whose CLOCK is faked: a busy
 	  wait never returns to the test that would have to advance a real one, so the fake
 	  advances by itself one step per read, which is what an interrupt does on a target
