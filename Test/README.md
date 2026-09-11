@@ -42,7 +42,8 @@ A missing tool fails its lane, never skips it.
 	  number formatting, which has no group of its own. Five modules, five test files
 	- `alxLinFunTest` - the x-to-y mappings: a line through two points, in float and in
 	  integer, a lookup table interpolated between its points, and the audio volume that is
-	  built on the line - percent to decibels to an amplitude factor. Three test files
+	  built on the line - percent to decibels to an amplitude factor. Three modules, three
+	  test files: `test_alxLinFun.py`, `test_alxInterpLin.py`, `test_alxAudioVol.py`
 	- `alxRotSwTest` - the rotary switch: a few IO pins read together and composed into a
 	  number, over the library's own IO pin fake
 	- `alxTempSensTest` - the RTD temperature sensor: two converter channels, a divider and a
