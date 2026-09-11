@@ -1,6 +1,6 @@
 """ALX-1553 - alxVdiv PC unit tests (Tier 1: a resistive divider's arithmetic, no state, no device).
 
-Nine context-free functions, and nothing tested them. They are worth testing because a product built
+Ten context-free functions, and nothing tested them. They are worth testing because a product built
 on this library reads its analog inputs through them: every voltage, every current shunt and every
 resistance measurement passes through this file, so an error here is an error in a number a client
 reads off a screen.
@@ -9,7 +9,8 @@ Two families with the same algebra in different units - float volts and kOhm, in
 ohm - plus the current a shunt drops. The four float functions are two pairs of inverses, which is
 what most of these tests exercise: convert one way, convert back, land where you started.
 
-Test group P79-P83 = ALX-1553 divider proofs.
+Test group P79-P83 = ALX-1553 divider proofs. P541-P543 cover AlxVdiv_GetCurrent_mA, added
+12.09 because its absence is what made a product write its own scale factor - see P541.
 """
 
 import pytest
@@ -152,3 +153,58 @@ def test_ALX1553_P83_a_short_across_the_high_leg_passes_the_input_through(vdiv_l
     """resHigh 0 means vout == vin, which is the degenerate divider and must not divide by zero."""
     assert vdiv_lib.vout_v(5.0, 0.0, LOW_KOHM) == pytest.approx(5.0)
     assert vdiv_lib.vin_v(5.0, 0.0, LOW_KOHM) == pytest.approx(5.0)
+
+
+# =====================================================================
+# P541-P543 - the float current, and the unit identity that makes it free
+# =====================================================================
+
+
+def test_ALX1553_P541_a_float_shunt_current_is_ohms_law_in_mA(vdiv_lib):
+    """V / kOhm IS mA - the kilo and the milli cancel, so nothing is scaled anywhere.
+
+    That identity is the whole reason this function takes kOhm rather than ohm, and the reason it
+    can exist at all without a magic constant in its body. The values are a 120 ohm shunt on a
+    4-20 mA loop, which is what a product actually wires.
+    """
+    shunt_kohm = 0.120                                   # a 120 ohm shunt, in the module's unit
+    for volts, expected_ma in ((0.480, 4.0), (1.428, 11.9), (2.400, 20.0)):
+        assert vdiv_lib.current_ma(volts, shunt_kohm) == pytest.approx(expected_ma, rel=1e-5)
+
+
+def test_ALX1553_P542_the_float_current_keeps_a_fraction_the_integer_one_cannot(vdiv_lib):
+    """Why this function was added, stated as a measurement rather than an opinion.
+
+    The integer twin answers in microamps, which is fine - but a caller who wants milliamps and
+    rescales an INTEGER throws the fraction away. That is exactly what a product did, dividing
+    AlxVdiv_GetCurrent_uA's uint32 by 1000 and reporting 11.0 mA for 11.9.
+
+    Both halves are shown here in one test: the integer path is correct in its own unit, and the
+    naive rescale of it is not. Nothing in either function is wrong - the defect lives in the
+    conversion the library used to leave to its caller.
+    """
+    volts, shunt_ohm = 1.428, 120
+    exact_ma = 11.9
+
+    integer_ua = vdiv_lib.current_ua(int(volts * 1_000_000), shunt_ohm)
+    assert integer_ua == pytest.approx(exact_ma * 1000, rel=1e-5), "the integer answer is right in uA"
+    assert integer_ua // 1000 == 11, "and rescaling it as an integer loses the 0.9 mA - P382"
+
+    assert vdiv_lib.current_ma(volts, shunt_ohm / 1000.0) == pytest.approx(exact_ma, rel=1e-5)
+
+
+def test_ALX1553_P543_the_two_flavours_agree_wherever_the_integer_one_can_express_the_answer(vdiv_lib):
+    """The float and fixed-point halves are the same algebra, and this pins that they stay so.
+
+    Compared in MICROAMPS, which is the integer half's own unit - comparing in mA would be asking
+    the integer one a question it cannot answer, which is the mistake this whole pair documents.
+    """
+    for volts, shunt_ohm in ((0.48, 120), (1.428, 120), (2.4, 120), (1.0, 1000), (0.1, 10)):
+        from_float = vdiv_lib.current_ma(volts, shunt_ohm / 1000.0) * 1000.0
+        from_integer = vdiv_lib.current_ua(round(volts * 1_000_000), shunt_ohm)
+        assert from_float == pytest.approx(from_integer, rel=1e-4), f"{volts} V over {shunt_ohm} ohm"
+
+
+def test_ALX1553_P543_a_zero_drop_is_a_zero_current(vdiv_lib):
+    """The edge a disconnected 4-20 mA loop actually presents."""
+    assert vdiv_lib.current_ma(0.0, 0.120) == pytest.approx(0.0)

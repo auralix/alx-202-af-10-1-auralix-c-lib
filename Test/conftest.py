@@ -1991,9 +1991,14 @@ class VdivLib:
             fn.argtypes = [u32, u32, u32]
         c.AlxVdiv_GetCurrent_uA.restype = u32
         c.AlxVdiv_GetCurrent_uA.argtypes = [u32, u32]
+        c.AlxVdiv_GetCurrent_mA.restype = f
+        c.AlxVdiv_GetCurrent_mA.argtypes = [f, f]
 
     def vout_v(self, vin_v, res_high_kohm, res_low_kohm) -> float:
         return self.c.AlxVdiv_GetVout_V(vin_v, res_high_kohm, res_low_kohm)
+
+    def current_ma(self, vout_v, res_low_kohm) -> float:
+        return self.c.AlxVdiv_GetCurrent_mA(vout_v, res_low_kohm)
 
     def vin_v(self, vout_v, res_high_kohm, res_low_kohm) -> float:
         return self.c.AlxVdiv_GetVin_V(vout_v, res_high_kohm, res_low_kohm)

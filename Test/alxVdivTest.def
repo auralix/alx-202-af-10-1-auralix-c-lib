@@ -9,6 +9,7 @@ EXPORTS
 	AlxVdiv_GetResHigh_ohm
 	AlxVdiv_GetResLow_ohm
 	AlxVdiv_GetCurrent_uA
+	AlxVdiv_GetCurrent_mA
 	AlxAssertPc_Reset
 	AlxAssertPc_Count
 	AlxAssertPc_First
