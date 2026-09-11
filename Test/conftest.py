@@ -10,7 +10,7 @@ import functools
 import os
 import re
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, NamedTuple
 
 import pytest
 from alx.c_lib import host_build
@@ -500,11 +500,15 @@ LIN_SOURCES = [
     TEST_DIR / "alxIrqFake.c",
     TEST_DIR / "alxOsDelayFake.c",
     TEST_DIR / "alxAssertPc.c",
+    # The trace sink. Every enabled ALX_TRACE_<LEVEL> macro calls AlxTrace_WriteLevel(&alxTrace, ...)
+    # and BOTH of those symbols live in Mcu/alxTrace.c, which no group compiles - measured, turning
+    # this group's traces on without it fails to link with exactly those two undefined and no others.
+    TEST_DIR / "alxTracePc.c",
 ]
 LIN_DEPS = [
     *LIN_SOURCES,
     CLIB_DIR / "alxLin.h",
-    CLIB_DIR / "alxSerialPort.h",
+    CLIB_DIR / "Mcu" / "alxSerialPort.h",
     CLIB_DIR / "alxGlobal.h",
     TEST_DIR / "alxConfig.h",
     TEST_DIR / "alxLinTest.def",
@@ -576,7 +580,7 @@ MUX_SOURCES = [
 MUX_DEPS = [
     *MUX_SOURCES,
     CLIB_DIR / "alxMux.h",
-    CLIB_DIR / "alxIoPin.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     TEST_DIR / "alxConfig.h",
@@ -1015,24 +1019,71 @@ def _build_dll(strict, closure, defines, dll: Path, def_file: Path, obj_dir_name
     )
 
 
-def _fifo_variant_dll(variant: str) -> Path:
-    """One FIFO DLL per named configuration.
+class VariantGroup(NamedTuple):
+    """A test group that can be built in every named configuration.
 
-    `default` keeps the unsuffixed name, so the sanitizer and coverage lanes - which select a DLL
-    through ALX_FIFO_TEST_DLL - carry on without having to learn about variants.
+    Only BUILD data lives here. The ctypes wrapper deliberately does not: the table has to be
+    defined up here beside the source lists, and the wrapper classes are 2000 lines further down.
+    The fixture is where the two meet.
     """
-    return FIFO_DLL if variant == DEFAULT_VARIANT else BUILD_DIR / f"alxFifoTest_{variant}.dll"
+
+    dll: Path
+    strict: tuple
+    closure: tuple
+    deps: list
+    def_file: Path
+    obj_dir: str | None
 
 
-def _build_fifo_variant_dll(variant: str) -> None:
-    _build_dll(FIFO_SOURCES, (), _variant_defines(variant, FIFO_SOURCES),
-               _fifo_variant_dll(variant), TEST_DIR / "alxFifoTest.def", None)
+# Which groups the variant matrix covers. Adding a row builds four more DLLs and costs nothing else.
+#
+#   fifo   the assert axis. 12 assertion sites, and ZERO trace sites - so it says nothing at all
+#          about the trace half, which is what lin is here for.
+#   lin    the trace axis. 23 sites at three levels (16 WRN, 6 DBG, 1 VRB), which straddles the
+#          INF/DBG boundary the four variants actually cross, and it is the only module in the
+#          library that does so AND already has a group.
+VARIANT_GROUPS: dict[str, VariantGroup] = {
+    "fifo": VariantGroup(FIFO_DLL, FIFO_SOURCES, (), FIFO_DEPS, TEST_DIR / "alxFifoTest.def", None),
+    "lin": VariantGroup(LIN_DLL, LIN_SOURCES, (), LIN_DEPS, TEST_DIR / "alxLinTest.def", None),
+}
+
+
+def _variant_dll(group: str, variant: str) -> Path:
+    """One DLL per (group, configuration).
+
+    `default` keeps the group's unsuffixed name, so the sanitizer and coverage lanes - which select
+    a DLL by path through ALX_<GROUP>_TEST_DLL - carry on without having to learn about variants.
+    The suffix is derived with with_name() rather than spelled out, so a group never acquires a
+    second spelling of its own DLL name.
+    """
+    dll = VARIANT_GROUPS[group].dll
+    return dll if variant == DEFAULT_VARIANT else dll.with_name(f"{dll.stem}_{variant}.dll")
+
+
+def _build_variant_dll(group: str, variant: str) -> None:
+    g = VARIANT_GROUPS[group]
+    _build_dll(g.strict, g.closure, _variant_defines(variant, g.strict, g.closure),
+               _variant_dll(group, variant), g.def_file, g.obj_dir)
+
+
+def _variant_lib(group: str, variant: str, wrapper):
+    """The group built in one configuration, wrapped. Used by the parametrized variant fixtures."""
+    dll = _variant_dll(group, variant)
+    if _needs_build(dll, VARIANT_GROUPS[group].deps):
+        _build_variant_dll(group, variant)
+    return wrapper(dll)
+
+
+def _fifo_variant_dll(variant: str) -> Path:
+    # Kept as a name of its own because test_alxFifo_variants.py imports it - P529 is a claim about
+    # exactly this function.
+    return _variant_dll("fifo", variant)
 
 
 def _build_fifo_dll() -> None:
     # The default group IS the `default` variant now. It used to be _assert_defines() alone, which
     # is assert-RST with no traces and ALX_TRACE_LEVEL_OFF - a combination no product ships.
-    _build_fifo_variant_dll(DEFAULT_VARIANT)
+    _build_variant_dll("fifo", DEFAULT_VARIANT)
 
 
 def _build_cli_dll() -> None:
@@ -1075,8 +1126,10 @@ def _build_fssafe_dll() -> None:
 
 
 def _build_lin_dll() -> None:
-    _build_dll(LIN_SOURCES, (), _assert_defines(LIN_SOURCES), LIN_DLL,
-               TEST_DIR / "alxLinTest.def", None)
+    # As with FIFO: the plain group is now the `default` variant, which is the only combination a
+    # product actually ships. _assert_defines() alone left ALX_TRACE_LEVEL_OFF, so all 23 of
+    # alxLin.c's trace call sites were compiled away in every build this suite had ever made.
+    _build_variant_dll("lin", DEFAULT_VARIANT)
 
 
 def _build_delay_dll() -> None:
@@ -1270,7 +1323,7 @@ def _assert_defines(*source_lists) -> list[str]:
 # own trace on or off, times the global ALX_TRACE_LEVEL - eight compiled behaviours from one source
 # file, across 12 assert sites. Until 11.09 this suite built exactly ONE of them, did not say which,
 # and it was not a combination any product ships: assert-RST like the shipped configuration, but
-# ALX_TRACE_LEVEL_OFF, which compiles all 558 of the library's trace call sites away AND DISCARDS
+# ALX_TRACE_LEVEL_OFF, which compiles all 549 of the library's trace call sites away AND DISCARDS
 # their arguments.
 #
 # These four are the standard set. Each earns its place by reaching something none of the others do:
@@ -1847,11 +1900,7 @@ def variant_lib(request) -> tuple[str, Lib]:
     `default`: a FIFO write and read behave identically in all four, and running 1400 tests four
     times would cost four times the wall clock to learn nothing.
     """
-    variant = request.param
-    dll = _fifo_variant_dll(variant)
-    if _needs_build(dll, FIFO_DEPS):
-        _build_fifo_variant_dll(variant)
-    return variant, Lib(dll)
+    return request.param, _variant_lib("fifo", request.param, Lib)
 
 
 @pytest.fixture(scope="session")
@@ -3212,7 +3261,66 @@ class LinLib:
         c.AlxSerialPortFake_TxRead.argtypes = [vp, u8p, u32]
         c.AlxSerialPortFake_TxNumOfEntries.restype = u32
         c.AlxSerialPortFake_TxNumOfEntries.argtypes = [vp]
+
+        # The trace axis: alxLin.c's own sites, the three-level probe, and the recorder they land in
+        c.AlxLinTest_Subscribe.restype = i32
+        c.AlxLinTest_Subscribe.argtypes = [vp, u8, u8]
+        c.AlxLinTest_RxFlush.argtypes = [vp]
+        c.AlxLinTest_RxByte.argtypes = [vp, u8]
+        for name in ("TraceArgEvalsWrn", "TraceArgEvalsDbg", "TraceArgEvalsVrb"):
+            getattr(c, f"AlxLinTest_{name}").restype = u32
+        c.AlxTracePc_Count.restype = u32
+        c.AlxTracePc_CountAtLevel.restype = u32
+        c.AlxTracePc_CountAtLevel.argtypes = [u8]
+        c.AlxTracePc_LastLevel.restype = u8
+        c.AlxTracePc_LastLine.restype = u32
+        c.AlxTracePc_LastFile.restype = ctypes.c_char_p
+        c.AlxTracePc_LastFun.restype = ctypes.c_char_p
+        c.AlxTracePc_LevelConfigured.restype = u8
         self._handles: list = []
+
+    # -- the trace axis -----------------------------------------------------
+    def trace_reset(self) -> None:
+        """Both recorders: the sink's counters and the probe's argument counters."""
+        self.c.AlxTracePc_Reset()
+        self.c.AlxLinTest_TraceReset()
+
+    def traces(self) -> int:
+        return self.c.AlxTracePc_Count()
+
+    def traces_at(self, level: int) -> int:
+        return self.c.AlxTracePc_CountAtLevel(level)
+
+    def arg_evals(self) -> tuple[int, int, int]:
+        """How many times the WRN, DBG and VRB probe ARGUMENTS were evaluated."""
+        return (self.c.AlxLinTest_TraceArgEvalsWrn(),
+                self.c.AlxLinTest_TraceArgEvalsDbg(),
+                self.c.AlxLinTest_TraceArgEvalsVrb())
+
+    def last_trace(self) -> tuple[int, str, int, str]:
+        return (self.c.AlxTracePc_LastLevel(),
+                (self.c.AlxTracePc_LastFile() or b"").decode("ascii", "replace"),
+                self.c.AlxTracePc_LastLine(),
+                (self.c.AlxTracePc_LastFun() or b"").decode("ascii", "replace"))
+
+    def protected_id(self, id_: int) -> int:
+        """The protected identifier for `id_`, taken OFF THE WIRE rather than recomputed.
+
+        AlxLin_CalcProtectedId is static, so a second spelling of the LIN parity rule in Python
+        would be exactly the kind of duplicated constant this suite exists to catch. A master's
+        frame header is SYNC then the protected id, so byte 1 of what Subscribe transmits is it.
+        """
+        handle = self.new()
+        try:
+            self.c.AlxLinTest_Subscribe(handle, id_, 1)
+            buff = (ctypes.c_uint8 * 2)()
+            got = self.c.AlxSerialPortFake_TxRead(self.c.AlxLinTest_Port(handle), buff, 2)
+            assert got == 2, f"the master put {got} header bytes on the wire, expected 2"
+            return int(buff[1])
+        finally:
+            # The fake has ALX_SERIAL_PORT_FAKE_MAX_PORTS (2) slots and calls exit(1) when they run
+            # out - which takes the runner down rather than failing a test. Give this one straight back.
+            self.free(handle)
 
     def new(self, *, init: bool = True) -> int:
         handle = self.c.AlxLinTest_New()
@@ -3255,6 +3363,10 @@ class LinLib:
         buff = (ctypes.c_uint8 * n)()
         got = self.c.AlxSerialPortFake_TxRead(port, buff, n)
         return bytes(buff[:got])
+
+    def free(self, handle: int) -> None:
+        self.c.AlxLinTest_Delete(handle)
+        self._handles.remove(handle)
 
     def free_all(self) -> None:
         for handle in self._handles:
@@ -4134,6 +4246,32 @@ def lin_lib_session() -> LinLib:
     if _needs_build(LIN_DLL, LIN_DEPS):
         _build_lin_dll()
     return LinLib(LIN_DLL)
+
+
+@pytest.fixture(scope="session", params=sorted(VARIANTS))
+def lin_variant_lib(request) -> tuple[str, LinLib]:
+    """The LIN group built in ONE named configuration - the TRACE half of the matrix.
+
+    alxFifo proved the assert axis and could not say anything about traces, because alxFifo.c and
+    alxBound.c have no trace call sites at all. alxLin.c has 23, at three levels, and the
+    INF/DBG boundary between them is the one the four variants actually cross.
+
+    Deliberately NOT wired to ALX_LIN_TEST_DLL. A variant is a statement about what conftest's own
+    recipe builds; honouring an externally built override here would let the sanitizer and coverage
+    lanes silently answer a question about a different binary. See test_alxLin_variants.py.
+    """
+    return request.param, _variant_lib("lin", request.param, LinLib)
+
+
+@pytest.fixture
+def lin_variant(lin_variant_lib) -> tuple[str, LinLib]:
+    """One named configuration of the LIN group, with this test's ports released afterwards.
+
+    The session-scoped fixture builds each DLL once; this is what a test takes, because the serial
+    fake has two port slots and running out of them is an exit(1) rather than a failure.
+    """
+    yield lin_variant_lib
+    lin_variant_lib[1].free_all()
 
 
 @pytest.fixture

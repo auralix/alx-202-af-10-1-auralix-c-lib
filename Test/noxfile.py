@@ -231,6 +231,49 @@ def build(session: nox.Session) -> None:
 
 
 @nox.session
+def variants(session: nox.Session) -> None:
+    """VARIANTS - HOST: every variant group built in every named configuration, then the proofs.
+
+    On demand, like mutate: nox.options.sessions comes from the shared lane list, so adding a
+    session here does not join the default run. That is deliberate - this lane multiplies build
+    time by len(VARIANTS) and answers a configuration question, not a regression one.
+
+    WHICH PAIRS COMPILE IS MOST OF THE EVIDENCE. `debug` is the only configuration that builds
+    alxLin.c's DBG and VRB call sites at all, so a build failure in one cell is the finding, not an
+    interruption - every pair is attempted and the matrix is reported at the end. That is the
+    opposite of the BUILD lane's fail-fast, on purpose.
+
+    The recipes come from conftest.VARIANT_GROUPS rather than being restated here. The sanitize and
+    coverage lanes each keep their own copy of a group's source list behind a KEEP IN SYNC comment;
+    a seventh copy would defeat the point of having a table.
+    """
+    out = lanes.evidence_dir(TEST, "variants")
+    rows, failed = [], []
+
+    for group in sorted(cf.VARIANT_GROUPS):
+        for variant in sorted(cf.VARIANTS):
+            dll = cf._variant_dll(group, variant)
+            form, module_trace, level = cf.VARIANTS[variant]
+            try:
+                cf._build_variant_dll(group, variant)
+                built = dll.exists()
+            except hb.BuildError as exc:
+                built = False
+                failed.append(f"{group}/{variant}")
+                _write(out / f"build_{group}_{variant}.txt", str(exc))
+            session.log(f"{group:6} {variant:14} {'built' if built else 'FAILED'}  {dll.name}")
+            rows.append(f"{group:6} {variant:14} {'yes' if built else 'NO':4} "
+                        f"assert={form or '-':6} trace={'on' if module_trace else 'off':4} {level}")
+
+    _write(out / "variants_matrix.txt", chr(10).join(rows) + chr(10))
+    if failed:
+        session.error(f"VARIANTS FAILED to build {sorted(failed)} - see {out}")
+
+    session.run(PYTHON, "-m", "pytest", "-q", "-m", "variants", *session.posargs)
+    session.log(f"VARIANTS CLEAN - {len(rows)} configurations, matrix in {out}")
+
+
+@nox.session
 def test(session: nox.Session) -> None:
     """TEST - HOST: the suite over the dev DLLs; evidence build/pytest_report.xml + .html."""
     session.run(PYTHON, "-m", "pytest", *session.posargs)

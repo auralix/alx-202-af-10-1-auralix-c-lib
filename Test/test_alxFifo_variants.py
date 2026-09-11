@@ -4,8 +4,10 @@ A library module's behaviour is not one thing. alxFifo has one source file, twel
 and three mutually exclusive assert forms plus none, and which of those a product gets is decided
 entirely by macros in its own alxConfig.h. Until now this suite built exactly ONE of the resulting
 binaries, did not record which, and it was not a combination any product ships: assert-RST like the
-shipped configuration, but ALX_TRACE_LEVEL_OFF, which compiles every one of the library's 558 trace
-call sites away and DISCARDS their arguments.
+shipped configuration, but ALX_TRACE_LEVEL_OFF, which compiles every one of the library's 549 trace
+call sites away and DISCARDS their arguments. (549 is the portable modules, 16 files; counting the
+MCU ports under Mcu/ as well it is 1006. Measured by counting ALX_<MODULE>_TRACE_<LEVEL> call
+sites in every library .c outside Test, Ext, FatFs, mcuboot and Usbh.)
 
 conftest.VARIANTS names the four that are worth building, and this file is what makes them a claim
 rather than a build option. Each variant reaches something none of the others do:
@@ -19,10 +21,11 @@ rather than a build option. Each variant reaches something none of the others do
 
 Two honest limits on what this pilot proves.
 
-alxFifo.c and alxBound.c contain ZERO trace call sites, so nothing here can observe the trace axis
+alxFifo.c and alxBound.c contain ZERO trace call sites, so nothing HERE can observe the trace axis
 at run time - only that all four configurations compile and link. The assert axis is fully
-observable and is what P526 and P527 test. A trace-heavy module (alxId has 53 sites, alxMemSafe 21)
-is where the trace half of the matrix has to be proved, and it is not proved yet.
+observable and is what P526 and P527 test. **The trace axis is proved in test_alxLin_variants.py**
+(P532-P539), on alxLin.c's 23 sites at three levels - the module that straddles the one threshold
+these four variants actually cross.
 
 And on this host all three assert handlers return, because Test/alxAssertPc.c records instead of
 aborting. So P527 proves the #elif chain in alxFifo.h selected the form the variant asked for -
@@ -49,6 +52,8 @@ from conftest import (
     _fifo_variant_dll,
     _variant_defines,
 )
+
+pytestmark = pytest.mark.variants
 
 # Where AlxFifo_Write says its own precondition is broken. The file is the HEADER - see P513.
 WRITE_LEN_ASSERT = "alxFifo.h:191 in AlxFifo_Write"

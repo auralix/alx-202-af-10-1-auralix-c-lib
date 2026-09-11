@@ -15,3 +15,22 @@ EXPORTS
 	AlxAssertPc_Reset
 	AlxAssertPc_Count
 	AlxAssertPc_First
+	AlxLinTest_Subscribe
+	AlxLinTest_RxFlush
+	AlxLinTest_RxByte
+	AlxLinTest_TraceProbe
+	AlxLinTest_TraceReset
+	AlxLinTest_TraceArgEvalsWrn
+	AlxLinTest_TraceArgEvalsDbg
+	AlxLinTest_TraceArgEvalsVrb
+	AlxLinTest_BumpWrnDirect
+	AlxLinTest_BumpDbgDirect
+	AlxLinTest_BumpVrbDirect
+	AlxTracePc_Reset
+	AlxTracePc_Count
+	AlxTracePc_CountAtLevel
+	AlxTracePc_LastLevel
+	AlxTracePc_LastLine
+	AlxTracePc_LastFile
+	AlxTracePc_LastFun
+	AlxTracePc_LevelConfigured

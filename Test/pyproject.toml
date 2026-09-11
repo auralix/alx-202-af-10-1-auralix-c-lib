@@ -40,6 +40,7 @@ markers = [
     "hil: hardware-in-loop test (requires device on serial port)",
     "req(id): additional proof/requirement id attached by a LATER task (name keeps the originating token)",
     "expect_assert(reason): this test trips one of the LIBRARY's own assertions on purpose - the reason is required",
+    "variants: builds the group in every named configuration (conftest.VARIANTS) rather than just the default one",
 ]
 # xunit1: allows per-testcase <property> elements (proof tokens) without schema friction
 junit_family = "xunit1"
