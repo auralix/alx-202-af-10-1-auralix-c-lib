@@ -1,14 +1,12 @@
-LIBRARY alxParamKvStoreTest
+LIBRARY alxFsSafeTest
 EXPORTS
-	AlxParamKvStoreTest_New
-	AlxParamKvStoreTest_Delete
-	AlxParamKvStoreTest_Store
-	AlxParamKvStoreTest_IsInit
-	AlxParamKvStore_Init
-	AlxParamKvStore_DeInit
-	AlxParamKvStore_Get
-	AlxParamKvStore_Set
-	AlxParamKvStore_Remove
+	AlxFsSafeTest_New
+	AlxFsSafeTest_Delete
+	AlxFsSafeTest_FsSafe
+	AlxFsSafeTest_CrcLen
+	AlxFsSafeTest_Crc
+	AlxFsSafe_File_Read
+	AlxFsSafe_File_Write
 	AlxFsFake_Reset
 	AlxFsFake_FailNext
 	AlxFsFake_FailSkip

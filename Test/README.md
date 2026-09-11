@@ -68,6 +68,10 @@ A missing tool fails its lane, never skips it.
 	  NEW file system fake that can be told to fail any one operation. The module is thirty
 	  lines of forwarding, so what the group is actually about is what it does when the file
 	  system says no
+	- `alxFsSafeTest` - two copies of every file, each with a CRC, and the logic that decides
+	  which to believe and which to repair. Over the same file system fake, so a copy can be
+	  corrupted on the "flash" before the module runs. CLOSURE, for a `const char*` output
+	  parameter the module sprintf()s into (TODO A18)
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real
 	  software timers: twenty-one queries and latches about one input
 	- `alxRtcTest` - the calendar: Unix time to a broken-down date and back, in four

@@ -442,6 +442,42 @@ NTC_DEPS = [
 NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
 
 
+# ------------------------------------------------ Safe file storage -----
+# Tier-2 target: two copies of every file, each with a CRC, and the logic that
+# decides which to believe and which to repair. It is what makes a stored
+# setting survive losing power halfway through writing it, and it had no test.
+# Over the same file system fake as the key-value store, so a copy can be
+# corrupted on the "flash" before the module ever runs.
+# alxFsSafe.c is CLOSURE, and for a real reason: AlxFsSafe_PathToPathWithSuffix
+# declares its OUTPUT parameter `const char*` and then sprintf()s into it, which
+# clang rejects under -Werror as discarding qualifiers. It is a library change
+# in somebody else's module, so it is recorded as TODO A18 rather than fixed
+# here - and it means nothing in that file is warning-checked (see README).
+FSSAFE_SOURCES_STRICT = [
+    CLIB_DIR / "alxCrc.c",
+    TEST_DIR / "alxFsSafeTestHelpers.c",
+    TEST_DIR / "alxFsFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+FSSAFE_SOURCES_CLOSURE = [
+    CLIB_DIR / "alxFsSafe.c",
+]
+FSSAFE_SOURCES = [*FSSAFE_SOURCES_STRICT, *FSSAFE_SOURCES_CLOSURE]
+FSSAFE_DEFINES = ["-D_CRT_SECURE_NO_WARNINGS", "-DALX_FS_SAFE_ASSERT_RST_ENABLE"]
+FSSAFE_DEPS = [
+    *FSSAFE_SOURCES,
+    CLIB_DIR / "alxFsSafe.h",
+    CLIB_DIR / "alxCrc.h",
+    CLIB_DIR / "alxFs.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxFsSafeTest.def",
+    Path(__file__),
+]
+FSSAFE_DLL = BUILD_DIR / "alxFsSafeTest.dll"
+
+
 # ------------------------------------------- Parameter key-value store -----
 # Tier-2 target: the store every stored parameter on a device passes through,
 # over a NEW link-time fake of the file system. The module is a thin shell over
@@ -778,6 +814,11 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_fssafe_dll() -> None:
+    _build_dll(FSSAFE_SOURCES_STRICT, FSSAFE_SOURCES_CLOSURE, FSSAFE_DEFINES, FSSAFE_DLL,
+               TEST_DIR / "alxFsSafeTest.def", "fsSafeClosure")
+
+
 def _build_paramkv_dll() -> None:
     _build_dll(PARAMKV_SOURCES, (), (), PARAMKV_DLL,
                TEST_DIR / "alxParamKvStoreTest.def", None)
@@ -875,6 +916,7 @@ DLL_GROUPS = [
     (BTS_DLL, BTS_DEPS, _build_bts_dll),
     (MUX_DLL, MUX_DEPS, _build_mux_dll),
     (PARAMKV_DLL, PARAMKV_DEPS, _build_paramkv_dll),
+    (FSSAFE_DLL, FSSAFE_DEPS, _build_fssafe_dll),
 ]
 
 
@@ -2531,6 +2573,128 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class FsSafeLib:
+    """ctypes wrapper around alxFsSafeTest.dll: two copies of a file and the logic that picks one.
+
+    A test writes onto the "flash" directly to set up a state the module then has to recover from -
+    a missing copy, a corrupt one, two copies that disagree - so the CRC the module uses is
+    exposed here rather than restated.
+    """
+
+    OPS = ("mount", "unmount", "format", "open", "close", "read", "write", "remove")
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, b, u16, u32, i32 = (ctypes.c_void_p, ctypes.c_bool, ctypes.c_uint16,
+                                ctypes.c_uint32, ctypes.c_int32)
+        u8p = ctypes.POINTER(ctypes.c_uint8)
+        cp = ctypes.c_char_p
+        c.AlxFsSafeTest_New.restype = vp
+        c.AlxFsSafeTest_New.argtypes = [b]
+        c.AlxFsSafeTest_Delete.argtypes = [vp]
+        c.AlxFsSafeTest_FsSafe.restype = vp
+        c.AlxFsSafeTest_FsSafe.argtypes = [vp]
+        c.AlxFsSafeTest_CrcLen.restype = u32
+        c.AlxFsSafeTest_CrcLen.argtypes = [vp]
+        c.AlxFsSafeTest_Crc.restype = u16
+        c.AlxFsSafeTest_Crc.argtypes = [vp, u8p, u32]
+        for name in ("Read", "Write"):
+            fn = getattr(c, f"AlxFsSafe_File_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp, cp, vp, u32]
+        c.AlxFsFake_FailNext.argtypes = [u32, i32]
+        c.AlxFsFake_FailSkip.argtypes = [u32, u32]
+        c.AlxFsFake_CallCount.restype = u32
+        c.AlxFsFake_CallCount.argtypes = [u32]
+        for name in ("OpenCount", "CloseCount", "FormatCount", "FilesHeld"):
+            getattr(c, f"AlxFsFake_{name}").restype = u32
+        c.AlxFsFake_Put.argtypes = [cp, u8p, u32]
+        c.AlxFsFake_Get.restype = u32
+        c.AlxFsFake_Get.argtypes = [cp, u8p, u32]
+        c.AlxFsFake_Has.restype = b
+        c.AlxFsFake_Has.argtypes = [cp]
+        self._handles: list = []
+
+    def new(self, *, use_orig: bool = False) -> int:
+        handle = self.c.AlxFsSafeTest_New(use_orig)
+        assert handle, "the safe storage helper could not allocate"
+        self._handles.append(handle)
+        return handle
+
+    # -- the module ------------------------------------------------------------
+    def _safe(self, handle: int) -> int:
+        return self.c.AlxFsSafeTest_FsSafe(handle)
+
+    def read(self, handle: int, path: str, length: int) -> tuple:
+        buff = ctypes.create_string_buffer(length)
+        status = self.c.AlxFsSafe_File_Read(self._safe(handle), path.encode("ascii"),
+                                            buff, length)
+        return status, buff.raw[:length]
+
+    def write(self, handle: int, path: str, data: bytes) -> int:
+        buff = ctypes.create_string_buffer(data, len(data))
+        return self.c.AlxFsSafe_File_Write(self._safe(handle), path.encode("ascii"),
+                                           buff, len(data))
+
+    # -- the module's own CRC, so a test can build a copy by hand ---------------
+    def crc_len(self, handle: int) -> int:
+        return self.c.AlxFsSafeTest_CrcLen(handle)
+
+    def crc(self, handle: int, data: bytes) -> int:
+        arr = (ctypes.c_uint8 * len(data))(*data)
+        return self.c.AlxFsSafeTest_Crc(handle, arr, len(data))
+
+    def copy_bytes(self, handle: int, data: bytes) -> bytes:
+        """What one good copy of `data` looks like on the flash: the data, then its CRC."""
+        crc = self.crc(handle, data)
+        return data + crc.to_bytes(self.crc_len(handle), "little")
+
+    # -- the flash under it ----------------------------------------------------
+    def put_copy(self, handle: int, path: str, which: str, data: bytes) -> None:
+        """Put a VALID copy on the flash - "a" keeps the plain name, "b" takes the B suffix."""
+        self.put_raw(self._suffixed(path, which), self.copy_bytes(handle, data))
+
+    def put_raw(self, path: str, blob: bytes) -> None:
+        arr = (ctypes.c_uint8 * len(blob))(*blob)
+        self.c.AlxFsFake_Put(path.encode("ascii"), arr, len(blob))
+
+    def raw(self, path: str, len_max: int = 256) -> bytes:
+        arr = (ctypes.c_uint8 * len_max)()
+        n = self.c.AlxFsFake_Get(path.encode("ascii"), arr, len_max)
+        return bytes(arr[:n])
+
+    def copy(self, handle: int, path: str, which: str, len_max: int = 256) -> bytes:
+        return self.raw(self._suffixed(path, which), len_max)
+
+    def has(self, path: str) -> bool:
+        return bool(self.c.AlxFsFake_Has(path.encode("ascii")))
+
+    @staticmethod
+    def _suffixed(path: str, which: str) -> str:
+        """The module's own naming: copy A keeps the plain name, copy B gets a B before the dot."""
+        stem, dot, ext = path.rpartition(".")
+        assert dot, "the module asserts that a path has a dot"
+        return f"{stem}.{ext}" if which == "a" else f"{stem}B.{ext}"
+
+    # -- failures --------------------------------------------------------------
+    def fail(self, op: str, times: int = 1, *, after: int = 0) -> None:
+        """Fail an operation - `after` calls let through first, then `times` failures."""
+        self.c.AlxFsFake_FailSkip(self.OPS.index(op), after)
+        self.c.AlxFsFake_FailNext(self.OPS.index(op), times)
+
+    def opens(self) -> int:
+        return self.c.AlxFsFake_OpenCount()
+
+    def closes(self) -> int:
+        return self.c.AlxFsFake_CloseCount()
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxFsSafeTest_Delete(handle)
+        self._handles.clear()
+
+
 class ParamKvStoreLib:
     """ctypes wrapper around alxParamKvStoreTest.dll: the store, over a file system that can fail.
 
@@ -2563,6 +2727,7 @@ class ParamKvStoreLib:
         c.AlxParamKvStore_Remove.restype = i32
         c.AlxParamKvStore_Remove.argtypes = [vp, cp]
         c.AlxFsFake_FailNext.argtypes = [u32, i32]
+        c.AlxFsFake_FailSkip.argtypes = [u32, u32]
         c.AlxFsFake_CallCount.restype = u32
         c.AlxFsFake_CallCount.argtypes = [u32]
         for name in ("OpenCount", "CloseCount", "FormatCount", "FilesHeld"):
@@ -3299,6 +3464,24 @@ def _assert_pins_fitted(lib) -> None:
         "more pins than the IO pin fake has slots - raise ALX_IO_PIN_FAKE_NUM_OF_PINS in "
         "Test/alxIoPinFake.c; everything this test measured about a pin is unreliable"
     )
+
+@pytest.fixture(scope="session")
+def fs_safe_lib_session() -> FsSafeLib:
+    override = os.environ.get("ALX_FSSAFE_TEST_DLL")
+    if override:
+        return FsSafeLib(Path(override))
+    if _needs_build(FSSAFE_DLL, FSSAFE_DEPS):
+        _build_fssafe_dll()
+    return FsSafeLib(FSSAFE_DLL)
+
+
+@pytest.fixture
+def fs_safe_lib(fs_safe_lib_session) -> FsSafeLib:
+    """Safe storage with an empty flash and no injected failures."""
+    fs_safe_lib_session.c.AlxFsFake_Reset()
+    yield fs_safe_lib_session
+    fs_safe_lib_session.free_all()
+
 
 @pytest.fixture(scope="session")
 def param_kv_store_lib_session() -> ParamKvStoreLib:

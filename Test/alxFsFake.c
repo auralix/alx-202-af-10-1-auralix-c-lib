@@ -63,6 +63,7 @@ typedef enum
 
 static AlxFsFake_Entry alxFsFake_entry[ALX_FS_FAKE_MAX_FILES];
 static int32_t alxFsFake_failCount[AlxFsFake_Op_COUNT];		// >0 = that many more times, -1 = always
+static uint32_t alxFsFake_failSkip[AlxFsFake_Op_COUNT];		// calls to let through first
 static uint32_t alxFsFake_callCount[AlxFsFake_Op_COUNT];
 static bool alxFsFake_isMounted;
 static uint32_t alxFsFake_openCount;
@@ -77,6 +78,7 @@ static char alxFsFake_openMode[8];			// the mode string the caller asked for
 //******************************************************************************
 void AlxFsFake_Reset(void);
 void AlxFsFake_FailNext(uint32_t op, int32_t times);
+void AlxFsFake_FailSkip(uint32_t op, uint32_t calls);
 uint32_t AlxFsFake_CallCount(uint32_t op);
 uint32_t AlxFsFake_OpenCount(void);
 uint32_t AlxFsFake_CloseCount(void);
@@ -95,6 +97,10 @@ const char* AlxFsFake_LastOpenMode(void);
 static bool AlxFsFake_ShouldFail(AlxFsFake_Op op)
 {
 	alxFsFake_callCount[op]++;
+
+	// A skip lets the first N calls through untouched, so a test can fail the SECOND write of a
+	// pair without touching the first - which is the power-loss case this fake exists for.
+	if (alxFsFake_failSkip[op] > 0) { alxFsFake_failSkip[op]--; return false; }
 
 	if (alxFsFake_failCount[op] < 0) { return true; }			// always
 	if (alxFsFake_failCount[op] > 0) { alxFsFake_failCount[op]--; return true; }
@@ -140,6 +146,7 @@ void AlxFsFake_Reset(void)
 {
 	memset(alxFsFake_entry, 0, sizeof(alxFsFake_entry));
 	memset(alxFsFake_failCount, 0, sizeof(alxFsFake_failCount));
+	memset(alxFsFake_failSkip, 0, sizeof(alxFsFake_failSkip));
 	memset(alxFsFake_callCount, 0, sizeof(alxFsFake_callCount));
 	alxFsFake_isMounted = false;
 	alxFsFake_openCount = 0;
@@ -147,6 +154,12 @@ void AlxFsFake_Reset(void)
 	alxFsFake_formatCount = 0;
 	alxFsFake_openName = NULL;
 	alxFsFake_openMode[0] = '\0';
+}
+
+void AlxFsFake_FailSkip(uint32_t op, uint32_t calls)
+{
+	// How many calls to let through before AlxFsFake_FailNext's count starts to apply.
+	if (op < (uint32_t)AlxFsFake_Op_COUNT) { alxFsFake_failSkip[op] = calls; }
 }
 
 void AlxFsFake_FailNext(uint32_t op, int32_t times)
