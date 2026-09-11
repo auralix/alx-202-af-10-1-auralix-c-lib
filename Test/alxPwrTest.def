@@ -1,0 +1,16 @@
+LIBRARY alxPwrTest
+EXPORTS
+	AlxPwrTest_New
+	AlxPwrTest_Delete
+	AlxPwrTest_Val_V
+	AlxPwrTest_HysSt
+	AlxPwrTest_IsInRangeRaw
+	AlxPwrTest_HysSt_Top
+	AlxPwrTest_HysSt_Mid
+	AlxPwrTest_HysSt_Bot
+	AlxPwr_Process
+	alxTick DATA
+	AlxTick_Ctor
+	AlxTick_Get_ns
+	AlxTick_IncRange_ns
+	AlxIrqFake_Reset

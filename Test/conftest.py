@@ -329,6 +329,38 @@ TEMPSENS_DEPS = [
 ]
 TEMPSENS_DLL = BUILD_DIR / "alxTempSensTest.dll"
 
+
+# ------------------------------------------------ Power supervisor module ---
+# Tier-2 target: the REAL supervisor over the REAL divider, hysteresis, glitch
+# filter and software timer, with only the interrupt lock faked. One converter
+# voltage in, one yes-or-no out, and three decisions between them.
+PWR_SOURCES = [
+    CLIB_DIR / "alxPwr.c",
+    CLIB_DIR / "alxVdiv.c",
+    CLIB_DIR / "alxHys2.c",
+    CLIB_DIR / "alxFiltGlitchBool.c",
+    CLIB_DIR / "alxTimSw.c",
+    CLIB_DIR / "alxTick.c",
+    TEST_DIR / "alxPwrTestHelpers.c",
+    TEST_DIR / "alxIrqFake.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+PWR_DEPS = [
+    *PWR_SOURCES,
+    CLIB_DIR / "alxPwr.h",
+    CLIB_DIR / "alxVdiv.h",
+    CLIB_DIR / "alxHys2.h",
+    CLIB_DIR / "alxFiltGlitchBool.h",
+    CLIB_DIR / "alxTimSw.h",
+    CLIB_DIR / "alxTick.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxPwrTest.def",
+    Path(__file__),
+]
+PWR_DLL = BUILD_DIR / "alxPwrTest.dll"
+
 # ------------------------------------------------------ Bool module -------
 # Tier-2 target: the library's boolean-with-memory, over the REAL glitch filter,
 # software timer and tick, with only the interrupt lock faked. Twenty-one query
@@ -587,6 +619,10 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_pwr_dll() -> None:
+    _build_dll(PWR_SOURCES, (), (), PWR_DLL, TEST_DIR / "alxPwrTest.def", None)
+
+
 def _build_tempsens_dll() -> None:
     _build_dll(TEMPSENS_SOURCES, (), (), TEMPSENS_DLL, TEST_DIR / "alxTempSensTest.def", None)
 
@@ -646,6 +682,7 @@ DLL_GROUPS = [
     (PI4IOE_DLL, PI4IOE_DEPS, _build_pi4ioe_dll),
     (ROTSW_DLL, ROTSW_DEPS, _build_rotsw_dll),
     (TEMPSENS_DLL, TEMPSENS_DEPS, _build_tempsens_dll),
+    (PWR_DLL, PWR_DEPS, _build_pwr_dll),
 ]
 
 
@@ -2285,6 +2322,78 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class PwrLib:
+    """ctypes wrapper around alxPwrTest.dll: one converter voltage in, one yes-or-no out.
+
+    The clock belongs to the test, as it does for every group with a timer in it: nothing here
+    moves until `advance_ms` says so.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        vp, f, i32, u64, b = (ctypes.c_void_p, ctypes.c_float, ctypes.c_int32,
+                              ctypes.c_uint64, ctypes.c_bool)
+        c.AlxPwrTest_New.restype = vp
+        c.AlxPwrTest_New.argtypes = [f, f, f, f, f, f, b, f, f]
+        c.AlxPwrTest_Delete.argtypes = [vp]
+        c.AlxPwr_Process.restype = b
+        c.AlxPwr_Process.argtypes = [vp, f]
+        c.AlxPwrTest_Val_V.restype = f
+        c.AlxPwrTest_Val_V.argtypes = [vp]
+        c.AlxPwrTest_HysSt.restype = i32
+        c.AlxPwrTest_HysSt.argtypes = [vp]
+        c.AlxPwrTest_IsInRangeRaw.restype = b
+        c.AlxPwrTest_IsInRangeRaw.argtypes = [vp]
+        for name in ("Top", "Mid", "Bot"):
+            getattr(c, f"AlxPwrTest_HysSt_{name}").restype = i32
+        c.AlxTick_Ctor.argtypes = [vp]
+        c.AlxTick_IncRange_ns.argtypes = [vp, u64]
+        self.TOP = c.AlxPwrTest_HysSt_Top()
+        self.MID = c.AlxPwrTest_HysSt_Mid()
+        self.BOT = c.AlxPwrTest_HysSt_Bot()
+        self.tick = ctypes.addressof(ctypes.c_uint8.in_dll(c, "alxTick"))
+        self._handles: list = []
+
+    # -- the clock the test owns ----------------------------------------------
+    def tick_reset(self) -> None:
+        self.c.AlxTick_Ctor(self.tick)
+        self.c.AlxIrqFake_Reset()
+
+    def advance_ms(self, ms: float) -> None:
+        self.c.AlxTick_IncRange_ns(self.tick, round(ms * 1_000_000))
+
+    # -- one supervisor -------------------------------------------------------
+    def new(self, *, res_high=0.0, res_low=1.0, top_high=0.0, top_low=0.0,
+            bot_high=0.0, bot_low=0.0, initial=False, stable_true_ms=0.0,
+            stable_false_ms=0.0):
+        """A supervisor: a divider, a window with hysteresis on both edges, and a glitch filter."""
+        handle = self.c.AlxPwrTest_New(res_high, res_low, top_high, top_low, bot_high, bot_low,
+                                       initial, stable_true_ms, stable_false_ms)
+        assert handle, "AlxPwrTest_New returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def process(self, obj, adc_V: float) -> bool:  # noqa: N803 - the unit belongs in the name
+        return self.c.AlxPwr_Process(obj, adc_V)
+
+    def val_V(self, obj) -> float:
+        """The supply voltage the supervisor reconstructed from the converter reading."""
+        return self.c.AlxPwrTest_Val_V(obj)
+
+    def hys_state(self, obj) -> int:
+        return self.c.AlxPwrTest_HysSt(obj)
+
+    def in_range_raw(self, obj) -> bool:
+        """In range BEFORE the glitch filter - what tells "out of range" from "not yet stable"."""
+        return self.c.AlxPwrTest_IsInRangeRaw(obj)
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxPwrTest_Delete(handle)
+        self._handles.clear()
+
+
 class TempSensLib:
     """ctypes wrapper around alxTempSensTest.dll: a voltage divider with an RTD in it.
 
@@ -2483,6 +2592,24 @@ def lin_fun_lib_session() -> LinFunLib:
     if _needs_build(LINFUN_DLL, LINFUN_DEPS):
         _build_linfun_dll()
     return LinFunLib(LINFUN_DLL)
+
+
+@pytest.fixture(scope="session")
+def pwr_lib_session() -> PwrLib:
+    override = os.environ.get("ALX_PWR_TEST_DLL")
+    if override:
+        return PwrLib(Path(override))
+    if _needs_build(PWR_DLL, PWR_DEPS):
+        _build_pwr_dll()
+    return PwrLib(PWR_DLL)
+
+
+@pytest.fixture
+def pwr_lib(pwr_lib_session) -> PwrLib:
+    """The supervisor library with the clock back at zero and nothing left from the last test."""
+    pwr_lib_session.tick_reset()
+    yield pwr_lib_session
+    pwr_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")
