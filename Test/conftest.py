@@ -361,6 +361,26 @@ PWR_DEPS = [
 ]
 PWR_DLL = BUILD_DIR / "alxPwrTest.dll"
 
+
+# ------------------------------------------------------- Audio module -----
+# Tier-1 target: the sample conversions. No objects, no hardware, no clock -
+# seven free functions that turn a PCM sample into a float and back, which is
+# where an audio path either keeps its full scale or quietly loses a count.
+AUDIO_SOURCES = [
+    CLIB_DIR / "alxAudio.c",
+    TEST_DIR / "alxAssertPc.c",
+]
+AUDIO_DEPS = [
+    *AUDIO_SOURCES,
+    CLIB_DIR / "alxAudio.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    TEST_DIR / "alxConfig.h",
+    TEST_DIR / "alxAudioTest.def",
+    Path(__file__),
+]
+AUDIO_DLL = BUILD_DIR / "alxAudioTest.dll"
+
 # ------------------------------------------------------ Bool module -------
 # Tier-2 target: the library's boolean-with-memory, over the REAL glitch filter,
 # software timer and tick, with only the interrupt lock faked. Twenty-one query
@@ -619,6 +639,10 @@ def _build_math_dll() -> None:
     _build_dll(MATH_SOURCES, (), (), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
 
 
+def _build_audio_dll() -> None:
+    _build_dll(AUDIO_SOURCES, (), (), AUDIO_DLL, TEST_DIR / "alxAudioTest.def", None)
+
+
 def _build_pwr_dll() -> None:
     _build_dll(PWR_SOURCES, (), (), PWR_DLL, TEST_DIR / "alxPwrTest.def", None)
 
@@ -683,6 +707,7 @@ DLL_GROUPS = [
     (ROTSW_DLL, ROTSW_DEPS, _build_rotsw_dll),
     (TEMPSENS_DLL, TEMPSENS_DEPS, _build_tempsens_dll),
     (PWR_DLL, PWR_DEPS, _build_pwr_dll),
+    (AUDIO_DLL, AUDIO_DEPS, _build_audio_dll),
 ]
 
 
@@ -2322,6 +2347,50 @@ def bool_lib(bool_lib_session) -> BoolLib:
     bool_lib_session.free_all()
 
 
+class AudioLib:
+    """ctypes wrapper around alxAudioTest.dll: PCM samples to floats and back.
+
+    Seven free functions and no object, so this is the whole module.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        f, i8, u8, i16, u16 = (ctypes.c_float, ctypes.c_int8, ctypes.c_uint8,
+                               ctypes.c_int16, ctypes.c_uint16)
+        for name, arg in (("Int8", i8), ("Uint8", u8), ("Int16", i16), ("Uint16", u16)):
+            fn = getattr(c, f"AlxAudio_LinerPcm{name}ToFloat")
+            fn.restype = f
+            fn.argtypes = [arg]
+        c.AlxAudio_FloatToLinerPcmInt8.restype = i8
+        c.AlxAudio_FloatToLinerPcmInt8.argtypes = [f]
+        c.AlxAudio_FloatToLinerPcmInt16.restype = i16
+        c.AlxAudio_FloatToLinerPcmInt16.argtypes = [f]
+        c.AlxAudio_StereoToMono.restype = f
+        c.AlxAudio_StereoToMono.argtypes = [f, f]
+
+    def int8_to_float(self, sample: int) -> float:
+        return self.c.AlxAudio_LinerPcmInt8ToFloat(sample)
+
+    def uint8_to_float(self, sample: int) -> float:
+        return self.c.AlxAudio_LinerPcmUint8ToFloat(sample)
+
+    def int16_to_float(self, sample: int) -> float:
+        return self.c.AlxAudio_LinerPcmInt16ToFloat(sample)
+
+    def uint16_to_float(self, sample: int) -> float:
+        return self.c.AlxAudio_LinerPcmUint16ToFloat(sample)
+
+    def float_to_int8(self, sample: float) -> int:
+        return self.c.AlxAudio_FloatToLinerPcmInt8(sample)
+
+    def float_to_int16(self, sample: float) -> int:
+        return self.c.AlxAudio_FloatToLinerPcmInt16(sample)
+
+    def stereo_to_mono(self, left: float, right: float) -> float:
+        return self.c.AlxAudio_StereoToMono(left, right)
+
+
 class PwrLib:
     """ctypes wrapper around alxPwrTest.dll: one converter voltage in, one yes-or-no out.
 
@@ -2592,6 +2661,17 @@ def lin_fun_lib_session() -> LinFunLib:
     if _needs_build(LINFUN_DLL, LINFUN_DEPS):
         _build_linfun_dll()
     return LinFunLib(LINFUN_DLL)
+
+
+@pytest.fixture(scope="session")
+def audio_lib() -> AudioLib:
+    """The audio conversions; nothing here holds state, so one instance serves every test."""
+    override = os.environ.get("ALX_AUDIO_TEST_DLL")
+    if override:
+        return AudioLib(Path(override))
+    if _needs_build(AUDIO_DLL, AUDIO_DEPS):
+        _build_audio_dll()
+    return AudioLib(AUDIO_DLL)
 
 
 @pytest.fixture(scope="session")

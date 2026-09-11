@@ -1,0 +1,9 @@
+LIBRARY alxAudioTest
+EXPORTS
+	AlxAudio_LinerPcmInt8ToFloat
+	AlxAudio_LinerPcmUint8ToFloat
+	AlxAudio_LinerPcmInt16ToFloat
+	AlxAudio_LinerPcmUint16ToFloat
+	AlxAudio_FloatToLinerPcmInt8
+	AlxAudio_FloatToLinerPcmInt16
+	AlxAudio_StereoToMono

@@ -49,6 +49,8 @@ A missing tool fails its lane, never skips it.
 	  lookup table, over the library's own ADC fake
 	- `alxPwrTest` - the power supervisor: a divider, a window with hysteresis on both edges
 	  and a glitch filter, all real, with only the interrupt lock faked
+	- `alxAudioTest` - the sample conversions: linear PCM in four widths to a float and back,
+	  and the stereo-to-mono average. Seven free functions, no object
 	- `alxBoolTest` - the boolean with memory, over the real glitch filter and two real
 	  software timers: twenty-one queries and latches about one input
 	- `alxRtcTest` - the calendar: Unix time to a broken-down date and back, in four
