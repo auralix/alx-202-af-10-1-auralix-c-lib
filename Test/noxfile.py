@@ -182,7 +182,14 @@ MS_STRICT = [CLIB / "alxMemSafe.c", CLIB / "alxCrc.c", CLIB / "alxBound.c", TEST
              TEST / "alxParamKvStoreFake.c", TEST / "alxAssertPc.c", TEST / "alxTracePc.c",
              TEST / "alxMemSafeTestHelpers.c"]
 MS_DEF = TEST / "alxMemSafeTest.def"
-MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "test_alxParamStore.py"]
+# Every test file that drives THIS group's DLL, which is not the same list as "the tests I was
+# thinking about when I wrote the gate". The four modules below were missing, and because the gate
+# names only alxCrc.c and alxMemSafe.c, nothing complained - the report simply stated that
+# alxParamItem.c was 4.14 % covered and 96 of its 105 functions never ran, while test_alxParamItem.py
+# sat next to it exercising them. A coverage report that quietly omits a module's tests is worse
+# than no report: it reads as a measurement of the library and is really a measurement of this list.
+MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "test_alxParamStore.py",
+            "test_alxParamItem.py", "test_alxRange.py", "test_alxFtoa.py"]
 
 # Id group: the real alxId over the IO pin fake, asserts ON = the code as shipped. Both closure
 # sources are closure for reasons written out at conftest's ID group - alxId.c fails -Wformat and
@@ -592,8 +599,13 @@ def coverage(session: nox.Session) -> None:
     objs = _closure_objects(session, ms / "closure", MS_CLOSURE, MS_ASSERTS, PROFILE)
     _dll(session, ms / "alxMemSafeTest.dll", MS_STRICT, MS_DEF, PROFILE,
          ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
+    # alxFtoa.c and alxParamGroup.c join the gate now that the report is honest about them; both
+    # measure 100 % of functions. alxRange.c is 11 of 12 and cannot - the one function never
+    # executed is AlxRange_CheckArr, the unimplemented stub Stage 5b names for falling off the end
+    # of a non-void function. alxParamStore.c is 6 of 8 and alxParamItem.c 25 of 105, which is the
+    # group's real remaining gap rather than an artefact of the list above.
     _llvm_cov_group(session, ms, ms / "alxMemSafeTest.dll", "ALX_MEMSAFE_TEST_DLL", MS_TESTS,
-                    "functions", ["alxCrc.c", "alxMemSafe.c"])
+                    "functions", ["alxCrc.c", "alxMemSafe.c", "alxFtoa.c", "alxParamGroup.c"])
     # Id group: gate = functions 100 %; lines and branches are REPORTED and not gated, on purpose.
     # alxId.c carries whole paragraphs behind #ifdef ALX_STM32 / ALX_GCC / ALX_CMSIS_CORE that a PC
     # build cannot reach at all, so a line gate here would be a number picked to fit rather than a
