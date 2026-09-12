@@ -264,7 +264,7 @@ A missing tool fails its lane, never skips it.
   gate = 100 % lines/branches/regions/functions on gated files (`alx.verify.coverage_gate` over
   `summary.json`, `--metrics lines,branches,regions,functions`). A gated file with unreachable code -
   assert-guarded blocks (`alxMemSafe.c`, `alxCrc.c`) or whole paragraphs behind a platform `#ifdef`
-  a PC build does not define (`alxId.c`: `ALX_STM32`, `ALX_GCC`, `ALX_CMSIS_CORE`) - is gated on
+  a PC build does not define (`alxId.c`: `ALX_STM32`, `ALX_CMSIS_CORE`) - is gated on
   functions only (`--metrics functions`); lines/branches are reported.
   A metric with nothing to cover counts as 100 % (llvm prints 0 %).
 - Sanitizers: native ASan+UBSan smoke exe + one UBSan DLL per test group under its suite.

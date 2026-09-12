@@ -196,7 +196,7 @@ void AlxId_Ctor
 	//------------------------------------------------------------------------------
 	#ifdef ALX_NEWLIB_NANO
 		// Preprocessor
-		#if (ALX_xVER3(__NEWLIB__, __NEWLIB_MINOR__, __NEWLIB_PATCHLEVEL__) < ALX_LANG_C_LIB_VER_MIN_REQUIRED)
+		#if (ALX_xVER3(__NEWLIB__, __NEWLIB_MINOR__, __NEWLIB_PATCHLEVEL__) < ALX_LANG_C_LIB_NEWLIB_VER_MIN_REQUIRED)
 			#error
 		#endif
 
@@ -206,7 +206,7 @@ void AlxId_Ctor
 		me->fwLangCLib.verMinor = __NEWLIB_MINOR__;
 		me->fwLangCLib.verPatch = __NEWLIB_PATCHLEVEL__;
 		me->fwLangCLib.ver = ALX_xVER3(__NEWLIB__, __NEWLIB_MINOR__, __NEWLIB_PATCHLEVEL__);
-		me->fwLangCLib.verMinRequired = ALX_LANG_C_LIB_VER_MIN_REQUIRED;
+		me->fwLangCLib.verMinRequired = ALX_LANG_C_LIB_NEWLIB_VER_MIN_REQUIRED;
 	#else
 		strcpy(me->fwLangCLib.name, "Unknown");
 	#endif

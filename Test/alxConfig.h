@@ -25,14 +25,11 @@
 #define ALX_C_LIB
 
 //******************************************************************************
-// FW identity minimums - what alxId.c checks and reports
-//
-// alxId.c used to read these only behind #ifdef ALX_GCC, so this config never needed them and the
-// Id group never compiled those paragraphs. The compiler is now detected rather than declared, so
-// the PC build reaches them too - and reaches them as CLANG, which is what it actually is.
+// FW identity minimums
 //******************************************************************************
 #define ALX_LANG_C_VER_MIN_REQUIRED 199901L			// C99
-#define ALX_COMP_VER_MIN_REQUIRED 0x07020000		// 7.2.0
+#define ALX_COMP_CLANG_VER_MIN_REQUIRED 0x16010008	// 22.1.8
+#define ALX_COMP_GCC_VER_MIN_REQUIRED 0x0A030001		// 10.3.1
 
 //******************************************************************************
 // Trace - OFF unless a build variant says otherwise

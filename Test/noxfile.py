@@ -761,9 +761,7 @@ def coverage(session: nox.Session) -> None:
     # Id group: gate = functions 100 %; lines and branches are REPORTED and not gated, on purpose.
     # alxId.c carries whole paragraphs behind #ifdef ALX_STM32 / ALX_CMSIS_CORE that a PC build
     # cannot reach at all, so a line gate here would be a number picked to fit rather than a claim
-    # about the tests. (The compiler paragraph used to be one of them, behind ALX_GCC; it is now
-    # detected from __clang__ / __GNUC__, so the PC build reaches it - as Clang, correctly.)
-    # Every function the module defines IS reached (measured 46 of 46,
+    # about the tests. Every function the module defines IS reached (measured 46 of 46,
     # 94.6 % of lines), which is the claim worth gating: a getter added and never called, or one
     # dropped from alxIdTest.def and so from every test, fails this lane.
     idg = lanes.evidence_dir(TEST, "coverage", "id")
