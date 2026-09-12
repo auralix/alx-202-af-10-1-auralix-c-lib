@@ -72,6 +72,12 @@ STYLE_PENDING_TERNARY = [
     "alxOsEventFlagGroup.c", "alxOsThread.c", "alxRtc_Global.c", "alxSocket.c",
 ]
 
+# Stage 5 compiles every PORTABLE library module - the ones that need no vendor SDK. Three cannot
+# join: alxAssert.c, alxBoot.c and alxIrq.c reach for CMSIS intrinsics (__BKPT, __disable_irq,
+# __get_PRIMASK) that only an MCU family header supplies, and those headers live in the PRODUCT's
+# include path, not this repository's. A family-specific check is therefore a product's job.
+SYNTAX_NEEDS_CMSIS = {"alxAssert.c", "alxBoot.c", "alxIrq.c"}
+
 _STYLE_PENDING = {*STYLE_PENDING_COMMENTS, *STYLE_PENDING_TERNARY}
 _STYLE_SKIP_DIRS = {"Ext", "FatFs", "mcuboot", "Usbh", "Test", "build", "Doc"}
 
@@ -382,6 +388,35 @@ def analyze(session: nox.Session) -> None:
                 _write(layout_log, "".join(reports))
                 session.error(f"Stage 4 FAILED: {source.name} with {variant} - see {layout_log}")
     _write(layout_log, "".join(reports))
+
+    session.log("Stage 5: does every portable library module still COMPILE? (arm-gcc -fsyntax-only)")
+    # Measured 12.09: of the library's 56 portable .c files, the host suite compiles 24 and the
+    # analysers above read 2. The rest - alxFs, alxLogger, alxNet, alxSocket, alxSd, alxFtp and the
+    # alxOs* wrappers among them - were compiled by NOTHING in this repository. They are built only
+    # when a product happens to use them, so an API change that breaks one is found by whoever
+    # updates next, not here. That is how ec2Test_BringUp.c came to be broken for an unknown length
+    # of time (ALX-1553 A9), and the answer there was the same: a syntax check costs seconds.
+    #
+    # -DALX_C_LIB and nothing else. The module guard has to be ON or every file preprocesses to
+    # nothing and the check passes without reading a line; an MCU family define cannot be added
+    # because its header is the product's. So this proves the portable half parses and type-checks,
+    # which is exactly the half that has no other cover.
+    syntax_log = out / "syntax.txt"
+    reports, broken = [], []
+    for src in sorted(CLIB.glob("*.c")):
+        if src.name in SYNTAX_NEEDS_CMSIS:
+            continue
+        result = subprocess.run(  # noqa: S603 - argv is the toolchain path and this repo's own sources
+            [str(tc.armgcc()), "-fsyntax-only", "-std=gnu99", "-mcpu=cortex-m7", "-mthumb",
+             "-DALX_C_LIB", *[f"-I{d}" for d in INCLUDE_DIRS], str(src)],
+            capture_output=True, text=True, check=False)   # the return code is read below
+        reports.append(f"{src.name}: rc={result.returncode}" + chr(10) + result.stderr)
+        if result.returncode != 0:
+            broken.append(src.name)
+    _write(syntax_log, "".join(reports))
+    if broken:
+        session.error(f"Stage 5 FAILED: {broken} do not compile - see {syntax_log}")
+    session.log(f"Stage 5: {len(reports)} portable modules compile")
 
     session.log(f"ANALYZE CLEAN - evidence in {out}")
 
