@@ -99,12 +99,6 @@ extern "C" {
 // FW - Language C Library
 #define ALX_LANG_C_LIB_VER_MIN_REQUIRED 0x02050000 // 2.5.0
 
-// FW - Language C++
-#define ALX_LANG_CPP_VER_MIN_REQUIRED 201402L // C++14
-
-// FW - Language C++ Library
-#define ALX_LANG_CPP_LIB_VER_MIN_REQUIRED 20170814
-
 // FW - Compiler
 #define ALX_COMP_VER_MIN_REQUIRED 0x07020000 // 7.2.0
 
