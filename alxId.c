@@ -180,11 +180,10 @@ void AlxId_Ctor
 	//------------------------------------------------------------------------------
 	// FW - Language C
 	//------------------------------------------------------------------------------
-	// No compiler gate: __STDC_VERSION__ is the standard's own macro, so every conforming
-	// compiler answers it. Behind #ifdef ALX_GCC this left any non-GCC build reporting no C
-	// version at all, which is a fact about the toolchain rather than about the compiler vendor.
+
+	// Preprocessor
 	#if (__STDC_VERSION__ < ALX_LANG_C_VER_MIN_REQUIRED)
-		#error "alxId.c: the C language version is older than ALX_LANG_C_VER_MIN_REQUIRED"
+		#error
 	#endif
 
 	// Const
@@ -195,13 +194,10 @@ void AlxId_Ctor
 	//------------------------------------------------------------------------------
 	// FW - Language C Standard Library
 	//------------------------------------------------------------------------------
-	// This one IS implementation-specific and stays behind its switch: __NEWLIB__ exists only in
-	// newlib. The #else is new - without it a non-newlib build reported an empty name, which reads
-	// on the banner as if the question had never been asked.
 	#ifdef ALX_NEWLIB_NANO
 		// Preprocessor
 		#if (ALX_xVER3(__NEWLIB__, __NEWLIB_MINOR__, __NEWLIB_PATCHLEVEL__) < ALX_LANG_C_LIB_VER_MIN_REQUIRED)
-			#error "alxId.c: newlib is older than ALX_LANG_C_LIB_VER_MIN_REQUIRED"
+			#error
 		#endif
 
 		// Const
@@ -212,23 +208,17 @@ void AlxId_Ctor
 		me->fwLangCLib.ver = ALX_xVER3(__NEWLIB__, __NEWLIB_MINOR__, __NEWLIB_PATCHLEVEL__);
 		me->fwLangCLib.verMinRequired = ALX_LANG_C_LIB_VER_MIN_REQUIRED;
 	#else
-		// Const - no C library other than newlib publishes a portable version macro, so the name
-		// is the whole of what can be reported honestly.
-		strcpy(me->fwLangCLib.name, "Unknown C Standard Library");
+		strcpy(me->fwLangCLib.name, "Unknown");
 	#endif
 
 
 	//------------------------------------------------------------------------------
 	// FW - Compiler
 	//------------------------------------------------------------------------------
-	// clang is tested FIRST, and the order is the whole point: clang predefines __GNUC__ as 4.2.1
-	// for GCC compatibility, so asking about GCC first reports a clang 22 build as GCC 4.2.1 - and
-	// then compares that 4.2.1 against ALX_COMP_VER_MIN_REQUIRED. Measured, not assumed.
-	// ALX_COMP_VER_MIN_REQUIRED is the minimum for whichever compiler the project builds with.
 	#if defined(__clang__)
 		// Preprocessor
 		#if (ALX_xVER3(__clang_major__, __clang_minor__, __clang_patchlevel__) < ALX_COMP_VER_MIN_REQUIRED)
-			#error "alxId.c: Clang is older than ALX_COMP_VER_MIN_REQUIRED"
+			#error
 		#endif
 
 		// Const
@@ -243,7 +233,7 @@ void AlxId_Ctor
 		// GNU -> [G]NU is [N]ot [U]nix
 		// GCC -> [G]NU [C]ompiler [C]ollection
 		#if (ALX_xVER3(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__) < ALX_COMP_VER_MIN_REQUIRED)
-			#error "alxId.c: GCC is older than ALX_COMP_VER_MIN_REQUIRED"
+			#error
 		#endif
 
 		// Const
@@ -254,10 +244,7 @@ void AlxId_Ctor
 		me->fwComp.ver = ALX_xVER3(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 		me->fwComp.verMinRequired = ALX_COMP_VER_MIN_REQUIRED;
 	#else
-		// alxGlobal.h already refuses anything but GCC or Clang, so this is unreachable - it is a
-		// defined value rather than a second #error, which would only be another place for a tool
-		// that is not a compiler to stop reading.
-		strcpy(me->fwComp.name, "Unknown Compiler");
+		strcpy(me->fwComp.name, "Unknown");
 	#endif
 
 
