@@ -60,9 +60,6 @@ extern "C" {
 #elif defined(ALX_ZEPHYR)
 #include "alxTrace_McuZephyr.h"
 
-#elif defined(ALX_PC)
-typedef struct { bool dummy; } AlxTrace;
-
 #else
 typedef struct { bool dummy; } AlxTrace;
 #endif
