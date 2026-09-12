@@ -154,8 +154,11 @@ ASSERT_PURE_CALLS = {
 }
 ASSERT_SIDE_EFFECT_PENDING = {"alxCli.c", "alxIoPin_McuZephyr.c", "alxParamItem.c",
                               "alxClk_McuLpc55S6x.c", "alxNet.c"}
-ASSERT_CALL = re.compile(r"ALX_[A-Z0-9_]*ASSERT\s*\((.*)\)\s*;")
-ASSERT_NAME = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(")
+STRING_LITERAL = re.compile(r"\"(?:[^\"\\]|\\.)*\"")
+CHAR_LITERAL = re.compile(r"'(?:[^'\\]|\\.)'")
+ELIDED_ASSERT = re.compile(r"ALX_[A-Z0-9_]*ASSERT[A-Z0-9_]*\s*\(")
+ELIDED_TRACE = re.compile(r"ALX_[A-Z0-9_]*TRACE[A-Z0-9_]*\s*\(")
+ELIDED_NAME = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(")
 
 _STYLE_PENDING = {*STYLE_PENDING_COMMENTS, *STYLE_PENDING_TERNARY}
 _STYLE_SKIP_DIRS = {"Ext", "FatFs", "mcuboot", "Usbh", "Test", "build", "Doc"}
@@ -426,6 +429,41 @@ def test(session: nox.Session) -> None:
     session.run(PYTHON, "-m", "pytest", *session.posargs)
 
 
+
+
+def _macro_arguments(line: str, open_paren: int) -> str:
+    """The text inside the macro's OWN parentheses, balanced.
+
+    Matching to the end of the line instead counts a call that is nowhere near the macro - the
+    shape `if (Call() != Alx_Ok) { ALX_X_ASSERT(false); }` is everywhere in this library.
+    """
+    depth, begin = 0, open_paren + 1
+    for i in range(open_paren, len(line)):
+        if line[i] == "(":
+            depth += 1
+            if depth == 1:
+                begin = i + 1
+        elif line[i] == ")":
+            depth -= 1
+            if depth == 0:
+                return line[begin:i]
+    return line[begin:]
+
+
+def _calls_inside(line: str, macro: "re.Pattern") -> list:
+    """Every function a macro's arguments call, with literals removed first.
+
+    Removing them is not tidiness: every trace message in this library names a function, as in
+    "FAIL: AlxNet_IsConnected()", and counting those reported 241 trace findings where there are
+    none at all.
+    """
+    found = macro.search(line)
+    if not found:
+        return []
+    inner = _macro_arguments(line, found.end() - 1)
+    inner = CHAR_LITERAL.sub("''", STRING_LITERAL.sub('""', inner))
+    return [c for c in ELIDED_NAME.findall(inner) if c not in ASSERT_PURE_CALLS]
+
 @nox.session
 def analyze(session: nox.Session) -> None:
     """ANALYZE: 0 codespell + ASCII + README + C-style + Python gates, 1 clang-tidy, 2 cppcheck, 3 gcc -fanalyzer."""
@@ -551,27 +589,32 @@ def analyze(session: nox.Session) -> None:
     session.log(f"Stage 5b: {checked - len(empty)} modules return on every path, "
                 f"{len(empty)} empty, {len(RETURN_TYPE_PENDING)} known-pending")
 
-    session.log("Stage 5c: does any assertion DO the work instead of checking it?")
-    hiding, pending_seen = {}, set()
+    session.log("Stage 5c: does any assertion or trace DO the work instead of reporting it?")
+    hiding, pending_seen, traces = {}, set(), {}
     for src in sorted(CLIB.rglob("*.c")):
-        if "Test" in src.parts or "build" in src.parts or "Ext" in src.parts:
+        if any(p in src.parts for p in ("Test", "build", "Ext")):
             continue
         for number, line in enumerate(src.read_text(encoding="ascii", errors="replace").splitlines(), 1):
-            found = ASSERT_CALL.search(line)
-            if not found:
-                continue
-            calls = ASSERT_NAME.findall(found.group(1))
-            if not calls or all(c in ASSERT_PURE_CALLS for c in calls):
-                continue
-            if src.name in ASSERT_SIDE_EFFECT_PENDING:
-                pending_seen.add(src.name)
-                continue
-            hiding.setdefault(src.name, []).append(f"{number}: {calls[0]}")
+            if line.lstrip().startswith("//"):
+                continue                      # a commented-out site elides nothing
+            calls = _calls_inside(line, ELIDED_ASSERT)
+            if calls:
+                if src.name in ASSERT_SIDE_EFFECT_PENDING:
+                    pending_seen.add(src.name)
+                else:
+                    hiding.setdefault(src.name, []).append(f"{number}: {calls[0]}")
+            calls = _calls_inside(line, ELIDED_TRACE)
+            if calls:
+                traces.setdefault(src.name, []).append(f"{number}: {calls[0]}")
     if hiding:
-        session.error(f"Stage 5c FAILED: an assertion performs the work in {sorted(hiding)} - "
-                      f"a build with that module's assertions off loses the behaviour, not the "
+        session.error(f"Stage 5c FAILED: an assertion performs the work in {sorted(hiding)} - a "
+                      f"build with that module's assertions off loses the behaviour, not the "
                       f"check. Sites: {hiding}")
-    session.log(f"Stage 5c: clean, {len(pending_seen)} files known-pending")
+    if traces:
+        session.error(f"Stage 5c FAILED: a TRACE argument performs the work in {sorted(traces)}. "
+                      f"Measured 12.09 there were none - either gate is closed and the argument "
+                      f"is deleted. Sites: {traces}")
+    session.log(f"Stage 5c: no trace does work, {len(pending_seen)} assert files known-pending")
 
 
     session.log(f"ANALYZE CLEAN - evidence in {out}")
