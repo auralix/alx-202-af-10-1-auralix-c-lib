@@ -302,20 +302,18 @@ extern "C" {
 	#define ALX_STM32_ASSERT
 #endif
 
-#if defined(__GNUC__)
-	#define ALX_INLINE __attribute__((always_inline))
-	#define ALX_STATIC_INLINE static __attribute__((always_inline))
+#if defined(__GNUC__) || defined(__clang__)
 	#define ALX_WEAK __attribute__ ((weak))
-	#define ALX_BKPT() __BKPT(255)
+#else
+	#error "alxGlobal.h: Unsupported compiler - GCC or Clang required"
 #endif
 
-#if defined(_MSC_VER)
-	#if defined(__clang__)
-		#define ALX_WEAK __attribute__ ((weak))	// clang emits a real weak symbol on COFF, MSVC itself has none
-	#else
-		#define ALX_WEAK
-	#endif
+#if defined(__arm__)
+	#define ALX_BKPT() __BKPT(255)
+#elif defined(_WIN32)
 	#define ALX_BKPT() __debugbreak()
+#else
+	#error "alxGlobal.h: Unsupported target - ARM or Windows required"
 #endif
 
 #define ALX_NULL 0
