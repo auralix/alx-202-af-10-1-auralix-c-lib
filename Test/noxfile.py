@@ -18,6 +18,7 @@ mechanics (alx.c_lib.host_build).
 """
 
 import argparse
+import ast
 import re
 import shutil
 import subprocess
@@ -237,6 +238,45 @@ MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "te
 # So the file stays in COVERAGE, where it measures the module at 100 %, and waits here for the fix.
 # Drop this list the moment P420 comes off.
 MS_TESTS_UBSAN = [t for t in MS_TESTS if t != "test_alxFtoa.py"]
+
+# The list above is hand-written on purpose, because the thing that decides membership is not the
+# file's NAME - test_alxBound.py drives the general DLL and test_alxParamItem_reset.py drives the
+# per-configuration ones through the `variants` marker, and both are named after a module in this
+# group. Deriving the list from the names looks tidier and is wrong; it was tried.
+#
+# So the list is CHECKED instead of derived: a test file that asks for one of this group's fixtures
+# and is not named here is the omission that cost the report once already, and it is now a lane
+# failure rather than a number nobody could see was wrong.
+MS_FIXTURES = {"memsafe_lib", "flash", "make_item", "make_meta_item", "make_enum_item",
+               "make_buff_item", "make_multi_store", "make_kv_item", "make_store"}
+
+
+def _fixtures_requested(path: Path) -> set[str]:
+    """Every fixture name the file's tests and their helpers take as an argument."""
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    return {a.arg for node in ast.walk(tree)
+            if isinstance(node, ast.FunctionDef) for a in node.args.args}
+
+
+def _guard(session: nox.Session, check) -> None:
+    """Run a consistency check and turn its failure into a lane failure with the reason."""
+    try:
+        check()
+    except RuntimeError as ex:
+        session.error(str(ex))
+
+
+def _check_ms_tests() -> None:
+    """Fail when a test file drives this group's DLL and the coverage list does not know about it."""
+    drivers = {p.name for p in sorted(TEST.glob("test_*.py"))
+               if _fixtures_requested(p) & MS_FIXTURES}
+    missing = sorted(drivers - set(MS_TESTS))
+    stale = sorted(t for t in MS_TESTS if t not in drivers)
+    if missing or stale:
+        raise RuntimeError(
+            f"MS_TESTS is out of step with the tests that drive the MemSafe DLL: "
+            f"missing {missing}, listed but no longer driving it {stale}"
+        )
 
 # Id group: the real alxId over the IO pin fake, asserts ON = the code as shipped. Both closure
 # sources are closure for reasons written out at conftest's ID group - alxId.c fails -Wformat and
@@ -625,6 +665,7 @@ def analyze(session: nox.Session) -> None:
 @nox.session
 def sanitize(session: nox.Session) -> None:
     """SANITIZE: 1 native ASan+UBSan smoke exe (diagnostics), 2 UBSan DLL per test group under its suite."""
+    _guard(session, _check_ms_tests)
     _fresh_dev_build(session)
     asan, ubsan = lanes.evidence_dir(TEST, "sanitize", "asan"), lanes.evidence_dir(TEST, "sanitize", "ubsan")
     session.log("Stage 1: native ASan+UBSan smoke exe")
@@ -698,6 +739,7 @@ def _llvm_cov_group(session: nox.Session, out: Path, dll: Path, env_var: str, te
 @nox.session
 def coverage(session: nox.Session) -> None:
     """COVERAGE: clang-instrumented DLL per test group, the same suite, llvm-cov + cobertura, gate per file."""
+    _guard(session, _check_ms_tests)
     _fresh_dev_build(session)
     out = lanes.evidence_dir(TEST, "coverage")
     _dll(session, out / "alxFifoTest.dll", FIFO_SOURCES, FIFO_DEF, PROFILE)
