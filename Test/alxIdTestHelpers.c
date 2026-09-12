@@ -109,6 +109,10 @@ uint32_t AlxIdTest_BuildRev(void);
 const char* AlxIdTest_BuildHash(void);
 const char* AlxIdTest_BuildHashShort(void);
 uint32_t AlxIdTest_BuildHashShortUint32(void);
+const char* AlxIdTest_FwCompName(AlxId* me);
+uint32_t AlxIdTest_FwCompVerMajor(AlxId* me);
+uint32_t AlxIdTest_FwLangCVer(AlxId* me);
+const char* AlxIdTest_FwLangCLibName(AlxId* me);
 
 
 //******************************************************************************
@@ -364,3 +368,10 @@ uint32_t AlxIdTest_BuildRev(void)				{ return ALX_BUILD_REV; }
 const char* AlxIdTest_BuildHash(void)			{ return ALX_BUILD_HASH; }
 const char* AlxIdTest_BuildHashShort(void)		{ return ALX_BUILD_HASH_SHORT; }
 uint32_t AlxIdTest_BuildHashShortUint32(void)	{ return ALX_BUILD_HASH_SHORT_UINT32; }
+
+// What the product reports about the toolchain that built it - the compiler paragraph used to be
+// behind ALX_GCC and so was unreachable from a PC build, which is exactly why it went untested.
+const char* AlxIdTest_FwCompName(AlxId* me)		{ return me->fwComp.name; }
+uint32_t AlxIdTest_FwCompVerMajor(AlxId* me)	{ return me->fwComp.verMajor; }
+uint32_t AlxIdTest_FwLangCVer(AlxId* me)		{ return me->fwLangC.ver; }
+const char* AlxIdTest_FwLangCLibName(AlxId* me)	{ return me->fwLangCLib.name; }

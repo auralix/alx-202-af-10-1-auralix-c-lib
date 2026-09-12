@@ -5123,6 +5123,15 @@ class IdLib:
         c.AlxIdTest_InstanceSetPcb.argtypes = [vp, u8, cp, cp, u8, u8, u8, u32]
         c.AlxIdTest_InstanceSetBom.argtypes = [vp, cp, cp, u8, u8, u8, u32]
         c.AlxIdTest_Ctor.argtypes = [vp, cp, cp, u8, u8, u8, b, u32, b, u32, u8, u8, u8, cp]
+        # what the product reports about the toolchain that built it
+        c.AlxIdTest_FwCompName.restype = cp
+        c.AlxIdTest_FwCompName.argtypes = [vp]
+        c.AlxIdTest_FwCompVerMajor.restype = u32
+        c.AlxIdTest_FwCompVerMajor.argtypes = [vp]
+        c.AlxIdTest_FwLangCVer.restype = u32
+        c.AlxIdTest_FwLangCVer.argtypes = [vp]
+        c.AlxIdTest_FwLangCLibName.restype = cp
+        c.AlxIdTest_FwLangCLibName.argtypes = [vp]
         c.AlxIdTest_CtorNoHwId.argtypes = [vp, cp, cp, u8, u8, u8, b, u32, b, u32, cp]
         for name in ("IsInit", "IsHwIdUsed"):
             fn = getattr(c, f"AlxIdTest_{name}")

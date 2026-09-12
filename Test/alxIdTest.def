@@ -87,3 +87,7 @@ EXPORTS
 	AlxAssertPc_Reset
 	AlxAssertPc_Count
 	AlxAssertPc_First
+	AlxIdTest_FwCompName
+	AlxIdTest_FwCompVerMajor
+	AlxIdTest_FwLangCVer
+	AlxIdTest_FwLangCLibName

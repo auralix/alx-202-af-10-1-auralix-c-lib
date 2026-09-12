@@ -105,8 +105,7 @@ extern "C" {
 // FW - Language C++ Library
 #define ALX_LANG_CPP_LIB_VER_MIN_REQUIRED 20170814
 
-// FW - Compiler
-#define ALX_GCC
+// FW - Compiler - detected from the compiler itself (alxId.c), not declared here
 #define ALX_COMP_VER_MIN_REQUIRED 0x07020000 // 7.2.0
 
 // FW - CMSIS Core

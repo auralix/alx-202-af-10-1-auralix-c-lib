@@ -225,7 +225,7 @@ def test_ALX1553_P472_the_firmware_half_is_finished_by_the_ctor_and_the_board_ha
     assertion that on a product with ALX_ID_ASSERT_RST_ENABLE is a RESET.
 
     Four assertions are counted, one per pre-Init getter, which is also the statement that the
-    assertion is per call and not once per object. Recorded text: "RST alxId.h:756 in AlxId_GetFwVer"
+    assertion is per call and not once per object. Recorded text: "RST alxId.h:785 in AlxId_GetFwVer"
     (ALX_ID_FILE is the header's name while the line number is alxId.c's).
 
     This is the test that has to fail if someone ever moves the version composition into Init to
@@ -902,14 +902,14 @@ def test_ALX1553_P497_an_unknown_board_leaves_the_object_abandoned_but_answering
     confidently as ever, while the version strings Init returned before rendering are still whatever
     was in memory. Every getter afterwards asserts isInit and every one of them answers anyway.
 
-    Recorded text: "RST alxId.h:443 in AlxId_Init" - ALX_ID_FILE is the header's name, the line is
+    Recorded text: "RST alxId.h:472 in AlxId_Init" - ALX_ID_FILE is the header's name, the line is
     alxId.c's.
     """
     obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(7, "BoardSeven"), (4, "BoardFour")], [7])
     id_lib.init(obj)
 
     assert id_lib.c.AlxAssertPc_Count() == 1
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:443 in AlxId_Init"
+    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:472 in AlxId_Init"
     assert not id_lib.is_init(obj)
     assert id_lib.num(obj, "HwId") == 2, "the id that matched nothing is still reported"
     assert _field_bytes(id_lib, obj, "HwPcbVerStr", 16) == b"\xff" * 16, "Init rendered a version"
@@ -929,13 +929,13 @@ def test_ALX1553_P498_an_unsupported_board_is_left_half_resolved(id_lib):
     problem rather than as what it is - this firmware refusing to run on this board - and on a
     product with assertions compiled out there is no other signal at all.
 
-    Recorded text: "RST alxId.h:460 in AlxId_Init".
+    Recorded text: "RST alxId.h:489 in AlxId_Init".
     """
     obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(7, "BoardSeven"), (2, "BoardTwo")], [7])
     id_lib.init(obj)
 
     assert id_lib.c.AlxAssertPc_Count() == 1
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:460 in AlxId_Init"
+    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:489 in AlxId_Init"
     assert not id_lib.is_init(obj)
     assert id_lib.text(obj, "HwPcbName") == "BoardTwo", "the instance copy did not happen"
     assert id_lib.num(obj, "HwId") == 2
@@ -1062,7 +1062,7 @@ def test_ALX1553_P502_a_second_init_re_reads_the_straps_and_takes_the_new_answer
     id_lib.init(obj)
 
     assert id_lib.c.AlxAssertPc_Count() == 1
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:418 in AlxId_Init"
+    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:447 in AlxId_Init"
     assert id_lib.num(obj, "HwId") == 1, "the second Init did not re-read the straps"
     assert [id_lib.pin_counts(obj, i) for i in range(2)] == [(2, 2), (2, 2)]
 
@@ -1084,7 +1084,7 @@ def test_ALX1553_P503_the_strap_count_is_asserted_and_then_not_enforced(id_lib):
     Six straps are driven here rather than reached through AlxId_Init on purpose: the sixth is left
     floating so the value that lands past the array is zero, and the object is not read again.
 
-    Recorded text: "RST alxId.h:1283 in AlxId_CalcHwId".
+    Recorded text: "RST alxId.h:1312 in AlxId_CalcHwId".
     """
     obj = id_lib.alloc()
     id_lib.ctor_no_hw_id(obj)
@@ -1095,7 +1095,7 @@ def test_ALX1553_P503_the_strap_count_is_asserted_and_then_not_enforced(id_lib):
     hw_id = id_lib.calc_hw_id(obj, 6)
 
     assert id_lib.c.AlxAssertPc_Count() == 1
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:1283 in AlxId_CalcHwId"
+    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:1312 in AlxId_CalcHwId"
     assert hw_id == 242, "the fold stopped at the fifth strap after all"
     assert [id_lib.pin_counts(obj, i) for i in range(6)] == [(1, 1)] * 6, "a strap past the limit was skipped"
 
@@ -1126,13 +1126,13 @@ def test_ALX1553_P504_trace_is_gated_on_init_and_renders_nothing_in_this_configu
     level made overridable. The four values those lines are formatted from are pinned through their
     getters instead (P473, P484).
 
-    Recorded text: "RST alxId.h:510 in AlxId_Trace".
+    Recorded text: "RST alxId.h:539 in AlxId_Trace".
     """
     before_init = _fw_ctor(id_lib)
     id_lib.trace(before_init)
 
     assert id_lib.c.AlxAssertPc_Count() == 1
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:510 in AlxId_Trace"
+    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:539 in AlxId_Trace"
 
     after_init = _fw(id_lib)
     id_lib.trace(after_init)
@@ -1178,3 +1178,58 @@ def test_ALX1553_P505_one_fact_reached_through_three_getters_with_three_differen
     id_lib.text(obj, "FwArtf")
 
     assert id_lib.c.AlxAssertPc_Count() == 3, "every other getter should assert isInit"
+
+
+# =====================================================================
+# P575 - the identity block reports the toolchain that actually built it
+# =====================================================================
+
+
+def test_ALX1553_P575_the_compiler_reported_is_the_compiler_that_built_it(id_lib):
+    """The whole FW-Compiler paragraph used to sit behind #ifdef ALX_GCC, so it had never run here.
+
+    Two things made that worth changing. The switch was a DECLARATION - a project asserted "I am
+    GCC" in its config - and a declaration cannot be wrong in a way the build notices. And the
+    paragraph reads __GNUC__/__GNUC_MINOR__/__GNUC_PATCHLEVEL__, which clang also defines: measured,
+    clang 22.1.8 on a GNU target answers 4.2.1, because that is the GCC version it claims
+    compatibility with. So a clang build declaring ALX_GCC would have reported, over the boot banner
+    and the CLI `id` command, that the firmware was built by GCC 4.2.1 - and then compared that
+    4.2.1 against ALX_COMP_VER_MIN_REQUIRED, which is 7.2.0.
+
+    The detection now asks __clang__ FIRST for exactly that reason. This build is clang-cl, so the
+    assertions below are the ones that would have failed before the change, and the version check is
+    written as "not the compatibility triple" rather than a hardcoded 22 - a test that pins the
+    toolchain's own version goes red on somebody else's upgrade.
+    """
+    obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(2, "BoardTwo")], [2])
+
+    name = id_lib.c.AlxIdTest_FwCompName(obj).decode("ascii")
+    major = id_lib.c.AlxIdTest_FwCompVerMajor(obj)
+
+    assert name == "Clang", "the host suite is built by clang-cl, and the report must say so"
+    assert major != 4, "4 is clang's __GNUC__ compatibility answer, not its own version"
+    assert major >= 7, "below ALX_COMP_VER_MIN_REQUIRED's major, so the preprocessor check is wrong"
+
+
+def test_ALX1553_P575_the_c_language_version_is_reported_without_a_compiler_gate(id_lib):
+    """__STDC_VERSION__ is the standard's own macro, so no compiler needs to vouch for it.
+
+    It was gated on ALX_GCC too, which meant a non-GCC build reported no C version at all - a fact
+    about the toolchain lost to a question about the vendor. The lanes build gnu99, so 199901 is
+    the answer, and a build that ever moved to C11 would say 201112 here rather than nothing.
+    """
+    obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(2, "BoardTwo")], [2])
+
+    assert id_lib.c.AlxIdTest_FwLangCVer(obj) == 199901
+
+
+def test_ALX1553_P575_a_non_newlib_build_names_its_c_library_instead_of_leaving_it_blank(id_lib):
+    """The one switch that SHOULD stay: __NEWLIB__ exists only in newlib, so it cannot be detected.
+
+    What was missing was the #else. Without it this build filled nothing, and `id` printed an empty
+    name - which on a banner reads as though the question had never been asked rather than as an
+    answer of "not newlib".
+    """
+    obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(2, "BoardTwo")], [2])
+
+    assert id_lib.c.AlxIdTest_FwLangCLibName(obj).decode("ascii") == "Unknown C Standard Library"
