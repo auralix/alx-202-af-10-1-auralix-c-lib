@@ -439,6 +439,9 @@ typedef struct
 {
 	AlxParamItem item;
 	AlxParamItem_DataType dataType;
+	char key[64];
+	char groupKey[64];
+	char unit[64];
 } AlxParamItemMetaTest_Ctx;
 
 AlxParamItemMetaTest_Ctx* AlxParamItemMetaTest_New(uint32_t dataType, const char* key, uint32_t id, const char* groupKey, uint32_t groupId, int64_t defI, int64_t minI, int64_t maxI, double defF, double minF, double maxF, uint32_t outOfRange, const char* valUnit, bool afterReset);
@@ -475,54 +478,57 @@ AlxParamItemMetaTest_Ctx* AlxParamItemMetaTest_New(uint32_t dataType, const char
 		return NULL;
 	}
 	ctx->dataType = (AlxParamItem_DataType)dataType;
+	strncpy(ctx->key, key, 63);
+	strncpy(ctx->groupKey, groupKey, 63);
+	strncpy(ctx->unit, valUnit, 63);
 
 	AlxParamItem_ValOutOfRangeHandle handle = (AlxParamItem_ValOutOfRangeHandle)outOfRange;
 	switch (ctx->dataType)
 	{
 		case AlxParamItem_Uint8:
-			AlxParamItem_CtorUint8(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				(uint8_t)defI, (uint8_t)minI, (uint8_t)maxI, handle, false, NULL, 0, valUnit, afterReset);
+			AlxParamItem_CtorUint8(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				(uint8_t)defI, (uint8_t)minI, (uint8_t)maxI, handle, false, NULL, 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Uint16:
-			AlxParamItem_CtorUint16(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				(uint16_t)defI, (uint16_t)minI, (uint16_t)maxI, handle, false, NULL, 0, valUnit, afterReset);
+			AlxParamItem_CtorUint16(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				(uint16_t)defI, (uint16_t)minI, (uint16_t)maxI, handle, false, NULL, 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Uint32:
-			AlxParamItem_CtorUint32(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				(uint32_t)defI, (uint32_t)minI, (uint32_t)maxI, handle, false, NULL, 0, valUnit, afterReset);
+			AlxParamItem_CtorUint32(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				(uint32_t)defI, (uint32_t)minI, (uint32_t)maxI, handle, false, NULL, 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Uint64:
-			AlxParamItem_CtorUint64(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				(uint64_t)defI, (uint64_t)minI, (uint64_t)maxI, handle, false, NULL, 0, valUnit, afterReset);
+			AlxParamItem_CtorUint64(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				(uint64_t)defI, (uint64_t)minI, (uint64_t)maxI, handle, false, NULL, 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Int8:
-			AlxParamItem_CtorInt8(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				(int8_t)defI, (int8_t)minI, (int8_t)maxI, handle, false, NULL, 0, valUnit, afterReset);
+			AlxParamItem_CtorInt8(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				(int8_t)defI, (int8_t)minI, (int8_t)maxI, handle, false, NULL, 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Int16:
-			AlxParamItem_CtorInt16(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				(int16_t)defI, (int16_t)minI, (int16_t)maxI, handle, false, NULL, 0, valUnit, afterReset);
+			AlxParamItem_CtorInt16(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				(int16_t)defI, (int16_t)minI, (int16_t)maxI, handle, false, NULL, 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Int32:
-			AlxParamItem_CtorInt32(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				(int32_t)defI, (int32_t)minI, (int32_t)maxI, handle, false, NULL, 0, valUnit, afterReset);
+			AlxParamItem_CtorInt32(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				(int32_t)defI, (int32_t)minI, (int32_t)maxI, handle, false, NULL, 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Int64:
-			AlxParamItem_CtorInt64(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				defI, minI, maxI, handle, false, NULL, 0, valUnit, afterReset);
+			AlxParamItem_CtorInt64(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				defI, minI, maxI, handle, false, NULL, 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Float:
-			AlxParamItem_CtorFloat(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				(float)defF, (float)minF, (float)maxF, handle, false, NULL, 0, valUnit, afterReset);
+			AlxParamItem_CtorFloat(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				(float)defF, (float)minF, (float)maxF, handle, false, NULL, 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Double:
-			AlxParamItem_CtorDouble(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				defF, minF, maxF, handle, false, NULL, 0, valUnit, afterReset);
+			AlxParamItem_CtorDouble(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				defF, minF, maxF, handle, false, NULL, 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Bool:
 			// no range and no enum: the ctor takes the default, the unit and the reset flag
-			AlxParamItem_CtorBool(&ctx->item, NULL, AlxParamItem_Param, key, id, groupKey, groupId,
-				defI != 0, valUnit, afterReset);
+			AlxParamItem_CtorBool(&ctx->item, NULL, AlxParamItem_Param, ctx->key, id, ctx->groupKey, groupId,
+				defI != 0, ctx->unit, afterReset);
 			break;
 		case AlxParamItem_Arr:
 		case AlxParamItem_Str:
@@ -1047,3 +1053,161 @@ int32_t AlxMemSafeTest_Status_ErrConv(void);
 
 int32_t AlxMemSafeTest_Status_ErrEnum(void)					{ return (int32_t)AlxParamItem_ErrEnum; }
 int32_t AlxMemSafeTest_Status_ErrConv(void)					{ return (int32_t)AlxParamItem_ErrConv; }
+
+
+//------------------------------------------------------------------------------
+// Parameter item - the two types that carry a buffer (ALX-1553)
+//------------------------------------------------------------------------------
+// Arr and Str are the last of alxParamItem's 105 functions that no test reached,
+// and they are shaped unlike the scalars: the caller supplies the storage. Arr
+// takes THREE buffers - the live value, the default, and the length they share -
+// and Str takes one buffer plus a length that counts the null terminator.
+//
+// That is the whole reason they need a shim of their own rather than another
+// case in the scalar one: a standalone item of these types is not a value, it is
+// a value plus the memory the caller lent it, and who owns that memory is the
+// part worth proving. The context owns it here, so a test cannot accidentally
+// prove something about a Python buffer that has already been freed.
+
+#define ALX_PARAM_ITEM_BUFF_MAX 64
+
+// AlxParamItem keeps the CALLER's pointer for key, groupKey and valUnit - it does not copy
+// them. In a product they are string literals and that is free; a test that hands over a
+// temporary is reading freed memory the moment the call returns, and it reads correctly for
+// exactly as long as nothing reuses the page. So every context here owns its own strings.
+typedef struct
+{
+	AlxParamItem item;
+	AlxParamItem_DataType dataType;
+	char key[ALX_PARAM_ITEM_BUFF_MAX];
+	char unit[ALX_PARAM_ITEM_BUFF_MAX];
+	uint8_t valBuff[ALX_PARAM_ITEM_BUFF_MAX];
+	uint8_t valDefBuff[ALX_PARAM_ITEM_BUFF_MAX];
+	uint8_t valDefSrc[ALX_PARAM_ITEM_BUFF_MAX];
+	char strDef[ALX_PARAM_ITEM_BUFF_MAX];
+} AlxParamItemBuffTest_Ctx;
+
+AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewArr(const uint8_t* valDef, uint32_t valBuffLen, const char* key, const char* valUnit);
+AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewStr(const char* valDef, uint32_t buffLen, const char* key, const char* valUnit);
+void AlxParamItemBuffTest_Delete(AlxParamItemBuffTest_Ctx* ctx);
+uint32_t AlxParamItemBuffTest_GetBuffLen(AlxParamItemBuffTest_Ctx* ctx);
+uint32_t AlxParamItemBuffTest_GetValLen(AlxParamItemBuffTest_Ctx* ctx);
+const char* AlxParamItemBuffTest_GetKey(AlxParamItemBuffTest_Ctx* ctx);
+const char* AlxParamItemBuffTest_GetValUnit(AlxParamItemBuffTest_Ctx* ctx);
+uint32_t AlxParamItemBuffTest_GetDataType(AlxParamItemBuffTest_Ctx* ctx);
+void AlxParamItemBuffTest_GetValArr(AlxParamItemBuffTest_Ctx* ctx, uint8_t* out);
+void AlxParamItemBuffTest_SetValArr(AlxParamItemBuffTest_Ctx* ctx, const uint8_t* val);
+void AlxParamItemBuffTest_GetValDefArr(AlxParamItemBuffTest_Ctx* ctx, uint8_t* out);
+int32_t AlxParamItemBuffTest_GetValStr(AlxParamItemBuffTest_Ctx* ctx, char* out, uint32_t maxLenWithNullTerm);
+int32_t AlxParamItemBuffTest_SetValStr(AlxParamItemBuffTest_Ctx* ctx, const char* val);
+const char* AlxParamItemBuffTest_GetValDefStr(AlxParamItemBuffTest_Ctx* ctx);
+void AlxParamItemBuffTest_SetValToDef(AlxParamItemBuffTest_Ctx* ctx);
+
+AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewArr(const uint8_t* valDef, uint32_t valBuffLen, const char* key, const char* valUnit)
+{
+	if (valBuffLen > ALX_PARAM_ITEM_BUFF_MAX)
+	{
+		return NULL;
+	}
+	AlxParamItemBuffTest_Ctx* ctx = calloc(1, sizeof(AlxParamItemBuffTest_Ctx));
+	if (ctx == NULL)
+	{
+		return NULL;
+	}
+	ctx->dataType = AlxParamItem_Arr;
+	memcpy(ctx->valDefSrc, valDef, valBuffLen);
+	strncpy(ctx->key, key, ALX_PARAM_ITEM_BUFF_MAX - 1);
+	strncpy(ctx->unit, valUnit, ALX_PARAM_ITEM_BUFF_MAX - 1);
+
+	AlxParamItem_CtorArr(&ctx->item, NULL, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
+		ctx->valDefSrc, ctx->valBuff, ctx->valDefBuff, valBuffLen,
+		AlxParamItem_Ignore, ctx->unit, false);
+	return ctx;
+}
+
+AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewStr(const char* valDef, uint32_t buffLen, const char* key, const char* valUnit)
+{
+	if (buffLen > ALX_PARAM_ITEM_BUFF_MAX)
+	{
+		return NULL;
+	}
+	AlxParamItemBuffTest_Ctx* ctx = calloc(1, sizeof(AlxParamItemBuffTest_Ctx));
+	if (ctx == NULL)
+	{
+		return NULL;
+	}
+	ctx->dataType = AlxParamItem_Str;
+	strncpy(ctx->strDef, valDef, ALX_PARAM_ITEM_BUFF_MAX - 1);
+	strncpy(ctx->key, key, ALX_PARAM_ITEM_BUFF_MAX - 1);
+	strncpy(ctx->unit, valUnit, ALX_PARAM_ITEM_BUFF_MAX - 1);
+
+	AlxParamItem_CtorStr(&ctx->item, NULL, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
+		ctx->strDef, AlxParamItem_Ignore, ctx->unit, false, ctx->valBuff, buffLen);
+	return ctx;
+}
+
+void AlxParamItemBuffTest_Delete(AlxParamItemBuffTest_Ctx* ctx)
+{
+	free(ctx);
+}
+
+uint32_t AlxParamItemBuffTest_GetBuffLen(AlxParamItemBuffTest_Ctx* ctx)
+{
+	return AlxParamItem_GetBuffLen(&ctx->item);
+}
+uint32_t AlxParamItemBuffTest_GetValLen(AlxParamItemBuffTest_Ctx* ctx)
+{
+	return AlxParamItem_GetValLen(&ctx->item);
+}
+const char* AlxParamItemBuffTest_GetKey(AlxParamItemBuffTest_Ctx* ctx)
+{
+	return AlxParamItem_GetKey(&ctx->item);
+}
+const char* AlxParamItemBuffTest_GetValUnit(AlxParamItemBuffTest_Ctx* ctx)
+{
+	return AlxParamItem_GetValUnit(&ctx->item);
+}
+uint32_t AlxParamItemBuffTest_GetDataType(AlxParamItemBuffTest_Ctx* ctx)
+{
+	AlxParamItem_DataType value = AlxParamItem_GetDataType(&ctx->item);
+	return (uint32_t)value;
+}
+
+void AlxParamItemBuffTest_GetValArr(AlxParamItemBuffTest_Ctx* ctx, uint8_t* out)
+{
+	AlxParamItem_GetValArr(&ctx->item, out);
+}
+void AlxParamItemBuffTest_SetValArr(AlxParamItemBuffTest_Ctx* ctx, const uint8_t* val)
+{
+	uint8_t scratch[ALX_PARAM_ITEM_BUFF_MAX];
+	// an Arr item's length is valLen - AlxParamItem_CtorArr never sets buffLen for it
+	memcpy(scratch, val, AlxParamItem_GetValLen(&ctx->item));
+	AlxParamItem_SetValArr(&ctx->item, scratch);
+}
+void AlxParamItemBuffTest_GetValDefArr(AlxParamItemBuffTest_Ctx* ctx, uint8_t* out)
+{
+	void* ptr = AlxParamItem_GetValDefArr(&ctx->item);
+	memcpy(out, ptr, AlxParamItem_GetValLen(&ctx->item));
+}
+
+int32_t AlxParamItemBuffTest_GetValStr(AlxParamItemBuffTest_Ctx* ctx, char* out, uint32_t maxLenWithNullTerm)
+{
+	Alx_Status status = AlxParamItem_GetValStr(&ctx->item, out, maxLenWithNullTerm);
+	return (int32_t)status;
+}
+int32_t AlxParamItemBuffTest_SetValStr(AlxParamItemBuffTest_Ctx* ctx, const char* val)
+{
+	char scratch[ALX_PARAM_ITEM_BUFF_MAX];
+	strncpy(scratch, val, ALX_PARAM_ITEM_BUFF_MAX - 1);
+	scratch[ALX_PARAM_ITEM_BUFF_MAX - 1] = '\0';
+	Alx_Status status = AlxParamItem_SetValStr(&ctx->item, scratch);
+	return (int32_t)status;
+}
+const char* AlxParamItemBuffTest_GetValDefStr(AlxParamItemBuffTest_Ctx* ctx)
+{
+	return AlxParamItem_GetValDefStr(&ctx->item);
+}
+void AlxParamItemBuffTest_SetValToDef(AlxParamItemBuffTest_Ctx* ctx)
+{
+	AlxParamItem_SetValToDef(&ctx->item);
+}

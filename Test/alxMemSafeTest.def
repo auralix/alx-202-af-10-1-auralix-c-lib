@@ -111,3 +111,18 @@ EXPORTS
 	AlxParamItemEnumTest_GetValF
 	AlxMemSafeTest_Status_ErrEnum
 	AlxMemSafeTest_Status_ErrConv
+	AlxParamItemBuffTest_NewArr
+	AlxParamItemBuffTest_NewStr
+	AlxParamItemBuffTest_Delete
+	AlxParamItemBuffTest_GetBuffLen
+	AlxParamItemBuffTest_GetValLen
+	AlxParamItemBuffTest_GetKey
+	AlxParamItemBuffTest_GetValUnit
+	AlxParamItemBuffTest_GetDataType
+	AlxParamItemBuffTest_GetValArr
+	AlxParamItemBuffTest_SetValArr
+	AlxParamItemBuffTest_GetValDefArr
+	AlxParamItemBuffTest_GetValStr
+	AlxParamItemBuffTest_SetValStr
+	AlxParamItemBuffTest_GetValDefStr
+	AlxParamItemBuffTest_SetValToDef

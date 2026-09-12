@@ -1770,6 +1770,26 @@ class MemSafeLib:
         c.AlxParamItemEnumTest_GetValI.argtypes = [vp]
         c.AlxParamItemEnumTest_GetValF.restype = f64
         c.AlxParamItemEnumTest_GetValF.argtypes = [vp]
+        # the buffer shim: Arr and Str lend the item their storage, so the context owns it
+        c.AlxParamItemBuffTest_NewArr.restype = vp
+        c.AlxParamItemBuffTest_NewArr.argtypes = [cp, u32, cp, cp]
+        c.AlxParamItemBuffTest_NewStr.restype = vp
+        c.AlxParamItemBuffTest_NewStr.argtypes = [cp, u32, cp, cp]
+        c.AlxParamItemBuffTest_Delete.argtypes = [vp]
+        for name in ("GetBuffLen", "GetValLen", "GetDataType"):
+            fn = getattr(c, f"AlxParamItemBuffTest_{name}")
+            fn.restype, fn.argtypes = u32, [vp]
+        for name in ("GetKey", "GetValUnit", "GetValDefStr"):
+            fn = getattr(c, f"AlxParamItemBuffTest_{name}")
+            fn.restype, fn.argtypes = cp, [vp]
+        c.AlxParamItemBuffTest_GetValArr.argtypes = [vp, cp]
+        c.AlxParamItemBuffTest_SetValArr.argtypes = [vp, cp]
+        c.AlxParamItemBuffTest_GetValDefArr.argtypes = [vp, cp]
+        c.AlxParamItemBuffTest_GetValStr.restype = i32
+        c.AlxParamItemBuffTest_GetValStr.argtypes = [vp, cp, u32]
+        c.AlxParamItemBuffTest_SetValStr.restype = i32
+        c.AlxParamItemBuffTest_SetValStr.argtypes = [vp, cp]
+        c.AlxParamItemBuffTest_SetValToDef.argtypes = [vp]
         c.AlxParamItemMetaTest_SetValToDef.argtypes = [vp]
         # alxRange and alxFtoa: pure functions, no context, called directly
         for name, ct in (("Uint8", ctypes.c_uint8), ("Uint16", ctypes.c_uint16),
@@ -1907,6 +1927,47 @@ class MemSafeLib:
         if data_type in self.FLOAT_TYPES:
             return self.c.AlxParamItemEnumTest_GetValF(ctx)
         return self.c.AlxParamItemEnumTest_GetValI(ctx)
+
+    # -- the two types that carry a buffer -------------------------------------
+
+    def buff_new_arr(self, val_def: bytes, key: str = "ARR", unit: str = ""):
+        return self.c.AlxParamItemBuffTest_NewArr(val_def, len(val_def), key.encode("ascii"),
+                                                  unit.encode("ascii"))
+
+    def buff_new_str(self, val_def: str, buff_len: int, key: str = "STR", unit: str = ""):
+        return self.c.AlxParamItemBuffTest_NewStr(val_def.encode("ascii"), buff_len,
+                                                  key.encode("ascii"), unit.encode("ascii"))
+
+    def buff_delete(self, ctx) -> None:
+        self.c.AlxParamItemBuffTest_Delete(ctx)
+
+    def buff(self, ctx, name: str):
+        value = getattr(self.c, f"AlxParamItemBuffTest_{name}")(ctx)
+        return value.decode("ascii") if isinstance(value, bytes) else value
+
+    def buff_get_arr(self, ctx, length: int) -> bytes:
+        out = ctypes.create_string_buffer(length)
+        self.c.AlxParamItemBuffTest_GetValArr(ctx, out)
+        return out.raw[:length]
+
+    def buff_set_arr(self, ctx, val: bytes) -> None:
+        self.c.AlxParamItemBuffTest_SetValArr(ctx, val)
+
+    def buff_get_def_arr(self, ctx, length: int) -> bytes:
+        out = ctypes.create_string_buffer(length)
+        self.c.AlxParamItemBuffTest_GetValDefArr(ctx, out)
+        return out.raw[:length]
+
+    def buff_get_str(self, ctx, size: int = 64) -> tuple[int, str]:
+        out = ctypes.create_string_buffer(size)
+        status = self.c.AlxParamItemBuffTest_GetValStr(ctx, out, size)
+        return status, out.value.decode("ascii", "replace")
+
+    def buff_set_str(self, ctx, val: str) -> int:
+        return self.c.AlxParamItemBuffTest_SetValStr(ctx, val.encode("ascii"))
+
+    def buff_set_val_to_def(self, ctx) -> None:
+        self.c.AlxParamItemBuffTest_SetValToDef(ctx)
 
     def item_set_str(self, ctx, val: str) -> int:
         return self.c.AlxParamItemStrTest_SetStr(ctx, val.encode("ascii"))
@@ -4768,6 +4829,22 @@ def make_enum_item(memsafe_lib):
     yield _make
     for ctx in ctxs:
         memsafe_lib.enum_delete(ctx)
+
+@pytest.fixture
+def make_buff_item(memsafe_lib):
+    """Factory: make_buff_item("arr"|"str", ...) -> an item whose storage the context owns."""
+    ctxs = []
+
+    def _make(kind: str, *args, **kwargs):
+        ctx = (memsafe_lib.buff_new_arr(*args, **kwargs) if kind == "arr"
+               else memsafe_lib.buff_new_str(*args, **kwargs))
+        assert ctx, f"the {kind} item could not be constructed"
+        ctxs.append(ctx)
+        return ctx
+
+    yield _make
+    for ctx in ctxs:
+        memsafe_lib.buff_delete(ctx)
 
 @pytest.fixture
 def make_store(flash):

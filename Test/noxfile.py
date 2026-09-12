@@ -190,7 +190,8 @@ MS_DEF = TEST / "alxMemSafeTest.def"
 # than no report: it reads as a measurement of the library and is really a measurement of this list.
 MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "test_alxParamStore.py",
             "test_alxParamItem.py", "test_alxParamItem_meta.py",
-            "test_alxParamItem_enum.py", "test_alxRange.py",
+            "test_alxParamItem_enum.py", "test_alxParamItem_buff.py",
+            "test_alxRange.py",
             "test_alxFtoa.py"]
 
 # The sanitize lane runs the same group with one file held back. alxFtoa.c:110 assigns a double to
