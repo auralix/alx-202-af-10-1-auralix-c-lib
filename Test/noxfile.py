@@ -222,6 +222,7 @@ MS_DEF = TEST / "alxMemSafeTest.def"
 # sat next to it exercising them. A coverage report that quietly omits a module's tests is worse
 # than no report: it reads as a measurement of the library and is really a measurement of this list.
 MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "test_alxParamStore.py",
+            "test_alxParamStore_groups.py",
             "test_alxParamItem.py", "test_alxParamItem_meta.py",
             "test_alxParamItem_enum.py", "test_alxParamItem_buff.py",
             "test_alxRange.py",

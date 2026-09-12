@@ -1211,3 +1211,200 @@ void AlxParamItemBuffTest_SetValToDef(AlxParamItemBuffTest_Ctx* ctx)
 {
 	AlxParamItem_SetValToDef(&ctx->item);
 }
+
+
+//------------------------------------------------------------------------------
+// Parameter store - MORE THAN ONE GROUP (ALX-1553)
+//------------------------------------------------------------------------------
+// AlxParamStore_Handle dispatches on the number of groups and has three state
+// machines: 1x, 2x and 4x. Only the first has ever run. _Handle_2xGroup is 160
+// lines and _Handle_4xGroup is 250, and they were the last two functions in
+// alxParamStore.c that no test entered - the shim above builds a store with
+// groupArr[1] and there was no way to ask for another.
+//
+// They are not dormant code in general: a product that keeps two banks of
+// parameters selects one of them. This product uses one group, so nothing here
+// is exposed today, which is exactly why nobody noticed.
+//
+// Each group is a whole chain of its own - crc, raw, safe, items, group - so
+// they are laid out as an array of one struct rather than parallel arrays. The
+// fake flash is global and 2048 bytes, so each group takes a 0x200 window and
+// they cannot tread on one another.
+//
+// The count is NOT validated by AlxParamStore_Ctor, which is worth knowing and
+// is why New accepts any number: the constructor stores it, Init only asserts
+// it matches what the constructor was given, and Handle's dispatch rejects
+// anything but 1, 2 and 4 with an assertion. So a 3-group store constructs,
+// initialises, and then does nothing for ever - silently, once assertions are
+// compiled out. That is P569.
+
+#define ALX_STORE_TEST_MAX_GROUPS 4
+#define ALX_STORE_TEST_ITEMS 2
+#define ALX_STORE_TEST_WINDOW 0x200
+
+typedef struct
+{
+	AlxCrc crc;
+	AlxMemRaw memRaw;
+	uint8_t buff1[16];
+	uint8_t buff2[16];
+	AlxMemSafe memSafe;
+	AlxParamItem items[ALX_STORE_TEST_ITEMS];
+	AlxParamItem* itemArr[ALX_STORE_TEST_ITEMS];
+	uint8_t valBuff[ALX_STORE_TEST_ITEMS];
+	uint8_t valStoredBuff[ALX_STORE_TEST_ITEMS];
+	uint8_t valToStoreBuff[ALX_STORE_TEST_ITEMS];
+	AlxParamGroup group;
+	char key[16];
+} AlxStoreTest_Group;
+
+typedef struct
+{
+	AlxStoreTest_Group groups[ALX_STORE_TEST_MAX_GROUPS];
+	AlxParamGroup* groupArr[ALX_STORE_TEST_MAX_GROUPS];
+	Alx_Status initStatus[ALX_STORE_TEST_MAX_GROUPS];
+	AlxParamStore store;
+	uint32_t numOfGroups;
+} AlxStoreTest_Ctx;
+
+AlxStoreTest_Ctx* AlxStoreTest_New(uint32_t numOfGroups);
+void AlxStoreTest_Delete(AlxStoreTest_Ctx* ctx);
+uint32_t AlxStoreTest_MaxGroups(void);
+uint32_t AlxStoreTest_ItemsPerGroup(void);
+uint32_t AlxStoreTest_GroupAddrA(uint32_t group);
+int32_t AlxStoreTest_Init(AlxStoreTest_Ctx* ctx);
+void AlxStoreTest_Handle(AlxStoreTest_Ctx* ctx, uint32_t times);
+bool AlxStoreTest_IsErr(AlxStoreTest_Ctx* ctx);
+uint32_t AlxStoreTest_ItemGet(AlxStoreTest_Ctx* ctx, uint32_t group, uint32_t index);
+int32_t AlxStoreTest_ItemSet(AlxStoreTest_Ctx* ctx, uint32_t group, uint32_t index, uint32_t val);
+
+uint32_t AlxStoreTest_MaxGroups(void)
+{
+	return ALX_STORE_TEST_MAX_GROUPS;
+}
+uint32_t AlxStoreTest_ItemsPerGroup(void)
+{
+	return ALX_STORE_TEST_ITEMS;
+}
+uint32_t AlxStoreTest_GroupAddrA(uint32_t group)
+{
+	return group * ALX_STORE_TEST_WINDOW;
+}
+
+AlxStoreTest_Ctx* AlxStoreTest_New(uint32_t numOfGroups)
+{
+	if (numOfGroups == 0 || numOfGroups > ALX_STORE_TEST_MAX_GROUPS)
+	{
+		return NULL;
+	}
+	AlxStoreTest_Ctx* ctx = (AlxStoreTest_Ctx*)calloc(1, sizeof(AlxStoreTest_Ctx));
+	if (ctx == NULL)
+	{
+		return NULL;
+	}
+	ctx->numOfGroups = numOfGroups;
+
+	for (uint32_t g = 0; g < numOfGroups; g++)
+	{
+		AlxStoreTest_Group* grp = &ctx->groups[g];
+		AlxCrc_Ctor(&grp->crc, AlxCrc_Config_Crc32);
+		AlxMemRaw_Ctor(&grp->memRaw);
+		AlxMemSafe_Ctor
+		(
+			&grp->memSafe,
+			&grp->memRaw,
+			&grp->crc,
+			AlxStoreTest_GroupAddrA(g),
+			AlxStoreTest_GroupAddrA(g) + 0x100,
+			ALX_STORE_TEST_ITEMS,
+			false,				// nonBlockingEnable
+			3,					// memSafeTries
+			3,					// memRawTries
+			100,				// memRawReadWriteTimeout_ms
+			grp->buff1,
+			sizeof(grp->buff1),
+			grp->buff2,
+			sizeof(grp->buff2)
+		);
+
+		// a distinct default per group, so a test can tell the groups apart in flash
+		for (uint32_t i = 0; i < ALX_STORE_TEST_ITEMS; i++)
+		{
+			AlxParamItem_CtorUint8
+			(
+				&grp->items[i],
+				NULL,
+				AlxParamItem_Param,
+				"PARAM",
+				i,
+				NULL,
+				g,
+				(uint8_t)(10 * (g + 1) + i),	// valDef
+				0,
+				255,
+				AlxParamItem_Ignore,
+				false,
+				NULL,
+				0,
+				"",
+				false
+			);
+			grp->itemArr[i] = &grp->items[i];
+		}
+
+		snprintf(grp->key, sizeof(grp->key), "GROUP_%u", (unsigned)g);
+		AlxParamGroup_Ctor
+		(
+			&grp->group,
+			&grp->memSafe,
+			grp->key,
+			ALX_STORE_TEST_ITEMS,
+			grp->valBuff,
+			grp->valStoredBuff,
+			grp->valToStoreBuff,
+			grp->itemArr,
+			ALX_STORE_TEST_ITEMS,
+			3					// initNumOfTries
+		);
+		ctx->groupArr[g] = &grp->group;
+		ctx->initStatus[g] = Alx_Err;
+	}
+
+	AlxParamStore_Ctor(&ctx->store, ctx->groupArr, numOfGroups);
+	return ctx;
+}
+
+void AlxStoreTest_Delete(AlxStoreTest_Ctx* ctx)
+{
+	free(ctx);
+}
+
+int32_t AlxStoreTest_Init(AlxStoreTest_Ctx* ctx)
+{
+	Alx_Status status = AlxParamStore_Init(&ctx->store, ctx->initStatus, ctx->numOfGroups);
+	return (int32_t)status;
+}
+
+void AlxStoreTest_Handle(AlxStoreTest_Ctx* ctx, uint32_t times)
+{
+	for (uint32_t i = 0; i < times; i++)
+	{
+		AlxParamStore_Handle(&ctx->store);
+	}
+}
+
+bool AlxStoreTest_IsErr(AlxStoreTest_Ctx* ctx)
+{
+	return AlxParamStore_IsErr(&ctx->store);
+}
+
+uint32_t AlxStoreTest_ItemGet(AlxStoreTest_Ctx* ctx, uint32_t group, uint32_t index)
+{
+	return AlxParamItem_GetValUint8(&ctx->groups[group].items[index]);
+}
+
+int32_t AlxStoreTest_ItemSet(AlxStoreTest_Ctx* ctx, uint32_t group, uint32_t index, uint32_t val)
+{
+	Alx_Status status = AlxParamItem_SetValUint8(&ctx->groups[group].items[index], (uint8_t)val);
+	return (int32_t)status;
+}

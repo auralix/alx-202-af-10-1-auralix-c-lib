@@ -1799,6 +1799,24 @@ class MemSafeLib:
         c.AlxParamItemBuffTest_SetValStr.restype = i32
         c.AlxParamItemBuffTest_SetValStr.argtypes = [vp, cp]
         c.AlxParamItemBuffTest_SetValToDef.argtypes = [vp]
+        # a store with MORE THAN ONE group - the 2x and 4x dispatch arms
+        c.AlxStoreTest_New.restype = vp
+        c.AlxStoreTest_New.argtypes = [u32]
+        c.AlxStoreTest_Delete.argtypes = [vp]
+        for name in ("MaxGroups", "ItemsPerGroup"):
+            fn = getattr(c, f"AlxStoreTest_{name}")
+            fn.restype, fn.argtypes = u32, []
+        c.AlxStoreTest_GroupAddrA.restype = u32
+        c.AlxStoreTest_GroupAddrA.argtypes = [u32]
+        c.AlxStoreTest_Init.restype = i32
+        c.AlxStoreTest_Init.argtypes = [vp]
+        c.AlxStoreTest_Handle.argtypes = [vp, u32]
+        c.AlxStoreTest_IsErr.restype = ctypes.c_bool
+        c.AlxStoreTest_IsErr.argtypes = [vp]
+        c.AlxStoreTest_ItemGet.restype = u32
+        c.AlxStoreTest_ItemGet.argtypes = [vp, u32, u32]
+        c.AlxStoreTest_ItemSet.restype = i32
+        c.AlxStoreTest_ItemSet.argtypes = [vp, u32, u32, u32]
         c.AlxParamItemMetaTest_SetValToDef.argtypes = [vp]
         # alxRange and alxFtoa: pure functions, no context, called directly
         for name, ct in (("Uint8", ctypes.c_uint8), ("Uint16", ctypes.c_uint16),
@@ -1977,6 +1995,38 @@ class MemSafeLib:
 
     def buff_set_val_to_def(self, ctx) -> None:
         self.c.AlxParamItemBuffTest_SetValToDef(ctx)
+
+    # -- a parameter store with more than one group ----------------------------
+
+    def store_new(self, groups: int):
+        return self.c.AlxStoreTest_New(groups)
+
+    def store_delete(self, ctx) -> None:
+        self.c.AlxStoreTest_Delete(ctx)
+
+    def store_max_groups(self) -> int:
+        return self.c.AlxStoreTest_MaxGroups()
+
+    def store_items_per_group(self) -> int:
+        return self.c.AlxStoreTest_ItemsPerGroup()
+
+    def store_group_addr(self, group: int) -> int:
+        return self.c.AlxStoreTest_GroupAddrA(group)
+
+    def store_group_init(self, ctx) -> int:
+        return self.c.AlxStoreTest_Init(ctx)
+
+    def store_group_handle(self, ctx, times: int = 1) -> None:
+        self.c.AlxStoreTest_Handle(ctx, times)
+
+    def store_group_err(self, ctx) -> bool:
+        return self.c.AlxStoreTest_IsErr(ctx)
+
+    def store_item(self, ctx, group: int, index: int) -> int:
+        return self.c.AlxStoreTest_ItemGet(ctx, group, index)
+
+    def store_item_set(self, ctx, group: int, index: int, val: int) -> int:
+        return self.c.AlxStoreTest_ItemSet(ctx, group, index, val)
 
     def item_set_str(self, ctx, val: str) -> int:
         return self.c.AlxParamItemStrTest_SetStr(ctx, val.encode("ascii"))
@@ -4878,6 +4928,26 @@ def make_cli_variant(cli_variant_lib):
     for ctx in ctxs:
         lib.c.AlxCliTest_Delete(ctx)
 
+
+@pytest.fixture
+def make_multi_store(memsafe_lib):
+    """Factory: make_multi_store(groups) -> a store of that many groups, auto-deleted.
+
+    The fake flash is global, so the fixture clears it first: two stores in one test would
+    otherwise read each other's records.
+    """
+    memsafe_lib.fake_reset()
+    ctxs = []
+
+    def _make(groups: int):
+        ctx = memsafe_lib.store_new(groups)
+        assert ctx, f"a store of {groups} group(s) could not be constructed"
+        ctxs.append(ctx)
+        return ctx
+
+    yield _make
+    for ctx in ctxs:
+        memsafe_lib.store_delete(ctx)
 
 @pytest.fixture
 def make_store(flash):

@@ -126,3 +126,13 @@ EXPORTS
 	AlxParamItemBuffTest_SetValStr
 	AlxParamItemBuffTest_GetValDefStr
 	AlxParamItemBuffTest_SetValToDef
+	AlxStoreTest_New
+	AlxStoreTest_Delete
+	AlxStoreTest_MaxGroups
+	AlxStoreTest_ItemsPerGroup
+	AlxStoreTest_GroupAddrA
+	AlxStoreTest_Init
+	AlxStoreTest_Handle
+	AlxStoreTest_IsErr
+	AlxStoreTest_ItemGet
+	AlxStoreTest_ItemSet
