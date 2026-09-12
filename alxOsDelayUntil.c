@@ -72,7 +72,7 @@ void AlxOsDelayUntil_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxOsDelayUntil_Init(AlxOsDelayUntil* me)
 {

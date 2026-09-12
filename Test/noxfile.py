@@ -53,13 +53,10 @@ ANALYSIS_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c",
 # It is now every library source EXCEPT the ones that cannot pass yet, named so the debt is visible
 # and shrinks by deletion rather than being rediscovered. Measured 12.09: 163 findings in 26 files.
 #
-# COMMENTS - 84 findings in 16 files, all "spaces in field separator (tabs only)". Mechanical, and
-# safe because it touches no code. Whoever does it deletes the name from this set.
-STYLE_PENDING_COMMENTS = [
-    "Mcu/alxRtc.h", "alxAudio.c", "alxAudioPlayer.c", "alxBool.c", "alxCrc.c", "alxDelay.c",
-    "alxFtoa.c", "alxId.c", "alxInterpLin.c", "alxIrq.c", "alxLinFun.c", "alxMemRaw.c",
-    "alxOsDelayUntil.c", "alxOsMutex.c", "alxTick.c", "alxTimSw.c",
-]
+# COMMENTS - was 84 findings in 16 files, all "spaces in field separator (tabs only)". Swept 12.09:
+# 54 doc blocks, 85 lines, a 1:1 space-for-tab swap that changed no content. The set is empty and
+# stays here as the place a new straggler would be named rather than quietly excluded.
+STYLE_PENDING_COMMENTS = []
 
 # TERNARIES - 29 findings in 10 files, and this half is NOT a cleanup job. Fifteen of them cannot
 # be written as if/else in C at all: they are macro bodies that must expand to an EXPRESSION.

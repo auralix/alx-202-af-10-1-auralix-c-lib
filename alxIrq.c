@@ -43,7 +43,7 @@
 
 /**
   * @brief
-  * @return key
+  * @return	key
   */
 uint32_t AlxIrq_Lock(void)
 {
@@ -58,7 +58,7 @@ uint32_t AlxIrq_Lock(void)
 
 /**
   * @brief
-  * @param[in] key
+  * @param[in]	key
   */
 void AlxIrq_Unlock(uint32_t key)
 {

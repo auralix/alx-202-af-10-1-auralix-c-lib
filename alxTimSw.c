@@ -65,7 +65,7 @@ void AlxTimSw_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTimSw_Start(AlxTimSw* me)
 {
@@ -81,7 +81,7 @@ void AlxTimSw_Start(AlxTimSw* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTimSw_Stop(AlxTimSw* me)
 {

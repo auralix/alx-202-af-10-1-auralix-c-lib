@@ -68,9 +68,9 @@ static const double rounders[MAX_PRECISION + 1] =
 
 /**
   * @brief
-  * @param[in] f
-  * @param[in,out] buf
-  * @param[in] precision
+  * @param[in]		f
+  * @param[in,out]	buf
+  * @param[in]		precision
   */
 char* AlxFtoa(double f, char* buf, int precision)
 {

@@ -43,7 +43,7 @@
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxOsMutex_Ctor
 (
@@ -70,7 +70,7 @@ void AlxOsMutex_Ctor
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in]	me
   */
 void AlxOsMutex_Lock(AlxOsMutex* me)
 {
@@ -84,7 +84,7 @@ void AlxOsMutex_Lock(AlxOsMutex* me)
 
 /**
   * @brief
-  * @param[in] me
+  * @param[in]	me
   */
 void AlxOsMutex_Unlock(AlxOsMutex* me)
 {

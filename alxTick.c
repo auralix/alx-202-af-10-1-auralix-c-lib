@@ -49,7 +49,7 @@ AlxTick alxTick = {};
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTick_Ctor
 (
@@ -157,7 +157,7 @@ uint64_t AlxTick_Get_hr(AlxTick* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTick_Inc_ns(AlxTick* me)
 {
@@ -170,7 +170,7 @@ void AlxTick_Inc_ns(AlxTick* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTick_Inc_us(AlxTick* me)
 {
@@ -183,7 +183,7 @@ void AlxTick_Inc_us(AlxTick* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTick_Inc_ms(AlxTick* me)
 {
@@ -196,7 +196,7 @@ void AlxTick_Inc_ms(AlxTick* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTick_Inc_sec(AlxTick* me)
 {
@@ -209,7 +209,7 @@ void AlxTick_Inc_sec(AlxTick* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTick_Inc_min(AlxTick* me)
 {
@@ -222,7 +222,7 @@ void AlxTick_Inc_min(AlxTick* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTick_Inc_hr(AlxTick* me)
 {

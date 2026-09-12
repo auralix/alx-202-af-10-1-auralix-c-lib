@@ -43,14 +43,14 @@
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] valInitial
-  * @param[in] trueShortTime_ms
-  * @param[in] trueLongTime_ms
-  * @param[in] falseShortTime_ms
-  * @param[in] falseLongTime_ms
-  * @param[in] filtGlitchBool_StableTrueTime_ms
-  * @param[in] filtGlitchBool_StableFalseTime_ms
+  * @param[in,out]	me
+  * @param[in]		valInitial
+  * @param[in]		trueShortTime_ms
+  * @param[in]		trueLongTime_ms
+  * @param[in]		falseShortTime_ms
+  * @param[in]		falseLongTime_ms
+  * @param[in]		filtGlitchBool_StableTrueTime_ms
+  * @param[in]		filtGlitchBool_StableFalseTime_ms
   */
 void AlxBool_Ctor
 (

@@ -88,7 +88,7 @@ void AlxInterpLin_Ctor
   * @brief
   * @param[in]	me
   * @param[in]	x
-  * @param[out] y
+  * @param[out]	y
   * @retval		Alx_Ok
   * @retval		Alx_Err
   */
@@ -164,8 +164,8 @@ Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* yPtr)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] x
+  * @param[in]	me
+  * @param[in]	x
   * @return
   */
 float AlxInterpLin_GetY(AlxInterpLin* me, float x)

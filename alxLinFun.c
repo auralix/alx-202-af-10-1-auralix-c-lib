@@ -243,8 +243,8 @@ Alx_Status AlxLinFun_GetY_WithStatus(AlxLinFun* me, float x, float* y)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] x
+  * @param[in]	me
+  * @param[in]	x
   * @return
   */
 float AlxLinFun_GetY(AlxLinFun* me, float x) // Return float, ignore Alx_Status
@@ -258,8 +258,8 @@ float AlxLinFun_GetY(AlxLinFun* me, float x) // Return float, ignore Alx_Status
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] y
+  * @param[in]	me
+  * @param[in]	y
   * @return
   */
 float AlxLinFun_GetX(AlxLinFun* me, float y) // Return float, ignore Alx_Status
@@ -325,8 +325,8 @@ Alx_Status AlxLinFunInt_GetY_WithStatus(AlxLinFunInt* me, int32_t x, int32_t* y)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] x
+  * @param[in]	me
+  * @param[in]	x
   * @return
   */
 int32_t AlxLinFunInt_GetY(AlxLinFunInt* me, int32_t x) // Return float, ignore Alx_Status

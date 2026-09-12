@@ -407,7 +407,7 @@ void AlxId_Ctor_NoHwId
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxId_Init(AlxId* me)
 {
@@ -499,7 +499,7 @@ void AlxId_Init(AlxId* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxId_Trace(AlxId* me)
 {
@@ -1217,8 +1217,8 @@ uint8_t AlxId_GetHwId(AlxId* me)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[out]	uniqueIdUint32
-  * @param[in]	len
+  * @param[out]		uniqueIdUint32
+  * @param[in]		len
   */
 void AlxId_GetHwMcuUniqueIdUint32(AlxId* me, uint32_t* uniqueIdUint32, uint8_t len)
 {
@@ -1236,8 +1236,8 @@ void AlxId_GetHwMcuUniqueIdUint32(AlxId* me, uint32_t* uniqueIdUint32, uint8_t l
 /**
   * @brief
   * @param[in,out]	me
-  * @param[out]	uniqueIdUint8
-  * @param[in]	len
+  * @param[out]		uniqueIdUint8
+  * @param[in]		len
   */
 void AlxId_GetHwMcuUniqueIdUint8(AlxId* me, uint8_t* uniqueIdUint8, uint8_t len)
 {

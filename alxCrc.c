@@ -245,7 +245,7 @@ bool AlxCrc_IsOk(AlxCrc* me, uint8_t* dataWithCrc, uint32_t lenWithCrc, uint32_t
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 uint32_t AlxCrc_GetLen(AlxCrc* me)
