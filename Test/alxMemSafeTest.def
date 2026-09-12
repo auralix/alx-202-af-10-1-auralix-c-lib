@@ -136,3 +136,19 @@ EXPORTS
 	AlxStoreTest_IsErr
 	AlxStoreTest_ItemGet
 	AlxStoreTest_ItemSet
+	AlxParamItemKvTest_New
+	AlxParamItemKvTest_Delete
+	AlxParamItemKvTest_LoadVal
+	AlxParamItemKvTest_StoreVal
+	AlxParamItemKvTest_SetVal
+	AlxParamItemKvTest_GetVal
+	AlxParamItemKvTest_GetKey
+	AlxParamKvStoreFake_Reset
+	AlxParamKvStoreFake_Enable
+	AlxParamKvStoreFake_FailGet
+	AlxParamKvStoreFake_FailSet
+	AlxParamKvStoreFake_GetCount
+	AlxParamKvStoreFake_SetCount
+	AlxParamKvStoreFake_NumOfKeys
+	AlxParamKvStoreFake_Peek
+	AlxParamKvStoreFake_Poke

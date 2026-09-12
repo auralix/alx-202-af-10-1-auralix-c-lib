@@ -225,6 +225,7 @@ MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "te
             "test_alxParamStore_groups.py",
             "test_alxParamItem.py", "test_alxParamItem_meta.py",
             "test_alxParamItem_enum.py", "test_alxParamItem_buff.py",
+            "test_alxParamItem_kv.py",
             "test_alxRange.py",
             "test_alxFtoa.py"]
 

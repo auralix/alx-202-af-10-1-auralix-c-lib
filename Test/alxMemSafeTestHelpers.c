@@ -1408,3 +1408,145 @@ int32_t AlxStoreTest_ItemSet(AlxStoreTest_Ctx* ctx, uint32_t group, uint32_t ind
 	Alx_Status status = AlxParamItem_SetValUint8(&ctx->groups[group].items[index], (uint8_t)val);
 	return (int32_t)status;
 }
+
+
+//------------------------------------------------------------------------------
+// Parameter item - the two functions that need a KV store (ALX-1553)
+//------------------------------------------------------------------------------
+// AlxParamItem_LoadVal and AlxParamItem_StoreVal were the last two of this
+// module's 105 functions that no test had called. Both open with
+// ALX_PARAM_ITEM_ASSERT(me->paramKvStore != NULL), and every item this harness
+// built until now passed NULL - the same as the product's CLI items - so there
+// was no way in.
+//
+// The store pointer is never dereferenced by the library: it is handed straight
+// back to AlxParamKvStore_Get/_Set, which the link-time fake supplies. So the
+// context can hand over a pointer to a dummy byte and the fake does the work.
+// That is what makes this reachable without a file system.
+
+typedef struct
+{
+	AlxParamItem item;
+	AlxParamItem_DataType dataType;
+	uint8_t storeStandIn;	// never dereferenced - only its address travels
+	char key[48];
+} AlxParamItemKvTest_Ctx;
+
+AlxParamItemKvTest_Ctx* AlxParamItemKvTest_New(uint32_t dataType, const char* key, int64_t valDef);
+void AlxParamItemKvTest_Delete(AlxParamItemKvTest_Ctx* ctx);
+int32_t AlxParamItemKvTest_LoadVal(AlxParamItemKvTest_Ctx* ctx);
+int32_t AlxParamItemKvTest_StoreVal(AlxParamItemKvTest_Ctx* ctx);
+int32_t AlxParamItemKvTest_SetVal(AlxParamItemKvTest_Ctx* ctx, int64_t val);
+int64_t AlxParamItemKvTest_GetVal(AlxParamItemKvTest_Ctx* ctx);
+const char* AlxParamItemKvTest_GetKey(AlxParamItemKvTest_Ctx* ctx);
+
+AlxParamItemKvTest_Ctx* AlxParamItemKvTest_New(uint32_t dataType, const char* key, int64_t valDef)
+{
+	AlxParamItemKvTest_Ctx* ctx = calloc(1, sizeof(AlxParamItemKvTest_Ctx));
+	if (ctx == NULL)
+	{
+		return NULL;
+	}
+	ctx->dataType = (AlxParamItem_DataType)dataType;
+	strncpy(ctx->key, key, sizeof(ctx->key) - 1);
+
+	AlxParamKvStore* store = (AlxParamKvStore*)(void*)&ctx->storeStandIn;
+	switch (ctx->dataType)
+	{
+		case AlxParamItem_Uint8:
+			AlxParamItem_CtorUint8(&ctx->item, store, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
+				(uint8_t)valDef, 0, 255, AlxParamItem_Ignore, false, NULL, 0, "", false);
+			break;
+		case AlxParamItem_Uint16:
+			AlxParamItem_CtorUint16(&ctx->item, store, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
+				(uint16_t)valDef, 0, 65535, AlxParamItem_Ignore, false, NULL, 0, "", false);
+			break;
+		case AlxParamItem_Uint32:
+			AlxParamItem_CtorUint32(&ctx->item, store, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
+				(uint32_t)valDef, 0, 4294967295u, AlxParamItem_Ignore, false, NULL, 0, "", false);
+			break;
+		case AlxParamItem_Int32:
+			AlxParamItem_CtorInt32(&ctx->item, store, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
+				(int32_t)valDef, -2147483647 - 1, 2147483647, AlxParamItem_Ignore, false, NULL, 0, "", false);
+			break;
+		case AlxParamItem_Uint64:
+		case AlxParamItem_Int8:
+		case AlxParamItem_Int16:
+		case AlxParamItem_Int64:
+		case AlxParamItem_Float:
+		case AlxParamItem_Double:
+		case AlxParamItem_Bool:
+		case AlxParamItem_Arr:
+		case AlxParamItem_Str:
+		default:
+			free(ctx);
+			return NULL;
+	}
+	return ctx;
+}
+
+void AlxParamItemKvTest_Delete(AlxParamItemKvTest_Ctx* ctx)
+{
+	free(ctx);
+}
+
+int32_t AlxParamItemKvTest_LoadVal(AlxParamItemKvTest_Ctx* ctx)
+{
+	Alx_Status status = AlxParamItem_LoadVal(&ctx->item);
+	return (int32_t)status;
+}
+
+int32_t AlxParamItemKvTest_StoreVal(AlxParamItemKvTest_Ctx* ctx)
+{
+	Alx_Status status = AlxParamItem_StoreVal(&ctx->item);
+	return (int32_t)status;
+}
+
+int32_t AlxParamItemKvTest_SetVal(AlxParamItemKvTest_Ctx* ctx, int64_t val)
+{
+	Alx_Status status = Alx_Err;
+	switch (ctx->dataType)
+	{
+		case AlxParamItem_Uint8:	status = AlxParamItem_SetValUint8(&ctx->item, (uint8_t)val);	break;
+		case AlxParamItem_Uint16:	status = AlxParamItem_SetValUint16(&ctx->item, (uint16_t)val);	break;
+		case AlxParamItem_Uint32:	status = AlxParamItem_SetValUint32(&ctx->item, (uint32_t)val);	break;
+		case AlxParamItem_Int32:	status = AlxParamItem_SetValInt32(&ctx->item, (int32_t)val);	break;
+		case AlxParamItem_Uint64:
+		case AlxParamItem_Int8:
+		case AlxParamItem_Int16:
+		case AlxParamItem_Int64:
+		case AlxParamItem_Float:
+		case AlxParamItem_Double:
+		case AlxParamItem_Bool:
+		case AlxParamItem_Arr:
+		case AlxParamItem_Str:
+		default:																					break;
+	}
+	return (int32_t)status;
+}
+
+int64_t AlxParamItemKvTest_GetVal(AlxParamItemKvTest_Ctx* ctx)
+{
+	switch (ctx->dataType)
+	{
+		case AlxParamItem_Uint8:	return (int64_t)AlxParamItem_GetValUint8(&ctx->item);
+		case AlxParamItem_Uint16:	return (int64_t)AlxParamItem_GetValUint16(&ctx->item);
+		case AlxParamItem_Uint32:	return (int64_t)AlxParamItem_GetValUint32(&ctx->item);
+		case AlxParamItem_Int32:	return (int64_t)AlxParamItem_GetValInt32(&ctx->item);
+		case AlxParamItem_Uint64:
+		case AlxParamItem_Int8:
+		case AlxParamItem_Int16:
+		case AlxParamItem_Int64:
+		case AlxParamItem_Float:
+		case AlxParamItem_Double:
+		case AlxParamItem_Bool:
+		case AlxParamItem_Arr:
+		case AlxParamItem_Str:
+		default:					return 0;
+	}
+}
+
+const char* AlxParamItemKvTest_GetKey(AlxParamItemKvTest_Ctx* ctx)
+{
+	return AlxParamItem_GetKey(&ctx->item);
+}

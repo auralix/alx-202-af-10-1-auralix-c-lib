@@ -1817,6 +1817,28 @@ class MemSafeLib:
         c.AlxStoreTest_ItemGet.argtypes = [vp, u32, u32]
         c.AlxStoreTest_ItemSet.restype = i32
         c.AlxStoreTest_ItemSet.argtypes = [vp, u32, u32, u32]
+        # LoadVal / StoreVal, which need a store pointer - and the fake that backs it
+        c.AlxParamItemKvTest_New.restype = vp
+        c.AlxParamItemKvTest_New.argtypes = [u32, cp, i64]
+        c.AlxParamItemKvTest_Delete.argtypes = [vp]
+        for name in ("LoadVal", "StoreVal"):
+            fn = getattr(c, f"AlxParamItemKvTest_{name}")
+            fn.restype, fn.argtypes = i32, [vp]
+        c.AlxParamItemKvTest_SetVal.restype = i32
+        c.AlxParamItemKvTest_SetVal.argtypes = [vp, i64]
+        c.AlxParamItemKvTest_GetVal.restype = i64
+        c.AlxParamItemKvTest_GetVal.argtypes = [vp]
+        c.AlxParamItemKvTest_GetKey.restype = cp
+        c.AlxParamItemKvTest_GetKey.argtypes = [vp]
+        c.AlxParamKvStoreFake_Reset.argtypes = []
+        for name in ("Enable", "FailGet", "FailSet"):
+            getattr(c, f"AlxParamKvStoreFake_{name}").argtypes = [ctypes.c_bool]
+        for name in ("GetCount", "SetCount", "NumOfKeys"):
+            fn = getattr(c, f"AlxParamKvStoreFake_{name}")
+            fn.restype, fn.argtypes = u32, []
+        c.AlxParamKvStoreFake_Peek.restype = ctypes.c_bool
+        c.AlxParamKvStoreFake_Peek.argtypes = [cp, cp, ctypes.POINTER(u32)]
+        c.AlxParamKvStoreFake_Poke.argtypes = [cp, cp, u32]
         c.AlxParamItemMetaTest_SetValToDef.argtypes = [vp]
         # alxRange and alxFtoa: pure functions, no context, called directly
         for name, ct in (("Uint8", ctypes.c_uint8), ("Uint16", ctypes.c_uint16),
@@ -2027,6 +2049,58 @@ class MemSafeLib:
 
     def store_item_set(self, ctx, group: int, index: int, val: int) -> int:
         return self.c.AlxStoreTest_ItemSet(ctx, group, index, val)
+
+    # -- the KV store an item loads from and stores to --------------------------
+
+    def kv_reset(self) -> None:
+        """Clear the fake AND disarm it - the disarmed fake is what every other group expects."""
+        self.c.AlxParamKvStoreFake_Reset()
+
+    def kv_enable(self, enable: bool = True) -> None:
+        self.c.AlxParamKvStoreFake_Enable(enable)
+
+    def kv_fail_get(self, fail: bool = True) -> None:
+        self.c.AlxParamKvStoreFake_FailGet(fail)
+
+    def kv_fail_set(self, fail: bool = True) -> None:
+        self.c.AlxParamKvStoreFake_FailSet(fail)
+
+    def kv_get_count(self) -> int:
+        return self.c.AlxParamKvStoreFake_GetCount()
+
+    def kv_set_count(self) -> int:
+        return self.c.AlxParamKvStoreFake_SetCount()
+
+    def kv_num_of_keys(self) -> int:
+        return self.c.AlxParamKvStoreFake_NumOfKeys()
+
+    def kv_peek(self, key: str, size: int = 64):
+        """The bytes stored under `key`, or None if the key is not there."""
+        out = ctypes.create_string_buffer(size)
+        length = ctypes.c_uint32(0)
+        found = self.c.AlxParamKvStoreFake_Peek(key.encode("ascii"), out, ctypes.byref(length))
+        return out.raw[:length.value] if found else None
+
+    def kv_poke(self, key: str, data: bytes) -> None:
+        self.c.AlxParamKvStoreFake_Poke(key.encode("ascii"), data, len(data))
+
+    def kv_item_new(self, data_type: int, key: str = "KV_KEY", val_def: int = 0):
+        return self.c.AlxParamItemKvTest_New(data_type, key.encode("ascii"), val_def)
+
+    def kv_item_delete(self, ctx) -> None:
+        self.c.AlxParamItemKvTest_Delete(ctx)
+
+    def kv_load(self, ctx) -> int:
+        return self.c.AlxParamItemKvTest_LoadVal(ctx)
+
+    def kv_store(self, ctx) -> int:
+        return self.c.AlxParamItemKvTest_StoreVal(ctx)
+
+    def kv_set(self, ctx, val: int) -> int:
+        return self.c.AlxParamItemKvTest_SetVal(ctx, val)
+
+    def kv_get(self, ctx) -> int:
+        return self.c.AlxParamItemKvTest_GetVal(ctx)
 
     def item_set_str(self, ctx, val: str) -> int:
         return self.c.AlxParamItemStrTest_SetStr(ctx, val.encode("ascii"))
@@ -4948,6 +5022,29 @@ def make_multi_store(memsafe_lib):
     yield _make
     for ctx in ctxs:
         memsafe_lib.store_delete(ctx)
+
+@pytest.fixture
+def make_kv_item(memsafe_lib):
+    """Factory: make_kv_item(data_type, key, val_def) -> an item WITH a store, auto-deleted.
+
+    Arms the fake on the way in and DISARMS it on the way out. Disarmed is the state every other
+    group depends on - their items are built without a store, and a call arriving at the fake means
+    a test wandered into persistence, which must keep failing loudly.
+    """
+    memsafe_lib.kv_reset()
+    memsafe_lib.kv_enable(True)
+    ctxs = []
+
+    def _make(data_type: int, key: str = "KV_KEY", val_def: int = 0):
+        ctx = memsafe_lib.kv_item_new(data_type, key, val_def)
+        assert ctx, f"an item of type {data_type} with a store could not be constructed"
+        ctxs.append(ctx)
+        return ctx
+
+    yield _make
+    for ctx in ctxs:
+        memsafe_lib.kv_item_delete(ctx)
+    memsafe_lib.kv_reset()
 
 @pytest.fixture
 def make_store(flash):
