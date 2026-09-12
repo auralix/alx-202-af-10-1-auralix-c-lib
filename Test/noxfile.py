@@ -166,7 +166,7 @@ CLI_ASSERTS = ["-DALX_CLI_ASSERT_RST_ENABLE", "-DALX_SERIAL_PORT_ASSERT_RST_ENAB
 CLI_CLOSURE = [CLIB / "alxParamItem.c", CLIB / "alxParamMgmt.c", CLIB / "alxFtoa.c", CLIB / "alxRange.c"]
 CLI_STRICT = [CLIB / "alxCli.c", CLIB / "alxFifo.c", CLIB / "alxBound.c", TEST / "alxSerialPortFake.c",
               TEST / "alxParamKvStoreFake.c", TEST / "alxIdFake.c", TEST / "alxAssertPc.c",
-              TEST / "alxCliTestHelpers.c"]
+              TEST / "alxTracePc.c", TEST / "alxCliTestHelpers.c"]
 CLI_DEF = TEST / "alxCliTest.def"
 CLI_TESTS = ["test_alxCli.py"]
 

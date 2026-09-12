@@ -54,6 +54,10 @@ CLI_SOURCES_STRICT = [
     TEST_DIR / "alxParamKvStoreFake.c",
     TEST_DIR / "alxIdFake.c",
     TEST_DIR / "alxAssertPc.c",
+    # alxTracePc.c SUPPLIES AlxTrace_WriteLevel and the alxTrace instance - no group compiles
+    # Mcu/alxTrace.c. Needed the moment a variant compiles a trace form; KEEP IN SYNC with
+    # noxfile.CLI_STRICT.
+    TEST_DIR / "alxTracePc.c",
     TEST_DIR / "alxCliTestHelpers.c",
 ]
 # asserts ON = test the code AS SHIPPED (product enables RST mode). Scoped to
@@ -1042,6 +1046,11 @@ VARIANT_GROUPS: dict[str, VariantGroup] = {
     "lin": VariantGroup(LIN_DLL, LIN_SOURCES, (), LIN_DEPS, TEST_DIR / "alxLinTest.def", None),
     "memsafe": VariantGroup(MEMSAFE_DLL, MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE,
                             MEMSAFE_DEPS, TEST_DIR / "alxMemSafeTest.def", "memSafeClosure"),
+    # cli   the ELISION question at its sharpest. alxCli.c does 21 of its serial writes
+    #       INSIDE ALX_CLI_ASSERT, so `off` compiles a CLI that answers nothing at all.
+    #       The group already had sources, a closure and a .def; only this line was missing.
+    "cli": VariantGroup(CLI_DLL, CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE,
+                        CLI_DEPS, TEST_DIR / "alxCliTest.def", "cliClosure"),
 }
 
 
@@ -4845,6 +4854,30 @@ def make_buff_item(memsafe_lib):
     yield _make
     for ctx in ctxs:
         memsafe_lib.buff_delete(ctx)
+
+@pytest.fixture(params=list(VARIANTS))
+def cli_variant_lib(request) -> tuple[str, CliLib]:
+    """The CLI group built in each named configuration. Not wired to ALX_CLI_TEST_DLL, for
+    the reason the other variant fixtures are not: a lane that overrides the DLL would hand
+    every configuration the same file and the test would pass without measuring anything."""
+    return request.param, _variant_lib("cli", request.param, CliLib)
+
+
+@pytest.fixture
+def make_cli_variant(cli_variant_lib):
+    """Factory over a variant CLI: make_cli_variant() -> CliUnderTest, auto-deleted."""
+    _name, lib = cli_variant_lib
+    ctxs = []
+
+    def _make() -> CliUnderTest:
+        ctx = lib.c.AlxCliTest_New()
+        ctxs.append(ctx)
+        return CliUnderTest(lib, ctx)
+
+    yield _make
+    for ctx in ctxs:
+        lib.c.AlxCliTest_Delete(ctx)
+
 
 @pytest.fixture
 def make_store(flash):
