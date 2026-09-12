@@ -215,20 +215,7 @@ void AlxId_Ctor
 	//------------------------------------------------------------------------------
 	// FW - Compiler
 	//------------------------------------------------------------------------------
-	#if defined(__clang__)
-		// Preprocessor
-		#if (ALX_xVER3(__clang_major__, __clang_minor__, __clang_patchlevel__) < ALX_COMP_CLANG_VER_MIN_REQUIRED)
-			#error
-		#endif
-
-		// Const
-		strcpy(me->fwComp.name, "Clang");
-		me->fwComp.verMajor = __clang_major__;
-		me->fwComp.verMinor = __clang_minor__;
-		me->fwComp.verPatch = __clang_patchlevel__;
-		me->fwComp.ver = ALX_xVER3(__clang_major__, __clang_minor__, __clang_patchlevel__);
-		me->fwComp.verMinRequired = ALX_COMP_CLANG_VER_MIN_REQUIRED;
-	#elif defined(__GNUC__)
+	#if defined(__GNUC__) && !defined(__clang__)
 		// Preprocessor
 		// GNU -> [G]NU is [N]ot [U]nix
 		// GCC -> [G]NU [C]ompiler [C]ollection
@@ -243,6 +230,19 @@ void AlxId_Ctor
 		me->fwComp.verPatch = __GNUC_PATCHLEVEL__;
 		me->fwComp.ver = ALX_xVER3(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 		me->fwComp.verMinRequired = ALX_COMP_GCC_VER_MIN_REQUIRED;
+	#elif defined(__clang__)
+		// Preprocessor
+		#if (ALX_xVER3(__clang_major__, __clang_minor__, __clang_patchlevel__) < ALX_COMP_CLANG_VER_MIN_REQUIRED)
+			#error
+		#endif
+
+		// Const
+		strcpy(me->fwComp.name, "Clang");
+		me->fwComp.verMajor = __clang_major__;
+		me->fwComp.verMinor = __clang_minor__;
+		me->fwComp.verPatch = __clang_patchlevel__;
+		me->fwComp.ver = ALX_xVER3(__clang_major__, __clang_minor__, __clang_patchlevel__);
+		me->fwComp.verMinRequired = ALX_COMP_CLANG_VER_MIN_REQUIRED;
 	#else
 		strcpy(me->fwComp.name, "Unknown");
 	#endif

@@ -1232,4 +1232,4 @@ def test_ALX1553_P575_a_non_newlib_build_names_its_c_library_instead_of_leaving_
     """
     obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(2, "BoardTwo")], [2])
 
-    assert id_lib.c.AlxIdTest_FwLangCLibName(obj).decode("ascii") == "Unknown"
+    assert id_lib.c.AlxIdTest_FwLangCLibName(obj).decode("ascii") == "Unknown C Standard Library"

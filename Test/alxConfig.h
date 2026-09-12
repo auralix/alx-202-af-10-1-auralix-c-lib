@@ -28,8 +28,8 @@
 // FW identity minimums
 //******************************************************************************
 #define ALX_LANG_C_VER_MIN_REQUIRED 199901L			// C99
-#define ALX_COMP_CLANG_VER_MIN_REQUIRED 0x16010008	// 22.1.8
 #define ALX_COMP_GCC_VER_MIN_REQUIRED 0x0A030001		// 10.3.1
+#define ALX_COMP_CLANG_VER_MIN_REQUIRED 0x16010008	// 22.1.8
 
 //******************************************************************************
 // Trace - OFF unless a build variant says otherwise
