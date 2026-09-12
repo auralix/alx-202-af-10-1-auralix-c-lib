@@ -74,3 +74,28 @@ EXPORTS
 	AlxTracePc_LastFile
 	AlxTracePc_LastFun
 	AlxTracePc_LevelConfigured
+	AlxParamItemMetaTest_New
+	AlxParamItemMetaTest_Delete
+	AlxParamItemMetaTest_GetDataType
+	AlxParamItemMetaTest_GetParamType
+	AlxParamItemMetaTest_GetKey
+	AlxParamItemMetaTest_GetId
+	AlxParamItemMetaTest_GetGroupKey
+	AlxParamItemMetaTest_GetGroupId
+	AlxParamItemMetaTest_GetValOutOfRangeHandle
+	AlxParamItemMetaTest_GetValUnit
+	AlxParamItemMetaTest_GetValChangeTakesEffectAfterReset
+	AlxParamItemMetaTest_GetBuffLen
+	AlxParamItemMetaTest_GetValLen
+	AlxParamItemMetaTest_GetIsEnum
+	AlxParamItemMetaTest_GetValDefI
+	AlxParamItemMetaTest_GetValMinI
+	AlxParamItemMetaTest_GetValMaxI
+	AlxParamItemMetaTest_GetValDefF
+	AlxParamItemMetaTest_GetValMinF
+	AlxParamItemMetaTest_GetValMaxF
+	AlxParamItemMetaTest_GetValI
+	AlxParamItemMetaTest_GetValF
+	AlxParamItemMetaTest_SetValI
+	AlxParamItemMetaTest_SetValF
+	AlxParamItemMetaTest_SetValToDef

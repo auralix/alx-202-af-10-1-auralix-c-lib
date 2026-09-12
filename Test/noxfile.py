@@ -189,7 +189,17 @@ MS_DEF = TEST / "alxMemSafeTest.def"
 # sat next to it exercising them. A coverage report that quietly omits a module's tests is worse
 # than no report: it reads as a measurement of the library and is really a measurement of this list.
 MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "test_alxParamStore.py",
-            "test_alxParamItem.py", "test_alxRange.py", "test_alxFtoa.py"]
+            "test_alxParamItem.py", "test_alxParamItem_meta.py", "test_alxRange.py",
+            "test_alxFtoa.py"]
+
+# The sanitize lane runs the same group with one file held back. alxFtoa.c:110 assigns a double to
+# a `long` - 32 bits here and on the target alike - and a value past 2147483647 is then a conversion
+# C99 6.3.1.4 leaves undefined. That defect is already sealed as P420, which proves it prints
+# punctuation instead of digits; what a strict xfail cannot do is survive UBSan, because the lane
+# builds with -fno-sanitize-recover and the process ABORTS rather than failing an assertion.
+# So the file stays in COVERAGE, where it measures the module at 100 %, and waits here for the fix.
+# Drop this list the moment P420 comes off.
+MS_TESTS_UBSAN = [t for t in MS_TESTS if t != "test_alxFtoa.py"]
 
 # Id group: the real alxId over the IO pin fake, asserts ON = the code as shipped. Both closure
 # sources are closure for reasons written out at conftest's ID group - alxId.c fails -Wformat and
@@ -535,7 +545,7 @@ def sanitize(session: nox.Session) -> None:
     objs = _closure_objects(session, ubsan / "memsafeClosure", MS_CLOSURE, MS_ASSERTS, UBSAN)
     _dll(session, ubsan / "alxMemSafeTest.dll", MS_STRICT, MS_DEF, UBSAN,
          ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
-    _pytest(session, {"ALX_MEMSAFE_TEST_DLL": str(ubsan / "alxMemSafeTest.dll")}, *MS_TESTS)
+    _pytest(session, {"ALX_MEMSAFE_TEST_DLL": str(ubsan / "alxMemSafeTest.dll")}, *MS_TESTS_UBSAN)
     session.log("Stage 2d: UBSan Id DLL, Id suite")
     objs = _closure_objects(session, ubsan / "idClosure", ID_CLOSURE, ID_ASSERTS, UBSAN)
     _dll(session, ubsan / "alxIdTest.dll", ID_STRICT, ID_DEF, UBSAN,

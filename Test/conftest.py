@@ -1722,6 +1722,31 @@ class MemSafeLib:
         c.AlxParamItemStrTest_GetStr.argtypes = [vp, ctypes.c_char_p, u32]
         c.AlxParamItemStrTest_GetNum.restype = ctypes.c_double
         c.AlxParamItemStrTest_GetNum.argtypes = [vp]
+        # the metadata shim: one context per data type, values widened to int64/double
+        cp, i64, f64 = ctypes.c_char_p, ctypes.c_int64, ctypes.c_double
+        c.AlxParamItemMetaTest_New.restype = vp
+        c.AlxParamItemMetaTest_New.argtypes = [u32, cp, u32, cp, u32, i64, i64, i64,
+                                               f64, f64, f64, u32, cp, ctypes.c_bool]
+        c.AlxParamItemMetaTest_Delete.argtypes = [vp]
+        for name in ("GetDataType", "GetParamType", "GetId", "GetGroupId",
+                     "GetValOutOfRangeHandle", "GetBuffLen", "GetValLen"):
+            fn = getattr(c, f"AlxParamItemMetaTest_{name}")
+            fn.restype, fn.argtypes = u32, [vp]
+        for name in ("GetKey", "GetGroupKey", "GetValUnit"):
+            fn = getattr(c, f"AlxParamItemMetaTest_{name}")
+            fn.restype, fn.argtypes = cp, [vp]
+        for name in ("GetValChangeTakesEffectAfterReset", "GetIsEnum"):
+            fn = getattr(c, f"AlxParamItemMetaTest_{name}")
+            fn.restype, fn.argtypes = ctypes.c_bool, [vp]
+        for name in ("GetValDefI", "GetValMinI", "GetValMaxI", "GetValI"):
+            fn = getattr(c, f"AlxParamItemMetaTest_{name}")
+            fn.restype, fn.argtypes = i64, [vp]
+        for name in ("GetValDefF", "GetValMinF", "GetValMaxF", "GetValF"):
+            fn = getattr(c, f"AlxParamItemMetaTest_{name}")
+            fn.restype, fn.argtypes = f64, [vp]
+        c.AlxParamItemMetaTest_SetValI.argtypes = [vp, i64]
+        c.AlxParamItemMetaTest_SetValF.argtypes = [vp, f64]
+        c.AlxParamItemMetaTest_SetValToDef.argtypes = [vp]
         # alxRange and alxFtoa: pure functions, no context, called directly
         for name, ct in (("Uint8", ctypes.c_uint8), ("Uint16", ctypes.c_uint16),
                          ("Uint32", u32), ("Uint64", ctypes.c_uint64),
@@ -1775,6 +1800,50 @@ class MemSafeLib:
 
     def item_delete(self, ctx) -> None:
         self.c.AlxParamItemStrTest_Delete(ctx)
+
+    # -- the same item, seen through the metadata its constructor was given ----
+    # AlxParamItem_DataType, in the library's own order (alxParamItem.h)
+    (D_UINT8, D_UINT16, D_UINT32, D_UINT64, D_INT8, D_INT16, D_INT32, D_INT64,
+     D_FLOAT, D_DOUBLE, D_BOOL, D_ARR, D_STR) = range(13)
+    INTEGER_TYPES = (D_UINT8, D_UINT16, D_UINT32, D_UINT64, D_INT8, D_INT16, D_INT32, D_INT64)
+    FLOAT_TYPES = (D_FLOAT, D_DOUBLE)
+    # AlxParamItem_ValOutOfRangeHandle
+    ASSERT, IGNORE, BOUND = 0, 1, 2
+    # AlxParamItem_ParamType - the shim always builds a Param
+    PARAM = 0
+
+    def meta_new(self, data_type: int, key: str = "KEY", item_id: int = 0, group_key: str = "GRP",
+                 group_id: int = 0, val_def: float = 0, val_min: float = 0, val_max: float = 0,
+                 out_of_range: int = 1, unit: str = "", after_reset: bool = False):
+        """Build one item of `data_type`. val_* travel down whichever channel that type reads."""
+        is_float = data_type in self.FLOAT_TYPES
+        ints = (0, 0, 0) if is_float else (int(val_def), int(val_min), int(val_max))
+        flts = (float(val_def), float(val_min), float(val_max)) if is_float else (0.0, 0.0, 0.0)
+        return self.c.AlxParamItemMetaTest_New(
+            data_type, key.encode("ascii"), item_id, group_key.encode("ascii"), group_id,
+            *ints, *flts, out_of_range, unit.encode("ascii"), after_reset)
+
+    def meta_delete(self, ctx) -> None:
+        self.c.AlxParamItemMetaTest_Delete(ctx)
+
+    def meta(self, ctx, name: str):
+        """Read one getter by its C name suffix, decoding the ones that answer with a string."""
+        value = getattr(self.c, f"AlxParamItemMetaTest_{name}")(ctx)
+        return value.decode("ascii") if isinstance(value, bytes) else value
+
+    def meta_set_val(self, ctx, data_type: int, val: float) -> None:
+        if data_type in self.FLOAT_TYPES:
+            self.c.AlxParamItemMetaTest_SetValF(ctx, float(val))
+        else:
+            self.c.AlxParamItemMetaTest_SetValI(ctx, int(val))
+
+    def meta_get_val(self, ctx, data_type: int):
+        if data_type in self.FLOAT_TYPES:
+            return self.c.AlxParamItemMetaTest_GetValF(ctx)
+        return self.c.AlxParamItemMetaTest_GetValI(ctx)
+
+    def meta_set_val_to_def(self, ctx) -> None:
+        self.c.AlxParamItemMetaTest_SetValToDef(ctx)
 
     def item_set_str(self, ctx, val: str) -> int:
         return self.c.AlxParamItemStrTest_SetStr(ctx, val.encode("ascii"))
@@ -4602,6 +4671,25 @@ def make_item(memsafe_lib):
     for ctx in ctxs:
         memsafe_lib.item_delete(ctx)
 
+
+@pytest.fixture
+def make_meta_item(memsafe_lib):
+    """Factory: make_meta_item(data_type, **ctor kwargs) -> an item, auto-deleted.
+
+    The item stands alone, exactly as make_item's does: no kv store and no group object, because
+    what is under test is what the CONSTRUCTOR recorded, not what a store would do with it.
+    """
+    ctxs = []
+
+    def _make(data_type: int, **kwargs):
+        ctx = memsafe_lib.meta_new(data_type, **kwargs)
+        assert ctx, f"the item of type {data_type} could not be constructed"
+        ctxs.append(ctx)
+        return ctx
+
+    yield _make
+    for ctx in ctxs:
+        memsafe_lib.meta_delete(ctx)
 
 @pytest.fixture
 def make_store(flash):
