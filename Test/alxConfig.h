@@ -4,8 +4,7 @@
   * @brief		Auralix C Library - PC Unit Test Configuration
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
-  * PC-side unit test build (Test/ folder). Selects the ALX_PC platform path
-  * (C11 standard headers, alxGlobal.h) and enables the C library. All module
+  * PC-side unit test build (Test/ folder). Enables the C library. All module
   * asserts/traces are intentionally OFF - the PC tests verify the documented
   * function contracts, not the assert configuration.
   ******************************************************************************
@@ -13,11 +12,6 @@
 
 #ifndef ALX_CONFIG_H
 #define ALX_CONFIG_H
-
-//******************************************************************************
-// Platform
-//******************************************************************************
-#define ALX_PC
 
 //******************************************************************************
 // Library

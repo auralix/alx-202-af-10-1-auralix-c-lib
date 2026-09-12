@@ -15,7 +15,7 @@
   * alxAssertPc.c: this file is simply the only definition in the image.
   *
   * Mcu/alxTrace.c is not the alternative. It needs AlxTrace_WriteStr, which has
-  * no ALX_PC body anywhere in the library - only six MCU ones - plus AlxTick,
+  * no PC body anywhere in the library - only six MCU ones - plus AlxTick,
   * AlxIrq and AlxRtc behind its date-time callback. A stub also makes the call
   * COUNTABLE, which is the whole point: what a variant changes is whether the
   * call happens at all.
