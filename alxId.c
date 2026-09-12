@@ -208,7 +208,7 @@ void AlxId_Ctor
 		me->fwLangCLib.ver = ALX_xVER3(__NEWLIB__, __NEWLIB_MINOR__, __NEWLIB_PATCHLEVEL__);
 		me->fwLangCLib.verMinRequired = ALX_LANG_C_LIB_NEWLIB_VER_MIN_REQUIRED;
 	#else
-		strcpy(me->fwLangCLib.name, "Unknown");
+		strcpy(me->fwLangCLib.name, "Unknown C Standard Library");
 	#endif
 
 
