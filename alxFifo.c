@@ -517,7 +517,7 @@ static Alx_Status AlxFifo_ReadStrUntil_Private(AlxFifo* me, char* str, const cha
 		*lenActual = lineLen;
 	}
 	return Alx_Ok;
-}	// NOTE: AI Created - ALX-1514
+}
 
 
 #endif	// #if defined(ALX_C_LIB)
