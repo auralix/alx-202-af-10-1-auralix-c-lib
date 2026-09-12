@@ -78,6 +78,55 @@ STYLE_PENDING_TERNARY = [
 # include path, not this repository's. A family-specific check is therefore a product's job.
 SYNTAX_NEEDS_CMSIS = {"alxAssert.c", "alxBoot.c", "alxIrq.c"}
 
+# Stage 5b asks a SECOND question of the same 53 sources: does every path out of a non-void
+# function return a value? C99 6.9.1/12 makes reading the result of one that does not undefined.
+#
+# It needs `-c`, not `-fsyntax-only`, and that distinction is the whole reason this went unasked.
+# GCC computes "control reaches end of non-void function" in the CFG pass, which -fsyntax-only
+# never runs - so Stage 5 above, and my first attempt at this one, were silent on a control case
+# as blunt as `bool f(void) { }`. That silence reads as "clean" and is really "not asked".
+#
+# Measured 12.09 - EIGHT sites in five modules:
+#
+#   alxCrc.c                 202, 280   AlxCrc_Calc's and AlxCrc_GetLen's `default:` label. Both
+#                                        switch on AlxCrc_Config, both end the default case with
+#                                        ALX_CRC_ASSERT(false) and `break`, and a `break` out of a
+#                                        switch at the end of a function falls off the end. With
+#                                        assertions ELIDED - which is what a module carrying no
+#                                        ALX_CRC_ASSERT_*_ENABLE compiles to - an out-of-range
+#                                        config returns whatever is in r0. THIS MODULE IS BUILT
+#                                        AND TESTED HERE (the MemSafe group, test_alxCrc.py).
+#   alxRange.c               296        AlxRange_CheckArr is an unimplemented stub: `// TV: TODO`,
+#                                        ALX_RANGE_ASSERT(false), nothing else. The P517 shape and
+#                                        worse - AlxMemRaw at least returned a defined, wrong 0.
+#                                        Compiled by the MemSafe group; exported by no .def and
+#                                        called by nothing on this machine.
+#   alxOsMutex.c             118        AlxOsMutex_IsUnlocked
+#   alxOsThread.c            260        AlxOsThread_Join
+#   alxOsEventFlagGroup.c    213,297,374  _Clear, _Wait, _Sync
+#
+# The four alxOs sites only bite a build with NEITHER ALX_FREE_RTOS nor ALX_ZEPHYR, where the
+# bodies are #if dispatch that selects nothing. Every one of the eight wants a default return, and
+# that is a source change in modules no test drives - so they are NAMED rather than fixed in the
+# dark, and the other 48 are gated from here on.
+RETURN_TYPE_PENDING = {"alxCrc.c", "alxRange.c",
+                       "alxOsMutex.c", "alxOsThread.c", "alxOsEventFlagGroup.c"}
+
+# And Stage 5b counts the SYMBOLS each object defines, because "it compiled" is not the same claim
+# as "it was read". Three of these modules carry a SECOND tier of guard below ALX_C_LIB - alxNet.c
+# wants `&& (ALX_FREE_RTOS_CELLULAR || ALX_WIZNET)` - so with ALX_C_LIB alone they preprocess to an
+# empty translation unit and pass every check ever pointed at them.
+#
+# That is the same trap as the 103-empty-files mistake one tier down, and it took a negative
+# control to find: a missing return planted in alxNet.c did NOT fail this stage. (The earlier
+# control that appeared to work was planted INSIDE the `#if` line and failed as a broken directive
+# - it never proved the body was compiled. Plant in a module named below as non-empty.)
+#
+# These three are compiled only by a product that selects a driver, so the set is a fact about this
+# repository, not a defect. It is asserted in BOTH directions: a fourth module going quiet is a
+# regression, and one of these three coming back to life means the set is stale.
+SYNTAX_EMPTY_TU = {"alxBuild.c", "alxNet.c", "alxSocket.c"}
+
 _STYLE_PENDING = {*STYLE_PENDING_COMMENTS, *STYLE_PENDING_TERNARY}
 _STYLE_SKIP_DIRS = {"Ext", "FatFs", "mcuboot", "Usbh", "Test", "build", "Doc"}
 
@@ -419,6 +468,39 @@ def analyze(session: nox.Session) -> None:
     if broken:
         session.error(f"Stage 5 FAILED: {broken} do not compile - see {syntax_log}")
     session.log(f"Stage 5: {len(reports)} portable modules compile")
+
+    session.log("Stage 5b: does every one of them RETURN? (arm-gcc -c -Werror=return-type)")
+    checked, missing, empty = 0, [], []
+    for src in sorted(CLIB.glob("*.c")):
+        if src.name in SYNTAX_NEEDS_CMSIS or src.name in RETURN_TYPE_PENDING:
+            continue
+        result = subprocess.run(  # noqa: S603 - argv is the toolchain path and this repo's own sources
+            [str(tc.armgcc()), "-c", "-std=gnu99", "-mcpu=cortex-m7", "-mthumb",
+             "-Werror=return-type", "-DALX_C_LIB", *[f"-I{d}" for d in INCLUDE_DIRS],
+             str(src), "-o", str(out / "return_type.o")],
+            capture_output=True, text=True, check=False)   # the return code is read below
+        checked += 1
+        reports.append(f"[return-type] {src.name}: rc={result.returncode}" + chr(10) + result.stderr)
+        if result.returncode != 0:
+            missing.append(src.name)
+            continue
+        symbols = subprocess.run(  # noqa: S603 - argv is the toolchain path and an object we just built
+            [str(tc.armgcc().with_name("arm-none-eabi-nm.exe")), "--defined-only",
+             str(out / "return_type.o")], capture_output=True, text=True, check=False)
+        if not symbols.stdout.strip():
+            empty.append(src.name)
+    _write(syntax_log, "".join(reports))
+    if missing:
+        session.error(f"Stage 5b FAILED: {missing} let control reach the end of a non-void "
+                      f"function - see {syntax_log}")
+    if set(empty) != SYNTAX_EMPTY_TU:
+        gone_quiet = sorted(set(empty) - SYNTAX_EMPTY_TU)
+        woken_up = sorted(SYNTAX_EMPTY_TU - set(empty))
+        session.error(f"Stage 5b FAILED: the empty-translation-unit set is wrong - newly empty "
+                      f"(checked but never read) {gone_quiet}, no longer empty (drop from "
+                      f"SYNTAX_EMPTY_TU) {woken_up}")
+    session.log(f"Stage 5b: {checked - len(empty)} modules return on every path, "
+                f"{len(empty)} empty, {len(RETURN_TYPE_PENDING)} known-pending")
 
     session.log(f"ANALYZE CLEAN - evidence in {out}")
 
