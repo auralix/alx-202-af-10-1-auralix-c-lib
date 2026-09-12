@@ -99,3 +99,15 @@ EXPORTS
 	AlxParamItemMetaTest_SetValI
 	AlxParamItemMetaTest_SetValF
 	AlxParamItemMetaTest_SetValToDef
+	AlxParamItemEnumTest_New
+	AlxParamItemEnumTest_Delete
+	AlxParamItemEnumTest_GetIsEnum
+	AlxParamItemEnumTest_GetEnumArrLen
+	AlxParamItemEnumTest_GetEnumArrAtI
+	AlxParamItemEnumTest_GetEnumArrAtF
+	AlxParamItemEnumTest_SetValI
+	AlxParamItemEnumTest_SetValF
+	AlxParamItemEnumTest_GetValI
+	AlxParamItemEnumTest_GetValF
+	AlxMemSafeTest_Status_ErrEnum
+	AlxMemSafeTest_Status_ErrConv

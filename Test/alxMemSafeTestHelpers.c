@@ -463,8 +463,8 @@ double AlxParamItemMetaTest_GetValMinF(AlxParamItemMetaTest_Ctx* ctx);
 double AlxParamItemMetaTest_GetValMaxF(AlxParamItemMetaTest_Ctx* ctx);
 int64_t AlxParamItemMetaTest_GetValI(AlxParamItemMetaTest_Ctx* ctx);
 double AlxParamItemMetaTest_GetValF(AlxParamItemMetaTest_Ctx* ctx);
-void AlxParamItemMetaTest_SetValI(AlxParamItemMetaTest_Ctx* ctx, int64_t val);
-void AlxParamItemMetaTest_SetValF(AlxParamItemMetaTest_Ctx* ctx, double val);
+int32_t AlxParamItemMetaTest_SetValI(AlxParamItemMetaTest_Ctx* ctx, int64_t val);
+int32_t AlxParamItemMetaTest_SetValF(AlxParamItemMetaTest_Ctx* ctx, double val);
 void AlxParamItemMetaTest_SetValToDef(AlxParamItemMetaTest_Ctx* ctx);
 
 AlxParamItemMetaTest_Ctx* AlxParamItemMetaTest_New(uint32_t dataType, const char* key, uint32_t id, const char* groupKey, uint32_t groupId, int64_t defI, int64_t minI, int64_t maxI, double defF, double minF, double maxF, uint32_t outOfRange, const char* valUnit, bool afterReset)
@@ -704,36 +704,346 @@ double AlxParamItemMetaTest_GetValF(AlxParamItemMetaTest_Ctx* ctx)
 	return AlxParamItem_GetValDouble(&ctx->item);
 }
 
-void AlxParamItemMetaTest_SetValI(AlxParamItemMetaTest_Ctx* ctx, int64_t val)
+int32_t AlxParamItemMetaTest_SetValI(AlxParamItemMetaTest_Ctx* ctx, int64_t val)
 {
+	Alx_Status status = Alx_Err;
 	switch (ctx->dataType)
 	{
-		case AlxParamItem_Uint8:	AlxParamItem_SetValUint8(&ctx->item, (uint8_t)val);		break;
-		case AlxParamItem_Uint16:	AlxParamItem_SetValUint16(&ctx->item, (uint16_t)val);	break;
-		case AlxParamItem_Uint32:	AlxParamItem_SetValUint32(&ctx->item, (uint32_t)val);	break;
-		case AlxParamItem_Uint64:	AlxParamItem_SetValUint64(&ctx->item, (uint64_t)val);	break;
-		case AlxParamItem_Int8:		AlxParamItem_SetValInt8(&ctx->item, (int8_t)val);		break;
-		case AlxParamItem_Int16:	AlxParamItem_SetValInt16(&ctx->item, (int16_t)val);		break;
-		case AlxParamItem_Int32:	AlxParamItem_SetValInt32(&ctx->item, (int32_t)val);		break;
-		case AlxParamItem_Int64:	AlxParamItem_SetValInt64(&ctx->item, val);				break;
-		case AlxParamItem_Bool:		AlxParamItem_SetValBool(&ctx->item, val != 0);			break;
+		case AlxParamItem_Uint8:	status = AlxParamItem_SetValUint8(&ctx->item, (uint8_t)val);	break;
+		case AlxParamItem_Uint16:status = AlxParamItem_SetValUint16(&ctx->item, (uint16_t)val);	break;
+		case AlxParamItem_Uint32:status = AlxParamItem_SetValUint32(&ctx->item, (uint32_t)val);	break;
+		case AlxParamItem_Uint64:status = AlxParamItem_SetValUint64(&ctx->item, (uint64_t)val);	break;
+		case AlxParamItem_Int8:	status = AlxParamItem_SetValInt8(&ctx->item, (int8_t)val);	break;
+		case AlxParamItem_Int16:	status = AlxParamItem_SetValInt16(&ctx->item, (int16_t)val);	break;
+		case AlxParamItem_Int32:	status = AlxParamItem_SetValInt32(&ctx->item, (int32_t)val);	break;
+		case AlxParamItem_Int64:	status = AlxParamItem_SetValInt64(&ctx->item, val);	break;
+		case AlxParamItem_Bool:		status = AlxParamItem_SetValBool(&ctx->item, val != 0);	break;
 		case AlxParamItem_Float:
 		case AlxParamItem_Double:
 		case AlxParamItem_Arr:
 		case AlxParamItem_Str:
-		default:																			break;
+		default:					break;
 	}
+	return (int32_t)status;
 }
-void AlxParamItemMetaTest_SetValF(AlxParamItemMetaTest_Ctx* ctx, double val)
+int32_t AlxParamItemMetaTest_SetValF(AlxParamItemMetaTest_Ctx* ctx, double val)
 {
+	Alx_Status status;
 	if (ctx->dataType == AlxParamItem_Float)
 	{
-		AlxParamItem_SetValFloat(&ctx->item, (float)val);
-		return;
+		status = AlxParamItem_SetValFloat(&ctx->item, (float)val);
 	}
-	AlxParamItem_SetValDouble(&ctx->item, val);
+	else
+	{
+		status = AlxParamItem_SetValDouble(&ctx->item, val);
+	}
+	return (int32_t)status;
 }
 void AlxParamItemMetaTest_SetValToDef(AlxParamItemMetaTest_Ctx* ctx)
 {
 	AlxParamItem_SetValToDef(&ctx->item);
 }
+
+#define ALX_PARAM_ITEM_META_ENUM_MAX 16
+// the longest enum list any test declares; the context carries its own copy because
+// AlxParamItem keeps the caller's pointer rather than copying the array
+
+//------------------------------------------------------------------------------
+// Parameter item - the enum list (ALX-1553)
+//------------------------------------------------------------------------------
+// An item may declare a LIST of the values it will accept, and then a set is
+// checked against that list instead of against the minimum and the maximum.
+// That is a second, separate gate, and it is where the module's only two static
+// functions live: AlxParamItem_AreEnumArrValFromLowToHigh, which the constructor
+// asks whether the list is ordered, and AlxParamItem_IsEnumOnList, which every
+// set asks whether the value is a member.
+//
+// Worth knowing which of the two an elided build still runs. The ordering check
+// is reached ONLY from inside ALX_PARAM_ITEM_ASSERT, so a module compiled with
+// no assert form discards the call along with the expression and an out-of-order
+// list is simply accepted. The membership check is not - it sits in the set path
+// itself and runs in every build. This group compiles asserts ON, so both run
+// here.
+//
+// The list crosses as int64_t or double for the same reason the values do, and
+// is copied into the context because AlxParamItem keeps the caller's pointer
+// rather than a copy of the array.
+
+typedef struct
+{
+	AlxParamItem item;
+	AlxParamItem_DataType dataType;
+	union
+	{
+		uint8_t u8[ALX_PARAM_ITEM_META_ENUM_MAX];
+		uint16_t u16[ALX_PARAM_ITEM_META_ENUM_MAX];
+		uint32_t u32[ALX_PARAM_ITEM_META_ENUM_MAX];
+		uint64_t u64[ALX_PARAM_ITEM_META_ENUM_MAX];
+		int8_t i8[ALX_PARAM_ITEM_META_ENUM_MAX];
+		int16_t i16[ALX_PARAM_ITEM_META_ENUM_MAX];
+		int32_t i32[ALX_PARAM_ITEM_META_ENUM_MAX];
+		int64_t i64[ALX_PARAM_ITEM_META_ENUM_MAX];
+		float f32[ALX_PARAM_ITEM_META_ENUM_MAX];
+		double f64[ALX_PARAM_ITEM_META_ENUM_MAX];
+	} list;
+} AlxParamItemEnumTest_Ctx;
+
+AlxParamItemEnumTest_Ctx* AlxParamItemEnumTest_New(uint32_t dataType, const int64_t* listI, const double* listF, uint8_t listLen, int64_t defI, int64_t minI, int64_t maxI, double defF, double minF, double maxF, uint32_t outOfRange);
+void AlxParamItemEnumTest_Delete(AlxParamItemEnumTest_Ctx* ctx);
+bool AlxParamItemEnumTest_GetIsEnum(AlxParamItemEnumTest_Ctx* ctx);
+uint8_t AlxParamItemEnumTest_GetEnumArrLen(AlxParamItemEnumTest_Ctx* ctx);
+int64_t AlxParamItemEnumTest_GetEnumArrAtI(AlxParamItemEnumTest_Ctx* ctx, uint8_t index);
+double AlxParamItemEnumTest_GetEnumArrAtF(AlxParamItemEnumTest_Ctx* ctx, uint8_t index);
+int32_t AlxParamItemEnumTest_SetValI(AlxParamItemEnumTest_Ctx* ctx, int64_t val);
+int32_t AlxParamItemEnumTest_SetValF(AlxParamItemEnumTest_Ctx* ctx, double val);
+int64_t AlxParamItemEnumTest_GetValI(AlxParamItemEnumTest_Ctx* ctx);
+double AlxParamItemEnumTest_GetValF(AlxParamItemEnumTest_Ctx* ctx);
+
+AlxParamItemEnumTest_Ctx* AlxParamItemEnumTest_New(uint32_t dataType, const int64_t* listI, const double* listF, uint8_t listLen, int64_t defI, int64_t minI, int64_t maxI, double defF, double minF, double maxF, uint32_t outOfRange)
+{
+	if (listLen > ALX_PARAM_ITEM_META_ENUM_MAX)
+	{
+		return NULL;
+	}
+	AlxParamItemEnumTest_Ctx* ctx = calloc(1, sizeof(AlxParamItemEnumTest_Ctx));
+	if (ctx == NULL)
+	{
+		return NULL;
+	}
+	ctx->dataType = (AlxParamItem_DataType)dataType;
+
+	for (uint8_t i = 0; i < listLen; i++)
+	{
+		switch (ctx->dataType)
+		{
+			case AlxParamItem_Uint8:	ctx->list.u8[i] = (uint8_t)listI[i];		break;
+			case AlxParamItem_Uint16:	ctx->list.u16[i] = (uint16_t)listI[i];		break;
+			case AlxParamItem_Uint32:	ctx->list.u32[i] = (uint32_t)listI[i];		break;
+			case AlxParamItem_Uint64:	ctx->list.u64[i] = (uint64_t)listI[i];		break;
+			case AlxParamItem_Int8:		ctx->list.i8[i] = (int8_t)listI[i];			break;
+			case AlxParamItem_Int16:	ctx->list.i16[i] = (int16_t)listI[i];		break;
+			case AlxParamItem_Int32:	ctx->list.i32[i] = (int32_t)listI[i];		break;
+			case AlxParamItem_Int64:	ctx->list.i64[i] = listI[i];				break;
+			case AlxParamItem_Float:	ctx->list.f32[i] = (float)listF[i];			break;
+			case AlxParamItem_Double:	ctx->list.f64[i] = listF[i];				break;
+			case AlxParamItem_Bool:
+			case AlxParamItem_Arr:
+			case AlxParamItem_Str:
+			default:
+				free(ctx);
+				return NULL;
+		}
+	}
+
+	AlxParamItem_ValOutOfRangeHandle handle = (AlxParamItem_ValOutOfRangeHandle)outOfRange;
+	switch (ctx->dataType)
+	{
+		case AlxParamItem_Uint8:
+			AlxParamItem_CtorUint8(&ctx->item, NULL, AlxParamItem_Param, "ENUM_ITEM", 0, "GRP", 0,
+				(uint8_t)defI, (uint8_t)minI, (uint8_t)maxI, handle, true, ctx->list.u8, listLen, "", false);
+			break;
+		case AlxParamItem_Uint16:
+			AlxParamItem_CtorUint16(&ctx->item, NULL, AlxParamItem_Param, "ENUM_ITEM", 0, "GRP", 0,
+				(uint16_t)defI, (uint16_t)minI, (uint16_t)maxI, handle, true, ctx->list.u16, listLen, "", false);
+			break;
+		case AlxParamItem_Uint32:
+			AlxParamItem_CtorUint32(&ctx->item, NULL, AlxParamItem_Param, "ENUM_ITEM", 0, "GRP", 0,
+				(uint32_t)defI, (uint32_t)minI, (uint32_t)maxI, handle, true, ctx->list.u32, listLen, "", false);
+			break;
+		case AlxParamItem_Uint64:
+			AlxParamItem_CtorUint64(&ctx->item, NULL, AlxParamItem_Param, "ENUM_ITEM", 0, "GRP", 0,
+				(uint64_t)defI, (uint64_t)minI, (uint64_t)maxI, handle, true, ctx->list.u64, listLen, "", false);
+			break;
+		case AlxParamItem_Int8:
+			AlxParamItem_CtorInt8(&ctx->item, NULL, AlxParamItem_Param, "ENUM_ITEM", 0, "GRP", 0,
+				(int8_t)defI, (int8_t)minI, (int8_t)maxI, handle, true, ctx->list.i8, listLen, "", false);
+			break;
+		case AlxParamItem_Int16:
+			AlxParamItem_CtorInt16(&ctx->item, NULL, AlxParamItem_Param, "ENUM_ITEM", 0, "GRP", 0,
+				(int16_t)defI, (int16_t)minI, (int16_t)maxI, handle, true, ctx->list.i16, listLen, "", false);
+			break;
+		case AlxParamItem_Int32:
+			AlxParamItem_CtorInt32(&ctx->item, NULL, AlxParamItem_Param, "ENUM_ITEM", 0, "GRP", 0,
+				(int32_t)defI, (int32_t)minI, (int32_t)maxI, handle, true, ctx->list.i32, listLen, "", false);
+			break;
+		case AlxParamItem_Int64:
+			AlxParamItem_CtorInt64(&ctx->item, NULL, AlxParamItem_Param, "ENUM_ITEM", 0, "GRP", 0,
+				defI, minI, maxI, handle, true, ctx->list.i64, listLen, "", false);
+			break;
+		case AlxParamItem_Float:
+			AlxParamItem_CtorFloat(&ctx->item, NULL, AlxParamItem_Param, "ENUM_ITEM", 0, "GRP", 0,
+				(float)defF, (float)minF, (float)maxF, handle, true, ctx->list.f32, listLen, "", false);
+			break;
+		case AlxParamItem_Double:
+			AlxParamItem_CtorDouble(&ctx->item, NULL, AlxParamItem_Param, "ENUM_ITEM", 0, "GRP", 0,
+				defF, minF, maxF, handle, true, ctx->list.f64, listLen, "", false);
+			break;
+		case AlxParamItem_Bool:
+		case AlxParamItem_Arr:
+		case AlxParamItem_Str:
+		default:
+			free(ctx);
+			return NULL;
+	}
+	return ctx;
+}
+
+void AlxParamItemEnumTest_Delete(AlxParamItemEnumTest_Ctx* ctx)
+{
+	free(ctx);
+}
+
+bool AlxParamItemEnumTest_GetIsEnum(AlxParamItemEnumTest_Ctx* ctx)
+{
+	return AlxParamItem_GetIsEnum(&ctx->item);
+}
+
+uint8_t AlxParamItemEnumTest_GetEnumArrLen(AlxParamItemEnumTest_Ctx* ctx)
+{
+	uint8_t len = 0;
+	uint8_t* u8 = NULL;
+	uint16_t* u16 = NULL;
+	uint32_t* u32 = NULL;
+	uint64_t* u64 = NULL;
+	int8_t* i8 = NULL;
+	int16_t* i16 = NULL;
+	int32_t* i32 = NULL;
+	int64_t* i64 = NULL;
+	float* f32 = NULL;
+	double* f64 = NULL;
+	switch (ctx->dataType)
+	{
+		case AlxParamItem_Uint8:	AlxParamItem_GetEnumArrUint8(&ctx->item, &u8, &len);	break;
+		case AlxParamItem_Uint16:	AlxParamItem_GetEnumArrUint16(&ctx->item, &u16, &len);	break;
+		case AlxParamItem_Uint32:	AlxParamItem_GetEnumArrUint32(&ctx->item, &u32, &len);	break;
+		case AlxParamItem_Uint64:	AlxParamItem_GetEnumArrUint64(&ctx->item, &u64, &len);	break;
+		case AlxParamItem_Int8:		AlxParamItem_GetEnumArrInt8(&ctx->item, &i8, &len);		break;
+		case AlxParamItem_Int16:	AlxParamItem_GetEnumArrInt16(&ctx->item, &i16, &len);	break;
+		case AlxParamItem_Int32:	AlxParamItem_GetEnumArrInt32(&ctx->item, &i32, &len);	break;
+		case AlxParamItem_Int64:	AlxParamItem_GetEnumArrInt64(&ctx->item, &i64, &len);	break;
+		case AlxParamItem_Float:	AlxParamItem_GetEnumArrFloat(&ctx->item, &f32, &len);	break;
+		case AlxParamItem_Double:	AlxParamItem_GetEnumArrDouble(&ctx->item, &f64, &len);	break;
+		case AlxParamItem_Bool:
+		case AlxParamItem_Arr:
+		case AlxParamItem_Str:
+		default:															break;
+	}
+	return len;
+}
+
+int64_t AlxParamItemEnumTest_GetEnumArrAtI(AlxParamItemEnumTest_Ctx* ctx, uint8_t index)
+{
+	uint8_t len = 0;
+	uint8_t* u8 = NULL;
+	uint16_t* u16 = NULL;
+	uint32_t* u32 = NULL;
+	uint64_t* u64 = NULL;
+	int8_t* i8 = NULL;
+	int16_t* i16 = NULL;
+	int32_t* i32 = NULL;
+	int64_t* i64 = NULL;
+	switch (ctx->dataType)
+	{
+		case AlxParamItem_Uint8:	AlxParamItem_GetEnumArrUint8(&ctx->item, &u8, &len);	return (int64_t)u8[index];
+		case AlxParamItem_Uint16:	AlxParamItem_GetEnumArrUint16(&ctx->item, &u16, &len);	return (int64_t)u16[index];
+		case AlxParamItem_Uint32:	AlxParamItem_GetEnumArrUint32(&ctx->item, &u32, &len);	return (int64_t)u32[index];
+		case AlxParamItem_Uint64:	AlxParamItem_GetEnumArrUint64(&ctx->item, &u64, &len);	return (int64_t)u64[index];
+		case AlxParamItem_Int8:		AlxParamItem_GetEnumArrInt8(&ctx->item, &i8, &len);		return (int64_t)i8[index];
+		case AlxParamItem_Int16:	AlxParamItem_GetEnumArrInt16(&ctx->item, &i16, &len);	return (int64_t)i16[index];
+		case AlxParamItem_Int32:	AlxParamItem_GetEnumArrInt32(&ctx->item, &i32, &len);	return (int64_t)i32[index];
+		case AlxParamItem_Int64:	AlxParamItem_GetEnumArrInt64(&ctx->item, &i64, &len);	return i64[index];
+		case AlxParamItem_Float:
+		case AlxParamItem_Double:
+		case AlxParamItem_Bool:
+		case AlxParamItem_Arr:
+		case AlxParamItem_Str:
+		default:																			return 0;
+	}
+}
+
+double AlxParamItemEnumTest_GetEnumArrAtF(AlxParamItemEnumTest_Ctx* ctx, uint8_t index)
+{
+	uint8_t len = 0;
+	float* f32 = NULL;
+	double* f64 = NULL;
+	if (ctx->dataType == AlxParamItem_Float)
+	{
+		AlxParamItem_GetEnumArrFloat(&ctx->item, &f32, &len);
+		return (double)f32[index];
+	}
+	AlxParamItem_GetEnumArrDouble(&ctx->item, &f64, &len);
+	return f64[index];
+}
+
+int32_t AlxParamItemEnumTest_SetValI(AlxParamItemEnumTest_Ctx* ctx, int64_t val)
+{
+	Alx_Status status = Alx_Err;
+	switch (ctx->dataType)
+	{
+		case AlxParamItem_Uint8:	status = AlxParamItem_SetValUint8(&ctx->item, (uint8_t)val);	break;
+		case AlxParamItem_Uint16:status = AlxParamItem_SetValUint16(&ctx->item, (uint16_t)val);	break;
+		case AlxParamItem_Uint32:status = AlxParamItem_SetValUint32(&ctx->item, (uint32_t)val);	break;
+		case AlxParamItem_Uint64:status = AlxParamItem_SetValUint64(&ctx->item, (uint64_t)val);	break;
+		case AlxParamItem_Int8:	status = AlxParamItem_SetValInt8(&ctx->item, (int8_t)val);	break;
+		case AlxParamItem_Int16:	status = AlxParamItem_SetValInt16(&ctx->item, (int16_t)val);	break;
+		case AlxParamItem_Int32:	status = AlxParamItem_SetValInt32(&ctx->item, (int32_t)val);	break;
+		case AlxParamItem_Int64:	status = AlxParamItem_SetValInt64(&ctx->item, val);	break;
+		case AlxParamItem_Float:
+		case AlxParamItem_Double:
+		case AlxParamItem_Bool:
+		case AlxParamItem_Arr:
+		case AlxParamItem_Str:
+		default:					break;
+	}
+	return (int32_t)status;
+}
+
+int32_t AlxParamItemEnumTest_SetValF(AlxParamItemEnumTest_Ctx* ctx, double val)
+{
+	Alx_Status status;
+	if (ctx->dataType == AlxParamItem_Float)
+	{
+		status = AlxParamItem_SetValFloat(&ctx->item, (float)val);
+	}
+	else
+	{
+		status = AlxParamItem_SetValDouble(&ctx->item, val);
+	}
+	return (int32_t)status;
+}
+
+int64_t AlxParamItemEnumTest_GetValI(AlxParamItemEnumTest_Ctx* ctx)
+{
+	switch (ctx->dataType)
+	{
+		case AlxParamItem_Uint8:	return (int64_t)AlxParamItem_GetValUint8(&ctx->item);
+		case AlxParamItem_Uint16:	return (int64_t)AlxParamItem_GetValUint16(&ctx->item);
+		case AlxParamItem_Uint32:	return (int64_t)AlxParamItem_GetValUint32(&ctx->item);
+		case AlxParamItem_Uint64:	return (int64_t)AlxParamItem_GetValUint64(&ctx->item);
+		case AlxParamItem_Int8:		return (int64_t)AlxParamItem_GetValInt8(&ctx->item);
+		case AlxParamItem_Int16:	return (int64_t)AlxParamItem_GetValInt16(&ctx->item);
+		case AlxParamItem_Int32:	return (int64_t)AlxParamItem_GetValInt32(&ctx->item);
+		case AlxParamItem_Int64:	return AlxParamItem_GetValInt64(&ctx->item);
+		case AlxParamItem_Float:
+		case AlxParamItem_Double:
+		case AlxParamItem_Bool:
+		case AlxParamItem_Arr:
+		case AlxParamItem_Str:
+		default:					return 0;
+	}
+}
+
+double AlxParamItemEnumTest_GetValF(AlxParamItemEnumTest_Ctx* ctx)
+{
+	if (ctx->dataType == AlxParamItem_Float)
+	{
+		return (double)AlxParamItem_GetValFloat(&ctx->item);
+	}
+	return AlxParamItem_GetValDouble(&ctx->item);
+}
+
+int32_t AlxMemSafeTest_Status_ErrEnum(void);
+int32_t AlxMemSafeTest_Status_ErrConv(void);
+
+int32_t AlxMemSafeTest_Status_ErrEnum(void)					{ return (int32_t)AlxParamItem_ErrEnum; }
+int32_t AlxMemSafeTest_Status_ErrConv(void)					{ return (int32_t)AlxParamItem_ErrConv; }

@@ -1744,8 +1744,32 @@ class MemSafeLib:
         for name in ("GetValDefF", "GetValMinF", "GetValMaxF", "GetValF"):
             fn = getattr(c, f"AlxParamItemMetaTest_{name}")
             fn.restype, fn.argtypes = f64, [vp]
+        c.AlxParamItemMetaTest_SetValI.restype = i32
         c.AlxParamItemMetaTest_SetValI.argtypes = [vp, i64]
+        c.AlxParamItemMetaTest_SetValF.restype = i32
         c.AlxParamItemMetaTest_SetValF.argtypes = [vp, f64]
+        # the enum-list shim: the item carries a copy of the list it was built from
+        c.AlxParamItemEnumTest_New.restype = vp
+        c.AlxParamItemEnumTest_New.argtypes = [u32, ctypes.POINTER(i64), ctypes.POINTER(f64),
+                                               ctypes.c_uint8, i64, i64, i64,
+                                               f64, f64, f64, u32]
+        c.AlxParamItemEnumTest_Delete.argtypes = [vp]
+        c.AlxParamItemEnumTest_GetIsEnum.restype = ctypes.c_bool
+        c.AlxParamItemEnumTest_GetIsEnum.argtypes = [vp]
+        c.AlxParamItemEnumTest_GetEnumArrLen.restype = ctypes.c_uint8
+        c.AlxParamItemEnumTest_GetEnumArrLen.argtypes = [vp]
+        c.AlxParamItemEnumTest_GetEnumArrAtI.restype = i64
+        c.AlxParamItemEnumTest_GetEnumArrAtI.argtypes = [vp, ctypes.c_uint8]
+        c.AlxParamItemEnumTest_GetEnumArrAtF.restype = f64
+        c.AlxParamItemEnumTest_GetEnumArrAtF.argtypes = [vp, ctypes.c_uint8]
+        c.AlxParamItemEnumTest_SetValI.restype = i32
+        c.AlxParamItemEnumTest_SetValI.argtypes = [vp, i64]
+        c.AlxParamItemEnumTest_SetValF.restype = i32
+        c.AlxParamItemEnumTest_SetValF.argtypes = [vp, f64]
+        c.AlxParamItemEnumTest_GetValI.restype = i64
+        c.AlxParamItemEnumTest_GetValI.argtypes = [vp]
+        c.AlxParamItemEnumTest_GetValF.restype = f64
+        c.AlxParamItemEnumTest_GetValF.argtypes = [vp]
         c.AlxParamItemMetaTest_SetValToDef.argtypes = [vp]
         # alxRange and alxFtoa: pure functions, no context, called directly
         for name, ct in (("Uint8", ctypes.c_uint8), ("Uint16", ctypes.c_uint16),
@@ -1774,6 +1798,8 @@ class MemSafeLib:
         self.BOTH_OK_DIFF_USE_A = status("BothOkDiff_UseA")
         self.A_OK_B_ERR_USE_A = status("AOkBErr_UseA")
         self.A_ERR_B_OK_USE_B = status("AErrBOk_UseB")
+        self.ERR_ENUM = status("ErrEnum")
+        self.ERR_CONV = status("ErrConv")
         self.COPY_LEN = c.AlxMemSafeTest_CopyLen()
         self.NUM_ITEMS = c.AlxMemSafeTest_NumOfItems()
 
@@ -1831,11 +1857,10 @@ class MemSafeLib:
         value = getattr(self.c, f"AlxParamItemMetaTest_{name}")(ctx)
         return value.decode("ascii") if isinstance(value, bytes) else value
 
-    def meta_set_val(self, ctx, data_type: int, val: float) -> None:
+    def meta_set_val(self, ctx, data_type: int, val: float) -> int:
         if data_type in self.FLOAT_TYPES:
-            self.c.AlxParamItemMetaTest_SetValF(ctx, float(val))
-        else:
-            self.c.AlxParamItemMetaTest_SetValI(ctx, int(val))
+            return self.c.AlxParamItemMetaTest_SetValF(ctx, float(val))
+        return self.c.AlxParamItemMetaTest_SetValI(ctx, int(val))
 
     def meta_get_val(self, ctx, data_type: int):
         if data_type in self.FLOAT_TYPES:
@@ -1844,6 +1869,44 @@ class MemSafeLib:
 
     def meta_set_val_to_def(self, ctx) -> None:
         self.c.AlxParamItemMetaTest_SetValToDef(ctx)
+
+    # -- an item that declares the LIST of values it will accept ---------------
+
+    def enum_new(self, data_type: int, values, val_def: float = 0, val_min: float = 0,
+                 val_max: float = 0, out_of_range: int = 1):
+        """Build an item carrying `values` as its enum list, in the type's own representation."""
+        is_float = data_type in self.FLOAT_TYPES
+        n = len(values)
+        list_i = (ctypes.c_int64 * max(n, 1))(*([0] * n if is_float else [int(v) for v in values]))
+        list_f = (ctypes.c_double * max(n, 1))(*([float(v) for v in values] if is_float else [0.0] * n))
+        ints = (0, 0, 0) if is_float else (int(val_def), int(val_min), int(val_max))
+        flts = (float(val_def), float(val_min), float(val_max)) if is_float else (0.0, 0.0, 0.0)
+        return self.c.AlxParamItemEnumTest_New(data_type, list_i, list_f, n, *ints, *flts,
+                                               out_of_range)
+
+    def enum_delete(self, ctx) -> None:
+        self.c.AlxParamItemEnumTest_Delete(ctx)
+
+    def enum_len(self, ctx) -> int:
+        return self.c.AlxParamItemEnumTest_GetEnumArrLen(ctx)
+
+    def enum_at(self, ctx, data_type: int, index: int):
+        if data_type in self.FLOAT_TYPES:
+            return self.c.AlxParamItemEnumTest_GetEnumArrAtF(ctx, index)
+        return self.c.AlxParamItemEnumTest_GetEnumArrAtI(ctx, index)
+
+    def enum_is_enum(self, ctx) -> bool:
+        return self.c.AlxParamItemEnumTest_GetIsEnum(ctx)
+
+    def enum_set_val(self, ctx, data_type: int, val: float) -> int:
+        if data_type in self.FLOAT_TYPES:
+            return self.c.AlxParamItemEnumTest_SetValF(ctx, float(val))
+        return self.c.AlxParamItemEnumTest_SetValI(ctx, int(val))
+
+    def enum_get_val(self, ctx, data_type: int):
+        if data_type in self.FLOAT_TYPES:
+            return self.c.AlxParamItemEnumTest_GetValF(ctx)
+        return self.c.AlxParamItemEnumTest_GetValI(ctx)
 
     def item_set_str(self, ctx, val: str) -> int:
         return self.c.AlxParamItemStrTest_SetStr(ctx, val.encode("ascii"))
@@ -4690,6 +4753,21 @@ def make_meta_item(memsafe_lib):
     yield _make
     for ctx in ctxs:
         memsafe_lib.meta_delete(ctx)
+
+@pytest.fixture
+def make_enum_item(memsafe_lib):
+    """Factory: make_enum_item(data_type, values, ...) -> an item with an enum list, auto-deleted."""
+    ctxs = []
+
+    def _make(data_type: int, values, **kwargs):
+        ctx = memsafe_lib.enum_new(data_type, values, **kwargs)
+        assert ctx, f"the enum item of type {data_type} could not be constructed"
+        ctxs.append(ctx)
+        return ctx
+
+    yield _make
+    for ctx in ctxs:
+        memsafe_lib.enum_delete(ctx)
 
 @pytest.fixture
 def make_store(flash):
