@@ -178,13 +178,7 @@ extern "C" {
 // General
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------------
-// C/C++
-//------------------------------------------------------------------------------
 #define ALX_C_LIB
-//#define ALX_CPP_LIB
 
 
 //------------------------------------------------------------------------------
@@ -295,9 +289,6 @@ extern "C" {
 //#define ALX_TIM_SW_ASSERT_BKPT_ENABLE
 //#define ALX_USB_ASSERT_BKPT_ENABLE
 //#define ALX_VDIV_ASSERT_BKPT_ENABLE
-//
-//// ALX - C++
-//#define ALX_NTP_CLIENT_ASSERT_BKPT_ENABLE
 
 
 //------------------------------------------------------------------------------
@@ -408,9 +399,6 @@ extern "C" {
 //#define ALX_TIM_SW_ASSERT_TRACE_ENABLE
 //#define ALX_USB_ASSERT_TRACE_ENABLE
 //#define ALX_VDIV_ASSERT_TRACE_ENABLE
-//
-//// ALX - C++
-//#define ALX_NTP_CLIENT_ASSERT_TRACE_ENABLE
 
 
 //------------------------------------------------------------------------------
@@ -522,9 +510,6 @@ extern "C" {
 #define ALX_USB_ASSERT_RST_ENABLE
 #define ALX_VDIV_ASSERT_RST_ENABLE
 
-// ALX - C++
-#define ALX_NTP_CLIENT_ASSERT_RST_ENABLE
-
 
 //------------------------------------------------------------------------------
 // Trace
@@ -635,9 +620,6 @@ extern "C" {
 #define ALX_TIM_SW_TRACE_ENABLE
 #define ALX_USB_TRACE_ENABLE
 #define ALX_VDIV_TRACE_ENABLE
-
-// ALX - C++
-#define ALX_NTP_CLIENT_TRACE_ENABLE
 
 
 //------------------------------------------------------------------------------
