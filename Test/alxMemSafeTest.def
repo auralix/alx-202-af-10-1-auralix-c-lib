@@ -66,3 +66,11 @@ EXPORTS
 	AlxAssertPc_Reset
 	AlxAssertPc_Count
 	AlxAssertPc_First
+	AlxTracePc_Reset
+	AlxTracePc_Count
+	AlxTracePc_CountAtLevel
+	AlxTracePc_LastLevel
+	AlxTracePc_LastLine
+	AlxTracePc_LastFile
+	AlxTracePc_LastFun
+	AlxTracePc_LevelConfigured

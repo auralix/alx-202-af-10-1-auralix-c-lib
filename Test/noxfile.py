@@ -123,14 +123,15 @@ CLI_TESTS = ["test_alxCli.py"]
 
 # MemSafe group: real alxMemSafe/alxCrc/alxParamGroup/alxParamStore over alxMemRawFake.
 # KEEP IN SYNC WITH conftest.MEMSAFE_SOURCES_STRICT/_CLOSURE/_ASSERT_DEFINES.
-MS_ASSERTS = ["-DALX_MEM_SAFE_ASSERT_RST_ENABLE", "-DALX_MEM_RAW_ASSERT_RST_ENABLE", "-DALX_CRC_ASSERT_RST_ENABLE",
+MS_ASSERTS = ["-DALX_MEM_SAFE_ASSERT_RST_ENABLE", "-DALX_CRC_ASSERT_RST_ENABLE",
               "-DALX_PARAM_GROUP_ASSERT_RST_ENABLE", "-DALX_PARAM_STORE_ASSERT_RST_ENABLE",
               "-DALX_PARAM_ITEM_ASSERT_RST_ENABLE", "-DALX_BOUND_ASSERT_RST_ENABLE", "-DALX_FTOA_ASSERT_RST_ENABLE",
               "-DALX_RANGE_ASSERT_RST_ENABLE"]
 MS_CLOSURE = [CLIB / "alxParamGroup.c", CLIB / "alxParamStore.c", CLIB / "alxParamItem.c", CLIB / "alxFtoa.c",
               CLIB / "alxRange.c"]
 MS_STRICT = [CLIB / "alxMemSafe.c", CLIB / "alxCrc.c", CLIB / "alxBound.c", TEST / "alxMemRawFake.c",
-             TEST / "alxParamKvStoreFake.c", TEST / "alxAssertPc.c", TEST / "alxMemSafeTestHelpers.c"]
+             TEST / "alxParamKvStoreFake.c", TEST / "alxAssertPc.c", TEST / "alxTracePc.c",
+             TEST / "alxMemSafeTestHelpers.c"]
 MS_DEF = TEST / "alxMemSafeTest.def"
 MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "test_alxParamStore.py"]
 
@@ -394,8 +395,9 @@ def analyze(session: nox.Session) -> None:
     # analysers above read 2. The rest - alxFs, alxLogger, alxNet, alxSocket, alxSd, alxFtp and the
     # alxOs* wrappers among them - were compiled by NOTHING in this repository. They are built only
     # when a product happens to use them, so an API change that breaks one is found by whoever
-    # updates next, not here. That is how ec2Test_BringUp.c came to be broken for an unknown length
-    # of time (ALX-1553 A9), and the answer there was the same: a syntax check costs seconds.
+    # updates next, not here. That is how an uncompiled bring-up source in a product repository came
+    # to be broken for an unknown length of time (ALX-1553 A9), and the answer there was the same:
+    # a syntax check costs seconds.
     #
     # -DALX_C_LIB and nothing else. The module guard has to be ON or every file preprocesses to
     # nothing and the check passes without reading a line; an MCU family define cannot be added

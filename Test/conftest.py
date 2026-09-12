@@ -103,6 +103,7 @@ MEMSAFE_SOURCES_STRICT = [
     TEST_DIR / "alxMemRawFake.c",
     TEST_DIR / "alxParamKvStoreFake.c",
     TEST_DIR / "alxAssertPc.c",
+    TEST_DIR / "alxTracePc.c",   # this group has traces once a variant enables them
     TEST_DIR / "alxMemSafeTestHelpers.c",
 ]
 MEMSAFE_SOURCES_CLOSURE = [
@@ -111,12 +112,6 @@ MEMSAFE_SOURCES_CLOSURE = [
     CLIB_DIR / "alxParamItem.c",
     CLIB_DIR / "alxFtoa.c",
     CLIB_DIR / "alxRange.c",
-]
-MEMSAFE_ASSERT_DEFINES = [
-    "-DALX_MEM_SAFE_ASSERT_RST_ENABLE", "-DALX_MEM_RAW_ASSERT_RST_ENABLE", "-DALX_CRC_ASSERT_RST_ENABLE",
-    "-DALX_PARAM_GROUP_ASSERT_RST_ENABLE", "-DALX_PARAM_STORE_ASSERT_RST_ENABLE",
-    "-DALX_PARAM_ITEM_ASSERT_RST_ENABLE", "-DALX_BOUND_ASSERT_RST_ENABLE",
-    "-DALX_FTOA_ASSERT_RST_ENABLE", "-DALX_RANGE_ASSERT_RST_ENABLE",
 ]
 MEMSAFE_DEPS = MEMSAFE_SOURCES_STRICT + MEMSAFE_SOURCES_CLOSURE + [
     CLIB_DIR / "alxMemSafe.h", CLIB_DIR / "alxMemRaw.h", CLIB_DIR / "alxCrc.h",
@@ -1045,6 +1040,8 @@ class VariantGroup(NamedTuple):
 VARIANT_GROUPS: dict[str, VariantGroup] = {
     "fifo": VariantGroup(FIFO_DLL, FIFO_SOURCES, (), FIFO_DEPS, TEST_DIR / "alxFifoTest.def", None),
     "lin": VariantGroup(LIN_DLL, LIN_SOURCES, (), LIN_DEPS, TEST_DIR / "alxLinTest.def", None),
+    "memsafe": VariantGroup(MEMSAFE_DLL, MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE,
+                            MEMSAFE_DEPS, TEST_DIR / "alxMemSafeTest.def", "memSafeClosure"),
 }
 
 
@@ -1093,9 +1090,15 @@ def _build_cli_dll() -> None:
 
 
 def _build_memsafe_dll() -> None:
-    _build_dll(MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE,
-               [*MEMSAFE_ASSERT_DEFINES, *_assert_defines(MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE)],
-               MEMSAFE_DLL, TEST_DIR / "alxMemSafeTest.def", "memSafeClosure")
+    # The hand-written MEMSAFE_ASSERT_DEFINES went 12.09. Eight of its nine entries were exactly
+    # what _assert_defines() derives from the modules' own headers, and the ninth -
+    # ALX_MEM_RAW_ASSERT_RST_ENABLE - named a module this group does not compile: it links
+    # alxMemRawFake.c, not alxMemRaw.c, so that define had never done anything. That is A31's third
+    # gate case, an enable macro for a module the build does not contain, found by hand instead.
+    #
+    # It also hard-coded RST, which is what would have stopped this group ever joining the variant
+    # matrix: `off` would have built as assert-RST and quietly lost the elision configuration.
+    _build_variant_dll("memsafe", DEFAULT_VARIANT)
 
 
 def _build_vdiv_dll() -> None:
@@ -1641,6 +1644,25 @@ class MemSafeLib:
     INIT, DEINIT, READ, WRITE = 0, 1, 2, 3
     CCITT, CRC16, CRC32 = 0, 1, 2
     ALWAYS = 0xFFFFFFFF
+
+    # -- the trace axis, as on LinLib. This group is the first in the variant matrix built in TWO
+    # -- steps (strict sources plus a warnings-off closure), which is the part of the harness the
+    # -- one-step fifo and lin groups cannot exercise.
+    def trace_reset(self) -> None:
+        self.c.AlxTracePc_Reset()
+
+    def traces(self) -> int:
+        self.c.AlxTracePc_Count.restype = ctypes.c_uint32
+        return self.c.AlxTracePc_Count()
+
+    def traces_at(self, level: int) -> int:
+        self.c.AlxTracePc_CountAtLevel.restype = ctypes.c_uint32
+        self.c.AlxTracePc_CountAtLevel.argtypes = [ctypes.c_uint8]
+        return self.c.AlxTracePc_CountAtLevel(level)
+
+    def trace_level_configured(self) -> int:
+        self.c.AlxTracePc_LevelConfigured.restype = ctypes.c_uint8
+        return self.c.AlxTracePc_LevelConfigured()
     POISON = 0xAA
 
     def __init__(self, dll_path: Path):
@@ -4266,6 +4288,16 @@ def lin_variant_lib(request) -> tuple[str, LinLib]:
     lanes silently answer a question about a different binary. See test_alxLin_variants.py.
     """
     return request.param, _variant_lib("lin", request.param, LinLib)
+
+
+@pytest.fixture(scope="session", params=sorted(VARIANTS))
+def memsafe_variant_lib(request) -> tuple[str, MemSafeLib]:
+    """The MemSafe group in ONE named configuration - the trace axis on a group of 46 sites.
+
+    Deliberately not wired to ALX_MEMSAFE_TEST_DLL, for the reason lin_variant_lib is not: a
+    variant is a statement about what conftest's own recipe builds.
+    """
+    return request.param, _variant_lib("memsafe", request.param, MemSafeLib)
 
 
 @pytest.fixture
