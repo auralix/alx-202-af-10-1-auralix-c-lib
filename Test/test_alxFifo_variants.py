@@ -44,7 +44,7 @@ Proofs (ALX-1553): P525-P531.
 
 import pytest
 
-from host_harness import (
+from host_build import (
     DEFAULT_VARIANT,
     FIFO_DLL,
     FIFO_SOURCES,

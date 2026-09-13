@@ -50,8 +50,12 @@ from pathlib import Path
 
 import pytest
 
-import host_harness
-from host_harness import LIN_SOURCES, VARIANTS, _variant_defines
+import host_build
+from host_build import (
+    LIN_SOURCES,
+    VARIANTS,
+    _variant_defines,
+)
 
 pytestmark = pytest.mark.variants
 
@@ -268,10 +272,10 @@ def test_ALX1553_P540_every_declared_dependency_of_every_group_exists():
     already loaded fails with 'permission denied', which is how it finally surfaced.
     """
     missing = []
-    for name in dir(host_harness):
+    for name in dir(host_build):
         if not name.endswith(("_DEPS", "_SOURCES", "_SOURCES_STRICT", "_SOURCES_CLOSURE")):
             continue
-        value = getattr(host_harness, name)
+        value = getattr(host_build, name)
         if not isinstance(value, (list, tuple)):
             continue
         missing += [f"{name}: {path}" for path in value

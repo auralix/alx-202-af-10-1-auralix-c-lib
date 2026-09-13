@@ -14,11 +14,11 @@ inventories and per-group lists belong to the Jira task and its Task folder note
 | Verification Runner | Select stages, configure processes, propagate failures | `noxfile.py` |
 | Host Test Application | Check library behavior through DLLs and fakes | `test_*.py`, pytest fixtures in `conftest.py` |
 | Native Check Application | Run checks that need their own native process | sanitizer smoke executables |
-| Test Harness | Declare builds and expose callable host interfaces | `host_harness.py`, C helpers and fakes |
+| Test Harness | Declare builds and expose callable host interfaces | `host_build.py`, `host_harness.py`, C helpers and fakes |
 | Shared Mechanisms | Tool execution, build recipes, evidence helpers | Python library `alx` package |
 | Build and Evidence Store | Keep outputs separate by stage and configuration | `build/` |
 
-Runners and behavioral tests import the harness, never `conftest.py`; fixture lifecycle stays
+Runners import `host_build.py`; behavioral tests import access harnesses, never `conftest.py`; fixture lifecycle stays
 inside pytest. The library code under test has no dependency on the verification system.
 Host and target describe where that code executes, not where the controller runs. This suite
 has no Target Test Application: on-target qualification belongs to a consumer's verification system.
@@ -44,7 +44,7 @@ A missing tool fails its lane, never skips it.
 ## Layout
 
 - `Test/` = the suite: tests, `conftest.py`, C helpers and fakes, the DLL export files.
-- The groups, one DLL each, declared in `conftest.py`:
+- The groups, one DLL each, declared in `host_build.py`:
 	- `alxFifoTest` - the FIFO and the bounds helper it uses
 	- `alxCliTest` - the CLI over a faked serial port and KV store
 	- `alxMemSafeTest` - the safe-store chain (CRC, MemSafe, ParamGroup, ParamStore) over a faked raw
@@ -117,7 +117,7 @@ A missing tool fails its lane, never skips it.
   from the Python lib and is called as a command or imported: the gates (`python -m alx.verify.<gate>`), the host
   toolchain and DLL build mechanics (`alx.c_lib.host_build`) and the C mutation hooks
   (`python -m alx.c_lib.mutation_hooks`). What stays here is what is THIS repository's: the source lists, the
-  defines, the `.def` files and the `DLL_GROUPS` declaration, all in `conftest.py` next to the fixtures.
+  defines, the `.def` files and the `DLL_GROUPS` declaration, in `host_build.py`, separate from the fixtures.
 - `Test/noxfile.py` = the lane runner: one nox session per pipeline stage, named after it, running in `Test/.venv`
   (`uv run nox`). The generic gates (`python -m alx.verify.<gate>`) and the lane vocabulary (`alx.verify.lanes`:
   stage names, evidence folders, tool locations) come from the Auralix Python lib, pinned by tag in `pyproject.toml`.
@@ -153,7 +153,7 @@ A missing tool fails its lane, never skips it.
 - **Files - Config**
 	- `Test/alxConfig.h`
 - **Files - Code**
-	- `Test/conftest.py`
+	- `Test/host_build.py`
 	- `Test/noxfile.py` -> `build`
 - **Files - Generated**
 	- `Test/build/alx<Module>Test.dll` -> `Test/build/alxFifoTest.dll`
@@ -167,11 +167,12 @@ A missing tool fails its lane, never skips it.
 	- nox (the lane runner: one session per pipeline stage, `uv run nox -s <stage>`)
 	- Auralix Python lib `alx.verify.evidence` (pytest plugin: proof token and `req` marker -> junit properties)
 - **Files - Config**
-	- `Test/pyproject.toml` (dependency `alx-202-2-af-1-auralix-py-lib @ git+...@v0.2.0`)
+	- `Test/pyproject.toml` (dependency `alx-202-2-af-1-auralix-py-lib @ git+...@v0.8.0`)
 	- `Test/uv.lock`
 	- `Test/.python-version`
 - **Files - Code**
-	- `Test/conftest.py`
+	- `Test/conftest.py` (fixture lifetime)
+	- `Test/host_harness.py` (ctypes access and observations)
 	- `Test/noxfile.py` -> `test`
 	- `Test/test_alx<Module>.py` -> `Test/test_alxFifo.py`
 	- `Test/alx<Module>TestHelpers.c` -> `Test/alxFifoTestHelpers.c`
@@ -239,7 +240,7 @@ A missing tool fails its lane, never skips it.
 	- clang `-fsyntax-only` + TCE object-compare (the C hooks: check, fingerprint) + the `-Werror` DLL rebuild (hook: rebuild), all three from the Python lib
 - **Files - Code**
 	- `Test/noxfile.py` -> `mutate`
-	- `alx.c_lib.mutation_hooks` (Python lib) -> `check`, `fingerprint`, `rebuild`; the groups come from `conftest.DLL_GROUPS`
+	- `alx.c_lib.mutation_hooks` (Python lib) -> `check`, `fingerprint`, `rebuild`; the groups come from `host_build.DLL_GROUPS`
 - **Files - Generated**
 	- `Test/build/mutate/mutants/<module>/`
 	- `Test/build/mutate/survivors/*.diff`
@@ -264,7 +265,7 @@ A missing tool fails its lane, never skips it.
 - **Files - Config** (device repo)
 	- `Test/pyproject.toml` + `Test/uv.lock` (uv project; the Python lib from the `Sub/` gitlink as an editable path source)
 - **Files - Code** (device repo)
-	- `Test/conftest.py` (bench roles; product values: MCU, memory map, supply policy)
+	- `Test/target_harness.py` in a consumer (product values: MCU, memory map, supply policy)
 	- `Test/test_<subsystem>.py`
 	- `Test/noxfile.py` -> `hil` (BUILD - TARGET, FLASH, TEST - TARGET in one session)
 	- `Test/flash.py` (FLASH through the Python lib's debug probe)
@@ -319,7 +320,7 @@ alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar),
                         module under test -> alxSerialPortFake.c
 ```
 
-Test groups (one DLL each) are declared in `conftest.py`: strict sources (warning set, -Werror) + closure
+Test groups (one DLL each) are declared in `host_build.py`: strict sources (warning set, -Werror) + closure
 sources (-w) + fakes.
 
 ## What the host lane cannot do

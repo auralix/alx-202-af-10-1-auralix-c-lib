@@ -29,7 +29,9 @@ import random
 
 import pytest
 
-from host_harness import check
+from host_harness import (
+    check,
+)
 
 pytestmark = pytest.mark.unit
 

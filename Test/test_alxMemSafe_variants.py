@@ -38,7 +38,12 @@ Proofs (ALX-1553): P544-P547.
 
 import pytest
 
-from host_harness import MEMSAFE_SOURCES_CLOSURE, MEMSAFE_SOURCES_STRICT, VARIANTS, _variant_defines
+from host_build import (
+    MEMSAFE_SOURCES_CLOSURE,
+    MEMSAFE_SOURCES_STRICT,
+    VARIANTS,
+    _variant_defines,
+)
 
 pytestmark = pytest.mark.variants
 

@@ -35,14 +35,14 @@ BUILD = TEST / "build"
 PYTHON = sys.executable
 tc = hb.Toolchain()   # where the tools are on THIS machine (ALX_* variables), and the vcvars environment
 sys.path.insert(0, str(TEST))
-import host_harness as hh  # noqa: E402  repository build recipes and DLL_GROUPS; no pytest lifecycle dependency
+import host_build as host_recipe  # noqa: E402  repository build recipes and DLL_GROUPS; no pytest lifecycle dependency
 
 nox.options.default_venv_backend = "none"
 nox.options.sessions = list(lanes.DEFAULT_SESSIONS)
 # third-party folders, not gated
 VENDOR = ["--exclude", "Ext", "--exclude", "FatFs", "--exclude", "mcuboot", "--exclude", "Usbh"]
 
-# ---- the module sets (extend per module; keep in sync with host_harness's group declarations) -------------------
+# ---- the module sets (extend per module; keep in sync with host_build's group declarations) -------------------
 ANALYSIS_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c",
                     TEST / "alxFifoTestHelpers.c", TEST / "alxBoundTestHelpers.c", TEST / "alxFifoSanSmoke.c"]
 # every C file this suite OWNS is style-gated, whatever module it serves; the LIBRARY sources
@@ -181,31 +181,28 @@ STYLE_FILES = [*_library_style_files(), *sorted(TEST.glob("*.c"))]
 # Target-only translation units: compiled by ANALYZE stage 4 with arm-gcc, never linked, one compile
 # per part variant. (source, variants to compile it under).
 LAYOUT_CHECKS = [(TEST / "alxIna228RegSizeCheck.c", ["ALX_INA238", "ALX_INA228"])]
-INCLUDE_DIRS = hh.INCLUDES
+INCLUDE_DIRS = host_recipe.INCLUDES
 CL_INCLUDES = [f"/I{d}" for d in INCLUDE_DIRS]
 GNU99 = ["/clang:-std=gnu99"]
 
 # alxAssertPc.c is in every group now: it holds the assertion counter the .def files export
-# and the suite's per-test check reads. Declared by host_harness.FIFO_SOURCES.
-FIFO_SOURCES = hh.FIFO_SOURCES
+# and the suite's per-test check reads. Declared by host_build.FIFO_SOURCES.
+FIFO_SOURCES = host_recipe.FIFO_SOURCES
 FIFO_DEF = TEST / "alxFifoTest.def"
 
 # CLI group (Tier 2: real alxCli + param stack over the fakes), asserts ON = the code as shipped
-# (alxParamItem.c has side effects inside its asserts). Declared by host_harness.CLI_SOURCES_STRICT/_CLOSURE.
-CLI_ASSERTS = hh.CLI_ASSERT_DEFINES
-CLI_CLOSURE = hh.CLI_SOURCES_CLOSURE
-CLI_STRICT = hh.CLI_SOURCES_STRICT
+# (alxParamItem.c has side effects inside its asserts). Declared by host_build.CLI_SOURCES_STRICT/_CLOSURE.
+CLI_ASSERTS = host_recipe.CLI_ASSERT_DEFINES
+CLI_CLOSURE = host_recipe.CLI_SOURCES_CLOSURE
+CLI_STRICT = host_recipe.CLI_SOURCES_STRICT
 CLI_DEF = TEST / "alxCliTest.def"
 CLI_TESTS = ["test_alxCli.py"]
 
 # MemSafe group: real alxMemSafe/alxCrc/alxParamGroup/alxParamStore over alxMemRawFake.
-# Declared by host_harness.MEMSAFE_SOURCES_STRICT/_CLOSURE/_ASSERT_DEFINES.
-MS_ASSERTS = ["-DALX_MEM_SAFE_ASSERT_RST_ENABLE", "-DALX_CRC_ASSERT_RST_ENABLE",
-              "-DALX_PARAM_GROUP_ASSERT_RST_ENABLE", "-DALX_PARAM_STORE_ASSERT_RST_ENABLE",
-              "-DALX_PARAM_ITEM_ASSERT_RST_ENABLE", "-DALX_BOUND_ASSERT_RST_ENABLE", "-DALX_FTOA_ASSERT_RST_ENABLE",
-              "-DALX_RANGE_ASSERT_RST_ENABLE"]
-MS_CLOSURE = hh.MEMSAFE_SOURCES_CLOSURE
-MS_STRICT = hh.MEMSAFE_SOURCES_STRICT
+# Source membership and assertion policy come from the same recipe as ordinary test builds.
+MS_ASSERTS = host_recipe._assert_defines(host_recipe.MEMSAFE_SOURCES_STRICT, host_recipe.MEMSAFE_SOURCES_CLOSURE)
+MS_CLOSURE = host_recipe.MEMSAFE_SOURCES_CLOSURE
+MS_STRICT = host_recipe.MEMSAFE_SOURCES_STRICT
 MS_DEF = TEST / "alxMemSafeTest.def"
 # Every test file that drives THIS group's DLL, which is not the same list as "the tests I was
 # thinking about when I wrote the gate". The four modules below were missing, and because the gate
@@ -270,18 +267,18 @@ def _check_ms_tests() -> None:
         )
 
 # Id group: the real alxId over the IO pin fake, asserts ON = the code as shipped. Both closure
-# sources are closure for reasons written out at host_harness's ID group - alxId.c fails -Wformat and
+# sources are closure for reasons written out at host_build's ID group - alxId.c fails -Wformat and
 # -Wint-to-void-pointer-cast, and alxIdTestDateComp.c cannot survive -Werror at all because the
-# library's ALX_BUILD_DATE_COMP overflows an int. Declared by host_harness.ID_SOURCES_STRICT/
-# _CLOSURE and with what host_harness._assert_defines derives from them.
+# library's ALX_BUILD_DATE_COMP overflows an int. Declared by host_build.ID_SOURCES_STRICT/
+# _CLOSURE and with what host_build._assert_defines derives from them.
 #
 # In SANITIZE from the group's first test: the identity block is read out of flash at a fixed
 # 32-bit address through a packed struct, which is exactly the shape UBSan has something to say
 # about. In COVERAGE since the suite arrived (ALX-1553 P468-P505) and gated on FUNCTIONS the way
 # the MemSafe group is, which is what the note here previously said it would take.
-ID_ASSERTS = ["-DALX_ID_ASSERT_RST_ENABLE"]
-ID_CLOSURE = hh.ID_SOURCES_CLOSURE
-ID_STRICT = hh.ID_SOURCES_STRICT
+ID_ASSERTS = host_recipe._assert_defines(host_recipe.ID_SOURCES_STRICT, host_recipe.ID_SOURCES_CLOSURE)
+ID_CLOSURE = host_recipe.ID_SOURCES_CLOSURE
+ID_STRICT = host_recipe.ID_SOURCES_STRICT
 ID_DEF = TEST / "alxIdTest.def"
 ID_TESTS = ["test_alxId.py"]
 
@@ -292,8 +289,8 @@ ID_TESTS = ["test_alxId.py"]
 # alxAssertBkptCaller.c is in the second list only - the weak AlxAssert_Bkpt is __debugbreak() on
 # this host and does not return, so a caller for it must not exist where that default would run.
 # No assert defines for either: alxAssert.h declares no enable macro of its own, which is right for
-# the mechanism rather than one of its clients. Declared by host_harness.ASSERT_WEAK_SOURCES and
-# host_harness.ASSERT_SOURCES.
+# the mechanism rather than one of its clients. Declared by host_build.ASSERT_WEAK_SOURCES and
+# host_build.ASSERT_SOURCES.
 #
 # In SANITIZE from the group's first test. NOT in COVERAGE, and that is a decision rather than an
 # omission: two of alxAssert.c's three functions are reachable from a DLL and the third terminates
@@ -301,9 +298,9 @@ ID_TESTS = ["test_alxId.py"]
 # what the Id group's note below refuses to do. Gating this module needs the out-of-process exe
 # that AlxAssert_Bkpt requires anyway (the ASan smoke exe in stage 1 is the shape), and that is a
 # lane change of its own.
-ASSERT_WEAK_SOURCES = hh.ASSERT_WEAK_SOURCES
+ASSERT_WEAK_SOURCES = host_recipe.ASSERT_WEAK_SOURCES
 ASSERT_WEAK_DEF = TEST / "alxAssertWeakTest.def"
-ASSERT_SOURCES = hh.ASSERT_SOURCES
+ASSERT_SOURCES = host_recipe.ASSERT_SOURCES
 ASSERT_DEF = TEST / "alxAssertTest.def"
 ASSERT_TESTS = ["test_alxAssert.py"]
 
@@ -312,12 +309,12 @@ ASSERT_TESTS = ["test_alxAssert.py"]
 # the weak defaults intact, once with alxMemRawTestOverride.c displacing four of the five (DeInit
 # is left weak on purpose, so displacement is visibly per symbol). Note that alxMemRawFake.c, which
 # the MemSafe group links INSTEAD of this module, is in neither list: it would displace all five
-# and leave nothing to test. Declared by host_harness.MEMRAW_SOURCES / MEMRAW_OVR_SOURCES and
-# with what host_harness._assert_defines derives from them.
+# and leave nothing to test. Declared by host_build.MEMRAW_SOURCES / MEMRAW_OVR_SOURCES and
+# with what host_build._assert_defines derives from them.
 MEMRAW_ASSERTS = ["-DALX_MEM_RAW_ASSERT_RST_ENABLE"]
-MEMRAW_SOURCES = hh.MEMRAW_SOURCES
+MEMRAW_SOURCES = host_recipe.MEMRAW_SOURCES
 MEMRAW_DEF = TEST / "alxMemRawTest.def"
-MEMRAW_OVR_SOURCES = hh.MEMRAW_OVR_SOURCES
+MEMRAW_OVR_SOURCES = host_recipe.MEMRAW_OVR_SOURCES
 MEMRAW_OVR_DEF = TEST / "alxMemRawOvrTest.def"
 MEMRAW_TESTS = ["test_alxMemRaw.py"]
 
@@ -348,18 +345,18 @@ def _strs(paths) -> list:
 
 
 def _dev_build(session: nox.Session) -> list:
-    """Build every stale group with host_harness's -Werror recipe; return the targets that are missing.
+    """Build every stale group with host_build's -Werror recipe; return the targets that are missing.
 
     Collection alone does NOT do this: the DLLs are built by the fixtures, which --collect-only
     never runs. Measured 10.09 - with alxFifoTest.dll deleted, the BUILD lane reported
     "BUILD CLEAN" listing the other two and exited 0.
     """
-    for target, deps, make in hh.DLL_GROUPS:
+    for target, deps, make in host_recipe.DLL_GROUPS:
         if hb.needs_build(target, deps):
             session.log(f"building {target.name}")
             make()
-    hh.write_compile_db()
-    return [t.name for t, _, _ in hh.DLL_GROUPS if not t.exists()]
+    host_recipe.write_compile_db()
+    return [t.name for t, _, _ in host_recipe.DLL_GROUPS if not t.exists()]
 
 
 def _fresh_dev_build(session: nox.Session) -> None:
@@ -380,7 +377,7 @@ def _clang_cl(session: nox.Session, *args, cwd: Path | None = None) -> None:
 
 
 def _closure_objects(session: nox.Session, out_dir: Path, sources, defines, flags) -> list:
-    """Two-step group build, step 1: the closure sources compiled with warnings off (host_harness's shape)."""
+    """Two-step group build, step 1: the closure sources compiled with warnings off (host_build's shape)."""
     out_dir.mkdir(parents=True, exist_ok=True)
     _clang_cl(session, *GNU99, *flags, "/w", "-D_CRT_SECURE_NO_WARNINGS", *defines, *CL_INCLUDES, "/c", *_strs(sources),
               cwd=out_dir)
@@ -409,7 +406,7 @@ def build(session: nox.Session) -> None:
     if missing:
         session.error(f"BUILD FAILED - the recipe did not produce {missing}")
     session.run(PYTHON, "-m", "pytest", "-q", "--collect-only")
-    session.log(f"BUILD CLEAN - {sorted(t.name for t, _, _ in hh.DLL_GROUPS)} in {BUILD}")
+    session.log(f"BUILD CLEAN - {sorted(t.name for t, _, _ in host_recipe.DLL_GROUPS)} in {BUILD}")
 
 
 @nox.session
@@ -425,19 +422,19 @@ def variants(session: nox.Session) -> None:
     interruption - every pair is attempted and the matrix is reported at the end. That is the
     opposite of the BUILD lane's fail-fast, on purpose.
 
-    The recipes come from host_harness.VARIANT_GROUPS rather than being restated here. The sanitize and
+    The recipes come from host_build.VARIANT_GROUPS rather than being restated here. The sanitize and
     coverage lanes each keep their own copy of a group's source list behind a Declared comment;
     a seventh copy would defeat the point of having a table.
     """
     out = lanes.evidence_dir(TEST, "variants")
     rows, failed = [], []
 
-    for group in sorted(hh.VARIANT_GROUPS):
-        for variant in sorted(hh.VARIANTS):
-            dll = hh._variant_dll(group, variant)
-            form, module_trace, level = hh.VARIANTS[variant]
+    for group in sorted(host_recipe.VARIANT_GROUPS):
+        for variant in sorted(host_recipe.VARIANTS):
+            dll = host_recipe._variant_dll(group, variant)
+            form, module_trace, level = host_recipe.VARIANTS[variant]
             try:
-                hh._build_variant_dll(group, variant)
+                host_recipe._build_variant_dll(group, variant)
                 built = dll.exists()
             except hb.BuildError as exc:
                 built = False
@@ -795,5 +792,5 @@ def mutate(session: nox.Session) -> None:
                 "--out", str(BUILD / "mutate"), "--sample", str(args.sample), "--seed", "1514",
                 "--check-cmd", f"{hooks} check {{mutant}} {flags}",
                 "--fingerprint-cmd", f"{hooks} fingerprint {{mutant}} --work {work} {flags}",
-                "--rebuild-cmd", f"{hooks} rebuild --groups host_harness:DLL_GROUPS --sys-path Test",
+                "--rebuild-cmd", f"{hooks} rebuild --groups host_build:DLL_GROUPS --sys-path Test",
                 *args.sources)
