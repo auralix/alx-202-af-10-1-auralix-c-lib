@@ -26,7 +26,7 @@ missing noreturn costs and which remedy removes it. Both skip when the tool is a
 lane needs both anyway, so a machine that runs the pipeline has them.
 
 Worth knowing while reading: alxAssert.h declares no ALX_<MODULE>_ASSERT_*_ENABLE macro of its own,
-so conftest._assert_defines contributes nothing to either DLL. That is correct - this module is the
+so host_harness._assert_defines contributes nothing to either DLL. That is correct - this module is the
 mechanism, not one of its clients - and it is not the gap it looks like. Related and equally
 harmless, alxGlobal.h:279 spells the pattern WITHOUT the _ENABLE suffix (ALX_GLOBAL_ASSERT_BKPT),
 which puts it outside that regex; ALX_GLOBAL_ASSERT has zero call sites in the library, so the
@@ -352,7 +352,7 @@ def test_ALX1553_P511_tracing_switched_off_does_not_silence_assertions(assert_we
 def test_ALX1553_P512_each_macro_form_reaches_its_own_handler(assert_lib, kind):
     """Three forms, three handlers, and until this file the suite had only ever compiled one of them.
 
-    conftest._assert_defines reads ALX_<M>_ASSERT_BKPT_ENABLE out of each module's header purely to
+    host_harness._assert_defines reads ALX_<M>_ASSERT_BKPT_ENABLE out of each module's header purely to
     learn the module's macro prefix and then always emits the RST form, and the three hand-written
     lists beside it are RST-only too. So ALX_ASSERT_BKPT and ALX_ASSERT_TRACE - the form a bench
     build uses and the form a field-diagnostic build uses, both configurations real products ship -

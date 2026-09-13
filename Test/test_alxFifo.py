@@ -29,7 +29,7 @@ import random
 
 import pytest
 
-from conftest import check
+from host_harness import check
 
 pytestmark = pytest.mark.unit
 
@@ -408,7 +408,7 @@ def test_ALX1514_P8_partial_read_current_contract_pinned(lib, make_fifo):
 def test_ALX1514_P8_partial_write_current_contract_pinned(lib, make_fifo):
     # D4/D5 accepted as-is: write commits until full, returns ErrFull.
     #
-    # 11.09: the FIFO DLL was brought under conftest._no_library_assertions and this was the one
+    # 11.09: the FIFO DLL was brought under host_harness._no_library_assertions and this was the one
     # test in the group that had been tripping a library assertion unseen. 6 > buffLen, so
     # ALX_FIFO_ASSERT(0 < len && len <= me->buffLen) fails before any of this runs. It is still
     # worth pinning - it is what an assertions-off build does - but it is not the partial-write

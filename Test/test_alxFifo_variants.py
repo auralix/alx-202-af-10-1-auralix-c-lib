@@ -9,7 +9,7 @@ call sites away and DISCARDS their arguments. (549 is the portable modules, 16 f
 MCU ports under Mcu/ as well it is 1006. Measured by counting ALX_<MODULE>_TRACE_<LEVEL> call
 sites in every library .c outside Test, Ext, FatFs, mcuboot and Usbh.)
 
-conftest.VARIANTS names the four that are worth building, and this file is what makes them a claim
+host_harness.VARIANTS names the four that are worth building, and this file is what makes them a claim
 rather than a build option. Each variant reaches something none of the others do:
 
     default       what customers get - alxConfig_TEMPLATE.h's own combination. Must stay green.
@@ -44,7 +44,7 @@ Proofs (ALX-1553): P525-P531.
 
 import pytest
 
-from conftest import (
+from host_harness import (
     DEFAULT_VARIANT,
     FIFO_DLL,
     FIFO_SOURCES,

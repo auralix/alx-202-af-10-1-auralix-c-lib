@@ -7,6 +7,26 @@ extern dependencies, tested via link-time fakes. `Mcu/**` ports are not tested h
 This file holds rules and facts only, in the form abstract name -> one FIFO example; task details, module
 inventories and per-group lists belong to the Jira task and its Task folder notes.
 
+## Verification architecture
+
+| Block | Responsibility | Implementation here |
+|---|---|---|
+| Verification Runner | Select stages, configure processes, propagate failures | `noxfile.py` |
+| Host Test Application | Check library behavior through DLLs and fakes | `test_*.py`, pytest fixtures in `conftest.py` |
+| Native Check Application | Run checks that need their own native process | sanitizer smoke executables |
+| Test Harness | Declare builds and expose callable host interfaces | `host_harness.py`, C helpers and fakes |
+| Shared Mechanisms | Tool execution, build recipes, evidence helpers | Python library `alx` package |
+| Build and Evidence Store | Keep outputs separate by stage and configuration | `build/` |
+
+Runners and behavioral tests import the harness, never `conftest.py`; fixture lifecycle stays
+inside pytest. The library code under test has no dependency on the verification system.
+Host and target describe where that code executes, not where the controller runs. This suite
+has no Target Test Application: on-target qualification belongs to a consumer's verification system.
+
+Use snake_case for Python modules/helpers, CapWords for classes and UPPER_CASE for constants.
+Keep existing proof IDs stable. Test responsibilities match the Python library's `tests/` layout;
+the C repository retains `Test/` and its C source naming convention.
+
 ## Run
 
 ```

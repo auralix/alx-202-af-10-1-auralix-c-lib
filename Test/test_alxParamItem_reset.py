@@ -44,7 +44,7 @@ Proofs (ALX-1553): P560-P561.
 
 import pytest
 
-from conftest import VARIANTS
+from host_harness import VARIANTS
 
 pytestmark = pytest.mark.variants
 

@@ -27,7 +27,7 @@ import struct
 
 import pytest
 
-from conftest import CanMsg
+from host_harness import CanMsg
 
 pytestmark = pytest.mark.unit
 
