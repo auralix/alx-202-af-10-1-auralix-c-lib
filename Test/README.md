@@ -45,8 +45,8 @@ A missing tool fails its lane, never skips it.
 
 - `Test/` = the verification root, with the same entries as every Auralix repository: `tests/` (the checks: `host/alx/` mirrors the
   library sources, `host/alx/ext/` the `Ext/` sources, `framework/` checks the verification system itself; `conftest.py` owns the
-  fixture lifecycle), `harness/` (`build.py` recipes and group declarations, `access.py` ctypes access), `host/` (`helpers/`,
-  `fakes/`, `exports/` the DLL export files, `checks/` the native check sources), `config/` (`alxConfig.h`, `alxAssert.cfg`) and
+  fixture lifecycle), `harness/` (`build.py` recipes, group declarations and their export lists, `access.py` ctypes access), `host/` (`helpers/`,
+  `fakes/`, `checks/` the native check sources), `config/` (`alxConfig.h`, `alxAssert.cfg`) and
   `build/` (evidence). Test module names keep the C module spelling (`test_alxFifo.py`) until the shared mutation lane learns the
   normalized mirror name.
 - The groups, one DLL each, declared in `harness/build.py`:
@@ -122,7 +122,7 @@ A missing tool fails its lane, never skips it.
   from the Python lib and is called as a command or imported: the gates (`python -m alx.verify.<gate>`), the host
   toolchain and DLL build mechanics (`alx.c_lib.host_build`) and the C mutation hooks
   (`python -m alx.c_lib.mutation_hooks`). What stays here is what is THIS repository's: the source lists, the
-  defines, the `.def` files and the `DLL_GROUPS` declaration, in `harness/build.py`, separate from the fixtures.
+  defines, the export lists and the `DLL_GROUPS` declaration, in `harness/build.py`, separate from the fixtures.
 - `Test/noxfile.py` = the lane runner: one nox session per pipeline stage, named after it, running in `Test/.venv`
   (`uv run nox`). The generic gates (`python -m alx.verify.<gate>`) and the lane vocabulary (`alx.verify.lanes`:
   stage names, evidence folders, tool locations) come from the Auralix Python lib, pinned by tag in `pyproject.toml`.
@@ -181,10 +181,11 @@ A missing tool fails its lane, never skips it.
 	- `Test/noxfile.py` -> `test`
 	- `Test/tests/host/alx/test_alx<Module>.py` -> `Test/tests/host/alx/test_alxFifo.py`
 	- `Test/host/helpers/alx<Module>TestHelpers.c` -> `Test/host/helpers/alxFifoTestHelpers.c`
-	- `Test/host/exports/alx<Module>Test.def` -> `Test/host/exports/alxFifoTest.def`
+	- `Test/harness/build.py` `<GROUP>_EXPORTS` -> `FIFO_EXPORTS` (the DLL's export list)
 	- `Test/host/fakes/alx<FakedModule>Fake.c` -> `Test/host/fakes/alxSerialPortFake.c`
 	- `Test/host/checks/alx<Module>RegSizeCheck.c` -> `Test/host/checks/alxIna228RegSizeCheck.c` (target-only)
 - **Files - Generated**
+	- `Test/build/alx<Module>Test.def` -> `Test/build/alxFifoTest.def` (written from the export list)
 	- `Test/build/pytest_report.xml`
 	- `Test/build/pytest_report.html`
 
@@ -319,14 +320,14 @@ A missing tool fails its lane, never skips it.
 
 ```
 alxFooTestHelpers.c     opaque-handle New/Delete + status-enum getters
-alxFooTest.def          DLL exports
+FOO_EXPORTS             DLL exports, in harness/build.py; the build writes build/alxFooTest.def
 test_alxFoo.py          tests; file = module-scoped, functions = task-scoped: test_<KEY>_P<n>_<what>
 alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar), never by the
                         module under test -> alxSerialPortFake.c
 ```
 
-Test groups (one DLL each) are declared in `host_build.py`: strict sources (warning set, -Werror) + closure
-sources (-w) + fakes.
+Test groups (one DLL each) are declared in `harness/build.py`: strict sources (warning set, -Werror) + closure
+sources (-w) + fakes + the export list.
 
 ## What the host lane cannot do
 

@@ -14,8 +14,34 @@ CONFIG_DIR = TEST_DIR / "config"
 HOST_DIR = TEST_DIR / "host"
 HELPERS_DIR = HOST_DIR / "helpers"
 FAKES_DIR = HOST_DIR / "fakes"
-EXPORTS_DIR = HOST_DIR / "exports"
 CHECKS_DIR = HOST_DIR / "checks"
+
+
+class Exports(NamedTuple):
+    """One test DLL's export list: the symbols Python may call through ctypes.
+
+    Declared here as Python data, beside the sources it belongs to; the linker's module-definition
+    (.def) file is a build output that def_file() writes from it. One entry per line of the .def's
+    EXPORTS section: a symbol name, or `<name> DATA` for a variable.
+    """
+
+    library: str
+    symbols: tuple[str, ...]
+
+
+def def_file(exports: Exports) -> Path:
+    """Write build/<library>.def from an export list and return its path.
+
+    Rewritten only when its text changes. It is not a rebuild dependency of its own: the list lives
+    in this file, and this file is a dependency of every DLL built from it.
+    """
+    path = BUILD_DIR / f"{exports.library}.def"
+    text = "".join([f"LIBRARY {exports.library}\n", "EXPORTS\n", *(f"\t{s}\n" for s in exports.symbols)])
+    if not path.is_file() or path.read_text(encoding="ascii") != text:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="ascii", newline="\n")
+    return path
+
 
 FIFO_SOURCES = [
     CLIB_DIR / "alxFifo.c",
@@ -32,10 +58,46 @@ FIFO_DEPS = [
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxTrace.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxFifoTest.def",
     Path(__file__),  # flags live here - flag edits must trigger a rebuild
 ]
 FIFO_DLL = BUILD_DIR / "alxFifoTest.dll"
+FIFO_EXPORTS = Exports("alxFifoTest", (
+    "AlxFifo_Ctor",
+    "AlxFifo_Flush",
+    "AlxFifo_Read",
+    "AlxFifo_ReadStrUntil",
+    "AlxFifo_ReadStrUntilAny",
+    "AlxFifo_Write",
+    "AlxFifo_WriteStr",
+    "AlxFifo_GetNumOfEntries",
+    "AlxFifo_Rewind",
+    "AlxFifoTest_New",
+    "AlxFifoTest_Delete",
+    "AlxFifoTest_Status_Ok",
+    "AlxFifoTest_Status_Err",
+    "AlxFifoTest_Status_ErrFull",
+    "AlxFifoTest_Status_ErrEmpty",
+    "AlxFifoTest_Status_ErrNoDelim",
+    "AlxFifoTest_Status_ErrTooLong",
+    "AlxBound_Uint8",
+    "AlxBound_Uint16",
+    "AlxBound_Uint32",
+    "AlxBound_Uint64",
+    "AlxBound_Int8",
+    "AlxBound_Int16",
+    "AlxBound_Int32",
+    "AlxBound_Int64",
+    "AlxBound_Float",
+    "AlxBound_Double",
+    "AlxBound_Str",
+    "AlxBoundTest_Status_Ok",
+    "AlxBoundTest_Status_ErrMin",
+    "AlxBoundTest_Status_ErrMax",
+    "AlxBoundTest_Status_ErrLen",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 # ----------------------------------------------------------- CLI module ------
 # Tier-2 target: REAL alxCli + real param stack over the faked serial port and
@@ -85,10 +147,26 @@ CLI_DEPS = CLI_SOURCES_STRICT + CLI_SOURCES_CLOSURE + [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxCliTest.def",
     Path(__file__),
 ]
 CLI_DLL = BUILD_DIR / "alxCliTest.dll"
+CLI_EXPORTS = Exports("alxCliTest", (
+    "AlxCliTest_New",
+    "AlxCliTest_Delete",
+    "AlxCliTest_Handle",
+    "AlxCliTest_Port",
+    "AlxCliTest_GetBuffLen",
+    "AlxCliTest_GetStrValBuffLen",
+    "AlxCliTest_Status_Ok",
+    "AlxCliTest_WasResetRequested",
+    "AlxCliTest_ClearResetRequested",
+    "AlxSerialPortFake_InjectRx",
+    "AlxSerialPortFake_TxRead",
+    "AlxSerialPortFake_TxNumOfEntries",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 # ------------------------------------------------------- MemSafe group -------
 # Tier-2 target (ALX-1513): REAL alxMemSafe + alxCrc under the strict set, the REAL
@@ -116,9 +194,163 @@ MEMSAFE_DEPS = MEMSAFE_SOURCES_STRICT + MEMSAFE_SOURCES_CLOSURE + [
     CLIB_DIR / "alxMemSafe.h", CLIB_DIR / "alxMemRaw.h", CLIB_DIR / "alxCrc.h",
     CLIB_DIR / "alxParamGroup.h", CLIB_DIR / "alxParamStore.h", CLIB_DIR / "alxParamItem.h",
     CLIB_DIR / "alxGlobal.h", CLIB_DIR / "alxAssert.h", CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxMemSafeTest.def", Path(__file__),
+    Path(__file__),
 ]
 MEMSAFE_DLL = BUILD_DIR / "alxMemSafeTest.dll"
+MEMSAFE_EXPORTS = Exports("alxMemSafeTest", (
+    "AlxMemSafeTest_New",
+    "AlxMemSafeTest_Delete",
+    "AlxMemSafeTest_CopyLen",
+    "AlxMemSafeTest_NumOfItems",
+    "AlxMemSafeTest_MemSafeRead",
+    "AlxMemSafeTest_MemSafeWrite",
+    "AlxMemSafeTest_MemSafeIsReadDone",
+    "AlxMemSafeTest_MemSafeIsReadErr",
+    "AlxMemSafeTest_MemSafeIsWriteDone",
+    "AlxMemSafeTest_MemSafeIsWriteErr",
+    "AlxMemSafeTest_GroupInit",
+    "AlxMemSafeTest_GroupIsValStoredBuffDiff",
+    "AlxMemSafeTest_StoreInit",
+    "AlxMemSafeTest_StoreHandle",
+    "AlxMemSafeTest_StoreIsErr",
+    "AlxMemSafeTest_ItemGet",
+    "AlxMemSafeTest_ItemSet",
+    "AlxMemSafeTest_ItemGetDef",
+    "AlxMemSafeTest_CrcCalc",
+    "AlxMemSafeTest_CrcIsOk",
+    "AlxMemSafeTest_CrcLen",
+    "AlxMemSafeTest_Status_Ok",
+    "AlxMemSafeTest_Status_Err",
+    "AlxMemSafeTest_Status_ErrNumOfTries",
+    "AlxMemSafeTest_Status_BothCopyErr",
+    "AlxMemSafeTest_Status_BothOkSame_UseA",
+    "AlxMemSafeTest_Status_BothOkDiff_UseA",
+    "AlxMemSafeTest_Status_AOkBErr_UseA",
+    "AlxMemSafeTest_Status_AErrBOk_UseB",
+    "AlxMemRawFake_Reset",
+    "AlxMemRawFake_Fill",
+    "AlxMemRawFake_Peek",
+    "AlxMemRawFake_Poke",
+    "AlxMemRawFake_FailAt",
+    "AlxMemRawFake_Count",
+    "AlxMemRawFake_PowerLossAt",
+    "AlxMemRawFake_PowerOn",
+    "AlxMemRawFake_IsPowerLost",
+    "AlxMemRawFake_SetRowEraseModel",
+    "AlxMemRawFake_Size",
+    "AlxMemRawFake_LastNumOfTries",
+    "AlxMemRawFake_LastTimeout_ms",
+    "AlxMemRawFake_LastWriteAddr",
+    "AlxMemRawFake_LastWriteLen",
+    "AlxMemRawFake_ArgsMismatchCount",
+    "AlxMemRawFake_NotInitCallCount",
+    "AlxParamItemStrTest_New",
+    "AlxParamItemStrTest_Delete",
+    "AlxParamItemStrTest_SetStr",
+    "AlxParamItemStrTest_GetStr",
+    "AlxParamItemStrTest_GetNum",
+    "AlxRange_CheckUint8",
+    "AlxRange_CheckUint16",
+    "AlxRange_CheckUint32",
+    "AlxRange_CheckUint64",
+    "AlxRange_CheckInt8",
+    "AlxRange_CheckInt16",
+    "AlxRange_CheckInt32",
+    "AlxRange_CheckInt64",
+    "AlxRange_CheckFloat",
+    "AlxRange_CheckDouble",
+    "AlxRange_CheckStr",
+    "AlxFtoa",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+    "AlxTracePc_Reset",
+    "AlxTracePc_Count",
+    "AlxTracePc_CountAtLevel",
+    "AlxTracePc_LastLevel",
+    "AlxTracePc_LastLine",
+    "AlxTracePc_LastFile",
+    "AlxTracePc_LastFun",
+    "AlxTracePc_LevelConfigured",
+    "AlxParamItemMetaTest_New",
+    "AlxParamItemMetaTest_Delete",
+    "AlxParamItemMetaTest_GetDataType",
+    "AlxParamItemMetaTest_GetParamType",
+    "AlxParamItemMetaTest_GetKey",
+    "AlxParamItemMetaTest_GetId",
+    "AlxParamItemMetaTest_GetGroupKey",
+    "AlxParamItemMetaTest_GetGroupId",
+    "AlxParamItemMetaTest_GetValOutOfRangeHandle",
+    "AlxParamItemMetaTest_GetValUnit",
+    "AlxParamItemMetaTest_GetValChangeTakesEffectAfterReset",
+    "AlxParamItemMetaTest_GetBuffLen",
+    "AlxParamItemMetaTest_GetValLen",
+    "AlxParamItemMetaTest_GetIsEnum",
+    "AlxParamItemMetaTest_GetValDefI",
+    "AlxParamItemMetaTest_GetValMinI",
+    "AlxParamItemMetaTest_GetValMaxI",
+    "AlxParamItemMetaTest_GetValDefF",
+    "AlxParamItemMetaTest_GetValMinF",
+    "AlxParamItemMetaTest_GetValMaxF",
+    "AlxParamItemMetaTest_GetValI",
+    "AlxParamItemMetaTest_GetValF",
+    "AlxParamItemMetaTest_SetValI",
+    "AlxParamItemMetaTest_SetValF",
+    "AlxParamItemMetaTest_SetValToDef",
+    "AlxParamItemEnumTest_New",
+    "AlxParamItemEnumTest_Delete",
+    "AlxParamItemEnumTest_GetIsEnum",
+    "AlxParamItemEnumTest_GetEnumArrLen",
+    "AlxParamItemEnumTest_GetEnumArrAtI",
+    "AlxParamItemEnumTest_GetEnumArrAtF",
+    "AlxParamItemEnumTest_SetValI",
+    "AlxParamItemEnumTest_SetValF",
+    "AlxParamItemEnumTest_GetValI",
+    "AlxParamItemEnumTest_GetValF",
+    "AlxMemSafeTest_Status_ErrEnum",
+    "AlxMemSafeTest_Status_ErrConv",
+    "AlxParamItemBuffTest_NewArr",
+    "AlxParamItemBuffTest_NewStr",
+    "AlxParamItemBuffTest_Delete",
+    "AlxParamItemBuffTest_GetBuffLen",
+    "AlxParamItemBuffTest_GetValLen",
+    "AlxParamItemBuffTest_GetKey",
+    "AlxParamItemBuffTest_GetValUnit",
+    "AlxParamItemBuffTest_GetDataType",
+    "AlxParamItemBuffTest_GetValArr",
+    "AlxParamItemBuffTest_SetValArr",
+    "AlxParamItemBuffTest_GetValDefArr",
+    "AlxParamItemBuffTest_GetValStr",
+    "AlxParamItemBuffTest_SetValStr",
+    "AlxParamItemBuffTest_GetValDefStr",
+    "AlxParamItemBuffTest_SetValToDef",
+    "AlxStoreTest_New",
+    "AlxStoreTest_Delete",
+    "AlxStoreTest_MaxGroups",
+    "AlxStoreTest_ItemsPerGroup",
+    "AlxStoreTest_GroupAddrA",
+    "AlxStoreTest_Init",
+    "AlxStoreTest_Handle",
+    "AlxStoreTest_IsErr",
+    "AlxStoreTest_ItemGet",
+    "AlxStoreTest_ItemSet",
+    "AlxParamItemKvTest_New",
+    "AlxParamItemKvTest_Delete",
+    "AlxParamItemKvTest_LoadVal",
+    "AlxParamItemKvTest_StoreVal",
+    "AlxParamItemKvTest_SetVal",
+    "AlxParamItemKvTest_GetVal",
+    "AlxParamItemKvTest_GetKey",
+    "AlxParamKvStoreFake_Reset",
+    "AlxParamKvStoreFake_Enable",
+    "AlxParamKvStoreFake_FailGet",
+    "AlxParamKvStoreFake_FailSet",
+    "AlxParamKvStoreFake_GetCount",
+    "AlxParamKvStoreFake_SetCount",
+    "AlxParamKvStoreFake_NumOfKeys",
+    "AlxParamKvStoreFake_Peek",
+    "AlxParamKvStoreFake_Poke",
+))
 
 
 # -------------------------------------------------------- Vdiv module -------
@@ -135,10 +367,24 @@ VDIV_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxVdivTest.def",
     Path(__file__),
 ]
 VDIV_DLL = BUILD_DIR / "alxVdivTest.dll"
+VDIV_EXPORTS = Exports("alxVdivTest", (
+    "AlxVdiv_GetVout_V",
+    "AlxVdiv_GetVin_V",
+    "AlxVdiv_GetResHigh_kOhm",
+    "AlxVdiv_GetResLow_kOhm",
+    "AlxVdiv_GetVout_mV",
+    "AlxVdiv_GetVin_mV",
+    "AlxVdiv_GetResHigh_ohm",
+    "AlxVdiv_GetResLow_ohm",
+    "AlxVdiv_GetCurrent_uA",
+    "AlxVdiv_GetCurrent_mA",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------------ TimSw module -------
@@ -160,10 +406,55 @@ TIMSW_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxTimSwTest.def",
     Path(__file__),
 ]
 TIMSW_DLL = BUILD_DIR / "alxTimSwTest.dll"
+TIMSW_EXPORTS = Exports("alxTimSwTest", (
+    "AlxTimSw_Ctor",
+    "AlxTimSw_Start",
+    "AlxTimSw_Stop",
+    "AlxTimSw_IsRunning",
+    "AlxTimSw_Get_ns",
+    "AlxTimSw_Get_us",
+    "AlxTimSw_Get_ms",
+    "AlxTimSw_Get_sec",
+    "AlxTimSw_Get_min",
+    "AlxTimSw_Get_hr",
+    "AlxTimSw_IsTimeout_ns",
+    "AlxTimSw_IsTimeout_us",
+    "AlxTimSw_IsTimeout_ms",
+    "AlxTimSw_IsTimeout_sec",
+    "AlxTimSw_IsTimeout_min",
+    "AlxTimSw_IsTimeout_hr",
+    "alxTick DATA",
+    "AlxTick_Ctor",
+    "AlxTick_Get_ns",
+    "AlxTick_Get_us",
+    "AlxTick_Get_ms",
+    "AlxTick_Get_sec",
+    "AlxTick_Get_min",
+    "AlxTick_Get_hr",
+    "AlxTick_Inc_ns",
+    "AlxTick_Inc_us",
+    "AlxTick_Inc_ms",
+    "AlxTick_Inc_sec",
+    "AlxTick_Inc_min",
+    "AlxTick_Inc_hr",
+    "AlxTick_IncRange_ns",
+    "AlxTick_IncRange_us",
+    "AlxTick_IncRange_ms",
+    "AlxTick_IncRange_sec",
+    "AlxTick_IncRange_min",
+    "AlxTick_IncRange_hr",
+    "AlxIrqFake_Reset",
+    "AlxIrqFake_LockCount",
+    "AlxIrqFake_UnlockCount",
+    "AlxIrqFake_Depth",
+    "AlxIrqFake_DepthMax",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------- CanParser module -------
@@ -182,10 +473,38 @@ CANPARSER_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxCanParserTest.def",
     Path(__file__),
 ]
 CANPARSER_DLL = BUILD_DIR / "alxCanParserTest.dll"
+CANPARSER_EXPORTS = Exports("alxCanParserTest", (
+    "AlxCanParser_SetBit",
+    "AlxCanParser_SetUint8",
+    "AlxCanParser_SetInt8",
+    "AlxCanParser_SetUint16",
+    "AlxCanParser_SetInt16",
+    "AlxCanParser_SetUint32",
+    "AlxCanParser_SetInt32",
+    "AlxCanParser_SetUint64",
+    "AlxCanParser_SetInt64",
+    "AlxCanParser_SetFloat",
+    "AlxCanParser_SetDouble",
+    "AlxCanParser_SetEnum",
+    "AlxCanParser_GetBit",
+    "AlxCanParser_GetUint8",
+    "AlxCanParser_GetInt8",
+    "AlxCanParser_GetUint16",
+    "AlxCanParser_GetInt16",
+    "AlxCanParser_GetUint32",
+    "AlxCanParser_GetInt32",
+    "AlxCanParser_GetUint64",
+    "AlxCanParser_GetInt64",
+    "AlxCanParser_GetFloat",
+    "AlxCanParser_GetDouble",
+    "AlxCanParser_GetEnum",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------ FiltGlitch modules -------
@@ -212,10 +531,26 @@ FILTGLITCH_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxFiltGlitchTest.def",
     Path(__file__),
 ]
 FILTGLITCH_DLL = BUILD_DIR / "alxFiltGlitchTest.dll"
+FILTGLITCH_EXPORTS = Exports("alxFiltGlitchTest", (
+    "AlxFiltGlitchBoolTest_New",
+    "AlxFiltGlitchBoolTest_New_us",
+    "AlxFiltGlitchBoolTest_Delete",
+    "AlxFiltGlitchBool_Process",
+    "AlxFiltGlitchBool_Reset",
+    "AlxFiltGlitchUint32Test_New",
+    "AlxFiltGlitchUint32Test_Delete",
+    "AlxFiltGlitchUint32_Process",
+    "alxTick DATA",
+    "AlxTick_Ctor",
+    "AlxTick_Get_ns",
+    "AlxTick_IncRange_ns",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ---------------------------------------------------- Math modules -------
@@ -243,10 +578,29 @@ MATH_DEPS = [
     CLIB_DIR / "alxGlobal.c",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxMathTest.def",
     Path(__file__),
 ]
 MATH_DLL = BUILD_DIR / "alxMathTest.dll"
+MATH_EXPORTS = Exports("alxMathTest", (
+    "AlxHys1Test_New",
+    "AlxHys1Test_Delete",
+    "AlxHys1_Process",
+    "AlxHys2Test_New",
+    "AlxHys2Test_Delete",
+    "AlxHys2_Process",
+    "AlxAvgTest_New",
+    "AlxAvgTest_Delete",
+    "AlxAvg_Process",
+    "AlxMathTest_New",
+    "AlxMathTest_Delete",
+    "AlxMath_Process",
+    "AlxGlobal_Ulltoa",
+    "AlxGlobal_Slltoa",
+    "AlxGlobal_Ntohl",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # -------------------------------------------------- Mapping modules -------
@@ -270,10 +624,37 @@ LINFUN_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxLinFunTest.def",
     Path(__file__),
 ]
 LINFUN_DLL = BUILD_DIR / "alxLinFunTest.dll"
+LINFUN_EXPORTS = Exports("alxLinFunTest", (
+    "AlxLinFunTest_New",
+    "AlxLinFunTest_Delete",
+    "AlxLinFun_GetY",
+    "AlxLinFun_GetX",
+    "AlxLinFun_GetY_WithStatus",
+    "AlxLinFun_GetX_WithStatus",
+    "AlxLinFunIntTest_New",
+    "AlxLinFunIntTest_Delete",
+    "AlxLinFunInt_GetY",
+    "AlxLinFunInt_GetY_WithStatus",
+    "AlxInterpLinTest_New",
+    "AlxInterpLinTest_Delete",
+    "AlxInterpLin_GetY",
+    "AlxInterpLin_GetY_WithStatus",
+    "AlxLinFunTest_Status_Ok",
+    "AlxLinFunTest_Status_ErrMin",
+    "AlxLinFunTest_Status_ErrMax",
+    "AlxAudioVolTest_New",
+    "AlxAudioVolTest_Delete",
+    "AlxAudioVolTest_PctMax",
+    "AlxAudioVol_Process",
+    "AlxAudioVol_Set_pct",
+    "AlxAudioVol_Set_dB",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------- Rotary switch module ---
@@ -293,10 +674,30 @@ ROTSW_DEPS = [
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxIoPin.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxRotSwTest.def",
     Path(__file__),
 ]
 ROTSW_DLL = BUILD_DIR / "alxRotSwTest.dll"
+ROTSW_EXPORTS = Exports("alxRotSwTest", (
+    "AlxRotSwTest_New",
+    "AlxRotSwTest_Delete",
+    "AlxRotSwTest_RotSw",
+    "AlxRotSwTest_Pin",
+    "AlxRotSwTest_CodeType_Real",
+    "AlxRotSwTest_CodeType_Complement",
+    "AlxRotSwTest_CodeType_Gray",
+    "AlxRotSw_Init",
+    "AlxRotSw_DeInit",
+    "AlxRotSw_GetCode",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_SetLevel",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------ RTD temperature sensor module ---
@@ -320,10 +721,29 @@ TEMPSENS_DEPS = [
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxAdc.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxTempSensTest.def",
     Path(__file__),
 ]
 TEMPSENS_DLL = BUILD_DIR / "alxTempSensTest.dll"
+TEMPSENS_EXPORTS = Exports("alxTempSensTest", (
+    "AlxTempSensTest_New",
+    "AlxTempSensTest_Delete",
+    "AlxTempSensTest_Sens",
+    "AlxTempSensTest_Adc",
+    "AlxTempSensRtdVdiv_Init",
+    "AlxTempSensRtdVdiv_DeInit",
+    "AlxTempSensRtdVdiv_GetTemp_degC",
+    "AlxAdcFake_Reset",
+    "AlxAdcFake_SetVoltage_V",
+    "AlxAdcFake_ReadCount",
+    "AlxAdcFake_InitCount",
+    "AlxAdcFake_DeInitCount",
+    "AlxTempSensTest_Status_Ok",
+    "AlxTempSensTest_Status_ErrMin",
+    "AlxTempSensTest_Status_ErrMax",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------ Power supervisor module ---
@@ -352,10 +772,28 @@ PWR_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxPwrTest.def",
     Path(__file__),
 ]
 PWR_DLL = BUILD_DIR / "alxPwrTest.dll"
+PWR_EXPORTS = Exports("alxPwrTest", (
+    "AlxPwrTest_New",
+    "AlxPwrTest_Delete",
+    "AlxPwrTest_Val_V",
+    "AlxPwrTest_HysSt",
+    "AlxPwrTest_IsInRangeRaw",
+    "AlxPwrTest_HysSt_Top",
+    "AlxPwrTest_HysSt_Mid",
+    "AlxPwrTest_HysSt_Bot",
+    "AlxPwr_Process",
+    "alxTick DATA",
+    "AlxTick_Ctor",
+    "AlxTick_Get_ns",
+    "AlxTick_IncRange_ns",
+    "AlxIrqFake_Reset",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------------- Audio module -----
@@ -372,10 +810,21 @@ AUDIO_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxAudioTest.def",
     Path(__file__),
 ]
 AUDIO_DLL = BUILD_DIR / "alxAudioTest.dll"
+AUDIO_EXPORTS = Exports("alxAudioTest", (
+    "AlxAudio_LinerPcmInt8ToFloat",
+    "AlxAudio_LinerPcmUint8ToFloat",
+    "AlxAudio_LinerPcmInt16ToFloat",
+    "AlxAudio_LinerPcmUint16ToFloat",
+    "AlxAudio_FloatToLinerPcmInt8",
+    "AlxAudio_FloatToLinerPcmInt16",
+    "AlxAudio_StereoToMono",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------ Audio player module -----
@@ -404,10 +853,32 @@ AUDIOPLAYER_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxAudioPlayerTest.def",
     Path(__file__),
 ]
 AUDIOPLAYER_DLL = BUILD_DIR / "alxAudioPlayerTest.dll"
+AUDIOPLAYER_EXPORTS = Exports("alxAudioPlayerTest", (
+    "AlxAudioPlayerTest_New",
+    "AlxAudioPlayerTest_Delete",
+    "AlxAudioPlayerTest_Player",
+    "AlxAudioPlayerTest_LoadOther",
+    "AlxAudioPlayerTest_Offset_Byte",
+    "AlxAudioPlayerTest_Step_Byte",
+    "AlxAudioPlayer_GetSampleL",
+    "AlxAudioPlayer_GetSampleR",
+    "AlxAudioPlayer_GetSampleMono",
+    "AlxAudioPlayer_IncSampleOffset",
+    "AlxAudioPlayer_Play",
+    "AlxAudioPlayer_Stop",
+    "AlxAudioPlayer_Pause",
+    "AlxAudioPlayer_Replay",
+    "AlxAudioPlayer_LoopOn",
+    "AlxAudioPlayer_LoopOff",
+    "AlxAudioPlayer_LoopConfig",
+    "AlxAudioPlayer_IsPlaying",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # --------------------------------------------------------- NTC module -----
@@ -432,10 +903,15 @@ NTC_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxNtcTest.def",
     Path(__file__),
 ]
 NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
+NTC_EXPORTS = Exports("alxNtcTest", (
+    "AlxNtcg103jf103ft1s_ResToTemp_degC",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------ Safe file storage -----
@@ -468,10 +944,34 @@ FSSAFE_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxFsSafeTest.def",
     Path(__file__),
 ]
 FSSAFE_DLL = BUILD_DIR / "alxFsSafeTest.dll"
+FSSAFE_EXPORTS = Exports("alxFsSafeTest", (
+    "AlxFsSafeTest_New",
+    "AlxFsSafeTest_Delete",
+    "AlxFsSafeTest_FsSafe",
+    "AlxFsSafeTest_CrcLen",
+    "AlxFsSafeTest_Crc",
+    "AlxFsSafe_File_Read",
+    "AlxFsSafe_File_Write",
+    "AlxFsFake_Reset",
+    "AlxFsFake_FailNext",
+    "AlxFsFake_FailSkip",
+    "AlxFsFake_CallCount",
+    "AlxFsFake_OpenCount",
+    "AlxFsFake_CloseCount",
+    "AlxFsFake_FormatCount",
+    "AlxFsFake_FilesHeld",
+    "AlxFsFake_IsMounted",
+    "AlxFsFake_Put",
+    "AlxFsFake_Get",
+    "AlxFsFake_Has",
+    "AlxFsFake_LastOpenMode",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # --------------------------------------------------------- LIN bus master -----
@@ -504,10 +1004,45 @@ LIN_DEPS = [
     CLIB_DIR / "Mcu" / "alxSerialPort.h",
     CLIB_DIR / "alxGlobal.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxLinTest.def",
     Path(__file__),
 ]
 LIN_DLL = BUILD_DIR / "alxLinTest.dll"
+LIN_EXPORTS = Exports("alxLinTest", (
+    "AlxLinTest_New",
+    "AlxLinTest_Delete",
+    "AlxLinTest_Lin",
+    "AlxLinTest_Port",
+    "AlxLinTest_Publish",
+    "AlxLin_Master_Init",
+    "AlxLin_Master_DeInit",
+    "AlxLin_Master_IsInit",
+    "AlxLin_SetNad",
+    "AlxLin_GetNad",
+    "AlxSerialPortFake_TxRead",
+    "AlxSerialPortFake_TxNumOfEntries",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+    "AlxLinTest_Subscribe",
+    "AlxLinTest_RxFlush",
+    "AlxLinTest_RxByte",
+    "AlxLinTest_TraceProbe",
+    "AlxLinTest_TraceReset",
+    "AlxLinTest_TraceArgEvalsWrn",
+    "AlxLinTest_TraceArgEvalsDbg",
+    "AlxLinTest_TraceArgEvalsVrb",
+    "AlxLinTest_BumpWrnDirect",
+    "AlxLinTest_BumpDbgDirect",
+    "AlxLinTest_BumpVrbDirect",
+    "AlxTracePc_Reset",
+    "AlxTracePc_Count",
+    "AlxTracePc_CountAtLevel",
+    "AlxTracePc_LastLevel",
+    "AlxTracePc_LastLine",
+    "AlxTracePc_LastFile",
+    "AlxTracePc_LastFun",
+    "AlxTracePc_LevelConfigured",
+))
 
 
 # ------------------------------------------------------- Busy-wait delay -----
@@ -528,10 +1063,24 @@ DELAY_DEPS = [
     CLIB_DIR / "alxTick.h",
     CLIB_DIR / "alxGlobal.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxDelayTest.def",
     Path(__file__),
 ]
 DELAY_DLL = BUILD_DIR / "alxDelayTest.dll"
+DELAY_EXPORTS = Exports("alxDelayTest", (
+    "AlxDelay_ns",
+    "AlxDelay_us",
+    "AlxDelay_ms",
+    "AlxDelay_sec",
+    "AlxDelay_min",
+    "AlxDelay_hr",
+    "AlxTickFake_Reset",
+    "AlxTickFake_SetNow_ns",
+    "AlxTickFake_Now_ns",
+    "AlxTickFake_Reads",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------- Parameter key-value store -----
@@ -553,10 +1102,36 @@ PARAMKV_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxParamKvStoreTest.def",
     Path(__file__),
 ]
 PARAMKV_DLL = BUILD_DIR / "alxParamKvStoreTest.dll"
+PARAMKV_EXPORTS = Exports("alxParamKvStoreTest", (
+    "AlxParamKvStoreTest_New",
+    "AlxParamKvStoreTest_Delete",
+    "AlxParamKvStoreTest_Store",
+    "AlxParamKvStoreTest_IsInit",
+    "AlxParamKvStore_Init",
+    "AlxParamKvStore_DeInit",
+    "AlxParamKvStore_Get",
+    "AlxParamKvStore_Set",
+    "AlxParamKvStore_Remove",
+    "AlxFsFake_Reset",
+    "AlxFsFake_FailNext",
+    "AlxFsFake_FailSkip",
+    "AlxFsFake_CallCount",
+    "AlxFsFake_OpenCount",
+    "AlxFsFake_CloseCount",
+    "AlxFsFake_FormatCount",
+    "AlxFsFake_FilesHeld",
+    "AlxFsFake_IsMounted",
+    "AlxFsFake_Put",
+    "AlxFsFake_Get",
+    "AlxFsFake_Has",
+    "AlxFsFake_LastOpenMode",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------- Analog multiplexer -----
@@ -577,10 +1152,30 @@ MUX_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxMuxTest.def",
     Path(__file__),
 ]
 MUX_DLL = BUILD_DIR / "alxMuxTest.dll"
+MUX_EXPORTS = Exports("alxMuxTest", (
+    "AlxMuxTest_New",
+    "AlxMuxTest_Delete",
+    "AlxMuxTest_Mux",
+    "AlxMuxTest_EnPin",
+    "AlxMuxTest_SelPin",
+    "AlxMux_Init",
+    "AlxMux_DeInit",
+    "AlxMux_DeInit_Select",
+    "AlxMux_Enable",
+    "AlxMux_Select",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_SetLevel",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------- BTS724G high side switch -----
@@ -607,10 +1202,42 @@ BTS_DEPS = [
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxIoPin.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxBts724gTest.def",
     Path(__file__),
 ]
 BTS_DLL = BUILD_DIR / "alxBts724gTest.dll"
+BTS_EXPORTS = Exports("alxBts724gTest", (
+    "AlxBts724gTest_New",
+    "AlxBts724gTest_Delete",
+    "AlxBts724gTest_Bts",
+    "AlxBts724gTest_OutPin",
+    "AlxBts724gTest_StatusPin",
+    "AlxBts724gTest_OpenLoadTrue_ms",
+    "AlxBts724gTest_OverTempTrue_ms",
+    "AlxBts724gTest_ClearTime_ms",
+    "AlxBts724g_Init",
+    "AlxBts724g_DeInit",
+    "AlxBts724g_Handle",
+    "AlxBts724g_SetOut",
+    "AlxBts724g_ResetOut",
+    "AlxBts724g_WriteOut",
+    "AlxBts724g_IsOpenLoadDetected",
+    "AlxBts724g_IsOverTempDetected",
+    "AlxBts724g_WasOpenLoadDetected",
+    "AlxBts724g_WasOverTempDetected",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_SetLevel",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "alxTick DATA",
+    "AlxTick_Ctor",
+    "AlxTick_IncRange_ns",
+    "AlxIrqFake_Reset",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 # ------------------------------------------------------ Bool module -------
 # Tier-2 target: the library's boolean-with-memory, over the REAL glitch filter,
@@ -637,10 +1264,41 @@ BOOL_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxBoolTest.def",
     Path(__file__),
 ]
 BOOL_DLL = BUILD_DIR / "alxBoolTest.dll"
+BOOL_EXPORTS = Exports("alxBoolTest", (
+    "AlxBoolTest_New",
+    "AlxBoolTest_Delete",
+    "AlxBool_Update",
+    "AlxBool_IsTrue",
+    "AlxBool_IsTrueUpToShortTime",
+    "AlxBool_IsTrueUpToLongTime",
+    "AlxBool_IsTrueForLongTime",
+    "AlxBool_WasTrue",
+    "AlxBool_WasTrueForShortTime",
+    "AlxBool_WasTrueForLongTime",
+    "AlxBool_IsFalse",
+    "AlxBool_IsFalseUpToShortTime",
+    "AlxBool_IsFalseUpToLongTime",
+    "AlxBool_IsFalseForLongTime",
+    "AlxBool_WasFalse",
+    "AlxBool_WasFalseForShortTime",
+    "AlxBool_WasFalseForLongTime",
+    "AlxBool_ClearWasTrueFlag",
+    "AlxBool_ClearWasTrueForShortTimeFlag",
+    "AlxBool_ClearWasTrueForLongTimeFlag",
+    "AlxBool_ClearWasFalseFlag",
+    "AlxBool_ClearWasFalseForShortTimeFlag",
+    "AlxBool_ClearWasFalseForLongTimeFlag",
+    "alxTick DATA",
+    "AlxTick_Ctor",
+    "AlxTick_Get_ns",
+    "AlxTick_IncRange_ns",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------------- RTC module -------
@@ -659,10 +1317,30 @@ RTC_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxRtcTest.def",
     Path(__file__),
 ]
 RTC_DLL = BUILD_DIR / "alxRtcTest.dll"
+RTC_EXPORTS = Exports("alxRtcTest", (
+    "AlxRtc_MsUsNsToNs",
+    "AlxRtc_MsUsToNs",
+    "AlxRtc_MsToNs",
+    "AlxRtc_MsUsNsToSecFract",
+    "AlxRtc_NsToMsUsNs",
+    "AlxRtc_NsToMsUs",
+    "AlxRtc_NsToMs",
+    "AlxRtc_SecFractToMsUsNs",
+    "AlxRtc_UnixTimeNsToDateTime",
+    "AlxRtc_UnixTimeUsToDateTime",
+    "AlxRtc_UnixTimeMsToDateTime",
+    "AlxRtc_UnixTimeSecToDateTime",
+    "AlxRtc_DateTimeToUnixTimeNs",
+    "AlxRtc_DateTimeToUnixTimeUs",
+    "AlxRtc_DateTimeToUnixTimeMs",
+    "AlxRtc_DateTimeToUnixTimeSec",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------ ParamMgmt module -------
@@ -700,10 +1378,43 @@ PARAMMGMT_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxParamMgmtTest.def",
     Path(__file__),
 ]
 PARAMMGMT_DLL = BUILD_DIR / "alxParamMgmtTest.dll"
+PARAMMGMT_EXPORTS = Exports("alxParamMgmtTest", (
+    "AlxParamMgmtTest_New",
+    "AlxParamMgmtTest_Delete",
+    "AlxParamMgmtTest_NumOfItems",
+    "AlxParamMgmtTest_ParamType_Param",
+    "AlxParamMgmtTest_ParamType_Var",
+    "AlxParamMgmtTest_DataType_Uint8",
+    "AlxParamMgmtTest_DataType_Uint16",
+    "AlxParamMgmtTest_DataType_Uint32",
+    "AlxParamMgmtTest_DataType_Int32",
+    "AlxParamMgmtTest_DataType_Float",
+    "AlxParamMgmtTest_DataType_Bool",
+    "AlxParamMgmtTest_Status_Ok",
+    "AlxParamMgmtTest_Status_Err",
+    "AlxParamMgmt_GetNumOfParamItems",
+    "AlxParamMgmt_GetNumOfParamTypeItems",
+    "AlxParamMgmt_ByIndex_GetDataType",
+    "AlxParamMgmt_ByIndex_GetParamType",
+    "AlxParamMgmt_ByIndex_GetKey",
+    "AlxParamMgmt_ByIndex_GetId",
+    "AlxParamMgmt_ByIndex_GetGroupKey",
+    "AlxParamMgmt_ByIndex_GetGroupId",
+    "AlxParamMgmt_ByIndex_GetValLen",
+    "AlxParamMgmt_ByIndex_GetVal_StrFormat",
+    "AlxParamMgmt_ByKey_SetVal_StrFormat",
+    "AlxParamMgmt_ById_GetValLen",
+    "AlxParamMgmt_ById_Get",
+    "AlxParamMgmt_ById_Set",
+    "AlxParamMgmt_SetValToDef_Group",
+    "AlxParamMgmt_SetValToDef_All",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ---------------------------------------------------- Ina228 module -------
@@ -745,10 +1456,34 @@ INA228_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxIna228Test.def",
     Path(__file__),
 ]
 INA228_DLL = BUILD_DIR / "alxIna228Test.dll"
+INA228_EXPORTS = Exports("alxIna228Test", (
+    "AlxIna228Test_New",
+    "AlxIna228Test_Delete",
+    "AlxIna228Test_CurrentLsb_A",
+    "AlxIna228Test_ShuntCal",
+    "AlxIna228Test_AdcRange_163_84_mV",
+    "AlxIna228Test_AdcRange_40_96_mV",
+    "AlxIna228Test_Status_Ok",
+    "AlxIna228Test_Status_Err",
+    "AlxIna228_GetShuntVoltage_V",
+    "AlxIna228_GetBusVoltage_V",
+    "AlxIna228_GetTemp_degC",
+    "AlxIna228_GetCurrent_A",
+    "AlxIna228_GetPower_W",
+    "AlxI2cFake_Reset",
+    "AlxI2cFake_SetReg",
+    "AlxI2cFake_GetLastWrite",
+    "AlxI2cFake_WriteCount",
+    "AlxI2cFake_ReadCount",
+    "AlxI2cFake_SetSlaveReady",
+    "AlxI2cFake_SetForcedStatus",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ---------------------------------------------------- Pi4ioe module -------
@@ -776,10 +1511,39 @@ PI4IOE_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxPi4ioe5v6534qTest.def",
     Path(__file__),
 ]
 PI4IOE_DLL = BUILD_DIR / "alxPi4ioe5v6534qTest.dll"
+PI4IOE_EXPORTS = Exports("alxPi4ioe5v6534qTest", (
+    "AlxPi4ioeTest_New",
+    "AlxPi4ioeTest_Delete",
+    "AlxPi4ioeTest_ResetPin",
+    "AlxPi4ioeTest_InputPortAddr",
+    "AlxPi4ioeTest_OutputPortAddr",
+    "AlxPi4ioeTest_Status_Ok",
+    "AlxPi4ioeTest_Status_Err",
+    "AlxPi4ioe5v6534q_Handle",
+    "AlxPi4ioe5v6534q_IoPin_Read",
+    "AlxPi4ioe5v6534q_IoPin_Write",
+    "AlxPi4ioe5v6534q_IoPin_Set",
+    "AlxPi4ioe5v6534q_IoPin_Reset",
+    "AlxPi4ioe5v6534q_IoPin_Toggle",
+    "AlxI2cFake_Reset",
+    "AlxI2cFake_SetReg",
+    "AlxI2cFake_GetLastWrite",
+    "AlxI2cFake_WriteCount",
+    "AlxI2cFake_ReadCount",
+    "AlxI2cFake_SetForcedStatus",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "AlxIoPinFake_WriteCount",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ----------------------------------------------------------- Id module -------
@@ -830,10 +1594,102 @@ ID_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxIdTest.def",
     Path(__file__),
 ]
 ID_DLL = BUILD_DIR / "alxIdTest.dll"
+ID_EXPORTS = Exports("alxIdTest", (
+    "AlxIdTest_Alloc",
+    "AlxIdTest_Delete",
+    "AlxIdTest_Pin",
+    "AlxIdTest_Instance",
+    "AlxIdTest_Known",
+    "AlxIdTest_SetSupported",
+    "AlxIdTest_InstanceSetPcb",
+    "AlxIdTest_InstanceSetBom",
+    "AlxIdTest_Ctor",
+    "AlxIdTest_CtorNoHwId",
+    "AlxIdTest_IsInit",
+    "AlxIdTest_IsHwIdUsed",
+    "AlxIdTest_IdIoPinState",
+    "AlxIdTest_CalcHwId",
+    "AlxIdTest_TriState_HiZ",
+    "AlxIdTest_TriState_Hi",
+    "AlxIdTest_TriState_Lo",
+    "AlxIdTest_TriState_Undefined",
+    "AlxIdTest_FlashAlloc",
+    "AlxIdTest_FlashFree",
+    "AlxIdTest_FlashFill",
+    "AlxIdTest_BootBlobWrite",
+    "AlxIdTest_BootBlobFillField",
+    "AlxIdTest_BootBlobLen",
+    "AlxIdTest_BootBlobMagicNum",
+    "AlxIdTest_BootBlobVer",
+    "AlxIdTest_BuildName",
+    "AlxIdTest_BuildDate",
+    "AlxIdTest_BuildNum",
+    "AlxIdTest_BuildRev",
+    "AlxIdTest_BuildHash",
+    "AlxIdTest_BuildHashShort",
+    "AlxIdTest_BuildHashShortUint32",
+    "AlxIdTest_BuildDateComp",
+    "AlxIdTest_CompDate",
+    "AlxIdTest_CompTime",
+    "AlxId_Init",
+    "AlxId_Trace",
+    "AlxId_GetFwIsBootUsed",
+    "AlxId_GetFwArtf",
+    "AlxId_GetFwName",
+    "AlxId_GetFwVerMajor",
+    "AlxId_GetFwVerMinor",
+    "AlxId_GetFwVerPatch",
+    "AlxId_GetFwVerDate",
+    "AlxId_GetFwVer",
+    "AlxId_GetFwHashShort",
+    "AlxId_GetFwVerStr",
+    "AlxId_GetFwBinStr",
+    "AlxId_GetFwBootArtf",
+    "AlxId_GetFwBootName",
+    "AlxId_GetFwBootVerMajor",
+    "AlxId_GetFwBootVerMinor",
+    "AlxId_GetFwBootVerPatch",
+    "AlxId_GetFwBootVerDate",
+    "AlxId_GetFwBootVer",
+    "AlxId_GetFwBootHashShort",
+    "AlxId_GetFwBootVerStr",
+    "AlxId_GetFwBootBinStr",
+    "AlxId_GetHwPcbArtf",
+    "AlxId_GetHwPcbName",
+    "AlxId_GetHwPcbVerMajor",
+    "AlxId_GetHwPcbVerMinor",
+    "AlxId_GetHwPcbVerPatch",
+    "AlxId_GetHwPcbVerDate",
+    "AlxId_GetHwPcbVer",
+    "AlxId_GetHwPcbVerStr",
+    "AlxId_GetHwBomArtf",
+    "AlxId_GetHwBomName",
+    "AlxId_GetHwBomVerMajor",
+    "AlxId_GetHwBomVerMinor",
+    "AlxId_GetHwBomVerPatch",
+    "AlxId_GetHwBomVerDate",
+    "AlxId_GetHwBomVer",
+    "AlxId_GetHwBomVerStr",
+    "AlxId_GetHwId",
+    "AlxId_GetHwMcuUniqueIdStr",
+    "AlxId_GetHwMcuUniqueIdUint32",
+    "AlxId_GetHwMcuUniqueIdUint8",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_SetTriState",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+    "AlxIdTest_FwCompName",
+    "AlxIdTest_FwCompVerMajor",
+    "AlxIdTest_FwLangCVer",
+    "AlxIdTest_FwLangCLibName",
+))
 
 
 # ------------------------------------------------------- Assert module -------
@@ -879,7 +1735,6 @@ ASSERT_WEAK_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "Mcu" / "alxTrace.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxAssertWeakTest.def",
     Path(__file__),
 ]
 ASSERT_DEPS = [
@@ -888,11 +1743,70 @@ ASSERT_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "Mcu" / "alxTrace.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxAssertTest.def",
     Path(__file__),
 ]
 ASSERT_WEAK_DLL = BUILD_DIR / "alxAssertWeakTest.dll"
 ASSERT_DLL = BUILD_DIR / "alxAssertTest.dll"
+ASSERT_WEAK_EXPORTS = Exports("alxAssertWeakTest", (
+    "AlxAssertTest_Reset",
+    "AlxAssertTest_TraceCount",
+    "AlxAssertTest_TraceLevel",
+    "AlxAssertTest_TraceText",
+    "AlxAssertTest_TraceFile",
+    "AlxAssertTest_TraceFun",
+    "AlxAssertTest_TraceLine",
+    "AlxAssertTest_TraceLevelFtl",
+    "AlxAssertTest_TraceLevelConfigured",
+    "AlxAssertTest_TraceLevelOff",
+    "AlxAssertTest_File",
+    "AlxAssertTest_SideEffects",
+    "AlxAssertTest_SideEffectsOff",
+    "AlxAssertTest_DriveRst",
+    "AlxAssertTest_DriveTrace",
+    "AlxAssertTest_DriveRstSideEffect",
+    "AlxAssertTest_DriveOffSideEffect",
+    "AlxAssertTest_BumpOffDirect",
+    "AlxAssertTest_LineRst",
+    "AlxAssertTest_LineTrace",
+    "AlxAssertTest_ReachedAfterRst",
+    "AlxAssertTest_ReachedAfterTrace",
+    "AlxAssertTest_CallRstDirect",
+    "AlxAssertTest_CallTraceDirect",
+))
+ASSERT_EXPORTS = Exports("alxAssertTest", (
+    "AlxAssertTest_Reset",
+    "AlxAssertTest_TraceCount",
+    "AlxAssertTest_TraceLevel",
+    "AlxAssertTest_TraceText",
+    "AlxAssertTest_TraceFile",
+    "AlxAssertTest_TraceFun",
+    "AlxAssertTest_TraceLine",
+    "AlxAssertTest_TraceLevelFtl",
+    "AlxAssertTest_TraceLevelConfigured",
+    "AlxAssertTest_TraceLevelOff",
+    "AlxAssertTest_File",
+    "AlxAssertTest_SideEffects",
+    "AlxAssertTest_SideEffectsOff",
+    "AlxAssertTest_DriveRst",
+    "AlxAssertTest_DriveTrace",
+    "AlxAssertTest_DriveRstSideEffect",
+    "AlxAssertTest_DriveOffSideEffect",
+    "AlxAssertTest_BumpOffDirect",
+    "AlxAssertTest_LineRst",
+    "AlxAssertTest_LineTrace",
+    "AlxAssertTest_ReachedAfterRst",
+    "AlxAssertTest_ReachedAfterTrace",
+    "AlxAssertTest_CallRstDirect",
+    "AlxAssertTest_CallTraceDirect",
+    "AlxAssertTest_DriveBkpt",
+    "AlxAssertTest_LineBkpt",
+    "AlxAssertTest_FileBkpt",
+    "AlxAssertTest_ReachedAfterBkpt",
+    "AlxAssertTest_CallBkptDirect",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
 
 
 # ------------------------------------------------------- MemRaw module -------
@@ -938,7 +1852,6 @@ MEMRAW_DEPS = [
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxTrace.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxMemRawTest.def",
     Path(__file__),
 ]
 MEMRAW_OVR_DEPS = [
@@ -948,17 +1861,75 @@ MEMRAW_OVR_DEPS = [
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxTrace.h",
     CONFIG_DIR / "alxConfig.h",
-    EXPORTS_DIR / "alxMemRawOvrTest.def",
     Path(__file__),
 ]
 MEMRAW_DLL = BUILD_DIR / "alxMemRawTest.dll"
 MEMRAW_OVR_DLL = BUILD_DIR / "alxMemRawOvrTest.dll"
+MEMRAW_EXPORTS = Exports("alxMemRawTest", (
+    "AlxMemRawTest_New",
+    "AlxMemRawTest_NewNoCtor",
+    "AlxMemRawTest_Delete",
+    "AlxMemRawTest_WasCtorCalled",
+    "AlxMemRawTest_IsInit",
+    "AlxMemRawTest_SizeOf",
+    "AlxMemRawTest_PoisonByte",
+    "AlxMemRawTest_Init",
+    "AlxMemRawTest_DeInit",
+    "AlxMemRawTest_Read",
+    "AlxMemRawTest_Write",
+    "AlxMemRawTest_BuffFill",
+    "AlxMemRawTest_BuffPeek",
+    "AlxMemRawTest_BuffPoke",
+    "AlxMemRawTest_BuffLen",
+    "AlxMemRawTest_Status_Ok",
+    "AlxMemRawTest_Status_Err",
+    "AlxMemRawTest_Status_ErrNumOfTries",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
+MEMRAW_OVR_EXPORTS = Exports("alxMemRawOvrTest", (
+    "AlxMemRawTest_New",
+    "AlxMemRawTest_NewNoCtor",
+    "AlxMemRawTest_Delete",
+    "AlxMemRawTest_WasCtorCalled",
+    "AlxMemRawTest_IsInit",
+    "AlxMemRawTest_SizeOf",
+    "AlxMemRawTest_PoisonByte",
+    "AlxMemRawTest_Init",
+    "AlxMemRawTest_DeInit",
+    "AlxMemRawTest_Read",
+    "AlxMemRawTest_Write",
+    "AlxMemRawTest_BuffFill",
+    "AlxMemRawTest_BuffPeek",
+    "AlxMemRawTest_BuffPoke",
+    "AlxMemRawTest_BuffLen",
+    "AlxMemRawTest_Status_Ok",
+    "AlxMemRawTest_Status_Err",
+    "AlxMemRawTest_Status_ErrNumOfTries",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+    "AlxMemRawOverride_Reset",
+    "AlxMemRawOverride_CtorCount",
+    "AlxMemRawOverride_InitCount",
+    "AlxMemRawOverride_ReadCount",
+    "AlxMemRawOverride_WriteCount",
+    "AlxMemRawOverride_LastAddr",
+    "AlxMemRawOverride_LastLen",
+    "AlxMemRawOverride_LastNumOfTries",
+    "AlxMemRawOverride_LastTimeout_ms",
+    "AlxMemRawOverride_LastCheckWithReadEnable",
+    "AlxMemRawOverride_Peek",
+    "AlxMemRawOverride_Poke",
+    "AlxMemRawOverride_Size",
+))
 
 
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
 # environment, the rebuild-if-stale check, the compile database and the two DLL recipes. What stays
-# here is what is this repository's - the source lists, the defines and the .def files above.
+# here is what is this repository's - the source lists, the defines and the export lists above.
 #
 # Driver GNU = clang with GNU-style flags, which is what the dev build has always used; the sanitizer
 # and coverage lanes use clang-cl on the same recipe (Test/noxfile.py). Dialect gnu99 = what the
@@ -986,7 +1957,7 @@ def write_compile_db() -> None:
     )
 
 
-def _build_dll(strict, closure, defines, dll: Path, def_file: Path, obj_dir_name: str | None) -> None:
+def _build_dll(strict, closure, defines, dll: Path, exports: Exports, obj_dir_name: str | None) -> None:
     """One group's DLL: the library's recipe, this repository's lists.
 
     With a closure it is the two-step build - the closure compiled with warnings off, then the
@@ -1004,7 +1975,7 @@ def _build_dll(strict, closure, defines, dll: Path, def_file: Path, obj_dir_name
         closure=closure,
         includes=INCLUDES,
         defines=defines,
-        def_file=def_file,
+        def_file=def_file(exports),
         flags=DEBUG_FLAGS,
         warnings=STRICT_WARNINGS,
         obj_dir=None if obj_dir_name is None else BUILD_DIR / obj_dir_name,
@@ -1024,7 +1995,7 @@ class VariantGroup(NamedTuple):
     strict: tuple
     closure: tuple
     deps: list
-    def_file: Path
+    exports: Exports
     obj_dir: str | None
 
 
@@ -1036,15 +2007,15 @@ class VariantGroup(NamedTuple):
 #          INF/DBG boundary the four variants actually cross, and it is the only module in the
 #          library that does so AND already has a group.
 VARIANT_GROUPS: dict[str, VariantGroup] = {
-    "fifo": VariantGroup(FIFO_DLL, FIFO_SOURCES, (), FIFO_DEPS, EXPORTS_DIR / "alxFifoTest.def", None),
-    "lin": VariantGroup(LIN_DLL, LIN_SOURCES, (), LIN_DEPS, EXPORTS_DIR / "alxLinTest.def", None),
+    "fifo": VariantGroup(FIFO_DLL, FIFO_SOURCES, (), FIFO_DEPS, FIFO_EXPORTS, None),
+    "lin": VariantGroup(LIN_DLL, LIN_SOURCES, (), LIN_DEPS, LIN_EXPORTS, None),
     "memsafe": VariantGroup(MEMSAFE_DLL, MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE,
-                            MEMSAFE_DEPS, EXPORTS_DIR / "alxMemSafeTest.def", "memSafeClosure"),
+                            MEMSAFE_DEPS, MEMSAFE_EXPORTS, "memSafeClosure"),
     # cli   the ELISION question at its sharpest. alxCli.c does 21 of its serial writes
     #       INSIDE ALX_CLI_ASSERT, so `off` compiles a CLI that answers nothing at all.
-    #       The group already had sources, a closure and a .def; only this line was missing.
+    #       The group already had sources, a closure and an export list; only this line was missing.
     "cli": VariantGroup(CLI_DLL, CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE,
-                        CLI_DEPS, EXPORTS_DIR / "alxCliTest.def", "cliClosure"),
+                        CLI_DEPS, CLI_EXPORTS, "cliClosure"),
 }
 
 
@@ -1063,7 +2034,7 @@ def _variant_dll(group: str, variant: str) -> Path:
 def _build_variant_dll(group: str, variant: str) -> None:
     g = VARIANT_GROUPS[group]
     _build_dll(g.strict, g.closure, _variant_defines(variant, g.strict, g.closure),
-               _variant_dll(group, variant), g.def_file, g.obj_dir)
+               _variant_dll(group, variant), g.exports, g.obj_dir)
 
 
 
@@ -1083,7 +2054,7 @@ def _build_fifo_dll() -> None:
 def _build_cli_dll() -> None:
     _build_dll(CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE,
                [*CLI_ASSERT_DEFINES, *_assert_defines(CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE)],
-               CLI_DLL, EXPORTS_DIR / "alxCliTest.def", "cliClosure")
+               CLI_DLL, CLI_EXPORTS, "cliClosure")
 
 
 def _build_memsafe_dll() -> None:
@@ -1099,30 +2070,30 @@ def _build_memsafe_dll() -> None:
 
 
 def _build_vdiv_dll() -> None:
-    _build_dll(VDIV_SOURCES, (), _assert_defines(VDIV_SOURCES), VDIV_DLL, EXPORTS_DIR / "alxVdivTest.def", None)
+    _build_dll(VDIV_SOURCES, (), _assert_defines(VDIV_SOURCES), VDIV_DLL, VDIV_EXPORTS, None)
 
 
 def _build_canparser_dll() -> None:
     _build_dll(CANPARSER_SOURCES, (),
                _assert_defines(CANPARSER_SOURCES),
-               CANPARSER_DLL, EXPORTS_DIR / "alxCanParserTest.def", None)
+               CANPARSER_DLL, CANPARSER_EXPORTS, None)
 
 
 def _build_filtglitch_dll() -> None:
     _build_dll(FILTGLITCH_SOURCES, (),
                _assert_defines(FILTGLITCH_SOURCES),
-               FILTGLITCH_DLL, EXPORTS_DIR / "alxFiltGlitchTest.def", None)
+               FILTGLITCH_DLL, FILTGLITCH_EXPORTS, None)
 
 
 def _build_math_dll() -> None:
-    _build_dll(MATH_SOURCES, (), _assert_defines(MATH_SOURCES), MATH_DLL, EXPORTS_DIR / "alxMathTest.def", None)
+    _build_dll(MATH_SOURCES, (), _assert_defines(MATH_SOURCES), MATH_DLL, MATH_EXPORTS, None)
 
 
 def _build_fssafe_dll() -> None:
     _build_dll(FSSAFE_SOURCES_STRICT, FSSAFE_SOURCES_CLOSURE,
                [*FSSAFE_DEFINES, *_assert_defines(FSSAFE_SOURCES_STRICT, FSSAFE_SOURCES_CLOSURE)],
                FSSAFE_DLL,
-               EXPORTS_DIR / "alxFsSafeTest.def", "fsSafeClosure")
+               FSSAFE_EXPORTS, "fsSafeClosure")
 
 
 def _build_lin_dll() -> None:
@@ -1134,110 +2105,110 @@ def _build_lin_dll() -> None:
 
 def _build_delay_dll() -> None:
     _build_dll(DELAY_SOURCES, (), _assert_defines(DELAY_SOURCES), DELAY_DLL,
-               EXPORTS_DIR / "alxDelayTest.def", None)
+               DELAY_EXPORTS, None)
 
 
 def _build_paramkv_dll() -> None:
     _build_dll(PARAMKV_SOURCES, (), _assert_defines(PARAMKV_SOURCES), PARAMKV_DLL,
-               EXPORTS_DIR / "alxParamKvStoreTest.def", None)
+               PARAMKV_EXPORTS, None)
 
 
 def _build_mux_dll() -> None:
-    _build_dll(MUX_SOURCES, (), _assert_defines(MUX_SOURCES), MUX_DLL, EXPORTS_DIR / "alxMuxTest.def", None)
+    _build_dll(MUX_SOURCES, (), _assert_defines(MUX_SOURCES), MUX_DLL, MUX_EXPORTS, None)
 
 
 def _build_bts_dll() -> None:
-    _build_dll(BTS_SOURCES, (), _assert_defines(BTS_SOURCES), BTS_DLL, EXPORTS_DIR / "alxBts724gTest.def", None)
+    _build_dll(BTS_SOURCES, (), _assert_defines(BTS_SOURCES), BTS_DLL, BTS_EXPORTS, None)
 
 
 def _build_ntc_dll() -> None:
     _build_dll(NTC_SOURCES_STRICT, NTC_SOURCES_CLOSURE,
                _assert_defines(NTC_SOURCES), NTC_DLL,
-               EXPORTS_DIR / "alxNtcTest.def", "ntcClosure")
+               NTC_EXPORTS, "ntcClosure")
 
 
 def _build_audioplayer_dll() -> None:
     _build_dll(AUDIOPLAYER_SOURCES_STRICT, AUDIOPLAYER_SOURCES_CLOSURE,
                _assert_defines(AUDIOPLAYER_SOURCES), AUDIOPLAYER_DLL,
-               EXPORTS_DIR / "alxAudioPlayerTest.def", "audioPlayerClosure")
+               AUDIOPLAYER_EXPORTS, "audioPlayerClosure")
 
 
 def _build_audio_dll() -> None:
-    _build_dll(AUDIO_SOURCES, (), _assert_defines(AUDIO_SOURCES), AUDIO_DLL, EXPORTS_DIR / "alxAudioTest.def", None)
+    _build_dll(AUDIO_SOURCES, (), _assert_defines(AUDIO_SOURCES), AUDIO_DLL, AUDIO_EXPORTS, None)
 
 
 def _build_pwr_dll() -> None:
-    _build_dll(PWR_SOURCES, (), _assert_defines(PWR_SOURCES), PWR_DLL, EXPORTS_DIR / "alxPwrTest.def", None)
+    _build_dll(PWR_SOURCES, (), _assert_defines(PWR_SOURCES), PWR_DLL, PWR_EXPORTS, None)
 
 
 def _build_tempsens_dll() -> None:
     _build_dll(TEMPSENS_SOURCES, (),
                _assert_defines(TEMPSENS_SOURCES),
-               TEMPSENS_DLL, EXPORTS_DIR / "alxTempSensTest.def", None)
+               TEMPSENS_DLL, TEMPSENS_EXPORTS, None)
 
 
 def _build_rotsw_dll() -> None:
-    _build_dll(ROTSW_SOURCES, (), _assert_defines(ROTSW_SOURCES), ROTSW_DLL, EXPORTS_DIR / "alxRotSwTest.def", None)
+    _build_dll(ROTSW_SOURCES, (), _assert_defines(ROTSW_SOURCES), ROTSW_DLL, ROTSW_EXPORTS, None)
 
 
 def _build_linfun_dll() -> None:
-    _build_dll(LINFUN_SOURCES, (), _assert_defines(LINFUN_SOURCES), LINFUN_DLL, EXPORTS_DIR / "alxLinFunTest.def", None)
+    _build_dll(LINFUN_SOURCES, (), _assert_defines(LINFUN_SOURCES), LINFUN_DLL, LINFUN_EXPORTS, None)
 
 
 def _build_bool_dll() -> None:
-    _build_dll(BOOL_SOURCES, (), _assert_defines(BOOL_SOURCES), BOOL_DLL, EXPORTS_DIR / "alxBoolTest.def", None)
+    _build_dll(BOOL_SOURCES, (), _assert_defines(BOOL_SOURCES), BOOL_DLL, BOOL_EXPORTS, None)
 
 
 def _build_rtc_dll() -> None:
-    _build_dll(RTC_SOURCES, (), _assert_defines(RTC_SOURCES), RTC_DLL, EXPORTS_DIR / "alxRtcTest.def", None)
+    _build_dll(RTC_SOURCES, (), _assert_defines(RTC_SOURCES), RTC_DLL, RTC_EXPORTS, None)
 
 
 def _build_parammgmt_dll() -> None:
     _build_dll(PARAMMGMT_SOURCES_STRICT, PARAMMGMT_SOURCES_CLOSURE,
                [*PARAMMGMT_ASSERT_DEFINES, *_assert_defines(PARAMMGMT_SOURCES_STRICT, PARAMMGMT_SOURCES_CLOSURE)],
-               PARAMMGMT_DLL, EXPORTS_DIR / "alxParamMgmtTest.def", "paramMgmtClosure")
+               PARAMMGMT_DLL, PARAMMGMT_EXPORTS, "paramMgmtClosure")
 
 
 def _build_ina228_dll() -> None:
     _build_dll(INA228_SOURCES_STRICT, INA228_SOURCES_CLOSURE,
                [*INA228_DEFINES, *_assert_defines(INA228_SOURCES_STRICT, INA228_SOURCES_CLOSURE)],
-               INA228_DLL, EXPORTS_DIR / "alxIna228Test.def", "ina228Closure")
+               INA228_DLL, INA228_EXPORTS, "ina228Closure")
 
 
 def _build_pi4ioe_dll() -> None:
     _build_dll(PI4IOE_SOURCES_STRICT, PI4IOE_SOURCES_CLOSURE,
                [*PI4IOE_DEFINES, *_assert_defines(PI4IOE_SOURCES_STRICT, PI4IOE_SOURCES_CLOSURE)],
-               PI4IOE_DLL, EXPORTS_DIR / "alxPi4ioe5v6534qTest.def", "pi4ioeClosure")
+               PI4IOE_DLL, PI4IOE_EXPORTS, "pi4ioeClosure")
 
 
 def _build_id_dll() -> None:
     _build_dll(ID_SOURCES_STRICT, ID_SOURCES_CLOSURE,
                _assert_defines(ID_SOURCES_STRICT, ID_SOURCES_CLOSURE),
-               ID_DLL, EXPORTS_DIR / "alxIdTest.def", "idClosure")
+               ID_DLL, ID_EXPORTS, "idClosure")
 
 
 def _build_timsw_dll() -> None:
-    _build_dll(TIMSW_SOURCES, (), _assert_defines(TIMSW_SOURCES), TIMSW_DLL, EXPORTS_DIR / "alxTimSwTest.def", None)
+    _build_dll(TIMSW_SOURCES, (), _assert_defines(TIMSW_SOURCES), TIMSW_DLL, TIMSW_EXPORTS, None)
 
 
 def _build_assert_weak_dll() -> None:
     _build_dll(ASSERT_WEAK_SOURCES, (), _assert_defines(ASSERT_WEAK_SOURCES), ASSERT_WEAK_DLL,
-               EXPORTS_DIR / "alxAssertWeakTest.def", None)
+               ASSERT_WEAK_EXPORTS, None)
 
 
 def _build_assert_dll() -> None:
     _build_dll(ASSERT_SOURCES, (), _assert_defines(ASSERT_SOURCES), ASSERT_DLL,
-               EXPORTS_DIR / "alxAssertTest.def", None)
+               ASSERT_EXPORTS, None)
 
 
 def _build_memraw_dll() -> None:
     _build_dll(MEMRAW_SOURCES, (), _assert_defines(MEMRAW_SOURCES), MEMRAW_DLL,
-               EXPORTS_DIR / "alxMemRawTest.def", None)
+               MEMRAW_EXPORTS, None)
 
 
 def _build_memraw_ovr_dll() -> None:
     _build_dll(MEMRAW_OVR_SOURCES, (), _assert_defines(MEMRAW_OVR_SOURCES), MEMRAW_OVR_DLL,
-               EXPORTS_DIR / "alxMemRawOvrTest.def", None)
+               MEMRAW_OVR_EXPORTS, None)
 
 
 # The groups as DATA, for anything that must rebuild them without running the suite: the MUTATE

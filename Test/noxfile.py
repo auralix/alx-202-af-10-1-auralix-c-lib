@@ -11,7 +11,7 @@ Run from Test/ inside its uv environment (`uv sync --locked` once):
 One nox session per stage, named after it, running in Test/.venv (no second environment per lane), the
 same shape as the Auralix Python lib's noxfile and the device repos'. Evidence under build/<stage>/; the
 dev lane (pytest) writes to build/ itself. What lives here is what is THIS repository's: the source lists,
-the defines, the .def files, the mutation hooks. Everything a second C repository would need identically
+the defines, the export lists, the mutation hooks. Everything a second C repository would need identically
 comes from the Python lib: the generic gates (alx.verify.ascii_gate / readme_gate / c_style /
 coverage_gate / mutation), the lane vocabulary (alx.verify.lanes) and the host toolchain and DLL build
 mechanics (alx.c_lib.host_build).
@@ -36,7 +36,6 @@ CONFIG = TEST / "config"
 HOST = TEST / "host"
 HELPERS = HOST / "helpers"
 FAKES = HOST / "fakes"
-EXPORTS = HOST / "exports"
 CHECKS = HOST / "checks"
 PYTHON = sys.executable
 tc = hb.Toolchain()   # where the tools are on THIS machine (ALX_* variables), and the vcvars environment
@@ -108,7 +107,7 @@ SYNTAX_NEEDS_CMSIS = {"alxAssert.c", "alxBoot.c", "alxIrq.c"}
 #   alxRange.c               296        AlxRange_CheckArr is an unimplemented stub: `// TV: TODO`,
 #                                        ALX_RANGE_ASSERT(false), nothing else. The P517 shape and
 #                                        worse - AlxMemRaw at least returned a defined, wrong 0.
-#                                        Compiled by the MemSafe group; exported by no .def and
+#                                        Compiled by the MemSafe group; exported by no export list and
 #                                        called by nothing on this machine.
 #   alxOsMutex.c             118        AlxOsMutex_IsUnlocked
 #   alxOsThread.c            260        AlxOsThread_Join
@@ -192,17 +191,17 @@ INCLUDE_DIRS = host_recipe.INCLUDES
 CL_INCLUDES = [f"/I{d}" for d in INCLUDE_DIRS]
 GNU99 = ["/clang:-std=gnu99"]
 
-# alxAssertPc.c is in every group now: it holds the assertion counter the .def files export
+# alxAssertPc.c is in every group now: it holds the assertion counter every export list exports
 # and the suite's per-test check reads. Declared by host_build.FIFO_SOURCES.
 FIFO_SOURCES = host_recipe.FIFO_SOURCES
-FIFO_DEF = EXPORTS / "alxFifoTest.def"
+FIFO_EXPORTS = host_recipe.FIFO_EXPORTS
 
 # CLI group (Tier 2: real alxCli + param stack over the fakes), asserts ON = the code as shipped
 # (alxParamItem.c has side effects inside its asserts). Declared by host_build.CLI_SOURCES_STRICT/_CLOSURE.
 CLI_ASSERTS = host_recipe.CLI_ASSERT_DEFINES
 CLI_CLOSURE = host_recipe.CLI_SOURCES_CLOSURE
 CLI_STRICT = host_recipe.CLI_SOURCES_STRICT
-CLI_DEF = EXPORTS / "alxCliTest.def"
+CLI_EXPORTS = host_recipe.CLI_EXPORTS
 CLI_TESTS = ["test_alxCli.py"]
 
 # MemSafe group: real alxMemSafe/alxCrc/alxParamGroup/alxParamStore over alxMemRawFake.
@@ -210,7 +209,7 @@ CLI_TESTS = ["test_alxCli.py"]
 MS_ASSERTS = host_recipe._assert_defines(host_recipe.MEMSAFE_SOURCES_STRICT, host_recipe.MEMSAFE_SOURCES_CLOSURE)
 MS_CLOSURE = host_recipe.MEMSAFE_SOURCES_CLOSURE
 MS_STRICT = host_recipe.MEMSAFE_SOURCES_STRICT
-MS_DEF = EXPORTS / "alxMemSafeTest.def"
+MS_EXPORTS = host_recipe.MEMSAFE_EXPORTS
 # Every test file that drives THIS group's DLL, which is not the same list as "the tests I was
 # thinking about when I wrote the gate". The four modules below were missing, and because the gate
 # names only alxCrc.c and alxMemSafe.c, nothing complained - the report simply stated that
@@ -286,7 +285,7 @@ def _check_ms_tests() -> None:
 ID_ASSERTS = host_recipe._assert_defines(host_recipe.ID_SOURCES_STRICT, host_recipe.ID_SOURCES_CLOSURE)
 ID_CLOSURE = host_recipe.ID_SOURCES_CLOSURE
 ID_STRICT = host_recipe.ID_SOURCES_STRICT
-ID_DEF = EXPORTS / "alxIdTest.def"
+ID_EXPORTS = host_recipe.ID_EXPORTS
 ID_TESTS = ["test_alxId.py"]
 
 # Assert group (ALX-1553): the funnel every ALX_*_ASSERT in the library goes through, built TWICE
@@ -306,9 +305,9 @@ ID_TESTS = ["test_alxId.py"]
 # that AlxAssert_Bkpt requires anyway (the ASan smoke exe in stage 1 is the shape), and that is a
 # lane change of its own.
 ASSERT_WEAK_SOURCES = host_recipe.ASSERT_WEAK_SOURCES
-ASSERT_WEAK_DEF = EXPORTS / "alxAssertWeakTest.def"
+ASSERT_WEAK_EXPORTS = host_recipe.ASSERT_WEAK_EXPORTS
 ASSERT_SOURCES = host_recipe.ASSERT_SOURCES
-ASSERT_DEF = EXPORTS / "alxAssertTest.def"
+ASSERT_EXPORTS = host_recipe.ASSERT_EXPORTS
 ASSERT_TESTS = ["test_alxAssert.py"]
 
 # MemRaw group (ALX-1553): the raw-memory contract, five ALX_WEAK symbols that no file in the
@@ -320,9 +319,9 @@ ASSERT_TESTS = ["test_alxAssert.py"]
 # with what host_build._assert_defines derives from them.
 MEMRAW_ASSERTS = ["-DALX_MEM_RAW_ASSERT_RST_ENABLE"]
 MEMRAW_SOURCES = host_recipe.MEMRAW_SOURCES
-MEMRAW_DEF = EXPORTS / "alxMemRawTest.def"
+MEMRAW_EXPORTS = host_recipe.MEMRAW_EXPORTS
 MEMRAW_OVR_SOURCES = host_recipe.MEMRAW_OVR_SOURCES
-MEMRAW_OVR_DEF = EXPORTS / "alxMemRawOvrTest.def"
+MEMRAW_OVR_EXPORTS = host_recipe.MEMRAW_OVR_EXPORTS
 MEMRAW_TESTS = ["test_alxMemRaw.py"]
 
 # Neither module is in ANALYSIS_SOURCES, and both were tried. alxMemRaw.c cannot enter it: that
@@ -391,10 +390,10 @@ def _closure_objects(session: nox.Session, out_dir: Path, sources, defines, flag
     return _strs(sorted(out_dir.glob("*.obj")))
 
 
-def _dll(session: nox.Session, dll: Path, sources, def_file: Path, flags, defines=(), objects=()) -> None:
+def _dll(session: nox.Session, dll: Path, sources, exports, flags, defines=(), objects=()) -> None:
     """Two-step group build, step 2 (or the whole build of a one-step group): the strict sources into the DLL."""
     _clang_cl(session, "/LD", *GNU99, *flags, *defines, *CL_INCLUDES, *_strs(sources), *objects,
-              f"/Fe:{dll}", f"/Fo{dll.parent}\\", "/link", f"/DEF:{def_file}")
+              f"/Fe:{dll}", f"/Fo{dll.parent}\\", "/link", f"/DEF:{host_recipe.def_file(exports)}")
 
 
 def _test_paths(args) -> list:
@@ -686,36 +685,36 @@ def sanitize(session: nox.Session) -> None:
     shutil.copy(tc.asan_runtime(), asan)
     session.run(str(asan / "alxFifoSanSmoke.exe"), external=True)
     session.log("Stage 2: UBSan FIFO DLL, full suite")
-    _dll(session, ubsan / "alxFifoTest.dll", FIFO_SOURCES, FIFO_DEF, UBSAN)
+    _dll(session, ubsan / "alxFifoTest.dll", FIFO_SOURCES, FIFO_EXPORTS, UBSAN)
     _pytest(session, {"ALX_FIFO_TEST_DLL": str(ubsan / "alxFifoTest.dll")})
     session.log("Stage 2b: UBSan CLI DLL, CLI suite")
     objs = _closure_objects(session, ubsan / "cliClosure", CLI_CLOSURE, CLI_ASSERTS, UBSAN)
-    _dll(session, ubsan / "alxCliTest.dll", CLI_STRICT, CLI_DEF, UBSAN,
+    _dll(session, ubsan / "alxCliTest.dll", CLI_STRICT, CLI_EXPORTS, UBSAN,
          ["-D_CRT_SECURE_NO_WARNINGS", *CLI_ASSERTS], objs)
     _pytest(session, {"ALX_CLI_TEST_DLL": str(ubsan / "alxCliTest.dll")}, *CLI_TESTS)
     session.log("Stage 2c: UBSan MemSafe DLL, MemSafe group suite")
     objs = _closure_objects(session, ubsan / "memsafeClosure", MS_CLOSURE, MS_ASSERTS, UBSAN)
-    _dll(session, ubsan / "alxMemSafeTest.dll", MS_STRICT, MS_DEF, UBSAN,
+    _dll(session, ubsan / "alxMemSafeTest.dll", MS_STRICT, MS_EXPORTS, UBSAN,
          ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
     _pytest(session, {"ALX_MEMSAFE_TEST_DLL": str(ubsan / "alxMemSafeTest.dll")}, *MS_TESTS_UBSAN)
     session.log("Stage 2d: UBSan Id DLL, Id suite")
     objs = _closure_objects(session, ubsan / "idClosure", ID_CLOSURE, ID_ASSERTS, UBSAN)
-    _dll(session, ubsan / "alxIdTest.dll", ID_STRICT, ID_DEF, UBSAN,
+    _dll(session, ubsan / "alxIdTest.dll", ID_STRICT, ID_EXPORTS, UBSAN,
          ["-D_CRT_SECURE_NO_WARNINGS", *ID_ASSERTS], objs)
     _pytest(session, {"ALX_ID_TEST_DLL": str(ubsan / "alxIdTest.dll")}, *ID_TESTS)
     session.log("Stage 2e: UBSan Assert DLLs (weak defaults and displaced), Assert suite")
     # Both DLLs in one pytest run: the suite's whole point is the comparison between them, so a run
     # that had only one of them instrumented would leave half of every comparison uninstrumented.
-    _dll(session, ubsan / "alxAssertWeakTest.dll", ASSERT_WEAK_SOURCES, ASSERT_WEAK_DEF, UBSAN,
+    _dll(session, ubsan / "alxAssertWeakTest.dll", ASSERT_WEAK_SOURCES, ASSERT_WEAK_EXPORTS, UBSAN,
          ["-D_CRT_SECURE_NO_WARNINGS"])
-    _dll(session, ubsan / "alxAssertTest.dll", ASSERT_SOURCES, ASSERT_DEF, UBSAN,
+    _dll(session, ubsan / "alxAssertTest.dll", ASSERT_SOURCES, ASSERT_EXPORTS, UBSAN,
          ["-D_CRT_SECURE_NO_WARNINGS"])
     _pytest(session, {"ALX_ASSERT_WEAK_TEST_DLL": str(ubsan / "alxAssertWeakTest.dll"),
                       "ALX_ASSERT_TEST_DLL": str(ubsan / "alxAssertTest.dll")}, *ASSERT_TESTS)
     session.log("Stage 2f: UBSan MemRaw DLLs (weak defaults and a product override), MemRaw suite")
-    _dll(session, ubsan / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_DEF, UBSAN,
+    _dll(session, ubsan / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_EXPORTS, UBSAN,
          ["-D_CRT_SECURE_NO_WARNINGS", *MEMRAW_ASSERTS])
-    _dll(session, ubsan / "alxMemRawOvrTest.dll", MEMRAW_OVR_SOURCES, MEMRAW_OVR_DEF, UBSAN,
+    _dll(session, ubsan / "alxMemRawOvrTest.dll", MEMRAW_OVR_SOURCES, MEMRAW_OVR_EXPORTS, UBSAN,
          ["-D_CRT_SECURE_NO_WARNINGS", *MEMRAW_ASSERTS])
     _pytest(session, {"ALX_MEMRAW_TEST_DLL": str(ubsan / "alxMemRawTest.dll"),
                       "ALX_MEMRAW_OVR_TEST_DLL": str(ubsan / "alxMemRawOvrTest.dll")}, *MEMRAW_TESTS)
@@ -753,14 +752,14 @@ def coverage(session: nox.Session) -> None:
     _guard(session, _check_ms_tests)
     _fresh_dev_build(session)
     out = lanes.evidence_dir(TEST, "coverage")
-    _dll(session, out / "alxFifoTest.dll", FIFO_SOURCES, FIFO_DEF, PROFILE)
+    _dll(session, out / "alxFifoTest.dll", FIFO_SOURCES, FIFO_EXPORTS, PROFILE)
     _llvm_cov_group(session, out, out / "alxFifoTest.dll", "ALX_FIFO_TEST_DLL", [],
                     "lines,branches,regions,functions", ["alxFifo.c", "alxBound.c"])
     # MemSafe group: gate = functions 100 %; lines/branches are REPORTED - alxMemSafe.c keeps three blocks unreachable
     # with asserts ON and alxCrc.c has `break` after `return` plus assert-guarded default branches (task notes).
     ms = lanes.evidence_dir(TEST, "coverage", "memsafe")
     objs = _closure_objects(session, ms / "closure", MS_CLOSURE, MS_ASSERTS, PROFILE)
-    _dll(session, ms / "alxMemSafeTest.dll", MS_STRICT, MS_DEF, PROFILE,
+    _dll(session, ms / "alxMemSafeTest.dll", MS_STRICT, MS_EXPORTS, PROFILE,
          ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
     # alxFtoa.c and alxParamGroup.c join the gate now that the report is honest about them; both
     # measure 100 % of functions. alxRange.c is 11 of 12 and cannot - the one function never
@@ -774,10 +773,10 @@ def coverage(session: nox.Session) -> None:
     # cannot reach at all, so a line gate here would be a number picked to fit rather than a claim
     # about the tests. Every function the module defines IS reached (measured 46 of 46,
     # 94.6 % of lines), which is the claim worth gating: a getter added and never called, or one
-    # dropped from alxIdTest.def and so from every test, fails this lane.
+    # dropped from ID_EXPORTS and so from every test, fails this lane.
     idg = lanes.evidence_dir(TEST, "coverage", "id")
     id_objs = _closure_objects(session, idg / "closure", ID_CLOSURE, ID_ASSERTS, PROFILE)
-    _dll(session, idg / "alxIdTest.dll", ID_STRICT, ID_DEF, PROFILE,
+    _dll(session, idg / "alxIdTest.dll", ID_STRICT, ID_EXPORTS, PROFILE,
          ["-D_CRT_SECURE_NO_WARNINGS", *ID_ASSERTS], id_objs)
     _llvm_cov_group(session, idg, idg / "alxIdTest.dll", "ALX_ID_TEST_DLL", ID_TESTS,
                     "functions", ["alxId.c"])
@@ -788,7 +787,7 @@ def coverage(session: nox.Session) -> None:
     # which is what makes 100 % an honest number rather than a chosen one. The Assert group is
     # absent on purpose - the reason is written at its declaration above.
     mr = lanes.evidence_dir(TEST, "coverage", "memraw")
-    _dll(session, mr / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_DEF, PROFILE,
+    _dll(session, mr / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_EXPORTS, PROFILE,
          ["-D_CRT_SECURE_NO_WARNINGS", *MEMRAW_ASSERTS])
     _llvm_cov_group(session, mr, mr / "alxMemRawTest.dll", "ALX_MEMRAW_TEST_DLL", MEMRAW_TESTS,
                     "functions", ["alxMemRaw.c"])
