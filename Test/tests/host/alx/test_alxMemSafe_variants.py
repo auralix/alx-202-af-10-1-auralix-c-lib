@@ -38,7 +38,7 @@ Proofs (ALX-1553): P544-P547.
 
 import pytest
 
-from host_build import (
+from harness.build import (
     MEMSAFE_SOURCES_CLOSURE,
     MEMSAFE_SOURCES_STRICT,
     VARIANTS,

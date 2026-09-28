@@ -24,7 +24,7 @@ TEMP_MAX_DEGC = 150
 
 def _table() -> list[int]:
     """The module's own lookup table, read from the source it is compiled from."""
-    source = Path(__file__).parent.parent / "Ext" / "alxNtcg103jf103ft1s.c"
+    source = Path(__file__).resolve().parents[5] / "Ext" / "alxNtcg103jf103ft1s.c"
     text = source.read_text(encoding="utf-8", errors="replace")
     block = text[text.index("static const uint32_t lut"):]
     block = block[:block.index("};")]

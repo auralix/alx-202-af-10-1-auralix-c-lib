@@ -12,13 +12,13 @@ inventories and per-group lists belong to the Jira task and its Task folder note
 | Block | Responsibility | Implementation here |
 |---|---|---|
 | Verification Runner | Select stages, configure processes, propagate failures | `noxfile.py` |
-| Host Test Application | Check library behavior through DLLs and fakes | `test_*.py`, pytest fixtures in `conftest.py` |
+| Host Test Application | Check library behavior through DLLs and fakes | `tests/`, pytest fixtures in `tests/conftest.py` |
 | Native Check Application | Run checks that need their own native process | sanitizer smoke executables |
-| Test Harness | Declare builds and expose callable host interfaces | `host_build.py`, `host_harness.py`, C helpers and fakes |
+| Test Harness | Declare builds and expose callable host interfaces | `harness/build.py`, `harness/access.py`, `native/` helpers and fakes |
 | Shared Mechanisms | Tool execution, build recipes, evidence helpers | Python library `alx` package |
 | Build and Evidence Store | Keep outputs separate by stage and configuration | `build/` |
 
-Runners import `host_build.py`; behavioral tests import access harnesses, never `conftest.py`; fixture lifecycle stays
+Runners import `harness.build`; behavioral tests import access harnesses, never `conftest.py`; fixture lifecycle stays
 inside pytest. The library code under test has no dependency on the verification system.
 Host and target describe where that code executes, not where the controller runs. This suite
 has no Target Test Application: on-target qualification belongs to a consumer's verification system.
@@ -43,8 +43,13 @@ A missing tool fails its lane, never skips it.
 
 ## Layout
 
-- `Test/` = the suite: tests, `conftest.py`, C helpers and fakes, the DLL export files.
-- The groups, one DLL each, declared in `host_build.py`:
+- `Test/` = the verification root, with the same entries as every Auralix repository: `tests/` (the checks: `host/alx/` mirrors the
+  library sources, `host/alx/ext/` the `Ext/` sources, `framework/` checks the verification system itself; `conftest.py` owns the
+  fixture lifecycle), `harness/` (`build.py` recipes and group declarations, `access.py` ctypes access), `native/` (`helpers/`,
+  `fakes/`, `exports/` the DLL export files, `checks/` the native check sources), `config/` (`alxConfig.h`, `alxAssert.cfg`) and
+  `build/` (evidence). Test module names keep the C module spelling (`test_alxFifo.py`) until the shared mutation lane learns the
+  normalized mirror name.
+- The groups, one DLL each, declared in `harness/build.py`:
 	- `alxFifoTest` - the FIFO and the bounds helper it uses
 	- `alxCliTest` - the CLI over a faked serial port and KV store
 	- `alxMemSafeTest` - the safe-store chain (CRC, MemSafe, ParamGroup, ParamStore) over a faked raw
@@ -117,7 +122,7 @@ A missing tool fails its lane, never skips it.
   from the Python lib and is called as a command or imported: the gates (`python -m alx.verify.<gate>`), the host
   toolchain and DLL build mechanics (`alx.c_lib.host_build`) and the C mutation hooks
   (`python -m alx.c_lib.mutation_hooks`). What stays here is what is THIS repository's: the source lists, the
-  defines, the `.def` files and the `DLL_GROUPS` declaration, in `host_build.py`, separate from the fixtures.
+  defines, the `.def` files and the `DLL_GROUPS` declaration, in `harness/build.py`, separate from the fixtures.
 - `Test/noxfile.py` = the lane runner: one nox session per pipeline stage, named after it, running in `Test/.venv`
   (`uv run nox`). The generic gates (`python -m alx.verify.<gate>`) and the lane vocabulary (`alx.verify.lanes`:
   stage names, evidence folders, tool locations) come from the Auralix Python lib, pinned by tag in `pyproject.toml`.
@@ -151,9 +156,9 @@ A missing tool fails its lane, never skips it.
 	- clang `-std=gnu99 -O0 -g -Werror` + warning_flags
 	- vswhere -> vcvars64 (VS2022 C++ workload) = build env for all lanes
 - **Files - Config**
-	- `Test/alxConfig.h`
+	- `Test/config/alxConfig.h`
 - **Files - Code**
-	- `Test/host_build.py`
+	- `Test/harness/build.py`
 	- `Test/noxfile.py` -> `build`
 - **Files - Generated**
 	- `Test/build/alx<Module>Test.dll` -> `Test/build/alxFifoTest.dll`
@@ -171,14 +176,14 @@ A missing tool fails its lane, never skips it.
 	- `Test/uv.lock`
 	- `Test/.python-version`
 - **Files - Code**
-	- `Test/conftest.py` (fixture lifetime)
-	- `Test/host_harness.py` (ctypes access and observations)
+	- `Test/tests/conftest.py` (fixture lifetime)
+	- `Test/harness/access.py` (ctypes access and observations)
 	- `Test/noxfile.py` -> `test`
-	- `Test/test_alx<Module>.py` -> `Test/test_alxFifo.py`
-	- `Test/alx<Module>TestHelpers.c` -> `Test/alxFifoTestHelpers.c`
-	- `Test/alx<Module>Test.def` -> `Test/alxFifoTest.def`
-	- `Test/alx<FakedModule>Fake.c` -> `Test/alxSerialPortFake.c`
-	- `Test/alx<Module>RegSizeCheck.c` -> `Test/alxIna228RegSizeCheck.c` (target-only)
+	- `Test/tests/host/alx/test_alx<Module>.py` -> `Test/tests/host/alx/test_alxFifo.py`
+	- `Test/native/helpers/alx<Module>TestHelpers.c` -> `Test/native/helpers/alxFifoTestHelpers.c`
+	- `Test/native/exports/alx<Module>Test.def` -> `Test/native/exports/alxFifoTest.def`
+	- `Test/native/fakes/alx<FakedModule>Fake.c` -> `Test/native/fakes/alxSerialPortFake.c`
+	- `Test/native/checks/alx<Module>RegSizeCheck.c` -> `Test/native/checks/alxIna228RegSizeCheck.c` (target-only)
 - **Files - Generated**
 	- `Test/build/pytest_report.xml`
 	- `Test/build/pytest_report.html`
@@ -211,7 +216,7 @@ A missing tool fails its lane, never skips it.
 	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alx<Module>Test.dll` & pytest `test_alx<Module>.py`, one stage per test group (asserts ON, as shipped) -> `alxFifoTest.dll` & `test_alxFifo.py`
 - **Files - Code**
 	- `Test/noxfile.py` -> `sanitize`
-	- `Test/alx<Module>SanSmoke.c` -> `Test/alxFifoSanSmoke.c`
+	- `Test/native/checks/alx<Module>SanSmoke.c` -> `Test/native/checks/alxFifoSanSmoke.c`
 - **Files - Generated**
 	- `Test/build/sanitize/asan/alx<Module>SanSmoke.exe` -> `Test/build/sanitize/asan/alxFifoSanSmoke.exe`
 	- `Test/build/sanitize/asan/clang_rt.asan_dynamic-x86_64.dll`

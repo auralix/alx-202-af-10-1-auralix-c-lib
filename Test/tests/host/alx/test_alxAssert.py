@@ -46,10 +46,10 @@ from alx.c_lib import host_build as hb
 
 pytestmark = pytest.mark.unit
 
-TEST_DIR = Path(__file__).parent
+TEST_DIR = Path(__file__).resolve().parents[3]   # Test/, the verification root
 CLIB_DIR = TEST_DIR.parent
-INCLUDE_DIRS = [TEST_DIR, CLIB_DIR, CLIB_DIR / "Mcu", CLIB_DIR / "Ext"]
-CPPCHECK_CFG = TEST_DIR / "alxAssert.cfg"
+INCLUDE_DIRS = [TEST_DIR / "config", CLIB_DIR, CLIB_DIR / "Mcu", CLIB_DIR / "Ext"]
+CPPCHECK_CFG = TEST_DIR / "config" / "alxAssert.cfg"
 
 # The library's own module headers. Test/ is not library source and the three vendor trees are not
 # Auralix's; everything else under these three folders is a module that may define an ALX_*_FILE.

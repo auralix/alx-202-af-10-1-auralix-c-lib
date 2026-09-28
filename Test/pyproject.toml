@@ -24,7 +24,8 @@ dependencies = [
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-testpaths = ["."]
+testpaths = ["tests"]
+pythonpath = ["."]   # Test/, the verification root: tests import harness
 # no test may hang the run (C infinite loop / stuck serial read) - generous global guard,
 # per-test overrides via @pytest.mark.timeout(n)
 timeout = 120

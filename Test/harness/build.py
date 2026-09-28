@@ -7,16 +7,22 @@ from typing import NamedTuple
 
 from alx.c_lib import host_build as build_tools
 
-TEST_DIR = Path(__file__).parent
+TEST_DIR = Path(__file__).resolve().parent.parent   # Test/, the verification root
 CLIB_DIR = TEST_DIR.parent
 BUILD_DIR = TEST_DIR / "build"
+CONFIG_DIR = TEST_DIR / "config"
+NATIVE_DIR = TEST_DIR / "native"
+HELPERS_DIR = NATIVE_DIR / "helpers"
+FAKES_DIR = NATIVE_DIR / "fakes"
+EXPORTS_DIR = NATIVE_DIR / "exports"
+CHECKS_DIR = NATIVE_DIR / "checks"
 
 FIFO_SOURCES = [
     CLIB_DIR / "alxFifo.c",
     CLIB_DIR / "alxBound.c",
-    TEST_DIR / "alxFifoTestHelpers.c",
-    TEST_DIR / "alxBoundTestHelpers.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxFifoTestHelpers.c",
+    HELPERS_DIR / "alxBoundTestHelpers.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 FIFO_DEPS = [
     *FIFO_SOURCES,
@@ -25,8 +31,8 @@ FIFO_DEPS = [
     CLIB_DIR / "alxBound.h",
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxTrace.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxFifoTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxFifoTest.def",
     Path(__file__),  # flags live here - flag edits must trigger a rebuild
 ]
 FIFO_DLL = BUILD_DIR / "alxFifoTest.dll"
@@ -39,15 +45,15 @@ CLI_SOURCES_STRICT = [
     CLIB_DIR / "alxCli.c",
     CLIB_DIR / "alxFifo.c",
     CLIB_DIR / "alxBound.c",
-    TEST_DIR / "alxSerialPortFake.c",
-    TEST_DIR / "alxParamKvStoreFake.c",
-    TEST_DIR / "alxIdFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxSerialPortFake.c",
+    FAKES_DIR / "alxParamKvStoreFake.c",
+    FAKES_DIR / "alxIdFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
     # alxTracePc.c SUPPLIES AlxTrace_WriteLevel and the alxTrace instance - no group compiles
     # Mcu/alxTrace.c. Needed the moment a variant compiles a trace form; KEEP IN SYNC with
     # noxfile.CLI_STRICT.
-    TEST_DIR / "alxTracePc.c",
-    TEST_DIR / "alxCliTestHelpers.c",
+    HELPERS_DIR / "alxTracePc.c",
+    HELPERS_DIR / "alxCliTestHelpers.c",
 ]
 # asserts ON = test the code AS SHIPPED (product enables RST mode). Scoped to
 # the CLI DLL for now; the fifo/bound DLL parity is its own follow-up.
@@ -78,8 +84,8 @@ CLI_DEPS = CLI_SOURCES_STRICT + CLI_SOURCES_CLOSURE + [
     CLIB_DIR / "alxBound.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxCliTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxCliTest.def",
     Path(__file__),
 ]
 CLI_DLL = BUILD_DIR / "alxCliTest.dll"
@@ -93,11 +99,11 @@ MEMSAFE_SOURCES_STRICT = [
     CLIB_DIR / "alxMemSafe.c",
     CLIB_DIR / "alxCrc.c",
     CLIB_DIR / "alxBound.c",
-    TEST_DIR / "alxMemRawFake.c",
-    TEST_DIR / "alxParamKvStoreFake.c",
-    TEST_DIR / "alxAssertPc.c",
-    TEST_DIR / "alxTracePc.c",   # this group has traces once a variant enables them
-    TEST_DIR / "alxMemSafeTestHelpers.c",
+    FAKES_DIR / "alxMemRawFake.c",
+    FAKES_DIR / "alxParamKvStoreFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxTracePc.c",   # this group has traces once a variant enables them
+    HELPERS_DIR / "alxMemSafeTestHelpers.c",
 ]
 MEMSAFE_SOURCES_CLOSURE = [
     CLIB_DIR / "alxParamGroup.c",
@@ -109,8 +115,8 @@ MEMSAFE_SOURCES_CLOSURE = [
 MEMSAFE_DEPS = MEMSAFE_SOURCES_STRICT + MEMSAFE_SOURCES_CLOSURE + [
     CLIB_DIR / "alxMemSafe.h", CLIB_DIR / "alxMemRaw.h", CLIB_DIR / "alxCrc.h",
     CLIB_DIR / "alxParamGroup.h", CLIB_DIR / "alxParamStore.h", CLIB_DIR / "alxParamItem.h",
-    CLIB_DIR / "alxGlobal.h", CLIB_DIR / "alxAssert.h", TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxMemSafeTest.def", Path(__file__),
+    CLIB_DIR / "alxGlobal.h", CLIB_DIR / "alxAssert.h", CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxMemSafeTest.def", Path(__file__),
 ]
 MEMSAFE_DLL = BUILD_DIR / "alxMemSafeTest.dll"
 
@@ -121,15 +127,15 @@ MEMSAFE_DLL = BUILD_DIR / "alxMemSafeTest.dll"
 # smallest DLL here, and the shape any other pure module should follow.
 VDIV_SOURCES = [
     CLIB_DIR / "alxVdiv.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 VDIV_DEPS = [
     *VDIV_SOURCES,
     CLIB_DIR / "alxVdiv.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxVdivTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxVdivTest.def",
     Path(__file__),
 ]
 VDIV_DLL = BUILD_DIR / "alxVdivTest.dll"
@@ -143,8 +149,8 @@ VDIV_DLL = BUILD_DIR / "alxVdivTest.dll"
 TIMSW_SOURCES = [
     CLIB_DIR / "alxTimSw.c",
     CLIB_DIR / "alxTick.c",
-    TEST_DIR / "alxIrqFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxIrqFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 TIMSW_DEPS = [
     *TIMSW_SOURCES,
@@ -153,8 +159,8 @@ TIMSW_DEPS = [
     CLIB_DIR / "alxIrq.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxTimSwTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxTimSwTest.def",
     Path(__file__),
 ]
 TIMSW_DLL = BUILD_DIR / "alxTimSwTest.dll"
@@ -167,7 +173,7 @@ TIMSW_DLL = BUILD_DIR / "alxTimSwTest.dll"
 # structure, so the whole codec is host code the moment it is compiled here.
 CANPARSER_SOURCES = [
     CLIB_DIR / "alxCanParser.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 CANPARSER_DEPS = [
     *CANPARSER_SOURCES,
@@ -175,8 +181,8 @@ CANPARSER_DEPS = [
     CLIB_DIR / "Mcu" / "alxCan.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxCanParserTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxCanParserTest.def",
     Path(__file__),
 ]
 CANPARSER_DLL = BUILD_DIR / "alxCanParserTest.dll"
@@ -192,9 +198,9 @@ FILTGLITCH_SOURCES = [
     CLIB_DIR / "alxFiltGlitchUint32.c",
     CLIB_DIR / "alxTimSw.c",
     CLIB_DIR / "alxTick.c",
-    TEST_DIR / "alxFiltGlitchTestHelpers.c",
-    TEST_DIR / "alxIrqFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxFiltGlitchTestHelpers.c",
+    FAKES_DIR / "alxIrqFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 FILTGLITCH_DEPS = [
     *FILTGLITCH_SOURCES,
@@ -205,8 +211,8 @@ FILTGLITCH_DEPS = [
     CLIB_DIR / "alxIrq.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxFiltGlitchTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxFiltGlitchTest.def",
     Path(__file__),
 ]
 FILTGLITCH_DLL = BUILD_DIR / "alxFiltGlitchTest.dll"
@@ -224,8 +230,8 @@ MATH_SOURCES = [
     CLIB_DIR / "alxAvg.c",
     CLIB_DIR / "alxMath.c",
     CLIB_DIR / "alxGlobal.c",
-    TEST_DIR / "alxMathTestHelpers.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxMathTestHelpers.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 MATH_DEPS = [
     *MATH_SOURCES,
@@ -236,8 +242,8 @@ MATH_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxGlobal.c",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxMathTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxMathTest.def",
     Path(__file__),
 ]
 MATH_DLL = BUILD_DIR / "alxMathTest.dll"
@@ -252,9 +258,9 @@ LINFUN_SOURCES = [
     CLIB_DIR / "alxLinFun.c",
     CLIB_DIR / "alxInterpLin.c",
     CLIB_DIR / "alxAudioVol.c",
-    TEST_DIR / "alxLinFunTestHelpers.c",
-    TEST_DIR / "alxAudioVolTestHelpers.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxLinFunTestHelpers.c",
+    HELPERS_DIR / "alxAudioVolTestHelpers.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 LINFUN_DEPS = [
     *LINFUN_SOURCES,
@@ -263,8 +269,8 @@ LINFUN_DEPS = [
     CLIB_DIR / "alxAudioVol.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxLinFunTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxLinFunTest.def",
     Path(__file__),
 ]
 LINFUN_DLL = BUILD_DIR / "alxLinFunTest.dll"
@@ -276,9 +282,9 @@ LINFUN_DLL = BUILD_DIR / "alxLinFunTest.dll"
 # of thing that is either right or off by a power of two.
 ROTSW_SOURCES = [
     CLIB_DIR / "alxRotSw.c",
-    TEST_DIR / "alxIoPinFake.c",
-    TEST_DIR / "alxRotSwTestHelpers.c",
-    TEST_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    HELPERS_DIR / "alxRotSwTestHelpers.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 ROTSW_DEPS = [
     *ROTSW_SOURCES,
@@ -286,8 +292,8 @@ ROTSW_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxIoPin.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxRotSwTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxRotSwTest.def",
     Path(__file__),
 ]
 ROTSW_DLL = BUILD_DIR / "alxRotSwTest.dll"
@@ -301,9 +307,9 @@ TEMPSENS_SOURCES = [
     CLIB_DIR / "alxTempSensRtdVdiv.c",
     CLIB_DIR / "alxVdiv.c",
     CLIB_DIR / "alxInterpLin.c",
-    TEST_DIR / "alxAdcFake.c",
-    TEST_DIR / "alxTempSensTestHelpers.c",
-    TEST_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAdcFake.c",
+    HELPERS_DIR / "alxTempSensTestHelpers.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 TEMPSENS_DEPS = [
     *TEMPSENS_SOURCES,
@@ -313,8 +319,8 @@ TEMPSENS_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxAdc.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxTempSensTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxTempSensTest.def",
     Path(__file__),
 ]
 TEMPSENS_DLL = BUILD_DIR / "alxTempSensTest.dll"
@@ -331,9 +337,9 @@ PWR_SOURCES = [
     CLIB_DIR / "alxFiltGlitchBool.c",
     CLIB_DIR / "alxTimSw.c",
     CLIB_DIR / "alxTick.c",
-    TEST_DIR / "alxPwrTestHelpers.c",
-    TEST_DIR / "alxIrqFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxPwrTestHelpers.c",
+    FAKES_DIR / "alxIrqFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 PWR_DEPS = [
     *PWR_SOURCES,
@@ -345,8 +351,8 @@ PWR_DEPS = [
     CLIB_DIR / "alxTick.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxPwrTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxPwrTest.def",
     Path(__file__),
 ]
 PWR_DLL = BUILD_DIR / "alxPwrTest.dll"
@@ -358,15 +364,15 @@ PWR_DLL = BUILD_DIR / "alxPwrTest.dll"
 # where an audio path either keeps its full scale or quietly loses a count.
 AUDIO_SOURCES = [
     CLIB_DIR / "alxAudio.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 AUDIO_DEPS = [
     *AUDIO_SOURCES,
     CLIB_DIR / "alxAudio.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxAudioTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxAudioTest.def",
     Path(__file__),
 ]
 AUDIO_DLL = BUILD_DIR / "alxAudioTest.dll"
@@ -378,8 +384,8 @@ AUDIO_DLL = BUILD_DIR / "alxAudioTest.dll"
 # an exact answer.
 AUDIOPLAYER_SOURCES_STRICT = [
     CLIB_DIR / "alxAudio.c",
-    TEST_DIR / "alxAudioPlayerTestHelpers.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxAudioPlayerTestHelpers.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 # alxAudioPlayer.c is CLOSURE, not because its tests are pending - they are in
 # test_alxAudioPlayer.py - but because it does not survive -Wcast-qual: it reads
@@ -397,8 +403,8 @@ AUDIOPLAYER_DEPS = [
     CLIB_DIR / "alxAudio.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxAudioPlayerTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxAudioPlayerTest.def",
     Path(__file__),
 ]
 AUDIOPLAYER_DLL = BUILD_DIR / "alxAudioPlayerTest.dll"
@@ -413,7 +419,7 @@ AUDIOPLAYER_DLL = BUILD_DIR / "alxAudioPlayerTest.dll"
 # library change and belongs to whoever owns the module (TODO A18).
 NTC_SOURCES_STRICT = [
     CLIB_DIR / "alxBound.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 NTC_SOURCES_CLOSURE = [
     CLIB_DIR / "Ext" / "alxNtcg103jf103ft1s.c",
@@ -425,8 +431,8 @@ NTC_DEPS = [
     CLIB_DIR / "alxBound.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxNtcTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxNtcTest.def",
     Path(__file__),
 ]
 NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
@@ -445,9 +451,9 @@ NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
 # here - and it means nothing in that file is warning-checked (see README).
 FSSAFE_SOURCES_STRICT = [
     CLIB_DIR / "alxCrc.c",
-    TEST_DIR / "alxFsSafeTestHelpers.c",
-    TEST_DIR / "alxFsFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxFsSafeTestHelpers.c",
+    FAKES_DIR / "alxFsFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 FSSAFE_SOURCES_CLOSURE = [
     CLIB_DIR / "alxFsSafe.c",
@@ -461,8 +467,8 @@ FSSAFE_DEPS = [
     CLIB_DIR / "alxFs.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxFsSafeTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxFsSafeTest.def",
     Path(__file__),
 ]
 FSSAFE_DLL = BUILD_DIR / "alxFsSafeTest.dll"
@@ -481,24 +487,24 @@ LIN_SOURCES = [
     CLIB_DIR / "alxFifo.c",
     CLIB_DIR / "alxBound.c",
     CLIB_DIR / "alxDelay.c",
-    TEST_DIR / "alxLinTestHelpers.c",
-    TEST_DIR / "alxSerialPortFake.c",
-    TEST_DIR / "alxIoPinFake.c",
-    TEST_DIR / "alxIrqFake.c",
-    TEST_DIR / "alxOsDelayFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxLinTestHelpers.c",
+    FAKES_DIR / "alxSerialPortFake.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    FAKES_DIR / "alxIrqFake.c",
+    FAKES_DIR / "alxOsDelayFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
     # The trace sink. Every enabled ALX_TRACE_<LEVEL> macro calls AlxTrace_WriteLevel(&alxTrace, ...)
     # and BOTH of those symbols live in Mcu/alxTrace.c, which no group compiles - measured, turning
     # this group's traces on without it fails to link with exactly those two undefined and no others.
-    TEST_DIR / "alxTracePc.c",
+    HELPERS_DIR / "alxTracePc.c",
 ]
 LIN_DEPS = [
     *LIN_SOURCES,
     CLIB_DIR / "alxLin.h",
     CLIB_DIR / "Mcu" / "alxSerialPort.h",
     CLIB_DIR / "alxGlobal.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxLinTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxLinTest.def",
     Path(__file__),
 ]
 LIN_DLL = BUILD_DIR / "alxLinTest.dll"
@@ -513,16 +519,16 @@ LIN_DLL = BUILD_DIR / "alxLinTest.dll"
 # this suite where the clock is not real.
 DELAY_SOURCES = [
     CLIB_DIR / "alxDelay.c",
-    TEST_DIR / "alxTickFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxTickFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 DELAY_DEPS = [
     *DELAY_SOURCES,
     CLIB_DIR / "alxDelay.h",
     CLIB_DIR / "alxTick.h",
     CLIB_DIR / "alxGlobal.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxDelayTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxDelayTest.def",
     Path(__file__),
 ]
 DELAY_DLL = BUILD_DIR / "alxDelayTest.dll"
@@ -536,9 +542,9 @@ DELAY_DLL = BUILD_DIR / "alxDelayTest.dll"
 # always, and it counts opens against closes.
 PARAMKV_SOURCES = [
     CLIB_DIR / "alxParamKvStore.c",
-    TEST_DIR / "alxParamKvStoreTestHelpers.c",
-    TEST_DIR / "alxFsFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxParamKvStoreTestHelpers.c",
+    FAKES_DIR / "alxFsFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 PARAMKV_DEPS = [
     *PARAMKV_SOURCES,
@@ -546,8 +552,8 @@ PARAMKV_DEPS = [
     CLIB_DIR / "alxFs.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxParamKvStoreTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxParamKvStoreTest.def",
     Path(__file__),
 ]
 PARAMKV_DLL = BUILD_DIR / "alxParamKvStoreTest.dll"
@@ -560,9 +566,9 @@ PARAMKV_DLL = BUILD_DIR / "alxParamKvStoreTest.dll"
 # select code written wrong reports the wrong signal under the right name.
 MUX_SOURCES = [
     CLIB_DIR / "alxMux.c",
-    TEST_DIR / "alxMuxTestHelpers.c",
-    TEST_DIR / "alxIoPinFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxMuxTestHelpers.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 MUX_DEPS = [
     *MUX_SOURCES,
@@ -570,8 +576,8 @@ MUX_DEPS = [
     CLIB_DIR / "Mcu" / "alxIoPin.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxMuxTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxMuxTest.def",
     Path(__file__),
 ]
 MUX_DLL = BUILD_DIR / "alxMuxTest.dll"
@@ -586,10 +592,10 @@ BTS_SOURCES = [
     CLIB_DIR / "alxFiltGlitchBool.c",
     CLIB_DIR / "alxTimSw.c",
     CLIB_DIR / "alxTick.c",
-    TEST_DIR / "alxIoPinFake.c",
-    TEST_DIR / "alxIrqFake.c",
-    TEST_DIR / "alxBts724gTestHelpers.c",
-    TEST_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    FAKES_DIR / "alxIrqFake.c",
+    HELPERS_DIR / "alxBts724gTestHelpers.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 BTS_DEPS = [
     *BTS_SOURCES,
@@ -600,8 +606,8 @@ BTS_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxIoPin.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxBts724gTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxBts724gTest.def",
     Path(__file__),
 ]
 BTS_DLL = BUILD_DIR / "alxBts724gTest.dll"
@@ -617,9 +623,9 @@ BOOL_SOURCES = [
     CLIB_DIR / "alxFiltGlitchBool.c",
     CLIB_DIR / "alxTimSw.c",
     CLIB_DIR / "alxTick.c",
-    TEST_DIR / "alxBoolTestHelpers.c",
-    TEST_DIR / "alxIrqFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxBoolTestHelpers.c",
+    FAKES_DIR / "alxIrqFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 BOOL_DEPS = [
     *BOOL_SOURCES,
@@ -630,8 +636,8 @@ BOOL_DEPS = [
     CLIB_DIR / "alxIrq.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxBoolTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxBoolTest.def",
     Path(__file__),
 ]
 BOOL_DLL = BUILD_DIR / "alxBoolTest.dll"
@@ -645,15 +651,15 @@ BOOL_DLL = BUILD_DIR / "alxBoolTest.dll"
 # these tests do.
 RTC_SOURCES = [
     CLIB_DIR / "alxRtc_Global.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 RTC_DEPS = [
     *RTC_SOURCES,
     CLIB_DIR / "alxRtc_Global.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxRtcTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxRtcTest.def",
     Path(__file__),
 ]
 RTC_DLL = BUILD_DIR / "alxRtcTest.dll"
@@ -671,9 +677,9 @@ RTC_DLL = BUILD_DIR / "alxRtcTest.dll"
 # they are off. Same reasoning, same defines as the MemSafe group.
 PARAMMGMT_SOURCES_STRICT = [
     CLIB_DIR / "alxParamMgmt.c",
-    TEST_DIR / "alxParamKvStoreFake.c",   # the items are constructed WITHOUT a store; this is here
-    TEST_DIR / "alxParamMgmtTestHelpers.c",   # only because alxParamItem.c references the symbols
-    TEST_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxParamKvStoreFake.c",   # the items are constructed WITHOUT a store; this is here
+    HELPERS_DIR / "alxParamMgmtTestHelpers.c",   # only because alxParamItem.c references the symbols
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 PARAMMGMT_SOURCES_CLOSURE = [
     CLIB_DIR / "alxParamItem.c",
@@ -693,8 +699,8 @@ PARAMMGMT_DEPS = [
     CLIB_DIR / "alxParamItem.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxParamMgmtTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxParamMgmtTest.def",
     Path(__file__),
 ]
 PARAMMGMT_DLL = BUILD_DIR / "alxParamMgmtTest.dll"
@@ -719,12 +725,12 @@ PARAMMGMT_DLL = BUILD_DIR / "alxParamMgmtTest.dll"
 # the header's style, not this suite's, and not something a test should waive
 # globally.
 INA228_SOURCES_STRICT = [
-    TEST_DIR / "alxI2cFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxI2cFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 INA228_SOURCES_CLOSURE = [
     CLIB_DIR / "Ext" / "alxIna228.c",
-    TEST_DIR / "alxIna228TestHelpers.c",
+    HELPERS_DIR / "alxIna228TestHelpers.c",
 ]
 # Asserts OFF here, unlike the other groups that mirror the product: the
 # library's weak AlxIna228_RegStruct_SetVal default is an assert, this suite
@@ -738,8 +744,8 @@ INA228_DEPS = [
     CLIB_DIR / "Mcu" / "alxI2c.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxIna228Test.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxIna228Test.def",
     Path(__file__),
 ]
 INA228_DLL = BUILD_DIR / "alxIna228Test.dll"
@@ -752,13 +758,13 @@ INA228_DLL = BUILD_DIR / "alxIna228Test.dll"
 # transfers, which is exactly the kind of thing that is right or wrong and never
 # nearly right.
 PI4IOE_SOURCES_STRICT = [
-    TEST_DIR / "alxI2cFake.c",
-    TEST_DIR / "alxIoPinFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxI2cFake.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 PI4IOE_SOURCES_CLOSURE = [
     CLIB_DIR / "Ext" / "alxPi4ioe5v6534q.c",
-    TEST_DIR / "alxPi4ioeTestHelpers.c",
+    HELPERS_DIR / "alxPi4ioeTestHelpers.c",
 ]
 PI4IOE_DEFINES: list[str] = []            # asserts off: the weak RegStruct_SetVal default is one
 PI4IOE_DEPS = [
@@ -769,8 +775,8 @@ PI4IOE_DEPS = [
     CLIB_DIR / "Mcu" / "alxIoPin.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxPi4ioe5v6534qTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxPi4ioe5v6534qTest.def",
     Path(__file__),
 ]
 PI4IOE_DLL = BUILD_DIR / "alxPi4ioe5v6534qTest.dll"
@@ -798,13 +804,13 @@ PI4IOE_DLL = BUILD_DIR / "alxPi4ioe5v6534qTest.dll"
 # translation unit that mentions ALX_BUILD_DATE_COMP cannot compile under -Werror at all, so the
 # three accessors that need the macro are split out and the rest of the helpers stay gated.
 ID_SOURCES_STRICT = [
-    TEST_DIR / "alxIdTestHelpers.c",
-    TEST_DIR / "alxIoPinFake.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxIdTestHelpers.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 ID_SOURCES_CLOSURE = [
     CLIB_DIR / "alxId.c",
-    TEST_DIR / "alxIdTestDateComp.c",
+    HELPERS_DIR / "alxIdTestDateComp.c",
 ]
 ID_SOURCES = [*ID_SOURCES_STRICT, *ID_SOURCES_CLOSURE]
 # No alxDelay.c and no alxTrace.c: alxId.h includes alxDelay.h but alxId.c calls nothing from it,
@@ -823,8 +829,8 @@ ID_DEPS = [
     CLIB_DIR / "alxDelay.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxIdTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxIdTest.def",
     Path(__file__),
 ]
 ID_DLL = BUILD_DIR / "alxIdTest.dll"
@@ -859,21 +865,21 @@ ID_DLL = BUILD_DIR / "alxIdTest.dll"
 # closure.
 ASSERT_WEAK_SOURCES = [
     CLIB_DIR / "alxAssert.c",
-    TEST_DIR / "alxAssertTestHelpers.c",
+    HELPERS_DIR / "alxAssertTestHelpers.c",
 ]
 ASSERT_SOURCES = [
     CLIB_DIR / "alxAssert.c",
-    TEST_DIR / "alxAssertTestHelpers.c",
-    TEST_DIR / "alxAssertBkptCaller.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxAssertTestHelpers.c",
+    HELPERS_DIR / "alxAssertBkptCaller.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 ASSERT_WEAK_DEPS = [
     *ASSERT_WEAK_SOURCES,
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "Mcu" / "alxTrace.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxAssertWeakTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxAssertWeakTest.def",
     Path(__file__),
 ]
 ASSERT_DEPS = [
@@ -881,8 +887,8 @@ ASSERT_DEPS = [
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "Mcu" / "alxTrace.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxAssertTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxAssertTest.def",
     Path(__file__),
 ]
 ASSERT_WEAK_DLL = BUILD_DIR / "alxAssertWeakTest.dll"
@@ -918,12 +924,12 @@ ASSERT_DLL = BUILD_DIR / "alxAssertTest.dll"
 # compiles clean under the full strict set, so neither DLL needs a closure.
 MEMRAW_SOURCES = [
     CLIB_DIR / "alxMemRaw.c",
-    TEST_DIR / "alxMemRawTestHelpers.c",
-    TEST_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxMemRawTestHelpers.c",
+    HELPERS_DIR / "alxAssertPc.c",
 ]
 MEMRAW_OVR_SOURCES = [
     *MEMRAW_SOURCES,
-    TEST_DIR / "alxMemRawTestOverride.c",
+    HELPERS_DIR / "alxMemRawTestOverride.c",
 ]
 MEMRAW_DEPS = [
     *MEMRAW_SOURCES,
@@ -931,8 +937,8 @@ MEMRAW_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxTrace.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxMemRawTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxMemRawTest.def",
     Path(__file__),
 ]
 MEMRAW_OVR_DEPS = [
@@ -941,8 +947,8 @@ MEMRAW_OVR_DEPS = [
     CLIB_DIR / "alxGlobal.h",
     CLIB_DIR / "alxAssert.h",
     CLIB_DIR / "Mcu" / "alxTrace.h",
-    TEST_DIR / "alxConfig.h",
-    TEST_DIR / "alxMemRawOvrTest.def",
+    CONFIG_DIR / "alxConfig.h",
+    EXPORTS_DIR / "alxMemRawOvrTest.def",
     Path(__file__),
 ]
 MEMRAW_DLL = BUILD_DIR / "alxMemRawTest.dll"
@@ -959,7 +965,7 @@ MEMRAW_OVR_DLL = BUILD_DIR / "alxMemRawOvrTest.dll"
 # target ships: never test a dialect you do not ship. -O0 -g for faithful debugging; clang's
 # diagnostics are front-end based, so the warning set is the same at any -O.
 TOOLCHAIN = build_tools.Toolchain()
-INCLUDES = [TEST_DIR, CLIB_DIR, CLIB_DIR / "Mcu", CLIB_DIR / "Ext"]
+INCLUDES = [CONFIG_DIR, CLIB_DIR, CLIB_DIR / "Mcu", CLIB_DIR / "Ext"]
 DEBUG_FLAGS = ["-O0", "-g"]
 STRICT_WARNINGS = [*build_tools.WARNINGS, "-Werror"]   # blanket -Werror on the host lane
 DB_ARGUMENTS = ["clang", "-std=gnu99", "-O0", *build_tools.WARNINGS, build_tools.CRT_DEFINE,
@@ -1030,15 +1036,15 @@ class VariantGroup(NamedTuple):
 #          INF/DBG boundary the four variants actually cross, and it is the only module in the
 #          library that does so AND already has a group.
 VARIANT_GROUPS: dict[str, VariantGroup] = {
-    "fifo": VariantGroup(FIFO_DLL, FIFO_SOURCES, (), FIFO_DEPS, TEST_DIR / "alxFifoTest.def", None),
-    "lin": VariantGroup(LIN_DLL, LIN_SOURCES, (), LIN_DEPS, TEST_DIR / "alxLinTest.def", None),
+    "fifo": VariantGroup(FIFO_DLL, FIFO_SOURCES, (), FIFO_DEPS, EXPORTS_DIR / "alxFifoTest.def", None),
+    "lin": VariantGroup(LIN_DLL, LIN_SOURCES, (), LIN_DEPS, EXPORTS_DIR / "alxLinTest.def", None),
     "memsafe": VariantGroup(MEMSAFE_DLL, MEMSAFE_SOURCES_STRICT, MEMSAFE_SOURCES_CLOSURE,
-                            MEMSAFE_DEPS, TEST_DIR / "alxMemSafeTest.def", "memSafeClosure"),
+                            MEMSAFE_DEPS, EXPORTS_DIR / "alxMemSafeTest.def", "memSafeClosure"),
     # cli   the ELISION question at its sharpest. alxCli.c does 21 of its serial writes
     #       INSIDE ALX_CLI_ASSERT, so `off` compiles a CLI that answers nothing at all.
     #       The group already had sources, a closure and a .def; only this line was missing.
     "cli": VariantGroup(CLI_DLL, CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE,
-                        CLI_DEPS, TEST_DIR / "alxCliTest.def", "cliClosure"),
+                        CLI_DEPS, EXPORTS_DIR / "alxCliTest.def", "cliClosure"),
 }
 
 
@@ -1077,7 +1083,7 @@ def _build_fifo_dll() -> None:
 def _build_cli_dll() -> None:
     _build_dll(CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE,
                [*CLI_ASSERT_DEFINES, *_assert_defines(CLI_SOURCES_STRICT, CLI_SOURCES_CLOSURE)],
-               CLI_DLL, TEST_DIR / "alxCliTest.def", "cliClosure")
+               CLI_DLL, EXPORTS_DIR / "alxCliTest.def", "cliClosure")
 
 
 def _build_memsafe_dll() -> None:
@@ -1093,30 +1099,30 @@ def _build_memsafe_dll() -> None:
 
 
 def _build_vdiv_dll() -> None:
-    _build_dll(VDIV_SOURCES, (), _assert_defines(VDIV_SOURCES), VDIV_DLL, TEST_DIR / "alxVdivTest.def", None)
+    _build_dll(VDIV_SOURCES, (), _assert_defines(VDIV_SOURCES), VDIV_DLL, EXPORTS_DIR / "alxVdivTest.def", None)
 
 
 def _build_canparser_dll() -> None:
     _build_dll(CANPARSER_SOURCES, (),
                _assert_defines(CANPARSER_SOURCES),
-               CANPARSER_DLL, TEST_DIR / "alxCanParserTest.def", None)
+               CANPARSER_DLL, EXPORTS_DIR / "alxCanParserTest.def", None)
 
 
 def _build_filtglitch_dll() -> None:
     _build_dll(FILTGLITCH_SOURCES, (),
                _assert_defines(FILTGLITCH_SOURCES),
-               FILTGLITCH_DLL, TEST_DIR / "alxFiltGlitchTest.def", None)
+               FILTGLITCH_DLL, EXPORTS_DIR / "alxFiltGlitchTest.def", None)
 
 
 def _build_math_dll() -> None:
-    _build_dll(MATH_SOURCES, (), _assert_defines(MATH_SOURCES), MATH_DLL, TEST_DIR / "alxMathTest.def", None)
+    _build_dll(MATH_SOURCES, (), _assert_defines(MATH_SOURCES), MATH_DLL, EXPORTS_DIR / "alxMathTest.def", None)
 
 
 def _build_fssafe_dll() -> None:
     _build_dll(FSSAFE_SOURCES_STRICT, FSSAFE_SOURCES_CLOSURE,
                [*FSSAFE_DEFINES, *_assert_defines(FSSAFE_SOURCES_STRICT, FSSAFE_SOURCES_CLOSURE)],
                FSSAFE_DLL,
-               TEST_DIR / "alxFsSafeTest.def", "fsSafeClosure")
+               EXPORTS_DIR / "alxFsSafeTest.def", "fsSafeClosure")
 
 
 def _build_lin_dll() -> None:
@@ -1128,110 +1134,110 @@ def _build_lin_dll() -> None:
 
 def _build_delay_dll() -> None:
     _build_dll(DELAY_SOURCES, (), _assert_defines(DELAY_SOURCES), DELAY_DLL,
-               TEST_DIR / "alxDelayTest.def", None)
+               EXPORTS_DIR / "alxDelayTest.def", None)
 
 
 def _build_paramkv_dll() -> None:
     _build_dll(PARAMKV_SOURCES, (), _assert_defines(PARAMKV_SOURCES), PARAMKV_DLL,
-               TEST_DIR / "alxParamKvStoreTest.def", None)
+               EXPORTS_DIR / "alxParamKvStoreTest.def", None)
 
 
 def _build_mux_dll() -> None:
-    _build_dll(MUX_SOURCES, (), _assert_defines(MUX_SOURCES), MUX_DLL, TEST_DIR / "alxMuxTest.def", None)
+    _build_dll(MUX_SOURCES, (), _assert_defines(MUX_SOURCES), MUX_DLL, EXPORTS_DIR / "alxMuxTest.def", None)
 
 
 def _build_bts_dll() -> None:
-    _build_dll(BTS_SOURCES, (), _assert_defines(BTS_SOURCES), BTS_DLL, TEST_DIR / "alxBts724gTest.def", None)
+    _build_dll(BTS_SOURCES, (), _assert_defines(BTS_SOURCES), BTS_DLL, EXPORTS_DIR / "alxBts724gTest.def", None)
 
 
 def _build_ntc_dll() -> None:
     _build_dll(NTC_SOURCES_STRICT, NTC_SOURCES_CLOSURE,
                _assert_defines(NTC_SOURCES), NTC_DLL,
-               TEST_DIR / "alxNtcTest.def", "ntcClosure")
+               EXPORTS_DIR / "alxNtcTest.def", "ntcClosure")
 
 
 def _build_audioplayer_dll() -> None:
     _build_dll(AUDIOPLAYER_SOURCES_STRICT, AUDIOPLAYER_SOURCES_CLOSURE,
                _assert_defines(AUDIOPLAYER_SOURCES), AUDIOPLAYER_DLL,
-               TEST_DIR / "alxAudioPlayerTest.def", "audioPlayerClosure")
+               EXPORTS_DIR / "alxAudioPlayerTest.def", "audioPlayerClosure")
 
 
 def _build_audio_dll() -> None:
-    _build_dll(AUDIO_SOURCES, (), _assert_defines(AUDIO_SOURCES), AUDIO_DLL, TEST_DIR / "alxAudioTest.def", None)
+    _build_dll(AUDIO_SOURCES, (), _assert_defines(AUDIO_SOURCES), AUDIO_DLL, EXPORTS_DIR / "alxAudioTest.def", None)
 
 
 def _build_pwr_dll() -> None:
-    _build_dll(PWR_SOURCES, (), _assert_defines(PWR_SOURCES), PWR_DLL, TEST_DIR / "alxPwrTest.def", None)
+    _build_dll(PWR_SOURCES, (), _assert_defines(PWR_SOURCES), PWR_DLL, EXPORTS_DIR / "alxPwrTest.def", None)
 
 
 def _build_tempsens_dll() -> None:
     _build_dll(TEMPSENS_SOURCES, (),
                _assert_defines(TEMPSENS_SOURCES),
-               TEMPSENS_DLL, TEST_DIR / "alxTempSensTest.def", None)
+               TEMPSENS_DLL, EXPORTS_DIR / "alxTempSensTest.def", None)
 
 
 def _build_rotsw_dll() -> None:
-    _build_dll(ROTSW_SOURCES, (), _assert_defines(ROTSW_SOURCES), ROTSW_DLL, TEST_DIR / "alxRotSwTest.def", None)
+    _build_dll(ROTSW_SOURCES, (), _assert_defines(ROTSW_SOURCES), ROTSW_DLL, EXPORTS_DIR / "alxRotSwTest.def", None)
 
 
 def _build_linfun_dll() -> None:
-    _build_dll(LINFUN_SOURCES, (), _assert_defines(LINFUN_SOURCES), LINFUN_DLL, TEST_DIR / "alxLinFunTest.def", None)
+    _build_dll(LINFUN_SOURCES, (), _assert_defines(LINFUN_SOURCES), LINFUN_DLL, EXPORTS_DIR / "alxLinFunTest.def", None)
 
 
 def _build_bool_dll() -> None:
-    _build_dll(BOOL_SOURCES, (), _assert_defines(BOOL_SOURCES), BOOL_DLL, TEST_DIR / "alxBoolTest.def", None)
+    _build_dll(BOOL_SOURCES, (), _assert_defines(BOOL_SOURCES), BOOL_DLL, EXPORTS_DIR / "alxBoolTest.def", None)
 
 
 def _build_rtc_dll() -> None:
-    _build_dll(RTC_SOURCES, (), _assert_defines(RTC_SOURCES), RTC_DLL, TEST_DIR / "alxRtcTest.def", None)
+    _build_dll(RTC_SOURCES, (), _assert_defines(RTC_SOURCES), RTC_DLL, EXPORTS_DIR / "alxRtcTest.def", None)
 
 
 def _build_parammgmt_dll() -> None:
     _build_dll(PARAMMGMT_SOURCES_STRICT, PARAMMGMT_SOURCES_CLOSURE,
                [*PARAMMGMT_ASSERT_DEFINES, *_assert_defines(PARAMMGMT_SOURCES_STRICT, PARAMMGMT_SOURCES_CLOSURE)],
-               PARAMMGMT_DLL, TEST_DIR / "alxParamMgmtTest.def", "paramMgmtClosure")
+               PARAMMGMT_DLL, EXPORTS_DIR / "alxParamMgmtTest.def", "paramMgmtClosure")
 
 
 def _build_ina228_dll() -> None:
     _build_dll(INA228_SOURCES_STRICT, INA228_SOURCES_CLOSURE,
                [*INA228_DEFINES, *_assert_defines(INA228_SOURCES_STRICT, INA228_SOURCES_CLOSURE)],
-               INA228_DLL, TEST_DIR / "alxIna228Test.def", "ina228Closure")
+               INA228_DLL, EXPORTS_DIR / "alxIna228Test.def", "ina228Closure")
 
 
 def _build_pi4ioe_dll() -> None:
     _build_dll(PI4IOE_SOURCES_STRICT, PI4IOE_SOURCES_CLOSURE,
                [*PI4IOE_DEFINES, *_assert_defines(PI4IOE_SOURCES_STRICT, PI4IOE_SOURCES_CLOSURE)],
-               PI4IOE_DLL, TEST_DIR / "alxPi4ioe5v6534qTest.def", "pi4ioeClosure")
+               PI4IOE_DLL, EXPORTS_DIR / "alxPi4ioe5v6534qTest.def", "pi4ioeClosure")
 
 
 def _build_id_dll() -> None:
     _build_dll(ID_SOURCES_STRICT, ID_SOURCES_CLOSURE,
                _assert_defines(ID_SOURCES_STRICT, ID_SOURCES_CLOSURE),
-               ID_DLL, TEST_DIR / "alxIdTest.def", "idClosure")
+               ID_DLL, EXPORTS_DIR / "alxIdTest.def", "idClosure")
 
 
 def _build_timsw_dll() -> None:
-    _build_dll(TIMSW_SOURCES, (), _assert_defines(TIMSW_SOURCES), TIMSW_DLL, TEST_DIR / "alxTimSwTest.def", None)
+    _build_dll(TIMSW_SOURCES, (), _assert_defines(TIMSW_SOURCES), TIMSW_DLL, EXPORTS_DIR / "alxTimSwTest.def", None)
 
 
 def _build_assert_weak_dll() -> None:
     _build_dll(ASSERT_WEAK_SOURCES, (), _assert_defines(ASSERT_WEAK_SOURCES), ASSERT_WEAK_DLL,
-               TEST_DIR / "alxAssertWeakTest.def", None)
+               EXPORTS_DIR / "alxAssertWeakTest.def", None)
 
 
 def _build_assert_dll() -> None:
     _build_dll(ASSERT_SOURCES, (), _assert_defines(ASSERT_SOURCES), ASSERT_DLL,
-               TEST_DIR / "alxAssertTest.def", None)
+               EXPORTS_DIR / "alxAssertTest.def", None)
 
 
 def _build_memraw_dll() -> None:
     _build_dll(MEMRAW_SOURCES, (), _assert_defines(MEMRAW_SOURCES), MEMRAW_DLL,
-               TEST_DIR / "alxMemRawTest.def", None)
+               EXPORTS_DIR / "alxMemRawTest.def", None)
 
 
 def _build_memraw_ovr_dll() -> None:
     _build_dll(MEMRAW_OVR_SOURCES, (), _assert_defines(MEMRAW_OVR_SOURCES), MEMRAW_OVR_DLL,
-               TEST_DIR / "alxMemRawOvrTest.def", None)
+               EXPORTS_DIR / "alxMemRawOvrTest.def", None)
 
 
 # The groups as DATA, for anything that must rebuild them without running the suite: the MUTATE

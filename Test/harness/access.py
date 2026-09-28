@@ -1,9 +1,9 @@
-"""Host access harness: ctypes interfaces and test-instance access; builds live in host_build.py."""
+"""Host access harness: ctypes interfaces and test-instance access; builds live in harness/build.py."""
 import ctypes
 from pathlib import Path
 from typing import ClassVar
 
-from host_build import (
+from harness.build import (
     VARIANT_GROUPS,
     _build_variant_dll,
     _needs_build,

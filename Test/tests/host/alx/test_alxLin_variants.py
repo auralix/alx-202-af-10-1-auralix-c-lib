@@ -50,8 +50,8 @@ from pathlib import Path
 
 import pytest
 
-import host_build
-from host_build import (
+import harness.build as host_build
+from harness.build import (
     LIN_SOURCES,
     VARIANTS,
     _variant_defines,
