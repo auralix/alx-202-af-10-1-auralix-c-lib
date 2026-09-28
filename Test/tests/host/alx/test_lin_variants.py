@@ -1,6 +1,6 @@
 """ALX-1553 - the TRACE half of the build variants (Tier 1: configuration, not code).
 
-test_alxFifo_variants.py proved the assert axis and could prove nothing at all about traces:
+test_fifo_variants.py proved the assert axis and could prove nothing at all about traces:
 alxFifo.c and alxBound.c contain ZERO trace call sites, so all four variants of that group differ
 only in their assert form and the ALX_TRACE_LEVEL each one sets is compiled but never reached.
 This file is the other half, on alxLin.c - 23 trace call sites at three levels (16 WRN, 6 DBG,
@@ -216,7 +216,7 @@ def test_ALX1553_P538_a_recorded_trace_names_its_level_and_the_header_it_came_fr
 
     ALX_LIN_FILE is "alxLin.h" while __LINE__ comes from alxLin.c, so a trace reports a file and a
     line that never occur together, exactly as an assertion does. Sealed for assertions in
-    test_alxAssert.py; recorded here because it is the same macro-level defect reached by a
+    test_assert.py; recorded here because it is the same macro-level defect reached by a
     different route, and because it is what makes the level and the function worth checking apart
     from it - those two ARE right.
     """

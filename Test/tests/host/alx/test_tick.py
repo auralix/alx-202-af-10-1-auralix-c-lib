@@ -17,7 +17,7 @@ counts, so P88 can assert the guard rather than assume it.
 Under ALX_ZEPHYR this module is a thin shell over the OS clock and every stepping function is
 compiled away to nothing - not reachable from this build, and not covered here.
 
-These tests were written inside test_alxTimSw.py, the timer being the only thing that used the
+These tests were written inside test_tim_sw.py, the timer being the only thing that used the
 clock. P88 moved here unchanged; P425-P429 are what covering the module itself added.
 
 Proofs (ALX-1553): P88 and P425-P430.

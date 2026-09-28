@@ -159,7 +159,7 @@ def test_ALX1553_P163_the_boolean_filter_changes_strictly_after_its_time(filt):
     A microsecond either way is not a defect and this does not call it one. It is recorded because it
     is exactly the kind of difference that is decided once, silently, by whoever wrote each file, and
     then relied on by someone reading the other one. The matching half is
-    test_alxFiltGlitchUint32.py P163.
+    test_filt_glitch_uint32.py P163.
     """
     flt = filt.boolean(False, RISE_MS, RISE_MS)
     filt.process(flt, True)

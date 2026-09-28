@@ -1012,7 +1012,7 @@ class CanParserLib:
     product ships unless it opts in. The asserts guard byteOffset only, and on the PC a failed
     assert calls abort(), which would take the whole suite down with no report; the same guarantee
     is proved here instead by writing at every LEGAL offset and checking that nothing outside the
-    payload moved (see test_alxCanParser.py P156).
+    payload moved (see test_can_parser.py P156).
     """
 
     BIG = 0
@@ -1082,7 +1082,7 @@ class FiltGlitchLib:
     The filters ask the software timer how long the input has been unstable, and the timer asks the
     tick counter. The tick moves only when ``advance_ms`` is called, so a debounce boundary can be
     approached from both sides exactly - which is the only way to tell ``>`` from ``>=``, and the two
-    filters do not agree on that (see test_alxFiltGlitch.py P163).
+    filters do not agree on that (see test_filt_glitch.py P163).
     """
 
     def __init__(self, dll_path: Path):
@@ -1482,7 +1482,7 @@ class RtcLib:
 
     Every function is free - no object, no clock - so the wrapper is a thin naming layer. The
     conversions are the one thing in the library whose right answer can be computed independently,
-    which is what test_alxRtc_Global.py does with Python's own datetime.
+    which is what test_rtc_global.py does with Python's own datetime.
     """
 
     RESOLUTIONS: ClassVar[dict[str, int]] = {

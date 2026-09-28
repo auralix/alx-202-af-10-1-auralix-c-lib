@@ -87,7 +87,7 @@ def test_ALX1553_P163_the_uint32_filter_changes_at_its_time(filt):
 
     It compares ``stableTime_ms >= me->stableTime_ms``. Its boolean sibling uses a strict
     greater-than and changes one tick later - same library, same purpose, opposite convention, and
-    neither header says which. The matching half is test_alxFiltGlitchBool.py P163.
+    neither header says which. The matching half is test_filt_glitch_bool.py P163.
     """
     flt = filt.uint32(0, 5.0)
     filt.process(flt, 7)

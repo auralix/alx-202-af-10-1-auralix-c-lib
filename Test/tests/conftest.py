@@ -396,7 +396,7 @@ def lin_variant_lib(request) -> tuple[str, LinLib]:
 
     Deliberately NOT wired to ALX_LIN_TEST_DLL. A variant is a statement about what conftest's own
     recipe builds; honouring an externally built override here would let the sanitizer and coverage
-    lanes silently answer a question about a different binary. See test_alxLin_variants.py.
+    lanes silently answer a question about a different binary. See test_lin_variants.py.
     """
     return request.param, _variant_lib("lin", request.param, LinLib)
 

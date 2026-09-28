@@ -12,7 +12,7 @@ One thing this file deliberately does NOT do is call AlxParamItem_SetValToDef on
 alxParamItem.c:1359 leaves valDefPtr NULL for that type and the function then passes it to
 AlxParamItem_SetVal, which memcpys from it - with assertions on that is a null dereference, and it
 took the test process down when I first reached it. A dead process cannot be xfailed. The whole of
-SetValToDef is sealed in test_alxParamItem_reset.py; this file stays on the far side of that line.
+SetValToDef is sealed in test_param_item_reset.py; this file stays on the far side of that line.
 
 Proofs (ALX-1553): P562-P565.
 """

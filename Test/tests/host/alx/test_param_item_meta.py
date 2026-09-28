@@ -1,6 +1,6 @@
 """ALX-1553 - what an AlxParamItem's CONSTRUCTOR recorded, read back through its getters.
 
-test_alxParamItem.py drives one corner of this module: the string conversion a CLI set-param
+test_param_item.py drives one corner of this module: the string conversion a CLI set-param
 reaches. That corner is 25 of the module's 105 functions, and the coverage lane had been reporting
 even those as never executed because the MemSafe group's test list did not name the file. With the
 list corrected the module measures 25 of 105, and the eighty that remain are this file's subject.

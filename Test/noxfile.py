@@ -103,7 +103,7 @@ SYNTAX_NEEDS_CMSIS = {"alxAssert.c", "alxBoot.c", "alxIrq.c"}
 #                                        assertions ELIDED - which is what a module carrying no
 #                                        ALX_CRC_ASSERT_*_ENABLE compiles to - an out-of-range
 #                                        config returns whatever is in r0. THIS MODULE IS BUILT
-#                                        AND TESTED HERE (the MemSafe group, test_alxCrc.py).
+#                                        AND TESTED HERE (the MemSafe group, test_crc.py).
 #   alxRange.c               296        AlxRange_CheckArr is an unimplemented stub: `// TV: TODO`,
 #                                        ALX_RANGE_ASSERT(false), nothing else. The P517 shape and
 #                                        worse - AlxMemRaw at least returned a defined, wrong 0.
@@ -202,7 +202,7 @@ CLI_ASSERTS = host_recipe.CLI_ASSERT_DEFINES
 CLI_CLOSURE = host_recipe.CLI_SOURCES_CLOSURE
 CLI_STRICT = host_recipe.CLI_SOURCES_STRICT
 CLI_EXPORTS = host_recipe.CLI_EXPORTS
-CLI_TESTS = ["test_alxCli.py"]
+CLI_TESTS = ["test_cli.py"]
 
 # MemSafe group: real alxMemSafe/alxCrc/alxParamGroup/alxParamStore over alxMemRawFake.
 # Source membership and assertion policy come from the same recipe as ordinary test builds.
@@ -213,16 +213,16 @@ MS_EXPORTS = host_recipe.MEMSAFE_EXPORTS
 # Every test file that drives THIS group's DLL, which is not the same list as "the tests I was
 # thinking about when I wrote the gate". The four modules below were missing, and because the gate
 # names only alxCrc.c and alxMemSafe.c, nothing complained - the report simply stated that
-# alxParamItem.c was 4.14 % covered and 96 of its 105 functions never ran, while test_alxParamItem.py
+# alxParamItem.c was 4.14 % covered and 96 of its 105 functions never ran, while test_param_item.py
 # sat next to it exercising them. A coverage report that quietly omits a module's tests is worse
 # than no report: it reads as a measurement of the library and is really a measurement of this list.
-MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "test_alxParamStore.py",
-            "test_alxParamStore_groups.py",
-            "test_alxParamItem.py", "test_alxParamItem_meta.py",
-            "test_alxParamItem_enum.py", "test_alxParamItem_buff.py",
-            "test_alxParamItem_kv.py",
-            "test_alxRange.py",
-            "test_alxFtoa.py"]
+MS_TESTS = ["test_crc.py", "test_mem_safe.py", "test_param_group.py", "test_param_store.py",
+            "test_param_store_groups.py",
+            "test_param_item.py", "test_param_item_meta.py",
+            "test_param_item_enum.py", "test_param_item_buff.py",
+            "test_param_item_kv.py",
+            "test_range.py",
+            "test_ftoa.py"]
 
 # The sanitize lane runs the same group with one file held back. alxFtoa.c:110 assigns a double to
 # a `long` - 32 bits here and on the target alike - and a value past 2147483647 is then a conversion
@@ -231,10 +231,10 @@ MS_TESTS = ["test_alxCrc.py", "test_alxMemSafe.py", "test_alxParamGroup.py", "te
 # builds with -fno-sanitize-recover and the process ABORTS rather than failing an assertion.
 # So the file stays in COVERAGE, where it measures the module at 100 %, and waits here for the fix.
 # Drop this list the moment P420 comes off.
-MS_TESTS_UBSAN = [t for t in MS_TESTS if t != "test_alxFtoa.py"]
+MS_TESTS_UBSAN = [t for t in MS_TESTS if t != "test_ftoa.py"]
 
 # The list above is hand-written on purpose, because the thing that decides membership is not the
-# file's NAME - test_alxBound.py drives the general DLL and test_alxParamItem_reset.py drives the
+# file's NAME - test_bound.py drives the general DLL and test_param_item_reset.py drives the
 # per-configuration ones through the `variants` marker, and both are named after a module in this
 # group. Deriving the list from the names looks tidier and is wrong; it was tried.
 #
@@ -286,7 +286,7 @@ ID_ASSERTS = host_recipe._assert_defines(host_recipe.ID_SOURCES_STRICT, host_rec
 ID_CLOSURE = host_recipe.ID_SOURCES_CLOSURE
 ID_STRICT = host_recipe.ID_SOURCES_STRICT
 ID_EXPORTS = host_recipe.ID_EXPORTS
-ID_TESTS = ["test_alxId.py"]
+ID_TESTS = ["test_id.py"]
 
 # Assert group (ALX-1553): the funnel every ALX_*_ASSERT in the library goes through, built TWICE
 # from almost the same list. All three handlers are ALX_WEAK and a strong definition displaces a
@@ -308,7 +308,7 @@ ASSERT_WEAK_SOURCES = host_recipe.ASSERT_WEAK_SOURCES
 ASSERT_WEAK_EXPORTS = host_recipe.ASSERT_WEAK_EXPORTS
 ASSERT_SOURCES = host_recipe.ASSERT_SOURCES
 ASSERT_EXPORTS = host_recipe.ASSERT_EXPORTS
-ASSERT_TESTS = ["test_alxAssert.py"]
+ASSERT_TESTS = ["test_assert.py"]
 
 # MemRaw group (ALX-1553): the raw-memory contract, five ALX_WEAK symbols that no file in the
 # library implements strongly. Two DLLs for the same reason the Assert group has two - once with
@@ -322,7 +322,7 @@ MEMRAW_SOURCES = host_recipe.MEMRAW_SOURCES
 MEMRAW_EXPORTS = host_recipe.MEMRAW_EXPORTS
 MEMRAW_OVR_SOURCES = host_recipe.MEMRAW_OVR_SOURCES
 MEMRAW_OVR_EXPORTS = host_recipe.MEMRAW_OVR_EXPORTS
-MEMRAW_TESTS = ["test_alxMemRaw.py"]
+MEMRAW_TESTS = ["test_mem_raw.py"]
 
 # Neither module is in ANALYSIS_SOURCES, and both were tried. alxMemRaw.c cannot enter it: that
 # list feeds STYLE_FILES too, and the C style gate reports alxMemRaw.c:46 (spaces rather than tabs
@@ -338,7 +338,7 @@ MEMRAW_TESTS = ["test_alxMemRaw.py"]
 # handlers noreturn in alxAssert.h, which changes nothing at c99 or c11. It would do nothing here:
 # ANALYSIS_SOURCES is compiled with no assert defines, so the modules this lane scans have their
 # assertions compiled out and the findings never arise. Its effect is proved instead by
-# test_alxAssert.py P515, which is where a consumer should look before adopting it.
+# test_assert.py P515, which is where a consumer should look before adopting it.
 
 UBSAN = list(hb.UBSAN)                 # the instrumented variants are the library's flag sets: one
 ASAN_UBSAN = list(hb.ASAN_UBSAN)       # definition for every C repository, not a copy per noxfile
@@ -526,10 +526,7 @@ def analyze(session: nox.Session) -> None:
     session.run(PYTHON, "-m", "alx.verify.c_style", *_strs(STYLE_FILES), "--out", str(out / "c_style.txt"))
     # this folder's Python is gated by the SAME profile the library gates its own tests with, so the two
     # repositories cannot drift into two dialects - see alx/verify/ruff_tests.toml for what a test may waive
-    # N999 (module names in snake_case) is ignored until the test modules are renamed from their C
-    # spelling (test_alxFifo.py) to the PEP 8 mirror names; the shared mutation lane must learn the
-    # normalized mirror name first (verification systematization, decision 2b).
-    session.run(PYTHON, "-m", "ruff", "check", "--config", str(lanes.ruff_tests_config()), "--ignore", "N999",
+    session.run(PYTHON, "-m", "ruff", "check", "--config", str(lanes.ruff_tests_config()),
                 str(TEST), "--output-file", str(out / "ruff.txt"))
     session.log("Stage 1: clang-tidy")
     session.run(str(tc.llvm("clang-tidy")), "--quiet", "-p", str(BUILD), *_strs(ANALYSIS_SOURCES), external=True,
@@ -812,6 +809,7 @@ def mutate(session: nox.Session) -> None:
     flags = " ".join(f"-I{d.as_posix()}" for d in INCLUDE_DIRS)
     work = (BUILD / "mutate" / "_tce").as_posix()
     session.run(PYTHON, "-m", "alx.verify.mutation", "--root", str(CLIB), "--tests-dir", "Test/tests/host/alx",
+                "--mirror", "c",
                 "--out", str(BUILD / "mutate"), "--sample", str(args.sample), "--seed", "1514",
                 "--check-cmd", f"{hooks} check {{mutant}} {flags}",
                 "--fingerprint-cmd", f"{hooks} fingerprint {{mutant}} --work {work} {flags}",

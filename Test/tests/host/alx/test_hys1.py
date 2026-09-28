@@ -54,7 +54,7 @@ def test_ALX1553_P171_hys1_starts_in_its_high_state_before_any_sample(math_lib):
     """CHARACTERIZATION: before it has measured anything, this filter already reports HIGH.
 
     ``AlxHys1_Ctor`` sets ``st = AlxHys1_StHigh``, the first value of the enum. Its two-threshold
-    sibling starts in the MIDDLE instead (test_alxHys2.py P171), so two modules of the same family
+    sibling starts in the MIDDLE instead (test_hys2.py P171), so two modules of the same family
     disagree about what "not yet measured" means and neither header says.
 
     It matters more here. A sample inside the dead band cannot move this filter, so a product whose

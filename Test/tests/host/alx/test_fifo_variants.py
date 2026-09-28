@@ -23,7 +23,7 @@ Two honest limits on what this pilot proves.
 
 alxFifo.c and alxBound.c contain ZERO trace call sites, so nothing HERE can observe the trace axis
 at run time - only that all four configurations compile and link. The assert axis is fully
-observable and is what P526 and P527 test. **The trace axis is proved in test_alxLin_variants.py**
+observable and is what P526 and P527 test. **The trace axis is proved in test_lin_variants.py**
 (P532-P539), on alxLin.c's 23 sites at three levels - the module that straddles the one threshold
 these four variants actually cross.
 
@@ -34,7 +34,7 @@ target does is alxAssert's own group (P506-P515).
 
 Cross-reference: every variant records the location as alxFifo.h, never alxFifo.c, because
 ALX_FIFO_FILE is the header while __LINE__ comes from the source. That is P513, sealed in
-test_alxAssert.py across 52 modules; P528 records that it is configuration-independent too.
+test_assert.py across 52 modules; P528 records that it is configuration-independent too.
 
 P531 is the one that shows why this matters beyond the library: a contract this suite
 pinned in 2024 turns out to be reachable only on a build with assertions compiled out.
@@ -63,7 +63,7 @@ WRITE_LEN_ASSERT = "alxFifo.h:191 in AlxFifo_Write"
 def test_ALX1553_P525_the_fifo_contract_is_the_same_in_every_variant(variant_lib):
     """Configuration decides what a broken invariant REPORTS. It must not decide what works.
 
-    The sequence is the one test_alxFifo.py already pins on the default build (P8's partial write
+    The sequence is the one test_fifo.py already pins on the default build (P8's partial write
     and partial read), run again on each configuration. Every call here keeps its precondition, so
     the assert form has nothing to say and the four binaries have to agree exactly.
     """
@@ -145,7 +145,7 @@ def test_ALX1553_P528_the_reported_location_names_the_header_in_every_variant(va
     ALX_FIFO_FILE is "alxFifo.h" and __LINE__ comes from alxFifo.c, so every assertion in the
     library reports a file and a line that never occur together. This records that the defect is in
     the macro rather than in any one build: all three enabled variants name the same wrong file.
-    Sealed in test_alxAssert.py; nothing here fixes it.
+    Sealed in test_assert.py; nothing here fixes it.
     """
     name, lib = variant_lib
     form, _trace, _level = VARIANTS[name]
@@ -167,7 +167,7 @@ def test_ALX1553_P528_the_reported_location_names_the_header_in_every_variant(va
 def test_ALX1553_P531_a_write_longer_than_the_buffer_is_a_violation_not_a_feature(variant_lib):
     """What the configuration decides here is not the behaviour - it is whether the board survives.
 
-    test_alxFifo.py's P8 pins a write of 6 bytes into a 4 byte FIFO as a partial write: four bytes
+    test_fifo.py's P8 pins a write of 6 bytes into a 4 byte FIFO as a partial write: four bytes
     commit and the call returns ErrFull. That is true in all four variants, and it is also a broken
     precondition, because AlxFifo_Write asserts len <= me->buffLen before any of it happens.
 

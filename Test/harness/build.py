@@ -837,7 +837,7 @@ AUDIOPLAYER_SOURCES_STRICT = [
     HELPERS_DIR / "alxAssertPc.c",
 ]
 # alxAudioPlayer.c is CLOSURE, not because its tests are pending - they are in
-# test_alxAudioPlayer.py - but because it does not survive -Wcast-qual: it reads
+# test_audio_player.py - but because it does not survive -Wcast-qual: it reads
 # the track through `*((volatile int16_t*)(me->trackPtr + offset))`, and trackPtr
 # is a const pointer, so every 16-bit read casts the const away. Nothing is
 # written through it, so nothing is undefined; cleaning it up is a LIBRARY change
@@ -2040,7 +2040,7 @@ def _build_variant_dll(group: str, variant: str) -> None:
 
 
 def _fifo_variant_dll(variant: str) -> Path:
-    # Kept as a name of its own because test_alxFifo_variants.py imports it - P529 is a claim about
+    # Kept as a name of its own because test_fifo_variants.py imports it - P529 is a claim about
     # exactly this function.
     return _variant_dll("fifo", variant)
 

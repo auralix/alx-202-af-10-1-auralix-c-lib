@@ -26,7 +26,7 @@
   * runner down, which would leave the suite unable to say anything about this
   * module at all. So the one accessor that evaluates the macro switches the
   * check off for itself and the defect is carried by a strict xfail in
-  * test_alxId.py (P481) instead, where it is named, explained and counted -
+  * test_id.py (P481) instead, where it is named, explained and counted -
   * which is louder than a crash, not quieter.
   *
   * The value is what the constructor is handed as fwBuildDateComp by a product

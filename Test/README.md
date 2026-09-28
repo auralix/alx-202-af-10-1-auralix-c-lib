@@ -47,15 +47,16 @@ A missing tool fails its lane, never skips it.
   library sources, `host/alx/ext/` the `Ext/` sources, `framework/` checks the verification system itself; `conftest.py` owns the
   fixture lifecycle), `harness/` (`build.py` recipes, group declarations and their export lists, `access.py` ctypes access), `host/` (`helpers/`,
   `fakes/`, `checks/` the native check sources), `config/` (`alxConfig.h`, `alxAssert.cfg`) and
-  `build/` (evidence). Test module names keep the C module spelling (`test_alxFifo.py`) until the shared mutation lane learns the
-  normalized mirror name.
+  `build/` (evidence). Test module names are PEP 8: the module prefix is the folder and the rest is snake_case
+  (`alxFifo.c` -> `host/alx/test_fifo.py`, `Ext/alxIna228.c` -> `host/alx/ext/test_ina228.py`), the mirror the
+  mutation lane follows with `--mirror c`.
 - The groups, one DLL each, declared in `harness/build.py`:
 	- `alxFifoTest` - the FIFO and the bounds helper it uses
 	- `alxCliTest` - the CLI over a faked serial port and KV store
 	- `alxMemSafeTest` - the safe-store chain (CRC, MemSafe, ParamGroup, ParamStore) over a faked raw
 	  memory, the parameter item's string format conversion, the bound check every parameter
 	  passes, and the float-to-text the command line answers with. Seven modules, seven test
-	  files - `test_alxRange.py` and `test_alxFtoa.py` among them
+	  files - `test_range.py` and `test_ftoa.py` among them
 	- `alxVdivTest` - a resistive divider's arithmetic; the smallest group here and the shape a pure
 	  module should copy
 	- `alxTimSwTest` - the software timer over the real tick counter, with the interrupt lock
@@ -71,7 +72,7 @@ A missing tool fails its lane, never skips it.
 	- `alxLinFunTest` - the x-to-y mappings: a line through two points, in float and in
 	  integer, a lookup table interpolated between its points, and the audio volume that is
 	  built on the line - percent to decibels to an amplitude factor. Three modules, three
-	  test files: `test_alxLinFun.py`, `test_alxInterpLin.py`, `test_alxAudioVol.py`
+	  test files: `test_lin_fun.py`, `test_interp_lin.py`, `test_audio_vol.py`
 	- `alxRotSwTest` - the rotary switch: a few IO pins read together and composed into a
 	  number, over the library's own IO pin fake
 	- `alxTempSensTest` - the RTD temperature sensor: two converter channels, a divider and a
@@ -179,7 +180,7 @@ A missing tool fails its lane, never skips it.
 	- `Test/tests/conftest.py` (fixture lifetime)
 	- `Test/harness/access.py` (ctypes access and observations)
 	- `Test/noxfile.py` -> `test`
-	- `Test/tests/host/alx/test_alx<Module>.py` -> `Test/tests/host/alx/test_alxFifo.py`
+	- `Test/tests/host/alx/test_<module>.py` -> `Test/tests/host/alx/test_fifo.py`
 	- `Test/host/helpers/alx<Module>TestHelpers.c` -> `Test/host/helpers/alxFifoTestHelpers.c`
 	- `Test/harness/build.py` `<GROUP>_EXPORTS` -> `FIFO_EXPORTS` (the DLL's export list)
 	- `Test/host/fakes/alx<FakedModule>Fake.c` -> `Test/host/fakes/alxSerialPortFake.c`
@@ -214,7 +215,7 @@ A missing tool fails its lane, never skips it.
 #### SANITIZE
 - **Tools**
 	- clang-cl ASan + UBSan `-fsanitize=address,undefined` -> Stage 1 = `alx<Module>SanSmoke.exe` -> `alxFifoSanSmoke.exe`
-	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alx<Module>Test.dll` & pytest `test_alx<Module>.py`, one stage per test group (asserts ON, as shipped) -> `alxFifoTest.dll` & `test_alxFifo.py`
+	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alx<Module>Test.dll` & pytest `test_<module>.py`, one stage per test group (asserts ON, as shipped) -> `alxFifoTest.dll` & `test_fifo.py`
 - **Files - Code**
 	- `Test/noxfile.py` -> `sanitize`
 	- `Test/host/checks/alx<Module>SanSmoke.c` -> `Test/host/checks/alxFifoSanSmoke.c`
@@ -299,7 +300,8 @@ A missing tool fails its lane, never skips it.
 - Mutation (report-only): `alx.verify.mutation` drives it (`uv run nox -s mutate -- alx<Module>.c`):
   universalmutator mutants of the source, `-fsyntax-only` check and object-code fingerprint (TCE) as the
   C hooks, each mutant planted, the stale test DLL rebuilt under `-Werror` (failure = KILLED_COMPILE), the
-  source's MIRROR test module `test_alx<Module>.py` run (`-x`, fixed order), source restored (crash-safe
+  source's MIRROR test module and its family run (`--mirror c`: `alxFifo.c` -> `test_fifo.py` and
+  `test_fifo_<subject>.py`; `-x`, fixed order), source restored (crash-safe
   backup). Survivors -> `build/mutate/survivors/*.diff`; a real hole gets a killing test (P-group
   "mutation-driven hardening"), an equivalent mutant gets a note. 100 % is not the target.
 
@@ -321,7 +323,7 @@ A missing tool fails its lane, never skips it.
 ```
 alxFooTestHelpers.c     opaque-handle New/Delete + status-enum getters
 FOO_EXPORTS             DLL exports, in harness/build.py; the build writes build/alxFooTest.def
-test_alxFoo.py          tests; file = module-scoped, functions = task-scoped: test_<KEY>_P<n>_<what>
+test_foo.py             tests; file = module-scoped, functions = task-scoped: test_<KEY>_P<n>_<what>
 alxBarFake.c            Tier-2 link-time fake - named by the FAKED module (Bar), never by the
                         module under test -> alxSerialPortFake.c
 ```
@@ -348,7 +350,7 @@ are recorded in the test that met them rather than worked around silently.
   clang follows on Windows start a new allocation unit per declared type, so the union is 4 bytes
   instead of 2. Any driver that derives an I2C or SPI length from `sizeof` of such an overlay cannot
   be tested here at that register. Counted on the INA driver: 11 of its 17 INA238 overlays are the
-  wrong size on this host, and none are on the target. `test_alxIna228.py` P225 records it.
+  wrong size on this host, and none are on the target. `test_ina228.py` P225 records it.
 
   What CAN be done here is check the target's answer without a target. A file of static assertions
   over `sizeof` of each overlay, compiled by ANALYZE stage 4 with arm-gcc and never linked, turns a

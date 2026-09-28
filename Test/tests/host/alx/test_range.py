@@ -2,13 +2,13 @@
 
 A small module that the parameter path leans on and that nothing tested.
 
-AlxRange_Check<Type>(val, valMin, valMax) is THE bound check. test_alxParamItem P71 showed from
+AlxRange_Check<Type>(val, valMin, valMax) is THE bound check. test_param_item P71 showed from
 above that it works, and that the defects there sit in the conversion in front of it; these tests
 say the same thing from below, per type and at the edges, so a future change to the check cannot
 hide behind the conversion's behaviour.
 
 `alxFtoa` was tested here too, the two being the small pure things that path leans on. Those tests
-now live in `test_alxFtoa.py`, so each module has the mirror file the README asks for; P78 moved
+now live in `test_ftoa.py`, so each module has the mirror file the README asks for; P78 moved
 unchanged, and a second pass over the module added five more proofs and two sealed defects.
 
 Test group P75-P77 = ALX-1553 range proofs.

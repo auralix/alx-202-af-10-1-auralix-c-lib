@@ -36,7 +36,7 @@ valDefPtr is left NULL and the line above then passes NULL to AlxParamItem_SetVa
 from it. With assertions ON that is a null dereference - it took the test process down when I first
 reached it, and no xfail can catch a process that dies. With assertions OFF the whole line is gone,
 so it is merely the no-op this file seals. Either way calling SetValToDef on an Arr item is never
-correct, so it is written down rather than run. test_alxParamItem_buff.py covers everything else
+correct, so it is written down rather than run. test_param_item_buff.py covers everything else
 those two types can do.
 
 Proofs (ALX-1553): P560-P561.

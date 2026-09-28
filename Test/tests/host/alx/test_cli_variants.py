@@ -9,7 +9,7 @@ no parameters, so the preprocessor deletes the argument - and the write with it.
 WRITE. Every reply the CLI makes goes through one of those lines, so the whole interface falls
 silent while every function still returns normally.
 
-Measured on `help`, the same command test_alxCli.py drives:
+Measured on `help`, the same command test_cli.py drives:
 
     default        ASSERT_RST      751 bytes
     debug          ASSERT_BKPT     751 bytes

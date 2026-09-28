@@ -20,7 +20,7 @@ that is the thing to hold on to while reading anything here. It is NOT how the m
 that define the module's own macro is `do{} while (false)` and DISCARDS the expression, so a product
 that forgets its override gets Alx_Ok, an untouched buffer and no diagnostic at all - and even with
 the define the net needs a second, independent opt-in, because the library's own AlxAssert_Rst is an
-empty body that returns (test_alxAssert.py P507). Two product-side decisions have to both go right
+empty body that returns (test_assert.py P507). Two product-side decisions have to both go right
 before a forgotten override produces any symptom at all.
 
 Sealed defects: P516, P517, P518.
@@ -116,7 +116,7 @@ def test_ALX1553_P516_the_constructor_sets_the_two_fields_its_header_declares(me
     "and decides from the result which of two stored copies of the product's parameters is valid. "
     "The assertion is not the safety net it looks like either: the module ships with no "
     "ALX_MEM_RAW_ASSERT_*_ENABLE defined, which makes the macro do{} while (false), and even with it "
-    "defined the library's own AlxAssert_Rst returns (test_alxAssert.py P507). A stub that cannot "
+    "defined the library's own AlxAssert_Rst returns (test_assert.py P507). A stub that cannot "
     "work should say so in its status - Alx_Err costs nothing and every caller already checks for "
     "it. The fix is one character per function"))
 @pytest.mark.expect_assert(
@@ -200,7 +200,7 @@ def test_ALX1553_P519_the_recorded_file_and_the_recorded_line_come_from_differen
     plausible line for the wrong function. Write's lands on line 120 of a header that is 113 lines
     long, which is the honest case, because nothing is there to mislead anyone.
 
-    Recorded here, sealed in test_alxAssert.py P513. It is a library-wide convention rather than
+    Recorded here, sealed in test_assert.py P513. It is a library-wide convention rather than
     this module's defect - all 91 ALX_*_FILE constants name a .h and none names a .c - so the group
     that owns the mechanism owns the seal, and this test's job is to show what it costs one module.
     The four strings are written out rather than derived, so moving a line in alxMemRaw.c makes this

@@ -66,7 +66,7 @@ def test_ALX1553_P171_hys2_starts_in_its_middle_state_before_any_sample(math_lib
 
     ``AlxHys2_Ctor`` sets ``st = AlxHys2_StMid``. Both choices are natural seen from inside their own
     file - the first enum value, and the neutral one - and together they are a trap. The matching
-    half is test_alxHys1.py P171, which is also where it matters more.
+    half is test_hys1.py P171, which is also where it matters more.
     """
     hys = math_lib.hys2(TOP_HIGH, TOP_LOW, BOT_HIGH, BOT_LOW)
     assert math_lib.hys2_process(hys, (TOP_HIGH + BOT_LOW) / 2) == math_lib.HYS2_MID
