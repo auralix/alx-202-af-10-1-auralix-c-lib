@@ -11,11 +11,11 @@ TEST_DIR = Path(__file__).resolve().parent.parent   # Test/, the verification ro
 CLIB_DIR = TEST_DIR.parent
 BUILD_DIR = TEST_DIR / "build"
 CONFIG_DIR = TEST_DIR / "config"
-NATIVE_DIR = TEST_DIR / "native"
-HELPERS_DIR = NATIVE_DIR / "helpers"
-FAKES_DIR = NATIVE_DIR / "fakes"
-EXPORTS_DIR = NATIVE_DIR / "exports"
-CHECKS_DIR = NATIVE_DIR / "checks"
+HOST_DIR = TEST_DIR / "host"
+HELPERS_DIR = HOST_DIR / "helpers"
+FAKES_DIR = HOST_DIR / "fakes"
+EXPORTS_DIR = HOST_DIR / "exports"
+CHECKS_DIR = HOST_DIR / "checks"
 
 FIFO_SOURCES = [
     CLIB_DIR / "alxFifo.c",

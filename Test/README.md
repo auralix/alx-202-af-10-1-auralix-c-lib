@@ -14,7 +14,7 @@ inventories and per-group lists belong to the Jira task and its Task folder note
 | Verification Runner | Select stages, configure processes, propagate failures | `noxfile.py` |
 | Host Test Application | Check library behavior through DLLs and fakes | `tests/`, pytest fixtures in `tests/conftest.py` |
 | Native Check Application | Run checks that need their own native process | sanitizer smoke executables |
-| Test Harness | Declare builds and expose callable host interfaces | `harness/build.py`, `harness/access.py`, `native/` helpers and fakes |
+| Test Harness | Declare builds and expose callable host interfaces | `harness/build.py`, `harness/access.py`, `host/` helpers and fakes |
 | Shared Mechanisms | Tool execution, build recipes, evidence helpers | Python library `alx` package |
 | Build and Evidence Store | Keep outputs separate by stage and configuration | `build/` |
 
@@ -45,7 +45,7 @@ A missing tool fails its lane, never skips it.
 
 - `Test/` = the verification root, with the same entries as every Auralix repository: `tests/` (the checks: `host/alx/` mirrors the
   library sources, `host/alx/ext/` the `Ext/` sources, `framework/` checks the verification system itself; `conftest.py` owns the
-  fixture lifecycle), `harness/` (`build.py` recipes and group declarations, `access.py` ctypes access), `native/` (`helpers/`,
+  fixture lifecycle), `harness/` (`build.py` recipes and group declarations, `access.py` ctypes access), `host/` (`helpers/`,
   `fakes/`, `exports/` the DLL export files, `checks/` the native check sources), `config/` (`alxConfig.h`, `alxAssert.cfg`) and
   `build/` (evidence). Test module names keep the C module spelling (`test_alxFifo.py`) until the shared mutation lane learns the
   normalized mirror name.
@@ -180,10 +180,10 @@ A missing tool fails its lane, never skips it.
 	- `Test/harness/access.py` (ctypes access and observations)
 	- `Test/noxfile.py` -> `test`
 	- `Test/tests/host/alx/test_alx<Module>.py` -> `Test/tests/host/alx/test_alxFifo.py`
-	- `Test/native/helpers/alx<Module>TestHelpers.c` -> `Test/native/helpers/alxFifoTestHelpers.c`
-	- `Test/native/exports/alx<Module>Test.def` -> `Test/native/exports/alxFifoTest.def`
-	- `Test/native/fakes/alx<FakedModule>Fake.c` -> `Test/native/fakes/alxSerialPortFake.c`
-	- `Test/native/checks/alx<Module>RegSizeCheck.c` -> `Test/native/checks/alxIna228RegSizeCheck.c` (target-only)
+	- `Test/host/helpers/alx<Module>TestHelpers.c` -> `Test/host/helpers/alxFifoTestHelpers.c`
+	- `Test/host/exports/alx<Module>Test.def` -> `Test/host/exports/alxFifoTest.def`
+	- `Test/host/fakes/alx<FakedModule>Fake.c` -> `Test/host/fakes/alxSerialPortFake.c`
+	- `Test/host/checks/alx<Module>RegSizeCheck.c` -> `Test/host/checks/alxIna228RegSizeCheck.c` (target-only)
 - **Files - Generated**
 	- `Test/build/pytest_report.xml`
 	- `Test/build/pytest_report.html`
@@ -216,7 +216,7 @@ A missing tool fails its lane, never skips it.
 	- clang-cl UBSan `-fsanitize=undefined` -> Stage 2 = `alx<Module>Test.dll` & pytest `test_alx<Module>.py`, one stage per test group (asserts ON, as shipped) -> `alxFifoTest.dll` & `test_alxFifo.py`
 - **Files - Code**
 	- `Test/noxfile.py` -> `sanitize`
-	- `Test/native/checks/alx<Module>SanSmoke.c` -> `Test/native/checks/alxFifoSanSmoke.c`
+	- `Test/host/checks/alx<Module>SanSmoke.c` -> `Test/host/checks/alxFifoSanSmoke.c`
 - **Files - Generated**
 	- `Test/build/sanitize/asan/alx<Module>SanSmoke.exe` -> `Test/build/sanitize/asan/alxFifoSanSmoke.exe`
 	- `Test/build/sanitize/asan/clang_rt.asan_dynamic-x86_64.dll`

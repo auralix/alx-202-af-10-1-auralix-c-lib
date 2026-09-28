@@ -33,11 +33,11 @@ TEST = Path(__file__).resolve().parent
 CLIB = TEST.parent
 BUILD = TEST / "build"
 CONFIG = TEST / "config"
-NATIVE = TEST / "native"
-HELPERS = NATIVE / "helpers"
-FAKES = NATIVE / "fakes"
-EXPORTS = NATIVE / "exports"
-CHECKS = NATIVE / "checks"
+HOST = TEST / "host"
+HELPERS = HOST / "helpers"
+FAKES = HOST / "fakes"
+EXPORTS = HOST / "exports"
+CHECKS = HOST / "checks"
 PYTHON = sys.executable
 tc = hb.Toolchain()   # where the tools are on THIS machine (ALX_* variables), and the vcvars environment
 sys.path.insert(0, str(TEST))
@@ -184,7 +184,7 @@ def _library_style_files() -> list:
     return found
 
 
-STYLE_FILES = [*_library_style_files(), *sorted(NATIVE.rglob("*.c"))]
+STYLE_FILES = [*_library_style_files(), *sorted(HOST.rglob("*.c"))]
 # Target-only translation units: compiled by ANALYZE stage 4 with arm-gcc, never linked, one compile
 # per part variant. (source, variants to compile it under).
 LAYOUT_CHECKS = [(CHECKS / "alxIna228RegSizeCheck.c", ["ALX_INA238", "ALX_INA228"])]
