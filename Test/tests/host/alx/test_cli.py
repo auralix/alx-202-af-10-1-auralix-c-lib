@@ -379,3 +379,28 @@ def test_ALX1564_P178_ordinary_strings_round_trip_through_json(make_cli, pretty,
     response = as_json(cmd(cli, command + b"\r", handles=4))
     assert response["status"] == "success"
     assert response["data"]["STR_TEST"] == value.decode()
+
+
+@pytest.mark.parametrize("line", [
+    pytest.param(b"set-param --key NO_SUCH_KEY --val 1", id="unknown_key"),
+    pytest.param(b"set-param --key UINT8_TEST", id="missing_value"),
+    pytest.param(b"set-param --key UINT8_TEST --val word", id="invalid_integer"),
+    pytest.param(b"set-param --key PRETTY_JSON_EN --val word", id="invalid_bool"),
+    pytest.param(b"set-param --val 1", id="missing_key"),
+    pytest.param(b"set-param --key UINT8_TEST --val 200", id="out_of_range"),
+    pytest.param(b"unknown-command", id="unknown_command"),
+])
+def test_ALX1564_P340_a_rejected_command_keeps_every_parameter_and_the_cli_recovers(make_cli, line):
+    """A rejected command leaves every parameter as it was, and the next command is taken.
+
+    The library-level half of what a consumer proves through its own store and table: the command
+    line is this library's, so what a rejection leaves behind is this suite's to prove.
+    """
+    cli = make_cli()
+    assert SUCCESS_MARK in set_param(cli, b"STR_TEST", b"edited")
+    assert SUCCESS_MARK in set_param(cli, b"UINT8_TEST", b"42")
+    before = as_json(cmd(cli, b"get-param\r", handles=4))["data"]
+    assert as_json(cmd(cli, line + b"\r", handles=4))["status"] == "error"
+    assert as_json(cmd(cli, b"get-param\r", handles=4))["data"] == before
+    assert SUCCESS_MARK in set_param(cli, b"UINT8_TEST", b"43")
+    assert as_json(cmd(cli, b"get-param\r", handles=4))["data"]["UINT8_TEST"] == 43
