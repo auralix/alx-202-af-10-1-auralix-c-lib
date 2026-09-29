@@ -670,11 +670,11 @@ def analyze(session: nox.Session) -> None:
 
 @nox.session
 def sanitize(session: nox.Session) -> None:
-    """SANITIZE: 1 native ASan+UBSan smoke exe (diagnostics), 2 UBSan DLL per test group under its suite."""
+    """SANITIZE: 1 host ASan+UBSan smoke exe (diagnostics), 2 UBSan DLL per test group under its suite."""
     _guard(session, _check_ms_tests)
     _fresh_dev_build(session)
     asan, ubsan = lanes.evidence_dir(TEST, "sanitize", "asan"), lanes.evidence_dir(TEST, "sanitize", "ubsan")
-    session.log("Stage 1: native ASan+UBSan smoke exe")
+    session.log("Stage 1: host ASan+UBSan smoke exe")
     _clang_cl(session, *GNU99, *ASAN_UBSAN, "/Z7", "/MT", *CL_INCLUDES,
               str(CLIB / "alxFifo.c"), str(CLIB / "alxBound.c"), str(CHECKS / "alxFifoSanSmoke.c"),
               f"/Fe:{asan / 'alxFifoSanSmoke.exe'}", f"/Fo{asan}\\")

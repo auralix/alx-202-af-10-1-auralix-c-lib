@@ -4,7 +4,7 @@
   * @brief		Auralix C Library - ALX FIFO Module - ASan+UBSan smoke runner
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
-  * Native exe built with /fsanitize=address. Exercises the memory-risky paths
+  * Host exe built with /fsanitize=address. Exercises the memory-risky paths
   * of AlxFifo_ReadStrUntil/ReadStrUntilAny with EXACTLY-sized heap buffers
   * (both the FIFO buffer and the str destination), at every rotation of the
   * circular buffer - any out-of-bounds read/write of even one byte trips an
