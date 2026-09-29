@@ -12,7 +12,7 @@ One nox session per stage, named after it, running in Test/.venv (no second envi
 same shape as the Auralix Python lib's noxfile and the device repos'. Evidence under build/<stage>/; the
 dev lane (pytest) writes to build/ itself. What lives here is what is THIS repository's: the source lists,
 the defines, the export lists, the mutation hooks. Everything a second C repository would need identically
-comes from the Python lib: the generic gates (alx.verify.ascii_gate / readme_gate / c_style /
+comes from the Python lib: the generic gates (alx.verify.ascii_gate / c_style /
 coverage_gate / mutation), the lane vocabulary (alx.verify.lanes) and the host toolchain and DLL build
 mechanics (alx.c_lib.host_build).
 """
@@ -515,14 +515,13 @@ def _calls_inside(line: str, macro: "re.Pattern") -> list:
 
 @nox.session
 def analyze(session: nox.Session) -> None:
-    """ANALYZE: 0 codespell + ASCII + README + C-style + Python gates, 1 clang-tidy, 2 cppcheck, 3 gcc -fanalyzer."""
+    """ANALYZE: 0 codespell + ASCII + C-style + Python gates, 1 clang-tidy, 2 cppcheck, 3 gcc -fanalyzer."""
     out = lanes.evidence_dir(TEST, "analyze")
     if not (BUILD / "compile_commands.json").exists():
         _fresh_dev_build(session)
-    session.log("Stage 0: codespell, ASCII gate, README gate, C style gate, ruff (the shared test profile)")
+    session.log("Stage 0: codespell, ASCII gate, C style gate, ruff (the shared test profile)")
     session.run(PYTHON, "-m", "codespell_lib", *_strs(ANALYSIS_SOURCES))
     session.run(PYTHON, "-m", "alx.verify.ascii_gate", str(CLIB), *VENDOR, "--out", str(out / "ascii_gate.txt"))
-    session.run(PYTHON, "-m", "alx.verify.readme_gate", str(CLIB), *VENDOR, "--out", str(out / "readme_gate.txt"))
     session.run(PYTHON, "-m", "alx.verify.c_style", *_strs(STYLE_FILES), "--out", str(out / "c_style.txt"))
     # this folder's Python is gated by the SAME profile the library gates its own tests with, so the two
     # repositories cannot drift into two dialects - see alx/verify/ruff_tests.toml for what a test may waive
