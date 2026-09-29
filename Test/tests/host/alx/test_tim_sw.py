@@ -12,7 +12,7 @@ itself is at 500 and not at 499 or 501.
 The interrupt lock IS faked, because the real one is CMSIS intrinsics that do not exist on a PC.
 The fake counts, so a test can assert that the timer takes the lock around the shared 64 bit tick
 rather than assuming it - that proof is P88, and it moved to `test_tick.py` with the rest of the
-clock's own tests, so each module has the mirror file the README asks for.
+clock's own tests, so each module has the mirror file the naming convention asks for.
 
 Test group P84-P87 = ALX-1553 software timer proofs.
 """

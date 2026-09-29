@@ -6,7 +6,7 @@ many points somebody measured on a bench.
 
 These tests were written with `alxLinFun`'s, in one file, because the two modules are the library's
 two ways of doing the same job and share a DLL. They are split out here so the module has the
-mirror file the README's convention asks for and the mutation lane resolves - which is why the
+mirror file the naming convention asks for and the mutation lane resolves - which is why the
 proof tokens are not contiguous: P183-P187 are that earlier work, moved unchanged, and P409-P411
 are what a second pass over the module added.
 

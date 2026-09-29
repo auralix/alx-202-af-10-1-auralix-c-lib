@@ -4,7 +4,7 @@
 float parameter on every device built on this library, and the bytes that end up in a client's JSON.
 
 These tests were written with `alxRange`'s, in one file, because the two are the small pure things
-the parameter path leans on. They are split out here so the module has the mirror file the README's
+the parameter path leans on. They are split out here so the module has the mirror file the naming
 convention asks for and the mutation lane resolves, which is why the proof tokens are not
 contiguous: P78 is that earlier work, moved unchanged, and P420-P424 are what a second pass added.
 

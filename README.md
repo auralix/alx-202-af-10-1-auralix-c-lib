@@ -7,4 +7,4 @@
 ## Links
 - [Auralix C/C++ Library CLI Design Specifications](Doc/AuralixCCppLibCliDesSpec/AuralixCCppLibCliDesSpec.md)
 - [Auralix C/C++ Library Trace How-To Guide](Doc/AuralixCCppLibTraceHowToGuide/AuralixCCppLibTraceHowToGuide.md)
-- [Auralix C/C++ Library Test Specifications](Test/README.md)
+- [Auralix C Library Verification System Stack](https://github.com/auralix/alx-202-af-30-auralix-c-lib-wiki/blob/master/Doc/AuralixCLibDoc.md#c-library-verification-system-stack)

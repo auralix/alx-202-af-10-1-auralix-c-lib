@@ -16,7 +16,7 @@ the whole reason a test suite is worth writing before someone needs the module.
 
 `alxInterpLin` was tested here too, the two modules being the library's two ways of doing the same
 job over one DLL. Those tests now live in `test_interp_lin.py`, so each module has the mirror file
-the README asks for; they moved unchanged, tokens and all.
+the naming convention asks for; they moved unchanged, tokens and all.
 
 Test group P179-P182 = ALX-1553 mapping proofs.
 """

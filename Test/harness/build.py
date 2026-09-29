@@ -924,7 +924,7 @@ NTC_EXPORTS = Exports("alxNtcTest", (
 # declares its OUTPUT parameter `const char*` and then sprintf()s into it, which
 # clang rejects under -Werror as discarding qualifiers. It is a library change
 # in somebody else's module, so it is recorded as TODO A18 rather than fixed
-# here - and it means nothing in that file is warning-checked (see README).
+# here - and it means nothing in that file is warning-checked (see the C Library Verification System Stack).
 FSSAFE_SOURCES_STRICT = [
     CLIB_DIR / "alxCrc.c",
     HELPERS_DIR / "alxFsSafeTestHelpers.c",

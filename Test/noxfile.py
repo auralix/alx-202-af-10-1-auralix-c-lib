@@ -1,4 +1,4 @@
-"""Auralix C Library - the verification lanes (the process is in Test/README.md).
+"""Auralix C Library - the verification lanes (described in the wiki: C Library Verification System Stack).
 
 Run from Test/ inside its uv environment (`uv sync --locked` once):
 
