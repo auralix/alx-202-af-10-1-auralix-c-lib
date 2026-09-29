@@ -39,8 +39,8 @@ FAKES = HOST / "fakes"
 CHECKS = HOST / "checks"
 PYTHON = sys.executable
 tc = hb.Toolchain()   # where the tools are on THIS machine (ALX_* variables), and the vcvars environment
-sys.path.insert(0, str(TEST))
-# repository build recipes and DLL_GROUPS; no pytest lifecycle dependency
+# repository build recipes and DLL_GROUPS; no pytest lifecycle dependency; harness is installed
+# into this project's environment (pyproject.toml, [build-system])
 from harness import build as host_recipe  # noqa: E402
 
 nox.options.default_venv_backend = "none"
@@ -805,5 +805,5 @@ def mutate(session: nox.Session) -> None:
                 "--out", str(BUILD / "mutate"), "--sample", str(args.sample), "--seed", "1514",
                 "--check-cmd", f"{hooks} check {{mutant}} {flags}",
                 "--fingerprint-cmd", f"{hooks} fingerprint {{mutant}} --work {work} {flags}",
-                "--rebuild-cmd", f"{hooks} rebuild --groups harness.build:DLL_GROUPS --sys-path Test",
+                "--rebuild-cmd", f"{hooks} rebuild --groups harness.build:DLL_GROUPS",
                 *args.sources)

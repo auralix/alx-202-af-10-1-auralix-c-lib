@@ -22,10 +22,20 @@ dependencies = [
     "nox>=2024",                             # the lane runner (Test/noxfile.py, one session per stage)
 ]
 
+
+[build-system]
+# The verification project is installed into its own environment (uv installs a project that
+# declares a build system, editable by default), so `harness` imports the same way from pytest,
+# the `nox` command, `python -m nox` and the mutation hooks, without a sys.path edit.
+requires = ["setuptools>=64"]   # 64: the PEP 660 editable-install hooks
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["harness"]
+
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["tests"]
-pythonpath = ["."]   # Test/, the verification root: tests import harness
 # no test may hang the run (C infinite loop / stuck serial read) - generous global guard,
 # per-test overrides via @pytest.mark.timeout(n)
 timeout = 120

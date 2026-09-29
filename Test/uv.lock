@@ -17,7 +17,7 @@ dependencies = [
 [[package]]
 name = "alx-c-lib-tests"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "alx-202-2-af-1-auralix-py-lib" },
     { name = "codespell" },
