@@ -102,7 +102,7 @@ static void AlxIoPinFake_Drive(AlxIoPin* me, bool val)
 	alxIoPinFake_level[slot] = val;
 	alxIoPinFake_writeCount[slot]++;
 
-	#if defined(ALX_STM32)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
 	// And into the port's OUTPUT DATA REGISTER, because a product may read some pins straight
 	// out of it rather than through AlxIoPin_Read. Only an OUTPUT writes ODR, which is the
 	// hardware's own rule and not a simplification: a pin in GPIO_MODE_INPUT has its output
@@ -184,7 +184,7 @@ uint32_t AlxIoPinFake_WriteCount(const AlxIoPin* me)
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
-#if defined(ALX_STM32)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,

@@ -133,7 +133,12 @@ RETURN_TYPE_PENDING = {"alxCrc.c", "alxRange.c",
 # These three are compiled only by a product that selects a driver, so the set is a fact about this
 # repository, not a defect. It is asserted in BOTH directions: a fourth module going quiet is a
 # regression, and one of these three coming back to life means the set is stale.
-SYNTAX_EMPTY_TU = {"alxBuild.c", "alxNet.c", "alxSocket.c"}
+#
+# The fakes of four MCU modules join them for the same reason: their only function is the
+# module's constructor, which exists under the module header's family guard, so without a family
+# they are empty too. They are compiled for real by a consumer that selects a family.
+SYNTAX_EMPTY_TU = {"alxBuild.c", "alxNet.c", "alxSocket.c",
+                   "alxDacFake.c", "alxIoPinIrqFake.c", "alxRtcFake.c", "alxSpiFake.c"}
 
 # Stage 5c asks the question P567 answered the hard way: does any assertion DO the work?
 #

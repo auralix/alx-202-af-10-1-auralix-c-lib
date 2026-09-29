@@ -225,6 +225,13 @@ const char* AlxFsFake_LastOpenMode(void)
 //******************************************************************************
 // The faked module
 //******************************************************************************
+void AlxFs_Ctor(AlxFs* me, AlxFs_Config config, AlxMmc* alxMmc, AlxUsb* alxUsb, AlxIoPin* do_DBG_ReadBlock, AlxIoPin* do_DBG_WriteBlock, AlxIoPin* do_DBG_EraseBlock, AlxIoPin* do_DBG_SyncBlock)
+{
+	// The files are the fake's, not the object's, so a constructor has nothing to keep.
+	(void)me; (void)config; (void)alxMmc; (void)alxUsb;
+	(void)do_DBG_ReadBlock; (void)do_DBG_WriteBlock; (void)do_DBG_EraseBlock; (void)do_DBG_SyncBlock;
+}
+
 Alx_Status AlxFs_Mount(AlxFs* me)
 {
 	(void)me;

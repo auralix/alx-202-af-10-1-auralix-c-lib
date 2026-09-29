@@ -134,7 +134,7 @@ void AlxCanFake_SetErr(const AlxCan* me, bool isErr)
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
-#if defined(ALX_STM32)
+#if ((defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)) && defined(HAL_CAN_MODULE_ENABLED)) || (defined(ALX_STM32G4) && defined(HAL_FDCAN_MODULE_ENABLED))
 void AlxCan_Ctor
 (
 	AlxCan* me,

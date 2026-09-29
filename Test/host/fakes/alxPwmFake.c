@@ -87,7 +87,7 @@ uint32_t AlxPwmFake_WriteCount(const AlxPwm* me, uint32_t ch)
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
-#if defined(ALX_STM32)
+#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 void AlxPwm_Ctor
 (
 	AlxPwm* me,

@@ -21,6 +21,10 @@
   * they were the last two of alxParamItem's 105 functions no test had called
   * (ALX-1553). Both assert paramKvStore != NULL, so a stand-in is the only way
   * in on a PC.
+  *
+  * A consumer that links its product's parameter table over this fake arms it
+  * after every reset and gets a store sized for such a table: a few hundred
+  * keys, and a value as long as a string parameter.
   ******************************************************************************
   **/
 
@@ -28,9 +32,9 @@
 
 #include "alxParamKvStore.h"
 
-#define ALX_PARAM_KV_STORE_FAKE_ENTRIES 16
-#define ALX_PARAM_KV_STORE_FAKE_KEY_LEN 48
-#define ALX_PARAM_KV_STORE_FAKE_VAL_LEN 64
+#define ALX_PARAM_KV_STORE_FAKE_ENTRIES 256
+#define ALX_PARAM_KV_STORE_FAKE_KEY_LEN 64
+#define ALX_PARAM_KV_STORE_FAKE_VAL_LEN 128
 
 typedef struct
 {
@@ -157,6 +161,20 @@ void AlxParamKvStoreFake_Poke(const char* key, const uint8_t* in, uint32_t len)
 	}
 	memcpy(entry->data, in, len);
 	entry->len = len;
+}
+
+void AlxParamKvStore_Ctor(AlxParamKvStore* me, AlxFs* fs)
+{
+	me->fs = fs;
+	me->wasCtorCalled = true;
+	me->isInit = false;
+}
+
+Alx_Status AlxParamKvStore_Init(AlxParamKvStore* me)
+{
+	// Nothing to mount: the entries are the fake's own RAM.
+	me->isInit = true;
+	return Alx_Ok;
 }
 
 Alx_Status AlxParamKvStore_Get(AlxParamKvStore* me, const char* key, void* data, uint32_t lenMax, uint32_t* lenActual)

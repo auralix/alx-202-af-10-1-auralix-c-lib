@@ -134,7 +134,7 @@ uint32_t AlxAdcFake_DeInitCount(void)
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
-#if defined(ALX_STM32)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
 void AlxAdc_Ctor(AlxAdc* me, ADC_TypeDef* adc, AlxIoPin** ioPinArr, uint8_t numOfIoPins, Alx_Ch* chArr, uint8_t numOfCh, AlxClk* clk, AlxAdc_Clk adcClk, uint32_t samplingTime, bool isVrefInt_V, float vrefExt_V)
 {
 	(void)me; (void)adc; (void)ioPinArr; (void)numOfIoPins; (void)chArr; (void)numOfCh;
