@@ -1931,6 +1931,162 @@ MEMRAW_OVR_EXPORTS = Exports("alxMemRawOvrTest", (
 ))
 
 
+# ------------------------------------------------------------ the fakes themselves -----
+# The fakes under host/fakes/ are the library's own files: a consumer links them in place of the
+# modules they fake, so each fake's controls are part of what the library promises. Most fakes are
+# also linked by the group of a module that calls the faked one; the ones written for consumers
+# are linked by no other group. This group links EVERY fake into one image, which is itself a
+# proof - a consumer may link any subset, and no two may collide - and tests/framework/
+# test_fakes.py proves each control contract once.
+FAKES_SOURCES = [
+    *sorted(FAKES_DIR.glob("*.c")),
+    CLIB_DIR / "alxFifo.c",     # the serial port fake is two FIFOs
+    CLIB_DIR / "alxBound.c",    # which bound their lengths
+    HELPERS_DIR / "alxFakesTestHelpers.c",
+    HELPERS_DIR / "alxAssertPc.c",
+]
+FAKES_DEPS = [
+    *FAKES_SOURCES,
+    *sorted(CLIB_DIR.glob("*.h")),
+    *sorted((CLIB_DIR / "Mcu").glob("*.h")),
+    *sorted((CLIB_DIR / "Ext").glob("*.h")),
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+FAKES_DLL = BUILD_DIR / "alxFakesTest.dll"
+FAKES_EXPORTS = Exports("alxFakesTest", (
+    # ADC
+    "AlxAdcFake_Reset",
+    "AlxAdcFake_SetVoltage_V",
+    "AlxAdcFake_SetVoltageSeq_V",
+    "AlxAdcFake_ReadCount",
+    "AlxAdcFake_InitCount",
+    "AlxAdcFake_DeInitCount",
+    "AlxAdc_Init",
+    "AlxAdc_DeInit",
+    "AlxAdc_GetVoltage_V",
+    "AlxAdc_GetVoltage_mV",
+    # CAN
+    "AlxCanFake_Reset",
+    "AlxCanFake_ClearTx",
+    "AlxCanFake_TxCount",
+    "AlxCanFake_TxMsg",
+    "AlxCanFake_QueueRxMsg",
+    "AlxCanFake_RxMsgCount",
+    "AlxCanFake_SetErr",
+    "AlxCan_TxMsg",
+    "AlxCan_RxMsg",
+    "AlxCan_IsErr",
+    # PWM
+    "AlxPwmFake_Reset",
+    "AlxPwmFake_Duty_pct",
+    "AlxPwmFake_WriteCount",
+    "AlxPwm_SetDuty_pct",
+    # INA228
+    "AlxIna228Fake_Reset",
+    "AlxIna228Fake_SetCurrent_A",
+    "AlxIna228Fake_SetBusVoltage_V",
+    "AlxIna228Fake_SetShuntVoltage_V",
+    "AlxIna228Fake_SetPower_W",
+    "AlxIna228Fake_SetTemp_degC",
+    "AlxIna228_GetCurrent_A",
+    "AlxIna228_GetBusVoltage_V",
+    "AlxIna228_GetShuntVoltage_V",
+    "AlxIna228_GetPower_W",
+    "AlxIna228_GetTemp_degC",
+    # PI4IOE5V6534Q
+    "AlxPi4ioe5v6534qFake_Reset",
+    "AlxPi4ioe5v6534qFake_SetLevel",
+    "AlxPi4ioe5v6534qFake_Level",
+    "AlxPi4ioe5v6534q_IoPin_Read",
+    "AlxPi4ioe5v6534q_IoPin_Write",
+    # LP586x
+    "AlxLp586xFake_Reset",
+    "AlxLp586xFake_SetPresent",
+    "AlxLp586xFake_InitPeriphCount",
+    "AlxLp586xFake_DeInitPeriphCount",
+    "AlxLp586xFake_InitCount",
+    "AlxLp586xFake_HandleCount",
+    "AlxLp586xFake_LedWriteCount",
+    "AlxLp586x_InitPeriph",
+    "AlxLp586x_DeInitPeriph",
+    "AlxLp586x_Init",
+    "AlxLp586x_Handle",
+    "AlxLp586x_Led_Write",
+    # ID
+    "AlxIdFake_Reset",
+    "AlxIdFake_SetHwId",
+    "AlxId_GetFwArtf",
+    "AlxId_GetFwName",
+    "AlxId_GetFwVerStr",
+    "AlxId_GetFwBinStr",
+    "AlxId_GetHwId",
+    "AlxId_GetHwMcuUniqueIdStr",
+    # IO pin
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_NumOfSlots",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_SetLevel",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_WriteCount",
+    "AlxIoPin_Toggle",
+    # delay and watchdog
+    "AlxDelayFake_Reset",
+    "AlxDelayFake_MsCount",
+    "AlxDelayFake_UsCount",
+    "AlxDelay_ms",
+    "AlxDelay_us",
+    "AlxWdtFake_Reset",
+    "AlxWdtFake_RefreshCount",
+    "AlxWdt_Init",
+    "AlxWdt_Refresh",
+    # safe memory
+    "AlxMemSafeFake_Reset",
+    "AlxMemSafe_Write",
+    "AlxMemSafe_Read",
+    "AlxMemSafe_IsWriteDone",
+    "AlxMemSafe_IsWriteErr",
+    # key-value store
+    "AlxParamKvStoreFake_Reset",
+    "AlxParamKvStoreFake_Enable",
+    "AlxParamKvStoreFake_NumOfKeys",
+    "AlxParamKvStore_Ctor",
+    "AlxParamKvStore_Init",
+    "AlxParamKvStore_Get",
+    "AlxParamKvStore_Set",
+    # the constructor-only fakes' portable entry points
+    "AlxBoot_Ctor",
+    "AlxBoot_App_Usb_Update",
+    "AlxClk_Init",
+    "AlxFs_Ctor",
+    "AlxRst_Init",
+    "AlxRst_Trace",
+    "AlxTmp1075_Ctor",
+    "AlxUsb_Irq_Handle",
+    # the helper
+    "AlxFakesTest_NewI2c",
+    "AlxFakesTest_NewId",
+    "AlxFakesTest_NewLp586x",
+    "AlxFakesTest_NewParamKvStore",
+    "AlxFakesTest_Delete",
+    "AlxFakesTest_I2c_IsInit",
+    "AlxFakesTest_Id_Ctor",
+    "AlxFakesTest_Id_HwIsTheConstructorsOwn",
+    "AlxFakesTest_Lp586x_ValNew",
+    "AlxFakesTest_ParamKvStore_WasCtorCalled",
+    "AlxFakesTest_ParamKvStore_IsInit",
+    "AlxFakesTest_ParamKvStore_Fs",
+    "AlxFakesTest_Status_Ok",
+    "AlxFakesTest_Status_Err",
+    "AlxFakesTest_Status_FifoErrEmpty",
+    "AlxFakesTest_Status_SafeBothCopyErr",
+    "AlxFakesTest_Status_SafeUseCopyA",
+    "AlxAssertPc_Reset",
+    "AlxAssertPc_Count",
+    "AlxAssertPc_First",
+))
+
+
 # ------------------------------------------------------------------ build ----
 # The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
 # environment, the rebuild-if-stale check, the compile database and the two DLL recipes. What stays
@@ -2216,6 +2372,10 @@ def _build_memraw_ovr_dll() -> None:
                MEMRAW_OVR_EXPORTS, None)
 
 
+def _build_fakes_dll() -> None:
+    _build_dll(FAKES_SOURCES, (), _assert_defines(FAKES_SOURCES), FAKES_DLL, FAKES_EXPORTS, None)
+
+
 # The groups as DATA, for anything that must rebuild them without running the suite: the MUTATE
 # lane names this list on the command line (alx.c_lib.mutation_hooks rebuild --groups
 # host_build:DLL_GROUPS), so the lane needs no script of its own in this repository.
@@ -2251,6 +2411,7 @@ DLL_GROUPS = [
     (ASSERT_DLL, ASSERT_DEPS, _build_assert_dll),
     (MEMRAW_DLL, MEMRAW_DEPS, _build_memraw_dll),
     (MEMRAW_OVR_DLL, MEMRAW_OVR_DEPS, _build_memraw_ovr_dll),
+    (FAKES_DLL, FAKES_DEPS, _build_fakes_dll),
 ]
 
 

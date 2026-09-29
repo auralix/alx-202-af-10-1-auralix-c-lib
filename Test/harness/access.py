@@ -2968,6 +2968,153 @@ class AudioVolLib:
         self._handles.clear()
 
 
+class FakesLib:
+    """ctypes wrapper around alxFakesTest.dll: every fake in host/fakes/, driven directly.
+
+    Most fakes tell objects apart by their address alone, so `handle()` hands out a distinct buffer;
+    the four whose fields a fake writes are allocated by the helper with `new()`. Both are released
+    when the test ends.
+    """
+
+    RESETS = ("AlxAdcFake_Reset", "AlxCanFake_Reset", "AlxPwmFake_Reset", "AlxIna228Fake_Reset",
+              "AlxPi4ioe5v6534qFake_Reset", "AlxLp586xFake_Reset", "AlxIdFake_Reset",
+              "AlxIoPinFake_Reset", "AlxDelayFake_Reset", "AlxWdtFake_Reset",
+              "AlxMemSafeFake_Reset", "AlxParamKvStoreFake_Reset")
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        vp, cp, b = ctypes.c_void_p, ctypes.c_char_p, ctypes.c_bool
+        u8, u16, u32, i32, f32 = (ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_int32,
+                                  ctypes.c_float)
+        pf32 = ctypes.POINTER(f32)
+
+        def sig(name: str, restype, *argtypes) -> None:
+            fn = getattr(c, name)
+            fn.restype = restype
+            fn.argtypes = list(argtypes)
+
+        sig("AlxAdcFake_SetVoltage_V", None, vp, u32, f32)
+        sig("AlxAdcFake_SetVoltageSeq_V", None, vp, u32, pf32, u32)
+        sig("AlxAdcFake_ReadCount", u32, vp, u32)
+        sig("AlxAdcFake_InitCount", u32)
+        sig("AlxAdcFake_DeInitCount", u32)
+        sig("AlxAdc_Init", i32, vp)
+        sig("AlxAdc_DeInit", i32, vp)
+        sig("AlxAdc_GetVoltage_V", f32, vp, ctypes.c_int)
+        sig("AlxAdc_GetVoltage_mV", u32, vp, ctypes.c_int)
+        sig("AlxCanFake_ClearTx", None, vp)
+        sig("AlxCanFake_TxCount", u32, vp)
+        sig("AlxCanFake_TxMsg", b, vp, u32, ctypes.POINTER(u32), ctypes.POINTER(b),
+            ctypes.POINTER(u8), ctypes.POINTER(u8))
+        sig("AlxCanFake_QueueRxMsg", b, vp, u32, b, u8, ctypes.POINTER(u8))
+        sig("AlxCanFake_RxMsgCount", u32, vp)
+        sig("AlxCanFake_SetErr", None, vp, b)
+        sig("AlxCan_TxMsg", i32, vp, CanMsg)
+        sig("AlxCan_RxMsg", i32, vp, ctypes.POINTER(CanMsg))
+        sig("AlxCan_IsErr", b, vp)
+        sig("AlxPwmFake_Duty_pct", f32, vp, u32)
+        sig("AlxPwmFake_WriteCount", u32, vp, u32)
+        sig("AlxPwm_SetDuty_pct", i32, vp, ctypes.c_int, f32)
+        for what in ("Current_A", "BusVoltage_V", "ShuntVoltage_V", "Power_W", "Temp_degC"):
+            sig(f"AlxIna228Fake_Set{what}", None, vp, f32)
+            sig(f"AlxIna228_Get{what}", i32, vp, pf32)
+        sig("AlxPi4ioe5v6534qFake_SetLevel", None, vp, u8, u8, b)
+        sig("AlxPi4ioe5v6534qFake_Level", b, vp, u8, u8)
+        sig("AlxPi4ioe5v6534q_IoPin_Read", b, vp, u8, u8)
+        sig("AlxPi4ioe5v6534q_IoPin_Write", None, vp, u8, u8, b)
+        sig("AlxLp586xFake_SetPresent", None, b)
+        for what in ("InitPeriph", "DeInitPeriph", "Init", "Handle", "LedWrite"):
+            sig(f"AlxLp586xFake_{what}Count", u32)
+        for what in ("InitPeriph", "DeInitPeriph", "Init", "Handle"):
+            sig(f"AlxLp586x_{what}", i32, vp)
+        sig("AlxLp586x_Led_Write", None, vp, u8, b)
+        sig("AlxIdFake_SetHwId", None, u8)
+        for what in ("FwArtf", "FwName", "FwVerStr", "FwBinStr", "HwMcuUniqueIdStr"):
+            sig(f"AlxId_Get{what}", cp, vp)
+        sig("AlxId_GetHwId", u8, vp)
+        sig("AlxIoPinFake_NumOfSlots", u32)
+        sig("AlxIoPinFake_DidOverflow", b)
+        sig("AlxIoPinFake_SetLevel", None, vp, b)
+        sig("AlxIoPinFake_Level", b, vp)
+        sig("AlxIoPinFake_WriteCount", u32, vp)
+        sig("AlxIoPin_Toggle", None, vp)
+        sig("AlxDelayFake_MsCount", u32)
+        sig("AlxDelayFake_UsCount", u32)
+        sig("AlxDelay_ms", None, ctypes.c_uint64)
+        sig("AlxDelay_us", None, ctypes.c_uint64)
+        sig("AlxWdtFake_RefreshCount", u32)
+        sig("AlxWdt_Init", i32, vp)
+        sig("AlxWdt_Refresh", i32, vp)
+        sig("AlxMemSafe_Write", i32, vp, cp, u32)
+        sig("AlxMemSafe_Read", i32, vp, cp, u32)
+        sig("AlxMemSafe_IsWriteDone", b, vp)
+        sig("AlxMemSafe_IsWriteErr", b, vp)
+        sig("AlxParamKvStoreFake_Enable", None, b)
+        sig("AlxParamKvStoreFake_NumOfKeys", u32)
+        sig("AlxParamKvStore_Ctor", None, vp, vp)
+        sig("AlxParamKvStore_Init", i32, vp)
+        sig("AlxParamKvStore_Get", i32, vp, cp, cp, u32, ctypes.POINTER(u32))
+        sig("AlxParamKvStore_Set", i32, vp, cp, cp, u32)
+        sig("AlxBoot_Ctor", None, vp, vp, vp, vp, u16, u16)
+        sig("AlxBoot_App_Usb_Update", None, vp)
+        sig("AlxClk_Init", i32, vp)
+        sig("AlxFs_Ctor", None, vp, ctypes.c_int, vp, vp, vp, vp, vp, vp)
+        sig("AlxRst_Init", i32, vp)
+        sig("AlxRst_Trace", None, vp)
+        sig("AlxTmp1075_Ctor", None, vp, vp, u8, b, u8, u16)
+        sig("AlxUsb_Irq_Handle", None, vp)
+        for kind in ("I2c", "Id", "Lp586x", "ParamKvStore"):
+            sig(f"AlxFakesTest_New{kind}", vp)
+        sig("AlxFakesTest_Delete", None, vp)
+        sig("AlxFakesTest_I2c_IsInit", b, vp)
+        sig("AlxFakesTest_Id_Ctor", None, vp, cp, cp)
+        sig("AlxFakesTest_Id_HwIsTheConstructorsOwn", b, vp)
+        sig("AlxFakesTest_Lp586x_ValNew", b, vp, u8)
+        sig("AlxFakesTest_ParamKvStore_WasCtorCalled", b, vp)
+        sig("AlxFakesTest_ParamKvStore_IsInit", b, vp)
+        sig("AlxFakesTest_ParamKvStore_Fs", vp, vp)
+
+        def status(name: str) -> int:
+            fn = getattr(c, f"AlxFakesTest_Status_{name}")
+            fn.restype = i32
+            return fn()
+
+        self.OK = status("Ok")
+        self.ERR = status("Err")
+        self.FIFO_ERR_EMPTY = status("FifoErrEmpty")
+        self.SAFE_BOTH_COPY_ERR = status("SafeBothCopyErr")
+        self.SAFE_USE_COPY_A = status("SafeUseCopyA")
+        self._buffers: list = []
+        self._objects: list[int] = []
+
+    def reset(self) -> None:
+        """Every fake a test here drives, back to its reset state."""
+        for name in self.RESETS:
+            getattr(self.c, name)()
+
+    def handle(self) -> int:
+        """A distinct address, for a fake that tells objects apart by address alone."""
+        buff = ctypes.create_string_buffer(64)
+        self._buffers.append(buff)
+        return ctypes.addressof(buff)
+
+    def new(self, kind: str) -> int:
+        """An object the helper allocates, for a fake that writes its fields: I2c, Id, Lp586x or
+        ParamKvStore."""
+        obj = getattr(self.c, f"AlxFakesTest_New{kind}")()
+        assert obj, f"AlxFakesTest_New{kind} returned NULL"
+        self._objects.append(obj)
+        return obj
+
+    def free_all(self) -> None:
+        for obj in self._objects:
+            self.c.AlxFakesTest_Delete(obj)
+        self._objects.clear()
+        self._buffers.clear()
+
+
 def _assert_pins_fitted(lib) -> None:
     """Every pin a test used had a slot of its own in the IO pin fake.
 

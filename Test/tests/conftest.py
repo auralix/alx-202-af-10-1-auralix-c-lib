@@ -22,6 +22,7 @@ from harness.access import (
     CliLib,
     CliUnderTest,
     DelayLib,
+    FakesLib,
     FiltGlitchLib,
     FsSafeLib,
     IdLib,
@@ -66,6 +67,8 @@ from harness.build import (
     CLI_DLL,
     DELAY_DEPS,
     DELAY_DLL,
+    FAKES_DEPS,
+    FAKES_DLL,
     FIFO_DEPS,
     FIFO_DLL,
     FILTGLITCH_DEPS,
@@ -120,6 +123,7 @@ from harness.build import (
     _build_canparser_dll,
     _build_cli_dll,
     _build_delay_dll,
+    _build_fakes_dll,
     _build_fifo_dll,
     _build_filtglitch_dll,
     _build_fssafe_dll,
@@ -904,6 +908,25 @@ def assert_lib(assert_lib_session) -> AssertLib:
     assert_lib_session.reset()
     assert_lib_session.assert_reset()
     return assert_lib_session
+
+
+@pytest.fixture(scope="session")
+def fakes_lib_session() -> FakesLib:
+    override = os.environ.get("ALX_FAKES_TEST_DLL")
+    if override:
+        return FakesLib(Path(override))
+    if _needs_build(FAKES_DLL, FAKES_DEPS):
+        _build_fakes_dll()
+    return FakesLib(FAKES_DLL)
+
+
+@pytest.fixture
+def fakes_lib(fakes_lib_session) -> FakesLib:
+    """Every fake back to its reset state, the test's objects released after, no pin folded."""
+    fakes_lib_session.reset()
+    yield fakes_lib_session
+    _assert_pins_fitted(fakes_lib_session)
+    fakes_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")
