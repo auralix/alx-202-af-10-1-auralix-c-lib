@@ -26,11 +26,13 @@ void NVIC_SystemReset(void);
 #define ALX_CLI_TEST_BUFF_LEN 1024
 #define ALX_CLI_TEST_STR_VAL_BUFF_LEN 600	// Str param value buffer -> value <= 599 chars (longer than any stack array the old parser had)
 
-// Param table under test: the product's bool + one Str + one Uint8, so every value kind the CLI formats is present
+// Param table under test: the product's bool + one Str + one Uint8, so every value kind the CLI formats is present,
+// and one item of each other type, so the typed get commands have something to tell apart
 typedef struct
 {
 	AlxSerialPort port;
-	AlxParamItem paramItems[3];		// [0] PRETTY_JSON_EN (bool), [1] STR_TEST (str), [2] UINT8_TEST (uint8, 0..100)
+	AlxParamItem paramItems[7];		// [0] PRETTY_JSON_EN (bool), [1] STR_TEST (str), [2] UINT8_TEST (uint8, 0..100),
+									// [3] VAR_TEST, [4] FLAG_TEST, [5] CONST_TEST, [6] TRIG_TEST
 	uint8_t strValBuff[ALX_CLI_TEST_STR_VAL_BUFF_LEN];
 	AlxParamMgmt paramMgmt;
 	AlxCli cli;
@@ -141,7 +143,75 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 		false				// valChangeTakesEffectAfterReset
 	);
 
-	AlxParamMgmt_Ctor(&ctx->paramMgmt, ctx->paramItems, 3);
+	AlxParamItem_CtorUint8
+	(
+		&ctx->paramItems[3],
+		NULL,				// paramKvStore
+		AlxParamItem_Var,
+		"VAR_TEST",
+		3,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		11,					// valDef
+		0,					// valMin
+		100,				// valMax
+		AlxParamItem_Ignore,
+		false,				// isEnum
+		NULL,				// enumArr
+		0,					// enumArrLen
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamItem_CtorBool
+	(
+		&ctx->paramItems[4],
+		NULL,				// paramKvStore
+		AlxParamItem_Flag,
+		"FLAG_TEST",
+		4,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		false,				// valDef
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamItem_CtorUint8
+	(
+		&ctx->paramItems[5],
+		NULL,				// paramKvStore
+		AlxParamItem_Const,
+		"CONST_TEST",
+		5,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		11,					// valDef
+		0,					// valMin
+		100,				// valMax
+		AlxParamItem_Ignore,
+		false,				// isEnum
+		NULL,				// enumArr
+		0,					// enumArrLen
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamItem_CtorBool
+	(
+		&ctx->paramItems[6],
+		NULL,				// paramKvStore
+		AlxParamItem_Trig,
+		"TRIG_TEST",
+		6,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		false,				// valDef
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamMgmt_Ctor(&ctx->paramMgmt, ctx->paramItems, 7);
 
 	AlxCli_Ctor
 	(

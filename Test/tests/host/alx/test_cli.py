@@ -404,3 +404,24 @@ def test_ALX1564_P340_a_rejected_command_keeps_every_parameter_and_the_cli_recov
     assert as_json(cmd(cli, b"get-param\r", handles=4))["data"] == before
     assert SUCCESS_MARK in set_param(cli, b"UINT8_TEST", b"43")
     assert as_json(cmd(cli, b"get-param\r", handles=4))["data"]["UINT8_TEST"] == 43
+
+
+def test_ALX1564_P341_the_typed_get_commands_partition_the_table(make_cli):
+    """Each typed get answers exactly the items of its type, and together they answer get.
+
+    The CLI group holds one item of every type beside its three parameters for this: a consumer
+    proves the same partition over its own table, but the rule is this library's.
+    """
+    cli = make_cli()
+    commands = (b"get-param", b"get-var", b"get-flag", b"get-const", b"get-trig")
+    groups = {c: set(as_json(cmd(cli, c + b"\r", handles=4))["data"]) for c in commands}
+    assert groups == {
+        b"get-param": {"PRETTY_JSON_EN", "STR_TEST", "UINT8_TEST"},
+        b"get-var": {"VAR_TEST"},
+        b"get-flag": {"FLAG_TEST"},
+        b"get-const": {"CONST_TEST"},
+        b"get-trig": {"TRIG_TEST"},
+    }
+    everything = set(as_json(cmd(cli, b"get\r", handles=4))["data"])
+    assert everything == set().union(*groups.values())
+    assert sum(len(g) for g in groups.values()) == len(everything), "an item answers under two types"
