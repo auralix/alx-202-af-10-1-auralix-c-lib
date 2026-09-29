@@ -193,8 +193,6 @@ STYLE_FILES = [*_library_style_files(), *sorted(HOST.rglob("*.c"))]
 # per part variant. (source, variants to compile it under).
 LAYOUT_CHECKS = [(CHECKS / "alxIna228RegSizeCheck.c", ["ALX_INA238", "ALX_INA228"])]
 INCLUDE_DIRS = host_recipe.INCLUDES
-CL_INCLUDES = [f"/I{d}" for d in INCLUDE_DIRS]
-GNU99 = ["/clang:-std=gnu99"]
 
 # alxAssertPc.c is in every group now: it holds the assertion counter every export list exports
 # and the suite's per-test check reads. Declared by host_build.FIFO_SOURCES.
@@ -378,27 +376,16 @@ def _fresh_dev_build(session: nox.Session) -> None:
     session.run(PYTHON, "-m", "pytest", "-q", "--collect-only", silent=True)
 
 
-def _clang_cl(session: nox.Session, *args, cwd: Path | None = None) -> None:
-    """clang-cl inside the vcvars environment; cwd = where the objects of a /c compile land."""
-    if cwd is None:
-        session.run(str(tc.compiler(hb.MSVC)), *args, env=tc.environment(), external=True)
-    else:
-        with session.chdir(cwd):
-            session.run(str(tc.compiler(hb.MSVC)), *args, env=tc.environment(), external=True)
+def _instrumented_dll(dll: Path, strict, exports, flags, *, closure=(), defines=(), obj_dir=None) -> None:
+    """A group's DLL again with instrumentation: host_build's clang-cl recipe over this group's lists.
 
-
-def _closure_objects(session: nox.Session, out_dir: Path, sources, defines, flags) -> list:
-    """Two-step group build, step 1: the closure sources compiled with warnings off (harness.build's shape)."""
-    out_dir.mkdir(parents=True, exist_ok=True)
-    _clang_cl(session, *GNU99, *flags, "/w", "-D_CRT_SECURE_NO_WARNINGS", *defines, *CL_INCLUDES, "/c", *_strs(sources),
-              cwd=out_dir)
-    return _strs(sorted(out_dir.glob("*.obj")))
-
-
-def _dll(session: nox.Session, dll: Path, sources, exports, flags, defines=(), objects=()) -> None:
-    """Two-step group build, step 2 (or the whole build of a one-step group): the strict sources into the DLL."""
-    _clang_cl(session, "/LD", *GNU99, *flags, *defines, *CL_INCLUDES, *_strs(sources), *objects,
-              f"/Fe:{dll}", f"/Fo{dll.parent}\\", "/link", f"/DEF:{host_recipe.def_file(exports)}")
+    The recipe is the Python library's, the same one the dev build and every consumer use, so an
+    instrumented DLL cannot be a different program from the one the suite tests. With a closure it
+    is the two-step build, the closure compiled with warnings off into obj_dir; the defines reach
+    both steps.
+    """
+    hb.build_dll(tc, out=dll, strict=strict, closure=closure, includes=INCLUDE_DIRS, defines=defines,
+                 def_file=host_recipe.def_file(exports), flags=flags, obj_dir=obj_dir, driver=hb.MSVC)
 
 
 def _test_paths(args) -> list:
@@ -683,43 +670,38 @@ def sanitize(session: nox.Session) -> None:
     _fresh_dev_build(session)
     asan, ubsan = lanes.evidence_dir(TEST, "sanitize", "asan"), lanes.evidence_dir(TEST, "sanitize", "ubsan")
     session.log("Stage 1: host ASan+UBSan smoke exe")
-    _clang_cl(session, *GNU99, *ASAN_UBSAN, "/Z7", "/MT", *CL_INCLUDES,
-              str(CLIB / "alxFifo.c"), str(CLIB / "alxBound.c"), str(CHECKS / "alxFifoSanSmoke.c"),
-              f"/Fe:{asan / 'alxFifoSanSmoke.exe'}", f"/Fo{asan}\\")
+    hb.build_exe(tc, out=asan / "alxFifoSanSmoke.exe",
+                 sources=[CLIB / "alxFifo.c", CLIB / "alxBound.c", CHECKS / "alxFifoSanSmoke.c"],
+                 includes=INCLUDE_DIRS, flags=[*ASAN_UBSAN, "/Z7", "/MT"], driver=hb.MSVC)
     shutil.copy(tc.asan_runtime(), asan)
     session.run(str(asan / "alxFifoSanSmoke.exe"), external=True)
     session.log("Stage 2: UBSan FIFO DLL, full suite")
-    _dll(session, ubsan / "alxFifoTest.dll", FIFO_SOURCES, FIFO_EXPORTS, UBSAN)
+    _instrumented_dll(ubsan / "alxFifoTest.dll", FIFO_SOURCES, FIFO_EXPORTS, UBSAN)
     _pytest(session, {"ALX_FIFO_TEST_DLL": str(ubsan / "alxFifoTest.dll")})
     session.log("Stage 2b: UBSan CLI DLL, CLI suite")
-    objs = _closure_objects(session, ubsan / "cliClosure", CLI_CLOSURE, CLI_ASSERTS, UBSAN)
-    _dll(session, ubsan / "alxCliTest.dll", CLI_STRICT, CLI_EXPORTS, UBSAN,
-         ["-D_CRT_SECURE_NO_WARNINGS", *CLI_ASSERTS], objs)
+    _instrumented_dll(ubsan / "alxCliTest.dll", CLI_STRICT, CLI_EXPORTS, UBSAN, closure=CLI_CLOSURE,
+                      defines=CLI_ASSERTS, obj_dir=ubsan / "cliClosure")
     _pytest(session, {"ALX_CLI_TEST_DLL": str(ubsan / "alxCliTest.dll")}, *CLI_TESTS)
     session.log("Stage 2c: UBSan MemSafe DLL, MemSafe group suite")
-    objs = _closure_objects(session, ubsan / "memsafeClosure", MS_CLOSURE, MS_ASSERTS, UBSAN)
-    _dll(session, ubsan / "alxMemSafeTest.dll", MS_STRICT, MS_EXPORTS, UBSAN,
-         ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
+    _instrumented_dll(ubsan / "alxMemSafeTest.dll", MS_STRICT, MS_EXPORTS, UBSAN, closure=MS_CLOSURE,
+                      defines=MS_ASSERTS, obj_dir=ubsan / "memsafeClosure")
     _pytest(session, {"ALX_MEMSAFE_TEST_DLL": str(ubsan / "alxMemSafeTest.dll")}, *MS_TESTS_UBSAN)
     session.log("Stage 2d: UBSan Id DLL, Id suite")
-    objs = _closure_objects(session, ubsan / "idClosure", ID_CLOSURE, ID_ASSERTS, UBSAN)
-    _dll(session, ubsan / "alxIdTest.dll", ID_STRICT, ID_EXPORTS, UBSAN,
-         ["-D_CRT_SECURE_NO_WARNINGS", *ID_ASSERTS], objs)
+    _instrumented_dll(ubsan / "alxIdTest.dll", ID_STRICT, ID_EXPORTS, UBSAN, closure=ID_CLOSURE,
+                      defines=ID_ASSERTS, obj_dir=ubsan / "idClosure")
     _pytest(session, {"ALX_ID_TEST_DLL": str(ubsan / "alxIdTest.dll")}, *ID_TESTS)
     session.log("Stage 2e: UBSan Assert DLLs (weak defaults and displaced), Assert suite")
     # Both DLLs in one pytest run: the suite's whole point is the comparison between them, so a run
     # that had only one of them instrumented would leave half of every comparison uninstrumented.
-    _dll(session, ubsan / "alxAssertWeakTest.dll", ASSERT_WEAK_SOURCES, ASSERT_WEAK_EXPORTS, UBSAN,
-         ["-D_CRT_SECURE_NO_WARNINGS"])
-    _dll(session, ubsan / "alxAssertTest.dll", ASSERT_SOURCES, ASSERT_EXPORTS, UBSAN,
-         ["-D_CRT_SECURE_NO_WARNINGS"])
+    _instrumented_dll(ubsan / "alxAssertWeakTest.dll", ASSERT_WEAK_SOURCES, ASSERT_WEAK_EXPORTS, UBSAN)
+    _instrumented_dll(ubsan / "alxAssertTest.dll", ASSERT_SOURCES, ASSERT_EXPORTS, UBSAN)
     _pytest(session, {"ALX_ASSERT_WEAK_TEST_DLL": str(ubsan / "alxAssertWeakTest.dll"),
                       "ALX_ASSERT_TEST_DLL": str(ubsan / "alxAssertTest.dll")}, *ASSERT_TESTS)
     session.log("Stage 2f: UBSan MemRaw DLLs (weak defaults and a product override), MemRaw suite")
-    _dll(session, ubsan / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_EXPORTS, UBSAN,
-         ["-D_CRT_SECURE_NO_WARNINGS", *MEMRAW_ASSERTS])
-    _dll(session, ubsan / "alxMemRawOvrTest.dll", MEMRAW_OVR_SOURCES, MEMRAW_OVR_EXPORTS, UBSAN,
-         ["-D_CRT_SECURE_NO_WARNINGS", *MEMRAW_ASSERTS])
+    _instrumented_dll(ubsan / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_EXPORTS, UBSAN,
+                      defines=MEMRAW_ASSERTS)
+    _instrumented_dll(ubsan / "alxMemRawOvrTest.dll", MEMRAW_OVR_SOURCES, MEMRAW_OVR_EXPORTS, UBSAN,
+                      defines=MEMRAW_ASSERTS)
     _pytest(session, {"ALX_MEMRAW_TEST_DLL": str(ubsan / "alxMemRawTest.dll"),
                       "ALX_MEMRAW_OVR_TEST_DLL": str(ubsan / "alxMemRawOvrTest.dll")}, *MEMRAW_TESTS)
     session.log("SANITIZE CLEAN")
@@ -756,15 +738,14 @@ def coverage(session: nox.Session) -> None:
     _guard(session, _check_ms_tests)
     _fresh_dev_build(session)
     out = lanes.evidence_dir(TEST, "coverage")
-    _dll(session, out / "alxFifoTest.dll", FIFO_SOURCES, FIFO_EXPORTS, PROFILE)
+    _instrumented_dll(out / "alxFifoTest.dll", FIFO_SOURCES, FIFO_EXPORTS, PROFILE)
     _llvm_cov_group(session, out, out / "alxFifoTest.dll", "ALX_FIFO_TEST_DLL", [],
                     "lines,branches,regions,functions", ["alxFifo.c", "alxBound.c"])
     # MemSafe group: gate = functions 100 %; lines/branches are REPORTED - alxMemSafe.c keeps three blocks unreachable
     # with asserts ON and alxCrc.c has `break` after `return` plus assert-guarded default branches (task notes).
     ms = lanes.evidence_dir(TEST, "coverage", "memsafe")
-    objs = _closure_objects(session, ms / "closure", MS_CLOSURE, MS_ASSERTS, PROFILE)
-    _dll(session, ms / "alxMemSafeTest.dll", MS_STRICT, MS_EXPORTS, PROFILE,
-         ["-D_CRT_SECURE_NO_WARNINGS", *MS_ASSERTS], objs)
+    _instrumented_dll(ms / "alxMemSafeTest.dll", MS_STRICT, MS_EXPORTS, PROFILE, closure=MS_CLOSURE,
+                      defines=MS_ASSERTS, obj_dir=ms / "closure")
     # alxFtoa.c and alxParamGroup.c join the gate now that the report is honest about them; both
     # measure 100 % of functions. alxRange.c is 11 of 12 and cannot - the one function never
     # executed is AlxRange_CheckArr, the unimplemented stub Stage 5b names for falling off the end
@@ -779,9 +760,8 @@ def coverage(session: nox.Session) -> None:
     # 94.6 % of lines), which is the claim worth gating: a getter added and never called, or one
     # dropped from ID_EXPORTS and so from every test, fails this lane.
     idg = lanes.evidence_dir(TEST, "coverage", "id")
-    id_objs = _closure_objects(session, idg / "closure", ID_CLOSURE, ID_ASSERTS, PROFILE)
-    _dll(session, idg / "alxIdTest.dll", ID_STRICT, ID_EXPORTS, PROFILE,
-         ["-D_CRT_SECURE_NO_WARNINGS", *ID_ASSERTS], id_objs)
+    _instrumented_dll(idg / "alxIdTest.dll", ID_STRICT, ID_EXPORTS, PROFILE, closure=ID_CLOSURE,
+                      defines=ID_ASSERTS, obj_dir=idg / "closure")
     _llvm_cov_group(session, idg, idg / "alxIdTest.dll", "ALX_ID_TEST_DLL", ID_TESTS,
                     "functions", ["alxId.c"])
     # MemRaw group: gate = functions 100 % over alxMemRaw.c, measured from the WEAK DLL and ONLY
@@ -791,8 +771,8 @@ def coverage(session: nox.Session) -> None:
     # which is what makes 100 % an honest number rather than a chosen one. The Assert group is
     # absent on purpose - the reason is written at its declaration above.
     mr = lanes.evidence_dir(TEST, "coverage", "memraw")
-    _dll(session, mr / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_EXPORTS, PROFILE,
-         ["-D_CRT_SECURE_NO_WARNINGS", *MEMRAW_ASSERTS])
+    _instrumented_dll(mr / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_EXPORTS, PROFILE,
+                      defines=MEMRAW_ASSERTS)
     _llvm_cov_group(session, mr, mr / "alxMemRawTest.dll", "ALX_MEMRAW_TEST_DLL", MEMRAW_TESTS,
                     "functions", ["alxMemRaw.c"])
     session.log("COVERAGE GATES PASS")
