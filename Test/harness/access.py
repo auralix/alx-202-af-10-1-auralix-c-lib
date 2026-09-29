@@ -2979,7 +2979,7 @@ class FakesLib:
     RESETS = ("AlxAdcFake_Reset", "AlxCanFake_Reset", "AlxPwmFake_Reset", "AlxIna228Fake_Reset",
               "AlxPi4ioe5v6534qFake_Reset", "AlxLp586xFake_Reset", "AlxIdFake_Reset",
               "AlxIoPinFake_Reset", "AlxDelayFake_Reset", "AlxWdtFake_Reset",
-              "AlxMemSafeFake_Reset", "AlxParamKvStoreFake_Reset")
+              "AlxMemSafeFake_Reset", "AlxParamKvStoreFake_Reset", "AlxSerialPortFake_Reset")
 
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
@@ -3014,6 +3014,11 @@ class FakesLib:
         sig("AlxCan_TxMsg", i32, vp, CanMsg)
         sig("AlxCan_RxMsg", i32, vp, ctypes.POINTER(CanMsg))
         sig("AlxCan_IsErr", b, vp)
+        sig("AlxSerialPortFake_Register", None, vp)
+        sig("AlxSerialPortFake_InjectRx", i32, vp, cp, u32)
+        sig("AlxSerialPortFake_TxRead", u32, vp, cp, u32)
+        sig("AlxSerialPort_ReadStrUntilAny", i32, vp, cp, cp, u32, ctypes.POINTER(u32))
+        sig("AlxSerialPort_Write", i32, vp, cp, u32)
         sig("AlxPwmFake_Duty_pct", f32, vp, u32)
         sig("AlxPwmFake_WriteCount", u32, vp, u32)
         sig("AlxPwm_SetDuty_pct", i32, vp, ctypes.c_int, f32)

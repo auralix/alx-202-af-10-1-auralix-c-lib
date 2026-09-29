@@ -1977,6 +1977,13 @@ FAKES_EXPORTS = Exports("alxFakesTest", (
     "AlxCan_TxMsg",
     "AlxCan_RxMsg",
     "AlxCan_IsErr",
+    # serial port
+    "AlxSerialPortFake_Reset",
+    "AlxSerialPortFake_Register",
+    "AlxSerialPortFake_InjectRx",
+    "AlxSerialPortFake_TxRead",
+    "AlxSerialPort_ReadStrUntilAny",
+    "AlxSerialPort_Write",
     # PWM
     "AlxPwmFake_Reset",
     "AlxPwmFake_Duty_pct",

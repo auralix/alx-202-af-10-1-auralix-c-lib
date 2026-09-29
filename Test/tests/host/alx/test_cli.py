@@ -285,3 +285,97 @@ def test_ALX1514_P15_get_param_lists_every_param_with_its_kind(make_cli):
     assert data["PRETTY_JSON_EN"] is True          # bool unquoted
     assert data["STR_TEST"] == ""                  # str quoted (empty default)
     assert data["UINT8_TEST"] == 7                 # number unquoted
+
+
+# =====================================================================
+# Moved here with their proof tokens (ALX-1564) from a consumer's host suite, which drove them
+# through its own parameter table: the behaviour is alxCli's, so the proof is this suite's. The
+# consumer keeps the tests that need its own table, buffers and store.
+# =====================================================================
+
+@pytest.mark.parametrize("fragmentation", ["bytes", "words", "before_value"])
+def test_ALX1564_P174_partial_commands_wait_for_terminator(make_cli, fragmentation):
+    """A command arriving in pieces is not executed before its terminator.
+
+    Every executed command answers, so no answer means nothing ran; the value the command sets
+    appears only once the terminator is in.
+    """
+    cli = make_cli()
+    line = b"set-param --key UINT8_TEST --val 54"
+    if fragmentation == "bytes":
+        fragments = [line[i:i + 1] for i in range(len(line))]
+    elif fragmentation == "words":
+        fragments = [b"set-param ", b"--key ", b"UINT8_TEST ", b"--val ", b"54"]
+    else:
+        fragments = [line[:-2], line[-2:]]
+    for fragment in fragments:
+        assert cmd(cli, fragment) == b"", "an answer before the terminator"
+    assert SUCCESS_MARK in cmd(cli, b"\r", handles=4)
+    assert as_json(cmd(cli, b"get-param\r", handles=4))["data"]["UINT8_TEST"] == 54
+
+
+def test_ALX1564_P175_queued_set_and_get_commands_preserve_reply_order(make_cli):
+    """Commands queued in one burst answer in the order they were sent, each with its own state."""
+    cli = make_cli()
+    values = [0, 100, 1, 50, 22, 99]
+    burst = b"".join(b"set-param --key UINT8_TEST --val %d\rget-param\r" % v for v in values)
+    cli.inject(burst)
+    output = b""
+    for _ in range(4 * len(burst)):
+        cli.handle()
+        output += cli.tx()
+    decoder = json.JSONDecoder()
+    remaining = output.replace(b"\r\n", b"").decode("ascii")
+    frames = []
+    while remaining:
+        frame, end = decoder.raw_decode(remaining)
+        frames.append(frame)
+        remaining = remaining[end:]
+    assert len(frames) == 2 * len(values)
+    for index, value in enumerate(values):
+        assert frames[2 * index]["status"] == "success"
+        assert frames[2 * index + 1]["data"]["UINT8_TEST"] == value
+
+
+@pytest.mark.parametrize("pretty", [b"true", b"false"])
+@pytest.mark.parametrize("command", [b"get", b"get-param"])
+@pytest.mark.parametrize("value", [b'a"b', b"a\tb"], ids=["quote", "tab"])
+def test_ALX1564_P176_accepted_strings_produce_valid_json(make_cli, request, pretty, command, value):
+    cli = make_cli()
+    assert SUCCESS_MARK in set_param(cli, b"PRETTY_JSON_EN", pretty)
+    assert SUCCESS_MARK in set_param(cli, b"STR_TEST", value)
+    resp = cmd(cli, command + b"\r", handles=4)
+    # Only the confirmed serializer defect is expected; a corrected serializer is a strict XPASS.
+    request.node.add_marker(pytest.mark.xfail(
+        strict=True, raises=json.JSONDecodeError,
+        reason="ALX-1564: alxCli emits accepted string quotes and tabs without JSON escaping",
+    ))
+    assert as_json(resp)["data"]["STR_TEST"] == value.decode()
+
+
+@pytest.mark.parametrize("pretty", [b"true", b"false"])
+@pytest.mark.parametrize("command", [b"get", b"get-param"])
+def test_ALX1564_P177_string_backslashes_round_trip_through_json(make_cli, request, pretty, command):
+    cli = make_cli()
+    value = rb"a\nb"
+    assert SUCCESS_MARK in set_param(cli, b"PRETTY_JSON_EN", pretty)
+    assert SUCCESS_MARK in set_param(cli, b"STR_TEST", value)
+    response = as_json(cmd(cli, command + b"\r", handles=4))
+    assert response["status"] == "success"
+    request.node.add_marker(pytest.mark.xfail(
+        strict=True, raises=AssertionError,
+        reason="ALX-1564: alxCli emits literal backslashes as JSON escapes, changing the string",
+    ))
+    assert response["data"]["STR_TEST"] == value.decode()
+
+
+@pytest.mark.parametrize("pretty", [b"true", b"false"])
+@pytest.mark.parametrize("command", [b"get", b"get-param"])
+@pytest.mark.parametrize("value", [b"PlainText", b"path/to.file-123_ABC"], ids=["plain", "punctuation"])
+def test_ALX1564_P178_ordinary_strings_round_trip_through_json(make_cli, pretty, command, value):
+    cli = make_cli()
+    assert SUCCESS_MARK in set_param(cli, b"PRETTY_JSON_EN", pretty)
+    assert SUCCESS_MARK in set_param(cli, b"STR_TEST", value)
+    response = as_json(cmd(cli, command + b"\r", handles=4))
+    assert response["status"] == "success"
+    assert response["data"]["STR_TEST"] == value.decode()

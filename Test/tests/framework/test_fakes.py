@@ -19,6 +19,11 @@ Proofs (ALX-1564):
   P316 safe memory: blank reads as both copies bad, a write reads back from copy A
   P317 key-value store: constructor and Init fill the object, and a product-sized table fits
   P318 the portable entry points of the constructor-only fakes succeed
+  P171 serial port: a read consumes its prefix and the unread tail stays for the next read
+  P172 serial port: what is sent is read back in order, however the reads are sized
+
+P171 and P172 moved here with their tokens from a consumer's host suite: they are the serial
+port fake's own contract, which the consumer drove through its product's port.
 """
 
 import ctypes
@@ -277,3 +282,43 @@ def test_ALX1564_P318_the_portable_entry_points_of_the_constructor_only_fakes_su
     c.AlxBoot_App_Usb_Update(me)
     c.AlxFs_Ctor(me, 0, None, None, None, None, None, None)
     c.AlxTmp1075_Ctor(me, None, 0x48, False, 3, 10)
+
+
+def _port(fakes_lib) -> int:
+    port = fakes_lib.handle()
+    fakes_lib.c.AlxSerialPortFake_Register(port)
+    return port
+
+
+def test_ALX1564_P171_host_rx_reuses_consumed_prefix_and_preserves_unread_tail(fakes_lib):
+    c = fakes_lib.c
+    port = _port(fakes_lib)
+    head = b"A" * 8000 + b"\rTAIL"
+    assert c.AlxSerialPortFake_InjectRx(port, head, len(head)) == fakes_lib.OK
+    buff = ctypes.create_string_buffer(11000)
+    actual = ctypes.c_uint32()
+    status = c.AlxSerialPort_ReadStrUntilAny(port, buff, b"\r", len(buff), ctypes.byref(actual))
+    assert status == fakes_lib.OK
+    assert buff.raw[:actual.value] == b"A" * 8000 + b"\r"
+    # 10001 more bytes fit in a 16 KB receive buffer only if the 8001 read are free again.
+    tail = b"B" * 10000 + b"\r"
+    assert c.AlxSerialPortFake_InjectRx(port, tail, len(tail)) == fakes_lib.OK
+    status = c.AlxSerialPort_ReadStrUntilAny(port, buff, b"\r", len(buff), ctypes.byref(actual))
+    assert status == fakes_lib.OK
+    assert buff.raw[:actual.value] == b"TAIL" + b"B" * 10000 + b"\r"
+
+
+def test_ALX1564_P172_host_tx_reuses_consumed_prefix_and_preserves_unread_tail(fakes_lib):
+    c = fakes_lib.c
+    port = _port(fakes_lib)
+    first = b"A" * 12000 + b"TAIL"
+    assert c.AlxSerialPort_Write(port, first, len(first)) == fakes_lib.OK
+    buff = ctypes.create_string_buffer(8000)
+    assert c.AlxSerialPortFake_TxRead(port, buff, len(buff)) == 8000
+    assert buff.raw == b"A" * 8000
+    added = b"B" * 7000
+    assert c.AlxSerialPort_Write(port, added, len(added)) == fakes_lib.OK
+    remaining = bytearray()
+    while actual := c.AlxSerialPortFake_TxRead(port, buff, len(buff)):
+        remaining.extend(buff.raw[:actual])
+    assert remaining == b"A" * 4000 + b"TAIL" + added
