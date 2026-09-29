@@ -173,7 +173,7 @@ A missing tool fails its lane, never skips it.
 	- nox (the lane runner: one session per pipeline stage, `uv run nox -s <stage>`)
 	- Auralix Python lib `alx.verify.evidence` (pytest plugin: proof token and `req` marker -> junit properties)
 - **Files - Config**
-	- `Test/pyproject.toml` (dependency `alx-202-2-af-1-auralix-py-lib @ git+...@v0.8.0`)
+	- `Test/pyproject.toml` (dependency `alx-202-2-af-1-auralix-py-lib @ git+...@v0.9.0`)
 	- `Test/uv.lock`
 	- `Test/.python-version`
 - **Files - Code**
