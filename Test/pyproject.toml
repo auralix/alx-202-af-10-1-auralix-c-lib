@@ -27,11 +27,13 @@ dependencies = [
 # The verification project is installed into its own environment (uv installs a project that
 # declares a build system, editable by default), so `harness` imports the same way from pytest,
 # the `nox` command, `python -m nox` and the mutation hooks, without a sys.path edit.
-requires = ["setuptools>=64"]   # 64: the PEP 660 editable-install hooks
-build-backend = "setuptools.build_meta"
+# uv_build is uv's own backend, the one `uv init` writes; the harness package sits at this root.
+requires = ["uv_build>=0.12.7,<0.13"]
+build-backend = "uv_build"
 
-[tool.setuptools]
-packages = ["harness"]
+[tool.uv.build-backend]
+module-name = "harness"
+module-root = ""
 
 [tool.pytest.ini_options]
 minversion = "8.0"
