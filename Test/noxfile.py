@@ -572,9 +572,9 @@ def analyze(session: nox.Session) -> None:
     _write(layout_log, "".join(reports))
 
     session.log("Stage 5: does every portable library module still COMPILE? (arm-gcc -fsyntax-only)")
-    # The fakes under host/fakes/ join both questions: they are the library's own files, and the ones
-    # written for consumers (CAN, PWM, the Ext drivers) are compiled by no group of this suite, so
-    # without this an API change that breaks one would be found by the next consumer update.
+    # The fakes under host/fakes/ join both questions: they are the library's own files, a consumer
+    # links them, and the fakes group builds them only with the host compiler - this is where the
+    # target compiler reads them too.
     # Measured 12.09: of the library's 56 portable .c files, the host suite compiles 24 and the
     # analysers above read 2. The rest - alxFs, alxLogger, alxNet, alxSocket, alxSd, alxFtp and the
     # alxOs* wrappers among them - were compiled by NOTHING in this repository. They are built only
