@@ -13,7 +13,8 @@
   * Pins are told apart by their ADDRESS, because that is all a caller has - the
   * structure is opaque and empty on the host. One pin is enough for the drivers
   * this suite exercises, but counting them separately costs nothing and makes a
-  * two-pin driver testable without changing the fake.
+  * two-pin driver testable without changing the fake; a product brings a few
+  * hundred pins, which is what the slot count is sized for.
   *
   * There are a fixed number of slots, and a test that asks for more than that
   * used to have its extra pins silently FOLDED onto the last slot - two pins
@@ -21,6 +22,11 @@
   * of reading a correct module looking for a defect that was in the fake. The
   * fold is still there, because aborting inside a DLL takes the test runner
   * with it, but it now RAISES A FLAG that a fixture can assert on.
+  *
+  * On an MCU family the module's own constructor exists and is defined here
+  * under the same guard the module header uses. On STM32 a pin also mirrors
+  * its level into the port's output data register, because a product may read
+  * a pin straight out of that register rather than through AlxIoPin_Read.
   ******************************************************************************
   **/
 
@@ -32,9 +38,9 @@
 
 
 //******************************************************************************
-// Private variables
+// Private Variables
 //******************************************************************************
-#define ALX_IO_PIN_FAKE_NUM_OF_PINS 32
+#define ALX_IO_PIN_FAKE_NUM_OF_PINS 512
 
 static const AlxIoPin* alxIoPinFake_pin[ALX_IO_PIN_FAKE_NUM_OF_PINS];
 static bool alxIoPinFake_level[ALX_IO_PIN_FAKE_NUM_OF_PINS];
@@ -59,11 +65,12 @@ void AlxIoPinFake_SetTriState(const AlxIoPin* me, AlxIoPin_TriState val);
 uint32_t AlxIoPinFake_InitCount(const AlxIoPin* me);
 uint32_t AlxIoPinFake_DeInitCount(const AlxIoPin* me);
 bool AlxIoPinFake_DidOverflow(void);
+uint32_t AlxIoPinFake_NumOfSlots(void);
 uint32_t AlxIoPinFake_WriteCount(const AlxIoPin* me);
 
 
 //******************************************************************************
-// Private functions
+// Private Functions
 //******************************************************************************
 static uint32_t AlxIoPinFake_Slot(const AlxIoPin* me)
 {
@@ -89,6 +96,33 @@ static uint32_t AlxIoPinFake_Slot(const AlxIoPin* me)
 	return ALX_IO_PIN_FAKE_NUM_OF_PINS - 1;
 }
 
+static void AlxIoPinFake_Drive(AlxIoPin* me, bool val)
+{
+	uint32_t slot = AlxIoPinFake_Slot(me);
+	alxIoPinFake_level[slot] = val;
+	alxIoPinFake_writeCount[slot]++;
+
+	#if defined(ALX_STM32)
+	// And into the port's OUTPUT DATA REGISTER, because a product may read some pins straight
+	// out of it rather than through AlxIoPin_Read. Only an OUTPUT writes ODR, which is the
+	// hardware's own rule and not a simplification: a pin in GPIO_MODE_INPUT has its output
+	// driver disconnected, so ODR keeps whatever was last written to it and never follows the
+	// pad. The port address is a real peripheral address; the consumer's host build maps it as
+	// ordinary memory.
+	if (me->port != NULL && me->mode != GPIO_MODE_INPUT)
+	{
+		if (val)
+		{
+			me->port->ODR |= me->pin;
+		}
+		else
+		{
+			me->port->ODR &= ~(uint32_t)me->pin;
+		}
+	}
+	#endif
+}
+
 
 //******************************************************************************
 // The fake's own controls
@@ -109,6 +143,11 @@ bool AlxIoPinFake_DidOverflow(void)
 	// True once more pins have been seen than there are slots. Whatever a test measured
 	// after that is two pins' worth of answers coming from one.
 	return alxIoPinFake_didOverflow;
+}
+uint32_t AlxIoPinFake_NumOfSlots(void)
+{
+	// How many pins the fake can tell apart, so a test that means to overflow it knows how far to go.
+	return ALX_IO_PIN_FAKE_NUM_OF_PINS;
 }
 bool AlxIoPinFake_Level(const AlxIoPin* me)
 {
@@ -145,6 +184,39 @@ uint32_t AlxIoPinFake_WriteCount(const AlxIoPin* me)
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
+#if defined(ALX_STM32)
+void AlxIoPin_Ctor
+(
+	AlxIoPin* me,
+	GPIO_TypeDef* port,
+	uint16_t pin,
+	uint32_t mode,
+	uint32_t pull,
+	uint32_t speed,
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	uint32_t alternate,
+	#endif
+	bool val
+)
+{
+	// A product may read some of these straight out of the structure rather than through the
+	// module's functions, so the fake fills the fields the real constructor fills.
+	me->port = port;
+	me->pin = pin;
+	me->mode = mode;
+	me->pull = pull;
+	me->speed = speed;
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	me->alternate = alternate;
+	#endif
+	me->val = val;
+	me->wasCtorCalled = true;
+	me->isInit = false;
+
+	alxIoPinFake_level[AlxIoPinFake_Slot(me)] = val;
+}
+#endif
+
 void AlxIoPin_Init(AlxIoPin* me)
 {
 	alxIoPinFake_initCount[AlxIoPinFake_Slot(me)]++;
@@ -155,21 +227,19 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 }
 void AlxIoPin_Set(AlxIoPin* me)
 {
-	uint32_t slot = AlxIoPinFake_Slot(me);
-	alxIoPinFake_level[slot] = true;
-	alxIoPinFake_writeCount[slot]++;
+	AlxIoPinFake_Drive(me, true);
 }
 void AlxIoPin_Reset(AlxIoPin* me)
 {
-	uint32_t slot = AlxIoPinFake_Slot(me);
-	alxIoPinFake_level[slot] = false;
-	alxIoPinFake_writeCount[slot]++;
+	AlxIoPinFake_Drive(me, false);
 }
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
-	uint32_t slot = AlxIoPinFake_Slot(me);
-	alxIoPinFake_level[slot] = val;
-	alxIoPinFake_writeCount[slot]++;
+	AlxIoPinFake_Drive(me, val);
+}
+void AlxIoPin_Toggle(AlxIoPin* me)
+{
+	AlxIoPinFake_Drive(me, !alxIoPinFake_level[AlxIoPinFake_Slot(me)]);
 }
 bool AlxIoPin_Read(AlxIoPin* me)
 {

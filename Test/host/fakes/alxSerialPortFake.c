@@ -1,18 +1,27 @@
 /**
   ******************************************************************************
   * @file		alxSerialPortFake.c
-  * @brief		Auralix C Library - ALX SerialPort Module - PC link-time fake
+  * @brief		Auralix C Library - ALX SerialPort Module - PC Unit Test Fake
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
-  * Tier-2 fake, named by the FAKED module. On PC, alxSerialPort.h falls back
-  * to `typedef struct { bool dummy; } AlxSerialPort;`, so this file implements
-  * the full wrapper API over two host-side AlxFifo instances per registered
-  * port: rx = what the "device" receives (tests inject bytes), tx = what the
-  * code under test sends (tests read responses). A small slot registry maps
-  * AlxSerialPort* -> state, mirroring how the real ports own their FIFOs.
+  * A link-time fake of the serial port, named after the module it fakes. On a
+  * PC the port is two host-side AlxFifo instances per registered port: rx is
+  * what the code under test receives (tests inject bytes), tx is what it sends
+  * (tests read the answers). The wrapper API runs over the library's own FIFO,
+  * so a read that stops at a delimiter answers exactly what the real driver
+  * answers - the same AlxFifo status codes, the bytes left in place.
+  *
+  * A port is registered before use: by a test, through AlxSerialPortFake_Register,
+  * or by the module's own constructor where an MCU family defines one. A port
+  * that was never registered is a harness bug and fails fast.
+  *
+  * The buffers are sized for a command line that dumps a whole parameter table.
   ******************************************************************************
   **/
 
+//******************************************************************************
+// Includes
+//******************************************************************************
 #include "alxSerialPort.h"
 #include "alxFifo.h"
 
@@ -20,15 +29,15 @@
 
 
 //******************************************************************************
-// Fake state registry
+// Private Variables
 //******************************************************************************
-#define ALX_SERIAL_PORT_FAKE_MAX_PORTS 2
-#define ALX_SERIAL_PORT_FAKE_RX_LEN 1024
-#define ALX_SERIAL_PORT_FAKE_TX_LEN 8192
+#define ALX_SERIAL_PORT_FAKE_NUM_OF_PORTS 8
+#define ALX_SERIAL_PORT_FAKE_RX_LEN 16384
+#define ALX_SERIAL_PORT_FAKE_TX_LEN 16384
 
 typedef struct
 {
-	AlxSerialPort* me;
+	const AlxSerialPort* me;
 	AlxFifo rxFifo;
 	AlxFifo txFifo;
 	uint8_t rxBuff[ALX_SERIAL_PORT_FAKE_RX_LEN];
@@ -36,54 +45,74 @@ typedef struct
 	bool used;
 } AlxSerialPortFake_Slot;
 
-static AlxSerialPortFake_Slot slots[ALX_SERIAL_PORT_FAKE_MAX_PORTS];
+static AlxSerialPortFake_Slot alxSerialPortFake_slot[ALX_SERIAL_PORT_FAKE_NUM_OF_PORTS];
 
-// Test-control API (exported to pytest via .def)
-void AlxSerialPortFake_Register(AlxSerialPort* me);
-void AlxSerialPortFake_Unregister(AlxSerialPort* me);
-Alx_Status AlxSerialPortFake_InjectRx(AlxSerialPort* me, const uint8_t* data, uint32_t len);
-uint32_t AlxSerialPortFake_TxRead(AlxSerialPort* me, uint8_t* buff, uint32_t len);
-uint32_t AlxSerialPortFake_TxNumOfEntries(AlxSerialPort* me);
 
-static AlxSerialPortFake_Slot* AlxSerialPortFake_Find(AlxSerialPort* me)
+//******************************************************************************
+// Prototypes - the DLL export surface (no separate header for test fakes)
+//******************************************************************************
+void AlxSerialPortFake_Reset(void);
+void AlxSerialPortFake_Register(const AlxSerialPort* me);
+void AlxSerialPortFake_Unregister(const AlxSerialPort* me);
+Alx_Status AlxSerialPortFake_InjectRx(const AlxSerialPort* me, const uint8_t* data, uint32_t len);
+uint32_t AlxSerialPortFake_TxRead(const AlxSerialPort* me, uint8_t* buff, uint32_t len);
+uint32_t AlxSerialPortFake_TxNumOfEntries(const AlxSerialPort* me);
+
+
+//******************************************************************************
+// Private Functions
+//******************************************************************************
+static AlxSerialPortFake_Slot* AlxSerialPortFake_Find(const AlxSerialPort* me)
 {
-	for (uint32_t i = 0; i < ALX_SERIAL_PORT_FAKE_MAX_PORTS; i++)
+	for (uint32_t i = 0; i < ALX_SERIAL_PORT_FAKE_NUM_OF_PORTS; i++)
 	{
-		if (slots[i].used && (slots[i].me == me))
+		if (alxSerialPortFake_slot[i].used && (alxSerialPortFake_slot[i].me == me))
 		{
-			return &slots[i];
+			return &alxSerialPortFake_slot[i];
 		}
 	}
 	exit(1);	// test infrastructure - unregistered port is a harness bug, fail fast
 }
 
-void AlxSerialPortFake_Register(AlxSerialPort* me)
+
+//******************************************************************************
+// The fake's own controls
+//******************************************************************************
+void AlxSerialPortFake_Reset(void)
 {
-	for (uint32_t i = 0; i < ALX_SERIAL_PORT_FAKE_MAX_PORTS; i++)
+	for (uint32_t i = 0; i < ALX_SERIAL_PORT_FAKE_NUM_OF_PORTS; i++)
 	{
-		if (slots[i].used == false)
+		alxSerialPortFake_slot[i].used = false;
+	}
+}
+
+void AlxSerialPortFake_Register(const AlxSerialPort* me)
+{
+	for (uint32_t i = 0; i < ALX_SERIAL_PORT_FAKE_NUM_OF_PORTS; i++)
+	{
+		if (alxSerialPortFake_slot[i].used == false)
 		{
-			slots[i].me = me;
-			slots[i].used = true;
-			AlxFifo_Ctor(&slots[i].rxFifo, slots[i].rxBuff, sizeof(slots[i].rxBuff));
-			AlxFifo_Ctor(&slots[i].txFifo, slots[i].txBuff, sizeof(slots[i].txBuff));
+			alxSerialPortFake_slot[i].me = me;
+			alxSerialPortFake_slot[i].used = true;
+			AlxFifo_Ctor(&alxSerialPortFake_slot[i].rxFifo, alxSerialPortFake_slot[i].rxBuff, sizeof(alxSerialPortFake_slot[i].rxBuff));
+			AlxFifo_Ctor(&alxSerialPortFake_slot[i].txFifo, alxSerialPortFake_slot[i].txBuff, sizeof(alxSerialPortFake_slot[i].txBuff));
 			return;
 		}
 	}
 	exit(1);	// test infrastructure - slot pool exhausted, fail fast
 }
 
-void AlxSerialPortFake_Unregister(AlxSerialPort* me)
+void AlxSerialPortFake_Unregister(const AlxSerialPort* me)
 {
 	AlxSerialPortFake_Find(me)->used = false;
 }
 
-Alx_Status AlxSerialPortFake_InjectRx(AlxSerialPort* me, const uint8_t* data, uint32_t len)
+Alx_Status AlxSerialPortFake_InjectRx(const AlxSerialPort* me, const uint8_t* data, uint32_t len)
 {
 	return AlxFifo_Write(&AlxSerialPortFake_Find(me)->rxFifo, data, len);
 }
 
-uint32_t AlxSerialPortFake_TxRead(AlxSerialPort* me, uint8_t* buff, uint32_t len)
+uint32_t AlxSerialPortFake_TxRead(const AlxSerialPort* me, uint8_t* buff, uint32_t len)
 {
 	AlxSerialPortFake_Slot* s = AlxSerialPortFake_Find(me);
 	uint32_t n = AlxFifo_GetNumOfEntries(&s->txFifo);
@@ -98,16 +127,44 @@ uint32_t AlxSerialPortFake_TxRead(AlxSerialPort* me, uint8_t* buff, uint32_t len
 	return n;
 }
 
-uint32_t AlxSerialPortFake_TxNumOfEntries(AlxSerialPort* me)
+uint32_t AlxSerialPortFake_TxNumOfEntries(const AlxSerialPort* me)
 {
 	return AlxFifo_GetNumOfEntries(&AlxSerialPortFake_Find(me)->txFifo);
 }
 
 
 //******************************************************************************
-// Faked wrapper API (mirrors the real per-MCU pass-throughs, minus IRQ locks -
-// the fake is single-threaded by construction)
+// The faked module's own contract (mirrors the real per-MCU pass-throughs, minus
+// IRQ locks - the fake is single-threaded by construction)
 //******************************************************************************
+#if defined(ALX_STM32)
+void AlxSerialPort_Ctor
+(
+	AlxSerialPort* me,
+	AlxSerialPort_Config config,
+	USART_TypeDef* uart,
+	AlxIoPin* do_TX,
+	AlxIoPin* di_RX,
+	AlxGlobal_BaudRate baudRate,
+	uint32_t dataWidth,
+	uint32_t stopBits,
+	uint32_t parity,
+	uint8_t* txFifoBuff,
+	uint32_t txFifoBuffLen,
+	uint8_t* rxFifoBuff,
+	uint32_t rxFifoBuffLen,
+	Alx_IrqPriority irqPriority,
+	AlxIoPin* do_DBG_Tx,
+	AlxIoPin* do_DBG_Rx
+)
+{
+	(void)config; (void)uart; (void)do_TX; (void)di_RX; (void)baudRate; (void)dataWidth;
+	(void)stopBits; (void)parity; (void)txFifoBuff; (void)txFifoBuffLen; (void)rxFifoBuff;
+	(void)rxFifoBuffLen; (void)irqPriority; (void)do_DBG_Tx; (void)do_DBG_Rx;
+	AlxSerialPortFake_Register(me);
+}
+#endif
+
 Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 {
 	(void)me;

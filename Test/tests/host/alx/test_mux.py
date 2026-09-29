@@ -186,12 +186,15 @@ def test_ALX1553_P419_the_pin_fake_says_so_when_it_runs_out_of_slots(mux_lib):
     lib = mux_lib
     assert not lib.c.AlxIoPinFake_DidOverflow(), "the fake started a test already overflowed"
 
+    # Eight select pins per switch, so the fake is full after slots / 8 of them and overflows on
+    # the next; the fake says how many slots it has, so this does not assume the number.
     made = 0
+    limit = lib.c.AlxIoPinFake_NumOfSlots() // 8 + 2
     while not lib.c.AlxIoPinFake_DidOverflow():
         handle = lib.new(8, init=False)         # 8 select pins and an enable pin each
         lib.select(handle, 0xFF)                # touch every one of them, so each takes a slot
         made += 1
-        assert made < 64, "the fake never reported running out of slots"
+        assert made < limit, "the fake never reported running out of slots"
 
     assert lib.c.AlxIoPinFake_DidOverflow() is True
     lib.c.AlxIoPinFake_Reset()

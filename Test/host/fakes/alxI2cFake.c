@@ -14,6 +14,9 @@
   * driver in Ext/ uses, and each holds up to ALX_I2C_FAKE_REG_LEN bytes in the
   * order they travel on the wire - most significant first, as I2C devices are
   * almost always specified.
+  *
+  * On an MCU family the module's own constructor exists and is defined here
+  * under the same guard the module header uses.
   ******************************************************************************
   **/
 
@@ -25,7 +28,7 @@
 
 
 //******************************************************************************
-// Private variables
+// Private Variables
 //******************************************************************************
 #define ALX_I2C_FAKE_NUM_OF_REGS 256
 #define ALX_I2C_FAKE_REG_LEN 8
@@ -93,6 +96,14 @@ void AlxI2cFake_SetForcedStatus(int32_t status)
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
+#if defined(ALX_STM32)
+void AlxI2c_Ctor(AlxI2c* me, I2C_TypeDef* i2c, AlxIoPin* io_SCL, AlxIoPin* io_SDA, AlxClk* clk, AlxI2c_Clk i2cClk)
+{
+	(void)i2c; (void)io_SCL; (void)io_SDA; (void)clk; (void)i2cClk;
+	me->isInit = false;
+}
+#endif
+
 Alx_Status AlxI2c_Init(AlxI2c* me)
 {
 	me->isInit = true;

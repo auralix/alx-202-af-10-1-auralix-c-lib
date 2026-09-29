@@ -2347,6 +2347,7 @@ class MuxLib:
         # register, so an undeclared call answers with whatever the upper bits happened to hold -
         # found 11.09 as a test that passed or failed depending on where the random order put it.
         c.AlxIoPinFake_DidOverflow.restype = b
+        c.AlxIoPinFake_NumOfSlots.restype = ctypes.c_uint32
         self._handles: list = []
 
     def new(self, num_of_sel_pins: int = 4, *, init: bool = True) -> int:
