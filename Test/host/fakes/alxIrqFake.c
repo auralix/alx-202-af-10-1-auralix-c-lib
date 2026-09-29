@@ -12,7 +12,7 @@
   ******************************************************************************
   **/
 
-#include "alxGlobal.h"
+#include "alxIrq.h"
 
 #if defined(ALX_C_LIB)
 
@@ -21,8 +21,6 @@ static uint32_t alxIrqFake_unlockCount = 0;
 static int32_t alxIrqFake_depth = 0;
 static int32_t alxIrqFake_depthMax = 0;
 
-uint32_t AlxIrq_Lock(void);
-void AlxIrq_Unlock(uint32_t key);
 void AlxIrqFake_Reset(void);
 uint32_t AlxIrqFake_LockCount(void);
 uint32_t AlxIrqFake_UnlockCount(void);
