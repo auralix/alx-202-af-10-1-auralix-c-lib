@@ -17,32 +17,6 @@ FAKES_DIR = HOST_DIR / "fakes"
 CHECKS_DIR = HOST_DIR / "checks"
 
 
-class Exports(NamedTuple):
-    """One test DLL's export list: the symbols Python may call through ctypes.
-
-    Declared here as Python data, beside the sources it belongs to; the linker's module-definition
-    (.def) file is a build output that def_file() writes from it. One entry per line of the .def's
-    EXPORTS section: a symbol name, or `<name> DATA` for a variable.
-    """
-
-    library: str
-    symbols: tuple[str, ...]
-
-
-def def_file(exports: Exports) -> Path:
-    """Write build/<library>.def from an export list and return its path.
-
-    Rewritten only when its text changes. It is not a rebuild dependency of its own: the list lives
-    in this file, and this file is a dependency of every DLL built from it.
-    """
-    path = BUILD_DIR / f"{exports.library}.def"
-    text = "".join([f"LIBRARY {exports.library}\n", "EXPORTS\n", *(f"\t{s}\n" for s in exports.symbols)])
-    if not path.is_file() or path.read_text(encoding="ascii") != text:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="ascii", newline="\n")
-    return path
-
-
 FIFO_SOURCES = [
     CLIB_DIR / "alxFifo.c",
     CLIB_DIR / "alxBound.c",
@@ -61,7 +35,7 @@ FIFO_DEPS = [
     Path(__file__),  # flags live here - flag edits must trigger a rebuild
 ]
 FIFO_DLL = BUILD_DIR / "alxFifoTest.dll"
-FIFO_EXPORTS = Exports("alxFifoTest", (
+FIFO_EXPORTS = build_tools.Exports("alxFifoTest", (
     "AlxFifo_Ctor",
     "AlxFifo_Flush",
     "AlxFifo_Read",
@@ -150,7 +124,7 @@ CLI_DEPS = CLI_SOURCES_STRICT + CLI_SOURCES_CLOSURE + [
     Path(__file__),
 ]
 CLI_DLL = BUILD_DIR / "alxCliTest.dll"
-CLI_EXPORTS = Exports("alxCliTest", (
+CLI_EXPORTS = build_tools.Exports("alxCliTest", (
     "AlxCliTest_New",
     "AlxCliTest_Delete",
     "AlxCliTest_Handle",
@@ -197,7 +171,7 @@ MEMSAFE_DEPS = MEMSAFE_SOURCES_STRICT + MEMSAFE_SOURCES_CLOSURE + [
     Path(__file__),
 ]
 MEMSAFE_DLL = BUILD_DIR / "alxMemSafeTest.dll"
-MEMSAFE_EXPORTS = Exports("alxMemSafeTest", (
+MEMSAFE_EXPORTS = build_tools.Exports("alxMemSafeTest", (
     "AlxMemSafeTest_New",
     "AlxMemSafeTest_Delete",
     "AlxMemSafeTest_CopyLen",
@@ -370,7 +344,7 @@ VDIV_DEPS = [
     Path(__file__),
 ]
 VDIV_DLL = BUILD_DIR / "alxVdivTest.dll"
-VDIV_EXPORTS = Exports("alxVdivTest", (
+VDIV_EXPORTS = build_tools.Exports("alxVdivTest", (
     "AlxVdiv_GetVout_V",
     "AlxVdiv_GetVin_V",
     "AlxVdiv_GetResHigh_kOhm",
@@ -409,7 +383,7 @@ TIMSW_DEPS = [
     Path(__file__),
 ]
 TIMSW_DLL = BUILD_DIR / "alxTimSwTest.dll"
-TIMSW_EXPORTS = Exports("alxTimSwTest", (
+TIMSW_EXPORTS = build_tools.Exports("alxTimSwTest", (
     "AlxTimSw_Ctor",
     "AlxTimSw_Start",
     "AlxTimSw_Stop",
@@ -476,7 +450,7 @@ CANPARSER_DEPS = [
     Path(__file__),
 ]
 CANPARSER_DLL = BUILD_DIR / "alxCanParserTest.dll"
-CANPARSER_EXPORTS = Exports("alxCanParserTest", (
+CANPARSER_EXPORTS = build_tools.Exports("alxCanParserTest", (
     "AlxCanParser_SetBit",
     "AlxCanParser_SetUint8",
     "AlxCanParser_SetInt8",
@@ -534,7 +508,7 @@ FILTGLITCH_DEPS = [
     Path(__file__),
 ]
 FILTGLITCH_DLL = BUILD_DIR / "alxFiltGlitchTest.dll"
-FILTGLITCH_EXPORTS = Exports("alxFiltGlitchTest", (
+FILTGLITCH_EXPORTS = build_tools.Exports("alxFiltGlitchTest", (
     "AlxFiltGlitchBoolTest_New",
     "AlxFiltGlitchBoolTest_New_us",
     "AlxFiltGlitchBoolTest_Delete",
@@ -581,7 +555,7 @@ MATH_DEPS = [
     Path(__file__),
 ]
 MATH_DLL = BUILD_DIR / "alxMathTest.dll"
-MATH_EXPORTS = Exports("alxMathTest", (
+MATH_EXPORTS = build_tools.Exports("alxMathTest", (
     "AlxHys1Test_New",
     "AlxHys1Test_Delete",
     "AlxHys1_Process",
@@ -627,7 +601,7 @@ LINFUN_DEPS = [
     Path(__file__),
 ]
 LINFUN_DLL = BUILD_DIR / "alxLinFunTest.dll"
-LINFUN_EXPORTS = Exports("alxLinFunTest", (
+LINFUN_EXPORTS = build_tools.Exports("alxLinFunTest", (
     "AlxLinFunTest_New",
     "AlxLinFunTest_Delete",
     "AlxLinFun_GetY",
@@ -677,7 +651,7 @@ ROTSW_DEPS = [
     Path(__file__),
 ]
 ROTSW_DLL = BUILD_DIR / "alxRotSwTest.dll"
-ROTSW_EXPORTS = Exports("alxRotSwTest", (
+ROTSW_EXPORTS = build_tools.Exports("alxRotSwTest", (
     "AlxRotSwTest_New",
     "AlxRotSwTest_Delete",
     "AlxRotSwTest_RotSw",
@@ -725,7 +699,7 @@ TEMPSENS_DEPS = [
     Path(__file__),
 ]
 TEMPSENS_DLL = BUILD_DIR / "alxTempSensTest.dll"
-TEMPSENS_EXPORTS = Exports("alxTempSensTest", (
+TEMPSENS_EXPORTS = build_tools.Exports("alxTempSensTest", (
     "AlxTempSensTest_New",
     "AlxTempSensTest_Delete",
     "AlxTempSensTest_Sens",
@@ -776,7 +750,7 @@ PWR_DEPS = [
     Path(__file__),
 ]
 PWR_DLL = BUILD_DIR / "alxPwrTest.dll"
-PWR_EXPORTS = Exports("alxPwrTest", (
+PWR_EXPORTS = build_tools.Exports("alxPwrTest", (
     "AlxPwrTest_New",
     "AlxPwrTest_Delete",
     "AlxPwrTest_Val_V",
@@ -814,7 +788,7 @@ AUDIO_DEPS = [
     Path(__file__),
 ]
 AUDIO_DLL = BUILD_DIR / "alxAudioTest.dll"
-AUDIO_EXPORTS = Exports("alxAudioTest", (
+AUDIO_EXPORTS = build_tools.Exports("alxAudioTest", (
     "AlxAudio_LinerPcmInt8ToFloat",
     "AlxAudio_LinerPcmUint8ToFloat",
     "AlxAudio_LinerPcmInt16ToFloat",
@@ -857,7 +831,7 @@ AUDIOPLAYER_DEPS = [
     Path(__file__),
 ]
 AUDIOPLAYER_DLL = BUILD_DIR / "alxAudioPlayerTest.dll"
-AUDIOPLAYER_EXPORTS = Exports("alxAudioPlayerTest", (
+AUDIOPLAYER_EXPORTS = build_tools.Exports("alxAudioPlayerTest", (
     "AlxAudioPlayerTest_New",
     "AlxAudioPlayerTest_Delete",
     "AlxAudioPlayerTest_Player",
@@ -907,7 +881,7 @@ NTC_DEPS = [
     Path(__file__),
 ]
 NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
-NTC_EXPORTS = Exports("alxNtcTest", (
+NTC_EXPORTS = build_tools.Exports("alxNtcTest", (
     "AlxNtcg103jf103ft1s_ResToTemp_degC",
     "AlxAssertPc_Reset",
     "AlxAssertPc_Count",
@@ -948,7 +922,7 @@ FSSAFE_DEPS = [
     Path(__file__),
 ]
 FSSAFE_DLL = BUILD_DIR / "alxFsSafeTest.dll"
-FSSAFE_EXPORTS = Exports("alxFsSafeTest", (
+FSSAFE_EXPORTS = build_tools.Exports("alxFsSafeTest", (
     "AlxFsSafeTest_New",
     "AlxFsSafeTest_Delete",
     "AlxFsSafeTest_FsSafe",
@@ -1008,7 +982,7 @@ LIN_DEPS = [
     Path(__file__),
 ]
 LIN_DLL = BUILD_DIR / "alxLinTest.dll"
-LIN_EXPORTS = Exports("alxLinTest", (
+LIN_EXPORTS = build_tools.Exports("alxLinTest", (
     "AlxLinTest_New",
     "AlxLinTest_Delete",
     "AlxLinTest_Lin",
@@ -1067,7 +1041,7 @@ DELAY_DEPS = [
     Path(__file__),
 ]
 DELAY_DLL = BUILD_DIR / "alxDelayTest.dll"
-DELAY_EXPORTS = Exports("alxDelayTest", (
+DELAY_EXPORTS = build_tools.Exports("alxDelayTest", (
     "AlxDelay_ns",
     "AlxDelay_us",
     "AlxDelay_ms",
@@ -1106,7 +1080,7 @@ PARAMKV_DEPS = [
     Path(__file__),
 ]
 PARAMKV_DLL = BUILD_DIR / "alxParamKvStoreTest.dll"
-PARAMKV_EXPORTS = Exports("alxParamKvStoreTest", (
+PARAMKV_EXPORTS = build_tools.Exports("alxParamKvStoreTest", (
     "AlxParamKvStoreTest_New",
     "AlxParamKvStoreTest_Delete",
     "AlxParamKvStoreTest_Store",
@@ -1156,7 +1130,7 @@ MUX_DEPS = [
     Path(__file__),
 ]
 MUX_DLL = BUILD_DIR / "alxMuxTest.dll"
-MUX_EXPORTS = Exports("alxMuxTest", (
+MUX_EXPORTS = build_tools.Exports("alxMuxTest", (
     "AlxMuxTest_New",
     "AlxMuxTest_Delete",
     "AlxMuxTest_Mux",
@@ -1207,7 +1181,7 @@ BTS_DEPS = [
     Path(__file__),
 ]
 BTS_DLL = BUILD_DIR / "alxBts724gTest.dll"
-BTS_EXPORTS = Exports("alxBts724gTest", (
+BTS_EXPORTS = build_tools.Exports("alxBts724gTest", (
     "AlxBts724gTest_New",
     "AlxBts724gTest_Delete",
     "AlxBts724gTest_Bts",
@@ -1270,7 +1244,7 @@ BOOL_DEPS = [
     Path(__file__),
 ]
 BOOL_DLL = BUILD_DIR / "alxBoolTest.dll"
-BOOL_EXPORTS = Exports("alxBoolTest", (
+BOOL_EXPORTS = build_tools.Exports("alxBoolTest", (
     "AlxBoolTest_New",
     "AlxBoolTest_Delete",
     "AlxBool_Update",
@@ -1323,7 +1297,7 @@ RTC_DEPS = [
     Path(__file__),
 ]
 RTC_DLL = BUILD_DIR / "alxRtcTest.dll"
-RTC_EXPORTS = Exports("alxRtcTest", (
+RTC_EXPORTS = build_tools.Exports("alxRtcTest", (
     "AlxRtc_MsUsNsToNs",
     "AlxRtc_MsUsToNs",
     "AlxRtc_MsToNs",
@@ -1384,7 +1358,7 @@ PARAMMGMT_DEPS = [
     Path(__file__),
 ]
 PARAMMGMT_DLL = BUILD_DIR / "alxParamMgmtTest.dll"
-PARAMMGMT_EXPORTS = Exports("alxParamMgmtTest", (
+PARAMMGMT_EXPORTS = build_tools.Exports("alxParamMgmtTest", (
     "AlxParamMgmtTest_New",
     "AlxParamMgmtTest_Delete",
     "AlxParamMgmtTest_NumOfItems",
@@ -1462,7 +1436,7 @@ INA228_DEPS = [
     Path(__file__),
 ]
 INA228_DLL = BUILD_DIR / "alxIna228Test.dll"
-INA228_EXPORTS = Exports("alxIna228Test", (
+INA228_EXPORTS = build_tools.Exports("alxIna228Test", (
     "AlxIna228Test_New",
     "AlxIna228Test_Delete",
     "AlxIna228Test_CurrentLsb_A",
@@ -1517,7 +1491,7 @@ PI4IOE_DEPS = [
     Path(__file__),
 ]
 PI4IOE_DLL = BUILD_DIR / "alxPi4ioe5v6534qTest.dll"
-PI4IOE_EXPORTS = Exports("alxPi4ioe5v6534qTest", (
+PI4IOE_EXPORTS = build_tools.Exports("alxPi4ioe5v6534qTest", (
     "AlxPi4ioeTest_New",
     "AlxPi4ioeTest_Delete",
     "AlxPi4ioeTest_ResetPin",
@@ -1601,7 +1575,7 @@ ID_DEPS = [
     Path(__file__),
 ]
 ID_DLL = BUILD_DIR / "alxIdTest.dll"
-ID_EXPORTS = Exports("alxIdTest", (
+ID_EXPORTS = build_tools.Exports("alxIdTest", (
     "AlxIdTest_Alloc",
     "AlxIdTest_Delete",
     "AlxIdTest_Pin",
@@ -1752,7 +1726,7 @@ ASSERT_DEPS = [
 ]
 ASSERT_WEAK_DLL = BUILD_DIR / "alxAssertWeakTest.dll"
 ASSERT_DLL = BUILD_DIR / "alxAssertTest.dll"
-ASSERT_WEAK_EXPORTS = Exports("alxAssertWeakTest", (
+ASSERT_WEAK_EXPORTS = build_tools.Exports("alxAssertWeakTest", (
     "AlxAssertTest_Reset",
     "AlxAssertTest_TraceCount",
     "AlxAssertTest_TraceLevel",
@@ -1778,7 +1752,7 @@ ASSERT_WEAK_EXPORTS = Exports("alxAssertWeakTest", (
     "AlxAssertTest_CallRstDirect",
     "AlxAssertTest_CallTraceDirect",
 ))
-ASSERT_EXPORTS = Exports("alxAssertTest", (
+ASSERT_EXPORTS = build_tools.Exports("alxAssertTest", (
     "AlxAssertTest_Reset",
     "AlxAssertTest_TraceCount",
     "AlxAssertTest_TraceLevel",
@@ -1870,7 +1844,7 @@ MEMRAW_OVR_DEPS = [
 ]
 MEMRAW_DLL = BUILD_DIR / "alxMemRawTest.dll"
 MEMRAW_OVR_DLL = BUILD_DIR / "alxMemRawOvrTest.dll"
-MEMRAW_EXPORTS = Exports("alxMemRawTest", (
+MEMRAW_EXPORTS = build_tools.Exports("alxMemRawTest", (
     "AlxMemRawTest_New",
     "AlxMemRawTest_NewNoCtor",
     "AlxMemRawTest_Delete",
@@ -1893,7 +1867,7 @@ MEMRAW_EXPORTS = Exports("alxMemRawTest", (
     "AlxAssertPc_Count",
     "AlxAssertPc_First",
 ))
-MEMRAW_OVR_EXPORTS = Exports("alxMemRawOvrTest", (
+MEMRAW_OVR_EXPORTS = build_tools.Exports("alxMemRawOvrTest", (
     "AlxMemRawTest_New",
     "AlxMemRawTest_NewNoCtor",
     "AlxMemRawTest_Delete",
@@ -1954,7 +1928,7 @@ FAKES_DEPS = [
     Path(__file__),
 ]
 FAKES_DLL = BUILD_DIR / "alxFakesTest.dll"
-FAKES_EXPORTS = Exports("alxFakesTest", (
+FAKES_EXPORTS = build_tools.Exports("alxFakesTest", (
     # ADC
     "AlxAdcFake_Reset",
     "AlxAdcFake_SetVoltage_V",
@@ -2125,7 +2099,7 @@ def write_compile_db() -> None:
     )
 
 
-def _build_dll(strict, closure, defines, dll: Path, exports: Exports, obj_dir_name: str | None) -> None:
+def _build_dll(strict, closure, defines, dll: Path, exports: build_tools.Exports, obj_dir_name: str | None) -> None:
     """One group's DLL: the library's recipe, this repository's lists.
 
     With a closure it is the two-step build - the closure compiled with warnings off, then the
@@ -2143,7 +2117,7 @@ def _build_dll(strict, closure, defines, dll: Path, exports: Exports, obj_dir_na
         closure=closure,
         includes=INCLUDES,
         defines=defines,
-        def_file=def_file(exports),
+        def_file=build_tools.write_def_file(BUILD_DIR, exports),
         flags=DEBUG_FLAGS,
         warnings=STRICT_WARNINGS,
         obj_dir=None if obj_dir_name is None else BUILD_DIR / obj_dir_name,
@@ -2163,7 +2137,7 @@ class VariantGroup(NamedTuple):
     strict: tuple
     closure: tuple
     deps: list
-    exports: Exports
+    exports: build_tools.Exports
     obj_dir: str | None
 
 

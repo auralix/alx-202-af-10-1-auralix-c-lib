@@ -385,7 +385,8 @@ def _instrumented_dll(dll: Path, strict, exports, flags, *, closure=(), defines=
     both steps.
     """
     hb.build_dll(tc, out=dll, strict=strict, closure=closure, includes=INCLUDE_DIRS, defines=defines,
-                 def_file=host_recipe.def_file(exports), flags=flags, obj_dir=obj_dir, driver=hb.MSVC)
+                 def_file=hb.write_def_file(host_recipe.BUILD_DIR, exports), flags=flags, obj_dir=obj_dir,
+                 driver=hb.MSVC)
 
 
 def _test_paths(args) -> list:
@@ -511,10 +512,14 @@ def analyze(session: nox.Session) -> None:
     out = lanes.evidence_dir(TEST, "analyze")
     if not (BUILD / "compile_commands.json").exists():
         _fresh_dev_build(session)
-    session.log("Stage 0: codespell, ASCII gate, C style gate, ruff (the shared test profile)")
+    session.log("Stage 0: codespell, ASCII gate, C style gate, fake style gate, ruff (the shared test profile)")
     session.run(PYTHON, "-m", "codespell_lib", *_strs(ANALYSIS_SOURCES))
     session.run(PYTHON, "-m", "alx.verify.ascii_gate", str(CLIB), *VENDOR, "--out", str(out / "ascii_gate.txt"))
     session.run(PYTHON, "-m", "alx.verify.c_style", *_strs(STYLE_FILES), "--out", str(out / "c_style.txt"))
+    # every fake a consumer links follows the one convention, family guards checked against the headers
+    session.run(PYTHON, "-m", "alx.verify.fake_style", *_strs(sorted(FAKES.glob("*.c"))),
+                "--headers", *_strs([CLIB, CLIB / "Mcu", CLIB / "Mcu" / "McuStm32", CLIB / "Ext"]),
+                "--out", str(out / "fake_style.txt"))
     # this folder's Python is gated by the SAME profile the library gates its own tests with, so the two
     # repositories cannot drift into two dialects - see alx/verify/ruff_tests.toml for what a test may waive
     session.run(PYTHON, "-m", "ruff", "check", "--config", str(lanes.ruff_tests_config()),
