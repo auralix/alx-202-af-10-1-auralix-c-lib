@@ -240,7 +240,12 @@ extern "C" {
 //******************************************************************************
 #define ALX_GLOBAL_FILE "alxGlobal.h"
 
-// Assert //
+
+//------------------------------------------------------------------------------
+// Assert
+//------------------------------------------------------------------------------
+
+// ALX
 #if defined(ALX_GLOBAL_ASSERT_BKPT)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_GLOBAL_FILE, expr)
 #elif defined(ALX_GLOBAL_ASSERT_TRACE)
@@ -251,28 +256,35 @@ extern "C" {
 	#define ALX_GLOBAL_ASSERT(expr) do{} while (false)
 #endif
 
-// Trace //
+// STM32
+#if defined(USE_FULL_ASSERT)
+	#define ALX_STM32_ASSERT
+#endif
+
+
+//------------------------------------------------------------------------------
+// Trace
+//------------------------------------------------------------------------------
 #if defined(ALX_GLOBAL_TRACE)
 	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_GLOBAL_FILE, __VA_ARGS__)
 #else
 	#define ALX_GLOBAL_TRACE(...) do{} while (false)
 #endif
 
-#define ALX_STR(s) #s
-#define ALX_xSTR(s) ALX_STR(s)
-#define ALX_xVER3(major, minor , patch) (((major) << 24) | ((minor) << 16) | (patch))
-#define ALX_ARR_LEN(x) (sizeof(x) / sizeof((x)[0]))
 
-#if defined (USE_FULL_ASSERT)
-	#define ALX_STM32_ASSERT
-#endif
-
+//------------------------------------------------------------------------------
+// Compiler
+//------------------------------------------------------------------------------
 #if defined(__GNUC__) || defined(__clang__)
-	#define ALX_WEAK __attribute__ ((weak))
+	#define ALX_WEAK __attribute__((weak))
 #else
 	#error "alxGlobal.h: Unsupported compiler - GCC or Clang required"
 #endif
 
+
+//------------------------------------------------------------------------------
+// Target
+//------------------------------------------------------------------------------
 #if defined(__arm__)
 	#define ALX_BKPT() __BKPT(255)
 #elif defined(_WIN32)
@@ -281,8 +293,16 @@ extern "C" {
 	#error "alxGlobal.h: Unsupported target - ARM or Windows required"
 #endif
 
+
+//------------------------------------------------------------------------------
+// Utilities
+//------------------------------------------------------------------------------
 #define ALX_NULL 0
 #define ALX_NULL_PTR NULL
+#define ALX_STR(s) #s
+#define ALX_xSTR(s) ALX_STR(s)
+#define ALX_xVER3(major, minor, patch) (((major) << 24) | ((minor) << 16) | (patch))
+#define ALX_ARR_LEN(x) (sizeof(x) / sizeof((x)[0]))
 
 
 //******************************************************************************
