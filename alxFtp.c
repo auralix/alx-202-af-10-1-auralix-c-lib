@@ -705,7 +705,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	//------------------------------------------------------------------------------
 	me->isInitialChunk = true;
 	uint32_t _fileSize = 0;
-	status = AlxFs_File_ReadInChunks(me->alxFs, localFilePath, me->buff, sizeof(me->buff), AlxFtp_Client_UploadFile_ChunkRead_Callback, me, &_fileSize, alxOsMutex_UploadFileInChunks);
+	status = AlxFs_File_ReadInChunks(me->alxFs, localFilePath, (uint8_t*)me->buff, sizeof(me->buff), AlxFtp_Client_UploadFile_ChunkRead_Callback, me, &_fileSize, alxOsMutex_UploadFileInChunks);
 	if (status != Alx_Ok)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: AlxFs_File_ReadInChunks() status %d localFilePath %s", status, localFilePath);
@@ -793,7 +793,7 @@ static Alx_Status AlxFtp_Client_UploadFile_ChunkRead_Callback(void* ctx, void* c
 		{
 			// Upload
 			uint32_t extraFileHeaderLen = strlen(me->extraFileHeader);
-			int32_t statusLen = AlxSocket_Send(&me->alxSocket_Data, me->extraFileHeader, extraFileHeaderLen);
+			int32_t statusLen = AlxSocket_Send(&me->alxSocket_Data, (void*)me->extraFileHeader, extraFileHeaderLen);
 			if (statusLen != (int32_t)extraFileHeaderLen)
 			{
 				ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Send(extraFileHeader) statusLen %" PRId32 " extraFileHeaderLen %" PRIu32, statusLen, extraFileHeaderLen);
