@@ -219,7 +219,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	status = AlxSocket_Connect(&me->alxSocket_Ctrl, alxSocket_Ctrl_Ip, alxSocket_Ctrl_Port);
 	if (status != Alx_Ok)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Connect(Ctrl) status %d alxSocket_Ctrl_Ip %s alxSocket_Ctrl_Port %u", status, alxSocket_Ctrl_Ip, alxSocket_Ctrl_Port);
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Connect(Ctrl) status %d alxSocket_Ctrl_Ip %s alxSocket_Ctrl_Port %" PRIu16, status, alxSocket_Ctrl_Ip, alxSocket_Ctrl_Port);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -609,7 +609,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	}
 
 	// Set data socket IP
-	sprintf(alxSocket_Data_Ip, "%u.%u.%u.%u", tuple[0], tuple[1], tuple[2], tuple[3]);
+	sprintf(alxSocket_Data_Ip, "%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8, tuple[0], tuple[1], tuple[2], tuple[3]);
 
 	// Set data socket port
 	alxSocket_Data_Port = (tuple[4] * 256) + tuple[5];

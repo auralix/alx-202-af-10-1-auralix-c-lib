@@ -405,7 +405,7 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	bool isCrcOk = AlxCrc_IsOk(&me->alxCrc, data, lenWithCrc, validatedCrc);
 	if (isCrcOk == false)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckCrc(%s) isCrcOk %u lenWithCrc %" PRIu32, pathWithSuffix, isCrcOk, lenWithCrc);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckCrc(%s) isCrcOk %d lenWithCrc %" PRIu32, pathWithSuffix, isCrcOk, lenWithCrc);
 		return Alx_Err;
 	}
 

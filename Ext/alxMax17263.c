@@ -184,7 +184,7 @@ Alx_Status AlxMax17263_Init(AlxMax17263* me)
 		return status;
 	}
 
-	snprintf(me->data.serial, sizeof(me->data.serial), "%04x%04x%04x%04x%04x%04x%04x%04x", sn[7], sn[6], sn[5], sn[4], sn[3], sn[2], sn[1], sn[0]);
+	snprintf(me->data.serial, sizeof(me->data.serial), "%04" PRIX16 "%04" PRIX16 "%04" PRIX16 "%04" PRIX16 "%04" PRIX16 "%04" PRIX16 "%04" PRIX16 "%04" PRIX16, sn[7], sn[6], sn[5], sn[4], sn[3], sn[2], sn[1], sn[0]);
 
 	// Set isInit
 	me->isInit = true;

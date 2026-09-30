@@ -120,8 +120,8 @@ void AlxId_Ctor
 		((uint64_t)me->fw.verPatch << 32) |
 		((uint64_t)me->fw.verDate)
 	);
-	sprintf(me->fw.verStr, "%u.%u.%u.%" PRIu32 ".%s", me->fw.verMajor, me->fw.verMinor, me->fw.verPatch, me->fw.verDate, me->fw.build.hash);
-	sprintf(me->fw.binStr, "%" PRIu32 "_%s_%s_V%u-%u-%u_%s.bin", me->fw.verDate, me->fw.artf, me->fw.name, me->fw.verMajor, me->fw.verMinor, me->fw.verPatch, me->fw.build.hashShort);
+	sprintf(me->fw.verStr, "%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu32 ".%s", me->fw.verMajor, me->fw.verMinor, me->fw.verPatch, me->fw.verDate, me->fw.build.hash);
+	sprintf(me->fw.binStr, "%" PRIu32 "_%s_%s_V%" PRIu8 "-%" PRIu8 "-%" PRIu8 "_%s.bin", me->fw.verDate, me->fw.artf, me->fw.name, me->fw.verMajor, me->fw.verMinor, me->fw.verPatch, me->fw.build.hashShort);
 
 
 	//------------------------------------------------------------------------------
@@ -168,8 +168,8 @@ void AlxId_Ctor
 				((uint64_t)me->fwBootId.fw.verPatch << 32) |
 				((uint64_t)me->fwBootId.fw.verDate)
 			);
-			sprintf(me->fwBootId.fw.verStr, "%u.%u.%u.%" PRIu32 ".%s", me->fwBootId.fw.verMajor, me->fwBootId.fw.verMinor, me->fwBootId.fw.verPatch, me->fwBootId.fw.verDate, me->fwBootId.fw.build.hash);
-			sprintf(me->fwBootId.fw.binStr, "%" PRIu32 "_%s_%s_V%u-%u-%u_%s.bin", me->fwBootId.fw.verDate, me->fwBootId.fw.artf, me->fwBootId.fw.name, me->fwBootId.fw.verMajor, me->fwBootId.fw.verMinor, me->fwBootId.fw.verPatch, me->fwBootId.fw.build.hashShort);
+			sprintf(me->fwBootId.fw.verStr, "%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu32 ".%s", me->fwBootId.fw.verMajor, me->fwBootId.fw.verMinor, me->fwBootId.fw.verPatch, me->fwBootId.fw.verDate, me->fwBootId.fw.build.hash);
+			sprintf(me->fwBootId.fw.binStr, "%" PRIu32 "_%s_%s_V%" PRIu8 "-%" PRIu8 "-%" PRIu8 "_%s.bin", me->fwBootId.fw.verDate, me->fwBootId.fw.artf, me->fwBootId.fw.name, me->fwBootId.fw.verMajor, me->fwBootId.fw.verMinor, me->fwBootId.fw.verPatch, me->fwBootId.fw.build.hashShort);
 
 			// Break
 			break;
@@ -491,7 +491,7 @@ void AlxId_Init(AlxId* me)
 		((uint64_t)me->hw.instance.pcbVerPatch << 32) |
 		((uint64_t)me->hw.instance.pcbVerDate)
 	);
-	sprintf(me->hw.instance.pcbVerStr, "%u.%u.%u.%" PRIu32, me->hw.instance.pcbVerMajor, me->hw.instance.pcbVerMinor, me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
+	sprintf(me->hw.instance.pcbVerStr, "%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu32, me->hw.instance.pcbVerMajor, me->hw.instance.pcbVerMinor, me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
 
 
 	//------------------------------------------------------------------------------
@@ -504,7 +504,7 @@ void AlxId_Init(AlxId* me)
 		((uint64_t)me->hw.instance.bomVerPatch << 32) |
 		((uint64_t)me->hw.instance.bomVerDate)
 	);
-	sprintf(me->hw.instance.bomVerStr, "%u.%u.%u.%" PRIu32, me->hw.instance.bomVerMajor, me->hw.instance.bomVerMinor, me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
+	sprintf(me->hw.instance.bomVerStr, "%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu32, me->hw.instance.bomVerMajor, me->hw.instance.bomVerMinor, me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
 
 
 	//------------------------------------------------------------------------------

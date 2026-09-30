@@ -565,7 +565,7 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 		else if (statusRead != Alx_Ok)
 		{
 			// Break, error occurred, trace, change status to Alx_Err
-			ALX_FS_TRACE_ERR("Err: %d, ch=%d, readLenActual=%" PRIu32 ", lenActual=%" PRIu32 ", len=%" PRIu32 ", delim=%s", statusRead, ch, readLenActual, _lenActual, len, delim);
+			ALX_FS_TRACE_ERR("Err: %d, ch=0x%02" PRIX8 ", readLenActual=%" PRIu32 ", lenActual=%" PRIu32 ", len=%" PRIu32 ", delim=%s", statusRead, (uint8_t)ch, readLenActual, _lenActual, len, delim);
 			status = Alx_Err;
 			break;
 		}
@@ -1182,7 +1182,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 	status = AlxFs_Dir_Open(me, &dir, path);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
+		ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%d", status, path, fileTrace);
 		return status;
 	}
 
@@ -1197,7 +1197,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 		}
 		else if (status != Alx_Ok)
 		{
-			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
+			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%d", status, path, fileTrace);
 			Alx_Status statusClose = AlxFs_Dir_Close(me, &dir);
 			if (statusClose != Alx_Ok)
 			{
@@ -1281,7 +1281,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 				status = AlxFs_File_Trace(me, buff, fileBin);
 				if (status != Alx_Ok)
 				{
-					ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
+					ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%d", status, path, fileTrace);
 					Alx_Status statusClose = AlxFs_Dir_Close(me, &dir);
 					if (statusClose != Alx_Ok)
 					{
@@ -2127,7 +2127,7 @@ static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(void* ctx, void* chunkData
 			// Trace data
 			for (uint32_t j = 0; j < lineLen; j++)
 			{
-				ALX_FS_TRACE_FORMAT("%02X ", ((uint8_t*)chunkData)[i + j]);
+				ALX_FS_TRACE_FORMAT("%02" PRIX8 " ", ((uint8_t*)chunkData)[i + j]);
 			}
 
 			// Trace new line

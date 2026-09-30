@@ -1274,7 +1274,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_INF("- oldest.file = %" PRIu32, me->md.oldest.file);
 		ALX_LOGGER_TRACE_INF("- oldest.dir = %" PRIu32, me->md.oldest.dir);
 
-		ALX_LOGGER_TRACE_INF("- crc = 0x%04X", me->md.crc);
+		ALX_LOGGER_TRACE_INF("- crc = 0x%04" PRIX16, me->md.crc);
 
 		// Repair write file
 		status = AlxLogger_CheckRepairWriteFile(
@@ -1343,7 +1343,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_INF("- oldest.file = %" PRIu32, me->md.oldest.file);
 		ALX_LOGGER_TRACE_INF("- oldest.dir = %" PRIu32, me->md.oldest.dir);
 
-		ALX_LOGGER_TRACE_INF("- crc = 0x%04X", me->md.crc);
+		ALX_LOGGER_TRACE_INF("- crc = 0x%04" PRIX16, me->md.crc);
 
 		// Return
 		return Alx_Ok;
@@ -1718,7 +1718,7 @@ static Alx_Status AlxLogger_SyncLogWriteFile
 	status = AlxFs_File_Truncate(me->alxFs, file, me->md.write.pos);
 	if (status != Alx_Ok)
 	{
-		ALX_LOGGER_TRACE_INF("Sync: failed to truncate file (%u)", status);
+		ALX_LOGGER_TRACE_INF("Sync: failed to truncate file (%d)", status);
 	}
 
 	return status;
@@ -1777,7 +1777,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 		status = AlxFs_File_Size(me->alxFs, &file, &fileSize);
 		if (status != Alx_Ok)
 		{
-			ALX_LOGGER_TRACE_ERR("Failed to get file size (%u)", status);
+			ALX_LOGGER_TRACE_ERR("Failed to get file size (%d)", status);
 			break;
 		}
 

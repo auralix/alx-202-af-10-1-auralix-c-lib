@@ -1879,11 +1879,11 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	//------------------------------------------------------------------------------
 	if (me->dataType == AlxParamItem_Uint8)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%u", me->val.uint8) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRIu8, me->val.uint8) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%u", me->val.uint16) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRIu16, me->val.uint16) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
 	{
@@ -1895,11 +1895,11 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Int8)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%d", me->val.int8) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRId8, me->val.int8) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%d", me->val.int16) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRId16, me->val.int16) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Int32)
 	{
@@ -1992,7 +1992,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	{
 		// Convert
 		uint16_t valNum_Uint16 = 0;
-		if (sscanf(val, "%hu", &valNum_Uint16) != 1)
+		if (sscanf(val, "%" SCNu16, &valNum_Uint16) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
@@ -2005,7 +2005,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	{
 		// Convert
 		uint16_t valNum = 0;
-		if (sscanf(val, "%hu", &valNum) != 1)
+		if (sscanf(val, "%" SCNu16, &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
@@ -2033,7 +2033,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	{
 		// Convert
 		int16_t valNum_Int16 = 0;
-		if (sscanf(val, "%hd", &valNum_Int16) != 1)
+		if (sscanf(val, "%" SCNd16, &valNum_Int16) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
@@ -2046,7 +2046,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	{
 		// Convert
 		int16_t valNum = 0;
-		if (sscanf(val, "%hd", &valNum) != 1)
+		if (sscanf(val, "%" SCNd16, &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}

@@ -277,7 +277,7 @@ void AlxCli_Handle(AlxCli* me)
 							"        \"hwBomArtf\":\"%s\",\r\n"
 							"        \"hwBomName\":\"%s\",\r\n"
 							"        \"hwBomVerStr\":\"%s\",\r\n"
-							"        \"hwId\":%u,\r\n"
+							"        \"hwId\":%" PRIu8 ",\r\n"
 							"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
 							"    }\r\n"
 							"}\r\n",
@@ -318,7 +318,7 @@ void AlxCli_Handle(AlxCli* me)
 							"        \"hwBomArtf\":\"%s\",\r\n"
 							"        \"hwBomName\":\"%s\",\r\n"
 							"        \"hwBomVerStr\":\"%s\",\r\n"
-							"        \"hwId\":%u,\r\n"
+							"        \"hwId\":%" PRIu8 ",\r\n"
 							"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
 							"    }\r\n"
 							"}\r\n",
@@ -362,7 +362,7 @@ void AlxCli_Handle(AlxCli* me)
 									"\"hwBomArtf\":\"%s\","
 									"\"hwBomName\":\"%s\","
 									"\"hwBomVerStr\":\"%s\","
-									"\"hwId\":%u,"
+									"\"hwId\":%" PRIu8 ","
 									"\"hwMcuUniqueIdStr\":\"%s\""
 								"}"
 							"}\r\n",
@@ -403,7 +403,7 @@ void AlxCli_Handle(AlxCli* me)
 									"\"hwBomArtf\":\"%s\","
 									"\"hwBomName\":\"%s\","
 									"\"hwBomVerStr\":\"%s\","
-									"\"hwId\":%u,"
+									"\"hwId\":%" PRIu8 ","
 									"\"hwMcuUniqueIdStr\":\"%s\""
 								"}"
 							"}\r\n",
