@@ -41,7 +41,7 @@
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#if defined(ALX_ZEPHYR_TRACE_WITH_LOG)
+#if defined(ALX_TRACE_ZEPHYR_WITH_LOG)
 LOG_MODULE_REGISTER(alx, LOG_LEVEL_INF);
 K_MUTEX_DEFINE(alx_trace_mutex);	// AB: Mutex for thread-safe access to accumulation buffer
 #endif
@@ -82,7 +82,7 @@ void AlxTrace_Ctor
 Alx_Status AlxTrace_Init(AlxTrace* me)
 {
 	// Init
-	#if !defined(ALX_ZEPHYR_TRACE_WITH_LOG)
+	#if !defined(ALX_TRACE_ZEPHYR_WITH_LOG)
 	me->device = DEVICE_DT_GET_OR_NULL(DT_CHOSEN(zephyr_console));
 	if (me->device == NULL)
 	{
@@ -125,7 +125,7 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 {
 	// Write
-	#if !defined(ALX_ZEPHYR_TRACE_WITH_LOG)
+	#if !defined(ALX_TRACE_ZEPHYR_WITH_LOG)
 	if (me->device)
 	{
 		while (*str)
