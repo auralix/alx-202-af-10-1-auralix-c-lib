@@ -297,7 +297,7 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 		HAL_StatusTypeDef statusHal = HAL_UART_Init(&me->huart);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %d", statusHal);
 			return Alx_Err;
 		}
 	}
@@ -334,7 +334,7 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	HAL_StatusTypeDef statusHal = HAL_UART_DeInit(&me->huart);
 	if (statusHal != HAL_OK)
 	{
-		ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_DeInit() statusHal %u", statusHal);
+		ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_DeInit() statusHal %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -508,13 +508,13 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 		if (statusHal != HAL_OK)
 		{
 			// Trace
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Transmit() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Transmit() statusHal %d", statusHal);
 
 			// Reset
 			status = AlxSerialPort_Reset(me);
 			if (status != Alx_Ok)
 			{
-				ALX_SERIAL_PORT_TRACE_ERR("FAIL: AlxSerialPort_Reset() status %u", status);
+				ALX_SERIAL_PORT_TRACE_ERR("FAIL: AlxSerialPort_Reset() status %d", status);
 				return Alx_Err;
 			}
 
@@ -704,7 +704,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 	HAL_StatusTypeDef statusHal = HAL_UART_DeInit(&me->huart);
 	if (statusHal != HAL_OK)
 	{
-		ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_DeInit() statusHal %u", statusHal);
+		ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_DeInit() statusHal %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -745,7 +745,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 		HAL_StatusTypeDef statusHal = HAL_UART_Init(&me->huart);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %d", statusHal);
 			return Alx_Err;
 		}
 	}

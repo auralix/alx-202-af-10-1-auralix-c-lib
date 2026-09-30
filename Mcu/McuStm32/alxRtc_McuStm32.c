@@ -221,21 +221,21 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 		HAL_StatusTypeDef status = HAL_RTC_DeInit(&me->hrtc);
 		if (status != HAL_OK)
 		{
-			ALX_RTC_TRACE_WRN("Err: RTC DeInit (%u)", status);
+			ALX_RTC_TRACE_WRN("Err: RTC DeInit (%d)", status);
 			me->isErr = true;
 		}
 
 		status = HAL_RTC_Init(&me->hrtc);
 		if (status != HAL_OK)
 		{
-			ALX_RTC_TRACE_WRN("Err RTC Init (%u)", status);
+			ALX_RTC_TRACE_WRN("Err RTC Init (%d)", status);
 			me->isErr = true;
 		}
 
 		Alx_Status alxStatus = AlxRtc_TuneClockSource(me, 0.0f);
 		if (alxStatus != Alx_Ok)
 		{
-			ALX_RTC_TRACE_WRN("Err AlxRtc_TuneClockSource (%u)", alxStatus);
+			ALX_RTC_TRACE_WRN("Err AlxRtc_TuneClockSource (%d)", alxStatus);
 			me->isErr = true;
 		}
 
@@ -248,13 +248,13 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 			alxStatus = AlxRtc_SetDateTime(me, dtBackup);
 			if (alxStatus != Alx_Ok)
 			{
-				ALX_RTC_TRACE_WRN("Err restore backed-up time 1 (%u)", alxStatus);
+				ALX_RTC_TRACE_WRN("Err restore backed-up time 1 (%d)", alxStatus);
 				me->isErr = true;
 			}
 			alxStatus = AlxRtc_TuneTime_ns(me, secFract);
 			if (alxStatus != Alx_Ok)
 			{
-				ALX_RTC_TRACE_WRN("Err restore backed-up time 2 (%u)", alxStatus);
+				ALX_RTC_TRACE_WRN("Err restore backed-up time 2 (%d)", alxStatus);
 				me->isErr = true;
 			}
 		}
