@@ -289,11 +289,11 @@ extern "C" {
 //------------------------------------------------------------------------------
 
 // ALX
-#if defined(ALX_GLOBAL_ASSERT_BKPT)
+#if defined(ALX_GLOBAL_ASSERT_BKPT_ENABLE)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_GLOBAL_FILE, expr)
-#elif defined(ALX_GLOBAL_ASSERT_TRACE)
+#elif defined(ALX_GLOBAL_ASSERT_TRACE_ENABLE)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_GLOBAL_FILE, expr)
-#elif defined(ALX_GLOBAL_ASSERT_RST)
+#elif defined(ALX_GLOBAL_ASSERT_RST_ENABLE)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_RST(ALX_GLOBAL_FILE, expr)
 #else
 	#define ALX_GLOBAL_ASSERT(expr) do{} while (false)
@@ -308,7 +308,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Trace
 //------------------------------------------------------------------------------
-#if defined(ALX_GLOBAL_TRACE)
+#if defined(ALX_GLOBAL_TRACE_ENABLE)
 	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_GLOBAL_FILE, __VA_ARGS__)
 #else
 	#define ALX_GLOBAL_TRACE(...) do{} while (false)
