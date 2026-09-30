@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC80X_TODO)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X_TODO)	// Unfinished: a _TODO guard keeps a file out of every build until it is done
 
 
 //******************************************************************************
