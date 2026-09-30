@@ -120,8 +120,8 @@ void AlxId_Ctor
 		((uint64_t)me->fw.verPatch << 32) |
 		((uint64_t)me->fw.verDate)
 	);
-	sprintf(me->fw.verStr, "%u.%u.%u.%lu.%s", me->fw.verMajor, me->fw.verMinor, me->fw.verPatch, me->fw.verDate, me->fw.build.hash);
-	sprintf(me->fw.binStr, "%lu_%s_%s_V%u-%u-%u_%s.bin", me->fw.verDate, me->fw.artf, me->fw.name, me->fw.verMajor, me->fw.verMinor, me->fw.verPatch, me->fw.build.hashShort);
+	sprintf(me->fw.verStr, "%u.%u.%u.%" PRIu32 ".%s", me->fw.verMajor, me->fw.verMinor, me->fw.verPatch, me->fw.verDate, me->fw.build.hash);
+	sprintf(me->fw.binStr, "%" PRIu32 "_%s_%s_V%u-%u-%u_%s.bin", me->fw.verDate, me->fw.artf, me->fw.name, me->fw.verMajor, me->fw.verMinor, me->fw.verPatch, me->fw.build.hashShort);
 
 
 	//------------------------------------------------------------------------------
@@ -168,8 +168,8 @@ void AlxId_Ctor
 				((uint64_t)me->fwBootId.fw.verPatch << 32) |
 				((uint64_t)me->fwBootId.fw.verDate)
 			);
-			sprintf(me->fwBootId.fw.verStr, "%u.%u.%u.%lu.%s", me->fwBootId.fw.verMajor, me->fwBootId.fw.verMinor, me->fwBootId.fw.verPatch, me->fwBootId.fw.verDate, me->fwBootId.fw.build.hash);
-			sprintf(me->fwBootId.fw.binStr, "%lu_%s_%s_V%u-%u-%u_%s.bin", me->fwBootId.fw.verDate, me->fwBootId.fw.artf, me->fwBootId.fw.name, me->fwBootId.fw.verMajor, me->fwBootId.fw.verMinor, me->fwBootId.fw.verPatch, me->fwBootId.fw.build.hashShort);
+			sprintf(me->fwBootId.fw.verStr, "%u.%u.%u.%" PRIu32 ".%s", me->fwBootId.fw.verMajor, me->fwBootId.fw.verMinor, me->fwBootId.fw.verPatch, me->fwBootId.fw.verDate, me->fwBootId.fw.build.hash);
+			sprintf(me->fwBootId.fw.binStr, "%" PRIu32 "_%s_%s_V%u-%u-%u_%s.bin", me->fwBootId.fw.verDate, me->fwBootId.fw.artf, me->fwBootId.fw.name, me->fwBootId.fw.verMajor, me->fwBootId.fw.verMinor, me->fwBootId.fw.verPatch, me->fwBootId.fw.build.hashShort);
 
 			// Break
 			break;
@@ -491,7 +491,7 @@ void AlxId_Init(AlxId* me)
 		((uint64_t)me->hw.instance.pcbVerPatch << 32) |
 		((uint64_t)me->hw.instance.pcbVerDate)
 	);
-	sprintf(me->hw.instance.pcbVerStr, "%u.%u.%u.%lu", me->hw.instance.pcbVerMajor, me->hw.instance.pcbVerMinor, me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
+	sprintf(me->hw.instance.pcbVerStr, "%u.%u.%u.%" PRIu32, me->hw.instance.pcbVerMajor, me->hw.instance.pcbVerMinor, me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
 
 
 	//------------------------------------------------------------------------------
@@ -504,7 +504,7 @@ void AlxId_Init(AlxId* me)
 		((uint64_t)me->hw.instance.bomVerPatch << 32) |
 		((uint64_t)me->hw.instance.bomVerDate)
 	);
-	sprintf(me->hw.instance.bomVerStr, "%u.%u.%u.%lu", me->hw.instance.bomVerMajor, me->hw.instance.bomVerMinor, me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
+	sprintf(me->hw.instance.bomVerStr, "%u.%u.%u.%" PRIu32, me->hw.instance.bomVerMajor, me->hw.instance.bomVerMinor, me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
 
 
 	//------------------------------------------------------------------------------
@@ -542,9 +542,9 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_INF("- ver: %s", me->fw.verStr);
 	ALX_ID_TRACE_INF("- bin: %s", me->fw.binStr);
 	ALX_ID_TRACE_INF("- job_name: %s", me->fw.build.name);
-	ALX_ID_TRACE_INF("- job_number: %lu", me->fw.build.num);
+	ALX_ID_TRACE_INF("- job_number: %" PRIu32, me->fw.build.num);
 	ALX_ID_TRACE_INF("- job_hash: %s", me->fw.build.hash);
-	ALX_ID_TRACE_INF("- job_revision: %lu", me->fw.build.rev);
+	ALX_ID_TRACE_INF("- job_revision: %" PRIu32, me->fw.build.rev);
 	ALX_ID_TRACE_INF("");
 
 
@@ -559,9 +559,9 @@ void AlxId_Trace(AlxId* me)
 		ALX_ID_TRACE_INF("- ver: %s", me->fwBootId.fw.verStr);
 		ALX_ID_TRACE_INF("- bin: %s", me->fwBootId.fw.binStr);
 		ALX_ID_TRACE_INF("- job_name: %s", me->fwBootId.fw.build.name);
-		ALX_ID_TRACE_INF("- job_number: %lu", me->fwBootId.fw.build.num);
+		ALX_ID_TRACE_INF("- job_number: %" PRIu32, me->fwBootId.fw.build.num);
 		ALX_ID_TRACE_INF("- job_hash: %s", me->fwBootId.fw.build.hash);
-		ALX_ID_TRACE_INF("- job_revision: %lu", me->fwBootId.fw.build.rev);
+		ALX_ID_TRACE_INF("- job_revision: %" PRIu32, me->fwBootId.fw.build.rev);
 		ALX_ID_TRACE_INF("");
 	}
 
@@ -570,8 +570,8 @@ void AlxId_Trace(AlxId* me)
 	// FW - Language C & Language C Standard Library
 	//------------------------------------------------------------------------------
 	ALX_ID_TRACE_INF("FW - Language:");
-	ALX_ID_TRACE_INF("- name: C, ver: %lu", me->fwLangC.ver);
-	ALX_ID_TRACE_INF("- name: %s, ver: %lu.%lu.%lu", me->fwLangCLib.name, me->fwLangCLib.verMajor, me->fwLangCLib.verMinor, me->fwLangCLib.verPatch);
+	ALX_ID_TRACE_INF("- name: C, ver: %" PRIu32, me->fwLangC.ver);
+	ALX_ID_TRACE_INF("- name: %s, ver: %" PRIu32 ".%" PRIu32 ".%" PRIu32, me->fwLangCLib.name, me->fwLangCLib.verMajor, me->fwLangCLib.verMinor, me->fwLangCLib.verPatch);
 	ALX_ID_TRACE_INF("");
 
 
@@ -580,7 +580,7 @@ void AlxId_Trace(AlxId* me)
 	//------------------------------------------------------------------------------
 	ALX_ID_TRACE_INF("FW - Compiler:");
 	ALX_ID_TRACE_INF("- name: %s", me->fwComp.name);
-	ALX_ID_TRACE_INF("- ver: %lu.%lu.%lu", me->fwComp.verMajor, me->fwComp.verMinor, me->fwComp.verPatch);
+	ALX_ID_TRACE_INF("- ver: %" PRIu32 ".%" PRIu32 ".%" PRIu32, me->fwComp.verMajor, me->fwComp.verMinor, me->fwComp.verPatch);
 	ALX_ID_TRACE_INF("");
 
 
@@ -611,11 +611,11 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_INF("HW:");
 	ALX_ID_TRACE_INF("- pcb_artf: %s", me->hw.instance.pcbArtf);
 	ALX_ID_TRACE_INF("- pcb_name: %s", me->hw.instance.pcbName);
-	ALX_ID_TRACE_INF("- pcb_ver: %lu.%lu.%lu.%lu", me->hw.instance.pcbVerMajor, me->hw.instance.pcbVerMinor, me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
-	ALX_ID_TRACE_INF("- pcb_id: %lu", me->hw.instance.id);
+	ALX_ID_TRACE_INF("- pcb_ver: %" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu32, me->hw.instance.pcbVerMajor, me->hw.instance.pcbVerMinor, me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
+	ALX_ID_TRACE_INF("- pcb_id: %" PRIu8, me->hw.instance.id);
 	ALX_ID_TRACE_INF("- bom_artf: %s", me->hw.instance.bomArtf);
 	ALX_ID_TRACE_INF("- bom_name: %s", me->hw.instance.bomName);
-	ALX_ID_TRACE_INF("- bom_ver: %lu.%lu.%lu.%lu", me->hw.instance.bomVerMajor, me->hw.instance.bomVerMinor, me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
+	ALX_ID_TRACE_INF("- bom_ver: %" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu32, me->hw.instance.bomVerMajor, me->hw.instance.bomVerMinor, me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
 	ALX_ID_TRACE_INF("- mcu_name: %s", me->hw.mcuName);
 	ALX_ID_TRACE_INF("");
 

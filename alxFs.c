@@ -187,7 +187,7 @@ Alx_Status AlxFs_Mount(AlxFs* me)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -223,7 +223,7 @@ Alx_Status AlxFs_UnMount(AlxFs* me)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -292,7 +292,7 @@ Alx_Status AlxFs_Format(AlxFs* me)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -325,7 +325,7 @@ Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s", status, path);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", path=%s", status, path);
 		return Alx_Err;
 	}
 
@@ -358,7 +358,7 @@ Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, pathOld=%s, pathNew=%s", status, pathOld, pathNew);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", pathOld=%s, pathNew=%s", status, pathOld, pathNew);
 		return Alx_Err;
 	}
 
@@ -462,7 +462,7 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const 
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s, mode=%s", status, path, mode);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", path=%s, mode=%s", status, path, mode);
 		return Alx_Err;
 	}
 
@@ -495,7 +495,7 @@ Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -565,7 +565,7 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 		else if (statusRead != Alx_Ok)
 		{
 			// Break, error occurred, trace, change status to Alx_Err
-			ALX_FS_TRACE_ERR("Err: %d, ch=%d, readLenActual=%u, lenActual=%u, len=%u, delim=%s", statusRead, ch, readLenActual, _lenActual, len, delim);
+			ALX_FS_TRACE_ERR("Err: %d, ch=%d, readLenActual=%" PRIu32 ", lenActual=%" PRIu32 ", len=%" PRIu32 ", delim=%s", statusRead, ch, readLenActual, _lenActual, len, delim);
 			status = Alx_Err;
 			break;
 		}
@@ -663,7 +663,7 @@ Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -779,7 +779,7 @@ Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* position)
 	// Trace
 	if (_position < 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", _position);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, _position);
 		return Alx_Err;
 	}
 
@@ -813,7 +813,7 @@ Alx_Status AlxFs_File_Rewind(AlxFs* me, AlxFs_File* file)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -846,7 +846,7 @@ Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* size)
 	// Trace
 	if (_size < 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", _size);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, _size);
 		return Alx_Err;
 	}
 
@@ -887,7 +887,7 @@ Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, size=%u", status, size);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", size=%" PRIu32, status, size);
 		return Alx_Err;
 	}
 
@@ -923,7 +923,7 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 	if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%u", status, path, fileSize);
+		ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%" PRIu32, status, path, fileSize);
 		if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 		Alx_Status statusClose = AlxFs_File_Close(me, &file);
 		if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
@@ -945,7 +945,7 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 		if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 		if (status != Alx_Ok)
 		{
-			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%u, chunkLen=%u, chunkLenActual=%u", status, path, fileSize, chunkLen, chunkLenActual);
+			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%" PRIu32 ", chunkLen=%" PRIu32 ", chunkLenActual=%" PRIu32, status, path, fileSize, chunkLen, chunkLenActual);
 			if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 			Alx_Status statusClose = AlxFs_File_Close(me, &file);
 			if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
@@ -961,7 +961,7 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 		status = chunkRead_Callback(chunkRead_Callback_Ctx, chunkBuff, chunkLenActual);
 		if (status != Alx_Ok)
 		{
-			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%u, chunkLenActual=%u", status, path, fileSize, chunkLenActual);
+			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%" PRIu32 ", chunkLenActual=%" PRIu32, status, path, fileSize, chunkLenActual);
 			if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 			Alx_Status statusClose = AlxFs_File_Close(me, &file);
 			if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
@@ -1046,7 +1046,7 @@ Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s", status, path);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", path=%s", status, path);
 		return Alx_Err;
 	}
 
@@ -1079,7 +1079,7 @@ Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s", status, path);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", path=%s", status, path);
 		return Alx_Err;
 	}
 
@@ -1112,7 +1112,7 @@ Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 

@@ -193,9 +193,9 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	numOfLogsToProcess = AlxLogger_Log_GetNumOfLogs(me->md.read.id, me->md.write.id);
 	AlxGlobal_Ulltoa(numOfLogsToProcess, numOfLogsToProcess_str);
 	ALX_LOGGER_TRACE_INF("AlxLogger - Totals");
-	ALX_LOGGER_TRACE_INF("- numOfFilesTotal = %lu", me->numOfFilesTotal);
-	ALX_LOGGER_TRACE_INF("- numOfLogsTotal = %lu", me->numOfLogsTotal);
-	ALX_LOGGER_TRACE_INF("- numOfLogsPerDirTotal = %lu", me->numOfLogsPerDirTotal);
+	ALX_LOGGER_TRACE_INF("- numOfFilesTotal = %" PRIu32, me->numOfFilesTotal);
+	ALX_LOGGER_TRACE_INF("- numOfLogsTotal = %" PRIu32, me->numOfLogsTotal);
+	ALX_LOGGER_TRACE_INF("- numOfLogsPerDirTotal = %" PRIu32, me->numOfLogsPerDirTotal);
 	ALX_LOGGER_TRACE_INF("- numOfLogsToProcess = %s", numOfLogsToProcess_str);
 
 	// Set isInit
@@ -342,7 +342,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 		if (md.read.pos != md.read.log)
 		{
 			// Open
-			sprintf(path, "/%lu/%lu.csv", md.read.dir, md.read.file);
+			sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", md.read.dir, md.read.file);
 			status = AlxFs_File_Open(me->alxFs, &file, path, "r");
 			if (status != Alx_Ok)
 			{
@@ -357,7 +357,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 				status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLen);
 				if (status != Alx_Ok)
 				{
-					ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, readLen=%u, readLenTotal=%u, readLog=%u", status, path, readLen, readLenTotal, readLog);
+					ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, readLen=%" PRIu32 ", readLenTotal=%" PRIu32 ", readLog=%" PRIu32, status, path, readLen, readLenTotal, readLog);
 					Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 					if (statusClose != Alx_Ok)
 					{
@@ -378,7 +378,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 					status = AlxFs_File_Close(me->alxFs, &file);
 					if (status != Alx_Ok)
 					{
-						ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, readLenTotal=%u, readLog=%u", status, path, readLenTotal, readLog);
+						ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, readLenTotal=%" PRIu32 ", readLog=%" PRIu32, status, path, readLenTotal, readLog);
 						// TV: TODO - Handle close error
 						return status;
 					}
@@ -422,11 +422,11 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 			}
 
 			// Open
-			sprintf(path, "/%lu/%lu.csv", md.read.dir, md.read.file);
+			sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", md.read.dir, md.read.file);
 			status = AlxFs_File_Open(me->alxFs, &file, path, "r");
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%u, readLenTotal=%u, numOfLogs=%u", status, path, logNum, readLenTotal, numOfLogs);
+				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%" PRIu32 ", readLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, logNum, readLenTotal, numOfLogs);
 				return status;
 			}
 
@@ -434,7 +434,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 			status = AlxFs_File_Seek(me->alxFs, &file, md.read.pos, AlxFs_File_Seek_Origin_Set, &positionNew);
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, offset=%d, positionNew=%u, logNum=%u, readLenTotal=%u, numOfLogs=%u", status, path, md.read.pos, positionNew, logNum, readLenTotal, numOfLogs);
+				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, offset=%" PRIu32 ", positionNew=%" PRIu32 ", logNum=%" PRIu32 ", readLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, md.read.pos, positionNew, logNum, readLenTotal, numOfLogs);
 				Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 				if (statusClose != Alx_Ok)
 				{
@@ -450,17 +450,17 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 			status = AlxFs_File_Close(me->alxFs, &file);
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%u, readLenTotal=%u, numOfLogs=%u", status, path, logNum, readLenTotal, numOfLogs);
+				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%" PRIu32 ", readLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, logNum, readLenTotal, numOfLogs);
 				// TV: TODO - Handle close error
 				return status;
 			}
 
 			// Open new file
-			sprintf(path, "/%lu/%lu.csv", md.read.dir, md.read.file);
+			sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", md.read.dir, md.read.file);
 			status = AlxFs_File_Open(me->alxFs, &file, path, "r");
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%u, readLenTotal=%u, numOfLogs=%u", status, path, logNum, readLenTotal, numOfLogs);
+				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%" PRIu32 ", readLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, logNum, readLenTotal, numOfLogs);
 				return status;
 			}
 		}
@@ -472,7 +472,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 		status = AlxFs_File_ReadStrUntil(me->alxFs, &file, logs + readLenTotal, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLen);
 		if (status != Alx_Ok)
 		{
-			ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, readLen=%u, logNum=%u, readLenTotal=%u, numOfLogs=%u", status, path, readLen, logNum, readLenTotal, numOfLogs);
+			ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, readLen=%" PRIu32 ", logNum=%" PRIu32 ", readLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, readLen, logNum, readLenTotal, numOfLogs);
 			Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 			if (statusClose != Alx_Ok)
 			{
@@ -535,7 +535,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 			status = AlxFs_File_Close(me->alxFs, &file);
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%u, readLenTotal=%u, numOfLogs=%u", status, path, logNum, readLenTotal, numOfLogs);
+				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%" PRIu32 ", readLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, logNum, readLenTotal, numOfLogs);
 				// TV: TODO - Handle close error
 				return status;
 			}
@@ -559,7 +559,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 			status = AlxFs_File_Close(me->alxFs, &file);
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%u, readLenTotal=%u, numOfLogs=%u", status, path, logNum, readLenTotal, numOfLogs);
+				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%" PRIu32 ", readLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, logNum, readLenTotal, numOfLogs);
 				// TV: TODO - Handle close error
 				return status;
 			}
@@ -623,11 +623,11 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		//------------------------------------------------------------------------------
 		// Open
 		//------------------------------------------------------------------------------
-		sprintf(path, "/%lu/%lu.csv", me->md.write.dir, me->md.write.file);
+		sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, me->md.write.file);
 		status = AlxFs_File_Open(me->alxFs, &file, path, "a");
 		if (status != Alx_Ok)
 		{
-			ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
+			ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%" PRIu32 ", writeLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, logNum, writeLenTotal, numOfLogs);
 			return status;
 		}
 
@@ -664,7 +664,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		status = AlxFs_File_Write(me->alxFs, &file, (void*)logs + writeLenTotal, writeLen);
 		if (status != Alx_Ok)
 		{
-			ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, writeLen=%u, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, writeLen, logNum, writeLenTotal, numOfLogs);
+			ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, writeLen=%" PRIu32 ", logNum=%" PRIu32 ", writeLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, writeLen, logNum, writeLenTotal, numOfLogs);
 			Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 			if (statusClose != Alx_Ok)
 			{
@@ -681,7 +681,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		status = AlxFs_File_Close(me->alxFs, &file);
 		if (status != Alx_Ok)
 		{
-			ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
+			ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%" PRIu32 ", writeLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, logNum, writeLenTotal, numOfLogs);
 			// TV: TODO - Handle close error
 			return status;
 		}
@@ -769,7 +769,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 				status = AlxLogger_ClearWriteDir(me);
 				if (status != Alx_Ok)
 				{
-					ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
+					ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%" PRIu32 ", writeLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, logNum, writeLenTotal, numOfLogs);
 					return status;
 				}
 			}
@@ -785,7 +785,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 			status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
+				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%" PRIu32 ", writeLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, logNum, writeLenTotal, numOfLogs);
 				return status;
 			}
 		}
@@ -797,7 +797,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 			status = AlxLogger_Metadata_Store_Private(me, config);
 			if (status != Alx_Ok)
 			{
-				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%u, writeLenTotal=%u, numOfLogs=%u", status, path, logNum, writeLenTotal, numOfLogs);
+				ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, logNum=%" PRIu32 ", writeLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, logNum, writeLenTotal, numOfLogs);
 				return status;
 			}
 		}
@@ -964,7 +964,7 @@ Alx_Status AlxLogger_File_ReadFirstLog(AlxLogger* me, const char* path, char* lo
 	status = AlxFs_File_ReadStrUntil(me->alxFs, &file, log, me->logDelim, ALX_LOGGER_LOG_LEN_MAX, &readLen);
 	if (status != Alx_Ok)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, readLen=%u", status, path, readLen);
+		ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, readLen=%" PRIu32, status, path, readLen);
 		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 		if (statusClose != Alx_Ok)
 		{
@@ -1069,7 +1069,7 @@ Alx_Status AlxLogger_File_GetPathStoredOldest(AlxLogger* me, char* pathStoredOld
 	uint32_t dirOldest = me->md.oldest.dir;
 
 	// Return
-	sprintf(pathStoredOldest, "/%lu/%lu.csv", dirOldest, fileOldest);
+	sprintf(pathStoredOldest, "/%" PRIu32 "/%" PRIu32 ".csv", dirOldest, fileOldest);
 	return Alx_Ok;
 }
 Alx_Status AlxLogger_File_GetPathStoredNewest(AlxLogger* me, char* pathStoredNewest)
@@ -1092,7 +1092,7 @@ Alx_Status AlxLogger_File_GetPathStoredNewest(AlxLogger* me, char* pathStoredNew
 	uint32_t dirNewest = (idNewest / me->numOfLogsPerDirTotal) % me->numOfDir;
 
 	// Return
-	sprintf(pathStoredNewest, "/%lu/%lu.csv", dirNewest, fileNewest);
+	sprintf(pathStoredNewest, "/%" PRIu32 "/%" PRIu32 ".csv", dirNewest, fileNewest);
 	return Alx_Ok;
 }
 Alx_Status AlxLogger_File_GetPathToProcessOldest(AlxLogger* me, char* pathToProcessOldest)
@@ -1114,7 +1114,7 @@ Alx_Status AlxLogger_File_GetPathToProcessOldest(AlxLogger* me, char* pathToProc
 	uint32_t dirOldest = me->md.read.dir;
 
 	// Return
-	sprintf(pathToProcessOldest, "/%lu/%lu.csv", dirOldest, fileOldest);
+	sprintf(pathToProcessOldest, "/%" PRIu32 "/%" PRIu32 ".csv", dirOldest, fileOldest);
 	return Alx_Ok;
 }
 
@@ -1246,33 +1246,33 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 
 		// Trace
 		ALX_LOGGER_TRACE_INF("AlxLogger - Load metadata OK");
-		ALX_LOGGER_TRACE_INF("- magicNumber = 0x%08lX", me->md.magicNumber);
-		ALX_LOGGER_TRACE_INF("- version = %lu", me->md.version);
+		ALX_LOGGER_TRACE_INF("- magicNumber = 0x%08" PRIX32, me->md.magicNumber);
+		ALX_LOGGER_TRACE_INF("- version = %" PRIu32, me->md.version);
 
-		ALX_LOGGER_TRACE_INF("- numOfDir = %lu", me->md.numOfDir);
-		ALX_LOGGER_TRACE_INF("- numOfFilesPerDir = %lu", me->md.numOfFilesPerDir);
-		ALX_LOGGER_TRACE_INF("- numOfLogsPerFile = %lu", me->md.numOfLogsPerFile);
+		ALX_LOGGER_TRACE_INF("- numOfDir = %" PRIu32, me->md.numOfDir);
+		ALX_LOGGER_TRACE_INF("- numOfFilesPerDir = %" PRIu32, me->md.numOfFilesPerDir);
+		ALX_LOGGER_TRACE_INF("- numOfLogsPerFile = %" PRIu32, me->md.numOfLogsPerFile);
 
 		AlxGlobal_Ulltoa(me->md.read.id, buffer);
 		ALX_LOGGER_TRACE_INF("- read.id = %s", buffer);
-		ALX_LOGGER_TRACE_INF("- read.pos = %lu", me->md.read.pos);
-		ALX_LOGGER_TRACE_INF("- read.log = %lu", me->md.read.log);
-		ALX_LOGGER_TRACE_INF("- read.file = %lu", me->md.read.file);
-		ALX_LOGGER_TRACE_INF("- read.dir = %lu", me->md.read.dir);
+		ALX_LOGGER_TRACE_INF("- read.pos = %" PRIu32, me->md.read.pos);
+		ALX_LOGGER_TRACE_INF("- read.log = %" PRIu32, me->md.read.log);
+		ALX_LOGGER_TRACE_INF("- read.file = %" PRIu32, me->md.read.file);
+		ALX_LOGGER_TRACE_INF("- read.dir = %" PRIu32, me->md.read.dir);
 
 		AlxGlobal_Ulltoa(me->md.write.id, buffer);
 		ALX_LOGGER_TRACE_INF("- write.id = %s", buffer);
-		ALX_LOGGER_TRACE_INF("- write.pos = %lu", me->md.write.pos);
-		ALX_LOGGER_TRACE_INF("- write.log = %lu", me->md.write.log);
-		ALX_LOGGER_TRACE_INF("- write.file = %lu", me->md.write.file);
-		ALX_LOGGER_TRACE_INF("- write.dir = %lu", me->md.write.dir);
+		ALX_LOGGER_TRACE_INF("- write.pos = %" PRIu32, me->md.write.pos);
+		ALX_LOGGER_TRACE_INF("- write.log = %" PRIu32, me->md.write.log);
+		ALX_LOGGER_TRACE_INF("- write.file = %" PRIu32, me->md.write.file);
+		ALX_LOGGER_TRACE_INF("- write.dir = %" PRIu32, me->md.write.dir);
 
 		AlxGlobal_Ulltoa(me->md.oldest.id, buffer);
 		ALX_LOGGER_TRACE_INF("- oldest.id = %s", buffer);
-		ALX_LOGGER_TRACE_INF("- oldest.pos = %lu", me->md.oldest.pos);
-		ALX_LOGGER_TRACE_INF("- oldest.log = %lu", me->md.oldest.log);
-		ALX_LOGGER_TRACE_INF("- oldest.file = %lu", me->md.oldest.file);
-		ALX_LOGGER_TRACE_INF("- oldest.dir = %lu", me->md.oldest.dir);
+		ALX_LOGGER_TRACE_INF("- oldest.pos = %" PRIu32, me->md.oldest.pos);
+		ALX_LOGGER_TRACE_INF("- oldest.log = %" PRIu32, me->md.oldest.log);
+		ALX_LOGGER_TRACE_INF("- oldest.file = %" PRIu32, me->md.oldest.file);
+		ALX_LOGGER_TRACE_INF("- oldest.dir = %" PRIu32, me->md.oldest.dir);
 
 		ALX_LOGGER_TRACE_INF("- crc = 0x%04X", me->md.crc);
 
@@ -1315,33 +1315,33 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 
 		// Trace
 		ALX_LOGGER_TRACE_INF("AlxLogger - Store metadata after Check/Repair current write_file and read_file OK");
-		ALX_LOGGER_TRACE_INF("- magicNumber = 0x%08lX", me->md.magicNumber);
-		ALX_LOGGER_TRACE_INF("- version = %lu", me->md.version);
+		ALX_LOGGER_TRACE_INF("- magicNumber = 0x%08" PRIX32, me->md.magicNumber);
+		ALX_LOGGER_TRACE_INF("- version = %" PRIu32, me->md.version);
 
-		ALX_LOGGER_TRACE_INF("- numOfDir = %lu", me->md.numOfDir);
-		ALX_LOGGER_TRACE_INF("- numOfFilesPerDir = %lu", me->md.numOfFilesPerDir);
-		ALX_LOGGER_TRACE_INF("- numOfLogsPerFile = %lu", me->md.numOfLogsPerFile);
+		ALX_LOGGER_TRACE_INF("- numOfDir = %" PRIu32, me->md.numOfDir);
+		ALX_LOGGER_TRACE_INF("- numOfFilesPerDir = %" PRIu32, me->md.numOfFilesPerDir);
+		ALX_LOGGER_TRACE_INF("- numOfLogsPerFile = %" PRIu32, me->md.numOfLogsPerFile);
 
 		AlxGlobal_Ulltoa(me->md.read.id, buffer);
 		ALX_LOGGER_TRACE_INF("- read.id = %s", buffer);
-		ALX_LOGGER_TRACE_INF("- read.pos = %lu", me->md.read.pos);
-		ALX_LOGGER_TRACE_INF("- read.log = %lu", me->md.read.log);
-		ALX_LOGGER_TRACE_INF("- read.file = %lu", me->md.read.file);
-		ALX_LOGGER_TRACE_INF("- read.dir = %lu", me->md.read.dir);
+		ALX_LOGGER_TRACE_INF("- read.pos = %" PRIu32, me->md.read.pos);
+		ALX_LOGGER_TRACE_INF("- read.log = %" PRIu32, me->md.read.log);
+		ALX_LOGGER_TRACE_INF("- read.file = %" PRIu32, me->md.read.file);
+		ALX_LOGGER_TRACE_INF("- read.dir = %" PRIu32, me->md.read.dir);
 
 		AlxGlobal_Ulltoa(me->md.write.id, buffer);
 		ALX_LOGGER_TRACE_INF("- write.id = %s", buffer);
-		ALX_LOGGER_TRACE_INF("- write.pos = %lu", me->md.write.pos);
-		ALX_LOGGER_TRACE_INF("- write.log = %lu", me->md.write.log);
-		ALX_LOGGER_TRACE_INF("- write.file = %lu", me->md.write.file);
-		ALX_LOGGER_TRACE_INF("- write.dir = %lu", me->md.write.dir);
+		ALX_LOGGER_TRACE_INF("- write.pos = %" PRIu32, me->md.write.pos);
+		ALX_LOGGER_TRACE_INF("- write.log = %" PRIu32, me->md.write.log);
+		ALX_LOGGER_TRACE_INF("- write.file = %" PRIu32, me->md.write.file);
+		ALX_LOGGER_TRACE_INF("- write.dir = %" PRIu32, me->md.write.dir);
 
 		AlxGlobal_Ulltoa(me->md.oldest.id, buffer);
 		ALX_LOGGER_TRACE_INF("- oldest.id = %s", buffer);
-		ALX_LOGGER_TRACE_INF("- oldest.pos = %lu", me->md.oldest.pos);
-		ALX_LOGGER_TRACE_INF("- oldest.log = %lu", me->md.oldest.log);
-		ALX_LOGGER_TRACE_INF("- oldest.file = %lu", me->md.oldest.file);
-		ALX_LOGGER_TRACE_INF("- oldest.dir = %lu", me->md.oldest.dir);
+		ALX_LOGGER_TRACE_INF("- oldest.pos = %" PRIu32, me->md.oldest.pos);
+		ALX_LOGGER_TRACE_INF("- oldest.log = %" PRIu32, me->md.oldest.log);
+		ALX_LOGGER_TRACE_INF("- oldest.file = %" PRIu32, me->md.oldest.file);
+		ALX_LOGGER_TRACE_INF("- oldest.dir = %" PRIu32, me->md.oldest.dir);
 
 		ALX_LOGGER_TRACE_INF("- crc = 0x%04X", me->md.crc);
 
@@ -1453,7 +1453,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles
 		AlxTimSw_Start(&alxTimSw_DirFilePrepSingle);
 
 		// Make dir
-		sprintf(dirPathBuffer, "/%lu", me->numOfDirCreated);
+		sprintf(dirPathBuffer, "/%" PRIu32, me->numOfDirCreated);
 		status = AlxFs_Dir_Make(me->alxFs, dirPathBuffer);
 		if (status != Alx_Ok)
 		{
@@ -1473,7 +1473,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles
 		for (me->numOfFilesPerDirCreated = 0; me->numOfFilesPerDirCreated < me->numOfFilesPerDir; me->numOfFilesPerDirCreated++)
 		{
 			// Open file
-			sprintf(filePathBuffer, "%s/%lu.csv", dirPathBuffer, me->numOfFilesPerDirCreated);
+			sprintf(filePathBuffer, "%s/%" PRIu32 ".csv", dirPathBuffer, me->numOfFilesPerDirCreated);
 			status = AlxFs_File_Open(me->alxFs, &file, filePathBuffer, "w");
 			if (status != Alx_Ok)
 			{
@@ -1513,13 +1513,13 @@ static Alx_Status AlxLogger_CreateDirAndFiles
 
 		// Trace
 		dirFilePrepSingle_sec = AlxTimSw_Get_sec(&alxTimSw_DirFilePrepSingle);
-		ALX_LOGGER_TRACE_INF("Created dir '%s' with %lu files in %lu sec", dirPathBuffer, me->numOfFilesPerDir, dirFilePrepSingle_sec);
+		ALX_LOGGER_TRACE_INF("Created dir '%s' with %" PRIu32 " files in %" PRIu32 " sec", dirPathBuffer, me->numOfFilesPerDir, dirFilePrepSingle_sec);
 	}
 
 	// Trace
 	dirFilePrepAllTime_sec = AlxTimSw_Get_sec(&alxTimSw_DirFilePrepAll);
-	ALX_LOGGER_TRACE_INF("Created %lu dir with %lu files, total %lu files in %lu sec", me->numOfDir, me->numOfFilesPerDir, me->numOfFilesTotal, dirFilePrepAllTime_sec);
-	ALX_LOGGER_TRACE_INF("Each file has %lu logs, so total number of logs is %lu", me->numOfLogsPerFile, me->numOfLogsTotal);
+	ALX_LOGGER_TRACE_INF("Created %" PRIu32 " dir with %" PRIu32 " files, total %" PRIu32 " files in %" PRIu32 " sec", me->numOfDir, me->numOfFilesPerDir, me->numOfFilesTotal, dirFilePrepAllTime_sec);
+	ALX_LOGGER_TRACE_INF("Each file has %" PRIu32 " logs, so total number of logs is %" PRIu32, me->numOfLogsPerFile, me->numOfLogsTotal);
 
 
 	//------------------------------------------------------------------------------
@@ -1545,7 +1545,7 @@ static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
 	ALX_LOGGER_TRACE_INF("AlxLogger - Check/Repair current read_file started");
 	ALX_LOGGER_TRACE_INF
 	(
-		"Address START - dir = %lu, file = %lu, log = %lu, pos = %lu, id = %lu",
+		"Address START - dir = %" PRIu32 ", file = %" PRIu32 ", log = %" PRIu32 ", pos = %" PRIu32 ", id = %" PRIu32,
 		me->md.read.dir,
 		me->md.read.file,
 		me->md.read.log,
@@ -1604,7 +1604,7 @@ static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
 	//------------------------------------------------------------------------------
 	ALX_LOGGER_TRACE_INF
 	(
-		"Address END - dir = %lu, file = %lu, log = %lu, pos = %lu, id = %lu",
+		"Address END - dir = %" PRIu32 ", file = %" PRIu32 ", log = %" PRIu32 ", pos = %" PRIu32 ", id = %" PRIu32,
 		me->md.read.dir,
 		me->md.read.file,
 		me->md.read.log,
@@ -1646,7 +1646,7 @@ static Alx_Status AlxLogger_SyncLogWriteFile
 	Alx_Status status = AlxFs_File_Seek(me->alxFs, file, 0, AlxFs_File_Seek_Origin_Set, &positionNew);
 	if (status != Alx_Ok)
 	{
-		ALX_LOGGER_TRACE_ERR("Sync: initial seek failed (err: %d, offset=%d, positionNew=%u)", status, 0, positionNew);
+		ALX_LOGGER_TRACE_ERR("Sync: initial seek failed (err: %d, offset=%d, positionNew=%" PRIu32 ")", status, 0, positionNew);
 		return Alx_Err;
 	}
 
@@ -1686,7 +1686,7 @@ static Alx_Status AlxLogger_SyncLogWriteFile
 				status = AlxFs_File_Seek(me->alxFs, file, -(logDelimSize - 1), AlxFs_File_Seek_Origin_Cur, &positionNew);
 				if (status != Alx_Ok)
 				{
-					ALX_LOGGER_TRACE_ERR("Sync: seek failed (err: %d, offset=%d, positionNew=%u)", status, 0, positionNew);
+					ALX_LOGGER_TRACE_ERR("Sync: seek failed (err: %d, offset=%d, positionNew=%" PRIu32 ")", status, 0, positionNew);
 					return Alx_Err;
 				}
 			}
@@ -1697,12 +1697,12 @@ static Alx_Status AlxLogger_SyncLogWriteFile
 		}
 		else
 		{
-			ALX_LOGGER_TRACE_ERR("Sync: read failed (err: %d, readLenActual: %u)", status, readLenActual);
+			ALX_LOGGER_TRACE_ERR("Sync: read failed (err: %d, readLenActual: %" PRIu32 ")", status, readLenActual);
 			break;
 		}
 	}
 
-	ALX_LOGGER_TRACE_INF("Sync: file read done (numLogs: %u, last delimiter position: %u)", logCount, lastDelimPos);
+	ALX_LOGGER_TRACE_INF("Sync: file read done (numLogs: %" PRIu32 ", last delimiter position: %" PRIu32 ")", logCount, lastDelimPos);
 	if (logCount < me->md.write.log)
 	{
 		me->md.write.id -= (me->md.write.log - logCount);
@@ -1748,7 +1748,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 	ALX_LOGGER_TRACE_INF("AlxLogger - Check/Repair current write_file started");
 	ALX_LOGGER_TRACE_INF
 	(
-		"Address START - dir = %lu, file = %lu, log = %lu, pos = %lu, id = %lu",
+		"Address START - dir = %" PRIu32 ", file = %" PRIu32 ", log = %" PRIu32 ", pos = %" PRIu32 ", id = %" PRIu32,
 		me->md.write.dir,
 		me->md.write.file,
 		me->md.write.log,
@@ -1762,7 +1762,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 	//------------------------------------------------------------------------------
 
 	// Open
-	sprintf(pathBuffer, "/%lu/%lu.csv", me->md.write.dir, me->md.write.file);
+	sprintf(pathBuffer, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, me->md.write.file);
 	status = AlxFs_File_Open(me->alxFs, &file, pathBuffer, "r+");
 	if (status != Alx_Ok)
 	{
@@ -1781,7 +1781,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 			break;
 		}
 
-		ALX_LOGGER_TRACE_INF("File size: %u, write.pos: %u", fileSize, me->md.write.pos);
+		ALX_LOGGER_TRACE_INF("File size: %" PRIu32 ", write.pos: %" PRIu32, fileSize, me->md.write.pos);
 		if (fileSize > me->md.write.pos)
 		{
 			ALX_LOGGER_TRACE_INF("File size is larger than indicated in metadata, synchronizing...");
@@ -1819,7 +1819,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 	//------------------------------------------------------------------------------
 	ALX_LOGGER_TRACE_INF
 	(
-		"Address END - dir = %lu, file = %lu, log = %lu, pos = %lu, id = %lu",
+		"Address END - dir = %" PRIu32 ", file = %" PRIu32 ", log = %" PRIu32 ", pos = %" PRIu32 ", id = %" PRIu32,
 		me->md.write.dir,
 		me->md.write.file,
 		me->md.write.log,
@@ -1849,7 +1849,7 @@ static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me)
 	for (uint32_t i = 0; i < me->numOfFilesPerDir; i++)
 	{
 		// Open
-		sprintf(path, "/%lu/%lu.csv", me->md.write.dir, i);
+		sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, i);
 		status = AlxFs_File_Open(me->alxFs, &file, path, "w");
 		if (status != Alx_Ok)
 		{
@@ -1903,7 +1903,7 @@ static Alx_Status AlxLogger_Metadata_Load(AlxLogger* me)
 		status != AlxSafe_CopyAErrCopyBOk_OrigDontCare_UseCopyB
 	)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, len=%u", status, ALX_LOGGER_METADATA_FILE_PATH, sizeof(mdTemp));
+		ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, len=%" PRIu32, status, ALX_LOGGER_METADATA_FILE_PATH, (uint32_t)sizeof(mdTemp));
 		return status;
 	}
 
@@ -1916,42 +1916,42 @@ static Alx_Status AlxLogger_Metadata_Load(AlxLogger* me)
 	isCrcOk = AlxCrc_IsOk(&me->alxCrc, (uint8_t*)&mdTemp, sizeof(mdTemp), &validatedCrc);
 	if (isCrcOk != true)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: path=%s, isCrcOk=%u, lenWithCrc=%u, validatedCrc=0x%X", ALX_LOGGER_METADATA_FILE_PATH, isCrcOk, sizeof(mdTemp), validatedCrc);
+		ALX_LOGGER_TRACE_ERR("Err: path=%s, isCrcOk=%d, lenWithCrc=%" PRIu32 ", validatedCrc=0x%" PRIX32, ALX_LOGGER_METADATA_FILE_PATH, isCrcOk, (uint32_t)sizeof(mdTemp), validatedCrc);
 		return Alx_Err;
 	}
 
 	// Check magic number
 	if (mdTemp.magicNumber != ALX_LOGGER_METADATA_MAGIC_NUMBER)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: path=%s, magicNumberActual=0x%X, magicNumberExpected=0x%X", ALX_LOGGER_METADATA_FILE_PATH, mdTemp.magicNumber, ALX_LOGGER_METADATA_MAGIC_NUMBER);
+		ALX_LOGGER_TRACE_ERR("Err: path=%s, magicNumberActual=0x%" PRIX32 ", magicNumberExpected=0x%X", ALX_LOGGER_METADATA_FILE_PATH, mdTemp.magicNumber, ALX_LOGGER_METADATA_MAGIC_NUMBER);
 		return Alx_Err;
 	}
 
 	// Check version
 	if (mdTemp.version != ALX_LOGGER_METADATA_VERSION)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: path=%s, versionActual=%u, versionExpected=%u", ALX_LOGGER_METADATA_FILE_PATH, mdTemp.version, ALX_LOGGER_METADATA_VERSION);
+		ALX_LOGGER_TRACE_ERR("Err: path=%s, versionActual=%" PRIu32 ", versionExpected=%u", ALX_LOGGER_METADATA_FILE_PATH, mdTemp.version, ALX_LOGGER_METADATA_VERSION);
 		return Alx_Err;
 	}
 
 	// Check number of directories
 	if (mdTemp.numOfDir != me->numOfDir)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: path=%s, numOfDirActual=%u, numOfDirExpected=%u", ALX_LOGGER_METADATA_FILE_PATH, mdTemp.numOfDir, me->numOfDir);
+		ALX_LOGGER_TRACE_ERR("Err: path=%s, numOfDirActual=%" PRIu32 ", numOfDirExpected=%" PRIu32, ALX_LOGGER_METADATA_FILE_PATH, mdTemp.numOfDir, me->numOfDir);
 		return Alx_Err;
 	}
 
 	// Check number of files per directory
 	if (mdTemp.numOfFilesPerDir != me->numOfFilesPerDir)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: path=%s, numOfFilesPerDirActual=%u, numOfFilesPerDirExpected=%u", ALX_LOGGER_METADATA_FILE_PATH, mdTemp.numOfFilesPerDir, me->numOfFilesPerDir);
+		ALX_LOGGER_TRACE_ERR("Err: path=%s, numOfFilesPerDirActual=%" PRIu32 ", numOfFilesPerDirExpected=%" PRIu32, ALX_LOGGER_METADATA_FILE_PATH, mdTemp.numOfFilesPerDir, me->numOfFilesPerDir);
 		return Alx_Err;
 	}
 
 	// Check number of logs per file
 	if (mdTemp.numOfLogsPerFile != me->numOfLogsPerFile)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: path=%s, numOfLogsPerFileActual=%u, numOfLogsPerFileExpected=%u", ALX_LOGGER_METADATA_FILE_PATH, mdTemp.numOfLogsPerFile, me->numOfLogsPerFile);
+		ALX_LOGGER_TRACE_ERR("Err: path=%s, numOfLogsPerFileActual=%" PRIu32 ", numOfLogsPerFileExpected=%" PRIu32, ALX_LOGGER_METADATA_FILE_PATH, mdTemp.numOfLogsPerFile, me->numOfLogsPerFile);
 		return Alx_Err;
 	}
 
@@ -2120,7 +2120,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 	status = AlxFsSafe_File_Write(me->alxFsSafe, ALX_LOGGER_METADATA_FILE_PATH, &mdTemp, sizeof(mdTemp));
 	if (status != Alx_Ok)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, len=%u", status, ALX_LOGGER_METADATA_FILE_PATH, sizeof(mdTemp));
+		ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, len=%" PRIu32, status, ALX_LOGGER_METADATA_FILE_PATH, (uint32_t)sizeof(mdTemp));
 		return status;
 	}
 

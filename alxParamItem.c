@@ -1887,7 +1887,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%lu", me->val.uint32) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRIu32, me->val.uint32) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Uint64)
 	{
@@ -1903,7 +1903,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Int32)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%ld", me->val.int32) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRId32, me->val.int32) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Int64)
 	{
@@ -2017,7 +2017,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	{
 		// Convert
 		uint32_t valNum = 0;
-		if (sscanf(val, "%lu", &valNum) != 1)
+		if (sscanf(val, "%" SCNu32, &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
@@ -2058,7 +2058,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	{
 		// Convert
 		int32_t valNum = 0;
-		if (sscanf(val, "%ld", &valNum) != 1)
+		if (sscanf(val, "%" SCNd32, &valNum) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}

@@ -122,7 +122,7 @@ Alx_Status AlxPi4ioe5v6534q_InitPeriph(AlxPi4ioe5v6534q* me)
 	status = AlxI2c_Init(me->i2c);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Init() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Init() status %d", status);
 		return status;
 	}
 
@@ -153,7 +153,7 @@ Alx_Status AlxPi4ioe5v6534q_DeInitPeriph(AlxPi4ioe5v6534q* me)
 	status = AlxI2c_DeInit(me->i2c);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_DeInit() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_DeInit() status %d", status);
 		return status;
 	}
 
@@ -190,7 +190,7 @@ Alx_Status AlxPi4ioe5v6534q_Init(AlxPi4ioe5v6534q* me)
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_IsSlaveReady() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_IsSlaveReady() status %d", status);
 		return status;
 	}
 
@@ -204,7 +204,7 @@ Alx_Status AlxPi4ioe5v6534q_Init(AlxPi4ioe5v6534q* me)
 	status = AlxPi4ioe5v6534q_RegStruct_Write(me);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxPi4ioe5v6534q_RegStruct_Write() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxPi4ioe5v6534q_RegStruct_Write() status %d", status);
 		return status;
 	}
 
@@ -267,7 +267,7 @@ Alx_Status AlxPi4ioe5v6534q_Handle(AlxPi4ioe5v6534q* me, uint8_t inPortNum, uint
 		status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, me->reg._0x00_InputPort.addr, AlxI2c_Master_MemAddrLen_8bit, me->reg._0x00_InputPort.val.raw, inPortNum, me->i2cNumOfTries, me->i2cTimeout_ms);
 		if (status != Alx_Ok)
 		{
-			ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartReadMemStop() status %ld", status);
+			ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartReadMemStop() status %d", status);
 			return status;
 		}
 	}
@@ -278,7 +278,7 @@ Alx_Status AlxPi4ioe5v6534q_Handle(AlxPi4ioe5v6534q* me, uint8_t inPortNum, uint
 		status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, me->reg._0x05_OutputPort.addr, AlxI2c_Master_MemAddrLen_8bit, me->reg._0x05_OutputPort.val.raw, outPortNum, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 		if (status != Alx_Ok)
 		{
-			ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %ld", status);
+			ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %d", status);
 			return status;
 		}
 	}
@@ -448,14 +448,14 @@ ALX_WEAK Alx_Status AlxPi4ioe5v6534q_RegStruct_Write(AlxPi4ioe5v6534q* me)
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, me->reg._0x05_OutputPort.addr, AlxI2c_Master_MemAddrLen_8bit, me->reg._0x05_OutputPort.val.raw, me->reg._0x05_OutputPort.len, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %d", status);
 		return status;
 	}
 
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, me->reg._0x0F_ConfigurationPort.addr, AlxI2c_Master_MemAddrLen_8bit, me->reg._0x0F_ConfigurationPort.val.raw, me->reg._0x0F_ConfigurationPort.len, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %d", status);
 		return status;
 	}
 

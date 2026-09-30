@@ -141,7 +141,7 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 		(level == ALX_TRACE_LEVEL_VRB)
 	)
 	{
-		AlxTrace_WriteFormat(me, "[%s] [%s] [%s:%04lu %s] %s\r\n", dateTimeStr, levelStr, file, line, fun, formatStr);
+		AlxTrace_WriteFormat(me, "[%s] [%s] [%s:%04" PRIu32 " %s] %s\r\n", dateTimeStr, levelStr, file, line, fun, formatStr);
 	}
 	else if (level == ALX_TRACE_LEVEL_INF)
 	{

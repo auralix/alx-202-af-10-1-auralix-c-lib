@@ -339,7 +339,7 @@ Alx_Status AlxFsSafe_File_ReadRaw(AlxFsSafe* me, const char* path, void* data, u
 	status = AlxFs_File_Read(me->alxFs, &file, data, len, &lenActual);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Read(%s) status %d len %u lenActual %u", path, status, len, lenActual);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Read(%s) status %d len %" PRIu32 " lenActual %" PRIu32, path, status, len, lenActual);
 		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 		if (statusClose != Alx_Ok)
 		{
@@ -364,7 +364,7 @@ Alx_Status AlxFsSafe_File_ReadRaw(AlxFsSafe* me, const char* path, void* data, u
 	//------------------------------------------------------------------------------
 	if (lenActual != len)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckLen(%s) lenActual %lu len %lu", path, lenActual, len);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckLen(%s) lenActual %" PRIu32 " len %" PRIu32, path, lenActual, len);
 		return Alx_Err;
 	}
 
@@ -394,7 +394,7 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	Alx_Status status = AlxFsSafe_File_ReadRaw(me, pathWithSuffix, data, lenWithCrc);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFsSafe_File_ReadRaw(%s) status %d lenWithCrc %lu", pathWithSuffix, status, lenWithCrc);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFsSafe_File_ReadRaw(%s) status %d lenWithCrc %" PRIu32, pathWithSuffix, status, lenWithCrc);
 		return status;
 	}
 
@@ -405,7 +405,7 @@ Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, vo
 	bool isCrcOk = AlxCrc_IsOk(&me->alxCrc, data, lenWithCrc, validatedCrc);
 	if (isCrcOk == false)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckCrc(%s) isCrcOk %u lenWithCrc %lu", pathWithSuffix, isCrcOk, lenWithCrc);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: CheckCrc(%s) isCrcOk %u lenWithCrc %" PRIu32, pathWithSuffix, isCrcOk, lenWithCrc);
 		return Alx_Err;
 	}
 
@@ -456,7 +456,7 @@ Alx_Status AlxFsSafe_File_WriteCopy(AlxFsSafe* me, bool isA, const char* path, v
 	status = AlxFs_File_Write(me->alxFs, &file, buff, lenWithCrc);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Write(%s) status %d lenWithCrc %u", pathWithSuffix, status, lenWithCrc);
+		ALX_FS_SAFE_TRACE_ERR("FAIL: AlxFs_File_Write(%s) status %d lenWithCrc %" PRIu32, pathWithSuffix, status, lenWithCrc);
 		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 		if (statusClose != Alx_Ok)
 		{

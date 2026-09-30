@@ -169,7 +169,7 @@ Alx_Status AlxLin_Master_Init(AlxLin* me)
 	Alx_Status status = AlxSerialPort_Init(me->alxSerialPort);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Init() status %ld", status);
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Init() status %d", status);
 		return status;
 	}
 
@@ -198,7 +198,7 @@ Alx_Status AlxLin_Master_DeInit(AlxLin* me)
 	Alx_Status status = AlxSerialPort_DeInit(me->alxSerialPort);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_DeInit() status %ld", status);
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_DeInit() status %d", status);
 		return status;
 	}
 
@@ -317,7 +317,7 @@ Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame)
 	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %ld", status);
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %d", status);
 		return status;
 	}
 
@@ -402,7 +402,7 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %ld", status);
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %d", status);
 		return status;
 	}
 
@@ -423,7 +423,7 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	uint32_t rxFrameLen_Expected = me->breakSyncOffset + 1 + frame->dataLen + 1;	// *Break + *SYNC + Protected ID + Data + Checksum
 	if (rxFrameLen_Actual != rxFrameLen_Expected)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: CheckRxFrameLen() rxFrameLen_Actual %lu rxFrameLen_Expected %lu", rxFrameLen_Actual, rxFrameLen_Expected);
+		ALX_LIN_TRACE_WRN("FAIL: CheckRxFrameLen() rxFrameLen_Actual %" PRIu32 " rxFrameLen_Expected %" PRIu32, rxFrameLen_Actual, rxFrameLen_Expected);
 		return Alx_Err;
 	}
 
@@ -431,7 +431,7 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen_Actual);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Read() status %ld", status);
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Read() status %d", status);
 		return status;
 	}
 
@@ -521,7 +521,7 @@ Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame)
 	status = AlxSerialPort_Write(me->alxSerialPort, txFrame, txFrameLen);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %ld", status);
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Write() status %d", status);
 		return status;
 	}
 
@@ -551,7 +551,7 @@ Alx_Status AlxLin_Slave_Init(AlxLin* me)
 	Alx_Status status = AlxSerialPort_Init(me->alxSerialPort);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Init() status %ld", status);
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Init() status %d", status);
 		return status;
 	}
 
@@ -580,7 +580,7 @@ Alx_Status AlxLin_Slave_DeInit(AlxLin* me)
 	Alx_Status status = AlxSerialPort_DeInit(me->alxSerialPort);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_DeInit() status %ld", status);
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_DeInit() status %d", status);
 		return status;
 	}
 
@@ -694,7 +694,7 @@ Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t time
 		// Check RX frame length too large
 		if (rxFrameLen_Actual > rxFrameLen_Expected)
 		{
-			ALX_LIN_TRACE_WRN("FAIL: CheckRxFrameLenTooLarge() rxFrameLen_Actual %lu rxFrameLen_Expected %lu", rxFrameLen_Actual, rxFrameLen_Expected);
+			ALX_LIN_TRACE_WRN("FAIL: CheckRxFrameLenTooLarge() rxFrameLen_Actual %" PRIu32 " rxFrameLen_Expected %" PRIu32, rxFrameLen_Actual, rxFrameLen_Expected);
 			return Alx_Err;
 		}
 
@@ -710,7 +710,7 @@ Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t time
 	status = AlxSerialPort_Read(me->alxSerialPort, rxFrame, rxFrameLen_Actual);
 	if (status != Alx_Ok)
 	{
-		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Read() status %ld", status);
+		ALX_LIN_TRACE_WRN("FAIL: AlxSerialPort_Read() status %d", status);
 		return Alx_Err;
 	}
 
@@ -872,7 +872,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				Alx_Status status = AlxLin_GetSlaveFrameConfigFromId(me, id_Actual, &slaveFrameConfig);
 				if (status != Alx_Ok)
 				{
-					ALX_LIN_TRACE_VRB("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %ld id_Actual %02X", status, id_Actual);
+					ALX_LIN_TRACE_VRB("FAIL: AlxLin_GetSlaveFrameConfigFromId() status %d id_Actual %02X", status, id_Actual);
 					me->rxb.active = false;
 					return;	// Unsupported Frame FAIL: Ignore frame, no Slave_Subscribe_Err_Callback
 				}
@@ -938,7 +938,7 @@ void AlxLin_RxBuff_Handle(AlxLin* me, uint8_t data)
 				Alx_Status status = AlxSerialPort_Write(me->alxSerialPort, txFrameResponse, txFrameResponseLen);
 				if (status != Alx_Ok)
 				{
-					ALX_LIN_TRACE_DBG("FAIL: AlxSerialPort_Write() status %ld", status);
+					ALX_LIN_TRACE_DBG("FAIL: AlxSerialPort_Write() status %d", status);
 					return;	// Serial Port FAIL: Fatal error, no Err_Callback
 				}
 			}
