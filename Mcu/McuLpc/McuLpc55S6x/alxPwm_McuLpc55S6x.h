@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_PWM_MCU_LPC55S6x_H
-#define ALX_PWM_MCU_LPC55S6x_H
+#ifndef ALX_PWM_MCU_LPC55S6X_H
+#define ALX_PWM_MCU_LPC55S6X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,4 +111,4 @@ void AlxPwm_Ctor
 }
 #endif
 
-#endif	// #ifndef ALX_PWM_MCU_LPC55S6x_H
+#endif	// #ifndef ALX_PWM_MCU_LPC55S6X_H
