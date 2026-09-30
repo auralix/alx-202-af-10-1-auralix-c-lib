@@ -187,7 +187,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	status = AlxUsb_Init(me->alxUsb);
 	if (status != Alx_Ok)
 	{
-		ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Init() status %ld", status);
+		ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Init() status %d", status);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
 	}
@@ -202,7 +202,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		status = AlxUsb_Handle(me->alxUsb);
 		if (status != Alx_Ok)
 		{
-			ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Handle() status %ld", status);
+			ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Handle() status %d", status);
 			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 			return;
 		}
@@ -218,7 +218,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		bool isTimeout = AlxTimSw_IsTimeout_ms(&alxUsb_alxTimSw, me->usbConnectedTimeout_ms);
 		if (isTimeout)
 		{
-			ALX_BOOT_TRACE_WRN("FAIL: 'USB NOT found' CheckUsbConnectedTimeout() usbConnectedTimeout_ms %lu", me->usbConnectedTimeout_ms);
+			ALX_BOOT_TRACE_WRN("FAIL: 'USB NOT found' CheckUsbConnectedTimeout() usbConnectedTimeout_ms %" PRIu16, me->usbConnectedTimeout_ms);
 			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_UsbNotFound);
 			return;
 		}
@@ -235,7 +235,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		status = AlxUsb_Handle(me->alxUsb);
 		if (status != Alx_Ok)
 		{
-			ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Handle() status %ld", status);
+			ALX_BOOT_TRACE_ERR("FAIL: AlxUsb_Handle() status %d", status);
 			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 			return;
 		}
@@ -251,7 +251,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		bool isTimeout = AlxTimSw_IsTimeout_ms(&alxUsb_alxTimSw, me->usbReadyTimeout_ms);
 		if (isTimeout)
 		{
-			ALX_BOOT_TRACE_WRN("FAIL: 'USB NOT found' CheckUsbReadyTimeout() usbReadyTimeout_ms %lu", me->usbReadyTimeout_ms);
+			ALX_BOOT_TRACE_WRN("FAIL: 'USB NOT found' CheckUsbReadyTimeout() usbReadyTimeout_ms %" PRIu16, me->usbReadyTimeout_ms);
 			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_UsbNotFound);
 			return;
 		}
@@ -277,7 +277,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	status = AlxFs_Mount(me->alxFs);
 	if (status != Alx_Ok)
 	{
-		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Mount() status %ld", status);
+		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Mount() status %d", status);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound);
 		return;
 	}
@@ -294,7 +294,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	status = AlxFs_Dir_Open(me->alxFs, &dir, dirPath);
 	if (status != Alx_Ok)
 	{
-		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Dir_Open() status %ld dirPath %s", status, dirPath);
+		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Dir_Open() status %d dirPath %s", status, dirPath);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound);
 		return;
@@ -316,7 +316,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		}
 		else if (status != Alx_Ok)
 		{
-			ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Dir_Read() status %ld", status);
+			ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate NOT found' AlxFs_Dir_Read() status %d", status);
 			AlxFs_Dir_Close(me->alxFs, &dir);
 			AlxFs_UnMount(me->alxFs);
 			AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandNotFound);
@@ -327,14 +327,14 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		#if defined(ALX_FATFS)
 		if (info.fatfsInfo.fattrib & (AM_DIR | AM_HID | AM_SYS))
 		{
-			ALX_BOOT_TRACE_WRN("SKIP: CheckIfFile() fattrib %lu fname %s", info.fatfsInfo.fattrib, info.fatfsInfo.fname);
+			ALX_BOOT_TRACE_WRN("SKIP: CheckIfFile() fattrib %" PRIu8 " fname %s", (uint8_t)info.fatfsInfo.fattrib, info.fatfsInfo.fname);
 			continue;
 		}
 
 		// Check file size
 		if (info.fatfsInfo.fsize != ALX_MCU_BOOT_IMAGE_SIZE)
 		{
-			ALX_BOOT_TRACE_WRN("SKIP: CheckFileSize() fsize %lu fname %s", info.fatfsInfo.fsize, info.fatfsInfo.fname);
+			ALX_BOOT_TRACE_WRN("SKIP: CheckFileSize() fsize %" PRIu32 " fname %s", (uint32_t)info.fatfsInfo.fsize, info.fatfsInfo.fname);
 			continue;
 		}
 
@@ -421,14 +421,14 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	uint32_t fwVerDate = AlxId_GetFwVerDate(me->alxId);
 	if (fwCandVerDate == fwVerDate)
 	{
-		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate REJECTED - FW candidate version SAME as active FW version' CheckFwCandVer() fwCandVerDate %lu fwVerDate %lu", fwCandVerDate, fwVerDate);
+		ALX_BOOT_TRACE_WRN("FAIL: 'FW candidate REJECTED - FW candidate version SAME as active FW version' CheckFwCandVer() fwCandVerDate %" PRIu32 " fwVerDate %" PRIu32, fwCandVerDate, fwVerDate);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_FwCandSameVer);
 		return;
 	}
 
 	// Trace
-	ALX_BOOT_TRACE_INF("DONE: 'FW candidate ACCEPTED - FW candidate version DIFFERENT from active FW version' CheckFwCandVer() fwCandVerDate %lu fwVerDate %lu", fwCandVerDate, fwVerDate);
+	ALX_BOOT_TRACE_INF("DONE: 'FW candidate ACCEPTED - FW candidate version DIFFERENT from active FW version' CheckFwCandVer() fwCandVerDate %" PRIu32 " fwVerDate %" PRIu32, fwCandVerDate, fwVerDate);
 	AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_FwCandDiscovery_CheckFwCandVerDone);
 
 
@@ -436,7 +436,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	// Trace
 	//------------------------------------------------------------------------------
 	uint32_t fwCandDiscovery_ExecutionTime_sec = AlxTimSw_Get_sec(&fwCandDiscovery_AlxTimSw);
-	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Discovery DONE - Execution Time: %lu sec", fwCandDiscovery_ExecutionTime_sec);
+	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Discovery DONE - Execution Time: %" PRIu32 " sec", fwCandDiscovery_ExecutionTime_sec);
 
 
 
@@ -473,7 +473,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	statusBoot = flash_area_open(id, &me->fa);
 	if (statusBoot != 0)
 	{
-		ALX_BOOT_TRACE_ERR("FAIL: flash_area_open() statusBoot %ld", statusBoot);
+		ALX_BOOT_TRACE_ERR("FAIL: flash_area_open() statusBoot %d", statusBoot);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
@@ -483,7 +483,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	statusBoot = flash_area_erase(me->fa, 0, ALX_MCU_BOOT_IMAGE_SIZE);
 	if (statusBoot != 0)
 	{
-		ALX_BOOT_TRACE_ERR("FAIL: flash_area_erase() statusBoot %ld", statusBoot);
+		ALX_BOOT_TRACE_ERR("FAIL: flash_area_erase() statusBoot %d", statusBoot);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
@@ -508,7 +508,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	status = AlxFs_File_ReadInChunks(me->alxFs, fwCandFilePath, me->buff, sizeof(me->buff), AlxBoot_App_Usb_FwCand_ChunkRead_Callback, me, &readLen, NULL);
 	if (status != Alx_Ok)
 	{
-		ALX_BOOT_TRACE_ERR("FAIL: AlxFs_File_ReadInChunks() status %ld fwCandFilePath %s", status, fwCandFilePath);
+		ALX_BOOT_TRACE_ERR("FAIL: AlxFs_File_ReadInChunks() status %d fwCandFilePath %s", status, fwCandFilePath);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
@@ -531,7 +531,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	// Trace
 	//------------------------------------------------------------------------------
 	uint32_t fwCandStaging_ExecutionTime_sec = AlxTimSw_Get_sec(&fwCandStaging_AlxTimSw);
-	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Staging DONE - Execution Time: %lu sec", fwCandStaging_ExecutionTime_sec);
+	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Staging DONE - Execution Time: %" PRIu32 " sec", fwCandStaging_ExecutionTime_sec);
 
 
 
@@ -580,14 +580,14 @@ Alx_Status AlxBoot_Boot_Run(AlxBoot* me)
 	fih_ret status = boot_go(&me->rsp);
 	if (status != FIH_SUCCESS)
 	{
-		ALX_BOOT_TRACE_ERR("FAIL: boot_go() status %ld", status);
+		ALX_BOOT_TRACE_ERR("FAIL: boot_go() status %d", status);
 		return Alx_Err;
 	}
 
 	// Check FLASH_DEVICE_ID
 	if (me->rsp.br_flash_dev_id != ALX_MCU_BOOT_FLASH_DEVICE_ID)
 	{
-		ALX_BOOT_TRACE_ERR("FAIL: CheckFlashDeviceId() rsp.br_flash_dev_id %u", me->rsp.br_flash_dev_id);
+		ALX_BOOT_TRACE_ERR("FAIL: CheckFlashDeviceId() rsp.br_flash_dev_id %" PRIu8, me->rsp.br_flash_dev_id);
 		return Alx_Err;
 	}
 	#endif
@@ -595,18 +595,18 @@ Alx_Status AlxBoot_Boot_Run(AlxBoot* me)
 	// Trace
 	ALX_BOOT_TRACE_INF("DONE: boot_go()");
 	#if defined(ALX_BOOT_B)
-	ALX_BOOT_TRACE_INF("- br_hdr->ih_magic = 0x%08lX", me->rsp.br_hdr->ih_magic);
-	ALX_BOOT_TRACE_INF("- br_hdr->ih_load_addr = 0x%08lX", me->rsp.br_hdr->ih_load_addr);
-	ALX_BOOT_TRACE_INF("- br_hdr->ih_hdr_size = 0x%04lX", me->rsp.br_hdr->ih_hdr_size);
-	ALX_BOOT_TRACE_INF("- br_hdr->ih_protect_tlv_size = 0x%04lX", me->rsp.br_hdr->ih_protect_tlv_size);
-	ALX_BOOT_TRACE_INF("- br_hdr->ih_img_size = %lu", me->rsp.br_hdr->ih_img_size);
-	ALX_BOOT_TRACE_INF("- br_hdr->ih_flags = 0x%08lX", me->rsp.br_hdr->ih_flags);
-	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_major = %lu", me->rsp.br_hdr->ih_ver.iv_major);
-	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_minor = %lu", me->rsp.br_hdr->ih_ver.iv_minor);
-	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_revision = %lu", me->rsp.br_hdr->ih_ver.iv_revision);
-	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_build_num = %lu", me->rsp.br_hdr->ih_ver.iv_build_num);
-	ALX_BOOT_TRACE_INF("- br_flash_dev_id = %lu", me->rsp.br_flash_dev_id);
-	ALX_BOOT_TRACE_INF("- br_image_off = 0x%08lX", me->rsp.br_image_off);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_magic = 0x%08" PRIX32, me->rsp.br_hdr->ih_magic);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_load_addr = 0x%08" PRIX32, me->rsp.br_hdr->ih_load_addr);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_hdr_size = 0x%04" PRIX16, me->rsp.br_hdr->ih_hdr_size);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_protect_tlv_size = 0x%04" PRIX16, me->rsp.br_hdr->ih_protect_tlv_size);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_img_size = %" PRIu32, me->rsp.br_hdr->ih_img_size);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_flags = 0x%08" PRIX32, me->rsp.br_hdr->ih_flags);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_major = %" PRIu8, me->rsp.br_hdr->ih_ver.iv_major);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_minor = %" PRIu8, me->rsp.br_hdr->ih_ver.iv_minor);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_revision = %" PRIu16, me->rsp.br_hdr->ih_ver.iv_revision);
+	ALX_BOOT_TRACE_INF("- br_hdr->ih_ver.iv_build_num = %" PRIu32, me->rsp.br_hdr->ih_ver.iv_build_num);
+	ALX_BOOT_TRACE_INF("- br_flash_dev_id = %" PRIu8, me->rsp.br_flash_dev_id);
+	ALX_BOOT_TRACE_INF("- br_image_off = 0x%08" PRIX32, me->rsp.br_image_off);
 	#endif
 
 
@@ -622,16 +622,16 @@ Alx_Status AlxBoot_Boot_Run(AlxBoot* me)
 	me->addrJmp = *(volatile uint32_t*)(me->addrVt + 4);
 
 	// Trace
-	ALX_BOOT_TRACE_INF("- addrVt = 0x%08lX", me->addrVt);
-	ALX_BOOT_TRACE_INF("- addrMsp = 0x%08lX", me->addrMsp);
-	ALX_BOOT_TRACE_INF("- addrJmp = 0x%08lX", me->addrJmp);
+	ALX_BOOT_TRACE_INF("- addrVt = 0x%08" PRIX32, me->addrVt);
+	ALX_BOOT_TRACE_INF("- addrMsp = 0x%08" PRIX32, me->addrMsp);
+	ALX_BOOT_TRACE_INF("- addrJmp = 0x%08" PRIX32, me->addrJmp);
 
 
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
 	uint32_t bootRun_ExecutionTime_sec = AlxTimSw_Get_sec(&bootRun_AlxTimSw);
-	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - DONE - Ready to jump to application - Execution Time: %lu sec", bootRun_ExecutionTime_sec);
+	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - DONE - Ready to jump to application - Execution Time: %" PRIu32 " sec", bootRun_ExecutionTime_sec);
 
 
 	//------------------------------------------------------------------------------
@@ -704,7 +704,7 @@ static Alx_Status AlxBoot_App_Usb_FwCand_ChunkRead_Callback(void* ctx, void* chu
 	int statusBoot = flash_area_write(me->fa, me->fwCandStaging_LenWritten_bytes, chunkData, chunkLenActual);
 	if (statusBoot != 0)
 	{
-		ALX_BOOT_TRACE_WRN("FAIL: flash_area_write() statusBoot %ld", statusBoot);
+		ALX_BOOT_TRACE_WRN("FAIL: flash_area_write() statusBoot %d", statusBoot);
 		return Alx_Err;
 	}
 
@@ -719,7 +719,7 @@ static Alx_Status AlxBoot_App_Usb_FwCand_ChunkRead_Callback(void* ctx, void* chu
 		me->fwCandStaging_ProgressStep10_pct = fwCandStaging_ProgressStep10_pct;
 
 		// Trace
-		ALX_BOOT_TRACE_INF("%02u%% - %lu/%lu bytes", fwCandStaging_ProgressStep10_pct, me->fwCandStaging_LenWritten_bytes, ALX_MCU_BOOT_IMAGE_SIZE);
+		ALX_BOOT_TRACE_INF("%02" PRIu8 "%% - %" PRIu32 "/%d bytes", fwCandStaging_ProgressStep10_pct, me->fwCandStaging_LenWritten_bytes, ALX_MCU_BOOT_IMAGE_SIZE);
 
 		// Callback
 		AlxBoot_App_Usb_FwCandStagingProgress_Callback(me, fwCandStaging_ProgressStep10_pct);

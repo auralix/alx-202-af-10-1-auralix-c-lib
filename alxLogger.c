@@ -2132,7 +2132,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 
 	#if defined(ALX_LOGGER_DEBUG)
 	char path[ALX_LOGGER_PATH_LEN_MAX] = "";
-	sprintf(path, "/%lu/%lu.csv", me->md.write.dir, me->md.write.file);
+	sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, me->md.write.file);
 	status = AlxFs_File_Open(me->alxFs, &file, path, "r+");
 	if (status != Alx_Ok)
 	{
@@ -2143,7 +2143,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 	AlxFs_File_Size(me->alxFs, &file, &fileSize);
 	if (fileSize != me->md.write.pos)
 	{
-		ALX_LOGGER_TRACE_WRN("File size does not equal metadata position (%u, %u)", fileSize, me->md.write.pos);
+		ALX_LOGGER_TRACE_WRN("File size does not equal metadata position (%" PRIu32 ", %" PRIu32 ")", fileSize, me->md.write.pos);
 	}
 	// Close
 	status = AlxFs_File_Close(me->alxFs, &file);

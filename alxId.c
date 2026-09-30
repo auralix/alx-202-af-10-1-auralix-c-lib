@@ -331,7 +331,7 @@ void AlxId_Ctor
 		me->hwStm32.mcuUniqueId.uint32[0] = *(uint32_t*)(UID_BASE);
 		me->hwStm32.mcuUniqueId.uint32[1] = *(uint32_t*)(UID_BASE + 4);
 		me->hwStm32.mcuUniqueId.uint32[2] = *(uint32_t*)(UID_BASE + 8);
-		sprintf(me->hwStm32.mcuUniqueIdStr, "%08lX%08lX%08lX", me->hwStm32.mcuUniqueId.uint32[2], me->hwStm32.mcuUniqueId.uint32[1], me->hwStm32.mcuUniqueId.uint32[0]);
+		sprintf(me->hwStm32.mcuUniqueIdStr, "%08" PRIX32 "%08" PRIX32 "%08" PRIX32, me->hwStm32.mcuUniqueId.uint32[2], me->hwStm32.mcuUniqueId.uint32[1], me->hwStm32.mcuUniqueId.uint32[0]);
 	#endif
 
 
@@ -589,7 +589,7 @@ void AlxId_Trace(AlxId* me)
 	//------------------------------------------------------------------------------
 	#ifdef ALX_CMSIS_CORE
 	ALX_ID_TRACE_INF("FW - CMSIS Core:");
-	ALX_ID_TRACE_INF("- ver: %lu.%lu", me->fwCmsisCore.verMajor, me->fwCmsisCore.verMinor);
+	ALX_ID_TRACE_INF("- ver: %" PRIu32 ".%" PRIu32, me->fwCmsisCore.verMajor, me->fwCmsisCore.verMinor);
 	ALX_ID_TRACE_INF("");
 	#endif
 
@@ -599,8 +599,8 @@ void AlxId_Trace(AlxId* me)
 	//------------------------------------------------------------------------------
 	#ifdef ALX_STM32
 	ALX_ID_TRACE_INF("FW - STM32:");
-	ALX_ID_TRACE_INF("- name: %s HAL CMSIS, ver: %lu.%lu.%lu", ALX_STM32_STR, me->fwStm32HalCmsis.verMajor, me->fwStm32HalCmsis.verMinor, me->fwStm32HalCmsis.verPatch);
-	ALX_ID_TRACE_INF("- name: %s HAL Driver, ver: %lu.%lu.%lu", ALX_STM32_STR, me->fwStm32HalDriver.verMajor, me->fwStm32HalDriver.verMinor, me->fwStm32HalDriver.verPatch);
+	ALX_ID_TRACE_INF("- name: %s HAL CMSIS, ver: %" PRIu32 ".%" PRIu32 ".%" PRIu32, ALX_STM32_STR, me->fwStm32HalCmsis.verMajor, me->fwStm32HalCmsis.verMinor, me->fwStm32HalCmsis.verPatch);
+	ALX_ID_TRACE_INF("- name: %s HAL Driver, ver: %" PRIu32 ".%" PRIu32 ".%" PRIu32, ALX_STM32_STR, me->fwStm32HalDriver.verMajor, me->fwStm32HalDriver.verMinor, me->fwStm32HalDriver.verPatch);
 	ALX_ID_TRACE_INF("");
 	#endif
 
@@ -625,9 +625,9 @@ void AlxId_Trace(AlxId* me)
 	//------------------------------------------------------------------------------
 	#ifdef ALX_STM32
 	ALX_ID_TRACE_INF("HW - STM32:");
-	ALX_ID_TRACE_INF("- device ID: %#lX", me->hwStm32.deviceId);
-	ALX_ID_TRACE_INF("- revision ID: %#lX", me->hwStm32.revisionId);
-	ALX_ID_TRACE_INF("- flash size: %lukB", me->hwStm32.flashSize_kB);
+	ALX_ID_TRACE_INF("- device ID: 0x%" PRIX32, me->hwStm32.deviceId);
+	ALX_ID_TRACE_INF("- revision ID: 0x%" PRIX32, me->hwStm32.revisionId);
+	ALX_ID_TRACE_INF("- flash size: %" PRIu32 "kB", me->hwStm32.flashSize_kB);
 	#ifdef ALX_STM32G4
 	ALX_ID_TRACE_INF("- package ID: %#lX", me->stm32Hw.packageId);
 	#endif

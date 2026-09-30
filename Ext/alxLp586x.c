@@ -133,7 +133,7 @@ Alx_Status AlxLp586x_InitPeriph(AlxLp586x* me)
 	status = AlxI2c_Init(me->i2c);
 	if (status != Alx_Ok)
 	{
-		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_Init() status %ld", status);
+		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_Init() status %d", status);
 		return status;
 	}
 
@@ -164,7 +164,7 @@ Alx_Status AlxLp586x_DeInitPeriph(AlxLp586x* me)
 	status = AlxI2c_DeInit(me->i2c);
 	if (status != Alx_Ok)
 	{
-		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_DeInit() status %ld", status);
+		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_DeInit() status %d", status);
 		return status;
 	}
 
@@ -205,7 +205,7 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok)
 	{
-		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_Master_IsSlaveReady() status %ld", status);
+		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_Master_IsSlaveReady() status %d", status);
 		return status;
 	}
 
@@ -221,7 +221,7 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 	status = AlxLp586x_RegStruct_Write(me);
 	if (status != Alx_Ok)
 	{
-		ALX_LP586x_TRACE_ERR("FAIL: AlxLp586x_RegStruct_Write() status %ld", status);
+		ALX_LP586x_TRACE_ERR("FAIL: AlxLp586x_RegStruct_Write() status %d", status);
 		return status;
 	}
 
