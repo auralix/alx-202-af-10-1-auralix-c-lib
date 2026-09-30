@@ -228,7 +228,8 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %.*s", statusLen, (int)statusLen, me->buff);
+		me->buff[sizeof(me->buff) - 1] = 0;
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %s", statusLen, me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -260,7 +261,8 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %.*s", statusLen, (int)statusLen, me->buff);
+		me->buff[sizeof(me->buff) - 1] = 0;
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %s", statusLen, me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -292,7 +294,8 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %.*s", statusLen, (int)statusLen, me->buff);
+		me->buff[sizeof(me->buff) - 1] = 0;
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %s", statusLen, me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -324,7 +327,8 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %.*s", statusLen, (int)statusLen, me->buff);
+		me->buff[sizeof(me->buff) - 1] = 0;
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %s", statusLen, me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -383,7 +387,8 @@ Alx_Status AlxFtp_Client_Logout(AlxFtp* me)
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_DBG("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %.*s", statusLen, (int)statusLen, me->buff);
+		me->buff[sizeof(me->buff) - 1] = 0;
+		ALX_FTP_TRACE_DBG("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %s", statusLen, me->buff);
 	}
 	else
 	{
@@ -451,7 +456,8 @@ Alx_Status AlxFtp_Client_MakeDir(AlxFtp* me, const char* path)
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %.*s", statusLen, (int)statusLen, me->buff);
+		me->buff[sizeof(me->buff) - 1] = 0;
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %s", statusLen, me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -504,7 +510,8 @@ Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path, bool* exists)
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %.*s", statusLen, (int)statusLen, me->buff);
+		me->buff[sizeof(me->buff) - 1] = 0;
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %s", statusLen, me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -568,7 +575,8 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %.*s", statusLen, (int)statusLen, me->buff);
+		me->buff[sizeof(me->buff) - 1] = 0;
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %s", statusLen, me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -673,7 +681,8 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %.*s", statusLen, (int)statusLen, me->buff);
+		me->buff[sizeof(me->buff) - 1] = 0;
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %s", statusLen, me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -722,7 +731,8 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
 	if (statusLen <= 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %.*s", statusLen, (int)statusLen, me->buff);
+		me->buff[sizeof(me->buff) - 1] = 0;
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Recv(Ctrl) statusLen %" PRId32 " buff %s", statusLen, me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
