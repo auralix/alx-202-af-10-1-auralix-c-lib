@@ -596,10 +596,14 @@ extern "C" {
 //------------------------------------------------------------------------------
 //#define ALX_INA228
 #define ALX_INA238
+//#define ALX_VNH7040_NO_PWM
 //#define ALX_ADC_OPTIMIZE_SIZE
 //#define ALX_IO_PIN_IRQ_HANDLERS_OFF
 //#define ALX_PWM_OPTIMIZE_SIZE
 //#define ALX_ZEPHYR_TRACE_WITH_LOG
+//#define ALX_LIN_FRAME_DATA_LEN_MAX 8
+//#define ALX_FREERTOS_TASK_PRIORITY_NET_TICK 1
+//#define ALX_FREERTOS_TASK_PRIORITY_NET_DHCP 1
 
 
 
