@@ -186,18 +186,23 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// Role
+// Role - App
 //------------------------------------------------------------------------------
 //#define ALX_BOOT_A
 //#define ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE "alxBoot_GENERATED.h"
 //#define ALX_BOOT_A_PRE_COMP_BOOT_HDR_FILE "2406071858_ALX-202-AF-27-1_NucleoF429Zi_Boot_CFw_V0-0-0_9f672fc.h"
+
+
+//------------------------------------------------------------------------------
+// Role - Bootloader
+//------------------------------------------------------------------------------
 //#define ALX_BOOT_B
 //#define ALX_BOOT_B_ID_FW_ARTF "ALX-202-AF-27-1"
 //#define ALX_BOOT_B_ID_FW_NAME "NucleoF429Zi_Boot_CFw"
 
 
 //------------------------------------------------------------------------------
-// Memory Map
+// MCU Boot - Memory Map
 //------------------------------------------------------------------------------
 //#define ALX_MCU_BOOT_FLASH_DEVICE_ID 0
 //#define ALX_MCU_BOOT_FLASH_SECTOR_SIZE (128*1024) // 128kB - 131072, 0x00020000
@@ -224,13 +229,13 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// Trace Level
+// Trace - Level
 //------------------------------------------------------------------------------
 #define ALX_TRACE_LEVEL ALX_TRACE_LEVEL_INF
 
 
 //------------------------------------------------------------------------------
-// Module Trace
+// Module - Trace
 //------------------------------------------------------------------------------
 #define ALX_A352_TRACE_ENABLE
 #define ALX_ADAU1961_TRACE_ENABLE
@@ -326,7 +331,7 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// Module Assert - BKPT
+// Module - Assert - BKPT
 //------------------------------------------------------------------------------
 //#define ALX_A352_ASSERT_BKPT_ENABLE
 //#define ALX_ADAU1961_ASSERT_BKPT_ENABLE
@@ -422,7 +427,7 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// Module Assert - TRACE
+// Module - Assert - TRACE
 //------------------------------------------------------------------------------
 //#define ALX_A352_ASSERT_TRACE_ENABLE
 //#define ALX_ADAU1961_ASSERT_TRACE_ENABLE
@@ -518,7 +523,7 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// Module Assert - RST
+// Module - Assert - RST
 //------------------------------------------------------------------------------
 #define ALX_A352_ASSERT_RST_ENABLE
 #define ALX_ADAU1961_ASSERT_RST_ENABLE
@@ -614,14 +619,14 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// Module Options
+// Module - Options
 //------------------------------------------------------------------------------
-//#define ALX_IO_PIN_IRQ_HANDLERS_OFF
-//#define ALX_ZEPHYR_TRACE_WITH_LOG
 //#define ALX_INA228
 #define ALX_INA238
 //#define ALX_ADC_OPTIMIZE_SIZE
+//#define ALX_IO_PIN_IRQ_HANDLERS_OFF
 //#define ALX_PWM_OPTIMIZE_SIZE
+//#define ALX_ZEPHYR_TRACE_WITH_LOG
 
 
 
