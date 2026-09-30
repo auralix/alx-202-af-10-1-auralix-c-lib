@@ -552,7 +552,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 		}
 		else if (AlxLogger_Log_AreLogsAvailable(md.read.id, md.write.id) == false)
 		{
-			ALX_LOGGER_TRACE_INF("No more logs available (read.id %u, write.id %u, logNum %u, numOfLogs %u)",
+			ALX_LOGGER_TRACE_INF("No more logs available (read.id %" PRIu64 ", write.id %" PRIu64 ", logNum %" PRIu32 ", numOfLogs %" PRIu32 ")",
 				md.read.id, md.write.id, logNum, numOfLogs);
 
 			// Close
@@ -1013,7 +1013,7 @@ Alx_Status AlxLogger_File_GetSize(AlxLogger* me, const char* path, uint32_t* siz
 	status = AlxFs_File_Size(me->alxFs, &file, size);
 	if (status != Alx_Ok)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, fileSize=%u", status, path, size);
+		ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, fileSize=%" PRIu32, status, path, *size);
 		Alx_Status statusClose = AlxFs_File_Close(me->alxFs, &file);
 		if (statusClose != Alx_Ok)
 		{

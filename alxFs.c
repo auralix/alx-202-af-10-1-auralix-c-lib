@@ -2136,7 +2136,7 @@ static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(void* ctx, void* chunkData
 	}
 	else
 	{
-		ALX_FS_TRACE_FORMAT("%s", chunkData);
+		ALX_FS_TRACE_FORMAT("%s", (const char*)chunkData);
 	}
 
 	// Return

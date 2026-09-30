@@ -600,7 +600,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 
 	// Parse tuple
 	uint8_t tuple[6] = {};
-	int32_t sscanfStatus = sscanf(ptr, "(%u,%u,%u,%u,%u,%u)", &tuple[0], &tuple[1], &tuple[2], &tuple[3], &tuple[4], &tuple[5]);
+	int32_t sscanfStatus = sscanf(ptr, "(%" SCNu8 ",%" SCNu8 ",%" SCNu8 ",%" SCNu8 ",%" SCNu8 ",%" SCNu8 ")", &tuple[0], &tuple[1], &tuple[2], &tuple[3], &tuple[4], &tuple[5]);
 	if (sscanfStatus != 6)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: sscanf(tuple) buff %.*s", statusLen, me->buff);
