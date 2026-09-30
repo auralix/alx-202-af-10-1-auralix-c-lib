@@ -71,7 +71,7 @@ typedef enum
 	AlxClk_Config_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_FroOsc_30MHz_WdtOsc_200kHz,
 	AlxClk_Config_McuLpc84x_Mainclk_30MHz_AhbClk_30MHz_ExtClk_12MHz,
 	#endif
-} AlxClk_Config;	// MF: NOTE - defined(ALX_LPC81X) || defined(ALX_LPC82X) || defined(ALX_LPC83X) || defined(ALX_LPC84X) this MCUs will have the same enum
+} AlxClk_Config;
 
 typedef struct
 {
