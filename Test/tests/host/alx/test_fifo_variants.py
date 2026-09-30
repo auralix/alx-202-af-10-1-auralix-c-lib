@@ -27,7 +27,7 @@ observable and is what P526 and P527 test. **The trace axis is proved in test_li
 (P532-P539), on alxLin.c's 23 sites at three levels - the module that straddles the one threshold
 these four variants actually cross.
 
-And on this host all three assert handlers return, because Test/alxAssertPc.c records instead of
+And on this host all three assert handlers return, because Test/alxAssertFake.c records instead of
 aborting. So P527 proves the #elif chain in alxFifo.h selected the form the variant asked for -
 which is the thing configuration can get wrong - and not what a target does afterwards. What a
 target does is alxAssert's own group (P506-P515).
@@ -44,7 +44,7 @@ Proofs (ALX-1553): P525-P531.
 
 import pytest
 
-from harness.build import (
+from harness.host.build import (
     DEFAULT_VARIANT,
     FIFO_DLL,
     FIFO_SOURCES,
@@ -99,9 +99,9 @@ def test_ALX1553_P526_a_broken_precondition_is_recorded_in_three_variants_and_ab
     form, _trace, _level = VARIANTS[name]
     f = lib.new(4)
     try:
-        lib.c.AlxAssertPc_Reset()
+        lib.c.AlxAssertFake_Reset()
         assert lib.write(f, b"") == lib.ERR, "a zero-length write stopped returning Alx_Err"
-        count = lib.c.AlxAssertPc_Count()
+        count = lib.c.AlxAssertFake_Count()
     finally:
         lib.delete(f)
 
@@ -126,9 +126,9 @@ def test_ALX1553_P527_the_handler_that_runs_is_the_one_the_variant_asked_for(var
     form, _trace, _level = VARIANTS[name]
     f = lib.new(4)
     try:
-        lib.c.AlxAssertPc_Reset()
+        lib.c.AlxAssertFake_Reset()
         lib.write(f, b"")
-        first = (lib.c.AlxAssertPc_First() or b"").decode("ascii", "replace")
+        first = (lib.c.AlxAssertFake_First() or b"").decode("ascii", "replace")
     finally:
         lib.delete(f)
 
@@ -153,9 +153,9 @@ def test_ALX1553_P528_the_reported_location_names_the_header_in_every_variant(va
         pytest.skip("`off` records no location at all - that is P526")
     f = lib.new(4)
     try:
-        lib.c.AlxAssertPc_Reset()
+        lib.c.AlxAssertFake_Reset()
         lib.write(f, b"")
-        first = (lib.c.AlxAssertPc_First() or b"").decode("ascii", "replace")
+        first = (lib.c.AlxAssertFake_First() or b"").decode("ascii", "replace")
     finally:
         lib.delete(f)
     assert first.endswith(WRITE_LEN_ASSERT)
@@ -174,7 +174,7 @@ def test_ALX1553_P531_a_write_longer_than_the_buffer_is_a_violation_not_a_featur
     So the pinned contract is only REACHABLE on a board built with assertions off. In `default` -
     the configuration a product ships - the same call hits ALX_ASSERT_RST, and on a target that
     resets the MCU; nothing downstream of the assertion ever runs and no caller sees ErrFull. The
-    host cannot show the reset, because alxAssertPc.c records and returns, so the record IS the
+    host cannot show the reset, because alxAssertFake.c records and returns, so the record IS the
     evidence: whether anything was reported is the whole difference between a supported partial
     write and a reboot.
 
@@ -186,9 +186,9 @@ def test_ALX1553_P531_a_write_longer_than_the_buffer_is_a_violation_not_a_featur
     form, _trace, _level = VARIANTS[name]
     f = lib.new(4)
     try:
-        lib.c.AlxAssertPc_Reset()
+        lib.c.AlxAssertFake_Reset()
         status = lib.c.AlxFifo_Write(f, b"abcdef", 6)
-        count = lib.c.AlxAssertPc_Count()
+        count = lib.c.AlxAssertFake_Count()
         entries = lib.entries(f)
         _read_status, data = lib.read(f, 4)
     finally:

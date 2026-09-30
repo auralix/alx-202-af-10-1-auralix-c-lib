@@ -236,12 +236,12 @@ def test_ALX1553_P472_the_firmware_half_is_finished_by_the_ctor_and_the_board_ha
 
     before = (id_lib.num(obj, "FwVer"), id_lib.text(obj, "FwVerStr"), id_lib.text(obj, "FwBinStr"))
     pcb_before = id_lib.num(obj, "HwPcbVer")
-    tripped = id_lib.c.AlxAssertPc_Count()
+    tripped = id_lib.c.AlxAssertFake_Count()
 
     id_lib.init(obj)
 
     assert tripped == 4, "the four pre-Init reads did not each record their own assertion"
-    assert "AlxId_GetFwVer" in (id_lib.c.AlxAssertPc_First() or b"").decode("ascii", "replace")
+    assert "AlxId_GetFwVer" in (id_lib.c.AlxAssertFake_First() or b"").decode("ascii", "replace")
     assert before == (id_lib.num(obj, "FwVer"), id_lib.text(obj, "FwVerStr"),
                       id_lib.text(obj, "FwBinStr")), "Init changed the firmware version surface"
     assert pcb_before == 0xFFFFFFFFFFFFFFFF, "the board version was composed before Init"
@@ -464,7 +464,7 @@ def test_ALX1553_P480_the_compile_stamp_is_the_compilers_own_clock_and_reaches_t
     "silently even with -Woverflow, which is why nobody has seen it. Two other tools do not: clang "
     "reports -Winteger-overflow, and under this suite's -Werror that is a hard build failure, "
     "which is why the three accessors that mention the macro live in a CLOSURE file of their own "
-    "(Test/alxIdTestDateComp.c); and UBSan reports it at runtime, measured word for word as "
+    "(Test/alxIdTestHelpers_DateComp.c); and UBSan reports it at runtime, measured word for word as "
     "\"signed integer overflow: 2000000000 + 600000000 cannot be represented in type 'int'\" - so "
     "the accessor that evaluates it carries a no_sanitize attribute, because -fno-sanitize-recover "
     "makes that finding an abort that takes the whole runner with it and this seal says the same "
@@ -649,7 +649,7 @@ def test_ALX1553_P488_nothing_in_the_public_header_can_tell_a_caller_the_block_w
     obj = _fw(id_lib, is_boot_used=True, boot_addr=addr)
 
     assert id_lib.num(obj, "FwIsBootUsed") is True, "the only flag a caller has stopped saying true"
-    assert id_lib.c.AlxAssertPc_Count() == 0, "a rejected block now records something after all"
+    assert id_lib.c.AlxAssertFake_Count() == 0, "a rejected block now records something after all"
     assert id_lib.text(obj, "FwBootArtf") == "BOOT-ARTF"
     assert id_lib.num(obj, "FwBootVerMajor") == 4
     assert id_lib.text(obj, "FwBootVerStr") == "", "the derived fields were rendered after all"
@@ -738,7 +738,7 @@ def test_ALX1553_P491_the_blocks_crc_is_never_computed_and_never_checked(id_lib)
     zero = _fw(id_lib, is_boot_used=True, boot_addr=addr)
 
     assert reported == (id_lib.text(zero, "FwBootVerStr"), id_lib.text(zero, "FwBootBinStr"))
-    assert id_lib.c.AlxAssertPc_Count() == 0, "a wrong crc was noticed after all"
+    assert id_lib.c.AlxAssertFake_Count() == 0, "a wrong crc was noticed after all"
 
 
 def test_ALX1553_P492_both_constructors_read_the_boot_block_the_same_way(id_lib):
@@ -908,8 +908,8 @@ def test_ALX1553_P497_an_unknown_board_leaves_the_object_abandoned_but_answering
     obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(7, "BoardSeven"), (4, "BoardFour")], [7])
     id_lib.init(obj)
 
-    assert id_lib.c.AlxAssertPc_Count() == 1
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:459 in AlxId_Init"
+    assert id_lib.c.AlxAssertFake_Count() == 1
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == "RST alxId.h:459 in AlxId_Init"
     assert not id_lib.is_init(obj)
     assert id_lib.num(obj, "HwId") == 2, "the id that matched nothing is still reported"
     assert _field_bytes(id_lib, obj, "HwPcbVerStr", 16) == b"\xff" * 16, "Init rendered a version"
@@ -934,8 +934,8 @@ def test_ALX1553_P498_an_unsupported_board_is_left_half_resolved(id_lib):
     obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(7, "BoardSeven"), (2, "BoardTwo")], [7])
     id_lib.init(obj)
 
-    assert id_lib.c.AlxAssertPc_Count() == 1
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:476 in AlxId_Init"
+    assert id_lib.c.AlxAssertFake_Count() == 1
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == "RST alxId.h:476 in AlxId_Init"
     assert not id_lib.is_init(obj)
     assert id_lib.text(obj, "HwPcbName") == "BoardTwo", "the instance copy did not happen"
     assert id_lib.num(obj, "HwId") == 2
@@ -1061,8 +1061,8 @@ def test_ALX1553_P502_a_second_init_re_reads_the_straps_and_takes_the_new_answer
     id_lib.strap(obj, 0, id_lib.HI)
     id_lib.init(obj)
 
-    assert id_lib.c.AlxAssertPc_Count() == 1
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:434 in AlxId_Init"
+    assert id_lib.c.AlxAssertFake_Count() == 1
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == "RST alxId.h:434 in AlxId_Init"
     assert id_lib.num(obj, "HwId") == 1, "the second Init did not re-read the straps"
     assert [id_lib.pin_counts(obj, i) for i in range(2)] == [(2, 2), (2, 2)]
 
@@ -1094,8 +1094,8 @@ def test_ALX1553_P503_the_strap_count_is_asserted_and_then_not_enforced(id_lib):
 
     hw_id = id_lib.calc_hw_id(obj, 6)
 
-    assert id_lib.c.AlxAssertPc_Count() == 1
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:1299 in AlxId_CalcHwId"
+    assert id_lib.c.AlxAssertFake_Count() == 1
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == "RST alxId.h:1299 in AlxId_CalcHwId"
     assert hw_id == 242, "the fold stopped at the fifth strap after all"
     assert [id_lib.pin_counts(obj, i) for i in range(6)] == [(1, 1)] * 6, "a strap past the limit was skipped"
 
@@ -1131,13 +1131,13 @@ def test_ALX1553_P504_trace_is_gated_on_init_and_renders_nothing_in_this_configu
     before_init = _fw_ctor(id_lib)
     id_lib.trace(before_init)
 
-    assert id_lib.c.AlxAssertPc_Count() == 1
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii") == "RST alxId.h:526 in AlxId_Trace"
+    assert id_lib.c.AlxAssertFake_Count() == 1
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == "RST alxId.h:526 in AlxId_Trace"
 
     after_init = _fw(id_lib)
     id_lib.trace(after_init)
 
-    assert id_lib.c.AlxAssertPc_Count() == 1, "tracing an initialised identity asserted or faulted"
+    assert id_lib.c.AlxAssertFake_Count() == 1, "tracing an initialised identity asserted or faulted"
 
 
 @pytest.mark.expect_assert(
@@ -1167,17 +1167,17 @@ def test_ALX1553_P505_one_fact_reached_through_three_getters_with_three_differen
     obj = _fw_ctor(id_lib)
 
     assert id_lib.text(obj, "HwMcuUniqueIdStr") == ""
-    assert id_lib.c.AlxAssertPc_Count() == 0, "the unique id string asserted on isInit after all"
+    assert id_lib.c.AlxAssertFake_Count() == 0, "the unique id string asserted on isInit after all"
 
     assert id_lib.mcu_unique_id(obj, 32, 3) == [0xA5A5A5A5] * 3, "the buffer was written after all"
     assert id_lib.mcu_unique_id(obj, 8, 12) == [0xA5] * 12, "the buffer was written after all"
 
-    assert id_lib.c.AlxAssertPc_Count() == 2, "the two array getters did not each assert"
-    assert (id_lib.c.AlxAssertPc_First() or b"").decode("ascii").endswith("AlxId_GetHwMcuUniqueIdUint32")
+    assert id_lib.c.AlxAssertFake_Count() == 2, "the two array getters did not each assert"
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii").endswith("AlxId_GetHwMcuUniqueIdUint32")
 
     id_lib.text(obj, "FwArtf")
 
-    assert id_lib.c.AlxAssertPc_Count() == 3, "every other getter should assert isInit"
+    assert id_lib.c.AlxAssertFake_Count() == 3, "every other getter should assert isInit"
 
 
 # =====================================================================

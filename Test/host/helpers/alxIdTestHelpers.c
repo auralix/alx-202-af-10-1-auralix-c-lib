@@ -30,7 +30,7 @@
   * this week's hash would go red on somebody else's build of the firmware; a
   * test compares what the module stored against what the module was compiled
   * with, which is a claim that stays true. ALX_BUILD_DATE_COMP is the one
-  * exception and it lives in alxIdTestDateComp.c - see that file.
+  * exception and it lives in alxIdTestHelpers_DateComp.c - see that file.
   *
   * The bootloader block is read from a FIXED ADDRESS: the module keeps it as a
   * uint32_t and casts it straight to void*, so on this x64 host a malloc'd

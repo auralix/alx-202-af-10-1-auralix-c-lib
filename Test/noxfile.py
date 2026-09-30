@@ -12,9 +12,9 @@ One nox session per stage, named after it, running in Test/.venv (no second envi
 same shape as the Auralix Python lib's noxfile and the device repos'. Evidence under build/<stage>/; the
 dev lane (pytest) writes to build/ itself. What lives here is what is THIS repository's: the source lists,
 the defines, the export lists, the mutation hooks. Everything a second C repository would need identically
-comes from the Python lib: the generic gates (alx.verify.ascii_gate / c_style /
+comes from the Python lib: the generic gates (alx.verify.gates.ascii / c_style /
 coverage_gate / mutation), the lane vocabulary (alx.verify.lanes) and the host toolchain and DLL build
-mechanics (alx.c_lib.host_build).
+mechanics (alx.verify.host_build).
 """
 
 import argparse
@@ -26,7 +26,7 @@ import sys
 from pathlib import Path
 
 import nox
-from alx.c_lib import host_build as hb
+from alx.verify import host_build as hb
 from alx.verify import lanes
 
 TEST = Path(__file__).resolve().parent
@@ -41,7 +41,7 @@ PYTHON = sys.executable
 tc = hb.Toolchain()   # where the tools are on THIS machine (ALX_* variables), and the vcvars environment
 # repository build recipes and DLL_GROUPS; no pytest lifecycle dependency; harness is installed
 # into this project's environment (pyproject.toml, [build-system])
-from harness import build as host_recipe  # noqa: E402
+from harness.host import build as host_recipe  # noqa: E402
 
 nox.options.default_venv_backend = "none"
 nox.options.sessions = list(lanes.DEFAULT_SESSIONS)
@@ -50,7 +50,8 @@ VENDOR = ["--exclude", "Ext", "--exclude", "FatFs", "--exclude", "mcuboot", "--e
 
 # ---- the module sets (extend per module; keep in sync with host_build's group declarations) -------------------
 ANALYSIS_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c",
-                    HELPERS / "alxFifoTestHelpers.c", HELPERS / "alxBoundTestHelpers.c", CHECKS / "alxFifoSanSmoke.c"]
+                    HELPERS / "alxFifoTestHelpers.c", HELPERS / "alxBoundTestHelpers.c",
+                    CHECKS / "alxFifoSanSmokeCheck.c"]
 # every C file this suite OWNS is style-gated, whatever module it serves; the LIBRARY sources
 # gated here are still only the ones ANALYSIS_SOURCES covers (see the Jira task, item A13)
 # The C style gate reads only what is listed here. Until 12.09 that list was ANALYSIS_SOURCES -
@@ -72,7 +73,7 @@ STYLE_PENDING_COMMENTS = []
 # required; ALX_RTC_DAYS_IN_YEAR(yr) is the same shape; alxLfsConfig.h's are littlefs's own
 # vendor shims. Rule 1 as written asks those files for something the language does not offer.
 #
-# So the last ten need a WAIVER MECHANISM in alx.verify.c_style - a per-line marker, or a rule that
+# So the last ten need a WAIVER MECHANISM in alx.verify.gates.c_style - a per-line marker, or a rule that
 # exempts a #define body - before they can be gated. That is a change to the Python library rather
 # than to this repository, and it is on the TODO.
 STYLE_PENDING_TERNARY = [
@@ -194,7 +195,7 @@ STYLE_FILES = [*_library_style_files(), *sorted(HOST.rglob("*.c"))]
 LAYOUT_CHECKS = [(CHECKS / "alxIna228RegSizeCheck.c", ["ALX_INA238", "ALX_INA228"])]
 INCLUDE_DIRS = host_recipe.INCLUDES
 
-# alxAssertPc.c is in every group now: it holds the assertion counter every export list exports
+# alxAssertFake.c is in every group now: it holds the assertion counter every export list exports
 # and the suite's per-test check reads. Declared by host_build.FIFO_SOURCES.
 FIFO_SOURCES = host_recipe.FIFO_SOURCES
 FIFO_EXPORTS = host_recipe.FIFO_EXPORTS
@@ -277,7 +278,7 @@ def _check_ms_tests() -> None:
 
 # Id group: the real alxId over the IO pin fake, asserts ON = the code as shipped. Both closure
 # sources are closure for reasons written out at host_build's ID group - alxId.c fails -Wformat and
-# -Wint-to-void-pointer-cast, and alxIdTestDateComp.c cannot survive -Werror at all because the
+# -Wint-to-void-pointer-cast, and alxIdTestHelpers_DateComp.c cannot survive -Werror at all because the
 # library's ALX_BUILD_DATE_COMP overflows an int. Declared by host_build.ID_SOURCES_STRICT/
 # _CLOSURE and with what host_build._assert_defines derives from them.
 #
@@ -294,8 +295,8 @@ ID_TESTS = ["test_id.py"]
 # Assert group (ALX-1553): the funnel every ALX_*_ASSERT in the library goes through, built TWICE
 # from almost the same list. All three handlers are ALX_WEAK and a strong definition displaces a
 # weak one for the whole image, so the two sides cannot both be reachable in one DLL: the WEAK DLL
-# omits alxAssertPc.c and runs alxAssert.c's own bodies, the other links it and is displaced.
-# alxAssertBkptCaller.c is in the second list only - the weak AlxAssert_Bkpt is __debugbreak() on
+# omits alxAssertFake.c and runs alxAssert.c's own bodies, the other links it and is displaced.
+# alxAssertTestHelpers_Bkpt.c is in the second list only - the weak AlxAssert_Bkpt is __debugbreak() on
 # this host and does not return, so a caller for it must not exist where that default would run.
 # No assert defines for either: alxAssert.h declares no enable macro of its own, which is right for
 # the mechanism rather than one of its clients. Declared by host_build.ASSERT_WEAK_SOURCES and
@@ -315,7 +316,7 @@ ASSERT_TESTS = ["test_assert.py"]
 
 # MemRaw group (ALX-1553): the raw-memory contract, five ALX_WEAK symbols that no file in the
 # library implements strongly. Two DLLs for the same reason the Assert group has two - once with
-# the weak defaults intact, once with alxMemRawTestOverride.c displacing four of the five (DeInit
+# the weak defaults intact, once with alxMemRawTestHelpers_Override.c displacing four of the five (DeInit
 # is left weak on purpose, so displacement is visibly per symbol). Note that alxMemRawFake.c, which
 # the MemSafe group links INSTEAD of this module, is in neither list: it would displace all five
 # and leave nothing to test. Declared by host_build.MEMRAW_SOURCES / MEMRAW_OVR_SOURCES and
@@ -354,7 +355,7 @@ def _strs(paths) -> list:
 
 
 def _dev_build(session: nox.Session) -> list:
-    """Build every stale group with harness.build's -Werror recipe; return the targets that are missing.
+    """Build every stale group with harness.host.build's -Werror recipe; return the targets that are missing.
 
     Collection alone does NOT do this: the DLLs are built by the fixtures, which --collect-only
     never runs. Measured 10.09 - with alxFifoTest.dll deleted, the BUILD lane reported
@@ -435,7 +436,7 @@ def variants(session: nox.Session) -> None:
     interruption - every pair is attempted and the matrix is reported at the end. That is the
     opposite of the BUILD lane's fail-fast, on purpose.
 
-    The recipes come from harness.build.VARIANT_GROUPS rather than being restated here. The sanitize and
+    The recipes come from harness.host.build.VARIANT_GROUPS rather than being restated here. The sanitize and
     coverage lanes each keep their own copy of a group's source list behind a Declared comment;
     a seventh copy would defeat the point of having a table.
     """
@@ -514,10 +515,10 @@ def analyze(session: nox.Session) -> None:
         _fresh_dev_build(session)
     session.log("Stage 0: codespell, ASCII gate, C style gate, fake style gate, ruff (the shared test profile)")
     session.run(PYTHON, "-m", "codespell_lib", *_strs(ANALYSIS_SOURCES))
-    session.run(PYTHON, "-m", "alx.verify.ascii_gate", str(CLIB), *VENDOR, "--out", str(out / "ascii_gate.txt"))
-    session.run(PYTHON, "-m", "alx.verify.c_style", *_strs(STYLE_FILES), "--out", str(out / "c_style.txt"))
+    session.run(PYTHON, "-m", "alx.verify.gates.ascii", str(CLIB), *VENDOR, "--out", str(out / "ascii_gate.txt"))
+    session.run(PYTHON, "-m", "alx.verify.gates.c_style", *_strs(STYLE_FILES), "--out", str(out / "c_style.txt"))
     # every fake a consumer links follows the one convention, family guards checked against the headers
-    session.run(PYTHON, "-m", "alx.verify.fake_style", *_strs(sorted(FAKES.glob("*.c"))),
+    session.run(PYTHON, "-m", "alx.verify.gates.fake_style", *_strs(sorted(FAKES.glob("*.c"))),
                 "--headers", *_strs([CLIB, CLIB / "Mcu", CLIB / "Mcu" / "McuStm32", CLIB / "Ext"]),
                 "--out", str(out / "fake_style.txt"))
     # this folder's Python is gated by the SAME profile the library gates its own tests with, so the two
@@ -675,11 +676,11 @@ def sanitize(session: nox.Session) -> None:
     _fresh_dev_build(session)
     asan, ubsan = lanes.evidence_dir(TEST, "sanitize", "asan"), lanes.evidence_dir(TEST, "sanitize", "ubsan")
     session.log("Stage 1: host ASan+UBSan smoke exe")
-    hb.build_exe(tc, out=asan / "alxFifoSanSmoke.exe",
-                 sources=[CLIB / "alxFifo.c", CLIB / "alxBound.c", CHECKS / "alxFifoSanSmoke.c"],
+    hb.build_exe(tc, out=asan / "alxFifoSanSmokeCheck.exe",
+                 sources=[CLIB / "alxFifo.c", CLIB / "alxBound.c", CHECKS / "alxFifoSanSmokeCheck.c"],
                  includes=INCLUDE_DIRS, flags=[*ASAN_UBSAN, "/Z7", "/MT"], driver=hb.MSVC)
     shutil.copy(tc.asan_runtime(), asan)
-    session.run(str(asan / "alxFifoSanSmoke.exe"), external=True)
+    session.run(str(asan / "alxFifoSanSmokeCheck.exe"), external=True)
     session.log("Stage 2: UBSan FIFO DLL, full suite")
     _instrumented_dll(ubsan / "alxFifoTest.dll", FIFO_SOURCES, FIFO_EXPORTS, UBSAN)
     _pytest(session, {"ALX_FIFO_TEST_DLL": str(ubsan / "alxFifoTest.dll")})
@@ -732,7 +733,7 @@ def _llvm_cov_group(session: nox.Session, out: Path, dll: Path, env_var: str, te
                 "-show-branches=count", "-show-line-counts", external=True, silent=True)
     _write(out / "summary.json", session.run(cov, "export", str(dll), f"-instr-profile={profdata}", "-summary-only",
                                             external=True, silent=True))
-    session.run(PYTHON, "-m", "alx.verify.coverage_gate", str(out / "summary.json"), "--metrics", metrics,
+    session.run(PYTHON, "-m", "alx.verify.gates.coverage", str(out / "summary.json"), "--metrics", metrics,
                 "--out", str(out / "coverage_gate.txt"), *gated)
     session.log(f"html: {out / 'html' / 'index.html'}   cobertura: {out / 'coverage_c.xml'}")
 
@@ -793,7 +794,7 @@ def mutate(session: nox.Session) -> None:
     _fresh_dev_build(session)
     # The hooks are the Python lib's; only the flags and the group declaration are this repository's.
     # Templates take POSIX paths and run with --root as the working directory.
-    hooks = f"{Path(PYTHON).as_posix()} -m alx.c_lib.mutation_hooks"
+    hooks = f"{Path(PYTHON).as_posix()} -m alx.verify.mutation_hooks"
     # Includes only, no assert defines: the fingerprint is a RELATIVE comparison (does the mutant
     # produce the original's object code?), so both sides only have to agree. Measured 10.09: adding
     # the assert defines drops EQUIVALENT from 156 to 42 on alxFifo.c and triples the run, because
@@ -805,5 +806,5 @@ def mutate(session: nox.Session) -> None:
                 "--out", str(BUILD / "mutate"), "--sample", str(args.sample), "--seed", "1514",
                 "--check-cmd", f"{hooks} check {{mutant}} {flags}",
                 "--fingerprint-cmd", f"{hooks} fingerprint {{mutant}} --work {work} {flags}",
-                "--rebuild-cmd", f"{hooks} rebuild --groups harness.build:DLL_GROUPS",
+                "--rebuild-cmd", f"{hooks} rebuild --groups harness.host.build:DLL_GROUPS",
                 *args.sources)

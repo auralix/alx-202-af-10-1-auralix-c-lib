@@ -29,7 +29,7 @@ import random
 
 import pytest
 
-from harness.access import (
+from harness.host.access import (
     check,
 )
 

@@ -231,7 +231,7 @@ def test_ALX1553_P466_the_sensor_can_be_initialised_and_de_initialised(temp_sens
     """A lifecycle call should do something, or say it cannot - not assert and report success."""
     lib = temp_sens_lib
     obj = lib.new(PT1000_KOHM, PT1000_DEGC, ch_vin=CH_VIN, ch_vout=CH_VOUT)
-    lib.c.AlxAssertPc_Reset()
+    lib.c.AlxAssertFake_Reset()
 
     status = lib.lifecycle(obj, call)
 

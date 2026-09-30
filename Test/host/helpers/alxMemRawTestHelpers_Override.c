@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file		alxMemRawTestOverride.c
+  * @file		alxMemRawTestHelpers_Override.c
   * @brief		Auralix C Library - ALX Memory Raw Module - a product's override
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
@@ -70,25 +70,25 @@ static bool alxMemRawOverride_lastCheckWithReadEnable;
 //******************************************************************************
 // Prototypes - the DLL export surface (no separate header for test helpers)
 //******************************************************************************
-void AlxMemRawOverride_Reset(void);
-uint32_t AlxMemRawOverride_CtorCount(void);
-uint32_t AlxMemRawOverride_InitCount(void);
-uint32_t AlxMemRawOverride_ReadCount(void);
-uint32_t AlxMemRawOverride_WriteCount(void);
-uint32_t AlxMemRawOverride_LastAddr(void);
-uint32_t AlxMemRawOverride_LastLen(void);
-uint32_t AlxMemRawOverride_LastNumOfTries(void);
-uint32_t AlxMemRawOverride_LastTimeout_ms(void);
-bool AlxMemRawOverride_LastCheckWithReadEnable(void);
-uint8_t AlxMemRawOverride_Peek(uint32_t addr);
-void AlxMemRawOverride_Poke(uint32_t addr, uint8_t value);
-uint32_t AlxMemRawOverride_Size(void);
+void AlxMemRawTest_OverrideReset(void);
+uint32_t AlxMemRawTest_OverrideCtorCount(void);
+uint32_t AlxMemRawTest_OverrideInitCount(void);
+uint32_t AlxMemRawTest_OverrideReadCount(void);
+uint32_t AlxMemRawTest_OverrideWriteCount(void);
+uint32_t AlxMemRawTest_OverrideLastAddr(void);
+uint32_t AlxMemRawTest_OverrideLastLen(void);
+uint32_t AlxMemRawTest_OverrideLastNumOfTries(void);
+uint32_t AlxMemRawTest_OverrideLastTimeout_ms(void);
+bool AlxMemRawTest_OverrideLastCheckWithReadEnable(void);
+uint8_t AlxMemRawTest_OverridePeek(uint32_t addr);
+void AlxMemRawTest_OverridePoke(uint32_t addr, uint8_t value);
+uint32_t AlxMemRawTest_OverrideSize(void);
 
 
 //******************************************************************************
 // The override's own controls
 //******************************************************************************
-void AlxMemRawOverride_Reset(void)
+void AlxMemRawTest_OverrideReset(void)
 {
 	memset(alxMemRawOverride_mem, 0xFF, sizeof(alxMemRawOverride_mem));	// blank, as an erased device reads
 	memset(alxMemRawOverride_count, 0, sizeof(alxMemRawOverride_count));
@@ -99,52 +99,52 @@ void AlxMemRawOverride_Reset(void)
 	alxMemRawOverride_lastCheckWithReadEnable = false;
 }
 
-uint32_t AlxMemRawOverride_CtorCount(void)
+uint32_t AlxMemRawTest_OverrideCtorCount(void)
 {
 	return alxMemRawOverride_count[ALX_MEM_RAW_OVERRIDE_CTOR];
 }
 
-uint32_t AlxMemRawOverride_InitCount(void)
+uint32_t AlxMemRawTest_OverrideInitCount(void)
 {
 	return alxMemRawOverride_count[ALX_MEM_RAW_OVERRIDE_INIT];
 }
 
-uint32_t AlxMemRawOverride_ReadCount(void)
+uint32_t AlxMemRawTest_OverrideReadCount(void)
 {
 	return alxMemRawOverride_count[ALX_MEM_RAW_OVERRIDE_READ];
 }
 
-uint32_t AlxMemRawOverride_WriteCount(void)
+uint32_t AlxMemRawTest_OverrideWriteCount(void)
 {
 	return alxMemRawOverride_count[ALX_MEM_RAW_OVERRIDE_WRITE];
 }
 
-uint32_t AlxMemRawOverride_LastAddr(void)
+uint32_t AlxMemRawTest_OverrideLastAddr(void)
 {
 	return alxMemRawOverride_lastAddr;
 }
 
-uint32_t AlxMemRawOverride_LastLen(void)
+uint32_t AlxMemRawTest_OverrideLastLen(void)
 {
 	return alxMemRawOverride_lastLen;
 }
 
-uint32_t AlxMemRawOverride_LastNumOfTries(void)
+uint32_t AlxMemRawTest_OverrideLastNumOfTries(void)
 {
 	return alxMemRawOverride_lastNumOfTries;
 }
 
-uint32_t AlxMemRawOverride_LastTimeout_ms(void)
+uint32_t AlxMemRawTest_OverrideLastTimeout_ms(void)
 {
 	return alxMemRawOverride_lastTimeout_ms;
 }
 
-bool AlxMemRawOverride_LastCheckWithReadEnable(void)
+bool AlxMemRawTest_OverrideLastCheckWithReadEnable(void)
 {
 	return alxMemRawOverride_lastCheckWithReadEnable;
 }
 
-uint8_t AlxMemRawOverride_Peek(uint32_t addr)
+uint8_t AlxMemRawTest_OverridePeek(uint32_t addr)
 {
 	if (addr >= sizeof(alxMemRawOverride_mem))
 	{
@@ -153,7 +153,7 @@ uint8_t AlxMemRawOverride_Peek(uint32_t addr)
 	return alxMemRawOverride_mem[addr];
 }
 
-void AlxMemRawOverride_Poke(uint32_t addr, uint8_t value)
+void AlxMemRawTest_OverridePoke(uint32_t addr, uint8_t value)
 {
 	if (addr < sizeof(alxMemRawOverride_mem))
 	{
@@ -161,7 +161,7 @@ void AlxMemRawOverride_Poke(uint32_t addr, uint8_t value)
 	}
 }
 
-uint32_t AlxMemRawOverride_Size(void)
+uint32_t AlxMemRawTest_OverrideSize(void)
 {
 	return (uint32_t)sizeof(alxMemRawOverride_mem);
 }

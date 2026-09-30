@@ -1,9 +1,9 @@
-"""Host access harness: ctypes interfaces and test-instance access; builds live in harness/build.py."""
+"""Host access harness: ctypes interfaces and test-instance access; builds live in harness/host/build.py."""
 import ctypes
 from pathlib import Path
 from typing import ClassVar
 
-from harness.build import (
+from harness.host.build import (
     VARIANT_GROUPS,
     _build_variant_dll,
     _needs_build,
@@ -25,8 +25,8 @@ _LOADED_DLLS: list = []
 def _register_lib(c) -> None:
     """Every wrapper's ctypes handle, so one fixture can watch all of them."""
     if c not in _LOADED_DLLS:
-        c.AlxAssertPc_Count.restype = ctypes.c_uint32
-        c.AlxAssertPc_First.restype = ctypes.c_char_p
+        c.AlxAssertFake_Count.restype = ctypes.c_uint32
+        c.AlxAssertFake_First.restype = ctypes.c_char_p
         _LOADED_DLLS.append(c)
 
 
@@ -248,20 +248,20 @@ class MemSafeLib:
     # -- steps (strict sources plus a warnings-off closure), which is the part of the harness the
     # -- one-step fifo and lin groups cannot exercise.
     def trace_reset(self) -> None:
-        self.c.AlxTracePc_Reset()
+        self.c.AlxTraceFake_Reset()
 
     def traces(self) -> int:
-        self.c.AlxTracePc_Count.restype = ctypes.c_uint32
-        return self.c.AlxTracePc_Count()
+        self.c.AlxTraceFake_Count.restype = ctypes.c_uint32
+        return self.c.AlxTraceFake_Count()
 
     def traces_at(self, level: int) -> int:
-        self.c.AlxTracePc_CountAtLevel.restype = ctypes.c_uint32
-        self.c.AlxTracePc_CountAtLevel.argtypes = [ctypes.c_uint8]
-        return self.c.AlxTracePc_CountAtLevel(level)
+        self.c.AlxTraceFake_CountAtLevel.restype = ctypes.c_uint32
+        self.c.AlxTraceFake_CountAtLevel.argtypes = [ctypes.c_uint8]
+        return self.c.AlxTraceFake_CountAtLevel(level)
 
     def trace_level_configured(self) -> int:
-        self.c.AlxTracePc_LevelConfigured.restype = ctypes.c_uint8
-        return self.c.AlxTracePc_LevelConfigured()
+        self.c.AlxTraceFake_LevelConfigured.restype = ctypes.c_uint8
+        return self.c.AlxTraceFake_LevelConfigured()
     POISON = 0xAA
 
     def __init__(self, dll_path: Path):
@@ -2041,27 +2041,27 @@ class LinLib:
         c.AlxLinTest_RxByte.argtypes = [vp, u8]
         for name in ("TraceArgEvalsWrn", "TraceArgEvalsDbg", "TraceArgEvalsVrb"):
             getattr(c, f"AlxLinTest_{name}").restype = u32
-        c.AlxTracePc_Count.restype = u32
-        c.AlxTracePc_CountAtLevel.restype = u32
-        c.AlxTracePc_CountAtLevel.argtypes = [u8]
-        c.AlxTracePc_LastLevel.restype = u8
-        c.AlxTracePc_LastLine.restype = u32
-        c.AlxTracePc_LastFile.restype = ctypes.c_char_p
-        c.AlxTracePc_LastFun.restype = ctypes.c_char_p
-        c.AlxTracePc_LevelConfigured.restype = u8
+        c.AlxTraceFake_Count.restype = u32
+        c.AlxTraceFake_CountAtLevel.restype = u32
+        c.AlxTraceFake_CountAtLevel.argtypes = [u8]
+        c.AlxTraceFake_LastLevel.restype = u8
+        c.AlxTraceFake_LastLine.restype = u32
+        c.AlxTraceFake_LastFile.restype = ctypes.c_char_p
+        c.AlxTraceFake_LastFun.restype = ctypes.c_char_p
+        c.AlxTraceFake_LevelConfigured.restype = u8
         self._handles: list = []
 
     # -- the trace axis -----------------------------------------------------
     def trace_reset(self) -> None:
         """Both recorders: the sink's counters and the probe's argument counters."""
-        self.c.AlxTracePc_Reset()
+        self.c.AlxTraceFake_Reset()
         self.c.AlxLinTest_TraceReset()
 
     def traces(self) -> int:
-        return self.c.AlxTracePc_Count()
+        return self.c.AlxTraceFake_Count()
 
     def traces_at(self, level: int) -> int:
-        return self.c.AlxTracePc_CountAtLevel(level)
+        return self.c.AlxTraceFake_CountAtLevel(level)
 
     def arg_evals(self) -> tuple[int, int, int]:
         """How many times the WRN, DBG and VRB probe ARGUMENTS were evaluated."""
@@ -2070,10 +2070,10 @@ class LinLib:
                 self.c.AlxLinTest_TraceArgEvalsVrb())
 
     def last_trace(self) -> tuple[int, str, int, str]:
-        return (self.c.AlxTracePc_LastLevel(),
-                (self.c.AlxTracePc_LastFile() or b"").decode("ascii", "replace"),
-                self.c.AlxTracePc_LastLine(),
-                (self.c.AlxTracePc_LastFun() or b"").decode("ascii", "replace"))
+        return (self.c.AlxTraceFake_LastLevel(),
+                (self.c.AlxTraceFake_LastFile() or b"").decode("ascii", "replace"),
+                self.c.AlxTraceFake_LastLine(),
+                (self.c.AlxTraceFake_LastFun() or b"").decode("ascii", "replace"))
 
     def protected_id(self, id_: int) -> int:
         """The protected identifier for `id_`, taken OFF THE WIRE rather than recomputed.
@@ -2833,7 +2833,7 @@ class TempSensLib:
 
     def asserts(self) -> int:
         """How many of the library's own assertions have failed since this test began."""
-        return self.c.AlxAssertPc_Count()
+        return self.c.AlxAssertFake_Count()
 
     def temp(self, obj) -> tuple[int, float]:
         """(status, temperature) - the status is the table's, passed straight through."""
@@ -3424,8 +3424,8 @@ class AssertWeakLib:
     body writes through AlxTrace_WriteLevel. The third, AlxAssert_Bkpt, runs ALX_BKPT() and does not
     return on this host, so nothing in this DLL can call it and no caller for it is exported.
 
-    Deliberately NOT registered with _register_lib: it links no alxAssertPc.c, so it exports none of
-    the AlxAssertPc_* symbols that fixture binds. Nothing is lost by that - alxAssert.c has no
+    Deliberately NOT registered with _register_lib: it links no alxAssertFake.c, so it exports none of
+    the AlxAssertFake_* symbols that fixture binds. Nothing is lost by that - alxAssert.c has no
     assertion of its own for the autouse check to find.
     """
 
@@ -3529,10 +3529,10 @@ class AssertWeakLib:
 
 
 class AssertLib(AssertWeakLib):
-    """ctypes wrapper around alxAssertTest.dll: the same weak defaults, displaced by alxAssertPc.c.
+    """ctypes wrapper around alxAssertTest.dll: the same weak defaults, displaced by alxAssertFake.c.
 
     Same surface as AssertWeakLib plus the BKPT call sites, which are safe only here, and the
-    AlxAssertPc_* recorder - so a test can say WHICH definition ran, which is the whole comparison.
+    AlxAssertFake_* recorder - so a test can say WHICH definition ran, which is the whole comparison.
     """
 
     def __init__(self, dll_path: Path):
@@ -3549,13 +3549,13 @@ class AssertLib(AssertWeakLib):
         return self.c.AlxAssertTest_FileBkpt().decode("ascii")
 
     def asserts(self) -> int:
-        return self.c.AlxAssertPc_Count()
+        return self.c.AlxAssertFake_Count()
 
     def first(self) -> str:
-        return (self.c.AlxAssertPc_First() or b"").decode("ascii", "replace")
+        return (self.c.AlxAssertFake_First() or b"").decode("ascii", "replace")
 
     def assert_reset(self) -> None:
-        self.c.AlxAssertPc_Reset()
+        self.c.AlxAssertFake_Reset()
 
 
 class MemRawLib:
@@ -3663,13 +3663,13 @@ class MemRawLib:
         return bytes(self.c.AlxMemRawTest_BuffPeek(i) for i in range(length))
 
     def asserts(self) -> int:
-        return self.c.AlxAssertPc_Count()
+        return self.c.AlxAssertFake_Count()
 
     def first(self) -> str:
-        return (self.c.AlxAssertPc_First() or b"").decode("ascii", "replace")
+        return (self.c.AlxAssertFake_First() or b"").decode("ascii", "replace")
 
     def assert_reset(self) -> None:
-        self.c.AlxAssertPc_Reset()
+        self.c.AlxAssertFake_Reset()
 
 
 class MemRawOverrideLib(MemRawLib):
@@ -3686,29 +3686,29 @@ class MemRawOverrideLib(MemRawLib):
         u8, u32, b = ctypes.c_uint8, ctypes.c_uint32, ctypes.c_bool
         for name in ("CtorCount", "InitCount", "ReadCount", "WriteCount", "LastAddr", "LastLen",
                      "LastNumOfTries", "LastTimeout_ms", "Size"):
-            getattr(c, f"AlxMemRawOverride_{name}").restype = u32
-        c.AlxMemRawOverride_LastCheckWithReadEnable.restype = b
-        c.AlxMemRawOverride_Peek.restype = u8
-        c.AlxMemRawOverride_Peek.argtypes = [u32]
-        c.AlxMemRawOverride_Poke.argtypes = [u32, u8]
-        self.SIZE = c.AlxMemRawOverride_Size()
+            getattr(c, f"AlxMemRawTest_Override{name}").restype = u32
+        c.AlxMemRawTest_OverrideLastCheckWithReadEnable.restype = b
+        c.AlxMemRawTest_OverridePeek.restype = u8
+        c.AlxMemRawTest_OverridePeek.argtypes = [u32]
+        c.AlxMemRawTest_OverridePoke.argtypes = [u32, u8]
+        self.SIZE = c.AlxMemRawTest_OverrideSize()
 
     def ovr_reset(self) -> None:
-        self.c.AlxMemRawOverride_Reset()
+        self.c.AlxMemRawTest_OverrideReset()
 
     def count(self, kind: str) -> int:
         """How many times the override's ``kind`` ran - Ctor, Init, Read or Write."""
-        return getattr(self.c, f"AlxMemRawOverride_{kind}Count")()
+        return getattr(self.c, f"AlxMemRawTest_Override{kind}Count")()
 
     def last(self, field: str):
         """One recorded argument of the last call: Addr, Len, NumOfTries, Timeout_ms, ..."""
-        return getattr(self.c, f"AlxMemRawOverride_Last{field}")()
+        return getattr(self.c, f"AlxMemRawTest_OverrideLast{field}")()
 
     def mem(self, addr: int, length: int) -> bytes:
-        return bytes(self.c.AlxMemRawOverride_Peek(addr + i) for i in range(length))
+        return bytes(self.c.AlxMemRawTest_OverridePeek(addr + i) for i in range(length))
 
     def poke(self, addr: int, data: bytes) -> None:
         for i, byte in enumerate(data):
-            self.c.AlxMemRawOverride_Poke(addr + i, byte)
+            self.c.AlxMemRawTest_OverridePoke(addr + i, byte)
 
 

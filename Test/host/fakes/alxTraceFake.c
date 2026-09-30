@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file		alxTracePc.c
+  * @file		alxTraceFake.c
   * @brief		Auralix C Library - ALX Trace - PC Unit Test Recorder
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
@@ -12,7 +12,7 @@
   * symbols live in Mcu/alxTrace.c, which NO test group compiles - measured, a
   * group that switches its traces on fails to link with exactly two undefined
   * symbols and no others. So there is no weak default to beat here, unlike
-  * alxAssertPc.c: this file is simply the only definition in the image.
+  * alxAssertFake.c: this file is simply the only definition in the image.
   *
   * Mcu/alxTrace.c is not the alternative. It needs AlxTrace_WriteStr, which has
   * no PC body anywhere in the library - only six MCU ones - plus AlxTick,
@@ -52,46 +52,46 @@
 // exist, because every trace macro takes its address and nothing below looks inside it.
 AlxTrace alxTrace;
 
-static uint32_t alxTracePc_count;
-static uint32_t alxTracePc_countAtLevel[ALX_TRACE_PC_LEVEL_NUM];
-static uint8_t alxTracePc_lastLevel;
-static uint32_t alxTracePc_lastLine;
-static char alxTracePc_lastFile[ALX_TRACE_PC_TEXT_LEN];
-static char alxTracePc_lastFun[ALX_TRACE_PC_TEXT_LEN];
+static uint32_t alxTraceFake_count;
+static uint32_t alxTraceFake_countAtLevel[ALX_TRACE_PC_LEVEL_NUM];
+static uint8_t alxTraceFake_lastLevel;
+static uint32_t alxTraceFake_lastLine;
+static char alxTraceFake_lastFile[ALX_TRACE_PC_TEXT_LEN];
+static char alxTraceFake_lastFun[ALX_TRACE_PC_TEXT_LEN];
 
 
 //******************************************************************************
 // Prototypes - the DLL export surface (no separate header for test fakes)
 //******************************************************************************
-void AlxTracePc_Reset(void);
-uint32_t AlxTracePc_Count(void);
-uint32_t AlxTracePc_CountAtLevel(uint8_t level);
-uint8_t AlxTracePc_LastLevel(void);
-uint32_t AlxTracePc_LastLine(void);
-const char* AlxTracePc_LastFile(void);
-const char* AlxTracePc_LastFun(void);
-uint8_t AlxTracePc_LevelConfigured(void);
+void AlxTraceFake_Reset(void);
+uint32_t AlxTraceFake_Count(void);
+uint32_t AlxTraceFake_CountAtLevel(uint8_t level);
+uint8_t AlxTraceFake_LastLevel(void);
+uint32_t AlxTraceFake_LastLine(void);
+const char* AlxTraceFake_LastFile(void);
+const char* AlxTraceFake_LastFun(void);
+uint8_t AlxTraceFake_LevelConfigured(void);
 
 
 //******************************************************************************
 // The recorder's own controls
 //******************************************************************************
-void AlxTracePc_Reset(void)
+void AlxTraceFake_Reset(void)
 {
-	alxTracePc_count = 0;
-	memset(alxTracePc_countAtLevel, 0, sizeof(alxTracePc_countAtLevel));
-	alxTracePc_lastLevel = ALX_TRACE_LEVEL_OFF;
-	alxTracePc_lastLine = 0;
-	alxTracePc_lastFile[0] = '\0';
-	alxTracePc_lastFun[0] = '\0';
+	alxTraceFake_count = 0;
+	memset(alxTraceFake_countAtLevel, 0, sizeof(alxTraceFake_countAtLevel));
+	alxTraceFake_lastLevel = ALX_TRACE_LEVEL_OFF;
+	alxTraceFake_lastLine = 0;
+	alxTraceFake_lastFile[0] = '\0';
+	alxTraceFake_lastFun[0] = '\0';
 }
 
-uint32_t AlxTracePc_Count(void)
+uint32_t AlxTraceFake_Count(void)
 {
-	return alxTracePc_count;
+	return alxTraceFake_count;
 }
 
-uint32_t AlxTracePc_CountAtLevel(uint8_t level)
+uint32_t AlxTraceFake_CountAtLevel(uint8_t level)
 {
 	// Out of range answers zero rather than asserting: a test asking "how many at DBG" in a build
 	// where DBG cannot occur is a legitimate question with the answer 0.
@@ -99,33 +99,33 @@ uint32_t AlxTracePc_CountAtLevel(uint8_t level)
 	{
 		return 0;
 	}
-	return alxTracePc_countAtLevel[level];
+	return alxTraceFake_countAtLevel[level];
 }
 
-uint8_t AlxTracePc_LastLevel(void)
+uint8_t AlxTraceFake_LastLevel(void)
 {
-	return alxTracePc_lastLevel;
+	return alxTraceFake_lastLevel;
 }
 
-uint32_t AlxTracePc_LastLine(void)
+uint32_t AlxTraceFake_LastLine(void)
 {
-	return alxTracePc_lastLine;
+	return alxTraceFake_lastLine;
 }
 
-const char* AlxTracePc_LastFile(void)
+const char* AlxTraceFake_LastFile(void)
 {
 	// The caller's ALX_<MODULE>_FILE constant - a .h, for every module in the library.
-	return alxTracePc_lastFile;
+	return alxTraceFake_lastFile;
 }
 
-const char* AlxTracePc_LastFun(void)
+const char* AlxTraceFake_LastFun(void)
 {
 	// The caller's __func__, which comes from the .c the site is in. Kept apart from the file for
-	// the reason alxAssertPc.c keeps them apart: they are two claims, not one.
-	return alxTracePc_lastFun;
+	// the reason alxAssertFake.c keeps them apart: they are two claims, not one.
+	return alxTraceFake_lastFun;
 }
 
-uint8_t AlxTracePc_LevelConfigured(void)
+uint8_t AlxTraceFake_LevelConfigured(void)
 {
 	// What ALX_TRACE_LEVEL was at compile time, read back at run time. This is how a test says
 	// which variant's binary it is actually holding, rather than trusting the name it asked for.
@@ -142,16 +142,16 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	(void)me;
 	(void)format;	// not rendered, on purpose - see the file header
 
-	alxTracePc_lastLevel = level;
-	alxTracePc_lastLine = line;
-	snprintf(alxTracePc_lastFile, sizeof(alxTracePc_lastFile), "%s", file);
-	snprintf(alxTracePc_lastFun, sizeof(alxTracePc_lastFun), "%s", fun);
+	alxTraceFake_lastLevel = level;
+	alxTraceFake_lastLine = line;
+	snprintf(alxTraceFake_lastFile, sizeof(alxTraceFake_lastFile), "%s", file);
+	snprintf(alxTraceFake_lastFun, sizeof(alxTraceFake_lastFun), "%s", fun);
 
 	if (level < ALX_TRACE_PC_LEVEL_NUM)
 	{
-		alxTracePc_countAtLevel[level]++;
+		alxTraceFake_countAtLevel[level]++;
 	}
-	alxTracePc_count++;
+	alxTraceFake_count++;
 
 	// Set ALX_TRACE_ECHO to watch them go by while working out where one comes from.
 	if (getenv("ALX_TRACE_ECHO") != NULL)

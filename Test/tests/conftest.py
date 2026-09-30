@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from harness.access import (
+from harness.host.access import (
     _LOADED_DLLS,
     AssertLib,
     AssertWeakLib,
@@ -48,7 +48,7 @@ from harness.access import (
     _assert_pins_fitted,
     _variant_lib,
 )
-from harness.build import (
+from harness.host.build import (
     ASSERT_DEPS,
     ASSERT_DLL,
     ASSERT_WEAK_DEPS,
@@ -165,13 +165,13 @@ def _no_library_assertions(request):
     device repository's host build in the first place.
     """
     for c in _LOADED_DLLS:
-        c.AlxAssertPc_Reset()
+        c.AlxAssertFake_Reset()
     yield
     marker = request.node.get_closest_marker("expect_assert")
     for c in _LOADED_DLLS:
-        count = c.AlxAssertPc_Count()
+        count = c.AlxAssertFake_Count()
         if count and marker is None:
-            where = (c.AlxAssertPc_First() or b"").decode("ascii", "replace")
+            where = (c.AlxAssertFake_First() or b"").decode("ascii", "replace")
             msg = f"a library assertion failed {count} time(s): {where}"
             raise AssertionError(msg)
     if marker is not None:

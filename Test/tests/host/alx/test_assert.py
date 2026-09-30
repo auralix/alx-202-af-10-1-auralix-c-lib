@@ -1,13 +1,13 @@
 """ALX-1553 - alxAssert PC unit tests (Tier 1: the mechanism every assertion in the library uses).
 
 Three macros and three ALX_WEAK handlers, and they are the funnel 2293 ALX_*_ASSERT call sites in
-90 modules reach. Nothing had ever compiled them: Test/alxAssertPc.c supplies strong definitions
+90 modules reach. Nothing had ever compiled them: Test/alxAssertFake.c supplies strong definitions
 for all three and is linked into every one of the other groups, so the library's own bodies ran
 nowhere in this suite and alxAssert.c appeared in no source list at all.
 
 The group is two DLLs because the handlers are weak. A strong definition displaces a weak one for
 the whole image, so one DLL can show the library's own body running or an override displacing it,
-never both. ``assert_weak_lib`` is the image without alxAssertPc.c and ``assert_lib`` is the image
+never both. ``assert_weak_lib`` is the image without alxAssertFake.c and ``assert_lib`` is the image
 with it, and everything worth saying here is a comparison between the two.
 
 The single most important thing this file records is what a failed assertion actually does. The
@@ -42,7 +42,7 @@ import subprocess  # the toolchain is the SUBJECT of P514 and P515, not an input
 from pathlib import Path
 
 import pytest
-from alx.c_lib import host_build as hb
+from alx.verify import host_build as hb
 
 pytestmark = pytest.mark.unit
 
@@ -145,7 +145,7 @@ def _cppcheck(tmp_path: Path, source: str, name: str, *extra: str) -> str:
 
 @pytest.mark.expect_assert(
     "P506: the override DLL records a deliberately failed assertion - that it records one at all is "
-    "what proves alxAssertPc.c displaced the library's weak default"
+    "what proves alxAssertFake.c displaced the library's weak default"
 )
 def test_ALX1553_P506_the_library_bodies_run_in_one_dll_and_are_displaced_in_the_other(
         assert_weak_lib, assert_lib):
@@ -157,7 +157,7 @@ def test_ALX1553_P506_the_library_bodies_run_in_one_dll_and_are_displaced_in_the
     though this DLL is compiled with ALX_TRACE_LEVEL_OFF: the compile-time gate is on the
     ALX_TRACE_* macros and the handler does not go through one.
 
-    In the override image both land in alxAssertPc.c instead, which records and returns, and the
+    In the override image both land in alxAssertFake.c instead, which records and returns, and the
     trace recorder stays at zero because the library's weak Trace body never ran. That is the whole
     weak-symbol mechanic, and it is newer than it looks - alxGlobal.h:313-317 emits
     __attribute__((weak)) for clang on Windows only since this branch, and before that lld-link
@@ -173,7 +173,7 @@ def test_ALX1553_P506_the_library_bodies_run_in_one_dll_and_are_displaced_in_the
     assert assert_weak_lib.trace_level() == assert_weak_lib.FTL
 
     assert_lib.drive("Rst", expr=False)
-    assert assert_lib.asserts() == 1, "alxAssertPc.c did not displace the library's weak AlxAssert_Rst"
+    assert assert_lib.asserts() == 1, "alxAssertFake.c did not displace the library's weak AlxAssert_Rst"
     assert assert_lib.first().startswith("RST ")
     assert assert_lib.traces() == 0, "the library's weak AlxAssert_Trace body ran in the override DLL"
 
@@ -198,7 +198,7 @@ def test_ALX1553_P507_a_failed_assertion_returns_and_the_next_statement_runs(ass
     guarding - which is worse than having assertions off, because nothing about the build says so.
 
     AlxAssert_Trace is the same story with a line of output, and in the override image so is BKPT,
-    since alxAssertPc.c records rather than breaking. The weak BKPT default is the one exception in
+    since alxAssertFake.c records rather than breaking. The weak BKPT default is the one exception in
     the library and it cannot be reached from here: __debugbreak() takes the process with it, which
     is why no caller for it is exported from the weak DLL at all.
 
@@ -216,7 +216,7 @@ def test_ALX1553_P507_a_failed_assertion_returns_and_the_next_statement_runs(ass
 
     for kind in ("Rst", "Trace", "Bkpt"):
         assert_lib.drive(kind, expr=False)
-        assert assert_lib.reached_after(kind), f"alxAssertPc's {kind} handler did not return"
+        assert assert_lib.reached_after(kind), f"alxAssertFake's {kind} handler did not return"
     assert assert_lib.asserts() == 3
 
 
@@ -359,7 +359,7 @@ def test_ALX1553_P512_each_macro_form_reaches_its_own_handler(assert_lib, kind):
     had never been through a compiler in this repository.
 
     It has to be the override DLL: the weak BKPT default is __debugbreak() and would take the runner
-    down. alxAssertPc.c prefixes the recorded line with the kind, so one string per form says which
+    down. alxAssertFake.c prefixes the recorded line with the kind, so one string per form says which
     branch of the module's #if / #elif / #elif the header selected and which handler the expansion
     called, and the line and function in it come from the caller as P508 describes.
     """
@@ -390,7 +390,7 @@ def test_ALX1553_P512_each_macro_form_reaches_its_own_handler(assert_lib, kind):
     "individually correct and the pair is never a location, in 91 of 91 modules, on every assert "
     "and every trace. Two readings are possible and the choice is the library owner's: either the "
     "constant is a PATH, in which case it should name the .c (Test/alxAssertTestHelpers.c and "
-    "Test/alxAssertBkptCaller.c both do, and P508 shows what a correct pair looks like), or it is a "
+    "Test/alxAssertTestHelpers_Bkpt.c both do, and P508 shows what a correct pair looks like), or it is a "
     "module TAG, in which case the handlers should stop presenting it beside a line number"))
 def test_ALX1553_P513_an_assertion_reports_a_file_the_line_number_belongs_to():
     """Every ALX_*_FILE in the library, read off the headers rather than sampled.

@@ -272,10 +272,10 @@ def test_ALX1553_P449_a_date_the_module_produced_can_be_given_back_to_it(rtc_lib
     Measured through the library's own assertion counter rather than by comparing numbers: the
     conversion still returns something, and what is wrong is that it asserted on the way.
     """
-    rtc_lib.c.AlxAssertPc_Reset()
+    rtc_lib.c.AlxAssertFake_Reset()
 
     rtc_lib.from_date(rtc_lib.date(2100, 3, 1))
 
-    assert rtc_lib.c.AlxAssertPc_Count() == 0, (
-        f"a date after 2099 asserted: {(rtc_lib.c.AlxAssertPc_First() or b'').decode()}"
+    assert rtc_lib.c.AlxAssertFake_Count() == 0, (
+        f"a date after 2099 asserted: {(rtc_lib.c.AlxAssertFake_First() or b'').decode()}"
     )

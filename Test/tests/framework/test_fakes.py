@@ -30,7 +30,7 @@ import ctypes
 
 import pytest
 
-from harness.access import CanMsg
+from harness.host.access import CanMsg
 
 
 def test_ALX1564_P306_an_adc_sequence_is_read_in_order_and_its_last_value_repeats(fakes_lib):

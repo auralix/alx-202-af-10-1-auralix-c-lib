@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file		alxIdTestDateComp.c
+  * @file		alxIdTestHelpers_DateComp.c
   * @brief		Auralix C Library - ALX ID Module - PC Unit Test Compile Stamp
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *

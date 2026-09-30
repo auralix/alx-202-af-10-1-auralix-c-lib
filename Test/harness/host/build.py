@@ -5,9 +5,9 @@ import re
 from pathlib import Path
 from typing import NamedTuple
 
-from alx.c_lib import host_build as build_tools
+from alx.verify import host_build as build_tools
 
-TEST_DIR = Path(__file__).resolve().parent.parent   # Test/, the verification root
+TEST_DIR = Path(__file__).resolve().parents[2]   # Test/, the verification root
 CLIB_DIR = TEST_DIR.parent
 BUILD_DIR = TEST_DIR / "build"
 CONFIG_DIR = TEST_DIR / "config"
@@ -22,7 +22,7 @@ FIFO_SOURCES = [
     CLIB_DIR / "alxBound.c",
     HELPERS_DIR / "alxFifoTestHelpers.c",
     HELPERS_DIR / "alxBoundTestHelpers.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 FIFO_DEPS = [
     *FIFO_SOURCES,
@@ -68,9 +68,9 @@ FIFO_EXPORTS = build_tools.Exports("alxFifoTest", (
     "AlxBoundTest_Status_ErrMin",
     "AlxBoundTest_Status_ErrMax",
     "AlxBoundTest_Status_ErrLen",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 # ----------------------------------------------------------- CLI module ------
@@ -84,11 +84,11 @@ CLI_SOURCES_STRICT = [
     FAKES_DIR / "alxSerialPortFake.c",
     FAKES_DIR / "alxParamKvStoreFake.c",
     FAKES_DIR / "alxIdFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
-    # alxTracePc.c SUPPLIES AlxTrace_WriteLevel and the alxTrace instance - no group compiles
+    FAKES_DIR / "alxAssertFake.c",
+    # alxTraceFake.c SUPPLIES AlxTrace_WriteLevel and the alxTrace instance - no group compiles
     # Mcu/alxTrace.c. Needed the moment a variant compiles a trace form; KEEP IN SYNC with
     # noxfile.CLI_STRICT.
-    HELPERS_DIR / "alxTracePc.c",
+    FAKES_DIR / "alxTraceFake.c",
     HELPERS_DIR / "alxCliTestHelpers.c",
 ]
 # asserts ON = test the code AS SHIPPED (product enables RST mode). Scoped to
@@ -137,9 +137,9 @@ CLI_EXPORTS = build_tools.Exports("alxCliTest", (
     "AlxSerialPortFake_InjectRx",
     "AlxSerialPortFake_TxRead",
     "AlxSerialPortFake_TxNumOfEntries",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 # ------------------------------------------------------- MemSafe group -------
@@ -153,8 +153,8 @@ MEMSAFE_SOURCES_STRICT = [
     CLIB_DIR / "alxBound.c",
     FAKES_DIR / "alxMemRawFake.c",
     FAKES_DIR / "alxParamKvStoreFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
-    HELPERS_DIR / "alxTracePc.c",   # this group has traces once a variant enables them
+    FAKES_DIR / "alxAssertFake.c",
+    FAKES_DIR / "alxTraceFake.c",   # this group has traces once a variant enables them
     HELPERS_DIR / "alxMemSafeTestHelpers.c",
 ]
 MEMSAFE_SOURCES_CLOSURE = [
@@ -235,17 +235,17 @@ MEMSAFE_EXPORTS = build_tools.Exports("alxMemSafeTest", (
     "AlxRange_CheckDouble",
     "AlxRange_CheckStr",
     "AlxFtoa",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
-    "AlxTracePc_Reset",
-    "AlxTracePc_Count",
-    "AlxTracePc_CountAtLevel",
-    "AlxTracePc_LastLevel",
-    "AlxTracePc_LastLine",
-    "AlxTracePc_LastFile",
-    "AlxTracePc_LastFun",
-    "AlxTracePc_LevelConfigured",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+    "AlxTraceFake_Reset",
+    "AlxTraceFake_Count",
+    "AlxTraceFake_CountAtLevel",
+    "AlxTraceFake_LastLevel",
+    "AlxTraceFake_LastLine",
+    "AlxTraceFake_LastFile",
+    "AlxTraceFake_LastFun",
+    "AlxTraceFake_LevelConfigured",
     "AlxParamItemMetaTest_New",
     "AlxParamItemMetaTest_Delete",
     "AlxParamItemMetaTest_GetDataType",
@@ -333,7 +333,7 @@ MEMSAFE_EXPORTS = build_tools.Exports("alxMemSafeTest", (
 # smallest DLL here, and the shape any other pure module should follow.
 VDIV_SOURCES = [
     CLIB_DIR / "alxVdiv.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 VDIV_DEPS = [
     *VDIV_SOURCES,
@@ -355,9 +355,9 @@ VDIV_EXPORTS = build_tools.Exports("alxVdivTest", (
     "AlxVdiv_GetResLow_ohm",
     "AlxVdiv_GetCurrent_uA",
     "AlxVdiv_GetCurrent_mA",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -370,7 +370,7 @@ TIMSW_SOURCES = [
     CLIB_DIR / "alxTimSw.c",
     CLIB_DIR / "alxTick.c",
     FAKES_DIR / "alxIrqFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 TIMSW_DEPS = [
     *TIMSW_SOURCES,
@@ -425,9 +425,9 @@ TIMSW_EXPORTS = build_tools.Exports("alxTimSwTest", (
     "AlxIrqFake_UnlockCount",
     "AlxIrqFake_Depth",
     "AlxIrqFake_DepthMax",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -438,7 +438,7 @@ TIMSW_EXPORTS = build_tools.Exports("alxTimSwTest", (
 # structure, so the whole codec is host code the moment it is compiled here.
 CANPARSER_SOURCES = [
     CLIB_DIR / "alxCanParser.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 CANPARSER_DEPS = [
     *CANPARSER_SOURCES,
@@ -475,9 +475,9 @@ CANPARSER_EXPORTS = build_tools.Exports("alxCanParserTest", (
     "AlxCanParser_GetFloat",
     "AlxCanParser_GetDouble",
     "AlxCanParser_GetEnum",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -493,7 +493,7 @@ FILTGLITCH_SOURCES = [
     CLIB_DIR / "alxTick.c",
     HELPERS_DIR / "alxFiltGlitchTestHelpers.c",
     FAKES_DIR / "alxIrqFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 FILTGLITCH_DEPS = [
     *FILTGLITCH_SOURCES,
@@ -521,9 +521,9 @@ FILTGLITCH_EXPORTS = build_tools.Exports("alxFiltGlitchTest", (
     "AlxTick_Ctor",
     "AlxTick_Get_ns",
     "AlxTick_IncRange_ns",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -540,7 +540,7 @@ MATH_SOURCES = [
     CLIB_DIR / "alxMath.c",
     CLIB_DIR / "alxGlobal.c",
     HELPERS_DIR / "alxMathTestHelpers.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 MATH_DEPS = [
     *MATH_SOURCES,
@@ -571,9 +571,9 @@ MATH_EXPORTS = build_tools.Exports("alxMathTest", (
     "AlxGlobal_Ulltoa",
     "AlxGlobal_Slltoa",
     "AlxGlobal_Ntohl",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -588,7 +588,7 @@ LINFUN_SOURCES = [
     CLIB_DIR / "alxAudioVol.c",
     HELPERS_DIR / "alxLinFunTestHelpers.c",
     HELPERS_DIR / "alxAudioVolTestHelpers.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 LINFUN_DEPS = [
     *LINFUN_SOURCES,
@@ -625,9 +625,9 @@ LINFUN_EXPORTS = build_tools.Exports("alxLinFunTest", (
     "AlxAudioVol_Process",
     "AlxAudioVol_Set_pct",
     "AlxAudioVol_Set_dB",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -639,7 +639,7 @@ ROTSW_SOURCES = [
     CLIB_DIR / "alxRotSw.c",
     FAKES_DIR / "alxIoPinFake.c",
     HELPERS_DIR / "alxRotSwTestHelpers.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 ROTSW_DEPS = [
     *ROTSW_SOURCES,
@@ -669,9 +669,9 @@ ROTSW_EXPORTS = build_tools.Exports("alxRotSwTest", (
     "AlxIoPinFake_SetLevel",
     "AlxIoPinFake_InitCount",
     "AlxIoPinFake_DeInitCount",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -685,7 +685,7 @@ TEMPSENS_SOURCES = [
     CLIB_DIR / "alxInterpLin.c",
     FAKES_DIR / "alxAdcFake.c",
     HELPERS_DIR / "alxTempSensTestHelpers.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 TEMPSENS_DEPS = [
     *TEMPSENS_SOURCES,
@@ -715,9 +715,9 @@ TEMPSENS_EXPORTS = build_tools.Exports("alxTempSensTest", (
     "AlxTempSensTest_Status_Ok",
     "AlxTempSensTest_Status_ErrMin",
     "AlxTempSensTest_Status_ErrMax",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -734,7 +734,7 @@ PWR_SOURCES = [
     CLIB_DIR / "alxTick.c",
     HELPERS_DIR / "alxPwrTestHelpers.c",
     FAKES_DIR / "alxIrqFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 PWR_DEPS = [
     *PWR_SOURCES,
@@ -765,9 +765,9 @@ PWR_EXPORTS = build_tools.Exports("alxPwrTest", (
     "AlxTick_Get_ns",
     "AlxTick_IncRange_ns",
     "AlxIrqFake_Reset",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -777,7 +777,7 @@ PWR_EXPORTS = build_tools.Exports("alxPwrTest", (
 # where an audio path either keeps its full scale or quietly loses a count.
 AUDIO_SOURCES = [
     CLIB_DIR / "alxAudio.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 AUDIO_DEPS = [
     *AUDIO_SOURCES,
@@ -796,9 +796,9 @@ AUDIO_EXPORTS = build_tools.Exports("alxAudioTest", (
     "AlxAudio_FloatToLinerPcmInt8",
     "AlxAudio_FloatToLinerPcmInt16",
     "AlxAudio_StereoToMono",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -809,7 +809,7 @@ AUDIO_EXPORTS = build_tools.Exports("alxAudioTest", (
 AUDIOPLAYER_SOURCES_STRICT = [
     CLIB_DIR / "alxAudio.c",
     HELPERS_DIR / "alxAudioPlayerTestHelpers.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 # alxAudioPlayer.c is CLOSURE, not because its tests are pending - they are in
 # test_audio_player.py - but because it does not survive -Wcast-qual: it reads
@@ -850,9 +850,9 @@ AUDIOPLAYER_EXPORTS = build_tools.Exports("alxAudioPlayerTest", (
     "AlxAudioPlayer_LoopOff",
     "AlxAudioPlayer_LoopConfig",
     "AlxAudioPlayer_IsPlaying",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -865,7 +865,7 @@ AUDIOPLAYER_EXPORTS = build_tools.Exports("alxAudioPlayerTest", (
 # library change and belongs to whoever owns the module (TODO A18).
 NTC_SOURCES_STRICT = [
     CLIB_DIR / "alxBound.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 NTC_SOURCES_CLOSURE = [
     CLIB_DIR / "Ext" / "alxNtcg103jf103ft1s.c",
@@ -883,9 +883,9 @@ NTC_DEPS = [
 NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
 NTC_EXPORTS = build_tools.Exports("alxNtcTest", (
     "AlxNtcg103jf103ft1s_ResToTemp_degC",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -904,7 +904,7 @@ FSSAFE_SOURCES_STRICT = [
     CLIB_DIR / "alxCrc.c",
     HELPERS_DIR / "alxFsSafeTestHelpers.c",
     FAKES_DIR / "alxFsFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 FSSAFE_SOURCES_CLOSURE = [
     CLIB_DIR / "alxFsSafe.c",
@@ -943,9 +943,9 @@ FSSAFE_EXPORTS = build_tools.Exports("alxFsSafeTest", (
     "AlxFsFake_Get",
     "AlxFsFake_Has",
     "AlxFsFake_LastOpenMode",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -967,11 +967,11 @@ LIN_SOURCES = [
     FAKES_DIR / "alxIoPinFake.c",
     FAKES_DIR / "alxIrqFake.c",
     FAKES_DIR / "alxOsDelayFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
     # The trace sink. Every enabled ALX_TRACE_<LEVEL> macro calls AlxTrace_WriteLevel(&alxTrace, ...)
     # and BOTH of those symbols live in Mcu/alxTrace.c, which no group compiles - measured, turning
     # this group's traces on without it fails to link with exactly those two undefined and no others.
-    HELPERS_DIR / "alxTracePc.c",
+    FAKES_DIR / "alxTraceFake.c",
 ]
 LIN_DEPS = [
     *LIN_SOURCES,
@@ -995,9 +995,9 @@ LIN_EXPORTS = build_tools.Exports("alxLinTest", (
     "AlxLin_GetNad",
     "AlxSerialPortFake_TxRead",
     "AlxSerialPortFake_TxNumOfEntries",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
     "AlxLinTest_Subscribe",
     "AlxLinTest_RxFlush",
     "AlxLinTest_RxByte",
@@ -1009,14 +1009,14 @@ LIN_EXPORTS = build_tools.Exports("alxLinTest", (
     "AlxLinTest_BumpWrnDirect",
     "AlxLinTest_BumpDbgDirect",
     "AlxLinTest_BumpVrbDirect",
-    "AlxTracePc_Reset",
-    "AlxTracePc_Count",
-    "AlxTracePc_CountAtLevel",
-    "AlxTracePc_LastLevel",
-    "AlxTracePc_LastLine",
-    "AlxTracePc_LastFile",
-    "AlxTracePc_LastFun",
-    "AlxTracePc_LevelConfigured",
+    "AlxTraceFake_Reset",
+    "AlxTraceFake_Count",
+    "AlxTraceFake_CountAtLevel",
+    "AlxTraceFake_LastLevel",
+    "AlxTraceFake_LastLine",
+    "AlxTraceFake_LastFile",
+    "AlxTraceFake_LastFun",
+    "AlxTraceFake_LevelConfigured",
 ))
 
 
@@ -1030,7 +1030,7 @@ LIN_EXPORTS = build_tools.Exports("alxLinTest", (
 DELAY_SOURCES = [
     CLIB_DIR / "alxDelay.c",
     FAKES_DIR / "alxTickFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 DELAY_DEPS = [
     *DELAY_SOURCES,
@@ -1052,9 +1052,9 @@ DELAY_EXPORTS = build_tools.Exports("alxDelayTest", (
     "AlxTickFake_SetNow_ns",
     "AlxTickFake_Now_ns",
     "AlxTickFake_Reads",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -1068,7 +1068,7 @@ PARAMKV_SOURCES = [
     CLIB_DIR / "alxParamKvStore.c",
     HELPERS_DIR / "alxParamKvStoreTestHelpers.c",
     FAKES_DIR / "alxFsFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 PARAMKV_DEPS = [
     *PARAMKV_SOURCES,
@@ -1103,9 +1103,9 @@ PARAMKV_EXPORTS = build_tools.Exports("alxParamKvStoreTest", (
     "AlxFsFake_Get",
     "AlxFsFake_Has",
     "AlxFsFake_LastOpenMode",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -1118,7 +1118,7 @@ MUX_SOURCES = [
     CLIB_DIR / "alxMux.c",
     HELPERS_DIR / "alxMuxTestHelpers.c",
     FAKES_DIR / "alxIoPinFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 MUX_DEPS = [
     *MUX_SOURCES,
@@ -1148,9 +1148,9 @@ MUX_EXPORTS = build_tools.Exports("alxMuxTest", (
     "AlxIoPinFake_SetLevel",
     "AlxIoPinFake_InitCount",
     "AlxIoPinFake_DeInitCount",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -1166,7 +1166,7 @@ BTS_SOURCES = [
     FAKES_DIR / "alxIoPinFake.c",
     FAKES_DIR / "alxIrqFake.c",
     HELPERS_DIR / "alxBts724gTestHelpers.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 BTS_DEPS = [
     *BTS_SOURCES,
@@ -1211,9 +1211,9 @@ BTS_EXPORTS = build_tools.Exports("alxBts724gTest", (
     "AlxTick_Ctor",
     "AlxTick_IncRange_ns",
     "AlxIrqFake_Reset",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 # ------------------------------------------------------ Bool module -------
@@ -1229,7 +1229,7 @@ BOOL_SOURCES = [
     CLIB_DIR / "alxTick.c",
     HELPERS_DIR / "alxBoolTestHelpers.c",
     FAKES_DIR / "alxIrqFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 BOOL_DEPS = [
     *BOOL_SOURCES,
@@ -1272,9 +1272,9 @@ BOOL_EXPORTS = build_tools.Exports("alxBoolTest", (
     "AlxTick_Ctor",
     "AlxTick_Get_ns",
     "AlxTick_IncRange_ns",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -1286,7 +1286,7 @@ BOOL_EXPORTS = build_tools.Exports("alxBoolTest", (
 # these tests do.
 RTC_SOURCES = [
     CLIB_DIR / "alxRtc_Global.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 RTC_DEPS = [
     *RTC_SOURCES,
@@ -1314,9 +1314,9 @@ RTC_EXPORTS = build_tools.Exports("alxRtcTest", (
     "AlxRtc_DateTimeToUnixTimeUs",
     "AlxRtc_DateTimeToUnixTimeMs",
     "AlxRtc_DateTimeToUnixTimeSec",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -1334,7 +1334,7 @@ PARAMMGMT_SOURCES_STRICT = [
     CLIB_DIR / "alxParamMgmt.c",
     FAKES_DIR / "alxParamKvStoreFake.c",   # the items are constructed WITHOUT a store; this is here
     HELPERS_DIR / "alxParamMgmtTestHelpers.c",   # only because alxParamItem.c references the symbols
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 PARAMMGMT_SOURCES_CLOSURE = [
     CLIB_DIR / "alxParamItem.c",
@@ -1388,9 +1388,9 @@ PARAMMGMT_EXPORTS = build_tools.Exports("alxParamMgmtTest", (
     "AlxParamMgmt_ById_Set",
     "AlxParamMgmt_SetValToDef_Group",
     "AlxParamMgmt_SetValToDef_All",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -1414,7 +1414,7 @@ PARAMMGMT_EXPORTS = build_tools.Exports("alxParamMgmtTest", (
 # globally.
 INA228_SOURCES_STRICT = [
     FAKES_DIR / "alxI2cFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 INA228_SOURCES_CLOSURE = [
     CLIB_DIR / "Ext" / "alxIna228.c",
@@ -1457,9 +1457,9 @@ INA228_EXPORTS = build_tools.Exports("alxIna228Test", (
     "AlxI2cFake_ReadCount",
     "AlxI2cFake_SetSlaveReady",
     "AlxI2cFake_SetForcedStatus",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -1472,7 +1472,7 @@ INA228_EXPORTS = build_tools.Exports("alxIna228Test", (
 PI4IOE_SOURCES_STRICT = [
     FAKES_DIR / "alxI2cFake.c",
     FAKES_DIR / "alxIoPinFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 PI4IOE_SOURCES_CLOSURE = [
     CLIB_DIR / "Ext" / "alxPi4ioe5v6534q.c",
@@ -1518,9 +1518,9 @@ PI4IOE_EXPORTS = build_tools.Exports("alxPi4ioe5v6534qTest", (
     "AlxIoPinFake_InitCount",
     "AlxIoPinFake_DeInitCount",
     "AlxIoPinFake_WriteCount",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -1542,17 +1542,17 @@ PI4IOE_EXPORTS = build_tools.Exports("alxPi4ioe5v6534qTest", (
 # genuinely wrong on an LP64 host, which is why it has survived. The .c is read-only to this suite
 # (TODO A18, the module's owner), so it is compiled with -w and nothing in it is warning-checked.
 #
-# alxIdTestDateComp.c is closure too, for a different and smaller reason - see its file header: a
+# alxIdTestHelpers_DateComp.c is closure too, for a different and smaller reason - see its file header: a
 # translation unit that mentions ALX_BUILD_DATE_COMP cannot compile under -Werror at all, so the
 # three accessors that need the macro are split out and the rest of the helpers stay gated.
 ID_SOURCES_STRICT = [
     HELPERS_DIR / "alxIdTestHelpers.c",
     FAKES_DIR / "alxIoPinFake.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 ID_SOURCES_CLOSURE = [
     CLIB_DIR / "alxId.c",
-    HELPERS_DIR / "alxIdTestDateComp.c",
+    HELPERS_DIR / "alxIdTestHelpers_DateComp.c",
 ]
 ID_SOURCES = [*ID_SOURCES_STRICT, *ID_SOURCES_CLOSURE]
 # No alxDelay.c and no alxTrace.c: alxId.h includes alxDelay.h but alxId.c calls nothing from it,
@@ -1661,9 +1661,9 @@ ID_EXPORTS = build_tools.Exports("alxIdTest", (
     "AlxIoPinFake_SetTriState",
     "AlxIoPinFake_InitCount",
     "AlxIoPinFake_DeInitCount",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
     "AlxIdTest_FwCompName",
     "AlxIdTest_FwCompVerMajor",
     "AlxIdTest_FwLangCVer",
@@ -1675,24 +1675,24 @@ ID_EXPORTS = build_tools.Exports("alxIdTest", (
 # Tier-1 target (ALX-1553), and the one module every other group already depends on without ever
 # compiling it: alxAssert.c is the funnel all 2293 ALX_*_ASSERT call sites in the library reach.
 # Until now it appeared in NO source list here - only alxAssert.h did, in 26 dependency lists -
-# because Test/alxAssertPc.c is in every group and supplies strong definitions for all three
+# because Test/alxAssertFake.c is in every group and supplies strong definitions for all three
 # handlers. So the library's own three bodies have run nowhere in this suite.
 #
 # TWO DLLs, one group, and the second one is not a convenience: all three handlers are ALX_WEAK, a
 # strong definition displaces a weak one for the whole image, and both sides of that cannot be
 # reachable at once. So the group is built twice from almost the same list.
 #
-#   ASSERT_WEAK  alxAssert.c WITHOUT alxAssertPc.c - the library's own bodies run. AlxAssert_Rst's
+#   ASSERT_WEAK  alxAssert.c WITHOUT alxAssertFake.c - the library's own bodies run. AlxAssert_Rst's
 #                default is EMPTY and returns (a shipped board resets only because a product
 #                supplies the override), and AlxAssert_Trace's calls AlxTrace_WriteLevel directly
 #                rather than through ALX_TRACE_FTL, so ALX_TRACE_LEVEL_OFF does not silence it.
-#                Both are observable only here. It exports no AlxAssertPc_* and its wrapper must
+#                Both are observable only here. It exports no AlxAssertFake_* and its wrapper must
 #                NOT be registered with _register_lib - safe, because alxAssert.c contains no
 #                ALX_*_ASSERT call site of its own for the autouse fixture to watch.
-#   ASSERT       alxAssert.c WITH alxAssertPc.c - the same three weak symbols, displaced. It is
+#   ASSERT       alxAssert.c WITH alxAssertFake.c - the same three weak symbols, displaced. It is
 #                what proves displacement works at all (nothing else in the suite links a weak
 #                default and its override together), and it is the only image where the BKPT form
-#                is safe to drive, which is why alxAssertBkptCaller.c is linked here alone.
+#                is safe to drive, which is why alxAssertTestHelpers_Bkpt.c is linked here alone.
 #
 # No assert defines for either: alxAssert.h declares no ALX_<MODULE>_ASSERT_*_ENABLE of its own, so
 # _assert_defines returns nothing for it, which is correct - this module is the mechanism, not one
@@ -1705,8 +1705,8 @@ ASSERT_WEAK_SOURCES = [
 ASSERT_SOURCES = [
     CLIB_DIR / "alxAssert.c",
     HELPERS_DIR / "alxAssertTestHelpers.c",
-    HELPERS_DIR / "alxAssertBkptCaller.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    HELPERS_DIR / "alxAssertTestHelpers_Bkpt.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 ASSERT_WEAK_DEPS = [
     *ASSERT_WEAK_SOURCES,
@@ -1782,9 +1782,9 @@ ASSERT_EXPORTS = build_tools.Exports("alxAssertTest", (
     "AlxAssertTest_FileBkpt",
     "AlxAssertTest_ReachedAfterBkpt",
     "AlxAssertTest_CallBkptDirect",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
@@ -1801,12 +1801,12 @@ ASSERT_EXPORTS = build_tools.Exports("alxAssertTest", (
 # TWO DLLs for the same reason the Assert group has two - a symbol cannot be weak and displaced at
 # once:
 #
-#   MEMRAW      the five weak defaults intact, with alxAssertPc.c so that the four asserting stubs
+#   MEMRAW      the five weak defaults intact, with alxAssertFake.c so that the four asserting stubs
 #               are observable. Each of Init/DeInit/Read/Write is (void)me, ALX_MEM_RAW_ASSERT
 #               (false), return 0 - and 0 is Alx_Ok, so a call that cannot work reports success.
 #               The constructor is the odd one out: it does not assert, and it sets neither of the
 #               two fields the header declares.
-#   MEMRAW_OVR  the same, plus alxMemRawTestOverride.c, which is what a product supplies. It
+#   MEMRAW_OVR  the same, plus alxMemRawTestHelpers_Override.c, which is what a product supplies. It
 #               overrides FOUR of the five and leaves AlxMemRaw_DeInit weak on purpose, so one
 #               image shows displacement is per symbol.
 #
@@ -1818,11 +1818,11 @@ ASSERT_EXPORTS = build_tools.Exports("alxAssertTest", (
 MEMRAW_SOURCES = [
     CLIB_DIR / "alxMemRaw.c",
     HELPERS_DIR / "alxMemRawTestHelpers.c",
-    HELPERS_DIR / "alxAssertPc.c",
+    FAKES_DIR / "alxAssertFake.c",
 ]
 MEMRAW_OVR_SOURCES = [
     *MEMRAW_SOURCES,
-    HELPERS_DIR / "alxMemRawTestOverride.c",
+    HELPERS_DIR / "alxMemRawTestHelpers_Override.c",
 ]
 MEMRAW_DEPS = [
     *MEMRAW_SOURCES,
@@ -1863,9 +1863,9 @@ MEMRAW_EXPORTS = build_tools.Exports("alxMemRawTest", (
     "AlxMemRawTest_Status_Ok",
     "AlxMemRawTest_Status_Err",
     "AlxMemRawTest_Status_ErrNumOfTries",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 MEMRAW_OVR_EXPORTS = build_tools.Exports("alxMemRawOvrTest", (
     "AlxMemRawTest_New",
@@ -1886,22 +1886,22 @@ MEMRAW_OVR_EXPORTS = build_tools.Exports("alxMemRawOvrTest", (
     "AlxMemRawTest_Status_Ok",
     "AlxMemRawTest_Status_Err",
     "AlxMemRawTest_Status_ErrNumOfTries",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
-    "AlxMemRawOverride_Reset",
-    "AlxMemRawOverride_CtorCount",
-    "AlxMemRawOverride_InitCount",
-    "AlxMemRawOverride_ReadCount",
-    "AlxMemRawOverride_WriteCount",
-    "AlxMemRawOverride_LastAddr",
-    "AlxMemRawOverride_LastLen",
-    "AlxMemRawOverride_LastNumOfTries",
-    "AlxMemRawOverride_LastTimeout_ms",
-    "AlxMemRawOverride_LastCheckWithReadEnable",
-    "AlxMemRawOverride_Peek",
-    "AlxMemRawOverride_Poke",
-    "AlxMemRawOverride_Size",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+    "AlxMemRawTest_OverrideReset",
+    "AlxMemRawTest_OverrideCtorCount",
+    "AlxMemRawTest_OverrideInitCount",
+    "AlxMemRawTest_OverrideReadCount",
+    "AlxMemRawTest_OverrideWriteCount",
+    "AlxMemRawTest_OverrideLastAddr",
+    "AlxMemRawTest_OverrideLastLen",
+    "AlxMemRawTest_OverrideLastNumOfTries",
+    "AlxMemRawTest_OverrideLastTimeout_ms",
+    "AlxMemRawTest_OverrideLastCheckWithReadEnable",
+    "AlxMemRawTest_OverridePeek",
+    "AlxMemRawTest_OverridePoke",
+    "AlxMemRawTest_OverrideSize",
 ))
 
 
@@ -1917,7 +1917,6 @@ FAKES_SOURCES = [
     CLIB_DIR / "alxFifo.c",     # the serial port fake is two FIFOs
     CLIB_DIR / "alxBound.c",    # which bound their lengths
     HELPERS_DIR / "alxFakesTestHelpers.c",
-    HELPERS_DIR / "alxAssertPc.c",
 ]
 FAKES_DEPS = [
     *FAKES_SOURCES,
@@ -2062,14 +2061,14 @@ FAKES_EXPORTS = build_tools.Exports("alxFakesTest", (
     "AlxFakesTest_Status_FifoErrEmpty",
     "AlxFakesTest_Status_SafeBothCopyErr",
     "AlxFakesTest_Status_SafeUseCopyA",
-    "AlxAssertPc_Reset",
-    "AlxAssertPc_Count",
-    "AlxAssertPc_First",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
 ))
 
 
 # ------------------------------------------------------------------ build ----
-# The mechanics live in the Python lib (alx.c_lib.host_build): where the tools are, the MSVC build
+# The mechanics live in the Python lib (alx.verify.host_build): where the tools are, the MSVC build
 # environment, the rebuild-if-stale check, the compile database and the two DLL recipes. What stays
 # here is what is this repository's - the source lists, the defines and the export lists above.
 #
@@ -2358,7 +2357,7 @@ def _build_fakes_dll() -> None:
 
 
 # The groups as DATA, for anything that must rebuild them without running the suite: the MUTATE
-# lane names this list on the command line (alx.c_lib.mutation_hooks rebuild --groups
+# lane names this list on the command line (alx.verify.mutation_hooks rebuild --groups
 # host_build:DLL_GROUPS), so the lane needs no script of its own in this repository.
 DLL_GROUPS = [
     (FIFO_DLL, FIFO_DEPS, _build_fifo_dll),
@@ -2423,7 +2422,7 @@ def _assert_macro(header: Path) -> str | None:
 def _assert_defines(*source_lists) -> list[str]:
     """-D flags turning on the assertions of every LIBRARY module a group compiles.
 
-    Test helpers and fakes are skipped - they have no assertions of their own, and alxAssertPc.c is
+    Test helpers and fakes are skipped - they have no assertions of their own, and alxAssertFake.c is
     what the enabled ones land in.
     """
     macros = set()
@@ -2455,7 +2454,7 @@ def _assert_defines(*source_lists) -> list[str]:
 #   assert_trace  the only form where a failed assertion CONTINUES into the code after the check.
 #                 RST resets and BKPT halts; this one carries on with the precondition violated.
 #
-# BKPT is safe in a DLL because alxAssertPc.c defines all three handlers strongly - it records where
+# BKPT is safe in a DLL because alxAssertFake.c defines all three handlers strongly - it records where
 # the target would break. Without that, `debug` would take the test runner down with it.
 VARIANTS: dict[str, tuple[str | None, bool, str]] = {
     #                assert form   module trace   ALX_TRACE_LEVEL
@@ -2482,7 +2481,7 @@ def _variant_defines(variant: str, *source_lists) -> list[str]:
     """-D flags putting every LIBRARY module a group compiles into one named configuration.
 
     Test helpers and fakes are skipped, as in _assert_defines: they have no assertions or traces of
-    their own, and alxAssertPc.c is where the enabled ones land.
+    their own, and alxAssertFake.c is where the enabled ones land.
     """
     form, module_trace, level = VARIANTS[variant]
     macros = {f"ALX_TRACE_LEVEL={level}"}

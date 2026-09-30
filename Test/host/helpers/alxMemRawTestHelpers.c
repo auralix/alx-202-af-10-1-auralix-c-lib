@@ -7,7 +7,7 @@
   * Opaque-handle construction and one caller per public function, linked into
   * BOTH DLLs of the group so the two images differ only in whether a strong
   * implementation is present. Nothing here is an implementation of AlxMemRaw -
-  * that is alxMemRawTestOverride.c, and it is linked into one DLL only.
+  * that is alxMemRawTestHelpers_Override.c, and it is linked into one DLL only.
   *
   * Not to be confused with alxMemRawFake.c, which is a complete strong
   * replacement the MemSafe group links INSTEAD of alxMemRaw.c. This group is

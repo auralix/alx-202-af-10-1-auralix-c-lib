@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file		alxFifoSanSmoke.c
+  * @file		alxFifoSanSmokeCheck.c
   * @brief		Auralix C Library - ALX FIFO Module - ASan+UBSan smoke runner
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *

@@ -197,11 +197,11 @@ def test_ALX1553_P450_full_volume_can_be_asked_for_by_name(audiovol_lib):
     """100 percent, on the range the rest of this file uses."""
     lib = audiovol_lib
     obj = lib.new(MIN_DB, MAX_DB)
-    lib.c.AlxAssertPc_Reset()
+    lib.c.AlxAssertFake_Reset()
 
     lib.set_pct(obj, 100.0)
 
-    assert lib.c.AlxAssertPc_Count() == 0, (
+    assert lib.c.AlxAssertFake_Count() == 0, (
         f"asking for full volume asserted; pctMax is {lib.pct_max(obj)!r}"
     )
 
@@ -218,9 +218,9 @@ def test_ALX1553_P450_full_volume_can_be_asked_for_by_name(audiovol_lib):
 def test_ALX1553_P451_a_fixed_volume_range_is_a_range(audiovol_lib):
     """The same decibel value for both ends - a control that does not vary."""
     lib = audiovol_lib
-    lib.c.AlxAssertPc_Reset()
+    lib.c.AlxAssertFake_Reset()
 
     obj = lib.new(-6.0, -6.0)
 
-    assert lib.c.AlxAssertPc_Count() == 0, "constructing a fixed volume asserted"
+    assert lib.c.AlxAssertFake_Count() == 0, "constructing a fixed volume asserted"
     assert lib.pct_max(obj) == lib.pct_max(obj), "pctMax is NaN"

@@ -27,7 +27,7 @@ import struct
 
 import pytest
 
-from harness.access import (
+from harness.host.access import (
     CanMsg,
 )
 

@@ -6,7 +6,7 @@
   *
   * The call sites this group needs, plus the two symbols the library's own weak
   * AlxAssert_Trace body refers to. Linked into BOTH DLLs of the group - the one
-  * that keeps alxAssert.c's weak defaults and the one that lets alxAssertPc.c
+  * that keeps alxAssert.c's weak defaults and the one that lets alxAssertFake.c
   * displace them - so the two images differ in exactly one thing, which is the
   * comparison the group exists to make.
   *
@@ -34,7 +34,7 @@
   * which is __debugbreak() on this host and takes the process with it, so a
   * caller for it cannot be exported from an image where the weak default is the
   * one that would run. The override DLL gets that caller from
-  * alxAssertBkptCaller.c, which is linked only there.
+  * alxAssertTestHelpers_Bkpt.c, which is linked only there.
   ******************************************************************************
   **/
 

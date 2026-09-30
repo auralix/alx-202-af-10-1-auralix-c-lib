@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file		alxAssertPc.c
+  * @file		alxAssertFake.c
   * @brief		Auralix C Library - ALX Assert - PC Unit Test Handler
   * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
   *
@@ -38,29 +38,29 @@
 //******************************************************************************
 #define ALX_ASSERT_PC_TEXT_LEN 256
 
-static uint32_t alxAssertPc_count;
-static char alxAssertPc_first[ALX_ASSERT_PC_TEXT_LEN];
+static uint32_t alxAssertFake_count;
+static char alxAssertFake_first[ALX_ASSERT_PC_TEXT_LEN];
 
 
 //******************************************************************************
 // Prototypes - the DLL export surface (no separate header for test fakes)
 //******************************************************************************
-void AlxAssertPc_Reset(void);
-uint32_t AlxAssertPc_Count(void);
-const char* AlxAssertPc_First(void);
+void AlxAssertFake_Reset(void);
+uint32_t AlxAssertFake_Count(void);
+const char* AlxAssertFake_First(void);
 
 
 //******************************************************************************
 // Private functions
 //******************************************************************************
-static void AlxAssertPc_Record(const char* kind, const char* file, uint32_t line, const char* fun)
+static void AlxAssertFake_Record(const char* kind, const char* file, uint32_t line, const char* fun)
 {
-	if (alxAssertPc_count == 0)
+	if (alxAssertFake_count == 0)
 	{
-		snprintf(alxAssertPc_first, sizeof(alxAssertPc_first), "%s %s:%u in %s",
+		snprintf(alxAssertFake_first, sizeof(alxAssertFake_first), "%s %s:%u in %s",
 			kind, file, (unsigned)line, fun);
 	}
-	alxAssertPc_count++;
+	alxAssertFake_count++;
 
 	// Set ALX_ASSERT_ECHO to watch them go by while working out where one comes from.
 	if (getenv("ALX_ASSERT_ECHO") != NULL)
@@ -74,21 +74,21 @@ static void AlxAssertPc_Record(const char* kind, const char* file, uint32_t line
 //******************************************************************************
 // The fake's own controls
 //******************************************************************************
-void AlxAssertPc_Reset(void)
+void AlxAssertFake_Reset(void)
 {
-	alxAssertPc_count = 0;
-	alxAssertPc_first[0] = '\0';
+	alxAssertFake_count = 0;
+	alxAssertFake_first[0] = '\0';
 }
 
-uint32_t AlxAssertPc_Count(void)
+uint32_t AlxAssertFake_Count(void)
 {
-	return alxAssertPc_count;
+	return alxAssertFake_count;
 }
 
-const char* AlxAssertPc_First(void)
+const char* AlxAssertFake_First(void)
 {
 	// Where the module first said its own invariant was broken - file, line and function.
-	return alxAssertPc_first;
+	return alxAssertFake_first;
 }
 
 
@@ -97,15 +97,15 @@ const char* AlxAssertPc_First(void)
 //******************************************************************************
 void AlxAssert_Rst(const char* file, uint32_t line, const char* fun)
 {
-	AlxAssertPc_Record("RST", file, line, fun);
+	AlxAssertFake_Record("RST", file, line, fun);
 }
 
 void AlxAssert_Bkpt(const char* file, uint32_t line, const char* fun)
 {
-	AlxAssertPc_Record("BKPT", file, line, fun);
+	AlxAssertFake_Record("BKPT", file, line, fun);
 }
 
 void AlxAssert_Trace(const char* file, uint32_t line, const char* fun)
 {
-	AlxAssertPc_Record("TRACE", file, line, fun);
+	AlxAssertFake_Record("TRACE", file, line, fun);
 }

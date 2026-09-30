@@ -226,7 +226,7 @@ def test_ALX1553_P519_the_recorded_file_and_the_recorded_line_come_from_differen
 def test_ALX1553_P520_a_strong_definition_displaces_the_weak_one_per_symbol(mem_raw_ovr_lib):
     """Four calls reach the product's code and the fifth still reaches the library's stub, in one image.
 
-    alxMemRawTestOverride.c is what a product writes. It defines Ctor, Init, Read and Write strongly
+    alxMemRawTestHelpers_Override.c is what a product writes. It defines Ctor, Init, Read and Write strongly
     and deliberately leaves DeInit alone, so this DLL holds both a displaced symbol and an
     undisplaced one and the difference between them is visible in the same run: the four record
     nothing and do the work, DeInit records its assertion and returns Alx_Ok.

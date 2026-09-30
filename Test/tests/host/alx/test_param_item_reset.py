@@ -44,7 +44,7 @@ Proofs (ALX-1553): P560-P561.
 
 import pytest
 
-from harness.build import (
+from harness.host.build import (
     VARIANTS,
 )
 

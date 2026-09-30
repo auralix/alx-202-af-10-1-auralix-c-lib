@@ -30,8 +30,8 @@ Note what the second and third rows say: `default` is what products ship, and in
 alxLin.c's trace call sites do not exist. The six DBG and the one VRB are only ever compiled by
 `debug`, so until this file nothing in the suite had ever built them at all.
 
-How a trace is observable here at all: Test/alxTracePc.c SUPPLIES AlxTrace_WriteLevel and the
-alxTrace instance. Unlike alxAssertPc.c it displaces nothing - both symbols live in Mcu/alxTrace.c,
+How a trace is observable here at all: Test/alxTraceFake.c SUPPLIES AlxTrace_WriteLevel and the
+alxTrace instance. Unlike alxAssertFake.c it displaces nothing - both symbols live in Mcu/alxTrace.c,
 which no test group compiles, so switching this group's traces on used to fail to link with exactly
 those two undefined and no others. Measured, and that measurement is the whole reason the recorder
 is a file rather than a linker argument.
@@ -50,8 +50,8 @@ from pathlib import Path
 
 import pytest
 
-import harness.build as host_build
-from harness.build import (
+import harness.host.build as host_build
+from harness.host.build import (
     LIN_SOURCES,
     VARIANTS,
     _variant_defines,
@@ -130,7 +130,7 @@ def test_ALX1553_P533_the_binary_reports_the_level_its_variant_asked_for(lin_var
     """
     name, lib = lin_variant
     _form, _module_trace, level_name = VARIANTS[name]
-    assert lib.c.AlxTracePc_LevelConfigured() == LEVEL_OF_NAME[level_name]
+    assert lib.c.AlxTraceFake_LevelConfigured() == LEVEL_OF_NAME[level_name]
 
 
 # ------------------------------------------------------------------------ the two gates ----
