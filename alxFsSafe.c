@@ -43,7 +43,7 @@
 Alx_Status AlxFsSafe_File_ReadRaw(AlxFsSafe* me, const char* path, void* data, uint32_t len);
 Alx_Status AlxFsSafe_File_ReadCopy(AlxFsSafe* me, bool isA, const char* path, void* data, uint32_t len, uint32_t* validatedCrc);
 Alx_Status AlxFsSafe_File_WriteCopy(AlxFsSafe* me, bool isA, const char* path, void* data, uint32_t len, uint8_t* buff);
-void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, const char* pathWithSuffix);
+void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, char* pathWithSuffix);
 
 
 //******************************************************************************
@@ -481,7 +481,7 @@ Alx_Status AlxFsSafe_File_WriteCopy(AlxFsSafe* me, bool isA, const char* path, v
 	//------------------------------------------------------------------------------
 	return Alx_Ok;
 }
-void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, const char* pathWithSuffix)
+void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, char* pathWithSuffix)
 {
 	// Find dot
 	const char* dot = strrchr(path, '.');
@@ -502,7 +502,7 @@ void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, const char* path
 	uint32_t prefixLen = (uint32_t)(dot - path);
 
 	// Transform
-	sprintf(pathWithSuffix, "%.*s%s%s", prefixLen, path, suffix, dot);
+	sprintf(pathWithSuffix, "%.*s%s%s", (int)prefixLen, path, suffix, dot);
 }
 
 
