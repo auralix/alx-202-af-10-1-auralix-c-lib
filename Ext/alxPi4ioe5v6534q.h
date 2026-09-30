@@ -87,7 +87,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool _0 : 1;
 		bool _1 : 1;
@@ -107,7 +107,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPi4ioe5v6534q_RegVal_Port P[5];
 	};
@@ -120,7 +120,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPi4ioe5v6534q_RegVal_Port P[5];
 	};
@@ -133,7 +133,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPi4ioe5v6534q_RegVal_Port P[5];
 	};

@@ -108,7 +108,7 @@ typedef enum
 } AlxIna228_RegEnum_0x00_RST;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t unused_0_3 : 4;
 		AlxIna228_RegEnum_0x00_ADCRANGE ADCRANGE : 1;
@@ -194,7 +194,7 @@ typedef enum
 } AlxIna228_RegEnum_0x01_TRIGGER_MODE;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxIna228_RegEnum_0x01_AVG AVG : 3;
 		AlxIna228_RegEnum_0x01_VTCT VTCT : 3;
@@ -212,7 +212,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t SHUNT_CAL_Current_Amperes : 15;
 		uint8_t unused_15 : 1;
@@ -228,7 +228,7 @@ typedef union
 #if defined(ALX_INA228)
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t TEMPCO_ppm_DegC : 14;
 		uint8_t unused_14_15 : 2;
@@ -243,7 +243,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 		#if defined(ALX_INA228)
 		int8_t unused_0_3 : 4;
@@ -265,7 +265,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		#if defined(ALX_INA228)
 		int8_t unused_0_3 : 4;
@@ -287,7 +287,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		#if defined(ALX_INA228)
 		int16_t DIETEMP_mDegC;
@@ -305,7 +305,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		#if defined(ALX_INA228)
 		int8_t unused_0_3 : 4;
@@ -327,7 +327,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint32_t POWER_Watts : 24;
 	};
@@ -341,7 +341,7 @@ typedef union
 #if defined(ALX_INA228)
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint64_t ENERGY_Joules : 40;
 	};
@@ -356,7 +356,7 @@ typedef union
 #if defined(ALX_INA228)
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		int64_t CHARGE_Coulombs : 40;
 	};
@@ -447,7 +447,7 @@ typedef enum
 } AlxIna228_RegEnum_0x0B_ALATCH;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxIna228_RegEnum_0x0B_MEMSTAT MEMSTAT : 1;
 		AlxIna228_RegEnum_0x0B_CNVRF CNVRF : 1;
@@ -479,7 +479,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		int16_t SOVL_uVoltage;
 	};
@@ -492,7 +492,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		int16_t SUVL_uVoltage;
 	};
@@ -505,7 +505,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t BOVL_mVoltage : 15;
 		uint8_t unused_15 : 1;
@@ -519,7 +519,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t BUVL_mVoltage : 15;
 		uint8_t unused_15 : 1;
@@ -533,7 +533,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 #if defined(ALX_INA228)
 		int16_t TOL_mDegC;
@@ -551,7 +551,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t POL;
 	};
@@ -564,7 +564,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t MANFID;
 	};
@@ -577,7 +577,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t REV_ID : 4;
 		uint16_t DIEID : 12;

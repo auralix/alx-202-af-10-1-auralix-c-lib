@@ -136,8 +136,8 @@ extern AlxTrace alxTrace;
 Alx_Status AlxTrace_Init(AlxTrace* me);
 Alx_Status AlxTrace_DeInit(AlxTrace* me);
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str);
-void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...);
-void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t line, const char* fun, const char* format, ...);
+void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...) ALX_PRINTF_FORMAT(2, 3);
+void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t line, const char* fun, const char* format, ...) ALX_PRINTF_FORMAT(6, 7);
 
 
 #endif	// #if defined(ALX_C_LIB)

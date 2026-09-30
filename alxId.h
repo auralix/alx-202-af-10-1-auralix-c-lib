@@ -97,7 +97,7 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	// Const
 	char name[ALX_ID_NAME_LEN];
@@ -110,7 +110,7 @@ typedef struct __attribute__((packed))
 	uint32_t rev;
 } AlxId_Fw_Build;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	// Const
 	AlxId_Fw_Build build;
@@ -130,7 +130,7 @@ typedef struct __attribute__((packed))
 	char binStr[ALX_ID_FW_BIN_STR_LEN];
 } AlxId_Fw;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	// Const
 	uint32_t magicNum;

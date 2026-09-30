@@ -88,7 +88,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t DEVID_AD;
 	};
@@ -101,7 +101,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t DEVID_MST;
 	};
@@ -114,7 +114,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PARTID;
 	};
@@ -127,7 +127,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t REVID;
 	};
@@ -170,7 +170,7 @@ typedef enum
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdxl35x_RegEnum_0x04_DATA_RDY DATA_RDY : 1;
 		AlxAdxl35x_RegEnum_0x04_FIFO_FULL FIFO_FULL : 1;
@@ -212,7 +212,7 @@ typedef enum
 } Adxl35x_RegEnum_0x28_HPF_CORNER;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		Adxl35x_RegEnum_0x28_ODR_LPF ODR_LPF : 4;
 		Adxl35x_RegEnum_0x28_HPF_CORNER HPF_CORNER : 3;
@@ -227,7 +227,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t FIFO_SAMPLES : 7;
 		uint8_t unused_7 : 1;
@@ -289,7 +289,7 @@ typedef enum
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdxl35x_RegEnum_0x2A_RDY_EN1 RDY_EN1 : 1;
 		AlxAdxl35x_RegEnum_0x2A_FULL_EN1 FULL_EN1 : 1;
@@ -324,7 +324,7 @@ typedef enum
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdxl35x_RegEnum_0x2B_EXT_SYNC EXT_SYNC : 2;
 		AlxAdxl35x_RegEnum_0x2B_EXT_CLK EXT_CLK : 1;
@@ -363,7 +363,7 @@ typedef enum
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdxl35x_RegEnum_0x2C_Range Range : 2;
 		uint8_t unused_3_7 : 4;
@@ -397,7 +397,7 @@ typedef enum
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdxl35x_RegEnum_0x2D_Standby Standby : 1;
 		AlxAdxl35x_RegEnum_0x2D_TEMP_OFF TEMP_OFF : 1;
@@ -413,7 +413,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t Reset;
 	};
@@ -431,7 +431,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t TEMP2;
 		uint8_t TEMP1;
@@ -445,7 +445,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t XDATA3;
 		uint8_t XDATA2;
@@ -468,7 +468,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t XDATA3;
 		uint8_t XDATA2;
@@ -498,84 +498,84 @@ typedef union
 //******************************************************************************
 // Register Structures
 //******************************************************************************
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x00_DEVID_AD val;
 } AlxAdxl35x_Reg_0x00_DEVID_AD;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x01_DEVID_MST val;
 } AlxAdxl35x_Reg_0x01_DEVID_MST;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x02_PARTID val;
 } AlxAdxl35x_Reg_0x02_PARTID;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x03_REVID val;
 } AlxAdxl35x_Reg_0x03_REVID;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x04_Status val;
 } AlxAdxl35x_Reg_0x04_Status;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x28_Filter val;
 } AlxAdxl35x_Reg_0x28_Filter;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x29_FIFO_SAMPLES val;
 } AlxAdxl35x_Reg_0x29_FIFO_SAMPLES;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x2A_INT_MAP val;
 } AlxAdxl35x_Reg_0x2A_INT_MAP;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x2B_Sync val;
 } AlxAdxl35x_Reg_0x2B_Sync;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x2C_Range val;
 } AlxAdxl35x_Reg_0x2C_Range;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegVal_0x2D_POWER_CTL val;
 } AlxAdxl35x_Reg_0x2D_POWER_CTL;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
@@ -586,21 +586,21 @@ typedef struct __attribute__((packed))
 //******************************************************************************
 // Register Group Structures
 //******************************************************************************
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegGroupVal_0x06_0x07_TEMP val;
 } AlxAdxl35x_RegGroup_0x06_0x07_TEMP;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
 	AlxAdxl35x_RegGroupVal_0x08_0x10_DATA val;
 } AlxAdxl35x_RegGroup_0x08_0x10_DATA;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint16_t len;
@@ -611,7 +611,7 @@ typedef struct __attribute__((packed))
 //******************************************************************************
 // Main Register Structure
 //******************************************************************************
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxAdxl35x_Reg_0x00_DEVID_AD		_0x00_DEVID_AD;
 	AlxAdxl35x_Reg_0x01_DEVID_MST		_0x01_DEVID_MST;
@@ -635,7 +635,7 @@ typedef struct __attribute__((packed))
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	float x_g;
 	float y_g;

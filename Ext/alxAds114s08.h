@@ -111,7 +111,7 @@ typedef enum
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		Ads114s08_RegEnum_0x00_DEV_ID DEV_ID: 3;
 		uint8_t RESERVED : 5;
@@ -125,7 +125,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool FL_REF_L0	: 1;
 		bool FL_REF_L1	: 1;
@@ -185,7 +185,7 @@ typedef enum
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		Ads114s08_RegEnum_0x02_MUXN MUXN : 4;
 		Ads114s08_RegEnum_0x02_MUXP MUXP : 4;
@@ -232,7 +232,7 @@ typedef enum
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		Ads114s08_RegEnum_0x03_GAIN		GAIN : 3;
 		Ads114s08_RegEnum_0x03_PGA_EN	PGA_EN : 2;
@@ -287,7 +287,7 @@ typedef enum
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		Ads114s08_RegEnum_0x04_DR		DR		: 4;
 		Ads114s08_RegEnum_0x04_FILTER	FILTER	: 1;
@@ -335,7 +335,7 @@ typedef enum
 } Ads114s08_RegEnum_0x05_REFCON;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		Ads114s08_RegEnum_0x05_REFCON		REFCON		: 2;
 		Ads114s08_RegEnum_0x05_REFSEL		REFSEL		: 2;
@@ -388,7 +388,7 @@ typedef enum
 } Ads114s08_RegEnum_0x06_IMAG;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		Ads114s08_RegEnum_0x06_IMAG			IMAG		: 4;
 		Ads114s08_RegEnum_0x06_RESERVED		RESERVED	: 2;
@@ -442,7 +442,7 @@ typedef enum
 } Ads114s08_RegEnum_0x07_I1MUX;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		Ads114s08_RegEnum_0x07_I1MUX	I1MUX	: 4;
 		Ads114s08_RegEnum_0x07_I2MUX	I2MUX	: 4;
@@ -496,7 +496,7 @@ typedef enum
 } Ads114s08_RegEnum_0x08_VB_AIN0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		Ads114s08_RegEnum_0x08_VB_AIN0	VB_AIN0	 : 1;
 		Ads114s08_RegEnum_0x08_VB_AIN1	VB_AIN1	 : 1;
@@ -534,7 +534,7 @@ typedef enum
 } Ads114s08_RegEnum_0x09_CAL_SAMP;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool SENDSTAT_EN							: 1;
 		bool CRC_EN									: 1;
@@ -551,7 +551,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t	reserved0 : 8;
 	};
@@ -564,7 +564,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t	OFC_7_0 : 8;
 	};
@@ -577,7 +577,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t	OFC_15_8 : 8;
 	};
@@ -590,7 +590,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t	reserved0 : 8;
 	};
@@ -603,7 +603,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t	FSC_7_0 : 8;
 	};
@@ -616,7 +616,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t	FSC_15_8 : 8;
 	};
@@ -629,7 +629,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool DAT_pin0 : 1;
 		bool DAT_pin1 : 1;
@@ -649,7 +649,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool CON_pin0_asGpio : 1;
 		bool CON_pin1_asGpio : 1;

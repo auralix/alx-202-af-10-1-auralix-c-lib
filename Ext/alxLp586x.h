@@ -87,7 +87,7 @@ extern "C" {
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool _0 : 1;
 		bool _1 : 1;
@@ -112,7 +112,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x00_Chip_En;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x00_Chip_En Chip_En : 1;
 		uint8_t unused_1_7 : 7;
@@ -137,7 +137,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x01_Data_Ref_Mode;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x01_PWM_Fre PWM_Fre : 1;
 		AlxLp586x_RegEnum_0x01_Data_Ref_Mode Ref_Mode : 2;
@@ -173,7 +173,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x02_SW_BLK;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x02_CS_ON_Shift CS_ON_Shift : 1;
 		AlxLp586x_RegEnum_0x02_PWM_Phase_Shift PWM_Phase_Shift : 1;
@@ -200,7 +200,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x03_LOD_removal; // turns off the current sink of the open channel
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x03_LSD_removal LSD_removal : 1;
 		AlxLp586x_RegEnum_0x03_LOD_removal LOD_removal : 1;
@@ -232,7 +232,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x04_Maximum_Current;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x04_Up_Deghost_enable Up_Deghost_enable : 1;
 		AlxLp586x_RegEnum_0x04_Maximum_Current Maximum_Current : 3;
@@ -248,7 +248,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PWM_Global : 8;
 	};
@@ -261,7 +261,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PWM_Group1 : 8;
 	};
@@ -274,7 +274,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PWM_Group2 : 8;
 	};
@@ -287,7 +287,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PWM_Group3 : 8;
 	};
@@ -436,7 +436,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x09_0x0B_CC_Group_1_3 CC_Group1 : 7;
 		uint8_t unused_7 : 1;
@@ -450,7 +450,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x09_0x0B_CC_Group_1_3 CC_Group2 : 7;
 		uint8_t unused_7 : 1;
@@ -464,7 +464,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x09_0x0B_CC_Group_1_3 CC_Group3 : 7;
 		uint8_t unused_7 : 1;
@@ -490,7 +490,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS0_Group   : 2;
 		AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS1_Group   : 2;
@@ -506,7 +506,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS5_Group   : 2;
@@ -522,7 +522,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS9_Group   : 2;
@@ -539,7 +539,7 @@ typedef union
 
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS13_Group  : 2;
@@ -555,7 +555,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS16_Group	: 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS17_Group	: 2;
@@ -570,7 +570,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS0_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS1_Group   : 2;
@@ -588,7 +588,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS5_Group   : 2;
@@ -604,7 +604,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS9_Group   : 2;
@@ -620,7 +620,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS13_Group  : 2;
@@ -636,7 +636,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS16_Group	: 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS17_Group	: 2;
@@ -651,7 +651,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS0_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS1_Group   : 2;
@@ -667,7 +667,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS5_Group   : 2;
@@ -683,7 +683,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS9_Group   : 2;
@@ -699,7 +699,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS13_Group  : 2;
@@ -715,7 +715,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS16_Group	: 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS17_Group	: 2;
@@ -730,7 +730,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS0_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS1_Group   : 2;
@@ -746,7 +746,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS5_Group   : 2;
@@ -762,7 +762,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS9_Group   : 2;
@@ -778,7 +778,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS13_Group  : 2;
@@ -794,7 +794,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS16_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS17_Group  : 2;
@@ -809,7 +809,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS0_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS1_Group   : 2;
@@ -825,7 +825,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS5_Group   : 2;
@@ -841,7 +841,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS9_Group   : 2;
@@ -857,7 +857,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS13_Group  : 2;
@@ -873,7 +873,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS16_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS17_Group  : 2;
@@ -888,7 +888,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS0_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS1_Group   : 2;
@@ -904,7 +904,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS5_Group   : 2;
@@ -920,7 +920,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS9_Group   : 2;
@@ -936,7 +936,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS13_Group  : 2;
@@ -952,7 +952,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group  Dot_L5_CS16_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group  Dot_L5_CS17_Group  : 2;
@@ -977,7 +977,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS1_OnOff   : 1;
@@ -997,7 +997,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS9_OnOff   : 1;
@@ -1017,7 +1017,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS16_OnOff  : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS17_OnOff  : 1;
@@ -1032,7 +1032,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS1_OnOff   : 1;
@@ -1052,7 +1052,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS9_OnOff   : 1;
@@ -1072,7 +1072,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS16_OnOff  : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS17_OnOff  : 1;
@@ -1087,7 +1087,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS1_OnOff   : 1;
@@ -1107,7 +1107,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS9_OnOff   : 1;
@@ -1127,7 +1127,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS16_OnOff  : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS17_OnOff  : 1;
@@ -1142,7 +1142,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS1_OnOff   : 1;
@@ -1162,7 +1162,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS9_OnOff   : 1;
@@ -1182,7 +1182,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS16_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS17_OnOff   : 1;
@@ -1197,7 +1197,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS1_OnOff   : 1;
@@ -1217,7 +1217,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS9_OnOff   : 1;
@@ -1237,7 +1237,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS16_OnOff  : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS17_OnOff  : 1;
@@ -1252,7 +1252,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS1_OnOff   : 1;
@@ -1272,7 +1272,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS9_OnOff   : 1;
@@ -1292,7 +1292,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS16_OnOff  : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS17_OnOff  : 1;
@@ -1317,7 +1317,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x64_Global_LOD;
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
         AlxLp586x_RegEnum_0x64_Global_LSD Global_LSD    : 1;
         AlxLp586x_RegEnum_0x64_Global_LOD Global_LOD    : 1;
@@ -1342,7 +1342,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS1_LOD   : 1;
@@ -1362,7 +1362,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS9_LOD   : 1;
@@ -1382,7 +1382,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS16_LOD  : 1;
 		AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS17_LOD  : 1;
@@ -1397,7 +1397,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS1_LOD   : 1;
@@ -1417,7 +1417,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS9_LOD   : 1;
@@ -1437,7 +1437,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS16_LOD  : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS17_LOD  : 1;
@@ -1452,7 +1452,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS1_LOD   : 1;
@@ -1472,7 +1472,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS9_LOD   : 1;
@@ -1492,7 +1492,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS16_LOD  : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS17_LOD  : 1;
@@ -1507,7 +1507,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS1_LOD   : 1;
@@ -1527,7 +1527,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS9_LOD   : 1;
@@ -1547,7 +1547,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS16_LOD  : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS17_LOD  : 1;
@@ -1562,7 +1562,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS1_LOD   : 1;
@@ -1582,7 +1582,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS9_LOD   : 1;
@@ -1602,7 +1602,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS16_LOD  : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS17_LOD  : 1;
@@ -1617,7 +1617,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS1_LOD   : 1;
@@ -1637,7 +1637,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS9_LOD   : 1;
@@ -1657,7 +1657,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS16_LOD  : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS17_LOD  : 1;
@@ -1682,7 +1682,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS1_LSD   : 1;
@@ -1702,7 +1702,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS9_LSD  : 1;
@@ -1722,7 +1722,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS17_LSD  : 1;
@@ -1737,7 +1737,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS1_LSD   : 1;
@@ -1757,7 +1757,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS9_LSD  : 1;
@@ -1777,7 +1777,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS17_LSD  : 1;
@@ -1792,7 +1792,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS1_LSD   : 1;
@@ -1812,7 +1812,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS9_LSD  : 1;
@@ -1832,7 +1832,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS17_LSD  : 1;
@@ -1847,7 +1847,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS1_LSD   : 1;
@@ -1867,7 +1867,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS9_LSD  : 1;
@@ -1887,7 +1887,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS17_LSD  : 1;
@@ -1902,7 +1902,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS1_LSD   : 1;
@@ -1922,7 +1922,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS9_LSD  : 1;
@@ -1942,7 +1942,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS17_LSD  : 1;
@@ -1957,7 +1957,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS1_LSD   : 1;
@@ -1977,7 +1977,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS9_LSD  : 1;
@@ -1997,7 +1997,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS17_LSD  : 1;
@@ -2017,7 +2017,7 @@ typedef enum
 } AlxLp586x_RegEnum_0xA7_LOD_Clear;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 
 		AlxLp586x_RegEnum_0xA7_LOD_Clear LOD_clear  : 4;
@@ -2037,7 +2037,7 @@ typedef enum
 } AlxLp586x_RegEnum_0xA8_LSD_Clear;
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 
         AlxLp586x_RegEnum_0xA8_LSD_Clear LSD_clear : 4;
@@ -2057,7 +2057,7 @@ typedef enum
 } AlxLp586x_RegEnum_0xA9_Reset;
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
         AlxLp586x_RegEnum_0xA9_Reset Reset : 8;
     };

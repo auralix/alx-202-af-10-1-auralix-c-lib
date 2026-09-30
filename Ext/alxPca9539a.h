@@ -86,7 +86,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -101,7 +101,7 @@ typedef union
 } AlxPca9539a_RegVal_00h_InputPort_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -120,7 +120,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -135,7 +135,7 @@ typedef union
 } AlxPca9539a_RegVal_02h_OutputPort_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -154,7 +154,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -169,7 +169,7 @@ typedef union
 } AlxPca9539a_RegVal_04h_PolarityInversion_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -188,7 +188,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -203,7 +203,7 @@ typedef union
 } AlxPca9539a_RegVal_06h_Configuration_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -218,7 +218,7 @@ typedef union
 } AlxPca9539a_RegVal_07h_Configuration_1;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -233,7 +233,7 @@ typedef union
 } AlxPca9539a_RegVal_OpenDrain_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;

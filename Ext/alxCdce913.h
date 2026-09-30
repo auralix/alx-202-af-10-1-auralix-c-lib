@@ -209,7 +209,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t VEN_ID : 4;
 		uint8_t REV_ID : 3;
@@ -220,7 +220,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t TARGET_ADR : 2;
 		uint8_t INCLK : 2;
@@ -234,7 +234,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PDIV1_8_9 : 2;
 		uint8_t Y1_ST0 : 2;
@@ -247,7 +247,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PDIV1_0_7;
 	};
@@ -256,7 +256,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t Y1_0 : 1;
 		uint8_t Y1_1 : 1;
@@ -272,7 +272,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t unused_0_2 : 3;
 		uint8_t XCSEL : 5;
@@ -282,7 +282,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t EEWRITE : 1;
 		uint8_t BCOUNT : 7;
@@ -292,7 +292,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t SSC1_5_1_2 : 2;
 		uint8_t SSC1_6 : 3;
@@ -303,7 +303,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t SSC1_2_2 : 1;
 		uint8_t SSC1_3 : 3;
@@ -315,7 +315,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t SSC1_0 : 3;
 		uint8_t SSC1_1 : 3;
@@ -326,7 +326,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t FS1_0 : 1;
 		uint8_t FS1_1 : 1;
@@ -342,7 +342,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t Y2Y3_ST0 : 2;
 		uint8_t Y2Y3_ST1 : 2;
@@ -355,7 +355,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t Y2Y31_0 : 1;
 		uint8_t Y2Y31_1 : 1;
@@ -371,7 +371,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PDIV2 : 7;
 		uint8_t SSC1DC : 1;
@@ -381,7 +381,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PDIV3 : 7;
 		uint8_t unused_7 : 1;
@@ -391,7 +391,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PLL1_0N_4_11;
 	};
@@ -400,7 +400,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PLL1_0R_5_8 : 4;
 		uint8_t PLL1_0N_0_3 : 4;
@@ -410,7 +410,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PLL1_0Q_3_5 : 3;
 		uint8_t PLL1_0R_0_4 : 5;
@@ -420,7 +420,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t VCO1_0_RANGE : 2;
 		uint8_t PLL1_0P : 3;
@@ -431,7 +431,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PLL1_1N_4_11;
 	};
@@ -440,7 +440,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PLL1_1R_5_8 : 4;
 		uint8_t PLL1_1N_0_3 : 4;
@@ -450,7 +450,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PLL1_1Q_3_5 : 3;
 		uint8_t PLL1_1R_0_4 : 5;
@@ -460,7 +460,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t VCO1_1_RANGE : 2;
 		uint8_t PLL1_1P : 3;

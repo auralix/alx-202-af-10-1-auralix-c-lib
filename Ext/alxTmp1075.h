@@ -86,7 +86,7 @@ extern "C" {
 // R0: Temp  //
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t T;
 	};
@@ -130,7 +130,7 @@ typedef enum
 } AlxTmp1075_R1_OneShotConversionMode;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t unused_0_7 : 8;
 		AlxTmp1075_R1_ShutdownModeEnable SD : 1;
@@ -146,7 +146,7 @@ typedef union
 // R2: Low limit  //
 typedef union
 	{
-		struct __attribute__((packed))
+		struct ALX_PACKED
 		{
 			uint16_t L;
 		};
@@ -156,7 +156,7 @@ typedef union
 // R3: High limit  //
 typedef union
 	{
-		struct __attribute__((packed))
+		struct ALX_PACKED
 		{
 			uint16_t H;
 		};
@@ -166,7 +166,7 @@ typedef union
 // R4: Device ID register  //
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t DID;
 	};

@@ -81,7 +81,7 @@ extern "C" {
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t NTC_FAULT	: 3;
 		uint8_t CHRG_FAULT	: 2;
@@ -101,7 +101,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t IINLIM	: 6;
 		bool EN_ILIM	: 1;
@@ -112,7 +112,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool PUMPX_DN		: 1;
 		bool PUMPX_UP		: 1;
@@ -128,7 +128,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool VSYS_STAT			: 1;
 		bool RESERVED			: 1;
@@ -141,7 +141,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t NTC_FAULT		: 3;
 		bool BAT_FAULT			: 1;

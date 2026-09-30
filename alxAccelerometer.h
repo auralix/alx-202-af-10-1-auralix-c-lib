@@ -75,7 +75,7 @@ typedef enum
 	ALX_ACC_SYNC_MODE_PLL
 } AlxAccSyncMode;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	float x;
 	float y;

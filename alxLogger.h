@@ -98,7 +98,7 @@ typedef enum
 	AlxLogger_Metadata_StoreConfig_WriteOldest
 } AlxLogger_Metadata_StoreConfig;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint64_t id;
 	uint32_t pos;
@@ -107,7 +107,7 @@ typedef struct __attribute__((packed))
 	uint32_t dir;
 } AlxLogger_Metadata_Id;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint32_t magicNumber;
 	uint32_t version;

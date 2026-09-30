@@ -157,7 +157,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t BURST_CMD   : 8;
 		uint16_t unused_8_15 : 8;
@@ -167,7 +167,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t unused_0_7   : 8;
 		uint16_t MODE_CMD     : 2;
@@ -179,7 +179,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t FLASH_BU_ERR : 1;
 		uint16_t ACC_ERR_ALL  : 1;
@@ -200,7 +200,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t EA           : 1;
 		uint16_t ALIASI_ERR   : 1;
@@ -219,7 +219,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t COUNT;
 	};
@@ -228,7 +228,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t TEMP_HIGH;
 		uint16_t TEMP_LOW;
@@ -238,7 +238,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t XACCL_HIGH;
 		uint16_t XACCL_LOW;
@@ -252,7 +252,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t unused_0_1   : 2;
 		uint16_t TEMP_STABIL  : 1;
@@ -273,7 +273,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t unused_0    : 1;
 		uint16_t DRDY_POL    : 1;
@@ -296,7 +296,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t unused_0_7   : 8;
 		uint16_t DOUT_RATE    : 4;
@@ -307,7 +307,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t FILTER_SEL  :  4;
 		uint16_t unused_4    :  1;
@@ -319,7 +319,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t unused_0_1   : 2;
 		uint16_t FLASH_RST    : 1;
@@ -337,7 +337,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t CHKSM_OUT    : 1;
 		uint16_t COUNT_OUT    : 1;
@@ -354,7 +354,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t FILT_EN     :  1;
 		uint16_t FILT_SEL    :  1;
@@ -365,7 +365,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t TAP_SIZE    :  4;
 		uint16_t unused_4_15 : 12;
@@ -375,7 +375,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t XOFFSET_HIGH;
 	};
@@ -384,7 +384,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t XOFFSET_LOW;
 	};
@@ -393,7 +393,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t YOFFSET_HIGH;
 	};
@@ -402,7 +402,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t YOFFSET_LOW;
 	};
@@ -411,7 +411,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t ZOFFSET_HIGH;
 	};
@@ -420,7 +420,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t ZOFFSET_LOW;
 	};
@@ -429,7 +429,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t PROD_ID1;
 		uint16_t PROD_ID2;
@@ -441,7 +441,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t VERSION;
 	};
@@ -450,7 +450,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t SERIAL_NUM1;
 		uint16_t SERIAL_NUM2;
@@ -462,7 +462,7 @@ typedef union
 
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t WINDOW_ID;
 	};
@@ -475,7 +475,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t high : 1;
 		uint8_t low  : 1;
@@ -484,7 +484,7 @@ typedef union
 	uint8_t raw;
 } AlxA352_RegWriteMeta;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint8_t addr;
 	uint8_t win;
@@ -492,151 +492,151 @@ typedef struct __attribute__((packed))
 	AlxA352_RegWriteMeta w;
 } AlxA352_RegMeta;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_BURST val;
 } AlxA352_Reg_BURST;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_MODE_CTRL val;
 } AlxA352_Reg_MODE_CTRL;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_DIAG_STAT val;
 } AlxA352_Reg_DIAG_STAT;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_FLAG val;
 } AlxA352_Reg_FLAG;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_COUNT val;
 } AlxA352_Reg_COUNT;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_TEMP val;
 } AlxA352_Reg_TEMP;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_ACCL val;
 } AlxA352_Reg_ACCL;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_SIG_CTRL val;
 } AlxA352_Reg_SIG_CTRL;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_MSC_CTRL val;
 } AlxA352_Reg_MSC_CTRL;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_SMPL_CTRL val;
 } AlxA352_Reg_SMPL_CTRL;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_FILTER_CTRL val;
 } AlxA352_Reg_FILTER_CTRL;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_GLOB_CMD val;
 } AlxA352_Reg_GLOB_CMD;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_BURST_CTRL val;
 } AlxA352_Reg_BURST_CTRL;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_LONGFILT_CTRL val;
 } AlxA352_Reg_LONGFILT_CTRL;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_LONGFILT_TAP val;
 } AlxA352_Reg_LONGFILT_TAP;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_XOFFSET_HIGH val;
 } AlxA352_Reg_XOFFSET_HIGH;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_XOFFSET_LOW val;
 } AlxA352_Reg_XOFFSET_LOW;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_YOFFSET_HIGH val;
 } AlxA352_Reg_YOFFSET_HIGH;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_YOFFSET_LOW val;
 } AlxA352_Reg_YOFFSET_LOW;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_ZOFFSET_HIGH val;
 } AlxA352_Reg_ZOFFSET_HIGH;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_ZOFFSET_LOW val;
 } AlxA352_Reg_ZOFFSET_LOW;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_PROD_ID val;
 } AlxA352_Reg_PROD_ID;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_VERSION val;
 } AlxA352_Reg_VERSION;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_SERIAL_NUM val;
 } AlxA352_Reg_SERIAL_NUM;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_RegMeta meta;
 	AlxA352_RegVal_WIN_CTRL val;
@@ -646,7 +646,7 @@ typedef struct __attribute__((packed))
 //******************************************************************************
 // Main Register Structure
 //******************************************************************************
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	AlxA352_Reg_BURST BURST;
 	AlxA352_Reg_MODE_CTRL MODE_CTRL;

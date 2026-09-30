@@ -109,7 +109,7 @@ typedef enum
 } AlxVeml6040_RegEnum_0x00_IntegrationTimeSelect;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxVeml6040_RegEnum_0x00_ColorSensorEnable SD : 1;
 		AlxVeml6040_RegEnum_0x00_ModeSelect AF : 1;
@@ -127,7 +127,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t R_DATA_L;
 		uint8_t R_DATA_H;
@@ -141,7 +141,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t G_DATA_L;
 		uint8_t G_DATA_H;
@@ -155,7 +155,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t B_DATA_L;
 		uint8_t B_DATA_H;
@@ -169,7 +169,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t W_DATA_L;
 		uint8_t W_DATA_H;
