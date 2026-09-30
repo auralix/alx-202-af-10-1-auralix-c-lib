@@ -42,6 +42,15 @@ extern "C" {
 #include "alxConfig.h"
 
 
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Toolchain
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
 //------------------------------------------------------------------------------
 // C Standard Library - C99
 //------------------------------------------------------------------------------
@@ -81,95 +90,13 @@ extern "C" {
 #endif
 
 
-//------------------------------------------------------------------------------
-// MCUboot
-//------------------------------------------------------------------------------
-#if defined(ALX_MCU_BOOT)
-#include "flash_map_backend/flash_map_backend.h"
-#include "sysflash/sysflash.h"
-#endif
-#if defined(ALX_MCU_BOOT) && defined(ALX_BOOT_B)
-#include "bootutil/bootutil.h"
-#endif
 
 
 //------------------------------------------------------------------------------
-// ARM CMSIS DSP Library
 //------------------------------------------------------------------------------
-#if defined(ALX_CMSIS_DSP)
-#include <arm_math.h>
-#endif
-
-
+// Platform
 //------------------------------------------------------------------------------
-// FreeRTOS
 //------------------------------------------------------------------------------
-#if defined(ALX_FREE_RTOS)
-#include "FreeRTOS.h"
-#include "croutine.h"
-#include "event_groups.h"
-#include "list.h"
-#include "queue.h"
-#include "semphr.h"
-#include "stream_buffer.h"
-#include "task.h"
-#include "timers.h"
-#endif
-
-
-//------------------------------------------------------------------------------
-// FreeRTOS Cellular Interface
-//------------------------------------------------------------------------------
-#if defined(ALX_FREE_RTOS_CELLULAR)
-#include "cellular_config.h"
-#include "cellular_comm_interface.h"
-#include "cellular_api.h"
-#include "cellular_types.h"
-#include "cellular_api_ext.h"
-#endif
-
-
-//------------------------------------------------------------------------------
-// FatFs
-//------------------------------------------------------------------------------
-#if defined(ALX_FATFS)
-#include "ff.h"
-#include "diskio.h"
-#endif
-
-
-//------------------------------------------------------------------------------
-// lwIP
-//------------------------------------------------------------------------------
-#if defined(ALX_LW_IP)
-#include "lwip/netif.h"
-#include "lwip/api.h"
-#include "lwip/tcpip.h"
-#include "lwip/dhcp.h"
-//#include "lwip/sockets.h"	// TV: TODO, conflict with read macro in lwIP with alxLfsConfig.h which includes lfs.h, must be separately included when needed
-#endif
-
-
-//------------------------------------------------------------------------------
-// Wiznet
-//------------------------------------------------------------------------------
-#if defined(ALX_WIZNET)
-// TV: TODO
-#endif
-
-
-//------------------------------------------------------------------------------
-// Zephyr
-//------------------------------------------------------------------------------
-#if defined(ALX_ZEPHYR)
-#include "zephyr/kernel.h"
-#include <zephyr/logging/log.h>
-#include "zephyr/drivers/gpio.h"
-#include "zephyr/drivers/i2c.h"
-#include "zephyr/drivers/adc.h"
-#include "zephyr/drivers/uart.h"
-#include "zephyr/drivers/spi.h"
-#endif
 
 
 //------------------------------------------------------------------------------
@@ -229,6 +156,122 @@ extern "C" {
 #endif
 
 
+//------------------------------------------------------------------------------
+// Zephyr
+//------------------------------------------------------------------------------
+#if defined(ALX_ZEPHYR)
+#include "zephyr/kernel.h"
+#include <zephyr/logging/log.h>
+#include "zephyr/drivers/gpio.h"
+#include "zephyr/drivers/i2c.h"
+#include "zephyr/drivers/adc.h"
+#include "zephyr/drivers/uart.h"
+#include "zephyr/drivers/spi.h"
+#endif
+
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Features
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// ARM CMSIS DSP Library
+//------------------------------------------------------------------------------
+#if defined(ALX_CMSIS_DSP)
+#include <arm_math.h>
+#endif
+
+
+//------------------------------------------------------------------------------
+// FatFs
+//------------------------------------------------------------------------------
+#if defined(ALX_FATFS)
+#include "ff.h"
+#include "diskio.h"
+#endif
+
+
+//------------------------------------------------------------------------------
+// FreeRTOS
+//------------------------------------------------------------------------------
+#if defined(ALX_FREE_RTOS)
+#include "FreeRTOS.h"
+#include "croutine.h"
+#include "event_groups.h"
+#include "list.h"
+#include "queue.h"
+#include "semphr.h"
+#include "stream_buffer.h"
+#include "task.h"
+#include "timers.h"
+#endif
+
+
+//------------------------------------------------------------------------------
+// FreeRTOS Cellular Interface
+//------------------------------------------------------------------------------
+#if defined(ALX_FREE_RTOS_CELLULAR)
+#include "cellular_config.h"
+#include "cellular_comm_interface.h"
+#include "cellular_api.h"
+#include "cellular_types.h"
+#include "cellular_api_ext.h"
+#endif
+
+
+//------------------------------------------------------------------------------
+// lwIP
+//------------------------------------------------------------------------------
+#if defined(ALX_LW_IP)
+#include "lwip/netif.h"
+#include "lwip/api.h"
+#include "lwip/tcpip.h"
+#include "lwip/dhcp.h"
+//#include "lwip/sockets.h"	// TV: TODO, conflict with read macro in lwIP with alxLfsConfig.h which includes lfs.h, must be separately included when needed
+#endif
+
+
+//------------------------------------------------------------------------------
+// MCUboot
+//------------------------------------------------------------------------------
+#if defined(ALX_MCU_BOOT)
+#include "flash_map_backend/flash_map_backend.h"
+#include "sysflash/sysflash.h"
+#endif
+
+
+//------------------------------------------------------------------------------
+// Wiznet
+//------------------------------------------------------------------------------
+#if defined(ALX_WIZNET)
+// TV: TODO
+#endif
+
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Target
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// MCUboot
+//------------------------------------------------------------------------------
+#if defined(ALX_MCU_BOOT) && defined(ALX_BOOT_B)
+#include "bootutil/bootutil.h"
+#endif
+
+
+
+
 //******************************************************************************
 // Module Guard
 //******************************************************************************
@@ -273,7 +316,7 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// Compiler
+// Toolchain
 //------------------------------------------------------------------------------
 #if defined(__GNUC__) || defined(__clang__)
 	#define ALX_WEAK __attribute__((weak))
@@ -287,7 +330,7 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// Target
+// Platform
 //------------------------------------------------------------------------------
 #if defined(__arm__)
 	#define ALX_BKPT() __BKPT(255)
