@@ -122,8 +122,8 @@ void AlxLp586x_Ctor
 Alx_Status AlxLp586x_InitPeriph(AlxLp586x* me)
 {
 	// Assert
-	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
-	ALX_LP586x_ASSERT(me->isInitPeriph == false);
+	ALX_LP586X_ASSERT(me->wasCtorCalled == true);
+	ALX_LP586X_ASSERT(me->isInitPeriph == false);
 	// isInit -> Don't care
 
 	// Local variables
@@ -133,7 +133,7 @@ Alx_Status AlxLp586x_InitPeriph(AlxLp586x* me)
 	status = AlxI2c_Init(me->i2c);
 	if (status != Alx_Ok)
 	{
-		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_Init() status %d", status);
+		ALX_LP586X_TRACE_ERR("FAIL: AlxI2c_Init() status %d", status);
 		return status;
 	}
 
@@ -153,8 +153,8 @@ Alx_Status AlxLp586x_InitPeriph(AlxLp586x* me)
 Alx_Status AlxLp586x_DeInitPeriph(AlxLp586x* me)
 {
 	// Assert
-	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
-	ALX_LP586x_ASSERT(me->isInitPeriph == true);
+	ALX_LP586X_ASSERT(me->wasCtorCalled == true);
+	ALX_LP586X_ASSERT(me->isInitPeriph == true);
 	// isInit -> Don't care
 
 	// Local variables
@@ -164,7 +164,7 @@ Alx_Status AlxLp586x_DeInitPeriph(AlxLp586x* me)
 	status = AlxI2c_DeInit(me->i2c);
 	if (status != Alx_Ok)
 	{
-		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_DeInit() status %d", status);
+		ALX_LP586X_TRACE_ERR("FAIL: AlxI2c_DeInit() status %d", status);
 		return status;
 	}
 
@@ -184,9 +184,9 @@ Alx_Status AlxLp586x_DeInitPeriph(AlxLp586x* me)
 Alx_Status AlxLp586x_Init(AlxLp586x* me)
 {
 	// Assert
-	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
-	ALX_LP586x_ASSERT(me->isInitPeriph == true);
-	ALX_LP586x_ASSERT(me->isInit == false);
+	ALX_LP586X_ASSERT(me->wasCtorCalled == true);
+	ALX_LP586X_ASSERT(me->isInitPeriph == true);
+	ALX_LP586X_ASSERT(me->isInit == false);
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -205,7 +205,7 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok)
 	{
-		ALX_LP586x_TRACE_ERR("FAIL: AlxI2c_Master_IsSlaveReady() status %d", status);
+		ALX_LP586X_TRACE_ERR("FAIL: AlxI2c_Master_IsSlaveReady() status %d", status);
 		return status;
 	}
 
@@ -221,7 +221,7 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 	status = AlxLp586x_RegStruct_Write(me);
 	if (status != Alx_Ok)
 	{
-		ALX_LP586x_TRACE_ERR("FAIL: AlxLp586x_RegStruct_Write() status %d", status);
+		ALX_LP586X_TRACE_ERR("FAIL: AlxLp586x_RegStruct_Write() status %d", status);
 		return status;
 	}
 
@@ -246,9 +246,9 @@ Alx_Status AlxLp586x_Init(AlxLp586x* me)
 Alx_Status AlxLp586x_DeInit(AlxLp586x* me)
 {
 	// Assert
-	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
-	ALX_LP586x_ASSERT(me->isInitPeriph == true);
-	ALX_LP586x_ASSERT(me->isInit == true);
+	ALX_LP586X_ASSERT(me->wasCtorCalled == true);
+	ALX_LP586X_ASSERT(me->isInitPeriph == true);
+	ALX_LP586X_ASSERT(me->isInit == true);
 
 	// Disable device
 	AlxIoPin_Reset(me->do_LED_DRV_EN);
@@ -274,9 +274,9 @@ Alx_Status AlxLp586x_DeInit(AlxLp586x* me)
 Alx_Status AlxLp586x_Handle(AlxLp586x* me)
 {
 	// Assert
-	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
-	ALX_LP586x_ASSERT(me->isInitPeriph == true);
-	ALX_LP586x_ASSERT(me->isInit == true);
+	ALX_LP586X_ASSERT(me->wasCtorCalled == true);
+	ALX_LP586X_ASSERT(me->isInitPeriph == true);
+	ALX_LP586X_ASSERT(me->isInit == true);
 
 	//
 	for (uint32_t ledNum = 0; ledNum < me->ledNumUsed; ledNum++)
@@ -316,8 +316,8 @@ Alx_Status AlxLp586x_Handle(AlxLp586x* me)
 Alx_Status AlxLp586x_Reg_Write(AlxLp586x* me, void* reg)
 {
 	// Assert
-	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
-	ALX_LP586x_ASSERT(me->isInitPeriph == true);
+	ALX_LP586X_ASSERT(me->wasCtorCalled == true);
+	ALX_LP586X_ASSERT(me->isInitPeriph == true);
 	// isInit -> Don't care
 
 
@@ -332,7 +332,7 @@ Alx_Status AlxLp586x_Reg_Write(AlxLp586x* me, void* reg)
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr + i2cAddr_Offset, regAddr, AlxI2c_Master_MemAddrLen_8bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok)
 	{
-		ALX_LP586x_TRACE_ERR("Err");
+		ALX_LP586X_TRACE_ERR("Err");
 		return status;
 	}
 
@@ -343,10 +343,10 @@ Alx_Status AlxLp586x_Reg_Write(AlxLp586x* me, void* reg)
 void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val)
 {
 	// Assert
-	ALX_LP586x_ASSERT(me->wasCtorCalled == true);
+	ALX_LP586X_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_LP586x_ASSERT(ledNum <= me->ledNumUsed);
+	ALX_LP586X_ASSERT(ledNum <= me->ledNumUsed);
 
 	me->valNew[ledNum] = val;
 }
@@ -709,47 +709,47 @@ Alx_Status AlxLp586x_RegStruct_Write(AlxLp586x* me)
 
 	// Set Core registers:
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x00_Chip_En);
-	if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
 
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x01_Dev_initial);
-	if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
 
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x02_Dev_config1);
-	if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
 
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x03_Dev_config2);
-	if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
 
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x04_Dev_config3);
-	if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
 
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x05_Global_bri);
-	if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
 
 	for (uint8_t i = 0; i < 3; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._group_bri[i]);
-		if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+		if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
 	}
 
 	for (uint8_t i = 0; i < 3; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._current_set_cc[i]);
-		if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+		if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
 	}
 
 	// Set Pwm Group
 	for (int i = 0; i < 30; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._dot_grp_sel[i]);
-		if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+		if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
 	}
 
 	//  Dot current registers (pwm_bri0…pwm_bri107 ) (0x200–0x26B):  all to 100%
 	for (uint16_t i = 0; i < 107; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._pwm_bri[i]);
-		if (status != Alx_Ok) { ALX_LP586x_TRACE_ERR("Err"); return status; }
+		if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
 	}
 
 	// Return
@@ -763,7 +763,7 @@ Alx_Status AlxLp586x_RegStruct_Write(AlxLp586x* me)
 ALX_WEAK void AlxLp586x_RegStruct_SetVal(AlxLp586x* me)
 {
 	(void)me;
-	ALX_LP586x_ASSERT(false);	// Implement in APP!
+	ALX_LP586X_ASSERT(false);	// Implement in APP!
 }
 
 

@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_LP586x_H
-#define ALX_LP586x_H
+#ifndef ALX_LP586X_H
+#define ALX_LP586X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,24 +56,24 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_LP586x_FILE "alxLp586x.h"
+#define ALX_LP586X_FILE "alxLp586x.h"
 
 // Assert //
-#if defined(ALX_LP586x_ASSERT_BKPT_ENABLE)
-	#define ALX_LP586x_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LP586x_FILE, expr)
-#elif defined(ALX_LP586x_ASSERT_TRACE_ENABLE)
-	#define ALX_LP586x_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LP586x_FILE, expr)
-#elif defined(ALX_LP586x_ASSERT_RST_ENABLE)
-	#define ALX_LP586x_ASSERT(expr) ALX_ASSERT_RST(ALX_LP586x_FILE, expr)
+#if defined(ALX_LP586X_ASSERT_BKPT_ENABLE)
+	#define ALX_LP586X_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LP586X_FILE, expr)
+#elif defined(ALX_LP586X_ASSERT_TRACE_ENABLE)
+	#define ALX_LP586X_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LP586X_FILE, expr)
+#elif defined(ALX_LP586X_ASSERT_RST_ENABLE)
+	#define ALX_LP586X_ASSERT(expr) ALX_ASSERT_RST(ALX_LP586X_FILE, expr)
 #else
-	#define ALX_LP586x_ASSERT(expr) do{} while (false)
+	#define ALX_LP586X_ASSERT(expr) do{} while (false)
 #endif
 
 // Trace //
-#if defined(ALX_LP586x_TRACE_ENABLE)
-	#define ALX_LP586x_TRACE_ERR(...) ALX_TRACE_ERR(ALX_LP586x_FILE, __VA_ARGS__)
+#if defined(ALX_LP586X_TRACE_ENABLE)
+	#define ALX_LP586X_TRACE_ERR(...) ALX_TRACE_ERR(ALX_LP586X_FILE, __VA_ARGS__)
 #else
-	#define ALX_LP586x_TRACE_ERR(...) do{} while (false)
+	#define ALX_LP586X_TRACE_ERR(...) do{} while (false)
 #endif
 
 
@@ -2788,4 +2788,4 @@ void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val);
 }
 #endif
 
-#endif	// #ifndef ALX_LP586x_H
+#endif	// #ifndef ALX_LP586X_H
