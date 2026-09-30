@@ -640,7 +640,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	}
 
 	// Try connect data socket
-	for (uint32_t _try = 1; _try <= ALX_FTP_SOCKET_DATA_CONNECT_TRY_COUNT; _try++)
+	for (uint32_t tryNum = 1; tryNum <= ALX_FTP_SOCKET_DATA_CONNECT_TRY_COUNT; tryNum++)
 	{
 		// Connect with PASV response IP
 		status = AlxSocket_Connect(&me->alxSocket_Data, alxSocket_Data_Ip, alxSocket_Data_Port);
@@ -650,7 +650,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		}
 
 		// Trace
-		ALX_FTP_TRACE_WRN("FAIL: 'Connect with PASV response IP' AlxSocket_Connect(Data) status %d alxSocket_Data_Ip %s alxSocket_Data_Port %u _try %lu", status, alxSocket_Data_Ip, alxSocket_Data_Port, _try);
+		ALX_FTP_TRACE_WRN("FAIL: 'Connect with PASV response IP' AlxSocket_Connect(Data) status %d alxSocket_Data_Ip %s alxSocket_Data_Port %" PRIu16 " tryNum %" PRIu32, status, alxSocket_Data_Ip, alxSocket_Data_Port, tryNum);
 
 		// Wait
 		AlxOsDelay_ms(&alxOsDelay, 1);

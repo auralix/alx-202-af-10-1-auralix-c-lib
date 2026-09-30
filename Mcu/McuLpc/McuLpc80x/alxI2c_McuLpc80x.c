@@ -234,7 +234,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 	AlxTimSw_Start(&me->tim);
 
 	// #4 Try read for number of tries
-	for (uint32_t _tryNo = 1; _tryNo <= numOfTries; _tryNo++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// #4.1 Send Start Condition
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Read, timeout_ms);
@@ -327,7 +327,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 	AlxTimSw_Start(&me->tim);
 
 	// #4 Try read memory for number of tries
-	for (uint32_t _tryNo = 1; _tryNo <= numOfTries; _tryNo++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// #4.1 Send Start Condition
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
@@ -483,7 +483,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 	AlxTimSw_Start(&me->tim);
 
 	// #4 Try write for number of tries
-	for (uint32_t _tryNo = 1; _tryNo <= numOfTries; _tryNo++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// #4.1 Send Start Condition
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
@@ -598,7 +598,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 	AlxTimSw_Start(&me->tim);
 
 	// #4 Try write memory for number of tries
-	for (uint32_t _tryNo = 1; _tryNo <= numOfTries; _tryNo++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// #4.1 Send Start Condition
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);
@@ -757,7 +757,7 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 	AlxTimSw_Start(&me->tim);
 
 	// #4 Try Generate start and send Slave address for number of tries
-	for (uint32_t _tryNo = 1; _tryNo <= numOfTries; _tryNo++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// #4.1 Send Start Condition
 		status = AlxI2c_MasterStart(me, me->i2c, slaveAddr, kI2C_Write, timeout_ms);

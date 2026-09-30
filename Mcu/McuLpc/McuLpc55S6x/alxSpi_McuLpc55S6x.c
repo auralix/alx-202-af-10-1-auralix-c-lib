@@ -404,7 +404,7 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 	status_t status = kStatus_Fail;
 
 	// Try SPI write/read
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		status = SPI_MasterTransferBlocking(me->spi, &me->spiTransfer);
 		if (status == kStatus_Success)

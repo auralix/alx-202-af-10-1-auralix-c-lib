@@ -127,7 +127,7 @@ Alx_Status AlxSd_Init(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_ms)
 	//------------------------------------------------------------------------------
 
 	// Try for number of tries
-	for (uint8_t _try = 1; _try <= numOfTries; _try++)
+	for (uint8_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// Send power-up clock cycles
 		status = AlxSd_SpiMode_SendPwrUpClkCycles(me);
@@ -243,7 +243,7 @@ Alx_Status AlxSd_DeInit(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_m
 	//------------------------------------------------------------------------------
 
 	// Try for number of tries
-	for (uint8_t _try = 1; _try <= numOfTries; _try++)
+	for (uint8_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// Send power-up clock cycles
 		status = AlxSd_SpiMode_SendPwrUpClkCycles(me);
@@ -306,7 +306,7 @@ Alx_Status AlxSd_ReadBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint8
 	//------------------------------------------------------------------------------
 
 	// Try for number of tries
-	for (uint8_t _try = 1; _try <= numOfTries; _try++)
+	for (uint8_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// Execute CMD18 SPI mode - Sends multiple block read command with specified address at which reading will begin
 		status = AlxSd_SpiMode_SendCmd18(me, addr);
@@ -367,7 +367,7 @@ Alx_Status AlxSd_WriteBlock(AlxSd* me, uint32_t numOfBlocks, uint32_t addr, uint
 	//------------------------------------------------------------------------------
 
 	// Try for number of tries
-	for (uint8_t _try = 1; _try <= numOfTries; _try++)
+	for (uint8_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// Execute ACMD23 SPI mode - Sends number of block to pre-erase before writing
 		status = AlxSd_SpiMode_SendAcmd23(me, numOfBlocks);
