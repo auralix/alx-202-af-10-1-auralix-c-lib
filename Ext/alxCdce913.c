@@ -507,7 +507,7 @@ Alx_Status AlxCdce913_Init
 		return Alx_Err;
 	}
 
-	#if defined(ALX_CDCE913_VERBOSE_DEBUG_ENABLED)
+	#if defined(ALX_CDCE913_DEBUG)
 	status = Cdce913_RegReadAll(me);
 	if (status != Alx_Ok)
 	{
@@ -537,7 +537,7 @@ Alx_Status AlxCdce913_Init
 	ALX_CDCE913_TRACE_INF("REG 0x%02X: 0x%02X", me->reg.PLL1_1_CFG1.addr, me->reg.PLL1_1_CFG1.val.raw);
 	ALX_CDCE913_TRACE_INF("REG 0x%02X: 0x%02X", me->reg.PLL1_1_CFG2.addr, me->reg.PLL1_1_CFG2.val.raw);
 	ALX_CDCE913_TRACE_INF("REG 0x%02X: 0x%02X", me->reg.PLL1_1_CFG3.addr, me->reg.PLL1_1_CFG3.val.raw);
-	#endif  // ALX_CDCE913_VERBOSE_DEBUG_ENABLED
+	#endif  // ALX_CDCE913_DEBUG
 
 	me->xtalFrequency_MHz = xtalFrequency;
 

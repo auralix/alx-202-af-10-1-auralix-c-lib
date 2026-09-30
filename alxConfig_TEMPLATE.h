@@ -594,6 +594,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Module - Options
 //------------------------------------------------------------------------------
+//#define ALX_CDCE913_DEBUG
 //#define ALX_INA228
 #define ALX_INA238
 //#define ALX_VNH7040_NO_PWM
@@ -602,6 +603,8 @@ extern "C" {
 //#define ALX_PWM_OPTIMIZE_SIZE
 //#define ALX_ZEPHYR_TRACE_WITH_LOG
 //#define ALX_LIN_FRAME_DATA_LEN_MAX 8
+//#define ALX_LOGGER_DEBUG
+//#define ALX_NET_DEBUG
 //#define ALX_FREERTOS_TASK_PRIORITY_NET_TICK 1
 //#define ALX_FREERTOS_TASK_PRIORITY_NET_DHCP 1
 

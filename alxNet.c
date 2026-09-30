@@ -53,7 +53,6 @@ extern void CellularDevice_PowerOff(void);
 //******************************************************************************
 // Defines
 //******************************************************************************
-//#define ALX_DBG_WIZNET
 
 #define CONNECT_TIMEOUT 5000
 
@@ -286,7 +285,7 @@ static void dhcp_task(void *argument)
 	}
 }
 
-#ifdef ALX_DBG_WIZNET
+#if defined(ALX_NET_DEBUG)
 // debug info
 static struct
 {
