@@ -1541,10 +1541,6 @@ PI4IOE_EXPORTS = build_tools.Exports("alxPi4ioe5v6534qTest", (
 # unsigned long is 32 bits, so the strings come out RIGHT in both places - the format is only
 # genuinely wrong on an LP64 host, which is why it has survived. The .c is read-only to this suite
 # (TODO A18, the module's owner), so it is compiled with -w and nothing in it is warning-checked.
-#
-# alxIdTestHelpers_DateComp.c is closure too, for a different and smaller reason - see its file header: a
-# translation unit that mentions ALX_BUILD_DATE_COMP cannot compile under -Werror at all, so the
-# three accessors that need the macro are split out and the rest of the helpers stay gated.
 ID_SOURCES_STRICT = [
     HELPERS_DIR / "alxIdTestHelpers.c",
     FAKES_DIR / "alxIoPinFake.c",
@@ -1552,7 +1548,6 @@ ID_SOURCES_STRICT = [
 ]
 ID_SOURCES_CLOSURE = [
     CLIB_DIR / "alxId.c",
-    HELPERS_DIR / "alxIdTestHelpers_DateComp.c",
 ]
 ID_SOURCES = [*ID_SOURCES_STRICT, *ID_SOURCES_CLOSURE]
 # No alxDelay.c and no alxTrace.c: alxId.h includes alxDelay.h but alxId.c calls nothing from it,

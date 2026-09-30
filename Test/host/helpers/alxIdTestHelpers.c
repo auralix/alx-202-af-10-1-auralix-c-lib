@@ -29,8 +29,8 @@
   * rewritten by alxBuild.py on every VisualGDB build, so a test that hardcoded
   * this week's hash would go red on somebody else's build of the firmware; a
   * test compares what the module stored against what the module was compiled
-  * with, which is a claim that stays true. ALX_BUILD_DATE_COMP is the one
-  * exception and it lives in alxIdTestHelpers_DateComp.c - see that file.
+  * with, which is a claim that stays true. ALX_BUILD_DATE_COMP is exported with
+  * the two strings it is assembled from, __DATE__ and __TIME__.
   *
   * The bootloader block is read from a FIXED ADDRESS: the module keeps it as a
   * uint32_t and casts it straight to void*, so on this x64 host a malloc'd
@@ -109,6 +109,9 @@ uint32_t AlxIdTest_BuildRev(void);
 const char* AlxIdTest_BuildHash(void);
 const char* AlxIdTest_BuildHashShort(void);
 uint32_t AlxIdTest_BuildHashShortUint32(void);
+uint32_t AlxIdTest_BuildDateComp(void);
+const char* AlxIdTest_CompDate(void);
+const char* AlxIdTest_CompTime(void);
 const char* AlxIdTest_FwCompName(AlxId* me);
 uint32_t AlxIdTest_FwCompVerMajor(AlxId* me);
 uint32_t AlxIdTest_FwLangCVer(AlxId* me);
@@ -368,6 +371,9 @@ uint32_t AlxIdTest_BuildRev(void)				{ return ALX_BUILD_REV; }
 const char* AlxIdTest_BuildHash(void)			{ return ALX_BUILD_HASH; }
 const char* AlxIdTest_BuildHashShort(void)		{ return ALX_BUILD_HASH_SHORT; }
 uint32_t AlxIdTest_BuildHashShortUint32(void)	{ return ALX_BUILD_HASH_SHORT_UINT32; }
+uint32_t AlxIdTest_BuildDateComp(void)			{ return (uint32_t)ALX_BUILD_DATE_COMP; }
+const char* AlxIdTest_CompDate(void)			{ return __DATE__; }	// "Sep 11 2026" - the string the macro takes the date digits out of
+const char* AlxIdTest_CompTime(void)			{ return __TIME__; }	// "07:44:19" - and the time digits
 
 const char* AlxIdTest_FwCompName(AlxId* me)		{ return me->fwComp.name; }
 uint32_t AlxIdTest_FwCompVerMajor(AlxId* me)	{ return me->fwComp.verMajor; }

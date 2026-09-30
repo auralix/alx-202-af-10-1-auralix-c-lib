@@ -27,7 +27,7 @@ Python parser keys on ("FW:", "- ver:", "- bin:", the INF framing) would mean re
 and linking the real alxTrace.c into this group; the getters those lines are formatted from are
 pinned here instead (P473, P484).
 
-Sealed defects: P475, P476, P481, P482, P486, P487, P489, P490, P494, P496.
+Sealed defects: P475, P476, P482, P486, P487, P489, P490, P494, P496.
 
 Proofs (ALX-1553): P468-P505.
 """
@@ -431,9 +431,7 @@ def test_ALX1553_P480_the_compile_stamp_is_the_compilers_own_clock_and_reaches_t
     the date the identity reports. Recomputed here from the same two strings the macro reads, in
     Python's exact arithmetic - which also checks the macro's day rule, since __DATE__ pads a
     single-digit day with a SPACE and ALX_BUILD_COMP_DAY_CH0 maps anything below '0' to '0'.
-
-    What this test does NOT say is that the macro computes it correctly. It computes the right answer
-    by accident; P481 is why.
+    P481 is the other half: the type the macro computes it in.
     """
     months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     comp_date, comp_time = id_lib.comp("Date"), id_lib.comp("Time")
@@ -452,33 +450,23 @@ def test_ALX1553_P480_the_compile_stamp_is_the_compilers_own_clock_and_reaches_t
     assert id_lib.text(obj, "FwBinStr").startswith(f"{expected}_")
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "DEFECT: ALX_BUILD_DATE_COMP (alxBuild.h:102-111) assembles YYMMDDHHmm as "
-    "(YEAR_CH2-'0')*1000000000 + (YEAR_CH3-'0')*100000000 + ... in PLAIN INT ARITHMETIC. INT_MAX is "
-    "2147483647, so the first term alone overflows for any build year whose last two digits are 22 "
-    "or more - every build since January 2022 - and the expression is signed integer overflow, "
-    "which is undefined behaviour in a constant expression that every product evaluates. It has "
-    "been correct since then only because the wraparound happens to land on the right value: the "
-    "test reads the macro back as a uint32 and gets a number ABOVE INT_MAX, which is only possible "
-    "because the int it was computed in went negative. arm-none-eabi-gcc 15.2.1 compiles it "
-    "silently even with -Woverflow, which is why nobody has seen it. Two other tools do not: clang "
-    "reports -Winteger-overflow, and under this suite's -Werror that is a hard build failure, "
-    "which is why the three accessors that mention the macro live in a CLOSURE file of their own "
-    "(Test/alxIdTestHelpers_DateComp.c); and UBSan reports it at runtime, measured word for word as "
-    "\"signed integer overflow: 2000000000 + 600000000 cannot be represented in type 'int'\" - so "
-    "the accessor that evaluates it carries a no_sanitize attribute, because -fno-sanitize-recover "
-    "makes that finding an abort that takes the whole runner with it and this seal says the same "
-    "thing without killing the lane. The fix is one suffix - make the multipliers unsigned long, "
-    "or build the value from uint32_t terms"))
 def test_ALX1553_P481_the_compile_stamp_is_computed_in_a_type_that_can_hold_it(id_lib):
-    """The macro's own int arithmetic should represent the date it computes.
+    """The macro's arithmetic is done in a type that holds the date it computes.
 
-    A YYMMDDHHmm value is ten decimal digits and passed 2147483647 in the year 2022, so the
-    expression has been overflowing for four years while producing the correct answer. A value read
-    back above INT_MAX is the proof that the int it was computed in did not hold it.
+    A YYMMDDHHmm value is ten decimal digits and passed 2147483647 in the year 2022. Until
+    2026-09-30 the multipliers were plain int, so the expression was signed overflow - undefined
+    behaviour that clang rejected under -Werror (-Winteger-overflow) and UBSan aborted on at
+    runtime, correct on the target only because the wraparound landed on the right value; the
+    accessor that evaluates it had to live in a closure file with a no_sanitize attribute. The
+    multipliers are unsigned long now, and the accessor is an ordinary strict helper: that it
+    compiles under -Werror and runs under UBSan is the proof of the arithmetic. What this test
+    pins is the value's range - above INT_MAX, which an int could not have delivered without
+    wrapping, and within the uint32_t the identity stores it in, which holds YYMMDDHHmm until
+    the year 2042.
     """
-    assert id_lib.build("DateComp") <= 0x7FFFFFFF, (
-        "ALX_BUILD_DATE_COMP overflowed the int its own arithmetic is done in")
+    value = id_lib.build("DateComp")
+
+    assert 0x7FFFFFFF < value <= 0xFFFFFFFF, f"{value} is not a YYMMDDHHmm stamp of this century"
 
 
 # =====================================================================

@@ -276,11 +276,10 @@ def _check_ms_tests() -> None:
             f"missing {missing}, listed but no longer driving it {stale}"
         )
 
-# Id group: the real alxId over the IO pin fake, asserts ON = the code as shipped. Both closure
-# sources are closure for reasons written out at host_build's ID group - alxId.c fails -Wformat and
-# -Wint-to-void-pointer-cast, and alxIdTestHelpers_DateComp.c cannot survive -Werror at all because the
-# library's ALX_BUILD_DATE_COMP overflows an int. Declared by host_build.ID_SOURCES_STRICT/
-# _CLOSURE and with what host_build._assert_defines derives from them.
+# Id group: the real alxId over the IO pin fake, asserts ON = the code as shipped. alxId.c is the
+# closure source, for reasons written out at host_build's ID group - it fails -Wformat and
+# -Wint-to-void-pointer-cast. Declared by host_build.ID_SOURCES_STRICT/_CLOSURE and with what
+# host_build._assert_defines derives from them.
 #
 # In SANITIZE from the group's first test: the identity block is read out of flash at a fixed
 # 32-bit address through a packed struct, which is exactly the shape UBSan has something to say
