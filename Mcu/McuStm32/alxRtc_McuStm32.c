@@ -771,7 +771,7 @@ Alx_Status AlxRtc_TuneClockSource(AlxRtc* me, float offset_ppm)
 
 	if ((tune < -255) || (tune > 256))
 	{
-		ALX_RTC_TRACE_INF("Invalid tune value %d, should be -255 >= tune <= 256", tune);
+		ALX_RTC_TRACE_INF("Invalid tune value %" PRId32 ", should be -255 >= tune <= 256", tune);
 		return Alx_Err;
 	}
 
@@ -782,7 +782,7 @@ Alx_Status AlxRtc_TuneClockSource(AlxRtc* me, float offset_ppm)
 		(uint32_t)(256 - tune));
 
 	ALX_RTC_TRACE_INF(
-		"HAL_RTCEx_SetSmoothCalib(%d): status %u",
+		"HAL_RTCEx_SetSmoothCalib(%" PRId32 "): status %d",
 		256 - tune, status);
 
 	return (status == HAL_OK) ? Alx_Ok : Alx_Err;
