@@ -13,7 +13,7 @@
   * bottom of the file. It did not until 11.09, on the grounds that lld-link
   * reported a duplicate symbol rather than letting a strong definition displace
   * the weak one. That was true of the build at the time and is not true now:
-  * alxGlobal.h has emitted __attribute__((weak)) for clang on Windows since
+  * alxGlobal.h has emitted ALX_WEAK for clang on Windows since
   * this branch, so the override works the way it does on the target.
   *
   * The override keeps every default the driver set, which is what this group

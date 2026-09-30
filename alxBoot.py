@@ -253,8 +253,8 @@ def Script(vsTargetPath: str, imgSlotLenHexStr: str, bootLenHexStr: str) -> None
 
 
 #if defined(ALX_BUILD_CONFIG_DEBUG)
-static const unsigned char app_header[{headerLenStr}] __attribute__((section(".app_header"), used)) = {{{binSignedHeaderArr}}};
-static const unsigned char app_trailer[{trailerLenStr}] __attribute__((section(".app_trailer"), used)) = {{{binSignedTrailerArr}}};
+static const unsigned char app_header[{headerLenStr}] ALX_SECTION(".app_header") = {{{binSignedHeaderArr}}};
+static const unsigned char app_trailer[{trailerLenStr}] ALX_SECTION(".app_trailer") = {{{binSignedTrailerArr}}};
 #endif
 
 

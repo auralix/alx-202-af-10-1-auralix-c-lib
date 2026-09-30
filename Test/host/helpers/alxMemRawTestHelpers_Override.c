@@ -12,7 +12,7 @@
   * Linked into the override DLL only, and alxMemRaw.c is linked there too, so
   * the two definitions of each symbol are in the same image and the strong one
   * has to win. That became possible on this host only recently: alxGlobal.h
-  * emits __attribute__((weak)) for clang on Windows since this branch, and
+  * emits ALX_WEAK for clang on Windows since this branch, and
   * before that lld-link reported a duplicate symbol. Test/alxIna228TestHelpers.c
   * and Test/alxPi4ioeTestHelpers.c are the other two overrides in the suite.
   *

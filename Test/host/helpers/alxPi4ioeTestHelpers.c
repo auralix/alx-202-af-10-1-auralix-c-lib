@@ -12,7 +12,7 @@
   * of the file. It did not until 11.09, on the grounds that the host linker
   * reported a duplicate rather than displacing the weak symbol; that was true
   * of the build at the time and is not true now (alxGlobal.h emits
-  * __attribute__((weak)) for clang on Windows since this branch).
+  * ALX_WEAK for clang on Windows since this branch).
   *
   * The override keeps every default the driver set, which is what these tests
   * were measuring all along - nothing under test depends on a product's choice

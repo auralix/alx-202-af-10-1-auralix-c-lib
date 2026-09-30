@@ -35,8 +35,8 @@
 		#include "alxBootMetadata_GENERATED.h"
 	#endif
 	#if defined(ALX_BUILD_CONFIG_FW_UP)
-		static const unsigned char app_header[0x0200] __attribute__((section(".app_header"), used)) = {0xDE, 0xAD, 0xBE, 0xEF};
-		static const unsigned char app_trailer[0x0028] __attribute__((section(".app_trailer"), used)) = {0xDE, 0xAD, 0xBE, 0xEF};
+		static const unsigned char app_header[0x0200] ALX_SECTION(".app_header") = {0xDE, 0xAD, 0xBE, 0xEF};
+		static const unsigned char app_trailer[0x0028] ALX_SECTION(".app_trailer") = {0xDE, 0xAD, 0xBE, 0xEF};
 	#endif
 #endif
 
@@ -51,7 +51,7 @@
 // Private Variables
 //******************************************************************************
 #if defined(ALX_BOOT_B)
-static const AlxId_FwBootId boot_id __attribute__((section(".boot_id"), used)) =
+static const AlxId_FwBootId boot_id ALX_SECTION(".boot_id") =
 {
 	.magicNum = ALX_ID_BOOT_ID_MAGIC_NUM,
 	.ver = ALX_ID_BOOT_ID_VER,

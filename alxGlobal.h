@@ -279,6 +279,7 @@ extern "C" {
 	#define ALX_WEAK __attribute__((weak))
 	#define ALX_PACKED __attribute__((packed))
 	#define ALX_ALIGNED(bytes) __attribute__((aligned(bytes)))
+	#define ALX_SECTION(name) __attribute__((section(name), used))
 	#define ALX_PRINTF_FORMAT(formatArg, firstValueArg) __attribute__((format(printf, formatArg, firstValueArg)))
 #else
 	#error "alxGlobal.h: Unsupported compiler - GCC or Clang required"
