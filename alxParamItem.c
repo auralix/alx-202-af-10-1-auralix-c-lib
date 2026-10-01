@@ -1370,7 +1370,9 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	}
 
 	// Set
-	ALX_PARAM_ITEM_ASSERT(AlxParamItem_SetVal(me, valDefPtr) == Alx_Ok);
+	Alx_Status status = AlxParamItem_SetVal(me, valDefPtr);
+	ALX_PARAM_ITEM_ASSERT(status == Alx_Ok);
+	(void)status;
 }
 uint8_t AlxParamItem_GetValDefUint8(AlxParamItem* me)
 {
