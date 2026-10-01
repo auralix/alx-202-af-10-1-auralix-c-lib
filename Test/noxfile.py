@@ -49,7 +49,7 @@ from harness.host import matrix as host_matrix  # noqa: E402
 nox.options.default_venv_backend = "none"
 nox.options.sessions = list(lanes.DEFAULT_SESSIONS)
 # third-party folders, not gated
-VENDOR = ["--exclude", "Ext", "--exclude", "FatFs", "--exclude", "mcuboot", "--exclude", "Usbh"]
+VENDOR = ["--exclude", "FatFs", "--exclude", "mcuboot", "--exclude", "Usbh"]
 
 # ---- the module sets (extend per module; keep in sync with host_build's group declarations) -------------------
 ANALYSIS_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c",
@@ -162,7 +162,7 @@ SYNTAX_EMPTY_TU = {"alxBuild.c", "alxNet.c", "alxSocket.c",
 # What this stage buys is that the list cannot grow. A new assertion that hides a call in a module
 # not below fails the lane.
 ASSERT_PURE_CALLS = {
-    "strlen", "sizeof",
+    "strlen", "sizeof", "fmodf",   # fmodf: alxAdau1961.c checks a gain is a whole number of steps
     "AlxAdc_GetCh", "AlxAdc_Ctor_CheckCh", "AlxAdc_Ctor_IsMainClkOk", "AlxAdc_Ctor_IsSysClkOk",
     "AlxAdc_IsClkOk", "AlxWdt_IsClkOk", "AlxCan_Ctor_IsClkOk", "AlxMmc_IsClkOk", "AlxSpi_IsClkOk",
     "AlxI2c_IsClkOk", "AlxI2s_Ctor_IsClkOk", "AlxPwm_CheckIoPins",
@@ -177,7 +177,7 @@ ELIDED_TRACE = re.compile(r"ALX_[A-Z0-9_]*TRACE[A-Z0-9_]*\s*\(")
 ELIDED_NAME = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(")
 
 _STYLE_PENDING = {*STYLE_PENDING_COMMENTS, *STYLE_PENDING_TERNARY}
-_STYLE_SKIP_DIRS = {"Ext", "FatFs", "mcuboot", "Usbh", "Test", "build", "Doc"}
+_STYLE_SKIP_DIRS = {"FatFs", "mcuboot", "Usbh", "Test", "build", "Doc"}
 
 
 def _library_style_files() -> list:
@@ -643,7 +643,7 @@ def analyze(session: nox.Session) -> None:
     session.log("Stage 5c: does any assertion or trace DO the work instead of reporting it?")
     hiding, pending_seen, traces = {}, set(), {}
     for src in sorted(CLIB.rglob("*.c")):
-        if any(p in src.parts for p in ("Test", "build", "Ext")):
+        if any(p in src.parts for p in ("Test", "build")):
             continue
         for number, line in enumerate(src.read_text(encoding="ascii", errors="replace").splitlines(), 1):
             if line.lstrip().startswith("//"):
