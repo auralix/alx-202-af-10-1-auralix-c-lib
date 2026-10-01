@@ -1524,8 +1524,11 @@ extern AlxShimStm32_Regs alxShimStm32_DMA2_Stream2;
 #define DMA2_Stream2 (&alxShimStm32_DMA2_Stream2)
 extern AlxShimStm32_Regs alxShimStm32_DMA3;
 #define DMA3 (&alxShimStm32_DMA3)
+// DMAMUX1 and the R1MODE bit exist on the G4 and the L4+ parts only, so the code without them compiles too
+#if defined(STM32G4) || defined(STM32L4P5xx) || defined(STM32L4Q5xx) || defined(STM32L4R5xx) || defined(STM32L4R7xx) || defined(STM32L4R9xx) || defined(STM32L4S5xx) || defined(STM32L4S7xx) || defined(STM32L4S9xx)
 extern AlxShimStm32_Regs alxShimStm32_DMAMUX1;
 #define DMAMUX1 (&alxShimStm32_DMAMUX1)
+#endif
 extern AlxShimStm32_Regs alxShimStm32_FDCAN1;
 #define FDCAN1 (&alxShimStm32_FDCAN1)
 extern AlxShimStm32_Regs alxShimStm32_FDCAN2;
@@ -1934,7 +1937,9 @@ extern AlxShimStm32_Regs alxShimStm32_USB_OTG_HS;
 #define LL_GPIO_PULL_DOWN (0x01E0U)
 #define LL_GPIO_PULL_UP (0x01E1U)
 #define LL_SPI_RX_FIFO_TH_QUARTER (0x01E2U)
+#if defined(STM32G4) || defined(STM32L4P5xx) || defined(STM32L4Q5xx) || defined(STM32L4R5xx) || defined(STM32L4R7xx) || defined(STM32L4R9xx) || defined(STM32L4S5xx) || defined(STM32L4S7xx) || defined(STM32L4S9xx)
 #define PWR_CR5_R1MODE (0x01E3U)
+#endif
 #define PWR_FLAG_VOS (0x01E4U)
 #define PWR_REGULATOR_VOLTAGE_SCALE1 (0x01E5U)
 #define PWR_REGULATOR_VOLTAGE_SCALE1_BOOST (0x01E6U)
