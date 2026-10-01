@@ -277,11 +277,6 @@ static int cell_send(AlxSocket* me, void* data, uint32_t len)
 			break;
 		}
 
-		if (sent_length < 0)
-		{
-			return sent_length;
-		}
-
 		sent_total += sent_length;
 		if (sent_total >= len)
 		{
