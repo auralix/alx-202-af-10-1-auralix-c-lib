@@ -213,7 +213,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusHal = HAL_MMC_ReadBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusHal, tryNum, numOfBlocks, addr, me->dmaReadDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaReadDone=%d", statusHal, tryNum, numOfBlocks, addr, me->dmaReadDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -228,7 +228,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, true);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, tryNum, numOfBlocks, addr, me->dmaReadDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaReadDone=%d", statusAlx, tryNum, numOfBlocks, addr, me->dmaReadDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -243,7 +243,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, tryNum, numOfBlocks, addr, me->dmaReadDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaReadDone=%d", statusAlx, tryNum, numOfBlocks, addr, me->dmaReadDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -310,7 +310,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusHal = HAL_MMC_WriteBlocks_DMA(&me->hmmc, me->dmaReadWriteBuffAlign4, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusHal, tryNum, numOfBlocks, addr, me->dmaWriteDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaWriteDone=%d", statusHal, tryNum, numOfBlocks, addr, me->dmaWriteDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -325,7 +325,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, false);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, tryNum, numOfBlocks, addr, me->dmaWriteDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaWriteDone=%d", statusAlx, tryNum, numOfBlocks, addr, me->dmaWriteDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -340,7 +340,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, tryNum, numOfBlocks, addr, me->dmaWriteDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaWriteDone=%d", statusAlx, tryNum, numOfBlocks, addr, me->dmaWriteDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
