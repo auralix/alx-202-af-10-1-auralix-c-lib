@@ -166,7 +166,7 @@
  * Otherwise this macro should be no-op.
  */
 //#define MCUBOOT_CPU_IDLE() \	// TV: Commented
-//    do {                   \
+//    do {
 //    } while (0)
 
 #include "mcuboot_config_usr.h"	// TV: Added
