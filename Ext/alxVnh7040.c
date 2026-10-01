@@ -519,8 +519,6 @@ static void AlxVnh7040_Monitoring_Select_Vcc(AlxVnh7040* me)
 }
 static void AlxVnh7040_Monitoring (AlxVnh7040* me)
 {
-	int32_t temp;
-
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
 	ALX_VNH7040_ASSERT(me->isInit == true);
 
