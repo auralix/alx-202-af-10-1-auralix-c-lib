@@ -43,7 +43,7 @@
 //******************************************************************************
 static AlxCan* alxCan_Can1 = NULL;
 static AlxCan* alxCan_Can2 = NULL;
-#if defined(ALX_STM32F7) || defined(ALX_STM32G4)
+#if defined(CAN3) || defined(FDCAN3)
 static AlxCan* alxCan_Can3 = NULL;
 #endif
 
