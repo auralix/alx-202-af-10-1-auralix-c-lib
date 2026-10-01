@@ -70,9 +70,9 @@ extern "C" {
 
 // Trace //
 #if defined(ALX_BTS724G_TRACE_ENABLE)
-	#define ALX_BTS724G_TRACE_WRN(...) ALX_TRACE_WRN(ALX_BTS724G_FILE, __VA_ARGS__)
+	#define ALX_BTS724G_TRACE_ERR(...) ALX_TRACE_ERR(ALX_BTS724G_FILE, __VA_ARGS__)
 #else
-	#define ALX_BTS724G_TRACE_WRN(...) do{} while (false)
+	#define ALX_BTS724G_TRACE_ERR(...) do{} while (false)
 #endif
 
 
