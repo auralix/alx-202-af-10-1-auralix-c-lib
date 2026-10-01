@@ -356,7 +356,7 @@ static int cell_recv(AlxSocket* me, void* data, uint32_t len)
 static int sslRandomCallback(void *p_rng, unsigned char *output, size_t output_len)
 {
 	(void)p_rng;
-	int i;
+	size_t i;
 
 	if (output_len <= 0)
 	{
