@@ -78,6 +78,7 @@ static void Cdce913_RegStructInit(AlxCdce913_Reg *reg)
 	reg->PLL1_1_CFG3.addr = 0x1F;
 }
 
+#if defined(ALX_CDCE913_DEBUG)
 static Alx_Status Cdce913_RegRead(AlxCdce913* me, void* reg)
 {
 	Alx_Status status = Alx_Err;
@@ -99,6 +100,7 @@ static Alx_Status Cdce913_RegRead(AlxCdce913* me, void* reg)
 
 	return status;
 }
+#endif
 
 static Alx_Status Cdce913_RegWrite(AlxCdce913* me, void* reg)
 {
@@ -122,6 +124,7 @@ static Alx_Status Cdce913_RegWrite(AlxCdce913* me, void* reg)
 	return status;
 }
 
+#if defined(ALX_CDCE913_DEBUG)
 static Alx_Status Cdce913_RegReadAll(AlxCdce913* me)
 {
 	Alx_Status status = Alx_Ok;
@@ -151,6 +154,7 @@ static Alx_Status Cdce913_RegReadAll(AlxCdce913* me)
 
 	return (status == Alx_Ok) ? Alx_Ok : Alx_Err;
 }
+#endif
 
 static Alx_Status Cdce913_RegWriteAll(AlxCdce913* me)
 {
