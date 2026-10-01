@@ -45,6 +45,7 @@ static void AlxAdau1961_RegStruct_SetLen(AlxAdau1961* me);
 static void AlxAdau1961_RegStruct_SetValToZero(AlxAdau1961* me);
 static void AlxAdau1961_RegStruct_SetNonClkValToDefault(AlxAdau1961* me);
 static Alx_Status AlxAdau1961_Reg_Write(AlxAdau1961* me, void* reg);
+static ALX_UNUSED Alx_Status AlxAdau1961_Reg_Read(AlxAdau1961* me, void* reg);
 static Alx_Status AlxAdau1961_Reg_WriteNonClkVal(AlxAdau1961* me);
 static uint8_t AlxAdau1961_CalcRegVal_InDiffGain(AlxAdau1961* me, float gain_dB);
 static AlxAdau1961_General_GainMixer1Mixer2 AlxAdau1961_CalcRegVal_InAuxGain(AlxAdau1961* me, int8_t gain_dB);
@@ -765,6 +766,14 @@ static Alx_Status AlxAdau1961_Reg_Write(AlxAdau1961* me, void* reg)
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(uint16_t) + sizeof(uint8_t);
 
 	return AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_16bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
+}
+static ALX_UNUSED Alx_Status AlxAdau1961_Reg_Read(AlxAdau1961* me, void* reg)
+{
+	uint16_t regAddr = *((uint16_t*)reg);
+	uint8_t regLen = *((uint8_t*)reg + sizeof(uint16_t));
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(uint16_t) + sizeof(uint8_t);
+
+	return AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_16bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
 }
 static Alx_Status AlxAdau1961_Reg_WriteNonClkVal(AlxAdau1961* me)
 {
