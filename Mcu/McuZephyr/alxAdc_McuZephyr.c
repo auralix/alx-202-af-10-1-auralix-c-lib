@@ -126,7 +126,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 		int32_t status = adc_channel_setup(me->device, &me->ch[i]);
 		if (status != 0)
 		{
-			ALX_ADC_TRACE_ERR("FAIL: adc_channel_setup() deviceName %s status %ld ch %u", me->deviceName, status, me->chArr[i]);
+			ALX_ADC_TRACE_ERR("FAIL: adc_channel_setup() deviceName %s status %" PRId32 " ch %d", me->deviceName, status, me->chArr[i]);
 			return Alx_Err;
 		}
 	}
@@ -179,7 +179,7 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 {
 	// Trace
-	ALX_ADC_TRACE_DBG("ENTER: deviceName %s ch %lu", me->deviceName, ch);
+	ALX_ADC_TRACE_DBG("ENTER: deviceName %s ch %d", me->deviceName, ch);
 
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
@@ -205,7 +205,7 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 {
 	// Trace
-	ALX_ADC_TRACE_DBG("ENTER: deviceName %s ch %lu", me->deviceName, ch);
+	ALX_ADC_TRACE_DBG("ENTER: deviceName %s ch %d", me->deviceName, ch);
 
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
@@ -215,7 +215,7 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 	uint32_t voltage_mV = AlxAdc_GetVoltage_mV_Private(me, ch);
 
 	// Trace
-	ALX_ADC_TRACE_DBG("EXIT: deviceName %s voltage_mV %lu", me->deviceName, voltage_mV);
+	ALX_ADC_TRACE_DBG("EXIT: deviceName %s voltage_mV %" PRIu32, me->deviceName, voltage_mV);
 
 	// Return
 	return voltage_mV;
@@ -243,7 +243,7 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_ADC_TRACE_DBG("ENTER: deviceName %s ch %lu", me->deviceName, ch);
+	ALX_ADC_TRACE_DBG("ENTER: deviceName %s ch %d", me->deviceName, ch);
 
 
 	//------------------------------------------------------------------------------
@@ -263,10 +263,10 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	vref_mV = adc_ref_internal(me->device);
 	if (vref_mV == 0)
 	{
-		ALX_ADC_TRACE_ERR("FAIL: adc_ref_internal() deviceName %s vref_mV %u", me->deviceName, vref_mV);
+		ALX_ADC_TRACE_ERR("FAIL: adc_ref_internal() deviceName %s vref_mV %" PRIu16, me->deviceName, vref_mV);
 		return 0;
 	}
-	ALX_ADC_TRACE_VRB("DONE: adc_ref_internal() deviceName %s vref_mV %u", me->deviceName, vref_mV);
+	ALX_ADC_TRACE_VRB("DONE: adc_ref_internal() deviceName %s vref_mV %" PRIu16, me->deviceName, vref_mV);
 
 
 	//------------------------------------------------------------------------------
@@ -279,42 +279,42 @@ uint32_t AlxAdc_GetVoltage_mV_Private(AlxAdc* me, Alx_Ch ch)
 	seq.resolution = ALX_ADC_RESOLUTION;
 	seq.oversampling = 8;
 	seq.calibrate = false;
-	ALX_ADC_TRACE_VRB("DO: adc_read() deviceName %s channels 0x%08lX resolution %u oversampling %u calibrate %u", me->deviceName, seq.channels, seq.resolution, seq.oversampling, seq.calibrate);
+	ALX_ADC_TRACE_VRB("DO: adc_read() deviceName %s channels 0x%08" PRIX32 " resolution %" PRIu8 " oversampling %" PRIu8 " calibrate %d", me->deviceName, seq.channels, seq.resolution, seq.oversampling, seq.calibrate);
 	status = adc_read(me->device, &seq);
 	if (status != 0)
 	{
-		ALX_ADC_TRACE_ERR("FAIL: adc_read() deviceName %s status %ld", me->deviceName, status);
+		ALX_ADC_TRACE_ERR("FAIL: adc_read() deviceName %s status %" PRId32, me->deviceName, status);
 		return 0;
 	}
-	ALX_ADC_TRACE_VRB("DONE: adc_read() deviceName %s status %ld voltage_raw %d", me->deviceName, status, voltage_raw);
+	ALX_ADC_TRACE_VRB("DONE: adc_read() deviceName %s status %" PRId32 " voltage_raw %" PRId16, me->deviceName, status, voltage_raw);
 
 
 	//------------------------------------------------------------------------------
 	// Bound
 	//------------------------------------------------------------------------------
-	ALX_ADC_TRACE_VRB("DO: AlxBound_Int16() deviceName %s voltage_raw %d", me->deviceName, voltage_raw);
+	ALX_ADC_TRACE_VRB("DO: AlxBound_Int16() deviceName %s voltage_raw %" PRId16, me->deviceName, voltage_raw);
 	AlxBound_Int16(&voltage_raw, 0x0000, 0x7FFF);
-	ALX_ADC_TRACE_VRB("DONE: AlxBound_Int16() deviceName %s voltage_raw %d", me->deviceName, voltage_raw);
+	ALX_ADC_TRACE_VRB("DONE: AlxBound_Int16() deviceName %s voltage_raw %" PRId16, me->deviceName, voltage_raw);
 
 
 	//------------------------------------------------------------------------------
 	// Convert
 	//------------------------------------------------------------------------------
 	voltage_mV = voltage_raw;
-	ALX_ADC_TRACE_VRB("DO: adc_raw_to_millivolts() deviceName %s vref_mV %ld, gain %lu resolution %u voltage_mV %ld", me->deviceName, vref_mV, me->gain, seq.resolution, voltage_mV);
+	ALX_ADC_TRACE_VRB("DO: adc_raw_to_millivolts() deviceName %s vref_mV %" PRIu16 ", gain %d resolution %" PRIu8 " voltage_mV %" PRId32, me->deviceName, vref_mV, me->gain, seq.resolution, voltage_mV);
 	status = adc_raw_to_millivolts(vref_mV, me->gain, ALX_ADC_RESOLUTION, &voltage_mV);
 	if (status != 0)
 	{
-		ALX_ADC_TRACE_ERR("FAIL: adc_raw_to_millivolts() deviceName %s status %ld", me->deviceName, status);
+		ALX_ADC_TRACE_ERR("FAIL: adc_raw_to_millivolts() deviceName %s status %" PRId32, me->deviceName, status);
 		return 0;
 	}
-	ALX_ADC_TRACE_VRB("DONE: adc_raw_to_millivolts() deviceName %s status %ld, voltage_mV %ld", me->deviceName, status, voltage_mV);
+	ALX_ADC_TRACE_VRB("DONE: adc_raw_to_millivolts() deviceName %s status %" PRId32 ", voltage_mV %" PRId32, me->deviceName, status, voltage_mV);
 
 
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_ADC_TRACE_DBG("EXIT: deviceName %s voltage_mV %lu", me->deviceName, voltage_mV);
+	ALX_ADC_TRACE_DBG("EXIT: deviceName %s voltage_mV %" PRId32, me->deviceName, voltage_mV);
 
 
 	//------------------------------------------------------------------------------
