@@ -158,10 +158,10 @@ static void CrisExit(void)
 	AlxOsMutex_Unlock(&alxSpiMutex);
 }
 static void Select(void) {
-	AlxIoPin_Reset(alxSpi->do_nCS);
+	AlxSpi_Master_AssertCs(alxSpi);
 }
 static void Unselect(void) {
-	AlxIoPin_Set(alxSpi->do_nCS);
+	AlxSpi_Master_DeAssertCs(alxSpi);
 }
 static void ReadBurst(uint8_t* buff, uint16_t len) {
 	ALX_NET_ASSERT(AlxSpi_Master_Read(alxSpi, buff, len, 2, 2000) == Alx_Ok);
