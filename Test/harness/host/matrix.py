@@ -133,15 +133,21 @@ FEATURE_SWITCHES = ["ALX_CMSIS_DSP", "ALX_FATFS", "ALX_FREE_RTOS", "ALX_FREE_RTO
                     "ALX_LFS", "ALX_LW_IP", "ALX_MBEDTLS", "ALX_MCU_BOOT", "ALX_USBH", "ALX_WIZNET"]
 _ALL = {"ALX_CMSIS_DSP", "ALX_FATFS", "ALX_FREE_RTOS", "ALX_LFS", "ALX_MBEDTLS", "ALX_MCU_BOOT",
         "ALX_USBH", "ALX_WIZNET"}
-FEATURES = {
-    "none": ("every feature off", set()),
-    "all": ("every feature on; the network through Wiznet", _ALL),
-    "all-cellular": ("every feature on; the network through the FreeRTOS cellular interface",
-                     _ALL - {"ALX_WIZNET"} | {"ALX_FREE_RTOS_CELLULAR"}),
-    "all-lwip": ("every feature on; the network through lwIP", _ALL - {"ALX_WIZNET"} | {"ALX_LW_IP"}),
-    "all-noos": ("every feature on but FreeRTOS: the bare-metal and Zephyr branches",
-                 _ALL - {"ALX_FREE_RTOS"}),
+# `all` and its variants: -cellular and -lwip take the network another way, -noos leaves FreeRTOS out
+# (the bare-metal and Zephyr branches), -nomcuboot leaves MCUboot out - its flash backend is the STM32
+# HAL's (mcuboot/flash_map_backend), so only the STM32 rows build a boot role.
+_VARIANTS = {
+    "": ("the network through Wiznet", set(), set()),
+    "-cellular": ("the network through the FreeRTOS cellular interface", {"ALX_WIZNET"}, {"ALX_FREE_RTOS_CELLULAR"}),
+    "-lwip": ("the network through lwIP", {"ALX_WIZNET"}, {"ALX_LW_IP"}),
+    "-noos": ("no FreeRTOS: the bare-metal and Zephyr branches", {"ALX_FREE_RTOS"}, set()),
 }
+FEATURES = {"none": ("every feature off", set())}
+for _mcuboot in ("", "-nomcuboot"):
+    for _suffix, (_what, _off, _on) in _VARIANTS.items():
+        _out = _off | ({"ALX_MCU_BOOT"} if _mcuboot else set())
+        FEATURES[f"all{_suffix}{_mcuboot}"] = (
+            f"every feature on; {_what}" + ("; no MCUboot" if _mcuboot else ""), (_ALL - _out) | _on)
 _MEMORY_MAP = ["ALX_MCU_BOOT_FLASH_DEVICE_ID", "ALX_MCU_BOOT_FLASH_SECTOR_SIZE",
                "ALX_MCU_BOOT_BOOTLOADER_SIZE", "ALX_MCU_BOOT_IMAGE_SIZE", "ALX_MCU_BOOT_BOOTLOADER_OFFSET",
                "ALX_MCU_BOOT_IMAGE_PRIMARY_OFFSET", "ALX_MCU_BOOT_IMAGE_SECONDARY_OFFSET"]

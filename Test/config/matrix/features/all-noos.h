@@ -1,4 +1,4 @@
-// Features: all-noos - every feature on but FreeRTOS: the bare-metal and Zephyr branches.
+// Features: all-noos - every feature on; no FreeRTOS: the bare-metal and Zephyr branches.
 // Written by harness.host.matrix from alxConfig_TEMPLATE.h; do not edit, run
 // `python -m harness.host.matrix` from Test/ instead.
 #define ALX_CMSIS_DSP
