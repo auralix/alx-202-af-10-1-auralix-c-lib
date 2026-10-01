@@ -277,7 +277,7 @@ static void dhcp_task(void *argument)
 						else if (retval == DHCP_FAILED)
 						{
 							dhcp_ip_leased_until = 0;
-							ALX_NET_TRACE_WRN("DHCP timeout occurred, retry: %d", dhcp_retry);
+							ALX_NET_TRACE_WRN("DHCP timeout occurred, retry: %" PRIu32, dhcp_retry);
 							(void)dhcp_retry;
 						}
 					}
@@ -1611,7 +1611,7 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 		uint32_t ip_uint = dns_resolve_wiznet(me, hostname);
 		if (ip_uint != 0)
 		{
-			sprintf(ip, "%lu.%lu.%lu.%lu", ip_uint & 0xff, (ip_uint >> 8) & 0xff, (ip_uint >> 16) & 0xff, ip_uint >> 24);
+			sprintf(ip, "%" PRIu32 ".%" PRIu32 ".%" PRIu32 ".%" PRIu32, ip_uint & 0xff, (ip_uint >> 8) & 0xff, (ip_uint >> 16) & 0xff, ip_uint >> 24);
 			AlxOsMutex_Unlock(&me->alxMutex);
 			return Alx_Ok;
 		}
