@@ -376,7 +376,7 @@ static void AlxLp586x_RegStruct_SetI2cAddrOffset(AlxLp586x* me)
 	}
 
 	// 0x0C-0x29: Dot group-select for L0...L5, CS0...CS17
-	for (int i = 0; i < 30; ++i)
+	for (uint32_t i = 0; i < 30; ++i)
 	{
 		me->reg._dot_grp_sel[i].i2cAddr_Offset		= 0x00;
 	}
@@ -442,7 +442,7 @@ static void AlxLp586x_RegStruct_SetAddr(AlxLp586x* me)
 	}
 
 	// 0x0C-0x29: Dot group-select for L0...L5, CS0...CS17
-	for (int i = 0; i < 30; ++i)
+	for (uint32_t i = 0; i < 30; ++i)
 	{
 		me->reg._dot_grp_sel[i].addr			= (uint8_t)(0x0C + i);
 	}
@@ -508,7 +508,7 @@ static void AlxLp586x_RegStruct_SetLen(AlxLp586x* me)
 	}
 
 	// 0x0C-0x29: Dot group-select for L0...L5, CS0...CS17
-	for (int i = 0; i < 30; ++i)
+	for (uint32_t i = 0; i < 30; ++i)
 	{
 		// Each entry is exactly one byte
 		me->reg._dot_grp_sel[i].len				= sizeof(me->reg._dot_grp_sel[i].val);
@@ -575,7 +575,7 @@ static void AlxLp586x_RegStruct_SetValToZero(AlxLp586x* me)
 	}
 
 	// 0x0C-0x29: Dot group-select for L0...L5, CS0...CS17
-	for (int i = 0; i < 30; ++i)
+	for (uint32_t i = 0; i < 30; ++i)
 	{
 		memset(&me->reg._dot_grp_sel[i].val.raw,	0x00, sizeof(me->reg._dot_grp_sel[i].val.raw));
 	}
@@ -643,7 +643,7 @@ static void AlxLp586x_RegStruct_SetValToDefault(AlxLp586x* me)
 	}
 
 	// Dot group selects (0x0C-0x29): all 0x00
-	for (int i = 0; i < 30; ++i)
+	for (uint32_t i = 0; i < 30; ++i)
 	{
 		memset(&me->reg._dot_grp_sel[i].val.raw,	0x00, sizeof(me->reg._dot_grp_sel[i].val.raw));
 	}
@@ -737,7 +737,7 @@ Alx_Status AlxLp586x_RegStruct_Write(AlxLp586x* me)
 	}
 
 	// Set Pwm Group
-	for (int i = 0; i < 30; ++i)
+	for (uint32_t i = 0; i < 30; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._dot_grp_sel[i]);
 		if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
