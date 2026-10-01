@@ -42,7 +42,7 @@
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		int32_t x_20bit;
 		int32_t y_20bit;
