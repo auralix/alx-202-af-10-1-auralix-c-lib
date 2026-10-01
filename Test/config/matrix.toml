@@ -56,6 +56,12 @@ includes = ["host/shim/stm32", "host/shim/cmsis"]
 defines = ["STM32F413xx"]
 flags = ["-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"]
 
+[platform.stm32f4-f446]
+description = "STM32F4, Cortex-M4F, the STM32F446xx part"
+includes = ["host/shim/stm32", "host/shim/cmsis"]
+defines = ["STM32F446xx"]
+flags = ["-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"]
+
 [platform.stm32l4-l4r5]
 description = "STM32L4+, Cortex-M4F, the STM32L4R5xx part"
 includes = ["host/shim/stm32", "host/shim/cmsis"]
@@ -3116,3 +3122,21 @@ features = "all-nomcuboot"
 target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4+, the STM32L4R5xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
+id = "0326"
+toolchain = "gcc"
+platform = "stm32f4-f446"
+features = "all-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32F4, the STM32F446xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
+id = "0327"
+toolchain = "clang"
+platform = "stm32f4-f446"
+features = "all-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32F4, the STM32F446xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
