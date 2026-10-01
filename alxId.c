@@ -243,8 +243,6 @@ void AlxId_Ctor
 		me->fwComp.verPatch = __clang_patchlevel__;
 		me->fwComp.ver = ALX_xVER3(__clang_major__, __clang_minor__, __clang_patchlevel__);
 		me->fwComp.verMinRequired = ALX_COMP_CLANG_VER_MIN_REQUIRED;
-	#else
-		strcpy(me->fwComp.name, "Unknown");
 	#endif
 
 
