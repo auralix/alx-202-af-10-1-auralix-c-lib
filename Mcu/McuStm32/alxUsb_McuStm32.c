@@ -255,7 +255,9 @@ Alx_Status AlxUsb_DeInit(AlxUsb* me)
 
 	// Clear
 	me->usbh_event = 0;
+	#if defined(ALX_USBH)
 	memset(&me->usbhMsc_info, 0, sizeof(me->usbhMsc_info));
+	#endif
 	me->usbhMsc_isReady = false;
 	me->blockCount = 0;
 	me->blockLen_byte = 0;
@@ -534,7 +536,9 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 
 	// Clear
 	me->usbh_event = 0;
+	#if defined(ALX_USBH)
 	memset(&me->usbhMsc_info, 0, sizeof(me->usbhMsc_info));
+	#endif
 	me->usbhMsc_isReady = false;
 	me->blockCount = 0;
 	me->blockLen_byte = 0;
