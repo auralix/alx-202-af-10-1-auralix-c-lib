@@ -56,7 +56,6 @@ static void AlxAds8678_RegStruct_SetAddr(AlxAds8678* me);
 static void AlxAds8678_RegStruct_SetLen(AlxAds8678* me);
 static void AlxAds8678_RegStruct_SetValToZero(AlxAds8678* me);
 static void AlxAds8678_RegStruct_SetToDefault(AlxAds8678* me);
-static Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg);
 static Alx_Status AlxAds8678_Reg_Write(AlxAds8678* me, void* reg);
 static Alx_Status AlxAds8678_Reg_WriteAll(AlxAds8678* me);
 static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, uint8_t* dataReadArr);
@@ -400,42 +399,6 @@ static void AlxAds8678_RegStruct_SetToDefault(AlxAds8678* me)
 	me->reg._0x0A_Channel5InputRange		.val.raw =	0x00;
 	me->reg._0x0B_Channel6InputRange		.val.raw =	0x00;
 	me->reg._0x0C_Channel7InputRange		.val.raw =	0x00;
-}
-static Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)
-{
-	// Local variables
-	Alx_Status status = Alx_Err;
-	uint8_t regAddr = *((uint8_t*)reg);
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
-	uint8_t dataWriteArr[3] = {};
-	uint8_t dataReadArr[3] = {};
-
-	// Assert CS
-	AlxSpi_Master_AssertCs(me->spi);
-
-	// Prepare
-	dataWriteArr[0] = (regAddr << 1) | 0x00;	// Register address and read/write info - LSB must be set to 0 for read operation
-	dataWriteArr[1] = 0x00;						// Dummy byte
-	dataWriteArr[2] = 0x00;						// Dummy byte
-
-	// Read
-	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, sizeof(dataWriteArr), me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok)
-	{
-		AlxSpi_Master_DeAssertCs(me->spi);
-		ALX_ADS8678_TRACE_ERR("Err");
-		return status;
-	}
-
-	// DeAssert CS
-	AlxSpi_Master_DeAssertCs(me->spi);
-
-	// Set
-	*regValPtr = dataReadArr[2];
-
-	// Return
-	return Alx_Ok;
 }
 static Alx_Status AlxAds8678_Reg_Write(AlxAds8678* me, void* reg)
 {
