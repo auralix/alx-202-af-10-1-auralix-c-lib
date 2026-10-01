@@ -84,7 +84,10 @@ def _library_files(suffixes: tuple[str, ...]) -> list[Path]:
 
 
 def sources() -> list[Path]:
-    """Every C file Auralix wrote, and the headers only others include: alxInc.h (products), mcuboot_logging.h (MCUboot)."""
+    """Every C file Auralix wrote, and the headers only others include.
+
+    alxInc.h is included by products, mcuboot_logging.h by MCUboot.
+    """
     return [*_library_files((".c",)), CLIB / "alxInc.h", CLIB / "mcuboot" / "mcuboot_config" / "mcuboot_logging.h"]
 
 
@@ -211,8 +214,8 @@ def fragments(text: str | None = None) -> dict[str, str]:
         return [f"#define {name}" for name in platform_names if name == switch or name.startswith(f"{switch}_")]
 
     for word in TARGET_PLATFORMS:
-        out[f"platform/{word}.h"] = _fragment(
-            "platform", word, f"ALX_{word.upper()}, with the minimum versions the template states", platform_lines(word))
+        what = f"ALX_{word.upper()}, with the minimum versions the template states"
+        out[f"platform/{word}.h"] = _fragment("platform", word, what, platform_lines(word))
     for word, (base, what) in PLATFORM_VARIANTS.items():
         out[f"platform/{word}.h"] = _fragment("platform", word, f"ALX_{base.upper()} {what}", platform_lines(base))
     out["platform/host.h"] = _fragment(
