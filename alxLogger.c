@@ -168,7 +168,7 @@ Alx_Status AlxLogger_Init(AlxLogger* me)
 	char numOfLogsToProcess_str[ALX_LOGGER_RESULT_STR_LEN_MAX] = "";
 
 	// Trace
-	ALX_LOGGER_TRACE_INF("");
+	ALX_LOGGER_TRACE_INF("%s", "");
 	ALX_LOGGER_TRACE_INF("AlxLogger - Init started");
 
 	// Prepare FS
@@ -1440,7 +1440,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles
 	//------------------------------------------------------------------------------
 
 	// Trace
-	ALX_LOGGER_TRACE_INF("");
+	ALX_LOGGER_TRACE_INF("%s", "");
 	ALX_LOGGER_TRACE_INF("AlxLogger - Started creating dir & files");
 
 	// Start timer

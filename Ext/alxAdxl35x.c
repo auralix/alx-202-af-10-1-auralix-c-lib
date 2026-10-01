@@ -880,13 +880,13 @@ static Alx_Status AlxAdxl35x_TraceId(AlxAdxl35x* me)
 	}
 
 	// Trace
-	ALX_ADXL35X_TRACE_DBG("");
+	ALX_ADXL35X_TRACE_DBG("%s", "");
 	ALX_ADXL35X_TRACE_DBG("AlxAdxl35x.h - Trace");
 	ALX_ADXL35X_TRACE_DBG("- DEVID_AD: 0x%02X", me->reg._0x00_DEVID_AD.val.DEVID_AD);
 	ALX_ADXL35X_TRACE_DBG("- DEVID_MST: 0x%02X", me->reg._0x01_DEVID_MST.val.DEVID_MST);
 	ALX_ADXL35X_TRACE_DBG("- PARTID: 0x%02X", me->reg._0x02_PARTID.val.PARTID);
 	ALX_ADXL35X_TRACE_DBG("- REVID: 0x%02X", me->reg._0x03_REVID.val.REVID);
-	ALX_ADXL35X_TRACE_DBG("");
+	ALX_ADXL35X_TRACE_DBG("%s", "");
 
 	if ((me->reg._0x00_DEVID_AD.val.DEVID_AD == 0xAD) &&
 		(me->reg._0x01_DEVID_MST.val.DEVID_MST == 0x1D) &&

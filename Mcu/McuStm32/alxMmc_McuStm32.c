@@ -545,7 +545,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	Alx_Status statusAlx = Alx_Err;
 
 	// Trace
-	ALX_MMC_TRACE_INF("");
+	ALX_MMC_TRACE_INF("%s", "");
 	ALX_MMC_TRACE_INF("AlxMmc_Init - START");
 
 	// Init GPIO

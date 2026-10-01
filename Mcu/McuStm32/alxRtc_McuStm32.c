@@ -194,7 +194,7 @@ Alx_Status AlxRtc_Init(AlxRtc* me)
 	ALX_RTC_ASSERT(me->isInit == false);
 
 	// Trace
-	ALX_RTC_TRACE_INF("");
+	ALX_RTC_TRACE_INF("%s", "");
 	ALX_RTC_TRACE_INF("AlxRtc - Init started");
 
 	// Clear isErr
