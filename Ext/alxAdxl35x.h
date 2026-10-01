@@ -365,7 +365,7 @@ typedef union
 {
 	struct ALX_PACKED
 	{
-		AlxAdxl35x_RegEnum_0x2C_Range Range : 2;
+		uint8_t Range : 2;	// AlxAdxl35x_RegEnum_0x2C_Range
 		uint8_t unused_3_7 : 4;
 		AlxAdxl35x_RegEnum_0x2C_INT_POL INT_POL : 1;
 		AlxAdxl35x_RegEnum_0x2C_I2C_HS I2C_HS : 1;
