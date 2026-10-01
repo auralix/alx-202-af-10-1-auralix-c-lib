@@ -1069,7 +1069,6 @@ static status_t AlxI2c_MasterStop(AlxI2c* me, I2C_Type *base, uint16_t timeout)
 }
 static uint32_t AlxI2c_PendingStatusWait(AlxI2c* me, I2C_Type* base, uint16_t timeout)
 {
-	status_t result = kStatus_Success;
 	uint32_t status;
 
 	do
@@ -1083,16 +1082,6 @@ static uint32_t AlxI2c_PendingStatusWait(AlxI2c* me, I2C_Type* base, uint16_t ti
 
 		status = I2C_GetStatusFlags(base);
 	} while ((status & (uint32_t)kI2C_MasterPendingFlag) == 0U);
-
-	if ((status & (uint32_t)kI2C_MasterArbitrationLostFlag) != 0U)
-	{
-		result = kStatus_I2C_ArbitrationLost;
-	}
-
-	if ((status & (uint32_t)kI2C_MasterStartStopErrorFlag) != 0U)
-	{
-		result = kStatus_I2C_StartStopError;
-	}
 
 	/* Clear controller state. */
 	I2C_ClearStatusFlags(base, (uint32_t)kI2C_MasterAllClearFlags | (uint32_t)kI2C_EventTimeoutFlag | (uint32_t)kI2C_SclTimeoutFlag);
