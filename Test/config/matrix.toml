@@ -112,6 +112,8 @@ flags = ["-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"]
 description = "the PC the host lanes run on, compiled for its 32-bit form"
 host = true
 includes = ["host/shim/cmsis"]
+# alxAssert.c, alxBoot.c and alxIrq.c call the CMSIS core without a platform header to bring it
+flags = ["-include", "cmsisHostShim.h"]
 
 [[exempt]]
 file = "*"
@@ -127,76 +129,49 @@ why = "an unfinished backend: its _TODO guard keeps it out of every build (decis
 id = "0001"
 toolchain = "gcc"
 platform = "stm32f0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
 id = "0002"
 toolchain = "gcc"
 platform = "stm32f0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-dbg"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
 id = "0003"
 toolchain = "gcc"
 platform = "stm32f0"
-features = "all"
-target = "app-fwup"
+features = "all-cellular-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
 id = "0004"
 toolchain = "gcc"
 platform = "stm32f0"
-features = "all"
-target = "app-noboot"
+features = "all-lwip-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
 id = "0005"
 toolchain = "gcc"
 platform = "stm32f0"
-features = "all"
-target = "boot-debug"
+features = "all-noos-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
 id = "0006"
-toolchain = "gcc"
-platform = "stm32f0"
-features = "all-cellular"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0007"
-toolchain = "gcc"
-platform = "stm32f0"
-features = "all-lwip"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0008"
-toolchain = "gcc"
-platform = "stm32f0"
-features = "all-noos"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0009"
 toolchain = "gcc"
 platform = "stm32f0"
 features = "none"
@@ -205,34 +180,34 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0010"
+id = "0007"
 toolchain = "gcc"
 platform = "stm32f0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-rst-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0011"
+id = "0008"
 toolchain = "gcc"
 platform = "stm32f0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-trace-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0012"
+id = "0009"
 toolchain = "gcc"
 platform = "stm32f0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-off-assert-none-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0013"
+id = "0010"
 toolchain = "gcc"
 platform = "stm32f0"
 features = "none"
@@ -241,79 +216,52 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F0, Cortex-M0, the STM32F030x8 part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
+id = "0011"
+toolchain = "clang"
+platform = "stm32f0"
+features = "all-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
+id = "0012"
+toolchain = "clang"
+platform = "stm32f0"
+features = "all-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-dbg"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
+
+[[row]]
+id = "0013"
+toolchain = "clang"
+platform = "stm32f0"
+features = "all-cellular-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
 id = "0014"
 toolchain = "clang"
 platform = "stm32f0"
-features = "all"
-target = "app-debug"
+features = "all-lwip-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
 id = "0015"
 toolchain = "clang"
 platform = "stm32f0"
-features = "all"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-dbg"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
+features = "all-noos-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
 id = "0016"
-toolchain = "clang"
-platform = "stm32f0"
-features = "all"
-target = "app-fwup"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0017"
-toolchain = "clang"
-platform = "stm32f0"
-features = "all"
-target = "app-noboot"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0018"
-toolchain = "clang"
-platform = "stm32f0"
-features = "all"
-target = "boot-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0019"
-toolchain = "clang"
-platform = "stm32f0"
-features = "all-cellular"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0020"
-toolchain = "clang"
-platform = "stm32f0"
-features = "all-lwip"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0021"
-toolchain = "clang"
-platform = "stm32f0"
-features = "all-noos"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0022"
 toolchain = "clang"
 platform = "stm32f0"
 features = "none"
@@ -322,34 +270,34 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0023"
+id = "0017"
 toolchain = "clang"
 platform = "stm32f0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-rst-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0024"
+id = "0018"
 toolchain = "clang"
 platform = "stm32f0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-trace-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0025"
+id = "0019"
 toolchain = "clang"
 platform = "stm32f0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-off-assert-none-opt-none"
-description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
+description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0026"
+id = "0020"
 toolchain = "clang"
 platform = "stm32f0"
 features = "none"
@@ -358,79 +306,52 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F0, Cortex-M0, the STM32F030x8 part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0027"
+id = "0021"
 toolchain = "gcc"
 platform = "stm32f1"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0028"
+id = "0022"
 toolchain = "gcc"
 platform = "stm32f1"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-dbg"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0029"
+id = "0023"
 toolchain = "gcc"
 platform = "stm32f1"
-features = "all"
-target = "app-fwup"
+features = "all-cellular-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0030"
+id = "0024"
 toolchain = "gcc"
 platform = "stm32f1"
-features = "all"
-target = "app-noboot"
+features = "all-lwip-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0031"
+id = "0025"
 toolchain = "gcc"
 platform = "stm32f1"
-features = "all"
-target = "boot-debug"
+features = "all-noos-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0032"
-toolchain = "gcc"
-platform = "stm32f1"
-features = "all-cellular"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0033"
-toolchain = "gcc"
-platform = "stm32f1"
-features = "all-lwip"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0034"
-toolchain = "gcc"
-platform = "stm32f1"
-features = "all-noos"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0035"
+id = "0026"
 toolchain = "gcc"
 platform = "stm32f1"
 features = "none"
@@ -439,34 +360,34 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0036"
+id = "0027"
 toolchain = "gcc"
 platform = "stm32f1"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-rst-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0037"
+id = "0028"
 toolchain = "gcc"
 platform = "stm32f1"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-trace-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0038"
+id = "0029"
 toolchain = "gcc"
 platform = "stm32f1"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-off-assert-none-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0039"
+id = "0030"
 toolchain = "gcc"
 platform = "stm32f1"
 features = "none"
@@ -475,79 +396,52 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F1, Cortex-M3, the STM32F103xB part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0040"
+id = "0031"
 toolchain = "clang"
 platform = "stm32f1"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0041"
+id = "0032"
 toolchain = "clang"
 platform = "stm32f1"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-dbg"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0042"
+id = "0033"
 toolchain = "clang"
 platform = "stm32f1"
-features = "all"
-target = "app-fwup"
+features = "all-cellular-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0043"
+id = "0034"
 toolchain = "clang"
 platform = "stm32f1"
-features = "all"
-target = "app-noboot"
+features = "all-lwip-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0044"
+id = "0035"
 toolchain = "clang"
 platform = "stm32f1"
-features = "all"
-target = "boot-debug"
+features = "all-noos-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0045"
-toolchain = "clang"
-platform = "stm32f1"
-features = "all-cellular"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0046"
-toolchain = "clang"
-platform = "stm32f1"
-features = "all-lwip"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0047"
-toolchain = "clang"
-platform = "stm32f1"
-features = "all-noos"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0048"
+id = "0036"
 toolchain = "clang"
 platform = "stm32f1"
 features = "none"
@@ -556,34 +450,34 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0049"
+id = "0037"
 toolchain = "clang"
 platform = "stm32f1"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-rst-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0050"
+id = "0038"
 toolchain = "clang"
 platform = "stm32f1"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-trace-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0051"
+id = "0039"
 toolchain = "clang"
 platform = "stm32f1"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-off-assert-none-opt-none"
-description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
+description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0052"
+id = "0040"
 toolchain = "clang"
 platform = "stm32f1"
 features = "none"
@@ -592,7 +486,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F1, Cortex-M3, the STM32F103xB part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0053"
+id = "0041"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all"
@@ -601,7 +495,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0054"
+id = "0042"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all"
@@ -610,7 +504,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0055"
+id = "0043"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all"
@@ -619,7 +513,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0056"
+id = "0044"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all"
@@ -628,7 +522,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0057"
+id = "0045"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all"
@@ -637,7 +531,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0058"
+id = "0046"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all-cellular"
@@ -646,7 +540,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0059"
+id = "0047"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all-lwip"
@@ -655,7 +549,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0060"
+id = "0048"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all-noos"
@@ -664,7 +558,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0061"
+id = "0049"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "none"
@@ -673,7 +567,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0062"
+id = "0050"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all"
@@ -682,7 +576,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
 
 [[row]]
-id = "0063"
+id = "0051"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all"
@@ -691,7 +585,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
 
 [[row]]
-id = "0064"
+id = "0052"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "all"
@@ -700,7 +594,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
 
 [[row]]
-id = "0065"
+id = "0053"
 toolchain = "gcc"
 platform = "stm32f4"
 features = "none"
@@ -709,7 +603,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0066"
+id = "0054"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all"
@@ -718,7 +612,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0067"
+id = "0055"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all"
@@ -727,7 +621,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0068"
+id = "0056"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all"
@@ -736,7 +630,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0069"
+id = "0057"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all"
@@ -745,7 +639,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0070"
+id = "0058"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all"
@@ -754,7 +648,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0071"
+id = "0059"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all-cellular"
@@ -763,7 +657,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0072"
+id = "0060"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all-lwip"
@@ -772,7 +666,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0073"
+id = "0061"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all-noos"
@@ -781,7 +675,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0074"
+id = "0062"
 toolchain = "clang"
 platform = "stm32f4"
 features = "none"
@@ -790,7 +684,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0075"
+id = "0063"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all"
@@ -799,7 +693,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
 
 [[row]]
-id = "0076"
+id = "0064"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all"
@@ -808,7 +702,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
 
 [[row]]
-id = "0077"
+id = "0065"
 toolchain = "clang"
 platform = "stm32f4"
 features = "all"
@@ -817,7 +711,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
 
 [[row]]
-id = "0078"
+id = "0066"
 toolchain = "clang"
 platform = "stm32f4"
 features = "none"
@@ -826,7 +720,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F4, Cortex-M4F, the STM32F429xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0079"
+id = "0067"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all"
@@ -835,7 +729,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0080"
+id = "0068"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all"
@@ -844,7 +738,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0081"
+id = "0069"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all"
@@ -853,7 +747,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0082"
+id = "0070"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all"
@@ -862,7 +756,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0083"
+id = "0071"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all"
@@ -871,7 +765,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0084"
+id = "0072"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all-cellular"
@@ -880,7 +774,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0085"
+id = "0073"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all-lwip"
@@ -889,7 +783,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0086"
+id = "0074"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all-noos"
@@ -898,7 +792,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0087"
+id = "0075"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "none"
@@ -907,7 +801,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0088"
+id = "0076"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all"
@@ -916,7 +810,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
 
 [[row]]
-id = "0089"
+id = "0077"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all"
@@ -925,7 +819,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
 
 [[row]]
-id = "0090"
+id = "0078"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "all"
@@ -934,7 +828,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
 
 [[row]]
-id = "0091"
+id = "0079"
 toolchain = "gcc"
 platform = "stm32f7"
 features = "none"
@@ -943,7 +837,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0092"
+id = "0080"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all"
@@ -952,7 +846,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0093"
+id = "0081"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all"
@@ -961,7 +855,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0094"
+id = "0082"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all"
@@ -970,7 +864,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0095"
+id = "0083"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all"
@@ -979,7 +873,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0096"
+id = "0084"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all"
@@ -988,7 +882,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0097"
+id = "0085"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all-cellular"
@@ -997,7 +891,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0098"
+id = "0086"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all-lwip"
@@ -1006,7 +900,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0099"
+id = "0087"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all-noos"
@@ -1015,7 +909,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0100"
+id = "0088"
 toolchain = "clang"
 platform = "stm32f7"
 features = "none"
@@ -1024,7 +918,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0101"
+id = "0089"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all"
@@ -1033,7 +927,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
 
 [[row]]
-id = "0102"
+id = "0090"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all"
@@ -1042,7 +936,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
 
 [[row]]
-id = "0103"
+id = "0091"
 toolchain = "clang"
 platform = "stm32f7"
 features = "all"
@@ -1051,7 +945,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
 
 [[row]]
-id = "0104"
+id = "0092"
 toolchain = "clang"
 platform = "stm32f7"
 features = "none"
@@ -1060,79 +954,52 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32F7, Cortex-M7 with the double-precision FPU, the STM32F765xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0105"
+id = "0093"
 toolchain = "gcc"
 platform = "stm32g4"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0106"
+id = "0094"
 toolchain = "gcc"
 platform = "stm32g4"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-dbg"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0107"
+id = "0095"
 toolchain = "gcc"
 platform = "stm32g4"
-features = "all"
-target = "app-fwup"
+features = "all-cellular-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0108"
+id = "0096"
 toolchain = "gcc"
 platform = "stm32g4"
-features = "all"
-target = "app-noboot"
+features = "all-lwip-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0109"
+id = "0097"
 toolchain = "gcc"
 platform = "stm32g4"
-features = "all"
-target = "boot-debug"
+features = "all-noos-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0110"
-toolchain = "gcc"
-platform = "stm32g4"
-features = "all-cellular"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0111"
-toolchain = "gcc"
-platform = "stm32g4"
-features = "all-lwip"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0112"
-toolchain = "gcc"
-platform = "stm32g4"
-features = "all-noos"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0113"
+id = "0098"
 toolchain = "gcc"
 platform = "stm32g4"
 features = "none"
@@ -1141,34 +1008,34 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0114"
+id = "0099"
 toolchain = "gcc"
 platform = "stm32g4"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-rst-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0115"
+id = "0100"
 toolchain = "gcc"
 platform = "stm32g4"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-trace-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0116"
+id = "0101"
 toolchain = "gcc"
 platform = "stm32g4"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-off-assert-none-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0117"
+id = "0102"
 toolchain = "gcc"
 platform = "stm32g4"
 features = "none"
@@ -1177,79 +1044,52 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32G4, Cortex-M4F, the STM32G474xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0118"
+id = "0103"
 toolchain = "clang"
 platform = "stm32g4"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0119"
+id = "0104"
 toolchain = "clang"
 platform = "stm32g4"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-dbg"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0120"
+id = "0105"
 toolchain = "clang"
 platform = "stm32g4"
-features = "all"
-target = "app-fwup"
+features = "all-cellular-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0121"
+id = "0106"
 toolchain = "clang"
 platform = "stm32g4"
-features = "all"
-target = "app-noboot"
+features = "all-lwip-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0122"
+id = "0107"
 toolchain = "clang"
 platform = "stm32g4"
-features = "all"
-target = "boot-debug"
+features = "all-noos-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0123"
-toolchain = "clang"
-platform = "stm32g4"
-features = "all-cellular"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0124"
-toolchain = "clang"
-platform = "stm32g4"
-features = "all-lwip"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0125"
-toolchain = "clang"
-platform = "stm32g4"
-features = "all-noos"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0126"
+id = "0108"
 toolchain = "clang"
 platform = "stm32g4"
 features = "none"
@@ -1258,34 +1098,34 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0127"
+id = "0109"
 toolchain = "clang"
 platform = "stm32g4"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-rst-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0128"
+id = "0110"
 toolchain = "clang"
 platform = "stm32g4"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-trace-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0129"
+id = "0111"
 toolchain = "clang"
 platform = "stm32g4"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-off-assert-none-opt-none"
-description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
+description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0130"
+id = "0112"
 toolchain = "clang"
 platform = "stm32g4"
 features = "none"
@@ -1294,79 +1134,52 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32G4, Cortex-M4F, the STM32G474xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0131"
+id = "0113"
 toolchain = "gcc"
 platform = "stm32l0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0132"
+id = "0114"
 toolchain = "gcc"
 platform = "stm32l0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-dbg"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0133"
+id = "0115"
 toolchain = "gcc"
 platform = "stm32l0"
-features = "all"
-target = "app-fwup"
+features = "all-cellular-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0134"
+id = "0116"
 toolchain = "gcc"
 platform = "stm32l0"
-features = "all"
-target = "app-noboot"
+features = "all-lwip-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0135"
+id = "0117"
 toolchain = "gcc"
 platform = "stm32l0"
-features = "all"
-target = "boot-debug"
+features = "all-noos-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0136"
-toolchain = "gcc"
-platform = "stm32l0"
-features = "all-cellular"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0137"
-toolchain = "gcc"
-platform = "stm32l0"
-features = "all-lwip"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0138"
-toolchain = "gcc"
-platform = "stm32l0"
-features = "all-noos"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0139"
+id = "0118"
 toolchain = "gcc"
 platform = "stm32l0"
 features = "none"
@@ -1375,34 +1188,34 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0140"
+id = "0119"
 toolchain = "gcc"
 platform = "stm32l0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-rst-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0141"
+id = "0120"
 toolchain = "gcc"
 platform = "stm32l0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-trace-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0142"
+id = "0121"
 toolchain = "gcc"
 platform = "stm32l0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-off-assert-none-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0143"
+id = "0122"
 toolchain = "gcc"
 platform = "stm32l0"
 features = "none"
@@ -1411,79 +1224,52 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32L0, Cortex-M0+, the STM32L073xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0144"
+id = "0123"
 toolchain = "clang"
 platform = "stm32l0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0145"
+id = "0124"
 toolchain = "clang"
 platform = "stm32l0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-dbg"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0146"
+id = "0125"
 toolchain = "clang"
 platform = "stm32l0"
-features = "all"
-target = "app-fwup"
+features = "all-cellular-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0147"
+id = "0126"
 toolchain = "clang"
 platform = "stm32l0"
-features = "all"
-target = "app-noboot"
+features = "all-lwip-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0148"
+id = "0127"
 toolchain = "clang"
 platform = "stm32l0"
-features = "all"
-target = "boot-debug"
+features = "all-noos-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0149"
-toolchain = "clang"
-platform = "stm32l0"
-features = "all-cellular"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0150"
-toolchain = "clang"
-platform = "stm32l0"
-features = "all-lwip"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0151"
-toolchain = "clang"
-platform = "stm32l0"
-features = "all-noos"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0152"
+id = "0128"
 toolchain = "clang"
 platform = "stm32l0"
 features = "none"
@@ -1492,34 +1278,34 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0153"
+id = "0129"
 toolchain = "clang"
 platform = "stm32l0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-rst-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0154"
+id = "0130"
 toolchain = "clang"
 platform = "stm32l0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-trace-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0155"
+id = "0131"
 toolchain = "clang"
 platform = "stm32l0"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-off-assert-none-opt-none"
-description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
+description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0156"
+id = "0132"
 toolchain = "clang"
 platform = "stm32l0"
 features = "none"
@@ -1528,7 +1314,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32L0, Cortex-M0+, the STM32L073xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0157"
+id = "0133"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all"
@@ -1537,7 +1323,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0158"
+id = "0134"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all"
@@ -1546,7 +1332,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0159"
+id = "0135"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all"
@@ -1555,7 +1341,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0160"
+id = "0136"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all"
@@ -1564,7 +1350,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0161"
+id = "0137"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all"
@@ -1573,7 +1359,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0162"
+id = "0138"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all-cellular"
@@ -1582,7 +1368,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0163"
+id = "0139"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all-lwip"
@@ -1591,7 +1377,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0164"
+id = "0140"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all-noos"
@@ -1600,7 +1386,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0165"
+id = "0141"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "none"
@@ -1609,7 +1395,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0166"
+id = "0142"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all"
@@ -1618,7 +1404,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
 
 [[row]]
-id = "0167"
+id = "0143"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all"
@@ -1627,7 +1413,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
 
 [[row]]
-id = "0168"
+id = "0144"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "all"
@@ -1636,7 +1422,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
 
 [[row]]
-id = "0169"
+id = "0145"
 toolchain = "gcc"
 platform = "stm32l4"
 features = "none"
@@ -1645,7 +1431,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0170"
+id = "0146"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all"
@@ -1654,7 +1440,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0171"
+id = "0147"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all"
@@ -1663,7 +1449,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0172"
+id = "0148"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all"
@@ -1672,7 +1458,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0173"
+id = "0149"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all"
@@ -1681,7 +1467,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0174"
+id = "0150"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all"
@@ -1690,7 +1476,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0175"
+id = "0151"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all-cellular"
@@ -1699,7 +1485,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0176"
+id = "0152"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all-lwip"
@@ -1708,7 +1494,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0177"
+id = "0153"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all-noos"
@@ -1717,7 +1503,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0178"
+id = "0154"
 toolchain = "clang"
 platform = "stm32l4"
 features = "none"
@@ -1726,7 +1512,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0179"
+id = "0155"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all"
@@ -1735,7 +1521,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
 
 [[row]]
-id = "0180"
+id = "0156"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all"
@@ -1744,7 +1530,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
 
 [[row]]
-id = "0181"
+id = "0157"
 toolchain = "clang"
 platform = "stm32l4"
 features = "all"
@@ -1753,7 +1539,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
 
 [[row]]
-id = "0182"
+id = "0158"
 toolchain = "clang"
 platform = "stm32l4"
 features = "none"
@@ -1762,79 +1548,52 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32L4, Cortex-M4F, the STM32L476xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0183"
+id = "0159"
 toolchain = "gcc"
 platform = "stm32u5"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0184"
+id = "0160"
 toolchain = "gcc"
 platform = "stm32u5"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-dbg"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0185"
+id = "0161"
 toolchain = "gcc"
 platform = "stm32u5"
-features = "all"
-target = "app-fwup"
+features = "all-cellular-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0186"
+id = "0162"
 toolchain = "gcc"
 platform = "stm32u5"
-features = "all"
-target = "app-noboot"
+features = "all-lwip-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0187"
+id = "0163"
 toolchain = "gcc"
 platform = "stm32u5"
-features = "all"
-target = "boot-debug"
+features = "all-noos-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0188"
-toolchain = "gcc"
-platform = "stm32u5"
-features = "all-cellular"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0189"
-toolchain = "gcc"
-platform = "stm32u5"
-features = "all-lwip"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0190"
-toolchain = "gcc"
-platform = "stm32u5"
-features = "all-noos"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0191"
+id = "0164"
 toolchain = "gcc"
 platform = "stm32u5"
 features = "none"
@@ -1843,34 +1602,34 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0192"
+id = "0165"
 toolchain = "gcc"
 platform = "stm32u5"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-rst-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0193"
+id = "0166"
 toolchain = "gcc"
 platform = "stm32u5"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-trace-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0194"
+id = "0167"
 toolchain = "gcc"
 platform = "stm32u5"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-off-assert-none-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0195"
+id = "0168"
 toolchain = "gcc"
 platform = "stm32u5"
 features = "none"
@@ -1879,79 +1638,52 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32U5, Cortex-M33F, the STM32U575xx part, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0196"
+id = "0169"
 toolchain = "clang"
 platform = "stm32u5"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0197"
+id = "0170"
 toolchain = "clang"
 platform = "stm32u5"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-dbg"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace at VRB, BKPT asserts, every module option on"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0198"
+id = "0171"
 toolchain = "clang"
 platform = "stm32u5"
-features = "all"
-target = "app-fwup"
+features = "all-cellular-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; the application (boot role A), firmware-update build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0199"
+id = "0172"
 toolchain = "clang"
 platform = "stm32u5"
-features = "all"
-target = "app-noboot"
+features = "all-lwip-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; the application (boot role A) built to run without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0200"
+id = "0173"
 toolchain = "clang"
 platform = "stm32u5"
-features = "all"
-target = "boot-debug"
+features = "all-noos-nomcuboot"
+target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; the bootloader (boot role B), debug build; every trace at VRB and BKPT asserts: every argument compiled"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0201"
-toolchain = "clang"
-platform = "stm32u5"
-features = "all-cellular"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through the FreeRTOS cellular interface; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0202"
-toolchain = "clang"
-platform = "stm32u5"
-features = "all-lwip"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through lwIP; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0203"
-toolchain = "clang"
-platform = "stm32u5"
-features = "all-noos"
-target = "app-debug"
-library = "trace-vrb-assert-bkpt-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; the application (boot role A), debug build; every trace at VRB and BKPT asserts: every argument compiled"
-
-[[row]]
-id = "0204"
+id = "0174"
 toolchain = "clang"
 platform = "stm32u5"
 features = "none"
@@ -1960,34 +1692,34 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0205"
+id = "0175"
 toolchain = "clang"
 platform = "stm32u5"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-rst-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; the template as shipped"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0206"
+id = "0176"
 toolchain = "clang"
 platform = "stm32u5"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-inf-assert-trace-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; TRACE asserts"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0207"
+id = "0177"
 toolchain = "clang"
 platform = "stm32u5"
-features = "all"
-target = "app-debug"
+features = "all-nomcuboot"
+target = "none"
 library = "trace-off-assert-none-opt-none"
-description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; the application (boot role A), debug build; every trace and every assert elided"
+description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0208"
+id = "0178"
 toolchain = "clang"
 platform = "stm32u5"
 features = "none"
@@ -1996,7 +1728,7 @@ library = "trace-off-assert-none-opt-none"
 description = "STM32U5, Cortex-M33F, the STM32U575xx part, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0209"
+id = "0179"
 toolchain = "gcc"
 platform = "lpc17xx"
 features = "all-nomcuboot"
@@ -2005,7 +1737,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0210"
+id = "0180"
 toolchain = "gcc"
 platform = "lpc17xx"
 features = "all-nomcuboot"
@@ -2014,7 +1746,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "LPC17xx (LPCOpen), Cortex-M3, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0211"
+id = "0181"
 toolchain = "gcc"
 platform = "lpc17xx"
 features = "all-cellular-nomcuboot"
@@ -2023,7 +1755,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0212"
+id = "0182"
 toolchain = "gcc"
 platform = "lpc17xx"
 features = "all-lwip-nomcuboot"
@@ -2032,7 +1764,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0213"
+id = "0183"
 toolchain = "gcc"
 platform = "lpc17xx"
 features = "all-noos-nomcuboot"
@@ -2041,7 +1773,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0214"
+id = "0184"
 toolchain = "gcc"
 platform = "lpc17xx"
 features = "none"
@@ -2050,7 +1782,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0215"
+id = "0185"
 toolchain = "gcc"
 platform = "lpc17xx"
 features = "all-nomcuboot"
@@ -2059,7 +1791,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0216"
+id = "0186"
 toolchain = "gcc"
 platform = "lpc17xx"
 features = "all-nomcuboot"
@@ -2068,7 +1800,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0217"
+id = "0187"
 toolchain = "gcc"
 platform = "lpc17xx"
 features = "all-nomcuboot"
@@ -2077,7 +1809,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0218"
+id = "0188"
 toolchain = "gcc"
 platform = "lpc17xx"
 features = "none"
@@ -2086,7 +1818,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0219"
+id = "0189"
 toolchain = "clang"
 platform = "lpc17xx"
 features = "all-nomcuboot"
@@ -2095,7 +1827,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0220"
+id = "0190"
 toolchain = "clang"
 platform = "lpc17xx"
 features = "all-nomcuboot"
@@ -2104,7 +1836,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "LPC17xx (LPCOpen), Cortex-M3, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0221"
+id = "0191"
 toolchain = "clang"
 platform = "lpc17xx"
 features = "all-cellular-nomcuboot"
@@ -2113,7 +1845,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0222"
+id = "0192"
 toolchain = "clang"
 platform = "lpc17xx"
 features = "all-lwip-nomcuboot"
@@ -2122,7 +1854,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0223"
+id = "0193"
 toolchain = "clang"
 platform = "lpc17xx"
 features = "all-noos-nomcuboot"
@@ -2131,7 +1863,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0224"
+id = "0194"
 toolchain = "clang"
 platform = "lpc17xx"
 features = "none"
@@ -2140,7 +1872,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0225"
+id = "0195"
 toolchain = "clang"
 platform = "lpc17xx"
 features = "all-nomcuboot"
@@ -2149,7 +1881,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0226"
+id = "0196"
 toolchain = "clang"
 platform = "lpc17xx"
 features = "all-nomcuboot"
@@ -2158,7 +1890,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0227"
+id = "0197"
 toolchain = "clang"
 platform = "lpc17xx"
 features = "all-nomcuboot"
@@ -2167,7 +1899,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0228"
+id = "0198"
 toolchain = "clang"
 platform = "lpc17xx"
 features = "none"
@@ -2176,7 +1908,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC17xx (LPCOpen), Cortex-M3, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0229"
+id = "0199"
 toolchain = "gcc"
 platform = "lpc55s6x"
 features = "all-nomcuboot"
@@ -2185,7 +1917,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0230"
+id = "0200"
 toolchain = "gcc"
 platform = "lpc55s6x"
 features = "all-nomcuboot"
@@ -2194,7 +1926,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0231"
+id = "0201"
 toolchain = "gcc"
 platform = "lpc55s6x"
 features = "all-cellular-nomcuboot"
@@ -2203,7 +1935,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0232"
+id = "0202"
 toolchain = "gcc"
 platform = "lpc55s6x"
 features = "all-lwip-nomcuboot"
@@ -2212,7 +1944,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0233"
+id = "0203"
 toolchain = "gcc"
 platform = "lpc55s6x"
 features = "all-noos-nomcuboot"
@@ -2221,7 +1953,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0234"
+id = "0204"
 toolchain = "gcc"
 platform = "lpc55s6x"
 features = "none"
@@ -2230,7 +1962,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0235"
+id = "0205"
 toolchain = "gcc"
 platform = "lpc55s6x"
 features = "all-nomcuboot"
@@ -2239,7 +1971,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0236"
+id = "0206"
 toolchain = "gcc"
 platform = "lpc55s6x"
 features = "all-nomcuboot"
@@ -2248,7 +1980,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0237"
+id = "0207"
 toolchain = "gcc"
 platform = "lpc55s6x"
 features = "all-nomcuboot"
@@ -2257,7 +1989,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0238"
+id = "0208"
 toolchain = "gcc"
 platform = "lpc55s6x"
 features = "none"
@@ -2266,7 +1998,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0239"
+id = "0209"
 toolchain = "clang"
 platform = "lpc55s6x"
 features = "all-nomcuboot"
@@ -2275,7 +2007,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0240"
+id = "0210"
 toolchain = "clang"
 platform = "lpc55s6x"
 features = "all-nomcuboot"
@@ -2284,7 +2016,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0241"
+id = "0211"
 toolchain = "clang"
 platform = "lpc55s6x"
 features = "all-cellular-nomcuboot"
@@ -2293,7 +2025,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0242"
+id = "0212"
 toolchain = "clang"
 platform = "lpc55s6x"
 features = "all-lwip-nomcuboot"
@@ -2302,7 +2034,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0243"
+id = "0213"
 toolchain = "clang"
 platform = "lpc55s6x"
 features = "all-noos-nomcuboot"
@@ -2311,7 +2043,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0244"
+id = "0214"
 toolchain = "clang"
 platform = "lpc55s6x"
 features = "none"
@@ -2320,7 +2052,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0245"
+id = "0215"
 toolchain = "clang"
 platform = "lpc55s6x"
 features = "all-nomcuboot"
@@ -2329,7 +2061,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0246"
+id = "0216"
 toolchain = "clang"
 platform = "lpc55s6x"
 features = "all-nomcuboot"
@@ -2338,7 +2070,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0247"
+id = "0217"
 toolchain = "clang"
 platform = "lpc55s6x"
 features = "all-nomcuboot"
@@ -2347,7 +2079,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0248"
+id = "0218"
 toolchain = "clang"
 platform = "lpc55s6x"
 features = "none"
@@ -2356,7 +2088,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC55S6x (MCUXpresso SDK), Cortex-M33F, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0249"
+id = "0219"
 toolchain = "gcc"
 platform = "lpc80x"
 features = "all-nomcuboot"
@@ -2365,7 +2097,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0250"
+id = "0220"
 toolchain = "gcc"
 platform = "lpc80x"
 features = "all-nomcuboot"
@@ -2374,7 +2106,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0251"
+id = "0221"
 toolchain = "gcc"
 platform = "lpc80x"
 features = "all-cellular-nomcuboot"
@@ -2383,7 +2115,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0252"
+id = "0222"
 toolchain = "gcc"
 platform = "lpc80x"
 features = "all-lwip-nomcuboot"
@@ -2392,7 +2124,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0253"
+id = "0223"
 toolchain = "gcc"
 platform = "lpc80x"
 features = "all-noos-nomcuboot"
@@ -2401,7 +2133,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0254"
+id = "0224"
 toolchain = "gcc"
 platform = "lpc80x"
 features = "none"
@@ -2410,7 +2142,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0255"
+id = "0225"
 toolchain = "gcc"
 platform = "lpc80x"
 features = "all-nomcuboot"
@@ -2419,7 +2151,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0256"
+id = "0226"
 toolchain = "gcc"
 platform = "lpc80x"
 features = "all-nomcuboot"
@@ -2428,7 +2160,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0257"
+id = "0227"
 toolchain = "gcc"
 platform = "lpc80x"
 features = "all-nomcuboot"
@@ -2437,7 +2169,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0258"
+id = "0228"
 toolchain = "gcc"
 platform = "lpc80x"
 features = "none"
@@ -2446,7 +2178,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0259"
+id = "0229"
 toolchain = "clang"
 platform = "lpc80x"
 features = "all-nomcuboot"
@@ -2455,7 +2187,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0260"
+id = "0230"
 toolchain = "clang"
 platform = "lpc80x"
 features = "all-nomcuboot"
@@ -2464,7 +2196,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0261"
+id = "0231"
 toolchain = "clang"
 platform = "lpc80x"
 features = "all-cellular-nomcuboot"
@@ -2473,7 +2205,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0262"
+id = "0232"
 toolchain = "clang"
 platform = "lpc80x"
 features = "all-lwip-nomcuboot"
@@ -2482,7 +2214,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0263"
+id = "0233"
 toolchain = "clang"
 platform = "lpc80x"
 features = "all-noos-nomcuboot"
@@ -2491,7 +2223,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0264"
+id = "0234"
 toolchain = "clang"
 platform = "lpc80x"
 features = "none"
@@ -2500,7 +2232,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0265"
+id = "0235"
 toolchain = "clang"
 platform = "lpc80x"
 features = "all-nomcuboot"
@@ -2509,7 +2241,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0266"
+id = "0236"
 toolchain = "clang"
 platform = "lpc80x"
 features = "all-nomcuboot"
@@ -2518,7 +2250,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0267"
+id = "0237"
 toolchain = "clang"
 platform = "lpc80x"
 features = "all-nomcuboot"
@@ -2527,7 +2259,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0268"
+id = "0238"
 toolchain = "clang"
 platform = "lpc80x"
 features = "none"
@@ -2536,7 +2268,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC80x (MCUXpresso SDK), Cortex-M0+, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0269"
+id = "0239"
 toolchain = "gcc"
 platform = "lpc84x"
 features = "all-nomcuboot"
@@ -2545,7 +2277,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0270"
+id = "0240"
 toolchain = "gcc"
 platform = "lpc84x"
 features = "all-nomcuboot"
@@ -2554,7 +2286,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0271"
+id = "0241"
 toolchain = "gcc"
 platform = "lpc84x"
 features = "all-cellular-nomcuboot"
@@ -2563,7 +2295,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0272"
+id = "0242"
 toolchain = "gcc"
 platform = "lpc84x"
 features = "all-lwip-nomcuboot"
@@ -2572,7 +2304,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0273"
+id = "0243"
 toolchain = "gcc"
 platform = "lpc84x"
 features = "all-noos-nomcuboot"
@@ -2581,7 +2313,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0274"
+id = "0244"
 toolchain = "gcc"
 platform = "lpc84x"
 features = "none"
@@ -2590,7 +2322,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0275"
+id = "0245"
 toolchain = "gcc"
 platform = "lpc84x"
 features = "all-nomcuboot"
@@ -2599,7 +2331,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0276"
+id = "0246"
 toolchain = "gcc"
 platform = "lpc84x"
 features = "all-nomcuboot"
@@ -2608,7 +2340,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0277"
+id = "0247"
 toolchain = "gcc"
 platform = "lpc84x"
 features = "all-nomcuboot"
@@ -2617,7 +2349,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0278"
+id = "0248"
 toolchain = "gcc"
 platform = "lpc84x"
 features = "none"
@@ -2626,7 +2358,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0279"
+id = "0249"
 toolchain = "clang"
 platform = "lpc84x"
 features = "all-nomcuboot"
@@ -2635,7 +2367,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0280"
+id = "0250"
 toolchain = "clang"
 platform = "lpc84x"
 features = "all-nomcuboot"
@@ -2644,7 +2376,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0281"
+id = "0251"
 toolchain = "clang"
 platform = "lpc84x"
 features = "all-cellular-nomcuboot"
@@ -2653,7 +2385,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0282"
+id = "0252"
 toolchain = "clang"
 platform = "lpc84x"
 features = "all-lwip-nomcuboot"
@@ -2662,7 +2394,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0283"
+id = "0253"
 toolchain = "clang"
 platform = "lpc84x"
 features = "all-noos-nomcuboot"
@@ -2671,7 +2403,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0284"
+id = "0254"
 toolchain = "clang"
 platform = "lpc84x"
 features = "none"
@@ -2680,7 +2412,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0285"
+id = "0255"
 toolchain = "clang"
 platform = "lpc84x"
 features = "all-nomcuboot"
@@ -2689,7 +2421,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0286"
+id = "0256"
 toolchain = "clang"
 platform = "lpc84x"
 features = "all-nomcuboot"
@@ -2698,7 +2430,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0287"
+id = "0257"
 toolchain = "clang"
 platform = "lpc84x"
 features = "all-nomcuboot"
@@ -2707,7 +2439,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0288"
+id = "0258"
 toolchain = "clang"
 platform = "lpc84x"
 features = "none"
@@ -2716,7 +2448,7 @@ library = "trace-off-assert-none-opt-none"
 description = "LPC84x (MCUXpresso SDK), Cortex-M0+, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0289"
+id = "0259"
 toolchain = "gcc"
 platform = "sam"
 features = "all-nomcuboot"
@@ -2725,7 +2457,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0290"
+id = "0260"
 toolchain = "gcc"
 platform = "sam"
 features = "all-nomcuboot"
@@ -2734,7 +2466,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0291"
+id = "0261"
 toolchain = "gcc"
 platform = "sam"
 features = "all-cellular-nomcuboot"
@@ -2743,7 +2475,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0292"
+id = "0262"
 toolchain = "gcc"
 platform = "sam"
 features = "all-lwip-nomcuboot"
@@ -2752,7 +2484,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0293"
+id = "0263"
 toolchain = "gcc"
 platform = "sam"
 features = "all-noos-nomcuboot"
@@ -2761,7 +2493,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0294"
+id = "0264"
 toolchain = "gcc"
 platform = "sam"
 features = "none"
@@ -2770,7 +2502,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0295"
+id = "0265"
 toolchain = "gcc"
 platform = "sam"
 features = "all-nomcuboot"
@@ -2779,7 +2511,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0296"
+id = "0266"
 toolchain = "gcc"
 platform = "sam"
 features = "all-nomcuboot"
@@ -2788,7 +2520,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0297"
+id = "0267"
 toolchain = "gcc"
 platform = "sam"
 features = "all-nomcuboot"
@@ -2797,7 +2529,7 @@ library = "trace-off-assert-none-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0298"
+id = "0268"
 toolchain = "gcc"
 platform = "sam"
 features = "none"
@@ -2806,7 +2538,7 @@ library = "trace-off-assert-none-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0299"
+id = "0269"
 toolchain = "clang"
 platform = "sam"
 features = "all-nomcuboot"
@@ -2815,7 +2547,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0300"
+id = "0270"
 toolchain = "clang"
 platform = "sam"
 features = "all-nomcuboot"
@@ -2824,7 +2556,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0301"
+id = "0271"
 toolchain = "clang"
 platform = "sam"
 features = "all-cellular-nomcuboot"
@@ -2833,7 +2565,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0302"
+id = "0272"
 toolchain = "clang"
 platform = "sam"
 features = "all-lwip-nomcuboot"
@@ -2842,7 +2574,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0303"
+id = "0273"
 toolchain = "clang"
 platform = "sam"
 features = "all-noos-nomcuboot"
@@ -2851,7 +2583,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0304"
+id = "0274"
 toolchain = "clang"
 platform = "sam"
 features = "none"
@@ -2860,7 +2592,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0305"
+id = "0275"
 toolchain = "clang"
 platform = "sam"
 features = "all-nomcuboot"
@@ -2869,7 +2601,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0306"
+id = "0276"
 toolchain = "clang"
 platform = "sam"
 features = "all-nomcuboot"
@@ -2878,7 +2610,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0307"
+id = "0277"
 toolchain = "clang"
 platform = "sam"
 features = "all-nomcuboot"
@@ -2887,7 +2619,7 @@ library = "trace-off-assert-none-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0308"
+id = "0278"
 toolchain = "clang"
 platform = "sam"
 features = "none"
@@ -2896,7 +2628,7 @@ library = "trace-off-assert-none-opt-none"
 description = "SAM (Atmel START, ASF4), Cortex-M0+, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0309"
+id = "0279"
 toolchain = "gcc"
 platform = "ra"
 features = "all-nomcuboot"
@@ -2905,7 +2637,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0310"
+id = "0280"
 toolchain = "gcc"
 platform = "ra"
 features = "all-nomcuboot"
@@ -2914,7 +2646,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "RA (Renesas FSP), Cortex-M4F, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0311"
+id = "0281"
 toolchain = "gcc"
 platform = "ra"
 features = "all-cellular-nomcuboot"
@@ -2923,7 +2655,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, arm-none-eabi-gcc: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0312"
+id = "0282"
 toolchain = "gcc"
 platform = "ra"
 features = "all-lwip-nomcuboot"
@@ -2932,7 +2664,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, arm-none-eabi-gcc: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0313"
+id = "0283"
 toolchain = "gcc"
 platform = "ra"
 features = "all-noos-nomcuboot"
@@ -2941,7 +2673,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0314"
+id = "0284"
 toolchain = "gcc"
 platform = "ra"
 features = "none"
@@ -2950,7 +2682,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0315"
+id = "0285"
 toolchain = "gcc"
 platform = "ra"
 features = "all-nomcuboot"
@@ -2959,7 +2691,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0316"
+id = "0286"
 toolchain = "gcc"
 platform = "ra"
 features = "all-nomcuboot"
@@ -2968,7 +2700,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0317"
+id = "0287"
 toolchain = "gcc"
 platform = "ra"
 features = "all-nomcuboot"
@@ -2977,7 +2709,7 @@ library = "trace-off-assert-none-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0318"
+id = "0288"
 toolchain = "gcc"
 platform = "ra"
 features = "none"
@@ -2986,7 +2718,7 @@ library = "trace-off-assert-none-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0319"
+id = "0289"
 toolchain = "clang"
 platform = "ra"
 features = "all-nomcuboot"
@@ -2995,7 +2727,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0320"
+id = "0290"
 toolchain = "clang"
 platform = "ra"
 features = "all-nomcuboot"
@@ -3004,7 +2736,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "RA (Renesas FSP), Cortex-M4F, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0321"
+id = "0291"
 toolchain = "clang"
 platform = "ra"
 features = "all-cellular-nomcuboot"
@@ -3013,7 +2745,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, clang: every feature on; the network through the FreeRTOS cellular interface; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0322"
+id = "0292"
 toolchain = "clang"
 platform = "ra"
 features = "all-lwip-nomcuboot"
@@ -3022,7 +2754,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, clang: every feature on; the network through lwIP; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0323"
+id = "0293"
 toolchain = "clang"
 platform = "ra"
 features = "all-noos-nomcuboot"
@@ -3031,7 +2763,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0324"
+id = "0294"
 toolchain = "clang"
 platform = "ra"
 features = "none"
@@ -3040,7 +2772,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0325"
+id = "0295"
 toolchain = "clang"
 platform = "ra"
 features = "all-nomcuboot"
@@ -3049,7 +2781,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0326"
+id = "0296"
 toolchain = "clang"
 platform = "ra"
 features = "all-nomcuboot"
@@ -3058,7 +2790,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0327"
+id = "0297"
 toolchain = "clang"
 platform = "ra"
 features = "all-nomcuboot"
@@ -3067,7 +2799,7 @@ library = "trace-off-assert-none-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0328"
+id = "0298"
 toolchain = "clang"
 platform = "ra"
 features = "none"
@@ -3076,7 +2808,7 @@ library = "trace-off-assert-none-opt-none"
 description = "RA (Renesas FSP), Cortex-M4F, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0329"
+id = "0299"
 toolchain = "gcc"
 platform = "zephyr"
 features = "all-noos-nomcuboot"
@@ -3085,7 +2817,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0330"
+id = "0300"
 toolchain = "gcc"
 platform = "zephyr"
 features = "all-noos-nomcuboot"
@@ -3094,7 +2826,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "Zephyr RTOS, on a Cortex-M4F, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0331"
+id = "0301"
 toolchain = "gcc"
 platform = "zephyr"
 features = "none"
@@ -3103,7 +2835,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0332"
+id = "0302"
 toolchain = "gcc"
 platform = "zephyr"
 features = "all-noos-nomcuboot"
@@ -3112,7 +2844,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0333"
+id = "0303"
 toolchain = "gcc"
 platform = "zephyr"
 features = "all-noos-nomcuboot"
@@ -3121,7 +2853,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0334"
+id = "0304"
 toolchain = "gcc"
 platform = "zephyr"
 features = "all-noos-nomcuboot"
@@ -3130,7 +2862,7 @@ library = "trace-off-assert-none-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, arm-none-eabi-gcc: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0335"
+id = "0305"
 toolchain = "gcc"
 platform = "zephyr"
 features = "none"
@@ -3139,7 +2871,7 @@ library = "trace-off-assert-none-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, arm-none-eabi-gcc: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0336"
+id = "0306"
 toolchain = "clang"
 platform = "zephyr"
 features = "all-noos-nomcuboot"
@@ -3148,7 +2880,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0337"
+id = "0307"
 toolchain = "clang"
 platform = "zephyr"
 features = "all-noos-nomcuboot"
@@ -3157,7 +2889,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "Zephyr RTOS, on a Cortex-M4F, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0338"
+id = "0308"
 toolchain = "clang"
 platform = "zephyr"
 features = "none"
@@ -3166,7 +2898,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0339"
+id = "0309"
 toolchain = "clang"
 platform = "zephyr"
 features = "all-noos-nomcuboot"
@@ -3175,7 +2907,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0340"
+id = "0310"
 toolchain = "clang"
 platform = "zephyr"
 features = "all-noos-nomcuboot"
@@ -3184,7 +2916,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0341"
+id = "0311"
 toolchain = "clang"
 platform = "zephyr"
 features = "all-noos-nomcuboot"
@@ -3193,7 +2925,7 @@ library = "trace-off-assert-none-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, clang: every feature on; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0342"
+id = "0312"
 toolchain = "clang"
 platform = "zephyr"
 features = "none"
@@ -3202,7 +2934,7 @@ library = "trace-off-assert-none-opt-none"
 description = "Zephyr RTOS, on a Cortex-M4F, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
 
 [[row]]
-id = "0343"
+id = "0313"
 toolchain = "clang"
 platform = "host"
 features = "none"
@@ -3211,7 +2943,7 @@ library = "trace-vrb-assert-bkpt-opt-none"
 description = "the PC, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
 
 [[row]]
-id = "0344"
+id = "0314"
 toolchain = "clang"
 platform = "host"
 features = "none"
@@ -3220,7 +2952,7 @@ library = "trace-vrb-assert-bkpt-opt-dbg"
 description = "the PC, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace at VRB, BKPT asserts, every module option on"
 
 [[row]]
-id = "0345"
+id = "0315"
 toolchain = "clang"
 platform = "host"
 features = "none"
@@ -3229,7 +2961,7 @@ library = "trace-inf-assert-rst-opt-none"
 description = "the PC, clang: every feature off; no boot role and no build configuration: a product without the bootloader; the template as shipped"
 
 [[row]]
-id = "0346"
+id = "0316"
 toolchain = "clang"
 platform = "host"
 features = "none"
@@ -3238,7 +2970,7 @@ library = "trace-inf-assert-trace-opt-none"
 description = "the PC, clang: every feature off; no boot role and no build configuration: a product without the bootloader; TRACE asserts"
 
 [[row]]
-id = "0347"
+id = "0317"
 toolchain = "clang"
 platform = "host"
 features = "none"
