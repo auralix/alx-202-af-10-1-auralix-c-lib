@@ -326,7 +326,7 @@ void AlxId_Ctor
 		me->hwStm32.revisionId = HAL_GetREVID();
 		me->hwStm32.flashSize_kB = *(uint16_t*)(FLASHSIZE_BASE);
 		#ifdef ALX_STM32G4
-			me->stm32Hw.packageId = (*(uint16_t*)(0x1FFF7500) & 0x001F);
+			me->hwStm32.packageId = (*(uint16_t*)(0x1FFF7500) & 0x001F);
 		#endif
 		me->hwStm32.mcuUniqueId.uint32[0] = *(uint32_t*)(UID_BASE);
 		me->hwStm32.mcuUniqueId.uint32[1] = *(uint32_t*)(UID_BASE + 4);
@@ -629,7 +629,7 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_INF("- revision ID: 0x%" PRIX32, me->hwStm32.revisionId);
 	ALX_ID_TRACE_INF("- flash size: %" PRIu32 "kB", me->hwStm32.flashSize_kB);
 	#ifdef ALX_STM32G4
-	ALX_ID_TRACE_INF("- package ID: %#lX", me->stm32Hw.packageId);
+	ALX_ID_TRACE_INF("- package ID: %#lX", me->hwStm32.packageId);
 	#endif
 	ALX_ID_TRACE_INF("- MCU unique ID: %s", me->hwStm32.mcuUniqueIdStr);
 	#endif
