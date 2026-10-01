@@ -244,8 +244,8 @@ Alx_Status AlxPi4ioe5v6534q_DeInit(AlxPi4ioe5v6534q* me)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		inPortNum - Number of input ports to handle, can be from 0 (none) to 5 (max)
-  * @param[in]		outPortNum - Number of output ports to handle, can be from 0 (none) to 5 (max)
+  * @param[in]		inPortNum	- Number of input ports to handle, can be from 0 (none) to 5 (max)
+  * @param[in]		outPortNum	- Number of output ports to handle, can be from 0 (none) to 5 (max)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */

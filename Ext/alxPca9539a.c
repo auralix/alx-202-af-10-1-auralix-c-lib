@@ -250,7 +250,7 @@ Alx_Status AlxPca9539a_DeInit(AlxPca9539a* me)
 }
 
 /**
-  * @brief Poll function
+  * @brief		Poll function
   * @param[in,out]	me
   * @retval			Alx_Ok
   * @retval			Alx_Err
@@ -327,7 +327,7 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 }
 
 /**
-  * @brief GPIO interrupt handle
+  * @brief		GPIO interrupt handle
   * @param[in,out]	me
   * @retval			Alx_Ok
   * @retval			Alx_Err

@@ -89,7 +89,7 @@ void AlxBts724g_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBts724g_Init(AlxBts724g* me)
 {
@@ -106,7 +106,7 @@ void AlxBts724g_Init(AlxBts724g* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBts724g_DeInit(AlxBts724g* me)
 {
@@ -123,7 +123,7 @@ void AlxBts724g_DeInit(AlxBts724g* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBts724g_Handle(AlxBts724g* me)
 {
@@ -146,7 +146,7 @@ void AlxBts724g_Handle(AlxBts724g* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBts724g_SetOut(AlxBts724g* me)
 {
@@ -159,7 +159,7 @@ void AlxBts724g_SetOut(AlxBts724g* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBts724g_ResetOut(AlxBts724g* me)
 {
@@ -172,7 +172,7 @@ void AlxBts724g_ResetOut(AlxBts724g* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBts724g_WriteOut(AlxBts724g* me, bool val)
 {

@@ -236,7 +236,7 @@ Alx_Status AlxAdau1961_DeInit(AlxAdau1961* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxAdau1961_Foreground_Handle(AlxAdau1961* me)
 {

@@ -153,7 +153,7 @@ void AlxVnh7040_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxVnh7040_Init(AlxVnh7040* me)
 {
@@ -186,7 +186,7 @@ void AlxVnh7040_Init(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxVnh7040_DeInit(AlxVnh7040* me)
 {
@@ -213,7 +213,7 @@ void AlxVnh7040_DeInit(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxVnh7040_Handle(AlxVnh7040* me)
 {
@@ -335,8 +335,8 @@ void AlxVnh7040_Handle(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] duty_permil
+  * @param[in,out]	me
+  * @param[in]		duty_permil
   */
 void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil)
 {
@@ -400,7 +400,7 @@ void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me)
@@ -413,7 +413,7 @@ uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 uint32_t AlxVnh7040_GetCurrentHsA_mA(AlxVnh7040* me)
@@ -426,7 +426,7 @@ uint32_t AlxVnh7040_GetCurrentHsA_mA(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 uint32_t AlxVnh7040_GetCurrentHsB_mA(AlxVnh7040* me)
@@ -439,7 +439,7 @@ uint32_t AlxVnh7040_GetCurrentHsB_mA(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 uint32_t AlxVnh7040_GetSupplyVoltage_mV(AlxVnh7040* me)
@@ -452,7 +452,7 @@ uint32_t AlxVnh7040_GetSupplyVoltage_mV(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 int32_t AlxVnh7040_GetTemp_degC(AlxVnh7040* me)
@@ -465,8 +465,8 @@ int32_t AlxVnh7040_GetTemp_degC(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] breakType
+  * @param[in,out]	me
+  * @param[in]		breakType
   */
 int32_t AlxVnh7040_GetIsError (AlxVnh7040* me)
 {
@@ -478,7 +478,7 @@ int32_t AlxVnh7040_GetIsError (AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType)
