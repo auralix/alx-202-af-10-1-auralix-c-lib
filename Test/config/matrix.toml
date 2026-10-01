@@ -8,8 +8,9 @@
 #       uv run nox -s matrix -- 0001 0045        the rows whose id or name starts so (no gate)
 # Paths are relative to Test/. The mechanism is the Python library's alx.verify.configs.
 
-# The build define every product with littlefs sets: alxLfsConfig.h is littlefs's configuration header.
-defines = ["LFS_CONFIG=alxLfsConfig.h"]
+# The build define every product with littlefs sets: alxLfsConfig.h is littlefs's configuration header;
+# and littlefs's LFS_THREADSAFE, so alxFs.c's lock hooks compile - nothing compiles only without it.
+defines = ["LFS_CONFIG=alxLfsConfig.h", "LFS_THREADSAFE"]
 
 # The fakes of the features, on every row's include path after the library's own folders.
 includes = ["host/shim/cmsis-dsp", "host/shim/freertos", "host/shim/freertos-cellular", "host/shim/littlefs", "host/shim/lwip", "host/shim/mbedtls", "host/shim/mcuboot", "host/shim/stm32-usb-host", "host/shim/wiznet"]

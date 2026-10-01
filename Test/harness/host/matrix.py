@@ -83,8 +83,8 @@ def _library_files(suffixes: tuple[str, ...]) -> list[Path]:
 
 
 def sources() -> list[Path]:
-    """Every C file Auralix wrote, and alxInc.h, which no library file includes but products do."""
-    return [*_library_files((".c",)), CLIB / "alxInc.h"]
+    """Every C file Auralix wrote, and the headers only others include: alxInc.h (products), mcuboot_logging.h (MCUboot)."""
+    return [*_library_files((".c",)), CLIB / "alxInc.h", CLIB / "mcuboot" / "mcuboot_config" / "mcuboot_logging.h"]
 
 
 def measured() -> list[Path]:
