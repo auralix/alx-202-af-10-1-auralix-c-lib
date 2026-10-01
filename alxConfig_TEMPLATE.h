@@ -210,18 +210,14 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Module - Trace
 //------------------------------------------------------------------------------
-#define ALX_A352_TRACE_ENABLE
 #define ALX_ADAU1961_TRACE_ENABLE
 #define ALX_ADS8678_TRACE_ENABLE
 #define ALX_ADS114S08_TRACE_ENABLE
 #define ALX_ADXL35X_TRACE_ENABLE
 #define ALX_BQ24600_TRACE_ENABLE
-#define ALX_BQ25890_TRACE_ENABLE
 #define ALX_BTS724G_TRACE_ENABLE
-#define ALX_CDCE913_TRACE_ENABLE
 #define ALX_INA228_TRACE_ENABLE
 #define ALX_LP586X_TRACE_ENABLE
-#define ALX_MAX17263_TRACE_ENABLE
 #define ALX_MCP73831_TRACE_ENABLE
 #define ALX_NTCG103JF103FT1S_TRACE_ENABLE
 #define ALX_PCA9539A_TRACE_ENABLE
@@ -306,18 +302,14 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Module - Assert - BKPT
 //------------------------------------------------------------------------------
-//#define ALX_A352_ASSERT_BKPT_ENABLE
 //#define ALX_ADAU1961_ASSERT_BKPT_ENABLE
 //#define ALX_ADS8678_ASSERT_BKPT_ENABLE
 //#define ALX_ADS114S08_ASSERT_BKPT_ENABLE
 //#define ALX_ADXL35X_ASSERT_BKPT_ENABLE
 //#define ALX_BQ24600_ASSERT_BKPT_ENABLE
-//#define ALX_BQ25890_ASSERT_BKPT_ENABLE
 //#define ALX_BTS724G_ASSERT_BKPT_ENABLE
-//#define ALX_CDCE913_ASSERT_BKPT_ENABLE
 //#define ALX_INA228_ASSERT_BKPT_ENABLE
 //#define ALX_LP586X_ASSERT_BKPT_ENABLE
-//#define ALX_MAX17263_ASSERT_BKPT_ENABLE
 //#define ALX_MCP73831_ASSERT_BKPT_ENABLE
 //#define ALX_NTCG103JF103FT1S_ASSERT_BKPT_ENABLE
 //#define ALX_PCA9539A_ASSERT_BKPT_ENABLE
@@ -402,18 +394,14 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Module - Assert - TRACE
 //------------------------------------------------------------------------------
-//#define ALX_A352_ASSERT_TRACE_ENABLE
 //#define ALX_ADAU1961_ASSERT_TRACE_ENABLE
 //#define ALX_ADS8678_ASSERT_TRACE_ENABLE
 //#define ALX_ADS114S08_ASSERT_TRACE_ENABLE
 //#define ALX_ADXL35X_ASSERT_TRACE_ENABLE
 //#define ALX_BQ24600_ASSERT_TRACE_ENABLE
-//#define ALX_BQ25890_ASSERT_TRACE_ENABLE
 //#define ALX_BTS724G_ASSERT_TRACE_ENABLE
-//#define ALX_CDCE913_ASSERT_TRACE_ENABLE
 //#define ALX_INA228_ASSERT_TRACE_ENABLE
 //#define ALX_LP586X_ASSERT_TRACE_ENABLE
-//#define ALX_MAX17263_ASSERT_TRACE_ENABLE
 //#define ALX_MCP73831_ASSERT_TRACE_ENABLE
 //#define ALX_NTCG103JF103FT1S_ASSERT_TRACE_ENABLE
 //#define ALX_PCA9539A_ASSERT_TRACE_ENABLE
@@ -498,18 +486,14 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Module - Assert - RST
 //------------------------------------------------------------------------------
-#define ALX_A352_ASSERT_RST_ENABLE
 #define ALX_ADAU1961_ASSERT_RST_ENABLE
 #define ALX_ADS8678_ASSERT_RST_ENABLE
 #define ALX_ADS114S08_ASSERT_RST_ENABLE
 #define ALX_ADXL35X_ASSERT_RST_ENABLE
 #define ALX_BQ24600_ASSERT_RST_ENABLE
-#define ALX_BQ25890_ASSERT_RST_ENABLE
 #define ALX_BTS724G_ASSERT_RST_ENABLE
-#define ALX_CDCE913_ASSERT_RST_ENABLE
 #define ALX_INA228_ASSERT_RST_ENABLE
 #define ALX_LP586X_ASSERT_RST_ENABLE
-#define ALX_MAX17263_ASSERT_RST_ENABLE
 #define ALX_MCP73831_ASSERT_RST_ENABLE
 #define ALX_NTCG103JF103FT1S_ASSERT_RST_ENABLE
 #define ALX_PCA9539A_ASSERT_RST_ENABLE
@@ -594,7 +578,6 @@ extern "C" {
 //------------------------------------------------------------------------------
 // Module - Options
 //------------------------------------------------------------------------------
-//#define ALX_CDCE913_DEBUG
 //#define ALX_INA228
 #define ALX_INA238
 //#define ALX_VNH7040_NO_PWM
