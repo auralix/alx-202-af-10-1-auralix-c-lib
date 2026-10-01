@@ -10,4 +10,3 @@
 #define ALX_MBEDTLS
 #undef ALX_MCU_BOOT
 #define ALX_USBH
-#undef ALX_WIZNET

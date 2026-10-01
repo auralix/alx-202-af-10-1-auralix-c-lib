@@ -80,8 +80,8 @@ STYLE_PENDING_COMMENTS = []
 # exempts a #define body - before they can be gated. That is a change to the Python library rather
 # than to this repository, and it is on the TODO.
 STYLE_PENDING_TERNARY = [
-    "alxBuild.h", "alxFs.c", "alxGlobal.c", "alxLfsConfig.h", "alxLogger.c", "alxNet.c",
-    "alxOsEventFlagGroup.c", "alxOsThread.c", "alxRtc_Global.c", "alxSocket.c",
+    "alxBuild.h", "alxFs.c", "alxGlobal.c", "alxLfsConfig.h", "alxLogger.c",
+    "alxOsEventFlagGroup.c", "alxOsThread.c", "alxRtc_Global.c",
 ]
 
 # Stage 5 compiles every PORTABLE library module - the ones that need no vendor SDK. Three cannot
@@ -134,14 +134,17 @@ RETURN_TYPE_PENDING = {"alxCrc.c", "alxRange.c",
 # control that appeared to work was planted INSIDE the `#if` line and failed as a broken directive
 # - it never proved the body was compiled. Plant in a module named below as non-empty.)
 #
-# These three are compiled only by a product that selects a driver, so the set is a fact about this
-# repository, not a defect. It is asserted in BOTH directions: a fourth module going quiet is a
-# regression, and one of these three coming back to life means the set is stale.
+# alxNet.c and alxSocket.c left the set on 2026-10-02: they went back to their empty skeletons,
+# which have no second tier, so ALX_C_LIB alone compiles them.
+#
+# alxBuild.c is compiled only by a product that selects a driver, so the set is a fact about this
+# repository, not a defect. It is asserted in BOTH directions: a second module going quiet is a
+# regression, and alxBuild.c coming back to life means the set is stale.
 #
 # The fakes of four MCU modules join them for the same reason: their only function is the
 # module's constructor, which exists under the module header's family guard, so without a family
 # they are empty too. They are compiled for real by a consumer that selects a family.
-SYNTAX_EMPTY_TU = {"alxBuild.c", "alxNet.c", "alxSocket.c",
+SYNTAX_EMPTY_TU = {"alxBuild.c",
                    "alxDacFake.c", "alxIoPinIrqFake.c", "alxRtcFake.c", "alxSpiFake.c"}
 
 # Stage 5c asks the question P567 answered the hard way: does any assertion DO the work?
@@ -158,7 +161,8 @@ SYNTAX_EMPTY_TU = {"alxBuild.c", "alxNet.c", "alxSocket.c",
 #   29 call a predicate     strlen, AlxAdc_IsClkOk, AlxWdt_IsClkOk and friends - eliding those
 #                            loses a check, which is what an assertion is for
 #
-# The five files are NAMED rather than fixed: the repair is one line each and it is library source.
+# alxNet.c left with its skeleton on 2026-10-02. The four files are NAMED rather than fixed: the
+# repair is one line each and it is library source.
 # What this stage buys is that the list cannot grow. A new assertion that hides a call in a module
 # not below fails the lane.
 ASSERT_PURE_CALLS = {
@@ -169,7 +173,7 @@ ASSERT_PURE_CALLS = {
     "AlxParamItem_AreEnumArrValFromLowToHigh", "AlxParamItem_IsEnumOnList",
 }
 ASSERT_SIDE_EFFECT_PENDING = {"alxCli.c", "alxIoPin_McuZephyr.c", "alxParamItem.c",
-                              "alxClk_McuLpc55S6x.c", "alxNet.c"}
+                              "alxClk_McuLpc55S6x.c"}
 STRING_LITERAL = re.compile(r"\"(?:[^\"\\]|\\.)*\"")
 CHAR_LITERAL = re.compile(r"'(?:[^'\\]|\\.)'")
 ELIDED_ASSERT = re.compile(r"ALX_[A-Z0-9_]*ASSERT[A-Z0-9_]*\s*\(")

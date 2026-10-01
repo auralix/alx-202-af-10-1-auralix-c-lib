@@ -1,4 +1,4 @@
-// Features: all-nomcuboot - every feature on; the network through Wiznet; no MCUboot.
+// Features: all-nomcuboot - every feature on; no network stack; no MCUboot.
 // Written by harness.host.matrix from alxConfig_TEMPLATE.h; do not edit, run
 // `python -m harness.host.matrix` from Test/ instead.
 #define ALX_CMSIS_DSP
@@ -10,4 +10,3 @@
 #define ALX_MBEDTLS
 #undef ALX_MCU_BOOT
 #define ALX_USBH
-#define ALX_WIZNET

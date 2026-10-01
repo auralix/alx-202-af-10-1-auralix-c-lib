@@ -147,16 +147,16 @@ PLATFORM_VARIANTS = {
                                  "configurable ADC inputs"),
 }
 FEATURE_SWITCHES = ["ALX_CMSIS_DSP", "ALX_FATFS", "ALX_FREE_RTOS", "ALX_FREE_RTOS_CELLULAR",
-                    "ALX_LFS", "ALX_LW_IP", "ALX_MBEDTLS", "ALX_MCU_BOOT", "ALX_USBH", "ALX_WIZNET"]
+                    "ALX_LFS", "ALX_LW_IP", "ALX_MBEDTLS", "ALX_MCU_BOOT", "ALX_USBH"]
 _ALL = {"ALX_CMSIS_DSP", "ALX_FATFS", "ALX_FREE_RTOS", "ALX_LFS", "ALX_MBEDTLS", "ALX_MCU_BOOT",
-        "ALX_USBH", "ALX_WIZNET"}
+        "ALX_USBH"}
 # `all` and its variants: -cellular and -lwip take the network another way, -noos leaves FreeRTOS out
 # (the bare-metal and Zephyr branches), -nomcuboot leaves MCUboot out - its flash backend is the STM32
 # HAL's (mcuboot/flash_map_backend), so only the STM32 rows build a boot role.
 _VARIANTS = {
-    "": ("the network through Wiznet", set(), set()),
-    "-cellular": ("the network through the FreeRTOS cellular interface", {"ALX_WIZNET"}, {"ALX_FREE_RTOS_CELLULAR"}),
-    "-lwip": ("the network through lwIP", {"ALX_WIZNET"}, {"ALX_LW_IP"}),
+    "": ("no network stack", set(), set()),
+    "-cellular": ("the network through the FreeRTOS cellular interface", set(), {"ALX_FREE_RTOS_CELLULAR"}),
+    "-lwip": ("the network through lwIP", set(), {"ALX_LW_IP"}),
     "-noos": ("no FreeRTOS: the bare-metal and Zephyr branches", {"ALX_FREE_RTOS"}, set()),
 }
 FEATURES = {"none": ("every feature off", set())}

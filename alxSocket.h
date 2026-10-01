@@ -44,12 +44,6 @@ extern "C" {
 #include "alxAssert.h"
 #include "alxNet.h"
 
-#if defined(ALX_MBEDTLS)
-#include "mbedtls/x509.h"
-#include "mbedtls/ctr_drbg.h"
-#include "mbedtls/ssl.h"
-#include "mbedtls/oid.h"
-#endif
 
 //******************************************************************************
 // Module Guard
@@ -76,13 +70,10 @@ extern "C" {
 // Trace //
 #if defined(ALX_SOCKET_TRACE_ENABLE)
 	#define ALX_SOCKET_TRACE_ERR(...) ALX_TRACE_ERR(ALX_SOCKET_FILE, __VA_ARGS__)
-	#define ALX_SOCKET_TRACE_INF(...) ALX_TRACE_INF(ALX_SOCKET_FILE, __VA_ARGS__)
 #else
 	#define ALX_SOCKET_TRACE_ERR(...) do{} while (false)
-	#define ALX_SOCKET_TRACE_INF(...) do{} while (false)
 #endif
 
-#define SOCKET_LISTEN_IDLE_TIMEOUT 2000
 
 //******************************************************************************
 // Types
@@ -97,84 +88,15 @@ typedef enum
 
 typedef struct
 {
-	int wiz_socket;
-	uint8_t wiz_protocol;
-	uint8_t dst_ip[4];
-	uint8_t mcast_ip[4];
-	uint16_t dst_port;
-	uint16_t my_port;
-	bool wiz_sock_opened;
-	int backlog;
-} AlxWizSocketData;
-
-typedef enum
-{
-	SSL_INITIALIZED_CACERT = 1,
-	SSL_INITIALIZED_CLCERT,
-	SSL_INITIALIZED_CLKEY,
-	SSL_INITIALIZED_DRBG_CONTEXT,
-	SSL_INITIALIZED_SSL_CONFIG,
-	SSL_INITIALIZED_SSL_CONTEXT,
-} AlxSslInitStateType;
-
-#if defined(ALX_MBEDTLS)
-typedef struct
-{
-	mbedtls_x509_crt x509_ca_certificate;
-	mbedtls_x509_crt x509_cl_certificate;
-	mbedtls_pk_context pkey;
-	mbedtls_ctr_drbg_context drbg_context;
-	mbedtls_ssl_config ssl_config;
-	mbedtls_ssl_context ssl_context;
-	AlxSslInitStateType init_state;
-	char domain[32];
-} AlxTlsData;
-#endif
-
-#if defined(ALX_FREE_RTOS_CELLULAR)
-
-	// Event group bits
-#define EVENT_BITS_SOCKET_CONNECT		0x01
-#define EVENT_BITS_SOCKET_DATA_READY	0x02
-#define EVENT_BITS_SOCKET_CLOSE			0x04
-
-typedef struct
-{
-	CellularSocketHandle_t socket;
-	CellularSocketProtocol_t protocol;
-	EventGroupHandle_t event_group;	// event group used to dispatch events from cellular callbacks
-	CellularUrcEvent_t URC_error;	// Unsolicited return code from cellular stack
-	CellularSocketAddress_t sockAddr;
-	uint16_t my_port;
-	bool cellular_sock_opened;
-	int backlog;
-}AlxCellularSocketData;
-#endif
-
-typedef struct
-{
 	// Defines
 
 	// Parameters
 
 	// Variables
-	AlxNet* alxNet;
-	AlxSocket_Protocol protocol;
-	#if defined(ALX_WIZNET)
-	AlxWizSocketData socket_data;
-	#endif
-	#if defined(ALX_FREE_RTOS_CELLULAR)
-	AlxCellularSocketData cellular_socket;
-	StaticEventGroup_t xEventGroupBuffer;
-	#endif
-	#if defined(ALX_MBEDTLS)
-	AlxTlsData tls_data;
-	#endif
-	uint32_t timeout;
 
 	// Info
 	bool wasCtorCalled;
-	bool isOpened;
+	bool isInit;
 } AlxSocket;
 
 
@@ -193,16 +115,9 @@ void AlxSocket_Ctor
 Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol protocol);
 Alx_Status AlxSocket_Close(AlxSocket* me);
 Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port);
-Alx_Status AlxSocket_Bind(AlxSocket* me, uint16_t port);
-Alx_Status AlxSocket_Bind_Mcast(AlxSocket* me, const char* ip, uint16_t port);
-Alx_Status AlxSocket_Listen(AlxSocket* me, int backlog);
-AlxSocket* AlxSocket_Accept(AlxSocket* me);
 int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len);
 int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len);
 void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms);
-#if defined(ALX_MBEDTLS)
-Alx_Status AlxSocket_InitTls(AlxSocket* me, const char *server_domain, const unsigned char *ca_cert, const unsigned char *cl_cert, const unsigned char *cl_key);
-#endif
 
 
 #endif	// #if defined(ALX_C_LIB)

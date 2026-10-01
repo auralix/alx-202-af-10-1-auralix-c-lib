@@ -1,4 +1,4 @@
-// Features: all - every feature on; the network through Wiznet.
+// Features: all - every feature on; no network stack.
 // Written by harness.host.matrix from alxConfig_TEMPLATE.h; do not edit, run
 // `python -m harness.host.matrix` from Test/ instead.
 #define ALX_CMSIS_DSP
@@ -10,4 +10,3 @@
 #define ALX_MBEDTLS
 #define ALX_MCU_BOOT
 #define ALX_USBH
-#define ALX_WIZNET
