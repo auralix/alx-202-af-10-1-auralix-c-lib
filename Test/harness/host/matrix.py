@@ -59,6 +59,7 @@ INCLUDES = [
 ALIASES = {
     "alxConfigUsr.h": CLIB / "alxConfigUsr_TEMPLATE.h",
     "alxBoot_GENERATED.h": CLIB / "alxBoot_GENERATED_TEMPLATE.h",
+    "alxBootMetadata_GENERATED.h": CLIB / "alxBootMetadata_GENERATED_TEMPLATE.h",
     "ffconf_usr.h": CLIB / "FatFs" / "ffconf_usr_TEMPLATE.h",
     "usbh_conf_usr.h": CLIB / "Usbh" / "usbh_conf_usr_TEMPLATE.h",
     "mcuboot_config_usr.h": CLIB / "mcuboot" / "mcuboot_config" / "mcuboot_config_usr_TEMPLATE.h",

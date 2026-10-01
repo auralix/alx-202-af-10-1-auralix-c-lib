@@ -15,9 +15,10 @@ defines = ["LFS_CONFIG=alxLfsConfig.h", "LFS_THREADSAFE"]
 # The fakes of the features, on every row's include path after the library's own folders.
 includes = ["host/shim/cmsis-dsp", "host/shim/freertos", "host/shim/freertos-cellular", "host/shim/littlefs", "host/shim/lwip", "host/shim/mbedtls", "host/shim/mcuboot", "host/shim/stm32-usb-host", "host/shim/wiznet"]
 
-# Only the rows that compile every trace and every assert with its arguments count for coverage.
+# The rows that compile every trace and every assert with its arguments count for coverage, and the
+# template as shipped (INF) for the branches below VRB, which the VRB rows cannot reach.
 [coverage]
-library = ["trace-vrb-assert-bkpt-opt-none", "trace-vrb-assert-bkpt-opt-dbg"]
+library = ["trace-vrb-assert-bkpt-opt-none", "trace-vrb-assert-bkpt-opt-dbg", "trace-inf-assert-rst-opt-none"]
 
 [platform.stm32f0]
 description = "STM32F0, Cortex-M0, the STM32F030x8 part"
@@ -123,8 +124,38 @@ why = "the C++ linkage block of every header; the library is compiled as C"
 
 [[exempt]]
 file = "Mcu/McuLpc/McuLpc80x/alxPwm_McuLpc80x.c"
-guard = "ALX_LPC80X_TODO"
-why = "an unfinished backend: its _TODO guard keeps it out of every build (decision 12, TV 2026-09-30)"
+guard = ""
+why = "an unfinished backend: its ALX_LPC80X_TODO guard keeps the whole file out of every build (decision 12, TV 2026-09-30)"
+
+[[exempt]]
+file = "alxConfig_TEMPLATE.h"
+guard = ""
+why = "the base header of every row: each row compiles its own synthesized copy of it"
+
+[[exempt]]
+file = "alxConfigUsr_TEMPLATE.h"
+guard = ""
+why = "a product's optional user configuration: the template includes alxConfigUsr.h only once a product uncomments that line"
+
+[[exempt]]
+file = "alxBootMetadata_GENERATED_TEMPLATE.h"
+guard = ""
+why = "the stand-in for the header alxBoot.py generates into the library root; where a product's build left the generated one there, alxBoot.c includes that one instead"
+
+[[exempt]]
+file = "alxLfsConfig.h"
+guard = "LFS_NO_INTRINSICS"
+why = "littlefs's fallbacks for compilers without the GCC builtins, taken over with its utility header: every Auralix toolchain is GCC or clang"
+
+[[exempt]]
+file = "alxLfsConfig.h"
+guard = "BYTE_ORDER"
+why = "littlefs's big-endian and unknown-order fallbacks, taken over with its utility header: every Auralix target is little-endian"
+
+[[exempt]]
+file = "alxLfsConfig.h"
+guard = "LFS_NO_MALLOC"
+why = "littlefs's build without malloc, taken over with its utility header: no Auralix configuration sets LFS_NO_MALLOC"
 
 # Findings kept by decision: reported with the reason, failing no row.
 [[accept]]
