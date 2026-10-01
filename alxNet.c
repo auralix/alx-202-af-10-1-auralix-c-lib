@@ -88,6 +88,7 @@ extern void CellularDevice_PowerOff(void);
 //******************************************************************************
 // Private Variables
 //******************************************************************************
+#if defined(ALX_WIZNET)
 static AlxOsMutex alxSpiMutex;
 static AlxSpi *alxSpi;
 static bool instance_guard = false;
@@ -107,6 +108,7 @@ static AlxOsMutex alxDhcpMutex;
 static bool dhcp_isRunning = false;
 
 AlxSocket alxDhcpSocket, alxDnsSocket, alxPingSocket;
+#endif
 
 #if defined(ALX_FREE_RTOS_CELLULAR)
 extern CellularCommInterface_t CellularCommInterface;
@@ -145,6 +147,7 @@ void str2mac(const char *macstr, uint8_t *mac)
 	mac[5] = m[5];
 }
 
+#if defined(ALX_WIZNET)
 // ioLibrary Callbacks
 static void CrisEnter(void)
 {
@@ -647,6 +650,7 @@ uint32_t dns_resolve_wiznet(AlxNet* me, const char *hostname)
 
 	return 0;
 }
+#endif
 
 
 
@@ -654,6 +658,7 @@ uint32_t dns_resolve_wiznet(AlxNet* me, const char *hostname)
 
 int AlxNet_Ping(AlxNet* me, const char *addr, uint16_t count, uint32_t timeout_ms)
 {
+	#if defined(ALX_WIZNET)
 	if (me->config == AlxNet_Config_Wiznet)
 	{
 		uint16_t rlen, i;
@@ -716,12 +721,15 @@ int AlxNet_Ping(AlxNet* me, const char *addr, uint16_t count, uint32_t timeout_m
 		AlxSocket_Close(&alxPingSocket);
 		return replies;
 	}
+	#endif
 
+	#if defined(ALX_FREE_RTOS_CELLULAR)
 	if (me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
 		Cellular_Ping(me->cellular.handle, me->cellular.cellularContext, (char *)addr);
 		return 0;
 	}
+	#endif
 
 	return -1;
 }
@@ -1412,11 +1420,13 @@ void AlxNet_SetMac(AlxNet* me, const char* mac)
 	}
 	#endif
 
+	#if defined(ALX_WIZNET)
 	AlxOsMutex_Lock(&me->alxMutex);
 	str2mac(mac, wiz_net_info.mac);
 	strcpy(me->mac, mac);
 	setSHAR(wiz_net_info.mac);
 	AlxOsMutex_Unlock(&me->alxMutex);
+	#endif
 }
 void AlxNet_SetIp(AlxNet* me, const char* ip)
 {
@@ -1432,12 +1442,14 @@ void AlxNet_SetIp(AlxNet* me, const char* ip)
 	}
 	#endif
 
+	#if defined(ALX_WIZNET)
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->ip, ip);
 	uint8_t addr[4];
 	str2ip(ip, addr);
 	setSIPR(addr);
 	AlxOsMutex_Unlock(&me->alxMutex);
+	#endif
 }
 void AlxNet_SetNetmask(AlxNet* me, const char* netmask)
 {
@@ -1453,12 +1465,14 @@ void AlxNet_SetNetmask(AlxNet* me, const char* netmask)
 	}
 	#endif
 
+	#if defined(ALX_WIZNET)
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->netmask, netmask);
 	uint8_t addr[4];
 	str2ip(netmask, addr);
 	setSUBR(addr);
 	AlxOsMutex_Unlock(&me->alxMutex);
+	#endif
 }
 void AlxNet_SetGateway(AlxNet* me, const char* gateway)
 {
@@ -1474,12 +1488,14 @@ void AlxNet_SetGateway(AlxNet* me, const char* gateway)
 	}
 	#endif
 
+	#if defined(ALX_WIZNET)
 	AlxOsMutex_Lock(&me->alxMutex);
 	strcpy(me->gateway, gateway);
 	uint8_t addr[4];
 	str2ip(gateway, addr);
 	setGAR(addr);
 	AlxOsMutex_Unlock(&me->alxMutex);
+	#endif
 }
 const char* AlxNet_GetMac(AlxNet* me)
 {
@@ -1494,11 +1510,13 @@ const char* AlxNet_GetMac(AlxNet* me)
 	}
 	#endif
 
+	#if defined(ALX_WIZNET)
 	uint8_t bin_mac[6];
 	AlxOsMutex_Lock(&me->alxMutex);
 	getSHAR(bin_mac);
 	mac2str(bin_mac, me->mac);
 	AlxOsMutex_Unlock(&me->alxMutex);
+	#endif
 
 	// Return
 	return me->mac;
@@ -1520,7 +1538,7 @@ const char* AlxNet_GetIp(AlxNet* me)
 	#endif
 
 	#if defined(ALX_FREE_RTOS_CELLULAR)
-	else if(me->config == AlxNet_Config_FreeRtos_Cellular)
+	if(me->config == AlxNet_Config_FreeRtos_Cellular)
 	{
 		// If cellular, just return me->ip.
 	}
@@ -1541,11 +1559,13 @@ const char* AlxNet_GetNetmask(AlxNet* me)
 	}
 	#endif
 
+	#if defined(ALX_WIZNET)
 	uint8_t addr[4];
 	AlxOsMutex_Lock(&me->alxMutex);
 	getSUBR(addr);
 	ip2str(addr, me->netmask);
 	AlxOsMutex_Unlock(&me->alxMutex);
+	#endif
 
 	// Return
 	return me->netmask;
@@ -1563,11 +1583,13 @@ const char* AlxNet_GetGateway(AlxNet* me)
 	}
 	#endif
 
+	#if defined(ALX_WIZNET)
 	uint8_t addr[4];
 	AlxOsMutex_Lock(&me->alxMutex);
 	getGAR(addr);
 	ip2str(addr, me->gateway);
 	AlxOsMutex_Unlock(&me->alxMutex);
+	#endif
 
 	// Return
 	return me->gateway;
@@ -1642,6 +1664,7 @@ void AlxNet_Dhcp_Enable(AlxNet* me, bool enable)
 	}
 	#endif
 
+	#if defined(ALX_WIZNET)
 	AlxOsMutex_Lock(&me->alxMutex);
 	if (enable)
 	{
@@ -1661,6 +1684,7 @@ void AlxNet_Dhcp_Enable(AlxNet* me, bool enable)
 		}
 	}
 	AlxOsMutex_Unlock(&me->alxMutex);
+	#endif
 }
 bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me)
 {
@@ -1668,7 +1692,11 @@ bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me)
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
 
 	// Return
+	#if defined(ALX_WIZNET)
 	return (AlxTick_Get_sec(&alxTick) < dhcp_ip_leased_until);
+	#else
+	return false;
+	#endif
 }
 
 AlxNet_Config Alx_GetNetInterface(AlxNet *me)
