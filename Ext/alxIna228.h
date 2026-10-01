@@ -119,11 +119,11 @@ typedef union
 		#endif
 		uint8_t CONVDLY : 8;
 		#if defined(ALX_INA228)
-		uint8_t RSTACC : 1;	// AlxIna228_RegEnum_0x00_RSTACC
+		AlxIna228_RegEnum_0x00_RSTACC RSTACC : 1;
 		#elif defined(ALX_INA238)
 		uint8_t unused_14 : 1;
 		#endif
-		uint8_t RST : 1;	// AlxIna228_RegEnum_0x00_RST
+		AlxIna228_RegEnum_0x00_RST RST : 1;
 	};
 	uint16_t raw;
 } AlxIna228_RegVal_0x00_CONFIG;

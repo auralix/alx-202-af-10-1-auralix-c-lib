@@ -267,7 +267,7 @@ typedef union
 	struct ALX_PACKED
 	{
 		AlxAdau1961_General_GainMixer1Mixer2 MX1AUXG : 3;
-		uint8_t LDBOOST : 2;	// AlxAdau1961_General_DiffPGAInputGain
+		AlxAdau1961_General_DiffPGAInputGain LDBOOST : 2;
 		uint8_t unused_5_7: 3; // bits 5..7 are unused
 	};
 	uint8_t raw;
@@ -296,7 +296,7 @@ typedef union
 	struct ALX_PACKED
 	{
 		AlxAdau1961_General_GainMixer1Mixer2 MX2AUXG : 3;
-		uint8_t RDBOOST : 2;	// AlxAdau1961_General_DiffPGAInputGain
+		AlxAdau1961_General_DiffPGAInputGain RDBOOST : 2;
 		uint8_t unused_5_7: 3; // bits 5..7 are unused
 	};
 	uint8_t raw;
@@ -320,7 +320,7 @@ typedef union
 	struct ALX_PACKED
 	{
 		AlxAdau1961_R8_R9_DiffPGAEnable LDEN : 1;
-		uint8_t LDMUTE : 1;	// AlxAdau1961_R8_R9_DiffInputMuteControl
+		AlxAdau1961_R8_R9_DiffInputMuteControl LDMUTE : 1;
 		uint8_t LDVOL: 6;		// -12dB to 35.25dB with 0.75dB step
 	};
 	uint8_t raw;
@@ -330,7 +330,7 @@ typedef union
 	struct ALX_PACKED
 	{
 		AlxAdau1961_R8_R9_DiffPGAEnable RDEN : 1;
-		uint8_t RDMUTE : 1;	// AlxAdau1961_R8_R9_DiffInputMuteControl
+		AlxAdau1961_R8_R9_DiffInputMuteControl RDMUTE : 1;
 		uint8_t RDVOL: 6;		// -12dB to 35.25dB with 0.75dB step
 	};
 	uint8_t raw;
@@ -935,7 +935,7 @@ typedef union
 	struct ALX_PACKED
 	{
 		AlxAdau1961_General_OutputMode LOMODE : 1;
-		uint8_t LOUTM : 1;	// AlxAdau1961_General_OutputMute
+		AlxAdau1961_General_OutputMute LOUTM : 1;
 		uint8_t LOUTVOL: 6;		// -57dB to 6dB with 1dB step
 	};
 	uint8_t raw;
@@ -949,7 +949,7 @@ typedef union
 	struct ALX_PACKED
 	{
 		AlxAdau1961_General_OutputMode ROMODE : 1;
-		uint8_t ROUTM : 1;	// AlxAdau1961_General_OutputMute
+		AlxAdau1961_General_OutputMute ROUTM : 1;
 		uint8_t ROUTVOL: 6;		// -57dB to 6dB with 1dB step
 	};
 	uint8_t raw;
