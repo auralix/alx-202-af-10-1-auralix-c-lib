@@ -78,10 +78,12 @@ void AlxSocket_Ctor
 	// Variables
 	me->alxNet = NULL;
 	me->protocol = AlxSocket_Protocol_Undefined;
+	#if defined(ALX_WIZNET)
 	if (!alxSocketAllocMutex.wasCtorCalled)
 	{
 		AlxOsMutex_Ctor(&alxSocketAllocMutex);
 	}
+	#endif
 	if (!socketMutex.wasCtorCalled)
 	{
 		AlxOsMutex_Ctor(&socketMutex);
@@ -1128,7 +1130,11 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 	#endif
 
 	// Return
+	#if defined(ALX_WIZNET)
 	return SOCKERR_SOCKINIT;
+	#else
+	return -1;
+	#endif
 }
 int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 {
@@ -1229,7 +1235,11 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 	#endif
 
 	// Return
+	#if defined(ALX_WIZNET)
 	return SOCKERR_SOCKINIT;
+	#else
+	return -1;
+	#endif
 }
 void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms)
 {
