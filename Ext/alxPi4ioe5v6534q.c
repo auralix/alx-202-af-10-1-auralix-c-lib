@@ -255,8 +255,8 @@ Alx_Status AlxPi4ioe5v6534q_Handle(AlxPi4ioe5v6534q* me, uint8_t inPortNum, uint
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	ALX_PI4IOE5V6534Q_ASSERT(me->isInitPeriph == true);
 	ALX_PI4IOE5V6534Q_ASSERT(me->isInit == true);
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= inPortNum) && (inPortNum <= 5));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= outPortNum) && (outPortNum <= 5));
+	ALX_PI4IOE5V6534Q_ASSERT(inPortNum <= 5);
+	ALX_PI4IOE5V6534Q_ASSERT(outPortNum <= 5);
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -301,8 +301,8 @@ bool AlxPi4ioe5v6534q_IoPin_Read(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pin
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= port) && (port <= 4));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= pin) && (pin <= 7));
+	ALX_PI4IOE5V6534Q_ASSERT(port <= 4);
+	ALX_PI4IOE5V6534Q_ASSERT(pin <= 7);
 
 	// Read
 	if (me->reg._0x00_InputPort.val.raw[port] & (1 << pin))
@@ -328,8 +328,8 @@ void AlxPi4ioe5v6534q_IoPin_Write(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pi
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= port) && (port <= 4));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= pin) && (pin <= 7));
+	ALX_PI4IOE5V6534Q_ASSERT(port <= 4);
+	ALX_PI4IOE5V6534Q_ASSERT(pin <= 7);
 
 	// Write
 	if (val == true)
@@ -354,8 +354,8 @@ void AlxPi4ioe5v6534q_IoPin_Set(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pin)
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= port) && (port <= 4));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= pin) && (pin <= 7));
+	ALX_PI4IOE5V6534Q_ASSERT(port <= 4);
+	ALX_PI4IOE5V6534Q_ASSERT(pin <= 7);
 
 	// Set
 	AlxPi4ioe5v6534q_IoPin_Write(me, port, pin, true);
@@ -373,8 +373,8 @@ void AlxPi4ioe5v6534q_IoPin_Reset(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pi
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= port) && (port <= 4));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= pin) && (pin <= 7));
+	ALX_PI4IOE5V6534Q_ASSERT(port <= 4);
+	ALX_PI4IOE5V6534Q_ASSERT(pin <= 7);
 
 	// Reset
 	AlxPi4ioe5v6534q_IoPin_Write(me, port, pin, false);
@@ -392,8 +392,8 @@ void AlxPi4ioe5v6534q_IoPin_Toggle(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t p
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= port) && (port <= 4));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= pin) && (pin <= 7));
+	ALX_PI4IOE5V6534Q_ASSERT(port <= 4);
+	ALX_PI4IOE5V6534Q_ASSERT(pin <= 7);
 
 	// Toggle
 	me->reg._0x05_OutputPort.val.raw[port] ^=  (1 << pin);

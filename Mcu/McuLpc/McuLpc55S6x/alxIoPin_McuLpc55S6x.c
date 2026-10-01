@@ -76,7 +76,7 @@ void AlxIoPin_Ctor
 {
 	// Assert
 	ALX_IO_PIN_ASSERT((port == 0) || (port == 1));
-	ALX_IO_PIN_ASSERT((0 <= pin) && (pin <= 31));
+	ALX_IO_PIN_ASSERT(pin <= 31);
 
 	// Parameters
 	me->port = port;

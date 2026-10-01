@@ -315,7 +315,7 @@ bool AlxPcal6416a_IoPin_Read(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCAL6416A_ASSERT((port == 0) || (port == 1));
-	ALX_PCAL6416A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCAL6416A_ASSERT(pin <= 8);
 
 	// Read if port 0 is used
 	if (port == 0)
@@ -365,7 +365,7 @@ void AlxPcal6416a_IoPin_Write(AlxPcal6416a* me, uint8_t port, uint8_t pin, bool 
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCAL6416A_ASSERT((port == 0) || (port == 1));
-	ALX_PCAL6416A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCAL6416A_ASSERT(pin <= 8);
 
 	// Write if port 0 is used
 	if (port == 0)
@@ -413,7 +413,7 @@ void AlxPcal6416a_IoPin_Set(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCAL6416A_ASSERT((port == 0) || (port == 1));
-	ALX_PCAL6416A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCAL6416A_ASSERT(pin <= 8);
 
 	// Set
 	AlxPcal6416a_IoPin_Write(me, port, pin, true);
@@ -432,7 +432,7 @@ void AlxPcal6416a_IoPin_Reset(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCAL6416A_ASSERT((port == 0) || (port == 1));
-	ALX_PCAL6416A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCAL6416A_ASSERT(pin <= 8);
 
 	// Reset
 	AlxPcal6416a_IoPin_Write(me, port, pin, false);
@@ -451,7 +451,7 @@ void AlxPcal6416a_IoPin_Toggle(AlxPcal6416a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCAL6416A_ASSERT((port == 0) || (port == 1));
-	ALX_PCAL6416A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCAL6416A_ASSERT(pin <= 8);
 
 	// Write if port 0 is used
 	if (port == 0)

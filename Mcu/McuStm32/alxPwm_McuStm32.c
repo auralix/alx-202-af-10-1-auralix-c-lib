@@ -361,7 +361,7 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
 	ALX_PWM_ASSERT(me->isInit == true);
 	(void)ch;
-	ALX_PWM_ASSERT((0 <= duty_permil) && (duty_permil <= 1000));
+	ALX_PWM_ASSERT(duty_permil <= 1000);
 
 	// Optimize guard
 	#if !(defined (ALX_PWM_OPTIMIZE_SIZE))

@@ -1256,7 +1256,7 @@ static uint32_t AlxAdc_GetRank(uint8_t buffPos)
 	// STM32F0, STM32F1, STM32F4, STM32F7
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7)
-	ALX_ADC_ASSERT((0 <= buffPos) && (buffPos <= 15));
+	ALX_ADC_ASSERT(buffPos <= 15);
 	return buffPos + 1;
 	#endif
 

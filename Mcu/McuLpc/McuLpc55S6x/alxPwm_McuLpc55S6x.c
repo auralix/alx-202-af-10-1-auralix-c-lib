@@ -246,7 +246,7 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 	// Assert
 	ALX_PWM_ASSERT(me->isInit == true);
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
-	ALX_PWM_ASSERT((0U <= duty_permil) && (duty_permil <= 1000U));
+	ALX_PWM_ASSERT(duty_permil <= 1000U);
 
 	// Optimize Guard
 	#if !(defined (ALX_PWM_OPTIMIZE_SIZE))

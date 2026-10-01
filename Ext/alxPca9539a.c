@@ -374,7 +374,7 @@ bool AlxPca9539a_IoPin_Read(AlxPca9539a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCA9539A_ASSERT((port == 0) || (port == 1));
-	ALX_PCA9539A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCA9539A_ASSERT(pin <= 8);
 
 	// Read if port 0 is used
 	if (port == 0)
@@ -452,7 +452,7 @@ void AlxPca9539a_IoPin_Write(AlxPca9539a* me, uint8_t port, uint8_t pin, bool va
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCA9539A_ASSERT((port == 0) || (port == 1));
-	ALX_PCA9539A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCA9539A_ASSERT(pin <= 8);
 
 	// Write if port 0 is used
 	if (port == 0)
@@ -500,7 +500,7 @@ void AlxPca9539a_IoPin_Set(AlxPca9539a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCA9539A_ASSERT((port == 0) || (port == 1));
-	ALX_PCA9539A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCA9539A_ASSERT(pin <= 8);
 
 	// Set
 	AlxPca9539a_IoPin_Write(me, port, pin, true);
@@ -519,7 +519,7 @@ void AlxPca9539a_IoPin_Reset(AlxPca9539a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCA9539A_ASSERT((port == 0) || (port == 1));
-	ALX_PCA9539A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCA9539A_ASSERT(pin <= 8);
 
 	// Reset
 	AlxPca9539a_IoPin_Write(me, port, pin, false);
@@ -538,7 +538,7 @@ void AlxPca9539a_IoPin_Toggle(AlxPca9539a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCA9539A_ASSERT((port == 0) || (port == 1));
-	ALX_PCA9539A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCA9539A_ASSERT(pin <= 8);
 
 	// Write if port 0 is used
 	if (port == 0)
