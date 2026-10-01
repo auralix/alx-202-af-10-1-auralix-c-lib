@@ -750,7 +750,6 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 
 	// #2 Prepare variables
 	status_t status = kStatus_Fail;
-	Alx_Status alxStat = Alx_Err;
 	uint32_t flag = 0;
 
 	// #3 Start Timeout
@@ -787,7 +786,6 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		{
 			ALX_I2C_TRACE_WRN("WrnNack");
 			status = kStatus_Fail;
-			alxStat = Alx_Err;
 			continue;
 		}
 
