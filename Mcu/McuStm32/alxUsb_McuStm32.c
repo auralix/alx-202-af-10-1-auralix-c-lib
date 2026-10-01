@@ -60,9 +60,7 @@ static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id);
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
-#if defined(ALX_USBH)
-static Alx_Status AlxUsb_Reset(AlxUsb* me);
-#endif
+static ALX_UNUSED Alx_Status AlxUsb_Reset(AlxUsb* me);
 static void AlxUsb_Periph_EnableClk(AlxUsb* me);
 static void AlxUsb_Periph_DisableClk(AlxUsb* me);
 static void AlxUsb_Periph_ForceReset(AlxUsb* me);
@@ -507,8 +505,7 @@ static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
-#if defined(ALX_USBH)
-static Alx_Status AlxUsb_Reset(AlxUsb* me)
+static ALX_UNUSED Alx_Status AlxUsb_Reset(AlxUsb* me)
 {
 	// Local variables
 	#if defined(ALX_USBH)
@@ -589,7 +586,6 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 	// Return
 	return Alx_Ok;
 }
-#endif
 static void AlxUsb_Periph_EnableClk(AlxUsb* me)
 {
 	#if defined(USB_OTG_FS)
