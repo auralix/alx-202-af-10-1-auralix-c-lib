@@ -152,6 +152,7 @@ void AlxMmc_Ctor
 
 	// Check clock
 	ALX_MMC_ASSERT(AlxMmc_IsClkOk(me));
+	(void)AlxMmc_IsClkOk;
 
 	// Info
 	me->wasCtorCalled = true;
