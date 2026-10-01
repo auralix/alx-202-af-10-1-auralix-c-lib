@@ -734,20 +734,6 @@ int AlxNet_Ping(AlxNet* me, const char *addr, uint16_t count, uint32_t timeout_m
 	return -1;
 }
 
-#if defined(ALX_FREE_RTOS_CELLULAR)
-static void cellular_info_task(void *argument)
-{
-	AlxNet* me = (AlxNet*) argument;
-	while (1)
-	{
-		Cellular_GetInfo(me->cellular.handle, &me->cellular.signalQuality) ;
-		//ALX_NET_TRACE_INF("CELLULAR RSSI: %d", signalInfo.rssi);
-		AlxOsDelay_ms(&alxOsDelay, 1000);
-	}
-
-}
-#endif
-
 //******************************************************************************
 // Constructor
 //******************************************************************************
