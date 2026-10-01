@@ -921,7 +921,9 @@ static uint32_t AlxAdc_GetVref_mV(AlxAdc* me)
 				#endif
 
 				// Return
+				#if !defined(ALX_STM32F1)
 				return vref_mV;
+				#endif
 			}
 		}
 	}
