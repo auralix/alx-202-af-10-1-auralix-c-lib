@@ -233,34 +233,31 @@ Alx_Status AlxIna228_ReadRegAll(AlxIna228* me)
 	ALX_INA228_ASSERT(me->isInitPeriph == true);
 	ALX_INA228_ASSERT(me->isInit == true);
 
-	// Local variables
-	Alx_Status status = Alx_Err;
-
 	// Read
-	status = AlxIna228_Reg_Read(me, &me->reg._0x00_CONFIG);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x01_ADC_CONFIG);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x02_SHUNT_CAL);
+	AlxIna228_Reg_Read(me, &me->reg._0x00_CONFIG);
+	AlxIna228_Reg_Read(me, &me->reg._0x01_ADC_CONFIG);
+	AlxIna228_Reg_Read(me, &me->reg._0x02_SHUNT_CAL);
 	#if defined(ALX_INA228)
-	status = AlxIna228_Reg_Read(me, &me->reg._0x03_SHUNT_TEMPCO);
+	AlxIna228_Reg_Read(me, &me->reg._0x03_SHUNT_TEMPCO);
 	#endif
-	status = AlxIna228_Reg_Read(me, &me->reg._0x04_VSHUNT);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x05_VBUS);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x06_DIETEMP);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x07_CURRENT);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x08_POWER);
+	AlxIna228_Reg_Read(me, &me->reg._0x04_VSHUNT);
+	AlxIna228_Reg_Read(me, &me->reg._0x05_VBUS);
+	AlxIna228_Reg_Read(me, &me->reg._0x06_DIETEMP);
+	AlxIna228_Reg_Read(me, &me->reg._0x07_CURRENT);
+	AlxIna228_Reg_Read(me, &me->reg._0x08_POWER);
 	#if defined(ALX_INA228)
-	status = AlxIna228_Reg_Read(me, &me->reg._0x09_ENERGY);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x0A_CHARGE);
+	AlxIna228_Reg_Read(me, &me->reg._0x09_ENERGY);
+	AlxIna228_Reg_Read(me, &me->reg._0x0A_CHARGE);
 	#endif
-	status = AlxIna228_Reg_Read(me, &me->reg._0x0B_DIAG_ALRT);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x0C_SOVL);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x0D_SUVL);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x0E_BOVL);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x0F_BUVL);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x10_TEMP_LIMIT);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x11_PWR_LIMIT);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x3E_MANUFACTURER_ID);
-	status = AlxIna228_Reg_Read(me, &me->reg._0x3F_DEVICE_ID);
+	AlxIna228_Reg_Read(me, &me->reg._0x0B_DIAG_ALRT);
+	AlxIna228_Reg_Read(me, &me->reg._0x0C_SOVL);
+	AlxIna228_Reg_Read(me, &me->reg._0x0D_SUVL);
+	AlxIna228_Reg_Read(me, &me->reg._0x0E_BOVL);
+	AlxIna228_Reg_Read(me, &me->reg._0x0F_BUVL);
+	AlxIna228_Reg_Read(me, &me->reg._0x10_TEMP_LIMIT);
+	AlxIna228_Reg_Read(me, &me->reg._0x11_PWR_LIMIT);
+	AlxIna228_Reg_Read(me, &me->reg._0x3E_MANUFACTURER_ID);
+	AlxIna228_Reg_Read(me, &me->reg._0x3F_DEVICE_ID);
 
 	// Return
 	return Alx_Ok;
