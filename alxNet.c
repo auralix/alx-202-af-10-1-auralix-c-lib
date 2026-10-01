@@ -289,57 +289,6 @@ static void dhcp_task(void *argument)
 	}
 }
 
-#if defined(ALX_NET_DEBUG)
-// debug info
-static struct
-{
-	uint8_t sr[8]; // socket status regs - getSn_SR
-	uint8_t link; // wizphy_getphylink();
-	wiz_PhyConf phyconf; //wizphy_getphyconf(&phyconf)
-} dbg_wiz_staus[2];
-
-static void dbg_get(void)
-{
-	memcpy(&dbg_wiz_staus[0], &dbg_wiz_staus[1], sizeof(dbg_wiz_staus[0]));
-	for (int i = 0; i < 8; i++)
-	{
-		dbg_wiz_staus[1].sr[i] = getSn_SR(i);
-	}
-	dbg_wiz_staus[1].link = wizphy_getphylink();
-	wizphy_getphyconf(&dbg_wiz_staus[1].phyconf);
-}
-
-static void dbg_dump(void)
-{
-	ALX_NET_TRACE_INF("--- WIZNET STATUS ----");
-	ALX_NET_TRACE_INF("SR[i]: %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x %02x->%02x",
-		dbg_wiz_staus[0].sr[0],
-		dbg_wiz_staus[1].sr[0],
-		dbg_wiz_staus[0].sr[1],
-		dbg_wiz_staus[1].sr[1],
-		dbg_wiz_staus[0].sr[2],
-		dbg_wiz_staus[1].sr[2],
-		dbg_wiz_staus[0].sr[3],
-		dbg_wiz_staus[1].sr[3],
-		dbg_wiz_staus[0].sr[4],
-		dbg_wiz_staus[1].sr[4],
-		dbg_wiz_staus[0].sr[5],
-		dbg_wiz_staus[1].sr[5],
-		dbg_wiz_staus[0].sr[6],
-		dbg_wiz_staus[1].sr[6],
-		dbg_wiz_staus[0].sr[7],
-		dbg_wiz_staus[1].sr[7]);
-	ALX_NET_TRACE_INF("PhyLink: %02x->%02x", dbg_wiz_staus[0].link, dbg_wiz_staus[1].link);
-	ALX_NET_TRACE_INF("PhyConf: mode:%02x->%02x duplex:%02x->%02x speed:%02x->%02x",
-		dbg_wiz_staus[0].phyconf.mode,
-		dbg_wiz_staus[1].phyconf.mode,
-		dbg_wiz_staus[0].phyconf.duplex,
-		dbg_wiz_staus[1].phyconf.duplex,
-		dbg_wiz_staus[0].phyconf.speed,
-		dbg_wiz_staus[1].phyconf.speed);
-}
-#endif
-
 // 1 sec tick task
 static void tick_task(void *argument)
 {
