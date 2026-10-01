@@ -382,4 +382,10 @@ typedef void (*k_thread_entry_t)(void* p1, void* p2, void* p3);
 #define alxShimZephyr_IsEnabled2(probe) alxShimZephyr_IsEnabled3(probe 1, 0, ~)
 #define alxShimZephyr_IsEnabled3(ignore, value, ...) value
 
+// The logging and the statically defined mutex of alxTrace_McuZephyr.c with ALX_TRACE_ZEPHYR_WITH_LOG
+#define LOG_LEVEL_INF 3
+#define LOG_MODULE_REGISTER(name, level) extern int alxShimZephyr_LogModule_##name
+#define LOG_INF(...) ((void)alxShimZephyr_Call(0, ##__VA_ARGS__))
+#define K_MUTEX_DEFINE(name) struct k_mutex name
+
 #endif	// ALX_SHIM_ZEPHYR_ZEPHYRHOSTSHIM_H
