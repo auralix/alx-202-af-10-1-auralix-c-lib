@@ -801,7 +801,6 @@ Alx_Status maxim_max1726x_get_repsoc(AlxMax17263* me, float *value)
 /* ************************************************************************* */
 Alx_Status maxim_max1726x_get_fullcaprep(AlxMax17263* me, float *value)
 {
-	float fullcaprep;
 	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_FULLCAPREP_REG, &max1726x_regs[MAX1726X_FULLCAPREP_REG]);
 	if(ret != Alx_Ok) return ret;
 
@@ -812,7 +811,6 @@ Alx_Status maxim_max1726x_get_fullcaprep(AlxMax17263* me, float *value)
 /* ************************************************************************* */
 Alx_Status maxim_max1726x_get_tte(AlxMax17263* me, float *value)
 {
-	float tte;
 	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_TTE_REG, &max1726x_regs[MAX1726X_TTE_REG]);
 	if(ret != Alx_Ok) return ret;
 
@@ -823,7 +821,6 @@ Alx_Status maxim_max1726x_get_tte(AlxMax17263* me, float *value)
 /* ************************************************************************* */
 Alx_Status maxim_max1726x_get_cycles(AlxMax17263* me, float *value)
 {
-	float cycles;
 	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_CYCLES_REG, &max1726x_regs[MAX1726X_CYCLES_REG]);
 	if(ret != Alx_Ok) return ret;
 
@@ -834,7 +831,6 @@ Alx_Status maxim_max1726x_get_cycles(AlxMax17263* me, float *value)
 /* ************************************************************************* */
 Alx_Status maxim_max1726x_get_avgta(AlxMax17263* me, float *value)
 {
-	float avgta;
 	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_AVGTA_REG, &max1726x_regs[MAX1726X_AVGTA_REG]);
 	if(ret != Alx_Ok) return ret;
 
@@ -845,7 +841,6 @@ Alx_Status maxim_max1726x_get_avgta(AlxMax17263* me, float *value)
 /* ************************************************************************* */
 Alx_Status maxim_max1726x_get_ttf(AlxMax17263* me, float *value)
 {
-	float ttf;
 	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_TTF_REG, &max1726x_regs[MAX1726X_TTF_REG]);
 	if(ret != Alx_Ok) return ret;
 
@@ -856,7 +851,6 @@ Alx_Status maxim_max1726x_get_ttf(AlxMax17263* me, float *value)
 /* ************************************************************************* */
 Alx_Status maxim_max1726x_get_avgvcell(AlxMax17263* me, float *value)
 {
-	float ttf;
 	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_AVGVCELL_REG, &max1726x_regs[MAX1726X_AVGVCELL_REG]);
 	if(ret != Alx_Ok) return ret;
 
@@ -867,7 +861,6 @@ Alx_Status maxim_max1726x_get_avgvcell(AlxMax17263* me, float *value)
 /* ************************************************************************* */
 Alx_Status maxim_max1726x_get_avgcurr(AlxMax17263* me, float *value)
 {
-	float ttf;
 	Alx_Status ret = maxim_max1726x_read_reg(me, MAX1726X_AVGCURRENT_REG, &max1726x_regs[MAX1726X_AVGCURRENT_REG]);
 	if(ret != Alx_Ok) return ret;
 
