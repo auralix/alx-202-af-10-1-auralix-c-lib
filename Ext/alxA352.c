@@ -658,7 +658,7 @@ static Alx_Status AlxA352_VerifyMode(AlxA352* me, AlxA352_RegEnum_MODE_CTRL_MODE
 		}
 	}
 
-	ALX_A352_TRACE_INF("Mode %u entered 0x%04X (%u) (%s)", target, me->reg.MODE_CTRL.val.raw, i, status == Alx_Ok ? "OK" : "ERR");
+	ALX_A352_TRACE_INF("Mode %d entered 0x%04" PRIX16 " (%" PRIu32 ") (%s)", target, me->reg.MODE_CTRL.val.raw, i, status == Alx_Ok ? "OK" : "ERR");
 
 	return status;
 }
@@ -955,11 +955,11 @@ static Alx_Status AlxA352_FlashBackup(AlxA352* me)
 
 	if ((status == Alx_Ok) && (me->reg.DIAG_STAT.val.FLASH_BU_ERR == 0))
 	{
-		ALX_A352_TRACE_INF("Flash backup complete (%u)", i);
+		ALX_A352_TRACE_INF("Flash backup complete (%" PRIu32 ")", i);
 	}
 	else
 	{
-		ALX_A352_TRACE_ERR("Flash backup failed (%u)", i);
+		ALX_A352_TRACE_ERR("Flash backup failed (%" PRIu32 ")", i);
 		status = Alx_Err;
 	}
 
@@ -998,7 +998,7 @@ static Alx_Status AlxA352_SwReset(AlxA352* me)
 		}
 	}
 
-	ALX_A352_TRACE_INF("Software reset complete (%u) (%s)", i, (status == Alx_Ok) ? "OK" : "ERR");
+	ALX_A352_TRACE_INF("Software reset complete (%" PRIu32 ") (%s)", i, (status == Alx_Ok) ? "OK" : "ERR");
 	return status;
 }
 
