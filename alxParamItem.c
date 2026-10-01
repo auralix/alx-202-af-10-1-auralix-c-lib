@@ -1359,6 +1359,7 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	else if (me->dataType == AlxParamItem_Arr)
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
+		return;
 	}
 	else if (me->dataType == AlxParamItem_Str)
 	{
@@ -1367,6 +1368,7 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	else
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
+		return;
 	}
 
 	// Set
