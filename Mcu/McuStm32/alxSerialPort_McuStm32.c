@@ -591,7 +591,7 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 		#if defined(ALX_STM32F4)
 		// Overrun error handling, periphery doesn't have overrun error disable functionality.
 		// We clear overrun flag with sequence of first reading status register, and then data register.
-		volatile const uint32_t dummy = me->huart.Instance->SR;
+		(void)me->huart.Instance->SR;
 		#endif
 
 		// No overrun error handling, overrun error must be disabled @ Uart initialization.
