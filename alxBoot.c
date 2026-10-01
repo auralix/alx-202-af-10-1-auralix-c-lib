@@ -332,11 +332,13 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		}
 
 		// Check file size
+		#if defined(ALX_BOOT_A)
 		if (info.fatfsInfo.fsize != ALX_MCU_BOOT_IMAGE_SIZE)
 		{
 			ALX_BOOT_TRACE_WRN("SKIP: CheckFileSize() fsize %" PRIu32 " fname %s", (uint32_t)info.fatfsInfo.fsize, info.fatfsInfo.fname);
 			continue;
 		}
+		#endif
 
 		// Parse file name
 		uint32_t _fwCandVerDate = 0;
