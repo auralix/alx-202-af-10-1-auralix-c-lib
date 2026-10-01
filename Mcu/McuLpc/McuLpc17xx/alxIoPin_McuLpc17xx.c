@@ -201,6 +201,7 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 {
 	// TV: TODO
 	ALX_IO_PIN_ASSERT(false);
+	return AlxIoPin_TriState_Undefined;
 }
 
 

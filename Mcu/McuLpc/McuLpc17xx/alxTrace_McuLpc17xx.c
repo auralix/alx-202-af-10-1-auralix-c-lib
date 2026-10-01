@@ -99,6 +99,9 @@ Alx_Status AlxTrace_Init(AlxTrace* me)
 	Chip_UART_TXEnable(me->uart);
 
 	me->isInit = true;
+
+	// Return
+	return Alx_Ok;
 }
 
 /**
@@ -111,6 +114,9 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me)
 {
 	// TV: TODO
 	me->isInit = false;
+
+	// Return
+	return Alx_Ok;
 }
 
 /**
@@ -127,6 +133,9 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 		while ((Chip_UART_ReadLineStatus(me->uart) & UART_LSR_THRE) == false) ; // Wait until TX buffer is empty
 		Chip_UART_SendByte(me->uart, (const uint8_t)*str++);
 	}
+
+	// Return
+	return Alx_Ok;
 }
 
 
