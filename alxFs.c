@@ -1128,7 +1128,9 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Local variables
+	#if defined(ALX_FATFS) || defined(ALX_LFS)
 	int32_t status = -1;
+	#endif
 
 	// Do
 	#if defined(ALX_FATFS)
@@ -1557,8 +1559,8 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff)
 			{
 				// Get
 				uint32_t blockCount = 0;
-				uint32_t blockLen_byte = 0;
 				#if defined(ALX_STM32F7)
+				uint32_t blockLen_byte = 0;
 				status = AlxUsb_GetCapacity(alxFs_Fatfs_Mmc_Usb_me->alxUsb, &blockCount, &blockLen_byte);
 				#endif
 				if (status != Alx_Ok)
@@ -1590,9 +1592,9 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff)
 			else if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Usb)
 			{
 				// Get
-				uint32_t blockCount = 0;
 				uint32_t blockLen_byte = 0;
 				#if defined(ALX_STM32F7)
+				uint32_t blockCount = 0;
 				status = AlxUsb_GetCapacity(alxFs_Fatfs_Mmc_Usb_me->alxUsb, &blockCount, &blockLen_byte);
 				#endif
 				if (status != Alx_Ok)
@@ -2015,12 +2017,12 @@ static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block
 	// Prepare
 	Alx_Status status = Alx_Err;
 	AlxFs* me = (AlxFs*)c->context;
-	uint32_t numOfBlocks = size / 512;
-	uint32_t blockAddr = (block * c->block_size + off) / 512;
 
 	// Read
 	if(me->do_DBG_ReadBlock != NULL) AlxIoPin_Set(me->do_DBG_ReadBlock);
 	#if defined(ALX_STM32L4)
+	uint32_t numOfBlocks = size / 512;
+	uint32_t blockAddr = (block * c->block_size + off) / 512;
 	status = AlxMmc_ReadBlock(me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 3, 100);
 	#endif
 	if(me->do_DBG_ReadBlock != NULL) AlxIoPin_Reset(me->do_DBG_ReadBlock);
@@ -2038,12 +2040,12 @@ static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block
 	// Prepare
 	Alx_Status status = Alx_Err;
 	AlxFs* me = (AlxFs*)c->context;
-	uint32_t numOfBlocks = size / 512;
-	uint32_t blockAddr = (block * c->block_size + off) / 512;
 
 	// Write
 	if(me->do_DBG_WriteBlock != NULL) AlxIoPin_Set(me->do_DBG_WriteBlock);
 	#if defined(ALX_STM32L4)
+	uint32_t numOfBlocks = size / 512;
+	uint32_t blockAddr = (block * c->block_size + off) / 512;
 	status = AlxMmc_WriteBlock(me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 3, 100);
 	#endif
 	if(me->do_DBG_WriteBlock != NULL) AlxIoPin_Reset(me->do_DBG_WriteBlock);
