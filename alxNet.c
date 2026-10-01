@@ -1690,6 +1690,7 @@ AlxNet_Config Alx_GetNetInterface(AlxNet *me)
 	return me->config;
 }
 
+#if defined(ALX_FREE_RTOS_CELLULAR)
 static int8_t parse_cellular_rssi_to_dbm(uint8_t input)
 {
 	if (input == 0) {
@@ -1730,7 +1731,6 @@ static int8_t parse_cellular_rssi_to_dbm(uint8_t input)
 	}
 }
 
-#if defined(ALX_FREE_RTOS_CELLULAR)
 void AlxNet_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber)
 {
 	if (rssi != NULL) {
