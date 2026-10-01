@@ -47,7 +47,7 @@ extern void CellularDevice_PowerOff(void);
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
+#if defined(ALX_C_LIB) && !defined(ALX_ZEPHYR) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
 
 
 //******************************************************************************
@@ -1761,4 +1761,4 @@ void AlxNet_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber)
 //******************************************************************************
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
+#endif	// #if defined(ALX_C_LIB) && !defined(ALX_ZEPHYR) && (defined(ALX_FREE_RTOS_CELLULAR) || defined(ALX_WIZNET))
