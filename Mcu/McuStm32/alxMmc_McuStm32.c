@@ -811,7 +811,7 @@ void HAL_MMC_RxCpltCallback(MMC_HandleTypeDef *hmmc)
 	alxMmc_Sdmmc1_me->dmaReadDone = true;
 	#endif
 	#if defined(SDMMC2)
-	alxMmc_Sdmmc2_me->isDmaReadDone = true;
+	alxMmc_Sdmmc2_me->dmaReadDone = true;
 	#endif
 }
 void HAL_MMC_TxCpltCallback(MMC_HandleTypeDef *hmmc)
@@ -822,7 +822,7 @@ void HAL_MMC_TxCpltCallback(MMC_HandleTypeDef *hmmc)
 	alxMmc_Sdmmc1_me->dmaWriteDone = true;
 	#endif
 	#if defined(SDMMC2)
-	alxMmc_Sdmmc2_me->isDmaWriteDone = true;
+	alxMmc_Sdmmc2_me->dmaWriteDone = true;
 	#endif
 }
 
