@@ -6,6 +6,8 @@ Run from Test/ inside its uv environment (`uv sync --locked` once):
     uv run nox                                      build, test, analyze, sanitize, coverage
     uv run nox -s coverage                          one lane
     uv run nox -s mutate -- --sample 5 alxFifo.c    MUTATE (report-only); --sample 0 = every mutant
+    uv run nox -s matrix                            every alx file in every configuration, then its gate
+    uv run nox -s matrix -- 0001 0045               the rows whose id or name starts so (no gate)
     uv run nox -s test -- -k Fifo                   arguments after -- go to pytest
 
 One nox session per stage, named after it, running in Test/.venv (no second environment per lane), the
@@ -42,6 +44,7 @@ tc = hb.Toolchain()   # where the tools are on THIS machine (ALX_* variables), a
 # repository build recipes and DLL_GROUPS; no pytest lifecycle dependency; harness is installed
 # into this project's environment (pyproject.toml, [build-system])
 from harness.host import build as host_recipe  # noqa: E402
+from harness.host import matrix as host_matrix  # noqa: E402
 
 nox.options.default_venv_backend = "none"
 nox.options.sessions = list(lanes.DEFAULT_SESSIONS)
@@ -807,3 +810,25 @@ def mutate(session: nox.Session) -> None:
                 "--fingerprint-cmd", f"{hooks} fingerprint {{mutant}} --work {work} {flags}",
                 "--rebuild-cmd", f"{hooks} rebuild --groups harness.host.build:DLL_GROUPS",
                 *args.sources)
+
+
+@nox.session
+def matrix(session: nox.Session) -> None:
+    """MATRIX - HOST: every alx file in every row of config/matrix.toml, then the configs gate.
+
+    Decision 13 (wiki, Design/ConfigurationMatrix.md): a row is one configuration of the library -
+    toolchain, platform, features, target, library - and the rows together must compile every line
+    of alx code, each one clean, against fakes of everything that is not alx (host/shim/<vendor>/).
+    On demand, like mutate and variants: every row is about four hundred compiles. `-- 0001 0045`
+    runs the rows whose id or name starts so and skips the gate, which reads only the whole matrix.
+    The mechanism is alx.verify.configs; harness.host.matrix holds what the words mean here.
+    """
+    shutil.rmtree(BUILD / "matrix", ignore_errors=True)
+    out = lanes.evidence_dir(TEST, "matrix")
+    report = host_matrix.run(out, only=session.posargs, log=session.log)
+    session.log(f"MATRIX: {report['coverage']} - {out / 'report.md'}")
+    if session.posargs:
+        session.log("MATRIX: a subset of the rows, so no gate - it reads the whole matrix only")
+        return
+    session.run(PYTHON, "-m", "alx.verify.gates.configs", str(out / "report.json"),
+                "--out", str(out / "configs_gate.txt"))
