@@ -295,7 +295,15 @@ Alx_Status AlxIna228_GetShuntVoltage_V(AlxIna228* me, float* voltage_V)
 	#endif
 
 	// Set Conversion shunt factor. Depending on (ADCRANGE) adc range: 0 or 1.
-	const float CONVERSION_SHUNT_FACTOR = (me->reg._0x00_CONFIG.val.ADCRANGE == AdcRange_163_84_mV) ? CONVERSION_SHUNT_FACTOR_1 : CONVERSION_SHUNT_FACTOR_2;
+	float CONVERSION_SHUNT_FACTOR = 0;
+	if (me->reg._0x00_CONFIG.val.ADCRANGE == AdcRange_163_84_mV)
+	{
+		CONVERSION_SHUNT_FACTOR = CONVERSION_SHUNT_FACTOR_1;
+	}
+	else
+	{
+		CONVERSION_SHUNT_FACTOR = CONVERSION_SHUNT_FACTOR_2;
+	}
 
 	// Set
 	*voltage_V = me->reg._0x04_VSHUNT.val.VSHUNT_nVoltage * CONVERSION_SHUNT_FACTOR;
@@ -775,7 +783,15 @@ static void AlxIna228_CurrentLsbFactor(AlxIna228* me)
 	const float ADC_RANGE_40_96_MV = 40.96e-3;
 
 	// Set Maximum Expected Current [A]
-	const float MAX_EXPECTED_CURRENT = (me->adcRange == AdcRange_163_84_mV) ? (ADC_RANGE_163_84_MV / SHUNT_RES_VAL) : (ADC_RANGE_40_96_MV / SHUNT_RES_VAL);
+	float MAX_EXPECTED_CURRENT = 0;
+	if (me->adcRange == AdcRange_163_84_mV)
+	{
+		MAX_EXPECTED_CURRENT = ADC_RANGE_163_84_MV / SHUNT_RES_VAL;
+	}
+	else
+	{
+		MAX_EXPECTED_CURRENT = ADC_RANGE_40_96_MV / SHUNT_RES_VAL;
+	}
 
 	// Set Current LSB factor
 	#if defined(ALX_INA228)
@@ -803,7 +819,15 @@ static void AlxIna228_ShuntFactor(AlxIna228* me)
 	const float SHUNT_RES_VAL = me->shuntRes_Ohm;
 
 	// Set Multiplied factor, Depending on ADCRANGE
-	const float MULTIPLIED_FACTOR = (me->adcRange == AdcRange_163_84_mV) ? 1.0 : 4.0;
+	float MULTIPLIED_FACTOR = 0;
+	if (me->adcRange == AdcRange_163_84_mV)
+	{
+		MULTIPLIED_FACTOR = 1.0;
+	}
+	else
+	{
+		MULTIPLIED_FACTOR = 4.0;
+	}
 
 	 // Set Shunt Cal Register Value
 	const float shuntCalRegVal = FIXED_SCALING_FACTOR * CONVERSION_CURRENT_LSB_FACTOR * SHUNT_RES_VAL * MULTIPLIED_FACTOR;

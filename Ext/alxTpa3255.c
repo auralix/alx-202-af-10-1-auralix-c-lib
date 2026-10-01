@@ -245,7 +245,14 @@ bool AlxTpa3255_IsErrAsserted(AlxTpa3255* me)
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
 
-	return (AlxIoPin_Read(me->di_nFAULT)) ? false : true;
+	if (AlxIoPin_Read(me->di_nFAULT))
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 /**
@@ -259,7 +266,14 @@ bool AlxTpa3255_IsWarningAsserted(AlxTpa3255* me)
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
 
-	return (AlxIoPin_Read(me->di_nCLIP_OTW)) ? false : true;
+	if (AlxIoPin_Read(me->di_nCLIP_OTW))
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 /**

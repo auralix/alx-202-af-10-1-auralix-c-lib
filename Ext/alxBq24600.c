@@ -232,7 +232,14 @@ bool AlxBq24600_IsBatCharging(AlxBq24600* me)
 	ALX_BQ24600_ASSERT(me->isInit == true);
 	ALX_BQ24600_ASSERT(me->wasCtorCalled == true);
 
-	return (me->status == Bq24600Status_Charging) ? true : false;
+	if (me->status == Bq24600Status_Charging)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /**
@@ -246,7 +253,14 @@ bool AlxBq24600_IsBatFull(AlxBq24600* me)
 	ALX_BQ24600_ASSERT(me->isInit == true);
 	ALX_BQ24600_ASSERT(me->wasCtorCalled == true);
 
-	return (me->status == Bq24600Status_BattFull) ? true : false;
+	if (me->status == Bq24600Status_BattFull)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /**
@@ -260,7 +274,14 @@ bool AlxBq24600_IsSleep(AlxBq24600* me)
 	ALX_BQ24600_ASSERT(me->isInit == true);
 	ALX_BQ24600_ASSERT(me->wasCtorCalled == true);
 
-	return (me->status == Bq24600Status_Sleep) ? true : false;
+	if (me->status == Bq24600Status_Sleep)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /**
@@ -274,7 +295,14 @@ bool AlxBq24600_IsErr(AlxBq24600* me)
 	ALX_BQ24600_ASSERT(me->isInit == true);
 	ALX_BQ24600_ASSERT(me->wasCtorCalled == true);
 
-	return (me->status == Bq24600Status_Error) ? true : false;
+	if (me->status == Bq24600Status_Error)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
