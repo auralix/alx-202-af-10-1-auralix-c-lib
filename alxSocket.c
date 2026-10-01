@@ -63,7 +63,6 @@ static AlxSocket wiz_server_sockets[_WIZCHIP_SOCK_NUM_]; // memory fror new sock
 #endif
 
 static AlxOsMutex socketMutex;
-static volatile uint8_t socketConnectBits = 0;
 
 //******************************************************************************
 // Constructor
