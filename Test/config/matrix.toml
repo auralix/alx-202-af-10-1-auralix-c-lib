@@ -126,6 +126,17 @@ file = "Mcu/McuLpc/McuLpc80x/alxPwm_McuLpc80x.c"
 guard = "ALX_LPC80X_TODO"
 why = "an unfinished backend: its _TODO guard keeps it out of every build (decision 12, TV 2026-09-30)"
 
+# Findings kept by decision: reported with the reason, failing no row.
+[[accept]]
+file = "alxBuild.c"
+text = "[-W#pragma-messages]"
+why = "the build stamp alxBuild.c prints on purpose; clang reports a #pragma message as a warning, gcc as a note"
+
+[[accept]]
+file = "alxBoot.c"
+text = "format specifies type 'unsigned long *' but the argument has type 'uint32_t *'"
+why = "the frozen firmware file-name parser (decision 12, TV 2026-09-30): %lu is right on arm-none-eabi-gcc, which builds the bootloader"
+
 [[row]]
 id = "0001"
 toolchain = "gcc"
