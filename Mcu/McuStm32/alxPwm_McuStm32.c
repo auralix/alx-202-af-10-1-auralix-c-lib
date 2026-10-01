@@ -496,9 +496,8 @@ static Alx_Status AlxPwm_RemapIoPin(AlxPwm* me)
 {
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		AlxIoPin* ioPin = *(me->ioPinArr + i);
-
 		#if defined(STM32L073xx)
+		AlxIoPin* ioPin = *(me->ioPinArr + i);
 		if
 		(
 			(me->htim.Instance == TIM3) &&
