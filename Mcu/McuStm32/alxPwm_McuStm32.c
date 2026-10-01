@@ -239,7 +239,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
-		if (AlxPwm_SetDuty_permil(me, me->ch[i], me->dutyDefault_permil[i]) != Alx_Ok)
+		if (AlxPwm_SetDuty_permil(me, me->ch[i], me->dutyDefaultArr_permil[i]) != Alx_Ok)
 		{
 			ALX_PWM_TRACE_ERR("Err");
 			return Alx_Err;
