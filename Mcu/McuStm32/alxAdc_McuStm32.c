@@ -49,9 +49,7 @@
 static uint32_t AlxAdc_GetVref_mV(AlxAdc* me);
 static uint32_t AlxAdc_GetClkPrescaler(AlxAdc* me);
 static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch);
-#if !defined(ALX_STM32L0)
-static uint32_t AlxAdc_GetRank(uint8_t buffPos);
-#endif
+static ALX_UNUSED uint32_t AlxAdc_GetRank(uint8_t buffPos);
 
 
 //------------------------------------------------------------------------------
@@ -1256,8 +1254,7 @@ static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	ALX_ADC_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }
-#if !defined(ALX_STM32L0)
-static uint32_t AlxAdc_GetRank(uint8_t buffPos)
+static ALX_UNUSED uint32_t AlxAdc_GetRank(uint8_t buffPos)
 {
 	//------------------------------------------------------------------------------
 	// STM32F0, STM32F1, STM32F4, STM32F7
@@ -1292,12 +1289,19 @@ static uint32_t AlxAdc_GetRank(uint8_t buffPos)
 
 
 	//------------------------------------------------------------------------------
+	// STM32L0
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32L0)
+	return ALX_NULL;
+	#endif
+
+
+	//------------------------------------------------------------------------------
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_ADC_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }
-#endif
 
 
 //------------------------------------------------------------------------------
