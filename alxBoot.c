@@ -286,7 +286,9 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	AlxDelay_ms(100);
 
 	// Open dir
+	#if defined(ALX_FATFS)
 	const char* fwArtf = AlxId_GetFwArtf(me->alxId);
+	#endif
 	const char* fwName = AlxId_GetFwName(me->alxId);
 	AlxFs_Dir dir = {};
 	char dirPath[128] = "";
