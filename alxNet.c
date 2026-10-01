@@ -343,7 +343,7 @@ static void dbg_dump(void)
 // 1 sec tick task
 static void tick_task(void *argument)
 {
-	UNUSED(argument);
+	(void)argument;
 	while (1)
 	{
 		DHCP_time_handler();

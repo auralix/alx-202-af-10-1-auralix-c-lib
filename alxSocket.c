@@ -209,7 +209,7 @@ static void CellularSocketOpenCallback( CellularUrcEvent_t urcEvent,
 	CellularSocketHandle_t socketHandle,
 	void * pCallbackContext)
 {
-	UNUSED(socketHandle);
+	(void)socketHandle;
 	if (pCallbackContext == NULL) return;
 	AlxSocket *me = (AlxSocket*)(pCallbackContext);
 	//ALX_SOCKET_TRACE_INF("EVENT_BITS_SOCKET_CONNECT");
@@ -220,7 +220,7 @@ static void CellularSocketOpenCallback( CellularUrcEvent_t urcEvent,
 static void CellularSocketCloseCallback(CellularSocketHandle_t socketHandle,
 	void * pCallbackContext)
 {
-	UNUSED(socketHandle);
+	(void)socketHandle;
 	if (pCallbackContext == NULL) return;
 	AlxSocket *me = (AlxSocket*)(pCallbackContext);
 	xEventGroupSetBits(me->cellular_socket.event_group, EVENT_BITS_SOCKET_CLOSE);
@@ -229,8 +229,8 @@ static void CellularSocketCloseCallback(CellularSocketHandle_t socketHandle,
 static void CellularSocketDataReadyCallback(CellularSocketHandle_t socketHandle,
 	void * pCallbackContext)
 {
-	UNUSED(socketHandle);
-	UNUSED(pCallbackContext);
+	(void)socketHandle;
+	(void)pCallbackContext;
 
 	// Currently unused!
 
@@ -358,7 +358,7 @@ static int cell_recv(AlxSocket* me, void* data, uint32_t len)
 #if defined(ALX_MBEDTLS)
 static int sslRandomCallback(void *p_rng, unsigned char *output, size_t output_len)
 {
-	UNUSED(p_rng);
+	(void)p_rng;
 	int i;
 
 	if (output_len <= 0)
@@ -555,7 +555,7 @@ static int sslVerifyDomain(void *p_vrfy, mbedtls_x509_crt *crt, int i, uint32_t 
 //******************************************************************************
 Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol protocol)
 {
-	UNUSED(alxNet);
+	(void)alxNet;
 
 	me->alxNet = alxNet;
 	me->protocol = protocol;
