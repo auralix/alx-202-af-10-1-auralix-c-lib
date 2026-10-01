@@ -1533,15 +1533,6 @@ static Alx_Status AlxLogger_CreateDirAndFiles
 static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
 {
 	//------------------------------------------------------------------------------
-	// Local Variables
-	//------------------------------------------------------------------------------
-	Alx_Status status = Alx_Err;
-	AlxFs_File file = {};
-	uint32_t positionNew = 0;
-	uint32_t readLenActual = 0;
-
-
-	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
 	ALX_LOGGER_TRACE_INF("AlxLogger - Check/Repair current read_file started");
@@ -1740,8 +1731,6 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	AlxFs_File file = {};
-	uint32_t positionNew = 0;
-	uint32_t readLenActual = 0;
 
 
 	//------------------------------------------------------------------------------
@@ -1798,6 +1787,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 		if (syncNeeded)
 		{
 //			status = AlxLogger_SyncLogWriteFile(me, &file, MIN(fileSize, me->md.write.pos), logBuffer, logBufferSize);	// TV: TODO
+			(void)AlxLogger_SyncLogWriteFile;	// Not called yet, see the TODO above
 			if (status != Alx_Ok)
 			{
 				break;
@@ -1886,7 +1876,6 @@ static Alx_Status AlxLogger_Metadata_Load(AlxLogger* me)
 	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
-	AlxFs_File file = {};
 	AlxLogger_Metadata mdTemp = {};
 	uint32_t validatedCrc = 0;
 	bool isCrcOk = false;
@@ -1975,7 +1964,6 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 	// Local Variables
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
-	AlxFs_File file = {};
 	AlxLogger_Metadata mdTemp = {};
 	uint32_t crcLen = 0;
 	uint32_t mdTempLenWithoutCrc = 0;
@@ -2133,6 +2121,7 @@ static Alx_Status AlxLogger_Metadata_Store_Private(AlxLogger* me, AlxLogger_Meta
 	me->mdStored = mdTemp;
 
 	#if defined(ALX_LOGGER_DEBUG)
+	AlxFs_File file = {};
 	char path[ALX_LOGGER_PATH_LEN_MAX] = "";
 	sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, me->md.write.file);
 	status = AlxFs_File_Open(me->alxFs, &file, path, "r+");
