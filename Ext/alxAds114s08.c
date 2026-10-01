@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAds114s08.c
   * @brief		Auralix C Library - ALX Current Monitor ADS114S08 Module

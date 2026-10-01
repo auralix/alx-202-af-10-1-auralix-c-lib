@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAdxl355.h
   * @brief		Auralix C Library - ALX Accelerometer ADXL355 Module

@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxTmp1075.h
   * @brief		Auralix C Library - ALX Temperature Sensor TMP1075 Module

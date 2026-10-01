@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxNtcg103jf103ft1s.c
   * @brief		Auralix C Library - ALX NTC Thermistors NTCG103JF103FT1S Module

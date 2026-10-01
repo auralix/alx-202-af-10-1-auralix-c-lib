@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxBts724g.h
   * @brief		Auralix C Library - ALX High Side Power Switch BTS724G Module

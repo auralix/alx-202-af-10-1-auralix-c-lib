@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAdau1961.c
   * @brief		Auralix C Library - ALX Audio Codec ADAU1961 Module

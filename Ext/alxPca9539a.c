@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPca9539a.c
   * @brief		Auralix C Library - ALX IO Expander PCA9539A Module

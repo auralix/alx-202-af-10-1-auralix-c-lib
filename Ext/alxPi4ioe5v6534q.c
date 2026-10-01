@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPi4ioe5v6534q.c
   * @brief		Auralix C Library - ALX IO Expander PI4IOE5V6534Q Module

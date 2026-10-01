@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPcal6416a.c
   * @brief		Auralix C Library - ALX IO Expander PCAL6416A Module

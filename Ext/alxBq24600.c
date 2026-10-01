@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxBq24600.c
   * @brief		Auralix C Library - ALX Battery Charger BQ24600 Module
