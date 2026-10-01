@@ -8,11 +8,12 @@ module's 105 that no test had called.
 Who owns that memory is the part worth being careful about, so the shim's context owns it. A test
 that lent the item a Python buffer could prove something about memory that had already been freed.
 
-One thing this file deliberately does NOT do is call AlxParamItem_SetValToDef on an Arr item.
-alxParamItem.c:1359 leaves valDefPtr NULL for that type and the function then passes it to
-AlxParamItem_SetVal, which memcpys from it - with assertions on that is a null dereference, and it
-took the test process down when I first reached it. A dead process cannot be xfailed. The whole of
-SetValToDef is sealed in test_param_item_reset.py; this file stays on the far side of that line.
+One thing this file does NOT do is call AlxParamItem_SetValToDef on an Arr item. Until
+2026-10-01 the function left valDefPtr NULL for that type and then passed it to
+AlxParamItem_SetVal, which memcpys from it - with assertions on that was a null dereference, and it
+took the test process down when I first reached it. A dead process cannot be xfailed. The Arr
+branch now returns after its assertion; the whole of SetValToDef is sealed in
+test_param_item_reset.py, and this file stays on the far side of that line.
 
 Proofs (ALX-1553): P562-P565.
 """
