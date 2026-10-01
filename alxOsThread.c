@@ -127,7 +127,7 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 	);
 	if (status != pdPASS)
 	{
-		ALX_OS_THREAD_TRACE_ERR("FAIL: xTaskCreate() status %ld name %s stackLen_word %lu priority %ld", status, me->name, me->stackLen_word, me->priority);
+		ALX_OS_THREAD_TRACE_ERR("FAIL: xTaskCreate() status %" PRId32 " name %s stackLen_word %" PRIu32 " priority %" PRId32, (int32_t)status, me->name, (uint32_t)me->stackLen_word, me->priority);
 		return Alx_Err;
 	}
 	#endif
@@ -149,7 +149,7 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 	int32_t status = k_thread_name_set(threadId, me->name);
 	if (status != 0)
 	{
-		ALX_OS_THREAD_TRACE_ERR("FAIL: k_thread_name_set() status %ld name %s stackLen_byte %lu priority %ld", status, me->name, me->stackLen_byte, me->priority);
+		ALX_OS_THREAD_TRACE_ERR("FAIL: k_thread_name_set() status %" PRId32 " name %s stackLen_byte %" PRIu32 " priority %" PRId32, status, me->name, me->stackLen_byte, me->priority);
 		return Alx_Err;
 	}
 	#endif
