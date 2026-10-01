@@ -61,7 +61,7 @@ static void AlxFs_Fatfs_Mmc_Usb_Ctor(AlxFs* me);
 //------------------------------------------------------------------------------
 // Lfs_FlashInt
 //------------------------------------------------------------------------------
-#if defined(ALX_LFS)
+#if defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me);
 static int AlxFs_Lfs_FlashInt_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size);
 static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
@@ -130,11 +130,13 @@ void AlxFs_Ctor
 		AlxFs_Fatfs_Mmc_Usb_Ctor(me);
 	}
 	#endif
-	#if defined(ALX_LFS)
+	#if defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 	else if (me->config == AlxFs_Config_Lfs_FlashInt)
 	{
 		AlxFs_Lfs_FlashInt_Ctor(me);
 	}
+	#endif
+	#if defined(ALX_LFS)
 	else if	(me->config == AlxFs_Config_Lfs_Mmc)
 	{
 		AlxFs_Lfs_Mmc_Ctor(me);
@@ -1630,7 +1632,7 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff)
 //------------------------------------------------------------------------------
 // Lfs_FlashInt
 //------------------------------------------------------------------------------
-#if defined(ALX_LFS)
+#if defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me)
 {
 	//------------------------------------------------------------------------------
