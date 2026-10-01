@@ -39,6 +39,8 @@ typedef struct alxShimZephyr_Sub
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -63,6 +65,8 @@ typedef struct alxShimZephyr_Struct
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -87,6 +91,8 @@ struct adc_channel_cfg
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -110,6 +116,8 @@ struct adc_sequence
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -133,6 +141,8 @@ struct gpio_callback
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -156,6 +166,8 @@ struct k_event
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -179,6 +191,8 @@ struct k_mutex
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -202,6 +216,8 @@ struct k_thread
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -225,6 +241,8 @@ struct spi_buf
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -248,6 +266,8 @@ struct spi_buf_set
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -271,6 +291,8 @@ struct spi_config
 	uint8_t differential;
 	uint32_t frequency;
 	uint32_t gain;
+	uint8_t input_negative;
+	uint8_t input_positive;
 	size_t len;
 	uint32_t operation;
 	uint8_t oversampling;
@@ -325,6 +347,8 @@ void* alxShimZephyr_CallPtr(int unused, ...);
 #define i2c_read(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 #define i2c_write(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 #define i2c_write_read(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
+#define k_cyc_to_ns_floor64(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
+#define k_cycle_get_64(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 #define k_event_clear(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 #define k_event_init(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 #define k_event_post(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
@@ -338,6 +362,7 @@ void* alxShimZephyr_CallPtr(int unused, ...);
 #define k_thread_abort(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 #define k_thread_create(...) alxShimZephyr_CallPtr(0, ##__VA_ARGS__)
 #define k_thread_join(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
+#define k_thread_name_set(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 #define k_ticks_to_ns_floor64(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 #define k_uptime_ticks(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 #define k_yield(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
@@ -356,11 +381,5 @@ typedef void (*k_thread_entry_t)(void* p1, void* p2, void* p3);
 #define alxShimZephyr_Probe_1 alxShimZephyr_Unused,
 #define alxShimZephyr_IsEnabled2(probe) alxShimZephyr_IsEnabled3(probe 1, 0, ~)
 #define alxShimZephyr_IsEnabled3(ignore, value, ...) value
-
-// The logging and the statically defined mutex of alxTrace_McuZephyr.c with ALX_TRACE_ZEPHYR_WITH_LOG
-#define LOG_LEVEL_INF 3
-#define LOG_MODULE_REGISTER(name, level) extern int alxShimZephyr_LogModule_##name
-#define LOG_INF(...) ((void)alxShimZephyr_Call(0, ##__VA_ARGS__))
-#define K_MUTEX_DEFINE(name) struct k_mutex name
 
 #endif	// ALX_SHIM_ZEPHYR_ZEPHYRHOSTSHIM_H
