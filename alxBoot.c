@@ -167,7 +167,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_BOOT_TRACE_INF("%s", "");
+	ALX_BOOT_TRACE_INF("");
 	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Discovery START");
 	AlxTimSw fwCandDiscovery_AlxTimSw;
 	AlxTimSw_Ctor(&fwCandDiscovery_AlxTimSw);
@@ -456,7 +456,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_BOOT_TRACE_INF("%s", "");
+	ALX_BOOT_TRACE_INF("");
 	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Staging START");
 	AlxTimSw fwCandStaging_AlxTimSw;
 	AlxTimSw_Ctor(&fwCandStaging_AlxTimSw);
@@ -567,7 +567,7 @@ Alx_Status AlxBoot_Boot_Run(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_BOOT_TRACE_INF("%s", "");
+	ALX_BOOT_TRACE_INF("");
 	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - START");
 	AlxTimSw bootRun_AlxTimSw;
 	AlxTimSw_Ctor(&bootRun_AlxTimSw);

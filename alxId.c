@@ -527,7 +527,7 @@ void AlxId_Trace(AlxId* me)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_ID_TRACE_INF("%s", "");
+	ALX_ID_TRACE_INF("");
 	ALX_ID_TRACE_INF("AlxId_Trace - START");
 
 
@@ -543,7 +543,7 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_INF("- job_number: %" PRIu32, me->fw.build.num);
 	ALX_ID_TRACE_INF("- job_hash: %s", me->fw.build.hash);
 	ALX_ID_TRACE_INF("- job_revision: %" PRIu32, me->fw.build.rev);
-	ALX_ID_TRACE_INF("%s", "");
+	ALX_ID_TRACE_INF("");
 
 
 	//------------------------------------------------------------------------------
@@ -560,7 +560,7 @@ void AlxId_Trace(AlxId* me)
 		ALX_ID_TRACE_INF("- job_number: %" PRIu32, me->fwBootId.fw.build.num);
 		ALX_ID_TRACE_INF("- job_hash: %s", me->fwBootId.fw.build.hash);
 		ALX_ID_TRACE_INF("- job_revision: %" PRIu32, me->fwBootId.fw.build.rev);
-		ALX_ID_TRACE_INF("%s", "");
+		ALX_ID_TRACE_INF("");
 	}
 
 
@@ -570,7 +570,7 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_INF("FW - Language:");
 	ALX_ID_TRACE_INF("- name: C, ver: %" PRIu32, me->fwLangC.ver);
 	ALX_ID_TRACE_INF("- name: %s, ver: %" PRIu32 ".%" PRIu32 ".%" PRIu32, me->fwLangCLib.name, me->fwLangCLib.verMajor, me->fwLangCLib.verMinor, me->fwLangCLib.verPatch);
-	ALX_ID_TRACE_INF("%s", "");
+	ALX_ID_TRACE_INF("");
 
 
 	//------------------------------------------------------------------------------
@@ -579,7 +579,7 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_INF("FW - Compiler:");
 	ALX_ID_TRACE_INF("- name: %s", me->fwComp.name);
 	ALX_ID_TRACE_INF("- ver: %" PRIu32 ".%" PRIu32 ".%" PRIu32, me->fwComp.verMajor, me->fwComp.verMinor, me->fwComp.verPatch);
-	ALX_ID_TRACE_INF("%s", "");
+	ALX_ID_TRACE_INF("");
 
 
 	//------------------------------------------------------------------------------
@@ -588,7 +588,7 @@ void AlxId_Trace(AlxId* me)
 	#ifdef ALX_CMSIS_CORE
 	ALX_ID_TRACE_INF("FW - CMSIS Core:");
 	ALX_ID_TRACE_INF("- ver: %" PRIu32 ".%" PRIu32, me->fwCmsisCore.verMajor, me->fwCmsisCore.verMinor);
-	ALX_ID_TRACE_INF("%s", "");
+	ALX_ID_TRACE_INF("");
 	#endif
 
 
@@ -599,7 +599,7 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_INF("FW - STM32:");
 	ALX_ID_TRACE_INF("- name: %s HAL CMSIS, ver: %" PRIu32 ".%" PRIu32 ".%" PRIu32, ALX_STM32_STR, me->fwStm32HalCmsis.verMajor, me->fwStm32HalCmsis.verMinor, me->fwStm32HalCmsis.verPatch);
 	ALX_ID_TRACE_INF("- name: %s HAL Driver, ver: %" PRIu32 ".%" PRIu32 ".%" PRIu32, ALX_STM32_STR, me->fwStm32HalDriver.verMajor, me->fwStm32HalDriver.verMinor, me->fwStm32HalDriver.verPatch);
-	ALX_ID_TRACE_INF("%s", "");
+	ALX_ID_TRACE_INF("");
 	#endif
 
 
@@ -615,7 +615,7 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_INF("- bom_name: %s", me->hw.instance.bomName);
 	ALX_ID_TRACE_INF("- bom_ver: %" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu32, me->hw.instance.bomVerMajor, me->hw.instance.bomVerMinor, me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
 	ALX_ID_TRACE_INF("- mcu_name: %s", me->hw.mcuName);
-	ALX_ID_TRACE_INF("%s", "");
+	ALX_ID_TRACE_INF("");
 
 
 	//------------------------------------------------------------------------------
