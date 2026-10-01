@@ -77,6 +77,7 @@ static void AlxClk_SetupPll(AlxClk* me, pll_setup_t* pllSetup, uint32_t inputFre
 static bool AlxClk_IsClkOk(AlxClk* me);
 static void AlxClk_Periph_Gpio_EnableClk(AlxClk* me);
 static void AlxClk_Periph_Gpio_DisableClk(AlxClk* me);
+static ALX_UNUSED void AlxClk_Periph_Gpio_Reset(AlxClk* me);
 
 
 //******************************************************************************
@@ -684,6 +685,17 @@ static void AlxClk_Periph_Gpio_DisableClk(AlxClk* me)
 	CLOCK_DisableClock(kCLOCK_Gpio1);
 	CLOCK_DisableClock(kCLOCK_Gpio2);	// MF: I'm not sure GPIO2 works on Lpc55S6x
 	CLOCK_DisableClock(kCLOCK_Gpio3);	// MF: I'm not sure GPIO3 works on Lpc55S6x
+}
+static ALX_UNUSED void AlxClk_Periph_Gpio_Reset(AlxClk* me)
+{
+	// Void
+	(void)me;
+
+	// Reset
+	RESET_PeripheralReset(kGPIO0_RST_SHIFT_RSTn);
+	RESET_PeripheralReset(kGPIO1_RST_SHIFT_RSTn);
+	RESET_PeripheralReset(kGPIO2_RST_SHIFT_RSTn);	// MF: I'm not sure GPIO2 works on Lpc55S6x
+	RESET_PeripheralReset(kGPIO3_RST_SHIFT_RSTn);	// MF: I'm not sure GPIO3 works on Lpc55S6x
 }
 
 
