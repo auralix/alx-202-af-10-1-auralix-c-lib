@@ -130,6 +130,13 @@ def template_groups(text: str | None = None) -> dict[tuple[str, str], list[str]]
 STM32 = ["stm32f0", "stm32f1", "stm32f4", "stm32f7", "stm32g4", "stm32l0", "stm32l4", "stm32u5"]
 OTHER = ["lpc17xx", "lpc55s6x", "lpc80x", "lpc84x", "sam", "ra", "zephyr"]
 TARGET_PLATFORMS = [*STM32, *OTHER]
+# A platform's variant states the platform's switches as the platform does; its table in matrix.toml
+# gives what differs - the part, or the vendor's own configuration - to reach the lines the
+# platform's one row set cannot.
+PLATFORM_VARIANTS = {
+    "zephyr-kconfig": ("zephyr", "with the Kconfig options the backends test: thread names, the 64-bit cycle counter, "
+                                 "configurable ADC inputs"),
+}
 FEATURE_SWITCHES = ["ALX_CMSIS_DSP", "ALX_FATFS", "ALX_FREE_RTOS", "ALX_FREE_RTOS_CELLULAR",
                     "ALX_LFS", "ALX_LW_IP", "ALX_MBEDTLS", "ALX_MCU_BOOT", "ALX_USBH", "ALX_WIZNET"]
 _ALL = {"ALX_CMSIS_DSP", "ALX_FATFS", "ALX_FREE_RTOS", "ALX_LFS", "ALX_MBEDTLS", "ALX_MCU_BOOT",
@@ -194,12 +201,16 @@ def fragments(text: str | None = None) -> dict[str, str]:
         out[f"toolchain/{word}.h"] = _fragment(
             "toolchain", word, f"{what}; the template's minimum versions hold, nothing changes", [])
     platform_names = groups[("Platform", "Platform")]
-    for word in TARGET_PLATFORMS:
+
+    def platform_lines(word: str) -> list[str]:
         switch = f"ALX_{word.upper()}"
-        lines = [f"#define {name}" for name in platform_names
-                 if name == switch or name.startswith(f"{switch}_")]
+        return [f"#define {name}" for name in platform_names if name == switch or name.startswith(f"{switch}_")]
+
+    for word in TARGET_PLATFORMS:
         out[f"platform/{word}.h"] = _fragment(
-            "platform", word, f"{switch}, with the minimum versions the template states", lines)
+            "platform", word, f"ALX_{word.upper()}, with the minimum versions the template states", platform_lines(word))
+    for word, (base, what) in PLATFORM_VARIANTS.items():
+        out[f"platform/{word}.h"] = _fragment("platform", word, f"ALX_{base.upper()} {what}", platform_lines(base))
     out["platform/host.h"] = _fragment(
         "platform", "host", "no target: no Newlib and no CMSIS core on the PC",
         ["#undef ALX_NEWLIB_NANO", "#undef ALX_CMSIS_CORE", "#undef ALX_CMSIS_CORE_VER_REQUIRED"])

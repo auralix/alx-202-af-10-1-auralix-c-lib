@@ -110,6 +110,12 @@ includes = ["host/shim/zephyr", "host/shim/cmsis"]
 defines = []
 flags = ["-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"]
 
+[platform.zephyr-kconfig]
+description = "Zephyr RTOS, on a Cortex-M4F, with the Kconfig options the backends test"
+includes = ["host/shim/zephyr", "host/shim/cmsis"]
+defines = ["CONFIG_ADC_CONFIGURABLE_INPUTS=1", "CONFIG_THREAD_NAME=1", "CONFIG_TIMER_HAS_64BIT_CYCLE_COUNTER=1"]
+flags = ["-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"]
+
 [platform.host]
 description = "the PC the host lanes run on, compiled for its 32-bit form"
 host = true
@@ -3020,3 +3026,21 @@ features = "none"
 target = "none"
 library = "trace-off-assert-none-opt-none"
 description = "the PC, clang: every feature off; no boot role and no build configuration: a product without the bootloader; every trace and every assert elided"
+
+[[row]]
+id = "0318"
+toolchain = "gcc"
+platform = "zephyr-kconfig"
+features = "all-noos-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "Zephyr RTOS with its Kconfig options on (thread names, the 64-bit cycle counter, configurable ADC inputs), arm-none-eabi-gcc: every feature on; the network through Wiznet; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
+id = "0319"
+toolchain = "clang"
+platform = "zephyr-kconfig"
+features = "all-noos-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "Zephyr RTOS with its Kconfig options on (thread names, the 64-bit cycle counter, configurable ADC inputs), clang: every feature on; the network through Wiznet; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
