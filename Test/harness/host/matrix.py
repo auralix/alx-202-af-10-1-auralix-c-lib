@@ -15,9 +15,11 @@ what this module writes, so a module added to the template reaches the matrix th
 The rows themselves are data, allocated once and never renumbered: matrix.toml is edited by hand.
 The mechanism - synthesis, compile, coverage, report - is the Python library's alx.verify.configs.
 
-Two choices of the compile, both recorded for TV in the wiki's morning report 4:
+Three choices of the compile, recorded for TV in the wiki:
 * -Wno-unused-parameter, as in the library's own warning set (alx.verify.host_build.WARNINGS): a
   backend stub that a configuration leaves without work is the library's normal shape.
+* -Wno-format-zero-length, as in Zephyr's gcc base warning set: an empty format string is valid C,
+  and the library writes a blank trace line as ("") (TV, 2026-10-01). Every other format check stays.
 * The host rows compile for a 32-bit PC (i686), whose pointers and integers have a target's widths:
   every Auralix target is 32-bit, and target code casting a uint32_t address to a pointer is right
   there; the 64-bit PC is the host lanes' question, over the portable modules they build.
@@ -275,7 +277,7 @@ def write() -> list[str]:
 
 
 # ---- the run --------------------------------------------------------------------------------------
-WARNINGS = ("-Wall", "-Wextra", "-Wformat=2", "-Wno-unused-parameter", "-Werror")
+WARNINGS = ("-Wall", "-Wextra", "-Wformat=2", "-Wno-format-zero-length", "-Wno-unused-parameter", "-Werror")
 OWN = ("Alx", "ALX_", "alx")   # an undeclared name with these prefixes is the library's finding, not a fake's
 
 
