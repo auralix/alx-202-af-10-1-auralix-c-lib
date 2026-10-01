@@ -321,6 +321,7 @@ extern "C" {
 #if defined(__GNUC__) || defined(__clang__)
 	#define ALX_WEAK __attribute__((weak))
 	#define ALX_PACKED __attribute__((packed))
+	#define ALX_UNUSED __attribute__((unused))
 	#define ALX_ALIGNED(bytes) __attribute__((aligned(bytes)))
 	#define ALX_SECTION(name) __attribute__((section(name), used))
 	#define ALX_PRINTF_FORMAT(formatArg, firstValueArg) __attribute__((format(printf, formatArg, firstValueArg)))
