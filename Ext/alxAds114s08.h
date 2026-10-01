@@ -187,8 +187,8 @@ typedef union
 {
 	struct ALX_PACKED
 	{
-		Ads114s08_RegEnum_0x02_MUXN MUXN : 4;
-		Ads114s08_RegEnum_0x02_MUXP MUXP : 4;
+		uint8_t MUXN : 4;	// Ads114s08_RegEnum_0x02_MUXN
+		uint8_t MUXP : 4;	// Ads114s08_RegEnum_0x02_MUXP
 	};
 	uint8_t raw;
 } Ads114s08_RegVal_0x02_INPMUX;
@@ -234,7 +234,7 @@ typedef union
 {
 	struct ALX_PACKED
 	{
-		Ads114s08_RegEnum_0x03_GAIN		GAIN : 3;
+		uint8_t		GAIN : 3;	// Ads114s08_RegEnum_0x03_GAIN
 		Ads114s08_RegEnum_0x03_PGA_EN	PGA_EN : 2;
 		Ads114s08_RegEnum_0x03_DELAY	DELAY : 3;
 	};
@@ -291,9 +291,9 @@ typedef union
 	{
 		Ads114s08_RegEnum_0x04_DR		DR		: 4;
 		Ads114s08_RegEnum_0x04_FILTER	FILTER	: 1;
-		Ads114s08_RegEnum_0x04_MODE		MODE	: 1;
+		uint8_t		MODE	: 1;	// Ads114s08_RegEnum_0x04_MODE
 		Ads114s08_RegEnum_0x04_CLK		CLK		: 1;
-		Ads114s08_RegEnum_0x04_G_CHOP	G_CHOP	: 1;
+		uint8_t	G_CHOP	: 1;	// Ads114s08_RegEnum_0x04_G_CHOP
 	};
 	uint8_t raw;
 } Ads114s08_RegVal_0x04_DATARATE;
@@ -337,8 +337,8 @@ typedef union
 {
 	struct ALX_PACKED
 	{
-		Ads114s08_RegEnum_0x05_REFCON		REFCON		: 2;
-		Ads114s08_RegEnum_0x05_REFSEL		REFSEL		: 2;
+		uint8_t		REFCON		: 2;	// Ads114s08_RegEnum_0x05_REFCON
+		uint8_t		REFSEL		: 2;	// Ads114s08_RegEnum_0x05_REFSEL
 		Ads114s08_RegEnum_0x05_REFN_BUF		REFN_BUF	: 1;
 		Ads114s08_RegEnum_0x05_REFP_BUF		REFP_BUF	: 1;
 		Ads114s08_RegEnum_0x05_FL_REF_EN	FL_REF_EN	: 2;
@@ -540,7 +540,7 @@ typedef union
 		bool CRC_EN									: 1;
 		bool TIMEOUT_EN								: 1;
 		Ads114s08_RegEnum_0x09_CAL_SAMP	CAL_SAMP	: 2;
-		Ads114s08_RegEnum_0x09_SYS_MON	SYS_MON		: 3;
+		uint8_t	SYS_MON		: 3;	// Ads114s08_RegEnum_0x09_SYS_MON
 	};
 	uint8_t raw;
 } Ads114s08_RegVal_0x09_SYS;
