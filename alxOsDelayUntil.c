@@ -102,11 +102,9 @@ void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osTimeIncrement_us)
 	ALX_OS_DELAY_UNTIL_ASSERT(osTimeIncrement_us >= (2 * (uint64_t)me->osTick));
 	ALX_OS_DELAY_UNTIL_ASSERT((osTimeIncrement_us % (uint64_t)me->osTick) == 0);
 
-	// Convert to osTick
-	uint64_t osTimeIncrement_osTick = osTimeIncrement_us / (uint64_t)me->osTick;
-
 	// Delay
 	#if defined(ALX_FREE_RTOS)
+	uint64_t osTimeIncrement_osTick = osTimeIncrement_us / (uint64_t)me->osTick;
 	vTaskDelayUntil(&me->xLastWakeTime, osTimeIncrement_osTick);
 	#endif
 }
