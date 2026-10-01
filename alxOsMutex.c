@@ -115,6 +115,11 @@ bool AlxOsMutex_IsUnlocked(AlxOsMutex* me)
 	}
 	return false;
 	#endif
+
+	// Return - no OS, the mutex is never locked
+	#if !defined(ALX_FREE_RTOS) && !defined(ALX_ZEPHYR)
+	return true;
+	#endif
 }
 
 

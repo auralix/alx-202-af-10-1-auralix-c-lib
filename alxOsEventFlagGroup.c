@@ -210,6 +210,11 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
 	// Return
 	return eventBits;
 	#endif
+
+	// Return - no OS, no event flags
+	#if !defined(ALX_FREE_RTOS) && !defined(ALX_ZEPHYR)
+	return 0;
+	#endif
 }
 
 /**
@@ -294,6 +299,11 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	// Return
 	return matched;
 	#endif
+
+	// Return - no OS, no event flags
+	#if !defined(ALX_FREE_RTOS) && !defined(ALX_ZEPHYR)
+	return 0;
+	#endif
 }
 
 /**
@@ -370,6 +380,11 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 
 	// Return
 	return eventBits;
+	#endif
+
+	// Return - no OS, no event flags
+	#if !defined(ALX_FREE_RTOS) && !defined(ALX_ZEPHYR)
+	return 0;
 	#endif
 }
 

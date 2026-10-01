@@ -257,6 +257,9 @@ Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
 
 	// Clear
 	me->wasStarted = false;
+
+	// Return - no OS, nothing ran to wait for
+	return Alx_Ok;
 }
 
 
