@@ -45,7 +45,6 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me);
 static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries);
 static void AlxSpi_Ctor_ParseMode(AlxSpi* me);
 static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me);
-static void AlxSpi_Periph_Reset(AlxSpi* me);
 static void AlxSpi_Periph_AttachClk(AlxSpi* me);
 static void AlxSpi_Periph_DisableClk(AlxSpi* me);
 
@@ -483,41 +482,6 @@ static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me)
 	// Assert
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return 0xFFFFFFFF;
-}
-static void AlxSpi_Periph_Reset(AlxSpi* me)
-{
-	// Assert
-	(void)me;
-
-	// Reset FlexComm
-	#if defined(SPI0)
-	if (me->spi == SPI0)	{ RESET_PeripheralReset(kFC0_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(SPI1)
-	if (me->spi == SPI1)	{ RESET_PeripheralReset(kFC1_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(SPI2)
-	if (me->spi == SPI2)	{ RESET_PeripheralReset(kFC2_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(SPI3)
-	if (me->spi == SPI3)	{ RESET_PeripheralReset(kFC3_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(SPI4)
-	if (me->spi == SPI4)	{ RESET_PeripheralReset(kFC4_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(SPI5)
-	if (me->spi == SPI5)	{ RESET_PeripheralReset(kFC5_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(SPI6)
-	if (me->spi == SPI6)	{ RESET_PeripheralReset(kFC6_RST_SHIFT_RSTn); return; }
-	#endif
-	#if defined(SPI7)
-	if (me->spi == SPI7)	{ RESET_PeripheralReset(kFC7_RST_SHIFT_RSTn); return; }
-	#endif
-
-	// Assert
-	ALX_SPI_ASSERT(false); // We shouldn't get here
-	return;
 }
 static void AlxSpi_Periph_AttachClk(AlxSpi* me)
 {
