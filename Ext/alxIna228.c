@@ -709,39 +709,83 @@ static Alx_Status AlxIna228_Reg_Write_All(AlxIna228* me)
 
 	// Write
 	status = AlxIna228_Reg_Write(me, &me->reg._0x00_CONFIG);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x00_CONFIG"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x00_CONFIG");
+		return status;
+	}
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x01_ADC_CONFIG);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x01_ADC_CONFIG"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x01_ADC_CONFIG");
+		return status;
+	}
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x02_SHUNT_CAL);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x02_SHUNT_CAL"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x02_SHUNT_CAL");
+		return status;
+	}
 
 	#if defined(ALX_INA228)
 	status = AlxIna228_Reg_Write(me, &me->reg._0x03_SHUNT_TEMPCO);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x03_SHUNT_TEMPCO"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x03_SHUNT_TEMPCO");
+		return status;
+	}
 	#endif
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0B_DIAG_ALRT);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x0B_DIAG_ALRT"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x0B_DIAG_ALRT");
+		return status;
+	}
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0C_SOVL);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x0C_SOVL"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x0C_SOVL");
+		return status;
+	}
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0D_SUVL);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x0D_SUVL"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x0D_SUVL");
+		return status;
+	}
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0E_BOVL);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x0E_BOVL"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x0E_BOVL");
+		return status;
+	}
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x0F_BUVL);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x0F_BUVL"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x0F_BUVL");
+		return status;
+	}
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x10_TEMP_LIMIT);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x10_TEMP_LIMIT"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x10_TEMP_LIMIT");
+		return status;
+	}
 
 	status = AlxIna228_Reg_Write(me, &me->reg._0x11_PWR_LIMIT);
-	if (status != Alx_Ok) { ALX_INA228_TRACE_ERR("Err_0x11_PWR_LIMIT"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_INA228_TRACE_ERR("Err_0x11_PWR_LIMIT");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;

@@ -484,37 +484,81 @@ static Alx_Status AlxAds8678_Reg_WriteAll(AlxAds8678* me)
 
 	// Write
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x01_AutoScanSequenceEnable);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x02_ChannelPowerDown);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x03_FeatureSelect);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x05_Channel0InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x06_Channel1InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x07_Channel2InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x08_Channel3InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x09_Channel4InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x0A_Channel5InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x0B_Channel6InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x0C_Channel7InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;

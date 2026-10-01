@@ -706,16 +706,32 @@ ALX_WEAK Alx_Status AlxPca9539a_RegStruct_Write(AlxPca9539a* me)
 	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._04h_PolarityInversion_0);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._05h_PolarityInversion_1);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._06h_Configuration_0);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._07h_Configuration_1);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;

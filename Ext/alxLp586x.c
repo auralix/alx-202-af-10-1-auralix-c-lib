@@ -707,47 +707,87 @@ Alx_Status AlxLp586x_RegStruct_Write(AlxLp586x* me)
 
 	// Set Core registers:
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x00_Chip_En);
-	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_LP586X_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x01_Dev_initial);
-	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_LP586X_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x02_Dev_config1);
-	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_LP586X_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x03_Dev_config2);
-	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_LP586X_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x04_Dev_config3);
-	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_LP586X_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxLp586x_Reg_Write(me, &me->reg._0x05_Global_bri);
-	if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_LP586X_TRACE_ERR("Err");
+		return status;
+	}
 
 	for (uint8_t i = 0; i < 3; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._group_bri[i]);
-		if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_LP586X_TRACE_ERR("Err");
+			return status;
+		}
 	}
 
 	for (uint8_t i = 0; i < 3; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._current_set_cc[i]);
-		if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_LP586X_TRACE_ERR("Err");
+			return status;
+		}
 	}
 
 	// Set Pwm Group
 	for (uint32_t i = 0; i < 30; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._dot_grp_sel[i]);
-		if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_LP586X_TRACE_ERR("Err");
+			return status;
+		}
 	}
 
 	//  Dot current registers (pwm_bri0...pwm_bri107 ) (0x200-0x26B):  all to 100%
 	for (uint16_t i = 0; i < 107; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._pwm_bri[i]);
-		if (status != Alx_Ok) { ALX_LP586X_TRACE_ERR("Err"); return status; }
+		if (status != Alx_Ok)
+		{
+			ALX_LP586X_TRACE_ERR("Err");
+			return status;
+		}
 	}
 
 	// Return

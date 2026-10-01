@@ -722,7 +722,12 @@ static Alx_Status AlxAds114s08_Reg_Write(AlxAds114s08* me, void* reg)
 
 	// Write
 	status = AlxSpi_Master_WriteRead(me->spi, dataWriteArr, dataReadArr, sizeof(dataWriteArr), me->spiNumOfTries, me->spiTimeout_ms);
-	if (status != Alx_Ok) { AlxSpi_Master_DeAssertCs(me->spi); ALX_ADS114S08_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		AlxSpi_Master_DeAssertCs(me->spi);
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);

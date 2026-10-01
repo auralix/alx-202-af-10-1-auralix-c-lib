@@ -959,52 +959,116 @@ ALX_WEAK Alx_Status AlxPcal6416a_RegStruct_Write(AlxPcal6416a* me)
 	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._04h_PolarityInversion_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._05h_PolarityInversion_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._06h_Configuration_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._07h_Configuration_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._40h_OutputDriveStrength_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._41h_OutputDriveStrength_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._42h_OutputDriveStrength_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._43h_OutputDriveStrength_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._44h_InputLatch_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._45h_InputLatch_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._46h_PullUpPullDownEn_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._47h_PullUpPullDownEn_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._48h_PullUpPullDownSel_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._49h_PullUpPullDownSel_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Ah_IrqMask_0);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Bh_IrqMask_1);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	//status = AlxPcal6416a_Reg_Write(me, &me->reg._4Ch_IrqStatus_0);		// MF: Read Only Reg
 	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
@@ -1013,7 +1077,11 @@ ALX_WEAK Alx_Status AlxPcal6416a_RegStruct_Write(AlxPcal6416a* me)
 	//if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPcal6416a_Reg_Write(me, &me->reg._4Fh_OutputPortConfig);
-	if (status != Alx_Ok) { ALX_PCAL6416A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCAL6416A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
