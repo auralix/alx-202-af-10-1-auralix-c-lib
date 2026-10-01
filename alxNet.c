@@ -576,7 +576,7 @@ static uint32_t dns_parse_response(uint8_t *buf, size_t len, uint16_t txid)
 		if ((p + 10) > end) return 0; // type(2) class(2) ttl(4) rdlen(2)
 		uint16_t type  = htons(*(uint16_t*)p); p += 2;
 		uint16_t clas  = htons(*(uint16_t*)p); p += 2;
-		uint32_t ttl   = htons(*(uint32_t*)p); p += 4;
+		p += 4;	// ttl
 		uint16_t rdlen = htons(*(uint16_t*)p); p += 2;
 
 		if ((p + rdlen) > end) return 0;
