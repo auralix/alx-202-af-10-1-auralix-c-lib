@@ -454,6 +454,7 @@ Alx_Status maxim_max1726x_initialize_ez_config(AlxMax17263* me)
 	/// Restore Original HibCFG value
 	if((ret = maxim_max1726x_write_reg(me, MAX1726X_HIBCFG_REG, &max1726x_regs[MAX1726X_HIBCFG_REG])) != Alx_Ok) return ret;
 
+	return Alx_Ok;
 }
 
 /* ************************************************************************* */
