@@ -198,6 +198,16 @@ file = "alxBoot.c"
 text = "format specifies type 'unsigned long *' but the argument has type 'uint32_t *'"
 why = "the frozen firmware file-name parser (decision 12, TV 2026-09-30): %lu is right on arm-none-eabi-gcc, which builds the bootloader"
 
+[[accept]]
+file = "Ext/*"
+text = "-Wsingle-bit-bitfield-constant-conversion"
+why = "an enumeration bit-field is signed in the MSVC ABI of the 32-bit Windows host only; on the targets it is unsigned and the register bytes are right; the drivers keep their enumeration types (TV, 2026-10-01, the revert of 8be52d4)"
+
+[[accept]]
+file = "Ext/*"
+text = "-Wbitfield-constant-conversion"
+why = "an enumeration bit-field is signed in the MSVC ABI of the 32-bit Windows host only; on the targets it is unsigned and the register bytes are right; the drivers keep their enumeration types (TV, 2026-10-01, the revert of 8be52d4)"
+
 [[row]]
 id = "0001"
 toolchain = "gcc"
