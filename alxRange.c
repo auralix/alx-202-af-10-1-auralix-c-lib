@@ -293,6 +293,7 @@ Alx_Status AlxRange_CheckArr(void* val, uint32_t valLenMax)
 {
 	// TV: TODO
 	ALX_RANGE_ASSERT(false);
+	return Alx_Err;
 }
 
 /**
