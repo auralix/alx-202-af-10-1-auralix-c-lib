@@ -90,8 +90,6 @@ void AlxLp586x_Ctor
 	me->i2cTimeout_ms = i2cTimeout_ms;
 
 	// Variables
-	bool valNew[108];
-	bool valOld[108];
 	for (uint32_t i = 0; i < 108; i++)
 	{
 		me->valNew[i] = false;
