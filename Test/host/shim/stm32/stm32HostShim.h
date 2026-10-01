@@ -1452,6 +1452,9 @@ typedef AlxShimStm32_Init FDCAN_TxHeaderTypeDef;
 typedef AlxShimStm32_Init FLASH_EraseInitTypeDef;
 typedef AlxShimStm32_Init GPIO_InitTypeDef;
 typedef AlxShimStm32_Regs GPIO_TypeDef;
+typedef AlxShimStm32_Init HAL_MMC_CardCIDTypeDef;
+typedef AlxShimStm32_Init HAL_MMC_CardCSDTypeDef;
+typedef AlxShimStm32_Init HAL_MMC_CardInfoTypeDef;
 typedef AlxShimStm32_Handle HCD_HandleTypeDef;
 typedef AlxShimStm32_Regs HCD_TypeDef;
 typedef AlxShimStm32_Handle I2C_HandleTypeDef;
@@ -2206,10 +2209,6 @@ uint32_t alxShimStm32_Call(int unused, ...);
 #define HAL_IWDG_Refresh(...) ALX_SHIM_STM32_CALL(__VA_ARGS__)
 #define HAL_LIN_Init(...) ALX_SHIM_STM32_CALL(__VA_ARGS__)
 #define HAL_LIN_SendBreak(...) ALX_SHIM_STM32_CALL(__VA_ARGS__)
-#define HAL_MMC_CardCIDTypeDef(...) ALX_SHIM_STM32_CALL(__VA_ARGS__)
-#define HAL_MMC_CardCSDTypeDef(...) ALX_SHIM_STM32_CALL(__VA_ARGS__)
-#define HAL_MMC_CardInfoTypeDef(...) ALX_SHIM_STM32_CALL(__VA_ARGS__)
-#define HAL_MMC_CardStateTypeDef(...) ALX_SHIM_STM32_CALL(__VA_ARGS__)
 #define HAL_MMC_DeInit(...) ALX_SHIM_STM32_CALL(__VA_ARGS__)
 #define HAL_MMC_GetCardCID(...) ALX_SHIM_STM32_CALL(__VA_ARGS__)
 #define HAL_MMC_GetCardCSD(...) ALX_SHIM_STM32_CALL(__VA_ARGS__)
