@@ -47,7 +47,7 @@ extern "C" {
 #include "alxAdau1961.h"
 #include "alxAds114s08.h"
 #include "alxAds8678.h"
-#include "alxAdxl35x.h"
+#include "alxAdxl355.h"
 #include "alxBq24600.h"
 #include "alxBts724g.h"
 #include "alxIna228.h"
@@ -88,7 +88,6 @@ extern "C" {
 //------------------------------------------------------------------------------
 // ALX
 //------------------------------------------------------------------------------
-#include "alxAccelerometer.h"
 #include "alxAssert.h"
 #include "alxAudio.h"
 #include "alxAudioPlayer.h"
