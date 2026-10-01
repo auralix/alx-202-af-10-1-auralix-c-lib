@@ -439,7 +439,7 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 		if ((int32_t)len != len_Expected)
 		{
 			// Trace
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: io_write() len %ld len_Expected %ld", len, len_Expected);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: io_write() len %" PRIu32 " len_Expected %" PRId32, len, len_Expected);
 
 			// Reset
 			status = AlxSerialPort_Reset(me);
