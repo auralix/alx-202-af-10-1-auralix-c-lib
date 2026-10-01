@@ -152,6 +152,8 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 		ALX_OS_THREAD_TRACE_ERR("FAIL: k_thread_name_set() status %" PRId32 " name %s stackLen_byte %" PRIu32 " priority %" PRId32, status, me->name, me->stackLen_byte, me->priority);
 		return Alx_Err;
 	}
+	#else
+	(void)threadId;
 	#endif
 	#endif
 
