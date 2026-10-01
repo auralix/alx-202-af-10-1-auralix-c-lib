@@ -777,7 +777,7 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 			if (AlxTimSw_IsTimeout_ms(&me->tim, timeout_ms))
 			{
 				ALX_I2C_TRACE_ERR("ErrTimeout");
-				return (uint32_t)kStatus_I2C_Timeout;
+				return Alx_Err;
 			}
 
 			flag = I2C_GetStatusFlags(me->i2c);
