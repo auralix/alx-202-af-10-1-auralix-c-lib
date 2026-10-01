@@ -401,7 +401,7 @@ Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTe
 	// Convert to mV
 	//------------------------------------------------------------------------------
 	bool isOutOfRange = true;
-	float adcVoltage_mV = -99999999;	// set out of range value
+	float adcVoltage_mV = -100000000.f;	// set out of range value
 	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
 	if (status != Alx_Ok)
 	{
@@ -844,7 +844,7 @@ Alx_Status AlxAds114s08_GetPgaShorted_uV(AlxAds114s08* me, float* pgaShortedVolt
 	// Convert to mV
 	//------------------------------------------------------------------------------
 	bool isOutOfRange = true;
-	float adcVoltage_mV = -99999999; // set out of range value
+	float adcVoltage_mV = -100000000.f; // set out of range value
 	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
 	if (status != Alx_Ok)
 	{
@@ -906,7 +906,7 @@ Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV)
 	// Convert to mV
 	//------------------------------------------------------------------------------
 	bool isOutOfRange = true;
-	float adcVoltage_mV = -99999999; // set out of range value
+	float adcVoltage_mV = -100000000.f; // set out of range value
 	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
 	if (status != Alx_Ok)
 	{
@@ -968,7 +968,7 @@ Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV)
 	// Convert to mV
 	//------------------------------------------------------------------------------
 	bool isOutOfRange = true;
-	float adcVoltage_mV = -99999999; // set out of range value
+	float adcVoltage_mV = -100000000.f; // set out of range value
 	status = AlxAds114s08_Convert_raw_mV(me, adcVoltage_raw, &adcVoltage_mV, &isOutOfRange);
 	if (status != Alx_Ok)
 	{
