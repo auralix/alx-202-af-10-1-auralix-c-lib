@@ -105,13 +105,12 @@ void AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, 
 
 		// Local variables
 		EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
-		EventBits_t eventBits_t = 0;
 
 		// Unlock
 		AlxOsMutex_Unlock(&me->alxOsMutex);
 
 		// Set
-		eventBits_t = xEventGroupSetBits(eventGroupHandle_t, eventFlagsToSet);
+		xEventGroupSetBits(eventGroupHandle_t, eventFlagsToSet);
 
 		// Set me->eventGroupHandle_t
 		AlxOsMutex_Lock(&me->alxOsMutex);
