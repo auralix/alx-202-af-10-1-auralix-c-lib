@@ -275,6 +275,7 @@ static void dhcp_task(void *argument)
 						{
 							dhcp_ip_leased_until = 0;
 							ALX_NET_TRACE_WRN("DHCP timeout occurred, retry: %d", dhcp_retry);
+							(void)dhcp_retry;
 						}
 					}
 				}

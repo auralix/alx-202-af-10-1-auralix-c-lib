@@ -1514,11 +1514,13 @@ static Alx_Status AlxLogger_CreateDirAndFiles
 		// Trace
 		dirFilePrepSingle_sec = AlxTimSw_Get_sec(&alxTimSw_DirFilePrepSingle);
 		ALX_LOGGER_TRACE_INF("Created dir '%s' with %" PRIu32 " files in %" PRIu32 " sec", dirPathBuffer, me->numOfFilesPerDir, dirFilePrepSingle_sec);
+		(void)dirFilePrepSingle_sec;
 	}
 
 	// Trace
 	dirFilePrepAllTime_sec = AlxTimSw_Get_sec(&alxTimSw_DirFilePrepAll);
 	ALX_LOGGER_TRACE_INF("Created %" PRIu32 " dir with %" PRIu32 " files, total %" PRIu32 " files in %" PRIu32 " sec", me->numOfDir, me->numOfFilesPerDir, me->numOfFilesTotal, dirFilePrepAllTime_sec);
+	(void)dirFilePrepAllTime_sec;
 	ALX_LOGGER_TRACE_INF("Each file has %" PRIu32 " logs, so total number of logs is %" PRIu32, me->numOfLogsPerFile, me->numOfLogsTotal);
 
 

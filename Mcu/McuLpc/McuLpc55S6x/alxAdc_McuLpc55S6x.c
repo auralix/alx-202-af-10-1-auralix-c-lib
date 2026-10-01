@@ -97,9 +97,11 @@ void AlxAdc_Ctor
 
 	// Check if right channels are used
 	ALX_ADC_ASSERT(AlxAdc_Ctor_CheckCh(me));
+	(void)AlxAdc_Ctor_CheckCh;
 
 	// Check if right MainClk is configured
 	ALX_ADC_ASSERT(AlxAdc_Ctor_IsMainClkOk(me));
+	(void)AlxAdc_Ctor_IsMainClkOk;
 
 	// Variables										// MF: Everything is set to default (see "void LPADC_GetDefault___()" functions) except "adcConfig.referenceVoltageSource" and "adcConvTrigConfig.targetCommandId"
 	me->adcConfig.enableInDozeMode						= true;

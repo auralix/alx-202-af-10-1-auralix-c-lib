@@ -634,6 +634,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 	float size_B = (float)me->info.BlockNbr * (float)me->info.BlockSize;
 	float size_GB = size_B / 1000000000.f;
 	ALX_MMC_TRACE_INF("AlxMmc_Init - INFO: size_GB %.2f", size_GB);
+	(void)size_GB;
 
 	// Set isInit
 	me->isInit = true;

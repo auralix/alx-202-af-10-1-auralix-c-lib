@@ -131,6 +131,7 @@ void AlxCan_Ctor
 	me->txIrqPriority = txIrqPriority;
 	me->rxIrqPriority = rxIrqPriority;
 	ALX_CAN_ASSERT(AlxCan_Ctor_IsClkOk(me));
+	(void)AlxCan_Ctor_IsClkOk;
 
 
 	//------------------------------------------------------------------------------

@@ -2378,6 +2378,7 @@ static void AlxParamItem_Ctor
 	{
 		// Check if enum array value are from low to high
 		ALX_PARAM_ITEM_ASSERT(AlxParamItem_AreEnumArrValFromLowToHigh(me) == true);
+		(void)AlxParamItem_AreEnumArrValFromLowToHigh;
 
 		// Check if enum number is on the list
 		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList(me, valDef) == true);

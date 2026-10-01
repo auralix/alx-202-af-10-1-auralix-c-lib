@@ -109,6 +109,7 @@ void AlxI2c_Ctor
 
 	// Check clock
 	ALX_I2C_ASSERT(AlxI2c_IsClkOk(me));
+	(void)AlxI2c_IsClkOk;
 
 	// Info
 	me->wasCtorCalled = true;

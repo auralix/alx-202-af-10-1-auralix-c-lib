@@ -103,6 +103,7 @@ void AlxAdc_Ctor
 
 	// Check clock
 	ALX_ADC_ASSERT(AlxAdc_Ctor_IsSysClkOk(me));
+	(void)AlxAdc_Ctor_IsSysClkOk;
 
 	// Variables
 	me->adcConfig.clockDividerNumber = 0;					// MF: Clkdiv = 0 ensures that sampling rate si appropriate (see User Manual)
