@@ -134,6 +134,9 @@ TARGET_PLATFORMS = [*STM32, *OTHER]
 # gives what differs - the part, or the vendor's own configuration - to reach the lines the
 # platform's one row set cannot.
 PLATFORM_VARIANTS = {
+    "stm32f0-f072": ("stm32f0", "on the STM32F072xB part, with the VBAT channel the F030 and F070 parts lack"),
+    "stm32f4-f413": ("stm32f4", "on the STM32F413xx part, with the PLLR divider and without the 180 MHz over-drive"),
+    "stm32l4-l4r5": ("stm32l4", "on the STM32L4R5xx part, an L4+ with DMAMUX1, the R1MODE boost and the new DAC"),
     "zephyr-kconfig": ("zephyr", "with the Kconfig options the backends test: thread names, the 64-bit cycle counter, "
                                  "configurable ADC inputs"),
 }

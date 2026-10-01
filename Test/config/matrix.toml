@@ -44,6 +44,24 @@ includes = ["host/shim/stm32", "host/shim/cmsis"]
 defines = ["STM32F765xx"]
 flags = ["-mcpu=cortex-m7", "-mthumb", "-mfpu=fpv5-d16", "-mfloat-abi=hard"]
 
+[platform.stm32f0-f072]
+description = "STM32F0, Cortex-M0, the STM32F072xB part"
+includes = ["host/shim/stm32", "host/shim/cmsis"]
+defines = ["STM32F072xB"]
+flags = ["-mcpu=cortex-m0", "-mthumb", "-mfloat-abi=soft"]
+
+[platform.stm32f4-f413]
+description = "STM32F4, Cortex-M4F, the STM32F413xx part"
+includes = ["host/shim/stm32", "host/shim/cmsis"]
+defines = ["STM32F413xx"]
+flags = ["-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"]
+
+[platform.stm32l4-l4r5]
+description = "STM32L4+, Cortex-M4F, the STM32L4R5xx part"
+includes = ["host/shim/stm32", "host/shim/cmsis"]
+defines = ["STM32L4R5xx"]
+flags = ["-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"]
+
 [platform.stm32g4]
 description = "STM32G4, Cortex-M4F, the STM32G474xx part"
 includes = ["host/shim/stm32", "host/shim/cmsis"]
@@ -3044,3 +3062,57 @@ features = "all-noos-nomcuboot"
 target = "none"
 library = "trace-vrb-assert-bkpt-opt-none"
 description = "Zephyr RTOS with its Kconfig options on (thread names, the 64-bit cycle counter, configurable ADC inputs), clang: every feature on; the network through Wiznet; no FreeRTOS: the bare-metal and Zephyr branches; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
+id = "0320"
+toolchain = "gcc"
+platform = "stm32f0-f072"
+features = "all-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32F0, the STM32F072xB part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
+id = "0321"
+toolchain = "clang"
+platform = "stm32f0-f072"
+features = "all-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32F0, the STM32F072xB part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
+id = "0322"
+toolchain = "gcc"
+platform = "stm32f4-f413"
+features = "all-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32F4, the STM32F413xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
+id = "0323"
+toolchain = "clang"
+platform = "stm32f4-f413"
+features = "all-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32F4, the STM32F413xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
+id = "0324"
+toolchain = "gcc"
+platform = "stm32l4-l4r5"
+features = "all-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32L4+, the STM32L4R5xx part, arm-none-eabi-gcc: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
+
+[[row]]
+id = "0325"
+toolchain = "clang"
+platform = "stm32l4-l4r5"
+features = "all-nomcuboot"
+target = "none"
+library = "trace-vrb-assert-bkpt-opt-none"
+description = "STM32L4+, the STM32L4R5xx part, clang: every feature on; the network through Wiznet; no MCUboot; no boot role and no build configuration: a product without the bootloader; every trace at VRB and BKPT asserts: every argument compiled"
