@@ -55,14 +55,6 @@ static Alx_Status AlxLogger_CreateDirAndFiles
 	uint32_t filePathBufferSize
 );
 static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me);
-static Alx_Status AlxLogger_SyncLogWriteFile
-(
-	AlxLogger* me,
-	AlxFs_File *file,
-	uint32_t maxReadLen,
-	char* buffer,
-	uint32_t bufferSize
-);
 static Alx_Status AlxLogger_CheckRepairWriteFile
 (
 	AlxLogger* me,
@@ -1612,111 +1604,6 @@ static Alx_Status AlxLogger_CheckRepairReadFile(AlxLogger* me)
 	return Alx_Ok;
 }
 
-static Alx_Status AlxLogger_SyncLogWriteFile
-(
-	AlxLogger* me,
-	AlxFs_File *file,
-	uint32_t maxReadLen,
-	char* buffer,
-	uint32_t bufferSize
-)
-{
-	uint32_t positionNew = 0;
-	uint32_t readLenActual = 0;
-	uint32_t offset = 0;
-	uint32_t logCount = 0;
-	uint32_t lastDelimPos = 0;
-	uint32_t lastDelimPosTemp = 0;
-	uint32_t logDelimSize = strlen(me->logDelim);
-
-	if (logDelimSize >= bufferSize)
-	{
-		ALX_LOGGER_TRACE_ERR("Delimiter too large");
-		return Alx_Err;
-	}
-
-	// File is open when we get here, seek to beginning
-	Alx_Status status = AlxFs_File_Seek(me->alxFs, file, 0, AlxFs_File_Seek_Origin_Set, &positionNew);
-	if (status != Alx_Ok)
-	{
-		ALX_LOGGER_TRACE_ERR("Sync: initial seek failed (err: %d, offset=%d, positionNew=%" PRIu32 ")", status, 0, positionNew);
-		return Alx_Err;
-	}
-
-	status = Alx_Ok;
-	while (true)
-	{
-		// This would be more elegant with AlxFs_File_ReadStrUntil but much slower
-		status = AlxFs_File_Read(me->alxFs, file, buffer, bufferSize, &readLenActual);
-		if ((status == Alx_Ok) && (readLenActual != 0))
-		{
-			for (uint32_t i = 0; i < readLenActual - logDelimSize + 1; i++)
-			{
-				if (!strncmp(&buffer[i], me->logDelim, logDelimSize))
-				{
-					logCount++;
-					lastDelimPosTemp = offset + i + logDelimSize - 1;
-					if (lastDelimPosTemp >= maxReadLen)
-					{
-						logCount--;
-						break;
-					}
-					else
-					{
-						lastDelimPos = lastDelimPosTemp;
-					}
-				}
-			}
-			offset += readLenActual;
-			if (offset >= maxReadLen)
-			{
-				break;
-			}
-			if ((logDelimSize > 1) && (lastDelimPos != offset - 1))
-			{
-				// Incomplete log at the end of buffer, ensure a delimiter is not missed
-				offset -= logDelimSize - 1;
-				status = AlxFs_File_Seek(me->alxFs, file, -(logDelimSize - 1), AlxFs_File_Seek_Origin_Cur, &positionNew);
-				if (status != Alx_Ok)
-				{
-					ALX_LOGGER_TRACE_ERR("Sync: seek failed (err: %d, offset=%d, positionNew=%" PRIu32 ")", status, 0, positionNew);
-					return Alx_Err;
-				}
-			}
-		}
-		else if ((status == Alx_Ok) && (readLenActual == 0))
-		{
-			break;
-		}
-		else
-		{
-			ALX_LOGGER_TRACE_ERR("Sync: read failed (err: %d, readLenActual: %" PRIu32 ")", status, readLenActual);
-			break;
-		}
-	}
-
-	ALX_LOGGER_TRACE_INF("Sync: file read done (numLogs: %" PRIu32 ", last delimiter position: %" PRIu32 ")", logCount, lastDelimPos);
-	if (logCount < me->md.write.log)
-	{
-		me->md.write.id -= (me->md.write.log - logCount);
-	}
-	else
-	{
-		me->md.write.id += (logCount - me->md.write.log);
-	}
-
-	me->md.write.pos = (logCount > 0) ? (lastDelimPos + 1) : (0);
-	me->md.write.log = logCount;
-
-	status = AlxFs_File_Truncate(me->alxFs, file, me->md.write.pos);
-	if (status != Alx_Ok)
-	{
-		ALX_LOGGER_TRACE_INF("Sync: failed to truncate file (%d)", status);
-	}
-
-	return status;
-}
-
 static Alx_Status AlxLogger_CheckRepairWriteFile
 (
 	AlxLogger* me,
@@ -1787,7 +1674,6 @@ static Alx_Status AlxLogger_CheckRepairWriteFile
 		if (syncNeeded)
 		{
 //			status = AlxLogger_SyncLogWriteFile(me, &file, MIN(fileSize, me->md.write.pos), logBuffer, logBufferSize);	// TV: TODO
-			(void)AlxLogger_SyncLogWriteFile;	// Not called yet, see the TODO above
 			if (status != Alx_Ok)
 			{
 				break;
