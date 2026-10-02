@@ -225,7 +225,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	}
 
 	// Receive response
-	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff) - 1);
 	if (statusLen <= 0)
 	{
 		me->buff[sizeof(me->buff) - 1] = 0;
@@ -234,10 +234,13 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 		return Alx_Err;
 	}
 
+	// Zero terminate response
+	me->buff[statusLen] = 0;
+
 	// Check response
 	if(strncmp(me->buff, "220", 3) != 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp(220) buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(220) buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -258,7 +261,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	}
 
 	// Receive response
-	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff) - 1);
 	if (statusLen <= 0)
 	{
 		me->buff[sizeof(me->buff) - 1] = 0;
@@ -267,10 +270,13 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 		return Alx_Err;
 	}
 
+	// Zero terminate response
+	me->buff[statusLen] = 0;
+
 	// Check response
 	if (strncmp(me->buff, "331", 3) != 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp(331) buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(331) buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -291,7 +297,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	}
 
 	// Receive response
-	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff) - 1);
 	if (statusLen <= 0)
 	{
 		me->buff[sizeof(me->buff) - 1] = 0;
@@ -300,10 +306,13 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 		return Alx_Err;
 	}
 
+	// Zero terminate response
+	me->buff[statusLen] = 0;
+
 	// Check response
 	if (strncmp(me->buff, "230", 3) != 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp(230) buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(230) buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -324,7 +333,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	}
 
 	// Receive response
-	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff) - 1);
 	if (statusLen <= 0)
 	{
 		me->buff[sizeof(me->buff) - 1] = 0;
@@ -333,10 +342,13 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 		return Alx_Err;
 	}
 
+	// Zero terminate response
+	me->buff[statusLen] = 0;
+
 	// Check response
 	if (strncmp(me->buff, "200", 3) != 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp(200) buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(200) buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -384,7 +396,7 @@ Alx_Status AlxFtp_Client_Logout(AlxFtp* me)
 	}
 
 	// Receive response - TV: Won't handle as wrong status as error, since it can happen that server sends response & closes socket so fast that we can NOT read socket quickly enough, then this function fails..
-	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff) - 1);
 	if (statusLen <= 0)
 	{
 		me->buff[sizeof(me->buff) - 1] = 0;
@@ -392,10 +404,13 @@ Alx_Status AlxFtp_Client_Logout(AlxFtp* me)
 	}
 	else
 	{
+		// Zero terminate response
+		me->buff[statusLen] = 0;
+
 		// Check response
 		if (strncmp(me->buff, "221", 3) != 0)
 		{
-			ALX_FTP_TRACE_DBG("FAIL: strncmp(221) buff %.*s", (int)statusLen, me->buff);
+			ALX_FTP_TRACE_DBG("FAIL: strncmp(221) buff %s", me->buff);
 		}
 	}
 
@@ -453,7 +468,7 @@ Alx_Status AlxFtp_Client_MakeDir(AlxFtp* me, const char* path)
 	}
 
 	// Receive response
-	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff) - 1);
 	if (statusLen <= 0)
 	{
 		me->buff[sizeof(me->buff) - 1] = 0;
@@ -462,10 +477,13 @@ Alx_Status AlxFtp_Client_MakeDir(AlxFtp* me, const char* path)
 		return Alx_Err;
 	}
 
+	// Zero terminate response
+	me->buff[statusLen] = 0;
+
 	// Check response
 	if (strncmp(me->buff, "257", 3) != 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp(257) buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(257) buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -507,7 +525,7 @@ Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path, bool* exists)
 	}
 
 	// Receive response
-	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff) - 1);
 	if (statusLen <= 0)
 	{
 		me->buff[sizeof(me->buff) - 1] = 0;
@@ -515,6 +533,9 @@ Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path, bool* exists)
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
+
+	// Zero terminate response
+	me->buff[statusLen] = 0;
 
 	// Check response
 	if (strncmp(me->buff, "250", 3) == 0)
@@ -527,7 +548,7 @@ Alx_Status AlxFtp_Client_ChangeDir(AlxFtp* me, const char* path, bool* exists)
 	}
 	else
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp(250 & 550) buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(250 & 550) buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -572,7 +593,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	}
 
 	// Receive response
-	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff) - 1);
 	if (statusLen <= 0)
 	{
 		me->buff[sizeof(me->buff) - 1] = 0;
@@ -581,10 +602,13 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		return Alx_Err;
 	}
 
+	// Zero terminate response
+	me->buff[statusLen] = 0;
+
 	// Check response
 	if (strncmp(me->buff, "227", 3) != 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp(227) buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(227) buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -594,14 +618,11 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	// Parse PASV Response Tuple + Set Data Socket IP & Port
 	//------------------------------------------------------------------------------
 
-	// Zero terminate response
-	me->buff[statusLen] = 0;
-
 	// Find '('
 	char* ptr = strchr(me->buff, '(');
 	if (ptr == NULL)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strchr('(') buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: strchr('(') buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -611,7 +632,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	int32_t sscanfStatus = sscanf(ptr, "(%" SCNu8 ",%" SCNu8 ",%" SCNu8 ",%" SCNu8 ",%" SCNu8 ",%" SCNu8 ")", &tuple[0], &tuple[1], &tuple[2], &tuple[3], &tuple[4], &tuple[5]);
 	if (sscanfStatus != 6)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: sscanf(tuple) buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: sscanf(tuple) buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -678,7 +699,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	}
 
 	// Receive response
-	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff) - 1);
 	if (statusLen <= 0)
 	{
 		me->buff[sizeof(me->buff) - 1] = 0;
@@ -687,6 +708,9 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		return Alx_Err;
 	}
 
+	// Zero terminate response
+	me->buff[statusLen] = 0;
+
 	// Check response
 	if
 	(
@@ -694,7 +718,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		(strncmp(me->buff, "125", 3) != 0)
 	)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp(150 & 125) buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(150 & 125) buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -728,7 +752,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	}
 
 	// Receive response
-	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff));
+	statusLen = AlxSocket_Recv(&me->alxSocket_Ctrl, me->buff, sizeof(me->buff) - 1);
 	if (statusLen <= 0)
 	{
 		me->buff[sizeof(me->buff) - 1] = 0;
@@ -737,10 +761,13 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		return Alx_Err;
 	}
 
+	// Zero terminate response
+	me->buff[statusLen] = 0;
+
 	// Check response
 	if (strncmp(me->buff, "226", 3) != 0)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: strncmp(226) buff %.*s", (int)statusLen, me->buff);
+		ALX_FTP_TRACE_ERR("FAIL: strncmp(226) buff %s", me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
