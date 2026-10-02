@@ -1943,7 +1943,14 @@ static int AlxFs_Lfs_FlashInt_EraseBlock(const struct lfs_config* c, lfs_block_t
 	HAL_FLASH_Lock();
 
 	// Return
-	return xHAL_Status == HAL_OK ? LFS_ERR_OK : LFS_ERR_IO;
+	if (xHAL_Status == HAL_OK)
+	{
+		return LFS_ERR_OK;
+	}
+	else
+	{
+		return LFS_ERR_IO;
+	}
 }
 static int AlxFs_Lfs_FlashInt_SyncBlock(const struct lfs_config* c)
 {
