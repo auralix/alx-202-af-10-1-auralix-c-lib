@@ -80,8 +80,7 @@ STYLE_PENDING_COMMENTS = []
 # exempts a #define body - before they can be gated. That is a change to the Python library rather
 # than to this repository, and it is on the TODO.
 STYLE_PENDING_TERNARY = [
-    "alxBuild.h", "alxFs.c", "alxGlobal.c", "alxLfsConfig.h", "alxLogger.c",
-    "alxOsEventFlagGroup.c", "alxOsThread.c", "alxRtc_Global.c",
+    "alxBuild.h", "alxLfsConfig.h", "alxRtc_Global.c",
 ]
 
 # Stage 5 compiles every PORTABLE library module - the ones that need no vendor SDK. Three cannot
