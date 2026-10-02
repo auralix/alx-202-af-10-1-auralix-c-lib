@@ -502,7 +502,8 @@ void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, char* pathWithSu
 	uint32_t prefixLen = (uint32_t)(dot - path);
 
 	// Transform
-	sprintf(pathWithSuffix, "%.*s%s%s", (int)prefixLen, path, suffix, dot);
+	memcpy(pathWithSuffix, path, prefixLen);
+	sprintf(pathWithSuffix + prefixLen, "%s%s", suffix, dot);
 }
 
 
