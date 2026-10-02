@@ -8,14 +8,13 @@ module's 105 that no test had called.
 Who owns that memory is the part worth being careful about, so the shim's context owns it. A test
 that lent the item a Python buffer could prove something about memory that had already been freed.
 
-One thing this file does NOT do is call AlxParamItem_SetValToDef on an Arr item. Until
-2026-10-01 the function left valDefPtr NULL for that type and then passed it to
-AlxParamItem_SetVal, which memcpys from it - with assertions on that was a null dereference, and it
-took the test process down when I first reached it. A dead process cannot be xfailed. The Arr
-branch now returns after its assertion; the whole of SetValToDef is sealed in
-test_param_item_reset.py, and this file stays on the far side of that line.
+Until 2026-10-01 AlxParamItem_SetValToDef left valDefPtr NULL for an Arr item and then passed it
+to AlxParamItem_SetVal, which memcpys from it - with assertions on that was a null dereference,
+and it took the test process down when I first reached it. A dead process cannot be xfailed. The
+Arr branch returns after its assertion since f7fcf2a, so the call can be made now, and P664 makes
+it: an Arr item has no default for SetValToDef to set, and its value is left as it was.
 
-Proofs (ALX-1553): P562-P565.
+Proofs (ALX-1553): P562-P565; (ALX-1564, A87): P664.
 """
 
 import pytest
@@ -194,3 +193,25 @@ def test_ALX1553_P565_the_default_string_is_readable_after_every_set(memsafe_lib
     for value in ("one", "two", "three"):
         assert m.buff_set_str(ctx, value) == m.OK
         assert m.buff(ctx, "GetValDefStr") == STR_DEF, f"the default moved after setting {value!r}"
+
+
+# =====================================================================
+# P664 - SetValToDef has nothing to set on an Arr item
+# =====================================================================
+
+
+@pytest.mark.expect_assert("SetValToDef on an Arr item: the Arr branch asserts, as it says, and returns")
+def test_ALX1564_P664_set_val_to_def_on_an_arr_item_asserts_and_leaves_the_value(memsafe_lib, make_buff_item):
+    """The Arr branch of SetValToDef is an assertion that it is never reached, and then a return.
+
+    Before f7fcf2a the return was missing and SetVal was handed a NULL default; the value is the
+    proof that nothing is copied now - neither the default over it nor anything else.
+    """
+    m = memsafe_lib
+    ctx = make_buff_item("arr", ARR_DEF)
+    m.buff_set_arr(ctx, ARR_NEW)
+
+    m.buff_set_val_to_def(ctx)
+
+    assert m.buff_get_arr(ctx, len(ARR_NEW)) == ARR_NEW, "SetValToDef changed an Arr value"
+    assert m.buff_get_def_arr(ctx, len(ARR_DEF)) == ARR_DEF
