@@ -140,11 +140,12 @@ RETURN_TYPE_PENDING = {"alxCrc.c", "alxRange.c",
 # repository, not a defect. It is asserted in BOTH directions: a second module going quiet is a
 # regression, and alxBuild.c coming back to life means the set is stale.
 #
-# The fakes of four MCU modules join them for the same reason: their only function is the
+# The fakes of three MCU modules join them for the same reason: their only function is the
 # module's constructor, which exists under the module header's family guard, so without a family
-# they are empty too. They are compiled for real by a consumer that selects a family.
+# they are empty too. They are compiled for real by a consumer that selects a family. The SPI
+# fake left the set on 2026-10-02 with its model (A92), which is portable.
 SYNTAX_EMPTY_TU = {"alxBuild.c",
-                   "alxDacFake.c", "alxIoPinIrqFake.c", "alxRtcFake.c", "alxSpiFake.c"}
+                   "alxDacFake.c", "alxIoPinIrqFake.c", "alxRtcFake.c"}
 
 # Stage 5c asks the question P567 answered the hard way: does any assertion DO the work?
 #

@@ -134,3 +134,7 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 	alxPwmFake_writeCount[slot]++;
 	return Alx_Ok;
 }
+Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
+{
+	return AlxPwm_SetDuty_pct(me, ch, (float)duty_permil / 10.f);
+}

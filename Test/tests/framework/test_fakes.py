@@ -21,6 +21,9 @@ Proofs (ALX-1564):
   P318 the portable entry points of the constructor-only fakes succeed
   P171 serial port: a read consumes its prefix and the unread tail stays for the next read
   P172 serial port: what is sent is read back in order, however the reads are sized
+  P661 SPI: what is sent is recorded in order, a receive answers from the queue, CS is counted
+  P662 I2S: init, de-init and handle are counted, and a reset clears them
+  P663 PWM: the per mille setter is the per cent setter of the same channel, in tenths
 
 P171 and P172 moved here with their tokens from a consumer's host suite: they are the serial
 port fake's own contract, which the consumer drove through its product's port.
@@ -322,3 +325,57 @@ def test_ALX1564_P172_host_tx_reuses_consumed_prefix_and_preserves_unread_tail(f
     while actual := c.AlxSerialPortFake_TxRead(port, buff, len(buff)):
         remaining.extend(buff.raw[:actual])
     assert remaining == b"A" * 4000 + b"TAIL" + added
+
+
+def test_ALX1564_P661_an_spi_transfer_is_recorded_and_answered_from_the_queue(fakes_lib):
+    """MOSI in order across every transfer, MISO from the queue and zeros once it is empty."""
+    c = fakes_lib.c
+    spi = fakes_lib.handle()
+    queued = (ctypes.c_uint8 * 3)(0xA1, 0xB2, 0xC3)
+    c.AlxSpiFake_QueueMiso(queued, 3)
+
+    c.AlxSpi_Master_AssertCs(spi)
+    assert c.AlxSpiFake_IsCsAsserted() is True
+    sent = (ctypes.c_uint8 * 2)(0x11, 0x22)
+    got = (ctypes.c_uint8 * 2)()
+    assert c.AlxSpi_Master_WriteRead(spi, sent, got, 2, 1, 10) == fakes_lib.OK
+    read = (ctypes.c_uint8 * 3)(0xFF, 0xFF, 0xFF)
+    assert c.AlxSpi_Master_Read(spi, read, 3, 1, 10) == fakes_lib.OK
+    assert c.AlxSpi_Master_Write(spi, (ctypes.c_uint8 * 1)(0x33), 1, 1, 10) == fakes_lib.OK
+    c.AlxSpi_Master_DeAssertCs(spi)
+
+    assert bytes(got) == bytes([0xA1, 0xB2])
+    assert bytes(read) == bytes([0xC3, 0x00, 0x00]), "an empty queue reads zeros"
+    mosi = (ctypes.c_uint8 * 8)()
+    assert c.AlxSpiFake_Mosi(mosi, 8) == 3
+    assert bytes(mosi[:3]) == bytes([0x11, 0x22, 0x33])
+    assert (c.AlxSpiFake_CsAssertCount(), c.AlxSpiFake_IsCsAsserted(), c.AlxSpiFake_MisoLeft()) == (1, False, 0)
+
+    c.AlxSpiFake_SetForcedStatus(fakes_lib.ERR)
+    assert c.AlxSpi_Init(spi) == fakes_lib.ERR, "a forced status is every call's answer"
+    c.AlxSpiFake_Reset()
+    assert (c.AlxSpiFake_MosiLen(), c.AlxSpiFake_CsAssertCount(), c.AlxSpi_Init(spi)) == (0, 0, fakes_lib.OK)
+
+
+def test_ALX1564_P662_the_i2s_interface_counts_its_init_deinit_and_handle(fakes_lib):
+    c = fakes_lib.c
+    i2s = fakes_lib.handle()
+
+    assert c.AlxI2s_Init(i2s) == fakes_lib.OK
+    c.AlxI2s_Foreground_Handle(i2s)
+    c.AlxI2s_Foreground_Handle(i2s)
+    assert c.AlxI2s_DeInit(i2s) == fakes_lib.OK
+
+    assert (c.AlxI2sFake_InitCount(), c.AlxI2sFake_HandleCount(), c.AlxI2sFake_DeInitCount()) == (1, 2, 1)
+    c.AlxI2sFake_Reset()
+    assert (c.AlxI2sFake_InitCount(), c.AlxI2sFake_HandleCount(), c.AlxI2sFake_DeInitCount()) == (0, 0, 0)
+
+
+def test_ALX1564_P663_the_per_mille_duty_is_the_per_cent_duty_in_tenths(fakes_lib):
+    c = fakes_lib.c
+    pwm = fakes_lib.handle()
+
+    assert c.AlxPwm_SetDuty_permil(pwm, 2, 255) == fakes_lib.OK
+
+    assert c.AlxPwmFake_Duty_pct(pwm, 2) == pytest.approx(25.5)
+    assert c.AlxPwmFake_WriteCount(pwm, 2) == 1

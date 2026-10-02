@@ -2979,7 +2979,8 @@ class FakesLib:
     RESETS = ("AlxAdcFake_Reset", "AlxCanFake_Reset", "AlxPwmFake_Reset", "AlxIna228Fake_Reset",
               "AlxPi4ioe5v6534qFake_Reset", "AlxLp586xFake_Reset", "AlxIdFake_Reset",
               "AlxIoPinFake_Reset", "AlxDelayFake_Reset", "AlxWdtFake_Reset",
-              "AlxMemSafeFake_Reset", "AlxParamKvStoreFake_Reset", "AlxSerialPortFake_Reset")
+              "AlxMemSafeFake_Reset", "AlxParamKvStoreFake_Reset", "AlxSerialPortFake_Reset",
+              "AlxSpiFake_Reset", "AlxI2sFake_Reset")
 
     def __init__(self, dll_path: Path):
         c = ctypes.CDLL(str(dll_path))
@@ -3022,6 +3023,25 @@ class FakesLib:
         sig("AlxPwmFake_Duty_pct", f32, vp, u32)
         sig("AlxPwmFake_WriteCount", u32, vp, u32)
         sig("AlxPwm_SetDuty_pct", i32, vp, ctypes.c_int, f32)
+        sig("AlxPwm_SetDuty_permil", i32, vp, ctypes.c_int, u16)
+        sig("AlxSpiFake_QueueMiso", None, ctypes.POINTER(u8), u32)
+        sig("AlxSpiFake_Mosi", u32, ctypes.POINTER(u8), u32)
+        for what in ("MosiLen", "MisoLeft", "CsAssertCount", "InitCount", "DeInitCount"):
+            sig(f"AlxSpiFake_{what}", u32)
+        sig("AlxSpiFake_IsCsAsserted", b)
+        sig("AlxSpiFake_SetForcedStatus", None, i32)
+        sig("AlxSpi_Init", i32, vp)
+        sig("AlxSpi_DeInit", i32, vp)
+        sig("AlxSpi_Master_Write", i32, vp, ctypes.POINTER(u8), u16, u8, u16)
+        sig("AlxSpi_Master_Read", i32, vp, ctypes.POINTER(u8), u16, u8, u16)
+        sig("AlxSpi_Master_WriteRead", i32, vp, ctypes.POINTER(u8), ctypes.POINTER(u8), u16, u8, u16)
+        sig("AlxSpi_Master_AssertCs", None, vp)
+        sig("AlxSpi_Master_DeAssertCs", None, vp)
+        for what in ("InitCount", "DeInitCount", "HandleCount"):
+            sig(f"AlxI2sFake_{what}", u32)
+        sig("AlxI2s_Init", i32, vp)
+        sig("AlxI2s_DeInit", i32, vp)
+        sig("AlxI2s_Foreground_Handle", None, vp)
         for what in ("Current_A", "BusVoltage_V", "ShuntVoltage_V", "Power_W", "Temp_degC"):
             sig(f"AlxIna228Fake_Set{what}", None, vp, f32)
             sig(f"AlxIna228_Get{what}", i32, vp, pf32)
