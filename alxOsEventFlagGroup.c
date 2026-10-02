@@ -51,7 +51,7 @@ static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, u
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxOsEventFlagGroup_Ctor
 (
@@ -271,16 +271,30 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
 	// Convert timeout
-	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
+	k_timeout_t timeout = K_NO_WAIT;
+	if (timeout_ms == 0)
+	{
+		timeout = K_NO_WAIT;
+	}
+	else
+	{
+		timeout = K_MSEC(timeout_ms);
+	}
 
 	// Wait for ANY vs ALL.
 	// Zephyr's wait functions do not do atomic clear-on-exit, so we handle that manually.
 	// Multi-consumer note: this post-return clear is not atomic with the wake.
 	// If multiple threads wait on the same bits, one can clear while another is waking,
 	// causing missed events.
-	uint32_t got = waitForAllEventFlags
-		? k_event_wait_all(&me->event, eventFlagsToWait, false, timeout)
-		: k_event_wait    (&me->event, eventFlagsToWait, false, timeout);
+	uint32_t got = 0;
+	if (waitForAllEventFlags)
+	{
+		got = k_event_wait_all(&me->event, eventFlagsToWait, false, timeout);
+	}
+	else
+	{
+		got = k_event_wait(&me->event, eventFlagsToWait, false, timeout);
+	}
 
 	// Check
 	uint32_t matched = got & eventFlagsToWait;
@@ -362,7 +376,15 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	uint32_t eventBits = 0;
 
 	// Convert timeout
-	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
+	k_timeout_t timeout = K_NO_WAIT;
+	if (timeout_ms == 0)
+	{
+		timeout = K_NO_WAIT;
+	}
+	else
+	{
+		timeout = K_MSEC(timeout_ms);
+	}
 
 	// Set our flags
 	k_event_post(&me->event, eventFlagsToSet);
