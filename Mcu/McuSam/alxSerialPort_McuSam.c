@@ -445,7 +445,7 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 			status = AlxSerialPort_Reset(me);
 			if (status != Alx_Ok)
 			{
-				ALX_SERIAL_PORT_TRACE_ERR("FAIL: AlxSerialPort_Reset() status %u", status);
+				ALX_SERIAL_PORT_TRACE_ERR("FAIL: AlxSerialPort_Reset() status %d", status);
 				return Alx_Err;
 			}
 
