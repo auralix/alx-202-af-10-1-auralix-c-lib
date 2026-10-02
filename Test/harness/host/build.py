@@ -2378,6 +2378,812 @@ def _build_fakes_dll() -> None:
     _build_dll(FAKES_SOURCES, (), _assert_defines(FAKES_SOURCES), FAKES_DLL, FAKES_EXPORTS, None)
 
 
+# ------------------------------------------------- BQ24600 battery charger -----
+# Tier-2 target (A92): the REAL driver over faked pins, with the REAL software timers and tick
+# under it. The charger says what it is doing on two pins, and one of them has a third meaning:
+# a STAT pin that blinks at 1 Hz is a fault, which only a window of time can tell from a level.
+BQ24600_SOURCES = [
+    CLIB_DIR / "Ext" / "alxBq24600.c",
+    CLIB_DIR / "alxTimSw.c",
+    CLIB_DIR / "alxTick.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    FAKES_DIR / "alxIrqFake.c",
+    HELPERS_DIR / "alxBq24600TestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+BQ24600_DEPS = [
+    *BQ24600_SOURCES,
+    CLIB_DIR / "Ext" / "alxBq24600.h",
+    CLIB_DIR / "alxTimSw.h",
+    CLIB_DIR / "alxTick.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+BQ24600_DLL = BUILD_DIR / "alxBq24600Test.dll"
+BQ24600_EXPORTS = build_tools.Exports("alxBq24600Test", (
+    "AlxBq24600Test_New",
+    "AlxBq24600Test_Delete",
+    "AlxBq24600Test_Bq",
+    "AlxBq24600Test_EnPin",
+    "AlxBq24600Test_NpgPin",
+    "AlxBq24600Test_StatPin",
+    "AlxBq24600Test_Window_ms",
+    "AlxBq24600Test_ErrTransitions",
+    "AlxBq24600Test_HalfPeriodMin_ms",
+    "AlxBq24600Test_HalfPeriodMax_ms",
+    "AlxBq24600_Init",
+    "AlxBq24600_DeInit",
+    "AlxBq24600_Handle",
+    "AlxBq24600_Enable",
+    "AlxBq24600_Disable",
+    "AlxBq24600_IsBatCharging",
+    "AlxBq24600_IsBatFull",
+    "AlxBq24600_IsSleep",
+    "AlxBq24600_IsErr",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_NumOfSlots",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_SetLevel",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "alxTick DATA",
+    "AlxTick_Ctor",
+    "AlxTick_IncRange_ns",
+    "AlxIrqFake_Reset",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_bq24600_dll() -> None:
+    _build_dll(BQ24600_SOURCES, (), _assert_defines(BQ24600_SOURCES), BQ24600_DLL, BQ24600_EXPORTS, None)
+
+
+# ------------------------------------------------ MCP73831 battery charger -----
+# Tier-2 target (A92): the REAL driver over one faked pin. The charger's STAT output has three
+# states - low, high and floating - and the driver reads it either as a tri-state or as a plain
+# level, which is the constructor's choice and decides which statuses can be told apart at all.
+MCP73831_SOURCES = [
+    CLIB_DIR / "Ext" / "alxMcp73831.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    HELPERS_DIR / "alxMcp73831TestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+MCP73831_DEPS = [
+    *MCP73831_SOURCES,
+    CLIB_DIR / "Ext" / "alxMcp73831.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+MCP73831_DLL = BUILD_DIR / "alxMcp73831Test.dll"
+MCP73831_EXPORTS = build_tools.Exports("alxMcp73831Test", (
+    "AlxMcp73831Test_New",
+    "AlxMcp73831Test_Delete",
+    "AlxMcp73831Test_Mcp",
+    "AlxMcp73831Test_StatPin",
+    "AlxMcp73831Test_St",
+    "AlxMcp73831Test_TriState",
+    "AlxMcp73831_Init",
+    "AlxMcp73831_DeInit",
+    "AlxMcp73831_GetSt",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_NumOfSlots",
+    "AlxIoPinFake_SetLevel",
+    "AlxIoPinFake_SetTriState",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_mcp73831_dll() -> None:
+    _build_dll(MCP73831_SOURCES, (), _assert_defines(MCP73831_SOURCES), MCP73831_DLL, MCP73831_EXPORTS, None)
+
+
+# ---------------------------------------------- TPA3255 audio amplifier -----
+# Tier-2 target (A92): the REAL driver over faked pins, with the REAL software timer and tick
+# under it. The amplifier shuts itself down on a fault and stays down until it is reset; the
+# driver waits, pulses the reset pin, waits again and lets the part run - a state machine in time.
+TPA3255_SOURCES = [
+    CLIB_DIR / "Ext" / "alxTpa3255.c",
+    CLIB_DIR / "alxTimSw.c",
+    CLIB_DIR / "alxTick.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    FAKES_DIR / "alxIrqFake.c",
+    HELPERS_DIR / "alxTpa3255TestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+TPA3255_DEPS = [
+    *TPA3255_SOURCES,
+    CLIB_DIR / "Ext" / "alxTpa3255.h",
+    CLIB_DIR / "alxTimSw.h",
+    CLIB_DIR / "alxTick.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+TPA3255_DLL = BUILD_DIR / "alxTpa3255Test.dll"
+TPA3255_EXPORTS = build_tools.Exports("alxTpa3255Test", (
+    "AlxTpa3255Test_New",
+    "AlxTpa3255Test_Delete",
+    "AlxTpa3255Test_Tpa",
+    "AlxTpa3255Test_NResetPin",
+    "AlxTpa3255Test_NFaultPin",
+    "AlxTpa3255Test_NClipOtwPin",
+    "AlxTpa3255Test_LowLevel_ms",
+    "AlxTpa3255Test_Waiting_ms",
+    "AlxTpa3255_Init",
+    "AlxTpa3255_DeInit",
+    "AlxTpa3255_Handle",
+    "AlxTpa3255_Enable",
+    "AlxTpa3255_Disable",
+    "AlxTpa3255_IsErrAsserted",
+    "AlxTpa3255_IsWarningAsserted",
+    "AlxTpa3255_WasErrAsserted",
+    "AlxTpa3255_WasWarningAsserted",
+    "AlxTpa3255_ClearWasErrAsserted",
+    "AlxTpa3255_ClearWasWarningAsserted",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_NumOfSlots",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_SetLevel",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "alxTick DATA",
+    "AlxTick_Ctor",
+    "AlxTick_IncRange_ns",
+    "AlxIrqFake_Reset",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_tpa3255_dll() -> None:
+    _build_dll(TPA3255_SOURCES, (), _assert_defines(TPA3255_SOURCES), TPA3255_DLL, TPA3255_EXPORTS, None)
+
+
+# ---------------------------------------------- TMP1075 temperature sensor -----
+# Tier-2 target (A92): the REAL driver over the faked I2C bus. A 12-bit reading, left-justified
+# in a 16-bit two's-complement register, read most significant byte first.
+TMP1075_SOURCES = [
+    CLIB_DIR / "Ext" / "alxTmp1075.c",
+    FAKES_DIR / "alxI2cFake.c",
+    HELPERS_DIR / "alxTmp1075TestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+TMP1075_DEPS = [
+    *TMP1075_SOURCES,
+    CLIB_DIR / "Ext" / "alxTmp1075.h",
+    CLIB_DIR / "Mcu" / "alxI2c.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+TMP1075_DLL = BUILD_DIR / "alxTmp1075Test.dll"
+TMP1075_EXPORTS = build_tools.Exports("alxTmp1075Test", (
+    "AlxTmp1075Test_New",
+    "AlxTmp1075Test_Delete",
+    "AlxTmp1075Test_Tmp",
+    "AlxTmp1075Test_Status_Ok",
+    "AlxTmp1075Test_Status_Err",
+    "AlxTmp1075_Init",
+    "AlxTmp1075_DeInit",
+    "AlxTmp1075_IsInit",
+    "AlxTmp1075_GetTemp_degC",
+    "AlxI2cFake_Reset",
+    "AlxI2cFake_SetReg",
+    "AlxI2cFake_GetLastWrite",
+    "AlxI2cFake_WriteCount",
+    "AlxI2cFake_ReadCount",
+    "AlxI2cFake_SetSlaveReady",
+    "AlxI2cFake_SetForcedStatus",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_tmp1075_dll() -> None:
+    _build_dll(TMP1075_SOURCES, (), _assert_defines(TMP1075_SOURCES), TMP1075_DLL, TMP1075_EXPORTS, None)
+
+
+# ---------------------------------------------------- VEML6040 colour sensor -----
+# Tier-2 target (A92): the REAL driver over the faked I2C bus. Four 16-bit channels, red, green,
+# blue and white, each its own register, least significant byte first.
+VEML6040_SOURCES = [
+    CLIB_DIR / "Ext" / "alxVeml6040.c",
+    FAKES_DIR / "alxI2cFake.c",
+    HELPERS_DIR / "alxVeml6040TestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+VEML6040_DEPS = [
+    *VEML6040_SOURCES,
+    CLIB_DIR / "Ext" / "alxVeml6040.h",
+    CLIB_DIR / "Mcu" / "alxI2c.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+VEML6040_DLL = BUILD_DIR / "alxVeml6040Test.dll"
+VEML6040_EXPORTS = build_tools.Exports("alxVeml6040Test", (
+    "AlxVeml6040Test_New",
+    "AlxVeml6040Test_Delete",
+    "AlxVeml6040Test_Veml",
+    "AlxVeml6040Test_Status_Ok",
+    "AlxVeml6040Test_Status_Err",
+    "AlxVeml6040_Init",
+    "AlxVeml6040_DeInit",
+    "AlxVeml6040_GetR_raw",
+    "AlxVeml6040_GetG_raw",
+    "AlxVeml6040_GetB_raw",
+    "AlxVeml6040_GetW_raw",
+    "AlxI2cFake_Reset",
+    "AlxI2cFake_SetReg",
+    "AlxI2cFake_GetLastWrite",
+    "AlxI2cFake_WriteCount",
+    "AlxI2cFake_ReadCount",
+    "AlxI2cFake_SetSlaveReady",
+    "AlxI2cFake_SetForcedStatus",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_veml6040_dll() -> None:
+    _build_dll(VEML6040_SOURCES, (), _assert_defines(VEML6040_SOURCES), VEML6040_DLL, VEML6040_EXPORTS, None)
+
+
+# ------------------------------------------------- PCA9539A IO expander -----
+# Tier-2 target (A92): the REAL driver over the faked I2C bus. Sixteen pins on two 8-bit ports,
+# a shadow of each port in the driver, and Handle as the one moment the shadow meets the part.
+PCA9539A_SOURCES = [
+    CLIB_DIR / "Ext" / "alxPca9539a.c",
+    FAKES_DIR / "alxI2cFake.c",
+    HELPERS_DIR / "alxPca9539aTestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+PCA9539A_DEPS = [
+    *PCA9539A_SOURCES,
+    CLIB_DIR / "Ext" / "alxPca9539a.h",
+    CLIB_DIR / "Mcu" / "alxI2c.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+PCA9539A_DLL = BUILD_DIR / "alxPca9539aTest.dll"
+PCA9539A_EXPORTS = build_tools.Exports("alxPca9539aTest", (
+    "AlxPca9539aTest_New",
+    "AlxPca9539aTest_Delete",
+    "AlxPca9539aTest_Pca",
+    "AlxPca9539aTest_Status_Ok",
+    "AlxPca9539aTest_Status_Err",
+    "AlxPca9539a_Init",
+    "AlxPca9539a_DeInit",
+    "AlxPca9539a_Handle",
+    "AlxPca9539a_irqHandle",
+    "AlxPca9539a_IoPin_Read",
+    "AlxPca9539a_Read_Port_Raw",
+    "AlxPca9539a_IoPin_Write",
+    "AlxPca9539a_IoPin_Set",
+    "AlxPca9539a_IoPin_Reset",
+    "AlxPca9539a_IoPin_Toggle",
+    "AlxI2cFake_Reset",
+    "AlxI2cFake_SetReg",
+    "AlxI2cFake_GetLastWrite",
+    "AlxI2cFake_WriteCount",
+    "AlxI2cFake_ReadCount",
+    "AlxI2cFake_SetSlaveReady",
+    "AlxI2cFake_SetForcedStatus",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_pca9539a_dll() -> None:
+    _build_dll(PCA9539A_SOURCES, (), _assert_defines(PCA9539A_SOURCES), PCA9539A_DLL, PCA9539A_EXPORTS, None)
+
+
+# ------------------------------------------------ PCAL6416A IO expander -----
+# Tier-2 target (A92): the REAL driver over the faked I2C bus. Sixteen pins on two ports, the
+# PCA9539A's registers plus drive strength, input latch, pulls and interrupt masks; Handle does
+# only the transfers its caller names, and a tri-state read is two reads under two pulls.
+PCAL6416A_SOURCES = [
+    CLIB_DIR / "Ext" / "alxPcal6416a.c",
+    FAKES_DIR / "alxI2cFake.c",
+    FAKES_DIR / "alxDelayFake.c",
+    HELPERS_DIR / "alxPcal6416aTestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+PCAL6416A_DEPS = [
+    *PCAL6416A_SOURCES,
+    CLIB_DIR / "Ext" / "alxPcal6416a.h",
+    CLIB_DIR / "Mcu" / "alxI2c.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    CLIB_DIR / "alxDelay.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+PCAL6416A_DLL = BUILD_DIR / "alxPcal6416aTest.dll"
+PCAL6416A_EXPORTS = build_tools.Exports("alxPcal6416aTest", (
+    "AlxPcal6416aTest_New",
+    "AlxPcal6416aTest_Delete",
+    "AlxPcal6416aTest_Pcal",
+    "AlxPcal6416aTest_TriState",
+    "AlxPcal6416aTest_Status_Ok",
+    "AlxPcal6416aTest_Status_Err",
+    "AlxPcal6416a_InitPeriph",
+    "AlxPcal6416a_DeInitPeriph",
+    "AlxPcal6416a_Init",
+    "AlxPcal6416a_DeInit",
+    "AlxPcal6416a_Handle",
+    "AlxPcal6416a_IoPin_Read",
+    "AlxPcal6416a_IoPin_Write",
+    "AlxPcal6416a_IoPin_Set",
+    "AlxPcal6416a_IoPin_Reset",
+    "AlxPcal6416a_IoPin_Toggle",
+    "AlxPcal6416a_IoPin_Read_TriState",
+    "AlxI2cFake_Reset",
+    "AlxI2cFake_SetReg",
+    "AlxI2cFake_GetLastWrite",
+    "AlxI2cFake_WriteCount",
+    "AlxI2cFake_ReadCount",
+    "AlxI2cFake_SetSlaveReady",
+    "AlxI2cFake_SetForcedStatus",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_pcal6416a_dll() -> None:
+    _build_dll(PCAL6416A_SOURCES, (), _assert_defines(PCAL6416A_SOURCES), PCAL6416A_DLL, PCAL6416A_EXPORTS, None)
+
+
+# -------------------------------------------- LP586x LED matrix driver -----
+# Tier-2 target (A92): the REAL driver over the faked I2C bus and two faked pins. 108 dots, one
+# brightness register each; the driver sends a dot only when it changed, then pulses SYNC so the
+# part shows every change at once.
+LP586X_SOURCES = [
+    CLIB_DIR / "Ext" / "alxLp586x.c",
+    FAKES_DIR / "alxI2cFake.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    FAKES_DIR / "alxDelayFake.c",
+    HELPERS_DIR / "alxLp586xTestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+LP586X_DEPS = [
+    *LP586X_SOURCES,
+    CLIB_DIR / "Ext" / "alxLp586x.h",
+    CLIB_DIR / "Mcu" / "alxI2c.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    CLIB_DIR / "alxDelay.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+LP586X_DLL = BUILD_DIR / "alxLp586xTest.dll"
+LP586X_EXPORTS = build_tools.Exports("alxLp586xTest", (
+    "AlxLp586xTest_New",
+    "AlxLp586xTest_Delete",
+    "AlxLp586xTest_Lp",
+    "AlxLp586xTest_EnPin",
+    "AlxLp586xTest_SyncPin",
+    "AlxLp586xTest_Status_Ok",
+    "AlxLp586xTest_Status_Err",
+    "AlxLp586x_InitPeriph",
+    "AlxLp586x_DeInitPeriph",
+    "AlxLp586x_Init",
+    "AlxLp586x_DeInit",
+    "AlxLp586x_Handle",
+    "AlxLp586x_Led_Write",
+    "AlxI2cFake_Reset",
+    "AlxI2cFake_SetReg",
+    "AlxI2cFake_GetLastWrite",
+    "AlxI2cFake_WriteCount",
+    "AlxI2cFake_ReadCount",
+    "AlxI2cFake_SetSlaveReady",
+    "AlxI2cFake_SetForcedStatus",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_NumOfSlots",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "AlxIoPinFake_WriteCount",
+    "AlxDelayFake_Reset",
+    "AlxDelayFake_UsCount",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_lp586x_dll() -> None:
+    _build_dll(LP586X_SOURCES, (), _assert_defines(LP586X_SOURCES), LP586X_DLL, LP586X_EXPORTS, None)
+
+
+# ------------------------------------------------- ADXL355 accelerometer -----
+# Tier-2 target (A92): the REAL driver over the SPI fake, which records what is sent and answers
+# from a queue. Three axes of 20-bit two's complement, most significant byte first, and a 12-bit
+# temperature; every register access is one chip-select frame.
+#
+# The driver is CLOSURE. On this host an enumeration bit-field is signed (A93), so setting the 1-bit
+# Standby field to 1 is a -Wsingle-bit-bitfield-constant-conversion error the target compilers do
+# not raise; and the strict set finds the range switch of AlxAdxl355_ConvertXyz without a case for
+# Range_Reserved (-Wswitch-enum; its default asserts), recorded in the night 5 report.
+ADXL355_SOURCES_STRICT = [
+    FAKES_DIR / "alxSpiFake.c",
+    HELPERS_DIR / "alxAdxl355TestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+ADXL355_SOURCES_CLOSURE = [
+    CLIB_DIR / "Ext" / "alxAdxl355.c",
+]
+ADXL355_DEPS = [
+    *ADXL355_SOURCES_STRICT,
+    *ADXL355_SOURCES_CLOSURE,
+    CLIB_DIR / "Ext" / "alxAdxl355.h",
+    CLIB_DIR / "Mcu" / "alxSpi.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+ADXL355_DLL = BUILD_DIR / "alxAdxl355Test.dll"
+ADXL355_EXPORTS = build_tools.Exports("alxAdxl355Test", (
+    "AlxAdxl355Test_New",
+    "AlxAdxl355Test_Delete",
+    "AlxAdxl355Test_Adxl",
+    "AlxAdxl355Test_GetXyz_g",
+    "AlxAdxl355Test_Status_Ok",
+    "AlxAdxl355Test_Status_Err",
+    "AlxAdxl355_Init",
+    "AlxAdxl355_DeInit",
+    "AlxAdxl355_Enable",
+    "AlxAdxl355_Disable",
+    "AlxAdxl355_GetTemp_degC",
+    "AlxSpiFake_Reset",
+    "AlxSpiFake_QueueMiso",
+    "AlxSpiFake_MosiLen",
+    "AlxSpiFake_Mosi",
+    "AlxSpiFake_MisoLeft",
+    "AlxSpiFake_CsAssertCount",
+    "AlxSpiFake_IsCsAsserted",
+    "AlxSpiFake_InitCount",
+    "AlxSpiFake_DeInitCount",
+    "AlxSpiFake_SetForcedStatus",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_adxl355_dll() -> None:
+    _build_dll(ADXL355_SOURCES_STRICT, ADXL355_SOURCES_CLOSURE,
+               _assert_defines(ADXL355_SOURCES_STRICT, ADXL355_SOURCES_CLOSURE),
+               ADXL355_DLL, ADXL355_EXPORTS, "adxl355Closure")
+
+
+# --------------------------------------------------------- ADS8678 ADC -----
+# Tier-2 target (A92): the REAL driver over the SPI fake and a faked reset pin. Eight channels of
+# 14 bits, read in the part's auto-scan order with one NO_OP frame each; every register write is
+# checked against the echo the part sends back.
+ADS8678_SOURCES = [
+    CLIB_DIR / "Ext" / "alxAds8678.c",
+    FAKES_DIR / "alxSpiFake.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    FAKES_DIR / "alxDelayFake.c",
+    HELPERS_DIR / "alxAds8678TestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+ADS8678_DEPS = [
+    *ADS8678_SOURCES,
+    CLIB_DIR / "Ext" / "alxAds8678.h",
+    CLIB_DIR / "Mcu" / "alxSpi.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    CLIB_DIR / "alxDelay.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+ADS8678_DLL = BUILD_DIR / "alxAds8678Test.dll"
+ADS8678_EXPORTS = build_tools.Exports("alxAds8678Test", (
+    "AlxAds8678Test_New",
+    "AlxAds8678Test_Delete",
+    "AlxAds8678Test_Ads",
+    "AlxAds8678Test_NRstPin",
+    "AlxAds8678Test_SetConfig",
+    "AlxAds8678Test_GetChVoltageAll_V",
+    "AlxAds8678Test_Status_Ok",
+    "AlxAds8678Test_Status_Err",
+    "AlxAds8678_InitPeriph",
+    "AlxAds8678_DeInitPeriph",
+    "AlxAds8678_Init",
+    "AlxAds8678_DeInit",
+    "AlxSpiFake_Reset",
+    "AlxSpiFake_QueueMiso",
+    "AlxSpiFake_MosiLen",
+    "AlxSpiFake_Mosi",
+    "AlxSpiFake_MisoLeft",
+    "AlxSpiFake_CsAssertCount",
+    "AlxSpiFake_IsCsAsserted",
+    "AlxSpiFake_InitCount",
+    "AlxSpiFake_DeInitCount",
+    "AlxSpiFake_SetForcedStatus",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_NumOfSlots",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "AlxDelayFake_Reset",
+    "AlxDelayFake_MsCount",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_ads8678_dll() -> None:
+    _build_dll(ADS8678_SOURCES, (), _assert_defines(ADS8678_SOURCES), ADS8678_DLL, ADS8678_EXPORTS, None)
+
+
+# ------------------------------------------------------- ADS114S08 ADC -----
+# Tier-2 target (A92): the REAL driver over the SPI fake and three faked pins, with the REAL
+# software timer, tick and linear interpolation under it. A conversion is START high, a wait for
+# data ready, one RDATA frame, START low. Init does not run on this host until A93 (the helper).
+#
+# The driver is CLOSURE. On this host an enumeration bit-field is signed (A93), so
+# every enumerator above the field's sign bit - MUXP_AIN8 in a 4-bit field, 1 in a 1-bit one - is
+# a -Wbitfield-constant-conversion error that the target compilers, where the field is unsigned, do
+# not raise; and the two thermocouple tables at the top of alxAds114s08.c are non-static globals
+# (-Wmissing-variable-declarations), a finding for the driver recorded in the night 5 report.
+ADS114S08_SOURCES_STRICT = [
+    CLIB_DIR / "alxInterpLin.c",
+    CLIB_DIR / "alxTimSw.c",
+    CLIB_DIR / "alxTick.c",
+    FAKES_DIR / "alxSpiFake.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    FAKES_DIR / "alxIrqFake.c",
+    FAKES_DIR / "alxDelayFake.c",
+    HELPERS_DIR / "alxAds114s08TestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+ADS114S08_SOURCES_CLOSURE = [
+    CLIB_DIR / "Ext" / "alxAds114s08.c",
+]
+ADS114S08_DEPS = [
+    *ADS114S08_SOURCES_STRICT,
+    *ADS114S08_SOURCES_CLOSURE,
+    CLIB_DIR / "Ext" / "alxAds114s08.h",
+    CLIB_DIR / "alxInterpLin.h",
+    CLIB_DIR / "alxTimSw.h",
+    CLIB_DIR / "alxTick.h",
+    CLIB_DIR / "Mcu" / "alxSpi.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    CLIB_DIR / "alxDelay.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+ADS114S08_DLL = BUILD_DIR / "alxAds114s08Test.dll"
+ADS114S08_EXPORTS = build_tools.Exports("alxAds114s08Test", (
+    "AlxAds114s08Test_New",
+    "AlxAds114s08Test_Delete",
+    "AlxAds114s08Test_Ads",
+    "AlxAds114s08Test_NDrdyPin",
+    "AlxAds114s08Test_StartPin",
+    "AlxAds114s08Test_NRstPin",
+    "AlxAds114s08Test_Perform",
+    "AlxAds114s08Test_MarkInit",
+    "AlxAds114s08Test_Status_Ok",
+    "AlxAds114s08Test_Status_Err",
+    "AlxAds114s08_InitPeriph",
+    "AlxAds114s08_DeInitPeriph",
+    "AlxAds114s08_Init",
+    "AlxAds114s08_DeInit",
+    "AlxSpiFake_Reset",
+    "AlxSpiFake_QueueMiso",
+    "AlxSpiFake_MosiLen",
+    "AlxSpiFake_Mosi",
+    "AlxSpiFake_MisoLeft",
+    "AlxSpiFake_CsAssertCount",
+    "AlxSpiFake_IsCsAsserted",
+    "AlxSpiFake_InitCount",
+    "AlxSpiFake_DeInitCount",
+    "AlxSpiFake_SetForcedStatus",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_NumOfSlots",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_SetLevel",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "AlxIoPinFake_WriteCount",
+    "AlxDelayFake_Reset",
+    "AlxDelayFake_MsCount",
+    "alxTick DATA",
+    "AlxTick_Ctor",
+    "AlxIrqFake_Reset",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_ads114s08_dll() -> None:
+    _build_dll(ADS114S08_SOURCES_STRICT, ADS114S08_SOURCES_CLOSURE,
+               _assert_defines(ADS114S08_SOURCES_STRICT, ADS114S08_SOURCES_CLOSURE),
+               ADS114S08_DLL, ADS114S08_EXPORTS, "ads114s08Closure")
+
+
+# --------------------------------------------------- ADAU1961 audio codec -----
+# Tier-2 target (A92): the REAL driver over the faked I2C bus and the faked I2S interface. The
+# codec's gains are register fields computed from decibels, three scales with three steps; the
+# differential input adds a +20 dB boost stage above 35.25 dB.
+#
+# The driver and its helper are CLOSURE. On this host an enumeration bit-field is signed (A93), so
+# assigning an enumerator above the field's sign bit is a -Wbitfield-constant-conversion error the
+# target compilers do not raise; and the strict set finds two things in the driver itself, recorded
+# in the night 5 report: the mute branch of each differential gain setter compares a float with ==
+# (-Wfloat-equal) and declares a second `status` that shadows the function's own (-Wshadow).
+ADAU1961_SOURCES_STRICT = [
+    FAKES_DIR / "alxI2cFake.c",
+    FAKES_DIR / "alxI2sFake.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+ADAU1961_SOURCES_CLOSURE = [
+    CLIB_DIR / "Ext" / "alxAdau1961.c",
+    HELPERS_DIR / "alxAdau1961TestHelpers.c",
+]
+ADAU1961_DEPS = [
+    *ADAU1961_SOURCES_STRICT,
+    *ADAU1961_SOURCES_CLOSURE,
+    CLIB_DIR / "Ext" / "alxAdau1961.h",
+    CLIB_DIR / "Mcu" / "alxI2c.h",
+    CLIB_DIR / "Mcu" / "alxI2s.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+ADAU1961_DLL = BUILD_DIR / "alxAdau1961Test.dll"
+ADAU1961_EXPORTS = build_tools.Exports("alxAdau1961Test", (
+    "AlxAdau1961Test_New",
+    "AlxAdau1961Test_Delete",
+    "AlxAdau1961Test_Adau",
+    "AlxAdau1961Test_InDiff",
+    "AlxAdau1961Test_InAux",
+    "AlxAdau1961Test_OutLine",
+    "AlxAdau1961Test_Status_Ok",
+    "AlxAdau1961Test_Status_Err",
+    "AlxAdau1961_Init",
+    "AlxAdau1961_DeInit",
+    "AlxAdau1961_Foreground_Handle",
+    "AlxAdau1961_InDiffL_SetGain_dB",
+    "AlxAdau1961_InDiffR_SetGain_dB",
+    "AlxAdau1961_InAuxL_SetGain_dB",
+    "AlxAdau1961_InAuxR_SetGain_dB",
+    "AlxAdau1961_OutLineL_SetGain_dB",
+    "AlxAdau1961_OutLineR_SetGain_dB",
+    "AlxI2cFake_Reset",
+    "AlxI2cFake_SetReg",
+    "AlxI2cFake_GetLastWrite",
+    "AlxI2cFake_WriteCount",
+    "AlxI2cFake_ReadCount",
+    "AlxI2cFake_SetSlaveReady",
+    "AlxI2cFake_SetForcedStatus",
+    "AlxI2sFake_Reset",
+    "AlxI2sFake_InitCount",
+    "AlxI2sFake_DeInitCount",
+    "AlxI2sFake_HandleCount",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_adau1961_dll() -> None:
+    _build_dll(ADAU1961_SOURCES_STRICT, ADAU1961_SOURCES_CLOSURE,
+               _assert_defines(ADAU1961_SOURCES_STRICT, ADAU1961_SOURCES_CLOSURE),
+               ADAU1961_DLL, ADAU1961_EXPORTS, "adau1961Closure")
+
+
+# ------------------------------------------------------ VNH7040 H-bridge -----
+# Tier-2 target (A92): the REAL driver over the faked ADC, PWM and pins, with the REAL software
+# timer, tick and voltage divider under it. A duty is a direction and a speed; one multisense pin
+# is read once a millisecond for, in turn, the two high-side currents, the chip temperature and
+# the supply voltage. Built with the PWM speed input, as the template ships it.
+VNH7040_SOURCES = [
+    CLIB_DIR / "Ext" / "alxVnh7040.c",
+    CLIB_DIR / "alxVdiv.c",
+    CLIB_DIR / "alxTimSw.c",
+    CLIB_DIR / "alxTick.c",
+    FAKES_DIR / "alxAdcFake.c",
+    FAKES_DIR / "alxPwmFake.c",
+    FAKES_DIR / "alxIoPinFake.c",
+    FAKES_DIR / "alxIrqFake.c",
+    FAKES_DIR / "alxDelayFake.c",
+    HELPERS_DIR / "alxVnh7040TestHelpers.c",
+    FAKES_DIR / "alxAssertFake.c",
+]
+VNH7040_DEPS = [
+    *VNH7040_SOURCES,
+    CLIB_DIR / "Ext" / "alxVnh7040.h",
+    CLIB_DIR / "alxVdiv.h",
+    CLIB_DIR / "alxTimSw.h",
+    CLIB_DIR / "alxTick.h",
+    CLIB_DIR / "Mcu" / "alxAdc.h",
+    CLIB_DIR / "Mcu" / "alxPwm.h",
+    CLIB_DIR / "Mcu" / "alxIoPin.h",
+    CLIB_DIR / "alxDelay.h",
+    CLIB_DIR / "alxGlobal.h",
+    CLIB_DIR / "alxAssert.h",
+    CONFIG_DIR / "alxConfig.h",
+    Path(__file__),
+]
+VNH7040_DLL = BUILD_DIR / "alxVnh7040Test.dll"
+VNH7040_EXPORTS = build_tools.Exports("alxVnh7040Test", (
+    "AlxVnh7040Test_New",
+    "AlxVnh7040Test_Delete",
+    "AlxVnh7040Test_Vnh",
+    "AlxVnh7040Test_Adc",
+    "AlxVnh7040Test_Pwm",
+    "AlxVnh7040Test_Pin",
+    "AlxVnh7040Test_SenseCh",
+    "AlxVnh7040Test_PwmCh",
+    "AlxVnh7040_Init",
+    "AlxVnh7040_DeInit",
+    "AlxVnh7040_Handle",
+    "AlxVnh7040_SetDuty_permil",
+    "AlxVnh7040_GetCurrent_mA",
+    "AlxVnh7040_GetCurrentHsA_mA",
+    "AlxVnh7040_GetCurrentHsB_mA",
+    "AlxVnh7040_GetSupplyVoltage_mV",
+    "AlxVnh7040_GetTemp_degC",
+    "AlxVnh7040_GetIsError",
+    "AlxVnh7040_Config_BreakType",
+    "AlxAdcFake_Reset",
+    "AlxAdcFake_SetVoltage_V",
+    "AlxAdcFake_SetVoltageSeq_V",
+    "AlxAdcFake_ReadCount",
+    "AlxPwmFake_Reset",
+    "AlxPwmFake_Duty_pct",
+    "AlxPwmFake_WriteCount",
+    "AlxIoPinFake_Reset",
+    "AlxIoPinFake_DidOverflow",
+    "AlxIoPinFake_NumOfSlots",
+    "AlxIoPinFake_Level",
+    "AlxIoPinFake_InitCount",
+    "AlxIoPinFake_DeInitCount",
+    "AlxDelayFake_Reset",
+    "AlxDelayFake_MsCount",
+    "alxTick DATA",
+    "AlxTick_Ctor",
+    "AlxTick_IncRange_ns",
+    "AlxIrqFake_Reset",
+    "AlxAssertFake_Reset",
+    "AlxAssertFake_Count",
+    "AlxAssertFake_First",
+))
+
+def _build_vnh7040_dll() -> None:
+    _build_dll(VNH7040_SOURCES, (), _assert_defines(VNH7040_SOURCES), VNH7040_DLL, VNH7040_EXPORTS, None)
+
+
 # The groups as DATA, for anything that must rebuild them without running the suite: the MUTATE
 # lane names this list on the command line (alx.verify.mutation_hooks rebuild --groups
 # host_build:DLL_GROUPS), so the lane needs no script of its own in this repository.
@@ -2414,6 +3220,19 @@ DLL_GROUPS = [
     (MEMRAW_DLL, MEMRAW_DEPS, _build_memraw_dll),
     (MEMRAW_OVR_DLL, MEMRAW_OVR_DEPS, _build_memraw_ovr_dll),
     (FAKES_DLL, FAKES_DEPS, _build_fakes_dll),
+    (BQ24600_DLL, BQ24600_DEPS, _build_bq24600_dll),
+    (MCP73831_DLL, MCP73831_DEPS, _build_mcp73831_dll),
+    (TPA3255_DLL, TPA3255_DEPS, _build_tpa3255_dll),
+    (TMP1075_DLL, TMP1075_DEPS, _build_tmp1075_dll),
+    (VEML6040_DLL, VEML6040_DEPS, _build_veml6040_dll),
+    (PCA9539A_DLL, PCA9539A_DEPS, _build_pca9539a_dll),
+    (PCAL6416A_DLL, PCAL6416A_DEPS, _build_pcal6416a_dll),
+    (LP586X_DLL, LP586X_DEPS, _build_lp586x_dll),
+    (ADXL355_DLL, ADXL355_DEPS, _build_adxl355_dll),
+    (ADS8678_DLL, ADS8678_DEPS, _build_ads8678_dll),
+    (ADS114S08_DLL, ADS114S08_DEPS, _build_ads114s08_dll),
+    (ADAU1961_DLL, ADAU1961_DEPS, _build_adau1961_dll),
+    (VNH7040_DLL, VNH7040_DEPS, _build_vnh7040_dll),
 ]
 
 

@@ -10,6 +10,10 @@ import pytest
 
 from harness.host.access import (
     _LOADED_DLLS,
+    Adau1961Lib,
+    Ads114s08Lib,
+    Ads8678Lib,
+    Adxl355Lib,
     AssertLib,
     AssertWeakLib,
     AudioLib,
@@ -17,6 +21,7 @@ from harness.host.access import (
     AudioVolLib,
     BoolLib,
     BoundLib,
+    Bq24600Lib,
     BtsLib,
     CanParserLib,
     CliLib,
@@ -30,7 +35,9 @@ from harness.host.access import (
     Lib,
     LinFunLib,
     LinLib,
+    Lp586xLib,
     MathLib,
+    Mcp73831Lib,
     MemRawLib,
     MemRawOverrideLib,
     MemSafeLib,
@@ -38,17 +45,31 @@ from harness.host.access import (
     NtcLib,
     ParamKvStoreLib,
     ParamMgmtLib,
+    Pca9539aLib,
+    Pcal6416aLib,
     Pi4ioeLib,
     PwrLib,
     RotSwLib,
     RtcLib,
     TempSensLib,
     TimSwLib,
+    Tmp1075Lib,
+    Tpa3255Lib,
     VdivLib,
+    Veml6040Lib,
+    Vnh7040Lib,
     _assert_pins_fitted,
     _variant_lib,
 )
 from harness.host.build import (
+    ADAU1961_DEPS,
+    ADAU1961_DLL,
+    ADS114S08_DEPS,
+    ADS114S08_DLL,
+    ADS8678_DEPS,
+    ADS8678_DLL,
+    ADXL355_DEPS,
+    ADXL355_DLL,
     ASSERT_DEPS,
     ASSERT_DLL,
     ASSERT_WEAK_DEPS,
@@ -59,6 +80,8 @@ from harness.host.build import (
     AUDIOPLAYER_DLL,
     BOOL_DEPS,
     BOOL_DLL,
+    BQ24600_DEPS,
+    BQ24600_DLL,
     BTS_DEPS,
     BTS_DLL,
     CANPARSER_DEPS,
@@ -83,8 +106,12 @@ from harness.host.build import (
     LIN_DLL,
     LINFUN_DEPS,
     LINFUN_DLL,
+    LP586X_DEPS,
+    LP586X_DLL,
     MATH_DEPS,
     MATH_DLL,
+    MCP73831_DEPS,
+    MCP73831_DLL,
     MEMRAW_DEPS,
     MEMRAW_DLL,
     MEMRAW_OVR_DEPS,
@@ -99,6 +126,10 @@ from harness.host.build import (
     PARAMKV_DLL,
     PARAMMGMT_DEPS,
     PARAMMGMT_DLL,
+    PCA9539A_DEPS,
+    PCA9539A_DLL,
+    PCAL6416A_DEPS,
+    PCAL6416A_DLL,
     PI4IOE_DEPS,
     PI4IOE_DLL,
     PWR_DEPS,
@@ -111,14 +142,27 @@ from harness.host.build import (
     TEMPSENS_DLL,
     TIMSW_DEPS,
     TIMSW_DLL,
+    TMP1075_DEPS,
+    TMP1075_DLL,
+    TPA3255_DEPS,
+    TPA3255_DLL,
     VARIANTS,
     VDIV_DEPS,
     VDIV_DLL,
+    VEML6040_DEPS,
+    VEML6040_DLL,
+    VNH7040_DEPS,
+    VNH7040_DLL,
+    _build_adau1961_dll,
+    _build_ads114s08_dll,
+    _build_ads8678_dll,
+    _build_adxl355_dll,
     _build_assert_dll,
     _build_assert_weak_dll,
     _build_audio_dll,
     _build_audioplayer_dll,
     _build_bool_dll,
+    _build_bq24600_dll,
     _build_bts_dll,
     _build_canparser_dll,
     _build_cli_dll,
@@ -131,7 +175,9 @@ from harness.host.build import (
     _build_ina228_dll,
     _build_lin_dll,
     _build_linfun_dll,
+    _build_lp586x_dll,
     _build_math_dll,
+    _build_mcp73831_dll,
     _build_memraw_dll,
     _build_memraw_ovr_dll,
     _build_memsafe_dll,
@@ -139,13 +185,19 @@ from harness.host.build import (
     _build_ntc_dll,
     _build_paramkv_dll,
     _build_parammgmt_dll,
+    _build_pca9539a_dll,
+    _build_pcal6416a_dll,
     _build_pi4ioe_dll,
     _build_pwr_dll,
     _build_rotsw_dll,
     _build_rtc_dll,
     _build_tempsens_dll,
     _build_timsw_dll,
+    _build_tmp1075_dll,
+    _build_tpa3255_dll,
     _build_vdiv_dll,
+    _build_veml6040_dll,
+    _build_vnh7040_dll,
     _needs_build,
 )
 
@@ -505,6 +557,261 @@ def bts_lib(bts_lib_session) -> BtsLib:
     yield bts_lib_session
     _assert_pins_fitted(bts_lib_session)
     bts_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def bq24600_lib_session() -> Bq24600Lib:
+    override = os.environ.get("ALX_BQ24600_TEST_DLL")
+    if override:
+        return Bq24600Lib(Path(override))
+    if _needs_build(BQ24600_DLL, BQ24600_DEPS):
+        _build_bq24600_dll()
+    return Bq24600Lib(BQ24600_DLL)
+
+
+@pytest.fixture
+def bq24600_lib(bq24600_lib_session) -> Bq24600Lib:
+    """The charger library with the clock back at zero and every pin low."""
+    bq24600_lib_session.tick_reset()
+    bq24600_lib_session.c.AlxIoPinFake_Reset()
+    yield bq24600_lib_session
+    _assert_pins_fitted(bq24600_lib_session)
+    bq24600_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def mcp73831_lib_session() -> Mcp73831Lib:
+    override = os.environ.get("ALX_MCP73831_TEST_DLL")
+    if override:
+        return Mcp73831Lib(Path(override))
+    if _needs_build(MCP73831_DLL, MCP73831_DEPS):
+        _build_mcp73831_dll()
+    return Mcp73831Lib(MCP73831_DLL)
+
+
+@pytest.fixture
+def mcp73831_lib(mcp73831_lib_session) -> Mcp73831Lib:
+    """The charger library with every pin low and every strap floating."""
+    mcp73831_lib_session.c.AlxIoPinFake_Reset()
+    yield mcp73831_lib_session
+    _assert_pins_fitted(mcp73831_lib_session)
+    mcp73831_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def tpa3255_lib_session() -> Tpa3255Lib:
+    override = os.environ.get("ALX_TPA3255_TEST_DLL")
+    if override:
+        return Tpa3255Lib(Path(override))
+    if _needs_build(TPA3255_DLL, TPA3255_DEPS):
+        _build_tpa3255_dll()
+    return Tpa3255Lib(TPA3255_DLL)
+
+
+@pytest.fixture
+def tpa3255_lib(tpa3255_lib_session) -> Tpa3255Lib:
+    """The amplifier library with the clock back at zero and every pin low."""
+    tpa3255_lib_session.tick_reset()
+    tpa3255_lib_session.c.AlxIoPinFake_Reset()
+    yield tpa3255_lib_session
+    _assert_pins_fitted(tpa3255_lib_session)
+    tpa3255_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def tmp1075_lib_session() -> Tmp1075Lib:
+    override = os.environ.get("ALX_TMP1075_TEST_DLL")
+    if override:
+        return Tmp1075Lib(Path(override))
+    if _needs_build(TMP1075_DLL, TMP1075_DEPS):
+        _build_tmp1075_dll()
+    return Tmp1075Lib(TMP1075_DLL)
+
+
+@pytest.fixture
+def tmp1075_lib(tmp1075_lib_session) -> Tmp1075Lib:
+    """The sensor library with the fake bus cleared and the previous test's sensors released."""
+    tmp1075_lib_session.bus_reset()
+    yield tmp1075_lib_session
+    tmp1075_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def veml6040_lib_session() -> Veml6040Lib:
+    override = os.environ.get("ALX_VEML6040_TEST_DLL")
+    if override:
+        return Veml6040Lib(Path(override))
+    if _needs_build(VEML6040_DLL, VEML6040_DEPS):
+        _build_veml6040_dll()
+    return Veml6040Lib(VEML6040_DLL)
+
+
+@pytest.fixture
+def veml6040_lib(veml6040_lib_session) -> Veml6040Lib:
+    """The sensor library with the fake bus cleared and the previous test's sensors released."""
+    veml6040_lib_session.bus_reset()
+    yield veml6040_lib_session
+    veml6040_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def pca9539a_lib_session() -> Pca9539aLib:
+    override = os.environ.get("ALX_PCA9539A_TEST_DLL")
+    if override:
+        return Pca9539aLib(Path(override))
+    if _needs_build(PCA9539A_DLL, PCA9539A_DEPS):
+        _build_pca9539a_dll()
+    return Pca9539aLib(PCA9539A_DLL)
+
+
+@pytest.fixture
+def pca9539a_lib(pca9539a_lib_session) -> Pca9539aLib:
+    """The expander library with the fake bus cleared and the previous test's expanders released."""
+    pca9539a_lib_session.bus_reset()
+    yield pca9539a_lib_session
+    pca9539a_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def pcal6416a_lib_session() -> Pcal6416aLib:
+    override = os.environ.get("ALX_PCAL6416A_TEST_DLL")
+    if override:
+        return Pcal6416aLib(Path(override))
+    if _needs_build(PCAL6416A_DLL, PCAL6416A_DEPS):
+        _build_pcal6416a_dll()
+    return Pcal6416aLib(PCAL6416A_DLL)
+
+
+@pytest.fixture
+def pcal6416a_lib(pcal6416a_lib_session) -> Pcal6416aLib:
+    """The expander library with the fake bus cleared and the previous test's expanders released."""
+    pcal6416a_lib_session.bus_reset()
+    yield pcal6416a_lib_session
+    pcal6416a_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def lp586x_lib_session() -> Lp586xLib:
+    override = os.environ.get("ALX_LP586X_TEST_DLL")
+    if override:
+        return Lp586xLib(Path(override))
+    if _needs_build(LP586X_DLL, LP586X_DEPS):
+        _build_lp586x_dll()
+    return Lp586xLib(LP586X_DLL)
+
+
+@pytest.fixture
+def lp586x_lib(lp586x_lib_session) -> Lp586xLib:
+    """The LED driver library with the fake bus, the pins and the delays cleared."""
+    lp586x_lib_session.bus_reset()
+    lp586x_lib_session.c.AlxIoPinFake_Reset()
+    lp586x_lib_session.c.AlxDelayFake_Reset()
+    yield lp586x_lib_session
+    _assert_pins_fitted(lp586x_lib_session)
+    lp586x_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def adxl355_lib_session() -> Adxl355Lib:
+    override = os.environ.get("ALX_ADXL355_TEST_DLL")
+    if override:
+        return Adxl355Lib(Path(override))
+    if _needs_build(ADXL355_DLL, ADXL355_DEPS):
+        _build_adxl355_dll()
+    return Adxl355Lib(ADXL355_DLL)
+
+
+@pytest.fixture
+def adxl355_lib(adxl355_lib_session) -> Adxl355Lib:
+    """The accelerometer library with the SPI fake cleared and the previous test's parts released."""
+    adxl355_lib_session.spi_reset()
+    yield adxl355_lib_session
+    adxl355_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def ads8678_lib_session() -> Ads8678Lib:
+    override = os.environ.get("ALX_ADS8678_TEST_DLL")
+    if override:
+        return Ads8678Lib(Path(override))
+    if _needs_build(ADS8678_DLL, ADS8678_DEPS):
+        _build_ads8678_dll()
+    return Ads8678Lib(ADS8678_DLL)
+
+
+@pytest.fixture
+def ads8678_lib(ads8678_lib_session) -> Ads8678Lib:
+    """The ADC library with the SPI fake, the pins and the delays cleared, the defaults configured."""
+    ads8678_lib_session.spi_reset()
+    ads8678_lib_session.c.AlxIoPinFake_Reset()
+    ads8678_lib_session.c.AlxDelayFake_Reset()
+    yield ads8678_lib_session
+    _assert_pins_fitted(ads8678_lib_session)
+    ads8678_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def ads114s08_lib_session() -> Ads114s08Lib:
+    override = os.environ.get("ALX_ADS114S08_TEST_DLL")
+    if override:
+        return Ads114s08Lib(Path(override))
+    if _needs_build(ADS114S08_DLL, ADS114S08_DEPS):
+        _build_ads114s08_dll()
+    return Ads114s08Lib(ADS114S08_DLL)
+
+
+@pytest.fixture
+def ads114s08_lib(ads114s08_lib_session) -> Ads114s08Lib:
+    """The ADC library with the SPI fake, the pins, the delays and the clock cleared."""
+    ads114s08_lib_session.spi_reset()
+    ads114s08_lib_session.c.AlxIoPinFake_Reset()
+    ads114s08_lib_session.c.AlxDelayFake_Reset()
+    ads114s08_lib_session.tick_reset()
+    yield ads114s08_lib_session
+    _assert_pins_fitted(ads114s08_lib_session)
+    ads114s08_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def adau1961_lib_session() -> Adau1961Lib:
+    override = os.environ.get("ALX_ADAU1961_TEST_DLL")
+    if override:
+        return Adau1961Lib(Path(override))
+    if _needs_build(ADAU1961_DLL, ADAU1961_DEPS):
+        _build_adau1961_dll()
+    return Adau1961Lib(ADAU1961_DLL)
+
+
+@pytest.fixture
+def adau1961_lib(adau1961_lib_session) -> Adau1961Lib:
+    """The codec library with the fake bus and the fake interface cleared."""
+    adau1961_lib_session.bus_reset()
+    adau1961_lib_session.c.AlxI2sFake_Reset()
+    yield adau1961_lib_session
+    adau1961_lib_session.free_all()
+
+
+@pytest.fixture(scope="session")
+def vnh7040_lib_session() -> Vnh7040Lib:
+    override = os.environ.get("ALX_VNH7040_TEST_DLL")
+    if override:
+        return Vnh7040Lib(Path(override))
+    if _needs_build(VNH7040_DLL, VNH7040_DEPS):
+        _build_vnh7040_dll()
+    return Vnh7040Lib(VNH7040_DLL)
+
+
+@pytest.fixture
+def vnh7040_lib(vnh7040_lib_session) -> Vnh7040Lib:
+    """The bridge library with the clock at zero and the ADC, PWM, pins and delays cleared."""
+    vnh7040_lib_session.tick_reset()
+    vnh7040_lib_session.c.AlxAdcFake_Reset()
+    vnh7040_lib_session.c.AlxPwmFake_Reset()
+    vnh7040_lib_session.c.AlxIoPinFake_Reset()
+    vnh7040_lib_session.c.AlxDelayFake_Reset()
+    yield vnh7040_lib_session
+    _assert_pins_fitted(vnh7040_lib_session)
+    vnh7040_lib_session.free_all()
 
 
 @pytest.fixture(scope="session")

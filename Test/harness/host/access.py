@@ -2532,6 +2532,1186 @@ class BtsLib:
         self._handles.clear()
 
 
+class Bq24600Lib:
+    """ctypes wrapper around alxBq24600Test.dll: a battery charger, its enable and its two status pins.
+
+    The clock belongs to the test; the charger's blink detection times are read back from the
+    driver rather than restated here.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        vp, u32, u64, b = ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_bool
+        c.AlxBq24600Test_New.restype = vp
+        c.AlxBq24600Test_Delete.argtypes = [vp]
+        for name in ("Bq", "EnPin", "NpgPin", "StatPin"):
+            fn = getattr(c, f"AlxBq24600Test_{name}")
+            fn.restype = vp
+            fn.argtypes = [vp]
+        for name in ("Window_ms", "ErrTransitions", "HalfPeriodMin_ms", "HalfPeriodMax_ms"):
+            fn = getattr(c, f"AlxBq24600Test_{name}")
+            fn.restype = u32
+            fn.argtypes = [vp]
+        for name in ("Init", "DeInit", "Handle", "Enable", "Disable"):
+            getattr(c, f"AlxBq24600_{name}").argtypes = [vp]
+        for name in ("IsBatCharging", "IsBatFull", "IsSleep", "IsErr"):
+            fn = getattr(c, f"AlxBq24600_{name}")
+            fn.restype = b
+            fn.argtypes = [vp]
+        c.AlxIoPinFake_InitCount.restype = u32
+        c.AlxIoPinFake_InitCount.argtypes = [vp]
+        c.AlxIoPinFake_DeInitCount.restype = u32
+        c.AlxIoPinFake_DeInitCount.argtypes = [vp]
+        c.AlxIoPinFake_SetLevel.argtypes = [vp, b]
+        c.AlxIoPinFake_Level.restype = b
+        c.AlxIoPinFake_Level.argtypes = [vp]
+        c.AlxTick_Ctor.argtypes = [vp]
+        c.AlxTick_IncRange_ns.argtypes = [vp, u64]
+        self.tick = ctypes.addressof(ctypes.c_uint8.in_dll(c, "alxTick"))
+        self._handles: list = []
+
+    # -- the clock the test owns ----------------------------------------------
+    def tick_reset(self) -> None:
+        self.c.AlxTick_Ctor(self.tick)
+        self.c.AlxIrqFake_Reset()
+
+    def advance_ms(self, ms: float) -> None:
+        self.c.AlxTick_IncRange_ns(self.tick, round(ms * 1_000_000))
+
+    # -- one charger ----------------------------------------------------------
+    def new(self):
+        """A charger, initialised, every pin low."""
+        handle = self.c.AlxBq24600Test_New()
+        assert handle, "AlxBq24600Test_New returned NULL"
+        self._handles.append(handle)
+        self.c.AlxBq24600_Init(self._b(handle))
+        return handle
+
+    def _b(self, obj):
+        return self.c.AlxBq24600Test_Bq(obj)
+
+    def set_pins(self, obj, *, stat: bool, npg: bool) -> None:
+        """What the charger puts on its two open-drain outputs, as the MCU reads them."""
+        self.c.AlxIoPinFake_SetLevel(self.c.AlxBq24600Test_StatPin(obj), stat)
+        self.c.AlxIoPinFake_SetLevel(self.c.AlxBq24600Test_NpgPin(obj), npg)
+
+    def en_level(self, obj) -> bool:
+        return self.c.AlxIoPinFake_Level(self.c.AlxBq24600Test_EnPin(obj))
+
+    def enable(self, obj) -> None:
+        self.c.AlxBq24600_Enable(self._b(obj))
+
+    def disable(self, obj) -> None:
+        self.c.AlxBq24600_Disable(self._b(obj))
+
+    def handle(self, obj, *, for_ms: float = 0.0, step_ms: float = 5.0) -> None:
+        """Run the driver, advancing the clock in steps, the way a super-loop would."""
+        self.c.AlxBq24600_Handle(self._b(obj))
+        elapsed = 0.0
+        while elapsed < for_ms:
+            self.advance_ms(step_ms)
+            self.c.AlxBq24600_Handle(self._b(obj))
+            elapsed += step_ms
+
+    def blink(self, obj, *, half_period_ms: float, for_ms: float, npg: bool = False,
+              step_ms: float = 5.0) -> None:
+        """Toggle STAT every half period while the driver runs, as the part does on a fault."""
+        stat = True
+        elapsed = 0.0
+        while elapsed < for_ms:
+            self.set_pins(obj, stat=stat, npg=npg)
+            self.handle(obj, for_ms=half_period_ms - step_ms, step_ms=step_ms)
+            self.advance_ms(step_ms)
+            elapsed += half_period_ms
+            stat = not stat
+
+    def status(self, obj) -> str:
+        """The one status the driver reports, by name: charging, full, sleep, error or none."""
+        found = [name for name, fn in (("charging", "IsBatCharging"), ("full", "IsBatFull"),
+                                       ("sleep", "IsSleep"), ("error", "IsErr"))
+                 if getattr(self.c, f"AlxBq24600_{fn}")(self._b(obj))]
+        assert len(found) <= 1, f"the driver reported several statuses at once: {found}"
+        return found[0] if found else "none"
+
+    def window_ms(self, obj) -> int:
+        return self.c.AlxBq24600Test_Window_ms(obj)
+
+    def err_transitions(self, obj) -> int:
+        return self.c.AlxBq24600Test_ErrTransitions(obj)
+
+    def half_period_ms(self, obj) -> tuple[int, int]:
+        return (self.c.AlxBq24600Test_HalfPeriodMin_ms(obj), self.c.AlxBq24600Test_HalfPeriodMax_ms(obj))
+
+    def deinit(self, obj) -> None:
+        self.c.AlxBq24600_DeInit(self._b(obj))
+
+    def pin_counts(self, obj) -> dict:
+        """How often each of the charger's three pins was initialised and de-initialised."""
+        return {
+            name: (self.c.AlxIoPinFake_InitCount(pin), self.c.AlxIoPinFake_DeInitCount(pin))
+            for name, pin in (("en", self.c.AlxBq24600Test_EnPin(obj)),
+                              ("npg", self.c.AlxBq24600Test_NpgPin(obj)),
+                              ("stat", self.c.AlxBq24600Test_StatPin(obj)))
+        }
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxBq24600Test_Delete(handle)
+        self._handles.clear()
+
+
+class Mcp73831Lib:
+    """ctypes wrapper around alxMcp73831Test.dll: a battery charger and its one status pin."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        vp, i32, u32, b = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint32, ctypes.c_bool
+        c.AlxMcp73831Test_New.restype = vp
+        c.AlxMcp73831Test_New.argtypes = [b]
+        c.AlxMcp73831Test_Delete.argtypes = [vp]
+        for name in ("Mcp", "StatPin"):
+            fn = getattr(c, f"AlxMcp73831Test_{name}")
+            fn.restype = vp
+            fn.argtypes = [vp]
+        for name in ("St", "TriState"):
+            fn = getattr(c, f"AlxMcp73831Test_{name}")
+            fn.restype = i32
+            fn.argtypes = [ctypes.c_char_p]
+        for name in ("Init", "DeInit"):
+            getattr(c, f"AlxMcp73831_{name}").argtypes = [vp]
+        c.AlxMcp73831_GetSt.restype = i32
+        c.AlxMcp73831_GetSt.argtypes = [vp]
+        c.AlxIoPinFake_InitCount.restype = u32
+        c.AlxIoPinFake_InitCount.argtypes = [vp]
+        c.AlxIoPinFake_DeInitCount.restype = u32
+        c.AlxIoPinFake_DeInitCount.argtypes = [vp]
+        c.AlxIoPinFake_SetLevel.argtypes = [vp, b]
+        c.AlxIoPinFake_SetTriState.argtypes = [vp, i32]
+        self.ST = {c.AlxMcp73831Test_St(n.encode()): n for n in ("Err", "Shutdown", "Charging", "Standby")}
+        self._handles: list = []
+
+    def new(self, *, tri_state: bool):
+        """A charger, initialised, reading its status pin as a tri-state or as a level."""
+        handle = self.c.AlxMcp73831Test_New(tri_state)
+        assert handle, "AlxMcp73831Test_New returned NULL"
+        self._handles.append(handle)
+        self.c.AlxMcp73831_Init(self.c.AlxMcp73831Test_Mcp(handle))
+        return handle
+
+    def strap(self, obj, tri_state: str) -> None:
+        """What a tri-state read of the pin answers: HiZ, Hi, Lo or Undefined."""
+        value = self.c.AlxMcp73831Test_TriState(tri_state.encode())
+        assert value >= 0, tri_state
+        self.c.AlxIoPinFake_SetTriState(self.c.AlxMcp73831Test_StatPin(obj), value)
+
+    def set_level(self, obj, level: bool) -> None:
+        """What a plain read of the pin answers."""
+        self.c.AlxIoPinFake_SetLevel(self.c.AlxMcp73831Test_StatPin(obj), level)
+
+    def status(self, obj) -> str:
+        return self.ST[self.c.AlxMcp73831_GetSt(self.c.AlxMcp73831Test_Mcp(obj))]
+
+    def deinit(self, obj) -> None:
+        self.c.AlxMcp73831_DeInit(self.c.AlxMcp73831Test_Mcp(obj))
+
+    def pin_counts(self, obj) -> tuple[int, int]:
+        pin = self.c.AlxMcp73831Test_StatPin(obj)
+        return (self.c.AlxIoPinFake_InitCount(pin), self.c.AlxIoPinFake_DeInitCount(pin))
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxMcp73831Test_Delete(handle)
+        self._handles.clear()
+
+
+class Tpa3255Lib:
+    """ctypes wrapper around alxTpa3255Test.dll: an audio amplifier, its reset and its two alarms.
+
+    The clock belongs to the test; the reset pulse and the settle time after it are read back from
+    the driver rather than restated here.
+    """
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        vp, f, u32, u64, b = ctypes.c_void_p, ctypes.c_float, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_bool
+        c.AlxTpa3255Test_New.restype = vp
+        c.AlxTpa3255Test_New.argtypes = [f]
+        c.AlxTpa3255Test_Delete.argtypes = [vp]
+        for name in ("Tpa", "NResetPin", "NFaultPin", "NClipOtwPin"):
+            fn = getattr(c, f"AlxTpa3255Test_{name}")
+            fn.restype = vp
+            fn.argtypes = [vp]
+        for name in ("LowLevel_ms", "Waiting_ms"):
+            fn = getattr(c, f"AlxTpa3255Test_{name}")
+            fn.restype = f
+            fn.argtypes = [vp]
+        for name in ("Init", "DeInit", "Handle", "Enable", "Disable", "ClearWasErrAsserted",
+                     "ClearWasWarningAsserted"):
+            getattr(c, f"AlxTpa3255_{name}").argtypes = [vp]
+        for name in ("IsErrAsserted", "IsWarningAsserted", "WasErrAsserted", "WasWarningAsserted"):
+            fn = getattr(c, f"AlxTpa3255_{name}")
+            fn.restype = b
+            fn.argtypes = [vp]
+        c.AlxIoPinFake_InitCount.restype = u32
+        c.AlxIoPinFake_InitCount.argtypes = [vp]
+        c.AlxIoPinFake_DeInitCount.restype = u32
+        c.AlxIoPinFake_DeInitCount.argtypes = [vp]
+        c.AlxIoPinFake_SetLevel.argtypes = [vp, b]
+        c.AlxIoPinFake_Level.restype = b
+        c.AlxIoPinFake_Level.argtypes = [vp]
+        c.AlxTick_Ctor.argtypes = [vp]
+        c.AlxTick_IncRange_ns.argtypes = [vp, u64]
+        self.tick = ctypes.addressof(ctypes.c_uint8.in_dll(c, "alxTick"))
+        self._handles: list = []
+
+    # -- the clock the test owns ----------------------------------------------
+    def tick_reset(self) -> None:
+        self.c.AlxTick_Ctor(self.tick)
+        self.c.AlxIrqFake_Reset()
+
+    def advance_ms(self, ms: float) -> None:
+        self.c.AlxTick_IncRange_ns(self.tick, round(ms * 1_000_000))
+
+    # -- one amplifier --------------------------------------------------------
+    def new(self, re_enable_ms: float = 100.0):
+        """An amplifier, initialised, with both alarm pins high - which is healthy."""
+        handle = self.c.AlxTpa3255Test_New(re_enable_ms)
+        assert handle, "AlxTpa3255Test_New returned NULL"
+        self._handles.append(handle)
+        self.set_alarms(handle, fault=False, warning=False)
+        self.c.AlxTpa3255_Init(self._t(handle))
+        return handle
+
+    def _t(self, obj):
+        return self.c.AlxTpa3255Test_Tpa(obj)
+
+    def set_alarms(self, obj, *, fault: bool, warning: bool) -> None:
+        """The part pulls nFAULT and nCLIP_OTW LOW to raise them."""
+        self.c.AlxIoPinFake_SetLevel(self.c.AlxTpa3255Test_NFaultPin(obj), not fault)
+        self.c.AlxIoPinFake_SetLevel(self.c.AlxTpa3255Test_NClipOtwPin(obj), not warning)
+
+    def reset_level(self, obj) -> bool:
+        """nRESET: high lets the amplifier run, low holds it in reset."""
+        return self.c.AlxIoPinFake_Level(self.c.AlxTpa3255Test_NResetPin(obj))
+
+    def enable(self, obj) -> None:
+        self.c.AlxTpa3255_Enable(self._t(obj))
+
+    def disable(self, obj) -> None:
+        self.c.AlxTpa3255_Disable(self._t(obj))
+
+    def handle(self, obj, *, for_ms: float = 0.0, step_ms: float = 0.5) -> list[bool]:
+        """Run the driver, advancing the clock in steps; return nRESET after every call."""
+        self.c.AlxTpa3255_Handle(self._t(obj))
+        levels = [self.reset_level(obj)]
+        elapsed = 0.0
+        while elapsed < for_ms:
+            self.advance_ms(step_ms)
+            self.c.AlxTpa3255_Handle(self._t(obj))
+            levels.append(self.reset_level(obj))
+            elapsed += step_ms
+        return levels
+
+    def err(self, obj) -> bool:
+        return self.c.AlxTpa3255_IsErrAsserted(self._t(obj))
+
+    def warning(self, obj) -> bool:
+        return self.c.AlxTpa3255_IsWarningAsserted(self._t(obj))
+
+    def was_err(self, obj) -> bool:
+        return self.c.AlxTpa3255_WasErrAsserted(self._t(obj))
+
+    def was_warning(self, obj) -> bool:
+        return self.c.AlxTpa3255_WasWarningAsserted(self._t(obj))
+
+    def clear_was(self, obj) -> None:
+        self.c.AlxTpa3255_ClearWasErrAsserted(self._t(obj))
+        self.c.AlxTpa3255_ClearWasWarningAsserted(self._t(obj))
+
+    def low_level_ms(self, obj) -> float:
+        return self.c.AlxTpa3255Test_LowLevel_ms(obj)
+
+    def waiting_ms(self, obj) -> float:
+        return self.c.AlxTpa3255Test_Waiting_ms(obj)
+
+    def deinit(self, obj) -> None:
+        self.c.AlxTpa3255_DeInit(self._t(obj))
+
+    def pin_counts(self, obj) -> dict:
+        """How often each of the amplifier's three pins was initialised and de-initialised."""
+        return {
+            name: (self.c.AlxIoPinFake_InitCount(pin), self.c.AlxIoPinFake_DeInitCount(pin))
+            for name, pin in (("nreset", self.c.AlxTpa3255Test_NResetPin(obj)),
+                              ("nfault", self.c.AlxTpa3255Test_NFaultPin(obj)),
+                              ("nclip_otw", self.c.AlxTpa3255Test_NClipOtwPin(obj)))
+        }
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxTpa3255Test_Delete(handle)
+        self._handles.clear()
+
+
+class _I2cFakeBus:
+    """The I2C fake's controls, shared by the wrappers of the drivers that sit on it.
+
+    The fake is a register file addressed by the 8-bit memory address the drivers use; the bytes
+    are in wire order, most significant first for the parts that send it so. A test fills a
+    register the way the part would present it and reads back what the driver last wrote.
+    """
+
+    c: ctypes.CDLL
+
+    def _bus_types(self) -> None:
+        c, u8, u32 = self.c, ctypes.c_uint8, ctypes.c_uint32
+        c.AlxI2cFake_SetReg.argtypes = [u8, ctypes.POINTER(u8), u8]
+        c.AlxI2cFake_GetLastWrite.argtypes = [u8, ctypes.POINTER(u8), u8]
+        for name in ("WriteCount", "ReadCount"):
+            fn = getattr(c, f"AlxI2cFake_{name}")
+            fn.restype = u32
+            fn.argtypes = [u8]
+        c.AlxI2cFake_SetSlaveReady.argtypes = [ctypes.c_bool]
+        c.AlxI2cFake_SetForcedStatus.argtypes = [ctypes.c_int32]
+
+    def bus_reset(self) -> None:
+        """Every register zero, every count zero, the slave ready, no forced status."""
+        self.c.AlxI2cFake_Reset()
+
+    def set_register(self, addr: int, data: bytes) -> None:
+        buff = (ctypes.c_uint8 * len(data))(*data)
+        self.c.AlxI2cFake_SetReg(addr, buff, len(data))
+
+    def last_write(self, addr: int, length: int) -> bytes:
+        buff = (ctypes.c_uint8 * length)()
+        self.c.AlxI2cFake_GetLastWrite(addr, buff, length)
+        return bytes(buff)
+
+    def write_count(self, addr: int) -> int:
+        return self.c.AlxI2cFake_WriteCount(addr)
+
+    def read_count(self, addr: int) -> int:
+        return self.c.AlxI2cFake_ReadCount(addr)
+
+    def slave_ready(self, ready: bool) -> None:
+        self.c.AlxI2cFake_SetSlaveReady(ready)
+
+    def force_status(self, status: int) -> None:
+        """Every bus call from now on returns this status; Alx_Ok puts the bus back."""
+        self.c.AlxI2cFake_SetForcedStatus(status)
+
+
+class Tmp1075Lib(_I2cFakeBus):
+    """ctypes wrapper around alxTmp1075Test.dll: the temperature sensor over a faked I2C bus."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        self._bus_types()
+        vp, i32, b = ctypes.c_void_p, ctypes.c_int32, ctypes.c_bool
+        c.AlxTmp1075Test_New.restype = vp
+        c.AlxTmp1075Test_Delete.argtypes = [vp]
+        c.AlxTmp1075Test_Tmp.restype = vp
+        c.AlxTmp1075Test_Tmp.argtypes = [vp]
+        for name in ("Init", "DeInit"):
+            fn = getattr(c, f"AlxTmp1075_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxTmp1075_IsInit.restype = b
+        c.AlxTmp1075_IsInit.argtypes = [vp]
+        c.AlxTmp1075_GetTemp_degC.restype = ctypes.c_float
+        c.AlxTmp1075_GetTemp_degC.argtypes = [vp]
+        c.AlxTmp1075Test_Status_Ok.restype = i32
+        c.AlxTmp1075Test_Status_Err.restype = i32
+        self.OK = c.AlxTmp1075Test_Status_Ok()
+        self.ERR = c.AlxTmp1075Test_Status_Err()
+        self._handles: list = []
+
+    def new(self):
+        """A sensor, constructed, not initialised."""
+        handle = self.c.AlxTmp1075Test_New()
+        assert handle, "AlxTmp1075Test_New returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def _t(self, obj):
+        return self.c.AlxTmp1075Test_Tmp(obj)
+
+    def init(self, obj) -> int:
+        return self.c.AlxTmp1075_Init(self._t(obj))
+
+    def deinit(self, obj) -> int:
+        return self.c.AlxTmp1075_DeInit(self._t(obj))
+
+    def is_init(self, obj) -> bool:
+        return self.c.AlxTmp1075_IsInit(self._t(obj))
+
+    def temp_degc(self, obj) -> float:
+        return self.c.AlxTmp1075_GetTemp_degC(self._t(obj))
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxTmp1075Test_Delete(handle)
+        self._handles.clear()
+
+
+class Veml6040Lib(_I2cFakeBus):
+    """ctypes wrapper around alxVeml6040Test.dll: the colour sensor over a faked I2C bus."""
+
+    CHANNELS = ("R", "G", "B", "W")
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        self._bus_types()
+        vp, i32 = ctypes.c_void_p, ctypes.c_int32
+        c.AlxVeml6040Test_New.restype = vp
+        c.AlxVeml6040Test_Delete.argtypes = [vp]
+        c.AlxVeml6040Test_Veml.restype = vp
+        c.AlxVeml6040Test_Veml.argtypes = [vp]
+        for name in ("Init", "DeInit"):
+            fn = getattr(c, f"AlxVeml6040_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        for ch in self.CHANNELS:
+            fn = getattr(c, f"AlxVeml6040_Get{ch}_raw")
+            fn.restype = i32
+            fn.argtypes = [vp, ctypes.POINTER(ctypes.c_uint16)]
+        c.AlxVeml6040Test_Status_Ok.restype = i32
+        c.AlxVeml6040Test_Status_Err.restype = i32
+        self.OK = c.AlxVeml6040Test_Status_Ok()
+        self.ERR = c.AlxVeml6040Test_Status_Err()
+        self._handles: list = []
+
+    def new(self):
+        """A sensor, constructed, not initialised."""
+        handle = self.c.AlxVeml6040Test_New()
+        assert handle, "AlxVeml6040Test_New returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def _v(self, obj):
+        return self.c.AlxVeml6040Test_Veml(obj)
+
+    def init(self, obj) -> int:
+        return self.c.AlxVeml6040_Init(self._v(obj))
+
+    def deinit(self, obj) -> int:
+        return self.c.AlxVeml6040_DeInit(self._v(obj))
+
+    def channel(self, obj, ch: str, *, preset: int = 0) -> tuple[int, int]:
+        """One channel's reading: (status, value); the value is `preset` if the driver left it alone."""
+        out = ctypes.c_uint16(preset)
+        status = getattr(self.c, f"AlxVeml6040_Get{ch}_raw")(self._v(obj), ctypes.byref(out))
+        return status, out.value
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxVeml6040Test_Delete(handle)
+        self._handles.clear()
+
+
+class Pca9539aLib(_I2cFakeBus):
+    """ctypes wrapper around alxPca9539aTest.dll: the 16-pin IO expander over a faked I2C bus."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        self._bus_types()
+        vp, i32, u8, b = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint8, ctypes.c_bool
+        c.AlxPca9539aTest_New.restype = vp
+        c.AlxPca9539aTest_Delete.argtypes = [vp]
+        c.AlxPca9539aTest_Pca.restype = vp
+        c.AlxPca9539aTest_Pca.argtypes = [vp]
+        for name in ("Init", "DeInit", "Handle", "irqHandle"):
+            fn = getattr(c, f"AlxPca9539a_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxPca9539a_IoPin_Read.restype = b
+        c.AlxPca9539a_IoPin_Read.argtypes = [vp, u8, u8]
+        c.AlxPca9539a_Read_Port_Raw.restype = u8
+        c.AlxPca9539a_Read_Port_Raw.argtypes = [vp, u8]
+        c.AlxPca9539a_IoPin_Write.argtypes = [vp, u8, u8, b]
+        for name in ("Set", "Reset", "Toggle"):
+            getattr(c, f"AlxPca9539a_IoPin_{name}").argtypes = [vp, u8, u8]
+        c.AlxPca9539aTest_Status_Ok.restype = i32
+        c.AlxPca9539aTest_Status_Err.restype = i32
+        self.OK = c.AlxPca9539aTest_Status_Ok()
+        self.ERR = c.AlxPca9539aTest_Status_Err()
+        self._handles: list = []
+
+    def new(self):
+        """An expander, constructed, not initialised."""
+        handle = self.c.AlxPca9539aTest_New()
+        assert handle, "AlxPca9539aTest_New returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def _p(self, obj):
+        return self.c.AlxPca9539aTest_Pca(obj)
+
+    def call(self, obj, name: str) -> int:
+        """Init, DeInit, Handle or irqHandle."""
+        return getattr(self.c, f"AlxPca9539a_{name}")(self._p(obj))
+
+    def read(self, obj, port: int, pin: int) -> bool:
+        return self.c.AlxPca9539a_IoPin_Read(self._p(obj), port, pin)
+
+    def read_port(self, obj, port: int) -> int:
+        return self.c.AlxPca9539a_Read_Port_Raw(self._p(obj), port)
+
+    def write(self, obj, port: int, pin: int, val: bool) -> None:
+        self.c.AlxPca9539a_IoPin_Write(self._p(obj), port, pin, val)
+
+    def pin_op(self, obj, op: str, port: int, pin: int) -> None:
+        """Set, Reset or Toggle."""
+        getattr(self.c, f"AlxPca9539a_IoPin_{op}")(self._p(obj), port, pin)
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxPca9539aTest_Delete(handle)
+        self._handles.clear()
+
+
+class Pcal6416aLib(_I2cFakeBus):
+    """ctypes wrapper around alxPcal6416aTest.dll: the 16-pin IO expander over a faked I2C bus."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        self._bus_types()
+        vp, i32, u8, b = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint8, ctypes.c_bool
+        c.AlxPcal6416aTest_New.restype = vp
+        c.AlxPcal6416aTest_Delete.argtypes = [vp]
+        c.AlxPcal6416aTest_Pcal.restype = vp
+        c.AlxPcal6416aTest_Pcal.argtypes = [vp]
+        c.AlxPcal6416aTest_TriState.restype = i32
+        c.AlxPcal6416aTest_TriState.argtypes = [ctypes.c_char_p]
+        for name in ("InitPeriph", "DeInitPeriph", "Init", "DeInit"):
+            fn = getattr(c, f"AlxPcal6416a_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxPcal6416a_Handle.restype = i32
+        c.AlxPcal6416a_Handle.argtypes = [vp, b, b, b, b]
+        c.AlxPcal6416a_IoPin_Read.restype = b
+        c.AlxPcal6416a_IoPin_Read.argtypes = [vp, u8, u8]
+        c.AlxPcal6416a_IoPin_Write.argtypes = [vp, u8, u8, b]
+        for name in ("Set", "Reset", "Toggle"):
+            getattr(c, f"AlxPcal6416a_IoPin_{name}").argtypes = [vp, u8, u8]
+        c.AlxPcal6416a_IoPin_Read_TriState.restype = i32
+        c.AlxPcal6416a_IoPin_Read_TriState.argtypes = [vp, u8, u8, ctypes.POINTER(i32)]
+        c.AlxPcal6416aTest_Status_Ok.restype = i32
+        c.AlxPcal6416aTest_Status_Err.restype = i32
+        self.OK = c.AlxPcal6416aTest_Status_Ok()
+        self.ERR = c.AlxPcal6416aTest_Status_Err()
+        self.TRI = {c.AlxPcal6416aTest_TriState(n.encode()): n for n in ("HiZ", "Hi", "Lo", "Undefined")}
+        self._handles: list = []
+
+    def new(self, *, periph: bool = True):
+        """An expander, constructed, its bus initialised unless `periph` is false."""
+        handle = self.c.AlxPcal6416aTest_New()
+        assert handle, "AlxPcal6416aTest_New returned NULL"
+        self._handles.append(handle)
+        if periph:
+            assert self.call(handle, "InitPeriph") == self.OK
+        return handle
+
+    def _p(self, obj):
+        return self.c.AlxPcal6416aTest_Pcal(obj)
+
+    def call(self, obj, name: str) -> int:
+        """InitPeriph, DeInitPeriph, Init or DeInit."""
+        return getattr(self.c, f"AlxPcal6416a_{name}")(self._p(obj))
+
+    def handle(self, obj, *, in0: bool = False, in1: bool = False, out0: bool = False, out1: bool = False) -> int:
+        return self.c.AlxPcal6416a_Handle(self._p(obj), in0, in1, out0, out1)
+
+    def read(self, obj, port: int, pin: int) -> bool:
+        return self.c.AlxPcal6416a_IoPin_Read(self._p(obj), port, pin)
+
+    def write(self, obj, port: int, pin: int, val: bool) -> None:
+        self.c.AlxPcal6416a_IoPin_Write(self._p(obj), port, pin, val)
+
+    def pin_op(self, obj, op: str, port: int, pin: int) -> None:
+        """Set, Reset or Toggle."""
+        getattr(self.c, f"AlxPcal6416a_IoPin_{op}")(self._p(obj), port, pin)
+
+    def read_tri_state(self, obj, port: int, pin: int) -> tuple[int, str]:
+        out = ctypes.c_int32(-1)
+        status = self.c.AlxPcal6416a_IoPin_Read_TriState(self._p(obj), port, pin, ctypes.byref(out))
+        return status, self.TRI.get(out.value, "untouched")
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxPcal6416aTest_Delete(handle)
+        self._handles.clear()
+
+
+class Lp586xLib(_I2cFakeBus):
+    """ctypes wrapper around alxLp586xTest.dll: the LED matrix driver, its two pins and its I2C bus."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        self._bus_types()
+        vp, i32, u8, u32, b = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint8, ctypes.c_uint32, ctypes.c_bool
+        c.AlxLp586xTest_New.restype = vp
+        c.AlxLp586xTest_New.argtypes = [u8]
+        c.AlxLp586xTest_Delete.argtypes = [vp]
+        for name in ("Lp", "EnPin", "SyncPin"):
+            fn = getattr(c, f"AlxLp586xTest_{name}")
+            fn.restype = vp
+            fn.argtypes = [vp]
+        for name in ("InitPeriph", "DeInitPeriph", "Init", "DeInit", "Handle"):
+            fn = getattr(c, f"AlxLp586x_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxLp586x_Led_Write.argtypes = [vp, u8, b]
+        for name in ("InitCount", "DeInitCount", "WriteCount"):
+            fn = getattr(c, f"AlxIoPinFake_{name}")
+            fn.restype = u32
+            fn.argtypes = [vp]
+        c.AlxIoPinFake_Level.restype = b
+        c.AlxIoPinFake_Level.argtypes = [vp]
+        c.AlxDelayFake_UsCount.restype = u32
+        c.AlxLp586xTest_Status_Ok.restype = i32
+        c.AlxLp586xTest_Status_Err.restype = i32
+        self.OK = c.AlxLp586xTest_Status_Ok()
+        self.ERR = c.AlxLp586xTest_Status_Err()
+        self._handles: list = []
+
+    def new(self, led_num_used: int = 108):
+        """A driver, constructed, its bus initialised."""
+        handle = self.c.AlxLp586xTest_New(led_num_used)
+        assert handle, "AlxLp586xTest_New returned NULL"
+        self._handles.append(handle)
+        assert self.call(handle, "InitPeriph") == self.OK
+        return handle
+
+    def _l(self, obj):
+        return self.c.AlxLp586xTest_Lp(obj)
+
+    def call(self, obj, name: str) -> int:
+        """InitPeriph, DeInitPeriph, Init, DeInit or Handle."""
+        return getattr(self.c, f"AlxLp586x_{name}")(self._l(obj))
+
+    def led(self, obj, num: int, on: bool) -> None:
+        self.c.AlxLp586x_Led_Write(self._l(obj), num, on)
+
+    def pin(self, obj, name: str):
+        return getattr(self.c, f"AlxLp586xTest_{name}Pin")(obj)
+
+    def level(self, obj, name: str) -> bool:
+        """En or Sync."""
+        return self.c.AlxIoPinFake_Level(self.pin(obj, name))
+
+    def pin_writes(self, obj, name: str) -> int:
+        return self.c.AlxIoPinFake_WriteCount(self.pin(obj, name))
+
+    def pin_counts(self, obj, name: str) -> tuple[int, int]:
+        p = self.pin(obj, name)
+        return (self.c.AlxIoPinFake_InitCount(p), self.c.AlxIoPinFake_DeInitCount(p))
+
+    def delays_us(self) -> int:
+        return self.c.AlxDelayFake_UsCount()
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxLp586xTest_Delete(handle)
+        self._handles.clear()
+
+
+class _SpiFakeBus:
+    """The SPI fake's controls, shared by the wrappers of the drivers that sit on it.
+
+    The fake records every byte the master sends and answers every receive from a queue the test
+    fills the way the part would; an empty queue reads zeros. Chip select is counted.
+    """
+
+    c: ctypes.CDLL
+
+    def _spi_types(self) -> None:
+        c, u8, u32 = self.c, ctypes.c_uint8, ctypes.c_uint32
+        c.AlxSpiFake_QueueMiso.argtypes = [ctypes.POINTER(u8), u32]
+        c.AlxSpiFake_Mosi.restype = u32
+        c.AlxSpiFake_Mosi.argtypes = [ctypes.POINTER(u8), u32]
+        for name in ("MosiLen", "MisoLeft", "CsAssertCount", "InitCount", "DeInitCount"):
+            getattr(c, f"AlxSpiFake_{name}").restype = u32
+        c.AlxSpiFake_IsCsAsserted.restype = ctypes.c_bool
+        c.AlxSpiFake_SetForcedStatus.argtypes = [ctypes.c_int32]
+
+    def spi_reset(self) -> None:
+        """Nothing sent, nothing queued, chip select released, no forced status."""
+        self.c.AlxSpiFake_Reset()
+
+    def queue_miso(self, data: bytes) -> None:
+        buff = (ctypes.c_uint8 * len(data))(*data)
+        self.c.AlxSpiFake_QueueMiso(buff, len(data))
+
+    def mosi(self) -> bytes:
+        """Every byte the master has sent since the last reset, in order."""
+        n = self.c.AlxSpiFake_MosiLen()
+        buff = (ctypes.c_uint8 * max(n, 1))()
+        self.c.AlxSpiFake_Mosi(buff, n)
+        return bytes(buff[:n])
+
+    def miso_left(self) -> int:
+        return self.c.AlxSpiFake_MisoLeft()
+
+    def cs_frames(self) -> int:
+        return self.c.AlxSpiFake_CsAssertCount()
+
+    def cs_asserted(self) -> bool:
+        return self.c.AlxSpiFake_IsCsAsserted()
+
+    def spi_inits(self) -> tuple[int, int]:
+        return (self.c.AlxSpiFake_InitCount(), self.c.AlxSpiFake_DeInitCount())
+
+    def force_spi_status(self, status: int) -> None:
+        self.c.AlxSpiFake_SetForcedStatus(status)
+
+
+class Adxl355Lib(_SpiFakeBus):
+    """ctypes wrapper around alxAdxl355Test.dll: the accelerometer over the SPI fake."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        self._spi_types()
+        vp, i32, f = ctypes.c_void_p, ctypes.c_int32, ctypes.c_float
+        c.AlxAdxl355Test_New.restype = vp
+        c.AlxAdxl355Test_Delete.argtypes = [vp]
+        c.AlxAdxl355Test_Adxl.restype = vp
+        c.AlxAdxl355Test_Adxl.argtypes = [vp]
+        c.AlxAdxl355Test_GetXyz_g.restype = i32
+        c.AlxAdxl355Test_GetXyz_g.argtypes = [vp, ctypes.POINTER(f), ctypes.POINTER(f), ctypes.POINTER(f)]
+        for name in ("Init", "DeInit", "Enable", "Disable"):
+            fn = getattr(c, f"AlxAdxl355_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxAdxl355_GetTemp_degC.restype = i32
+        c.AlxAdxl355_GetTemp_degC.argtypes = [vp, ctypes.POINTER(f)]
+        c.AlxAdxl355Test_Status_Ok.restype = i32
+        c.AlxAdxl355Test_Status_Err.restype = i32
+        self.OK = c.AlxAdxl355Test_Status_Ok()
+        self.ERR = c.AlxAdxl355Test_Status_Err()
+        self._handles: list = []
+
+    def new(self):
+        """An accelerometer, constructed, not initialised."""
+        handle = self.c.AlxAdxl355Test_New()
+        assert handle, "AlxAdxl355Test_New returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def _a(self, obj):
+        return self.c.AlxAdxl355Test_Adxl(obj)
+
+    def call(self, obj, name: str) -> int:
+        """Init, DeInit, Enable or Disable."""
+        return getattr(self.c, f"AlxAdxl355_{name}")(self._a(obj))
+
+    def xyz_g(self, obj) -> tuple[int, tuple[float, float, float]]:
+        x, y, z = ctypes.c_float(), ctypes.c_float(), ctypes.c_float()
+        status = self.c.AlxAdxl355Test_GetXyz_g(obj, ctypes.byref(x), ctypes.byref(y), ctypes.byref(z))
+        return status, (x.value, y.value, z.value)
+
+    def temp_degc(self, obj) -> tuple[int, float]:
+        out = ctypes.c_float()
+        status = self.c.AlxAdxl355_GetTemp_degC(self._a(obj), ctypes.byref(out))
+        return status, out.value
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxAdxl355Test_Delete(handle)
+        self._handles.clear()
+
+
+class Ads8678Lib(_SpiFakeBus):
+    """ctypes wrapper around alxAds8678Test.dll: the eight-channel ADC over the SPI fake."""
+
+    NUM_OF_CH = 8
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        self._spi_types()
+        vp, i32, u8, u32, b = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint8, ctypes.c_uint32, ctypes.c_bool
+        c.AlxAds8678Test_New.restype = vp
+        c.AlxAds8678Test_Delete.argtypes = [vp]
+        for name in ("Ads", "NRstPin"):
+            fn = getattr(c, f"AlxAds8678Test_{name}")
+            fn.restype = vp
+            fn.argtypes = [vp]
+        c.AlxAds8678Test_SetConfig.argtypes = [u8, u8, ctypes.POINTER(u8)]
+        c.AlxAds8678Test_GetChVoltageAll_V.restype = i32
+        c.AlxAds8678Test_GetChVoltageAll_V.argtypes = [vp, ctypes.POINTER(ctypes.c_float), ctypes.POINTER(b)]
+        for name in ("InitPeriph", "DeInitPeriph", "Init", "DeInit"):
+            fn = getattr(c, f"AlxAds8678_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxIoPinFake_Level.restype = b
+        c.AlxIoPinFake_Level.argtypes = [vp]
+        c.AlxDelayFake_MsCount.restype = u32
+        c.AlxAds8678Test_Status_Ok.restype = i32
+        c.AlxAds8678Test_Status_Err.restype = i32
+        self.OK = c.AlxAds8678Test_Status_Ok()
+        self.ERR = c.AlxAds8678Test_Status_Err()
+        self._handles: list = []
+
+    def configure(self, *, auto_scan: int = 0xFF, feature_select: int = 0x00, ranges: bytes = bytes(8)) -> None:
+        """What the application's RegStruct_SetVal writes over the defaults at the next Init."""
+        buff = (ctypes.c_uint8 * self.NUM_OF_CH)(*ranges)
+        self.c.AlxAds8678Test_SetConfig(auto_scan, feature_select, buff)
+
+    def new(self):
+        """A converter, constructed, its reset pin and bus initialised."""
+        handle = self.c.AlxAds8678Test_New()
+        assert handle, "AlxAds8678Test_New returned NULL"
+        self._handles.append(handle)
+        assert self.call(handle, "InitPeriph") == self.OK
+        return handle
+
+    def _a(self, obj):
+        return self.c.AlxAds8678Test_Ads(obj)
+
+    def call(self, obj, name: str) -> int:
+        """InitPeriph, DeInitPeriph, Init or DeInit."""
+        return getattr(self.c, f"AlxAds8678_{name}")(self._a(obj))
+
+    def nrst_level(self, obj) -> bool:
+        return self.c.AlxIoPinFake_Level(self.c.AlxAds8678Test_NRstPin(obj))
+
+    def delays_ms(self) -> int:
+        return self.c.AlxDelayFake_MsCount()
+
+    def voltages(self, obj) -> tuple[int, list[float], list[bool]]:
+        v = (ctypes.c_float * self.NUM_OF_CH)()
+        en = (ctypes.c_bool * self.NUM_OF_CH)()
+        status = self.c.AlxAds8678Test_GetChVoltageAll_V(obj, v, en)
+        return status, list(v), list(en)
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxAds8678Test_Delete(handle)
+        self._handles.clear()
+        self.configure()
+
+
+class Ads114s08Lib(_SpiFakeBus):
+    """ctypes wrapper around alxAds114s08Test.dll: the 16-bit ADC over the SPI fake and three pins."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        self._spi_types()
+        vp, i32, i16, u32, b = ctypes.c_void_p, ctypes.c_int32, ctypes.c_int16, ctypes.c_uint32, ctypes.c_bool
+        c.AlxAds114s08Test_New.restype = vp
+        c.AlxAds114s08Test_Delete.argtypes = [vp]
+        for name in ("Ads", "NDrdyPin", "StartPin", "NRstPin"):
+            fn = getattr(c, f"AlxAds114s08Test_{name}")
+            fn.restype = vp
+            fn.argtypes = [vp]
+        c.AlxAds114s08Test_Perform.restype = i32
+        c.AlxAds114s08Test_Perform.argtypes = [vp, ctypes.POINTER(i16)]
+        c.AlxAds114s08Test_MarkInit.argtypes = [vp]
+        for name in ("InitPeriph", "DeInitPeriph", "Init", "DeInit"):
+            fn = getattr(c, f"AlxAds114s08_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        for name in ("WriteCount",):
+            fn = getattr(c, f"AlxIoPinFake_{name}")
+            fn.restype = u32
+            fn.argtypes = [vp]
+        c.AlxIoPinFake_Level.restype = b
+        c.AlxIoPinFake_Level.argtypes = [vp]
+        c.AlxIoPinFake_SetLevel.argtypes = [vp, b]
+        c.AlxDelayFake_MsCount.restype = u32
+        c.AlxTick_Ctor.argtypes = [vp]
+        self.tick = ctypes.addressof(ctypes.c_uint8.in_dll(c, "alxTick"))
+        c.AlxAds114s08Test_Status_Ok.restype = i32
+        c.AlxAds114s08Test_Status_Err.restype = i32
+        self.OK = c.AlxAds114s08Test_Status_Ok()
+        self.ERR = c.AlxAds114s08Test_Status_Err()
+        self._handles: list = []
+
+    def tick_reset(self) -> None:
+        self.c.AlxTick_Ctor(self.tick)
+        self.c.AlxIrqFake_Reset()
+
+    def new(self):
+        """A converter, its pins and bus initialised, left as Init leaves it, data ready (nDRDY low)."""
+        handle = self.c.AlxAds114s08Test_New()
+        assert handle, "AlxAds114s08Test_New returned NULL"
+        self._handles.append(handle)
+        assert self.call(handle, "InitPeriph") == self.OK
+        self.c.AlxAds114s08Test_MarkInit(handle)
+        self.c.AlxIoPinFake_SetLevel(self.c.AlxAds114s08Test_NDrdyPin(handle), False)
+        return handle
+
+    def _a(self, obj):
+        return self.c.AlxAds114s08Test_Ads(obj)
+
+    def call(self, obj, name: str) -> int:
+        """InitPeriph, DeInitPeriph, Init or DeInit."""
+        return getattr(self.c, f"AlxAds114s08_{name}")(self._a(obj))
+
+    def level(self, obj, pin: str) -> bool:
+        """NDrdy, Start or NRst."""
+        return self.c.AlxIoPinFake_Level(getattr(self.c, f"AlxAds114s08Test_{pin}Pin")(obj))
+
+    def pin_writes(self, obj, pin: str) -> int:
+        return self.c.AlxIoPinFake_WriteCount(getattr(self.c, f"AlxAds114s08Test_{pin}Pin")(obj))
+
+    def delays_ms(self) -> int:
+        return self.c.AlxDelayFake_MsCount()
+
+    def perform(self, obj) -> tuple[int, int]:
+        raw = ctypes.c_int16(0x5A5A)
+        status = self.c.AlxAds114s08Test_Perform(obj, ctypes.byref(raw))
+        return status, raw.value
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxAds114s08Test_Delete(handle)
+        self._handles.clear()
+
+
+class Adau1961Lib(_I2cFakeBus):
+    """ctypes wrapper around alxAdau1961Test.dll: the audio codec over a faked I2C bus and I2S."""
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        self._bus_types()
+        vp, i32, i8, u8, u32, b, f = (ctypes.c_void_p, ctypes.c_int32, ctypes.c_int8, ctypes.c_uint8,
+                                      ctypes.c_uint32, ctypes.c_bool, ctypes.c_float)
+        c.AlxAdau1961Test_New.restype = vp
+        c.AlxAdau1961Test_Delete.argtypes = [vp]
+        c.AlxAdau1961Test_Adau.restype = vp
+        c.AlxAdau1961Test_Adau.argtypes = [vp]
+        p8 = ctypes.POINTER(u8)
+        c.AlxAdau1961Test_InDiff.argtypes = [vp, b, p8, p8, p8]
+        c.AlxAdau1961Test_InAux.restype = u8
+        c.AlxAdau1961Test_InAux.argtypes = [vp, b]
+        c.AlxAdau1961Test_OutLine.argtypes = [vp, b, p8, p8]
+        for name in ("Init", "DeInit"):
+            fn = getattr(c, f"AlxAdau1961_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxAdau1961_Foreground_Handle.argtypes = [vp]
+        for side in ("L", "R"):
+            fn = getattr(c, f"AlxAdau1961_InDiff{side}_SetGain_dB")
+            fn.restype = i32
+            fn.argtypes = [vp, f]
+            for name in (f"InAux{side}_SetGain_dB", f"OutLine{side}_SetGain_dB"):
+                fn = getattr(c, f"AlxAdau1961_{name}")
+                fn.restype = i32
+                fn.argtypes = [vp, i8]
+        for name in ("InitCount", "DeInitCount", "HandleCount"):
+            getattr(c, f"AlxI2sFake_{name}").restype = u32
+        c.AlxAdau1961Test_Status_Ok.restype = i32
+        c.AlxAdau1961Test_Status_Err.restype = i32
+        self.OK = c.AlxAdau1961Test_Status_Ok()
+        self.ERR = c.AlxAdau1961Test_Status_Err()
+        self._handles: list = []
+
+    def new(self):
+        """A codec, constructed, not initialised."""
+        handle = self.c.AlxAdau1961Test_New()
+        assert handle, "AlxAdau1961Test_New returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def _a(self, obj):
+        return self.c.AlxAdau1961Test_Adau(obj)
+
+    def call(self, obj, name: str) -> int:
+        """Init or DeInit."""
+        return getattr(self.c, f"AlxAdau1961_{name}")(self._a(obj))
+
+    def handle(self, obj) -> None:
+        self.c.AlxAdau1961_Foreground_Handle(self._a(obj))
+
+    def set_gain(self, obj, what: str, gain_db: float) -> int:
+        """InDiffL, InDiffR, InAuxL, InAuxR, OutLineL or OutLineR."""
+        value = gain_db if what.startswith("InDiff") else int(gain_db)
+        return getattr(self.c, f"AlxAdau1961_{what}_SetGain_dB")(self._a(obj), value)
+
+    def in_diff(self, obj, *, right: bool = False) -> tuple[int, int, int]:
+        """(volume code, unmuted, boost code) of one differential input."""
+        vol, unmuted, boost = ctypes.c_uint8(), ctypes.c_uint8(), ctypes.c_uint8()
+        self.c.AlxAdau1961Test_InDiff(obj, right, ctypes.byref(vol), ctypes.byref(unmuted), ctypes.byref(boost))
+        return vol.value, unmuted.value, boost.value
+
+    def in_aux(self, obj, *, right: bool = False) -> int:
+        return self.c.AlxAdau1961Test_InAux(obj, right)
+
+    def out_line(self, obj, *, right: bool = False) -> tuple[int, int]:
+        """(volume code, unmuted) of one line output."""
+        vol, unmuted = ctypes.c_uint8(), ctypes.c_uint8()
+        self.c.AlxAdau1961Test_OutLine(obj, right, ctypes.byref(vol), ctypes.byref(unmuted))
+        return vol.value, unmuted.value
+
+    def i2s_counts(self) -> tuple[int, int, int]:
+        return (self.c.AlxI2sFake_InitCount(), self.c.AlxI2sFake_DeInitCount(), self.c.AlxI2sFake_HandleCount())
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxAdau1961Test_Delete(handle)
+        self._handles.clear()
+
+
+class Vnh7040Lib:
+    """ctypes wrapper around alxVnh7040Test.dll: an H-bridge, its PWM, its pins and its multisense ADC.
+
+    The clock belongs to the test: the driver reads its multisense once a millisecond.
+    """
+
+    PINS = ("ina", "inb", "sel0", "sel1", "sens_en")
+    BREAK: ClassVar[dict[str, int]] = {"gnd": 0, "vcc": 1, "open": 2}
+
+    def __init__(self, dll_path: Path):
+        c = ctypes.CDLL(str(dll_path))
+        self.c = c
+        _register_lib(c)
+        vp, i16, i32, u32, u64, b, f = (ctypes.c_void_p, ctypes.c_int16, ctypes.c_int32, ctypes.c_uint32,
+                                        ctypes.c_uint64, ctypes.c_bool, ctypes.c_float)
+        c.AlxVnh7040Test_New.restype = vp
+        c.AlxVnh7040Test_New.argtypes = [i32]
+        c.AlxVnh7040Test_Delete.argtypes = [vp]
+        for name in ("Vnh", "Adc", "Pwm"):
+            fn = getattr(c, f"AlxVnh7040Test_{name}")
+            fn.restype = vp
+            fn.argtypes = [vp]
+        c.AlxVnh7040Test_Pin.restype = vp
+        c.AlxVnh7040Test_Pin.argtypes = [vp, i32]
+        c.AlxVnh7040Test_SenseCh.restype = u32
+        c.AlxVnh7040Test_PwmCh.restype = u32
+        for name in ("Init", "DeInit", "Handle"):
+            getattr(c, f"AlxVnh7040_{name}").argtypes = [vp]
+        c.AlxVnh7040_SetDuty_permil.argtypes = [vp, i16]
+        c.AlxVnh7040_Config_BreakType.argtypes = [vp, i32]
+        for name in ("GetCurrent_mA", "GetCurrentHsA_mA", "GetCurrentHsB_mA", "GetSupplyVoltage_mV"):
+            fn = getattr(c, f"AlxVnh7040_{name}")
+            fn.restype = u32
+            fn.argtypes = [vp]
+        for name in ("GetTemp_degC", "GetIsError"):
+            fn = getattr(c, f"AlxVnh7040_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxAdcFake_SetVoltageSeq_V.argtypes = [vp, u32, ctypes.POINTER(f), u32]
+        c.AlxAdcFake_ReadCount.restype = u32
+        c.AlxAdcFake_ReadCount.argtypes = [vp, u32]
+        c.AlxPwmFake_Duty_pct.restype = f
+        c.AlxPwmFake_Duty_pct.argtypes = [vp, u32]
+        c.AlxPwmFake_WriteCount.restype = u32
+        c.AlxPwmFake_WriteCount.argtypes = [vp, u32]
+        for name in ("InitCount", "DeInitCount"):
+            fn = getattr(c, f"AlxIoPinFake_{name}")
+            fn.restype = u32
+            fn.argtypes = [vp]
+        c.AlxIoPinFake_Level.restype = b
+        c.AlxIoPinFake_Level.argtypes = [vp]
+        c.AlxDelayFake_MsCount.restype = u32
+        c.AlxTick_Ctor.argtypes = [vp]
+        c.AlxTick_IncRange_ns.argtypes = [vp, u64]
+        self.tick = ctypes.addressof(ctypes.c_uint8.in_dll(c, "alxTick"))
+        self.sense_ch = c.AlxVnh7040Test_SenseCh()
+        self.pwm_ch = c.AlxVnh7040Test_PwmCh()
+        self._handles: list = []
+
+    # -- the clock the test owns ----------------------------------------------
+    def tick_reset(self) -> None:
+        self.c.AlxTick_Ctor(self.tick)
+        self.c.AlxIrqFake_Reset()
+
+    def advance_ms(self, ms: float) -> None:
+        self.c.AlxTick_IncRange_ns(self.tick, round(ms * 1_000_000))
+
+    # -- one bridge -----------------------------------------------------------
+    def new(self, break_type: str = "gnd", *, init: bool = True):
+        """A bridge, constructed with the break type, initialised unless `init` is false."""
+        handle = self.c.AlxVnh7040Test_New(self.BREAK[break_type])
+        assert handle, "AlxVnh7040Test_New returned NULL"
+        self._handles.append(handle)
+        if init:
+            self.c.AlxVnh7040_Init(self._v(handle))
+        return handle
+
+    def _v(self, obj):
+        return self.c.AlxVnh7040Test_Vnh(obj)
+
+    def init(self, obj) -> None:
+        self.c.AlxVnh7040_Init(self._v(obj))
+
+    def deinit(self, obj) -> None:
+        self.c.AlxVnh7040_DeInit(self._v(obj))
+
+    def duty(self, obj, permil: int) -> None:
+        self.c.AlxVnh7040_SetDuty_permil(self._v(obj), permil)
+
+    def config_break(self, obj, break_type: str) -> None:
+        self.c.AlxVnh7040_Config_BreakType(self._v(obj), self.BREAK[break_type])
+
+    def sense(self, obj, volts) -> None:
+        """What the ADC reads on the multisense, read after read; the last value repeats."""
+        values = [volts] if isinstance(volts, (int, float)) else list(volts)
+        buff = (ctypes.c_float * len(values))(*values)
+        self.c.AlxAdcFake_SetVoltageSeq_V(self.c.AlxVnh7040Test_Adc(obj), self.sense_ch, buff, len(values))
+
+    def sense_reads(self, obj) -> int:
+        return self.c.AlxAdcFake_ReadCount(self.c.AlxVnh7040Test_Adc(obj), self.sense_ch)
+
+    def handle(self, obj, *, periods: int = 1) -> None:
+        """Run the driver for a number of 1 ms monitoring periods, one Handle at the end of each."""
+        for _ in range(periods):
+            self.advance_ms(1.0)
+            self.c.AlxVnh7040_Handle(self._v(obj))
+
+    def pin(self, obj, name: str):
+        return self.c.AlxVnh7040Test_Pin(obj, self.PINS.index(name))
+
+    def level(self, obj, name: str) -> bool:
+        return self.c.AlxIoPinFake_Level(self.pin(obj, name))
+
+    def direction(self, obj) -> tuple[bool, bool]:
+        return (self.level(obj, "ina"), self.level(obj, "inb"))
+
+    def pwm_pct(self, obj) -> float:
+        return self.c.AlxPwmFake_Duty_pct(self.c.AlxVnh7040Test_Pwm(obj), self.pwm_ch)
+
+    def pin_counts(self, obj) -> dict:
+        return {n: (self.c.AlxIoPinFake_InitCount(self.pin(obj, n)), self.c.AlxIoPinFake_DeInitCount(self.pin(obj, n)))
+                for n in self.PINS}
+
+    def read(self, obj, name: str) -> int:
+        """Current_mA, CurrentHsA_mA, CurrentHsB_mA, SupplyVoltage_mV, Temp_degC or IsError."""
+        return getattr(self.c, f"AlxVnh7040_Get{name}")(self._v(obj))
+
+    def delays_ms(self) -> int:
+        return self.c.AlxDelayFake_MsCount()
+
+    def free_all(self) -> None:
+        for handle in self._handles:
+            self.c.AlxVnh7040Test_Delete(handle)
+        self._handles.clear()
+
+
 class NtcLib:
     """ctypes wrapper around alxNtcTest.dll: a thermistor resistance to a temperature."""
 
