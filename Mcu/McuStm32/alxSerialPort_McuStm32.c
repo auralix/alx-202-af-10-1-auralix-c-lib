@@ -286,7 +286,7 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 		HAL_StatusTypeDef statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %d", statusHal);
 			return Alx_Err;
 		}
 		#endif
@@ -472,7 +472,7 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 		statusHal = HAL_LIN_SendBreak(&me->huart);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_SendBreak() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_SendBreak() statusHal %d", statusHal);
 			return Alx_Err;
 		}
 		#endif
@@ -734,7 +734,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 		HAL_StatusTypeDef statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %d", statusHal);
 			return Alx_Err;
 		}
 		#endif
