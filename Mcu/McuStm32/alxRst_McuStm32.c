@@ -124,8 +124,8 @@ void AlxRst_Trace(AlxRst* me)
 	ALX_RST_TRACE_INF("- Power-on (POR): %d", me->rr.por);
 	#endif
 	#if defined(ALX_STM32L4)
-	ALX_RST_TRACE_INF("- Firewall: %u", me->rr.firewall);
-	ALX_RST_TRACE_INF("- Option Byte Loader: %u", me->rr.optionByteLoader);
+	ALX_RST_TRACE_INF("- Firewall: %d", me->rr.firewall);
+	ALX_RST_TRACE_INF("- Option Byte Loader: %d", me->rr.optionByteLoader);
 	#endif
 }
 
