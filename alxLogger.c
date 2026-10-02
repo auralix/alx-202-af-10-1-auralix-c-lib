@@ -791,9 +791,20 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		}
 		else if (me->md.write.log == 0)	// If new file, store write only, if new dir store write & oldest
 		{
-			ALX_LOGGER_TRACE_INF("Storing metadata because of new write %s", me->md.write.file == 0 ? "dir" : "file");
-			AlxLogger_Metadata_StoreConfig config = me->md.write.file == 0
-				? AlxLogger_Metadata_StoreConfig_WriteOldest : AlxLogger_Metadata_StoreConfig_Write;
+			const char* newEntry = "";
+			AlxLogger_Metadata_StoreConfig config = AlxLogger_Metadata_StoreConfig_Write;
+			if (me->md.write.file == 0)
+			{
+				newEntry = "dir";
+				config = AlxLogger_Metadata_StoreConfig_WriteOldest;
+			}
+			else
+			{
+				newEntry = "file";
+				config = AlxLogger_Metadata_StoreConfig_Write;
+			}
+			ALX_LOGGER_TRACE_INF("Storing metadata because of new write %s", newEntry);
+			(void)newEntry;
 			status = AlxLogger_Metadata_Store_Private(me, config);
 			if (status != Alx_Ok)
 			{
@@ -1705,7 +1716,14 @@ static ALX_UNUSED Alx_Status AlxLogger_SyncLogWriteFile
 		me->md.write.id += (logCount - me->md.write.log);
 	}
 
-	me->md.write.pos = (logCount > 0) ? (lastDelimPos + 1) : (0);
+	if (logCount > 0)
+	{
+		me->md.write.pos = lastDelimPos + 1;
+	}
+	else
+	{
+		me->md.write.pos = 0;
+	}
 	me->md.write.log = logCount;
 
 	status = AlxFs_File_Truncate(me->alxFs, file, me->md.write.pos);
@@ -1913,14 +1931,14 @@ static Alx_Status AlxLogger_Metadata_Load(AlxLogger* me)
 	// Check magic number
 	if (mdTemp.magicNumber != ALX_LOGGER_METADATA_MAGIC_NUMBER)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: path=%s, magicNumberActual=0x%" PRIX32 ", magicNumberExpected=0x%X", ALX_LOGGER_METADATA_FILE_PATH, mdTemp.magicNumber, ALX_LOGGER_METADATA_MAGIC_NUMBER);
+		ALX_LOGGER_TRACE_ERR("Err: path=%s, magicNumberActual=0x%" PRIX32 ", magicNumberExpected=0x%" PRIX32, ALX_LOGGER_METADATA_FILE_PATH, mdTemp.magicNumber, (uint32_t)ALX_LOGGER_METADATA_MAGIC_NUMBER);
 		return Alx_Err;
 	}
 
 	// Check version
 	if (mdTemp.version != ALX_LOGGER_METADATA_VERSION)
 	{
-		ALX_LOGGER_TRACE_ERR("Err: path=%s, versionActual=%" PRIu32 ", versionExpected=%u", ALX_LOGGER_METADATA_FILE_PATH, mdTemp.version, ALX_LOGGER_METADATA_VERSION);
+		ALX_LOGGER_TRACE_ERR("Err: path=%s, versionActual=%" PRIu32 ", versionExpected=%" PRIu32, ALX_LOGGER_METADATA_FILE_PATH, mdTemp.version, (uint32_t)ALX_LOGGER_METADATA_VERSION);
 		return Alx_Err;
 	}
 
