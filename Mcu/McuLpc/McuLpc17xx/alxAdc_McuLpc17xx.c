@@ -41,7 +41,10 @@
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static ADC_CHANNEL_T AlxAdcMcu_GetChannel(AlxIoPin* pin);
+static uint16_t AlxAdc_GetResult(AlxAdc* me, Alx_Ch ch);
+static ADC_CHANNEL_T AlxAdc_GetCh(Alx_Ch ch);
+static ADC_CHANNEL_T AlxAdc_GetIoPinCh(AlxIoPin* ioPin);
+static bool AlxAdc_Ctor_AreIoPinsAndChOk(AlxAdc* me);
 
 
 //******************************************************************************
@@ -51,23 +54,41 @@ static ADC_CHANNEL_T AlxAdcMcu_GetChannel(AlxIoPin* pin);
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		channels
-  * @param[in]		numChannels
-  * @param[in]		voltageRefP_mV
+  * @param[in]		ioPinArr
+  * @param[in]		chArr
+  * @param[in]		numOfIoPinsAndCh
+  * @param[in]		vRef_mV
+  * @param[in]		vRef_V
   */
-void AlxAdcMcu_Ctor
+void AlxAdc_Ctor
 (
-	AlxAdc_Mcu* me,
-	AlxIoPin** channels,
-	uint8_t numChannels,
-	uint16_t voltageRefP_mV)
+	AlxAdc* me,
+	AlxIoPin** ioPinArr,
+	Alx_Ch* chArr,
+	uint8_t numOfIoPinsAndCh,
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
+	uint32_t vRef_mV
+	#else
+	float vRef_V
+	#endif
+)
 {
-	// Obejcts - External
-	me->channels = channels;
+	// Assert
+	ALX_ADC_ASSERT(numOfIoPinsAndCh <= ALX_ADC_BUFF_LEN);
 
 	// Parameters
-	me->numChannels = numChannels;
-	me->voltageRefP_mV = voltageRefP_mV;
+	me->ioPinArr = ioPinArr;
+	me->chArr = chArr;
+	me->numOfIoPinsAndCh = numOfIoPinsAndCh;
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
+	me->vRef_mV = vRef_mV;
+	#else
+	me->vRef_V = vRef_V;
+	#endif
+
+	// Check IoPins and channels - each IoPin must be the pin of its channel
+	ALX_ADC_ASSERT(AlxAdc_Ctor_AreIoPinsAndChOk(me));
+	(void)AlxAdc_Ctor_AreIoPinsAndChOk;
 
 	// Variables
 	me->adcClkSetup.adcRate = 0;
@@ -88,82 +109,184 @@ void AlxAdcMcu_Ctor
 /**
   * @brief
   * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
-void AlxAdcMcu_Init(AlxAdc_Mcu* me)
+Alx_Status AlxAdc_Init(AlxAdc* me)
 {
+	// Assert
 	ALX_ADC_ASSERT(me->isInit == false);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Set isInit attribute
-	me->isInit = true;
+	// Init GPIO
+	for (uint8_t i = 0; i < me->numOfIoPinsAndCh; i++)
+	{
+		AlxIoPin_Init(*(me->ioPinArr + i));
+	}
 
-	// #2 Init one pin for each channel
-	for(uint8_t i = 0 ; i < me->numChannels ; i++)	{ AlxIoPin_Init(*(me->channels + i)); }
-
-	// #3 Init Clk, Power, Control Register
+	// Init ADC - clock, power and control register
 	Chip_ADC_Init(LPC_ADC, &me->adcClkSetup);
 	Chip_ADC_SetBurstCmd(LPC_ADC, DISABLE);
+
+	// Set isInit
+	me->isInit = true;
+
+	// Return
+	return Alx_Ok;
 }
 
 /**
   * @brief
   * @param[in,out]	me
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
   */
-void AlxAdcMcu_DeInit(AlxAdc_Mcu* me)
+Alx_Status AlxAdc_DeInit(AlxAdc* me)
 {
+	// Assert
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
-	// #1 Set isInit attribute
-	me->isInit = false;
-
-	// #2 DeInit Clk, Power, Control Register
+	// DeInit ADC - clock, power and control register
 	Chip_ADC_DeInit(LPC_ADC);
 
-	// #3 DeInit pin for each channel
-	for(uint8_t i = 0 ; i < me->numChannels ; i++)	{ AlxIoPin_DeInit(*(me->channels + i)); }
+	// DeInit GPIO
+	for (uint8_t i = 0; i < me->numOfIoPinsAndCh; i++)
+	{
+		AlxIoPin_DeInit(*(me->ioPinArr + i));
+	}
+
+	// Clear isInit
+	me->isInit = false;
+
+	// Return
+	return Alx_Ok;
 }
 
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		channel
+  * @param[in]		ch
   * @return
   */
-uint32_t AlxAdcMcu_GetVoltage_mV(AlxAdc_Mcu* me, AlxIoPin* channel)
+float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 {
+	// Assert
 	ALX_ADC_ASSERT(me->isInit == true);
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
 
-	ADC_CHANNEL_T ch = AlxAdcMcu_GetChannel(channel);
+	// Optimize Guard
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
+	ALX_ADC_ASSERT(false);
+	return ALX_NULL;
+	#else
+	// Get result
+	uint16_t result = AlxAdc_GetResult(me, ch);
 
-	// There must be Enable and Disable function for each chennel before convertion.
-	// I tried only enabling channels in Init, but it doens't work if there is no disable
-	Chip_ADC_EnableChannel(LPC_ADC, ch, ENABLE);
-	Chip_ADC_SetStartMode(LPC_ADC, ADC_START_NOW, ADC_TRIGGERMODE_RISING);
-	while (Chip_ADC_ReadStatus(LPC_ADC, ch, ADC_DR_DONE_STAT) != SET) {}
-	Chip_ADC_ReadValue(LPC_ADC, ch, &me->adcResult);
-	Chip_ADC_EnableChannel(LPC_ADC, ch, DISABLE);
+	// Prepare
+	float voltage_V = ((result * me->vRef_V) / 4095);
 
-	return ((me->adcResult * me->voltageRefP_mV) / 4095); 	// Returns mV
+	// Return
+	return voltage_V;
+	#endif
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		ch
+  * @return
+  */
+uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
+{
+	// Assert
+	ALX_ADC_ASSERT(me->isInit == true);
+	ALX_ADC_ASSERT(me->wasCtorCalled == true);
+
+	// Optimize Guard
+	#if !(defined(ALX_ADC_OPTIMIZE_SIZE))
+	ALX_ADC_ASSERT(false);
+	return ALX_NULL;
+	#else
+	// Get result
+	uint16_t result = AlxAdc_GetResult(me, ch);
+
+	// Prepare
+	uint32_t voltage_mV = ((result * me->vRef_mV) / 4095);
+
+	// Return
+	return voltage_mV;
+	#endif
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @return
+  */
+float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
+{
+	// LPC17xx has no internal temperature sensor
+	ALX_ADC_ASSERT(false);	// We shouldn't get here
+	return ALX_NULL;
 }
 
 
 //******************************************************************************
 // Private Functions
 //******************************************************************************
-static ADC_CHANNEL_T AlxAdcMcu_GetChannel(AlxIoPin* pin)
+static uint16_t AlxAdc_GetResult(AlxAdc* me, Alx_Ch ch)
 {
-	if (pin->port == 0 && pin->pin == 23)	return ADC_CH0;
-	if (pin->port == 0 && pin->pin == 24)	return ADC_CH1;
-	if (pin->port == 0 && pin->pin == 25)	return ADC_CH2;
-	if (pin->port == 0 && pin->pin == 26)	return ADC_CH3;
-	if (pin->port == 1 && pin->pin == 30)	return ADC_CH4;
-	if (pin->port == 1 && pin->pin == 31)	return ADC_CH5;
-	if (pin->port == 0 && pin->pin == 3)	return ADC_CH6;
-	if (pin->port == 0 && pin->pin == 2)	return ADC_CH7;
+	// Prepare
+	ADC_CHANNEL_T adcCh = AlxAdc_GetCh(ch);
 
-	else									return 0xFF;
+	// There must be Enable and Disable function for each chennel before convertion.
+	// I tried only enabling channels in Init, but it doens't work if there is no disable
+	Chip_ADC_EnableChannel(LPC_ADC, adcCh, ENABLE);
+	Chip_ADC_SetStartMode(LPC_ADC, ADC_START_NOW, ADC_TRIGGERMODE_RISING);
+	while (Chip_ADC_ReadStatus(LPC_ADC, adcCh, ADC_DR_DONE_STAT) != SET) {}
+	Chip_ADC_ReadValue(LPC_ADC, adcCh, &me->adcResult);
+	Chip_ADC_EnableChannel(LPC_ADC, adcCh, DISABLE);
+
+	// Return
+	return me->adcResult;
+}
+static ADC_CHANNEL_T AlxAdc_GetCh(Alx_Ch ch)
+{
+	if (ch == Alx_Ch_0)	return ADC_CH0;
+	if (ch == Alx_Ch_1)	return ADC_CH1;
+	if (ch == Alx_Ch_2)	return ADC_CH2;
+	if (ch == Alx_Ch_3)	return ADC_CH3;
+	if (ch == Alx_Ch_4)	return ADC_CH4;
+	if (ch == Alx_Ch_5)	return ADC_CH5;
+	if (ch == Alx_Ch_6)	return ADC_CH6;
+	if (ch == Alx_Ch_7)	return ADC_CH7;
+
+	ALX_ADC_ASSERT(false);	// We shouldn't get here
+	return ALX_NULL;
+}
+static ADC_CHANNEL_T AlxAdc_GetIoPinCh(AlxIoPin* ioPin)
+{
+	if (ioPin->port == 0 && ioPin->pin == 23)	return ADC_CH0;
+	if (ioPin->port == 0 && ioPin->pin == 24)	return ADC_CH1;
+	if (ioPin->port == 0 && ioPin->pin == 25)	return ADC_CH2;
+	if (ioPin->port == 0 && ioPin->pin == 26)	return ADC_CH3;
+	if (ioPin->port == 1 && ioPin->pin == 30)	return ADC_CH4;
+	if (ioPin->port == 1 && ioPin->pin == 31)	return ADC_CH5;
+	if (ioPin->port == 0 && ioPin->pin == 3)	return ADC_CH6;
+	if (ioPin->port == 0 && ioPin->pin == 2)	return ADC_CH7;
+	return 0xFF;	// Not an ADC pin
+}
+static bool AlxAdc_Ctor_AreIoPinsAndChOk(AlxAdc* me)
+{
+	for (uint8_t i = 0; i < me->numOfIoPinsAndCh; i++)
+	{
+		if (AlxAdc_GetIoPinCh(*(me->ioPinArr + i)) != AlxAdc_GetCh(*(me->chArr + i)))
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 

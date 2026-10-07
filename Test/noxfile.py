@@ -171,6 +171,7 @@ ASSERT_PURE_CALLS = {
     "AlxAdc_IsClkOk", "AlxWdt_IsClkOk", "AlxCan_Ctor_IsClkOk", "AlxMmc_IsClkOk", "AlxSpi_IsClkOk",
     "AlxI2c_IsClkOk", "AlxI2s_Ctor_IsClkOk", "AlxPwm_CheckIoPins",
     "AlxParamItem_AreEnumArrValFromLowToHigh", "AlxParamItem_IsEnumOnList",
+    "AlxAdc_Ctor_AreIoPinsAndChOk",   # alxAdc_McuLpc17xx.c: every IoPin is its channel's pin
 }
 ASSERT_SIDE_EFFECT_PENDING = {"alxCli.c", "alxIoPin_McuZephyr.c", "alxParamItem.c",
                               "alxClk_McuLpc55S6x.c"}
