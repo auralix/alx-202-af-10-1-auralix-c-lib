@@ -14,7 +14,7 @@ One nox session per stage, named after it, running in Test/.venv (no second envi
 same shape as the Auralix Python lib's noxfile and the device repos'. Evidence under build/<stage>/; the
 dev lane (pytest) writes to build/ itself. What lives here is what is THIS repository's: the source lists,
 the defines, the export lists, the mutation hooks. Everything a second C repository would need identically
-comes from the Python lib: the generic gates (alx.verify.gates.ascii / c_style /
+comes from the Python lib: the generic gates (alx.verify.gates.ascii / c_style / c_format / c_types /
 coverage_gate / mutation), the lane vocabulary (alx.verify.lanes) and the host toolchain and DLL build
 mechanics (alx.verify.host_build).
 """
@@ -82,6 +82,23 @@ STYLE_PENDING_COMMENTS = []
 STYLE_PENDING_TERNARY = [
     "alxBuild.h", "alxLfsConfig.h", "alxRtc_Global.c",
 ]
+
+# Decision 12's other two gates (A74), one pending list each, the same pattern.
+#
+# FORMAT - every format string of the library and of Test/host against TV's table: the PRI and
+# SCN macros, the bare %d %c %s %p %f %%, %.*s with (int)len on the call. alxBoot.c's frozen
+# file-name parser is the gate's single exemption, decided by TV. Measured 2026-10-07: six
+# findings, all in the harness (%u and %02X), fixed. The set is empty and stays here as the place
+# a new one would be named.
+FORMAT_PENDING = []
+FORMAT_EXEMPT = ["alxBoot.c:sscanf"]
+
+# TYPES - every declaration a library file makes, read from clang's AST of Stage 5's portable
+# modules (below): the twelve, void and the Alx names, nothing else. The Ext/ drivers and the Mcu/
+# backends need a part define or a vendor SDK to parse at all, so they are a product's to judge,
+# as Stage 5 says of the CMSIS three. Measured 2026-10-07: three findings in one module, listed
+# for TV - AlxFtoa's int precision (alxFtoa.h:80, alxFtoa.c:75) and its long intPart.
+TYPES_PENDING = ["alxFtoa.c", "alxFtoa.h"]
 
 # Stage 5 compiles every PORTABLE library module - the ones that need no vendor SDK. Three cannot
 # join: alxAssert.c, alxBoot.c and alxIrq.c reach for CMSIS intrinsics (__BKPT, __disable_irq,
@@ -183,19 +200,20 @@ _STYLE_PENDING = {*STYLE_PENDING_COMMENTS, *STYLE_PENDING_TERNARY}
 _STYLE_SKIP_DIRS = {"FatFs", "mcuboot", "Usbh", "Test", "build", "Doc"}
 
 
-def _library_style_files() -> list:
-    """Every library .c/.h the gate can check today, vendor trees and the pending list excluded."""
+def _library_style_files(pending=_STYLE_PENDING) -> list:
+    """Every library .c/.h a gate can check today, vendor trees and its pending list excluded."""
     found = []
     for path in sorted(CLIB.glob("*.[ch]")) + sorted(CLIB.glob("*/*.[ch]")):
         if set(path.relative_to(CLIB).parts[:-1]) & _STYLE_SKIP_DIRS:
             continue
-        if path.relative_to(CLIB).as_posix() in _STYLE_PENDING:
+        if path.relative_to(CLIB).as_posix() in pending:
             continue
         found.append(path)
     return found
 
 
 STYLE_FILES = [*_library_style_files(), *sorted(HOST.rglob("*.c"))]
+FORMAT_FILES = [*_library_style_files(set(FORMAT_PENDING)), *sorted(HOST.rglob("*.[ch]"))]
 # Target-only translation units: compiled by ANALYZE stage 4 with arm-gcc, never linked, one compile
 # per part variant. (source, variants to compile it under).
 LAYOUT_CHECKS = [(CHECKS / "alxIna228RegSizeCheck.c", ["ALX_INA238", "ALX_INA228"])]
@@ -514,14 +532,18 @@ def _calls_inside(line: str, macro: "re.Pattern") -> list:
 
 @nox.session
 def analyze(session: nox.Session) -> None:
-    """ANALYZE: 0 codespell + ASCII + C-style + Python gates, 1 clang-tidy, 2 cppcheck, 3 gcc -fanalyzer."""
+    """ANALYZE: 0 codespell + ASCII + C-style + C-format + Python gates, 1 clang-tidy, 2 cppcheck, 3 gcc -fanalyzer."""
     out = lanes.evidence_dir(TEST, "analyze")
     if not (BUILD / "compile_commands.json").exists():
         _fresh_dev_build(session)
-    session.log("Stage 0: codespell, ASCII gate, C style gate, fake style gate, ruff (the shared test profile)")
+    session.log("Stage 0: codespell, ASCII gate, C style and C format gates, fake style gate, ruff (shared profile)")
     session.run(PYTHON, "-m", "codespell_lib", *_strs(ANALYSIS_SOURCES))
     session.run(PYTHON, "-m", "alx.verify.gates.ascii", str(CLIB), *VENDOR, "--out", str(out / "ascii_gate.txt"))
     session.run(PYTHON, "-m", "alx.verify.gates.c_style", *_strs(STYLE_FILES), "--out", str(out / "c_style.txt"))
+    # relative to Test/, where nox runs: 640-odd absolute paths overflow a Windows command line
+    session.run(PYTHON, "-m", "alx.verify.gates.c_format",
+                *[str(Path("..") / f.relative_to(CLIB)) for f in FORMAT_FILES],
+                *[a for spot in FORMAT_EXEMPT for a in ("--exempt", spot)], "--out", str(out / "c_format.txt"))
     # every fake a consumer links follows the one convention, family guards checked against the headers
     session.run(PYTHON, "-m", "alx.verify.gates.fake_style", *_strs(sorted(FAKES.glob("*.c"))),
                 "--headers", *_strs([CLIB, CLIB / "Mcu", CLIB / "Mcu" / "McuStm32", CLIB / "Ext"]),
@@ -669,6 +691,17 @@ def analyze(session: nox.Session) -> None:
                       f"Measured 12.09 there were none - either gate is closed and the argument "
                       f"is deleted. Sites: {traces}")
     session.log(f"Stage 5c: no trace does work, {len(pending_seen)} assert files known-pending")
+
+    session.log("Stage 5d: does every portable module DECLARE only decision 12's types? (clang's AST)")
+    # The same sources as Stage 5, read by clang with the host build's flags: the gate dumps each
+    # one's AST and judges every declaration made in a library file - the headers under the root
+    # included, vendor trees, build output and TYPES_PENDING not.
+    types_db = out / "types_compile_commands.json"
+    portable = [s for s in sorted([*CLIB.glob("*.c"), *FAKES.glob("*.c")]) if s.name not in SYNTAX_NEEDS_CMSIS]
+    hb.write_compile_db(types_db, portable, [*host_recipe.DB_ARGUMENTS, "-DALX_C_LIB"], directory=BUILD)
+    session.run(PYTHON, "-m", "alx.verify.gates.c_types", str(types_db), "--root", str(CLIB), *VENDOR,
+                *[a for name in ("Doc", "build", ".venv", *TYPES_PENDING) for a in ("--exclude", name)],
+                "--clang", str(tc.llvm("clang")), "--out", str(out / "c_types.txt"))
 
 
     session.log(f"ANALYZE CLEAN - evidence in {out}")
