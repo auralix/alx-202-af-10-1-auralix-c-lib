@@ -1883,7 +1883,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	//------------------------------------------------------------------------------
 	if (me->dataType == AlxParamItem_Uint8)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRIu8, me->val.uint8) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRIu32, (uint32_t)me->val.uint8) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
@@ -1899,7 +1899,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Int8)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRId8, me->val.int8) >= 0);
+		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRId32, (int32_t)me->val.int8) >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
