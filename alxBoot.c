@@ -328,7 +328,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 		#if defined(ALX_FATFS)
 		if (info.fatfsInfo.fattrib & (AM_DIR | AM_HID | AM_SYS))
 		{
-			ALX_BOOT_TRACE_WRN("SKIP: CheckIfFile() fattrib %" PRIu8 " fname %s", (uint8_t)info.fatfsInfo.fattrib, info.fatfsInfo.fname);
+			ALX_BOOT_TRACE_WRN("SKIP: CheckIfFile() fattrib %" PRIu32 " fname %s", (uint32_t)info.fatfsInfo.fattrib, info.fatfsInfo.fname);
 			continue;
 		}
 
