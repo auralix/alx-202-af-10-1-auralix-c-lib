@@ -277,7 +277,7 @@ void AlxCli_Handle(AlxCli* me)
 							"        \"hwBomArtf\":\"%s\",\r\n"
 							"        \"hwBomName\":\"%s\",\r\n"
 							"        \"hwBomVerStr\":\"%s\",\r\n"
-							"        \"hwId\":%" PRIu8 ",\r\n"
+							"        \"hwId\":%" PRIu32 ",\r\n"
 							"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
 							"    }\r\n"
 							"}\r\n",
@@ -295,7 +295,7 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomArtf,
 							hwBomName,
 							hwBomVerStr,
-							hwId,
+							(uint32_t)hwId,
 							hwMcuUniqueIdStr
 						);
 					}
@@ -318,7 +318,7 @@ void AlxCli_Handle(AlxCli* me)
 							"        \"hwBomArtf\":\"%s\",\r\n"
 							"        \"hwBomName\":\"%s\",\r\n"
 							"        \"hwBomVerStr\":\"%s\",\r\n"
-							"        \"hwId\":%" PRIu8 ",\r\n"
+							"        \"hwId\":%" PRIu32 ",\r\n"
 							"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
 							"    }\r\n"
 							"}\r\n",
@@ -332,7 +332,7 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomArtf,
 							hwBomName,
 							hwBomVerStr,
-							hwId,
+							(uint32_t)hwId,
 							hwMcuUniqueIdStr
 						);
 					}
@@ -362,7 +362,7 @@ void AlxCli_Handle(AlxCli* me)
 									"\"hwBomArtf\":\"%s\","
 									"\"hwBomName\":\"%s\","
 									"\"hwBomVerStr\":\"%s\","
-									"\"hwId\":%" PRIu8 ","
+									"\"hwId\":%" PRIu32 ","
 									"\"hwMcuUniqueIdStr\":\"%s\""
 								"}"
 							"}\r\n",
@@ -380,7 +380,7 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomArtf,
 							hwBomName,
 							hwBomVerStr,
-							hwId,
+							(uint32_t)hwId,
 							hwMcuUniqueIdStr
 						);
 					}
@@ -403,7 +403,7 @@ void AlxCli_Handle(AlxCli* me)
 									"\"hwBomArtf\":\"%s\","
 									"\"hwBomName\":\"%s\","
 									"\"hwBomVerStr\":\"%s\","
-									"\"hwId\":%" PRIu8 ","
+									"\"hwId\":%" PRIu32 ","
 									"\"hwMcuUniqueIdStr\":\"%s\""
 								"}"
 							"}\r\n",
@@ -417,7 +417,7 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomArtf,
 							hwBomName,
 							hwBomVerStr,
-							hwId,
+							(uint32_t)hwId,
 							hwMcuUniqueIdStr
 						);
 					}
