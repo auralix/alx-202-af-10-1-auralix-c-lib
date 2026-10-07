@@ -25,7 +25,8 @@ alxParamItem.c 7 (six of them the sprintf that renders a parameter's value), alx
 (CLOCK_SetPLL0Freq - the clock setup) and alxNet.c 2 (the SPI transfers).
 
 The fix is the same everywhere and is library source: perform the call on its own line, keep its
-status, and assert on the status.
+status, and assert on the status. D42 made it (TV, 2026-10-07), in all four files, and P567 passes
+since.
 
 This group also exists because of what it cost to add: the CLI group already had its sources, its
 closure and its .def, and only a line in VARIANT_GROUPS was missing. The four variants were built
@@ -59,7 +60,7 @@ def test_ALX1553_P566_a_build_with_assertions_answers_a_command(
     name, _lib = cli_variant_lib
     form, _trace, _level = VARIANTS[name]
     if form is None:
-        pytest.skip("the variant with no assert form is P567, the sealed half")
+        pytest.skip("the variant with no assert form is P567")
 
     response = _ask(make_cli_variant(), b"help\r\n")
 
@@ -87,19 +88,6 @@ def test_ALX1553_P566_the_three_assert_forms_answer_identically(
     )
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "DEFECT: alxCli.c performs 21 of its serial writes INSIDE ALX_CLI_ASSERT - for example "
-    "ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok) at alxCli.c:129. "
-    "A module compiled with no ALX_CLI_ASSERT_*_ENABLE expands that macro to do {} while(false) "
-    "taking no parameters, so the preprocessor deletes the argument and the WRITE with it. Every "
-    "reply the CLI makes goes through one of those lines, so a build without this module's "
-    "assertions answers NOTHING to any command while every function still returns normally and no "
-    "error is raised anywhere. Measured on `help`: 751 bytes with RST, BKPT or TRACE, 0 bytes with "
-    "no form. The CLI is how a product is operated, which makes this the widest instance of a shape "
-    "the library repeats in 49 places across five files - alxIoPin_McuZephyr.c puts the gpio_pin_set "
-    "calls themselves inside assertions, alxParamItem.c the sprintf that renders a value, "
-    "alxClk_McuLpc55S6x.c the PLL setup. The fix is the same in all of them and is library source: "
-    "make the call on its own line, keep the status, assert on the status"))
 def test_ALX1553_P567_a_build_without_assertions_also_answers_a_command(
         cli_variant_lib, make_cli_variant):
     """The `off` variant, where the writes have been deleted along with the assertions.
@@ -116,3 +104,4 @@ def test_ALX1553_P567_a_build_without_assertions_also_answers_a_command(
 
     assert response, "the CLI answered nothing at all"
     assert HELP_MARK in response
+    assert len(response) == 751, "the same answer as the three forms that compile the assertion"
