@@ -497,7 +497,7 @@ static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
 	alxUsb_me->usbh_event = id;
 
 	// Trace
-	ALX_USB_TRACE_INF("AlxUsb_Event_Callback() id %" PRIu8 " name %s", id, alxUsb_me->eventNameArr[id]);
+	ALX_USB_TRACE_INF("AlxUsb_Event_Callback() id %" PRIu32 " name %s", (uint32_t)id, alxUsb_me->eventNameArr[id]);
 }
 #endif
 
