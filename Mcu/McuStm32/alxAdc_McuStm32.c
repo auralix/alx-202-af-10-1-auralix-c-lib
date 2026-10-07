@@ -914,7 +914,7 @@ static uint32_t AlxAdc_GetVref_mV(AlxAdc* me)
 			if (me->ch[i] == Alx_Ch_McuStm32_Vref)
 			{
 				// Prepare
-				#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+				#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 				uint32_t vref_mV = __LL_ADC_CALC_VREFANALOG_VOLTAGE(me->buff[i], ALX_ADC_RESOLUTION);
 				#endif
 				#if defined(ALX_STM32U5)
@@ -922,9 +922,7 @@ static uint32_t AlxAdc_GetVref_mV(AlxAdc* me)
 				#endif
 
 				// Return
-				#if !defined(ALX_STM32F1)
 				return vref_mV;
-				#endif
 			}
 		}
 	}

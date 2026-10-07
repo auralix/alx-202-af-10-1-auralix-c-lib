@@ -395,27 +395,27 @@ static uint32_t AlxMmc_GetBusWidth(AlxMmc* me)
 	#if defined(ALX_STM32L4)
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz)
 	)
 	{
 		return SDMMC_BUS_WIDE_1B;
 	}
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz)
 	)
 	{
 		return SDMMC_BUS_WIDE_4B;
 	}
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
 	)
 	{
 		return SDMMC_BUS_WIDE_8B;
@@ -437,27 +437,27 @@ static uint32_t AlxMmc_GetClkDiv(AlxMmc* me)
 	#if defined(ALX_STM32L4)
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz)
 	)
 	{
 		return 2;
 	}
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz)
 	)
 	{
 		return 1;
 	}
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
 	)
 	{
 		return 0;
@@ -708,15 +708,15 @@ static bool AlxMmc_IsClkOk(AlxMmc* me)
 	#if defined(ALX_STM32L4)
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
 	)
 	{
 		if(48000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_PllP_Ctor))

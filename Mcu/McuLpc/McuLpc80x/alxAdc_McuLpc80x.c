@@ -99,7 +99,7 @@ void AlxAdc_Ctor
 	#endif
 
 	// Check channel sequence
-	for (uint32_t i = 0; i + 1U < numOfIoPinsAndCh; i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) < AlxAdc_GetCh(me, chArr[i + 1]));	// Channel sequence must be from low to high number
+	for (uint32_t i = 0; i < (uint32_t)(numOfIoPinsAndCh - 1); i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) < AlxAdc_GetCh(me, chArr[i + 1]));	// Channel sequence must be from low to high number
 
 	// Check clock
 	ALX_ADC_ASSERT(AlxAdc_Ctor_IsSysClkOk(me));

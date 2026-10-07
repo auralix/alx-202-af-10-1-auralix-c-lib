@@ -59,15 +59,15 @@ extern "C" {
 typedef enum
 {
 	#if defined(ALX_STM32L4)
-	AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz,
-	AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz,
-	AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz,
-	AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz,
-	AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz,
-	AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz,
-	AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz,
-	AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz,
-	AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz,
+	AlxMmc_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz,
+	AlxMmc_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz,
+	AlxMmc_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz,
+	AlxMmc_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz,
+	AlxMmc_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz,
+	AlxMmc_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz,
+	AlxMmc_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz,
+	AlxMmc_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz,
+	AlxMmc_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz,
 	#endif
 } AlxMmc_Clk;
 
