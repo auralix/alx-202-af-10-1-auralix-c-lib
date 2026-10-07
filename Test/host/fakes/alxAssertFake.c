@@ -57,8 +57,8 @@ static void AlxAssertFake_Record(const char* kind, const char* file, uint32_t li
 {
 	if (alxAssertFake_count == 0)
 	{
-		snprintf(alxAssertFake_first, sizeof(alxAssertFake_first), "%s %s:%u in %s",
-			kind, file, (unsigned)line, fun);
+		snprintf(alxAssertFake_first, sizeof(alxAssertFake_first), "%s %s:%" PRIu32 " in %s",
+			kind, file, line, fun);
 	}
 	alxAssertFake_count++;
 
