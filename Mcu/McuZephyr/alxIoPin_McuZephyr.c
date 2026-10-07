@@ -111,7 +111,8 @@ void AlxIoPin_Init(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->device != NULL);
 
 	// Configure GPIO
-	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, me->gpioFlags) == 0);
+	int32_t status = (int32_t)gpio_pin_configure(me->device, me->pin, me->gpioFlags);
+	ALX_IO_PIN_ASSERT(status == 0);
 
 	// Init IRQ
 	if (me->irqFlags != 0)
@@ -120,13 +121,16 @@ void AlxIoPin_Init(AlxIoPin* me)
 		ALX_IO_PIN_ASSERT(me->isIrqEnabled == false);
 
 		// Configure IRQ
-		ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, me->irqFlags) == 0);
+		status = (int32_t)gpio_pin_interrupt_configure(me->device, me->pin, me->irqFlags);
+		ALX_IO_PIN_ASSERT(status == 0);
 
 		// Init IRQ Callback
 		gpio_init_callback(&me->irqStruct, AlxIoPin_Irq_Callback_Zephyr, BIT(me->pin));
 
 		// Add IRQ Callback - Enables IRQ
-		ALX_IO_PIN_ASSERT(gpio_add_callback(me->device, &me->irqStruct) == 0);
+		status = (int32_t)gpio_add_callback(me->device, &me->irqStruct);
+		ALX_IO_PIN_ASSERT(status == 0);
+		(void)status;
 
 		// Set isInitIrq
 		me->isIrqEnabled = true;
@@ -145,6 +149,9 @@ void AlxIoPin_Init(AlxIoPin* me)
   */
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
+	// Local variables
+	int32_t status = 0;
+
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("ENTER: deviceName %s pin %" PRIu8, me->deviceName, me->pin);
 
@@ -160,10 +167,12 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 		// isIrqEnabled -> Don't care
 
 		// DeConfigure IRQ
-		ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, GPIO_INT_DISABLE) == 0);
+		status = (int32_t)gpio_pin_interrupt_configure(me->device, me->pin, GPIO_INT_DISABLE);
+		ALX_IO_PIN_ASSERT(status == 0);
 
 		// Remove IRQ Callback
-		ALX_IO_PIN_ASSERT(gpio_remove_callback(me->device, &me->irqStruct) == 0);
+		status = (int32_t)gpio_remove_callback(me->device, &me->irqStruct);
+		ALX_IO_PIN_ASSERT(status == 0);
 
 		// Clear irqStruct
 		memset(&me->irqStruct, 0, sizeof(me->irqStruct));
@@ -173,7 +182,9 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 	}
 
 	// DeConfigure GPIO
-	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, GPIO_DISCONNECTED) == 0);
+	status = (int32_t)gpio_pin_configure(me->device, me->pin, GPIO_DISCONNECTED);
+	ALX_IO_PIN_ASSERT(status == 0);
+	(void)status;
 
 	// DeInit GPIO
 	me->device = NULL;
@@ -228,7 +239,9 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 	// isIrqEnabled -> Don't care
 
 	// Write
-	ALX_IO_PIN_ASSERT(gpio_pin_set(me->device, me->pin, val) == 0);
+	int32_t status = (int32_t)gpio_pin_set(me->device, me->pin, val);
+	ALX_IO_PIN_ASSERT(status == 0);
+	(void)status;
 
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %" PRIu8, me->deviceName, me->pin);
@@ -249,7 +262,9 @@ void AlxIoPin_Set(AlxIoPin* me)
 	// isIrqEnabled -> Don't care
 
 	// Set
-	ALX_IO_PIN_ASSERT(gpio_pin_set(me->device, me->pin, 1) == 0);
+	int32_t status = (int32_t)gpio_pin_set(me->device, me->pin, 1);
+	ALX_IO_PIN_ASSERT(status == 0);
+	(void)status;
 
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %" PRIu8, me->deviceName, me->pin);
@@ -270,7 +285,9 @@ void AlxIoPin_Reset(AlxIoPin* me)
 	// isIrqEnabled -> Don't care
 
 	// Reset
-	ALX_IO_PIN_ASSERT(gpio_pin_set(me->device, me->pin, 0) == 0);
+	int32_t status = (int32_t)gpio_pin_set(me->device, me->pin, 0);
+	ALX_IO_PIN_ASSERT(status == 0);
+	(void)status;
 
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %" PRIu8, me->deviceName, me->pin);
@@ -291,7 +308,9 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 	// isIrqEnabled -> Don't care
 
 	// Toggle
-	ALX_IO_PIN_ASSERT(gpio_pin_toggle(me->device, me->pin) == 0);
+	int32_t status = (int32_t)gpio_pin_toggle(me->device, me->pin);
+	ALX_IO_PIN_ASSERT(status == 0);
+	(void)status;
 
 	// Trace
 	ALX_IO_PIN_TRACE_DBG("EXIT: deviceName %s pin %" PRIu8, me->deviceName, me->pin);
@@ -326,7 +345,8 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 
 	// Config PullUp
-	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, GPIO_PULL_UP) == 0);
+	int32_t status = (int32_t)gpio_pin_configure(me->device, me->pin, GPIO_PULL_UP);
+	ALX_IO_PIN_ASSERT(status == 0);
 
 	// Wait
 	AlxDelay_ms(1);
@@ -340,7 +360,9 @@ AlxIoPin_TriState AlxIoPin_Read_TriState(AlxIoPin* me)
 	//------------------------------------------------------------------------------
 
 	// Config PullDown
-	ALX_IO_PIN_ASSERT(gpio_pin_configure(me->device, me->pin, GPIO_PULL_DOWN) == 0);
+	status = (int32_t)gpio_pin_configure(me->device, me->pin, GPIO_PULL_DOWN);
+	ALX_IO_PIN_ASSERT(status == 0);
+	(void)status;
 
 	// Wait
 	AlxDelay_ms(1);
@@ -399,7 +421,9 @@ void AlxIoPin_Irq_Disable(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->irqFlags != 0);
 
 	// DeConfigure IRQ
-	ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, GPIO_INT_DISABLE) == 0);
+	int32_t status = (int32_t)gpio_pin_interrupt_configure(me->device, me->pin, GPIO_INT_DISABLE);
+	ALX_IO_PIN_ASSERT(status == 0);
+	(void)status;
 
 	// Clear isInitIrq
 	me->isIrqEnabled = false;
@@ -424,7 +448,9 @@ void AlxIoPin_Irq_Enable(AlxIoPin* me)
 	ALX_IO_PIN_ASSERT(me->irqFlags != 0);
 
 	// Configure IRQ
-	ALX_IO_PIN_ASSERT(gpio_pin_interrupt_configure(me->device, me->pin, me->irqFlags) == 0);
+	int32_t status = (int32_t)gpio_pin_interrupt_configure(me->device, me->pin, me->irqFlags);
+	ALX_IO_PIN_ASSERT(status == 0);
+	(void)status;
 
 	// Set isInitIrq
 	me->isIrqEnabled = true;
