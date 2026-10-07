@@ -43,7 +43,7 @@ needs a fifth variant and a module that has INF sites, which is alxMemSafe's gro
 And all 23 of alxLin.c's sites are failure reports, so this says nothing about a trace on a normal
 path.
 
-Proofs (ALX-1553): P532-P540.
+Proofs (ALX-1553): P532-P540. Proofs (ALX-1564): P685.
 """
 
 from pathlib import Path
@@ -282,3 +282,21 @@ def test_ALX1553_P540_every_declared_dependency_of_every_group_exists():
                     if isinstance(path, Path) and not path.exists()]
 
     assert not missing, "declared but absent, so the group rebuilds every run: " + "; ".join(missing)
+
+
+def test_ALX1564_P685_the_build_lists_the_headers_a_group_reads(lin_lib_session):
+    """A75: the headers a group reads are the compiler's to list, in <dll>.d beside the DLL.
+
+    LIN_DEPS once had to name Mcu/alxTrace.h by hand, did not, and two lane runs passed on a stale
+    DLL. No DEPS list names a header now: build_dll records every file the build read, and
+    needs_build reads that record. alxLin.c reaches alxTrace.h only through other headers, and the
+    record names it, so a change to it rebuilds the group.
+    """
+    headers = [f"{name}: {path.name}" for name in dir(host_build) if name.endswith("_DEPS")
+               for path in getattr(host_build, name) if isinstance(path, Path) and path.suffix == ".h"]
+    assert not headers, "a hand-written header in a DEPS list: " + "; ".join(headers)
+
+    record = host_build.build_tools.dependency_file(host_build.LIN_DLL)
+    read = {path.resolve() for path in host_build.build_tools.read_dependencies(record)}
+    assert (host_build.CLIB_DIR / "Mcu" / "alxTrace.h").resolve() in read
+    assert {path.resolve() for path in LIN_SOURCES} <= read, "and every source of the group"
