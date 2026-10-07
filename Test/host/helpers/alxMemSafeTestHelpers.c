@@ -1352,7 +1352,7 @@ AlxStoreTest_Ctx* AlxStoreTest_New(uint32_t numOfGroups)
 			grp->itemArr[i] = &grp->items[i];
 		}
 
-		snprintf(grp->key, sizeof(grp->key), "GROUP_%u", (unsigned)g);
+		snprintf(grp->key, sizeof(grp->key), "GROUP_%" PRIu32, g);
 		AlxParamGroup_Ctor
 		(
 			&grp->group,
