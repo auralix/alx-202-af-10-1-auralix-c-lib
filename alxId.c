@@ -609,11 +609,11 @@ void AlxId_Trace(AlxId* me)
 	ALX_ID_TRACE_INF("HW:");
 	ALX_ID_TRACE_INF("- pcb_artf: %s", me->hw.instance.pcbArtf);
 	ALX_ID_TRACE_INF("- pcb_name: %s", me->hw.instance.pcbName);
-	ALX_ID_TRACE_INF("- pcb_ver: %" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu32, me->hw.instance.pcbVerMajor, me->hw.instance.pcbVerMinor, me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
-	ALX_ID_TRACE_INF("- pcb_id: %" PRIu8, me->hw.instance.id);
+	ALX_ID_TRACE_INF("- pcb_ver: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ".%" PRIu32, (uint32_t)me->hw.instance.pcbVerMajor, (uint32_t)me->hw.instance.pcbVerMinor, (uint32_t)me->hw.instance.pcbVerPatch, me->hw.instance.pcbVerDate);
+	ALX_ID_TRACE_INF("- pcb_id: %" PRIu32, (uint32_t)me->hw.instance.id);
 	ALX_ID_TRACE_INF("- bom_artf: %s", me->hw.instance.bomArtf);
 	ALX_ID_TRACE_INF("- bom_name: %s", me->hw.instance.bomName);
-	ALX_ID_TRACE_INF("- bom_ver: %" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu32, me->hw.instance.bomVerMajor, me->hw.instance.bomVerMinor, me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
+	ALX_ID_TRACE_INF("- bom_ver: %" PRIu32 ".%" PRIu32 ".%" PRIu32 ".%" PRIu32, (uint32_t)me->hw.instance.bomVerMajor, (uint32_t)me->hw.instance.bomVerMinor, (uint32_t)me->hw.instance.bomVerPatch, me->hw.instance.bomVerDate);
 	ALX_ID_TRACE_INF("- mcu_name: %s", me->hw.mcuName);
 	ALX_ID_TRACE_INF("");
 
