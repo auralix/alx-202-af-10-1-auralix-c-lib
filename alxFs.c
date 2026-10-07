@@ -567,7 +567,7 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 		else if (statusRead != Alx_Ok)
 		{
 			// Break, error occurred, trace, change status to Alx_Err
-			ALX_FS_TRACE_ERR("Err: %d, ch=0x%02" PRIX8 ", readLenActual=%" PRIu32 ", lenActual=%" PRIu32 ", len=%" PRIu32 ", delim=%s", statusRead, (uint8_t)ch, readLenActual, _lenActual, len, delim);
+			ALX_FS_TRACE_ERR("Err: %d, ch=0x%02" PRIX32 ", readLenActual=%" PRIu32 ", lenActual=%" PRIu32 ", len=%" PRIu32 ", delim=%s", statusRead, (uint32_t)(uint8_t)ch, readLenActual, _lenActual, len, delim);
 			status = Alx_Err;
 			break;
 		}
