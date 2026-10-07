@@ -146,8 +146,8 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	(void)format;	// the arguments are not rendered: what this group measures is THAT the call happened
 
 	alxAssertTest_traceLevel = level;
-	snprintf(alxAssertTest_traceText, sizeof(alxAssertTest_traceText), "%s:%u in %s",
-		file, (unsigned)line, fun);
+	snprintf(alxAssertTest_traceText, sizeof(alxAssertTest_traceText), "%s:%" PRIu32 " in %s",
+		file, line, fun);
 
 	// The three pieces kept apart as well, because what a test has to say about them is different:
 	// the file is the caller's constant, the line is the caller's __LINE__ and the function is the
