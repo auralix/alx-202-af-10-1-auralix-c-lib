@@ -33,7 +33,13 @@ closure and its .def, and only a line in VARIANT_GROUPS was missing. The four va
 for exactly this question and had never been pointed at the module where the answer matters most.
 
 Proofs (ALX-1553): P566-P567.
+
+Proof (ALX-1564): P670 - every configuration renders a parameter's value. alxParamItem.c rendered
+a numeric value with a sprintf inside ALX_PARAM_ITEM_ASSERT, so a build without that module's
+assertions answered get-param with every number EMPTY; D42 moved the sprintf out (2026-10-07).
 """
+
+import json
 
 import pytest
 
@@ -105,3 +111,14 @@ def test_ALX1553_P567_a_build_without_assertions_also_answers_a_command(
     assert response, "the CLI answered nothing at all"
     assert HELP_MARK in response
     assert len(response) == 751, "the same answer as the three forms that compile the assertion"
+
+
+def test_ALX1564_P670_every_configuration_renders_a_parameters_value(
+        cli_variant_lib, make_cli_variant):
+    """get-param answers UINT8_TEST's default, 7, in all four configurations, `off` included."""
+    name, _lib = cli_variant_lib
+
+    response = _ask(make_cli_variant(), b"get-param\r\n", handles=4)
+
+    data = json.loads(response.replace(b"\r\n", b"").decode("ascii"))["data"]
+    assert data["UINT8_TEST"] == 7, f"variant {name!r} rendered {data['UINT8_TEST']!r}"

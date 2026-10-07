@@ -1843,6 +1843,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	char valStr[32] = "";
+	int32_t sprintfStatus = 0;
 
 
 
@@ -1883,15 +1884,18 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	//------------------------------------------------------------------------------
 	if (me->dataType == AlxParamItem_Uint8)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRIu32, (uint32_t)me->val.uint8) >= 0);
+		sprintfStatus = (int32_t)sprintf(valStr, "%" PRIu32, (uint32_t)me->val.uint8);
+		ALX_PARAM_ITEM_ASSERT(sprintfStatus >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRIu16, me->val.uint16) >= 0);
+		sprintfStatus = (int32_t)sprintf(valStr, "%" PRIu16, me->val.uint16);
+		ALX_PARAM_ITEM_ASSERT(sprintfStatus >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRIu32, me->val.uint32) >= 0);
+		sprintfStatus = (int32_t)sprintf(valStr, "%" PRIu32, me->val.uint32);
+		ALX_PARAM_ITEM_ASSERT(sprintfStatus >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Uint64)
 	{
@@ -1899,15 +1903,19 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Int8)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRId32, (int32_t)me->val.int8) >= 0);
+		sprintfStatus = (int32_t)sprintf(valStr, "%" PRId32, (int32_t)me->val.int8);
+		ALX_PARAM_ITEM_ASSERT(sprintfStatus >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRId16, me->val.int16) >= 0);
+		sprintfStatus = (int32_t)sprintf(valStr, "%" PRId16, me->val.int16);
+		ALX_PARAM_ITEM_ASSERT(sprintfStatus >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Int32)
 	{
-		ALX_PARAM_ITEM_ASSERT(sprintf(valStr, "%" PRId32, me->val.int32) >= 0);
+		sprintfStatus = (int32_t)sprintf(valStr, "%" PRId32, me->val.int32);
+		ALX_PARAM_ITEM_ASSERT(sprintfStatus >= 0);
+		(void)sprintfStatus;
 	}
 	else if (me->dataType == AlxParamItem_Int64)
 	{
