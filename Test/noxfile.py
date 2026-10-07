@@ -161,10 +161,9 @@ SYNTAX_EMPTY_TU = {"alxBuild.c",
 #   29 call a predicate     strlen, AlxAdc_IsClkOk, AlxWdt_IsClkOk and friends - eliding those
 #                            loses a check, which is what an assertion is for
 #
-# alxNet.c left with its skeleton on 2026-10-02. The four files are NAMED rather than fixed: the
-# repair is one line each and it is library source.
-# What this stage buys is that the list cannot grow. A new assertion that hides a call in a module
-# not below fails the lane.
+# alxNet.c left with its skeleton on 2026-10-02. The other four were fixed by D42 (TV, 2026-10-07):
+# the call runs first into a local, the assertion checks the local - the form of alxParamItem's
+# SetVal. The pending set is empty, so a new assertion that hides a call anywhere fails the lane.
 ASSERT_PURE_CALLS = {
     "strlen", "sizeof", "fmodf",   # fmodf: alxAdau1961.c checks a gain is a whole number of steps
     "AlxAdc_GetCh", "AlxAdc_Ctor_CheckCh", "AlxAdc_Ctor_IsMainClkOk", "AlxAdc_Ctor_IsSysClkOk",
@@ -173,8 +172,7 @@ ASSERT_PURE_CALLS = {
     "AlxParamItem_AreEnumArrValFromLowToHigh", "AlxParamItem_IsEnumOnList",
     "AlxAdc_Ctor_AreIoPinsAndChOk",   # alxAdc_McuLpc17xx.c: every IoPin is its channel's pin
 }
-ASSERT_SIDE_EFFECT_PENDING = {"alxCli.c", "alxIoPin_McuZephyr.c", "alxParamItem.c",
-                              "alxClk_McuLpc55S6x.c"}
+ASSERT_SIDE_EFFECT_PENDING: set[str] = set()
 STRING_LITERAL = re.compile(r"\"(?:[^\"\\]|\\.)*\"")
 CHAR_LITERAL = re.compile(r"'(?:[^'\\]|\\.)'")
 ELIDED_ASSERT = re.compile(r"ALX_[A-Z0-9_]*ASSERT[A-Z0-9_]*\s*\(")
