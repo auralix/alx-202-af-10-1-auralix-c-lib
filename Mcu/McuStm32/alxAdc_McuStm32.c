@@ -140,8 +140,8 @@ void AlxAdc_Ctor
 	}
 
 	// Check clock
-	ALX_ADC_ASSERT(AlxAdc_IsClkOk(me));
-	(void)AlxAdc_IsClkOk;
+	ALX_UNUSED bool isClkOk = AlxAdc_IsClkOk(me);
+	ALX_ADC_ASSERT(isClkOk);
 
 
 	//------------------------------------------------------------------------------
