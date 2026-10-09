@@ -132,11 +132,9 @@ void AlxAdc_Ctor
 	// Check channel sequence
 	for (uint8_t i = 0; i < numOfCh - 1; i++)
 	{
-		uint32_t chNumCurrent = AlxAdc_GetCh(me, chArr[i]);
-		uint32_t chNumNext = AlxAdc_GetCh(me, chArr[i+1]);
+		ALX_UNUSED uint32_t chNumCurrent = AlxAdc_GetCh(me, chArr[i]);
+		ALX_UNUSED uint32_t chNumNext = AlxAdc_GetCh(me, chArr[i+1]);
 		ALX_ADC_ASSERT(chNumCurrent < chNumNext);	// Channel sequence must be from low to high number
-		(void)chNumCurrent;
-		(void)chNumNext;
 	}
 
 	// Check clock
