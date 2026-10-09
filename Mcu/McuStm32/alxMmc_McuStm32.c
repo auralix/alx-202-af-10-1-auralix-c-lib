@@ -151,8 +151,8 @@ void AlxMmc_Ctor
 	me->dmaWriteDone = false;
 
 	// Check clock
-	ALX_MMC_ASSERT(AlxMmc_IsClkOk(me));
-	(void)AlxMmc_IsClkOk;
+	ALX_UNUSED bool isClkOk = AlxMmc_IsClkOk(me);
+	ALX_MMC_ASSERT(isClkOk);
 
 	// Info
 	me->wasCtorCalled = true;
