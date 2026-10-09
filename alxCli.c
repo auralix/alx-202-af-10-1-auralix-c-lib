@@ -758,7 +758,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 	}
 
 	// Send
-	Alx_Status status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+	ALX_UNUSED Alx_Status status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
 	ALX_CLI_ASSERT(status == Alx_Ok);
 
 
@@ -900,7 +900,6 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 	// Send
 	status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
 	ALX_CLI_ASSERT(status == Alx_Ok);
-	(void)status;
 }
 
 
