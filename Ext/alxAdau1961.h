@@ -468,16 +468,16 @@ typedef enum
 	ALCDecayTime_192ms    = 0b0011,
 	ALCDecayTime_384ms    = 0b0100,
 	ALCDecayTime_768ms    = 0b0101,
-	ALCDecayTime_1s54     = 0b0110,
-	ALCDecayTime_3s07     = 0b0111,
-	ALCDecayTime_6s14     = 0b1000,
-	ALCDecayTime_12s29    = 0b1001,
-	ALCDecayTime_24s58    = 0b1010,
-	ALCDecayTime_49s15    = 0b1011,
-	ALCDecayTime_98s30    = 0b1100,
-	ALCDecayTime_196s61   = 0b1101,
-	ALCDecayTime_393s22   = 0b1110,
-	ALCDecayTime_786s43   = 0b1111
+	ALCDecayTime_1sec54   = 0b0110,
+	ALCDecayTime_3sec07   = 0b0111,
+	ALCDecayTime_6sec14   = 0b1000,
+	ALCDecayTime_12sec29  = 0b1001,
+	ALCDecayTime_24sec58  = 0b1010,
+	ALCDecayTime_49sec15  = 0b1011,
+	ALCDecayTime_98sec30  = 0b1100,
+	ALCDecayTime_196sec61 = 0b1101,
+	ALCDecayTime_393sec22 = 0b1110,
+	ALCDecayTime_786sec43 = 0b1111
 } AlxAdau1961_R13_ALCDecayTime;
 typedef enum
 {
@@ -489,14 +489,14 @@ typedef enum
 	ALCAttackTime_192ms    = 0b0101,
 	ALCAttackTime_384ms    = 0b0110,
 	ALCAttackTime_768ms    = 0b0111,
-	ALCAttackTime_1s54     = 0b1000,
-	ALCAttackTime_3s07     = 0b1001,
-	ALCAttackTime_6s14     = 0b1010,
-	ALCAttackTime_12s29    = 0b1011,
-	ALCAttackTime_24s58    = 0b1100,
-	ALCAttackTime_49s15    = 0b1101,
-	ALCAttackTime_98s30    = 0b1110,
-	ALCAttackTime_196s61   = 0b1111
+	ALCAttackTime_1sec54   = 0b1000,
+	ALCAttackTime_3sec07   = 0b1001,
+	ALCAttackTime_6sec14   = 0b1010,
+	ALCAttackTime_12sec29  = 0b1011,
+	ALCAttackTime_24sec58  = 0b1100,
+	ALCAttackTime_49sec15  = 0b1101,
+	ALCAttackTime_98sec30  = 0b1110,
+	ALCAttackTime_196sec61 = 0b1111
 } AlxAdau1961_R13_ALCAttackTime;
 typedef union
 {
