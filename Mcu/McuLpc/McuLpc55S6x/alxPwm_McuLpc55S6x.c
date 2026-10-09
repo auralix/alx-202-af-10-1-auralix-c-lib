@@ -91,8 +91,8 @@ void AlxPwm_Ctor
 	ALX_PWM_ASSERT((alxClk_Clk == AlxClk_Clk_McuLpc55s6x_MainClk_Ctor) || (alxClk_Clk == AlxClk_Clk_McuLpc55s6x_FroOsc_1MHz_Ctor));
 	ALX_PWM_ASSERT(prescaler == 0);														// MF: Do not understand how prescaler affect the PWM behaviour
 	for (uint8_t i = 0; i < numOfCh - 1; i++) ALX_PWM_ASSERT(chArr[i] < chArr[i + 1]);	// MF: Channel sequence must be from low to high number
-	ALX_PWM_ASSERT(AlxPwm_CheckIoPins(tim, ioPinArr, numOfCh));							// MF: Check if right pins are used
-	(void)AlxPwm_CheckIoPins;
+	ALX_UNUSED bool areIoPinsOk = AlxPwm_CheckIoPins(tim, ioPinArr, numOfCh);
+	ALX_PWM_ASSERT(areIoPinsOk);							// MF: Check if right pins are used
 
 	// Parameters
 	me->tim = tim;
