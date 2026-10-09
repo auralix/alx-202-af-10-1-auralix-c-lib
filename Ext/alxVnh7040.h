@@ -76,7 +76,7 @@ extern "C" {
 #if defined(ALX_VNH7040_TRACE_ENABLE)
 	#define ALX_VNH7040_TRACE_ERR(...) ALX_TRACE_ERR(ALX_VNH7040_FILE, __VA_ARGS__)
 #else
-	#define ALX_VNH7040_TRACE_ERR(...) do{} while (false)
+	#define ALX_VNH7040_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 #ifndef ALX_VNH7040_NO_PWM

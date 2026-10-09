@@ -73,7 +73,7 @@ extern "C" {
 #if defined(ALX_CLI_TRACE_ENABLE)
 	#define ALX_CLI_TRACE_WRN(...) ALX_TRACE_WRN(ALX_CLI_FILE, __VA_ARGS__)
 #else
-	#define ALX_CLI_TRACE_WRN(...) do{} while (false)
+	#define ALX_CLI_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

@@ -71,7 +71,7 @@ extern "C" {
 #if defined(ALX_VEML6040_TRACE_ENABLE)
 	#define ALX_VEML6040_TRACE_ERR(...) ALX_TRACE_ERR(ALX_VEML6040_FILE, __VA_ARGS__)
 #else
-	#define ALX_VEML6040_TRACE_ERR(...) do{} while (false)
+	#define ALX_VEML6040_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

@@ -72,8 +72,8 @@ extern "C" {
 	#define ALX_ADXL355_TRACE_ERR(...) ALX_TRACE_ERR(ALX_ADXL355_FILE, __VA_ARGS__)
 	#define ALX_ADXL355_TRACE_DBG(...) ALX_TRACE_DBG(ALX_ADXL355_FILE, __VA_ARGS__)
 #else
-	#define ALX_ADXL355_TRACE_ERR(...) do{} while (false)
-	#define ALX_ADXL355_TRACE_DBG(...) do{} while (false)
+	#define ALX_ADXL355_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_ADXL355_TRACE_DBG(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

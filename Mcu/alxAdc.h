@@ -95,9 +95,9 @@ typedef struct { bool dummy; } AlxAdc;
 	#define ALX_ADC_TRACE_DBG(...) ALX_TRACE_DBG(ALX_ADC_FILE, __VA_ARGS__)
 	#define ALX_ADC_TRACE_VRB(...) ALX_TRACE_VRB(ALX_ADC_FILE, __VA_ARGS__)
 #else
-	#define ALX_ADC_TRACE_ERR(...) do{} while (false)
-	#define ALX_ADC_TRACE_DBG(...) do{} while (false)
-	#define ALX_ADC_TRACE_VRB(...) do{} while (false)
+	#define ALX_ADC_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_ADC_TRACE_DBG(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_ADC_TRACE_VRB(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

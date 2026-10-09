@@ -303,7 +303,7 @@ extern "C" {
 #if defined(ALX_GLOBAL_TRACE_ENABLE)
 	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_GLOBAL_FILE, __VA_ARGS__)
 #else
-	#define ALX_GLOBAL_TRACE(...) do{} while (false)
+	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

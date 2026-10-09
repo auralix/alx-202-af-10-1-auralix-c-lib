@@ -71,7 +71,7 @@ extern "C" {
 #if defined(ALX_FIFO_TRACE_ENABLE)
 	#define ALX_FIFO_TRACE_WRN(...) ALX_TRACE_WRN(ALX_FIFO_FILE, __VA_ARGS__)
 #else
-	#define ALX_FIFO_TRACE_WRN(...) do{} while (false)
+	#define ALX_FIFO_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

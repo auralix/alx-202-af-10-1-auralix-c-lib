@@ -73,8 +73,8 @@ extern "C" {
 	#define ALX_FS_SAFE_TRACE_ERR(...) ALX_TRACE_ERR(ALX_FS_SAFE_FILE, __VA_ARGS__)
 	#define ALX_FS_SAFE_TRACE_INF(...) ALX_TRACE_INF(ALX_FS_SAFE_FILE, __VA_ARGS__)
 #else
-	#define ALX_FS_SAFE_TRACE_ERR(...) do{} while (false)
-	#define ALX_FS_SAFE_TRACE_INF(...) do{} while (false)
+	#define ALX_FS_SAFE_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_FS_SAFE_TRACE_INF(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

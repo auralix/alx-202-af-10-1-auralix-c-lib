@@ -70,7 +70,7 @@ extern "C" {
 #if defined(ALX_NET_TRACE_ENABLE)
 	#define ALX_NET_TRACE_ERR(...) ALX_TRACE_ERR(ALX_NET_FILE, __VA_ARGS__)
 #else
-	#define ALX_NET_TRACE_ERR(...) do{} while (false)
+	#define ALX_NET_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

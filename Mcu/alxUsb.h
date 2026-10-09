@@ -78,8 +78,8 @@ typedef struct { bool dummy; } AlxUsb;
 	#define ALX_USB_TRACE_ERR(...) ALX_TRACE_ERR(ALX_USB_FILE, __VA_ARGS__)
 	#define ALX_USB_TRACE_INF(...) ALX_TRACE_INF(ALX_USB_FILE, __VA_ARGS__)
 #else
-	#define ALX_USB_TRACE_ERR(...) do {} while (false)
-	#define ALX_USB_TRACE_INF(...) do {} while (false)
+	#define ALX_USB_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_USB_TRACE_INF(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

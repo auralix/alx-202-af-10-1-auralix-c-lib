@@ -78,7 +78,7 @@ typedef struct { bool dummy; } AlxI2s;
 #if defined(ALX_I2S_TRACE_ENABLE)
 	#define ALX_I2S_TRACE_ERR(...) ALX_TRACE_ERR(ALX_I2S_FILE, __VA_ARGS__)
 #else
-	#define ALX_I2S_TRACE_ERR(...) do{} while (false)
+	#define ALX_I2S_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

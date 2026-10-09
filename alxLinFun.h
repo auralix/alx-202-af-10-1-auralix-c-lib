@@ -70,7 +70,7 @@ extern "C" {
 #if defined(ALX_LIN_FUN_TRACE_ENABLE)
 	#define ALX_LIN_FUN_TRACE_WRN(...) ALX_TRACE_WRN(ALX_LIN_FUN_FILE, __VA_ARGS__)
 #else
-	#define ALX_LIN_FUN_TRACE_WRN(...) do{} while (false)
+	#define ALX_LIN_FUN_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

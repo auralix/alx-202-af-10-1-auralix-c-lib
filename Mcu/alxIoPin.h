@@ -93,7 +93,7 @@ typedef struct { bool dummy; } AlxIoPin;
 #if defined(ALX_IO_PIN_TRACE_ENABLE)
 	#define ALX_IO_PIN_TRACE_DBG(...) ALX_TRACE_DBG(ALX_IO_PIN_FILE, __VA_ARGS__)
 #else
-	#define ALX_IO_PIN_TRACE_DBG(...) do{} while (false)
+	#define ALX_IO_PIN_TRACE_DBG(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

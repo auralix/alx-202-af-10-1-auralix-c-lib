@@ -78,7 +78,7 @@ typedef struct { bool dummy; } AlxDac;
 #if defined(ALX_DAC_TRACE_ENABLE)
 	#define ALX_DAC_TRACE_ERR(...) ALX_TRACE_ERR(ALX_DAC_FILE, __VA_ARGS__)
 #else
-	#define ALX_DAC_TRACE_ERR(...) do{} while (false)
+	#define ALX_DAC_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

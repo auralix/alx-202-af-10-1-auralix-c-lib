@@ -86,41 +86,50 @@ typedef struct { bool dummy; } AlxTrace;
 
 #define ALX_TRACE_STR(str) do			{ AlxTrace_WriteStr(&alxTrace, str); } while(false)
 #define ALX_TRACE_FORMAT(...) do		{ AlxTrace_WriteFormat(&alxTrace, __VA_ARGS__); } while(false)
+// A disabled trace: its format and arguments stay compiled and referenced and are never evaluated,
+// as a disabled assertion's expression is (decision 14, D51). AlxTrace_Off is declared and never
+// defined: the operand of sizeof calls nothing, and clang checks the format against the
+// arguments there (gcc does not look inside sizeof).
+// A coverage build defines it as ((void)0): clang's coverage maps the && || ?: of the sizeof
+// operand as branches that never run.
+#ifndef ALX_TRACE_OFF
+#define ALX_TRACE_OFF(...) ((void)sizeof(AlxTrace_Off(__VA_ARGS__)))
+#endif
 
 #if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_FTL
 	#define ALX_TRACE_FTL(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_FTL, file, __LINE__, __func__, __VA_ARGS__); } while(false)
 #else
-	#define ALX_TRACE_FTL(file, ...) do {} while(false)
+	#define ALX_TRACE_FTL(file, ...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 #if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_ERR
 	#define ALX_TRACE_ERR(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_ERR, file, __LINE__, __func__, __VA_ARGS__); } while(false)
 #else
-	#define ALX_TRACE_ERR(file, ...) do {} while(false)
+	#define ALX_TRACE_ERR(file, ...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 #if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_WRN
 	#define ALX_TRACE_WRN(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_WRN, file, __LINE__, __func__, __VA_ARGS__); } while(false)
 #else
-	#define ALX_TRACE_WRN(file, ...) do {} while(false)
+	#define ALX_TRACE_WRN(file, ...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 #if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_INF
 	#define ALX_TRACE_INF(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_INF, file, __LINE__, __func__, __VA_ARGS__); } while(false)
 #else
-	#define ALX_TRACE_INF(file, ...) do {} while(false)
+	#define ALX_TRACE_INF(file, ...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 #if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_DBG
 	#define ALX_TRACE_DBG(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_DBG, file, __LINE__, __func__, __VA_ARGS__); } while(false)
 #else
-	#define ALX_TRACE_DBG(file, ...) do {} while(false)
+	#define ALX_TRACE_DBG(file, ...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 #if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 	#define ALX_TRACE_VRB(file, ...) do { AlxTrace_WriteLevel(&alxTrace, ALX_TRACE_LEVEL_VRB, file, __LINE__, __func__, __VA_ARGS__); } while(false)
 #else
-	#define ALX_TRACE_VRB(file, ...) do {} while(false)
+	#define ALX_TRACE_VRB(file, ...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -138,6 +147,7 @@ Alx_Status AlxTrace_DeInit(AlxTrace* me);
 Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str);
 void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...) ALX_PRINTF_FORMAT(2, 3);
 void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t line, const char* fun, const char* format, ...) ALX_PRINTF_FORMAT(6, 7);
+int32_t AlxTrace_Off(const char* format, ...) ALX_PRINTF_FORMAT(1, 2);
 
 
 #endif	// #if defined(ALX_C_LIB)

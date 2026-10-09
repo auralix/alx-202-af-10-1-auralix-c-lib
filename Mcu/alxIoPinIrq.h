@@ -83,7 +83,7 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 #if defined(ALX_IO_PIN_IRQ_TRACE_ENABLE)
 	#define ALX_IO_PIN_IRQ_TRACE_WRN(...) ALX_TRACE_WRN(ALX_IO_PIN_IRQ_FILE, __VA_ARGS__)
 #else
-	#define ALX_IO_PIN_IRQ_TRACE_WRN(...) do{} while (false)
+	#define ALX_IO_PIN_IRQ_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

@@ -73,7 +73,7 @@ extern "C" {
 #if defined(ALX_PCAL6416A_TRACE_ENABLE)
 	#define ALX_PCAL6416A_TRACE_ERR(...) ALX_TRACE_ERR(ALX_PCAL6416A_FILE, __VA_ARGS__)
 #else
-	#define ALX_PCAL6416A_TRACE_ERR(...) do{} while (false)
+	#define ALX_PCAL6416A_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

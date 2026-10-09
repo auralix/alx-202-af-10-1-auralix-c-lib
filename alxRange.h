@@ -70,7 +70,7 @@ extern "C" {
 #if defined(ALX_RANGE_TRACE_ENABLE)
 	#define ALX_RANGE_TRACE_WRN(...) ALX_TRACE_WRN(ALX_RANGE_FILE, __VA_ARGS__)
 #else
-	#define ALX_RANGE_TRACE_WRN(...) do{} while (false)
+	#define ALX_RANGE_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

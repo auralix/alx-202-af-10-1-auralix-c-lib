@@ -70,7 +70,7 @@ extern "C" {
 #if defined(ALX_FTOA_TRACE_ENABLE)
 	#define ALX_FTOA_TRACE_WRN(...) ALX_TRACE_WRN(ALX_FTOA_FILE, __VA_ARGS__)
 #else
-	#define ALX_FTOA_TRACE_WRN(...) do{} while (false)
+	#define ALX_FTOA_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

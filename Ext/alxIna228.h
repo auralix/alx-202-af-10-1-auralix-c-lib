@@ -73,8 +73,8 @@ extern "C" {
 	#define ALX_INA228_TRACE_ERR(...) ALX_TRACE_ERR(ALX_INA228_FILE, __VA_ARGS__)
 	#define ALX_INA228_TRACE_DBG(...) ALX_TRACE_DBG(ALX_INA228_FILE, __VA_ARGS__)
 #else
-	#define ALX_INA228_TRACE_ERR(...) do{} while (false)
-	#define ALX_INA228_TRACE_DBG(...) do{} while (false)
+	#define ALX_INA228_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_INA228_TRACE_DBG(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

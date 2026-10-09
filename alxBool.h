@@ -72,7 +72,7 @@ extern "C" {
 #if defined(ALX_BOOL_TRACE_ENABLE)
 	#define ALX_BOOL_TRACE_WRN(...) ALX_TRACE_WRN(ALX_BOOL_FILE, __VA_ARGS__)
 #else
-	#define ALX_BOOL_TRACE_WRN(...) do{} while (false)
+	#define ALX_BOOL_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
