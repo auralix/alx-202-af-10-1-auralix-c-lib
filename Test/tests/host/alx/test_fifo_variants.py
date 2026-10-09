@@ -14,9 +14,9 @@ rather than a build option. Each variant reaches something none of the others do
 
     default       what customers get - alxConfig_TEMPLATE.h's own combination. Must stay green.
     off           the elision configuration: no assert macro, no traces, so both collapse to
-                  do{} while(false). This is the shape of the biggest defect ALX-1553 found, and
-                  P526 is where it is pinned so it cannot come back unnoticed.
-    debug         the only variant that COMPILES the DBG and VRB trace call sites at all.
+                  ALX_ASSERT_OFF and ALX_TRACE_OFF. This is the shape of the biggest defect
+                  ALX-1553 found, and P526 is where it is pinned so it cannot come back unnoticed.
+    debug         the only variant that RUNS the DBG and VRB trace call sites at all.
     assert_trace  the form where a failed assertion reports and CONTINUES, rather than resetting.
 
 Two honest limits on what this pilot proves.

@@ -12,9 +12,9 @@ TWO GATES, AND THEY ARE INDEPENDENT. A trace call site survives compilation only
     gate A   ALX_LIN_TRACE_ENABLE           alxLin.h:74     the module's own switch
     gate B   ALX_TRACE_LEVEL >= <level>     alxTrace.h:93   the global threshold
 
-Either one closed replaces the macro with `do {} while(false)` TAKING NO PARAMETERS, so the file,
-the line, the function and every variadic argument are deleted by the preprocessor and never
-evaluated. That is the same shape as the assertion elision this task started from (NotesClaude 3g),
+Either one closed replaces the call with ALX_TRACE_OFF (decision 14), so the file, the line and the
+function are dropped and every variadic argument is compiled and never evaluated. That is the same
+shape as the assertion elision this task started from (NotesClaude 3g),
 and it is why the tests below count ARGUMENT EVALUATIONS and not just calls: a trace that is off
 and a trace that is absent look identical from the outside, and only the argument tells them apart.
 
@@ -137,10 +137,10 @@ def test_ALX1553_P533_the_binary_reports_the_level_its_variant_asked_for(lin_var
 def test_ALX1553_P534_the_modules_own_switch_discards_the_argument(lin_variant):
     """Gate A, alxLin.h:74 - and the reason it has to be measured by its ARGUMENT.
 
-    In `off` no ALX_LIN_TRACE_ENABLE is defined, so every ALX_LIN_TRACE_* becomes an empty
-    do{} while(false) and the expression inside it is deleted rather than skipped. The probe's
-    argument is a function call that increments a counter, so a counter that never moves is an
-    expression that was never compiled.
+    In `off` no ALX_LIN_TRACE_ENABLE is defined, so every ALX_LIN_TRACE_* becomes ALX_TRACE_OFF
+    and the expression inside it is compiled and never evaluated. The probe's argument is a
+    function call that increments a counter, so a counter that never moves is an expression that
+    was never evaluated.
     """
     name, lib = lin_variant
     lib.trace_reset()

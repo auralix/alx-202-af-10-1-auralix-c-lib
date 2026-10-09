@@ -1551,7 +1551,7 @@ ASSERT_EXPORTS = build_tools.Exports("alxAssertTest", (
 #
 # Assertions come from _assert_defines, which reads ALX_MEM_RAW_ASSERT_BKPT_ENABLE out of
 # alxMemRaw.h and derives the RST form - do NOT hand-write it. Note what that define is doing here:
-# without it the module's own macro is do{} while (false) and DISCARDS the expression, so a product
+# without it the module's own macro is ALX_ASSERT_OFF and never evaluates the expression, so a product
 # that forgets its override gets Alx_Ok, an untouched buffer and no diagnostic at all. alxMemRaw.c
 # compiles clean under the full strict set, so neither DLL needs a closure.
 MEMRAW_SOURCES = [
@@ -2830,7 +2830,7 @@ DLL_GROUPS = [
 
 # ------------------------------------- the library's own assertions, per group -----
 # A module built with no ALX_<MODULE>_ASSERT_*_ENABLE macro compiles its assertions down to
-# do{} while(false) and DISCARDS the expression - the invariant is not weakened, it is absent.
+# ALX_ASSERT_OFF, which never evaluates the expression - the invariant is not weakened, it is absent.
 # Seventeen groups here were doing that until 11.09, when the device repository's mutation lane
 # found the same thing: mutants that inverted an assertion survived, because there was nothing
 # left of it to change.
@@ -2873,17 +2873,18 @@ def _assert_defines(*source_lists) -> list[str]:
 # own trace on or off, times the global ALX_TRACE_LEVEL - eight compiled behaviours from one source
 # file, across 12 assert sites. Until 11.09 this suite built exactly ONE of them, did not say which,
 # and it was not a combination any product ships: assert-RST like the shipped configuration, but
-# ALX_TRACE_LEVEL_OFF, which compiles all 549 of the library's trace call sites away AND DISCARDS
-# their arguments.
+# ALX_TRACE_LEVEL_OFF, which compiles all 549 of the library's trace call sites away and never
+# evaluates their arguments.
 #
 # These four are the standard set. Each earns its place by reaching something none of the others do:
 #
 #   default       what customers get - alxConfig_TEMPLATE.h's own combination. Must always be green.
 #   off           the elision configuration. No assert macro and no traces, so both collapse to
-#                 do{} while(false) and discard their expressions - the shape of the biggest defect
-#                 ALX-1553 found (NotesClaude 3g), pinned here so it cannot come back unnoticed.
-#   debug         the only variant that COMPILES the DBG and VRB call sites, so a wrong format
-#                 string or argument count in one of them is visible at all.
+#                 ALX_ASSERT_OFF and ALX_TRACE_OFF and never evaluate their expressions - the shape
+#                 of the biggest defect ALX-1553 found (NotesClaude 3g), pinned here so it cannot
+#                 come back unnoticed.
+#   debug         the only variant that RUNS the DBG and VRB call sites, so what one of them
+#                 prints is visible at all.
 #   assert_trace  the only form where a failed assertion CONTINUES into the code after the check.
 #                 RST resets and BKPT halts; this one carries on with the precondition violated.
 #
