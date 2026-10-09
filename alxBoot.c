@@ -438,9 +438,8 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	uint32_t fwCandDiscovery_ExecutionTime_sec = AlxTimSw_Get_sec(&fwCandDiscovery_AlxTimSw);
+	ALX_UNUSED uint32_t fwCandDiscovery_ExecutionTime_sec = AlxTimSw_Get_sec(&fwCandDiscovery_AlxTimSw);
 	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Discovery DONE - Execution Time: %" PRIu32 " sec", fwCandDiscovery_ExecutionTime_sec);
-	(void)fwCandDiscovery_ExecutionTime_sec;
 
 
 
@@ -534,9 +533,8 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	uint32_t fwCandStaging_ExecutionTime_sec = AlxTimSw_Get_sec(&fwCandStaging_AlxTimSw);
+	ALX_UNUSED uint32_t fwCandStaging_ExecutionTime_sec = AlxTimSw_Get_sec(&fwCandStaging_AlxTimSw);
 	ALX_BOOT_TRACE_INF("AlxBoot_App_Usb - FW Candidate Staging DONE - Execution Time: %" PRIu32 " sec", fwCandStaging_ExecutionTime_sec);
-	(void)fwCandStaging_ExecutionTime_sec;
 
 
 
@@ -635,9 +633,8 @@ Alx_Status AlxBoot_Boot_Run(AlxBoot* me)
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	uint32_t bootRun_ExecutionTime_sec = AlxTimSw_Get_sec(&bootRun_AlxTimSw);
+	ALX_UNUSED uint32_t bootRun_ExecutionTime_sec = AlxTimSw_Get_sec(&bootRun_AlxTimSw);
 	ALX_BOOT_TRACE_INF("AlxBoot_Boot_Run - DONE - Ready to jump to application - Execution Time: %" PRIu32 " sec", bootRun_ExecutionTime_sec);
-	(void)bootRun_ExecutionTime_sec;
 
 
 	//------------------------------------------------------------------------------
