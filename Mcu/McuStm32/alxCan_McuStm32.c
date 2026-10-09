@@ -130,8 +130,8 @@ void AlxCan_Ctor
 	me->rxFifoBuffLen = rxFifoBuffLen;
 	me->txIrqPriority = txIrqPriority;
 	me->rxIrqPriority = rxIrqPriority;
-	ALX_CAN_ASSERT(AlxCan_Ctor_IsClkOk(me));
-	(void)AlxCan_Ctor_IsClkOk;
+	ALX_UNUSED bool isClkOk = AlxCan_Ctor_IsClkOk(me);
+	ALX_CAN_ASSERT(isClkOk);
 
 
 	//------------------------------------------------------------------------------
