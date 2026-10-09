@@ -754,10 +754,6 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 	// Assert
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
 	ALX_I2C_ASSERT(me->isInit == true);
-	(void)me;
-	(void)slaveAddr;
-	(void)numOfTries;
-	(void)timeout_ms;
 
 	// Trace
 	ALX_I2C_TRACE_DBG("EXIT: deviceName %s", me->deviceName);
