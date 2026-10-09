@@ -64,7 +64,7 @@ extern "C" {
 #elif defined(ALX_NTCG103JF103FT1S_ASSERT_RST_ENABLE)
 	#define ALX_NTCG103JF103FT1S_ASSERT(expr) ALX_ASSERT_RST(ALX_NTCG103JF103FT1S_FILE, expr)
 #else
-	#define ALX_NTCG103JF103FT1S_ASSERT(expr) do{} while (false)
+	#define ALX_NTCG103JF103FT1S_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

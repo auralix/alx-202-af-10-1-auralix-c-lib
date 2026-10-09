@@ -71,7 +71,7 @@ typedef struct { bool dummy; } AlxDac;
 #elif defined(ALX_DAC_ASSERT_RST_ENABLE)
 	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_RST(ALX_DAC_FILE, expr)
 #else
-	#define ALX_DAC_ASSERT(expr) do{} while (false)
+	#define ALX_DAC_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_AUDIO_ASSERT_RST_ENABLE)
 	#define ALX_AUDIO_ASSERT(expr) ALX_ASSERT_RST(ALX_AUDIO_FILE, expr)
 #else
-	#define ALX_AUDIO_ASSERT(expr) do{} while (false)
+	#define ALX_AUDIO_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

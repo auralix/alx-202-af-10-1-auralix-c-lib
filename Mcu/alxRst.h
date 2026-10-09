@@ -70,7 +70,7 @@ typedef struct { bool dummy; } AlxRst;
 #elif defined(ALX_RST_ASSERT_RST_ENABLE)
 	#define ALX_RST_ASSERT(expr) ALX_ASSERT_RST(ALX_RST_FILE, expr)
 #else
-	#define ALX_RST_ASSERT(expr) do{} while (false)
+	#define ALX_RST_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

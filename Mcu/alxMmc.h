@@ -70,7 +70,7 @@ typedef struct { bool dummy; } AlxMmc;
 #elif defined(ALX_MMC_ASSERT_RST_ENABLE)
 	#define ALX_MMC_ASSERT(expr) ALX_ASSERT_RST(ALX_MMC_FILE, expr)
 #else
-	#define ALX_MMC_ASSERT(expr) do{} while (false)
+	#define ALX_MMC_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

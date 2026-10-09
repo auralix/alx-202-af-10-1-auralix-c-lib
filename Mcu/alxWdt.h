@@ -76,7 +76,7 @@ typedef struct { bool dummy; } AlxWdt;
 #elif defined(ALX_WDT_ASSERT_RST_ENABLE)
 	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_RST(ALX_WDT_FILE, expr)
 #else
-	#define ALX_WDT_ASSERT(expr) do{} while (false)
+	#define ALX_WDT_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

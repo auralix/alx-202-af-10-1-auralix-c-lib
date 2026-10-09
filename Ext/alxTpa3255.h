@@ -65,7 +65,7 @@ extern "C" {
 #elif defined(ALX_TPA3255_ASSERT_RST_ENABLE)
 	#define ALX_TPA3255_ASSERT(expr) ALX_ASSERT_RST(ALX_TPA3255_FILE, expr)
 #else
-	#define ALX_TPA3255_ASSERT(expr) do{} while (false)
+	#define ALX_TPA3255_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

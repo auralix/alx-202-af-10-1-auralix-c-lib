@@ -65,7 +65,7 @@ extern "C" {
 #elif defined(ALX_FS_SAFE_ASSERT_RST_ENABLE)
 	#define ALX_FS_SAFE_ASSERT(expr) ALX_ASSERT_RST(ALX_FS_SAFE_FILE, expr)
 #else
-	#define ALX_FS_SAFE_ASSERT(expr) do{} while (false)
+	#define ALX_FS_SAFE_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

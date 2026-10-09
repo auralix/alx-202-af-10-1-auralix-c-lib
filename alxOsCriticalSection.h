@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_OS_CRITICAL_SECTION_ASSERT_RST_ENABLE)
 	#define ALX_OS_CRITICAL_SECTION_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_CRITICAL_SECTION_FILE, expr)
 #else
-	#define ALX_OS_CRITICAL_SECTION_ASSERT(expr) do{} while (false)
+	#define ALX_OS_CRITICAL_SECTION_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

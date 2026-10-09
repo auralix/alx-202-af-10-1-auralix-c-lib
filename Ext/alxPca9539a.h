@@ -66,7 +66,7 @@ extern "C" {
 #elif defined(ALX_PCA9539A_ASSERT_RST_ENABLE)
 	#define ALX_PCA9539A_ASSERT(expr) ALX_ASSERT_RST(ALX_PCA9539A_FILE, expr)
 #else
-	#define ALX_PCA9539A_ASSERT(expr) do{} while (false)
+	#define ALX_PCA9539A_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

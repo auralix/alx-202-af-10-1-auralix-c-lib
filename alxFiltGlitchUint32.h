@@ -64,7 +64,7 @@ extern "C" {
 #elif defined(ALX_FILT_GLITCH_UINT32_ASSERT_RST_ENABLE)
 	#define ALX_FILT_GLITCH_UINT32_ASSERT(expr) ALX_ASSERT_RST(ALX_FILT_GLITCH_UINT32_FILE, expr)
 #else
-	#define ALX_FILT_GLITCH_UINT32_ASSERT(expr) do{} while (false)
+	#define ALX_FILT_GLITCH_UINT32_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

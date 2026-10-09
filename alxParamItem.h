@@ -67,7 +67,7 @@ extern "C" {
 #elif defined(ALX_PARAM_ITEM_ASSERT_RST_ENABLE)
 	#define ALX_PARAM_ITEM_ASSERT(expr) ALX_ASSERT_RST(ALX_PARAM_ITEM_FILE, expr)
 #else
-	#define ALX_PARAM_ITEM_ASSERT(expr) do{} while (false)
+	#define ALX_PARAM_ITEM_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

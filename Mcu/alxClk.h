@@ -79,7 +79,7 @@ typedef struct { bool dummy; } AlxClk;
 #elif defined(ALX_CLK_ASSERT_RST_ENABLE)
 	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_RST(ALX_CLK_FILE, expr)
 #else
-	#define ALX_CLK_ASSERT(expr) do{} while (false)
+	#define ALX_CLK_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

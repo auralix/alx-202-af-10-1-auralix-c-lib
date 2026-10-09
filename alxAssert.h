@@ -55,6 +55,15 @@ extern "C" {
 #define ALX_ASSERT_BKPT(file, expr) if (expr) {} else { AlxAssert_Bkpt(file, __LINE__, __func__); }
 #define ALX_ASSERT_TRACE(file, expr) if (expr) {} else { AlxAssert_Trace(file, __LINE__, __func__); }
 #define ALX_ASSERT_RST(file, expr) if (expr) {} else { AlxAssert_Rst(file, __LINE__, __func__); }
+// A disabled assertion: its expression stays compiled and referenced and is never evaluated, so a
+// variable only assertions read is still read (decision 14, D51). The operand of sizeof generates
+// no code; one expression, no do-while, leaves no branch for coverage to count; the ! makes a
+// bit-field a valid operand.
+// A coverage build defines it as ((void)0): clang's coverage maps the && || ?: of the sizeof
+// operand as branches that never run.
+#ifndef ALX_ASSERT_OFF
+#define ALX_ASSERT_OFF(expr) ((void)sizeof(!(expr)))
+#endif
 
 
 //******************************************************************************

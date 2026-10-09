@@ -367,6 +367,7 @@ MEMRAW_TESTS = ["test_mem_raw.py"]
 # assertions compiled out and the findings never arise. Its effect is proved instead by
 # test_assert.py P515, which is where a consumer should look before adopting it.
 
+COVERAGE_ASSERT_OFF = "-DALX_ASSERT_OFF(expr)=((void)0)"   # the coverage builds' disabled assertion
 UBSAN = list(hb.UBSAN)                 # the instrumented variants are the library's flag sets: one
 ASAN_UBSAN = list(hb.ASAN_UBSAN)       # definition for every C repository, not a copy per noxfile
 PROFILE = list(hb.PROFILE)
@@ -779,17 +780,20 @@ def _llvm_cov_group(session: nox.Session, out: Path, dll: Path, env_var: str, te
 @nox.session
 def coverage(session: nox.Session) -> None:
     """COVERAGE: clang-instrumented DLL per test group, the same suite, llvm-cov + cobertura, gate per file."""
+    # A disabled assertion keeps its expression in a sizeof (decision 14); clang's coverage still maps the
+    # && || ?: of that operand as branches that never run, so every coverage build disables assertions
+    # with nothing at all. Coverage builds are measured, never analysed.
     _guard(session, _check_ms_tests)
     _fresh_dev_build(session)
     out = lanes.evidence_dir(TEST, "coverage")
-    _instrumented_dll(out / "alxFifoTest.dll", FIFO_SOURCES, FIFO_EXPORTS, PROFILE)
+    _instrumented_dll(out / "alxFifoTest.dll", FIFO_SOURCES, FIFO_EXPORTS, PROFILE, defines=[COVERAGE_ASSERT_OFF])
     _llvm_cov_group(session, out, out / "alxFifoTest.dll", "ALX_FIFO_TEST_DLL", [],
                     "lines,branches,regions,functions", ["alxFifo.c", "alxBound.c"])
     # MemSafe group: gate = functions 100 %; lines/branches are REPORTED - alxMemSafe.c keeps three blocks unreachable
     # with asserts ON and alxCrc.c has `break` after `return` plus assert-guarded default branches (task notes).
     ms = lanes.evidence_dir(TEST, "coverage", "memsafe")
     _instrumented_dll(ms / "alxMemSafeTest.dll", MS_STRICT, MS_EXPORTS, PROFILE, closure=MS_CLOSURE,
-                      defines=MS_ASSERTS, obj_dir=ms / "closure")
+                      defines=[*MS_ASSERTS, COVERAGE_ASSERT_OFF], obj_dir=ms / "closure")
     # alxFtoa.c and alxParamGroup.c join the gate now that the report is honest about them; both
     # measure 100 % of functions. alxRange.c is 11 of 12 and cannot - the one function never
     # executed is AlxRange_CheckArr, the unimplemented stub Stage 5b names for falling off the end
@@ -805,7 +809,7 @@ def coverage(session: nox.Session) -> None:
     # dropped from ID_EXPORTS and so from every test, fails this lane.
     idg = lanes.evidence_dir(TEST, "coverage", "id")
     _instrumented_dll(idg / "alxIdTest.dll", ID_STRICT, ID_EXPORTS, PROFILE, closure=ID_CLOSURE,
-                      defines=ID_ASSERTS, obj_dir=idg / "closure")
+                      defines=[*ID_ASSERTS, COVERAGE_ASSERT_OFF], obj_dir=idg / "closure")
     _llvm_cov_group(session, idg, idg / "alxIdTest.dll", "ALX_ID_TEST_DLL", ID_TESTS,
                     "functions", ["alxId.c"])
     # MemRaw group: gate = functions 100 % over alxMemRaw.c, measured from the WEAK DLL and ONLY
@@ -816,7 +820,7 @@ def coverage(session: nox.Session) -> None:
     # absent on purpose - the reason is written at its declaration above.
     mr = lanes.evidence_dir(TEST, "coverage", "memraw")
     _instrumented_dll(mr / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_EXPORTS, PROFILE,
-                      defines=MEMRAW_ASSERTS)
+                      defines=[*MEMRAW_ASSERTS, COVERAGE_ASSERT_OFF])
     _llvm_cov_group(session, mr, mr / "alxMemRawTest.dll", "ALX_MEMRAW_TEST_DLL", MEMRAW_TESTS,
                     "functions", ["alxMemRaw.c"])
     session.log("COVERAGE GATES PASS")

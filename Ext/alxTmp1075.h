@@ -66,7 +66,7 @@ extern "C" {
 #elif defined(ALX_TMP1075_ASSERT_RST_ENABLE)
 	#define ALX_TMP1075_ASSERT(expr) ALX_ASSERT_RST(ALX_TMP1075_FILE, expr)
 #else
-	#define ALX_TMP1075_ASSERT(expr) do{} while (false)
+	#define ALX_TMP1075_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

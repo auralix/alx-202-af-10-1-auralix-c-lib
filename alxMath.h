@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_MATH_ASSERT_RST_ENABLE)
 	#define ALX_MATH_ASSERT(expr) ALX_ASSERT_RST(ALX_MATH_FILE, expr)
 #else
-	#define ALX_MATH_ASSERT(expr) do{} while (false)
+	#define ALX_MATH_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

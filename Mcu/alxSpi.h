@@ -77,7 +77,7 @@ typedef struct { bool dummy; } AlxSpi;
 #elif defined(ALX_SPI_ASSERT_RST_ENABLE)
 	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_RST(ALX_SPI_FILE, expr)
 #else
-	#define ALX_SPI_ASSERT(expr) do{} while (false)
+	#define ALX_SPI_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

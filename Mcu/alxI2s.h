@@ -71,7 +71,7 @@ typedef struct { bool dummy; } AlxI2s;
 #elif defined(ALX_I2S_ASSERT_RST_ENABLE)
 	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_RST(ALX_I2S_FILE, expr)
 #else
-	#define ALX_I2S_ASSERT(expr) do{} while (false)
+	#define ALX_I2S_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

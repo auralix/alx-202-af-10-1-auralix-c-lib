@@ -66,7 +66,7 @@ extern "C" {
 #elif defined(ALX_TEMP_SENS_RTD_VDIV_ASSERT_RST_ENABLE)
 	#define ALX_TEMP_SENS_RTD_VDIV_ASSERT(expr) ALX_ASSERT_RST(ALX_TEMP_SENS_RTD_VDIV_FILE, expr)
 #else
-	#define ALX_TEMP_SENS_RTD_VDIV_ASSERT(expr) do{} while (false)
+	#define ALX_TEMP_SENS_RTD_VDIV_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

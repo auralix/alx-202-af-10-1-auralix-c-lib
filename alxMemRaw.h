@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_MEM_RAW_ASSERT_RST_ENABLE)
 	#define ALX_MEM_RAW_ASSERT(expr) ALX_ASSERT_RST(ALX_MEM_RAW_FILE, expr)
 #else
-	#define ALX_MEM_RAW_ASSERT(expr) do{} while (false)
+	#define ALX_MEM_RAW_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

@@ -66,7 +66,7 @@ extern "C" {
 #elif defined(ALX_CLI_ASSERT_RST_ENABLE)
 	#define ALX_CLI_ASSERT(expr) ALX_ASSERT_RST(ALX_CLI_FILE, expr)
 #else
-	#define ALX_CLI_ASSERT(expr) do{} while (false)
+	#define ALX_CLI_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

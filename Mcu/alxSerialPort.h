@@ -76,7 +76,7 @@ typedef struct { bool dummy; } AlxSerialPort;
 #elif defined(ALX_SERIAL_PORT_ASSERT_RST_ENABLE)
 	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_RST(ALX_SERIAL_PORT_FILE, expr)
 #else
-	#define ALX_SERIAL_PORT_ASSERT(expr) do{} while (false)
+	#define ALX_SERIAL_PORT_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

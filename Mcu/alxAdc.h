@@ -86,7 +86,7 @@ typedef struct { bool dummy; } AlxAdc;
 #elif defined(ALX_ADC_ASSERT_RST_ENABLE)
 	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_RST(ALX_ADC_FILE, expr)
 #else
-	#define ALX_ADC_ASSERT(expr) do{} while (false)
+	#define ALX_ADC_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_NET_ASSERT_RST_ENABLE)
 	#define ALX_NET_ASSERT(expr) ALX_ASSERT_RST(ALX_NET_FILE, expr)
 #else
-	#define ALX_NET_ASSERT(expr) do{} while (false)
+	#define ALX_NET_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

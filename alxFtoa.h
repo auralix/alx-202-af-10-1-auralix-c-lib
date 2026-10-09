@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_FTOA_ASSERT_RST_ENABLE)
 	#define ALX_FTOA_ASSERT(expr) ALX_ASSERT_RST(ALX_FTOA_FILE, expr)
 #else
-	#define ALX_FTOA_ASSERT(expr) do{} while (false)
+	#define ALX_FTOA_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

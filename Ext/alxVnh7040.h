@@ -69,7 +69,7 @@ extern "C" {
 #elif defined(ALX_VNH7040_ASSERT_RST_ENABLE)
 	#define ALX_VNH7040_ASSERT(expr) ALX_ASSERT_RST(ALX_VNH7040_FILE, expr)
 #else
-	#define ALX_VNH7040_ASSERT(expr) do{} while (false)
+	#define ALX_VNH7040_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

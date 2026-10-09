@@ -76,7 +76,7 @@ typedef struct { bool dummy; } AlxIoPinIrq;
 #elif defined(ALX_IO_PIN_IRQ_ASSERT_RST_ENABLE)
 	#define ALX_IO_PIN_IRQ_ASSERT(expr) ALX_ASSERT_RST(ALX_IO_PIN_IRQ_FILE, expr)
 #else
-	#define ALX_IO_PIN_IRQ_ASSERT(expr) do{} while (false)
+	#define ALX_IO_PIN_IRQ_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

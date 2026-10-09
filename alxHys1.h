@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_HYS1_ASSERT_RST_ENABLE)
 	#define ALX_HYS1_ASSERT(expr) ALX_ASSERT_RST(ALX_HYS1_FILE, expr)
 #else
-	#define ALX_HYS1_ASSERT(expr) do{} while (false)
+	#define ALX_HYS1_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_LFS_CONFIG_ASSERT_RST_ENABLE)
     #define LFS_ASSERT(expr) ALX_ASSERT_RST(ALX_LFS_CONFIG_FILE, expr)
 #else
-    #define LFS_ASSERT(expr) do{} while (false)
+    #define LFS_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

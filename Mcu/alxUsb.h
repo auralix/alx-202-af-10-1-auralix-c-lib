@@ -70,7 +70,7 @@ typedef struct { bool dummy; } AlxUsb;
 #elif defined(ALX_USB_ASSERT_RST_ENABLE)
 	#define ALX_USB_ASSERT(expr) ALX_ASSERT_RST(ALX_USB_FILE, expr)
 #else
-	#define ALX_USB_ASSERT(expr) do{} while (false)
+	#define ALX_USB_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

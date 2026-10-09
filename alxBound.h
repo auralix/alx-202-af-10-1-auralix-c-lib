@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_BOUND_ASSERT_RST_ENABLE)
 	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_RST(ALX_BOUND_FILE, expr)
 #else
-	#define ALX_BOUND_ASSERT(expr) do{} while (false)
+	#define ALX_BOUND_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

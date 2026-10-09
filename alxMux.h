@@ -64,7 +64,7 @@ extern "C" {
 #elif defined(ALX_MUX_ASSERT_RST_ENABLE)
 	#define ALX_MUX_ASSERT(expr) ALX_ASSERT_RST(ALX_MUX_FILE, expr)
 #else
-	#define ALX_MUX_ASSERT(expr) do{} while (false)
+	#define ALX_MUX_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

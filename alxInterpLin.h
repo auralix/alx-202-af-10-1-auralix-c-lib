@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_INTERP_LIN_ASSERT_RST_ENABLE)
 	#define ALX_INTERP_LIN_ASSERT(expr) ALX_ASSERT_RST(ALX_INTERP_LIN_FILE, expr)
 #else
-	#define ALX_INTERP_LIN_ASSERT(expr) do{} while (false)
+	#define ALX_INTERP_LIN_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

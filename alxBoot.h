@@ -67,7 +67,7 @@ extern "C" {
 #elif defined(ALX_BOOT_ASSERT_RST_ENABLE)
 	#define ALX_BOOT_ASSERT(expr) ALX_ASSERT_RST(ALX_BOOT_FILE, expr)
 #else
-	#define ALX_BOOT_ASSERT(expr) do{} while (false)
+	#define ALX_BOOT_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

@@ -64,7 +64,7 @@ extern "C" {
 #elif defined(ALX_FIFO_ASSERT_RST_ENABLE)
 	#define ALX_FIFO_ASSERT(expr) ALX_ASSERT_RST(ALX_FIFO_FILE, expr)
 #else
-	#define ALX_FIFO_ASSERT(expr) do{} while (false)
+	#define ALX_FIFO_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

@@ -64,7 +64,7 @@ extern "C" {
 #elif defined(ALX_PARAM_KV_STORE_ASSERT_RST_ENABLE)
 	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_RST(ALX_PARAM_KV_STORE_FILE, expr)
 #else
-	#define ALX_PARAM_KV_STORE_ASSERT(expr) do{} while (false)
+	#define ALX_PARAM_KV_STORE_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

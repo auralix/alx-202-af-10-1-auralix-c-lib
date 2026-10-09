@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_AVG_ASSERT_RST_ENABLE)
 	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_RST(ALX_AVG_FILE, expr)
 #else
-	#define ALX_AVG_ASSERT(expr) do{} while (false)
+	#define ALX_AVG_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

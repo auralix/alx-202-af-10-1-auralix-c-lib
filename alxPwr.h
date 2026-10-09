@@ -68,7 +68,7 @@ extern "C" {
 #elif defined(ALX_PWR_ASSERT_RST_ENABLE)
 	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_RST(ALX_PWR_FILE, expr)
 #else
-	#define ALX_PWR_ASSERT(expr) do{} while (false)
+	#define ALX_PWR_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

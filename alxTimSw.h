@@ -65,7 +65,7 @@ extern "C" {
 #elif defined(ALX_TIM_SW_ASSERT_RST_ENABLE)
 	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_RST(ALX_TIM_SW_FILE, expr)
 #else
-	#define ALX_TIM_SW_ASSERT(expr) do{} while (false)
+	#define ALX_TIM_SW_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //

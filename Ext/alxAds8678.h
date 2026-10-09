@@ -64,7 +64,7 @@ extern "C" {
 #elif defined(ALX_ADS8678_ASSERT_RST_ENABLE)
 	#define ALX_ADS8678_ASSERT(expr) ALX_ASSERT_RST(ALX_ADS8678_FILE, expr)
 #else
-	#define ALX_ADS8678_ASSERT(expr) do{} while (false)
+	#define ALX_ADS8678_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
