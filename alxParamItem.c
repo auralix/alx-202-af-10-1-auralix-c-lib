@@ -551,7 +551,8 @@ void AlxParamItem_CtorBool
 )
 {
 	// Assert
-	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
+	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
 
 	// Parameters
 	me->dataType = AlxParamItem_Bool;
@@ -596,7 +597,8 @@ void AlxParamItem_CtorArr
 )
 {
 	// Assert
-	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
+	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
 
 	// Parameters
 	me->dataType = AlxParamItem_Arr;
@@ -640,8 +642,10 @@ void AlxParamItem_CtorStr
 )
 {
 	// Assert
-	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
-	ALX_PARAM_ITEM_ASSERT(strlen(valDef) < buffLen);
+	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
+	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+	ALX_UNUSED uint32_t valDefLen = (uint32_t)strlen(valDef);
+	ALX_PARAM_ITEM_ASSERT(valDefLen < buffLen);
 
 	// Parameters
 	me->dataType = AlxParamItem_Str;
@@ -2357,7 +2361,8 @@ static void AlxParamItem_Ctor
 )
 {
 	// Assert
-	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
+	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
 
 	// Parameters
 	me->dataType = dataType;
@@ -2387,13 +2392,16 @@ static void AlxParamItem_Ctor
 	if (me->enumArr != ALX_NULL)
 	{
 		// Check if enum array value are from low to high
-		ALX_PARAM_ITEM_ASSERT(AlxParamItem_AreEnumArrValFromLowToHigh(me) == true);
-		(void)AlxParamItem_AreEnumArrValFromLowToHigh;
+		ALX_UNUSED bool areEnumArrValFromLowToHigh = AlxParamItem_AreEnumArrValFromLowToHigh(me);
+		ALX_PARAM_ITEM_ASSERT(areEnumArrValFromLowToHigh == true);
 
 		// Check if enum number is on the list
-		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList(me, valDef) == true);
-		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList(me, valMin) == true);
-		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList(me, valMax) == true);
+		ALX_UNUSED bool isValDefOnList = AlxParamItem_IsEnumOnList(me, valDef);
+		ALX_UNUSED bool isValMinOnList = AlxParamItem_IsEnumOnList(me, valMin);
+		ALX_UNUSED bool isValMaxOnList = AlxParamItem_IsEnumOnList(me, valMax);
+		ALX_PARAM_ITEM_ASSERT(isValDefOnList == true);
+		ALX_PARAM_ITEM_ASSERT(isValMinOnList == true);
+		ALX_PARAM_ITEM_ASSERT(isValMaxOnList == true);
 	}
 
 	// Info
