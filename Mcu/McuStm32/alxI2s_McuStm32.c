@@ -119,8 +119,8 @@ void AlxI2s_Ctor
 	me->protocolDataSize = protocolDataSize;
 	me->isMclkUsed = isMclkUsed;
 	me->irqPriority = irqPriority;
-	ALX_I2S_ASSERT(AlxI2s_Ctor_IsClkOk(me));
-	(void)AlxI2s_Ctor_IsClkOk;
+	ALX_UNUSED bool isClkOk = AlxI2s_Ctor_IsClkOk(me);
+	ALX_I2S_ASSERT(isClkOk);
 
 	// Variables - PLL
 	#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx)
