@@ -122,8 +122,8 @@ void AlxSpi_Ctor
 	#endif
 
 	// Check clock
-	ALX_SPI_ASSERT(AlxSpi_IsClkOk(me));
-	(void)AlxSpi_IsClkOk;
+	ALX_UNUSED bool isClkOk = AlxSpi_IsClkOk(me);
+	ALX_SPI_ASSERT(isClkOk);
 
 	// Info
 	me->wasCtorCalled = true;
