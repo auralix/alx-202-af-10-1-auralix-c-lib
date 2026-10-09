@@ -80,8 +80,8 @@ void AlxWdt_Ctor
 	}
 
 	// Check clock
-	ALX_WDT_ASSERT(AlxWdt_IsClkOk(me));
-	(void)AlxWdt_IsClkOk;
+	ALX_UNUSED bool isClkOk = AlxWdt_IsClkOk(me);
+	ALX_WDT_ASSERT(isClkOk);
 
 	// Info
 	me->isInit = false;
