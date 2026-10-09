@@ -87,8 +87,8 @@ void AlxAdc_Ctor
 	#endif
 
 	// Check IoPins and channels - each IoPin must be the pin of its channel
-	ALX_ADC_ASSERT(AlxAdc_Ctor_AreIoPinsAndChOk(me));
-	(void)AlxAdc_Ctor_AreIoPinsAndChOk;
+	ALX_UNUSED bool areIoPinsAndChOk = AlxAdc_Ctor_AreIoPinsAndChOk(me);
+	ALX_ADC_ASSERT(areIoPinsAndChOk);
 
 	// Variables
 	me->adcClkSetup.adcRate = 0;
