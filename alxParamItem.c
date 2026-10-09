@@ -1376,9 +1376,8 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	}
 
 	// Set
-	Alx_Status status = AlxParamItem_SetVal(me, valDefPtr);
+	ALX_UNUSED Alx_Status status = AlxParamItem_SetVal(me, valDefPtr);
 	ALX_PARAM_ITEM_ASSERT(status == Alx_Ok);
-	(void)status;
 }
 uint8_t AlxParamItem_GetValDefUint8(AlxParamItem* me)
 {
@@ -1847,7 +1846,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	char valStr[32] = "";
-	int32_t sprintfStatus = 0;
+	ALX_UNUSED int32_t sprintfStatus = 0;
 
 
 
@@ -1919,7 +1918,6 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	{
 		sprintfStatus = (int32_t)sprintf(valStr, "%" PRId32, me->val.int32);
 		ALX_PARAM_ITEM_ASSERT(sprintfStatus >= 0);
-		(void)sprintfStatus;
 	}
 	else if (me->dataType == AlxParamItem_Int64)
 	{
