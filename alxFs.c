@@ -545,7 +545,8 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
-	ALX_FS_ASSERT(strlen(delim) == 1);	// Only single char delim supported
+	ALX_UNUSED uint32_t delimLen = (uint32_t)strlen(delim);
+	ALX_FS_ASSERT(delimLen == 1);	// Only single char delim supported
 
 	// Local variables
 	Alx_Status status = AlxFs_ErrNoDelim;
