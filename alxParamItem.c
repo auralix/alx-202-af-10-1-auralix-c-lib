@@ -655,7 +655,7 @@ void AlxParamItem_CtorStr
 	me->id = id;
 	me->groupKey = groupKey;
 	me->groupId = groupId;
-	me->valDef.str = (char*)valDef;
+	me->valDef.str = (char*)(uintptr_t)valDef;	// the union's one string pointer; nothing writes through valDef
 	me->valMin.str = ALX_NULL_PTR;
 	me->valMax.str = ALX_NULL_PTR;
 	me->valLen = strlen(valDef) + 1;	// Add +1 for null terminator
@@ -1925,7 +1925,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Float)
 	{
-		AlxFtoa(me->val._float, valStr, ALX_PARAM_ITEM_FTOA_PRECISION);
+		AlxFtoa((double)me->val._float, valStr, ALX_PARAM_ITEM_FTOA_PRECISION);
 	}
 	else if (me->dataType == AlxParamItem_Double)
 	{
@@ -2659,7 +2659,7 @@ static bool AlxParamItem_IsEnumOnList(AlxParamItem* me, void* enumVal)
 			float _enumArrVal = *((float*)me->enumArr + i);
 
 			// If enum value is on the list, return true
-			if (_enumVal == _enumArrVal)
+			if ((_enumVal >= _enumArrVal) && (_enumVal <= _enumArrVal))
 			{
 				return true;
 			}
@@ -2671,7 +2671,7 @@ static bool AlxParamItem_IsEnumOnList(AlxParamItem* me, void* enumVal)
 			double _enumArrVal = *((double*)me->enumArr + i);
 
 			// If enum value is on the list, return true
-			if (_enumVal == _enumArrVal)
+			if ((_enumVal >= _enumArrVal) && (_enumVal <= _enumArrVal))
 			{
 				return true;
 			}
