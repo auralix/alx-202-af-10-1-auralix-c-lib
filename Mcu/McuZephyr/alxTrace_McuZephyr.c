@@ -139,7 +139,7 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 
 	// Static accumulation buffer
 	static char accumBuffer[ALX_TRACE_LEN_MAX];
-	static size_t accumLen = 0;
+	static uint32_t accumLen = 0;
 
 	// Lock mutex for thread-safe access
 	k_mutex_lock(&alx_trace_mutex, K_FOREVER);
@@ -150,7 +150,7 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 	if (newlinePos != NULL)
 	{
 		// Copy up to (but not including) the newline
-		size_t copyLen = newlinePos - str;
+		uint32_t copyLen = (uint32_t)(newlinePos - str);
 
 		// Check if we have space in the accumulation buffer
 		if (accumLen + copyLen < ALX_TRACE_LEN_MAX - 1)
@@ -179,7 +179,15 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 
 			// Log the current part (up to newline)
 			static char tempBuffer[ALX_TRACE_LEN_MAX];
-			size_t tempLen = (copyLen < ALX_TRACE_LEN_MAX - 1) ? copyLen : ALX_TRACE_LEN_MAX - 1;
+			uint32_t tempLen = 0;
+			if (copyLen < ALX_TRACE_LEN_MAX - 1)
+			{
+				tempLen = copyLen;
+			}
+			else
+			{
+				tempLen = ALX_TRACE_LEN_MAX - 1;
+			}
 			memcpy(tempBuffer, str, tempLen);
 			tempBuffer[tempLen] = '\0';
 			LOG_INF("%s", tempBuffer);
@@ -191,7 +199,7 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 	else
 	{
 		// No newline - accumulate the string
-		size_t strLen = strlen(str);
+		uint32_t strLen = (uint32_t)strlen(str);
 
 		if (accumLen + strLen < ALX_TRACE_LEN_MAX - 1)
 		{
@@ -209,7 +217,15 @@ Alx_Status AlxTrace_WriteStr(AlxTrace* me, const char* str)
 			}
 
 			// Start new accumulation with current string
-			size_t copyLen = (strLen < ALX_TRACE_LEN_MAX - 1) ? strLen : ALX_TRACE_LEN_MAX - 1;
+			uint32_t copyLen = 0;
+			if (strLen < ALX_TRACE_LEN_MAX - 1)
+			{
+				copyLen = strLen;
+			}
+			else
+			{
+				copyLen = ALX_TRACE_LEN_MAX - 1;
+			}
 			memcpy(accumBuffer, str, copyLen);
 			accumLen = copyLen;
 			accumBuffer[accumLen] = '\0';
