@@ -4,17 +4,40 @@
 #   cert-int09-c                         - non-consecutive enumerators are intentional here
 #   clang-analyzer-optin.performance.Padding / insecureAPI.DeprecatedOrUnsafeBufferHandling
 #                                        - host-CRT artifacts, meaningless for the target
+#   bugprone-narrowing-conversions       - no build of the library enforces conversion discipline
+#                                          (no -Wconversion); its implicit conversions are C's own
+#                                          arithmetic - measured over every library file (goal 7,
+#                                          2026-10-12), listed for TV in report 7
+#   readability-non-const-parameter      - every object function takes `AlxX* me`, a getter too
+#   bugprone-branch-clone                - a branch per value with the same body is the library's table
+#                                          form (alxParamItem's true/True/TRUE, alxCrc's widths, the
+#                                          per-pin IOCON tables), a disabled assertion leaves branches
+#                                          empty and the matrix fakes make two vendor calls one - 30 over
+#                                          every library file, no defect among them (goal 7, 2026-10-12)
+#   clang-analyzer-security.insecureAPI.strcpy
+#                                        - reports every strcpy and strcat, whatever the sizes, and asks
+#                                          for strlcpy and strlcat, which C99 does not have (20 in the
+#                                          library, goal 7, 2026-10-12)
+# Options:
+#   bugprone-sizeof-expression.WarnOnSizeOfConstant - a disabled ALX_*_ASSERT(false), the library's
+#       "never get here", is ALX_ASSERT_OFF's sizeof(!(false)) by decision 14; every constant
+#       sizeof the check found in the library was one (goal 7, 2026-10-12)
 Checks: >
   -*, clang-analyzer-*, bugprone-*, cert-*, concurrency-mt-unsafe,
   misc-redundant-expression, misc-static-assert,
-  readability-misleading-indentation, readability-non-const-parameter,
+  readability-misleading-indentation,
   readability-inconsistent-declaration-parameter-name,
   -bugprone-easily-swappable-parameters, -cert-int09-c,
+  -bugprone-narrowing-conversions,
   -clang-analyzer-optin.performance.Padding,
-  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+  -bugprone-branch-clone,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+  -clang-analyzer-security.insecureAPI.strcpy
 WarningsAsErrors: >
-  clang-analyzer-*, bugprone-branch-clone, bugprone-macro-parentheses,
+  clang-analyzer-*, bugprone-macro-parentheses,
   bugprone-suspicious-semicolon, bugprone-terminating-continue,
   cert-err33-c, cert-flp30-c, misc-redundant-expression,
   readability-inconsistent-declaration-parameter-name
+CheckOptions:
+  bugprone-sizeof-expression.WarnOnSizeOfConstant: false
 HeaderFilterRegex: '.*[\/]alx[A-Za-z0-9]+\.h$'
