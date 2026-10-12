@@ -731,7 +731,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 
 		// Init
 		#if (defined(ALX_STM32F0) || defined(ALX_STM32F4)) && defined(USART_CR2_LINEN)
-		HAL_StatusTypeDef statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
+		statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
 		if (statusHal != HAL_OK)
 		{
 			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %d", statusHal);
@@ -742,7 +742,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 	else
 	{
 		// Init
-		HAL_StatusTypeDef statusHal = HAL_UART_Init(&me->huart);
+		statusHal = HAL_UART_Init(&me->huart);
 		if (statusHal != HAL_OK)
 		{
 			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %d", statusHal);
