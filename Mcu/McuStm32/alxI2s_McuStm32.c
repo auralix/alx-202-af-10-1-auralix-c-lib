@@ -348,7 +348,7 @@ Alx_Status AlxI2s_DeInit(AlxI2s* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxI2s_Foreground_Handle(AlxI2s* me)
 {
