@@ -24,6 +24,21 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+typedef enum
+{
+	NonMaskableInt_IRQn = -14,
+	HardFault_IRQn = -13,
+	SVCall_IRQn = -5,
+	PendSV_IRQn = -2,
+	SysTick_IRQn = -1,
+	SERCOM0_IRQn = 1,
+	SERCOM1_IRQn = 2,
+	SERCOM2_IRQn = 3,
+	SERCOM3_IRQn = 4,
+	SERCOM4_IRQn = 5,
+	SERCOM5_IRQn = 6
+} IRQn_Type;
+#define ALX_SHIM_IRQN_TYPE
 #include "cmsisHostShim.h"
 
 
@@ -71,17 +86,11 @@ extern alxShimAsf4_Struct alxShimAsf4_Instance;
 #define GPIO_PULL_UP (0x0106U)
 #define PM_BUS_APBC (0x0107U)
 #define SERCOM0_GCLK_ID_CORE (0x0108U)
-#define SERCOM0_IRQn ((IRQn_Type)1)
 #define SERCOM1_GCLK_ID_CORE (0x010AU)
-#define SERCOM1_IRQn ((IRQn_Type)2)
 #define SERCOM2_GCLK_ID_CORE (0x010CU)
-#define SERCOM2_IRQn ((IRQn_Type)3)
 #define SERCOM3_GCLK_ID_CORE (0x010EU)
-#define SERCOM3_IRQn ((IRQn_Type)4)
 #define SERCOM4_GCLK_ID_CORE (0x0110U)
-#define SERCOM4_IRQn ((IRQn_Type)5)
 #define SERCOM5_GCLK_ID_CORE (0x0112U)
-#define SERCOM5_IRQn ((IRQn_Type)6)
 #define TCC0_GCLK_ID (0x0114U)
 #define TCC1_GCLK_ID (0x0115U)
 #define TCC2_GCLK_ID (0x0116U)

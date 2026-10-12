@@ -14,7 +14,9 @@
   * structure shape hold every member the code names, a call forwards its
   * arguments to one variadic function, a constant has a value no other has.
   * Grown from the compilers' diagnostics by the scratch tool of ALX-1564
-  * night goal 4; edited by hand from then on.
+  * night goal 4; edited by hand from then on. Where the analysers read a
+  * value or a shape (goal 7), it is the vendor's: interrupt 0, the bit-slice
+  * shift, the callback a pointer.
   ******************************************************************************
   **/
 
@@ -24,6 +26,24 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+typedef enum
+{
+	NonMaskableInt_IRQn = -14,
+	HardFault_IRQn = -13,
+	SVCall_IRQn = -5,
+	PendSV_IRQn = -2,
+	SysTick_IRQn = -1,
+	SPI0_IRQn = 0,
+	PIN_INT0_IRQn = 1,
+	PIN_INT1_IRQn = 2,
+	PIN_INT2_IRQn = 3,
+	PIN_INT3_IRQn = 4,
+	PIN_INT4_IRQn = 5,
+	PIN_INT5_IRQn = 6,
+	PIN_INT6_IRQn = 7,
+	PIN_INT7_IRQn = 8
+} IRQn_Type;
+#define ALX_SHIM_IRQN_TYPE
 #include "cmsisHostShim.h"
 
 
@@ -170,15 +190,7 @@ extern alxShimLpc80x_Struct alxShimLpc80x_Instance;
 #define IOCON_MODE_PULLDOWN (0x010FU)
 #define IOCON_MODE_PULLUP (0x0110U)
 #define IOCON_MODE_REPEATER (0x0111U)
-#define PININT_BITSLICE_CFG_START (0x0112U)
-#define PIN_INT0_IRQn ((IRQn_Type)1)
-#define PIN_INT1_IRQn ((IRQn_Type)2)
-#define PIN_INT2_IRQn ((IRQn_Type)3)
-#define PIN_INT3_IRQn ((IRQn_Type)4)
-#define PIN_INT4_IRQn ((IRQn_Type)5)
-#define PIN_INT5_IRQn ((IRQn_Type)6)
-#define PIN_INT6_IRQn ((IRQn_Type)7)
-#define PIN_INT7_IRQn ((IRQn_Type)8)
+#define PININT_BITSLICE_CFG_START (8U)
 #define SWM0 (0x011BU)
 #define WWDT (0x011CU)
 #define kADC_Clk_From_Fro (0x011DU)
@@ -362,7 +374,7 @@ void* alxShimLpc80x_CallPtr(int unused, ...);
 #define PINT_DisableCallbackByIndex(...) alxShimLpc80x_Call(0, ##__VA_ARGS__)
 #define PINT_EnableCallbackByIndex(...) alxShimLpc80x_Call(0, ##__VA_ARGS__)
 #define PINT_PinInterruptClrStatus(...) alxShimLpc80x_Call(0, ##__VA_ARGS__)
-#define PINT_PinInterruptConfig(...) alxShimLpc80x_Call(0, ##__VA_ARGS__)
+#define PINT_PinInterruptConfig(base, intr, enable, callback) alxShimLpc80x_Call(0, (base), (intr), (enable), (void*)(callback))
 #define POWER_DisablePD(...) alxShimLpc80x_Call(0, ##__VA_ARGS__)
 #define POWER_EnablePD(...) alxShimLpc80x_Call(0, ##__VA_ARGS__)
 #define RESET_PeripheralReset(...) alxShimLpc80x_Call(0, ##__VA_ARGS__)
