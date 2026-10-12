@@ -140,7 +140,7 @@ void AlxRtc_Ctor
 		me->rtcClk == AlxRtc_Clk_McuStm32_SyncClk_1Hz_AsynClk_32kHz768_RtcClk_32kHz768_LseOscillator_32kHz768
 	)
 	{
-		me->hrtc.Init.AsynchPrediv = 1 - 1;
+		me->hrtc.Init.AsynchPrediv = 0;
 		me->hrtc.Init.SynchPrediv = 32768 - 1 - 8; // -8 is needed for smooth calibration and is compensated by setting CALM to 0x100 in case of an ideal clock source
 		me->rtcTick_ns = 30518;	// 1000000000 / 32768 = 30517.57813 = ~30518ns
 		me->PRER_Expected = 0x00007FF7;
@@ -420,30 +420,30 @@ Alx_Status AlxRtc_GetDateTimeWithStatus(AlxRtc* me, AlxRtc_DateTime* dateTime)
 		ss += (int32_t)sTime.SecondFraction;
 
 		// Handle if hr, min, sec are 0
-		if (dateTime->sec == 0)								// If sec are 0, we must substract min
+		if (dateTime->sec == 0)								// If sec are 0, we must subtract min
 		{
-			if (dateTime->min == 0)							// If min are 0, we must substract hr
+			if (dateTime->min == 0)							// If min are 0, we must subtract hr
 			{
-				if (dateTime->hr == 0)						// If hr are 0, we must substract days
+				if (dateTime->hr == 0)						// If hr are 0, we must subtract days
 				{
 					// We will not handle this, this can only happen once per day
 				}
 				else
 				{
-					dateTime->hr = dateTime->hr - 1;		// Substract 1hr
+					dateTime->hr = dateTime->hr - 1;		// Subtract 1hr
 					dateTime->min = 59;						// Set min
 					dateTime->sec = 59;						// Set sec
 				}
 			}
 			else
 			{
-				dateTime->min = dateTime->min - 1;			// Substract 1min
+				dateTime->min = dateTime->min - 1;			// Subtract 1min
 				dateTime->sec = 59;							// Set sec
 			}
 		}
 		else
 		{
-			dateTime->sec = dateTime->sec - 1;				// Substract 1s
+			dateTime->sec = dateTime->sec - 1;				// Subtract 1s
 		}
 	}
 
@@ -694,8 +694,8 @@ Alx_Status AlxRtc_TuneTime_ns(AlxRtc* me, int64_t tuneTime_ns)
 	ALX_RTC_ASSERT(me->isInit == true);
 
 	// Bound
-	if (tuneTime_ns < -990000000) tuneTime_ns = -990000000;	// Max tunning is +990000000ns = +990ms
-	if (tuneTime_ns > +990000000) tuneTime_ns = +990000000;	// Max tunning is -990000000ns = -990ms
+	if (tuneTime_ns < -990000000) tuneTime_ns = -990000000;	// Max tuning is +990000000ns = +990ms
+	if (tuneTime_ns > +990000000) tuneTime_ns = +990000000;	// Max tuning is -990000000ns = -990ms
 
 	// Check if no tuning is needed
 	if (tuneTime_ns == 0) return Alx_Ok;	// No tuning needed
@@ -785,7 +785,14 @@ Alx_Status AlxRtc_TuneClockSource(AlxRtc* me, float offset_ppm)
 		"HAL_RTCEx_SetSmoothCalib(%" PRId32 "): status %d",
 		256 - tune, status);
 
-	return (status == HAL_OK) ? Alx_Ok : Alx_Err;
+	if (status == HAL_OK)
+	{
+		return Alx_Ok;
+	}
+	else
+	{
+		return Alx_Err;
+	}
 }
 
 
