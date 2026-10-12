@@ -42,13 +42,13 @@
 //******************************************************************************
 typedef union
 {
+	uint8_t raw[12];
 	struct ALX_PACKED
 	{
 		int32_t x_20bit;
 		int32_t y_20bit;
 		int32_t z_20bit;
 	};
-	uint8_t raw[12];
 } AlxAdxl355_Xyz_20bit;
 
 typedef union
@@ -582,7 +582,7 @@ static Alx_Status AlxAdxl355_Reg_Read(AlxAdxl355* me, void* reg)
 	// Assert CS
 	AlxSpi_Master_AssertCs(me->spi);
 
-	// Write address -> LSB is set to 1 for read operaton
+	// Write address -> LSB is set to 1 for read operation
 	uint8_t regAddr_Write = (regAddr << 1) | 0x01;
 	status = AlxSpi_Master_Write(me->spi, &regAddr_Write, 1, me->spiNumOfTries, me->spiTimeout_ms);
 	if (status != Alx_Ok)
@@ -618,7 +618,7 @@ static Alx_Status AlxAdxl355_Reg_Write(AlxAdxl355* me, void* reg)
 	// Assert CS
 	AlxSpi_Master_AssertCs(me->spi);
 
-	// Write address -> LSB is set to 0 for write operaton
+	// Write address -> LSB is set to 0 for write operation
 	uint8_t regAddr_Write = regAddr << 1;
 	status = AlxSpi_Master_Write(me->spi, &regAddr_Write, 1, me->spiNumOfTries, me->spiTimeout_ms);
 	if (status != Alx_Ok)
