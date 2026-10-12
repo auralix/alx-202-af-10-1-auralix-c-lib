@@ -48,8 +48,8 @@ static uint32_t AlxI2c_GetFlexCommClkFreq(AlxI2c* me);
 
 // MF: These functions are copied from FSL so that Timeout can be added
 static status_t AlxI2c_MasterStart(AlxI2c* me, I2C_Type* base, uint8_t address, i2c_direction_t direction, uint16_t timeout);
-static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const void* txBuff, size_t txSize, uint32_t flags, uint16_t timeout);
-static status_t AlxI2c_MasterReadBlocking(AlxI2c* me, I2C_Type* base, void* rxBuff, size_t rxSize, uint32_t flags, uint16_t timeout);
+static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const void* txBuff, uint32_t txSize, uint32_t flags, uint16_t timeout);
+static status_t AlxI2c_MasterReadBlocking(AlxI2c* me, I2C_Type* base, void* rxBuff, uint32_t rxSize, uint32_t flags, uint16_t timeout);
 static status_t AlxI2c_MasterStop(AlxI2c* me, I2C_Type *base, uint16_t timeout);
 static uint32_t AlxI2c_PendingStatusWait(AlxI2c* me, I2C_Type* base, uint16_t timeout);
 
@@ -271,7 +271,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		return Alx_Ok;
 	}
 
-	// If we are here, the number of tries error occured
+	// If we are here, the number of tries error occurred
 	if (status != kStatus_Success)
 	{
 		ALX_I2C_TRACE_ERR("ErrNumOfTries");
@@ -390,7 +390,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		return Alx_Ok;
 	}
 
-	// If we are here, the number of tries error occured
+	// If we are here, the number of tries error occurred
 	if (status != kStatus_Success)
 	{
 		ALX_I2C_TRACE_ERR("ErrNumOfTries");
@@ -520,7 +520,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		return Alx_Ok;
 	}
 
-	// If we are here, the number of tries error occured
+	// If we are here, the number of tries error occurred
 	if (status != kStatus_Success)
 	{
 		ALX_I2C_TRACE_ERR("ErrNumOfTries");
@@ -672,7 +672,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		}
 	}
 
-	// If we are here, write was OK or number of tries error occured
+	// If we are here, write was OK or number of tries error occurred
 	if (status != kStatus_Success)
 	{
 		ALX_I2C_TRACE_ERR("ErrNumOfTries");
@@ -789,7 +789,7 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 		return Alx_Ok;
 	}
 
-	// If we are here, the number of tries error occured
+	// If we are here, the number of tries error occurred
 	if (status != kStatus_Success)
 	{
 		ALX_I2C_TRACE_ERR("ErrNumOfTries");
@@ -923,7 +923,7 @@ static status_t AlxI2c_MasterStart(AlxI2c* me, I2C_Type* base, uint8_t address, 
 
 	return kStatus_Success;
 }
-static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const void* txBuff, size_t txSize, uint32_t flags, uint16_t timeout)
+static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const void* txBuff, uint32_t txSize, uint32_t flags, uint16_t timeout)
 {
 	uint32_t status;
 	uint32_t master_state;
@@ -994,7 +994,7 @@ static status_t AlxI2c_MasterWriteBlocking(AlxI2c* me, I2C_Type* base, const voi
 
 	return kStatus_Success;
 }
-static status_t AlxI2c_MasterReadBlocking(AlxI2c* me, I2C_Type* base, void* rxBuff, size_t rxSize, uint32_t flags, uint16_t timeout)
+static status_t AlxI2c_MasterReadBlocking(AlxI2c* me, I2C_Type* base, void* rxBuff, uint32_t rxSize, uint32_t flags, uint16_t timeout)
 {
 	uint32_t status = 0;
 	uint32_t master_state;
