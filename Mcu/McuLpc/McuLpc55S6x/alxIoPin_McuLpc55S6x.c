@@ -100,7 +100,7 @@ void AlxIoPin_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPin_Init(AlxIoPin* me)
 {
@@ -147,7 +147,7 @@ void AlxIoPin_Init(AlxIoPin* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPin_DeInit(AlxIoPin* me)
 {
@@ -170,9 +170,9 @@ void AlxIoPin_DeInit(AlxIoPin* me)
 
 /**
   * @brief
-  * @param[in,out] me
-  * @retval		false
-  * @retval		true
+  * @param[in,out]	me
+  * @retval			false
+  * @retval			true
   */
 bool AlxIoPin_Read(AlxIoPin* me)
 {
@@ -187,8 +187,8 @@ bool AlxIoPin_Read(AlxIoPin* me)
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in]	val
+  * @param[in,out]	me
+  * @param[in]		val
   */
 void AlxIoPin_Write(AlxIoPin* me, bool val)
 {
@@ -203,7 +203,7 @@ void AlxIoPin_Write(AlxIoPin* me, bool val)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPin_Set(AlxIoPin* me)
 {
@@ -217,7 +217,7 @@ void AlxIoPin_Set(AlxIoPin* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPin_Reset(AlxIoPin* me)
 {
@@ -231,7 +231,7 @@ void AlxIoPin_Reset(AlxIoPin* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPin_Toggle(AlxIoPin* me)
 {
@@ -245,7 +245,7 @@ void AlxIoPin_Toggle(AlxIoPin* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @retval			AlxIoPin_TriState_HiZ
   * @retval			AlxIoPin_TriState_Hi
   * @retval			AlxIoPin_TriState_Lo
