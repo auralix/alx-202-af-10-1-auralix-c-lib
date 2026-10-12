@@ -107,7 +107,7 @@ void AlxOsDelayUntil_Ctor
 // Functions
 //******************************************************************************
 void AlxOsDelayUntil_Init(AlxOsDelayUntil* me);
-void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osDelayUntilIncrement_us);
+void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osTimeIncrement_us);
 void AlxOsDelayUntil_ms(AlxOsDelayUntil* me, uint64_t osTimeIncrement_ms);
 void AlxOsDelayUntil_sec(AlxOsDelayUntil* me, uint64_t osTimeIncrement_sec);
 void AlxOsDelayUntil_min(AlxOsDelayUntil* me, uint64_t osTimeIncrement_min);
