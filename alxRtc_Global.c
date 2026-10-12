@@ -60,10 +60,10 @@ static uint8_t AlxRtc_MonthDaysTable[2][12] =
 
 /**
   * @brief
-  * @param[in] rtcTick_ns
-  * @param[in] ms
-  * @param[in] us
-  * @param[in] ns
+  * @param[in]	rtcTick_ns
+  * @param[in]	ms
+  * @param[in]	us
+  * @param[in]	ns
   * @return
   */
 uint64_t AlxRtc_MsUsNsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us, uint16_t ns)
@@ -79,9 +79,9 @@ uint64_t AlxRtc_MsUsNsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us, uint16
 
 /**
   * @brief
-  * @param[in] rtcTick_ns
-  * @param[in] ms
-  * @param[in] us
+  * @param[in]	rtcTick_ns
+  * @param[in]	ms
+  * @param[in]	us
   * @return
   */
 uint64_t AlxRtc_MsUsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us)
@@ -91,8 +91,8 @@ uint64_t AlxRtc_MsUsToNs(uint64_t rtcTick_ns, uint16_t ms, uint16_t us)
 
 /**
   * @brief
-  * @param[in] rtcTick_ns
-  * @param[in] ms
+  * @param[in]	rtcTick_ns
+  * @param[in]	ms
   * @return
   */
 uint64_t AlxRtc_MsToNs(uint64_t rtcTick_ns, uint16_t ms)
@@ -102,9 +102,9 @@ uint64_t AlxRtc_MsToNs(uint64_t rtcTick_ns, uint16_t ms)
 
 /**
   * @brief
-  * @param[in] ms
-  * @param[in] us
-  * @param[in] ns
+  * @param[in]	ms
+  * @param[in]	us
+  * @param[in]	ns
   * @return
   */
 float AlxRtc_MsUsNsToSecFract(uint16_t ms, uint16_t us, uint16_t ns)
@@ -227,7 +227,7 @@ void AlxRtc_SecFractToMsUsNs(float secFract, uint16_t* ms, uint16_t* us, uint16_
 
 /**
   * @brief
-  * @param[in] unixTime_ns
+  * @param[in]	unixTime_ns
   * @return
   */
 AlxRtc_DateTime AlxRtc_UnixTimeNsToDateTime(uint64_t unixTime_ns)
@@ -345,7 +345,7 @@ AlxRtc_DateTime AlxRtc_UnixTimeNsToDateTime(uint64_t unixTime_ns)
 
 /**
   * @brief
-  * @param[in] unixTime_us
+  * @param[in]	unixTime_us
   * @return
   */
 AlxRtc_DateTime AlxRtc_UnixTimeUsToDateTime(uint64_t unixTime_us)
@@ -355,7 +355,7 @@ AlxRtc_DateTime AlxRtc_UnixTimeUsToDateTime(uint64_t unixTime_us)
 
 /**
   * @brief
-  * @param[in] unixTime_ms
+  * @param[in]	unixTime_ms
   * @return
   */
 AlxRtc_DateTime AlxRtc_UnixTimeMsToDateTime(uint64_t unixTime_ms)
@@ -365,7 +365,7 @@ AlxRtc_DateTime AlxRtc_UnixTimeMsToDateTime(uint64_t unixTime_ms)
 
 /**
   * @brief
-  * @param[in] unixTime_sec
+  * @param[in]	unixTime_sec
   * @return
   */
 AlxRtc_DateTime AlxRtc_UnixTimeSecToDateTime(uint64_t unixTime_sec)
@@ -375,7 +375,7 @@ AlxRtc_DateTime AlxRtc_UnixTimeSecToDateTime(uint64_t unixTime_sec)
 
 /**
   * @brief
-  * @param[in] dateTime
+  * @param[in]	dateTime
   * @return
   */
 uint64_t AlxRtc_DateTimeToUnixTimeNs(AlxRtc_DateTime dateTime)
@@ -425,7 +425,7 @@ uint64_t AlxRtc_DateTimeToUnixTimeNs(AlxRtc_DateTime dateTime)
 
 /**
   * @brief
-  * @param[in] dateTime
+  * @param[in]	dateTime
   * @return
   */
 uint64_t AlxRtc_DateTimeToUnixTimeUs(AlxRtc_DateTime dateTime)
@@ -435,7 +435,7 @@ uint64_t AlxRtc_DateTimeToUnixTimeUs(AlxRtc_DateTime dateTime)
 
 /**
   * @brief
-  * @param[in] dateTime
+  * @param[in]	dateTime
   * @return
   */
 uint64_t AlxRtc_DateTimeToUnixTimeMs(AlxRtc_DateTime dateTime)
@@ -445,7 +445,7 @@ uint64_t AlxRtc_DateTimeToUnixTimeMs(AlxRtc_DateTime dateTime)
 
 /**
   * @brief
-  * @param[in] dateTime
+  * @param[in]	dateTime
   * @return
   */
 uint64_t AlxRtc_DateTimeToUnixTimeSec(AlxRtc_DateTime dateTime)
