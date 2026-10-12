@@ -867,7 +867,7 @@ Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC
 	Ads114s08_ThermocoupleType thermocoupleType,
 	float thermocoupleVoltage_mV,
 	float coldJunctionTemp_degC,
-	float* thermocoupleTemperatureCompnsated_degC
+	float* thermocoupleTemperatureCompensated_degC
 );
 
 
