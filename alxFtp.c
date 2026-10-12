@@ -617,7 +617,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 	}
 
 	// Set data socket IP
-	sprintf(alxSocket_Data_Ip, "%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8, tuple[0], tuple[1], tuple[2], tuple[3]);
+	(void)sprintf(alxSocket_Data_Ip, "%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8, tuple[0], tuple[1], tuple[2], tuple[3]);
 
 	// Set data socket port
 	alxSocket_Data_Port = (tuple[4] * 256) + tuple[5];
