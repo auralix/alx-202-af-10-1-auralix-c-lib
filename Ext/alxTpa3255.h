@@ -98,7 +98,7 @@ typedef struct
 	AlxIoPin* di_nCLIP_OTW;
 
 	// Objects - Internal
-	AlxTimSw tim; // Timer to ReEnable Ic
+	AlxTimSw tim; // Timer to re-enable Ic
 
 	// Parameters
 	float waitTime_ReEnable_ms;
@@ -121,9 +121,9 @@ typedef struct
 void AlxTpa3255_Ctor
 (
 	AlxTpa3255* me,
-	AlxIoPin* di_nRESET,
-	AlxIoPin* do_nFAULT,
-	AlxIoPin* do_nCLIP_OTW,
+	AlxIoPin* do_nRESET,
+	AlxIoPin* di_nFAULT,
+	AlxIoPin* di_nCLIP_OTW,
 	float waitTime_ReEnable_ms
 );
 
