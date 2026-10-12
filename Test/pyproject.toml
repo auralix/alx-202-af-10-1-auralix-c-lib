@@ -61,3 +61,11 @@ junit_family = "xunit1"
 filterwarnings = [
     "error",
 ]
+
+# ANALYZE stage 0 - codespell over every library file and the suite's own C (goal 7). The words below
+# are names, not typos: FRO is NXP's free-running oscillator, HSI the STM32's high-speed internal one,
+# HSA the VNH7040's high side A, LOD the LP586x's load-open detection; "tread" is English ("cannot
+# tread on one another"); the regex is alxId.c's "[G]NU is [N]ot [U]nix".
+[tool.codespell]
+ignore-words-list = "fro,hsi,hsa,lod,tread"
+ignore-regex = '\[N\]ot'
