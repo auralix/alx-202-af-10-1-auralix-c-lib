@@ -351,6 +351,10 @@ int flash_area_id_from_multi_image_slot(int image_index, int slot)
 		{
 			return FLASH_AREA_IMAGE_SCRATCH;
 		}
+		default:
+		{
+			break;
+		}
 	}
 
 	return -1;
@@ -531,7 +535,7 @@ static bool Flash_Write(uint32_t addr, const void* src, uint32_t len)
 	{
 		// Prepare
 		uint64_t data = 0;
-		memcpy(&data, src + i, HAL_FLASH_PROGRAM_LEN);
+		memcpy(&data, (const uint8_t*)src + i, HAL_FLASH_PROGRAM_LEN);
 
 		// Write
 		HAL_StatusTypeDef status = HAL_FLASH_Program(HAL_FLASH_PROGRAM_TYPE, addr + i, data);
