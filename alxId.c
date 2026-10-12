@@ -138,7 +138,7 @@ void AlxId_Ctor
 			memset(&me->fwBootId, 0, sizeof(me->fwBootId));
 
 			// Read bootloader ID info in FLASH
-			memcpy(&me->fwBootId, (void*)me->fwBootIdAddr, sizeof(me->fwBootId));
+			memcpy(&me->fwBootId, (const void*)(uintptr_t)me->fwBootIdAddr, sizeof(me->fwBootId));
 
 			// Check magic number
 			if (me->fwBootId.magicNum != ALX_ID_BOOT_ID_MAGIC_NUM)
