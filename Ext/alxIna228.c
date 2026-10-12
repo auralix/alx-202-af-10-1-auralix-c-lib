@@ -839,9 +839,9 @@ static void AlxIna228_CurrentLsbFactor(AlxIna228* me)
 
 	// Set Current LSB factor
 	#if defined(ALX_INA228)
-	const float CURRENT_LSB_FACTOR =  MAX_EXPECTED_CURRENT / 524288.0; // 2^19 = 524288;
+	const float CURRENT_LSB_FACTOR =  MAX_EXPECTED_CURRENT / 524288.0f; // 2^19 = 524288;
 	#elif defined(ALX_INA238)
-	const float CURRENT_LSB_FACTOR =  MAX_EXPECTED_CURRENT / 32768.0; // 2^15 = 32768;
+	const float CURRENT_LSB_FACTOR =  MAX_EXPECTED_CURRENT / 32768.0f; // 2^15 = 32768;
 	#endif
 
 	// Save
