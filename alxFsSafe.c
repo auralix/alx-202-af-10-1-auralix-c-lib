@@ -490,7 +490,7 @@ void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, char* pathWithSu
 	ALX_FS_SAFE_ASSERT(dot != NULL);
 
 	// Set suffix
-	const char* suffix = "";
+	const char* suffix = ALX_NULL_PTR;
 	if (isA)
 	{
 		suffix = "";	// We will use empty suffix for copy A, so then we have copy.bin & copyB.bin
@@ -504,7 +504,7 @@ void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, char* pathWithSu
 	uint32_t prefixLen = (uint32_t)(dot - path);
 
 	// Transform
-	sprintf(pathWithSuffix, "%.*s%s%s", (int)prefixLen, path, suffix, dot);
+	(void)sprintf(pathWithSuffix, "%.*s%s%s", (int)prefixLen, path, suffix, dot);
 }
 
 
