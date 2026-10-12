@@ -19,7 +19,7 @@ import pytest
 
 pytestmark = pytest.mark.unit
 
-LONG_MAX = 2147483647           # `long` is 32 bits on this host AND on the target
+LONG_MAX = 2147483647           # the integer part is an int32_t (a 32-bit long until goal 7)
 MAX_PRECISION = 10              # alxFtoa.c: the size of the rounders table
 
 
@@ -66,7 +66,7 @@ def test_ALX1553_P78_the_sign_survives_a_value_that_rounds_to_zero(memsafe_lib):
 
 
 @pytest.mark.xfail(strict=True, reason=(
-    "DEFECT: AlxFtoa takes the integer part with `long intPart = f;`, and `long` is 32 bits both "
+    "DEFECT: AlxFtoa takes the integer part with `intPart = f;` into an int32_t, 32 bits both "
     "on this host and on the target, so any value above 2147483647 overflows it. That conversion "
     "is undefined behaviour, and what it actually produces here is a NEGATIVE intPart, which the "
     "digit loop turns into `'0' + intPart % 10` - characters BELOW '0'. 2147483648.0 formats as "
