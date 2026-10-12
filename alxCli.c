@@ -90,7 +90,7 @@ void AlxCli_Handle(AlxCli* me)
 	// Local Variables
 	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
-	Alx_Status status = Alx_Err;
+	ALX_UNUSED Alx_Status status = Alx_Err;
 
 
 
@@ -276,7 +276,7 @@ void AlxCli_Handle(AlxCli* me)
 				{
 					if (fwIsBootUsed)
 					{
-						sprintf
+						(void)sprintf
 						(
 							me->buff,
 							"{\r\n"
@@ -321,7 +321,7 @@ void AlxCli_Handle(AlxCli* me)
 					}
 					else
 					{
-						sprintf
+						(void)sprintf
 						(
 							me->buff,
 							"{\r\n"
@@ -361,7 +361,7 @@ void AlxCli_Handle(AlxCli* me)
 				{
 					if (fwIsBootUsed)
 					{
-						sprintf
+						(void)sprintf
 						(
 							me->buff,
 							"{"
@@ -406,7 +406,7 @@ void AlxCli_Handle(AlxCli* me)
 					}
 					else
 					{
-						sprintf
+						(void)sprintf
 						(
 							me->buff,
 							"{"
@@ -631,8 +631,8 @@ void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 	//------------------------------------------------------------------------------
 	// Prepare
 	//------------------------------------------------------------------------------
-	const char* statusStr = "";
-	const char* messageStr = "";
+	ALX_UNUSED const char* statusStr = "";
+	ALX_UNUSED const char* messageStr = "";
 	if (responseType == AlxCli_ResponseType_Success)
 	{
 		statusStr = "success";
@@ -671,7 +671,7 @@ void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 	{
 		if (messageStr == NULL)
 		{
-			sprintf
+			(void)sprintf
 			(
 				me->buff,
 				"{\r\n"
@@ -682,7 +682,7 @@ void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 		}
 		else
 		{
-			sprintf
+			(void)sprintf
 			(
 				me->buff,
 				"{\r\n"
@@ -698,7 +698,7 @@ void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 	{
 		if (messageStr == NULL)
 		{
-			sprintf
+			(void)sprintf
 			(
 				me->buff,
 				"{"
@@ -709,7 +709,7 @@ void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 		}
 		else
 		{
-			sprintf
+			(void)sprintf
 			(
 				me->buff,
 				"{"
