@@ -78,8 +78,8 @@ EXPECTED = {
 
 # alxLin.c's own sites, one per level, each reached by one ordinary call with nothing injected.
 SITE_WRN_LINE = 426     # AlxLin_Master_Subscribe - a response nobody sent
-SITE_DBG_LINE = 836     # AlxLin_RxBuff_Handle - a protected id whose parity is wrong
-SITE_VRB_LINE = 875     # AlxLin_RxBuff_Handle - right parity, an identifier nothing claims
+SITE_DBG_LINE = 835     # AlxLin_RxBuff_Handle - a protected id whose parity is wrong
+SITE_VRB_LINE = 874     # AlxLin_RxBuff_Handle - right parity, an identifier nothing claims
 
 BAD_PARITY_PID = 0x00   # id 0 protects to 0x80, so 0x00 can never be a valid protected id
 UNCLAIMED_ID = 0x10     # not MASTER_REQ (0x3C), not SLAVE_REQ (0x3D), and no slave frame configured
