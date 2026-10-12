@@ -258,7 +258,7 @@ Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
 		timeout = K_MSEC(timeout_ms);
 	}
 
-	int ret = k_thread_join(&me->threadHandle, timeout);	// AB: Zephyr has k_thread_join function
+	int32_t ret = k_thread_join(&me->threadHandle, timeout);	// AB: Zephyr has k_thread_join function
 	if (ret == 0)
 	{
 		return Alx_Ok;
