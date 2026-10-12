@@ -107,7 +107,7 @@ void AlxIoPinIrq_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 {
@@ -138,7 +138,7 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 {
