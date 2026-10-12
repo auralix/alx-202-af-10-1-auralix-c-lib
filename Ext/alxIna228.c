@@ -646,7 +646,8 @@ static void AlxIna228_RegStruct_SetToDefault(AlxIna228* me)
 	me->reg._0x00_CONFIG.val.raw =			0x0000;
 	me->reg._0x01_ADC_CONFIG.val.raw =		0xFB68;
 	//me->reg._0x02_SHUNT_CAL.val.raw	=		0x1000;
-	memset(me->reg._0x02_SHUNT_CAL.val.raw,	0x1000, sizeof(me->reg._0x02_SHUNT_CAL	.val.raw));
+	me->reg._0x02_SHUNT_CAL.val.raw[0] =	0x00;
+	me->reg._0x02_SHUNT_CAL.val.raw[1] =	0x10;
 	#if defined(ALX_INA228)
 	me->reg._0x03_SHUNT_TEMPCO.val.raw =	0x0000;
 	#endif
@@ -687,9 +688,9 @@ static Alx_Status AlxIna228_Reg_Write(AlxIna228* me, void* reg)
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
 	uint8_t data[regLen];
 
-	// flipped the MSB and LSB all lenght
+	// flipped the MSB and LSB all length
 	for(uint32_t i = 0; i< regLen; i++)
-	data[regLen-1-i] = regValPtr[i];
+		data[regLen-1-i] = regValPtr[i];
 
 	// Write
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_8bit, data, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
@@ -807,9 +808,9 @@ static Alx_Status AlxIna228_Reg_Read(AlxIna228* me, void* reg)
 		return status;
 	}
 
-	// flipped the MSB and LSB all lenght
+	// flipped the MSB and LSB all length
 	for(uint32_t i = 0; i< regLen; i++)
-	regValPtr[i] = data[regLen-1-i];
+		regValPtr[i] = data[regLen-1-i];
 
 	// Return
 	return Alx_Ok;
