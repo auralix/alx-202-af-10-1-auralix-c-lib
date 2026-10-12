@@ -865,7 +865,7 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 	ALX_ADC_ASSERT(me->isInit == true);
 
 	// Get reference voltage
-	uint32_t vref_mV = AlxAdc_GetVref_mV(me);
+	ALX_UNUSED uint32_t vref_mV = AlxAdc_GetVref_mV(me);
 
 	// Get temperature
 	for (uint32_t i = 0; i < me->numOfCh; i++)
@@ -876,7 +876,6 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 			#if defined(ALX_STM32F1) || defined(STM32F469) || defined(STM32F479xx) || defined(STM32F429xx) || defined(STM32F439xx)
 			int32_t temp_degC = 0;	// Not working, problems
 			ALX_ADC_ASSERT(false);
-			(void)vref_mV;
 			#elif defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 			int32_t temp_degC = __LL_ADC_CALC_TEMPERATURE(vref_mV, me->buff[i], ALX_ADC_RESOLUTION);
 			#elif defined(ALX_STM32U5)
