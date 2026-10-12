@@ -181,13 +181,13 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 		me->adcConvSeqConfig.channelMask |= (1U << AlxAdc_GetCh(me, me->chArr[i]));
 	}
 
-	// Init ADC coversion sequence
+	// Init ADC conversion sequence
 	ADC_SetConvSeqAConfig(ALX_ADC_LPC8XX, &me->adcConvSeqConfig);
 	ADC_EnableConvSeqA(ALX_ADC_LPC8XX, true);
 
 	// Clear result register
 	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC8XX);
-	ADC_GetConvSeqAGlobalConversionResult(ALX_ADC_LPC8XX, &me->adcResult);		// MF: Clears global ADC conversion infomation of sequence A.
+	ADC_GetConvSeqAGlobalConversionResult(ALX_ADC_LPC8XX, &me->adcResult);		// MF: Clears global ADC conversion information of sequence A.
 
 	// Set isInit
 	me->isInit = true;
@@ -211,7 +211,7 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	// DeInit ADC
 	ADC_Deinit(ALX_ADC_LPC8XX);
 
-	// Clear all ADC registers and both coversion sequence registers
+	// Clear all ADC registers and both conversion sequence registers
 	SYSCON->PRESETCTRL0 &= ~(1U << 24U);
 	SYSCON->PRESETCTRL0 |= (1U << 24U);
 
