@@ -300,9 +300,8 @@ def _check_ms_tests() -> None:
             f"missing {missing}, listed but no longer driving it {stale}"
         )
 
-# Id group: the real alxId over the IO pin fake, asserts ON = the code as shipped. alxId.c is the
-# closure source, for reasons written out at host_build's ID group - it fails -Wformat and
-# -Wint-to-void-pointer-cast. Declared by host_build.ID_SOURCES_STRICT/_CLOSURE and with what
+# Id group: the real alxId over the IO pin fake, asserts ON = the code as shipped, alxId.c under
+# the strict set since goal 7. Declared by host_build.ID_SOURCES_STRICT/_CLOSURE and with what
 # host_build._assert_defines derives from them.
 #
 # In SANITIZE from the group's first test: the identity block is read out of flash at a fixed
