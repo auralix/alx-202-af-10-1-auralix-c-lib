@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef __MCUBOOT_LOGGING_H__
-#define __MCUBOOT_LOGGING_H__
+#ifndef MCUBOOT_LOGGING_H
+#define MCUBOOT_LOGGING_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -98,4 +98,4 @@ extern "C" {
 }
 #endif
 
-#endif	// #ifndef __MCUBOOT_LOGGING_H__
+#endif	// #ifndef MCUBOOT_LOGGING_H
