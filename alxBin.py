@@ -247,10 +247,10 @@ def Script(vsTargetPath: str, fwName: str, copyFwUpNoBoot2Enable: str, binRawBin
 
 // {binDstName}
 #if defined(ALX_BUILD_CONFIG_DEBUG)
-static const unsigned char boot[{bootHdrFileLenHexStr}] ALX_SECTION(".boot") = {{{bootHdrArr}}};
+static const uint8_t boot[{bootHdrFileLenHexStr}] ALX_SECTION(".boot") = {{{bootHdrArr}}};
 #endif
 #if defined(ALX_BUILD_CONFIG_FW_UP)
-static const unsigned char boot[{bootHdrFileLenHexStr}] ALX_SECTION(".boot") = {{{bootHdrArrFF}}};
+static const uint8_t boot[{bootHdrFileLenHexStr}] ALX_SECTION(".boot") = {{{bootHdrArrFF}}};
 #endif
 
 
