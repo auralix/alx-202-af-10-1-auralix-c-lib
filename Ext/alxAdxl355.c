@@ -780,6 +780,7 @@ static AlxAdxl355_Xyz_g AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20b
 			rangeFactor = 0.0000156f;
 			break;
 		}
+		case Range_Reserved:
 		default:
 		{
 			ALX_ADXL355_ASSERT(false);	// We should never get here
