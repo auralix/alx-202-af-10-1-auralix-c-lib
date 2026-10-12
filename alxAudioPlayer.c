@@ -354,7 +354,6 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 					// Left
 					int8_t sampleInt8L = *(me->trackPtr + me->trackSampleOffset_Byte);
 					float sampleFloatL = AlxAudio_LinerPcmInt8ToFloat(sampleInt8L);
-					sampleOut = sampleFloatL;
 					// Right
 					int8_t sampleInt8R = *(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_8bit_Byte);
 					float sampleFloatR = AlxAudio_LinerPcmInt8ToFloat(sampleInt8R);
