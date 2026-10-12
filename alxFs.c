@@ -514,7 +514,7 @@ Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len
 	#if defined(ALX_FATFS)
 	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
-		unsigned int _lenActual = 0;
+		UINT _lenActual = 0;
 		int32_t status = f_read(&file->fatfsFile, data, len, &_lenActual);
 		if (status != 0)
 		{
@@ -607,7 +607,7 @@ Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t le
 	#if defined(ALX_FATFS)
 	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
-		unsigned int lenActual = 0;
+		UINT lenActual = 0;
 		int32_t status = f_write(&file->fatfsFile, data, len, &lenActual);
 		if ((status != 0) || (lenActual != len))
 		{
@@ -720,7 +720,7 @@ Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_Fi
 	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
 	{
 		// Local variables
-		int lfsOrigin = 0;
+		int32_t lfsOrigin = 0;
 
 		// Prepare
 		if (origin == AlxFs_File_Seek_Origin_Set)
@@ -1252,13 +1252,13 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 			#if defined(ALX_FATFS)
 			if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 			{
-				sprintf(buff, "FILE - %s - %" PRIu32 " B\r\n", info.fatfsInfo.fname, (uint32_t)info.fatfsInfo.fsize);
+				(void)sprintf(buff, "FILE - %s - %" PRIu32 " B\r\n", info.fatfsInfo.fname, (uint32_t)info.fatfsInfo.fsize);
 			}
 			#endif
 			#if defined(ALX_LFS)
 			if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
 			{
-				sprintf(buff, "FILE - %s - %" PRIu32 " B\r\n", info.lfsInfo.name, (uint32_t)info.lfsInfo.size);
+				(void)sprintf(buff, "FILE - %s - %" PRIu32 " B\r\n", info.lfsInfo.name, (uint32_t)info.lfsInfo.size);
 			}
 			#endif
 
@@ -1272,13 +1272,13 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 				#if defined(ALX_FATFS)
 				if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 				{
-					sprintf(buff, "%s/%s", path, info.fatfsInfo.fname);
+					(void)sprintf(buff, "%s/%s", path, info.fatfsInfo.fname);
 				}
 				#endif
 				#if defined(ALX_LFS)
 				if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
 				{
-					sprintf(buff, "%s/%s", path, info.lfsInfo.name);
+					(void)sprintf(buff, "%s/%s", path, info.lfsInfo.name);
 				}
 				#endif
 
@@ -1303,13 +1303,13 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 			#if defined(ALX_FATFS)
 			if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 			{
-				sprintf(buff, "DIR - %s\r\n", info.fatfsInfo.fname);
+				(void)sprintf(buff, "DIR - %s\r\n", info.fatfsInfo.fname);
 			}
 			#endif
 			#if defined(ALX_LFS)
 			if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
 			{
-				sprintf(buff, "DIR - %s\r\n", info.lfsInfo.name);
+				(void)sprintf(buff, "DIR - %s\r\n", info.lfsInfo.name);
 			}
 			#endif
 
@@ -1815,7 +1815,7 @@ static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t 
 		AlxFs* me = (AlxFs*)c->context;
 		uint32_t block_base_addr = me->lfsAddr + block * c->block_size;
 		uint32_t dest_address = block_base_addr + off + i_row * 4;		// Multiply by 4 because we write 4 bytes at the time
-		uint32_t* src_address_ptr = (uint32_t*)(buffer + i_row * 4);	// Multiply by 4 because we write 4 bytes at the time
+		uint32_t* src_address_ptr = (uint32_t*)((const uint8_t*)buffer + i_row * 4);	// Multiply by 4 because we write 4 bytes at the time
 
 		// Program
 		HAL_StatusTypeDef xHAL_Status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, dest_address, *src_address_ptr);
@@ -1833,7 +1833,7 @@ static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t 
 		AlxFs* me = (AlxFs*)c->context;
 		uint32_t block_base_addr = me->lfsAddr + block * c->block_size;
 		uint32_t dest_address = block_base_addr + off + i_row * 8;		// Multiply by 8 because we write 8 bytes at the time
-		uint64_t* src_address_ptr = (uint64_t*)(buffer + i_row * 8);	// Multiply by 8 because we write 8 bytes at the time
+		uint64_t* src_address_ptr = (uint64_t*)((const uint8_t*)buffer + i_row * 8);	// Multiply by 8 because we write 8 bytes at the time
 
 		// Program
 		HAL_StatusTypeDef xHAL_Status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, dest_address, *src_address_ptr);
