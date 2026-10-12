@@ -192,7 +192,7 @@ typedef enum
 {
 	LSD_removal_Off = 0,
 	LSD_removal_On	= 1
-} AlxLp586x_RegEnum_0x03_LSD_removal; // turns off the upside deghosting functio
+} AlxLp586x_RegEnum_0x03_LSD_removal; // turns off the upside deghosting function
 typedef enum
 {
 	LOD_removal_Off = 0,
