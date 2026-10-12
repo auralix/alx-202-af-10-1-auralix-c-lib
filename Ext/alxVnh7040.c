@@ -473,7 +473,7 @@ int32_t AlxVnh7040_GetIsError (AlxVnh7040* me)
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
 	ALX_VNH7040_ASSERT(me->isInit == true);
 
-	return me->currentHsA_clamp || me->currentHsB_clamp;	// true-> short circuit or overcurrent protection is acctive on one of half bridges
+	return me->currentHsA_clamp || me->currentHsB_clamp;	// true-> short circuit or overcurrent protection is active on one of half bridges
 }
 
 /**
