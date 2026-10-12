@@ -1813,6 +1813,22 @@ def write_compile_db() -> None:
     )
 
 
+class Recipe(NamedTuple):
+    """One group's DLL as its builder states it - what the coverage lane rebuilds instrumented."""
+
+    dll: Path
+    strict: tuple
+    closure: tuple
+    defines: tuple
+    exports: build_tools.Exports
+    obj_dir_name: str | None
+
+
+# While recipes() reads the builders, _build_dll records instead of building: the one place a group
+# is described stays its builder.
+_RECORDING: list[list[Recipe]] = []
+
+
 def _build_dll(strict, closure, defines, dll: Path, exports: build_tools.Exports, obj_dir_name: str | None) -> None:
     """One group's DLL: the library's recipe, this repository's lists.
 
@@ -1822,6 +1838,9 @@ def _build_dll(strict, closure, defines, dll: Path, exports: build_tools.Exports
     ALX_PARAM_ITEM_ASSERT (sprintf of numeric values), so a closure built without them printed
     numbers as EMPTY (found 03.09 by the P15 uint8 test).
     """
+    if _RECORDING:
+        _RECORDING[-1].append(Recipe(dll, tuple(strict), tuple(closure), tuple(defines), exports, obj_dir_name))
+        return
     BUILD_DIR.mkdir(exist_ok=True)
     write_compile_db()
     build_tools.build_dll(
@@ -2795,6 +2814,26 @@ DLL_GROUPS = [
     (ADAU1961_DLL, ADAU1961_DEPS, _build_adau1961_dll),
     (VNH7040_DLL, VNH7040_DEPS, _build_vnh7040_dll),
 ]
+
+
+def recipes() -> list[Recipe]:
+    """Every group's recipe, in DLL_GROUPS' order, read from its builder without building anything."""
+    _RECORDING.append([])
+    try:
+        for _, _, builder in DLL_GROUPS:
+            builder()
+        return _RECORDING[-1]
+    finally:
+        _RECORDING.pop()
+
+
+def dll_variable(dll: Path) -> str:
+    """The environment variable through which the suite's fixture of a group takes another DLL.
+
+    conftest names it after the group's constant: FIFO_DLL is ALX_FIFO_TEST_DLL.
+    """
+    name = next(n for n, v in globals().items() if n.endswith("_DLL") and v == dll)
+    return f"ALX_{name.removesuffix('_DLL')}_TEST_DLL"
 
 
 # ------------------------------------- the library's own assertions, per group -----

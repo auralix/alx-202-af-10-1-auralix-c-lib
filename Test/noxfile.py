@@ -21,6 +21,7 @@ mechanics (alx.verify.host_build).
 
 import argparse
 import ast
+import json
 import re
 import shutil
 import subprocess
@@ -64,24 +65,17 @@ ANALYSIS_SOURCES = [CLIB / "alxFifo.c", CLIB / "alxBound.c",
 #
 # It is now every library source EXCEPT the ones that cannot pass yet, named so the debt is visible
 # and shrinks by deletion rather than being rediscovered. Measured 12.09: 163 findings in 26 files.
+# Since goal 7 it reads Mcu/ and Ext/ at every depth: the MCU backends' 119 doc-block separators
+# and 5 ternaries were fixed then.
 #
 # COMMENTS - was 84 findings in 16 files, all "spaces in field separator (tabs only)". Swept 12.09:
 # 54 doc blocks, 85 lines, a 1:1 space-for-tab swap that changed no content. The set is empty and
 # stays here as the place a new straggler would be named rather than quietly excluded.
 STYLE_PENDING_COMMENTS = []
 
-# TERNARIES - 29 findings in 10 files, and this half is NOT a cleanup job. Fifteen of them cannot
-# be written as if/else in C at all: they are macro bodies that must expand to an EXPRESSION.
-# alxBuild.h builds a compile-time character out of __DATE__ and is used where a constant is
-# required; ALX_RTC_DAYS_IN_YEAR(yr) is the same shape; alxLfsConfig.h's are littlefs's own
-# vendor shims. Rule 1 as written asks those files for something the language does not offer.
-#
-# So the last ten need a WAIVER MECHANISM in alx.verify.gates.c_style - a per-line marker, or a rule that
-# exempts a #define body - before they can be gated. That is a change to the Python library rather
-# than to this repository, and it is on the TODO.
-STYLE_PENDING_TERNARY = [
-    "alxBuild.h", "alxLfsConfig.h", "alxRtc_Global.c",
-]
+# TERNARIES - a macro body that must expand to an EXPRESSION (alxBuild.h's compile-time character
+# out of __DATE__, ALX_RTC_DAYS_IN_YEAR(yr)) is rule 1's own exemption since the Python library's
+# c_style exempts a #define body (goal 7); every other ternary is written as if/else.
 
 # Decision 12's other two gates (A74), one pending list each, the same pattern.
 #
@@ -93,12 +87,52 @@ STYLE_PENDING_TERNARY = [
 FORMAT_PENDING = []
 FORMAT_EXEMPT = ["alxBoot.c:sscanf"]
 
-# TYPES - every declaration a library file makes, read from clang's AST of Stage 5's portable
-# modules (below): the twelve, void and the Alx names, nothing else. The Ext/ drivers and the Mcu/
-# backends need a part define or a vendor SDK to parse at all, so they are a product's to judge,
-# as Stage 5 says of the CMSIS three. Measured 2026-10-07: three findings in one module, listed
-# for TV - AlxFtoa's int precision (alxFtoa.h:80, alxFtoa.c:75) and its long intPart.
-TYPES_PENDING = ["alxFtoa.c", "alxFtoa.h"]
+# TYPES - every declaration a library file makes, read from clang's AST (Stage 7) with the compile
+# commands of the analysed matrix rows: every file, Ext/ and Mcu/ included, judged in the
+# configurations that compile it, and the fakes with the host build's flags. The twelve, void and
+# the library's own types, nothing else; AlxFtoa's int precision and long intPart became int32_t (goal 7).
+TYPES_JOBS = 8   # AST dumps at once - each holds a whole translation unit's AST in memory
+# The enums, structs and typedefs of the library's own headers are decision 12's own types: three Ext
+# drivers name their register types without the Alx prefix.
+TYPES_PREFIXES = ["Alx", "Ads114s08", "Adxl355", "Bq24600"]
+# littlefs's block-device callbacks, written under the prefix: they keep the signature littlefs gives them.
+TYPES_CALLBACKS = [f"AlxFs_Lfs_{medium}_{op}" for medium in ("FlashInt", "Mmc")
+                   for op in ("ReadBlock", "ProgBlock", "EraseBlock", "SyncBlock", "Lock", "Unlock")]
+# The frozen firmware file-name parser (decision 12): its sscanf count and its %n target stay int.
+TYPES_EXEMPT = ["alxBoot.c:charConsumed", "alxBoot.c:sscanfStatus"]
+# What the generators write into the root for a build, ignored by git; their templates are judged.
+TYPES_GENERATED = ["alxBoot_GENERATED.h", "alxBootMetadata_GENERATED.h", "alxBuild_GENERATED.h"]
+# D55, waiting for TV: decision 12 gives a vendor's type no variable, and these files hold the vendor's
+# objects - the MCU backends' register blocks, HAL and SDK handles, configurations and statuses, the
+# Zephyr devices; alxOs*'s FreeRTOS and Zephyr handles; alxFs's FatFs and littlefs objects; alxBoot's
+# MCUboot ones; alxTrace.c's va_list. Measured 2026-10-12 over the analysed rows: 398 declarations in
+# 87 files. Their foreign types are listed and do not fail; every other type there does.
+TYPES_PENDING = {
+    "alxBoot.c", "alxBoot.h", "alxFs.c", "alxFs.h", "alxOsDelayUntil.h", "alxOsEventFlagGroup.c",
+    "alxOsEventFlagGroup.h", "alxOsMutex.h", "alxOsThread.c", "alxOsThread.h",
+    "alxTrace.c",
+    "alxAdc_McuLpc17xx.c", "alxAdc_McuLpc17xx.h", "alxTrace_McuLpc17xx.c", "alxTrace_McuLpc17xx.h",
+    "alxAdc_McuLpc55S6x.c", "alxAdc_McuLpc55S6x.h", "alxClk_McuLpc55S6x.c", "alxI2c_McuLpc55S6x.c",
+    "alxI2c_McuLpc55S6x.h", "alxIoPinIrq_McuLpc55S6x.c", "alxIoPinIrq_McuLpc55S6x.h",
+    "alxIoPin_McuLpc55S6x.c", "alxPwm_McuLpc55S6x.c", "alxPwm_McuLpc55S6x.h", "alxSerialPort_McuLpc55S6x.c",
+    "alxSerialPort_McuLpc55S6x.h", "alxSpi_McuLpc55S6x.c", "alxSpi_McuLpc55S6x.h", "alxTrace_McuLpc55S6x.c",
+    "alxTrace_McuLpc55S6x.h", "alxWdt_McuLpc55S6x.h",
+    "alxAdc_McuLpc80x.h", "alxI2c_McuLpc80x.c", "alxI2c_McuLpc80x.h", "alxIoPinIrq_McuLpc80x.c",
+    "alxIoPinIrq_McuLpc80x.h", "alxIoPin_McuLpc80x.c", "alxPwm_McuLpc80x.h", "alxTrace_McuLpc80x.c",
+    "alxTrace_McuLpc80x.h", "alxWdt_McuLpc80x.h",
+    "alxAdc_McuSam.h", "alxIoPin_McuSam.c", "alxIoPin_McuSam.h", "alxPwm_McuSam.h", "alxSerialPort_McuSam.c",
+    "alxSerialPort_McuSam.h", "alxTrace_McuSam.c", "alxTrace_McuSam.h",
+    "alxAdc_McuStm32.c", "alxAdc_McuStm32.h", "alxCan_McuStm32.c", "alxCan_McuStm32.h", "alxClk_McuStm32.h",
+    "alxDac_McuStm32.c", "alxDac_McuStm32.h", "alxI2c_McuStm32.c", "alxI2c_McuStm32.h", "alxI2s_McuStm32.c",
+    "alxI2s_McuStm32.h", "alxIoPin_McuStm32.c", "alxIoPin_McuStm32.h", "alxMmc_McuStm32.c",
+    "alxMmc_McuStm32.h", "alxPwm_McuStm32.c", "alxPwm_McuStm32.h", "alxRtc_McuStm32.c", "alxRtc_McuStm32.h",
+    "alxSerialPort_McuStm32.c", "alxSerialPort_McuStm32.h", "alxSpi_McuStm32.c", "alxSpi_McuStm32.h",
+    "alxTrace_McuStm32.c", "alxTrace_McuStm32.h", "alxUsb_McuStm32.c", "alxUsb_McuStm32.h",
+    "alxWdt_McuStm32.h",
+    "alxAdc_McuZephyr.c", "alxAdc_McuZephyr.h", "alxI2c_McuZephyr.h", "alxIoPin_McuZephyr.c",
+    "alxIoPin_McuZephyr.h", "alxSpi_McuZephyr.c", "alxSpi_McuZephyr.h", "alxTrace_McuZephyr.c",
+    "alxTrace_McuZephyr.h",
+}
 
 # Stage 5 compiles every PORTABLE library module - the ones that need no vendor SDK. Three cannot
 # join: alxAssert.c, alxBoot.c and alxIrq.c reach for CMSIS intrinsics (__BKPT, __disable_irq,
@@ -137,8 +171,11 @@ SYNTAX_NEEDS_CMSIS = {"alxAssert.c", "alxBoot.c", "alxIrq.c"}
 # bodies are #if dispatch that selects nothing. Every one of the eight wants a default return, and
 # that is a source change in modules no test drives - so they are NAMED rather than fixed in the
 # dark, and the other 48 are gated from here on.
-RETURN_TYPE_PENDING = {"alxCrc.c", "alxRange.c",
-                       "alxOsMutex.c", "alxOsThread.c", "alxOsEventFlagGroup.c"}
+#
+# Recounted 2026-10-12 (goal 7): alxRange.c and the three alxOs modules return on every path now,
+# and alxCrc.c's two defaults return 0 after their assertion. The set is empty and stays as the
+# place a new one would be named.
+RETURN_TYPE_PENDING: set[str] = set()
 
 # And Stage 5b counts the SYMBOLS each object defines, because "it compiled" is not the same claim
 # as "it was read". Three of these modules carry a SECOND tier of guard below ALX_C_LIB - alxNet.c
@@ -164,46 +201,19 @@ RETURN_TYPE_PENDING = {"alxCrc.c", "alxRange.c",
 SYNTAX_EMPTY_TU = {"alxBuild.c",
                    "alxDacFake.c", "alxIoPinIrqFake.c", "alxRtcFake.c"}
 
-# Stage 5c asks the question P567 answered the hard way: does any assertion DO the work?
-#
-# ALX_<M>_ASSERT(expr) with no assert form compiled expands to do {} while(false) taking NO
-# parameters, so the preprocessor deletes `expr` entirely. When expr is a predicate that is the
-# point. When expr performs the call the function exists to make, the BEHAVIOUR goes with it, and
-# nothing reports an error: alxCli.c writes its replies that way and answers 0 bytes instead of 751.
-#
-# Measured 12.09 - 80 assertions call something, and they split cleanly:
-#
-#   49 perform the work     alxCli.c 21, alxIoPin_McuZephyr.c 14, alxParamItem.c 7,
-#                            alxClk_McuLpc55S6x.c 5, alxNet.c 2
-#   29 call a predicate     strlen, AlxAdc_IsClkOk, AlxWdt_IsClkOk and friends - eliding those
-#                            loses a check, which is what an assertion is for
-#
-# alxNet.c left with its skeleton on 2026-10-02. The other four were fixed by D42 (TV, 2026-10-07):
-# the call runs first into a local, the assertion checks the local - the form of alxParamItem's
-# SetVal. The pending set is empty, so a new assertion that hides a call anywhere fails the lane.
-ASSERT_PURE_CALLS = {
-    "strlen", "sizeof", "fmodf",   # fmodf: alxAdau1961.c checks a gain is a whole number of steps
-    "AlxAdc_GetCh", "AlxAdc_Ctor_CheckCh", "AlxAdc_Ctor_IsMainClkOk", "AlxAdc_Ctor_IsSysClkOk",
-    "AlxAdc_IsClkOk", "AlxWdt_IsClkOk", "AlxCan_Ctor_IsClkOk", "AlxMmc_IsClkOk", "AlxSpi_IsClkOk",
-    "AlxI2c_IsClkOk", "AlxI2s_Ctor_IsClkOk", "AlxPwm_CheckIoPins",
-    "AlxParamItem_AreEnumArrValFromLowToHigh", "AlxParamItem_IsEnumOnList",
-    "AlxAdc_Ctor_AreIoPinsAndChOk",   # alxAdc_McuLpc17xx.c: every IoPin is its channel's pin
-}
-ASSERT_SIDE_EFFECT_PENDING: set[str] = set()
-STRING_LITERAL = re.compile(r"\"(?:[^\"\\]|\\.)*\"")
-CHAR_LITERAL = re.compile(r"'(?:[^'\\]|\\.)'")
-ELIDED_ASSERT = re.compile(r"ALX_[A-Z0-9_]*ASSERT[A-Z0-9_]*\s*\(")
-ELIDED_TRACE = re.compile(r"ALX_[A-Z0-9_]*TRACE[A-Z0-9_]*\s*\(")
-ELIDED_NAME = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(")
+# Decision 14 (TV, 2026-10-09): an assertion checks only variables, and a trace too (goal 7). A
+# disabled one keeps its expression compiled and never evaluates it, so a call inside it runs in one
+# configuration and not in another. Stage 0 runs the Python library's c_assert gate over every
+# library file; it replaced Stage 5c and its list of calls allowed as pure, which has no list.
 
-_STYLE_PENDING = {*STYLE_PENDING_COMMENTS, *STYLE_PENDING_TERNARY}
+_STYLE_PENDING = {*STYLE_PENDING_COMMENTS}
 _STYLE_SKIP_DIRS = {"FatFs", "mcuboot", "Usbh", "Test", "build", "Doc"}
 
 
 def _library_style_files(pending=_STYLE_PENDING) -> list:
-    """Every library .c/.h a gate can check today, vendor trees and its pending list excluded."""
+    """Every library .c/.h - the root, Mcu/ and Ext/ at every depth - its pending list excluded."""
     found = []
-    for path in sorted(CLIB.glob("*.[ch]")) + sorted(CLIB.glob("*/*.[ch]")):
+    for path in sorted([*CLIB.glob("*.[ch]"), *(CLIB / "Mcu").rglob("*.[ch]"), *(CLIB / "Ext").rglob("*.[ch]")]):
         if set(path.relative_to(CLIB).parts[:-1]) & _STYLE_SKIP_DIRS:
             continue
         if path.relative_to(CLIB).as_posix() in pending:
@@ -214,6 +224,7 @@ def _library_style_files(pending=_STYLE_PENDING) -> list:
 
 STYLE_FILES = [*_library_style_files(), *sorted(HOST.rglob("*.c"))]
 FORMAT_FILES = [*_library_style_files(set(FORMAT_PENDING)), *sorted(HOST.rglob("*.[ch]"))]
+LIBRARY_FILES = _library_style_files(set())
 # Target-only translation units: compiled by ANALYZE stage 4 with arm-gcc, never linked, one compile
 # per part variant. (source, variants to compile it under).
 LAYOUT_CHECKS = [(CHECKS / "alxIna228RegSizeCheck.c", ["ALX_INA238", "ALX_INA228"])]
@@ -253,7 +264,7 @@ MS_TESTS = ["test_crc.py", "test_mem_safe.py", "test_param_group.py", "test_para
             "test_ftoa.py"]
 
 # The sanitize lane runs the same group with one file held back. alxFtoa.c:110 assigns a double to
-# a `long` - 32 bits here and on the target alike - and a value past 2147483647 is then a conversion
+# an int32_t - 32 bits here and on the target alike - and a value past 2147483647 is then a conversion
 # C99 6.3.1.4 leaves undefined. That defect is already sealed as P420, which proves it prints
 # punctuation instead of digits; what a strict xfail cannot do is survive UBSan, because the lane
 # builds with -fno-sanitize-recover and the process ABORTS rather than failing an assertion.
@@ -357,17 +368,74 @@ MEMRAW_TESTS = ["test_mem_raw.py"]
 # either module. Widening the analyze lane over library sources is a decision of its own; it is
 # recorded here so the next reader does not think it was overlooked.
 #
-# Test/alxAssert.cfg is a cppcheck library definition this lane does NOT pass, also on purpose. It
+# Test/config/alxAssert.cfg is a cppcheck library definition Stage 2 does NOT pass, also on purpose. It
 # marks AlxAssert_Rst and AlxAssert_Bkpt noreturn, which is what stops cppcheck reasoning about the
 # code after an assertion as reachable with the asserted condition false - measured worth 21 of 35
 # findings in a firmware this library serves, and measured NOT to be achievable by declaring the
-# handlers noreturn in alxAssert.h, which changes nothing at c99 or c11. It would do nothing here:
-# ANALYSIS_SOURCES is compiled with no assert defines, so the modules this lane scans have their
-# assertions compiled out and the findings never arise. Its effect is proved instead by
-# test_assert.py P515, which is where a consumer should look before adopting it.
+# handlers noreturn in alxAssert.h, which changes nothing at c99 or c11. It would do nothing there:
+# ANALYSIS_SOURCES is compiled with no assert defines, so the modules Stage 2 scans have their
+# assertions compiled out and the findings never arise. Its effect is proved by test_assert.py P515,
+# which is where a consumer should look before adopting it. Stage 6 passes it, because the matrix
+# rows compile their assertions, and tells clang-tidy the same through Test/config/alxAssertAnalyzer.h.
 
 COVERAGE_ASSERT_OFF = "-DALX_ASSERT_OFF(expr)=((void)0)"   # the coverage builds' disabled assertion
 COVERAGE_TRACE_OFF = "-DALX_TRACE_OFF(...)=((void)0)"      # and their disabled trace
+ASSERT_ENABLE = re.compile(r"-DALX_[A-Z0-9_]+_ASSERT_(BKPT|TRACE|RST)_ENABLE")
+# The coverage lane disables every group's assertions; a group whose tests need them keeps them,
+# by its DLL's variable, with the reason. Measured 2026-10-12: with every group's off, 15 tests failed,
+# each one in these six groups and each one reading an assertion the code trips.
+COVERAGE_ASSERTS_ON: dict[str, str] = {
+    "ALX_ID_TEST_DLL": "test_id.py's P472, P497, P498 and P502 to P505 read the assertions AlxId trips",
+    "ALX_LINFUN_TEST_DLL": "test_audio_vol.py's sealed P450 is the assertion the full volume trips",
+    "ALX_MEMRAW_TEST_DLL": "test_mem_raw.py's P519, P520, P522 and P523 read the assertion record",
+    "ALX_MEMRAW_OVR_TEST_DLL": "test_mem_raw.py's P519, P520, P522 and P523 read the assertion record",
+    "ALX_RTC_TEST_DLL": "test_rtc_global.py's sealed P449 is the assertion a year past 2099 trips",
+    "ALX_TEMPSENS_TEST_DLL": "test_temp_sens_rtd_vdiv.py's sealed P466 is the stubs' assertion",
+}
+# The library files under 100 % on a gated metric, with what they measured (%, 2026-10-12): the queue of
+# tests to write - goal 7 step 9 wrote none. A file leaves the list when it reaches 100 % on every
+# metric; the gate fails until it does.
+COVERAGE_PENDING: dict[str, str] = {
+    "alxAudioPlayer.c": "lines 59.7, branches 50.0, regions 57.4, functions 87.5",
+    "alxAudioVol.c": "lines 100.0, branches 72.2, regions 89.2, functions 100.0",
+    "alxBool.c": "lines 89.1, branches 79.2, regions 88.4, functions 86.4",
+    "alxCanParser.c": "lines 79.7, branches 84.6, regions 77.1, functions 100.0",
+    "alxCli.c": "lines 58.8, branches 80.6, regions 85.8, functions 85.7",
+    "alxCrc.c": "lines 89.0, branches 95.0, regions 92.9, functions 100.0",
+    "alxFsSafe.c": "lines 79.1, branches 76.9, regions 85.6, functions 100.0",
+    "alxHys1.c": "lines 72.7, branches 90.0, regions 68.8, functions 100.0",
+    "alxHys2.c": "lines 77.8, branches 93.8, regions 78.3, functions 100.0",
+    "alxId.c": "lines 97.0, branches 63.9, regions 76.5, functions 100.0",
+    "alxInterpLin.c": "lines 100.0, branches 90.0, regions 89.1, functions 100.0",
+    "alxLin.c": "lines 13.3, branches 6.6, regions 9.0, functions 19.4",
+    "alxLinFun.c": "lines 71.0, branches 54.3, regions 69.8, functions 100.0",
+    "alxMemRaw.c": "lines 100.0, branches 100.0, regions 86.2, functions 100.0",
+    "alxMemSafe.c": "lines 94.9, branches 93.7, regions 97.9, functions 100.0",
+    "alxParamGroup.c": "lines 80.0, branches 68.0, regions 75.4, functions 100.0",
+    "alxParamItem.c": "lines 87.1, branches 76.6, regions 84.2, functions 100.0",
+    "alxParamKvStore.c": "lines 90.2, branches 86.4, regions 94.5, functions 100.0",
+    "alxParamMgmt.c": "lines 68.9, branches 52.2, regions 65.8, functions 77.3",
+    "alxParamStore.c": "lines 77.7, branches 74.7, regions 78.4, functions 100.0",
+    "alxRange.c": "lines 97.1, branches 100.0, regions 97.7, functions 91.7",
+    "alxRotSw.c": "lines 63.0, branches 50.0, regions 56.4, functions 75.0",
+    "alxRtc_Global.c": "lines 95.3, branches 70.1, regions 77.8, functions 87.5",
+    "alxTempSensRtdVdiv.c": "lines 96.6, branches 83.3, regions 81.5, functions 100.0",
+    "Ext/alxAdau1961.c": "lines 65.4, branches 53.7, regions 60.9, functions 90.9",
+    "Ext/alxAds114s08.c": "lines 19.9, branches 2.3, regions 8.2, functions 26.1",
+    "Ext/alxAds8678.c": "lines 56.1, branches 38.9, regions 51.5, functions 84.2",
+    "Ext/alxAdxl355.c": "lines 51.8, branches 39.3, regions 45.8, functions 78.9",
+    "Ext/alxIna228.c": "lines 70.6, branches 55.0, regions 65.2, functions 87.0",
+    "Ext/alxLp586x.c": "lines 85.5, branches 87.9, regions 86.0, functions 93.3",
+    "Ext/alxMcp73831.c": "lines 93.2, branches 91.7, regions 94.1, functions 100.0",
+    "Ext/alxNtcg103jf103ft1s.c": "lines 83.3, branches 75.0, regions 81.8, functions 100.0",
+    "Ext/alxPca9539a.c": "lines 65.9, branches 57.6, regions 68.6, functions 85.7",
+    "Ext/alxPcal6416a.c": "lines 59.5, branches 56.0, regions 63.0, functions 90.5",
+    "Ext/alxPi4ioe5v6534q.c": "lines 74.4, branches 66.7, regions 75.5, functions 88.2",
+    "Ext/alxTmp1075.c": "lines 80.6, branches 60.0, regions 77.1, functions 100.0",
+    "Ext/alxTpa3255.c": "lines 100.0, branches 96.2, regions 100.0, functions 100.0",
+    "Ext/alxVeml6040.c": "lines 79.8, branches 62.5, regions 77.5, functions 100.0",
+    "Ext/alxVnh7040.c": "lines 96.1, branches 79.2, regions 91.3, functions 100.0",
+}
 UBSAN = list(hb.UBSAN)                 # the instrumented variants are the library's flag sets: one
 ASAN_UBSAN = list(hb.ASAN_UBSAN)       # definition for every C repository, not a copy per noxfile
 PROFILE = list(hb.PROFILE)
@@ -498,53 +566,23 @@ def test(session: nox.Session) -> None:
 
 
 
-def _macro_arguments(line: str, open_paren: int) -> str:
-    """The text inside the macro's OWN parentheses, balanced.
-
-    Matching to the end of the line instead counts a call that is nowhere near the macro - the
-    shape `if (Call() != Alx_Ok) { ALX_X_ASSERT(false); }` is everywhere in this library.
-    """
-    depth, begin = 0, open_paren + 1
-    for i in range(open_paren, len(line)):
-        if line[i] == "(":
-            depth += 1
-            if depth == 1:
-                begin = i + 1
-        elif line[i] == ")":
-            depth -= 1
-            if depth == 0:
-                return line[begin:i]
-    return line[begin:]
-
-
-def _calls_inside(line: str, macro: "re.Pattern") -> list:
-    """Every function a macro's arguments call, with literals removed first.
-
-    Removing them is not tidiness: every trace message in this library names a function, as in
-    "FAIL: AlxNet_IsConnected()", and counting those reported 241 trace findings where there are
-    none at all.
-    """
-    found = macro.search(line)
-    if not found:
-        return []
-    inner = _macro_arguments(line, found.end() - 1)
-    inner = CHAR_LITERAL.sub("''", STRING_LITERAL.sub('""', inner))
-    return [c for c in ELIDED_NAME.findall(inner) if c not in ASSERT_PURE_CALLS]
+def _rel(files) -> list:
+    """Paths relative to Test/, where nox runs: 350-odd absolute ones overflow a Windows command line."""
+    return [str(Path("..") / f.relative_to(CLIB)) for f in files]
 
 @nox.session
 def analyze(session: nox.Session) -> None:
-    """ANALYZE: 0 codespell + ASCII + C-style + C-format + Python gates, 1 clang-tidy, 2 cppcheck, 3 gcc -fanalyzer."""
+    """ANALYZE: 0 text gates, 1 clang-tidy, 2 cppcheck, 3 -fanalyzer, 4-5 compiles, 6 matrix analysers, 7 types."""
     out = lanes.evidence_dir(TEST, "analyze")
     if not (BUILD / "compile_commands.json").exists():
         _fresh_dev_build(session)
-    session.log("Stage 0: codespell, ASCII gate, C style and C format gates, fake style gate, ruff (shared profile)")
-    session.run(PYTHON, "-m", "codespell_lib", *_strs(ANALYSIS_SOURCES))
+    session.log("Stage 0: codespell, ASCII, C style, format and assert gates, fake style gate, ruff (shared profile)")
+    session.run(PYTHON, "-m", "codespell_lib", *_rel(STYLE_FILES))
     session.run(PYTHON, "-m", "alx.verify.gates.ascii", str(CLIB), *VENDOR, "--out", str(out / "ascii_gate.txt"))
-    session.run(PYTHON, "-m", "alx.verify.gates.c_style", *_strs(STYLE_FILES), "--out", str(out / "c_style.txt"))
-    # relative to Test/, where nox runs: 640-odd absolute paths overflow a Windows command line
-    session.run(PYTHON, "-m", "alx.verify.gates.c_format",
-                *[str(Path("..") / f.relative_to(CLIB)) for f in FORMAT_FILES],
+    session.run(PYTHON, "-m", "alx.verify.gates.c_style", *_rel(STYLE_FILES), "--out", str(out / "c_style.txt"))
+    session.run(PYTHON, "-m", "alx.verify.gates.c_format", *_rel(FORMAT_FILES),
                 *[a for spot in FORMAT_EXEMPT for a in ("--exempt", spot)], "--out", str(out / "c_format.txt"))
+    session.run(PYTHON, "-m", "alx.verify.gates.c_assert", *_rel(LIBRARY_FILES), "--out", str(out / "c_assert.txt"))
     # every fake a consumer links follows the one convention, family guards checked against the headers
     session.run(PYTHON, "-m", "alx.verify.gates.fake_style", *_strs(sorted(FAKES.glob("*.c"))),
                 "--headers", *_strs([CLIB, CLIB / "Mcu", CLIB / "Mcu" / "McuStm32", CLIB / "Ext"]),
@@ -666,43 +704,35 @@ def analyze(session: nox.Session) -> None:
     session.log(f"Stage 5b: {checked - len(empty)} modules return on every path, "
                 f"{len(empty)} empty, {len(RETURN_TYPE_PENDING)} known-pending")
 
-    session.log("Stage 5c: does any assertion or trace DO the work instead of reporting it?")
-    hiding, pending_seen, traces = {}, set(), {}
-    for src in sorted(CLIB.rglob("*.c")):
-        if any(p in src.parts for p in ("Test", "build")):
-            continue
-        for number, line in enumerate(src.read_text(encoding="ascii", errors="replace").splitlines(), 1):
-            if line.lstrip().startswith("//"):
-                continue                      # a commented-out site elides nothing
-            calls = _calls_inside(line, ELIDED_ASSERT)
-            if calls:
-                if src.name in ASSERT_SIDE_EFFECT_PENDING:
-                    pending_seen.add(src.name)
-                else:
-                    hiding.setdefault(src.name, []).append(f"{number}: {calls[0]}")
-            calls = _calls_inside(line, ELIDED_TRACE)
-            if calls:
-                traces.setdefault(src.name, []).append(f"{number}: {calls[0]}")
-    if hiding:
-        session.error(f"Stage 5c FAILED: an assertion performs the work in {sorted(hiding)} - a "
-                      f"build with that module's assertions off loses the behaviour, not the "
-                      f"check. Sites: {hiding}")
-    if traces:
-        session.error(f"Stage 5c FAILED: a TRACE argument performs the work in {sorted(traces)}. "
-                      f"Measured 12.09 there were none - either gate is closed and the argument "
-                      f"is deleted. Sites: {traces}")
-    session.log(f"Stage 5c: no trace does work, {len(pending_seen)} assert files known-pending")
+    session.log("Stage 6: clang-tidy and cppcheck over the analysed matrix rows, configured and checks off")
+    # harness.host.matrix.ANALYSIS_ROWS between them compile every code line of the library. The
+    # Python library's runner (D33) reads each source of each row through both analysers twice, the
+    # second time with every assertion and trace disabled, and the gate fails on any finding and on
+    # a line the rows stopped compiling. Evidence: build/analyze/matrix/, report.md first.
+    analysis = out / "matrix"
+    shutil.rmtree(analysis, ignore_errors=True)
+    host_matrix.analyze(analysis, log=session.log)
+    session.run(PYTHON, "-m", "alx.verify.gates.analyzers", str(analysis / "report.json"),
+                "--out", str(out / "analyzers_gate.txt"))
 
-    session.log("Stage 5d: does every portable module DECLARE only decision 12's types? (clang's AST)")
-    # The same sources as Stage 5, read by clang with the host build's flags: the gate dumps each
-    # one's AST and judges every declaration made in a library file - the headers under the root
-    # included, vendor trees, build output and TYPES_PENDING not.
+    session.log("Stage 7: does every library file DECLARE only decision 12's types? (clang's AST)")
+    # Every analysed row's compile commands as Stage 6 wrote them - each file judged in the
+    # configurations that compile it, Ext/ and Mcu/ included - and the fakes with the host build's
+    # flags. The gate judges every declaration a file under the root makes: vendor trees, the vendor
+    # fakes (shim), build output and the venv excepted.
     types_db = out / "types_compile_commands.json"
-    portable = [s for s in sorted([*CLIB.glob("*.c"), *FAKES.glob("*.c")]) if s.name not in SYNTAX_NEEDS_CMSIS]
-    hb.write_compile_db(types_db, portable, [*host_recipe.DB_ARGUMENTS, "-DALX_C_LIB"], directory=BUILD)
+    hb.write_compile_db(types_db, sorted(FAKES.glob("*.c")), [*host_recipe.DB_ARGUMENTS, "-DALX_C_LIB"],
+                        directory=BUILD)
+    entries = [*json.loads((analysis / "compile_commands.json").read_text(encoding="utf-8")),
+               *json.loads(types_db.read_text(encoding="utf-8"))]
+    types_db.write_text(json.dumps(entries, indent=1), encoding="utf-8")
     session.run(PYTHON, "-m", "alx.verify.gates.c_types", str(types_db), "--root", str(CLIB), *VENDOR,
-                *[a for name in ("Doc", "build", ".venv", *TYPES_PENDING) for a in ("--exclude", name)],
-                "--clang", str(tc.llvm("clang")), "--out", str(out / "c_types.txt"))
+                *[a for name in ("Doc", "build", ".venv", "shim", *TYPES_GENERATED) for a in ("--exclude", name)],
+                *[a for name in TYPES_PREFIXES for a in ("--prefix", name)],
+                *[a for name in TYPES_CALLBACKS for a in ("--callback", name)],
+                *[a for spot in TYPES_EXEMPT for a in ("--exempt", spot)],
+                *[a for name in sorted(TYPES_PENDING) for a in ("--pending", name)],
+                "--jobs", str(TYPES_JOBS), "--clang", str(tc.llvm("clang")), "--out", str(out / "c_types.txt"))
 
 
     session.log(f"ANALYZE CLEAN - evidence in {out}")
@@ -752,79 +782,59 @@ def sanitize(session: nox.Session) -> None:
     session.log("SANITIZE CLEAN")
 
 
-def _llvm_cov_group(session: nox.Session, out: Path, dll: Path, env_var: str, tests, metrics: str, gated) -> None:
-    """Run the group's suite against its instrumented DLL, merge the profiles, report, export, gate."""
-    for old in out.glob("*.profraw"):
-        old.unlink()
-    _pytest(session, {env_var: str(dll), "LLVM_PROFILE_FILE": str(out / "%m-%p.profraw")}, *tests)
-    profdata = out / "merged.profdata"
-    session.run(str(tc.llvm("llvm-profdata")), "merge", "-sparse", *_strs(out.glob("*.profraw")), "-o", str(profdata),
-                external=True)
-    cov = str(tc.llvm("llvm-cov"))
-    report = session.run(cov, "report", str(dll), f"-instr-profile={profdata}", external=True, silent=True)
-    _write(out / "coverage_report.txt", report)
-    session.log(report)
-    _write(out / "lcov.info", session.run(cov, "export", str(dll), f"-instr-profile={profdata}", "-format=lcov",
-                                         external=True, silent=True))
-    session.run(PYTHON, "-m", "lcov_cobertura", str(out / "lcov.info"), "--output", str(out / "coverage_c.xml"),
-                "--base-dir", str(CLIB))
-    session.run(cov, "show", str(dll), f"-instr-profile={profdata}", "-format=html", f"-output-dir={out / 'html'}",
-                "-show-branches=count", "-show-line-counts", external=True, silent=True)
-    _write(out / "summary.json", session.run(cov, "export", str(dll), f"-instr-profile={profdata}", "-summary-only",
-                                            external=True, silent=True))
-    session.run(PYTHON, "-m", "alx.verify.gates.coverage", str(out / "summary.json"), "--metrics", metrics,
-                "--out", str(out / "coverage_gate.txt"), *gated)
-    session.log(f"html: {out / 'html' / 'index.html'}   cobertura: {out / 'coverage_c.xml'}")
-
-
 @nox.session
 def coverage(session: nox.Session) -> None:
-    """COVERAGE: clang-instrumented DLL per test group, the same suite, llvm-cov + cobertura, gate per file."""
-    # A disabled assertion keeps its expression in a sizeof (decision 14), a disabled trace its arguments;
-    # clang's coverage still maps the && || ?: of that operand as branches that never run, so every
-    # coverage build disables both with nothing at all. Coverage builds are measured, never analysed.
-    _guard(session, _check_ms_tests)
+    """COVERAGE: every group's DLL instrumented, the whole suite against them, llvm-cov per library file, gate."""
+    # Every group of harness.host.build as its builder states it (host_recipe.recipes()), rebuilt with
+    # clang's instrumentation and its assertions disabled: a disabled assertion keeps its expression in a
+    # sizeof (decision 14), a disabled trace its arguments, and clang's coverage maps the && || ?: of that
+    # operand as branches that never run, so a coverage build disables both with nothing at all. A group
+    # whose tests need its assertions keeps them (COVERAGE_ASSERTS_ON). One run of the whole suite reaches
+    # every DLL through its fixture's variable, and llvm-cov reads them together, so a file several groups
+    # compile is measured over all of them. Coverage builds are measured, never analysed.
     _fresh_dev_build(session)
     out = lanes.evidence_dir(TEST, "coverage")
-    _instrumented_dll(out / "alxFifoTest.dll", FIFO_SOURCES, FIFO_EXPORTS, PROFILE,
-                      defines=[COVERAGE_ASSERT_OFF, COVERAGE_TRACE_OFF])
-    _llvm_cov_group(session, out, out / "alxFifoTest.dll", "ALX_FIFO_TEST_DLL", [],
-                    "lines,branches,regions,functions", ["alxFifo.c", "alxBound.c"])
-    # MemSafe group: gate = functions 100 %; lines/branches are REPORTED - alxMemSafe.c keeps three blocks unreachable
-    # with asserts ON and alxCrc.c has `break` after `return` plus assert-guarded default branches (task notes).
-    ms = lanes.evidence_dir(TEST, "coverage", "memsafe")
-    _instrumented_dll(ms / "alxMemSafeTest.dll", MS_STRICT, MS_EXPORTS, PROFILE, closure=MS_CLOSURE,
-                      defines=[*MS_ASSERTS, COVERAGE_ASSERT_OFF, COVERAGE_TRACE_OFF], obj_dir=ms / "closure")
-    # alxFtoa.c and alxParamGroup.c join the gate now that the report is honest about them; both
-    # measure 100 % of functions. alxRange.c is 11 of 12 and cannot - the one function never
-    # executed is AlxRange_CheckArr, the unimplemented stub Stage 5b names for falling off the end
-    # of a non-void function. alxParamStore.c is 6 of 8 and alxParamItem.c 25 of 105, which is the
-    # group's real remaining gap rather than an artefact of the list above.
-    _llvm_cov_group(session, ms, ms / "alxMemSafeTest.dll", "ALX_MEMSAFE_TEST_DLL", MS_TESTS,
-                    "functions", ["alxCrc.c", "alxMemSafe.c", "alxFtoa.c", "alxParamGroup.c"])
-    # Id group: gate = functions 100 %; lines and branches are REPORTED and not gated, on purpose.
-    # alxId.c carries whole paragraphs behind #ifdef ALX_STM32 / ALX_CMSIS_CORE that a PC build
-    # cannot reach at all, so a line gate here would be a number picked to fit rather than a claim
-    # about the tests. Every function the module defines IS reached (measured 46 of 46,
-    # 94.6 % of lines), which is the claim worth gating: a getter added and never called, or one
-    # dropped from ID_EXPORTS and so from every test, fails this lane.
-    idg = lanes.evidence_dir(TEST, "coverage", "id")
-    _instrumented_dll(idg / "alxIdTest.dll", ID_STRICT, ID_EXPORTS, PROFILE, closure=ID_CLOSURE,
-                      defines=[*ID_ASSERTS, COVERAGE_ASSERT_OFF, COVERAGE_TRACE_OFF], obj_dir=idg / "closure")
-    _llvm_cov_group(session, idg, idg / "alxIdTest.dll", "ALX_ID_TEST_DLL", ID_TESTS,
-                    "functions", ["alxId.c"])
-    # MemRaw group: gate = functions 100 % over alxMemRaw.c, measured from the WEAK DLL and ONLY
-    # from there. In the override DLL four of the five bodies are displaced by a strong definition
-    # and would report zero executions however many tests ran, so instrumenting that one instead is
-    # the way a well-meant addition breaks this lane. All five weak bodies run in the weak DLL,
-    # which is what makes 100 % an honest number rather than a chosen one. The Assert group is
-    # absent on purpose - the reason is written at its declaration above.
-    mr = lanes.evidence_dir(TEST, "coverage", "memraw")
-    _instrumented_dll(mr / "alxMemRawTest.dll", MEMRAW_SOURCES, MEMRAW_EXPORTS, PROFILE,
-                      defines=[*MEMRAW_ASSERTS, COVERAGE_ASSERT_OFF, COVERAGE_TRACE_OFF])
-    _llvm_cov_group(session, mr, mr / "alxMemRawTest.dll", "ALX_MEMRAW_TEST_DLL", MEMRAW_TESTS,
-                    "functions", ["alxMemRaw.c"])
-    session.log("COVERAGE GATES PASS")
+    for old in out.glob("*.profraw"):
+        old.unlink()
+    env = {"LLVM_PROFILE_FILE": str(out / "%m-%p.profraw")}
+    dlls = []
+    for recipe in host_recipe.recipes():
+        variable = host_recipe.dll_variable(recipe.dll)
+        defines = list(recipe.defines)
+        if variable not in COVERAGE_ASSERTS_ON:
+            defines = [d for d in defines if not ASSERT_ENABLE.fullmatch(d)]
+        dll = out / recipe.dll.name
+        _instrumented_dll(dll, recipe.strict, recipe.exports, PROFILE, closure=recipe.closure,
+                          defines=[*defines, COVERAGE_ASSERT_OFF, COVERAGE_TRACE_OFF],
+                          obj_dir=out / "closure" / recipe.dll.stem)
+        env[variable] = str(dll)
+        dlls.append(dll)
+    _pytest(session, env)
+    profdata = out / "merged.profdata"
+    session.run(str(tc.llvm("llvm-profdata")), "merge", "-sparse", *_strs(sorted(out.glob("*.profraw"))),
+                "-o", str(profdata), external=True)
+    cov, objects = str(tc.llvm("llvm-cov")), [str(dlls[0]), *[a for d in dlls[1:] for a in ("-object", str(d))]]
+    profile = f"-instr-profile={profdata}"
+    _write(out / "coverage_report.txt", session.run(cov, "report", *objects, profile, external=True, silent=True))
+    _write(out / "lcov.info", session.run(cov, "export", *objects, profile, "-format=lcov", external=True, silent=True))
+    session.run(PYTHON, "-m", "lcov_cobertura", str(out / "lcov.info"), "--output", str(out / "coverage_c.xml"),
+                "--base-dir", str(CLIB))
+    session.run(cov, "show", *objects, profile, "-format=html", f"-output-dir={out / 'html'}",
+                "-show-branches=count", "-show-line-counts", external=True, silent=True)
+    summary = session.run(cov, "export", *objects, profile, "-summary-only", external=True, silent=True)
+    _write(out / "summary.json", summary)
+    # The gate reads every library file some group compiles; the ones no group compiles are listed.
+    reported = {Path(f["filename"]).resolve() for f in json.loads(summary)["data"][0]["files"]}
+    measured = [f for f in LIBRARY_FILES if f.resolve() in reported]
+    unmeasured = [f.relative_to(CLIB).as_posix() for f in LIBRARY_FILES if f.resolve() not in reported]
+    _write(out / "unmeasured.txt", "".join(f"{f}\n" for f in unmeasured))
+    session.log(f"COVERAGE: {len(measured)} library files measured, {len(unmeasured)} compiled by no group "
+                f"(unmeasured.txt); html {out / 'html' / 'index.html'}")
+    session.run(PYTHON, "-m", "alx.verify.gates.coverage", str(out / "summary.json"),
+                "--metrics", "lines,branches,regions,functions", "--out", str(out / "coverage_gate.txt"),
+                *[a for name in COVERAGE_PENDING for a in ("--pending", name)],
+                *[f.relative_to(CLIB).as_posix() for f in measured])
+    session.log("COVERAGE GATE PASS")
 
 
 @nox.session
