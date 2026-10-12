@@ -77,7 +77,7 @@ extern "C" {
 //******************************************************************************
 // Functions
 //******************************************************************************
-char* AlxFtoa(double f, char* buf, int precision);
+char* AlxFtoa(double f, char* buf, int32_t precision);
 
 
 #endif	// #if defined(ALX_C_LIB)
