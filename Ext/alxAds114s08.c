@@ -40,8 +40,8 @@
 //******************************************************************************
 // Private Variables
 //******************************************************************************
-float transferFun_thermocoupleS_PointArr_mV[] = { -0.236, 0.000, 0.173, 0.646, 1.441, 2.323, 3.259, 4.233, 5.239, 6.275, 7.345, 8.449, 9.587, 10.757, 11.951, 13.159, 15.582, 17.947 };
-float transferFun_thermocoupleS_PointArr_degC[] = { -50, 0, 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1500, 1700 };
+static float transferFun_thermocoupleS_PointArr_mV[] = { -0.236, 0.000, 0.173, 0.646, 1.441, 2.323, 3.259, 4.233, 5.239, 6.275, 7.345, 8.449, 9.587, 10.757, 11.951, 13.159, 15.582, 17.947 };
+static float transferFun_thermocoupleS_PointArr_degC[] = { -50, 0, 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1500, 1700 };
 #define NUM_OF_PONTS_TRANSFER_FUN_THERMCOUPLE_S (sizeof(transferFun_thermocoupleS_PointArr_mV) / sizeof(transferFun_thermocoupleS_PointArr_mV[0]))
 
 
