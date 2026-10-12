@@ -198,6 +198,27 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				ALX_PARAM_GROUP_TRACE_WRN("%s_Err", me->name);
 				continue;
 			}
+			case Alx_Ok:
+			case Alx_ErrNumOfTries:
+			case AlxBound_ErrMin:
+			case AlxBound_ErrMax:
+			case AlxBound_ErrLen:
+			case AlxFifo_ErrFull:
+			case AlxFifo_ErrEmpty:
+			case AlxFifo_ErrNoDelim:
+			case AlxFifo_ErrTooLong:
+			case AlxSafe_BothCopyErr_OrigOk_UseOrig:
+			case AlxParamItem_ErrConv:
+			case AlxParamItem_ErrEnum:
+			case AlxRange_ErrMin:
+			case AlxRange_ErrMax:
+			case AlxRange_ErrLen:
+			case AlxFs_ErrNoDelim:
+			case AlxFs_EndOfDir:
+			case AlxLogger_ErrNoReadLog:
+			case AlxNet_Timeout:
+			case AlxNet_NotSupported:
+			case AlxNtp_NotEnoughSamples:
 			default:
 			{
 				ALX_PARAM_GROUP_ASSERT(false);	// We should never get here
