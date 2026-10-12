@@ -319,7 +319,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 		if (md.read.pos != md.read.log)
 		{
 			// Open
-			sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", md.read.dir, md.read.file);
+			(void)sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", md.read.dir, md.read.file);
 			status = AlxFs_File_Open(me->alxFs, &file, path, "r");
 			if (status != Alx_Ok)
 			{
@@ -399,7 +399,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 			}
 
 			// Open
-			sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", md.read.dir, md.read.file);
+			(void)sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", md.read.dir, md.read.file);
 			status = AlxFs_File_Open(me->alxFs, &file, path, "r");
 			if (status != Alx_Ok)
 			{
@@ -433,7 +433,7 @@ Alx_Status AlxLogger_Log_Read(AlxLogger* me, char* logs, uint32_t numOfLogs, uin
 			}
 
 			// Open new file
-			sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", md.read.dir, md.read.file);
+			(void)sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", md.read.dir, md.read.file);
 			status = AlxFs_File_Open(me->alxFs, &file, path, "r");
 			if (status != Alx_Ok)
 			{
@@ -597,7 +597,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		//------------------------------------------------------------------------------
 		// Open
 		//------------------------------------------------------------------------------
-		sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, me->md.write.file);
+		(void)sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, me->md.write.file);
 		status = AlxFs_File_Open(me->alxFs, &file, path, "a");
 		if (status != Alx_Ok)
 		{
@@ -629,13 +629,13 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		}
 
 		// Set writeLen
-		writeLen = AlxLogger_Log_GetLogsEndPosition(me, (void*)logs + writeLenTotal, numOfLogsToWrite);
+		writeLen = AlxLogger_Log_GetLogsEndPosition(me, logs + writeLenTotal, numOfLogsToWrite);
 
 
 		//------------------------------------------------------------------------------
 		// Write
 		//------------------------------------------------------------------------------
-		status = AlxFs_File_Write(me->alxFs, &file, (void*)logs + writeLenTotal, writeLen);
+		status = AlxFs_File_Write(me->alxFs, &file, (void*)(logs + writeLenTotal), writeLen);
 		if (status != Alx_Ok)
 		{
 			ALX_LOGGER_TRACE_ERR("Err: %d, path=%s, writeLen=%" PRIu32 ", logNum=%" PRIu32 ", writeLenTotal=%" PRIu32 ", numOfLogs=%" PRIu32, status, path, writeLen, logNum, writeLenTotal, numOfLogs);
@@ -753,7 +753,7 @@ Alx_Status AlxLogger_Log_Write(AlxLogger* me, const char* logs, uint32_t numOfLo
 		//------------------------------------------------------------------------------
 		// Store Metadata
 		//------------------------------------------------------------------------------
-		if (wereOldestReadLogsDiscarded)	// If oldest read logs were discared, store read & write & oldest
+		if (wereOldestReadLogsDiscarded)	// If oldest read logs were discarded, store read & write & oldest
 		{
 			status = AlxLogger_Metadata_Store_Private(me, AlxLogger_Metadata_StoreConfig_ReadWriteOldest);
 			if (status != Alx_Ok)
@@ -1047,7 +1047,7 @@ Alx_Status AlxLogger_File_GetPathStoredOldest(AlxLogger* me, char* pathStoredOld
 	uint32_t dirOldest = me->md.oldest.dir;
 
 	// Return
-	sprintf(pathStoredOldest, "/%" PRIu32 "/%" PRIu32 ".csv", dirOldest, fileOldest);
+	(void)sprintf(pathStoredOldest, "/%" PRIu32 "/%" PRIu32 ".csv", dirOldest, fileOldest);
 	return Alx_Ok;
 }
 Alx_Status AlxLogger_File_GetPathStoredNewest(AlxLogger* me, char* pathStoredNewest)
@@ -1070,7 +1070,7 @@ Alx_Status AlxLogger_File_GetPathStoredNewest(AlxLogger* me, char* pathStoredNew
 	uint32_t dirNewest = (idNewest / me->numOfLogsPerDirTotal) % me->numOfDir;
 
 	// Return
-	sprintf(pathStoredNewest, "/%" PRIu32 "/%" PRIu32 ".csv", dirNewest, fileNewest);
+	(void)sprintf(pathStoredNewest, "/%" PRIu32 "/%" PRIu32 ".csv", dirNewest, fileNewest);
 	return Alx_Ok;
 }
 Alx_Status AlxLogger_File_GetPathToProcessOldest(AlxLogger* me, char* pathToProcessOldest)
@@ -1092,7 +1092,7 @@ Alx_Status AlxLogger_File_GetPathToProcessOldest(AlxLogger* me, char* pathToProc
 	uint32_t dirOldest = me->md.read.dir;
 
 	// Return
-	sprintf(pathToProcessOldest, "/%" PRIu32 "/%" PRIu32 ".csv", dirOldest, fileOldest);
+	(void)sprintf(pathToProcessOldest, "/%" PRIu32 "/%" PRIu32 ".csv", dirOldest, fileOldest);
 	return Alx_Ok;
 }
 
@@ -1406,7 +1406,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 		AlxTimSw_Start(&alxTimSw_DirFilePrepSingle);
 
 		// Make dir
-		sprintf(dirPath, "/%" PRIu32, me->numOfDirCreated);
+		(void)sprintf(dirPath, "/%" PRIu32, me->numOfDirCreated);
 		status = AlxFs_Dir_Make(me->alxFs, dirPath);
 		if (status != Alx_Ok)
 		{
@@ -1426,7 +1426,7 @@ static Alx_Status AlxLogger_CreateDirAndFiles(AlxLogger* me)
 		for (me->numOfFilesPerDirCreated = 0; me->numOfFilesPerDirCreated < me->numOfFilesPerDir; me->numOfFilesPerDirCreated++)
 		{
 			// Open file
-			sprintf(filePath, "%s/%" PRIu32 ".csv", dirPath, me->numOfFilesPerDirCreated);
+			(void)sprintf(filePath, "%s/%" PRIu32 ".csv", dirPath, me->numOfFilesPerDirCreated);
 			status = AlxFs_File_Open(me->alxFs, &file, filePath, "w");
 			if (status != Alx_Ok)
 			{
@@ -1513,7 +1513,7 @@ static Alx_Status AlxLogger_CheckRepairWriteFile(AlxLogger* me)
 	//------------------------------------------------------------------------------
 
 	// Open
-	sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, me->md.write.file);
+	(void)sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, me->md.write.file);
 	status = AlxFs_File_Open(me->alxFs, &file, path, "r+");
 	if (status != Alx_Ok)
 	{
@@ -1720,7 +1720,7 @@ static Alx_Status AlxLogger_ClearWriteDir(AlxLogger* me)
 	for (uint32_t i = 0; i < me->numOfFilesPerDir; i++)
 	{
 		// Open
-		sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, i);
+		(void)sprintf(path, "/%" PRIu32 "/%" PRIu32 ".csv", me->md.write.dir, i);
 		status = AlxFs_File_Open(me->alxFs, &file, path, "w");
 		if (status != Alx_Ok)
 		{
