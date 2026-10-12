@@ -392,6 +392,9 @@ COVERAGE_ASSERTS_ON: dict[str, str] = {
     "ALX_RTC_TEST_DLL": "test_rtc_global.py's sealed P449 is the assertion a year past 2099 trips",
     "ALX_TEMPSENS_TEST_DLL": "test_temp_sens_rtd_vdiv.py's sealed P466 is the stubs' assertion",
 }
+# The files the per-group gates held at 100 % of functions until goal 7 (MemSafe, Id, MemRaw), now in
+# the queue below for their other metrics: their functions stay gated.
+COVERAGE_FUNCTIONS = ["alxCrc.c", "alxMemSafe.c", "alxParamGroup.c", "alxId.c", "alxMemRaw.c"]
 # The library files under 100 % on a gated metric, with what they measured (%, 2026-10-12): the queue of
 # tests to write - goal 7 step 9 wrote none. A file leaves the list when it reaches 100 % on every
 # metric; the gate fails until it does.
@@ -834,6 +837,9 @@ def coverage(session: nox.Session) -> None:
                 "--metrics", "lines,branches,regions,functions", "--out", str(out / "coverage_gate.txt"),
                 *[a for name in COVERAGE_PENDING for a in ("--pending", name)],
                 *[f.relative_to(CLIB).as_posix() for f in measured])
+    # What the per-group gates this lane replaced held, a file in the queue keeps: every function runs.
+    session.run(PYTHON, "-m", "alx.verify.gates.coverage", str(out / "summary.json"), "--metrics", "functions",
+                "--out", str(out / "coverage_gate_functions.txt"), *COVERAGE_FUNCTIONS)
     session.log("COVERAGE GATE PASS")
 
 
