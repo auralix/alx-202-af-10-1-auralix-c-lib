@@ -35,8 +35,8 @@
 		#include "alxBootMetadata_GENERATED.h"
 	#endif
 	#if defined(ALX_BUILD_CONFIG_FW_UP)
-		static const unsigned char app_header[0x0200] ALX_SECTION(".app_header") = {0xDE, 0xAD, 0xBE, 0xEF};
-		static const unsigned char app_trailer[0x0028] ALX_SECTION(".app_trailer") = {0xDE, 0xAD, 0xBE, 0xEF};
+		static const uint8_t app_header[0x0200] ALX_SECTION(".app_header") = {0xDE, 0xAD, 0xBE, 0xEF};
+		static const uint8_t app_trailer[0x0028] ALX_SECTION(".app_trailer") = {0xDE, 0xAD, 0xBE, 0xEF};
 	#endif
 #endif
 
@@ -291,7 +291,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	const char* fwName = AlxId_GetFwName(me->alxId);
 	AlxFs_Dir dir = {};
 	char dirPath[128] = "";
-	sprintf(dirPath, "/%s", fwName);
+	(void)sprintf(dirPath, "/%s", fwName);
 	status = AlxFs_Dir_Open(me->alxFs, &dir, dirPath);
 	if (status != Alx_Ok)
 	{
@@ -390,7 +390,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 			// Update
 			fwCandFound = true;
 			fwCandVerDate = _fwCandVerDate;
-			sprintf(fwCandFilePath, "/%s/%s", fwName, info.fatfsInfo.fname);
+			(void)sprintf(fwCandFilePath, "/%s/%s", fwName, info.fatfsInfo.fname);
 
 			// Trace
 			ALX_BOOT_TRACE_INF("UPDATE: FwCandFilePathUpdated() fwCandFilePath %s", fwCandFilePath);
@@ -471,12 +471,12 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 
 	// Open FLASH
 	#if defined(ALX_BOOT_A)
-	int statusBoot = -1;
-	int id = flash_area_id_from_image_slot(1);
+	int32_t statusBoot = -1;
+	int32_t id = flash_area_id_from_image_slot(1);
 	statusBoot = flash_area_open(id, &me->fa);
 	if (statusBoot != 0)
 	{
-		ALX_BOOT_TRACE_ERR("FAIL: flash_area_open() statusBoot %d", statusBoot);
+		ALX_BOOT_TRACE_ERR("FAIL: flash_area_open() statusBoot %" PRId32, statusBoot);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
@@ -486,7 +486,7 @@ void AlxBoot_App_Usb_Update(AlxBoot* me)
 	statusBoot = flash_area_erase(me->fa, 0, ALX_MCU_BOOT_IMAGE_SIZE);
 	if (statusBoot != 0)
 	{
-		ALX_BOOT_TRACE_ERR("FAIL: flash_area_erase() statusBoot %d", statusBoot);
+		ALX_BOOT_TRACE_ERR("FAIL: flash_area_erase() statusBoot %" PRId32, statusBoot);
 		AlxFs_UnMount(me->alxFs);
 		AlxBoot_App_Usb_StatusChange_Callback(me, AlxBoot_App_Status_Err);
 		return;
@@ -704,15 +704,15 @@ static Alx_Status AlxBoot_App_Usb_FwCand_ChunkRead_Callback(void* ctx, void* chu
 
 	// Write FLASH area
 	#if defined(ALX_BOOT_A)
-	int statusBoot = flash_area_write(me->fa, me->fwCandStaging_LenWritten_bytes, chunkData, chunkLenActual);
+	int32_t statusBoot = flash_area_write(me->fa, me->fwCandStaging_LenWritten_bytes, chunkData, chunkLenActual);
 	if (statusBoot != 0)
 	{
-		ALX_BOOT_TRACE_WRN("FAIL: flash_area_write() statusBoot %d", statusBoot);
+		ALX_BOOT_TRACE_WRN("FAIL: flash_area_write() statusBoot %" PRId32, statusBoot);
 		return Alx_Err;
 	}
 
 	// Calculate progress
-	uint8_t fwCandStaging_Progress_pct = ((uint64_t)me->fwCandStaging_LenWritten_bytes * 100) / ALX_MCU_BOOT_IMAGE_SIZE;
+	uint8_t fwCandStaging_Progress_pct = ((uint64_t)me->fwCandStaging_LenWritten_bytes * 100) / (uint64_t)ALX_MCU_BOOT_IMAGE_SIZE;
 	uint8_t fwCandStaging_ProgressStep10_pct = fwCandStaging_Progress_pct / 10 * 10;
 
 	// Trace progress
