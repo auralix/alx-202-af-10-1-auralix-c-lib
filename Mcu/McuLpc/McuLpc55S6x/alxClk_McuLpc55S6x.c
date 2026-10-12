@@ -305,7 +305,7 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxClk_Irq_Handle(AlxClk* me)
 {
@@ -514,7 +514,7 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz(Al
 	CLOCK_AttachClk(kFRO12M_to_PLL0);
 
 	// Enable PLL
-	ALX_UNUSED int32_t status = (int32_t)CLOCK_SetPLL0Freq(&pll0Setup);	// MF: Enabling PLL happend here
+	ALX_UNUSED int32_t status = (int32_t)CLOCK_SetPLL0Freq(&pll0Setup);	// MF: Enabling PLL happened here
 	ALX_CLK_ASSERT(status == kStatus_PLL_Success);
 
 	// Attach to mainClk
@@ -552,7 +552,7 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(Al
 	CLOCK_AttachClk(kEXT_CLK_to_PLL0);
 
 	// Enable PLL
-	status = (int32_t)CLOCK_SetPLL0Freq(&pll0Setup);	// MF: Enabling PLL happend here
+	status = (int32_t)CLOCK_SetPLL0Freq(&pll0Setup);	// MF: Enabling PLL happened here
 	ALX_CLK_ASSERT(status == kStatus_PLL_Success);
 
 	// Attach to mainClk
@@ -579,7 +579,7 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz(Al
 	CLOCK_AttachClk(kEXT_CLK_to_PLL0);
 
 	// Enable PLL
-	status = (int32_t)CLOCK_SetPLL0Freq(&pll0Setup);	// MF: Enabling PLL happend here
+	status = (int32_t)CLOCK_SetPLL0Freq(&pll0Setup);	// MF: Enabling PLL happened here
 	ALX_CLK_ASSERT(status == kStatus_PLL_Success);
 
 	// Attach to mainClk
