@@ -127,7 +127,7 @@ void AlxBts724g_DeInit(AlxBts724g* me);
 void AlxBts724g_Handle(AlxBts724g* me);
 void AlxBts724g_SetOut(AlxBts724g* me);
 void AlxBts724g_ResetOut(AlxBts724g* me);
-void AlxBts724g_WriteOut(AlxBts724g* me, bool state);
+void AlxBts724g_WriteOut(AlxBts724g* me, bool val);
 bool AlxBts724g_IsOpenLoadDetected(AlxBts724g* me);
 bool AlxBts724g_IsOverTempDetected(AlxBts724g* me);
 bool AlxBts724g_WasOpenLoadDetected(AlxBts724g* me);
