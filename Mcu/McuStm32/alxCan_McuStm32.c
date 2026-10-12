@@ -663,7 +663,7 @@ bool AlxCan_IsErr(AlxCan* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxCan_IrqHandler(AlxCan* me)
 {
@@ -897,7 +897,7 @@ static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me)
 			else // Remote Frame
 				alxRxMsg.isDataFrame = false;
 
-			// Set Lenght
+			// Set Length
 			alxRxMsg.dataLen = AlxCan_GetDataLen(halRxMsg.DataLength);
 		}
 
