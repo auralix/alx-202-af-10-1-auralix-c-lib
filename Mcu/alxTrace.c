@@ -41,7 +41,7 @@
 //******************************************************************************
 // Variables
 //******************************************************************************
-AlxTrace alxTrace = {0};
+AlxTrace alxTrace;
 
 
 //******************************************************************************
@@ -64,9 +64,9 @@ void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
 {
 	// Prepare formatStr
 	char formatStr[ALX_TRACE_LEN_MAX] = {};
-	va_list args = {};
+	va_list args;
 	va_start(args, format);
-	vsnprintf(formatStr, sizeof(formatStr), format, args);
+	(void)vsnprintf(formatStr, sizeof(formatStr), format, args);
 	va_end(args);
 
 	// Trace
@@ -89,7 +89,7 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	//------------------------------------------------------------------------------
 	char dateTimeStr[32] = "";
 	AlxRtc_DateTime dateTime = AlxTrace_GetRtcDateTime_Callback(me);
-	sprintf
+	(void)sprintf
 	(
 		dateTimeStr,
 		"20%02" PRIu32 "-%02" PRIu32 "-%02" PRIu32 " %02" PRIu32 ":%02" PRIu32 ":%02" PRIu32 ".%03" PRIu16,
@@ -106,7 +106,7 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	//------------------------------------------------------------------------------
 	// Prepare levelStr
 	//------------------------------------------------------------------------------
-	const char* levelStr = "";
+	const char* levelStr = ALX_NULL_PTR;
 	switch (level)
 	{
 		case ALX_TRACE_LEVEL_FTL: levelStr = "FTL"; break;
@@ -123,9 +123,9 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	// Prepare formatStr
 	//------------------------------------------------------------------------------
 	char formatStr[ALX_TRACE_LEN_MAX] = {};
-	va_list args = {};
+	va_list args;
 	va_start(args, format);
-	vsnprintf(formatStr, sizeof(formatStr), format, args);
+	(void)vsnprintf(formatStr, sizeof(formatStr), format, args);
 	va_end(args);
 
 
