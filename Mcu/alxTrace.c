@@ -41,7 +41,7 @@
 //******************************************************************************
 // Variables
 //******************************************************************************
-AlxTrace alxTrace;
+AlxTrace alxTrace = {0};
 
 
 //******************************************************************************
@@ -106,7 +106,7 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	//------------------------------------------------------------------------------
 	// Prepare levelStr
 	//------------------------------------------------------------------------------
-	const char* levelStr = ALX_NULL_PTR;
+	const char* levelStr = "";
 	switch (level)
 	{
 		case ALX_TRACE_LEVEL_FTL: levelStr = "FTL"; break;
@@ -115,7 +115,7 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 		case ALX_TRACE_LEVEL_INF: levelStr = "INF"; break;
 		case ALX_TRACE_LEVEL_DBG: levelStr = "DBG"; break;
 		case ALX_TRACE_LEVEL_VRB: levelStr = "VRB"; break;
-		default: levelStr = ""; break;
+		default: break;
 	}
 
 

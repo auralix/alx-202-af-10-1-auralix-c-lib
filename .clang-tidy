@@ -14,6 +14,10 @@
 #                                          per-pin IOCON tables), a disabled assertion leaves branches
 #                                          empty and the matrix fakes make two vendor calls one - 30 over
 #                                          every library file, no defect among them (goal 7, 2026-10-12)
+#   bugprone-invalid-enum-default-initialization
+#                                        - `= {0}` is how the library writes an object's start state,
+#                                          its enumeration members included; a constructor gives every
+#                                          one its value (TV's review of goal 7, 2026-10-20)
 #   clang-analyzer-security.insecureAPI.strcpy
 #                                        - reports every strcpy and strcat, whatever the sizes, and asks
 #                                          for strlcpy and strlcat, which C99 does not have (20 in the
@@ -30,7 +34,7 @@ Checks: >
   -bugprone-easily-swappable-parameters, -cert-int09-c,
   -bugprone-narrowing-conversions,
   -clang-analyzer-optin.performance.Padding,
-  -bugprone-branch-clone,
+  -bugprone-branch-clone, -bugprone-invalid-enum-default-initialization,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   -clang-analyzer-security.insecureAPI.strcpy
 WarningsAsErrors: >
