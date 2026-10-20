@@ -617,8 +617,7 @@ static void AlxIna228_RegStruct_SetValToZero(AlxIna228* me)
 {
 	me->reg._0x00_CONFIG			.val.raw =	0x0000;
 	me->reg._0x01_ADC_CONFIG		.val.raw =	0x0000;
-	//me->reg._0x02_SHUNT_CAL			.val.raw =	0x0000;
-	memset(me->reg._0x02_SHUNT_CAL.val.raw,		0x0000, sizeof(me->reg._0x02_SHUNT_CAL	.val.raw));
+	me->reg._0x02_SHUNT_CAL			.val.raw =	0x0000;
 	#if defined(ALX_INA228)
 	me->reg._0x03_SHUNT_TEMPCO		.val.raw =	0x0000;
 	#endif
@@ -645,9 +644,7 @@ static void AlxIna228_RegStruct_SetToDefault(AlxIna228* me)
 {
 	me->reg._0x00_CONFIG.val.raw =			0x0000;
 	me->reg._0x01_ADC_CONFIG.val.raw =		0xFB68;
-	//me->reg._0x02_SHUNT_CAL.val.raw	=		0x1000;
-	me->reg._0x02_SHUNT_CAL.val.raw[0] =	0x00;
-	me->reg._0x02_SHUNT_CAL.val.raw[1] =	0x10;
+	me->reg._0x02_SHUNT_CAL.val.raw =		0x1000;
 	#if defined(ALX_INA228)
 	me->reg._0x03_SHUNT_TEMPCO.val.raw =	0x0000;
 	#endif

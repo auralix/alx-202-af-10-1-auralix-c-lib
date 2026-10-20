@@ -1,6 +1,7 @@
 #ifndef ALX_BOOT_GENERATED_H
 #define ALX_BOOT_GENERATED_H
 
+#include "alxGlobal.h"
 
 // 2405281248_ALX-202-AF-27-1_NucleoF429Zi_Boot_CFw_V0-0-0_23870d7.bin
 #if defined(ALX_BUILD_CONFIG_DEBUG)

@@ -217,8 +217,7 @@ typedef union
 		uint16_t SHUNT_CAL_Current_Amperes : 15;
 		uint8_t unused_15 : 1;
 	};
-	//uint16_t raw;
-	uint8_t raw[2];
+	uint16_t raw;
 } AlxIna228_RegVal_0x02_SHUNT_CAL;
 
 
