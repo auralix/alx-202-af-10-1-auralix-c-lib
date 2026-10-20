@@ -264,12 +264,6 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 			// #4 Break
 			break;
 		}
-		case AlxParamStore_St_CheckingGroup2:
-		case AlxParamStore_St_CheckingGroup3:
-		case AlxParamStore_St_CheckingGroup4:
-		case AlxParamStore_St_WritingGroup2:
-		case AlxParamStore_St_WritingGroup3:
-		case AlxParamStore_St_WritingGroup4:
 		default:
 		{
 			// #1 Assert
@@ -432,10 +426,6 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 			// #4 Break
 			break;
 		}
-		case AlxParamStore_St_CheckingGroup3:
-		case AlxParamStore_St_CheckingGroup4:
-		case AlxParamStore_St_WritingGroup3:
-		case AlxParamStore_St_WritingGroup4:
 		default:
 		{
 			// #1 Assert
