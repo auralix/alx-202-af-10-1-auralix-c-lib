@@ -2701,9 +2701,7 @@ static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me)
 {
 	if (me->dataType == AlxParamItem_Arr)
 	{
-		void* ptr = NULL;
-		memcpy((void*)&ptr, &me->val, 4);
-		return ptr;
+		return me->val.arr;
 	}
 	else if (me->dataType == AlxParamItem_Str)
 	{
