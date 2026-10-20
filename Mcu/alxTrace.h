@@ -86,12 +86,6 @@ typedef struct { bool dummy; } AlxTrace;
 
 #define ALX_TRACE_STR(str) do			{ AlxTrace_WriteStr(&alxTrace, str); } while(false)
 #define ALX_TRACE_FORMAT(...) do		{ AlxTrace_WriteFormat(&alxTrace, __VA_ARGS__); } while(false)
-// A disabled trace: its format and arguments stay compiled and referenced and are never evaluated,
-// as a disabled assertion's expression is (decision 14, D51). AlxTrace_Off is declared and never
-// defined: the operand of sizeof calls nothing, and clang checks the format against the
-// arguments there (gcc does not look inside sizeof).
-// A coverage build defines it as ((void)0): clang's coverage maps the && || ?: of the sizeof
-// operand as branches that never run.
 #ifndef ALX_TRACE_OFF
 #define ALX_TRACE_OFF(...) ((void)sizeof(AlxTrace_Off(__VA_ARGS__)))
 #endif
