@@ -59,19 +59,19 @@ void AlxGlobal_Ulltoa(uint64_t uint64, char* str)
 
 	if ((num1 == 0) && (num2 == 0) && (num3 == 0))
 	{
-		snprintf(str, 50, "%" PRIu32, num4);
+		(void)snprintf(str, 50, "%" PRIu32, num4);
 	}
 	else if ((num1 == 0) && (num2 == 0))
 	{
-		snprintf(str, 50, "%" PRIu32 "%05" PRIu32, num3, num4);
+		(void)snprintf(str, 50, "%" PRIu32 "%05" PRIu32, num3, num4);
 	}
 	else if (num1 == 0)
 	{
-		snprintf(str, 50, "%" PRIu32 "%05" PRIu32 "%05" PRIu32, num2, num3, num4);
+		(void)snprintf(str, 50, "%" PRIu32 "%05" PRIu32 "%05" PRIu32, num2, num3, num4);
 	}
 	else
 	{
-		snprintf(str, 50, "%" PRIu32 "%05" PRIu32 "%05" PRIu32 "%05" PRIu32, num1, num2, num3, num4);
+		(void)snprintf(str, 50, "%" PRIu32 "%05" PRIu32 "%05" PRIu32 "%05" PRIu32, num1, num2, num3, num4);
 	}
 }
 

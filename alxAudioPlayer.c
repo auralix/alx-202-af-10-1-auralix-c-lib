@@ -354,7 +354,6 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 					// Left
 					int8_t sampleInt8L = *(me->trackPtr + me->trackSampleOffset_Byte);
 					float sampleFloatL = AlxAudio_LinerPcmInt8ToFloat(sampleInt8L);
-					sampleOut = sampleFloatL;
 					// Right
 					int8_t sampleInt8R = *(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_8bit_Byte);
 					float sampleFloatR = AlxAudio_LinerPcmInt8ToFloat(sampleInt8R);
@@ -427,7 +426,7 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 			// #2.3.1 Check if track is mono
 			if (me->isTrackMono)
 			{
-				int16_t sampleInt16L = *((volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte));
+				int16_t sampleInt16L = *((const volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte));
 				float sampleFloatL = AlxAudio_LinerPcmInt16ToFloat(sampleInt16L);
 				sampleOut = sampleFloatL;	// If track is mono we always return left channel (no matter what type is selected)
 			}
@@ -437,22 +436,22 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 				if (sampleType == AlxAudioPlayer_SampleType_L)
 				{
 					// Left
-					int16_t sampleInt16L = *((volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte));
+					int16_t sampleInt16L = *((const volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte));
 					sampleOut = AlxAudio_LinerPcmInt16ToFloat(sampleInt16L);
 				}
 				else if (sampleType == AlxAudioPlayer_SampleType_R)
 				{
 					// Right
-					int16_t sampleInt16R = *((volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_16bit_Byte));
+					int16_t sampleInt16R = *((const volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_16bit_Byte));
 					sampleOut = AlxAudio_LinerPcmInt16ToFloat(sampleInt16R);
 				}
 				else if (sampleType == AlxAudioPlayer_SampleType_Mono)
 				{
 					// Left
-					int16_t sampleInt16L = *((volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte));
+					int16_t sampleInt16L = *((const volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte));
 					float sampleFloatL = AlxAudio_LinerPcmInt16ToFloat(sampleInt16L);
 					// Right
-					int16_t sampleInt16R = *((volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_16bit_Byte));
+					int16_t sampleInt16R = *((const volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_16bit_Byte));
 					float sampleFloatR = AlxAudio_LinerPcmInt16ToFloat(sampleInt16R);
 					// Mono
 					sampleOut = AlxAudio_StereoToMono(sampleFloatL, sampleFloatR);

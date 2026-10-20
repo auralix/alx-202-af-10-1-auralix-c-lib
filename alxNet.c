@@ -74,7 +74,6 @@ bool AlxNet_IsConnected(AlxNet* me)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
-	(void)me;
 
 	// Return
 	return false;
@@ -92,7 +91,6 @@ Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip)
 {
 	// Assert
 	ALX_NET_ASSERT(me->wasCtorCalled == true);
-	(void)me;
 	(void)hostname;
 	(void)ip;
 

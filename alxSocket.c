@@ -76,7 +76,6 @@ Alx_Status AlxSocket_Open(AlxSocket* me, AlxNet* alxNet, AlxSocket_Protocol prot
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-	(void)me;
 	(void)alxNet;
 	(void)protocol;
 
@@ -94,7 +93,6 @@ Alx_Status AlxSocket_Close(AlxSocket* me)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-	(void)me;
 
 	// Return
 	return Alx_Err;
@@ -112,7 +110,6 @@ Alx_Status AlxSocket_Connect(AlxSocket* me, const char* ip, uint16_t port)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-	(void)me;
 	(void)ip;
 	(void)port;
 
@@ -131,7 +128,6 @@ int32_t AlxSocket_Send(AlxSocket* me, void* data, uint32_t len)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-	(void)me;
 	(void)data;
 	(void)len;
 
@@ -150,7 +146,6 @@ int32_t AlxSocket_Recv(AlxSocket* me, void* data, uint32_t len)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-	(void)me;
 	(void)data;
 	(void)len;
 
@@ -167,7 +162,6 @@ void AlxSocket_SetTimeout_ms(AlxSocket* me, uint32_t timeout_ms)
 {
 	// Assert
 	ALX_SOCKET_ASSERT(me->wasCtorCalled == true);
-	(void)me;
 	(void)timeout_ms;
 }
 

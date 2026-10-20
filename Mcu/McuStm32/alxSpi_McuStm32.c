@@ -122,8 +122,8 @@ void AlxSpi_Ctor
 	#endif
 
 	// Check clock
-	ALX_SPI_ASSERT(AlxSpi_IsClkOk(me));
-	(void)AlxSpi_IsClkOk;
+	ALX_UNUSED bool isClkOk = AlxSpi_IsClkOk(me);
+	ALX_SPI_ASSERT(isClkOk);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -276,7 +276,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 			}
 		}
 
-		// If we are here, write was OK or number of tries error occured
+		// If we are here, write was OK or number of tries error occurred
 		if (status == HAL_OK)
 		{
 			return Alx_Ok;
@@ -387,7 +387,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 			}
 		}
 
-		// If we are here, read was OK or number of tries error occured
+		// If we are here, read was OK or number of tries error occurred
 		if (status == HAL_OK)
 		{
 			return Alx_Ok;
@@ -500,7 +500,7 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 			}
 		}
 
-		// If we are here, write/read was OK or number of tries error occured
+		// If we are here, write/read was OK or number of tries error occurred
 		if (status == HAL_OK)
 		{
 			return Alx_Ok;

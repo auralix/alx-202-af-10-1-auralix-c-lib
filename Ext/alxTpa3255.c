@@ -194,7 +194,7 @@ void AlxTpa3255_Handle(AlxTpa3255* me)
 				AlxTpa3255_Enable(me);
 			}
 		}
-		// Procesing WAS
+		// Processing WAS
 		if(AlxTpa3255_IsErrAsserted(me))
 		{
 			me->wasErrAsserted = true;
@@ -204,7 +204,7 @@ void AlxTpa3255_Handle(AlxTpa3255* me)
 			me->wasWarningAsserted = true;
 		}
 	}
-	else // functionality is disabled -> not try to ReEnable IC
+	else // functionality is disabled -> not try to re-enable IC
 	{
 		AlxIoPin_Write(me->do_nRESET, true);
 	}

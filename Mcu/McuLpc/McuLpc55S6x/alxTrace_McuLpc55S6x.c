@@ -208,49 +208,49 @@ static uint8_t AlxTrace_Periph_GetIoconFunc(AlxTrace* me)
 
 	// Get IOCON Func (see Table 340-342 in User Manual on page 343)
 	#if defined(USART0)
-	if (me->usart == USART0)						{ isErr = false; return IOCON_FUNC1; }
+	if (me->usart == USART0)						{ return IOCON_FUNC1; }
 	#endif
 	#if defined(USART1)
 	if (me->usart == USART1)
 	{
-		if		(me->port == 0 && me->pin == 10)	{ isErr = false; return IOCON_FUNC4; }
-		else if (me->port == 0 && me->pin == 14)	{ isErr = false; return IOCON_FUNC6; }
-		else if (me->port == 1 && me->pin == 11)	{ isErr = false; return IOCON_FUNC2; }
+		if		(me->port == 0 && me->pin == 10)	{ return IOCON_FUNC4; }
+		else if (me->port == 0 && me->pin == 14)	{ return IOCON_FUNC6; }
+		else if (me->port == 1 && me->pin == 11)	{ return IOCON_FUNC2; }
 		else										{ isErr = true; }
 	}
 	#endif
 	#if defined(USART2)
-	if (me->usart == USART2)						{ isErr = false; return IOCON_FUNC1; }
+	if (me->usart == USART2)						{ return IOCON_FUNC1; }
 	#endif
 	#if defined(USART3)
-	if (me->usart == USART3)						{ isErr = false; return IOCON_FUNC1; }
+	if (me->usart == USART3)						{ return IOCON_FUNC1; }
 	#endif
 	#if defined(USART4)
 	if (me->usart == USART4)
 	{
-		if		(me->port == 0 && me->pin == 16)	{ isErr = false; return IOCON_FUNC1; }
-		else if (me->port == 0 && me->pin == 20)	{ isErr = false; return IOCON_FUNC11; }
-		else if (me->port == 1 && me->pin == 20)	{ isErr = false; return IOCON_FUNC5; }
+		if		(me->port == 0 && me->pin == 16)	{ return IOCON_FUNC1; }
+		else if (me->port == 0 && me->pin == 20)	{ return IOCON_FUNC11; }
+		else if (me->port == 1 && me->pin == 20)	{ return IOCON_FUNC5; }
 		else										{ isErr = true; }
 	}
 	#endif
 	#if defined(USART5)
-	if (me->usart == USART5)						{ isErr = false; return IOCON_FUNC3; }
+	if (me->usart == USART5)						{ return IOCON_FUNC3; }
 	#endif
 	#if defined(USART6)
 	if (me->usart == USART6)
 	{
-		if		(me->port == 0 && me->pin == 12)	{ isErr = false; return IOCON_FUNC7; }
-		else if (me->port == 0 && me->pin == 22)	{ isErr = false; return IOCON_FUNC1; }
-		else if (me->port == 1 && me->pin == 16)	{ isErr = false; return IOCON_FUNC2; }
+		if		(me->port == 0 && me->pin == 12)	{ return IOCON_FUNC7; }
+		else if (me->port == 0 && me->pin == 22)	{ return IOCON_FUNC1; }
+		else if (me->port == 1 && me->pin == 16)	{ return IOCON_FUNC2; }
 		else										{ isErr = true; }
 	}
 	#endif
 	#if defined(USART7)
 	if (me->usart == USART7)
 	{
-		if		(me->port == 0 && me->pin == 19)	{ isErr = false; return IOCON_FUNC7; }
-		else if (me->port == 1 && me->pin == 30)	{ isErr = false; return IOCON_FUNC1; }
+		if		(me->port == 0 && me->pin == 19)	{ return IOCON_FUNC7; }
+		else if (me->port == 1 && me->pin == 30)	{ return IOCON_FUNC1; }
 		else										{ isErr = true; }
 	}
 	#endif
@@ -266,28 +266,28 @@ static uint32_t AlxTrace_Periph_GetClk(AlxTrace* me)
 	bool isErr = true;
 
 	#if defined(USART0)
-	if (me->usart == USART0)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(0U); }
+	if (me->usart == USART0)	{ return CLOCK_GetFlexCommClkFreq(0U); }
 	#endif
 	#if defined(USART1)
-	if (me->usart == USART1)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(1U); }
+	if (me->usart == USART1)	{ return CLOCK_GetFlexCommClkFreq(1U); }
 	#endif
 	#if defined(USART2)
-	if (me->usart == USART2)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(2U); }
+	if (me->usart == USART2)	{ return CLOCK_GetFlexCommClkFreq(2U); }
 	#endif
 	#if defined(USART3)
-	if (me->usart == USART3)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(3U); }
+	if (me->usart == USART3)	{ return CLOCK_GetFlexCommClkFreq(3U); }
 	#endif
 	#if defined(USART4)
-	if (me->usart == USART4)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(4U); }
+	if (me->usart == USART4)	{ return CLOCK_GetFlexCommClkFreq(4U); }
 	#endif
 	#if defined(USART5)
-	if (me->usart == USART5)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(5U); }
+	if (me->usart == USART5)	{ return CLOCK_GetFlexCommClkFreq(5U); }
 	#endif
 	#if defined(USART6)
-	if (me->usart == USART6)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(6U); }
+	if (me->usart == USART6)	{ return CLOCK_GetFlexCommClkFreq(6U); }
 	#endif
 	#if defined(USART7)
-	if (me->usart == USART7)	{ isErr = false; return CLOCK_GetFlexCommClkFreq(7U); }
+	if (me->usart == USART7)	{ return CLOCK_GetFlexCommClkFreq(7U); }
 	#endif
 
 	if (isErr)

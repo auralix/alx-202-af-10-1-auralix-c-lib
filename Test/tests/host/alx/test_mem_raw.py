@@ -17,7 +17,7 @@ that displacement is per symbol.
 
 Both DLLs are built with the module's assertions ON, which conftest derives from alxMemRaw.h, and
 that is the thing to hold on to while reading anything here. It is NOT how the module ships. Without
-that define the module's own macro is `do{} while (false)` and DISCARDS the expression, so a product
+that define the module's own macro is ALX_ASSERT_OFF and never evaluates the expression, so a product
 that forgets its override gets Alx_Ok, an untouched buffer and no diagnostic at all - and even with
 the define the net needs a second, independent opt-in, because the library's own AlxAssert_Rst is an
 empty body that returns (test_assert.py P507). Two product-side decisions have to both go right
@@ -115,7 +115,7 @@ def test_ALX1553_P516_the_constructor_sets_the_two_fields_its_header_declares(me
     "takes the success branch on every one of them, runs AlxCrc_IsOk over a buffer nobody filled, "
     "and decides from the result which of two stored copies of the product's parameters is valid. "
     "The assertion is not the safety net it looks like either: the module ships with no "
-    "ALX_MEM_RAW_ASSERT_*_ENABLE defined, which makes the macro do{} while (false), and even with it "
+    "ALX_MEM_RAW_ASSERT_*_ENABLE defined, which makes the macro ALX_ASSERT_OFF, and even with it "
     "defined the library's own AlxAssert_Rst returns (test_assert.py P507). A stub that cannot "
     "work should say so in its status - Alx_Err costs nothing and every caller already checks for "
     "it. The fix is one character per function"))

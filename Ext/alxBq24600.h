@@ -66,14 +66,14 @@ extern "C" {
 #elif defined(ALX_BQ24600_ASSERT_RST_ENABLE)
 	#define ALX_BQ24600_ASSERT(expr) ALX_ASSERT_RST(ALX_BQ24600_FILE, expr)
 #else
-	#define ALX_BQ24600_ASSERT(expr) do{} while (false)
+	#define ALX_BQ24600_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_BQ24600_TRACE_ENABLE)
 	#define ALX_BQ24600_TRACE_ERR(...) ALX_TRACE_ERR(ALX_BQ24600_FILE, __VA_ARGS__)
 #else
-	#define ALX_BQ24600_TRACE_ERR(...) do{} while (false)
+	#define ALX_BQ24600_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

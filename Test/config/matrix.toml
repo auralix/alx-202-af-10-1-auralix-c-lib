@@ -208,6 +208,42 @@ file = "Ext/*"
 text = "-Wbitfield-constant-conversion"
 why = "an enumeration bit-field is signed in the MSVC ABI of the 32-bit Windows host only; on the targets it is unsigned and the register bytes are right; the drivers keep their enumeration types (TV, 2026-10-01, the revert of 8be52d4)"
 
+# The analysers' (harness.host.matrix.analyze, goal 7): each waits for TV under its decision or D item.
+[[accept]]
+file = "alxBoot.c"
+text = "[invalidScanfArgType_int]"
+why = "the frozen firmware file-name parser (decision 12, TV 2026-09-30), the %lu above in cppcheck's words"
+
+[[accept]]
+file = "alxBoot.c"
+text = "bugprone-unchecked-string-to-number-conversion"
+why = "the frozen firmware file-name parser (decision 12, TV 2026-09-30)"
+
+[[accept]]
+file = "alxParamItem.c"
+text = "bugprone-unchecked-string-to-number-conversion"
+why = "decision 12 converts with sscanf and its SCN macros and checks the count it returns; strtoul and its kin are TV's to decide (D52)"
+
+[[accept]]
+file = "alxFtp.c"
+text = "bugprone-unchecked-string-to-number-conversion"
+why = "the PASV reply's sscanf, waiting for TV in D50; strtoul and its kin are TV's to decide (D52)"
+
+[[accept]]
+file = "Mcu/McuStm32/alxDac_McuStm32.c"
+text = "Out of bound access to memory after the end of the field 'ch'"
+why = "with assertions disabled: the constructor's assertion is the only bound on numOfCh, as the library's preconditions are (D53)"
+
+[[accept]]
+file = "Ext/alxPca9539a.h"
+text = "declaration uses identifier '_OpenDrain_"
+why = "a reserved name (C99 7.1.3) of a member a product's AlxPca9539a_RegStruct_SetVal writes; a rename changes the driver's interface (D54)"
+
+[[accept]]
+file = "Ext/alxIna228.c"
+text = "Uninitialized variable: data"
+why = "Reg_Write's variable-length array, kept for the host's bit-field layout (A93, goal 7 step 7), is filled whole by the byte-flip loop before the write; cppcheck does not follow a loop into a variable-length array"
+
 [[row]]
 id = "0001"
 toolchain = "gcc"

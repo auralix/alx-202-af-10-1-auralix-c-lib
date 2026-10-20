@@ -371,7 +371,7 @@ void* alxShimZephyr_CallPtr(int unused, ...);
 #define spi_write(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 #define uart_poll_out(...) alxShimZephyr_Call(0, ##__VA_ARGS__)
 
-#define CONTAINER_OF(ptr, type, field) ((type*)(void*)((char*)(ptr) - offsetof(type, field)))
+#define CONTAINER_OF(ptr, type, field) ((type*)((char*)(ptr) - offsetof(type, field)))
 #define DT_CHOSEN(prop) 0U
 typedef void (*k_thread_entry_t)(void* p1, void* p2, void* p3);
 
@@ -384,7 +384,7 @@ typedef void (*k_thread_entry_t)(void* p1, void* p2, void* p3);
 
 // The logging and the statically defined mutex of alxTrace_McuZephyr.c with ALX_TRACE_ZEPHYR_WITH_LOG
 #define LOG_LEVEL_INF 3
-#define LOG_MODULE_REGISTER(name, level) extern int alxShimZephyr_LogModule_##name
+#define LOG_MODULE_REGISTER(name, level) extern const uint8_t alxShimZephyr_LogModule_##name
 #define LOG_INF(...) ((void)alxShimZephyr_Call(0, ##__VA_ARGS__))
 #define K_MUTEX_DEFINE(name) struct k_mutex name
 

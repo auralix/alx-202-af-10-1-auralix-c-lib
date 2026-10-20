@@ -70,7 +70,7 @@ typedef struct { bool dummy; } AlxMmc;
 #elif defined(ALX_MMC_ASSERT_RST_ENABLE)
 	#define ALX_MMC_ASSERT(expr) ALX_ASSERT_RST(ALX_MMC_FILE, expr)
 #else
-	#define ALX_MMC_ASSERT(expr) do{} while (false)
+	#define ALX_MMC_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
@@ -80,10 +80,10 @@ typedef struct { bool dummy; } AlxMmc;
 	#define ALX_MMC_TRACE_WRN(...) ALX_TRACE_WRN(ALX_MMC_FILE, __VA_ARGS__)
 	#define ALX_MMC_TRACE_INF(...) ALX_TRACE_INF(ALX_MMC_FILE, __VA_ARGS__)
 #else
-	#define ALX_MMC_TRACE_FTL(...) do{} while (false)
-	#define ALX_MMC_TRACE_ERR(...) do{} while (false)
-	#define ALX_MMC_TRACE_WRN(...) do{} while (false)
-	#define ALX_MMC_TRACE_INF(...) do{} while (false)
+	#define ALX_MMC_TRACE_FTL(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_MMC_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_MMC_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_MMC_TRACE_INF(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

@@ -83,7 +83,7 @@ static uint32_t alxAssertTest_lineTrace;
 #if defined(ALX_ASSERT_TEST_OFF_ASSERT_RST_ENABLE)
 	#define ALX_ASSERT_TEST_OFF_ASSERT(expr) ALX_ASSERT_RST(ALX_ASSERT_TEST_FILE, expr)
 #else
-	#define ALX_ASSERT_TEST_OFF_ASSERT(expr) do{} while (false)
+	#define ALX_ASSERT_TEST_OFF_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 

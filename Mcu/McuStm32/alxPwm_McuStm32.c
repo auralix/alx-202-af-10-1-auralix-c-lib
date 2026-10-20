@@ -188,7 +188,7 @@ void AlxPwm_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 Alx_Status AlxPwm_Init(AlxPwm* me)
 {
@@ -272,7 +272,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 Alx_Status AlxPwm_DeInit(AlxPwm* me)
 {
@@ -308,9 +308,9 @@ Alx_Status AlxPwm_DeInit(AlxPwm* me)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] ch
-  * @param[in] duty_pct
+  * @param[in]	me
+  * @param[in]	ch
+  * @param[in]	duty_pct
   */
 Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 {
@@ -333,7 +333,7 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 		{
 			// Local variables
 			uint64_t pulse = (duty_pct * ((float)me->period + 1.f)) / 100.f;		// We must add 1 to period because transition from, example: 0xFFFF to 0 also count..
-			if (pulse > (uint64_t)me->periodMax) pulse = me->periodMax;				// Limit uper pulse value
+			if (pulse > (uint64_t)me->periodMax) pulse = me->periodMax;				// Limit upper pulse value
 
 			// Set
 			__HAL_TIM_SET_COMPARE(&me->htim, AlxPwm_GetCh(ch), (uint32_t)pulse);	// Here max value can be only 0xFFFF, so we must design system with period that is maximum set 0xFFFE by user, so that we can get clean high level when duty = 100%
@@ -351,9 +351,9 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] ch
-  * @param[in] duty_permil
+  * @param[in]	me
+  * @param[in]	ch
+  * @param[in]	duty_permil
   */
 Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {
@@ -376,7 +376,7 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 		{
 			// Local variables
 			uint64_t pulse = (duty_permil * (me->period + 1ul)) / 1000ul;			// We must add 1 to period because transition from, example: 0xFFFF to 0 also count..
-			if (pulse > (uint64_t)me->periodMax) pulse = me->periodMax;				// Limit uper pulse value
+			if (pulse > (uint64_t)me->periodMax) pulse = me->periodMax;				// Limit upper pulse value
 
 			// Set
 			__HAL_TIM_SET_COMPARE(&me->htim, AlxPwm_GetCh(ch), (uint32_t)pulse);	// Here max value can be only 0xFFFF, so we must design system with period that is maximum set 0xFFFE by user, so that we can get clean high level when duty = 100%

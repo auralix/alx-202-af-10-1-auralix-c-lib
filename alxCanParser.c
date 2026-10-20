@@ -269,7 +269,7 @@ void AlxCanParser_SetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, uint64_t val)
 {
 	// Assert
-	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
+	ALX_CAN_PARSER_ASSERT(byteOffset == 0);
 
 	// Set
 	switch (endian)
@@ -316,7 +316,7 @@ void AlxCanParser_SetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 void AlxCanParser_SetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, int64_t val)
 {
 	// Assert
-	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
+	ALX_CAN_PARSER_ASSERT(byteOffset == 0);
 
 	// Set
 	switch (endian)
@@ -406,7 +406,7 @@ void AlxCanParser_SetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t 
 void AlxCanParser_SetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset, double val)
 {
 	// Assert
-	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
+	ALX_CAN_PARSER_ASSERT(byteOffset == 0);
 
 	// Local variables
 	AlxCanParser_Double _val = {};
@@ -710,7 +710,7 @@ int32_t AlxCanParser_GetInt32(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8
 uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	// Assert
-	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
+	ALX_CAN_PARSER_ASSERT(byteOffset == 0);
 
 	// Local variables
 	uint64_t val = 0;
@@ -763,7 +763,7 @@ uint64_t AlxCanParser_GetUint64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uin
 int64_t AlxCanParser_GetInt64(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	// Assert
-	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
+	ALX_CAN_PARSER_ASSERT(byteOffset == 0);
 
 	// Local variables
 	int64_t val = 0;
@@ -861,7 +861,7 @@ float AlxCanParser_GetFloat(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t
 double AlxCanParser_GetDouble(AlxCan_Msg* msg, AlxCanParser_Endian endian, uint8_t byteOffset)
 {
 	// Assert
-	ALX_CAN_PARSER_ASSERT(byteOffset <= (8 - 8));
+	ALX_CAN_PARSER_ASSERT(byteOffset == 0);
 
 	// Local variables
 	AlxCanParser_Double val = {};

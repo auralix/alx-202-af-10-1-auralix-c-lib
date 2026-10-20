@@ -87,8 +87,8 @@ void AlxAdc_Ctor
 	#endif
 
 	// Check IoPins and channels - each IoPin must be the pin of its channel
-	ALX_ADC_ASSERT(AlxAdc_Ctor_AreIoPinsAndChOk(me));
-	(void)AlxAdc_Ctor_AreIoPinsAndChOk;
+	ALX_UNUSED bool areIoPinsAndChOk = AlxAdc_Ctor_AreIoPinsAndChOk(me);
+	ALX_ADC_ASSERT(areIoPinsAndChOk);
 
 	// Variables
 	me->adcClkSetup.adcRate = 0;
@@ -240,8 +240,8 @@ static uint16_t AlxAdc_GetResult(AlxAdc* me, Alx_Ch ch)
 	// Prepare
 	ADC_CHANNEL_T adcCh = AlxAdc_GetCh(ch);
 
-	// There must be Enable and Disable function for each chennel before convertion.
-	// I tried only enabling channels in Init, but it doens't work if there is no disable
+	// There must be Enable and Disable function for each channel before conversion.
+	// I tried only enabling channels in Init, but it doesn't work if there is no disable
 	Chip_ADC_EnableChannel(LPC_ADC, adcCh, ENABLE);
 	Chip_ADC_SetStartMode(LPC_ADC, ADC_START_NOW, ADC_TRIGGERMODE_RISING);
 	while (Chip_ADC_ReadStatus(LPC_ADC, adcCh, ADC_DR_DONE_STAT) != SET) {}

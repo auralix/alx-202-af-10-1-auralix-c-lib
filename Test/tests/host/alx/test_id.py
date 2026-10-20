@@ -884,7 +884,7 @@ def test_ALX1553_P497_an_unknown_board_leaves_the_object_abandoned_but_answering
     """Init asserts, returns, and leaves an object nothing but isInit can tell apart from a good one.
 
     The assertion and the return are separate statements, so the return fires whether or not
-    assertions were compiled in - and the library's default compiles them to do{}while(false), which
+    assertions were compiled in - and the library's default compiles them to ALX_ASSERT_OFF, which
     means a shipping product takes this path in silence. What is left behind is not neutral: the id
     the straps computed is already written into the instance, so AlxId_GetHwId answers 2 as
     confidently as ever, while the version strings Init returned before rendering are still whatever
@@ -1032,7 +1032,7 @@ def test_ALX1553_P501_the_no_strap_constructor_takes_its_board_verbatim_and_read
 def test_ALX1553_P502_a_second_init_re_reads_the_straps_and_takes_the_new_answer(id_lib):
     """CHARACTERIZATION: re-entry is flagged, not blocked, and the flag is compiled out by default.
 
-    ALX_ID_ASSERT(me->isInit == false) is the entire guard, and it is a do{}while(false) in the
+    ALX_ID_ASSERT(me->isInit == false) is the entire guard, and it is an ALX_ASSERT_OFF in the
     library's default configuration - so a product that calls Init twice, after a bootloader hands
     over or after a brown-out, simply runs the whole thing again. Every strap is reconfigured, read
     and released a second time, which on the target is another 2 ms per strap spent driving pins the

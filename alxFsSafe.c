@@ -86,7 +86,8 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_FS_SAFE_ASSERT(me->wasCtorCalled == true);
-	ALX_FS_SAFE_ASSERT(strlen(path) <= ALX_FS_SAFE_PATH_LEN_MAX);
+	ALX_UNUSED uint32_t pathLen = (uint32_t)strlen(path);
+	ALX_FS_SAFE_ASSERT(pathLen <= ALX_FS_SAFE_PATH_LEN_MAX);
 	ALX_FS_SAFE_ASSERT(len <= me->buffLen - me->alxCrcLen);
 
 
@@ -273,7 +274,8 @@ Alx_Status AlxFsSafe_File_Write(AlxFsSafe* me, const char* path, void* data, uin
 	// Assert
 	//------------------------------------------------------------------------------
 	ALX_FS_SAFE_ASSERT(me->wasCtorCalled == true);
-	ALX_FS_SAFE_ASSERT(strlen(path) <= ALX_FS_SAFE_PATH_LEN_MAX);
+	ALX_UNUSED uint32_t pathLen = (uint32_t)strlen(path);
+	ALX_FS_SAFE_ASSERT(pathLen <= ALX_FS_SAFE_PATH_LEN_MAX);
 	ALX_FS_SAFE_ASSERT(len <= me->buffLen - me->alxCrcLen);
 
 
@@ -488,7 +490,7 @@ void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, char* pathWithSu
 	ALX_FS_SAFE_ASSERT(dot != NULL);
 
 	// Set suffix
-	const char* suffix = "";
+	const char* suffix = ALX_NULL_PTR;
 	if (isA)
 	{
 		suffix = "";	// We will use empty suffix for copy A, so then we have copy.bin & copyB.bin
@@ -502,7 +504,7 @@ void AlxFsSafe_PathToPathWithSuffix(bool isA, const char* path, char* pathWithSu
 	uint32_t prefixLen = (uint32_t)(dot - path);
 
 	// Transform
-	sprintf(pathWithSuffix, "%.*s%s%s", (int)prefixLen, path, suffix, dot);
+	(void)sprintf(pathWithSuffix, "%.*s%s%s", (int)prefixLen, path, suffix, dot);
 }
 
 

@@ -64,14 +64,14 @@ extern "C" {
 #elif defined(ALX_CAN_PARSER_ASSERT_RST_ENABLE)
 	#define ALX_CAN_PARSER_ASSERT(expr) ALX_ASSERT_RST(ALX_CAN_PARSER_FILE, expr)
 #else
-	#define ALX_CAN_PARSER_ASSERT(expr) do{} while (false)
+	#define ALX_CAN_PARSER_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_CAN_PARSER_TRACE_ENABLE)
 	#define ALX_CAN_PARSER_TRACE_WRN(...) ALX_TRACE_WRN(ALX_CAN_PARSER_FILE, __VA_ARGS__)
 #else
-	#define ALX_CAN_PARSER_TRACE_WRN(...) do{} while (false)
+	#define ALX_CAN_PARSER_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

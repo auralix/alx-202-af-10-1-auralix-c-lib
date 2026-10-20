@@ -65,7 +65,7 @@ extern "C" {
 #elif defined(ALX_INA228_ASSERT_RST_ENABLE)
 	#define ALX_INA228_ASSERT(expr) ALX_ASSERT_RST(ALX_INA228_FILE, expr)
 #else
-	#define ALX_INA228_ASSERT(expr) do{} while (false)
+	#define ALX_INA228_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
@@ -73,8 +73,8 @@ extern "C" {
 	#define ALX_INA228_TRACE_ERR(...) ALX_TRACE_ERR(ALX_INA228_FILE, __VA_ARGS__)
 	#define ALX_INA228_TRACE_DBG(...) ALX_TRACE_DBG(ALX_INA228_FILE, __VA_ARGS__)
 #else
-	#define ALX_INA228_TRACE_ERR(...) do{} while (false)
-	#define ALX_INA228_TRACE_DBG(...) do{} while (false)
+	#define ALX_INA228_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_INA228_TRACE_DBG(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -217,8 +217,7 @@ typedef union
 		uint16_t SHUNT_CAL_Current_Amperes : 15;
 		uint8_t unused_15 : 1;
 	};
-	//uint16_t raw;
-	uint8_t raw[2];
+	uint16_t raw;
 } AlxIna228_RegVal_0x02_SHUNT_CAL;
 
 

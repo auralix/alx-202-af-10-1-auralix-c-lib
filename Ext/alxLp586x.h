@@ -66,14 +66,14 @@ extern "C" {
 #elif defined(ALX_LP586X_ASSERT_RST_ENABLE)
 	#define ALX_LP586X_ASSERT(expr) ALX_ASSERT_RST(ALX_LP586X_FILE, expr)
 #else
-	#define ALX_LP586X_ASSERT(expr) do{} while (false)
+	#define ALX_LP586X_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_LP586X_TRACE_ENABLE)
 	#define ALX_LP586X_TRACE_ERR(...) ALX_TRACE_ERR(ALX_LP586X_FILE, __VA_ARGS__)
 #else
-	#define ALX_LP586X_TRACE_ERR(...) do{} while (false)
+	#define ALX_LP586X_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -192,7 +192,7 @@ typedef enum
 {
 	LSD_removal_Off = 0,
 	LSD_removal_On	= 1
-} AlxLp586x_RegEnum_0x03_LSD_removal; // turns off the upside deghosting functio
+} AlxLp586x_RegEnum_0x03_LSD_removal; // turns off the upside deghosting function
 typedef enum
 {
 	LOD_removal_Off = 0,

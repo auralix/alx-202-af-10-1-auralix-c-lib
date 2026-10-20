@@ -551,7 +551,8 @@ void AlxParamItem_CtorBool
 )
 {
 	// Assert
-	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
+	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
 
 	// Parameters
 	me->dataType = AlxParamItem_Bool;
@@ -596,7 +597,8 @@ void AlxParamItem_CtorArr
 )
 {
 	// Assert
-	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
+	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
 
 	// Parameters
 	me->dataType = AlxParamItem_Arr;
@@ -640,8 +642,10 @@ void AlxParamItem_CtorStr
 )
 {
 	// Assert
-	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
-	ALX_PARAM_ITEM_ASSERT(strlen(valDef) < buffLen);
+	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
+	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+	ALX_UNUSED uint32_t valDefLen = (uint32_t)strlen(valDef);
+	ALX_PARAM_ITEM_ASSERT(valDefLen < buffLen);
 
 	// Parameters
 	me->dataType = AlxParamItem_Str;
@@ -651,7 +655,7 @@ void AlxParamItem_CtorStr
 	me->id = id;
 	me->groupKey = groupKey;
 	me->groupId = groupId;
-	me->valDef.str = (char*)valDef;
+	me->valDef.str = (char*)(uintptr_t)valDef;	// the union's one string pointer; nothing writes through valDef
 	me->valMin.str = ALX_NULL_PTR;
 	me->valMax.str = ALX_NULL_PTR;
 	me->valLen = strlen(valDef) + 1;	// Add +1 for null terminator
@@ -1372,9 +1376,8 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	}
 
 	// Set
-	Alx_Status status = AlxParamItem_SetVal(me, valDefPtr);
+	ALX_UNUSED Alx_Status status = AlxParamItem_SetVal(me, valDefPtr);
 	ALX_PARAM_ITEM_ASSERT(status == Alx_Ok);
-	(void)status;
 }
 uint8_t AlxParamItem_GetValDefUint8(AlxParamItem* me)
 {
@@ -1843,7 +1846,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	//------------------------------------------------------------------------------
 	Alx_Status status = Alx_Err;
 	char valStr[32] = "";
-	int32_t sprintfStatus = 0;
+	ALX_UNUSED int32_t sprintfStatus = 0;
 
 
 
@@ -1915,7 +1918,6 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	{
 		sprintfStatus = (int32_t)sprintf(valStr, "%" PRId32, me->val.int32);
 		ALX_PARAM_ITEM_ASSERT(sprintfStatus >= 0);
-		(void)sprintfStatus;
 	}
 	else if (me->dataType == AlxParamItem_Int64)
 	{
@@ -1923,7 +1925,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Float)
 	{
-		AlxFtoa(me->val._float, valStr, ALX_PARAM_ITEM_FTOA_PRECISION);
+		AlxFtoa((double)me->val._float, valStr, ALX_PARAM_ITEM_FTOA_PRECISION);
 	}
 	else if (me->dataType == AlxParamItem_Double)
 	{
@@ -2357,7 +2359,8 @@ static void AlxParamItem_Ctor
 )
 {
 	// Assert
-	ALX_PARAM_ITEM_ASSERT(strlen(key) < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
+	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
+	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
 
 	// Parameters
 	me->dataType = dataType;
@@ -2387,13 +2390,16 @@ static void AlxParamItem_Ctor
 	if (me->enumArr != ALX_NULL)
 	{
 		// Check if enum array value are from low to high
-		ALX_PARAM_ITEM_ASSERT(AlxParamItem_AreEnumArrValFromLowToHigh(me) == true);
-		(void)AlxParamItem_AreEnumArrValFromLowToHigh;
+		ALX_UNUSED bool areEnumArrValFromLowToHigh = AlxParamItem_AreEnumArrValFromLowToHigh(me);
+		ALX_PARAM_ITEM_ASSERT(areEnumArrValFromLowToHigh == true);
 
 		// Check if enum number is on the list
-		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList(me, valDef) == true);
-		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList(me, valMin) == true);
-		ALX_PARAM_ITEM_ASSERT(AlxParamItem_IsEnumOnList(me, valMax) == true);
+		ALX_UNUSED bool isValDefOnList = AlxParamItem_IsEnumOnList(me, valDef);
+		ALX_UNUSED bool isValMinOnList = AlxParamItem_IsEnumOnList(me, valMin);
+		ALX_UNUSED bool isValMaxOnList = AlxParamItem_IsEnumOnList(me, valMax);
+		ALX_PARAM_ITEM_ASSERT(isValDefOnList == true);
+		ALX_PARAM_ITEM_ASSERT(isValMinOnList == true);
+		ALX_PARAM_ITEM_ASSERT(isValMaxOnList == true);
 	}
 
 	// Info
@@ -2653,7 +2659,7 @@ static bool AlxParamItem_IsEnumOnList(AlxParamItem* me, void* enumVal)
 			float _enumArrVal = *((float*)me->enumArr + i);
 
 			// If enum value is on the list, return true
-			if (_enumVal == _enumArrVal)
+			if ((_enumVal >= _enumArrVal) && (_enumVal <= _enumArrVal))
 			{
 				return true;
 			}
@@ -2665,7 +2671,7 @@ static bool AlxParamItem_IsEnumOnList(AlxParamItem* me, void* enumVal)
 			double _enumArrVal = *((double*)me->enumArr + i);
 
 			// If enum value is on the list, return true
-			if (_enumVal == _enumArrVal)
+			if ((_enumVal >= _enumArrVal) && (_enumVal <= _enumArrVal))
 			{
 				return true;
 			}
@@ -2695,9 +2701,7 @@ static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me)
 {
 	if (me->dataType == AlxParamItem_Arr)
 	{
-		void* ptr = NULL;
-		memcpy(&ptr, &me->val, 4);
-		return ptr;
+		return me->val.arr;
 	}
 	else if (me->dataType == AlxParamItem_Str)
 	{

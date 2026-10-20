@@ -130,8 +130,8 @@ void AlxCan_Ctor
 	me->rxFifoBuffLen = rxFifoBuffLen;
 	me->txIrqPriority = txIrqPriority;
 	me->rxIrqPriority = rxIrqPriority;
-	ALX_CAN_ASSERT(AlxCan_Ctor_IsClkOk(me));
-	(void)AlxCan_Ctor_IsClkOk;
+	ALX_UNUSED bool isClkOk = AlxCan_Ctor_IsClkOk(me);
+	ALX_CAN_ASSERT(isClkOk);
 
 
 	//------------------------------------------------------------------------------
@@ -663,7 +663,7 @@ bool AlxCan_IsErr(AlxCan* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxCan_IrqHandler(AlxCan* me)
 {
@@ -897,7 +897,7 @@ static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me)
 			else // Remote Frame
 				alxRxMsg.isDataFrame = false;
 
-			// Set Lenght
+			// Set Length
 			alxRxMsg.dataLen = AlxCan_GetDataLen(halRxMsg.DataLength);
 		}
 

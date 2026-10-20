@@ -66,7 +66,7 @@ extern "C" {
 #elif defined(ALX_TMP1075_ASSERT_RST_ENABLE)
 	#define ALX_TMP1075_ASSERT(expr) ALX_ASSERT_RST(ALX_TMP1075_FILE, expr)
 #else
-	#define ALX_TMP1075_ASSERT(expr) do{} while (false)
+	#define ALX_TMP1075_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
@@ -74,8 +74,8 @@ extern "C" {
 	#define ALX_TMP1075_TRACE_ERR(...) ALX_TRACE_ERR(ALX_TMP1075_FILE, __VA_ARGS__)
 	#define ALX_TMP1075_TRACE_DBG(...) ALX_TRACE_DBG(ALX_TMP1075_FILE, __VA_ARGS__)
 #else
-	#define ALX_TMP1075_TRACE_ERR(...) do{} while (false)
-	#define ALX_TMP1075_TRACE_DBG(...) do{} while (false)
+	#define ALX_TMP1075_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_TMP1075_TRACE_DBG(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

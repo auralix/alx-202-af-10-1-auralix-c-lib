@@ -70,12 +70,15 @@ FIFO_EXPORTS = build_tools.Exports("alxFifoTest", (
 
 # ----------------------------------------------------------- CLI module ------
 # Tier-2 target: REAL alxCli + real param stack over the faked serial port and
-# KV store. GATED sources compile with the full strict set; CLOSURE sources
-# (linked real, own suites pending per the ALX-1495 rollout) compile with -w.
+# KV store, every source under the full strict set (the param stack since goal 7).
 CLI_SOURCES_STRICT = [
     CLIB_DIR / "alxCli.c",
     CLIB_DIR / "alxFifo.c",
     CLIB_DIR / "alxBound.c",
+    CLIB_DIR / "alxParamItem.c",
+    CLIB_DIR / "alxParamMgmt.c",
+    CLIB_DIR / "alxFtoa.c",
+    CLIB_DIR / "alxRange.c",
     FAKES_DIR / "alxSerialPortFake.c",
     FAKES_DIR / "alxParamKvStoreFake.c",
     FAKES_DIR / "alxIdFake.c",
@@ -95,12 +98,7 @@ CLI_ASSERT_DEFINES = [
     "-DALX_FTOA_ASSERT_RST_ENABLE", "-DALX_RANGE_ASSERT_RST_ENABLE",
     "-DALX_ID_ASSERT_RST_ENABLE",
 ]
-CLI_SOURCES_CLOSURE = [
-    CLIB_DIR / "alxParamItem.c",
-    CLIB_DIR / "alxParamMgmt.c",
-    CLIB_DIR / "alxFtoa.c",
-    CLIB_DIR / "alxRange.c",
-]
+CLI_SOURCES_CLOSURE: list[Path] = []
 CLI_DEPS = [*CLI_SOURCES_STRICT, *CLI_SOURCES_CLOSURE, Path(__file__)]
 CLI_DLL = BUILD_DIR / "alxCliTest.dll"
 CLI_EXPORTS = build_tools.Exports("alxCliTest", (
@@ -122,27 +120,25 @@ CLI_EXPORTS = build_tools.Exports("alxCliTest", (
 ))
 
 # ------------------------------------------------------- MemSafe group -------
-# Tier-2 target (ALX-1513): REAL alxMemSafe + alxCrc under the strict set, the REAL
-# param group/store chain as closure (-w: alxParamGroup.c/alxParamStore.c carry
-# -Wswitch-enum warnings, ALX-1495 backlog), all over alxMemRawFake = a 2 kB RAM
-# flash with fault injection and a power-loss model.
+# Tier-2 target (ALX-1513): REAL alxMemSafe + alxCrc and the REAL param group/store
+# chain, all under the strict set (the chain since goal 7), all over alxMemRawFake = a
+# 2 kB RAM flash with fault injection and a power-loss model.
 MEMSAFE_SOURCES_STRICT = [
     CLIB_DIR / "alxMemSafe.c",
     CLIB_DIR / "alxCrc.c",
     CLIB_DIR / "alxBound.c",
+    CLIB_DIR / "alxParamGroup.c",
+    CLIB_DIR / "alxParamStore.c",
+    CLIB_DIR / "alxParamItem.c",
+    CLIB_DIR / "alxFtoa.c",
+    CLIB_DIR / "alxRange.c",
     FAKES_DIR / "alxMemRawFake.c",
     FAKES_DIR / "alxParamKvStoreFake.c",
     FAKES_DIR / "alxAssertFake.c",
     FAKES_DIR / "alxTraceFake.c",   # this group has traces once a variant enables them
     HELPERS_DIR / "alxMemSafeTestHelpers.c",
 ]
-MEMSAFE_SOURCES_CLOSURE = [
-    CLIB_DIR / "alxParamGroup.c",
-    CLIB_DIR / "alxParamStore.c",
-    CLIB_DIR / "alxParamItem.c",
-    CLIB_DIR / "alxFtoa.c",
-    CLIB_DIR / "alxRange.c",
-]
+MEMSAFE_SOURCES_CLOSURE: list[Path] = []
 MEMSAFE_DEPS = [*MEMSAFE_SOURCES_STRICT, *MEMSAFE_SOURCES_CLOSURE, Path(__file__)]
 MEMSAFE_DLL = BUILD_DIR / "alxMemSafeTest.dll"
 MEMSAFE_EXPORTS = build_tools.Exports("alxMemSafeTest", (
@@ -690,18 +686,11 @@ AUDIO_EXPORTS = build_tools.Exports("alxAudioTest", (
 # an exact answer.
 AUDIOPLAYER_SOURCES_STRICT = [
     CLIB_DIR / "alxAudio.c",
+    CLIB_DIR / "alxAudioPlayer.c",
     HELPERS_DIR / "alxAudioPlayerTestHelpers.c",
     FAKES_DIR / "alxAssertFake.c",
 ]
-# alxAudioPlayer.c is CLOSURE, not because its tests are pending - they are in
-# test_audio_player.py - but because it does not survive -Wcast-qual: it reads
-# the track through `*((volatile int16_t*)(me->trackPtr + offset))`, and trackPtr
-# is a const pointer, so every 16-bit read casts the const away. Nothing is
-# written through it, so nothing is undefined; cleaning it up is a LIBRARY change
-# and belongs to whoever owns the module (TODO A18).
-AUDIOPLAYER_SOURCES_CLOSURE = [
-    CLIB_DIR / "alxAudioPlayer.c",
-]
+AUDIOPLAYER_SOURCES_CLOSURE: list[Path] = []
 AUDIOPLAYER_SOURCES = [*AUDIOPLAYER_SOURCES_STRICT, *AUDIOPLAYER_SOURCES_CLOSURE]
 AUDIOPLAYER_DEPS = [*AUDIOPLAYER_SOURCES, Path(__file__)]
 AUDIOPLAYER_DLL = BUILD_DIR / "alxAudioPlayerTest.dll"
@@ -734,16 +723,12 @@ AUDIOPLAYER_EXPORTS = build_tools.Exports("alxAudioPlayerTest", (
 # Tier-1 target: one free function and a 191-entry lookup table. A thermistor
 # is the cheapest temperature sensor on a board and the table is the whole
 # part - so the test is mostly the table, read back through the function.
-# The module is CLOSURE, for one line: it defines LUT_TEMP_MAX_degC and never
-# uses it, which -Wunused-macros makes an error. Deleting a dead macro is a
-# library change and belongs to whoever owns the module (TODO A18).
 NTC_SOURCES_STRICT = [
     CLIB_DIR / "alxBound.c",
+    CLIB_DIR / "Ext" / "alxNtcg103jf103ft1s.c",
     FAKES_DIR / "alxAssertFake.c",
 ]
-NTC_SOURCES_CLOSURE = [
-    CLIB_DIR / "Ext" / "alxNtcg103jf103ft1s.c",
-]
+NTC_SOURCES_CLOSURE: list[Path] = []
 NTC_SOURCES = [*NTC_SOURCES_STRICT, *NTC_SOURCES_CLOSURE]
 NTC_DEPS = [*NTC_SOURCES, Path(__file__)]
 NTC_DLL = BUILD_DIR / "alxNtcTest.dll"
@@ -761,20 +746,14 @@ NTC_EXPORTS = build_tools.Exports("alxNtcTest", (
 # setting survive losing power halfway through writing it, and it had no test.
 # Over the same file system fake as the key-value store, so a copy can be
 # corrupted on the "flash" before the module ever runs.
-# alxFsSafe.c is CLOSURE, and for a real reason: AlxFsSafe_PathToPathWithSuffix
-# declares its OUTPUT parameter `const char*` and then sprintf()s into it, which
-# clang rejects under -Werror as discarding qualifiers. It is a library change
-# in somebody else's module, so it is recorded as TODO A18 rather than fixed
-# here - and it means nothing in that file is warning-checked (see the C Library Verification System Stack).
 FSSAFE_SOURCES_STRICT = [
     CLIB_DIR / "alxCrc.c",
+    CLIB_DIR / "alxFsSafe.c",
     HELPERS_DIR / "alxFsSafeTestHelpers.c",
     FAKES_DIR / "alxFsFake.c",
     FAKES_DIR / "alxAssertFake.c",
 ]
-FSSAFE_SOURCES_CLOSURE = [
-    CLIB_DIR / "alxFsSafe.c",
-]
+FSSAFE_SOURCES_CLOSURE: list[Path] = []
 FSSAFE_SOURCES = [*FSSAFE_SOURCES_STRICT, *FSSAFE_SOURCES_CLOSURE]
 FSSAFE_DEFINES = ["-D_CRT_SECURE_NO_WARNINGS", "-DALX_FS_SAFE_ASSERT_RST_ENABLE"]
 FSSAFE_DEPS = [*FSSAFE_SOURCES, Path(__file__)]
@@ -1130,16 +1109,15 @@ RTC_EXPORTS = build_tools.Exports("alxRtcTest", (
 # they are off. Same reasoning, same defines as the MemSafe group.
 PARAMMGMT_SOURCES_STRICT = [
     CLIB_DIR / "alxParamMgmt.c",
-    FAKES_DIR / "alxParamKvStoreFake.c",   # the items are constructed WITHOUT a store; this is here
-    HELPERS_DIR / "alxParamMgmtTestHelpers.c",   # only because alxParamItem.c references the symbols
-    FAKES_DIR / "alxAssertFake.c",
-]
-PARAMMGMT_SOURCES_CLOSURE = [
     CLIB_DIR / "alxParamItem.c",
     CLIB_DIR / "alxFtoa.c",
     CLIB_DIR / "alxRange.c",
     CLIB_DIR / "alxBound.c",
+    FAKES_DIR / "alxParamKvStoreFake.c",   # the items are constructed WITHOUT a store; this is here
+    HELPERS_DIR / "alxParamMgmtTestHelpers.c",   # only because alxParamItem.c references the symbols
+    FAKES_DIR / "alxAssertFake.c",
 ]
+PARAMMGMT_SOURCES_CLOSURE: list[Path] = []
 PARAMMGMT_ASSERT_DEFINES = [
     "-DALX_PARAM_MGMT_ASSERT_RST_ENABLE", "-DALX_PARAM_ITEM_ASSERT_RST_ENABLE",
     "-DALX_BOUND_ASSERT_RST_ENABLE", "-DALX_FTOA_ASSERT_RST_ENABLE",
@@ -1200,7 +1178,9 @@ PARAMMGMT_EXPORTS = build_tools.Exports("alxParamMgmtTest", (
 # is implementation defined, so clang reports every assignment of a full-width
 # enum value as a truncation. The bits that reach the wire are correct - it is
 # the header's style, not this suite's, and not something a test should waive
-# globally.
+# globally. Reg_Write's variable length array (-Wvla) waits for the same
+# reason: the register unions are larger on this host than on the target, so a
+# buffer sized for the target, as Reg_Read's is, overflows here (A93).
 INA228_SOURCES_STRICT = [
     FAKES_DIR / "alxI2cFake.c",
     FAKES_DIR / "alxAssertFake.c",
@@ -1250,12 +1230,12 @@ INA228_EXPORTS = build_tools.Exports("alxIna228Test", (
 # transfers, which is exactly the kind of thing that is right or wrong and never
 # nearly right.
 PI4IOE_SOURCES_STRICT = [
+    CLIB_DIR / "Ext" / "alxPi4ioe5v6534q.c",
     FAKES_DIR / "alxI2cFake.c",
     FAKES_DIR / "alxIoPinFake.c",
     FAKES_DIR / "alxAssertFake.c",
 ]
 PI4IOE_SOURCES_CLOSURE = [
-    CLIB_DIR / "Ext" / "alxPi4ioe5v6534q.c",
     HELPERS_DIR / "alxPi4ioeTestHelpers.c",
 ]
 PI4IOE_DEFINES: list[str] = []            # asserts off: the weak RegStruct_SetVal default is one
@@ -1304,21 +1284,13 @@ PI4IOE_EXPORTS = build_tools.Exports("alxPi4ioe5v6534qTest", (
 # and the device suite uses it to say WHICH IMAGE a bench run actually ran against, so an identity
 # block that is wrong does not break a board - it makes every result describe the wrong binary.
 #
-# alxId.c is CLOSURE, and it is not close: under the strict set it produces seven errors. Six are
-# -Wformat, every "%lu" in the file given a uint32_t (alxId.c:123, 124, 171, 172, 478, 491), and one
-# is -Wint-to-void-pointer-cast at alxId.c:141, where the boot block's uint32_t address is cast
-# straight to void*. Worth knowing while reading those six: on Windows and on the ARM target
-# unsigned long is 32 bits, so the strings come out RIGHT in both places - the format is only
-# genuinely wrong on an LP64 host, which is why it has survived. The .c is read-only to this suite
-# (TODO A18, the module's owner), so it is compiled with -w and nothing in it is warning-checked.
 ID_SOURCES_STRICT = [
+    CLIB_DIR / "alxId.c",
     HELPERS_DIR / "alxIdTestHelpers.c",
     FAKES_DIR / "alxIoPinFake.c",
     FAKES_DIR / "alxAssertFake.c",
 ]
-ID_SOURCES_CLOSURE = [
-    CLIB_DIR / "alxId.c",
-]
+ID_SOURCES_CLOSURE: list[Path] = []
 ID_SOURCES = [*ID_SOURCES_STRICT, *ID_SOURCES_CLOSURE]
 # No alxDelay.c and no alxTrace.c: alxId.h includes alxDelay.h but alxId.c calls nothing from it,
 # and Test/alxConfig.h sets ALX_TRACE_LEVEL_OFF, which compiles ALX_TRACE_INF itself away - so the
@@ -1551,7 +1523,7 @@ ASSERT_EXPORTS = build_tools.Exports("alxAssertTest", (
 #
 # Assertions come from _assert_defines, which reads ALX_MEM_RAW_ASSERT_BKPT_ENABLE out of
 # alxMemRaw.h and derives the RST form - do NOT hand-write it. Note what that define is doing here:
-# without it the module's own macro is do{} while (false) and DISCARDS the expression, so a product
+# without it the module's own macro is ALX_ASSERT_OFF and never evaluates the expression, so a product
 # that forgets its override gets Alx_Ok, an untouched buffer and no diagnostic at all. alxMemRaw.c
 # compiles clean under the full strict set, so neither DLL needs a closure.
 MEMRAW_SOURCES = [
@@ -1841,6 +1813,22 @@ def write_compile_db() -> None:
     )
 
 
+class Recipe(NamedTuple):
+    """One group's DLL as its builder states it - what the coverage lane rebuilds instrumented."""
+
+    dll: Path
+    strict: tuple
+    closure: tuple
+    defines: tuple
+    exports: build_tools.Exports
+    obj_dir_name: str | None
+
+
+# While recipes() reads the builders, _build_dll records instead of building: the one place a group
+# is described stays its builder.
+_RECORDING: list[list[Recipe]] = []
+
+
 def _build_dll(strict, closure, defines, dll: Path, exports: build_tools.Exports, obj_dir_name: str | None) -> None:
     """One group's DLL: the library's recipe, this repository's lists.
 
@@ -1850,6 +1838,9 @@ def _build_dll(strict, closure, defines, dll: Path, exports: build_tools.Exports
     ALX_PARAM_ITEM_ASSERT (sprintf of numeric values), so a closure built without them printed
     numbers as EMPTY (found 03.09 by the P15 uint8 test).
     """
+    if _RECORDING:
+        _RECORDING[-1].append(Recipe(dll, tuple(strict), tuple(closure), tuple(defines), exports, obj_dir_name))
+        return
     BUILD_DIR.mkdir(exist_ok=True)
     write_compile_db()
     build_tools.build_dll(
@@ -2473,8 +2464,7 @@ def _build_lp586x_dll() -> None:
 #
 # The driver is CLOSURE. On this host an enumeration bit-field is signed (A93), so setting the 1-bit
 # Standby field to 1 is a -Wsingle-bit-bitfield-constant-conversion error the target compilers do
-# not raise; and the strict set finds the range switch of AlxAdxl355_ConvertXyz without a case for
-# Range_Reserved (-Wswitch-enum; its default asserts), recorded in the night 5 report.
+# not raise. Nothing else in the driver fails the strict set (D48, fixed in goal 7).
 ADXL355_SOURCES_STRICT = [
     FAKES_DIR / "alxSpiFake.c",
     HELPERS_DIR / "alxAdxl355TestHelpers.c",
@@ -2580,8 +2570,7 @@ def _build_ads8678_dll() -> None:
 # The driver is CLOSURE. On this host an enumeration bit-field is signed (A93), so
 # every enumerator above the field's sign bit - MUXP_AIN8 in a 4-bit field, 1 in a 1-bit one - is
 # a -Wbitfield-constant-conversion error that the target compilers, where the field is unsigned, do
-# not raise; and the two thermocouple tables at the top of alxAds114s08.c are non-static globals
-# (-Wmissing-variable-declarations), a finding for the driver recorded in the night 5 report.
+# not raise. Nothing else in the driver fails the strict set (D48, fixed in goal 7).
 ADS114S08_SOURCES_STRICT = [
     CLIB_DIR / "alxInterpLin.c",
     CLIB_DIR / "alxTimSw.c",
@@ -2654,9 +2643,8 @@ def _build_ads114s08_dll() -> None:
 #
 # The driver and its helper are CLOSURE. On this host an enumeration bit-field is signed (A93), so
 # assigning an enumerator above the field's sign bit is a -Wbitfield-constant-conversion error the
-# target compilers do not raise; and the strict set finds two things in the driver itself, recorded
-# in the night 5 report: the mute branch of each differential gain setter compares a float with ==
-# (-Wfloat-equal) and declares a second `status` that shadows the function's own (-Wshadow).
+# target compilers do not raise. Nothing else in the driver fails the strict set (D48, fixed in
+# goal 7).
 ADAU1961_SOURCES_STRICT = [
     FAKES_DIR / "alxI2cFake.c",
     FAKES_DIR / "alxI2sFake.c",
@@ -2828,9 +2816,29 @@ DLL_GROUPS = [
 ]
 
 
+def recipes() -> list[Recipe]:
+    """Every group's recipe, in DLL_GROUPS' order, read from its builder without building anything."""
+    _RECORDING.append([])
+    try:
+        for _, _, builder in DLL_GROUPS:
+            builder()
+        return _RECORDING[-1]
+    finally:
+        _RECORDING.pop()
+
+
+def dll_variable(dll: Path) -> str:
+    """The environment variable through which the suite's fixture of a group takes another DLL.
+
+    conftest names it after the group's constant: FIFO_DLL is ALX_FIFO_TEST_DLL.
+    """
+    name = next(n for n, v in globals().items() if n.endswith("_DLL") and v == dll)
+    return f"ALX_{name.removesuffix('_DLL')}_TEST_DLL"
+
+
 # ------------------------------------- the library's own assertions, per group -----
 # A module built with no ALX_<MODULE>_ASSERT_*_ENABLE macro compiles its assertions down to
-# do{} while(false) and DISCARDS the expression - the invariant is not weakened, it is absent.
+# ALX_ASSERT_OFF, which never evaluates the expression - the invariant is not weakened, it is absent.
 # Seventeen groups here were doing that until 11.09, when the device repository's mutation lane
 # found the same thing: mutants that inverted an assertion survived, because there was nothing
 # left of it to change.
@@ -2873,17 +2881,18 @@ def _assert_defines(*source_lists) -> list[str]:
 # own trace on or off, times the global ALX_TRACE_LEVEL - eight compiled behaviours from one source
 # file, across 12 assert sites. Until 11.09 this suite built exactly ONE of them, did not say which,
 # and it was not a combination any product ships: assert-RST like the shipped configuration, but
-# ALX_TRACE_LEVEL_OFF, which compiles all 549 of the library's trace call sites away AND DISCARDS
-# their arguments.
+# ALX_TRACE_LEVEL_OFF, which compiles all 549 of the library's trace call sites away and never
+# evaluates their arguments.
 #
 # These four are the standard set. Each earns its place by reaching something none of the others do:
 #
 #   default       what customers get - alxConfig_TEMPLATE.h's own combination. Must always be green.
 #   off           the elision configuration. No assert macro and no traces, so both collapse to
-#                 do{} while(false) and discard their expressions - the shape of the biggest defect
-#                 ALX-1553 found (NotesClaude 3g), pinned here so it cannot come back unnoticed.
-#   debug         the only variant that COMPILES the DBG and VRB call sites, so a wrong format
-#                 string or argument count in one of them is visible at all.
+#                 ALX_ASSERT_OFF and ALX_TRACE_OFF and never evaluate their expressions - the shape
+#                 of the biggest defect ALX-1553 found (NotesClaude 3g), pinned here so it cannot
+#                 come back unnoticed.
+#   debug         the only variant that RUNS the DBG and VRB call sites, so what one of them
+#                 prints is visible at all.
 #   assert_trace  the only form where a failed assertion CONTINUES into the code after the check.
 #                 RST resets and BKPT halts; this one carries on with the precondition violated.
 #

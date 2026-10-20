@@ -108,8 +108,8 @@ void AlxI2c_Ctor
 	#endif
 
 	// Check clock
-	ALX_I2C_ASSERT(AlxI2c_IsClkOk(me));
-	(void)AlxI2c_IsClkOk;
+	ALX_UNUSED bool isClkOk = AlxI2c_IsClkOk(me);
+	ALX_I2C_ASSERT(isClkOk);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -260,7 +260,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		}
 	}
 
-	// If we are here, read was OK or number of tries error occured
+	// If we are here, read was OK or number of tries error occurred
 	if(status == HAL_OK)
 	{
 		// Trace
@@ -339,7 +339,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		}
 	}
 
-	// If we are here, read was OK or number of tries error occured
+	// If we are here, read was OK or number of tries error occurred
 	if (status == HAL_OK)
 	{
 		// Trace
@@ -437,7 +437,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		}
 	}
 
-	// If we are here, write was OK or number of tries error occured
+	// If we are here, write was OK or number of tries error occurred
 	if(status == HAL_OK)
 	{
 		// Trace
@@ -527,14 +527,14 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 			// If enabled, read & check previously written data
 			if (checkWithRead)
 			{
-				Alx_Status status = Alx_Err;
-				status = AlxI2c_Master_StartReadMemStop(me, slaveAddr, memAddr, memAddrLen, buff, len, numOfTries, timeout_ms);
-				if (status == Alx_ErrNumOfTries)
+				Alx_Status alxStat = Alx_Err;
+				alxStat = AlxI2c_Master_StartReadMemStop(me, slaveAddr, memAddr, memAddrLen, buff, len, numOfTries, timeout_ms);
+				if (alxStat == Alx_ErrNumOfTries)
 				{
 					ALX_I2C_TRACE_WRN("Wrn");
 					continue;
 				}
-				else if (status != Alx_Ok)
+				else if (alxStat != Alx_Ok)
 				{
 					ALX_I2C_ASSERT(false);	// We should never get here
 					return Alx_Err;
@@ -566,7 +566,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		}
 	}
 
-	// If we are here, write was OK or number of tries error occured
+	// If we are here, write was OK or number of tries error occurred
 	if (status == HAL_OK)
 	{
 		// Trace

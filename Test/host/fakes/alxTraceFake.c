@@ -25,7 +25,7 @@
   * are what a configuration test asks about, and rendering adds nothing to
   * them. And the build runs -Wformat=2 under a blanket -Werror, so a vsnprintf
   * of a non-literal format is a hard error; the usual remedy, a printf format
-  * attribute, would mean re-declaring a function Mcu/alxTrace.h already
+  * attribute, would mean redeclaring a function Mcu/alxTrace.h already
   * declares, which -Wredundant-decls rejects in turn. If you are here to "fix"
   * this file by rendering the text, that is why it does not.
   ******************************************************************************

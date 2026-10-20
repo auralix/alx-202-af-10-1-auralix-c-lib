@@ -63,14 +63,14 @@ extern "C" {
 #elif defined(ALX_HYS1_ASSERT_RST_ENABLE)
 	#define ALX_HYS1_ASSERT(expr) ALX_ASSERT_RST(ALX_HYS1_FILE, expr)
 #else
-	#define ALX_HYS1_ASSERT(expr) do{} while (false)
+	#define ALX_HYS1_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_HYS1_TRACE_ENABLE)
 	#define ALX_HYS1_TRACE_WRN(...) ALX_TRACE_WRN(ALX_HYS1_FILE, __VA_ARGS__)
 #else
-	#define ALX_HYS1_TRACE_WRN(...) do{} while (false)
+	#define ALX_HYS1_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

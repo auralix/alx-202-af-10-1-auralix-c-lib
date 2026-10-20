@@ -288,7 +288,7 @@ extern "C" {
 #elif defined(ALX_GLOBAL_ASSERT_RST_ENABLE)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_RST(ALX_GLOBAL_FILE, expr)
 #else
-	#define ALX_GLOBAL_ASSERT(expr) do{} while (false)
+	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // STM32
@@ -303,7 +303,7 @@ extern "C" {
 #if defined(ALX_GLOBAL_TRACE_ENABLE)
 	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_GLOBAL_FILE, __VA_ARGS__)
 #else
-	#define ALX_GLOBAL_TRACE(...) do{} while (false)
+	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

@@ -406,8 +406,7 @@ static ALX_UNUSED Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t regAddr = *((uint8_t*)reg);
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(uint8_t);
 	uint8_t dataWriteArr[3] = {};
 	uint8_t dataReadArr[3] = {};
 
@@ -415,7 +414,7 @@ static ALX_UNUSED Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)
 	AlxSpi_Master_AssertCs(me->spi);
 
 	// Prepare
-	dataWriteArr[0] = (regAddr << 1) | 0x00;	// Register address and read/write info - LSB must be set to 0 for read operation
+	dataWriteArr[0] = (regAddr << 1);	// Register address and read/write info - LSB must be set to 0 for read operation
 	dataWriteArr[1] = 0x00;						// Dummy byte
 	dataWriteArr[2] = 0x00;						// Dummy byte
 
@@ -442,8 +441,7 @@ static Alx_Status AlxAds8678_Reg_Write(AlxAds8678* me, void* reg)
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t regAddr = *((uint8_t*)reg);
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(uint8_t);
 	uint8_t dataWriteArr[3] = {};
 	uint8_t dataReadArr[3] = {};
 
@@ -580,7 +578,7 @@ static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, uint8_t* dataReadArr
 	dataWriteArr[4] = 0x00;
 	dataWriteArr[5] = 0x00;
 
-	// Prepare write/read lenght
+	// Prepare write/read length
 	uint16_t len = 0;
 	if (me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv)
 		len = 4;

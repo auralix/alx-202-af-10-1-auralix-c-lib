@@ -14,7 +14,9 @@
   * structure shape hold every member the code names, a call forwards its
   * arguments to one variadic function, a constant has a value no other has.
   * Grown from the compilers' diagnostics by the scratch tool of ALX-1564
-  * night goal 4; edited by hand from then on.
+  * night goal 4; edited by hand from then on. Where the analysers read a
+  * value or a shape (goal 7), it is the vendor's: interrupt 0, the PLL's two
+  * spread-spectrum words, the callback a pointer.
   ******************************************************************************
   **/
 
@@ -24,6 +26,32 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+typedef enum
+{
+	NonMaskableInt_IRQn = -14,
+	HardFault_IRQn = -13,
+	SVCall_IRQn = -5,
+	PendSV_IRQn = -2,
+	SysTick_IRQn = -1,
+	WDT_BOD_IRQn = 0,
+	FLEXCOMM0_IRQn = 1,
+	FLEXCOMM1_IRQn = 2,
+	FLEXCOMM2_IRQn = 3,
+	FLEXCOMM3_IRQn = 4,
+	FLEXCOMM4_IRQn = 5,
+	FLEXCOMM5_IRQn = 6,
+	FLEXCOMM6_IRQn = 7,
+	FLEXCOMM7_IRQn = 8,
+	PIN_INT0_IRQn = 9,
+	PIN_INT1_IRQn = 10,
+	PIN_INT2_IRQn = 11,
+	PIN_INT3_IRQn = 12,
+	PIN_INT4_IRQn = 13,
+	PIN_INT5_IRQn = 14,
+	PIN_INT6_IRQn = 15,
+	PIN_INT7_IRQn = 16
+} IRQn_Type;
+#define ALX_SHIM_IRQN_TYPE
 #include "cmsisHostShim.h"
 
 
@@ -118,7 +146,7 @@ typedef struct alxShimLpc55s6x_Sub
 	uint32_t* DIR;
 	uint32_t* MR;
 	uint32_t** PIO;
-	uint32_t* pllsscg;
+	uint32_t pllsscg[2];
 } alxShimLpc55s6x_Sub;
 
 typedef struct alxShimLpc55s6x_Struct
@@ -213,7 +241,7 @@ typedef struct alxShimLpc55s6x_Struct
 	uint32_t* DIR;
 	uint32_t* MR;
 	uint32_t** PIO;
-	uint32_t* pllsscg;
+	uint32_t pllsscg[2];
 } alxShimLpc55s6x_Struct;
 
 typedef alxShimLpc55s6x_Struct CTIMER_Type;
@@ -276,14 +304,6 @@ extern alxShimLpc55s6x_Struct alxShimLpc55s6x_Instance;
 #define USART7 (&alxShimLpc55s6x_Instance)
 #define ADC0 (0x0100U)
 #define ANACTRL_XO32M_CTRL_ENABLE_SYSTEM_CLK_OUT_MASK (0x0101U)
-#define FLEXCOMM0_IRQn ((IRQn_Type)1)
-#define FLEXCOMM1_IRQn ((IRQn_Type)2)
-#define FLEXCOMM2_IRQn ((IRQn_Type)3)
-#define FLEXCOMM3_IRQn ((IRQn_Type)4)
-#define FLEXCOMM4_IRQn ((IRQn_Type)5)
-#define FLEXCOMM5_IRQn ((IRQn_Type)6)
-#define FLEXCOMM6_IRQn ((IRQn_Type)7)
-#define FLEXCOMM7_IRQn ((IRQn_Type)8)
 #define I2C_MSTCTL_MSTCONTINUE_MASK (0x010AU)
 #define I2C_MSTCTL_MSTSTART_MASK (0x010BU)
 #define I2C_MSTCTL_MSTSTOP_MASK (0x010CU)
@@ -311,14 +331,6 @@ extern alxShimLpc55s6x_Struct alxShimLpc55s6x_Instance;
 #define IOCON_MODE_PULLUP (0x0122U)
 #define IOCON_MODE_REPEATER (0x0123U)
 #define PINT (0x0124U)
-#define PIN_INT0_IRQn ((IRQn_Type)9)
-#define PIN_INT1_IRQn ((IRQn_Type)10)
-#define PIN_INT2_IRQn ((IRQn_Type)11)
-#define PIN_INT3_IRQn ((IRQn_Type)12)
-#define PIN_INT4_IRQn ((IRQn_Type)13)
-#define PIN_INT5_IRQn ((IRQn_Type)14)
-#define PIN_INT6_IRQn ((IRQn_Type)15)
-#define PIN_INT7_IRQn ((IRQn_Type)16)
 #define PLL_SETUPFLAG_WAITLOCK (0x012DU)
 #define SYSCON_PLL0CTRL_CLKEN_MASK (0x012EU)
 #define SYSCON_PLL0SSCG1_SEL_EXT_MASK (0x012FU)
@@ -559,7 +571,7 @@ void* alxShimLpc55s6x_CallPtr(int unused, ...);
 #define PINT_EnableCallbackByIndex(...) alxShimLpc55s6x_Call(0, ##__VA_ARGS__)
 #define PINT_Init(...) alxShimLpc55s6x_Call(0, ##__VA_ARGS__)
 #define PINT_PinInterruptClrStatus(...) alxShimLpc55s6x_Call(0, ##__VA_ARGS__)
-#define PINT_PinInterruptConfig(...) alxShimLpc55s6x_Call(0, ##__VA_ARGS__)
+#define PINT_PinInterruptConfig(base, intr, enable, callback) alxShimLpc55s6x_Call(0, (base), (intr), (enable), (void*)(callback))
 #define POWER_DisablePD(...) alxShimLpc55s6x_Call(0, ##__VA_ARGS__)
 #define POWER_EnablePD(...) alxShimLpc55s6x_Call(0, ##__VA_ARGS__)
 #define RESET_PeripheralReset(...) alxShimLpc55s6x_Call(0, ##__VA_ARGS__)

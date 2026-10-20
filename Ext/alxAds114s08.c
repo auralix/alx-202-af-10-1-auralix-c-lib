@@ -40,8 +40,8 @@
 //******************************************************************************
 // Private Variables
 //******************************************************************************
-float transferFun_thermocoupleS_PointArr_mV[] = { -0.236, 0.000, 0.173, 0.646, 1.441, 2.323, 3.259, 4.233, 5.239, 6.275, 7.345, 8.449, 9.587, 10.757, 11.951, 13.159, 15.582, 17.947 };
-float transferFun_thermocoupleS_PointArr_degC[] = { -50, 0, 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1500, 1700 };
+static float transferFun_thermocoupleS_PointArr_mV[] = { -0.236, 0.000, 0.173, 0.646, 1.441, 2.323, 3.259, 4.233, 5.239, 6.275, 7.345, 8.449, 9.587, 10.757, 11.951, 13.159, 15.582, 17.947 };
+static float transferFun_thermocoupleS_PointArr_degC[] = { -50, 0, 30, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1500, 1700 };
 #define NUM_OF_PONTS_TRANSFER_FUN_THERMCOUPLE_S (sizeof(transferFun_thermocoupleS_PointArr_mV) / sizeof(transferFun_thermocoupleS_PointArr_mV[0]))
 
 
@@ -328,7 +328,7 @@ Alx_Status AlxAds114s08_GetChVoltage_mV(AlxAds114s08* me, uint8_t chNum, float* 
 	me->reg.reg_0x04_DATARATE.val.MODE = MODE_SingleConversion;
 	me->reg.reg_0x05_REF.val.REFSEL = REFSEL_Internal2_5Vref;
 	me->reg.reg_0x05_REF.val.REFCON = REFCON_InternalRefAlwaysOn;
-	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_BurnOutCurrentSrcEn_0_2uA;	// GK: Should be dissabled if G_CHOP is enabled, but we need it and it doesn't seem to pose issues at low currents
+	me->reg.reg_0x09_SYS.val.SYS_MON = SYS_MON_BurnOutCurrentSrcEn_0_2uA;	// GK: Should be disabled if G_CHOP is enabled, but we need it and it doesn't seem to pose issues at low currents
 	status = AlxAds114s08_Reg_WriteAll(me);
 	if (status != Alx_Ok)
 	{
@@ -351,6 +351,11 @@ Alx_Status AlxAds114s08_GetChVoltage_mV(AlxAds114s08* me, uint8_t chNum, float* 
 	// Convert to mV
 	//------------------------------------------------------------------------------
 	status = AlxAds114s08_Convert_raw_mV(me, chVoltage_raw, chVoltage_mV, isOutOfRange);
+	if (status != Alx_Ok)
+	{
+		ALX_ADS114S08_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -644,7 +649,7 @@ static Alx_Status AlxAds114s08_Cmd_RREG(AlxAds114s08* me, uint8_t regAddr, uint8
 	ALX_ADS114S08_ASSERT(regAddr <= 0x1F);
 	ALX_ADS114S08_ASSERT(len >  0x00);
 	ALX_ADS114S08_ASSERT(len <= 0x1F);
-	ALX_ADS114S08_ASSERT(len <= 0x02);	// GK: not implemeted for more
+	ALX_ADS114S08_ASSERT(len <= 0x02);	// GK: not implemented for more
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -707,8 +712,7 @@ static Alx_Status AlxAds114s08_Reg_Write(AlxAds114s08* me, void* reg)
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t regAddr = *((uint8_t*)reg);
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(uint8_t);
 	uint8_t dataWriteArr[3] = { };
 	uint8_t dataReadArr[3] = { };
 
@@ -716,7 +720,7 @@ static Alx_Status AlxAds114s08_Reg_Write(AlxAds114s08* me, void* reg)
 	AlxSpi_Master_AssertCs(me->spi);
 
 	// Prepare
-	dataWriteArr[0] = 0x40 | regAddr; // WREG command + rgister address
+	dataWriteArr[0] = 0x40 | regAddr; // WREG command + register address
 	dataWriteArr[1] = 0x00; // num_of_reg_to_read = 0x00 (we want to write 1 register, so we need to put 0x00)
 	dataWriteArr[2] = *regValPtr; // Data to write to register
 

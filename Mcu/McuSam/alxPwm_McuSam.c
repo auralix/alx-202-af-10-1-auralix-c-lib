@@ -90,7 +90,7 @@ void AlxPwm_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 Alx_Status AlxPwm_Init(AlxPwm* me)
 {
@@ -129,7 +129,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 Alx_Status AlxPwm_DeInit(AlxPwm* me)
 {
@@ -156,9 +156,9 @@ Alx_Status AlxPwm_DeInit(AlxPwm* me)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] ch
-  * @param[in] duty_pct
+  * @param[in]	me
+  * @param[in]	ch
+  * @param[in]	duty_pct
   */
 Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 {
@@ -169,9 +169,9 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] ch
-  * @param[in] duty_permil
+  * @param[in]	me
+  * @param[in]	ch
+  * @param[in]	duty_permil
   */
 Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {

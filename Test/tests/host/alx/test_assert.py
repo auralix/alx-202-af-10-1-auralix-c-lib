@@ -68,7 +68,7 @@ _DANGLE_TU = """\
 #if defined(DANGLE_ASSERT_RST_ENABLE)
 	#define DANGLE_ASSERT(expr) ALX_ASSERT_RST(DANGLE_FILE, expr)
 #else
-	#define DANGLE_ASSERT(expr) do{} while (false)
+	#define DANGLE_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 int Dangle(int c, int* y);
@@ -286,8 +286,8 @@ def test_ALX1553_P510_the_expression_is_evaluated_once_when_compiled_in_and_neve
     """The difference between an assertion that is off and an assertion that is not there.
 
     With no ALX_<MODULE>_ASSERT_*_ENABLE macro the module's own header defines its assert as
-    `do{} while (false)` and the argument is DISCARDED by the preprocessor: not evaluated, not
-    compiled, not present in the object file. So an expression with a side effect silently stops
+    `ALX_ASSERT_OFF(expr)` and the argument is compiled and never evaluated (decision 14): not
+    present in the object file. So an expression with a side effect silently stops
     happening, and an invariant that is written down stops existing - there is nothing left for a
     mutation to change, which is how the device repository's mutation lane found 257 assertions
     compiled out of its host build on 11.09 and why seventeen groups here were rebuilt with
@@ -431,7 +431,7 @@ def test_ALX1553_P513_an_assertion_reports_a_file_the_line_number_belongs_to():
     "do/while wrapper, so at a call site written `if (c) MODULE_ASSERT(x); else y;` the macro's own "
     "trailing `}` plus the call site's `;` leaves the outer else unattached: clang reports "
     "-Wdangling-else and then `error: expected expression`. The same call site compiles clean with "
-    "assertions off, because the #else branch IS `do{} while (false)`. Measured on this toolchain, "
+    "assertions off, because the #else branch IS `ALX_ASSERT_OFF(expr)`, one expression. Measured on this toolchain, "
     "both ways. The consequence is a build failure that appears only in the configuration a product "
     "ships: a caller writes an unbraced if/else around an assertion, it builds green on the "
     "library's default, and it stops compiling the day that product defines an enable macro - or "

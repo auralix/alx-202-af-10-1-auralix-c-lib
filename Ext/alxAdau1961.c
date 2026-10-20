@@ -254,15 +254,16 @@ Alx_Status AlxAdau1961_InDiffL_SetGain_dB(AlxAdau1961* me, float gain_dB)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == true);
 	ALX_ADAU1961_ASSERT(me->wasCtorCalled == true);
-	ALX_ADAU1961_ASSERT(fmodf(gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB) == 0);
+	ALX_UNUSED float gainRem_dB = fmodf(gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB);
+	ALX_ADAU1961_ASSERT((gainRem_dB >= 0.f) && (gainRem_dB <= 0.f));
 
 	Alx_Status status = Alx_Err;
 
 	// #1 Set Mute
-	if (gain_dB == (float)me->MUTE_GAIN_dB)
+	if (gain_dB <= (float)me->MUTE_GAIN_dB)
 	{
 		me->reg.R8_LeftDiffInputVol.val.LDMUTE = DiffInputMuteControl_Mute;
-		Alx_Status status = AlxAdau1961_Reg_Write(me, &me->reg.R8_LeftDiffInputVol);
+		status = AlxAdau1961_Reg_Write(me, &me->reg.R8_LeftDiffInputVol);
 		if (status != Alx_Ok)
 		{
 			ALX_ADAU1961_TRACE_ERR("Err");
@@ -284,7 +285,7 @@ Alx_Status AlxAdau1961_InDiffL_SetGain_dB(AlxAdau1961* me, float gain_dB)
 		}
 
 		// #2.2 Un-Mute & Set PGA gain
-		float _gain_dB = gain_dB;	// We do not need to substract anything
+		float _gain_dB = gain_dB;	// We do not need to subtract anything
 		me->reg.R8_LeftDiffInputVol.val.LDMUTE = DiffInputMuteControl_UnMute;
 		me->reg.R8_LeftDiffInputVol.val.LDVOL = AlxAdau1961_CalcRegVal_InDiffGain(me, _gain_dB);
 		status = AlxAdau1961_Reg_Write(me, &me->reg.R8_LeftDiffInputVol);
@@ -310,7 +311,8 @@ Alx_Status AlxAdau1961_InDiffL_SetGain_dB(AlxAdau1961* me, float gain_dB)
 
 		// #3.2 Un-Mute & Set PGA gain
 		float _gain_dB = gain_dB - me->IN_DIFF_PGA_BOOST_REDUCE_VAL_dB;	// We must reduce set gain because PGA gain boost is set to +20dB (we reduce it by 20.25dB, to get number which is multiple of 0.75dB to have uniform 0.75dB/bit, for easier handling)
-		ALX_ADAU1961_ASSERT(fmodf(_gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB) == 0);
+		ALX_UNUSED float _gainRem_dB = fmodf(_gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB);
+		ALX_ADAU1961_ASSERT((_gainRem_dB >= 0.f) && (_gainRem_dB <= 0.f));
 		me->reg.R8_LeftDiffInputVol.val.LDMUTE = DiffInputMuteControl_UnMute;
 		me->reg.R8_LeftDiffInputVol.val.LDVOL = AlxAdau1961_CalcRegVal_InDiffGain(me, _gain_dB);
 		status = AlxAdau1961_Reg_Write(me, &me->reg.R8_LeftDiffInputVol);
@@ -336,15 +338,16 @@ Alx_Status AlxAdau1961_InDiffR_SetGain_dB(AlxAdau1961* me, float gain_dB)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == true);
 	ALX_ADAU1961_ASSERT(me->wasCtorCalled == true);
-	ALX_ADAU1961_ASSERT(fmodf(gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB) == 0);
+	ALX_UNUSED float gainRem_dB = fmodf(gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB);
+	ALX_ADAU1961_ASSERT((gainRem_dB >= 0.f) && (gainRem_dB <= 0.f));
 
 	Alx_Status status = Alx_Err;
 
 	// #1 Set Mute
-	if (gain_dB == (float)me->MUTE_GAIN_dB)
+	if (gain_dB <= (float)me->MUTE_GAIN_dB)
 	{
 		me->reg.R9_RightDiffInputVol.val.RDMUTE = DiffInputMuteControl_Mute;
-		Alx_Status status = AlxAdau1961_Reg_Write(me, &me->reg.R9_RightDiffInputVol);
+		status = AlxAdau1961_Reg_Write(me, &me->reg.R9_RightDiffInputVol);
 		if (status != Alx_Ok)
 		{
 			ALX_ADAU1961_TRACE_ERR("Err");
@@ -367,7 +370,7 @@ Alx_Status AlxAdau1961_InDiffR_SetGain_dB(AlxAdau1961* me, float gain_dB)
 		}
 
 		// #2.2 Un-Mute & Set PGA gain
-		float _gain_dB = gain_dB;	// We do not need to substract anything
+		float _gain_dB = gain_dB;	// We do not need to subtract anything
 		me->reg.R9_RightDiffInputVol.val.RDMUTE = DiffInputMuteControl_UnMute;
 		me->reg.R9_RightDiffInputVol.val.RDVOL = AlxAdau1961_CalcRegVal_InDiffGain(me, _gain_dB);
 		status = AlxAdau1961_Reg_Write(me, &me->reg.R9_RightDiffInputVol);
@@ -393,7 +396,8 @@ Alx_Status AlxAdau1961_InDiffR_SetGain_dB(AlxAdau1961* me, float gain_dB)
 
 		// #3.2 Un-Mute & Set PGA gain
 		float _gain_dB = gain_dB - me->IN_DIFF_PGA_BOOST_REDUCE_VAL_dB;	// We must reduce set gain because PGA gain boost is set to +20dB (we reduce it by 20.25dB, to get number which is multiple of 0.75dB to have uniform 0.75dB/bit, for easier handling)
-		ALX_ADAU1961_ASSERT(fmodf(_gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB) == 0);
+		ALX_UNUSED float _gainRem_dB = fmodf(_gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB);
+		ALX_ADAU1961_ASSERT((_gainRem_dB >= 0.f) && (_gainRem_dB <= 0.f));
 		me->reg.R9_RightDiffInputVol.val.RDMUTE = DiffInputMuteControl_UnMute;
 		me->reg.R9_RightDiffInputVol.val.RDVOL = AlxAdau1961_CalcRegVal_InDiffGain(me, _gain_dB);
 		status = AlxAdau1961_Reg_Write(me, &me->reg.R9_RightDiffInputVol);

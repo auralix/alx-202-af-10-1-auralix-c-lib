@@ -99,11 +99,16 @@ void AlxAdc_Ctor
 	#endif
 
 	// Check channel sequence
-	for (uint32_t i = 0; i < (uint32_t)(numOfIoPinsAndCh - 1); i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) < AlxAdc_GetCh(me, chArr[i + 1]));	// Channel sequence must be from low to high number
+	for (uint32_t i = 0; i < (uint32_t)(numOfIoPinsAndCh - 1); i++)
+	{
+		ALX_UNUSED uint8_t chNumCurrent = AlxAdc_GetCh(me, chArr[i]);
+		ALX_UNUSED uint8_t chNumNext = AlxAdc_GetCh(me, chArr[i + 1]);
+		ALX_ADC_ASSERT(chNumCurrent < chNumNext);	// Channel sequence must be from low to high number
+	}
 
 	// Check clock
-	ALX_ADC_ASSERT(AlxAdc_Ctor_IsSysClkOk(me));
-	(void)AlxAdc_Ctor_IsSysClkOk;
+	ALX_UNUSED bool isSysClkOk = AlxAdc_Ctor_IsSysClkOk(me);
+	ALX_ADC_ASSERT(isSysClkOk);
 
 	// Variables
 	me->adcConfig.clockDividerNumber = 0;					// MF: Clkdiv = 0 ensures that sampling rate si appropriate (see User Manual)
@@ -176,13 +181,13 @@ Alx_Status AlxAdc_Init(AlxAdc* me)
 		me->adcConvSeqConfig.channelMask |= (1U << AlxAdc_GetCh(me, me->chArr[i]));
 	}
 
-	// Init ADC coversion sequence
+	// Init ADC conversion sequence
 	ADC_SetConvSeqAConfig(ALX_ADC_LPC8XX, &me->adcConvSeqConfig);
 	ADC_EnableConvSeqA(ALX_ADC_LPC8XX, true);
 
 	// Clear result register
 	ADC_DoSoftwareTriggerConvSeqA(ALX_ADC_LPC8XX);
-	ADC_GetConvSeqAGlobalConversionResult(ALX_ADC_LPC8XX, &me->adcResult);		// MF: Clears global ADC conversion infomation of sequence A.
+	ADC_GetConvSeqAGlobalConversionResult(ALX_ADC_LPC8XX, &me->adcResult);		// MF: Clears global ADC conversion information of sequence A.
 
 	// Set isInit
 	me->isInit = true;
@@ -206,7 +211,7 @@ Alx_Status AlxAdc_DeInit(AlxAdc* me)
 	// DeInit ADC
 	ADC_Deinit(ALX_ADC_LPC8XX);
 
-	// Clear all ADC registers and both coversion sequence registers
+	// Clear all ADC registers and both conversion sequence registers
 	SYSCON->PRESETCTRL0 &= ~(1U << 24U);
 	SYSCON->PRESETCTRL0 |= (1U << 24U);
 

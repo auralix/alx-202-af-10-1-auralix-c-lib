@@ -32,7 +32,7 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from alx.verify import configs
+from alx.verify import analyzers, configs
 from alx.verify import host_build as hb
 from alx.verify.evidence import git_head
 
@@ -309,6 +309,90 @@ def matrix(tc: hb.Toolchain, heads: dict[str, str] | None = None) -> configs.Mat
 def run(out: Path, only: Sequence[str] = (), log: Callable[[str], None] | None = None) -> dict:
     """Run the rows (all, or those whose id or name starts with one of `only`) into `out`."""
     return configs.run_matrix(matrix(hb.Toolchain(), {"c-lib": git_head(CLIB)}), out, only=only, log=log)
+
+
+# ---- the analysers over the rows (goal 7 step 8, D33) ---------------------------------------------
+# The rows clang-tidy and cppcheck read, each as configured and with every assertion and trace off
+# (disabled_operations). Between them they compile every code line the whole matrix compiles: the
+# run measures that and fails on a line none of them compiles. Chosen on 2026-10-12 by a greedy
+# cover over every measured row's preprocessed lines; choose again the same way when that happens.
+ANALYSIS_ROWS = (
+    "0134",
+    "0213",
+    "0219",
+    "0071",
+    "0300",
+    "0259",
+    "0043",
+    "0159",
+    "0093",
+    "0240",
+    "0179",
+    "0113",
+    "0320",
+    "0021",
+    "0324",
+    "0200",
+    "0318",
+    "0313",
+    "0180",
+    "0302",
+    "0322",
+    "0326",
+    "0220",
+)
+
+# What a compiler predefines that the library tests and cppcheck does not know, by toolchain word,
+# `host` for a row on the PC: the toolchain guards of alxGlobal.h, alxId.c's C, C library and compiler
+# versions - this machine's arm-none-eabi-gcc 15.2.1 with newlib 4.5.0 and clang 22.1.8, above the
+# minimums alxConfig_TEMPLATE.h requires - and littlefs's byte order in alxLfsConfig.h.
+_ENDIAN = ("__ORDER_LITTLE_ENDIAN__=1234", "__ORDER_BIG_ENDIAN__=4321", "__BYTE_ORDER__=1234")
+_C99 = ("__STDC_VERSION__=199901L",)
+_NEWLIB = ("__NEWLIB__=4", "__NEWLIB_MINOR__=5", "__NEWLIB_PATCHLEVEL__=0")
+_CLANG = ("__clang__", "__clang_major__=22", "__clang_minor__=1", "__clang_patchlevel__=8")
+CPPCHECK_DEFINES = {
+    "gcc": ("__GNUC__=15", "__GNUC_MINOR__=2", "__GNUC_PATCHLEVEL__=1", "__arm__", *_NEWLIB, *_ENDIAN, *_C99),
+    "clang": ("__GNUC__=4", *_CLANG, "__arm__", *_NEWLIB, *_ENDIAN, *_C99),
+    "host": (*_CLANG, "_WIN32", *_ENDIAN, *_C99),
+}
+# The analyze lane's own cppcheck options and its two runs, the Cortex-M widths and the PC's. The
+# assertion handlers that do not return are Test/config/alxAssert.cfg's (test_assert.py P515), and the
+# style checks below report the library's conventions rather than defects (goal 7, 2026-10-12): an object
+# function takes `AlxX* me`, a getter too (the const checks); a local is declared at the top of its
+# function (variableScope) and given a value there (unreadVariable, redundantInitialization,
+# redundantAssignment - clang-tidy's dead-store check reports a value really never read); a status check
+# of a function that cannot fail in this configuration - a vendor fake, a backend without an error path -
+# is defensive code that stays (knownConditionTrueFalse).
+_STYLE = ("constParameterPointer", "constParameterCallback", "constVariablePointer", "constVariable",
+          "variableScope", "unreadVariable", "redundantInitialization", "redundantAssignment",
+          "knownConditionTrueFalse")
+CPPCHECK_OPTIONS = ("--std=c99", "--language=c", "--inline-suppr", "--quiet", f"--library={CONFIG / 'alxAssert.cfg'}",
+                    "--suppress=missingIncludeSystem", "--suppress=unusedFunction",
+                    *(f"--suppress={check}" for check in _STYLE))
+# clang-tidy's analyser is told the same of the handlers by a header included first.
+TIDY_FLAGS = ("-include", str(CONFIG / "alxAssertAnalyzer.h"))
+CPPCHECK_RUNS = (("--platform=unix32", "--funsigned-char", "--enable=warning,style,performance,portability"),
+                 ("--platform=win64", "--enable=warning,portability"))
+
+
+def disabled_operations(text: str | None = None) -> list[configs.Operation]:
+    """Every assertion and every trace off, after a row's own operations - its options stay."""
+    groups = template_groups(text)
+    names = [*groups[("Library", "Module - Trace")],
+             *(s for form in ("BKPT", "TRACE", "RST") for s in groups[("Library", f"Module - Assert - {form}")])]
+    return [("define", "ALX_TRACE_LEVEL", LEVELS["off"]), *[("undef", n, None) for n in names]]
+
+
+def analyze(out: Path, only: Sequence[str] = (), log: Callable[[str], None] | None = None) -> dict:
+    """Run clang-tidy and cppcheck over ANALYSIS_ROWS (those of them `only` selects) into `out`."""
+    tc = hb.Toolchain()
+    m = matrix(tc, {"c-lib": git_head(CLIB)})
+    rows = [r for r in m.matrix.rows if r.id in ANALYSIS_ROWS]
+    return analyzers.run_analysis(
+        m, rows, out,
+        tidy=analyzers.Tidy(tc.llvm("clang-tidy"), CLIB / ".clang-tidy", flags=TIDY_FLAGS),
+        cppcheck=analyzers.Cppcheck(tc.cppcheck(), CPPCHECK_OPTIONS, CPPCHECK_RUNS, CPPCHECK_DEFINES),
+        disabled=disabled_operations(), only=only, log=log)
 
 
 if __name__ == "__main__":

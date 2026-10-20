@@ -165,7 +165,7 @@ Alx_Status AlxSd_Init(AlxSd* me, uint8_t numOfTries, uint16_t newTryWaitTime_ms)
 			continue;
 		}
 
-		// Execute ACMD41 SPI mode - Starts SD card initialization process, polls untils initialization is complete, also sends HSC (high capacits support) bit
+		// Execute ACMD41 SPI mode - Starts SD card initialization process, polls until initialization is complete, also sends HSC (high capacits support) bit
 		status = AlxSd_SpiMode_SendAcmd41(me);
 		if (status != Alx_Ok)
 		{
@@ -780,7 +780,7 @@ Alx_Status AlxSd_SpiMode_SendCmd0(AlxSd* me)
 {
 	// Prepare
 	uint8_t cmd[6] = {};
-	cmd[0] = (0x40 | 0);	// 0x40
+	cmd[0] = 0x40;	// 0x40
 	cmd[1] = 0x00;
 	cmd[2] = 0x00;
 	cmd[3] = 0x00;

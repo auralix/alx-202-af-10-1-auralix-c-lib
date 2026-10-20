@@ -277,7 +277,7 @@ Alx_Status AlxLin_Master_Publish(AlxLin* me, AlxLin_Frame frame)
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInit == true);
 	ALX_LIN_ASSERT(me->isMaster == true);
-	ALX_LIN_ASSERT((0 <= frame.id) && (frame.id <= 0x3F));
+	ALX_LIN_ASSERT(frame.id <= 0x3F);
 	ALX_LIN_ASSERT((0 < frame.dataLen) && (frame.dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
 
 
@@ -371,7 +371,7 @@ Alx_Status AlxLin_Master_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t sla
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInit == true);
 	ALX_LIN_ASSERT(me->isMaster == true);
-	ALX_LIN_ASSERT((0 <= frame->id) && (frame->id <= 0x3F));
+	ALX_LIN_ASSERT(frame->id <= 0x3F);
 	ALX_LIN_ASSERT((0 < frame->dataLen) && (frame->dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
 
 
@@ -482,7 +482,7 @@ Alx_Status AlxLin_Master_SubscribeViaCallback(AlxLin* me, AlxLin_Frame frame)
 	ALX_LIN_ASSERT(me->wasCtorCalled == true);
 	ALX_LIN_ASSERT(me->isInit == true);
 	ALX_LIN_ASSERT(me->isMaster == true);
-	ALX_LIN_ASSERT((0 <= frame.id) && (frame.id <= 0x3F));
+	ALX_LIN_ASSERT(frame.id <= 0x3F);
 	ALX_LIN_ASSERT((0 < frame.dataLen) && (frame.dataLen <= ALX_LIN_FRAME_DATA_LEN_MAX));
 
 
@@ -680,7 +680,6 @@ Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t time
 		uint32_t rxFrameLen_Expected = me->breakSyncOffset + 1 + frame->dataLen + 1;	// *Break + *SYNC + Protected ID + Data + Checksum
 		if (rxFrameLen_Actual == rxFrameLen_Expected)
 		{
-			status = Alx_Ok;
 			break;
 		}
 

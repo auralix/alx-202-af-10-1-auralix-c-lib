@@ -119,10 +119,10 @@ int32_t AlxLinTest_Publish(AlxLinTest_Obj* me, uint8_t id, const uint8_t* data, 
 //     gate A   ALX_LIN_TRACE_ENABLE          alxLin.h:74 - the module's own switch
 //     gate B   ALX_TRACE_LEVEL >= <level>    Mcu/alxTrace.h:93-127 - the global threshold
 //
-// Either one closing replaces the macro with do{} while(false) taking NO parameters, so the
-// arguments are deleted by the preprocessor and never evaluated. These counters are how a test
-// sees that: the argument is a call that increments one, so a counter that does not move is an
-// expression that was not compiled.
+// Either one closing replaces the call with ALX_TRACE_OFF, which keeps the arguments compiled and
+// never evaluates them (decision 14). These counters are how a test sees that: the argument is a
+// call that increments one, so a counter that does not move is an expression that was not
+// evaluated.
 //
 // alxLin.c's own sites prove the same thing on real library code, but only for whichever levels
 // that module happens to use. The probe carries one site at each of the three the module declares,
