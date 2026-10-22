@@ -102,37 +102,12 @@ TYPES_CALLBACKS = [f"AlxFs_Lfs_{medium}_{op}" for medium in ("FlashInt", "Mmc")
 TYPES_EXEMPT = ["alxBoot.c:charConsumed", "alxBoot.c:sscanfStatus"]
 # What the generators write into the root for a build, ignored by git; their templates are judged.
 TYPES_GENERATED = ["alxBoot_GENERATED.h", "alxBootMetadata_GENERATED.h", "alxBuild_GENERATED.h"]
-# D55, waiting for TV: decision 12 gives a vendor's type no variable, and these files hold the vendor's
-# objects - the MCU backends' register blocks, HAL and SDK handles, configurations and statuses, the
-# Zephyr devices; alxOs*'s FreeRTOS and Zephyr handles; alxFs's FatFs and littlefs objects; alxBoot's
-# MCUboot ones; alxTrace.c's va_list. Measured 2026-10-12 over the analysed rows: 398 declarations in
-# 87 files. Their foreign types are listed and do not fail; every other type there does.
-TYPES_PENDING = {
-    "alxBoot.c", "alxBoot.h", "alxFs.c", "alxFs.h", "alxOsDelayUntil.h", "alxOsEventFlagGroup.c",
-    "alxOsEventFlagGroup.h", "alxOsMutex.h", "alxOsThread.c", "alxOsThread.h",
-    "alxTrace.c",
-    "alxAdc_McuLpc17xx.c", "alxAdc_McuLpc17xx.h", "alxTrace_McuLpc17xx.c", "alxTrace_McuLpc17xx.h",
-    "alxAdc_McuLpc55S6x.c", "alxAdc_McuLpc55S6x.h", "alxClk_McuLpc55S6x.c", "alxI2c_McuLpc55S6x.c",
-    "alxI2c_McuLpc55S6x.h", "alxIoPinIrq_McuLpc55S6x.c", "alxIoPinIrq_McuLpc55S6x.h",
-    "alxIoPin_McuLpc55S6x.c", "alxPwm_McuLpc55S6x.c", "alxPwm_McuLpc55S6x.h", "alxSerialPort_McuLpc55S6x.c",
-    "alxSerialPort_McuLpc55S6x.h", "alxSpi_McuLpc55S6x.c", "alxSpi_McuLpc55S6x.h", "alxTrace_McuLpc55S6x.c",
-    "alxTrace_McuLpc55S6x.h", "alxWdt_McuLpc55S6x.h",
-    "alxAdc_McuLpc80x.h", "alxI2c_McuLpc80x.c", "alxI2c_McuLpc80x.h", "alxIoPinIrq_McuLpc80x.c",
-    "alxIoPinIrq_McuLpc80x.h", "alxIoPin_McuLpc80x.c", "alxPwm_McuLpc80x.h", "alxTrace_McuLpc80x.c",
-    "alxTrace_McuLpc80x.h", "alxWdt_McuLpc80x.h",
-    "alxAdc_McuSam.h", "alxIoPin_McuSam.c", "alxIoPin_McuSam.h", "alxPwm_McuSam.h", "alxSerialPort_McuSam.c",
-    "alxSerialPort_McuSam.h", "alxTrace_McuSam.c", "alxTrace_McuSam.h",
-    "alxAdc_McuStm32.c", "alxAdc_McuStm32.h", "alxCan_McuStm32.c", "alxCan_McuStm32.h", "alxClk_McuStm32.h",
-    "alxDac_McuStm32.c", "alxDac_McuStm32.h", "alxI2c_McuStm32.c", "alxI2c_McuStm32.h", "alxI2s_McuStm32.c",
-    "alxI2s_McuStm32.h", "alxIoPin_McuStm32.c", "alxIoPin_McuStm32.h", "alxMmc_McuStm32.c",
-    "alxMmc_McuStm32.h", "alxPwm_McuStm32.c", "alxPwm_McuStm32.h", "alxRtc_McuStm32.c", "alxRtc_McuStm32.h",
-    "alxSerialPort_McuStm32.c", "alxSerialPort_McuStm32.h", "alxSpi_McuStm32.c", "alxSpi_McuStm32.h",
-    "alxTrace_McuStm32.c", "alxTrace_McuStm32.h", "alxUsb_McuStm32.c", "alxUsb_McuStm32.h",
-    "alxWdt_McuStm32.h",
-    "alxAdc_McuZephyr.c", "alxAdc_McuZephyr.h", "alxI2c_McuZephyr.h", "alxIoPin_McuZephyr.c",
-    "alxIoPin_McuZephyr.h", "alxSpi_McuZephyr.c", "alxSpi_McuZephyr.h", "alxTrace_McuZephyr.c",
-    "alxTrace_McuZephyr.h",
-}
+# Decision 12 rule 1 as TV amended it on 2026-10-22 (D55): a vendor's object - a register block, a HAL
+# or SDK handle, a configuration, an RTOS handle, a file-system object, a va_list - is declared as the
+# vendor's type in the backend that talks to that vendor and nowhere else: Mcu/ and the glue modules
+# alxOs*, alxFs, alxBoot and alxTrace (which is in Mcu/). The gate lists a backend's vendor types and
+# fails a vendor type anywhere else; a never-declared type (int, size_t) fails in a backend too.
+TYPES_BACKENDS = ["Mcu", "alxOs*.[ch]", "alxFs.[ch]", "alxBoot.[ch]"]
 
 # Stage 5 compiles every PORTABLE library module - the ones that need no vendor SDK. Three cannot
 # join: alxAssert.c, alxBoot.c and alxIrq.c reach for CMSIS intrinsics (__BKPT, __disable_irq,
@@ -734,7 +709,7 @@ def analyze(session: nox.Session) -> None:
                 *[a for name in TYPES_PREFIXES for a in ("--prefix", name)],
                 *[a for name in TYPES_CALLBACKS for a in ("--callback", name)],
                 *[a for spot in TYPES_EXEMPT for a in ("--exempt", spot)],
-                *[a for name in sorted(TYPES_PENDING) for a in ("--pending", name)],
+                *[a for name in TYPES_BACKENDS for a in ("--backend", name)],
                 "--jobs", str(TYPES_JOBS), "--clang", str(tc.llvm("clang")), "--out", str(out / "c_types.txt"))
 
 
