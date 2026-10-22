@@ -97,5 +97,12 @@ void AlxAds114s08Test_TimePasses(bool enable)
 {
 	// With it on, every millisecond the driver waits moves the clock: a conversion that never becomes
 	// ready reaches its timeout instead of waiting forever (A97)
-	AlxDelayFake_SetOnDelay(enable ? AlxAds114s08Test_Advance : NULL);
+	if (enable)
+	{
+		AlxDelayFake_SetOnDelay(AlxAds114s08Test_Advance);
+	}
+	else
+	{
+		AlxDelayFake_SetOnDelay(NULL);
+	}
 }

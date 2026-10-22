@@ -114,7 +114,14 @@ void AlxI2cFake_FailAt(uint32_t nth)
 {
 	// The nth call from now answers Alx_Err, the others the forced status: a driver's error path at one
 	// chosen step of a sequence. 0 disarms.
-	alxI2cFake_failAt = (nth == 0) ? 0 : alxI2cFake_callCount + nth;
+	if (nth == 0)
+	{
+		alxI2cFake_failAt = 0;
+	}
+	else
+	{
+		alxI2cFake_failAt = alxI2cFake_callCount + nth;
+	}
 }
 uint32_t AlxI2cFake_CallCount(void)
 {

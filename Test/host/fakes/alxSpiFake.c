@@ -162,7 +162,14 @@ void AlxSpiFake_SetForcedStatus(int32_t status)
 void AlxSpiFake_FailAt(uint32_t nth)
 {
 	// The nth call from now answers Alx_Err, the others the forced status. 0 disarms.
-	alxSpiFake_failAt = (nth == 0) ? 0 : alxSpiFake_callCount + nth;
+	if (nth == 0)
+	{
+		alxSpiFake_failAt = 0;
+	}
+	else
+	{
+		alxSpiFake_failAt = alxSpiFake_callCount + nth;
+	}
 }
 uint32_t AlxSpiFake_CallCount(void)
 {
