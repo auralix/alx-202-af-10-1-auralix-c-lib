@@ -673,7 +673,7 @@ Alx_Status AlxLin_Slave_Subscribe(AlxLin* me, AlxLin_Frame* frame, uint16_t time
 
 	// Wait for master to transmit whole frame response with specified data length
 	uint32_t rxFrameLen_Actual = 0;
-	while (1)
+	for (;;)
 	{
 		// Check RX frame length
 		rxFrameLen_Actual = AlxSerialPort_GetRxFifoNumOfEntries(me->alxSerialPort);

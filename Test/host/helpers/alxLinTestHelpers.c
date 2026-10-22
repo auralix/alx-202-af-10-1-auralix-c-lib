@@ -20,6 +20,7 @@
 // Includes
 //******************************************************************************
 #include "alxLin.h"
+#include "alxTick.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,11 +28,13 @@
 //******************************************************************************
 // Private Types
 //******************************************************************************
+#define ALX_LIN_TEST_SLAVE_FRAME_CONFIG_LEN 8
 typedef struct
 {
 	AlxLin lin;
 	AlxSerialPort port;
 	AlxIoPin dbgPin;
+	AlxLin_SlaveFrameConfig slaveFrameConfigArr[ALX_LIN_TEST_SLAVE_FRAME_CONFIG_LEN];
 } AlxLinTest_Obj;
 
 
@@ -58,6 +61,19 @@ uint32_t AlxLinTest_TraceArgEvalsVrb(void);
 void AlxLinTest_BumpWrnDirect(void);
 void AlxLinTest_BumpDbgDirect(void);
 void AlxLinTest_BumpVrbDirect(void);
+AlxLinTest_Obj* AlxLinTest_NewWithoutDbgPin(void);
+AlxIoPin* AlxLinTest_DbgPin(AlxLinTest_Obj* me);
+int32_t AlxLinTest_SubscribeFrame(AlxLinTest_Obj* me, uint8_t id, uint8_t dataLen, bool enhanced, uint8_t* pid, uint8_t* data, uint8_t* checksum);
+int32_t AlxLinTest_SubscribeViaCallback(AlxLinTest_Obj* me, uint8_t id, uint8_t dataLen, bool enhanced);
+int32_t AlxLinTest_SlaveSubscribe(AlxLinTest_Obj* me, uint8_t dataLen, bool enhanced, uint16_t timeout_ms, uint8_t* id, uint8_t* pid, uint8_t* data, uint8_t* checksum);
+void AlxLinTest_SetSlaveFrameConfig(AlxLinTest_Obj* me, uint8_t index, uint8_t id, uint8_t dataLen, bool publish, bool enhanced);
+void AlxLinTest_UseSlaveFrameConfigArr(AlxLinTest_Obj* me, uint8_t len);
+bool AlxLinTest_RxActive(AlxLinTest_Obj* me);
+uint8_t AlxLinTest_RxIndex(AlxLinTest_Obj* me);
+void AlxLinTest_RxFrame(AlxLinTest_Obj* me, uint8_t* id, uint8_t* pid, uint8_t* dataLen, uint8_t* data, uint8_t* checksum, bool* enhanced);
+bool AlxLinTest_SlaveReqPending(AlxLinTest_Obj* me);
+void AlxLinTest_SetSlaveReqPending(AlxLinTest_Obj* me, bool pending);
+void AlxLinTest_TickAdvance_ms(uint32_t ms);
 
 
 //******************************************************************************
@@ -232,4 +248,100 @@ void AlxLinTest_RxFlush(AlxLinTest_Obj* me)
 void AlxLinTest_RxByte(AlxLinTest_Obj* me, uint8_t data)
 {
 	AlxLin_RxBuff_Handle(&me->lin, data);
+}
+
+//******************************************************************************
+// The receive paths: the master's subscribe, the slave and the RX buffer (A97)
+//******************************************************************************
+// The weak callbacks are the library's own and stay in place, so what a test sees is the frame the
+// RX buffer holds, the response the slave put on the wire, and the slave-request flag. Every wait is
+// 0 ms: alxDelay spins on the tick, and nothing on the host advances it but AlxLinTest_TickAdvance_ms.
+AlxLinTest_Obj* AlxLinTest_NewWithoutDbgPin(void)
+{
+	AlxLinTest_Obj* me = (AlxLinTest_Obj*)calloc(1, sizeof(AlxLinTest_Obj));
+	if (me == NULL) { return NULL; }
+	AlxSerialPortFake_Register(&me->port);
+	AlxLin_Ctor(&me->lin, &me->port, 1, 100, NULL);
+	return me;
+}
+AlxIoPin* AlxLinTest_DbgPin(AlxLinTest_Obj* me)
+{
+	return &me->dbgPin;
+}
+int32_t AlxLinTest_SubscribeFrame(AlxLinTest_Obj* me, uint8_t id, uint8_t dataLen, bool enhanced, uint8_t* pid, uint8_t* data, uint8_t* checksum)
+{
+	AlxLin_Frame frame;
+	memset(&frame, 0, sizeof(frame));
+	frame.id = id;
+	frame.dataLen = dataLen;
+	frame.enhancedChecksumEnable = enhanced;
+	Alx_Status status = AlxLin_Master_Subscribe(&me->lin, &frame, 0);
+	*pid = frame.protectedId;
+	memcpy(data, frame.data, ALX_LIN_FRAME_DATA_LEN_MAX);
+	*checksum = frame.checksum;
+	return (int32_t)status;
+}
+int32_t AlxLinTest_SubscribeViaCallback(AlxLinTest_Obj* me, uint8_t id, uint8_t dataLen, bool enhanced)
+{
+	AlxLin_Frame frame;
+	memset(&frame, 0, sizeof(frame));
+	frame.id = id;
+	frame.dataLen = dataLen;
+	frame.enhancedChecksumEnable = enhanced;
+	Alx_Status status = AlxLin_Master_SubscribeViaCallback(&me->lin, frame);
+	return (int32_t)status;
+}
+int32_t AlxLinTest_SlaveSubscribe(AlxLinTest_Obj* me, uint8_t dataLen, bool enhanced, uint16_t timeout_ms, uint8_t* id, uint8_t* pid, uint8_t* data, uint8_t* checksum)
+{
+	AlxLin_Frame frame;
+	memset(&frame, 0, sizeof(frame));
+	frame.dataLen = dataLen;
+	frame.enhancedChecksumEnable = enhanced;
+	Alx_Status status = AlxLin_Slave_Subscribe(&me->lin, &frame, timeout_ms, 0);
+	*id = frame.id;
+	*pid = frame.protectedId;
+	memcpy(data, frame.data, ALX_LIN_FRAME_DATA_LEN_MAX);
+	*checksum = frame.checksum;
+	return (int32_t)status;
+}
+void AlxLinTest_SetSlaveFrameConfig(AlxLinTest_Obj* me, uint8_t index, uint8_t id, uint8_t dataLen, bool publish, bool enhanced)
+{
+	if (index >= ALX_LIN_TEST_SLAVE_FRAME_CONFIG_LEN) { return; }
+	me->slaveFrameConfigArr[index].id = id;
+	me->slaveFrameConfigArr[index].dataLen = dataLen;
+	me->slaveFrameConfigArr[index].publish = publish;
+	me->slaveFrameConfigArr[index].enhancedChecksumEnable = enhanced;
+}
+void AlxLinTest_UseSlaveFrameConfigArr(AlxLinTest_Obj* me, uint8_t len)
+{
+	AlxLin_SetSlaveFrameConfigArr(&me->lin, me->slaveFrameConfigArr, len);
+}
+bool AlxLinTest_RxActive(AlxLinTest_Obj* me)
+{
+	return me->lin.rxb.active;
+}
+uint8_t AlxLinTest_RxIndex(AlxLinTest_Obj* me)
+{
+	return me->lin.rxb.i;
+}
+void AlxLinTest_RxFrame(AlxLinTest_Obj* me, uint8_t* id, uint8_t* pid, uint8_t* dataLen, uint8_t* data, uint8_t* checksum, bool* enhanced)
+{
+	*id = me->lin.rxb.frame.id;
+	*pid = me->lin.rxb.frame.protectedId;
+	*dataLen = me->lin.rxb.frame.dataLen;
+	memcpy(data, me->lin.rxb.frame.data, ALX_LIN_FRAME_DATA_LEN_MAX);
+	*checksum = me->lin.rxb.frame.checksum;
+	*enhanced = me->lin.rxb.frame.enhancedChecksumEnable;
+}
+bool AlxLinTest_SlaveReqPending(AlxLinTest_Obj* me)
+{
+	return me->lin.slaveReqPending;
+}
+void AlxLinTest_SetSlaveReqPending(AlxLinTest_Obj* me, bool pending)
+{
+	me->lin.slaveReqPending = pending;
+}
+void AlxLinTest_TickAdvance_ms(uint32_t ms)
+{
+	AlxTick_IncRange_ms(&alxTick, ms);
 }

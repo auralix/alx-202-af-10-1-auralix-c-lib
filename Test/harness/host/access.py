@@ -2049,6 +2049,42 @@ class LinLib:
         c.AlxTraceFake_LastFile.restype = ctypes.c_char_p
         c.AlxTraceFake_LastFun.restype = ctypes.c_char_p
         c.AlxTraceFake_LevelConfigured.restype = u8
+        # the receive paths (A97)
+        c.AlxLinTest_NewWithoutDbgPin.restype = vp
+        c.AlxLinTest_DbgPin.restype = vp
+        c.AlxLinTest_DbgPin.argtypes = [vp]
+        c.AlxLinTest_SubscribeFrame.restype = i32
+        c.AlxLinTest_SubscribeFrame.argtypes = [vp, u8, u8, b, u8p, u8p, u8p]
+        c.AlxLinTest_SubscribeViaCallback.restype = i32
+        c.AlxLinTest_SubscribeViaCallback.argtypes = [vp, u8, u8, b]
+        c.AlxLinTest_SlaveSubscribe.restype = i32
+        c.AlxLinTest_SlaveSubscribe.argtypes = [vp, u8, b, ctypes.c_uint16, u8p, u8p, u8p, u8p]
+        c.AlxLinTest_SetSlaveFrameConfig.argtypes = [vp, u8, u8, u8, b, b]
+        c.AlxLinTest_UseSlaveFrameConfigArr.argtypes = [vp, u8]
+        c.AlxLinTest_RxActive.restype = b
+        c.AlxLinTest_RxActive.argtypes = [vp]
+        c.AlxLinTest_RxIndex.restype = u8
+        c.AlxLinTest_RxIndex.argtypes = [vp]
+        c.AlxLinTest_RxFrame.argtypes = [vp, u8p, u8p, u8p, u8p, u8p, ctypes.POINTER(ctypes.c_bool)]
+        c.AlxLinTest_SlaveReqPending.restype = b
+        c.AlxLinTest_SlaveReqPending.argtypes = [vp]
+        c.AlxLinTest_SetSlaveReqPending.argtypes = [vp, b]
+        c.AlxLinTest_TickAdvance_ms.argtypes = [u32]
+        for name in ("Master_Handle", "Slave_Handle", "Irq_Handle"):
+            getattr(c, f"AlxLin_{name}").argtypes = [vp]
+        for name in ("Init", "DeInit"):
+            fn = getattr(c, f"AlxLin_Slave_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxLin_Slave_IsInit.restype = b
+        c.AlxLin_Slave_IsInit.argtypes = [vp]
+        c.AlxSerialPortFake_InjectRx.restype = i32
+        c.AlxSerialPortFake_InjectRx.argtypes = [vp, u8p, u32]
+        c.AlxSerialPortFake_SetForcedStatus.argtypes = [i32, u32]
+        c.AlxSerialPortFake_SetRxAfterFlush.argtypes = [vp, u8p, u32]
+        c.AlxSerialPortFake_SetRxAfterPolls.argtypes = [vp, u8p, u32, u32]
+        c.AlxIoPinFake_Level.restype = b
+        c.AlxIoPinFake_Level.argtypes = [vp]
         self._handles: list = []
 
     # -- the trace axis -----------------------------------------------------
@@ -2144,6 +2180,117 @@ class LinLib:
         for handle in self._handles:
             self.c.AlxLinTest_Delete(handle)
         self._handles.clear()
+        self.c.AlxSerialPortFake_SetForcedStatus(0, 0)
+
+    # -- the receive paths (A97) ----------------------------------------------
+    INIT, DEINIT, READ, WRITE = 1, 2, 4, 8   # the serial port's operations a test can make fail
+
+    def new_slave(self, *, dbg_pin: bool = True) -> int:
+        """A constructed object, not initialised: a slave once Slave_Init is called."""
+        handle = self.c.AlxLinTest_New() if dbg_pin else self.c.AlxLinTest_NewWithoutDbgPin()
+        assert handle, "the LIN helper could not allocate"
+        self._handles.append(handle)
+        return handle
+
+    def slave_init(self, handle: int) -> int:
+        return self.c.AlxLin_Slave_Init(self._lin(handle))
+
+    def slave_deinit(self, handle: int) -> int:
+        return self.c.AlxLin_Slave_DeInit(self._lin(handle))
+
+    def slave_is_init(self, handle: int) -> bool:
+        return bool(self.c.AlxLin_Slave_IsInit(self._lin(handle)))
+
+    def handle(self, handle: int, *, master: bool) -> None:
+        """One pass of the response timeout watch, the master's or the slave's."""
+        if master:
+            self.c.AlxLin_Master_Handle(self._lin(handle))
+        else:
+            self.c.AlxLin_Slave_Handle(self._lin(handle))
+
+    def irq(self, handle: int) -> None:
+        self.c.AlxLin_Irq_Handle(self._lin(handle))
+
+    def port_fail(self, status: int, ops: int) -> None:
+        """The serial port's operations in `ops` answer `status` until free_all; the others work."""
+        self.c.AlxSerialPortFake_SetForcedStatus(status, ops)
+
+    def inject(self, handle: int, data: bytes) -> int:
+        """Bytes on the bus for the object to receive, in its RX FIFO now."""
+        arr = (ctypes.c_uint8 * max(len(data), 1))(*data)
+        return self.c.AlxSerialPortFake_InjectRx(self.c.AlxLinTest_Port(handle), arr, len(data))
+
+    def respond(self, handle: int, data: bytes) -> None:
+        """What the other side sends once the object listens: in its RX FIFO after its next flush.
+
+        Both subscribes flush the RX FIFO before they read - the master right after its header, the
+        slave as it starts to wait - so a response has to arrive after that, not before.
+        """
+        arr = (ctypes.c_uint8 * max(len(data), 1))(*data)
+        self.c.AlxSerialPortFake_SetRxAfterFlush(self.c.AlxLinTest_Port(handle), arr, len(data))
+
+    def respond_late(self, handle: int, data: bytes, polls: int) -> None:
+        """The response lands at the object's `polls`-th count of its RX FIFO: a wait of two counts goes round."""
+        arr = (ctypes.c_uint8 * max(len(data), 1))(*data)
+        self.c.AlxSerialPortFake_SetRxAfterPolls(self.c.AlxLinTest_Port(handle), arr, len(data), polls)
+
+    def subscribe(self, handle: int, frame_id: int, data_len: int, *, enhanced: bool = False):
+        """Master_Subscribe with no wait: (status, protected id, data, checksum)."""
+        pid, checksum = ctypes.c_uint8(), ctypes.c_uint8()
+        data = (ctypes.c_uint8 * 8)()
+        status = self.c.AlxLinTest_SubscribeFrame(handle, frame_id, data_len, enhanced, pid, data, checksum)
+        return status, pid.value, bytes(data[:data_len]), checksum.value
+
+    def subscribe_via_callback(self, handle: int, frame_id: int, data_len: int, *, enhanced: bool = False) -> int:
+        return self.c.AlxLinTest_SubscribeViaCallback(handle, frame_id, data_len, enhanced)
+
+    def slave_subscribe(self, handle: int, data_len: int, *, enhanced: bool = False, timeout_ms: int = 0):
+        """Slave_Subscribe with no check wait: (status, id, protected id, data, checksum)."""
+        id_, pid, checksum = ctypes.c_uint8(), ctypes.c_uint8(), ctypes.c_uint8()
+        data = (ctypes.c_uint8 * 8)()
+        status = self.c.AlxLinTest_SlaveSubscribe(handle, data_len, enhanced, timeout_ms, id_, pid, data, checksum)
+        return status, id_.value, pid.value, bytes(data[:data_len]), checksum.value
+
+    def slave_frames(self, handle: int, configs) -> None:
+        """The slave's frame table: (id, data length, publish, enhanced) per entry, up to eight."""
+        for index, (frame_id, data_len, publish, enhanced) in enumerate(configs):
+            self.c.AlxLinTest_SetSlaveFrameConfig(handle, index, frame_id, data_len, publish, enhanced)
+        self.c.AlxLinTest_UseSlaveFrameConfigArr(handle, len(configs))
+
+    def rx_flush(self, handle: int) -> None:
+        self.c.AlxLinTest_RxFlush(handle)
+
+    def rx_bytes(self, handle: int, data: bytes) -> None:
+        """The bytes, one RxBuff_Handle each, as the serial IRQ would hand them over."""
+        for byte in data:
+            self.c.AlxLinTest_RxByte(handle, byte)
+
+    def rx_active(self, handle: int) -> bool:
+        return bool(self.c.AlxLinTest_RxActive(handle))
+
+    def rx_index(self, handle: int) -> int:
+        return self.c.AlxLinTest_RxIndex(handle)
+
+    def rx_frame(self, handle: int) -> dict:
+        """The frame the RX buffer holds: id, pid, len, data (len bytes), checksum, enhanced."""
+        id_, pid, length, checksum = (ctypes.c_uint8() for _ in range(4))
+        data, enhanced = (ctypes.c_uint8 * 8)(), ctypes.c_bool()
+        self.c.AlxLinTest_RxFrame(handle, id_, pid, length, data, checksum, enhanced)
+        return {"id": id_.value, "pid": pid.value, "len": length.value, "data": bytes(data[:length.value]),
+                "checksum": checksum.value, "enhanced": enhanced.value}
+
+    def slave_req_pending(self, handle: int) -> bool:
+        return bool(self.c.AlxLinTest_SlaveReqPending(handle))
+
+    def set_slave_req_pending(self, handle: int, pending: bool) -> None:
+        self.c.AlxLinTest_SetSlaveReqPending(handle, pending)
+
+    def tick_ms(self, ms: int) -> None:
+        """The host's tick, which nothing else advances, forward by `ms`."""
+        self.c.AlxLinTest_TickAdvance_ms(ms)
+
+    def dbg_pin(self, handle: int) -> bool:
+        return bool(self.c.AlxIoPinFake_Level(self.c.AlxLinTest_DbgPin(handle)))
 
 
 class DelayLib:
