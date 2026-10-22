@@ -203,3 +203,60 @@ def test_ALX1553_P574_a_record_shorter_than_the_type_is_refused(memsafe_lib, mak
         f"a one-byte record was accepted for a uint32 and read back as "
         f"0x{m.kv_get(ctx):08X} - the item should have kept its default"
     )
+
+
+# =====================================================================
+# P749, P750 - a Str item loads, a record the item cannot take, an Arr item with a store (A97)
+# =====================================================================
+
+
+def test_ALX1564_P749_a_str_item_loads_its_stored_text(memsafe_lib, make_kv_item):
+    """LoadVal asks for buffLen bytes for a Str item, not valLen: the stored text replaces the default."""
+    m = memsafe_lib
+    m.kv_poke("P749_S", b"hi\0")
+    ctx = make_kv_item(m.D_STR, "P749_S", "default")
+
+    assert m.kv_load(ctx) == m.OK
+    assert m.kv_get_str(ctx) == (m.OK, "hi")
+
+
+def test_ALX1564_P749_a_record_the_item_cannot_take_is_replaced_in_the_store_by_the_default(
+        memsafe_lib, make_kv_item):
+    """Get succeeds, SetVal refuses the value, and the default is written back: the second seed path."""
+    m = memsafe_lib
+    m.kv_poke("P749_R", bytes([127]))
+    ctx = make_kv_item(m.D_UINT8, "P749_R", 5, val_min=0, val_max=10)
+
+    assert m.kv_load(ctx) == m.OK
+    assert m.kv_get(ctx) == 5
+    assert m.kv_peek("P749_R") == bytes([5]), "the default was not written over the bad record"
+
+
+def test_ALX1564_P749_a_record_the_item_cannot_take_and_a_store_that_cannot_be_written_report_failure(
+        memsafe_lib, make_kv_item):
+    m = memsafe_lib
+    m.kv_poke("P749_F", bytes([127]))
+    ctx = make_kv_item(m.D_UINT8, "P749_F", 5, val_min=0, val_max=10)
+    m.kv_fail_set(True)
+
+    assert m.kv_load(ctx) != m.OK
+    assert m.kv_get(ctx) == 5
+
+
+@pytest.mark.parametrize("handle", ["IGNORE", "BOUND"])
+@pytest.mark.expect_assert("P750: SetVal has no Arr branch under either handle - the branch asserts")
+@pytest.mark.xfail(strict=True, reason=(
+    "DEFECT: an Arr item built with a KV store cannot load its record. AlxParamItem_LoadVal hands the "
+    "record to AlxParamItem_SetVal, and SetVal's Arr branch is `ALX_PARAM_ITEM_ASSERT(false); // We should "
+    "never get here` under the Ignore and the Bound handle alike (alxParamItem.c), so the set fails, LoadVal "
+    "takes its value-set-ERR path, writes the DEFAULT back over the record and answers Alx_Ok. StoreVal on the "
+    "same item works - AlxParamItem_GetValPtr_Private has an Arr branch - so an Arr parameter stores and never "
+    "loads. The fix is a memcpy of valLen bytes in SetVal's Arr branches, as AlxParamItem_SetValArr does"))
+def test_ALX1564_P750_an_arr_item_with_a_store_loads_its_record(memsafe_lib, make_kv_item, handle):
+    m = memsafe_lib
+    m.kv_poke("P750_" + handle, bytes([9, 8, 7, 6]))
+    ctx = make_kv_item(m.D_ARR, "P750_" + handle, bytes([1, 2, 3, 4]), out_of_range=getattr(m, handle))
+
+    m.kv_load(ctx)
+
+    assert m.kv_get_arr(ctx, 4) == bytes([9, 8, 7, 6]), "the record was not loaded"

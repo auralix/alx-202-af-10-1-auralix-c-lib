@@ -425,3 +425,77 @@ def test_ALX1564_P341_the_typed_get_commands_partition_the_table(make_cli):
     everything = set(as_json(cmd(cli, b"get\r", handles=4))["data"])
     assert everything == set().union(*groups.values())
     assert sum(len(g) for g in groups.values()) == len(everything), "an item answers under two types"
+
+
+# =====================================================================
+# P737-P740 - the id command, an event, the other responses (A97)
+# =====================================================================
+
+SUCCESS, ERR_CMD, ERR_ARG, ERR_CRC, ERR_TIMEOUT = range(5)
+
+
+@pytest.mark.parametrize("pretty", [False, True])
+@pytest.mark.parametrize("boot", [False, True])
+def test_ALX1564_P737_the_id_command_renders_the_identity_with_or_without_a_bootloader(make_cli, pretty, boot):
+    """Every field of the identity in one JSON object, the bootloader's four only when there is one."""
+    cli = make_cli(with_id=True)
+    cli.boot_used(boot)
+    set_param(cli, b"PRETTY_JSON_EN", b"true" if pretty else b"false")
+
+    resp = cmd(cli, b"id\r")
+
+    doc = as_json(resp)
+    assert doc["status"] == "success"
+    data = doc["data"]
+    assert set(data) >= {"fwArtf", "fwName", "fwVerStr", "fwBinStr", "hwPcbArtf", "hwPcbName", "hwPcbVerStr",
+                         "hwBomArtf", "hwBomName", "hwBomVerStr", "hwId", "hwMcuUniqueIdStr"}
+    assert ("fwBootArtf" in data) is boot, "the bootloader's fields exactly when a bootloader is used"
+    assert (b"\r\n    " in resp) is pretty
+
+
+def test_ALX1564_P737_the_id_command_is_unknown_without_an_identity(make_cli):
+    """The product's guarded optional: no AlxId, and id is a command the CLI does not have."""
+    cli = make_cli()
+    assert INVALID_MARK in cmd(cli, b"id\r")
+
+
+def test_ALX1564_P738_a_prepared_event_goes_out_on_the_next_handle_before_any_command(make_cli):
+    """PrepareEvent stages bytes; Handle writes them first, then clears the buffer and reads the command."""
+    cli = make_cli()
+    cli.prepare_event(b"{\"event\":\"boot\"}\r\n")
+
+    assert cmd(cli, b"help\r", handles=1).startswith(b"{\"event\":\"boot\"}\r\n")
+    assert HELP_MARK in cli.tx() + cmd(cli, b"help\r")
+
+
+@pytest.mark.parametrize(("response_type", "message"), [
+    (ERR_CRC, "CRC mismatch"), (ERR_TIMEOUT, "Command timeout"), (SUCCESS, None), (ERR_ARG, "Arguments invalid"),
+])
+@pytest.mark.parametrize("pretty", [False, True])
+def test_ALX1564_P739_every_response_type_renders_its_message_compact_and_pretty(make_cli, response_type, message, pretty):
+    """The responses a product's own command callback sends through PrepareResponse, both formats."""
+    cli = make_cli()
+    set_param(cli, b"PRETTY_JSON_EN", b"true" if pretty else b"false")
+
+    doc = as_json(cli.prepare_response(response_type))
+
+    assert doc["status"] == ("success" if message is None else "error")
+    assert doc.get("message") == message
+
+
+@pytest.mark.expect_assert("P739: a response type outside the enumeration reaches the else of PrepareResponse")
+def test_ALX1564_P739_a_response_type_the_enumeration_does_not_have_renders_an_empty_status(make_cli):
+    """What a build without assertions is left with: the empty strings the locals start from."""
+    cli = make_cli()
+    assert as_json(cli.prepare_response(99)) == {"status": "", "message": ""}
+
+
+def test_ALX1564_P740_set_param_refuses_an_empty_key_and_a_pretty_error_carries_its_message(make_cli):
+    """Two spaces between --key and --val leave an empty key; with pretty JSON on, the error is pretty too."""
+    cli = make_cli()
+    set_param(cli, b"PRETTY_JSON_EN", b"true")
+
+    resp = cmd(cli, b"set-param --key  --val 5\r", handles=4)
+
+    assert as_json(resp) == {"status": "error", "message": "Arguments invalid"}
+    assert resp.startswith(b"{\r\n    "), "pretty"

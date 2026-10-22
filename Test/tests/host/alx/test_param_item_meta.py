@@ -311,3 +311,93 @@ def test_ALX1553_P554_an_item_built_without_an_enum_list_is_not_an_enum(
 
     assert m.meta(ctx, "GetIsEnum") is False
     assert m.meta(ctx, "GetBuffLen") == 0, "a scalar carries no buffer"
+
+
+# =====================================================================
+# P741, P743, P747, P748 - the default of a Double, TV's TODO stubs, the Assert and the Bound handle (A97)
+# =====================================================================
+
+
+def test_ALX1564_P741_a_double_goes_back_to_its_default(memsafe_lib, make_meta_item):
+    """SetValToDef takes the Double branch: the one scalar type P559 and the store chain never set back."""
+    m = memsafe_lib
+    ctx = make_meta_item(m.D_DOUBLE, val_def=1.5, val_min=0.0, val_max=10.0)
+    assert m.meta_set_val(ctx, m.D_DOUBLE, 3.25) == m.OK
+
+    m.meta_set_val_to_def(ctx)
+
+    assert m.meta_get_val(ctx, m.D_DOUBLE) == 1.5
+
+
+@pytest.mark.parametrize("type_name", ["D_UINT64", "D_INT64", "D_DOUBLE"])
+@pytest.mark.expect_assert("P743: the string form of a Uint64, an Int64 and a Double is TV's TODO - the branch asserts")
+def test_ALX1564_P743_the_three_types_without_a_string_form_read_as_the_empty_string(
+        memsafe_lib, make_meta_item, type_name):
+    """CHARACTERIZATION: what a build without assertions is left with - an empty string and Alx_Ok."""
+    m = memsafe_lib
+    ctx = make_meta_item(_t(m, type_name), val_def=7, val_min=0, val_max=100)
+
+    assert m.meta_get_str_format(ctx) == (m.OK, "")
+
+
+@pytest.mark.parametrize("type_name", ["D_UINT64", "D_INT64"])
+@pytest.mark.expect_assert("P743: setting a Uint64 or an Int64 by string is TV's TODO - the branch asserts")
+def test_ALX1564_P743_the_two_integer_types_without_a_string_form_refuse_a_string(
+        memsafe_lib, make_meta_item, type_name):
+    """CHARACTERIZATION: the status the locals start from, Alx_Err, and the value untouched."""
+    m = memsafe_lib
+    ctx = make_meta_item(_t(m, type_name), val_def=7, val_min=0, val_max=100)
+
+    assert m.meta_set_str_format(ctx, "9") == m.ERR
+    assert m.meta_get_val(ctx, _t(m, type_name)) == 7
+
+
+def test_ALX1564_P744_a_double_is_set_by_string_and_text_with_no_number_is_refused(memsafe_lib, make_meta_item):
+    """The Double branch of SetVal_StrFormat: sscanf with %lf, then the same SetVal as every type."""
+    m = memsafe_lib
+    ctx = make_meta_item(m.D_DOUBLE, val_def=1.0, val_min=0.0, val_max=10.0)
+
+    assert m.meta_set_str_format(ctx, "2.5") == m.OK
+    assert m.meta_get_val(ctx, m.D_DOUBLE) == 2.5
+    assert m.meta_set_str_format(ctx, "abc") == m.ERR_CONV
+    assert m.meta_get_val(ctx, m.D_DOUBLE) == 2.5
+
+
+def test_ALX1564_P747_under_the_assert_handle_a_value_in_range_is_set(memsafe_lib, make_meta_item):
+    """The Assert handle shares the Ignore handle's path: a value inside the range is simply set."""
+    m = memsafe_lib
+    ctx = make_meta_item(m.D_UINT8, val_def=5, val_min=0, val_max=10, out_of_range=m.ASSERT)
+
+    assert m.meta_set_val(ctx, m.D_UINT8, 7) == m.OK
+    assert m.meta_get_val(ctx, m.D_UINT8) == 7
+
+
+@pytest.mark.expect_assert("P747: a value outside the range under the Assert handle asserts after the range check")
+def test_ALX1564_P747_under_the_assert_handle_a_value_out_of_range_asserts_and_is_refused(
+        memsafe_lib, make_meta_item):
+    """The range check's status comes back and the value stays: the assertion is the handle's whole difference."""
+    m = memsafe_lib
+    ctx = make_meta_item(m.D_UINT8, val_def=5, val_min=0, val_max=10, out_of_range=m.ASSERT)
+
+    assert m.meta_set_val(ctx, m.D_UINT8, 20) == m.RANGE_ERR_MAX
+    assert m.meta_get_val(ctx, m.D_UINT8) == 5
+
+
+def test_ALX1564_P747_a_double_out_of_range_under_the_ignore_handle_is_refused(memsafe_lib, make_meta_item):
+    """The false side of the Double branch's range check, the one P70 to P74 never reached."""
+    m = memsafe_lib
+    ctx = make_meta_item(m.D_DOUBLE, val_def=1.0, val_min=0.0, val_max=10.0)
+
+    assert m.meta_set_val(ctx, m.D_DOUBLE, 20.0) == m.RANGE_ERR_MAX
+    assert m.meta_get_val(ctx, m.D_DOUBLE) == 1.0
+
+
+@pytest.mark.parametrize("type_name", ["D_FLOAT", "D_DOUBLE"])
+def test_ALX1564_P748_under_the_bound_handle_a_float_or_a_double_beyond_the_maximum_is_pulled_to_it(
+        memsafe_lib, make_meta_item, type_name):
+    """AlxBound_Float and AlxBound_Double: the value lands on the maximum and the status says it was moved."""
+    m = memsafe_lib
+    ctx = make_meta_item(_t(m, type_name), val_def=1.0, val_min=0.0, val_max=10.0, out_of_range=m.BOUND)
+
+    assert m.meta_set_val(ctx, _t(m, type_name), 20.0) == m.BOUND_ERR_MAX
+    assert m.meta_get_val(ctx, _t(m, type_name)) == 10.0
