@@ -24,6 +24,8 @@ import random
 
 import pytest
 
+from tests.conftest import ASSERTS_ON
+
 pytestmark = pytest.mark.unit
 
 EPOCH = dt.datetime(1970, 1, 1, tzinfo=dt.UTC)
@@ -254,7 +256,7 @@ def test_ALX1553_P210_the_shorter_conversions_drop_the_fields_they_do_not_take(r
 # =====================================================================
 
 
-@pytest.mark.xfail(strict=True, reason=(
+@pytest.mark.xfail(ASSERTS_ON, strict=True, reason=(
     "DEFECT: the module's two conversions disagree about the years they support. "
     "AlxRtc_UnixTimeNsToDateTime happily produces years past 2099 - P201 walks every day to 2135 "
     "and P203 checks 2100 and 2135 by name - but AlxRtc_DateTimeToUnixTimeNs opens with "

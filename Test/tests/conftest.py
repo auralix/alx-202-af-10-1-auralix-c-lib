@@ -201,7 +201,22 @@ from harness.host.build import (
     _needs_build,
 )
 
+# A coverage build has every assertion off (the coverage lane sets this); the tests that read the
+# assertion record expect what it gives, and a defect sealed by an assertion is not a defect there.
+ASSERTS_ON = os.environ.get("ALX_ASSERTS_OFF") != "1"
+
 pytest_plugins = ("alx.verify.evidence",)
+
+
+@pytest.fixture
+def asserts_on() -> bool:
+    """Whether the DLLs under test carry their assertions: a coverage build has them off.
+
+    The coverage lane sets ALX_ASSERTS_OFF=1 (goal 8): every group is built with its assertions off,
+    since an enabled one is a branch nothing takes - the failing side of ASSERT(cond), both sides of
+    ASSERT(false). A test that reads the assertion record expects what such a build gives.
+    """
+    return ASSERTS_ON
 
 
 @pytest.fixture(autouse=True)

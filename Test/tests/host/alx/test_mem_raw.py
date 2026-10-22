@@ -190,7 +190,9 @@ def test_ALX1553_P518_a_read_that_reports_success_wrote_something_to_the_buffer(
     "P519: all four stubs are driven so that all four records can be read back - the text is the "
     "measurement"
 )
-def test_ALX1553_P519_the_recorded_file_and_the_recorded_line_come_from_different_files(mem_raw_lib):
+def test_ALX1553_P519_the_recorded_file_and_the_recorded_line_come_from_different_files(
+    mem_raw_lib, asserts_on
+):
     """"RST alxMemRaw.h:101 in AlxMemRaw_Read" - and alxMemRaw.h:101 declares AlxMemRaw_DeInit.
 
     ALX_MEM_RAW_FILE is "alxMemRaw.h" (alxMemRaw.h:56) and __LINE__ expands in alxMemRaw.c, so the
@@ -211,7 +213,7 @@ def test_ALX1553_P519_the_recorded_file_and_the_recorded_line_come_from_differen
     for call, expected in ASSERT_TEXT.items():
         mem_raw_lib.assert_reset()
         _call(mem_raw_lib, me, call)
-        assert mem_raw_lib.first() == expected
+        assert mem_raw_lib.first() == (expected if asserts_on else "")
 
 
 # =====================================================================
@@ -223,7 +225,7 @@ def test_ALX1553_P519_the_recorded_file_and_the_recorded_line_come_from_differen
     "P520: AlxMemRaw_DeInit is left weak on purpose, so the one call in this image that still "
     "reaches the library trips its assertion - which is the measurement"
 )
-def test_ALX1553_P520_a_strong_definition_displaces_the_weak_one_per_symbol(mem_raw_ovr_lib):
+def test_ALX1553_P520_a_strong_definition_displaces_the_weak_one_per_symbol(mem_raw_ovr_lib, asserts_on):
     """Four calls reach the product's code and the fifth still reaches the library's stub, in one image.
 
     alxMemRawTestHelpers_Override.c is what a product writes. It defines Ctor, Init, Read and Write strongly
@@ -253,8 +255,10 @@ def test_ALX1553_P520_a_strong_definition_displaces_the_weak_one_per_symbol(mem_
     assert ovr.asserts() == 0, "one of the four displaced calls reached the library's stub"
 
     assert ovr.deinit(me) == ovr.OK, "the undisplaced stub returns Alx_Ok, as P517 seals"
-    assert ovr.asserts() == 1, "AlxMemRaw_DeInit was displaced - it is meant to be left weak here"
-    assert ovr.first() == ASSERT_TEXT["DeInit"]
+    assert ovr.asserts() == (1 if asserts_on else 0), (
+        "AlxMemRaw_DeInit was displaced - it is meant to be left weak here"
+    )
+    assert ovr.first() == (ASSERT_TEXT["DeInit"] if asserts_on else "")
 
 
 # =====================================================================
@@ -310,7 +314,7 @@ def test_ALX1553_P521_the_callers_retry_count_and_timeout_arrive_at_the_override
     "caller cannot tell the difference from the status alone"
 )
 def test_ALX1553_P522_a_stored_parameter_survives_a_write_and_a_read_only_in_the_override(
-        mem_raw_lib, mem_raw_ovr_lib):
+        mem_raw_lib, mem_raw_ovr_lib, asserts_on):
     """Write eight bytes, read them back, and compare what each image tells a caller that checks status.
 
     Against the product's override this is what the contract is for: the bytes go to the device, the
@@ -342,7 +346,7 @@ def test_ALX1553_P522_a_stored_parameter_survives_a_write_and_a_read_only_in_the
     assert weak.write(stub, addr=0, length=len(PARAMS)) == weak.OK == ovr.OK
     assert weak.read(stub, addr=0, length=len(PARAMS)) == weak.OK == ovr.OK
     assert weak.buff(len(PARAMS)) == bytes([0xA5] * len(PARAMS)), "the weak Read touched the buffer"
-    assert weak.asserts() == 2
+    assert weak.asserts() == (2 if asserts_on else 0)
 
 
 # =====================================================================
@@ -354,7 +358,7 @@ def test_ALX1553_P522_a_stored_parameter_survives_a_write_and_a_read_only_in_the
     "P523: four of the five weak defaults assert - counting them is the measurement, and the fifth "
     "not asserting is the finding"
 )
-def test_ALX1553_P523_the_constructor_is_the_one_weak_default_that_says_nothing(mem_raw_lib):
+def test_ALX1553_P523_the_constructor_is_the_one_weak_default_that_says_nothing(mem_raw_lib, asserts_on):
     """Five weak bodies driven in order, and the assertion count comes to four.
 
     The four functions announce that they must not be called. The constructor does not, and it is
@@ -374,8 +378,10 @@ def test_ALX1553_P523_the_constructor_is_the_one_weak_default_that_says_nothing(
     for call in ("Init", "DeInit", "Read", "Write"):
         _call(mem_raw_lib, me, call)
 
-    assert mem_raw_lib.asserts() == 4, "one of the four stubs did not reach its ALX_MEM_RAW_ASSERT"
-    assert mem_raw_lib.first() == ASSERT_TEXT["Init"], "the first record is not the first call"
+    assert mem_raw_lib.asserts() == (4 if asserts_on else 0), (
+        "one of the four stubs did not reach its ALX_MEM_RAW_ASSERT"
+    )
+    assert mem_raw_lib.first() == (ASSERT_TEXT["Init"] if asserts_on else ""), "the first record is not the first call"
 
 
 # =====================================================================

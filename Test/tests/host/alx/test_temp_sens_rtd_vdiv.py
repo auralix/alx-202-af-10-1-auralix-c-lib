@@ -13,6 +13,8 @@ Proofs (ALX-1553): P251-P258.
 
 import pytest
 
+from tests.conftest import ASSERTS_ON
+
 # A Pt1000, thinned. Rising in resistance, which is what the table is told.
 PT1000_KOHM = [0.803, 0.882, 0.961, 1.000, 1.039, 1.117, 1.194, 1.271, 1.347, 1.423]
 PT1000_DEGC = [-50.0, -30.0, -10.0, 0.0, 10.0, 30.0, 50.0, 70.0, 90.0, 110.0]
@@ -213,7 +215,7 @@ def test_ALX1553_P258_a_middle_voltage_equal_to_the_top_is_not_a_temperature(sen
 # =====================================================================
 
 
-@pytest.mark.xfail(strict=True, reason=(
+@pytest.mark.xfail(ASSERTS_ON, strict=True, reason=(
     "DEFECT: AlxTempSensRtdVdiv_Init and _DeInit are STUBS. Each one is (void)me, "
     "ALX_TEMP_SENS_RTD_VDIV_ASSERT(false), return 0 - so a product doing the ordinary thing, "
     "constructing a sensor and initialising it, trips an assertion and, on a build that enables "

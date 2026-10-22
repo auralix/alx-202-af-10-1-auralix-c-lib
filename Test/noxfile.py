@@ -361,17 +361,11 @@ ASSERT_ENABLE = re.compile(r"-DALX_[A-Z0-9_]+_ASSERT_(BKPT|TRACE|RST)_ENABLE")
 # its 18 half-taken branches were trace sites). The three groups that enable traces (Fifo, MemSafe, Lin)
 # prove them in their variants session; the coverage build takes them out as it takes the assertions.
 TRACE_ENABLE = re.compile(r"-DALX_[A-Z0-9_]+_TRACE_ENABLE|-DALX_TRACE_LEVEL=.*")
-# The coverage lane disables every group's assertions; a group whose tests need them keeps them,
-# by its DLL's variable, with the reason. Measured 2026-10-12: with every group's off, 15 tests failed,
-# each one in these six groups and each one reading an assertion the code trips.
-COVERAGE_ASSERTS_ON: dict[str, str] = {
-    "ALX_ID_TEST_DLL": "test_id.py's P472, P497, P498 and P502 to P505 read the assertions AlxId trips",
-    "ALX_LINFUN_TEST_DLL": "test_audio_vol.py's sealed P450 is the assertion the full volume trips",
-    "ALX_MEMRAW_TEST_DLL": "test_mem_raw.py's P519, P520, P522 and P523 read the assertion record",
-    "ALX_MEMRAW_OVR_TEST_DLL": "test_mem_raw.py's P519, P520, P522 and P523 read the assertion record",
-    "ALX_RTC_TEST_DLL": "test_rtc_global.py's sealed P449 is the assertion a year past 2099 trips",
-    "ALX_TEMPSENS_TEST_DLL": "test_temp_sens_rtd_vdiv.py's sealed P466 is the stubs' assertion",
-}
+# The coverage lane disables every group's assertions and says so (ALX_ASSERTS_OFF=1): the 15 tests that
+# read the assertion record, or whose sealed defect is an assertion, expect what such a build gives
+# (conftest's asserts_on, ASSERTS_ON). Until goal 8 their six groups kept their assertions on
+# (COVERAGE_ASSERTS_ON), and every assertion then cost a branch nothing takes - the failing side of
+# `ASSERT(cond)`, both sides of `ASSERT(false)`.
 # The files the per-group gates held at 100 % of functions until goal 7 (MemSafe, Id, MemRaw), now in
 # the queue below for their other metrics: their functions stay gated.
 COVERAGE_FUNCTIONS = ["alxCrc.c", "alxMemSafe.c", "alxParamGroup.c", "alxId.c", "alxMemRaw.c"]
@@ -380,7 +374,6 @@ COVERAGE_FUNCTIONS = ["alxCrc.c", "alxMemSafe.c", "alxParamGroup.c", "alxId.c", 
 # metric; the gate fails until it does.
 COVERAGE_PENDING: dict[str, str] = {
     "alxAudioPlayer.c": "lines 59.7, branches 50.0, regions 57.4, functions 87.5",
-    "alxAudioVol.c": "lines 100.0, branches 72.2, regions 89.2, functions 100.0",
     "alxBool.c": "lines 89.1, branches 79.2, regions 88.4, functions 86.4",
     "alxCanParser.c": "lines 79.7, branches 84.6, regions 77.1, functions 100.0",
     "alxCli.c": "lines 58.8, branches 80.6, regions 85.8, functions 85.7",
@@ -389,9 +382,7 @@ COVERAGE_PENDING: dict[str, str] = {
     "alxHys1.c": "lines 72.7, branches 90.0, regions 68.8, functions 100.0",
     "alxHys2.c": "lines 77.8, branches 93.8, regions 78.3, functions 100.0",
     "alxId.c": "lines 97.0, branches 63.9, regions 76.5, functions 100.0",
-    "alxInterpLin.c": "lines 100.0, branches 90.0, regions 89.1, functions 100.0",
     "alxLinFun.c": "lines 71.0, branches 54.3, regions 69.8, functions 100.0",
-    "alxMemRaw.c": "lines 100.0, branches 100.0, regions 86.2, functions 100.0",
     "alxMemSafe.c": "lines 94.9, branches 93.7, regions 97.9, functions 100.0",
     "alxParamGroup.c": "lines 80.0, branches 68.0, regions 75.4, functions 100.0",
     "alxParamItem.c": "lines 87.1, branches 76.6, regions 84.2, functions 100.0",
@@ -772,22 +763,20 @@ def coverage(session: nox.Session) -> None:
     # sizeof (decision 14), a disabled trace its arguments, and clang's coverage maps the && || ?: of that
     # operand as branches that never run, so a coverage build disables both with nothing at all - the
     # traces by dropping a group's trace defines (TRACE_ENABLE), since an enabled one is a do-while whose
-    # `while (false)` is a branch never taken. A group whose tests need its assertions keeps them
-    # (COVERAGE_ASSERTS_ON). One run of the whole suite reaches
+    # `while (false)` is a branch never taken. The tests that read the assertion record expect none
+    # (ALX_ASSERTS_OFF). One run of the whole suite reaches
     # every DLL through its fixture's variable, and llvm-cov reads them together, so a file several groups
     # compile is measured over all of them. Coverage builds are measured, never analysed.
     _fresh_dev_build(session)
     out = lanes.evidence_dir(TEST, "coverage")
     for old in out.glob("*.profraw"):
         old.unlink()
-    env = {"LLVM_PROFILE_FILE": str(out / "%m-%p.profraw")}
+    env = {"LLVM_PROFILE_FILE": str(out / "%m-%p.profraw"), "ALX_ASSERTS_OFF": "1"}
     dlls = []
     for recipe in host_recipe.recipes():
         variable = host_recipe.dll_variable(recipe.dll)
         defines = list(recipe.defines)
-        if variable not in COVERAGE_ASSERTS_ON:
-            defines = [d for d in defines if not ASSERT_ENABLE.fullmatch(d)]
-        defines = [d for d in defines if not TRACE_ENABLE.fullmatch(d)]
+        defines = [d for d in defines if not ASSERT_ENABLE.fullmatch(d) and not TRACE_ENABLE.fullmatch(d)]
         dll = out / recipe.dll.name
         _instrumented_dll(dll, recipe.strict, recipe.exports, PROFILE, closure=recipe.closure,
                           defines=[*defines, COVERAGE_ASSERT_OFF, COVERAGE_TRACE_OFF],
@@ -815,12 +804,21 @@ def coverage(session: nox.Session) -> None:
     _write(out / "unmeasured.txt", "".join(f"{f}\n" for f in unmeasured))
     session.log(f"COVERAGE: {len(measured)} library files measured, {len(unmeasured)} compiled by no group "
                 f"(unmeasured.txt); html {out / 'html' / 'index.html'}")
+    # The sources are gated on the tracefile since goal 8: a line no host test can reach carries one of
+    # lcov's exclusion markers with its reason, which the gate honours and lists (the Python library's
+    # v0.18.4). Regions are not in a tracefile; with ternaries banned (c_style rule 1) and the short-
+    # circuits counted as branches, lines and branches say what regions said. The headers stay on the
+    # summary: the tracefile gives them the lines of the macros expanded in the sources.
+    sources = [f.relative_to(CLIB).as_posix() for f in measured if f.suffix == ".c"]
+    headers = [f.relative_to(CLIB).as_posix() for f in measured if f.suffix == ".h"]
+    session.run(PYTHON, "-m", "alx.verify.gates.coverage", str(out / "lcov.info"),
+                "--metrics", "lines,branches,functions", "--out", str(out / "coverage_gate.txt"),
+                *[a for name in COVERAGE_PENDING for a in ("--pending", name)], *sources)
     session.run(PYTHON, "-m", "alx.verify.gates.coverage", str(out / "summary.json"),
-                "--metrics", "lines,branches,regions,functions", "--out", str(out / "coverage_gate.txt"),
-                *[a for name in COVERAGE_PENDING for a in ("--pending", name)],
-                *[f.relative_to(CLIB).as_posix() for f in measured])
+                "--metrics", "lines,branches,regions,functions", "--out", str(out / "coverage_gate_headers.txt"),
+                *headers)
     # What the per-group gates this lane replaced held, a file in the queue keeps: every function runs.
-    session.run(PYTHON, "-m", "alx.verify.gates.coverage", str(out / "summary.json"), "--metrics", "functions",
+    session.run(PYTHON, "-m", "alx.verify.gates.coverage", str(out / "lcov.info"), "--metrics", "functions",
                 "--out", str(out / "coverage_gate_functions.txt"), *COVERAGE_FUNCTIONS)
     session.log("COVERAGE GATE PASS")
 
