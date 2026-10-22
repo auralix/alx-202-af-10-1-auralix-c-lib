@@ -219,7 +219,7 @@ Alx_Status AlxFtp_Client_Login(AlxFtp* me)
 	status = AlxSocket_Connect(&me->alxSocket_Ctrl, alxSocket_Ctrl_Ip, alxSocket_Ctrl_Port);
 	if (status != Alx_Ok)
 	{
-		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Connect(Ctrl) status %d alxSocket_Ctrl_Ip %s alxSocket_Ctrl_Port %" PRIu16, status, alxSocket_Ctrl_Ip, alxSocket_Ctrl_Port);
+		ALX_FTP_TRACE_ERR("FAIL: AlxSocket_Connect(Ctrl) status %d alxSocket_Ctrl_Ip %s alxSocket_Ctrl_Port %" PRIu32, status, alxSocket_Ctrl_Ip, (uint32_t)alxSocket_Ctrl_Port);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
@@ -606,21 +606,30 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		return Alx_Err;
 	}
 
-	// Parse tuple
-	uint8_t tuple[6] = {};
-	int32_t sscanfStatus = sscanf(ptr, "(%" SCNu8 ",%" SCNu8 ",%" SCNu8 ",%" SCNu8 ",%" SCNu8 ",%" SCNu8 ")", &tuple[0], &tuple[1], &tuple[2], &tuple[3], &tuple[4], &tuple[5]);
+	// Parse tuple - six bytes, each read as a 32-bit value and checked (decision 12: no 8-bit scan)
+	uint32_t tuple[6] = {};
+	int32_t sscanfStatus = sscanf(ptr, "(%" SCNu32 ",%" SCNu32 ",%" SCNu32 ",%" SCNu32 ",%" SCNu32 ",%" SCNu32 ")", &tuple[0], &tuple[1], &tuple[2], &tuple[3], &tuple[4], &tuple[5]);
 	if (sscanfStatus != 6)
 	{
 		ALX_FTP_TRACE_ERR("FAIL: sscanf(tuple) buff %.*s", (int)statusLen, me->buff);
 		AlxFtp_Reset(me);
 		return Alx_Err;
 	}
+	for (uint32_t i = 0; i < 6; i++)
+	{
+		if (tuple[i] > 255)
+		{
+			ALX_FTP_TRACE_ERR("FAIL: tuple[%" PRIu32 "] %" PRIu32 " is no byte", i, tuple[i]);
+			AlxFtp_Reset(me);
+			return Alx_Err;
+		}
+	}
 
 	// Set data socket IP
-	(void)sprintf(alxSocket_Data_Ip, "%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8, tuple[0], tuple[1], tuple[2], tuple[3]);
+	(void)sprintf(alxSocket_Data_Ip, "%" PRIu32 ".%" PRIu32 ".%" PRIu32 ".%" PRIu32, tuple[0], tuple[1], tuple[2], tuple[3]);
 
 	// Set data socket port
-	alxSocket_Data_Port = (tuple[4] * 256) + tuple[5];
+	alxSocket_Data_Port = (uint16_t)((tuple[4] * 256) + tuple[5]);
 
 
 	//------------------------------------------------------------------------------
@@ -650,7 +659,7 @@ Alx_Status AlxFtp_Client_UploadFile(AlxFtp* me, const char* localFilePath, const
 		}
 
 		// Trace
-		ALX_FTP_TRACE_WRN("FAIL: 'Connect with PASV response IP' AlxSocket_Connect(Data) status %d alxSocket_Data_Ip %s alxSocket_Data_Port %" PRIu16 " tryNum %" PRIu32, status, alxSocket_Data_Ip, alxSocket_Data_Port, tryNum);
+		ALX_FTP_TRACE_WRN("FAIL: 'Connect with PASV response IP' AlxSocket_Connect(Data) status %d alxSocket_Data_Ip %s alxSocket_Data_Port %" PRIu32 " tryNum %" PRIu32, status, alxSocket_Data_Ip, (uint32_t)alxSocket_Data_Port, tryNum);
 
 		// Wait
 		AlxOsDelay_ms(&alxOsDelay, 1);
