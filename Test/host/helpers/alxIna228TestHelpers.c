@@ -35,9 +35,11 @@
 // Prototypes - the DLL export surface (no separate header for test helpers)
 //******************************************************************************
 AlxIna228* AlxIna228Test_New(int32_t adcRange, float shuntRes_Ohm, float shuntResTemp_ppmPerDegC);
+AlxIna228* AlxIna228Test_NewRaw(int32_t adcRange, float shuntRes_Ohm, float shuntResTemp_ppmPerDegC);
 void AlxIna228Test_Delete(AlxIna228* me);
 float AlxIna228Test_CurrentLsb_A(AlxIna228* me);
 uint16_t AlxIna228Test_ShuntCal(AlxIna228* me);
+void AlxIna228Test_SetConfigAdcRange(AlxIna228* me, int32_t adcRange);
 int32_t AlxIna228Test_AdcRange_163_84_mV(void);
 int32_t AlxIna228Test_AdcRange_40_96_mV(void);
 int32_t AlxIna228Test_Status_Ok(void);
@@ -49,6 +51,15 @@ int32_t AlxIna228Test_Status_Err(void);
 //******************************************************************************
 AlxIna228* AlxIna228Test_New(int32_t adcRange, float shuntRes_Ohm, float shuntResTemp_ppmPerDegC)
 {
+	AlxIna228* me = AlxIna228Test_NewRaw(adcRange, shuntRes_Ohm, shuntResTemp_ppmPerDegC);
+	if (me == NULL) { return NULL; }
+	if (AlxIna228_InitPeriph(me) != Alx_Ok) { AlxIna228Test_Delete(me); return NULL; }
+	if (AlxIna228_Init(me) != Alx_Ok) { AlxIna228Test_Delete(me); return NULL; }
+	return me;
+}
+AlxIna228* AlxIna228Test_NewRaw(int32_t adcRange, float shuntRes_Ohm, float shuntResTemp_ppmPerDegC)
+{
+	// Constructed and not initialised: the test drives InitPeriph and Init itself (A97)
 	AlxIna228* me = (AlxIna228*)calloc(1, sizeof(AlxIna228));
 	AlxI2c* i2c = (AlxI2c*)calloc(1, sizeof(AlxI2c));
 	if ((me == NULL) || (i2c == NULL))
@@ -61,8 +72,6 @@ AlxIna228* AlxIna228Test_New(int32_t adcRange, float shuntRes_Ohm, float shuntRe
 	// a main power sensor, less the parts a fake bus does not care about
 	AlxIna228_Ctor(me, i2c, 0x80, true, 3, 1000,
 		(AlxIna228_RegEnum_0x00_ADCRANGE)adcRange, shuntRes_Ohm, shuntResTemp_ppmPerDegC);
-	if (AlxIna228_InitPeriph(me) != Alx_Ok) { free(i2c); free(me); return NULL; }
-	if (AlxIna228_Init(me) != Alx_Ok) { free(i2c); free(me); return NULL; }
 	return me;
 }
 void AlxIna228Test_Delete(AlxIna228* me)
@@ -80,6 +89,12 @@ float AlxIna228Test_CurrentLsb_A(AlxIna228* me)
 uint16_t AlxIna228Test_ShuntCal(AlxIna228* me)
 {
 	return me->conversionShuntFactor;
+}
+void AlxIna228Test_SetConfigAdcRange(AlxIna228* me, int32_t adcRange)
+{
+	// CONFIG's ADCRANGE, which the shunt conversion reads: the constructor keeps its adcRange for the
+	// calibration and leaves the register to the product's RegStruct_SetVal, which this helper is (A97)
+	me->reg._0x00_CONFIG.val.ADCRANGE = (AlxIna228_RegEnum_0x00_ADCRANGE)adcRange;
 }
 int32_t AlxIna228Test_AdcRange_163_84_mV(void)
 {

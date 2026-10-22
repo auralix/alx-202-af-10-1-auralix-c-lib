@@ -215,3 +215,51 @@ def test_ALX1564_P664_set_val_to_def_on_an_arr_item_asserts_and_leaves_the_value
 
     assert m.buff_get_arr(ctx, len(ARR_NEW)) == ARR_NEW, "SetValToDef changed an Arr value"
     assert m.buff_get_def_arr(ctx, len(ARR_DEF)) == ARR_DEF
+
+
+# =====================================================================
+# P741, P742, P745, P748 - a Str back to its default, a form too long, an Arr's string form, a Str bounded (A97)
+# =====================================================================
+
+
+def test_ALX1564_P741_a_str_goes_back_to_its_default(memsafe_lib, make_buff_item):
+    """SetValToDef takes the Str branch: the default pointer is the string itself, not its address."""
+    m = memsafe_lib
+    ctx = make_buff_item("str", STR_DEF, STR_BUFF)
+    assert m.buff_set_str(ctx, "other") == m.OK
+
+    m.buff_set_val_to_def(ctx)
+
+    assert m.buff_get_str(ctx) == (m.OK, STR_DEF)
+
+
+def test_ALX1564_P742_the_string_form_of_a_str_is_refused_when_the_caller_s_buffer_is_too_small(
+        memsafe_lib, make_buff_item):
+    """GetVal_StrFormat's Str path checks the value against the caller's length before it copies."""
+    m = memsafe_lib
+    ctx = make_buff_item("str", STR_DEF, STR_BUFF)
+
+    status, text = m.buff_get_str_format(ctx, size=3)
+
+    assert status != m.OK
+    assert text == ""
+
+
+@pytest.mark.expect_assert("P745: an Arr item has no string form - both conversions assert")
+def test_ALX1564_P745_an_arr_item_has_no_string_form(memsafe_lib, make_buff_item):
+    """CHARACTERIZATION: reading gives the empty string and Alx_Ok, setting gives Alx_Err and changes nothing."""
+    m = memsafe_lib
+    ctx = make_buff_item("arr", ARR_DEF)
+
+    assert m.buff_get_str_format(ctx) == (m.OK, "")
+    assert m.buff_set_str_format(ctx, "1") == m.ERR
+    assert m.buff_get_arr(ctx, len(ARR_DEF)) == ARR_DEF
+
+
+def test_ALX1564_P748_under_the_bound_handle_a_string_too_long_is_cut_to_the_buffer(memsafe_lib, make_buff_item):
+    """AlxBound_Str keeps what fits and says the length was wrong; the cut value counts as a change."""
+    m = memsafe_lib
+    ctx = make_buff_item("str_with", "abc", 8, m.BOUND)
+
+    assert m.buff_set_str(ctx, "0123456789") == m.BOUND_ERR_LEN
+    assert m.buff_get_str(ctx) == (m.OK, "0123456")

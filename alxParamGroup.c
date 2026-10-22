@@ -198,11 +198,11 @@ Alx_Status AlxParamGroup_Init(AlxParamGroup* me)
 				ALX_PARAM_GROUP_TRACE_WRN("%s_Err", me->name);
 				continue;
 			}
-			default:
+			default:	// LCOV_EXCL_START: AlxMemSafe_Read answers one of the six cases above
 			{
 				ALX_PARAM_GROUP_ASSERT(false);	// We should never get here
 				return Alx_Err;
-			}
+			}	// LCOV_EXCL_STOP: the default above
 		}
 
 		// Update valBuff from final valStoredBuff

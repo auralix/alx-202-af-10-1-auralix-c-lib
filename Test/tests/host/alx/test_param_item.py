@@ -207,3 +207,49 @@ def test_ALX1553_P74_the_integer_and_float_paths_read_different_notations(memsaf
         assert memsafe_lib.item_get_num(number) == pytest.approx(as_float, rel=1e-6), (
             f"float read {text!r} differently"
         )
+
+
+# =====================================================================
+# P742, P744 - a number too long for the caller, an int16 that does not fit, a float with no number, the four
+# other spellings of a bool (A97)
+# =====================================================================
+
+
+def test_ALX1564_P742_the_string_form_of_a_number_is_refused_when_the_caller_s_buffer_is_too_small(
+        memsafe_lib, make_item):
+    """The formatted text is checked against the caller's length before it is copied."""
+    m = memsafe_lib
+    item = make_item(m.UINT32, 4294967295, 0, 4294967295)
+
+    status, text = m.item_get_str(item, size=4)
+
+    assert status != m.OK
+    assert text == ""
+
+
+@pytest.mark.parametrize("text", ["40000", "-40000"])
+def test_ALX1564_P744_an_int16_that_does_not_fit_the_type_is_refused_either_side(memsafe_lib, make_item, text):
+    """Both halves of the int16 check, the one P72 left to the int8."""
+    m = memsafe_lib
+    item = make_item(m.INT16, 0, -32768, 32767)
+
+    assert m.item_set_str(item, text) == m.ERR_CONV
+    assert m.item_get_num(item) == 0
+
+
+def test_ALX1564_P744_a_float_with_no_number_in_it_is_refused(memsafe_lib, make_item):
+    m = memsafe_lib
+    item = make_item(m.FLOAT, 1.0, -10.0, 10.0)
+
+    assert m.item_set_str(item, "abc") == m.ERR_CONV
+    assert m.item_get_num(item) == 1.0
+
+
+@pytest.mark.parametrize(("text", "value"), [("True", 1.0), ("TRUE", 1.0), ("False", 0.0), ("FALSE", 0.0)])
+def test_ALX1564_P744_a_bool_reads_its_capitalised_spellings(memsafe_lib, make_item, text, value):
+    """Six spellings are accepted; P70 read the two lower-case ones."""
+    m = memsafe_lib
+    item = make_item(m.BOOL, 0.0 if value else 1.0)
+
+    assert m.item_set_str(item, text) == m.OK
+    assert m.item_get_num(item) == value

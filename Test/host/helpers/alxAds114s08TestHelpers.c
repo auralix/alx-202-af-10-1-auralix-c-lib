@@ -48,6 +48,8 @@ AlxIoPin* AlxAds114s08Test_StartPin(AlxAds114s08Test_Obj* me);
 AlxIoPin* AlxAds114s08Test_NRstPin(AlxAds114s08Test_Obj* me);
 Alx_Status AlxAds114s08Test_Perform(AlxAds114s08Test_Obj* me, int16_t* raw);
 void AlxAds114s08Test_MarkInit(AlxAds114s08Test_Obj* me);
+void AlxAds114s08Test_TimePasses(bool enable);
+void AlxDelayFake_SetOnDelay(void (*onDelay)(uint64_t delay_ms));	// alxDelayFake.c
 int32_t AlxAds114s08Test_Status_Ok(void);
 int32_t AlxAds114s08Test_Status_Err(void);
 
@@ -86,4 +88,21 @@ Alx_Status AlxAds114s08Test_Perform(AlxAds114s08Test_Obj* me, int16_t* raw)
 void AlxAds114s08Test_MarkInit(AlxAds114s08Test_Obj* me)
 {
 	me->ads.isInit = true;
+}
+static void AlxAds114s08Test_Advance(uint64_t delay_ms)
+{
+	AlxTick_IncRange_ns(&alxTick, delay_ms * 1000000ull);
+}
+void AlxAds114s08Test_TimePasses(bool enable)
+{
+	// With it on, every millisecond the driver waits moves the clock: a conversion that never becomes
+	// ready reaches its timeout instead of waiting forever (A97)
+	if (enable)
+	{
+		AlxDelayFake_SetOnDelay(AlxAds114s08Test_Advance);
+	}
+	else
+	{
+		AlxDelayFake_SetOnDelay(NULL);
+	}
 }

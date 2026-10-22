@@ -32,6 +32,7 @@ static uint32_t alxPwmFake_ch[ALX_PWM_FAKE_NUM_OF_CH];
 static float alxPwmFake_duty_pct[ALX_PWM_FAKE_NUM_OF_CH];
 static uint32_t alxPwmFake_writeCount[ALX_PWM_FAKE_NUM_OF_CH];
 static uint32_t alxPwmFake_used;
+static int32_t alxPwmFake_forcedStatus = Alx_Ok;	// what Init and DeInit answer (A97)
 
 
 //******************************************************************************
@@ -40,6 +41,7 @@ static uint32_t alxPwmFake_used;
 void AlxPwmFake_Reset(void);
 float AlxPwmFake_Duty_pct(const AlxPwm* me, uint32_t ch);
 uint32_t AlxPwmFake_WriteCount(const AlxPwm* me, uint32_t ch);
+void AlxPwmFake_SetForcedStatus(int32_t status);
 
 
 //******************************************************************************
@@ -71,6 +73,7 @@ void AlxPwmFake_Reset(void)
 	memset(alxPwmFake_duty_pct, 0, sizeof(alxPwmFake_duty_pct));
 	memset(alxPwmFake_writeCount, 0, sizeof(alxPwmFake_writeCount));
 	alxPwmFake_used = 0;
+	alxPwmFake_forcedStatus = Alx_Ok;
 }
 
 float AlxPwmFake_Duty_pct(const AlxPwm* me, uint32_t ch)
@@ -81,6 +84,10 @@ float AlxPwmFake_Duty_pct(const AlxPwm* me, uint32_t ch)
 uint32_t AlxPwmFake_WriteCount(const AlxPwm* me, uint32_t ch)
 {
 	return alxPwmFake_writeCount[AlxPwmFake_Slot(me, ch)];
+}
+void AlxPwmFake_SetForcedStatus(int32_t status)
+{
+	alxPwmFake_forcedStatus = status;
 }
 
 
@@ -118,13 +125,13 @@ void AlxPwm_Ctor
 Alx_Status AlxPwm_Init(AlxPwm* me)
 {
 	(void)me;
-	return Alx_Ok;
+	return (Alx_Status)alxPwmFake_forcedStatus;
 }
 
 Alx_Status AlxPwm_DeInit(AlxPwm* me)
 {
 	(void)me;
-	return Alx_Ok;
+	return (Alx_Status)alxPwmFake_forcedStatus;
 }
 
 Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)

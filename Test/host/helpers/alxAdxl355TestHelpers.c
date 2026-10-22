@@ -38,6 +38,9 @@ AlxAdxl355Test_Obj* AlxAdxl355Test_New(void);
 void AlxAdxl355Test_Delete(AlxAdxl355Test_Obj* me);
 AlxAdxl355* AlxAdxl355Test_Adxl(AlxAdxl355Test_Obj* me);
 Alx_Status AlxAdxl355Test_GetXyz_g(AlxAdxl355Test_Obj* me, float* x_g, float* y_g, float* z_g);
+Alx_Status AlxAdxl355Test_GetFifoXyz_g(AlxAdxl355Test_Obj* me, uint8_t len, float* xyz_g);
+Alx_Status AlxAdxl355Test_GetStatusRaw(AlxAdxl355Test_Obj* me, uint8_t* raw);
+void AlxAdxl355Test_SetRange(AlxAdxl355Test_Obj* me, uint8_t range);
 int32_t AlxAdxl355Test_Status_Ok(void);
 int32_t AlxAdxl355Test_Status_Err(void);
 
@@ -73,6 +76,31 @@ Alx_Status AlxAdxl355Test_GetXyz_g(AlxAdxl355Test_Obj* me, float* x_g, float* y_
 	*y_g = xyz.y_g;
 	*z_g = xyz.z_g;
 	return status;
+}
+Alx_Status AlxAdxl355Test_GetFifoXyz_g(AlxAdxl355Test_Obj* me, uint8_t len, float* xyz_g)
+{
+	// len samples out of the FIFO, as x, y, z triples (A97)
+	AlxAdxl355_Xyz_g xyz[32] = {};
+	Alx_Status status = AlxAdxl355_GetFifoXyz_g(&me->adxl, xyz, len);
+	for (uint32_t i = 0; i < len; i++)
+	{
+		xyz_g[3 * i + 0] = xyz[i].x_g;
+		xyz_g[3 * i + 1] = xyz[i].y_g;
+		xyz_g[3 * i + 2] = xyz[i].z_g;
+	}
+	return status;
+}
+Alx_Status AlxAdxl355Test_GetStatusRaw(AlxAdxl355Test_Obj* me, uint8_t* raw)
+{
+	AlxAdxl355_RegVal_0x04_Status statusReg = {};
+	Alx_Status status = AlxAdxl355_GetStatusReg(&me->adxl, &statusReg);
+	*raw = statusReg.raw;
+	return status;
+}
+void AlxAdxl355Test_SetRange(AlxAdxl355Test_Obj* me, uint8_t range)
+{
+	// The full-scale range the conversion reads - what a product's register hook decides (A97)
+	me->adxl.reg._0x2C_Range.val.Range = (AlxAdxl355_RegEnum_0x2C_Range)range;
 }
 
 

@@ -135,3 +135,24 @@ def test_ALX1553_P250_only_one_of_the_three_code_types_is_implemented(rot_sw_lib
     # and the code is NOT read here: GetCode would abort. The construction and the pins are what
     # this test can reach; the assert inside GetCode is the boundary.
     assert rot_sw_lib.code is not None
+
+
+def test_ALX1564_P715_deinit_releases_every_pin(switch):
+    """DeInit calls each pin's DeInit once, in the order of the array."""
+    lib, obj = switch
+    lib.deinit(obj)
+    assert [lib.deinit_count(obj, i) for i in range(PINS)] == [1] * PINS
+
+
+@pytest.mark.parametrize("code_type", ["COMPLEMENT", "GRAY", "INVALID"])
+@pytest.mark.expect_assert(
+    "P716: the two unimplemented code types and a type outside the enumeration assert in GetCode"
+)
+def test_ALX1564_P716_an_unimplemented_code_type_reads_zero(rot_sw_lib, code_type):
+    """CHARACTERIZATION: Complement and Gray are TV's TODO, and GetCode leaves the code at 0 for them."""
+    kind = 7 if code_type == "INVALID" else getattr(rot_sw_lib, code_type)
+    obj = rot_sw_lib.new(PINS, kind)
+    rot_sw_lib.init(obj)
+    rot_sw_lib.set_pins(obj, 0b0011, PINS)
+
+    assert rot_sw_lib.code(obj) == 0

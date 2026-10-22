@@ -227,7 +227,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					break;
 				}
 				// #3.2.5.3 Both CRC OK & Different -> Use CopyA (CopyA is used because we always write CopyA first)
-				else if ((me->isCopyAValid == true) && (me->isCopyBValid == true) && (me->crcCopyA != me->crcCopyB))
+				else if ((me->isCopyAValid == true) && (me->isCopyBValid == true) && (me->crcCopyA != me->crcCopyB))	// LCOV_EXCL_BR_LINE: with both copies valid the branch before took the equal CRCs
 				{
 					// Update CopyB with CopyA
 
@@ -263,7 +263,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					break;
 				}
 				// #3.2.5.4 CopyA OK, CopyB NOK
-				else if ((me->isCopyAValid == true) && (me->isCopyBValid == false))
+				else if ((me->isCopyAValid == true) && (me->isCopyBValid == false))	// LCOV_EXCL_BR_LINE: with copy A valid the two branches before took copy B valid
 				{
 					// Update CopyB with CopyA
 
@@ -299,7 +299,7 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					break;
 				}
 				// #3.2.5.5 CopyA NOK & CopyB OK
-				else if ((me->isCopyAValid == false) && (me->isCopyBValid == true))
+				else if ((me->isCopyAValid == false) && (me->isCopyBValid == true))	// LCOV_EXCL_BR_LINE: the branches before leave only copy A invalid and copy B valid
 				{
 					// Update CopyA with CopyB
 
@@ -335,11 +335,11 @@ Alx_Status AlxMemSafe_Read(AlxMemSafe* me, uint8_t* data, uint32_t len)
 					break;
 				}
 				// #3.2.5.6 Assert
-				else
+				else	// LCOV_EXCL_START: the five branches before cover every validity of the two copies
 				{
 					ALX_MEM_SAFE_ASSERT(false);	// We should never get here
 					return Alx_Err;
-				}
+				}	// LCOV_EXCL_STOP: the else above
 			}
 		}
 

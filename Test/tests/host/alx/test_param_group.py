@@ -151,3 +151,11 @@ def test_ALX1513_P10_init_retry_budget_is_exactly_initNumOfTries_times_the_memsa
     assert flash.count(flash.INIT) == 9
     assert flash.count(flash.READ) == 0
     assert flash.count(flash.WRITE) == 0
+
+
+def test_ALX1564_P714_init_that_cannot_write_its_defaults_to_a_blank_flash_returns_error(flash, make_store):
+    """Both copies invalid, the reset to defaults is written, and every write fails: Init gives up."""
+    flash.fail_at(flash.WRITE, flash.ALWAYS)
+    ctx = make_store()
+    assert flash.group_init(ctx) == flash.ERR
+    assert flash.items(ctx) == DEFAULTS, "the items keep their defaults"

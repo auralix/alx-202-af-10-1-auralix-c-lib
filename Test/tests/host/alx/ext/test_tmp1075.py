@@ -106,3 +106,52 @@ def test_ALX1564_P602_deinit_returns_the_sensor_to_uninitialised(sensor):
 
     assert lib.init(obj) == lib.OK
     assert lib.is_init(obj) is True
+
+
+# =====================================================================
+# P751-P753 - the bus fails at one chosen step (A97)
+# =====================================================================
+
+INIT_STEPS = {
+    # the nth bus call of Init fails -> (ID reads, config writes, limit-low writes, limit-high writes) made;
+    # the first call is the bus's own Init (P601), the second the part's acknowledge (P600 by another route)
+    2: (0, 0, 0, 0),
+    3: (1, 0, 0, 0),
+    4: (1, 1, 0, 0),
+    5: (1, 1, 1, 0),
+    6: (1, 1, 1, 1),
+}
+
+
+@pytest.mark.parametrize(("nth", "made"), sorted(INIT_STEPS.items()))
+def test_ALX1564_P751_init_stops_at_the_bus_step_that_fails(tmp1075_lib, nth, made):
+    """The acknowledge, the ID read, then the three writes: whichever fails ends Init with the error, the
+    steps before it made."""
+    obj = tmp1075_lib.new()
+    tmp1075_lib.fail_at(nth)
+
+    assert tmp1075_lib.init(obj) == tmp1075_lib.ERR
+
+    assert tmp1075_lib.is_init(obj) is False
+    regs = (REG_DEVICE_ID, REG_CONFIG, REG_LIMIT_LOW, REG_LIMIT_HIGH)
+    counts = (tmp1075_lib.read_count(REG_DEVICE_ID), *(tmp1075_lib.write_count(r) for r in regs[1:]))
+    assert counts == made
+
+
+def test_ALX1564_P752_deinit_reports_a_bus_that_will_not_release(sensor):
+    """The bus's DeInit fails: the error comes back and the sensor stays initialised."""
+    lib, obj = sensor
+    lib.fail_at(1)
+
+    assert lib.deinit(obj) == lib.ERR
+    assert lib.is_init(obj) is True
+
+
+def test_ALX1564_P753_a_failed_temperature_read_keeps_the_last_reading(sensor):
+    """CHARACTERIZATION: GetTemp_degC traces the error and converts the register as it was."""
+    lib, obj = sensor
+    lib.set_register(REG_TEMP, bytes([0x19, 0x00]))
+    assert lib.temp_degc(obj) == 25.0
+    lib.fail_at(1)
+
+    assert lib.temp_degc(obj) == 25.0

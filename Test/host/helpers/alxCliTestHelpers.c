@@ -41,6 +41,10 @@ typedef struct
 
 // Exported test API
 AlxCliTest_Ctx* AlxCliTest_New(void);
+AlxCliTest_Ctx* AlxCliTest_NewWithId(void);
+void AlxCliTest_PrepareEvent(AlxCliTest_Ctx* ctx, const uint8_t* data, uint32_t len);
+void AlxCliTest_PrepareResponse(AlxCliTest_Ctx* ctx, int32_t responseType);
+const char* AlxCliTest_Buff(AlxCliTest_Ctx* ctx);
 void AlxCliTest_Delete(AlxCliTest_Ctx* ctx);
 int32_t AlxCliTest_Status_Ok(void);
 void AlxCliTest_Handle(AlxCliTest_Ctx* ctx);
@@ -82,7 +86,10 @@ int32_t AlxCliTest_Status_Ok(void)
 	return (int32_t)Alx_Ok;
 }
 
-AlxCliTest_Ctx* AlxCliTest_New(void)
+// The identity the id command reads: the link-time ID fake answers every getter, so the pointer
+// only has to be one (A97).
+static AlxId alxCliTest_idStandIn;
+static AlxCliTest_Ctx* AlxCliTest_NewWith(AlxId* alxId)
 {
 	AlxCliTest_Ctx* ctx = (AlxCliTest_Ctx*)calloc(1, sizeof(AlxCliTest_Ctx));
 	if (ctx == NULL)
@@ -217,7 +224,7 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 	(
 		&ctx->cli,
 		&ctx->port,
-		NULL,				// alxId - the guarded optional, same as the product
+		alxId,				// NULL as the product, the guarded optional; the stand-in for the id command
 		&ctx->paramMgmt,
 		&ctx->paramItems[0],
 		ctx->buff,
@@ -227,6 +234,26 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 	return ctx;
 }
 
+AlxCliTest_Ctx* AlxCliTest_New(void)
+{
+	return AlxCliTest_NewWith(NULL);
+}
+AlxCliTest_Ctx* AlxCliTest_NewWithId(void)
+{
+	return AlxCliTest_NewWith(&alxCliTest_idStandIn);
+}
+void AlxCliTest_PrepareEvent(AlxCliTest_Ctx* ctx, const uint8_t* data, uint32_t len)
+{
+	AlxCli_PrepareEvent(&ctx->cli, data, len);
+}
+void AlxCliTest_PrepareResponse(AlxCliTest_Ctx* ctx, int32_t responseType)
+{
+	AlxCli_PrepareResponse(&ctx->cli, (AlxCli_ResponseType)responseType);
+}
+const char* AlxCliTest_Buff(AlxCliTest_Ctx* ctx)
+{
+	return ctx->buff;
+}
 void AlxCliTest_Delete(AlxCliTest_Ctx* ctx)
 {
 	AlxSerialPortFake_Unregister(&ctx->port);

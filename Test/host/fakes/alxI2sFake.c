@@ -26,6 +26,9 @@ static uint32_t alxI2sFake_deInitCount;
 static uint32_t alxI2sFake_handleCount;
 
 
+static int32_t alxI2sFake_forcedStatus = Alx_Ok;	// what Init answers (A97)
+
+
 //******************************************************************************
 // Prototypes - the DLL export surface (no separate header for test fakes)
 //******************************************************************************
@@ -33,6 +36,7 @@ void AlxI2sFake_Reset(void);
 uint32_t AlxI2sFake_InitCount(void);
 uint32_t AlxI2sFake_DeInitCount(void);
 uint32_t AlxI2sFake_HandleCount(void);
+void AlxI2sFake_SetForcedStatus(int32_t status);
 
 
 //******************************************************************************
@@ -43,6 +47,7 @@ void AlxI2sFake_Reset(void)
 	alxI2sFake_initCount = 0;
 	alxI2sFake_deInitCount = 0;
 	alxI2sFake_handleCount = 0;
+	alxI2sFake_forcedStatus = Alx_Ok;
 }
 uint32_t AlxI2sFake_InitCount(void)
 {
@@ -51,6 +56,10 @@ uint32_t AlxI2sFake_InitCount(void)
 uint32_t AlxI2sFake_DeInitCount(void)
 {
 	return alxI2sFake_deInitCount;
+}
+void AlxI2sFake_SetForcedStatus(int32_t status)
+{
+	alxI2sFake_forcedStatus = status;
 }
 uint32_t AlxI2sFake_HandleCount(void)
 {
@@ -65,7 +74,7 @@ Alx_Status AlxI2s_Init(AlxI2s* me)
 {
 	(void)me;
 	alxI2sFake_initCount++;
-	return Alx_Ok;
+	return (Alx_Status)alxI2sFake_forcedStatus;
 }
 Alx_Status AlxI2s_DeInit(AlxI2s* me)
 {

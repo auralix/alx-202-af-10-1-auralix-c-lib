@@ -191,3 +191,50 @@ def test_ALX1553_P218_resetting_everything_includes_the_variable_and_an_unknown_
 
     param_mgmt_lib.defaults_all(mgmt)
     assert param_mgmt_lib.values(mgmt) == DEFAULTS, "the Var was not restored with the rest"
+
+
+def test_ALX1564_P723_the_value_pointer_is_one_per_item_and_an_unknown_id_is_refused_both_ways(param_mgmt_lib):
+    """ByIndex_GetValPtr answers each item's own storage; ById_Get and _Set loop to the end and refuse."""
+    mgmt = param_mgmt_lib.table()
+    pointers = [param_mgmt_lib.val_ptr(mgmt, i) for i in range(param_mgmt_lib.count(mgmt))]
+    assert all(pointers)
+    assert len(set(pointers)) == len(pointers)
+
+    assert param_mgmt_lib.get_by_id(mgmt, 9999, 4)[0] == param_mgmt_lib.ERR
+    assert param_mgmt_lib.set_by_id(mgmt, 9999, b"\x01\x02\x03\x04") == param_mgmt_lib.ERR
+
+
+def test_ALX1564_P724_load_and_store_walk_the_items_of_a_group_or_of_all_and_stop_at_the_first_failure(param_mgmt_lib):
+    """Over the KV store fake: a changed item is stored, every item is loaded, once each; a failing store ends the walk.
+
+    An item stores itself only while a change is pending, which the item's own setter marks and the
+    raw ById_Set does not (AlxParamItem_StoreVal), so each store is preceded by a set by key.
+    """
+    mgmt = param_mgmt_lib.table_with_store()
+    changes = {"U8_A": "7", "U16_B": "10000", "I32_C": "-10", "F_D": "4.0", "BOOL_E": "false", "VAR_F": "43"}
+
+    for key, value in changes.items():
+        assert param_mgmt_lib.set_by_key(mgmt, key, value) == param_mgmt_lib.OK
+    assert param_mgmt_lib.store(mgmt) == param_mgmt_lib.OK
+    assert param_mgmt_lib.kv_counts()[1] == len(changes), "every changed item stored once"
+    for key, value in (("U8_A", "8"), ("U16_B", "10001"), ("BOOL_E", "true")):
+        assert param_mgmt_lib.set_by_key(mgmt, key, value) == param_mgmt_lib.OK
+    assert param_mgmt_lib.store(mgmt, 100) == param_mgmt_lib.OK
+    assert param_mgmt_lib.kv_counts()[1] == len(changes) + 3, "the three items of group 100"
+
+    assert param_mgmt_lib.load(mgmt) == param_mgmt_lib.OK
+    assert param_mgmt_lib.kv_counts()[0] == len(changes), "every item loaded once"
+    assert param_mgmt_lib.load(mgmt, 200) == param_mgmt_lib.OK
+    assert param_mgmt_lib.kv_counts()[0] == len(changes) + 3, "the three items of group 200"
+    assert param_mgmt_lib.load(mgmt, 7) == param_mgmt_lib.OK, "a group nobody belongs to: nothing to do"
+
+    param_mgmt_lib.kv_fail(set_=True)
+    for key, value in (("I32_C", "-11"), ("F_D", "5.0"), ("VAR_F", "44")):
+        assert param_mgmt_lib.set_by_key(mgmt, key, value) == param_mgmt_lib.OK
+    assert param_mgmt_lib.store(mgmt, 200) == param_mgmt_lib.ERR, "the first pending item of the group fails"
+    assert param_mgmt_lib.store(mgmt) == param_mgmt_lib.ERR, "and of all"
+    param_mgmt_lib.kv_fail(get=True, set_=True)
+    assert param_mgmt_lib.load(mgmt) == param_mgmt_lib.ERR, (
+        "a key the store cannot give is written back as its default; that failed too"
+    )
+    assert param_mgmt_lib.load(mgmt, 100) == param_mgmt_lib.ERR

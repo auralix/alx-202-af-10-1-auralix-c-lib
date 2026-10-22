@@ -402,7 +402,7 @@ static void AlxAds8678_RegStruct_SetToDefault(AlxAds8678* me)
 	me->reg._0x0B_Channel6InputRange		.val.raw =	0x00;
 	me->reg._0x0C_Channel7InputRange		.val.raw =	0x00;
 }
-static ALX_UNUSED Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)
+static ALX_UNUSED Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)	// LCOV_EXCL_START: no caller in the module, kept under ALX_UNUSED
 {
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -436,7 +436,7 @@ static ALX_UNUSED Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)
 
 	// Return
 	return Alx_Ok;
-}
+}	// LCOV_EXCL_STOP: the function above
 static Alx_Status AlxAds8678_Reg_Write(AlxAds8678* me, void* reg)
 {
 	// Local variables
@@ -655,11 +655,11 @@ static AlxAds8678_RegEnum_0x05_0x0C_Range_CHn AlxAds8678_GetChRegEnumChVoltageRa
 	else if	(chNum == 4)	return me->reg._0x09_Channel4InputRange.val.Range_CHn;
 	else if	(chNum == 5)	return me->reg._0x0A_Channel5InputRange.val.Range_CHn;
 	else if	(chNum == 6)	return me->reg._0x0B_Channel6InputRange.val.Range_CHn;
-	else if	(chNum == 7)	return me->reg._0x0C_Channel7InputRange.val.Range_CHn;
+	else if	(chNum == 7)	return me->reg._0x0C_Channel7InputRange.val.Range_CHn;	// LCOV_EXCL_BR_LINE: the callers loop over the eight channels
 
-	ALX_ADS8678_ASSERT(false);	// We shouldn't get here
+	ALX_ADS8678_ASSERT(false);	// We shouldn't get here	// LCOV_EXCL_START: the callers loop over the eight channels
 	return ALX_NULL;
-}
+}	// LCOV_EXCL_STOP: the lines above
 static void AlxAds8678_RegEnumChVoltageRangeToChVoltageRangeParam(AlxAds8678_RegEnum_0x05_0x0C_Range_CHn regEnumChVoltageRange, float* chVoltagePerBit_V, float* chVoltageOffset_V)
 {
 	if (regEnumChVoltageRange == Range_CHn_PM_2V5xVref)
@@ -682,11 +682,11 @@ static void AlxAds8678_RegEnumChVoltageRangeToChVoltageRangeParam(AlxAds8678_Reg
 		*chVoltagePerBit_V = 156.25 * 0.000001;
 		*chVoltageOffset_V = -1.28;
 	}
-	else if (regEnumChVoltageRange == Range_CHn_PM_0V15625xVref)
-	{
+	else if (regEnumChVoltageRange == Range_CHn_PM_0V15625xVref)	// LCOV_EXCL_BR_LINE: A93: on this host the 4-bit enumeration field reads this code, its top bit set, as negative, so it never matches (P792)
+	{	// LCOV_EXCL_START: A93: on this host the 4-bit enumeration field reads this code, its top bit set, as negative, so it never matches (P792)
 		*chVoltagePerBit_V = 78.125 * 0.000001;
 		*chVoltageOffset_V = -0.64;
-	}
+	}	// LCOV_EXCL_STOP: the branch above
 	else if (regEnumChVoltageRange == Range_CHn_0V_2V5xVref)
 	{
 		*chVoltagePerBit_V = 625 * 0.000001;
@@ -702,11 +702,11 @@ static void AlxAds8678_RegEnumChVoltageRangeToChVoltageRangeParam(AlxAds8678_Reg
 		*chVoltagePerBit_V = 156.25 * 0.000001;
 		*chVoltageOffset_V = 0;
 	}
-	else if (regEnumChVoltageRange == Range_CHn_0V_0V3125xVref)
-	{
+	else if (regEnumChVoltageRange == Range_CHn_0V_0V3125xVref)	// LCOV_EXCL_BR_LINE: A93: on this host the 4-bit enumeration field reads this code, its top bit set, as negative, so it never matches (P792)
+	{	// LCOV_EXCL_START: A93: on this host the 4-bit enumeration field reads this code, its top bit set, as negative, so it never matches (P792)
 		*chVoltagePerBit_V = 78.125 * 0.000001;
 		*chVoltageOffset_V = 0;
-	}
+	}	// LCOV_EXCL_STOP: the branch above
 	else
 	{
 		ALX_ADS8678_ASSERT(false);	// We shouldn't get here

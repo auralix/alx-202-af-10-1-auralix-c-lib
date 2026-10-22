@@ -26,6 +26,7 @@
 #include "alxFifo.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 
 //******************************************************************************
@@ -34,6 +35,7 @@
 #define ALX_SERIAL_PORT_FAKE_NUM_OF_PORTS 8
 #define ALX_SERIAL_PORT_FAKE_RX_LEN 16384
 #define ALX_SERIAL_PORT_FAKE_TX_LEN 16384
+#define ALX_SERIAL_PORT_FAKE_AFTER_FLUSH_LEN 64
 
 typedef struct
 {
@@ -42,10 +44,21 @@ typedef struct
 	AlxFifo txFifo;
 	uint8_t rxBuff[ALX_SERIAL_PORT_FAKE_RX_LEN];
 	uint8_t txBuff[ALX_SERIAL_PORT_FAKE_TX_LEN];
+	uint8_t afterFlush[ALX_SERIAL_PORT_FAKE_AFTER_FLUSH_LEN];	// what the bus carries once the code listens
+	uint32_t afterFlushLen;
+	uint32_t afterPolls;		// how many RX FIFO counts the code reads before the bytes land, 0 = at the flush
 	bool used;
 } AlxSerialPortFake_Slot;
 
 static AlxSerialPortFake_Slot alxSerialPortFake_slot[ALX_SERIAL_PORT_FAKE_NUM_OF_PORTS];
+// What the port answers when a test makes it fail - Alx_Ok is the port working - and which of its
+// operations fail: a mask of ALX_SERIAL_PORT_FAKE_INIT, _DEINIT, _READ and _WRITE.
+#define ALX_SERIAL_PORT_FAKE_INIT 1
+#define ALX_SERIAL_PORT_FAKE_DEINIT 2
+#define ALX_SERIAL_PORT_FAKE_READ 4
+#define ALX_SERIAL_PORT_FAKE_WRITE 8
+static int32_t alxSerialPortFake_forcedStatus = Alx_Ok;
+static uint32_t alxSerialPortFake_forcedOps = 0;
 
 
 //******************************************************************************
@@ -57,6 +70,9 @@ void AlxSerialPortFake_Unregister(const AlxSerialPort* me);
 Alx_Status AlxSerialPortFake_InjectRx(const AlxSerialPort* me, const uint8_t* data, uint32_t len);
 uint32_t AlxSerialPortFake_TxRead(const AlxSerialPort* me, uint8_t* buff, uint32_t len);
 uint32_t AlxSerialPortFake_TxNumOfEntries(const AlxSerialPort* me);
+void AlxSerialPortFake_SetForcedStatus(int32_t status, uint32_t ops);
+void AlxSerialPortFake_SetRxAfterFlush(const AlxSerialPort* me, const uint8_t* data, uint32_t len);
+void AlxSerialPortFake_SetRxAfterPolls(const AlxSerialPort* me, const uint8_t* data, uint32_t len, uint32_t polls);
 
 
 //******************************************************************************
@@ -73,6 +89,14 @@ static AlxSerialPortFake_Slot* AlxSerialPortFake_Find(const AlxSerialPort* me)
 	}
 	exit(1);	// test infrastructure - unregistered port is a harness bug, fail fast
 }
+static Alx_Status AlxSerialPortFake_Forced(uint32_t op)
+{
+	if (alxSerialPortFake_forcedOps & op)
+	{
+		return (Alx_Status)alxSerialPortFake_forcedStatus;
+	}
+	return Alx_Ok;
+}
 
 
 //******************************************************************************
@@ -84,6 +108,33 @@ void AlxSerialPortFake_Reset(void)
 	{
 		alxSerialPortFake_slot[i].used = false;
 	}
+	alxSerialPortFake_forcedStatus = Alx_Ok;
+	alxSerialPortFake_forcedOps = 0;
+}
+// A response the other side of the bus sends as soon as the code under test starts to listen: the
+// bytes land in the RX FIFO at its next flush, which is where both LIN subscribes begin. One shot.
+void AlxSerialPortFake_SetRxAfterFlush(const AlxSerialPort* me, const uint8_t* data, uint32_t len)
+{
+	AlxSerialPortFake_Slot* s = AlxSerialPortFake_Find(me);
+	if (len > ALX_SERIAL_PORT_FAKE_AFTER_FLUSH_LEN)
+	{
+		exit(1);	// test infrastructure - a response longer than the buffer is a harness bug
+	}
+	memcpy(s->afterFlush, data, len);
+	s->afterFlushLen = len;
+	s->afterPolls = 0;
+}
+// The same response, late: it lands once the code has counted the RX FIFO `polls` times after its flush,
+// which is how a wait that checks, waits and checks again is made to go round.
+void AlxSerialPortFake_SetRxAfterPolls(const AlxSerialPort* me, const uint8_t* data, uint32_t len, uint32_t polls)
+{
+	AlxSerialPortFake_SetRxAfterFlush(me, data, len);
+	AlxSerialPortFake_Find(me)->afterPolls = polls;
+}
+void AlxSerialPortFake_SetForcedStatus(int32_t status, uint32_t ops)
+{
+	alxSerialPortFake_forcedStatus = status;
+	alxSerialPortFake_forcedOps = ops;
 }
 
 void AlxSerialPortFake_Register(const AlxSerialPort* me)
@@ -94,6 +145,8 @@ void AlxSerialPortFake_Register(const AlxSerialPort* me)
 		{
 			alxSerialPortFake_slot[i].me = me;
 			alxSerialPortFake_slot[i].used = true;
+			alxSerialPortFake_slot[i].afterFlushLen = 0;
+			alxSerialPortFake_slot[i].afterPolls = 0;
 			AlxFifo_Ctor(&alxSerialPortFake_slot[i].rxFifo, alxSerialPortFake_slot[i].rxBuff, sizeof(alxSerialPortFake_slot[i].rxBuff));
 			AlxFifo_Ctor(&alxSerialPortFake_slot[i].txFifo, alxSerialPortFake_slot[i].txBuff, sizeof(alxSerialPortFake_slot[i].txBuff));
 			return;
@@ -168,17 +221,21 @@ void AlxSerialPort_Ctor
 Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 {
 	(void)me;
-	return Alx_Ok;
+	return AlxSerialPortFake_Forced(ALX_SERIAL_PORT_FAKE_INIT);
 }
 
 Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 {
 	(void)me;
-	return Alx_Ok;
+	return AlxSerialPortFake_Forced(ALX_SERIAL_PORT_FAKE_DEINIT);
 }
 
 Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
 {
+	if (AlxSerialPortFake_Forced(ALX_SERIAL_PORT_FAKE_READ) != Alx_Ok)
+	{
+		return (Alx_Status)alxSerialPortFake_forcedStatus;
+	}
 	return AlxFifo_Read(&AlxSerialPortFake_Find(me)->rxFifo, data, len);
 }
 
@@ -194,6 +251,10 @@ Alx_Status AlxSerialPort_ReadStrUntilAny(AlxSerialPort* me, char* str, const cha
 
 Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t len)
 {
+	if (AlxSerialPortFake_Forced(ALX_SERIAL_PORT_FAKE_WRITE) != Alx_Ok)
+	{
+		return (Alx_Status)alxSerialPortFake_forcedStatus;
+	}
 	return AlxFifo_Write(&AlxSerialPortFake_Find(me)->txFifo, data, len);
 }
 
@@ -214,12 +275,28 @@ uint32_t AlxSerialPort_GetTxFifoNumOfEntries(AlxSerialPort* me)
 
 void AlxSerialPort_FlushRxFifo(AlxSerialPort* me)
 {
-	AlxFifo_Flush(&AlxSerialPortFake_Find(me)->rxFifo);
+	AlxSerialPortFake_Slot* s = AlxSerialPortFake_Find(me);
+	AlxFifo_Flush(&s->rxFifo);
+	if (s->afterFlushLen > 0 && s->afterPolls == 0)
+	{
+		AlxFifo_Write(&s->rxFifo, s->afterFlush, s->afterFlushLen);
+		s->afterFlushLen = 0;
+	}
 }
 
 uint32_t AlxSerialPort_GetRxFifoNumOfEntries(AlxSerialPort* me)
 {
-	return AlxFifo_GetNumOfEntries(&AlxSerialPortFake_Find(me)->rxFifo);
+	AlxSerialPortFake_Slot* s = AlxSerialPortFake_Find(me);
+	if (s->afterFlushLen > 0 && s->afterPolls > 0)
+	{
+		s->afterPolls--;
+		if (s->afterPolls == 0)
+		{
+			AlxFifo_Write(&s->rxFifo, s->afterFlush, s->afterFlushLen);
+			s->afterFlushLen = 0;
+		}
+	}
+	return AlxFifo_GetNumOfEntries(&s->rxFifo);
 }
 
 void AlxSerialPort_IrqHandler(AlxSerialPort* me)

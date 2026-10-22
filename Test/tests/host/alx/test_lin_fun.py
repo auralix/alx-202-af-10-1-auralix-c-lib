@@ -118,3 +118,33 @@ def test_ALX1553_P182_the_integer_line_passes_through_its_own_two_points(lin_fun
     """
     line = lin_fun_lib.line_int(0, 0, 100, 1000, -1_000_000, 1_000_000)
     assert lin_fun_lib.y_int(line, x) == y
+
+
+def test_ALX1564_P721_getx_with_status_clips_in_both_limit_modes(lin_fun_lib):
+    """The inverse of P181: limits on X clip the computed X, limits on Y clip the input Y."""
+    on_x = lin_fun_lib.line(X1, Y1, X2, Y2, 10.0, 90.0, limit_on_x=True)
+    assert lin_fun_lib.x_status(on_x, 0.0) == (lin_fun_lib.ERR_MIN, pytest.approx(10.0))
+    assert lin_fun_lib.x_status(on_x, 500.0) == (lin_fun_lib.OK, pytest.approx(50.0))
+    assert lin_fun_lib.x_status(on_x, 1000.0) == (lin_fun_lib.ERR_MAX, pytest.approx(90.0))
+
+    on_y = lin_fun_lib.line(X1, Y1, X2, Y2, 100.0, 800.0, limit_on_x=False)
+    assert lin_fun_lib.x_status(on_y, 0.0) == (lin_fun_lib.ERR_MIN, pytest.approx(10.0))
+    assert lin_fun_lib.x_status(on_y, 500.0) == (lin_fun_lib.OK, pytest.approx(50.0))
+    assert lin_fun_lib.x_status(on_y, 1000.0) == (lin_fun_lib.ERR_MAX, pytest.approx(80.0))
+
+
+def test_ALX1564_P722_the_integer_line_clips_with_status_in_both_limit_modes(lin_fun_lib):
+    """The same two modes on the integer line, measured against its own unlimited evaluation (P182)."""
+    wide = lin_fun_lib.line_int(0, 0, 100, 1000, -1_000_000, 1_000_000, limit_on_x=True)
+    on_x = lin_fun_lib.line_int(0, 0, 100, 1000, 10, 90, limit_on_x=True)
+    assert lin_fun_lib.y_int_status(on_x, 0) == (lin_fun_lib.ERR_MIN, lin_fun_lib.y_int(wide, 10))
+    assert lin_fun_lib.y_int_status(on_x, 50) == (lin_fun_lib.OK, lin_fun_lib.y_int(wide, 50))
+    assert lin_fun_lib.y_int_status(on_x, 100) == (lin_fun_lib.ERR_MAX, lin_fun_lib.y_int(wide, 90))
+
+    mid = lin_fun_lib.y_int(wide, 50)
+    below = lin_fun_lib.line_int(0, 0, 100, 1000, mid + 1, 1_000_000, limit_on_x=False)
+    assert lin_fun_lib.y_int_status(below, 50) == (lin_fun_lib.ERR_MIN, mid + 1)
+    above = lin_fun_lib.line_int(0, 0, 100, 1000, -1_000_000, mid - 1, limit_on_x=False)
+    assert lin_fun_lib.y_int_status(above, 50) == (lin_fun_lib.ERR_MAX, mid - 1)
+    within = lin_fun_lib.line_int(0, 0, 100, 1000, -1_000_000, 1_000_000, limit_on_x=False)
+    assert lin_fun_lib.y_int_status(within, 50) == (lin_fun_lib.OK, mid)

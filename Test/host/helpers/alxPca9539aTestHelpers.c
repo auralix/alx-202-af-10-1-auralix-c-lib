@@ -31,6 +31,8 @@ typedef struct
 // Prototypes - the DLL export surface (no separate header for test helpers)
 //******************************************************************************
 AlxPca9539aTest_Obj* AlxPca9539aTest_New(void);
+AlxPca9539aTest_Obj* AlxPca9539aTest_NewOnBusOf(AlxPca9539aTest_Obj* other);
+void AlxPca9539aTest_SetOpenDrain(AlxPca9539aTest_Obj* me, uint8_t port0, uint8_t port1);
 void AlxPca9539aTest_Delete(AlxPca9539aTest_Obj* me);
 AlxPca9539a* AlxPca9539aTest_Pca(AlxPca9539aTest_Obj* me);
 int32_t AlxPca9539aTest_Status_Ok(void);
@@ -48,6 +50,20 @@ AlxPca9539aTest_Obj* AlxPca9539aTest_New(void)
 	return me;
 }
 
+AlxPca9539aTest_Obj* AlxPca9539aTest_NewOnBusOf(AlxPca9539aTest_Obj* other)
+{
+	// A second expander on the first one's bus - the case Init has for a bus already initialised (A97)
+	AlxPca9539aTest_Obj* me = (AlxPca9539aTest_Obj*)calloc(1, sizeof(AlxPca9539aTest_Obj));
+	if (me == NULL) { return NULL; }
+	AlxPca9539a_Ctor(&me->pca, &other->i2c, 0xEA, false, 3, 10);
+	return me;
+}
+void AlxPca9539aTest_SetOpenDrain(AlxPca9539aTest_Obj* me, uint8_t port0, uint8_t port1)
+{
+	// Which pins are driven open-drain, by port mask - what the product's register hook decides (A97)
+	me->pca.regVal_OpenDrain_0.raw = port0;
+	me->pca.regVal_OpenDrain_1.raw = port1;
+}
 void AlxPca9539aTest_Delete(AlxPca9539aTest_Obj* me)
 {
 	free(me);

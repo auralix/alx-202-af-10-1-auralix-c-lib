@@ -32,6 +32,7 @@
 //******************************************************************************
 static const char* alxIdFake_fwArtf = "";
 static const char* alxIdFake_fwName = "";
+static bool alxIdFake_fwIsBootUsed = false;
 static uint8_t alxIdFake_hwId;
 
 
@@ -40,6 +41,7 @@ static uint8_t alxIdFake_hwId;
 //******************************************************************************
 void AlxIdFake_Reset(void);
 void AlxIdFake_SetHwId(uint8_t hwId);
+void AlxIdFake_SetFwIsBootUsed(bool used);
 
 
 //******************************************************************************
@@ -50,11 +52,16 @@ void AlxIdFake_Reset(void)
 	alxIdFake_fwArtf = "";
 	alxIdFake_fwName = "";
 	alxIdFake_hwId = 0;
+	alxIdFake_fwIsBootUsed = false;
 }
 
 void AlxIdFake_SetHwId(uint8_t hwId)
 {
 	alxIdFake_hwId = hwId;
+}
+void AlxIdFake_SetFwIsBootUsed(bool used)
+{
+	alxIdFake_fwIsBootUsed = used;
 }
 
 
@@ -112,7 +119,7 @@ const char* AlxId_GetFwArtf(AlxId* me)				{ (void)me; return alxIdFake_fwArtf; }
 const char* AlxId_GetFwName(AlxId* me)				{ (void)me; return alxIdFake_fwName; }
 const char* AlxId_GetFwVerStr(AlxId* me)			{ (void)me; return "0.0.0"; }
 const char* AlxId_GetFwBinStr(AlxId* me)			{ (void)me; return "0000000000_HOST_0-0-0_0000000.bin"; }
-bool AlxId_GetFwIsBootUsed(AlxId* me)				{ (void)me; return false; }
+bool AlxId_GetFwIsBootUsed(AlxId* me)				{ (void)me; return alxIdFake_fwIsBootUsed; }
 const char* AlxId_GetFwBootArtf(AlxId* me)			{ (void)me; return ""; }
 const char* AlxId_GetFwBootName(AlxId* me)			{ (void)me; return ""; }
 const char* AlxId_GetFwBootVerStr(AlxId* me)		{ (void)me; return "0.0.0"; }
