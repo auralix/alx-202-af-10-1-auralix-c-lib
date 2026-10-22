@@ -151,9 +151,9 @@ static uint8_t AlxLinTest_BumpVrb(uint8_t value)
 
 void AlxLinTest_TraceProbe(void)
 {
-	ALX_LIN_TRACE_WRN("probe %02" PRIX8, AlxLinTest_BumpWrn(1));
-	ALX_LIN_TRACE_DBG("probe %02" PRIX8, AlxLinTest_BumpDbg(2));
-	ALX_LIN_TRACE_VRB("probe %02" PRIX8, AlxLinTest_BumpVrb(3));
+	ALX_LIN_TRACE_WRN("probe %02" PRIX32, (uint32_t)AlxLinTest_BumpWrn(1));
+	ALX_LIN_TRACE_DBG("probe %02" PRIX32, (uint32_t)AlxLinTest_BumpDbg(2));
+	ALX_LIN_TRACE_VRB("probe %02" PRIX32, (uint32_t)AlxLinTest_BumpVrb(3));
 }
 
 void AlxLinTest_TraceReset(void)
