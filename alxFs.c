@@ -2139,7 +2139,7 @@ static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(void* ctx, void* chunkData
 			// Trace data
 			for (uint32_t j = 0; j < lineLen; j++)
 			{
-				ALX_FS_TRACE_FORMAT("%02" PRIX8 " ", ((uint8_t*)chunkData)[i + j]);
+				ALX_FS_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)(((uint8_t*)chunkData)[i + j]));
 			}
 
 			// Trace new line
