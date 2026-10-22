@@ -100,12 +100,6 @@ def test_ALX1564_P626_init_fails_when_the_part_does_not_answer_and_leaves_it_ena
     assert sum(lp586x_lib.write_count(d) for d in range(0x2A, 0x6C)) == 0
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "DEFECT: AlxLp586x_RegStruct_Write writes the dot brightness registers with "
-    "`for (uint16_t i = 0; i < 107; ++i)` under the comment 'pwm_bri0...pwm_bri107 (0x200-0x26B)', "
-    "so the 108th dot, pwm_bri107 at 0x26B, is never written at Init. A product whose "
-    "RegStruct_SetVal sets the brightness of every dot gets 107 of them; the last dot keeps the "
-    "part's reset value until Handle happens to send it. The loop bound should be 108"))
 def test_ALX1564_P627_init_writes_the_brightness_of_all_108_dots(lp586x_lib):
     """Dot 107 is a dot like the others, and Init writes it like the others."""
     obj = lp586x_lib.new()

@@ -344,7 +344,7 @@ void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val)
 	ALX_LP586X_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_LP586X_ASSERT(ledNum <= me->ledNumUsed);
+	ALX_LP586X_ASSERT(ledNum < me->ledNumUsed);
 
 	me->valNew[ledNum] = val;
 }
@@ -779,8 +779,8 @@ Alx_Status AlxLp586x_RegStruct_Write(AlxLp586x* me)
 		}
 	}
 
-	//  Dot current registers (pwm_bri0...pwm_bri107 ) (0x200-0x26B):  all to 100%
-	for (uint16_t i = 0; i < 107; ++i)
+	//  PWM brightness registers (pwm_bri0...pwm_bri107) (0x200-0x26B)
+	for (uint32_t i = 0; i < 108; ++i)
 	{
 		status = AlxLp586x_Reg_Write(me, &me->reg._pwm_bri[i]);
 		if (status != Alx_Ok)
