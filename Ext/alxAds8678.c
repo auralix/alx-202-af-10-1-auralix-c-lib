@@ -682,11 +682,11 @@ static void AlxAds8678_RegEnumChVoltageRangeToChVoltageRangeParam(AlxAds8678_Reg
 		*chVoltagePerBit_V = 156.25 * 0.000001;
 		*chVoltageOffset_V = -1.28;
 	}
-	else if (regEnumChVoltageRange == Range_CHn_PM_0V15625xVref)
-	{
+	else if (regEnumChVoltageRange == Range_CHn_PM_0V15625xVref)	// LCOV_EXCL_BR_LINE: A93: on this host the 4-bit enumeration field reads this code, its top bit set, as negative, so it never matches (P792)
+	{	// LCOV_EXCL_START: A93: on this host the 4-bit enumeration field reads this code, its top bit set, as negative, so it never matches (P792)
 		*chVoltagePerBit_V = 78.125 * 0.000001;
 		*chVoltageOffset_V = -0.64;
-	}
+	}	// LCOV_EXCL_STOP: the branch above
 	else if (regEnumChVoltageRange == Range_CHn_0V_2V5xVref)
 	{
 		*chVoltagePerBit_V = 625 * 0.000001;
@@ -702,11 +702,11 @@ static void AlxAds8678_RegEnumChVoltageRangeToChVoltageRangeParam(AlxAds8678_Reg
 		*chVoltagePerBit_V = 156.25 * 0.000001;
 		*chVoltageOffset_V = 0;
 	}
-	else if (regEnumChVoltageRange == Range_CHn_0V_0V3125xVref)
-	{
+	else if (regEnumChVoltageRange == Range_CHn_0V_0V3125xVref)	// LCOV_EXCL_BR_LINE: A93: on this host the 4-bit enumeration field reads this code, its top bit set, as negative, so it never matches (P792)
+	{	// LCOV_EXCL_START: A93: on this host the 4-bit enumeration field reads this code, its top bit set, as negative, so it never matches (P792)
 		*chVoltagePerBit_V = 78.125 * 0.000001;
 		*chVoltageOffset_V = 0;
-	}
+	}	// LCOV_EXCL_STOP: the branch above
 	else
 	{
 		ALX_ADS8678_ASSERT(false);	// We shouldn't get here

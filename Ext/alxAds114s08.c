@@ -182,7 +182,7 @@ Alx_Status AlxAds114s08_DeInitPeriph(AlxAds114s08* me)
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxAds114s08_Init(AlxAds114s08* me)
+Alx_Status AlxAds114s08_Init(AlxAds114s08* me)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -218,8 +218,8 @@ Alx_Status AlxAds114s08_Init(AlxAds114s08* me)
 
 	// Return
 	return Alx_Ok;
-}
-Alx_Status AlxAds114s08_DeInit(AlxAds114s08* me)
+}	// LCOV_EXCL_STOP: the function above
+Alx_Status AlxAds114s08_DeInit(AlxAds114s08* me)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -250,8 +250,8 @@ Alx_Status AlxAds114s08_DeInit(AlxAds114s08* me)
 
 	// Return
 	return Alx_Ok;
-}
-Alx_Status AlxAds114s08_GetDevId(AlxAds114s08* me, Ads114s08_RegEnum_0x00_DEV_ID* DEV_ID)
+}	// LCOV_EXCL_STOP: the function above
+Alx_Status AlxAds114s08_GetDevId(AlxAds114s08* me, Ads114s08_RegEnum_0x00_DEV_ID* DEV_ID)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -272,8 +272,8 @@ Alx_Status AlxAds114s08_GetDevId(AlxAds114s08* me, Ads114s08_RegEnum_0x00_DEV_ID
 	// Return ID register
 	*DEV_ID = me->reg.reg_0x00_ID.val.DEV_ID;
 	return Alx_Ok;
-}
-Alx_Status AlxAds114s08_GetChVoltage_mV(AlxAds114s08* me, uint8_t chNum, float* chVoltage_mV, bool* isOutOfRange)
+}	// LCOV_EXCL_STOP: the function above
+Alx_Status AlxAds114s08_GetChVoltage_mV(AlxAds114s08* me, uint8_t chNum, float* chVoltage_mV, bool* isOutOfRange)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -359,8 +359,8 @@ Alx_Status AlxAds114s08_GetChVoltage_mV(AlxAds114s08* me, uint8_t chNum, float* 
 
 	// Return
 	return Alx_Ok;
-}
-Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTemp_degC)
+}	// LCOV_EXCL_STOP: the function above
+Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTemp_degC)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -421,7 +421,7 @@ Alx_Status AlxAds114s08_GetInternalTemp_degC(AlxAds114s08* me, float* internalTe
 
 	// Return
 	return Alx_Ok;
-}
+}	// LCOV_EXCL_STOP: the function above
 Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltage_raw, uint32_t timeout_ms)
 {
 	// Assert
@@ -498,7 +498,7 @@ Alx_Status AlxAds114s08_PerformAdcConversion(AlxAds114s08* me, int16_t* chVoltag
 	// Return
 	return Alx_Ok;
 }
-Alx_Status AlxAds114s08_Convert_raw_mV(AlxAds114s08* me, int16_t chVoltage_raw, float* chVoltage_mV, bool* isOutOfRange)
+Alx_Status AlxAds114s08_Convert_raw_mV(AlxAds114s08* me, int16_t chVoltage_raw, float* chVoltage_mV, bool* isOutOfRange)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->reg.reg_0x05_REF.val.REFSEL == REFSEL_Internal2_5Vref);
@@ -551,7 +551,7 @@ Alx_Status AlxAds114s08_Convert_raw_mV(AlxAds114s08* me, int16_t chVoltage_raw, 
 
 	// Return
 	return Alx_Ok;
-}
+}	// LCOV_EXCL_STOP: the function above
 
 
 //******************************************************************************
@@ -620,7 +620,7 @@ static void AlxAds114s08_RegStruct_SetValToZero(AlxAds114s08* me)
 	me->reg.reg_0x10_GPIODAT.val.raw =		0x00;
 	me->reg.reg_0x11_GPIOCON.val.raw =		0x00;
 }
-static void AlxAds114s08_RegStruct_SetToDefault(AlxAds114s08* me)
+static void AlxAds114s08_RegStruct_SetToDefault(AlxAds114s08* me)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	me->reg.reg_0x00_ID.val.raw =			0x00;
 	me->reg.reg_0x01_STATUS.val.raw =		0x80;
@@ -640,8 +640,8 @@ static void AlxAds114s08_RegStruct_SetToDefault(AlxAds114s08* me)
 	me->reg.reg_0x0F_FSCAL1.val.raw =		0x40;
 	me->reg.reg_0x10_GPIODAT.val.raw =		0x00;
 	me->reg.reg_0x11_GPIOCON.val.raw =		0x00;
-}
-static Alx_Status AlxAds114s08_Cmd_RREG(AlxAds114s08* me, uint8_t regAddr, uint8_t len, uint8_t* data)
+}	// LCOV_EXCL_STOP: the function above
+static Alx_Status AlxAds114s08_Cmd_RREG(AlxAds114s08* me, uint8_t regAddr, uint8_t len, uint8_t* data)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -679,8 +679,8 @@ static Alx_Status AlxAds114s08_Cmd_RREG(AlxAds114s08* me, uint8_t regAddr, uint8
 	// DeAssert CS
 	AlxSpi_Master_DeAssertCs(me->spi);
 	return Alx_Ok;
-}
-static Alx_Status AlxAds114s08_Reg_Read(AlxAds114s08* me, void* reg)
+}	// LCOV_EXCL_STOP: the function above
+static Alx_Status AlxAds114s08_Reg_Read(AlxAds114s08* me, void* reg)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -702,8 +702,8 @@ static Alx_Status AlxAds114s08_Reg_Read(AlxAds114s08* me, void* reg)
 
 	// Return
 	return Alx_Ok;
-}
-static Alx_Status AlxAds114s08_Reg_Write(AlxAds114s08* me, void* reg)
+}	// LCOV_EXCL_STOP: the function above
+static Alx_Status AlxAds114s08_Reg_Write(AlxAds114s08* me, void* reg)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -738,8 +738,8 @@ static Alx_Status AlxAds114s08_Reg_Write(AlxAds114s08* me, void* reg)
 
 	// Return
 	return Alx_Ok;
-}
-static Alx_Status AlxAds114s08_Reg_WriteAndRead(AlxAds114s08* me, void* reg)
+}	// LCOV_EXCL_STOP: the function above
+static Alx_Status AlxAds114s08_Reg_WriteAndRead(AlxAds114s08* me, void* reg)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -781,8 +781,8 @@ static Alx_Status AlxAds114s08_Reg_WriteAndRead(AlxAds114s08* me, void* reg)
 
 	// Return
 	return Alx_Ok;
-}
-static Alx_Status AlxAds114s08_Reg_WriteAll(AlxAds114s08* me)
+}	// LCOV_EXCL_STOP: the function above
+static Alx_Status AlxAds114s08_Reg_WriteAll(AlxAds114s08* me)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Write
 	// me->reg.reg_0x00_ID // is read only
@@ -806,8 +806,8 @@ static Alx_Status AlxAds114s08_Reg_WriteAll(AlxAds114s08* me)
 
 	// Return
 	return Alx_Ok;
-}
-Alx_Status AlxAds114s08_GetPgaShorted_uV(AlxAds114s08* me, float* pgaShortedVoltage_uV)
+}	// LCOV_EXCL_STOP: the function above
+Alx_Status AlxAds114s08_GetPgaShorted_uV(AlxAds114s08* me, float* pgaShortedVoltage_uV)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -868,8 +868,8 @@ Alx_Status AlxAds114s08_GetPgaShorted_uV(AlxAds114s08* me, float* pgaShortedVolt
 
 	// Return
 	return Alx_Ok;
-}
-Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV)
+}	// LCOV_EXCL_STOP: the function above
+Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -930,8 +930,8 @@ Alx_Status AlxAds114s08_GetAvddAvss_mV(AlxAds114s08* me, float* avddAvss_mV)
 
 	// Return
 	return Alx_Ok;
-}
-Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV)
+}	// LCOV_EXCL_STOP: the function above
+Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV)	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 {
 	// Assert
 	ALX_ADS114S08_ASSERT(me->wasCtorCalled == true);
@@ -992,8 +992,8 @@ Alx_Status AlxAds114s08_GetDvdd_mV(AlxAds114s08* me, float* dvdd_mV)
 
 	// Return
 	return Alx_Ok;
-}
-Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC
+}	// LCOV_EXCL_STOP: the function above
+Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC	// LCOV_EXCL_START: A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)
 (
 	AlxAds114s08* me,
 	Ads114s08_ThermocoupleType thermocoupleType,
@@ -1012,7 +1012,7 @@ Alx_Status AlxAds114s08_ApplyColdJunctionCompensation_degC
 	AlxInterpLin_GetY_WithStatus(&me->transferFun_thermocoupleS_mV_degC, thermocoupleVotlageCompensated_mV, thermocoupleTemperatureCompensated_degC);
 
 	return Alx_Ok;
-}
+}	// LCOV_EXCL_STOP: the function above
 
 
 #endif	// #if defined(ALX_C_LIB)

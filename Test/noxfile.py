@@ -372,15 +372,10 @@ COVERAGE_FUNCTIONS = ["alxCrc.c", "alxMemSafe.c", "alxParamGroup.c", "alxId.c", 
 # The library files under 100 % on a gated metric, with what they measured (%, 2026-10-12): the queue of
 # tests to write - goal 7 step 9 wrote none. A file leaves the list when it reaches 100 % on every
 # metric; the gate fails until it does.
-COVERAGE_PENDING: dict[str, str] = {
-    # The three the host cannot finish (A93, the host compiler's layout of enumeration bit-fields):
-    "Ext/alxAds114s08.c": "lines 26.5, branches 7.7, functions 30.4 - Init, the readings and the register access "
-                          "overrun their frames on the host (test_ads114s08.py)",
-    "Ext/alxAds8678.c": "lines 98.4, branches 98.1, functions 100.0 - the two ranges with the top bit set read "
-                        "back negative from a 4-bit field (P792)",
-    "Ext/alxAdxl355.c": "lines 98.0, branches 97.6, functions 100.0 - the 4 g and 8 g range codes read back "
-                        "negative from a 2-bit field (P798)",
-}
+COVERAGE_PENDING: dict[str, str] = {}
+# A97 done (goal 8, 2026-10-22): every measured file at 100% of lines, branches and functions; a line no host
+# test can reach carries an lcov exclusion marker with its reason, A93's among them (Ext/alxAds114s08.c,
+# Ext/alxAdxl355.c, Ext/alxAds8678.c: the host's layout of enumeration and mixed-type bit-fields).
 UBSAN = list(hb.UBSAN)                 # the instrumented variants are the library's flag sets: one
 ASAN_UBSAN = list(hb.ASAN_UBSAN)       # definition for every C repository, not a copy per noxfile
 PROFILE = list(hb.PROFILE)
