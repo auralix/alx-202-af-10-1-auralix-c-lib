@@ -351,7 +351,7 @@ static Alx_Status AlxTmp1075_TraceId(AlxTmp1075* me)
 	// Trace
 	ALX_TMP1075_TRACE_DBG("");
 	ALX_TMP1075_TRACE_DBG("Auralix C Library ALX Temperature Sensor TMP1075 Module Identification:");
-	ALX_TMP1075_TRACE_DBG("- Device ID: %" PRIX16, me->reg.R4_DeviceId.val.DID);
+	ALX_TMP1075_TRACE_DBG("- Device ID: %" PRIX32, (uint32_t)me->reg.R4_DeviceId.val.DID);
 	ALX_TMP1075_TRACE_DBG("");
 
 	// Return
