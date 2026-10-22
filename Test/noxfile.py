@@ -356,6 +356,11 @@ MEMRAW_TESTS = ["test_mem_raw.py"]
 COVERAGE_ASSERT_OFF = "-DALX_ASSERT_OFF(expr)=((void)0)"   # the coverage builds' disabled assertion
 COVERAGE_TRACE_OFF = "-DALX_TRACE_OFF(...)=((void)0)"      # and their disabled trace
 ASSERT_ENABLE = re.compile(r"-DALX_[A-Z0-9_]+_ASSERT_(BKPT|TRACE|RST)_ENABLE")
+# An enabled trace is `do { AlxTrace_WriteLevel(...); } while (false)`, and clang maps that `while (false)`
+# as a branch never taken: every executed trace site cost a branch (goal 8, measured on alxLin.c - 15 of
+# its 18 half-taken branches were trace sites). The three groups that enable traces (Fifo, MemSafe, Lin)
+# prove them in their variants session; the coverage build takes them out as it takes the assertions.
+TRACE_ENABLE = re.compile(r"-DALX_[A-Z0-9_]+_TRACE_ENABLE|-DALX_TRACE_LEVEL=.*")
 # The coverage lane disables every group's assertions; a group whose tests need them keeps them,
 # by its DLL's variable, with the reason. Measured 2026-10-12: with every group's off, 15 tests failed,
 # each one in these six groups and each one reading an assertion the code trips.
@@ -385,7 +390,6 @@ COVERAGE_PENDING: dict[str, str] = {
     "alxHys2.c": "lines 77.8, branches 93.8, regions 78.3, functions 100.0",
     "alxId.c": "lines 97.0, branches 63.9, regions 76.5, functions 100.0",
     "alxInterpLin.c": "lines 100.0, branches 90.0, regions 89.1, functions 100.0",
-    "alxLin.c": "lines 13.3, branches 6.6, regions 9.0, functions 19.4",
     "alxLinFun.c": "lines 71.0, branches 54.3, regions 69.8, functions 100.0",
     "alxMemRaw.c": "lines 100.0, branches 100.0, regions 86.2, functions 100.0",
     "alxMemSafe.c": "lines 94.9, branches 93.7, regions 97.9, functions 100.0",
@@ -766,8 +770,10 @@ def coverage(session: nox.Session) -> None:
     # Every group of harness.host.build as its builder states it (host_recipe.recipes()), rebuilt with
     # clang's instrumentation and its assertions disabled: a disabled assertion keeps its expression in a
     # sizeof (decision 14), a disabled trace its arguments, and clang's coverage maps the && || ?: of that
-    # operand as branches that never run, so a coverage build disables both with nothing at all. A group
-    # whose tests need its assertions keeps them (COVERAGE_ASSERTS_ON). One run of the whole suite reaches
+    # operand as branches that never run, so a coverage build disables both with nothing at all - the
+    # traces by dropping a group's trace defines (TRACE_ENABLE), since an enabled one is a do-while whose
+    # `while (false)` is a branch never taken. A group whose tests need its assertions keeps them
+    # (COVERAGE_ASSERTS_ON). One run of the whole suite reaches
     # every DLL through its fixture's variable, and llvm-cov reads them together, so a file several groups
     # compile is measured over all of them. Coverage builds are measured, never analysed.
     _fresh_dev_build(session)
@@ -781,6 +787,7 @@ def coverage(session: nox.Session) -> None:
         defines = list(recipe.defines)
         if variable not in COVERAGE_ASSERTS_ON:
             defines = [d for d in defines if not ASSERT_ENABLE.fullmatch(d)]
+        defines = [d for d in defines if not TRACE_ENABLE.fullmatch(d)]
         dll = out / recipe.dll.name
         _instrumented_dll(dll, recipe.strict, recipe.exports, PROFILE, closure=recipe.closure,
                           defines=[*defines, COVERAGE_ASSERT_OFF, COVERAGE_TRACE_OFF],
