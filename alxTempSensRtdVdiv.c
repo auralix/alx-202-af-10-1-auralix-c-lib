@@ -131,7 +131,7 @@ Alx_Status AlxTempSensRtdVdiv_GetTemp_degC(AlxTempSensRtdVdiv* me, float* temp_d
 	// Get degC through Linear Interpoaltion
 	return AlxInterpLin_GetY_WithStatus(me->interpLin, rtdRes_kOhm, temp_degC);
 
-	return rtdTemp_degC;
+	return rtdTemp_degC;	// LCOV_EXCL_LINE: unreachable after the return above
 }
 
 
