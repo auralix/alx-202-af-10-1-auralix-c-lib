@@ -137,12 +137,6 @@ def test_ALX1564_P658_the_multisense_cycles_through_both_currents_temperature_an
     assert (lib.level(obj, "sel0"), lib.level(obj, "sel1")) == (True, False), "the cycle did not come back to A"
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "DEFECT: the driver starts its multisense cycle with high side A selected "
-    "(monitoringTypeSelected = AlxVnh7040_MonitoringType_HSA in AlxVnh7040_Ctor), but neither the "
-    "constructor nor Init writes the select pins, so the first reading is made with SEL0 and SEL1 "
-    "low - the high side B selection - and filed as high side A. Every later reading is right, "
-    "because each step selects the next one. The fix is to select high side A in Init"))
 def test_ALX1564_P659_init_selects_high_side_a_before_the_first_reading(bridge):
     """SEL0 high and SEL1 low is high side A, the quantity the first reading is filed under."""
     lib, obj = bridge

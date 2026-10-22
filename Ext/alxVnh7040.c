@@ -167,20 +167,23 @@ void AlxVnh7040_Init(AlxVnh7040* me)
 	AlxIoPin_Init(me->do_SEL1);
 	AlxIoPin_Init(me->do_SENS_EN);
 
-	// #2 Init PWM/GPIO
+	// #2 Select high side A, the first source of the monitoring cycle
+	AlxVnh7040_Monitoring_Select_HSA(me);
+
+	// #3 Init PWM/GPIO
 	#ifdef ALX_VNH7040_PWM
 	if(AlxPwm_Init(me->pwm) != Alx_Ok) { ALX_VNH7040_ASSERT(false); return; }
 	#else
 	AlxIoPin_Init(me->do_PWM);
 	#endif
 
-	// #3 Enable Multisense
+	// #4 Enable Multisense
 	AlxIoPin_Set(me->do_SENS_EN);
 
-	// #4 Delay for device to come from standby mode to operating mode
+	// #5 Delay for device to come from standby mode to operating mode
 	AlxDelay_ms(2);
 
-	// #5 Set isInit
+	// #6 Set isInit
 	me->isInit = true;
 }
 
