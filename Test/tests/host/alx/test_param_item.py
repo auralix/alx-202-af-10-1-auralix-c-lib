@@ -114,51 +114,38 @@ def test_ALX1553_P71_an_integer_outside_its_range_but_inside_its_type_is_refused
 
 
 # =====================================================================
-# P72 - the defect: a number that does not fit the type
+# P72 - a number that does not fit the type
 # =====================================================================
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="the string to integer conversion truncates into the target type before the bound "
-    "check runs, so a value that does not fit is stored as a different in-range value",
-)
 @pytest.mark.parametrize(
-    ("kind", "low", "high", "sent", "wrapped_to"),
+    ("kind", "low", "high", "sent"),
     [
-        ("uint8", 0, 255, "999", 231),          # 999 mod 256
-        ("uint8", 0, 255, "256", 0),
-        ("uint8", 0, 255, "-1", 255),
-        ("uint16", 0, 65535, "65536", 0),
-        ("uint16", 0, 65535, "-1", 65535),
-        ("int8", -128, 127, "128", -128),
-        ("int8", -128, 127, "-129", 127),
+        ("uint8", 0, 255, "999"),
+        ("uint8", 0, 255, "256"),
+        ("uint8", 0, 255, "-1"),
+        ("uint16", 0, 65535, "65536"),
+        ("uint16", 0, 65535, "-1"),
+        ("int8", -128, 127, "128"),
+        ("int8", -128, 127, "-129"),
     ],
 )
 def test_ALX1553_P72_a_value_that_does_not_fit_the_type_is_refused(
-    memsafe_lib, make_item, kinds, kind, low, high, sent, wrapped_to
+    memsafe_lib, make_item, kinds, kind, low, high, sent
 ):
-    """SEALED DEFECT - out-of-type values are accepted and stored wrapped.
+    """A value outside the type is refused and the item keeps what it had.
 
     Found on a device through the CLI (set-param on a 0..255 parameter answered success for 999 and
-    stored 231) and reproduced here on the host, which is where the fix belongs.
-
-    The parametrisation states the measured wrap for each case, and the test asserts BOTH: that the
-    value really is wrapped as measured, and that the call should have refused it. So the day the
-    conversion learns to notice that the number does not fit, this XPASSes and the marker comes off
-    in that commit - and until then it documents exactly what a caller gets.
-
-    P71 is the other half of the argument: with a range the value CAN reach, the check refuses it
-    correctly. Nothing is wrong with the bound check; the conversion never lets it see the value.
+    stored 231) and reproduced here on the host as a sealed defect: the conversion read the text
+    straight into the target type, so the bound check never saw the number. Since D50 (2026-10-22)
+    the conversion reads a 32-bit value and checks the type's range first, so 999 is refused as
+    ErrConv and the item still holds 0. P71 is the other half: a value the range can reach is bounded.
     """
     item_type = kinds[kind][0]
     item = make_item(item_type, 0, low, high)
     status = memsafe_lib.item_set_str(item, sent)
-    assert memsafe_lib.item_get_num(item) == wrapped_to, (
-        f"{kind} stored {memsafe_lib.item_get_num(item)} for {sent}, expected the measured wrap "
-        f"to {wrapped_to}"
-    )
     assert status != memsafe_lib.OK, f"{kind} accepted {sent}, which does not fit the type"
+    assert memsafe_lib.item_get_num(item) == 0, f"{kind} stored something for {sent}"
 
 
 # =====================================================================

@@ -1892,7 +1892,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
-		sprintfStatus = (int32_t)sprintf(valStr, "%" PRIu16, me->val.uint16);
+		sprintfStatus = (int32_t)sprintf(valStr, "%" PRIu32, (uint32_t)me->val.uint16);
 		ALX_PARAM_ITEM_ASSERT(sprintfStatus >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
@@ -1911,7 +1911,7 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
-		sprintfStatus = (int32_t)sprintf(valStr, "%" PRId16, me->val.int16);
+		sprintfStatus = (int32_t)sprintf(valStr, "%" PRId32, (int32_t)me->val.int16);
 		ALX_PARAM_ITEM_ASSERT(sprintfStatus >= 0);
 	}
 	else if (me->dataType == AlxParamItem_Int32)
@@ -2005,12 +2005,16 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	if (me->dataType == AlxParamItem_Uint8)
 	{
 		// Convert
-		uint16_t valNum_Uint16 = 0;
-		if (sscanf(val, "%" SCNu16, &valNum_Uint16) != 1)
+		uint32_t valNum_Uint32 = 0;
+		if (sscanf(val, "%" SCNu32, &valNum_Uint32) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
-		uint8_t valNum = valNum_Uint16;
+		if (valNum_Uint32 > UINT8_MAX)
+		{
+			return AlxParamItem_ErrConv;
+		}
+		uint8_t valNum = (uint8_t)valNum_Uint32;
 
 		// Set
 		status = AlxParamItem_SetVal(me, &valNum);
@@ -2018,11 +2022,16 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
 		// Convert
-		uint16_t valNum = 0;
-		if (sscanf(val, "%" SCNu16, &valNum) != 1)
+		uint32_t valNum_Uint32 = 0;
+		if (sscanf(val, "%" SCNu32, &valNum_Uint32) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+		if (valNum_Uint32 > UINT16_MAX)
+		{
+			return AlxParamItem_ErrConv;
+		}
+		uint16_t valNum = (uint16_t)valNum_Uint32;
 
 		// Set
 		status = AlxParamItem_SetVal(me, &valNum);
@@ -2046,12 +2055,16 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	else if (me->dataType == AlxParamItem_Int8)
 	{
 		// Convert
-		int16_t valNum_Int16 = 0;
-		if (sscanf(val, "%" SCNd16, &valNum_Int16) != 1)
+		int32_t valNum_Int32 = 0;
+		if (sscanf(val, "%" SCNd32, &valNum_Int32) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
-		int8_t valNum = valNum_Int16;
+		if ((valNum_Int32 < INT8_MIN) || (valNum_Int32 > INT8_MAX))
+		{
+			return AlxParamItem_ErrConv;
+		}
+		int8_t valNum = (int8_t)valNum_Int32;
 
 		// Set
 		status = AlxParamItem_SetVal(me, &valNum);
@@ -2059,11 +2072,16 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	else if (me->dataType == AlxParamItem_Int16)
 	{
 		// Convert
-		int16_t valNum = 0;
-		if (sscanf(val, "%" SCNd16, &valNum) != 1)
+		int32_t valNum_Int32 = 0;
+		if (sscanf(val, "%" SCNd32, &valNum_Int32) != 1)
 		{
 			return AlxParamItem_ErrConv;
 		}
+		if ((valNum_Int32 < INT16_MIN) || (valNum_Int32 > INT16_MAX))
+		{
+			return AlxParamItem_ErrConv;
+		}
+		int16_t valNum = (int16_t)valNum_Int32;
 
 		// Set
 		status = AlxParamItem_SetVal(me, &valNum);
