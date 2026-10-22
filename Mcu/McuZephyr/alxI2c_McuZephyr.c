@@ -170,7 +170,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX16 " len %" PRIu16 " numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, slaveAddr, len, numOfTries, timeout_ms);
+	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX32 " len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, (uint32_t)slaveAddr, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 
 
 	//------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		//------------------------------------------------------------------------------
 		// Trace
 		//------------------------------------------------------------------------------
-		ALX_I2C_TRACE_VRB("DO: i2c_read() deviceName %s try %" PRIu8 " slaveAddr 0x%04" PRIX16 " len %" PRIu16, me->deviceName, tryNum, slaveAddr, len);
+		ALX_I2C_TRACE_VRB("DO: i2c_read() deviceName %s try %" PRIu32 " slaveAddr 0x%04" PRIX32 " len %" PRIu32, me->deviceName, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)len);
 
 
 		//------------------------------------------------------------------------------
@@ -204,9 +204,9 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		if (status != 0)
 		{
 			#if ALX_TRACE_LEVEL < ALX_TRACE_LEVEL_VRB
-			ALX_I2C_TRACE_WRN("FAIL: i2c_read() deviceName %s status %" PRId32 " try %" PRIu8, me->deviceName, status, tryNum);
+			ALX_I2C_TRACE_WRN("FAIL: i2c_read() deviceName %s status %" PRId32 " try %" PRIu32, me->deviceName, status, (uint32_t)tryNum);
 			#else
-			ALX_I2C_TRACE_VRB("FAIL: i2c_read() deviceName %s status %" PRId32 " try %" PRIu8 " slaveAddr 0x%04" PRIX16 " len %" PRIu16 " numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, status, tryNum, slaveAddr, len, numOfTries, timeout_ms);
+			ALX_I2C_TRACE_VRB("FAIL: i2c_read() deviceName %s status %" PRId32 " try %" PRIu32 " slaveAddr 0x%04" PRIX32 " len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, status, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 			#endif
 			continue;
 		}
@@ -222,7 +222,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		ALX_I2C_TRACE_FORMAT("    data: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_I2C_TRACE_FORMAT("%02" PRIX8 " ", data[i]);
+			ALX_I2C_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)data[i]);
 		}
 		ALX_I2C_TRACE_FORMAT("\r\n");
 		#endif
@@ -267,7 +267,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX16 " memAddr 0x%04" PRIX16 " memAddrLen %d len %" PRIu16 " numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, slaveAddr, memAddr, memAddrLen, len, numOfTries, timeout_ms);
+	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX32 " memAddr 0x%04" PRIX32 " memAddrLen %d len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, (uint32_t)slaveAddr, (uint32_t)memAddr, memAddrLen, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 
 
 	//------------------------------------------------------------------------------
@@ -293,7 +293,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		//-----------------------------------------------------------------------------
 		// Trace
 		//-----------------------------------------------------------------------------
-		ALX_I2C_TRACE_VRB("DO: i2c_burst_read() deviceName %s try %" PRIu8 " slaveAddr 0x%04" PRIX16 " memAddr 0x%04" PRIX16 " len %" PRIu16, me->deviceName, tryNum, slaveAddr, memAddr, len);
+		ALX_I2C_TRACE_VRB("DO: i2c_burst_read() deviceName %s try %" PRIu32 " slaveAddr 0x%04" PRIX32 " memAddr 0x%04" PRIX32 " len %" PRIu32, me->deviceName, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)memAddr, (uint32_t)len);
 
 
 		//-----------------------------------------------------------------------------
@@ -303,9 +303,9 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		if (status != 0)
 		{
 			#if ALX_TRACE_LEVEL < ALX_TRACE_LEVEL_VRB
-			ALX_I2C_TRACE_WRN("FAIL: i2c_burst_read() deviceName %s status %" PRId32 " try %" PRIu8, me->deviceName, status, tryNum);
+			ALX_I2C_TRACE_WRN("FAIL: i2c_burst_read() deviceName %s status %" PRId32 " try %" PRIu32, me->deviceName, status, (uint32_t)tryNum);
 			#else
-			ALX_I2C_TRACE_VRB("FAIL: i2c_burst_read() deviceName %s status %" PRId32 " try %" PRIu8 " slaveAddr 0x%04" PRIX16 " memAddr 0x%04" PRIX16 " memAddrLen %d len %" PRIu16 " numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, status, tryNum, slaveAddr, memAddr, memAddrLen, len, numOfTries, timeout_ms);
+			ALX_I2C_TRACE_VRB("FAIL: i2c_burst_read() deviceName %s status %" PRId32 " try %" PRIu32 " slaveAddr 0x%04" PRIX32 " memAddr 0x%04" PRIX32 " memAddrLen %d len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, status, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)memAddr, memAddrLen, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 			#endif
 			continue;
 		}
@@ -321,7 +321,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		ALX_I2C_TRACE_FORMAT("    data: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_I2C_TRACE_FORMAT("%02" PRIX8 " ", data[i]);
+			ALX_I2C_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)data[i]);
 		}
 		ALX_I2C_TRACE_FORMAT("\r\n");
 		#endif
@@ -386,7 +386,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX16 " len %" PRIu16 " numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, slaveAddr, len, numOfTries, timeout_ms);
+	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX32 " len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, (uint32_t)slaveAddr, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 
 
 	//------------------------------------------------------------------------------
@@ -409,12 +409,12 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		//------------------------------------------------------------------------------
 		// Trace
 		//------------------------------------------------------------------------------
-		ALX_I2C_TRACE_VRB("DO: i2c_write() deviceName %s try %" PRIu8 " slaveAddr 0x%04" PRIX16 " len %" PRIu16, me->deviceName, tryNum, slaveAddr, len);
+		ALX_I2C_TRACE_VRB("DO: i2c_write() deviceName %s try %" PRIu32 " slaveAddr 0x%04" PRIX32 " len %" PRIu32, me->deviceName, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)len);
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		ALX_I2C_TRACE_FORMAT("    data: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_I2C_TRACE_FORMAT("%02" PRIX8 " ", data[i]);
+			ALX_I2C_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)data[i]);
 		}
 		ALX_I2C_TRACE_FORMAT("\r\n");
 		#endif
@@ -427,9 +427,9 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		if (status != 0)
 		{
 			#if ALX_TRACE_LEVEL < ALX_TRACE_LEVEL_VRB
-			ALX_I2C_TRACE_WRN("FAIL: i2c_write() deviceName %s status %" PRId32 " try %" PRIu8, me->deviceName, status, tryNum);
+			ALX_I2C_TRACE_WRN("FAIL: i2c_write() deviceName %s status %" PRId32 " try %" PRIu32, me->deviceName, status, (uint32_t)tryNum);
 			#else
-			ALX_I2C_TRACE_VRB("FAIL: i2c_write() deviceName %s status %" PRId32 " try %" PRIu8 " slaveAddr 0x%04" PRIX16 " len %" PRIu16 " numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, status, tryNum, slaveAddr, len, numOfTries, timeout_ms);
+			ALX_I2C_TRACE_VRB("FAIL: i2c_write() deviceName %s status %" PRId32 " try %" PRIu32 " slaveAddr 0x%04" PRIX32 " len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, status, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 			#endif
 			continue;
 		}
@@ -501,7 +501,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX16 " memAddr 0x%04" PRIX16 " memAddrLen %d len %" PRIu16 " checkWithRead %d numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, slaveAddr, memAddr, memAddrLen, len, checkWithRead, numOfTries, timeout_ms);
+	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX32 " memAddr 0x%04" PRIX32 " memAddrLen %d len %" PRIu32 " checkWithRead %d numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, (uint32_t)slaveAddr, (uint32_t)memAddr, memAddrLen, (uint32_t)len, checkWithRead, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 
 
 	//------------------------------------------------------------------------------
@@ -529,12 +529,12 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		//------------------------------------------------------------------------------
 		// Trace
 		//------------------------------------------------------------------------------
-		ALX_I2C_TRACE_VRB("DO: i2c_burst_write() deviceName %s try %" PRIu8 " slaveAddr 0x%04" PRIX16 " memAddr 0x%04" PRIX16 " len %" PRIu16, me->deviceName, tryNum, slaveAddr, memAddr, len);
+		ALX_I2C_TRACE_VRB("DO: i2c_burst_write() deviceName %s try %" PRIu32 " slaveAddr 0x%04" PRIX32 " memAddr 0x%04" PRIX32 " len %" PRIu32, me->deviceName, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)memAddr, (uint32_t)len);
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		ALX_I2C_TRACE_FORMAT("    data: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_I2C_TRACE_FORMAT("%02" PRIX8 " ", data[i]);
+			ALX_I2C_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)data[i]);
 		}
 		ALX_I2C_TRACE_FORMAT("\r\n");
 		#endif
@@ -547,9 +547,9 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		if (status != 0)
 		{
 			#if ALX_TRACE_LEVEL < ALX_TRACE_LEVEL_VRB
-			ALX_I2C_TRACE_WRN("FAIL: i2c_burst_write() deviceName %s status %" PRId32 " try %" PRIu8, me->deviceName, status, tryNum);
+			ALX_I2C_TRACE_WRN("FAIL: i2c_burst_write() deviceName %s status %" PRId32 " try %" PRIu32, me->deviceName, status, (uint32_t)tryNum);
 			#else
-			ALX_I2C_TRACE_VRB("FAIL: i2c_burst_write() deviceName %s status %" PRId32 " try %" PRIu8 " slaveAddr 0x%04" PRIX16 " memAddr 0x%04" PRIX16 " memAddrLen %d len %" PRIu16 " checkWithRead %d numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, status, tryNum, slaveAddr, memAddr, memAddrLen, len, checkWithRead, numOfTries, timeout_ms);
+			ALX_I2C_TRACE_VRB("FAIL: i2c_burst_write() deviceName %s status %" PRId32 " try %" PRIu32 " slaveAddr 0x%04" PRIX32 " memAddr 0x%04" PRIX32 " memAddrLen %d len %" PRIu32 " checkWithRead %d numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, status, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)memAddr, memAddrLen, (uint32_t)len, checkWithRead, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 			#endif
 			continue;
 		}
@@ -580,9 +580,9 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 			if (memcmp(buff, data, len) != 0)
 			{
 				#if ALX_TRACE_LEVEL < ALX_TRACE_LEVEL_VRB
-				ALX_I2C_TRACE_WRN("FAIL: memcmp() deviceName %s status %d try %" PRIu8, me->deviceName, alxStat, tryNum);
+				ALX_I2C_TRACE_WRN("FAIL: memcmp() deviceName %s status %d try %" PRIu32, me->deviceName, alxStat, (uint32_t)tryNum);
 				#else
-				ALX_I2C_TRACE_VRB("FAIL: memcmp() deviceName %s status %d try %" PRIu8 " slaveAddr 0x%04" PRIX16 " memAddr 0x%04" PRIX16 " memAddrLen %d len %" PRIu16 " checkWithRead %d numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, alxStat, tryNum, slaveAddr, memAddr, memAddrLen, len, checkWithRead, numOfTries, timeout_ms);
+				ALX_I2C_TRACE_VRB("FAIL: memcmp() deviceName %s status %d try %" PRIu32 " slaveAddr 0x%04" PRIX32 " memAddr 0x%04" PRIX32 " memAddrLen %d len %" PRIu32 " checkWithRead %d numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, alxStat, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)memAddr, memAddrLen, (uint32_t)len, checkWithRead, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 				#endif
 				continue;
 			}
@@ -632,7 +632,7 @@ Alx_Status AlxI2c_Master_StartWriteReadStop(AlxI2c* me, uint16_t slaveAddr, cons
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX16 " writeLen %" PRIu16 " readLen %" PRIu16 " numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, slaveAddr, writeLen, readLen, numOfTries, timeout_ms);
+	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX32 " writeLen %" PRIu32 " readLen %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, (uint32_t)slaveAddr, (uint32_t)writeLen, (uint32_t)readLen, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 
 
 	//------------------------------------------------------------------------------
@@ -658,12 +658,12 @@ Alx_Status AlxI2c_Master_StartWriteReadStop(AlxI2c* me, uint16_t slaveAddr, cons
 		//------------------------------------------------------------------------------
 		// Trace
 		//------------------------------------------------------------------------------
-		ALX_I2C_TRACE_VRB("DO: i2c_write_read() deviceName %s try %" PRIu8 " slaveAddr 0x%04" PRIX16 " writeLen %" PRIu16 " readLen %" PRIu16, me->deviceName, tryNum, slaveAddr, writeLen, readLen);
+		ALX_I2C_TRACE_VRB("DO: i2c_write_read() deviceName %s try %" PRIu32 " slaveAddr 0x%04" PRIX32 " writeLen %" PRIu32 " readLen %" PRIu32, me->deviceName, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)writeLen, (uint32_t)readLen);
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		ALX_I2C_TRACE_FORMAT("    writeData: ");
 		for (uint32_t i = 0; i < writeLen; i++)
 		{
-			ALX_I2C_TRACE_FORMAT("%02" PRIX8 " ", writeData[i]);
+			ALX_I2C_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)writeData[i]);
 		}
 		ALX_I2C_TRACE_FORMAT("\r\n");
 		#endif
@@ -676,9 +676,9 @@ Alx_Status AlxI2c_Master_StartWriteReadStop(AlxI2c* me, uint16_t slaveAddr, cons
 		if (status != 0)
 		{
 			#if ALX_TRACE_LEVEL < ALX_TRACE_LEVEL_VRB
-			ALX_I2C_TRACE_WRN("FAIL: i2c_write_read() deviceName %s status %" PRId32 " try %" PRIu8, me->deviceName, status, tryNum);
+			ALX_I2C_TRACE_WRN("FAIL: i2c_write_read() deviceName %s status %" PRId32 " try %" PRIu32, me->deviceName, status, (uint32_t)tryNum);
 			#else
-			ALX_I2C_TRACE_VRB("FAIL: i2c_write_read() deviceName %s status %" PRId32 " try %" PRIu8 " slaveAddr 0x%04" PRIX16 " writeLen %" PRIu16 " readLen %" PRIu16 " numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, status, tryNum, slaveAddr, writeLen, readLen, numOfTries, timeout_ms);
+			ALX_I2C_TRACE_VRB("FAIL: i2c_write_read() deviceName %s status %" PRId32 " try %" PRIu32 " slaveAddr 0x%04" PRIX32 " writeLen %" PRIu32 " readLen %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, status, (uint32_t)tryNum, (uint32_t)slaveAddr, (uint32_t)writeLen, (uint32_t)readLen, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 			#endif
 			continue;
 		}
@@ -694,7 +694,7 @@ Alx_Status AlxI2c_Master_StartWriteReadStop(AlxI2c* me, uint16_t slaveAddr, cons
 		ALX_I2C_TRACE_FORMAT("    readData: ");
 		for (uint32_t i = 0; i < readLen; i++)
 		{
-			ALX_I2C_TRACE_FORMAT("%02" PRIX8 " ", readData[i]);
+			ALX_I2C_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)readData[i]);
 		}
 		ALX_I2C_TRACE_FORMAT("\r\n");
 		#endif
@@ -749,7 +749,7 @@ Alx_Status AlxI2c_Master_Stop(AlxI2c* me, uint16_t timeout_ms)
 Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	// Trace
-	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX16 " numOfTries %" PRIu8 " timeout_ms %" PRIu16, me->deviceName, slaveAddr, numOfTries, timeout_ms);
+	ALX_I2C_TRACE_DBG("ENTER: deviceName %s slaveAddr 0x%04" PRIX32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, (uint32_t)slaveAddr, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 
 	// Assert
 	ALX_I2C_ASSERT(me->wasCtorCalled == true);
