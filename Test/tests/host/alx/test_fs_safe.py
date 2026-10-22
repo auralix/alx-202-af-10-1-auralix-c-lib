@@ -226,3 +226,88 @@ def test_ALX1553_P448_a_write_interrupted_after_the_first_copy_is_recovered_by_t
     assert got == OTHER, "the interrupted write was rolled back rather than completed"
     assert lib.copy(handle, PATH, "b") == lib.copy_bytes(handle, OTHER), "the redundancy was not restored"
     assert lib.read(handle, PATH, len(DATA)) == (BOTH_OK_CRC_SAME, OTHER), "and it stays repaired"
+
+
+ALX_ERR = 1
+
+
+def test_ALX1564_P727_an_original_file_is_read_when_the_copies_are_not_there_and_taken_over(fs_safe_lib):
+    """With the migration on: nothing is both copies missing, a plain file alone becomes the two copies.
+
+    Copy A keeps the plain name, so the original and copy A are one file: a plain file with no CRC is
+    an invalid copy A and a valid original, and the migration rewrites it in place with its CRC.
+    """
+    lib = fs_safe_lib
+    handle = lib.new(use_orig=True)
+    assert lib.read(handle, "none.bin", len(DATA))[0] == BOTH_ERR, "nothing anywhere"
+
+    lib.put_raw("mig.bin", DATA)
+    assert lib.read(handle, "mig.bin", len(DATA)) == (ORIG_OK_USE_ORIG, DATA)
+    assert lib.copy(handle, "mig.bin", "a") == lib.copy_bytes(handle, DATA), (
+        "the plain file carries its CRC now"
+    )
+    assert lib.copy(handle, "mig.bin", "b") == lib.copy_bytes(handle, DATA)
+
+    lib.put_raw("raw.bin", DATA)
+    lib.put_copy(handle, "raw.bin", "b", OTHER)
+    assert lib.read(handle, "raw.bin", len(DATA)) == (A_ERR_B_OK, OTHER), (
+        "a good copy outranks a plain original"
+    )
+
+
+def test_ALX1564_P728_a_repair_that_cannot_be_written_is_the_status_the_caller_gets(fs_safe_lib):
+    """Each of the four repairs - from the original, the differing copies, the one good copy - fails as its write."""
+    lib = fs_safe_lib
+    handle = lib.new(use_orig=True)
+    lib.put_raw("ma.bin", DATA)
+    lib.fail("write", -1)
+    assert lib.read(handle, "ma.bin", len(DATA))[0] == ALX_ERR, "copy A could not be written from the original"
+    lib.fail("write", 0)
+    lib.put_raw("mb.bin", DATA)
+    lib.fail("write", 1, after=1)
+    assert lib.read(handle, "mb.bin", len(DATA))[0] == ALX_ERR, "copy B could not be written from the original"
+    lib.fail("write", 0)
+
+    plain = lib.new()
+    lib.put_copy(plain, "diff.bin", "a", DATA)
+    lib.put_copy(plain, "diff.bin", "b", OTHER)
+    lib.fail("write", -1)
+    assert lib.read(plain, "diff.bin", len(DATA))[0] == ALX_ERR, "copy B could not be rewritten from copy A"
+    lib.fail("write", 0)
+
+    lib.put_copy(plain, "bonly.bin", "b", DATA)
+    lib.fail("write", -1)
+    assert lib.read(plain, "bonly.bin", len(DATA))[0] == ALX_ERR, "copy A could not be rewritten from copy B"
+    lib.fail("write", 0)
+
+
+def test_ALX1564_P729_a_write_reports_a_copy_that_would_not_open_or_close(safe):
+    """The copy's open, its write and its close each report their failure; a failed write still closes."""
+    lib, handle = safe
+    lib.fail("open", 1)
+    assert lib.write(handle, PATH, DATA) == ALX_ERR
+    lib.fail("write", 1)
+    lib.fail("close", 1)
+    assert lib.write(handle, PATH, DATA) == ALX_ERR, "the write failed and the close after it failed too"
+    lib.fail("close", 1)
+    assert lib.write(handle, PATH, DATA) == ALX_ERR, "the write landed and the close failed"
+    assert lib.write(handle, PATH, DATA) == ALX_OK, "the file system works again"
+
+
+def test_ALX1564_P730_a_raw_read_reports_a_read_or_a_close_that_failed(safe):
+    """ReadRaw: a failed read closes the file and reports the read; a failed close is reported too."""
+    lib, handle = safe
+    assert lib.write(handle, PATH, DATA) == ALX_OK
+    lib.fail("read", 1)
+    assert lib.read(handle, PATH, len(DATA))[0] in (A_ERR_B_OK, BOTH_OK_CRC_SAME, ALX_OK), (
+        "copy A failed to read, B served"
+    )
+    lib.fail("read", 1)
+    lib.fail("close", 1)
+    assert lib.read(handle, PATH, len(DATA))[0] in (A_ERR_B_OK, BOTH_OK_CRC_SAME, ALX_OK), (
+        "and the close after it failed"
+    )
+    lib.fail("close", 1)
+    assert lib.read(handle, PATH, len(DATA))[0] in (A_ERR_B_OK, BOTH_OK_CRC_SAME, ALX_OK), (
+        "copy A read, its close failed"
+    )

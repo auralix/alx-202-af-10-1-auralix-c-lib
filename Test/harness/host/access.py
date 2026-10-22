@@ -1589,6 +1589,22 @@ class ParamMgmtLib:
         _register_lib(c)
         vp, u32, i32, cp = ctypes.c_void_p, ctypes.c_uint32, ctypes.c_int32, ctypes.c_char_p
         c.AlxParamMgmtTest_New.restype = vp
+        c.AlxParamMgmtTest_NewWithStore.restype = vp
+        c.AlxParamMgmt_ByIndex_GetValPtr.restype = vp
+        c.AlxParamMgmt_ByIndex_GetValPtr.argtypes = [vp, u32]
+        for name in ("LoadVal_Group", "StoreVal_Group"):
+            fn = getattr(c, f"AlxParamMgmt_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp, u32]
+        for name in ("LoadVal_All", "StoreVal_All"):
+            fn = getattr(c, f"AlxParamMgmt_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxParamKvStoreFake_Enable.argtypes = [ctypes.c_bool]
+        c.AlxParamKvStoreFake_FailGet.argtypes = [ctypes.c_bool]
+        c.AlxParamKvStoreFake_FailSet.argtypes = [ctypes.c_bool]
+        c.AlxParamKvStoreFake_GetCount.restype = u32
+        c.AlxParamKvStoreFake_SetCount.restype = u32
         c.AlxParamMgmtTest_Delete.argtypes = [vp]
         for name in ("NumOfItems",):
             getattr(c, f"AlxParamMgmtTest_{name}").restype = u32
@@ -1691,6 +1707,38 @@ class ParamMgmtLib:
 
     def defaults_all(self, mgmt) -> None:
         self.c.AlxParamMgmt_SetValToDef_All(mgmt)
+
+    # -- the store behind the items (A97) ----------------------------------------
+    def table_with_store(self):
+        """The same six items, each over the KV store fake, armed and empty."""
+        self.c.AlxParamKvStoreFake_Reset()
+        self.c.AlxParamKvStoreFake_Enable(True)
+        mgmt = self.c.AlxParamMgmtTest_NewWithStore()
+        assert mgmt, "AlxParamMgmtTest_NewWithStore returned NULL"
+        self._handles.append(mgmt)
+        return mgmt
+
+    def val_ptr(self, mgmt, index: int) -> int:
+        return self.c.AlxParamMgmt_ByIndex_GetValPtr(mgmt, index) or 0
+
+    def load(self, mgmt, group_id: int | None = None) -> int:
+        """LoadVal_Group for a group, LoadVal_All without one."""
+        if group_id is None:
+            return self.c.AlxParamMgmt_LoadVal_All(mgmt)
+        return self.c.AlxParamMgmt_LoadVal_Group(mgmt, group_id)
+
+    def store(self, mgmt, group_id: int | None = None) -> int:
+        if group_id is None:
+            return self.c.AlxParamMgmt_StoreVal_All(mgmt)
+        return self.c.AlxParamMgmt_StoreVal_Group(mgmt, group_id)
+
+    def kv_fail(self, *, get: bool = False, set_: bool = False) -> None:
+        self.c.AlxParamKvStoreFake_FailGet(get)
+        self.c.AlxParamKvStoreFake_FailSet(set_)
+
+    def kv_counts(self) -> tuple[int, int]:
+        """(gets, sets) the store fake has seen."""
+        return (self.c.AlxParamKvStoreFake_GetCount(), self.c.AlxParamKvStoreFake_SetCount())
 
     def free_all(self) -> None:
         for handle in self._handles:
