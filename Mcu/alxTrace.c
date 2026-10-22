@@ -92,15 +92,14 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	(void)sprintf
 	(
 		dateTimeStr,
-		"20%02" PRIu32 "-%02" PRIu32 "-%02" PRIu32 " %02" PRIu32 ":%02" PRIu32 ":%02" PRIu32 ".%03" PRIu16,
+		"20%02" PRIu32 "-%02" PRIu32 "-%02" PRIu32 " %02" PRIu32 ":%02" PRIu32 ":%02" PRIu32 ".%03" PRIu32,
 		(uint32_t)dateTime.yr,
 		(uint32_t)dateTime.mo,
 		(uint32_t)dateTime.day,
 		(uint32_t)dateTime.hr,
 		(uint32_t)dateTime.min,
 		(uint32_t)dateTime.sec,
-		dateTime.ms
-	);
+		(uint32_t)dateTime.ms);
 
 
 	//------------------------------------------------------------------------------
