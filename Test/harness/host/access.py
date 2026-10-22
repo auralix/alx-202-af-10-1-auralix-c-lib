@@ -3986,6 +3986,8 @@ class AudioPlayerLib:
         for name in ("IncSampleOffset", "Play", "Stop", "Pause", "Replay", "LoopOn", "LoopOff"):
             getattr(c, f"AlxAudioPlayer_{name}").argtypes = [vp]
         c.AlxAudioPlayer_LoopConfig.argtypes = [vp, b]
+        c.AlxAudioPlayer_LoopOn.argtypes = [vp]
+        c.AlxAudioPlayer_LoopOff.argtypes = [vp]
         c.AlxAudioPlayer_IsPlaying.restype = b
         c.AlxAudioPlayer_IsPlaying.argtypes = [vp]
         self._handles: list = []
@@ -4038,6 +4040,12 @@ class AudioPlayerLib:
 
     def loop(self, obj, *, on: bool) -> None:
         self.c.AlxAudioPlayer_LoopConfig(self._p(obj), on)
+
+    def loop_on(self, obj) -> None:
+        self.c.AlxAudioPlayer_LoopOn(self._p(obj))
+
+    def loop_off(self, obj) -> None:
+        self.c.AlxAudioPlayer_LoopOff(self._p(obj))
 
     def is_playing(self, obj) -> bool:
         return self.c.AlxAudioPlayer_IsPlaying(self._p(obj))

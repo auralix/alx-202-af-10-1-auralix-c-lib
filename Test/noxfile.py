@@ -373,8 +373,6 @@ COVERAGE_FUNCTIONS = ["alxCrc.c", "alxMemSafe.c", "alxParamGroup.c", "alxId.c", 
 # tests to write - goal 7 step 9 wrote none. A file leaves the list when it reaches 100 % on every
 # metric; the gate fails until it does.
 COVERAGE_PENDING: dict[str, str] = {
-    "alxAudioPlayer.c": "lines 59.7, branches 50.0, regions 57.4, functions 87.5",
-    "alxCanParser.c": "lines 79.7, branches 84.6, regions 77.1, functions 100.0",
     "alxCli.c": "lines 58.8, branches 80.6, regions 85.8, functions 85.7",
     "alxParamItem.c": "lines 87.1, branches 76.6, regions 84.2, functions 100.0",
     "Ext/alxAdau1961.c": "lines 65.4, branches 53.7, regions 60.9, functions 90.9",

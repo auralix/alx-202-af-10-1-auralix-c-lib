@@ -262,3 +262,77 @@ def test_ALX1553_P290_a_player_that_is_not_playing_answers_silence(audio_player_
     lib.pause(obj)
     assert lib.left(obj) == 0.0, "a paused player still answered a sample"
     assert lib.offset(obj) == 3, "and pausing moved the cursor"
+
+
+def _u(code: int) -> float:
+    """The float an 8-bit unsigned sample becomes: offset binary, 128 is silence."""
+    signed = (code - 128) % 256
+    return (signed - 256 if signed >= 128 else signed) / 128.0
+
+
+def _s16(lo: int, hi: int) -> float:
+    """The float a little-endian 16-bit signed sample becomes."""
+    value = lo | (hi << 8)
+    return (value - 65536 if value >= 32768 else value) / 32768.0
+
+
+def test_ALX1564_P731_loop_on_and_loop_off_are_the_two_halves_of_loop_config(mono):
+    """LoopOn keeps the player past the end; LoopOff lets the end stop it, as P284 and P285."""
+    lib, obj = mono
+    lib.loop_on(obj)
+    lib.advance(obj, times=len(TRACK))
+    assert lib.is_playing(obj) is True
+    lib.loop_off(obj)
+    lib.advance(obj, times=len(TRACK))
+    assert lib.is_playing(obj) is False
+
+
+def test_ALX1564_P732_an_8_bit_unsigned_track_is_offset_binary_on_both_layouts(audio_player_lib):
+    """128 is silence, 0 is the negative full scale; a mono track answers its sample on every channel."""
+    lib = audio_player_lib
+    mono = lib.new(TRACK, encoding=lib.UINT8, mono=True)
+    lib.play(mono)
+    assert (lib.left(mono), lib.right(mono), lib.mono(mono)) == (pytest.approx(_u(TRACK[0]),),) * 3
+
+    stereo = lib.new(TRACK, encoding=lib.UINT8, mono=False)
+    lib.play(stereo)
+    assert lib.left(stereo) == pytest.approx(_u(TRACK[0]))
+    assert lib.right(stereo) == pytest.approx(_u(TRACK[1]))
+    assert lib.mono(stereo) == pytest.approx((_u(TRACK[0]) + _u(TRACK[1])) / 2)
+
+
+def test_ALX1564_P733_a_16_bit_track_in_internal_flash_is_read_as_little_endian_words(audio_player_lib):
+    """Two bytes a sample, the low one first; stereo puts the right word after the left."""
+    lib = audio_player_lib
+    mono = lib.new(TRACK, encoding=lib.INT16_FLASH, mono=True)
+    lib.play(mono)
+    assert lib.left(mono) == lib.right(mono) == lib.mono(mono) == pytest.approx(_s16(TRACK[0], TRACK[1]))
+    lib.advance(mono)
+    assert lib.left(mono) == pytest.approx(_s16(TRACK[2], TRACK[3]))
+
+    stereo = lib.new(TRACK, encoding=lib.INT16_FLASH, mono=False)
+    lib.play(stereo)
+    assert lib.left(stereo) == pytest.approx(_s16(TRACK[0], TRACK[1]))
+    assert lib.right(stereo) == pytest.approx(_s16(TRACK[2], TRACK[3]))
+    assert lib.mono(stereo) == pytest.approx((_s16(TRACK[0], TRACK[1]) + _s16(TRACK[2], TRACK[3])) / 2)
+
+
+@pytest.mark.parametrize("encoding", ["INT16", "UINT16"])
+@pytest.mark.expect_assert("P734: the two 16-bit RAM encodings are declared and not implemented - GetSample asserts")
+def test_ALX1564_P734_the_two_16_bit_ram_encodings_answer_silence(audio_player_lib, encoding):
+    """CHARACTERIZATION: Int16 and Uint16 step like the flash encoding and read nothing (TV: TODO)."""
+    lib = audio_player_lib
+    obj = lib.new(TRACK, encoding=getattr(lib, encoding), mono=True)
+    lib.play(obj)
+    assert lib.step(obj) == 2
+    assert lib.left(obj) == 0.0
+
+
+@pytest.mark.expect_assert("P735: an encoding outside the enumeration reaches the else of the step and of the sample")
+def test_ALX1564_P735_an_encoding_the_enumeration_does_not_have_steps_nowhere_and_reads_silence(audio_player_lib):
+    """The step comes out 0 and the sample 0.0: what a build without assertions is left with."""
+    lib = audio_player_lib
+    obj = lib.new(TRACK, encoding=99, mono=True)
+    lib.play(obj)
+    assert lib.step(obj) == 0
+    assert lib.left(obj) == 0.0
