@@ -1251,7 +1251,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_INF("- oldest.file = %" PRIu32, me->md.oldest.file);
 		ALX_LOGGER_TRACE_INF("- oldest.dir = %" PRIu32, me->md.oldest.dir);
 
-		ALX_LOGGER_TRACE_INF("- crc = 0x%04" PRIX16, me->md.crc);
+		ALX_LOGGER_TRACE_INF("- crc = 0x%04" PRIX32, (uint32_t)me->md.crc);
 
 		// Repair write file
 		status = AlxLogger_CheckRepairWriteFile(me);
@@ -1307,7 +1307,7 @@ static Alx_Status AlxLogger_Prepare(AlxLogger* me)
 		ALX_LOGGER_TRACE_INF("- oldest.file = %" PRIu32, me->md.oldest.file);
 		ALX_LOGGER_TRACE_INF("- oldest.dir = %" PRIu32, me->md.oldest.dir);
 
-		ALX_LOGGER_TRACE_INF("- crc = 0x%04" PRIX16, me->md.crc);
+		ALX_LOGGER_TRACE_INF("- crc = 0x%04" PRIX32, (uint32_t)me->md.crc);
 
 		// Return
 		return Alx_Ok;
