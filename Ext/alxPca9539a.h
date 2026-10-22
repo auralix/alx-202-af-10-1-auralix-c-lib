@@ -328,8 +328,8 @@ typedef struct
 
 	// Variables
 	AlxPca9539a_Reg reg;
-	AlxPca9539a_RegVal_OpenDrain_0 _OpenDrain_0;
-	AlxPca9539a_RegVal_OpenDrain_1 _OpenDrain_1;
+	AlxPca9539a_RegVal_OpenDrain_0 regVal_OpenDrain_0;
+	AlxPca9539a_RegVal_OpenDrain_1 regVal_OpenDrain_1;
 
 	// Info
 	bool wasCtorCalled;

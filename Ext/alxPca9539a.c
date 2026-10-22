@@ -282,10 +282,10 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 		return status;
 	}
 
-	if (me->_OpenDrain_0.raw != 0b00000000)
+	if (me->regVal_OpenDrain_0.raw != 0b00000000)
 	{
-		mask = me->_OpenDrain_0.raw & me->reg._02h_OutputPort_0.val.raw;
-		me->reg._06h_Configuration_0.val.raw = (me->reg._06h_Configuration_0.val.raw & ~me->_OpenDrain_0.raw) | mask;
+		mask = me->regVal_OpenDrain_0.raw & me->reg._02h_OutputPort_0.val.raw;
+		me->reg._06h_Configuration_0.val.raw = (me->reg._06h_Configuration_0.val.raw & ~me->regVal_OpenDrain_0.raw) | mask;
 
 		status = AlxPca9539a_Reg_Write(me, &me->reg._06h_Configuration_0);
 		if (status != Alx_Ok)
@@ -295,10 +295,10 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 		}
 	}
 
-	if (me->_OpenDrain_1.raw != 0b00000000)
+	if (me->regVal_OpenDrain_1.raw != 0b00000000)
 	{
-		mask = me->_OpenDrain_1.raw & me->reg._03h_OutputPort_1.val.raw;
-		me->reg._07h_Configuration_1.val.raw = (me->reg._07h_Configuration_1.val.raw & ~me->_OpenDrain_1.raw) | mask;
+		mask = me->regVal_OpenDrain_1.raw & me->reg._03h_OutputPort_1.val.raw;
+		me->reg._07h_Configuration_1.val.raw = (me->reg._07h_Configuration_1.val.raw & ~me->regVal_OpenDrain_1.raw) | mask;
 
 		status = AlxPca9539a_Reg_Write(me, &me->reg._07h_Configuration_1);
 		if (status != Alx_Ok)
@@ -661,8 +661,8 @@ static void AlxPca9539a_RegStruct_SetValToZero(AlxPca9539a* me)
 	me->reg._05h_PolarityInversion_1.val.raw = 0b00000000;
 	me->reg._06h_Configuration_0.val.raw = 0b00000000;
 	me->reg._07h_Configuration_1.val.raw = 0b00000000;
-	me->_OpenDrain_0.raw = 0b00000000;
-	me->_OpenDrain_1.raw = 0b00000000;
+	me->regVal_OpenDrain_0.raw = 0b00000000;
+	me->regVal_OpenDrain_1.raw = 0b00000000;
 }
 
 static void AlxPca9539a_RegStruct_SetValToDefault(AlxPca9539a* me)
@@ -675,8 +675,8 @@ static void AlxPca9539a_RegStruct_SetValToDefault(AlxPca9539a* me)
 	me->reg._05h_PolarityInversion_1	.val.raw = 0b00000000;
 	me->reg._06h_Configuration_0		.val.raw = 0b11111111;
 	me->reg._07h_Configuration_1		.val.raw = 0b11111111;
-	me->_OpenDrain_0.raw = 0b01000000;
-	me->_OpenDrain_1.raw = 0b00000000;
+	me->regVal_OpenDrain_0.raw = 0b01000000;
+	me->regVal_OpenDrain_1.raw = 0b00000000;
 }
 
 //******************************************************************************
