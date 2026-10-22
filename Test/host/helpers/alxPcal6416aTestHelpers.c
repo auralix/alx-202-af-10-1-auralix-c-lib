@@ -39,6 +39,7 @@ AlxPcal6416aTest_Obj* AlxPcal6416aTest_New(void);
 void AlxPcal6416aTest_Delete(AlxPcal6416aTest_Obj* me);
 AlxPcal6416a* AlxPcal6416aTest_Pcal(AlxPcal6416aTest_Obj* me);
 int32_t AlxPcal6416aTest_TriState(const char* name);
+int32_t AlxPcal6416aTest_Pull(const char* name);
 int32_t AlxPcal6416aTest_Status_Ok(void);
 int32_t AlxPcal6416aTest_Status_Err(void);
 
@@ -66,6 +67,13 @@ AlxPcal6416a* AlxPcal6416aTest_Pcal(AlxPcal6416aTest_Obj* me)		{ return &me->pca
 int32_t AlxPcal6416aTest_Status_Ok(void)								{ return (int32_t)Alx_Ok; }
 int32_t AlxPcal6416aTest_Status_Err(void)								{ return (int32_t)Alx_Err; }
 
+int32_t AlxPcal6416aTest_Pull(const char* name)
+{
+	if (strcmp(name, "None") == 0) { return 0; }	// AlxPcal6416a_Pull_None - the enumeration is private to the module
+	if (strcmp(name, "Up") == 0) { return 1; }	// AlxPcal6416a_Pull_Up
+	if (strcmp(name, "Down") == 0) { return 2; }	// AlxPcal6416a_Pull_Down
+	return 99;	// outside the enumeration
+}
 int32_t AlxPcal6416aTest_TriState(const char* name)
 {
 	if (strcmp(name, "HiZ") == 0) { return (int32_t)AlxIoPin_TriState_HiZ; }

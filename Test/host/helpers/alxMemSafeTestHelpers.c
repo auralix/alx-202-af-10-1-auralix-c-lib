@@ -479,6 +479,8 @@ double AlxParamItemMetaTest_GetValF(AlxParamItemMetaTest_Ctx* ctx);
 int32_t AlxParamItemMetaTest_SetValI(AlxParamItemMetaTest_Ctx* ctx, int64_t val);
 int32_t AlxParamItemMetaTest_SetValF(AlxParamItemMetaTest_Ctx* ctx, double val);
 void AlxParamItemMetaTest_SetValToDef(AlxParamItemMetaTest_Ctx* ctx);
+int32_t AlxParamItemMetaTest_GetStrFormat(AlxParamItemMetaTest_Ctx* ctx, char* out, uint32_t maxLenWithNullTerm);
+int32_t AlxParamItemMetaTest_SetStrFormat(AlxParamItemMetaTest_Ctx* ctx, const char* val);
 
 AlxParamItemMetaTest_Ctx* AlxParamItemMetaTest_New(uint32_t dataType, const char* key, uint32_t id, const char* groupKey, uint32_t groupId, int64_t defI, int64_t minI, int64_t maxI, double defF, double minF, double maxF, uint32_t outOfRange, const char* valUnit, bool afterReset)
 {
@@ -758,6 +760,19 @@ int32_t AlxParamItemMetaTest_SetValF(AlxParamItemMetaTest_Ctx* ctx, double val)
 void AlxParamItemMetaTest_SetValToDef(AlxParamItemMetaTest_Ctx* ctx)
 {
 	AlxParamItem_SetValToDef(&ctx->item);
+}
+int32_t AlxParamItemMetaTest_GetStrFormat(AlxParamItemMetaTest_Ctx* ctx, char* out, uint32_t maxLenWithNullTerm)
+{
+	Alx_Status status = AlxParamItem_GetVal_StrFormat(&ctx->item, out, maxLenWithNullTerm);
+	return (int32_t)status;
+}
+int32_t AlxParamItemMetaTest_SetStrFormat(AlxParamItemMetaTest_Ctx* ctx, const char* val)
+{
+	char scratch[64];
+	strncpy(scratch, val, sizeof(scratch) - 1);
+	scratch[sizeof(scratch) - 1] = '\0';
+	Alx_Status status = AlxParamItem_SetVal_StrFormat(&ctx->item, scratch);
+	return (int32_t)status;
 }
 
 #define ALX_PARAM_ITEM_META_ENUM_MAX 16
@@ -1060,9 +1075,15 @@ double AlxParamItemEnumTest_GetValF(AlxParamItemEnumTest_Ctx* ctx)
 
 int32_t AlxMemSafeTest_Status_ErrEnum(void);
 int32_t AlxMemSafeTest_Status_ErrConv(void);
+int32_t AlxMemSafeTest_Status_BoundErrMax(void);
+int32_t AlxMemSafeTest_Status_BoundErrLen(void);
+int32_t AlxMemSafeTest_Status_RangeErrMax(void);
 
 int32_t AlxMemSafeTest_Status_ErrEnum(void)					{ return (int32_t)AlxParamItem_ErrEnum; }
 int32_t AlxMemSafeTest_Status_ErrConv(void)					{ return (int32_t)AlxParamItem_ErrConv; }
+int32_t AlxMemSafeTest_Status_BoundErrMax(void)				{ return (int32_t)AlxBound_ErrMax; }
+int32_t AlxMemSafeTest_Status_BoundErrLen(void)				{ return (int32_t)AlxBound_ErrLen; }
+int32_t AlxMemSafeTest_Status_RangeErrMax(void)				{ return (int32_t)AlxRange_ErrMax; }
 
 
 //------------------------------------------------------------------------------
@@ -1099,6 +1120,9 @@ typedef struct
 
 AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewArr(const uint8_t* valDef, uint32_t valBuffLen, const char* key, const char* valUnit);
 AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewStr(const char* valDef, uint32_t buffLen, const char* key, const char* valUnit);
+AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewStrWith(const char* valDef, uint32_t buffLen, const char* key, const char* valUnit, uint32_t outOfRange);
+int32_t AlxParamItemBuffTest_GetStrFormat(AlxParamItemBuffTest_Ctx* ctx, char* out, uint32_t maxLenWithNullTerm);
+int32_t AlxParamItemBuffTest_SetStrFormat(AlxParamItemBuffTest_Ctx* ctx, const char* val);
 void AlxParamItemBuffTest_Delete(AlxParamItemBuffTest_Ctx* ctx);
 uint32_t AlxParamItemBuffTest_GetBuffLen(AlxParamItemBuffTest_Ctx* ctx);
 uint32_t AlxParamItemBuffTest_GetValLen(AlxParamItemBuffTest_Ctx* ctx);
@@ -1137,6 +1161,10 @@ AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewArr(const uint8_t* valDef, uin
 
 AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewStr(const char* valDef, uint32_t buffLen, const char* key, const char* valUnit)
 {
+	return AlxParamItemBuffTest_NewStrWith(valDef, buffLen, key, valUnit, (uint32_t)AlxParamItem_Ignore);
+}
+AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewStrWith(const char* valDef, uint32_t buffLen, const char* key, const char* valUnit, uint32_t outOfRange)
+{
 	if (buffLen > ALX_PARAM_ITEM_BUFF_MAX)
 	{
 		return NULL;
@@ -1152,7 +1180,7 @@ AlxParamItemBuffTest_Ctx* AlxParamItemBuffTest_NewStr(const char* valDef, uint32
 	strncpy(ctx->unit, valUnit, ALX_PARAM_ITEM_BUFF_MAX - 1);
 
 	AlxParamItem_CtorStr(&ctx->item, NULL, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
-		ctx->strDef, AlxParamItem_Ignore, ctx->unit, false, ctx->valBuff, buffLen);
+		ctx->strDef, (AlxParamItem_ValOutOfRangeHandle)outOfRange, ctx->unit, false, ctx->valBuff, buffLen);
 	return ctx;
 }
 
@@ -1220,6 +1248,19 @@ const char* AlxParamItemBuffTest_GetValDefStr(AlxParamItemBuffTest_Ctx* ctx)
 void AlxParamItemBuffTest_SetValToDef(AlxParamItemBuffTest_Ctx* ctx)
 {
 	AlxParamItem_SetValToDef(&ctx->item);
+}
+int32_t AlxParamItemBuffTest_GetStrFormat(AlxParamItemBuffTest_Ctx* ctx, char* out, uint32_t maxLenWithNullTerm)
+{
+	Alx_Status status = AlxParamItem_GetVal_StrFormat(&ctx->item, out, maxLenWithNullTerm);
+	return (int32_t)status;
+}
+int32_t AlxParamItemBuffTest_SetStrFormat(AlxParamItemBuffTest_Ctx* ctx, const char* val)
+{
+	char scratch[ALX_PARAM_ITEM_BUFF_MAX];
+	strncpy(scratch, val, ALX_PARAM_ITEM_BUFF_MAX - 1);
+	scratch[ALX_PARAM_ITEM_BUFF_MAX - 1] = '\0';
+	Alx_Status status = AlxParamItem_SetVal_StrFormat(&ctx->item, scratch);
+	return (int32_t)status;
 }
 
 
@@ -1440,9 +1481,19 @@ typedef struct
 	AlxParamItem_DataType dataType;
 	uint8_t storeStandIn;	// never dereferenced - only its address travels
 	char key[48];
+	char strDef[32];		// a Str item's default and the buffer it is lent (A97)
+	uint8_t strBuff[32];
+	uint8_t arrDefSrc[16];	// an Arr item's default and the two buffers it is lent (A97)
+	uint8_t arrBuff[16];
+	uint8_t arrDefBuff[16];
 } AlxParamItemKvTest_Ctx;
 
 AlxParamItemKvTest_Ctx* AlxParamItemKvTest_New(uint32_t dataType, const char* key, int64_t valDef);
+AlxParamItemKvTest_Ctx* AlxParamItemKvTest_NewRanged(uint32_t dataType, const char* key, int64_t valDef, int64_t valMin, int64_t valMax);
+AlxParamItemKvTest_Ctx* AlxParamItemKvTest_NewStr(const char* key, const char* valDef);
+AlxParamItemKvTest_Ctx* AlxParamItemKvTest_NewArr(const char* key, const uint8_t* valDef, uint32_t len, uint32_t outOfRange);
+int32_t AlxParamItemKvTest_GetStr(AlxParamItemKvTest_Ctx* ctx, char* out, uint32_t maxLenWithNullTerm);
+void AlxParamItemKvTest_GetArr(AlxParamItemKvTest_Ctx* ctx, uint8_t* out);
 void AlxParamItemKvTest_Delete(AlxParamItemKvTest_Ctx* ctx);
 int32_t AlxParamItemKvTest_LoadVal(AlxParamItemKvTest_Ctx* ctx);
 int32_t AlxParamItemKvTest_StoreVal(AlxParamItemKvTest_Ctx* ctx);
@@ -1451,6 +1502,18 @@ int64_t AlxParamItemKvTest_GetVal(AlxParamItemKvTest_Ctx* ctx);
 const char* AlxParamItemKvTest_GetKey(AlxParamItemKvTest_Ctx* ctx);
 
 AlxParamItemKvTest_Ctx* AlxParamItemKvTest_New(uint32_t dataType, const char* key, int64_t valDef)
+{
+	// the whole range of the type, as before A97: a stored record is never out of range
+	switch ((AlxParamItem_DataType)dataType)
+	{
+		case AlxParamItem_Uint8:	return AlxParamItemKvTest_NewRanged(dataType, key, valDef, 0, 255);
+		case AlxParamItem_Uint16:	return AlxParamItemKvTest_NewRanged(dataType, key, valDef, 0, 65535);
+		case AlxParamItem_Uint32:	return AlxParamItemKvTest_NewRanged(dataType, key, valDef, 0, 4294967295);
+		case AlxParamItem_Int32:	return AlxParamItemKvTest_NewRanged(dataType, key, valDef, -2147483647 - 1, 2147483647);
+		default:					return NULL;
+	}
+}
+AlxParamItemKvTest_Ctx* AlxParamItemKvTest_NewRanged(uint32_t dataType, const char* key, int64_t valDef, int64_t valMin, int64_t valMax)
 {
 	AlxParamItemKvTest_Ctx* ctx = calloc(1, sizeof(AlxParamItemKvTest_Ctx));
 	if (ctx == NULL)
@@ -1465,19 +1528,19 @@ AlxParamItemKvTest_Ctx* AlxParamItemKvTest_New(uint32_t dataType, const char* ke
 	{
 		case AlxParamItem_Uint8:
 			AlxParamItem_CtorUint8(&ctx->item, store, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
-				(uint8_t)valDef, 0, 255, AlxParamItem_Ignore, false, NULL, 0, "", false);
+				(uint8_t)valDef, (uint8_t)valMin, (uint8_t)valMax, AlxParamItem_Ignore, false, NULL, 0, "", false);
 			break;
 		case AlxParamItem_Uint16:
 			AlxParamItem_CtorUint16(&ctx->item, store, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
-				(uint16_t)valDef, 0, 65535, AlxParamItem_Ignore, false, NULL, 0, "", false);
+				(uint16_t)valDef, (uint16_t)valMin, (uint16_t)valMax, AlxParamItem_Ignore, false, NULL, 0, "", false);
 			break;
 		case AlxParamItem_Uint32:
 			AlxParamItem_CtorUint32(&ctx->item, store, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
-				(uint32_t)valDef, 0, 4294967295u, AlxParamItem_Ignore, false, NULL, 0, "", false);
+				(uint32_t)valDef, (uint32_t)valMin, (uint32_t)valMax, AlxParamItem_Ignore, false, NULL, 0, "", false);
 			break;
 		case AlxParamItem_Int32:
 			AlxParamItem_CtorInt32(&ctx->item, store, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
-				(int32_t)valDef, -2147483647 - 1, 2147483647, AlxParamItem_Ignore, false, NULL, 0, "", false);
+				(int32_t)valDef, (int32_t)valMin, (int32_t)valMax, AlxParamItem_Ignore, false, NULL, 0, "", false);
 			break;
 		case AlxParamItem_Uint64:
 		case AlxParamItem_Int8:
@@ -1495,6 +1558,51 @@ AlxParamItemKvTest_Ctx* AlxParamItemKvTest_New(uint32_t dataType, const char* ke
 	return ctx;
 }
 
+AlxParamItemKvTest_Ctx* AlxParamItemKvTest_NewStr(const char* key, const char* valDef)
+{
+	AlxParamItemKvTest_Ctx* ctx = calloc(1, sizeof(AlxParamItemKvTest_Ctx));
+	if (ctx == NULL)
+	{
+		return NULL;
+	}
+	ctx->dataType = AlxParamItem_Str;
+	strncpy(ctx->key, key, sizeof(ctx->key) - 1);
+	strncpy(ctx->strDef, valDef, sizeof(ctx->strDef) - 1);
+
+	AlxParamKvStore* store = (AlxParamKvStore*)(void*)&ctx->storeStandIn;
+	AlxParamItem_CtorStr(&ctx->item, store, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
+		ctx->strDef, AlxParamItem_Ignore, "", false, ctx->strBuff, sizeof(ctx->strBuff));
+	return ctx;
+}
+AlxParamItemKvTest_Ctx* AlxParamItemKvTest_NewArr(const char* key, const uint8_t* valDef, uint32_t len, uint32_t outOfRange)
+{
+	if (len > 16)	// the three Arr buffers of the context
+	{
+		return NULL;
+	}
+	AlxParamItemKvTest_Ctx* ctx = calloc(1, sizeof(AlxParamItemKvTest_Ctx));
+	if (ctx == NULL)
+	{
+		return NULL;
+	}
+	ctx->dataType = AlxParamItem_Arr;
+	strncpy(ctx->key, key, sizeof(ctx->key) - 1);
+	memcpy(ctx->arrDefSrc, valDef, len);
+
+	AlxParamKvStore* store = (AlxParamKvStore*)(void*)&ctx->storeStandIn;
+	AlxParamItem_CtorArr(&ctx->item, store, AlxParamItem_Param, ctx->key, 0, "GRP", 0,
+		ctx->arrDefSrc, ctx->arrBuff, ctx->arrDefBuff, len, (AlxParamItem_ValOutOfRangeHandle)outOfRange, "", false);
+	return ctx;
+}
+int32_t AlxParamItemKvTest_GetStr(AlxParamItemKvTest_Ctx* ctx, char* out, uint32_t maxLenWithNullTerm)
+{
+	Alx_Status status = AlxParamItem_GetValStr(&ctx->item, out, maxLenWithNullTerm);
+	return (int32_t)status;
+}
+void AlxParamItemKvTest_GetArr(AlxParamItemKvTest_Ctx* ctx, uint8_t* out)
+{
+	AlxParamItem_GetValArr(&ctx->item, out);
+}
 void AlxParamItemKvTest_Delete(AlxParamItemKvTest_Ctx* ctx)
 {
 	free(ctx);

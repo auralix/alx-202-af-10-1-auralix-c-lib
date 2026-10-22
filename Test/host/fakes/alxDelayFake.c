@@ -23,6 +23,7 @@
 //******************************************************************************
 static uint32_t alxDelayFake_msCount;
 static uint32_t alxDelayFake_usCount;
+static void (*alxDelayFake_onDelay)(uint64_t delay_ms) = NULL;	// a test's own clock, if it has one (A97)
 
 
 //******************************************************************************
@@ -31,6 +32,7 @@ static uint32_t alxDelayFake_usCount;
 void AlxDelayFake_Reset(void);
 uint32_t AlxDelayFake_MsCount(void);
 uint32_t AlxDelayFake_UsCount(void);
+void AlxDelayFake_SetOnDelay(void (*onDelay)(uint64_t delay_ms));
 
 
 //******************************************************************************
@@ -40,6 +42,7 @@ void AlxDelayFake_Reset(void)
 {
 	alxDelayFake_msCount = 0;
 	alxDelayFake_usCount = 0;
+	alxDelayFake_onDelay = NULL;
 }
 
 uint32_t AlxDelayFake_MsCount(void)
@@ -51,6 +54,12 @@ uint32_t AlxDelayFake_UsCount(void)
 {
 	return alxDelayFake_usCount;
 }
+void AlxDelayFake_SetOnDelay(void (*onDelay)(uint64_t delay_ms))
+{
+	// Called with every millisecond delay: a helper that owns a clock advances it, so a driver that
+	// waits in a loop reaches its timeout. NULL, the default, lets no time pass.
+	alxDelayFake_onDelay = onDelay;
+}
 
 
 //******************************************************************************
@@ -58,8 +67,11 @@ uint32_t AlxDelayFake_UsCount(void)
 //******************************************************************************
 void AlxDelay_ms(uint64_t delay_ms)
 {
-	(void)delay_ms;
 	alxDelayFake_msCount++;
+	if (alxDelayFake_onDelay != NULL)
+	{
+		alxDelayFake_onDelay(delay_ms);
+	}
 }
 
 void AlxDelay_us(uint64_t delay_us)

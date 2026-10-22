@@ -182,7 +182,13 @@ class CliLib:
         self.c = c
         _register_lib(c)
         c.AlxCliTest_New.restype = ctypes.c_void_p
+        c.AlxCliTest_NewWithId.restype = ctypes.c_void_p
         c.AlxCliTest_Delete.argtypes = [ctypes.c_void_p]
+        c.AlxCliTest_PrepareEvent.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32]
+        c.AlxCliTest_PrepareResponse.argtypes = [ctypes.c_void_p, ctypes.c_int32]
+        c.AlxCliTest_Buff.restype = ctypes.c_char_p
+        c.AlxCliTest_Buff.argtypes = [ctypes.c_void_p]
+        c.AlxIdFake_SetFwIsBootUsed.argtypes = [ctypes.c_bool]
         c.AlxCliTest_Handle.argtypes = [ctypes.c_void_p]
         c.AlxCliTest_Port.restype = ctypes.c_void_p
         c.AlxCliTest_Port.argtypes = [ctypes.c_void_p]
@@ -223,6 +229,19 @@ class CliUnderTest:
 
     def handle(self):
         self._l.c.AlxCliTest_Handle(self.ctx)
+
+    def prepare_event(self, data: bytes) -> None:
+        """An event the next Handle writes before it reads a command."""
+        self._l.c.AlxCliTest_PrepareEvent(self.ctx, data, len(data))
+
+    def prepare_response(self, response_type: int) -> bytes:
+        """AlxCli_PrepareResponse, the response a product's callback would send: what it put in the buffer."""
+        self._l.c.AlxCliTest_PrepareResponse(self.ctx, response_type)
+        return self._l.c.AlxCliTest_Buff(self.ctx) or b""
+
+    def boot_used(self, used: bool) -> None:
+        """Whether the identity the id command reads carries a bootloader (the ID fake)."""
+        self._l.c.AlxIdFake_SetFwIsBootUsed(used)
 
     def tx(self) -> bytes:
         out = b""
@@ -349,6 +368,10 @@ class MemSafeLib:
         c.AlxParamItemMetaTest_SetValI.argtypes = [vp, i64]
         c.AlxParamItemMetaTest_SetValF.restype = i32
         c.AlxParamItemMetaTest_SetValF.argtypes = [vp, f64]
+        c.AlxParamItemMetaTest_GetStrFormat.restype = i32
+        c.AlxParamItemMetaTest_GetStrFormat.argtypes = [vp, cp, u32]
+        c.AlxParamItemMetaTest_SetStrFormat.restype = i32
+        c.AlxParamItemMetaTest_SetStrFormat.argtypes = [vp, cp]
         # the enum-list shim: the item carries a copy of the list it was built from
         c.AlxParamItemEnumTest_New.restype = vp
         c.AlxParamItemEnumTest_New.argtypes = [u32, ctypes.POINTER(i64), ctypes.POINTER(f64),
@@ -376,6 +399,12 @@ class MemSafeLib:
         c.AlxParamItemBuffTest_NewArr.argtypes = [cp, u32, cp, cp]
         c.AlxParamItemBuffTest_NewStr.restype = vp
         c.AlxParamItemBuffTest_NewStr.argtypes = [cp, u32, cp, cp]
+        c.AlxParamItemBuffTest_NewStrWith.restype = vp
+        c.AlxParamItemBuffTest_NewStrWith.argtypes = [cp, u32, cp, cp, u32]
+        c.AlxParamItemBuffTest_GetStrFormat.restype = i32
+        c.AlxParamItemBuffTest_GetStrFormat.argtypes = [vp, cp, u32]
+        c.AlxParamItemBuffTest_SetStrFormat.restype = i32
+        c.AlxParamItemBuffTest_SetStrFormat.argtypes = [vp, cp]
         c.AlxParamItemBuffTest_Delete.argtypes = [vp]
         for name in ("GetBuffLen", "GetValLen", "GetDataType"):
             fn = getattr(c, f"AlxParamItemBuffTest_{name}")
@@ -422,6 +451,15 @@ class MemSafeLib:
         c.AlxParamItemKvTest_GetVal.argtypes = [vp]
         c.AlxParamItemKvTest_GetKey.restype = cp
         c.AlxParamItemKvTest_GetKey.argtypes = [vp]
+        c.AlxParamItemKvTest_NewRanged.restype = vp
+        c.AlxParamItemKvTest_NewRanged.argtypes = [u32, cp, i64, i64, i64]
+        c.AlxParamItemKvTest_NewStr.restype = vp
+        c.AlxParamItemKvTest_NewStr.argtypes = [cp, cp]
+        c.AlxParamItemKvTest_NewArr.restype = vp
+        c.AlxParamItemKvTest_NewArr.argtypes = [cp, cp, u32, u32]
+        c.AlxParamItemKvTest_GetStr.restype = i32
+        c.AlxParamItemKvTest_GetStr.argtypes = [vp, cp, u32]
+        c.AlxParamItemKvTest_GetArr.argtypes = [vp, cp]
         c.AlxParamKvStoreFake_Reset.argtypes = []
         for name in ("Enable", "FailGet", "FailSet"):
             getattr(c, f"AlxParamKvStoreFake_{name}").argtypes = [ctypes.c_bool]
@@ -461,6 +499,9 @@ class MemSafeLib:
         self.A_ERR_B_OK_USE_B = status("AErrBOk_UseB")
         self.ERR_ENUM = status("ErrEnum")
         self.ERR_CONV = status("ErrConv")
+        self.BOUND_ERR_MAX = status("BoundErrMax")
+        self.BOUND_ERR_LEN = status("BoundErrLen")
+        self.RANGE_ERR_MAX = status("RangeErrMax")
         self.COPY_LEN = c.AlxMemSafeTest_CopyLen()
         self.NUM_ITEMS = c.AlxMemSafeTest_NumOfItems()
 
@@ -535,6 +576,15 @@ class MemSafeLib:
     def meta_set_val_to_def(self, ctx) -> None:
         self.c.AlxParamItemMetaTest_SetValToDef(ctx)
 
+    def meta_get_str_format(self, ctx, size: int = 64) -> tuple[int, str]:
+        """AlxParamItem_GetVal_StrFormat on an item of any scalar type."""
+        out = ctypes.create_string_buffer(size)
+        status = self.c.AlxParamItemMetaTest_GetStrFormat(ctx, out, size)
+        return status, out.value.decode("ascii", "replace")
+
+    def meta_set_str_format(self, ctx, val: str) -> int:
+        return self.c.AlxParamItemMetaTest_SetStrFormat(ctx, val.encode("ascii"))
+
     # -- an item that declares the LIST of values it will accept ---------------
 
     def enum_new(self, data_type: int, values, val_def: float = 0, val_min: float = 0,
@@ -583,6 +633,13 @@ class MemSafeLib:
         return self.c.AlxParamItemBuffTest_NewStr(val_def.encode("ascii"), buff_len,
                                                   key.encode("ascii"), unit.encode("ascii"))
 
+    def buff_new_str_with(self, val_def: str, buff_len: int, out_of_range: int, key: str = "STR",
+                          unit: str = ""):
+        """A Str item with the out-of-range handle of the test's choosing (buff_new_str: Ignore)."""
+        return self.c.AlxParamItemBuffTest_NewStrWith(val_def.encode("ascii"), buff_len,
+                                                      key.encode("ascii"), unit.encode("ascii"),
+                                                      out_of_range)
+
     def buff_delete(self, ctx) -> None:
         self.c.AlxParamItemBuffTest_Delete(ctx)
 
@@ -613,6 +670,15 @@ class MemSafeLib:
 
     def buff_set_val_to_def(self, ctx) -> None:
         self.c.AlxParamItemBuffTest_SetValToDef(ctx)
+
+    def buff_get_str_format(self, ctx, size: int = 64) -> tuple[int, str]:
+        """AlxParamItem_GetVal_StrFormat on an Arr or a Str item."""
+        out = ctypes.create_string_buffer(size)
+        status = self.c.AlxParamItemBuffTest_GetStrFormat(ctx, out, size)
+        return status, out.value.decode("ascii", "replace")
+
+    def buff_set_str_format(self, ctx, val: str) -> int:
+        return self.c.AlxParamItemBuffTest_SetStrFormat(ctx, val.encode("ascii"))
 
     # -- a parameter store with more than one group ----------------------------
 
@@ -682,6 +748,26 @@ class MemSafeLib:
 
     def kv_item_new(self, data_type: int, key: str = "KV_KEY", val_def: int = 0):
         return self.c.AlxParamItemKvTest_New(data_type, key.encode("ascii"), val_def)
+
+    def kv_item_new_ranged(self, data_type: int, key: str, val_def: int, val_min: int, val_max: int):
+        """The same item with a range narrower than its type, so a stored record can fall outside it."""
+        return self.c.AlxParamItemKvTest_NewRanged(data_type, key.encode("ascii"), val_def, val_min, val_max)
+
+    def kv_item_new_str(self, key: str, val_def: str):
+        return self.c.AlxParamItemKvTest_NewStr(key.encode("ascii"), val_def.encode("ascii"))
+
+    def kv_item_new_arr(self, key: str, val_def: bytes, out_of_range: int = 1):
+        return self.c.AlxParamItemKvTest_NewArr(key.encode("ascii"), val_def, len(val_def), out_of_range)
+
+    def kv_get_str(self, ctx, size: int = 64) -> tuple[int, str]:
+        out = ctypes.create_string_buffer(size)
+        status = self.c.AlxParamItemKvTest_GetStr(ctx, out, size)
+        return status, out.value.decode("ascii", "replace")
+
+    def kv_get_arr(self, ctx, length: int) -> bytes:
+        out = ctypes.create_string_buffer(length)
+        self.c.AlxParamItemKvTest_GetArr(ctx, out)
+        return out.raw[:length]
 
     def kv_item_delete(self, ctx) -> None:
         self.c.AlxParamItemKvTest_Delete(ctx)
@@ -1763,11 +1849,19 @@ class Ina228Lib:
                                ctypes.c_uint8, ctypes.c_uint32)
         c.AlxIna228Test_New.restype = vp
         c.AlxIna228Test_New.argtypes = [i32, f, f]
+        c.AlxIna228Test_NewRaw.restype = vp
+        c.AlxIna228Test_NewRaw.argtypes = [i32, f, f]
+        for name in ("InitPeriph", "DeInitPeriph", "Init", "DeInit", "ResetSystem"):
+            fn = getattr(c, f"AlxIna228_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
+        c.AlxI2cFake_FailAt.argtypes = [u32]
         c.AlxIna228Test_Delete.argtypes = [vp]
         c.AlxIna228Test_CurrentLsb_A.restype = f
         c.AlxIna228Test_CurrentLsb_A.argtypes = [vp]
         c.AlxIna228Test_ShuntCal.restype = ctypes.c_uint16
         c.AlxIna228Test_ShuntCal.argtypes = [vp]
+        c.AlxIna228Test_SetConfigAdcRange.argtypes = [vp, i32]
         for name in ("AdcRange_163_84_mV", "AdcRange_40_96_mV", "Status_Ok", "Status_Err"):
             getattr(c, f"AlxIna228Test_{name}").restype = i32
         for name in ("GetShuntVoltage_V", "GetBusVoltage_V", "GetTemp_degC", "GetCurrent_A",
@@ -1799,9 +1893,29 @@ class Ina228Lib:
         self._handles.append(handle)
         return handle
 
+    def sensor_raw(self, adc_range: int, shunt_ohm: float, shunt_ppm: float = 200.0):
+        """A constructed sensor, NOT initialised, the fake bus cleared: the test drives the lifecycle."""
+        self.c.AlxI2cFake_Reset()
+        handle = self.c.AlxIna228Test_NewRaw(adc_range, shunt_ohm, shunt_ppm)
+        assert handle, "AlxIna228Test_NewRaw returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def lifecycle(self, sensor, step: str) -> int:
+        """``InitPeriph``, ``Init``, ``DeInit``, ``DeInitPeriph`` or ``ResetSystem``: the status it answers."""
+        return getattr(self.c, f"AlxIna228_{step}")(sensor)
+
+    def fail_at(self, nth: int) -> None:
+        """The nth bus call from now fails; 0 disarms."""
+        self.c.AlxI2cFake_FailAt(nth)
+
     def current_lsb(self, sensor) -> float:
         """Amps per count of the CURRENT register - what the reading's resolution is."""
         return self.c.AlxIna228Test_CurrentLsb_A(sensor)
+
+    def config_adc_range(self, sensor, adc_range: int) -> None:
+        """CONFIG's ADCRANGE in the driver's shadow, as a product's register hook sets it."""
+        self.c.AlxIna228Test_SetConfigAdcRange(sensor, adc_range)
 
     def shunt_cal(self, sensor) -> int:
         """The value the driver computes for the part's SHUNT_CAL register."""
@@ -1870,6 +1984,12 @@ class Pi4ioeLib:
             getattr(c, f"AlxPi4ioeTest_{name}").restype = i32
         c.AlxPi4ioe5v6534q_Handle.restype = i32
         c.AlxPi4ioe5v6534q_Handle.argtypes = [vp, u8, u8]
+        c.AlxPi4ioeTest_NewRaw.restype = vp
+        c.AlxPi4ioeTest_NewRaw.argtypes = [u8]
+        for name in ("InitPeriph", "DeInitPeriph", "Init", "DeInit"):
+            fn = getattr(c, f"AlxPi4ioe5v6534q_{name}")
+            fn.restype = i32
+            fn.argtypes = [vp]
         c.AlxPi4ioe5v6534q_IoPin_Read.restype = b
         c.AlxPi4ioe5v6534q_IoPin_Read.argtypes = [vp, u8, u8]
         c.AlxPi4ioe5v6534q_IoPin_Write.argtypes = [vp, u8, u8, b]
@@ -1882,6 +2002,7 @@ class Pi4ioeLib:
             fn.restype = u32
             fn.argtypes = [u8]
         c.AlxI2cFake_SetForcedStatus.argtypes = [i32]
+        c.AlxI2cFake_FailAt.argtypes = [u32]
         c.AlxIoPinFake_Level.restype = b
         c.AlxIoPinFake_Level.argtypes = [vp]
         for name in ("InitCount", "DeInitCount", "WriteCount"):
@@ -1901,6 +2022,23 @@ class Pi4ioeLib:
         assert handle, "the driver refused to initialise over the fakes"
         self._handles.append(handle)
         return handle
+
+    def expander_raw(self, i2c_addr: int = 0x40):
+        """A constructed expander, NOT initialised, both fakes cleared: the test drives the lifecycle."""
+        self.c.AlxI2cFake_Reset()
+        self.c.AlxIoPinFake_Reset()
+        handle = self.c.AlxPi4ioeTest_NewRaw(i2c_addr)
+        assert handle, "AlxPi4ioeTest_NewRaw returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def lifecycle(self, dev, step: str) -> int:
+        """``InitPeriph``, ``Init``, ``DeInit`` or ``DeInitPeriph``: the status it answers."""
+        return getattr(self.c, f"AlxPi4ioe5v6534q_{step}")(dev)
+
+    def fail_at(self, nth: int) -> None:
+        """The nth bus call from now fails; 0 disarms."""
+        self.c.AlxI2cFake_FailAt(nth)
 
     # -- the driver -----------------------------------------------------------
     def addresses(self, dev) -> tuple[int, int]:
@@ -3094,6 +3232,7 @@ class _I2cFakeBus:
     def _bus_types(self) -> None:
         c, u8, u32 = self.c, ctypes.c_uint8, ctypes.c_uint32
         c.AlxI2cFake_SetReg.argtypes = [u8, ctypes.POINTER(u8), u8]
+        c.AlxI2cFake_SetRegNext.argtypes = [u8, ctypes.POINTER(u8), u8]
         c.AlxI2cFake_GetLastWrite.argtypes = [u8, ctypes.POINTER(u8), u8]
         for name in ("WriteCount", "ReadCount"):
             fn = getattr(c, f"AlxI2cFake_{name}")
@@ -3101,6 +3240,8 @@ class _I2cFakeBus:
             fn.argtypes = [u8]
         c.AlxI2cFake_SetSlaveReady.argtypes = [ctypes.c_bool]
         c.AlxI2cFake_SetForcedStatus.argtypes = [ctypes.c_int32]
+        c.AlxI2cFake_FailAt.argtypes = [u32]
+        c.AlxI2cFake_CallCount.restype = u32
 
     def bus_reset(self) -> None:
         """Every register zero, every count zero, the slave ready, no forced status."""
@@ -3109,6 +3250,11 @@ class _I2cFakeBus:
     def set_register(self, addr: int, data: bytes) -> None:
         buff = (ctypes.c_uint8 * len(data))(*data)
         self.c.AlxI2cFake_SetReg(addr, buff, len(data))
+
+    def set_register_next(self, addr: int, data: bytes) -> None:
+        """What the NEXT read of the register answers; the reads after it answer the register again."""
+        buff = (ctypes.c_uint8 * len(data))(*data)
+        self.c.AlxI2cFake_SetRegNext(addr, buff, len(data))
 
     def last_write(self, addr: int, length: int) -> bytes:
         buff = (ctypes.c_uint8 * length)()
@@ -3127,6 +3273,14 @@ class _I2cFakeBus:
     def force_status(self, status: int) -> None:
         """Every bus call from now on returns this status; Alx_Ok puts the bus back."""
         self.c.AlxI2cFake_SetForcedStatus(status)
+
+    def fail_at(self, nth: int) -> None:
+        """The nth bus call from now fails, the others answer as before; 0 disarms."""
+        self.c.AlxI2cFake_FailAt(nth)
+
+    def bus_calls(self) -> int:
+        """How many bus calls the drivers have made since the last reset."""
+        return self.c.AlxI2cFake_CallCount()
 
 
 class Tmp1075Lib(_I2cFakeBus):
@@ -3252,9 +3406,13 @@ class Pca9539aLib(_I2cFakeBus):
         vp, i32, u8, b = ctypes.c_void_p, ctypes.c_int32, ctypes.c_uint8, ctypes.c_bool
         c.AlxPca9539aTest_New.restype = vp
         c.AlxPca9539aTest_Delete.argtypes = [vp]
+        c.AlxPca9539aTest_NewOnBusOf.restype = vp
+        c.AlxPca9539aTest_NewOnBusOf.argtypes = [vp]
+        c.AlxPca9539aTest_SetOpenDrain.argtypes = [vp, u8, u8]
+        c.AlxPca9539a_RegStruct_SetVal.argtypes = [vp]
         c.AlxPca9539aTest_Pca.restype = vp
         c.AlxPca9539aTest_Pca.argtypes = [vp]
-        for name in ("Init", "DeInit", "Handle", "irqHandle"):
+        for name in ("Init", "DeInit", "Handle", "irqHandle", "InitPeriph", "DeInitPeriph"):
             fn = getattr(c, f"AlxPca9539a_{name}")
             fn.restype = i32
             fn.argtypes = [vp]
@@ -3278,11 +3436,26 @@ class Pca9539aLib(_I2cFakeBus):
         self._handles.append(handle)
         return handle
 
+    def new_on_bus_of(self, other):
+        """A second expander, constructed on the first one's bus, not initialised."""
+        handle = self.c.AlxPca9539aTest_NewOnBusOf(other)
+        assert handle, "AlxPca9539aTest_NewOnBusOf returned NULL"
+        self._handles.append(handle)
+        return handle
+
+    def open_drain(self, obj, port0: int, port1: int) -> None:
+        """The pins driven open-drain, a mask per port (the default is pin 6 of port 0)."""
+        self.c.AlxPca9539aTest_SetOpenDrain(obj, port0, port1)
+
+    def weak_set_val(self, obj) -> None:
+        """The library's own RegStruct_SetVal, the hook a product overrides."""
+        self.c.AlxPca9539a_RegStruct_SetVal(self._p(obj))
+
     def _p(self, obj):
         return self.c.AlxPca9539aTest_Pca(obj)
 
     def call(self, obj, name: str) -> int:
-        """Init, DeInit, Handle or irqHandle."""
+        """Init, DeInit, Handle, irqHandle, InitPeriph or DeInitPeriph."""
         return getattr(self.c, f"AlxPca9539a_{name}")(self._p(obj))
 
     def read(self, obj, port: int, pin: int) -> bool:
@@ -3319,6 +3492,9 @@ class Pcal6416aLib(_I2cFakeBus):
         c.AlxPcal6416aTest_Pcal.argtypes = [vp]
         c.AlxPcal6416aTest_TriState.restype = i32
         c.AlxPcal6416aTest_TriState.argtypes = [ctypes.c_char_p]
+        c.AlxPcal6416aTest_Pull.restype = i32
+        c.AlxPcal6416aTest_Pull.argtypes = [ctypes.c_char_p]
+        c.AlxPcal6416a_IoPin_ConfigPull.argtypes = [vp, u8, u8, i32]
         for name in ("InitPeriph", "DeInitPeriph", "Init", "DeInit"):
             fn = getattr(c, f"AlxPcal6416a_{name}")
             fn.restype = i32
@@ -3368,6 +3544,10 @@ class Pcal6416aLib(_I2cFakeBus):
         """Set, Reset or Toggle."""
         getattr(self.c, f"AlxPcal6416a_IoPin_{op}")(self._p(obj), port, pin)
 
+    def config_pull(self, obj, port: int, pin: int, pull: str) -> None:
+        """None, Up or Down - any other name is a pull outside the enumeration."""
+        self.c.AlxPcal6416a_IoPin_ConfigPull(self._p(obj), port, pin, self.c.AlxPcal6416aTest_Pull(pull.encode()))
+
     def read_tri_state(self, obj, port: int, pin: int) -> tuple[int, str]:
         out = ctypes.c_int32(-1)
         status = self.c.AlxPcal6416a_IoPin_Read_TriState(self._p(obj), port, pin, ctypes.byref(out))
@@ -3413,12 +3593,13 @@ class Lp586xLib(_I2cFakeBus):
         self.ERR = c.AlxLp586xTest_Status_Err()
         self._handles: list = []
 
-    def new(self, led_num_used: int = 108):
-        """A driver, constructed, its bus initialised."""
+    def new(self, led_num_used: int = 108, *, periph: bool = True):
+        """A driver, constructed, its bus initialised unless `periph` is false."""
         handle = self.c.AlxLp586xTest_New(led_num_used)
         assert handle, "AlxLp586xTest_New returned NULL"
         self._handles.append(handle)
-        assert self.call(handle, "InitPeriph") == self.OK
+        if periph:
+            assert self.call(handle, "InitPeriph") == self.OK
         return handle
 
     def _l(self, obj):
@@ -3472,10 +3653,19 @@ class _SpiFakeBus:
             getattr(c, f"AlxSpiFake_{name}").restype = u32
         c.AlxSpiFake_IsCsAsserted.restype = ctypes.c_bool
         c.AlxSpiFake_SetForcedStatus.argtypes = [ctypes.c_int32]
+        c.AlxSpiFake_FailAt.argtypes = [u32]
+        c.AlxSpiFake_CallCount.restype = u32
 
     def spi_reset(self) -> None:
         """Nothing sent, nothing queued, chip select released, no forced status."""
         self.c.AlxSpiFake_Reset()
+
+    def spi_fail_at(self, nth: int) -> None:
+        """The nth SPI call from now fails, the others answer as before; 0 disarms."""
+        self.c.AlxSpiFake_FailAt(nth)
+
+    def spi_calls(self) -> int:
+        return self.c.AlxSpiFake_CallCount()
 
     def queue_miso(self, data: bytes) -> None:
         buff = (ctypes.c_uint8 * len(data))(*data)
@@ -3519,6 +3709,13 @@ class Adxl355Lib(_SpiFakeBus):
         c.AlxAdxl355Test_Adxl.argtypes = [vp]
         c.AlxAdxl355Test_GetXyz_g.restype = i32
         c.AlxAdxl355Test_GetXyz_g.argtypes = [vp, ctypes.POINTER(f), ctypes.POINTER(f), ctypes.POINTER(f)]
+        c.AlxAdxl355Test_GetFifoXyz_g.restype = i32
+        c.AlxAdxl355Test_GetFifoXyz_g.argtypes = [vp, ctypes.c_uint8, ctypes.POINTER(f)]
+        c.AlxAdxl355Test_GetStatusRaw.restype = i32
+        c.AlxAdxl355Test_GetStatusRaw.argtypes = [vp, ctypes.POINTER(ctypes.c_uint8)]
+        c.AlxAdxl355Test_SetRange.argtypes = [vp, ctypes.c_uint8]
+        c.AlxAdxl355_GetFifoLen.restype = ctypes.c_uint8
+        c.AlxAdxl355_GetFifoLen.argtypes = [vp]
         for name in ("Init", "DeInit", "Enable", "Disable"):
             fn = getattr(c, f"AlxAdxl355_{name}")
             fn.restype = i32
@@ -3554,6 +3751,25 @@ class Adxl355Lib(_SpiFakeBus):
         out = ctypes.c_float()
         status = self.c.AlxAdxl355_GetTemp_degC(self._a(obj), ctypes.byref(out))
         return status, out.value
+
+    def fifo_xyz_g(self, obj, length: int) -> tuple[int, list[tuple[float, float, float]]]:
+        """`length` samples out of the FIFO: (status, [(x, y, z), ...])."""
+        out = (ctypes.c_float * (3 * length))()
+        status = self.c.AlxAdxl355Test_GetFifoXyz_g(obj, length, out)
+        return status, [tuple(out[3 * i:3 * i + 3]) for i in range(length)]
+
+    def status_reg(self, obj) -> tuple[int, int]:
+        """The status register's byte: (status, raw)."""
+        raw = ctypes.c_uint8(0xA5)
+        status = self.c.AlxAdxl355Test_GetStatusRaw(obj, ctypes.byref(raw))
+        return status, raw.value
+
+    def fifo_len(self, obj) -> int:
+        return self.c.AlxAdxl355_GetFifoLen(self._a(obj))
+
+    def set_range(self, obj, range_code: int) -> None:
+        """The full-scale range code the conversion reads: 1 is 2 g, 2 is 4 g, 3 is 8 g, 0 is reserved."""
+        self.c.AlxAdxl355Test_SetRange(obj, range_code)
 
     def free_all(self) -> None:
         for handle in self._handles:
@@ -3599,12 +3815,13 @@ class Ads8678Lib(_SpiFakeBus):
         buff = (ctypes.c_uint8 * self.NUM_OF_CH)(*ranges)
         self.c.AlxAds8678Test_SetConfig(auto_scan, feature_select, buff)
 
-    def new(self):
-        """A converter, constructed, its reset pin and bus initialised."""
+    def new(self, *, periph: bool = True):
+        """A converter, constructed, its reset pin and bus initialised unless `periph` is false."""
         handle = self.c.AlxAds8678Test_New()
         assert handle, "AlxAds8678Test_New returned NULL"
         self._handles.append(handle)
-        assert self.call(handle, "InitPeriph") == self.OK
+        if periph:
+            assert self.call(handle, "InitPeriph") == self.OK
         return handle
 
     def _a(self, obj):
@@ -3651,6 +3868,7 @@ class Ads114s08Lib(_SpiFakeBus):
         c.AlxAds114s08Test_Perform.restype = i32
         c.AlxAds114s08Test_Perform.argtypes = [vp, ctypes.POINTER(i16)]
         c.AlxAds114s08Test_MarkInit.argtypes = [vp]
+        c.AlxAds114s08Test_TimePasses.argtypes = [b]
         for name in ("InitPeriph", "DeInitPeriph", "Init", "DeInit"):
             fn = getattr(c, f"AlxAds114s08_{name}")
             fn.restype = i32
@@ -3675,15 +3893,25 @@ class Ads114s08Lib(_SpiFakeBus):
         self.c.AlxTick_Ctor(self.tick)
         self.c.AlxIrqFake_Reset()
 
-    def new(self):
-        """A converter, its pins and bus initialised, left as Init leaves it, data ready (nDRDY low)."""
+    def new(self, *, periph: bool = True):
+        """A converter, its pins and bus initialised, left as Init leaves it, data ready (nDRDY low);
+        with `periph` false only constructed."""
         handle = self.c.AlxAds114s08Test_New()
         assert handle, "AlxAds114s08Test_New returned NULL"
         self._handles.append(handle)
+        if not periph:
+            return handle
         assert self.call(handle, "InitPeriph") == self.OK
         self.c.AlxAds114s08Test_MarkInit(handle)
         self.c.AlxIoPinFake_SetLevel(self.c.AlxAds114s08Test_NDrdyPin(handle), False)
         return handle
+
+    def set_ndrdy(self, obj, level: bool) -> None:
+        self.c.AlxIoPinFake_SetLevel(self.c.AlxAds114s08Test_NDrdyPin(obj), level)
+
+    def time_passes(self, enable: bool = True) -> None:
+        """Whether the driver's millisecond delays move the clock (off after every reset of the delays)."""
+        self.c.AlxAds114s08Test_TimePasses(enable)
 
     def _a(self, obj):
         return self.c.AlxAds114s08Test_Ads(obj)
@@ -3747,6 +3975,7 @@ class Adau1961Lib(_I2cFakeBus):
                 fn.argtypes = [vp, i8]
         for name in ("InitCount", "DeInitCount", "HandleCount"):
             getattr(c, f"AlxI2sFake_{name}").restype = u32
+        c.AlxI2sFake_SetForcedStatus.argtypes = [i32]
         c.AlxAdau1961Test_Status_Ok.restype = i32
         c.AlxAdau1961Test_Status_Err.restype = i32
         self.OK = c.AlxAdau1961Test_Status_Ok()
@@ -3789,6 +4018,10 @@ class Adau1961Lib(_I2cFakeBus):
         vol, unmuted = ctypes.c_uint8(), ctypes.c_uint8()
         self.c.AlxAdau1961Test_OutLine(obj, right, ctypes.byref(vol), ctypes.byref(unmuted))
         return vol.value, unmuted.value
+
+    def i2s_answers(self, status: int) -> None:
+        """What the interface's Init answers from now on (0 is Alx_Ok)."""
+        self.c.AlxI2sFake_SetForcedStatus(status)
 
     def i2s_counts(self) -> tuple[int, int, int]:
         return (self.c.AlxI2sFake_InitCount(), self.c.AlxI2sFake_DeInitCount(), self.c.AlxI2sFake_HandleCount())
@@ -3844,6 +4077,7 @@ class Vnh7040Lib:
         c.AlxPwmFake_Duty_pct.argtypes = [vp, u32]
         c.AlxPwmFake_WriteCount.restype = u32
         c.AlxPwmFake_WriteCount.argtypes = [vp, u32]
+        c.AlxPwmFake_SetForcedStatus.argtypes = [i32]
         for name in ("InitCount", "DeInitCount"):
             fn = getattr(c, f"AlxIoPinFake_{name}")
             fn.restype = u32
@@ -3905,6 +4139,18 @@ class Vnh7040Lib:
         for _ in range(periods):
             self.advance_ms(1.0)
             self.c.AlxVnh7040_Handle(self._v(obj))
+
+    def handle_now(self, obj) -> None:
+        """One Handle with no time passed since the last."""
+        self.c.AlxVnh7040_Handle(self._v(obj))
+
+    def pwm_answers(self, status: int) -> None:
+        """What the PWM's Init and DeInit answer from now on (0 is Alx_Ok)."""
+        self.c.AlxPwmFake_SetForcedStatus(status)
+
+    def config_break_raw(self, obj, break_type: int) -> None:
+        """A break type by its number, one outside the enumeration included."""
+        self.c.AlxVnh7040_Config_BreakType(self._v(obj), break_type)
 
     def pin(self, obj, name: str):
         return self.c.AlxVnh7040Test_Pin(obj, self.PINS.index(name))

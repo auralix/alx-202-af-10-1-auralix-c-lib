@@ -40,6 +40,8 @@ static bool alxSpiFake_isCsAsserted;
 static uint32_t alxSpiFake_initCount;
 static uint32_t alxSpiFake_deInitCount;
 static int32_t alxSpiFake_forcedStatus = Alx_Ok;
+static uint32_t alxSpiFake_callCount = 0;	// every call of the contract, whatever it answered (A97)
+static uint32_t alxSpiFake_failAt = 0;		// the call count at which one call answers Alx_Err; 0 disarms
 
 
 //******************************************************************************
@@ -55,6 +57,8 @@ bool AlxSpiFake_IsCsAsserted(void);
 uint32_t AlxSpiFake_InitCount(void);
 uint32_t AlxSpiFake_DeInitCount(void);
 void AlxSpiFake_SetForcedStatus(int32_t status);
+void AlxSpiFake_FailAt(uint32_t nth);
+uint32_t AlxSpiFake_CallCount(void);
 
 
 //******************************************************************************
@@ -103,6 +107,8 @@ void AlxSpiFake_Reset(void)
 	alxSpiFake_initCount = 0;
 	alxSpiFake_deInitCount = 0;
 	alxSpiFake_forcedStatus = Alx_Ok;
+	alxSpiFake_callCount = 0;
+	alxSpiFake_failAt = 0;
 }
 void AlxSpiFake_QueueMiso(const uint8_t* data, uint32_t len)
 {
@@ -153,6 +159,25 @@ void AlxSpiFake_SetForcedStatus(int32_t status)
 {
 	alxSpiFake_forcedStatus = status;
 }
+void AlxSpiFake_FailAt(uint32_t nth)
+{
+	// The nth call from now answers Alx_Err, the others the forced status. 0 disarms.
+	alxSpiFake_failAt = (nth == 0) ? 0 : alxSpiFake_callCount + nth;
+}
+uint32_t AlxSpiFake_CallCount(void)
+{
+	return alxSpiFake_callCount;
+}
+
+static Alx_Status AlxSpiFake_Answer(void)
+{
+	alxSpiFake_callCount++;
+	if (alxSpiFake_failAt != 0 && alxSpiFake_callCount == alxSpiFake_failAt)
+	{
+		return Alx_Err;
+	}
+	return (Alx_Status)(alxSpiFake_forcedStatus);
+}
 
 
 //******************************************************************************
@@ -170,32 +195,32 @@ Alx_Status AlxSpi_Init(AlxSpi* me)
 {
 	(void)me;
 	alxSpiFake_initCount++;
-	return (Alx_Status)alxSpiFake_forcedStatus;
+	return AlxSpiFake_Answer();
 }
 Alx_Status AlxSpi_DeInit(AlxSpi* me)
 {
 	(void)me;
 	alxSpiFake_deInitCount++;
-	return (Alx_Status)alxSpiFake_forcedStatus;
+	return AlxSpiFake_Answer();
 }
 Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	(void)me; (void)numOfTries; (void)timeout_ms;
 	AlxSpiFake_Send(writeData, len);
-	return (Alx_Status)alxSpiFake_forcedStatus;
+	return AlxSpiFake_Answer();
 }
 Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	(void)me; (void)numOfTries; (void)timeout_ms;
 	AlxSpiFake_Receive(readData, len);
-	return (Alx_Status)alxSpiFake_forcedStatus;
+	return AlxSpiFake_Answer();
 }
 Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* readData, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	(void)me; (void)numOfTries; (void)timeout_ms;
 	AlxSpiFake_Send(writeData, len);
 	AlxSpiFake_Receive(readData, len);
-	return (Alx_Status)alxSpiFake_forcedStatus;
+	return AlxSpiFake_Answer();
 }
 void AlxSpi_Master_AssertCs(AlxSpi* me)
 {
