@@ -349,7 +349,7 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 					int8_t sampleInt8R = *(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_8bit_Byte);
 					sampleOut = AlxAudio_LinerPcmInt8ToFloat(sampleInt8R);
 				}
-				else if (sampleType == AlxAudioPlayer_SampleType_Mono)
+				else if (sampleType == AlxAudioPlayer_SampleType_Mono)	// LCOV_EXCL_BR_LINE: the three sample types are the enumeration
 				{
 					// Left
 					int8_t sampleInt8L = *(me->trackPtr + me->trackSampleOffset_Byte);
@@ -360,10 +360,10 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 					// Mono
 					sampleOut = AlxAudio_StereoToMono(sampleFloatL, sampleFloatR);
 				}
-				else
+				else	// LCOV_EXCL_START: the three sample types above are the enumeration
 				{
 					ALX_AUDIO_PLAYER_ASSERT(false);	// We should never get here
-				}
+				}	// LCOV_EXCL_STOP: the else above
 			}
 		}
 		// #2.2 Encoding - Liner PCM Uint 8
@@ -391,7 +391,7 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 					uint8_t sampleUint8R = *(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_8bit_Byte);
 					sampleOut = AlxAudio_LinerPcmUint8ToFloat(sampleUint8R);
 				}
-				else if (sampleType == AlxAudioPlayer_SampleType_Mono)
+				else if (sampleType == AlxAudioPlayer_SampleType_Mono)	// LCOV_EXCL_BR_LINE: the three sample types are the enumeration
 				{
 					// Left
 					uint8_t sampleUint8L = *(me->trackPtr + me->trackSampleOffset_Byte);
@@ -402,10 +402,10 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 					// Mono
 					sampleOut = AlxAudio_StereoToMono(sampleFloatL, sampleFloatR);
 				}
-				else
+				else	// LCOV_EXCL_START: the three sample types above are the enumeration
 				{
 					ALX_AUDIO_PLAYER_ASSERT(false); 	// We should never get here
-				}
+				}	// LCOV_EXCL_STOP: the else above
 			}
 		}
 		// #2.3 Encoding - Liner PCM Int 16
@@ -445,7 +445,7 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 					int16_t sampleInt16R = *((const volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte + me->TRACK_SAMPLE_R_OFFSET_16bit_Byte));
 					sampleOut = AlxAudio_LinerPcmInt16ToFloat(sampleInt16R);
 				}
-				else if (sampleType == AlxAudioPlayer_SampleType_Mono)
+				else if (sampleType == AlxAudioPlayer_SampleType_Mono)	// LCOV_EXCL_BR_LINE: the three sample types are the enumeration
 				{
 					// Left
 					int16_t sampleInt16L = *((const volatile int16_t *)(me->trackPtr + me->trackSampleOffset_Byte));
@@ -456,10 +456,10 @@ float AlxAudioPlayer_GetSample(AlxAudioPlayer* me, AlxAudioPlayer_SampleType sam
 					// Mono
 					sampleOut = AlxAudio_StereoToMono(sampleFloatL, sampleFloatR);
 				}
-				else
+				else	// LCOV_EXCL_START: the three sample types above are the enumeration
 				{
 					ALX_AUDIO_PLAYER_ASSERT(false);	// We should never get here
-				}
+				}	// LCOV_EXCL_STOP: the else above
 			}
 		}
 		// #2.5 Encoding - Error
