@@ -35,6 +35,13 @@ def settled_true(bool_lib, obj):
     bool_lib.update(obj, True)
 
 
+def settled_false(bool_lib, obj):
+    """The mirror: the input false, believed, no threshold consumed."""
+    bool_lib.update(obj, True)
+    bool_lib.advance_ms(TICK)
+    bool_lib.update(obj, False)
+
+
 # =====================================================================
 # P188-P190 - the state machine
 # =====================================================================
@@ -325,3 +332,26 @@ def test_ALX1553_P197_the_was_flag_is_latched_by_the_constructor_before_anything
     assert state["WasTrueForLongTime"] is False
     assert state["WasFalseForShortTime"] is False
     assert state["WasFalseForLongTime"] is False
+
+
+@pytest.mark.parametrize(("clear", "cleared"), [
+    ("ClearWasFalseFlag", "WasFalse"),
+    ("ClearWasFalseForShortTimeFlag", "WasFalseForShortTime"),
+    ("ClearWasFalseForLongTimeFlag", "WasFalseForLongTime"),
+])
+def test_ALX1564_P717_each_false_side_clear_function_clears_exactly_one_latch(bool_lib, clear, cleared):
+    """The mirror of P191: three latches on the false side, three clear functions, one latch each."""
+    obj = bool_lib.make(True, SHORT_MS, LONG_MS, SHORT_MS, LONG_MS)
+    settled_false(bool_lib, obj)
+    bool_lib.advance_ms(SHORT_MS)
+    bool_lib.update(obj, False)
+    bool_lib.advance_ms(LONG_MS)
+    bool_lib.update(obj, False)
+    before = bool_lib.state(obj)
+    assert before[cleared] is True, f"{cleared} was not latched by the false side"
+
+    bool_lib.clear(obj, clear)
+    after = bool_lib.state(obj)
+    assert after[cleared] is False, f"{clear} did not clear {cleared}"
+    assert {k: v for k, v in after.items() if k != cleared} == \
+           {k: v for k, v in before.items() if k != cleared}, f"{clear} moved something else"

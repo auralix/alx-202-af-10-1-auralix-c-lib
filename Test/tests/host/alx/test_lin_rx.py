@@ -12,7 +12,7 @@ object put on it. The host's tick stands still unless a test advances it, which 
 timeout is made to happen. The weak callbacks stay the library's own, so what a test observes is
 the frame the RX buffer holds, the response on the wire and the slave-request flag.
 
-Proofs (ALX-1564, A97): P686-P699.
+Proofs (ALX-1564, A97): P686-P698, P707.
 """
 
 import pytest
@@ -241,7 +241,7 @@ def test_ALX1564_P698_a_slave_keeps_waiting_while_the_frame_is_still_coming(slav
     assert (status, frame_id, got) == (0, 0x10, data)
 
 
-def test_ALX1564_P699_a_master_reports_a_port_that_would_not_send_its_frame(lin_lib):
+def test_ALX1564_P707_a_master_reports_a_port_that_would_not_send_its_frame(lin_lib):
     """Publish puts the whole frame out in one write; a refused write is the status it returns."""
     handle = lin_lib.new()
     lin_lib.port_fail(1, lin_lib.WRITE)

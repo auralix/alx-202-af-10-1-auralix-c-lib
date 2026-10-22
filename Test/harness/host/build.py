@@ -143,6 +143,7 @@ MEMSAFE_DEPS = [*MEMSAFE_SOURCES_STRICT, *MEMSAFE_SOURCES_CLOSURE, Path(__file__
 MEMSAFE_DLL = BUILD_DIR / "alxMemSafeTest.dll"
 MEMSAFE_EXPORTS = build_tools.Exports("alxMemSafeTest", (
     "AlxMemSafeTest_New",
+    "AlxMemSafeTest_NewNonBlocking",
     "AlxMemSafeTest_Delete",
     "AlxMemSafeTest_CopyLen",
     "AlxMemSafeTest_NumOfItems",
@@ -163,6 +164,7 @@ MEMSAFE_EXPORTS = build_tools.Exports("alxMemSafeTest", (
     "AlxMemSafeTest_CrcCalc",
     "AlxMemSafeTest_CrcIsOk",
     "AlxMemSafeTest_CrcLen",
+    "AlxRange_CheckArr",
     "AlxMemSafeTest_Status_Ok",
     "AlxMemSafeTest_Status_Err",
     "AlxMemSafeTest_Status_ErrNumOfTries",
@@ -486,6 +488,8 @@ MATH_EXPORTS = build_tools.Exports("alxMathTest", (
     "AlxHys2Test_New",
     "AlxHys2Test_Delete",
     "AlxHys2_Process",
+    "AlxHys1Test_SetState",
+    "AlxHys2Test_SetState",
     "AlxAvgTest_New",
     "AlxAvgTest_Delete",
     "AlxAvg_Process",

@@ -272,6 +272,8 @@ class MemSafeLib:
         u8p, b = ctypes.POINTER(ctypes.c_uint8), ctypes.c_bool
         c.AlxMemSafeTest_New.restype = vp
         c.AlxMemSafeTest_New.argtypes = [u32, u32, ctypes.c_uint8, ctypes.c_uint8]
+        c.AlxMemSafeTest_NewNonBlocking.restype = vp
+        c.AlxMemSafeTest_NewNonBlocking.argtypes = [u32, u32, ctypes.c_uint8, ctypes.c_uint8]
         c.AlxMemSafeTest_Delete.argtypes = [vp]
         for name in ("CopyLen", "NumOfItems"):
             getattr(c, f"AlxMemSafeTest_{name}").restype = u32
@@ -466,6 +468,10 @@ class MemSafeLib:
     def range_check(self, kind: str, val, low, high) -> int:
         """AlxRange_Check<kind>(val, valMin, valMax) - the bound check itself."""
         return getattr(self.c, f"AlxRange_Check{kind}")(val, low, high)
+
+    def range_check_arr(self, data: bytes) -> int:
+        """AlxRange_CheckArr(val, valLenMax) - the array check, a stub the module keeps (A97)."""
+        return self.c.AlxRange_CheckArr(self._buf(data), len(data))
 
     def range_check_str(self, text: str, max_len_with_null: int) -> int:
         return self.c.AlxRange_CheckStr(text.encode("ascii"), max_len_with_null)
@@ -704,7 +710,10 @@ class MemSafeLib:
         return self.c.AlxParamItemStrTest_GetNum(ctx)
 
     # -- chain under test -----------------------------------------------------
-    def new(self, addr_a: int = 0x000, addr_b: int = 0x100, tries: int = 3, raw_tries: int = 3):
+    def new(self, addr_a: int = 0x000, addr_b: int = 0x100, tries: int = 3, raw_tries: int = 3,
+            *, non_blocking: bool = False):
+        if non_blocking:
+            return self.c.AlxMemSafeTest_NewNonBlocking(addr_a, addr_b, tries, raw_tries)
         return self.c.AlxMemSafeTest_New(addr_a, addr_b, tries, raw_tries)
 
     def delete(self, ctx):
@@ -1196,6 +1205,8 @@ class MathLib:
         c.AlxHys1_Process.restype = i32
         c.AlxHys1_Process.argtypes = [vp, f]
         c.AlxHys2_Process.restype = i32
+        c.AlxHys1Test_SetState.argtypes = [vp, i32]
+        c.AlxHys2Test_SetState.argtypes = [vp, i32]
         c.AlxHys2_Process.argtypes = [vp, f]
         c.AlxAvg_Process.restype = f
         c.AlxAvg_Process.argtypes = [vp, f]
@@ -1229,6 +1240,13 @@ class MathLib:
     def math(self):
         """A running count, sum, mean, minimum and maximum over uint32 samples."""
         return self._keep(self.c.AlxMathTest_New(), "AlxMathTest_Delete")
+
+    def hys1_set_state(self, obj, state: int) -> None:
+        """A state the module itself never sets, for the default of Process (A97)."""
+        self.c.AlxHys1Test_SetState(obj, state)
+
+    def hys2_set_state(self, obj, state: int) -> None:
+        self.c.AlxHys2Test_SetState(obj, state)
 
     def hys1_process(self, obj, value: float) -> int:
         return self.c.AlxHys1_Process(obj, value)
@@ -1537,6 +1555,16 @@ class RtcLib:
         out = [ctypes.c_uint16() for _ in range(3)]
         self.c.AlxRtc_NsToMsUsNs(tick_ns, value_ns, *[ctypes.byref(o) for o in out])
         return tuple(o.value for o in out)
+
+    def ns_to_ms_us(self, tick_ns: int, value_ns: int) -> tuple[int, int]:
+        out = [ctypes.c_uint16() for _ in range(2)]
+        self.c.AlxRtc_NsToMsUs(tick_ns, value_ns, *[ctypes.byref(o) for o in out])
+        return tuple(o.value for o in out)
+
+    def ns_to_ms(self, tick_ns: int, value_ns: int) -> int:
+        out = ctypes.c_uint16()
+        self.c.AlxRtc_NsToMs(tick_ns, value_ns, ctypes.byref(out))
+        return out.value
 
     def sec_fract(self, ms: int, us: int, ns: int) -> float:
         return self.c.AlxRtc_MsUsNsToSecFract(ms, us, ns)
@@ -4204,6 +4232,8 @@ class RotSwLib:
         c.AlxIoPinFake_SetLevel.argtypes = [vp, b]
         c.AlxIoPinFake_InitCount.restype = u32
         c.AlxIoPinFake_InitCount.argtypes = [vp]
+        c.AlxIoPinFake_DeInitCount.restype = u32
+        c.AlxIoPinFake_DeInitCount.argtypes = [vp]
         self.REAL = c.AlxRotSwTest_CodeType_Real()
         self.COMPLEMENT = c.AlxRotSwTest_CodeType_Complement()
         self.GRAY = c.AlxRotSwTest_CodeType_Gray()
@@ -4236,6 +4266,9 @@ class RotSwLib:
 
     def code(self, obj) -> int:
         return self.c.AlxRotSw_GetCode(self.rotsw(obj))
+
+    def deinit_count(self, obj, index: int) -> int:
+        return self.c.AlxIoPinFake_DeInitCount(self.pin(obj, index))
 
     def init_count(self, obj, index: int) -> int:
         return self.c.AlxIoPinFake_InitCount(self.pin(obj, index))

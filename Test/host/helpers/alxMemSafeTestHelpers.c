@@ -45,6 +45,7 @@ typedef struct
 
 // Exported test API
 AlxMemSafeTest_Ctx* AlxMemSafeTest_New(uint32_t copyAddrA, uint32_t copyAddrB, uint8_t memSafeTries, uint8_t memRawTries);
+AlxMemSafeTest_Ctx* AlxMemSafeTest_NewNonBlocking(uint32_t copyAddrA, uint32_t copyAddrB, uint8_t memSafeTries, uint8_t memRawTries);
 void AlxMemSafeTest_Delete(AlxMemSafeTest_Ctx* ctx);
 uint32_t AlxMemSafeTest_CopyLen(void);
 uint32_t AlxMemSafeTest_NumOfItems(void);
@@ -79,7 +80,7 @@ static void AlxMemSafeTest_OutOfMemory(void)
 	exit(1);	// test infrastructure - fail fast on OOM
 }
 
-AlxMemSafeTest_Ctx* AlxMemSafeTest_New(uint32_t copyAddrA, uint32_t copyAddrB, uint8_t memSafeTries, uint8_t memRawTries)
+static AlxMemSafeTest_Ctx* AlxMemSafeTest_NewWith(uint32_t copyAddrA, uint32_t copyAddrB, uint8_t memSafeTries, uint8_t memRawTries, bool nonBlockingEnable)
 {
 	AlxMemSafeTest_Ctx* ctx = (AlxMemSafeTest_Ctx*)calloc(1, sizeof(AlxMemSafeTest_Ctx));
 	memset(ctx, 0xFF, sizeof(AlxMemSafeTest_Ctx));	// poison BEFORE the Ctors: a forgotten field init must show (not 0xAA - clang tests a bool by its low bit)
@@ -100,7 +101,7 @@ AlxMemSafeTest_Ctx* AlxMemSafeTest_New(uint32_t copyAddrA, uint32_t copyAddrB, u
 		copyAddrA,
 		copyAddrB,
 		ALX_MEM_SAFE_TEST_COPY_LEN,
-		false,				// nonBlockingEnable
+		nonBlockingEnable,
 		memSafeTries,
 		memRawTries,
 		100,				// memRawReadWriteTimeout_ms
@@ -160,6 +161,15 @@ AlxMemSafeTest_Ctx* AlxMemSafeTest_New(uint32_t copyAddrA, uint32_t copyAddrB, u
 	return ctx;
 }
 
+AlxMemSafeTest_Ctx* AlxMemSafeTest_New(uint32_t copyAddrA, uint32_t copyAddrB, uint8_t memSafeTries, uint8_t memRawTries)
+{
+	return AlxMemSafeTest_NewWith(copyAddrA, copyAddrB, memSafeTries, memRawTries, false);
+}
+// The non-blocking mode the module declares and does not implement (TV: TODO): Read and Write refuse (A97).
+AlxMemSafeTest_Ctx* AlxMemSafeTest_NewNonBlocking(uint32_t copyAddrA, uint32_t copyAddrB, uint8_t memSafeTries, uint8_t memRawTries)
+{
+	return AlxMemSafeTest_NewWith(copyAddrA, copyAddrB, memSafeTries, memRawTries, true);
+}
 void AlxMemSafeTest_Delete(AlxMemSafeTest_Ctx* ctx)
 {
 	free(ctx);

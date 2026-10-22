@@ -422,3 +422,14 @@ def test_ALX1513_P8_repair_write_failing_always_gives_error_and_leaves_flash_as_
     assert status == flash.ERR
     assert data == bytes([flash.POISON] * 5), "no record delivered when the repair cannot be completed"
     assert (flash.peek(A, REC), flash.peek(B, REC)) == before
+
+
+@pytest.mark.expect_assert("P712: the non-blocking mode is not implemented - Read and Write assert and refuse")
+def test_ALX1564_P712_a_non_blocking_store_refuses_to_read_and_to_write(flash):
+    """CHARACTERIZATION: the constructor accepts nonBlockingEnable, and the two transfers answer Alx_Err (TV: TODO)."""
+    ctx = flash.new(non_blocking=True)
+    try:
+        assert flash.read(ctx)[0] == flash.ERR
+        assert flash.write(ctx, bytes(flash.COPY_LEN)) == flash.ERR
+    finally:
+        flash.delete(ctx)

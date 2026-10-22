@@ -1235,3 +1235,14 @@ def test_ALX1553_P575_a_non_newlib_build_names_its_c_library_instead_of_leaving_
     obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(2, "BoardTwo")], [2])
 
     assert id_lib.c.AlxIdTest_FwLangCLibName(obj).decode("ascii") == "Unknown C Standard Library"
+
+
+def test_ALX1564_P719_trace_renders_the_bootloaders_block_when_there_is_one(id_lib):
+    """With a bootloader identity the trace walks its block too; nothing of it is rendered here (P504)."""
+    addr = id_lib.flash()
+    id_lib.boot_blob(addr, **BOOT)
+    obj = _fw(id_lib, is_boot_used=True, boot_addr=addr)
+
+    id_lib.trace(obj)
+
+    assert id_lib.num(obj, "FwBootHashShort") == 0x0DEADBEE, "the block is still the one the trace read"

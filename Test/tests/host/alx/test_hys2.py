@@ -70,3 +70,12 @@ def test_ALX1553_P171_hys2_starts_in_its_middle_state_before_any_sample(math_lib
     """
     hys = math_lib.hys2(TOP_HIGH, TOP_LOW, BOT_HIGH, BOT_LOW)
     assert math_lib.hys2_process(hys, (TOP_HIGH + BOT_LOW) / 2) == math_lib.HYS2_MID
+
+
+@pytest.mark.expect_assert("P709: a state the enumeration does not have reaches the default and the assertion after it")
+def test_ALX1564_P709_a_state_the_enumeration_does_not_have_answers_null(math_lib):
+    """The module owns its state; put one it never sets there, and Process falls through to ALX_NULL."""
+    obj = math_lib.hys2(2.0, 1.5, 1.0, 0.5)
+    math_lib.hys2_set_state(obj, 7)
+
+    assert math_lib.hys2_process(obj, 1.25) == 0, "ALX_NULL"

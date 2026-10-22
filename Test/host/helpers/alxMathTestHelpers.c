@@ -30,6 +30,8 @@ AlxHys1* AlxHys1Test_New(float high, float low);
 void AlxHys1Test_Delete(AlxHys1* me);
 AlxHys2* AlxHys2Test_New(float topHigh, float topLow, float botHigh, float botLow);
 void AlxHys2Test_Delete(AlxHys2* me);
+void AlxHys1Test_SetState(AlxHys1* me, int32_t st);
+void AlxHys2Test_SetState(AlxHys2* me, int32_t st);
 AlxAvg* AlxAvgTest_New(uint32_t buffLen, uint32_t shiftThreshold, float fill);
 void AlxAvgTest_Delete(AlxAvg* me);
 AlxMath* AlxMathTest_New(void);
@@ -91,4 +93,15 @@ AlxMath* AlxMathTest_New(void)
 void AlxMathTest_Delete(AlxMath* me)
 {
 	free(me);
+}
+
+// The state is the module's own and no API sets it: a test puts a value the enumeration does not have
+// into it to reach Process's default (A97).
+void AlxHys1Test_SetState(AlxHys1* me, int32_t st)
+{
+	me->st = (AlxHys1_St)st;
+}
+void AlxHys2Test_SetState(AlxHys2* me, int32_t st)
+{
+	me->st = (AlxHys2_St)st;
 }

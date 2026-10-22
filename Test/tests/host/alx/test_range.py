@@ -108,3 +108,9 @@ def test_ALX1553_P77_a_string_is_checked_against_its_buffer(memsafe_lib):
     assert memsafe_lib.range_check_str("abcdefg", 8) == memsafe_lib.OK, "7 characters plus the null"
     assert memsafe_lib.range_check_str("abcdefgh", 8) != memsafe_lib.OK, "8 characters need 9 bytes"
     assert memsafe_lib.range_check_str("abcdefghijk", 8) != memsafe_lib.OK
+
+
+@pytest.mark.expect_assert("P711: AlxRange_CheckArr is a stub that asserts and answers an error")
+def test_ALX1564_P711_the_array_check_is_a_stub_that_refuses(memsafe_lib):
+    """CHARACTERIZATION: declared beside the other checks, it checks nothing and answers Alx_Err (TV: TODO)."""
+    assert memsafe_lib.range_check_arr(b"abc") == memsafe_lib.ERR

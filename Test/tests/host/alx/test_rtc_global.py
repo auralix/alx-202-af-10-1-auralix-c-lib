@@ -281,3 +281,13 @@ def test_ALX1553_P449_a_date_the_module_produced_can_be_given_back_to_it(rtc_lib
     assert rtc_lib.c.AlxAssertFake_Count() == 0, (
         f"a date after 2099 asserted: {(rtc_lib.c.AlxAssertFake_First() or b'').decode()}"
     )
+
+
+@pytest.mark.parametrize(("ms", "us", "ns"), [(0, 0, 0), (1, 0, 0), (123, 456, 789), (999, 999, 999)])
+def test_ALX1564_P720_the_shorter_splits_are_the_full_split_without_the_fields_they_do_not_give(rtc_lib, ms, us, ns):
+    """``NsToMsUs`` and ``NsToMs`` answer the leading fields of ``NsToMsUsNs`` and drop the rest."""
+    ticks = rtc_lib.ms_us_ns_to_ns(1, ms, us, ns)
+    full = rtc_lib.ns_to_ms_us_ns(1, ticks)
+
+    assert rtc_lib.ns_to_ms_us(1, ticks) == full[:2]
+    assert rtc_lib.ns_to_ms(1, ticks) == full[0]
