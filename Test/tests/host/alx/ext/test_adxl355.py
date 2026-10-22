@@ -191,7 +191,8 @@ def test_ALX1564_P797_a_negative_y_sample_is_sign_extended(adxl):
 
 
 @pytest.mark.parametrize("range_code", [2, 3])
-@pytest.mark.expect_assert("P798: on this host the 4 g and 8 g codes read back as -2 and -1 and reach the switch's default")
+@pytest.mark.expect_assert("P798: on this host the 4 g and 8 g codes read back as -2 and -1 and reach the switch's "
+                           "default")
 def test_ALX1564_P798_the_4_g_and_8_g_ranges_cannot_be_tested_on_this_host(adxl, range_code, record_property):
     """CHARACTERIZATION: on the target 7.8 ug and 15.6 ug a count; here the two-bit enumeration field reads
     0b10 as -2 and 0b11 as -1 (A93, as P225 describes for the INA228), so neither case of the range switch is
@@ -231,7 +232,7 @@ def test_ALX1564_P799_a_fifo_read_is_one_frame_of_nine_bytes_a_sample_with_the_x
 
 
 @pytest.mark.parametrize("wrong", [
-    dict(x_marker=False), dict(y_marker=True), dict(z_marker=True), dict(empty=True),
+    {"x_marker": False}, {"y_marker": True}, {"z_marker": True}, {"empty": True},
 ])
 def test_ALX1564_P799_a_fifo_sample_with_the_markers_wrong_is_refused(adxl, wrong):
     lib, obj = adxl

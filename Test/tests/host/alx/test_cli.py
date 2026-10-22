@@ -472,7 +472,8 @@ def test_ALX1564_P738_a_prepared_event_goes_out_on_the_next_handle_before_any_co
     (ERR_CRC, "CRC mismatch"), (ERR_TIMEOUT, "Command timeout"), (SUCCESS, None), (ERR_ARG, "Arguments invalid"),
 ])
 @pytest.mark.parametrize("pretty", [False, True])
-def test_ALX1564_P739_every_response_type_renders_its_message_compact_and_pretty(make_cli, response_type, message, pretty):
+def test_ALX1564_P739_every_response_type_renders_its_message_compact_and_pretty(
+        make_cli, response_type, message, pretty):
     """The responses a product's own command callback sends through PrepareResponse, both formats."""
     cli = make_cli()
     set_param(cli, b"PRETTY_JSON_EN", b"true" if pretty else b"false")

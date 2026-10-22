@@ -228,7 +228,8 @@ def test_ALX1564_P791_with_the_device_address_on_a_frame_from_another_device_is_
     (0b0001, 0.0), (0b0010, 0.0), (0b0011, 0.0),      # the bipolar ranges, mid-scale is zero
     (0b0110, 2.56), (0b0111, 1.28),                   # the unipolar ones, mid-scale is half
 ])
-def test_ALX1564_P792_in_the_in_range_mode_each_range_converts_by_its_own_step_and_offset(ads8678_lib, range_code, mid_volts):
+def test_ALX1564_P792_in_the_in_range_mode_each_range_converts_by_its_own_step_and_offset(
+        ads8678_lib, range_code, mid_volts):
     """Six-byte frames carrying the range's low three bits, checked against the channel's register, then converted.
 
     The two ranges with the top bit set, 0b1011 and 0b1111, are P792's other test: the host cannot reach them.
@@ -249,8 +250,10 @@ def test_ALX1564_P792_in_the_in_range_mode_each_range_converts_by_its_own_step_a
 
 
 @pytest.mark.parametrize("range_code", [0b1011, 0b1111])
-@pytest.mark.expect_assert("P792: on this host the two range codes with the top bit set read back negative and reach the else")
-def test_ALX1564_P792_the_two_ranges_with_the_top_bit_set_cannot_be_tested_on_this_host(ads8678_lib, range_code, record_property):
+@pytest.mark.expect_assert("P792: on this host the two range codes with the top bit set read back negative and reach "
+                           "the else")
+def test_ALX1564_P792_the_two_ranges_with_the_top_bit_set_cannot_be_tested_on_this_host(
+        ads8678_lib, range_code, record_property):
     """CHARACTERIZATION: on the target +-0.15625 x Vref and 0..0.3125 x Vref; here the four-bit enumeration field
     reads 0b1011 as -5 and 0b1111 as -1 (A93, as P225 describes for the INA228), so neither branch of the range
     parameters is reached, the conversion asserts and the channel reads 0 V. The read succeeds; recorded."""

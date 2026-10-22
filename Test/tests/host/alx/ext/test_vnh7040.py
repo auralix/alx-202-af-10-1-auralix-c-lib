@@ -164,7 +164,8 @@ def test_ALX1564_P660_handle_before_any_duty_asserts(bridge):
 # =====================================================================
 
 
-@pytest.mark.expect_assert("P760: a PWM that will not initialise asserts in Init, and one that will not release in DeInit")
+@pytest.mark.expect_assert("P760: a PWM that will not initialise asserts in Init, and one that will not release in "
+                           "DeInit")
 def test_ALX1564_P760_a_pwm_that_fails_ends_init_before_the_multisense_and_deinit_before_the_pins(vnh7040_lib):
     """CHARACTERIZATION: Init returns after the PWM's error - the multisense is not enabled and the part is not
     waited for; DeInit returns before the five pins are released."""

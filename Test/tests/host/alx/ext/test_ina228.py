@@ -328,7 +328,8 @@ def test_ALX1564_P768_deinit_writes_the_defaults_back_and_deinit_periph_releases
     assert ina228_lib.lifecycle(board, "DeInitPeriph") == ina228_lib.ERR
 
 
-def test_ALX1564_P769_a_system_reset_is_one_configuration_write_that_reports_its_bus(ina228_lib, board, record_property):
+def test_ALX1564_P769_a_system_reset_is_one_configuration_write_that_reports_its_bus(
+        ina228_lib, board, record_property):
     """One CONFIG write, with RST set in the shadow and cleared again after it.
 
     Where the bit lands on the wire is not asserted: the CONFIG overlay mixes bit-field types, so on this
@@ -347,7 +348,8 @@ def test_ALX1564_P769_a_system_reset_is_one_configuration_write_that_reports_its
 
 @pytest.mark.parametrize(("adc_range", "volts_per_count"), [("RANGE_163_84_MV", 5.0e-6), ("RANGE_40_96_MV", 1.25e-6)])
 @pytest.mark.parametrize("counts", [0, 1, 1000, -1000, 32767, -32768])
-def test_ALX1564_P770_the_shunt_voltage_is_signed_counts_of_the_ranges_lsb(ina228_lib, adc_range, volts_per_count, counts):
+def test_ALX1564_P770_the_shunt_voltage_is_signed_counts_of_the_ranges_lsb(
+        ina228_lib, adc_range, volts_per_count, counts):
     """An INA238: 5 uV per count on the 163.84 mV range, 1.25 uV on the 40.96 mV one, two's complement, 16 bits.
 
     The factor follows CONFIG's ADCRANGE in the driver's shadow, which the constructor does not set: it keeps

@@ -182,13 +182,16 @@ def test_ALX1564_P775_deinit_releases_the_bus_and_deinit_periph_reports_one_that
 def test_ALX1564_P776_handle_stops_at_the_transfer_that_fails(pca9539a_lib, expander, nth):
     """Two input reads, the open-drain direction write, two output writes: the ones before the failure are made."""
     lib, obj = expander
-    before = (lib.read_count(IN0), lib.read_count(IN1), lib.write_count(CFG0), lib.write_count(OUT0), lib.write_count(OUT1))
+    def transfers():
+        return (lib.read_count(IN0), lib.read_count(IN1), lib.write_count(CFG0), lib.write_count(OUT0),
+                lib.write_count(OUT1))
+
+    before = transfers()
     lib.fail_at(nth)
 
     assert lib.call(obj, "Handle") == lib.ERR
 
-    after = (lib.read_count(IN0), lib.read_count(IN1), lib.write_count(CFG0), lib.write_count(OUT0), lib.write_count(OUT1))
-    assert [a - b for a, b in zip(after, before)] == [1] * nth + [0] * (5 - nth)
+    assert [a - b for a, b in zip(transfers(), before, strict=True)] == [1] * nth + [0] * (5 - nth)
 
 
 def test_ALX1564_P776_an_open_drain_pin_on_port_1_is_driven_by_its_direction_too(pca9539a_lib, expander):

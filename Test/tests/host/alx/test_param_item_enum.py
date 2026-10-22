@@ -255,7 +255,8 @@ def test_ALX1564_P746_a_list_out_of_order_is_caught_by_the_constructor_s_check(
     the check is an assertion, not a refusal."""
     m = memsafe_lib
     data_type = _t(m, type_name)
-    values = (VALUES[1], VALUES[0], VALUES[2]) if type_name in INT_TYPES else (FLOAT_VALUES[1], FLOAT_VALUES[0], FLOAT_VALUES[2])
+    ordered = VALUES if type_name in INT_TYPES else FLOAT_VALUES
+    values = (ordered[1], ordered[0], ordered[2])
     ctx = make_enum_item(data_type, values, val_def=values[0], val_min=values[0], val_max=values[2])
 
     assert m.enum_len(ctx) == 3

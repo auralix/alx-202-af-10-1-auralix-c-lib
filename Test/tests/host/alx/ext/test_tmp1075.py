@@ -134,7 +134,7 @@ def test_ALX1564_P751_init_stops_at_the_bus_step_that_fails(tmp1075_lib, nth, ma
 
     assert tmp1075_lib.is_init(obj) is False
     regs = (REG_DEVICE_ID, REG_CONFIG, REG_LIMIT_LOW, REG_LIMIT_HIGH)
-    counts = (tmp1075_lib.read_count(REG_DEVICE_ID),) + tuple(tmp1075_lib.write_count(r) for r in regs[1:])
+    counts = (tmp1075_lib.read_count(REG_DEVICE_ID), *(tmp1075_lib.write_count(r) for r in regs[1:]))
     assert counts == made
 
 
