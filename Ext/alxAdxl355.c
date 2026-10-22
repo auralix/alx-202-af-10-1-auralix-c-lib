@@ -376,16 +376,16 @@ Alx_Status AlxAdxl355_GetFifoXyz_g(AlxAdxl355* me, AlxAdxl355_Xyz_g* xyz_g, uint
 		if (status == Alx_Err)
 		{
 			ALX_ADXL355_TRACE_ERR(
-				"%02" PRIX8 " %02" PRIX8 " %02" PRIX8 " %02" PRIX8 " %02" PRIX8 " %02" PRIX8 " %02" PRIX8 " %02" PRIX8 " %02" PRIX8,
-				me->reg._0x11_FIFO_DATA.val.raw[9 * i + 0],
-				me->reg._0x11_FIFO_DATA.val.raw[9 * i + 1],
-				me->reg._0x11_FIFO_DATA.val.raw[9 * i + 2],
-				me->reg._0x11_FIFO_DATA.val.raw[9 * i + 3],
-				me->reg._0x11_FIFO_DATA.val.raw[9 * i + 4],
-				me->reg._0x11_FIFO_DATA.val.raw[9 * i + 5],
-				me->reg._0x11_FIFO_DATA.val.raw[9 * i + 6],
-				me->reg._0x11_FIFO_DATA.val.raw[9 * i + 7],
-				me->reg._0x11_FIFO_DATA.val.raw[9 * i + 8]);
+				"%02" PRIX32 " %02" PRIX32 " %02" PRIX32 " %02" PRIX32 " %02" PRIX32 " %02" PRIX32 " %02" PRIX32 " %02" PRIX32 " %02" PRIX32,
+				(uint32_t)(me->reg._0x11_FIFO_DATA.val.raw[9 * i + 0]),
+				(uint32_t)(me->reg._0x11_FIFO_DATA.val.raw[9 * i + 1]),
+				(uint32_t)(me->reg._0x11_FIFO_DATA.val.raw[9 * i + 2]),
+				(uint32_t)(me->reg._0x11_FIFO_DATA.val.raw[9 * i + 3]),
+				(uint32_t)(me->reg._0x11_FIFO_DATA.val.raw[9 * i + 4]),
+				(uint32_t)(me->reg._0x11_FIFO_DATA.val.raw[9 * i + 5]),
+				(uint32_t)(me->reg._0x11_FIFO_DATA.val.raw[9 * i + 6]),
+				(uint32_t)(me->reg._0x11_FIFO_DATA.val.raw[9 * i + 7]),
+				(uint32_t)(me->reg._0x11_FIFO_DATA.val.raw[9 * i + 8]));
 			return status;
 		}
 
@@ -731,10 +731,10 @@ static Alx_Status AlxAdxl355_TraceId(AlxAdxl355* me)
 	// Trace
 	ALX_ADXL355_TRACE_DBG("");
 	ALX_ADXL355_TRACE_DBG("alxAdxl355.h - Trace");
-	ALX_ADXL355_TRACE_DBG("- DEVID_AD: 0x%02" PRIX8, me->reg._0x00_DEVID_AD.val.DEVID_AD);
-	ALX_ADXL355_TRACE_DBG("- DEVID_MST: 0x%02" PRIX8, me->reg._0x01_DEVID_MST.val.DEVID_MST);
-	ALX_ADXL355_TRACE_DBG("- PARTID: 0x%02" PRIX8, me->reg._0x02_PARTID.val.PARTID);
-	ALX_ADXL355_TRACE_DBG("- REVID: 0x%02" PRIX8, me->reg._0x03_REVID.val.REVID);
+	ALX_ADXL355_TRACE_DBG("- DEVID_AD: 0x%02" PRIX32, (uint32_t)me->reg._0x00_DEVID_AD.val.DEVID_AD);
+	ALX_ADXL355_TRACE_DBG("- DEVID_MST: 0x%02" PRIX32, (uint32_t)me->reg._0x01_DEVID_MST.val.DEVID_MST);
+	ALX_ADXL355_TRACE_DBG("- PARTID: 0x%02" PRIX32, (uint32_t)me->reg._0x02_PARTID.val.PARTID);
+	ALX_ADXL355_TRACE_DBG("- REVID: 0x%02" PRIX32, (uint32_t)me->reg._0x03_REVID.val.REVID);
 	ALX_ADXL355_TRACE_DBG("");
 
 	// Return
