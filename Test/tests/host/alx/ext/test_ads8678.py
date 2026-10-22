@@ -152,3 +152,161 @@ def test_ALX1564_P640_deinit_writes_the_defaults_back_and_holds_the_part_in_rese
 
     assert lib.mosi() == b"".join(bytes([(a << 1) | 0x01, v, 0x00]) for a, v in zip(REG_ORDER, _values(), strict=True))
     assert lib.nrst_level(obj) is False
+
+
+# =====================================================================
+# P787-P793 - the bus failing at any step, the other output modes, the other ranges, the chain's ends (A97)
+# =====================================================================
+
+MID = 0x8000                      # mid-scale, left-justified: 8192 counts
+
+
+def _range_frame(data: int, range_code: int, dev: int = 0, ch: int = 0) -> bytes:
+    """A NO_OP answer in the in-range mode: the channel, the device, the range's low three bits."""
+    lsb3 = range_code & 0x07
+    return _frame(data, bytes([(ch << 4) | (dev << 2) | (lsb3 >> 1), (lsb3 & 1) << 7]))
+
+
+def test_ALX1564_P787_the_bus_that_will_not_initialise_or_release_is_reported(ads8678_lib):
+    obj = ads8678_lib.new(periph=False)
+    ads8678_lib.spi_fail_at(1)
+    assert ads8678_lib.call(obj, "InitPeriph") == ads8678_lib.ERR
+    assert ads8678_lib.call(obj, "InitPeriph") == ads8678_lib.OK
+
+    ads8678_lib.spi_fail_at(1)
+    assert ads8678_lib.call(obj, "DeInitPeriph") == ads8678_lib.ERR
+    assert ads8678_lib.call(obj, "DeInitPeriph") == ads8678_lib.OK
+    assert ads8678_lib.spi_inits() == (2, 2)
+
+
+@pytest.mark.parametrize("nth", range(1, 12))
+def test_ALX1564_P788_init_stops_at_the_register_write_that_fails(ads8678_lib, nth):
+    obj = ads8678_lib.new()
+    ads8678_lib.queue_miso(_echoes(_values()))
+    ads8678_lib.spi_fail_at(nth)
+
+    assert ads8678_lib.call(obj, "Init") == ads8678_lib.ERR
+    assert ads8678_lib.cs_frames() == nth
+
+
+def test_ALX1564_P789_deinit_reports_a_bus_that_fails(adc):
+    lib, obj = adc
+    lib.queue_miso(_echoes(_values()))
+    lib.spi_fail_at(1)
+
+    assert lib.call(obj, "DeInit") == lib.ERR
+
+
+@pytest.mark.parametrize("nth", [1, 2])
+def test_ALX1564_P790_a_reading_stops_at_the_frame_that_fails(adc, nth):
+    """The AUTO_RST frame, then the first NO_OP frame: either reports the bus and ends the scan."""
+    lib, obj = adc
+    lib.queue_miso(AUTO_RST + _frame(MID) * 8)
+    lib.spi_fail_at(nth)
+
+    assert lib.voltages(obj)[0] == lib.ERR
+    assert lib.cs_frames() == nth
+
+
+def test_ALX1564_P791_with_the_device_address_on_a_frame_from_another_device_is_an_error(ads8678_lib):
+    """SDO with the channel and the device address: five-byte frames, the device in bits 2 and 3 of the fifth."""
+    obj = ads8678_lib.new()
+    ads8678_lib.configure(auto_scan=0b0000_0001, feature_select=0x02)
+    ads8678_lib.queue_miso(_echoes(_values(auto_scan=0b0000_0001, feature_select=0x02)))
+    assert ads8678_lib.call(obj, "Init") == ads8678_lib.OK
+    ads8678_lib.spi_reset()
+
+    ads8678_lib.queue_miso(AUTO_RST + _frame(MID, bytes([0x00])))
+    assert ads8678_lib.voltages(obj)[0] == ads8678_lib.OK
+    assert ads8678_lib.mosi() == AUTO_RST + bytes(5)
+
+    ads8678_lib.queue_miso(AUTO_RST + _frame(MID, bytes([1 << 2])))
+    assert ads8678_lib.voltages(obj)[0] == ads8678_lib.ERR
+
+
+@pytest.mark.parametrize(("range_code", "mid_volts"), [
+    (0b0001, 0.0), (0b0010, 0.0), (0b0011, 0.0),      # the bipolar ranges, mid-scale is zero
+    (0b0110, 2.56), (0b0111, 1.28),                   # the unipolar ones, mid-scale is half
+])
+def test_ALX1564_P792_in_the_in_range_mode_each_range_converts_by_its_own_step_and_offset(ads8678_lib, range_code, mid_volts):
+    """Six-byte frames carrying the range's low three bits, checked against the channel's register, then converted.
+
+    The two ranges with the top bit set, 0b1011 and 0b1111, are P792's other test: the host cannot reach them.
+    """
+    obj = ads8678_lib.new()
+    ranges = bytes([range_code] + [0x00] * 7)
+    ads8678_lib.configure(auto_scan=0b0000_0001, feature_select=0x03, ranges=ranges)
+    ads8678_lib.queue_miso(_echoes(_values(auto_scan=0b0000_0001, feature_select=0x03, ranges=ranges)))
+    assert ads8678_lib.call(obj, "Init") == ads8678_lib.OK
+    ads8678_lib.spi_reset()
+    ads8678_lib.queue_miso(AUTO_RST + _range_frame(MID, range_code))
+
+    status, v, _ = ads8678_lib.voltages(obj)
+
+    assert status == ads8678_lib.OK
+    assert v[0] == pytest.approx(mid_volts, abs=1e-3)
+    assert ads8678_lib.mosi() == AUTO_RST + bytes(6)
+
+
+@pytest.mark.parametrize("range_code", [0b1011, 0b1111])
+@pytest.mark.expect_assert("P792: on this host the two range codes with the top bit set read back negative and reach the else")
+def test_ALX1564_P792_the_two_ranges_with_the_top_bit_set_cannot_be_tested_on_this_host(ads8678_lib, range_code, record_property):
+    """CHARACTERIZATION: on the target +-0.15625 x Vref and 0..0.3125 x Vref; here the four-bit enumeration field
+    reads 0b1011 as -5 and 0b1111 as -1 (A93, as P225 describes for the INA228), so neither branch of the range
+    parameters is reached, the conversion asserts and the channel reads 0 V. The read succeeds; recorded."""
+    obj = ads8678_lib.new()
+    ranges = bytes([range_code] + [0x00] * 7)
+    ads8678_lib.configure(auto_scan=0b0000_0001, feature_select=0x03, ranges=ranges)
+    ads8678_lib.queue_miso(_echoes(_values(auto_scan=0b0000_0001, feature_select=0x03, ranges=ranges)))
+    assert ads8678_lib.call(obj, "Init") == ads8678_lib.OK
+    ads8678_lib.queue_miso(AUTO_RST + _range_frame(MID, range_code))
+
+    status, v, _ = ads8678_lib.voltages(obj)
+
+    record_property("host_mid_scale_volts", v[0])
+    assert status == ads8678_lib.OK
+
+
+def test_ALX1564_P792_a_frame_carrying_another_range_than_the_channels_is_an_error(ads8678_lib):
+    obj = ads8678_lib.new()
+    ranges = bytes([0b0001] + [0x00] * 7)
+    ads8678_lib.configure(auto_scan=0b0000_0001, feature_select=0x03, ranges=ranges)
+    ads8678_lib.queue_miso(_echoes(_values(auto_scan=0b0000_0001, feature_select=0x03, ranges=ranges)))
+    assert ads8678_lib.call(obj, "Init") == ads8678_lib.OK
+    ads8678_lib.queue_miso(AUTO_RST + _range_frame(MID, 0b0010))
+
+    assert ads8678_lib.voltages(obj)[0] == ads8678_lib.ERR
+
+
+@pytest.mark.expect_assert("P793: a range code outside the enumeration reaches the else of the range parameters")
+def test_ALX1564_P793_a_range_the_enumeration_does_not_have_converts_to_zero(ads8678_lib):
+    """CHARACTERIZATION: the step and the offset stay zero, so the channel reads 0 V whatever the count."""
+    obj = ads8678_lib.new()
+    ranges = bytes([0b0100] + [0x00] * 7)
+    ads8678_lib.configure(auto_scan=0b0000_0001, feature_select=0x03, ranges=ranges)
+    ads8678_lib.queue_miso(_echoes(_values(auto_scan=0b0000_0001, feature_select=0x03, ranges=ranges)))
+    assert ads8678_lib.call(obj, "Init") == ads8678_lib.OK
+    ads8678_lib.queue_miso(AUTO_RST + _range_frame(MID, 0b0100))
+
+    status, v, _ = ads8678_lib.voltages(obj)
+
+    assert status == ads8678_lib.OK
+    assert v[0] == 0.0
+
+
+@pytest.mark.expect_assert("P793: an output mode outside the enumeration reaches the else of the frame length")
+def test_ALX1564_P793_an_output_mode_the_enumeration_does_not_have_sends_an_empty_frame(ads8678_lib):
+    """CHARACTERIZATION: the NO_OP frame has no length, nothing is checked, and the channel reads the bottom of
+    its range from the zeros nothing filled."""
+    obj = ads8678_lib.new()
+    ads8678_lib.configure(auto_scan=0b0000_0001, feature_select=0x04)
+    ads8678_lib.queue_miso(_echoes(_values(auto_scan=0b0000_0001, feature_select=0x04)))
+    assert ads8678_lib.call(obj, "Init") == ads8678_lib.OK
+    ads8678_lib.spi_reset()
+    ads8678_lib.queue_miso(AUTO_RST)
+
+    status, v, _ = ads8678_lib.voltages(obj)
+
+    assert status == ads8678_lib.OK
+    assert ads8678_lib.mosi() == AUTO_RST
+    assert v[0] == pytest.approx(-10.24, abs=1e-4)

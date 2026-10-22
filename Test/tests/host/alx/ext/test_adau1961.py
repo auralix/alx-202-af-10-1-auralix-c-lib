@@ -126,3 +126,65 @@ def test_ALX1564_P651_deinit_is_not_implemented(codec):
     assert lib.call(obj, "DeInit") == lib.ERR
 
     assert lib.i2s_counts()[1] == 0
+
+
+# =====================================================================
+# P804-P807 - the interface and the bus failing at any step, the gains' failing writes, the right-side mutes,
+# the foreground handle (A97)
+# =====================================================================
+
+# the nth bus call of Init: the bus's Init, the acknowledge, the clock control, then the 41 other registers
+INIT_STEPS = tuple(range(1, 45))
+
+
+def test_ALX1564_P804_init_stops_when_the_interface_will_not_start(adau1961_lib):
+    obj = adau1961_lib.new()
+    adau1961_lib.i2s_answers(1)
+
+    assert adau1961_lib.call(obj, "Init") == adau1961_lib.ERR
+    assert adau1961_lib.bus_calls() == 0, "the bus was touched after the interface failed"
+
+
+@pytest.mark.parametrize("nth", INIT_STEPS)
+def test_ALX1564_P804_init_stops_at_the_bus_call_that_fails(adau1961_lib, nth):
+    obj = adau1961_lib.new()
+    adau1961_lib.fail_at(nth)
+
+    assert adau1961_lib.call(obj, "Init") == adau1961_lib.ERR
+    assert adau1961_lib.bus_calls() == nth
+
+
+@pytest.mark.parametrize(("what", "gain_db", "nth"), [
+    ("InDiffL", -120.0, 1), ("InDiffL", 20.25, 1), ("InDiffL", 20.25, 2), ("InDiffL", 40.5, 1), ("InDiffL", 40.5, 2),
+    ("InDiffR", -120.0, 1), ("InDiffR", 20.25, 1), ("InDiffR", 20.25, 2), ("InDiffR", 40.5, 1), ("InDiffR", 40.5, 2),
+    ("InAuxL", 0, 1), ("InAuxR", 0, 1), ("OutLineL", 0, 1), ("OutLineR", 0, 1),
+])
+def test_ALX1564_P805_a_gain_whose_register_write_fails_reports_the_bus(codec, what, gain_db, nth):
+    """Every write of every gain path: the mute, the boosted and the unboosted differential, the aux, the line."""
+    lib, obj = codec
+    lib.fail_at(nth)
+
+    assert lib.set_gain(obj, what, gain_db) == lib.ERR
+
+
+def test_ALX1564_P806_the_right_differential_input_and_the_right_line_output_mute_like_the_left(codec):
+    """P647 and P650 for the right side: the mute bit alone, the volume kept."""
+    lib, obj = codec
+    assert lib.set_gain(obj, "InDiffR", 20.25) == lib.OK
+    assert lib.set_gain(obj, "OutLineR", -6) == lib.OK
+    vol_in, _, boost = lib.in_diff(obj, right=True)
+    vol_out, _ = lib.out_line(obj, right=True)
+
+    assert lib.set_gain(obj, "InDiffR", -120.0) == lib.OK
+    assert lib.set_gain(obj, "OutLineR", -120) == lib.OK
+
+    assert lib.in_diff(obj, right=True) == (vol_in, 0, boost)
+    assert lib.out_line(obj, right=True) == (vol_out, 0)
+
+
+def test_ALX1564_P807_the_foreground_handle_is_the_interfaces(codec):
+    lib, obj = codec
+
+    lib.handle(obj)
+
+    assert lib.i2s_counts()[2] == 1

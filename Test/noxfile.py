@@ -373,23 +373,13 @@ COVERAGE_FUNCTIONS = ["alxCrc.c", "alxMemSafe.c", "alxParamGroup.c", "alxId.c", 
 # tests to write - goal 7 step 9 wrote none. A file leaves the list when it reaches 100 % on every
 # metric; the gate fails until it does.
 COVERAGE_PENDING: dict[str, str] = {
-    "alxCli.c": "lines 58.8, branches 80.6, regions 85.8, functions 85.7",
-    "alxParamItem.c": "lines 87.1, branches 76.6, regions 84.2, functions 100.0",
-    "Ext/alxAdau1961.c": "lines 65.4, branches 53.7, regions 60.9, functions 90.9",
-    "Ext/alxAds114s08.c": "lines 19.9, branches 2.3, regions 8.2, functions 26.1",
-    "Ext/alxAds8678.c": "lines 56.1, branches 38.9, regions 51.5, functions 84.2",
-    "Ext/alxAdxl355.c": "lines 51.8, branches 39.3, regions 45.8, functions 78.9",
-    "Ext/alxIna228.c": "lines 70.6, branches 55.0, regions 65.2, functions 87.0",
-    "Ext/alxLp586x.c": "lines 85.5, branches 87.9, regions 86.0, functions 93.3",
-    "Ext/alxMcp73831.c": "lines 93.2, branches 91.7, regions 94.1, functions 100.0",
-    "Ext/alxNtcg103jf103ft1s.c": "lines 83.3, branches 75.0, regions 81.8, functions 100.0",
-    "Ext/alxPca9539a.c": "lines 65.9, branches 57.6, regions 68.6, functions 85.7",
-    "Ext/alxPcal6416a.c": "lines 59.5, branches 56.0, regions 63.0, functions 90.5",
-    "Ext/alxPi4ioe5v6534q.c": "lines 74.4, branches 66.7, regions 75.5, functions 88.2",
-    "Ext/alxTmp1075.c": "lines 80.6, branches 60.0, regions 77.1, functions 100.0",
-    "Ext/alxTpa3255.c": "lines 100.0, branches 96.2, regions 100.0, functions 100.0",
-    "Ext/alxVeml6040.c": "lines 79.8, branches 62.5, regions 77.5, functions 100.0",
-    "Ext/alxVnh7040.c": "lines 96.1, branches 79.2, regions 91.3, functions 100.0",
+    # The three the host cannot finish (A93, the host compiler's layout of enumeration bit-fields):
+    "Ext/alxAds114s08.c": "lines 26.5, branches 7.7, functions 30.4 - Init, the readings and the register access "
+                          "overrun their frames on the host (test_ads114s08.py)",
+    "Ext/alxAds8678.c": "lines 98.4, branches 98.1, functions 100.0 - the two ranges with the top bit set read "
+                        "back negative from a 4-bit field (P792)",
+    "Ext/alxAdxl355.c": "lines 98.0, branches 97.6, functions 100.0 - the 4 g and 8 g range codes read back "
+                        "negative from a 2-bit field (P798)",
 }
 UBSAN = list(hb.UBSAN)                 # the instrumented variants are the library's flag sets: one
 ASAN_UBSAN = list(hb.ASAN_UBSAN)       # definition for every C repository, not a copy per noxfile
