@@ -128,15 +128,6 @@ def test_ALX1564_P638_with_the_channel_address_on_a_frame_from_another_channel_i
     assert ads8678_lib.voltages(obj)[0] == ads8678_lib.ERR
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "DEFECT: AlxAds8678_GetChVoltageAll_V reads the channel's input range only inside "
-    "`if (SDO == SDO_Conv_ChAddr_DevAddr_InRange)` and starts from `regEnumChVoltageRange = 0`, "
-    "which is Range_CHn_PM_2V5xVref. So in the other three output modes - the default among them - "
-    "every channel is converted as +-2.5 x Vref whatever range Init wrote to the part: a channel "
-    "set to 0..2.5 x Vref reading mid-scale (5.12 V) is reported as 0 V, and only its full scale "
-    "comes out near right, by coincidence. The fix is to take the range from the "
-    "channel's register in every mode and to check it against the frame only where the frame "
-    "carries it"))
 def test_ALX1564_P639_a_channel_converts_in_the_range_init_gave_it(ads8678_lib):
     """Channel 0 at 0..2.5 x Vref (0 to 10.24 V, 625 uV a count): mid-scale is 5.12 V."""
     obj = ads8678_lib.new()

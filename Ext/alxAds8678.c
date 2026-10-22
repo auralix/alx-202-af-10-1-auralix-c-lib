@@ -298,8 +298,10 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 				}
 			}
 
-			// Check channel voltage range
-			AlxAds8678_RegEnum_0x05_0x0C_Range_CHn regEnumChVoltageRange = 0;
+			// Get channel voltage range from the channel's register
+			AlxAds8678_RegEnum_0x05_0x0C_Range_CHn regEnumChVoltageRange = AlxAds8678_GetChRegEnumChVoltageRange(me, chNum);
+
+			// Check channel voltage range, if the frame carries it
 			if (me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr_DevAddr_InRange)
 			{
 				// Parse
@@ -308,7 +310,6 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 				chDataFrame.chVoltageRangeLsb3 = (chVoltageRangeLsb3_MSB << 1) | (chVoltageRangeLsb3_LSB >> 7);
 
 				// Check
-				regEnumChVoltageRange = AlxAds8678_GetChRegEnumChVoltageRange(me, chNum);
 				uint8_t chVoltageRangeLsb3 = regEnumChVoltageRange & 0x07;
 				if(chDataFrame.chVoltageRangeLsb3 != chVoltageRangeLsb3)
 				{
