@@ -157,3 +157,73 @@ def test_ALX1564_P660_handle_before_any_duty_asserts(bridge):
     lib.handle(obj)
 
     assert lib.read(obj, "Current_mA") == 0
+
+
+# =====================================================================
+# P760-P763 - the PWM that fails, high side B's fault flag, no time passed, a brake outside the enumeration (A97)
+# =====================================================================
+
+
+@pytest.mark.expect_assert("P760: a PWM that will not initialise asserts in Init, and one that will not release in DeInit")
+def test_ALX1564_P760_a_pwm_that_fails_ends_init_before_the_multisense_and_deinit_before_the_pins(vnh7040_lib):
+    """CHARACTERIZATION: Init returns after the PWM's error - the multisense is not enabled and the part is not
+    waited for; DeInit returns before the five pins are released."""
+    lib = vnh7040_lib
+    lib.pwm_answers(1)
+    obj = lib.new("gnd")
+
+    assert lib.level(obj, "sens_en") is False
+    assert lib.delays_ms() == 0
+
+    lib.pwm_answers(0)
+    lib.init(obj)
+    assert lib.level(obj, "sens_en") is True
+    lib.pwm_answers(1)
+    lib.deinit(obj)
+    assert lib.pin_counts(obj) == dict.fromkeys(lib.PINS, (2, 0))
+
+
+def test_ALX1564_P761_a_multisense_above_5_v_on_high_side_b_is_its_fault_flag(bridge):
+    """The second step of the cycle: B's current reads zero and the bridge is in error for B alone."""
+    lib, obj = bridge
+    lib.sense(obj, [0.25, 3.0])
+    lib.duty(obj, 500)
+
+    lib.handle(obj)
+    assert lib.read(obj, "IsError") == 0, "A is operational"
+    lib.handle(obj)
+
+    assert lib.read(obj, "CurrentHsA_mA") == 250 * RATIO // 1000
+    assert lib.read(obj, "CurrentHsB_mA") == 0
+    assert lib.read(obj, "IsError") == 1
+
+
+def test_ALX1564_P762_a_handle_before_the_monitoring_period_is_over_reads_nothing(bridge):
+    """One reading a millisecond: a Handle with no time passed makes no reading and selects nothing."""
+    lib, obj = bridge
+    lib.sense(obj, 0.25)
+    lib.duty(obj, 500)
+    lib.handle(obj)
+    assert lib.sense_reads(obj) == 1
+
+    selected = (lib.level(obj, "sel0"), lib.level(obj, "sel1"))
+    lib.handle_now(obj)
+
+    assert lib.sense_reads(obj) == 1
+    assert (lib.level(obj, "sel0"), lib.level(obj, "sel1")) == selected, "the selection moved on without a reading"
+
+
+@pytest.mark.expect_assert("P763: a break type outside the enumeration reaches the default of the brake switch")
+def test_ALX1564_P763_a_brake_of_a_type_the_enumeration_does_not_have_leaves_the_pins_as_they_were(bridge):
+    """CHARACTERIZATION: the switch's default asserts and sets nothing - the next Handle drives the last duty."""
+    lib, obj = bridge
+    lib.sense(obj, 0.25)
+    lib.duty(obj, 500)
+    lib.handle(obj)
+    assert lib.direction(obj) == (True, False)
+    lib.config_break_raw(obj, 99)
+
+    lib.duty(obj, 0)
+    lib.handle(obj)
+
+    assert lib.direction(obj) == (True, False)
