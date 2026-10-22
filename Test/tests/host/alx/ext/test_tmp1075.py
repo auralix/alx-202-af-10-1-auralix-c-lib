@@ -59,14 +59,6 @@ def test_ALX1564_P598_a_positive_reading_is_counts_of_a_sixteenth_of_a_degree(se
     assert lib.temp_degc(obj) == pytest.approx(deg_c)
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "DEFECT: AlxTmp1075_GetTemp_degC shifts the reading as an unsigned value - "
-    "`me->temp_raw = me->reg.R0_Temp.val.T >> 4;` with T a uint16_t - so the sign bit of the "
-    "part's two's complement is shifted in as magnitude: -25 degC (0xE700) reads as 231 degC, "
-    "-0.0625 degC (0xFFF0) as 255.9375 degC, and every temperature below zero as one between 128 "
-    "and 256 degC. A product that switches a heater or raises an over-temperature alarm on this "
-    "reading does the opposite of what the cold calls for. The fix is to convert the 16-bit "
-    "reading as signed before dropping the four low bits, (int16_t)T / 16"))
 @pytest.mark.parametrize(("wire", "deg_c"), [
     (bytes([0xFF, 0xF0]), -0.0625),
     (bytes([0xE7, 0x00]), -25.0),

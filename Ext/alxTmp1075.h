@@ -88,7 +88,8 @@ typedef union
 {
 	struct ALX_PACKED
 	{
-		uint16_t T;
+		int16_t unused_0_3 : 4;
+		int16_t T : 12;
 	};
 	uint16_t raw;
 } AlxTmp1075_RegVal_R0_Temp;
@@ -148,7 +149,8 @@ typedef union
 	{
 		struct ALX_PACKED
 		{
-			uint16_t L;
+			int16_t unused_0_3 : 4;
+			int16_t L : 12;
 		};
 		uint16_t raw;
 	} AlxTmp1075_RegVal_R2_LimitLow;
@@ -158,7 +160,8 @@ typedef union
 	{
 		struct ALX_PACKED
 		{
-			uint16_t H;
+			int16_t unused_0_3 : 4;
+			int16_t H : 12;
 		};
 		uint16_t raw;
 	} AlxTmp1075_RegVal_R3_LimitHigh;
