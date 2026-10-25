@@ -286,3 +286,106 @@ def test_ALX1553_P227_the_calibration_register_rounds_rather_than_truncates(
     """
     sensor = ina228_lib.sensor(getattr(ina228_lib, adc_range), shunt_ohm)
     assert ina228_lib.shunt_cal(sensor) == 4096
+
+
+# =====================================================================
+# P767-P772 - the lifecycle, the bus failing at any step, the shunt voltage, the power, the die temperature (A97)
+# =====================================================================
+
+REG_VSHUNT, REG_POWER = 0x04, 0x08
+# the nth bus call from a constructed sensor: the bus's Init, the acknowledge (InitPeriph); the two ID reads,
+# then the ten configuration writes (Init)
+INIT_PERIPH_STEPS = (1, 2)
+ID_STEPS = (3, 4)
+WRITE_STEPS = tuple(range(5, 15))
+
+
+@pytest.mark.parametrize("nth", INIT_PERIPH_STEPS + ID_STEPS + WRITE_STEPS)
+def test_ALX1564_P767_initialisation_stops_at_the_bus_step_that_fails_except_at_the_id_reads(ina228_lib, nth):
+    """InitPeriph reports its two steps; Init reports its ten writes, and reads the IDs only to trace them."""
+    sensor = ina228_lib.sensor_raw(ina228_lib.RANGE_40_96_MV, 100e-6)
+    ina228_lib.fail_at(nth)
+
+    periph = ina228_lib.lifecycle(sensor, "InitPeriph")
+    if nth in INIT_PERIPH_STEPS:
+        assert periph == ina228_lib.ERR
+        return
+    assert periph == ina228_lib.OK
+    assert ina228_lib.lifecycle(sensor, "Init") == (ina228_lib.OK if nth in ID_STEPS else ina228_lib.ERR)
+
+
+def test_ALX1564_P768_deinit_writes_the_defaults_back_and_deinit_periph_releases_the_bus(ina228_lib, board):
+    """The lifecycle's other half: ten writes of the part's defaults, then the bus's DeInit; each reports its bus."""
+    assert ina228_lib.lifecycle(board, "DeInit") == ina228_lib.OK
+    assert ina228_lib.lifecycle(board, "DeInitPeriph") == ina228_lib.OK
+
+    assert ina228_lib.lifecycle(board, "InitPeriph") == ina228_lib.OK
+    assert ina228_lib.lifecycle(board, "Init") == ina228_lib.OK
+    ina228_lib.fail_at(1)
+    assert ina228_lib.lifecycle(board, "DeInit") == ina228_lib.ERR
+    assert ina228_lib.lifecycle(board, "DeInit") == ina228_lib.OK
+    ina228_lib.fail_at(1)
+    assert ina228_lib.lifecycle(board, "DeInitPeriph") == ina228_lib.ERR
+
+
+def test_ALX1564_P769_a_system_reset_is_one_configuration_write_that_reports_its_bus(
+        ina228_lib, board, record_property):
+    """One CONFIG write, with RST set in the shadow and cleared again after it.
+
+    Where the bit lands on the wire is not asserted: the CONFIG overlay mixes bit-field types, so on this
+    host it is laid out as P225 describes and the word written is the host's, not the target's. The byte
+    is recorded.
+    """
+    writes = ina228_lib.write_count(0x00)
+
+    assert ina228_lib.lifecycle(board, "ResetSystem") == ina228_lib.OK
+    assert ina228_lib.write_count(0x00) == writes + 1
+    record_property("host_config_wire_bytes", ina228_lib.last_write(0x00, 2).hex())
+
+    ina228_lib.fail_at(1)
+    assert ina228_lib.lifecycle(board, "ResetSystem") == ina228_lib.ERR
+
+
+@pytest.mark.parametrize(("adc_range", "volts_per_count"), [("RANGE_163_84_MV", 5.0e-6), ("RANGE_40_96_MV", 1.25e-6)])
+@pytest.mark.parametrize("counts", [0, 1, 1000, -1000, 32767, -32768])
+def test_ALX1564_P770_the_shunt_voltage_is_signed_counts_of_the_ranges_lsb(
+        ina228_lib, adc_range, volts_per_count, counts):
+    """An INA238: 5 uV per count on the 163.84 mV range, 1.25 uV on the 40.96 mV one, two's complement, 16 bits.
+
+    The factor follows CONFIG's ADCRANGE in the driver's shadow, which the constructor does not set: it keeps
+    its adcRange for the calibration and leaves the register to the product's RegStruct_SetVal. The test sets
+    the bit as that hook would; a product whose hook does not set it converts every range with 5 uV (for TV).
+    """
+    sensor = ina228_lib.sensor(getattr(ina228_lib, adc_range), 100e-6)
+    ina228_lib.config_adc_range(sensor, getattr(ina228_lib, adc_range))
+    ina228_lib.set_register(REG_VSHUNT, counts, 2)
+
+    status, value = ina228_lib.read(sensor, "shunt_voltage_V")
+
+    assert status == ina228_lib.OK
+    assert value == pytest.approx(counts * volts_per_count, rel=1e-5, abs=1e-12)
+
+
+@pytest.mark.parametrize("counts", [0, 1, 400, 0xFFFFFF])
+def test_ALX1564_P771_the_power_reading_cannot_be_tested_on_this_host(ina228_lib, board, counts, record_property):
+    """CHARACTERIZATION: 0.2 times the current LSB per count of the 24-bit POWER register on the target.
+
+    The POWER overlay is a 24-bit field of a 32-bit type over three raw bytes: on this host the unit is
+    four bytes, the transfer the driver sizes from it is four, and the count comes back shifted by one
+    byte (P225). The read succeeds; the number is recorded and not asserted.
+    """
+    ina228_lib.set_register(REG_POWER, counts, 3)
+
+    status, value = ina228_lib.read(board, "power_W")
+
+    record_property("host_power_reading_W", value)
+    assert status == ina228_lib.OK
+
+
+def test_ALX1564_P772_a_failed_temperature_read_is_reported(ina228_lib, board):
+    """The one getter P223 did not ask: the die temperature's read reports the bus."""
+    ina228_lib.fail_at(1)
+
+    status, _ = ina228_lib.read(board, "temp_degC")
+
+    assert status == ina228_lib.ERR

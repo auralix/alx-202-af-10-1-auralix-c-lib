@@ -45,3 +45,43 @@ def test_ALX1564_P641_a_conversion_is_start_rdata_and_a_twos_complement_result(a
     assert lib.cs_frames() == 1
     assert lib.pin_writes(obj, "Start") - start_writes == 2
     assert lib.level(obj, "Start") is False
+
+
+# =====================================================================
+# P801-P803 - the bus that will not initialise or release, a conversion that times out, a read that fails (A97)
+# =====================================================================
+
+
+def test_ALX1564_P801_the_bus_that_will_not_initialise_or_release_is_reported(ads114s08_lib):
+    obj = ads114s08_lib.new(periph=False)
+    ads114s08_lib.spi_fail_at(1)
+    assert ads114s08_lib.call(obj, "InitPeriph") == ads114s08_lib.ERR
+    assert ads114s08_lib.call(obj, "InitPeriph") == ads114s08_lib.OK
+
+    ads114s08_lib.spi_fail_at(1)
+    assert ads114s08_lib.call(obj, "DeInitPeriph") == ads114s08_lib.ERR
+    assert ads114s08_lib.call(obj, "DeInitPeriph") == ads114s08_lib.OK
+    assert ads114s08_lib.spi_inits() == (2, 2)
+
+
+def test_ALX1564_P802_a_conversion_that_never_becomes_ready_times_out_with_start_low_and_no_frame(adc):
+    """nDRDY stays high: 10 ms waits until the 750 ms timeout, then the error, START released, nothing sent."""
+    lib, obj = adc
+    lib.set_ndrdy(obj, True)
+    lib.time_passes(True)
+
+    status, _ = lib.perform(obj)
+
+    assert status == lib.ERR
+    assert lib.level(obj, "Start") is False
+    assert lib.mosi() == b""
+    assert lib.cs_asserted() is False
+    assert 70 <= lib.delays_ms() <= 80
+
+
+def test_ALX1564_P803_a_read_frame_that_fails_is_reported(adc):
+    lib, obj = adc
+    lib.queue_miso(bytes([0x00, 0x12, 0x34]))
+    lib.spi_fail_at(1)
+
+    assert lib.perform(obj)[0] == lib.ERR

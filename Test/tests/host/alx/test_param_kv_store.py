@@ -217,3 +217,20 @@ def test_ALX1553_P439_deinit_unmounts_and_a_failed_unmount_leaves_the_store_init
     assert lib.deinit(handle) == ALX_OK
     assert lib.is_init(handle) is False
     assert lib.mounted() is False
+
+
+def test_ALX1564_P713_a_failed_open_or_close_is_the_status_the_caller_gets(store):
+    """The three steps a transfer has - open, transfer, close - each report their own failure."""
+    lib, handle = store
+    assert lib.set(handle, KEY, VALUE) == ALX_OK
+
+    lib.fail("open", 1)
+    assert lib.set(handle, KEY, OTHER) != ALX_OK, "the file would not open for writing"
+    lib.fail("close", 1)
+    assert lib.set(handle, KEY, OTHER) != ALX_OK, "the file would not close after the write"
+    lib.fail("close", 1)
+    assert lib.get(handle, KEY)[0] != ALX_OK, "the file would not close after the read"
+
+    assert lib.get(handle, KEY) == (ALX_OK, OTHER), (
+        "the store is usable afterwards; the write before the failed close landed"
+    )

@@ -214,7 +214,7 @@ def test_ALX1553_P471_the_build_job_flag_chooses_which_date_becomes_the_version_
     "reading the firmware version before Init is the whole subject of P472 - every getter asserts "
     "isInit even when the value it returns was finished by the constructor"
 )
-def test_ALX1553_P472_the_firmware_half_is_finished_by_the_ctor_and_the_board_half_only_by_init(id_lib):
+def test_ALX1553_P472_the_firmware_half_is_finished_by_the_ctor_and_the_board_half_only_by_init(id_lib, asserts_on):
     """Two halves of one object, opposite lifecycles, and one lifecycle rule over both.
 
     The firmware version, its string and the .bin filename are complete the moment the constructor
@@ -240,8 +240,9 @@ def test_ALX1553_P472_the_firmware_half_is_finished_by_the_ctor_and_the_board_ha
 
     id_lib.init(obj)
 
-    assert tripped == 4, "the four pre-Init reads did not each record their own assertion"
-    assert "AlxId_GetFwVer" in (id_lib.c.AlxAssertFake_First() or b"").decode("ascii", "replace")
+    assert tripped == (4 if asserts_on else 0), "the four pre-Init reads did not each record their own assertion"
+    first = (id_lib.c.AlxAssertFake_First() or b"").decode("ascii", "replace")
+    assert ("AlxId_GetFwVer" in first) or not asserts_on
     assert before == (id_lib.num(obj, "FwVer"), id_lib.text(obj, "FwVerStr"),
                       id_lib.text(obj, "FwBinStr")), "Init changed the firmware version surface"
     assert pcb_before == 0xFFFFFFFFFFFFFFFF, "the board version was composed before Init"
@@ -880,7 +881,7 @@ def test_ALX1553_P496_a_board_that_matched_nothing_does_not_come_up_initialised(
     "an id that is in no known instance is the failure P497 characterises, and the getters called "
     "afterwards each add their own isInit assertion on the object Init abandoned"
 )
-def test_ALX1553_P497_an_unknown_board_leaves_the_object_abandoned_but_answering(id_lib):
+def test_ALX1553_P497_an_unknown_board_leaves_the_object_abandoned_but_answering(id_lib, asserts_on):
     """Init asserts, returns, and leaves an object nothing but isInit can tell apart from a good one.
 
     The assertion and the return are separate statements, so the return fires whether or not
@@ -896,8 +897,10 @@ def test_ALX1553_P497_an_unknown_board_leaves_the_object_abandoned_but_answering
     obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(7, "BoardSeven"), (4, "BoardFour")], [7])
     id_lib.init(obj)
 
-    assert id_lib.c.AlxAssertFake_Count() == 1
-    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == "RST alxId.h:457 in AlxId_Init"
+    assert id_lib.c.AlxAssertFake_Count() == (1 if asserts_on else 0)
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == (
+        "RST alxId.h:457 in AlxId_Init" if asserts_on else ""
+    )
     assert not id_lib.is_init(obj)
     assert id_lib.num(obj, "HwId") == 2, "the id that matched nothing is still reported"
     assert _field_bytes(id_lib, obj, "HwPcbVerStr", 16) == b"\xff" * 16, "Init rendered a version"
@@ -907,7 +910,7 @@ def test_ALX1553_P497_an_unknown_board_leaves_the_object_abandoned_but_answering
     "a board that is known but not supported is the failure P498 characterises; the getters after "
     "it each add their own isInit assertion"
 )
-def test_ALX1553_P498_an_unsupported_board_is_left_half_resolved(id_lib):
+def test_ALX1553_P498_an_unsupported_board_is_left_half_resolved(id_lib, asserts_on):
     """The instance copy has already happened when the support check fails, so the object is a mixture.
 
     The two lookups are separate loops: the first copies the WHOLE matching AlxId_HwInstance over
@@ -922,8 +925,10 @@ def test_ALX1553_P498_an_unsupported_board_is_left_half_resolved(id_lib):
     obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(7, "BoardSeven"), (2, "BoardTwo")], [7])
     id_lib.init(obj)
 
-    assert id_lib.c.AlxAssertFake_Count() == 1
-    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == "RST alxId.h:474 in AlxId_Init"
+    assert id_lib.c.AlxAssertFake_Count() == (1 if asserts_on else 0)
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == (
+        "RST alxId.h:474 in AlxId_Init" if asserts_on else ""
+    )
     assert not id_lib.is_init(obj)
     assert id_lib.text(obj, "HwPcbName") == "BoardTwo", "the instance copy did not happen"
     assert id_lib.num(obj, "HwId") == 2
@@ -1029,7 +1034,7 @@ def test_ALX1553_P501_the_no_strap_constructor_takes_its_board_verbatim_and_read
     "a second Init on an initialised object is the isInit == false assertion, which is what P502 "
     "characterises - the module flags re-entry and then performs it"
 )
-def test_ALX1553_P502_a_second_init_re_reads_the_straps_and_takes_the_new_answer(id_lib):
+def test_ALX1553_P502_a_second_init_re_reads_the_straps_and_takes_the_new_answer(id_lib, asserts_on):
     """CHARACTERIZATION: re-entry is flagged, not blocked, and the flag is compiled out by default.
 
     ALX_ID_ASSERT(me->isInit == false) is the entire guard, and it is an ALX_ASSERT_OFF in the
@@ -1049,8 +1054,10 @@ def test_ALX1553_P502_a_second_init_re_reads_the_straps_and_takes_the_new_answer
     id_lib.strap(obj, 0, id_lib.HI)
     id_lib.init(obj)
 
-    assert id_lib.c.AlxAssertFake_Count() == 1
-    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == "RST alxId.h:432 in AlxId_Init"
+    assert id_lib.c.AlxAssertFake_Count() == (1 if asserts_on else 0)
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == (
+        "RST alxId.h:432 in AlxId_Init" if asserts_on else ""
+    )
     assert id_lib.num(obj, "HwId") == 1, "the second Init did not re-read the straps"
     assert [id_lib.pin_counts(obj, i) for i in range(2)] == [(2, 2), (2, 2)]
 
@@ -1059,7 +1066,7 @@ def test_ALX1553_P502_a_second_init_re_reads_the_straps_and_takes_the_new_answer
     "more straps than ALX_ID_HW_ID_IO_PIN_ARR_LEN is exactly the precondition AlxId_CalcHwId "
     "asserts against - P503 characterises what it does afterwards"
 )
-def test_ALX1553_P503_the_strap_count_is_asserted_and_then_not_enforced(id_lib):
+def test_ALX1553_P503_the_strap_count_is_asserted_and_then_not_enforced(id_lib, asserts_on):
     """CHARACTERIZATION: the length check records the violation and the loop runs to completion anyway.
 
     ALX_ID_ASSERT(hwIdIoPinArrLen <= ALX_ID_HW_ID_IO_PIN_ARR_LEN) is the only guard in the function
@@ -1082,8 +1089,10 @@ def test_ALX1553_P503_the_strap_count_is_asserted_and_then_not_enforced(id_lib):
 
     hw_id = id_lib.calc_hw_id(obj, 6)
 
-    assert id_lib.c.AlxAssertFake_Count() == 1
-    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == "RST alxId.h:1297 in AlxId_CalcHwId"
+    assert id_lib.c.AlxAssertFake_Count() == (1 if asserts_on else 0)
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == (
+        "RST alxId.h:1297 in AlxId_CalcHwId" if asserts_on else ""
+    )
     assert hw_id == 242, "the fold stopped at the fifth strap after all"
     assert [id_lib.pin_counts(obj, i) for i in range(6)] == [(1, 1)] * 6, "a strap past the limit was skipped"
 
@@ -1097,7 +1106,7 @@ def test_ALX1553_P503_the_strap_count_is_asserted_and_then_not_enforced(id_lib):
     "tracing before Init is the assertion P504 characterises - the one observable thing AlxId_Trace "
     "does in a build with ALX_TRACE_LEVEL_OFF"
 )
-def test_ALX1553_P504_trace_is_gated_on_init_and_renders_nothing_in_this_configuration(id_lib):
+def test_ALX1553_P504_trace_is_gated_on_init_and_renders_nothing_in_this_configuration(id_lib, asserts_on):
     """CHARACTERIZATION: in this build AlxId_Trace is its two assertions and nothing else.
 
     Test/alxConfig.h sets ALX_TRACE_LEVEL to ALX_TRACE_LEVEL_OFF, which compiles ALX_TRACE_INF
@@ -1119,13 +1128,17 @@ def test_ALX1553_P504_trace_is_gated_on_init_and_renders_nothing_in_this_configu
     before_init = _fw_ctor(id_lib)
     id_lib.trace(before_init)
 
-    assert id_lib.c.AlxAssertFake_Count() == 1
-    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == "RST alxId.h:524 in AlxId_Trace"
+    assert id_lib.c.AlxAssertFake_Count() == (1 if asserts_on else 0)
+    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii") == (
+        "RST alxId.h:524 in AlxId_Trace" if asserts_on else ""
+    )
 
     after_init = _fw(id_lib)
     id_lib.trace(after_init)
 
-    assert id_lib.c.AlxAssertFake_Count() == 1, "tracing an initialised identity asserted or faulted"
+    assert id_lib.c.AlxAssertFake_Count() == (1 if asserts_on else 0), (
+        "tracing an initialised identity asserted or faulted"
+    )
 
 
 @pytest.mark.expect_assert(
@@ -1133,7 +1146,7 @@ def test_ALX1553_P504_trace_is_gated_on_init_and_renders_nothing_in_this_configu
     "the firmware artifact before Init trips the isInit assertion this getter does not make - both "
     "are the contrasts P505 is built on"
 )
-def test_ALX1553_P505_one_fact_reached_through_three_getters_with_three_different_contracts(id_lib):
+def test_ALX1553_P505_one_fact_reached_through_three_getters_with_three_different_contracts(id_lib, asserts_on):
     """CHARACTERIZATION: the MCU's unique id has a getter that answers, one that asserts, and one lifecycle all its own.
 
     AlxId_GetHwMcuUniqueIdStr asserts wasCtorCalled and stops there, unlike all forty getters
@@ -1160,12 +1173,13 @@ def test_ALX1553_P505_one_fact_reached_through_three_getters_with_three_differen
     assert id_lib.mcu_unique_id(obj, 32, 3) == [0xA5A5A5A5] * 3, "the buffer was written after all"
     assert id_lib.mcu_unique_id(obj, 8, 12) == [0xA5] * 12, "the buffer was written after all"
 
-    assert id_lib.c.AlxAssertFake_Count() == 2, "the two array getters did not each assert"
-    assert (id_lib.c.AlxAssertFake_First() or b"").decode("ascii").endswith("AlxId_GetHwMcuUniqueIdUint32")
+    assert id_lib.c.AlxAssertFake_Count() == (2 if asserts_on else 0), "the two array getters did not each assert"
+    first = (id_lib.c.AlxAssertFake_First() or b"").decode("ascii")
+    assert first.endswith("AlxId_GetHwMcuUniqueIdUint32") or not asserts_on
 
     id_lib.text(obj, "FwArtf")
 
-    assert id_lib.c.AlxAssertFake_Count() == 3, "every other getter should assert isInit"
+    assert id_lib.c.AlxAssertFake_Count() == (3 if asserts_on else 0), "every other getter should assert isInit"
 
 
 # =====================================================================
@@ -1221,3 +1235,14 @@ def test_ALX1553_P575_a_non_newlib_build_names_its_c_library_instead_of_leaving_
     obj = _board(id_lib, [id_lib.LO, id_lib.HI_Z], [(2, "BoardTwo")], [2])
 
     assert id_lib.c.AlxIdTest_FwLangCLibName(obj).decode("ascii") == "Unknown C Standard Library"
+
+
+def test_ALX1564_P719_trace_renders_the_bootloaders_block_when_there_is_one(id_lib):
+    """With a bootloader identity the trace walks its block too; nothing of it is rendered here (P504)."""
+    addr = id_lib.flash()
+    id_lib.boot_blob(addr, **BOOT)
+    obj = _fw(id_lib, is_boot_used=True, boot_addr=addr)
+
+    id_lib.trace(obj)
+
+    assert id_lib.num(obj, "FwBootHashShort") == 0x0DEADBEE, "the block is still the one the trace read"

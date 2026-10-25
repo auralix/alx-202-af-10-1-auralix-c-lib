@@ -24,6 +24,8 @@ import random
 
 import pytest
 
+from tests.conftest import ASSERTS_ON
+
 pytestmark = pytest.mark.unit
 
 EPOCH = dt.datetime(1970, 1, 1, tzinfo=dt.UTC)
@@ -254,7 +256,7 @@ def test_ALX1553_P210_the_shorter_conversions_drop_the_fields_they_do_not_take(r
 # =====================================================================
 
 
-@pytest.mark.xfail(strict=True, reason=(
+@pytest.mark.xfail(ASSERTS_ON, strict=True, reason=(
     "DEFECT: the module's two conversions disagree about the years they support. "
     "AlxRtc_UnixTimeNsToDateTime happily produces years past 2099 - P201 walks every day to 2135 "
     "and P203 checks 2100 and 2135 by name - but AlxRtc_DateTimeToUnixTimeNs opens with "
@@ -279,3 +281,13 @@ def test_ALX1553_P449_a_date_the_module_produced_can_be_given_back_to_it(rtc_lib
     assert rtc_lib.c.AlxAssertFake_Count() == 0, (
         f"a date after 2099 asserted: {(rtc_lib.c.AlxAssertFake_First() or b'').decode()}"
     )
+
+
+@pytest.mark.parametrize(("ms", "us", "ns"), [(0, 0, 0), (1, 0, 0), (123, 456, 789), (999, 999, 999)])
+def test_ALX1564_P720_the_shorter_splits_are_the_full_split_without_the_fields_they_do_not_give(rtc_lib, ms, us, ns):
+    """``NsToMsUs`` and ``NsToMs`` answer the leading fields of ``NsToMsUsNs`` and drop the rest."""
+    ticks = rtc_lib.ms_us_ns_to_ns(1, ms, us, ns)
+    full = rtc_lib.ns_to_ms_us_ns(1, ticks)
+
+    assert rtc_lib.ns_to_ms_us(1, ticks) == full[:2]
+    assert rtc_lib.ns_to_ms(1, ticks) == full[0]

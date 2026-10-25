@@ -80,3 +80,36 @@ def test_ALX1564_P607_init_fails_when_the_part_does_not_answer(veml6040_lib):
     assert veml6040_lib.init(obj) == veml6040_lib.ERR
 
     assert veml6040_lib.write_count(REG_CONF) == 0
+
+
+# =====================================================================
+# P754-P756 - the bus fails at one chosen step (A97)
+# =====================================================================
+
+
+@pytest.mark.parametrize("nth", [1, 2, 3])
+def test_ALX1564_P754_init_stops_at_the_bus_step_that_fails(veml6040_lib, nth):
+    """The bus's Init, the part's acknowledge, the configuration write: whichever fails ends Init."""
+    obj = veml6040_lib.new()
+    veml6040_lib.fail_at(nth)
+
+    assert veml6040_lib.init(obj) == veml6040_lib.ERR
+    assert veml6040_lib.write_count(REG_CONF) == (1 if nth == 3 else 0)
+
+
+@pytest.mark.parametrize("nth", [1, 2])
+def test_ALX1564_P755_deinit_stops_at_the_bus_step_that_fails(sensor, nth):
+    """The default written back, then the bus released: whichever fails ends DeInit with the error."""
+    lib, obj = sensor
+    lib.fail_at(nth)
+
+    assert lib.deinit(obj) == lib.ERR
+
+
+@pytest.mark.parametrize("ch", ["R", "B", "W"])
+def test_ALX1564_P756_a_failed_read_of_each_other_channel_leaves_the_value_alone(sensor, ch):
+    """P606 is the green channel; the red, blue and white reads are their own functions."""
+    lib, obj = sensor
+    lib.fail_at(1)
+
+    assert lib.channel(obj, ch, preset=0xBEEF) == (lib.ERR, 0xBEEF)

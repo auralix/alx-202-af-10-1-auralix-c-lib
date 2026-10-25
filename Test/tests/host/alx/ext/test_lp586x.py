@@ -107,3 +107,37 @@ def test_ALX1564_P627_init_writes_the_brightness_of_all_108_dots(lp586x_lib):
     assert lp586x_lib.call(obj, "Init") == lp586x_lib.OK
 
     assert lp586x_lib.write_count(0x6B) == 1
+
+
+# =====================================================================
+# P764-P766 - the bus failing at any step of Init, the bus's own Init and DeInit (A97)
+# =====================================================================
+
+# the nth bus call of Init: the acknowledge, then the configuration registers in the order the driver
+# writes them - the six core registers, the first of each group, of each current, of each dot's group,
+# of each dot's brightness
+INIT_STEPS = (2, 3, 4, 5, 6, 7, 8, 11, 14, 44)
+
+
+@pytest.mark.parametrize("nth", INIT_STEPS)
+def test_ALX1564_P764_init_stops_at_the_configuration_write_that_fails(lp586x_lib, nth):
+    obj = lp586x_lib.new()
+    lp586x_lib.fail_at(nth)
+
+    assert lp586x_lib.call(obj, "Init") == lp586x_lib.ERR
+
+
+def test_ALX1564_P765_the_bus_that_will_not_initialise_is_reported(lp586x_lib):
+    obj = lp586x_lib.new(periph=False)
+    lp586x_lib.fail_at(1)
+
+    assert lp586x_lib.call(obj, "InitPeriph") == lp586x_lib.ERR
+    assert lp586x_lib.call(obj, "InitPeriph") == lp586x_lib.OK, "and the next attempt works"
+
+
+def test_ALX1564_P766_deinit_periph_releases_the_bus_and_reports_one_that_will_not(lp586x_lib):
+    obj = lp586x_lib.new()
+    lp586x_lib.fail_at(1)
+
+    assert lp586x_lib.call(obj, "DeInitPeriph") == lp586x_lib.ERR
+    assert lp586x_lib.call(obj, "DeInitPeriph") == lp586x_lib.OK

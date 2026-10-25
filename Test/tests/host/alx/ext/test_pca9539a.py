@@ -127,3 +127,127 @@ def test_ALX1564_P614_init_fails_when_the_part_does_not_answer(pca9539a_lib):
     assert pca9539a_lib.call(obj, "Init") == pca9539a_lib.ERR
 
     assert pca9539a_lib.write_count(CFG0) == 0
+
+
+# =====================================================================
+# P773-P779 - the bus steps, a shared bus, the open-drain of port 1, the pins outside the ports, the weak hook (A97)
+# =====================================================================
+
+
+@pytest.mark.xfail(strict=True, reason=(
+    "DEFECT: AlxPca9539a_Init calls AlxPca9539a_InitPeriph and drops its status (alxPca9539a.c, Init), so a bus "
+    "that would not initialise is reported as Alx_Ok by Init, with isInitPeriph false - and the next Handle "
+    "trips the assertion on it. The fix is to return InitPeriph's status as the other drivers do"))
+def test_ALX1564_P773_init_reports_a_bus_that_will_not_initialise(pca9539a_lib):
+    obj = pca9539a_lib.new()
+    pca9539a_lib.fail_at(1)
+
+    assert pca9539a_lib.call(obj, "Init") == pca9539a_lib.ERR
+
+
+@pytest.mark.parametrize("nth", [3, 4, 5, 6])
+def test_ALX1564_P773_init_stops_at_the_configuration_write_that_fails(pca9539a_lib, nth):
+    """The bus's Init, the acknowledge, then the four configuration writes: whichever fails ends Init."""
+    obj = pca9539a_lib.new()
+    pca9539a_lib.fail_at(nth)
+
+    assert pca9539a_lib.call(obj, "Init") == pca9539a_lib.ERR
+    assert sum(pca9539a_lib.write_count(r) for r in (POL0, POL1, CFG0, CFG1)) == nth - 2
+
+
+def test_ALX1564_P774_a_second_expander_on_an_initialised_bus_does_not_initialise_it_again(pca9539a_lib, expander):
+    """Init sees the bus already initialised and only marks its own periph flag: one bus Init for two parts."""
+    lib, first = expander
+    second = lib.new_on_bus_of(first)
+    calls = lib.bus_calls()
+
+    assert lib.call(second, "Init") == lib.OK
+
+    assert lib.bus_calls() == calls + 5, "the acknowledge and the four writes, no bus Init"
+    assert lib.call(second, "Handle") == lib.OK, "and it is usable"
+
+
+def test_ALX1564_P775_deinit_releases_the_bus_and_deinit_periph_reports_one_that_will_not(pca9539a_lib, expander):
+    lib, obj = expander
+    lib.fail_at(1)
+    assert lib.call(obj, "DeInitPeriph") == lib.ERR
+    assert lib.call(obj, "DeInitPeriph") == lib.OK
+    assert lib.call(obj, "InitPeriph") == lib.OK
+
+    assert lib.call(obj, "DeInit") == lib.OK
+    assert lib.call(obj, "Init") == lib.OK, "and the expander comes back"
+
+
+@pytest.mark.parametrize("nth", [1, 2, 3, 4, 5])
+def test_ALX1564_P776_handle_stops_at_the_transfer_that_fails(pca9539a_lib, expander, nth):
+    """Two input reads, the open-drain direction write, two output writes: the ones before the failure are made."""
+    lib, obj = expander
+    def transfers():
+        return (lib.read_count(IN0), lib.read_count(IN1), lib.write_count(CFG0), lib.write_count(OUT0),
+                lib.write_count(OUT1))
+
+    before = transfers()
+    lib.fail_at(nth)
+
+    assert lib.call(obj, "Handle") == lib.ERR
+
+    assert [a - b for a, b in zip(transfers(), before, strict=True)] == [1] * nth + [0] * (5 - nth)
+
+
+def test_ALX1564_P776_an_open_drain_pin_on_port_1_is_driven_by_its_direction_too(pca9539a_lib, expander):
+    """P612 for the other port: with the open-drain mask on port 1 alone, its direction register is written."""
+    lib, obj = expander
+    lib.open_drain(obj, 0x00, 0x40)
+    lib.write(obj, 1, 6, True)
+
+    assert lib.call(obj, "Handle") == lib.OK
+    assert lib.last_write(CFG1, 1) == b"\xff", "an open-drain pin driven high is an input"
+    assert lib.write_count(CFG0) == 1, "port 0's direction was written by Init only"
+
+    lib.write(obj, 1, 6, False)
+    assert lib.call(obj, "Handle") == lib.OK
+    assert lib.last_write(CFG1, 1) == b"\xbf", "driven low it is an output"
+
+    lib.fail_at(3)
+    assert lib.call(obj, "Handle") == lib.ERR, "and its write reports the bus"
+
+
+@pytest.mark.parametrize("nth", [1, 2])
+def test_ALX1564_P777_the_interrupt_handler_stops_at_the_read_that_fails(pca9539a_lib, expander, nth):
+    lib, obj = expander
+    lib.fail_at(nth)
+
+    assert lib.call(obj, "irqHandle") == lib.ERR
+
+
+def test_ALX1564_P778_the_pin_operations_of_port_1_and_port_0_each_change_their_own_register(pca9539a_lib, expander):
+    """Write low on port 1 and toggle on port 0 - the two halves P611 left to the other port."""
+    lib, obj = expander
+    lib.write(obj, 1, 2, True)
+    lib.write(obj, 1, 2, False)
+    lib.pin_op(obj, "Toggle", 0, 1)
+
+    assert lib.call(obj, "Handle") == lib.OK
+    assert lib.last_write(OUT1, 1) == b"\x00"
+    assert lib.last_write(OUT0, 1) == b"\x02"
+
+
+@pytest.mark.expect_assert("P779: a port outside 0 and 1 asserts in Read, Read_Port_Raw, Write and Toggle")
+def test_ALX1564_P779_a_port_the_part_does_not_have_asserts_and_changes_nothing(pca9539a_lib, expander):
+    """CHARACTERIZATION: a read answers false and the raw port 0; a write and a toggle touch no register."""
+    lib, obj = expander
+
+    assert lib.read(obj, 2, 0) is False
+    assert lib.read_port(obj, 2) == 0
+    lib.write(obj, 2, 0, True)
+    lib.pin_op(obj, "Toggle", 2, 0)
+    assert lib.call(obj, "Handle") == lib.OK
+    assert (lib.last_write(OUT0, 1), lib.last_write(OUT1, 1)) == (b"\x00", b"\x00")
+
+
+@pytest.mark.expect_assert("P779: the library's weak RegStruct_SetVal asserts - a product implements it")
+def test_ALX1564_P779_the_weak_register_hook_asserts_that_a_product_implements_it(pca9539a_lib):
+    """CHARACTERIZATION: the hook Init no longer calls; the library's own body is one assertion."""
+    obj = pca9539a_lib.new()
+
+    pca9539a_lib.weak_set_val(obj)

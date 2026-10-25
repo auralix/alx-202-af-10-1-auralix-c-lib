@@ -308,3 +308,13 @@ def test_ALX1553_P158_the_signed_and_unsigned_getters_read_the_same_bytes(
     canparser_lib.set(unsigned, frame, *call_args(unsigned, BIG, 0), raw)
     assert canparser_lib.get(unsigned, frame, *call_args(unsigned, BIG, 0)) == as_unsigned
     assert canparser_lib.get(signed, frame, *call_args(signed, BIG, 0)) == as_signed
+
+
+@pytest.mark.parametrize("name", ["Uint16", "Int16", "Uint32", "Int32", "Uint64", "Int64", "Float", "Double"])
+@pytest.mark.expect_assert("P736: an endianness outside the enumeration reaches the default of every setter and getter")
+def test_ALX1564_P736_an_endianness_the_enumeration_does_not_have_writes_nothing_and_reads_zero(canparser_lib, name):
+    """The switch on the endianness has two cases; any other value leaves the frame alone and answers 0."""
+    frame = canparser_lib.msg(bytes(range(1, 9)))
+    canparser_lib.set(name, frame, 99, 0, 1)
+    assert canparser_lib.payload(frame) == bytes(range(1, 9)), "nothing written"
+    assert canparser_lib.get(name, frame, 99, 0) == 0

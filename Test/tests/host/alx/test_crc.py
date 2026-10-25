@@ -161,3 +161,10 @@ def test_ALX1513_P9_is_ok_with_empty_payload(memsafe_lib):
     ok, validated = lib.crc_is_ok(lib.CRC32, le(zlib.crc32(b""), 4))
     assert ok is True
     assert validated == zlib.crc32(b"")
+
+
+@pytest.mark.expect_assert("P710: a configuration the enumeration does not have reaches the default of both switches")
+def test_ALX1564_P710_a_configuration_the_enumeration_does_not_have_computes_nothing(memsafe_lib):
+    """Calc answers 0 and GetLen answers 0: the defaults a build without assertions is left with."""
+    assert memsafe_lib.crc_calc(99, b"\x01\x02\x03") == 0
+    assert memsafe_lib.crc_len(99) == 0

@@ -67,3 +67,12 @@ def test_ALX1553_P171_hys1_starts_in_its_high_state_before_any_sample(math_lib):
     """
     hys = math_lib.hys1(HIGH, LOW)
     assert math_lib.hys1_process(hys, (HIGH + LOW) / 2) == math_lib.HYS1_HIGH
+
+
+@pytest.mark.expect_assert("P708: a state the enumeration does not have reaches the default and the assertion after it")
+def test_ALX1564_P708_a_state_the_enumeration_does_not_have_answers_null(math_lib):
+    """The module owns its state; put one it never sets there, and Process falls through to ALX_NULL."""
+    obj = math_lib.hys1(1.0, 0.0)
+    math_lib.hys1_set_state(obj, 7)
+
+    assert math_lib.hys1_process(obj, 0.5) == 0, "ALX_NULL"

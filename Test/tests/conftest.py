@@ -201,7 +201,22 @@ from harness.host.build import (
     _needs_build,
 )
 
+# A coverage build has every assertion off (the coverage lane sets this); the tests that read the
+# assertion record expect what it gives, and a defect sealed by an assertion is not a defect there.
+ASSERTS_ON = os.environ.get("ALX_ASSERTS_OFF") != "1"
+
 pytest_plugins = ("alx.verify.evidence",)
+
+
+@pytest.fixture
+def asserts_on() -> bool:
+    """Whether the DLLs under test carry their assertions: a coverage build has them off.
+
+    The coverage lane sets ALX_ASSERTS_OFF=1 (goal 8): every group is built with its assertions off,
+    since an enabled one is a branch nothing takes - the failing side of ASSERT(cond), both sides of
+    ASSERT(false). A test that reads the assertion record expects what such a build gives.
+    """
+    return ASSERTS_ON
 
 
 @pytest.fixture(autouse=True)
@@ -277,8 +292,8 @@ def make_cli(cli_lib):
     """Factory: make_cli() -> CliUnderTest with a fresh CLI + fake port. Auto-deleted."""
     ctxs = []
 
-    def _make() -> CliUnderTest:
-        ctx = cli_lib.c.AlxCliTest_New()
+    def _make(*, with_id: bool = False) -> CliUnderTest:
+        ctx = cli_lib.c.AlxCliTest_NewWithId() if with_id else cli_lib.c.AlxCliTest_New()
         ctxs.append(ctx)
         return CliUnderTest(cli_lib, ctx)
 
@@ -1067,8 +1082,9 @@ def make_buff_item(memsafe_lib):
     ctxs = []
 
     def _make(kind: str, *args, **kwargs):
-        ctx = (memsafe_lib.buff_new_arr(*args, **kwargs) if kind == "arr"
-               else memsafe_lib.buff_new_str(*args, **kwargs))
+        new = {"arr": memsafe_lib.buff_new_arr, "str": memsafe_lib.buff_new_str,
+               "str_with": memsafe_lib.buff_new_str_with}[kind]
+        ctx = new(*args, **kwargs)
         assert ctx, f"the {kind} item could not be constructed"
         ctxs.append(ctx)
         return ctx
@@ -1135,8 +1151,17 @@ def make_kv_item(memsafe_lib):
     memsafe_lib.kv_enable(True)
     ctxs = []
 
-    def _make(data_type: int, key: str = "KV_KEY", val_def: int = 0):
-        ctx = memsafe_lib.kv_item_new(data_type, key, val_def)
+    def _make(data_type: int, key: str = "KV_KEY", val_def=0, **kwargs):
+        """A scalar over its whole type; with val_min and val_max over a narrower range; a Str item
+        with a string default; an Arr item with a bytes default and an out_of_range handle."""
+        if data_type == memsafe_lib.D_STR:
+            ctx = memsafe_lib.kv_item_new_str(key, val_def)
+        elif data_type == memsafe_lib.D_ARR:
+            ctx = memsafe_lib.kv_item_new_arr(key, val_def, **kwargs)
+        elif kwargs:
+            ctx = memsafe_lib.kv_item_new_ranged(data_type, key, val_def, **kwargs)
+        else:
+            ctx = memsafe_lib.kv_item_new(data_type, key, val_def)
         assert ctx, f"an item of type {data_type} with a store could not be constructed"
         ctxs.append(ctx)
         return ctx

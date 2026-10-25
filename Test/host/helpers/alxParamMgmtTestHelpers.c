@@ -38,6 +38,7 @@
 // Prototypes - the DLL export surface (no separate header for test helpers)
 //******************************************************************************
 AlxParamMgmt* AlxParamMgmtTest_New(void);
+AlxParamMgmt* AlxParamMgmtTest_NewWithStore(void);
 void AlxParamMgmtTest_Delete(AlxParamMgmt* me);
 uint32_t AlxParamMgmtTest_NumOfItems(void);
 int32_t AlxParamMgmtTest_ParamType_Param(void);
@@ -55,7 +56,10 @@ int32_t AlxParamMgmtTest_Status_Err(void);
 //******************************************************************************
 // Functions
 //******************************************************************************
-AlxParamMgmt* AlxParamMgmtTest_New(void)
+// The items' store: AlxParamItem_LoadVal and _StoreVal assert it is not NULL and the link-time fake answers
+// for it, so a stand-in object is all the pointer has to be (A97).
+static AlxParamKvStore alxParamMgmtTest_storeStandIn;
+static AlxParamMgmt* AlxParamMgmtTest_NewWith(AlxParamKvStore* store)
 {
 	AlxParamMgmt* me = (AlxParamMgmt*)malloc(sizeof(AlxParamMgmt));
 	AlxParamItem* items = (AlxParamItem*)calloc(ALX_PARAM_MGMT_TEST_NUM_OF_ITEMS, sizeof(AlxParamItem));
@@ -66,21 +70,29 @@ AlxParamMgmt* AlxParamMgmtTest_New(void)
 		return NULL;
 	}
 
-	AlxParamItem_CtorUint8(&items[0], NULL, AlxParamItem_Param, "U8_A", 10, "GRP_A", 100,
+	AlxParamItem_CtorUint8(&items[0], store, AlxParamItem_Param, "U8_A", 10, "GRP_A", 100,
 		5, 0, 255, AlxParamItem_Ignore, false, NULL, 0, "", false);
-	AlxParamItem_CtorUint16(&items[1], NULL, AlxParamItem_Param, "U16_B", 11, "GRP_A", 100,
+	AlxParamItem_CtorUint16(&items[1], store, AlxParamItem_Param, "U16_B", 11, "GRP_A", 100,
 		1000, 0, 65535, AlxParamItem_Ignore, false, NULL, 0, "", false);
-	AlxParamItem_CtorInt32(&items[2], NULL, AlxParamItem_Param, "I32_C", 12, "GRP_B", 200,
+	AlxParamItem_CtorInt32(&items[2], store, AlxParamItem_Param, "I32_C", 12, "GRP_B", 200,
 		-7, -100, 100, AlxParamItem_Ignore, false, NULL, 0, "", false);
-	AlxParamItem_CtorFloat(&items[3], NULL, AlxParamItem_Param, "F_D", 13, "GRP_B", 200,
+	AlxParamItem_CtorFloat(&items[3], store, AlxParamItem_Param, "F_D", 13, "GRP_B", 200,
 		1.5f, -10.f, 10.f, AlxParamItem_Ignore, false, NULL, 0, "", false);
-	AlxParamItem_CtorBool(&items[4], NULL, AlxParamItem_Param, "BOOL_E", 14, "GRP_A", 100,
+	AlxParamItem_CtorBool(&items[4], store, AlxParamItem_Param, "BOOL_E", 14, "GRP_A", 100,
 		true, "", false);
-	AlxParamItem_CtorUint32(&items[5], NULL, AlxParamItem_Var, "VAR_F", 15, "GRP_B", 200,
+	AlxParamItem_CtorUint32(&items[5], store, AlxParamItem_Var, "VAR_F", 15, "GRP_B", 200,
 		42, 0, 1000, AlxParamItem_Ignore, false, NULL, 0, "", false);
 
 	AlxParamMgmt_Ctor(me, items, ALX_PARAM_MGMT_TEST_NUM_OF_ITEMS);
 	return me;
+}
+AlxParamMgmt* AlxParamMgmtTest_New(void)
+{
+	return AlxParamMgmtTest_NewWith(NULL);
+}
+AlxParamMgmt* AlxParamMgmtTest_NewWithStore(void)
+{
+	return AlxParamMgmtTest_NewWith(&alxParamMgmtTest_storeStandIn);
 }
 void AlxParamMgmtTest_Delete(AlxParamMgmt* me)
 {

@@ -33,6 +33,7 @@
 // Prototypes - the DLL export surface (no separate header for test helpers)
 //******************************************************************************
 AlxPi4ioe5v6534q* AlxPi4ioeTest_New(uint8_t i2cAddr);
+AlxPi4ioe5v6534q* AlxPi4ioeTest_NewRaw(uint8_t i2cAddr);
 void AlxPi4ioeTest_Delete(AlxPi4ioe5v6534q* me);
 AlxIoPin* AlxPi4ioeTest_ResetPin(AlxPi4ioe5v6534q* me);
 uint8_t AlxPi4ioeTest_InputPortAddr(AlxPi4ioe5v6534q* me);
@@ -46,6 +47,15 @@ int32_t AlxPi4ioeTest_Status_Err(void);
 //******************************************************************************
 AlxPi4ioe5v6534q* AlxPi4ioeTest_New(uint8_t i2cAddr)
 {
+	AlxPi4ioe5v6534q* me = AlxPi4ioeTest_NewRaw(i2cAddr);
+	if (me == NULL) { return NULL; }
+	if (AlxPi4ioe5v6534q_InitPeriph(me) != Alx_Ok) { return NULL; }
+	if (AlxPi4ioe5v6534q_Init(me) != Alx_Ok) { return NULL; }
+	return me;
+}
+AlxPi4ioe5v6534q* AlxPi4ioeTest_NewRaw(uint8_t i2cAddr)
+{
+	// Constructed and not initialised, so a test can drive the two Init steps itself (A97)
 	AlxPi4ioe5v6534q* me = (AlxPi4ioe5v6534q*)calloc(1, sizeof(AlxPi4ioe5v6534q));
 	AlxI2c* i2c = (AlxI2c*)calloc(1, sizeof(AlxI2c));
 	AlxIoPin* resetPin = (AlxIoPin*)calloc(1, sizeof(AlxIoPin));
@@ -58,8 +68,6 @@ AlxPi4ioe5v6534q* AlxPi4ioeTest_New(uint8_t i2cAddr)
 	}
 
 	AlxPi4ioe5v6534q_Ctor(me, resetPin, i2c, i2cAddr, true, 3, 1000);
-	if (AlxPi4ioe5v6534q_InitPeriph(me) != Alx_Ok) { return NULL; }
-	if (AlxPi4ioe5v6534q_Init(me) != Alx_Ok) { return NULL; }
 	return me;
 }
 void AlxPi4ioeTest_Delete(AlxPi4ioe5v6534q* me)

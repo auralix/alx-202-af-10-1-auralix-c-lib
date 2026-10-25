@@ -17,6 +17,8 @@ import math
 
 import pytest
 
+from tests.conftest import ASSERTS_ON
+
 # The range this suite builds most of its objects over: the usual shape of an audio volume control,
 # silence at one end and unity at the other.
 MIN_DB = -60.0
@@ -183,7 +185,7 @@ def test_ALX1553_P243_setting_the_volume_twice_does_not_accumulate(vol):
 # =====================================================================
 
 
-@pytest.mark.xfail(strict=True, reason=(
+@pytest.mark.xfail(ASSERTS_ON, strict=True, reason=(
     "DEFECT: the volume cannot be set to 100 percent on an ordinary range. pctMax is computed in "
     "the constructor as AlxLinFun_GetX(line, volMax_dB) - the inverse of the line at its own "
     "maximum - and float arithmetic does not round-trip, so for the common -60 dB to 0 dB range it "

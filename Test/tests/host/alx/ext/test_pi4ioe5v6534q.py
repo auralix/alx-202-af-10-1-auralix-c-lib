@@ -183,3 +183,53 @@ def test_ALX1553_P234_the_reset_pin_is_driven_once_and_left_released(pi4ioe_lib)
     for _ in range(5):
         pi4ioe_lib.handle(device)
     assert pi4ioe_lib.reset_pin(device) == (True, writes), "a service pass touched the reset pin"
+
+
+# =====================================================================
+# P757-P759 - the lifecycle, and the bus failing at one chosen step (A97)
+# =====================================================================
+
+
+@pytest.mark.parametrize("nth", [1, 2, 3, 4])
+def test_ALX1564_P757_initialisation_stops_at_the_bus_step_that_fails(pi4ioe_lib, nth):
+    """InitPeriph is the bus's Init; Init is the acknowledge and the two configuration writes."""
+    dev = pi4ioe_lib.expander_raw()
+    pi4ioe_lib.fail_at(nth)
+
+    periph = pi4ioe_lib.lifecycle(dev, "InitPeriph")
+    assert periph == (pi4ioe_lib.ERR if nth == 1 else pi4ioe_lib.OK)
+    if nth > 1:
+        assert pi4ioe_lib.lifecycle(dev, "Init") == pi4ioe_lib.ERR
+
+    _, out_addr = pi4ioe_lib.addresses(dev)
+    assert pi4ioe_lib.bus_writes(out_addr) == (1 if nth >= 3 else 0)
+
+
+def test_ALX1564_P758_deinit_holds_the_part_in_reset_and_deinit_periph_releases_the_bus(pi4ioe_lib):
+    """The reverse of Init: the reset pin driven low and released, then the bus's DeInit."""
+    dev = pi4ioe_lib.expander()
+    level, writes = pi4ioe_lib.reset_pin(dev)
+    assert level is True
+
+    assert pi4ioe_lib.lifecycle(dev, "DeInit") == pi4ioe_lib.OK
+    assert pi4ioe_lib.reset_pin(dev) == (False, writes + 1)
+    assert pi4ioe_lib.lifecycle(dev, "DeInitPeriph") == pi4ioe_lib.OK
+
+    assert pi4ioe_lib.lifecycle(dev, "InitPeriph") == pi4ioe_lib.OK
+    assert pi4ioe_lib.lifecycle(dev, "Init") == pi4ioe_lib.OK, "and the expander comes back"
+
+
+def test_ALX1564_P758_deinit_periph_reports_a_bus_that_will_not_release(pi4ioe_lib):
+    dev = pi4ioe_lib.expander()
+    assert pi4ioe_lib.lifecycle(dev, "DeInit") == pi4ioe_lib.OK
+    pi4ioe_lib.fail_at(1)
+
+    assert pi4ioe_lib.lifecycle(dev, "DeInitPeriph") == pi4ioe_lib.ERR
+
+
+def test_ALX1564_P759_a_failed_output_write_is_reported(pi4ioe_lib, dev):
+    """The second half of P232: the read succeeded and the write did not."""
+    pi4ioe_lib.fail_at(2)
+
+    assert pi4ioe_lib.handle(dev) == pi4ioe_lib.ERR
+    assert pi4ioe_lib.handle(dev) == pi4ioe_lib.OK, "and the driver still works afterwards"

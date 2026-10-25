@@ -240,3 +240,35 @@ def test_ALX1553_P559_setting_a_bool_to_default_undoes_a_set(memsafe_lib, make_m
 
     m.meta_set_val_to_def(ctx)
     assert m.meta_get_val(ctx, m.D_BOOL) == 1
+
+
+# =====================================================================
+# P746, P747 - a list out of order, a value off the list under the Assert handle (A97)
+# =====================================================================
+
+
+@pytest.mark.parametrize("type_name", INT_TYPES + FLOAT_TYPES)
+@pytest.mark.expect_assert("P746: the constructor asserts that the enum list is ordered; this one is not")
+def test_ALX1564_P746_a_list_out_of_order_is_caught_by_the_constructor_s_check(
+        memsafe_lib, make_enum_item, type_name):
+    """AlxParamItem_AreEnumArrValFromLowToHigh answers false for every type, and the item is built regardless -
+    the check is an assertion, not a refusal."""
+    m = memsafe_lib
+    data_type = _t(m, type_name)
+    ordered = VALUES if type_name in INT_TYPES else FLOAT_VALUES
+    values = (ordered[1], ordered[0], ordered[2])
+    ctx = make_enum_item(data_type, values, val_def=values[0], val_min=values[0], val_max=values[2])
+
+    assert m.enum_len(ctx) == 3
+
+
+@pytest.mark.expect_assert("P747: a value off the list under the Assert handle asserts before it is refused")
+def test_ALX1564_P747_under_the_assert_handle_a_value_off_the_list_asserts_and_is_refused(
+        memsafe_lib, make_enum_item):
+    """The status is the same ErrEnum the Ignore handle answers (P556); the assertion is the only difference."""
+    m = memsafe_lib
+    ctx = make_enum_item(m.D_UINT8, VALUES, val_def=VALUES[0], val_min=VALUES[0], val_max=VALUES[-1],
+                         out_of_range=m.ASSERT)
+
+    assert m.enum_set_val(ctx, m.D_UINT8, 7) == m.ERR_ENUM
+    assert m.enum_get_val(ctx, m.D_UINT8) == VALUES[0]

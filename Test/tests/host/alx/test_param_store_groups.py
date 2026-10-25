@@ -154,3 +154,34 @@ def test_ALX1553_P570_a_store_of_three_groups_persists_a_change(memsafe_lib, mak
     landed = _change_and_run(m, ctx, 0)
 
     assert landed[0] == CHANGED
+
+
+@pytest.mark.parametrize("group", [0, 1])
+def test_ALX1564_P725_a_write_that_fails_puts_a_store_of_two_groups_in_error_and_keeps_it_there(
+    memsafe_lib, make_multi_store, group
+):
+    """Either group's write error is the store's error state, sticky under further handles."""
+    ctx = make_multi_store(2)
+    assert memsafe_lib.store_group_init(ctx) == memsafe_lib.OK
+    memsafe_lib.fail_at(memsafe_lib.WRITE, memsafe_lib.ALWAYS)
+
+    assert memsafe_lib.store_item_set(ctx, group, 0, CHANGED) == memsafe_lib.OK
+    memsafe_lib.store_group_handle(ctx, 20)
+
+    assert memsafe_lib.store_group_err(ctx) is True
+    memsafe_lib.store_group_handle(ctx, 5)
+    assert memsafe_lib.store_group_err(ctx) is True, "the error state is sticky"
+
+
+def test_ALX1564_P726_a_store_of_two_groups_after_a_failed_init_is_inert_under_handle(
+    memsafe_lib, make_multi_store
+):
+    """As P11 for one group: the Init state is never left, and nothing is written."""
+    memsafe_lib.fail_at(memsafe_lib.INIT, memsafe_lib.ALWAYS)
+    ctx = make_multi_store(2)
+    assert memsafe_lib.store_group_init(ctx) == memsafe_lib.ERR
+
+    memsafe_lib.store_group_handle(ctx, 20)
+
+    assert memsafe_lib.store_group_err(ctx) is False
+    assert memsafe_lib.count(memsafe_lib.WRITE) == 0
