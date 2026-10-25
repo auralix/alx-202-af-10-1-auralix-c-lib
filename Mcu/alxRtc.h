@@ -71,7 +71,7 @@ typedef struct { bool dummy; } AlxRtc;
 #elif defined(ALX_RTC_ASSERT_RST_ENABLE)
 	#define ALX_RTC_ASSERT(expr) ALX_ASSERT_RST(ALX_RTC_FILE, expr)
 #else
-	#define ALX_RTC_ASSERT(expr) do{} while (false)
+	#define ALX_RTC_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
@@ -79,8 +79,8 @@ typedef struct { bool dummy; } AlxRtc;
 	#define ALX_RTC_TRACE_WRN(...) ALX_TRACE_WRN(ALX_RTC_FILE, __VA_ARGS__)
 	#define ALX_RTC_TRACE_INF(...) ALX_TRACE_INF(ALX_RTC_FILE, __VA_ARGS__)
 #else
-	#define ALX_RTC_TRACE_WRN(...) do{} while (false)
-	#define ALX_RTC_TRACE_INF(...) do{} while (false)
+	#define ALX_RTC_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_RTC_TRACE_INF(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

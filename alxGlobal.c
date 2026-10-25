@@ -59,26 +59,34 @@ void AlxGlobal_Ulltoa(uint64_t uint64, char* str)
 
 	if ((num1 == 0) && (num2 == 0) && (num3 == 0))
 	{
-		snprintf(str, 50, "%" PRIu32, num4);
+		(void)snprintf(str, 50, "%" PRIu32, num4);
 	}
 	else if ((num1 == 0) && (num2 == 0))
 	{
-		snprintf(str, 50, "%" PRIu32 "%05" PRIu32, num3, num4);
+		(void)snprintf(str, 50, "%" PRIu32 "%05" PRIu32, num3, num4);
 	}
 	else if (num1 == 0)
 	{
-		snprintf(str, 50, "%" PRIu32 "%05" PRIu32 "%05" PRIu32, num2, num3, num4);
+		(void)snprintf(str, 50, "%" PRIu32 "%05" PRIu32 "%05" PRIu32, num2, num3, num4);
 	}
 	else
 	{
-		snprintf(str, 50, "%" PRIu32 "%05" PRIu32 "%05" PRIu32 "%05" PRIu32, num1, num2, num3, num4);
+		(void)snprintf(str, 50, "%" PRIu32 "%05" PRIu32 "%05" PRIu32 "%05" PRIu32, num1, num2, num3, num4);
 	}
 }
 
 void AlxGlobal_Slltoa(int64_t int64, char* str)
 {
 	uint32_t offset = 0;
-	int32_t sign = int64 < 0 ? -1 : 1;
+	int32_t sign = 0;
+	if (int64 < 0)
+	{
+		sign = -1;
+	}
+	else
+	{
+		sign = 1;
+	}
 	int64 *= sign;
 	if (sign == -1)
 	{
@@ -89,7 +97,7 @@ void AlxGlobal_Slltoa(int64_t int64, char* str)
 }
 /**
   * @brief
-  * @param[in] val
+  * @param[in]		val
   * @return
   */
 uint32_t AlxGlobal_Ntohl(uint32_t val)

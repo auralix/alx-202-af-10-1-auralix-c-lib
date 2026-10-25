@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_SPI_MCU_Lpc55S6x_H
-#define ALX_SPI_MCU_Lpc55S6x_H
+#ifndef ALX_SPI_MCU_LPC55S6X_H
+#define ALX_SPI_MCU_LPC55S6X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,4 +118,4 @@ void AlxSpi_Ctor
 }
 #endif
 
-#endif	// #ifndef ALX_SPI_MCU_Lpc55S6x_H
+#endif	// #ifndef ALX_SPI_MCU_LPC55S6X_H

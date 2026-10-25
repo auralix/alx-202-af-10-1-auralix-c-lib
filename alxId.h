@@ -67,14 +67,14 @@ extern "C" {
 #elif defined(ALX_ID_ASSERT_RST_ENABLE)
 	#define ALX_ID_ASSERT(expr) ALX_ASSERT_RST(ALX_ID_FILE, expr)
 #else
-	#define ALX_ID_ASSERT(expr) do{} while (false)
+	#define ALX_ID_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_ID_TRACE_ENABLE)
 	#define ALX_ID_TRACE_INF(...) ALX_TRACE_INF(ALX_ID_FILE, __VA_ARGS__)
 #else
-	#define ALX_ID_TRACE_INF(...) do{} while (false)
+	#define ALX_ID_TRACE_INF(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -97,7 +97,7 @@ extern "C" {
 //******************************************************************************
 // Types
 //******************************************************************************
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	// Const
 	char name[ALX_ID_NAME_LEN];
@@ -110,7 +110,7 @@ typedef struct __attribute__((packed))
 	uint32_t rev;
 } AlxId_Fw_Build;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	// Const
 	AlxId_Fw_Build build;
@@ -130,7 +130,7 @@ typedef struct __attribute__((packed))
 	char binStr[ALX_ID_FW_BIN_STR_LEN];
 } AlxId_Fw;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	// Const
 	uint32_t magicNum;

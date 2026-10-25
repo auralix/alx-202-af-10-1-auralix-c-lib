@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxLp586x.h
   * @brief		Auralix C Library - ALX LED Driver LP586x Module
@@ -28,8 +28,8 @@
 //******************************************************************************
 // Include Guard
 //******************************************************************************
-#ifndef ALX_LP586x_H
-#define ALX_LP586x_H
+#ifndef ALX_LP586X_H
+#define ALX_LP586X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,24 +56,24 @@ extern "C" {
 //******************************************************************************
 // Preprocessor
 //******************************************************************************
-#define ALX_LP586x_FILE "alxLp586x.h"
+#define ALX_LP586X_FILE "alxLp586x.h"
 
 // Assert //
-#if defined(ALX_LP586x_ASSERT_BKPT_ENABLE)
-	#define ALX_LP586x_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LP586x_FILE, expr)
-#elif defined(ALX_LP586x_ASSERT_TRACE_ENABLE)
-	#define ALX_LP586x_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LP586x_FILE, expr)
-#elif defined(ALX_LP586x_ASSERT_RST_ENABLE)
-	#define ALX_LP586x_ASSERT(expr) ALX_ASSERT_RST(ALX_LP586x_FILE, expr)
+#if defined(ALX_LP586X_ASSERT_BKPT_ENABLE)
+	#define ALX_LP586X_ASSERT(expr) ALX_ASSERT_BKPT(ALX_LP586X_FILE, expr)
+#elif defined(ALX_LP586X_ASSERT_TRACE_ENABLE)
+	#define ALX_LP586X_ASSERT(expr) ALX_ASSERT_TRACE(ALX_LP586X_FILE, expr)
+#elif defined(ALX_LP586X_ASSERT_RST_ENABLE)
+	#define ALX_LP586X_ASSERT(expr) ALX_ASSERT_RST(ALX_LP586X_FILE, expr)
 #else
-	#define ALX_LP586x_ASSERT(expr) do{} while (false)
+	#define ALX_LP586X_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
-#if defined(ALX_LP586x_TRACE_ENABLE)
-	#define ALX_LP586x_TRACE_ERR(...) ALX_TRACE_ERR(ALX_LP586x_FILE, __VA_ARGS__)
+#if defined(ALX_LP586X_TRACE_ENABLE)
+	#define ALX_LP586X_TRACE_ERR(...) ALX_TRACE_ERR(ALX_LP586X_FILE, __VA_ARGS__)
 #else
-	#define ALX_LP586x_TRACE_ERR(...) do{} while (false)
+	#define ALX_LP586X_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -87,7 +87,7 @@ extern "C" {
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool _0 : 1;
 		bool _1 : 1;
@@ -112,7 +112,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x00_Chip_En;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x00_Chip_En Chip_En : 1;
 		uint8_t unused_1_7 : 7;
@@ -137,7 +137,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x01_Data_Ref_Mode;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x01_PWM_Fre PWM_Fre : 1;
 		AlxLp586x_RegEnum_0x01_Data_Ref_Mode Ref_Mode : 2;
@@ -168,12 +168,12 @@ typedef enum
 } AlxLp586x_RegEnum_0x02_PWM_Scale_Mode;
 typedef enum
 {
-	SW_BLK_1us		= 0, // switch blank time: 1μs
-	SW_BLK_0u5s		= 1	// switch blank time: 0,5μs
+	SW_BLK_1us		= 0, // switch blank time: 1us
+	SW_BLK_0u5s		= 1	// switch blank time: 0,5us
 } AlxLp586x_RegEnum_0x02_SW_BLK;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x02_CS_ON_Shift CS_ON_Shift : 1;
 		AlxLp586x_RegEnum_0x02_PWM_Phase_Shift PWM_Phase_Shift : 1;
@@ -192,7 +192,7 @@ typedef enum
 {
 	LSD_removal_Off = 0,
 	LSD_removal_On	= 1
-} AlxLp586x_RegEnum_0x03_LSD_removal; // turns off the upside deghosting functio
+} AlxLp586x_RegEnum_0x03_LSD_removal; // turns off the upside deghosting function
 typedef enum
 {
 	LOD_removal_Off = 0,
@@ -200,7 +200,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x03_LOD_removal; // turns off the current sink of the open channel
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x03_LSD_removal LSD_removal : 1;
 		AlxLp586x_RegEnum_0x03_LOD_removal LOD_removal : 1;
@@ -232,7 +232,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x04_Maximum_Current;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x04_Up_Deghost_enable Up_Deghost_enable : 1;
 		AlxLp586x_RegEnum_0x04_Maximum_Current Maximum_Current : 3;
@@ -248,7 +248,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PWM_Global : 8;
 	};
@@ -261,7 +261,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PWM_Group1 : 8;
 	};
@@ -274,7 +274,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PWM_Group2 : 8;
 	};
@@ -287,7 +287,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t PWM_Group3 : 8;
 	};
@@ -436,7 +436,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x09_0x0B_CC_Group_1_3 CC_Group1 : 7;
 		uint8_t unused_7 : 1;
@@ -450,7 +450,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x09_0x0B_CC_Group_1_3 CC_Group2 : 7;
 		uint8_t unused_7 : 1;
@@ -464,7 +464,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x09_0x0B_CC_Group_1_3 CC_Group3 : 7;
 		uint8_t unused_7 : 1;
@@ -490,7 +490,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS0_Group   : 2;
 		AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS1_Group   : 2;
@@ -506,7 +506,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS5_Group   : 2;
@@ -522,7 +522,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS9_Group   : 2;
@@ -539,7 +539,7 @@ typedef union
 
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS13_Group  : 2;
@@ -555,7 +555,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS16_Group	: 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L0_CS17_Group	: 2;
@@ -570,7 +570,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS0_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS1_Group   : 2;
@@ -588,7 +588,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS5_Group   : 2;
@@ -604,7 +604,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS9_Group   : 2;
@@ -620,7 +620,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS13_Group  : 2;
@@ -636,7 +636,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS16_Group	: 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L1_CS17_Group	: 2;
@@ -651,7 +651,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS0_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS1_Group   : 2;
@@ -667,7 +667,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS5_Group   : 2;
@@ -683,7 +683,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS9_Group   : 2;
@@ -699,7 +699,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS13_Group  : 2;
@@ -715,7 +715,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS16_Group	: 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L2_CS17_Group	: 2;
@@ -730,7 +730,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS0_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS1_Group   : 2;
@@ -746,7 +746,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS5_Group   : 2;
@@ -762,7 +762,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS9_Group   : 2;
@@ -778,7 +778,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS13_Group  : 2;
@@ -794,7 +794,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS16_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L3_CS17_Group  : 2;
@@ -809,7 +809,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS0_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS1_Group   : 2;
@@ -825,7 +825,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS5_Group   : 2;
@@ -841,7 +841,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS9_Group   : 2;
@@ -857,7 +857,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS13_Group  : 2;
@@ -873,7 +873,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS16_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L4_CS17_Group  : 2;
@@ -888,7 +888,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS0_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS1_Group   : 2;
@@ -904,7 +904,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS4_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS5_Group   : 2;
@@ -920,7 +920,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS8_Group   : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS9_Group   : 2;
@@ -936,7 +936,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS12_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group Dot_L5_CS13_Group  : 2;
@@ -952,7 +952,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group  Dot_L5_CS16_Group  : 2;
 	    AlxLp586x_RegEnum_0x0C_0x29_Dot_Lx_CSx_Group  Dot_L5_CS17_Group  : 2;
@@ -977,7 +977,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS1_OnOff   : 1;
@@ -997,7 +997,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS9_OnOff   : 1;
@@ -1017,7 +1017,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS16_OnOff  : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L0_CS17_OnOff  : 1;
@@ -1032,7 +1032,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS1_OnOff   : 1;
@@ -1052,7 +1052,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS9_OnOff   : 1;
@@ -1072,7 +1072,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS16_OnOff  : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L1_CS17_OnOff  : 1;
@@ -1087,7 +1087,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS1_OnOff   : 1;
@@ -1107,7 +1107,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS9_OnOff   : 1;
@@ -1127,7 +1127,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS16_OnOff  : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L2_CS17_OnOff  : 1;
@@ -1142,7 +1142,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS1_OnOff   : 1;
@@ -1162,7 +1162,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS9_OnOff   : 1;
@@ -1182,7 +1182,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS16_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L3_CS17_OnOff   : 1;
@@ -1197,7 +1197,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS1_OnOff   : 1;
@@ -1217,7 +1217,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS9_OnOff   : 1;
@@ -1237,7 +1237,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS16_OnOff  : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L4_CS17_OnOff  : 1;
@@ -1252,7 +1252,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS0_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS1_OnOff   : 1;
@@ -1272,7 +1272,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS8_OnOff   : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS9_OnOff   : 1;
@@ -1292,7 +1292,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS16_OnOff  : 1;
 	    AlxLp586x_RegEnum_0x43_0x54_Dot_Lx_CSx_OnOff Dot_L5_CS17_OnOff  : 1;
@@ -1317,7 +1317,7 @@ typedef enum
 } AlxLp586x_RegEnum_0x64_Global_LOD;
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
         AlxLp586x_RegEnum_0x64_Global_LSD Global_LSD    : 1;
         AlxLp586x_RegEnum_0x64_Global_LOD Global_LOD    : 1;
@@ -1342,7 +1342,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS1_LOD   : 1;
@@ -1362,7 +1362,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS9_LOD   : 1;
@@ -1382,7 +1382,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS16_LOD  : 1;
 		AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L0_CS17_LOD  : 1;
@@ -1397,7 +1397,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS1_LOD   : 1;
@@ -1417,7 +1417,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS9_LOD   : 1;
@@ -1437,7 +1437,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS16_LOD  : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L1_CS17_LOD  : 1;
@@ -1452,7 +1452,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS1_LOD   : 1;
@@ -1472,7 +1472,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS9_LOD   : 1;
@@ -1492,7 +1492,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS16_LOD  : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L2_CS17_LOD  : 1;
@@ -1507,7 +1507,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS1_LOD   : 1;
@@ -1527,7 +1527,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS9_LOD   : 1;
@@ -1547,7 +1547,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS16_LOD  : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L3_CS17_LOD  : 1;
@@ -1562,7 +1562,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS1_LOD   : 1;
@@ -1582,7 +1582,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS9_LOD   : 1;
@@ -1602,7 +1602,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS16_LOD  : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L4_CS17_LOD  : 1;
@@ -1617,7 +1617,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS0_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS1_LOD   : 1;
@@ -1637,7 +1637,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS8_LOD   : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS9_LOD   : 1;
@@ -1657,7 +1657,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS16_LOD  : 1;
 	    AlxLp586x_RegEnum_0x65_0x76_Dot_Lx_CSx_LOD Dot_L5_CS17_LOD  : 1;
@@ -1682,7 +1682,7 @@ typedef enum
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS1_LSD   : 1;
@@ -1702,7 +1702,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS9_LSD  : 1;
@@ -1722,7 +1722,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L0_CS17_LSD  : 1;
@@ -1737,7 +1737,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS1_LSD   : 1;
@@ -1757,7 +1757,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS9_LSD  : 1;
@@ -1777,7 +1777,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L1_CS17_LSD  : 1;
@@ -1792,7 +1792,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS1_LSD   : 1;
@@ -1812,7 +1812,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS9_LSD  : 1;
@@ -1832,7 +1832,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L2_CS17_LSD  : 1;
@@ -1847,7 +1847,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS1_LSD   : 1;
@@ -1867,7 +1867,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS9_LSD  : 1;
@@ -1887,7 +1887,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L3_CS17_LSD  : 1;
@@ -1902,7 +1902,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS1_LSD   : 1;
@@ -1922,7 +1922,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS9_LSD  : 1;
@@ -1942,7 +1942,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L4_CS17_LSD  : 1;
@@ -1957,7 +1957,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS0_LSD   : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS1_LSD   : 1;
@@ -1977,7 +1977,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS8_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS9_LSD  : 1;
@@ -1997,7 +1997,7 @@ typedef union
 //******************************************************************************
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS16_LSD  : 1;
 	    AlxLp586x_RegEnum_0x86_0x97_Dot_Lx_CSx_LSD Dot_L5_CS17_LSD  : 1;
@@ -2017,7 +2017,7 @@ typedef enum
 } AlxLp586x_RegEnum_0xA7_LOD_Clear;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 
 		AlxLp586x_RegEnum_0xA7_LOD_Clear LOD_clear  : 4;
@@ -2037,7 +2037,7 @@ typedef enum
 } AlxLp586x_RegEnum_0xA8_LSD_Clear;
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
 
         AlxLp586x_RegEnum_0xA8_LSD_Clear LSD_clear : 4;
@@ -2057,7 +2057,7 @@ typedef enum
 } AlxLp586x_RegEnum_0xA9_Reset;
 typedef union
 {
-    struct __attribute__((packed))
+    struct ALX_PACKED
     {
         AlxLp586x_RegEnum_0xA9_Reset Reset : 8;
     };
@@ -2070,70 +2070,70 @@ typedef union
 //******************************************************************************
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x00_Chip_En val;
 } AlxLp586x_Reg_0x00_Chip_En;
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x01_Dev_initial val;
 } AlxLp586x_Reg_0x01_Dev_initial;
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x02_Dev_config1 val;
 } AlxLp586x_Reg_0x02_Dev_config1;
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x03_Dev_config2 val;
 } AlxLp586x_Reg_0x03_Dev_config2;
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x04_Dev_config3 val;
 } AlxLp586x_Reg_0x04_Dev_config3;
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
 	uint8_t addr;
 	uint8_t len;
 	AlxLp586x_RegVal_0x05_Global_bri val;
 } AlxLp586x_Reg_0x05_Global_bri;
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
     uint8_t addr;
     uint8_t len;
     AlxLp586x_RegVal_0x64_Fault_state    val;
 } AlxLp586x_Reg_0x64_Fault_state;
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
     uint8_t addr;
     uint8_t len;
     AlxLp586x_RegVal_0xA7_LOD_clear      val;
 } AlxLp586x_Reg_0xA7_LOD_clear;
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
     uint8_t addr;
     uint8_t len;
     AlxLp586x_RegVal_0xA8_LSD_clear      val;
 } AlxLp586x_Reg_0xA8_LSD_clear;
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
     uint8_t addr;
     uint8_t len;
     AlxLp586x_RegVal_0xA9_Reset          val;
@@ -2141,11 +2141,11 @@ typedef struct
 
 
 //------------------------------------------------------------------------------
-// 0x06–0x08: Group brightness registers (Group0_bri…Group2_bri)
+// 0x06-0x08: Group brightness registers (Group0_bri...Group2_bri)
 //------------------------------------------------------------------------------
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
 	uint8_t addr;
 	uint8_t len;
 	union {
@@ -2158,11 +2158,11 @@ typedef struct
 
 
 //------------------------------------------------------------------------------
-// 0x09–0x0B: 3-groups CC current-set registers
+// 0x09-0x0B: 3-groups CC current-set registers
 //------------------------------------------------------------------------------
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
 	uint8_t addr;
 	uint8_t len;
 	union
@@ -2176,44 +2176,44 @@ typedef struct
 
 
 //------------------------------------------------------------------------------
-// Dot group-select registers (0x0C…0x29)
+// Dot group-select registers (0x0C...0x29)
 //------------------------------------------------------------------------------
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
     uint8_t addr;
     uint8_t len;
     union
     {
-    AlxLp586x_RegVal_0x0C_Dot_grp_sel0   rg0;   // 0Ch:  L0-CS3…CS0
-    AlxLp586x_RegVal_0x0D_Dot_grp_sel1   rg1;   // 0Dh:  L0-CS7…CS4
-    AlxLp586x_RegVal_0x0E_Dot_grp_sel2   rg2;   // 0Eh:  L0-CS11…CS8
-    AlxLp586x_RegVal_0x0F_Dot_grp_sel3   rg3;   // 0Fh:  L0-CS15…CS12
+    AlxLp586x_RegVal_0x0C_Dot_grp_sel0   rg0;   // 0Ch:  L0-CS3...CS0
+    AlxLp586x_RegVal_0x0D_Dot_grp_sel1   rg1;   // 0Dh:  L0-CS7...CS4
+    AlxLp586x_RegVal_0x0E_Dot_grp_sel2   rg2;   // 0Eh:  L0-CS11...CS8
+    AlxLp586x_RegVal_0x0F_Dot_grp_sel3   rg3;   // 0Fh:  L0-CS15...CS12
     AlxLp586x_RegVal_0x10_Dot_grp_sel4   rg4;   // 10h:  L0-CS17/16
-    AlxLp586x_RegVal_0x11_Dot_grp_sel5   rg5;   // 11h:  L1-CS3…CS0
-    AlxLp586x_RegVal_0x12_Dot_grp_sel6   rg6;   // 12h:  L1-CS7…CS4
-    AlxLp586x_RegVal_0x13_Dot_grp_sel7   rg7;   // 13h:  L1-CS11…CS8
-    AlxLp586x_RegVal_0x14_Dot_grp_sel8   rg8;   // 14h:  L1-CS15…CS12
+    AlxLp586x_RegVal_0x11_Dot_grp_sel5   rg5;   // 11h:  L1-CS3...CS0
+    AlxLp586x_RegVal_0x12_Dot_grp_sel6   rg6;   // 12h:  L1-CS7...CS4
+    AlxLp586x_RegVal_0x13_Dot_grp_sel7   rg7;   // 13h:  L1-CS11...CS8
+    AlxLp586x_RegVal_0x14_Dot_grp_sel8   rg8;   // 14h:  L1-CS15...CS12
     AlxLp586x_RegVal_0x15_Dot_grp_sel9   rg9;   // 15h:  L1-CS17/16
-    AlxLp586x_RegVal_0x16_Dot_grp_sel10  rg10;  // 16h:  L2-CS3…CS0
-    AlxLp586x_RegVal_0x17_Dot_grp_sel11  rg11;  // 17h:  L2-CS7…CS4
-    AlxLp586x_RegVal_0x18_Dot_grp_sel12  rg12;  // 18h:  L2-CS11…CS8
-    AlxLp586x_RegVal_0x19_Dot_grp_sel13  rg13;  // 19h:  L2-CS15…CS12
+    AlxLp586x_RegVal_0x16_Dot_grp_sel10  rg10;  // 16h:  L2-CS3...CS0
+    AlxLp586x_RegVal_0x17_Dot_grp_sel11  rg11;  // 17h:  L2-CS7...CS4
+    AlxLp586x_RegVal_0x18_Dot_grp_sel12  rg12;  // 18h:  L2-CS11...CS8
+    AlxLp586x_RegVal_0x19_Dot_grp_sel13  rg13;  // 19h:  L2-CS15...CS12
     AlxLp586x_RegVal_0x1A_Dot_grp_sel14  rg14;  // 1Ah:  L2-CS17/16
-    AlxLp586x_RegVal_0x1B_Dot_grp_sel15  rg15;  // 1Bh:  L3-CS3…CS0
-    AlxLp586x_RegVal_0x1C_Dot_grp_sel16  rg16;  // 1Ch:  L3-CS7…CS4
-    AlxLp586x_RegVal_0x1D_Dot_grp_sel17  rg17;  // 1Dh:  L3-CS11…CS8
-    AlxLp586x_RegVal_0x1E_Dot_grp_sel18  rg18;  // 1Eh:  L3-CS15…CS12
+    AlxLp586x_RegVal_0x1B_Dot_grp_sel15  rg15;  // 1Bh:  L3-CS3...CS0
+    AlxLp586x_RegVal_0x1C_Dot_grp_sel16  rg16;  // 1Ch:  L3-CS7...CS4
+    AlxLp586x_RegVal_0x1D_Dot_grp_sel17  rg17;  // 1Dh:  L3-CS11...CS8
+    AlxLp586x_RegVal_0x1E_Dot_grp_sel18  rg18;  // 1Eh:  L3-CS15...CS12
     AlxLp586x_RegVal_0x1F_Dot_grp_sel19  rg19;  // 1Fh:  L3-CS17/16
-    AlxLp586x_RegVal_0x20_Dot_grp_sel20  rg20;  // 20h:  L4-CS3…CS0
-    AlxLp586x_RegVal_0x21_Dot_grp_sel21  rg21;  // 21h:  L4-CS7…CS4
-    AlxLp586x_RegVal_0x22_Dot_grp_sel22  rg22;  // 22h:  L4-CS11…CS8
-    AlxLp586x_RegVal_0x23_Dot_grp_sel23  rg23;  // 23h:  L4-CS15…CS12
+    AlxLp586x_RegVal_0x20_Dot_grp_sel20  rg20;  // 20h:  L4-CS3...CS0
+    AlxLp586x_RegVal_0x21_Dot_grp_sel21  rg21;  // 21h:  L4-CS7...CS4
+    AlxLp586x_RegVal_0x22_Dot_grp_sel22  rg22;  // 22h:  L4-CS11...CS8
+    AlxLp586x_RegVal_0x23_Dot_grp_sel23  rg23;  // 23h:  L4-CS15...CS12
     AlxLp586x_RegVal_0x24_Dot_grp_sel24  rg24;  // 24h:  L4-CS17/16
-    AlxLp586x_RegVal_0x25_Dot_grp_sel25  rg25;  // 25h:  L5-CS3…CS0
-    AlxLp586x_RegVal_0x26_Dot_grp_sel26  rg26;  // 26h:  L5-CS7…CS4
-    AlxLp586x_RegVal_0x27_Dot_grp_sel27  rg27;  // 27h:  L5-CS11…CS8
-    AlxLp586x_RegVal_0x28_Dot_grp_sel28  rg28;  // 28h:  L5-CS15…CS12
+    AlxLp586x_RegVal_0x25_Dot_grp_sel25  rg25;  // 25h:  L5-CS3...CS0
+    AlxLp586x_RegVal_0x26_Dot_grp_sel26  rg26;  // 26h:  L5-CS7...CS4
+    AlxLp586x_RegVal_0x27_Dot_grp_sel27  rg27;  // 27h:  L5-CS11...CS8
+    AlxLp586x_RegVal_0x28_Dot_grp_sel28  rg28;  // 28h:  L5-CS15...CS12
     AlxLp586x_RegVal_0x29_Dot_grp_sel29  rg29;  // 29h:  L5-CS17/16
 	uint8_t raw; // fallback so we can memset the whole byte
     } val;
@@ -2221,19 +2221,19 @@ typedef struct
 
 
 //------------------------------------------------------------------------------
-// Dot on/off registers (0x43…0x54)
+// Dot on/off registers (0x43...0x54)
 //------------------------------------------------------------------------------
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
     uint8_t addr;
     uint8_t len;
 
     // each entry is one of the union types you already generated:
-    //   0  → AlxLp586x_RegVal_0x43_Dot_onoff0
-    //   1  → AlxLp586x_RegVal_0x44_Dot_onoff1
-    //   …
-    //  17  → AlxLp586x_RegVal_0x54_Dot_onoff17
+    //   0  -> AlxLp586x_RegVal_0x43_Dot_onoff0
+    //   1  -> AlxLp586x_RegVal_0x44_Dot_onoff1
+    //   ...
+    //  17  -> AlxLp586x_RegVal_0x54_Dot_onoff17
     union
     {
         AlxLp586x_RegVal_0x43_Dot_onoff0   onoff0;
@@ -2260,11 +2260,11 @@ typedef struct
 
 
 //------------------------------------------------------------------------------
-// 0x65–0x76: Dot LOD status registers (L0…L5, CS0…CS7)
+// 0x65-0x76: Dot LOD status registers (L0...L5, CS0...CS7)
 //------------------------------------------------------------------------------
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
     uint8_t addr;
     uint8_t len;
     union
@@ -2293,11 +2293,11 @@ typedef struct
 
 
 //------------------------------------------------------------------------------
-// 0x86–0x97: Dot LSD status registers (L0…L5, CS0…CS7)
+// 0x86-0x97: Dot LSD status registers (L0...L5, CS0...CS7)
 //------------------------------------------------------------------------------
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
     uint8_t addr;
     uint8_t len;
     union
@@ -2326,134 +2326,134 @@ typedef struct
 
 
 //------------------------------------------------------------------------------
-// 0x100–0x16B: Dot current registers (DC0…DC107)
+// 0x100-0x16B: Dot current registers (DC0...DC107)
 //------------------------------------------------------------------------------
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
     uint8_t addr;     // Always 1 byte
     uint8_t  len;     // Always 1 byte
     union
     {
-        uint8_t  dc0;    // L0–CS0
-        uint8_t  dc1;    // L0–CS1
-        uint8_t  dc2;    // L0–CS2
-        uint8_t  dc3;    // L0–CS3
-        uint8_t  dc4;    // L0–CS4
-        uint8_t  dc5;    // L0–CS5
-        uint8_t  dc6;    // L0–CS6
-        uint8_t  dc7;    // L0–CS7
-        uint8_t  dc8;    // L0–CS8
-        uint8_t  dc9;    // L0–CS9
-        uint8_t  dc10;   // L0–CS10
-        uint8_t  dc11;   // L0–CS11
-        uint8_t  dc12;   // L0–CS12
-        uint8_t  dc13;   // L0–CS13
-        uint8_t  dc14;   // L0–CS14
-        uint8_t  dc15;   // L0–CS15
-        uint8_t  dc16;   // L0–CS16
-        uint8_t  dc17;   // L0–CS17
-        uint8_t  dc18;   // L1–CS0
-        uint8_t  dc19;   // L1–CS1
-        uint8_t  dc20;   // L1–CS2
-        uint8_t  dc21;   // L1–CS3
-        uint8_t  dc22;   // L1–CS4
-        uint8_t  dc23;   // L1–CS5
-        uint8_t  dc24;   // L1–CS6
-        uint8_t  dc25;   // L1–CS7
-        uint8_t  dc26;   // L1–CS8
-        uint8_t  dc27;   // L1–CS9
-        uint8_t  dc28;   // L1–CS10
-        uint8_t  dc29;   // L1–CS11
-        uint8_t  dc30;   // L1–CS12
-        uint8_t  dc31;   // L1–CS13
-        uint8_t  dc32;   // L1–CS14
-        uint8_t  dc33;   // L1–CS15
-        uint8_t  dc34;   // L1–CS16
-        uint8_t  dc35;   // L1–CS17
-        uint8_t  dc36;   // L2–CS0
-        uint8_t  dc37;   // L2–CS1
-        uint8_t  dc38;   // L2–CS2
-        uint8_t  dc39;   // L2–CS3
-        uint8_t  dc40;   // L2–CS4
-        uint8_t  dc41;   // L2–CS5
-        uint8_t  dc42;   // L2–CS6
-        uint8_t  dc43;   // L2–CS7
-        uint8_t  dc44;   // L2–CS8
-        uint8_t  dc45;   // L2–CS9
-        uint8_t  dc46;   // L2–CS10
-        uint8_t  dc47;   // L2–CS11
-        uint8_t  dc48;   // L2–CS12
-        uint8_t  dc49;   // L2–CS13
-        uint8_t  dc50;   // L2–CS14
-        uint8_t  dc51;   // L2–CS15
-        uint8_t  dc52;   // L2–CS16
-        uint8_t  dc53;   // L2–CS17
-        uint8_t  dc54;   // L3–CS0
-        uint8_t  dc55;   // L3–CS1
-        uint8_t  dc56;   // L3–CS2
-        uint8_t  dc57;   // L3–CS3
-        uint8_t  dc58;   // L3–CS4
-        uint8_t  dc59;   // L3–CS5
-        uint8_t  dc60;   // L3–CS6
-        uint8_t  dc61;   // L3–CS7
-        uint8_t  dc62;   // L3–CS8
-        uint8_t  dc63;   // L3–CS9
-        uint8_t  dc64;   // L3–CS10
-        uint8_t  dc65;   // L3–CS11
-        uint8_t  dc66;   // L3–CS12
-        uint8_t  dc67;   // L3–CS13
-        uint8_t  dc68;   // L3–CS14
-        uint8_t  dc69;   // L3–CS15
-        uint8_t  dc70;   // L3–CS16
-        uint8_t  dc71;   // L3–CS17
-        uint8_t  dc72;   // L4–CS0
-        uint8_t  dc73;   // L4–CS1
-        uint8_t  dc74;   // L4–CS2
-        uint8_t  dc75;   // L4–CS3
-        uint8_t  dc76;   // L4–CS4
-        uint8_t  dc77;   // L4–CS5
-        uint8_t  dc78;   // L4–CS6
-        uint8_t  dc79;   // L4–CS7
-        uint8_t  dc80;   // L4–CS8
-        uint8_t  dc81;   // L4–CS9
-        uint8_t  dc82;   // L4–CS10
-        uint8_t  dc83;   // L4–CS11
-        uint8_t  dc84;   // L4–CS12
-        uint8_t  dc85;   // L4–CS13
-        uint8_t  dc86;   // L4–CS14
-        uint8_t  dc87;   // L4–CS15
-        uint8_t  dc88;   // L4–CS16
-        uint8_t  dc89;   // L4–CS17
-        uint8_t  dc90;   // L5–CS0
-        uint8_t  dc91;   // L5–CS1
-        uint8_t  dc92;   // L5–CS2
-        uint8_t  dc93;   // L5–CS3
-        uint8_t  dc94;   // L5–CS4
-        uint8_t  dc95;   // L5–CS5
-        uint8_t  dc96;   // L5–CS6
-        uint8_t  dc97;   // L5–CS7
-        uint8_t  dc98;   // L5–CS8
-        uint8_t  dc99;   // L5–CS9
-        uint8_t  dc100;  // L5–CS10
-        uint8_t  dc101;  // L5–CS11
-        uint8_t  dc102;  // L5–CS12
-        uint8_t  dc103;  // L5–CS13
-        uint8_t  dc104;  // L5–CS14
-        uint8_t  dc105;  // L5–CS15
-        uint8_t  dc106;  // L5–CS16
-        uint8_t  dc107;  // L5–CS17
+        uint8_t  dc0;    // L0-CS0
+        uint8_t  dc1;    // L0-CS1
+        uint8_t  dc2;    // L0-CS2
+        uint8_t  dc3;    // L0-CS3
+        uint8_t  dc4;    // L0-CS4
+        uint8_t  dc5;    // L0-CS5
+        uint8_t  dc6;    // L0-CS6
+        uint8_t  dc7;    // L0-CS7
+        uint8_t  dc8;    // L0-CS8
+        uint8_t  dc9;    // L0-CS9
+        uint8_t  dc10;   // L0-CS10
+        uint8_t  dc11;   // L0-CS11
+        uint8_t  dc12;   // L0-CS12
+        uint8_t  dc13;   // L0-CS13
+        uint8_t  dc14;   // L0-CS14
+        uint8_t  dc15;   // L0-CS15
+        uint8_t  dc16;   // L0-CS16
+        uint8_t  dc17;   // L0-CS17
+        uint8_t  dc18;   // L1-CS0
+        uint8_t  dc19;   // L1-CS1
+        uint8_t  dc20;   // L1-CS2
+        uint8_t  dc21;   // L1-CS3
+        uint8_t  dc22;   // L1-CS4
+        uint8_t  dc23;   // L1-CS5
+        uint8_t  dc24;   // L1-CS6
+        uint8_t  dc25;   // L1-CS7
+        uint8_t  dc26;   // L1-CS8
+        uint8_t  dc27;   // L1-CS9
+        uint8_t  dc28;   // L1-CS10
+        uint8_t  dc29;   // L1-CS11
+        uint8_t  dc30;   // L1-CS12
+        uint8_t  dc31;   // L1-CS13
+        uint8_t  dc32;   // L1-CS14
+        uint8_t  dc33;   // L1-CS15
+        uint8_t  dc34;   // L1-CS16
+        uint8_t  dc35;   // L1-CS17
+        uint8_t  dc36;   // L2-CS0
+        uint8_t  dc37;   // L2-CS1
+        uint8_t  dc38;   // L2-CS2
+        uint8_t  dc39;   // L2-CS3
+        uint8_t  dc40;   // L2-CS4
+        uint8_t  dc41;   // L2-CS5
+        uint8_t  dc42;   // L2-CS6
+        uint8_t  dc43;   // L2-CS7
+        uint8_t  dc44;   // L2-CS8
+        uint8_t  dc45;   // L2-CS9
+        uint8_t  dc46;   // L2-CS10
+        uint8_t  dc47;   // L2-CS11
+        uint8_t  dc48;   // L2-CS12
+        uint8_t  dc49;   // L2-CS13
+        uint8_t  dc50;   // L2-CS14
+        uint8_t  dc51;   // L2-CS15
+        uint8_t  dc52;   // L2-CS16
+        uint8_t  dc53;   // L2-CS17
+        uint8_t  dc54;   // L3-CS0
+        uint8_t  dc55;   // L3-CS1
+        uint8_t  dc56;   // L3-CS2
+        uint8_t  dc57;   // L3-CS3
+        uint8_t  dc58;   // L3-CS4
+        uint8_t  dc59;   // L3-CS5
+        uint8_t  dc60;   // L3-CS6
+        uint8_t  dc61;   // L3-CS7
+        uint8_t  dc62;   // L3-CS8
+        uint8_t  dc63;   // L3-CS9
+        uint8_t  dc64;   // L3-CS10
+        uint8_t  dc65;   // L3-CS11
+        uint8_t  dc66;   // L3-CS12
+        uint8_t  dc67;   // L3-CS13
+        uint8_t  dc68;   // L3-CS14
+        uint8_t  dc69;   // L3-CS15
+        uint8_t  dc70;   // L3-CS16
+        uint8_t  dc71;   // L3-CS17
+        uint8_t  dc72;   // L4-CS0
+        uint8_t  dc73;   // L4-CS1
+        uint8_t  dc74;   // L4-CS2
+        uint8_t  dc75;   // L4-CS3
+        uint8_t  dc76;   // L4-CS4
+        uint8_t  dc77;   // L4-CS5
+        uint8_t  dc78;   // L4-CS6
+        uint8_t  dc79;   // L4-CS7
+        uint8_t  dc80;   // L4-CS8
+        uint8_t  dc81;   // L4-CS9
+        uint8_t  dc82;   // L4-CS10
+        uint8_t  dc83;   // L4-CS11
+        uint8_t  dc84;   // L4-CS12
+        uint8_t  dc85;   // L4-CS13
+        uint8_t  dc86;   // L4-CS14
+        uint8_t  dc87;   // L4-CS15
+        uint8_t  dc88;   // L4-CS16
+        uint8_t  dc89;   // L4-CS17
+        uint8_t  dc90;   // L5-CS0
+        uint8_t  dc91;   // L5-CS1
+        uint8_t  dc92;   // L5-CS2
+        uint8_t  dc93;   // L5-CS3
+        uint8_t  dc94;   // L5-CS4
+        uint8_t  dc95;   // L5-CS5
+        uint8_t  dc96;   // L5-CS6
+        uint8_t  dc97;   // L5-CS7
+        uint8_t  dc98;   // L5-CS8
+        uint8_t  dc99;   // L5-CS9
+        uint8_t  dc100;  // L5-CS10
+        uint8_t  dc101;  // L5-CS11
+        uint8_t  dc102;  // L5-CS12
+        uint8_t  dc103;  // L5-CS13
+        uint8_t  dc104;  // L5-CS14
+        uint8_t  dc105;  // L5-CS15
+        uint8_t  dc106;  // L5-CS16
+        uint8_t  dc107;  // L5-CS17
 	    uint8_t raw; // fallback so we can memset the whole byte
     } val;
 } AlxLp586x_Reg_DotCurr;
 
 
 //------------------------------------------------------------------------------
-// 0x200–0x2D7: Dot current registers (pwm_bri0…pwm_bri215 )
+// 0x200-0x2D7: Dot current registers (pwm_bri0...pwm_bri215 )
 //------------------------------------------------------------------------------
 typedef struct
 {
-	uint8_t i2cAddr_Offset; // Added because addresses ≥ 0x100
+	uint8_t i2cAddr_Offset; // Added because addresses >= 0x100
 	uint8_t addr; // Always 1 byte
 	uint8_t  len; // Always 1 byte
 	union
@@ -2691,36 +2691,36 @@ typedef struct
 	AlxLp586x_Reg_0x04_Dev_config3  _0x04_Dev_config3;
 	AlxLp586x_Reg_0x05_Global_bri   _0x05_Global_bri;
 
-	// 0x06–0x08: Group brightness registers (Group0_bri…Group2_bri)
+	// 0x06-0x08: Group brightness registers (Group0_bri...Group2_bri)
 	AlxLp586x_Reg_GroupBri          _group_bri[3];
 
-	// 0x09…0x0B: CC-current-set
+	// 0x09...0x0B: CC-current-set
 	AlxLp586x_Reg_CurrentSetCC      _current_set_cc[3];
 
-	// 0x0C–0x29: Dot group-select for L0…L5, CS0…CS17
+	// 0x0C-0x29: Dot group-select for L0...L5, CS0...CS17
 	AlxLp586x_Reg_DotGrpSel         _dot_grp_sel[30];
 
-	// 0x43–0x54: Dot on/off registers (L0…L5, CS0…CS7)
+	// 0x43-0x54: Dot on/off registers (L0...L5, CS0...CS7)
     AlxLp586x_Reg_DotOnOff          _dot_onoff[18];
 
-	// 0x65–0x76: Dot Lod open load errors registers (L0…L5, CS0…CS7)
+	// 0x65-0x76: Dot Lod open load errors registers (L0...L5, CS0...CS7)
 	AlxLp586x_Reg_DotLod            _dot_lod[18];
 
-	// 0x86–0x97: Dot Lsd short-cut load errors registers (L0…L5, CS0…CS7)
+	// 0x86-0x97: Dot Lsd short-cut load errors registers (L0...L5, CS0...CS7)
 	AlxLp586x_Reg_DotLsd            _dot_lsd[18];
 
 	// 0x64: Fault_state
     AlxLp586x_Reg_0x64_Fault_state  _0x64_Fault_state;
 
-	// 0xA7–0xA9: Clears and reset registers
+	// 0xA7-0xA9: Clears and reset registers
     AlxLp586x_Reg_0xA7_LOD_clear    _0xA7_LOD_clear;
     AlxLp586x_Reg_0xA8_LSD_clear    _0xA8_LSD_clear;
     AlxLp586x_Reg_0xA9_Reset        _0xA9_Reset;
 
-	// 0x100–0x16B: Dot-current (DC0…DC107)
+	// 0x100-0x16B: Dot-current (DC0...DC107)
 	AlxLp586x_Reg_DotCurr           _dot_curr[108];
 
-	// 0x200–0x2D7: Dot current registers (pwm_bri0…pwm_bri215 )
+	// 0x200-0x2D7: Dot current registers (pwm_bri0...pwm_bri215 )
 	AlxLp586x_Reg_PwmBri            _pwm_bri[216];
 
 } AlxLp586x_Reg;
@@ -2788,4 +2788,4 @@ void AlxLp586x_Led_Write(AlxLp586x* me, uint8_t ledNum, bool val);
 }
 #endif
 
-#endif	// #ifndef ALX_LP586x_H
+#endif	// #ifndef ALX_LP586X_H

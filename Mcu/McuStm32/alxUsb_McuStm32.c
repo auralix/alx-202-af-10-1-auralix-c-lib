@@ -60,7 +60,7 @@ static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id);
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
-static Alx_Status AlxUsb_Reset(AlxUsb* me);
+static ALX_UNUSED Alx_Status AlxUsb_Reset(AlxUsb* me);
 static void AlxUsb_Periph_EnableClk(AlxUsb* me);
 static void AlxUsb_Periph_DisableClk(AlxUsb* me);
 static void AlxUsb_Periph_ForceReset(AlxUsb* me);
@@ -179,7 +179,7 @@ Alx_Status AlxUsb_Init(AlxUsb* me)
 	status = USBH_Init(&me->usbh, AlxUsb_Event_Callback, 0);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_Init() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: USBH_Init() status %d", status);
 		return Alx_Err;
 	}
 
@@ -187,7 +187,7 @@ Alx_Status AlxUsb_Init(AlxUsb* me)
 	status = USBH_RegisterClass(&me->usbh, USBH_MSC_CLASS);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_RegisterClass() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: USBH_RegisterClass() status %d", status);
 		return Alx_Err;
 	}
 
@@ -195,7 +195,7 @@ Alx_Status AlxUsb_Init(AlxUsb* me)
 	status = USBH_Start(&me->usbh);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_Start() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: USBH_Start() status %d", status);
 		return Alx_Err;
 	}
 	#endif
@@ -227,7 +227,7 @@ Alx_Status AlxUsb_DeInit(AlxUsb* me)
 	status = USBH_Stop(&me->usbh);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_Stop() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: USBH_Stop() status %d", status);
 		return Alx_Err;
 	}
 
@@ -235,7 +235,7 @@ Alx_Status AlxUsb_DeInit(AlxUsb* me)
 	status = USBH_DeInit(&me->usbh);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_DeInit() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: USBH_DeInit() status %d", status);
 		return Alx_Err;
 	}
 	#endif
@@ -255,7 +255,9 @@ Alx_Status AlxUsb_DeInit(AlxUsb* me)
 
 	// Clear
 	me->usbh_event = 0;
+	#if defined(ALX_USBH)
 	memset(&me->usbhMsc_info, 0, sizeof(me->usbhMsc_info));
+	#endif
 	me->usbhMsc_isReady = false;
 	me->blockCount = 0;
 	me->blockLen_byte = 0;
@@ -301,7 +303,7 @@ Alx_Status AlxUsb_Handle(AlxUsb* me)
 		Alx_Status status = AlxUsb_Reset(me);
 		if (status != Alx_Ok)
 		{
-			ALX_USB_TRACE_ERR("FAIL: AlxUsb_Reset() status %ld", status);
+			ALX_USB_TRACE_ERR("FAIL: AlxUsb_Reset() status %d", status);
 			return Alx_Err;
 		}
 	}
@@ -311,7 +313,7 @@ Alx_Status AlxUsb_Handle(AlxUsb* me)
 		USBH_StatusTypeDef status = USBH_MSC_GetLUNInfo(&me->usbh, 0, &me->usbhMsc_info);
 		if (status != USBH_OK)
 		{
-			ALX_USB_TRACE_ERR("FAIL: USBH_MSC_GetLUNInfo() status %ld", status);
+			ALX_USB_TRACE_ERR("FAIL: USBH_MSC_GetLUNInfo() status %d", status);
 			return Alx_Err;
 		}
 
@@ -412,7 +414,7 @@ Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t numOfBlocks, uint32_t addr, uint8_t*
 	// Check
 	if (!me->isReady)
 	{
-		ALX_USB_TRACE_ERR("FAIL: isReady() addr %lu numOfBlocks %lu", addr, numOfBlocks);
+		ALX_USB_TRACE_ERR("FAIL: isReady() addr %" PRIu32 " numOfBlocks %" PRIu32, addr, numOfBlocks);
 		return Alx_Err;
 	}
 
@@ -421,7 +423,7 @@ Alx_Status AlxUsb_Read(AlxUsb* me, uint32_t numOfBlocks, uint32_t addr, uint8_t*
 	USBH_StatusTypeDef status = USBH_MSC_Read(&me->usbh, 0, addr, data, numOfBlocks);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Read() status %ld addr %lu numOfBlocks %lu", status, addr, numOfBlocks);
+		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Read() status %d addr %" PRIu32 " numOfBlocks %" PRIu32, status, addr, numOfBlocks);
 		return Alx_Err;
 	}
 	#endif
@@ -449,7 +451,7 @@ Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t numOfBlocks, uint32_t addr, uint8_t
 	// Check
 	if (!me->isReady)
 	{
-		ALX_USB_TRACE_ERR("FAIL: isReady() addr %lu numOfBlocks %lu", addr, numOfBlocks);
+		ALX_USB_TRACE_ERR("FAIL: isReady() addr %" PRIu32 " numOfBlocks %" PRIu32, addr, numOfBlocks);
 		return Alx_Err;
 	}
 
@@ -458,7 +460,7 @@ Alx_Status AlxUsb_Write(AlxUsb* me, uint32_t numOfBlocks, uint32_t addr, uint8_t
 	USBH_StatusTypeDef status = USBH_MSC_Write(&me->usbh, 0, addr, data, numOfBlocks);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Write() status %ld addr %lu numOfBlocks %lu", status, addr, numOfBlocks);
+		ALX_USB_TRACE_ERR("FAIL: USBH_MSC_Write() status %d addr %" PRIu32 " numOfBlocks %" PRIu32, status, addr, numOfBlocks);
 		return Alx_Err;
 	}
 	#endif
@@ -495,7 +497,7 @@ static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
 	alxUsb_me->usbh_event = id;
 
 	// Trace
-	ALX_USB_TRACE_INF("AlxUsb_Event_Callback() id %lu name %s", id, alxUsb_me->eventNameArr[id]);
+	ALX_USB_TRACE_INF("AlxUsb_Event_Callback() id %" PRIu32 " name %s", (uint32_t)id, alxUsb_me->eventNameArr[id]);
 }
 #endif
 
@@ -503,7 +505,7 @@ static void AlxUsb_Event_Callback(USBH_HandleTypeDef* phost, uint8_t id)
 //------------------------------------------------------------------------------
 // General
 //------------------------------------------------------------------------------
-static Alx_Status AlxUsb_Reset(AlxUsb* me)
+static ALX_UNUSED Alx_Status AlxUsb_Reset(AlxUsb* me)
 {
 	// Local variables
 	#if defined(ALX_USBH)
@@ -513,7 +515,7 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 	status = USBH_Stop(&me->usbh);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_Stop() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: USBH_Stop() status %d", status);
 		return Alx_Err;
 	}
 
@@ -521,7 +523,7 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 	status = USBH_DeInit(&me->usbh);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_DeInit() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: USBH_DeInit() status %d", status);
 		return Alx_Err;
 	}
 	#endif
@@ -534,7 +536,9 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 
 	// Clear
 	me->usbh_event = 0;
+	#if defined(ALX_USBH)
 	memset(&me->usbhMsc_info, 0, sizeof(me->usbhMsc_info));
+	#endif
 	me->usbhMsc_isReady = false;
 	me->blockCount = 0;
 	me->blockLen_byte = 0;
@@ -555,7 +559,7 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 	status = USBH_Init(&me->usbh, AlxUsb_Event_Callback, 0);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_Init() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: USBH_Init() status %d", status);
 		return Alx_Err;
 	}
 
@@ -563,7 +567,7 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 	status = USBH_RegisterClass(&me->usbh, USBH_MSC_CLASS);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_RegisterClass() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: USBH_RegisterClass() status %d", status);
 		return Alx_Err;
 	}
 
@@ -571,7 +575,7 @@ static Alx_Status AlxUsb_Reset(AlxUsb* me)
 	status = USBH_Start(&me->usbh);
 	if (status != USBH_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: USBH_Start() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: USBH_Start() status %d", status);
 		return Alx_Err;
 	}
 	#endif
@@ -700,7 +704,7 @@ USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef* phost)
 	HAL_StatusTypeDef status = HAL_HCD_Init(hhcd);
 	if (status != HAL_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_Init() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_Init() status %d", status);
 		return USBH_UNRECOVERED_ERROR;
 	}
 
@@ -716,7 +720,7 @@ USBH_StatusTypeDef USBH_LL_DeInit(USBH_HandleTypeDef* phost)
 	HAL_StatusTypeDef status = HAL_HCD_DeInit(phost->pData);
 	if (status != HAL_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_DeInit() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_DeInit() status %d", status);
 		return USBH_UNRECOVERED_ERROR;
 	}
 
@@ -729,7 +733,7 @@ USBH_StatusTypeDef USBH_LL_Start(USBH_HandleTypeDef* phost)
 	HAL_StatusTypeDef status = HAL_HCD_Start(phost->pData);
 	if (status != HAL_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_Start() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_Start() status %d", status);
 		return USBH_UNRECOVERED_ERROR;
 	}
 
@@ -742,7 +746,7 @@ USBH_StatusTypeDef USBH_LL_Stop(USBH_HandleTypeDef* phost)
 	HAL_StatusTypeDef status = HAL_HCD_Stop(phost->pData);
 	if (status != HAL_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_Stop() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_Stop() status %d", status);
 		return USBH_UNRECOVERED_ERROR;
 	}
 
@@ -781,7 +785,7 @@ USBH_StatusTypeDef USBH_LL_ResetPort(USBH_HandleTypeDef* phost)
 	HAL_StatusTypeDef status = HAL_HCD_ResetPort(phost->pData);
 	if (status != HAL_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_ResetPort() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_ResetPort() status %d", status);
 		return USBH_UNRECOVERED_ERROR;
 	}
 
@@ -808,7 +812,7 @@ USBH_StatusTypeDef USBH_LL_OpenPipe(USBH_HandleTypeDef* phost, uint8_t pipe, uin
 	HAL_StatusTypeDef status = HAL_HCD_HC_Init(phost->pData, pipe, epnum, dev_address, speed, ep_type, mps);
 	if (status != HAL_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_HC_Init() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_HC_Init() status %d", status);
 		return USBH_UNRECOVERED_ERROR;
 	}
 
@@ -821,7 +825,7 @@ USBH_StatusTypeDef USBH_LL_ClosePipe(USBH_HandleTypeDef* phost, uint8_t pipe)
 	HAL_StatusTypeDef status = HAL_HCD_HC_Halt(phost->pData, pipe);
 	if (status != HAL_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_HC_Halt() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_HC_Halt() status %d", status);
 		return USBH_UNRECOVERED_ERROR;
 	}
 
@@ -834,7 +838,7 @@ USBH_StatusTypeDef USBH_LL_SubmitURB(USBH_HandleTypeDef* phost, uint8_t pipe, ui
 	HAL_StatusTypeDef status = HAL_HCD_HC_SubmitRequest(phost->pData, pipe,direction, ep_type, token, pbuff, length, do_ping);
 	if (status != HAL_OK)
 	{
-		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_HC_SubmitRequest() status %ld", status);
+		ALX_USB_TRACE_ERR("FAIL: HAL_HCD_HC_SubmitRequest() status %d", status);
 		return USBH_UNRECOVERED_ERROR;
 	}
 

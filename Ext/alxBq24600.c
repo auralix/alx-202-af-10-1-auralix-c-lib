@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxBq24600.c
   * @brief		Auralix C Library - ALX Battery Charger BQ24600 Module
@@ -91,7 +91,7 @@ void AlxBq24600_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBq24600_Init(AlxBq24600* me)
 {
@@ -120,7 +120,7 @@ void AlxBq24600_Init(AlxBq24600* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBq24600_DeInit(AlxBq24600* me)
 {
@@ -138,7 +138,7 @@ void AlxBq24600_DeInit(AlxBq24600* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBq24600_Handle(AlxBq24600* me)
 {
@@ -199,7 +199,7 @@ void AlxBq24600_Handle(AlxBq24600* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBq24600_Enable(AlxBq24600* me)
 {
@@ -211,7 +211,7 @@ void AlxBq24600_Enable(AlxBq24600* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxBq24600_Disable(AlxBq24600* me)
 {
@@ -232,7 +232,14 @@ bool AlxBq24600_IsBatCharging(AlxBq24600* me)
 	ALX_BQ24600_ASSERT(me->isInit == true);
 	ALX_BQ24600_ASSERT(me->wasCtorCalled == true);
 
-	return (me->status == Bq24600Status_Charging) ? true : false;
+	if (me->status == Bq24600Status_Charging)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /**
@@ -246,7 +253,14 @@ bool AlxBq24600_IsBatFull(AlxBq24600* me)
 	ALX_BQ24600_ASSERT(me->isInit == true);
 	ALX_BQ24600_ASSERT(me->wasCtorCalled == true);
 
-	return (me->status == Bq24600Status_BattFull) ? true : false;
+	if (me->status == Bq24600Status_BattFull)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /**
@@ -260,7 +274,14 @@ bool AlxBq24600_IsSleep(AlxBq24600* me)
 	ALX_BQ24600_ASSERT(me->isInit == true);
 	ALX_BQ24600_ASSERT(me->wasCtorCalled == true);
 
-	return (me->status == Bq24600Status_Sleep) ? true : false;
+	if (me->status == Bq24600Status_Sleep)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /**
@@ -274,7 +295,14 @@ bool AlxBq24600_IsErr(AlxBq24600* me)
 	ALX_BQ24600_ASSERT(me->isInit == true);
 	ALX_BQ24600_ASSERT(me->wasCtorCalled == true);
 
-	return (me->status == Bq24600Status_Error) ? true : false;
+	if (me->status == Bq24600Status_Error)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 

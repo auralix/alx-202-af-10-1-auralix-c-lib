@@ -69,20 +69,22 @@ extern "C" {
 #elif defined(ALX_LOGGER_ASSERT_RST_ENABLE)
 	#define ALX_LOGGER_ASSERT(expr) ALX_ASSERT_RST(ALX_LOGGER_FILE, expr)
 #else
-	#define ALX_LOGGER_ASSERT(expr) do{} while (false)
+	#define ALX_LOGGER_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_LOGGER_TRACE_ENABLE)
+	#define ALX_LOGGER_TRACE_FORMAT(...) ALX_TRACE_FORMAT(__VA_ARGS__)
 	#define ALX_LOGGER_TRACE_ERR(...) ALX_TRACE_ERR(ALX_LOGGER_FILE, __VA_ARGS__)
 	#define ALX_LOGGER_TRACE_WRN(...) ALX_TRACE_WRN(ALX_LOGGER_FILE, __VA_ARGS__)
 	#define ALX_LOGGER_TRACE_INF(...) ALX_TRACE_INF(ALX_LOGGER_FILE, __VA_ARGS__)
 	#define ALX_LOGGER_TRACE_VRB(...) ALX_TRACE_VRB(ALX_LOGGER_FILE, __VA_ARGS__)
 #else
-	#define ALX_LOGGER_TRACE_ERR(...) do{} while (false)
-	#define ALX_LOGGER_TRACE_WRN(...) do{} while (false)
-	#define ALX_LOGGER_TRACE_INF(...) do{} while (false)
-	#define ALX_LOGGER_TRACE_VRB(...) do{} while (false)
+	#define ALX_LOGGER_TRACE_FORMAT(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_LOGGER_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_LOGGER_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_LOGGER_TRACE_INF(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_LOGGER_TRACE_VRB(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -98,7 +100,7 @@ typedef enum
 	AlxLogger_Metadata_StoreConfig_WriteOldest
 } AlxLogger_Metadata_StoreConfig;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint64_t id;
 	uint32_t pos;
@@ -107,7 +109,7 @@ typedef struct __attribute__((packed))
 	uint32_t dir;
 } AlxLogger_Metadata_Id;
 
-typedef struct __attribute__((packed))
+typedef struct ALX_PACKED
 {
 	uint32_t magicNumber;
 	uint32_t version;

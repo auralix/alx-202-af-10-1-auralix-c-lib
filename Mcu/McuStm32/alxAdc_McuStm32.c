@@ -49,7 +49,7 @@
 static uint32_t AlxAdc_GetVref_mV(AlxAdc* me);
 static uint32_t AlxAdc_GetClkPrescaler(AlxAdc* me);
 static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch);
-static uint32_t AlxAdc_GetRank(uint8_t buffPos);
+static ALX_UNUSED uint32_t AlxAdc_GetRank(uint8_t buffPos);
 
 
 //------------------------------------------------------------------------------
@@ -132,13 +132,14 @@ void AlxAdc_Ctor
 	// Check channel sequence
 	for (uint8_t i = 0; i < numOfCh - 1; i++)
 	{
-		uint32_t chNumCurrent = AlxAdc_GetCh(me, chArr[i]);
-		uint32_t chNumNext = AlxAdc_GetCh(me, chArr[i+1]);
+		ALX_UNUSED uint32_t chNumCurrent = AlxAdc_GetCh(me, chArr[i]);
+		ALX_UNUSED uint32_t chNumNext = AlxAdc_GetCh(me, chArr[i+1]);
 		ALX_ADC_ASSERT(chNumCurrent < chNumNext);	// Channel sequence must be from low to high number
 	}
 
 	// Check clock
-	ALX_ADC_ASSERT(AlxAdc_IsClkOk(me));
+	ALX_UNUSED bool isClkOk = AlxAdc_IsClkOk(me);
+	ALX_ADC_ASSERT(isClkOk);
 
 
 	//------------------------------------------------------------------------------
@@ -864,7 +865,7 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 	ALX_ADC_ASSERT(me->isInit == true);
 
 	// Get reference voltage
-	uint32_t vref_mV = AlxAdc_GetVref_mV(me);
+	ALX_UNUSED uint32_t vref_mV = AlxAdc_GetVref_mV(me);
 
 	// Get temperature
 	for (uint32_t i = 0; i < me->numOfCh; i++)
@@ -910,7 +911,7 @@ static uint32_t AlxAdc_GetVref_mV(AlxAdc* me)
 			if (me->ch[i] == Alx_Ch_McuStm32_Vref)
 			{
 				// Prepare
-				#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+				#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
 				uint32_t vref_mV = __LL_ADC_CALC_VREFANALOG_VOLTAGE(me->buff[i], ALX_ADC_RESOLUTION);
 				#endif
 				#if defined(ALX_STM32U5)
@@ -1248,13 +1249,13 @@ static uint32_t AlxAdc_GetCh(AlxAdc* me, Alx_Ch ch)
 	ALX_ADC_ASSERT(false);	// We should not get here
 	return ALX_NULL;
 }
-static uint32_t AlxAdc_GetRank(uint8_t buffPos)
+static ALX_UNUSED uint32_t AlxAdc_GetRank(uint8_t buffPos)
 {
 	//------------------------------------------------------------------------------
 	// STM32F0, STM32F1, STM32F4, STM32F7
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7)
-	ALX_ADC_ASSERT((0 <= buffPos) && (buffPos <= 15));
+	ALX_ADC_ASSERT(buffPos <= 15);
 	return buffPos + 1;
 	#endif
 

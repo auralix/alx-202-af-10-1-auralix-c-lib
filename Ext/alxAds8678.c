@@ -56,7 +56,7 @@ static void AlxAds8678_RegStruct_SetAddr(AlxAds8678* me);
 static void AlxAds8678_RegStruct_SetLen(AlxAds8678* me);
 static void AlxAds8678_RegStruct_SetValToZero(AlxAds8678* me);
 static void AlxAds8678_RegStruct_SetToDefault(AlxAds8678* me);
-static Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg);
+static ALX_UNUSED Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg);
 static Alx_Status AlxAds8678_Reg_Write(AlxAds8678* me, void* reg);
 static Alx_Status AlxAds8678_Reg_WriteAll(AlxAds8678* me);
 static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, uint8_t* dataReadArr);
@@ -298,8 +298,10 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 				}
 			}
 
-			// Check channel voltage range
-			AlxAds8678_RegEnum_0x05_0x0C_Range_CHn regEnumChVoltageRange = 0;
+			// Get channel voltage range from the channel's register
+			AlxAds8678_RegEnum_0x05_0x0C_Range_CHn regEnumChVoltageRange = AlxAds8678_GetChRegEnumChVoltageRange(me, chNum);
+
+			// Check channel voltage range, if the frame carries it
 			if (me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv_ChAddr_DevAddr_InRange)
 			{
 				// Parse
@@ -308,7 +310,6 @@ Alx_Status AlxAds8678_GetChVoltageAll_V(AlxAds8678* me, AlxAds8678_ChVoltageAll_
 				chDataFrame.chVoltageRangeLsb3 = (chVoltageRangeLsb3_MSB << 1) | (chVoltageRangeLsb3_LSB >> 7);
 
 				// Check
-				regEnumChVoltageRange = AlxAds8678_GetChRegEnumChVoltageRange(me, chNum);
 				uint8_t chVoltageRangeLsb3 = regEnumChVoltageRange & 0x07;
 				if(chDataFrame.chVoltageRangeLsb3 != chVoltageRangeLsb3)
 				{
@@ -401,13 +402,12 @@ static void AlxAds8678_RegStruct_SetToDefault(AlxAds8678* me)
 	me->reg._0x0B_Channel6InputRange		.val.raw =	0x00;
 	me->reg._0x0C_Channel7InputRange		.val.raw =	0x00;
 }
-static Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)
+static ALX_UNUSED Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)
 {
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t regAddr = *((uint8_t*)reg);
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(uint8_t);
 	uint8_t dataWriteArr[3] = {};
 	uint8_t dataReadArr[3] = {};
 
@@ -415,7 +415,7 @@ static Alx_Status AlxAds8678_Reg_Read(AlxAds8678* me, void* reg)
 	AlxSpi_Master_AssertCs(me->spi);
 
 	// Prepare
-	dataWriteArr[0] = (regAddr << 1) | 0x00;	// Register address and read/write info - LSB must be set to 0 for read operation
+	dataWriteArr[0] = (regAddr << 1);	// Register address and read/write info - LSB must be set to 0 for read operation
 	dataWriteArr[1] = 0x00;						// Dummy byte
 	dataWriteArr[2] = 0x00;						// Dummy byte
 
@@ -442,8 +442,7 @@ static Alx_Status AlxAds8678_Reg_Write(AlxAds8678* me, void* reg)
 	// Local variables
 	Alx_Status status = Alx_Err;
 	uint8_t regAddr = *((uint8_t*)reg);
-	uint8_t regLen = *((uint8_t*)reg + sizeof(regAddr));
-	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(regLen);
+	uint8_t* regValPtr = (uint8_t*)reg + sizeof(regAddr) + sizeof(uint8_t);
 	uint8_t dataWriteArr[3] = {};
 	uint8_t dataReadArr[3] = {};
 
@@ -484,37 +483,81 @@ static Alx_Status AlxAds8678_Reg_WriteAll(AlxAds8678* me)
 
 	// Write
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x01_AutoScanSequenceEnable);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x02_ChannelPowerDown);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x03_FeatureSelect);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x05_Channel0InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x06_Channel1InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x07_Channel2InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x08_Channel3InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x09_Channel4InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x0A_Channel5InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x0B_Channel6InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxAds8678_Reg_Write(me, &me->reg._0x0C_Channel7InputRange);
-	if (status != Alx_Ok) { ALX_ADS8678_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_ADS8678_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;
@@ -536,7 +579,7 @@ static Alx_Status AlxAds8678_Cmd_Write_NoOp(AlxAds8678* me, uint8_t* dataReadArr
 	dataWriteArr[4] = 0x00;
 	dataWriteArr[5] = 0x00;
 
-	// Prepare write/read lenght
+	// Prepare write/read length
 	uint16_t len = 0;
 	if (me->reg._0x03_FeatureSelect.val.SDO == SDO_Conv)
 		len = 4;

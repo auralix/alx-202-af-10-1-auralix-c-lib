@@ -99,16 +99,16 @@ extern "C" {
 #define ALX_BUILD_COMP_SEC_CH1  (__TIME__[7])
 
 // Compiler Date
-#define ALX_BUILD_DATE_COMP		((ALX_BUILD_COMP_YEAR_CH2  - '0') * 1000000000 + \
-								 (ALX_BUILD_COMP_YEAR_CH3  - '0') * 100000000 + \
-								 (ALX_BUILD_COMP_MONTH_CH0 - '0') * 10000000 + \
-								 (ALX_BUILD_COMP_MONTH_CH1 - '0') * 1000000 + \
-								 (ALX_BUILD_COMP_DAY_CH0   - '0') * 100000 + \
-								 (ALX_BUILD_COMP_DAY_CH1   - '0') * 10000 + \
-								 (ALX_BUILD_COMP_HOUR_CH0  - '0') * 1000 + \
-								 (ALX_BUILD_COMP_HOUR_CH1  - '0') * 100 + \
-								 (ALX_BUILD_COMP_MIN_CH0   - '0') * 10 + \
-								 (ALX_BUILD_COMP_MIN_CH1   - '0') * 1)
+#define ALX_BUILD_DATE_COMP		((ALX_BUILD_COMP_YEAR_CH2  - '0') * 1000000000UL + \
+								 (ALX_BUILD_COMP_YEAR_CH3  - '0') * 100000000UL + \
+								 (ALX_BUILD_COMP_MONTH_CH0 - '0') * 10000000UL + \
+								 (ALX_BUILD_COMP_MONTH_CH1 - '0') * 1000000UL + \
+								 (ALX_BUILD_COMP_DAY_CH0   - '0') * 100000UL + \
+								 (ALX_BUILD_COMP_DAY_CH1   - '0') * 10000UL + \
+								 (ALX_BUILD_COMP_HOUR_CH0  - '0') * 1000UL + \
+								 (ALX_BUILD_COMP_HOUR_CH1  - '0') * 100UL + \
+								 (ALX_BUILD_COMP_MIN_CH0   - '0') * 10UL + \
+								 (ALX_BUILD_COMP_MIN_CH1   - '0') * 1UL)
 
 
 #endif	// #if defined(ALX_C_LIB)

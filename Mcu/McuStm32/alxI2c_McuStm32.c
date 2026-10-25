@@ -108,7 +108,8 @@ void AlxI2c_Ctor
 	#endif
 
 	// Check clock
-	ALX_I2C_ASSERT(AlxI2c_IsClkOk(me));
+	ALX_UNUSED bool isClkOk = AlxI2c_IsClkOk(me);
+	ALX_I2C_ASSERT(isClkOk);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -236,10 +237,10 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 	HAL_StatusTypeDef status = HAL_ERROR;
 
 	// Try read for number of tries
-	for(uint32_t _try = 1 ; _try <= numOfTries ; _try++)
+	for(uint32_t tryNum = 1 ; tryNum <= numOfTries ; tryNum++)
 	{
 		// Trace
-		ALX_I2C_TRACE_VRB("I2C Read START: try %lu, slaveAddr 0x%04X, len %u, timeout %ums", _try, slaveAddr, len, timeout_ms);
+		ALX_I2C_TRACE_VRB("I2C Read START: try %" PRIu32 ", slaveAddr 0x%04" PRIX32 ", len %" PRIu32 ", timeout %" PRIu32 "ms", tryNum, (uint32_t)slaveAddr, (uint32_t)len, (uint32_t)timeout_ms);
 
 		// Read
 		status = HAL_I2C_Master_Receive(&me->hi2c, slaveAddr, data, len, timeout_ms);
@@ -259,7 +260,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		}
 	}
 
-	// If we are here, read was OK or number of tries error occured
+	// If we are here, read was OK or number of tries error occurred
 	if(status == HAL_OK)
 	{
 		// Trace
@@ -268,7 +269,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
 		ALX_I2C_TRACE_FORMAT("    data: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_I2C_TRACE_FORMAT("%02X ", data[i]);
+			ALX_I2C_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)data[i]);
 		}
 		ALX_I2C_TRACE_FORMAT("\r\n");
 		#endif
@@ -315,10 +316,10 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 	uint16_t _memAddrLen = AlxI2c_ParseMemAddrLen(memAddrLen);
 
 	// Try read for number of tries
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// Trace
-		ALX_I2C_TRACE_VRB("I2C Read Memory START: try %lu, slaveAddr 0x%04X, memAddr 0x%04X, len %u, timeout %ums", _try, slaveAddr, memAddr, len, timeout_ms);
+		ALX_I2C_TRACE_VRB("I2C Read Memory START: try %" PRIu32 ", slaveAddr 0x%04" PRIX32 ", memAddr 0x%04" PRIX32 ", len %" PRIu32 ", timeout %" PRIu32 "ms", tryNum, (uint32_t)slaveAddr, (uint32_t)memAddr, (uint32_t)len, (uint32_t)timeout_ms);
 
 		// Read
 		status = HAL_I2C_Mem_Read(&me->hi2c, slaveAddr, memAddr, _memAddrLen, data, len, timeout_ms);
@@ -338,7 +339,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		}
 	}
 
-	// If we are here, read was OK or number of tries error occured
+	// If we are here, read was OK or number of tries error occurred
 	if (status == HAL_OK)
 	{
 		// Trace
@@ -347,7 +348,7 @@ Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16
 		ALX_I2C_TRACE_FORMAT("    data: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_I2C_TRACE_FORMAT("%02X ", data[i]);
+			ALX_I2C_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)data[i]);
 		}
 		ALX_I2C_TRACE_FORMAT("\r\n");
 		#endif
@@ -405,15 +406,15 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 	HAL_StatusTypeDef status = HAL_ERROR;
 
 	// Try write for number of tries
-	for(uint32_t _try = 1 ; _try <= numOfTries ; _try++)
+	for(uint32_t tryNum = 1 ; tryNum <= numOfTries ; tryNum++)
 	{
 		// Trace
-		ALX_I2C_TRACE_VRB("I2C Write START: try %lu, slaveAddr 0x%04X, len %u, timeout %ums", _try, slaveAddr, len, timeout_ms);
+		ALX_I2C_TRACE_VRB("I2C Write START: try %" PRIu32 ", slaveAddr 0x%04" PRIX32 ", len %" PRIu32 ", timeout %" PRIu32 "ms", tryNum, (uint32_t)slaveAddr, (uint32_t)len, (uint32_t)timeout_ms);
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		ALX_I2C_TRACE_FORMAT("    data: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_I2C_TRACE_FORMAT("%02X ", data[i]);
+			ALX_I2C_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)data[i]);
 		}
 		ALX_I2C_TRACE_FORMAT("\r\n");
 		#endif
@@ -436,7 +437,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
 		}
 	}
 
-	// If we are here, write was OK or number of tries error occured
+	// If we are here, write was OK or number of tries error occurred
 	if(status == HAL_OK)
 	{
 		// Trace
@@ -506,15 +507,15 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 	uint8_t buff[ALX_I2C_BUFF_LEN] = {};
 
 	// Try write for number of tries
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// Trace
-		ALX_I2C_TRACE_VRB("I2C Write Memory START: try %lu, slaveAddr 0x%04X, memAddr 0x%04X, len %u, timeout %ums", _try, slaveAddr, memAddr, len, timeout_ms);
+		ALX_I2C_TRACE_VRB("I2C Write Memory START: try %" PRIu32 ", slaveAddr 0x%04" PRIX32 ", memAddr 0x%04" PRIX32 ", len %" PRIu32 ", timeout %" PRIu32 "ms", tryNum, (uint32_t)slaveAddr, (uint32_t)memAddr, (uint32_t)len, (uint32_t)timeout_ms);
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		ALX_I2C_TRACE_FORMAT("    data: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_I2C_TRACE_FORMAT("%02X ", data[i]);
+			ALX_I2C_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)data[i]);
 		}
 		ALX_I2C_TRACE_FORMAT("\r\n");
 		#endif
@@ -526,14 +527,14 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 			// If enabled, read & check previously written data
 			if (checkWithRead)
 			{
-				Alx_Status status = Alx_Err;
-				status = AlxI2c_Master_StartReadMemStop(me, slaveAddr, memAddr, memAddrLen, buff, len, numOfTries, timeout_ms);
-				if (status == Alx_ErrNumOfTries)
+				Alx_Status alxStat = Alx_Err;
+				alxStat = AlxI2c_Master_StartReadMemStop(me, slaveAddr, memAddr, memAddrLen, buff, len, numOfTries, timeout_ms);
+				if (alxStat == Alx_ErrNumOfTries)
 				{
 					ALX_I2C_TRACE_WRN("Wrn");
 					continue;
 				}
-				else if (status != Alx_Ok)
+				else if (alxStat != Alx_Ok)
 				{
 					ALX_I2C_ASSERT(false);	// We should never get here
 					return Alx_Err;
@@ -565,7 +566,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 		}
 	}
 
-	// If we are here, write was OK or number of tries error occured
+	// If we are here, write was OK or number of tries error occurred
 	if (status == HAL_OK)
 	{
 		// Trace

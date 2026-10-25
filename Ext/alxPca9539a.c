@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPca9539a.c
   * @brief		Auralix C Library - ALX IO Expander PCA9539A Module
@@ -250,7 +250,7 @@ Alx_Status AlxPca9539a_DeInit(AlxPca9539a* me)
 }
 
 /**
-  * @brief Poll function
+  * @brief		Poll function
   * @param[in,out]	me
   * @retval			Alx_Ok
   * @retval			Alx_Err
@@ -282,10 +282,10 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 		return status;
 	}
 
-	if (me->_OpenDrain_0.raw != 0b00000000)
+	if (me->regVal_OpenDrain_0.raw != 0b00000000)
 	{
-		mask = me->_OpenDrain_0.raw & me->reg._02h_OutputPort_0.val.raw;
-		me->reg._06h_Configuration_0.val.raw = (me->reg._06h_Configuration_0.val.raw & ~me->_OpenDrain_0.raw) | mask;
+		mask = me->regVal_OpenDrain_0.raw & me->reg._02h_OutputPort_0.val.raw;
+		me->reg._06h_Configuration_0.val.raw = (me->reg._06h_Configuration_0.val.raw & ~me->regVal_OpenDrain_0.raw) | mask;
 
 		status = AlxPca9539a_Reg_Write(me, &me->reg._06h_Configuration_0);
 		if (status != Alx_Ok)
@@ -295,10 +295,10 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 		}
 	}
 
-	if (me->_OpenDrain_1.raw != 0b00000000)
+	if (me->regVal_OpenDrain_1.raw != 0b00000000)
 	{
-		mask = me->_OpenDrain_1.raw & me->reg._03h_OutputPort_1.val.raw;
-		me->reg._07h_Configuration_1.val.raw = (me->reg._07h_Configuration_1.val.raw & ~me->_OpenDrain_1.raw) | mask;
+		mask = me->regVal_OpenDrain_1.raw & me->reg._03h_OutputPort_1.val.raw;
+		me->reg._07h_Configuration_1.val.raw = (me->reg._07h_Configuration_1.val.raw & ~me->regVal_OpenDrain_1.raw) | mask;
 
 		status = AlxPca9539a_Reg_Write(me, &me->reg._07h_Configuration_1);
 		if (status != Alx_Ok)
@@ -327,7 +327,7 @@ Alx_Status AlxPca9539a_Handle(AlxPca9539a* me)
 }
 
 /**
-  * @brief GPIO interrupt handle
+  * @brief		GPIO interrupt handle
   * @param[in,out]	me
   * @retval			Alx_Ok
   * @retval			Alx_Err
@@ -374,7 +374,7 @@ bool AlxPca9539a_IoPin_Read(AlxPca9539a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCA9539A_ASSERT((port == 0) || (port == 1));
-	ALX_PCA9539A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCA9539A_ASSERT(pin <= 7);
 
 	// Read if port 0 is used
 	if (port == 0)
@@ -452,7 +452,7 @@ void AlxPca9539a_IoPin_Write(AlxPca9539a* me, uint8_t port, uint8_t pin, bool va
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCA9539A_ASSERT((port == 0) || (port == 1));
-	ALX_PCA9539A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCA9539A_ASSERT(pin <= 7);
 
 	// Write if port 0 is used
 	if (port == 0)
@@ -500,7 +500,7 @@ void AlxPca9539a_IoPin_Set(AlxPca9539a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCA9539A_ASSERT((port == 0) || (port == 1));
-	ALX_PCA9539A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCA9539A_ASSERT(pin <= 7);
 
 	// Set
 	AlxPca9539a_IoPin_Write(me, port, pin, true);
@@ -519,7 +519,7 @@ void AlxPca9539a_IoPin_Reset(AlxPca9539a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCA9539A_ASSERT((port == 0) || (port == 1));
-	ALX_PCA9539A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCA9539A_ASSERT(pin <= 7);
 
 	// Reset
 	AlxPca9539a_IoPin_Write(me, port, pin, false);
@@ -538,7 +538,7 @@ void AlxPca9539a_IoPin_Toggle(AlxPca9539a* me, uint8_t port, uint8_t pin)
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
 	ALX_PCA9539A_ASSERT((port == 0) || (port == 1));
-	ALX_PCA9539A_ASSERT((0 <= pin) && (pin <= 8));
+	ALX_PCA9539A_ASSERT(pin <= 7);
 
 	// Write if port 0 is used
 	if (port == 0)
@@ -661,8 +661,8 @@ static void AlxPca9539a_RegStruct_SetValToZero(AlxPca9539a* me)
 	me->reg._05h_PolarityInversion_1.val.raw = 0b00000000;
 	me->reg._06h_Configuration_0.val.raw = 0b00000000;
 	me->reg._07h_Configuration_1.val.raw = 0b00000000;
-	me->_OpenDrain_0.raw = 0b00000000;
-	me->_OpenDrain_1.raw = 0b00000000;
+	me->regVal_OpenDrain_0.raw = 0b00000000;
+	me->regVal_OpenDrain_1.raw = 0b00000000;
 }
 
 static void AlxPca9539a_RegStruct_SetValToDefault(AlxPca9539a* me)
@@ -675,8 +675,8 @@ static void AlxPca9539a_RegStruct_SetValToDefault(AlxPca9539a* me)
 	me->reg._05h_PolarityInversion_1	.val.raw = 0b00000000;
 	me->reg._06h_Configuration_0		.val.raw = 0b11111111;
 	me->reg._07h_Configuration_1		.val.raw = 0b11111111;
-	me->_OpenDrain_0.raw = 0b01000000;
-	me->_OpenDrain_1.raw = 0b00000000;
+	me->regVal_OpenDrain_0.raw = 0b01000000;
+	me->regVal_OpenDrain_1.raw = 0b00000000;
 }
 
 //******************************************************************************
@@ -706,16 +706,32 @@ ALX_WEAK Alx_Status AlxPca9539a_RegStruct_Write(AlxPca9539a* me)
 	//if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._04h_PolarityInversion_0);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._05h_PolarityInversion_1);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._06h_Configuration_0);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	status = AlxPca9539a_Reg_Write(me, &me->reg._07h_Configuration_1);
-	if (status != Alx_Ok) { ALX_PCA9539A_TRACE_ERR("Err"); return status; }
+	if (status != Alx_Ok)
+	{
+		ALX_PCA9539A_TRACE_ERR("Err");
+		return status;
+	}
 
 	// Return
 	return Alx_Ok;

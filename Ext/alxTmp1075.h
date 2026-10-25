@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxTmp1075.h
   * @brief		Auralix C Library - ALX Temperature Sensor TMP1075 Module
@@ -66,7 +66,7 @@ extern "C" {
 #elif defined(ALX_TMP1075_ASSERT_RST_ENABLE)
 	#define ALX_TMP1075_ASSERT(expr) ALX_ASSERT_RST(ALX_TMP1075_FILE, expr)
 #else
-	#define ALX_TMP1075_ASSERT(expr) do{} while (false)
+	#define ALX_TMP1075_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
@@ -74,8 +74,8 @@ extern "C" {
 	#define ALX_TMP1075_TRACE_ERR(...) ALX_TRACE_ERR(ALX_TMP1075_FILE, __VA_ARGS__)
 	#define ALX_TMP1075_TRACE_DBG(...) ALX_TRACE_DBG(ALX_TMP1075_FILE, __VA_ARGS__)
 #else
-	#define ALX_TMP1075_TRACE_ERR(...) do{} while (false)
-	#define ALX_TMP1075_TRACE_DBG(...) do{} while (false)
+	#define ALX_TMP1075_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
+	#define ALX_TMP1075_TRACE_DBG(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -86,9 +86,10 @@ extern "C" {
 // R0: Temp  //
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
-		uint16_t T;
+		int16_t unused_0_3 : 4;
+		int16_t T : 12;
 	};
 	uint16_t raw;
 } AlxTmp1075_RegVal_R0_Temp;
@@ -130,7 +131,7 @@ typedef enum
 } AlxTmp1075_R1_OneShotConversionMode;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t unused_0_7 : 8;
 		AlxTmp1075_R1_ShutdownModeEnable SD : 1;
@@ -146,9 +147,10 @@ typedef union
 // R2: Low limit  //
 typedef union
 	{
-		struct __attribute__((packed))
+		struct ALX_PACKED
 		{
-			uint16_t L;
+			int16_t unused_0_3 : 4;
+			int16_t L : 12;
 		};
 		uint16_t raw;
 	} AlxTmp1075_RegVal_R2_LimitLow;
@@ -156,9 +158,10 @@ typedef union
 // R3: High limit  //
 typedef union
 	{
-		struct __attribute__((packed))
+		struct ALX_PACKED
 		{
-			uint16_t H;
+			int16_t unused_0_3 : 4;
+			int16_t H : 12;
 		};
 		uint16_t raw;
 	} AlxTmp1075_RegVal_R3_LimitHigh;
@@ -166,7 +169,7 @@ typedef union
 // R4: Device ID register  //
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint16_t DID;
 	};

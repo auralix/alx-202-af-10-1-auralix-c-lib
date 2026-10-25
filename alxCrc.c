@@ -119,7 +119,6 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 
 			// The final remainder is the CRC result
 			return (remainder ^ finalXorValue);
-			break;
 		}
 		case AlxCrc_Config_Crc16:
 		{
@@ -155,7 +154,6 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 
 			// The final remainder is the CRC result
 			return (((uint16_t)AlxCrc_Reflect((remainder), width)) ^ finalXorValue);
-			break;
 		}
 		case AlxCrc_Config_Crc32:
 		{
@@ -191,12 +189,11 @@ uint32_t AlxCrc_Calc(AlxCrc* me, uint8_t* data, uint32_t len)
 
 			// The final remainder is the CRC result
 			return (((uint32_t)AlxCrc_Reflect((remainder), width)) ^ finalXorValue);
-			break;
 		}
 		default:
 		{
 			ALX_CRC_ASSERT(false);	// We should never get here
-			break;
+			return 0;
 		}
 	}
 }
@@ -259,22 +256,19 @@ uint32_t AlxCrc_GetLen(AlxCrc* me)
 		case AlxCrc_Config_Ccitt:
 		{
 			return 2;
-			break;
 		}
 		case AlxCrc_Config_Crc16:
 		{
 			return 2;
-			break;
 		}
 		case AlxCrc_Config_Crc32:
 		{
 			return 4;
-			break;
 		}
 		default:
 		{
 			ALX_CRC_ASSERT(false);	// We should never get here
-			break;
+			return 0;
 		}
 	}
 }

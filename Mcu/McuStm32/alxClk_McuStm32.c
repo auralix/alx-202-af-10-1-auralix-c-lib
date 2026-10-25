@@ -238,7 +238,7 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 			#if defined(ALX_STM32F4)
 			if (me->config == AlxClk_Config_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hse_12MHz_BackupHsi_16MHz)						{ AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true;	}
 			#endif
-			#if defined(ALX_STM32F7)
+			#if defined(ALX_STM32F7) || defined(ALX_STM32L0)
 			if (true)																																{ ALX_CLK_ASSERT(false); return Alx_Err; } // We should not get here
 			#endif
 			#if defined(ALX_STM32G4)
@@ -393,7 +393,7 @@ ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxClk_Irq_Handle(AlxClk* me)
 {

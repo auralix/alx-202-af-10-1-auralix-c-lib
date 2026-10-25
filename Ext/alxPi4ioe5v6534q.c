@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPi4ioe5v6534q.c
   * @brief		Auralix C Library - ALX IO Expander PI4IOE5V6534Q Module
@@ -122,7 +122,7 @@ Alx_Status AlxPi4ioe5v6534q_InitPeriph(AlxPi4ioe5v6534q* me)
 	status = AlxI2c_Init(me->i2c);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Init() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Init() status %d", status);
 		return status;
 	}
 
@@ -153,7 +153,7 @@ Alx_Status AlxPi4ioe5v6534q_DeInitPeriph(AlxPi4ioe5v6534q* me)
 	status = AlxI2c_DeInit(me->i2c);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_DeInit() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_DeInit() status %d", status);
 		return status;
 	}
 
@@ -190,7 +190,7 @@ Alx_Status AlxPi4ioe5v6534q_Init(AlxPi4ioe5v6534q* me)
 	status = AlxI2c_Master_IsSlaveReady(me->i2c, me->i2cAddr, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_IsSlaveReady() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_IsSlaveReady() status %d", status);
 		return status;
 	}
 
@@ -204,7 +204,7 @@ Alx_Status AlxPi4ioe5v6534q_Init(AlxPi4ioe5v6534q* me)
 	status = AlxPi4ioe5v6534q_RegStruct_Write(me);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxPi4ioe5v6534q_RegStruct_Write() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxPi4ioe5v6534q_RegStruct_Write() status %d", status);
 		return status;
 	}
 
@@ -244,8 +244,8 @@ Alx_Status AlxPi4ioe5v6534q_DeInit(AlxPi4ioe5v6534q* me)
 /**
   * @brief
   * @param[in,out]	me
-  * @param[in]		inPortNum - Number of input ports to handle, can be from 0 (none) to 5 (max)
-  * @param[in]		outPortNum - Number of output ports to handle, can be from 0 (none) to 5 (max)
+  * @param[in]		inPortNum	- Number of input ports to handle, can be from 0 (none) to 5 (max)
+  * @param[in]		outPortNum	- Number of output ports to handle, can be from 0 (none) to 5 (max)
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
@@ -255,8 +255,8 @@ Alx_Status AlxPi4ioe5v6534q_Handle(AlxPi4ioe5v6534q* me, uint8_t inPortNum, uint
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	ALX_PI4IOE5V6534Q_ASSERT(me->isInitPeriph == true);
 	ALX_PI4IOE5V6534Q_ASSERT(me->isInit == true);
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= inPortNum) && (inPortNum <= 5));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= outPortNum) && (outPortNum <= 5));
+	ALX_PI4IOE5V6534Q_ASSERT(inPortNum <= 5);
+	ALX_PI4IOE5V6534Q_ASSERT(outPortNum <= 5);
 
 	// Local variables
 	Alx_Status status = Alx_Err;
@@ -267,7 +267,7 @@ Alx_Status AlxPi4ioe5v6534q_Handle(AlxPi4ioe5v6534q* me, uint8_t inPortNum, uint
 		status = AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, me->reg._0x00_InputPort.addr, AlxI2c_Master_MemAddrLen_8bit, me->reg._0x00_InputPort.val.raw, inPortNum, me->i2cNumOfTries, me->i2cTimeout_ms);
 		if (status != Alx_Ok)
 		{
-			ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartReadMemStop() status %ld", status);
+			ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartReadMemStop() status %d", status);
 			return status;
 		}
 	}
@@ -278,7 +278,7 @@ Alx_Status AlxPi4ioe5v6534q_Handle(AlxPi4ioe5v6534q* me, uint8_t inPortNum, uint
 		status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, me->reg._0x05_OutputPort.addr, AlxI2c_Master_MemAddrLen_8bit, me->reg._0x05_OutputPort.val.raw, outPortNum, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 		if (status != Alx_Ok)
 		{
-			ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %ld", status);
+			ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %d", status);
 			return status;
 		}
 	}
@@ -301,8 +301,8 @@ bool AlxPi4ioe5v6534q_IoPin_Read(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pin
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= port) && (port <= 4));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= pin) && (pin <= 7));
+	ALX_PI4IOE5V6534Q_ASSERT(port <= 4);
+	ALX_PI4IOE5V6534Q_ASSERT(pin <= 7);
 
 	// Read
 	if (me->reg._0x00_InputPort.val.raw[port] & (1 << pin))
@@ -328,8 +328,8 @@ void AlxPi4ioe5v6534q_IoPin_Write(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pi
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= port) && (port <= 4));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= pin) && (pin <= 7));
+	ALX_PI4IOE5V6534Q_ASSERT(port <= 4);
+	ALX_PI4IOE5V6534Q_ASSERT(pin <= 7);
 
 	// Write
 	if (val == true)
@@ -354,8 +354,8 @@ void AlxPi4ioe5v6534q_IoPin_Set(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pin)
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= port) && (port <= 4));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= pin) && (pin <= 7));
+	ALX_PI4IOE5V6534Q_ASSERT(port <= 4);
+	ALX_PI4IOE5V6534Q_ASSERT(pin <= 7);
 
 	// Set
 	AlxPi4ioe5v6534q_IoPin_Write(me, port, pin, true);
@@ -373,8 +373,8 @@ void AlxPi4ioe5v6534q_IoPin_Reset(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t pi
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= port) && (port <= 4));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= pin) && (pin <= 7));
+	ALX_PI4IOE5V6534Q_ASSERT(port <= 4);
+	ALX_PI4IOE5V6534Q_ASSERT(pin <= 7);
 
 	// Reset
 	AlxPi4ioe5v6534q_IoPin_Write(me, port, pin, false);
@@ -392,8 +392,8 @@ void AlxPi4ioe5v6534q_IoPin_Toggle(AlxPi4ioe5v6534q* me, uint8_t port, uint8_t p
 	ALX_PI4IOE5V6534Q_ASSERT(me->wasCtorCalled == true);
 	// isInitPeriph -> Don't care
 	// isInit -> Don't care
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= port) && (port <= 4));
-	ALX_PI4IOE5V6534Q_ASSERT((0 <= pin) && (pin <= 7));
+	ALX_PI4IOE5V6534Q_ASSERT(port <= 4);
+	ALX_PI4IOE5V6534Q_ASSERT(pin <= 7);
 
 	// Toggle
 	me->reg._0x05_OutputPort.val.raw[port] ^=  (1 << pin);
@@ -448,14 +448,14 @@ ALX_WEAK Alx_Status AlxPi4ioe5v6534q_RegStruct_Write(AlxPi4ioe5v6534q* me)
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, me->reg._0x05_OutputPort.addr, AlxI2c_Master_MemAddrLen_8bit, me->reg._0x05_OutputPort.val.raw, me->reg._0x05_OutputPort.len, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %d", status);
 		return status;
 	}
 
 	status = AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, me->reg._0x0F_ConfigurationPort.addr, AlxI2c_Master_MemAddrLen_8bit, me->reg._0x0F_ConfigurationPort.val.raw, me->reg._0x0F_ConfigurationPort.len, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 	if (status != Alx_Ok)
 	{
-		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %ld", status);
+		ALX_PI4IOE5V6534Q_TRACE_ERR("FAIL: AlxI2c_Master_StartWriteMemStop_Multi() status %d", status);
 		return status;
 	}
 

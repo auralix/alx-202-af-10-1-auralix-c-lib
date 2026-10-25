@@ -64,9 +64,9 @@ void AlxTrace_WriteFormat(AlxTrace* me, const char* format, ...)
 {
 	// Prepare formatStr
 	char formatStr[ALX_TRACE_LEN_MAX] = {};
-	va_list args = {};
+	va_list args;
 	va_start(args, format);
-	vsnprintf(formatStr, sizeof(formatStr), format, args);
+	(void)vsnprintf(formatStr, sizeof(formatStr), format, args);
 	va_end(args);
 
 	// Trace
@@ -89,18 +89,17 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	//------------------------------------------------------------------------------
 	char dateTimeStr[32] = "";
 	AlxRtc_DateTime dateTime = AlxTrace_GetRtcDateTime_Callback(me);
-	sprintf
+	(void)sprintf
 	(
 		dateTimeStr,
-		"20%02u-%02u-%02u %02u:%02u:%02u.%03u",
-		dateTime.yr,
-		dateTime.mo,
-		dateTime.day,
-		dateTime.hr,
-		dateTime.min,
-		dateTime.sec,
-		dateTime.ms
-	);
+		"20%02" PRIu32 "-%02" PRIu32 "-%02" PRIu32 " %02" PRIu32 ":%02" PRIu32 ":%02" PRIu32 ".%03" PRIu32,
+		(uint32_t)dateTime.yr,
+		(uint32_t)dateTime.mo,
+		(uint32_t)dateTime.day,
+		(uint32_t)dateTime.hr,
+		(uint32_t)dateTime.min,
+		(uint32_t)dateTime.sec,
+		(uint32_t)dateTime.ms);
 
 
 	//------------------------------------------------------------------------------
@@ -115,7 +114,7 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 		case ALX_TRACE_LEVEL_INF: levelStr = "INF"; break;
 		case ALX_TRACE_LEVEL_DBG: levelStr = "DBG"; break;
 		case ALX_TRACE_LEVEL_VRB: levelStr = "VRB"; break;
-		default: levelStr = ""; break;
+		default: break;
 	}
 
 
@@ -123,9 +122,9 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 	// Prepare formatStr
 	//------------------------------------------------------------------------------
 	char formatStr[ALX_TRACE_LEN_MAX] = {};
-	va_list args = {};
+	va_list args;
 	va_start(args, format);
-	vsnprintf(formatStr, sizeof(formatStr), format, args);
+	(void)vsnprintf(formatStr, sizeof(formatStr), format, args);
 	va_end(args);
 
 
@@ -141,7 +140,7 @@ void AlxTrace_WriteLevel(AlxTrace* me, uint8_t level, const char* file, uint32_t
 		(level == ALX_TRACE_LEVEL_VRB)
 	)
 	{
-		AlxTrace_WriteFormat(me, "[%s] [%s] [%s:%04lu %s] %s\r\n", dateTimeStr, levelStr, file, line, fun, formatStr);
+		AlxTrace_WriteFormat(me, "[%s] [%s] [%s:%04" PRIu32 " %s] %s\r\n", dateTimeStr, levelStr, file, line, fun, formatStr);
 	}
 	else if (level == ALX_TRACE_LEVEL_INF)
 	{

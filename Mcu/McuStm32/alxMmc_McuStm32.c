@@ -151,7 +151,8 @@ void AlxMmc_Ctor
 	me->dmaWriteDone = false;
 
 	// Check clock
-	ALX_MMC_ASSERT(AlxMmc_IsClkOk(me));
+	ALX_UNUSED bool isClkOk = AlxMmc_IsClkOk(me);
+	ALX_MMC_ASSERT(isClkOk);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -188,7 +189,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 	ALX_MMC_ASSERT(me->wasCtorCalled == true);
 	ALX_MMC_ASSERT(me->isInit == true);
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
-	ALX_MMC_ASSERT(((uintptr_t)data & 0x3) == 0);	// Check data address 4-byte alignment, requred for DMA
+	ALX_MMC_ASSERT(((uintptr_t)data & 0x3) == 0);	// Check data address 4-byte alignment, required for DMA
 	// TV: TODO - Implement dmaReadWriteBuffAlign4Len
 
 
@@ -204,7 +205,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 	//------------------------------------------------------------------------------
 
 	// Try for number of tries
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// Clear
 		me->dmaReadDone = false;
@@ -213,7 +214,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusHal = HAL_MMC_ReadBlocks_DMA(&me->hmmc, data, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaReadDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaReadDone=%d", statusHal, tryNum, numOfBlocks, addr, me->dmaReadDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -228,7 +229,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, true);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaReadDone=%d", statusAlx, tryNum, numOfBlocks, addr, me->dmaReadDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -243,7 +244,7 @@ Alx_Status AlxMmc_ReadBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, uin
 		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaReadDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaReadDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaReadDone=%d", statusAlx, tryNum, numOfBlocks, addr, me->dmaReadDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -276,10 +277,10 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	ALX_MMC_ASSERT((numOfBlocks * ALX_MMC_BLOCK_LEN) == len);
 	if (len > me->dmaReadWriteBuffAlign4Len)
 	{
-		ALX_MMC_TRACE_FTL("FAIL: CheckLen() len %lu dmaReadWriteBuffAlign4Len %lu", len, me->dmaReadWriteBuffAlign4Len);
+		ALX_MMC_TRACE_FTL("FAIL: CheckLen() len %" PRIu32 " dmaReadWriteBuffAlign4Len %" PRIu32, len, me->dmaReadWriteBuffAlign4Len);
 	}
 	ALX_MMC_ASSERT(len <= me->dmaReadWriteBuffAlign4Len);
-	ALX_MMC_ASSERT(((uintptr_t)me->dmaReadWriteBuffAlign4 & 0x3) == 0);	// Check data address 4-byte alignment, requred for DMA
+	ALX_MMC_ASSERT(((uintptr_t)me->dmaReadWriteBuffAlign4 & 0x3) == 0);	// Check data address 4-byte alignment, required for DMA
 
 
 	//------------------------------------------------------------------------------
@@ -301,7 +302,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 	//------------------------------------------------------------------------------
 
 	// Try for number of tries
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		// Clear
 		me->dmaWriteDone = false;
@@ -310,7 +311,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusHal = HAL_MMC_WriteBlocks_DMA(&me->hmmc, me->dmaReadWriteBuffAlign4, addr, numOfBlocks);
 		if (statusHal != HAL_OK)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusHal, _try, numOfBlocks, addr, me->dmaWriteDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaWriteDone=%d", statusHal, tryNum, numOfBlocks, addr, me->dmaWriteDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -325,7 +326,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusAlx = AlxMmc_WaitForDmaReadWriteDone(me, false);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaWriteDone=%d", statusAlx, tryNum, numOfBlocks, addr, me->dmaWriteDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -340,7 +341,7 @@ Alx_Status AlxMmc_WriteBlock(AlxMmc* me, uint32_t numOfBlocks, uint32_t addr, ui
 		statusAlx = AlxMmc_WaitForTransferState_Private(me);
 		if (statusAlx != Alx_Ok)
 		{
-			ALX_MMC_TRACE_WRN("Err: %d, try=%u, numOfBlocks=%u, addr=%u, dmaWriteDone=%u", statusAlx, _try, numOfBlocks, addr, me->dmaWriteDone);
+			ALX_MMC_TRACE_WRN("Err: %d, try=%" PRIu32 ", numOfBlocks=%" PRIu32 ", addr=%" PRIu32 ", dmaWriteDone=%d", statusAlx, tryNum, numOfBlocks, addr, me->dmaWriteDone);
 			statusAlx = AlxMmc_ReInit(me);
 			if (statusAlx != Alx_Ok)
 			{
@@ -394,27 +395,27 @@ static uint32_t AlxMmc_GetBusWidth(AlxMmc* me)
 	#if defined(ALX_STM32L4)
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz)
 	)
 	{
 		return SDMMC_BUS_WIDE_1B;
 	}
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz)
 	)
 	{
 		return SDMMC_BUS_WIDE_4B;
 	}
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
 	)
 	{
 		return SDMMC_BUS_WIDE_8B;
@@ -436,27 +437,27 @@ static uint32_t AlxMmc_GetClkDiv(AlxMmc* me)
 	#if defined(ALX_STM32L4)
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz)
 	)
 	{
 		return 2;
 	}
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz)
 	)
 	{
 		return 1;
 	}
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
 	)
 	{
 		return 0;
@@ -606,7 +607,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 		return Alx_Err;
 	}
 
-	// Get CID - NO Commucination with MMC - Uses data which is aquired from HAL_MMC_Init
+	// Get CID - NO Commucination with MMC - Uses data which is acquired from HAL_MMC_Init
 	statusHal = HAL_MMC_GetCardCID(&me->hmmc, &me->cid);
 	if (statusHal != HAL_OK)
 	{
@@ -622,7 +623,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 		return Alx_Err;
 	}
 
-	// Get Info - NO Commucination with MMC - Uses data which is aquired from HAL_MMC_GetCardCSD
+	// Get Info - NO Commucination with MMC - Uses data which is acquired from HAL_MMC_GetCardCSD
 	statusHal = HAL_MMC_GetCardInfo(&me->hmmc, &me->info);
 	if (statusHal != HAL_OK)
 	{
@@ -632,7 +633,7 @@ static Alx_Status AlxMmc_Init_Private(AlxMmc* me)
 
 	// Trace
 	float size_B = (float)me->info.BlockNbr * (float)me->info.BlockSize;
-	float size_GB = size_B / 1000000000.f;
+	ALX_UNUSED float size_GB = size_B / 1000000000.f;
 	ALX_MMC_TRACE_INF("AlxMmc_Init - INFO: size_GB %.2f", size_GB);
 
 	// Set isInit
@@ -706,15 +707,15 @@ static bool AlxMmc_IsClkOk(AlxMmc* me)
 	#if defined(ALX_STM32L4)
 	if
 	(
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
-		(me->mmcClk == AlxMmx_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_12MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_24MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_1bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_4bit_MmcClk_48MHz_PllP_48MHz) ||
+		(me->mmcClk == AlxMmc_Clk_McuStm32L4_8bit_MmcClk_48MHz_PllP_48MHz)
 	)
 	{
 		if(48000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_PllP_Ctor))
@@ -810,7 +811,7 @@ void HAL_MMC_RxCpltCallback(MMC_HandleTypeDef *hmmc)
 	alxMmc_Sdmmc1_me->dmaReadDone = true;
 	#endif
 	#if defined(SDMMC2)
-	alxMmc_Sdmmc2_me->isDmaReadDone = true;
+	alxMmc_Sdmmc2_me->dmaReadDone = true;
 	#endif
 }
 void HAL_MMC_TxCpltCallback(MMC_HandleTypeDef *hmmc)
@@ -821,7 +822,7 @@ void HAL_MMC_TxCpltCallback(MMC_HandleTypeDef *hmmc)
 	alxMmc_Sdmmc1_me->dmaWriteDone = true;
 	#endif
 	#if defined(SDMMC2)
-	alxMmc_Sdmmc2_me->isDmaWriteDone = true;
+	alxMmc_Sdmmc2_me->dmaWriteDone = true;
 	#endif
 }
 

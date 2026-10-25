@@ -165,7 +165,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_SPI_TRACE_DBG("ENTER: deviceName %s len %u numOfTries %u timeout_ms %u", me->deviceName, len, numOfTries, timeout_ms);
+	ALX_SPI_TRACE_DBG("ENTER: deviceName %s len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 
 
 	//------------------------------------------------------------------------------
@@ -183,17 +183,17 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	//------------------------------------------------------------------------------
 	// Try
 	//------------------------------------------------------------------------------
-	for (uint8_t _try = 1; _try <= numOfTries; _try++)
+	for (uint8_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		//------------------------------------------------------------------------------
 		// Trace
 		//------------------------------------------------------------------------------
-		ALX_SPI_TRACE_VRB("DO: spi_write() deviceName %s try %u len %u", me->deviceName, _try, len);
+		ALX_SPI_TRACE_VRB("DO: spi_write() deviceName %s try %" PRIu32 " len %" PRIu32, me->deviceName, (uint32_t)tryNum, (uint32_t)len);
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		ALX_SPI_TRACE_FORMAT("    writeData: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_SPI_TRACE_FORMAT("%02X ", writeData[i]);
+			ALX_SPI_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)writeData[i]);
 		}
 		ALX_SPI_TRACE_FORMAT("\r\n");
 		#endif
@@ -217,9 +217,9 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 		if (status != 0)
 		{
 			#if ALX_TRACE_LEVEL < ALX_TRACE_LEVEL_VRB
-			ALX_SPI_TRACE_WRN("FAIL: spi_write() deviceName %s status %ld try %u", me->deviceName, status, _try);
+			ALX_SPI_TRACE_WRN("FAIL: spi_write() deviceName %s status %" PRId32 " try %" PRIu32, me->deviceName, status, (uint32_t)tryNum);
 			#else
-			ALX_SPI_TRACE_VRB("FAIL: spi_write() deviceName %s status %ld try %u len %u numOfTries %u timeout_ms %u", me->deviceName, status, _try, len, numOfTries, timeout_ms);
+			ALX_SPI_TRACE_VRB("FAIL: spi_write() deviceName %s status %" PRId32 " try %" PRIu32 " len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, status, (uint32_t)tryNum, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 			#endif
 			continue;
 		}
@@ -230,7 +230,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 		//------------------------------------------------------------------------------
 
 		// DONE
-		ALX_SPI_TRACE_VRB("DONE: spi_write() deviceName %s status %ld", me->deviceName, status);
+		ALX_SPI_TRACE_VRB("DONE: spi_write() deviceName %s status %" PRId32, me->deviceName, status);
 
 		// EXIT
 		ALX_SPI_TRACE_DBG("EXIT: deviceName %s", me->deviceName);
@@ -270,7 +270,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_SPI_TRACE_DBG("ENTER: deviceName %s len %u numOfTries %u timeout_ms %u", me->deviceName, len, numOfTries, timeout_ms);
+	ALX_SPI_TRACE_DBG("ENTER: deviceName %s len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 
 
 	//------------------------------------------------------------------------------
@@ -288,12 +288,12 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	//------------------------------------------------------------------------------
 	// Try
 	//------------------------------------------------------------------------------
-	for (uint8_t _try = 1; _try <= numOfTries; _try++)
+	for (uint8_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		//------------------------------------------------------------------------------
 		// Trace
 		//------------------------------------------------------------------------------
-		ALX_SPI_TRACE_VRB("DO: spi_read() deviceName %s try %u len %u", me->deviceName, _try, len);
+		ALX_SPI_TRACE_VRB("DO: spi_read() deviceName %s try %" PRIu32 " len %" PRIu32, me->deviceName, (uint32_t)tryNum, (uint32_t)len);
 
 
 		//------------------------------------------------------------------------------
@@ -314,9 +314,9 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 		if (status != 0)
 		{
 			#if ALX_TRACE_LEVEL < ALX_TRACE_LEVEL_VRB
-			ALX_SPI_TRACE_WRN("FAIL: spi_read() deviceName %s status %ld try %u", me->deviceName, status, _try);
+			ALX_SPI_TRACE_WRN("FAIL: spi_read() deviceName %s status %" PRId32 " try %" PRIu32, me->deviceName, status, (uint32_t)tryNum);
 			#else
-			ALX_SPI_TRACE_VRB("FAIL: spi_read() deviceName %s status %ld try %u len %u numOfTries %u timeout_ms %u", me->deviceName, status, _try, len, numOfTries, timeout_ms);
+			ALX_SPI_TRACE_VRB("FAIL: spi_read() deviceName %s status %" PRId32 " try %" PRIu32 " len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, status, (uint32_t)tryNum, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 			#endif
 			continue;
 		}
@@ -327,12 +327,12 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 		//-----------------------------------------------------------------------------
 
 		// DONE
-		ALX_SPI_TRACE_VRB("DONE: spi_read() deviceName %s status %ld", me->deviceName, status);
+		ALX_SPI_TRACE_VRB("DONE: spi_read() deviceName %s status %" PRId32, me->deviceName, status);
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		ALX_SPI_TRACE_FORMAT("    readData: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_SPI_TRACE_FORMAT("%02X ", readData[i]);
+			ALX_SPI_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)readData[i]);
 		}
 		ALX_SPI_TRACE_FORMAT("\r\n");
 		#endif
@@ -376,7 +376,7 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	//------------------------------------------------------------------------------
 	// Trace
 	//------------------------------------------------------------------------------
-	ALX_SPI_TRACE_DBG("ENTER: deviceName %s len %u numOfTries %u timeout_ms %u", me->deviceName, len, numOfTries, timeout_ms);
+	ALX_SPI_TRACE_DBG("ENTER: deviceName %s len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 
 
 	//------------------------------------------------------------------------------
@@ -395,17 +395,17 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	//------------------------------------------------------------------------------
 	// Try
 	//------------------------------------------------------------------------------
-	for (uint8_t _try = 1; _try <= numOfTries; _try++)
+	for (uint8_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		//------------------------------------------------------------------------------
 		// Trace
 		//------------------------------------------------------------------------------
-		ALX_SPI_TRACE_VRB("DO: spi_transceive() deviceName %s try %u len %u", me->deviceName, _try, len);
+		ALX_SPI_TRACE_VRB("DO: spi_transceive() deviceName %s try %" PRIu32 " len %" PRIu32, me->deviceName, (uint32_t)tryNum, (uint32_t)len);
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		ALX_SPI_TRACE_FORMAT("    writeData: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_SPI_TRACE_FORMAT("%02X ", writeData[i]);
+			ALX_SPI_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)writeData[i]);
 		}
 		ALX_SPI_TRACE_FORMAT("\r\n");
 		#endif
@@ -435,9 +435,9 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 		if (status != 0)
 		{
 			#if ALX_TRACE_LEVEL < ALX_TRACE_LEVEL_VRB
-			ALX_SPI_TRACE_WRN("FAIL: spi_transceive() deviceName %s status %ld try %u", me->deviceName, status, _try);
+			ALX_SPI_TRACE_WRN("FAIL: spi_transceive() deviceName %s status %" PRId32 " try %" PRIu32, me->deviceName, status, (uint32_t)tryNum);
 			#else
-			ALX_SPI_TRACE_VRB("FAIL: spi_transceive() deviceName %s status %ld try %u len %u numOfTries %u timeout_ms %u", me->deviceName, status, _try, len, numOfTries, timeout_ms);
+			ALX_SPI_TRACE_VRB("FAIL: spi_transceive() deviceName %s status %" PRId32 " try %" PRIu32 " len %" PRIu32 " numOfTries %" PRIu32 " timeout_ms %" PRIu32, me->deviceName, status, (uint32_t)tryNum, (uint32_t)len, (uint32_t)numOfTries, (uint32_t)timeout_ms);
 			#endif
 			continue;
 		}
@@ -448,12 +448,12 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 		//------------------------------------------------------------------------------
 
 		// DONE
-		ALX_SPI_TRACE_VRB("DONE: spi_transceive() deviceName %s status %ld", me->deviceName, status);
+		ALX_SPI_TRACE_VRB("DONE: spi_transceive() deviceName %s status %" PRId32, me->deviceName, status);
 		#if ALX_TRACE_LEVEL >= ALX_TRACE_LEVEL_VRB
 		ALX_SPI_TRACE_FORMAT("    readData: ");
 		for (uint32_t i = 0; i < len; i++)
 		{
-			ALX_SPI_TRACE_FORMAT("%02X ", readData[i]);
+			ALX_SPI_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)readData[i]);
 		}
 		ALX_SPI_TRACE_FORMAT("\r\n");
 		#endif

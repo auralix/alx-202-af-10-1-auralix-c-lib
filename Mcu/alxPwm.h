@@ -79,14 +79,14 @@ typedef struct { bool dummy; } AlxPwm;
 #elif defined(ALX_PWM_ASSERT_RST_ENABLE)
 	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_RST(ALX_PWM_FILE, expr)
 #else
-	#define ALX_PWM_ASSERT(expr) do{} while (false)
+	#define ALX_PWM_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_PWM_TRACE_ENABLE)
 	#define ALX_PWM_TRACE_ERR(...) ALX_TRACE_ERR(ALX_PWM_FILE, __VA_ARGS__)
 #else
-	#define ALX_PWM_TRACE_ERR(...) do{} while (false)
+	#define ALX_PWM_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

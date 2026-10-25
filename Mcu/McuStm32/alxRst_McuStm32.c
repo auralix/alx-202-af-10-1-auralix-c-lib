@@ -114,18 +114,18 @@ void AlxRst_Trace(AlxRst* me)
 
 	// Trace
 	ALX_RST_TRACE_INF("AlxRst_Trace - START - STM32 Reset Reason:");
-	ALX_RST_TRACE_INF("- Software: %u", me->rr.sw);
-	ALX_RST_TRACE_INF("- nRST Pin: %u", me->rr.rstPin);
-	ALX_RST_TRACE_INF("- Window Watchdog (WWDG): %u", me->rr.wwdg);
-	ALX_RST_TRACE_INF("- Independent Watchdog (IWDG): %u", me->rr.iwdg);
-	ALX_RST_TRACE_INF("- Low-power Management: %u", me->rr.lowPowerMgmt);
-	ALX_RST_TRACE_INF("- Power-on (POR) / Brown-out (BOR): %u", me->rr.porOrBor);
+	ALX_RST_TRACE_INF("- Software: %d", me->rr.sw);
+	ALX_RST_TRACE_INF("- nRST Pin: %d", me->rr.rstPin);
+	ALX_RST_TRACE_INF("- Window Watchdog (WWDG): %d", me->rr.wwdg);
+	ALX_RST_TRACE_INF("- Independent Watchdog (IWDG): %d", me->rr.iwdg);
+	ALX_RST_TRACE_INF("- Low-power Management: %d", me->rr.lowPowerMgmt);
+	ALX_RST_TRACE_INF("- Power-on (POR) / Brown-out (BOR): %d", me->rr.porOrBor);
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7)
-	ALX_RST_TRACE_INF("- Power-on (POR): %u", me->rr.por);
+	ALX_RST_TRACE_INF("- Power-on (POR): %d", me->rr.por);
 	#endif
 	#if defined(ALX_STM32L4)
-	ALX_RST_TRACE_INF("- Firewall: %u", me->rr.firewall);
-	ALX_RST_TRACE_INF("- Option Byte Loader: %u", me->rr.optionByteLoader);
+	ALX_RST_TRACE_INF("- Firewall: %d", me->rr.firewall);
+	ALX_RST_TRACE_INF("- Option Byte Loader: %d", me->rr.optionByteLoader);
 	#endif
 }
 

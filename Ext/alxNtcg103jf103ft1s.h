@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxNtcg103jf103ft1s.h
   * @brief		Auralix C Library - ALX NTC Thermistors NTCG103JF103FT1S Module
@@ -64,14 +64,14 @@ extern "C" {
 #elif defined(ALX_NTCG103JF103FT1S_ASSERT_RST_ENABLE)
 	#define ALX_NTCG103JF103FT1S_ASSERT(expr) ALX_ASSERT_RST(ALX_NTCG103JF103FT1S_FILE, expr)
 #else
-	#define ALX_NTCG103JF103FT1S_ASSERT(expr) do{} while (false)
+	#define ALX_NTCG103JF103FT1S_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_NTCG103JF103FT1S_TRACE_ENABLE)
-	#define ALX_NTCG103JF103FT1S_TRACE_WRN(...) ALX_TRACE_WRN(ALX_NTCG103JF103FT1S_FILE, __VA_ARGS__)
+	#define ALX_NTCG103JF103FT1S_TRACE_ERR(...) ALX_TRACE_ERR(ALX_NTCG103JF103FT1S_FILE, __VA_ARGS__)
 #else
-	#define ALX_NTCG103JF103FT1S_TRACE_WRN(...) do{} while (false)
+	#define ALX_NTCG103JF103FT1S_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

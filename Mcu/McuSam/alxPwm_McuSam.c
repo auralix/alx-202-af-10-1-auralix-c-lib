@@ -90,7 +90,7 @@ void AlxPwm_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 Alx_Status AlxPwm_Init(AlxPwm* me)
 {
@@ -129,7 +129,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 Alx_Status AlxPwm_DeInit(AlxPwm* me)
 {
@@ -156,9 +156,9 @@ Alx_Status AlxPwm_DeInit(AlxPwm* me)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] ch
-  * @param[in] duty_pct
+  * @param[in]	me
+  * @param[in]	ch
+  * @param[in]	duty_pct
   */
 Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 {
@@ -169,9 +169,9 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] ch
-  * @param[in] duty_permil
+  * @param[in]	me
+  * @param[in]	ch
+  * @param[in]	duty_permil
   */
 Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {
@@ -179,7 +179,7 @@ Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 	ALX_PWM_ASSERT(me->wasCtorCalled == true);
 	ALX_PWM_ASSERT(me->isInit == true);
 	ALX_PWM_ASSERT(ch == me->ch);
-	ALX_PWM_ASSERT((0 <= duty_permil) && (duty_permil <= 1000));
+	ALX_PWM_ASSERT(duty_permil <= 1000);
 
 	// If duty NOT zero
 	if (duty_permil > 0)

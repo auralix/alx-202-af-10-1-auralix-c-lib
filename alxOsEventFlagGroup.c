@@ -51,7 +51,7 @@ static uint32_t AlxOsEventFlagGroup_GetTimeout_osTick(AlxOsEventFlagGroup* me, u
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxOsEventFlagGroup_Ctor
 (
@@ -105,13 +105,12 @@ void AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, 
 
 		// Local variables
 		EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
-		EventBits_t eventBits_t = 0;
 
 		// Unlock
 		AlxOsMutex_Unlock(&me->alxOsMutex);
 
 		// Set
-		eventBits_t = xEventGroupSetBits(eventGroupHandle_t, eventFlagsToSet);
+		xEventGroupSetBits(eventGroupHandle_t, eventFlagsToSet);
 
 		// Set me->eventGroupHandle_t
 		AlxOsMutex_Lock(&me->alxOsMutex);
@@ -160,6 +159,12 @@ void AlxOsEventFlagGroup_Set(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, 
 uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsToClear)
 {
 	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	uint32_t eventBits = 0;
+
+
+	//------------------------------------------------------------------------------
 	// ALX_FREE_RTOS
 	//------------------------------------------------------------------------------
 	#if defined(ALX_FREE_RTOS)	// TV: Original TV implementation
@@ -172,21 +177,17 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
 
 	// Local variables
 	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
-	EventBits_t eventBits_t = 0;
 
 	// Unlock
 	AlxOsMutex_Unlock(&me->alxOsMutex);
 
 	// Clear
-	eventBits_t = xEventGroupClearBits(eventGroupHandle_t, eventFlagsToClear);
+	eventBits = xEventGroupClearBits(eventGroupHandle_t, eventFlagsToClear);
 
 	// Set me->eventGroupHandle_t
 	AlxOsMutex_Lock(&me->alxOsMutex);
 	me->eventGroupHandle_t = eventGroupHandle_t;
 	AlxOsMutex_Unlock(&me->alxOsMutex);
-
-	// Return
-	return eventBits_t;
 	#endif
 
 
@@ -198,18 +199,18 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
 	// Assert
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
-	// Local variables
-	uint32_t eventBits = 0;
-
 	// Get current state before clearing
 	eventBits = k_event_test(&me->event, UINT32_MAX) & eventFlagsToClear;
 
 	// Clear event flags
 	k_event_clear(&me->event, eventFlagsToClear);
-
-	// Return
-	return eventBits;
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return eventBits;
 }
 
 /**
@@ -224,6 +225,12 @@ uint32_t AlxOsEventFlagGroup_Clear(AlxOsEventFlagGroup* me, uint32_t eventFlagsT
 uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsToWait, bool clearEventFlagsOnExit, bool waitForAllEventFlags, uint32_t timeout_ms)
 {
 	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	uint32_t eventBits = 0;
+
+
+	//------------------------------------------------------------------------------
 	// ALX_FREE_RTOS
 	//------------------------------------------------------------------------------
 	#if defined(ALX_FREE_RTOS)	// TV: Original TV implementation
@@ -236,7 +243,6 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 
 	// Local variables
 	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
-	EventBits_t eventBits_t = 0;
 	uint32_t timeout_osTick = 0;
 
 	// Convert to timeout_osTick
@@ -246,15 +252,12 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	AlxOsMutex_Unlock(&me->alxOsMutex);
 
 	// Wait
-	eventBits_t = xEventGroupWaitBits(eventGroupHandle_t, eventFlagsToWait, clearEventFlagsOnExit, waitForAllEventFlags, timeout_osTick);
+	eventBits = xEventGroupWaitBits(eventGroupHandle_t, eventFlagsToWait, clearEventFlagsOnExit, waitForAllEventFlags, timeout_osTick);
 
 	// Set me->eventGroupHandle_t
 	AlxOsMutex_Lock(&me->alxOsMutex);
 	me->eventGroupHandle_t = eventGroupHandle_t;
 	AlxOsMutex_Unlock(&me->alxOsMutex);
-
-	// Return
-	return eventBits_t;
 	#endif
 
 
@@ -267,20 +270,34 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
 	// Convert timeout
-	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
+	k_timeout_t timeout = K_NO_WAIT;
+	if (timeout_ms == 0)
+	{
+		timeout = K_NO_WAIT;
+	}
+	else
+	{
+		timeout = K_MSEC(timeout_ms);
+	}
 
 	// Wait for ANY vs ALL.
 	// Zephyr's wait functions do not do atomic clear-on-exit, so we handle that manually.
 	// Multi-consumer note: this post-return clear is not atomic with the wake.
 	// If multiple threads wait on the same bits, one can clear while another is waking,
 	// causing missed events.
-	uint32_t got = waitForAllEventFlags
-		? k_event_wait_all(&me->event, eventFlagsToWait, false, timeout)
-		: k_event_wait    (&me->event, eventFlagsToWait, false, timeout);
+	uint32_t got = 0;
+	if (waitForAllEventFlags)
+	{
+		got = k_event_wait_all(&me->event, eventFlagsToWait, false, timeout);
+	}
+	else
+	{
+		got = k_event_wait(&me->event, eventFlagsToWait, false, timeout);
+	}
 
 	// Check
-	uint32_t matched = got & eventFlagsToWait;
-	if (matched == 0)
+	eventBits = got & eventFlagsToWait;
+	if (eventBits == 0)
 	{
 		return 0;	// Timeout
 	}
@@ -288,12 +305,15 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	// Post-return clear (not atomic with wake; OK for single-consumer)
 	if (clearEventFlagsOnExit)
 	{
-		k_event_clear(&me->event, matched);
+		k_event_clear(&me->event, eventBits);
 	}
-
-	// Return
-	return matched;
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return eventBits;
 }
 
 /**
@@ -307,6 +327,12 @@ uint32_t AlxOsEventFlagGroup_Wait(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsToSet, uint32_t eventFlagsToWait, uint32_t timeout_ms)
 {
 	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	uint32_t eventBits = 0;
+
+
+	//------------------------------------------------------------------------------
 	// ALX_FREE_RTOS
 	//------------------------------------------------------------------------------
 	#if defined(ALX_FREE_RTOS)	// TV: Original TV implementation
@@ -319,7 +345,6 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 
 	// Local variables
 	EventGroupHandle_t eventGroupHandle_t = me->eventGroupHandle_t;
-	EventBits_t eventBits_t = 0;
 	uint32_t timeout_osTick = 0;
 
 	// Convert to timeout_osTick
@@ -329,15 +354,12 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	AlxOsMutex_Unlock(&me->alxOsMutex);
 
 	// Sync
-	eventBits_t = xEventGroupSync(eventGroupHandle_t, eventFlagsToSet, eventFlagsToWait, timeout_osTick);
+	eventBits = xEventGroupSync(eventGroupHandle_t, eventFlagsToSet, eventFlagsToWait, timeout_osTick);
 
 	// Set me->eventGroupHandle_t
 	AlxOsMutex_Lock(&me->alxOsMutex);
 	me->eventGroupHandle_t = eventGroupHandle_t;
 	AlxOsMutex_Unlock(&me->alxOsMutex);
-
-	// Return
-	return eventBits_t;
 	#endif
 
 
@@ -349,11 +371,16 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 	// Assert
 	ALX_OS_EVENT_FLAG_GROUP_ASSERT(me->wasCtorCalled == true);
 
-	// Local variables
-	uint32_t eventBits = 0;
-
 	// Convert timeout
-	k_timeout_t timeout = (timeout_ms == 0) ? K_NO_WAIT : K_MSEC(timeout_ms);
+	k_timeout_t timeout = K_NO_WAIT;
+	if (timeout_ms == 0)
+	{
+		timeout = K_NO_WAIT;
+	}
+	else
+	{
+		timeout = K_MSEC(timeout_ms);
+	}
 
 	// Set our flags
 	k_event_post(&me->event, eventFlagsToSet);
@@ -367,10 +394,13 @@ uint32_t AlxOsEventFlagGroup_Sync(AlxOsEventFlagGroup* me, uint32_t eventFlagsTo
 			  In practice it's OK for a simple barrier if all bits belong to the same round. */
 		k_event_clear(&me->event, eventFlagsToWait);
 	}
-
-	// Return
-	return eventBits;
 	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
+	return eventBits;
 }
 
 

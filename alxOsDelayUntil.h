@@ -63,14 +63,14 @@ extern "C" {
 #elif defined(ALX_OS_DELAY_UNTIL_ASSERT_RST_ENABLE)
 	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_RST(ALX_OS_DELAY_UNTIL_FILE, expr)
 #else
-	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) do{} while (false)
+	#define ALX_OS_DELAY_UNTIL_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_OS_DELAY_UNTIL_TRACE_ENABLE)
 	#define ALX_OS_DELAY_UNTIL_TRACE_WRN(...) ALX_TRACE_WRN(ALX_OS_DELAY_UNTIL_FILE, __VA_ARGS__)
 #else
-	#define ALX_OS_DELAY_UNTIL_TRACE_WRN(...) do{} while (false)
+	#define ALX_OS_DELAY_UNTIL_TRACE_WRN(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -107,7 +107,7 @@ void AlxOsDelayUntil_Ctor
 // Functions
 //******************************************************************************
 void AlxOsDelayUntil_Init(AlxOsDelayUntil* me);
-void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osDelayUntilIncrement_us);
+void AlxOsDelayUntil_us(AlxOsDelayUntil* me, uint64_t osTimeIncrement_us);
 void AlxOsDelayUntil_ms(AlxOsDelayUntil* me, uint64_t osTimeIncrement_ms);
 void AlxOsDelayUntil_sec(AlxOsDelayUntil* me, uint64_t osTimeIncrement_sec);
 void AlxOsDelayUntil_min(AlxOsDelayUntil* me, uint64_t osTimeIncrement_min);

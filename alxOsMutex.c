@@ -104,17 +104,25 @@ void AlxOsMutex_Unlock(AlxOsMutex* me)
   */
 bool AlxOsMutex_IsUnlocked(AlxOsMutex* me)
 {
+	bool isUnlocked = true;
+
 	#if defined(ALX_FREE_RTOS)
-	return uxSemaphoreGetCount(me->semaphoreHandle);
+	isUnlocked = uxSemaphoreGetCount(me->semaphoreHandle);
 	#endif
 	#if defined(ALX_ZEPHYR)
 	if (k_mutex_lock(&me->mutex, K_NO_WAIT) == 0)
 	{
 		k_mutex_unlock(&me->mutex);
-		return true;
+		isUnlocked = true;
 	}
-	return false;
+	else
+	{
+		isUnlocked = false;
+	}
 	#endif
+
+	// Return
+	return isUnlocked;
 }
 
 

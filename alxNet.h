@@ -36,161 +36,76 @@ extern "C" {
 #endif
 
 
-	//******************************************************************************
-	// Includes
-	//******************************************************************************
+//******************************************************************************
+// Includes
+//******************************************************************************
 #include "alxGlobal.h"
 #include "alxTrace.h"
 #include "alxAssert.h"
-#include "alxSpi.h"
-#include "alxIoPin.h"
-#include "alxOsMutex.h"
 
 
-	//******************************************************************************
-	// Module Guard
-	//******************************************************************************
+//******************************************************************************
+// Module Guard
+//******************************************************************************
 #if defined(ALX_C_LIB)
 
 
-	//******************************************************************************
-	// Preprocessor
-	//******************************************************************************
+//******************************************************************************
+// Preprocessor
+//******************************************************************************
 #define ALX_NET_FILE "alxNet.h"
 
-	// Assert //
+// Assert //
 #if defined(ALX_NET_ASSERT_BKPT_ENABLE)
-#define ALX_NET_ASSERT(expr) ALX_ASSERT_BKPT(ALX_NET_FILE, expr)
+	#define ALX_NET_ASSERT(expr) ALX_ASSERT_BKPT(ALX_NET_FILE, expr)
 #elif defined(ALX_NET_ASSERT_TRACE_ENABLE)
-#define ALX_NET_ASSERT(expr) ALX_ASSERT_TRACE(ALX_NET_FILE, expr)
+	#define ALX_NET_ASSERT(expr) ALX_ASSERT_TRACE(ALX_NET_FILE, expr)
 #elif defined(ALX_NET_ASSERT_RST_ENABLE)
-#define ALX_NET_ASSERT(expr) ALX_ASSERT_RST(ALX_NET_FILE, expr)
+	#define ALX_NET_ASSERT(expr) ALX_ASSERT_RST(ALX_NET_FILE, expr)
 #else
-#define ALX_NET_ASSERT(expr) do{} while (false)
+	#define ALX_NET_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
-					// Trace //
+// Trace //
 #if defined(ALX_NET_TRACE_ENABLE)
-#define ALX_NET_TRACE_ERR(...) ALX_TRACE_ERR(ALX_NET_FILE, __VA_ARGS__)
-#define ALX_NET_TRACE_WRN(...) ALX_TRACE_WRN(ALX_NET_FILE, __VA_ARGS__)
-#define ALX_NET_TRACE_INF(...) ALX_TRACE_INF(ALX_NET_FILE, __VA_ARGS__)
+	#define ALX_NET_TRACE_ERR(...) ALX_TRACE_ERR(ALX_NET_FILE, __VA_ARGS__)
 #else
-#define ALX_NET_TRACE_ERR(...) do{} while (false)
-#define ALX_NET_TRACE_WRN(...) do{} while (false)
-#define ALX_NET_TRACE_INF(...) do{} while (false)
+	#define ALX_NET_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
-							//******************************************************************************
-							// Defines
-							//******************************************************************************
-#define ALX_NET_IP_ADDRESS_SIZE 45
-#define ALX_NET_MAC_SIZE 18
-#define ALX_NET_NUM_DNS_SERVERS 4
 
-							//******************************************************************************
-							// Types
-							//******************************************************************************
-	typedef enum
-	{
-		AlxNet_Config_Undefined,
-#if defined(ALX_WIZNET)
-		AlxNet_Config_Wiznet,
-#endif
-#if defined(ALX_FREE_RTOS_CELLULAR)
-		AlxNet_Config_FreeRtos_Cellular
-#endif
-	} AlxNet_Config;
+//******************************************************************************
+// Types
+//******************************************************************************
+typedef struct
+{
+	// Defines
 
-#if defined(ALX_FREE_RTOS_CELLULAR)
-	typedef struct
-	{
-		// Cellular context
-		CellularHandle_t handle;
-		CellularCommInterface_t * CommIntf; // UART interface
-		CellularSimCardStatus_t simStatus;
-		CellularServiceStatus_t serviceStatus;
-		cellularSignalQuality_t signalQuality;
-		uint8_t cellularContext; // Cellular context id
+	// Parameters
 
-		CellularPdnConfig_t pdn_config;
-		uint32_t pdn_connect_timeout;
-	}AlxNet_Cellular;
-#endif
+	// Variables
 
-	typedef struct
-	{
-		// Defines
-
-		// Parameters
-		AlxNet_Config config;
-		AlxSpi* alxSpi;
-		AlxIoPin* do_nRST;
-		AlxIoPin* di_nINT;
-		bool enable_dhcp;
-
-#if defined(ALX_FREE_RTOS_CELLULAR)
-		AlxNet_Cellular cellular;
-#endif
-		// Variables
-		AlxOsMutex alxMutex;
-		char mac[ALX_NET_MAC_SIZE]; // MAC in string format -> "00:18:10:3A:B8:39"
-		char ip[ALX_NET_IP_ADDRESS_SIZE]; // IP, Netmask, gateway, dns in string format -> "123.123.123.123"
-		char netmask[ALX_NET_IP_ADDRESS_SIZE];
-		char gateway[ALX_NET_IP_ADDRESS_SIZE];
-		char dns[ALX_NET_NUM_DNS_SERVERS][ALX_NET_IP_ADDRESS_SIZE];
-
-		// Info
-		bool wasCtorCalled;
-		bool isNetConnected;
-	} AlxNet;
-
-	typedef enum
-	{
-		DnsTaskRunning,
-		DnsTaskTimeout,
-		DnsTaskSuccess
-	} DnsTaskState;
-
-	//******************************************************************************
-	// Constructor
-	//******************************************************************************
-	void AlxNet_Ctor
-	(
-		AlxNet* me,
-		AlxNet_Config config,
-		AlxSpi* alxSpi,
-		AlxIoPin* do_nRST,
-		AlxIoPin* di_nINT);
+	// Info
+	bool wasCtorCalled;
+	bool isInit;
+} AlxNet;
 
 
-	//******************************************************************************
-	// Functions
-	//******************************************************************************
-	Alx_Status AlxNet_Init(AlxNet* me);
+//******************************************************************************
+// Constructor
+//******************************************************************************
+void AlxNet_Ctor
+(
+	AlxNet* me
+);
 
-	Alx_Status AlxNet_Connect(AlxNet* me);
-	Alx_Status AlxNet_Disconnect(AlxNet* me);
-	Alx_Status AlxNet_Restart(AlxNet* me);
-	void AlxNet_Handle(AlxNet* me);
-	bool AlxNet_IsConnected(AlxNet* me);
-	void AlxNet_SetMac(AlxNet* me, const char* mac);
-	void AlxNet_SetIp(AlxNet* me, const char* ip);
-	void AlxNet_SetNetmask(AlxNet* me, const char* netmask);
-	void AlxNet_SetGateway(AlxNet* me, const char* gateway);
-	const char* AlxNet_GetMac(AlxNet* me);
-	const char* AlxNet_GetIp(AlxNet* me);
-	const char* AlxNet_GetNetmask(AlxNet* me);
-	const char* AlxNet_GetGateway(AlxNet* me);
-	void AlxNet_Dns_SetIp(AlxNet* me, uint8_t dnsId, const char* ip);
-	Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip);
-	void AlxNet_Dhcp_Enable(AlxNet* me, bool enable);
-	bool AlxNet_Dhcp_WasAddrSupplied(AlxNet* me);
-	AlxNet_Config Alx_GetNetInterface(AlxNet* me);
-#if defined(ALX_FREE_RTOS_CELLULAR)
-	void AlxNet_GetCellularSignalQuality(AlxNet *me, int8_t *rssi, uint8_t *ber);
-	void AlxNet_SetPdnConfig(AlxNet* me, const char* apn, const char* user, const char* pass, CellularPdnAuthType_t auth_type, uint32_t connect_timeout);
-#endif
-	int AlxNet_Ping(AlxNet* me, const char *addr, uint16_t count, uint32_t timeout_ms);
+
+//******************************************************************************
+// Functions
+//******************************************************************************
+bool AlxNet_IsConnected(AlxNet* me);
+Alx_Status AlxNet_Dns_GetHostByName(AlxNet* me, const char* hostname, char* ip);
+
 
 #endif	// #if defined(ALX_C_LIB)
 

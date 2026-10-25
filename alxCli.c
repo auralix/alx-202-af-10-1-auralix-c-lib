@@ -87,6 +87,16 @@ void AlxCli_Handle(AlxCli* me)
 {
 	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
+	// Local Variables
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
+	ALX_UNUSED Alx_Status status = Alx_Err;
+
+
+
+
+	//------------------------------------------------------------------------------
+	//------------------------------------------------------------------------------
 	// Assert
 	//------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------
@@ -103,7 +113,8 @@ void AlxCli_Handle(AlxCli* me)
 	if (me->buffLenUsed > 0)
 	{
 		// Write
-		ALX_CLI_ASSERT(AlxSerialPort_Write(me->alxSerialPort, (const uint8_t*)me->buff, me->buffLenUsed) == Alx_Ok);
+		status = AlxSerialPort_Write(me->alxSerialPort, (const uint8_t*)me->buff, me->buffLenUsed);
+		ALX_CLI_ASSERT(status == Alx_Ok);
 
 		// Clear
 		memset(me->buff, 0, me->buffLen);
@@ -126,7 +137,8 @@ void AlxCli_Handle(AlxCli* me)
 		AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrCmd);
 
 		// Send response
-		ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+		status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+		ALX_CLI_ASSERT(status == Alx_Ok);
 	}
 	else if (cmdStatus == Alx_Ok && cmdLen > 1)
 	{
@@ -149,51 +161,58 @@ void AlxCli_Handle(AlxCli* me)
 				//------------------------------------------------------------------------------
 				// JSON Header
 				//------------------------------------------------------------------------------
-				ALX_CLI_ASSERT
+				status = AlxSerialPort_WriteStr
 				(
-					AlxSerialPort_WriteStr
-					(
-						me->alxSerialPort,
-						"{\r\n"
-						"    \"status\":\"success\",\r\n"
-						"    \"data\":\r\n"
-						"    {\r\n"
-					) == Alx_Ok
+					me->alxSerialPort,
+					"{\r\n"
+					"    \"status\":\"success\",\r\n"
+					"    \"data\":\r\n"
+					"    {\r\n"
 				);
+				ALX_CLI_ASSERT(status == Alx_Ok);
 
 
 				//------------------------------------------------------------------------------
 				// JSON Body
 				//------------------------------------------------------------------------------
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"help\":\"Help Command - Gets CLI help info\",\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"reset\":\"Reset Command - Triggers device reset\",\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"id\":\"ID Command - Gets device ID info\",\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get\":\"Get Command - Gets device properties\",\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-param\":\"Get Parameters Command - Gets device parameters\",\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-var\":\"Get Variables Command - Gets device variables\",\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-flag\":\"Get Flags Command - Gets device flags\",\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-const\":\"Get Constants Command - Gets device constants\",\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-trig\":\"Get Triggers Command - Gets device triggers\",\r\n") == Alx_Ok);
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "        \"set-param\":\"Set Parameter Command - Sets specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\"") == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"help\":\"Help Command - Gets CLI help info\",\r\n");
+				ALX_CLI_ASSERT(status == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"reset\":\"Reset Command - Triggers device reset\",\r\n");
+				ALX_CLI_ASSERT(status == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"id\":\"ID Command - Gets device ID info\",\r\n");
+				ALX_CLI_ASSERT(status == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get\":\"Get Command - Gets device properties\",\r\n");
+				ALX_CLI_ASSERT(status == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-param\":\"Get Parameters Command - Gets device parameters\",\r\n");
+				ALX_CLI_ASSERT(status == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-var\":\"Get Variables Command - Gets device variables\",\r\n");
+				ALX_CLI_ASSERT(status == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-flag\":\"Get Flags Command - Gets device flags\",\r\n");
+				ALX_CLI_ASSERT(status == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-const\":\"Get Constants Command - Gets device constants\",\r\n");
+				ALX_CLI_ASSERT(status == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-trig\":\"Get Triggers Command - Gets device triggers\",\r\n");
+				ALX_CLI_ASSERT(status == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"set-param\":\"Set Parameter Command - Sets specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\"");
+				ALX_CLI_ASSERT(status == Alx_Ok);
 				bool isImplemented = AlxCli_Help_Callback(me);
 				if (isImplemented == false)
 				{
-					ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, "\r\n") == Alx_Ok);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, "\r\n");
+					ALX_CLI_ASSERT(status == Alx_Ok);
 				}
 
 
 				//------------------------------------------------------------------------------
 				// JSON Footer
 				//------------------------------------------------------------------------------
-				ALX_CLI_ASSERT
+				status = AlxSerialPort_WriteStr
 				(
-					AlxSerialPort_WriteStr
-					(
-						me->alxSerialPort,
-						"    }\r\n"
-						"}\r\n"
-					) == Alx_Ok
+					me->alxSerialPort,
+					"    }\r\n"
+					"}\r\n"
 				);
+				ALX_CLI_ASSERT(status == Alx_Ok);
 
 
 				//------------------------------------------------------------------------------
@@ -212,7 +231,8 @@ void AlxCli_Handle(AlxCli* me)
 				AlxCli_PrepareResponse(me, AlxCli_ResponseType_Success);
 
 				// Send response
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+				ALX_CLI_ASSERT(status == Alx_Ok);
 
 				// Reset MCU
 				NVIC_SystemReset();
@@ -256,7 +276,7 @@ void AlxCli_Handle(AlxCli* me)
 				{
 					if (fwIsBootUsed)
 					{
-						sprintf
+						(void)sprintf
 						(
 							me->buff,
 							"{\r\n"
@@ -277,7 +297,7 @@ void AlxCli_Handle(AlxCli* me)
 							"        \"hwBomArtf\":\"%s\",\r\n"
 							"        \"hwBomName\":\"%s\",\r\n"
 							"        \"hwBomVerStr\":\"%s\",\r\n"
-							"        \"hwId\":%u,\r\n"
+							"        \"hwId\":%" PRIu32 ",\r\n"
 							"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
 							"    }\r\n"
 							"}\r\n",
@@ -295,13 +315,13 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomArtf,
 							hwBomName,
 							hwBomVerStr,
-							hwId,
+							(uint32_t)hwId,
 							hwMcuUniqueIdStr
 						);
 					}
 					else
 					{
-						sprintf
+						(void)sprintf
 						(
 							me->buff,
 							"{\r\n"
@@ -318,7 +338,7 @@ void AlxCli_Handle(AlxCli* me)
 							"        \"hwBomArtf\":\"%s\",\r\n"
 							"        \"hwBomName\":\"%s\",\r\n"
 							"        \"hwBomVerStr\":\"%s\",\r\n"
-							"        \"hwId\":%u,\r\n"
+							"        \"hwId\":%" PRIu32 ",\r\n"
 							"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
 							"    }\r\n"
 							"}\r\n",
@@ -332,7 +352,7 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomArtf,
 							hwBomName,
 							hwBomVerStr,
-							hwId,
+							(uint32_t)hwId,
 							hwMcuUniqueIdStr
 						);
 					}
@@ -341,7 +361,7 @@ void AlxCli_Handle(AlxCli* me)
 				{
 					if (fwIsBootUsed)
 					{
-						sprintf
+						(void)sprintf
 						(
 							me->buff,
 							"{"
@@ -362,7 +382,7 @@ void AlxCli_Handle(AlxCli* me)
 									"\"hwBomArtf\":\"%s\","
 									"\"hwBomName\":\"%s\","
 									"\"hwBomVerStr\":\"%s\","
-									"\"hwId\":%u,"
+									"\"hwId\":%" PRIu32 ","
 									"\"hwMcuUniqueIdStr\":\"%s\""
 								"}"
 							"}\r\n",
@@ -380,13 +400,13 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomArtf,
 							hwBomName,
 							hwBomVerStr,
-							hwId,
+							(uint32_t)hwId,
 							hwMcuUniqueIdStr
 						);
 					}
 					else
 					{
-						sprintf
+						(void)sprintf
 						(
 							me->buff,
 							"{"
@@ -403,7 +423,7 @@ void AlxCli_Handle(AlxCli* me)
 									"\"hwBomArtf\":\"%s\","
 									"\"hwBomName\":\"%s\","
 									"\"hwBomVerStr\":\"%s\","
-									"\"hwId\":%u,"
+									"\"hwId\":%" PRIu32 ","
 									"\"hwMcuUniqueIdStr\":\"%s\""
 								"}"
 							"}\r\n",
@@ -417,14 +437,15 @@ void AlxCli_Handle(AlxCli* me)
 							hwBomArtf,
 							hwBomName,
 							hwBomVerStr,
-							hwId,
+							(uint32_t)hwId,
 							hwMcuUniqueIdStr
 						);
 					}
 				}
 
 				// Send response
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+				ALX_CLI_ASSERT(status == Alx_Ok);
 
 				// Break
 				break;
@@ -528,7 +549,7 @@ void AlxCli_Handle(AlxCli* me)
 					//------------------------------------------------------------------------------
 					// Set
 					//------------------------------------------------------------------------------
-					Alx_Status status = AlxParamMgmt_ByKey_SetVal_StrFormat(me->alxParamMgmt, key, val);
+					status = AlxParamMgmt_ByKey_SetVal_StrFormat(me->alxParamMgmt, key, val);
 					if (status != Alx_Ok)
 					{
 						AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrArg);
@@ -547,7 +568,8 @@ void AlxCli_Handle(AlxCli* me)
 				//------------------------------------------------------------------------------
 				// Send Response
 				//------------------------------------------------------------------------------
-				ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+				ALX_CLI_ASSERT(status == Alx_Ok);
 
 
 				//------------------------------------------------------------------------------
@@ -575,7 +597,8 @@ void AlxCli_Handle(AlxCli* me)
 			AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrCmd);
 
 			// Send response
-			ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+			status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+			ALX_CLI_ASSERT(status == Alx_Ok);
 
 			// Break
 			break;
@@ -608,8 +631,8 @@ void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 	//------------------------------------------------------------------------------
 	// Prepare
 	//------------------------------------------------------------------------------
-	const char* statusStr = "";
-	const char* messageStr = "";
+	ALX_UNUSED const char* statusStr = "";
+	ALX_UNUSED const char* messageStr = "";
 	if (responseType == AlxCli_ResponseType_Success)
 	{
 		statusStr = "success";
@@ -648,7 +671,7 @@ void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 	{
 		if (messageStr == NULL)
 		{
-			sprintf
+			(void)sprintf
 			(
 				me->buff,
 				"{\r\n"
@@ -659,7 +682,7 @@ void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 		}
 		else
 		{
-			sprintf
+			(void)sprintf
 			(
 				me->buff,
 				"{\r\n"
@@ -675,7 +698,7 @@ void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 	{
 		if (messageStr == NULL)
 		{
-			sprintf
+			(void)sprintf
 			(
 				me->buff,
 				"{"
@@ -686,7 +709,7 @@ void AlxCli_PrepareResponse(AlxCli* me, AlxCli_ResponseType responseType)
 		}
 		else
 		{
-			sprintf
+			(void)sprintf
 			(
 				me->buff,
 				"{"
@@ -735,7 +758,8 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 	}
 
 	// Send
-	ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+	ALX_UNUSED Alx_Status status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+	ALX_CLI_ASSERT(status == Alx_Ok);
 
 
 	//------------------------------------------------------------------------------
@@ -806,7 +830,8 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 		}
 
 		// Set value straight into buff after the key
-		ALX_CLI_ASSERT(AlxParamMgmt_ByIndex_GetVal_StrFormat(me->alxParamMgmt, i, &me->buff[len], me->buffLen - len - 4) == Alx_Ok);
+		status = AlxParamMgmt_ByIndex_GetVal_StrFormat(me->alxParamMgmt, i, &me->buff[len], me->buffLen - len - 4);
+		ALX_CLI_ASSERT(status == Alx_Ok);
 
 		// If string type add closing double quote (")
 		if (dataType == AlxParamItem_Str)
@@ -843,7 +868,8 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 		}
 
 		// Send
-		ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+		status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+		ALX_CLI_ASSERT(status == Alx_Ok);
 	}
 
 
@@ -872,7 +898,8 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 	}
 
 	// Send
-	ALX_CLI_ASSERT(AlxSerialPort_WriteStr(me->alxSerialPort, me->buff) == Alx_Ok);
+	status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+	ALX_CLI_ASSERT(status == Alx_Ok);
 }
 
 

@@ -43,7 +43,7 @@
 //******************************************************************************
 static AlxCan* alxCan_Can1 = NULL;
 static AlxCan* alxCan_Can2 = NULL;
-#if defined(ALX_STM32F7) || defined(ALX_STM32G4)
+#if defined(CAN3) || defined(FDCAN3)
 static AlxCan* alxCan_Can3 = NULL;
 #endif
 
@@ -130,7 +130,8 @@ void AlxCan_Ctor
 	me->rxFifoBuffLen = rxFifoBuffLen;
 	me->txIrqPriority = txIrqPriority;
 	me->rxIrqPriority = rxIrqPriority;
-	ALX_CAN_ASSERT(AlxCan_Ctor_IsClkOk(me));
+	ALX_UNUSED bool isClkOk = AlxCan_Ctor_IsClkOk(me);
+	ALX_CAN_ASSERT(isClkOk);
 
 
 	//------------------------------------------------------------------------------
@@ -662,7 +663,7 @@ bool AlxCan_IsErr(AlxCan* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxCan_IrqHandler(AlxCan* me)
 {
@@ -896,7 +897,7 @@ static void AlxCan_RxMsg_TryReadFromHwFifo(AlxCan* me)
 			else // Remote Frame
 				alxRxMsg.isDataFrame = false;
 
-			// Set Lenght
+			// Set Length
 			alxRxMsg.dataLen = AlxCan_GetDataLen(halRxMsg.DataLength);
 		}
 

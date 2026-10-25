@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPca9539a.h
   * @brief		Auralix C Library - ALX IO Expander PCA9539A Module
@@ -66,14 +66,14 @@ extern "C" {
 #elif defined(ALX_PCA9539A_ASSERT_RST_ENABLE)
 	#define ALX_PCA9539A_ASSERT(expr) ALX_ASSERT_RST(ALX_PCA9539A_FILE, expr)
 #else
-	#define ALX_PCA9539A_ASSERT(expr) do{} while (false)
+	#define ALX_PCA9539A_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_PCA9539A_TRACE_ENABLE)
 	#define ALX_PCA9539A_TRACE_ERR(...) ALX_TRACE_ERR(ALX_PCA9539A_FILE, __VA_ARGS__)
 #else
-	#define ALX_PCA9539A_TRACE_ERR(...) do{} while (false)
+	#define ALX_PCA9539A_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -86,7 +86,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -101,7 +101,7 @@ typedef union
 } AlxPca9539a_RegVal_00h_InputPort_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -120,7 +120,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -135,7 +135,7 @@ typedef union
 } AlxPca9539a_RegVal_02h_OutputPort_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -154,7 +154,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -169,7 +169,7 @@ typedef union
 } AlxPca9539a_RegVal_04h_PolarityInversion_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -188,7 +188,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -203,7 +203,7 @@ typedef union
 } AlxPca9539a_RegVal_06h_Configuration_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -218,7 +218,7 @@ typedef union
 } AlxPca9539a_RegVal_07h_Configuration_1;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -233,7 +233,7 @@ typedef union
 } AlxPca9539a_RegVal_OpenDrain_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -328,8 +328,8 @@ typedef struct
 
 	// Variables
 	AlxPca9539a_Reg reg;
-	AlxPca9539a_RegVal_OpenDrain_0 _OpenDrain_0;
-	AlxPca9539a_RegVal_OpenDrain_1 _OpenDrain_1;
+	AlxPca9539a_RegVal_OpenDrain_0 regVal_OpenDrain_0;
+	AlxPca9539a_RegVal_OpenDrain_1 regVal_OpenDrain_1;
 
 	// Info
 	bool wasCtorCalled;

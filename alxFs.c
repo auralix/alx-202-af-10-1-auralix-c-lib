@@ -61,7 +61,7 @@ static void AlxFs_Fatfs_Mmc_Usb_Ctor(AlxFs* me);
 //------------------------------------------------------------------------------
 // Lfs_FlashInt
 //------------------------------------------------------------------------------
-#if defined(ALX_LFS)
+#if defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me);
 static int AlxFs_Lfs_FlashInt_ReadBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size);
 static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size);
@@ -130,11 +130,13 @@ void AlxFs_Ctor
 		AlxFs_Fatfs_Mmc_Usb_Ctor(me);
 	}
 	#endif
-	#if defined(ALX_LFS)
+	#if defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 	else if (me->config == AlxFs_Config_Lfs_FlashInt)
 	{
 		AlxFs_Lfs_FlashInt_Ctor(me);
 	}
+	#endif
+	#if defined(ALX_LFS)
 	else if	(me->config == AlxFs_Config_Lfs_Mmc)
 	{
 		AlxFs_Lfs_Mmc_Ctor(me);
@@ -187,7 +189,7 @@ Alx_Status AlxFs_Mount(AlxFs* me)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -223,7 +225,7 @@ Alx_Status AlxFs_UnMount(AlxFs* me)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -292,7 +294,7 @@ Alx_Status AlxFs_Format(AlxFs* me)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -325,7 +327,7 @@ Alx_Status AlxFs_Remove(AlxFs* me, const char* path)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s", status, path);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", path=%s", status, path);
 		return Alx_Err;
 	}
 
@@ -358,7 +360,7 @@ Alx_Status AlxFs_Rename(AlxFs* me, const char* pathOld, const char* pathNew)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, pathOld=%s, pathNew=%s", status, pathOld, pathNew);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", pathOld=%s, pathNew=%s", status, pathOld, pathNew);
 		return Alx_Err;
 	}
 
@@ -462,7 +464,7 @@ Alx_Status AlxFs_File_Open(AlxFs* me, AlxFs_File* file, const char* path, const 
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s, mode=%s", status, path, mode);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", path=%s, mode=%s", status, path, mode);
 		return Alx_Err;
 	}
 
@@ -495,7 +497,7 @@ Alx_Status AlxFs_File_Close(AlxFs* me, AlxFs_File* file)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -512,11 +514,11 @@ Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len
 	#if defined(ALX_FATFS)
 	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
-		unsigned int _lenActual = 0;
+		UINT _lenActual = 0;
 		int32_t status = f_read(&file->fatfsFile, data, len, &_lenActual);
 		if (status != 0)
 		{
-			ALX_FS_TRACE_ERR("Err: %d, lenActual=%d, len=%u", status, _lenActual, len);
+			ALX_FS_TRACE_ERR("Err: %" PRId32 ", lenActual=%" PRIu32 ", len=%" PRIu32, status, (uint32_t)_lenActual, len);
 			return Alx_Err;
 		}
 		*lenActual = (uint32_t)_lenActual;
@@ -528,7 +530,7 @@ Alx_Status AlxFs_File_Read(AlxFs* me, AlxFs_File* file, void* data, uint32_t len
 		int32_t _lenActual = lfs_file_read(&me->lfs, &file->lfsFile, data, len);
 		if (_lenActual < 0)
 		{
-			ALX_FS_TRACE_ERR("Err: lenActual=%d, len=%u", _lenActual, len);
+			ALX_FS_TRACE_ERR("Err: lenActual=%" PRId32 ", len=%" PRIu32, _lenActual, len);
 			return Alx_Err;
 		}
 		*lenActual = (uint32_t)_lenActual;
@@ -543,13 +545,14 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 	// Assert
 	ALX_FS_ASSERT(me->wasCtorCalled == true);
 	ALX_FS_ASSERT(me->isMounted == true);
-	ALX_FS_ASSERT(strlen(delim) == 1);	// Only single char delim supported
+	ALX_UNUSED uint32_t delimLen = (uint32_t)strlen(delim);
+	ALX_FS_ASSERT(delimLen == 1);	// Only single char delim supported
 
 	// Local variables
 	Alx_Status status = AlxFs_ErrNoDelim;
 	Alx_Status statusRead = Alx_Err;
 	uint32_t _lenActual = 0;
-	char ch __attribute__((aligned(4))) = 0;
+	char ch = 0;
 	uint32_t readLenActual = 0;
 
 	// Loop
@@ -565,7 +568,7 @@ Alx_Status AlxFs_File_ReadStrUntil(AlxFs* me, AlxFs_File* file, char* str, const
 		else if (statusRead != Alx_Ok)
 		{
 			// Break, error occurred, trace, change status to Alx_Err
-			ALX_FS_TRACE_ERR("Err: %d, ch=%d, readLenActual=%u, lenActual=%u, len=%u, delim=%s", statusRead, ch, readLenActual, _lenActual, len, delim);
+			ALX_FS_TRACE_ERR("Err: %d, ch=0x%02" PRIX32 ", readLenActual=%" PRIu32 ", lenActual=%" PRIu32 ", len=%" PRIu32 ", delim=%s", statusRead, (uint32_t)(uint8_t)ch, readLenActual, _lenActual, len, delim);
 			status = Alx_Err;
 			break;
 		}
@@ -604,11 +607,11 @@ Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t le
 	#if defined(ALX_FATFS)
 	if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 	{
-		unsigned int lenActual = 0;
+		UINT lenActual = 0;
 		int32_t status = f_write(&file->fatfsFile, data, len, &lenActual);
 		if ((status != 0) || (lenActual != len))
 		{
-			ALX_FS_TRACE_ERR("Err: %d, lenActual=%d, len=%u", status, lenActual, len);
+			ALX_FS_TRACE_ERR("Err: %" PRId32 ", lenActual=%" PRIu32 ", len=%" PRIu32, status, (uint32_t)lenActual, len);
 			return Alx_Err;
 		}
 	}
@@ -619,7 +622,7 @@ Alx_Status AlxFs_File_Write(AlxFs* me, AlxFs_File* file, void* data, uint32_t le
 		int32_t lenActual = lfs_file_write(&me->lfs, &file->lfsFile, data, len);
 		if (lenActual != (int32_t)len)
 		{
-			ALX_FS_TRACE_ERR("Err: lenActual=%d, len=%u", lenActual, len);
+			ALX_FS_TRACE_ERR("Err: lenActual=%" PRId32 ", len=%" PRIu32, lenActual, len);
 			return Alx_Err;
 		}
 	}
@@ -663,7 +666,7 @@ Alx_Status AlxFs_File_Sync(AlxFs* me, AlxFs_File* file)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -705,7 +708,7 @@ Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_Fi
 		int32_t status = f_lseek(&file->fatfsFile, fatfsPositionNew);
 		if (status != 0)
 		{
-			ALX_FS_TRACE_ERR("Err: %d, fatfsPositionNew=%d, offset=%d, origin=%d", status, fatfsPositionNew, offset, origin);
+			ALX_FS_TRACE_ERR("Err: %" PRId32 ", fatfsPositionNew=%" PRId32 ", offset=%" PRId32 ", origin=%d", status, fatfsPositionNew, offset, origin);
 			return Alx_Err;
 		}
 
@@ -717,7 +720,7 @@ Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_Fi
 	if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
 	{
 		// Local variables
-		int lfsOrigin = 0;
+		int32_t lfsOrigin = 0;
 
 		// Prepare
 		if (origin == AlxFs_File_Seek_Origin_Set)
@@ -741,7 +744,7 @@ Alx_Status AlxFs_File_Seek(AlxFs* me, AlxFs_File* file, int32_t offset, AlxFs_Fi
 		int32_t lfsPositionNew = lfs_file_seek(&me->lfs, &file->lfsFile, (lfs_soff_t)offset, lfsOrigin);
 		if (lfsPositionNew < 0)
 		{
-			ALX_FS_TRACE_ERR("Err: lfsPositionNew=%d, offset=%d, origin=%d", lfsPositionNew, offset, origin);
+			ALX_FS_TRACE_ERR("Err: lfsPositionNew=%" PRId32 ", offset=%" PRId32 ", origin=%d", lfsPositionNew, offset, origin);
 			return Alx_Err;
 		}
 
@@ -779,7 +782,7 @@ Alx_Status AlxFs_File_Tell(AlxFs* me, AlxFs_File* file, uint32_t* position)
 	// Trace
 	if (_position < 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", _position);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, _position);
 		return Alx_Err;
 	}
 
@@ -813,7 +816,7 @@ Alx_Status AlxFs_File_Rewind(AlxFs* me, AlxFs_File* file)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -846,7 +849,7 @@ Alx_Status AlxFs_File_Size(AlxFs* me, AlxFs_File* file, uint32_t* size)
 	// Trace
 	if (_size < 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", _size);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, _size);
 		return Alx_Err;
 	}
 
@@ -887,7 +890,7 @@ Alx_Status AlxFs_File_Truncate(AlxFs* me, AlxFs_File* file, uint32_t size)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, size=%u", status, size);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", size=%" PRIu32, status, size);
 		return Alx_Err;
 	}
 
@@ -923,7 +926,7 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 	if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%u", status, path, fileSize);
+		ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%" PRIu32, status, path, fileSize);
 		if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 		Alx_Status statusClose = AlxFs_File_Close(me, &file);
 		if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
@@ -945,7 +948,7 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 		if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
 		if (status != Alx_Ok)
 		{
-			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%u, chunkLen=%u, chunkLenActual=%u", status, path, fileSize, chunkLen, chunkLenActual);
+			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%" PRIu32 ", chunkLen=%" PRIu32 ", chunkLenActual=%" PRIu32, status, path, fileSize, chunkLen, chunkLenActual);
 			if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 			Alx_Status statusClose = AlxFs_File_Close(me, &file);
 			if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
@@ -961,7 +964,7 @@ Alx_Status AlxFs_File_ReadInChunks(AlxFs* me, const char* path, uint8_t* chunkBu
 		status = chunkRead_Callback(chunkRead_Callback_Ctx, chunkBuff, chunkLenActual);
 		if (status != Alx_Ok)
 		{
-			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%u, chunkLenActual=%u", status, path, fileSize, chunkLenActual);
+			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileSize=%" PRIu32 ", chunkLenActual=%" PRIu32, status, path, fileSize, chunkLenActual);
 			if (alxOsMutex != NULL) AlxOsMutex_Lock(alxOsMutex);
 			Alx_Status statusClose = AlxFs_File_Close(me, &file);
 			if (alxOsMutex != NULL) AlxOsMutex_Unlock(alxOsMutex);
@@ -1046,7 +1049,7 @@ Alx_Status AlxFs_Dir_Make(AlxFs* me, const char* path)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s", status, path);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", path=%s", status, path);
 		return Alx_Err;
 	}
 
@@ -1079,7 +1082,7 @@ Alx_Status AlxFs_Dir_Open(AlxFs* me, AlxFs_Dir* dir, const char* path)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s", status, path);
+		ALX_FS_TRACE_ERR("Err: %" PRId32 ", path=%s", status, path);
 		return Alx_Err;
 	}
 
@@ -1112,7 +1115,7 @@ Alx_Status AlxFs_Dir_Close(AlxFs* me, AlxFs_Dir* dir)
 	// Trace
 	if (status != 0)
 	{
-		ALX_FS_TRACE_ERR("Err: %d", status);
+		ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 		return Alx_Err;
 	}
 
@@ -1126,7 +1129,9 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 	ALX_FS_ASSERT(me->isMounted == true);
 
 	// Local variables
+	#if defined(ALX_FATFS) || defined(ALX_LFS)
 	int32_t status = -1;
+	#endif
 
 	// Do
 	#if defined(ALX_FATFS)
@@ -1135,7 +1140,7 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 		status = f_readdir(&dir->fatfsDir, &info->fatfsInfo);
 		if (status != 0)
 		{
-			ALX_FS_TRACE_ERR("Err: %d", status);
+			ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 			return Alx_Err;
 		}
 		else if (strcmp(info->fatfsInfo.fname, "") == 0)
@@ -1154,7 +1159,7 @@ Alx_Status AlxFs_Dir_Read(AlxFs* me, AlxFs_Dir* dir, AlxFs_Info* info)
 		}
 		else if (status != 1)
 		{
-			ALX_FS_TRACE_ERR("Err: %d", status);
+			ALX_FS_TRACE_ERR("Err: %" PRId32, status);
 			return Alx_Err;
 		}
 	}
@@ -1182,7 +1187,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 	status = AlxFs_Dir_Open(me, &dir, path);
 	if (status != Alx_Ok)
 	{
-		ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
+		ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%d", status, path, fileTrace);
 		return status;
 	}
 
@@ -1197,7 +1202,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 		}
 		else if (status != Alx_Ok)
 		{
-			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
+			ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%d", status, path, fileTrace);
 			Alx_Status statusClose = AlxFs_Dir_Close(me, &dir);
 			if (statusClose != Alx_Ok)
 			{
@@ -1247,13 +1252,13 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 			#if defined(ALX_FATFS)
 			if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 			{
-				sprintf(buff, "FILE - %s - %lu B\r\n", info.fatfsInfo.fname, info.fatfsInfo.fsize);
+				(void)sprintf(buff, "FILE - %s - %" PRIu32 " B\r\n", info.fatfsInfo.fname, (uint32_t)info.fatfsInfo.fsize);
 			}
 			#endif
 			#if defined(ALX_LFS)
 			if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
 			{
-				sprintf(buff, "FILE - %s - %lu B\r\n", info.lfsInfo.name, info.lfsInfo.size);
+				(void)sprintf(buff, "FILE - %s - %" PRIu32 " B\r\n", info.lfsInfo.name, (uint32_t)info.lfsInfo.size);
 			}
 			#endif
 
@@ -1267,13 +1272,13 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 				#if defined(ALX_FATFS)
 				if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 				{
-					sprintf(buff, "%s/%s", path, info.fatfsInfo.fname);
+					(void)sprintf(buff, "%s/%s", path, info.fatfsInfo.fname);
 				}
 				#endif
 				#if defined(ALX_LFS)
 				if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
 				{
-					sprintf(buff, "%s/%s", path, info.lfsInfo.name);
+					(void)sprintf(buff, "%s/%s", path, info.lfsInfo.name);
 				}
 				#endif
 
@@ -1281,7 +1286,7 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 				status = AlxFs_File_Trace(me, buff, fileBin);
 				if (status != Alx_Ok)
 				{
-					ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%u", status, path, fileTrace);
+					ALX_FS_TRACE_ERR("Err: %d, path=%s, fileTrace=%d", status, path, fileTrace);
 					Alx_Status statusClose = AlxFs_Dir_Close(me, &dir);
 					if (statusClose != Alx_Ok)
 					{
@@ -1298,13 +1303,13 @@ Alx_Status AlxFs_Dir_Trace(AlxFs* me, const char* path, bool fileTrace, bool fil
 			#if defined(ALX_FATFS)
 			if (me->config == AlxFs_Config_Fatfs_Mmc || me->config == AlxFs_Config_Fatfs_Usb)
 			{
-				sprintf(buff, "DIR - %s\r\n", info.fatfsInfo.fname);
+				(void)sprintf(buff, "DIR - %s\r\n", info.fatfsInfo.fname);
 			}
 			#endif
 			#if defined(ALX_LFS)
 			if (me->config == AlxFs_Config_Lfs_FlashInt || me->config == AlxFs_Config_Lfs_Mmc)
 			{
-				sprintf(buff, "DIR - %s\r\n", info.lfsInfo.name);
+				(void)sprintf(buff, "DIR - %s\r\n", info.lfsInfo.name);
 			}
 			#endif
 
@@ -1555,8 +1560,8 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff)
 			{
 				// Get
 				uint32_t blockCount = 0;
-				uint32_t blockLen_byte = 0;
 				#if defined(ALX_STM32F7)
+				uint32_t blockLen_byte = 0;
 				status = AlxUsb_GetCapacity(alxFs_Fatfs_Mmc_Usb_me->alxUsb, &blockCount, &blockLen_byte);
 				#endif
 				if (status != Alx_Ok)
@@ -1588,9 +1593,9 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff)
 			else if (alxFs_Fatfs_Mmc_Usb_me->config == AlxFs_Config_Fatfs_Usb)
 			{
 				// Get
-				uint32_t blockCount = 0;
 				uint32_t blockLen_byte = 0;
 				#if defined(ALX_STM32F7)
+				uint32_t blockCount = 0;
 				status = AlxUsb_GetCapacity(alxFs_Fatfs_Mmc_Usb_me->alxUsb, &blockCount, &blockLen_byte);
 				#endif
 				if (status != Alx_Ok)
@@ -1630,7 +1635,7 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff)
 //------------------------------------------------------------------------------
 // Lfs_FlashInt
 //------------------------------------------------------------------------------
-#if defined(ALX_LFS)
+#if defined(ALX_LFS) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
 static void AlxFs_Lfs_FlashInt_Ctor(AlxFs* me)
 {
 	//------------------------------------------------------------------------------
@@ -1810,7 +1815,7 @@ static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t 
 		AlxFs* me = (AlxFs*)c->context;
 		uint32_t block_base_addr = me->lfsAddr + block * c->block_size;
 		uint32_t dest_address = block_base_addr + off + i_row * 4;		// Multiply by 4 because we write 4 bytes at the time
-		uint32_t* src_address_ptr = (uint32_t*)(buffer + i_row * 4);	// Multiply by 4 because we write 4 bytes at the time
+		uint32_t* src_address_ptr = (uint32_t*)((const uint8_t*)buffer + i_row * 4);	// Multiply by 4 because we write 4 bytes at the time
 
 		// Program
 		HAL_StatusTypeDef xHAL_Status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, dest_address, *src_address_ptr);
@@ -1828,7 +1833,7 @@ static int AlxFs_Lfs_FlashInt_ProgBlock(const struct lfs_config* c, lfs_block_t 
 		AlxFs* me = (AlxFs*)c->context;
 		uint32_t block_base_addr = me->lfsAddr + block * c->block_size;
 		uint32_t dest_address = block_base_addr + off + i_row * 8;		// Multiply by 8 because we write 8 bytes at the time
-		uint64_t* src_address_ptr = (uint64_t*)(buffer + i_row * 8);	// Multiply by 8 because we write 8 bytes at the time
+		uint64_t* src_address_ptr = (uint64_t*)((const uint8_t*)buffer + i_row * 8);	// Multiply by 8 because we write 8 bytes at the time
 
 		// Program
 		HAL_StatusTypeDef xHAL_Status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, dest_address, *src_address_ptr);
@@ -1939,7 +1944,14 @@ static int AlxFs_Lfs_FlashInt_EraseBlock(const struct lfs_config* c, lfs_block_t
 	HAL_FLASH_Lock();
 
 	// Return
-	return xHAL_Status == HAL_OK ? LFS_ERR_OK : LFS_ERR_IO;
+	if (xHAL_Status == HAL_OK)
+	{
+		return LFS_ERR_OK;
+	}
+	else
+	{
+		return LFS_ERR_IO;
+	}
 }
 static int AlxFs_Lfs_FlashInt_SyncBlock(const struct lfs_config* c)
 {
@@ -2013,12 +2025,12 @@ static int AlxFs_Lfs_Mmc_ReadBlock(const struct lfs_config* c, lfs_block_t block
 	// Prepare
 	Alx_Status status = Alx_Err;
 	AlxFs* me = (AlxFs*)c->context;
-	uint32_t numOfBlocks = size / 512;
-	uint32_t blockAddr = (block * c->block_size + off) / 512;
 
 	// Read
 	if(me->do_DBG_ReadBlock != NULL) AlxIoPin_Set(me->do_DBG_ReadBlock);
 	#if defined(ALX_STM32L4)
+	uint32_t numOfBlocks = size / 512;
+	uint32_t blockAddr = (block * c->block_size + off) / 512;
 	status = AlxMmc_ReadBlock(me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 3, 100);
 	#endif
 	if(me->do_DBG_ReadBlock != NULL) AlxIoPin_Reset(me->do_DBG_ReadBlock);
@@ -2036,12 +2048,12 @@ static int AlxFs_Lfs_Mmc_ProgBlock(const struct lfs_config* c, lfs_block_t block
 	// Prepare
 	Alx_Status status = Alx_Err;
 	AlxFs* me = (AlxFs*)c->context;
-	uint32_t numOfBlocks = size / 512;
-	uint32_t blockAddr = (block * c->block_size + off) / 512;
 
 	// Write
 	if(me->do_DBG_WriteBlock != NULL) AlxIoPin_Set(me->do_DBG_WriteBlock);
 	#if defined(ALX_STM32L4)
+	uint32_t numOfBlocks = size / 512;
+	uint32_t blockAddr = (block * c->block_size + off) / 512;
 	status = AlxMmc_WriteBlock(me->alxMmc, numOfBlocks, blockAddr, (uint8_t*)buffer, size, 3, 100);
 	#endif
 	if(me->do_DBG_WriteBlock != NULL) AlxIoPin_Reset(me->do_DBG_WriteBlock);
@@ -2127,7 +2139,7 @@ static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(void* ctx, void* chunkData
 			// Trace data
 			for (uint32_t j = 0; j < lineLen; j++)
 			{
-				ALX_FS_TRACE_FORMAT("%02X ", ((uint8_t*)chunkData)[i + j]);
+				ALX_FS_TRACE_FORMAT("%02" PRIX32 " ", (uint32_t)(((uint8_t*)chunkData)[i + j]));
 			}
 
 			// Trace new line
@@ -2136,7 +2148,7 @@ static Alx_Status AlxFs_File_Trace_ChunkRead_Callback(void* ctx, void* chunkData
 	}
 	else
 	{
-		ALX_FS_TRACE_FORMAT("%s", chunkData);
+		ALX_FS_TRACE_FORMAT("%s", (const char*)chunkData);
 	}
 
 	// Return

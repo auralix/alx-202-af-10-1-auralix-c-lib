@@ -56,12 +56,18 @@ extern "C" {
 //******************************************************************************
 typedef struct
 {
-	// Obejcts - External
-	AlxIoPin** channels;
+	// Defines
+	#define ALX_ADC_BUFF_LEN 8
 
 	// Parameters
-	uint8_t numChannels;
-	uint16_t voltageRefP_mV;
+	AlxIoPin** ioPinArr;
+	Alx_Ch* chArr;
+	uint8_t numOfIoPinsAndCh;
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
+	uint32_t vRef_mV;
+	#else
+	float vRef_V;
+	#endif
 
 	// Variables
 	ADC_CLOCK_SETUP_T adcClkSetup;
@@ -70,18 +76,23 @@ typedef struct
 	// Info
 	bool isInit;
 	bool wasCtorCalled;
-} AlxAdc_Mcu;
+} AlxAdc;
 
 
 //******************************************************************************
 // Constructor
 //******************************************************************************
-void AlxAdcMcu_Ctor
+void AlxAdc_Ctor
 (
-	AlxAdc_Mcu* me,
-	AlxIoPin** channels,
-	uint8_t numChannels,
-	uint16_t voltageRefP_mV
+	AlxAdc* me,
+	AlxIoPin** ioPinArr,
+	Alx_Ch* chArr,
+	uint8_t numOfIoPinsAndCh,
+	#if defined(ALX_ADC_OPTIMIZE_SIZE)
+	uint32_t vRef_mV
+	#else
+	float vRef_V
+	#endif
 );
 
 

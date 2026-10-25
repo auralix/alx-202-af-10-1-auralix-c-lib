@@ -55,6 +55,9 @@ extern "C" {
 #define ALX_ASSERT_BKPT(file, expr) if (expr) {} else { AlxAssert_Bkpt(file, __LINE__, __func__); }
 #define ALX_ASSERT_TRACE(file, expr) if (expr) {} else { AlxAssert_Trace(file, __LINE__, __func__); }
 #define ALX_ASSERT_RST(file, expr) if (expr) {} else { AlxAssert_Rst(file, __LINE__, __func__); }
+#ifndef ALX_ASSERT_OFF
+#define ALX_ASSERT_OFF(expr) ((void)sizeof(!(expr)))
+#endif
 
 
 //******************************************************************************

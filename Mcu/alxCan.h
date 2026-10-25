@@ -71,14 +71,14 @@ typedef struct { bool dummy; } AlxCan;
 #elif defined(ALX_CAN_ASSERT_RST_ENABLE)
 	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_RST(ALX_CAN_FILE, expr)
 #else
-	#define ALX_CAN_ASSERT(expr) do{} while (false)
+	#define ALX_CAN_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_CAN_TRACE_ENABLE)
 	#define ALX_CAN_TRACE_ERR(...) ALX_TRACE_ERR(ALX_CAN_FILE, __VA_ARGS__)
 #else
-	#define ALX_CAN_TRACE_ERR(...) do{} while (false)
+	#define ALX_CAN_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 

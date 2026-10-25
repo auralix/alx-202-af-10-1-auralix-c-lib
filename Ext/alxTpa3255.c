@@ -90,7 +90,7 @@ void AlxTpa3255_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTpa3255_Init(AlxTpa3255* me)
 {
@@ -108,7 +108,7 @@ void AlxTpa3255_Init(AlxTpa3255* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTpa3255_DeInit(AlxTpa3255* me)
 {
@@ -126,7 +126,7 @@ void AlxTpa3255_DeInit(AlxTpa3255* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTpa3255_Handle(AlxTpa3255* me)
 {
@@ -194,7 +194,7 @@ void AlxTpa3255_Handle(AlxTpa3255* me)
 				AlxTpa3255_Enable(me);
 			}
 		}
-		// Procesing WAS
+		// Processing WAS
 		if(AlxTpa3255_IsErrAsserted(me))
 		{
 			me->wasErrAsserted = true;
@@ -204,7 +204,7 @@ void AlxTpa3255_Handle(AlxTpa3255* me)
 			me->wasWarningAsserted = true;
 		}
 	}
-	else // functionality is disabled -> not try to ReEnable IC
+	else // functionality is disabled -> not try to re-enable IC
 	{
 		AlxIoPin_Write(me->do_nRESET, true);
 	}
@@ -212,7 +212,7 @@ void AlxTpa3255_Handle(AlxTpa3255* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTpa3255_Enable(AlxTpa3255* me)
 {
@@ -224,7 +224,7 @@ void AlxTpa3255_Enable(AlxTpa3255* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTpa3255_Disable(AlxTpa3255* me)
 {
@@ -245,7 +245,14 @@ bool AlxTpa3255_IsErrAsserted(AlxTpa3255* me)
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
 
-	return (AlxIoPin_Read(me->di_nFAULT)) ? false : true;
+	if (AlxIoPin_Read(me->di_nFAULT))
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 /**
@@ -259,7 +266,14 @@ bool AlxTpa3255_IsWarningAsserted(AlxTpa3255* me)
 	ALX_TPA3255_ASSERT(me->isInit == true);
 	ALX_TPA3255_ASSERT(me->wasCtorCalled == true);
 
-	return (AlxIoPin_Read(me->di_nCLIP_OTW)) ? false : true;
+	if (AlxIoPin_Read(me->di_nCLIP_OTW))
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 /**
@@ -292,7 +306,7 @@ bool AlxTpa3255_WasWarningAsserted(AlxTpa3255* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTpa3255_ClearWasErrAsserted(AlxTpa3255* me)
 {
@@ -304,7 +318,7 @@ void AlxTpa3255_ClearWasErrAsserted(AlxTpa3255* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxTpa3255_ClearWasWarningAsserted(AlxTpa3255* me)
 {

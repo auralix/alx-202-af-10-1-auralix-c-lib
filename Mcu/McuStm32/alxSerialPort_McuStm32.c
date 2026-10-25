@@ -286,7 +286,7 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 		HAL_StatusTypeDef statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %d", statusHal);
 			return Alx_Err;
 		}
 		#endif
@@ -297,7 +297,7 @@ Alx_Status AlxSerialPort_Init(AlxSerialPort* me)
 		HAL_StatusTypeDef statusHal = HAL_UART_Init(&me->huart);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %d", statusHal);
 			return Alx_Err;
 		}
 	}
@@ -334,7 +334,7 @@ Alx_Status AlxSerialPort_DeInit(AlxSerialPort* me)
 	HAL_StatusTypeDef statusHal = HAL_UART_DeInit(&me->huart);
 	if (statusHal != HAL_OK)
 	{
-		ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_DeInit() statusHal %u", statusHal);
+		ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_DeInit() statusHal %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -472,7 +472,7 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 		statusHal = HAL_LIN_SendBreak(&me->huart);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_SendBreak() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_SendBreak() statusHal %d", statusHal);
 			return Alx_Err;
 		}
 		#endif
@@ -508,13 +508,13 @@ Alx_Status AlxSerialPort_Write(AlxSerialPort* me, const uint8_t* data, uint32_t 
 		if (statusHal != HAL_OK)
 		{
 			// Trace
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Transmit() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Transmit() statusHal %d", statusHal);
 
 			// Reset
 			status = AlxSerialPort_Reset(me);
 			if (status != Alx_Ok)
 			{
-				ALX_SERIAL_PORT_TRACE_ERR("FAIL: AlxSerialPort_Reset() status %u", status);
+				ALX_SERIAL_PORT_TRACE_ERR("FAIL: AlxSerialPort_Reset() status %d", status);
 				return Alx_Err;
 			}
 
@@ -591,7 +591,7 @@ void AlxSerialPort_IrqHandler(AlxSerialPort* me)
 		#if defined(ALX_STM32F4)
 		// Overrun error handling, periphery doesn't have overrun error disable functionality.
 		// We clear overrun flag with sequence of first reading status register, and then data register.
-		volatile const uint32_t dummy = me->huart.Instance->SR;
+		(void)me->huart.Instance->SR;
 		#endif
 
 		// No overrun error handling, overrun error must be disabled @ Uart initialization.
@@ -704,7 +704,7 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 	HAL_StatusTypeDef statusHal = HAL_UART_DeInit(&me->huart);
 	if (statusHal != HAL_OK)
 	{
-		ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_DeInit() statusHal %u", statusHal);
+		ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_DeInit() statusHal %d", statusHal);
 		return Alx_Err;
 	}
 
@@ -731,10 +731,10 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 
 		// Init
 		#if (defined(ALX_STM32F0) || defined(ALX_STM32F4)) && defined(USART_CR2_LINEN)
-		HAL_StatusTypeDef statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
+		statusHal = HAL_LIN_Init(&me->huart, UART_LINBREAKDETECTLENGTH_11B);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_LIN_Init() statusHal %d", statusHal);
 			return Alx_Err;
 		}
 		#endif
@@ -742,10 +742,10 @@ static Alx_Status AlxSerialPort_Reset(AlxSerialPort* me)
 	else
 	{
 		// Init
-		HAL_StatusTypeDef statusHal = HAL_UART_Init(&me->huart);
+		statusHal = HAL_UART_Init(&me->huart);
 		if (statusHal != HAL_OK)
 		{
-			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %u", statusHal);
+			ALX_SERIAL_PORT_TRACE_ERR("FAIL: HAL_UART_Init() statusHal %d", statusHal);
 			return Alx_Err;
 		}
 	}

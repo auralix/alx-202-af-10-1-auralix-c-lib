@@ -52,14 +52,14 @@
 #elif defined(ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT_RST_ENABLE)
 	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(expr) ALX_ASSERT_RST(ALX_MCU_BOOT_FLASH_MAP_BACKEND_FILE, expr)
 #else
-	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(expr) do{} while (false)
+	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_ENABLE)
 	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF(...) ALX_TRACE_INF(ALX_MCU_BOOT_FLASH_MAP_BACKEND_FILE, __VA_ARGS__)
 #else
-	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF(...) do{} while (false)
+	#define ALX_MCU_BOOT_FLASH_MAP_BACKEND_TRACE_INF(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -351,6 +351,10 @@ int flash_area_id_from_multi_image_slot(int image_index, int slot)
 		{
 			return FLASH_AREA_IMAGE_SCRATCH;
 		}
+		default:
+		{
+			break;
+		}
 	}
 
 	return -1;
@@ -531,7 +535,7 @@ static bool Flash_Write(uint32_t addr, const void* src, uint32_t len)
 	{
 		// Prepare
 		uint64_t data = 0;
-		memcpy(&data, src + i, HAL_FLASH_PROGRAM_LEN);
+		memcpy(&data, (const uint8_t*)src + i, HAL_FLASH_PROGRAM_LEN);
 
 		// Write
 		HAL_StatusTypeDef status = HAL_FLASH_Program(HAL_FLASH_PROGRAM_TYPE, addr + i, data);

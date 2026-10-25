@@ -213,12 +213,12 @@ Alx_Status AlxSerialPort_Read(AlxSerialPort* me, uint8_t* data, uint32_t len)
   * @param[in,out]	me
   * @param[out]		str
   * @param[in]		delim
-  * @param[in]		maxLen
-  * @param[out]		numRead
+  * @param[in]		len
+  * @param[out]		lenActual
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
-Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t maxLen, uint32_t* numRead)
+Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* delim, uint32_t len, uint32_t* lenActual)
 {
 	// Assert
 	ALX_SERIAL_PORT_ASSERT(me->wasCtorCalled == true);
@@ -226,7 +226,7 @@ Alx_Status AlxSerialPort_ReadStrUntil(AlxSerialPort* me, char* str, const char* 
 
 	// Read
 	uint32_t key = AlxIrq_Lock();
-	Alx_Status status = AlxFifo_ReadStrUntil(&me->rxFifo, str, delim, maxLen, numRead);
+	Alx_Status status = AlxFifo_ReadStrUntil(&me->rxFifo, str, delim, len, lenActual);
 	AlxIrq_Unlock(key);
 
 	// Return

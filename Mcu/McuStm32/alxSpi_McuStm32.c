@@ -122,7 +122,8 @@ void AlxSpi_Ctor
 	#endif
 
 	// Check clock
-	ALX_SPI_ASSERT(AlxSpi_IsClkOk(me));
+	ALX_UNUSED bool isClkOk = AlxSpi_IsClkOk(me);
+	ALX_SPI_ASSERT(isClkOk);
 
 	// Info
 	me->wasCtorCalled = true;
@@ -256,7 +257,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 		HAL_StatusTypeDef status = HAL_ERROR;
 
 		// Try write for number of tries
-		for (uint32_t _try = 1; _try <= numOfTries; _try++)
+		for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 		{
 			status = HAL_SPI_Transmit(&me->hspi, writeData, len, timeout_ms);
 			if (status == HAL_OK)
@@ -275,7 +276,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 			}
 		}
 
-		// If we are here, write was OK or number of tries error occured
+		// If we are here, write was OK or number of tries error occurred
 		if (status == HAL_OK)
 		{
 			return Alx_Ok;
@@ -367,7 +368,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 		HAL_StatusTypeDef status = HAL_ERROR;
 
 		// Try read for number of tries
-		for (uint32_t _try = 1; _try <= numOfTries; _try++)
+		for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 		{
 			status = HAL_SPI_Receive(&me->hspi, readData, len, timeout_ms);
 			if (status == HAL_OK)
@@ -386,7 +387,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 			}
 		}
 
-		// If we are here, read was OK or number of tries error occured
+		// If we are here, read was OK or number of tries error occurred
 		if (status == HAL_OK)
 		{
 			return Alx_Ok;
@@ -480,7 +481,7 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 		HAL_StatusTypeDef status = HAL_ERROR;
 
 		// Try write/read for number of tries
-		for (uint32_t _try = 1; _try <= numOfTries; _try++)
+		for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 		{
 			status = HAL_SPI_TransmitReceive(&me->hspi, writeData, readData, len, timeout_ms);
 			if (status == HAL_OK)
@@ -499,7 +500,7 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 			}
 		}
 
-		// If we are here, write/read was OK or number of tries error occured
+		// If we are here, write/read was OK or number of tries error occurred
 		if (status == HAL_OK)
 		{
 			return Alx_Ok;

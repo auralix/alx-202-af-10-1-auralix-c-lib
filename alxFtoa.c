@@ -72,13 +72,13 @@ static const double rounders[MAX_PRECISION + 1] =
   * @param[in,out]	buf
   * @param[in]		precision
   */
-char* AlxFtoa(double f, char* buf, int precision)
+char* AlxFtoa(double f, char* buf, int32_t precision)
 {
 	char * ptr = buf;
-	char * p = ptr;
+	char * p = ALX_NULL_PTR;
 	char * p1;
 	char c;
-	long intPart;
+	int32_t intPart;
 
 	// check precision bounds
 	if (precision > MAX_PRECISION)

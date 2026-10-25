@@ -63,7 +63,7 @@ extern "C" {
 #elif defined(ALX_LFS_CONFIG_ASSERT_RST_ENABLE)
     #define LFS_ASSERT(expr) ALX_ASSERT_RST(ALX_LFS_CONFIG_FILE, expr)
 #else
-    #define LFS_ASSERT(expr) do{} while (false)
+    #define LFS_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
@@ -181,11 +181,21 @@ extern "C" {
 
 // Min/max functions for unsigned 32-bit numbers
 static inline uint32_t lfs_max(uint32_t a, uint32_t b) {
-    return (a > b) ? a : b;
+    if (a > b) {
+        return a;
+    }
+    else {
+        return b;
+    }
 }
 
 static inline uint32_t lfs_min(uint32_t a, uint32_t b) {
-    return (a < b) ? a : b;
+    if (a < b) {
+        return a;
+    }
+    else {
+        return b;
+    }
 }
 
 // Align to nearest multiple of a size
@@ -297,7 +307,7 @@ static inline uint32_t lfs_crc(uint32_t crc, const void *buffer, size_t size) { 
 
     const uint8_t *data = (const uint8_t*)buffer;
 
-    for (size_t i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < size; i++) {
         crc = (crc >> 4) ^ rtable[(crc ^ (data[i] >> 0)) & 0xf];
         crc = (crc >> 4) ^ rtable[(crc ^ (data[i] >> 4)) & 0xf];
     }

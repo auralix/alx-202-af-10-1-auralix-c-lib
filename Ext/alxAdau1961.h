@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAdau1961.h
   * @brief		Auralix C Library - ALX Audio Codec ADAU1961 Module
@@ -66,14 +66,14 @@ extern "C" {
 #elif defined(ALX_ADAU1961_ASSERT_RST_ENABLE)
 	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_RST(ALX_ADAU1961_FILE, expr)
 #else
-	#define ALX_ADAU1961_ASSERT(expr) do{} while (false)
+	#define ALX_ADAU1961_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_ADAU1961_TRACE_ENABLE)
 	#define ALX_ADAU1961_TRACE_ERR(...) ALX_TRACE_ERR(ALX_ADAU1961_FILE, __VA_ARGS__)
 #else
-	#define ALX_ADAU1961_TRACE_ERR(...) do{} while (false)
+	#define ALX_ADAU1961_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -155,7 +155,7 @@ typedef enum
 } AlxAdau1961_R0_ClkSourceSelect;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R0_CoreClkEnable COREN : 1;
 		AlxAdau1961_R0_InputClkFreq INFREQ : 2;
@@ -192,7 +192,7 @@ typedef enum
 } AlxAdau1961_R1_PllEnable;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t M_MSB;
 		uint8_t M_LSB;
@@ -232,7 +232,7 @@ typedef enum
 } AlxAdau1961_R2_JackDebounceTime;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R2_JackDetectPolarity JDPOL : 1;
 		uint8_t unused_1_3: 3; // bits 1..3 are unused
@@ -249,7 +249,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_MixerEnable MX1EN : 1;
 		AlxAdau1961_General_GainMixer1Mixer2 LINNG : 3;
@@ -264,7 +264,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_GainMixer1Mixer2 MX1AUXG : 3;
 		AlxAdau1961_General_DiffPGAInputGain LDBOOST : 2;
@@ -278,7 +278,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_MixerEnable MX2EN : 1;
 		AlxAdau1961_General_GainMixer1Mixer2 RINNG : 3;
@@ -293,7 +293,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_GainMixer1Mixer2 MX2AUXG : 3;
 		AlxAdau1961_General_DiffPGAInputGain RDBOOST : 2;
@@ -317,7 +317,7 @@ typedef enum
 } AlxAdau1961_R8_R9_DiffInputMuteControl;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R8_R9_DiffPGAEnable LDEN : 1;
 		AlxAdau1961_R8_R9_DiffInputMuteControl LDMUTE : 1;
@@ -327,7 +327,7 @@ typedef union
 } AlxAdau1961_RegVal_R8_LeftDiffInputVol;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R8_R9_DiffPGAEnable RDEN : 1;
 		AlxAdau1961_R8_R9_DiffInputMuteControl RDMUTE : 1;
@@ -356,7 +356,7 @@ typedef enum
 } AlxAdau1961_R10_MicPerformanceOperation;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R10_MicBiasOutputEnable MBIEN : 1;
 		uint8_t unused_1: 1; // bit 1 is unused
@@ -397,7 +397,7 @@ typedef enum
 } AlxAdau1961_R11_PGAVolSlewTimeALC;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R11_ALCSelect ALCSEL : 3;
 		AlxAdau1961_R11_MaxALCGain ALCMAX : 3;
@@ -449,7 +449,7 @@ typedef enum
 } AlxAdau1961_R12_ALCHoldTime;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R12_ALCTarget ALCTARG : 4;
 		AlxAdau1961_R12_ALCHoldTime ALCHOLD : 4;
@@ -500,7 +500,7 @@ typedef enum
 } AlxAdau1961_R13_ALCAttackTime;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R13_ALCDecayTime ALCDEC : 4;
 		AlxAdau1961_R13_ALCAttackTime ALCATCK : 4;
@@ -525,7 +525,7 @@ typedef enum
 } AlxAdau1961_R14_NoiseGateType;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t NGTHR: 5;		// -76.5dB to -30dB with 1.5dB step
 		AlxAdau1961_R14_NoiseGateEnable NGEN : 1;
@@ -569,7 +569,7 @@ typedef enum
 } AlxAdau1961_R15_DitherEnable;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R15_PortMode MS : 1;
 		AlxAdau1961_R15_ChPerFrame CHPF : 2;
@@ -617,7 +617,7 @@ typedef enum
 } AlxAdau1961_R16_NumBitClkCycles;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R16_DataDelay LRDEL : 2;
 		AlxAdau1961_R16_MSBPosition MSBP : 1;
@@ -660,7 +660,7 @@ typedef enum
 } AlxAdau1961_R17_DACSerialDataSelection;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R17_ConvSamplRate CONVSR : 3;
 		AlxAdau1961_R17_ADCOversamplRatio ADOSR : 1;
@@ -683,7 +683,7 @@ typedef enum
 } AlxAdau1961_R18_ADCSerialDataSelect;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R18_ADCSerialDataSelect ADPAIR : 2;
 		uint8_t unused_2_7: 6; // bits 4..7 are unused
@@ -728,7 +728,7 @@ typedef enum
 } AlxAdau1961_R19_InvertInputPolarity;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R19_ADCEnable ADCEN : 2;
 		AlxAdau1961_R19_DigiMicInputSelect INSEL : 1;
@@ -746,7 +746,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t LADVOL;			// 0dB to -95.625dB with 0.375dB step
 	};
@@ -758,7 +758,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t RADVOL;			// 0dB to -95.625dB with 0.375dB step
 	};
@@ -775,7 +775,7 @@ typedef enum
 } AlxAdau1961_R22_R24_MixInputMute;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_MixerEnable MX3EN : 1;
 		AlxAdau1961_General_GainMixer3Mixer4 MX3AUXG : 4;
@@ -791,7 +791,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_GainMixer3Mixer4 MX3G1 : 4;
 		AlxAdau1961_General_GainMixer3Mixer4 MX3G2 : 4;
@@ -804,7 +804,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_MixerEnable MX4EN : 1;
 		AlxAdau1961_General_GainMixer3Mixer4 MX4AUXG : 4;
@@ -820,7 +820,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_GainMixer3Mixer4 MX4G1 : 4;
 		AlxAdau1961_General_GainMixer3Mixer4 MX4G2 : 4;
@@ -839,7 +839,7 @@ typedef enum
 } AlxAdau1961_R26_R27_MixerInputGainBoost;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_MixerEnable MX5EN : 1;
 		AlxAdau1961_R26_R27_MixerInputGainBoost MX5G3 : 2;
@@ -854,7 +854,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_MixerEnable MX6EN : 1;
 		AlxAdau1961_R26_R27_MixerInputGainBoost MX6G3 : 2;
@@ -875,7 +875,7 @@ typedef enum
 } AlxAdau1961_R26_R27_PlaybackMixer7;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_MixerEnable MX7EN : 1;
 		AlxAdau1961_R26_R27_PlaybackMixer7 MX7 : 2;
@@ -899,7 +899,7 @@ typedef enum
 } AlxAdau1961_R29_R30_HPMute;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R29_HPEnable HPEN : 1;
 		AlxAdau1961_R29_R30_HPMute LHPM : 1;
@@ -918,7 +918,7 @@ typedef enum
 } AlxAdau1961_R30_OutputMode;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R30_OutputMode HPMODE : 1;
 		AlxAdau1961_R29_R30_HPMute RHPM : 1;
@@ -932,7 +932,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_OutputMode LOMODE : 1;
 		AlxAdau1961_General_OutputMute LOUTM : 1;
@@ -946,7 +946,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_OutputMode ROMODE : 1;
 		AlxAdau1961_General_OutputMute ROUTM : 1;
@@ -960,7 +960,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_OutputMode MOMODE : 1;
 		AlxAdau1961_General_OutputMute MONOM : 1;
@@ -991,7 +991,7 @@ typedef enum
 } AlxAdau1961_R34_PopSuppressMode;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t unused_0: 1;  // bit 0 is unused
 		AlxAdau1961_R34_AnalVolSlew ASLEW : 2;
@@ -1012,7 +1012,7 @@ typedef enum
 } AlxAdau1961_R35_PlaybackChEnable;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R35_PlaybackChEnable PLEN : 1;
 		AlxAdau1961_R35_PlaybackChEnable PREN : 1;
@@ -1050,7 +1050,7 @@ typedef enum
 } AlxAdau1961_R36_DACMonoMode;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R36_DACEnable DACEN : 2;
 		AlxAdau1961_R36_DACEmphFilter DEMPH : 1;
@@ -1066,7 +1066,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t LDAVOL;			// 0dB to -95.625dB with 0.375dB step
 	};
@@ -1078,7 +1078,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t RDAVOL;			// 0dB to -95.625dB with 0.375dB step
 	};
@@ -1090,7 +1090,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_PullConfig BCLKP : 2;
 		AlxAdau1961_General_PullConfig LRCLKP : 2;
@@ -1105,7 +1105,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_General_PullConfig SDAP : 2;
 		AlxAdau1961_General_PullConfig SCLP : 2;
@@ -1125,7 +1125,7 @@ typedef enum
 } AlxAdau1961_R41_R42_PinDriveStrength;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R41_R42_PinDriveStrength SDASTR : 1;
 		uint8_t unused_1_7: 7; // bits 1..7 are unused
@@ -1138,7 +1138,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		uint8_t unused_0_1: 2; // bits 0..1 are unused
 		AlxAdau1961_General_PullConfig JDP : 2;
@@ -1161,7 +1161,7 @@ typedef enum						// MF: Check if this is good, or al 256 values are needed
 } AlxAdau1961_R67_DejitWindowSize;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAdau1961_R67_DejitWindowSize DEJIT;
 	};

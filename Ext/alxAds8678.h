@@ -64,14 +64,14 @@ extern "C" {
 #elif defined(ALX_ADS8678_ASSERT_RST_ENABLE)
 	#define ALX_ADS8678_ASSERT(expr) ALX_ASSERT_RST(ALX_ADS8678_FILE, expr)
 #else
-	#define ALX_ADS8678_ASSERT(expr) do{} while (false)
+	#define ALX_ADS8678_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_ADS8678_TRACE_ENABLE)
 	#define ALX_ADS8678_TRACE_ERR(...) ALX_TRACE_ERR(ALX_ADS8678_FILE, __VA_ARGS__)
 #else
-	#define ALX_ADS8678_TRACE_ERR(...) do{} while (false)
+	#define ALX_ADS8678_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -85,7 +85,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool CH0_EN : 1;
 		bool CH1_EN : 1;
@@ -105,7 +105,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool CH0_PD : 1;
 		bool CH1_PD : 1;
@@ -139,7 +139,7 @@ typedef enum
 } AlxAds8678_RegEnum_0x03_DEV;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAds8678_RegEnum_0x03_SDO SDO : 3;
 		uint8_t unused_3 : 1;
@@ -168,7 +168,7 @@ typedef enum
 } AlxAds8678_RegEnum_0x05_0x0C_Range_CHn;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAds8678_RegEnum_0x05_0x0C_Range_CHn Range_CHn : 4;
 		uint8_t unused_4_7 : 4;
@@ -177,7 +177,7 @@ typedef union
 } AlxAds8678_RegVal_0x05_Channel0InputRange;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAds8678_RegEnum_0x05_0x0C_Range_CHn Range_CHn : 4;
 		uint8_t unused_4_7 : 4;
@@ -186,7 +186,7 @@ typedef union
 } AlxAds8678_RegVal_0x06_Channel1InputRange;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAds8678_RegEnum_0x05_0x0C_Range_CHn Range_CHn : 4;
 		uint8_t unused_4_7 : 4;
@@ -195,7 +195,7 @@ typedef union
 } AlxAds8678_RegVal_0x07_Channel2InputRange;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAds8678_RegEnum_0x05_0x0C_Range_CHn Range_CHn : 4;
 		uint8_t unused_4_7 : 4;
@@ -204,7 +204,7 @@ typedef union
 } AlxAds8678_RegVal_0x08_Channel3InputRange;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAds8678_RegEnum_0x05_0x0C_Range_CHn Range_CHn : 4;
 		uint8_t unused_4_7 : 4;
@@ -213,7 +213,7 @@ typedef union
 } AlxAds8678_RegVal_0x09_Channel4InputRange;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAds8678_RegEnum_0x05_0x0C_Range_CHn Range_CHn : 4;
 		uint8_t unused_4_7 : 4;
@@ -222,7 +222,7 @@ typedef union
 } AlxAds8678_RegVal_0x0A_Channel5InputRange;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAds8678_RegEnum_0x05_0x0C_Range_CHn Range_CHn : 4;
 		uint8_t unused_4_7 : 4;
@@ -231,7 +231,7 @@ typedef union
 } AlxAds8678_RegVal_0x0B_Channel6InputRange;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxAds8678_RegEnum_0x05_0x0C_Range_CHn Range_CHn : 4;
 		uint8_t unused_4_7 : 4;

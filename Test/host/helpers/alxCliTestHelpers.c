@@ -1,0 +1,271 @@
+/**
+  ******************************************************************************
+  * @file		alxCliTestHelpers.c
+  * @brief		Auralix C Library - ALX CLI Module - PC test helpers
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
+  *
+  * Opaque-handle constructor for a complete Tier-2 CLI under test, wired the
+  * SAME way the product wires it: fake serial port + real AlxParamItem
+  * PRETTY_JSON_EN (valDef true, no KV store) + real AlxParamMgmt over that one
+  * item + alxId = NULL (the guarded optional).
+  * NVIC_SystemReset is shimmed here: it records a flag the tests can read.
+  ******************************************************************************
+  **/
+
+#include "alxCli.h"
+
+#include <stdlib.h>
+
+// alxSerialPortFake.c test-control API
+void AlxSerialPortFake_Register(AlxSerialPort* me);
+void AlxSerialPortFake_Unregister(AlxSerialPort* me);
+
+// CMSIS shim (declaration for alxCli.c comes from Test/alxConfig.h on PC)
+void NVIC_SystemReset(void);
+
+#define ALX_CLI_TEST_BUFF_LEN 1024
+#define ALX_CLI_TEST_STR_VAL_BUFF_LEN 600	// Str param value buffer -> value <= 599 chars (longer than any stack array the old parser had)
+
+// Param table under test: the product's bool + one Str + one Uint8, so every value kind the CLI formats is present,
+// and one item of each other type, so the typed get commands have something to tell apart
+typedef struct
+{
+	AlxSerialPort port;
+	AlxParamItem paramItems[7];		// [0] PRETTY_JSON_EN (bool), [1] STR_TEST (str), [2] UINT8_TEST (uint8, 0..100),
+									// [3] VAR_TEST, [4] FLAG_TEST, [5] CONST_TEST, [6] TRIG_TEST
+	uint8_t strValBuff[ALX_CLI_TEST_STR_VAL_BUFF_LEN];
+	AlxParamMgmt paramMgmt;
+	AlxCli cli;
+	char buff[ALX_CLI_TEST_BUFF_LEN];
+} AlxCliTest_Ctx;
+
+// Exported test API
+AlxCliTest_Ctx* AlxCliTest_New(void);
+AlxCliTest_Ctx* AlxCliTest_NewWithId(void);
+void AlxCliTest_PrepareEvent(AlxCliTest_Ctx* ctx, const uint8_t* data, uint32_t len);
+void AlxCliTest_PrepareResponse(AlxCliTest_Ctx* ctx, int32_t responseType);
+const char* AlxCliTest_Buff(AlxCliTest_Ctx* ctx);
+void AlxCliTest_Delete(AlxCliTest_Ctx* ctx);
+int32_t AlxCliTest_Status_Ok(void);
+void AlxCliTest_Handle(AlxCliTest_Ctx* ctx);
+AlxSerialPort* AlxCliTest_Port(AlxCliTest_Ctx* ctx);
+uint32_t AlxCliTest_GetBuffLen(void);
+uint32_t AlxCliTest_GetStrValBuffLen(void);
+bool AlxCliTest_WasResetRequested(void);
+void AlxCliTest_ClearResetRequested(void);
+
+static bool nvicResetRequested = false;
+
+void NVIC_SystemReset(void)
+{
+	nvicResetRequested = true;	// on the device this never returns; tests just observe it
+}
+
+bool AlxCliTest_WasResetRequested(void)
+{
+	return nvicResetRequested;
+}
+
+void AlxCliTest_ClearResetRequested(void)
+{
+	nvicResetRequested = false;
+}
+
+uint32_t AlxCliTest_GetBuffLen(void)
+{
+	return ALX_CLI_TEST_BUFF_LEN;
+}
+
+uint32_t AlxCliTest_GetStrValBuffLen(void)
+{
+	return ALX_CLI_TEST_STR_VAL_BUFF_LEN;
+}
+
+int32_t AlxCliTest_Status_Ok(void)
+{
+	return (int32_t)Alx_Ok;
+}
+
+// The identity the id command reads: the link-time ID fake answers every getter, so the pointer
+// only has to be one (A97).
+static AlxId alxCliTest_idStandIn;
+static AlxCliTest_Ctx* AlxCliTest_NewWith(AlxId* alxId)
+{
+	AlxCliTest_Ctx* ctx = (AlxCliTest_Ctx*)calloc(1, sizeof(AlxCliTest_Ctx));
+	if (ctx == NULL)
+	{
+		exit(1);	// test infrastructure - fail fast on OOM
+	}
+
+	AlxSerialPortFake_Register(&ctx->port);
+
+	AlxParamItem_CtorBool
+	(
+		&ctx->paramItems[0],
+		NULL,				// paramKvStore - none, same as the product's CLI items
+		AlxParamItem_Param,
+		"PRETTY_JSON_EN",
+		0,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		true,				// valDef - pretty JSON, same as the product
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamItem_CtorStr
+	(
+		&ctx->paramItems[1],
+		NULL,				// paramKvStore
+		AlxParamItem_Param,
+		"STR_TEST",
+		1,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		"",					// valDef
+		AlxParamItem_Ignore,
+		"",					// valUnit
+		false,				// valChangeTakesEffectAfterReset
+		ctx->strValBuff,
+		sizeof(ctx->strValBuff)
+	);
+
+	AlxParamItem_CtorUint8
+	(
+		&ctx->paramItems[2],
+		NULL,				// paramKvStore
+		AlxParamItem_Param,
+		"UINT8_TEST",
+		2,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		7,					// valDef
+		0,					// valMin
+		100,				// valMax
+		AlxParamItem_Ignore,
+		false,				// isEnum
+		NULL,				// enumArr
+		0,					// enumArrLen
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamItem_CtorUint8
+	(
+		&ctx->paramItems[3],
+		NULL,				// paramKvStore
+		AlxParamItem_Var,
+		"VAR_TEST",
+		3,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		11,					// valDef
+		0,					// valMin
+		100,				// valMax
+		AlxParamItem_Ignore,
+		false,				// isEnum
+		NULL,				// enumArr
+		0,					// enumArrLen
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamItem_CtorBool
+	(
+		&ctx->paramItems[4],
+		NULL,				// paramKvStore
+		AlxParamItem_Flag,
+		"FLAG_TEST",
+		4,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		false,				// valDef
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamItem_CtorUint8
+	(
+		&ctx->paramItems[5],
+		NULL,				// paramKvStore
+		AlxParamItem_Const,
+		"CONST_TEST",
+		5,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		11,					// valDef
+		0,					// valMin
+		100,				// valMax
+		AlxParamItem_Ignore,
+		false,				// isEnum
+		NULL,				// enumArr
+		0,					// enumArrLen
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamItem_CtorBool
+	(
+		&ctx->paramItems[6],
+		NULL,				// paramKvStore
+		AlxParamItem_Trig,
+		"TRIG_TEST",
+		6,					// id
+		NULL,				// groupKey
+		0,					// groupId
+		false,				// valDef
+		"",					// valUnit
+		false				// valChangeTakesEffectAfterReset
+	);
+
+	AlxParamMgmt_Ctor(&ctx->paramMgmt, ctx->paramItems, 7);
+
+	AlxCli_Ctor
+	(
+		&ctx->cli,
+		&ctx->port,
+		alxId,				// NULL as the product, the guarded optional; the stand-in for the id command
+		&ctx->paramMgmt,
+		&ctx->paramItems[0],
+		ctx->buff,
+		sizeof(ctx->buff)
+	);
+
+	return ctx;
+}
+
+AlxCliTest_Ctx* AlxCliTest_New(void)
+{
+	return AlxCliTest_NewWith(NULL);
+}
+AlxCliTest_Ctx* AlxCliTest_NewWithId(void)
+{
+	return AlxCliTest_NewWith(&alxCliTest_idStandIn);
+}
+void AlxCliTest_PrepareEvent(AlxCliTest_Ctx* ctx, const uint8_t* data, uint32_t len)
+{
+	AlxCli_PrepareEvent(&ctx->cli, data, len);
+}
+void AlxCliTest_PrepareResponse(AlxCliTest_Ctx* ctx, int32_t responseType)
+{
+	AlxCli_PrepareResponse(&ctx->cli, (AlxCli_ResponseType)responseType);
+}
+const char* AlxCliTest_Buff(AlxCliTest_Ctx* ctx)
+{
+	return ctx->buff;
+}
+void AlxCliTest_Delete(AlxCliTest_Ctx* ctx)
+{
+	AlxSerialPortFake_Unregister(&ctx->port);
+	free(ctx);
+}
+
+void AlxCliTest_Handle(AlxCliTest_Ctx* ctx)
+{
+	AlxCli_Handle(&ctx->cli);
+}
+
+AlxSerialPort* AlxCliTest_Port(AlxCliTest_Ctx* ctx)
+{
+	return &ctx->port;
+}

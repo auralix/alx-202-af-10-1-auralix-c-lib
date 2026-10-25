@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxNtcg103jf103ft1s.c
   * @brief		Auralix C Library - ALX NTC Thermistors NTCG103JF103FT1S Module
@@ -41,8 +41,7 @@
 // Private Defines
 //******************************************************************************
 #define LUT_LEN 191
-#define LUT_TEMP_MIN_degC -40
-#define LUT_TEMP_MAX_degC 150
+#define LUT_TEMP_MIN_degC (-40)
 
 
 //******************************************************************************

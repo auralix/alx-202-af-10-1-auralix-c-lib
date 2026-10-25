@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPi4ioe5v6534q.h
   * @brief		Auralix C Library - ALX IO Expander PI4IOE5V6534Q Module
@@ -66,14 +66,14 @@ extern "C" {
 #elif defined(ALX_PI4IOE5V6534Q_ASSERT_RST_ENABLE)
 	#define ALX_PI4IOE5V6534Q_ASSERT(expr) ALX_ASSERT_RST(ALX_PI4IOE5V6534Q_FILE, expr)
 #else
-	#define ALX_PI4IOE5V6534Q_ASSERT(expr) do{} while (false)
+	#define ALX_PI4IOE5V6534Q_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_PI4IOE5V6534Q_TRACE_ENABLE)
 	#define ALX_PI4IOE5V6534Q_TRACE_ERR(...) ALX_TRACE_ERR(ALX_PI4IOE5V6534Q_FILE, __VA_ARGS__)
 #else
-	#define ALX_PI4IOE5V6534Q_TRACE_ERR(...) do{} while (false)
+	#define ALX_PI4IOE5V6534Q_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -87,7 +87,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool _0 : 1;
 		bool _1 : 1;
@@ -107,7 +107,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPi4ioe5v6534q_RegVal_Port P[5];
 	};
@@ -120,7 +120,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPi4ioe5v6534q_RegVal_Port P[5];
 	};
@@ -133,7 +133,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPi4ioe5v6534q_RegVal_Port P[5];
 	};

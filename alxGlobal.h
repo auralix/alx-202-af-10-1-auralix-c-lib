@@ -42,8 +42,17 @@ extern "C" {
 #include "alxConfig.h"
 
 
+
+
 //------------------------------------------------------------------------------
-// C Standard Library - C99
+//------------------------------------------------------------------------------
+// Toolchain
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Library - C99
 //------------------------------------------------------------------------------
 #if defined(ALX_C_LIB)
 #include <assert.h>
@@ -74,106 +83,24 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
-// Newlib Nano
+// Library - Newlib Nano
 //------------------------------------------------------------------------------
 #if defined(ALX_NEWLIB_NANO)
 #include "../include/_newlib_version.h"
 #endif
 
 
-//------------------------------------------------------------------------------
-// MCUboot
-//------------------------------------------------------------------------------
-#if defined(ALX_MCU_BOOT)
-#include "flash_map_backend/flash_map_backend.h"
-#include "sysflash/sysflash.h"
-#endif
-#if defined(ALX_MCU_BOOT) && defined(ALX_BOOT_B)
-#include "bootutil/bootutil.h"
-#endif
 
 
 //------------------------------------------------------------------------------
-// ARM CMSIS DSP Library
 //------------------------------------------------------------------------------
-#if defined(ALX_CMSIS_DSP)
-#include <arm_math.h>
-#endif
+// Platform
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 
 //------------------------------------------------------------------------------
-// FreeRTOS
-//------------------------------------------------------------------------------
-#if defined(ALX_FREE_RTOS)
-#include "FreeRTOS.h"
-#include "croutine.h"
-#include "event_groups.h"
-#include "list.h"
-#include "queue.h"
-#include "semphr.h"
-#include "stream_buffer.h"
-#include "task.h"
-#include "timers.h"
-#endif
-
-
-//------------------------------------------------------------------------------
-// FreeRTOS Cellular Interface
-//------------------------------------------------------------------------------
-#if defined(ALX_FREE_RTOS_CELLULAR)
-#include "cellular_config.h"
-#include "cellular_comm_interface.h"
-#include "cellular_api.h"
-#include "cellular_types.h"
-#include "cellular_api_ext.h"
-#endif
-
-
-//------------------------------------------------------------------------------
-// FatFs
-//------------------------------------------------------------------------------
-#if defined(ALX_FATFS)
-#include "ff.h"
-#include "diskio.h"
-#endif
-
-
-//------------------------------------------------------------------------------
-// lwIP
-//------------------------------------------------------------------------------
-#if defined(ALX_LW_IP)
-#include "lwip/netif.h"
-#include "lwip/api.h"
-#include "lwip/tcpip.h"
-#include "lwip/dhcp.h"
-//#include "lwip/sockets.h"	// TV: TODO, conflict with read macro in lwIP with alxLfsConfig.h which includes lfs.h, must be separately included when needed
-#endif
-
-
-//------------------------------------------------------------------------------
-// Wiznet
-//------------------------------------------------------------------------------
-#if defined(ALX_WIZNET)
-// TV: TODO
-#endif
-
-
-//------------------------------------------------------------------------------
-// Zephyr
-//------------------------------------------------------------------------------
-#if defined(ALX_ZEPHYR)
-#include "zephyr/kernel.h"
-#include <zephyr/logging/log.h>
-#include "zephyr/drivers/gpio.h"
-#include "zephyr/drivers/i2c.h"
-#include "zephyr/drivers/adc.h"
-#include "zephyr/drivers/uart.h"
-#include "zephyr/drivers/spi.h"
-#endif
-
-
-//------------------------------------------------------------------------------
-// MCU
+// Platform
 //------------------------------------------------------------------------------
 #if defined(ALX_STM32F0)
 #include "alxGlobal_McuStm32F0.h"
@@ -229,6 +156,114 @@ extern "C" {
 #endif
 
 
+//------------------------------------------------------------------------------
+// Platform - Zephyr
+//------------------------------------------------------------------------------
+#if defined(ALX_ZEPHYR)
+#include "zephyr/kernel.h"
+#include <zephyr/logging/log.h>
+#include "zephyr/drivers/gpio.h"
+#include "zephyr/drivers/i2c.h"
+#include "zephyr/drivers/adc.h"
+#include "zephyr/drivers/uart.h"
+#include "zephyr/drivers/spi.h"
+#endif
+
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Features
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// CMSIS DSP
+//------------------------------------------------------------------------------
+#if defined(ALX_CMSIS_DSP)
+#include <arm_math.h>
+#endif
+
+
+//------------------------------------------------------------------------------
+// FatFs
+//------------------------------------------------------------------------------
+#if defined(ALX_FATFS)
+#include "ff.h"
+#include "diskio.h"
+#endif
+
+
+//------------------------------------------------------------------------------
+// FreeRTOS
+//------------------------------------------------------------------------------
+#if defined(ALX_FREE_RTOS)
+#include "FreeRTOS.h"
+#include "croutine.h"
+#include "event_groups.h"
+#include "list.h"
+#include "queue.h"
+#include "semphr.h"
+#include "stream_buffer.h"
+#include "task.h"
+#include "timers.h"
+#endif
+
+
+//------------------------------------------------------------------------------
+// FreeRTOS Cellular
+//------------------------------------------------------------------------------
+#if defined(ALX_FREE_RTOS_CELLULAR)
+#include "cellular_config.h"
+#include "cellular_comm_interface.h"
+#include "cellular_api.h"
+#include "cellular_types.h"
+#include "cellular_api_ext.h"
+#endif
+
+
+//------------------------------------------------------------------------------
+// lwIP
+//------------------------------------------------------------------------------
+#if defined(ALX_LW_IP)
+#include "lwip/netif.h"
+#include "lwip/api.h"
+#include "lwip/tcpip.h"
+#include "lwip/dhcp.h"
+//#include "lwip/sockets.h"	// TV: TODO, conflict with read macro in lwIP with alxLfsConfig.h which includes lfs.h, must be separately included when needed
+#endif
+
+
+//------------------------------------------------------------------------------
+// MCUboot
+//------------------------------------------------------------------------------
+#if defined(ALX_MCU_BOOT)
+#include "flash_map_backend/flash_map_backend.h"
+#include "sysflash/sysflash.h"
+#endif
+
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Target
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Role - Bootloader
+//------------------------------------------------------------------------------
+#if defined(ALX_MCU_BOOT) && defined(ALX_BOOT_B)
+#include "bootutil/bootutil.h"
+#endif
+
+
+
+
 //******************************************************************************
 // Module Guard
 //******************************************************************************
@@ -240,39 +275,56 @@ extern "C" {
 //******************************************************************************
 #define ALX_GLOBAL_FILE "alxGlobal.h"
 
-// Assert //
-#if defined(ALX_GLOBAL_ASSERT_BKPT)
+
+//------------------------------------------------------------------------------
+// Assert
+//------------------------------------------------------------------------------
+
+// ALX
+#if defined(ALX_GLOBAL_ASSERT_BKPT_ENABLE)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_BKPT(ALX_GLOBAL_FILE, expr)
-#elif defined(ALX_GLOBAL_ASSERT_TRACE)
+#elif defined(ALX_GLOBAL_ASSERT_TRACE_ENABLE)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_TRACE(ALX_GLOBAL_FILE, expr)
-#elif defined(ALX_GLOBAL_ASSERT_RST)
+#elif defined(ALX_GLOBAL_ASSERT_RST_ENABLE)
 	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_RST(ALX_GLOBAL_FILE, expr)
 #else
-	#define ALX_GLOBAL_ASSERT(expr) do{} while (false)
+	#define ALX_GLOBAL_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
-// Trace //
-#if defined(ALX_GLOBAL_TRACE)
-	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_GLOBAL_FILE, __VA_ARGS__)
-#else
-	#define ALX_GLOBAL_TRACE(...) do{} while (false)
-#endif
-
-#define ALX_STR(s) #s
-#define ALX_xSTR(s) ALX_STR(s)
-#define ALX_xVER3(major, minor , patch) (((major) << 24) | ((minor) << 16) | (patch))
-#define ALX_ARR_LEN(x) (sizeof(x) / sizeof((x)[0]))
-
-#if defined (USE_FULL_ASSERT)
+// STM32
+#if defined(USE_FULL_ASSERT)
 	#define ALX_STM32_ASSERT
 #endif
 
+
+//------------------------------------------------------------------------------
+// Trace
+//------------------------------------------------------------------------------
+#if defined(ALX_GLOBAL_TRACE_ENABLE)
+	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_WRN(ALX_GLOBAL_FILE, __VA_ARGS__)
+#else
+	#define ALX_GLOBAL_TRACE(...) ALX_TRACE_OFF(__VA_ARGS__)
+#endif
+
+
+//------------------------------------------------------------------------------
+// Toolchain
+//------------------------------------------------------------------------------
 #if defined(__GNUC__) || defined(__clang__)
-	#define ALX_WEAK __attribute__ ((weak))
+	#define ALX_WEAK __attribute__((weak))
+	#define ALX_PACKED __attribute__((packed))
+	#define ALX_UNUSED __attribute__((unused))
+	#define ALX_ALIGNED(bytes) __attribute__((aligned(bytes)))
+	#define ALX_SECTION(name) __attribute__((section(name), used))
+	#define ALX_PRINTF_FORMAT(formatArg, firstValueArg) __attribute__((format(printf, formatArg, firstValueArg)))
 #else
 	#error "alxGlobal.h: Unsupported compiler - GCC or Clang required"
 #endif
 
+
+//------------------------------------------------------------------------------
+// Platform
+//------------------------------------------------------------------------------
 #if defined(__arm__)
 	#define ALX_BKPT() __BKPT(255)
 #elif defined(_WIN32)
@@ -281,8 +333,16 @@ extern "C" {
 	#error "alxGlobal.h: Unsupported target - ARM or Windows required"
 #endif
 
+
+//------------------------------------------------------------------------------
+// Utilities
+//------------------------------------------------------------------------------
 #define ALX_NULL 0
 #define ALX_NULL_PTR NULL
+#define ALX_STR(s) #s
+#define ALX_xSTR(s) ALX_STR(s)
+#define ALX_xVER3(major, minor, patch) (((major) << 24) | ((minor) << 16) | (patch))
+#define ALX_ARR_LEN(x) (sizeof(x) / sizeof((x)[0]))
 
 
 //******************************************************************************

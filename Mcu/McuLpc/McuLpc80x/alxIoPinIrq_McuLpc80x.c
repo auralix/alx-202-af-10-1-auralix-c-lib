@@ -107,7 +107,7 @@ void AlxIoPinIrq_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 {
@@ -138,7 +138,7 @@ void AlxIoPinIrq_Init(AlxIoPinIrq* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxIoPinIrq_DeInit(AlxIoPinIrq* me)
 {
@@ -238,42 +238,42 @@ static void AlxIoPin_PINT_Init(AlxIoPinIrq* me, PINT_Type* base)
 #if !defined(ALX_IO_PIN_IRQ_HANDLERS_OFF)
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin0()
 {
-	ALX_IO_PIN_TRACE_IRQ("Define AlxIoPinIrq_Foreground_Callback_Pin0");
+	ALX_IO_PIN_IRQ_TRACE_WRN("Define AlxIoPinIrq_Foreground_Callback_Pin0");
 	ALX_IO_PIN_ASSERT(false);
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin1()
 {
-	ALX_IO_PIN_TRACE_IRQ("Define AlxIoPinIrq_Foreground_Callback_Pin1");
+	ALX_IO_PIN_IRQ_TRACE_WRN("Define AlxIoPinIrq_Foreground_Callback_Pin1");
 	ALX_IO_PIN_ASSERT(false);
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin2()
 {
-	ALX_IO_PIN_TRACE_IRQ("Define AlxIoPinIrq_Foreground_Callback_Pin2");
+	ALX_IO_PIN_IRQ_TRACE_WRN("Define AlxIoPinIrq_Foreground_Callback_Pin2");
 	ALX_IO_PIN_ASSERT(false);
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin3()
 {
-	ALX_IO_PIN_TRACE_IRQ("Define AlxIoPinIrq_Foreground_Callback_Pin3");
+	ALX_IO_PIN_IRQ_TRACE_WRN("Define AlxIoPinIrq_Foreground_Callback_Pin3");
 	ALX_IO_PIN_ASSERT(false);
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin4()
 {
-	ALX_IO_PIN_TRACE_IRQ("Define AlxIoPinIrq_Foreground_Callback_Pin4");
+	ALX_IO_PIN_IRQ_TRACE_WRN("Define AlxIoPinIrq_Foreground_Callback_Pin4");
 	ALX_IO_PIN_ASSERT(false);
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin5()
 {
-	ALX_IO_PIN_TRACE_IRQ("Define AlxIoPinIrq_Foreground_Callback_Pin5");
+	ALX_IO_PIN_IRQ_TRACE_WRN("Define AlxIoPinIrq_Foreground_Callback_Pin5");
 	ALX_IO_PIN_ASSERT(false);
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin6()
 {
-	ALX_IO_PIN_TRACE_IRQ("Define AlxIoPinIrq_Foreground_Callback_Pin6");
+	ALX_IO_PIN_IRQ_TRACE_WRN("Define AlxIoPinIrq_Foreground_Callback_Pin6");
 	ALX_IO_PIN_ASSERT(false);
 }
 ALX_WEAK void AlxIoPinIrq_Foreground_Callback_Pin7()
 {
-	ALX_IO_PIN_TRACE_IRQ("Define AlxIoPinIrq_Foreground_Callback_Pin7");
+	ALX_IO_PIN_IRQ_TRACE_WRN("Define AlxIoPinIrq_Foreground_Callback_Pin7");
 	ALX_IO_PIN_ASSERT(false);
 }
 #endif

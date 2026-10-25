@@ -77,7 +77,7 @@ static void AlxClk_SetupPll(AlxClk* me, pll_setup_t* pllSetup, uint32_t inputFre
 static bool AlxClk_IsClkOk(AlxClk* me);
 static void AlxClk_Periph_Gpio_EnableClk(AlxClk* me);
 static void AlxClk_Periph_Gpio_DisableClk(AlxClk* me);
-static void AlxClk_Periph_Gpio_Reset(AlxClk* me);
+static ALX_UNUSED void AlxClk_Periph_Gpio_Reset(AlxClk* me);
 
 
 //******************************************************************************
@@ -305,7 +305,7 @@ uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxClk_Irq_Handle(AlxClk* me)
 {
@@ -514,7 +514,8 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz(Al
 	CLOCK_AttachClk(kFRO12M_to_PLL0);
 
 	// Enable PLL
-	ALX_CLK_ASSERT(CLOCK_SetPLL0Freq(&pll0Setup) == kStatus_PLL_Success);	// MF: Enabling PLL happend here
+	ALX_UNUSED int32_t status = (int32_t)CLOCK_SetPLL0Freq(&pll0Setup);	// MF: Enabling PLL happened here
+	ALX_CLK_ASSERT(status == kStatus_PLL_Success);
 
 	// Attach to mainClk
 	CLOCK_AttachClk(kPLL0_to_MAIN_CLK);
@@ -536,7 +537,8 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_FroOsc_12MHz_Fr
 static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(AlxClk* me)
 {
 	// Enable external clock
-	ALX_CLK_ASSERT(CLOCK_SetupExtClocking(16000000U) == kStatus_Success);	// MF: Enable clk_in and set up crystal Freq. Enabling XTAL32M happens here
+	ALX_UNUSED int32_t status = (int32_t)CLOCK_SetupExtClocking(16000000U);	// MF: Enable clk_in and set up crystal Freq. Enabling XTAL32M happens here
+	ALX_CLK_ASSERT(status == kStatus_Success);
 	ANACTRL->XO32M_CTRL |= ANACTRL_XO32M_CTRL_ENABLE_SYSTEM_CLK_OUT_MASK;	// MF: Enable clk_in to system
 
 	// Set FLASH wait states
@@ -550,7 +552,8 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(Al
 	CLOCK_AttachClk(kEXT_CLK_to_PLL0);
 
 	// Enable PLL
-	ALX_CLK_ASSERT(CLOCK_SetPLL0Freq(&pll0Setup) == kStatus_PLL_Success);	// MF: Enabling PLL happend here
+	status = (int32_t)CLOCK_SetPLL0Freq(&pll0Setup);	// MF: Enabling PLL happened here
+	ALX_CLK_ASSERT(status == kStatus_PLL_Success);
 
 	// Attach to mainClk
 	CLOCK_AttachClk(kPLL0_to_MAIN_CLK);
@@ -561,7 +564,8 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_16MHz(Al
 static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz(AlxClk* me)
 {
 	// Enable external clock
-	ALX_CLK_ASSERT(CLOCK_SetupExtClocking(25000000U) == kStatus_Success);	// MF: Enable clk_in and set up crystal Freq. Enabling XTAL32M happens here
+	ALX_UNUSED int32_t status = (int32_t)CLOCK_SetupExtClocking(25000000U);	// MF: Enable clk_in and set up crystal Freq. Enabling XTAL32M happens here
+	ALX_CLK_ASSERT(status == kStatus_Success);
 	ANACTRL->XO32M_CTRL |= ANACTRL_XO32M_CTRL_ENABLE_SYSTEM_CLK_OUT_MASK;	// MF: Enable clk_in to system
 
 	// Set FLASH wait states
@@ -575,7 +579,8 @@ static void AlxClk_Init_McuLpc55S6x_MainClk_150MHz_AhbClk_150MHz_ExtOsc_25MHz(Al
 	CLOCK_AttachClk(kEXT_CLK_to_PLL0);
 
 	// Enable PLL
-	ALX_CLK_ASSERT(CLOCK_SetPLL0Freq(&pll0Setup) == kStatus_PLL_Success);	// MF: Enabling PLL happend here
+	status = (int32_t)CLOCK_SetPLL0Freq(&pll0Setup);	// MF: Enabling PLL happened here
+	ALX_CLK_ASSERT(status == kStatus_PLL_Success);
 
 	// Attach to mainClk
 	CLOCK_AttachClk(kPLL0_to_MAIN_CLK);
@@ -686,7 +691,7 @@ static void AlxClk_Periph_Gpio_DisableClk(AlxClk* me)
 	CLOCK_DisableClock(kCLOCK_Gpio2);	// MF: I'm not sure GPIO2 works on Lpc55S6x
 	CLOCK_DisableClock(kCLOCK_Gpio3);	// MF: I'm not sure GPIO3 works on Lpc55S6x
 }
-static void AlxClk_Periph_Gpio_Reset(AlxClk* me)
+static ALX_UNUSED void AlxClk_Periph_Gpio_Reset(AlxClk* me)
 {
 	// Void
 	(void)me;

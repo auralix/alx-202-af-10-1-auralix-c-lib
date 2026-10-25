@@ -93,13 +93,20 @@ void AlxAdc_Ctor
 	#endif
 
 	// Check channel sequence
-	for (uint32_t i = 0; i < (uint32_t)(numOfIoPinsAndCh - 1); i++) ALX_ADC_ASSERT(AlxAdc_GetCh(me, chArr[i]) <= AlxAdc_GetCh(me, chArr[i + 1]));	// MF: Channel sequence must be from low to high number
+	for (uint32_t i = 0; i < (uint32_t)(numOfIoPinsAndCh - 1); i++)
+	{
+		ALX_UNUSED uint8_t chNumCurrent = AlxAdc_GetCh(me, chArr[i]);
+		ALX_UNUSED uint8_t chNumNext = AlxAdc_GetCh(me, chArr[i + 1]);
+		ALX_ADC_ASSERT(chNumCurrent <= chNumNext);	// MF: Channel sequence must be from low to high number
+	}
 
 	// Check if right channels are used
-	ALX_ADC_ASSERT(AlxAdc_Ctor_CheckCh(me));
+	ALX_UNUSED bool isChOk = AlxAdc_Ctor_CheckCh(me);
+	ALX_ADC_ASSERT(isChOk);
 
 	// Check if right MainClk is configured
-	ALX_ADC_ASSERT(AlxAdc_Ctor_IsMainClkOk(me));
+	ALX_UNUSED bool isMainClkOk = AlxAdc_Ctor_IsMainClkOk(me);
+	ALX_ADC_ASSERT(isMainClkOk);
 
 	// Variables										// MF: Everything is set to default (see "void LPADC_GetDefault___()" functions) except "adcConfig.referenceVoltageSource" and "adcConvTrigConfig.targetCommandId"
 	me->adcConfig.enableInDozeMode						= true;

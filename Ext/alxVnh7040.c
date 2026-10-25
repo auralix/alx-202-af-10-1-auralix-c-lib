@@ -153,7 +153,7 @@ void AlxVnh7040_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxVnh7040_Init(AlxVnh7040* me)
 {
@@ -167,26 +167,29 @@ void AlxVnh7040_Init(AlxVnh7040* me)
 	AlxIoPin_Init(me->do_SEL1);
 	AlxIoPin_Init(me->do_SENS_EN);
 
-	// #2 Init PWM/GPIO
+	// #2 Select high side A, the first source of the monitoring cycle
+	AlxVnh7040_Monitoring_Select_HSA(me);
+
+	// #3 Init PWM/GPIO
 	#ifdef ALX_VNH7040_PWM
 	if(AlxPwm_Init(me->pwm) != Alx_Ok) { ALX_VNH7040_ASSERT(false); return; }
 	#else
 	AlxIoPin_Init(me->do_PWM);
 	#endif
 
-	// #3 Enable Multisense
+	// #4 Enable Multisense
 	AlxIoPin_Set(me->do_SENS_EN);
 
-	// #4 Delay for device to come from standby mode to operating mode
+	// #5 Delay for device to come from standby mode to operating mode
 	AlxDelay_ms(2);
 
-	// #5 Set isInit
+	// #6 Set isInit
 	me->isInit = true;
 }
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxVnh7040_DeInit(AlxVnh7040* me)
 {
@@ -213,7 +216,7 @@ void AlxVnh7040_DeInit(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxVnh7040_Handle(AlxVnh7040* me)
 {
@@ -335,8 +338,8 @@ void AlxVnh7040_Handle(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] duty_permil
+  * @param[in,out]	me
+  * @param[in]		duty_permil
   */
 void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil)
 {
@@ -400,7 +403,7 @@ void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me)
@@ -413,7 +416,7 @@ uint32_t AlxVnh7040_GetCurrent_mA(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 uint32_t AlxVnh7040_GetCurrentHsA_mA(AlxVnh7040* me)
@@ -426,7 +429,7 @@ uint32_t AlxVnh7040_GetCurrentHsA_mA(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 uint32_t AlxVnh7040_GetCurrentHsB_mA(AlxVnh7040* me)
@@ -439,7 +442,7 @@ uint32_t AlxVnh7040_GetCurrentHsB_mA(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 uint32_t AlxVnh7040_GetSupplyVoltage_mV(AlxVnh7040* me)
@@ -452,7 +455,7 @@ uint32_t AlxVnh7040_GetSupplyVoltage_mV(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 int32_t AlxVnh7040_GetTemp_degC(AlxVnh7040* me)
@@ -465,20 +468,20 @@ int32_t AlxVnh7040_GetTemp_degC(AlxVnh7040* me)
 
 /**
   * @brief
-  * @param[in,out] me
-  * @param[in] breakType
+  * @param[in,out]	me
+  * @param[in]		breakType
   */
 int32_t AlxVnh7040_GetIsError (AlxVnh7040* me)
 {
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
 	ALX_VNH7040_ASSERT(me->isInit == true);
 
-	return me->currentHsA_clamp || me->currentHsB_clamp;	// true-> short circuit or overcurrent protection is acctive on one of half bridges
+	return me->currentHsA_clamp || me->currentHsB_clamp;	// true-> short circuit or overcurrent protection is active on one of half bridges
 }
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   * @return
   */
 void AlxVnh7040_Config_BreakType(AlxVnh7040* me, AlxVnh7040_BreakType breakType)
@@ -519,8 +522,6 @@ static void AlxVnh7040_Monitoring_Select_Vcc(AlxVnh7040* me)
 }
 static void AlxVnh7040_Monitoring (AlxVnh7040* me)
 {
-	int32_t temp;
-
 	ALX_VNH7040_ASSERT(me->wasCtorCalled == true);
 	ALX_VNH7040_ASSERT(me->isInit == true);
 

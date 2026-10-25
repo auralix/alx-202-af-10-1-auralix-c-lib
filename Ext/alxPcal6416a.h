@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxPcal6416a.h
   * @brief		Auralix C Library - ALX IO Expander PCAL6416A Module
@@ -66,14 +66,14 @@ extern "C" {
 #elif defined(ALX_PCAL6416A_ASSERT_RST_ENABLE)
 	#define ALX_PCAL6416A_ASSERT(expr) ALX_ASSERT_RST(ALX_PCAL6416A_FILE, expr)
 #else
-	#define ALX_PCAL6416A_ASSERT(expr) do{} while (false)
+	#define ALX_PCAL6416A_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_PCAL6416A_TRACE_ENABLE)
 	#define ALX_PCAL6416A_TRACE_ERR(...) ALX_TRACE_ERR(ALX_PCAL6416A_FILE, __VA_ARGS__)
 #else
-	#define ALX_PCAL6416A_TRACE_ERR(...) do{} while (false)
+	#define ALX_PCAL6416A_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -86,7 +86,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -101,7 +101,7 @@ typedef union
 } AlxPcal6416a_RegVal_00h_InputPort_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -120,7 +120,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -135,7 +135,7 @@ typedef union
 } AlxPcal6416a_RegVal_02h_OutputPort_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -154,7 +154,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -169,7 +169,7 @@ typedef union
 } AlxPcal6416a_RegVal_04h_PolarityInversion_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -188,7 +188,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -203,7 +203,7 @@ typedef union
 } AlxPcal6416a_RegVal_06h_Configuration_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -229,7 +229,7 @@ typedef enum
 } AlxPcal6416a_OutputDriveLevel;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPcal6416a_OutputDriveLevel P0_0 : 2;
 		AlxPcal6416a_OutputDriveLevel P0_1 : 2;
@@ -240,7 +240,7 @@ typedef union
 } AlxPcal6416a_RegVal_40h_OutputDriveStrength_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPcal6416a_OutputDriveLevel P0_4 : 2;
 		AlxPcal6416a_OutputDriveLevel P0_5 : 2;
@@ -251,7 +251,7 @@ typedef union
 } AlxPcal6416a_RegVal_41h_OutputDriveStrength_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPcal6416a_OutputDriveLevel P1_0 : 2;
 		AlxPcal6416a_OutputDriveLevel P1_1 : 2;
@@ -262,7 +262,7 @@ typedef union
 } AlxPcal6416a_RegVal_42h_OutputDriveStrength_1;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPcal6416a_OutputDriveLevel P1_4 : 2;
 		AlxPcal6416a_OutputDriveLevel P1_5 : 2;
@@ -277,7 +277,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -292,7 +292,7 @@ typedef union
 } AlxPcal6416a_RegVal_44h_InputLatch_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -311,7 +311,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -326,7 +326,7 @@ typedef union
 } AlxPcal6416a_RegVal_46h_PullUpPullDownEn_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -345,7 +345,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -360,7 +360,7 @@ typedef union
 } AlxPcal6416a_RegVal_48h_PullUpPullDownSel_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -379,7 +379,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -394,7 +394,7 @@ typedef union
 } AlxPcal6416a_RegVal_4Ah_IrqMask_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -413,7 +413,7 @@ typedef union
 //------------------------------------------------------------------------------
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P0_0 : 1;
 		bool P0_1 : 1;
@@ -428,7 +428,7 @@ typedef union
 } AlxPcal6416a_RegVal_4Ch_IrqStatus_0;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		bool P1_0 : 1;
 		bool P1_1 : 1;
@@ -452,7 +452,7 @@ typedef enum
 } AlxPcal6416a_4Fh_OpenDrainEn;
 typedef union
 {
-	struct __attribute__((packed))
+	struct ALX_PACKED
 	{
 		AlxPcal6416a_4Fh_OpenDrainEn ODEN0 : 1;
 		AlxPcal6416a_4Fh_OpenDrainEn ODEN1 : 1;

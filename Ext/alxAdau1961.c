@@ -1,4 +1,4 @@
-﻿/**
+/**
   ******************************************************************************
   * @file		alxAdau1961.c
   * @brief		Auralix C Library - ALX Audio Codec ADAU1961 Module
@@ -45,7 +45,7 @@ static void AlxAdau1961_RegStruct_SetLen(AlxAdau1961* me);
 static void AlxAdau1961_RegStruct_SetValToZero(AlxAdau1961* me);
 static void AlxAdau1961_RegStruct_SetNonClkValToDefault(AlxAdau1961* me);
 static Alx_Status AlxAdau1961_Reg_Write(AlxAdau1961* me, void* reg);
-static Alx_Status AlxAdau1961_Reg_Read(AlxAdau1961* me, void* reg);
+static ALX_UNUSED Alx_Status AlxAdau1961_Reg_Read(AlxAdau1961* me, void* reg);
 static Alx_Status AlxAdau1961_Reg_WriteNonClkVal(AlxAdau1961* me);
 static uint8_t AlxAdau1961_CalcRegVal_InDiffGain(AlxAdau1961* me, float gain_dB);
 static AlxAdau1961_General_GainMixer1Mixer2 AlxAdau1961_CalcRegVal_InAuxGain(AlxAdau1961* me, int8_t gain_dB);
@@ -236,7 +236,7 @@ Alx_Status AlxAdau1961_DeInit(AlxAdau1961* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxAdau1961_Foreground_Handle(AlxAdau1961* me)
 {
@@ -254,15 +254,16 @@ Alx_Status AlxAdau1961_InDiffL_SetGain_dB(AlxAdau1961* me, float gain_dB)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == true);
 	ALX_ADAU1961_ASSERT(me->wasCtorCalled == true);
-	ALX_ADAU1961_ASSERT(fmodf(gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB) == 0);
+	ALX_UNUSED float gainRem_dB = fmodf(gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB);
+	ALX_ADAU1961_ASSERT((gainRem_dB >= 0.f) && (gainRem_dB <= 0.f));
 
 	Alx_Status status = Alx_Err;
 
 	// #1 Set Mute
-	if (gain_dB == (float)me->MUTE_GAIN_dB)
+	if (gain_dB <= (float)me->MUTE_GAIN_dB)
 	{
 		me->reg.R8_LeftDiffInputVol.val.LDMUTE = DiffInputMuteControl_Mute;
-		Alx_Status status = AlxAdau1961_Reg_Write(me, &me->reg.R8_LeftDiffInputVol);
+		status = AlxAdau1961_Reg_Write(me, &me->reg.R8_LeftDiffInputVol);
 		if (status != Alx_Ok)
 		{
 			ALX_ADAU1961_TRACE_ERR("Err");
@@ -284,7 +285,7 @@ Alx_Status AlxAdau1961_InDiffL_SetGain_dB(AlxAdau1961* me, float gain_dB)
 		}
 
 		// #2.2 Un-Mute & Set PGA gain
-		float _gain_dB = gain_dB;	// We do not need to substract anything
+		float _gain_dB = gain_dB;	// We do not need to subtract anything
 		me->reg.R8_LeftDiffInputVol.val.LDMUTE = DiffInputMuteControl_UnMute;
 		me->reg.R8_LeftDiffInputVol.val.LDVOL = AlxAdau1961_CalcRegVal_InDiffGain(me, _gain_dB);
 		status = AlxAdau1961_Reg_Write(me, &me->reg.R8_LeftDiffInputVol);
@@ -310,7 +311,8 @@ Alx_Status AlxAdau1961_InDiffL_SetGain_dB(AlxAdau1961* me, float gain_dB)
 
 		// #3.2 Un-Mute & Set PGA gain
 		float _gain_dB = gain_dB - me->IN_DIFF_PGA_BOOST_REDUCE_VAL_dB;	// We must reduce set gain because PGA gain boost is set to +20dB (we reduce it by 20.25dB, to get number which is multiple of 0.75dB to have uniform 0.75dB/bit, for easier handling)
-		ALX_ADAU1961_ASSERT(fmodf(_gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB) == 0);
+		ALX_UNUSED float _gainRem_dB = fmodf(_gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB);
+		ALX_ADAU1961_ASSERT((_gainRem_dB >= 0.f) && (_gainRem_dB <= 0.f));
 		me->reg.R8_LeftDiffInputVol.val.LDMUTE = DiffInputMuteControl_UnMute;
 		me->reg.R8_LeftDiffInputVol.val.LDVOL = AlxAdau1961_CalcRegVal_InDiffGain(me, _gain_dB);
 		status = AlxAdau1961_Reg_Write(me, &me->reg.R8_LeftDiffInputVol);
@@ -336,15 +338,16 @@ Alx_Status AlxAdau1961_InDiffR_SetGain_dB(AlxAdau1961* me, float gain_dB)
 {
 	ALX_ADAU1961_ASSERT(me->isInit == true);
 	ALX_ADAU1961_ASSERT(me->wasCtorCalled == true);
-	ALX_ADAU1961_ASSERT(fmodf(gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB) == 0);
+	ALX_UNUSED float gainRem_dB = fmodf(gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB);
+	ALX_ADAU1961_ASSERT((gainRem_dB >= 0.f) && (gainRem_dB <= 0.f));
 
 	Alx_Status status = Alx_Err;
 
 	// #1 Set Mute
-	if (gain_dB == (float)me->MUTE_GAIN_dB)
+	if (gain_dB <= (float)me->MUTE_GAIN_dB)
 	{
 		me->reg.R9_RightDiffInputVol.val.RDMUTE = DiffInputMuteControl_Mute;
-		Alx_Status status = AlxAdau1961_Reg_Write(me, &me->reg.R9_RightDiffInputVol);
+		status = AlxAdau1961_Reg_Write(me, &me->reg.R9_RightDiffInputVol);
 		if (status != Alx_Ok)
 		{
 			ALX_ADAU1961_TRACE_ERR("Err");
@@ -367,7 +370,7 @@ Alx_Status AlxAdau1961_InDiffR_SetGain_dB(AlxAdau1961* me, float gain_dB)
 		}
 
 		// #2.2 Un-Mute & Set PGA gain
-		float _gain_dB = gain_dB;	// We do not need to substract anything
+		float _gain_dB = gain_dB;	// We do not need to subtract anything
 		me->reg.R9_RightDiffInputVol.val.RDMUTE = DiffInputMuteControl_UnMute;
 		me->reg.R9_RightDiffInputVol.val.RDVOL = AlxAdau1961_CalcRegVal_InDiffGain(me, _gain_dB);
 		status = AlxAdau1961_Reg_Write(me, &me->reg.R9_RightDiffInputVol);
@@ -393,7 +396,8 @@ Alx_Status AlxAdau1961_InDiffR_SetGain_dB(AlxAdau1961* me, float gain_dB)
 
 		// #3.2 Un-Mute & Set PGA gain
 		float _gain_dB = gain_dB - me->IN_DIFF_PGA_BOOST_REDUCE_VAL_dB;	// We must reduce set gain because PGA gain boost is set to +20dB (we reduce it by 20.25dB, to get number which is multiple of 0.75dB to have uniform 0.75dB/bit, for easier handling)
-		ALX_ADAU1961_ASSERT(fmodf(_gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB) == 0);
+		ALX_UNUSED float _gainRem_dB = fmodf(_gain_dB, me->IN_DIFF_GAIN_PER_BIT_dB);
+		ALX_ADAU1961_ASSERT((_gainRem_dB >= 0.f) && (_gainRem_dB <= 0.f));
 		me->reg.R9_RightDiffInputVol.val.RDMUTE = DiffInputMuteControl_UnMute;
 		me->reg.R9_RightDiffInputVol.val.RDVOL = AlxAdau1961_CalcRegVal_InDiffGain(me, _gain_dB);
 		status = AlxAdau1961_Reg_Write(me, &me->reg.R9_RightDiffInputVol);
@@ -767,7 +771,7 @@ static Alx_Status AlxAdau1961_Reg_Write(AlxAdau1961* me, void* reg)
 
 	return AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_16bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 }
-static Alx_Status AlxAdau1961_Reg_Read(AlxAdau1961* me, void* reg)
+static ALX_UNUSED Alx_Status AlxAdau1961_Reg_Read(AlxAdau1961* me, void* reg)
 {
 	uint16_t regAddr = *((uint16_t*)reg);
 	uint8_t regLen = *((uint8_t*)reg + sizeof(uint16_t));
@@ -778,130 +782,294 @@ static Alx_Status AlxAdau1961_Reg_Read(AlxAdau1961* me, void* reg)
 static Alx_Status AlxAdau1961_Reg_WriteNonClkVal(AlxAdau1961* me)
 {
 	Alx_Status status = AlxAdau1961_Reg_Write(me, &me->reg.R2_DigMicJackDetect);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R2_DigMicJackDetect		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R2_DigMicJackDetect		");
+		return status;
+	}
 
 	//status = AlxAdau1961_Reg_Write(me, &me->reg.R3_Reserved			);
 	//if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R3_Reserved			"); return status;}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R4_RecMixerLeft0		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R4_RecMixerLeft0		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R4_RecMixerLeft0		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R5_RecMixerLeft1		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R5_RecMixerLeft1		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R5_RecMixerLeft1		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R6_RecMixerRight0		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R6_RecMixerRight0		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R6_RecMixerRight0		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R7_RecMixerRight1		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R7_RecMixerRight1		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R7_RecMixerRight1		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R8_LeftDiffInputVol		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R8_LeftDiffInputVol		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R8_LeftDiffInputVol		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R9_RightDiffInputVol	);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R9_RightDiffInputVol	"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R9_RightDiffInputVol	");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R10_RecordMicBias		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R10_RecordMicBias		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R10_RecordMicBias		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R11_Alc0				);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R11_Alc0				"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R11_Alc0				");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R12_Alc1				);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R12_Alc1				"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R12_Alc1				");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R13_Alc2				);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R13_Alc2				"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R13_Alc2				");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R14_Alc3				);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R14_Alc3				"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R14_Alc3				");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R15_SerialPort0			);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R15_SerialPort0			"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R15_SerialPort0			");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R16_SerialPort1			);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R16_SerialPort1			"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R16_SerialPort1			");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R17_Converter0			);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R17_Converter0			"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R17_Converter0			");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R18_Converter1			);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R18_Converter1			"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R18_Converter1			");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R19_AdcControl			);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R19_AdcControl			"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R19_AdcControl			");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R20_LeftDigitalVol		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R20_LeftDigitalVol		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R20_LeftDigitalVol		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R21_RightDigitalVol		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R21_RightDigitalVol		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R21_RightDigitalVol		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R22_PlayMixerLeft0		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R22_PlayMixerLeft0		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R22_PlayMixerLeft0		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R23_PlayMixerLeft1		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R23_PlayMixerLeft1		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R23_PlayMixerLeft1		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R24_PlayMixerRight0		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R24_PlayMixerRight0		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R24_PlayMixerRight0		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R25_PlayMixerRight1		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R25_PlayMixerRight1		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R25_PlayMixerRight1		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R26_PlayLrMixerLeft		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R26_PlayLrMixerLeft		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R26_PlayLrMixerLeft		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R27_PlayLrMixerRight	);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R27_PlayLrMixerRight	"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R27_PlayLrMixerRight	");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R28_PlayLrMixerMono		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R28_PlayLrMixerMono		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R28_PlayLrMixerMono		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R29_PlayHpLeftVol		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R29_PlayHpLeftVol		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R29_PlayHpLeftVol		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R30_PlayHpRightVol		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R30_PlayHpRightVol		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R30_PlayHpRightVol		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R31_LineOutputLeftVol	);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R31_LineOutputLeftVol	"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R31_LineOutputLeftVol	");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R32_LineOutputRightVol	);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R32_LineOutputRightVol	"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R32_LineOutputRightVol	");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R33_PlayMonoOutput		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R33_PlayMonoOutput		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R33_PlayMonoOutput		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R34_PopClickSuppress	);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R34_PopClickSuppress	"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R34_PopClickSuppress	");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R35_PlayPowerMgmt		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R35_PlayPowerMgmt		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R35_PlayPowerMgmt		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R36_DacControl0			);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R36_DacControl0			"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R36_DacControl0			");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R37_DacControl1			);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R37_DacControl1			"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R37_DacControl1			");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R38_DacControl2			);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R38_DacControl2			"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R38_DacControl2			");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R39_SerialPortPad		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R39_SerialPortPad		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R39_SerialPortPad		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R40_ControlPortPad0		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R40_ControlPortPad0		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R40_ControlPortPad0		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R41_ControlPortPad1		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R41_ControlPortPad1		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R41_ControlPortPad1		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R42_JackDetectPin		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R42_JackDetectPin		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R42_JackDetectPin		");
+		return status;
+	}
 
 	status = AlxAdau1961_Reg_Write(me, &me->reg.R67_DejitterControl		);
-	if (status != Alx_Ok) { ALX_ADAU1961_TRACE_ERR("Err_R67_DejitterControl		"); return status;}
+	if (status != Alx_Ok)
+	{
+		ALX_ADAU1961_TRACE_ERR("Err_R67_DejitterControl		");
+		return status;
+	}
 
 	return Alx_Ok;
 }

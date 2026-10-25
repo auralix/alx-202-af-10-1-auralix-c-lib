@@ -44,7 +44,7 @@
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxClk_Ctor
 (

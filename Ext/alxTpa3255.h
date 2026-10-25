@@ -65,14 +65,14 @@ extern "C" {
 #elif defined(ALX_TPA3255_ASSERT_RST_ENABLE)
 	#define ALX_TPA3255_ASSERT(expr) ALX_ASSERT_RST(ALX_TPA3255_FILE, expr)
 #else
-	#define ALX_TPA3255_ASSERT(expr) do{} while (false)
+	#define ALX_TPA3255_ASSERT(expr) ALX_ASSERT_OFF(expr)
 #endif
 
 // Trace //
 #if defined(ALX_TPA3255_TRACE_ENABLE)
-	#define ALX_TPA3255_TRACE_WRN(...) ALX_TRACE_WRN(ALX_TPA3255_FILE, __VA_ARGS__)
+	#define ALX_TPA3255_TRACE_ERR(...) ALX_TRACE_ERR(ALX_TPA3255_FILE, __VA_ARGS__)
 #else
-	#define ALX_TPA3255_TRACE_WRN(...) do{} while (false)
+	#define ALX_TPA3255_TRACE_ERR(...) ALX_TRACE_OFF(__VA_ARGS__)
 #endif
 
 
@@ -98,7 +98,7 @@ typedef struct
 	AlxIoPin* di_nCLIP_OTW;
 
 	// Objects - Internal
-	AlxTimSw tim; // Timer to ReEnable Ic
+	AlxTimSw tim; // Timer to re-enable Ic
 
 	// Parameters
 	float waitTime_ReEnable_ms;
@@ -121,9 +121,9 @@ typedef struct
 void AlxTpa3255_Ctor
 (
 	AlxTpa3255* me,
-	AlxIoPin* di_nRESET,
-	AlxIoPin* do_nFAULT,
-	AlxIoPin* do_nCLIP_OTW,
+	AlxIoPin* do_nRESET,
+	AlxIoPin* di_nFAULT,
+	AlxIoPin* di_nCLIP_OTW,
 	float waitTime_ReEnable_ms
 );
 

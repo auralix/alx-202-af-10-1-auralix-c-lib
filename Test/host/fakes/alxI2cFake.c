@@ -1,0 +1,195 @@
+/**
+  ******************************************************************************
+  * @file		alxI2cFake.c
+  * @brief		Auralix C Library - ALX I2C Module - PC Unit Test Fake
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
+  *
+  * A link-time fake of the I2C master, named after the module it fakes, so a
+  * device driver above it can be exercised on a PC. It is a register file: the
+  * test puts bytes at an address, the driver reads them; the driver writes
+  * bytes, the test reads them back. Nothing is timed, nothing fails unless the
+  * test asks it to.
+  *
+  * Registers are addressed by their 8-bit memory address, which is what every
+  * driver in Ext/ uses, and each holds up to ALX_I2C_FAKE_REG_LEN bytes in the
+  * order they travel on the wire - most significant first, as I2C devices are
+  * almost always specified.
+  *
+  * On an MCU family the module's own constructor exists and is defined here
+  * under the same guard the module header uses.
+  ******************************************************************************
+  **/
+
+//******************************************************************************
+// Includes
+//******************************************************************************
+#include "alxI2c.h"
+#include <string.h>
+
+
+//******************************************************************************
+// Private Variables
+//******************************************************************************
+#define ALX_I2C_FAKE_NUM_OF_REGS 256
+#define ALX_I2C_FAKE_REG_LEN 8
+
+static uint8_t alxI2cFake_reg[ALX_I2C_FAKE_NUM_OF_REGS][ALX_I2C_FAKE_REG_LEN];
+static uint8_t alxI2cFake_lastWrite[ALX_I2C_FAKE_NUM_OF_REGS][ALX_I2C_FAKE_REG_LEN];
+static uint32_t alxI2cFake_writeCount[ALX_I2C_FAKE_NUM_OF_REGS];
+static uint32_t alxI2cFake_readCount[ALX_I2C_FAKE_NUM_OF_REGS];
+static bool alxI2cFake_slaveReady = true;
+static int32_t alxI2cFake_forcedStatus = Alx_Ok;
+static uint8_t alxI2cFake_next[ALX_I2C_FAKE_NUM_OF_REGS][ALX_I2C_FAKE_REG_LEN];	// one read's answer (A97)
+static bool alxI2cFake_nextArmed[ALX_I2C_FAKE_NUM_OF_REGS];
+static uint32_t alxI2cFake_callCount = 0;	// every call of the contract, whatever it answered (A97)
+static uint32_t alxI2cFake_failAt = 0;		// the call count at which one call answers Alx_Err; 0 disarms
+
+
+//******************************************************************************
+// Prototypes - the DLL export surface (no separate header for test fakes)
+//******************************************************************************
+void AlxI2cFake_Reset(void);
+void AlxI2cFake_SetReg(uint8_t addr, const uint8_t* data, uint8_t len);
+void AlxI2cFake_SetRegNext(uint8_t addr, const uint8_t* data, uint8_t len);
+void AlxI2cFake_GetLastWrite(uint8_t addr, uint8_t* data, uint8_t len);
+uint32_t AlxI2cFake_WriteCount(uint8_t addr);
+uint32_t AlxI2cFake_ReadCount(uint8_t addr);
+void AlxI2cFake_SetSlaveReady(bool ready);
+void AlxI2cFake_SetForcedStatus(int32_t status);
+void AlxI2cFake_FailAt(uint32_t nth);
+uint32_t AlxI2cFake_CallCount(void);
+
+
+//******************************************************************************
+// The fake's own controls
+//******************************************************************************
+void AlxI2cFake_Reset(void)
+{
+	memset(alxI2cFake_reg, 0, sizeof(alxI2cFake_reg));
+	memset(alxI2cFake_lastWrite, 0, sizeof(alxI2cFake_lastWrite));
+	memset(alxI2cFake_writeCount, 0, sizeof(alxI2cFake_writeCount));
+	memset(alxI2cFake_readCount, 0, sizeof(alxI2cFake_readCount));
+	memset(alxI2cFake_next, 0, sizeof(alxI2cFake_next));
+	memset(alxI2cFake_nextArmed, 0, sizeof(alxI2cFake_nextArmed));
+	alxI2cFake_slaveReady = true;
+	alxI2cFake_forcedStatus = Alx_Ok;
+	alxI2cFake_callCount = 0;
+	alxI2cFake_failAt = 0;
+}
+void AlxI2cFake_SetReg(uint8_t addr, const uint8_t* data, uint8_t len)
+{
+	if (len > ALX_I2C_FAKE_REG_LEN) { len = ALX_I2C_FAKE_REG_LEN; }
+	memcpy(alxI2cFake_reg[addr], data, len);
+}
+void AlxI2cFake_SetRegNext(uint8_t addr, const uint8_t* data, uint8_t len)
+{
+	// What the NEXT read of the register answers; the one after reads the register again. A pin that
+	// follows its pull reads differently under a pull-up and under a pull-down, and this is that pin.
+	if (len > ALX_I2C_FAKE_REG_LEN) { len = ALX_I2C_FAKE_REG_LEN; }
+	memcpy(alxI2cFake_next[addr], data, len);
+	alxI2cFake_nextArmed[addr] = true;
+}
+void AlxI2cFake_GetLastWrite(uint8_t addr, uint8_t* data, uint8_t len)
+{
+	if (len > ALX_I2C_FAKE_REG_LEN) { len = ALX_I2C_FAKE_REG_LEN; }
+	memcpy(data, alxI2cFake_lastWrite[addr], len);
+}
+uint32_t AlxI2cFake_WriteCount(uint8_t addr)
+{
+	return alxI2cFake_writeCount[addr];
+}
+uint32_t AlxI2cFake_ReadCount(uint8_t addr)
+{
+	return alxI2cFake_readCount[addr];
+}
+void AlxI2cFake_SetSlaveReady(bool ready)
+{
+	alxI2cFake_slaveReady = ready;
+}
+void AlxI2cFake_SetForcedStatus(int32_t status)
+{
+	alxI2cFake_forcedStatus = status;
+}
+void AlxI2cFake_FailAt(uint32_t nth)
+{
+	// The nth call from now answers Alx_Err, the others the forced status: a driver's error path at one
+	// chosen step of a sequence. 0 disarms.
+	if (nth == 0)
+	{
+		alxI2cFake_failAt = 0;
+	}
+	else
+	{
+		alxI2cFake_failAt = alxI2cFake_callCount + nth;
+	}
+}
+uint32_t AlxI2cFake_CallCount(void)
+{
+	return alxI2cFake_callCount;
+}
+
+static Alx_Status AlxI2cFake_Answer(void)
+{
+	alxI2cFake_callCount++;
+	if (alxI2cFake_failAt != 0 && alxI2cFake_callCount == alxI2cFake_failAt)
+	{
+		return Alx_Err;
+	}
+	return (Alx_Status)(alxI2cFake_forcedStatus);
+}
+
+
+//******************************************************************************
+// The faked module's own contract
+//******************************************************************************
+#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+void AlxI2c_Ctor(AlxI2c* me, I2C_TypeDef* i2c, AlxIoPin* io_SCL, AlxIoPin* io_SDA, AlxClk* clk, AlxI2c_Clk i2cClk)
+{
+	(void)i2c; (void)io_SCL; (void)io_SDA; (void)clk; (void)i2cClk;
+	me->isInit = false;
+}
+#endif
+
+Alx_Status AlxI2c_Init(AlxI2c* me)
+{
+	me->isInit = true;
+	return AlxI2cFake_Answer();
+}
+Alx_Status AlxI2c_DeInit(AlxI2c* me)
+{
+	me->isInit = false;
+	return AlxI2cFake_Answer();
+}
+Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t numOfTries, uint16_t timeout_ms)
+{
+	(void)me; (void)slaveAddr; (void)numOfTries; (void)timeout_ms;
+	if (alxI2cFake_slaveReady == false) { return Alx_Err; }
+	return AlxI2cFake_Answer();
+}
+Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
+{
+	(void)me; (void)slaveAddr; (void)memAddrLen; (void)numOfTries; (void)timeout_ms;
+	uint8_t addr = (uint8_t)memAddr;
+	if (len > ALX_I2C_FAKE_REG_LEN) { len = ALX_I2C_FAKE_REG_LEN; }
+	if (alxI2cFake_nextArmed[addr])
+	{
+		memcpy(data, alxI2cFake_next[addr], len);
+		alxI2cFake_nextArmed[addr] = false;
+	}
+	else
+	{
+		memcpy(data, alxI2cFake_reg[addr], len);
+	}
+	alxI2cFake_readCount[addr]++;
+	return AlxI2cFake_Answer();
+}
+Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, const uint8_t* data, uint16_t len, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms)
+{
+	(void)me; (void)slaveAddr; (void)memAddrLen; (void)checkWithRead; (void)numOfTries; (void)timeout_ms;
+	uint8_t addr = (uint8_t)memAddr;
+	if (len > ALX_I2C_FAKE_REG_LEN) { len = ALX_I2C_FAKE_REG_LEN; }
+	memcpy(alxI2cFake_reg[addr], data, len);
+	memcpy(alxI2cFake_lastWrite[addr], data, len);
+	alxI2cFake_writeCount[addr]++;
+	return AlxI2cFake_Answer();
+}

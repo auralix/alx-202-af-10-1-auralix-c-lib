@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && defined(ALX_LPC80X_TODO)
+#if defined(ALX_C_LIB) && defined(ALX_LPC80X_TODO)	// Unfinished: a _TODO guard keeps a file out of every build until it is done
 
 
 //******************************************************************************
@@ -89,7 +89,7 @@ void AlxPwm_Ctor
 	(void)tim;
 	(void)ioPinArr;
 	(void)chArr;
-	ALX_PWM_ASSERT(numOfCh <= 3);	// MF: Only match registers 0, 1, 2 can be used for PWM Output. Match register 3 is for cycle lenght (freq or period)
+	ALX_PWM_ASSERT(numOfCh <= 3);	// MF: Only match registers 0, 1, 2 can be used for PWM Output. Match register 3 is for cycle length (freq or period)
 	(void)clk;
 	#if defined(ALX_PWM_OPTIMIZE_SIZE)
 	(void)dutyDefaultArr_permil;
@@ -134,7 +134,7 @@ void AlxPwm_Ctor
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 Alx_Status AlxPwm_Init(AlxPwm* me)
 {
@@ -153,7 +153,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 	for (uint32_t i = 0; i < me->numOfCh; i++)
 	{
 		#if defined(ALX_PWM_OPTIMIZE_SIZE)
-		// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period). Divide duty by 10 to get pct from permil
+		// MF: Match register 3 ("kCTIMER_Match_3") is for cycle length(freq or period). Divide duty by 10 to get pct from permil
 		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), me->dutyDefaultArr_permil[i] / 10, me->period, me->srcClk_Hz, false) != kStatus_Success)
 		{
 			ALX_PWM_TRACE_ERR("ErrChInit");
@@ -161,7 +161,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 		}
 		AlxPwm_UpdatePwmDutyPermil(me, me->chArr[i], me->dutyDefaultArr_permil[i]);	// MF: To setup duty in permil because FLS can not handle it
 		#else
-		// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
+		// MF: Match register 3 ("kCTIMER_Match_3") is for cycle length(freq or period)
 		if (CTIMER_SetupPwm(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(me->chArr[i]), (uint8_t)me->dutyDefaultArr_pct[i], me->period, me->srcClk_Hz, false) != kStatus_Success)
 		{
 			ALX_PWM_TRACE_ERR("ErrChInit");
@@ -183,7 +183,7 @@ Alx_Status AlxPwm_Init(AlxPwm* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 Alx_Status AlxPwm_DeInit(AlxPwm* me)
 {
@@ -207,9 +207,9 @@ Alx_Status AlxPwm_DeInit(AlxPwm* me)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] ch
-  * @param[in] duty_pct
+  * @param[in]	me
+  * @param[in]	ch
+  * @param[in]	duty_pct
   */
 Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 {
@@ -234,7 +234,7 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 		if (me->chArr[i] == ch)
 		{
 			AlxPwm_UpdatePwmDutyPct(me, ch, duty_pct);
-			//CTIMER_UpdatePwmDutycycle(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(ch), (uint32_t)duty_pct);	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
+			//CTIMER_UpdatePwmDutycycle(me->tim, kCTIMER_Match_3, AlxPwm_GetCh(ch), (uint32_t)duty_pct);	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle length(freq or period)
 			return Alx_Ok;
 		}
 	}
@@ -246,9 +246,9 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 
 /**
   * @brief
-  * @param[in] me
-  * @param[in] ch
-  * @param[in] duty_permil
+  * @param[in]	me
+  * @param[in]	ch
+  * @param[in]	duty_permil
   */
 Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {
@@ -291,7 +291,7 @@ static uint32_t AlxPwm_GetCh(Alx_Ch ch)
 	if (ch == Alx_Ch_0) return kCTIMER_Match_0;
 	if (ch == Alx_Ch_1) return kCTIMER_Match_1;
 	if (ch == Alx_Ch_2) return kCTIMER_Match_2;
-	//if (ch == Alx_Ch_3) return kCTIMER_Match_3; //	MF: Match register 3 is for cycle lenght (freq or period)
+	//if (ch == Alx_Ch_3) return kCTIMER_Match_3; //	MF: Match register 3 is for cycle length (freq or period)
 
 	ALX_PWM_ASSERT(false); // We shouldn't get here
 	return ALX_NULL;
@@ -308,7 +308,7 @@ static void AlxPwm_UpdatePwmDutyPermil(AlxPwm* me, Alx_Ch ch, uint16_t duty_perm
 	uint32_t pulsePeriod = 0;
 
 	// #2 Get Period
-	uint32_t period = me->tim->MR[kCTIMER_Match_3];	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
+	uint32_t period = me->tim->MR[kCTIMER_Match_3];	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle length(freq or period)
 
 	// #3 Calculate Pulse
 	if (duty_permil == 0U)	{ pulsePeriod = period + 1U; }
@@ -324,7 +324,7 @@ static void AlxPwm_UpdatePwmDutyPct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 	uint32_t pulsePeriod = 0;
 
 	// #2 Get Period
-	uint32_t period = me->tim->MR[kCTIMER_Match_3];	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle lenght(freq or period)
+	uint32_t period = me->tim->MR[kCTIMER_Match_3];	// MF: Match register 3 ("kCTIMER_Match_3") is for cycle length(freq or period)
 
 	// #3 Calculate Pulse
 	if (duty_pct == 0.f)	{ pulsePeriod = period + 1U; }

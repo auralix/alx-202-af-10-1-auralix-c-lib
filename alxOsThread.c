@@ -127,7 +127,7 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 	);
 	if (status != pdPASS)
 	{
-		ALX_OS_THREAD_TRACE_ERR("FAIL: xTaskCreate() status %ld name %s stackLen_word %lu priority %ld", status, me->name, me->stackLen_word, me->priority);
+		ALX_OS_THREAD_TRACE_ERR("FAIL: xTaskCreate() status %" PRId32 " name %s stackLen_word %" PRIu32 " priority %" PRId32, (int32_t)status, me->name, (uint32_t)me->stackLen_word, me->priority);
 		return Alx_Err;
 	}
 	#endif
@@ -149,9 +149,11 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 	int32_t status = k_thread_name_set(threadId, me->name);
 	if (status != 0)
 	{
-		ALX_OS_THREAD_TRACE_ERR("FAIL: k_thread_name_set() status %ld name %s stackLen_byte %lu priority %ld", status, me->name, me->stackLen_byte, me->priority);
+		ALX_OS_THREAD_TRACE_ERR("FAIL: k_thread_name_set() status %" PRId32 " name %s stackLen_byte %" PRIu32 " priority %" PRId32, status, me->name, me->stackLen_byte, me->priority);
 		return Alx_Err;
 	}
+	#else
+	(void)threadId;
 	#endif
 	#endif
 
@@ -164,7 +166,7 @@ Alx_Status AlxOsThread_Start(AlxOsThread* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxOsThread_Yield(AlxOsThread* me)
 {
@@ -183,7 +185,7 @@ void AlxOsThread_Yield(AlxOsThread* me)
 
 /**
   * @brief
-  * @param[in,out] me
+  * @param[in,out]	me
   */
 void AlxOsThread_Terminate(AlxOsThread* me)
 {
@@ -210,7 +212,15 @@ Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
 
 	// Join
 	#if defined(ALX_FREE_RTOS)
-	TickType_t timeout_ticks = (timeout_ms == UINT32_MAX) ? portMAX_DELAY : pdMS_TO_TICKS(timeout_ms);
+	TickType_t timeout_ticks = 0;
+	if (timeout_ms == UINT32_MAX)
+	{
+		timeout_ticks = portMAX_DELAY;
+	}
+	else
+	{
+		timeout_ticks = pdMS_TO_TICKS(timeout_ms);
+	}
 	TickType_t start_time = xTaskGetTickCount();
 
 	while (true)	// AB: FreeRTOS doesn't have a native join mechanism, we need to poll task state and wait for deletion
@@ -238,9 +248,17 @@ Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
 	}
 	#endif
 	#if defined(ALX_ZEPHYR)
-	k_timeout_t timeout = (timeout_ms == UINT32_MAX) ? K_FOREVER : K_MSEC(timeout_ms);
+	k_timeout_t timeout = K_FOREVER;
+	if (timeout_ms == UINT32_MAX)
+	{
+		timeout = K_FOREVER;
+	}
+	else
+	{
+		timeout = K_MSEC(timeout_ms);
+	}
 
-	int ret = k_thread_join(&me->threadHandle, timeout);	// AB: Zephyr has k_thread_join function
+	int32_t ret = k_thread_join(&me->threadHandle, timeout);	// AB: Zephyr has k_thread_join function
 	if (ret == 0)
 	{
 		return Alx_Ok;
@@ -257,6 +275,9 @@ Alx_Status AlxOsThread_Join(AlxOsThread* me, uint32_t timeout_ms)
 
 	// Clear
 	me->wasStarted = false;
+
+	// Return
+	return Alx_Ok;
 }
 
 

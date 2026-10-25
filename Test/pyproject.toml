@@ -2,7 +2,7 @@
 # Standard: uv-managed (uv sync --locked -> Test/.venv, the environment of the dev loop and of every lane);
 # lanes = nox sessions named after the pipeline stages (Test/noxfile.py):  uv run nox -l
 # Without uv: any Python >= 3.11 with these dependencies installed runs the suite directly
-# (pip install "alx-202-2-af-1-auralix-py-lib @ git+https://github.com/auralix/alx-202-2-af-1-auralix-py-lib@v0.8.0"
+# (pip install "alx-202-2-af-1-auralix-py-lib @ git+https://github.com/auralix/alx-202-2-af-1-auralix-py-lib@v0.18.8"
 # pytest pytest-html pytest-timeout pytest-randomly lcov-cobertura codespell ruff universalmutator nox):  python -m pytest
 [project]
 name = "alx-c-lib-tests"
@@ -10,7 +10,7 @@ version = "0.1.0"
 description = "PC unit tests for Auralix C Library modules (pytest + ctypes over per-module DLLs)"
 requires-python = ">=3.11"
 dependencies = [
-    "alx-202-2-af-1-auralix-py-lib @ git+https://github.com/auralix/alx-202-2-af-1-auralix-py-lib@v0.8.0",
+    "alx-202-2-af-1-auralix-py-lib @ git+https://github.com/auralix/alx-202-2-af-1-auralix-py-lib@v0.18.8",
     "pytest>=8",
     "pytest-html>=4",
     "pytest-timeout>=2",
@@ -22,9 +22,22 @@ dependencies = [
     "nox>=2024",                             # the lane runner (Test/noxfile.py, one session per stage)
 ]
 
+
+[build-system]
+# The verification project is installed into its own environment (uv installs a project that
+# declares a build system, editable by default), so `harness` imports the same way from pytest,
+# the `nox` command, `python -m nox` and the mutation hooks, without a sys.path edit.
+# uv_build is uv's own backend, the one `uv init` writes; the harness package sits at this root.
+requires = ["uv_build>=0.12.7,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "harness"
+module-root = ""
+
 [tool.pytest.ini_options]
 minversion = "8.0"
-testpaths = ["."]
+testpaths = ["tests"]
 # no test may hang the run (C infinite loop / stuck serial read) - generous global guard,
 # per-test overrides via @pytest.mark.timeout(n)
 timeout = 120
@@ -48,3 +61,11 @@ junit_family = "xunit1"
 filterwarnings = [
     "error",
 ]
+
+# ANALYZE stage 0 - codespell over every library file and the suite's own C (goal 7). The words below
+# are names, not typos: FRO is NXP's free-running oscillator, HSI the STM32's high-speed internal one,
+# HSA the VNH7040's high side A, LOD the LP586x's load-open detection; "tread" is English ("cannot
+# tread on one another"); the regex is alxId.c's "[G]NU is [N]ot [U]nix".
+[tool.codespell]
+ignore-words-list = "fro,hsi,hsa,lod,tread"
+ignore-regex = '\[N\]ot'

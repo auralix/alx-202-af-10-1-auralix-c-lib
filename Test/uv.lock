@@ -8,8 +8,8 @@ resolution-markers = [
 
 [[package]]
 name = "alx-202-2-af-1-auralix-py-lib"
-version = "0.8.0"
-source = { git = "https://github.com/auralix/alx-202-2-af-1-auralix-py-lib?rev=v0.8.0#a484f897600f7885fb286dcb0c142b31412865da" }
+version = "0.18.8"
+source = { git = "https://github.com/auralix/alx-202-2-af-1-auralix-py-lib?rev=v0.18.8#5cd331e5e16f04ede3d9f19207ceb0dc1c4f68b9" }
 dependencies = [
     { name = "pyserial" },
 ]
@@ -17,7 +17,7 @@ dependencies = [
 [[package]]
 name = "alx-c-lib-tests"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "alx-202-2-af-1-auralix-py-lib" },
     { name = "codespell" },
@@ -33,7 +33,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "alx-202-2-af-1-auralix-py-lib", git = "https://github.com/auralix/alx-202-2-af-1-auralix-py-lib?rev=v0.8.0" },
+    { name = "alx-202-2-af-1-auralix-py-lib", git = "https://github.com/auralix/alx-202-2-af-1-auralix-py-lib?rev=v0.18.8" },
     { name = "codespell", specifier = ">=2" },
     { name = "lcov-cobertura", specifier = ">=2" },
     { name = "nox", specifier = ">=2024" },

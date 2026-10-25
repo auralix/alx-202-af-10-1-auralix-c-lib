@@ -45,7 +45,7 @@ static Alx_Status AlxSpi_Reset(AlxSpi* me);
 static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries);
 static void AlxSpi_Ctor_ParseMode(AlxSpi* me);
 static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me);
-static void AlxSpi_Periph_Reset(AlxSpi* me);
+static ALX_UNUSED void AlxSpi_Periph_Reset(AlxSpi* me);
 static void AlxSpi_Periph_AttachClk(AlxSpi* me);
 static void AlxSpi_Periph_DisableClk(AlxSpi* me);
 
@@ -222,7 +222,7 @@ Alx_Status AlxSpi_Master_Write(AlxSpi* me, uint8_t* writeData, uint16_t len, uin
 	// Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// If we are here, SPI write/read was OK or number of tries error occured
+	// If we are here, SPI write/read was OK or number of tries error occurred
 	if (status == Alx_Ok)
 	{
 		return Alx_Ok;
@@ -257,7 +257,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 
 	// Prepare variables
 	uint8_t* dummy = NULL;
-	me->spiTransfer.txData = dummy;		// MF: We dont need transmited data
+	me->spiTransfer.txData = dummy;		// MF: We dont need transmitted data
 	me->spiTransfer.rxData = readData;
 	me->spiTransfer.dataSize = len;
 	Alx_Status status = Alx_Err;
@@ -265,7 +265,7 @@ Alx_Status AlxSpi_Master_Read(AlxSpi* me, uint8_t* readData, uint16_t len, uint8
 	// Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// If we are here, SPI write/read was OK or number of tries error occured
+	// If we are here, SPI write/read was OK or number of tries error occurred
 	if (status == Alx_Ok)
 	{
 		return Alx_Ok;
@@ -309,7 +309,7 @@ Alx_Status AlxSpi_Master_WriteRead(AlxSpi* me, uint8_t* writeData, uint8_t* read
 	// Try SPI write/read
 	status = AlxSpi_MasterTransferBlocking(me, numOfTries);
 
-	// If we are here, SPI write/read was OK or number of tries error occured
+	// If we are here, SPI write/read was OK or number of tries error occurred
 	if (status == Alx_Ok)
 	{
 		return Alx_Ok;
@@ -404,7 +404,7 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 	status_t status = kStatus_Fail;
 
 	// Try SPI write/read
-	for (uint32_t _try = 1; _try <= numOfTries; _try++)
+	for (uint32_t tryNum = 1; tryNum <= numOfTries; tryNum++)
 	{
 		status = SPI_MasterTransferBlocking(me->spi, &me->spiTransfer);
 		if (status == kStatus_Success)
@@ -423,7 +423,7 @@ static Alx_Status AlxSpi_MasterTransferBlocking(AlxSpi* me, uint8_t numOfTries)
 		}
 	}
 
-	// If we are here, SPI write/read was OK or number of tries error occured
+	// If we are here, SPI write/read was OK or number of tries error occurred
 	if (status == kStatus_Success)
 	{
 		return Alx_Ok;
@@ -484,7 +484,7 @@ static uint32_t AlxSpi_GetFlexCommClkFreq(AlxSpi* me)
 	ALX_SPI_ASSERT(false); // We shouldn't get here
 	return 0xFFFFFFFF;
 }
-static void AlxSpi_Periph_Reset(AlxSpi* me)
+static ALX_UNUSED void AlxSpi_Periph_Reset(AlxSpi* me)
 {
 	// Assert
 	(void)me;

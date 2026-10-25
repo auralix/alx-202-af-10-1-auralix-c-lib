@@ -229,8 +229,8 @@ float AlxTmp1075_GetTemp_degC(AlxTmp1075* me)
 		ALX_TMP1075_TRACE_ERR("Err");
 	}
 
-	// Shift value to get rid of the 4 unused bits
-	me->temp_raw = me->reg.R0_Temp.val.T >> 4;
+	// Read the signed 12-bit temperature field
+	me->temp_raw = me->reg.R0_Temp.val.T;
 
 	// Calculate
 	me->temp_degC = me->temp_raw * ALX_TMP1075_DEG_C_PER_BIT;
@@ -351,7 +351,7 @@ static Alx_Status AlxTmp1075_TraceId(AlxTmp1075* me)
 	// Trace
 	ALX_TMP1075_TRACE_DBG("");
 	ALX_TMP1075_TRACE_DBG("Auralix C Library ALX Temperature Sensor TMP1075 Module Identification:");
-	ALX_TMP1075_TRACE_DBG("- Device ID: %X", me->reg.R4_DeviceId.val.DID);
+	ALX_TMP1075_TRACE_DBG("- Device ID: %" PRIX32, (uint32_t)me->reg.R4_DeviceId.val.DID);
 	ALX_TMP1075_TRACE_DBG("");
 
 	// Return

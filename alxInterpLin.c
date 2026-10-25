@@ -115,7 +115,7 @@ Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* yPtr)
 		}
 
 		// Search for the indexes of the numbers surrounding inserted x
-		for(uint32_t i = 0 ; i < me->numOfArrPoints ; i++)
+		for(uint32_t i = 1 ; i < me->numOfArrPoints ; i++)
 		{
 			if (x < *(me->xPointArr + i)) // When this is true it  means that we found the first number that is larger than X (X1). Save and break from for loop
 			{
@@ -140,7 +140,7 @@ Alx_Status AlxInterpLin_GetY_WithStatus(AlxInterpLin* me, float x, float* yPtr)
 		}
 
 		// Search for the indexes of the numbers surrounding inserted x
-		for (uint32_t i = 0; i < me->numOfArrPoints; i++)
+		for (uint32_t i = 1; i < me->numOfArrPoints; i++)
 		{
 			if (x > *(me->xPointArr + i)) // When this is true it  means that we found the first number that is smaller than X (X1). Save and break from for loop
 			{

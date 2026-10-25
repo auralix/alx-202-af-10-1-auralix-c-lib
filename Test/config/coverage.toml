@@ -1,0 +1,711 @@
+# The lines of the library no host test can reach, taken out of the coverage gate's figures: the
+# gate alx.verify.gates.coverage of the Python library (v0.18.8) reads this file by --exclusions
+# (Test/noxfile.py, the coverage lane), so that the sources carry no coverage comments.
+#
+# One [[exclude]] table per exemption: file (by its trailing path), kind, line (the line's code, its
+# comment and spacing aside; or match, a regex; the function's name for kind function), reason;
+# function narrows the search to that function's lines, nth picks the nth match. Kind branches
+# takes the line out of branches alone; lines
+# out of every metric; block takes the line and the block it opens (its braces, or the statements to
+# its break or return) out of every metric; function takes the function's body. The gate lists every
+# entry under its file and fails a stale one: a match the source no longer holds, a reached line,
+# a branch exclusion whose every branch was taken.
+#
+# A93 names the host's layout of enumeration and mixed-type bit-fields (Ext/alxAds114s08.c,
+# Ext/alxAdxl355.c, Ext/alxAds8678.c): those lines go with A93. Every other entry is a line the
+# code's own structure leaves unreachable - the else after an exhaustive chain, the default of a
+# switch over the enumeration, a constant loop condition, a calloc that does not fail on the host,
+# an uncalled reader kept under ALX_UNUSED; folding or deleting such code is the task of the
+# coverage effort over every file.
+
+# Ext/alxAdau1961.c
+
+[[exclude]]
+file = "Ext/alxAdau1961.c"
+kind = "function"
+match = "AlxAdau1961_Reg_Read"
+reason = "no caller in the module, kept under ALX_UNUSED"
+
+# Ext/alxAds114s08.c
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_Init"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_DeInit"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_GetDevId"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_GetChVoltage_mV"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_GetInternalTemp_degC"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_Convert_raw_mV"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_RegStruct_SetToDefault"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_Cmd_RREG"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_Reg_Read"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_Reg_Write"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_Reg_WriteAndRead"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_Reg_WriteAll"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_GetPgaShorted_uV"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_GetAvddAvss_mV"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_GetDvdd_mV"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+[[exclude]]
+file = "Ext/alxAds114s08.c"
+kind = "function"
+match = "AlxAds114s08_ApplyColdJunctionCompensation_degC"
+reason = "A93: on this host the register unions are up to five bytes where the target makes one, so the frame this function writes or reads would overrun its buffer (test_ads114s08.py)"
+
+# Ext/alxAds8678.c
+
+[[exclude]]
+file = "Ext/alxAds8678.c"
+kind = "function"
+match = "AlxAds8678_Reg_Read"
+reason = "no caller in the module, kept under ALX_UNUSED"
+
+[[exclude]]
+file = "Ext/alxAds8678.c"
+kind = "branches"
+line = "else if (chNum == 7) return me->reg._0x0C_Channel7InputRange.val.Range_CHn;"
+reason = "the callers loop over the eight channels"
+
+[[exclude]]
+file = "Ext/alxAds8678.c"
+function = "AlxAds8678_GetChRegEnumChVoltageRange"
+kind = "lines"
+line = "ALX_ADS8678_ASSERT(false);"
+reason = "the callers loop over the eight channels"
+
+[[exclude]]
+file = "Ext/alxAds8678.c"
+kind = "lines"
+line = "return ALX_NULL;"
+reason = "the callers loop over the eight channels"
+
+[[exclude]]
+file = "Ext/alxAds8678.c"
+kind = "block"
+line = "else if (regEnumChVoltageRange == Range_CHn_PM_0V15625xVref)"
+reason = "A93: on this host the 4-bit enumeration field reads this code, its top bit set, as negative, so it never matches (P792)"
+
+[[exclude]]
+file = "Ext/alxAds8678.c"
+kind = "block"
+line = "else if (regEnumChVoltageRange == Range_CHn_0V_0V3125xVref)"
+reason = "A93: on this host the 4-bit enumeration field reads this code, its top bit set, as negative, so it never matches (P792)"
+
+# Ext/alxAdxl355.c
+
+[[exclude]]
+file = "Ext/alxAdxl355.c"
+kind = "block"
+line = "case Range_4g096:"
+reason = "A93: on this host the 2-bit enumeration field reads 0b10 as -2 and 0b11 as -1, so this case never matches (P798)"
+
+[[exclude]]
+file = "Ext/alxAdxl355.c"
+kind = "block"
+line = "case Range_8g192:"
+reason = "A93: on this host the 2-bit enumeration field reads 0b10 as -2 and 0b11 as -1, so this case never matches (P798)"
+
+# Ext/alxMcp73831.c
+
+[[exclude]]
+file = "Ext/alxMcp73831.c"
+kind = "branches"
+line = "else if (me->di_STAT_TriStateVal == AlxIoPin_TriState_Undefined)"
+reason = "the four tri-states are the enumeration"
+
+[[exclude]]
+file = "Ext/alxMcp73831.c"
+kind = "block"
+line = "else"
+nth = 1
+reason = "the four tri-states above are the enumeration"
+
+# Ext/alxNtcg103jf103ft1s.c
+
+[[exclude]]
+file = "Ext/alxNtcg103jf103ft1s.c"
+kind = "branches"
+line = "for (uint32_t i = 0; i < LUT_LEN; i++)"
+reason = "the bound above puts the resistance inside the table, so the loop returns"
+
+[[exclude]]
+file = "Ext/alxNtcg103jf103ft1s.c"
+kind = "lines"
+line = "ALX_NTCG103JF103FT1S_ASSERT(false);"
+reason = "the loop above returns"
+
+[[exclude]]
+file = "Ext/alxNtcg103jf103ft1s.c"
+kind = "lines"
+line = "return 0;"
+reason = "the loop above returns"
+
+# Ext/alxPcal6416a.c
+
+[[exclude]]
+file = "Ext/alxPcal6416a.c"
+kind = "branches"
+line = "else if ((valPullUp == true) && (valPullDown == true))"
+reason = "the branch before took the pull-up alone"
+
+[[exclude]]
+file = "Ext/alxPcal6416a.c"
+kind = "branches"
+line = "else if ((valPullUp == false) && (valPullDown == false))"
+reason = "the two branches before took every reading high under the pull-up"
+
+# Ext/alxTpa3255.c
+
+[[exclude]]
+file = "Ext/alxTpa3255.c"
+kind = "branches"
+line = "else if(me->state == Tpa3255_St_Waiting)"
+reason = "the four states are the enumeration"
+
+# Ext/alxVnh7040.c
+
+[[exclude]]
+file = "Ext/alxVnh7040.c"
+kind = "branches"
+line = "else if (duty_permil < 0)"
+reason = "a duty that is neither zero nor positive is negative"
+
+[[exclude]]
+file = "Ext/alxVnh7040.c"
+function = "AlxVnh7040_Monitoring"
+kind = "block"
+line = "default:"
+reason = "the quantity selected is the module's own and holds one of the four values above"
+
+# alxAudioPlayer.c
+
+[[exclude]]
+file = "alxAudioPlayer.c"
+kind = "branches"
+line = "else if (sampleType == AlxAudioPlayer_SampleType_Mono)"
+nth = 1
+reason = "the three sample types are the enumeration"
+
+[[exclude]]
+file = "alxAudioPlayer.c"
+function = "AlxAudioPlayer_GetSample"
+kind = "block"
+line = "else"
+nth = 2
+reason = "the three sample types above are the enumeration"
+
+[[exclude]]
+file = "alxAudioPlayer.c"
+kind = "branches"
+line = "else if (sampleType == AlxAudioPlayer_SampleType_Mono)"
+nth = 2
+reason = "the three sample types are the enumeration"
+
+[[exclude]]
+file = "alxAudioPlayer.c"
+function = "AlxAudioPlayer_GetSample"
+kind = "block"
+line = "else"
+nth = 4
+reason = "the three sample types above are the enumeration"
+
+[[exclude]]
+file = "alxAudioPlayer.c"
+kind = "branches"
+line = "else if (sampleType == AlxAudioPlayer_SampleType_Mono)"
+nth = 3
+reason = "the three sample types are the enumeration"
+
+[[exclude]]
+file = "alxAudioPlayer.c"
+function = "AlxAudioPlayer_GetSample"
+kind = "block"
+line = "else"
+nth = 6
+reason = "the three sample types above are the enumeration"
+
+# alxBool.c
+
+[[exclude]]
+file = "alxBool.c"
+kind = "branches"
+line = "else if((me->trueShortTime_ms <= me->trueTime_ms) && (me->trueTime_ms < me->trueLongTime_ms))"
+reason = "the first comparison restates the branch before"
+
+[[exclude]]
+file = "alxBool.c"
+kind = "branches"
+line = "else if(me->trueLongTime_ms <= me->trueTime_ms)"
+reason = "the comparison restates the two branches before"
+
+[[exclude]]
+file = "alxBool.c"
+kind = "block"
+line = "else"
+nth = 1
+reason = "the three comparisons before cover every time"
+
+[[exclude]]
+file = "alxBool.c"
+kind = "branches"
+line = "else if(me->valFiltered == false)"
+reason = "the comparison restates the branch before"
+
+[[exclude]]
+file = "alxBool.c"
+kind = "branches"
+line = "else if((me->falseShortTime_ms <= me->falseTime_ms) && (me->falseTime_ms < me->falseLongTime_ms))"
+reason = "the first comparison restates the branch before"
+
+[[exclude]]
+file = "alxBool.c"
+kind = "branches"
+line = "else if(me->falseLongTime_ms <= me->falseTime_ms)"
+reason = "the comparison restates the two branches before"
+
+[[exclude]]
+file = "alxBool.c"
+kind = "block"
+line = "else"
+nth = 2
+reason = "the three comparisons before cover every time"
+
+[[exclude]]
+file = "alxBool.c"
+kind = "block"
+line = "else"
+nth = 3
+reason = "a bool is true or false"
+
+# alxCli.c
+
+[[exclude]]
+file = "alxCli.c"
+kind = "branches"
+line = "while (1)"
+nth = 1
+reason = "a constant condition has no false side"
+
+[[exclude]]
+file = "alxCli.c"
+kind = "branches"
+line = "if (isImplemented == false)"
+reason = "the weak Help callback answers false; a product's own answers true"
+
+[[exclude]]
+file = "alxCli.c"
+kind = "branches"
+line = "while (1)"
+nth = 2
+reason = "a constant condition has no false side"
+
+[[exclude]]
+file = "alxCli.c"
+kind = "block"
+line = "if (wasCmdHandled)"
+reason = "the weak Handle callback answers false; a product's own answers true"
+
+# alxFsSafe.c
+
+[[exclude]]
+file = "alxFsSafe.c"
+kind = "branches"
+line = "else if (validA && validB && crcA != crcB)"
+reason = "with both copies valid the branch before took the equal CRCs"
+
+[[exclude]]
+file = "alxFsSafe.c"
+kind = "branches"
+line = "else if (validA && validB == false)"
+reason = "with copy A valid the branches before took copy B valid"
+
+[[exclude]]
+file = "alxFsSafe.c"
+kind = "branches"
+line = "else if (validA == false && validB)"
+reason = "the branches before leave only copy A invalid and copy B valid"
+
+[[exclude]]
+file = "alxFsSafe.c"
+function = "AlxFsSafe_File_Read"
+kind = "block"
+line = "else"
+nth = 5
+reason = "the six branches before cover every validity of the original and the copies"
+
+# alxId.c
+
+[[exclude]]
+file = "alxId.c"
+kind = "branches"
+line = "while (true)"
+reason = "a constant condition has no false side"
+
+# alxLin.c
+
+[[exclude]]
+file = "alxLin.c"
+kind = "branches"
+line = "while (1)"
+reason = "a constant condition has no false side"
+
+# alxMemSafe.c
+
+[[exclude]]
+file = "alxMemSafe.c"
+kind = "branches"
+line = "else if ((me->isCopyAValid == true) && (me->isCopyBValid == true) && (me->crcCopyA != me->crcCopyB))"
+reason = "with both copies valid the branch before took the equal CRCs"
+
+[[exclude]]
+file = "alxMemSafe.c"
+kind = "branches"
+line = "else if ((me->isCopyAValid == true) && (me->isCopyBValid == false))"
+reason = "with copy A valid the two branches before took copy B valid"
+
+[[exclude]]
+file = "alxMemSafe.c"
+kind = "branches"
+line = "else if ((me->isCopyAValid == false) && (me->isCopyBValid == true))"
+reason = "the branches before leave only copy A invalid and copy B valid"
+
+[[exclude]]
+file = "alxMemSafe.c"
+function = "AlxMemSafe_Read"
+kind = "block"
+line = "else"
+nth = 2
+reason = "the five branches before cover every validity of the two copies"
+
+# alxParamGroup.c
+
+[[exclude]]
+file = "alxParamGroup.c"
+kind = "block"
+line = "default:"
+reason = "AlxMemSafe_Read answers one of the six cases above"
+
+# alxParamItem.c
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetValToDef"
+kind = "branches"
+line = "else if (me->dataType == AlxParamItem_Str)"
+reason = "the thirteen data types are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetValToDef"
+kind = "block"
+line = "else"
+reason = "the thirteen data types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_GetVal_StrFormat"
+kind = "branches"
+line = "else if (me->dataType == AlxParamItem_Arr)"
+reason = "a string returned above; the thirteen data types are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_GetVal_StrFormat"
+kind = "block"
+line = "else if (me->dataType == AlxParamItem_Str)"
+reason = "a string returned above; the thirteen data types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_GetVal_StrFormat"
+kind = "block"
+line = "else"
+nth = 2
+reason = "a string returned above; the thirteen data types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetVal_StrFormat"
+kind = "branches"
+line = "else if (me->dataType == AlxParamItem_Str)"
+reason = "the thirteen data types are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetVal_StrFormat"
+kind = "block"
+line = "else"
+nth = 2
+reason = "the thirteen data types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+kind = "block"
+line = "if (buff == NULL)"
+reason = "calloc of a value's length does not fail on the host"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_AreEnumArrValFromLowToHigh"
+kind = "branches"
+line = "else if (me->dataType == AlxParamItem_Double)"
+reason = "Bool, Arr and Str declare no enum list"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_AreEnumArrValFromLowToHigh"
+kind = "block"
+line = "else if (me->dataType == AlxParamItem_Bool)"
+reason = "Bool, Arr and Str declare no enum list; the ten types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_AreEnumArrValFromLowToHigh"
+kind = "block"
+line = "else if (me->dataType == AlxParamItem_Arr)"
+reason = "Bool, Arr and Str declare no enum list; the ten types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_AreEnumArrValFromLowToHigh"
+kind = "block"
+line = "else if (me->dataType == AlxParamItem_Str)"
+reason = "Bool, Arr and Str declare no enum list; the ten types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_AreEnumArrValFromLowToHigh"
+kind = "block"
+line = "else"
+reason = "Bool, Arr and Str declare no enum list; the ten types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_IsEnumOnList"
+kind = "branches"
+line = "else if (me->dataType == AlxParamItem_Double)"
+reason = "Bool, Arr and Str declare no enum list"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_IsEnumOnList"
+kind = "block"
+line = "else if (me->dataType == AlxParamItem_Bool)"
+reason = "Bool, Arr and Str declare no enum list; the ten types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_IsEnumOnList"
+kind = "block"
+line = "else if (me->dataType == AlxParamItem_Arr)"
+reason = "Bool, Arr and Str declare no enum list; the ten types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_IsEnumOnList"
+kind = "block"
+line = "else if (me->dataType == AlxParamItem_Str)"
+reason = "Bool, Arr and Str declare no enum list; the ten types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_IsEnumOnList"
+kind = "block"
+line = "else"
+reason = "Bool, Arr and Str declare no enum list; the ten types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+kind = "block"
+line = "if (oldValPtr == NULL)"
+reason = "calloc of a value's length does not fail on the host"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetVal"
+kind = "block"
+line = "else if (me->dataType == AlxParamItem_Bool)"
+nth = 1
+reason = "a bool is set before the handle is read"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetVal"
+kind = "branches"
+line = "else if (me->dataType == AlxParamItem_Str)"
+nth = 1
+reason = "the thirteen data types are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetVal"
+kind = "block"
+line = "else"
+nth = 2
+reason = "the thirteen data types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+kind = "branches"
+line = "else if (me->valOutOfRangeHandle == AlxParamItem_Bound)"
+reason = "the three handles are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetVal"
+kind = "block"
+line = "else if (me->dataType == AlxParamItem_Bool)"
+nth = 2
+reason = "a bool is set before the handle is read"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetVal"
+kind = "branches"
+line = "else if (me->dataType == AlxParamItem_Str)"
+nth = 2
+reason = "the thirteen data types are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetVal"
+kind = "block"
+line = "else"
+nth = 3
+reason = "the thirteen data types above are the enumeration"
+
+[[exclude]]
+file = "alxParamItem.c"
+function = "AlxParamItem_SetVal"
+kind = "block"
+line = "else"
+nth = 4
+reason = "the three handles above are the enumeration"
+
+# alxParamStore.c
+
+[[exclude]]
+file = "alxParamStore.c"
+kind = "branches"
+line = "else if(AlxParamGroup_IsWriteErr(me->paramGroupArr[0]))"
+reason = "a blocking write is done or in error by the next handle"
+
+[[exclude]]
+file = "alxParamStore.c"
+function = "AlxParamStore_Handle_1xGroup"
+kind = "block"
+line = "default:"
+reason = "the state is the module's own and holds one of the values above"
+
+[[exclude]]
+file = "alxParamStore.c"
+kind = "branches"
+line = "else if (AlxParamGroup_IsWriteErr(me->paramGroupArr[0]))"
+reason = "a blocking write is done or in error by the next handle"
+
+[[exclude]]
+file = "alxParamStore.c"
+kind = "branches"
+line = "else if (AlxParamGroup_IsWriteErr(me->paramGroupArr[1]))"
+reason = "a blocking write is done or in error by the next handle"
+
+[[exclude]]
+file = "alxParamStore.c"
+function = "AlxParamStore_Handle_2xGroup"
+kind = "block"
+line = "default:"
+reason = "the state is the module's own and holds one of the values above"
+
+# alxRtc_Global.c
+
+[[exclude]]
+file = "alxRtc_Global.c"
+kind = "branches"
+line = "while (1)"
+reason = "a constant condition has no false side"
+
+[[exclude]]
+file = "alxRtc_Global.c"
+kind = "branches"
+line = "for (dateTime.mo = 0; dateTime.mo < 12; dateTime.mo++)"
+reason = "the loop leaves by its break, a month is always found"
+
+# alxTempSensRtdVdiv.c
+
+[[exclude]]
+file = "alxTempSensRtdVdiv.c"
+kind = "lines"
+line = "return rtdTemp_degC;"
+reason = "unreachable after the return above"

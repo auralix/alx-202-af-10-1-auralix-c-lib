@@ -1,0 +1,113 @@
+/**
+  ******************************************************************************
+  * @file		alxAdxl355TestHelpers.c
+  * @brief		Auralix C Library - ALX ADXL355 Accelerometer - PC Unit Test Helpers
+  * @copyright	Copyright (C) Auralix d.o.o. All rights reserved.
+  *
+  * The driver keeps a POINTER to its SPI bus, so the helper owns one next to
+  * the accelerometer. The bus is the SPI fake: it records every byte sent and
+  * answers from a queue the test fills the way the part would.
+  *
+  * The driver's weak RegStruct_SetVal default asserts, so this helper is the
+  * application here and keeps every default the driver set: the +-2 g range,
+  * the part's own filter and FIFO settings.
+  ******************************************************************************
+  **/
+
+//******************************************************************************
+// Includes
+//******************************************************************************
+#include "alxAdxl355.h"
+#include <stdlib.h>
+
+
+//******************************************************************************
+// Private Types
+//******************************************************************************
+typedef struct
+{
+	AlxAdxl355 adxl;
+	AlxSpi spi;
+} AlxAdxl355Test_Obj;
+
+
+//******************************************************************************
+// Prototypes - the DLL export surface (no separate header for test helpers)
+//******************************************************************************
+AlxAdxl355Test_Obj* AlxAdxl355Test_New(void);
+void AlxAdxl355Test_Delete(AlxAdxl355Test_Obj* me);
+AlxAdxl355* AlxAdxl355Test_Adxl(AlxAdxl355Test_Obj* me);
+Alx_Status AlxAdxl355Test_GetXyz_g(AlxAdxl355Test_Obj* me, float* x_g, float* y_g, float* z_g);
+Alx_Status AlxAdxl355Test_GetFifoXyz_g(AlxAdxl355Test_Obj* me, uint8_t len, float* xyz_g);
+Alx_Status AlxAdxl355Test_GetStatusRaw(AlxAdxl355Test_Obj* me, uint8_t* raw);
+void AlxAdxl355Test_SetRange(AlxAdxl355Test_Obj* me, uint8_t range);
+int32_t AlxAdxl355Test_Status_Ok(void);
+int32_t AlxAdxl355Test_Status_Err(void);
+
+// The application hook the driver declares in its .c and this helper defines
+void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me);
+
+
+//******************************************************************************
+// Functions
+//******************************************************************************
+AlxAdxl355Test_Obj* AlxAdxl355Test_New(void)
+{
+	AlxAdxl355Test_Obj* me = (AlxAdxl355Test_Obj*)calloc(1, sizeof(AlxAdxl355Test_Obj));
+	if (me == NULL) { return NULL; }
+	AlxAdxl355_Ctor(&me->adxl, &me->spi, 3, 10);
+	return me;
+}
+
+void AlxAdxl355Test_Delete(AlxAdxl355Test_Obj* me)
+{
+	free(me);
+}
+
+AlxAdxl355* AlxAdxl355Test_Adxl(AlxAdxl355Test_Obj* me)		{ return &me->adxl; }
+int32_t AlxAdxl355Test_Status_Ok(void)							{ return (int32_t)Alx_Ok; }
+int32_t AlxAdxl355Test_Status_Err(void)						{ return (int32_t)Alx_Err; }
+
+Alx_Status AlxAdxl355Test_GetXyz_g(AlxAdxl355Test_Obj* me, float* x_g, float* y_g, float* z_g)
+{
+	AlxAdxl355_Xyz_g xyz = {};
+	Alx_Status status = AlxAdxl355_GetXyz_g(&me->adxl, &xyz);
+	*x_g = xyz.x_g;
+	*y_g = xyz.y_g;
+	*z_g = xyz.z_g;
+	return status;
+}
+Alx_Status AlxAdxl355Test_GetFifoXyz_g(AlxAdxl355Test_Obj* me, uint8_t len, float* xyz_g)
+{
+	// len samples out of the FIFO, as x, y, z triples (A97)
+	AlxAdxl355_Xyz_g xyz[32] = {};
+	Alx_Status status = AlxAdxl355_GetFifoXyz_g(&me->adxl, xyz, len);
+	for (uint32_t i = 0; i < len; i++)
+	{
+		xyz_g[3 * i + 0] = xyz[i].x_g;
+		xyz_g[3 * i + 1] = xyz[i].y_g;
+		xyz_g[3 * i + 2] = xyz[i].z_g;
+	}
+	return status;
+}
+Alx_Status AlxAdxl355Test_GetStatusRaw(AlxAdxl355Test_Obj* me, uint8_t* raw)
+{
+	AlxAdxl355_RegVal_0x04_Status statusReg = {};
+	Alx_Status status = AlxAdxl355_GetStatusReg(&me->adxl, &statusReg);
+	*raw = statusReg.raw;
+	return status;
+}
+void AlxAdxl355Test_SetRange(AlxAdxl355Test_Obj* me, uint8_t range)
+{
+	// The full-scale range the conversion reads - what a product's register hook decides (A97)
+	me->adxl.reg._0x2C_Range.val.Range = (AlxAdxl355_RegEnum_0x2C_Range)range;
+}
+
+
+//******************************************************************************
+// The application hook the driver requires
+//******************************************************************************
+void AlxAdxl355_RegStruct_SetVal(AlxAdxl355* me)
+{
+	(void)me;	// this application keeps every default the driver set
+}
