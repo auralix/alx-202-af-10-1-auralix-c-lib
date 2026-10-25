@@ -167,7 +167,7 @@ void AlxBool_Update(AlxBool* me, bool val)
 			me->isTrueForLongTime = false;
 		}
 		// Up to long time
-		else if((me->trueShortTime_ms <= me->trueTime_ms) && (me->trueTime_ms < me->trueLongTime_ms))	// LCOV_EXCL_BR_LINE: the first comparison restates the branch before
+		else if((me->trueShortTime_ms <= me->trueTime_ms) && (me->trueTime_ms < me->trueLongTime_ms))
 		{
 			me->isTrueUpToShortTime = false;
 			me->isTrueUpToLongTime = true;
@@ -175,7 +175,7 @@ void AlxBool_Update(AlxBool* me, bool val)
 			me->wasTrueForShortTime = true;
 		}
 		// Long time
-		else if(me->trueLongTime_ms <= me->trueTime_ms)	// LCOV_EXCL_BR_LINE: the comparison restates the two branches before
+		else if(me->trueLongTime_ms <= me->trueTime_ms)
 		{
 			me->isTrueUpToShortTime = false;
 			me->isTrueUpToLongTime = false;
@@ -183,12 +183,12 @@ void AlxBool_Update(AlxBool* me, bool val)
 			me->wasTrueForLongTime = true;
 		}
 		// Assert
-		else	// LCOV_EXCL_START: the three comparisons before cover every time
+		else
 		{
 			ALX_BOOL_ASSERT(false);	// We should never get here
-		}	// LCOV_EXCL_STOP: the else above
+		}
 	}
-	else if(me->valFiltered == false)	// LCOV_EXCL_BR_LINE: the comparison restates the branch before
+	else if(me->valFiltered == false)
 	{
 		//------------------------------------------------------------------------------
 		// Clear True variables
@@ -225,7 +225,7 @@ void AlxBool_Update(AlxBool* me, bool val)
 			me->isFalseForLongTime = false;
 		}
 		// Up to long time
-		else if((me->falseShortTime_ms <= me->falseTime_ms) && (me->falseTime_ms < me->falseLongTime_ms))	// LCOV_EXCL_BR_LINE: the first comparison restates the branch before
+		else if((me->falseShortTime_ms <= me->falseTime_ms) && (me->falseTime_ms < me->falseLongTime_ms))
 		{
 			me->isFalseUpToShortTime = false;
 			me->isFalseUpToLongTime = true;
@@ -233,7 +233,7 @@ void AlxBool_Update(AlxBool* me, bool val)
 			me->wasFalseForShortTime = true;
 		}
 		// Long time
-		else if(me->falseLongTime_ms <= me->falseTime_ms)	// LCOV_EXCL_BR_LINE: the comparison restates the two branches before
+		else if(me->falseLongTime_ms <= me->falseTime_ms)
 		{
 			me->isFalseUpToShortTime = false;
 			me->isFalseUpToLongTime = false;
@@ -241,15 +241,15 @@ void AlxBool_Update(AlxBool* me, bool val)
 			me->wasFalseForLongTime = true;
 		}
 		// Assert
-		else	// LCOV_EXCL_START: the three comparisons before cover every time
+		else
 		{
 			ALX_BOOL_ASSERT(false);	// We should never get here
-		}	// LCOV_EXCL_STOP: the else above
+		}
 	}
-	else	// LCOV_EXCL_START: a bool is true or false
+	else
 	{
 		ALX_BOOL_ASSERT(false);	// We should never get here
-	}	// LCOV_EXCL_STOP: the else above
+	}
 }
 
 /**

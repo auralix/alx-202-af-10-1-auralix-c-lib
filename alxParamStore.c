@@ -250,7 +250,7 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 			}
 
 			// #2 Transition
-			else if(AlxParamGroup_IsWriteErr(me->paramGroupArr[0]))	// LCOV_EXCL_BR_LINE: a blocking write is done or in error by the next handle
+			else if(AlxParamGroup_IsWriteErr(me->paramGroupArr[0]))
 			{
 				// #2.1 Change state
 				me->st = AlxParamStore_St_Err;
@@ -264,14 +264,14 @@ static void AlxParamStore_Handle_1xGroup(AlxParamStore* me)
 			// #4 Break
 			break;
 		}
-		default:	// LCOV_EXCL_START: the state is the module's own and holds one of the values above
+		default:
 		{
 			// #1 Assert
-			ALX_PARAM_STORE_ASSERT(false);	// We should never get here
+			ALX_PARAM_STORE_ASSERT(false); 	// We should never get here
 
 			// #2 Break
 			break;
-		}	// LCOV_EXCL_STOP: the default above
+		}
 	}
 }
 static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
@@ -350,7 +350,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 			}
 
 			// #2 Transition
-			else if (AlxParamGroup_IsWriteErr(me->paramGroupArr[0]))	// LCOV_EXCL_BR_LINE: a blocking write is done or in error by the next handle
+			else if (AlxParamGroup_IsWriteErr(me->paramGroupArr[0]))
 			{
 				// #2.1 Change state
 				me->st = AlxParamStore_St_Err;
@@ -412,7 +412,7 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 			}
 
 			// #2 Transition
-			else if (AlxParamGroup_IsWriteErr(me->paramGroupArr[1]))	// LCOV_EXCL_BR_LINE: a blocking write is done or in error by the next handle
+			else if (AlxParamGroup_IsWriteErr(me->paramGroupArr[1]))
 			{
 				// #2.1 Change state
 				me->st = AlxParamStore_St_Err;
@@ -426,14 +426,14 @@ static void AlxParamStore_Handle_2xGroup(AlxParamStore* me)
 			// #4 Break
 			break;
 		}
-		default:	// LCOV_EXCL_START: the state is the module's own and holds one of the values above
+		default:
 		{
 			// #1 Assert
 			ALX_PARAM_STORE_ASSERT(false);	// We should never get here
 
 			// #2 Break
 			break;
-		}	// LCOV_EXCL_STOP: the default above
+		}
 	}
 }
 static void AlxParamStore_Handle_4xGroup(AlxParamStore* me)

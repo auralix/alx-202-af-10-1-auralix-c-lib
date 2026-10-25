@@ -199,8 +199,7 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 		// Status
 		status = AlxSafe_BothCopyOkCrcSame_OrigDontCare_UseCopyA;
 	}
-	else if (validA && validB && crcA != crcB)	// LCOV_EXCL_BR_LINE: with both copies valid the branch before took the equal CRCs
-	// Both Copy OK & CRC Different and Original Don't Care -> Use CopyA and update CopyB with CopyA, CopyA is used because we always write CopyA first and update
+	else if (validA && validB && crcA != crcB)	// Both Copy OK & CRC Different and Original Don't Care -> Use CopyA and update CopyB with CopyA, CopyA is used because we always write CopyA first and update
 	{
 		// Trace
 		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'Both Copy OK & CRC Different and Original Don't Care -> Use CopyA and update CopyB with CopyA'");
@@ -219,8 +218,7 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 		// Status
 		status = AlxSafe_BothCopyOkCrcDiff_OrigDontCare_UseCopyA;
 	}
-	else if (validA && validB == false)	// LCOV_EXCL_BR_LINE: with copy A valid the branches before took copy B valid
-	// CopyA OK, CopyB ERR and Original Don't Care -> Use CopyA and update CopyB with CopyA
+	else if (validA && validB == false)	// CopyA OK, CopyB ERR and Original Don't Care -> Use CopyA and update CopyB with CopyA
 	{
 		// Trace
 		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'CopyA OK, CopyB ERR and Original Don't Care -> Use CopyA and update CopyB with CopyA'");
@@ -239,8 +237,7 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 		// Status
 		status = AlxSafe_CopyAOkCopyBErr_OrigDontCare_UseCopyA;
 	}
-	else if (validA == false && validB)	// LCOV_EXCL_BR_LINE: the branches before leave only copy A invalid and copy B valid
-	// CopyA ERR, CopyB OK and Original Don't Care -> Use CopyB and update CopyA with CopyB
+	else if (validA == false && validB)	// CopyA ERR, CopyB OK and Original Don't Care -> Use CopyB and update CopyA with CopyB
 	{
 		// Trace
 		ALX_FS_SAFE_TRACE_INF("AlxFsSafe_File_Read - DONE: CheckValidity() 'CopyA ERR, CopyB OK and Original Don't Care -> Use CopyB and update CopyA with CopyB'");
@@ -259,11 +256,11 @@ Alx_Status AlxFsSafe_File_Read(AlxFsSafe* me, const char* path, void* data, uint
 		// Status
 		status = AlxSafe_CopyAErrCopyBOk_OrigDontCare_UseCopyB;
 	}
-	else	// LCOV_EXCL_START: the six branches before cover every validity of the original and the copies
+	else
 	{
 		ALX_FS_SAFE_ASSERT(false);	// We should never get here
 		return Alx_Err;
-	}	// LCOV_EXCL_STOP: the else above
+	}
 
 
 	//------------------------------------------------------------------------------

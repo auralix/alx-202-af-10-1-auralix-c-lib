@@ -391,7 +391,7 @@ void AlxVnh7040_SetDuty_permil(AlxVnh7040* me, int16_t duty_permil)
 		me->status = AlxVnh7040_Status_RotateCw;
 	}
 	// #3 Rotate Counter-Clockwise
-	else if (duty_permil < 0)	// LCOV_EXCL_BR_LINE: a duty that is neither zero nor positive is negative
+	else if (duty_permil < 0)
 	{
 		me->duty_permil = duty_permil * (-1);
 		me->do_PWM_val = true;
@@ -591,10 +591,10 @@ static void AlxVnh7040_Monitoring (AlxVnh7040* me)
 			AlxVnh7040_Monitoring_Select_HSA (me);
 			break;
 
-			default:	// LCOV_EXCL_START: the quantity selected is the module's own and holds one of the four values above
+			default:
 				ALX_VNH7040_ASSERT (false);  // We should never get here
 				break;
-		}	// LCOV_EXCL_STOP: the default above
+		}
 	}
 }
 

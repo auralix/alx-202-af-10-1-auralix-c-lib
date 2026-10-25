@@ -132,7 +132,7 @@ void AlxId_Ctor
 	if (me->fwIsBootUsed)
 	{
 		// Do
-		while (true)	// LCOV_EXCL_BR_LINE: a constant condition has no false side
+		while (true)
 		{
 			// Init fwBootId
 			memset(&me->fwBootId, 0, sizeof(me->fwBootId));

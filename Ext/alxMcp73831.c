@@ -140,14 +140,14 @@ AlxMcp73831_St AlxMcp73831_GetSt(AlxMcp73831* me)
 		{
 			me->st = AlxMcp73831_St_Shutdown;
 		}
-		else if (me->di_STAT_TriStateVal == AlxIoPin_TriState_Undefined)	// LCOV_EXCL_BR_LINE: the four tri-states are the enumeration
+		else if (me->di_STAT_TriStateVal == AlxIoPin_TriState_Undefined)
 		{
 			me->st = AlxMcp73831_St_Err;
 		}
-		else	// LCOV_EXCL_START: the four tri-states above are the enumeration
+		else
 		{
 			ALX_MCP73831_ASSERT(false);	// We should never get here
-		}	// LCOV_EXCL_STOP: the else above
+		}
 	}
 	else
 	{

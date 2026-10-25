@@ -770,16 +770,16 @@ static AlxAdxl355_Xyz_g AlxAdxl355_ConvertXyz(AlxAdxl355* me, AlxAdxl355_Xyz_20b
 			rangeFactor = 0.0000039f;
 			break;
 		}
-		case Range_4g096:	// LCOV_EXCL_START: A93: on this host the 2-bit enumeration field reads 0b10 as -2 and 0b11 as -1, so this case never matches (P798)
+		case Range_4g096:
 		{
 			rangeFactor = 0.0000078f;
 			break;
-		}	// LCOV_EXCL_STOP: the case above
-		case Range_8g192:	// LCOV_EXCL_START: A93: on this host the 2-bit enumeration field reads 0b10 as -2 and 0b11 as -1, so this case never matches (P798)
+		}
+		case Range_8g192:
 		{
 			rangeFactor = 0.0000156f;
 			break;
-		}	// LCOV_EXCL_STOP: the case above
+		}
 		case Range_Reserved:
 		default:
 		{

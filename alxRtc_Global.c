@@ -285,7 +285,7 @@ AlxRtc_DateTime AlxRtc_UnixTimeNsToDateTime(uint64_t unixTime_ns)
 
 	// Set yr
 	uint16_t year = 1970u;
-	while (1)	// LCOV_EXCL_BR_LINE: a constant condition has no false side
+	while (1)
 	{
 		if(ALX_RTC_LEAP_YEAR(year))
 		{
@@ -312,7 +312,7 @@ AlxRtc_DateTime AlxRtc_UnixTimeNsToDateTime(uint64_t unixTime_ns)
 	dateTime.yr = (uint8_t)(year - 2000u);	// Set yr in xx format
 
 	// Set mo
-	for (dateTime.mo = 0; dateTime.mo < 12; dateTime.mo++)	// LCOV_EXCL_BR_LINE: the loop leaves by its break, a month is always found
+	for (dateTime.mo = 0; dateTime.mo < 12; dateTime.mo++)
 	{
 		if (ALX_RTC_LEAP_YEAR(year))
 		{

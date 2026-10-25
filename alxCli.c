@@ -151,7 +151,7 @@ void AlxCli_Handle(AlxCli* me)
 		//------------------------------------------------------------------------------
 		// Handle
 		//------------------------------------------------------------------------------
-		while (1)	// LCOV_EXCL_BR_LINE: a constant condition has no false side
+		while (1)
 		{
 			//------------------------------------------------------------------------------
 			// Help Command
@@ -196,7 +196,7 @@ void AlxCli_Handle(AlxCli* me)
 				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"set-param\":\"Set Parameter Command - Sets specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\"");
 				ALX_CLI_ASSERT(status == Alx_Ok);
 				bool isImplemented = AlxCli_Help_Callback(me);
-				if (isImplemented == false)	// LCOV_EXCL_BR_LINE: the weak Help callback answers false; a product's own answers true
+				if (isImplemented == false)
 				{
 					status = AlxSerialPort_WriteStr(me->alxSerialPort, "\r\n");
 					ALX_CLI_ASSERT(status == Alx_Ok);
@@ -520,7 +520,7 @@ void AlxCli_Handle(AlxCli* me)
 				//------------------------------------------------------------------------------
 				// Handle
 				//------------------------------------------------------------------------------
-				while (1)	// LCOV_EXCL_BR_LINE: a constant condition has no false side
+				while (1)
 				{
 					//------------------------------------------------------------------------------
 					// Parse
@@ -583,10 +583,10 @@ void AlxCli_Handle(AlxCli* me)
 			// Callback
 			//------------------------------------------------------------------------------
 			bool wasCmdHandled = AlxCli_Handle_Callback(me);
-			if (wasCmdHandled)	// LCOV_EXCL_BR_LINE: the weak Handle callback answers false; a product's own answers true
-			{	// LCOV_EXCL_START: the weak Handle callback answers false; a product's own answers true
+			if (wasCmdHandled)
+			{
 				break;
-			}	// LCOV_EXCL_STOP: the branch above
+			}
 
 
 			//------------------------------------------------------------------------------

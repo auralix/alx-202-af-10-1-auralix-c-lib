@@ -1365,15 +1365,15 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 		return;
 	}
-	else if (me->dataType == AlxParamItem_Str)	// LCOV_EXCL_BR_LINE: the thirteen data types are the enumeration
+	else if (me->dataType == AlxParamItem_Str)
 	{
 		valDefPtr =  me->valDef.str;
 	}
-	else	// LCOV_EXCL_START: the thirteen data types above are the enumeration
+	else
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 		return;
-	}	// LCOV_EXCL_STOP: the else above
+	}
 
 	// Set
 	ALX_UNUSED Alx_Status status = AlxParamItem_SetVal(me, valDefPtr);
@@ -1942,18 +1942,18 @@ Alx_Status AlxParamItem_GetVal_StrFormat(AlxParamItem* me, char* val, uint32_t m
 			strcpy(valStr, "false");
 		}
 	}
-	else if (me->dataType == AlxParamItem_Arr)	// LCOV_EXCL_BR_LINE: a string returned above; the thirteen data types are the enumeration
+	else if (me->dataType == AlxParamItem_Arr)
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
-	else if (me->dataType == AlxParamItem_Str)	// LCOV_EXCL_START: a string returned above; the thirteen data types above are the enumeration
+	else if (me->dataType == AlxParamItem_Str)
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
 	else
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-	}	// LCOV_EXCL_STOP: the else above
+	}
 
 
 	//------------------------------------------------------------------------------
@@ -2166,15 +2166,15 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 	}
-	else if (me->dataType == AlxParamItem_Str)	// LCOV_EXCL_BR_LINE: the thirteen data types are the enumeration
+	else if (me->dataType == AlxParamItem_Str)
 	{
 		// Set
 		status = AlxParamItem_SetVal(me, val);
 	}
-	else	// LCOV_EXCL_START: the thirteen data types above are the enumeration
+	else
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-	}	// LCOV_EXCL_STOP: the else above
+	}
 
 
 	//------------------------------------------------------------------------------
@@ -2227,12 +2227,12 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 
 	// Allocate memory
 	buff = calloc(buffLen, sizeof(uint8_t));
-	if (buff == NULL)	// LCOV_EXCL_BR_LINE: calloc of a value's length does not fail on the host
-	{	// LCOV_EXCL_START: calloc of a value's length does not fail on the host
+	if (buff == NULL)
+	{
 		free(buff);
 		ALX_PARAM_ITEM_TRACE_ERR("FAIL: calloc()");
 		return Alx_Err;
-	}	// LCOV_EXCL_STOP: the branch above
+	}
 
 
 	//------------------------------------------------------------------------------
@@ -2536,7 +2536,7 @@ static bool AlxParamItem_AreEnumArrValFromLowToHigh(AlxParamItem* me)
 				return false;
 			}
 		}
-		else if (me->dataType == AlxParamItem_Double)	// LCOV_EXCL_BR_LINE: Bool, Arr and Str declare no enum list
+		else if (me->dataType == AlxParamItem_Double)
 		{
 			// Dereference
 			double _enumArrValCurrent = *((double*)me->enumArr + i);
@@ -2548,7 +2548,7 @@ static bool AlxParamItem_AreEnumArrValFromLowToHigh(AlxParamItem* me)
 				return false;
 			}
 		}
-		else if (me->dataType == AlxParamItem_Bool)	// LCOV_EXCL_START: Bool, Arr and Str declare no enum list; the ten types above are the enumeration
+		else if (me->dataType == AlxParamItem_Bool)
 		{
 			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 		}
@@ -2563,7 +2563,7 @@ static bool AlxParamItem_AreEnumArrValFromLowToHigh(AlxParamItem* me)
 		else
 		{
 			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-		}	// LCOV_EXCL_STOP: the else above
+		}
 	}
 
 	// If we are here, enum array values are from low to high, so return true
@@ -2682,7 +2682,7 @@ static bool AlxParamItem_IsEnumOnList(AlxParamItem* me, void* enumVal)
 				return true;
 			}
 		}
-		else if (me->dataType == AlxParamItem_Double)	// LCOV_EXCL_BR_LINE: Bool, Arr and Str declare no enum list
+		else if (me->dataType == AlxParamItem_Double)
 		{
 			// Dereference
 			double _enumVal = *(double*)enumVal;
@@ -2694,7 +2694,7 @@ static bool AlxParamItem_IsEnumOnList(AlxParamItem* me, void* enumVal)
 				return true;
 			}
 		}
-		else if (me->dataType == AlxParamItem_Bool)	// LCOV_EXCL_START: Bool, Arr and Str declare no enum list; the ten types above are the enumeration
+		else if (me->dataType == AlxParamItem_Bool)
 		{
 			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 		}
@@ -2709,7 +2709,7 @@ static bool AlxParamItem_IsEnumOnList(AlxParamItem* me, void* enumVal)
 		else
 		{
 			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-		}	// LCOV_EXCL_STOP: the else above
+		}
 	}
 
 	// If we are here, enum value was not found on the list, so return false
@@ -2779,12 +2779,12 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 
 	// Allocate memory
 	oldValPtr = calloc(oldValLen, sizeof(uint8_t));
-	if (oldValPtr == NULL)	// LCOV_EXCL_BR_LINE: calloc of a value's length does not fail on the host
-	{	// LCOV_EXCL_START: calloc of a value's length does not fail on the host
+	if (oldValPtr == NULL)
+	{
 		free(oldValPtr);
 		ALX_PARAM_ITEM_TRACE_ERR("FAIL: calloc()");
 		return Alx_Err;
-	}	// LCOV_EXCL_STOP: the branch above
+	}
 
 	// Set oldVal
 	memcpy(oldValPtr, valPtr, me->valLen);
@@ -2892,15 +2892,15 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 				me->val._double = _val;
 			}
 		}
-		else if (me->dataType == AlxParamItem_Bool)	// LCOV_EXCL_BR_LINE: a bool is set before the handle is read
-		{	// LCOV_EXCL_START: a bool is set before the handle is read
+		else if (me->dataType == AlxParamItem_Bool)
+		{
 			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-		}	// LCOV_EXCL_STOP: the branch above
+		}
 		else if (me->dataType == AlxParamItem_Arr)
 		{
 			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 		}
-		else if (me->dataType == AlxParamItem_Str)	// LCOV_EXCL_BR_LINE: the thirteen data types are the enumeration
+		else if (me->dataType == AlxParamItem_Str)
 		{
 			char* _val = (char*)val;
 			status = AlxRange_CheckStr(_val, me->buffLen);
@@ -2910,10 +2910,10 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 				me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
 			}
 		}
-		else	// LCOV_EXCL_START: the thirteen data types above are the enumeration
+		else
 		{
 			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-		}	// LCOV_EXCL_STOP: the else above
+		}
 
 		// If ValOutOfRangeHandle_Assert and status is NOT OK, assert
 		if (me->valOutOfRangeHandle == AlxParamItem_Assert && status != Alx_Ok)
@@ -2921,7 +2921,7 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 			ALX_PARAM_ITEM_ASSERT(false);
 		}
 	}
-	else if (me->valOutOfRangeHandle == AlxParamItem_Bound)	// LCOV_EXCL_BR_LINE: the three handles are the enumeration
+	else if (me->valOutOfRangeHandle == AlxParamItem_Bound)
 	{
 		// Set
 		if (me->dataType == AlxParamItem_Uint8)
@@ -2984,29 +2984,29 @@ static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
 			status = AlxBound_Double(&_val, me->valMin._double, me->valMax._double);
 			me->val._double = _val;
 		}
-		else if (me->dataType == AlxParamItem_Bool)	// LCOV_EXCL_BR_LINE: a bool is set before the handle is read
-		{	// LCOV_EXCL_START: a bool is set before the handle is read
+		else if (me->dataType == AlxParamItem_Bool)
+		{
 			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-		}	// LCOV_EXCL_STOP: the branch above
+		}
 		else if (me->dataType == AlxParamItem_Arr)
 		{
 			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
 		}
-		else if (me->dataType == AlxParamItem_Str)	// LCOV_EXCL_BR_LINE: the thirteen data types are the enumeration
+		else if (me->dataType == AlxParamItem_Str)
 		{
 			char* _val = (char*)val;
 			status = AlxBound_Str(me->val.str, _val, me->buffLen);
 			me->valLen = strlen(me->val.str) + 1;	// Add +1 for null terminator
 		}
-		else	// LCOV_EXCL_START: the thirteen data types above are the enumeration
+		else
 		{
 			ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-		}	// LCOV_EXCL_STOP: the else above
+		}
 	}
-	else	// LCOV_EXCL_START: the three handles above are the enumeration
+	else
 	{
 		ALX_PARAM_ITEM_ASSERT(false);	// We should never get here
-	}	// LCOV_EXCL_STOP: the else above
+	}
 
 
 	//------------------------------------------------------------------------------

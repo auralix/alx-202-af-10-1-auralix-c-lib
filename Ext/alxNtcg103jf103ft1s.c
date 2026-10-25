@@ -252,7 +252,7 @@ int16_t AlxNtcg103jf103ft1s_ResToTemp_degC(uint32_t res_Ohm)
 	AlxBound_Uint32(&res_Ohm, lut[LUT_LEN - 1], lut[0]);
 
 	// Loop
-	for (uint32_t i = 0; i < LUT_LEN; i++)	// LCOV_EXCL_BR_LINE: the bound above puts the resistance inside the table, so the loop returns
+	for (uint32_t i = 0; i < LUT_LEN; i++)
 	{
 		if (res_Ohm >= lut[i])
 		{
@@ -261,9 +261,9 @@ int16_t AlxNtcg103jf103ft1s_ResToTemp_degC(uint32_t res_Ohm)
 	}
 
 	// Assert
-	ALX_NTCG103JF103FT1S_ASSERT(false);	// We should never get here	// LCOV_EXCL_START: the loop above returns
+	ALX_NTCG103JF103FT1S_ASSERT(false);	// We should never get here
 	return 0;
-}	// LCOV_EXCL_STOP: the lines above
+}
 
 
 #endif	// #if defined(ALX_C_LIB)

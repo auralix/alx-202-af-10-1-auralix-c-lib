@@ -672,11 +672,11 @@ Alx_Status AlxPcal6416a_IoPin_Read_TriState(AlxPcal6416a* me, uint8_t port, uint
 	{
 		*val = AlxIoPin_TriState_HiZ;
 	}
-	else if ((valPullUp == true) && (valPullDown == true))	// LCOV_EXCL_BR_LINE: the branch before took the pull-up alone
+	else if ((valPullUp == true) && (valPullDown == true))
 	{
 		*val = AlxIoPin_TriState_Hi;
 	}
-	else if ((valPullUp == false) && (valPullDown == false))	// LCOV_EXCL_BR_LINE: the two branches before took every reading high under the pull-up
+	else if ((valPullUp == false) && (valPullDown == false))
 	{
 		*val = AlxIoPin_TriState_Lo;
 	}

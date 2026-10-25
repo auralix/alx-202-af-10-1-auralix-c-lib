@@ -181,7 +181,7 @@ void AlxTpa3255_Handle(AlxTpa3255* me)
 			}
 		}
 		// #4 Waiting state
-		else if(me->state == Tpa3255_St_Waiting)	// LCOV_EXCL_BR_LINE: the four states are the enumeration
+		else if(me->state == Tpa3255_St_Waiting)
 		{
 			// Transition
 			if(AlxTimSw_IsTimeout_ms(&me->tim, me->waitTime_Waitning_ms))

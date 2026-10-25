@@ -771,14 +771,14 @@ static Alx_Status AlxAdau1961_Reg_Write(AlxAdau1961* me, void* reg)
 
 	return AlxI2c_Master_StartWriteMemStop_Multi(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_16bit, regValPtr, regLen, me->i2cCheckWithRead, me->i2cNumOfTries, me->i2cTimeout_ms);
 }
-static ALX_UNUSED Alx_Status AlxAdau1961_Reg_Read(AlxAdau1961* me, void* reg)	// LCOV_EXCL_START: no caller in the module, kept under ALX_UNUSED
+static ALX_UNUSED Alx_Status AlxAdau1961_Reg_Read(AlxAdau1961* me, void* reg)
 {
 	uint16_t regAddr = *((uint16_t*)reg);
 	uint8_t regLen = *((uint8_t*)reg + sizeof(uint16_t));
 	uint8_t* regValPtr = (uint8_t*)reg + sizeof(uint16_t) + sizeof(uint8_t);
 
 	return AlxI2c_Master_StartReadMemStop(me->i2c, me->i2cAddr, regAddr, AlxI2c_Master_MemAddrLen_16bit, regValPtr, regLen, me->i2cNumOfTries, me->i2cTimeout_ms);
-}	// LCOV_EXCL_STOP: the function above
+}
 static Alx_Status AlxAdau1961_Reg_WriteNonClkVal(AlxAdau1961* me)
 {
 	Alx_Status status = AlxAdau1961_Reg_Write(me, &me->reg.R2_DigMicJackDetect);

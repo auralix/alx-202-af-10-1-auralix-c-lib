@@ -374,7 +374,7 @@ COVERAGE_FUNCTIONS = ["alxCrc.c", "alxMemSafe.c", "alxParamGroup.c", "alxId.c", 
 # metric; the gate fails until it does.
 COVERAGE_PENDING: dict[str, str] = {}
 # A97 done (goal 8, 2026-10-22): every measured file at 100% of lines, branches and functions; a line no host
-# test can reach carries an lcov exclusion marker with its reason, A93's among them (Ext/alxAds114s08.c,
+# test can reach is named in config/coverage.toml with its reason, A93's among them (Ext/alxAds114s08.c,
 # Ext/alxAdxl355.c, Ext/alxAds8678.c: the host's layout of enumeration and mixed-type bit-fields).
 UBSAN = list(hb.UBSAN)                 # the instrumented variants are the library's flag sets: one
 ASAN_UBSAN = list(hb.ASAN_UBSAN)       # definition for every C repository, not a copy per noxfile
@@ -771,15 +771,17 @@ def coverage(session: nox.Session) -> None:
     _write(out / "unmeasured.txt", "".join(f"{f}\n" for f in unmeasured))
     session.log(f"COVERAGE: {len(measured)} library files measured, {len(unmeasured)} compiled by no group "
                 f"(unmeasured.txt); html {out / 'html' / 'index.html'}")
-    # The sources are gated on the tracefile since goal 8: a line no host test can reach carries one of
-    # lcov's exclusion markers with its reason, which the gate honours and lists (the Python library's
-    # v0.18.4). Regions are not in a tracefile; with ternaries banned (c_style rule 1) and the short-
-    # circuits counted as branches, lines and branches say what regions said. The headers stay on the
-    # summary: the tracefile gives them the lines of the macros expanded in the sources.
+    # The sources are gated on the tracefile since goal 8: a line no host test can reach is named in
+    # config/coverage.toml with its reason, which the gate honours and lists (the Python library's
+    # v0.18.8); the sources carry no coverage comments. Regions are not in a tracefile; with ternaries
+    # banned (c_style rule 1) and the short-circuits counted as branches, lines and branches say what
+    # regions said. The headers stay on the summary: the tracefile gives them the lines of the macros
+    # expanded in the sources.
     sources = [f.relative_to(CLIB).as_posix() for f in measured if f.suffix == ".c"]
     headers = [f.relative_to(CLIB).as_posix() for f in measured if f.suffix == ".h"]
     session.run(PYTHON, "-m", "alx.verify.gates.coverage", str(out / "lcov.info"),
                 "--metrics", "lines,branches,functions", "--out", str(out / "coverage_gate.txt"),
+                "--exclusions", str(TEST / "config" / "coverage.toml"),
                 *[a for name in COVERAGE_PENDING for a in ("--pending", name)], *sources)
     session.run(PYTHON, "-m", "alx.verify.gates.coverage", str(out / "summary.json"),
                 "--metrics", "lines,branches,regions,functions", "--out", str(out / "coverage_gate_headers.txt"),
