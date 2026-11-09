@@ -130,6 +130,10 @@ extern "C" {
 #include "alxGlobal_McuStm32L4.h"
 #define ALX_STM32
 
+#elif defined(ALX_STM32U3)
+#include "alxGlobal_McuStm32U3.h"
+#define ALX_STM32
+
 #elif defined(ALX_STM32U5)
 #include "alxGlobal_McuStm32U5.h"
 #define ALX_STM32
