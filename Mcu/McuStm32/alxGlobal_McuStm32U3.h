@@ -94,6 +94,22 @@ extern "C" {
 
 
 //------------------------------------------------------------------------------
+// ALX - MCU - ADC
+//------------------------------------------------------------------------------
+#define __HAL_RCC_ADC1_CLK_ENABLE		__HAL_RCC_ADC12_CLK_ENABLE
+#define __HAL_RCC_ADC2_CLK_ENABLE		__HAL_RCC_ADC12_CLK_ENABLE
+
+#define __HAL_RCC_ADC1_CLK_DISABLE		__HAL_RCC_ADC12_CLK_DISABLE
+#define __HAL_RCC_ADC2_CLK_DISABLE		__HAL_RCC_ADC12_CLK_DISABLE
+
+#define __HAL_RCC_ADC1_FORCE_RESET		__HAL_RCC_ADC12_FORCE_RESET
+#define __HAL_RCC_ADC2_FORCE_RESET		__HAL_RCC_ADC12_FORCE_RESET
+
+#define __HAL_RCC_ADC1_RELEASE_RESET	__HAL_RCC_ADC12_RELEASE_RESET
+#define __HAL_RCC_ADC2_RELEASE_RESET	__HAL_RCC_ADC12_RELEASE_RESET
+
+
+//------------------------------------------------------------------------------
 // ALX - ID
 //------------------------------------------------------------------------------
 #define ALX_STM32_CMSIS_VERSION_MAIN	__STM32U3_CMSIS_VERSION_MAIN

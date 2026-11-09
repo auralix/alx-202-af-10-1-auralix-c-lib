@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -82,6 +82,9 @@ typedef enum
 	AlxAdc_Clk_McuStm32L4_AdcClk_20MHz_Sysclk_80MHz,
 	AlxAdc_Clk_McuStm32L4_AdcClk_30MHz_Sysclk_120MHz,
 	#endif
+	#if defined(ALX_STM32U3)
+	AlxAdc_Clk_McuStm32U3_AdcClk_24MHz_Hclk_48MHz,
+	#endif
 	#if defined(ALX_STM32U5)
 	AlxAdc_Clk_McuStm32U5_AdcClk_16MHz_Hclk_16MHz,
 	AlxAdc_Clk_McuStm32U5_AdcClk_20MHz_Hclk_160MHz,
@@ -107,13 +110,13 @@ typedef struct
 	float vrefExt_V;
 
 	// Variables
-	#if defined(ALX_STM32F1)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32U3)
 	RCC_PeriphCLKInitTypeDef iclk;
 	#endif
 	ADC_HandleTypeDef hadc;
 	DMA_TypeDef* dma;
 	DMA_HandleTypeDef hdma;
-	#if defined(ALX_STM32U5)
+	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	DMA_NodeConfTypeDef ncdma;
 	DMA_NodeTypeDef ndma;
 	DMA_QListTypeDef qdma;
