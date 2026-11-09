@@ -434,10 +434,10 @@ typedef enum
 	AlxClk_Clk_McuStm32_Sysclk,
 	AlxClk_Clk_McuStm32_Hclk,
 	AlxClk_Clk_McuStm32_Pclk1Apb1,
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	AlxClk_Clk_McuStm32_Pclk2Apb2,
 	#endif
-	#if defined(ALX_STM32U5)
+	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	AlxClk_Clk_McuStm32_Pclk3Apb3,
 	#endif
 
@@ -445,19 +445,19 @@ typedef enum
 	AlxClk_Clk_McuStm32_Sysclk_Ctor,
 	AlxClk_Clk_McuStm32_Hclk_Ctor,
 	AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor,
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor,
 	#endif
-	#if defined(ALX_STM32U5)
+	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	AlxClk_Clk_McuStm32_Pclk3Apb3_Ctor,
 	#endif
 	AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor,
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	AlxClk_Clk_McuStm32_Pclk2Apb2Tim_Ctor,
 	#endif
 	AlxClk_Clk_McuStm32_MainPllClk,
 	AlxClk_Clk_McuStm32_MainPllInputClk_Ctor,
-	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	AlxClk_Clk_McuStm32_PllP_Ctor,
 	AlxClk_Clk_McuStm32_PllQ_Ctor,
 	#endif

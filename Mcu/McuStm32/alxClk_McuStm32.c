@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -87,6 +87,10 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_
 static void AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hse_8MHz(AlxClk* me);
 static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(AlxClk* me);
 static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_25MHz(AlxClk* me);
+#endif
+#if defined(ALX_STM32U3)
+static void AlxClk_Ctor_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default(AlxClk* me);
+static void AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz(AlxClk* me);
 #endif
 #if defined(ALX_STM32U5)
 static void AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default(AlxClk* me);
@@ -170,11 +174,15 @@ ALX_WEAK void AlxClk_Ctor
 	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_25MHz)					{ AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_25MHz(me);			me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_12MHz_BackupHsi_16MHz)	{ ALX_CLK_ASSERT(false); me->backupHsiEnable = true; }	// TV: TODO
 	#endif
+	#if defined(ALX_STM32U3)
+	if		(me->config == AlxClk_Config_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default)					{ AlxClk_Ctor_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default(me);	me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz)							{ AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz(me);			me->backupHsiEnable = false;	}
+	#endif
 	#if defined(ALX_STM32U5)
-	if		(me->config == AlxClk_Config_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default)						{ AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default(me);		me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Pclk3Apb3_16MHz_Hsi_16MHz)							{ AlxClk_Ctor_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Pclk3Apb3_16MHz_Hsi_16MHz(me);		me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz)						{ AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz(me);	me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz)						{ AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz(me);	me->backupHsiEnable = false;	}
+	if		(me->config == AlxClk_Config_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default)						{ AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default(me);			me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Pclk3Apb3_16MHz_Hsi_16MHz)							{ AlxClk_Ctor_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Pclk3Apb3_16MHz_Hsi_16MHz(me);			me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz)						{ AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz(me);		me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz)						{ AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz(me);		me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz_BackupHsi_16MHz)		{ ALX_CLK_ASSERT(false); me->backupHsiEnable = true; }	// TV: TODO
 	#endif
 	else																																			{ ALX_CLK_ASSERT(false); return; }	// We should not get here
@@ -184,10 +192,10 @@ ALX_WEAK void AlxClk_Ctor
 	me->sysclk = 0;
 	me->hclk = 0;
 	me->pclk1Apb1 = 0;
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	me->pclk2Apb2 = 0;
 	#endif
-	#if defined(ALX_STM32U5)
+	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	me->pclk3Apb3 = 0;
 	#endif
 
@@ -209,18 +217,72 @@ ALX_WEAK void AlxClk_Ctor
   */
 ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 {
+	//------------------------------------------------------------------------------
 	// Assert
+	//------------------------------------------------------------------------------
 	ALX_CLK_ASSERT(me->wasCtorCalled == true);
 	//ALX_CLK_ASSERT(me->isInit == false);
 
-	// If backup HSI enabled, enable CSS
+
+	//------------------------------------------------------------------------------
+	// Init CSS
+	//------------------------------------------------------------------------------
 	if (me->backupHsiEnable)
 	{
 		HAL_RCC_EnableCSS();
 	}
 
-	// Init oscillators
-	if(HAL_RCC_OscConfig(&me->iosc) != HAL_OK)
+
+	//------------------------------------------------------------------------------
+	// Init OSC - Before
+	//------------------------------------------------------------------------------
+
+	// Enable PWR periphery clock
+	__HAL_RCC_PWR_CLK_ENABLE();
+
+	// Enable SYSCFG periphery clock
+	__HAL_RCC_SYSCFG_CLK_ENABLE();
+
+	// Init flash latency
+	__HAL_FLASH_SET_LATENCY(me->flashLatency);
+
+	// Init voltage scaling
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
+	if (HAL_PWREx_ControlVoltageScaling(me->pwrRegVoltageScale) != HAL_OK)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	};
+	#endif
+	#if defined(ALX_STM32L0)
+	while (__HAL_PWR_GET_FLAG(PWR_FLAG_VOS));
+	__HAL_PWR_VOLTAGESCALING_CONFIG(me->pwrRegVoltageScale);
+	while (__HAL_PWR_GET_FLAG(PWR_FLAG_VOS));
+	#endif
+
+	// Init EPOD booster
+	#if defined(ALX_STM32U3)
+	if (me->isPwrRegEpodBooster)
+	{
+		if (HAL_RCCEx_EpodBoosterClkConfig(RCC_EPODBOOSTER_SOURCE_MSIS, RCC_EPODBOOSTER_DIV1) != HAL_OK)
+		{
+			ALX_CLK_TRACE_ERR("Err");
+			return Alx_Err;
+		}
+
+		if (HAL_PWREx_EnableEpodBooster() != HAL_OK)
+		{
+			ALX_CLK_TRACE_ERR("Err");
+			return Alx_Err;
+		}
+	}
+	#endif
+
+
+	//------------------------------------------------------------------------------
+	// Init OSC
+	//------------------------------------------------------------------------------
+	if (HAL_RCC_OscConfig(&me->iosc) != HAL_OK)
 	{
 		// If backup HSI enabled
 		if (me->backupHsiEnable)
@@ -248,6 +310,9 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 			if (me->config == AlxClk_Config_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hse_8MHz_BackupHsi_16MHz)						{ AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true; }
 			else if (me->config == AlxClk_Config_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_12MHz_BackupHsi_16MHz)				{ AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true; }
 			#endif
+			#if defined(ALX_STM32U3)
+			if (true)																																{ ALX_CLK_ASSERT(false); return Alx_Err; } // We should not get here
+			#endif
 			#if defined(ALX_STM32U5)
 			if (me->config == AlxClk_Config_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz_BackupHsi_16MHz)	{ AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz(me);	me->isBackupHsiUsed = true; }
 			#endif
@@ -257,7 +322,7 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 			me->wasCtorCalled = true;
 
 			// Init
-			if(HAL_RCC_OscConfig(&me->iosc) != HAL_OK)
+			if (HAL_RCC_OscConfig(&me->iosc) != HAL_OK)
 			{
 				ALX_CLK_TRACE_ERR("Err");
 				return Alx_Err;
@@ -271,57 +336,59 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 		}
 	}
 
-	// Enable GPIO periphery clocks
-	AlxClk_Periph_Gpio_EnableClk(me);
 
-	// Enable PWR periphery clock
-	__HAL_RCC_PWR_CLK_ENABLE();
+	//------------------------------------------------------------------------------
+	// Init OSC - After
+	//----------------------------------------------------------------------------
 
-	// Enable GPIO PWR
-	#if defined(ALX_STM32L4)
-	HAL_PWREx_EnableVddIO2();
-	#endif
-
-	// Init power regulator
-	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
-	if(HAL_PWREx_ControlVoltageScaling(me->pwrRegVoltageScale) != HAL_OK)
-	{
-		ALX_CLK_TRACE_ERR("Err");
-		return Alx_Err;
-	};
-	#endif
+	// Init overdrive
 	#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) || defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx) || defined(ALX_STM32F7)
 	if (me->isPwrRegOverDrive)
 	{
-		if(HAL_PWREx_EnableOverDrive() != HAL_OK)
+		if (HAL_PWREx_EnableOverDrive() != HAL_OK)
 		{
 			ALX_CLK_TRACE_ERR("Err");
 			return Alx_Err;
 		};
 	}
 	#endif
-	#if defined(ALX_STM32L0)
-	while(__HAL_PWR_GET_FLAG(PWR_FLAG_VOS));
-	__HAL_PWR_VOLTAGESCALING_CONFIG(me->pwrRegVoltageScale);
-	while(__HAL_PWR_GET_FLAG(PWR_FLAG_VOS));
+
+
+	//------------------------------------------------------------------------------
+	// Init CLK
+	//------------------------------------------------------------------------------
+
+	// Config CLK
+	if (HAL_RCC_ClockConfig(&me->iclk, me->flashLatency) != HAL_OK)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	}
+
+	// Check CLK
+	if (AlxClk_IsClkOk(me) == false)
+	{
+		ALX_CLK_TRACE_ERR("Err");
+		return Alx_Err;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// Init GPIO
+	//------------------------------------------------------------------------------
+
+	// Enable GPIO PWR
+	#if defined(ALX_STM32L4)
+	HAL_PWREx_EnableVddIO2();
 	#endif
 
-	// Enable SYSCFG periphery clock
-	__HAL_RCC_SYSCFG_CLK_ENABLE();
+	// Enable GPIO periphery clocks
+	AlxClk_Periph_Gpio_EnableClk(me);
 
-	// Init clocks
-	if(HAL_RCC_ClockConfig(&me->iclk, me->flashLatency) != HAL_OK)
-	{
-		ALX_CLK_TRACE_ERR("Err");
-		return Alx_Err;
-	}
 
-	// Check clocks
-	if(AlxClk_IsClkOk(me) == false)
-	{
-		ALX_CLK_TRACE_ERR("Err");
-		return Alx_Err;
-	}
+	//------------------------------------------------------------------------------
+	// Return
+	//------------------------------------------------------------------------------
 
 	// Set isInit
 	me->isInit = true;
@@ -359,10 +426,10 @@ ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 		if(clk == AlxClk_Clk_McuStm32_Sysclk )				return me->sysclk;
 		if(clk == AlxClk_Clk_McuStm32_Hclk )				return me->hclk;
 		if(clk == AlxClk_Clk_McuStm32_Pclk1Apb1 )			return me->pclk1Apb1;
-		#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+		#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 		if(clk == AlxClk_Clk_McuStm32_Pclk2Apb2 )			return me->pclk2Apb2;
 		#endif
-		#if defined(ALX_STM32U5)
+		#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 		if(clk == AlxClk_Clk_McuStm32_Pclk3Apb3 )			return me->pclk3Apb3;
 		#endif
 	}
@@ -371,18 +438,18 @@ ALX_WEAK uint32_t AlxClk_GetClk_Hz(AlxClk* me, AlxClk_Clk clk)
 	if(clk == AlxClk_Clk_McuStm32_Sysclk_Ctor )				return me->sysclk_Ctor;
 	if(clk == AlxClk_Clk_McuStm32_Hclk_Ctor )				return me->hclk_Ctor;
 	if(clk == AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor )			return me->pclk1Apb1_Ctor;
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	if(clk == AlxClk_Clk_McuStm32_Pclk2Apb2_Ctor )			return me->pclk2Apb2_Ctor;
 	#endif
-	#if defined(ALX_STM32U5)
-	if(clk == AlxClk_Clk_McuStm32_Pclk3Apb3_Ctor )			return me->pclk3Apb3;
+	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
+	if(clk == AlxClk_Clk_McuStm32_Pclk3Apb3_Ctor )			return me->pclk3Apb3_Ctor;
 	#endif
 	if(clk == AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor )		return me->pclk1Apb1Tim_Ctor;
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	if(clk == AlxClk_Clk_McuStm32_Pclk2Apb2Tim_Ctor )		return me->pclk2Apb2Tim_Ctor;
 	#endif
 	if(clk == AlxClk_Clk_McuStm32_MainPllInputClk_Ctor )	return me->mainPllInputClk_Ctor;
-	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	if(clk == AlxClk_Clk_McuStm32_PllP_Ctor )				return me->pllP_Ctor;
 	if(clk == AlxClk_Clk_McuStm32_PllQ_Ctor )				return me->pllQ_Ctor;
 	#endif
@@ -413,11 +480,10 @@ void AlxClk_Irq_Handle(AlxClk* me)
 #if defined(ALX_STM32F0)
 static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hsi_8MHz_Default(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = ALX_NULL;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -434,16 +500,13 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hsi_8MHz_Default(A
 	me->iosc.PLL.PLLMUL = ALX_NULL;
 	me->iosc.PLL.PREDIV = ALX_NULL;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 8000000;
 	me->sysclk_Ctor = 8000000;
 	me->hclk_Ctor = 8000000;
@@ -454,11 +517,10 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hsi_8MHz_Default(A
 }
 static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hse_8MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = ALX_NULL;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -475,16 +537,13 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hse_8MHz(AlxClk* m
 	me->iosc.PLL.PLLMUL = ALX_NULL;
 	me->iosc.PLL.PREDIV = ALX_NULL;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_HSE;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 8000000;
 	me->sysclk_Ctor = 8000000;
 	me->hclk_Ctor = 8000000;
@@ -495,11 +554,10 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_8MHz_Pclk1Apb1_8MHz_Hse_8MHz(AlxClk* m
 }
 static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = ALX_NULL;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_1;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -516,16 +574,13 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz(AlxClk*
 	me->iosc.PLL.PLLMUL = RCC_PLL_MUL6;
 	me->iosc.PLL.PREDIV = RCC_PREDIV_DIV1;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_1;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 48000000;
 	me->sysclk_Ctor = 48000000;
 	me->hclk_Ctor = 48000000;
@@ -536,11 +591,10 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hsi_8MHz(AlxClk*
 }
 static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = ALX_NULL;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_1;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -557,16 +611,13 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz(AlxClk*
 	me->iosc.PLL.PLLMUL = RCC_PLL_MUL6;
 	me->iosc.PLL.PREDIV = RCC_PREDIV_DIV1;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_1;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 48000000;
 	me->sysclk_Ctor = 48000000;
 	me->hclk_Ctor = 48000000;
@@ -579,11 +630,10 @@ static void AlxClk_Ctor_McuStm32F0_Sysclk_48MHz_Pclk1Apb1_48MHz_Hse_8MHz(AlxClk*
 #if defined(ALX_STM32F1)
 static void AlxClk_Ctor_McuStm32F1_Sysclk_8MHz_Pclk1Apb1_8MHz_Pclk2Apb2_8MHz_Hsi_8MHz_Default(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = ALX_NULL;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSIState = RCC_HSI_ON;
 	me->iosc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -591,18 +641,14 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_8MHz_Pclk1Apb1_8MHz_Pclk2Apb2_8MHz_Hsi
 	me->iosc.PLL.PLLSource = 0;
 	me->iosc.PLL.PLLMUL = 0;
 
-
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 8000000UL;
 	me->sysclk_Ctor = 8000000UL;
 	me->hclk_Ctor = 8000000UL;
@@ -614,11 +660,10 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_8MHz_Pclk1Apb1_8MHz_Pclk2Apb2_8MHz_Hsi
 }
 static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hsi_8MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = ALX_NULL;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_1; // Change to 1 JK, goes to hard fault if its 0
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSIState = RCC_HSI_ON;
 	me->iosc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -626,17 +671,14 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_
 	me->iosc.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
 	me->iosc.PLL.PLLMUL = RCC_PLL_MUL16;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV2;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_1; // Change to 1 JK, goes to hard fault if its 0
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 64000000UL;
 	me->sysclk_Ctor = 64000000UL;
 	me->hclk_Ctor = 64000000UL;
@@ -648,11 +690,10 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_
 }
 static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_Hse_8MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = ALX_NULL;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_1;		// Cube set this to 0, did not work. Googling suggested this is a bug with cube and this should larger than 0. 1 Worked fine.
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;	// copied from cube
 	me->iosc.HSEState = RCC_HSE_ON;						// copied from cube
 	me->iosc.HSEPredivValue = RCC_HSE_PREDIV_DIV1;		// copied from cube
@@ -660,17 +701,14 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_
 	me->iosc.PLL.PLLSource = RCC_PLLSOURCE_HSE;		// same as cube and alx
 	me->iosc.PLL.PLLMUL = RCC_PLL_MUL8;				// same as cube and alx
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2; // same as cube and alx
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;	// same as cube, not sure??
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;	// same as cube
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV2;	// same as cube
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;	// same as cube
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_1;		// Cube set this to 0, did not work. Googling suggested this is a bug with cube and this should larger than 0. 1 Worked fine.
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor =	64000000UL;		// ??
 	me->sysclk_Ctor =			64000000UL;		// 64 MHz OK - same as cube
 	me->hclk_Ctor =				64000000UL;		// 64 MHz OK - same as cube
@@ -684,11 +722,16 @@ static void AlxClk_Ctor_McuStm32F1_Sysclk_64MHz_Pclk1Apb1_32MHz_Pclk2Apb2_64MHz_
 #if defined(ALX_STM32F4)
 static void AlxClk_Ctor_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = false;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+	#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) || defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx)
+	me->isPwrRegOverDrive = false;
+	#endif
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -707,17 +750,14 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 	me->iosc.PLL.PLLR = ALX_NULL;
 	#endif
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 16000000;
 	me->sysclk_Ctor = 16000000;
 	me->hclk_Ctor = 16000000;
@@ -729,11 +769,16 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 }
 static void AlxClk_Ctor_McuStm32F4_Sysclk_168MHz_Pclk1Apb1_42MHz_Pclk2Apb2_84MHz_Hse_12MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = false;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_5;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+	#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) || defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx)
+	me->isPwrRegOverDrive = false;
+	#endif
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -752,17 +797,14 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_168MHz_Pclk1Apb1_42MHz_Pclk2Apb2_84MHz
 	me->iosc.PLL.PLLR = 0;	// TV: TODO
 	#endif
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV4;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV2;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_5;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 168000000;
 	me->sysclk_Ctor = 168000000;
 	me->hclk_Ctor = 168000000;
@@ -776,11 +818,14 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz
 {
 	#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) ||\
 		defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx)
-	// Set power regulator
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_5;
+
+	// Set power
 	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
 	me->isPwrRegOverDrive = true;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -799,17 +844,14 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz
 	me->iosc.PLL.PLLR = 0;	// TV: TODO
 	#endif
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV4;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV2;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_5;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 180000000;
 	me->sysclk_Ctor = 180000000;
 	me->hclk_Ctor = 180000000;
@@ -826,11 +868,14 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz
 {
 	#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) ||\
 	defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx)
-	// Set power regulator
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_5;
+
+	// Set power
 	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
 	me->isPwrRegOverDrive = true;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -849,17 +894,14 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz
 	me->iosc.PLL.PLLR = 0;	// TV: TODO
 	#endif
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV4;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV2;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_5;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 180000000;
 	me->sysclk_Ctor = 180000000;
 	me->hclk_Ctor = 180000000;
@@ -876,11 +918,14 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz
 {
 	#if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) ||\
 	defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx)
-	// Set power regulator
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_5;
+
+	// Set power
 	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
 	me->isPwrRegOverDrive = true;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -899,17 +944,14 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz
 	me->iosc.PLL.PLLR = 0;	// TV: TODO
 	#endif
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV4;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV2;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_5;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 180000000;
 	me->sysclk_Ctor = 180000000;
 	me->hclk_Ctor = 180000000;
@@ -926,11 +968,14 @@ static void AlxClk_Ctor_McuStm32F4_Sysclk_180MHz_Pclk1Apb1_45MHz_Pclk2Apb2_90MHz
 #if defined(ALX_STM32F7)
 static void AlxClk_Ctor_McuStm32F7_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default(AlxClk* me)
 {
-	// Set power regulator
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
+
+	// Set power
 	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
 	me->isPwrRegOverDrive = false;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -947,17 +992,14 @@ static void AlxClk_Ctor_McuStm32F7_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 	me->iosc.PLL.PLLR = ALX_NULL;
 	#endif
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 16000000;
 	me->sysclk_Ctor = 16000000;
 	me->hclk_Ctor = 16000000;
@@ -969,11 +1011,14 @@ static void AlxClk_Ctor_McuStm32F7_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 }
 static void AlxClk_Ctor_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MHz_Hsi_16MHz(AlxClk* me)
 {
-	// Set power regulator
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_7;
+
+	// Set power
 	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
 	me->isPwrRegOverDrive = true;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -990,17 +1035,14 @@ static void AlxClk_Ctor_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MH
 	me->iosc.PLL.PLLR = 2;	// Default
 	#endif
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV4;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV2;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_7;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 216000000;
 	me->sysclk_Ctor = 216000000;
 	me->hclk_Ctor = 216000000;
@@ -1012,11 +1054,14 @@ static void AlxClk_Ctor_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MH
 }
 static void AlxClk_Ctor_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MHz_Hse_12MHz(AlxClk* me)
 {
-	// Set power regulator
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_7;
+
+	// Set power
 	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
 	me->isPwrRegOverDrive = true;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1033,17 +1078,14 @@ static void AlxClk_Ctor_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MH
 	me->iosc.PLL.PLLR = 2;	// Default
 	#endif
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV4;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV2;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_7;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 216000000;
 	me->sysclk_Ctor = 216000000;
 	me->hclk_Ctor = 216000000;
@@ -1055,11 +1097,14 @@ static void AlxClk_Ctor_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MH
 }
 static void AlxClk_Ctor_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MHz_Hse_25MHz(AlxClk* me)
 {
-	// Set power regulator
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_7;
+
+	// Set power
 	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
 	me->isPwrRegOverDrive = true;
 
-	// Set oscillators
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1076,17 +1121,14 @@ static void AlxClk_Ctor_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MH
 	me->iosc.PLL.PLLR = 2;	// Default
 	#endif
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV4;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV2;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_7;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 216000000;
 	me->sysclk_Ctor = 216000000;
 	me->hclk_Ctor = 216000000;
@@ -1100,11 +1142,13 @@ static void AlxClk_Ctor_McuStm32F7_Sysclk_216MHz_Pclk1Apb1_54MHz_Pclk2Apb2_108MH
 #if defined(ALX_STM32G4)
 static void AlxClk_Ctor_McuStm32G4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz_Default(AlxClk* me)
 {
-	// Set voltage regulator scale
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = false;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1120,17 +1164,14 @@ static void AlxClk_Ctor_McuStm32G4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 	me->iosc.PLL.PLLQ = 0;
 	me->iosc.PLL.PLLR = 0;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 16000000UL;
 	me->sysclk_Ctor = 16000000UL;
 	me->hclk_Ctor = 16000000UL;
@@ -1141,11 +1182,13 @@ static void AlxClk_Ctor_McuStm32G4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 }
 static void AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hsi_16MHz(AlxClk* me)
 {
-	// Set voltage regulator scale
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;
-	me->isPwrRegOverDrive = false;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_4;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1161,17 +1204,14 @@ static void AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170M
 	me->iosc.PLL.PLLQ = RCC_PLLQ_DIV2;
 	me->iosc.PLL.PLLR = RCC_PLLR_DIV2;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_4;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 170000000UL;
 	me->sysclk_Ctor = 170000000UL;
 	me->hclk_Ctor = 170000000UL;
@@ -1182,11 +1222,13 @@ static void AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170M
 }
 static void AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170MHz_Hse_12MHz(AlxClk* me)
 {
-	// Set voltage regulator scale
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;
-	me->isPwrRegOverDrive = false;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_4;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1202,17 +1244,14 @@ static void AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170M
 	me->iosc.PLL.PLLQ = RCC_PLLQ_DIV2;
 	me->iosc.PLL.PLLR = RCC_PLLR_DIV2;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_4;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 170000000UL;
 	me->sysclk_Ctor = 170000000UL;
 	me->hclk_Ctor = 170000000UL;
@@ -1225,11 +1264,13 @@ static void AlxClk_Ctor_McuStm32G4_Sysclk_170MHz_Pclk1Apb1_170MHz_Pclk2Apb2_170M
 #if defined(ALX_STM32L0)
 static void AlxClk_Ctor_McuStm32L0_Sysclk_524kHz_Pclk1Apb1_524kHz_Pclk2Apb2_524kHz_Msi_2MHz1(AlxClk* me)
 {
-	// Set voltage regulator scale
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE3;
-	me->isPwrRegOverDrive = false;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE3;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_MSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1245,17 +1286,14 @@ static void AlxClk_Ctor_McuStm32L0_Sysclk_524kHz_Pclk1Apb1_524kHz_Pclk2Apb2_524k
 	me->iosc.PLL.PLLMUL = 0;
 	me->iosc.PLL.PLLDIV = 0;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 2097152UL;
 	me->sysclk_Ctor = 2097152UL;
 	me->hclk_Ctor = 2097152UL;
@@ -1266,11 +1304,13 @@ static void AlxClk_Ctor_McuStm32L0_Sysclk_524kHz_Pclk1Apb1_524kHz_Pclk2Apb2_524k
 }
 static void AlxClk_Ctor_McuStm32L0_Sysclk_2MHz1_Pclk1Apb1_2MHz1_Pclk2Apb2_2MHz1_Msi_2MHz1_Default(AlxClk* me)
 {
-	// Set voltage regulator scale
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE3;
-	me->isPwrRegOverDrive = false;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE3;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_MSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1286,17 +1326,14 @@ static void AlxClk_Ctor_McuStm32L0_Sysclk_2MHz1_Pclk1Apb1_2MHz1_Pclk2Apb2_2MHz1_
 	me->iosc.PLL.PLLMUL = 0;
 	me->iosc.PLL.PLLDIV = 0;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 2097152UL;
 	me->sysclk_Ctor = 2097152UL;
 	me->hclk_Ctor = 2097152UL;
@@ -1307,11 +1344,13 @@ static void AlxClk_Ctor_McuStm32L0_Sysclk_2MHz1_Pclk1Apb1_2MHz1_Pclk2Apb2_2MHz1_
 }
 static void AlxClk_Ctor_McuStm32L0_Sysclk_32MHz_Pclk1Apb1_32MHz_Pclk2Apb2_32MHz_Hsi_16MHz(AlxClk* me)
 {
-	// Set voltage regulator scale
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = false;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_1;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1327,17 +1366,14 @@ static void AlxClk_Ctor_McuStm32L0_Sysclk_32MHz_Pclk1Apb1_32MHz_Pclk2Apb2_32MHz_
 	me->iosc.PLL.PLLMUL = RCC_PLL_MUL4;
 	me->iosc.PLL.PLLDIV = RCC_PLL_DIV2;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_1;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 32000000UL;
 	me->sysclk_Ctor = 32000000UL;
 	me->hclk_Ctor = 32000000UL;
@@ -1350,11 +1386,13 @@ static void AlxClk_Ctor_McuStm32L0_Sysclk_32MHz_Pclk1Apb1_32MHz_Pclk2Apb2_32MHz_
 #if defined(ALX_STM32L4)
 static void AlxClk_Ctor_McuStm32L4_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Msi_4MHz_Default(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_MSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1373,17 +1411,14 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Msi
 	me->iosc.PLL.PLLQ = ALX_NULL;
 	me->iosc.PLL.PLLR = ALX_NULL;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 4000000;
 	me->sysclk_Ctor = 4000000;
 	me->hclk_Ctor = 4000000;
@@ -1397,11 +1432,13 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Msi
 }
 static void AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Hsi_16MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1420,17 +1457,14 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 	me->iosc.PLL.PLLQ = ALX_NULL;
 	me->iosc.PLL.PLLR = ALX_NULL;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 16000000;
 	me->sysclk_Ctor = 16000000;
 	me->hclk_Ctor = 16000000;
@@ -1444,11 +1478,13 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 }
 static void AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hsi_16MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_4;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1467,17 +1503,14 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_
 	me->iosc.PLL.PLLQ = RCC_PLLP_DIV2;
 	me->iosc.PLL.PLLR = RCC_PLLP_DIV2;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_4;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 80000000;
 	me->sysclk_Ctor = 80000000;
 	me->hclk_Ctor = 80000000;
@@ -1491,11 +1524,13 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_
 }
 static void AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_Hse_8MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_4;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1514,17 +1549,14 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_
 	me->iosc.PLL.PLLQ = RCC_PLLP_DIV2;
 	me->iosc.PLL.PLLR = RCC_PLLP_DIV2;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_4;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 80000000;
 	me->sysclk_Ctor = 80000000;
 	me->hclk_Ctor = 80000000;
@@ -1539,11 +1571,13 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_80MHz_Pclk1Apb1_80MHz_Pclk2Apb2_80MHz_
 static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hsi_16MHz(AlxClk* me)
 {
 	#if defined(PWR_CR5_R1MODE)
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_5;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1562,17 +1596,14 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 	me->iosc.PLL.PLLQ = RCC_PLLP_DIV2;
 	me->iosc.PLL.PLLR = RCC_PLLP_DIV2;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_5;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 120000000;
 	me->sysclk_Ctor = 120000000;
 	me->hclk_Ctor = 120000000;
@@ -1590,11 +1621,13 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120MHz_Hse_25MHz(AlxClk* me)
 {
 	#if defined(PWR_CR5_R1MODE)
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_5;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1_BOOST;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1613,17 +1646,14 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 	me->iosc.PLL.PLLQ = RCC_PLLP_DIV2;
 	me->iosc.PLL.PLLR = RCC_PLLP_DIV2;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_5;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 120000000;
 	me->sysclk_Ctor = 120000000;
 	me->hclk_Ctor = 120000000;
@@ -1639,14 +1669,110 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 	#endif
 }
 #endif
+#if defined(ALX_STM32U3)
+static void AlxClk_Ctor_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default(AlxClk* me)
+{
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
+
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE2;
+	me->isPwrRegEpodBooster = false;
+
+	// Set OSC
+	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_MSIS | RCC_OSCILLATORTYPE_MSIK;
+	me->iosc.HSEState = RCC_HSE_OFF;
+	me->iosc.HSIState = RCC_HSI_OFF;
+	me->iosc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	me->iosc.HSI48State = RCC_HSI48_OFF;
+	me->iosc.LSEState = RCC_LSE_OFF;
+	me->iosc.LSIState = RCC_LSI_OFF;
+	me->iosc.LSIDiv = RCC_LSI_DIV1;
+	me->iosc.MSISState = RCC_MSI_ON;
+	me->iosc.MSISSource = RCC_MSI_RC1;
+	me->iosc.MSISDiv = RCC_MSI_DIV2;
+	me->iosc.MSIKState = RCC_MSI_ON;
+	me->iosc.MSIKSource = RCC_MSI_RC1;
+	me->iosc.MSIKDiv = RCC_MSI_DIV2;
+
+	// Set CLK
+	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_PCLK3;
+	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_MSIS;
+	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
+	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
+	me->iclk.APB3CLKDivider = RCC_HCLK_DIV1;
+
+	// Set expected CLK
+	me->systemCoreClock_Ctor = 12000000;
+	me->sysclk_Ctor = 12000000;
+	me->hclk_Ctor = 12000000;
+	me->pclk1Apb1_Ctor = 12000000;
+	me->pclk2Apb2_Ctor = 12000000;
+	me->pclk3Apb3_Ctor = 12000000;
+	me->pclk1Apb1Tim_Ctor = 12000000;
+	me->pclk2Apb2Tim_Ctor = 12000000;
+	me->mainPllInputClk_Ctor = 0;
+	me->pllP_Ctor = 0;
+	me->pllQ_Ctor = 0;
+}
+static void AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz(AlxClk* me)
+{
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_2;
+
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE2;
+	me->isPwrRegEpodBooster = true;
+
+	// Set OSC
+	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_MSIS | RCC_OSCILLATORTYPE_MSIK;
+	me->iosc.HSEState = RCC_HSE_OFF;
+	me->iosc.HSIState = RCC_HSI_OFF;
+	me->iosc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	me->iosc.HSI48State = RCC_HSI48_OFF;
+	me->iosc.LSEState = RCC_LSE_OFF;
+	me->iosc.LSIState = RCC_LSI_OFF;
+	me->iosc.LSIDiv = RCC_LSI_DIV1;
+	me->iosc.MSISState = RCC_MSI_ON;
+	me->iosc.MSISSource = RCC_MSI_RC0;
+	me->iosc.MSISDiv = RCC_MSI_DIV2;
+	me->iosc.MSIKState = RCC_MSI_ON;
+	me->iosc.MSIKSource = RCC_MSI_RC0;
+	me->iosc.MSIKDiv = RCC_MSI_DIV2;
+
+	// Set CLK
+	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_PCLK3;
+	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_MSIS;
+	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
+	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
+	me->iclk.APB3CLKDivider = RCC_HCLK_DIV1;
+
+	// Set expected CLK
+	me->systemCoreClock_Ctor = 48000000;
+	me->sysclk_Ctor = 48000000;
+	me->hclk_Ctor = 48000000;
+	me->pclk1Apb1_Ctor = 48000000;
+	me->pclk2Apb2_Ctor = 48000000;
+	me->pclk3Apb3_Ctor = 48000000;
+	me->pclk1Apb1Tim_Ctor = 48000000;
+	me->pclk2Apb2Tim_Ctor = 48000000;
+	me->mainPllInputClk_Ctor = 0;
+	me->pllP_Ctor = 0;
+	me->pllQ_Ctor = 0;
+}
+#endif
 #if defined(ALX_STM32U5)
 static void AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_MSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1672,7 +1798,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pcl
 	me->iosc.PLL.PLLRGE = RCC_PLLVCIRANGE_0;
 	me->iosc.PLL.PLLFRACN = 0;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_PCLK3;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
@@ -1680,10 +1806,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pcl
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB3CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 4000000;
 	me->sysclk_Ctor = 4000000;
 	me->hclk_Ctor = 4000000;
@@ -1696,11 +1819,13 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pcl
 }
 static void AlxClk_Ctor_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_Pclk3Apb3_16MHz_Hsi_16MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_0;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1726,7 +1851,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 	me->iosc.PLL.PLLRGE = RCC_PLLVCIRANGE_0;
 	me->iosc.PLL.PLLFRACN = 0;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_PCLK3;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
@@ -1734,10 +1859,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB3CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_0;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 16000000;
 	me->sysclk_Ctor = 16000000;
 	me->hclk_Ctor = 16000000;
@@ -1750,11 +1872,13 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_16MHz_Pclk1Apb1_16MHz_Pclk2Apb2_16MHz_
 }
 static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hsi_16MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_4;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	me->iosc.HSEState = RCC_HSE_OFF;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1780,7 +1904,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160M
 	me->iosc.PLL.PLLRGE = RCC_PLLVCIRANGE_0;
 	me->iosc.PLL.PLLFRACN = 0;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_PCLK3;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
@@ -1788,10 +1912,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160M
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB3CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_4;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 160000000;
 	me->sysclk_Ctor = 160000000;
 	me->hclk_Ctor = 160000000;
@@ -1804,11 +1925,13 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160M
 }
 static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160MHz_Pclk3Apb3_160MHz_Hse_12MHz(AlxClk* me)
 {
-	// Set power regulator
-	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
-	me->isPwrRegOverDrive = ALX_NULL;
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_4;
 
-	// Set oscillators
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+
+	// Set OSC
 	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	me->iosc.HSEState = RCC_HSE_ON;
 	me->iosc.LSEState = RCC_LSE_OFF;
@@ -1834,7 +1957,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160M
 	me->iosc.PLL.PLLRGE = RCC_PLLVCIRANGE_0;
 	me->iosc.PLL.PLLFRACN = 0;
 
-	// Set clocks
+	// Set CLK
 	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_PCLK3;
 	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
@@ -1842,10 +1965,7 @@ static void AlxClk_Ctor_McuStm32U5_Sysclk_160MHz_Pclk1Apb1_160MHz_Pclk2Apb2_160M
 	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
 	me->iclk.APB3CLKDivider = RCC_HCLK_DIV1;
 
-	// Set flash latency
-	me->flashLatency = FLASH_LATENCY_4;
-
-	// Set expected clocks
+	// Set expected CLK
 	me->systemCoreClock_Ctor = 160000000;
 	me->sysclk_Ctor = 160000000;
 	me->hclk_Ctor = 160000000;
@@ -1869,10 +1989,10 @@ static bool AlxClk_IsClkOk(AlxClk* me)
 	me->sysclk = HAL_RCC_GetSysClockFreq();
 	me->hclk = HAL_RCC_GetHCLKFreq();
 	me->pclk1Apb1 = HAL_RCC_GetPCLK1Freq();
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	me->pclk2Apb2 = HAL_RCC_GetPCLK2Freq();
 	#endif
-	#if defined(ALX_STM32U5)
+	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	me->pclk3Apb3 = HAL_RCC_GetPCLK3Freq();
 	#endif
 
@@ -1897,14 +2017,14 @@ static bool AlxClk_IsClkOk(AlxClk* me)
 		ALX_CLK_TRACE_ERR("Err");
 		return false;
 	}
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	if (me->pclk2Apb2 != me->pclk2Apb2_Ctor)
 	{
 		ALX_CLK_TRACE_ERR("Err");
 		return false;
 	}
 	#endif
-	#if defined(ALX_STM32U5)
+	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	if (me->pclk3Apb3 != me->pclk3Apb3_Ctor)
 	{
 		ALX_CLK_TRACE_ERR("Err");
