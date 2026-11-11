@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U3))
 
 
 //******************************************************************************
@@ -92,6 +92,8 @@ Alx_Status AlxRst_Init(AlxRst* me)
 	#endif
 	#if defined(ALX_STM32L4)
 	me->rr.firewall = (me->csr & RCC_CSR_FWRSTF) != 0;
+	#endif
+	#if defined(ALX_STM32L4) || defined(ALX_STM32U3)
 	me->rr.optionByteLoader = (me->csr & RCC_CSR_OBLRSTF) != 0;
 	#endif
 
@@ -125,9 +127,11 @@ void AlxRst_Trace(AlxRst* me)
 	#endif
 	#if defined(ALX_STM32L4)
 	ALX_RST_TRACE_INF("- Firewall: %d", me->rr.firewall);
+	#endif
+	#if defined(ALX_STM32L4) || defined(ALX_STM32U3)
 	ALX_RST_TRACE_INF("- Option Byte Loader: %d", me->rr.optionByteLoader);
 	#endif
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U3))
