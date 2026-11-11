@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -93,13 +93,22 @@ void AlxWdt_Ctor
 		me->hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
 		me->hiwdg.Init.Reload = 0x0FFF;
 	}
-
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
+	else if (me->config == AlxWdt_Config_McuStm32_WdtTimeout_65536ms_WdtClk_62Hz5_Lsi_32kHz)
+	{
+		me->hiwdg.Init.Prescaler = IWDG_PRESCALER_512;
+		me->hiwdg.Init.Reload = 0x0FFF;
+	}
+	else if (me->config == AlxWdt_Config_McuStm32_WdtTimeout_131072ms_WdtClk_31Hz25_Lsi_32kHz)
+	{
+		me->hiwdg.Init.Prescaler = IWDG_PRESCALER_1024;
+		me->hiwdg.Init.Reload = 0x0FFF;
+	}
+	#endif
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	me->hiwdg.Init.Window = IWDG_WINDOW_DISABLE;
 	#endif
-
-	#if defined(ALX_STM32U5)
-	me->hiwdg.Init.Window = IWDG_WINDOW_DISABLE;
+	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	me->hiwdg.Init.EWI = IWDG_EWI_DISABLE;
 	#endif
 
@@ -163,4 +172,4 @@ Alx_Status AlxWdt_Refresh(AlxWdt* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))

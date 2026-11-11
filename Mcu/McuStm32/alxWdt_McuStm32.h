@@ -47,7 +47,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -61,7 +61,11 @@ typedef enum
 	AlxWdt_Config_McuStm32_WdtTimeout_4096ms_WdtClk_1kHz_Lsi_32kHz,
 	AlxWdt_Config_McuStm32_WdtTimeout_8192ms_WdtClk_500Hz_Lsi_32kHz,
 	AlxWdt_Config_McuStm32_WdtTimeout_16384ms_WdtClk_250Hz_Lsi_32kHz,
-	AlxWdt_Config_McuStm32_WdtTimeout_32768ms_WdtClk_125Hz_Lsi_32kHz
+	AlxWdt_Config_McuStm32_WdtTimeout_32768ms_WdtClk_125Hz_Lsi_32kHz,
+	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
+	AlxWdt_Config_McuStm32_WdtTimeout_65536ms_WdtClk_62Hz5_Lsi_32kHz,
+	AlxWdt_Config_McuStm32_WdtTimeout_131072ms_WdtClk_31Hz25_Lsi_32kHz,
+	#endif
 } AlxWdt_Config;
 
 typedef struct
@@ -88,7 +92,7 @@ void AlxWdt_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
 
 #ifdef __cplusplus
 }
