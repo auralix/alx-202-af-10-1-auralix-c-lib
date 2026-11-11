@@ -49,7 +49,7 @@ extern "C" {
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -86,6 +86,9 @@ typedef enum
 	AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_80MHz = 0x00702991,
 	AlxI2c_Clk_McuStm32L4_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_120MHz = 0x307075B1,
 	AlxI2c_Clk_McuStm32L4_I2cClk_400kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_120MHz = 0x00B03FDB,
+	#endif
+	#if defined(ALX_STM32U3)
+	AlxI2c_Clk_McuStm32U3_I2c1_I2c2_I2cClk_400kHz_Pclk1Apb1_48MHz_tPRESC_20ns83_tSCLDEL_104ns_tSDADEL_0ns_tSCLH_1125ns_tSCLL_1125ns = 0x00403535,
 	#endif
 	#if defined(ALX_STM32U5)
 	AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_16MHz = 0x00303D5B,
@@ -143,7 +146,7 @@ void AlxI2c_Ctor
 );
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
 
 #ifdef __cplusplus
 }

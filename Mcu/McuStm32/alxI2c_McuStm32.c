@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -98,7 +98,7 @@ void AlxI2c_Ctor
 	me->hi2c.Init.OwnAddress2 = ALX_NULL;
 	me->hi2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	me->hi2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	me->hi2c.Init.Timing = (uint32_t)i2cClk;
 	me->hi2c.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
 	#endif
@@ -802,6 +802,26 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 
 
 	//------------------------------------------------------------------------------
+	// STM32U3
+	//------------------------------------------------------------------------------
+	#if defined(ALX_STM32U3)
+	if ((me->hi2c.Instance == I2C1) || (me->hi2c.Instance == I2C2))
+	{
+		if
+		(
+			me->i2cClk == AlxI2c_Clk_McuStm32U3_I2c1_I2c2_I2cClk_400kHz_Pclk1Apb1_48MHz_tPRESC_20ns83_tSCLDEL_104ns_tSDADEL_0ns_tSCLH_1125ns_tSCLL_1125ns
+		)
+		{
+			if(48000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
+				return true;
+			else
+				return false;
+		}
+	}
+	#endif
+
+
+	//------------------------------------------------------------------------------
 	// STM32U5
 	//------------------------------------------------------------------------------
 	#if defined(ALX_STM32U5)
@@ -967,4 +987,4 @@ static void AlxI2c_Periph_ReleaseReset(AlxI2c* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
