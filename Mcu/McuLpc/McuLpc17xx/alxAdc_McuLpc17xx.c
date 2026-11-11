@@ -224,7 +224,7 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
   * @param[in,out]	me
   * @return
   */
-float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
+int32_t AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
 	// LPC17xx has no internal temperature sensor
 	ALX_ADC_ASSERT(false);	// We shouldn't get here

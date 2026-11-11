@@ -302,7 +302,7 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
   * @param[in,out]	me
   * @return
   */
-float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
+int32_t AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
 	// MF: Lpc80x doesn't support internal TempSens_GetTemp
 

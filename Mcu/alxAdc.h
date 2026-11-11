@@ -108,7 +108,7 @@ Alx_Status AlxAdc_Init(AlxAdc* me);
 Alx_Status AlxAdc_DeInit(AlxAdc* me);
 float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch);
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch);
-float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
+int32_t AlxAdc_TempSens_GetTemp_degC(AlxAdc* me);
 
 
 #endif	// #if defined(ALX_C_LIB)

@@ -955,7 +955,7 @@ uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
   * @param[in,out]	me
   * @return
   */
-float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
+int32_t AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 {
 	// Assert
 	ALX_ADC_ASSERT(me->wasCtorCalled == true);
@@ -980,7 +980,7 @@ float AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
 			#endif
 
 			// Return
-			return (float)temp_degC;
+			return temp_degC;
 		}
 	}
 
