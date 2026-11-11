@@ -195,38 +195,11 @@ void AlxSerialPort_Ctor
 	me->huart.Init.Mode = UART_MODE_TX_RX;
 	me->huart.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	me->huart.Init.OverSampling = UART_OVERSAMPLING_16;
-	#if defined(ALX_STM32F0)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT;
-	me->huart.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
-	#endif
-	#if defined(ALX_STM32F7)
-	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT;
-	me->huart.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
-	#endif
-	#if defined(ALX_STM32G4)
-	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT;
-	me->huart.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
-	#endif
-	#if defined(ALX_STM32L0)
-	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT;
-	me->huart.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
-	#endif
-	#if defined(ALX_STM32L4)
-	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	#if defined(USART_PRESC_PRESCALER)
-	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-	#endif
-	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT;
-	me->huart.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
-	#endif
-	#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
-	me->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+		#if defined(USART_PRESC_PRESCALER)
+		me->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+		#endif
 	me->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT;
 	me->huart.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
 	#endif
