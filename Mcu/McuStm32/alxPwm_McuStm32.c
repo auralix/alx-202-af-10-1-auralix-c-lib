@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3))
 
 
 //******************************************************************************
@@ -146,7 +146,7 @@ void AlxPwm_Ctor
 	me->htim.Init.Period = me->period;
 	me->htim.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;	// Not relevant for PWM, used by dead-time generators & digital filters
 	me->htim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4)
+	#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U3)
 	me->htim.Init.RepetitionCounter = 0;
 	#endif
 
@@ -157,7 +157,7 @@ void AlxPwm_Ctor
 		me->chtim[buffPos].Pulse = 0;
 		me->chtim[buffPos].OCPolarity = TIM_OCPOLARITY_HIGH;	// Will will use active high, so duty = 100% output is high, duty = 0% output is low
 		me->chtim[buffPos].OCFastMode = TIM_OCFAST_DISABLE;
-		#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4)
+		#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U3)
 		me->chtim[buffPos].OCNPolarity = TIM_OCNPOLARITY_HIGH;
 		me->chtim[buffPos].OCIdleState = TIM_OCIDLESTATE_RESET;	// Only relevant if OCN is used with dead time
 		me->chtim[buffPos].OCNIdleState = TIM_OCNIDLESTATE_RESET;
@@ -411,9 +411,10 @@ static void AlxPwm_SetSrcClk_SetPeriodMax(AlxPwm* me)
 	#if defined(TIM2)
 	if (me->htim.Instance == TIM2)
 	{
-		#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4)
+		#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L4) || defined(ALX_STM32U3)
 		me->periodMax = 0xFFFFFFFF;
-		#elif defined(ALX_STM32F1) || defined(ALX_STM32L0)
+		#endif
+		#if defined(ALX_STM32F1) || defined(ALX_STM32L0)
 		me->periodMax = 0x0000FFFF;
 		#endif
 
@@ -422,10 +423,32 @@ static void AlxPwm_SetSrcClk_SetPeriodMax(AlxPwm* me)
 	}
 	#endif
 	#if defined(TIM3)
-	if (me->htim.Instance == TIM3)	{ me->periodMax = 0x0000FFFF; me->srcClk_Hz = AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor); isErr = false; }
+	if (me->htim.Instance == TIM3)
+	{
+		#if defined(ALX_STM32U3)
+		me->periodMax = 0xFFFFFFFF;
+		#endif
+		#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+		me->periodMax = 0x0000FFFF;
+		#endif
+
+		me->srcClk_Hz = AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor);
+		isErr = false;
+	}
 	#endif
 	#if defined(TIM4)
-	if (me->htim.Instance == TIM4)	{ me->periodMax = 0x0000FFFF; me->srcClk_Hz = AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor); isErr = false; }
+	if (me->htim.Instance == TIM4)
+	{
+		#if defined(ALX_STM32U3)
+		me->periodMax = 0xFFFFFFFF;
+		#endif
+		#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+		me->periodMax = 0x0000FFFF;
+		#endif
+
+		me->srcClk_Hz = AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1Tim_Ctor);
+		isErr = false;
+	}
 	#endif
 	#if defined(TIM5)
 	if (me->htim.Instance == TIM5)
@@ -526,7 +549,7 @@ static uint32_t AlxPwm_GetCh(Alx_Ch ch)
 	if(ch == Alx_Ch_2 ) return TIM_CHANNEL_2;
 	if(ch == Alx_Ch_3 ) return TIM_CHANNEL_3;
 	if(ch == Alx_Ch_4 ) return TIM_CHANNEL_4;
-	#if defined(ALX_STM32G4)
+	#if defined(ALX_STM32G4) || defined(ALX_STM32U3)
 	if(ch == Alx_Ch_5 ) return TIM_CHANNEL_5;
 	if(ch == Alx_Ch_6 ) return TIM_CHANNEL_6;
 	#endif
@@ -825,4 +848,4 @@ static void AlxPwm_Periph_ReleaseReset(AlxPwm* me)
 }
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3))
