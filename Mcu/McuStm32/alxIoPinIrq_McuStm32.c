@@ -35,7 +35,7 @@
 //******************************************************************************
 // Module Guard
 //******************************************************************************
-#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
 
 
 //******************************************************************************
@@ -225,7 +225,7 @@ static void AlxIoPinIrq_Periph_EnableIrq(AlxIoPinIrq* me)
 			HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 		}
 		#endif
-		#if defined(ALX_STM32U5)
+		#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 		else if (ioPin->igpio.Pin == GPIO_PIN_5)
 		{
 			HAL_NVIC_SetPriority(EXTI5_IRQn, me->irqPriorityArr[i], 0);
@@ -346,7 +346,7 @@ static void AlxIoPinIrq_Periph_DisableIrq(AlxIoPinIrq* me)
 			HAL_NVIC_ClearPendingIRQ(EXTI15_10_IRQn);
 		}
 		#endif
-		#if defined(ALX_STM32U5)
+		#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 		else if (ioPin->igpio.Pin == GPIO_PIN_5)
 		{
 			HAL_NVIC_DisableIRQ(EXTI5_IRQn);
@@ -438,7 +438,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	else	ALX_IO_PIN_IRQ_ASSERT(false);	// We should not get here
 }
 #endif
-#if defined(ALX_STM32U5)
+#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 {
 	if		(GPIO_Pin == GPIO_PIN_0 ) AlxIoPinIrq_IrqCallback_Pin0();
@@ -589,7 +589,7 @@ void EXTI15_10_IRQHandler(void)
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
 }
 #endif
-#if defined(ALX_STM32U5)
+#if defined(ALX_STM32U3) || defined(ALX_STM32U5)
 void EXTI5_IRQHandler(void)
 {
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
@@ -638,4 +638,4 @@ void EXTI15_IRQHandler(void)
 #endif
 
 
-#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5))
+#endif	// #if defined(ALX_C_LIB) && (defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5))
