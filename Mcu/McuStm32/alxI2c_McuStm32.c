@@ -220,6 +220,7 @@ Alx_Status AlxI2c_Master_StartRead(AlxI2c* me, uint16_t slaveAddr, uint8_t* data
   * @param[in]		timeout_ms
   * @retval			Alx_Ok
   * @retval			Alx_Err
+  * @retval			Alx_ErrNumOfTries
   */
 Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -296,6 +297,7 @@ Alx_Status AlxI2c_Master_StartReadStop(AlxI2c* me, uint16_t slaveAddr, uint8_t* 
   * @param[in]		timeout_ms
   * @retval			Alx_Ok
   * @retval			Alx_Err
+  * @retval			Alx_ErrNumOfTries
   */
 Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -390,6 +392,7 @@ Alx_Status AlxI2c_Master_StartWrite(AlxI2c* me, uint16_t slaveAddr, const uint8_
   * @param[in]		timeout_ms
   * @retval			Alx_Ok
   * @retval			Alx_Err
+  * @retval			Alx_ErrNumOfTries
   */
 Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -465,6 +468,7 @@ Alx_Status AlxI2c_Master_StartWriteStop(AlxI2c* me, uint16_t slaveAddr, const ui
   * @param[in]		timeout_ms
   * @retval			Alx_Ok
   * @retval			Alx_Err
+  * @retval			Alx_ErrNumOfTries
   */
 Alx_Status AlxI2c_Master_StartWriteMemStop_Single(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t data, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -484,6 +488,7 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Single(AlxI2c* me, uint16_t slaveAddr
   * @param[in]		timeout_ms
   * @retval			Alx_Ok
   * @retval			Alx_Err
+  * @retval			Alx_ErrNumOfTries
   */
 Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, const uint8_t* data, uint16_t len, bool checkWithRead, uint8_t numOfTries, uint16_t timeout_ms)
 {
@@ -585,6 +590,27 @@ Alx_Status AlxI2c_Master_StartWriteMemStop_Multi(AlxI2c* me, uint16_t slaveAddr,
 /**
   * @brief
   * @param[in,out]	me
+  * @param[in]		slaveAddr
+  * @param[in]		writeData
+  * @param[in]		writeLen
+  * @param[out]		readData
+  * @param[in]		readLen
+  * @param[in]		numOfTries
+  * @param[in]		timeout_ms
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  * @retval			Alx_ErrNumOfTries
+  */
+Alx_Status AlxI2c_Master_StartWriteReadStop(AlxI2c* me, uint16_t slaveAddr, const uint8_t* writeData, uint16_t writeLen, uint8_t* readData, uint16_t readLen, uint8_t numOfTries, uint16_t timeout_ms)
+{
+	// TV: TODO
+	ALX_I2C_ASSERT(false);
+	return Alx_Err;
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
   * @param[in]		timeout_ms
   * @retval			Alx_Ok
   * @retval			Alx_Err
@@ -619,12 +645,8 @@ Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t nu
 	HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(&me->hi2c, slaveAddr, numOfTries, timeout_ms);
 	if (status != HAL_OK)
 	{
-		ALX_I2C_TRACE_ERR("Err");
-		if (AlxI2c_Reset(me) != Alx_Ok)
-		{
-			ALX_I2C_TRACE_ERR("Err");
-			return Alx_Err;
-		}
+		ALX_I2C_TRACE_WRN("Wrn");
+		return Alx_Err;
 	}
 
 	// Return
