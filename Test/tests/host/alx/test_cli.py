@@ -500,3 +500,103 @@ def test_ALX1564_P740_set_param_refuses_an_empty_key_and_a_pretty_error_carries_
 
     assert as_json(resp) == {"status": "error", "message": "Arguments invalid"}
     assert resp.startswith(b"{\r\n    "), "pretty"
+
+
+# Explicit flag clear must reach the owner, not just its published property.
+@pytest.mark.parametrize("pretty", [b"true", b"false"])
+@pytest.mark.parametrize("term", [b"\r", b"\n", b"\r\n"])
+def test_clear_flag_clears_owner_and_property(make_cli, pretty, term):
+    cli = make_cli()
+    set_param(cli, b"PRETTY_JSON_EN", pretty)
+    cli.latch_flag()
+    assert as_json(cmd(cli, b"get-flag\r"))["data"]["FLAG_TEST"] is True
+
+    assert as_json(cmd(cli, b"clear-flag --key FLAG_TEST" + term)) == {"status": "success"}
+    assert cli.flag_clear_count() == 1
+    assert as_json(cmd(cli, b"get-flag\r"))["data"]["FLAG_TEST"] is False
+    cli.publish_flag()
+    assert as_json(cmd(cli, b"get-flag\r"))["data"]["FLAG_TEST"] is False
+
+    # A new event is observable after a successful clear.
+    cli.latch_flag()
+    assert as_json(cmd(cli, b"get-flag\r"))["data"]["FLAG_TEST"] is True
+
+
+def test_clear_flag_preserves_event_after_owner_clear(make_cli):
+    cli = make_cli()
+    cli.latch_flag(relatch_on_clear=True)
+    assert as_json(cmd(cli, b"clear-flag --key FLAG_TEST\r")) == {"status": "success"}
+    assert as_json(cmd(cli, b"get-flag\r"))["data"]["FLAG_TEST"] is False
+    cli.publish_flag()
+    assert as_json(cmd(cli, b"get-flag\r"))["data"]["FLAG_TEST"] is True
+    assert cli.flag_clear_count() == 1
+
+
+def test_value_publication_does_not_invoke_flag_clear_callback(make_cli):
+    cli = make_cli()
+    cli.latch_flag()
+    set_param(cli, b"FLAG_TEST", b"false")
+    assert cli.flag_clear_count() == 0
+    cli.publish_flag()
+    assert as_json(cmd(cli, b"get-flag\r"))["data"]["FLAG_TEST"] is True
+
+
+@pytest.mark.parametrize("key", [
+    b"UNKNOWN", b"flag_test", b"PRETTY_JSON_EN", b"STR_TEST", b"UINT8_TEST",
+    b"VAR_TEST", b"CONST_TEST", b"TRIG_TEST",
+])
+def test_clear_flag_refuses_unknown_keys_and_other_property_types(make_cli, key):
+    cli = make_cli()
+    cli.latch_flag()
+    before = as_json(cmd(cli, b"get\r"))
+    response = cmd(cli, b"clear-flag --key " + key + b"\r")
+    assert as_json(response) == {"status": "error", "message": "Arguments invalid"}
+    assert cli.flag_clear_count() == 0
+    assert as_json(cmd(cli, b"get\r")) == before
+
+
+@pytest.mark.parametrize("line", [
+    b"clear-flag", b"clear-flag --key", b"clear-flag --key ",
+    b"clear-flag --key  FLAG_TEST", b"clear-flag --key FLAG_TEST --val false",
+    b"clear-flag --key FLAG_TEST --key FLAG_TEST", b"clear-flag --key FLAG_TEST\t",
+    b"clear-flag --other FLAG_TEST",
+])
+def test_clear_flag_refuses_invalid_command_or_arguments_without_clearing(make_cli, line):
+    cli = make_cli()
+    cli.latch_flag()
+    message = "Command invalid" if line == b"clear-flag" else "Arguments invalid"
+    assert as_json(cmd(cli, line + b"\r")) == {"status": "error", "message": message}
+    assert cli.flag_clear_count() == 0
+    assert as_json(cmd(cli, b"get-flag\r"))["data"]["FLAG_TEST"] is True
+
+
+def test_clear_flag_accepts_text_before_key_like_set_param(make_cli):
+    cli = make_cli()
+    cli.latch_flag()
+    assert as_json(cmd(cli, b"clear-flag junk --key FLAG_TEST\r")) == {"status": "success"}
+    assert cli.flag_clear_count() == 1
+    cli.publish_flag()
+    assert as_json(cmd(cli, b"get-flag\r"))["data"]["FLAG_TEST"] is False
+
+
+def test_clear_flag_without_owner_and_repeated_clear_succeed(make_cli):
+    cli = make_cli()
+    set_param(cli, b"FLAG_TEST", b"true")
+    for _ in range(2):
+        assert as_json(cmd(cli, b"clear-flag --key FLAG_TEST\r")) == {"status": "success"}
+        assert as_json(cmd(cli, b"get-flag\r"))["data"]["FLAG_TEST"] is False
+
+
+def test_clear_flag_routes_only_the_matching_cli_instance(make_cli):
+    owner = make_cli()
+    other = make_cli()
+    owner.latch_flag()
+    set_param(other, b"FLAG_TEST", b"true")
+    assert as_json(cmd(other, b"clear-flag --key FLAG_TEST\r")) == {"status": "success"}
+    assert owner.flag_clear_count() == 0
+    assert as_json(cmd(owner, b"get-flag\r"))["data"]["FLAG_TEST"] is True
+
+
+def test_help_documents_clear_flag(make_cli):
+    help_data = as_json(cmd(make_cli(), b"help\r"))["data"]
+    assert "clear-flag --key <flag_key>" in help_data["clear-flag"]

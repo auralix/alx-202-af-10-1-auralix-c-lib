@@ -196,6 +196,12 @@ class CliLib:
         c.AlxCliTest_GetStrValBuffLen.restype = ctypes.c_uint32
         c.AlxCliTest_WasResetRequested.restype = ctypes.c_bool
         c.AlxCliTest_Status_Ok.restype = ctypes.c_int32
+        c.AlxCliTest_LatchFlag.argtypes = [ctypes.c_void_p, ctypes.c_bool]
+        c.AlxCliTest_LatchFlag.restype = None
+        c.AlxCliTest_PublishFlag.argtypes = [ctypes.c_void_p]
+        c.AlxCliTest_PublishFlag.restype = None
+        c.AlxCliTest_FlagClearCount.argtypes = [ctypes.c_void_p]
+        c.AlxCliTest_FlagClearCount.restype = ctypes.c_uint32
         c.AlxSerialPortFake_InjectRx.restype = ctypes.c_int32
         c.AlxSerialPortFake_InjectRx.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32]
         c.AlxSerialPortFake_TxRead.restype = ctypes.c_uint32
@@ -251,6 +257,15 @@ class CliUnderTest:
             if n == 0:
                 return out
             out += buf.raw[:n]
+
+    def latch_flag(self, relatch_on_clear: bool = False) -> None:
+        self._l.c.AlxCliTest_LatchFlag(self.ctx, relatch_on_clear)
+
+    def publish_flag(self) -> None:
+        self._l.c.AlxCliTest_PublishFlag(self.ctx)
+
+    def flag_clear_count(self) -> int:
+        return self._l.c.AlxCliTest_FlagClearCount(self.ctx)
 
 
 class MemSafeLib:
@@ -1716,11 +1731,17 @@ class ParamMgmtLib:
             fn.argtypes = [vp, u32]
         c.AlxParamMgmt_ByIndex_GetVal_StrFormat.restype = i32
         c.AlxParamMgmt_ByIndex_GetVal_StrFormat.argtypes = [vp, u32, cp, u32]
+        c.AlxParamMgmt_ByKey_SetVal.restype = i32
+        c.AlxParamMgmt_ByKey_GetParamType.restype = i32
+        c.AlxParamMgmt_ByKey_GetParamType.argtypes = [vp, cp]
+        c.AlxParamMgmtTest_FlagParamType.restype = i32
+        c.AlxParamMgmtTest_FlagParamType.argtypes = [u32]
+        c.AlxParamMgmt_ByKey_SetVal.argtypes = [vp, cp, vp]
         c.AlxParamMgmt_ByKey_SetVal_StrFormat.restype = i32
         c.AlxParamMgmt_ByKey_SetVal_StrFormat.argtypes = [vp, cp, cp]
         c.AlxParamMgmt_ById_GetValLen.restype = i32
         c.AlxParamMgmt_ById_GetValLen.argtypes = [vp, u32, ctypes.POINTER(u32)]
-        for name in ("Get", "Set"):
+        for name in ("GetVal", "SetVal"):
             fn = getattr(c, f"AlxParamMgmt_ById_{name}")
             fn.restype = i32
             fn.argtypes = [vp, u32, ctypes.c_void_p, u32]
@@ -1731,6 +1752,8 @@ class ParamMgmtLib:
         self.ERR = c.AlxParamMgmtTest_Status_Err()
         self.PARAM = c.AlxParamMgmtTest_ParamType_Param()
         self.VAR = c.AlxParamMgmtTest_ParamType_Var()
+        self.FLAG = c.AlxParamMgmtTest_ParamType_Flag()
+        self.UNDEFINED = c.AlxParamMgmtTest_ParamType_Undefined()
         self.TYPES = {name: getattr(c, f"AlxParamMgmtTest_DataType_{name}")()
                       for name in ("Uint8", "Uint16", "Uint32", "Int32", "Float", "Bool")}
         self._handles: list = []
@@ -1775,18 +1798,22 @@ class ParamMgmtLib:
     def set_by_key(self, mgmt, key: str, value: str) -> int:
         return self.c.AlxParamMgmt_ByKey_SetVal_StrFormat(mgmt, key.encode(), value.encode())
 
+    def set_native_by_key(self, mgmt, key: str, raw: bytes) -> int:
+        buff = ctypes.create_string_buffer(raw, len(raw))
+        return self.c.AlxParamMgmt_ByKey_SetVal(mgmt, key.encode(), buff)
+
     def len_by_id(self, mgmt, identifier: int) -> tuple[int, int]:
         out = ctypes.c_uint32()
         return self.c.AlxParamMgmt_ById_GetValLen(mgmt, identifier, ctypes.byref(out)), out.value
 
     def get_by_id(self, mgmt, identifier: int, length: int) -> tuple[int, bytes]:
         buff = ctypes.create_string_buffer(length)
-        status = self.c.AlxParamMgmt_ById_Get(mgmt, identifier, buff, length)
+        status = self.c.AlxParamMgmt_ById_GetVal(mgmt, identifier, buff, length)
         return status, buff.raw
 
     def set_by_id(self, mgmt, identifier: int, raw: bytes) -> int:
         buff = ctypes.create_string_buffer(raw, len(raw))
-        return self.c.AlxParamMgmt_ById_Set(mgmt, identifier, buff, len(raw))
+        return self.c.AlxParamMgmt_ById_SetVal(mgmt, identifier, buff, len(raw))
 
     def defaults_group(self, mgmt, group_id: int) -> None:
         self.c.AlxParamMgmt_SetValToDef_Group(mgmt, group_id)

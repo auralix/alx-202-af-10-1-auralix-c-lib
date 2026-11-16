@@ -74,6 +74,33 @@ def test_ALX1553_P212_every_item_reports_its_own_identity(param_mgmt_lib, index)
                                     else param_mgmt_lib.PARAM)
 
 
+@pytest.mark.parametrize("index", range(len(TABLE)))
+def test_get_param_type_by_key(param_mgmt_lib, index):
+    lib = param_mgmt_lib
+    mgmt = lib.table()
+    expected = lib.VAR if TABLE[index]["key"] == "VAR_F" else lib.PARAM
+    assert lib.c.AlxParamMgmt_ByKey_GetParamType(mgmt, TABLE[index]["key"].encode()) == expected
+
+
+@pytest.mark.parametrize("key", [b"", b"MISSING", b"u8_a", b"U8_A "])
+def test_get_param_type_by_key_unknown_returns_undefined(param_mgmt_lib, key):
+    lib = param_mgmt_lib
+    assert lib.c.AlxParamMgmt_ByKey_GetParamType(lib.table(), key) == lib.UNDEFINED
+
+
+def test_boolean_flag_constructor_and_key_lookup(param_mgmt_lib):
+    lib = param_mgmt_lib
+    assert lib.c.AlxParamMgmtTest_FlagParamType(0) == lib.FLAG
+
+
+@pytest.mark.expect_assert("Flag properties must use Bool, including separate array/string constructors")
+@pytest.mark.parametrize("ctor", [1, 2, 3], ids=["numeric", "array", "string"])
+def test_non_boolean_flag_constructor_asserts(param_mgmt_lib, asserts_on, ctor):
+    lib = param_mgmt_lib
+    lib.c.AlxParamMgmtTest_FlagParamType(ctor)
+    assert lib.c.AlxAssertFake_Count() == (1 if asserts_on else 0)
+
+
 def test_ALX1553_P213_the_dump_of_every_value_is_the_table_of_defaults(param_mgmt_lib):
     """A freshly constructed table reads back as its declared defaults, in index order.
 
@@ -145,6 +172,62 @@ def test_ALX1553_P216_by_id_reads_and_writes_the_raw_value(param_mgmt_lib):
 
 
 # =====================================================================
+# Native value writes by key
+# =====================================================================
+
+
+@pytest.mark.parametrize(("key", "raw", "index", "expected"), [
+    ("U8_A", bytes([200]), 0, "200"),
+    ("U16_B", (4242).to_bytes(2, "little"), 1, "4242"),
+    ("I32_C", (-55).to_bytes(4, "little", signed=True), 2, "-55"),
+    ("BOOL_E", bytes([0]), 4, "false"),
+    ("VAR_F", (999).to_bytes(4, "little"), 5, "999"),
+])
+def test_native_set_by_key_updates_only_the_selected_value(param_mgmt_lib, key, raw, index, expected):
+    mgmt = param_mgmt_lib.table()
+    assert param_mgmt_lib.set_native_by_key(mgmt, key, raw) == param_mgmt_lib.OK
+    values = DEFAULTS.copy()
+    values[index] = expected
+    assert param_mgmt_lib.values(mgmt) == values
+
+
+@pytest.mark.parametrize(("key", "raw"), [
+    ("UNKNOWN", bytes([0])), ("bool_e", bytes([0])),
+])
+def test_native_set_by_key_rejects_missing_key(param_mgmt_lib, key, raw):
+    mgmt = param_mgmt_lib.table()
+    assert param_mgmt_lib.set_native_by_key(mgmt, key, raw) == param_mgmt_lib.ERR
+    assert param_mgmt_lib.values(mgmt) == DEFAULTS
+
+
+def test_native_set_by_key_reads_only_the_value_type(param_mgmt_lib):
+    mgmt = param_mgmt_lib.table()
+    assert param_mgmt_lib.set_native_by_key(mgmt, "BOOL_E", bytes([0, 255])) == param_mgmt_lib.OK
+    values = DEFAULTS.copy()
+    values[4] = "false"
+    assert param_mgmt_lib.values(mgmt) == values
+
+
+@pytest.mark.parametrize("value", [-101, 101])
+def test_native_set_by_key_preserves_item_range_validation(param_mgmt_lib, value):
+    mgmt = param_mgmt_lib.table()
+    raw = value.to_bytes(4, "little", signed=True)
+    assert param_mgmt_lib.set_native_by_key(mgmt, "I32_C", raw) != param_mgmt_lib.OK
+    assert param_mgmt_lib.values(mgmt) == DEFAULTS
+
+
+def test_native_set_by_key_tracks_changes_for_storage(param_mgmt_lib):
+    mgmt = param_mgmt_lib.table_with_store()
+    assert param_mgmt_lib.set_native_by_key(mgmt, "BOOL_E", bytes([0])) == param_mgmt_lib.OK
+    assert param_mgmt_lib.store(mgmt) == param_mgmt_lib.OK
+    assert param_mgmt_lib.kv_counts()[1] == 1
+
+    assert param_mgmt_lib.set_native_by_key(mgmt, "BOOL_E", bytes([0])) == param_mgmt_lib.OK
+    assert param_mgmt_lib.store(mgmt) == param_mgmt_lib.OK
+    assert param_mgmt_lib.kv_counts()[1] == 1
+
+
+# =====================================================================
 # P217-P218 - back to the defaults
 # =====================================================================
 
@@ -208,7 +291,7 @@ def test_ALX1564_P724_load_and_store_walk_the_items_of_a_group_or_of_all_and_sto
     """Over the KV store fake: a changed item is stored, every item is loaded, once each; a failing store ends the walk.
 
     An item stores itself only while a change is pending, which the item's own setter marks and the
-    raw ById_Set does not (AlxParamItem_StoreVal), so each store is preceded by a set by key.
+    raw ById_SetVal does not (AlxParamItem_StoreVal), so each store is preceded by a set by key.
     """
     mgmt = param_mgmt_lib.table_with_store()
     changes = {"U8_A": "7", "U16_B": "10000", "I32_C": "-10", "F_D": "4.0", "BOOL_E": "false", "VAR_F": "43"}

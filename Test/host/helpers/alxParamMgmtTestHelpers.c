@@ -43,6 +43,9 @@ void AlxParamMgmtTest_Delete(AlxParamMgmt* me);
 uint32_t AlxParamMgmtTest_NumOfItems(void);
 int32_t AlxParamMgmtTest_ParamType_Param(void);
 int32_t AlxParamMgmtTest_ParamType_Var(void);
+int32_t AlxParamMgmtTest_ParamType_Flag(void);
+int32_t AlxParamMgmtTest_ParamType_Undefined(void);
+int32_t AlxParamMgmtTest_FlagParamType(uint32_t ctor);
 int32_t AlxParamMgmtTest_DataType_Uint8(void);
 int32_t AlxParamMgmtTest_DataType_Uint16(void);
 int32_t AlxParamMgmtTest_DataType_Uint32(void);
@@ -113,6 +116,50 @@ int32_t AlxParamMgmtTest_ParamType_Param(void)
 int32_t AlxParamMgmtTest_ParamType_Var(void)
 {
 	return (int32_t)AlxParamItem_Var;
+}
+int32_t AlxParamMgmtTest_ParamType_Flag(void)
+{
+	return (int32_t)AlxParamItem_Flag;
+}
+int32_t AlxParamMgmtTest_ParamType_Undefined(void)
+{
+	return (int32_t)AlxParamItem_Undefined;
+}
+int32_t AlxParamMgmtTest_FlagParamType(uint32_t ctor)
+{
+	AlxParamItem item = {0};
+	AlxParamMgmt mgmt = {0};
+	uint8_t valDef[8] = {0};
+	uint8_t valBuff[8] = {0};
+	uint8_t valDefBuff[8] = {0};
+
+	// Exercise each constructor path: Bool, shared numeric, array and string.
+	switch (ctor)
+	{
+		case 0:
+			AlxParamItem_CtorBool(&item, NULL, AlxParamItem_Flag, "FLAG_TEST", 1, NULL, 0,
+				false, "", false);
+			break;
+		case 1:
+			AlxParamItem_CtorUint32(&item, NULL, AlxParamItem_Flag, "FLAG_TEST", 1, NULL, 0,
+				0, 0, 100, AlxParamItem_Ignore, false, NULL, 0, "", false);
+			break;
+		case 2:
+			AlxParamItem_CtorArr(&item, NULL, AlxParamItem_Flag, "FLAG_TEST", 1, NULL, 0,
+				valDef, valBuff, valDefBuff, sizeof(valBuff), AlxParamItem_Ignore, "", false);
+			break;
+		case 3:
+			AlxParamItem_CtorStr(&item, NULL, AlxParamItem_Flag, "FLAG_TEST", 1, NULL, 0,
+				"", AlxParamItem_Ignore, "", false, valBuff, sizeof(valBuff));
+			break;
+		default:
+			return (int32_t)AlxParamItem_Undefined;
+	}
+
+	AlxParamMgmt_Ctor(&mgmt, &item, 1);
+	char key[] = "FLAG_TEST";
+	AlxParamItem_ParamType paramType = AlxParamMgmt_ByKey_GetParamType(&mgmt, key);
+	return (int32_t)paramType;
 }
 int32_t AlxParamMgmtTest_DataType_Uint8(void)
 {

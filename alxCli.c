@@ -48,6 +48,7 @@ static void AlxCli_Get(AlxCli* me, bool paramTypeCheck, AlxParamItem_ParamType p
 //******************************************************************************
 bool AlxCli_Handle_Callback(AlxCli* me);
 bool AlxCli_Help_Callback(AlxCli* me);
+void AlxCli_ClearFlag_Callback(AlxCli* me, AlxParamItem* paramItem);
 
 
 //******************************************************************************
@@ -193,7 +194,9 @@ void AlxCli_Handle(AlxCli* me)
 				ALX_CLI_ASSERT(status == Alx_Ok);
 				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"get-trig\":\"Get Triggers Command - Gets device triggers\",\r\n");
 				ALX_CLI_ASSERT(status == Alx_Ok);
-				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"set-param\":\"Set Parameter Command - Sets specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\"");
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"set-param\":\"Set Parameter Command - Sets specified device parameter value: set-param --key <param_key> --val <param_val_to_set>\",\r\n");
+				ALX_CLI_ASSERT(status == Alx_Ok);
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, "        \"clear-flag\":\"Clear Flag Command - Clears specified device flag: clear-flag --key <flag_key>\"");
 				ALX_CLI_ASSERT(status == Alx_Ok);
 				bool isImplemented = AlxCli_Help_Callback(me);
 				if (isImplemented == false)
@@ -580,6 +583,86 @@ void AlxCli_Handle(AlxCli* me)
 
 
 			//------------------------------------------------------------------------------
+			// Clear Flag Command
+			//------------------------------------------------------------------------------
+			if (strncmp(me->buff, "clear-flag ", strlen("clear-flag ")) == 0)
+			{
+				//------------------------------------------------------------------------------
+				// Handle
+				//------------------------------------------------------------------------------
+				while (1)
+				{
+					//------------------------------------------------------------------------------
+					// Parse
+					//------------------------------------------------------------------------------
+
+					// Find
+					char* key = strstr(me->buff, " --key ");
+					if (key == NULL)
+					{
+						AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrArg);
+						break;
+					}
+
+					// Split
+					key = key + strlen(" --key ");
+					if (*key == '\0')
+					{
+						AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrArg);
+						break;
+					}
+
+
+					//------------------------------------------------------------------------------
+					// Check
+					//------------------------------------------------------------------------------
+					AlxParamItem_ParamType paramType = AlxParamMgmt_ByKey_GetParamType(me->alxParamMgmt, key);
+					if (paramType != AlxParamItem_Flag)
+					{
+						AlxCli_PrepareResponse(me, AlxCli_ResponseType_ErrArg);
+						break;
+					}
+
+
+					//------------------------------------------------------------------------------
+					// Clear
+					//------------------------------------------------------------------------------
+					bool val = false;
+					status = AlxParamMgmt_ByKey_SetVal(me->alxParamMgmt, key, &val);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+
+
+					//------------------------------------------------------------------------------
+					// Callback
+					//------------------------------------------------------------------------------
+					AlxParamItem* paramItem = AlxParamMgmt_ByKey_GetParamItemPtr(me->alxParamMgmt, key);
+					ALX_CLI_ASSERT(paramItem != NULL);
+					AlxCli_ClearFlag_Callback(me, paramItem);
+
+
+					//------------------------------------------------------------------------------
+					// Break
+					//------------------------------------------------------------------------------
+					AlxCli_PrepareResponse(me, AlxCli_ResponseType_Success);
+					break;
+				}
+
+
+				//------------------------------------------------------------------------------
+				// Send Response
+				//------------------------------------------------------------------------------
+				status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+				ALX_CLI_ASSERT(status == Alx_Ok);
+
+
+				//------------------------------------------------------------------------------
+				// Break
+				//------------------------------------------------------------------------------
+				break;
+			}
+
+
+			//------------------------------------------------------------------------------
 			// Callback
 			//------------------------------------------------------------------------------
 			bool wasCmdHandled = AlxCli_Handle_Callback(me);
@@ -915,6 +998,11 @@ ALX_WEAK bool AlxCli_Help_Callback(AlxCli* me)
 {
 	(void)me;
 	return false;
+}
+ALX_WEAK void AlxCli_ClearFlag_Callback(AlxCli* me, AlxParamItem* paramItem)
+{
+	(void)me;
+	(void)paramItem;
 }
 
 

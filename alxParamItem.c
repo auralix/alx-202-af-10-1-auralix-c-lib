@@ -90,7 +90,7 @@ static void AlxParamItem_Ctor
 static bool AlxParamItem_AreEnumArrValFromLowToHigh(AlxParamItem* me);
 static bool AlxParamItem_IsEnumOnList(AlxParamItem* me, void* enumVal);
 static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me);
-static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val);
+static Alx_Status AlxParamItem_SetVal_Private(AlxParamItem* me, void* val);
 
 
 //******************************************************************************
@@ -597,6 +597,7 @@ void AlxParamItem_CtorArr
 )
 {
 	// Assert
+	ALX_PARAM_ITEM_ASSERT(paramType != AlxParamItem_Flag);
 	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
 	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
 
@@ -642,6 +643,7 @@ void AlxParamItem_CtorStr
 )
 {
 	// Assert
+	ALX_PARAM_ITEM_ASSERT(paramType != AlxParamItem_Flag);
 	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
 	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
 	ALX_UNUSED uint32_t valDefLen = (uint32_t)strlen(valDef);
@@ -1091,6 +1093,22 @@ Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWi
   * @retval			Alx_Ok
   * @retval			Alx_Err
   */
+Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
+{
+	// Assert
+	ALX_PARAM_ITEM_ASSERT(me->wasCtorCalled == true);
+
+	// Set
+	return AlxParamItem_SetVal_Private(me, val);
+}
+
+/**
+  * @brief
+  * @param[in,out]	me
+  * @param[in]		val
+  * @retval			Alx_Ok
+  * @retval			Alx_Err
+  */
 Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val)
 {
 	// Assert
@@ -1098,7 +1116,7 @@ Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint8);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1115,7 +1133,7 @@ Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint16);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1132,7 +1150,7 @@ Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint32);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1149,7 +1167,7 @@ Alx_Status AlxParamItem_SetValUint64(AlxParamItem* me, uint64_t val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Uint64);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1166,7 +1184,7 @@ Alx_Status AlxParamItem_SetValInt8(AlxParamItem* me, int8_t val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int8);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1183,7 +1201,7 @@ Alx_Status AlxParamItem_SetValInt16(AlxParamItem* me, int16_t val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int16);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1200,7 +1218,7 @@ Alx_Status AlxParamItem_SetValInt32(AlxParamItem* me, int32_t val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int32);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1217,7 +1235,7 @@ Alx_Status AlxParamItem_SetValInt64(AlxParamItem* me, int64_t val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Int64);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1234,7 +1252,7 @@ Alx_Status AlxParamItem_SetValFloat(AlxParamItem* me, float val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Float);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1251,7 +1269,7 @@ Alx_Status AlxParamItem_SetValDouble(AlxParamItem* me, double val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Double);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1268,7 +1286,7 @@ Alx_Status AlxParamItem_SetValBool(AlxParamItem* me, bool val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Bool);
 
 	// Set
-	return AlxParamItem_SetVal(me, &val);
+	return AlxParamItem_SetVal_Private(me, &val);
 }
 
 /**
@@ -1300,7 +1318,7 @@ Alx_Status AlxParamItem_SetValStr(AlxParamItem* me, char* val)
 	ALX_PARAM_ITEM_ASSERT(me->dataType == AlxParamItem_Str);
 
 	// Set
-	return AlxParamItem_SetVal(me, val);
+	return AlxParamItem_SetVal_Private(me, val);
 }
 
 
@@ -1376,7 +1394,7 @@ void AlxParamItem_SetValToDef(AlxParamItem* me)
 	}
 
 	// Set
-	ALX_UNUSED Alx_Status status = AlxParamItem_SetVal(me, valDefPtr);
+	ALX_UNUSED Alx_Status status = AlxParamItem_SetVal_Private(me, valDefPtr);
 	ALX_PARAM_ITEM_ASSERT(status == Alx_Ok);
 }
 uint8_t AlxParamItem_GetValDefUint8(AlxParamItem* me)
@@ -2017,7 +2035,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		uint8_t valNum = (uint8_t)valNum_Uint32;
 
 		// Set
-		status = AlxParamItem_SetVal(me, &valNum);
+		status = AlxParamItem_SetVal_Private(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Uint16)
 	{
@@ -2034,7 +2052,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		uint16_t valNum = (uint16_t)valNum_Uint32;
 
 		// Set
-		status = AlxParamItem_SetVal(me, &valNum);
+		status = AlxParamItem_SetVal_Private(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Uint32)
 	{
@@ -2046,7 +2064,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetVal(me, &valNum);
+		status = AlxParamItem_SetVal_Private(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Uint64)
 	{
@@ -2067,7 +2085,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		int8_t valNum = (int8_t)valNum_Int32;
 
 		// Set
-		status = AlxParamItem_SetVal(me, &valNum);
+		status = AlxParamItem_SetVal_Private(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Int16)
 	{
@@ -2084,7 +2102,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		int16_t valNum = (int16_t)valNum_Int32;
 
 		// Set
-		status = AlxParamItem_SetVal(me, &valNum);
+		status = AlxParamItem_SetVal_Private(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Int32)
 	{
@@ -2096,7 +2114,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetVal(me, &valNum);
+		status = AlxParamItem_SetVal_Private(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Int64)
 	{
@@ -2112,7 +2130,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetVal(me, &valNum);
+		status = AlxParamItem_SetVal_Private(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Double)
 	{
@@ -2124,7 +2142,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetVal(me, &valNum);
+		status = AlxParamItem_SetVal_Private(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Bool)
 	{
@@ -2160,7 +2178,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 		}
 
 		// Set
-		status = AlxParamItem_SetVal(me, &valNum);
+		status = AlxParamItem_SetVal_Private(me, &valNum);
 	}
 	else if (me->dataType == AlxParamItem_Arr)
 	{
@@ -2169,7 +2187,7 @@ Alx_Status AlxParamItem_SetVal_StrFormat(AlxParamItem* me, char* val)
 	else if (me->dataType == AlxParamItem_Str)
 	{
 		// Set
-		status = AlxParamItem_SetVal(me, val);
+		status = AlxParamItem_SetVal_Private(me, val);
 	}
 	else
 	{
@@ -2270,7 +2288,7 @@ Alx_Status AlxParamItem_LoadVal(AlxParamItem* me)
 	//------------------------------------------------------------------------------
 
 	// Set value
-	status = AlxParamItem_SetVal(me, buff);
+	status = AlxParamItem_SetVal_Private(me, buff);
 
 	// Force pending store to FALSE - We had problem, that if loaded val diff than default, pendingStore was set.. we don't want that..
 	me->pendingStore = false;
@@ -2377,6 +2395,7 @@ static void AlxParamItem_Ctor
 )
 {
 	// Assert
+	ALX_PARAM_ITEM_ASSERT(dataType == AlxParamItem_Bool || paramType != AlxParamItem_Flag);
 	ALX_UNUSED uint32_t keyLen = (uint32_t)strlen(key);
 	ALX_PARAM_ITEM_ASSERT(keyLen < ALX_PARAM_ITEM_KEY_LEN_WITH_NULL_TERM_MAX);
 
@@ -2730,7 +2749,7 @@ static void* AlxParamItem_GetValPtr_Private(AlxParamItem* me)
 		return &me->val;
 	}
 }
-static Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val)
+static Alx_Status AlxParamItem_SetVal_Private(AlxParamItem* me, void* val)
 {
 	//------------------------------------------------------------------------------
 	// Local Variables

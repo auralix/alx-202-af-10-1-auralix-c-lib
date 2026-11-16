@@ -23,6 +23,9 @@ void AlxSerialPortFake_Unregister(AlxSerialPort* me);
 // CMSIS shim (declaration for alxCli.c comes from Test/alxConfig.h on PC)
 void NVIC_SystemReset(void);
 
+// Weak callback override
+void AlxCli_ClearFlag_Callback(AlxCli* me, AlxParamItem* paramItem);
+
 #define ALX_CLI_TEST_BUFF_LEN 1024
 #define ALX_CLI_TEST_STR_VAL_BUFF_LEN 600	// Str param value buffer -> value <= 599 chars (longer than any stack array the old parser had)
 
@@ -37,6 +40,9 @@ typedef struct
 	AlxParamMgmt paramMgmt;
 	AlxCli cli;
 	char buff[ALX_CLI_TEST_BUFF_LEN];
+	bool flagLatch;
+	bool relatchOnClear;
+	uint32_t flagClearCount;
 } AlxCliTest_Ctx;
 
 // Exported test API
@@ -53,8 +59,45 @@ uint32_t AlxCliTest_GetBuffLen(void);
 uint32_t AlxCliTest_GetStrValBuffLen(void);
 bool AlxCliTest_WasResetRequested(void);
 void AlxCliTest_ClearResetRequested(void);
+void AlxCliTest_LatchFlag(AlxCliTest_Ctx* ctx, bool relatchOnClear);
+void AlxCliTest_PublishFlag(AlxCliTest_Ctx* ctx);
+uint32_t AlxCliTest_FlagClearCount(AlxCliTest_Ctx* ctx);
 
 static bool nvicResetRequested = false;
+static AlxCliTest_Ctx* flagOwner = NULL;
+
+void AlxCli_ClearFlag_Callback(AlxCli* me, AlxParamItem* paramItem)
+{
+	if (flagOwner != NULL && me == &flagOwner->cli && paramItem == &flagOwner->paramItems[4])
+	{
+		ALX_CLI_ASSERT(AlxParamItem_GetValBool(&flagOwner->paramItems[4]) == false);
+		flagOwner->flagLatch = false;
+		flagOwner->flagClearCount++;
+		if (flagOwner->relatchOnClear)
+		{
+			// Simulate an event after the owner's clear, before the CLI responds.
+			flagOwner->flagLatch = true;
+		}
+	}
+}
+
+void AlxCliTest_LatchFlag(AlxCliTest_Ctx* ctx, bool relatchOnClear)
+{
+	flagOwner = ctx;
+	ctx->flagLatch = true;
+	ctx->relatchOnClear = relatchOnClear;
+	AlxCliTest_PublishFlag(ctx);
+}
+
+void AlxCliTest_PublishFlag(AlxCliTest_Ctx* ctx)
+{
+	(void)AlxParamItem_SetValBool(&ctx->paramItems[4], ctx->flagLatch);
+}
+
+uint32_t AlxCliTest_FlagClearCount(AlxCliTest_Ctx* ctx)
+{
+	return ctx->flagClearCount;
+}
 
 void NVIC_SystemReset(void)
 {
@@ -256,6 +299,10 @@ const char* AlxCliTest_Buff(AlxCliTest_Ctx* ctx)
 }
 void AlxCliTest_Delete(AlxCliTest_Ctx* ctx)
 {
+	if (flagOwner == ctx)
+	{
+		flagOwner = NULL;
+	}
 	AlxSerialPortFake_Unregister(&ctx->port);
 	free(ctx);
 }

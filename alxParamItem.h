@@ -106,7 +106,8 @@ typedef enum
 	AlxParamItem_Var,
 	AlxParamItem_Flag,
 	AlxParamItem_Const,
-	AlxParamItem_Trig
+	AlxParamItem_Trig,
+	AlxParamItem_Undefined
 } AlxParamItem_ParamType;
 
 typedef enum
@@ -453,6 +454,7 @@ Alx_Status AlxParamItem_GetValStr(AlxParamItem* me, char* val, uint32_t maxLenWi
 //------------------------------------------------------------------------------
 // Set
 //------------------------------------------------------------------------------
+Alx_Status AlxParamItem_SetVal(AlxParamItem* me, void* val);
 Alx_Status AlxParamItem_SetValUint8(AlxParamItem* me, uint8_t val);
 Alx_Status AlxParamItem_SetValUint16(AlxParamItem* me, uint16_t val);
 Alx_Status AlxParamItem_SetValUint32(AlxParamItem* me, uint32_t val);

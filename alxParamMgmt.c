@@ -217,6 +217,84 @@ Alx_Status AlxParamMgmt_ByIndex_GetVal_StrFormat(AlxParamMgmt* me, uint32_t inde
 //------------------------------------------------------------------------------
 // By Key
 //------------------------------------------------------------------------------
+AlxParamItem* AlxParamMgmt_ByKey_GetParamItemPtr(AlxParamMgmt* me, char* key)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get key
+		const char* _key = AlxParamItem_GetKey(ptr);
+
+		// If key match, get parameter item pointer
+		if (strcmp(key, _key) == 0)
+		{
+			// Return
+			return ptr;
+		}
+	}
+
+	// If we are here, key was not found, so we return NULL pointer
+	return NULL;
+}
+AlxParamItem_ParamType AlxParamMgmt_ByKey_GetParamType(AlxParamMgmt* me, char* key)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get key
+		const char* _key = AlxParamItem_GetKey(ptr);
+
+		// If key match, get parameter type
+		if (strcmp(key, _key) == 0)
+		{
+			// Return
+			return AlxParamItem_GetParamType(ptr);
+		}
+	}
+
+	// If we are here, key was not found, so we return UNDEFINED
+	return AlxParamItem_Undefined;
+}
+Alx_Status AlxParamMgmt_ByKey_SetVal(AlxParamMgmt* me, char* key, void* val)
+{
+	// Assert
+	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
+
+	// Loop through all parameters
+	for (uint32_t i = 0; i < me->numOfParamItems; i++)
+	{
+		// Get pointer
+		AlxParamItem* ptr = &me->paramItemArr[i];
+
+		// Get key
+		const char* _key = AlxParamItem_GetKey(ptr);
+
+		// If key match, set value
+		if (strcmp(key, _key) == 0)
+		{
+			// Set
+			Alx_Status status = AlxParamItem_SetVal(ptr, val);
+
+			// Return
+			return status;
+		}
+	}
+
+	// If we are here, key was not found, so we return ERROR
+	return Alx_Err;
+}
 Alx_Status AlxParamMgmt_ByKey_SetVal_StrFormat(AlxParamMgmt* me, char* key, char* val)
 {
 	// Assert
@@ -281,7 +359,7 @@ Alx_Status AlxParamMgmt_ById_GetValLen(AlxParamMgmt* me, uint32_t id, uint32_t* 
 	// If we are here, id was not found, so we return ERROR
 	return Alx_Err;
 }
-Alx_Status AlxParamMgmt_ById_Get(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len)
+Alx_Status AlxParamMgmt_ById_GetVal(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len)
 {
 	// Assert
 	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
@@ -318,7 +396,7 @@ Alx_Status AlxParamMgmt_ById_Get(AlxParamMgmt* me, uint32_t id, void* val, uint3
 	// If we are here, id was not found, so we return ERROR
 	return Alx_Err;
 }
-Alx_Status AlxParamMgmt_ById_Set(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len)
+Alx_Status AlxParamMgmt_ById_SetVal(AlxParamMgmt* me, uint32_t id, void* val, uint32_t len)
 {
 	// Assert
 	ALX_PARAM_MGMT_ASSERT(me->wasCtorCalled == true);
