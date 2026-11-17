@@ -105,7 +105,7 @@ typedef enum
 	#endif
 	#if defined(ALX_STM32U3)
 	AlxClk_Config_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default,
-	AlxClk_Config_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz,
+	AlxClk_Config_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz_Smps,
 	#endif
 	#if defined(ALX_STM32U5)
 	AlxClk_Config_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default,
@@ -125,6 +125,9 @@ typedef struct
 	uint32_t flashLatency;
 	#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3) || defined(ALX_STM32U5)
 	uint32_t pwrRegVoltageScale;
+	#endif
+	#if defined(ALX_STM32U3)
+	bool isPwrRegSmps;
 	#endif
 	#if defined(ALX_STM32U3)
 	bool isPwrRegEpodBooster;

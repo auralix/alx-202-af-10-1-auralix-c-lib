@@ -90,7 +90,7 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 #endif
 #if defined(ALX_STM32U3)
 static void AlxClk_Ctor_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default(AlxClk* me);
-static void AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz(AlxClk* me);
+static void AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz_Smps(AlxClk* me);
 #endif
 #if defined(ALX_STM32U5)
 static void AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default(AlxClk* me);
@@ -176,7 +176,7 @@ ALX_WEAK void AlxClk_Ctor
 	#endif
 	#if defined(ALX_STM32U3)
 	if		(me->config == AlxClk_Config_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default)					{ AlxClk_Ctor_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default(me);	me->backupHsiEnable = false;	}
-	else if	(me->config == AlxClk_Config_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz)							{ AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz(me);			me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz_Smps)					{ AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz_Smps(me);		me->backupHsiEnable = false;	}
 	#endif
 	#if defined(ALX_STM32U5)
 	if		(me->config == AlxClk_Config_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default)						{ AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default(me);			me->backupHsiEnable = false;	}
@@ -242,6 +242,19 @@ ALX_WEAK Alx_Status AlxClk_Init(AlxClk* me)
 
 	// Enable SYSCFG periphery clock
 	__HAL_RCC_SYSCFG_CLK_ENABLE();
+
+	// Config SMPS
+	#if defined(ALX_STM32U3)
+	if (me->isPwrRegSmps)
+	{
+		if (HAL_PWREx_ConfigSupply(PWR_SMPS_SUPPLY) != HAL_OK)
+		{
+			ALX_CLK_TRACE_ERR("Err");
+			return Alx_Err;
+		}
+
+	}
+	#endif
 
 	// Init flash latency
 	__HAL_FLASH_SET_LATENCY(me->flashLatency);
@@ -1677,6 +1690,7 @@ static void AlxClk_Ctor_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_
 
 	// Set power
 	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE2;
+	me->isPwrRegSmps = false;
 	me->isPwrRegEpodBooster = false;
 
 	// Set OSC
@@ -1716,13 +1730,14 @@ static void AlxClk_Ctor_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_
 	me->pllP_Ctor = 0;
 	me->pllQ_Ctor = 0;
 }
-static void AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz(AlxClk* me)
+static void AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz_Smps(AlxClk* me)
 {
 	// Set flash latency
 	me->flashLatency = FLASH_LATENCY_2;
 
 	// Set power
 	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE2;
+	me->isPwrRegSmps = true;
 	me->isPwrRegEpodBooster = true;
 
 	// Set OSC
