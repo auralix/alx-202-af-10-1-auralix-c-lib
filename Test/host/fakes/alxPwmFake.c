@@ -38,6 +38,8 @@ static int32_t alxPwmFake_forcedStatus = Alx_Ok;	// what Init and DeInit answer 
 //******************************************************************************
 // Prototypes - the DLL export surface (no separate header for test fakes)
 //******************************************************************************
+static Alx_Status alxPwmFake_writeStatus = Alx_Ok;
+void AlxPwmFake_SetWriteStatus(int32_t status);
 void AlxPwmFake_Reset(void);
 float AlxPwmFake_Duty_pct(const AlxPwm* me, uint32_t ch);
 uint32_t AlxPwmFake_WriteCount(const AlxPwm* me, uint32_t ch);
@@ -66,6 +68,11 @@ static uint32_t AlxPwmFake_Slot(const AlxPwm* me, uint32_t ch)
 //******************************************************************************
 // The fake's own controls
 //******************************************************************************
+void AlxPwmFake_SetWriteStatus(int32_t status)
+{
+	alxPwmFake_writeStatus = (Alx_Status)status;
+}
+
 void AlxPwmFake_Reset(void)
 {
 	memset(alxPwmFake_pwm, 0, sizeof(alxPwmFake_pwm));
@@ -73,6 +80,7 @@ void AlxPwmFake_Reset(void)
 	memset(alxPwmFake_duty_pct, 0, sizeof(alxPwmFake_duty_pct));
 	memset(alxPwmFake_writeCount, 0, sizeof(alxPwmFake_writeCount));
 	alxPwmFake_used = 0;
+	alxPwmFake_writeStatus = Alx_Ok;
 	alxPwmFake_forcedStatus = Alx_Ok;
 }
 
@@ -94,7 +102,7 @@ void AlxPwmFake_SetForcedStatus(int32_t status)
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
-#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4)
+#if defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U3)
 void AlxPwm_Ctor
 (
 	AlxPwm* me,
@@ -139,7 +147,7 @@ Alx_Status AlxPwm_SetDuty_pct(AlxPwm* me, Alx_Ch ch, float duty_pct)
 	uint32_t slot = AlxPwmFake_Slot(me, (uint32_t)ch);
 	alxPwmFake_duty_pct[slot] = duty_pct;
 	alxPwmFake_writeCount[slot]++;
-	return Alx_Ok;
+	return alxPwmFake_writeStatus;
 }
 Alx_Status AlxPwm_SetDuty_permil(AlxPwm* me, Alx_Ch ch, uint16_t duty_permil)
 {

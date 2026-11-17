@@ -151,7 +151,7 @@ static Alx_Status AlxI2cFake_Answer(void)
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
-#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5) || defined(ALX_STM32U3)
 void AlxI2c_Ctor(AlxI2c* me, I2C_TypeDef* i2c, AlxIoPin* io_SCL, AlxIoPin* io_SDA, AlxClk* clk, AlxI2c_Clk i2cClk)
 {
 	(void)i2c; (void)io_SCL; (void)io_SDA; (void)clk; (void)i2cClk;

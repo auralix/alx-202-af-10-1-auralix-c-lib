@@ -21,7 +21,7 @@
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
-#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4)
+#if defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U3)
 void AlxRst_Ctor(AlxRst* me)
 {
 	(void)me;

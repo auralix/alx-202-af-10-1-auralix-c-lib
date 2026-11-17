@@ -102,7 +102,7 @@ static void AlxIoPinFake_Drive(AlxIoPin* me, bool val)
 	alxIoPinFake_level[slot] = val;
 	alxIoPinFake_writeCount[slot]++;
 
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5) || defined(ALX_STM32U3)
 	// And into the port's OUTPUT DATA REGISTER, because a product may read some pins straight
 	// out of it rather than through AlxIoPin_Read. Only an OUTPUT writes ODR, which is the
 	// hardware's own rule and not a simplification: a pin in GPIO_MODE_INPUT has its output
@@ -184,7 +184,7 @@ uint32_t AlxIoPinFake_WriteCount(const AlxIoPin* me)
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
-#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F1) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5) || defined(ALX_STM32U3)
 void AlxIoPin_Ctor
 (
 	AlxIoPin* me,
@@ -193,7 +193,7 @@ void AlxIoPin_Ctor
 	uint32_t mode,
 	uint32_t pull,
 	uint32_t speed,
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5) || defined(ALX_STM32U3)
 	uint32_t alternate,
 	#endif
 	bool val
@@ -206,7 +206,7 @@ void AlxIoPin_Ctor
 	me->mode = mode;
 	me->pull = pull;
 	me->speed = speed;
-	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+	#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5) || defined(ALX_STM32U3)
 	me->alternate = alternate;
 	#endif
 	me->val = val;

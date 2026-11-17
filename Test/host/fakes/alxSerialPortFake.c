@@ -190,7 +190,7 @@ uint32_t AlxSerialPortFake_TxNumOfEntries(const AlxSerialPort* me)
 // The faked module's own contract (mirrors the real per-MCU pass-throughs, minus
 // IRQ locks - the fake is single-threaded by construction)
 //******************************************************************************
-#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32G4) || defined(ALX_STM32L0) || defined(ALX_STM32L4) || defined(ALX_STM32U5) || defined(ALX_STM32U3)
 void AlxSerialPort_Ctor
 (
 	AlxSerialPort* me,

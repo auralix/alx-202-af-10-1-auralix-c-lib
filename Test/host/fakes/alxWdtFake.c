@@ -49,7 +49,7 @@ uint32_t AlxWdtFake_RefreshCount(void)
 //******************************************************************************
 // The faked module's own contract
 //******************************************************************************
-#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5)
+#if defined(ALX_STM32F0) || defined(ALX_STM32F4) || defined(ALX_STM32F7) || defined(ALX_STM32L4) || defined(ALX_STM32U5) || defined(ALX_STM32U3)
 void AlxWdt_Ctor(AlxWdt* me, AlxWdt_Config config)
 {
 	(void)me; (void)config;
