@@ -17,6 +17,32 @@ import pytest
 
 pytestmark = pytest.mark.unit
 
+
+@pytest.mark.parametrize(("vin", "high", "low"), [
+    (120_000, 2_000_000, 40_000),
+    (3_000_000, 300_000_000, 3_000_000),
+    (0xFFFFFFFF, 0xFFFFFFFE, 0xFFFFFFFF),
+])
+def test_ALX1753_P3_integer_output_widens_product_and_sum(vdiv_lib, vin, high, low):
+    assert vdiv_lib.vout_mv(vin, high, low) == vin * low // (high + low)
+
+
+@pytest.mark.parametrize(("vout", "high", "low"), [
+    (1200, 2_000_000, 40_000),
+    (3000, 300_000_000, 3_000_000),
+    (2_000_000_000, 0xFFFFFFFF, 0xFFFFFFFF),
+])
+def test_ALX1753_P4_integer_input_widens_product_and_sum(vdiv_lib, vout, high, low):
+    assert vdiv_lib.vin_mv(vout, high, low) == (high + low) * vout // low
+
+
+@pytest.mark.parametrize(("vin", "vout", "resistance"), [
+    (120_000, 40_000, 2_000_000), (3000, 1500, 2_000_000_000),
+])
+def test_ALX1753_P5_integer_resistance_widens_intermediates(vdiv_lib, vin, vout, resistance):
+    assert vdiv_lib.res_high_ohm(vin, vout, resistance) == resistance * (vin - vout) // vout
+    assert vdiv_lib.res_low_ohm(vin, vout, resistance) == resistance * vout // (vin - vout)
+
 # a 10:1 divider, the shape a product uses to read a supply rail
 HIGH_KOHM, LOW_KOHM = 90.0, 10.0
 

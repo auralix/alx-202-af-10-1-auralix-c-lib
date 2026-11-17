@@ -1702,6 +1702,13 @@ FAKES_SOURCES = [
 FAKES_DEPS = [*FAKES_SOURCES, Path(__file__)]
 FAKES_DLL = BUILD_DIR / "alxFakesTest.dll"
 FAKES_EXPORTS = build_tools.Exports("alxFakesTest", (
+    "AlxI2cFake_Reset", "AlxI2cFake_SetSlaveReady", "AlxI2cFake_CallCount",
+    "AlxI2c_Master_IsSlaveReady",
+    "AlxI2cFake_LastSlaveAddr",
+    "AlxI2cFake_LastNumOfTries",
+    "AlxI2cFake_LastTimeout_ms",
+    "AlxAdcFake_SetTemp_degC",
+    "AlxAdc_TempSens_GetTemp_degC",
     # ADC
     "AlxAdcFake_Reset",
     "AlxAdcFake_SetVoltage_V",

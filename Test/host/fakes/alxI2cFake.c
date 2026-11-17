@@ -38,6 +38,9 @@ static uint8_t alxI2cFake_lastWrite[ALX_I2C_FAKE_NUM_OF_REGS][ALX_I2C_FAKE_REG_L
 static uint32_t alxI2cFake_writeCount[ALX_I2C_FAKE_NUM_OF_REGS];
 static uint32_t alxI2cFake_readCount[ALX_I2C_FAKE_NUM_OF_REGS];
 static bool alxI2cFake_slaveReady = true;
+static uint16_t alxI2cFake_lastSlaveAddr;
+static uint8_t alxI2cFake_lastNumOfTries;
+static uint16_t alxI2cFake_lastTimeout_ms;
 static int32_t alxI2cFake_forcedStatus = Alx_Ok;
 static uint8_t alxI2cFake_next[ALX_I2C_FAKE_NUM_OF_REGS][ALX_I2C_FAKE_REG_LEN];	// one read's answer (A97)
 static bool alxI2cFake_nextArmed[ALX_I2C_FAKE_NUM_OF_REGS];
@@ -55,6 +58,9 @@ void AlxI2cFake_GetLastWrite(uint8_t addr, uint8_t* data, uint8_t len);
 uint32_t AlxI2cFake_WriteCount(uint8_t addr);
 uint32_t AlxI2cFake_ReadCount(uint8_t addr);
 void AlxI2cFake_SetSlaveReady(bool ready);
+uint16_t AlxI2cFake_LastSlaveAddr(void);
+uint8_t AlxI2cFake_LastNumOfTries(void);
+uint16_t AlxI2cFake_LastTimeout_ms(void);
 void AlxI2cFake_SetForcedStatus(int32_t status);
 void AlxI2cFake_FailAt(uint32_t nth);
 uint32_t AlxI2cFake_CallCount(void);
@@ -72,6 +78,9 @@ void AlxI2cFake_Reset(void)
 	memset(alxI2cFake_next, 0, sizeof(alxI2cFake_next));
 	memset(alxI2cFake_nextArmed, 0, sizeof(alxI2cFake_nextArmed));
 	alxI2cFake_slaveReady = true;
+	alxI2cFake_lastSlaveAddr = 0;
+	alxI2cFake_lastNumOfTries = 0;
+	alxI2cFake_lastTimeout_ms = 0;
 	alxI2cFake_forcedStatus = Alx_Ok;
 	alxI2cFake_callCount = 0;
 	alxI2cFake_failAt = 0;
@@ -162,10 +171,17 @@ Alx_Status AlxI2c_DeInit(AlxI2c* me)
 }
 Alx_Status AlxI2c_Master_IsSlaveReady(AlxI2c* me, uint16_t slaveAddr, uint8_t numOfTries, uint16_t timeout_ms)
 {
-	(void)me; (void)slaveAddr; (void)numOfTries; (void)timeout_ms;
+	(void)me;
+	alxI2cFake_lastSlaveAddr = slaveAddr;
+	alxI2cFake_lastNumOfTries = numOfTries;
+	alxI2cFake_lastTimeout_ms = timeout_ms;
+	Alx_Status status = AlxI2cFake_Answer();
 	if (alxI2cFake_slaveReady == false) { return Alx_Err; }
-	return AlxI2cFake_Answer();
+	return status;
 }
+uint16_t AlxI2cFake_LastSlaveAddr(void) { return alxI2cFake_lastSlaveAddr; }
+uint8_t AlxI2cFake_LastNumOfTries(void) { return alxI2cFake_lastNumOfTries; }
+uint16_t AlxI2cFake_LastTimeout_ms(void) { return alxI2cFake_lastTimeout_ms; }
 Alx_Status AlxI2c_Master_StartReadMemStop(AlxI2c* me, uint16_t slaveAddr, uint16_t memAddr, AlxI2c_Master_MemAddrLen memAddrLen, uint8_t* data, uint16_t len, uint8_t numOfTries, uint16_t timeout_ms)
 {
 	(void)me; (void)slaveAddr; (void)memAddrLen; (void)numOfTries; (void)timeout_ms;

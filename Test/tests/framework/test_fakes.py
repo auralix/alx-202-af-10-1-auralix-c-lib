@@ -36,6 +36,42 @@ import pytest
 from harness.host.access import CanMsg
 
 
+@pytest.mark.parametrize("temperature", [-40, -1, 0, 25, 125])
+def test_ALX1753_P001_adc_temperature_is_signed_per_instance_and_resettable(fakes_lib, temperature):
+    c = fakes_lib.c
+    first, second = fakes_lib.handle(), fakes_lib.handle()
+    assert c.AlxAdc_TempSens_GetTemp_degC(first) == 0
+    c.AlxAdcFake_SetTemp_degC(first, temperature)
+    assert c.AlxAdc_TempSens_GetTemp_degC(first) == temperature
+    assert c.AlxAdc_TempSens_GetTemp_degC(second) == 0
+    c.AlxAdcFake_SetVoltage_V(first, 3, 1.5)
+    assert c.AlxAdc_GetVoltage_mV(first, 3) == 1500
+    assert c.AlxAdc_TempSens_GetTemp_degC(first) == temperature
+    c.AlxAdcFake_Reset()
+    assert c.AlxAdc_TempSens_GetTemp_degC(first) == 0
+
+
+def test_ALX1753_P002_i2c_readiness_records_failed_attempts_and_arguments(fakes_lib):
+    c = fakes_lib.c
+    for name, result in (("AlxI2cFake_LastSlaveAddr", ctypes.c_uint16),
+                         ("AlxI2cFake_LastNumOfTries", ctypes.c_uint8),
+                         ("AlxI2cFake_LastTimeout_ms", ctypes.c_uint16)):
+        func = getattr(c, name)
+        func.restype, func.argtypes = result, []
+    bus = fakes_lib.handle()
+    c.AlxI2cFake_SetSlaveReady(False)
+    before = c.AlxI2cFake_CallCount()
+    assert c.AlxI2c_Master_IsSlaveReady(bus, 0xA0, 3, 17) != fakes_lib.OK
+    assert c.AlxI2cFake_CallCount() == before + 1
+    assert c.AlxI2cFake_LastSlaveAddr() == 0xA0
+    assert c.AlxI2cFake_LastNumOfTries() == 3
+    assert c.AlxI2cFake_LastTimeout_ms() == 17
+    c.AlxI2cFake_Reset()
+    assert c.AlxI2cFake_LastSlaveAddr() == 0
+    assert c.AlxI2cFake_LastNumOfTries() == 0
+    assert c.AlxI2cFake_LastTimeout_ms() == 0
+
+
 def test_ALX1564_P306_an_adc_sequence_is_read_in_order_and_its_last_value_repeats(fakes_lib):
     c = fakes_lib.c
     adc = fakes_lib.handle()

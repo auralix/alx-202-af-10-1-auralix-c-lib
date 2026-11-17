@@ -44,6 +44,7 @@ static float alxAdcFake_voltage_V[ALX_ADC_FAKE_NUM_OF_CH][ALX_ADC_FAKE_SEQ_LEN];
 static uint32_t alxAdcFake_seqLen[ALX_ADC_FAKE_NUM_OF_CH];
 static uint32_t alxAdcFake_seqIndex[ALX_ADC_FAKE_NUM_OF_CH];
 static uint32_t alxAdcFake_readCount[ALX_ADC_FAKE_NUM_OF_CH];
+static int32_t alxAdcFake_temp_degC[ALX_ADC_FAKE_NUM_OF_CH];
 static uint32_t alxAdcFake_initCount;
 static uint32_t alxAdcFake_deInitCount;
 static uint32_t alxAdcFake_used;
@@ -54,6 +55,7 @@ static uint32_t alxAdcFake_used;
 //******************************************************************************
 void AlxAdcFake_Reset(void);
 void AlxAdcFake_SetVoltage_V(const AlxAdc* me, uint32_t ch, float voltage_V);
+void AlxAdcFake_SetTemp_degC(const AlxAdc* me, int32_t temp_degC);
 void AlxAdcFake_SetVoltageSeq_V(const AlxAdc* me, uint32_t ch, const float* voltage_V, uint32_t len);
 uint32_t AlxAdcFake_ReadCount(const AlxAdc* me, uint32_t ch);
 uint32_t AlxAdcFake_InitCount(void);
@@ -92,6 +94,7 @@ void AlxAdcFake_Reset(void)
 	memset(alxAdcFake_seqLen, 0, sizeof(alxAdcFake_seqLen));
 	memset(alxAdcFake_seqIndex, 0, sizeof(alxAdcFake_seqIndex));
 	memset(alxAdcFake_readCount, 0, sizeof(alxAdcFake_readCount));
+	memset(alxAdcFake_temp_degC, 0, sizeof(alxAdcFake_temp_degC));
 	alxAdcFake_initCount = 0;
 	alxAdcFake_deInitCount = 0;
 	alxAdcFake_used = 0;
@@ -172,4 +175,14 @@ float AlxAdc_GetVoltage_V(AlxAdc* me, Alx_Ch ch)
 uint32_t AlxAdc_GetVoltage_mV(AlxAdc* me, Alx_Ch ch)
 {
 	return (uint32_t)(AlxAdc_GetVoltage_V(me, ch) * 1000.f);
+}
+
+void AlxAdcFake_SetTemp_degC(const AlxAdc* me, int32_t temp_degC)
+{
+	alxAdcFake_temp_degC[AlxAdcFake_Slot(me, UINT32_MAX)] = temp_degC;
+}
+
+int32_t AlxAdc_TempSens_GetTemp_degC(AlxAdc* me)
+{
+	return alxAdcFake_temp_degC[AlxAdcFake_Slot(me, UINT32_MAX)];
 }

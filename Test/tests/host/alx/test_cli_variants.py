@@ -76,7 +76,7 @@ def test_ALX1553_P566_a_build_with_assertions_answers_a_command(
 
 
 def test_ALX1553_P566_the_three_assert_forms_answer_identically(
-        cli_variant_lib, make_cli_variant):
+        cli_variant_lib, make_cli_variant, make_cli):
     """The assert FORM must not change what the CLI says - only what happens when one fails.
 
     RST, BKPT and TRACE differ in their handler, and all three keep the expression, so the reply
@@ -89,13 +89,13 @@ def test_ALX1553_P566_the_three_assert_forms_answer_identically(
 
     response = _ask(make_cli_variant(), b"help\r\n")
 
-    assert len(response) == 751, (
-        f"variant {name!r} answered {len(response)} bytes where the other assert forms answer 751"
-    )
+    reference = _ask(make_cli(), b"help\r\n")
+    assert response == reference, f"variant {name!r} differs from the default help response"
+    assert "get-trig" in json.loads(response)["data"]
 
 
 def test_ALX1553_P567_a_build_without_assertions_also_answers_a_command(
-        cli_variant_lib, make_cli_variant):
+        cli_variant_lib, make_cli_variant, make_cli):
     """The `off` variant, where the writes have been deleted along with the assertions.
 
     Only the configuration with no assert form is asked; the other three are P566 and skip here, so
@@ -110,7 +110,8 @@ def test_ALX1553_P567_a_build_without_assertions_also_answers_a_command(
 
     assert response, "the CLI answered nothing at all"
     assert HELP_MARK in response
-    assert len(response) == 751, "the same answer as the three forms that compile the assertion"
+    assert response == _ask(make_cli(), b"help\r\n")
+    assert "get-trig" in json.loads(response)["data"]
 
 
 def test_ALX1564_P670_every_configuration_renders_a_parameters_value(

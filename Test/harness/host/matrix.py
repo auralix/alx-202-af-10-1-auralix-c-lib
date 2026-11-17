@@ -132,7 +132,7 @@ def template_groups(text: str | None = None) -> dict[tuple[str, str], list[str]]
 
 
 # ---- the vocabulary ----------------------------------------------------------------------------
-STM32 = ["stm32f0", "stm32f1", "stm32f4", "stm32f7", "stm32g4", "stm32l0", "stm32l4", "stm32u5"]
+STM32 = ["stm32f0", "stm32f1", "stm32f4", "stm32f7", "stm32g4", "stm32l0", "stm32l4", "stm32u3", "stm32u5"]
 OTHER = ["lpc17xx", "lpc55s6x", "lpc80x", "lpc84x", "sam", "ra", "zephyr"]
 TARGET_PLATFORMS = [*STM32, *OTHER]
 # A platform's variant states the platform's switches as the platform does; its table in matrix.toml

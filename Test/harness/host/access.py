@@ -4687,6 +4687,11 @@ class FakesLib:
 
         sig("AlxAdcFake_SetVoltage_V", None, vp, u32, f32)
         sig("AlxAdcFake_SetVoltageSeq_V", None, vp, u32, pf32, u32)
+        sig("AlxAdcFake_SetTemp_degC", None, vp, i32)
+        sig("AlxAdc_TempSens_GetTemp_degC", i32, vp)
+        sig("AlxI2cFake_SetSlaveReady", None, b)
+        sig("AlxI2cFake_CallCount", u32)
+        sig("AlxI2c_Master_IsSlaveReady", i32, vp, u16, u8, u16)
         sig("AlxAdcFake_ReadCount", u32, vp, u32)
         sig("AlxAdcFake_InitCount", u32)
         sig("AlxAdcFake_DeInitCount", u32)
