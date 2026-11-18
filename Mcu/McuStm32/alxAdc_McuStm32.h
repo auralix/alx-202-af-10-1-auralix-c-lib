@@ -85,6 +85,7 @@ typedef enum
 	#if defined(ALX_STM32U3)
 	AlxAdc_Clk_McuStm32U3_AdcClk_24MHz_Hclk_48MHz,
 	AlxAdc_Clk_McuStm32U3_AdcClk_24MHz_Hclk_96MHz,
+	AlxAdc_Clk_McuStm32U3_AdcClk_12MHz_Hclk_96MHz,
 	#endif
 	#if defined(ALX_STM32U5)
 	AlxAdc_Clk_McuStm32U5_AdcClk_16MHz_Hclk_16MHz,

@@ -1103,6 +1103,7 @@ static uint32_t AlxAdc_GetClkPrescaler(AlxAdc* me)
 	#if defined(ALX_STM32U3)
 	if(me->adcClk == AlxAdc_Clk_McuStm32U3_AdcClk_24MHz_Hclk_48MHz)				return RCC_ADCDACCLK_DIV2;
 	if(me->adcClk == AlxAdc_Clk_McuStm32U3_AdcClk_24MHz_Hclk_96MHz)				return RCC_ADCDACCLK_DIV4;
+	if(me->adcClk == AlxAdc_Clk_McuStm32U3_AdcClk_12MHz_Hclk_96MHz)				return RCC_ADCDACCLK_DIV8;
 	#endif
 
 
@@ -1573,6 +1574,13 @@ static bool AlxAdc_IsClkOk(AlxAdc* me)
 			return false;
 	}
 	if(me->adcClk == AlxAdc_Clk_McuStm32U3_AdcClk_24MHz_Hclk_96MHz)
+	{
+		if(96000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Hclk_Ctor))
+			return true;
+		else
+			return false;
+	}
+	if(me->adcClk == AlxAdc_Clk_McuStm32U3_AdcClk_12MHz_Hclk_96MHz)
 	{
 		if(96000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Hclk_Ctor))
 			return true;
