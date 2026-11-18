@@ -839,6 +839,16 @@ static bool AlxI2c_IsClkOk(AlxI2c* me)
 			else
 				return false;
 		}
+		if
+		(
+			me->i2cClk == AlxI2c_Clk_McuStm32U3_I2c1_I2c2_I2cClk_400kHz_Pclk1Apb1_96MHz_tPRESC_20ns83_tSCLDEL_104ns_tSDADEL_0ns_tSCLH_1125ns_tSCLL_1125ns
+		)
+		{
+			if(96000000 == AlxClk_GetClk_Hz(me->clk, AlxClk_Clk_McuStm32_Pclk1Apb1_Ctor))
+				return true;
+			else
+				return false;
+		}
 	}
 	#endif
 

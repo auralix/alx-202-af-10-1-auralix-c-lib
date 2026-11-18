@@ -89,6 +89,7 @@ typedef enum
 	#endif
 	#if defined(ALX_STM32U3)
 	AlxI2c_Clk_McuStm32U3_I2c1_I2c2_I2cClk_400kHz_Pclk1Apb1_48MHz_tPRESC_20ns83_tSCLDEL_104ns_tSDADEL_0ns_tSCLH_1125ns_tSCLL_1125ns = 0x00403535,
+	AlxI2c_Clk_McuStm32U3_I2c1_I2c2_I2cClk_400kHz_Pclk1Apb1_96MHz_tPRESC_20ns83_tSCLDEL_104ns_tSDADEL_0ns_tSCLH_1125ns_tSCLL_1125ns = 0x10403535,
 	#endif
 	#if defined(ALX_STM32U5)
 	AlxI2c_Clk_McuStm32U5_I2c1_I2c2_I2c4_I2cClk_100kHz_RiseTime_0ns_FallTime_0ns_Pclk1Apb1_16MHz = 0x00303D5B,

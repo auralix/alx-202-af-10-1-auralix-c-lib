@@ -91,6 +91,7 @@ static void AlxClk_Ctor_McuStm32L4_Sysclk_120MHz_Pclk1Apb1_120MHz_Pclk2Apb2_120M
 #if defined(ALX_STM32U3)
 static void AlxClk_Ctor_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default(AlxClk* me);
 static void AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz_Smps(AlxClk* me);
+static void AlxClk_Ctor_McuStm32U3_Sysclk_96MHz_Pclk1Apb1_96MHz_Pclk2Apb2_96MHz_Pclk3Apb3_96MHz_Msi_96MHz_Smps(AlxClk* me);
 #endif
 #if defined(ALX_STM32U5)
 static void AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default(AlxClk* me);
@@ -177,6 +178,7 @@ ALX_WEAK void AlxClk_Ctor
 	#if defined(ALX_STM32U3)
 	if		(me->config == AlxClk_Config_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default)					{ AlxClk_Ctor_McuStm32U3_Sysclk_12MHz_Pclk1Apb1_12MHz_Pclk2Apb2_12MHz_Pclk3Apb3_12MHz_Msi_12MHz_Default(me);	me->backupHsiEnable = false;	}
 	else if	(me->config == AlxClk_Config_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz_Smps)					{ AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_Pclk3Apb3_48MHz_Msi_48MHz_Smps(me);		me->backupHsiEnable = false;	}
+	else if	(me->config == AlxClk_Config_McuStm32U3_Sysclk_96MHz_Pclk1Apb1_96MHz_Pclk2Apb2_96MHz_Pclk3Apb3_96MHz_Msi_96MHz_Smps)					{ AlxClk_Ctor_McuStm32U3_Sysclk_96MHz_Pclk1Apb1_96MHz_Pclk2Apb2_96MHz_Pclk3Apb3_96MHz_Msi_96MHz_Smps(me);		me->backupHsiEnable = false;	}
 	#endif
 	#if defined(ALX_STM32U5)
 	if		(me->config == AlxClk_Config_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default)						{ AlxClk_Ctor_McuStm32U5_Sysclk_4MHz_Pclk1Apb1_4MHz_Pclk2Apb2_4MHz_Pclk3Apb3_4MHz_Msi_4MHz_Default(me);			me->backupHsiEnable = false;	}
@@ -1773,6 +1775,53 @@ static void AlxClk_Ctor_McuStm32U3_Sysclk_48MHz_Pclk1Apb1_48MHz_Pclk2Apb2_48MHz_
 	me->pclk3Apb3_Ctor = 48000000;
 	me->pclk1Apb1Tim_Ctor = 48000000;
 	me->pclk2Apb2Tim_Ctor = 48000000;
+	me->mainPllInputClk_Ctor = 0;
+	me->pllP_Ctor = 0;
+	me->pllQ_Ctor = 0;
+}
+static void AlxClk_Ctor_McuStm32U3_Sysclk_96MHz_Pclk1Apb1_96MHz_Pclk2Apb2_96MHz_Pclk3Apb3_96MHz_Msi_96MHz_Smps(AlxClk* me)
+{
+	// Set flash latency
+	me->flashLatency = FLASH_LATENCY_2;
+
+	// Set power
+	me->pwrRegVoltageScale = PWR_REGULATOR_VOLTAGE_SCALE1;
+	me->isPwrRegSmps = true;
+	me->isPwrRegEpodBooster = true;
+
+	// Set OSC
+	me->iosc.OscillatorType = RCC_OSCILLATORTYPE_MSIS | RCC_OSCILLATORTYPE_MSIK;
+	me->iosc.HSEState = RCC_HSE_OFF;
+	me->iosc.HSIState = RCC_HSI_OFF;
+	me->iosc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	me->iosc.HSI48State = RCC_HSI48_OFF;
+	me->iosc.LSEState = RCC_LSE_OFF;
+	me->iosc.LSIState = RCC_LSI_OFF;
+	me->iosc.LSIDiv = RCC_LSI_DIV1;
+	me->iosc.MSISState = RCC_MSI_ON;
+	me->iosc.MSISSource = RCC_MSI_RC0;
+	me->iosc.MSISDiv = RCC_MSI_DIV1;
+	me->iosc.MSIKState = RCC_MSI_ON;
+	me->iosc.MSIKSource = RCC_MSI_RC0;
+	me->iosc.MSIKDiv = RCC_MSI_DIV1;
+
+	// Set CLK
+	me->iclk.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_PCLK3;
+	me->iclk.SYSCLKSource = RCC_SYSCLKSOURCE_MSIS;
+	me->iclk.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	me->iclk.APB1CLKDivider = RCC_HCLK_DIV1;
+	me->iclk.APB2CLKDivider = RCC_HCLK_DIV1;
+	me->iclk.APB3CLKDivider = RCC_HCLK_DIV1;
+
+	// Set expected CLK
+	me->systemCoreClock_Ctor = 96000000;
+	me->sysclk_Ctor = 96000000;
+	me->hclk_Ctor = 96000000;
+	me->pclk1Apb1_Ctor = 96000000;
+	me->pclk2Apb2_Ctor = 96000000;
+	me->pclk3Apb3_Ctor = 96000000;
+	me->pclk1Apb1Tim_Ctor = 96000000;
+	me->pclk2Apb2Tim_Ctor = 96000000;
 	me->mainPllInputClk_Ctor = 0;
 	me->pllP_Ctor = 0;
 	me->pllQ_Ctor = 0;
