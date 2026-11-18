@@ -250,7 +250,9 @@ void AlxCli_Handle(AlxCli* me)
 			//------------------------------------------------------------------------------
 			if (strcmp(me->buff, "id") == 0 && me->alxId != NULL)
 			{
+				//------------------------------------------------------------------------------
 				// Get
+				//------------------------------------------------------------------------------
 				bool fwIsBootUsed = AlxId_GetFwIsBootUsed(me->alxId);
 
 				const char* fwArtf = AlxId_GetFwArtf(me->alxId);
@@ -274,183 +276,185 @@ void AlxCli_Handle(AlxCli* me)
 				uint8_t hwId = AlxId_GetHwId(me->alxId);
 				const char* hwMcuUniqueIdStr = AlxId_GetHwMcuUniqueIdStr(me->alxId);
 
+
+				//------------------------------------------------------------------------------
 				// Prepare response
+				//------------------------------------------------------------------------------
 				if (AlxParamItem_GetValBool(me->PRETTY_JSON_EN))
 				{
+					//------------------------------------------------------------------------------
+					// JSON Header
+					//------------------------------------------------------------------------------
+					status = AlxSerialPort_WriteStr
+					(
+						me->alxSerialPort,
+						"{\r\n"
+						"    \"status\":\"success\",\r\n"
+						"    \"data\":\r\n"
+						"    {\r\n"
+					);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+
+
+					//------------------------------------------------------------------------------
+					// JSON Body
+					//------------------------------------------------------------------------------
+					(void)sprintf(me->buff, "        \"fwArtf\":\"%s\",\r\n", fwArtf);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "        \"fwName\":\"%s\",\r\n", fwName);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "        \"fwVerStr\":\"%s\",\r\n", fwVerStr);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "        \"fwBinStr\":\"%s\",\r\n", fwBinStr);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+
 					if (fwIsBootUsed)
 					{
-						(void)sprintf
-						(
-							me->buff,
-							"{\r\n"
-							"    \"status\":\"success\",\r\n"
-							"    \"data\":\r\n"
-							"    {\r\n"
-							"        \"fwArtf\":\"%s\",\r\n"
-							"        \"fwName\":\"%s\",\r\n"
-							"        \"fwVerStr\":\"%s\",\r\n"
-							"        \"fwBinStr\":\"%s\",\r\n"
-							"        \"fwBootArtf\":\"%s\",\r\n"
-							"        \"fwBootName\":\"%s\",\r\n"
-							"        \"fwBootVerStr\":\"%s\",\r\n"
-							"        \"fwBootBinStr\":\"%s\",\r\n"
-							"        \"hwPcbArtf\":\"%s\",\r\n"
-							"        \"hwPcbName\":\"%s\",\r\n"
-							"        \"hwPcbVerStr\":\"%s\",\r\n"
-							"        \"hwBomArtf\":\"%s\",\r\n"
-							"        \"hwBomName\":\"%s\",\r\n"
-							"        \"hwBomVerStr\":\"%s\",\r\n"
-							"        \"hwId\":%" PRIu32 ",\r\n"
-							"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
-							"    }\r\n"
-							"}\r\n",
-							fwArtf,
-							fwName,
-							fwVerStr,
-							fwBinStr,
-							fwBootArtf,
-							fwBootName,
-							fwBootVerStr,
-							fwBootBinStr,
-							hwPcbArtf,
-							hwPcbName,
-							hwPcbVerStr,
-							hwBomArtf,
-							hwBomName,
-							hwBomVerStr,
-							(uint32_t)hwId,
-							hwMcuUniqueIdStr
-						);
+						(void)sprintf(me->buff, "        \"fwBootArtf\":\"%s\",\r\n", fwBootArtf);
+						status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+						ALX_CLI_ASSERT(status == Alx_Ok);
+						(void)sprintf(me->buff, "        \"fwBootName\":\"%s\",\r\n", fwBootName);
+						status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+						ALX_CLI_ASSERT(status == Alx_Ok);
+						(void)sprintf(me->buff, "        \"fwBootVerStr\":\"%s\",\r\n", fwBootVerStr);
+						status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+						ALX_CLI_ASSERT(status == Alx_Ok);
+						(void)sprintf(me->buff, "        \"fwBootBinStr\":\"%s\",\r\n", fwBootBinStr);
+						status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+						ALX_CLI_ASSERT(status == Alx_Ok);
 					}
-					else
-					{
-						(void)sprintf
-						(
-							me->buff,
-							"{\r\n"
-							"    \"status\":\"success\",\r\n"
-							"    \"data\":\r\n"
-							"    {\r\n"
-							"        \"fwArtf\":\"%s\",\r\n"
-							"        \"fwName\":\"%s\",\r\n"
-							"        \"fwVerStr\":\"%s\",\r\n"
-							"        \"fwBinStr\":\"%s\",\r\n"
-							"        \"hwPcbArtf\":\"%s\",\r\n"
-							"        \"hwPcbName\":\"%s\",\r\n"
-							"        \"hwPcbVerStr\":\"%s\",\r\n"
-							"        \"hwBomArtf\":\"%s\",\r\n"
-							"        \"hwBomName\":\"%s\",\r\n"
-							"        \"hwBomVerStr\":\"%s\",\r\n"
-							"        \"hwId\":%" PRIu32 ",\r\n"
-							"        \"hwMcuUniqueIdStr\":\"%s\"\r\n"
-							"    }\r\n"
-							"}\r\n",
-							fwArtf,
-							fwName,
-							fwVerStr,
-							fwBinStr,
-							hwPcbArtf,
-							hwPcbName,
-							hwPcbVerStr,
-							hwBomArtf,
-							hwBomName,
-							hwBomVerStr,
-							(uint32_t)hwId,
-							hwMcuUniqueIdStr
-						);
-					}
+
+					(void)sprintf(me->buff, "        \"hwPcbArtf\":\"%s\",\r\n", hwPcbArtf);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "        \"hwPcbName\":\"%s\",\r\n", hwPcbName);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "        \"hwPcbVerStr\":\"%s\",\r\n", hwPcbVerStr);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "        \"hwBomArtf\":\"%s\",\r\n", hwBomArtf);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "        \"hwBomName\":\"%s\",\r\n", hwBomName);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "        \"hwBomVerStr\":\"%s\",\r\n", hwBomVerStr);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "        \"hwId\":%" PRIu32 ",\r\n", (uint32_t)hwId);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "        \"hwMcuUniqueIdStr\":\"%s\"\r\n", hwMcuUniqueIdStr);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+
+
+					//------------------------------------------------------------------------------
+					// JSON Footer
+					//------------------------------------------------------------------------------
+					status = AlxSerialPort_WriteStr
+					(
+						me->alxSerialPort,
+						"    }\r\n"
+						"}\r\n"
+					);
+					ALX_CLI_ASSERT(status == Alx_Ok);
 				}
 				else
 				{
+					//------------------------------------------------------------------------------
+					// JSON Header
+					//------------------------------------------------------------------------------
+					status = AlxSerialPort_WriteStr
+					(
+						me->alxSerialPort,
+						"{"
+							"\"status\":\"success\","
+							"\"data\":"
+							"{"
+					);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+
+
+					//------------------------------------------------------------------------------
+					// JSON Body
+					//------------------------------------------------------------------------------
+					(void)sprintf(me->buff, "\"fwArtf\":\"%s\",", fwArtf);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "\"fwName\":\"%s\",", fwName);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "\"fwVerStr\":\"%s\",", fwVerStr);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "\"fwBinStr\":\"%s\",", fwBinStr);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+
 					if (fwIsBootUsed)
 					{
-						(void)sprintf
-						(
-							me->buff,
-							"{"
-								"\"status\":\"success\","
-								"\"data\":"
-								"{"
-									"\"fwArtf\":\"%s\","
-									"\"fwName\":\"%s\","
-									"\"fwVerStr\":\"%s\","
-									"\"fwBinStr\":\"%s\","
-									"\"fwBootArtf\":\"%s\","
-									"\"fwBootName\":\"%s\","
-									"\"fwBootVerStr\":\"%s\","
-									"\"fwBootBinStr\":\"%s\","
-									"\"hwPcbArtf\":\"%s\","
-									"\"hwPcbName\":\"%s\","
-									"\"hwPcbVerStr\":\"%s\","
-									"\"hwBomArtf\":\"%s\","
-									"\"hwBomName\":\"%s\","
-									"\"hwBomVerStr\":\"%s\","
-									"\"hwId\":%" PRIu32 ","
-									"\"hwMcuUniqueIdStr\":\"%s\""
-								"}"
-							"}\r\n",
-							fwArtf,
-							fwName,
-							fwVerStr,
-							fwBinStr,
-							fwBootArtf,
-							fwBootName,
-							fwBootVerStr,
-							fwBootBinStr,
-							hwPcbArtf,
-							hwPcbName,
-							hwPcbVerStr,
-							hwBomArtf,
-							hwBomName,
-							hwBomVerStr,
-							(uint32_t)hwId,
-							hwMcuUniqueIdStr
-						);
+						(void)sprintf(me->buff, "\"fwBootArtf\":\"%s\",", fwBootArtf);
+						status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+						ALX_CLI_ASSERT(status == Alx_Ok);
+						(void)sprintf(me->buff, "\"fwBootName\":\"%s\",", fwBootName);
+						status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+						ALX_CLI_ASSERT(status == Alx_Ok);
+						(void)sprintf(me->buff, "\"fwBootVerStr\":\"%s\",", fwBootVerStr);
+						status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+						ALX_CLI_ASSERT(status == Alx_Ok);
+						(void)sprintf(me->buff, "\"fwBootBinStr\":\"%s\",", fwBootBinStr);
+						status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+						ALX_CLI_ASSERT(status == Alx_Ok);
 					}
-					else
-					{
-						(void)sprintf
-						(
-							me->buff,
-							"{"
-								"\"status\":\"success\","
-								"\"data\":"
-								"{"
-									"\"fwArtf\":\"%s\","
-									"\"fwName\":\"%s\","
-									"\"fwVerStr\":\"%s\","
-									"\"fwBinStr\":\"%s\","
-									"\"hwPcbArtf\":\"%s\","
-									"\"hwPcbName\":\"%s\","
-									"\"hwPcbVerStr\":\"%s\","
-									"\"hwBomArtf\":\"%s\","
-									"\"hwBomName\":\"%s\","
-									"\"hwBomVerStr\":\"%s\","
-									"\"hwId\":%" PRIu32 ","
-									"\"hwMcuUniqueIdStr\":\"%s\""
-								"}"
-							"}\r\n",
-							fwArtf,
-							fwName,
-							fwVerStr,
-							fwBinStr,
-							hwPcbArtf,
-							hwPcbName,
-							hwPcbVerStr,
-							hwBomArtf,
-							hwBomName,
-							hwBomVerStr,
-							(uint32_t)hwId,
-							hwMcuUniqueIdStr
-						);
-					}
+
+					(void)sprintf(me->buff, "\"hwPcbArtf\":\"%s\",", hwPcbArtf);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "\"hwPcbName\":\"%s\",", hwPcbName);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "\"hwPcbVerStr\":\"%s\",", hwPcbVerStr);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "\"hwBomArtf\":\"%s\",", hwBomArtf);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "\"hwBomName\":\"%s\",", hwBomName);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "\"hwBomVerStr\":\"%s\",", hwBomVerStr);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "\"hwId\":%" PRIu32 ",", (uint32_t)hwId);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+					(void)sprintf(me->buff, "\"hwMcuUniqueIdStr\":\"%s\"", hwMcuUniqueIdStr);
+					status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
+					ALX_CLI_ASSERT(status == Alx_Ok);
+
+
+					//------------------------------------------------------------------------------
+					// JSON Footer
+					//------------------------------------------------------------------------------
+					status = AlxSerialPort_WriteStr
+					(
+						me->alxSerialPort,
+							"}"
+						"}\r\n"
+					);
+					ALX_CLI_ASSERT(status == Alx_Ok);
 				}
 
-				// Send response
-				status = AlxSerialPort_WriteStr(me->alxSerialPort, me->buff);
-				ALX_CLI_ASSERT(status == Alx_Ok);
 
+				//------------------------------------------------------------------------------
 				// Break
+				//------------------------------------------------------------------------------
 				break;
 			}
 

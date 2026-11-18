@@ -27,6 +27,7 @@ void NVIC_SystemReset(void);
 void AlxCli_ClearFlag_Callback(AlxCli* me, AlxParamItem* paramItem);
 
 #define ALX_CLI_TEST_BUFF_LEN 1024
+#define ALX_CLI_TEST_ID_BUFF_LEN 256
 #define ALX_CLI_TEST_STR_VAL_BUFF_LEN 600	// Str param value buffer -> value <= 599 chars (longer than any stack array the old parser had)
 
 // Param table under test: the product's bool + one Str + one Uint8, so every value kind the CLI formats is present,
@@ -283,7 +284,10 @@ AlxCliTest_Ctx* AlxCliTest_New(void)
 }
 AlxCliTest_Ctx* AlxCliTest_NewWithId(void)
 {
-	return AlxCliTest_NewWith(&alxCliTest_idStandIn);
+	AlxCliTest_Ctx* ctx = AlxCliTest_NewWith(&alxCliTest_idStandIn);
+	ctx->cli.buffLen = ALX_CLI_TEST_ID_BUFF_LEN;
+	memset(&ctx->buff[ALX_CLI_TEST_ID_BUFF_LEN], 0xA5, sizeof(ctx->buff) - ALX_CLI_TEST_ID_BUFF_LEN);
+	return ctx;
 }
 void AlxCliTest_PrepareEvent(AlxCliTest_Ctx* ctx, const uint8_t* data, uint32_t len)
 {
@@ -310,6 +314,10 @@ void AlxCliTest_Delete(AlxCliTest_Ctx* ctx)
 void AlxCliTest_Handle(AlxCliTest_Ctx* ctx)
 {
 	AlxCli_Handle(&ctx->cli);
+	for (uint32_t i = ctx->cli.buffLen; i < sizeof(ctx->buff); i++)
+	{
+		ALX_CLI_ASSERT((uint8_t)ctx->buff[i] == 0xA5);
+	}
 }
 
 AlxSerialPort* AlxCliTest_Port(AlxCliTest_Ctx* ctx)

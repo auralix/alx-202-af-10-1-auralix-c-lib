@@ -436,7 +436,7 @@ SUCCESS, ERR_CMD, ERR_ARG, ERR_CRC, ERR_TIMEOUT = range(5)
 
 @pytest.mark.parametrize("pretty", [False, True])
 @pytest.mark.parametrize("boot", [False, True])
-def test_ALX1564_P737_the_id_command_renders_the_identity_with_or_without_a_bootloader(make_cli, pretty, boot):
+def test_ALX1564_P737_the_id_command_streams_with_256_byte_buffer_with_or_without_a_bootloader(make_cli, pretty, boot):
     """Every field of the identity in one JSON object, the bootloader's four only when there is one."""
     cli = make_cli(with_id=True)
     cli.boot_used(boot)
